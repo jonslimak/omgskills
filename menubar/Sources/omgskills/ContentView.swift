@@ -143,6 +143,17 @@ struct ContentView: View {
             .menuIndicator(.hidden)
             .fixedSize()
             .help("Sort results")
+
+            Button {
+                store.refresh()
+                selectedId = results.first?.id
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Rescan installed skills and reload index")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

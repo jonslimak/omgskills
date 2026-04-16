@@ -15,6 +15,10 @@ final class SkillsStore: ObservableObject {
         loadInstalled()
     }
 
+    func refresh() {
+        load()
+    }
+
     private func loadAvailable() {
         guard let url = Bundle.main.url(forResource: "skills", withExtension: "json") else {
             loadError = "skills.json not found in app bundle"

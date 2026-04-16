@@ -1,0 +1,61 @@
+name: scrape
+
+# Setup:
+#   Create a fine-grained PAT with public-repo read access.
+#   Add it as a repo secret named SCRAPER_GITHUB_TOKEN.
+#   (Settings → Secrets and variables → Actions → New repository secret)
+#
+# Schedule: nightly at 03:00 UTC. Manual trigger available via
+# Actions tab → scrape → "Run workflow".
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: index/package-lock.json
+
+      - name: Install deps
+        working-directory: index
+        run: npm ci
+
+      - name: Run scraper
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape
+
+      - name: Commit if changed
+        run: |
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- index/skills.json; then
+            echo "No changes to skills.json"
+          else
+            git add index/skills.json
+            git commit -m "scrape: update skills.json ($(date -u +%Y-%m-%d))"
+            git push
+          fi
