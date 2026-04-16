@@ -1,0 +1,15 @@
+[
+  {
+    "id": "AfeiFun/appstore-connect",
+    "name": "appstore-connect",
+    "description": "Manage Apple App Store Connect via API — read and update app metadata, screenshots, review info, and auto-fill Connect metadata by analyzing your iOS codebase.",
+    "github_url": "https://github.com/AfeiFun/appstore-connect",
+    "install_cmd": "git clone https://github.com/AfeiFun/appstore-connect ~/.claude/skills/appstore-connect",
+    "author_handle": "AfeiFun",
+    "tags": ["claude-code-skill", "ios", "app-store"],
+    "readme_snippet": "Claude Code skill for managing Apple App Store Connect via API. Zero-dependency CLI with JWT auth, metadata management, screenshot upload, and iOS project analysis.",
+    "stars": 5,
+    "last_updated": "2026-03-20T08:32:47Z",
+    "first_seen": "2026-04-16"
+  }
+]
