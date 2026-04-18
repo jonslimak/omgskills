@@ -3,7 +3,7 @@ import AppKit
 
 enum Source: String, CaseIterable, Identifiable {
     case installed = "Installed"
-    case available = "Available"
+    case available = "Discover"
     var id: String { rawValue }
 }
 
@@ -26,7 +26,7 @@ enum SortKey: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
-        case .stars: return "star.fill"
+        case .stars: return "star"
         case .lastUpdated: return "clock.arrow.circlepath"
         case .firstSeen: return "sparkles"
         case .name: return "textformat"
@@ -40,7 +40,9 @@ struct ContentView: View {
     @State private var selectedId: String?
     @State private var keyMonitor: Any?
     @State private var sortKey: SortKey = .stars
-    @State private var source: Source = .installed
+    @State private var source: Source = .available
+    @State private var showDetail = false
+    @State private var readmeHeight: CGFloat = 200
     @FocusState private var searchFocused: Bool
 
     private var baseSkills: [Skill] {
@@ -49,15 +51,13 @@ struct ContentView: View {
 
     private var results: [Skill] {
         let base: [Skill]
-        if query.isEmpty {
+        let terms = query.lowercased().split(separator: " ").map(String.init)
+        if terms.isEmpty {
             base = baseSkills
         } else {
-            let q = query.lowercased()
             base = baseSkills.filter { s in
-                s.name.lowercased().contains(q)
-                    || s.description.lowercased().contains(q)
-                    || s.authorHandle.lowercased().contains(q)
-                    || s.tags.contains { $0.lowercased().contains(q) }
+                let searchable = "\(s.name) \(s.description) \(s.authorHandle) \(s.tags.joined(separator: " "))".lowercased()
+                return terms.allSatisfy { searchable.contains($0) }
             }
         }
         switch sortKey {
@@ -79,17 +79,21 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            sourcePicker
+            toolbar
             searchField
             Divider()
-            content
+            masterDetail
         }
-        .frame(width: 400, height: 500)
+        .frame(width: showDetail ? 750 : 400, height: 675)
+        .onChange(of: showDetail) { _, newValue in
+            NotificationCenter.default.post(
+                name: .detailToggled,
+                object: nil,
+                userInfo: ["showDetail": newValue]
+            )
+        }
+        .background(.background)
         .onAppear {
-            // If nothing is installed locally, default to Available
-            if store.installedSkills.isEmpty && !store.availableSkills.isEmpty {
-                source = .available
-            }
             if selectedId == nil { selectedId = results.first?.id }
             addKeyMonitor()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -97,74 +101,85 @@ struct ContentView: View {
             }
         }
         .onDisappear { removeKeyMonitor() }
+        .onReceive(NotificationCenter.default.publisher(for: .popoverDidOpen)) { _ in
+            store.refresh()
+            query = ""
+            showDetail = false
+            selectedId = results.first?.id
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                searchFocused = true
+            }
+        }
         .onChange(of: query)    { _, _ in selectedId = results.first?.id }
         .onChange(of: sortKey)  { _, _ in selectedId = results.first?.id }
         .onChange(of: source)   { _, _ in
-            selectedId = results.first?.id
             searchFocused = true
         }
     }
 
-    private var sourcePicker: some View {
-        Picker("Source", selection: $source) {
-            ForEach(Source.allCases) { s in
-                Text("\(s.rawValue) (\(countFor(s)))").tag(s)
-            }
-        }
-        .pickerStyle(.segmented)
-        .labelsHidden()
-        .padding(.horizontal, 10)
-        .padding(.top, 10)
-    }
+    // MARK: - Header
 
-    private func countFor(_ s: Source) -> Int {
-        s == .installed ? store.installedSkills.count : store.availableSkills.count
-    }
-
-    private var searchField: some View {
-        HStack(spacing: 10) {
-            TextField(source == .installed ? "Search installed skills…" : "Search Claude skills…", text: $query)
-                .textFieldStyle(.plain)
-                .font(.title3)
-                .focused($searchFocused)
+    private var toolbar: some View {
+        HStack(spacing: 8) {
+            Spacer()
 
             Menu {
-                Picker("Sort by", selection: $sortKey) {
-                    ForEach(SortKey.allCases) { key in
-                        Label(key.label, systemImage: key.icon).tag(key)
+                ForEach(SortKey.allCases) { key in
+                    Button {
+                        sortKey = key
+                    } label: {
+                        Label(key.label, systemImage: key.icon)
                     }
                 }
             } label: {
-                Image(systemName: "arrow.up.arrow.down")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
+                Image(systemName: sortKey.icon)
+                    .font(.system(size: 9))
+                    .foregroundStyle(.gray)
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
             .fixedSize()
-            .help("Sort results")
+            .help("Sort: \(sortKey.label)")
 
-            Button {
-                store.refresh()
-                selectedId = results.first?.id
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
+            Picker("Source", selection: $source) {
+                Image(systemName: "laptopcomputer").tag(Source.installed)
+                Image(systemName: "globe").tag(Source.available)
             }
-            .buttonStyle(.plain)
-            .help("Rescan installed skills and reload index")
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(width: 80)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 10)
+        .padding(.top, 14)
+        .padding(.bottom, 6)
     }
 
+    private var searchField: some View {
+        TextField(source == .available ? "Search for skills on Github..." : "Search your device...", text: $query)
+            .textFieldStyle(.plain)
+            .font(.title3)
+            .focused($searchFocused)
+            .padding(.horizontal, 14)
+            .padding(.top, 8)
+            .padding(.bottom, 12)
+    }
+
+    // MARK: - Master-Detail
+
     @ViewBuilder
-    private var content: some View {
+    private var masterDetail: some View {
         if let err = store.loadError, source == .available {
             errorView(err)
         } else if results.isEmpty {
             emptyView
+        } else if showDetail {
+            HStack(spacing: 0) {
+                skillsList
+                    .frame(width: 320)
+                Divider()
+                detailPane
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         } else {
             skillsList
         }
@@ -211,6 +226,8 @@ struct ContentView: View {
         return "No matches"
     }
 
+    // MARK: - List
+
     private var skillsList: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -219,18 +236,205 @@ struct ContentView: View {
                         SkillRow(skill: skill, selected: skill.id == selectedId, source: source)
                             .id(skill.id)
                             .contentShape(Rectangle())
-                            .onTapGesture { selectedId = skill.id }
+                            .onTapGesture {
+                                selectedId = skill.id
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    showDetail = true
+                                }
+                            }
                     }
                 }
                 .padding(.vertical, 4)
             }
             .onChange(of: selectedId) { _, newId in
+                readmeHeight = 200
                 if let newId {
                     withAnimation(.easeOut(duration: 0.08)) {
                         proxy.scrollTo(newId, anchor: .center)
                     }
                 }
             }
+        }
+    }
+
+    // MARK: - Detail Pane
+
+    @ViewBuilder
+    private var detailPane: some View {
+        if let skill = selectedSkill {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Close button
+                    HStack {
+                        Spacer()
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.15)) { showDetail = false }
+                        } label: {
+                            HStack(spacing: 3) {
+                                Image(systemName: "chevron.left")
+                                Text("Close")
+                            }
+                            .font(.caption)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.mini)
+                    }
+
+                    // Name + author
+                    VStack(alignment: .leading, spacing: 4) {
+                        if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
+                            Link(skill.name, destination: url)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                        } else {
+                            Text(skill.name)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                        }
+                        if !skill.authorHandle.isEmpty {
+                            Text("by @\(skill.authorHandle)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    // Tags
+                    if !skill.tags.isEmpty {
+                        FlowLayout(spacing: 6) {
+                            ForEach(skill.tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.caption)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Capsule().fill(.quaternary))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    // Stats
+                    if source == .available {
+                        HStack(spacing: 16) {
+                            Label("★ \(skill.stars)", systemImage: "star")
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                            Label(formatDate(skill.lastUpdated), systemImage: "clock")
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else if let origin = skill.origin {
+                        HStack(spacing: 8) {
+                            Text(origin)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(Capsule().fill(originColor(origin).opacity(0.18)))
+                                .foregroundStyle(originColor(origin))
+                        }
+                    }
+
+                    Divider()
+
+                    // Full description
+                    Text((try? AttributedString(markdown: skill.description, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(skill.description))
+                        .font(.body)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .textSelection(.enabled)
+
+                    // Readme snippet
+                    if let snippet = skill.readmeSnippet, !snippet.isEmpty {
+                        Divider()
+                        Text("README")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.tertiary)
+                        ReadmeWebView(markdown: snippet, height: $readmeHeight)
+                            .frame(height: readmeHeight)
+                    }
+
+                    Divider()
+
+                    // Action buttons
+                    detailActions(skill)
+                }
+                .padding(20)
+            }
+        } else {
+            VStack(spacing: 8) {
+                Image(systemName: "sidebar.right")
+                    .font(.largeTitle)
+                    .foregroundStyle(.quaternary)
+                Text("Select a skill")
+                    .font(.callout)
+                    .foregroundStyle(.tertiary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    @ViewBuilder
+    private func detailActions(_ skill: Skill) -> some View {
+        if source == .installed {
+            HStack(spacing: 10) {
+                Button {
+                    NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: skill.installCmd)])
+                } label: {
+                    Label("Open in Finder", systemImage: "folder")
+                }
+                Button {
+                    let url = URL(fileURLWithPath: skill.installCmd).appendingPathComponent("SKILL.md")
+                    NSWorkspace.shared.open(url)
+                } label: {
+                    Label("Open SKILL.md", systemImage: "doc.text")
+                }
+                if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
+                    Button {
+                        NSWorkspace.shared.open(url)
+                    } label: {
+                        Label("GitHub", systemImage: "arrow.up.right")
+                    }
+                }
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        } else {
+            HStack(spacing: 10) {
+                Button {
+                    setPasteboard(skill.installCmd)
+                } label: {
+                    Label("Copy Install", systemImage: "doc.on.clipboard")
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+
+                if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
+                    Button {
+                        NSWorkspace.shared.open(url)
+                    } label: {
+                        Label("GitHub", systemImage: "arrow.up.right")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+            }
+        }
+    }
+
+    private func formatDate(_ iso: String) -> String {
+        let df = ISO8601DateFormatter()
+        guard let date = df.date(from: iso) else { return String(iso.prefix(10)) }
+        let out = DateFormatter()
+        out.dateStyle = .medium
+        return out.string(from: date)
+    }
+
+    private func originColor(_ origin: String) -> Color {
+        switch origin {
+        case "Claude": return .blue
+        case "Codex":  return .green
+        case "Agents": return .purple
+        default:       return .secondary
         }
     }
 
@@ -268,19 +472,19 @@ struct ContentView: View {
         case 47 where cmd:
             source == .installed ? copyPath() : copyGithubURL()
             return nil
-        case 53: closePopover(); return nil
+        case 53:
+            if showDetail {
+                withAnimation(.easeInOut(duration: 0.15)) { showDetail = false }
+            } else {
+                closePopover()
+            }
+            return nil
         default: return event
         }
     }
 
     private enum InstallTarget {
         case claude, codex
-        var dir: String {
-            switch self {
-            case .claude: return "~/.claude/skills"
-            case .codex:  return "~/.codex/skills"
-            }
-        }
     }
 
     private func moveSelection(by delta: Int) {
@@ -290,7 +494,7 @@ struct ContentView: View {
         selectedId = results[nextIdx].id
     }
 
-    // MARK: - Available actions
+    // MARK: - Actions
 
     private func copyInstall(target: InstallTarget) {
         guard let skill = selectedSkill else { return }
@@ -299,7 +503,6 @@ struct ContentView: View {
         case .claude:
             cmd = skill.installCmd
         case .codex:
-            // Scraper emits `git clone {url} ~/.claude/skills/{name}`; rewrite for Codex.
             cmd = skill.installCmd.replacingOccurrences(of: "~/.claude/skills", with: "~/.codex/skills")
         }
         setPasteboard(cmd)
@@ -317,8 +520,6 @@ struct ContentView: View {
         setPasteboard(skill.githubUrl)
         closePopover()
     }
-
-    // MARK: - Installed actions
 
     private func openInFinder() {
         guard let skill = selectedSkill else { return }
@@ -349,50 +550,42 @@ struct ContentView: View {
     }
 }
 
+// MARK: - Skill Row
+
 struct SkillRow: View {
     let skill: Skill
     let selected: Bool
     let source: Source
 
     var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
-                    Text(skill.name)
-                        .font(.headline)
-                        .lineLimit(1)
-                    if let firstTag = skill.tags.first {
-                        Text(firstTag)
-                            .font(.caption2)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 1)
-                            .background(Capsule().fill(.quaternary))
-                            .foregroundStyle(.secondary)
-                    }
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
+                Text(skill.name)
+                    .font(.headline)
+                    .lineLimit(1)
+                Spacer(minLength: 4)
+                if source == .available {
+                    Text("★ \(skill.stars)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                } else if let origin = skill.origin {
+                    Text(origin)
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(originColor(origin).opacity(0.18)))
+                        .foregroundStyle(originColor(origin))
                 }
-                Text(skill.description)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
             }
-            Spacer(minLength: 8)
-            if source == .available {
-                Text("★ \(skill.stars)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            } else if let origin = skill.origin {
-                Text(origin)
-                    .font(.caption2)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Capsule().fill(originColor(origin).opacity(0.18)))
-                    .foregroundStyle(originColor(origin))
-            }
+            Text(skill.description)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(selected ? Color.accentColor.opacity(0.18) : .clear)
     }
@@ -404,5 +597,52 @@ struct SkillRow: View {
         case "Agents": return .purple
         default:       return .secondary
         }
+    }
+}
+
+// MARK: - Flow Layout (horizontal wrapping for tags)
+
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 6
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let rows = computeRows(proposal: proposal, subviews: subviews)
+        var height: CGFloat = 0
+        for (i, row) in rows.enumerated() {
+            let rowHeight = row.map { $0.sizeThatFits(.unspecified).height }.max() ?? 0
+            height += rowHeight + (i > 0 ? spacing : 0)
+        }
+        return CGSize(width: proposal.width ?? 0, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let rows = computeRows(proposal: proposal, subviews: subviews)
+        var y = bounds.minY
+        for row in rows {
+            let rowHeight = row.map { $0.sizeThatFits(.unspecified).height }.max() ?? 0
+            var x = bounds.minX
+            for subview in row {
+                let size = subview.sizeThatFits(.unspecified)
+                subview.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
+                x += size.width + spacing
+            }
+            y += rowHeight + spacing
+        }
+    }
+
+    private func computeRows(proposal: ProposedViewSize, subviews: Subviews) -> [[LayoutSubviews.Element]] {
+        let maxWidth = proposal.width ?? .infinity
+        var rows: [[LayoutSubviews.Element]] = [[]]
+        var currentWidth: CGFloat = 0
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if currentWidth + size.width + spacing > maxWidth && !rows[rows.count - 1].isEmpty {
+                rows.append([])
+                currentWidth = 0
+            }
+            rows[rows.count - 1].append(subview)
+            currentWidth += size.width + spacing
+        }
+        return rows
     }
 }

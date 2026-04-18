@@ -14,7 +14,8 @@ let package = Package(
             dependencies: [
                 .product(name: "KeyboardShortcuts", package: "KeyboardShortcuts"),
                 .product(name: "Yams", package: "Yams"),
-            ]
+            ],
+            resources: [.copy("Resources")]
         )
     ]
 )
