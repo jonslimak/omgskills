@@ -148,20 +148,24 @@ struct ReadmeWebView: NSViewRepresentable {
 
         func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
             if let h = message.body as? CGFloat {
-                DispatchQueue.main.async { self.height.wrappedValue = max(h, 20) }
+                Task { @MainActor in
+                    self.height.wrappedValue = max(h, 20)
+                }
             }
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             webView.evaluateJavaScript("document.documentElement.scrollHeight") { result, _ in
                 if let h = result as? CGFloat, h > 0 {
-                    DispatchQueue.main.async { self.height.wrappedValue = h }
+                    Task { @MainActor in
+                        self.height.wrappedValue = h
+                    }
                 }
             }
         }
 
         func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
-                     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+                     decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
             if action.navigationType == .linkActivated, let url = action.request.url {
                 NSWorkspace.shared.open(url)
                 decisionHandler(.cancel)

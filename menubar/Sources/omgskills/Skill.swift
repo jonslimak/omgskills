@@ -12,5 +12,6 @@ struct Skill: Codable, Identifiable, Hashable {
     let stars: Int
     let lastUpdated: String
     let firstSeen: String
+    let skillMdSha: String?
     let origin: String?  // "Claude" | "Codex" | "Agents" — set for installed skills only
 }

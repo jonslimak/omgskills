@@ -15,7 +15,7 @@ const HardenedOctokit = Octokit.plugin(throttling, retry);
 export const octokit = new HardenedOctokit({
   auth: token,
   retry: {
-    doNotRetry: ["429"], // let throttling plugin handle rate-limits
+    doNotRetry: [400, 401, 403, 404, 409, 422, 429],
   },
   throttle: {
     onRateLimit: (retryAfter, options, _octokit, retryCount) => {

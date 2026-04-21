@@ -50,25 +50,17 @@ struct ContentView: View {
     }
 
     private var results: [Skill] {
-        let base: [Skill]
-        let terms = query.lowercased().split(separator: " ").map(String.init)
-        if terms.isEmpty {
-            base = baseSkills
-        } else {
-            base = baseSkills.filter { s in
-                let searchable = "\(s.name) \(s.description) \(s.authorHandle) \(s.tags.joined(separator: " "))".lowercased()
-                return terms.allSatisfy { searchable.contains($0) }
-            }
-        }
+        let searched = store.search(query: query, in: baseSkills, usingIndex: source == .available)
         switch sortKey {
         case .stars:
-            return source == .available ? base : base.sorted {
-                $0.name.localizedCompare($1.name) == .orderedAscending
-            }
-        case .lastUpdated: return base.sorted { $0.lastUpdated > $1.lastUpdated }
-        case .firstSeen:   return base.sorted { $0.firstSeen > $1.firstSeen }
-        case .name:
-            return base.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+            // If FTS returned ranked results, preserve that order for available skills
+            if source == .available && !query.isEmpty { return searched }
+            return source == .available
+                ? searched
+                : searched.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+        case .lastUpdated: return searched.sorted { $0.lastUpdated > $1.lastUpdated }
+        case .firstSeen:   return searched.sorted { $0.firstSeen > $1.firstSeen }
+        case .name:        return searched.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
         }
     }
 
@@ -84,7 +76,7 @@ struct ContentView: View {
             Divider()
             masterDetail
         }
-        .frame(width: showDetail ? 750 : 400, height: 675)
+        .frame(width: showDetail ? 750 : 400, height: 855)
         .onChange(of: showDetail) { _, newValue in
             NotificationCenter.default.post(
                 name: .detailToggled,
@@ -121,8 +113,6 @@ struct ContentView: View {
 
     private var toolbar: some View {
         HStack(spacing: 8) {
-            Spacer()
-
             Menu {
                 ForEach(SortKey.allCases) { key in
                     Button {
@@ -134,23 +124,33 @@ struct ContentView: View {
             } label: {
                 Image(systemName: sortKey.icon)
                     .font(.system(size: 9))
-                    .foregroundStyle(.gray)
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
+            .controlSize(.small)
             .fixedSize()
+            .tint(.secondary)
             .help("Sort: \(sortKey.label)")
 
-            Picker("Source", selection: $source) {
-                Image(systemName: "laptopcomputer").tag(Source.installed)
-                Image(systemName: "globe").tag(Source.available)
+            Spacer()
+
+            HStack(spacing: 2) {
+                ForEach(Source.allCases) { s in
+                    Button { source = s } label: {
+                        Image(systemName: s == .installed ? "laptopcomputer" : "globe")
+                            .font(.system(size: 11))
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 4)
+                            .background(source == s ? Color.primary.opacity(0.1) : Color.clear)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(source == s ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
+                }
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .frame(width: 80)
         }
         .padding(.horizontal, 10)
-        .padding(.top, 14)
+        .padding(.top, 6)
         .padding(.bottom, 6)
     }
 
@@ -264,38 +264,35 @@ struct ContentView: View {
         if let skill = selectedSkill {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Close button
-                    HStack {
-                        Spacer()
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.15)) { showDetail = false }
-                        } label: {
-                            HStack(spacing: 3) {
-                                Image(systemName: "chevron.left")
-                                Text("Close")
-                            }
-                            .font(.caption)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.mini)
-                    }
-
                     // Name + author
-                    VStack(alignment: .leading, spacing: 4) {
-                        if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
-                            Link(skill.name, destination: url)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                        } else {
-                            Text(skill.name)
-                                .font(.title2)
-                                .fontWeight(.bold)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
+                                Link(skill.name, destination: url)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                            } else {
+                                Text(skill.name)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                            }
+                            if !skill.authorHandle.isEmpty {
+                                Text("by @\(skill.authorHandle)")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
-                        if !skill.authorHandle.isEmpty {
-                            Text("by @\(skill.authorHandle)")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Close", systemImage: "xmark") {
+                            withAnimation(.easeInOut(duration: 0.15)) { showDetail = false }
                         }
+                        .labelStyle(.iconOnly)
+                        .buttonStyle(.plain)
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 24, height: 24)
+                        .contentShape(Rectangle())
+                        .help("Close")
                     }
 
                     // Tags
@@ -303,10 +300,10 @@ struct ContentView: View {
                         FlowLayout(spacing: 6) {
                             ForEach(skill.tags, id: \.self) { tag in
                                 Text(tag)
-                                    .font(.caption)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 3)
-                                    .background(Capsule().fill(.quaternary))
+                                    .font(.system(size: 9))
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(Capsule().fill(.quaternary.opacity(0.5)))
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -315,7 +312,7 @@ struct ContentView: View {
                     // Stats
                     if source == .available {
                         HStack(spacing: 16) {
-                            Label("★ \(skill.stars)", systemImage: "star")
+                            Label("\(skill.stars)", systemImage: "star")
                                 .font(.callout)
                                 .foregroundStyle(.secondary)
                             Label(formatDate(skill.lastUpdated), systemImage: "clock")
@@ -334,13 +331,23 @@ struct ContentView: View {
                         }
                     }
 
+                    // Action buttons
+                    detailActions(skill)
+
                     Divider()
 
                     // Full description
-                    Text((try? AttributedString(markdown: skill.description, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(skill.description))
-                        .font(.body)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .textSelection(.enabled)
+                    VStack(alignment: .leading, spacing: 9) {
+                        ForEach(descriptionBullets(skill.description), id: \.self) { sentence in
+                            HStack(alignment: .top, spacing: 6) {
+                                Text("•").foregroundStyle(.secondary)
+                                Text(sentence)
+                            }
+                        }
+                    }
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
 
                     // Readme snippet
                     if let snippet = skill.readmeSnippet, !snippet.isEmpty {
@@ -353,10 +360,6 @@ struct ContentView: View {
                             .frame(height: readmeHeight)
                     }
 
-                    Divider()
-
-                    // Action buttons
-                    detailActions(skill)
                 }
                 .padding(20)
             }
@@ -403,9 +406,9 @@ struct ContentView: View {
                 Button {
                     setPasteboard(skill.installCmd)
                 } label: {
-                    Label("Copy Install", systemImage: "doc.on.clipboard")
+                    Label("Copy Install", systemImage: "folder")
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.bordered)
                 .controlSize(.small)
 
                 if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
@@ -419,6 +422,13 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    private func descriptionBullets(_ text: String) -> [String] {
+        text.components(separatedBy: ". ")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+            .map { $0.hasSuffix(".") ? $0 : $0 + "." }
     }
 
     private func formatDate(_ iso: String) -> String {
@@ -563,6 +573,10 @@ struct SkillRow: View {
                 Text(skill.name)
                     .font(.headline)
                     .lineLimit(1)
+                Text("@\(skill.authorHandle)")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
                 Spacer(minLength: 4)
                 if source == .available {
                     Text("★ \(skill.stars)")
@@ -580,8 +594,8 @@ struct SkillRow: View {
                 }
             }
             Text(skill.description)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary.opacity(0.7))
                 .lineLimit(2)
         }
         .padding(.horizontal, 12)

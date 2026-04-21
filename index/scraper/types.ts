@@ -10,4 +10,5 @@ export interface Skill {
   stars: number;
   last_updated: string;
   first_seen: string;
+  skill_md_sha?: string;
 }
