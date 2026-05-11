@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/omgskills-eye.png" alt="omgskills" width="426">
+  <img src="assets/omgskills-eye.png" alt="omgskills" width="240">
 </p>
 
 # omgskills
