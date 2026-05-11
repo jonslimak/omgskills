@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/omgskills-eye.png" alt="omgskills" width="426">
+</p>
+
 # omgskills
 
 A macOS menubar app for browsing and installing Claude, Codex, and agent skills from GitHub. Two independent parts: a Node.js scraper that builds the public skill library, and a Swift menubar app that reads bundled or remotely refreshed library data.
