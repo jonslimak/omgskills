@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>omgskills health</title>
+    <style>
+      :root { color-scheme: light; }
+      body {
+        margin: 0;
+        font: 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #fff;
+        color: #111;
+      }
+      main { max-width: 980px; margin: 0 auto; padding: 40px 20px 64px; }
+      h1 { margin: 0 0 8px; font-size: 28px; }
+      p { margin: 0 0 20px; color: #555; }
+      .status {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+      .ok { background: #e8f7ec; color: #136c2e; }
+      .degraded { background: #fff4e5; color: #8a5a00; }
+      .failed { background: #fdecec; color: #9b1c1c; }
+      .grid {
+        margin: 20px 0 28px;
+      }
+      .card {
+        border: 1px solid #e5e5e5;
+        border-radius: 10px;
+        padding: 14px;
+      }
+      .section-title {
+        margin: 24px 0 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+      }
+      ul { padding-left: 18px; }
+      .kv-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 28px;
+        border-top: 1px solid #e5e5e5;
+      }
+      .kv-list li {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 10px 0;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .kv-key {
+        font-size: 13px;
+        color: #666;
+      }
+      .kv-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111;
+        text-align: right;
+        word-break: break-word;
+      }
+      .section-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 28px 28px;
+      }
+      .section-block {
+        min-width: 0;
+      }
+      .link-list {
+        margin-bottom: 28px;
+      }
+      .link-list a { color: #0a66ff; text-decoration: none; }
+      a { color: #0a66ff; text-decoration: none; }
+      @media (max-width: 760px) {
+        .section-grid {
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>omgskills health</h1>
+      <p>Operator status for crawl, publish, and app data.</p>
+      <div id="status" class="status degraded">loading</div>
+      <ul id="summary" class="kv-list"></ul>
+      <div class="section-grid">
+        <div class="section-block">
+          <div class="section-title">Core Library</div>
+          <ul id="core" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">X Feed</div>
+          <ul id="x" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Overlays</div>
+          <ul id="overlays" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Content Reports</div>
+          <ul id="content" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Links</div>
+          <ul id="links" class="link-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Message</div>
+          <ul id="message" class="kv-list"></ul>
+        </div>
+      </div>
+    </main>
+    <script>
+      const dataUrl = location.protocol === "file:"
+        ? new URL("../data/health.json", location.href).href
+        : "/data/health.json";
+      const assetUrl = (path) => location.protocol === "file:"
+        ? new URL(`../data/${path}`, location.href).href
+        : `/data/${path}`;
+      const fmt = (value) => value ? new Date(value).toLocaleString() : "-";
+      const fmtSuccess = (value) => value ? new Date(value).toLocaleString() : "no successful run yet";
+      const fmtGenerated = (value) => value ? new Date(value).toLocaleString() : "not published";
+      const addItem = (label, value) => `<li><span class="kv-key">${label}</span><span class="kv-value">${value ?? "-"}</span></li>`;
+      const statusLabel = (value) => value ? value.toUpperCase() : "-";
+
+      fetch(dataUrl, { cache: "no-store" })
+        .then((res) => {
+          if (!res.ok) throw new Error(`health fetch failed: ${res.status}`);
+          return res.json();
+        })
+        .then((health) => {
+          const status = document.getElementById("status");
+          status.textContent = health.status || "degraded";
+          status.className = `status ${health.status || "degraded"}`;
+
+          document.getElementById("summary").innerHTML = [
+            addItem("Last checked", fmt(health.checkedAt)),
+            addItem("Published", fmt(health.publishedAt)),
+            addItem("Workflow", health.workflow || "-"),
+            addItem("Run ID", health.runId || "-"),
+            addItem("Git SHA", health.gitSha || "-"),
+          ].join("");
+
+          document.getElementById("core").innerHTML = [
+            addItem("Status", statusLabel(health.sections?.core?.status)),
+            addItem("Last library publish", fmtGenerated(health.assets?.skills?.generatedAt)),
+            addItem("Skills", health.sections?.core?.skillsCount ?? "-"),
+            addItem("Trending", health.sections?.core?.trendingCount ?? "-"),
+            addItem("Last successful scrape", fmtSuccess(health.sections?.core?.lastSuccessfulScrapeAt)),
+          ].join("");
+
+          document.getElementById("x").innerHTML = [
+            addItem("Status", statusLabel(health.sections?.x?.status)),
+            addItem("Last X publish", fmtGenerated(health.assets?.xTrending?.generatedAt)),
+            addItem("X feed", health.sections?.x?.xTrendingCount ?? "-"),
+            addItem("Last successful X refresh", fmtSuccess(health.sections?.x?.lastSuccessfulXRefreshAt)),
+          ].join("");
+
+          document.getElementById("overlays").innerHTML = [
+            addItem("Status", statusLabel(health.sections?.overlays?.status)),
+            addItem("Last overlay publish", fmtGenerated(health.assets?.skillSignals?.generatedAt)),
+            addItem("Skill signals", health.sections?.overlays?.skillSignalsCount ?? "-"),
+            addItem("Author signals", health.sections?.overlays?.authorSignalsCount ?? "-"),
+            addItem("Author leaderboards", health.sections?.overlays?.authorLeaderboardsCount ?? "-"),
+          ].join("");
+
+          document.getElementById("content").innerHTML = [
+            addItem("Status", statusLabel(health.sections?.contentReports?.status)),
+            addItem("Last report publish", fmtGenerated(health.content?.dashboardGeneratedAt)),
+            addItem("Last successful content run", fmtSuccess(health.sections?.contentReports?.lastSuccessfulContentReportAt)),
+            addItem("Basket enriched", fmt(health.sections?.contentReports?.basketEnrichedAt)),
+            addItem("Trending snapshots", health.sections?.contentReports?.snapshotCount ?? "-"),
+          ].join("");
+
+          document.getElementById("message").innerHTML = addItem("Status message", health.message || "OK");
+
+          const links = [
+            [location.protocol === "file:" ? new URL("../data/manifest.json", location.href).href : "/data/manifest.json", "manifest"],
+            [dataUrl, "health json"],
+            ["https://github.com/jonslimak/omgskills/actions", "GitHub Actions"],
+          ];
+          if (health.assets?.skills?.path) links.push([assetUrl(health.assets.skills.path), "skills asset"]);
+          if (health.assets?.trending?.path) links.push([assetUrl(health.assets.trending.path), "trending asset"]);
+          if (health.assets?.xTrending?.path) links.push([assetUrl(health.assets.xTrending.path), "x asset"]);
+          if (health.assets?.skillSignals?.path) links.push([assetUrl(health.assets.skillSignals.path), "skill signals asset"]);
+          if (health.assets?.authorSignals?.path) links.push([assetUrl(health.assets.authorSignals.path), "author signals asset"]);
+          if (health.assets?.authorLeaderboards?.path) links.push([assetUrl(health.assets.authorLeaderboards.path), "author leaderboards asset"]);
+          document.getElementById("links").innerHTML = links.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join("");
+        })
+        .catch((error) => {
+          const status = document.getElementById("status");
+          status.textContent = "degraded";
+          status.className = "status degraded";
+          document.getElementById("message").innerHTML = addItem("Status message", error.message);
+          document.getElementById("summary").innerHTML = addItem("Health", "unavailable");
+          document.getElementById("links").innerHTML = `<li><a href="${location.protocol === "file:" ? new URL("../data/manifest.json", location.href).href : "/data/manifest.json"}">manifest</a></li>`;
+        });
+    </script>
+  </body>
+</html>

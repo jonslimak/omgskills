@@ -1,0 +1,64 @@
+<?xml version="1.0" standalone="yes"?>
+<!-- sparkle-sign-warning:
+IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.
+-->
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>omgskills</title>
+        <item>
+            <title>0.0.10</title>
+            <pubDate>Mon, 11 May 2026 11:14:12 -0400</pubDate>
+            <link>https://omgskills.com</link>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>0.0.10</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://omgskills.com/updates/omgskills-0.0.10.zip" length="13261768" type="application/octet-stream" sparkle:edSignature="a/HYojrl3TuGRdVin95tV3BYW+36XUU40GXSTlO303sTeiRyAbMt+nGWlj+bR90wskYoQ27L0Q1qBaE/jVEBDA=="/>
+            <sparkle:deltas>
+                <enclosure url="https://omgskills.com/updates/omgskills10-9.delta" sparkle:deltaFrom="9" length="144982" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="+LsJFdT8bJPayGr2tTnkGOF8ElmOpqsZazE0zoE57kJd345u8xqbbvT20DzN6eTvD6e8kxZchhu8k7vXG+yQBw=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills10-8.delta" sparkle:deltaFrom="8" length="699038" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="XwmrcGSsf/BLa9WHF3FRUgRxLMGGPVOjngAVr4McPlaVGYY5rOjxpmC9tt9WYPSGk0ZEA6PQPGsTgAR9JSwVAQ=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills10-7.delta" sparkle:deltaFrom="7" length="697266" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="m5+AWA6PnLat4d2cApcq48TXRwetSUGLMpBUN0pl9c8WAAQbYBpsYTUpo6wS5dMVECe5CcHvwdCCtPJXQk6UBA=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills10-6.delta" sparkle:deltaFrom="6" length="699386" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="VE6IH+KQ5xXxA2XZRAWbf2hDkOze8xcrptIaWAwa6yIRgAuwJtIh8aiSGPfIyiBdhsMFVGj7rXP8xJndudRoDg=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills10-5.delta" sparkle:deltaFrom="5" length="700826" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="0eOXy9AmX7vBITD1XOc//Ci5rIyRfjtQIe1E+Zz1rj7UltA4ui+vU1onX8RJq8ViHjblB1LpKxU0BDC0vdtYAA=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
+            <title>0.0.9</title>
+            <pubDate>Fri, 08 May 2026 19:06:57 -0400</pubDate>
+            <link>https://omgskills.com</link>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.0.9</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://omgskills.com/updates/omgskills-0.0.9.zip" length="13258733" type="application/octet-stream" sparkle:edSignature="w4aP15PoXGbT3j/KaVql/HGtTl+vs68RSQlTuQeIqOgrD6/jbt3zUY5JTgf+mRsE3kQQjhGTu6kyoDkOgT6DDw=="/>
+            <sparkle:deltas>
+                <enclosure url="https://omgskills.com/updates/omgskills9-8.delta" sparkle:deltaFrom="8" length="688822" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="daRBMNHpXi4QygagjruS7VUiGI+ABOMKF6BCo+CUo0RR3fdoEJl4eTEl9x+TXTG1sBs173lgmIf7empuwvq4CQ=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills9-7.delta" sparkle:deltaFrom="7" length="695874" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="Dk0exuoBENGvHQRiLAn3Fvc7QJuLER1qV/2tFOcz5z8whmtzvNr0cPv6q1jStc6qPDq/0qJIOpcFNbVYxppwCg=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills9-6.delta" sparkle:deltaFrom="6" length="693138" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="fd1JZvKvZ6c9f39DzL7UEsiEj76zr6TGNbn0dS94mNYj3bWPvHWpQHIvl1VK8b1DJ/WuMldCGP80rYYPciNHCQ=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills9-5.delta" sparkle:deltaFrom="5" length="694706" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="0chL/7bYoiEm4ROFlshVt2OaKRewQ7BEXrlhqu7jNtYtszDgl5YxXOf6uhMXu6FvtlX86KPUqdqt0fMhzgy7Cg=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills9-4.delta" sparkle:deltaFrom="4" length="3807966" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="BjY0CO3CLadFY8YmPv2xvem1TRclIzBgAY9wPAQbXhAJVCNcnhZLwhDpTczmgcXFSjqsv+302FmdBbOAnEdiAQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
+            <title>0.0.8</title>
+            <pubDate>Wed, 06 May 2026 08:58:01 -0400</pubDate>
+            <link>https://omgskills.com</link>
+            <sparkle:version>8</sparkle:version>
+            <sparkle:shortVersionString>0.0.8</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://omgskills.com/updates/omgskills-0.0.8.zip" length="12818840" type="application/octet-stream" sparkle:edSignature="g2ZPLkDDxGeV6l6PlZFcAFJsVuN39xFQx5MrokRwg9x6C5BUad7W2OB1qPluS38+Gyjs1iWUzBQqjZngXxhfAw=="/>
+            <sparkle:deltas>
+                <enclosure url="https://omgskills.com/updates/omgskills8-7.delta" sparkle:deltaFrom="7" length="11350" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="HepHi5OcPplfLoyS0S9Pb2TQqlQ+Oxd1uP3d+cj565aoSVKUEjwtAEFDqT0fXqyl/QDof0VTGWcvoxjkKoiVDw=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills8-6.delta" sparkle:deltaFrom="6" length="106002" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="a+bL9oWN20q4s4JFErOTFPnvilEdOK8AW9T7mPryXfAyP7/l+fHjbJqWCeH4S1LcdQMb7LYTztA2Npv4RrWkDw=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills8-5.delta" sparkle:deltaFrom="5" length="108742" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="nukYS7Ab0+4dd/iOol6hwfy7lPwtCuXq6RLY5tFF0EsjUseraSQ6HKApor9oXSrP+oMt3LiuoJ47iwlEzoTMAQ=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills8-4.delta" sparkle:deltaFrom="4" length="3392710" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="D5J3dDwBMTDsIzRb5JVCq1dAn+wKgwfQV4fD7Ys0H0Kiq179l9Y0/RNkUKpKgS48y9st2wmEzYbZdSLjkCeRBw=="/>
+                <enclosure url="https://omgskills.com/updates/omgskills8-3.delta" sparkle:deltaFrom="3" length="5511390" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="2+AMqnU07kFCbfDDg6vAhu2rHfrLVCkQmsYILnF0o9wFBy2hI9qnDJEPqGeF3Hr3IFDaLIM8xcuoPMSbvJPEBA=="/>
+            </sparkle:deltas>
+        </item>
+    </channel>
+</rss>
+<!-- sparkle-signatures:
+edSignature: QNFxYUT/8fMUXUztC+bEIbmBYZEpmMipr+KMrboV11OLkAKrk6lfzSJ1blcSuADSBacstJsdXX+UE+AetfSrAw==
+length: 8232
+-->

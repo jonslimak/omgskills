@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>omgskills</title>
+  <meta name="description" content="Search for skills on GitHub from your macOS menu bar.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="omgskills">
+  <meta property="og:description" content="Search for skills on GitHub from your macOS menu bar.">
+  <!-- Start Humblytics Tracking Code -->
+  <script>
+    (function(){
+      document.documentElement.style.opacity='0';
+      window._hmblReveal=function(){ document.documentElement.style.opacity='1'; };
+      setTimeout(window._hmblReveal, 2000);
+    })();
+  </script>
+  <script async src="https://app.humblytics.com/hmbl.min.js?id=a156a68"></script>
+  <!-- End Humblytics Tracking Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #0d0d0d;
+      --muted: #6b7280;
+      --max-w: 1000px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ── */
+
+    header {
+      padding: 20px 32px;
+    }
+
+    nav {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wordmark {
+      font-family: "DM Sans", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    a.nav-link {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+    }
+
+    a.nav-link:hover {
+      opacity: 1;
+    }
+
+    a.nav-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: var(--text);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s;
+    }
+
+    a.nav-button:hover {
+      opacity: 0.82;
+    }
+
+    /* ── Hero ── */
+
+    main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    .hero {
+      padding: 56px 0 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 1px 2px rgba(60, 64, 67, 0.3)) drop-shadow(0 1px 3px rgba(60, 64, 67, 0.15));
+    }
+
+    h1 {
+      font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 44px;
+      font-weight: 100;
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+
+    .headline-strong {
+      font-weight: 600;
+    }
+
+    .subheadline {
+      max-width: 640px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .subheadline-highlight {
+      color: #1591ff;
+      font-weight: 700;
+    }
+
+    a.primary-button {
+      font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 48px;
+      padding: 0 24px;
+      border-radius: 999px;
+      background: var(--text);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s;
+    }
+
+    a.primary-button:hover {
+      opacity: 0.82;
+    }
+
+    .apple-icon {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 17px;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+
+    a.ghost-link {
+      font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      opacity: 0.55;
+      transition: opacity 0.15s;
+    }
+
+    a.ghost-link:hover {
+      opacity: 1;
+    }
+
+    /* ── Banner ── */
+
+    .banner {
+      width: 100%;
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .banner-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .banner-actions .ghost-link {
+      color: var(--text);
+      opacity: 0.55;
+    }
+
+    .banner-actions .ghost-link:hover {
+      opacity: 1;
+    }
+
+    .banner-actions .primary-button {
+      background: var(--text);
+    }
+
+    .banner img,
+    .banner video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .banner .banner-desktop-video {
+      display: block;
+    }
+
+    .banner .banner-mobile-video {
+      display: none;
+    }
+
+    /* ── Features ── */
+
+    .features {
+      width: calc(100vw - 20px);
+      margin-top: 0;
+      margin-left: calc(50% - 50vw + 10px);
+      padding: 104px 56px;
+      background: #f4f4f7;
+      color: #1d1d1f;
+      border-radius: 38px;
+    }
+
+    .features-inner {
+      width: min(100%, 800px);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .features-header {
+      max-width: 800px;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+
+    .features-eyebrow {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .features h2 {
+      font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      color: #1d1d1f;
+    }
+
+    .features-intro {
+      font-size: 14px;
+      line-height: 1.5;
+      color: rgba(29, 29, 31, 0.68);
+      margin-top: 12px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 58px 44px;
+    }
+
+    .feature {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 34px;
+      color: #1d1d1f;
+      border-radius: 10px;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .feature-icon svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+      stroke-width: 1.9;
+    }
+
+    .feature h3 {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: #1d1d1f;
+      margin-bottom: 5px;
+    }
+
+    .feature p {
+      font-size: 12px;
+      line-height: 1.45;
+      color: rgba(29, 29, 31, 0.68);
+    }
+
+    /* ── Reviews ── */
+
+    .reviews {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 104px 0 0;
+    }
+
+    .reviews-header {
+      max-width: 620px;
+      margin: 0 auto 34px;
+      text-align: center;
+    }
+
+    .reviews-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .reviews h2 {
+      font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .reviews-intro {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .reviews-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 74px;
+    }
+
+    .review-card {
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      border-radius: 20px;
+      background: #f4f4f7;
+    }
+
+    .review-card blockquote {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .review-stars {
+      color: #f5b301;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+
+    .review-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .review-avatar {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--text);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .review-name {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .review-role {
+      font-size: 12px;
+      line-height: 1.3;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .faq {
+      max-width: 800px;
+      margin: 104px auto 0;
+      font-size: 13px;
+    }
+
+    .faq h2 {
+      font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: center;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .faq details {
+      padding: 10px 0;
+      font-size: 13px;
+    }
+
+    .faq summary {
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--text);
+      list-style: none;
+    }
+
+    .faq summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    footer {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 32px 40px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    footer a {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--text);
+    }
+
+    /* ── Mobile ── */
+
+    @media (max-width: 500px) {
+      header {
+        padding: 16px 20px;
+      }
+
+      main {
+        padding: 0 20px 60px;
+      }
+
+      .hero {
+        padding: 40px 0 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 32px;
+        text-align: center;
+      }
+
+      .subheadline {
+        font-size: 13px;
+      }
+
+      .banner-actions {
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .banner {
+        border-radius: 0;
+      }
+
+      .banner .banner-desktop-video {
+        display: none;
+      }
+
+      .banner .banner-mobile-video {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .features {
+        margin-top: 0;
+        padding: 80px 24px;
+        border-radius: 38px;
+      }
+
+      .features-header {
+        max-width: none;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+
+      .features h2 {
+        font-size: 28px;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .feature {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .reviews {
+        padding-top: 80px;
+      }
+
+      .faq {
+        margin-top: 80px;
+      }
+
+      .reviews h2 {
+        font-size: 28px;
+      }
+
+      .faq h2 {
+        font-size: 28px;
+      }
+
+      .reviews-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-link {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero" aria-label="omgskills hero">
+      <img class="logo" src="logo.png" alt="omgskills" width="404" height="195">
+      <h1><span class="headline-strong">Discover skills</span><br>from your Mac menu-bar</h1>
+      <p class="subheadline">Search <span class="subheadline-highlight">49,000+</span> skills on Github &amp; X, read docs, install in one click and manage all your skills in one place</p>
+      <div class="banner-actions">
+        <a class="primary-button" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download free for Mac</a>
+      </div>
+    </section>
+
+    <div class="banner">
+      <video class="banner-desktop-video" autoplay muted loop playsinline width="1100" height="700" aria-label="omgskills app — search and browse Claude Code skills from your Mac menu bar">
+        <source src="home-good.mp4?v=67" type="video/mp4">
+        <img src="banner.png" alt="omgskills app — search and browse Claude Code skills from your Mac menu bar" width="1100" height="700">
+      </video>
+      <video class="banner-mobile-video" autoplay muted loop playsinline preload="metadata" aria-label="omgskills app mobile preview">
+        <source src="mobile-good.mp4?v=1" type="video/mp4">
+      </video>
+    </div>
+
+    <section class="features" aria-label="omgskills features">
+      <div class="features-inner">
+        <div class="features-header">
+          <h2>One place for all your skills</h2>
+          <p class="features-intro">One simple tool to stay on top of everything</p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+            </span>
+            <div>
+              <h3>Find Claude &amp; Codex skills</h3>
+              <p>Get new skills right from one menu bar app.</p>
+            </div>
+          </article>
+
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/><path d="M10 18v3"/><path d="M14 17.75V21"/><path d="M7 18a6 6 0 0 0 3.84-10.61"/></svg>
+            </span>
+            <div>
+              <h3>Search Github &amp; Twitter</h3>
+              <p>See what's trending and gaining traction.</p>
+            </div>
+          </article>
+
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="4" r="2"/><path d="m14 5 3-3 3 3"/><path d="m14 10 3-3 3 3"/><path d="M17 14V2"/><path d="M17 14H7l-5 8h20Z"/><path d="M8 14v8"/><path d="m9 14 5 8"/></svg>
+            </span>
+            <div>
+              <h3>Your Skills in one place</h3>
+              <p>See and manage all your skills together.</p>
+            </div>
+          </article>
+
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            </span>
+            <div>
+              <h3>One Click installs</h3>
+              <p>Install skills directly with one click.</p>
+            </div>
+          </article>
+
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            </span>
+            <div>
+              <h3>From Claude to Codex</h3>
+              <p>Copy skills from Claude to Codex or back.</p>
+            </div>
+          </article>
+
+          <article class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/><path d="M18 18a4 4 0 0 0 2-7.464"/><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/><path d="M6 18a4 4 0 0 1-2-7.464"/><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/></svg>
+            </span>
+            <div>
+              <h3>Keep up with new Skills</h3>
+              <p>We monitor new skills so you don't have to.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reviews" aria-label="omgskills reviews">
+      <div class="reviews-header">
+        <h2>Its a SKILL.md issue</h2>
+        <p class="reviews-intro">Less repo-hopping, less copy-paste, more useful skills</p>
+      </div>
+
+      <div class="reviews-grid">
+        <article class="review-card">
+          <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>“I stopped losing skills in bookmarks. omgskills gives me one place to find, read, and install the ones I actually use.”</blockquote>
+          <div class="review-author">
+            <span class="review-avatar" aria-hidden="true">JS</span>
+            <div>
+              <p class="review-name">Jon S.</p>
+              <p class="review-role">Agent workflow builder</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>“The trending feed makes discovery feel alive. I can see what people are sharing instead of guessing which repos matter.”</blockquote>
+          <div class="review-author">
+            <span class="review-avatar" aria-hidden="true">AC</span>
+            <div>
+              <p class="review-name">Alex C.</p>
+              <p class="review-role">Claude Code user</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>“Moving a skill from Claude to Codex used to be annoying. Now it feels like managing apps, not folders.”</blockquote>
+          <div class="review-author">
+            <span class="review-avatar" aria-hidden="true">MR</span>
+            <div>
+              <p class="review-name">Maya R.</p>
+              <p class="review-role">Independent developer</p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="reviews-actions">
+        <a class="primary-button" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download free for Mac</a>
+      </div>
+
+      <section class="faq" aria-label="Frequently asked questions">
+        <h2>Questions?</h2>
+        <details open>
+          <summary>What is omgskills?</summary>
+          <p>A simple Mac menu-bar app for finding, reading, installing, and managing skills.</p>
+        </details>
+        <details open>
+          <summary>How much does it cost?</summary>
+          <p>omgskills is totally free.</p>
+        </details>
+        <details open>
+          <summary>Does it work with Claude and Codex?</summary>
+          <p>Yes, it is built to help you discover and manage skills across both workflows.</p>
+        </details>
+        <details open>
+          <summary>Can I install skills from the app?</summary>
+          <p>Yes, the goal is to make installing useful skills fast and simple.</p>
+        </details>
+        <details open>
+          <summary>Where does the skill data come from?</summary>
+          <p>omgskills helps surface skills from places like Github and X so you can find what is useful faster.</p>
+        </details>
+        <details open>
+          <summary>Is this only for Mac?</summary>
+          <p>The app is focused on the Mac menu bar experience.</p>
+        </details>
+      </section>
+    </section>
+  </main>
+  <footer>
+    <a href="/privacy/">Privacy</a>
+    <a href="/terms/">Terms</a>
+  </footer>
+  <script>
+    if (window.location.pathname === "/download" || window.location.pathname === "/download/") {
+      const downloadLink = document.createElement("a");
+      downloadLink.href = "/downloads/omgskills-mac.dmg";
+      downloadLink.download = "omgskills-mac.dmg";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+    }
+  </script>
+</body>
+</html>

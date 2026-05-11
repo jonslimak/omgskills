@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "status": "degraded",
+  "message": "Pipeline health check failed",
+  "checkedAt": "2026-05-11T14:28:38Z",
+  "publishedAt": "2026-05-11T12:03:43Z",
+  "deployedAt": null,
+  "lastSuccessfulScrapeAt": null,
+  "lastSuccessfulXRefreshAt": null,
+  "lastSuccessfulContentReportAt": null,
+  "workflow": "pipeline-health",
+  "runId": "25676243027",
+  "gitSha": "3c58eb5488f67cf14bfa78ea16b8e9ee806469bc",
+  "manifestPath": "data/manifest.json",
+  "manifestGeneratedAt": "2026-05-11T12:02:39.583Z",
+  "assets": {
+    "skills": {
+      "path": "skills-3c2bdf9fecab.json",
+      "count": 48998,
+      "generatedAt": "2026-05-11T14:28:35.408Z"
+    },
+    "trending": {
+      "path": "trending-1302635be3f1.json",
+      "count": 346,
+      "generatedAt": "2026-05-11T14:28:35.508Z"
+    },
+    "trendingLeaderboard": {
+      "path": "trending-leaderboard-d7f30e052c65.json",
+      "count": 342,
+      "generatedAt": "2026-05-11T14:28:35.508Z"
+    },
+    "leaderboardViewData": {
+      "path": "leaderboard-view-data-b75e1e1416ff.json",
+      "count": 10,
+      "generatedAt": "2026-05-11T14:28:35.215Z"
+    },
+    "xTrending": {
+      "path": "x-trending-3d458a45d7c4.json",
+      "count": 50,
+      "generatedAt": "2026-05-11T14:28:35.509Z"
+    },
+    "skillSignals": {
+      "path": "skill-signals-3a3646101775.json",
+      "count": 48998,
+      "generatedAt": "2026-05-11T14:28:35.251Z"
+    },
+    "authorSignals": {
+      "path": "author-signals-2f7177afbc22.json",
+      "count": 8071,
+      "generatedAt": "2026-05-11T14:28:35.212Z"
+    },
+    "authorLeaderboards": {
+      "path": "author-leaderboards-9aacc922435b.json",
+      "count": 8071,
+      "generatedAt": "2026-05-11T14:28:35.207Z"
+    }
+  },
+  "content": {
+    "goldBasketGeneratedAt": "2026-05-11T14:28:35.215Z",
+    "basketEnrichedAt": "2026-05-11T06:15:51.999Z",
+    "statsGeneratedAt": "2026-05-11T14:28:35.507Z",
+    "dashboardGeneratedAt": "2026-05-11T14:28:35.213Z",
+    "snapshotCount": 2
+  },
+  "sections": {
+    "core": {
+      "status": "ok",
+      "skillsCount": 48998,
+      "trendingCount": 346,
+      "trendingLeaderboardCount": 342,
+      "leaderboardViewDataPath": "leaderboard-view-data-b75e1e1416ff.json",
+      "lastSuccessfulScrapeAt": null
+    },
+    "x": {
+      "status": "ok",
+      "xTrendingCount": 50,
+      "lastSuccessfulXRefreshAt": null
+    },
+    "overlays": {
+      "status": "ok",
+      "skillSignalsCount": 48998,
+      "authorSignalsCount": 8071,
+      "authorLeaderboardsCount": 8071
+    },
+    "contentReports": {
+      "status": "ok",
+      "lastSuccessfulContentReportAt": null,
+      "basketEnrichedAt": "2026-05-11T06:15:51.999Z",
+      "snapshotCount": 2
+    }
+  }
+}

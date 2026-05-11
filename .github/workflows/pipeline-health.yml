@@ -1,0 +1,105 @@
+name: pipeline-health
+
+on:
+  schedule:
+    - cron: "30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: pipeline-health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check pipeline health
+        id: healthcheck
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node ./scripts/check-pipeline-health.mjs || true
+
+      - name: Collect workflow timestamps
+        id: runmeta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "last_scrape_success_at=$(gh run list --repo "${{ github.repository }}" --workflow scrape.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == \"success\") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
+          echo "last_x_refresh_success_at=$(gh run list --repo "${{ github.repository }}" --workflow x-refresh.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == \"success\") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
+          echo "last_content_report_success_at=$(gh run list --repo "${{ github.repository }}" --workflow content-reports.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == \"success\") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
+
+      - name: Update health snapshot
+        run: |
+          HEALTH_STATUS="${{ steps.healthcheck.outputs.health_status || 'degraded' }}" \
+          HEALTH_MESSAGE="${{ steps.healthcheck.outputs.health_message || 'Pipeline health check failed' }}" \
+          HEALTH_LAST_SCRAPE_SUCCESS_AT="${{ steps.runmeta.outputs.last_scrape_success_at }}" \
+          HEALTH_LAST_X_REFRESH_SUCCESS_AT="${{ steps.runmeta.outputs.last_x_refresh_success_at }}" \
+          HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT="${{ steps.runmeta.outputs.last_content_report_success_at }}" \
+          HEALTH_WORKFLOW="pipeline-health" \
+          HEALTH_RUN_ID="${{ github.run_id }}" \
+          HEALTH_GIT_SHA="${{ github.sha }}" \
+          HEALTH_CHECKED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+          node ./scripts/build-health.mjs
+
+      - name: Commit health if changed
+        run: |
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- site/data/health.json; then
+            echo "No health changes"
+          else
+            git add site/data/health.json
+            git commit -m "health: update pipeline status ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+            git push
+          fi
+
+      - name: Update health issue on failure
+        if: steps.healthcheck.outputs.health_status == 'degraded'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Pipeline health"
+          BODY="Pipeline degraded on $(date -u +"%Y-%m-%dT%H:%M:%SZ").\n\n${{ steps.healthcheck.outputs.health_message }}"
+          ISSUE_NUMBER="$(gh issue list --repo "${{ github.repository }}" --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue edit "$ISSUE_NUMBER" --repo "${{ github.repository }}" --title "$TITLE" --body "$BODY"
+          else
+            gh issue create --repo "${{ github.repository }}" --title "$TITLE" --body "$BODY"
+          fi
+
+      - name: Close health issue on recovery
+        if: steps.healthcheck.outputs.health_status == 'ok'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Pipeline health"
+          ISSUE_NUMBER="$(gh issue list --repo "${{ github.repository }}" --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue close "$ISSUE_NUMBER" --repo "${{ github.repository }}" --comment "Pipeline healthy again on $(date -u +"%Y-%m-%dT%H:%M:%SZ")."
+          fi
+
+      - name: Deploy site to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npx netlify-cli deploy --prod --dir=site
+
+      - name: Fail on degraded health
+        if: steps.healthcheck.outputs.health_status == 'degraded'
+        run: exit 1

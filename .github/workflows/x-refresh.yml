@@ -1,0 +1,102 @@
+name: x-refresh
+
+# Required repository secrets:
+#   SCRAPER_GITHUB_TOKEN  - GitHub API token for repo validation
+#   ENABLE_X_SOCIAL       - set to 1
+#   X_AUTH_TOKEN          - X auth token cookie
+#   X_CT0                 - X ct0 cookie
+#   NETLIFY_AUTH_TOKEN    - Netlify deploy token
+#
+# Schedule: daily at 11:00 UTC. Manual trigger available via
+# Actions tab -> x-refresh -> "Run workflow".
+
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: x-refresh
+  cancel-in-progress: false
+
+jobs:
+  x-refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: index/package-lock.json
+
+      - name: Install deps
+        working-directory: index
+        run: npm ci
+
+      - name: Refresh X feed
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+          ENABLE_X_SOCIAL: ${{ secrets.ENABLE_X_SOCIAL }}
+          X_AUTH_TOKEN: ${{ secrets.X_AUTH_TOKEN }}
+          X_CT0: ${{ secrets.X_CT0 }}
+          X_STRICT: "1"
+        run: npx tsx scraper/run-x-enrichment.ts
+
+      - name: Rebuild overlay data
+        working-directory: index
+        run: npm run content:overlays
+
+      - name: Publish hosted app data
+        env:
+          HEALTH_STATUS: ok
+          HEALTH_MESSAGE: Latest X feed published
+          HEALTH_WORKFLOW: x-refresh
+          HEALTH_RUN_ID: ${{ github.run_id }}
+          HEALTH_GIT_SHA: ${{ github.sha }}
+        run: ./scripts/publish-data.sh
+
+      - name: Stamp X refresh success time
+        run: |
+          HEALTH_STATUS=ok \
+          HEALTH_MESSAGE="Latest X feed published" \
+          HEALTH_LAST_X_REFRESH_SUCCESS_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+          HEALTH_WORKFLOW="x-refresh" \
+          HEALTH_RUN_ID="${{ github.run_id }}" \
+          HEALTH_GIT_SHA="${{ github.sha }}" \
+          node ./scripts/build-health.mjs
+
+      - name: Verify published data
+        run: node ./scripts/verify-published-data.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- index/top-x-skill-tweets.json index/x-trending.json index/skill-signals.json index/author-signals.json site/data; then
+            echo "No X feed changes"
+          else
+            git add index/top-x-skill-tweets.json index/x-trending.json index/skill-signals.json index/author-signals.json site/data
+            git commit -m "x-refresh: update X feed ($(date -u +%Y-%m-%d))"
+            git push
+          fi
+
+      - name: Deploy site to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npx netlify-cli deploy --prod --dir=site
+
+      - name: Verify live manifest
+        run: node ./scripts/verify-live-manifest.mjs

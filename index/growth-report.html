@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>omgskills · Trending Growth</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f2;color:#1a1a1a;min-height:100vh}
+
+/* Header */
+header{background:#fff;border-bottom:1px solid #e5e5e0;padding:18px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.header-title{font-size:18px;font-weight:700;color:#111}
+.header-sub{font-size:13px;color:#888;margin-left:auto}
+.header-badge{font-size:11px;background:#f0f0ed;border:1px solid #ddd;border-radius:99px;padding:2px 10px;color:#777}
+
+/* Snapshot nav */
+.snap-nav{background:#fff;border-bottom:1px solid #e9e9e6;padding:10px 32px;font-size:12px;color:#aaa;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.snap-item{padding:3px 10px;border-radius:99px;border:1px solid #e5e5e0;background:#fafaf8;color:#999}
+.snap-active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+
+/* Layout */
+.page{max-width:860px;margin:32px auto;padding:0 24px;display:flex;flex-direction:column;gap:28px}
+
+/* Summary bar */
+.summary-bar{display:flex;gap:0;background:#fff;border:1px solid #e5e5e0;border-radius:14px;overflow:hidden}
+.summary-stat{flex:1;padding:18px 20px;text-align:center;border-right:1px solid #f0f0ed}
+.summary-stat:last-child{border-right:none}
+.stat-num{display:block;font-size:26px;font-weight:700;color:#111;font-variant-numeric:tabular-nums}
+.stat-label{display:block;font-size:11px;color:#aaa;margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+
+/* Come-back banner */
+.come-back-banner{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start;font-size:14px;color:#1e40af;line-height:1.5}
+.cb-icon{font-size:22px;flex-shrink:0}
+.come-back-banner code{font-family:monospace;background:#dbeafe;padding:2px 6px;border-radius:4px;font-size:12px}
+
+/* Section */
+.section{background:#fff;border:1px solid #e5e5e0;border-radius:14px;overflow:hidden}
+.section-header{display:flex;gap:12px;align-items:flex-start;padding:18px 22px 14px;border-bottom:1px solid #f0f0ed}
+.section-icon{font-size:22px;line-height:1;flex-shrink:0;margin-top:2px}
+.section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:3px}
+.section-title{font-size:16px;font-weight:700;color:#111}
+
+/* Table */
+.skill-table{width:100%;border-collapse:collapse;font-size:13px}
+.skill-table thead th{padding:9px 16px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#aaa;border-bottom:1px solid #f0f0ed}
+.skill-table td{padding:10px 16px;border-bottom:1px solid #f9f9f7;vertical-align:middle}
+.skill-table tr:last-child td{border-bottom:none}
+.skill-table tr:hover td{background:#fafaf8}
+.is-new td{background:#f0fdf4}
+.is-new:hover td{background:#dcfce7}
+
+/* Cells */
+.td-rank{color:#aaa;font-size:12px;white-space:nowrap;width:64px}
+.td-name{min-width:180px}
+.td-installs{font-variant-numeric:tabular-nums;font-weight:600;color:#111;white-space:nowrap}
+.td-delta{white-space:nowrap}
+.td-stars{color:#888;white-space:nowrap;font-size:12px}
+
+.skill-link{color:#111;font-weight:600;text-decoration:none}
+.skill-link:hover{color:#2563eb;text-decoration:underline}
+.skill-author{display:block;font-size:11px;color:#aaa;margin-top:1px}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.chip-up{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.chip-down{background:#fff1f2;color:#e11d48;border:1px solid #fecdd3}
+.chip-new{background:#fef3c7;color:#d97706;border:1px solid #fde68a}
+.chip-neutral{background:#f5f5f2;color:#aaa;border:1px solid #e5e5e0}
+
+/* Rank badges */
+.rank-badge{display:inline-flex;font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;margin-left:4px}
+.rank-up{background:#dcfce7;color:#16a34a}
+.rank-down{background:#fee2e2;color:#dc2626}
+.rank-flat{background:#f5f5f2;color:#aaa}
+
+/* Footer */
+footer{text-align:center;font-size:11px;color:#ccc;padding:32px 0 48px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="header-title">📊 Trending Growth</div>
+    <div style="font-size:12px;color:#999;margin-top:2px">Comparing <strong>2026-05-06</strong> → <strong>2026-05-08</strong></div>
+  </div>
+  <span class="header-badge">2 snapshots</span>
+  <span class="header-badge">346 skills tracked</span>
+  <span class="header-sub">omgskills · May 11, 2026</span>
+</header>
+
+<div class="snap-nav">Snapshots: <span class="snap-item">2026-05-06</span><span class="snap-item snap-active">2026-05-08 (latest)</span></div>
+
+<div class="page">
+  
+  <div class="summary-bar">
+    <div class="summary-stat">
+      <span class="stat-num">0</span>
+      <span class="stat-label">New installs this week</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-num">29</span>
+      <span class="stat-label">New entrants</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-num">314</span>
+      <span class="stat-label">Skills gained installs</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-num">25</span>
+      <span class="stat-label">Dropped off</span>
+    </div>
+  </div>
+       
+  <section class="section">
+    <div class="section-header">
+      <span class="section-icon">🔥</span>
+      <div>
+        <div class="section-label">Top Trending</div>
+        <h2 class="section-title">Most Installed This Week</h2>
+      </div>
+    </div>
+    <table class="skill-table">
+      <thead><tr><th>Rank</th><th>Skill</th><th>Installs</th><th>This week</th><th>Stars</th></tr></thead>
+      <tbody>
+  <tr class="skill-row">
+    <td class="td-rank">#1 <span class="rank-badge rank-up">▲53</span></td>
+    <td class="td-name">
+      <a href="https://github.com/mattpocock/skills" target="_blank" class="skill-link">triage</a>
+      <span class="skill-author">@mattpocock</span>
+    </td>
+    <td class="td-installs">40.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +8.2k (+25.3%)</span></td>
+    <td class="td-stars">⭐ 62.4k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#2 <span class="rank-badge rank-up">▲15</span></td>
+    <td class="td-name">
+      <a href="https://github.com/coreyhaines31/marketingskills" target="_blank" class="skill-link">site-architecture</a>
+      <span class="skill-author">@coreyhaines31</span>
+    </td>
+    <td class="td-installs">40.4k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +1.3k (+3.3%)</span></td>
+    <td class="td-stars">⭐ 26.9k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#4 <span class="rank-badge rank-up">▲12</span></td>
+    <td class="td-name">
+      <a href="https://github.com/wshobson/agents" target="_blank" class="skill-link">tailwind-design-system</a>
+      <span class="skill-author">@wshobson</span>
+    </td>
+    <td class="td-installs">39.7k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +556 (+1.4%)</span></td>
+    <td class="td-stars">⭐ 34.9k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#5 <span class="rank-badge rank-up">▲15</span></td>
+    <td class="td-name">
+      <a href="https://github.com/coreyhaines31/marketingskills" target="_blank" class="skill-link">sales-enablement</a>
+      <span class="skill-author">@coreyhaines31</span>
+    </td>
+    <td class="td-installs">39.6k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +1.3k (+3.4%)</span></td>
+    <td class="td-stars">⭐ 26.9k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#7 <span class="rank-badge rank-up">▲11</span></td>
+    <td class="td-name">
+      <a href="https://github.com/wshobson/agents" target="_blank" class="skill-link">typescript-advanced-types</a>
+      <span class="skill-author">@wshobson</span>
+    </td>
+    <td class="td-installs">39.3k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +483 (+1.2%)</span></td>
+    <td class="td-stars">⭐ 34.9k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#8 <span class="rank-badge rank-up">▲15</span></td>
+    <td class="td-name">
+      <a href="https://github.com/anthropics/skills" target="_blank" class="skill-link">algorithmic-art</a>
+      <span class="skill-author">@anthropics</span>
+    </td>
+    <td class="td-installs">38.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +709 (+1.9%)</span></td>
+    <td class="td-stars">⭐ 128.9k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#9 <span class="rank-badge rank-up">▲19</span></td>
+    <td class="td-name">
+      <a href="https://github.com/coreyhaines31/marketingskills" target="_blank" class="skill-link">revops</a>
+      <span class="skill-author">@coreyhaines31</span>
+    </td>
+    <td class="td-installs">38.4k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +1.2k (+3.3%)</span></td>
+    <td class="td-stars">⭐ 26.9k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#10 <span class="rank-badge rank-up">▲15</span></td>
+    <td class="td-name">
+      <a href="https://github.com/google-labs-code/stitch-skills" target="_blank" class="skill-link">enhance-prompt</a>
+      <span class="skill-author">@google-labs-code</span>
+    </td>
+    <td class="td-installs">38.0k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +469 (+1.2%)</span></td>
+    <td class="td-stars">⭐ 5.2k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#11 <span class="rank-badge rank-up">▲15</span></td>
+    <td class="td-name">
+      <a href="https://github.com/google-labs-code/stitch-skills" target="_blank" class="skill-link">stitch-loop</a>
+      <span class="skill-author">@google-labs-code</span>
+    </td>
+    <td class="td-installs">37.9k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +416 (+1.1%)</span></td>
+    <td class="td-stars">⭐ 5.2k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#12 <span class="rank-badge rank-up">▲17</span></td>
+    <td class="td-name">
+      <a href="https://github.com/anthropics/skills" target="_blank" class="skill-link">doc-coauthoring</a>
+      <span class="skill-author">@anthropics</span>
+    </td>
+    <td class="td-installs">37.9k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +826 (+2.2%)</span></td>
+    <td class="td-stars">⭐ 128.9k</td>
+  </tr></tbody>
+    </table>
+  </section>
+       
+  <section class="section">
+    <div class="section-header">
+      <span class="section-icon">📈</span>
+      <div>
+        <div class="section-label">Biggest Gainers</div>
+        <h2 class="section-title">Most New Installs This Week</h2>
+      </div>
+    </div>
+    <table class="skill-table">
+      <thead><tr><th>Rank</th><th>Skill</th><th>Installs</th><th>This week</th><th>Stars</th></tr></thead>
+      <tbody>
+  <tr class="skill-row">
+    <td class="td-rank">#1 <span class="rank-badge rank-up">▲53</span></td>
+    <td class="td-name">
+      <a href="https://github.com/mattpocock/skills" target="_blank" class="skill-link">triage</a>
+      <span class="skill-author">@mattpocock</span>
+    </td>
+    <td class="td-installs">40.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +8.2k (+25.3%)</span></td>
+    <td class="td-stars">⭐ 62.4k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#15 <span class="rank-badge rank-up">▲46</span></td>
+    <td class="td-name">
+      <a href="https://github.com/larksuite/cli" target="_blank" class="skill-link">lark-okr</a>
+      <span class="skill-author">@larksuite</span>
+    </td>
+    <td class="td-installs">37.3k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.5k (+25.1%)</span></td>
+    <td class="td-stars">⭐ 9.3k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#97 <span class="rank-badge rank-up">▲95</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">web-search</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.6k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.2k (+49.9%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#99 <span class="rank-badge rank-up">▲98</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">python-executor</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.6%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#101 <span class="rank-badge rank-up">▲97</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">agent-browser</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.6%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#98 <span class="rank-badge rank-up">▲97</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">remotion-render</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.5%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#100 <span class="rank-badge rank-up">▲96</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">twitter-automation</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.5%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#50 <span class="rank-badge rank-up">▲19</span></td>
+    <td class="td-name">
+      <a href="https://github.com/heygen-com/hyperframes" target="_blank" class="skill-link">hyperframes</a>
+      <span class="skill-author">@heygen-com</span>
+    </td>
+    <td class="td-installs">31.9k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +4.2k (+15.1%)</span></td>
+    <td class="td-stars">⭐ 15.0k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#54 <span class="rank-badge rank-up">▲20</span></td>
+    <td class="td-name">
+      <a href="https://github.com/heygen-com/hyperframes" target="_blank" class="skill-link">hyperframes-cli</a>
+      <span class="skill-author">@heygen-com</span>
+    </td>
+    <td class="td-installs">30.7k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +4.0k (+15.2%)</span></td>
+    <td class="td-stars">⭐ 15.0k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#55 <span class="rank-badge rank-up">▲18</span></td>
+    <td class="td-name">
+      <a href="https://github.com/heygen-com/hyperframes" target="_blank" class="skill-link">gsap</a>
+      <span class="skill-author">@heygen-com</span>
+    </td>
+    <td class="td-installs">30.7k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +4.0k (+15%)</span></td>
+    <td class="td-stars">⭐ 15.0k</td>
+  </tr></tbody>
+    </table>
+  </section>
+       
+  <section class="section">
+    <div class="section-header">
+      <span class="section-icon">✦</span>
+      <div>
+        <div class="section-label">New Entrants</div>
+        <h2 class="section-title">First Time in Trending</h2>
+      </div>
+    </div>
+    <table class="skill-table">
+      <thead><tr><th>Rank</th><th>Skill</th><th>Installs</th><th></th><th>Stars</th></tr></thead>
+      <tbody>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#134 </td>
+    <td class="td-name">
+      <a href="https://github.com/JimLiu/baoyu-skills" target="_blank" class="skill-link">baoyu-infographic</a>
+      <span class="skill-author">@jimliu</span>
+    </td>
+    <td class="td-installs">19.0k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 17.2k</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#171 </td>
+    <td class="td-name">
+      <a href="https://github.com/larksuite/cli" target="_blank" class="skill-link">lark-markdown</a>
+      <span class="skill-author">@larksuite</span>
+    </td>
+    <td class="td-installs">15.5k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 9.3k</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#227 </td>
+    <td class="td-name">
+      <a href="https://github.com/JuliusBrussee/caveman" target="_blank" class="skill-link">cavecrew</a>
+      <span class="skill-author">@juliusbrussee</span>
+    </td>
+    <td class="td-installs">12.6k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 55.1k</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#232 </td>
+    <td class="td-name">
+      <a href="https://github.com/JuliusBrussee/caveman" target="_blank" class="skill-link">caveman-stats</a>
+      <span class="skill-author">@juliusbrussee</span>
+    </td>
+    <td class="td-installs">12.5k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 55.1k</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#322 </td>
+    <td class="td-name">
+      <a href="https://github.com/heygen-com/hyperframes" target="_blank" class="skill-link">css-animations</a>
+      <span class="skill-author">@heygen-com</span>
+    </td>
+    <td class="td-installs">10.9k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 15.0k</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#324 </td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">landing-page-design</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">10.9k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#326 </td>
+    <td class="td-name">
+      <a href="https://github.com/firebase/agent-skills" target="_blank" class="skill-link">firebase-security-rules-auditor</a>
+      <span class="skill-author">@firebase</span>
+    </td>
+    <td class="td-installs">10.9k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 268</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#329 </td>
+    <td class="td-name">
+      <a href="https://github.com/firebase/agent-skills" target="_blank" class="skill-link">firebase-ai-logic-basics</a>
+      <span class="skill-author">@firebase</span>
+    </td>
+    <td class="td-installs">10.7k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 268</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#331 </td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">storyboard-creation</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">10.7k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row is-new">
+    <td class="td-rank">#332 </td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">youtube-thumbnail-design</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">10.7k</td>
+    <td class="td-delta"><span class="chip chip-new">✦ NEW</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr></tbody>
+    </table>
+  </section>
+       
+  <section class="section">
+    <div class="section-header">
+      <span class="section-icon">🚀</span>
+      <div>
+        <div class="section-label">Fast Climbers</div>
+        <h2 class="section-title">Biggest Rank Jumps</h2>
+      </div>
+    </div>
+    <table class="skill-table">
+      <thead><tr><th>Rank</th><th>Skill</th><th>Installs</th><th>This week</th><th>Stars</th></tr></thead>
+      <tbody>
+  <tr class="skill-row">
+    <td class="td-rank">#201 <span class="rank-badge rank-up">▲167</span></td>
+    <td class="td-name">
+      <a href="https://github.com/heygen-com/hyperframes" target="_blank" class="skill-link">remotion-to-hyperframes</a>
+      <span class="skill-author">@heygen-com</span>
+    </td>
+    <td class="td-installs">13.7k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +3.8k (+37.9%)</span></td>
+    <td class="td-stars">⭐ 15.0k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#99 <span class="rank-badge rank-up">▲98</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">python-executor</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.6%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#98 <span class="rank-badge rank-up">▲97</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">remotion-render</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.5%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#101 <span class="rank-badge rank-up">▲97</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">agent-browser</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.6%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#100 <span class="rank-badge rank-up">▲96</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">twitter-automation</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.1k (+49.5%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#97 <span class="rank-badge rank-up">▲95</span></td>
+    <td class="td-name">
+      <a href="https://github.com/inference-sh/skills" target="_blank" class="skill-link">web-search</a>
+      <span class="skill-author">@inference-skills</span>
+    </td>
+    <td class="td-installs">21.6k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.2k (+49.9%)</span></td>
+    <td class="td-stars">⭐ 414</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#1 <span class="rank-badge rank-up">▲53</span></td>
+    <td class="td-name">
+      <a href="https://github.com/mattpocock/skills" target="_blank" class="skill-link">triage</a>
+      <span class="skill-author">@mattpocock</span>
+    </td>
+    <td class="td-installs">40.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +8.2k (+25.3%)</span></td>
+    <td class="td-stars">⭐ 62.4k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#181 <span class="rank-badge rank-up">▲51</span></td>
+    <td class="td-name">
+      <a href="https://github.com/firebase/agent-skills" target="_blank" class="skill-link">developing-genkit-python</a>
+      <span class="skill-author">@firebase</span>
+    </td>
+    <td class="td-installs">14.7k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +2.1k (+16.7%)</span></td>
+    <td class="td-stars">⭐ 268</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#15 <span class="rank-badge rank-up">▲46</span></td>
+    <td class="td-name">
+      <a href="https://github.com/larksuite/cli" target="_blank" class="skill-link">lark-okr</a>
+      <span class="skill-author">@larksuite</span>
+    </td>
+    <td class="td-installs">37.3k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +7.5k (+25.1%)</span></td>
+    <td class="td-stars">⭐ 9.3k</td>
+  </tr>
+  <tr class="skill-row">
+    <td class="td-rank">#203 <span class="rank-badge rank-up">▲38</span></td>
+    <td class="td-name">
+      <a href="https://github.com/jakubkrehel/make-interfaces-feel-better" target="_blank" class="skill-link">make-interfaces-feel-better</a>
+      <span class="skill-author">@jakubkrehel</span>
+    </td>
+    <td class="td-installs">13.5k</td>
+    <td class="td-delta"><span class="chip chip-up">▲ +1.2k (+9.5%)</span></td>
+    <td class="td-stars">⭐ 747</td>
+  </tr></tbody>
+    </table>
+  </section>
+</div>
+
+<footer>Generated by omgskills · 2026-05-11T06:16:15.282Z</footer>
+</body>
+</html>

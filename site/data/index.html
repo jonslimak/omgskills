@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creator Leaderboards | omgskills</title>
+  <meta name="description" content="Creator leaderboards for the Claude and Codex skills ecosystem.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <!-- Start Humblytics Tracking Code -->
+  <script>
+    (function(){
+      document.documentElement.style.opacity='0';
+      window._hmblReveal=function(){ document.documentElement.style.opacity='1'; };
+      setTimeout(window._hmblReveal, 2000);
+    })();
+  </script>
+  <script async src="https://app.humblytics.com/hmbl.min.js?id=a156a68"></script>
+  <!-- End Humblytics Tracking Code -->
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#1a1a1a;min-height:100vh}
+    .meta{font-size:12px;color:#aaa;text-align:center;margin-top:-8px}
+    .creator-toggle{display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;font-weight:600;color:#666}
+    .creator-toggle input{width:28px;height:16px;appearance:none;background:#ddd;border-radius:99px;position:relative;cursor:pointer;transition:background .18s ease}
+    .creator-toggle input::before{content:"";position:absolute;width:12px;height:12px;top:2px;left:2px;background:#fff;border-radius:50%;transition:transform .18s ease;box-shadow:0 1px 2px rgba(0,0,0,.18)}
+    .creator-toggle input:checked{background:#1a1a1a}
+    .creator-toggle input:checked::before{transform:translateX(12px)}
+    .page{max-width:1100px;margin:0 auto;padding:32px 24px;display:flex;flex-direction:column;gap:40px}
+    .leaderboard-group{display:flex;flex-direction:column;gap:18px}
+    .creators-group{margin-top:80px}
+    .page-section-title{font-family:"Geist","DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:32px;font-weight:600;line-height:1.1;letter-spacing:-.04em;color:#1d1d1f;text-align:center}
+    .status{background:#fff;border:1px solid #e5e5e0;border-radius:14px;padding:24px 28px;color:#666;font-size:14px}
+    .goat-section{max-width:800px;width:100%;margin:40px auto 0}
+    .goat-section .goat-table-wrap{width:800px;max-width:100%;margin:0 auto}
+    .goat-section .goat-table{min-width:800px}
+    .goat-table-wrap{background:#fff;border:1px solid #e5e5e0;border-radius:14px;overflow-x:auto}
+    .goat-header{display:flex;gap:12px;align-items:flex-start;padding:18px 22px 14px;border-bottom:1px solid #f0f0ed}
+    .goat-header-icon{font-size:22px;line-height:1;flex-shrink:0;margin-top:2px}
+    .goat-header-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:3px}
+    .goat-header-title{font-size:16px;font-weight:700;color:#111}
+    .goat-table{width:100%;border-collapse:collapse;font-size:12px;min-width:760px}
+    .goat-table th{padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:#999;border-bottom:1px solid #e5e5e0;font-weight:700;white-space:nowrap}
+    .goat-table td{padding:11px 14px;border-bottom:1px solid #f0f0ed;vertical-align:middle;color:#444}
+    .goat-table tr:last-child td{border-bottom:none}
+    .goat-table tr:hover td{background:#fafaf8}
+    .goat-handle{font-size:13px;font-weight:700;color:#111;white-space:nowrap}
+    .goat-num{font-variant-numeric:tabular-nums;white-space:nowrap}
+    .goat-trophies{display:flex;gap:6px;flex-wrap:wrap}
+    .goat-trophy{font-size:11px;color:#555;background:#f5f5f2;border-radius:99px;padding:3px 8px;white-space:nowrap}
+    .trending-section{background:#fff;border:1px solid #e5e5e0;border-radius:14px;overflow:hidden}
+    .skills-group{align-items:center}
+    .skills-group .trending-section{width:100%;max-width:500px}
+    .skills-group .goat-table{min-width:0}
+    .trending-header{display:flex;gap:12px;align-items:flex-start;padding:18px 22px 14px;border-bottom:1px solid #f0f0ed}
+    .trending-icon{font-size:22px;line-height:1;flex-shrink:0;margin-top:2px}
+    .trending-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:3px}
+    .trending-title{font-size:16px;font-weight:700;color:#111}
+    .skill-link{font-size:13px;font-weight:700;color:#111;text-decoration:none}
+    .skill-link:hover{text-decoration:underline}
+    .skill-author{display:block;font-size:11px;color:#aaa;margin-top:1px}
+    .trophy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,360px));gap:60px 80px;justify-content:center}
+    .trophy-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+    .trophy-header{display:flex;gap:12px;align-items:center;padding:16px 18px 12px;border-bottom:1px solid var(--card-border)}
+    .trophy-icon{font-size:22px}
+    .trophy-title{font-size:15px;font-weight:700;color:#111}
+    .trophy-subtitle{font-size:11px;color:#999;margin-top:2px}
+    .trophy-winner-bar{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--medal),var(--accent));padding:10px 18px}
+    .winner-crown{font-size:14px}
+    .winner-name{font-size:14px;font-weight:700;color:#fff;flex:1}
+    .winner-value{font-size:13px;color:rgba(255,255,255,.86);font-weight:600}
+    .lb-list{padding:10px 14px;display:flex;flex-direction:column;gap:2px;flex:1}
+    .lb-row{display:grid;grid-template-columns:24px 1fr auto;column-gap:8px;align-items:baseline;padding:5px 4px;border-radius:6px;font-size:12px}
+    .lb-row:hover{background:rgba(0,0,0,.03)}
+    .lb-winner{font-weight:600}
+    .lb-medal{font-size:14px;text-align:center}
+    .lb-handle{color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .lb-value{color:var(--accent);font-weight:600;white-space:nowrap;text-align:right}
+    .lb-detail{grid-column:2/-1;color:#aaa;font-size:11px;margin-top:-2px}
+    .trophy-insight{margin:0 14px 16px;font-size:10px;color:rgba(85,85,85,.5);line-height:1.5;padding:10px 12px}
+    .vendor-dot{color:#2563eb;font-size:10px;vertical-align:super}
+    .hidden,.overflow-hidden{display:none}
+    .all-hidden .lb-list::after{content:"No results for this filter";display:block;text-align:center;color:#bbb;font-size:12px;padding:12px 0}
+    .footer{font-size:12px;color:#999;text-align:center;padding-bottom:28px}
+    .footer a{color:#555}
+    @media (max-width:720px){
+      .creator-toggle{width:100%;padding-bottom:2px}
+      .page{padding:24px 16px;gap:28px}
+      .page-section-title{font-size:28px}
+      .trophy-grid{grid-template-columns:1fr}
+      .goat-table{min-width:680px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="app">
+    <div class="status">Loading leaderboards from manifest...</div>
+  </main>
+
+  <script>
+    const CATEGORIES = [
+      {
+        id: "influential",
+        icon: "🏆",
+        title: "Most Influential",
+        subtitle: "Total stars across all skills",
+        insight: "Total stars measure ecosystem reputation: how much the community values an author's body of work.",
+        color: { bg: "#fffbeb", accent: "#d97706", border: "#fde68a", medal: "#f59e0b" },
+      },
+      {
+        id: "most-used",
+        icon: "⚡",
+        title: "Most Used",
+        subtitle: "Total installs across all skills",
+        insight: "Installs measure real-world utility: developers voting with their workflows, not their stars.",
+        color: { bg: "#fff7ed", accent: "#ea580c", border: "#fed7aa", medal: "#f97316" },
+      },
+      {
+        id: "peak",
+        icon: "💎",
+        title: "Peak Achiever",
+        subtitle: "Highest single-skill star count",
+        insight: "One breakout skill can define a creator's legacy. This measures the single best release.",
+        color: { bg: "#f0fdf4", accent: "#16a34a", border: "#bbf7d0", medal: "#22c55e" },
+      },
+      {
+        id: "consistent",
+        icon: "🎯",
+        title: "Most Consistent",
+        subtitle: "Highest avg stars per skill",
+        insight: "Average quality is hard to sustain. These creators ship hits, not just volume.",
+        color: { bg: "#eff6ff", accent: "#2563eb", border: "#bfdbfe", medal: "#3b82f6" },
+      },
+      {
+        id: "prolific",
+        icon: "📚",
+        title: "Most Prolific",
+        subtitle: "Most skills published with a quality floor",
+        insight: "Volume with quality is rare. These creators ship constantly without losing community trust.",
+        color: { bg: "#fdf4ff", accent: "#9333ea", border: "#e9d5ff", medal: "#a855f7" },
+      },
+      {
+        id: "efficient",
+        icon: "🚀",
+        title: "Install Efficiency",
+        subtitle: "Avg installs per skill",
+        insight: "Efficiency reveals which creators nail real developer needs every time they ship.",
+        color: { bg: "#f0fdfa", accent: "#0d9488", border: "#99f6e4", medal: "#14b8a6" },
+      },
+    ];
+
+    const MEDALS = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
+    const MAX_VISIBLE = 10;
+    const MAX_ALL_ROUNDERS_VISIBLE = 15;
+
+    function esc(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function fmt(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+      if (n >= 1000) return (n / 1000).toFixed(1) + "k";
+      return String(Math.round(n || 0));
+    }
+
+    function manifestUrl() {
+      const separator = location.protocol === "file:" ? "?" : "?";
+      return (location.protocol === "file:" ? "manifest.json" : "/data/manifest.json") + separator + "v=" + Date.now();
+    }
+
+    function assetUrl(path) {
+      const url = location.protocol === "file:" ? path : "/data/" + path;
+      return url + "?v=" + Date.now();
+    }
+
+    async function loadLeaderboards() {
+      const manifestResponse = await fetch(manifestUrl(), { cache: "no-cache" });
+      if (!manifestResponse.ok) throw new Error("Manifest request failed: " + manifestResponse.status);
+      const manifest = await manifestResponse.json();
+      if (!manifest.leaderboardViewData?.path) throw new Error("manifest.leaderboardViewData.path is missing");
+
+      const dataResponse = await fetch(assetUrl(manifest.leaderboardViewData.path), { cache: "no-cache" });
+      if (!dataResponse.ok) throw new Error("Leaderboard view data request failed: " + dataResponse.status);
+      const viewData = await dataResponse.json();
+      if (!Array.isArray(viewData.topSkills)) throw new Error("Leaderboard view data topSkills must be an array");
+      if (!Array.isArray(viewData.creatorCategories)) throw new Error("Leaderboard view data creatorCategories must be an array");
+      if (!Array.isArray(viewData.allRounders)) throw new Error("Leaderboard view data allRounders must be an array");
+      return { manifest, viewData };
+    }
+
+    function vendorDot(record) {
+      return record.isVendor ? ' <span class="vendor-dot" title="Official vendor">★</span>' : "";
+    }
+
+    function renderGoats(records) {
+      if (records.length === 0) return "";
+
+      return `
+        <section class="goat-section">
+          <div class="goat-table-wrap">
+            <div class="goat-header">
+              <span class="goat-header-icon">🏅</span>
+              <div>
+                <div class="goat-header-label">Top GOATS</div>
+                <h2 class="goat-header-title">All-Rounders</h2>
+              </div>
+            </div>
+            <table class="goat-table">
+              <thead>
+                <tr>
+                  <th>Creator</th>
+                  <th>Skills</th>
+                  <th>Total Stars</th>
+                  <th>Installs</th>
+                  <th>Trophies</th>
+                </tr>
+              </thead>
+              <tbody>
+            ${records.map((record) => {
+              return `
+                <tr class="goat-row" data-vendor="${record.isVendor ? "1" : "0"}">
+                  <td><span class="goat-handle">@${esc(record.authorHandle)}${vendorDot(record)}</span></td>
+                  <td class="goat-num">${record.skillCount}</td>
+                  <td class="goat-num">${fmt(record.totalStars)} ⭐</td>
+                  <td class="goat-num">${fmt(record.totalInstalls)}</td>
+                  <td><div class="goat-trophies">${record.trophies.map((trophy) => `<span class="goat-trophy">${esc(trophy)}</span>`).join("")}</div></td>
+                </tr>`;
+            }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    function renderTrendingSkills(records) {
+      const rows = records.slice(0, 10).map((record) => `
+        <tr>
+          <td class="goat-num">#${record.rank}</td>
+          <td>
+            <a class="skill-link" href="${esc(record.githubUrl)}" target="_blank" rel="noreferrer">${esc(record.name)}</a>
+            <span class="skill-author">@${esc(record.authorHandle)}</span>
+          </td>
+          <td class="goat-num">${fmt(record.installs)}</td>
+          <td class="goat-num">${fmt(record.stars)} ⭐</td>
+        </tr>`).join("");
+
+      return `
+        <section class="trending-section">
+          <div class="trending-header">
+            <span class="trending-icon">🔥</span>
+            <div>
+              <div class="trending-label">Top Trending</div>
+              <h2 class="trending-title">Most Installed This Week</h2>
+            </div>
+          </div>
+          <div>
+            <table class="goat-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Skill</th>
+                  <th>Installs</th>
+                  <th>Stars</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    function renderTrophy(category) {
+      const winner = category.rows[0];
+      const rows = category.rows.map((record, index) => {
+        return `
+          <div class="lb-row ${index === 0 ? "lb-winner" : ""} ${index >= 10 ? "overflow-hidden" : ""}" data-vendor="${record.isVendor ? "1" : "0"}">
+            <span class="lb-medal">${MEDALS[index] ?? String(index + 1)}</span>
+            <span class="lb-handle">@${esc(record.authorHandle)}${vendorDot(record)}</span>
+            <span class="lb-value">${esc(record.value)}</span>
+            <span class="lb-detail">${esc(record.detail)}</span>
+          </div>`;
+      }).join("");
+
+      return `
+        <section class="trophy-card" style="--accent:${category.color.accent};--card-bg:${category.color.bg};--card-border:${category.color.border};--medal:${category.color.medal}">
+          <div class="trophy-header">
+            <span class="trophy-icon">${category.icon}</span>
+            <div>
+              <div class="trophy-title">${esc(category.title)}</div>
+              <div class="trophy-subtitle">${esc(category.subtitle)}</div>
+            </div>
+          </div>
+          ${winner ? `<div class="trophy-winner-bar">
+            <span class="winner-crown">👑</span>
+            <span class="winner-name">@${esc(winner.authorHandle)}</span>
+            <span class="winner-value">${esc(winner.value)}</span>
+          </div>` : ""}
+          <div class="lb-list">${rows}</div>
+          <div class="trophy-insight">${esc(category.insight)}</div>
+        </section>`;
+    }
+
+    function applyFilter(showCorpos) {
+      document.querySelectorAll(".trophy-card").forEach((card) => {
+        const rows = Array.from(card.querySelectorAll(".lb-row"));
+        let visibleCount = 0;
+        rows.forEach((row) => {
+          const isVendor = row.dataset.vendor === "1";
+          const filteredOut = !showCorpos && isVendor;
+          const overLimit = !filteredOut && visibleCount >= MAX_VISIBLE;
+          row.classList.toggle("hidden", filteredOut);
+          row.classList.toggle("overflow-hidden", overLimit);
+          if (!filteredOut && visibleCount < MAX_VISIBLE) {
+            row.classList.toggle("lb-winner", visibleCount === 0);
+            row.querySelector(".lb-medal").textContent = MEDALS[visibleCount] ?? String(visibleCount + 1);
+            visibleCount++;
+          }
+        });
+        card.classList.toggle("all-hidden", visibleCount === 0);
+      });
+
+      const goatRows = Array.from(document.querySelectorAll(".goat-row"));
+      const visibleGoatRows = goatRows.filter((row) => showCorpos || row.dataset.vendor !== "1");
+      goatRows.forEach((row) => {
+        const isVendor = row.dataset.vendor === "1";
+        const visibleIndex = visibleGoatRows.indexOf(row);
+        row.classList.toggle("hidden", isVendor && !showCorpos || visibleIndex >= MAX_ALL_ROUNDERS_VISIBLE);
+      });
+
+    }
+
+    function render(viewData) {
+      const updatedLabel = `Updated ${new Date(viewData.generatedAt).toLocaleDateString()}`;
+      document.getElementById("app").innerHTML = `
+        <section class="leaderboard-group skills-group">
+          <h2 class="page-section-title">Top Skills this Week</h2>
+          <span class="meta">${updatedLabel}</span>
+          ${renderTrendingSkills(viewData.topSkills)}
+        </section>
+        <section class="leaderboard-group creators-group">
+          <h2 class="page-section-title">Top Skill Creators</h2>
+          <label class="creator-toggle"><input type="checkbox" id="show-corpos"> Show Corpos</label>
+          <section class="trophy-grid">${viewData.creatorCategories.map((category) => renderTrophy(category)).join("")}</section>
+        </section>
+        ${renderGoats(viewData.allRounders)}
+        <div class="footer">Data source: <a href="/data/manifest.json">manifest.json</a> → <code>leaderboardViewData.path</code></div>
+      `;
+      document.getElementById("show-corpos").addEventListener("change", (event) => {
+        applyFilter(event.target.checked);
+      });
+      applyFilter(false);
+    }
+
+    loadLeaderboards()
+      .then(({ viewData }) => render(viewData))
+      .catch((error) => {
+        document.getElementById("app").innerHTML = `<div class="status">Could not load leaderboards: ${esc(error.message)}</div>`;
+      })
+      .finally(() => {
+        if (typeof window._hmblReveal === "function") window._hmblReveal();
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "omgskills-index",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "tsx scraper/build.ts",
+    "scrape:with-x": "npm run scrape && tsx scraper/run-x-enrichment.ts",
+    "scrape:trending": "tsx scraper/build-trending.ts",
+    "scrape:x": "tsx scraper/run-x-enrichment.ts",
+    "collect:x-skill-tweets": "tsx scraper/collect-x-skill-tweets.ts",
+    "merge:x-skill-tweets": "tsx scraper/merge-x-skill-tweets.ts",
+    "typecheck": "tsc --noEmit",
+    "content:stats": "tsx scraper/content/compute-stats.ts",
+    "content:stats-html": "tsx scraper/content/build-stats-html.ts",
+    "content:leaderboards": "tsx scraper/content/build-leaderboards-html.ts",
+    "content:fetch-essentials": "tsx scraper/content/fetch-external-essentials.ts",
+    "content:build-basket": "tsx scraper/content/build-gold-basket.ts",
+    "content:enrich-basket": "tsx scraper/content/enrich-gold-basket.ts",
+    "content:overlays": "tsx scraper/content/build-overlays.ts",
+    "content:author-leaderboards": "tsx scraper/content/build-author-leaderboards.ts",
+    "content:trending-leaderboard": "tsx scraper/content/build-trending-leaderboard.ts",
+    "content:leaderboard-view-data": "tsx scraper/content/build-leaderboard-view-data.ts",
+    "content:reports": "tsx scraper/content/build-content-reports.ts",
+    "content:generate": "tsx scraper/content/generate-content.ts",
+    "content:review-html": "tsx scraper/content/build-review-html.ts",
+    "content:growth-html": "tsx scraper/content/build-growth-html.ts",
+    "content:dashboard": "tsx scraper/content/build-dashboard.ts"
+  },
+  "dependencies": {
+    "@octokit/plugin-retry": "^7.2.1",
+    "@octokit/plugin-throttling": "^9.3.2",
+    "@octokit/rest": "^21.0.2",
+    "@the-convocation/twitter-scraper": "^0.22.3",
+    "dotenv": "^16.4.5",
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

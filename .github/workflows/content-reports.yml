@@ -1,0 +1,88 @@
+name: content-reports
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: content-reports
+  cancel-in-progress: false
+
+jobs:
+  content-reports:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: index/package-lock.json
+
+      - name: Install deps
+        working-directory: index
+        run: npm ci
+
+      - name: Build content reports
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run content:reports
+
+      - name: Build overlay data
+        working-directory: index
+        run: npm run content:overlays
+
+      - name: Publish hosted app data
+        env:
+          HEALTH_STATUS: ok
+          HEALTH_MESSAGE: Latest content reports published
+          HEALTH_WORKFLOW: content-reports
+          HEALTH_RUN_ID: ${{ github.run_id }}
+          HEALTH_GIT_SHA: ${{ github.sha }}
+        run: ./scripts/publish-data.sh
+
+      - name: Stamp content success time
+        run: |
+          HEALTH_STATUS=ok \
+          HEALTH_MESSAGE="Latest content reports published" \
+          HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+          HEALTH_WORKFLOW="content-reports" \
+          HEALTH_RUN_ID="${{ github.run_id }}" \
+          HEALTH_GIT_SHA="${{ github.sha }}" \
+          node ./scripts/build-health.mjs
+
+      - name: Verify published data
+        run: node ./scripts/verify-published-data.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- index/external-essentials.json index/gold-basket.json index/stats.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data; then
+            echo "No content report changes"
+          else
+            git add index/external-essentials.json index/gold-basket.json index/stats.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data
+            git commit -m "content: update reports ($(date -u +%Y-%m-%d))"
+            git push
+          fi
+
+      - name: Deploy site to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npx netlify-cli deploy --prod --dir=site
+
+      - name: Verify live manifest
+        run: node ./scripts/verify-live-manifest.mjs

@@ -1,0 +1,102 @@
+name: scrape
+
+# Setup:
+#   Create a fine-grained PAT with public-repo read access.
+#   Add it as a repo secret named SCRAPER_GITHUB_TOKEN.
+#   (Settings → Secrets and variables → Actions → New repository secret)
+#
+# Schedule: nightly at 03:00 UTC. Manual trigger available via
+# Actions tab → scrape → "Run workflow".
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: index/package-lock.json
+
+      - name: Install deps
+        working-directory: index
+        run: npm ci
+
+      - name: Run scraper
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape
+
+      - name: Build trending data
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:trending
+
+      - name: Build overlay data
+        working-directory: index
+        run: npm run content:overlays
+
+      - name: Publish hosted app data
+        env:
+          HEALTH_STATUS: ok
+          HEALTH_MESSAGE: Latest scrape data published
+          HEALTH_WORKFLOW: scrape
+          HEALTH_RUN_ID: ${{ github.run_id }}
+          HEALTH_GIT_SHA: ${{ github.sha }}
+        run: ./scripts/publish-data.sh
+
+      - name: Stamp scrape success time
+        run: |
+          HEALTH_STATUS=ok \
+          HEALTH_MESSAGE="Latest scrape data published" \
+          HEALTH_LAST_SCRAPE_SUCCESS_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+          HEALTH_WORKFLOW="scrape" \
+          HEALTH_RUN_ID="${{ github.run_id }}" \
+          HEALTH_GIT_SHA="${{ github.sha }}" \
+          node ./scripts/build-health.mjs
+
+      - name: Verify published data
+        run: node ./scripts/verify-published-data.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- index/skills.json index/trending.json index/skill-signals.json index/author-signals.json index/snapshots site/data; then
+            echo "No library data changes"
+          else
+            git add index/skills.json index/trending.json index/skill-signals.json index/author-signals.json index/snapshots site/data
+            git commit -m "scrape: update library data ($(date -u +%Y-%m-%d))"
+            git push
+          fi
+
+      - name: Deploy site to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npx netlify-cli deploy --prod --dir=site
+
+      - name: Verify live manifest
+        run: node ./scripts/verify-live-manifest.mjs

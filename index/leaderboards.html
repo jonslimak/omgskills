@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>omgskills Creator Leaderboards</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f2;color:#1a1a1a}
+
+/* ── Header ── */
+header{background:#fff;border-bottom:1px solid #e5e5e0;padding:20px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:18px;font-weight:700}
+.tagline{font-size:13px;color:#888;margin-left:4px}
+.badge{font-size:11px;background:#f0f0ed;border:1px solid #ddd;border-radius:99px;padding:2px 10px;color:#888}
+.meta{font-size:12px;color:#bbb;margin-left:auto}
+
+/* ── Layout ── */
+.page{max-width:1100px;margin:0 auto;padding:32px 24px;display:flex;flex-direction:column;gap:40px}
+
+/* ── Contrast callout ── */
+.contrast{background:#fff;border:1px solid #e5e5e0;border-radius:14px;padding:24px 28px}
+.contrast-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:16px}
+.contrast-headline{font-size:20px;font-weight:800;color:#111;line-height:1.3;margin-bottom:20px}
+.contrast-cols{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start}
+.contrast-col h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:10px}
+.contrast-col.stars h3{color:#d97706}
+.contrast-col.installs h3{color:#ea580c}
+.contrast-col.both h3{color:#16a34a;text-align:center}
+.contrast-handle{font-size:14px;font-weight:600;color:#333;padding:4px 0;display:block}
+.contrast-divider{width:1px;background:#e5e5e0;align-self:stretch;margin:20px 0}
+.contrast-insight{margin-top:16px;font-size:13px;color:#555;line-height:1.5;background:#f9f9f7;border-radius:8px;padding:12px 14px;border-left:3px solid #e5e5e0}
+
+/* ── GOAT section ── */
+.goat-section h2{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.goat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.goat-card{background:#fff;border:1px solid #e5e5e0;border-radius:12px;padding:16px 18px}
+.goat-rank{font-size:11px;font-weight:700;letter-spacing:.4px;color:#888;text-transform:uppercase;margin-bottom:6px}
+.goat-handle{font-size:16px;font-weight:700;color:#111;margin-bottom:8px}
+.goat-stats{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#666;margin-bottom:10px}
+.goat-stats span{background:#f5f5f2;border-radius:99px;padding:2px 8px}
+.goat-trophies{display:flex;flex-direction:column;gap:4px}
+.goat-trophy{font-size:12px;color:#555;padding:2px 0}
+
+/* ── Trophy grid ── */
+.trophy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.trophy-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.trophy-header{display:flex;gap:12px;align-items:center;padding:16px 18px 12px;border-bottom:1px solid var(--card-border)}
+.trophy-icon{font-size:22px}
+.trophy-title{font-size:15px;font-weight:700;color:#111}
+.trophy-subtitle{font-size:11px;color:#999;margin-top:2px}
+.trophy-winner-bar{display:flex;align-items:center;gap:8px;background:var(--medal);background:linear-gradient(135deg,var(--medal),var(--accent));padding:10px 18px}
+.winner-crown{font-size:14px}
+.winner-name{font-size:14px;font-weight:700;color:#fff;flex:1}
+.winner-value{font-size:13px;color:rgba(255,255,255,.85);font-weight:600}
+.lb-list{padding:10px 14px;display:flex;flex-direction:column;gap:2px;flex:1}
+.lb-row{display:grid;grid-template-columns:24px 1fr auto;column-gap:8px;align-items:baseline;padding:5px 4px;border-radius:6px;font-size:12px}
+.lb-row:hover{background:rgba(0,0,0,.03)}
+.lb-winner{font-weight:600}
+.lb-medal{font-size:14px;text-align:center}
+.lb-handle{color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-value{color:var(--accent);font-weight:600;white-space:nowrap;text-align:right}
+.lb-detail{grid-column:2/-1;color:#aaa;font-size:11px;margin-top:-2px}
+.trophy-insight{margin:0 14px 12px;font-size:12px;color:#555;line-height:1.5;background:#fff;border-radius:8px;padding:10px 12px}
+.trophy-tweet{margin:0 14px 16px;display:flex;gap:8px;align-items:flex-start;background:#fff;border:1px solid #e9e9e6;border-radius:8px;padding:10px 12px}
+.tweet-text{flex:1;font-size:12px;color:#333;line-height:1.45}
+.copy-btn{flex-shrink:0;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.copy-btn:hover{opacity:.85}
+.copy-btn.copied{background:#16a34a}
+.vendor-dot{color:#2563eb;font-size:10px;vertical-align:super}
+
+/* ── Filter buttons ── */
+.filter-btns{display:flex;gap:4px;margin-left:8px}
+.filter-btn{background:#f0f0ed;border:1px solid #ddd;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:500;color:#666;cursor:pointer;transition:all .15s}
+.filter-btn:hover{background:#e5e5e0;color:#333}
+.filter-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+
+/* ── Hidden by filter / overflow ── */
+.lb-row.hidden{display:none}
+.lb-row.overflow-hidden{display:none}
+.goat-card.hidden{display:none}
+.trophy-card.all-hidden .lb-list::after{content:"No results for this filter";display:block;text-align:center;color:#bbb;font-size:12px;padding:12px 0}
+
+/* ── Download button ── */
+.dl-btn{margin-left:auto;background:transparent;border:1px solid var(--card-border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .15s;flex-shrink:0}
+.dl-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dl-btn.loading{opacity:.5;cursor:wait}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>omgskills Creator Leaderboards</h1>
+  <span class="tagline">— Who really runs the Claude skill ecosystem?</span>
+  <span class="badge">3431 creators ranked</span>
+  <span class="badge">6 trophy categories</span>
+  <div class="filter-btns">
+    <button class="filter-btn active" data-filter="all">All creators</button>
+    <button class="filter-btn" data-filter="community">Community only</button>
+    <button class="filter-btn" data-filter="vendor">Official only</button>
+  </div>
+  <span class="meta">48,998 skills indexed</span>
+</header>
+
+<div class="page">
+
+  <!-- ── Contrast callout ── -->
+  <div class="contrast">
+    <div class="contrast-title">📊 The Two Economies</div>
+    <div class="contrast-headline">Stars and installs rank creators completely differently — they measure different kinds of greatness.</div>
+    <div class="contrast-cols">
+      <div class="contrast-col stars">
+        <h3>⭐ Stars only (top 5)</h3>
+        <span class="contrast-handle" data-vendor="0">@affaan-m</span><span class="contrast-handle" data-vendor="0">@steipete</span><span class="contrast-handle" data-vendor="1">@github <span class="vendor-dot">★</span></span><span class="contrast-handle" data-vendor="0">@davila7</span><span class="contrast-handle" data-vendor="0">@ruvnet</span>
+      </div>
+      <div class="contrast-divider"></div>
+      <div class="contrast-col both">
+        <h3>✓ Both top 5s</h3>
+        <span class="contrast-handle" data-vendor="1" style="text-align:center">@github <span class="vendor-dot">★</span></span>
+      </div>
+      <div class="contrast-divider"></div>
+      <div class="contrast-col installs">
+        <h3>⚡ Installs only (top 5)</h3>
+        <span class="contrast-handle" data-vendor="1">@googleworkspace <span class="vendor-dot">★</span></span><span class="contrast-handle" data-vendor="1">@github <span class="vendor-dot">★</span></span><span class="contrast-handle" data-vendor="0">@wshobson</span><span class="contrast-handle" data-vendor="0">@jimliu</span><span class="contrast-handle" data-vendor="1">@firecrawl <span class="vendor-dot">★</span></span>
+      </div>
+    </div>
+    <div class="contrast-insight">
+      Only 1 creator (@github) appears in both top 5s. The two rankings are almost entirely different people — stars and installs measure different things.
+    </div>
+  </div>
+
+  <!-- ── GOAT section ── -->
+  
+  <div class="goat-section">
+    <h2>🏅 All-Rounders — Top 5 in 3+ Categories</h2>
+    <div class="goat-grid">
+      
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">👑 GOAT</div>
+    <div class="goat-handle">@anthropics <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>296 skills</span>
+      <span>8.9M ⭐ total</span>
+      <span>290.7k installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">⚡ Most Used</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">📚 Most Prolific</span><span class="goat-trophy">🚀 Install Efficiency</span></div>
+  </div>
+  <div class="goat-card" data-vendor="0">
+    <div class="goat-rank">🥈 Runner-up</div>
+    <div class="goat-handle">@affaan-m</div>
+    <div class="goat-stats">
+      <span>204 skills</span>
+      <span>35.6M ⭐ total</span>
+      <span>0 installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span><span class="goat-trophy">📚 Most Prolific</span></div>
+  </div>
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@github <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>432 skills</span>
+      <span>12.9M ⭐ total</span>
+      <span>541.0k installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">⚡ Most Used</span><span class="goat-trophy">📚 Most Prolific</span><span class="goat-trophy">🚀 Install Efficiency</span></div>
+  </div>
+  <div class="goat-card" data-vendor="0">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@wshobson</div>
+    <div class="goat-stats">
+      <span>204 skills</span>
+      <span>7.1M ⭐ total</span>
+      <span>492.7k installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">⚡ Most Used</span><span class="goat-trophy">📚 Most Prolific</span><span class="goat-trophy">🚀 Install Efficiency</span></div>
+  </div>
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@microsoft <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>479 skills</span>
+      <span>6.4M ⭐ total</span>
+      <span>55.7k installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">⚡ Most Used</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">📚 Most Prolific</span></div>
+  </div>
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@googleworkspace <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>112 skills</span>
+      <span>2.9M ⭐ total</span>
+      <span>1.3M installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">⚡ Most Used</span><span class="goat-trophy">📚 Most Prolific</span><span class="goat-trophy">🚀 Install Efficiency</span></div>
+  </div>
+  <div class="goat-card" data-vendor="0">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@steipete</div>
+    <div class="goat-stats">
+      <span>53 skills</span>
+      <span>18.1M ⭐ total</span>
+      <span>14.3k installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span></div>
+  </div>
+  <div class="goat-card" data-vendor="0">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@garrytan</div>
+    <div class="goat-stats">
+      <span>43 skills</span>
+      <span>3.8M ⭐ total</span>
+      <span>0 installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span></div>
+  </div>
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@facebook <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>13 skills</span>
+      <span>2.7M ⭐ total</span>
+      <span>0 installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span></div>
+  </div>
+  <div class="goat-card" data-vendor="0">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@obra</div>
+    <div class="goat-stats">
+      <span>22 skills</span>
+      <span>2.4M ⭐ total</span>
+      <span>0 installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span></div>
+  </div>
+  <div class="goat-card" data-vendor="0">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@shubhamsaboo</div>
+    <div class="goat-stats">
+      <span>20 skills</span>
+      <span>2.2M ⭐ total</span>
+      <span>0 installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span></div>
+  </div>
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@n8n-io <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>10 skills</span>
+      <span>1.9M ⭐ total</span>
+      <span>0 installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span></div>
+  </div>
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@pytorch <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>18 skills</span>
+      <span>1.8M ⭐ total</span>
+      <span>0 installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">🏆 Most Influential</span><span class="goat-trophy">💎 Peak Achiever</span><span class="goat-trophy">🎯 Most Consistent</span></div>
+  </div>
+  <div class="goat-card" data-vendor="1">
+    <div class="goat-rank">🥉 All-rounder</div>
+    <div class="goat-handle">@vercel-labs <span class="vendor-dot">★</span></div>
+    <div class="goat-stats">
+      <span>123 skills</span>
+      <span>1.1M ⭐ total</span>
+      <span>72.8k installs</span>
+    </div>
+    <div class="goat-trophies"><span class="goat-trophy">⚡ Most Used</span><span class="goat-trophy">📚 Most Prolific</span><span class="goat-trophy">🚀 Install Efficiency</span></div>
+  </div>
+    </div>
+  </div>
+
+  <!-- ── Trophy grid ── -->
+  <div class="trophy-grid">
+    
+  <div class="trophy-card" style="--accent:#d97706;--card-bg:#fffbeb;--card-border:#fde68a;--medal:#f59e0b">
+    <div class="trophy-header">
+      <span class="trophy-icon">🏆</span>
+      <div>
+        <div class="trophy-title">Most Influential</div>
+        <div class="trophy-subtitle">Total stars across all skills</div>
+      </div>
+      <button class="dl-btn" onclick="downloadCard(this, 'influential')">↓ PNG</button>
+    </div>
+    <div class="trophy-winner-bar">
+      <span class="winner-crown">👑</span>
+      <span class="winner-name">@affaan-m</span>
+      <span class="winner-value">35.6M ⭐</span>
+    </div>
+    <div class="lb-list">
+    <div class="lb-row lb-winner " data-vendor="0" data-pos="0">
+      <span class="lb-medal">🥇</span>
+      <span class="lb-handle">@affaan-m</span>
+      <span class="lb-value">35.6M ⭐</span>
+      <span class="lb-detail">204 skills · avg 174.4k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="1">
+      <span class="lb-medal">🥈</span>
+      <span class="lb-handle">@steipete</span>
+      <span class="lb-value">18.1M ⭐</span>
+      <span class="lb-detail">53 skills · avg 341.3k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="2">
+      <span class="lb-medal">🥉</span>
+      <span class="lb-handle">@github <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">12.9M ⭐</span>
+      <span class="lb-detail">432 skills · avg 29.9k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="3">
+      <span class="lb-medal">4️⃣</span>
+      <span class="lb-handle">@davila7</span>
+      <span class="lb-value">12.4M ⭐</span>
+      <span class="lb-detail">464 skills · avg 26.8k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="4">
+      <span class="lb-medal">5️⃣</span>
+      <span class="lb-handle">@ruvnet</span>
+      <span class="lb-value">11.4M ⭐</span>
+      <span class="lb-detail">256 skills · avg 44.5k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="5">
+      <span class="lb-medal">6️⃣</span>
+      <span class="lb-handle">@anthropics <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">8.9M ⭐</span>
+      <span class="lb-detail">296 skills · avg 29.9k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="6">
+      <span class="lb-medal">7️⃣</span>
+      <span class="lb-handle">@wshobson</span>
+      <span class="lb-value">7.1M ⭐</span>
+      <span class="lb-detail">204 skills · avg 34.9k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="7">
+      <span class="lb-medal">8️⃣</span>
+      <span class="lb-handle">@microsoft <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">6.4M ⭐</span>
+      <span class="lb-detail">479 skills · avg 13.4k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="8">
+      <span class="lb-medal">9️⃣</span>
+      <span class="lb-handle">@garrytan</span>
+      <span class="lb-value">3.8M ⭐</span>
+      <span class="lb-detail">43 skills · avg 88.9k ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="9">
+      <span class="lb-medal">🔟</span>
+      <span class="lb-handle">@openai <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">3.2M ⭐</span>
+      <span class="lb-detail">227 skills · avg 14.0k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="10">
+      <span class="lb-medal">11</span>
+      <span class="lb-handle">@ComposioHQ</span>
+      <span class="lb-value">3.1M ⭐</span>
+      <span class="lb-detail">82 skills · avg 37.9k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="11">
+      <span class="lb-medal">12</span>
+      <span class="lb-handle">@googleworkspace <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">2.9M ⭐</span>
+      <span class="lb-detail">112 skills · avg 25.8k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="12">
+      <span class="lb-medal">13</span>
+      <span class="lb-handle">@facebook <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">2.7M ⭐</span>
+      <span class="lb-detail">13 skills · avg 209.0k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="13">
+      <span class="lb-medal">14</span>
+      <span class="lb-handle">@lobehub</span>
+      <span class="lb-value">2.7M ⭐</span>
+      <span class="lb-detail">35 skills · avg 76.1k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="14">
+      <span class="lb-medal">15</span>
+      <span class="lb-handle">@obra</span>
+      <span class="lb-value">2.4M ⭐</span>
+      <span class="lb-detail">22 skills · avg 108.8k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="15">
+      <span class="lb-medal">16</span>
+      <span class="lb-handle">@shubhamsaboo</span>
+      <span class="lb-value">2.2M ⭐</span>
+      <span class="lb-detail">20 skills · avg 109.0k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="16">
+      <span class="lb-medal">17</span>
+      <span class="lb-handle">@K-Dense-AI</span>
+      <span class="lb-value">2.0M ⭐</span>
+      <span class="lb-detail">124 skills · avg 16.5k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="17">
+      <span class="lb-medal">18</span>
+      <span class="lb-handle">@n8n-io <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">1.9M ⭐</span>
+      <span class="lb-detail">10 skills · avg 186.9k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="18">
+      <span class="lb-medal">19</span>
+      <span class="lb-handle">@pytorch <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">1.8M ⭐</span>
+      <span class="lb-detail">18 skills · avg 99.7k ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="19">
+      <span class="lb-medal">20</span>
+      <span class="lb-handle">@posthog</span>
+      <span class="lb-value">1.6M ⭐</span>
+      <span class="lb-detail">208 skills · avg 7.8k ⭐</span>
+    </div></div>
+    <div class="trophy-insight">Total stars measure ecosystem reputation — how much the community collectively values an author's body of work.</div>
+    <div class="trophy-tweet">
+      <div class="tweet-text" id="tw-0">@affaan-m is the most influential Claude skill creator with 35.6M total ⭐ across 204 skills. omgskills.app</div>
+      <button class="copy-btn" onclick="copyTweet(0)">Copy tweet</button>
+    </div>
+  </div>
+  <div class="trophy-card" style="--accent:#ea580c;--card-bg:#fff7ed;--card-border:#fed7aa;--medal:#f97316">
+    <div class="trophy-header">
+      <span class="trophy-icon">⚡</span>
+      <div>
+        <div class="trophy-title">Most Used</div>
+        <div class="trophy-subtitle">Total installs across all skills</div>
+      </div>
+      <button class="dl-btn" onclick="downloadCard(this, 'most-used')">↓ PNG</button>
+    </div>
+    <div class="trophy-winner-bar">
+      <span class="winner-crown">👑</span>
+      <span class="winner-name">@googleworkspace</span>
+      <span class="winner-value">1.3M installs</span>
+    </div>
+    <div class="lb-list">
+    <div class="lb-row lb-winner " data-vendor="1" data-pos="0">
+      <span class="lb-medal">🥇</span>
+      <span class="lb-handle">@googleworkspace <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">1.3M installs</span>
+      <span class="lb-detail">112 skills · 93 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="1">
+      <span class="lb-medal">🥈</span>
+      <span class="lb-handle">@github <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">541.0k installs</span>
+      <span class="lb-detail">432 skills · 47 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="2">
+      <span class="lb-medal">🥉</span>
+      <span class="lb-handle">@wshobson</span>
+      <span class="lb-value">492.7k installs</span>
+      <span class="lb-detail">204 skills · 33 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="3">
+      <span class="lb-medal">4️⃣</span>
+      <span class="lb-handle">@jimliu</span>
+      <span class="lb-value">323.4k installs</span>
+      <span class="lb-detail">22 skills · 18 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="4">
+      <span class="lb-medal">5️⃣</span>
+      <span class="lb-handle">@firecrawl <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">312.0k installs</span>
+      <span class="lb-detail">132 skills · 11 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="5">
+      <span class="lb-medal">6️⃣</span>
+      <span class="lb-handle">@anthropics <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">290.7k installs</span>
+      <span class="lb-detail">296 skills · 10 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="6">
+      <span class="lb-medal">7️⃣</span>
+      <span class="lb-handle">@heygen-com <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">229.6k installs</span>
+      <span class="lb-detail">13 skills · 12 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="7">
+      <span class="lb-medal">8️⃣</span>
+      <span class="lb-handle">@expo <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">228.8k installs</span>
+      <span class="lb-detail">24 skills · 9 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="8">
+      <span class="lb-medal">9️⃣</span>
+      <span class="lb-handle">@inference-skills</span>
+      <span class="lb-value">214.7k installs</span>
+      <span class="lb-detail">21 skills · 15 with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="9">
+      <span class="lb-medal">🔟</span>
+      <span class="lb-handle">@coreyhaines31</span>
+      <span class="lb-value">190.3k installs</span>
+      <span class="lb-detail">42 skills · 6 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="10">
+      <span class="lb-medal">11</span>
+      <span class="lb-handle">@antfu</span>
+      <span class="lb-value">172.3k installs</span>
+      <span class="lb-detail">17 skills · 12 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="11">
+      <span class="lb-medal">12</span>
+      <span class="lb-handle">@google-labs-code <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">158.0k installs</span>
+      <span class="lb-detail">20 skills · 5 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="12">
+      <span class="lb-medal">13</span>
+      <span class="lb-handle">@kepano</span>
+      <span class="lb-value">114.7k installs</span>
+      <span class="lb-detail">5 skills · 5 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="13">
+      <span class="lb-medal">14</span>
+      <span class="lb-handle">@firebase <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">102.6k installs</span>
+      <span class="lb-detail">25 skills · 5 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="14">
+      <span class="lb-medal">15</span>
+      <span class="lb-handle">@vercel-labs <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">72.8k installs</span>
+      <span class="lb-detail">123 skills · 3 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="15">
+      <span class="lb-medal">16</span>
+      <span class="lb-handle">@microsoft <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">55.7k installs</span>
+      <span class="lb-detail">479 skills · 2 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="16">
+      <span class="lb-medal">17</span>
+      <span class="lb-handle">@addyosmani</span>
+      <span class="lb-value">53.2k installs</span>
+      <span class="lb-detail">45 skills · 3 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="17">
+      <span class="lb-medal">18</span>
+      <span class="lb-handle">@larksuite <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">52.9k installs</span>
+      <span class="lb-detail">26 skills · 2 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="18">
+      <span class="lb-medal">19</span>
+      <span class="lb-handle">@mattpocock</span>
+      <span class="lb-value">50.0k installs</span>
+      <span class="lb-detail">23 skills · 2 with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="19">
+      <span class="lb-medal">20</span>
+      <span class="lb-handle">@ibelick</span>
+      <span class="lb-value">45.4k installs</span>
+      <span class="lb-detail">8 skills · 4 with installs</span>
+    </div></div>
+    <div class="trophy-insight">Installs measure real-world utility — developers voting with their workflows, not their stars.</div>
+    <div class="trophy-tweet">
+      <div class="tweet-text" id="tw-1">@googleworkspace is the most-installed Claude skill creator with 1.3M total installs. Stars don't tell this story. omgskills.app</div>
+      <button class="copy-btn" onclick="copyTweet(1)">Copy tweet</button>
+    </div>
+  </div>
+  <div class="trophy-card" style="--accent:#16a34a;--card-bg:#f0fdf4;--card-border:#bbf7d0;--medal:#22c55e">
+    <div class="trophy-header">
+      <span class="trophy-icon">💎</span>
+      <div>
+        <div class="trophy-title">Peak Achiever</div>
+        <div class="trophy-subtitle">Highest single-skill star count</div>
+      </div>
+      <button class="dl-btn" onclick="downloadCard(this, 'peak')">↓ PNG</button>
+    </div>
+    <div class="trophy-winner-bar">
+      <span class="winner-crown">👑</span>
+      <span class="winner-name">@steipete</span>
+      <span class="winner-value">369.0k ⭐</span>
+    </div>
+    <div class="lb-list">
+    <div class="lb-row lb-winner " data-vendor="0" data-pos="0">
+      <span class="lb-medal">🥇</span>
+      <span class="lb-handle">@steipete</span>
+      <span class="lb-value">369.0k ⭐</span>
+      <span class="lb-detail">&quot;summarize&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="1">
+      <span class="lb-medal">🥈</span>
+      <span class="lb-handle">@facebook <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">244.8k ⭐</span>
+      <span class="lb-detail">&quot;fix&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="2">
+      <span class="lb-medal">🥉</span>
+      <span class="lb-handle">@n8n-io <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">186.9k ⭐</span>
+      <span class="lb-detail">&quot;n8n:create-pr&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="3">
+      <span class="lb-medal">4️⃣</span>
+      <span class="lb-handle">@microsoft <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">184.6k ⭐</span>
+      <span class="lb-detail">&quot;fix-errors&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="4">
+      <span class="lb-medal">5️⃣</span>
+      <span class="lb-handle">@obra</span>
+      <span class="lb-value">180.3k ⭐</span>
+      <span class="lb-detail">&quot;using-superpowers&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="5">
+      <span class="lb-medal">6️⃣</span>
+      <span class="lb-handle">@flutter</span>
+      <span class="lb-value">176.2k ⭐</span>
+      <span class="lb-detail">&quot;find-release&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="6">
+      <span class="lb-medal">7️⃣</span>
+      <span class="lb-handle">@affaan-m</span>
+      <span class="lb-value">174.4k ⭐</span>
+      <span class="lb-detail">&quot;continuous-learning-v2&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="7">
+      <span class="lb-medal">8️⃣</span>
+      <span class="lb-handle">@f</span>
+      <span class="lb-value">161.7k ⭐</span>
+      <span class="lb-detail">&quot;skill-lookup&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="8">
+      <span class="lb-medal">9️⃣</span>
+      <span class="lb-handle">@huggingface <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">160.3k ⭐</span>
+      <span class="lb-detail">&quot;add-or-fix-type-checking&quot;</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="9">
+      <span class="lb-medal">🔟</span>
+      <span class="lb-handle">@langgenius</span>
+      <span class="lb-value">140.3k ⭐</span>
+      <span class="lb-detail">&quot;frontend-testing&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="10">
+      <span class="lb-medal">11</span>
+      <span class="lb-handle">@anthropics <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">128.9k ⭐</span>
+      <span class="lb-detail">&quot;algorithmic-art&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="11">
+      <span class="lb-medal">12</span>
+      <span class="lb-handle">@electron <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">121.2k ⭐</span>
+      <span class="lb-detail">&quot;electron-chromium-upgrade&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="12">
+      <span class="lb-medal">13</span>
+      <span class="lb-handle">@shubhamsaboo</span>
+      <span class="lb-value">109.0k ⭐</span>
+      <span class="lb-detail">&quot;fullstack-developer&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="13">
+      <span class="lb-medal">14</span>
+      <span class="lb-handle">@google-gemini <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">103.3k ⭐</span>
+      <span class="lb-detail">&quot;code-reviewer&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="14">
+      <span class="lb-medal">15</span>
+      <span class="lb-handle">@supabase <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">102.0k ⭐</span>
+      <span class="lb-detail">&quot;vitest&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="15">
+      <span class="lb-medal">16</span>
+      <span class="lb-handle">@angular</span>
+      <span class="lb-value">100.1k ⭐</span>
+      <span class="lb-detail">&quot;reference-core&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="16">
+      <span class="lb-medal">17</span>
+      <span class="lb-handle">@pytorch <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">99.7k ⭐</span>
+      <span class="lb-detail">&quot;docstring&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="17">
+      <span class="lb-medal">18</span>
+      <span class="lb-handle">@browser-use</span>
+      <span class="lb-value">92.5k ⭐</span>
+      <span class="lb-detail">&quot;browser-use&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="18">
+      <span class="lb-medal">19</span>
+      <span class="lb-handle">@garrytan</span>
+      <span class="lb-value">90.2k ⭐</span>
+      <span class="lb-detail">&quot;qa&quot;</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="19">
+      <span class="lb-medal">20</span>
+      <span class="lb-handle">@oven-sh</span>
+      <span class="lb-value">89.7k ⭐</span>
+      <span class="lb-detail">&quot;implementing-jsc-classes-cpp&quot;</span>
+    </div></div>
+    <div class="trophy-insight">One breakout skill can define a creator's legacy. This measures the single best release — the skill that put them on the map.</div>
+    <div class="trophy-tweet">
+      <div class="tweet-text" id="tw-2">@steipete's &quot;summarize&quot; has 369.0k ⭐ — the highest-starred single Claude skill from any creator. omgskills.app</div>
+      <button class="copy-btn" onclick="copyTweet(2)">Copy tweet</button>
+    </div>
+  </div>
+  <div class="trophy-card" style="--accent:#2563eb;--card-bg:#eff6ff;--card-border:#bfdbfe;--medal:#3b82f6">
+    <div class="trophy-header">
+      <span class="trophy-icon">🎯</span>
+      <div>
+        <div class="trophy-title">Most Consistent</div>
+        <div class="trophy-subtitle">Highest avg stars per skill (min 5 skills)</div>
+      </div>
+      <button class="dl-btn" onclick="downloadCard(this, 'consistent')">↓ PNG</button>
+    </div>
+    <div class="trophy-winner-bar">
+      <span class="winner-crown">👑</span>
+      <span class="winner-name">@steipete</span>
+      <span class="winner-value">341.3k avg ⭐</span>
+    </div>
+    <div class="lb-list">
+    <div class="lb-row lb-winner " data-vendor="0" data-pos="0">
+      <span class="lb-medal">🥇</span>
+      <span class="lb-handle">@steipete</span>
+      <span class="lb-value">341.3k avg ⭐</span>
+      <span class="lb-detail">53 skills · 18.1M total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="1">
+      <span class="lb-medal">🥈</span>
+      <span class="lb-handle">@facebook <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">209.0k avg ⭐</span>
+      <span class="lb-detail">13 skills · 2.7M total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="2">
+      <span class="lb-medal">🥉</span>
+      <span class="lb-handle">@n8n-io <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">186.9k avg ⭐</span>
+      <span class="lb-detail">10 skills · 1.9M total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="3">
+      <span class="lb-medal">4️⃣</span>
+      <span class="lb-handle">@affaan-m</span>
+      <span class="lb-value">174.4k avg ⭐</span>
+      <span class="lb-detail">204 skills · 35.6M total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="4">
+      <span class="lb-medal">5️⃣</span>
+      <span class="lb-handle">@f</span>
+      <span class="lb-value">161.7k avg ⭐</span>
+      <span class="lb-detail">5 skills · 808.5k total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="5">
+      <span class="lb-medal">6️⃣</span>
+      <span class="lb-handle">@langgenius</span>
+      <span class="lb-value">140.3k avg ⭐</span>
+      <span class="lb-detail">5 skills · 701.6k total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="6">
+      <span class="lb-medal">7️⃣</span>
+      <span class="lb-handle">@shubhamsaboo</span>
+      <span class="lb-value">109.0k avg ⭐</span>
+      <span class="lb-detail">20 skills · 2.2M total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="7">
+      <span class="lb-medal">8️⃣</span>
+      <span class="lb-handle">@obra</span>
+      <span class="lb-value">108.8k avg ⭐</span>
+      <span class="lb-detail">22 skills · 2.4M total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="8">
+      <span class="lb-medal">9️⃣</span>
+      <span class="lb-handle">@pytorch <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">99.7k avg ⭐</span>
+      <span class="lb-detail">18 skills · 1.8M total ⭐</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="9">
+      <span class="lb-medal">🔟</span>
+      <span class="lb-handle">@garrytan</span>
+      <span class="lb-value">88.9k avg ⭐</span>
+      <span class="lb-detail">43 skills · 3.8M total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="10">
+      <span class="lb-medal">11</span>
+      <span class="lb-handle">@supabase <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">80.4k avg ⭐</span>
+      <span class="lb-detail">14 skills · 1.1M total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="11">
+      <span class="lb-medal">12</span>
+      <span class="lb-handle">@lobehub</span>
+      <span class="lb-value">76.1k avg ⭐</span>
+      <span class="lb-detail">35 skills · 2.7M total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="12">
+      <span class="lb-medal">13</span>
+      <span class="lb-handle">@angular</span>
+      <span class="lb-value">71.6k avg ⭐</span>
+      <span class="lb-detail">7 skills · 501.0k total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="13">
+      <span class="lb-medal">14</span>
+      <span class="lb-handle">@google-gemini <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">70.0k avg ⭐</span>
+      <span class="lb-detail">21 skills · 1.5M total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="14">
+      <span class="lb-medal">15</span>
+      <span class="lb-handle">@browser-use</span>
+      <span class="lb-value">68.5k avg ⭐</span>
+      <span class="lb-detail">7 skills · 479.5k total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="15">
+      <span class="lb-medal">16</span>
+      <span class="lb-handle">@thedotmack</span>
+      <span class="lb-value">66.7k avg ⭐</span>
+      <span class="lb-detail">12 skills · 800.3k total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="16">
+      <span class="lb-medal">17</span>
+      <span class="lb-handle">@paperclipai</span>
+      <span class="lb-value">62.9k avg ⭐</span>
+      <span class="lb-detail">5 skills · 314.5k total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="17">
+      <span class="lb-medal">18</span>
+      <span class="lb-handle">@bytedance</span>
+      <span class="lb-value">62.8k avg ⭐</span>
+      <span class="lb-detail">25 skills · 1.6M total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="18">
+      <span class="lb-medal">19</span>
+      <span class="lb-handle">@mattpocock</span>
+      <span class="lb-value">59.5k avg ⭐</span>
+      <span class="lb-detail">23 skills · 1.4M total ⭐</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="19">
+      <span class="lb-medal">20</span>
+      <span class="lb-handle">@leonardomso</span>
+      <span class="lb-value">56.9k avg ⭐</span>
+      <span class="lb-detail">7 skills · 398.4k total ⭐</span>
+    </div></div>
+    <div class="trophy-insight">Average quality is the hardest thing to sustain. These creators ship hits, not just volume.</div>
+    <div class="trophy-tweet">
+      <div class="tweet-text" id="tw-3">@steipete averages 341.3k ⭐ per skill across 53 skills. The most consistent quality creator in the index. omgskills.app</div>
+      <button class="copy-btn" onclick="copyTweet(3)">Copy tweet</button>
+    </div>
+  </div>
+  <div class="trophy-card" style="--accent:#9333ea;--card-bg:#fdf4ff;--card-border:#e9d5ff;--medal:#a855f7">
+    <div class="trophy-header">
+      <span class="trophy-icon">📚</span>
+      <div>
+        <div class="trophy-title">Most Prolific</div>
+        <div class="trophy-subtitle">Most skills published (avg ≥ 500 ⭐ quality floor)</div>
+      </div>
+      <button class="dl-btn" onclick="downloadCard(this, 'prolific')">↓ PNG</button>
+    </div>
+    <div class="trophy-winner-bar">
+      <span class="winner-crown">👑</span>
+      <span class="winner-name">@jeremylongshore</span>
+      <span class="winner-value">625 skills</span>
+    </div>
+    <div class="lb-list">
+    <div class="lb-row lb-winner " data-vendor="0" data-pos="0">
+      <span class="lb-medal">🥇</span>
+      <span class="lb-handle">@jeremylongshore</span>
+      <span class="lb-value">625 skills</span>
+      <span class="lb-detail">avg 2.1k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="1">
+      <span class="lb-medal">🥈</span>
+      <span class="lb-handle">@microsoft <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">479 skills</span>
+      <span class="lb-detail">avg 13.4k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="2">
+      <span class="lb-medal">🥉</span>
+      <span class="lb-handle">@davila7</span>
+      <span class="lb-value">464 skills</span>
+      <span class="lb-detail">avg 26.8k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="3">
+      <span class="lb-medal">4️⃣</span>
+      <span class="lb-handle">@github <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">432 skills</span>
+      <span class="lb-detail">avg 29.9k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="4">
+      <span class="lb-medal">5️⃣</span>
+      <span class="lb-handle">@anthropics <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">296 skills</span>
+      <span class="lb-detail">avg 29.9k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="5">
+      <span class="lb-medal">6️⃣</span>
+      <span class="lb-handle">@ruvnet</span>
+      <span class="lb-value">256 skills</span>
+      <span class="lb-detail">avg 44.5k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="6">
+      <span class="lb-medal">7️⃣</span>
+      <span class="lb-handle">@openai <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">227 skills</span>
+      <span class="lb-detail">avg 14.0k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="7">
+      <span class="lb-medal">8️⃣</span>
+      <span class="lb-handle">@posthog</span>
+      <span class="lb-value">208 skills</span>
+      <span class="lb-detail">avg 7.8k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="8">
+      <span class="lb-medal">9️⃣</span>
+      <span class="lb-handle">@getsentry <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">205 skills</span>
+      <span class="lb-detail">avg 5.2k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="9">
+      <span class="lb-medal">🔟</span>
+      <span class="lb-handle">@affaan-m</span>
+      <span class="lb-value">204 skills</span>
+      <span class="lb-detail">avg 174.4k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="10">
+      <span class="lb-medal">11</span>
+      <span class="lb-handle">@wshobson</span>
+      <span class="lb-value">204 skills</span>
+      <span class="lb-detail">avg 34.9k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="11">
+      <span class="lb-medal">12</span>
+      <span class="lb-handle">@parcadei</span>
+      <span class="lb-value">171 skills</span>
+      <span class="lb-detail">avg 3.8k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="12">
+      <span class="lb-medal">13</span>
+      <span class="lb-handle">@openclaw <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">144 skills</span>
+      <span class="lb-detail">avg 4.4k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="13">
+      <span class="lb-medal">14</span>
+      <span class="lb-handle">@alirezarezvani</span>
+      <span class="lb-value">136 skills</span>
+      <span class="lb-detail">avg 11.8k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="14">
+      <span class="lb-medal">15</span>
+      <span class="lb-handle">@K-Dense-AI</span>
+      <span class="lb-value">124 skills</span>
+      <span class="lb-detail">avg 16.5k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="15">
+      <span class="lb-medal">16</span>
+      <span class="lb-handle">@vercel-labs <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">123 skills</span>
+      <span class="lb-detail">avg 9.0k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="16">
+      <span class="lb-medal">17</span>
+      <span class="lb-handle">@GPTomics</span>
+      <span class="lb-value">121 skills</span>
+      <span class="lb-detail">avg 567 ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="17">
+      <span class="lb-medal">18</span>
+      <span class="lb-handle">@gooseworks-ai</span>
+      <span class="lb-value">115 skills</span>
+      <span class="lb-detail">avg 656 ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="18">
+      <span class="lb-medal">19</span>
+      <span class="lb-handle">@googleworkspace <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">112 skills</span>
+      <span class="lb-detail">avg 25.8k ⭐ per skill</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="19">
+      <span class="lb-medal">20</span>
+      <span class="lb-handle">@trailofbits <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">109 skills</span>
+      <span class="lb-detail">avg 5.0k ⭐ per skill</span>
+    </div></div>
+    <div class="trophy-insight">Volume with quality is rare. These creators ship constantly without compromising on the community's standards.</div>
+    <div class="trophy-tweet">
+      <div class="tweet-text" id="tw-4">@jeremylongshore has published 625 quality Claude skills (avg 2.1k ⭐ each). The most prolific creator in the index. omgskills.app</div>
+      <button class="copy-btn" onclick="copyTweet(4)">Copy tweet</button>
+    </div>
+  </div>
+  <div class="trophy-card" style="--accent:#0d9488;--card-bg:#f0fdfa;--card-border:#99f6e4;--medal:#14b8a6">
+    <div class="trophy-header">
+      <span class="trophy-icon">🚀</span>
+      <div>
+        <div class="trophy-title">Install Efficiency</div>
+        <div class="trophy-subtitle">Avg installs per skill (min 3 skills with installs)</div>
+      </div>
+      <button class="dl-btn" onclick="downloadCard(this, 'efficient')">↓ PNG</button>
+    </div>
+    <div class="trophy-winner-bar">
+      <span class="winner-crown">👑</span>
+      <span class="winner-name">@kepano</span>
+      <span class="winner-value">22.9k installs/skill</span>
+    </div>
+    <div class="lb-list">
+    <div class="lb-row lb-winner " data-vendor="0" data-pos="0">
+      <span class="lb-medal">🥇</span>
+      <span class="lb-handle">@kepano</span>
+      <span class="lb-value">22.9k installs/skill</span>
+      <span class="lb-detail">5 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="1">
+      <span class="lb-medal">🥈</span>
+      <span class="lb-handle">@heygen-com <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">17.7k installs/skill</span>
+      <span class="lb-detail">12 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="2">
+      <span class="lb-medal">🥉</span>
+      <span class="lb-handle">@jimliu</span>
+      <span class="lb-value">14.7k installs/skill</span>
+      <span class="lb-detail">18 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="3">
+      <span class="lb-medal">4️⃣</span>
+      <span class="lb-handle">@googleworkspace <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">11.4k installs/skill</span>
+      <span class="lb-detail">93 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="4">
+      <span class="lb-medal">5️⃣</span>
+      <span class="lb-handle">@inference-skills</span>
+      <span class="lb-value">10.2k installs/skill</span>
+      <span class="lb-detail">15 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="5">
+      <span class="lb-medal">6️⃣</span>
+      <span class="lb-handle">@antfu</span>
+      <span class="lb-value">10.1k installs/skill</span>
+      <span class="lb-detail">12 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="6">
+      <span class="lb-medal">7️⃣</span>
+      <span class="lb-handle">@leonxlnx</span>
+      <span class="lb-value">9.7k installs/skill</span>
+      <span class="lb-detail">3 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="7">
+      <span class="lb-medal">8️⃣</span>
+      <span class="lb-handle">@expo <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">9.5k installs/skill</span>
+      <span class="lb-detail">9 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="1" data-pos="8">
+      <span class="lb-medal">9️⃣</span>
+      <span class="lb-handle">@google-labs-code <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">7.9k installs/skill</span>
+      <span class="lb-detail">5 skills with installs</span>
+    </div>
+    <div class="lb-row  " data-vendor="0" data-pos="9">
+      <span class="lb-medal">🔟</span>
+      <span class="lb-handle">@ibelick</span>
+      <span class="lb-value">5.7k installs/skill</span>
+      <span class="lb-detail">4 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="10">
+      <span class="lb-medal">11</span>
+      <span class="lb-handle">@coreyhaines31</span>
+      <span class="lb-value">4.5k installs/skill</span>
+      <span class="lb-detail">6 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="11">
+      <span class="lb-medal">12</span>
+      <span class="lb-handle">@firebase <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">4.1k installs/skill</span>
+      <span class="lb-detail">5 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="12">
+      <span class="lb-medal">13</span>
+      <span class="lb-handle">@wshobson</span>
+      <span class="lb-value">2.4k installs/skill</span>
+      <span class="lb-detail">33 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="13">
+      <span class="lb-medal">14</span>
+      <span class="lb-handle">@firecrawl <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">2.4k installs/skill</span>
+      <span class="lb-detail">11 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="14">
+      <span class="lb-medal">15</span>
+      <span class="lb-handle">@github <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">1.3k installs/skill</span>
+      <span class="lb-detail">47 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="15">
+      <span class="lb-medal">16</span>
+      <span class="lb-handle">@addyosmani</span>
+      <span class="lb-value">1.2k installs/skill</span>
+      <span class="lb-detail">3 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="16">
+      <span class="lb-medal">17</span>
+      <span class="lb-handle">@anthropics <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">982 installs/skill</span>
+      <span class="lb-detail">10 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="17">
+      <span class="lb-medal">18</span>
+      <span class="lb-handle">@cloudflare <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">802 installs/skill</span>
+      <span class="lb-detail">3 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="1" data-pos="18">
+      <span class="lb-medal">19</span>
+      <span class="lb-handle">@vercel-labs <span class="vendor-dot" title="Official vendor">★</span></span>
+      <span class="lb-value">592 installs/skill</span>
+      <span class="lb-detail">3 skills with installs</span>
+    </div>
+    <div class="lb-row  overflow-hidden" data-vendor="0" data-pos="19">
+      <span class="lb-medal">20</span>
+      <span class="lb-handle">@jeffallan</span>
+      <span class="lb-value">525 installs/skill</span>
+      <span class="lb-detail">3 skills with installs</span>
+    </div></div>
+    <div class="trophy-insight">Efficiency reveals which creators nail real developer needs every time they ship — not just once.</div>
+    <div class="trophy-tweet">
+      <div class="tweet-text" id="tw-5">@kepano averages 22.9k installs per Claude skill. The highest hit-rate of any creator. omgskills.app</div>
+      <button class="copy-btn" onclick="copyTweet(5)">Copy tweet</button>
+    </div>
+  </div>
+  </div>
+
+</div>
+
+<script>
+const TWEETS = ["@affaan-m is the most influential Claude skill creator with 35.6M total ⭐ across 204 skills. omgskills.app","@googleworkspace is the most-installed Claude skill creator with 1.3M total installs. Stars don't tell this story. omgskills.app","@steipete's \"summarize\" has 369.0k ⭐ — the highest-starred single Claude skill from any creator. omgskills.app","@steipete averages 341.3k ⭐ per skill across 53 skills. The most consistent quality creator in the index. omgskills.app","@jeremylongshore has published 625 quality Claude skills (avg 2.1k ⭐ each). The most prolific creator in the index. omgskills.app","@kepano averages 22.9k installs per Claude skill. The highest hit-rate of any creator. omgskills.app"];
+
+function copyTweet(i) {
+  navigator.clipboard.writeText(TWEETS[i]).then(() => {
+    const btn = document.querySelectorAll('.copy-btn')[i];
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy tweet'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+async function downloadCard(btn, id) {
+  const card = btn.closest('.trophy-card');
+  btn.classList.add('loading');
+  btn.textContent = '…';
+
+  // Elements to hide during capture (UI chrome, not content)
+  // Use display:none so they don't leave a gap in the PNG
+  const hideEls = card.querySelectorAll('.trophy-tweet, .dl-btn');
+  hideEls.forEach(el => el.style.display = 'none');
+
+  // Add a small watermark footer during capture
+  const watermark = document.createElement('div');
+  watermark.style.cssText = 'padding:10px 18px 14px;font-size:11px;color:#bbb;text-align:right;font-family:-apple-system,sans-serif';
+  watermark.textContent = 'omgskills.com';
+  card.appendChild(watermark);
+
+  try {
+    const canvas = await html2canvas(card, {
+      scale: 2,
+      backgroundColor: null,
+      useCORS: true,
+      logging: false,
+    });
+
+    const a = document.createElement('a');
+    a.download = 'omgskills-' + id + '-leaderboard.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  } finally {
+    card.removeChild(watermark);
+    hideEls.forEach(el => el.style.display = '');
+    btn.classList.remove('loading');
+    btn.textContent = '↓ PNG';
+  }
+}
+
+// ── Filter logic ──
+const MEDALS = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
+const MAX_VISIBLE = 10;
+
+function applyFilter(filter) {
+  // Update button states
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+
+  // Filter leaderboard rows — show top 10 matching, re-medal them
+  document.querySelectorAll('.trophy-card').forEach(card => {
+    const rows = Array.from(card.querySelectorAll('.lb-row'));
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const isVendor = row.dataset.vendor === '1';
+      const filteredOut = (filter === 'community' && isVendor) || (filter === 'vendor' && !isVendor);
+      const overLimit = !filteredOut && visibleCount >= MAX_VISIBLE;
+      const hide = filteredOut || overLimit;
+
+      row.classList.toggle('hidden', filteredOut);
+      row.classList.toggle('overflow-hidden', overLimit);
+
+      if (!filteredOut && visibleCount < MAX_VISIBLE) {
+        row.classList.toggle('lb-winner', visibleCount === 0);
+        row.querySelector('.lb-medal').textContent = MEDALS[visibleCount] ?? String(visibleCount + 1);
+        visibleCount++;
+      }
+    });
+
+    card.classList.toggle('all-hidden', visibleCount === 0);
+  });
+
+  // Filter GOAT cards
+  document.querySelectorAll('.goat-card').forEach(card => {
+    const isVendor = card.dataset.vendor === '1';
+    const hide = (filter === 'community' && isVendor) || (filter === 'vendor' && !isVendor);
+    card.classList.toggle('hidden', hide);
+  });
+
+  // Dim contrast callout handles that don't match filter
+  document.querySelectorAll('.contrast-handle').forEach(el => {
+    const isVendor = el.dataset.vendor === '1';
+    const hide = (filter === 'community' && isVendor) || (filter === 'vendor' && !isVendor);
+    el.style.opacity = hide ? '0.25' : '1';
+  });
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyFilter(btn.dataset.filter));
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>omgskills Stats Report</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f2;color:#1a1a1a;min-height:100vh}
+header{background:#fff;border-bottom:1px solid #e5e5e0;padding:20px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+h1{font-size:18px;font-weight:700;color:#111}
+.meta{font-size:12px;color:#999;margin-left:auto}
+.badge{font-size:11px;background:#f0f0ed;border:1px solid #ddd;border-radius:99px;padding:2px 10px;color:#888}
+
+.grid{max-width:900px;margin:32px auto;padding:0 24px;display:flex;flex-direction:column;gap:24px}
+
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-header{display:flex;gap:14px;align-items:flex-start;padding:20px 24px 16px;border-bottom:1px solid var(--card-border)}
+.card-icon{font-size:24px;line-height:1;flex-shrink:0;margin-top:2px}
+.card-meta{flex:1;min-width:0}
+.card-id{font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:4px}
+.card-hook{font-size:17px;font-weight:700;color:#111;line-height:1.35}
+.card-body{padding:18px 24px;display:flex;flex-direction:column;gap:14px}
+
+.angle-bar{display:flex;gap:10px;background:#fff;border-radius:8px;padding:12px 14px;border:1px solid #e9e9e6}
+.angle-label{font-size:16px;flex-shrink:0}
+.angle-text{font-size:13px;color:#444;line-height:1.55}
+
+.tweet-section{display:flex;flex-direction:column;gap:8px}
+.tweet-section-label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#aaa}
+.tweet-hook{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #e5e5e0;border-radius:8px;padding:10px 12px}
+.tweet-text{flex:1;font-size:13px;color:#333;line-height:1.5}
+.copy-btn{flex-shrink:0;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.copy-btn:hover{opacity:.85}
+.copy-btn.copied{background:#16a34a}
+
+details.data-details{border-radius:8px;overflow:hidden}
+details summary{font-size:12px;color:#aaa;cursor:pointer;padding:6px 2px;user-select:none;list-style:none}
+details summary::before{content:"▶ "}
+details[open] summary::before{content:"▼ "}
+.data-inner{margin-top:10px;background:#fff;border:1px solid #e9e9e6;border-radius:8px;padding:14px;overflow-x:auto}
+
+.data-dl{display:flex;flex-direction:column;gap:6px}
+.dl-row{display:flex;gap:12px;flex-wrap:wrap;font-size:12px}
+dt{color:#888;min-width:120px;font-weight:500;flex-shrink:0}
+dd{color:#222;flex:1}
+
+.data-table-wrap{overflow-x:auto}
+.data-table{border-collapse:collapse;font-size:11px;width:100%}
+.data-table th{text-align:left;padding:5px 10px;color:#888;border-bottom:2px solid #e5e5e0;white-space:nowrap;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+.data-table td{padding:5px 10px;border-bottom:1px solid #f0f0ed;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#fafaf8}
+.truncated{font-size:11px;color:#aaa;padding:6px 10px;text-align:center}
+.num{color:#2563eb;font-variant-numeric:tabular-nums}
+.str{color:#333}
+.bool{color:#9333ea}
+.null{color:#aaa}
+</style>
+</head>
+<body>
+<header>
+  <h1>omgskills Stats Report</h1>
+  <span class="badge">9 insights</span>
+  <span class="badge">20 tweet hooks</span>
+  <span class="meta">Generated 5/11/2026, 6:16:12 AM · 48,998 skills indexed</span>
+</header>
+
+<div class="grid">
+  
+  <section class="card" style="--accent:#ea580c;--card-bg:#fff7ed;--card-border:#fed7aa">
+    <div class="card-header">
+      <span class="card-icon">⚡</span>
+      <div class="card-meta">
+        <span class="card-id">INSTALL POWER LAW</span>
+        <h2 class="card-hook">Just 237 skills drive 80% of all 5.7M installs across the index</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">The Claude skill ecosystem is winner-take-all. Most skills are never installed — a tiny handful capture nearly everything. This is your content angle: the crowd doesn't know what the crowd is installing.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-0-0">
+      <div class="tweet-text">237 skills out of 346 tracked drive 80% of all Claude skill installs 🤯 #ClaudeCode</div>
+      <button class="copy-btn" onclick="copyHook(0,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-0-1">
+      <div class="tweet-text">Top 5 authors control 51.4% of all Claude skill installs. The ecosystem has a serious power law. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(0,1)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-0-2">
+      <div class="tweet-text">5.7M Claude skills installs — and 237 skills account for 80% of them. Who's dominating? omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(0,2)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>total_installs</dt><dd><span class="num">5,728,019</span></dd></div><div class="dl-row"><dt>skills_for_80_pct</dt><dd><span class="num">237</span></dd></div><div class="dl-row"><dt>top10</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>id</th><th>installs</th><th>trending_rank</th><th>trending_source</th></tr></thead>
+        <tbody><tr><td><span class="str">mattpocock/skills:triage</span></td><td><span class="num">40,466</span></td><td><span class="num">1</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">coreyhaines31/marketingskills:site-architecture</span></td><td><span class="num">40,367</span></td><td><span class="num">2</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">wshobson/agents:tailwind-design-system</span></td><td><span class="num">39,698</span></td><td><span class="num">4</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">coreyhaines31/marketingskills:sales-enablement</span></td><td><span class="num">39,630</span></td><td><span class="num">5</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">wshobson/agents:typescript-advanced-types</span></td><td><span class="num">39,264</span></td><td><span class="num">7</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">anthropics/skills:algorithmic-art</span></td><td><span class="num">38,478</span></td><td><span class="num">8</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">coreyhaines31/marketingskills:revops</span></td><td><span class="num">38,359</span></td><td><span class="num">9</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">google-labs-code/stitch-skills:enhance-prompt</span></td><td><span class="num">38,048</span></td><td><span class="num">10</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">google-labs-code/stitch-skills:stitch-loop</span></td><td><span class="num">37,904</span></td><td><span class="num">11</span></td><td><span class="str">skills.sh</span></td></tr><tr><td><span class="str">anthropics/skills:doc-coauthoring</span></td><td><span class="num">37,877</span></td><td><span class="num">12</span></td><td><span class="str">skills.sh</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>top_authors</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>author</th><th>installs</th></tr></thead>
+        <tbody><tr><td><span class="str">googleworkspace</span></td><td><span class="num">1,276,467</span></td></tr><tr><td><span class="str">github</span></td><td><span class="num">540,957</span></td></tr><tr><td><span class="str">wshobson</span></td><td><span class="num">492,686</span></td></tr><tr><td><span class="str">jimliu</span></td><td><span class="num">323,384</span></td></tr><tr><td><span class="str">firecrawl</span></td><td><span class="num">312,021</span></td></tr></tbody>
+      </table></div></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#16a34a;--card-bg:#f0fdf4;--card-border:#bbf7d0">
+    <div class="card-header">
+      <span class="card-icon">💎</span>
+      <div class="card-meta">
+        <span class="card-id">HIDDEN GEMS</span>
+        <h2 class="card-hook">10 high-quality skills (500+ ⭐) have zero installs — the crowd hasn't found them yet</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">Stars and installs measure completely different things. Stars = developer respect. Installs = real usage. The gap between them is your editorial advantage — surface the gems before the crowd does.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-1-0">
+      <div class="tweet-text">10 Claude skills have 500+ GitHub stars but zero recorded installs. Hidden gems waiting to be discovered. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(1,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-1-1">
+      <div class="tweet-text">Stars ≠ installs in the Claude skill ecosystem. Some of the highest-rated skills are barely installed. We found the gap. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(1,1)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>hidden_gems</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>id</th><th>name</th><th>author</th><th>stars</th></tr></thead>
+        <tbody><tr><td><span class="str">steipete/clawdis:weather</span></td><td><span class="str">weather</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:tmux</span></td><td><span class="str">tmux</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:gog</span></td><td><span class="str">gog</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:nano-pdf</span></td><td><span class="str">nano-pdf</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:openai-whisper</span></td><td><span class="str">openai-whisper</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:mcporter</span></td><td><span class="str">mcporter</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:peekaboo</span></td><td><span class="str">peekaboo</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:himalaya</span></td><td><span class="str">himalaya</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:clawhub</span></td><td><span class="str">clawhub</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr><tr><td><span class="str">steipete/clawdis:apple-reminders</span></td><td><span class="str">apple-reminders</span></td><td><span class="str">steipete</span></td><td><span class="num">368,990</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>efficiency_outliers</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>id</th><th>installs</th><th>stars</th></tr></thead>
+        <tbody><tr><td><span class="str">google-labs-code/stitch-skills:enhance-prompt</span></td><td><span class="num">38,048</span></td><td><span class="num">5,242</span></td></tr><tr><td><span class="str">coreyhaines31/marketingskills:site-architecture</span></td><td><span class="num">40,367</span></td><td><span class="num">26,909</span></td></tr><tr><td><span class="str">google-labs-code/stitch-skills:stitch-loop</span></td><td><span class="num">37,904</span></td><td><span class="num">5,242</span></td></tr><tr><td><span class="str">emilkowalski/skill:emil-design-eng</span></td><td><span class="num">37,091</span></td><td><span class="num">1,116</span></td></tr><tr><td><span class="str">coreyhaines31/marketingskills:sales-enablement</span></td><td><span class="num">39,630</span></td><td><span class="num">26,909</span></td></tr><tr><td><span class="str">expo/skills:building-native-ui</span></td><td><span class="num">36,865</span></td><td><span class="num">1,856</span></td></tr><tr><td><span class="str">larksuite/cli:lark-okr</span></td><td><span class="num">37,338</span></td><td><span class="num">9,333</span></td></tr><tr><td><span class="str">firecrawl/cli:firecrawl-scrape</span></td><td><span class="num">36,239</span></td><td><span class="num">368</span></td></tr><tr><td><span class="str">firecrawl/cli:firecrawl-search</span></td><td><span class="num">35,967</span></td><td><span class="num">368</span></td></tr><tr><td><span class="str">wshobson/agents:tailwind-design-system</span></td><td><span class="num">39,698</span></td><td><span class="num">34,867</span></td></tr></tbody>
+      </table></div></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#2563eb;--card-bg:#eff6ff;--card-border:#bfdbfe">
+    <div class="card-header">
+      <span class="card-icon">🏢</span>
+      <div class="card-meta">
+        <span class="card-id">OFFICIAL VS COMMUNITY</span>
+        <h2 class="card-hook">Official vendor skills get 1.6x more installs than community skills — brand beats quality</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">In the Claude ecosystem, brand trust is a multiplier. Developers reach for official vendor skills first — even when community alternatives are just as good or better. The discovery gap is real.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-2-0">
+      <div class="tweet-text">Official vendor Claude skills get 1.6x more installs than community-built ones. Brand trust dominates quality. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(2,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-2-1">
+      <div class="tweet-text">211 vendor skills control 62.3% of all gold-basket installs despite being 50.2% of the list. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(2,1)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>vendor</dt><dd><dl class="data-dl"><div class="dl-row"><dt>count</dt><dd><span class="num">211</span></dd></div><div class="dl-row"><dt>avg_stars</dt><dd><span class="num">60,345</span></dd></div><div class="dl-row"><dt>avg_installs</dt><dd><span class="num">11,168</span></dd></div><div class="dl-row"><dt>avg_forks</dt><dd><span class="num">10,365</span></dd></div><div class="dl-row"><dt>avg_watchers</dt><dd><span class="num">832</span></dd></div><div class="dl-row"><dt>total_installs</dt><dd><span class="num">2,356,387</span></dd></div></dl></dd></div><div class="dl-row"><dt>community</dt><dd><dl class="data-dl"><div class="dl-row"><dt>count</dt><dd><span class="num">209</span></dd></div><div class="dl-row"><dt>avg_stars</dt><dd><span class="num">139,672</span></dd></div><div class="dl-row"><dt>avg_installs</dt><dd><span class="num">6,816</span></dd></div><div class="dl-row"><dt>avg_forks</dt><dd><span class="num">25,437</span></dd></div><div class="dl-row"><dt>avg_watchers</dt><dd><span class="num">737</span></dd></div><div class="dl-row"><dt>total_installs</dt><dd><span class="num">1,424,483</span></dd></div></dl></dd></div><div class="dl-row"><dt>vendor_install_share_pct</dt><dd><span class="num">62.3</span></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#ca8a04;--card-bg:#fefce8;--card-border:#fde68a">
+    <div class="card-header">
+      <span class="card-icon">⭐</span>
+      <div class="card-meta">
+        <span class="card-id">STARS POWER LAW</span>
+        <h2 class="card-hook">16.8% of the 49.0k skills in the index have zero GitHub stars</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">The index is a massive iceberg. The vast majority of skills are invisible by stars — yet some get installed heavily anyway. Stars alone aren't the signal people think they are.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-3-0">
+      <div class="tweet-text">16.8% of Claude skills on GitHub have zero stars. The index has 49.0k skills — most are invisible. omgskills.app finds the ones worth using.</div>
+      <button class="copy-btn" onclick="copyHook(3,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-3-1">
+      <div class="tweet-text">80% of all GitHub stars in the Claude ecosystem belong to just 2990 skills out of 49.0k. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(3,1)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>total_stars</dt><dd><span class="num">248,025,825</span></dd></div><div class="dl-row"><dt>skills_for_80_pct</dt><dd><span class="num">2,990</span></dd></div><div class="dl-row"><dt>buckets</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>label</th><th>min</th><th>max</th><th>count</th></tr></thead>
+        <tbody><tr><td><span class="str">0 stars</span></td><td><span class="num">0</span></td><td><span class="num">0</span></td><td><span class="num">8,251</span></td></tr><tr><td><span class="str">1–9 stars</span></td><td><span class="num">1</span></td><td><span class="num">9</span></td><td><span class="num">12,963</span></td></tr><tr><td><span class="str">10–99 stars</span></td><td><span class="num">10</span></td><td><span class="num">99</span></td><td><span class="num">9,992</span></td></tr><tr><td><span class="str">100–499 stars</span></td><td><span class="num">100</span></td><td><span class="num">499</span></td><td><span class="num">7,261</span></td></tr><tr><td><span class="str">500–999 stars</span></td><td><span class="num">500</span></td><td><span class="num">999</span></td><td><span class="num">2,059</span></td></tr><tr><td><span class="str">1000+ stars</span></td><td><span class="num">1,000</span></td><td><span class="null">null</span></td><td><span class="num">8,472</span></td></tr></tbody>
+      </table></div></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#9333ea;--card-bg:#fdf4ff;--card-border:#e9d5ff">
+    <div class="card-header">
+      <span class="card-icon">🗂️</span>
+      <div class="card-meta">
+        <span class="card-id">NICHE BREAKDOWN</span>
+        <h2 class="card-hook">DevOps &amp; CI/CD dominates with 18.7% of installs — MCP Servers is last</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">Developer attention isn't evenly distributed. Some niches punch far above their weight in installs — others have passionate but small communities. Knowing this shapes which content formats will resonate.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-4-0">
+      <div class="tweet-text">DevOps &amp; CI/CD skills get 18.7% of all Claude skill installs. MCP Servers is last. The niche breakdown is wilder than you'd expect. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(4,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-4-1">
+      <div class="tweet-text">The most community-engaged Claude skill niche (by forks/stars)? General &amp; Utilities. The most loyal? MCP Servers. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(4,1)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>niches</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>label</th><th>count</th><th>totalInstalls</th><th>avgStars</th><th>avgForks</th><th>avgWatchers</th><th>avgScore</th><th>forksPerStar</th><th>watchersPerInstall</th></tr></thead>
+        <tbody><tr><td><span class="str">DevOps &amp; CI/CD</span></td><td><span class="num">30</span></td><td><span class="num">706,994</span></td><td><span class="num">30,771</span></td><td><span class="num">3,281</span></td><td><span class="num">196</span></td><td><span class="num">51.3</span></td><td><span class="num">0.107</span></td><td><span class="num">0.008</span></td></tr><tr><td><span class="str">Media &amp; Creative</span></td><td><span class="num">30</span></td><td><span class="num">620,210</span></td><td><span class="num">36,097</span></td><td><span class="num">6,474</span></td><td><span class="num">194</span></td><td><span class="num">41.4</span></td><td><span class="num">0.179</span></td><td><span class="num">0.009</span></td></tr><tr><td><span class="str">Design &amp; UI</span></td><td><span class="num">30</span></td><td><span class="num">554,008</span></td><td><span class="num">93,820</span></td><td><span class="num">18,369</span></td><td><span class="num">1,946</span></td><td><span class="num">44</span></td><td><span class="num">0.196</span></td><td><span class="num">0.105</span></td></tr><tr><td><span class="str">Web Scraping &amp; Automation</span></td><td><span class="num">30</span></td><td><span class="num">541,780</span></td><td><span class="num">26,503</span></td><td><span class="num">1,482</span></td><td><span class="num">98</span></td><td><span class="num">41.8</span></td><td><span class="num">0.056</span></td><td><span class="num">0.005</span></td></tr><tr><td><span class="str">Writing &amp; Documentation</span></td><td><span class="num">30</span></td><td><span class="num">506,138</span></td><td><span class="num">72,986</span></td><td><span class="num">12,191</span></td><td><span class="num">488</span></td><td><span class="num">40.2</span></td><td><span class="num">0.167</span></td><td><span class="num">0.029</span></td></tr><tr><td><span class="str">Coding Productivity</span></td><td><span class="num">30</span></td><td><span class="num">294,560</span></td><td><span class="num">104,246</span></td><td><span class="num">18,626</span></td><td><span class="num">1,438</span></td><td><span class="num">27.2</span></td><td><span class="num">0.179</span></td><td><span class="num">0.146</span></td></tr><tr><td><span class="str">AI Orchestration</span></td><td><span class="num">30</span></td><td><span class="num">115,026</span></td><td><span class="num">63,757</span></td><td><span class="num">10,175</span></td><td><span class="num">430</span></td><td><span class="num">11.1</span></td><td><span class="num">0.16</span></td><td><span class="num">0.112</span></td></tr><tr><td><span class="str">Content &amp; Marketing</span></td><td><span class="num">30</span></td><td><span class="num">102,063</span></td><td><span class="num">47,790</span></td><td><span class="num">8,262</span></td><td><span class="num">308</span></td><td><span class="num">10.7</span></td><td><span class="num">0.173</span></td><td><span class="num">0.091</span></td></tr><tr><td><span class="str">General &amp; Utilities</span></td><td><span class="num">30</span></td><td><span class="num">84,883</span></td><td><span class="num">250,255</span></td><td><span class="num">50,005</span></td><td><span class="num">1,422</span></td><td><span class="num">25.6</span></td><td><span class="num">0.2</span></td><td><span class="num">0.503</span></td></tr><tr><td><span class="str">Data &amp; Analytics</span></td><td><span class="num">30</span></td><td><span class="num">81,804</span></td><td><span class="num">90,892</span></td><td><span class="num">17,509</span></td><td><span class="num">941</span></td><td><span class="num">13.1</span></td><td><span class="num">0.193</span></td><td><span class="num">0.345</span></td></tr><tr><td><span class="str">Agent Memory &amp; Workflow</span></td><td><span class="num">30</span></td><td><span class="num">64,733</span></td><td><span class="num">150,774</span></td><td><span class="num">26,619</span></td><td><span class="num">1,053</span></td><td><span class="num">16.3</span></td><td><span class="num">0.177</span></td><td><span class="num">0.488</span></td></tr><tr><td><span class="str">Security</span></td><td><span class="num">30</span></td><td><span class="num">50,361</span></td><td><span class="num">115,394</span></td><td><span class="num">17,676</span></td><td><span class="num">674</span></td><td><span class="num">12.2</span></td><td><span class="num">0.153</span></td><td><span class="num">0.402</span></td></tr><tr><td><span class="str">Research &amp; Summarization</span></td><td><span class="num">30</span></td><td><span class="num">48,532</span></td><td><span class="num">242,839</span></td><td><span class="num">48,182</span></td><td><span class="num">1,349</span></td><td><span class="num">22.5</span></td><td><span class="num">0.198</span></td><td><span class="num">0.834</span></td></tr><tr><td><span class="str">MCP Servers</span></td><td><span class="num">30</span></td><td><span class="num">9,778</span></td><td><span class="num">71,355</span></td><td><span class="num">11,262</span></td><td><span class="num">449</span></td><td><span class="num">6.2</span></td><td><span class="num">0.158</span></td><td><span class="num">1.378</span></td></tr></tbody>
+      </table></div></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#0d9488;--card-bg:#f0fdfa;--card-border:#99f6e4">
+    <div class="card-header">
+      <span class="card-icon">🏷️</span>
+      <div class="card-meta">
+        <span class="card-id">TAG INTELLIGENCE</span>
+        <h2 class="card-hook">&quot;ai-agents + claude-code&quot; is the most common tag pair — appearing together in 5.0k skills</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">Tag co-occurrence is a map of developer intent. The most common pairs reveal what people actually build with Claude — and where the white space is. Use this to spot emerging niches before they're obvious.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-5-0">
+      <div class="tweet-text">&quot;claude-code&quot; is the most common tag in the Claude skill ecosystem with 12.1k skills. Here's the full breakdown: omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(5,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-5-1">
+      <div class="tweet-text">The top tag pair in Claude skills is &quot;ai-agents + claude-code&quot; — appearing in 5.0k skills together. The ecosystem's shape is clearer than you'd think. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(5,1)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>top_tags</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>tag</th><th>count</th></tr></thead>
+        <tbody><tr><td><span class="str">claude-code</span></td><td><span class="num">12,068</span></td></tr><tr><td><span class="str">agent-skills</span></td><td><span class="num">6,990</span></td></tr><tr><td><span class="str">ai-agents</span></td><td><span class="num">6,467</span></td></tr><tr><td><span class="str">claude</span></td><td><span class="num">6,010</span></td></tr><tr><td><span class="str">skills</span></td><td><span class="num">5,037</span></td></tr><tr><td><span class="str">claude-skills</span></td><td><span class="num">4,830</span></td></tr><tr><td><span class="str">developer-tools</span></td><td><span class="num">4,510</span></td></tr><tr><td><span class="str">mcp</span></td><td><span class="num">4,113</span></td></tr><tr><td><span class="str">claude-code-skills</span></td><td><span class="num">4,103</span></td></tr><tr><td><span class="str">ai</span></td><td><span class="num">3,992</span></td></tr><tr><td><span class="str">anthropic</span></td><td><span class="num">3,439</span></td></tr><tr><td><span class="str">cursor</span></td><td><span class="num">2,771</span></td></tr><tr><td><span class="str">llm</span></td><td><span class="num">2,635</span></td></tr><tr><td><span class="str">codex</span></td><td><span class="num">2,584</span></td></tr><tr><td><span class="str">automation</span></td><td><span class="num">2,555</span></td></tr><tr><td><span class="str">agents</span></td><td><span class="num">2,257</span></td></tr><tr><td><span class="str">ai-coding</span></td><td><span class="num">2,081</span></td></tr><tr><td><span class="str">codex-skills</span></td><td><span class="num">2,027</span></td></tr><tr><td><span class="str">prompt-engineering</span></td><td><span class="num">1,750</span></td></tr><tr><td><span class="str">claude-code-plugins</span></td><td><span class="num">1,613</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>top_pairs</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>pair</th><th>count</th></tr></thead>
+        <tbody><tr><td><span class="str">ai-agents + claude-code</span></td><td><span class="num">5,009</span></td></tr><tr><td><span class="str">claude + claude-code</span></td><td><span class="num">4,366</span></td></tr><tr><td><span class="str">agent-skills + claude-code</span></td><td><span class="num">4,061</span></td></tr><tr><td><span class="str">claude-code + developer-tools</span></td><td><span class="num">3,971</span></td></tr><tr><td><span class="str">claude-code + claude-code-skills</span></td><td><span class="num">3,815</span></td></tr><tr><td><span class="str">claude-code + claude-skills</span></td><td><span class="num">3,755</span></td></tr><tr><td><span class="str">ai-agents + developer-tools</span></td><td><span class="num">3,649</span></td></tr><tr><td><span class="str">claude-code + skills</span></td><td><span class="num">3,356</span></td></tr><tr><td><span class="str">claude-code + mcp</span></td><td><span class="num">3,336</span></td></tr><tr><td><span class="str">anthropic + claude-code</span></td><td><span class="num">3,022</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>high_quality_tags</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>tag</th><th>avg</th></tr></thead>
+        <tbody><tr><td><span class="str">crustacean</span></td><td><span class="num">368,973</span></td></tr><tr><td><span class="str">molty</span></td><td><span class="num">368,973</span></td></tr><tr><td><span class="str">personal</span></td><td><span class="num">368,973</span></td></tr><tr><td><span class="str">own-your-data</span></td><td><span class="num">365,061</span></td></tr><tr><td><span class="str">assistant</span></td><td><span class="num">306,707</span></td></tr><tr><td><span class="str">declarative</span></td><td><span class="num">224,432</span></td></tr><tr><td><span class="str">apis</span></td><td><span class="num">186,866</span></td></tr><tr><td><span class="str">integration-framework</span></td><td><span class="num">186,866</span></td></tr><tr><td><span class="str">ipaas</span></td><td><span class="num">186,866</span></td></tr><tr><td><span class="str">low-code-platform</span></td><td><span class="num">186,866</span></td></tr></tbody>
+      </table></div></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#e11d48;--card-bg:#fff1f2;--card-border:#fecdd3">
+    <div class="card-header">
+      <span class="card-icon">✍️</span>
+      <div class="card-meta">
+        <span class="card-id">AUTHOR INTELLIGENCE</span>
+        <h2 class="card-hook">The most prolific author (@majiayu000) has 2037 skills — avg 115 ⭐ each</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">Prolific doesn't always mean quality — and one-hit wonders often have the highest-starred skills. Author spotlights work best when you contrast quantity vs quality builders.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-6-0">
+      <div class="tweet-text">@majiayu000 has built 2037 Claude skills. The most prolific creator in the index. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(6,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-6-1">
+      <div class="tweet-text">Multi-skill Claude authors avg 1.5k ⭐ per skill vs 448 ⭐ for one-timers. Quantity drives quality. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(6,1)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>top_prolific</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>author</th><th>count</th><th>avg_stars</th></tr></thead>
+        <tbody><tr><td><span class="str">majiayu000</span></td><td><span class="num">2,037</span></td><td><span class="num">115</span></td></tr><tr><td><span class="str">sickn33</span></td><td><span class="num">1,103</span></td><td><span class="num">36,532</span></td></tr><tr><td><span class="str">diegosouzapw</span></td><td><span class="num">666</span></td><td><span class="num">27</span></td></tr><tr><td><span class="str">jeremylongshore</span></td><td><span class="num">625</span></td><td><span class="num">2,109</span></td></tr><tr><td><span class="str">boisenoise</span></td><td><span class="num">502</span></td><td><span class="num">5</span></td></tr><tr><td><span class="str">aj-geddes</span></td><td><span class="num">501</span></td><td><span class="num">202</span></td></tr><tr><td><span class="str">microsoft</span></td><td><span class="num">479</span></td><td><span class="num">13,369</span></td></tr><tr><td><span class="str">davila7</span></td><td><span class="num">464</span></td><td><span class="num">26,823</span></td></tr><tr><td><span class="str">github</span></td><td><span class="num">432</span></td><td><span class="num">29,912</span></td></tr><tr><td><span class="str">aiskillstore</span></td><td><span class="num">427</span></td><td><span class="num">264</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>top_quality</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>author</th><th>count</th><th>avgStars</th></tr></thead>
+        <tbody><tr><td><span class="str">steipete</span></td><td><span class="num">53</span></td><td><span class="num">341,328</span></td></tr><tr><td><span class="str">facebook</span></td><td><span class="num">13</span></td><td><span class="num">208,957</span></td></tr><tr><td><span class="str">n8n-io</span></td><td><span class="num">10</span></td><td><span class="num">186,866</span></td></tr><tr><td><span class="str">affaan-m</span></td><td><span class="num">204</span></td><td><span class="num">174,381</span></td></tr><tr><td><span class="str">f</span></td><td><span class="num">5</span></td><td><span class="num">161,696</span></td></tr><tr><td><span class="str">clawdbot</span></td><td><span class="num">105</span></td><td><span class="num">157,149</span></td></tr><tr><td><span class="str">langgenius</span></td><td><span class="num">5</span></td><td><span class="num">140,313</span></td></tr><tr><td><span class="str">shubhamsaboo</span></td><td><span class="num">20</span></td><td><span class="num">109,035</span></td></tr><tr><td><span class="str">obra</span></td><td><span class="num">22</span></td><td><span class="num">108,831</span></td></tr><tr><td><span class="str">pytorch</span></td><td><span class="num">18</span></td><td><span class="num">99,685</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>single_skill</dt><dd><dl class="data-dl"><div class="dl-row"><dt>count</dt><dd><span class="num">4,640</span></dd></div><div class="dl-row"><dt>avg_stars</dt><dd><span class="num">448</span></dd></div></dl></dd></div><div class="dl-row"><dt>multi_skill</dt><dd><dl class="data-dl"><div class="dl-row"><dt>count</dt><dd><span class="num">3,437</span></dd></div><div class="dl-row"><dt>avg_stars</dt><dd><span class="num">1,522</span></dd></div></dl></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#15803d;--card-bg:#f0fdf4;--card-border:#bbf7d0">
+    <div class="card-header">
+      <span class="card-icon">🏥</span>
+      <div class="card-meta">
+        <span class="card-id">GITHUB HEALTH</span>
+        <h2 class="card-hook">The freshest niche (Web Scraping &amp; Automation) averaged 0d since last push — Content &amp; Marketing averaged 0mo</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">Repo freshness reveals which niches are actively evolving vs coasting on past work. Every niche in the gold basket pushed within the last week — the 100-star floor filtered out stale skills automatically.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-7-0">
+      <div class="tweet-text">Which Claude skill niches are most actively maintained? Web Scraping &amp; Automation wins — avg 0 days since last push. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(7,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-7-1">
+      <div class="tweet-text">Every niche in the omgskills gold basket pushed to GitHub in the last week. Stale skills filtered out automatically. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(7,1)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>niche_age</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>label</th><th>avg_days</th></tr></thead>
+        <tbody><tr><td><span class="str">Web Scraping &amp; Automation</span></td><td><span class="num">0</span></td></tr><tr><td><span class="str">General &amp; Utilities</span></td><td><span class="num">0</span></td></tr><tr><td><span class="str">Research &amp; Summarization</span></td><td><span class="num">0</span></td></tr><tr><td><span class="str">Agent Memory &amp; Workflow</span></td><td><span class="num">0</span></td></tr><tr><td><span class="str">Security</span></td><td><span class="num">0</span></td></tr><tr><td><span class="str">MCP Servers</span></td><td><span class="num">0</span></td></tr><tr><td><span class="str">Data &amp; Analytics</span></td><td><span class="num">1</span></td></tr><tr><td><span class="str">AI Orchestration</span></td><td><span class="num">1</span></td></tr><tr><td><span class="str">Writing &amp; Documentation</span></td><td><span class="num">2</span></td></tr><tr><td><span class="str">Design &amp; UI</span></td><td><span class="num">2</span></td></tr><tr><td><span class="str">DevOps &amp; CI/CD</span></td><td><span class="num">3</span></td></tr><tr><td><span class="str">Coding Productivity</span></td><td><span class="num">3</span></td></tr><tr><td><span class="str">Media &amp; Creative</span></td><td><span class="num">4</span></td></tr><tr><td><span class="str">Content &amp; Marketing</span></td><td><span class="num">6</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>high_issue_repos</dt><dd><div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>name</th><th>author</th><th>open_issues</th></tr></thead>
+        <tbody><tr><td><span class="str">skill-writer</span></td><td><span class="str">pytorch</span></td><td><span class="num">18,485</span></td></tr><tr><td><span class="str">skill-writer</span></td><td><span class="str">pytorch</span></td><td><span class="num">18,485</span></td></tr><tr><td><span class="str">at-dispatch-v2</span></td><td><span class="str">pytorch</span></td><td><span class="num">18,485</span></td></tr><tr><td><span class="str">aoti-debug</span></td><td><span class="str">pytorch</span></td><td><span class="num">18,485</span></td></tr><tr><td><span class="str">at-dispatch-v2</span></td><td><span class="str">pytorch</span></td><td><span class="num">18,485</span></td></tr></tbody>
+      </table></div></dd></div><div class="dl-row"><dt>correlations</dt><dd><dl class="data-dl"><div class="dl-row"><dt>stars_installs</dt><dd><span class="num">-0.48</span></dd></div><div class="dl-row"><dt>stars_forks</dt><dd><span class="num">0.98</span></dd></div><div class="dl-row"><dt>installs_watchers</dt><dd><span class="num">-0.39</span></dd></div></dl></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" style="--accent:#1e40af;--card-bg:#f8fafc;--card-border:#bfdbfe">
+    <div class="card-header">
+      <span class="card-icon">📊</span>
+      <div class="card-meta">
+        <span class="card-id">SIGNAL CORRELATIONS</span>
+        <h2 class="card-hook">Stars and installs are negatively correlated (r=-0.48) — more stars does NOT mean more installs</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="angle-bar">
+        <span class="angle-label">💡</span>
+        <p class="angle-text">This is the most counterintuitive finding in the data. Stars and installs measure completely different things — and they slightly oppose each other. A skill with few stars but high installs is solving a real problem. A skill with many stars but few installs is respected but not used day-to-day.</p>
+      </div>
+
+      <div class="tweet-section">
+        <div class="tweet-section-label">Tweet hooks</div>
+        
+    <div class="tweet-hook" id="hook-8-0">
+      <div class="tweet-text">Stars and installs in the Claude skill ecosystem have a -0.48 correlation. More stars = slightly fewer installs. They measure completely different things 🤯 omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(8,0)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-8-1">
+      <div class="tweet-text">GitHub stars predict forks with r=0.98 but predict installs with r=-0.48. Stars ≠ usefulness. omgskills.app tracks both. omgskills.app</div>
+      <button class="copy-btn" onclick="copyHook(8,1)">Copy</button>
+    </div>
+    <div class="tweet-hook" id="hook-8-2">
+      <div class="tweet-text">Hot take backed by data: the most-starred Claude skills are NOT the most-installed. r=-0.48 correlation. omgskills.app finds the ones that get used.</div>
+      <button class="copy-btn" onclick="copyHook(8,2)">Copy</button>
+    </div>
+      </div>
+
+      <details class="data-details">
+        <summary>Raw data</summary>
+        <div class="data-inner"><dl class="data-dl"><div class="dl-row"><dt>r_stars_installs</dt><dd><span class="num">-0.48</span></dd></div><div class="dl-row"><dt>r_stars_forks</dt><dd><span class="num">0.98</span></dd></div><div class="dl-row"><dt>r_installs_watchers</dt><dd><span class="num">-0.39</span></dd></div></dl></div>
+      </details>
+    </div>
+  </section>
+</div>
+
+<script>
+const HOOKS = [["237 skills out of 346 tracked drive 80% of all Claude skill installs 🤯 #ClaudeCode","Top 5 authors control 51.4% of all Claude skill installs. The ecosystem has a serious power law. omgskills.app","5.7M Claude skills installs — and 237 skills account for 80% of them. Who's dominating? omgskills.app"],["10 Claude skills have 500+ GitHub stars but zero recorded installs. Hidden gems waiting to be discovered. omgskills.app","Stars ≠ installs in the Claude skill ecosystem. Some of the highest-rated skills are barely installed. We found the gap. omgskills.app"],["Official vendor Claude skills get 1.6x more installs than community-built ones. Brand trust dominates quality. omgskills.app","211 vendor skills control 62.3% of all gold-basket installs despite being 50.2% of the list. omgskills.app"],["16.8% of Claude skills on GitHub have zero stars. The index has 49.0k skills — most are invisible. omgskills.app finds the ones worth using.","80% of all GitHub stars in the Claude ecosystem belong to just 2990 skills out of 49.0k. omgskills.app"],["DevOps & CI/CD skills get 18.7% of all Claude skill installs. MCP Servers is last. The niche breakdown is wilder than you'd expect. omgskills.app","The most community-engaged Claude skill niche (by forks/stars)? General & Utilities. The most loyal? MCP Servers. omgskills.app"],["\"claude-code\" is the most common tag in the Claude skill ecosystem with 12.1k skills. Here's the full breakdown: omgskills.app","The top tag pair in Claude skills is \"ai-agents + claude-code\" — appearing in 5.0k skills together. The ecosystem's shape is clearer than you'd think. omgskills.app"],["@majiayu000 has built 2037 Claude skills. The most prolific creator in the index. omgskills.app","Multi-skill Claude authors avg 1.5k ⭐ per skill vs 448 ⭐ for one-timers. Quantity drives quality. omgskills.app"],["Which Claude skill niches are most actively maintained? Web Scraping & Automation wins — avg 0 days since last push. omgskills.app","Every niche in the omgskills gold basket pushed to GitHub in the last week. Stale skills filtered out automatically. omgskills.app"],["Stars and installs in the Claude skill ecosystem have a -0.48 correlation. More stars = slightly fewer installs. They measure completely different things 🤯 omgskills.app","GitHub stars predict forks with r=0.98 but predict installs with r=-0.48. Stars ≠ usefulness. omgskills.app tracks both. omgskills.app","Hot take backed by data: the most-starred Claude skills are NOT the most-installed. r=-0.48 correlation. omgskills.app finds the ones that get used."]];
+
+function copyHook(si, hi) {
+  const text = HOOKS[si][hi];
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('hook-' + si + '-' + hi).querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
