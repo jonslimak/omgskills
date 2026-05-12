@@ -92,6 +92,9 @@ jobs:
             git push
           fi
 
+      - name: Prepare release assets for Netlify deploy
+        run: node ./scripts/prepare-netlify-site-deploy.mjs
+
       - name: Deploy site to Netlify
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
