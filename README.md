@@ -8,6 +8,36 @@ A macOS menubar app for browsing and installing Claude, Codex, and agent skills 
 
 ---
 
+## MCP server
+
+Agents can search the omgskills library through the published read-only MCP server:
+
+```bash
+npm install -g omgskills-mcp
+```
+
+Add it to your MCP client:
+
+```json
+{
+  "mcpServers": {
+    "omgskills": {
+      "command": "omgskills-mcp"
+    }
+  }
+}
+```
+
+The npm package uses hosted library data by default from:
+
+```text
+https://omgskills.com/data/manifest.json
+```
+
+No local repo checkout is required for MCP users. Full tool docs live in [mcp/README.md](mcp/README.md).
+
+---
+
 ## Trust and safety
 
 This repo is public so people can inspect how omgskills works before running it. It is source-available, not open source. You may read and audit the code, but you may not copy, redistribute, or repackage it without permission.
@@ -90,6 +120,13 @@ omgskills/
 ├── scripts/
 │   ├── publish-data.sh  # Publishes hashed skill data into site/data
 │   └── release-mac.sh   # Signs, notarizes, packages DMG, and updates Sparkle appcast
+│
+├── mcp/                 # Read-only MCP server for agent access to hosted skill data
+│   ├── package.json
+│   ├── README.md        # MCP install, client config, tools, and data-source docs
+│   └── src/
+│       ├── index.ts     # MCP stdio server and tool definitions
+│       └── library.ts   # Hosted/local JSON loading and search logic
 │
 ├── site/
 │   ├── data/            # Hosted skill data manifest + hashed JSON files
