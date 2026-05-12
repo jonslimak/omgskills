@@ -2,64 +2,64 @@
   "version": 1,
   "status": "degraded",
   "message": "No successful scrape run found",
-  "checkedAt": "2026-05-12T21:55:52Z",
+  "checkedAt": "2026-05-12T22:50:35Z",
   "publishedAt": "2026-05-12T11:40:09Z",
   "deployedAt": null,
   "lastSuccessfulScrapeAt": null,
   "lastSuccessfulXRefreshAt": null,
   "lastSuccessfulContentReportAt": null,
   "workflow": "pipeline-health",
-  "runId": "25764526293",
-  "gitSha": "f9aba6ab7641bf37a0ccbe17295dc95a1b3f1d03",
+  "runId": "25766847621",
+  "gitSha": "58e7d5e2913b7fafbbf6402074aac3257307b868",
   "manifestPath": "data/manifest.json",
   "manifestGeneratedAt": "2026-05-12T11:38:52.364Z",
   "assets": {
     "skills": {
       "path": "skills-3c2bdf9fecab.json",
       "count": 48998,
-      "generatedAt": "2026-05-12T21:55:46.136Z"
+      "generatedAt": "2026-05-12T22:50:29.816Z"
     },
     "trending": {
       "path": "trending-12adb0d1245b.json",
       "count": 349,
-      "generatedAt": "2026-05-12T21:55:46.236Z"
+      "generatedAt": "2026-05-12T22:50:29.919Z"
     },
     "trendingLeaderboard": {
       "path": "trending-leaderboard-d7f30e052c65.json",
       "count": 342,
-      "generatedAt": "2026-05-12T21:55:46.235Z"
+      "generatedAt": "2026-05-12T22:50:29.918Z"
     },
     "leaderboardViewData": {
       "path": "leaderboard-view-data-b75e1e1416ff.json",
       "count": 10,
-      "generatedAt": "2026-05-12T21:55:45.948Z"
+      "generatedAt": "2026-05-12T22:50:29.627Z"
     },
     "xTrending": {
       "path": "x-trending-f23a3cfa46b1.json",
       "count": 50,
-      "generatedAt": "2026-05-12T21:55:46.237Z"
+      "generatedAt": "2026-05-12T22:50:29.919Z"
     },
     "skillSignals": {
       "path": "skill-signals-384b9fba20fd.json",
       "count": 48998,
-      "generatedAt": "2026-05-12T21:55:46.081Z"
+      "generatedAt": "2026-05-12T22:50:29.762Z"
     },
     "authorSignals": {
       "path": "author-signals-d65071656d19.json",
       "count": 8071,
-      "generatedAt": "2026-05-12T21:55:45.945Z"
+      "generatedAt": "2026-05-12T22:50:29.624Z"
     },
     "authorLeaderboards": {
       "path": "author-leaderboards-9aacc922435b.json",
       "count": 8071,
-      "generatedAt": "2026-05-12T21:55:45.939Z"
+      "generatedAt": "2026-05-12T22:50:29.618Z"
     }
   },
   "content": {
-    "goldBasketGeneratedAt": "2026-05-12T21:55:45.948Z",
+    "goldBasketGeneratedAt": "2026-05-12T22:50:29.627Z",
     "basketEnrichedAt": "2026-05-11T06:15:51.999Z",
-    "statsGeneratedAt": "2026-05-12T21:55:46.234Z",
-    "dashboardGeneratedAt": "2026-05-12T21:55:45.946Z",
+    "statsGeneratedAt": "2026-05-12T22:50:29.917Z",
+    "dashboardGeneratedAt": "2026-05-12T22:50:29.625Z",
     "snapshotCount": 0
   },
   "sections": {
