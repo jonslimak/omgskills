@@ -257,9 +257,14 @@ cp "$ZIP_CHECKSUM" "$SITE_DOWNLOADS/$DOWNLOAD_ZIP_CHECKSUM"
 cp "$ZIP" "$SITE_UPDATES/omgskills-$VERSION.zip"
 
 if grep -q '^/download ' "$REDIRECTS_FILE"; then
-    sed -i '' "s#^/download .*#/download /index.html 200#" "$REDIRECTS_FILE"
+    sed -i '' "s#^/download .*#/download /downloads/omgskills-mac.dmg 302#" "$REDIRECTS_FILE"
 else
-    printf '/download /index.html 200\n' >> "$REDIRECTS_FILE"
+    printf '/download /downloads/omgskills-mac.dmg 302\n' >> "$REDIRECTS_FILE"
+fi
+if grep -q '^/download/ ' "$REDIRECTS_FILE"; then
+    sed -i '' "s#^/download/ .*#/download/ /downloads/omgskills-mac.dmg 302#" "$REDIRECTS_FILE"
+else
+    printf '/download/ /downloads/omgskills-mac.dmg 302\n' >> "$REDIRECTS_FILE"
 fi
 
 "$SPARKLE_TOOLS/generate_appcast" \

@@ -40,7 +40,13 @@ curl -I https://omgskills.com/appcast.xml
 curl -I https://omgskills.com/updates/omgskills-<version>.zip
 ```
 
-Each production check should return `200`.
+The `/download` check should return `302` to `/downloads/omgskills-mac.dmg`. The DMG, appcast, and update zip checks should return `200`.
+
+## Download Links
+
+Primary website CTAs should link directly to `/downloads/omgskills-mac.dmg`.
+
+Keep `/download` only as a legacy redirect to `/downloads/omgskills-mac.dmg`. Do not use JavaScript-triggered downloads because some ad, privacy, and in-app browsers block scripted downloads.
 
 ## Cache Rules
 
@@ -63,7 +69,7 @@ Use a web commit when changing:
 
 - website HTML, CSS, or JavaScript
 - Netlify config
-- download page behavior
+- download link or redirect behavior
 - deploy docs
 
 Use a release commit when app and web release metadata change together:
@@ -80,3 +86,4 @@ Do not expect files in `site/downloads/` or `site/updates/` to appear in Git com
 - Release binaries stay out of Git.
 - Netlify remains the production host.
 - Stable download URL stays `/downloads/omgskills-mac.dmg`.
+- Legacy `/download` redirects to the stable DMG URL.
