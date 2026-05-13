@@ -22,6 +22,30 @@
         font-weight: 600;
         margin-bottom: 20px;
       }
+      .top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+      .top-row .status {
+        margin-bottom: 0;
+      }
+      .button {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #111;
+        border-radius: 8px;
+        color: #111;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .button:hover {
+        background: #f5f5f5;
+      }
       .ok { background: #e8f7ec; color: #136c2e; }
       .degraded { background: #fff4e5; color: #8a5a00; }
       .failed { background: #fdecec; color: #9b1c1c; }
@@ -74,6 +98,32 @@
       .section-block {
         min-width: 0;
       }
+      .status-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0 30px;
+        border-top: 1px solid #e5e5e5;
+      }
+      .status-table th,
+      .status-table td {
+        padding: 10px 0;
+        border-bottom: 1px solid #e5e5e5;
+        text-align: left;
+        vertical-align: top;
+      }
+      .status-table th {
+        font-size: 13px;
+        color: #666;
+        font-weight: 700;
+      }
+      .status-table td {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .status-table td:last-child,
+      .status-table th:last-child {
+        text-align: right;
+      }
       .link-list {
         margin-bottom: 28px;
       }
@@ -90,13 +140,43 @@
   <body>
     <main>
       <h1>omgskills health</h1>
-      <p>Operator status for crawl, publish, and app data.</p>
-      <div id="status" class="status degraded">loading</div>
+      <p>Operator status for download, updates, data refresh, crawls, and search.</p>
+      <div class="top-row">
+        <div id="status" class="status degraded">loading</div>
+        <a class="button" href="https://github.com/jonslimak/omgskills/actions/workflows/pipeline-health.yml" target="_blank" rel="noopener">Test now</a>
+      </div>
       <ul id="summary" class="kv-list"></ul>
+      <div class="section-title">Summary</div>
+      <table class="status-table">
+        <thead>
+          <tr>
+            <th>Section</th>
+            <th>Status</th>
+            <th>Last passed</th>
+          </tr>
+        </thead>
+        <tbody id="sectionSummary"></tbody>
+      </table>
       <div class="section-grid">
         <div class="section-block">
-          <div class="section-title">Core Library</div>
-          <ul id="core" class="kv-list"></ul>
+          <div class="section-title">Download</div>
+          <ul id="download" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Updates</div>
+          <ul id="updates" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Data Refresh</div>
+          <ul id="dataRefresh" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Search</div>
+          <ul id="search" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Crawls</div>
+          <ul id="crawl" class="kv-list"></ul>
         </div>
         <div class="section-block">
           <div class="section-title">X Feed</div>
@@ -109,6 +189,10 @@
         <div class="section-block">
           <div class="section-title">Content Reports</div>
           <ul id="content" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
+          <div class="section-title">Core Library</div>
+          <ul id="core" class="kv-list"></ul>
         </div>
         <div class="section-block">
           <div class="section-title">Links</div>
@@ -127,11 +211,47 @@
       const assetUrl = (path) => location.protocol === "file:"
         ? new URL(`../data/${path}`, location.href).href
         : `/data/${path}`;
-      const fmt = (value) => value ? new Date(value).toLocaleString() : "-";
-      const fmtSuccess = (value) => value ? new Date(value).toLocaleString() : "no successful run yet";
-      const fmtGenerated = (value) => value ? new Date(value).toLocaleString() : "not published";
-      const addItem = (label, value) => `<li><span class="kv-key">${label}</span><span class="kv-value">${value ?? "-"}</span></li>`;
+      const dateFormatter = new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+      const fmt = (value) => value ? dateFormatter.format(new Date(value)) : "-";
+      const fmtSuccess = (value) => value ? fmt(value) : "no successful run yet";
+      const fmtGenerated = (value) => value ? fmt(value) : "not published";
+      const escapeHtml = (value) => String(value ?? "-")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+      const addItem = (label, value) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value">${escapeHtml(value)}</span></li>`;
       const statusLabel = (value) => value ? value.toUpperCase() : "-";
+      const bytes = (value) => typeof value === "number" ? `${(value / 1_000_000).toFixed(1)} MB` : "-";
+      const issueText = (section) => (section?.issues && section.issues.length) ? section.issues.join("; ") : "OK";
+      const queryText = (section) => (section?.queryResults || [])
+        .map((item) => `${item.query}: ${item.resultCount}`)
+        .join(", ") || "-";
+      const assetText = (section) => (section?.checkedAssets || [])
+        .map((item) => `${item.name}: ${bytes(item.bytes)}`)
+        .join(", ") || "-";
+      const renderBase = (section) => [
+        addItem("Status", statusLabel(section?.status)),
+        addItem("Last tested", fmt(section?.checkedAt)),
+        addItem("Last passed", fmtSuccess(section?.lastPassedAt)),
+      ];
+      const summaryRows = [
+        ["Download", "download"],
+        ["Updates", "updates"],
+        ["Data Refresh", "dataRefresh"],
+        ["Search", "search"],
+        ["Crawls", "crawl"],
+        ["X Feed", "x"],
+        ["Overlays", "overlays"],
+        ["Content Reports", "contentReports"],
+        ["Core Library", "core"],
+      ];
 
       fetch(dataUrl, { cache: "no-store" })
         .then((res) => {
@@ -151,8 +271,51 @@
             addItem("Git SHA", health.gitSha || "-"),
           ].join("");
 
+          document.getElementById("sectionSummary").innerHTML = summaryRows.map(([label, key]) => {
+            const section = health.sections?.[key];
+            return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${escapeHtml(fmtSuccess(section?.lastPassedAt))}</td></tr>`;
+          }).join("");
+
+          document.getElementById("download").innerHTML = [
+            ...renderBase(health.sections?.download),
+            addItem("Download URL", health.sections?.download?.redirectLocation || "-"),
+            addItem("DMG size", bytes(health.sections?.download?.bytes)),
+            addItem("Message", issueText(health.sections?.download)),
+          ].join("");
+
+          document.getElementById("updates").innerHTML = [
+            ...renderBase(health.sections?.updates),
+            addItem("Latest version", health.sections?.updates?.latestVersion || "-"),
+            addItem("Update zip", health.sections?.updates?.latestZipUrl || "-"),
+            addItem("Zip size", bytes(health.sections?.updates?.latestZipBytes)),
+            addItem("Message", issueText(health.sections?.updates)),
+          ].join("");
+
+          document.getElementById("dataRefresh").innerHTML = [
+            ...renderBase(health.sections?.dataRefresh),
+            addItem("Manifest generated", fmtGenerated(health.sections?.dataRefresh?.manifestGeneratedAt)),
+            addItem("Skills", health.sections?.dataRefresh?.skillsCount ?? "-"),
+            addItem("Trending", health.sections?.dataRefresh?.trendingCount ?? "-"),
+            addItem("Assets", assetText(health.sections?.dataRefresh)),
+            addItem("Message", issueText(health.sections?.dataRefresh)),
+          ].join("");
+
+          document.getElementById("search").innerHTML = [
+            ...renderBase(health.sections?.search),
+            addItem("Queries", queryText(health.sections?.search)),
+            addItem("Message", issueText(health.sections?.search)),
+          ].join("");
+
+          document.getElementById("crawl").innerHTML = [
+            ...renderBase(health.sections?.crawl),
+            addItem("Last scrape", fmtSuccess(health.sections?.crawl?.lastSuccessfulScrapeAt)),
+            addItem("Last X refresh", fmtSuccess(health.sections?.crawl?.lastSuccessfulXRefreshAt)),
+            addItem("Last content run", fmtSuccess(health.sections?.crawl?.lastSuccessfulContentReportAt)),
+            addItem("Message", issueText(health.sections?.crawl)),
+          ].join("");
+
           document.getElementById("core").innerHTML = [
-            addItem("Status", statusLabel(health.sections?.core?.status)),
+            ...renderBase(health.sections?.core),
             addItem("Last library publish", fmtGenerated(health.assets?.skills?.generatedAt)),
             addItem("Skills", health.sections?.core?.skillsCount ?? "-"),
             addItem("Trending", health.sections?.core?.trendingCount ?? "-"),
@@ -160,14 +323,14 @@
           ].join("");
 
           document.getElementById("x").innerHTML = [
-            addItem("Status", statusLabel(health.sections?.x?.status)),
+            ...renderBase(health.sections?.x),
             addItem("Last X publish", fmtGenerated(health.assets?.xTrending?.generatedAt)),
             addItem("X feed", health.sections?.x?.xTrendingCount ?? "-"),
             addItem("Last successful X refresh", fmtSuccess(health.sections?.x?.lastSuccessfulXRefreshAt)),
           ].join("");
 
           document.getElementById("overlays").innerHTML = [
-            addItem("Status", statusLabel(health.sections?.overlays?.status)),
+            ...renderBase(health.sections?.overlays),
             addItem("Last overlay publish", fmtGenerated(health.assets?.skillSignals?.generatedAt)),
             addItem("Skill signals", health.sections?.overlays?.skillSignalsCount ?? "-"),
             addItem("Author signals", health.sections?.overlays?.authorSignalsCount ?? "-"),
@@ -175,7 +338,7 @@
           ].join("");
 
           document.getElementById("content").innerHTML = [
-            addItem("Status", statusLabel(health.sections?.contentReports?.status)),
+            ...renderBase(health.sections?.contentReports),
             addItem("Last report publish", fmtGenerated(health.content?.dashboardGeneratedAt)),
             addItem("Last successful content run", fmtSuccess(health.sections?.contentReports?.lastSuccessfulContentReportAt)),
             addItem("Basket enriched", fmt(health.sections?.contentReports?.basketEnrichedAt)),
@@ -201,7 +364,13 @@
           const status = document.getElementById("status");
           status.textContent = "degraded";
           status.className = "status degraded";
-          document.getElementById("message").innerHTML = addItem("Status message", error.message);
+          const localHint = location.protocol === "file:"
+            ? "Open through a local web server, for example http://127.0.0.1:8765/health/. Browsers often block file pages from reading local JSON."
+            : error.message;
+          document.getElementById("message").innerHTML = [
+            addItem("Status message", localHint),
+            addItem("Error", error.message),
+          ].join("");
           document.getElementById("summary").innerHTML = addItem("Health", "unavailable");
           document.getElementById("links").innerHTML = `<li><a href="${location.protocol === "file:" ? new URL("../data/manifest.json", location.href).href : "/data/manifest.json"}">manifest</a></li>`;
         });

@@ -24,8 +24,37 @@ function normalizeValue(value) {
   return value === "" ? null : value;
 }
 
+function parseJsonValue(value, fallback = null) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function hoursSince(iso) {
+  if (!iso) return Infinity;
+  return (Date.now() - new Date(iso).getTime()) / 36e5;
+}
+
+function withCheckMetadata(name, current, checkedAt) {
+  const previousSection = previous.sections?.[name] ?? {};
+  const status = current.status ?? "degraded";
+  return {
+    ...current,
+    checkedAt: current.checkedAt ?? checkedAt,
+    lastPassedAt: status === "ok"
+      ? (current.checkedAt ?? checkedAt)
+      : (previousSection.lastPassedAt ?? null),
+  };
+}
+
 const previous = loadJson(healthPath, {}) ?? {};
 const manifest = loadJson(manifestPath, {});
+const productHealth = parseJsonValue(process.env.HEALTH_PRODUCT_JSON, previous.productHealth ?? null);
+const pipelineStatus = process.env.HEALTH_PIPELINE_STATUS ?? process.env.HEALTH_STATUS ?? previous.pipeline?.status ?? previous.status ?? "ok";
+const pipelineMessage = process.env.HEALTH_PIPELINE_MESSAGE ?? process.env.HEALTH_MESSAGE ?? previous.pipeline?.message ?? previous.message ?? null;
 
 function countItems(asset) {
   if (!asset?.path) return null;
@@ -77,8 +106,8 @@ function countSnapshots() {
 
 const health = {
   version: 1,
-  status: process.env.HEALTH_STATUS ?? previous.status ?? "ok",
-  message: process.env.HEALTH_MESSAGE ?? previous.message ?? null,
+  status: pipelineStatus,
+  message: pipelineMessage,
   checkedAt: process.env.HEALTH_CHECKED_AT ?? isoNow(),
   publishedAt: normalizeValue(process.env.HEALTH_PUBLISHED_AT ?? previous.publishedAt) ?? null,
   deployedAt: normalizeValue(process.env.HEALTH_DEPLOYED_AT ?? previous.deployedAt) ?? null,
@@ -90,6 +119,11 @@ const health = {
   gitSha: process.env.HEALTH_GIT_SHA ?? previous.gitSha ?? null,
   manifestPath: "data/manifest.json",
   manifestGeneratedAt: manifest.generatedAt ?? previous.manifestGeneratedAt ?? null,
+  pipeline: {
+    status: pipelineStatus,
+    message: pipelineMessage,
+  },
+  productHealth,
   assets: {
     skills: manifest.skills
       ? {
@@ -176,33 +210,78 @@ const contentOk = Boolean(health.content.goldBasketGeneratedAt) &&
   Boolean(health.content.dashboardGeneratedAt) &&
   Boolean(health.content.basketEnrichedAt);
 
+const scrapeMaxAgeHours = Number(process.env.SCRAPE_MAX_AGE_HOURS ?? 36);
+const xMaxAgeHours = Number(process.env.X_MAX_AGE_HOURS ?? 30);
+const contentMaxAgeHours = Number(process.env.CONTENT_MAX_AGE_HOURS ?? 192);
+const crawlIssues = [];
+if (!health.lastSuccessfulScrapeAt) {
+  crawlIssues.push("No successful scrape run found");
+} else if (hoursSince(health.lastSuccessfulScrapeAt) > scrapeMaxAgeHours) {
+  crawlIssues.push(`scrape is stale (${hoursSince(health.lastSuccessfulScrapeAt).toFixed(1)}h)`);
+}
+if (!health.lastSuccessfulXRefreshAt) {
+  crawlIssues.push("No successful x-refresh run found");
+} else if (hoursSince(health.lastSuccessfulXRefreshAt) > xMaxAgeHours) {
+  crawlIssues.push(`x-refresh is stale (${hoursSince(health.lastSuccessfulXRefreshAt).toFixed(1)}h)`);
+}
+if (!health.lastSuccessfulContentReportAt) {
+  crawlIssues.push("No successful content-reports run found");
+} else if (hoursSince(health.lastSuccessfulContentReportAt) > contentMaxAgeHours) {
+  crawlIssues.push(`content-reports is stale (${hoursSince(health.lastSuccessfulContentReportAt).toFixed(1)}h)`);
+}
+
 health.sections = {
-  core: {
+  crawl: withCheckMetadata("crawl", {
+    status: crawlIssues.length === 0 ? "ok" : "degraded",
+    issues: crawlIssues,
+    lastSuccessfulScrapeAt: health.lastSuccessfulScrapeAt,
+    lastSuccessfulXRefreshAt: health.lastSuccessfulXRefreshAt,
+    lastSuccessfulContentReportAt: health.lastSuccessfulContentReportAt,
+  }, health.checkedAt),
+  core: withCheckMetadata("core", {
     status: coreOk ? "ok" : "degraded",
     skillsCount: health.assets.skills?.count ?? 0,
     trendingCount: health.assets.trending?.count ?? 0,
     trendingLeaderboardCount: health.assets.trendingLeaderboard?.count ?? 0,
     leaderboardViewDataPath: health.assets.leaderboardViewData?.path ?? null,
     lastSuccessfulScrapeAt: health.lastSuccessfulScrapeAt,
-  },
-  x: {
+  }, health.checkedAt),
+  x: withCheckMetadata("x", {
     status: xOk ? "ok" : "degraded",
     xTrendingCount: health.assets.xTrending?.count ?? 0,
     lastSuccessfulXRefreshAt: health.lastSuccessfulXRefreshAt,
-  },
-  overlays: {
+  }, health.checkedAt),
+  overlays: withCheckMetadata("overlays", {
     status: overlaysOk ? "ok" : "degraded",
     skillSignalsCount: health.assets.skillSignals?.count ?? 0,
     authorSignalsCount: health.assets.authorSignals?.count ?? 0,
     authorLeaderboardsCount: health.assets.authorLeaderboards?.count ?? 0,
-  },
-  contentReports: {
+  }, health.checkedAt),
+  contentReports: withCheckMetadata("contentReports", {
     status: contentOk ? "ok" : "degraded",
     lastSuccessfulContentReportAt: health.lastSuccessfulContentReportAt,
     basketEnrichedAt: health.content.basketEnrichedAt,
     snapshotCount: health.content.snapshotCount,
-  },
+  }, health.checkedAt),
 };
+
+for (const name of ["download", "updates", "dataRefresh", "search"]) {
+  const current = productHealth?.sections?.[name];
+  if (current) {
+    health.sections[name] = withCheckMetadata(name, current, health.checkedAt);
+  }
+}
+
+const sectionIssues = Object.values(health.sections)
+  .flatMap((section) => Array.isArray(section.issues) ? section.issues : []);
+const messages = [
+  pipelineStatus === "ok" ? null : pipelineMessage,
+  productHealth?.status === "ok" ? null : productHealth?.message,
+  ...sectionIssues,
+].filter(Boolean);
+const anySectionDegraded = Object.values(health.sections).some((section) => section.status !== "ok");
+health.status = pipelineStatus === "ok" && productHealth?.status !== "degraded" && !anySectionDegraded ? "ok" : "degraded";
+health.message = health.status === "ok" ? "All health checks passed" : [...new Set(messages)].join("; ");
 
 writeFileSync(healthPath, JSON.stringify(health, null, 2) + "\n", "utf8");
 console.log(healthPath);

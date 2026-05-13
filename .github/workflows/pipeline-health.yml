@@ -35,6 +35,10 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: node ./scripts/check-pipeline-health.mjs || true
 
+      - name: Check product health
+        id: productcheck
+        run: node ./scripts/check-product-health.mjs || true
+
       - name: Collect workflow timestamps
         id: runmeta
         env:
@@ -45,15 +49,17 @@ jobs:
           echo "last_content_report_success_at=$(gh run list --repo "${{ github.repository }}" --workflow content-reports.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == \"success\") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
 
       - name: Update health snapshot
+        env:
+          HEALTH_PIPELINE_STATUS: ${{ steps.healthcheck.outputs.health_status || 'degraded' }}
+          HEALTH_PIPELINE_MESSAGE: ${{ steps.healthcheck.outputs.health_message || 'Pipeline health check failed' }}
+          HEALTH_PRODUCT_JSON: ${{ steps.productcheck.outputs.product_health_json }}
+          HEALTH_LAST_SCRAPE_SUCCESS_AT: ${{ steps.runmeta.outputs.last_scrape_success_at }}
+          HEALTH_LAST_X_REFRESH_SUCCESS_AT: ${{ steps.runmeta.outputs.last_x_refresh_success_at }}
+          HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT: ${{ steps.runmeta.outputs.last_content_report_success_at }}
+          HEALTH_WORKFLOW: pipeline-health
+          HEALTH_RUN_ID: ${{ github.run_id }}
+          HEALTH_GIT_SHA: ${{ github.sha }}
         run: |
-          HEALTH_STATUS="${{ steps.healthcheck.outputs.health_status || 'degraded' }}" \
-          HEALTH_MESSAGE="${{ steps.healthcheck.outputs.health_message || 'Pipeline health check failed' }}" \
-          HEALTH_LAST_SCRAPE_SUCCESS_AT="${{ steps.runmeta.outputs.last_scrape_success_at }}" \
-          HEALTH_LAST_X_REFRESH_SUCCESS_AT="${{ steps.runmeta.outputs.last_x_refresh_success_at }}" \
-          HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT="${{ steps.runmeta.outputs.last_content_report_success_at }}" \
-          HEALTH_WORKFLOW="pipeline-health" \
-          HEALTH_RUN_ID="${{ github.run_id }}" \
-          HEALTH_GIT_SHA="${{ github.sha }}" \
           HEALTH_CHECKED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
           node ./scripts/build-health.mjs
 
@@ -70,12 +76,12 @@ jobs:
           fi
 
       - name: Update health issue on failure
-        if: steps.healthcheck.outputs.health_status == 'degraded'
+        if: steps.healthcheck.outputs.health_status == 'degraded' || steps.productcheck.outputs.product_status == 'degraded'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TITLE="Pipeline health"
-          BODY="Pipeline degraded on $(date -u +"%Y-%m-%dT%H:%M:%SZ").\n\n${{ steps.healthcheck.outputs.health_message }}"
+          BODY="Health degraded on $(date -u +"%Y-%m-%dT%H:%M:%SZ").\n\nPipeline: ${{ steps.healthcheck.outputs.health_message || 'ok' }}\n\nProduct: ${{ steps.productcheck.outputs.product_message || 'ok' }}"
           ISSUE_NUMBER="$(gh issue list --repo "${{ github.repository }}" --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number // empty')"
           if [ -n "$ISSUE_NUMBER" ]; then
             gh issue edit "$ISSUE_NUMBER" --repo "${{ github.repository }}" --title "$TITLE" --body "$BODY"
@@ -84,7 +90,7 @@ jobs:
           fi
 
       - name: Close health issue on recovery
-        if: steps.healthcheck.outputs.health_status == 'ok'
+        if: steps.healthcheck.outputs.health_status == 'ok' && steps.productcheck.outputs.product_status == 'ok'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -104,5 +110,5 @@ jobs:
         run: npx netlify-cli deploy --prod --dir=site
 
       - name: Fail on degraded health
-        if: steps.healthcheck.outputs.health_status == 'degraded'
+        if: steps.healthcheck.outputs.health_status == 'degraded' || steps.productcheck.outputs.product_status == 'degraded'
         run: exit 1
