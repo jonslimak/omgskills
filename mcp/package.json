@@ -1,17 +1,28 @@
 {
   "name": "omgskills-mcp",
   "version": "0.1.0",
-  "private": true,
+  "description": "Read-only MCP server for searching the omgskills agent skill library.",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonslimak/omgskills.git",
+    "directory": "mcp"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "bin": {
-    "omgskills-mcp": "./dist/index.js"
+    "omgskills-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "smoke": "tsx src/smoke.ts"
+    "smoke": "tsx src/smoke.ts",
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

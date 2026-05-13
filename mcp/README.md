@@ -4,13 +4,20 @@ Read-only MCP server for agent access to the omgskills library.
 
 ## What It Does
 
-The server exposes the local skill library as safe agent tools. Agents can search, inspect one skill, list trending skills, list curated gold-basket skills, and filter by author.
+The server exposes the skill library as safe agent tools. Agents can search, inspect one skill, list trending skills, list curated gold-basket skills, and filter by author.
 
 It does not crawl, scrape, edit, install, or write files.
 
 ## Data Sources
 
-Defaults:
+Default remote sources:
+
+- `https://omgskills.com/data/manifest.json`
+- skills JSON from that manifest
+- trending JSON from that manifest
+- `https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json`
+
+Local repo sources:
 
 - `../index/skills.json`
 - `../index/trending.json`
@@ -21,6 +28,8 @@ Override with environment variables:
 - `OMGSKILLS_SKILLS_PATH`
 - `OMGSKILLS_TRENDING_PATH`
 - `OMGSKILLS_GOLD_BASKET_PATH`
+- `OMGSKILLS_MANIFEST_URL`
+- `OMGSKILLS_GOLD_BASKET_URL`
 
 ## Tools
 
@@ -81,28 +90,36 @@ List skills by GitHub author handle.
 
 ## Setup
 
+Install from npm:
+
 ```bash
-cd mcp
+npm install -g omgskills-mcp
+```
+
+MCP client config:
+
+```json
+{
+  "mcpServers": {
+    "omgskills": {
+      "command": "omgskills-mcp"
+    }
+  }
+}
+```
+
+Local development:
+
+```bash
 npm install
 npm run typecheck
 npm run build
-```
-
-Run locally:
-
-```bash
-npm run start
-```
-
-Smoke test:
-
-```bash
 npm run smoke
 ```
 
 ## Agent Client Config
 
-Example MCP client config:
+Example local MCP client config:
 
 ```json
 {

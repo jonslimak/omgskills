@@ -1,6 +1,15 @@
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { OmgskillsLibrary } from "./library.js";
 
-const library = await OmgskillsLibrary.load();
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(__dirname, "..", "..");
+
+const library = await OmgskillsLibrary.load({
+  skillsPath: resolve(repoRoot, "index/skills.json"),
+  trendingPath: resolve(repoRoot, "index/trending.json"),
+  goldBasketPath: resolve(repoRoot, "index/gold-basket.json")
+});
 
 const swift = library.searchSkills({ query: "swift", limit: 3 });
 const figma = library.searchSkills({ query: "figma", limit: 3 });

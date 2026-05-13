@@ -152,6 +152,7 @@ struct ContentView: View {
 
     private let detailDescriptionFont: Font = .body
     private let toolbarSources: [Source] = [.installed, .available]
+    private let friendShareText = "I use omgskills.com to find skills and it doesn't suck"
 
     private let starterSearchGroups: [(String, [StarterSearch])] = [
         ("Design + Apps", [
@@ -605,6 +606,14 @@ struct ContentView: View {
                         trendingStarterButton("Skills.sh", icon: "triangle", action: showTrendingSkills)
                     }
                 }
+
+                ShareLink(item: friendShareText) {
+                    Label("Send to a friend", systemImage: "square.and.arrow.up")
+                        .font(.system(size: 11, weight: .regular))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .help("Share omgskills")
             }
             .padding(.horizontal, 18)
             .padding(.top, 18)
@@ -1011,6 +1020,11 @@ struct ContentView: View {
                             Label("GitHub", systemImage: "arrow.up.right")
                         }
                     }
+                    if let shareText = skillShareText(skill) {
+                        ShareLink(item: shareText) {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        }
+                    }
                     if let target = crossInstallTarget(for: skill) {
                         Button {
                             crossInstallSkill(skill, target: target)
@@ -1068,6 +1082,11 @@ struct ContentView: View {
                             Label("GitHub", systemImage: "arrow.up.right")
                         }
                     }
+                    if let shareText = skillShareText(skill) {
+                        ShareLink(item: shareText) {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        }
+                    }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -1079,6 +1098,11 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    private func skillShareText(_ skill: Skill) -> String? {
+        guard !skill.githubUrl.isEmpty else { return nil }
+        return "Check out the \(skill.name) skill: \(skill.githubUrl) via omgskills.com"
     }
 
     private func twitterTweetCard(_ skill: Skill, tweetText: String) -> some View {

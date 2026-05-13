@@ -18,6 +18,14 @@
   </script>
   <script async src="https://app.humblytics.com/hmbl.min.js?id=a156a68"></script>
   <!-- End Humblytics Tracking Code -->
+  <!-- X conversion tracking base code -->
+  <script>
+    !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+    },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
+    a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+    twq('config','qwhi7');
+  </script>
+  <!-- End X conversion tracking base code -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -781,5 +789,23 @@
     <a href="/privacy/">Privacy</a>
     <a href="/terms/">Terms</a>
   </footer>
+  <script>
+    document.querySelectorAll('a[href="/downloads/omgskills-mac.dmg"]').forEach(function(link) {
+      link.addEventListener('click', function(event) {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+
+        event.preventDefault();
+        if (typeof window.twq === 'function') {
+          window.twq('event', 'tw-qwhi7-rceh8', { value: null });
+        }
+
+        window.setTimeout(function() {
+          window.location.href = link.href;
+        }, 150);
+      });
+    });
+  </script>
 </body>
 </html>

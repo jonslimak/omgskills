@@ -3,8 +3,6 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const packageRoot = resolve(__dirname, "..");
-const repoRoot = resolve(packageRoot, "..");
 
 export type Skill = {
   id: string;
@@ -40,9 +38,11 @@ export type GoldBasketEntry = Skill & {
 };
 
 export type LibraryPaths = {
-  skillsPath: string;
-  trendingPath: string;
-  goldBasketPath: string;
+  skillsPath?: string;
+  trendingPath?: string;
+  goldBasketPath?: string;
+  manifestUrl?: string;
+  goldBasketUrl?: string;
 };
 
 export type SearchOptions = {
@@ -80,10 +80,14 @@ export class OmgskillsLibrary {
   }
 
   static async load(paths = defaultLibraryPaths()): Promise<OmgskillsLibrary> {
+    const manifestUrl = paths.manifestUrl ?? defaultManifestUrl;
+    const manifest = paths.skillsPath && paths.trendingPath ? undefined : await readJson<Manifest>(manifestUrl);
+    const baseUrl = new URL(".", manifestUrl).toString();
+
     const [skills, trending, goldBasket] = await Promise.all([
-      readJsonArray<Skill>(paths.skillsPath),
-      readJsonArray<TrendingEntry>(paths.trendingPath),
-      readJsonArray<GoldBasketEntry>(paths.goldBasketPath)
+      readJsonArray<Skill>(paths.skillsPath ?? new URL(manifest?.skills.path ?? "", baseUrl).toString()),
+      readJsonArray<TrendingEntry>(paths.trendingPath ?? new URL(manifest?.trending.path ?? "", baseUrl).toString()),
+      readJsonArray<GoldBasketEntry>(paths.goldBasketPath ?? paths.goldBasketUrl ?? defaultGoldBasketUrl)
     ]);
 
     return new OmgskillsLibrary({ skills, trending, goldBasket });
@@ -203,23 +207,45 @@ export class OmgskillsLibrary {
 
 export function defaultLibraryPaths(): LibraryPaths {
   return {
-    skillsPath: resolvePath(process.env.OMGSKILLS_SKILLS_PATH, "index/skills.json"),
-    trendingPath: resolvePath(process.env.OMGSKILLS_TRENDING_PATH, "index/trending.json"),
-    goldBasketPath: resolvePath(process.env.OMGSKILLS_GOLD_BASKET_PATH, "index/gold-basket.json")
+    skillsPath: process.env.OMGSKILLS_SKILLS_PATH ? resolve(process.env.OMGSKILLS_SKILLS_PATH) : undefined,
+    trendingPath: process.env.OMGSKILLS_TRENDING_PATH ? resolve(process.env.OMGSKILLS_TRENDING_PATH) : undefined,
+    goldBasketPath: process.env.OMGSKILLS_GOLD_BASKET_PATH ? resolve(process.env.OMGSKILLS_GOLD_BASKET_PATH) : undefined,
+    manifestUrl: process.env.OMGSKILLS_MANIFEST_URL ?? defaultManifestUrl,
+    goldBasketUrl: process.env.OMGSKILLS_GOLD_BASKET_URL ?? defaultGoldBasketUrl
   };
 }
 
-function resolvePath(path: string | undefined, fallbackFromRepoRoot: string): string {
-  return path ? resolve(path) : resolve(repoRoot, fallbackFromRepoRoot);
-}
-
-async function readJsonArray<T>(path: string): Promise<T[]> {
-  const raw = await readFile(path, "utf8");
-  const parsed = JSON.parse(raw);
+async function readJsonArray<T>(pathOrUrl: string): Promise<T[]> {
+  const parsed = await readJson<unknown>(pathOrUrl);
   if (!Array.isArray(parsed)) {
-    throw new Error(`Expected JSON array at ${path}`);
+    throw new Error(`Expected JSON array at ${pathOrUrl}`);
   }
   return parsed as T[];
+}
+
+async function readJson<T>(pathOrUrl: string): Promise<T> {
+  if (isUrl(pathOrUrl)) {
+    const response = await fetch(pathOrUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${pathOrUrl}: ${response.status} ${response.statusText}`);
+    }
+    return await response.json() as T;
+  }
+
+  const raw = await readFile(pathOrUrl, "utf8");
+  return JSON.parse(raw) as T;
+}
+
+type Manifest = {
+  skills: { path: string };
+  trending: { path: string };
+};
+
+const defaultManifestUrl = "https://omgskills.com/data/manifest.json";
+const defaultGoldBasketUrl = "https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json";
+
+function isUrl(value: string): boolean {
+  return value.startsWith("http://") || value.startsWith("https://");
 }
 
 function normalize(value: unknown): string {
