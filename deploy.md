@@ -28,8 +28,13 @@ grep "omgskills-<version>.zip" site/appcast.xml
 3. Deploy the local site folder:
 
 ```bash
-netlify deploy --prod --dir=site
+./scripts/deploy-site-prod.sh
 ```
+
+This guarded deploy command refuses to run when tracked deploy files have
+uncommitted changes. Commit and push website, workflow, script, or Netlify config
+changes first so the next GitHub Actions deploy cannot overwrite production with
+older files.
 
 4. Verify production:
 
