@@ -28,6 +28,8 @@
     .page{max-width:1100px;margin:0 auto;padding:32px 24px;display:flex;flex-direction:column;gap:40px}
     .leaderboard-group{display:flex;flex-direction:column;gap:18px}
     .creators-group{margin-top:80px}
+    .data-logo{width:80px;height:auto;display:block;margin:0 auto -4px}
+    .data-kicker{max-width:640px;font-size:13px;line-height:1.45;color:#6b7280;text-align:center;margin:-8px auto 22px}
     .page-section-title{font-family:"Geist","DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:32px;font-weight:600;line-height:1.1;letter-spacing:-.04em;color:#1d1d1f;text-align:center}
     .status{background:#fff;border:1px solid #e5e5e0;border-radius:14px;padding:24px 28px;color:#666;font-size:14px}
     .goat-section{max-width:800px;width:100%;margin:40px auto 0}
@@ -59,22 +61,23 @@
     .skill-link:hover{text-decoration:underline}
     .skill-author{display:block;font-size:11px;color:#aaa;margin-top:1px}
     .trophy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,360px));gap:60px 80px;justify-content:center}
-    .trophy-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-    .trophy-header{display:flex;gap:12px;align-items:center;padding:16px 18px 12px;border-bottom:1px solid var(--card-border)}
+    .trophy-card{background:#fff;border:1px solid #e5e5e0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+    .trophy-header{display:flex;gap:12px;align-items:center;padding:16px 18px 12px;border-bottom:1px solid #e5e5e0}
     .trophy-icon{font-size:22px}
     .trophy-title{font-size:15px;font-weight:700;color:#111}
     .trophy-subtitle{font-size:11px;color:#999;margin-top:2px}
-    .trophy-winner-bar{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--medal),var(--accent));padding:10px 18px}
+    .trophy-winner-bar{display:flex;align-items:center;gap:8px;background:var(--medal);padding:10px 18px}
     .winner-crown{font-size:14px}
     .winner-name{font-size:14px;font-weight:700;color:#fff;flex:1}
     .winner-value{font-size:13px;color:rgba(255,255,255,.86);font-weight:600}
-    .lb-list{padding:10px 14px;display:flex;flex-direction:column;gap:2px;flex:1}
-    .lb-row{display:grid;grid-template-columns:24px 1fr auto;column-gap:8px;align-items:baseline;padding:5px 4px;border-radius:6px;font-size:12px}
+    .lb-list{padding:0 14px;display:flex;flex-direction:column;flex:1}
+    .lb-row{display:grid;grid-template-columns:24px 1fr auto;column-gap:8px;align-items:baseline;padding:7px 4px;border-bottom:1px solid #f0f0ed;font-size:12px}
+    .lb-row:last-child{border-bottom:none}
     .lb-row:hover{background:rgba(0,0,0,.03)}
     .lb-winner{font-weight:600}
     .lb-medal{font-size:14px;text-align:center}
-    .lb-handle{color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .lb-value{color:var(--accent);font-weight:600;white-space:nowrap;text-align:right}
+    .lb-handle{color:#111;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .lb-value{color:#444;font-weight:400;white-space:nowrap;text-align:right}
     .lb-detail{grid-column:2/-1;color:#aaa;font-size:11px;margin-top:-2px}
     .trophy-insight{margin:0 14px 16px;font-size:10px;color:rgba(85,85,85,.5);line-height:1.5;padding:10px 12px}
     .vendor-dot{color:#2563eb;font-size:10px;vertical-align:super}
@@ -336,6 +339,8 @@
       const updatedLabel = `Updated ${new Date(viewData.generatedAt).toLocaleDateString()}`;
       document.getElementById("app").innerHTML = `
         <section class="leaderboard-group skills-group">
+          <img class="data-logo" src="/data-logo.png" alt="omgdata" width="378" height="223">
+          <p class="data-kicker">Follow the latest growing repos and prolific creators every week</p>
           <h2 class="page-section-title">Top Skills this Week</h2>
           <span class="meta">${updatedLabel}</span>
           ${renderTrendingSkills(viewData.topSkills)}

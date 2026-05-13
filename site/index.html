@@ -512,6 +512,22 @@
       gap: 18px;
     }
 
+    .data-logo {
+      width: 80px;
+      height: auto;
+      display: block;
+      margin: 0 auto -4px;
+    }
+
+    .data-kicker {
+      max-width: 640px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+      text-align: center;
+      margin: -8px auto 22px;
+    }
+
     .data-creators {
       margin-top: 80px;
     }
@@ -650,8 +666,8 @@
     }
 
     .data-trophy-card {
-      background: var(--data-card-bg);
-      border: 1px solid var(--data-card-border);
+      background: #fff;
+      border: 1px solid #e5e5e0;
       border-radius: 14px;
       overflow: hidden;
       display: flex;
@@ -663,7 +679,7 @@
       gap: 12px;
       align-items: center;
       padding: 16px 18px 12px;
-      border-bottom: 1px solid var(--data-card-border);
+      border-bottom: 1px solid #e5e5e0;
     }
 
     .data-trophy-icon {
@@ -686,7 +702,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: linear-gradient(135deg, var(--data-medal), var(--data-accent));
+      background: var(--data-medal);
       padding: 10px 18px;
     }
 
@@ -708,10 +724,9 @@
     }
 
     .data-lb-list {
-      padding: 10px 14px;
+      padding: 0 14px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
       flex: 1;
     }
 
@@ -720,9 +735,13 @@
       grid-template-columns: 24px 1fr auto;
       column-gap: 8px;
       align-items: baseline;
-      padding: 5px 4px;
-      border-radius: 6px;
+      padding: 7px 4px;
+      border-bottom: 1px solid #f0f0ed;
       font-size: 12px;
+    }
+
+    .data-lb-row:last-child {
+      border-bottom: none;
     }
 
     .data-lb-winner {
@@ -735,15 +754,16 @@
     }
 
     .data-lb-handle {
-      color: #333;
+      color: #111;
+      font-weight: 700;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .data-lb-value {
-      color: var(--data-accent);
-      font-weight: 600;
+      color: #444;
+      font-weight: 400;
       white-space: nowrap;
       text-align: right;
     }
@@ -1214,7 +1234,7 @@
 
     function renderHomepageData(viewData) {
       const updatedLabel = "Updated " + new Date(viewData.generatedAt).toLocaleDateString();
-      document.getElementById("homepage-data").innerHTML = '<section class="data-group data-skills"><h2 class="data-section-title">Top Skills this Week</h2><span class="data-meta">' + dataEsc(updatedLabel) + '</span>' + renderDataTrending(viewData.topSkills) + '</section><section class="data-group data-creators"><h2 class="data-section-title">Top Skill Creators</h2><section class="data-trophy-grid">' + viewData.creatorCategories.map(renderDataTrophy).join("") + '</section></section>' + renderDataGoats(viewData.allRounders) + '<div class="data-footer">Data source: <a href="/data/manifest.json">manifest.json</a></div>';
+      document.getElementById("homepage-data").innerHTML = '<section class="data-group data-skills"><img class="data-logo" src="/data-logo.png" alt="omgdata" width="378" height="223"><p class="data-kicker">Follow the latest growing repos and prolific creators every week</p><h2 class="data-section-title">Top Skills this Week</h2><span class="data-meta">' + dataEsc(updatedLabel) + '</span>' + renderDataTrending(viewData.topSkills) + '</section><section class="data-group data-creators"><h2 class="data-section-title">Top Skill Creators</h2><section class="data-trophy-grid">' + viewData.creatorCategories.map(renderDataTrophy).join("") + '</section></section>' + renderDataGoats(viewData.allRounders) + '<div class="data-footer">Data source: <a href="/data/manifest.json">manifest.json</a></div>';
     }
 
     fetch(dataManifestUrl(), { cache: "no-cache" })
