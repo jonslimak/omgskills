@@ -60,6 +60,28 @@ function headerNumber(response, name) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function contentRangeTotal(response) {
+  const value = response.headers.get("content-range") ?? "";
+  const match = value.match(/\/(\d+)$/);
+  if (!match) return null;
+  const parsed = Number(match[1]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+async function assetSize(url) {
+  const head = await fetchWithTimeout(url, { method: "HEAD" });
+  let bytes = headerNumber(head, "content-length");
+
+  if (!bytes && head.ok) {
+    const range = await fetchWithTimeout(url, {
+      headers: { range: "bytes=0-0" },
+    });
+    bytes = contentRangeTotal(range) ?? headerNumber(range, "content-length");
+  }
+
+  return { response: head, bytes };
+}
+
 function sha256Hex(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
 }
@@ -128,8 +150,7 @@ async function checkDownload() {
   const redirectOk = [301, 302, 307, 308].includes(redirect.status) &&
     location.includes("/downloads/omgskills-mac.dmg");
 
-  const dmg = await fetchWithTimeout(absolute("/downloads/omgskills-mac.dmg"), { method: "HEAD" });
-  const bytes = headerNumber(dmg, "content-length");
+  const { response: dmg, bytes } = await assetSize(absolute("/downloads/omgskills-mac.dmg"));
   const cacheControl = dmg.headers.get("cache-control") ?? "";
   const issues = [];
 
