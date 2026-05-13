@@ -493,6 +493,336 @@
       margin-top: 8px;
     }
 
+    .data-section {
+      width: calc(100vw - 20px);
+      margin: 96px 0 0 calc(50% - 50vw + 10px);
+      padding: 0 0 48px;
+      color: #1a1a1a;
+    }
+
+    .data-inner {
+      width: min(100%, 1100px);
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .data-group {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .data-creators {
+      margin-top: 80px;
+    }
+
+    .data-section-title {
+      font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: 0;
+      color: #1d1d1f;
+      text-align: center;
+    }
+
+    .data-meta {
+      font-size: 12px;
+      color: #aaa;
+      text-align: center;
+      margin-top: -8px;
+    }
+
+    .data-table-wrap,
+    .data-trending-section {
+      background: #fff;
+      border: 1px solid #e5e5e0;
+      border-radius: 14px;
+      overflow-x: auto;
+    }
+
+    .data-skills {
+      align-items: center;
+    }
+
+    .data-skills .data-trending-section {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 760px;
+    }
+
+    .data-skills .data-table {
+      min-width: 0;
+    }
+
+    .data-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 10px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: #999;
+      border-bottom: 1px solid #e5e5e0;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f0f0ed;
+      vertical-align: middle;
+      color: #444;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-trending-header,
+    .data-goat-header {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid #f0f0ed;
+    }
+
+    .data-trending-icon,
+    .data-goat-header-icon {
+      font-size: 22px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .data-trending-label,
+    .data-goat-header-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: #aaa;
+      margin-bottom: 3px;
+    }
+
+    .data-trending-title,
+    .data-goat-header-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111;
+      margin: 0;
+    }
+
+    .data-skill-link {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111;
+      text-decoration: none;
+    }
+
+    .data-skill-link:hover {
+      text-decoration: underline;
+    }
+
+    .data-skill-author {
+      display: block;
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 1px;
+    }
+
+    .data-num {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .data-trophy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 360px));
+      gap: 60px 80px;
+      justify-content: center;
+    }
+
+    .data-trophy-card {
+      background: var(--data-card-bg);
+      border: 1px solid var(--data-card-border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .data-trophy-header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--data-card-border);
+    }
+
+    .data-trophy-icon {
+      font-size: 22px;
+    }
+
+    .data-trophy-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .data-trophy-subtitle {
+      font-size: 11px;
+      color: #999;
+      margin-top: 2px;
+    }
+
+    .data-winner-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--data-medal), var(--data-accent));
+      padding: 10px 18px;
+    }
+
+    .data-winner-crown {
+      font-size: 14px;
+    }
+
+    .data-winner-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      flex: 1;
+    }
+
+    .data-winner-value {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .86);
+      font-weight: 600;
+    }
+
+    .data-lb-list {
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .data-lb-row {
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      column-gap: 8px;
+      align-items: baseline;
+      padding: 5px 4px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .data-lb-winner {
+      font-weight: 600;
+    }
+
+    .data-lb-medal {
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .data-lb-handle {
+      color: #333;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .data-lb-value {
+      color: var(--data-accent);
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .data-lb-detail {
+      grid-column: 2 / -1;
+      color: #aaa;
+      font-size: 11px;
+      margin-top: -2px;
+    }
+
+    .data-trophy-insight {
+      margin: 0 14px 16px;
+      font-size: 10px;
+      color: rgba(85, 85, 85, .5);
+      line-height: 1.5;
+      padding: 10px 12px;
+    }
+
+    .data-goat-section {
+      max-width: 800px;
+      width: 100%;
+      margin: 40px auto 0;
+    }
+
+    .data-goat-section .data-table-wrap {
+      width: 800px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .data-goat-section .data-table {
+      min-width: 800px;
+    }
+
+    .data-goat-handle {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111;
+      white-space: nowrap;
+    }
+
+    .data-goat-trophies {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .data-goat-trophy {
+      font-size: 11px;
+      color: #555;
+      background: #f5f5f2;
+      border-radius: 99px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    .data-vendor-dot {
+      color: #2563eb;
+      font-size: 10px;
+      vertical-align: super;
+    }
+
+    .data-status,
+    .data-footer {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+    }
+
+    .data-footer {
+      padding-bottom: 28px;
+      margin-top: 24px;
+    }
+
+    .data-footer a {
+      color: #555;
+    }
+
     footer {
       max-width: var(--max-w);
       margin: 0 auto;
@@ -598,12 +928,38 @@
         margin-top: 80px;
       }
 
+      .data-section {
+        width: calc(100vw - 20px);
+        margin-left: calc(50% - 50vw + 10px);
+        margin-top: 72px;
+      }
+
+      .data-inner {
+        padding: 0 16px;
+      }
+
       .reviews h2 {
         font-size: 28px;
       }
 
       .faq h2 {
         font-size: 28px;
+      }
+
+      .data-section-title {
+        font-size: 28px;
+      }
+
+      .data-trophy-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .data-table {
+        min-width: 680px;
+      }
+
+      .data-skills .data-table {
+        min-width: 520px;
       }
 
       .reviews-grid {
@@ -783,6 +1139,12 @@
           <p>The app is focused on the Mac menu bar experience.</p>
         </details>
       </section>
+
+      <section class="data-section" aria-label="omgskills data">
+        <div class="data-inner" id="homepage-data">
+          <div class="data-status">Loading leaderboards...</div>
+        </div>
+      </section>
     </section>
   </main>
   <footer>
@@ -792,6 +1154,88 @@
     <a href="https://x.com/jonslimak" target="_blank" rel="noreferrer">Developer</a>
   </footer>
   <script>
+    const dataMedals = ["🥇", "🥈", "🥉", "4", "5", "6", "7", "8", "9", "10"];
+
+    function dataEsc(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function dataFmt(value) {
+      const n = Number(value) || 0;
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+      if (n >= 1000) return (n / 1000).toFixed(1) + "k";
+      return String(Math.round(n));
+    }
+
+    function dataAssetUrl(path) {
+      const base = location.protocol === "file:" ? "data/" : "/data/";
+      return base + path + "?v=" + Date.now();
+    }
+
+    function dataManifestUrl() {
+      const base = location.protocol === "file:" ? "data/manifest.json" : "/data/manifest.json";
+      return base + "?v=" + Date.now();
+    }
+
+    function dataVendorDot(record) {
+      return record.isVendor ? ' <span class="data-vendor-dot" title="Official vendor">★</span>' : "";
+    }
+
+    function renderDataTrending(records) {
+      const rows = records.slice(0, 10).map(function(record) {
+        return '<tr><td class="data-num">#' + dataEsc(record.rank) + '</td><td><a class="data-skill-link" href="' + dataEsc(record.githubUrl) + '" target="_blank" rel="noreferrer">' + dataEsc(record.name) + '</a><span class="data-skill-author">@' + dataEsc(record.authorHandle) + '</span></td><td class="data-num">' + dataFmt(record.installs) + '</td><td class="data-num">' + dataFmt(record.stars) + ' ⭐</td></tr>';
+      }).join("");
+
+      return '<section class="data-trending-section"><div class="data-trending-header"><span class="data-trending-icon">🔥</span><div><div class="data-trending-label">Top Trending</div><h3 class="data-trending-title">Most Installed This Week</h3></div></div><table class="data-table"><thead><tr><th>Rank</th><th>Skill</th><th>Installs</th><th>Stars</th></tr></thead><tbody>' + rows + '</tbody></table></section>';
+    }
+
+    function renderDataTrophy(category) {
+      const winner = category.rows[0];
+      const rows = category.rows.slice(0, 10).map(function(record, index) {
+        return '<div class="data-lb-row ' + (index === 0 ? "data-lb-winner" : "") + '"><span class="data-lb-medal">' + dataMedals[index] + '</span><span class="data-lb-handle">@' + dataEsc(record.authorHandle) + dataVendorDot(record) + '</span><span class="data-lb-value">' + dataEsc(record.value) + '</span><span class="data-lb-detail">' + dataEsc(record.detail) + '</span></div>';
+      }).join("");
+
+      return '<section class="data-trophy-card" style="--data-accent:' + dataEsc(category.color.accent) + ';--data-card-bg:' + dataEsc(category.color.bg) + ';--data-card-border:' + dataEsc(category.color.border) + ';--data-medal:' + dataEsc(category.color.medal) + '"><div class="data-trophy-header"><span class="data-trophy-icon">' + dataEsc(category.icon) + '</span><div><div class="data-trophy-title">' + dataEsc(category.title) + '</div><div class="data-trophy-subtitle">' + dataEsc(category.subtitle) + '</div></div></div>' + (winner ? '<div class="data-winner-bar"><span class="data-winner-crown">👑</span><span class="data-winner-name">@' + dataEsc(winner.authorHandle) + '</span><span class="data-winner-value">' + dataEsc(winner.value) + '</span></div>' : "") + '<div class="data-lb-list">' + rows + '</div><div class="data-trophy-insight">' + dataEsc(category.insight) + '</div></section>';
+    }
+
+    function renderDataGoats(records) {
+      if (!records.length) return "";
+
+      const rows = records.slice(0, 15).map(function(record) {
+        return '<tr><td><span class="data-goat-handle">@' + dataEsc(record.authorHandle) + dataVendorDot(record) + '</span></td><td class="data-num">' + dataEsc(record.skillCount) + '</td><td class="data-num">' + dataFmt(record.totalStars) + ' ⭐</td><td class="data-num">' + dataFmt(record.totalInstalls) + '</td><td><div class="data-goat-trophies">' + record.trophies.map(function(trophy) { return '<span class="data-goat-trophy">' + dataEsc(trophy) + '</span>'; }).join("") + '</div></td></tr>';
+      }).join("");
+
+      return '<section class="data-goat-section"><div class="data-table-wrap"><div class="data-goat-header"><span class="data-goat-header-icon">🏅</span><div><div class="data-goat-header-label">Top GOATS</div><h3 class="data-goat-header-title">All-Rounders</h3></div></div><table class="data-table"><thead><tr><th>Creator</th><th>Skills</th><th>Total Stars</th><th>Installs</th><th>Trophies</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
+    }
+
+    function renderHomepageData(viewData) {
+      const updatedLabel = "Updated " + new Date(viewData.generatedAt).toLocaleDateString();
+      document.getElementById("homepage-data").innerHTML = '<section class="data-group data-skills"><h2 class="data-section-title">Top Skills this Week</h2><span class="data-meta">' + dataEsc(updatedLabel) + '</span>' + renderDataTrending(viewData.topSkills) + '</section><section class="data-group data-creators"><h2 class="data-section-title">Top Skill Creators</h2><section class="data-trophy-grid">' + viewData.creatorCategories.map(renderDataTrophy).join("") + '</section></section>' + renderDataGoats(viewData.allRounders) + '<div class="data-footer">Data source: <a href="/data/manifest.json">manifest.json</a></div>';
+    }
+
+    fetch(dataManifestUrl(), { cache: "no-cache" })
+      .then(function(response) {
+        if (!response.ok) throw new Error("Manifest request failed");
+        return response.json();
+      })
+      .then(function(manifest) {
+        if (!manifest.leaderboardViewData || !manifest.leaderboardViewData.path) throw new Error("Missing leaderboard data");
+        return fetch(dataAssetUrl(manifest.leaderboardViewData.path), { cache: "no-cache" });
+      })
+      .then(function(response) {
+        if (!response.ok) throw new Error("Leaderboard request failed");
+        return response.json();
+      })
+      .then(renderHomepageData)
+      .catch(function(error) {
+        document.getElementById("homepage-data").innerHTML = '<div class="data-status">Could not load leaderboards.</div>';
+        console.warn(error);
+      });
+
     document.querySelectorAll('a[href="/downloads/omgskills-mac.dmg"]').forEach(function(link) {
       link.addEventListener('click', function(event) {
         if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
