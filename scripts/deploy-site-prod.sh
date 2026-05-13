@@ -13,5 +13,5 @@ if ! git diff --quiet -- site .github/workflows scripts netlify.toml; then
   exit 1
 fi
 
-./scripts/prepare-netlify-site-deploy.mjs
+node ./scripts/prepare-netlify-site-deploy.mjs
 npx netlify-cli deploy --prod --dir=site
