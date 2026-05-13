@@ -28,6 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var libraryRefreshTask: Task<Void, Never>?
     private var libraryRefreshTimer: Timer?
     private var workspaceDidWakeObserver: NSObjectProtocol?
+    private var isSharePickerActive = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Analytics.start()
@@ -55,6 +56,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.updaterController.checkForUpdates(nil)
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: .sharePickerDidOpen, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.isSharePickerActive = true
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: .sharePickerDidClose, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.isSharePickerActive = false
             }
         }
     }
@@ -263,6 +280,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
 
     private func addClickOutsideMonitor() {
         clickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+            guard self?.isSharePickerActive != true else { return }
             self?.closePopover()
         }
     }
@@ -312,4 +330,6 @@ extension Notification.Name {
     static let checkForUpdates = Notification.Name("checkForUpdates")
     static let updateAvailabilityChanged = Notification.Name("updateAvailabilityChanged")
     static let libraryDataDidRefresh = Notification.Name("libraryDataDidRefresh")
+    static let sharePickerDidOpen = Notification.Name("sharePickerDidOpen")
+    static let sharePickerDidClose = Notification.Name("sharePickerDidClose")
 }

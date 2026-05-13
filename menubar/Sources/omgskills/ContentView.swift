@@ -607,13 +607,23 @@ struct ContentView: View {
                     }
                 }
 
-                ShareLink(item: friendShareText) {
-                    Label("Send to a friend", systemImage: "square.and.arrow.up")
-                        .font(.system(size: 11, weight: .regular))
+                HStack {
+                    NativeShareButton(
+                        title: "Send to a friend",
+                        systemImage: "square.and.arrow.up",
+                        item: friendShareText,
+                        style: .plain,
+                        help: "Share omgskills",
+                        onShareStarted: {
+                            Analytics.signal("app.share_started", parameters: [
+                                "share_location": "discover_default"
+                            ])
+                        }
+                    )
+                    Spacer()
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .help("Share omgskills")
+                .padding(.horizontal, 9)
+                .offset(y: -12)
             }
             .padding(.horizontal, 18)
             .padding(.top, 18)
@@ -1021,9 +1031,15 @@ struct ContentView: View {
                         }
                     }
                     if let shareText = skillShareText(skill) {
-                        ShareLink(item: shareText) {
-                            Label("Share", systemImage: "square.and.arrow.up")
-                        }
+                        NativeShareButton(
+                            title: "Share",
+                            systemImage: "square.and.arrow.up",
+                            item: shareText,
+                            onShareStarted: {
+                                trackSkillShareStarted(skill, location: "detail_actions")
+                            }
+                        )
+                            .frame(height: 21)
                     }
                     if let target = crossInstallTarget(for: skill) {
                         Button {
@@ -1083,9 +1099,15 @@ struct ContentView: View {
                         }
                     }
                     if let shareText = skillShareText(skill) {
-                        ShareLink(item: shareText) {
-                            Label("Share", systemImage: "square.and.arrow.up")
-                        }
+                        NativeShareButton(
+                            title: "Share",
+                            systemImage: "square.and.arrow.up",
+                            item: shareText,
+                            onShareStarted: {
+                                trackSkillShareStarted(skill, location: "detail_actions")
+                            }
+                        )
+                            .frame(height: 21)
                     }
                 }
                 .buttonStyle(.bordered)
@@ -2031,6 +2053,12 @@ struct ContentView: View {
         Analytics.signal("skill.opened", parameters: analyticsParameters(for: skill))
     }
 
+    private func trackSkillShareStarted(_ skill: Skill, location: String) {
+        var parameters = analyticsParameters(for: skill)
+        parameters["share_location"] = location
+        Analytics.signal("skill.share_started", parameters: parameters)
+    }
+
     private func resetTelemetryDedupe() {
         lastTrackedSearchQuery = ""
         lastTrackedSearchErrorKey = ""
@@ -2246,5 +2274,89 @@ struct FlowLayout: Layout {
             currentWidth += size.width + spacing
         }
         return rows
+    }
+}
+
+private struct NativeShareButton: NSViewRepresentable {
+    enum Style {
+        case bordered
+        case plain
+    }
+
+    let title: String
+    let systemImage: String
+    let item: String
+    var style: Style = .bordered
+    var help: String?
+    var onShareStarted: (() -> Void)?
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(item: item, onShareStarted: onShareStarted)
+    }
+
+    func makeNSView(context: Context) -> NSButton {
+        let button = NSButton(title: title, target: context.coordinator, action: #selector(Coordinator.share(_:)))
+        button.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: title)
+        button.imagePosition = .imageLeading
+        button.controlSize = .small
+        button.font = .systemFont(ofSize: style == .plain ? 11 : NSFont.systemFontSize(for: .small))
+        button.bezelStyle = .rounded
+        button.isBordered = style == .bordered
+        button.contentTintColor = style == .plain ? .secondaryLabelColor : nil
+        button.toolTip = help
+        button.setContentHuggingPriority(.required, for: .horizontal)
+        button.setContentHuggingPriority(.required, for: .vertical)
+        button.setContentCompressionResistancePriority(.required, for: .horizontal)
+        button.setContentCompressionResistancePriority(.required, for: .vertical)
+        button.setAccessibilityLabel(title)
+        return button
+    }
+
+    func updateNSView(_ button: NSButton, context: Context) {
+        context.coordinator.item = item
+        context.coordinator.onShareStarted = onShareStarted
+        button.title = title
+        button.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: title)
+        button.isBordered = style == .bordered
+        button.contentTintColor = style == .plain ? .secondaryLabelColor : nil
+        button.toolTip = help
+        button.invalidateIntrinsicContentSize()
+        button.setAccessibilityLabel(title)
+    }
+
+    final class Coordinator: NSObject {
+        var item: String
+        var onShareStarted: (() -> Void)?
+        private var picker: NSSharingServicePicker?
+        private var closeTask: Task<Void, Never>?
+
+        init(item: String, onShareStarted: (() -> Void)?) {
+            self.item = item
+            self.onShareStarted = onShareStarted
+        }
+
+        deinit {
+            closeTask?.cancel()
+        }
+
+        @MainActor @objc func share(_ sender: NSButton) {
+            closeTask?.cancel()
+            onShareStarted?()
+            NotificationCenter.default.post(name: .sharePickerDidOpen, object: nil)
+            NSApp.activate(ignoringOtherApps: true)
+            let picker = NSSharingServicePicker(items: [item])
+            self.picker = picker
+            picker.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
+            scheduleClose()
+        }
+
+        @MainActor private func scheduleClose() {
+            closeTask?.cancel()
+            closeTask = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(8))
+                picker = nil
+                NotificationCenter.default.post(name: .sharePickerDidClose, object: nil)
+            }
+        }
     }
 }
