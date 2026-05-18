@@ -129,6 +129,27 @@
       }
       .link-list a { color: #0a66ff; text-decoration: none; }
       a { color: #0a66ff; text-decoration: none; }
+      details.section-block {
+        border-top: 1px solid #e5e5e5;
+        padding-top: 10px;
+      }
+      details.section-block .section-title {
+        cursor: pointer;
+        list-style: none;
+        margin: 0 0 12px;
+      }
+      details.section-block .section-title::-webkit-details-marker {
+        display: none;
+      }
+      details.section-block .section-title::after {
+        content: "⌄";
+        float: right;
+        font-size: 16px;
+        color: #777;
+      }
+      details.section-block[open] .section-title::after {
+        content: "⌃";
+      }
       @media (max-width: 760px) {
         .section-grid {
           grid-template-columns: 1fr;
@@ -157,55 +178,53 @@
         </thead>
         <tbody id="sectionSummary"></tbody>
       </table>
+      <div class="section-title">Marketing Funnel</div>
+      <ul id="marketingFunnel" class="kv-list"></ul>
       <div class="section-grid">
-        <div class="section-block">
-          <div class="section-title">Download</div>
+        <details class="section-block">
+          <summary class="section-title">Download</summary>
           <ul id="download" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Updates</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Updates</summary>
           <ul id="updates" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Data Refresh</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Data Refresh</summary>
           <ul id="dataRefresh" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Search</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Search</summary>
           <ul id="search" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Crawls</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Crawls</summary>
           <ul id="crawl" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">X Feed</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">X Feed</summary>
           <ul id="x" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Overlays</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Overlays</summary>
           <ul id="overlays" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Marketing Funnel</div>
-          <ul id="marketingFunnel" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Content Reports</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Content Reports</summary>
           <ul id="content" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Core Library</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Core Library</summary>
           <ul id="core" class="kv-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Links</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Links</summary>
           <ul id="links" class="link-list"></ul>
-        </div>
-        <div class="section-block">
-          <div class="section-title">Message</div>
+        </details>
+        <details class="section-block">
+          <summary class="section-title">Message</summary>
           <ul id="message" class="kv-list"></ul>
-        </div>
+        </details>
       </div>
     </main>
     <script>
