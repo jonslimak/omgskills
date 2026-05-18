@@ -1,6 +1,14 @@
 [build]
   publish = "site"
 
+[[edge_functions]]
+  path = "/health/*"
+  function = "health-basic-auth"
+
+[[edge_functions]]
+  path = "/data/health.json"
+  function = "health-basic-auth"
+
 [[headers]]
   for = "/downloads/*"
   [headers.values]

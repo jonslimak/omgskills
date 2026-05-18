@@ -59,6 +59,12 @@ Keep `/downloads/*` and `/updates/*` short-cache in `netlify.toml`.
 
 Do not set these paths to long immutable caching. If a release file is missing, long caching can make the broken download stick.
 
+## Health Page
+
+`/health/` and `/data/health.json` are operator-only and protected by Netlify Basic Auth.
+
+Set `HEALTH_BASIC_AUTH_PASSWORD` in Netlify before deploying health changes. The username is `ops`.
+
 ## Commit Rules
 
 Use an app commit when changing:

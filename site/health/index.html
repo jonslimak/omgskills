@@ -187,6 +187,10 @@
           <ul id="overlays" class="kv-list"></ul>
         </div>
         <div class="section-block">
+          <div class="section-title">Marketing Funnel</div>
+          <ul id="marketingFunnel" class="kv-list"></ul>
+        </div>
+        <div class="section-block">
           <div class="section-title">Content Reports</div>
           <ul id="content" class="kv-list"></ul>
         </div>
@@ -236,6 +240,8 @@
       const assetText = (section) => (section?.checkedAssets || [])
         .map((item) => `${item.name}: ${bytes(item.bytes)}`)
         .join(", ") || "-";
+      const numberText = (value) => typeof value === "number" ? value.toLocaleString() : "-";
+      const percentText = (value) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "-";
       const renderBase = (section) => [
         addItem("Status", statusLabel(section?.status)),
         addItem("Last tested", fmt(section?.checkedAt)),
@@ -249,6 +255,7 @@
         ["Crawls", "crawl"],
         ["X Feed", "x"],
         ["Overlays", "overlays"],
+        ["Marketing Funnel", "marketingFunnel"],
         ["Content Reports", "contentReports"],
         ["Core Library", "core"],
       ];
@@ -335,6 +342,22 @@
             addItem("Skill signals", health.sections?.overlays?.skillSignalsCount ?? "-"),
             addItem("Author signals", health.sections?.overlays?.authorSignalsCount ?? "-"),
             addItem("Author leaderboards", health.sections?.overlays?.authorLeaderboardsCount ?? "-"),
+          ].join("");
+
+          document.getElementById("marketingFunnel").innerHTML = [
+            ...renderBase(health.sections?.marketingFunnel),
+            addItem("Window", health.sections?.marketingFunnel?.window || "-"),
+            addItem("Sessions", numberText(health.sections?.marketingFunnel?.sessions)),
+            addItem("Download clicks", numberText(health.sections?.marketingFunnel?.downloadClicks)),
+            addItem("Download click rate", percentText(health.sections?.marketingFunnel?.downloadClickRate)),
+            addItem("Hero / lower CTA", `${numberText(health.sections?.marketingFunnel?.heroDownloadClicks)} / ${numberText(health.sections?.marketingFunnel?.reviewsDownloadClicks)}`),
+            addItem("Paid X sessions", numberText(health.sections?.marketingFunnel?.paidXSessions)),
+            addItem("Paid X downloads", numberText(health.sections?.marketingFunnel?.paidXDownloadClicks)),
+            addItem("Installs", numberText(health.sections?.marketingFunnel?.installs)),
+            addItem("Launches", numberText(health.sections?.marketingFunnel?.launches)),
+            addItem("Engaged app users", numberText(health.sections?.marketingFunnel?.engagedUsersLowerBound)),
+            addItem("Download → install", percentText(health.sections?.marketingFunnel?.downloadToInstallRate)),
+            addItem("Message", issueText(health.sections?.marketingFunnel)),
           ].join("");
 
           document.getElementById("content").innerHTML = [

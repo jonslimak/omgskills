@@ -57,6 +57,7 @@ function withCheckMetadata(name, current, checkedAt) {
 const previous = loadJson(healthPath, {}) ?? {};
 const manifest = loadJson(manifestPath, {});
 const productHealth = parseJsonValue(process.env.HEALTH_PRODUCT_JSON, previous.productHealth ?? null);
+const marketingFunnel = parseJsonValue(process.env.HEALTH_MARKETING_FUNNEL_JSON, previous.sections?.marketingFunnel ?? null);
 const pipelineStatus = process.env.HEALTH_PIPELINE_STATUS ?? process.env.HEALTH_STATUS ?? previous.pipeline?.status ?? previous.status ?? "ok";
 const pipelineMessage = process.env.HEALTH_PIPELINE_MESSAGE ?? process.env.HEALTH_MESSAGE ?? previous.pipeline?.message ?? previous.message ?? null;
 
@@ -277,6 +278,10 @@ for (const name of ["download", "updates", "dataRefresh", "search"]) {
   if (current) {
     health.sections[name] = withCheckMetadata(name, current, health.checkedAt);
   }
+}
+
+if (marketingFunnel) {
+  health.sections.marketingFunnel = withCheckMetadata("marketingFunnel", marketingFunnel, health.checkedAt);
 }
 
 const sectionIssues = Object.values(health.sections)

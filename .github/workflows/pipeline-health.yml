@@ -39,6 +39,17 @@ jobs:
         id: productcheck
         run: node ./scripts/check-product-health.mjs || true
 
+      - name: Check marketing funnel
+        id: funnelcheck
+        env:
+          HUMBLYTICS_API_KEY: ${{ secrets.HUMBLYTICS_API_KEY }}
+          HUMBLYTICS_PROPERTY_ID: 814e1eff5ae9eb83465c64eccf151b165071a7b6fce4ac72543fbbc98c543692
+          TELEMETRYDECK_TOKEN: ${{ secrets.TELEMETRYDECK_TOKEN }}
+          TELEMETRYDECK_APP_ID: 9641DEC0-3FCD-47DA-872C-4325CE6A561B
+          TELEMETRYDECK_DATASOURCE: com.omgskills
+          FUNNEL_TIMEZONE: America/New_York
+        run: node ./scripts/check-funnel-health.mjs || true
+
       - name: Collect workflow timestamps
         id: runmeta
         env:
@@ -53,6 +64,7 @@ jobs:
           HEALTH_PIPELINE_STATUS: ${{ steps.healthcheck.outputs.health_status || 'degraded' }}
           HEALTH_PIPELINE_MESSAGE: ${{ steps.healthcheck.outputs.health_message || 'Pipeline health check failed' }}
           HEALTH_PRODUCT_JSON: ${{ steps.productcheck.outputs.product_health_json }}
+          HEALTH_MARKETING_FUNNEL_JSON: ${{ steps.funnelcheck.outputs.marketing_funnel_json }}
           HEALTH_LAST_SCRAPE_SUCCESS_AT: ${{ steps.runmeta.outputs.last_scrape_success_at }}
           HEALTH_LAST_X_REFRESH_SUCCESS_AT: ${{ steps.runmeta.outputs.last_x_refresh_success_at }}
           HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT: ${{ steps.runmeta.outputs.last_content_report_success_at }}
