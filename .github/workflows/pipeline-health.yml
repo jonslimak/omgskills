@@ -44,9 +44,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "last_scrape_success_at=$(gh run list --repo "${{ github.repository }}" --workflow scrape.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == \"success\") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
-          echo "last_x_refresh_success_at=$(gh run list --repo "${{ github.repository }}" --workflow x-refresh.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == \"success\") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
-          echo "last_content_report_success_at=$(gh run list --repo "${{ github.repository }}" --workflow content-reports.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == \"success\") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
+          echo "last_scrape_success_at=$(gh run list --repo "${{ github.repository }}" --workflow scrape.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == "success") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
+          echo "last_x_refresh_success_at=$(gh run list --repo "${{ github.repository }}" --workflow x-refresh.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == "success") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
+          echo "last_content_report_success_at=$(gh run list --repo "${{ github.repository }}" --workflow content-reports.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == "success") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
 
       - name: Update health snapshot
         env:

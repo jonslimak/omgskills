@@ -24,6 +24,10 @@ function normalizeValue(value) {
   return value === "" ? null : value;
 }
 
+function envOrPrevious(name, previousValue) {
+  return normalizeValue(process.env[name]) ?? previousValue ?? null;
+}
+
 function parseJsonValue(value, fallback = null) {
   if (!value) return fallback;
   try {
@@ -109,11 +113,14 @@ const health = {
   status: pipelineStatus,
   message: pipelineMessage,
   checkedAt: process.env.HEALTH_CHECKED_AT ?? isoNow(),
-  publishedAt: normalizeValue(process.env.HEALTH_PUBLISHED_AT ?? previous.publishedAt) ?? null,
-  deployedAt: normalizeValue(process.env.HEALTH_DEPLOYED_AT ?? previous.deployedAt) ?? null,
-  lastSuccessfulScrapeAt: normalizeValue(process.env.HEALTH_LAST_SCRAPE_SUCCESS_AT ?? previous.lastSuccessfulScrapeAt) ?? null,
-  lastSuccessfulXRefreshAt: normalizeValue(process.env.HEALTH_LAST_X_REFRESH_SUCCESS_AT ?? previous.lastSuccessfulXRefreshAt) ?? null,
-  lastSuccessfulContentReportAt: normalizeValue(process.env.HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT ?? previous.lastSuccessfulContentReportAt) ?? null,
+  publishedAt: envOrPrevious("HEALTH_PUBLISHED_AT", previous.publishedAt),
+  deployedAt: envOrPrevious("HEALTH_DEPLOYED_AT", previous.deployedAt),
+  lastSuccessfulScrapeAt: envOrPrevious("HEALTH_LAST_SCRAPE_SUCCESS_AT", previous.lastSuccessfulScrapeAt),
+  lastSuccessfulXRefreshAt: envOrPrevious("HEALTH_LAST_X_REFRESH_SUCCESS_AT", previous.lastSuccessfulXRefreshAt),
+  lastSuccessfulContentReportAt: envOrPrevious(
+    "HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT",
+    previous.lastSuccessfulContentReportAt,
+  ),
   workflow: process.env.HEALTH_WORKFLOW ?? previous.workflow ?? null,
   runId: process.env.HEALTH_RUN_ID ?? previous.runId ?? null,
   gitSha: process.env.HEALTH_GIT_SHA ?? previous.gitSha ?? null,
