@@ -90,6 +90,11 @@
         text-align: right;
         word-break: break-word;
       }
+      .time-value {
+        color: #9ca3af;
+        font-size: 12px;
+        font-weight: 500;
+      }
       .section-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -250,6 +255,8 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
       const addItem = (label, value) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value">${escapeHtml(value)}</span></li>`;
+      const addTimeItem = (label, value) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value time-value">${escapeHtml(value)}</span></li>`;
+      const timeCell = (value) => `<span class="time-value">${escapeHtml(value)}</span>`;
       const statusLabel = (value) => value ? value.toUpperCase() : "-";
       const bytes = (value) => typeof value === "number" ? `${(value / 1_000_000).toFixed(1)} MB` : "-";
       const issueText = (section) => (section?.issues && section.issues.length) ? section.issues.join("; ") : "OK";
@@ -263,8 +270,8 @@
       const percentText = (value) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "-";
       const renderBase = (section) => [
         addItem("Status", statusLabel(section?.status)),
-        addItem("Last tested", fmt(section?.checkedAt)),
-        addItem("Last passed", fmtSuccess(section?.lastPassedAt)),
+        addTimeItem("Last tested", fmt(section?.checkedAt)),
+        addTimeItem("Last passed", fmtSuccess(section?.lastPassedAt)),
       ];
       const summaryRows = [
         ["Download", "download"],
@@ -290,8 +297,8 @@
           status.className = `status ${health.status || "degraded"}`;
 
           document.getElementById("summary").innerHTML = [
-            addItem("Last checked", fmt(health.checkedAt)),
-            addItem("Published", fmt(health.publishedAt)),
+            addTimeItem("Last checked", fmt(health.checkedAt)),
+            addTimeItem("Published", fmt(health.publishedAt)),
             addItem("Workflow", health.workflow || "-"),
             addItem("Run ID", health.runId || "-"),
             addItem("Git SHA", health.gitSha || "-"),
@@ -299,7 +306,7 @@
 
           document.getElementById("sectionSummary").innerHTML = summaryRows.map(([label, key]) => {
             const section = health.sections?.[key];
-            return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${escapeHtml(fmtSuccess(section?.lastPassedAt))}</td></tr>`;
+            return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${timeCell(fmtSuccess(section?.lastPassedAt))}</td></tr>`;
           }).join("");
 
           document.getElementById("download").innerHTML = [
@@ -319,7 +326,7 @@
 
           document.getElementById("dataRefresh").innerHTML = [
             ...renderBase(health.sections?.dataRefresh),
-            addItem("Manifest generated", fmtGenerated(health.sections?.dataRefresh?.manifestGeneratedAt)),
+            addTimeItem("Manifest generated", fmtGenerated(health.sections?.dataRefresh?.manifestGeneratedAt)),
             addItem("Skills", health.sections?.dataRefresh?.skillsCount ?? "-"),
             addItem("Trending", health.sections?.dataRefresh?.trendingCount ?? "-"),
             addItem("Assets", assetText(health.sections?.dataRefresh)),
@@ -334,30 +341,30 @@
 
           document.getElementById("crawl").innerHTML = [
             ...renderBase(health.sections?.crawl),
-            addItem("Last scrape", fmtSuccess(health.sections?.crawl?.lastSuccessfulScrapeAt)),
-            addItem("Last X refresh", fmtSuccess(health.sections?.crawl?.lastSuccessfulXRefreshAt)),
-            addItem("Last content run", fmtSuccess(health.sections?.crawl?.lastSuccessfulContentReportAt)),
+            addTimeItem("Last scrape", fmtSuccess(health.sections?.crawl?.lastSuccessfulScrapeAt)),
+            addTimeItem("Last X refresh", fmtSuccess(health.sections?.crawl?.lastSuccessfulXRefreshAt)),
+            addTimeItem("Last content run", fmtSuccess(health.sections?.crawl?.lastSuccessfulContentReportAt)),
             addItem("Message", issueText(health.sections?.crawl)),
           ].join("");
 
           document.getElementById("core").innerHTML = [
             ...renderBase(health.sections?.core),
-            addItem("Last library publish", fmtGenerated(health.assets?.skills?.generatedAt)),
+            addTimeItem("Last library publish", fmtGenerated(health.assets?.skills?.generatedAt)),
             addItem("Skills", health.sections?.core?.skillsCount ?? "-"),
             addItem("Trending", health.sections?.core?.trendingCount ?? "-"),
-            addItem("Last successful scrape", fmtSuccess(health.sections?.core?.lastSuccessfulScrapeAt)),
+            addTimeItem("Last successful scrape", fmtSuccess(health.sections?.core?.lastSuccessfulScrapeAt)),
           ].join("");
 
           document.getElementById("x").innerHTML = [
             ...renderBase(health.sections?.x),
-            addItem("Last X publish", fmtGenerated(health.assets?.xTrending?.generatedAt)),
+            addTimeItem("Last X publish", fmtGenerated(health.assets?.xTrending?.generatedAt)),
             addItem("X feed", health.sections?.x?.xTrendingCount ?? "-"),
-            addItem("Last successful X refresh", fmtSuccess(health.sections?.x?.lastSuccessfulXRefreshAt)),
+            addTimeItem("Last successful X refresh", fmtSuccess(health.sections?.x?.lastSuccessfulXRefreshAt)),
           ].join("");
 
           document.getElementById("overlays").innerHTML = [
             ...renderBase(health.sections?.overlays),
-            addItem("Last overlay publish", fmtGenerated(health.assets?.skillSignals?.generatedAt)),
+            addTimeItem("Last overlay publish", fmtGenerated(health.assets?.skillSignals?.generatedAt)),
             addItem("Skill signals", health.sections?.overlays?.skillSignalsCount ?? "-"),
             addItem("Author signals", health.sections?.overlays?.authorSignalsCount ?? "-"),
             addItem("Author leaderboards", health.sections?.overlays?.authorLeaderboardsCount ?? "-"),
@@ -381,9 +388,9 @@
 
           document.getElementById("content").innerHTML = [
             ...renderBase(health.sections?.contentReports),
-            addItem("Last report publish", fmtGenerated(health.content?.dashboardGeneratedAt)),
-            addItem("Last successful content run", fmtSuccess(health.sections?.contentReports?.lastSuccessfulContentReportAt)),
-            addItem("Basket enriched", fmt(health.sections?.contentReports?.basketEnrichedAt)),
+            addTimeItem("Last report publish", fmtGenerated(health.content?.dashboardGeneratedAt)),
+            addTimeItem("Last successful content run", fmtSuccess(health.sections?.contentReports?.lastSuccessfulContentReportAt)),
+            addTimeItem("Basket enriched", fmt(health.sections?.contentReports?.basketEnrichedAt)),
             addItem("Trending snapshots", health.sections?.contentReports?.snapshotCount ?? "-"),
           ].join("");
 
