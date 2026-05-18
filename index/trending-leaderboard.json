@@ -6,7 +6,7 @@
     "authorHandle": "anthropics",
     "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.",
     "stars": 128912,
-    "installs": 55639,
+    "installs": 55729,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -28,7 +28,7 @@
     "authorHandle": "larksuite",
     "description": "飞书 Markdown：查看、创建、上传和编辑 Markdown 文件。当用户需要创建或编辑 Markdown 文件、读取或修改时使用。",
     "stars": 9333,
-    "installs": 54973,
+    "installs": 55336,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -39,7 +39,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. Also use when the user mentions 'PPC,' 'paid media,' 'ROAS,' 'CPA,' 'ad campaign,' 'retargeting,' 'audience targeting,' 'Google Ads,' 'Facebook ads,' 'LinkedIn ads,' 'ad budget,' 'cost per click,' 'ad spend,' or 'should I run ads.' Use this for campaign strategy, audience targeting, bidding, and optimization. For bulk ad creative generation and iteration, see ad-creative. For landing page optimization, see page-cro.",
     "stars": 25364,
-    "installs": 54799,
+    "installs": 54800,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -61,7 +61,7 @@
     "authorHandle": "firebase",
     "description": "Develop AI-powered applications using Genkit in Node.js/TypeScript. Use when the user asks about Genkit, AI agents, flows, or tools in JavaScript/TypeScript, or when encountering Genkit errors, validation issues, type errors, or API problems.",
     "stars": 268,
-    "installs": 52840,
+    "installs": 52934,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -72,7 +72,7 @@
     "authorHandle": "firebase",
     "description": "Generates code and provides documentation for the Genkit Dart SDK. Use when the user asks to build AI agents in Dart, use Genkit flows, or integrate LLMs into Dart/Flutter applications.",
     "stars": 268,
-    "installs": 52627,
+    "installs": 52721,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -83,7 +83,7 @@
     "authorHandle": "vercel-labs",
     "description": "Deploy applications and websites to Vercel. Use when the user requests deployment actions like \"deploy my app\", \"deploy and give me the link\", \"push this live\", or \"create a preview deployment\".",
     "stars": 26185,
-    "installs": 52603,
+    "installs": 52690,
     "githubUrl": "https://github.com/vercel-labs/agent-skills",
     "source": "skills.sh"
   },
@@ -105,7 +105,7 @@
     "authorHandle": "emilkowalski",
     "description": "This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.",
     "stars": 1116,
-    "installs": 52202,
+    "installs": 52388,
     "githubUrl": "https://github.com/emilkowalski/skill",
     "source": "skills.sh"
   },
@@ -149,7 +149,7 @@
     "authorHandle": "squirrelscan",
     "description": "Audit websites for SEO, performance, security, technical, content, and 15 other issue cateories with 230+ rules using the squirrelscan CLI. Returns LLM-optimized reports with health scores, broken links, meta tag analysis, and actionable recommendations. Use to discover and asses website or webapp issues and health.",
     "stars": 75,
-    "installs": 50753,
+    "installs": 50763,
     "githubUrl": "https://github.com/squirrelscan/skills",
     "source": "skills.sh"
   },
@@ -160,7 +160,7 @@
     "authorHandle": "microsoft",
     "description": "Provision Microsoft Entra Agent Identity Blueprints, BlueprintPrincipals, and per-instance Agent Identities via Microsoft Graph, and configure OAuth 2.0 token exchange (fmi_path, OBO, cross-tenant) including the Microsoft Entra SDK for AgentID sidecar. USE FOR: Agent Identity Blueprint, BlueprintPrincipal, agent OAuth, fmi_path token exchange, agent OBO, Workload Identity Federation for agents, polyglot agent auth, Microsoft.Identity.Web.AgentIdentities. DO NOT USE FOR: standard Entra app registration (use entra-app-registration), Azure RBAC (use azure-rbac), Microsoft Foundry agent authoring (use microsoft-foundry).",
     "stars": 850,
-    "installs": 50152,
+    "installs": 50548,
     "githubUrl": "https://github.com/microsoft/azure-skills",
     "source": "skills.sh"
   },
@@ -171,7 +171,7 @@
     "authorHandle": "coreyhaines31",
     "description": "Write B2B cold emails and follow-up sequences that get replies. Use when the user wants to write cold outreach emails, prospecting emails, cold email campaigns, sales development emails, or SDR emails. Also use when the user mentions \"cold outreach,\" \"prospecting email,\" \"outbound email,\" \"email to leads,\" \"reach out to prospects,\" \"sales email,\" \"follow-up email sequence,\" \"nobody's replying to my emails,\" or \"how do I write a cold email.\" Covers subject lines, opening lines, body copy, CTAs, personalization, and multi-touch follow-up sequences. For warm/lifecycle email sequences, see email-sequence. For sales collateral beyond emails, see sales-enablement.",
     "stars": 26909,
-    "installs": 49833,
+    "installs": 49920,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -182,7 +182,7 @@
     "authorHandle": "get-convex",
     "description": "Creates or adds Convex to an app. Use for new Convex projects, npm create convex@latest, frontend setup, env vars, or the first npx convex dev run.",
     "stars": 25,
-    "installs": 48497,
+    "installs": 48568,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -193,7 +193,7 @@
     "authorHandle": "heygen-com",
     "description": "Create video compositions, animations, title cards, overlays, captions, voiceovers, audio-reactive visuals, and scene transitions in HyperFrames HTML. Use when asked to build any HTML-based video content, add captions or subtitles synced to audio, generate text-to-speech narration, create audio-reactive animation (beat sync, glow, pulse driven by music), add animated text highlighting (marker sweeps, hand-drawn circles, burst lines, scribble, sketchout), or add transitions between scenes (crossfades, wipes, reveals, shader transitions). Covers composition authoring, timing, media, and the full video production workflow. For dev-loop CLI commands (init, lint, inspect, preview, render) see the hyperframes-cli skill; for asset preprocessing commands (tts, transcribe, remove-background) see the hyperframes-media skill.",
     "stars": 15037,
-    "installs": 48255,
+    "installs": 48441,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -204,7 +204,7 @@
     "authorHandle": "get-convex",
     "description": "Audits Convex performance for reads, subscriptions, write contention, and function limits. Use for slow features, insights findings, OCC conflicts, or read amplification.",
     "stars": 25,
-    "installs": 48022,
+    "installs": 48095,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -215,7 +215,7 @@
     "authorHandle": "get-convex",
     "description": "Sets up Convex auth, identity mapping, and access control. Use for login, auth providers, users tables, protected functions, or roles in a Convex app.",
     "stars": 25,
-    "installs": 47877,
+    "installs": 47948,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -226,7 +226,7 @@
     "authorHandle": "get-convex",
     "description": "Plans Convex schema and data migrations with widen-migrate-narrow and @convex-dev/migrations. Use for breaking schema changes, backfills, table reshaping, or zero-downtime rollouts.",
     "stars": 25,
-    "installs": 47822,
+    "installs": 47895,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -237,7 +237,7 @@
     "authorHandle": "get-convex",
     "description": "Builds reusable Convex components with isolated tables and app-facing APIs. Use for new components, reusable backend modules, integrations, or component boundary work.",
     "stars": 25,
-    "installs": 47816,
+    "installs": 47888,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -248,7 +248,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to reduce churn, build cancellation flows, set up save offers, recover failed payments, or implement retention strategies. Also use when the user mentions 'churn,' 'cancel flow,' 'offboarding,' 'save offer,' 'dunning,' 'failed payment recovery,' 'win-back,' 'retention,' 'exit survey,' 'pause subscription,' 'involuntary churn,' 'people keep canceling,' 'churn rate is too high,' 'how do I keep users,' or 'customers are leaving.' Use this whenever someone is losing subscribers or wants to build systems to prevent it. For post-cancel win-back email sequences, see email-sequence. For in-app upgrade paywalls, see paywall-upgrade-cro.",
     "stars": 26909,
-    "installs": 47470,
+    "installs": 47556,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -259,7 +259,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to plan, map, or restructure their website's page hierarchy, navigation, URL structure, or internal linking. Also use when the user mentions \"sitemap,\" \"site map,\" \"visual sitemap,\" \"site structure,\" \"page hierarchy,\" \"information architecture,\" \"IA,\" \"navigation design,\" \"URL structure,\" \"breadcrumbs,\" \"internal linking strategy,\" \"website planning,\" \"what pages do I need,\" \"how should I organize my site,\" or \"site navigation.\" Use this whenever someone is planning what pages a website should have and how they connect. NOT for XML sitemaps (that's technical SEO — see seo-audit). For SEO audits, see seo-audit. For structured data, see schema-markup.",
     "stars": 26909,
-    "installs": 47388,
+    "installs": 47475,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -270,7 +270,7 @@
     "authorHandle": "anthropics",
     "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
     "stars": 128912,
-    "installs": 46989,
+    "installs": 47079,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -281,7 +281,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create sales collateral, pitch decks, one-pagers, objection handling docs, or demo scripts. Also use when the user mentions 'sales deck,' 'pitch deck,' 'one-pager,' 'leave-behind,' 'objection handling,' 'deal-specific ROI analysis,' 'demo script,' 'talk track,' 'sales playbook,' 'proposal template,' 'buyer persona card,' 'help my sales team,' 'sales materials,' or 'what should I give my sales reps.' Use this for any document or asset that helps a sales team close deals. For competitor comparison pages and battle cards, see competitor-alternatives. For marketing website copy, see copywriting. For cold outreach emails, see cold-email.",
     "stars": 26909,
-    "installs": 46546,
+    "installs": 46635,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -292,7 +292,7 @@
     "authorHandle": "heygen-com",
     "description": "HyperFrames CLI dev loop — `npx hyperframes` for scaffolding (init), validation (lint, inspect), preview, render, and environment troubleshooting (doctor, browser, info, upgrade). Use when running any of these commands or troubleshooting the HyperFrames build/render environment. For asset preprocessing commands (`tts`, `transcribe`, `remove-background`), invoke the `hyperframes-media` skill instead.",
     "stars": 15037,
-    "installs": 46305,
+    "installs": 46485,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -303,7 +303,7 @@
     "authorHandle": "heygen-com",
     "description": "GSAP animation reference for HyperFrames. Covers gsap.to(), from(), fromTo(), easing, stagger, defaults, timelines (gsap.timeline(), position parameter, labels, nesting, playback), and performance (transforms, will-change, quickTo). Use when writing GSAP animations in HyperFrames compositions.",
     "stars": 15037,
-    "installs": 46124,
+    "installs": 46297,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -325,7 +325,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. Also use when the user mentions 'RevOps,' 'revenue operations,' 'lead scoring,' 'lead routing,' 'MQL,' 'SQL,' 'pipeline stages,' 'deal desk,' 'CRM automation,' 'marketing-to-sales handoff,' 'data hygiene,' 'leads aren't getting to sales,' 'pipeline management,' 'lead qualification,' or 'when should marketing hand off to sales.' Use this for anything involving the systems and processes that connect marketing to revenue. For cold outreach emails, see cold-email. For email drip campaigns, see email-sequence. For pricing decisions, see pricing-strategy.",
     "stars": 26909,
-    "installs": 45035,
+    "installs": 45118,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -336,7 +336,7 @@
     "authorHandle": "heygen-com",
     "description": "Capture a website and create a HyperFrames video from it. Use when: (1) a user provides a URL and wants a video, (2) someone says \"capture this site\", \"turn this into a video\", \"make a promo from my site\", (3) the user wants a social ad, product tour, or any video based on an existing website, (4) the user shares a link and asks for any kind of video content. Even if the user just pastes a URL — this is the skill to use.",
     "stars": 15037,
-    "installs": 44695,
+    "installs": 44861,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -347,7 +347,7 @@
     "authorHandle": "heygen-com",
     "description": "Install and wire registry blocks and components into HyperFrames compositions. Use when running hyperframes add, installing a block or component, wiring an installed item into index.html, or working with hyperframes.json. Covers the add command, install locations, block sub-composition wiring, component snippet merging, and registry discovery.",
     "stars": 15037,
-    "installs": 44570,
+    "installs": 44740,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -358,7 +358,7 @@
     "authorHandle": "google-labs-code",
     "description": "Analyze Stitch projects and synthesize a semantic design system into DESIGN.md files",
     "stars": 5242,
-    "installs": 44448,
+    "installs": 44470,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -369,7 +369,7 @@
     "authorHandle": "anthropics",
     "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.",
     "stars": 128912,
-    "installs": 43013,
+    "installs": 43087,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -380,7 +380,7 @@
     "authorHandle": "anthropics",
     "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
     "stars": 128912,
-    "installs": 42916,
+    "installs": 42997,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -391,7 +391,7 @@
     "authorHandle": "anthropics",
     "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.",
     "stars": 128912,
-    "installs": 42692,
+    "installs": 42769,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -402,7 +402,7 @@
     "authorHandle": "wshobson",
     "description": "Build scalable design systems with Tailwind CSS v4, design tokens, component libraries, and responsive patterns. Use when creating component libraries, implementing design systems, or standardizing UI patterns.",
     "stars": 34867,
-    "installs": 42558,
+    "installs": 42592,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -413,7 +413,7 @@
     "authorHandle": "firecrawl",
     "description": "Extract clean markdown from any URL, including JavaScript-rendered SPAs. Use this skill whenever the user provides a URL and wants its content, says \"scrape\", \"grab\", \"fetch\", \"pull\", \"get the page\", \"extract from this URL\", or \"read this webpage\". Handles JS-rendered pages, multiple concurrent URLs, and returns LLM-optimized markdown. Use this instead of WebFetch for any webpage content extraction.",
     "stars": 368,
-    "installs": 42015,
+    "installs": 42078,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -424,7 +424,7 @@
     "authorHandle": "firecrawl",
     "description": "Web search with full page content extraction. Use this skill whenever the user asks to search the web, find articles, research a topic, look something up, find recent news, discover sources, or says \"search for\", \"find me\", \"look up\", \"what are people saying about\", or \"find articles about\". Returns real search results with optional full-page markdown — not just snippets. Provides capabilities beyond Claude's built-in WebSearch.",
     "stars": 368,
-    "installs": 41807,
+    "installs": 41873,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -435,7 +435,7 @@
     "authorHandle": "wshobson",
     "description": "Master TypeScript's advanced type system including generics, conditional types, mapped types, template literals, and utility types for building type-safe applications. Use when implementing complex type logic, creating reusable type utilities, or ensuring compile-time type safety in TypeScript projects.",
     "stars": 34867,
-    "installs": 41708,
+    "installs": 41730,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -446,7 +446,7 @@
     "authorHandle": "anthropics",
     "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.",
     "stars": 128912,
-    "installs": 41616,
+    "installs": 41694,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -457,7 +457,7 @@
     "authorHandle": "firecrawl",
     "description": "AI-powered autonomous data extraction that navigates complex sites and returns structured JSON. Use this skill when the user wants structured data from websites, needs to extract pricing tiers, product listings, directory entries, or any data as JSON with a schema. Triggers on \"extract structured data\", \"get all the products\", \"pull pricing info\", \"extract as JSON\", or when the user provides a JSON schema for website data. More powerful than simple scraping for multi-page structured extraction.",
     "stars": 368,
-    "installs": 41188,
+    "installs": 41249,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -468,7 +468,7 @@
     "authorHandle": "firecrawl",
     "description": "Bulk extract content from an entire website or site section. Use this skill when the user wants to crawl a site, extract all pages from a docs section, bulk-scrape multiple pages following links, or says \"crawl\", \"get all the pages\", \"extract everything under /docs\", \"bulk extract\", or needs content from many pages on the same site. Handles depth limits, path filtering, and concurrent extraction.",
     "stars": 368,
-    "installs": 41129,
+    "installs": 41190,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -479,7 +479,7 @@
     "authorHandle": "firecrawl",
     "description": "Discover and list all URLs on a website, with optional search filtering. Use this skill when the user wants to find a specific page on a large site, list all URLs, see the site structure, find where something is on a domain, or says \"map the site\", \"find the URL for\", \"what pages are on\", or \"list all pages\". Essential when the user knows which site but not which exact page.",
     "stars": 368,
-    "installs": 40961,
+    "installs": 41022,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -490,7 +490,7 @@
     "authorHandle": "expo",
     "description": "Complete guide for building beautiful apps with Expo Router. Covers fundamentals, styling, components, navigation, animations, patterns, and native tabs.",
     "stars": 1856,
-    "installs": 40915,
+    "installs": 40960,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -501,7 +501,7 @@
     "authorHandle": "firecrawl",
     "description": "Download an entire website as local files — markdown, screenshots, or multiple formats per page. Use this skill when the user wants to save a site locally, download documentation for offline use, bulk-save pages as files, or says \"download the site\", \"save as local files\", \"offline copy\", \"download all the docs\", or \"save for reference\". Combines site mapping and scraping into organized local directories.",
     "stars": 368,
-    "installs": 40865,
+    "installs": 40924,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -512,7 +512,7 @@
     "authorHandle": "google-labs-code",
     "description": "Transforms vague UI ideas into polished, Stitch-optimized prompts. Enhances specificity, adds UI/UX keywords, injects design system context, and structures output for better generation results.",
     "stars": 5242,
-    "installs": 40170,
+    "installs": 40187,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -523,7 +523,7 @@
     "authorHandle": "firebase",
     "description": "Develop AI-powered applications using Genkit in Go. Use when the user asks to build AI features, agents, flows, or tools in Go using Genkit, or when working with Genkit Go code involving generation, prompts, streaming, tool calling, or model providers.",
     "stars": 268,
-    "installs": 40093,
+    "installs": 40187,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -534,7 +534,7 @@
     "authorHandle": "google-labs-code",
     "description": "Teaches agents to iteratively build websites using Stitch with an autonomous baton-passing loop pattern",
     "stars": 5242,
-    "installs": 39782,
+    "installs": 39799,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -545,7 +545,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create, plan, or optimize a lead magnet for email capture or lead generation. Also use when the user mentions \"lead magnet,\" \"gated content,\" \"content upgrade,\" \"downloadable,\" \"ebook,\" \"cheat sheet,\" \"checklist,\" \"template download,\" \"opt-in,\" \"freebie,\" \"PDF download,\" \"resource library,\" \"content offer,\" \"email capture content,\" \"Notion template,\" \"spreadsheet template,\" or \"what should I give away for emails.\" Use this for planning what to create and how to distribute it. For interactive tools as lead magnets, see free-tool-strategy. For writing the actual content, see copywriting. For the email sequence after capture, see email-sequence.",
     "stars": 26909,
-    "installs": 39558,
+    "installs": 39644,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -556,7 +556,7 @@
     "authorHandle": "anthropics",
     "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.",
     "stars": 120905,
-    "installs": 37647,
+    "installs": 37672,
     "githubUrl": "https://github.com/anthropics/claude-code",
     "source": "skills.sh"
   },
@@ -567,41 +567,41 @@
     "authorHandle": "anthropics",
     "description": "A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal communications (status reports, leadership updates, 3P updates, company newsletters, FAQs, incident reports, project updates, etc.).",
     "stars": 128912,
-    "installs": 36451,
+    "installs": 36524,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
   {
     "rank": 53,
-    "id": "google-labs-code/stitch-skills:shadcn-ui",
-    "name": "shadcn-ui",
-    "authorHandle": "google-labs-code",
-    "description": "Expert guidance for integrating and building applications with shadcn/ui components, including component discovery, installation, customization, and best practices.",
-    "stars": 5242,
-    "installs": 36224,
-    "githubUrl": "https://github.com/google-labs-code/stitch-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 54,
-    "id": "microsoft/playwright-cli:playwright-cli",
-    "name": "playwright-cli",
-    "authorHandle": "microsoft",
-    "description": "Automate browser interactions, test web pages and work with Playwright tests.",
-    "stars": 10009,
-    "installs": 36165,
-    "githubUrl": "https://github.com/microsoft/playwright-cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 55,
     "id": "juliusbrussee/caveman:cavecrew",
     "name": "cavecrew",
     "authorHandle": "juliusbrussee",
     "description": "Decision guide for delegating to caveman-style subagents. Tells the main thread WHEN to spawn `cavecrew-investigator` (locate code), `cavecrew-builder` (1-2 file edit), or `cavecrew-reviewer` (diff review) instead of doing the work inline or using vanilla `Explore`. Subagent output is caveman-compressed so the tool-result injected back into main context is ~60% smaller — main context lasts longer across long sessions. Trigger: \"delegate to subagent\", \"use cavecrew\", \"spawn investigator/builder/reviewer\", \"save context\", \"compressed agent output\".",
     "stars": 55115,
-    "installs": 35957,
+    "installs": 36360,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 54,
+    "id": "google-labs-code/stitch-skills:shadcn-ui",
+    "name": "shadcn-ui",
+    "authorHandle": "google-labs-code",
+    "description": "Expert guidance for integrating and building applications with shadcn/ui components, including component discovery, installation, customization, and best practices.",
+    "stars": 5242,
+    "installs": 36240,
+    "githubUrl": "https://github.com/google-labs-code/stitch-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 55,
+    "id": "microsoft/playwright-cli:playwright-cli",
+    "name": "playwright-cli",
+    "authorHandle": "microsoft",
+    "description": "Automate browser interactions, test web pages and work with Playwright tests.",
+    "stars": 10009,
+    "installs": 36214,
+    "githubUrl": "https://github.com/microsoft/playwright-cli",
     "source": "skills.sh"
   },
   {
@@ -611,7 +611,7 @@
     "authorHandle": "juliusbrussee",
     "description": "Show real token usage and estimated savings for the current session. Reads directly from the Claude Code session log — no AI estimation. Triggers on /caveman-stats. Output is injected by the mode-tracker hook; the model itself does not compute the numbers.",
     "stars": 55115,
-    "installs": 35787,
+    "installs": 36185,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
   },
@@ -644,7 +644,7 @@
     "authorHandle": "vercel-labs",
     "description": "Deploy and manage projects on Vercel using token-based authentication. Use when working with Vercel CLI using access tokens rather than interactive login — e.g. \"deploy to vercel\", \"set up vercel\", \"add environment variables to vercel\".",
     "stars": 26185,
-    "installs": 34714,
+    "installs": 34795,
     "githubUrl": "https://github.com/vercel-labs/agent-skills",
     "source": "skills.sh"
   },
@@ -655,7 +655,7 @@
     "authorHandle": "neondatabase",
     "description": "Guides and best practices for working with Neon Serverless Postgres. Covers getting started, local development with Neon, choosing a connection method, Neon features, authentication (@neondatabase/auth), PostgREST-style data API (@neondatabase/neon-js), Neon CLI, and Neon's Platform API/SDKs. Use for any Neon-related questions.",
     "stars": 57,
-    "installs": 34461,
+    "installs": 34494,
     "githubUrl": "https://github.com/neondatabase/agent-skills",
     "source": "skills.sh"
   },
@@ -666,30 +666,30 @@
     "authorHandle": "anthropics",
     "description": "Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use when users request animated GIFs for Slack like \"make me a GIF of X doing Y for Slack.\"",
     "stars": 128912,
-    "installs": 34423,
+    "installs": 34491,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
   {
     "rank": 62,
-    "id": "wshobson/agents:nodejs-backend-patterns",
-    "name": "nodejs-backend-patterns",
-    "authorHandle": "wshobson",
-    "description": "Build production-ready Node.js backend services with Express/Fastify, implementing middleware patterns, error handling, authentication, database integration, and API design best practices. Use when creating Node.js servers, REST APIs, GraphQL backends, or microservices architectures.",
-    "stars": 34867,
-    "installs": 32602,
-    "githubUrl": "https://github.com/wshobson/agents",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 63,
     "id": "kepano/obsidian-skills:obsidian-markdown",
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
     "stars": 29243,
-    "installs": 32591,
+    "installs": 32647,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 63,
+    "id": "wshobson/agents:nodejs-backend-patterns",
+    "name": "nodejs-backend-patterns",
+    "authorHandle": "wshobson",
+    "description": "Build production-ready Node.js backend services with Express/Fastify, implementing middleware patterns, error handling, authentication, database integration, and API design best practices. Use when creating Node.js servers, REST APIs, GraphQL backends, or microservices architectures.",
+    "stars": 34867,
+    "installs": 32624,
+    "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
   {
@@ -699,7 +699,7 @@
     "authorHandle": "expo",
     "description": "Use when implementing or debugging ANY network request, API call, or data fetching. Covers fetch API, React Query, SWR, error handling, caching, offline support, and Expo Router data loaders (`useLoaderData`).",
     "stars": 1856,
-    "installs": 32307,
+    "installs": 32339,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -710,7 +710,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to conduct, analyze, or synthesize customer research. Use when the user mentions \"customer research,\" \"ICP research,\" \"talk to customers,\" \"analyze transcripts,\" \"customer interviews,\" \"survey analysis,\" \"support ticket analysis,\" \"voice of customer,\" \"VOC,\" \"build personas,\" \"customer personas,\" \"jobs to be done,\" \"JTBD,\" \"what do customers say,\" \"what are customers struggling with,\" \"Reddit mining,\" \"G2 reviews,\" \"review mining,\" \"digital watering holes,\" \"community research,\" \"forum research,\" \"competitor reviews,\" \"customer sentiment,\" or \"find out why customers churn/convert/buy.\" Use for both analyzing existing research assets AND gathering new research from online sources. For writing copy informed by research, see copywriting. For acting on research to improve pages, see page-cro.",
     "stars": 26909,
-    "installs": 32199,
+    "installs": 32291,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -721,7 +721,7 @@
     "authorHandle": "github",
     "description": "Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions \"/commit\". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping",
     "stars": 32249,
-    "installs": 31316,
+    "installs": 31330,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -732,7 +732,7 @@
     "authorHandle": "genkit-ai",
     "description": "Develop AI-powered applications using Genkit in Node.js/TypeScript. Use when the user asks about Genkit, AI agents, flows, or tools in JavaScript/TypeScript, or when encountering Genkit errors, validation issues, type errors, or API problems.",
     "stars": 12,
-    "installs": 28999,
+    "installs": 29047,
     "githubUrl": "https://github.com/genkit-ai/skills",
     "source": "skills.sh"
   },
@@ -743,7 +743,7 @@
     "authorHandle": "vercel-labs",
     "description": "Next.js 16 Cache Components - PPR, use cache directive, cacheLife, cacheTag, updateTag",
     "stars": 854,
-    "installs": 28936,
+    "installs": 28977,
     "githubUrl": "https://github.com/vercel-labs/next-skills",
     "source": "skills.sh"
   },
@@ -754,7 +754,7 @@
     "authorHandle": "kepano",
     "description": "Interact with Obsidian vaults using the Obsidian CLI to read, create, search, and manage notes, tasks, properties, and more. Also supports plugin and theme development with commands to reload plugins, run JavaScript, capture errors, take screenshots, and inspect the DOM. Use when the user asks to interact with their Obsidian vault, manage notes, search vault content, perform vault operations from the command line, or develop and debug Obsidian plugins and themes.",
     "stars": 29243,
-    "installs": 28724,
+    "installs": 28775,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
@@ -765,30 +765,30 @@
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.",
     "stars": 29243,
-    "installs": 28615,
+    "installs": 28663,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
   {
     "rank": 71,
-    "id": "expo/skills:expo-tailwind-setup",
-    "name": "expo-tailwind-setup",
-    "authorHandle": "expo",
-    "description": "Set up Tailwind CSS v4 in Expo with react-native-css and NativeWind v5 for universal styling",
-    "stars": 1856,
-    "installs": 28381,
-    "githubUrl": "https://github.com/expo/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 72,
     "id": "heygen-com/hyperframes:remotion-to-hyperframes",
     "name": "remotion-to-hyperframes",
     "authorHandle": "heygen-com",
     "description": "Translate an existing Remotion (React-based) video composition into a HyperFrames HTML composition. Use ONLY when the user explicitly asks to port, convert, migrate, translate, or rewrite a Remotion composition as HyperFrames — for example \"port my Remotion project to HyperFrames\", \"convert this Remotion code to HyperFrames\", \"migrate from Remotion\", \"translate this Remotion comp\", or \"rewrite this as HyperFrames HTML\". Do NOT use when (a) the user is authoring a NEW HyperFrames composition, even if they have or are A/B-testing a similar Remotion video; (b) the user mentions Remotion in passing without asking for migration; (c) the user shares Remotion code as reference material rather than asking for a translation; (d) the user asks for \"the same video as my Remotion one\" without explicitly asking to migrate the source — treat that as a fresh HyperFrames build. When in doubt, default to authoring a native HyperFrames composition with the `hyperframes` skill instead. Skill detects unsupported patterns (useState, useEffect with side effects, async calculateMetadata, third-party React component libraries, `@remotion/lambda` features) and recommends the runtime interop escape hatch instead of attempting a lossy translation.",
     "stars": 15037,
-    "installs": 28316,
+    "installs": 28482,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 72,
+    "id": "expo/skills:expo-tailwind-setup",
+    "name": "expo-tailwind-setup",
+    "authorHandle": "expo",
+    "description": "Set up Tailwind CSS v4 in Expo with react-native-css and NativeWind v5 for universal styling",
+    "stars": 1856,
+    "installs": 28413,
+    "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
   {
@@ -798,30 +798,30 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Send, read, and manage email.",
     "stars": 25810,
-    "installs": 28274,
+    "installs": 28298,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 74,
-    "id": "charon-fan/agent-playbook:self-improving-agent",
-    "name": "self-improving-agent",
-    "authorHandle": "charon-fan",
-    "description": "A universal self-improving agent that learns from ALL skill experiences. Uses multi-memory architecture (semantic + episodic + working) to continuously evolve the codebase. Auto-triggers on skill completion/error with hooks-based self-correction.",
-    "stars": 51,
-    "installs": 28219,
-    "githubUrl": "https://github.com/zhaono1/agent-playbook",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 75,
     "id": "expo/skills:upgrading-expo",
     "name": "upgrading-expo",
     "authorHandle": "expo",
     "description": "Guidelines for upgrading Expo SDK versions and fixing dependency issues",
     "stars": 1856,
-    "installs": 28218,
+    "installs": 28251,
     "githubUrl": "https://github.com/expo/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 75,
+    "id": "charon-fan/agent-playbook:self-improving-agent",
+    "name": "self-improving-agent",
+    "authorHandle": "charon-fan",
+    "description": "A universal self-improving agent that learns from ALL skill experiences. Uses multi-memory architecture (semantic + episodic + working) to continuously evolve the codebase. Auto-triggers on skill completion/error with hooks-based self-correction.",
+    "stars": 51,
+    "installs": 28233,
+    "githubUrl": "https://github.com/zhaono1/agent-playbook",
     "source": "skills.sh"
   },
   {
@@ -831,7 +831,7 @@
     "authorHandle": "googleworkspace",
     "description": "Read and write Google Docs.",
     "stars": 25810,
-    "installs": 28168,
+    "installs": 28194,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -842,7 +842,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Drive: Manage files, folders, and shared drives.",
     "stars": 25810,
-    "installs": 28100,
+    "installs": 28124,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -853,7 +853,7 @@
     "authorHandle": "intellectronica",
     "description": "This skill provides comprehensive instructions for interacting with the Notion API via REST calls. This skill should be used whenever the user asks to interact with Notion, including reading, creating, updating, or deleting pages, databases, blocks, comments, or any other Notion content. The skill covers authentication, all available endpoints, pagination, error handling, and best practices.",
     "stars": 257,
-    "installs": 28041,
+    "installs": 28067,
     "githubUrl": "https://github.com/intellectronica/agent-skills",
     "source": "skills.sh"
   },
@@ -864,7 +864,7 @@
     "authorHandle": "expo",
     "description": "Helps understand and write EAS workflow YAML files for Expo projects. Use this skill when the user asks about CI/CD or workflows in an Expo or EAS context, mentions .eas/workflows/, or wants help with EAS build pipelines or deployment automation.",
     "stars": 1856,
-    "installs": 26924,
+    "installs": 26955,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -875,7 +875,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Calendar: Manage calendars and events.",
     "stars": 25810,
-    "installs": 26746,
+    "installs": 26775,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -886,7 +886,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Sheets: Read and write spreadsheets.",
     "stars": 25810,
-    "installs": 26693,
+    "installs": 26720,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -897,7 +897,7 @@
     "authorHandle": "expo",
     "description": "Deploying Expo apps to iOS App Store, Android Play Store, web hosting, and API routes",
     "stars": 1856,
-    "installs": 26554,
+    "installs": 26588,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -908,7 +908,7 @@
     "authorHandle": "expo",
     "description": "Build and distribute Expo development clients locally or via TestFlight",
     "stars": 1856,
-    "installs": 26462,
+    "installs": 26496,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -919,7 +919,7 @@
     "authorHandle": "resciencelab",
     "description": "SEO & GEO (Generative Engine Optimization) for websites. Analyze keywords, generate schema markup, optimize for AI search engines (ChatGPT, Perplexity, Gemini, Copilot, Claude) and traditional search (Google, Bing). Use when user wants to improve search visibility, search optimization, search ranking, AI visibility, ChatGPT ranking, Google AI Overview, indexing, JSON-LD, meta tags, or keyword research.",
     "stars": 838,
-    "installs": 26431,
+    "installs": 26435,
     "githubUrl": "https://github.com/ReScienceLab/opc-skills",
     "source": "skills.sh"
   },
@@ -930,7 +930,7 @@
     "authorHandle": "firecrawl",
     "description": "Control and interact with a live browser session on any scraped page — click buttons, fill forms, navigate flows, and extract data using natural language prompts or code. Use when the user needs to interact with a webpage beyond simple scraping: logging into a site, submitting forms, clicking through pagination, handling infinite scroll, navigating multi-step checkout or wizard flows, or when a regular scrape failed because content is behind JavaScript interaction. Also useful for authenticated scraping via profiles. Triggers on \"interact\", \"click\", \"fill out the form\", \"log in to\", \"sign in\", \"submit\", \"paginated\", \"next page\", \"infinite scroll\", \"interact with the page\", \"navigate to\", \"open a session\", or \"scrape failed\".",
     "stars": 368,
-    "installs": 26362,
+    "installs": 26421,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -941,7 +941,7 @@
     "authorHandle": "heygen-com",
     "description": "CSS animation adapter patterns for HyperFrames. Use when authoring CSS keyframes, animation-delay based timing, animation-fill-mode, animation-play-state, or CSS-only motion that HyperFrames must seek deterministically during preview and rendering.",
     "stars": 15037,
-    "installs": 26218,
+    "installs": 26391,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -952,7 +952,7 @@
     "authorHandle": "google-labs-code",
     "description": "Generate walkthrough videos from Stitch projects using Remotion with smooth transitions, zooming, and text overlays",
     "stars": 5242,
-    "installs": 26078,
+    "installs": 26094,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -963,7 +963,7 @@
     "authorHandle": "heygen-com",
     "description": "Anime.js adapter patterns for HyperFrames. Use when writing Anime.js animations or timelines inside HyperFrames compositions, registering animations on window.__hfAnime, making Anime.js seek-driven and deterministic, or translating Anime.js examples into render-safe HyperFrames HTML.",
     "stars": 15037,
-    "installs": 25554,
+    "installs": 25725,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -974,7 +974,7 @@
     "authorHandle": "expo",
     "description": "Guidelines for creating API routes in Expo Router with EAS Hosting",
     "stars": 1856,
-    "installs": 25441,
+    "installs": 25467,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -985,7 +985,7 @@
     "authorHandle": "anthropics",
     "description": "Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements). TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project. SKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML.",
     "stars": 128912,
-    "installs": 25393,
+    "installs": 25465,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -996,7 +996,7 @@
     "authorHandle": "heygen-com",
     "description": "Three.js and WebGL adapter patterns for HyperFrames. Use when creating deterministic Three.js scenes, WebGL canvas layers, AnimationMixer timelines, camera motion, shader-driven visuals, or canvas renders that respond to HyperFrames hf-seek events.",
     "stars": 15037,
-    "installs": 25289,
+    "installs": 25453,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -1007,52 +1007,52 @@
     "authorHandle": "heygen-com",
     "description": "Tailwind CSS v4.2 browser-runtime patterns for HyperFrames compositions. Use when scaffolding or editing projects created with `hyperframes init --tailwind`, writing Tailwind utility classes in composition HTML, adding CSS-first Tailwind v4 theme tokens, debugging v3 vs v4 syntax, or deciding when to compile Tailwind to CSS instead of using the browser runtime.",
     "stars": 15037,
-    "installs": 25176,
+    "installs": 25348,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
   {
     "rank": 93,
-    "id": "othmanadi/planning-with-files:planning-with-files",
-    "name": "planning-with-files",
-    "authorHandle": "othmanadi",
-    "description": "Implements Manus-style file-based planning to organize and track progress on complex tasks. Creates task_plan.md, findings.md, and progress.md. Use when asked to plan out, break down, or organize a multi-step project, research task, or any work requiring 5+ tool calls. Supports automatic session recovery after /clear.",
-    "stars": 20500,
-    "installs": 25147,
-    "githubUrl": "https://github.com/OthmanAdi/planning-with-files",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 94,
     "id": "heygen-com/hyperframes:lottie",
     "name": "lottie",
     "authorHandle": "heygen-com",
     "description": "Lottie and dotLottie adapter patterns for HyperFrames. Use when embedding lottie-web JSON animations, .lottie files, @lottiefiles/dotlottie-web players, registering instances on window.__hfLottie, or making After Effects exports deterministic in HyperFrames.",
     "stars": 15037,
-    "installs": 25144,
+    "installs": 25307,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
   {
-    "rank": 95,
-    "id": "google-labs-code/stitch-skills:stitch-design",
-    "name": "stitch-design",
-    "authorHandle": "google-labs-code",
-    "description": "Unified entry point for Stitch design work. Handles prompt enhancement (UI/UX keywords, atmosphere), design system synthesis (.stitch/DESIGN.md), and high-fidelity screen generation/editing via Stitch MCP.",
-    "stars": 5242,
-    "installs": 25104,
-    "githubUrl": "https://github.com/google-labs-code/stitch-skills",
+    "rank": 94,
+    "id": "othmanadi/planning-with-files:planning-with-files",
+    "name": "planning-with-files",
+    "authorHandle": "othmanadi",
+    "description": "Implements Manus-style file-based planning to organize and track progress on complex tasks. Creates task_plan.md, findings.md, and progress.md. Use when asked to plan out, break down, or organize a multi-step project, research task, or any work requiring 5+ tool calls. Supports automatic session recovery after /clear.",
+    "stars": 20500,
+    "installs": 25193,
+    "githubUrl": "https://github.com/OthmanAdi/planning-with-files",
     "source": "skills.sh"
   },
   {
-    "rank": 96,
+    "rank": 95,
     "id": "heygen-com/hyperframes:waapi",
     "name": "waapi",
     "authorHandle": "heygen-com",
     "description": "Web Animations API adapter patterns for HyperFrames. Use when authoring element.animate() motion, Animation currentTime seeking, document.getAnimations(), KeyframeEffect timing, fill modes, or native browser animations that must render deterministically in HyperFrames.",
     "stars": 15037,
-    "installs": 25007,
+    "installs": 25172,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 96,
+    "id": "google-labs-code/stitch-skills:stitch-design",
+    "name": "stitch-design",
+    "authorHandle": "google-labs-code",
+    "description": "Unified entry point for Stitch design work. Handles prompt enhancement (UI/UX keywords, atmosphere), design system synthesis (.stitch/DESIGN.md), and high-fidelity screen generation/editing via Stitch MCP.",
+    "stars": 5242,
+    "installs": 25124,
+    "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
   {
@@ -1062,7 +1062,7 @@
     "authorHandle": "firecrawl",
     "description": "Integrate Firecrawl `/search` into product code and agent workflows. Use when an app needs discovery before extraction, when the feature starts with a query instead of a URL, or when the system should search the web and optionally hydrate result content.",
     "stars": 5,
-    "installs": 24667,
+    "installs": 24723,
     "githubUrl": "https://github.com/firecrawl/skills",
     "source": "skills.sh"
   },
@@ -1073,41 +1073,41 @@
     "authorHandle": "firecrawl",
     "description": "Integrate Firecrawl `/scrape` into product code for single-page extraction. Use when an app already has a URL and needs markdown, HTML, links, screenshots, metadata, or structured page output. Prefer this skill over broader crawl patterns when the feature is page-level.",
     "stars": 5,
-    "installs": 24660,
+    "installs": 24717,
     "githubUrl": "https://github.com/firecrawl/skills",
     "source": "skills.sh"
   },
   {
     "rank": 99,
-    "id": "jimliu/baoyu-skills:baoyu-post-to-wechat",
-    "name": "baoyu-post-to-wechat",
-    "authorHandle": "jimliu",
-    "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
-    "stars": 17222,
-    "installs": 24631,
-    "githubUrl": "https://github.com/JimLiu/baoyu-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 100,
     "id": "firecrawl/skills:firecrawl-build-interact",
     "name": "firecrawl-build-interact",
     "authorHandle": "firecrawl",
     "description": "Integrate Firecrawl `/interact` into product code for dynamic pages and browser actions after scraping. Use when a feature needs clicks, form fills, pagination, authentication-aware flows, or other multi-step interactions that plain `/scrape` cannot complete.",
     "stars": 5,
-    "installs": 24620,
+    "installs": 24676,
     "githubUrl": "https://github.com/firecrawl/skills",
     "source": "skills.sh"
   },
   {
-    "rank": 101,
+    "rank": 100,
     "id": "firecrawl/skills:firecrawl-build-onboarding",
     "name": "firecrawl-build-onboarding",
     "authorHandle": "firecrawl",
     "description": "Get Firecrawl credentials and SDK setup into a project. Use when an application needs `FIRECRAWL_API_KEY`, when an agent should add Firecrawl to `.env`, when the user wants to authenticate Firecrawl for app code, or when choosing the first SDK and docs for a new Firecrawl integration. This skill includes its own browser auth flow, so it does not depend on the website onboarding skill.",
     "stars": 5,
-    "installs": 24608,
+    "installs": 24664,
     "githubUrl": "https://github.com/firecrawl/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 101,
+    "id": "jimliu/baoyu-skills:baoyu-post-to-wechat",
+    "name": "baoyu-post-to-wechat",
+    "authorHandle": "jimliu",
+    "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
+    "stars": 17222,
+    "installs": 24644,
+    "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
   {
@@ -1117,7 +1117,7 @@
     "authorHandle": "firebase",
     "description": "Develop AI-powered applications using Genkit in Python. Use when the user asks about Genkit, AI agents, flows, or tools in Python, or when encountering Genkit errors, import issues, or API problems.",
     "stars": 268,
-    "installs": 24201,
+    "installs": 24295,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -1128,7 +1128,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Docs: Append text to a document.",
     "stars": 25810,
-    "installs": 23675,
+    "installs": 23693,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1139,30 +1139,30 @@
     "authorHandle": "googleworkspace",
     "description": "Google Sheets: Read values from a spreadsheet.",
     "stars": 25810,
-    "installs": 23529,
+    "installs": 23551,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 105,
-    "id": "kepano/obsidian-skills:json-canvas",
-    "name": "json-canvas",
-    "authorHandle": "kepano",
-    "description": "Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps, flowcharts, or when the user mentions Canvas files in Obsidian.",
-    "stars": 29243,
-    "installs": 23249,
-    "githubUrl": "https://github.com/kepano/obsidian-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 106,
     "id": "pexoai/pexo-skills:pexo-agent",
     "name": "pexoai-agent",
     "authorHandle": "pexoai",
     "description": "Use this skill when the user wants to produce a short video (5–120 seconds). Supports any video type: product ads, TikTok/Instagram/YouTube content, brand videos, explainers, social clips. USE FOR: video production, AI video, make a video, product video, brand video, promotional clip, explainer video, short video.",
     "stars": 865,
-    "installs": 23204,
+    "installs": 23294,
     "githubUrl": "https://github.com/pexoai/pexo-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 106,
+    "id": "kepano/obsidian-skills:json-canvas",
+    "name": "json-canvas",
+    "authorHandle": "kepano",
+    "description": "Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps, flowcharts, or when the user mentions Canvas files in Obsidian.",
+    "stars": 29243,
+    "installs": 23292,
+    "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
   {
@@ -1172,7 +1172,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Drive: Upload a file with automatic metadata.",
     "stars": 25810,
-    "installs": 23165,
+    "installs": 23187,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1183,7 +1183,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Calendar: Show upcoming events across all calendars.",
     "stars": 25810,
-    "installs": 23079,
+    "installs": 23098,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1194,7 +1194,7 @@
     "authorHandle": "wshobson",
     "description": "Profile and optimize Python code using cProfile, memory profilers, and performance best practices. Use when debugging slow Python code, optimizing bottlenecks, or improving application performance.",
     "stars": 34867,
-    "installs": 22841,
+    "installs": 22862,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -1205,7 +1205,7 @@
     "authorHandle": "antfu",
     "description": "Vite build tool configuration, plugin API, SSR, and Vite 8 Rolldown migration. Use when working with Vite projects, vite.config.ts, Vite plugins, or building libraries/SSR apps with Vite.",
     "stars": 4821,
-    "installs": 22667,
+    "installs": 22678,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -1216,7 +1216,7 @@
     "authorHandle": "addyosmani",
     "description": "Audit and improve web accessibility following WCAG 2.2 guidelines. Use when asked to \"improve accessibility\", \"a11y audit\", \"WCAG compliance\", \"screen reader support\", \"keyboard navigation\", or \"make accessible\".",
     "stars": 1864,
-    "installs": 22573,
+    "installs": 22595,
     "githubUrl": "https://github.com/addyosmani/web-quality-skills",
     "source": "skills.sh"
   },
@@ -1227,30 +1227,30 @@
     "authorHandle": "antfu",
     "description": "Vue 3 Composition API, script setup macros, reactivity system, and built-in components. Use when writing Vue SFCs, defineProps/defineEmits/defineModel, watchers, or using Transition/Teleport/Suspense/KeepAlive.",
     "stars": 4821,
-    "installs": 22514,
+    "installs": 22529,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
   {
     "rank": 113,
-    "id": "googleworkspace/cli:gws-calendar-insert",
-    "name": "gws-calendar-insert",
-    "authorHandle": "googleworkspace",
-    "description": "Google Calendar: Create a new event.",
-    "stars": 25810,
-    "installs": 22185,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 114,
     "id": "kepano/obsidian-skills:defuddle",
     "name": "defuddle",
     "authorHandle": "kepano",
     "description": "Extract clean markdown content from web pages using Defuddle CLI, removing clutter and navigation to save tokens. Use instead of WebFetch when the user provides a URL to read or analyze, for online documentation, articles, blog posts, or any standard web page. Do NOT use for URLs ending in .md — those are already markdown, use WebFetch directly.",
     "stars": 29243,
-    "installs": 22169,
+    "installs": 22211,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 114,
+    "id": "googleworkspace/cli:gws-calendar-insert",
+    "name": "gws-calendar-insert",
+    "authorHandle": "googleworkspace",
+    "description": "Google Calendar: Create a new event.",
+    "stars": 25810,
+    "installs": 22204,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -1260,7 +1260,7 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Send an email.",
     "stars": 25810,
-    "installs": 22055,
+    "installs": 22074,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1271,7 +1271,7 @@
     "authorHandle": "jimliu",
     "description": "[Deprecated: use baoyu-imagine] AI image generation with OpenAI, Azure OpenAI, Google, OpenRouter, DashScope, Z.AI GLM-Image, MiniMax, Jimeng, Seedream and Replicate APIs. Supports text-to-image, reference images, aspect ratios, and batch generation from saved prompt files. Sequential by default; use batch parallel generation when the user already has multiple prompts or wants stable multi-image throughput. Use when user asks to generate, create, or draw images.",
     "stars": 17222,
-    "installs": 22034,
+    "installs": 22050,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1282,19 +1282,19 @@
     "authorHandle": "jimliu",
     "description": "Converts Markdown to styled HTML with WeChat-compatible themes. Supports code highlighting, math, PlantUML, footnotes, alerts, infographics, and optional bottom citations for external links. Use when user asks for \"markdown to html\", \"convert md to html\", \"md 转 html\", \"微信外链转底部引用\", or needs styled HTML output from markdown.",
     "stars": 17222,
-    "installs": 21914,
+    "installs": 21931,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
   {
     "rank": 118,
-    "id": "hyf0/vue-skills:vue-best-practices",
-    "name": "vue-best-practices",
-    "authorHandle": "hyf0",
-    "description": "MUST be used for Vue.js tasks. Strongly recommends Composition API with `<script setup>` and TypeScript as the standard approach. Covers Vue 3, SSR, Volar, vue-tsc. Load for any Vue, .vue files, Vue Router, Pinia, or Vite with Vue work. ALWAYS use Composition API unless the project explicitly requires Options API.",
-    "stars": 2354,
-    "installs": 21740,
-    "githubUrl": "https://github.com/vuejs-ai/skills",
+    "id": "leonxlnx/taste-skill:brandkit",
+    "name": "brandkit",
+    "authorHandle": "leonxlnx",
+    "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
+    "stars": 15751,
+    "installs": 21837,
+    "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
   },
   {
@@ -1304,30 +1304,30 @@
     "authorHandle": "googleworkspace",
     "description": "Google Sheets: Append a row to a spreadsheet.",
     "stars": 25810,
-    "installs": 21738,
+    "installs": 21760,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 120,
+    "id": "hyf0/vue-skills:vue-best-practices",
+    "name": "vue-best-practices",
+    "authorHandle": "hyf0",
+    "description": "MUST be used for Vue.js tasks. Strongly recommends Composition API with `<script setup>` and TypeScript as the standard approach. Covers Vue 3, SSR, Volar, vue-tsc. Load for any Vue, .vue files, Vue Router, Pinia, or Vite with Vue work. ALWAYS use Composition API unless the project explicitly requires Options API.",
+    "stars": 2354,
+    "installs": 21744,
+    "githubUrl": "https://github.com/vuejs-ai/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 121,
     "id": "jimliu/baoyu-skills:baoyu-cover-image",
     "name": "baoyu-cover-image",
     "authorHandle": "jimliu",
     "description": "Generates article cover images with 5 dimensions (type, palette, rendering, text, mood) combining 11 color palettes and 7 rendering styles. Supports cinematic (2.35:1), widescreen (16:9), and square (1:1) aspects. Use when user asks to \"generate cover image\", \"create article cover\", or \"make cover\".",
     "stars": 17222,
-    "installs": 21667,
+    "installs": 21681,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 121,
-    "id": "leonxlnx/taste-skill:brandkit",
-    "name": "brandkit",
-    "authorHandle": "leonxlnx",
-    "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
-    "stars": 15751,
-    "installs": 21649,
-    "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
   },
   {
@@ -1337,41 +1337,41 @@
     "authorHandle": "addyosmani",
     "description": "Optimize for search engine visibility and ranking. Use when asked to \"improve SEO\", \"optimize for search\", \"fix meta tags\", \"add structured data\", \"sitemap optimization\", or \"search engine optimization\".",
     "stars": 1864,
-    "installs": 21638,
+    "installs": 21652,
     "githubUrl": "https://github.com/addyosmani/web-quality-skills",
     "source": "skills.sh"
   },
   {
     "rank": 123,
-    "id": "jimliu/baoyu-skills:baoyu-article-illustrator",
-    "name": "baoyu-article-illustrator",
-    "authorHandle": "jimliu",
-    "description": "Analyzes article structure, identifies positions requiring visual aids, generates illustrations with Type × Style × Palette three-dimension approach. Use when user asks to \"illustrate article\", \"add images\", \"generate images for article\", or \"为文章配图\".",
-    "stars": 17222,
-    "installs": 21586,
-    "githubUrl": "https://github.com/JimLiu/baoyu-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 124,
     "id": "heygen-com/hyperframes:hyperframes-media",
     "name": "hyperframes-media",
     "authorHandle": "heygen-com",
     "description": "Asset preprocessing for HyperFrames compositions — text-to-speech narration (Kokoro), audio/video transcription (Whisper), and background removal for transparent overlays (u2net). Use when generating voiceover from text, transcribing speech for captions, removing the background from a video or image to use as a transparent overlay, choosing a TTS voice or whisper model, or chaining these (TTS → transcribe → captions). Each command downloads its own model on first run.",
     "stars": 15037,
-    "installs": 21453,
+    "installs": 21627,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
   {
-    "rank": 125,
+    "rank": 124,
     "id": "leonxlnx/taste-skill:imagegen-frontend-web",
     "name": "imagegen-frontend-web",
     "authorHandle": "leonxlnx",
     "description": "Elite frontend image-direction skill for generating premium, conversion-aware website design references. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.",
     "stars": 15751,
-    "installs": 21414,
+    "installs": 21612,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 125,
+    "id": "jimliu/baoyu-skills:baoyu-article-illustrator",
+    "name": "baoyu-article-illustrator",
+    "authorHandle": "jimliu",
+    "description": "Analyzes article structure, identifies positions requiring visual aids, generates illustrations with Type × Style × Palette three-dimension approach. Use when user asks to \"illustrate article\", \"add images\", \"generate images for article\", or \"为文章配图\".",
+    "stars": 17222,
+    "installs": 21601,
+    "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
   {
@@ -1381,7 +1381,7 @@
     "authorHandle": "jimliu",
     "description": "[Deprecated: use baoyu-image-cards] Generates Xiaohongshu (Little Red Book) image card series with 12 visual styles, 8 layouts, and 3 color palettes. Breaks content into 1-10 cartoon-style image cards optimized for XHS engagement. Use when user mentions \"小红书图片\", \"XHS images\", \"RedNote infographics\", \"小红书种草\", \"小绿书\", \"微信图文\", \"微信贴图\", or wants social media infographic series for Chinese platforms.",
     "stars": 17222,
-    "installs": 21340,
+    "installs": 21355,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1392,7 +1392,7 @@
     "authorHandle": "github",
     "description": "GitHub CLI (gh) comprehensive reference for repositories, issues, pull requests, Actions, projects, releases, gists, codespaces, organizations, extensions, and all GitHub operations from the command line.",
     "stars": 32249,
-    "installs": 21334,
+    "installs": 21336,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -1403,7 +1403,7 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Show unread inbox summary (sender, subject, date).",
     "stars": 25810,
-    "installs": 21269,
+    "installs": 21290,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1414,7 +1414,7 @@
     "authorHandle": "avdlee",
     "description": "Write, review, or improve SwiftUI code following best practices for state management, view composition, performance, macOS-specific APIs, and iOS 26+ Liquid Glass adoption. Use when building new SwiftUI features, refactoring existing views, reviewing code quality, or adopting modern SwiftUI patterns. Also triggers whenever an Xcode Instruments `.trace` file is referenced (to analyse it) or the user asks to **record** a new trace — attach to a running app, launch one fresh, or capture a manually-stopped session with the bundled `record_trace.py`. A target SwiftUI source file is optional; if provided it grounds recommendations in specific lines, but a trace alone is enough to diagnose hangs, hitches, CPU hotspots, and high-severity SwiftUI updates.",
     "stars": 2803,
-    "installs": 21105,
+    "installs": 21123,
     "githubUrl": "https://github.com/AvdLee/SwiftUI-Agent-Skill",
     "source": "skills.sh"
   },
@@ -1425,7 +1425,7 @@
     "authorHandle": "jimliu",
     "description": "Generate professional infographics with 21 layout types and 22 visual styles. Analyzes content, recommends layout×style combinations, and generates publication-ready infographics. Use when user asks to create \"infographic\", \"信息图\", \"visual summary\", \"可视化\", or \"高密度信息大图\".",
     "stars": 17222,
-    "installs": 21099,
+    "installs": 21119,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1436,30 +1436,30 @@
     "authorHandle": "jimliu",
     "description": "Generates professional slide deck images from content. Creates outlines with style instructions, then generates individual slide images. Use when user asks to \"create slides\", \"make a presentation\", \"generate deck\", \"slide deck\", or \"PPT\".",
     "stars": 17222,
-    "installs": 21058,
+    "installs": 21072,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
   {
     "rank": 132,
-    "id": "wshobson/agents:api-design-principles",
-    "name": "api-design-principles",
-    "authorHandle": "wshobson",
-    "description": "Master REST and GraphQL API design principles to build intuitive, scalable, and maintainable APIs that delight developers. Use when designing new APIs, reviewing API specifications, or establishing API design standards.",
-    "stars": 34867,
-    "installs": 20825,
-    "githubUrl": "https://github.com/wshobson/agents",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 133,
     "id": "leonxlnx/taste-skill:imagegen-frontend-mobile",
     "name": "imagegen-frontend-mobile",
     "authorHandle": "leonxlnx",
     "description": "Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. Designed for iOS, Android, and cross-platform mobile products. Prioritizes clean hierarchy, comfortably readable text, strong multi-screen consistency, controlled color palettes, non-generic creative direction, textured surfaces, image-led composition, tasteful custom iconography, and clean phone mockup framing. By default, screens should be shown inside a subtle premium iPhone or similar phone mockup with a visible frame, while the main focus stays on the app content itself. This skill generates images only. It does not write code.",
     "stars": 15751,
-    "installs": 20792,
+    "installs": 20984,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 133,
+    "id": "wshobson/agents:api-design-principles",
+    "name": "api-design-principles",
+    "authorHandle": "wshobson",
+    "description": "Master REST and GraphQL API design principles to build intuitive, scalable, and maintainable APIs that delight developers. Use when designing new APIs, reviewing API specifications, or establishing API design standards.",
+    "stars": 34867,
+    "installs": 20843,
+    "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
   {
@@ -1469,7 +1469,7 @@
     "authorHandle": "firebase",
     "description": "A skill to evaluate how secure Firestore security rules are. Use this when Firestore security rules are updated to ensure that the generated rules are extremely secure and robust.",
     "stars": 268,
-    "installs": 20665,
+    "installs": 20763,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -1480,7 +1480,7 @@
     "authorHandle": "googleworkspace",
     "description": "gws CLI: Shared patterns for authentication, global flags, and output formatting.",
     "stars": 25810,
-    "installs": 20550,
+    "installs": 20574,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1491,30 +1491,30 @@
     "authorHandle": "jimliu",
     "description": "Fetch any URL and convert to markdown using baoyu-fetch CLI (Chrome CDP with site-specific adapters). Built-in adapters for X/Twitter, YouTube transcripts, Hacker News threads, and generic pages via Defuddle. Handles login/CAPTCHA via interaction wait modes. Use when user wants to save a webpage as markdown.",
     "stars": 17222,
-    "installs": 20498,
+    "installs": 20513,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
   {
     "rank": 137,
-    "id": "wshobson/agents:python-testing-patterns",
-    "name": "python-testing-patterns",
-    "authorHandle": "wshobson",
-    "description": "Implement comprehensive testing strategies with pytest, fixtures, mocking, and test-driven development. Use when writing Python tests, setting up test suites, or implementing testing best practices.",
-    "stars": 34867,
-    "installs": 20470,
-    "githubUrl": "https://github.com/wshobson/agents",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 138,
     "id": "firebase/agent-skills:firebase-ai-logic-basics",
     "name": "firebase-ai-logic-basics",
     "authorHandle": "firebase",
     "description": "Official skill for integrating Firebase AI Logic (Gemini API) into web applications. Covers setup, multimodal inference, structured output, and security.",
     "stars": 268,
-    "installs": 20405,
+    "installs": 20500,
     "githubUrl": "https://github.com/firebase/agent-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 138,
+    "id": "wshobson/agents:python-testing-patterns",
+    "name": "python-testing-patterns",
+    "authorHandle": "wshobson",
+    "description": "Implement comprehensive testing strategies with pytest, fixtures, mocking, and test-driven development. Use when writing Python tests, setting up test suites, or implementing testing best practices.",
+    "stars": 34867,
+    "installs": 20492,
+    "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
   {
@@ -1524,7 +1524,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Generate images/videos via Higgsfield AI. Models: GPT Image 2, Nano Banana 2/Pro, Soul V2/Cinema/Cast/Location, Seedance 2.0, Veo 3.1, Kling 3.0, Flux 2, Z Image, Hailuo; plus Marketing Studio ads with avatars/products/hooks/settings. Use when: \"generate an image\", \"make a picture\", \"make a video\", \"animate this photo\", \"image-to-video\", \"edit/stylize/remix this image\", \"produce a clip\", \"create an ad\", \"make a UGC video\", \"product demo\", \"unboxing\", \"TV spot\", \"brand video\", \"presenter video\", \"import product from URL\", \"create avatar for ad\". Supports text-to-image, image-to-image, image-to-video, reference-based generation, and Marketing Studio. Auto-detects upload IDs vs previous job IDs. Chain with higgsfield-soul-id when the user wants face/identity consistency. NOT for: training Soul Character (use higgsfield-soul-id), product photoshoots (use higgsfield-product-photoshoot), marketplace listing cards (use higgsfield-marketplace-cards), text/chat/TTS tasks.",
     "stars": 72,
-    "installs": 20245,
+    "installs": 20372,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -1535,7 +1535,7 @@
     "authorHandle": "expo",
     "description": "Use Expo DOM components to run web code in a webview on native and as-is on web. Migrate web code to native incrementally.",
     "stars": 1856,
-    "installs": 20221,
+    "installs": 20238,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -1546,7 +1546,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Slides: Read and write presentations.",
     "stars": 25810,
-    "installs": 20085,
+    "installs": 20100,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1557,7 +1557,7 @@
     "authorHandle": "jimliu",
     "description": "Knowledge comic creator supporting multiple art styles and tones. Creates original educational comics with detailed panel layouts and sequential image generation. Use when user asks to create \"知识漫画\", \"教育漫画\", \"biography comic\", \"tutorial comic\", or \"Logicomix-style comic\".",
     "stars": 17222,
-    "installs": 20022,
+    "installs": 20036,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1568,7 +1568,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Tasks: Manage task lists and tasks.",
     "stars": 25810,
-    "installs": 19825,
+    "installs": 19845,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1579,7 +1579,7 @@
     "authorHandle": "jimliu",
     "description": "Posts content and articles to X (Twitter). Supports regular posts with images/videos and X Articles (long-form Markdown). Uses real Chrome with CDP to bypass anti-automation. Use when user asks to \"post to X\", \"tweet\", \"publish to Twitter\", or \"share on X\".",
     "stars": 17222,
-    "installs": 19748,
+    "installs": 19761,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1590,7 +1590,7 @@
     "authorHandle": "jakubkrehel",
     "description": "Design engineering principles for making interfaces feel polished. Use when building UI components, reviewing frontend code, implementing animations, hover states, shadows, borders, typography, micro-interactions, enter/exit animations, or any visual detail work. Triggers on UI polish, design details, \"make it feel better\", \"feels off\", stagger animations, border radius, optical alignment, font smoothing, tabular numbers, image outlines, box shadows.",
     "stars": 747,
-    "installs": 19656,
+    "installs": 19712,
     "githubUrl": "https://github.com/jakubkrehel/make-interfaces-feel-better",
     "source": "skills.sh"
   },
@@ -1601,7 +1601,7 @@
     "authorHandle": "aaron-he-zhu",
     "description": "Use when analyzing backlink profiles, link authority, toxic links, link-building opportunities, or competitor link gaps. 外链分析/反向链接",
     "stars": 1502,
-    "installs": 19488,
+    "installs": 19492,
     "githubUrl": "https://github.com/aaron-he-zhu/seo-geo-claude-skills",
     "source": "skills.sh"
   },
@@ -1612,7 +1612,7 @@
     "authorHandle": "vercel-labs",
     "description": "Upgrade Next.js to the latest version following official migration guides and codemods",
     "stars": 854,
-    "installs": 19262,
+    "installs": 19293,
     "githubUrl": "https://github.com/vercel-labs/next-skills",
     "source": "skills.sh"
   },
@@ -1623,7 +1623,7 @@
     "authorHandle": "jimliu",
     "description": "Converts X (Twitter) tweets and articles to markdown with YAML front matter. Uses reverse-engineered API requiring user consent. Use when user mentions \"X to markdown\", \"tweet to markdown\", \"save tweet\", or provides x.com/twitter.com URLs for conversion.",
     "stars": 17222,
-    "installs": 19176,
+    "installs": 19189,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1634,7 +1634,7 @@
     "authorHandle": "jimliu",
     "description": "Compresses images to WebP (default) or PNG with automatic tool selection. Use when user asks to \"compress image\", \"optimize image\", \"convert to webp\", or reduce image file size.",
     "stars": 17222,
-    "installs": 19044,
+    "installs": 19058,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1645,7 +1645,7 @@
     "authorHandle": "antfu",
     "description": "Vitest fast unit testing framework powered by Vite with Jest-compatible API. Use when writing tests, mocking, configuring coverage, or working with test filtering and fixtures.",
     "stars": 4821,
-    "installs": 18960,
+    "installs": 18971,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -1656,7 +1656,7 @@
     "authorHandle": "jimliu",
     "description": "Generates images and text via reverse-engineered Gemini Web API. Supports text generation, image generation from prompts, reference images for vision input, and multi-turn conversations. Use when other skills need image generation backend, or when user requests \"generate image with Gemini\", \"Gemini text generation\", or needs vision-capable AI generation.",
     "stars": 17222,
-    "installs": 18956,
+    "installs": 18969,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1667,7 +1667,7 @@
     "authorHandle": "wshobson",
     "description": "Master effective code review practices to provide constructive feedback, catch bugs early, and foster knowledge sharing while maintaining team morale. Use when reviewing pull requests, establishing review standards, or mentoring developers.",
     "stars": 34867,
-    "installs": 18514,
+    "installs": 18552,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -1678,7 +1678,7 @@
     "authorHandle": "jimliu",
     "description": "Formats plain text or markdown files with frontmatter, titles, summaries, headings, bold, lists, and code blocks. Use when user asks to \"format markdown\", \"beautify article\", \"add formatting\", or improve article layout. Outputs to {filename}-formatted.md.",
     "stars": 17222,
-    "installs": 18329,
+    "installs": 18345,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1689,7 +1689,7 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Watch for new emails and stream them as NDJSON.",
     "stars": 25810,
-    "installs": 18244,
+    "installs": 18256,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1700,7 +1700,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Generate brand-quality product images through Higgsfield product-photoshoot prompt enhancement on GPT Image 2 / gpt_image_2. Entry point for professional brand/product visuals. Use when: \"product photo\", \"studio shot\", \"lifestyle image\", \"Pinterest pin\", \"hero/banner\", \"carousel\", \"ad creative\", \"Meta ads\", \"virtual try-on\", \"model wearing\", \"person holding product\", \"closeup with hands\", \"levitating/floating/splash product\", \"CGI/surreal product\", \"restyle\", \"seasonal/aesthetic variation\", or any product, brand, or paid-social creative. Modes: product_shot, lifestyle_scene, closeup_product_with_person, moodboard_pin, hero_banner, social_carousel, ad_creative_pack, virtual_model_tryout, conceptual_product, restyle. Backend assembles the final prompt; never freehand it. NOT for: no-product text-to-image (use higgsfield-generate), branded avatar video (use higgsfield-generate Marketing Studio), marketplace listing cards (use higgsfield-marketplace-cards), Soul Character training (use higgsfield-soul-id).",
     "stars": 72,
-    "installs": 18099,
+    "installs": 18205,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -1711,7 +1711,7 @@
     "authorHandle": "googleworkspace",
     "description": "Manage Google Meet conferences.",
     "stars": 25810,
-    "installs": 18079,
+    "installs": 18094,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1722,7 +1722,7 @@
     "authorHandle": "github",
     "description": "Diátaxis Documentation Expert. An expert technical writer specializing in creating high-quality software documentation, guided by the principles and structure of the Diátaxis technical documentation authoring framework.",
     "stars": 32249,
-    "installs": 18045,
+    "installs": 18062,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -1733,7 +1733,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Train a Soul Character — a personalized model on a person's face that Higgsfield uses for identity-faithful image and video generation. Use when: \"create my Soul\", \"train my face\", \"make my digital twin\", \"build me an avatar\", \"learn my appearance\", \"create a character of me\", \"set up identity for video\", \"I want my face in generated images\". Chain: train Soul (one-time, returns reference_id) → use in higgsfield-generate via `--soul-id <id>` with models like `text2image_soul_v2` or `soul_cinema_studio`. NOT for: one-shot face swaps (use higgsfield-generate with --image), named-character / non-photo avatars (use higgsfield-generate with prompt).",
     "stars": 72,
-    "installs": 17899,
+    "installs": 18003,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -1744,30 +1744,30 @@
     "authorHandle": "github",
     "description": "Generate high-quality Product Requirements Documents (PRDs) for software systems and AI-powered features. Includes executive summaries, user stories, technical specifications, and risk analysis.",
     "stars": 32249,
-    "installs": 17837,
+    "installs": 17848,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
   {
     "rank": 160,
-    "id": "coreyhaines31/marketingskills:aso-audit",
-    "name": "aso-audit",
-    "authorHandle": "coreyhaines31",
-    "description": "When the user wants to audit or optimize an App Store or Google Play listing. Also use when the user mentions 'ASO audit,' 'app store optimization,' 'optimize my app listing,' 'improve app visibility,' 'app store ranking,' 'audit my listing,' 'why aren't people downloading my app,' 'improve my app conversion,' 'keyword optimization for app,' or 'compare my app to competitors.' Use when the user shares an App Store or Google Play URL and wants to improve it.",
-    "stars": 26909,
-    "installs": 17816,
-    "githubUrl": "https://github.com/coreyhaines31/marketingskills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 161,
     "id": "wshobson/agents:nextjs-app-router-patterns",
     "name": "nextjs-app-router-patterns",
     "authorHandle": "wshobson",
     "description": "Master Next.js 14+ App Router with Server Components, streaming, parallel routes, and advanced data fetching. Use when building Next.js applications, implementing SSR/SSG, or optimizing React Server Components.",
     "stars": 34867,
-    "installs": 17804,
+    "installs": 17825,
     "githubUrl": "https://github.com/wshobson/agents",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 161,
+    "id": "coreyhaines31/marketingskills:aso-audit",
+    "name": "aso-audit",
+    "authorHandle": "coreyhaines31",
+    "description": "When the user wants to audit or optimize an App Store or Google Play listing. Also use when the user mentions 'ASO audit,' 'app store optimization,' 'optimize my app listing,' 'improve app visibility,' 'app store ranking,' 'audit my listing,' 'why aren't people downloading my app,' 'improve my app conversion,' 'keyword optimization for app,' or 'compare my app to competitors.' Use when the user shares an App Store or Google Play URL and wants to improve it.",
+    "stars": 26909,
+    "installs": 17817,
+    "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
   {
@@ -1777,7 +1777,7 @@
     "authorHandle": "jimliu",
     "description": "Universal release workflow. Auto-detects version files and changelogs. Supports Node.js, Python, Rust, Claude Plugin, GitHub Releases, annotated tags, historical release backfill, and generic projects. Use when user says \"release\", \"发布\", \"new version\", \"bump version\", \"push\", \"推送\", \"release notes\", \"GitHub Release\", or \"回填 Release\".",
     "stars": 17222,
-    "installs": 17783,
+    "installs": 17795,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -1788,7 +1788,7 @@
     "authorHandle": "useai-pro",
     "description": "Security-first vetting for OpenClaw skills. Use before installing any skill from ClawHub, GitHub, or other sources. Checks for red flags, permission scope, and suspicious patterns.",
     "stars": 48,
-    "installs": 17737,
+    "installs": 17747,
     "githubUrl": "https://github.com/UseAI-pro/openclaw-skills-security",
     "source": "skills.sh"
   },
@@ -1799,7 +1799,7 @@
     "authorHandle": "googleworkspace",
     "description": "Read and write Google Forms.",
     "stars": 25810,
-    "installs": 17650,
+    "installs": 17667,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1810,7 +1810,7 @@
     "authorHandle": "firebase",
     "description": "Sets up, manages, and executes queries against Cloud Firestore database instances. You MUST unconditionally activate this skill if you plan to use Firestore in any way. Use when listing or creating Firestore databases, configuring security rules, designing data models, writing client SDK queries, or checking indexes.",
     "stars": 268,
-    "installs": 17420,
+    "installs": 17517,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -1821,7 +1821,7 @@
     "authorHandle": "tavily-ai",
     "description": "Search the web with LLM-optimized results via the Tavily CLI. Use this skill when the user wants to search the web, find articles, look up information, get recent news, discover sources, or says \"search for\", \"find me\", \"look up\", \"what's the latest on\", \"find articles about\", or needs current information from the internet. Returns relevant results with content snippets, relevance scores, and metadata — optimized for LLM consumption. Supports domain filtering, time ranges, and multiple search depths.",
     "stars": 270,
-    "installs": 17327,
+    "installs": 17351,
     "githubUrl": "https://github.com/tavily-ai/skills",
     "source": "skills.sh"
   },
@@ -1832,7 +1832,7 @@
     "authorHandle": "wshobson",
     "description": "Create production-ready FastAPI projects with async patterns, dependency injection, and comprehensive error handling. Use when building new FastAPI applications or setting up backend API projects.",
     "stars": 34867,
-    "installs": 17285,
+    "installs": 17297,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -1843,7 +1843,7 @@
     "authorHandle": "giuseppe-trisciuoglio",
     "description": "Provides complete shadcn/ui component library patterns including installation, configuration, and implementation of accessible React components. Use when setting up shadcn/ui, installing components, building forms with React Hook Form and Zod, customizing themes with Tailwind CSS, or implementing UI patterns like buttons, dialogs, dropdowns, tables, and complex form layouts.",
     "stars": 238,
-    "installs": 17258,
+    "installs": 17260,
     "githubUrl": "https://github.com/giuseppe-trisciuoglio/developer-kit",
     "source": "skills.sh"
   },
@@ -1854,7 +1854,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Generate marketplace product image cards through Higgsfield: compliant main image, secondary product images, and A+ style content modules. Use when the user asks for marketplace listing images, product detail cards, secondary product images, product infographics, lifestyle listing shots, A+ style content, marketplace image sets, or sales-ready product visuals. Backend owns marketplace compliance references and prompt templates; this skill only routes user intent to the CLI. NOT for generic brand product photography without marketplace/listing context (use higgsfield-product-photoshoot), video generation or UGC ads (use higgsfield-generate), or Soul Character training (use higgsfield-soul-id).",
     "stars": 72,
-    "installs": 17139,
+    "installs": 17245,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -1865,7 +1865,7 @@
     "authorHandle": "cloudflare",
     "description": "Comprehensive Cloudflare platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), feature flags (Flagship), networking (Tunnel, Spectrum), security (WAF, DDoS), and infrastructure-as-code (Terraform, Pulumi). Use for any Cloudflare development task. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 1433,
-    "installs": 17087,
+    "installs": 17113,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -1876,30 +1876,30 @@
     "authorHandle": "github",
     "description": "Generate Excalidraw diagrams from natural language descriptions. Use when asked to \"create a diagram\", \"make a flowchart\", \"visualize a process\", \"draw a system architecture\", \"create a mind map\", or \"generate an Excalidraw file\". Supports flowcharts, relationship diagrams, mind maps, and system architecture diagrams. Outputs .excalidraw JSON files that can be opened directly in Excalidraw.",
     "stars": 32249,
-    "installs": 17069,
+    "installs": 17089,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
   {
     "rank": 172,
-    "id": "googleworkspace/cli:gws-keep",
-    "name": "gws-keep",
-    "authorHandle": "googleworkspace",
-    "description": "Manage Google Keep notes.",
-    "stars": 25810,
-    "installs": 16932,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 173,
     "id": "firebase/agent-skills:firebase-crashlytics",
     "name": "firebase-crashlytics",
     "authorHandle": "firebase",
     "description": "Comprehensive guide for Firebase Crashlytics, including provisioning and SDK usage. Use this skill when the user needs help setting up Crashlytics, adding crash reporting, or using the Crashlytics SDK in their application.",
     "stars": 268,
-    "installs": 16864,
+    "installs": 16958,
     "githubUrl": "https://github.com/firebase/agent-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 173,
+    "id": "googleworkspace/cli:gws-keep",
+    "name": "gws-keep",
+    "authorHandle": "googleworkspace",
+    "description": "Manage Google Keep notes.",
+    "stars": 25810,
+    "installs": 16949,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -1909,7 +1909,7 @@
     "authorHandle": "firebase",
     "description": "Safely modifies Xcode projects (.pbxproj) to add Swift Packages and link files. Use this skill whenever an iOS project needs dependencies installed (e.g. Firebase, Alamofire).",
     "stars": 268,
-    "installs": 16732,
+    "installs": 16828,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -1920,7 +1920,7 @@
     "authorHandle": "github",
     "description": "Surgical code refactoring to improve maintainability without changing behavior. Covers extracting functions, renaming variables, breaking down god functions, improving type safety, eliminating code smells, and applying design patterns. Less drastic than repo-rebuilder; use for gradual improvements.",
     "stars": 32249,
-    "installs": 16540,
+    "installs": 16543,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -1931,7 +1931,7 @@
     "authorHandle": "twostraws",
     "description": "Comprehensively reviews SwiftUI code for best practices on modern APIs, maintainability, and performance. Use when reading, writing, or reviewing SwiftUI projects.",
     "stars": 3822,
-    "installs": 16504,
+    "installs": 16528,
     "githubUrl": "https://github.com/twostraws/SwiftUI-Agent-Skill",
     "source": "skills.sh"
   },
@@ -1942,7 +1942,7 @@
     "authorHandle": "mastra-ai",
     "description": "Comprehensive Mastra framework guide. Teaches how to find current documentation, verify API signatures, and build agents and workflows. Covers documentation lookup strategies (embedded docs, remote docs), core concepts (agents vs workflows, tools, memory, RAG), TypeScript requirements, and common patterns. Use this skill for all Mastra development to ensure you're using current APIs from the installed version or latest documentation.",
     "stars": 52,
-    "installs": 16470,
+    "installs": 16487,
     "githubUrl": "https://github.com/mastra-ai/skills",
     "source": "skills.sh"
   },
@@ -1953,7 +1953,7 @@
     "authorHandle": "antfu",
     "description": "MUST be used for Vue.js tasks. Strongly recommends Composition API with `<script setup>` and TypeScript as the standard approach. Covers Vue 3, SSR, Volar, vue-tsc. Load for any Vue, .vue files, Vue Router, Pinia, or Vite with Vue work. ALWAYS use Composition API unless the project explicitly requires Options API.",
     "stars": 4821,
-    "installs": 16334,
+    "installs": 16340,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -1964,41 +1964,41 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to research, profile, or analyze competitors from their URLs. Also use when the user mentions 'competitor profile,' 'competitor research,' 'competitor analysis,' 'profile this competitor,' 'analyze competitor,' 'competitive intelligence,' 'competitor deep dive,' 'who are my competitors,' 'competitor landscape,' 'competitor dossier,' 'competitive audit,' or 'research these competitors.' Input is a list of competitor URLs. Output is structured competitor profile markdown files. For creating comparison/alternative pages from profiles, see competitor-alternatives. For sales-specific battle cards, see sales-enablement.",
     "stars": 26909,
-    "installs": 16028,
+    "installs": 16118,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
   {
     "rank": 180,
-    "id": "wshobson/agents:e2e-testing-patterns",
-    "name": "e2e-testing-patterns",
-    "authorHandle": "wshobson",
-    "description": "Master end-to-end testing with Playwright and Cypress to build reliable test suites that catch bugs, improve confidence, and enable fast deployment. Use when implementing E2E tests, debugging flaky tests, or establishing testing standards.",
-    "stars": 34867,
-    "installs": 15778,
-    "githubUrl": "https://github.com/wshobson/agents",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 181,
-    "id": "steipete/clawdis:summarize",
-    "name": "summarize",
-    "authorHandle": "steipete",
-    "description": "Summarize or transcribe URLs, YouTube/videos, podcasts, articles, transcripts, PDFs, and local files.",
-    "stars": 368990,
-    "installs": 15750,
-    "githubUrl": "https://github.com/openclaw/openclaw",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 182,
     "id": "coreyhaines31/marketingskills:community-marketing",
     "name": "community-marketing",
     "authorHandle": "coreyhaines31",
     "description": "Build and leverage online communities to drive product growth and brand loyalty. Use when the user wants to create a community strategy, grow a Discord or Slack community, manage a forum or subreddit, build brand advocates, increase word-of-mouth, drive community-led growth, engage users post-signup, or turn customers into evangelists. Trigger phrases: \"build a community,\" \"community strategy,\" \"Discord community,\" \"Slack community,\" \"community-led growth,\" \"brand advocates,\" \"user community,\" \"forum strategy,\" \"community engagement,\" \"grow our community,\" \"ambassador program,\" \"community flywheel.\"",
     "stars": 26909,
-    "installs": 15714,
+    "installs": 15801,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 181,
+    "id": "wshobson/agents:e2e-testing-patterns",
+    "name": "e2e-testing-patterns",
+    "authorHandle": "wshobson",
+    "description": "Master end-to-end testing with Playwright and Cypress to build reliable test suites that catch bugs, improve confidence, and enable fast deployment. Use when implementing E2E tests, debugging flaky tests, or establishing testing standards.",
+    "stars": 34867,
+    "installs": 15794,
+    "githubUrl": "https://github.com/wshobson/agents",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 182,
+    "id": "steipete/clawdis:summarize",
+    "name": "summarize",
+    "authorHandle": "steipete",
+    "description": "Summarize or transcribe URLs, YouTube/videos, podcasts, articles, transcripts, PDFs, and local files.",
+    "stars": 368990,
+    "installs": 15760,
+    "githubUrl": "https://github.com/openclaw/openclaw",
     "source": "skills.sh"
   },
   {
@@ -2008,7 +2008,7 @@
     "authorHandle": "wshobson",
     "description": "Implement proven backend architecture patterns including Clean Architecture, Hexagonal Architecture, and Domain-Driven Design. Use this skill when designing clean architecture for a new microservice, when refactoring a monolith to use bounded contexts, when implementing hexagonal or onion architecture patterns, or when debugging dependency cycles between application layers.",
     "stars": 34867,
-    "installs": 15652,
+    "installs": 15664,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -2019,7 +2019,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workflow: Cross-service productivity workflows.",
     "stars": 25810,
-    "installs": 15491,
+    "installs": 15503,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2030,7 +2030,7 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Reply to a message (handles threading automatically).",
     "stars": 25810,
-    "installs": 15462,
+    "installs": 15477,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2041,30 +2041,30 @@
     "authorHandle": "antfu",
     "description": "Nuxt full-stack Vue framework with SSR, auto-imports, and file-based routing. Use when working with Nuxt apps, server routes, useFetch, middleware, or hybrid rendering.",
     "stars": 4821,
-    "installs": 15284,
+    "installs": 15292,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
   {
     "rank": 187,
-    "id": "googleworkspace/cli:gws-gmail-forward",
-    "name": "gws-gmail-forward",
-    "authorHandle": "googleworkspace",
-    "description": "Gmail: Forward a message to new recipients.",
-    "stars": 25810,
-    "installs": 15231,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 188,
     "id": "coreyhaines31/marketingskills:directory-submissions",
     "name": "directory-submissions",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to submit their product to startup, SaaS, AI, agent, MCP, no-code, or review directories for backlinks, domain rating, and discovery. Also use when the user mentions \"directory submissions,\" \"submit to directories,\" \"backlinks from directories,\" \"list my product,\" \"submit to Product Hunt,\" \"BetaList,\" \"TAAFT,\" \"Futurepedia,\" \"G2 listing,\" \"Capterra listing,\" \"AlternativeTo,\" \"SaaSHub,\" \"AI directories,\" \"MCP registry,\" \"agent directory,\" \"dofollow backlinks,\" \"launch directories,\" or \"directory tracker.\" Use this whenever someone is planning the directory layer of a product launch or an ongoing backlink campaign. For the broader launch moment, see launch-strategy. For programmatic SEO pages that should live behind these backlinks, see programmatic-seo. For AI citation optimization, see ai-seo.",
     "stars": 26909,
-    "installs": 15185,
+    "installs": 15269,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 188,
+    "id": "googleworkspace/cli:gws-gmail-forward",
+    "name": "gws-gmail-forward",
+    "authorHandle": "googleworkspace",
+    "description": "Gmail: Forward a message to new recipients.",
+    "stars": 25810,
+    "installs": 15244,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -2074,7 +2074,7 @@
     "authorHandle": "wshobson",
     "description": "Master iOS Human Interface Guidelines and SwiftUI patterns for building native iOS apps. Use when designing iOS interfaces, implementing SwiftUI views, or ensuring apps follow Apple's design principles.",
     "stars": 34867,
-    "installs": 15183,
+    "installs": 15201,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -2085,7 +2085,7 @@
     "authorHandle": "cloudflare",
     "description": "Cloudflare Workers CLI for deploying, developing, and managing Workers, KV, R2, D1, Vectorize, Hyperdrive, Workers AI, Containers, Queues, Workflows, Pipelines, and Secrets Store. Load before running wrangler commands to ensure correct syntax and best practices. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 1433,
-    "installs": 15174,
+    "installs": 15195,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -2096,7 +2096,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Chat: Manage Chat spaces and messages.",
     "stars": 25810,
-    "installs": 15056,
+    "installs": 15068,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2107,30 +2107,30 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workflow: Convert a Gmail message into a Google Tasks entry.",
     "stars": 25810,
-    "installs": 15043,
+    "installs": 15054,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 193,
-    "id": "antfu/skills:vueuse-functions",
-    "name": "vueuse-functions",
-    "authorHandle": "antfu",
-    "description": "Apply VueUse composables where appropriate to build concise, maintainable Vue.js / Nuxt features.",
-    "stars": 4821,
-    "installs": 14991,
-    "githubUrl": "https://github.com/antfu/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 194,
     "id": "googleworkspace/cli:gws-gmail-reply-all",
     "name": "gws-gmail-reply-all",
     "authorHandle": "googleworkspace",
     "description": "Gmail: Reply-all to a message (handles threading automatically).",
     "stars": 25810,
-    "installs": 14989,
+    "installs": 15002,
     "githubUrl": "https://github.com/googleworkspace/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 194,
+    "id": "antfu/skills:vueuse-functions",
+    "name": "vueuse-functions",
+    "authorHandle": "antfu",
+    "description": "Apply VueUse composables where appropriate to build concise, maintainable Vue.js / Nuxt features.",
+    "stars": 4821,
+    "installs": 14997,
+    "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
   {
@@ -2140,7 +2140,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a new Google Slides presentation and add initial slides.",
     "stars": 25810,
-    "installs": 14868,
+    "installs": 14881,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2151,7 +2151,7 @@
     "authorHandle": "jimliu",
     "description": "Translates articles and documents between languages with three modes - quick (direct), normal (analyze then translate), and refined (analyze, translate, review, polish). Supports custom glossaries and terminology consistency via EXTEND.md. Use when user asks to \"translate\", \"翻译\", \"精翻\", \"translate article\", \"translate to Chinese/English\", \"改成中文\", \"改成英文\", \"convert to Chinese\", \"localize\", \"本地化\", or needs any document translation. Also triggers for \"refined translation\", \"精细翻译\", \"proofread translation\", \"快速翻译\", \"快翻\", \"这篇文章翻译一下\", or when a URL or file is provided with translation intent.",
     "stars": 17222,
-    "installs": 14794,
+    "installs": 14810,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -2162,7 +2162,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workflow: Prepare for your next meeting: agenda, attendees, and linked docs.",
     "stars": 25810,
-    "installs": 14756,
+    "installs": 14768,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2173,7 +2173,7 @@
     "authorHandle": "ibelick",
     "description": "Audit and fix animation performance issues including layout thrashing, compositor properties, scroll-linked motion, and blur effects. Use when animations stutter, transitions jank, or reviewing CSS/JS animation performance.",
     "stars": 1625,
-    "installs": 14741,
+    "installs": 14744,
     "githubUrl": "https://github.com/ibelick/ui-skills",
     "source": "skills.sh"
   },
@@ -2184,7 +2184,7 @@
     "authorHandle": "github",
     "description": "Get best practices for developing applications with Spring Boot.",
     "stars": 32249,
-    "installs": 14711,
+    "installs": 14720,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -2195,7 +2195,7 @@
     "authorHandle": "wshobson",
     "description": "Master Material Design 3 and Jetpack Compose patterns for building native Android apps. Use when designing Android interfaces, implementing Compose UI, or following Google's Material Design guidelines.",
     "stars": 34867,
-    "installs": 14706,
+    "installs": 14719,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -2206,7 +2206,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google People: Manage contacts and profiles.",
     "stars": 25810,
-    "installs": 14635,
+    "installs": 14646,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2217,7 +2217,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workflow: Weekly summary: this week's meetings + unread email count.",
     "stars": 25810,
-    "installs": 14609,
+    "installs": 14620,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2228,7 +2228,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workflow: Today's meetings + open tasks as a standup summary.",
     "stars": 25810,
-    "installs": 14599,
+    "installs": 14611,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2239,7 +2239,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a Gmail filter to automatically label, star, or categorize incoming messages.",
     "stars": 25810,
-    "installs": 14504,
+    "installs": 14516,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2250,7 +2250,7 @@
     "authorHandle": "googleworkspace",
     "description": "Organize research — manage references, notes, and collaboration.",
     "stars": 25810,
-    "installs": 14454,
+    "installs": 14465,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2261,7 +2261,7 @@
     "authorHandle": "googleworkspace",
     "description": "Subscribe to Google Workspace events.",
     "stars": 25810,
-    "installs": 14403,
+    "installs": 14414,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2272,7 +2272,7 @@
     "authorHandle": "googleworkspace",
     "description": "Coordinate projects — track tasks, schedule meetings, and share docs.",
     "stars": 25810,
-    "installs": 14399,
+    "installs": 14410,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2283,7 +2283,7 @@
     "authorHandle": "googleworkspace",
     "description": "Manage an executive's schedule, inbox, and communications.",
     "stars": 25810,
-    "installs": 14376,
+    "installs": 14388,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2294,7 +2294,7 @@
     "authorHandle": "dammyjay93",
     "description": "This skill is for interface design — dashboards, admin panels, apps, tools, and interactive products. NOT for marketing design (landing pages, marketing sites, campaigns).",
     "stars": 4759,
-    "installs": 14361,
+    "installs": 14367,
     "githubUrl": "https://github.com/Dammyjay93/interface-design",
     "source": "skills.sh"
   },
@@ -2305,7 +2305,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Chat: Send a message to a space.",
     "stars": 25810,
-    "installs": 14329,
+    "installs": 14341,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2316,30 +2316,30 @@
     "authorHandle": "googleworkspace",
     "description": "Export a Google Sheets spreadsheet as a CSV file for local backup or processing.",
     "stars": 25810,
-    "installs": 14306,
+    "installs": 14318,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 212,
-    "id": "callstackincubator/agent-skills:react-native-best-practices",
-    "name": "react-native-best-practices",
-    "authorHandle": "callstackincubator",
-    "description": "Provides React Native performance optimization guidelines for FPS, TTI, bundle size, memory leaks, re-renders, and animations. Applies to tasks involving Hermes optimization, JS thread blocking, bridge overhead, FlashList, native modules, or debugging jank and frame drops.",
-    "stars": 1305,
-    "installs": 14231,
-    "githubUrl": "https://github.com/callstackincubator/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 213,
     "id": "googleworkspace/cli:recipe-save-email-attachments",
     "name": "recipe-save-email-attachments",
     "authorHandle": "googleworkspace",
     "description": "Find Gmail messages with attachments and save them to a Google Drive folder.",
     "stars": 25810,
-    "installs": 14230,
+    "installs": 14241,
     "githubUrl": "https://github.com/googleworkspace/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 213,
+    "id": "callstackincubator/agent-skills:react-native-best-practices",
+    "name": "react-native-best-practices",
+    "authorHandle": "callstackincubator",
+    "description": "Provides React Native performance optimization guidelines for FPS, TTI, bundle size, memory leaks, re-renders, and animations. Applies to tasks involving Hermes optimization, JS thread blocking, bridge overhead, FlashList, native modules, or debugging jank and frame drops.",
+    "stars": 1305,
+    "installs": 14238,
+    "githubUrl": "https://github.com/callstackincubator/agent-skills",
     "source": "skills.sh"
   },
   {
@@ -2349,7 +2349,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a Google Drive folder structure and move files into the right locations.",
     "stars": 25810,
-    "installs": 14224,
+    "installs": 14235,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2360,7 +2360,7 @@
     "authorHandle": "googleworkspace",
     "description": "Query Google Calendar free/busy status for multiple users to find a meeting slot.",
     "stars": 25810,
-    "installs": 14211,
+    "installs": 14222,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2371,7 +2371,7 @@
     "authorHandle": "googleworkspace",
     "description": "Copy a Google Docs template, fill in content, and share with collaborators.",
     "stars": 25810,
-    "installs": 14173,
+    "installs": 14185,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2382,7 +2382,7 @@
     "authorHandle": "googleworkspace",
     "description": "List and download all files from a Google Drive folder.",
     "stars": 25810,
-    "installs": 14160,
+    "installs": 14172,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2393,7 +2393,7 @@
     "authorHandle": "googleworkspace",
     "description": "Read data from two tabs in a Google Sheet to compare and identify differences.",
     "stars": 25810,
-    "installs": 14139,
+    "installs": 14150,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2404,7 +2404,7 @@
     "authorHandle": "googleworkspace",
     "description": "Review your Google Calendar week, identify gaps, and add events to fill them.",
     "stars": 25810,
-    "installs": 14136,
+    "installs": 14147,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2415,7 +2415,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workflow: Announce a Drive file in a Chat space.",
     "stars": 25810,
-    "installs": 14132,
+    "installs": 14144,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2426,30 +2426,30 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workspace Events: Renew/reactivate Workspace Events subscriptions.",
     "stars": 25810,
-    "installs": 14081,
+    "installs": 14092,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 222,
-    "id": "googleworkspace/cli:recipe-draft-email-from-doc",
-    "name": "recipe-draft-email-from-doc",
-    "authorHandle": "googleworkspace",
-    "description": "Read content from a Google Doc and use it as the body of a Gmail message.",
-    "stars": 25810,
-    "installs": 14072,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 223,
     "id": "wshobson/agents:prompt-engineering-patterns",
     "name": "prompt-engineering-patterns",
     "authorHandle": "wshobson",
     "description": "Master advanced prompt engineering techniques to maximize LLM performance, reliability, and controllability in production. Use when optimizing prompts, improving LLM outputs, or designing production prompt templates.",
     "stars": 34867,
-    "installs": 14068,
+    "installs": 14084,
     "githubUrl": "https://github.com/wshobson/agents",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 223,
+    "id": "googleworkspace/cli:recipe-draft-email-from-doc",
+    "name": "recipe-draft-email-from-doc",
+    "authorHandle": "googleworkspace",
+    "description": "Read content from a Google Doc and use it as the body of a Gmail message.",
+    "stars": 25810,
+    "installs": 14083,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -2459,7 +2459,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workspace Events: Subscribe to Workspace events and stream them as NDJSON.",
     "stars": 25810,
-    "installs": 14068,
+    "installs": 14079,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2470,7 +2470,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create, organize, and distribute content across Workspace.",
     "stars": 25810,
-    "installs": 14057,
+    "installs": 14069,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2481,7 +2481,7 @@
     "authorHandle": "googleworkspace",
     "description": "Share a Google Drive file and email the link with a message to recipients.",
     "stars": 25810,
-    "installs": 14054,
+    "installs": 14065,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2492,52 +2492,52 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Read a message and extract its body or headers.",
     "stars": 25810,
-    "installs": 14039,
+    "installs": 14054,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 228,
-    "id": "googleworkspace/cli:recipe-generate-report-from-sheet",
-    "name": "recipe-generate-report-from-sheet",
-    "authorHandle": "googleworkspace",
-    "description": "Read data from a Google Sheet and create a formatted Google Docs report.",
-    "stars": 25810,
-    "installs": 14019,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 229,
-    "id": "googleworkspace/cli:recipe-reschedule-meeting",
-    "name": "recipe-reschedule-meeting",
-    "authorHandle": "googleworkspace",
-    "description": "Move a Google Calendar event to a new time and automatically notify all attendees.",
-    "stars": 25810,
-    "installs": 13974,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 230,
     "id": "coreyhaines31/marketingskills:image",
     "name": "image",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create, generate, edit, or optimize images for marketing — blog heroes, social graphics, product mockups, profile banners, listing visuals, or brand assets. Also use when the user mentions 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' 'social media graphic,' 'banner image,' 'cover photo,' 'profile banner,' 'listing screenshot,' 'Flux,' 'Midjourney,' 'DALL-E,' 'GPT Image,' 'Ideogram,' 'Gemini image,' 'Canva,' 'Figma,' 'image optimization,' 'compress images,' 'WebP,' or 'OG image.' Use this for general-purpose marketing image creation and optimization. For paid ad image creative and platform-specific ad specs, see ad-creative. For video production, see video.",
     "stars": 26909,
-    "installs": 13950,
+    "installs": 14036,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
   {
-    "rank": 231,
+    "rank": 229,
     "id": "coreyhaines31/marketingskills:video",
     "name": "video",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create, generate, or produce video content using AI tools or programmatic frameworks. Also use when the user mentions 'video production,' 'AI video,' 'Remotion,' 'Hyperframes,' 'HeyGen,' 'Synthesia,' 'Veo,' 'Runway,' 'Kling,' 'Pika,' 'video generation,' 'AI avatar,' 'talking head video,' 'programmatic video,' 'video template,' 'explainer video,' 'product demo video,' 'video pipeline,' or 'make me a video.' Use this for video creation, generation, and production workflows. For video content strategy and what to post, see social-content. For paid video ad creative, see ad-creative.",
     "stars": 26909,
-    "installs": 13947,
+    "installs": 14035,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 230,
+    "id": "googleworkspace/cli:recipe-generate-report-from-sheet",
+    "name": "recipe-generate-report-from-sheet",
+    "authorHandle": "googleworkspace",
+    "description": "Read data from a Google Sheet and create a formatted Google Docs report.",
+    "stars": 25810,
+    "installs": 14031,
+    "githubUrl": "https://github.com/googleworkspace/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 231,
+    "id": "googleworkspace/cli:recipe-reschedule-meeting",
+    "name": "recipe-reschedule-meeting",
+    "authorHandle": "googleworkspace",
+    "description": "Move a Google Calendar event to a new time and automatically notify all attendees.",
+    "stars": 25810,
+    "installs": 13985,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -2547,7 +2547,7 @@
     "authorHandle": "googleworkspace",
     "description": "Save a Gmail message body into a Google Doc for archival or reference.",
     "stars": 25810,
-    "installs": 13932,
+    "installs": 13944,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2558,7 +2558,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Workspace Admin SDK: Audit logs and usage reports.",
     "stars": 25810,
-    "installs": 13925,
+    "installs": 13938,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2569,7 +2569,7 @@
     "authorHandle": "googleworkspace",
     "description": "Subscribe to change notifications on a Google Drive file or folder.",
     "stars": 25810,
-    "installs": 13919,
+    "installs": 13930,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2580,7 +2580,7 @@
     "authorHandle": "googleworkspace",
     "description": "Apply Gmail labels to matching messages and archive them to keep your inbox clean.",
     "stars": 25810,
-    "installs": 13901,
+    "installs": 13912,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2591,7 +2591,7 @@
     "authorHandle": "googleworkspace",
     "description": "Lead a team — run standups, coordinate tasks, and communicate.",
     "stars": 25810,
-    "installs": 13893,
+    "installs": 13904,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2602,7 +2602,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a Google Shared Drive and add members with appropriate roles.",
     "stars": 25810,
-    "installs": 13887,
+    "installs": 13899,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2613,7 +2613,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a recurring Google Calendar event with attendees.",
     "stars": 25810,
-    "installs": 13842,
+    "installs": 13853,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2624,7 +2624,7 @@
     "authorHandle": "googleworkspace",
     "description": "Set up a new Google Tasks list with initial tasks.",
     "stars": 25810,
-    "installs": 13841,
+    "installs": 13852,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2635,7 +2635,7 @@
     "authorHandle": "googleworkspace",
     "description": "Identify large Google Drive files consuming storage quota.",
     "stars": 25810,
-    "installs": 13837,
+    "installs": 13849,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2646,7 +2646,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create recurring focus time blocks on Google Calendar to protect deep work hours.",
     "stars": 25810,
-    "installs": 13831,
+    "installs": 13842,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2657,7 +2657,7 @@
     "authorHandle": "googleworkspace",
     "description": "Duplicate a Google Sheets template tab for a new month of tracking.",
     "stars": 25810,
-    "installs": 13761,
+    "installs": 13772,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2668,7 +2668,7 @@
     "authorHandle": "googleworkspace",
     "description": "Share a Google Docs document with edit access and email collaborators the link.",
     "stars": 25810,
-    "installs": 13749,
+    "installs": 13760,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2679,7 +2679,7 @@
     "authorHandle": "github",
     "description": "Create optimized multi-stage Dockerfiles for any language or framework",
     "stars": 32249,
-    "installs": 13742,
+    "installs": 13749,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -2690,7 +2690,7 @@
     "authorHandle": "googleworkspace",
     "description": "Retrieve and review responses from a Google Form.",
     "stars": 25810,
-    "installs": 13723,
+    "installs": 13734,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2701,7 +2701,7 @@
     "authorHandle": "googleworkspace",
     "description": "Add a list of attendees to an existing Google Calendar event and send notifications.",
     "stars": 25810,
-    "installs": 13720,
+    "installs": 13731,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2712,7 +2712,7 @@
     "authorHandle": "googleworkspace",
     "description": "Read event data from a Google Sheets spreadsheet and create Google Calendar entries for each row.",
     "stars": 25810,
-    "installs": 13701,
+    "installs": 13713,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2723,7 +2723,7 @@
     "authorHandle": "googleworkspace",
     "description": "Find Google Tasks that are past due and need attention.",
     "stars": 25810,
-    "installs": 13670,
+    "installs": 13681,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2734,7 +2734,7 @@
     "authorHandle": "googleworkspace",
     "description": "Administer IT — monitor security and configure Workspace.",
     "stars": 25810,
-    "installs": 13664,
+    "installs": 13675,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2745,7 +2745,7 @@
     "authorHandle": "googleworkspace",
     "description": "Find Gmail messages with a specific label and forward them to another address.",
     "stars": 25810,
-    "installs": 13619,
+    "installs": 13631,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2756,7 +2756,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a Google Meet meeting space and share the join link.",
     "stars": 25810,
-    "installs": 13609,
+    "installs": 13620,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2767,7 +2767,7 @@
     "authorHandle": "googleworkspace",
     "description": "Plan and manage events — scheduling, invitations, and logistics.",
     "stars": 25810,
-    "installs": 13596,
+    "installs": 13607,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2778,7 +2778,7 @@
     "authorHandle": "googleworkspace",
     "description": "Set up a Google Sheets spreadsheet for tracking expenses with headers and initial entries.",
     "stars": 25810,
-    "installs": 13573,
+    "installs": 13584,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2789,7 +2789,7 @@
     "authorHandle": "googleworkspace",
     "description": "Review who attended a Google Meet conference and for how long.",
     "stars": 25810,
-    "installs": 13563,
+    "installs": 13574,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2800,7 +2800,7 @@
     "authorHandle": "googleworkspace",
     "description": "Manage customer support — track tickets, respond, escalate issues.",
     "stars": 25810,
-    "installs": 13561,
+    "installs": 13573,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2811,7 +2811,7 @@
     "authorHandle": "googleworkspace",
     "description": "Share a Google Drive folder and all its contents with a list of collaborators.",
     "stars": 25810,
-    "installs": 13559,
+    "installs": 13570,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2822,7 +2822,7 @@
     "authorHandle": "googleworkspace",
     "description": "Enable a Gmail out-of-office auto-reply with a custom message and date range.",
     "stars": 25810,
-    "installs": 13555,
+    "installs": 13566,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2833,7 +2833,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a Google Docs post-mortem, schedule a Google Calendar review, and notify via Chat.",
     "stars": 25810,
-    "installs": 13554,
+    "installs": 13565,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2844,7 +2844,7 @@
     "authorHandle": "googleworkspace",
     "description": "Manage sales workflows — track deals, schedule calls, client comms.",
     "stars": 25810,
-    "installs": 13553,
+    "installs": 13564,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2855,7 +2855,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Model Armor: Filter user-generated content for safety.",
     "stars": 25810,
-    "installs": 13523,
+    "installs": 13534,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2866,7 +2866,7 @@
     "authorHandle": "googleworkspace",
     "description": "Create a Google Form for feedback and share it via Gmail.",
     "stars": 25810,
-    "installs": 13515,
+    "installs": 13526,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2877,7 +2877,7 @@
     "authorHandle": "jeffallan",
     "description": "Build and configure Laravel 10+ applications, including creating Eloquent models and relationships, implementing Sanctum authentication, configuring Horizon queues, designing RESTful APIs with API resources, and building reactive interfaces with Livewire. Use when creating Laravel models, setting up queue workers, implementing Sanctum auth flows, building Livewire components, optimising Eloquent queries, or writing Pest/PHPUnit tests for Laravel features.",
     "stars": 8810,
-    "installs": 13463,
+    "installs": 13474,
     "githubUrl": "https://github.com/Jeffallan/claude-skills",
     "source": "skills.sh"
   },
@@ -2888,7 +2888,7 @@
     "authorHandle": "googleworkspace",
     "description": "Export Google Contacts directory to a Google Sheets spreadsheet.",
     "stars": 25810,
-    "installs": 13451,
+    "installs": 13462,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2899,7 +2899,7 @@
     "authorHandle": "googleworkspace",
     "description": "Handle HR workflows — onboarding, announcements, and employee comms.",
     "stars": 25810,
-    "installs": 13449,
+    "installs": 13460,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2910,7 +2910,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Model Armor: Create a new Model Armor template.",
     "stars": 25810,
-    "installs": 13427,
+    "installs": 13438,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2921,7 +2921,7 @@
     "authorHandle": "googleworkspace",
     "description": "Share Google Drive files with all attendees of a Google Calendar event.",
     "stars": 25810,
-    "installs": 13400,
+    "installs": 13411,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2932,7 +2932,7 @@
     "authorHandle": "googleworkspace",
     "description": "Send a team announcement via both Gmail and a Google Chat space.",
     "stars": 25810,
-    "installs": 13387,
+    "installs": 13398,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2943,7 +2943,7 @@
     "authorHandle": "googleworkspace",
     "description": "Append a deal status update to a Google Sheets sales tracking spreadsheet.",
     "stars": 25810,
-    "installs": 13300,
+    "installs": 13311,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2954,7 +2954,7 @@
     "authorHandle": "wshobson",
     "description": "Master error handling patterns across languages including exceptions, Result types, error propagation, and graceful degradation to build resilient applications. Use when implementing error handling, designing APIs, or improving application reliability.",
     "stars": 34867,
-    "installs": 13259,
+    "installs": 13283,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -2965,7 +2965,7 @@
     "authorHandle": "wshobson",
     "description": "Master SQL query optimization, indexing strategies, and EXPLAIN analysis to dramatically improve database performance and eliminate slow queries. Use when debugging slow queries, designing database schemas, or optimizing application performance.",
     "stars": 34867,
-    "installs": 13241,
+    "installs": 13252,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -2976,12 +2976,23 @@
     "authorHandle": "googleworkspace",
     "description": "Google Model Armor: Sanitize a user prompt through a Model Armor template.",
     "stars": 25810,
-    "installs": 13216,
+    "installs": 13227,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 272,
+    "id": "antfu/skills:web-design-guidelines",
+    "name": "web-design-guidelines",
+    "authorHandle": "antfu",
+    "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+    "stars": 4821,
+    "installs": 13198,
+    "githubUrl": "https://github.com/antfu/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 273,
     "id": "hyf0/vue-skills:vue-debug-guides",
     "name": "vue-debug-guides",
     "authorHandle": "hyf0",
@@ -2992,24 +3003,13 @@
     "source": "skills.sh"
   },
   {
-    "rank": 273,
-    "id": "antfu/skills:web-design-guidelines",
-    "name": "web-design-guidelines",
-    "authorHandle": "antfu",
-    "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
-    "stars": 4821,
-    "installs": 13191,
-    "githubUrl": "https://github.com/antfu/skills",
-    "source": "skills.sh"
-  },
-  {
     "rank": 274,
     "id": "googleworkspace/cli:recipe-create-classroom-course",
     "name": "recipe-create-classroom-course",
     "authorHandle": "googleworkspace",
     "description": "Create a Google Classroom course and invite students.",
     "stars": 25810,
-    "installs": 13175,
+    "installs": 13186,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -3020,7 +3020,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Model Armor: Sanitize a model response through a Model Armor template.",
     "stars": 25810,
-    "installs": 13175,
+    "installs": 13186,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -3031,7 +3031,7 @@
     "authorHandle": "msmps",
     "description": "Comprehensive OpenTUI skill for building terminal user interfaces. Covers the core imperative API, React reconciler, and Solid reconciler. Use for any TUI development task including components, layout, keyboard handling, animations, and testing.",
     "stars": 203,
-    "installs": 13142,
+    "installs": 13185,
     "githubUrl": "https://github.com/msmps/opentui-skill",
     "source": "skills.sh"
   },
@@ -3042,7 +3042,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Classroom: Manage classes, rosters, and coursework.",
     "stars": 25810,
-    "installs": 13074,
+    "installs": 13086,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -3053,7 +3053,7 @@
     "authorHandle": "github",
     "description": "Create a README.md file for the project",
     "stars": 32249,
-    "installs": 13024,
+    "installs": 13027,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3064,7 +3064,7 @@
     "authorHandle": "wshobson",
     "description": "Implement comprehensive testing strategies using Jest, Vitest, and Testing Library for unit tests, integration tests, and end-to-end testing with mocking, fixtures, and test-driven development. Use when writing JavaScript/TypeScript tests, setting up test infrastructure, or implementing TDD/BDD workflows.",
     "stars": 34867,
-    "installs": 13002,
+    "installs": 13016,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3075,7 +3075,7 @@
     "authorHandle": "antfu",
     "description": "Vue Router 4 patterns, navigation guards, route params, and route-component lifecycle interactions.",
     "stars": 4821,
-    "installs": 12857,
+    "installs": 12863,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -3086,7 +3086,7 @@
     "authorHandle": "wshobson",
     "description": "Derive security requirements from threat models and business context. Use when translating threats into actionable requirements, creating security user stories, or building security test cases.",
     "stars": 34867,
-    "installs": 12782,
+    "installs": 12791,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3097,7 +3097,7 @@
     "authorHandle": "jimliu",
     "description": "Posts content to Weibo (微博). Supports regular posts with text, images, and videos, and headline articles (头条文章) with Markdown input via Chrome CDP. Use when user asks to \"post to Weibo\", \"发微博\", \"发布微博\", \"publish to Weibo\", \"share on Weibo\", \"写微博\", or \"微博头条文章\".",
     "stars": 17222,
-    "installs": 12775,
+    "installs": 12788,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -3108,7 +3108,7 @@
     "authorHandle": "wshobson",
     "description": "Master ES6+ features including async/await, destructuring, spread operators, arrow functions, promises, modules, iterators, generators, and functional programming patterns for writing clean, efficient JavaScript code. Use when refactoring legacy code, implementing modern patterns, or optimizing JavaScript applications.",
     "stars": 34867,
-    "installs": 12738,
+    "installs": 12751,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3119,7 +3119,7 @@
     "authorHandle": "wshobson",
     "description": "Master C#/.NET backend development patterns for building robust APIs, MCP servers, and enterprise applications. Covers async/await, dependency injection, Entity Framework Core, Dapper, configuration, caching, and testing with xUnit. Use when developing .NET backends, reviewing C# code, or designing API architectures.",
     "stars": 34867,
-    "installs": 12715,
+    "installs": 12724,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3130,7 +3130,7 @@
     "authorHandle": "addyosmani",
     "description": "Optimize web performance for faster loading and better user experience. Use when asked to \"speed up my site\", \"optimize performance\", \"reduce load time\", \"fix slow loading\", \"improve page speed\", or \"performance audit\".",
     "stars": 1864,
-    "installs": 12620,
+    "installs": 12636,
     "githubUrl": "https://github.com/addyosmani/web-quality-skills",
     "source": "skills.sh"
   },
@@ -3141,7 +3141,7 @@
     "authorHandle": "jeffallan",
     "description": "Implements concurrent Go patterns using goroutines and channels, designs and builds microservices with gRPC or REST, optimizes Go application performance with pprof, and enforces idiomatic Go with generics, interfaces, and robust error handling. Use when building Go applications requiring concurrent programming, microservices architecture, or high-performance systems. Invoke for goroutines, channels, Go generics, gRPC integration, CLI tools, benchmarks, or table-driven testing.",
     "stars": 8810,
-    "installs": 12599,
+    "installs": 12609,
     "githubUrl": "https://github.com/Jeffallan/claude-skills",
     "source": "skills.sh"
   },
@@ -3158,24 +3158,24 @@
   },
   {
     "rank": 288,
-    "id": "wshobson/agents:rust-async-patterns",
-    "name": "rust-async-patterns",
-    "authorHandle": "wshobson",
-    "description": "Master Rust async programming with Tokio, async traits, error handling, and concurrent patterns. Use when building async Rust applications, implementing concurrent systems, or debugging async code.",
-    "stars": 34867,
-    "installs": 12476,
-    "githubUrl": "https://github.com/wshobson/agents",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 289,
     "id": "firecrawl/cli:firecrawl-parse",
     "name": "firecrawl-parse",
     "authorHandle": "firecrawl",
     "description": "Efficiently extract and convert the contents of any local file—such as PDF, DOCX, DOC, ODT, RTF, XLSX, XLS, or HTML—into clean, well-formatted markdown saved to disk. Use this skill whenever the user requests to parse, read, or extract information from a file on their computer, including phrases like “parse this PDF”, “convert this document”, “read this file”, “extract text from”, or when a local file path (not a URL) is provided. This skill offers advanced options like generating AI-powered summaries and answering questions based on the file's content. Prefer this tool over `scrape` when handling local files to deliver precise, structured outputs for downstream tasks.",
     "stars": 368,
-    "installs": 12459,
+    "installs": 12519,
     "githubUrl": "https://github.com/firecrawl/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 289,
+    "id": "wshobson/agents:rust-async-patterns",
+    "name": "rust-async-patterns",
+    "authorHandle": "wshobson",
+    "description": "Master Rust async programming with Tokio, async traits, error handling, and concurrent patterns. Use when building async Rust applications, implementing concurrent systems, or debugging async code.",
+    "stars": 34867,
+    "installs": 12489,
+    "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
   {
@@ -3185,7 +3185,7 @@
     "authorHandle": "github",
     "description": "Generate a Playwright test based on a scenario using Playwright MCP",
     "stars": 32249,
-    "installs": 12338,
+    "installs": 12343,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3196,7 +3196,7 @@
     "authorHandle": "google-gemini",
     "description": "Use this skill when building applications with Gemini API hosted models, including Gemini and Gemma 4, working with multimodal content (text, images, audio, video), implementing function calling, using structured outputs, or needing current model specifications. Covers SDK usage (google-genai for Python, @google/genai for JavaScript/TypeScript, com.google.genai:google-genai for Java, google.golang.org/genai for Go), model selection, and API capabilities.",
     "stars": 3418,
-    "installs": 12330,
+    "installs": 12337,
     "githubUrl": "https://github.com/google-gemini/gemini-skills",
     "source": "skills.sh"
   },
@@ -3207,7 +3207,7 @@
     "authorHandle": "antfu",
     "description": "Node.js package manager with strict dependency resolution. Use when running pnpm specific commands, configuring workspaces, or managing dependencies with catalogs, patches, or overrides.",
     "stars": 4821,
-    "installs": 12270,
+    "installs": 12277,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -3218,7 +3218,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions.",
     "stars": 3111,
-    "installs": 12163,
+    "installs": 12183,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -3229,7 +3229,7 @@
     "authorHandle": "github",
     "description": "Expert-level browser automation, debugging, and performance analysis using Chrome DevTools MCP. Use for interacting with web pages, capturing screenshots, analyzing network traffic, and profiling performance.",
     "stars": 32249,
-    "installs": 11972,
+    "installs": 11974,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3240,7 +3240,7 @@
     "authorHandle": "github",
     "description": "Merges mature lessons from a domain memory file into its instruction file. Syntax: `/memory-merger >domain [scope]` where scope is `global` (default), `user`, `workspace`, or `ws`.",
     "stars": 32249,
-    "installs": 11890,
+    "installs": 11894,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3251,7 +3251,7 @@
     "authorHandle": "clerk",
     "description": "Advanced Next.js patterns - middleware, Server Actions, caching with Clerk.",
     "stars": 40,
-    "installs": 11790,
+    "installs": 11803,
     "githubUrl": "https://github.com/clerk/skills",
     "source": "skills.sh"
   },
@@ -3262,7 +3262,7 @@
     "authorHandle": "github",
     "description": "PostgreSQL-specific development assistant focusing on unique PostgreSQL features, advanced data types, and PostgreSQL-exclusive capabilities. Covers JSONB operations, array types, custom types, range/geometric types, full-text search, window functions, and PostgreSQL extensions ecosystem.",
     "stars": 32249,
-    "installs": 11776,
+    "installs": 11781,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3273,7 +3273,7 @@
     "authorHandle": "github",
     "description": "Prompt and workflow for generating conventional commit messages using a structured XML format. Guides users to create standardized, descriptive commit messages in line with the Conventional Commits specification, including instructions, examples, and validation.",
     "stars": 32249,
-    "installs": 11743,
+    "installs": 11745,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3284,7 +3284,7 @@
     "authorHandle": "anthropics",
     "description": "This skill should be used when the user asks to \"create an agent\", \"add an agent\", \"write a subagent\", \"agent frontmatter\", \"when to use description\", \"agent examples\", \"agent tools\", \"agent colors\", \"autonomous agent\", or needs guidance on agent structure, system prompts, triggering conditions, or agent development best practices for Claude Code plugins.",
     "stars": 120905,
-    "installs": 11727,
+    "installs": 11735,
     "githubUrl": "https://github.com/anthropics/claude-code",
     "source": "skills.sh"
   },
@@ -3295,7 +3295,7 @@
     "authorHandle": "wshobson",
     "description": "Execute database migrations across ORMs and platforms with zero-downtime strategies, data transformation, and rollback procedures. Use when migrating databases, changing schemas, performing data transformations, or implementing zero-downtime deployment strategies.",
     "stars": 34867,
-    "installs": 11699,
+    "installs": 11709,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3317,7 +3317,7 @@
     "authorHandle": "forrestchang",
     "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
     "stars": 115909,
-    "installs": 11612,
+    "installs": 11637,
     "githubUrl": "https://github.com/forrestchang/andrej-karpathy-skills",
     "source": "skills.sh"
   },
@@ -3328,7 +3328,7 @@
     "authorHandle": "nuxt",
     "description": "Build UIs with @nuxt/ui v4 — 125+ accessible Vue components with Tailwind CSS theming. Use when creating interfaces, customizing themes to match a brand, building forms, or composing layouts like dashboards, docs sites, and chat interfaces.",
     "stars": 6550,
-    "installs": 11542,
+    "installs": 11553,
     "githubUrl": "https://github.com/nuxt/ui",
     "source": "skills.sh"
   },
@@ -3339,7 +3339,7 @@
     "authorHandle": "github",
     "description": "Ensure .NET/C# code meets best practices for the solution/project.",
     "stars": 32249,
-    "installs": 11515,
+    "installs": 11517,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3350,7 +3350,7 @@
     "authorHandle": "ibelick",
     "description": "Validates animation durations, enforces typography scale, checks component accessibility, and prevents layout anti-patterns in Tailwind CSS projects. Use when building UI components, reviewing CSS utilities, styling React views, or enforcing design consistency.",
     "stars": 1625,
-    "installs": 11510,
+    "installs": 11512,
     "githubUrl": "https://github.com/ibelick/ui-skills",
     "source": "skills.sh"
   },
@@ -3361,7 +3361,7 @@
     "authorHandle": "antfu",
     "description": "Use for Vue.js testing. Covers Vitest, Vue Test Utils, component testing, mocking, testing patterns, and Playwright for E2E testing.",
     "stars": 4821,
-    "installs": 11473,
+    "installs": 11479,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -3372,7 +3372,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for ScrollTrigger — scroll-linked animations, pinning, scrub, triggers. Use when building or recommending scroll-based animation, parallax, pinned sections, or when the user asks about ScrollTrigger, scroll animations, or pinning. Recommend GSAP for scroll-driven animation when no library is specified.",
     "stars": 3111,
-    "installs": 11452,
+    "installs": 11469,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -3383,7 +3383,7 @@
     "authorHandle": "github",
     "description": "Create, update, and manage GitHub issues using MCP tools. Use this skill when users want to create bug reports, feature requests, or task issues, update existing issues, add labels/assignees/milestones, set issue fields (dates, priority, custom fields), set issue types, manage issue workflows, link issues, add dependencies, or track blocked-by/blocking relationships. Triggers on requests like \"create an issue\", \"file a bug\", \"request a feature\", \"update issue X\", \"set the priority\", \"set the start date\", \"link issues\", \"add dependency\", \"blocked by\", \"blocking\", or any GitHub issue management task.",
     "stars": 32249,
-    "installs": 11441,
+    "installs": 11444,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3394,30 +3394,30 @@
     "authorHandle": "cloudflare",
     "description": "Reviews and authors Cloudflare Workers code against production best practices. Load when writing new Workers, reviewing Worker code, configuring wrangler.jsonc, or checking for common Workers anti-patterns (streaming, floating promises, global state, secrets, bindings, observability). Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 1433,
-    "installs": 11404,
+    "installs": 11424,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
   {
     "rank": 310,
-    "id": "sickn33/antigravity-awesome-skills:nodejs-best-practices",
-    "name": "nodejs-best-practices",
-    "authorHandle": "sickn33",
-    "description": "Node.js development principles and decision-making. Framework selection, async patterns, security, and architecture. Teaches thinking, not copying.",
-    "stars": 36544,
-    "installs": 11360,
-    "githubUrl": "https://github.com/sickn33/antigravity-awesome-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 311,
     "id": "antfu/skills:pinia",
     "name": "pinia",
     "authorHandle": "antfu",
     "description": "Pinia official Vue state management library, type-safe and extensible. Use when defining stores, working with state/getters/actions, or implementing store patterns in Vue apps.",
     "stars": 4821,
-    "installs": 11357,
+    "installs": 11363,
     "githubUrl": "https://github.com/antfu/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 311,
+    "id": "sickn33/antigravity-awesome-skills:nodejs-best-practices",
+    "name": "nodejs-best-practices",
+    "authorHandle": "sickn33",
+    "description": "Node.js development principles and decision-making. Framework selection, async patterns, security, and architecture. Teaches thinking, not copying.",
+    "stars": 36544,
+    "installs": 11363,
+    "githubUrl": "https://github.com/sickn33/antigravity-awesome-skills",
     "source": "skills.sh"
   },
   {
@@ -3427,7 +3427,7 @@
     "authorHandle": "anthropics",
     "description": "This skill should be used when the user wants to \"create a skill\", \"add a skill to plugin\", \"write a new skill\", \"improve skill description\", \"organize skill content\", or needs guidance on skill structure, progressive disclosure, or skill development best practices for Claude Code plugins.",
     "stars": 120905,
-    "installs": 11351,
+    "installs": 11359,
     "githubUrl": "https://github.com/anthropics/claude-code",
     "source": "skills.sh"
   },
@@ -3438,7 +3438,7 @@
     "authorHandle": "antfu",
     "description": "UnoCSS instant atomic CSS engine, superset of Tailwind CSS. Use when configuring UnoCSS, writing utility rules, shortcuts, or working with presets like Wind, Icons, Attributify.",
     "stars": 4821,
-    "installs": 11343,
+    "installs": 11347,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -3449,7 +3449,7 @@
     "authorHandle": "ibelick",
     "description": "Audit and fix HTML accessibility issues including ARIA labels, keyboard navigation, focus management, color contrast, and form errors. Use when adding interactive controls, forms, dialogs, or reviewing WCAG compliance.",
     "stars": 1625,
-    "installs": 11299,
+    "installs": 11301,
     "githubUrl": "https://github.com/ibelick/ui-skills",
     "source": "skills.sh"
   },
@@ -3460,7 +3460,7 @@
     "authorHandle": "github",
     "description": "Universal SQL performance optimization assistant for comprehensive query tuning, indexing strategies, and database performance analysis across all SQL databases (MySQL, PostgreSQL, SQL Server, Oracle). Provides execution plan analysis, pagination optimization, batch operations, and performance monitoring guidance.",
     "stars": 32249,
-    "installs": 11240,
+    "installs": 11248,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3482,7 +3482,7 @@
     "authorHandle": "wshobson",
     "description": "Implement modern responsive layouts using container queries, fluid typography, CSS Grid, and mobile-first breakpoint strategies. Use when building adaptive interfaces, implementing fluid layouts, or creating component-level responsive behavior.",
     "stars": 34867,
-    "installs": 11191,
+    "installs": 11202,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3493,7 +3493,7 @@
     "authorHandle": "avdlee",
     "description": "Diagnose Swift Concurrency issues, refactor callback-based code to async/await, and guide Swift 6 migration when working with tasks, actors, @MainActor, Sendable, data races, thread safety, or concurrency-related compiler and linter warnings.",
     "stars": 1480,
-    "installs": 11187,
+    "installs": 11196,
     "githubUrl": "https://github.com/AvdLee/Swift-Concurrency-Agent-Skill",
     "source": "skills.sh"
   },
@@ -3504,7 +3504,7 @@
     "authorHandle": "giuseppe-trisciuoglio",
     "description": "Provides comprehensive Tailwind CSS utility-first styling patterns including responsive design, layout utilities, flexbox, grid, spacing, typography, colors, and modern CSS best practices. Use when styling React/Vue/Svelte components, building responsive layouts, implementing design systems, or optimizing CSS workflow.",
     "stars": 238,
-    "installs": 11085,
+    "installs": 11090,
     "githubUrl": "https://github.com/giuseppe-trisciuoglio/developer-kit",
     "source": "skills.sh"
   },
@@ -3515,7 +3515,7 @@
     "authorHandle": "wshobson",
     "description": "Python design patterns including KISS, Separation of Concerns, Single Responsibility, and composition over inheritance. Use this skill when designing a new service or component from scratch and choosing how to layer responsibilities, when refactoring a God class or monolithic function that has grown too large, when deciding whether to add a new abstraction or live with duplication, when evaluating a pull request for structural issues like tight coupling or leaking internal types, when choosing between inheritance and composition for a new class hierarchy, or when a codebase is becoming hard to test because of entangled I/O and business logic.",
     "stars": 34867,
-    "installs": 11051,
+    "installs": 11068,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3526,7 +3526,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for performance — prefer transforms, avoid layout thrashing, will-change, batching. Use when optimizing GSAP animations, reducing jank, or when the user asks about animation performance, FPS, or smooth 60fps.",
     "stars": 3111,
-    "installs": 10972,
+    "installs": 10990,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -3537,30 +3537,30 @@
     "authorHandle": "github",
     "description": "Create a new specification file for the solution, optimized for Generative AI consumption.",
     "stars": 32249,
-    "installs": 10923,
+    "installs": 10929,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
   {
     "rank": 323,
-    "id": "github/awesome-copilot:web-design-reviewer",
-    "name": "web-design-reviewer",
-    "authorHandle": "github",
-    "description": "This skill enables visual inspection of websites running locally or remotely to identify and fix design issues. Triggers on requests like \"review website design\", \"check the UI\", \"fix the layout\", \"find design problems\". Detects issues with responsive design, accessibility, visual consistency, and layout breakage, then performs fixes at the source code level.",
-    "stars": 32249,
-    "installs": 10905,
-    "githubUrl": "https://github.com/github/awesome-copilot",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 324,
     "id": "wshobson/agents:git-advanced-workflows",
     "name": "git-advanced-workflows",
     "authorHandle": "wshobson",
     "description": "Master advanced Git workflows including rebasing, cherry-picking, bisect, worktrees, and reflog to maintain clean history and recover from any situation. Use when managing complex Git histories, collaborating on feature branches, or troubleshooting repository issues.",
     "stars": 34867,
-    "installs": 10903,
+    "installs": 10926,
     "githubUrl": "https://github.com/wshobson/agents",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 324,
+    "id": "github/awesome-copilot:web-design-reviewer",
+    "name": "web-design-reviewer",
+    "authorHandle": "github",
+    "description": "This skill enables visual inspection of websites running locally or remotely to identify and fix design issues. Triggers on requests like \"review website design\", \"check the UI\", \"fix the layout\", \"find design problems\". Detects issues with responsive design, accessibility, visual consistency, and layout breakage, then performs fixes at the source code level.",
+    "stars": 32249,
+    "installs": 10910,
+    "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
   {
@@ -3570,7 +3570,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for timelines — gsap.timeline(), position parameter, nesting, playback. Use when sequencing animations, choreographing keyframes, or when the user asks about animation sequencing, timelines, or animation order (in GSAP or when recommending a library that supports timelines).",
     "stars": 3111,
-    "installs": 10827,
+    "installs": 10845,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -3581,7 +3581,7 @@
     "authorHandle": "jeffallan",
     "description": "Use when building cross-platform applications with Flutter 3+ and Dart. Invoke for widget development, Riverpod/Bloc state management, GoRouter navigation, platform-specific implementations, performance optimization.",
     "stars": 8810,
-    "installs": 10817,
+    "installs": 10818,
     "githubUrl": "https://github.com/Jeffallan/claude-skills",
     "source": "skills.sh"
   },
@@ -3592,7 +3592,7 @@
     "authorHandle": "wshobson",
     "description": "Generate and maintain OpenAPI 3.1 specifications from code, design-first specs, and validation patterns. Use when creating API documentation, generating SDKs, or ensuring API contract compliance.",
     "stars": 34867,
-    "installs": 10728,
+    "installs": 10736,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3614,7 +3614,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for GSAP plugins — registration, ScrollToPlugin, ScrollSmoother, Flip, Draggable, Inertia, Observer, SplitText, ScrambleText, SVG and physics plugins, CustomEase, EasePack, CustomWiggle, CustomBounce, GSDevTools. Use when the user asks about a GSAP plugin, scroll-to, flip animations, draggable, SVG drawing, or plugin registration.",
     "stars": 3111,
-    "installs": 10665,
+    "installs": 10683,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -3625,7 +3625,7 @@
     "authorHandle": "wshobson",
     "description": "Master smart contract security best practices to prevent common vulnerabilities and implement secure Solidity patterns. Use when writing smart contracts, auditing existing contracts, or implementing security measures for blockchain applications.",
     "stars": 34867,
-    "installs": 10665,
+    "installs": 10674,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -3636,7 +3636,7 @@
     "authorHandle": "github",
     "description": "Query official Microsoft documentation to find concepts, tutorials, and code examples across Azure, .NET, Agent Framework, Aspire, VS Code, GitHub, and more. Uses Microsoft Learn MCP as the default, with Context7 and Aspire MCP for content that lives outside learn.microsoft.com.",
     "stars": 32249,
-    "installs": 10657,
+    "installs": 10659,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3658,7 +3658,7 @@
     "authorHandle": "github",
     "description": "Plan a multi-file refactor with proper sequencing and rollback steps",
     "stars": 32249,
-    "installs": 10624,
+    "installs": 10625,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3669,7 +3669,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for gsap.utils — clamp, mapRange, normalize, interpolate, random, snap, toArray, wrap, pipe. Use when the user asks about gsap.utils, clamp, mapRange, random, snap, toArray, wrap, or helper utilities in GSAP.",
     "stars": 3111,
-    "installs": 10552,
+    "installs": 10570,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -3680,7 +3680,7 @@
     "authorHandle": "github",
     "description": "Website exploration for testing using Playwright MCP",
     "stars": 32249,
-    "installs": 10535,
+    "installs": 10541,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3691,7 +3691,7 @@
     "authorHandle": "ibelick",
     "description": "Audit and fix HTML metadata including page titles, meta descriptions, canonical URLs, Open Graph tags, Twitter cards, favicons, JSON-LD structured data, and robots directives. Use when adding SEO metadata, fixing social share previews, reviewing Open Graph tags, setting up canonical URLs, or shipping new pages that need correct meta tags.",
     "stars": 1625,
-    "installs": 10514,
+    "installs": 10516,
     "githubUrl": "https://github.com/ibelick/ui-skills",
     "source": "skills.sh"
   },
@@ -3702,7 +3702,7 @@
     "authorHandle": "github",
     "description": "Best practices for writing JavaScript/TypeScript tests using Jest, including mocking strategies, test structure, and common patterns.",
     "stars": 32249,
-    "installs": 10513,
+    "installs": 10515,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3713,7 +3713,7 @@
     "authorHandle": "github",
     "description": "Manage Azure DevOps resources via CLI including projects, repos, pipelines, builds, pull requests, work items, artifacts, and service endpoints. Use when working with Azure DevOps, az commands, devops automation, CI/CD, or when user mentions Azure DevOps CLI.",
     "stars": 32249,
-    "installs": 10504,
+    "installs": 10506,
     "githubUrl": "https://github.com/github/awesome-copilot",
     "source": "skills.sh"
   },
@@ -3724,12 +3724,23 @@
     "authorHandle": "wshobson",
     "description": "Transform data into compelling narratives using visualization, context, and persuasive structure. Use when presenting analytics to stakeholders, creating data reports, or building executive presentations.",
     "stars": 34867,
-    "installs": 10492,
+    "installs": 10505,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
   {
     "rank": 340,
+    "id": "wshobson/agents:backtesting-frameworks",
+    "name": "backtesting-frameworks",
+    "authorHandle": "wshobson",
+    "description": "Build robust backtesting systems for trading strategies with proper handling of look-ahead bias, survivorship bias, and transaction costs. Use when developing trading algorithms, validating strategies, or building backtesting infrastructure.",
+    "stars": 34867,
+    "installs": 10480,
+    "githubUrl": "https://github.com/wshobson/agents",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 341,
     "id": "github/awesome-copilot:webapp-testing",
     "name": "webapp-testing",
     "authorHandle": "github",
@@ -3740,25 +3751,25 @@
     "source": "skills.sh"
   },
   {
-    "rank": 341,
-    "id": "wshobson/agents:backtesting-frameworks",
-    "name": "backtesting-frameworks",
-    "authorHandle": "wshobson",
-    "description": "Build robust backtesting systems for trading strategies with proper handling of look-ahead bias, survivorship bias, and transaction costs. Use when developing trading algorithms, validating strategies, or building backtesting infrastructure.",
-    "stars": 34867,
-    "installs": 10472,
-    "githubUrl": "https://github.com/wshobson/agents",
-    "source": "skills.sh"
-  },
-  {
     "rank": 342,
     "id": "github/awesome-copilot:create-agentsmd",
     "name": "create-agentsmd",
     "authorHandle": "github",
     "description": "Prompt for generating an AGENTS.md file for a repository",
     "stars": 32249,
-    "installs": 10464,
+    "installs": 10467,
     "githubUrl": "https://github.com/github/awesome-copilot",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 343,
+    "id": "wshobson/agents:async-python-patterns",
+    "name": "async-python-patterns",
+    "authorHandle": "wshobson",
+    "description": "Master Python asyncio, concurrent programming, and async/await patterns for high-performance applications. Use when building async APIs, concurrent systems, or I/O-bound applications requiring non-blocking operations.",
+    "stars": 34867,
+    "installs": 10465,
+    "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   }
 ]

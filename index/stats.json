@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T14:53:25.844Z",
+  "generated_at": "2026-05-18T14:55:21.895Z",
   "total_skills": 48998,
   "total_trending": 343,
   "total_basket": 420,
@@ -248,7 +248,7 @@
           "count": 205,
           "avg_stars": 158308,
           "avg_installs": 8500,
-          "avg_forks": 29892,
+          "avg_forks": 29893,
           "avg_watchers": 846,
           "total_installs": 1742441
         },
@@ -387,10 +387,10 @@
             "count": 30,
             "totalInstalls": 250198,
             "avgStars": 126999,
-            "avgForks": 22971,
+            "avgForks": 22972,
             "avgWatchers": 1727,
             "avgScore": 21.5,
-            "forksPerStar": 0.1808754399640942,
+            "forksPerStar": 0.18088331404184285,
             "watchersPerInstall": 0.20707599581131747
           },
           {
@@ -453,10 +453,10 @@
             "count": 30,
             "totalInstalls": 30088,
             "avgStars": 120046,
-            "avgForks": 19287,
+            "avgForks": 19288,
             "avgWatchers": 715,
             "avgScore": 10.9,
-            "forksPerStar": 0.16066341235859588,
+            "forksPerStar": 0.16067174249870883,
             "watchersPerInstall": 0.7129088008508376
           },
           {
@@ -775,18 +775,14 @@
     },
     {
       "id": "github_health",
-      "hook": "The freshest niche (Research & Summarization) averaged -1d since last push — Content & Marketing averaged 0mo",
+      "hook": "The freshest niche (AI Orchestration) averaged 0d since last push — Content & Marketing averaged 0mo",
       "angle": "Repo freshness reveals which niches are actively evolving vs coasting on past work. Every niche in the gold basket pushed within the last week — the 100-star floor filtered out stale skills automatically.",
       "tweet_hooks": [
-        "Which Claude skill niches are most actively maintained? Research & Summarization wins — avg -1 days since last push. omgskills.app",
+        "Which Claude skill niches are most actively maintained? AI Orchestration wins — avg 0 days since last push. omgskills.app",
         "Every niche in the omgskills gold basket pushed to GitHub in the last week. Stale skills filtered out automatically. omgskills.app"
       ],
       "data": {
         "niche_age": [
-          {
-            "label": "Research & Summarization",
-            "avg_days": -1
-          },
           {
             "label": "AI Orchestration",
             "avg_days": 0
@@ -796,7 +792,7 @@
             "avg_days": 0
           },
           {
-            "label": "General & Utilities",
+            "label": "Research & Summarization",
             "avg_days": 0
           },
           {
@@ -806,6 +802,10 @@
           {
             "label": "Security",
             "avg_days": 0
+          },
+          {
+            "label": "General & Utilities",
+            "avg_days": 1
           },
           {
             "label": "Design & UI",
@@ -844,27 +844,27 @@
           {
             "name": "skill-writer",
             "author": "pytorch",
-            "open_issues": 18557
+            "open_issues": 18558
           },
           {
             "name": "skill-writer",
             "author": "pytorch",
-            "open_issues": 18557
+            "open_issues": 18558
           },
           {
             "name": "at-dispatch-v2",
             "author": "pytorch",
-            "open_issues": 18557
+            "open_issues": 18558
           },
           {
             "name": "aoti-debug",
             "author": "pytorch",
-            "open_issues": 18557
+            "open_issues": 18558
           },
           {
             "name": "at-dispatch-v2",
             "author": "pytorch",
-            "open_issues": 18557
+            "open_issues": 18558
           }
         ],
         "correlations": {
