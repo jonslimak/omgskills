@@ -88,6 +88,7 @@ jobs:
           else
             git add index/external-essentials.json index/gold-basket.json index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data
             git commit -m "content: update reports ($(date -u +%Y-%m-%d))"
+            git pull --rebase --autostash origin main
             git push
           fi
 

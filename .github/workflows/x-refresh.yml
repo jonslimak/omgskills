@@ -96,6 +96,7 @@ jobs:
           else
             git add index/top-x-skill-tweets.json index/x-trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json site/data
             git commit -m "x-refresh: update X feed ($(date -u +%Y-%m-%d))"
+            git pull --rebase --autostash origin main
             git push
           fi
 
