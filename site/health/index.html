@@ -97,9 +97,9 @@
       }
       .source-link {
         margin-left: 8px;
-        color: #9ca3af;
+        color: #0a66ff;
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
         white-space: nowrap;
       }
       .section-grid {
@@ -263,7 +263,7 @@
         .replaceAll("'", "&#039;");
       const addItem = (label, value) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value">${escapeHtml(value)}</span></li>`;
       const addTimeItem = (label, value) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value time-value">${escapeHtml(value)}</span></li>`;
-      const addSourceItem = (label, value, href) => `<li><span class="kv-key">${escapeHtml(label)}<a class="source-link" href="${href}" target="_blank" rel="noopener">source</a></span><span class="kv-value">${escapeHtml(value)}</span></li>`;
+      const addSourceItem = (label, value, href) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value">${escapeHtml(value)}<a class="source-link" href="${href}" target="_blank" rel="noopener">source</a></span></li>`;
       const timeCell = (value) => `<span class="time-value">${escapeHtml(value)}</span>`;
       const statusLabel = (value) => value ? value.toUpperCase() : "-";
       const bytes = (value) => typeof value === "number" ? `${(value / 1_000_000).toFixed(1)} MB` : "-";
