@@ -30,14 +30,11 @@ byte_count() {
     wc -c < "$1" | tr -d ' '
 }
 
-file_modified_iso() {
-    node -e "console.log(new Date(require('fs').statSync(process.argv[1]).mtimeMs).toISOString())" "$1"
-}
-
 require_file "$SKILLS" "Run: cd index && npm run scrape"
 require_file "$TRENDING" "Run: cd index && npm run scrape:trending"
 
 mkdir -p "$DATA_DIR"
+manifest_generated_at="${MANIFEST_GENERATED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
 
 skills_hash="$(hash_file "$SKILLS")"
 trending_hash="$(hash_file "$TRENDING")"
@@ -104,7 +101,7 @@ fi
 cat > "$DATA_DIR/manifest.json" <<JSON
 {
   "version": 1,
-  "generatedAt": "$(file_modified_iso "$SKILLS")",
+  "generatedAt": "$manifest_generated_at",
   "skills": {
     "path": "$skills_file",
     "sha256": "$skills_hash",

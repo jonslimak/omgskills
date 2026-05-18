@@ -58,6 +58,13 @@ jobs:
         working-directory: index
         run: npm run content:overlays
 
+      - name: Build homepage leaderboard data
+        working-directory: index
+        run: |
+          npm run content:trending-leaderboard
+          npm run content:author-leaderboards
+          npm run content:leaderboard-view-data
+
       - name: Publish hosted app data
         env:
           HEALTH_STATUS: ok
@@ -84,10 +91,10 @@ jobs:
         run: |
           git config user.name "omgskills-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- index/top-x-skill-tweets.json index/x-trending.json index/skill-signals.json index/author-signals.json site/data; then
+          if git diff --quiet -- index/top-x-skill-tweets.json index/x-trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json site/data; then
             echo "No X feed changes"
           else
-            git add index/top-x-skill-tweets.json index/x-trending.json index/skill-signals.json index/author-signals.json site/data
+            git add index/top-x-skill-tweets.json index/x-trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json site/data
             git commit -m "x-refresh: update X feed ($(date -u +%Y-%m-%d))"
             git push
           fi
