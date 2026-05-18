@@ -95,6 +95,13 @@
         font-size: 12px;
         font-weight: 500;
       }
+      .source-link {
+        margin-left: 8px;
+        color: #9ca3af;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
       .section-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -256,6 +263,7 @@
         .replaceAll("'", "&#039;");
       const addItem = (label, value) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value">${escapeHtml(value)}</span></li>`;
       const addTimeItem = (label, value) => `<li><span class="kv-key">${escapeHtml(label)}</span><span class="kv-value time-value">${escapeHtml(value)}</span></li>`;
+      const addSourceItem = (label, value, href) => `<li><span class="kv-key">${escapeHtml(label)}<a class="source-link" href="${href}" target="_blank" rel="noopener">source</a></span><span class="kv-value">${escapeHtml(value)}</span></li>`;
       const timeCell = (value) => `<span class="time-value">${escapeHtml(value)}</span>`;
       const statusLabel = (value) => value ? value.toUpperCase() : "-";
       const bytes = (value) => typeof value === "number" ? `${(value / 1_000_000).toFixed(1)} MB` : "-";
@@ -268,10 +276,20 @@
         .join(", ") || "-";
       const numberText = (value) => typeof value === "number" ? value.toLocaleString() : "-";
       const percentText = (value) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "-";
+      const healthJsonUrl = location.protocol === "file:"
+        ? new URL("../data/health.json", location.href).href
+        : "/data/health.json";
+      const humblyticsUrl = "https://app.humblytics.com/workspace/jonathan-s-workspace-1dc60210-3a21-4f8b-a86a-cd56219638e2";
+      const telemetryDeckUrl = "https://dashboard.telemetrydeck.com/";
       const renderBase = (section) => [
         addItem("Status", statusLabel(section?.status)),
         addTimeItem("Last tested", fmt(section?.checkedAt)),
         addTimeItem("Last passed", fmtSuccess(section?.lastPassedAt)),
+      ];
+      const renderSourceBase = (section, href) => [
+        addSourceItem("Status", statusLabel(section?.status), href),
+        addSourceItem("Last tested", fmt(section?.checkedAt), href),
+        addSourceItem("Last passed", fmtSuccess(section?.lastPassedAt), href),
       ];
       const summaryRows = [
         ["Download", "download"],
@@ -371,19 +389,19 @@
           ].join("");
 
           document.getElementById("marketingFunnel").innerHTML = [
-            ...renderBase(health.sections?.marketingFunnel),
-            addItem("Window", health.sections?.marketingFunnel?.window || "-"),
-            addItem("Sessions", numberText(health.sections?.marketingFunnel?.sessions)),
-            addItem("Download clicks", numberText(health.sections?.marketingFunnel?.downloadClicks)),
-            addItem("Download click rate", percentText(health.sections?.marketingFunnel?.downloadClickRate)),
-            addItem("Hero / lower CTA", `${numberText(health.sections?.marketingFunnel?.heroDownloadClicks)} / ${numberText(health.sections?.marketingFunnel?.reviewsDownloadClicks)}`),
-            addItem("Paid X sessions", numberText(health.sections?.marketingFunnel?.paidXSessions)),
-            addItem("Paid X downloads", numberText(health.sections?.marketingFunnel?.paidXDownloadClicks)),
-            addItem("Installs", numberText(health.sections?.marketingFunnel?.installs)),
-            addItem("Launches", numberText(health.sections?.marketingFunnel?.launches)),
-            addItem("Engaged app users", numberText(health.sections?.marketingFunnel?.engagedUsersLowerBound)),
-            addItem("Download → install", percentText(health.sections?.marketingFunnel?.downloadToInstallRate)),
-            addItem("Message", issueText(health.sections?.marketingFunnel)),
+            ...renderSourceBase(health.sections?.marketingFunnel, healthJsonUrl),
+            addSourceItem("Window", health.sections?.marketingFunnel?.window || "-", healthJsonUrl),
+            addSourceItem("Sessions", numberText(health.sections?.marketingFunnel?.sessions), humblyticsUrl),
+            addSourceItem("Download clicks", numberText(health.sections?.marketingFunnel?.downloadClicks), humblyticsUrl),
+            addSourceItem("Download click rate", percentText(health.sections?.marketingFunnel?.downloadClickRate), healthJsonUrl),
+            addSourceItem("Hero / lower CTA", `${numberText(health.sections?.marketingFunnel?.heroDownloadClicks)} / ${numberText(health.sections?.marketingFunnel?.reviewsDownloadClicks)}`, humblyticsUrl),
+            addSourceItem("Paid X sessions", numberText(health.sections?.marketingFunnel?.paidXSessions), humblyticsUrl),
+            addSourceItem("Paid X downloads", numberText(health.sections?.marketingFunnel?.paidXDownloadClicks), humblyticsUrl),
+            addSourceItem("Installs", numberText(health.sections?.marketingFunnel?.installs), telemetryDeckUrl),
+            addSourceItem("Launches", numberText(health.sections?.marketingFunnel?.launches), telemetryDeckUrl),
+            addSourceItem("Engaged app users", numberText(health.sections?.marketingFunnel?.engagedUsersLowerBound), telemetryDeckUrl),
+            addSourceItem("Download → install", percentText(health.sections?.marketingFunnel?.downloadToInstallRate), healthJsonUrl),
+            addSourceItem("Message", issueText(health.sections?.marketingFunnel), healthJsonUrl),
           ].join("");
 
           document.getElementById("content").innerHTML = [
