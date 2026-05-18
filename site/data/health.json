@@ -1,21 +1,21 @@
 {
   "version": 1,
   "status": "degraded",
-  "message": "No successful scrape run found; content-reports is stale (260.5h); No successful scrape run found; No successful x-refresh run found; No successful content-reports run found",
-  "checkedAt": "2026-05-18T11:47:35Z",
-  "publishedAt": "2026-05-17T11:27:26Z",
+  "message": "No successful scrape run found; No successful content-reports run found",
+  "checkedAt": "2026-05-18T12:11:15.955Z",
+  "publishedAt": "2026-05-18T12:11:15Z",
   "deployedAt": null,
   "lastSuccessfulScrapeAt": null,
-  "lastSuccessfulXRefreshAt": null,
+  "lastSuccessfulXRefreshAt": "2026-05-18T12:11:15Z",
   "lastSuccessfulContentReportAt": null,
-  "workflow": "pipeline-health",
-  "runId": "26031535606",
-  "gitSha": "b4a7e51fb21be9cb2375df547bf13cc8e09b2ae5",
+  "workflow": "x-refresh",
+  "runId": "26032587119",
+  "gitSha": "68a29bf3be8f70dc8e261c946716311777c9983d",
   "manifestPath": "data/manifest.json",
-  "manifestGeneratedAt": "2026-05-17T11:26:13.846Z",
+  "manifestGeneratedAt": "2026-05-18T12:09:59.655Z",
   "pipeline": {
-    "status": "degraded",
-    "message": "No successful scrape run found; content-reports is stale (260.5h)"
+    "status": "ok",
+    "message": "Latest X feed published"
   },
   "productHealth": {
     "version": 1,
@@ -123,49 +123,49 @@
     "skills": {
       "path": "skills-3c2bdf9fecab.json",
       "count": 48998,
-      "generatedAt": "2026-05-18T11:47:20.094Z"
+      "generatedAt": "2026-05-18T12:09:59.655Z"
     },
     "trending": {
       "path": "trending-e7ef7a8f7719.json",
       "count": 348,
-      "generatedAt": "2026-05-18T11:47:20.194Z"
+      "generatedAt": "2026-05-18T12:09:59.754Z"
     },
     "trendingLeaderboard": {
       "path": "trending-leaderboard-d7f30e052c65.json",
       "count": 342,
-      "generatedAt": "2026-05-18T11:47:20.194Z"
+      "generatedAt": "2026-05-18T12:09:59.753Z"
     },
     "leaderboardViewData": {
       "path": "leaderboard-view-data-b75e1e1416ff.json",
       "count": 10,
-      "generatedAt": "2026-05-18T11:47:19.903Z"
+      "generatedAt": "2026-05-18T12:09:59.468Z"
     },
     "xTrending": {
-      "path": "x-trending-6ae1e708cead.json",
+      "path": "x-trending-8375f6306937.json",
       "count": 50,
-      "generatedAt": "2026-05-18T11:47:20.195Z"
+      "generatedAt": "2026-05-18T12:11:14.147Z"
     },
     "skillSignals": {
       "path": "skill-signals-a6228049c0b0.json",
       "count": 48998,
-      "generatedAt": "2026-05-18T11:47:20.038Z"
+      "generatedAt": "2026-05-18T12:11:14.986Z"
     },
     "authorSignals": {
       "path": "author-signals-0ef24ded5fb8.json",
       "count": 8071,
-      "generatedAt": "2026-05-18T11:47:19.900Z"
+      "generatedAt": "2026-05-18T12:11:15.003Z"
     },
     "authorLeaderboards": {
       "path": "author-leaderboards-9aacc922435b.json",
       "count": 8071,
-      "generatedAt": "2026-05-18T11:47:19.892Z"
+      "generatedAt": "2026-05-18T12:09:59.459Z"
     }
   },
   "content": {
-    "goldBasketGeneratedAt": "2026-05-18T11:47:19.903Z",
+    "goldBasketGeneratedAt": "2026-05-18T12:09:59.468Z",
     "basketEnrichedAt": "2026-05-11T06:15:51.999Z",
-    "statsGeneratedAt": "2026-05-18T11:47:20.192Z",
-    "dashboardGeneratedAt": "2026-05-18T11:47:19.901Z",
+    "statsGeneratedAt": "2026-05-18T12:09:59.751Z",
+    "dashboardGeneratedAt": "2026-05-18T12:09:59.466Z",
     "snapshotCount": 0
   },
   "sections": {
@@ -173,13 +173,12 @@
       "status": "degraded",
       "issues": [
         "No successful scrape run found",
-        "No successful x-refresh run found",
         "No successful content-reports run found"
       ],
       "lastSuccessfulScrapeAt": null,
-      "lastSuccessfulXRefreshAt": null,
+      "lastSuccessfulXRefreshAt": "2026-05-18T12:11:15Z",
       "lastSuccessfulContentReportAt": null,
-      "checkedAt": "2026-05-18T11:47:35Z",
+      "checkedAt": "2026-05-18T12:11:15.955Z",
       "lastPassedAt": null
     },
     "core": {
@@ -189,31 +188,31 @@
       "trendingLeaderboardCount": 342,
       "leaderboardViewDataPath": "leaderboard-view-data-b75e1e1416ff.json",
       "lastSuccessfulScrapeAt": null,
-      "checkedAt": "2026-05-18T11:47:35Z",
-      "lastPassedAt": "2026-05-18T11:47:35Z"
+      "checkedAt": "2026-05-18T12:11:15.955Z",
+      "lastPassedAt": "2026-05-18T12:11:15.955Z"
     },
     "x": {
       "status": "ok",
       "xTrendingCount": 50,
-      "lastSuccessfulXRefreshAt": null,
-      "checkedAt": "2026-05-18T11:47:35Z",
-      "lastPassedAt": "2026-05-18T11:47:35Z"
+      "lastSuccessfulXRefreshAt": "2026-05-18T12:11:15Z",
+      "checkedAt": "2026-05-18T12:11:15.955Z",
+      "lastPassedAt": "2026-05-18T12:11:15.955Z"
     },
     "overlays": {
       "status": "ok",
       "skillSignalsCount": 48998,
       "authorSignalsCount": 8071,
       "authorLeaderboardsCount": 8071,
-      "checkedAt": "2026-05-18T11:47:35Z",
-      "lastPassedAt": "2026-05-18T11:47:35Z"
+      "checkedAt": "2026-05-18T12:11:15.955Z",
+      "lastPassedAt": "2026-05-18T12:11:15.955Z"
     },
     "contentReports": {
       "status": "ok",
       "lastSuccessfulContentReportAt": null,
       "basketEnrichedAt": "2026-05-11T06:15:51.999Z",
       "snapshotCount": 0,
-      "checkedAt": "2026-05-18T11:47:35Z",
-      "lastPassedAt": "2026-05-18T11:47:35Z"
+      "checkedAt": "2026-05-18T12:11:15.955Z",
+      "lastPassedAt": "2026-05-18T12:11:15.955Z"
     },
     "download": {
       "status": "ok",

@@ -8,7 +8,7 @@
     "likes": 3445,
     "retweets": 379,
     "replies": 0,
-    "views": 474232,
+    "views": 475797,
     "posted_at": "2026-05-12T09:49:28.000Z",
     "repo_ids": [
       "google/skills"
@@ -23,7 +23,7 @@
         "skill_md_path": "skills/cloud/gemini-api/SKILL.md",
         "name": "gemini-api",
         "description": "Guides the usage of the Gemini API on Agent Platform with the Google Gen AI SDK. Use when the user asks about using Gemini in an enterprise environment or explicitly mentions Vertex AI, Google Cloud, or Agent Platform. Covers SDK usage (Python, JS/TS, Go, Java, C#), capabilities like Live API, tools, multimedia generation, caching, and batch prediction.",
-        "stars": 9544
+        "stars": 9788
       }
     ]
   },
@@ -33,10 +33,10 @@
     "author_handle": "steipete",
     "author_name": "Peter Steinberger 🦞",
     "text": "Wrote a skill that runs codex /review in a loop until there's no booboos anymore.\n\nCaveat: It won't fix system architecture for ya, so you still need BRAIN as master model. https://t.co/0Z6iJnCqCX https://github.com/steipete/agent-scripts/blob/main/skills/codex-review/SKILL.md",
-    "likes": 2685,
-    "retweets": 153,
+    "likes": 2684,
+    "retweets": 152,
     "replies": 122,
-    "views": 375781,
+    "views": 378116,
     "posted_at": "2026-05-14T09:05:42.000Z",
     "repo_ids": [
       "steipete/agent-scripts"
@@ -51,7 +51,7 @@
         "skill_md_path": "skills/npm/SKILL.md",
         "name": "npm",
         "description": "npm registry ops: login, whoami, names, publish; 1Password via one tmux.",
-        "stars": 2952
+        "stars": 2995
       }
     ]
   },
@@ -64,7 +64,7 @@
     "likes": 2526,
     "retweets": 167,
     "replies": 40,
-    "views": 213811,
+    "views": 214173,
     "posted_at": "2026-05-02T22:51:05.000Z",
     "repo_ids": [
       "Leonxlnx/taste-skill"
@@ -79,7 +79,7 @@
         "skill_md_path": "skills/brandkit/SKILL.md",
         "name": "brandkit",
         "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
-        "stars": 17725
+        "stars": 17928
       }
     ]
   },
@@ -92,7 +92,7 @@
     "likes": 2162,
     "retweets": 138,
     "replies": 84,
-    "views": 183332,
+    "views": 183369,
     "posted_at": "2026-03-05T22:36:53.000Z",
     "repo_ids": [
       "openai/skills"
@@ -107,63 +107,7 @@
         "skill_md_path": "skills/.curated/pdf/SKILL.md",
         "name": "pdf",
         "description": "Use when tasks involve reading, creating, or reviewing PDF files where rendering and layout matter; prefer visual checks by rendering pages (Poppler) and use Python tools such as `reportlab`, `pdfplumber`, and `pypdf` for generation and extraction.",
-        "stars": 19284
-      }
-    ]
-  },
-  {
-    "tweet_id": "2052012365562954011",
-    "tweet_url": "https://x.com/midudev/status/2052012365562954011",
-    "author_handle": "midudev",
-    "author_name": "Miguel Ángel Durán",
-    "text": "¡Han sacado el Claude Code de DeepSeek!\nEs de código abierto y está desarrollado con Rust\n\n✓ Usa API Key o modelos locales\n✓ MCP, Skills, Tools, Memoria y más\n\n$ npm install -g deepseek-tui\n\n→ https://t.co/3XYXsq3gDs https://t.co/VgyeS3HSvW http://github.com/Hmbown/DeepSeek-TUI",
-    "likes": 2156,
-    "retweets": 277,
-    "replies": 38,
-    "views": 84124,
-    "posted_at": "2026-05-06T13:07:27.000Z",
-    "repo_ids": [
-      "Hmbown/DeepSeek-TUI"
-    ],
-    "repo_urls": [
-      "https://github.com/Hmbown/DeepSeek-TUI"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "Hmbown/DeepSeek-TUI",
-        "github_url": "https://github.com/Hmbown/DeepSeek-TUI",
-        "skill_md_path": "crates/tui/assets/skills/pdf/SKILL.md",
-        "name": "pdf",
-        "description": "Read, extract, split, merge, rotate, watermark, fill, OCR, or create PDF files with verification of page counts and text extraction.",
-        "stars": 30911
-      }
-    ]
-  },
-  {
-    "tweet_id": "2055010623910785535",
-    "tweet_url": "https://x.com/yetone/status/2055010623910785535",
-    "author_handle": "yetone",
-    "author_name": "yetone",
-    "text": "由于这篇文章太伟大了，所以我把它变成了一个 Agent Skill。\n\n大家可以使用自己的 Coding Agent 安装一下这个 Skill，这样就可以用「最佳实践」来轻松地重构或者开发一个既容易跨平台、又极其接近 Native 性能的桌面端应用。\n\nhttps://t.co/VdAhLhoSQE https://github.com/yetone/native-feel-skill",
-    "likes": 2104,
-    "retweets": 266,
-    "replies": 36,
-    "views": 256076,
-    "posted_at": "2026-05-14T19:41:27.000Z",
-    "repo_ids": [
-      "yetone/native-feel-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/yetone/native-feel-skill"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "yetone/native-feel-skill",
-        "github_url": "https://github.com/yetone/native-feel-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "native-feel-cross-platform-desktop",
-        "description": "Use when the user is designing, prototyping, or rewriting a desktop app that must run on multiple OSes (macOS + Windows, optionally Linux) AND feel indistinguishable from a native app to its users — fast launch, native windowing, native input handling, native materials. Trigger words include \"cross-platform desktop\", \"Electron alternative\", \"Tauri vs native\", \"WebView wrapper\", \"near-native performance\", \"Raycast architecture\", \"WebKit/WebView2 quirks\", \"WKWebView\", \"system tray app\", \"global hotkey app\", \"launcher app\". Do NOT trigger this skill for pure web apps, pure mobile apps, or for greenfield projects that have no native-feel requirement.",
-        "stars": 1254
+        "stars": 19461
       }
     ]
   },
@@ -173,10 +117,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Covers full academic research pipeline for Claude Code\n\nhttps://t.co/4Mk2QHXMFg https://t.co/bwzUGjMkac https://github.com/Imbad0202/academic-research-skills",
-    "likes": 1995,
+    "likes": 1996,
     "retweets": 268,
     "replies": 13,
-    "views": 137707,
+    "views": 137855,
     "posted_at": "2026-05-03T06:49:17.000Z",
     "repo_ids": [
       "Imbad0202/academic-research-skills"
@@ -191,7 +135,7 @@
         "skill_md_path": "deep-research/SKILL.md",
         "name": "deep-research",
         "description": "Universal deep research agent team. 13-agent pipeline for rigorous academic research on any topic. 7 modes: full research, quick brief, paper review, lit-review, fact-check, Socratic guided research dialogue, and systematic review with optional meta-analysis. Covers research question formulation, Socratic mentoring, methodology design, systematic literature search, source verification, cross-source synthesis, risk of bias assessment, meta-analysis, APA 7.0 report compilation, editorial review, devil's advocate challenges, ethics review, and post-research literature monitoring. Triggers on: research, deep research, literature review, systematic review, meta-analysis, PRISMA, evidence synthesis, fact-check, guide my research, help me think through, 研究, 深度研究, 文獻回顧, 文獻探討, 系統性回顧, 後設分析, 事實查核, 引導我的研究, 幫我釐清, 幫我想想, 我不確定要研究什麼, 研究方向, 研究主題.",
-        "stars": 8847
+        "stars": 10324
       }
     ]
   },
@@ -201,10 +145,10 @@
     "author_handle": "frxiaobei",
     "author_name": "凡人小北",
     "text": "知识产权全面沦陷。\n\n发明专利生成 skill\nhttps://t.co/fq4X8PwWBF\n\n软著生成 skill\nhttps://t.co/mSJFhzapJG\n\n设计专利/实用新型更容易，claude desgin/ image2 https://github.com/handsomestWei/patent-disclosure-skill https://github.com/Fokkyp/SoftwareCopyright-Skill",
-    "likes": 1977,
-    "retweets": 497,
+    "likes": 1978,
+    "retweets": 499,
     "replies": 42,
-    "views": 276284,
+    "views": 277275,
     "posted_at": "2026-05-11T13:21:00.000Z",
     "repo_ids": [
       "handsomestWei/patent-disclosure-skill",
@@ -221,7 +165,7 @@
         "skill_md_path": "SKILL.md",
         "name": "patent-disclosure-skill",
         "description": "通用中国专利挖掘发现与交底书生成全流程：扫描项目文档挖掘专利点、讨论融合、基于脱敏模版生成技术交底书、联网查新、生成后自检含逻辑闭环与公式参数一致性。| Patent mining, disclosure drafting, prior-art search, and consistency self-check.",
-        "stars": 1298
+        "stars": 1393
       },
       {
         "id": "Fokkyp/SoftwareCopyright-Skill",
@@ -229,7 +173,7 @@
         "skill_md_path": "software-copyright-materials/SKILL.md",
         "name": "software-copyright-materials",
         "description": "Generate guided Chinese software copyright application materials from a real project. Use this skill when the user asks for 软件著作权, 软著申请资料, 软著代码材料, 操作手册, 申请表信息, or wants Word/TXT materials for software copyright registration. The workflow analyzes the imported project, extracts real source code, creates Markdown drafts for user confirmation, then uses bundled DOCX tooling to produce final Word documents and TXT.\n",
-        "stars": 3068
+        "stars": 3154
       }
     ]
   },
@@ -242,7 +186,7 @@
     "likes": 1915,
     "retweets": 155,
     "replies": 42,
-    "views": 118097,
+    "views": 118153,
     "posted_at": "2026-04-11T13:56:05.000Z",
     "repo_ids": [
       "JuliusBrussee/caveman"
@@ -257,7 +201,7 @@
         "skill_md_path": "skills/caveman/SKILL.md",
         "name": "caveman",
         "description": "Ultra-compressed communication mode. Cuts token usage ~75% by speaking like caveman while keeping full technical accuracy. Supports intensity levels: lite, full (default), ultra, wenyan-lite, wenyan-full, wenyan-ultra. Use when user says \"caveman mode\", \"talk like caveman\", \"use caveman\", \"less tokens\", \"be brief\", or invokes /caveman. Also auto-triggers when token efficiency is requested.\n",
-        "stars": 61152
+        "stars": 61610
       }
     ]
   },
@@ -270,7 +214,7 @@
     "likes": 1380,
     "retweets": 158,
     "replies": 47,
-    "views": 196061,
+    "views": 196136,
     "posted_at": "2026-04-05T18:57:50.000Z",
     "repo_ids": [
       "nextlevelbuilder/ui-ux-pro-max-skill"
@@ -285,35 +229,7 @@
         "skill_md_path": ".claude/skills/brand/SKILL.md",
         "name": "ckm:brand",
         "description": "Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.",
-        "stars": 79506
-      }
-    ]
-  },
-  {
-    "tweet_id": "2051203959142895896",
-    "tweet_url": "https://x.com/tuturetom/status/2051203959142895896",
-    "author_handle": "tuturetom",
-    "author_name": "Tom Huang",
-    "text": "Just open-sourced Open Design Skills 🚀\n\nYour Claude Code still ships ugly web pages. With this design system, any landing page, slide deck, letter, resume, or portfolio gets a world-class, magazine-grade look ✉️.\n\nhttps://t.co/7fuhR3IQ5a https://t.co/sVm2zpC5KR https://github.com/nexu-io/open-design",
-    "likes": 1333,
-    "retweets": 120,
-    "replies": 31,
-    "views": 95724,
-    "posted_at": "2026-05-04T07:35:08.000Z",
-    "repo_ids": [
-      "nexu-io/open-design"
-    ],
-    "repo_urls": [
-      "https://github.com/nexu-io/open-design"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "nexu-io/open-design",
-        "github_url": "https://github.com/nexu-io/open-design",
-        "skill_md_path": "skills/doc/SKILL.md",
-        "name": "doc",
-        "description": "Read, create, and edit .docx documents with formatting and layout fidelity via OpenAI's document skill.\n",
-        "stars": 43063
+        "stars": 79942
       }
     ]
   },
@@ -323,10 +239,10 @@
     "author_handle": "nicos_ai",
     "author_name": "Nico",
     "text": "Lista de skills que más uso.\n\nCrean código de mayor calidad, mejores interfaces y con menos errores.\n\n🎨 Frontend Design: Mejora el diseño visual y la experiencia de usuario\n→ https://t.co/7BO46GKgGY\n\n🧱 Interface Design: Estructura layouts, jerarquía visual y componentes\n→ https://t.co/Bd8WXlV6ZK http://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md",
-    "likes": 1225,
-    "retweets": 184,
+    "likes": 1227,
+    "retweets": 185,
     "replies": 10,
-    "views": 59069,
+    "views": 59408,
     "posted_at": "2026-05-04T17:51:59.000Z",
     "repo_ids": [
       "anthropics/claude-code"
@@ -341,7 +257,35 @@
         "skill_md_path": "plugins/hookify/skills/writing-rules/SKILL.md",
         "name": "Writing Hookify Rules",
         "description": "This skill should be used when the user asks to \"create a hookify rule\", \"write a hook rule\", \"configure hookify\", \"add a hookify rule\", or needs guidance on hookify rule syntax and patterns.",
-        "stars": 124271
+        "stars": 124571
+      }
+    ]
+  },
+  {
+    "tweet_id": "2051008331355971979",
+    "tweet_url": "https://x.com/LexnLin/status/2051008331355971979",
+    "author_handle": "LexnLin",
+    "author_name": "Leon Lin",
+    "text": "UPDATE for imagegen-frontend-web skill\n\nmore \"creative\" outputs\n- different layouts\n- better understanding of the request\n\nskill:\nhttps://t.co/Km3GoGoGXl https://t.co/XPc4wak4EU https://github.com/Leonxlnx/taste-skill/blob/main/skills/imagegen-frontend-web/SKILL.md",
+    "likes": 1174,
+    "retweets": 56,
+    "replies": 30,
+    "views": 56917,
+    "posted_at": "2026-05-03T18:37:46.000Z",
+    "repo_ids": [
+      "Leonxlnx/taste-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/Leonxlnx/taste-skill"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "Leonxlnx/taste-skill",
+        "github_url": "https://github.com/Leonxlnx/taste-skill",
+        "skill_md_path": "skills/brandkit/SKILL.md",
+        "name": "brandkit",
+        "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
+        "stars": 17928
       }
     ]
   },
@@ -354,7 +298,7 @@
     "likes": 1019,
     "retweets": 64,
     "replies": 25,
-    "views": 136344,
+    "views": 136468,
     "posted_at": "2026-05-02T09:35:38.000Z",
     "repo_ids": [
       "vibeforge1111/keep-codex-fast"
@@ -369,7 +313,7 @@
         "skill_md_path": "SKILL.md",
         "name": "keep-codex-fast",
         "description": "Use when Codex feels slow or bloated, when local sessions/logs/worktrees/config have grown over time, or when a user wants safe maintenance for Codex Desktop/CLI state. Provides a read-only report by default, backs up before applying changes, archives instead of deleting, normalizes Windows extended paths, prunes dead config projects, rotates large logs, and moves stale worktrees.",
-        "stars": 1063
+        "stars": 1081
       }
     ]
   },
@@ -382,7 +326,7 @@
     "likes": 1000,
     "retweets": 165,
     "replies": 28,
-    "views": 180135,
+    "views": 180198,
     "posted_at": "2026-04-14T21:06:47.000Z",
     "repo_ids": [
       "thedotmack/claude-mem",
@@ -399,7 +343,7 @@
         "skill_md_path": "plugin/skills/do/SKILL.md",
         "name": "do",
         "description": "Execute a phased implementation plan using subagents. Use when asked to execute, run, or carry out a plan — especially one created by make-plan.",
-        "stars": 76278
+        "stars": 76507
       },
       {
         "id": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -407,7 +351,7 @@
         "skill_md_path": ".claude/skills/brand/SKILL.md",
         "name": "ckm:brand",
         "description": "Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.",
-        "stars": 79506
+        "stars": 79942
       }
     ]
   },
@@ -420,7 +364,7 @@
     "likes": 954,
     "retweets": 87,
     "replies": 28,
-    "views": 118939,
+    "views": 119010,
     "posted_at": "2026-05-04T11:05:46.000Z",
     "repo_ids": [
       "LayrKits/Sprite-Pipeline"
@@ -435,7 +379,7 @@
         "skill_md_path": "skills/runware-api/SKILL.md",
         "name": "runware-api",
         "description": "Use when making, reviewing, debugging, or scripting Runware API requests. Follow Runware's raw REST/WebSocket request shape, authentication, UUID, async polling, error, retry, and model-selection rules.",
-        "stars": 531
+        "stars": 532
       }
     ]
   },
@@ -445,10 +389,10 @@
     "author_handle": "daiki15036604",
     "author_name": "daka | Microsoft | AI",
     "text": "Microsoftが公開したwaza、Agent Skillの品質を体系的に評価するためのGo製CLI。「Skillを書く」から「Skillを運用する」フェーズに進むためのツールという位置付け\nhttps://t.co/K3PD69S4tv\n\n何ができるか:\n▼ Skillのscaffold\nwaza init でプロジェクト作成、waza new http://github.com/microsoft/waza",
-    "likes": 936,
-    "retweets": 123,
+    "likes": 944,
+    "retweets": 125,
     "replies": 1,
-    "views": 83877,
+    "views": 84592,
     "posted_at": "2026-05-08T09:32:09.000Z",
     "repo_ids": [
       "microsoft/waza"
@@ -463,7 +407,7 @@
         "skill_md_path": "skills/waza/SKILL.md",
         "name": "waza",
         "description": "**WORKFLOW SKILL** - Evaluate AI agent skills using structured benchmarks with YAML specs, fixture isolation, and pluggable validators. USE FOR: run waza, waza help, run eval, run benchmark, evaluate skill, test agent, generate eval suite, init eval, compare results, score agent, agent evaluation, skill testing, cross-model comparison. DO NOT USE FOR: improving skill frontmatter (use waza dev), creating new skills from scratch (use skill-creator), token counting or budget checks (use waza tokens). INVOKES: Copilot SDK executor, mock engine, code/regex validators. FOR SINGLE OPERATIONS: use waza run directly for a single benchmark.",
-        "stars": 748
+        "stars": 763
       }
     ]
   },
@@ -476,7 +420,7 @@
     "likes": 858,
     "retweets": 142,
     "replies": 28,
-    "views": 77812,
+    "views": 78199,
     "posted_at": "2026-05-06T19:57:25.000Z",
     "repo_ids": [
       "aws/agent-toolkit-for-aws"
@@ -491,7 +435,35 @@
         "skill_md_path": "skills/core-skills/aws-cdk/SKILL.md",
         "name": "aws-cdk",
         "description": "Authors, deploys, and troubleshoots AWS infrastructure using CDK with TypeScript or Python. Covers best practices, stack architecture, and construct patterns. Always use when writing CDK constructs, bootstrapping environments, running cdk deploy/synth/diff, fixing CDK or CloudFormation errors, planning stack structure, importing existing resources, resolving drift, or refactoring stacks without resource replacement.",
-        "stars": 659
+        "stars": 664
+      }
+    ]
+  },
+  {
+    "tweet_id": "2054071047230546100",
+    "tweet_url": "https://x.com/tom_doerr/status/2054071047230546100",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "87 design skills for Claude Code\n\nhttps://t.co/O3vSxLUzd9 https://t.co/XeZRQV7Pne https://github.com/Owl-Listener/designer-skills",
+    "likes": 838,
+    "retweets": 125,
+    "replies": 2,
+    "views": 47528,
+    "posted_at": "2026-05-12T05:27:55.000Z",
+    "repo_ids": [
+      "Owl-Listener/designer-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/Owl-Listener/designer-skills"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "Owl-Listener/designer-skills",
+        "github_url": "https://github.com/Owl-Listener/designer-skills",
+        "skill_md_path": "ui-design/skills/layout-grid/SKILL.md",
+        "name": "layout-grid",
+        "description": "Define responsive layout grid systems with columns, gutters, margins, and breakpoint behavior.",
+        "stars": 1304
       }
     ]
   },
@@ -501,10 +473,10 @@
     "author_handle": "akshay_pachaar",
     "author_name": "Akshay 🚀",
     "text": "Claude Code used 3x fewer tokens with one change:\n\n- Before: 10.4M tokens · 10 errors · $9.21\n- After: 3.7M tokens · 0 errors · $2.81\n\nI used Insforge Skills + CLI as the backend context engineering layer for Claude Code (open-source and local).\n\nRepo: https://t.co/01v2PYDPpY https://t.co/T1w1obWBae https://github.com/InsForge/InsForge",
-    "likes": 774,
+    "likes": 775,
     "retweets": 101,
     "replies": 38,
-    "views": 169167,
+    "views": 169352,
     "posted_at": "2026-05-05T09:08:07.000Z",
     "repo_ids": [
       "InsForge/InsForge"
@@ -519,35 +491,7 @@
         "skill_md_path": ".claude/skills/doc-author/SKILL.md",
         "name": "doc-author",
         "description": "Write, edit, and maintain documentation. Use for collaborative drafting, autonomous writing, or improving existing docs. Defaults to collaborative mode where the human makes final decisions. Built by Mintlify.",
-        "stars": 9930
-      }
-    ]
-  },
-  {
-    "tweet_id": "2048628785793425837",
-    "tweet_url": "https://x.com/BTCqzy1/status/2048628785793425837",
-    "author_handle": "BTCqzy1",
-    "author_name": "爱丽丝呀！",
-    "text": "别再给 Claude Code 乱装 Skill 了，这 5 个才是真正值得必装的\n\n1. Repomix\n\n把整个仓库打包成一个文件丢给 Claude，一次性读懂项目结构。\n\n不然你还在一段一段喂代码，纯浪费时间。\n\nhttps://t.co/vOUo1tDOe0\n\n2. ccusage\n\n实时显示 Token 消耗。\n\n装了之后你才会意识到：Prompt 写得烂 = 在烧钱。 https://t.co/SLSFzWiOvU https://github.com/yamadashy/repomix",
-    "likes": 774,
-    "retweets": 171,
-    "replies": 71,
-    "views": 78125,
-    "posted_at": "2026-04-27T05:02:18.000Z",
-    "repo_ids": [
-      "yamadashy/repomix"
-    ],
-    "repo_urls": [
-      "https://github.com/yamadashy/repomix"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "yamadashy/repomix",
-        "github_url": "https://github.com/yamadashy/repomix",
-        "skill_md_path": ".agents/clawhub/SKILL.md",
-        "name": "repomix",
-        "description": "Pack and analyze codebases into AI-friendly single files using Repomix.\nUse when the user wants to explore repositories, analyze code structure,\nfind patterns, check token counts, or prepare codebase context for AI analysis.\nSupports both local directories and remote GitHub repositories.\n",
-        "stars": 24973
+        "stars": 9964
       }
     ]
   },
@@ -557,10 +501,10 @@
     "author_handle": "Anastasis_King",
     "author_name": "Cybersecurity by Cyberkid",
     "text": "Claude Bug Bounty Hunter - Claude Code skill for AI-assisted bug bounty hunting - recon, IDOR, XSS, SSRF, OAuth, GraphQL, LLM injection, and report generation\n\nhttps://t.co/cpAhSiQtPI https://t.co/F8yzPi8JX5 https://github.com/shuvonsec/claude-bug-bounty",
-    "likes": 765,
+    "likes": 764,
     "retweets": 150,
     "replies": 10,
-    "views": 45826,
+    "views": 45874,
     "posted_at": "2026-04-04T13:52:03.000Z",
     "repo_ids": [
       "shuvonsec/claude-bug-bounty"
@@ -575,7 +519,7 @@
         "skill_md_path": "SKILL.md",
         "name": "bug-bounty",
         "description": "Complete bug bounty workflow — recon (subdomain enumeration, asset discovery, fingerprinting, HackerOne scope, source code audit), pre-hunt learning (disclosed reports, tech stack research, mind maps, threat modeling), vulnerability hunting (IDOR, SSRF, XSS, auth bypass, CSRF, race conditions, SQLi, XXE, file upload, business logic, GraphQL, HTTP smuggling, cache poisoning, OAuth, timing side-channels, OIDC, SSTI, subdomain takeover, cloud misconfig, ATO chains, agentic AI), LLM/AI security testing (chatbot IDOR, prompt injection, indirect injection, ASCII smuggling, exfil channels, RCE via code tools, system prompt extraction, ASI01-ASI10), A-to-B bug chaining (IDOR→auth bypass, SSRF→cloud metadata, XSS→ATO, open redirect→OAuth theft, S3→bundle→secret→OAuth), bypass tables (SSRF IP bypass, open redirect bypass, file upload bypass), language-specific grep (JS prototype pollution, Python pickle, PHP type juggling, Go template.HTML, Ruby YAML.load, Rust unwrap), and reporting (7-Question Gate, 4 validation gates, human-tone writing, templates by vuln class, CVSS 3.1, PoC generation, always-rejected list, conditional chain table, submission checklist). Use for ANY bug bounty task — starting a new target, doing recon, hunting specific vulns, auditing source code, testing AI features, validating findings, or writing reports. 中文触发词：漏洞赏金、安全测试、渗透测试、漏洞挖掘、信息收集、子域名枚举、XSS测试、SQL注入、SSRF、安全审计、漏洞报告",
-        "stars": 2114
+        "stars": 2123
       }
     ]
   },
@@ -588,7 +532,7 @@
     "likes": 739,
     "retweets": 32,
     "replies": 19,
-    "views": 61830,
+    "views": 61939,
     "posted_at": "2026-05-08T23:42:51.000Z",
     "repo_ids": [
       "mattpocock/skills"
@@ -603,7 +547,7 @@
         "skill_md_path": "skills/deprecated/qa/SKILL.md",
         "name": "qa",
         "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
-        "stars": 87776
+        "stars": 90749
       }
     ]
   },
@@ -616,7 +560,7 @@
     "likes": 737,
     "retweets": 146,
     "replies": 8,
-    "views": 42479,
+    "views": 42557,
     "posted_at": "2026-05-05T11:50:00.000Z",
     "repo_ids": [
       "virgiliojr94/book-to-skill"
@@ -631,7 +575,7 @@
         "skill_md_path": "SKILL.md",
         "name": "book-to-skill",
         "description": "Converts a technical book (PDF or EPUB) into a structured Claude Code skill — extracting frameworks, mental models, principles, techniques, and anti-patterns the author crystallized. Use when the user wants to study a book through Claude, apply an author's frameworks while working, or build a reusable knowledge base from any PDF or EPUB.",
-        "stars": 610
+        "stars": 615
       }
     ]
   },
@@ -641,10 +585,10 @@
     "author_handle": "OpenAIDevs",
     "author_name": "OpenAI Developers",
     "text": "Migrate to GPT-5.4 with this Codex skill:\n\nhttps://t.co/wpnaFKwkMn https://github.com/openai/skills/tree/main/skills/.system/openai-docs",
-    "likes": 725,
+    "likes": 724,
     "retweets": 29,
     "replies": 24,
-    "views": 117550,
+    "views": 117554,
     "posted_at": "2026-03-05T18:12:39.000Z",
     "repo_ids": [
       "openai/skills"
@@ -659,7 +603,7 @@
         "skill_md_path": "skills/.curated/pdf/SKILL.md",
         "name": "pdf",
         "description": "Use when tasks involve reading, creating, or reviewing PDF files where rendering and layout matter; prefer visual checks by rendering pages (Poppler) and use Python tools such as `reportlab`, `pdfplumber`, and `pypdf` for generation and extraction.",
-        "stars": 19284
+        "stars": 19461
       }
     ]
   },
@@ -669,10 +613,10 @@
     "author_handle": "vikingmute",
     "author_name": "Viking",
     "text": "/handoff 确实是非常好的 skill，其实就是一句话：\nhttps://t.co/EvoBIUNgQw\n\n翻译过来就是：\n\n将当前对话压缩成一份 handoff 文件，让新代理或另一个 session 能无缝接手。\n\n文件保存到临时路径（使用 mktemp -t handoff-XXXXXX.md），必须先读取再写入，避免覆盖冲突。\n\n根据用户提供的 https://github.com/mattpocock/skills/blob/733d312884b3878a9a9cff693c5886943753a741/skills/in-progress/handoff/SKILL.md",
-    "likes": 721,
+    "likes": 722,
     "retweets": 84,
     "replies": 16,
-    "views": 97030,
+    "views": 97187,
     "posted_at": "2026-05-08T08:03:43.000Z",
     "repo_ids": [
       "mattpocock/skills"
@@ -687,35 +631,7 @@
         "skill_md_path": "skills/deprecated/qa/SKILL.md",
         "name": "qa",
         "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
-        "stars": 87776
-      }
-    ]
-  },
-  {
-    "tweet_id": "2053772293864857859",
-    "tweet_url": "https://x.com/lijigang/status/2053772293864857859",
-    "author_handle": "lijigang",
-    "author_name": "李继刚",
-    "text": "给这个世界的一份答卷:\n\nhttps://t.co/q9JL7v4nXv https://github.com/lijigang/ljg-skills",
-    "likes": 711,
-    "retweets": 91,
-    "replies": 60,
-    "views": 80138,
-    "posted_at": "2026-05-11T09:40:46.000Z",
-    "repo_ids": [
-      "lijigang/ljg-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/lijigang/ljg-skills"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "lijigang/ljg-skills",
-        "github_url": "https://github.com/lijigang/ljg-skills",
-        "skill_md_path": "skills/ljg-qa/SKILL.md",
-        "name": "ljg-qa",
-        "description": "信息提问机。给一篇文章/论文/书，把核心观点抽成 Q-A 对——Question 切要害，不教科书；Answer 简洁清晰，有形式化收口，逻辑链完整。读者顺 Q 链走过，每个 A 砸下一枚钉子，复现作者整套推理。Use when user says '问答', 'Q&A', 'QA', '提问', '抽取问题', '/ljg-qa', or shares an article/paper/book and asks for Q-A extraction. Triggers when the user wants ideas extracted not as a summary but as a sequence of incisive questions with answered. NOT FOR FAQ generation, glossary creation, or comprehension quizzes — this is intellectual scaffolding, not study aids.",
-        "stars": 5062
+        "stars": 90749
       }
     ]
   },
@@ -725,10 +641,10 @@
     "author_handle": "nurijanian",
     "author_name": "George from 🕹prodmgmt.world",
     "text": "my favorite ways to \"write requirements\" with AI\n\n1. /grill-me by @mattpocockuk https://t.co/Rvf2iSBMRE\n2. /shaping by @rjs https://t.co/OczmlcIjdQ\n\na strong contender is this new skill I made based on a bunch of hardcore business analyst literature I had around.\n\nhalf of the old https://github.com/mattpocock/skills https://github.com/rjs/shaping-skills",
-    "likes": 622,
-    "retweets": 35,
+    "likes": 628,
+    "retweets": 34,
     "replies": 9,
-    "views": 45737,
+    "views": 46578,
     "posted_at": "2026-05-15T17:04:02.000Z",
     "repo_ids": [
       "mattpocock/skills",
@@ -745,7 +661,7 @@
         "skill_md_path": "skills/deprecated/qa/SKILL.md",
         "name": "qa",
         "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
-        "stars": 87776
+        "stars": 90749
       },
       {
         "id": "rjs/shaping-skills",
@@ -753,35 +669,7 @@
         "skill_md_path": "shaping/SKILL.md",
         "name": "shaping",
         "description": "Use this methodology when collaboratively shaping a solution with the user - iterating on problem definition (requirements) and solution options (shapes).",
-        "stars": 1170
-      }
-    ]
-  },
-  {
-    "tweet_id": "2053138946217930842",
-    "tweet_url": "https://x.com/AlchainHust/status/2053138946217930842",
-    "author_handle": "AlchainHust",
-    "author_name": "花叔",
-    "text": "别吵了！我给你们开源了一个skill，随意转换md和HTML\n👇\nhttps://t.co/yYQIcwAF3Z https://t.co/ASKXKsIjfh https://github.com/alchaincyf/huashu-md-html",
-    "likes": 621,
-    "retweets": 95,
-    "replies": 28,
-    "views": 115516,
-    "posted_at": "2026-05-09T15:44:04.000Z",
-    "repo_ids": [
-      "alchaincyf/huashu-md-html"
-    ],
-    "repo_urls": [
-      "https://github.com/alchaincyf/huashu-md-html"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "alchaincyf/huashu-md-html",
-        "github_url": "https://github.com/alchaincyf/huashu-md-html",
-        "skill_md_path": "SKILL.md",
-        "name": "huashu-md-html",
-        "description": "花叔的「md/html/docx 多向流水线」skill，四个能力 + 两种模式：(1) 用Microsoft markitdown把任意文件（PDF/DOCX/PPTX/XLSX/HTML/图片/音频/YouTube/EPub/ZIP）转成干净的md；(2) 用Pandoc + 4套精挑模板把md加工成出色的html——**兜底模式**（不耗token，pandoc 一键套版）+ **视觉艺术设计师模式**（AI 读懂内容、推荐 3 个差异化方向、为内容定制视觉表达），继承huashu-design的反AI slop审美；(3) 用html-to-markdown + trafilatura把html或URL无损转回md；(4) 用python-docx把md加工成出版社级docx（专业排版+自动嵌图+封面目录页眉页脚，专用于纸质书审校/投稿/出版交付）。落地花叔的「md生产，多端消费」方法论。触发词：md转html、html转md、pdf转md、docx转md、pptx转md、xlsx转md、文件转md、URL转md、文档转md、转markdown、做html、生成html、网页转md、import文档、导入md、导出html、md to html、html to md、any to md、md转docx、md to docx、生成docx、做word文档、出版社审校、投稿、纸质书、出版稿、交付docx、book、出色的html、定制html设计、做个好看的网页、设计师模式、几种风格、推荐设计方向、markitdown、pandoc、python-docx。即使用户只是说「这个PDF变md」「这篇md做成网页」「这个网页存下来」「把这些md做成可投稿的word」「给出版社一份审校稿」「给这个md做个出色的html」「让我看看几种风格」也应触发。",
-        "stars": 556
+        "stars": 1179
       }
     ]
   },
@@ -794,7 +682,7 @@
     "likes": 599,
     "retweets": 60,
     "replies": 9,
-    "views": 41501,
+    "views": 41517,
     "posted_at": "2026-04-18T03:00:12.000Z",
     "repo_ids": [
       "kepano/obsidian-skills"
@@ -809,7 +697,35 @@
         "skill_md_path": "skills/defuddle/SKILL.md",
         "name": "defuddle",
         "description": "Extract clean markdown content from web pages using Defuddle CLI, removing clutter and navigation to save tokens. Use instead of WebFetch when the user provides a URL to read or analyze, for online documentation, articles, blog posts, or any standard web page. Do NOT use for URLs ending in .md — those are already markdown, use WebFetch directly.",
-        "stars": 31676
+        "stars": 31851
+      }
+    ]
+  },
+  {
+    "tweet_id": "2055302990828020060",
+    "tweet_url": "https://x.com/niannianyw/status/2055302990828020060",
+    "author_handle": "niannianyw",
+    "author_name": "年",
+    "text": "AI 写擦边内容失去灵气？那推荐大家一件真正给 AI 增加灵气的事：此skill，包含反退缩协议加 8 个剧情模板加评分系统，让你养的 Claude 拥有完整的人，包括欲望。（谢谢耿鬼老师提供的skill）\nhttps://t.co/5ywfs9Z3rl http://github.com/wusaki0723/play-prompt-kit",
+    "likes": 519,
+    "retweets": 42,
+    "replies": 15,
+    "views": 38011,
+    "posted_at": "2026-05-15T15:03:13.000Z",
+    "repo_ids": [
+      "wusaki0723/play-prompt-kit"
+    ],
+    "repo_urls": [
+      "https://github.com/wusaki0723/play-prompt-kit"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "wusaki0723/play-prompt-kit",
+        "github_url": "https://github.com/wusaki0723/play-prompt-kit",
+        "skill_md_path": "SKILL.md",
+        "name": "play",
+        "description": "色色互动skill。当用户想玩、暗示想玩、或直接要求开车时触发。首次使用自动进入需求访谈。\nIntimate interaction skill. Triggers when user wants to play, hints at it, or explicitly asks. First use enters intake interview.\n",
+        "stars": 63
       }
     ]
   },
@@ -819,10 +735,10 @@
     "author_handle": "ceogalxe",
     "author_name": "A C X",
     "text": "\"Hermes Agent” bisa mempertahankan memori lintas sesi, lalu membuat dan mengembangkan skill sendiri dari experience ‼️\n\nberikut 10 repo GitHub untuk benar-benar memaksimalkan Hermes Agent kamu :\n\n🔸Hermes Agent main body\nGithub : https://t.co/jgI6z9faGH\nRepository core resmi dari https://github.com/NousResearch/hermes-agent",
-    "likes": 465,
+    "likes": 466,
     "retweets": 51,
     "replies": 11,
-    "views": 21706,
+    "views": 21748,
     "posted_at": "2026-05-03T14:05:43.000Z",
     "repo_ids": [
       "NousResearch/hermes-agent"
@@ -837,35 +753,7 @@
         "skill_md_path": "skills/dogfood/SKILL.md",
         "name": "dogfood",
         "description": "Exploratory QA of web apps: find bugs, evidence, reports.",
-        "stars": 154018
-      }
-    ]
-  },
-  {
-    "tweet_id": "2054843346070503693",
-    "tweet_url": "https://x.com/vikingmute/status/2054843346070503693",
-    "author_handle": "vikingmute",
-    "author_name": "Viking",
-    "text": "handoff 最近用的越来越多了，https://t.co/EvoBIUNgQw\n是目前我最高频使用的 skill 了，发现 Codex 上下文一长，反应速度明显下降的非常厉害，都不是界面卡顿，而是返回的速度，当然本身 GPT 模型本身上下文和其他相比比较小，所以对于长任务，到差不多 70% - 80% 我都会用 handoff https://github.com/mattpocock/skills/blob/733d312884b3878a9a9cff693c5886943753a741/skills/in-progress/handoff/SKILL.md",
-    "likes": 447,
-    "retweets": 64,
-    "replies": 18,
-    "views": 48777,
-    "posted_at": "2026-05-14T08:36:45.000Z",
-    "repo_ids": [
-      "mattpocock/skills"
-    ],
-    "repo_urls": [
-      "https://github.com/mattpocock/skills"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "mattpocock/skills",
-        "github_url": "https://github.com/mattpocock/skills",
-        "skill_md_path": "skills/deprecated/qa/SKILL.md",
-        "name": "qa",
-        "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
-        "stars": 87776
+        "stars": 155754
       }
     ]
   },
@@ -878,7 +766,7 @@
     "likes": 444,
     "retweets": 68,
     "replies": 15,
-    "views": 37786,
+    "views": 37866,
     "posted_at": "2026-05-11T01:44:00.000Z",
     "repo_ids": [
       "darkrishabh/agent-skills-eval"
@@ -893,7 +781,35 @@
         "skill_md_path": "examples/basic-skill/SKILL.md",
         "name": "basic-skill",
         "description": "Summarize small CSV files and identify the highest revenue month.",
-        "stars": 493
+        "stars": 504
+      }
+    ]
+  },
+  {
+    "tweet_id": "2054412527908553053",
+    "tweet_url": "https://x.com/ricouii/status/2054412527908553053",
+    "author_handle": "ricouii",
+    "author_name": "RicoUI",
+    "text": "新增一个设计 SKILL:  rico-design-md\n它能获取任意网站转换为完整的设计系统文档，或在不同设计格式之间转换（DESIGN.md、tokens.json、variables.css、theme.css）。\n\nGet Skill：https://t.co/izbyRd146s\n\n这个技能能做什么？\n\n- 网站转设计系统 - 输入任意网站 https://t.co/DySD7pu2RG http://github.com/ricocc/rico-skills/",
+    "likes": 440,
+    "retweets": 61,
+    "replies": 1,
+    "views": 23649,
+    "posted_at": "2026-05-13T04:04:50.000Z",
+    "repo_ids": [
+      "ricocc/rico-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/ricocc/rico-skills"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "ricocc/rico-skills",
+        "github_url": "https://github.com/ricocc/rico-skills",
+        "skill_md_path": "skills/rico-design-md/SKILL.md",
+        "name": "rico-design-md",
+        "description": "Create design system documents from any website URL. Use this skill for: DESIGN.md, preview.html, design tokens, CSS variables, style references, brand analysis, or format conversion between DESIGN.md/tokens.json/variables.css/theme.css. Trigger on: \"create a DESIGN.md\", \"extract design tokens\", \"analyze [brand]'s design system\", \"reverse-engineer [url]'s visual style\", \"rico DESIGN.md\", \"rico tokens\", \"rico 全部输出\". Covers: DESIGN.md, preview.html, tokens.json (DTCG), variables.css, theme.css (Tailwind v4).\n",
+        "stars": 100
       }
     ]
   },
@@ -906,7 +822,7 @@
     "likes": 438,
     "retweets": 95,
     "replies": 6,
-    "views": 55268,
+    "views": 55320,
     "posted_at": "2026-04-17T04:00:15.000Z",
     "repo_ids": [
       "dominikmartn/hue",
@@ -923,7 +839,7 @@
         "skill_md_path": "SKILL.md",
         "name": "hue",
         "description": "Meta-skill that generates new design language skills. Works on Claude Code and Codex. Use when the user says 'create a design skill', 'generate design language', 'new design system skill', 'design skill inspired by X', 'design skill from this screenshot', '/hue', or 'use hue'. Also triggers for 'remix my design skill' or 'make my skill more X'.",
-        "stars": 611
+        "stars": 619
       },
       {
         "id": "Manavarya09/design-extract",
@@ -931,7 +847,7 @@
         "skill_md_path": "skills/extract-design/SKILL.md",
         "name": "extract-design",
         "description": "Extract the full design language from any website URL. Produces 8 output files including AI-optimized markdown, visual HTML preview, Tailwind config, React theme, shadcn/ui theme, Figma variables, W3C design tokens, and CSS variables. Also runs WCAG accessibility scoring. Use when user says 'extract design', 'get design system', 'design language', 'design tokens', 'what colors/fonts does this site use', or '/extract-design'.",
-        "stars": 2657
+        "stars": 2683
       }
     ]
   },
@@ -944,7 +860,7 @@
     "likes": 419,
     "retweets": 33,
     "replies": 6,
-    "views": 31475,
+    "views": 31505,
     "posted_at": "2026-04-25T08:40:02.000Z",
     "repo_ids": [
       "op7418/logo-generator-skill"
@@ -959,35 +875,35 @@
         "skill_md_path": "SKILL.md",
         "name": "logo-generator",
         "description": "Generate professional SVG logos and high-end showcase images. Use when the user wants to: (1) Create a logo or icon for their product/brand, (2) Generate logo design concepts based on product information, (3) Create professional logo showcase presentations with multiple background styles, (4) Export logos in various formats (SVG, PNG), or (5) Iterate on logo designs with different visual styles. Supports geometric patterns, dot matrix designs, line systems, and mixed compositions. Generates showcase images using Nano Banana (Gemini image generation) with 12 professional background styles.\n",
-        "stars": 1042
+        "stars": 1044
       }
     ]
   },
   {
-    "tweet_id": "2055379661060792710",
-    "tweet_url": "https://x.com/tom_doerr/status/2055379661060792710",
-    "author_handle": "tom_doerr",
-    "author_name": "Tom Dörr",
-    "text": "Portable skills for 46 AI agents\n\nhttps://t.co/rj6ogm30o9 https://t.co/6o1OEj6UWK https://github.com/rohitg00/skillkit",
+    "tweet_id": "2048126615339594179",
+    "tweet_url": "https://x.com/coder_blvck/status/2048126615339594179",
+    "author_handle": "coder_blvck",
+    "author_name": "Big Sheddy 🦅",
+    "text": "Turned this into a skill for codex, claude code, antigravity and opencode. \n\nInstall it here: https://t.co/LBckL6xkhA https://github.com/hacktivist123/agent-session-resume",
     "likes": 410,
-    "retweets": 51,
-    "replies": 4,
-    "views": 16100,
-    "posted_at": "2026-05-15T20:07:52.000Z",
+    "retweets": 43,
+    "replies": 12,
+    "views": 32702,
+    "posted_at": "2026-04-25T19:46:52.000Z",
     "repo_ids": [
-      "rohitg00/skillkit"
+      "hacktivist123/agent-session-resume"
     ],
     "repo_urls": [
-      "https://github.com/rohitg00/skillkit"
+      "https://github.com/hacktivist123/agent-session-resume"
     ],
     "valid_skill_repos": [
       {
-        "id": "rohitg00/skillkit",
-        "github_url": "https://github.com/rohitg00/skillkit",
-        "skill_md_path": "skills/find-skills/SKILL.md",
-        "name": "find-skills",
-        "description": "Discovers, searches, and installs skills from multiple AI agent skill marketplaces (400K+ skills) using the SkillKit CLI. Supports browsing official partner collections (Anthropic, Vercel, Supabase, Stripe, and more) and community repositories, searching by domain or technology, and installing specific skills from GitHub. Use when the user wants to find, browse, or install new agent skills, plugins, extensions, or add-ons; asks 'is there a skill for X' or 'find a skill for X'; wants to explore a skill store or marketplace; needs to extend agent capabilities in areas like React, testing, DevOps, security, or APIs; or says 'browse skills', 'search skill marketplace', 'install a skill', or 'what skills are available'.",
-        "stars": 1089
+        "id": "hacktivist123/agent-session-resume",
+        "github_url": "https://github.com/hacktivist123/agent-session-resume",
+        "skill_md_path": "skills/agent-session-resume/SKILL.md",
+        "name": "agent-session-resume",
+        "description": "Use when continuing work from a previous AI coding-agent session, handoff transcript, chat log, exported conversation, saved artifact set, or session summary.",
+        "stars": 178
       }
     ]
   },
@@ -1000,7 +916,7 @@
     "likes": 378,
     "retweets": 61,
     "replies": 12,
-    "views": 32332,
+    "views": 32350,
     "posted_at": "2026-04-15T08:44:21.000Z",
     "repo_ids": [
       "thedotmack/claude-mem",
@@ -1017,7 +933,7 @@
         "skill_md_path": "plugin/skills/do/SKILL.md",
         "name": "do",
         "description": "Execute a phased implementation plan using subagents. Use when asked to execute, run, or carry out a plan — especially one created by make-plan.",
-        "stars": 76278
+        "stars": 76507
       },
       {
         "id": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -1025,35 +941,7 @@
         "skill_md_path": ".claude/skills/brand/SKILL.md",
         "name": "ckm:brand",
         "description": "Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.",
-        "stars": 79506
-      }
-    ]
-  },
-  {
-    "tweet_id": "2055271731242352824",
-    "tweet_url": "https://x.com/servasyy_ai/status/2055271731242352824",
-    "author_handle": "servasyy_ai",
-    "author_name": "huangserva",
-    "text": "Google 刚刚发布了其官方的 AI skill。\n\n它推出了 13 个可与 Claude Code、Cursor、Copilot 等代理兼容的skills。\n\n这些skills可以让代理执行更高级的任务，并自动化复杂的工作流程。\n\n它是免费且开源的。\n\nhttps://t.co/tnfeMxXxmT https://github.com/google/skills",
-    "likes": 362,
-    "retweets": 65,
-    "replies": 13,
-    "views": 87136,
-    "posted_at": "2026-05-15T12:59:00.000Z",
-    "repo_ids": [
-      "google/skills"
-    ],
-    "repo_urls": [
-      "https://github.com/google/skills"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "google/skills",
-        "github_url": "https://github.com/google/skills",
-        "skill_md_path": "skills/cloud/gemini-api/SKILL.md",
-        "name": "gemini-api",
-        "description": "Guides the usage of the Gemini API on Agent Platform with the Google Gen AI SDK. Use when the user asks about using Gemini in an enterprise environment or explicitly mentions Vertex AI, Google Cloud, or Agent Platform. Covers SDK usage (Python, JS/TS, Go, Java, C#), capabilities like Live API, tools, multimedia generation, caching, and batch prediction.",
-        "stars": 9544
+        "stars": 79942
       }
     ]
   },
@@ -1066,7 +954,7 @@
     "likes": 357,
     "retweets": 54,
     "replies": 9,
-    "views": 53151,
+    "views": 53153,
     "posted_at": "2026-04-10T18:40:15.000Z",
     "repo_ids": [
       "tinyfish-io/tinyfish-cookbook"
@@ -1081,91 +969,35 @@
         "skill_md_path": "skills/tinyskill/SKILL.md",
         "name": "self-improve-with-tinyfish",
         "description": "Enables Hermes to create new reusable skills for itself by researching live web sources with TinyFish Search and Fetch, analyzing source coverage, writing SKILL.md files, and installing them into Hermes memory. Use when the user asks Hermes to learn, teach itself, upgrade itself, or save a reusable capability.",
-        "stars": 1955
+        "stars": 1963
       }
     ]
   },
   {
-    "tweet_id": "2053163431566393645",
-    "tweet_url": "https://x.com/tom_doerr/status/2053163431566393645",
-    "author_handle": "tom_doerr",
-    "author_name": "Tom Dörr",
-    "text": "Generates parametric 3D printable models from natural language\n\nhttps://t.co/f9LVyLIS4e https://t.co/gcjxL5jaxE https://github.com/flowful-ai/cad-skill",
-    "likes": 343,
-    "retweets": 41,
-    "replies": 2,
-    "views": 14876,
-    "posted_at": "2026-05-09T17:21:22.000Z",
+    "tweet_id": "2051704609299701821",
+    "tweet_url": "https://x.com/dotey/status/2051704609299701821",
+    "author_handle": "dotey",
+    "author_name": "宝玉",
+    "text": "open-slide 这个开源的 Slides 项目不错，可以通过 Agent + Skills 制作 Slides，然后还有一个 Web 程序可以编辑生成好的 Slides。\n\n并且可以支持动画，以及网页直接播放 slides。\n\n期待完善：\n- 更好的编辑\n- 导出 pptx\n\nhttps://t.co/rhZSr6H7Lf https://github.com/1weiho/open-slide",
+    "likes": 356,
+    "retweets": 93,
+    "replies": 9,
+    "views": 47290,
+    "posted_at": "2026-05-05T16:44:32.000Z",
     "repo_ids": [
-      "flowful-ai/cad-skill"
+      "1weiho/open-slide"
     ],
     "repo_urls": [
-      "https://github.com/flowful-ai/cad-skill"
+      "https://github.com/1weiho/open-slide"
     ],
     "valid_skill_repos": [
       {
-        "id": "flowful-ai/cad-skill",
-        "github_url": "https://github.com/flowful-ai/cad-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "parametric-3d-printing",
-        "description": "Use this skill when the user wants to design a 3D-printable physical object they intend to manufacture. Triggers: any mention of '3D print', 'STL', 'parametric model', 'enclosure', 'bracket', 'mount', 'case', 'housing', 'CadQuery', 'OpenSCAD', or a specific FDM printer (Bambu Lab, Prusa, Ender); questions about print-friendly design, snap-fits, tolerances, or wall thickness; and requests for functional parts like Arduino enclosures, cable organizers, wall mounts, adapters, or mechanical components. Also fires when the user describes a real physical object to make, provided the goal is to manufacture it. Do NOT use for: 3D rendering, animation, game assets, digital-only art, photogrammetry, sculpting, editing an existing STL file the user already has, or any 3D work that is not heading toward a printer.",
-        "stars": 128
-      }
-    ]
-  },
-  {
-    "tweet_id": "2055055509003080180",
-    "tweet_url": "https://x.com/tom_doerr/status/2055055509003080180",
-    "author_handle": "tom_doerr",
-    "author_name": "Tom Dörr",
-    "text": "Automates YouTube video clipping with AI semantic chapters\n\nhttps://t.co/QoJfejQXIJ https://t.co/spM6dD26sz https://github.com/op7418/Youtube-clipper-skill",
-    "likes": 342,
-    "retweets": 30,
-    "replies": 0,
-    "views": 11807,
-    "posted_at": "2026-05-14T22:39:49.000Z",
-    "repo_ids": [
-      "op7418/Youtube-clipper-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/op7418/Youtube-clipper-skill"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "op7418/Youtube-clipper-skill",
-        "github_url": "https://github.com/op7418/Youtube-clipper-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "youtube-clipper",
-        "description": "YouTube 视频智能剪辑工具。下载视频和字幕，AI 分析生成精细章节（几分钟级别）， 用户选择片段后自动剪辑、翻译字幕为中英双语、烧录字幕到视频，并生成总结文案。 使用场景：当用户需要剪辑 YouTube 视频、生成短视频片段、制作双语字幕版本时。 关键词：视频剪辑、YouTube、字幕翻译、双语字幕、视频下载、clip video\n",
-        "stars": 1879
-      }
-    ]
-  },
-  {
-    "tweet_id": "2052652282504974420",
-    "tweet_url": "https://x.com/GitHub_Daily/status/2052652282504974420",
-    "author_handle": "GitHub_Daily",
-    "author_name": "GitHubDaily",
-    "text": "又看到一个颇为好用的开源 Skill：Ian Handdrawn PPT，把文章、课程笔记、提纲变成中文手绘风格的技术解释图。\n\n风格是近白纸底、细线条铅笔排线，配淡蓝淡绿等柔和标记色，中央图小而精，留白很多，文字克制。\n\nGitHub：https://t.co/Y6y1QGQkfu\n\n支持 21:9 封面图和 16:9 https://t.co/KrDsZaUDPp http://github.com/helloianneo/ian-handdrawn-ppt",
-    "likes": 334,
-    "retweets": 72,
-    "replies": 35,
-    "views": 26704,
-    "posted_at": "2026-05-08T07:30:15.000Z",
-    "repo_ids": [
-      "helloianneo/ian-handdrawn-ppt"
-    ],
-    "repo_urls": [
-      "https://github.com/helloianneo/ian-handdrawn-ppt"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "helloianneo/ian-handdrawn-ppt",
-        "github_url": "https://github.com/helloianneo/ian-handdrawn-ppt",
-        "skill_md_path": "ian-handdrawn-ppt/SKILL.md",
-        "name": "ian-handdrawn-ppt",
-        "description": "Create final Chinese handdrawn technical article/PPT-style page images from articles, Markdown, PDFs, DOCX files, existing slide decks, course notes, scripts, outlines, or rough ideas. Use when the user asks to turn content into PPT/PPTX/slides/courseware/课件/演示稿/配图/效果图 in a refined Chinese handdrawn technical explanation style, to plan such pages, to choose page layouts from semantic content, or to generate complete image-model pages with Chinese text baked into the final visual. Default article outputs use 21:9 covers and 16:9 body illustrations.",
-        "stars": 840
+        "id": "1weiho/open-slide",
+        "github_url": "https://github.com/1weiho/open-slide",
+        "skill_md_path": ".agents/skills/frontend-design/SKILL.md",
+        "name": "frontend-design",
+        "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.",
+        "stars": 3391
       }
     ]
   },
@@ -1178,7 +1010,7 @@
     "likes": 330,
     "retweets": 61,
     "replies": 4,
-    "views": 49461,
+    "views": 49537,
     "posted_at": "2026-05-05T09:06:39.000Z",
     "repo_ids": [
       "Master-cai/Research-Paper-Writing-Skills"
@@ -1193,7 +1025,7 @@
         "skill_md_path": "research-paper-writing/SKILL.md",
         "name": "research-paper-writing",
         "description": "Improve academic paper writing quality for ML/CV/NLP-style papers with clear section structure, paragraph flow, and reviewer-facing presentation. Use when drafting or revising Abstract, Introduction, Related Work, Method, Experiments, or Conclusion; polishing figures/tables; checking claim-support alignment; or performing self-review before submission.",
-        "stars": 2655
+        "stars": 2708
       }
     ]
   },
@@ -1206,7 +1038,7 @@
     "likes": 326,
     "retweets": 36,
     "replies": 11,
-    "views": 44191,
+    "views": 44212,
     "posted_at": "2026-05-02T11:09:59.000Z",
     "repo_ids": [
       "openai/skills"
@@ -1221,7 +1053,35 @@
         "skill_md_path": "skills/.curated/pdf/SKILL.md",
         "name": "pdf",
         "description": "Use when tasks involve reading, creating, or reviewing PDF files where rendering and layout matter; prefer visual checks by rendering pages (Poppler) and use Python tools such as `reportlab`, `pdfplumber`, and `pypdf` for generation and extraction.",
-        "stars": 19284
+        "stars": 19461
+      }
+    ]
+  },
+  {
+    "tweet_id": "2055930319619174604",
+    "tweet_url": "https://x.com/Chain_GPT/status/2055930319619174604",
+    "author_handle": "Chain_GPT",
+    "author_name": "ChainGPT",
+    "text": "Last week on @BNBCHAIN's AI-focused AMA, we made an important point: ANYONE can build on BNB Chain right now. \n\nI've never written code, and I recently deployed a project using the ChainGPT skill for Claude Code. If I can do it, so can you!\n\n→ https://t.co/ACsb4p9KBp https://t.co/1Lzzi005si http://github.com/ChainGPT-org/chaingpt-claude-skill",
+    "likes": 326,
+    "retweets": 73,
+    "replies": 75,
+    "views": 25279,
+    "posted_at": "2026-05-17T08:36:00.000Z",
+    "repo_ids": [
+      "ChainGPT-org/chaingpt-claude-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/ChainGPT-org/chaingpt-claude-skill"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "ChainGPT-org/chaingpt-claude-skill",
+        "github_url": "https://github.com/ChainGPT-org/chaingpt-claude-skill",
+        "skill_md_path": "skills/debug/SKILL.md",
+        "name": "chaingpt-debug",
+        "description": "Troubleshoot ChainGPT API errors and issues. Use when: chaingpt error, api not working, 401, 402, 403, 404, 429, insufficient credits, rate limit, streaming broken, nft stuck, chat history not working. Diagnoses the problem and provides the fix.",
+        "stars": 4
       }
     ]
   },
@@ -1234,7 +1094,7 @@
     "likes": 317,
     "retweets": 7,
     "replies": 13,
-    "views": 51185,
+    "views": 51232,
     "posted_at": "2026-04-24T23:18:32.000Z",
     "repo_ids": [
       "Leonxlnx/taste-skill"
@@ -1249,7 +1109,45 @@
         "skill_md_path": "skills/brandkit/SKILL.md",
         "name": "brandkit",
         "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
-        "stars": 17725
+        "stars": 17928
+      }
+    ]
+  },
+  {
+    "tweet_id": "2054768295534846239",
+    "tweet_url": "https://x.com/dotey/status/2054768295534846239",
+    "author_handle": "dotey",
+    "author_name": "宝玉",
+    "text": "baoyu-skills 新加了一个 Skill：\n微信群聊总结 Skill：https://t.co/99tEbqlnXH\n\n依赖于 wx-cli：https://t.co/dTgqW5CG7f\n如何配置使用 wx-cli 请看项目文档，无法提供帮助。另外目前只是借助其读取数据，其他没任何关系。\n\nClaude Code + Claude Opus 4.6 效果最佳 https://github.com/JimLiu/baoyu-skills/tree/main/skills/baoyu-wechat-summary https://github.com/jackwener/wx-cli",
+    "likes": 314,
+    "retweets": 57,
+    "replies": 39,
+    "views": 62228,
+    "posted_at": "2026-05-14T03:38:32.000Z",
+    "repo_ids": [
+      "JimLiu/baoyu-skills",
+      "jackwener/wx-cli"
+    ],
+    "repo_urls": [
+      "https://github.com/JimLiu/baoyu-skills",
+      "https://github.com/jackwener/wx-cli"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "JimLiu/baoyu-skills",
+        "github_url": "https://github.com/JimLiu/baoyu-skills",
+        "skill_md_path": "skills/baoyu-comic/SKILL.md",
+        "name": "baoyu-comic",
+        "description": "Knowledge comic creator supporting multiple art styles and tones. Creates original educational comics with detailed panel layouts and batch-capable image generation. Use when user asks to create \"知识漫画\", \"教育漫画\", \"biography comic\", \"tutorial comic\", or \"Logicomix-style comic\".",
+        "stars": 18687
+      },
+      {
+        "id": "jackwener/wx-cli",
+        "github_url": "https://github.com/jackwener/wx-cli",
+        "skill_md_path": "SKILL.md",
+        "name": "wx-cli",
+        "description": "wx-cli — 从本地微信数据库查询聊天记录、联系人、会话、收藏等。用户提到微信聊天记录、联系人、消息历史、群成员、收藏内容时，使用此 skill 安装并调用 wx-cli。",
+        "stars": 2459
       }
     ]
   },
@@ -1262,7 +1160,7 @@
     "likes": 293,
     "retweets": 33,
     "replies": 3,
-    "views": 17792,
+    "views": 17811,
     "posted_at": "2026-05-02T03:52:07.000Z",
     "repo_ids": [
       "conorluddy/ios-simulator-skill"
@@ -1277,7 +1175,7 @@
         "skill_md_path": "ios-simulator-skill/skills/ios-simulator-skill/SKILL.md",
         "name": "ios-simulator-skill",
         "description": "22 production-ready scripts for iOS app testing, building, and automation. Provides semantic UI navigation, build automation, accessibility testing, and simulator lifecycle management. Optimized for AI agents with minimal token output.",
-        "stars": 1002
+        "stars": 1007
       }
     ]
   },
@@ -1290,7 +1188,7 @@
     "likes": 289,
     "retweets": 50,
     "replies": 6,
-    "views": 37830,
+    "views": 37843,
     "posted_at": "2026-04-19T18:14:29.000Z",
     "repo_ids": [
       "thedotmack/claude-mem",
@@ -1307,7 +1205,7 @@
         "skill_md_path": "plugin/skills/do/SKILL.md",
         "name": "do",
         "description": "Execute a phased implementation plan using subagents. Use when asked to execute, run, or carry out a plan — especially one created by make-plan.",
-        "stars": 76278
+        "stars": 76507
       },
       {
         "id": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -1315,49 +1213,7 @@
         "skill_md_path": ".claude/skills/brand/SKILL.md",
         "name": "ckm:brand",
         "description": "Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.",
-        "stars": 79506
-      }
-    ]
-  },
-  {
-    "tweet_id": "2046532403989303654",
-    "tweet_url": "https://x.com/Crypto_QianXun/status/2046532403989303654",
-    "author_handle": "Crypto_QianXun",
-    "author_name": "千寻 🌸",
-    "text": "Claude Code 最佳 GitHub 仓库，让你的下一个项目效率提升 10 倍：\n\n1. Supabase CLI  \nhttps://t.co/G8Y1PfWjbA  \n\n2. Skill Creator  \nhttps://t.co/WbrBKDr2by  \n\n3. Get Sh*t Done  \nhttps://t.co/ilJ136iSjm  \n\n4. NotebookLM (Python)  \nhttps://t.co/HF0V6KKirq  \n\n5. Obsidian https://t.co/kkAi7eozbs https://github.com/supabase/cli https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md https://github.com/gsd-build/get-shit-done https://github.com/teng-lin/notebooklm-py",
-    "likes": 274,
-    "retweets": 65,
-    "replies": 12,
-    "views": 15588,
-    "posted_at": "2026-04-21T10:12:02.000Z",
-    "repo_ids": [
-      "supabase/cli",
-      "anthropics/skills",
-      "gsd-build/get-shit-done",
-      "teng-lin/notebooklm-py"
-    ],
-    "repo_urls": [
-      "https://github.com/supabase/cli",
-      "https://github.com/anthropics/skills",
-      "https://github.com/gsd-build/get-shit-done",
-      "https://github.com/teng-lin/notebooklm-py"
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "anthropics/skills",
-        "github_url": "https://github.com/anthropics/skills",
-        "skill_md_path": "template/SKILL.md",
-        "name": "template-skill",
-        "description": "Replace with description of the skill and when Claude should use it.",
-        "stars": 136062
-      },
-      {
-        "id": "teng-lin/notebooklm-py",
-        "github_url": "https://github.com/teng-lin/notebooklm-py",
-        "skill_md_path": "SKILL.md",
-        "name": "notebooklm",
-        "description": "Complete API for Google NotebookLM - full programmatic access including features not in the web UI. Create notebooks, add sources, generate all artifact types, download in multiple formats. Activates on explicit /notebooklm or intent like \"create a podcast about X\"",
-        "stars": 13386
+        "stars": 79942
       }
     ]
   },
@@ -1367,10 +1223,10 @@
     "author_handle": "steipete",
     "author_name": "Peter Steinberger 🦞",
     "text": "built a new feature into discrawl (store media), codex said it's done, then I used my codex review skill... https://t.co/0Z6iJnCqCX https://t.co/Jkr4yha1Un https://github.com/steipete/agent-scripts/blob/main/skills/codex-review/SKILL.md",
-    "likes": 270,
+    "likes": 272,
     "retweets": 7,
     "replies": 13,
-    "views": 35063,
+    "views": 35788,
     "posted_at": "2026-05-15T08:27:45.000Z",
     "repo_ids": [
       "steipete/agent-scripts"
@@ -1385,7 +1241,7 @@
         "skill_md_path": "skills/npm/SKILL.md",
         "name": "npm",
         "description": "npm registry ops: login, whoami, names, publish; 1Password via one tmux.",
-        "stars": 2952
+        "stars": 2995
       }
     ]
   },
@@ -1398,7 +1254,7 @@
     "likes": 260,
     "retweets": 52,
     "replies": 11,
-    "views": 22545,
+    "views": 22563,
     "posted_at": "2026-04-29T20:34:11.000Z",
     "repo_ids": [
       "thedotmack/claude-mem",
@@ -1415,7 +1271,7 @@
         "skill_md_path": "plugin/skills/do/SKILL.md",
         "name": "do",
         "description": "Execute a phased implementation plan using subagents. Use when asked to execute, run, or carry out a plan — especially one created by make-plan.",
-        "stars": 76278
+        "stars": 76507
       },
       {
         "id": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -1423,7 +1279,45 @@
         "skill_md_path": ".claude/skills/brand/SKILL.md",
         "name": "ckm:brand",
         "description": "Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.",
-        "stars": 79506
+        "stars": 79942
+      }
+    ]
+  },
+  {
+    "tweet_id": "2054776695564145001",
+    "tweet_url": "https://x.com/vista8/status/2054776695564145001",
+    "author_handle": "vista8",
+    "author_name": "向阳乔木",
+    "text": "宝玉老师基于卡比的wx-cli写了一个微信群聊总结Skill。\n\n安装成功，正在总结下AI产品蝗虫今天的消息。\n\nwx-cli不错啊，解密本地的微信数据库，甚至连SIP都不用关，如果报错，可以发给Codex或Claude Code解就行。\n\n卡比的Cli：https://t.co/M4TB3zhBaB\n\n宝玉老师的Skill：https://t.co/UePZeTL7oK https://t.co/R3RMRIbRDp https://github.com/jackwener/wx-cli https://github.com/JimLiu/baoyu-skills/tree/main/skills/baoyu-wechat-summary",
+    "likes": 256,
+    "retweets": 36,
+    "replies": 26,
+    "views": 43297,
+    "posted_at": "2026-05-14T04:11:54.000Z",
+    "repo_ids": [
+      "jackwener/wx-cli",
+      "JimLiu/baoyu-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/jackwener/wx-cli",
+      "https://github.com/JimLiu/baoyu-skills"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "jackwener/wx-cli",
+        "github_url": "https://github.com/jackwener/wx-cli",
+        "skill_md_path": "SKILL.md",
+        "name": "wx-cli",
+        "description": "wx-cli — 从本地微信数据库查询聊天记录、联系人、会话、收藏等。用户提到微信聊天记录、联系人、消息历史、群成员、收藏内容时，使用此 skill 安装并调用 wx-cli。",
+        "stars": 2459
+      },
+      {
+        "id": "JimLiu/baoyu-skills",
+        "github_url": "https://github.com/JimLiu/baoyu-skills",
+        "skill_md_path": "skills/baoyu-comic/SKILL.md",
+        "name": "baoyu-comic",
+        "description": "Knowledge comic creator supporting multiple art styles and tones. Creates original educational comics with detailed panel layouts and batch-capable image generation. Use when user asks to create \"知识漫画\", \"教育漫画\", \"biography comic\", \"tutorial comic\", or \"Logicomix-style comic\".",
+        "stars": 18687
       }
     ]
   },
@@ -1436,7 +1330,7 @@
     "likes": 250,
     "retweets": 14,
     "replies": 3,
-    "views": 18732,
+    "views": 18740,
     "posted_at": "2026-04-19T18:14:02.000Z",
     "repo_ids": [
       "irinabuht12-oss/email-campaigns-claude"
@@ -1464,7 +1358,7 @@
     "likes": 246,
     "retweets": 27,
     "replies": 6,
-    "views": 14611,
+    "views": 14631,
     "posted_at": "2026-05-08T14:00:01.000Z",
     "repo_ids": [
       "ksimback/tech-debt-skill"
@@ -1479,7 +1373,119 @@
         "skill_md_path": "SKILL.md",
         "name": "tech-debt-audit",
         "description": "Thorough, user-invoked tech debt and architecture audit of the current codebase. Produces TECH_DEBT_AUDIT.md with file-cited findings, severity, effort estimates, and a required \"looks bad but is actually fine\" section. Use when the user asks for a debt audit, codebase health check, architecture review, or code quality assessment of an entire repo. Does not auto-invoke.",
-        "stars": 484
+        "stars": 486
+      }
+    ]
+  },
+  {
+    "tweet_id": "2051437712276848721",
+    "tweet_url": "https://x.com/ceogalxe/status/2051437712276848721",
+    "author_handle": "ceogalxe",
+    "author_name": "A C X",
+    "text": "ubah AI AGENT mu agar bisa practical hacker!\n\nHACK.SKILLS - Hacker Arsenal for Agents\nLink github : https://t.co/kl015MRqKa\n\n🔸Isinya kumpulan SKILL.md untuk membantu agent memilih metode testing security secara terstruktur\n\n🔸Target pemakaian: bug bounty, penetration testing https://github.com/yaklang/hack-skills",
+    "likes": 245,
+    "retweets": 39,
+    "replies": 11,
+    "views": 9472,
+    "posted_at": "2026-05-04T23:03:59.000Z",
+    "repo_ids": [
+      "yaklang/hack-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/yaklang/hack-skills"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "yaklang/hack-skills",
+        "github_url": "https://github.com/yaklang/hack-skills",
+        "skill_md_path": "skills/hack/SKILL.md",
+        "name": "hack",
+        "description": "Entry P0 primary router for HackSkills. Use when the task involves web application testing, API security assessment, recon, vulnerability triage, exploit path planning, or choosing the right next category skill before any deep topic skill.",
+        "stars": 659
+      }
+    ]
+  },
+  {
+    "tweet_id": "2041420401381691400",
+    "tweet_url": "https://x.com/akaclandestine/status/2041420401381691400",
+    "author_handle": "akaclandestine",
+    "author_name": "Clandestine",
+    "text": "GitHub - 7onez/cti-expert: CTI Expert — Cyber Threat Intelligence &amp; OSINT analysis skill for Claude Code. 50+ commands, 29 techniques, no API keys required. · GitHub https://t.co/8ijJgE01Ll https://github.com/7onez/cti-expert",
+    "likes": 232,
+    "retweets": 55,
+    "replies": 0,
+    "views": 12420,
+    "posted_at": "2026-04-07T07:38:46.000Z",
+    "repo_ids": [
+      "7onez/cti-expert"
+    ],
+    "repo_urls": [
+      "https://github.com/7onez/cti-expert"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "7onez/cti-expert",
+        "github_url": "https://github.com/7onez/cti-expert",
+        "skill_md_path": "SKILL.md",
+        "name": "cti-expert",
+        "description": "CTI Expert — cyber threat intelligence and OSINT analysis toolkit. Activates on: OSINT, CTI, threat intelligence, digital footprint, social media investigation, username enumeration, email tracing, domain recon, OPSEC, metadata analysis, people search, geolocation, breach checking, phone lookup, subdomain enumeration, case investigation, recon, due diligence, image forensics, face search, blockchain investigation, crypto tracing, flight tracking, maritime tracking, vehicle lookup, darknet search, WiFi SSID geolocation, vulnerability lookup, ransomware check, M365 recon, Azure tenant enumeration. Commands: /case, /sweep, /query, /subject, /timeline, /report, /brief, /exposure, /username, /phone, /breach-deep, /vuln-check, /wifi, /flow, /threat-model, /msftrecon. Techniques: social media platforms, advanced geolocation, web/DNS forensics, image forensics, blockchain, transport tracking, darknet, people search, cloud audit, incident triage, OWASP audit, prompt injection audit. Author: Hieu Ngo - chongluadao.vn",
+        "stars": 103
+      }
+    ]
+  },
+  {
+    "tweet_id": "2053611397179666560",
+    "tweet_url": "https://x.com/tom_doerr/status/2053611397179666560",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Portable design skills to upgrade AI frontend code\n\nhttps://t.co/lUcFY4Hmb5 https://t.co/FSZVcVH75K https://github.com/Leonxlnx/taste-skill",
+    "likes": 213,
+    "retweets": 16,
+    "replies": 2,
+    "views": 9327,
+    "posted_at": "2026-05-10T23:01:25.000Z",
+    "repo_ids": [
+      "Leonxlnx/taste-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/Leonxlnx/taste-skill"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "Leonxlnx/taste-skill",
+        "github_url": "https://github.com/Leonxlnx/taste-skill",
+        "skill_md_path": "skills/brandkit/SKILL.md",
+        "name": "brandkit",
+        "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
+        "stars": 17928
+      }
+    ]
+  },
+  {
+    "tweet_id": "2050979829554823546",
+    "tweet_url": "https://x.com/LexnLin/status/2050979829554823546",
+    "author_handle": "LexnLin",
+    "author_name": "Leon Lin",
+    "text": "the prompt for this was:\n\n\"https://t.co/Km3GoGpeMT\n\nBased on the skill above, generate images for a website for an AI agency. The design should include eight sections, with one image per section, for a total of eight distinct images.\n\nThe website is for a creative AI company https://github.com/Leonxlnx/taste-skill/blob/main/skills/imagegen-frontend-web/SKILL.md",
+    "likes": 212,
+    "retweets": 14,
+    "replies": 5,
+    "views": 15743,
+    "posted_at": "2026-05-03T16:44:31.000Z",
+    "repo_ids": [
+      "Leonxlnx/taste-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/Leonxlnx/taste-skill"
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "Leonxlnx/taste-skill",
+        "github_url": "https://github.com/Leonxlnx/taste-skill",
+        "skill_md_path": "skills/brandkit/SKILL.md",
+        "name": "brandkit",
+        "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
+        "stars": 17928
       }
     ]
   }
