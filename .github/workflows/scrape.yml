@@ -87,14 +87,17 @@ jobs:
       - name: Verify published data
         run: node ./scripts/verify-published-data.mjs
 
+      - name: Reset transient health snapshot
+        run: git checkout -- site/data/health.json
+
       - name: Commit if changed
         run: |
           git config user.name "omgskills-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data; then
+          if git diff --quiet -- index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/manifest.json site/data/skills-*.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/x-trending-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json; then
             echo "No library data changes"
           else
-            git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data
+            git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/manifest.json site/data/skills-*.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/x-trending-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json
             git commit -m "scrape: update library data ($(date -u +%Y-%m-%d))"
             git pull --rebase --autostash origin main
             git push
