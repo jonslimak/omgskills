@@ -161,25 +161,27 @@ async function listSkillPaths(owner: string, repo: string, ref?: string): Promis
 }
 
 function resolveSkillPathFromHint(paths: string[], hint: string): string | null {
-  const normalizedHint = normalizeSkillKey(hint);
-  const exactDirMatches = paths.filter((path) => path.split("/").at(-2) === hint);
-  if (exactDirMatches.length > 0) {
-    return exactDirMatches.sort((a, b) => a.length - b.length)[0];
-  }
+  for (const alias of buildSkillHintAliases(hint)) {
+    const normalizedAlias = normalizeSkillKey(alias);
+    const exactDirMatches = paths.filter((path) => path.split("/").at(-2) === alias);
+    if (exactDirMatches.length > 0) {
+      return exactDirMatches.sort((a, b) => a.length - b.length)[0];
+    }
 
-  const normalizedDirMatches = paths.filter((path) => normalizeSkillKey(path.split("/").at(-2) ?? "") === normalizedHint);
-  if (normalizedDirMatches.length > 0) {
-    return normalizedDirMatches.sort((a, b) => a.length - b.length)[0];
-  }
+    const normalizedDirMatches = paths.filter((path) => normalizeSkillKey(path.split("/").at(-2) ?? "") === normalizedAlias);
+    if (normalizedDirMatches.length > 0) {
+      return normalizedDirMatches.sort((a, b) => a.length - b.length)[0];
+    }
 
-  const partialMatches = paths.filter((path) => path.includes(`/${hint}/`));
-  if (partialMatches.length > 0) {
-    return partialMatches.sort((a, b) => a.length - b.length)[0];
-  }
+    const partialMatches = paths.filter((path) => path.includes(`/${alias}/`));
+    if (partialMatches.length > 0) {
+      return partialMatches.sort((a, b) => a.length - b.length)[0];
+    }
 
-  const normalizedPartialMatches = paths.filter((path) => normalizeSkillKey(path).includes(normalizedHint));
-  if (normalizedPartialMatches.length > 0) {
-    return normalizedPartialMatches.sort((a, b) => a.length - b.length)[0];
+    const normalizedPartialMatches = paths.filter((path) => normalizeSkillKey(path).includes(normalizedAlias));
+    if (normalizedPartialMatches.length > 0) {
+      return normalizedPartialMatches.sort((a, b) => a.length - b.length)[0];
+    }
   }
 
   return null;
@@ -219,23 +221,15 @@ async function fetchSkillFile(
     throw new Error(`Unable to resolve SKILL.md path for ${owner}/${repo}`);
   }
 
-  const normalizedSkillNameHint = normalizeSkillKey(skillNameHint);
-  const commonPaths = [
-    `${skillNameHint}/SKILL.md`,
-    `${normalizedSkillNameHint}/SKILL.md`,
-    `skills/${skillNameHint}/SKILL.md`,
-    `skills/${normalizedSkillNameHint}/SKILL.md`,
-    `.claude/skills/${skillNameHint}/SKILL.md`,
-    `.claude/skills/${normalizedSkillNameHint}/SKILL.md`,
-    `claude/skills/${skillNameHint}/SKILL.md`,
-    `claude/skills/${normalizedSkillNameHint}/SKILL.md`,
-    `Claude/skills/${skillNameHint}/SKILL.md`,
-    `Claude/skills/${normalizedSkillNameHint}/SKILL.md`,
-    `.codex/skills/${skillNameHint}/SKILL.md`,
-    `.codex/skills/${normalizedSkillNameHint}/SKILL.md`,
-    `codex/skills/${skillNameHint}/SKILL.md`,
-    `codex/skills/${normalizedSkillNameHint}/SKILL.md`,
-  ];
+  const commonPaths = buildSkillHintAliases(skillNameHint).flatMap((alias) => [
+    `${alias}/SKILL.md`,
+    `skills/${alias}/SKILL.md`,
+    `.claude/skills/${alias}/SKILL.md`,
+    `claude/skills/${alias}/SKILL.md`,
+    `Claude/skills/${alias}/SKILL.md`,
+    `.codex/skills/${alias}/SKILL.md`,
+    `codex/skills/${alias}/SKILL.md`,
+  ]);
   for (const candidatePath of commonPaths) {
     try {
       return await tryPath(candidatePath);
@@ -288,6 +282,17 @@ function normalizeSkillKey(s: string): string {
     .replace(/[^a-z0-9-]/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function buildSkillHintAliases(hint: string): string[] {
+  const normalized = normalizeSkillKey(hint);
+  const aliases = new Set<string>([hint, normalized]);
+  const parts = normalized.split("-").filter(Boolean);
+  if (parts.length >= 3) {
+    aliases.add(parts.slice(1).join("-"));
+    aliases.add(`${parts[0]}-${parts.at(-1)}`);
+  }
+  return [...aliases].filter(Boolean);
 }
 
 // Remove lone surrogates — Node.js can produce them from GitHub API responses
