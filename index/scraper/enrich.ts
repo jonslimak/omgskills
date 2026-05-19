@@ -63,6 +63,7 @@ export function seedRepoCache(repoFullName: string, meta: RepoMeta) {
 const readmeCache = new Map<string, string | undefined>();
 const treeCache = new Map<string, string[]>();
 const branchGuessCache = new Map<string, string>();
+const failedSkillPathCache = new Map<string, Error>();
 
 function gitBlobSha(content: string): string {
   const body = Buffer.from(content, "utf8");
@@ -160,14 +161,25 @@ async function listSkillPaths(owner: string, repo: string, ref?: string): Promis
 }
 
 function resolveSkillPathFromHint(paths: string[], hint: string): string | null {
+  const normalizedHint = normalizeSkillKey(hint);
   const exactDirMatches = paths.filter((path) => path.split("/").at(-2) === hint);
   if (exactDirMatches.length > 0) {
     return exactDirMatches.sort((a, b) => a.length - b.length)[0];
   }
 
+  const normalizedDirMatches = paths.filter((path) => normalizeSkillKey(path.split("/").at(-2) ?? "") === normalizedHint);
+  if (normalizedDirMatches.length > 0) {
+    return normalizedDirMatches.sort((a, b) => a.length - b.length)[0];
+  }
+
   const partialMatches = paths.filter((path) => path.includes(`/${hint}/`));
   if (partialMatches.length > 0) {
     return partialMatches.sort((a, b) => a.length - b.length)[0];
+  }
+
+  const normalizedPartialMatches = paths.filter((path) => normalizeSkillKey(path).includes(normalizedHint));
+  if (normalizedPartialMatches.length > 0) {
+    return normalizedPartialMatches.sort((a, b) => a.length - b.length)[0];
   }
 
   return null;
@@ -180,6 +192,10 @@ async function fetchSkillFile(
   ref?: string,
   skillNameHint?: string,
 ) {
+  const failureCacheKey = `${owner}/${repo}::${path}::${ref ?? ""}::${skillNameHint ?? ""}`;
+  const cachedFailure = failedSkillPathCache.get(failureCacheKey);
+  if (cachedFailure) throw cachedFailure;
+
   const tryPath = async (candidatePath: string) => {
     const fileData = await fetchRawFile(owner, repo, candidatePath, ref);
     if (!fileData) {
@@ -203,14 +219,22 @@ async function fetchSkillFile(
     throw new Error(`Unable to resolve SKILL.md path for ${owner}/${repo}`);
   }
 
+  const normalizedSkillNameHint = normalizeSkillKey(skillNameHint);
   const commonPaths = [
     `${skillNameHint}/SKILL.md`,
+    `${normalizedSkillNameHint}/SKILL.md`,
     `skills/${skillNameHint}/SKILL.md`,
+    `skills/${normalizedSkillNameHint}/SKILL.md`,
     `.claude/skills/${skillNameHint}/SKILL.md`,
+    `.claude/skills/${normalizedSkillNameHint}/SKILL.md`,
     `claude/skills/${skillNameHint}/SKILL.md`,
+    `claude/skills/${normalizedSkillNameHint}/SKILL.md`,
     `Claude/skills/${skillNameHint}/SKILL.md`,
+    `Claude/skills/${normalizedSkillNameHint}/SKILL.md`,
     `.codex/skills/${skillNameHint}/SKILL.md`,
+    `.codex/skills/${normalizedSkillNameHint}/SKILL.md`,
     `codex/skills/${skillNameHint}/SKILL.md`,
+    `codex/skills/${normalizedSkillNameHint}/SKILL.md`,
   ];
   for (const candidatePath of commonPaths) {
     try {
@@ -226,9 +250,16 @@ async function fetchSkillFile(
     skillNameHint,
   );
   if (!resolvedPath) {
-    throw new Error(`Unable to resolve SKILL.md path for ${owner}/${repo}:${skillNameHint}`);
+    const err = new Error(`Unable to resolve SKILL.md path for ${owner}/${repo}:${skillNameHint}`);
+    failedSkillPathCache.set(failureCacheKey, err);
+    throw err;
   }
-  return tryPath(resolvedPath);
+  try {
+    return await tryPath(resolvedPath);
+  } catch (err: unknown) {
+    failedSkillPathCache.set(failureCacheKey, err as Error);
+    throw err;
+  }
 }
 
 function parseFrontmatter(content: string): Frontmatter | null {
@@ -247,6 +278,16 @@ function parseFrontmatter(content: string): Frontmatter | null {
 
 function normalize(s: string): string {
   return s.replace(/\s+/g, " ").trim();
+}
+
+function normalizeSkillKey(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[_\s]+/g, "-")
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 // Remove lone surrogates — Node.js can produce them from GitHub API responses

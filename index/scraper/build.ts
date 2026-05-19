@@ -39,6 +39,9 @@ type CliOptions = {
   topicPageLimit: number | null;
   socialPageLimit: number | null;
   aggregatorRepoLimit: number | null;
+  repoFilter: string | null;
+  authorFilter: string | null;
+  idPrefix: string | null;
 };
 
 type BuildPaths = {
@@ -105,6 +108,9 @@ function parseArgs(argv: string[]): CliOptions {
     topicPageLimit: null,
     socialPageLimit: null,
     aggregatorRepoLimit: null,
+    repoFilter: null,
+    authorFilter: null,
+    idPrefix: null,
   };
 
   for (const arg of argv) {
@@ -159,6 +165,24 @@ function parseArgs(argv: string[]): CliOptions {
     }
     if (arg.startsWith("--aggregator-repo-limit=")) {
       options.aggregatorRepoLimit = parsePositiveInt("--aggregator-repo-limit", arg.split("=", 2)[1]);
+      continue;
+    }
+    if (arg.startsWith("--repo=")) {
+      const value = arg.split("=", 2)[1]?.trim().toLowerCase();
+      if (!value) throw new Error("--repo requires a value");
+      options.repoFilter = value;
+      continue;
+    }
+    if (arg.startsWith("--author=")) {
+      const value = arg.split("=", 2)[1]?.trim().toLowerCase();
+      if (!value) throw new Error("--author requires a value");
+      options.authorFilter = value;
+      continue;
+    }
+    if (arg.startsWith("--id-prefix=")) {
+      const value = arg.split("=", 2)[1]?.trim().toLowerCase();
+      if (!value) throw new Error("--id-prefix requires a value");
+      options.idPrefix = value;
       continue;
     }
     throw new Error(`Unknown flag "${arg}"`);
@@ -274,6 +298,20 @@ function isBlockedId(id: string): boolean {
   return BLOCKED_REPOS.has(repoFromId(id));
 }
 
+function candidateMatchesFilters(candidate: Candidate, options: CliOptions): boolean {
+  if (options.repoFilter && repoFromId(candidate.id).toLowerCase() !== options.repoFilter) {
+    return false;
+  }
+  if (options.authorFilter) {
+    const author = (candidate.author_handle ?? repoFromId(candidate.id).split("/")[0] ?? "").toLowerCase();
+    if (author !== options.authorFilter) return false;
+  }
+  if (options.idPrefix && !candidate.id.toLowerCase().startsWith(options.idPrefix)) {
+    return false;
+  }
+  return true;
+}
+
 async function timedSource<T>(name: SourceName, fn: () => Promise<T[]>): Promise<{ hits: T[]; summary: SourceResult }> {
   const startedAt = performance.now();
   const hits = await fn();
@@ -302,6 +340,9 @@ async function main() {
   if (options.topicPageLimit) console.log(`[limit] topic pages/query: ${options.topicPageLimit}`);
   if (options.socialPageLimit) console.log(`[limit] social pages/query: ${options.socialPageLimit}`);
   if (options.aggregatorRepoLimit) console.log(`[limit] aggregator repos: ${options.aggregatorRepoLimit}`);
+  if (options.repoFilter) console.log(`[filter] repo: ${options.repoFilter}`);
+  if (options.authorFilter) console.log(`[filter] author: ${options.authorFilter}`);
+  if (options.idPrefix) console.log(`[filter] id prefix: ${options.idPrefix}`);
   if (options.resumeFrom) console.log(`[resume] loading existing snapshot from ${options.resumeFrom}`);
 
   // Back up the current index before touching anything
@@ -474,6 +515,15 @@ async function main() {
   }
 
   console.log(`  merged: ${candidates.size} unique candidates`);
+  if (options.repoFilter || options.authorFilter || options.idPrefix) {
+    const before = candidates.size;
+    for (const [id, candidate] of [...candidates.entries()]) {
+      if (!candidateMatchesFilters(candidate, options)) {
+        candidates.delete(id);
+      }
+    }
+    console.log(`  filtered: ${candidates.size} candidates after repo/author/id filters (${before - candidates.size} removed)`);
+  }
   if (options.maxCandidates && candidates.size > options.maxCandidates) {
     const limited = [...candidates.entries()].slice(0, options.maxCandidates);
     candidates.clear();
@@ -499,7 +549,9 @@ async function main() {
 
   for (const c of candidates.values()) {
     i++;
+    const enrichStartedAt = performance.now();
     const s = await enrichCandidate(c, existingFirstSeen, existingSkills, today);
+    const enrichDurationMs = performance.now() - enrichStartedAt;
     if (s) {
       const isExisting = existingFirstSeen.has(s.id);
       if (!isExisting && s.stars < MIN_STARS_FOR_NEW_SKILLS) {
@@ -521,6 +573,15 @@ async function main() {
       }
     } else {
       skipped++;
+    }
+    if (
+      enrichDurationMs >= 1000 ||
+      options.repoFilter ||
+      options.authorFilter ||
+      options.idPrefix ||
+      (options.maxCandidates !== null && options.maxCandidates <= 20)
+    ) {
+      console.log(`  [enrich-time] ${c.id} ${Math.round(enrichDurationMs)}ms ${s ? "kept" : "skipped"}`);
     }
     if (i % 50 === 0 || i === total) {
       console.log(`  enriched ${i}/${total} (kept ${skills.length}, cached ${cached}, skipped ${skipped})`);
