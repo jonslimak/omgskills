@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "scrape": "tsx scraper/build.ts",
+    "scrape:debug": "tsx scraper/build.ts --output-suffix=debug --max-enriched=200",
+    "scrape:debug:official": "tsx scraper/build.ts --sources=official --output-suffix=debug --max-enriched=100 --max-candidates=150",
+    "scrape:debug:skillssh": "tsx scraper/build.ts --sources=skillssh --output-suffix=debug --max-enriched=100 --max-candidates=150",
+    "scrape:debug:awesome": "tsx scraper/build.ts --sources=awesome --output-suffix=debug --max-enriched=100 --max-candidates=150",
     "scrape:with-x": "npm run scrape && tsx scraper/run-x-enrichment.ts",
     "scrape:trending": "tsx scraper/build-trending.ts",
     "scrape:x": "tsx scraper/run-x-enrichment.ts",
