@@ -21,6 +21,7 @@ const BLOCKED_REPOS = new Set([
   "majiayu000/claude-skill-registry",
   "majiayu000/claude-skill-registry-data",
   "supercent-io/skills-template",
+  "anthropics/claude-for-legal",
 ]);
 const X_SOURCE_TAG = "x-top-skill-tweet";
 const ALL_SOURCES = ["topics", "code", "aggregators", "social", "registry", "skillssh", "awesome", "official"] as const;
