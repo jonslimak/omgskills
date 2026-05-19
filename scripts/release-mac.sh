@@ -101,11 +101,12 @@ package_dmg() {
     /usr/bin/ditto "$APP" "$mount_dir/$APP_NAME.app"
     mkdir -p "$mount_dir/.background"
     cp "$DMG_BACKGROUND_PNG" "$mount_dir/.background/background.png"
-    ln -s /Applications "$mount_dir/Applications"
     MOUNT_DIR="$mount_dir" osascript <<'APPLESCRIPT'
 tell application "Finder"
+    set targetFolder to POSIX file "/Applications" as alias
     set containerFolder to POSIX file (system attribute "MOUNT_DIR") as alias
     set backgroundPicture to POSIX file ((system attribute "MOUNT_DIR") & "/.background/background.png") as alias
+    make new alias file at containerFolder to targetFolder with properties {name:"Applications"}
     open containerFolder
     delay 1
     set dmgWindow to window of containerFolder
@@ -123,6 +124,7 @@ tell application "Finder"
     close dmgWindow
 end tell
 APPLESCRIPT
+    apply_custom_icon "$mount_dir/Applications" "$APPLICATIONS_ICON"
     sync
     hdiutil detach "$mount_dir"
     hdiutil convert "$rw_dmg" -format UDZO -o "$output_dmg"
