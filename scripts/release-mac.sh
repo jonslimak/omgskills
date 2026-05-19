@@ -86,19 +86,26 @@ apply_custom_icon() {
 
 package_dmg() {
     local output_dmg="$1"
-    local staging_dir="$MENUBAR_DIR/dist/dmg-staging"
+    local rw_dmg="$MENUBAR_DIR/dist/omgskills-mac-rw.dmg"
+    local mount_dir="$MENUBAR_DIR/dist/dmg-mount"
 
-    rm -rf "$staging_dir" "$output_dmg"
-    mkdir -p "$staging_dir"
-    /usr/bin/ditto "$APP" "$staging_dir/$APP_NAME.app"
-    mkdir -p "$staging_dir/.background"
-    cp "$DMG_BACKGROUND_PNG" "$staging_dir/.background/background.png"
-    STAGING_DIR="$staging_dir" osascript <<'APPLESCRIPT'
+    rm -rf "$mount_dir" "$output_dmg" "$rw_dmg"
+    mkdir -p "$mount_dir"
+    hdiutil create \
+        -size 160m \
+        -fs HFS+ \
+        -volname "$APP_NAME" \
+        -ov \
+        "$rw_dmg"
+    hdiutil attach "$rw_dmg" -mountpoint "$mount_dir" -nobrowse -noautoopen
+    /usr/bin/ditto "$APP" "$mount_dir/$APP_NAME.app"
+    mkdir -p "$mount_dir/.background"
+    cp "$DMG_BACKGROUND_PNG" "$mount_dir/.background/background.png"
+    ln -s /Applications "$mount_dir/Applications"
+    MOUNT_DIR="$mount_dir" osascript <<'APPLESCRIPT'
 tell application "Finder"
-    set targetFolder to POSIX file "/Applications" as alias
-    set containerFolder to POSIX file (system attribute "STAGING_DIR") as alias
-    set backgroundPicture to POSIX file ((system attribute "STAGING_DIR") & "/.background/background.png") as alias
-    make new alias file at containerFolder to targetFolder with properties {name:"Applications"}
+    set containerFolder to POSIX file (system attribute "MOUNT_DIR") as alias
+    set backgroundPicture to POSIX file ((system attribute "MOUNT_DIR") & "/.background/background.png") as alias
     open containerFolder
     delay 1
     set dmgWindow to window of containerFolder
@@ -116,15 +123,10 @@ tell application "Finder"
     close dmgWindow
 end tell
 APPLESCRIPT
-    apply_custom_icon "$staging_dir/Applications" "$APPLICATIONS_ICON"
-    hdiutil create \
-        -volname "$APP_NAME" \
-        -srcfolder "$staging_dir" \
-        -fs HFS+ \
-        -ov \
-        -format UDZO \
-        "$output_dmg"
-    rm -rf "$staging_dir"
+    sync
+    hdiutil detach "$mount_dir"
+    hdiutil convert "$rw_dmg" -format UDZO -o "$output_dmg"
+    rm -rf "$mount_dir" "$rw_dmg"
     require_file "$output_dmg" "DMG packaging failed."
 }
 
