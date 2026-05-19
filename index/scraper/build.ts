@@ -11,18 +11,44 @@ import { searchRegistry } from "./sources/registry.js";
 import { searchSkillsSh } from "./sources/skillssh.js";
 import { searchAwesomeAgentSkills } from "./sources/awesome.js";
 import { searchOfficialSkills } from "./sources/official.js";
-import { enrichCandidate, seedRepoCache, type Candidate } from "./enrich.js";
+import {
+  enrichCandidate,
+  getCandidateRepoMeta,
+  seedRepoCache,
+  type Candidate,
+  type NegativeCacheFailure,
+} from "./enrich.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CHECKPOINT_INTERVAL = 500;
-const MIN_STARS_FOR_NEW_SKILLS = 3;
+const MIN_REPO_STARS = 5;
 const SKILLS_SH_MIN_REPO_STARS = 50;
+const REPO_NEGATIVE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const CANDIDATE_NEGATIVE_CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 const BLOCKED_REPOS = new Set([
   "majiayu000/claude-skill-registry",
   "majiayu000/claude-skill-registry-data",
   "supercent-io/skills-template",
   "anthropics/claude-for-legal",
 ]);
+const KNOWN_INVALID_REPOS = new Set([
+  "user-attachments/assets",
+  "anthropics/skills",
+  "smerchek/claude-epub-skill",
+  "zxkane/aws-skills",
+  "bluzername/claude-code-terminal-title",
+  "jthack/ffuf_claude_skill",
+  "obra/superpowers",
+  "avelikiy/great_cto",
+  "conorluddy/ios-simulator-skill",
+  "sanjay3290/ai-skills",
+  "yvgude/lean-ctx",
+  "openweb-org/openweb",
+  "lackeyjb/playwright-skill",
+  "NeoLabHQ/context-engineering-kit",
+  "ykdojo/claude-code-tips",
+]);
+const BLOCKED_OWNERS = new Set(["user-attachments"]);
 const X_SOURCE_TAG = "x-top-skill-tweet";
 const ALL_SOURCES = ["topics", "code", "aggregators", "social", "registry", "skillssh", "awesome", "official"] as const;
 type SourceName = typeof ALL_SOURCES[number];
@@ -43,6 +69,7 @@ type CliOptions = {
   repoFilter: string | null;
   authorFilter: string | null;
   idPrefix: string | null;
+  ignoreNegativeCache: boolean;
 };
 
 type BuildPaths = {
@@ -50,6 +77,7 @@ type BuildPaths = {
   backupPath: string;
   cachePath: string;
   cacheReadPath: string;
+  negativeCachePath: string;
   existingPath: string;
 };
 
@@ -57,6 +85,13 @@ type SourceResult = {
   name: SourceName;
   hitCount: number;
   durationMs: number;
+};
+
+type NegativeCacheEntry = {
+  scope: "repo" | "candidate";
+  reason: string;
+  cachedAt: string;
+  status?: number;
 };
 
 function withSuffix(file: string, suffix: string | null): string {
@@ -71,11 +106,13 @@ function buildPaths(options: CliOptions): BuildPaths {
   const defaultOutPath = withSuffix("skills.json", null);
   const cachePath = withSuffix("sha-cache.json", options.outputSuffix);
   const defaultCachePath = withSuffix("sha-cache.json", null);
+  const negativeCachePath = withSuffix("negative-cache.json", null);
   return {
     outPath,
     backupPath: withSuffix("skills.backup.json", options.outputSuffix),
     cachePath,
     cacheReadPath: existsSync(cachePath) ? cachePath : defaultCachePath,
+    negativeCachePath,
     existingPath: options.resumeFrom ?? (existsSync(outPath) ? outPath : defaultOutPath),
   };
 }
@@ -112,6 +149,7 @@ function parseArgs(argv: string[]): CliOptions {
     repoFilter: null,
     authorFilter: null,
     idPrefix: null,
+    ignoreNegativeCache: false,
   };
 
   for (const arg of argv) {
@@ -125,6 +163,10 @@ function parseArgs(argv: string[]): CliOptions {
     }
     if (arg === "--no-checkpoint") {
       options.noCheckpoint = true;
+      continue;
+    }
+    if (arg === "--ignore-negative-cache") {
+      options.ignoreNegativeCache = true;
       continue;
     }
     if (arg.startsWith("--sources=")) {
@@ -222,6 +264,30 @@ function saveShaCache(cachePath: string, cache: Map<string, string>) {
   writeAtomic(cachePath, JSON.stringify(Object.fromEntries(cache), null, 2) + "\n");
 }
 
+function negativeCacheTtlMs(scope: NegativeCacheEntry["scope"]): number {
+  return scope === "repo" ? REPO_NEGATIVE_CACHE_TTL_MS : CANDIDATE_NEGATIVE_CACHE_TTL_MS;
+}
+
+function isNegativeCacheEntryExpired(entry: NegativeCacheEntry, nowMs: number): boolean {
+  const cachedAtMs = Date.parse(entry.cachedAt);
+  if (!Number.isFinite(cachedAtMs)) return true;
+  return nowMs - cachedAtMs > negativeCacheTtlMs(entry.scope);
+}
+
+function loadNegativeCache(path: string): Map<string, NegativeCacheEntry> {
+  if (!existsSync(path)) return new Map();
+  try {
+    const raw = readFileSync(path, "utf8");
+    return new Map(Object.entries(JSON.parse(raw) as Record<string, NegativeCacheEntry>));
+  } catch {
+    return new Map();
+  }
+}
+
+function saveNegativeCache(path: string, cache: Map<string, NegativeCacheEntry>) {
+  writeAtomic(path, JSON.stringify(Object.fromEntries(cache), null, 2) + "\n");
+}
+
 function skillRepoPathKey(skill: Skill): string | null {
   if (!skill.github_url) return null;
   const githubUrl = skill.github_url.replace(/\/+$/, "").toLowerCase();
@@ -299,6 +365,65 @@ function isBlockedId(id: string): boolean {
   return BLOCKED_REPOS.has(repoFromId(id));
 }
 
+function isValidRepoFullName(repo: string): boolean {
+  return /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(repo);
+}
+
+function candidateValidationFailure(candidate: Candidate): string | null {
+  const repo = repoFromId(candidate.id);
+  if (!isValidRepoFullName(repo)) return "invalid repo name";
+  const [owner] = repo.split("/");
+  if (BLOCKED_OWNERS.has(owner)) return `blocked owner ${owner}`;
+  if (KNOWN_INVALID_REPOS.has(repo)) return "known invalid repo";
+  return null;
+}
+
+function negativeCacheEntryForCandidate(
+  candidate: Candidate,
+  negativeCache: Map<string, NegativeCacheEntry>,
+): NegativeCacheEntry | null {
+  return negativeCache.get(candidate.id) ?? negativeCache.get(repoFromId(candidate.id)) ?? null;
+}
+
+function writeStableFailure(
+  negativeCache: Map<string, NegativeCacheEntry>,
+  failure: NegativeCacheFailure,
+  nowIso: string,
+) {
+  negativeCache.set(failure.key, {
+    scope: failure.scope,
+    reason: failure.reason,
+    cachedAt: nowIso,
+    status: failure.status,
+  });
+}
+
+function clearNegativeCacheForCandidate(
+  negativeCache: Map<string, NegativeCacheEntry>,
+  candidate: Candidate,
+) {
+  negativeCache.delete(candidate.id);
+  negativeCache.delete(repoFromId(candidate.id));
+}
+
+function asNegativeCacheFailure(err: unknown): NegativeCacheFailure | null {
+  if (!err || typeof err !== "object") return null;
+  const value = err as Record<string, unknown>;
+  if (
+    (value.scope === "repo" || value.scope === "candidate") &&
+    typeof value.key === "string" &&
+    typeof value.reason === "string"
+  ) {
+    return {
+      scope: value.scope,
+      key: value.key,
+      reason: value.reason,
+      status: typeof value.status === "number" ? value.status : undefined,
+    };
+  }
+  return null;
+}
+
 function candidateMatchesFilters(candidate: Candidate, options: CliOptions): boolean {
   if (options.repoFilter && repoFromId(candidate.id).toLowerCase() !== options.repoFilter) {
     return false;
@@ -344,6 +469,7 @@ async function main() {
   if (options.repoFilter) console.log(`[filter] repo: ${options.repoFilter}`);
   if (options.authorFilter) console.log(`[filter] author: ${options.authorFilter}`);
   if (options.idPrefix) console.log(`[filter] id prefix: ${options.idPrefix}`);
+  if (options.ignoreNegativeCache) console.log("[cache] ignoring negative cache");
   if (options.resumeFrom) console.log(`[resume] loading existing snapshot from ${options.resumeFrom}`);
 
   // Back up the current index before touching anything
@@ -354,6 +480,12 @@ async function main() {
 
   const { firstSeen: existingFirstSeen, skills: existingSkills } = loadExisting(paths.existingPath);
   const shaCache = loadShaCache(paths.cacheReadPath);
+  const negativeCache = loadNegativeCache(paths.negativeCachePath);
+  const nowMs = Date.now();
+  const nowIso = new Date(nowMs).toISOString();
+  for (const [key, entry] of [...negativeCache.entries()]) {
+    if (isNegativeCacheEntryExpired(entry, nowMs)) negativeCache.delete(key);
+  }
 
   // Merge SHAs from sha-cache.json into complete existing skills only.
   // SHA-only cache entries are metadata, not enough to safely reuse parsed skill data.
@@ -516,6 +648,21 @@ async function main() {
   }
 
   console.log(`  merged: ${candidates.size} unique candidates`);
+  {
+    let invalidRemoved = 0;
+    for (const [id, candidate] of [...candidates.entries()]) {
+      const invalidReason = candidateValidationFailure(candidate);
+      if (!invalidReason) continue;
+      candidates.delete(id);
+      invalidRemoved++;
+      if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
+        console.log(`  [pre-skip] ${candidate.id}: ${invalidReason}`);
+      }
+    }
+    if (invalidRemoved > 0) {
+      console.log(`  prefiltered: ${candidates.size} candidates after cheap validation (${invalidRemoved} removed)`);
+    }
+  }
   if (options.repoFilter || options.authorFilter || options.idPrefix) {
     const before = candidates.size;
     for (const [id, candidate] of [...candidates.entries()]) {
@@ -545,20 +692,59 @@ async function main() {
   const skills: Skill[] = [];
   let skipped = 0;
   let cached = 0;
+  let starFiltered = 0;
+  let negativeCached = 0;
   let i = 0;
   const total = candidates.size;
 
   for (const c of candidates.values()) {
     i++;
-    const enrichStartedAt = performance.now();
-    const s = await enrichCandidate(c, existingFirstSeen, existingSkills, today);
-    const enrichDurationMs = performance.now() - enrichStartedAt;
-    if (s) {
-      const isExisting = existingFirstSeen.has(s.id);
-      if (!isExisting && s.stars < MIN_STARS_FOR_NEW_SKILLS) {
+    if (!options.ignoreNegativeCache) {
+      const cachedFailure = negativeCacheEntryForCandidate(c, negativeCache);
+      if (cachedFailure) {
         skipped++;
+        negativeCached++;
+        if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
+          console.log(`  [pre-skip] ${c.id}: negative cache (${cachedFailure.reason})`);
+        }
         continue;
       }
+    }
+
+    let prefetchedMeta = null;
+    try {
+      prefetchedMeta = await getCandidateRepoMeta(c, today);
+    } catch (err: unknown) {
+      const failure = asNegativeCacheFailure(err);
+      if (failure) {
+        writeStableFailure(negativeCache, failure, nowIso);
+        skipped++;
+        if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
+          console.log(`  [pre-skip] ${c.id}: ${failure.reason}`);
+        }
+        continue;
+      }
+      throw err;
+    }
+    if (!prefetchedMeta) {
+      skipped++;
+      continue;
+    }
+    if (prefetchedMeta.stars < MIN_REPO_STARS) {
+      skipped++;
+      starFiltered++;
+      if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
+        console.log(`  [pre-skip] ${c.id}: below ${MIN_REPO_STARS} stars (${prefetchedMeta.stars})`);
+      }
+      continue;
+    }
+
+    const enrichStartedAt = performance.now();
+    const result = await enrichCandidate(c, existingFirstSeen, existingSkills, today, prefetchedMeta);
+    const enrichDurationMs = performance.now() - enrichStartedAt;
+    const s = result.skill;
+    if (s) {
+      clearNegativeCacheForCandidate(negativeCache, c);
       skills.push(s);
       if (s.skill_md_sha && existingSkills.get(c.id)?.skill_md_sha === s.skill_md_sha) cached++;
       // Persist SHA to durable cache as we go, and checkpoint the index periodically.
@@ -574,6 +760,7 @@ async function main() {
       }
     } else {
       skipped++;
+      if (result.failure) writeStableFailure(negativeCache, result.failure, nowIso);
     }
     if (
       enrichDurationMs >= 1000 ||
@@ -621,11 +808,12 @@ async function main() {
     // Atomic write — temp file + rename prevents truncated output on kill
     writeAtomic(paths.outPath, stringifySkills(deduped.skills));
     saveShaCache(paths.cachePath, shaCache);
+    saveNegativeCache(paths.negativeCachePath, negativeCache);
   }
 
   const newCount = deduped.skills.filter((s) => !existingFirstSeen.has(s.id)).length;
   const totalMs = performance.now() - buildStart;
-  console.log(`\nDone. ${deduped.skills.length} skills (${newCount} new, ${cached} cached, ${skipped} skipped, ${carriedForward} carried forward, ${deduped.removed} deduped).`);
+  console.log(`\nDone. ${deduped.skills.length} skills (${newCount} new, ${cached} cached, ${skipped} skipped, ${starFiltered} star-filtered, ${negativeCached} negative-cached, ${carriedForward} carried forward, ${deduped.removed} deduped).`);
   console.log(`Summary: ${sourceSummaries.length} sources, ${candidates.size} candidates, ${enrichedKept} enriched kept, ${totalMs.toFixed(0)}ms total.`);
   if (options.dryRun) {
     console.log("→ dry run: no files written");

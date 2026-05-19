@@ -16,11 +16,23 @@ export interface Candidate {
   repo_description?: string | null;
 }
 
-interface RepoMeta {
+export interface RepoMeta {
   stars: number;
   lastUpdated: string;
   tags: string[];
   githubUrl: string;
+}
+
+export interface NegativeCacheFailure {
+  scope: "repo" | "candidate";
+  key: string;
+  reason: string;
+  status?: number;
+}
+
+export interface EnrichResult {
+  skill: Skill | null;
+  failure?: NegativeCacheFailure;
 }
 
 interface Frontmatter {
@@ -30,6 +42,21 @@ interface Frontmatter {
 }
 
 const repoCache = new Map<string, RepoMeta>();
+
+class StableFailure extends Error {
+  scope: "repo" | "candidate";
+  key: string;
+  reason: string;
+  status?: number;
+
+  constructor(scope: "repo" | "candidate", key: string, reason: string, message: string, status?: number) {
+    super(message);
+    this.scope = scope;
+    this.key = key;
+    this.reason = reason;
+    this.status = status;
+  }
+}
 
 async function getRepoMeta(owner: string, repo: string): Promise<RepoMeta> {
   const key = `${owner}/${repo}`;
@@ -58,6 +85,30 @@ function fallbackRepoMeta(c: Candidate, owner: string, today: string): RepoMeta 
 
 export function seedRepoCache(repoFullName: string, meta: RepoMeta) {
   repoCache.set(repoFullName, meta);
+}
+
+export async function getCandidateRepoMeta(c: Candidate, today: string): Promise<RepoMeta | null> {
+  const parsed = parseOwnerRepo(c.id);
+  if (!parsed) return null;
+  const [owner, repo] = parsed;
+
+  if (c.stars !== undefined && c.last_updated && c.github_url) {
+    return { stars: c.stars, lastUpdated: c.last_updated, tags: c.tags ?? [], githubUrl: c.github_url };
+  }
+
+  try {
+    return await getRepoMeta(owner, repo);
+  } catch (err: unknown) {
+    const e = err as { status?: number; message?: string };
+    if (e.status === 403 && c.github_url) {
+      console.warn(`[meta-fallback] ${c.id}: ${e.message ?? "GitHub repo metadata unavailable"}`);
+      return fallbackRepoMeta(c, owner, today);
+    }
+    if (e.status === 404) {
+      throw new StableFailure("repo", `${owner}/${repo}`, "repo-404", `${owner}/${repo} not found`, 404);
+    }
+    throw err;
+  }
 }
 
 const readmeCache = new Map<string, string | undefined>();
@@ -188,6 +239,7 @@ function resolveSkillPathFromHint(paths: string[], hint: string): string | null 
 }
 
 async function fetchSkillFile(
+  candidateId: string,
   owner: string,
   repo: string,
   path: string,
@@ -201,9 +253,7 @@ async function fetchSkillFile(
   const tryPath = async (candidatePath: string) => {
     const fileData = await fetchRawFile(owner, repo, candidatePath, ref);
     if (!fileData) {
-      const err = new Error(`${candidatePath} not found`) as Error & { status?: number };
-      err.status = 404;
-      throw err;
+      throw new StableFailure("candidate", candidateId, "skill-file-404", `${candidatePath} not found`, 404);
     }
     return { fileData, resolvedPath: candidatePath };
   };
@@ -244,14 +294,19 @@ async function fetchSkillFile(
     skillNameHint,
   );
   if (!resolvedPath) {
-    const err = new Error(`Unable to resolve SKILL.md path for ${owner}/${repo}:${skillNameHint}`);
+    const err = new StableFailure(
+      "candidate",
+      candidateId,
+      "skill-path-unresolved",
+      `Unable to resolve SKILL.md path for ${owner}/${repo}:${skillNameHint}`,
+    );
     failedSkillPathCache.set(failureCacheKey, err);
     throw err;
   }
   try {
     return await tryPath(resolvedPath);
   } catch (err: unknown) {
-    failedSkillPathCache.set(failureCacheKey, err as Error);
+    if (err instanceof StableFailure) failedSkillPathCache.set(failureCacheKey, err);
     throw err;
   }
 }
@@ -350,32 +405,18 @@ export async function enrichCandidate(
   existingFirstSeen: Map<string, string>,
   existingSkills: Map<string, Skill>,
   today: string,
-): Promise<Skill | null> {
+  prefetchedMeta?: RepoMeta,
+): Promise<EnrichResult> {
   const parsed = parseOwnerRepo(c.id);
-  if (!parsed) return null;
+  if (!parsed) return { skill: null };
   const [owner, repo] = parsed;
 
   try {
-    // Use provided repo metadata when available. If GitHub repo metadata is throttled,
-    // keep going with minimal candidate metadata so the crawl can still finish.
-    let meta: RepoMeta;
-    if (c.stars !== undefined && c.last_updated && c.github_url) {
-      meta = { stars: c.stars, lastUpdated: c.last_updated, tags: c.tags ?? [], githubUrl: c.github_url };
-    } else {
-      try {
-        meta = await getRepoMeta(owner, repo);
-      } catch (err: unknown) {
-        const e = err as { status?: number; message?: string };
-        if (e.status === 403 && c.github_url) {
-          console.warn(`[meta-fallback] ${c.id}: ${e.message ?? "GitHub repo metadata unavailable"}`);
-          meta = fallbackRepoMeta(c, owner, today);
-        } else {
-          throw err;
-        }
-      }
-    }
+    const meta = prefetchedMeta ?? await getCandidateRepoMeta(c, today);
+    if (!meta) return { skill: null };
 
     const { fileData, resolvedPath } = await fetchSkillFile(
+      c.id,
       owner,
       repo,
       c.skill_md_path,
@@ -388,9 +429,11 @@ export async function enrichCandidate(
     if (existing?.skill_md_sha && existing.skill_md_sha === fileData.sha && hasCompleteCachedSkill(existing)) {
       const { readme_snippet: _readmeSnippet, ...lightweightExisting } = existing as Skill & { readme_snippet?: string };
       return {
-        ...lightweightExisting,
-        stars: meta.stars,
-        last_updated: meta.lastUpdated,
+        skill: {
+          ...lightweightExisting,
+          stars: meta.stars,
+          last_updated: meta.lastUpdated,
+        },
       };
     }
 
@@ -398,7 +441,7 @@ export async function enrichCandidate(
     const fm = parseFrontmatter(content);
     if (!fm?.name || !fm?.description) {
       console.warn(`[skip] ${c.id}: missing name/description in frontmatter`);
-      return null;
+      return { skill: null };
     }
 
     const name = stripSurrogates(normalize(fm.name));
@@ -408,22 +451,36 @@ export async function enrichCandidate(
     const first_seen = existingFirstSeen.get(c.id) ?? today;
 
     return {
-      id: c.id,
-      name,
-      description,
-      github_url: meta.githubUrl,
-      skill_md_path: resolvedPath,
-      install_cmd,
-      author_handle: owner,
-      tags: mergedTags,
-      stars: meta.stars,
-      last_updated: meta.lastUpdated,
-      first_seen,
-      skill_md_sha: fileData.sha,
+      skill: {
+        id: c.id,
+        name,
+        description,
+        github_url: meta.githubUrl,
+        skill_md_path: resolvedPath,
+        install_cmd,
+        author_handle: owner,
+        tags: mergedTags,
+        stars: meta.stars,
+        last_updated: meta.lastUpdated,
+        first_seen,
+        skill_md_sha: fileData.sha,
+      },
     };
   } catch (err: unknown) {
+    if (err instanceof StableFailure) {
+      console.warn(`[skip] ${c.id}: ${err.status ?? "?"} ${err.message}`);
+      return {
+        skill: null,
+        failure: {
+          scope: err.scope,
+          key: err.key,
+          reason: err.reason,
+          status: err.status,
+        },
+      };
+    }
     const e = err as { status?: number; message?: string };
     console.warn(`[skip] ${c.id}: ${e.status ?? "?"} ${e.message ?? String(err)}`);
-    return null;
+    return { skill: null };
   }
 }
