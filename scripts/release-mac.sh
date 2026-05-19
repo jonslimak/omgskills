@@ -117,11 +117,10 @@ tell application "Finder"
 end tell
 APPLESCRIPT
     apply_custom_icon "$staging_dir/Applications" "$APPLICATIONS_ICON"
-    xattr -cr "$staging_dir" 2>/dev/null || true
     hdiutil create \
-        -volname "$APP_NAME-$VERSION" \
+        -volname "$APP_NAME" \
         -srcfolder "$staging_dir" \
-        -fs APFS \
+        -fs HFS+ \
         -ov \
         -format UDZO \
         "$output_dmg"
