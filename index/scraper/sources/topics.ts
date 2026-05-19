@@ -10,6 +10,11 @@ export interface TopicHit {
   repo_description: string | null;
 }
 
+interface TopicSearchOptions {
+  maxQueries?: number;
+  maxPagesPerQuery?: number;
+}
+
 const TOPICS = [
   "claude-code-skill",
   "claude-skill",
@@ -53,31 +58,32 @@ function toHit(repo: any): TopicHit {
   };
 }
 
-async function paginateRepoSearch(q: string, seen: Map<string, TopicHit>) {
+async function paginateRepoSearch(q: string, seen: Map<string, TopicHit>, maxPagesPerQuery?: number) {
   const iter = octokit.paginate.iterator(octokit.rest.search.repos, {
     q,
     per_page: 100,
   });
+  let pageCount = 0;
   for await (const { data } of iter) {
+    pageCount++;
     for (const repo of data) {
       if (!seen.has(repo.full_name)) seen.set(repo.full_name, toHit(repo));
     }
+    if (maxPagesPerQuery && pageCount >= maxPagesPerQuery) break;
   }
 }
 
-export async function searchByTopics(): Promise<TopicHit[]> {
+export async function searchByTopics(options: TopicSearchOptions = {}): Promise<TopicHit[]> {
   const seen = new Map<string, TopicHit>();
+  const queries = [
+    ...TOPICS.map((topic) => `topic:${topic}`),
+    ...LARGE_TOPICS_STAR_SPLITS.map(({ topic, stars }) => `topic:${topic} stars:${stars}`),
+    ...NAME_QUERIES,
+  ];
+  const limitedQueries = options.maxQueries ? queries.slice(0, options.maxQueries) : queries;
 
-  for (const topic of TOPICS) {
-    await paginateRepoSearch(`topic:${topic}`, seen);
-  }
-
-  for (const { topic, stars } of LARGE_TOPICS_STAR_SPLITS) {
-    await paginateRepoSearch(`topic:${topic} stars:${stars}`, seen);
-  }
-
-  for (const q of NAME_QUERIES) {
-    await paginateRepoSearch(q, seen);
+  for (const q of limitedQueries) {
+    await paginateRepoSearch(q, seen, options.maxPagesPerQuery);
   }
 
   return [...seen.values()];

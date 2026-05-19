@@ -6,6 +6,10 @@ export interface AggregatorHit {
   author_handle: string;
 }
 
+interface AggregatorSearchOptions {
+  maxRepos?: number;
+}
+
 const GITHUB_URL_RE = /https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)/g;
 
 async function extractRepoLinksFromReadme(owner: string, repo: string): Promise<string[]> {
@@ -24,7 +28,7 @@ async function extractRepoLinksFromReadme(owner: string, repo: string): Promise<
   }
 }
 
-export async function searchAggregators(): Promise<AggregatorHit[]> {
+export async function searchAggregators(options: AggregatorSearchOptions = {}): Promise<AggregatorHit[]> {
   const seen = new Set<string>();
   const results: AggregatorHit[] = [];
 
@@ -36,7 +40,9 @@ export async function searchAggregators(): Promise<AggregatorHit[]> {
     per_page: 50,
   });
 
-  for (const repo of data.items) {
+  const repos = options.maxRepos ? data.items.slice(0, options.maxRepos) : data.items;
+
+  for (const repo of repos) {
     const [owner, name] = repo.full_name.split("/");
     const linkedIds = await extractRepoLinksFromReadme(owner, name);
     for (const id of linkedIds) {
@@ -51,6 +57,6 @@ export async function searchAggregators(): Promise<AggregatorHit[]> {
     }
   }
 
-  console.log(`  aggregators: found ${results.length} linked repos from ${data.items.length} aggregator repos`);
+  console.log(`  aggregators: found ${results.length} linked repos from ${repos.length} aggregator repos`);
   return results;
 }

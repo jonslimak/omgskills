@@ -35,6 +35,10 @@ type CliOptions = {
   maxCandidates: number | null;
   maxEnriched: number | null;
   resumeFrom: string | null;
+  topicQueryLimit: number | null;
+  topicPageLimit: number | null;
+  socialPageLimit: number | null;
+  aggregatorRepoLimit: number | null;
 };
 
 type BuildPaths = {
@@ -97,6 +101,10 @@ function parseArgs(argv: string[]): CliOptions {
     maxCandidates: null,
     maxEnriched: null,
     resumeFrom: null,
+    topicQueryLimit: null,
+    topicPageLimit: null,
+    socialPageLimit: null,
+    aggregatorRepoLimit: null,
   };
 
   for (const arg of argv) {
@@ -135,6 +143,22 @@ function parseArgs(argv: string[]): CliOptions {
       const resumeFrom = arg.split("=", 2)[1]?.trim();
       if (!resumeFrom) throw new Error("--resume-from requires a value");
       options.resumeFrom = resumeFrom;
+      continue;
+    }
+    if (arg.startsWith("--topic-query-limit=")) {
+      options.topicQueryLimit = parsePositiveInt("--topic-query-limit", arg.split("=", 2)[1]);
+      continue;
+    }
+    if (arg.startsWith("--social-page-limit=")) {
+      options.socialPageLimit = parsePositiveInt("--social-page-limit", arg.split("=", 2)[1]);
+      continue;
+    }
+    if (arg.startsWith("--topic-page-limit=")) {
+      options.topicPageLimit = parsePositiveInt("--topic-page-limit", arg.split("=", 2)[1]);
+      continue;
+    }
+    if (arg.startsWith("--aggregator-repo-limit=")) {
+      options.aggregatorRepoLimit = parsePositiveInt("--aggregator-repo-limit", arg.split("=", 2)[1]);
       continue;
     }
     throw new Error(`Unknown flag "${arg}"`);
@@ -274,6 +298,10 @@ async function main() {
   console.log(`[sources] ${[...options.sources].join(", ")}`);
   if (options.maxCandidates) console.log(`[limit] max candidates: ${options.maxCandidates}`);
   if (options.maxEnriched) console.log(`[limit] max enriched: ${options.maxEnriched}`);
+  if (options.topicQueryLimit) console.log(`[limit] topic queries: ${options.topicQueryLimit}`);
+  if (options.topicPageLimit) console.log(`[limit] topic pages/query: ${options.topicPageLimit}`);
+  if (options.socialPageLimit) console.log(`[limit] social pages/query: ${options.socialPageLimit}`);
+  if (options.aggregatorRepoLimit) console.log(`[limit] aggregator repos: ${options.aggregatorRepoLimit}`);
   if (options.resumeFrom) console.log(`[resume] loading existing snapshot from ${options.resumeFrom}`);
 
   // Back up the current index before touching anything
@@ -297,10 +325,19 @@ async function main() {
   console.log(`Loaded ${existingSkills.size} skills, ${shaCache.size} SHA cache entries\n`);
 
   console.log("Fetching discovery sources...");
-  const topicPromise = options.sources.has("topics") ? timedSource("topics", searchByTopics) : Promise.resolve(null);
+  const topicPromise = options.sources.has("topics")
+    ? timedSource("topics", () => searchByTopics({
+      maxQueries: options.topicQueryLimit ?? undefined,
+      maxPagesPerQuery: options.topicPageLimit ?? undefined,
+    }))
+    : Promise.resolve(null);
   const codePromise = options.sources.has("code") ? timedSource("code", searchBySkillMdFilename) : Promise.resolve(null);
-  const aggregatorsPromise = options.sources.has("aggregators") ? timedSource("aggregators", searchAggregators) : Promise.resolve(null);
-  const socialPromise = options.sources.has("social") ? timedSource("social", searchSocial) : Promise.resolve(null);
+  const aggregatorsPromise = options.sources.has("aggregators")
+    ? timedSource("aggregators", () => searchAggregators({ maxRepos: options.aggregatorRepoLimit ?? undefined }))
+    : Promise.resolve(null);
+  const socialPromise = options.sources.has("social")
+    ? timedSource("social", () => searchSocial({ maxPagesPerQuery: options.socialPageLimit ?? undefined }))
+    : Promise.resolve(null);
   const registryPromise = options.sources.has("registry") ? timedSource("registry", searchRegistry) : Promise.resolve(null);
   const skillsshPromise = options.sources.has("skillssh")
     ? timedSource("skillssh", () => searchSkillsSh({

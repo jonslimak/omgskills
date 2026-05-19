@@ -7,6 +7,10 @@ export interface SocialHit {
   author_handle: string;
 }
 
+interface SocialSearchOptions {
+  maxPagesPerQuery?: number;
+}
+
 const GITHUB_URL_RE = /https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)/g;
 
 function extractRepoIds(text: string): string[] {
@@ -30,10 +34,10 @@ const HN_QUERIES = [
   "claude code skill",
 ];
 
-async function searchHN(seen: Set<string>, results: SocialHit[]) {
+async function searchHN(seen: Set<string>, results: SocialHit[], maxPagesPerQuery: number) {
   for (const query of HN_QUERIES) {
     let page = 0;
-    while (page < 3) {
+    while (page < maxPagesPerQuery) {
       const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=(story,comment)&hitsPerPage=100&page=${page}`;
       const res = await fetch(url);
       if (!res.ok) break;
@@ -67,11 +71,11 @@ const REDDIT_HEADERS = {
   "User-Agent": "omgskills-scraper/1.0 (github.com/omgskills/scraper)",
 };
 
-async function searchReddit(seen: Set<string>, results: SocialHit[]) {
+async function searchReddit(seen: Set<string>, results: SocialHit[], maxPagesPerQuery: number) {
   for (const { subreddit, query } of REDDIT_SEARCHES) {
     let after = "";
     let pages = 0;
-    while (pages < 3) {
+    while (pages < maxPagesPerQuery) {
       const url = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(query)}&restrict_sr=1&sort=new&limit=100${after ? `&after=${after}` : ""}`;
       const res = await fetch(url, { headers: REDDIT_HEADERS });
       if (!res.ok) break;
@@ -96,13 +100,14 @@ async function searchReddit(seen: Set<string>, results: SocialHit[]) {
 
 // ── Combined export ───────────────────────────────────────────────────────────
 
-export async function searchSocial(): Promise<SocialHit[]> {
+export async function searchSocial(options: SocialSearchOptions = {}): Promise<SocialHit[]> {
   const seen = new Set<string>();
   const results: SocialHit[] = [];
+  const maxPagesPerQuery = options.maxPagesPerQuery ?? 3;
 
   await Promise.all([
-    searchHN(seen, results),
-    searchReddit(seen, results),
+    searchHN(seen, results, maxPagesPerQuery),
+    searchReddit(seen, results, maxPagesPerQuery),
   ]);
 
   console.log(`  social: found ${results.length} linked repos (HN + Reddit)`);
