@@ -2295,14 +2295,15 @@ private struct NativeShareButton: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSButton {
-        let button = NSButton(title: title, target: context.coordinator, action: #selector(Coordinator.share(_:)))
+        let button = NSButton(title: "", target: context.coordinator, action: #selector(Coordinator.share(_:)))
         button.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: title)
         button.imagePosition = .imageLeading
+        button.imageHugsTitle = style == .plain
         button.controlSize = .small
-        button.font = .systemFont(ofSize: style == .plain ? 11 : NSFont.systemFontSize(for: .small))
         button.bezelStyle = .rounded
         button.isBordered = style == .bordered
-        button.contentTintColor = style == .plain ? .secondaryLabelColor : nil
+        configureTitle(for: button)
+        context.coordinator.configureShine(for: button, title: title, style: style)
         button.toolTip = help
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentHuggingPriority(.required, for: .vertical)
@@ -2315,13 +2316,32 @@ private struct NativeShareButton: NSViewRepresentable {
     func updateNSView(_ button: NSButton, context: Context) {
         context.coordinator.item = item
         context.coordinator.onShareStarted = onShareStarted
-        button.title = title
         button.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: title)
+        button.imageHugsTitle = style == .plain
         button.isBordered = style == .bordered
-        button.contentTintColor = style == .plain ? .secondaryLabelColor : nil
+        configureTitle(for: button)
+        context.coordinator.configureShine(for: button, title: title, style: style)
         button.toolTip = help
         button.invalidateIntrinsicContentSize()
         button.setAccessibilityLabel(title)
+    }
+
+    private func configureTitle(for button: NSButton) {
+        let font = NSFont.systemFont(ofSize: style == .plain ? 11 : NSFont.systemFontSize(for: .small))
+        button.font = font
+        if style == .plain {
+            button.contentTintColor = .tertiaryLabelColor
+            let titleAttributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: NSColor.tertiaryLabelColor
+            ]
+            let spacer = NSMutableAttributedString(string: " ", attributes: titleAttributes)
+            spacer.append(NSAttributedString(string: title, attributes: titleAttributes))
+            button.attributedTitle = spacer
+        } else {
+            button.contentTintColor = nil
+            button.title = title
+        }
     }
 
     final class Coordinator: NSObject {
@@ -2329,6 +2349,10 @@ private struct NativeShareButton: NSViewRepresentable {
         var onShareStarted: (() -> Void)?
         private var picker: NSSharingServicePicker?
         private var closeTask: Task<Void, Never>?
+        private weak var shineButton: NSButton?
+        private var shineTimer: Timer?
+        private var shineIndex = 0
+        private var shineTitle = ""
 
         init(item: String, onShareStarted: (() -> Void)?) {
             self.item = item
@@ -2337,6 +2361,73 @@ private struct NativeShareButton: NSViewRepresentable {
 
         deinit {
             closeTask?.cancel()
+            shineTimer?.invalidate()
+        }
+
+        @MainActor
+        func configureShine(for button: NSButton, title: String, style: Style) {
+            guard style == .plain,
+                  NSWorkspace.shared.accessibilityDisplayShouldReduceMotion == false else {
+                stopShine()
+                return
+            }
+
+            shineButton = button
+            shineTitle = title
+            applyShineTitle(title, to: button)
+            guard shineTimer == nil else { return }
+
+            shineTimer = Timer.scheduledTimer(
+                timeInterval: 0.18,
+                target: self,
+                selector: #selector(updateShine),
+                userInfo: nil,
+                repeats: true
+            )
+        }
+
+        @MainActor
+        private func stopShine() {
+            shineTimer?.invalidate()
+            shineTimer = nil
+            shineButton = nil
+            shineTitle = ""
+            shineIndex = 0
+        }
+
+        @MainActor @objc private func updateShine() {
+            guard let shineButton else { return }
+            shineIndex = (shineIndex + 1) % max(shineTitle.count + 5, 1)
+            applyShineTitle(shineTitle, to: shineButton)
+        }
+
+        @MainActor
+        private func applyShineTitle(_ title: String, to button: NSButton) {
+            let font = NSFont.systemFont(ofSize: 11)
+            let text = " \(title)"
+            let baseColor = NSColor.tertiaryLabelColor
+            let shineColor = NSColor.secondaryLabelColor
+            let attributed = NSMutableAttributedString(
+                string: text,
+                attributes: [
+                    .font: font,
+                    .foregroundColor: baseColor
+                ]
+            )
+
+            let titleStart = 1
+            let titleLength = title.count
+            for offset in 0..<3 {
+                let rawIndex = shineIndex - offset
+                guard rawIndex >= 0, rawIndex < titleLength else { continue }
+                attributed.addAttribute(
+                    .foregroundColor,
+                    value: shineColor,
+                    range: NSRange(location: titleStart + rawIndex, length: 1)
+                )
+            }
+
+            button.attributedTitle = attributed
         }
 
         @MainActor @objc func share(_ sender: NSButton) {
