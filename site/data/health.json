@@ -2,15 +2,15 @@
   "version": 1,
   "status": "degraded",
   "message": "No successful scrape run found; updates: latest update zip byte mismatch (13279986 != 13282842); latest update zip byte mismatch (13279986 != 13282842)",
-  "checkedAt": "2026-05-20T07:47:47Z",
+  "checkedAt": "2026-05-20T09:47:02Z",
   "publishedAt": "2026-05-19T12:03:24Z",
   "deployedAt": null,
   "lastSuccessfulScrapeAt": null,
   "lastSuccessfulXRefreshAt": "2026-05-19T12:04:22Z",
   "lastSuccessfulContentReportAt": "2026-05-18T14:59:24Z",
   "workflow": "pipeline-health",
-  "runId": "26148899507",
-  "gitSha": "6be65eb36410858383790b52f89f3cfce6cbb2df",
+  "runId": "26154714502",
+  "gitSha": "8c0571d8259d776db8865162ce425019b1b9f670",
   "manifestPath": "data/manifest.json",
   "manifestGeneratedAt": "2026-05-19T12:03:24Z",
   "pipeline": {
@@ -21,12 +21,12 @@
     "version": 1,
     "status": "degraded",
     "message": "updates: latest update zip byte mismatch (13279986 != 13282842)",
-    "checkedAt": "2026-05-20T07:47:29.260Z",
+    "checkedAt": "2026-05-20T09:46:51.709Z",
     "origin": "https://omgskills.com",
     "sections": {
       "download": {
         "status": "ok",
-        "checkedAt": "2026-05-20T07:47:29.260Z",
+        "checkedAt": "2026-05-20T09:46:51.709Z",
         "issues": [],
         "redirectStatus": 302,
         "redirectLocation": "/downloads/omgskills-mac.dmg",
@@ -36,7 +36,7 @@
       },
       "updates": {
         "status": "degraded",
-        "checkedAt": "2026-05-20T07:47:29.260Z",
+        "checkedAt": "2026-05-20T09:46:51.709Z",
         "issues": [
           "latest update zip byte mismatch (13279986 != 13282842)"
         ],
@@ -49,7 +49,7 @@
       },
       "dataRefresh": {
         "status": "ok",
-        "checkedAt": "2026-05-20T07:47:29.260Z",
+        "checkedAt": "2026-05-20T09:46:51.709Z",
         "issues": [],
         "manifestGeneratedAt": "2026-05-19T12:03:24Z",
         "checkedAssets": [
@@ -99,7 +99,7 @@
       },
       "search": {
         "status": "ok",
-        "checkedAt": "2026-05-20T07:47:29.260Z",
+        "checkedAt": "2026-05-20T09:46:51.709Z",
         "issues": [],
         "queryResults": [
           {
@@ -125,49 +125,49 @@
     "skills": {
       "path": "skills-3c2bdf9fecab.json",
       "count": 48998,
-      "generatedAt": "2026-05-20T07:47:23.198Z"
+      "generatedAt": "2026-05-20T09:46:46.507Z"
     },
     "trending": {
       "path": "trending-9e075b84d4c4.json",
       "count": 343,
-      "generatedAt": "2026-05-20T07:47:23.300Z"
+      "generatedAt": "2026-05-20T09:46:46.608Z"
     },
     "trendingLeaderboard": {
       "path": "trending-leaderboard-0103138a6959.json",
       "count": 343,
-      "generatedAt": "2026-05-20T07:47:23.300Z"
+      "generatedAt": "2026-05-20T09:46:46.608Z"
     },
     "leaderboardViewData": {
       "path": "leaderboard-view-data-c1cffd63c341.json",
       "count": 10,
-      "generatedAt": "2026-05-20T07:47:23.010Z"
+      "generatedAt": "2026-05-20T09:46:46.313Z"
     },
     "xTrending": {
       "path": "x-trending-0f3bbdf2dbb8.json",
       "count": 50,
-      "generatedAt": "2026-05-20T07:47:23.301Z"
+      "generatedAt": "2026-05-20T09:46:46.609Z"
     },
     "skillSignals": {
       "path": "skill-signals-b96aff397669.json",
       "count": 48998,
-      "generatedAt": "2026-05-20T07:47:23.145Z"
+      "generatedAt": "2026-05-20T09:46:46.455Z"
     },
     "authorSignals": {
       "path": "author-signals-770254bd6ca8.json",
       "count": 8071,
-      "generatedAt": "2026-05-20T07:47:23.008Z"
+      "generatedAt": "2026-05-20T09:46:46.310Z"
     },
     "authorLeaderboards": {
       "path": "author-leaderboards-324bbf373f7a.json",
       "count": 8071,
-      "generatedAt": "2026-05-20T07:47:23.002Z"
+      "generatedAt": "2026-05-20T09:46:46.304Z"
     }
   },
   "content": {
-    "goldBasketGeneratedAt": "2026-05-20T07:47:23.010Z",
+    "goldBasketGeneratedAt": "2026-05-20T09:46:46.312Z",
     "basketEnrichedAt": "2026-05-18T14:58:04.463Z",
-    "statsGeneratedAt": "2026-05-20T07:47:23.298Z",
-    "dashboardGeneratedAt": "2026-05-20T07:47:23.009Z",
+    "statsGeneratedAt": "2026-05-20T09:46:46.606Z",
+    "dashboardGeneratedAt": "2026-05-20T09:46:46.311Z",
     "snapshotCount": 9
   },
   "sections": {
@@ -179,7 +179,7 @@
       "lastSuccessfulScrapeAt": null,
       "lastSuccessfulXRefreshAt": "2026-05-19T12:04:22Z",
       "lastSuccessfulContentReportAt": "2026-05-18T14:59:24Z",
-      "checkedAt": "2026-05-20T07:47:47Z",
+      "checkedAt": "2026-05-20T09:47:02Z",
       "lastPassedAt": null
     },
     "core": {
@@ -189,46 +189,46 @@
       "trendingLeaderboardCount": 343,
       "leaderboardViewDataPath": "leaderboard-view-data-c1cffd63c341.json",
       "lastSuccessfulScrapeAt": null,
-      "checkedAt": "2026-05-20T07:47:47Z",
-      "lastPassedAt": "2026-05-20T07:47:47Z"
+      "checkedAt": "2026-05-20T09:47:02Z",
+      "lastPassedAt": "2026-05-20T09:47:02Z"
     },
     "x": {
       "status": "ok",
       "xTrendingCount": 50,
       "lastSuccessfulXRefreshAt": "2026-05-19T12:04:22Z",
-      "checkedAt": "2026-05-20T07:47:47Z",
-      "lastPassedAt": "2026-05-20T07:47:47Z"
+      "checkedAt": "2026-05-20T09:47:02Z",
+      "lastPassedAt": "2026-05-20T09:47:02Z"
     },
     "overlays": {
       "status": "ok",
       "skillSignalsCount": 48998,
       "authorSignalsCount": 8071,
       "authorLeaderboardsCount": 8071,
-      "checkedAt": "2026-05-20T07:47:47Z",
-      "lastPassedAt": "2026-05-20T07:47:47Z"
+      "checkedAt": "2026-05-20T09:47:02Z",
+      "lastPassedAt": "2026-05-20T09:47:02Z"
     },
     "contentReports": {
       "status": "ok",
       "lastSuccessfulContentReportAt": "2026-05-18T14:59:24Z",
       "basketEnrichedAt": "2026-05-18T14:58:04.463Z",
       "snapshotCount": 9,
-      "checkedAt": "2026-05-20T07:47:47Z",
-      "lastPassedAt": "2026-05-20T07:47:47Z"
+      "checkedAt": "2026-05-20T09:47:02Z",
+      "lastPassedAt": "2026-05-20T09:47:02Z"
     },
     "download": {
       "status": "ok",
-      "checkedAt": "2026-05-20T07:47:29.260Z",
+      "checkedAt": "2026-05-20T09:46:51.709Z",
       "issues": [],
       "redirectStatus": 302,
       "redirectLocation": "/downloads/omgskills-mac.dmg",
       "dmgStatus": 200,
       "bytes": 16378954,
       "cacheControl": "public,max-age=60,must-revalidate",
-      "lastPassedAt": "2026-05-20T07:47:29.260Z"
+      "lastPassedAt": "2026-05-20T09:46:51.709Z"
     },
     "updates": {
       "status": "degraded",
-      "checkedAt": "2026-05-20T07:47:29.260Z",
+      "checkedAt": "2026-05-20T09:46:51.709Z",
       "issues": [
         "latest update zip byte mismatch (13279986 != 13282842)"
       ],
@@ -242,7 +242,7 @@
     },
     "dataRefresh": {
       "status": "ok",
-      "checkedAt": "2026-05-20T07:47:29.260Z",
+      "checkedAt": "2026-05-20T09:46:51.709Z",
       "issues": [],
       "manifestGeneratedAt": "2026-05-19T12:03:24Z",
       "checkedAssets": [
@@ -289,11 +289,11 @@
       ],
       "skillsCount": 48998,
       "trendingCount": 343,
-      "lastPassedAt": "2026-05-20T07:47:29.260Z"
+      "lastPassedAt": "2026-05-20T09:46:51.709Z"
     },
     "search": {
       "status": "ok",
-      "checkedAt": "2026-05-20T07:47:29.260Z",
+      "checkedAt": "2026-05-20T09:46:51.709Z",
       "issues": [],
       "queryResults": [
         {
@@ -312,16 +312,16 @@
           "topResult": "affaan-m/everything-claude-code:mcp-server-patterns"
         }
       ],
-      "lastPassedAt": "2026-05-20T07:47:29.260Z"
+      "lastPassedAt": "2026-05-20T09:46:51.709Z"
     },
     "marketingFunnel": {
       "status": "ok",
-      "checkedAt": "2026-05-20T07:47:37.660Z",
+      "checkedAt": "2026-05-20T09:46:57.410Z",
       "window": "today",
       "timezone": "America/New_York",
       "issues": [],
-      "sessions": 126,
-      "pageViews": 136,
+      "sessions": 139,
+      "pageViews": 149,
       "downloadClicks": 10,
       "downloadUniqueSessions": 8,
       "heroDownloadClicks": 9,
@@ -336,9 +336,9 @@
       "skillOpens": 7,
       "skillInstalls": 3,
       "engagedUsersLowerBound": 7,
-      "downloadClickRate": 0.0794,
+      "downloadClickRate": 0.0719,
       "downloadToInstallRate": 0.2,
-      "lastPassedAt": "2026-05-20T07:47:37.660Z"
+      "lastPassedAt": "2026-05-20T09:46:57.410Z"
     }
   }
 }
