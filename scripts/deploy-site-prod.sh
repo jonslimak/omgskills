@@ -15,3 +15,10 @@ fi
 
 node ./scripts/prepare-netlify-site-deploy.mjs
 npx netlify-cli deploy --prod --dir=site
+
+VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' menubar/Info.plist 2>/dev/null || true)
+if [ -n "$VERSION" ] && ! git tag | grep -q "^v$VERSION$"; then
+  git tag "v$VERSION"
+  git push origin "v$VERSION"
+  echo "→ Tagged and pushed v$VERSION"
+fi
