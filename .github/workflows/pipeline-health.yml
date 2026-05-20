@@ -75,18 +75,6 @@ jobs:
           HEALTH_CHECKED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
           node ./scripts/build-health.mjs
 
-      - name: Commit health if changed
-        run: |
-          git config user.name "omgskills-bot"
-          git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- site/data/health.json; then
-            echo "No health changes"
-          else
-            git add site/data/health.json
-            git commit -m "health: update pipeline status ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
-            git push
-          fi
-
       - name: Update health issue on failure
         if: steps.healthcheck.outputs.health_status == 'degraded' || steps.productcheck.outputs.product_status == 'degraded'
         env:
