@@ -458,6 +458,14 @@ function addDiscoveredRepo(
   });
 }
 
+function formatDiscoveryWarning(source: DiscoverySourceName, error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/rate limit/i.test(message)) {
+    return `${source} rate-limited; returned 0 hits under background budget`;
+  }
+  return `${source} failed under background budget`;
+}
+
 async function timeSource<T>(
   source: DiscoverySourceName,
   lane: DiscoveryLane,
@@ -487,7 +495,7 @@ async function timeSource<T>(
         hitCount: 0,
         durationMs: Math.round(performance.now() - startedAt),
       },
-      warning: `${source} failed under background budget: ${error instanceof Error ? error.message : String(error)}`,
+      warning: formatDiscoveryWarning(source, error),
     };
   }
 }
@@ -621,31 +629,31 @@ async function runDiscovery(
       { allowFailure: true }),
     ]);
     if (discoveryBudgetSummary) {
-      partialDiscoveryWarnings.push("broad code search skipped by budget");
+      partialDiscoveryWarnings.push("code broad search skipped by budget");
       partialDiscoveryWarnings.push(
         `code fingerprint queries capped at ${discoveryBudgetSummary.code.maxFingerprintQueries}`,
       );
       partialDiscoveryWarnings.push(
-        `code query pages capped at ${discoveryBudgetSummary.code.maxPagesPerQuery}`,
+        `code pages capped at ${discoveryBudgetSummary.code.maxPagesPerQuery}`,
       );
       partialDiscoveryWarnings.push(
-        `topic queries capped at ${discoveryBudgetSummary.topics.maxQueries}`,
+        `topics queries capped at ${discoveryBudgetSummary.topics.maxQueries}`,
       );
       partialDiscoveryWarnings.push(
-        `topic query pages capped at ${discoveryBudgetSummary.topics.maxPagesPerQuery}`,
+        `topics pages capped at ${discoveryBudgetSummary.topics.maxPagesPerQuery}`,
       );
       partialDiscoveryWarnings.push(
         `social pages capped at ${discoveryBudgetSummary.social.maxPagesPerQuery}`,
       );
       partialDiscoveryWarnings.push(
-        `aggregator repos capped at ${discoveryBudgetSummary.aggregators.maxRepos}`,
+        `aggregators capped at ${discoveryBudgetSummary.aggregators.maxRepos} repos`,
       );
     }
     for (const result of [topicsRun, codeRun, socialRun, aggregatorsRun] as const) {
       sourceRuns.push(result.summary);
       if (result.warning) partialDiscoveryWarnings.push(result.warning);
       if (discoveryBudgetSummary && result.summary.durationMs >= 30000) {
-        partialDiscoveryWarnings.push(`${result.summary.source} may have hit retry pressure (${result.summary.durationMs}ms)`);
+        partialDiscoveryWarnings.push(`${result.summary.source} slow under budget (${result.summary.durationMs}ms)`);
       }
       for (const hit of result.hits) {
         addDiscoveredRepo(
