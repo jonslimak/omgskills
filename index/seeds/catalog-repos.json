@@ -10,5 +10,29 @@
     "publisherHandle": "openclaw",
     "defaultProvenanceType": "catalog",
     "notes": "Publishes bundled skills that can point back to upstream repos."
+  },
+  {
+    "repo": "neversight/learn-skills.dev",
+    "publisherHandle": "neversight",
+    "defaultProvenanceType": "mirrored",
+    "notes": "Feed-style mirrored library. Source repo owner should not be treated as the skill author."
+  },
+  {
+    "repo": "openclaw/skills",
+    "publisherHandle": "openclaw",
+    "defaultProvenanceType": "repackaged",
+    "notes": "Bundled skills repo with path-level upstream references that need better per-skill provenance later."
+  },
+  {
+    "repo": "francostino/opencode-skills-collection",
+    "publisherHandle": "francostino",
+    "defaultProvenanceType": "repackaged",
+    "notes": "Collection repo bundling other sources including antigravity-derived skills."
+  },
+  {
+    "repo": "orcaqubits/agentic-commerce-skills-plugins",
+    "publisherHandle": "orcaqubits",
+    "defaultProvenanceType": "repackaged",
+    "notes": "Packaged plugin/skills collection. Publisher should remain separate from the true skill author."
   }
 ]
