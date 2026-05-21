@@ -2,10 +2,20 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { performance } from "node:perf_hooks";
 import type { Skill } from "../types.js";
+import { searchByTopics } from "../sources/topics.js";
+import { searchBySkillMdFilename } from "../sources/code.js";
+import { searchAggregators } from "../sources/aggregators.js";
+import { searchSocial } from "../sources/social.js";
+import { searchRegistry } from "../sources/registry.js";
+import { searchSkillsSh } from "../sources/skillssh.js";
+import { searchAwesomeAgentSkills } from "../sources/awesome.js";
+import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import type {
+  DiscoveryLane,
+  ShadowCadence,
   ProvenanceType,
   RepoOverride,
   RepoState,
@@ -15,9 +25,53 @@ import type {
   ShadowSkillRecord,
   ShadowRunReport,
   ShadowSkillSignals,
+  SourceRunSummary,
   StageTimings,
   TopRepoSummary,
 } from "./types.js";
+
+type DiscoverySourceName =
+  | "official"
+  | "skillssh"
+  | "awesome"
+  | "registry"
+  | "topics"
+  | "code"
+  | "social"
+  | "aggregators"
+  | "trusted-vendors"
+  | "trusted-creators"
+  | "monitored-repos";
+
+type DiscoveredRepoRecord = {
+  repo: string;
+  repoUrl: string;
+  sources: Set<DiscoverySourceName>;
+  lanes: Set<DiscoveryLane>;
+};
+
+const CADENCE_LANES: Record<ShadowCadence, DiscoveryLane[]> = {
+  fast: ["fast"],
+  periodic: ["periodic"],
+  background: ["background"],
+  combined: ["fast", "periodic", "background"],
+};
+
+const EXTERNAL_SOURCES_BY_LANE: Record<DiscoveryLane, DiscoverySourceName[]> = {
+  fast: ["official"],
+  periodic: ["skillssh", "awesome", "registry"],
+  background: ["topics", "code", "social", "aggregators"],
+};
+
+function parseCadence(argv: string[]): ShadowCadence {
+  const raw = argv.find((arg) => arg.startsWith("--cadence="));
+  if (!raw) return "combined";
+  const value = raw.split("=", 2)[1]?.trim().toLowerCase();
+  if (value === "fast" || value === "periodic" || value === "background" || value === "combined") {
+    return value;
+  }
+  throw new Error(`Unknown cadence "${value}". Expected fast, periodic, background, or combined.`);
+}
 
 function writeShadowFile(path: string, content: string) {
   assertShadowPath(path);
@@ -29,9 +83,9 @@ function loadSkills(path: string): Skill[] {
   return JSON.parse(readFileSync(path, "utf8")) as Skill[];
 }
 
-function repoKeyFor(skill: Skill): { repo: string; repoUrl: string } | null {
+function repoKeyFromGithubUrl(githubUrl: string): { repo: string; repoUrl: string } | null {
   try {
-    const url = new URL(skill.github_url);
+    const url = new URL(githubUrl);
     if (url.hostname !== "github.com") return null;
     const parts = url.pathname.split("/").filter(Boolean);
     if (parts.length < 2) return null;
@@ -45,6 +99,10 @@ function repoKeyFor(skill: Skill): { repo: string; repoUrl: string } | null {
   } catch {
     return null;
   }
+}
+
+function repoKeyFor(skill: Skill): { repo: string; repoUrl: string } | null {
+  return repoKeyFromGithubUrl(skill.github_url);
 }
 
 function ownerHandle(repo: string): string {
@@ -285,6 +343,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     `- Checked at: ${report.checkedAt}`,
     `- Status: ${report.status.toUpperCase()}`,
+    `- Cadence: ${report.cadence}`,
     `- Baseline skills: ${report.baselineSkillCount}`,
     `- Shadow skills: ${report.shadowSkillCount}`,
     `- Carried forward: ${report.carriedForwardCount}`,
@@ -300,7 +359,19 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Author/publisher mismatches: ${report.authorPublisherMismatchCount}`,
     `- Unknown-author skills: ${report.unknownAuthorSkillCount}`,
     `- Catalog repo skills: ${report.catalogRepoSkillCount}`,
+    `- Discovered repos: ${report.discoveredRepoCount}`,
+    `- Discovery lane counts: fast=${report.discoveredRepoCountByLane.fast}, periodic=${report.discoveredRepoCountByLane.periodic}, background=${report.discoveredRepoCountByLane.background}`,
+    `- Discovery matched baseline repos: ${report.baselineRepoCountMatchedByDiscovery}`,
+    `- New discovery repos: ${report.newDiscoveryRepoCount}`,
+    `- Bootstrap value repos: ${report.bootstrapValueRepoCount}`,
+    `- Fast-only repos: ${report.fastOnlyRepoCount}`,
     `- Production write guard: ${report.productionWriteGuardPassed ? "passed" : "failed"}`,
+    "",
+    "## Source runs",
+    "",
+    ...(report.sourceRuns.length
+      ? report.sourceRuns.map((run) => `- ${run.source} [${run.lane}] ${run.hitCount} hits ${run.durationMs}ms`)
+      : ["- none"]),
     "",
     "## Top provisional core repos",
     "",
@@ -314,6 +385,14 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     ...(diffPreview.length ? diffPreview : ["- none"]),
     "",
+    "## Discovery samples",
+    "",
+    `- New discovery repos: ${report.newDiscoveryReposSample.join(", ") || "none"}`,
+    `- Periodic-only repos: ${report.periodicOnlyReposSample.join(", ") || "none"}`,
+    `- Background-only repos: ${report.backgroundOnlyReposSample.join(", ") || "none"}`,
+    `- Bootstrap value repos: ${report.bootstrapValueReposSample.join(", ") || "none"}`,
+    `- Fast-only repos: ${report.fastOnlyReposSample.join(", ") || "none"}`,
+    "",
     "## Stage timings (ms)",
     "",
     ...Object.entries(report.stageTimings).map(([stage, ms]) => `- ${stage}: ${ms}`),
@@ -321,9 +400,181 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
   ].join("\n");
 }
 
+function addDiscoveredRepo(
+  discovered: Map<string, DiscoveredRepoRecord>,
+  repoInfo: { repo: string; repoUrl: string } | null,
+  source: DiscoverySourceName,
+  lane: DiscoveryLane,
+) {
+  if (!repoInfo) return;
+  const existing = discovered.get(repoInfo.repo);
+  if (existing) {
+    existing.sources.add(source);
+    existing.lanes.add(lane);
+    return;
+  }
+  discovered.set(repoInfo.repo, {
+    repo: repoInfo.repo,
+    repoUrl: repoInfo.repoUrl,
+    sources: new Set([source]),
+    lanes: new Set([lane]),
+  });
+}
+
+async function timeSource<T>(
+  source: DiscoverySourceName,
+  lane: DiscoveryLane,
+  run: () => Promise<T[]>,
+): Promise<{ hits: T[]; summary: SourceRunSummary }> {
+  const startedAt = performance.now();
+  const hits = await run();
+  return {
+    hits,
+    summary: {
+      source,
+      lane,
+      hitCount: hits.length,
+      durationMs: Math.round(performance.now() - startedAt),
+    },
+  };
+}
+
+async function runDiscovery(
+  cadence: ShadowCadence,
+  repoIndex: ShadowRepoIndex,
+): Promise<{ sourceRuns: SourceRunSummary[]; discovered: Map<string, DiscoveredRepoRecord> }> {
+  const lanes = CADENCE_LANES[cadence];
+  const sourceRuns: SourceRunSummary[] = [];
+  const discovered = new Map<string, DiscoveredRepoRecord>();
+  const seeds = loadTrustedSeeds();
+
+  for (const lane of lanes) {
+    if (lane === "fast") {
+      const officialRun = await timeSource("official", "fast", searchOfficialSkills);
+      sourceRuns.push(officialRun.summary);
+      for (const hit of officialRun.hits) {
+        addDiscoveredRepo(discovered, repoKeyFromGithubUrl(hit.github_url), "official", "fast");
+      }
+
+      const trustedVendorRepos = repoIndex.repos.filter((repo) => repo.isTrustedVendor);
+      sourceRuns.push({
+        source: "trusted-vendors",
+        lane: "fast",
+        hitCount: trustedVendorRepos.length,
+        durationMs: 0,
+      });
+      for (const repo of trustedVendorRepos) {
+        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "trusted-vendors", "fast");
+      }
+
+      const trustedCreatorRepos = repoIndex.repos.filter(
+        (repo) => repo.isTrustedCreator || seeds.trustedCreatorHandles.has(ownerHandle(repo.repo)),
+      );
+      sourceRuns.push({
+        source: "trusted-creators",
+        lane: "fast",
+        hitCount: trustedCreatorRepos.length,
+        durationMs: 0,
+      });
+      for (const repo of trustedCreatorRepos) {
+        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "trusted-creators", "fast");
+      }
+
+      const monitoredRepos = repoIndex.repos.filter((repo) => repo.state === "rising" || repo.state === "core");
+      sourceRuns.push({
+        source: "monitored-repos",
+        lane: "fast",
+        hitCount: monitoredRepos.length,
+        durationMs: 0,
+      });
+      for (const repo of monitoredRepos) {
+        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "monitored-repos", "fast");
+      }
+      continue;
+    }
+
+    if (lane === "periodic") {
+      const [skillsshRun, awesomeRun, registryRun] = await Promise.all([
+        timeSource("skillssh", "periodic", () =>
+          searchSkillsSh({
+            board: "all-time",
+            topLimit: 500,
+            minRepoStars: 50,
+            pageConcurrency: 1,
+            repoConcurrency: 8,
+          }),
+        ),
+        timeSource("awesome", "periodic", searchAwesomeAgentSkills),
+        timeSource("registry", "periodic", searchRegistry),
+      ]);
+      for (const result of [skillsshRun, awesomeRun, registryRun] as const) {
+        sourceRuns.push(result.summary);
+        for (const hit of result.hits) {
+          addDiscoveredRepo(
+            discovered,
+            repoKeyFromGithubUrl(hit.github_url),
+            result.summary.source as DiscoverySourceName,
+            "periodic",
+          );
+        }
+      }
+      continue;
+    }
+
+    const [topicsRun, codeRun, socialRun, aggregatorsRun] = await Promise.all([
+      timeSource("topics", "background", () => searchByTopics({})),
+      timeSource("code", "background", searchBySkillMdFilename),
+      timeSource("social", "background", () => searchSocial({})),
+      timeSource("aggregators", "background", () => searchAggregators({})),
+    ]);
+    for (const result of [topicsRun, codeRun, socialRun, aggregatorsRun] as const) {
+      sourceRuns.push(result.summary);
+      for (const hit of result.hits) {
+        addDiscoveredRepo(
+          discovered,
+          repoKeyFromGithubUrl(hit.github_url),
+          result.summary.source as DiscoverySourceName,
+          "background",
+        );
+      }
+    }
+  }
+
+  return { sourceRuns, discovered };
+}
+
+function countDiscoveredByLane(discovered: Map<string, DiscoveredRepoRecord>): Record<DiscoveryLane, number> {
+  const counts: Record<DiscoveryLane, number> = { fast: 0, periodic: 0, background: 0 };
+  for (const repo of discovered.values()) {
+    for (const lane of repo.lanes) counts[lane] += 1;
+  }
+  return counts;
+}
+
+function countDiscoveredBySource(discovered: Map<string, DiscoveredRepoRecord>): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const repo of discovered.values()) {
+    for (const source of repo.sources) counts[source] = (counts[source] ?? 0) + 1;
+  }
+  return counts;
+}
+
+function sampleRepos(
+  discovered: Map<string, DiscoveredRepoRecord>,
+  predicate: (repo: DiscoveredRepoRecord) => boolean,
+  limit = 10,
+): string[] {
+  return [...discovered.values()]
+    .filter(predicate)
+    .map((repo) => repo.repo)
+    .sort()
+    .slice(0, limit);
+}
+
 async function main() {
   const timings: StageTimings = {};
   const checkedAt = new Date().toISOString();
+  const cadence = parseCadence(process.argv.slice(2));
 
   const baselinePath = join(indexRoot, "skills.json");
   const goldBasketPath = join(indexRoot, "gold-basket.json");
@@ -346,13 +597,42 @@ async function main() {
   const { repoIndex, unresolvedBaselineSkillCount } = buildRepoIndex(baselineSkills, goldBasketSkills, checkedAt);
   timings.buildRepoIndex = Math.round(performance.now() - repoIndexStart);
 
+  const discoveryStart = performance.now();
+  const { sourceRuns, discovered } = await runDiscovery(cadence, repoIndex);
+  timings.runDiscovery = Math.round(performance.now() - discoveryStart);
+
   const skillSignalsStart = performance.now();
   const skillSignals = buildSkillSignals(checkedAt);
   timings.buildSkillSignals = Math.round(performance.now() - skillSignalsStart);
 
+  const baselineRepos = new Set(repoIndex.repos.map((repo) => repo.repo));
+  const discoveredRepoCountByLane = countDiscoveredByLane(discovered);
+  const discoveredRepoCountBySource = countDiscoveredBySource(discovered);
+  const baselineRepoCountMatchedByDiscovery = [...discovered.keys()].filter((repo) => baselineRepos.has(repo)).length;
+  const newDiscoveryRepos = [...discovered.keys()].filter((repo) => !baselineRepos.has(repo)).sort();
+  const periodicOnlyReposSample = sampleRepos(
+    discovered,
+    (repo) => repo.lanes.has("periodic") && !repo.lanes.has("fast") && !repo.lanes.has("background"),
+  );
+  const backgroundOnlyReposSample = sampleRepos(
+    discovered,
+    (repo) => repo.lanes.has("background") && !repo.lanes.has("fast") && !repo.lanes.has("periodic"),
+  );
+  const bootstrapValueReposSample = sampleRepos(
+    discovered,
+    (repo) =>
+      !baselineRepos.has(repo.repo) &&
+      (repo.sources.has("awesome") || repo.sources.has("registry")),
+  );
+  const fastOnlyReposSample = sampleRepos(
+    discovered,
+    (repo) => repo.lanes.has("fast") && !repo.lanes.has("periodic") && !repo.lanes.has("background"),
+  );
+
   const reportBase: Omit<ShadowRunReport, "stageTimings"> = {
     checkedAt,
     status: "ok",
+    cadence,
     baselineSkillCount: baselineSkills.length,
     shadowSkillCount: shadowSkills.length,
     carriedForwardCount: baselineSkills.length,
@@ -373,6 +653,23 @@ async function main() {
     catalogRepoExamples: buildCatalogRepoExamples(baselineSkills, shadowSkills),
     topCoreRepos: topReposByState(repoIndex.repos, "core"),
     topRisingRepos: topReposByState(repoIndex.repos, "rising"),
+    sourceRuns,
+    discoveredRepoCount: discovered.size,
+    discoveredRepoCountByLane,
+    discoveredRepoCountBySource,
+    baselineRepoCountMatchedByDiscovery,
+    newDiscoveryRepoCount: newDiscoveryRepos.length,
+    newDiscoveryReposSample: newDiscoveryRepos.slice(0, 10),
+    periodicOnlyReposSample,
+    backgroundOnlyReposSample,
+    bootstrapValueRepoCount: [...discovered.values()].filter(
+      (repo) => !baselineRepos.has(repo.repo) && (repo.sources.has("awesome") || repo.sources.has("registry")),
+    ).length,
+    bootstrapValueReposSample,
+    fastOnlyRepoCount: [...discovered.values()].filter(
+      (repo) => repo.lanes.has("fast") && !repo.lanes.has("periodic") && !repo.lanes.has("background"),
+    ).length,
+    fastOnlyReposSample,
     productionWriteGuardPassed: true,
   };
 
@@ -390,7 +687,7 @@ async function main() {
   writeShadowFile(reportOutPath, JSON.stringify(finalReport, null, 2) + "\n");
   writeShadowFile(summaryOutPath, buildSummary(finalReport, repoIndex));
 
-  console.log(`shadow crawl complete: ${baselineSkills.length} skills, ${repoIndex.repoCount} repos`);
+  console.log(`shadow crawl complete: ${baselineSkills.length} skills, ${repoIndex.repoCount} repos (${cadence})`);
 }
 
 main().catch((error) => {

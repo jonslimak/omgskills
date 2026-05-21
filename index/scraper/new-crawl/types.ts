@@ -1,4 +1,6 @@
 export type RepoState = "library" | "rising" | "core";
+export type DiscoveryLane = "fast" | "periodic" | "background";
+export type ShadowCadence = DiscoveryLane | "combined";
 
 export type RepoOverride = {
   repo: string;
@@ -87,6 +89,12 @@ export type ShadowSkillSignals = {
 };
 
 export type StageTimings = Record<string, number>;
+export type SourceRunSummary = {
+  source: string;
+  lane: DiscoveryLane;
+  hitCount: number;
+  durationMs: number;
+};
 
 export type TopRepoSummary = {
   repo: string;
@@ -108,6 +116,7 @@ export type ShadowAuthorDiffExample = {
 export type ShadowRunReport = {
   checkedAt: string;
   status: "ok";
+  cadence: ShadowCadence;
   baselineSkillCount: number;
   shadowSkillCount: number;
   carriedForwardCount: number;
@@ -128,6 +137,19 @@ export type ShadowRunReport = {
   catalogRepoExamples: ShadowAuthorDiffExample[];
   topCoreRepos: TopRepoSummary[];
   topRisingRepos: TopRepoSummary[];
+  sourceRuns: SourceRunSummary[];
+  discoveredRepoCount: number;
+  discoveredRepoCountByLane: Record<DiscoveryLane, number>;
+  discoveredRepoCountBySource: Record<string, number>;
+  baselineRepoCountMatchedByDiscovery: number;
+  newDiscoveryRepoCount: number;
+  newDiscoveryReposSample: string[];
+  periodicOnlyReposSample: string[];
+  backgroundOnlyReposSample: string[];
+  bootstrapValueRepoCount: number;
+  bootstrapValueReposSample: string[];
+  fastOnlyRepoCount: number;
+  fastOnlyReposSample: string[];
   stageTimings: StageTimings;
   productionWriteGuardPassed: true;
 };
