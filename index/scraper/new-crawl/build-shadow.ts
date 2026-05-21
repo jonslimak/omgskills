@@ -14,6 +14,7 @@ import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js"
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import type {
+  DiscoveryBudgetSummary,
   DiscoveryLane,
   ShadowCadence,
   ProvenanceType,
@@ -61,6 +62,24 @@ const EXTERNAL_SOURCES_BY_LANE: Record<DiscoveryLane, DiscoverySourceName[]> = {
   fast: ["official"],
   periodic: ["skillssh", "awesome", "registry"],
   background: ["topics", "code", "social", "aggregators"],
+};
+
+const BACKGROUND_DISCOVERY_BUDGET: DiscoveryBudgetSummary = {
+  topics: {
+    maxQueries: 4,
+    maxPagesPerQuery: 2,
+  },
+  code: {
+    includeBroadQuery: false,
+    maxFingerprintQueries: 3,
+    maxPagesPerQuery: 2,
+  },
+  social: {
+    maxPagesPerQuery: 1,
+  },
+  aggregators: {
+    maxRepos: 10,
+  },
 };
 
 function parseCadence(argv: string[]): ShadowCadence {
@@ -365,12 +384,30 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- New discovery repos: ${report.newDiscoveryRepoCount}`,
     `- Bootstrap value repos: ${report.bootstrapValueRepoCount}`,
     `- Fast-only repos: ${report.fastOnlyRepoCount}`,
+    `- Discovery budget applied: ${report.discoveryBudgetApplied ? "yes" : "no"}`,
     `- Production write guard: ${report.productionWriteGuardPassed ? "passed" : "failed"}`,
     "",
     "## Source runs",
     "",
     ...(report.sourceRuns.length
       ? report.sourceRuns.map((run) => `- ${run.source} [${run.lane}] ${run.hitCount} hits ${run.durationMs}ms`)
+      : ["- none"]),
+    "",
+    "## Discovery budget",
+    "",
+    ...(report.discoveryBudgetSummary
+      ? [
+          `- topics: maxQueries=${report.discoveryBudgetSummary.topics.maxQueries}, maxPagesPerQuery=${report.discoveryBudgetSummary.topics.maxPagesPerQuery}`,
+          `- code: includeBroadQuery=${report.discoveryBudgetSummary.code.includeBroadQuery}, maxFingerprintQueries=${report.discoveryBudgetSummary.code.maxFingerprintQueries}, maxPagesPerQuery=${report.discoveryBudgetSummary.code.maxPagesPerQuery}`,
+          `- social: maxPagesPerQuery=${report.discoveryBudgetSummary.social.maxPagesPerQuery}`,
+          `- aggregators: maxRepos=${report.discoveryBudgetSummary.aggregators.maxRepos}`,
+        ]
+      : ["- none"]),
+    "",
+    "## Partial discovery warnings",
+    "",
+    ...(report.partialDiscoveryWarnings.length
+      ? report.partialDiscoveryWarnings.map((warning) => `- ${warning}`)
       : ["- none"]),
     "",
     "## Top provisional core repos",
@@ -425,28 +462,53 @@ async function timeSource<T>(
   source: DiscoverySourceName,
   lane: DiscoveryLane,
   run: () => Promise<T[]>,
-): Promise<{ hits: T[]; summary: SourceRunSummary }> {
+  options: { allowFailure?: boolean } = {},
+): Promise<{ hits: T[]; summary: SourceRunSummary; warning: string | null }> {
   const startedAt = performance.now();
-  const hits = await run();
-  return {
-    hits,
-    summary: {
-      source,
-      lane,
-      hitCount: hits.length,
-      durationMs: Math.round(performance.now() - startedAt),
-    },
-  };
+  try {
+    const hits = await run();
+    return {
+      hits,
+      summary: {
+        source,
+        lane,
+        hitCount: hits.length,
+        durationMs: Math.round(performance.now() - startedAt),
+      },
+      warning: null,
+    };
+  } catch (error) {
+    if (!options.allowFailure) throw error;
+    return {
+      hits: [],
+      summary: {
+        source,
+        lane,
+        hitCount: 0,
+        durationMs: Math.round(performance.now() - startedAt),
+      },
+      warning: `${source} failed under background budget: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
 }
 
 async function runDiscovery(
   cadence: ShadowCadence,
   repoIndex: ShadowRepoIndex,
-): Promise<{ sourceRuns: SourceRunSummary[]; discovered: Map<string, DiscoveredRepoRecord> }> {
+): Promise<{
+  sourceRuns: SourceRunSummary[];
+  discovered: Map<string, DiscoveredRepoRecord>;
+  discoveryBudgetApplied: boolean;
+  discoveryBudgetSummary: DiscoveryBudgetSummary | null;
+  partialDiscoveryWarnings: string[];
+}> {
   const lanes = CADENCE_LANES[cadence];
   const sourceRuns: SourceRunSummary[] = [];
   const discovered = new Map<string, DiscoveredRepoRecord>();
   const seeds = loadTrustedSeeds();
+  const discoveryBudgetApplied = cadence === "background" || cadence === "combined";
+  const discoveryBudgetSummary = discoveryBudgetApplied ? BACKGROUND_DISCOVERY_BUDGET : null;
+  const partialDiscoveryWarnings: string[] = [];
 
   for (const lane of lanes) {
     if (lane === "fast") {
@@ -522,13 +584,69 @@ async function runDiscovery(
     }
 
     const [topicsRun, codeRun, socialRun, aggregatorsRun] = await Promise.all([
-      timeSource("topics", "background", () => searchByTopics({})),
-      timeSource("code", "background", searchBySkillMdFilename),
-      timeSource("social", "background", () => searchSocial({})),
-      timeSource("aggregators", "background", () => searchAggregators({})),
+      timeSource("topics", "background", () =>
+        searchByTopics(
+          discoveryBudgetSummary
+            ? {
+                maxQueries: discoveryBudgetSummary.topics.maxQueries,
+                maxPagesPerQuery: discoveryBudgetSummary.topics.maxPagesPerQuery,
+              }
+            : {},
+        ),
+      { allowFailure: true }),
+      timeSource("code", "background", () =>
+        searchBySkillMdFilename(
+          discoveryBudgetSummary
+            ? {
+                includeBroadQuery: discoveryBudgetSummary.code.includeBroadQuery,
+                maxFingerprintQueries: discoveryBudgetSummary.code.maxFingerprintQueries,
+                maxPagesPerQuery: discoveryBudgetSummary.code.maxPagesPerQuery,
+              }
+            : {},
+        ),
+      { allowFailure: true }),
+      timeSource("social", "background", () =>
+        searchSocial(
+          discoveryBudgetSummary
+            ? { maxPagesPerQuery: discoveryBudgetSummary.social.maxPagesPerQuery }
+            : {},
+        ),
+      { allowFailure: true }),
+      timeSource("aggregators", "background", () =>
+        searchAggregators(
+          discoveryBudgetSummary
+            ? { maxRepos: discoveryBudgetSummary.aggregators.maxRepos }
+            : {},
+        ),
+      { allowFailure: true }),
     ]);
+    if (discoveryBudgetSummary) {
+      partialDiscoveryWarnings.push("broad code search skipped by budget");
+      partialDiscoveryWarnings.push(
+        `code fingerprint queries capped at ${discoveryBudgetSummary.code.maxFingerprintQueries}`,
+      );
+      partialDiscoveryWarnings.push(
+        `code query pages capped at ${discoveryBudgetSummary.code.maxPagesPerQuery}`,
+      );
+      partialDiscoveryWarnings.push(
+        `topic queries capped at ${discoveryBudgetSummary.topics.maxQueries}`,
+      );
+      partialDiscoveryWarnings.push(
+        `topic query pages capped at ${discoveryBudgetSummary.topics.maxPagesPerQuery}`,
+      );
+      partialDiscoveryWarnings.push(
+        `social pages capped at ${discoveryBudgetSummary.social.maxPagesPerQuery}`,
+      );
+      partialDiscoveryWarnings.push(
+        `aggregator repos capped at ${discoveryBudgetSummary.aggregators.maxRepos}`,
+      );
+    }
     for (const result of [topicsRun, codeRun, socialRun, aggregatorsRun] as const) {
       sourceRuns.push(result.summary);
+      if (result.warning) partialDiscoveryWarnings.push(result.warning);
+      if (discoveryBudgetSummary && result.summary.durationMs >= 30000) {
+        partialDiscoveryWarnings.push(`${result.summary.source} may have hit retry pressure (${result.summary.durationMs}ms)`);
+      }
       for (const hit of result.hits) {
         addDiscoveredRepo(
           discovered,
@@ -540,7 +658,13 @@ async function runDiscovery(
     }
   }
 
-  return { sourceRuns, discovered };
+  return {
+    sourceRuns,
+    discovered,
+    discoveryBudgetApplied,
+    discoveryBudgetSummary,
+    partialDiscoveryWarnings,
+  };
 }
 
 function countDiscoveredByLane(discovered: Map<string, DiscoveredRepoRecord>): Record<DiscoveryLane, number> {
@@ -598,7 +722,8 @@ async function main() {
   timings.buildRepoIndex = Math.round(performance.now() - repoIndexStart);
 
   const discoveryStart = performance.now();
-  const { sourceRuns, discovered } = await runDiscovery(cadence, repoIndex);
+  const { sourceRuns, discovered, discoveryBudgetApplied, discoveryBudgetSummary, partialDiscoveryWarnings } =
+    await runDiscovery(cadence, repoIndex);
   timings.runDiscovery = Math.round(performance.now() - discoveryStart);
 
   const skillSignalsStart = performance.now();
@@ -654,6 +779,9 @@ async function main() {
     topCoreRepos: topReposByState(repoIndex.repos, "core"),
     topRisingRepos: topReposByState(repoIndex.repos, "rising"),
     sourceRuns,
+    discoveryBudgetApplied,
+    discoveryBudgetSummary,
+    partialDiscoveryWarnings,
     discoveredRepoCount: discovered.size,
     discoveredRepoCountByLane,
     discoveredRepoCountBySource,

@@ -96,6 +96,24 @@ export type SourceRunSummary = {
   durationMs: number;
 };
 
+export type DiscoveryBudgetSummary = {
+  topics: {
+    maxQueries: number;
+    maxPagesPerQuery: number;
+  };
+  code: {
+    includeBroadQuery: boolean;
+    maxFingerprintQueries: number;
+    maxPagesPerQuery: number;
+  };
+  social: {
+    maxPagesPerQuery: number;
+  };
+  aggregators: {
+    maxRepos: number;
+  };
+};
+
 export type TopRepoSummary = {
   repo: string;
   stars: number;
@@ -138,6 +156,9 @@ export type ShadowRunReport = {
   topCoreRepos: TopRepoSummary[];
   topRisingRepos: TopRepoSummary[];
   sourceRuns: SourceRunSummary[];
+  discoveryBudgetApplied: boolean;
+  discoveryBudgetSummary: DiscoveryBudgetSummary | null;
+  partialDiscoveryWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;
   discoveredRepoCountBySource: Record<string, number>;
