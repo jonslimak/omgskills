@@ -89,6 +89,23 @@ test("parses openclaw/skills path author", () => {
   assert.equal(result.authorConfidence, "high");
 });
 
+test("parses NeverSight mirrored path", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "NeverSight/skills.sh_feed:data/skills-md/vercel/ai/ai-sdk",
+      github_url: "https://github.com/NeverSight/learn-skills.dev",
+      author_handle: "NeverSight",
+    }),
+    seeds(),
+  );
+  assert.equal(result.authorHandle, "vercel");
+  assert.equal(result.publisherHandle, "neversight");
+  assert.equal(result.publisherRepo, "neversight/learn-skills.dev");
+  assert.equal(result.upstreamRepo, "vercel/ai");
+  assert.equal(result.provenanceType, "mirrored");
+  assert.equal(result.authorConfidence, "high");
+});
+
 test("unmatched openclaw/skills ids fall back safely", () => {
   const result = resolveShadowProvenance(
     skill({
@@ -102,6 +119,31 @@ test("unmatched openclaw/skills ids fall back safely", () => {
   assert.equal(result.publisherHandle, "openclaw");
   assert.equal(result.provenanceType, "original");
   assert.equal(result.authorConfidence, "high");
+});
+
+test("unmatched NeverSight ids fall back safely", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "NeverSight/skills_feed:data/other-source/ai-sdk",
+      github_url: "https://github.com/NeverSight/learn-skills.dev",
+      author_handle: "NeverSight",
+    }),
+    seeds({
+      provenanceOverrides: [
+        {
+          repo: "neversight/learn-skills.dev",
+          authorHandle: "",
+          publisherHandle: "neversight",
+          provenanceType: "mirrored",
+          authorConfidence: "low",
+        },
+      ],
+    }),
+  );
+  assert.equal(result.authorHandle, "");
+  assert.equal(result.publisherHandle, "neversight");
+  assert.equal(result.provenanceType, "mirrored");
+  assert.equal(result.authorConfidence, "low");
 });
 
 test("skill-level overrides beat repo-level rules", () => {
@@ -169,5 +211,31 @@ test("openclaw path parsing beats repo-level override", () => {
   assert.equal(result.authorHandle, "steipete");
   assert.equal(result.publisherHandle, "openclaw");
   assert.equal(result.provenanceType, "repackaged");
+  assert.equal(result.authorConfidence, "high");
+});
+
+test("NeverSight path parsing beats repo-level override", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "NeverSight/skills.sh_feed:data/skills-md/vercel/ai/ai-sdk",
+      github_url: "https://github.com/NeverSight/learn-skills.dev",
+      author_handle: "NeverSight",
+    }),
+    seeds({
+      provenanceOverrides: [
+        {
+          repo: "neversight/learn-skills.dev",
+          authorHandle: "",
+          publisherHandle: "neversight",
+          provenanceType: "mirrored",
+          authorConfidence: "low",
+        },
+      ],
+    }),
+  );
+  assert.equal(result.authorHandle, "vercel");
+  assert.equal(result.publisherHandle, "neversight");
+  assert.equal(result.upstreamRepo, "vercel/ai");
+  assert.equal(result.provenanceType, "mirrored");
   assert.equal(result.authorConfidence, "high");
 });

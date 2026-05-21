@@ -52,6 +52,27 @@ function parseOpenclawSkillAuthor(skill: Skill): ShadowSkillProvenance | null {
   };
 }
 
+function parseNeverSightSkillAuthor(skill: Skill): ShadowSkillProvenance | null {
+  const publisherRepo = repoKeyForSkill(skill);
+  if (publisherRepo !== "neversight/learn-skills.dev") return null;
+
+  const match = skill.id.match(/^[^:]+:data\/skills-md\/([^/]+)\/([^/]+)\//i);
+  if (!match) return null;
+
+  const authorHandle = normalizeRepo(match[1] ?? "");
+  const upstreamRepoName = normalizeRepo(match[2] ?? "");
+  if (!authorHandle || !upstreamRepoName) return null;
+
+  return {
+    authorHandle,
+    publisherHandle: "neversight",
+    publisherRepo: "neversight/learn-skills.dev",
+    upstreamRepo: `${authorHandle}/${upstreamRepoName}`,
+    provenanceType: "mirrored",
+    authorConfidence: "high",
+  };
+}
+
 function overrideForSkill(skill: Skill, overrides: ProvenanceOverride[]) {
   const publisherRepo = repoKeyForSkill(skill);
   const repoOverride = overrides.find((override) => override.repo === publisherRepo);
@@ -87,6 +108,7 @@ export function resolveShadowProvenance(skill: Skill, seeds: TrustedSeeds): Shad
   const catalogRule = catalogRuleForRepo(publisherRepo, seeds.catalogRepoRules);
   const { repoOverride, idOverride } = overrideForSkill(skill, seeds.provenanceOverrides);
   const parsedOpenclaw = parseOpenclawSkillAuthor(skill);
+  const parsedNeverSight = parseNeverSightSkillAuthor(skill);
 
   let result: ShadowSkillProvenance;
 
@@ -102,6 +124,8 @@ export function resolveShadowProvenance(skill: Skill, seeds: TrustedSeeds): Shad
       },
       idOverride,
     );
+  } else if (parsedNeverSight) {
+    result = parsedNeverSight;
   } else if (parsedOpenclaw) {
     result = parsedOpenclaw;
   } else if (repoOverride) {
