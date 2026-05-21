@@ -1,0 +1,93 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { resolveShadowProvenance } from "./provenance.js";
+import type { Skill } from "../types.js";
+import type { TrustedSeeds } from "./types.js";
+
+function skill(overrides: Partial<Skill>): Skill {
+  return {
+    id: "owner/repo:skill",
+    name: "skill",
+    description: "desc",
+    github_url: "https://github.com/owner/repo",
+    install_cmd: "cmd",
+    author_handle: "owner",
+    tags: [],
+    stars: 10,
+    last_updated: "2026-01-01T00:00:00Z",
+    first_seen: "2026-01-01",
+    ...overrides,
+  };
+}
+
+function seeds(partial: Partial<TrustedSeeds> = {}): TrustedSeeds {
+  return {
+    trustedVendorHandles: new Set(),
+    trustedCreatorHandles: new Set(),
+    repoOverrides: [],
+    catalogRepoRules: [],
+    provenanceOverrides: [],
+    ...partial,
+  };
+}
+
+test("keeps a normal one-author repo as original", () => {
+  const result = resolveShadowProvenance(skill({}), seeds());
+  assert.equal(result.authorHandle, "owner");
+  assert.equal(result.publisherHandle, "owner");
+  assert.equal(result.provenanceType, "original");
+  assert.equal(result.authorConfidence, "high");
+});
+
+test("catalog repo child skill does not inherit repo owner by default", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "sickn33/antigravity-awesome-skills:content-marketer",
+      github_url: "https://github.com/sickn33/antigravity-awesome-skills",
+      author_handle: "sickn33",
+    }),
+    seeds({
+      catalogRepoRules: [{ repo: "sickn33/antigravity-awesome-skills", defaultProvenanceType: "catalog" }],
+    }),
+  );
+  assert.equal(result.authorHandle, "");
+  assert.equal(result.publisherHandle, "sickn33");
+  assert.equal(result.provenanceType, "catalog");
+  assert.equal(result.authorConfidence, "low");
+});
+
+test("obvious upstream repo in skill id produces repackaged provenance", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "steipete/clawdis:summarize",
+      github_url: "https://github.com/openclaw/openclaw",
+      author_handle: "steipete",
+    }),
+    seeds(),
+  );
+  assert.equal(result.authorHandle, "steipete");
+  assert.equal(result.publisherHandle, "openclaw");
+  assert.equal(result.upstreamRepo, "steipete/clawdis");
+  assert.equal(result.provenanceType, "repackaged");
+  assert.equal(result.authorConfidence, "high");
+});
+
+test("skill-level overrides beat repo-level rules", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "owner/repo:skill",
+      github_url: "https://github.com/sickn33/antigravity-awesome-skills",
+      author_handle: "sickn33",
+    }),
+    seeds({
+      catalogRepoRules: [{ repo: "sickn33/antigravity-awesome-skills", defaultProvenanceType: "catalog" }],
+      provenanceOverrides: [
+        { repo: "sickn33/antigravity-awesome-skills", authorHandle: "publisher", provenanceType: "catalog", authorConfidence: "low" },
+        { id: "owner/repo:skill", authorHandle: "real-author", provenanceType: "mirrored", authorConfidence: "high" },
+      ],
+    }),
+  );
+  assert.equal(result.authorHandle, "real-author");
+  assert.equal(result.provenanceType, "mirrored");
+  assert.equal(result.authorConfidence, "high");
+});

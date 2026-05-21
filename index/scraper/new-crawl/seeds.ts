@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { indexRoot } from "./shadow-path-guard.js";
-import type { RepoOverride, TrustedSeeds } from "./types.js";
+import type { CatalogRepoRule, ProvenanceOverride, RepoOverride, TrustedSeeds } from "./types.js";
 
 type HandleList = { handles: string[] };
 
@@ -22,6 +22,8 @@ export function loadTrustedSeeds(): TrustedSeeds {
   const vendorJson = readJson<HandleList>(join(seedsRoot, "trusted-vendors.json"));
   const creatorJson = readJson<HandleList>(join(seedsRoot, "trusted-creators.json"));
   const overridesJson = readJson<RepoOverride[]>(join(seedsRoot, "repo-overrides.json"));
+  const catalogJson = readJson<CatalogRepoRule[]>(join(seedsRoot, "catalog-repos.json"));
+  const provenanceJson = readJson<ProvenanceOverride[]>(join(seedsRoot, "provenance-overrides.json"));
 
   return {
     trustedVendorHandles: new Set(vendorJson.handles.map(normalizeHandle).filter(Boolean)),
@@ -32,5 +34,22 @@ export function loadTrustedSeeds(): TrustedSeeds {
         repo: normalizeRepo(override.repo),
       }))
       .filter((override) => override.repo),
+    catalogRepoRules: catalogJson
+      .map((rule) => ({
+        ...rule,
+        repo: normalizeRepo(rule.repo),
+        publisherHandle: rule.publisherHandle ? normalizeHandle(rule.publisherHandle) : undefined,
+      }))
+      .filter((rule) => rule.repo),
+    provenanceOverrides: provenanceJson
+      .map((override) => ({
+        ...override,
+        id: override.id?.trim(),
+        repo: override.repo ? normalizeRepo(override.repo) : undefined,
+        authorHandle: override.authorHandle ? normalizeHandle(override.authorHandle) : undefined,
+        publisherHandle: override.publisherHandle ? normalizeHandle(override.publisherHandle) : undefined,
+        upstreamRepo: override.upstreamRepo ? normalizeRepo(override.upstreamRepo) : undefined,
+      }))
+      .filter((override) => override.id || override.repo),
   };
 }

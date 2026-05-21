@@ -7,10 +7,52 @@ export type RepoOverride = {
   notes?: string;
 };
 
+export type AuthorConfidence = "high" | "low";
+
+export type ProvenanceType = "original" | "catalog" | "repackaged" | "mirrored" | "unknown";
+
+export type CatalogRepoRule = {
+  repo: string;
+  publisherHandle?: string;
+  defaultProvenanceType?: ProvenanceType;
+  notes?: string;
+};
+
+export type ProvenanceOverride = {
+  id?: string;
+  repo?: string;
+  authorHandle?: string;
+  publisherHandle?: string;
+  upstreamRepo?: string;
+  provenanceType?: ProvenanceType;
+  authorConfidence?: AuthorConfidence;
+  notes?: string;
+};
+
 export type TrustedSeeds = {
   trustedVendorHandles: Set<string>;
   trustedCreatorHandles: Set<string>;
   repoOverrides: RepoOverride[];
+  catalogRepoRules: CatalogRepoRule[];
+  provenanceOverrides: ProvenanceOverride[];
+};
+
+export type ShadowSkillProvenance = {
+  authorHandle: string;
+  publisherHandle: string;
+  publisherRepo: string;
+  upstreamRepo: string | null;
+  provenanceType: ProvenanceType;
+  authorConfidence: AuthorConfidence;
+};
+
+export type ShadowSkillRecord = Omit<import("../types.js").Skill, "author_handle"> & {
+  author_handle: string;
+  publisher_handle: string;
+  publisher_repo: string;
+  upstream_repo: string | null;
+  provenance_type: ProvenanceType;
+  author_confidence: AuthorConfidence;
 };
 
 export type ShadowRepoIndexEntry = {
@@ -52,6 +94,17 @@ export type TopRepoSummary = {
   topSkillId: string | null;
 };
 
+export type ShadowAuthorDiffExample = {
+  id: string;
+  currentAuthorHandle: string;
+  shadowAuthorHandle: string;
+  publisherHandle: string;
+  publisherRepo: string;
+  upstreamRepo: string | null;
+  provenanceType: ProvenanceType;
+  authorConfidence: AuthorConfidence;
+};
+
 export type ShadowRunReport = {
   checkedAt: string;
   status: "ok";
@@ -67,6 +120,12 @@ export type ShadowRunReport = {
   trustedCreatorRepoCount: number;
   goldBasketRepoCount: number;
   unresolvedBaselineSkillCount: number;
+  authorPublisherMismatchCount: number;
+  provenanceCounts: Record<ProvenanceType, number>;
+  unknownAuthorSkillCount: number;
+  catalogRepoSkillCount: number;
+  authorDiffExamples: ShadowAuthorDiffExample[];
+  catalogRepoExamples: ShadowAuthorDiffExample[];
   topCoreRepos: TopRepoSummary[];
   topRisingRepos: TopRepoSummary[];
   stageTimings: StageTimings;
