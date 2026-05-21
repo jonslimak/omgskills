@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "scrape": "tsx scraper/build.ts",
+    "scrape:shadow": "tsx scraper/new-crawl/build-shadow.ts",
+    "test:shadow-guard": "tsx --test scraper/new-crawl/shadow-path-guard.test.ts",
     "scrape:debug": "tsx scraper/build.ts --sources=aggregators,social,registry,awesome,official --aggregator-repo-limit=10 --social-page-limit=1 --output-suffix=debug --max-enriched=200",
     "scrape:debug:official": "tsx scraper/build.ts --sources=official --output-suffix=debug --max-enriched=100 --max-candidates=150",
     "scrape:debug:skillssh": "tsx scraper/build.ts --sources=skillssh --output-suffix=debug --max-enriched=100 --max-candidates=150",
