@@ -72,6 +72,38 @@ test("obvious upstream repo in skill id produces repackaged provenance", () => {
   assert.equal(result.authorConfidence, "high");
 });
 
+test("parses openclaw/skills path author", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "clawdbot/skills:skills/steipete/github",
+      github_url: "https://github.com/openclaw/skills",
+      author_handle: "clawdbot",
+    }),
+    seeds(),
+  );
+  assert.equal(result.authorHandle, "steipete");
+  assert.equal(result.publisherHandle, "openclaw");
+  assert.equal(result.publisherRepo, "openclaw/skills");
+  assert.equal(result.upstreamRepo, null);
+  assert.equal(result.provenanceType, "repackaged");
+  assert.equal(result.authorConfidence, "high");
+});
+
+test("unmatched openclaw/skills ids fall back safely", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "openclaw/skills:rstack-page",
+      github_url: "https://github.com/openclaw/skills",
+      author_handle: "openclaw",
+    }),
+    seeds(),
+  );
+  assert.equal(result.authorHandle, "openclaw");
+  assert.equal(result.publisherHandle, "openclaw");
+  assert.equal(result.provenanceType, "original");
+  assert.equal(result.authorConfidence, "high");
+});
+
 test("skill-level overrides beat repo-level rules", () => {
   const result = resolveShadowProvenance(
     skill({
@@ -89,5 +121,53 @@ test("skill-level overrides beat repo-level rules", () => {
   );
   assert.equal(result.authorHandle, "real-author");
   assert.equal(result.provenanceType, "mirrored");
+  assert.equal(result.authorConfidence, "high");
+});
+
+test("skill-level overrides beat openclaw path parsing", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "clawdbot/skills:skills/steipete/github",
+      github_url: "https://github.com/openclaw/skills",
+      author_handle: "clawdbot",
+    }),
+    seeds({
+      provenanceOverrides: [
+        {
+          id: "clawdbot/skills:skills/steipete/github",
+          authorHandle: "manual-author",
+          provenanceType: "repackaged",
+          authorConfidence: "high",
+        },
+      ],
+    }),
+  );
+  assert.equal(result.authorHandle, "manual-author");
+  assert.equal(result.publisherHandle, "openclaw");
+  assert.equal(result.provenanceType, "repackaged");
+});
+
+test("openclaw path parsing beats repo-level override", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "clawdbot/skills:skills/steipete/github",
+      github_url: "https://github.com/openclaw/skills",
+      author_handle: "clawdbot",
+    }),
+    seeds({
+      provenanceOverrides: [
+        {
+          repo: "openclaw/skills",
+          authorHandle: "",
+          publisherHandle: "openclaw",
+          provenanceType: "repackaged",
+          authorConfidence: "low",
+        },
+      ],
+    }),
+  );
+  assert.equal(result.authorHandle, "steipete");
+  assert.equal(result.publisherHandle, "openclaw");
+  assert.equal(result.provenanceType, "repackaged");
   assert.equal(result.authorConfidence, "high");
 });

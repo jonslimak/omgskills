@@ -32,6 +32,26 @@ function ownerHandle(repo: string): string {
   return repo.split("/")[0] ?? "";
 }
 
+function parseOpenclawSkillAuthor(skill: Skill): ShadowSkillProvenance | null {
+  const publisherRepo = repoKeyForSkill(skill);
+  if (publisherRepo !== "openclaw/skills") return null;
+
+  const match = skill.id.match(/^[^:]+:skills\/([^/]+)\//i);
+  if (!match) return null;
+
+  const authorHandle = normalizeRepo(match[1] ?? "");
+  if (!authorHandle) return null;
+
+  return {
+    authorHandle,
+    publisherHandle: "openclaw",
+    publisherRepo: "openclaw/skills",
+    upstreamRepo: null,
+    provenanceType: "repackaged",
+    authorConfidence: "high",
+  };
+}
+
 function overrideForSkill(skill: Skill, overrides: ProvenanceOverride[]) {
   const publisherRepo = repoKeyForSkill(skill);
   const repoOverride = overrides.find((override) => override.repo === publisherRepo);
@@ -65,50 +85,76 @@ export function resolveShadowProvenance(skill: Skill, seeds: TrustedSeeds): Shad
   const obviousUpstreamRepo =
     upstreamRepoFromId && publisherRepo && upstreamRepoFromId !== publisherRepo ? upstreamRepoFromId : "";
   const catalogRule = catalogRuleForRepo(publisherRepo, seeds.catalogRepoRules);
+  const { repoOverride, idOverride } = overrideForSkill(skill, seeds.provenanceOverrides);
+  const parsedOpenclaw = parseOpenclawSkillAuthor(skill);
 
   let result: ShadowSkillProvenance;
 
-  if (obviousUpstreamRepo) {
-    result = {
-      authorHandle: ownerHandle(obviousUpstreamRepo),
-      publisherHandle: catalogRule?.publisherHandle ?? publisherHandle,
-      publisherRepo,
-      upstreamRepo: obviousUpstreamRepo,
-      provenanceType: catalogRule?.defaultProvenanceType ?? "repackaged",
-      authorConfidence: "high",
-    };
-  } else if (catalogRule) {
-    result = {
-      authorHandle: "",
-      publisherHandle: catalogRule.publisherHandle ?? publisherHandle,
-      publisherRepo,
-      upstreamRepo: null,
-      provenanceType: catalogRule.defaultProvenanceType ?? "catalog",
-      authorConfidence: "low",
-    };
-  } else if (publisherRepo) {
-    result = {
-      authorHandle: skill.author_handle || publisherHandle,
-      publisherHandle,
-      publisherRepo,
-      upstreamRepo: null,
-      provenanceType: "original",
-      authorConfidence: "high",
-    };
+  if (idOverride) {
+    result = applyOverride(
+      {
+        authorHandle: "",
+        publisherHandle,
+        publisherRepo,
+        upstreamRepo: null,
+        provenanceType: "unknown",
+        authorConfidence: "low",
+      },
+      idOverride,
+    );
+  } else if (parsedOpenclaw) {
+    result = parsedOpenclaw;
+  } else if (repoOverride) {
+    result = applyOverride(
+      {
+        authorHandle: "",
+        publisherHandle,
+        publisherRepo,
+        upstreamRepo: null,
+        provenanceType: "unknown",
+        authorConfidence: "low",
+      },
+      repoOverride,
+    );
   } else {
-    result = {
-      authorHandle: "",
-      publisherHandle: "",
-      publisherRepo: "",
-      upstreamRepo: null,
-      provenanceType: "unknown",
-      authorConfidence: "low",
-    };
+    if (obviousUpstreamRepo) {
+      result = {
+        authorHandle: ownerHandle(obviousUpstreamRepo),
+        publisherHandle: catalogRule?.publisherHandle ?? publisherHandle,
+        publisherRepo,
+        upstreamRepo: obviousUpstreamRepo,
+        provenanceType: catalogRule?.defaultProvenanceType ?? "repackaged",
+        authorConfidence: "high",
+      };
+    } else if (catalogRule) {
+      result = {
+        authorHandle: "",
+        publisherHandle: catalogRule.publisherHandle ?? publisherHandle,
+        publisherRepo,
+        upstreamRepo: null,
+        provenanceType: catalogRule.defaultProvenanceType ?? "catalog",
+        authorConfidence: "low",
+      };
+    } else if (publisherRepo) {
+      result = {
+        authorHandle: skill.author_handle || publisherHandle,
+        publisherHandle,
+        publisherRepo,
+        upstreamRepo: null,
+        provenanceType: "original",
+        authorConfidence: "high",
+      };
+    } else {
+      result = {
+        authorHandle: "",
+        publisherHandle: "",
+        publisherRepo: "",
+        upstreamRepo: null,
+        provenanceType: "unknown",
+        authorConfidence: "low",
+      };
+    }
   }
-
-  const { repoOverride, idOverride } = overrideForSkill(skill, seeds.provenanceOverrides);
-  result = applyOverride(result, repoOverride);
-  result = applyOverride(result, idOverride);
 
   if (!result.authorHandle && result.provenanceType === "original" && result.publisherHandle) {
     result.authorHandle = result.publisherHandle;
