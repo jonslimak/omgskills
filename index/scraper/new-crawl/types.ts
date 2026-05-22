@@ -114,6 +114,14 @@ export type NextPromotionCandidateSample = {
   reason: NextPromotionCandidateReason;
 };
 
+export type PromotedRepoSample = {
+  repo: string;
+  priorState: RepoState;
+  newState: RepoState;
+  reason: NextPromotionCandidateReason;
+  stars: number;
+};
+
 export type ShadowStaleInvalidCandidate = {
   id: string;
   repo: string;
@@ -204,6 +212,9 @@ export type ShadowRunReport = {
   nextPromotionCandidatesSample: NextPromotionCandidateSample[];
   nextPromotionShortlistCount: number;
   nextPromotionShortlistSample: NextPromotionCandidateSample[];
+  promotedRepoCount: number;
+  promotedToRisingCount: number;
+  promotedRepoSample: PromotedRepoSample[];
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;

@@ -1,11 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  applyShortlistPromotions,
   buildDailyPriorityRepos,
   buildNextPromotionCandidates,
   buildNextPromotionShortlist,
   DAILY_PRIORITY_REPO_LIMIT,
   NEXT_PROMOTION_SHORTLIST_LIMIT,
+  SHORTLIST_PROMOTION_LIMIT,
 } from "./daily-priority.js";
 import type { PriorityReason, PriorityReasonCounts, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
 
@@ -188,8 +190,8 @@ test("priority reason counts and sample reasons stay valid for report output", (
 
 test("already-selected daily repos are excluded from next promotion candidates", () => {
   const repos = repoIndex([
-    repo({ repo: "daily/repo", stars: 100, isTrustedVendor: true }),
-    repo({ repo: "next/repo", stars: 90 }),
+    repo({ repo: "daily/repo", stars: 100, isTrustedVendor: true, state: "library" }),
+    repo({ repo: "next/repo", stars: 90, state: "library" }),
   ]);
   const daily = [repos.repos[0]];
 
@@ -208,8 +210,8 @@ test("already-selected daily repos are excluded from next promotion candidates",
 test("periodic candidates rank ahead of background candidates", () => {
   const result = buildNextPromotionCandidates(
     repoIndex([
-      repo({ repo: "periodic/repo", stars: 1 }),
-      repo({ repo: "background/repo", stars: 999 }),
+      repo({ repo: "periodic/repo", stars: 1, state: "library" }),
+      repo({ repo: "background/repo", stars: 999, state: "library" }),
     ]),
     candidateDiscovery([
       { repo: "background/repo", lanes: ["background"] },
@@ -224,9 +226,9 @@ test("periodic candidates rank ahead of background candidates", () => {
 test("trusted vendor ranks ahead of plain periodic and background candidates", () => {
   const result = buildNextPromotionCandidates(
     repoIndex([
-      repo({ repo: "vendor/repo", stars: 1, isTrustedVendor: true }),
-      repo({ repo: "periodic/repo", stars: 999 }),
-      repo({ repo: "background/repo", stars: 998 }),
+      repo({ repo: "vendor/repo", stars: 1, isTrustedVendor: true, state: "library" }),
+      repo({ repo: "periodic/repo", stars: 999, state: "library" }),
+      repo({ repo: "background/repo", stars: 998, state: "library" }),
     ]),
     candidateDiscovery([
       { repo: "vendor/repo", lanes: ["background"] },
@@ -243,9 +245,9 @@ test("trusted vendor ranks ahead of plain periodic and background candidates", (
 test("gold basket ranks ahead of plain periodic and background candidates", () => {
   const result = buildNextPromotionCandidates(
     repoIndex([
-      repo({ repo: "gold/repo", stars: 1, isGoldBasketRepo: true }),
-      repo({ repo: "periodic/repo", stars: 999 }),
-      repo({ repo: "background/repo", stars: 998 }),
+      repo({ repo: "gold/repo", stars: 1, isGoldBasketRepo: true, state: "library" }),
+      repo({ repo: "periodic/repo", stars: 999, state: "library" }),
+      repo({ repo: "background/repo", stars: 998, state: "library" }),
     ]),
     candidateDiscovery([
       { repo: "gold/repo", lanes: ["background"] },
@@ -262,9 +264,9 @@ test("gold basket ranks ahead of plain periodic and background candidates", () =
 test("stars break ties within the same candidate reason bucket", () => {
   const result = buildNextPromotionCandidates(
     repoIndex([
-      repo({ repo: "periodic/high", stars: 20 }),
-      repo({ repo: "periodic/low", stars: 10 }),
-      repo({ repo: "periodic/zero", stars: 0 }),
+      repo({ repo: "periodic/high", stars: 20, state: "library" }),
+      repo({ repo: "periodic/low", stars: 10, state: "library" }),
+      repo({ repo: "periodic/zero", stars: 0, state: "library" }),
     ]),
     candidateDiscovery([
       { repo: "periodic/low", lanes: ["periodic"] },
@@ -327,4 +329,67 @@ test("promotion shortlist preserves ranked order within each reason bucket", () 
     shortlist.filter((row) => row.reason === "periodic").map((row) => row.repo),
     ["periodic/high", "periodic/low"],
   );
+});
+
+test("only top 3 shortlist repos are promoted", () => {
+  const index = repoIndex([
+    repo({ repo: "library/one", stars: 10, state: "library" }),
+    repo({ repo: "library/two", stars: 9, state: "library" }),
+    repo({ repo: "library/three", stars: 8, state: "library" }),
+    repo({ repo: "library/four", stars: 7, state: "library" }),
+  ]);
+
+  const promoted = applyShortlistPromotions(
+    index,
+    [
+      { repo: "library/one", stars: 10, reason: "periodic" },
+      { repo: "library/two", stars: 9, reason: "periodic" },
+      { repo: "library/three", stars: 8, reason: "background" },
+      { repo: "library/four", stars: 7, reason: "background" },
+    ],
+    "combined",
+  );
+
+  assert.equal(promoted.length, SHORTLIST_PROMOTION_LIMIT);
+  assert.deepEqual(promoted.map((row) => row.repo), ["library/one", "library/two", "library/three"]);
+});
+
+test("only library repos are promoted and they become rising", () => {
+  const index = repoIndex([
+    repo({ repo: "library/one", stars: 10, state: "library" }),
+    repo({ repo: "rising/one", stars: 9, state: "rising" }),
+    repo({ repo: "core/one", stars: 8, state: "core" }),
+  ]);
+
+  const promoted = applyShortlistPromotions(
+    index,
+    [
+      { repo: "library/one", stars: 10, reason: "periodic" },
+      { repo: "rising/one", stars: 9, reason: "periodic" },
+      { repo: "core/one", stars: 8, reason: "background" },
+    ],
+    "combined",
+  );
+
+  assert.equal(promoted.length, 1);
+  assert.equal(promoted[0]?.repo, "library/one");
+  assert.equal(promoted[0]?.priorState, "library");
+  assert.equal(promoted[0]?.newState, "rising");
+  assert.equal(index.repos[0]?.state, "rising");
+  assert.ok(index.repos[0]?.promotionReasons.includes("shortlist-promotion"));
+});
+
+test("promotion does not run on non-combined cadences", () => {
+  const index = repoIndex([
+    repo({ repo: "library/one", stars: 10, state: "library" }),
+  ]);
+
+  const promoted = applyShortlistPromotions(
+    index,
+    [{ repo: "library/one", stars: 10, reason: "periodic" }],
+    "fast",
+  );
+
+  assert.equal(promoted.length, 0);
+  assert.equal(index.repos[0]?.state, "library");
 });

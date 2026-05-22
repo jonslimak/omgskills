@@ -2,6 +2,9 @@ import type {
   DiscoveryLane,
   NextPromotionCandidateReason,
   PriorityReason,
+  PromotedRepoSample,
+  RepoState,
+  ShadowCadence,
   ShadowRepoIndex,
   ShadowRepoIndexEntry,
 } from "./types.js";
@@ -13,6 +16,7 @@ export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason,
   { reason: "trustedVendor", cap: 8 },
 ];
 export const NEXT_PROMOTION_SHORTLIST_LIMIT = 20;
+export const SHORTLIST_PROMOTION_LIMIT = 3;
 export const NEXT_PROMOTION_SHORTLIST_BUCKET_CAPS: Array<{ reason: NextPromotionCandidateReason; cap: number }> = [
   { reason: "trustedVendor", cap: 5 },
   { reason: "goldBasket", cap: 3 },
@@ -126,6 +130,7 @@ export function buildNextPromotionCandidates(
   return [...discovered.values()]
     .filter((repo) => !dailyPrioritySet.has(repo.repo))
     .filter((repo) => repo.lanes.has("periodic") || repo.lanes.has("background"))
+    .filter((repo) => repoByName.get(repo.repo)?.state === "library")
     .map((discoveredRepo) => {
       const repo = repoByName.get(discoveredRepo.repo) ?? null;
       return {
@@ -161,4 +166,35 @@ export function buildNextPromotionShortlist(candidates: NextPromotionCandidate[]
   }
 
   return shortlist;
+}
+
+export function applyShortlistPromotions(
+  repoIndex: ShadowRepoIndex,
+  shortlist: NextPromotionCandidate[],
+  cadence: ShadowCadence,
+): PromotedRepoSample[] {
+  if (cadence !== "combined") return [];
+
+  const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
+  const promoted: PromotedRepoSample[] = [];
+
+  for (const candidate of shortlist) {
+    if (promoted.length >= SHORTLIST_PROMOTION_LIMIT) break;
+    const repo = repoByName.get(candidate.repo);
+    if (!repo || repo.state !== "library") continue;
+
+    const priorState: RepoState = repo.state;
+    repo.state = "rising";
+    repo.promotionReasons = [...new Set([...repo.promotionReasons, "shortlist-promotion"])];
+
+    promoted.push({
+      repo: repo.repo,
+      priorState,
+      newState: repo.state,
+      reason: candidate.reason,
+      stars: repo.stars,
+    });
+  }
+
+  return promoted;
 }
