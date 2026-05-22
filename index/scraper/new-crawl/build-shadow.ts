@@ -15,6 +15,7 @@ import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
+import { bootstrapRisingRepos, selectBetterBootstrapCandidate } from "./bootstrap.js";
 import {
   applyShortlistPromotions,
   buildDailyPriorityRepos,
@@ -30,10 +31,12 @@ import type {
   PriorityReason,
   PriorityReasonCounts,
   PromotedRepoSample,
+  RepoBootstrapCandidate,
   ShadowCadence,
   ProvenanceType,
   RepoOverride,
   RepoState,
+  BootstrapRepoSample,
   ShadowEnrichmentCounts,
   ShadowRepoIndex,
   ShadowAuthorDiffExample,
@@ -65,6 +68,8 @@ type DiscoveredRepoRecord = {
   repoUrl: string;
   sources: Set<DiscoverySourceName>;
   lanes: Set<DiscoveryLane>;
+  stars: number;
+  bootstrapCandidate?: RepoBootstrapCandidate;
 };
 
 const CADENCE_LANES: Record<ShadowCadence, DiscoveryLane[]> = {
@@ -443,6 +448,10 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Next promotion shortlist: ${report.nextPromotionShortlistCount}`,
     `- Promoted repos: ${report.promotedRepoCount}`,
     `- Promoted to rising: ${report.promotedToRisingCount}`,
+    `- New discovered repos promoted: ${report.newDiscoveredRepoPromotedCount}`,
+    `- Bootstrapped repos: ${report.bootstrappedRepoCount}`,
+    `- Bootstrap failures: ${report.bootstrapFailedRepoCount}`,
+    `- Bootstrap skipped: ${report.bootstrapSkippedRepoCount}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
     `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
     `- Corrected: ${report.enrichmentCounts.correctedCount}`,
@@ -476,7 +485,10 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Fast-only repos: ${report.fastOnlyReposSample.join(", ") || "none"}`,
     `- Next promotion candidates: ${report.nextPromotionCandidatesSample.map((row) => `${row.repo} (${row.reason}, ${row.stars})`).join(", ") || "none"}`,
     `- Next promotion shortlist: ${report.nextPromotionShortlistSample.map((row) => `${row.repo} (${row.reason}, ${row.stars})`).join(", ") || "none"}`,
-    `- Promoted repos: ${report.promotedRepoSample.map((row) => `${row.repo} (${row.priorState}->${row.newState}, ${row.reason}, ${row.stars})`).join(", ") || "none"}`,
+    `- Promoted repos: ${report.promotedRepoSample.map((row) => `${row.repo} (${row.promotionKind}, ${row.priorState}->${row.newState}, ${row.reason}, ${row.stars})`).join(", ") || "none"}`,
+    `- Bootstrapped repos: ${report.bootstrappedRepoSample.map((row) => `${row.repo} (${row.source}, ${row.candidateId})`).join(", ") || "none"}`,
+    `- Bootstrap failures: ${report.bootstrapFailedRepoSample.map((row) => `${row.repo} (${row.source}, ${row.failureReason ?? "failed"})`).join(", ") || "none"}`,
+    `- Bootstrap skipped: ${report.bootstrapSkippedRepoSample.map((row) => `${row.repo} (${row.source}, ${row.failureReason ?? "skipped"})`).join(", ") || "none"}`,
     `- Low-star valid skills: ${report.lowStarValidSkillSample.join(", ") || "none"}`,
     `- Stale/invalid candidates: ${report.staleInvalidCandidatesSample.map((row) => `${row.id} (${row.reason})`).join(", ") || "none"}`,
     `- Daily priority repos: ${report.dailyPriorityRepoSample.map((row) => `${row.repo} (${row.reason})`).join(", ") || "none"}`,
@@ -493,12 +505,14 @@ function addDiscoveredRepo(
   repoInfo: { repo: string; repoUrl: string } | null,
   source: DiscoverySourceName,
   lane: DiscoveryLane,
+  stars = 0,
 ) {
   if (!repoInfo) return;
   const existing = discovered.get(repoInfo.repo);
   if (existing) {
     existing.sources.add(source);
     existing.lanes.add(lane);
+    existing.stars = Math.max(existing.stars, stars);
     return;
   }
   discovered.set(repoInfo.repo, {
@@ -506,7 +520,53 @@ function addDiscoveredRepo(
     repoUrl: repoInfo.repoUrl,
     sources: new Set([source]),
     lanes: new Set([lane]),
+    stars,
   });
+}
+
+function maybeSetBootstrapCandidate(
+  discovered: Map<string, DiscoveredRepoRecord>,
+  repoInfo: { repo: string; repoUrl: string } | null,
+  candidate: RepoBootstrapCandidate,
+) {
+  if (!repoInfo) return;
+  const existing = discovered.get(repoInfo.repo);
+  if (!existing) return;
+  existing.bootstrapCandidate = selectBetterBootstrapCandidate(existing.bootstrapCandidate, candidate);
+}
+
+function observedStars(hit: unknown): number {
+  if (typeof hit !== "object" || hit === null) return 0;
+  const value = (hit as { stars?: unknown }).stars;
+  return typeof value === "number" ? value : 0;
+}
+
+function buildPromotionCandidateMeta(repo: string, repoUrl?: string): Candidate {
+  return {
+    id: repo,
+    skill_md_path: "SKILL.md",
+    github_url: repoUrl,
+  };
+}
+
+function buildTrustSignalsForRepo(
+  repo: string,
+  goldBasketRepos: Set<string>,
+): Pick<ShadowRepoIndexEntry, "isTrustedVendor" | "isTrustedCreator" | "isGoldBasketRepo" | "trustSignals"> {
+  const seeds = loadTrustedSeeds();
+  const trustedVendor = seeds.trustedVendorHandles.has(ownerHandle(repo));
+  const trustedCreator = seeds.trustedCreatorHandles.has(ownerHandle(repo));
+  const goldBasketRepo = goldBasketRepos.has(repo);
+  return {
+    isTrustedVendor: trustedVendor,
+    isTrustedCreator: trustedCreator,
+    isGoldBasketRepo: goldBasketRepo,
+    trustSignals: sortUnique([
+      trustedVendor ? "trusted-vendor" : "",
+      trustedCreator ? "trusted-creator" : "",
+      goldBasketRepo ? "gold-basket" : "",
+    ].filter(Boolean)),
+  };
 }
 
 function formatDiscoveryWarning(source: DiscoverySourceName, error: unknown): string {
@@ -545,6 +605,7 @@ function isMeaningfullyCorrected(previous: Skill, next: Skill): boolean {
 type ShadowRefreshResult = {
   shadowSkills: ShadowSkillRecord[];
   enrichmentCounts: ShadowEnrichmentCounts;
+  newlyDiscoveredCount: number;
   lowStarValidSkillCount: number;
   lowStarValidSkillSample: string[];
   trustedLowStarSkillCount: number;
@@ -553,6 +614,9 @@ type ShadowRefreshResult = {
   priorityReasonCounts: PriorityReasonCounts;
   dailyPriorityRepoSample: DailyPriorityRepoSample[];
   skippedMonitoredRepoCount: number;
+  bootstrappedRepoSample: BootstrapRepoSample[];
+  bootstrapFailedRepoSample: BootstrapRepoSample[];
+  bootstrapSkippedRepoSample: BootstrapRepoSample[];
   enrichmentWarnings: string[];
 };
 
@@ -576,6 +640,7 @@ async function runShadowRefresh(
   repoIndex: ShadowRepoIndex,
   discovered: Map<string, DiscoveredRepoRecord>,
   checkedAt: string,
+  repoAliasByCanonical: Map<string, string>,
 ): Promise<ShadowRefreshResult> {
   const baselineById = new Map(baselineSkills.map((skill) => [skill.id, skill]));
   const shadowById = new Map(shadowSkills.map((skill) => [skill.id, skill]));
@@ -593,6 +658,24 @@ async function runShadowRefresh(
   let libraryReposChecked = 0;
   let skillsDeepRefreshed = 0;
   let correctedCount = 0;
+  const bootstrapCandidateByRepo = new Map(
+    [...discovered.values()]
+      .filter((repo) => repo.bootstrapCandidate)
+      .map((repo) => [repo.repo, repo.bootstrapCandidate!] as const),
+  );
+  const bootstrapResult = await bootstrapRisingRepos({
+    cadence,
+    checkedAt,
+    repoIndex,
+    bootstrapCandidateByRepo,
+    repoAliasByCanonical,
+    existingFirstSeen,
+    existingSkills,
+    enrichCandidateFn: enrichCandidate,
+  });
+  for (const skill of bootstrapResult.bootstrappedSkills) {
+    shadowById.set(skill.id, toShadowSkillRecord(skill));
+  }
 
   const libraryReposToCheck = repoIndex.repos
     .filter((repo) => repo.state === "library" && discovered.has(repo.repo))
@@ -601,7 +684,7 @@ async function runShadowRefresh(
   for (const repo of libraryReposToCheck) {
     const skillId = repo.topSkillId ?? repo.skillIds[0];
     if (!skillId) continue;
-    const baselineSkill = baselineById.get(skillId);
+    const baselineSkill = baselineById.get(skillId) ?? shadowById.get(skillId);
     if (!baselineSkill) continue;
     libraryReposChecked += 1;
     try {
@@ -640,7 +723,7 @@ async function runShadowRefresh(
   for (const repo of reposToRefresh) {
     const skillId = repo.topSkillId ?? repo.skillIds[0];
     if (!skillId) continue;
-    const baselineSkill = baselineById.get(skillId);
+    const baselineSkill = baselineById.get(skillId) ?? shadowById.get(skillId);
     if (!baselineSkill) continue;
 
     const result = await enrichCandidate(
@@ -673,7 +756,9 @@ async function runShadowRefresh(
     });
   }
 
-  const refreshedShadowSkills = baselineSkills.map((skill) => shadowById.get(skill.id) ?? toShadowSkillRecord(skill));
+  const baselineShadowSkills = baselineSkills.map((skill) => shadowById.get(skill.id) ?? toShadowSkillRecord(skill));
+  const bootstrappedShadowSkills = bootstrapResult.bootstrappedSkills.map((skill) => toShadowSkillRecord(skill));
+  const refreshedShadowSkills = [...baselineShadowSkills, ...bootstrappedShadowSkills];
   const lowStarValidSkills = refreshedShadowSkills
     .filter((skill) => skill.stars < LOW_STAR_FLOOR)
     .sort((a, b) => b.stars - a.stars || a.id.localeCompare(b.id));
@@ -690,7 +775,7 @@ async function runShadowRefresh(
   }).length;
 
   const staleInvalidUnique = [...new Map(staleInvalidCandidates.map((row) => [`${row.id}:${row.reason}`, row])).values()];
-  const carriedForwardCount = refreshedShadowSkills.length - correctedCount;
+  const carriedForwardCount = baselineSkills.length - correctedCount;
 
   return {
     shadowSkills: refreshedShadowSkills,
@@ -702,6 +787,7 @@ async function runShadowRefresh(
       correctedCount,
       staleInvalidCandidateCount: staleInvalidUnique.length,
     },
+    newlyDiscoveredCount: bootstrapResult.bootstrappedSkills.length,
     lowStarValidSkillCount: lowStarValidSkills.length,
     lowStarValidSkillSample: lowStarValidSkills.slice(0, 10).map((skill) => `${skill.id} (${skill.stars})`),
     trustedLowStarSkillCount,
@@ -713,6 +799,9 @@ async function runShadowRefresh(
       reason: reasonByRepo.get(repo.repo) ?? "stars",
     })),
     skippedMonitoredRepoCount,
+    bootstrappedRepoSample: bootstrapResult.bootstrappedRepoSample,
+    bootstrapFailedRepoSample: bootstrapResult.bootstrapFailedRepoSample,
+    bootstrapSkippedRepoSample: bootstrapResult.bootstrapSkippedRepoSample,
     enrichmentWarnings,
   };
 }
@@ -774,7 +863,15 @@ async function runDiscovery(
       const officialRun = await timeSource("official", "fast", searchOfficialSkills);
       sourceRuns.push(officialRun.summary);
       for (const hit of officialRun.hits) {
-        addDiscoveredRepo(discovered, repoKeyFromGithubUrl(hit.github_url), "official", "fast");
+        const repoInfo = repoKeyFromGithubUrl(hit.github_url);
+        addDiscoveredRepo(discovered, repoInfo, "official", "fast", observedStars(hit));
+        maybeSetBootstrapCandidate(discovered, repoInfo, {
+          source: "official",
+          id: hit.id,
+          skill_md_path: hit.path,
+          skill_name_hint: hit.skill_name_hint,
+          github_url: hit.github_url,
+        });
       }
 
       const trustedVendorRepos = repoIndex.repos.filter((repo) => repo.isTrustedVendor);
@@ -785,7 +882,7 @@ async function runDiscovery(
         durationMs: 0,
       });
       for (const repo of trustedVendorRepos) {
-        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "trusted-vendors", "fast");
+        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "trusted-vendors", "fast", repo.stars);
       }
 
       const trustedCreatorRepos = repoIndex.repos.filter(
@@ -798,7 +895,7 @@ async function runDiscovery(
         durationMs: 0,
       });
       for (const repo of trustedCreatorRepos) {
-        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "trusted-creators", "fast");
+        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "trusted-creators", "fast", repo.stars);
       }
 
       const monitoredRepos = repoIndex.repos.filter((repo) => repo.state === "rising" || repo.state === "core");
@@ -809,7 +906,7 @@ async function runDiscovery(
         durationMs: 0,
       });
       for (const repo of monitoredRepos) {
-        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "monitored-repos", "fast");
+        addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "monitored-repos", "fast", repo.stars);
       }
       continue;
     }
@@ -831,12 +928,25 @@ async function runDiscovery(
       for (const result of [skillsshRun, awesomeRun, registryRun] as const) {
         sourceRuns.push(result.summary);
         for (const hit of result.hits) {
+          const repoInfo = repoKeyFromGithubUrl(hit.github_url);
           addDiscoveredRepo(
             discovered,
-            repoKeyFromGithubUrl(hit.github_url),
+            repoInfo,
             result.summary.source as DiscoverySourceName,
             "periodic",
+            observedStars(hit),
           );
+          maybeSetBootstrapCandidate(discovered, repoInfo, {
+            source: result.summary.source as "skillssh" | "awesome" | "registry",
+            id: hit.id,
+            skill_md_path: hit.path,
+            skill_name_hint: "skill_name_hint" in hit ? hit.skill_name_hint : undefined,
+            ref: "ref" in hit ? hit.ref : undefined,
+            github_url: hit.github_url,
+            stars: "stars" in hit ? hit.stars : undefined,
+            last_updated: "last_updated" in hit ? hit.last_updated : undefined,
+            tags: "tags" in hit ? hit.tags : undefined,
+          });
         }
       }
       continue;
@@ -907,12 +1017,23 @@ async function runDiscovery(
         partialDiscoveryWarnings.push(`${result.summary.source} slow under budget (${result.summary.durationMs}ms)`);
       }
       for (const hit of result.hits) {
+        const repoInfo = repoKeyFromGithubUrl(hit.github_url);
         addDiscoveredRepo(
           discovered,
-          repoKeyFromGithubUrl(hit.github_url),
+          repoInfo,
           result.summary.source as DiscoverySourceName,
           "background",
+          observedStars(hit),
         );
+        if (result.summary.source === "code") {
+          const codeHit = hit as { id: string; path: string; github_url: string };
+          maybeSetBootstrapCandidate(discovered, repoInfo, {
+            source: "code",
+            id: codeHit.id,
+            skill_md_path: codeHit.path,
+            github_url: codeHit.github_url,
+          });
+        }
       }
     }
   }
@@ -970,6 +1091,12 @@ async function main() {
   const baselineStart = performance.now();
   const baselineSkills = loadSkills(baselinePath);
   const goldBasketSkills = loadSkills(goldBasketPath);
+  const goldBasketRepos = new Set(
+    goldBasketSkills
+      .map(repoKeyFor)
+      .filter((repoInfo): repoInfo is { repo: string; repoUrl: string } => Boolean(repoInfo))
+      .map((repoInfo) => repoInfo.repo),
+  );
   timings.loadBaseline = Math.round(performance.now() - baselineStart);
 
   const provenanceStart = performance.now();
@@ -981,6 +1108,7 @@ async function main() {
   timings.buildRepoIndex = Math.round(performance.now() - repoIndexStart);
 
   const discoveryStart = performance.now();
+  const repoAliasByCanonical = new Map<string, string>();
   const { sourceRuns, discovered, discoveryBudgetApplied, discoveryBudgetSummary, partialDiscoveryWarnings } =
     await runDiscovery(cadence, repoIndex);
   timings.runDiscovery = Math.round(performance.now() - discoveryStart);
@@ -988,10 +1116,44 @@ async function main() {
   const dailyPrioritySelection = buildDailyPriorityRepos(repoIndex, discovered);
   const nextPromotionCandidates = buildNextPromotionCandidates(repoIndex, discovered, dailyPrioritySelection.repos);
   const nextPromotionShortlist = buildNextPromotionShortlist(nextPromotionCandidates);
-  const promotedRepoSample = applyShortlistPromotions(repoIndex, nextPromotionShortlist, cadence);
+  const promotedRepoSample = await applyShortlistPromotions({
+    checkedAt,
+    cadence,
+    repoIndex,
+    shortlist: nextPromotionShortlist,
+    getMissingRepoMeta: async (repo) => {
+      const discoveredRepo = discovered.get(repo);
+      const meta = await getCandidateRepoMeta(
+        buildPromotionCandidateMeta(repo, discoveredRepo?.repoUrl),
+        checkedAt.slice(0, 10),
+      );
+      const canonicalRepoInfo = meta ? repoKeyFromGithubUrl(meta.githubUrl) : null;
+      if (canonicalRepoInfo?.repo && canonicalRepoInfo.repo !== repo) {
+        repoAliasByCanonical.set(canonicalRepoInfo.repo, repo);
+      }
+      return meta
+        ? {
+            canonicalRepo: canonicalRepoInfo?.repo ?? repo.toLowerCase(),
+            stars: meta.stars,
+            repoUrl: meta.githubUrl,
+          }
+        : null;
+    },
+    getMissingRepoContext: (repo) => {
+      const discoveredRepo = discovered.get(repo);
+      const trust = buildTrustSignalsForRepo(repo, goldBasketRepos);
+      return {
+        checkedAt,
+        discoveredSources: sortUnique([...(discoveredRepo?.sources ?? [])]),
+        isTrustedVendor: trust.isTrustedVendor,
+        isTrustedCreator: trust.isTrustedCreator,
+        isGoldBasketRepo: trust.isGoldBasketRepo,
+      };
+    },
+  });
 
   const refreshStart = performance.now();
-  const refreshResult = await runShadowRefresh(cadence, baselineSkills, shadowSkills, repoIndex, discovered, checkedAt);
+  const refreshResult = await runShadowRefresh(cadence, baselineSkills, shadowSkills, repoIndex, discovered, checkedAt, repoAliasByCanonical);
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
 
@@ -1031,7 +1193,7 @@ async function main() {
     shadowSkillCount: shadowSkills.length,
     carriedForwardCount: refreshResult.enrichmentCounts.carriedForwardCount,
     correctedCount: refreshResult.enrichmentCounts.correctedCount,
-    newlyDiscoveredCount: 0,
+    newlyDiscoveredCount: refreshResult.newlyDiscoveredCount,
     staleInvalidCandidateCount: refreshResult.enrichmentCounts.staleInvalidCandidateCount,
     repoCount: repoIndex.repoCount,
     repoCountsByState: buildRepoCountsByState(repoIndex.repos),
@@ -1083,7 +1245,14 @@ async function main() {
     nextPromotionShortlistSample: nextPromotionShortlist.slice(0, NEXT_PROMOTION_SHORTLIST_LIMIT),
     promotedRepoCount: promotedRepoSample.length,
     promotedToRisingCount: promotedRepoSample.filter((row) => row.newState === "rising").length,
+    newDiscoveredRepoPromotedCount: promotedRepoSample.filter((row) => row.promotionKind === "new-discovery").length,
     promotedRepoSample: promotedRepoSample.slice(0, 10),
+    bootstrappedRepoCount: refreshResult.bootstrappedRepoSample.length,
+    bootstrappedRepoSample: refreshResult.bootstrappedRepoSample.slice(0, 10),
+    bootstrapFailedRepoCount: refreshResult.bootstrapFailedRepoSample.length,
+    bootstrapFailedRepoSample: refreshResult.bootstrapFailedRepoSample.slice(0, 10),
+    bootstrapSkippedRepoCount: refreshResult.bootstrapSkippedRepoSample.length,
+    bootstrapSkippedRepoSample: refreshResult.bootstrapSkippedRepoSample.slice(0, 10),
     productionWriteGuardPassed: true,
   };
 

@@ -108,6 +108,20 @@ export type DailyPriorityRepoSample = {
 
 export type NextPromotionCandidateReason = "trustedVendor" | "goldBasket" | "periodic" | "background";
 
+export type BootstrapSource = "official" | "skillssh" | "awesome" | "registry" | "code";
+
+export type RepoBootstrapCandidate = {
+  source: BootstrapSource;
+  id: string;
+  skill_md_path: string;
+  skill_name_hint?: string;
+  ref?: string;
+  github_url: string;
+  stars?: number;
+  last_updated?: string;
+  tags?: string[];
+};
+
 export type NextPromotionCandidateSample = {
   repo: string;
   stars: number;
@@ -120,6 +134,15 @@ export type PromotedRepoSample = {
   newState: RepoState;
   reason: NextPromotionCandidateReason;
   stars: number;
+  promotionKind: "existing-library" | "new-discovery";
+};
+
+export type BootstrapRepoSample = {
+  repo: string;
+  source: BootstrapSource;
+  candidateId: string;
+  outcome: "bootstrapped" | "failed" | "skipped";
+  failureReason?: string;
 };
 
 export type ShadowStaleInvalidCandidate = {
@@ -214,7 +237,14 @@ export type ShadowRunReport = {
   nextPromotionShortlistSample: NextPromotionCandidateSample[];
   promotedRepoCount: number;
   promotedToRisingCount: number;
+  newDiscoveredRepoPromotedCount: number;
   promotedRepoSample: PromotedRepoSample[];
+  bootstrappedRepoCount: number;
+  bootstrappedRepoSample: BootstrapRepoSample[];
+  bootstrapFailedRepoCount: number;
+  bootstrapFailedRepoSample: BootstrapRepoSample[];
+  bootstrapSkippedRepoCount: number;
+  bootstrapSkippedRepoSample: BootstrapRepoSample[];
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;
