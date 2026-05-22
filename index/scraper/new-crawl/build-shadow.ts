@@ -16,7 +16,13 @@ import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js"
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { bootstrapRisingRepos, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
-import { applyShadowRepoOverlay, buildShadowRepoOverlay, loadShadowRepoOverlay } from "./repo-overlay.js";
+import {
+  applyShadowRepoOverlay,
+  buildShadowRepoOverlay,
+  loadShadowRepoOverlay,
+  shouldReadShadowRepoOverlay,
+  shouldWriteShadowRepoOverlay,
+} from "./repo-overlay.js";
 import {
   applyShortlistPromotions,
   buildDailyPriorityRepos,
@@ -663,6 +669,7 @@ async function runShadowRefresh(
   );
   const enrichmentWarnings: string[] = [];
   const staleInvalidCandidates: ShadowStaleInvalidCandidate[] = [];
+  const missingPersistedSkillRefreshSample: string[] = [];
   const priorityReasonCounts = emptyPriorityReasonCounts();
   let libraryReposChecked = 0;
   let skillsDeepRefreshed = 0;
@@ -695,7 +702,12 @@ async function runShadowRefresh(
     const skillId = repo.topSkillId ?? repo.skillIds[0];
     if (!skillId) continue;
     const baselineSkill = baselineById.get(skillId) ?? shadowById.get(skillId);
-    if (!baselineSkill) continue;
+    if (!baselineSkill) {
+      if (missingPersistedSkillRefreshSample.length < 10) {
+        missingPersistedSkillRefreshSample.push(`${repo.repo}:${skillId}`);
+      }
+      continue;
+    }
     libraryReposChecked += 1;
     try {
       const meta = await getCandidateRepoMeta(buildCandidateFromSkill(baselineSkill), checkedAt.slice(0, 10));
@@ -734,7 +746,12 @@ async function runShadowRefresh(
     const skillId = repo.topSkillId ?? repo.skillIds[0];
     if (!skillId) continue;
     const baselineSkill = baselineById.get(skillId) ?? shadowById.get(skillId);
-    if (!baselineSkill) continue;
+    if (!baselineSkill) {
+      if (missingPersistedSkillRefreshSample.length < 10) {
+        missingPersistedSkillRefreshSample.push(`${repo.repo}:${skillId}`);
+      }
+      continue;
+    }
 
     const result = await enrichCandidate(
       buildCandidateFromSkill(baselineSkill),
@@ -786,6 +803,11 @@ async function runShadowRefresh(
 
   const staleInvalidUnique = [...new Map(staleInvalidCandidates.map((row) => [`${row.id}:${row.reason}`, row])).values()];
   const carriedForwardCount = baselineSkills.length - correctedCount;
+  if (missingPersistedSkillRefreshSample.length > 0) {
+    enrichmentWarnings.push(
+      `skipped persisted monitored skills missing from current shadow skill set: ${missingPersistedSkillRefreshSample.join(", ")}`,
+    );
+  }
 
   return {
     shadowSkills: refreshedShadowSkills,
@@ -1119,7 +1141,7 @@ async function main() {
   const baselineRepoIndexForOverlay = cloneRepoIndex(repoIndex);
   timings.buildRepoIndex = Math.round(performance.now() - repoIndexStart);
 
-  const repoOverlay = loadShadowRepoOverlay(repoOverlayOutPath);
+  const repoOverlay = shouldReadShadowRepoOverlay(cadence) ? loadShadowRepoOverlay(repoOverlayOutPath) : null;
   const { overlayLoaded: shadowRepoOverlayLoaded, overlayEntryCount: shadowRepoOverlayEntryCount } = applyShadowRepoOverlay(
     cadence,
     repoIndex,
@@ -1176,7 +1198,7 @@ async function main() {
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
 
-  const shadowRepoOverlay: ShadowRepoOverlay | null = cadence === "combined"
+  const shadowRepoOverlay: ShadowRepoOverlay | null = shouldWriteShadowRepoOverlay(cadence)
     ? buildShadowRepoOverlay(repoIndex, baselineRepoIndexForOverlay, checkedAt)
     : null;
   const shadowRepoOverlayWrittenCount = shadowRepoOverlay?.repoCount ?? 0;

@@ -72,12 +72,20 @@ export function loadShadowRepoOverlay(path: string): ShadowRepoOverlay | null {
   return JSON.parse(readFileSync(path, "utf8")) as ShadowRepoOverlay;
 }
 
+export function shouldReadShadowRepoOverlay(cadence: ShadowCadence): boolean {
+  return cadence === "fast" || cadence === "combined";
+}
+
+export function shouldWriteShadowRepoOverlay(cadence: ShadowCadence): boolean {
+  return cadence === "combined";
+}
+
 export function applyShadowRepoOverlay(
   cadence: ShadowCadence,
   repoIndex: ShadowRepoIndex,
   overlay: ShadowRepoOverlay | null,
 ): { overlayLoaded: boolean; overlayEntryCount: number } {
-  if (cadence !== "combined" || !overlay) {
+  if (!shouldReadShadowRepoOverlay(cadence) || !overlay) {
     return { overlayLoaded: false, overlayEntryCount: 0 };
   }
 

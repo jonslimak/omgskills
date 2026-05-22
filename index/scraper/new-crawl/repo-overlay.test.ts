@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { applyShadowRepoOverlay, buildShadowRepoOverlay } from "./repo-overlay.js";
+import {
+  applyShadowRepoOverlay,
+  buildShadowRepoOverlay,
+  shouldReadShadowRepoOverlay,
+  shouldWriteShadowRepoOverlay,
+} from "./repo-overlay.js";
 import type { ShadowRepoIndex, ShadowRepoIndexEntry, ShadowRepoOverlay } from "./types.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
@@ -70,7 +75,7 @@ test("combined run loads overlay and merges onto baseline index", () => {
   assert.deepEqual(index.repos[0]?.discoveredSources, ["awesome", "baseline"]);
 });
 
-test("non-combined cadences ignore overlay", () => {
+test("fast run loads overlay and merges onto baseline index", () => {
   const index = repoIndex([repo({ repo: "owner/repo", stars: 10 })]);
   const result = applyShadowRepoOverlay(
     "fast",
@@ -78,9 +83,42 @@ test("non-combined cadences ignore overlay", () => {
     overlay([repo({ repo: "owner/repo", stars: 20, state: "rising" })]),
   );
 
-  assert.equal(result.overlayLoaded, false);
-  assert.equal(result.overlayEntryCount, 0);
+  assert.equal(result.overlayLoaded, true);
+  assert.equal(result.overlayEntryCount, 1);
+  assert.equal(index.repos[0]?.state, "rising");
+  assert.equal(index.repos[0]?.stars, 20);
+});
+
+test("periodic and background cadences ignore overlay", () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 10 })]);
+  const periodicResult = applyShadowRepoOverlay(
+    "periodic",
+    index,
+    overlay([repo({ repo: "owner/repo", stars: 20, state: "rising" })]),
+  );
+  const backgroundResult = applyShadowRepoOverlay(
+    "background",
+    index,
+    overlay([repo({ repo: "owner/repo", stars: 20, state: "rising" })]),
+  );
+
+  assert.equal(periodicResult.overlayLoaded, false);
+  assert.equal(periodicResult.overlayEntryCount, 0);
+  assert.equal(backgroundResult.overlayLoaded, false);
+  assert.equal(backgroundResult.overlayEntryCount, 0);
   assert.equal(index.repos[0]?.state, "library");
+});
+
+test("only combined writes overlay", () => {
+  assert.equal(shouldReadShadowRepoOverlay("fast"), true);
+  assert.equal(shouldReadShadowRepoOverlay("combined"), true);
+  assert.equal(shouldReadShadowRepoOverlay("periodic"), false);
+  assert.equal(shouldReadShadowRepoOverlay("background"), false);
+
+  assert.equal(shouldWriteShadowRepoOverlay("combined"), true);
+  assert.equal(shouldWriteShadowRepoOverlay("fast"), false);
+  assert.equal(shouldWriteShadowRepoOverlay("periodic"), false);
+  assert.equal(shouldWriteShadowRepoOverlay("background"), false);
 });
 
 test("overlay-only repo is added to repo index", () => {
