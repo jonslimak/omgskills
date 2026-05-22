@@ -1,6 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildDailyPriorityRepos, buildNextPromotionCandidates, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
+import {
+  buildDailyPriorityRepos,
+  buildNextPromotionCandidates,
+  buildNextPromotionShortlist,
+  DAILY_PRIORITY_REPO_LIMIT,
+  NEXT_PROMOTION_SHORTLIST_LIMIT,
+} from "./daily-priority.js";
 import type { PriorityReason, PriorityReasonCounts, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
@@ -269,4 +275,56 @@ test("stars break ties within the same candidate reason bucket", () => {
   );
 
   assert.deepEqual(result.map((row) => row.repo), ["periodic/high", "periodic/low", "periodic/zero"]);
+});
+
+test("promotion shortlist respects total cap", () => {
+  const candidates = [
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `vendor/${index}`, stars: 100 - index, reason: "trustedVendor" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `gold/${index}`, stars: 90 - index, reason: "goldBasket" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `periodic/${index}`, stars: 80 - index, reason: "periodic" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `background/${index}`, stars: 70 - index, reason: "background" as const })),
+  ];
+
+  const shortlist = buildNextPromotionShortlist(candidates);
+
+  assert.equal(shortlist.length, NEXT_PROMOTION_SHORTLIST_LIMIT);
+});
+
+test("promotion shortlist respects per-reason caps", () => {
+  const candidates = [
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `vendor/${index}`, stars: 100 - index, reason: "trustedVendor" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `gold/${index}`, stars: 90 - index, reason: "goldBasket" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `periodic/${index}`, stars: 80 - index, reason: "periodic" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `background/${index}`, stars: 70 - index, reason: "background" as const })),
+  ];
+
+  const shortlist = buildNextPromotionShortlist(candidates);
+  const counts = shortlist.reduce<Record<string, number>>((acc, row) => {
+    acc[row.reason] = (acc[row.reason] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  assert.equal(counts.trustedVendor, 5);
+  assert.equal(counts.goldBasket, 5);
+  assert.equal(counts.periodic, 8);
+  assert.equal(counts.background, 2);
+});
+
+test("promotion shortlist preserves ranked order within each reason bucket", () => {
+  const shortlist = buildNextPromotionShortlist([
+    { repo: "vendor/high", stars: 20, reason: "trustedVendor" },
+    { repo: "vendor/mid", stars: 15, reason: "trustedVendor" },
+    { repo: "vendor/low", stars: 10, reason: "trustedVendor" },
+    { repo: "periodic/high", stars: 2, reason: "periodic" },
+    { repo: "periodic/low", stars: 1, reason: "periodic" },
+  ]);
+
+  assert.deepEqual(
+    shortlist.filter((row) => row.reason === "trustedVendor").map((row) => row.repo),
+    ["vendor/high", "vendor/mid", "vendor/low"],
+  );
+  assert.deepEqual(
+    shortlist.filter((row) => row.reason === "periodic").map((row) => row.repo),
+    ["periodic/high", "periodic/low"],
+  );
 });

@@ -202,6 +202,8 @@ export type ShadowRunReport = {
   skippedMonitoredRepoCount: number;
   nextPromotionCandidateCount: number;
   nextPromotionCandidatesSample: NextPromotionCandidateSample[];
+  nextPromotionShortlistCount: number;
+  nextPromotionShortlistSample: NextPromotionCandidateSample[];
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;

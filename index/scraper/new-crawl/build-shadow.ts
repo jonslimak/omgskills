@@ -15,7 +15,13 @@ import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
-import { buildDailyPriorityRepos, buildNextPromotionCandidates, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
+import {
+  buildDailyPriorityRepos,
+  buildNextPromotionCandidates,
+  buildNextPromotionShortlist,
+  DAILY_PRIORITY_REPO_LIMIT,
+  NEXT_PROMOTION_SHORTLIST_LIMIT,
+} from "./daily-priority.js";
 import type {
   DailyPriorityRepoSample,
   DiscoveryBudgetSummary,
@@ -432,6 +438,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Daily priority repos: ${report.enrichmentCounts.dailyPriorityRepoCount}`,
     `- Daily priority reasons: ${formatPriorityReasonCounts(report.priorityReasonCounts)}`,
     `- Next promotion candidates: ${report.nextPromotionCandidateCount}`,
+    `- Next promotion shortlist: ${report.nextPromotionShortlistCount}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
     `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
     `- Corrected: ${report.enrichmentCounts.correctedCount}`,
@@ -464,6 +471,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Bootstrap value repos: ${report.bootstrapValueReposSample.join(", ") || "none"}`,
     `- Fast-only repos: ${report.fastOnlyReposSample.join(", ") || "none"}`,
     `- Next promotion candidates: ${report.nextPromotionCandidatesSample.map((row) => `${row.repo} (${row.reason}, ${row.stars})`).join(", ") || "none"}`,
+    `- Next promotion shortlist: ${report.nextPromotionShortlistSample.map((row) => `${row.repo} (${row.reason}, ${row.stars})`).join(", ") || "none"}`,
     `- Low-star valid skills: ${report.lowStarValidSkillSample.join(", ") || "none"}`,
     `- Stale/invalid candidates: ${report.staleInvalidCandidatesSample.map((row) => `${row.id} (${row.reason})`).join(", ") || "none"}`,
     `- Daily priority repos: ${report.dailyPriorityRepoSample.map((row) => `${row.repo} (${row.reason})`).join(", ") || "none"}`,
@@ -1006,6 +1014,7 @@ async function main() {
   );
   const dailyPrioritySelection = buildDailyPriorityRepos(repoIndex, discovered);
   const nextPromotionCandidates = buildNextPromotionCandidates(repoIndex, discovered, dailyPrioritySelection.repos);
+  const nextPromotionShortlist = buildNextPromotionShortlist(nextPromotionCandidates);
 
   const reportBase: Omit<ShadowRunReport, "stageTimings"> = {
     checkedAt,
@@ -1063,6 +1072,8 @@ async function main() {
     fastOnlyReposSample,
     nextPromotionCandidateCount: nextPromotionCandidates.length,
     nextPromotionCandidatesSample: nextPromotionCandidates.slice(0, 10),
+    nextPromotionShortlistCount: nextPromotionShortlist.length,
+    nextPromotionShortlistSample: nextPromotionShortlist.slice(0, NEXT_PROMOTION_SHORTLIST_LIMIT),
     productionWriteGuardPassed: true,
   };
 

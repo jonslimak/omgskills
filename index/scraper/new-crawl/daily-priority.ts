@@ -12,6 +12,13 @@ export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason,
   { reason: "goldBasket", cap: 10 },
   { reason: "trustedVendor", cap: 8 },
 ];
+export const NEXT_PROMOTION_SHORTLIST_LIMIT = 20;
+export const NEXT_PROMOTION_SHORTLIST_BUCKET_CAPS: Array<{ reason: NextPromotionCandidateReason; cap: number }> = [
+  { reason: "trustedVendor", cap: 5 },
+  { reason: "goldBasket", cap: 5 },
+  { reason: "periodic", cap: 8 },
+  { reason: "background", cap: 2 },
+];
 
 export type DailyPriorityDiscoveredRepo = {
   repo: string;
@@ -132,4 +139,26 @@ export function buildNextPromotionCandidates(
       if (reasonDelta !== 0) return reasonDelta;
       return b.stars - a.stars || a.repo.localeCompare(b.repo);
     });
+}
+
+export function buildNextPromotionShortlist(candidates: NextPromotionCandidate[]): NextPromotionCandidate[] {
+  const shortlist: NextPromotionCandidate[] = [];
+  const byReason = new Map<NextPromotionCandidateReason, NextPromotionCandidate[]>();
+
+  for (const candidate of candidates) {
+    const existing = byReason.get(candidate.reason) ?? [];
+    existing.push(candidate);
+    byReason.set(candidate.reason, existing);
+  }
+
+  for (const bucket of NEXT_PROMOTION_SHORTLIST_BUCKET_CAPS) {
+    const rows = byReason.get(bucket.reason) ?? [];
+    for (const candidate of rows.slice(0, bucket.cap)) {
+      if (shortlist.length >= NEXT_PROMOTION_SHORTLIST_LIMIT) break;
+      shortlist.push(candidate);
+    }
+    if (shortlist.length >= NEXT_PROMOTION_SHORTLIST_LIMIT) break;
+  }
+
+  return shortlist;
 }
