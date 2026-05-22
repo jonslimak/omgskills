@@ -2,6 +2,8 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { performance } from "node:perf_hooks";
 import type { Skill } from "../types.js";
+import type { Candidate, EnrichResult } from "../enrich.js";
+import { enrichCandidate, getCandidateRepoMeta } from "../enrich.js";
 import { searchByTopics } from "../sources/topics.js";
 import { searchBySkillMdFilename } from "../sources/code.js";
 import { searchAggregators } from "../sources/aggregators.js";
@@ -20,12 +22,14 @@ import type {
   ProvenanceType,
   RepoOverride,
   RepoState,
+  ShadowEnrichmentCounts,
   ShadowRepoIndex,
   ShadowAuthorDiffExample,
   ShadowRepoIndexEntry,
   ShadowSkillRecord,
   ShadowRunReport,
   ShadowSkillSignals,
+  ShadowStaleInvalidCandidate,
   SourceRunSummary,
   StageTimings,
   TopRepoSummary,
@@ -81,6 +85,10 @@ const BACKGROUND_DISCOVERY_BUDGET: DiscoveryBudgetSummary = {
     maxRepos: 10,
   },
 };
+
+const MONITORED_CORE_REFRESH_LIMIT = 50;
+const MONITORED_RISING_REFRESH_LIMIT = 25;
+const LOW_STAR_FLOOR = 5;
 
 function parseCadence(argv: string[]): ShadowCadence {
   const raw = argv.find((arg) => arg.startsWith("--cadence="));
@@ -145,20 +153,22 @@ function buildSkillSignals(checkedAt: string): ShadowSkillSignals {
   };
 }
 
-function buildShadowSkills(skills: Skill[]): ShadowSkillRecord[] {
+function toShadowSkillRecord(skill: Skill): ShadowSkillRecord {
   const seeds = loadTrustedSeeds();
-  return skills.map((skill) => {
-    const provenance = resolveShadowProvenance(skill, seeds);
-    return {
-      ...skill,
-      author_handle: provenance.authorHandle,
-      publisher_handle: provenance.publisherHandle,
-      publisher_repo: provenance.publisherRepo,
-      upstream_repo: provenance.upstreamRepo,
-      provenance_type: provenance.provenanceType,
-      author_confidence: provenance.authorConfidence,
-    };
-  });
+  const provenance = resolveShadowProvenance(skill, seeds);
+  return {
+    ...skill,
+    author_handle: provenance.authorHandle,
+    publisher_handle: provenance.publisherHandle,
+    publisher_repo: provenance.publisherRepo,
+    upstream_repo: provenance.upstreamRepo,
+    provenance_type: provenance.provenanceType,
+    author_confidence: provenance.authorConfidence,
+  };
+}
+
+function buildShadowSkills(skills: Skill[]): ShadowSkillRecord[] {
+  return skills.map(toShadowSkillRecord);
 }
 
 function buildRepoCountsByState(repos: ShadowRepoIndexEntry[]): Record<RepoState, number> {
@@ -385,6 +395,9 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Bootstrap value repos: ${report.bootstrapValueRepoCount}`,
     `- Fast-only repos: ${report.fastOnlyRepoCount}`,
     `- Discovery budget applied: ${report.discoveryBudgetApplied ? "yes" : "no"}`,
+    `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
+    `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
+    `- Official low-star skills: ${report.officialLowStarSkillCount}`,
     `- Production write guard: ${report.productionWriteGuardPassed ? "passed" : "failed"}`,
     "",
     "## Source runs",
@@ -410,6 +423,22 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
       ? report.partialDiscoveryWarnings.map((warning) => `- ${warning}`)
       : ["- none"]),
     "",
+    "## Enrichment",
+    "",
+    `- Library repos checked: ${report.enrichmentCounts.libraryReposChecked}`,
+    `- Core repos deep-refreshed: ${report.enrichmentCounts.coreReposDeepRefreshed}`,
+    `- Rising repos deep-refreshed: ${report.enrichmentCounts.risingReposDeepRefreshed}`,
+    `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
+    `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
+    `- Corrected: ${report.enrichmentCounts.correctedCount}`,
+    `- Stale/invalid candidates: ${report.enrichmentCounts.staleInvalidCandidateCount}`,
+    "",
+    "## Enrichment warnings",
+    "",
+    ...(report.enrichmentWarnings.length
+      ? report.enrichmentWarnings.map((warning) => `- ${warning}`)
+      : ["- none"]),
+    "",
     "## Top provisional core repos",
     "",
     ...(corePreview.length ? corePreview : ["- none"]),
@@ -429,6 +458,8 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Background-only repos: ${report.backgroundOnlyReposSample.join(", ") || "none"}`,
     `- Bootstrap value repos: ${report.bootstrapValueReposSample.join(", ") || "none"}`,
     `- Fast-only repos: ${report.fastOnlyReposSample.join(", ") || "none"}`,
+    `- Low-star valid skills: ${report.lowStarValidSkillSample.join(", ") || "none"}`,
+    `- Stale/invalid candidates: ${report.staleInvalidCandidatesSample.map((row) => `${row.id} (${row.reason})`).join(", ") || "none"}`,
     "",
     "## Stage timings (ms)",
     "",
@@ -464,6 +495,192 @@ function formatDiscoveryWarning(source: DiscoverySourceName, error: unknown): st
     return `${source} rate-limited; returned 0 hits under background budget`;
   }
   return `${source} failed under background budget`;
+}
+
+function buildCandidateFromSkill(skill: Skill): Candidate {
+  return {
+    id: skill.id,
+    skill_md_path: skill.skill_md_path ?? "SKILL.md",
+    skill_name_hint: skill.name,
+  };
+}
+
+function toStaleReason(result: EnrichResult): ShadowStaleInvalidCandidate["reason"] {
+  const reason = result.failure?.reason ?? "";
+  if (reason === "repo-404") return "repoMissing";
+  if (reason === "skill-file-404" || reason === "skill-path-unresolved") return "skillFileMissing";
+  return "validationFailed";
+}
+
+function isMeaningfullyCorrected(previous: Skill, next: Skill): boolean {
+  return (
+    previous.name !== next.name ||
+    previous.description !== next.description ||
+    previous.github_url !== next.github_url ||
+    (previous.skill_md_path ?? "") !== (next.skill_md_path ?? "") ||
+    JSON.stringify(sortUnique(previous.tags)) !== JSON.stringify(sortUnique(next.tags))
+  );
+}
+
+type ShadowRefreshResult = {
+  shadowSkills: ShadowSkillRecord[];
+  enrichmentCounts: ShadowEnrichmentCounts;
+  lowStarValidSkillCount: number;
+  lowStarValidSkillSample: string[];
+  trustedLowStarSkillCount: number;
+  officialLowStarSkillCount: number;
+  staleInvalidCandidatesSample: ShadowStaleInvalidCandidate[];
+  enrichmentWarnings: string[];
+};
+
+async function runShadowRefresh(
+  cadence: ShadowCadence,
+  baselineSkills: Skill[],
+  shadowSkills: ShadowSkillRecord[],
+  repoIndex: ShadowRepoIndex,
+  discovered: Map<string, DiscoveredRepoRecord>,
+  checkedAt: string,
+): Promise<ShadowRefreshResult> {
+  const baselineById = new Map(baselineSkills.map((skill) => [skill.id, skill]));
+  const shadowById = new Map(shadowSkills.map((skill) => [skill.id, skill]));
+  const existingFirstSeen = new Map(baselineSkills.map((skill) => [skill.id, skill.first_seen]));
+  const existingSkills = new Map(baselineSkills.map((skill) => [skill.id, skill]));
+  const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
+  const officialRepos = new Set(
+    [...discovered.values()]
+      .filter((repo) => repo.sources.has("official"))
+      .map((repo) => repo.repo),
+  );
+  const enrichmentWarnings: string[] = [];
+  const staleInvalidCandidates: ShadowStaleInvalidCandidate[] = [];
+  let libraryReposChecked = 0;
+  let skillsDeepRefreshed = 0;
+  let correctedCount = 0;
+
+  const libraryReposToCheck = repoIndex.repos
+    .filter((repo) => repo.state === "library" && discovered.has(repo.repo))
+    .sort((a, b) => a.repo.localeCompare(b.repo));
+
+  for (const repo of libraryReposToCheck) {
+    const skillId = repo.topSkillId ?? repo.skillIds[0];
+    if (!skillId) continue;
+    const baselineSkill = baselineById.get(skillId);
+    if (!baselineSkill) continue;
+    libraryReposChecked += 1;
+    try {
+      const meta = await getCandidateRepoMeta(buildCandidateFromSkill(baselineSkill), checkedAt.slice(0, 10));
+      if (meta) {
+        repo.stars = meta.stars;
+        repo.repoUrl = meta.githubUrl;
+        repo.lastRefreshedAt = checkedAt;
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (/not found/i.test(message)) {
+        staleInvalidCandidates.push({
+          id: skillId,
+          repo: repo.repo,
+          reason: "repoMissing",
+        });
+      } else {
+        enrichmentWarnings.push(`library refresh failed for ${repo.repo}`);
+      }
+    }
+  }
+
+  const hasFastLane = CADENCE_LANES[cadence].includes("fast");
+  const allCoreRepos = repoIndex.repos
+    .filter((repo) => repo.state === "core")
+    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+  const coreRepos = allCoreRepos.slice(0, MONITORED_CORE_REFRESH_LIMIT);
+  const allRisingRepos = repoIndex.repos
+    .filter((repo) => repo.state === "rising")
+    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+  const risingRepos = allRisingRepos.slice(0, MONITORED_RISING_REFRESH_LIMIT);
+
+  if (!hasFastLane) {
+    enrichmentWarnings.push("monitored refresh skipped because cadence excludes fast lane");
+  } else {
+    if (allCoreRepos.length > coreRepos.length) {
+      enrichmentWarnings.push(`core refresh capped at ${coreRepos.length} repos`);
+    }
+    if (allRisingRepos.length > risingRepos.length) {
+      enrichmentWarnings.push(`rising refresh capped at ${risingRepos.length} repos`);
+    }
+  }
+
+  const reposToRefresh = hasFastLane ? [...coreRepos, ...risingRepos] : [];
+  const today = checkedAt.slice(0, 10);
+
+  for (const repo of reposToRefresh) {
+    const skillId = repo.topSkillId ?? repo.skillIds[0];
+    if (!skillId) continue;
+    const baselineSkill = baselineById.get(skillId);
+    if (!baselineSkill) continue;
+
+    const result = await enrichCandidate(
+      buildCandidateFromSkill(baselineSkill),
+      existingFirstSeen,
+      existingSkills,
+      today,
+    );
+    repo.lastRefreshedAt = checkedAt;
+
+    if (result.skill) {
+      skillsDeepRefreshed += 1;
+      repo.stars = result.skill.stars;
+      repo.repoUrl = result.skill.github_url;
+      if (isMeaningfullyCorrected(baselineSkill, result.skill)) {
+        correctedCount += 1;
+        shadowById.set(skillId, toShadowSkillRecord(result.skill));
+      }
+      continue;
+    }
+
+    staleInvalidCandidates.push({
+      id: skillId,
+      repo: repo.repo,
+      reason: toStaleReason(result),
+    });
+  }
+
+  const refreshedShadowSkills = baselineSkills.map((skill) => shadowById.get(skill.id) ?? toShadowSkillRecord(skill));
+  const lowStarValidSkills = refreshedShadowSkills
+    .filter((skill) => skill.stars < LOW_STAR_FLOOR)
+    .sort((a, b) => b.stars - a.stars || a.id.localeCompare(b.id));
+
+  const trustedLowStarSkillCount = lowStarValidSkills.filter((skill) => {
+    const repo = repoKeyFor(skill);
+    const entry = repo ? repoByName.get(repo.repo) : null;
+    return Boolean(entry?.isTrustedVendor || entry?.isTrustedCreator);
+  }).length;
+
+  const officialLowStarSkillCount = lowStarValidSkills.filter((skill) => {
+    const repo = repoKeyFor(skill);
+    return Boolean(repo && officialRepos.has(repo.repo));
+  }).length;
+
+  const staleInvalidUnique = [...new Map(staleInvalidCandidates.map((row) => [`${row.id}:${row.reason}`, row])).values()];
+  const carriedForwardCount = refreshedShadowSkills.length - correctedCount;
+
+  return {
+    shadowSkills: refreshedShadowSkills,
+    enrichmentCounts: {
+      libraryReposChecked,
+      coreReposDeepRefreshed: hasFastLane ? coreRepos.length : 0,
+      risingReposDeepRefreshed: hasFastLane ? risingRepos.length : 0,
+      skillsDeepRefreshed,
+      carriedForwardCount,
+      correctedCount,
+      staleInvalidCandidateCount: staleInvalidUnique.length,
+    },
+    lowStarValidSkillCount: lowStarValidSkills.length,
+    lowStarValidSkillSample: lowStarValidSkills.slice(0, 10).map((skill) => `${skill.id} (${skill.stars})`),
+    trustedLowStarSkillCount,
+    officialLowStarSkillCount,
+    staleInvalidCandidatesSample: staleInvalidUnique.slice(0, 10),
+    enrichmentWarnings,
+  };
 }
 
 async function timeSource<T>(
@@ -722,7 +939,7 @@ async function main() {
   timings.loadBaseline = Math.round(performance.now() - baselineStart);
 
   const provenanceStart = performance.now();
-  const shadowSkills = buildShadowSkills(baselineSkills);
+  let shadowSkills = buildShadowSkills(baselineSkills);
   timings.buildProvenance = Math.round(performance.now() - provenanceStart);
 
   const repoIndexStart = performance.now();
@@ -733,6 +950,11 @@ async function main() {
   const { sourceRuns, discovered, discoveryBudgetApplied, discoveryBudgetSummary, partialDiscoveryWarnings } =
     await runDiscovery(cadence, repoIndex);
   timings.runDiscovery = Math.round(performance.now() - discoveryStart);
+
+  const refreshStart = performance.now();
+  const refreshResult = await runShadowRefresh(cadence, baselineSkills, shadowSkills, repoIndex, discovered, checkedAt);
+  shadowSkills = refreshResult.shadowSkills;
+  timings.runRefresh = Math.round(performance.now() - refreshStart);
 
   const skillSignalsStart = performance.now();
   const skillSignals = buildSkillSignals(checkedAt);
@@ -768,10 +990,10 @@ async function main() {
     cadence,
     baselineSkillCount: baselineSkills.length,
     shadowSkillCount: shadowSkills.length,
-    carriedForwardCount: baselineSkills.length,
-    correctedCount: 0,
+    carriedForwardCount: refreshResult.enrichmentCounts.carriedForwardCount,
+    correctedCount: refreshResult.enrichmentCounts.correctedCount,
     newlyDiscoveredCount: 0,
-    staleInvalidCandidateCount: 0,
+    staleInvalidCandidateCount: refreshResult.enrichmentCounts.staleInvalidCandidateCount,
     repoCount: repoIndex.repoCount,
     repoCountsByState: buildRepoCountsByState(repoIndex.repos),
     trustedVendorRepoCount: countRepos(repoIndex.repos, (repo) => repo.isTrustedVendor),
@@ -790,6 +1012,13 @@ async function main() {
     discoveryBudgetApplied,
     discoveryBudgetSummary,
     partialDiscoveryWarnings,
+    enrichmentCounts: refreshResult.enrichmentCounts,
+    lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
+    lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,
+    trustedLowStarSkillCount: refreshResult.trustedLowStarSkillCount,
+    officialLowStarSkillCount: refreshResult.officialLowStarSkillCount,
+    staleInvalidCandidatesSample: refreshResult.staleInvalidCandidatesSample,
+    enrichmentWarnings: refreshResult.enrichmentWarnings,
     discoveredRepoCount: discovered.size,
     discoveredRepoCountByLane,
     discoveredRepoCountBySource,

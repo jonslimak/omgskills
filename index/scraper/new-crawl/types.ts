@@ -88,6 +88,22 @@ export type ShadowSkillSignals = {
   signals: Record<string, never>;
 };
 
+export type ShadowEnrichmentCounts = {
+  libraryReposChecked: number;
+  coreReposDeepRefreshed: number;
+  risingReposDeepRefreshed: number;
+  skillsDeepRefreshed: number;
+  carriedForwardCount: number;
+  correctedCount: number;
+  staleInvalidCandidateCount: number;
+};
+
+export type ShadowStaleInvalidCandidate = {
+  id: string;
+  repo: string;
+  reason: "repoMissing" | "skillFileMissing" | "validationFailed";
+};
+
 export type StageTimings = Record<string, number>;
 export type SourceRunSummary = {
   source: string;
@@ -159,6 +175,13 @@ export type ShadowRunReport = {
   discoveryBudgetApplied: boolean;
   discoveryBudgetSummary: DiscoveryBudgetSummary | null;
   partialDiscoveryWarnings: string[];
+  enrichmentCounts: ShadowEnrichmentCounts;
+  lowStarValidSkillCount: number;
+  lowStarValidSkillSample: string[];
+  trustedLowStarSkillCount: number;
+  officialLowStarSkillCount: number;
+  staleInvalidCandidatesSample: ShadowStaleInvalidCandidate[];
+  enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;
   discoveredRepoCountBySource: Record<string, number>;
