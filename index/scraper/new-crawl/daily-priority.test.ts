@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildDailyPriorityRepos, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
+import { buildDailyPriorityRepos, buildNextPromotionCandidates, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
 import type { PriorityReason, PriorityReasonCounts, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
@@ -35,8 +35,23 @@ function repoIndex(repos: ShadowRepoIndexEntry[]): ShadowRepoIndex {
   };
 }
 
-function discovered(...repos: string[]): Map<string, { repo: string; sources: Set<string> }> {
-  return new Map(repos.map((repo) => [repo, { repo, sources: new Set(["official"]) }]));
+function discovered(...repos: string[]): Map<string, { repo: string; sources: Set<string>; lanes: Set<"fast"> }> {
+  return new Map(repos.map((repo) => [repo, { repo, sources: new Set(["official"]), lanes: new Set(["fast"]) }]));
+}
+
+function candidateDiscovery(
+  rows: Array<{ repo: string; lanes: Array<"periodic" | "background">; sources?: string[] }>,
+): Map<string, { repo: string; sources: Set<string>; lanes: Set<"periodic" | "background"> }> {
+  return new Map(
+    rows.map((row) => [
+      row.repo,
+      {
+        repo: row.repo,
+        sources: new Set(row.sources ?? row.lanes),
+        lanes: new Set(row.lanes),
+      },
+    ]),
+  );
 }
 
 function countReasons(reasonByRepo: Map<string, PriorityReason>): PriorityReasonCounts {
@@ -163,4 +178,95 @@ test("priority reason counts and sample reasons stay valid for report output", (
     assert.ok(row.reason);
     assert.ok(["official", "goldBasket", "trustedVendor", "stars"].includes(row.reason));
   }
+});
+
+test("already-selected daily repos are excluded from next promotion candidates", () => {
+  const repos = repoIndex([
+    repo({ repo: "daily/repo", stars: 100, isTrustedVendor: true }),
+    repo({ repo: "next/repo", stars: 90 }),
+  ]);
+  const daily = [repos.repos[0]];
+
+  const result = buildNextPromotionCandidates(
+    repos,
+    candidateDiscovery([
+      { repo: "daily/repo", lanes: ["periodic"] },
+      { repo: "next/repo", lanes: ["periodic"] },
+    ]),
+    daily,
+  );
+
+  assert.deepEqual(result.map((row) => row.repo), ["next/repo"]);
+});
+
+test("periodic candidates rank ahead of background candidates", () => {
+  const result = buildNextPromotionCandidates(
+    repoIndex([
+      repo({ repo: "periodic/repo", stars: 1 }),
+      repo({ repo: "background/repo", stars: 999 }),
+    ]),
+    candidateDiscovery([
+      { repo: "background/repo", lanes: ["background"] },
+      { repo: "periodic/repo", lanes: ["periodic"] },
+    ]),
+    [],
+  );
+
+  assert.deepEqual(result.map((row) => row.repo), ["periodic/repo", "background/repo"]);
+});
+
+test("trusted vendor ranks ahead of plain periodic and background candidates", () => {
+  const result = buildNextPromotionCandidates(
+    repoIndex([
+      repo({ repo: "vendor/repo", stars: 1, isTrustedVendor: true }),
+      repo({ repo: "periodic/repo", stars: 999 }),
+      repo({ repo: "background/repo", stars: 998 }),
+    ]),
+    candidateDiscovery([
+      { repo: "vendor/repo", lanes: ["background"] },
+      { repo: "periodic/repo", lanes: ["periodic"] },
+      { repo: "background/repo", lanes: ["background"] },
+    ]),
+    [],
+  );
+
+  assert.equal(result[0]?.repo, "vendor/repo");
+  assert.equal(result[0]?.reason, "trustedVendor");
+});
+
+test("gold basket ranks ahead of plain periodic and background candidates", () => {
+  const result = buildNextPromotionCandidates(
+    repoIndex([
+      repo({ repo: "gold/repo", stars: 1, isGoldBasketRepo: true }),
+      repo({ repo: "periodic/repo", stars: 999 }),
+      repo({ repo: "background/repo", stars: 998 }),
+    ]),
+    candidateDiscovery([
+      { repo: "gold/repo", lanes: ["background"] },
+      { repo: "periodic/repo", lanes: ["periodic"] },
+      { repo: "background/repo", lanes: ["background"] },
+    ]),
+    [],
+  );
+
+  assert.equal(result[0]?.repo, "gold/repo");
+  assert.equal(result[0]?.reason, "goldBasket");
+});
+
+test("stars break ties within the same candidate reason bucket", () => {
+  const result = buildNextPromotionCandidates(
+    repoIndex([
+      repo({ repo: "periodic/high", stars: 20 }),
+      repo({ repo: "periodic/low", stars: 10 }),
+      repo({ repo: "periodic/zero", stars: 0 }),
+    ]),
+    candidateDiscovery([
+      { repo: "periodic/low", lanes: ["periodic"] },
+      { repo: "periodic/high", lanes: ["periodic"] },
+      { repo: "periodic/zero", lanes: ["periodic"] },
+    ]),
+    [],
+  );
+
+  assert.deepEqual(result.map((row) => row.repo), ["periodic/high", "periodic/low", "periodic/zero"]);
 });

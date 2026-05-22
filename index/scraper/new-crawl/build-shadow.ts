@@ -15,7 +15,7 @@ import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
-import { buildDailyPriorityRepos, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
+import { buildDailyPriorityRepos, buildNextPromotionCandidates, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
 import type {
   DailyPriorityRepoSample,
   DiscoveryBudgetSummary,
@@ -431,6 +431,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Library repos checked: ${report.enrichmentCounts.libraryReposChecked}`,
     `- Daily priority repos: ${report.enrichmentCounts.dailyPriorityRepoCount}`,
     `- Daily priority reasons: ${formatPriorityReasonCounts(report.priorityReasonCounts)}`,
+    `- Next promotion candidates: ${report.nextPromotionCandidateCount}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
     `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
     `- Corrected: ${report.enrichmentCounts.correctedCount}`,
@@ -462,6 +463,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Background-only repos: ${report.backgroundOnlyReposSample.join(", ") || "none"}`,
     `- Bootstrap value repos: ${report.bootstrapValueReposSample.join(", ") || "none"}`,
     `- Fast-only repos: ${report.fastOnlyReposSample.join(", ") || "none"}`,
+    `- Next promotion candidates: ${report.nextPromotionCandidatesSample.map((row) => `${row.repo} (${row.reason}, ${row.stars})`).join(", ") || "none"}`,
     `- Low-star valid skills: ${report.lowStarValidSkillSample.join(", ") || "none"}`,
     `- Stale/invalid candidates: ${report.staleInvalidCandidatesSample.map((row) => `${row.id} (${row.reason})`).join(", ") || "none"}`,
     `- Daily priority repos: ${report.dailyPriorityRepoSample.map((row) => `${row.repo} (${row.reason})`).join(", ") || "none"}`,
@@ -1002,6 +1004,8 @@ async function main() {
     discovered,
     (repo) => repo.lanes.has("fast") && !repo.lanes.has("periodic") && !repo.lanes.has("background"),
   );
+  const dailyPrioritySelection = buildDailyPriorityRepos(repoIndex, discovered);
+  const nextPromotionCandidates = buildNextPromotionCandidates(repoIndex, discovered, dailyPrioritySelection.repos);
 
   const reportBase: Omit<ShadowRunReport, "stageTimings"> = {
     checkedAt,
@@ -1057,6 +1061,8 @@ async function main() {
       (repo) => repo.lanes.has("fast") && !repo.lanes.has("periodic") && !repo.lanes.has("background"),
     ).length,
     fastOnlyReposSample,
+    nextPromotionCandidateCount: nextPromotionCandidates.length,
+    nextPromotionCandidatesSample: nextPromotionCandidates.slice(0, 10),
     productionWriteGuardPassed: true,
   };
 

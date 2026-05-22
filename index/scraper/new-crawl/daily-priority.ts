@@ -1,4 +1,10 @@
-import type { PriorityReason, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
+import type {
+  DiscoveryLane,
+  NextPromotionCandidateReason,
+  PriorityReason,
+  ShadowRepoIndex,
+  ShadowRepoIndexEntry,
+} from "./types.js";
 
 export const DAILY_PRIORITY_REPO_LIMIT = 40;
 export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason, "stars">; cap: number }> = [
@@ -10,12 +16,19 @@ export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason,
 export type DailyPriorityDiscoveredRepo = {
   repo: string;
   sources: Set<string>;
+  lanes: Set<DiscoveryLane>;
 };
 
 export type DailyPrioritySelection = {
   repos: ShadowRepoIndexEntry[];
   reasonByRepo: Map<string, PriorityReason>;
   skippedMonitoredRepoCount: number;
+};
+
+export type NextPromotionCandidate = {
+  repo: string;
+  stars: number;
+  reason: NextPromotionCandidateReason;
 };
 
 export function buildDailyPriorityRepos(
@@ -70,4 +83,53 @@ export function buildDailyPriorityRepos(
     reasonByRepo,
     skippedMonitoredRepoCount: Math.max(monitoredRepos.length - selected.length, 0),
   };
+}
+
+function nextPromotionReason(
+  repo: ShadowRepoIndexEntry | null,
+  discoveredRepo: DailyPriorityDiscoveredRepo,
+): NextPromotionCandidateReason {
+  if (repo?.isTrustedVendor) return "trustedVendor";
+  if (repo?.isGoldBasketRepo) return "goldBasket";
+  if (discoveredRepo.lanes.has("periodic")) return "periodic";
+  return "background";
+}
+
+function nextPromotionRank(reason: NextPromotionCandidateReason): number {
+  switch (reason) {
+    case "trustedVendor":
+      return 0;
+    case "goldBasket":
+      return 1;
+    case "periodic":
+      return 2;
+    case "background":
+      return 3;
+  }
+}
+
+export function buildNextPromotionCandidates(
+  repoIndex: ShadowRepoIndex,
+  discovered: Map<string, DailyPriorityDiscoveredRepo>,
+  dailyPriorityRepos: ShadowRepoIndexEntry[],
+): NextPromotionCandidate[] {
+  const dailyPrioritySet = new Set(dailyPriorityRepos.map((repo) => repo.repo));
+  const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
+
+  return [...discovered.values()]
+    .filter((repo) => !dailyPrioritySet.has(repo.repo))
+    .filter((repo) => repo.lanes.has("periodic") || repo.lanes.has("background"))
+    .map((discoveredRepo) => {
+      const repo = repoByName.get(discoveredRepo.repo) ?? null;
+      return {
+        repo: discoveredRepo.repo,
+        stars: repo?.stars ?? 0,
+        reason: nextPromotionReason(repo, discoveredRepo),
+      };
+    })
+    .sort((a, b) => {
+      const reasonDelta = nextPromotionRank(a.reason) - nextPromotionRank(b.reason);
+      if (reasonDelta !== 0) return reasonDelta;
+      return b.stars - a.stars || a.repo.localeCompare(b.repo);
+    });
 }

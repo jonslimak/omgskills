@@ -106,6 +106,14 @@ export type DailyPriorityRepoSample = {
   reason: PriorityReason;
 };
 
+export type NextPromotionCandidateReason = "trustedVendor" | "goldBasket" | "periodic" | "background";
+
+export type NextPromotionCandidateSample = {
+  repo: string;
+  stars: number;
+  reason: NextPromotionCandidateReason;
+};
+
 export type ShadowStaleInvalidCandidate = {
   id: string;
   repo: string;
@@ -192,6 +200,8 @@ export type ShadowRunReport = {
   priorityReasonCounts: PriorityReasonCounts;
   dailyPriorityRepoSample: DailyPriorityRepoSample[];
   skippedMonitoredRepoCount: number;
+  nextPromotionCandidateCount: number;
+  nextPromotionCandidatesSample: NextPromotionCandidateSample[];
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;
