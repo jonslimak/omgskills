@@ -15,9 +15,9 @@ export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason,
 export const NEXT_PROMOTION_SHORTLIST_LIMIT = 20;
 export const NEXT_PROMOTION_SHORTLIST_BUCKET_CAPS: Array<{ reason: NextPromotionCandidateReason; cap: number }> = [
   { reason: "trustedVendor", cap: 5 },
-  { reason: "goldBasket", cap: 5 },
+  { reason: "goldBasket", cap: 3 },
   { reason: "periodic", cap: 8 },
-  { reason: "background", cap: 2 },
+  { reason: "background", cap: 4 },
 ];
 
 export type DailyPriorityDiscoveredRepo = {

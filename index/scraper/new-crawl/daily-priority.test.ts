@@ -305,9 +305,9 @@ test("promotion shortlist respects per-reason caps", () => {
   }, {});
 
   assert.equal(counts.trustedVendor, 5);
-  assert.equal(counts.goldBasket, 5);
+  assert.equal(counts.goldBasket, 3);
   assert.equal(counts.periodic, 8);
-  assert.equal(counts.background, 2);
+  assert.equal(counts.background, 4);
 });
 
 test("promotion shortlist preserves ranked order within each reason bucket", () => {
