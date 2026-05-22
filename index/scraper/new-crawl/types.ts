@@ -83,6 +83,12 @@ export type ShadowRepoIndex = {
   repos: ShadowRepoIndexEntry[];
 };
 
+export type ShadowRepoOverlay = {
+  generatedAt: string;
+  repoCount: number;
+  repos: ShadowRepoIndexEntry[];
+};
+
 export type ShadowSkillSignals = {
   generatedAt: string;
   signals: Record<string, never>;
@@ -245,6 +251,9 @@ export type ShadowRunReport = {
   bootstrapFailedRepoSample: BootstrapRepoSample[];
   bootstrapSkippedRepoCount: number;
   bootstrapSkippedRepoSample: BootstrapRepoSample[];
+  shadowRepoOverlayLoaded: boolean;
+  shadowRepoOverlayEntryCount: number;
+  shadowRepoOverlayWrittenCount: number;
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;

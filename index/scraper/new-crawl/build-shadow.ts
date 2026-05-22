@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { performance } from "node:perf_hooks";
 import type { Skill } from "../types.js";
 import type { Candidate, EnrichResult } from "../enrich.js";
-import { enrichCandidate, getCandidateRepoMeta } from "../enrich.js";
+import { enrichCandidate, getCandidateRepoMeta, resolveCandidateSkillPath } from "../enrich.js";
 import { searchByTopics } from "../sources/topics.js";
 import { searchBySkillMdFilename } from "../sources/code.js";
 import { searchAggregators } from "../sources/aggregators.js";
@@ -15,7 +15,8 @@ import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
-import { bootstrapRisingRepos, selectBetterBootstrapCandidate } from "./bootstrap.js";
+import { bootstrapRisingRepos, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
+import { applyShadowRepoOverlay, buildShadowRepoOverlay, loadShadowRepoOverlay } from "./repo-overlay.js";
 import {
   applyShortlistPromotions,
   buildDailyPriorityRepos,
@@ -39,6 +40,7 @@ import type {
   BootstrapRepoSample,
   ShadowEnrichmentCounts,
   ShadowRepoIndex,
+  ShadowRepoOverlay,
   ShadowAuthorDiffExample,
   ShadowRepoIndexEntry,
   ShadowSkillRecord,
@@ -123,6 +125,10 @@ function writeShadowFile(path: string, content: string) {
 
 function loadSkills(path: string): Skill[] {
   return JSON.parse(readFileSync(path, "utf8")) as Skill[];
+}
+
+function cloneRepoIndex(repoIndex: ShadowRepoIndex): ShadowRepoIndex {
+  return JSON.parse(JSON.stringify(repoIndex)) as ShadowRepoIndex;
 }
 
 function repoKeyFromGithubUrl(githubUrl: string): { repo: string; repoUrl: string } | null {
@@ -452,6 +458,9 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Bootstrapped repos: ${report.bootstrappedRepoCount}`,
     `- Bootstrap failures: ${report.bootstrapFailedRepoCount}`,
     `- Bootstrap skipped: ${report.bootstrapSkippedRepoCount}`,
+    `- Shadow repo overlay loaded: ${report.shadowRepoOverlayLoaded ? "yes" : "no"}`,
+    `- Shadow repo overlay entries: ${report.shadowRepoOverlayEntryCount}`,
+    `- Shadow repo overlay written: ${report.shadowRepoOverlayWrittenCount}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
     `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
     `- Corrected: ${report.enrichmentCounts.correctedCount}`,
@@ -671,6 +680,7 @@ async function runShadowRefresh(
     repoAliasByCanonical,
     existingFirstSeen,
     existingSkills,
+    resolveCandidatePathFn: async (candidate) => resolveCandidateSkillPath(toEnrichCandidate(candidate)),
     enrichCandidateFn: enrichCandidate,
   });
   for (const skill of bootstrapResult.bootstrappedSkills) {
@@ -1084,6 +1094,7 @@ async function main() {
   const goldBasketPath = join(indexRoot, "gold-basket.json");
   const skillsOutPath = join(shadowRoot, "skills.shadow.json");
   const repoIndexOutPath = join(shadowRoot, "repo-index.shadow.json");
+  const repoOverlayOutPath = join(shadowRoot, "repo-index.overlay.json");
   const skillSignalsOutPath = join(shadowRoot, "skill-signals.shadow.json");
   const reportOutPath = join(shadowRoot, "shadow-report.json");
   const summaryOutPath = join(shadowRoot, "shadow-summary.md");
@@ -1105,7 +1116,15 @@ async function main() {
 
   const repoIndexStart = performance.now();
   const { repoIndex, unresolvedBaselineSkillCount } = buildRepoIndex(baselineSkills, goldBasketSkills, checkedAt);
+  const baselineRepoIndexForOverlay = cloneRepoIndex(repoIndex);
   timings.buildRepoIndex = Math.round(performance.now() - repoIndexStart);
+
+  const repoOverlay = loadShadowRepoOverlay(repoOverlayOutPath);
+  const { overlayLoaded: shadowRepoOverlayLoaded, overlayEntryCount: shadowRepoOverlayEntryCount } = applyShadowRepoOverlay(
+    cadence,
+    repoIndex,
+    repoOverlay,
+  );
 
   const discoveryStart = performance.now();
   const repoAliasByCanonical = new Map<string, string>();
@@ -1156,6 +1175,11 @@ async function main() {
   const refreshResult = await runShadowRefresh(cadence, baselineSkills, shadowSkills, repoIndex, discovered, checkedAt, repoAliasByCanonical);
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
+
+  const shadowRepoOverlay: ShadowRepoOverlay | null = cadence === "combined"
+    ? buildShadowRepoOverlay(repoIndex, baselineRepoIndexForOverlay, checkedAt)
+    : null;
+  const shadowRepoOverlayWrittenCount = shadowRepoOverlay?.repoCount ?? 0;
 
   const skillSignalsStart = performance.now();
   const skillSignals = buildSkillSignals(checkedAt);
@@ -1253,6 +1277,9 @@ async function main() {
     bootstrapFailedRepoSample: refreshResult.bootstrapFailedRepoSample.slice(0, 10),
     bootstrapSkippedRepoCount: refreshResult.bootstrapSkippedRepoSample.length,
     bootstrapSkippedRepoSample: refreshResult.bootstrapSkippedRepoSample.slice(0, 10),
+    shadowRepoOverlayLoaded,
+    shadowRepoOverlayEntryCount,
+    shadowRepoOverlayWrittenCount,
     productionWriteGuardPassed: true,
   };
 
@@ -1261,6 +1288,9 @@ async function main() {
   const writeStart = performance.now();
   writeShadowFile(skillsOutPath, JSON.stringify(shadowSkills, null, 2) + "\n");
   writeShadowFile(repoIndexOutPath, JSON.stringify(repoIndex, null, 2) + "\n");
+  if (shadowRepoOverlay) {
+    writeShadowFile(repoOverlayOutPath, JSON.stringify(shadowRepoOverlay, null, 2) + "\n");
+  }
   writeShadowFile(skillSignalsOutPath, JSON.stringify(skillSignals, null, 2) + "\n");
   writeShadowFile(reportOutPath, JSON.stringify(initialReport, null, 2) + "\n");
   writeShadowFile(summaryOutPath, buildSummary(initialReport, repoIndex));
