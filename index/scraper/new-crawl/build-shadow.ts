@@ -16,8 +16,11 @@ import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js"
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import type {
+  DailyPriorityRepoSample,
   DiscoveryBudgetSummary,
   DiscoveryLane,
+  PriorityReason,
+  PriorityReasonCounts,
   ShadowCadence,
   ProvenanceType,
   RepoOverride,
@@ -86,8 +89,7 @@ const BACKGROUND_DISCOVERY_BUDGET: DiscoveryBudgetSummary = {
   },
 };
 
-const MONITORED_CORE_REFRESH_LIMIT = 50;
-const MONITORED_RISING_REFRESH_LIMIT = 25;
+const DAILY_PRIORITY_REPO_LIMIT = 40;
 const LOW_STAR_FLOOR = 5;
 
 function parseCadence(argv: string[]): ShadowCadence {
@@ -426,12 +428,12 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "## Enrichment",
     "",
     `- Library repos checked: ${report.enrichmentCounts.libraryReposChecked}`,
-    `- Core repos deep-refreshed: ${report.enrichmentCounts.coreReposDeepRefreshed}`,
-    `- Rising repos deep-refreshed: ${report.enrichmentCounts.risingReposDeepRefreshed}`,
+    `- Daily priority repos: ${report.enrichmentCounts.dailyPriorityRepoCount}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
     `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
     `- Corrected: ${report.enrichmentCounts.correctedCount}`,
     `- Stale/invalid candidates: ${report.enrichmentCounts.staleInvalidCandidateCount}`,
+    `- Skipped monitored repos: ${report.skippedMonitoredRepoCount}`,
     "",
     "## Enrichment warnings",
     "",
@@ -460,6 +462,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Fast-only repos: ${report.fastOnlyReposSample.join(", ") || "none"}`,
     `- Low-star valid skills: ${report.lowStarValidSkillSample.join(", ") || "none"}`,
     `- Stale/invalid candidates: ${report.staleInvalidCandidatesSample.map((row) => `${row.id} (${row.reason})`).join(", ") || "none"}`,
+    `- Daily priority repos: ${report.dailyPriorityRepoSample.map((row) => `${row.repo} (${row.reason})`).join(", ") || "none"}`,
     "",
     "## Stage timings (ms)",
     "",
@@ -530,8 +533,68 @@ type ShadowRefreshResult = {
   trustedLowStarSkillCount: number;
   officialLowStarSkillCount: number;
   staleInvalidCandidatesSample: ShadowStaleInvalidCandidate[];
+  priorityReasonCounts: PriorityReasonCounts;
+  dailyPriorityRepoSample: DailyPriorityRepoSample[];
+  skippedMonitoredRepoCount: number;
   enrichmentWarnings: string[];
 };
+
+function emptyPriorityReasonCounts(): PriorityReasonCounts {
+  return {
+    official: 0,
+    goldBasket: 0,
+    trustedVendor: 0,
+    stars: 0,
+  };
+}
+
+function buildDailyPriorityRepos(
+  repoIndex: ShadowRepoIndex,
+  discovered: Map<string, DiscoveredRepoRecord>,
+): { repos: ShadowRepoIndexEntry[]; reasonByRepo: Map<string, PriorityReason>; skippedMonitoredRepoCount: number } {
+  const monitoredRepos = repoIndex.repos.filter((repo) => repo.state === "core" || repo.state === "rising");
+  const monitoredByName = new Map(monitoredRepos.map((repo) => [repo.repo, repo]));
+  const reasonByRepo = new Map<string, PriorityReason>();
+  const selected: ShadowRepoIndexEntry[] = [];
+  const selectedNames = new Set<string>();
+
+  const pushRepos = (repos: ShadowRepoIndexEntry[], reason: PriorityReason) => {
+    for (const repo of repos) {
+      if (selected.length >= DAILY_PRIORITY_REPO_LIMIT) break;
+      if (selectedNames.has(repo.repo)) continue;
+      selected.push(repo);
+      selectedNames.add(repo.repo);
+      reasonByRepo.set(repo.repo, reason);
+    }
+  };
+
+  const officialRepos = [...discovered.values()]
+    .filter((repo) => repo.sources.has("official"))
+    .map((repo) => monitoredByName.get(repo.repo))
+    .filter((repo): repo is ShadowRepoIndexEntry => Boolean(repo))
+    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+  pushRepos(officialRepos.slice(0, 12), "official");
+
+  const goldBasketRepos = monitoredRepos
+    .filter((repo) => repo.isGoldBasketRepo)
+    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+  pushRepos(goldBasketRepos.slice(0, 10), "goldBasket");
+
+  const trustedVendorRepos = monitoredRepos
+    .filter((repo) => repo.isTrustedVendor)
+    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+  pushRepos(trustedVendorRepos.slice(0, 8), "trustedVendor");
+
+  const remainingMonitoredRepos = monitoredRepos
+    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+  pushRepos(remainingMonitoredRepos, "stars");
+
+  return {
+    repos: selected,
+    reasonByRepo,
+    skippedMonitoredRepoCount: Math.max(monitoredRepos.length - selected.length, 0),
+  };
+}
 
 async function runShadowRefresh(
   cadence: ShadowCadence,
@@ -553,6 +616,7 @@ async function runShadowRefresh(
   );
   const enrichmentWarnings: string[] = [];
   const staleInvalidCandidates: ShadowStaleInvalidCandidate[] = [];
+  const priorityReasonCounts = emptyPriorityReasonCounts();
   let libraryReposChecked = 0;
   let skillsDeepRefreshed = 0;
   let correctedCount = 0;
@@ -589,27 +653,15 @@ async function runShadowRefresh(
   }
 
   const hasFastLane = CADENCE_LANES[cadence].includes("fast");
-  const allCoreRepos = repoIndex.repos
-    .filter((repo) => repo.state === "core")
-    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
-  const coreRepos = allCoreRepos.slice(0, MONITORED_CORE_REFRESH_LIMIT);
-  const allRisingRepos = repoIndex.repos
-    .filter((repo) => repo.state === "rising")
-    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
-  const risingRepos = allRisingRepos.slice(0, MONITORED_RISING_REFRESH_LIMIT);
+  const { repos: dailyPriorityRepos, reasonByRepo, skippedMonitoredRepoCount } = buildDailyPriorityRepos(repoIndex, discovered);
 
   if (!hasFastLane) {
     enrichmentWarnings.push("monitored refresh skipped because cadence excludes fast lane");
-  } else {
-    if (allCoreRepos.length > coreRepos.length) {
-      enrichmentWarnings.push(`core refresh capped at ${coreRepos.length} repos`);
-    }
-    if (allRisingRepos.length > risingRepos.length) {
-      enrichmentWarnings.push(`rising refresh capped at ${risingRepos.length} repos`);
-    }
+  } else if (skippedMonitoredRepoCount > 0) {
+    enrichmentWarnings.push(`daily priority refresh capped at ${dailyPriorityRepos.length} repos`);
   }
 
-  const reposToRefresh = hasFastLane ? [...coreRepos, ...risingRepos] : [];
+  const reposToRefresh = hasFastLane ? dailyPriorityRepos : [];
   const today = checkedAt.slice(0, 10);
 
   for (const repo of reposToRefresh) {
@@ -625,6 +677,10 @@ async function runShadowRefresh(
       today,
     );
     repo.lastRefreshedAt = checkedAt;
+    const priorityReason = reasonByRepo.get(repo.repo);
+    if (priorityReason) {
+      priorityReasonCounts[priorityReason] += 1;
+    }
 
     if (result.skill) {
       skillsDeepRefreshed += 1;
@@ -667,8 +723,7 @@ async function runShadowRefresh(
     shadowSkills: refreshedShadowSkills,
     enrichmentCounts: {
       libraryReposChecked,
-      coreReposDeepRefreshed: hasFastLane ? coreRepos.length : 0,
-      risingReposDeepRefreshed: hasFastLane ? risingRepos.length : 0,
+      dailyPriorityRepoCount: hasFastLane ? dailyPriorityRepos.length : 0,
       skillsDeepRefreshed,
       carriedForwardCount,
       correctedCount,
@@ -679,6 +734,12 @@ async function runShadowRefresh(
     trustedLowStarSkillCount,
     officialLowStarSkillCount,
     staleInvalidCandidatesSample: staleInvalidUnique.slice(0, 10),
+    priorityReasonCounts,
+    dailyPriorityRepoSample: dailyPriorityRepos.slice(0, 10).map((repo) => ({
+      repo: repo.repo,
+      reason: reasonByRepo.get(repo.repo) ?? "stars",
+    })),
+    skippedMonitoredRepoCount,
     enrichmentWarnings,
   };
 }
@@ -1018,6 +1079,9 @@ async function main() {
     trustedLowStarSkillCount: refreshResult.trustedLowStarSkillCount,
     officialLowStarSkillCount: refreshResult.officialLowStarSkillCount,
     staleInvalidCandidatesSample: refreshResult.staleInvalidCandidatesSample,
+    priorityReasonCounts: refreshResult.priorityReasonCounts,
+    dailyPriorityRepoSample: refreshResult.dailyPriorityRepoSample,
+    skippedMonitoredRepoCount: refreshResult.skippedMonitoredRepoCount,
     enrichmentWarnings: refreshResult.enrichmentWarnings,
     discoveredRepoCount: discovered.size,
     discoveredRepoCountByLane,

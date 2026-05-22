@@ -90,12 +90,20 @@ export type ShadowSkillSignals = {
 
 export type ShadowEnrichmentCounts = {
   libraryReposChecked: number;
-  coreReposDeepRefreshed: number;
-  risingReposDeepRefreshed: number;
+  dailyPriorityRepoCount: number;
   skillsDeepRefreshed: number;
   carriedForwardCount: number;
   correctedCount: number;
   staleInvalidCandidateCount: number;
+};
+
+export type PriorityReason = "official" | "trustedVendor" | "goldBasket" | "stars";
+
+export type PriorityReasonCounts = Record<PriorityReason, number>;
+
+export type DailyPriorityRepoSample = {
+  repo: string;
+  reason: PriorityReason;
 };
 
 export type ShadowStaleInvalidCandidate = {
@@ -181,6 +189,9 @@ export type ShadowRunReport = {
   trustedLowStarSkillCount: number;
   officialLowStarSkillCount: number;
   staleInvalidCandidatesSample: ShadowStaleInvalidCandidate[];
+  priorityReasonCounts: PriorityReasonCounts;
+  dailyPriorityRepoSample: DailyPriorityRepoSample[];
+  skippedMonitoredRepoCount: number;
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;
