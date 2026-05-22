@@ -1,0 +1,166 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { buildDailyPriorityRepos, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
+import type { PriorityReason, PriorityReasonCounts, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
+
+function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
+  const { repo: repoName, stars, ...rest } = overrides;
+  return {
+    repo: repoName,
+    repoUrl: `https://github.com/${repoName}`,
+    state: "core",
+    discoveredSources: ["baseline"],
+    skillIds: [`${repoName}:skill`],
+    skillCount: 1,
+    stars,
+    lastSeenAt: "2026-05-22T00:00:00Z",
+    lastRefreshedAt: "2026-05-22T00:00:00Z",
+    trustSignals: [],
+    promotionReasons: [],
+    staleOrInvalidState: null,
+    isTrustedVendor: false,
+    isTrustedCreator: false,
+    isGoldBasketRepo: false,
+    topSkillId: `${repoName}:skill`,
+    topSkillStars: stars,
+    ...rest,
+  };
+}
+
+function repoIndex(repos: ShadowRepoIndexEntry[]): ShadowRepoIndex {
+  return {
+    generatedAt: "2026-05-22T00:00:00Z",
+    repoCount: repos.length,
+    repos,
+  };
+}
+
+function discovered(...repos: string[]): Map<string, { repo: string; sources: Set<string> }> {
+  return new Map(repos.map((repo) => [repo, { repo, sources: new Set(["official"]) }]));
+}
+
+function countReasons(reasonByRepo: Map<string, PriorityReason>): PriorityReasonCounts {
+  const counts: PriorityReasonCounts = {
+    official: 0,
+    goldBasket: 0,
+    trustedVendor: 0,
+    stars: 0,
+  };
+  for (const reason of reasonByRepo.values()) {
+    counts[reason] += 1;
+  }
+  return counts;
+}
+
+test("caps daily priority selection by bucket and total size", () => {
+  const repos: ShadowRepoIndexEntry[] = [];
+  for (let i = 0; i < 20; i += 1) {
+    repos.push(repo({ repo: `official/repo-${i}`, stars: 500 - i }));
+  }
+  for (let i = 0; i < 20; i += 1) {
+    repos.push(repo({ repo: `gold/repo-${i}`, stars: 400 - i, isGoldBasketRepo: true }));
+  }
+  for (let i = 0; i < 20; i += 1) {
+    repos.push(repo({ repo: `vendor/repo-${i}`, stars: 300 - i, isTrustedVendor: true }));
+  }
+  for (let i = 0; i < 40; i += 1) {
+    repos.push(repo({ repo: `stars/repo-${i}`, stars: 200 - i }));
+  }
+
+  const result = buildDailyPriorityRepos(
+    repoIndex(repos),
+    discovered(...repos.filter((row) => row.repo.startsWith("official/")).map((row) => row.repo)),
+  );
+  const counts = countReasons(result.reasonByRepo);
+
+  assert.equal(result.repos.length, DAILY_PRIORITY_REPO_LIMIT);
+  assert.equal(counts.official, 12);
+  assert.equal(counts.goldBasket, 10);
+  assert.equal(counts.trustedVendor, 8);
+  assert.equal(counts.stars, 10);
+});
+
+test("earlier buckets beat higher-star fallback repos", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "official/selected", stars: 5 }),
+      repo({ repo: "gold/selected", stars: 4, isGoldBasketRepo: true }),
+      repo({ repo: "vendor/selected", stars: 3, isTrustedVendor: true }),
+      repo({ repo: "plain/high-stars", stars: 999 }),
+    ]),
+    discovered("official/selected"),
+  );
+
+  assert.equal(result.reasonByRepo.get("official/selected"), "official");
+  assert.equal(result.reasonByRepo.get("gold/selected"), "goldBasket");
+  assert.equal(result.reasonByRepo.get("vendor/selected"), "trustedVendor");
+  assert.equal(result.reasonByRepo.get("plain/high-stars"), "stars");
+});
+
+test("dedupes repos that match multiple buckets and keeps the first winning reason", () => {
+  const dual = repo({
+    repo: "dual/repo",
+    stars: 100,
+    isGoldBasketRepo: true,
+    isTrustedVendor: true,
+  });
+
+  const result = buildDailyPriorityRepos(repoIndex([dual]), discovered("dual/repo"));
+
+  assert.equal(result.repos.length, 1);
+  assert.equal(result.reasonByRepo.get("dual/repo"), "official");
+});
+
+test("fills leftover slots by stars after earlier buckets", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "official/one", stars: 5 }),
+      repo({ repo: "plain/low", stars: 1 }),
+      repo({ repo: "plain/high", stars: 10 }),
+      repo({ repo: "plain/mid", stars: 7 }),
+    ]),
+    discovered("official/one"),
+  );
+
+  assert.deepEqual(
+    result.repos.map((row) => row.repo),
+    ["official/one", "plain/high", "plain/mid", "plain/low"],
+  );
+  assert.equal(result.reasonByRepo.get("plain/high"), "stars");
+  assert.equal(result.reasonByRepo.get("plain/mid"), "stars");
+  assert.equal(result.reasonByRepo.get("plain/low"), "stars");
+});
+
+test("skipped monitored repo count matches total monitored minus selected", () => {
+  const repos = Array.from({ length: 45 }, (_, index) => repo({ repo: `plain/repo-${index}`, stars: 100 - index }));
+  repos.push(repo({ repo: "library/ignored", stars: 1, state: "library" }));
+  repos[0] = repo({ repo: "official/one", stars: 500 });
+
+  const result = buildDailyPriorityRepos(repoIndex(repos), discovered("official/one"));
+
+  assert.equal(result.repos.length, DAILY_PRIORITY_REPO_LIMIT);
+  assert.equal(result.skippedMonitoredRepoCount, 5);
+});
+
+test("priority reason counts and sample reasons stay valid for report output", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "official/one", stars: 10 }),
+      repo({ repo: "gold/one", stars: 9, isGoldBasketRepo: true }),
+      repo({ repo: "vendor/one", stars: 8, isTrustedVendor: true }),
+      repo({ repo: "plain/one", stars: 7 }),
+    ]),
+    discovered("official/one"),
+  );
+  const counts = countReasons(result.reasonByRepo);
+  const sample = result.repos.slice(0, 10).map((row) => ({
+    repo: row.repo,
+    reason: result.reasonByRepo.get(row.repo),
+  }));
+
+  assert.equal(Object.values(counts).reduce((sum, value) => sum + value, 0), result.repos.length);
+  for (const row of sample) {
+    assert.ok(row.reason);
+    assert.ok(["official", "goldBasket", "trustedVendor", "stars"].includes(row.reason));
+  }
+});

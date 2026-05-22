@@ -15,6 +15,7 @@ import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
+import { buildDailyPriorityRepos, DAILY_PRIORITY_REPO_LIMIT } from "./daily-priority.js";
 import type {
   DailyPriorityRepoSample,
   DiscoveryBudgetSummary,
@@ -89,7 +90,6 @@ const BACKGROUND_DISCOVERY_BUDGET: DiscoveryBudgetSummary = {
   },
 };
 
-const DAILY_PRIORITY_REPO_LIMIT = 40;
 const LOW_STAR_FLOOR = 5;
 
 function parseCadence(argv: string[]): ShadowCadence {
@@ -427,8 +427,10 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     "## Enrichment",
     "",
+    `- Daily priority rule: official (12), gold basket (10), trusted vendor (8), stars fill to ${DAILY_PRIORITY_REPO_LIMIT}`,
     `- Library repos checked: ${report.enrichmentCounts.libraryReposChecked}`,
     `- Daily priority repos: ${report.enrichmentCounts.dailyPriorityRepoCount}`,
+    `- Daily priority reasons: ${formatPriorityReasonCounts(report.priorityReasonCounts)}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
     `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
     `- Corrected: ${report.enrichmentCounts.correctedCount}`,
@@ -548,52 +550,8 @@ function emptyPriorityReasonCounts(): PriorityReasonCounts {
   };
 }
 
-function buildDailyPriorityRepos(
-  repoIndex: ShadowRepoIndex,
-  discovered: Map<string, DiscoveredRepoRecord>,
-): { repos: ShadowRepoIndexEntry[]; reasonByRepo: Map<string, PriorityReason>; skippedMonitoredRepoCount: number } {
-  const monitoredRepos = repoIndex.repos.filter((repo) => repo.state === "core" || repo.state === "rising");
-  const monitoredByName = new Map(monitoredRepos.map((repo) => [repo.repo, repo]));
-  const reasonByRepo = new Map<string, PriorityReason>();
-  const selected: ShadowRepoIndexEntry[] = [];
-  const selectedNames = new Set<string>();
-
-  const pushRepos = (repos: ShadowRepoIndexEntry[], reason: PriorityReason) => {
-    for (const repo of repos) {
-      if (selected.length >= DAILY_PRIORITY_REPO_LIMIT) break;
-      if (selectedNames.has(repo.repo)) continue;
-      selected.push(repo);
-      selectedNames.add(repo.repo);
-      reasonByRepo.set(repo.repo, reason);
-    }
-  };
-
-  const officialRepos = [...discovered.values()]
-    .filter((repo) => repo.sources.has("official"))
-    .map((repo) => monitoredByName.get(repo.repo))
-    .filter((repo): repo is ShadowRepoIndexEntry => Boolean(repo))
-    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
-  pushRepos(officialRepos.slice(0, 12), "official");
-
-  const goldBasketRepos = monitoredRepos
-    .filter((repo) => repo.isGoldBasketRepo)
-    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
-  pushRepos(goldBasketRepos.slice(0, 10), "goldBasket");
-
-  const trustedVendorRepos = monitoredRepos
-    .filter((repo) => repo.isTrustedVendor)
-    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
-  pushRepos(trustedVendorRepos.slice(0, 8), "trustedVendor");
-
-  const remainingMonitoredRepos = monitoredRepos
-    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
-  pushRepos(remainingMonitoredRepos, "stars");
-
-  return {
-    repos: selected,
-    reasonByRepo,
-    skippedMonitoredRepoCount: Math.max(monitoredRepos.length - selected.length, 0),
-  };
+function formatPriorityReasonCounts(counts: PriorityReasonCounts): string {
+  return `official=${counts.official}, goldBasket=${counts.goldBasket}, trustedVendor=${counts.trustedVendor}, stars=${counts.stars}`;
 }
 
 async function runShadowRefresh(
