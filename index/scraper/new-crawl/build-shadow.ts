@@ -208,6 +208,29 @@ function buildRepoCountsByState(repos: ShadowRepoIndexEntry[]): Record<RepoState
   );
 }
 
+function buildUnresolvedCatalogPublishers(skills: ShadowSkillRecord[]): { publisherRepo: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const skill of skills) {
+    if (skill.author_handle) continue;
+    if (skill.provenance_type !== "catalog" && skill.provenance_type !== "repackaged") continue;
+    if (!skill.publisher_repo) continue;
+    counts.set(skill.publisher_repo, (counts.get(skill.publisher_repo) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 10)
+    .map(([publisherRepo, count]) => ({ publisherRepo, count }));
+}
+
+function shouldExcludeFromInspectableShadowLibrary(skill: ShadowSkillRecord): boolean {
+  return !skill.author_handle && (skill.provenance_type === "catalog" || skill.provenance_type === "repackaged");
+}
+
+function buildInspectableShadowSkills(skills: ShadowSkillRecord[]): ShadowSkillRecord[] {
+  return skills.filter((skill) => !shouldExcludeFromInspectableShadowLibrary(skill));
+}
+
 function topReposByState(repos: ShadowRepoIndexEntry[], state: RepoState, limit = 10): TopRepoSummary[] {
   return repos
     .filter((repo) => repo.state === state)
@@ -402,6 +425,8 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Cadence: ${report.cadence}`,
     `- Baseline skills: ${report.baselineSkillCount}`,
     `- Shadow skills: ${report.shadowSkillCount}`,
+    `- Inspectable shadow skills: ${report.inspectableShadowSkillCount}`,
+    `- Excluded inspectable catalog skills: ${report.excludedInspectableCatalogSkillCount}`,
     `- Carried forward: ${report.carriedForwardCount}`,
     `- Corrected: ${report.correctedCount}`,
     `- Newly discovered: ${report.newlyDiscoveredCount}`,
@@ -415,6 +440,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Author/publisher mismatches: ${report.authorPublisherMismatchCount}`,
     `- Unknown-author skills: ${report.unknownAuthorSkillCount}`,
     `- Catalog repo skills: ${report.catalogRepoSkillCount}`,
+    `- Unresolved catalog skills: ${report.unresolvedCatalogSkillCount}`,
     `- Discovered repos: ${report.discoveredRepoCount}`,
     `- Discovery lane counts: fast=${report.discoveredRepoCountByLane.fast}, periodic=${report.discoveredRepoCountByLane.periodic}, background=${report.discoveredRepoCountByLane.background}`,
     `- Discovery matched baseline repos: ${report.baselineRepoCountMatchedByDiscovery}`,
@@ -426,6 +452,11 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
     `- Official low-star skills: ${report.officialLowStarSkillCount}`,
     `- Production write guard: ${report.productionWriteGuardPassed ? "passed" : "failed"}`,
+    "",
+    "## Unresolved catalog publishers",
+    ...(report.unresolvedCatalogPublishers.length
+      ? report.unresolvedCatalogPublishers.map((row) => `- ${row.publisherRepo}: ${row.count}`)
+      : ["- none"]),
     "",
     "## Source runs",
     "",
@@ -1115,6 +1146,7 @@ async function main() {
   const baselinePath = join(indexRoot, "skills.json");
   const goldBasketPath = join(indexRoot, "gold-basket.json");
   const skillsOutPath = join(shadowRoot, "skills.shadow.json");
+  const inspectableSkillsOutPath = join(shadowRoot, "skills.inspectable.shadow.json");
   const repoIndexOutPath = join(shadowRoot, "repo-index.shadow.json");
   const repoOverlayOutPath = join(shadowRoot, "repo-index.overlay.json");
   const skillSignalsOutPath = join(shadowRoot, "skill-signals.shadow.json");
@@ -1197,6 +1229,7 @@ async function main() {
   const refreshResult = await runShadowRefresh(cadence, baselineSkills, shadowSkills, repoIndex, discovered, checkedAt, repoAliasByCanonical);
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
+  const inspectableShadowSkills = buildInspectableShadowSkills(shadowSkills);
 
   const shadowRepoOverlay: ShadowRepoOverlay | null = shouldWriteShadowRepoOverlay(cadence)
     ? buildShadowRepoOverlay(repoIndex, baselineRepoIndexForOverlay, checkedAt)
@@ -1237,6 +1270,8 @@ async function main() {
     cadence,
     baselineSkillCount: baselineSkills.length,
     shadowSkillCount: shadowSkills.length,
+    inspectableShadowSkillCount: inspectableShadowSkills.length,
+    excludedInspectableCatalogSkillCount: shadowSkills.length - inspectableShadowSkills.length,
     carriedForwardCount: refreshResult.enrichmentCounts.carriedForwardCount,
     correctedCount: refreshResult.enrichmentCounts.correctedCount,
     newlyDiscoveredCount: refreshResult.newlyDiscoveredCount,
@@ -1251,6 +1286,8 @@ async function main() {
     provenanceCounts: buildProvenanceCounts(shadowSkills),
     unknownAuthorSkillCount: shadowSkills.filter((skill) => !skill.author_handle).length,
     catalogRepoSkillCount: shadowSkills.filter((skill) => skill.provenance_type === "catalog").length,
+    unresolvedCatalogSkillCount: shadowSkills.filter((skill) => !skill.author_handle && (skill.provenance_type === "catalog" || skill.provenance_type === "repackaged")).length,
+    unresolvedCatalogPublishers: buildUnresolvedCatalogPublishers(shadowSkills),
     authorDiffExamples: buildAuthorDiffExamples(baselineSkills, shadowSkills),
     catalogRepoExamples: buildCatalogRepoExamples(baselineSkills, shadowSkills),
     topCoreRepos: topReposByState(repoIndex.repos, "core"),
@@ -1309,6 +1346,7 @@ async function main() {
 
   const writeStart = performance.now();
   writeShadowFile(skillsOutPath, JSON.stringify(shadowSkills, null, 2) + "\n");
+  writeShadowFile(inspectableSkillsOutPath, JSON.stringify(inspectableShadowSkills, null, 2) + "\n");
   writeShadowFile(repoIndexOutPath, JSON.stringify(repoIndex, null, 2) + "\n");
   if (shadowRepoOverlay) {
     writeShadowFile(repoOverlayOutPath, JSON.stringify(shadowRepoOverlay, null, 2) + "\n");

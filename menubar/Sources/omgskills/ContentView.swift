@@ -115,6 +115,7 @@ private struct StarterSearch: Identifiable, Hashable {
 struct ContentView: View {
     @StateObject private var store = SkillsStore()
     @State private var query = ""
+    @State private var selectedCreatorHandle: String?
     @State private var selectedId: String?
     @State private var keyMonitor: Any?
     @State private var sortKey: SortKey = .stars
@@ -145,6 +146,7 @@ struct ContentView: View {
     @State private var savedSession: PopoverSessionState?
     @State private var isRestoringSession = false
     @State private var suppressSessionChangeHandlers = false
+    @State private var isApplyingCreatorFilter = false
     @State private var lastTrackedSearchQuery = ""
     @State private var lastTrackedSearchErrorKey = ""
     @State private var lastTrackedOpenedSkillId = ""
@@ -218,9 +220,20 @@ struct ContentView: View {
         case .twitter: return store.twitterLoadError
         }
     }
+
+    private var queryMatchesSelectedCreator: Bool {
+        guard let selectedCreatorHandle else { return false }
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.hasPrefix("@") && normalizedCreatorHandle(trimmed) == selectedCreatorHandle
+    }
+
+    private var searchQueryForResults: String {
+        queryMatchesSelectedCreator ? "" : debouncedQuery
+    }
     
     private func computeResults() -> [Skill] {
-        let searched = store.search(query: debouncedQuery, in: baseSkills, source: source, usingIndex: source != .installed)
+        let creatorFiltered = skillsFilteredBySelectedCreator(baseSkills)
+        let searched = store.search(query: searchQueryForResults, in: creatorFiltered, source: source, usingIndex: source != .installed)
         let sorted: [Skill] = switch sortKey {
         case .trending:
             searched.sorted {
@@ -338,6 +351,7 @@ struct ContentView: View {
         }
         .onChange(of: query) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
+            updateCreatorFilter(forQuery: newValue)
             if !newValue.isEmpty && source == .trending {
                 source = .available
                 return
@@ -366,6 +380,11 @@ struct ContentView: View {
         }
         .onChange(of: source)   { _, _ in
             guard !suppressSessionChangeHandlers else { return }
+            if isApplyingCreatorFilter {
+                isApplyingCreatorFilter = false
+            } else {
+                selectedCreatorHandle = nil
+            }
             if source != .installed { localDashboardFilter = nil }
             if source == .trending { sortKey = .trending }
             else if sortKey == .trending { sortKey = .stars }
@@ -375,6 +394,9 @@ struct ContentView: View {
         }
         .onChange(of: localDashboardFilter) { _, _ in
             guard !suppressSessionChangeHandlers else { return }
+            if localDashboardFilter != nil {
+                selectedCreatorHandle = nil
+            }
             captureSessionIfNeeded()
         }
         .onChange(of: store.searchIndexVersion) { _, _ in refreshResults(selectFirst: true) }
@@ -435,6 +457,35 @@ struct ContentView: View {
                 }
 
                 Spacer()
+
+                Menu {
+                    ForEach(LibraryMode.allCases) { mode in
+                        Button {
+                            store.libraryMode = mode
+                        } label: {
+                            if store.libraryMode == mode {
+                                Label(mode.label, systemImage: "checkmark")
+                            } else {
+                                Text(mode.label)
+                            }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("Library")
+                        Text(store.libraryMode.shortLabel)
+                            .foregroundStyle(.secondary)
+                    }
+                    .font(.system(size: 9))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 4)
+                    .background(Color.primary.opacity(0.1))
+                    .cornerRadius(6)
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .controlSize(.small)
+                .help("Library: \(store.libraryMode.label). Discover uses this source only.")
 
                 if updateAvailable {
                     Button {
@@ -500,6 +551,7 @@ struct ContentView: View {
 
             if !query.isEmpty {
                 Button {
+                    selectedCreatorHandle = nil
                     query = ""
                     debouncedQuery = ""
                     refreshResults(selectFirst: true)
@@ -820,17 +872,18 @@ struct ContentView: View {
     private var skillsListRows: some View {
         LazyVStack(spacing: 0) {
             ForEach(cachedResults) { skill in
-                Button {
-                    select(skill, scroll: false)
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        showDetail = true
+                SkillRow(
+                    skill: skill,
+                    selected: skill.id == selectedId,
+                    source: source,
+                    onSelect: {
+                        selectSkillFromRow(skill)
+                    },
+                    onCreatorTap: { handle in
+                        filterByCreator(handle)
                     }
-                } label: {
-                    SkillRow(skill: skill, selected: skill.id == selectedId, source: source)
-                }
+                )
                 .id(skill.id)
-                .buttonStyle(.plain)
-                .contentShape(Rectangle())
                 .padding(.bottom, source == .twitter ? 10 : 0)
             }
         }
@@ -856,7 +909,11 @@ struct ContentView: View {
                                     .font(.title2)
                                     .fontWeight(.bold)
                             }
-                            if !skill.authorHandle.isEmpty {
+                            if let attribution = skill.discoverAttributionText, source == .available {
+                                Text(attribution)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            } else if !skill.authorHandle.isEmpty {
                                 Text("by @\(skill.authorHandle)")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
@@ -1759,6 +1816,7 @@ struct ContentView: View {
     }
 
     private func runStarterSearch(_ term: String) {
+        selectedCreatorHandle = nil
         source = .available
         sortKey = .stars
         showDetail = false
@@ -1769,6 +1827,7 @@ struct ContentView: View {
     }
 
     private func showTrendingSkills() {
+        selectedCreatorHandle = nil
         source = .trending
         sortKey = .trending
         localDashboardFilter = nil
@@ -1780,6 +1839,7 @@ struct ContentView: View {
     }
 
     private func showTwitterSkills() {
+        selectedCreatorHandle = nil
         source = .twitter
         sortKey = .stars
         localDashboardFilter = nil
@@ -1873,6 +1933,7 @@ struct ContentView: View {
         isRestoringSession = true
         suppressSessionChangeHandlers = true
         query = ""
+        selectedCreatorHandle = nil
         debouncedQuery = ""
         source = .available
         sortKey = .stars
@@ -1887,6 +1948,52 @@ struct ContentView: View {
     }
 
     // MARK: - Selection
+
+    private func normalizedCreatorHandle(_ rawHandle: String) -> String {
+        var handle = rawHandle.trimmingCharacters(in: .whitespacesAndNewlines)
+        while handle.hasPrefix("@") {
+            handle.removeFirst()
+        }
+        return handle.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+
+    private func skillsFilteredBySelectedCreator(_ skills: [Skill]) -> [Skill] {
+        guard let selectedCreatorHandle else { return skills }
+        return skills.filter { normalizedCreatorHandle($0.authorHandle) == selectedCreatorHandle }
+    }
+
+    private func updateCreatorFilter(forQuery newValue: String) {
+        guard let selectedCreatorHandle else { return }
+        let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.hasPrefix("@") || normalizedCreatorHandle(trimmed) != selectedCreatorHandle {
+            self.selectedCreatorHandle = nil
+        }
+    }
+
+    private func filterByCreator(_ rawHandle: String) {
+        let handle = normalizedCreatorHandle(rawHandle)
+        guard !handle.isEmpty else { return }
+
+        if source != .installed {
+            if source != .available {
+                isApplyingCreatorFilter = true
+            }
+            source = .available
+        }
+        localDashboardFilter = nil
+        selectedCreatorHandle = handle
+        query = "@\(handle)"
+        debouncedQuery = query
+        refreshResults(selectFirst: true)
+        searchFocused = true
+    }
+
+    private func selectSkillFromRow(_ skill: Skill) {
+        select(skill, scroll: false)
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showDetail = true
+        }
+    }
 
     private func refreshResults(selectFirst: Bool) {
         if shouldShowStarterSearches ||
@@ -1911,6 +2018,7 @@ struct ContentView: View {
 
     private func resetResultsForStarterState() {
         cachedResults = []
+        selectedCreatorHandle = nil
         selectedId = nil
         selectedSkill = nil
         displayedReadme = nil
@@ -1921,6 +2029,7 @@ struct ContentView: View {
 
     private func selectLocalDashboardFilter(_ filter: LocalDashboardFilter) {
         if localDashboardFilter == filter {
+            selectedCreatorHandle = nil
             localDashboardFilter = nil
             showDetail = false
             query = ""
@@ -1930,6 +2039,7 @@ struct ContentView: View {
             searchFocused = true
             return
         }
+        selectedCreatorHandle = nil
         localDashboardFilter = filter
         showDetail = false
         query = ""
@@ -1946,6 +2056,7 @@ struct ContentView: View {
         }
 
         source = .installed
+        selectedCreatorHandle = nil
         localDashboardFilter = .all
         showDetail = true
         query = ""
@@ -2100,15 +2211,28 @@ struct SkillRow: View {
     let skill: Skill
     let selected: Bool
     let source: Source
+    let onSelect: () -> Void
+    let onCreatorTap: (String) -> Void
+    private let tweetPostedAgeWidth: CGFloat = 30
     private let trailingMetricWidth: CGFloat = 60
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             if source == .twitter {
                 HStack(alignment: .top, spacing: 6) {
-                    TwitterSkillContextView(skill: skill)
-                        .padding(.bottom, 2)
+                    Button(action: onSelect) {
+                        TwitterSkillContextView(skill: skill)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 2)
                     Spacer(minLength: 4)
+                    Text(relativeTweetPostedAt(skill.tweetPostedAt) ?? "")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .monospacedDigit()
+                        .frame(width: tweetPostedAgeWidth, alignment: .trailing)
                     HStack(spacing: 4) {
                         Image(systemName: "heart")
                         Text(formatCompactCount(skill.tweetLikes ?? 0))
@@ -2120,13 +2244,8 @@ struct SkillRow: View {
                 }
 
                 HStack(spacing: 6) {
-                    Text(skill.name)
-                        .font(.headline)
-                        .lineLimit(1)
-                    Text("@\(skill.authorHandle)")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
+                    rowTextButton(skill.name, font: .headline, color: .primary, lineLimit: 1)
+                    creatorButton
                     Spacer(minLength: 4)
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
@@ -2137,19 +2256,11 @@ struct SkillRow: View {
                     .monospacedDigit()
                     .frame(width: trailingMetricWidth, alignment: .leading)
                 }
-                Text(skill.description)
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary.opacity(0.7))
-                    .lineLimit(2)
+                rowTextButton(skill.description, font: .system(size: 10), color: .secondary.opacity(0.7), lineLimit: 2, fillWidth: true)
             } else {
                 HStack(spacing: 6) {
-                    Text(skill.name)
-                        .font(.headline)
-                        .lineLimit(1)
-                    Text("@\(skill.authorHandle)")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
+                    rowTextButton(skill.name, font: .headline, color: .primary, lineLimit: 1)
+                    creatorButton
                     Spacer(minLength: 4)
                     if source == .available {
                         HStack(spacing: 4) {
@@ -2179,10 +2290,7 @@ struct SkillRow: View {
                             .foregroundStyle(originColor(origin))
                     }
                 }
-                Text(skill.description)
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary.opacity(0.7))
-                    .lineLimit(2)
+                rowTextButton(skill.description, font: .system(size: 10), color: .secondary.opacity(0.7), lineLimit: 2, fillWidth: true)
             }
         }
         .padding(.horizontal, 12)
@@ -2190,6 +2298,41 @@ struct SkillRow: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(selected ? Color.accentColor.opacity(0.18) : .clear)
         .contentShape(Rectangle())
+    }
+
+    private func rowTextButton(_ text: String, font: Font, color: Color, lineLimit: Int, fillWidth: Bool = false) -> some View {
+        Button(action: onSelect) {
+            Text(text)
+                .font(font)
+                .foregroundStyle(color)
+                .lineLimit(lineLimit)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: fillWidth ? .infinity : nil, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var creatorButton: some View {
+        if !skill.authorHandle.isEmpty {
+            Button {
+                onCreatorTap(skill.authorHandle)
+            } label: {
+                Text("@\(skill.authorHandle)")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Show all skills by @\(skill.authorHandle)")
+            .help("Show all skills by @\(skill.authorHandle)")
+        } else if source == .available, let attribution = skill.discoverAttributionText {
+            Text(attribution.replacingOccurrences(of: "via ", with: ""))
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .lineLimit(1)
+        }
     }
 
     private func originColor(_ origin: String) -> Color {
@@ -2209,6 +2352,31 @@ private func twitterAuthorLabel(_ skill: Skill) -> String {
         return name
     }
     return "X"
+}
+
+private func relativeTweetPostedAt(_ rawValue: String?) -> String? {
+    guard let rawValue,
+          let date = parseTweetPostedAt(rawValue) else {
+        return nil
+    }
+
+    let seconds = max(0, Int(Date().timeIntervalSince(date)))
+    if seconds < 60 { return "now" }
+    let minutes = seconds / 60
+    if minutes < 60 { return "\(minutes)m" }
+    let hours = minutes / 60
+    if hours < 24 { return "\(hours)h" }
+    return "\(hours / 24)d"
+}
+
+private func parseTweetPostedAt(_ rawValue: String) -> Date? {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    if let date = formatter.date(from: rawValue) {
+        return date
+    }
+    formatter.formatOptions = [.withInternetDateTime]
+    return formatter.date(from: rawValue)
 }
 
 private func formatCompactCount(_ value: Int) -> String {

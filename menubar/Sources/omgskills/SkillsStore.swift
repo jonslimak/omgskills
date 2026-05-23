@@ -2,6 +2,8 @@ import Foundation
 
 @MainActor
 final class SkillsStore: ObservableObject {
+    static let libraryModeDefaultsKey = "libraryMode"
+
     @Published private(set) var availableSkills: [Skill] = []
     @Published private(set) var trendingSkills: [Skill] = []
     @Published private(set) var twitterSkills: [Skill] = []
@@ -15,13 +17,24 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var trendingSearchIndex: SkillSearchIndex?
     @Published private(set) var twitterSearchIndex: SkillSearchIndex?
     @Published private(set) var searchIndexVersion = 0
+    @Published var libraryMode: LibraryMode {
+        didSet {
+            guard libraryMode != oldValue else { return }
+            UserDefaults.standard.set(libraryMode.rawValue, forKey: Self.libraryModeDefaultsKey)
+            load()
+        }
+    }
     private var trendingEntries: [TrendingEntry] = []
+    private var trendingBaseSkills: [Skill] = []
     private var loadGeneration = 0
     private var availableIndexTask: Task<Void, Never>?
     private var trendingIndexTask: Task<Void, Never>?
     private var twitterIndexTask: Task<Void, Never>?
 
-    init() { load() }
+    init() {
+        libraryMode = Self.savedLibraryMode()
+        load()
+    }
 
     func load() {
         Task { await loadLibraryData() }
@@ -68,11 +81,12 @@ final class SkillsStore: ObservableObject {
         trendingIndexTask?.cancel()
         twitterIndexTask?.cancel()
 
-        async let availableResult = decodeAvailableSkills()
+        async let availableResult = decodeAvailableSkills(mode: libraryMode)
         async let trendingResult = decodeTrendingEntries()
         async let twitterResult = decodeTwitterSkills()
 
         let available = await availableResult
+        let trendingBase = libraryMode == .production ? available : await decodeAvailableSkills(mode: .production)
         let trending = await trendingResult
         let twitter = await twitterResult
         guard generation == loadGeneration else { return }
@@ -84,6 +98,13 @@ final class SkillsStore: ObservableObject {
             buildIndex(for: availableSkills, kind: .available, generation: generation)
         case .failure(let error):
             loadError = error
+        }
+
+        switch trendingBase {
+        case .success(let skills):
+            trendingBaseSkills = skills
+        case .failure:
+            trendingBaseSkills = []
         }
 
         switch trending {
@@ -112,7 +133,24 @@ final class SkillsStore: ObservableObject {
         }
     }
 
-    private nonisolated func decodeAvailableSkills() async -> LoadResult<[Skill]> {
+    private nonisolated func decodeAvailableSkills(mode: LibraryMode) async -> LoadResult<[Skill]> {
+        switch mode {
+        case .production:
+            return await decodeProductionAvailableSkills()
+        case .shadow:
+            guard let url = AppResource.shadowSkillsURL() else {
+                return .failure("\(AppResource.inspectableShadowSkillsFilename) not found. Run the shadow crawl first.")
+            }
+            do {
+                let data = try Data(contentsOf: url)
+                return await decode(data, as: [Skill].self, label: AppResource.inspectableShadowSkillsFilename)
+            } catch {
+                return .failure("Failed to load \(AppResource.inspectableShadowSkillsFilename): \(error)")
+            }
+        }
+    }
+
+    private nonisolated func decodeProductionAvailableSkills() async -> LoadResult<[Skill]> {
         if let data = DataRefreshService.cachedData(for: .skills) {
             let decoded = await decode(data, as: [Skill].self, label: "skills.json")
             if case .success = decoded {
@@ -216,7 +254,7 @@ final class SkillsStore: ObservableObject {
     }
 
     private func rebuildTrending() {
-        let byId = Dictionary(uniqueKeysWithValues: availableSkills.map { ($0.id, $0) })
+        let byId = Dictionary(uniqueKeysWithValues: trendingBaseSkills.map { ($0.id, $0) })
         trendingSkills = trendingEntries.compactMap { entry in
             byId[entry.id]?.withTrending(entry)
         }
@@ -257,5 +295,13 @@ final class SkillsStore: ObservableObject {
         case .twitter:
             twitterIndexTask = task
         }
+    }
+
+    private static func savedLibraryMode(defaults: UserDefaults = .standard) -> LibraryMode {
+        guard let rawValue = defaults.string(forKey: libraryModeDefaultsKey),
+              let mode = LibraryMode(rawValue: rawValue) else {
+            return .production
+        }
+        return mode
     }
 }

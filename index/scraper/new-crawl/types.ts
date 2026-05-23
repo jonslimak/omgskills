@@ -206,6 +206,8 @@ export type ShadowRunReport = {
   cadence: ShadowCadence;
   baselineSkillCount: number;
   shadowSkillCount: number;
+  inspectableShadowSkillCount: number;
+  excludedInspectableCatalogSkillCount: number;
   carriedForwardCount: number;
   correctedCount: number;
   newlyDiscoveredCount: number;
@@ -220,6 +222,11 @@ export type ShadowRunReport = {
   provenanceCounts: Record<ProvenanceType, number>;
   unknownAuthorSkillCount: number;
   catalogRepoSkillCount: number;
+  unresolvedCatalogSkillCount: number;
+  unresolvedCatalogPublishers: {
+    publisherRepo: string;
+    count: number;
+  }[];
   authorDiffExamples: ShadowAuthorDiffExample[];
   catalogRepoExamples: ShadowAuthorDiffExample[];
   topCoreRepos: TopRepoSummary[];
