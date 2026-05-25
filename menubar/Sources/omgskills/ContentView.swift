@@ -113,6 +113,8 @@ private struct StarterSearch: Identifiable, Hashable {
 }
 
 struct ContentView: View {
+    private let displaysDataUpdatedToast = false
+
     @StateObject private var store = SkillsStore()
     @State private var query = ""
     @State private var selectedId: String?
@@ -1382,6 +1384,7 @@ struct ContentView: View {
     }
 
     private func showDataUpdatedToastIfPossible() {
+        guard displaysDataUpdatedToast else { return }
         guard let date = DataRefreshService.lastDisplayableDataUpdateDate() else { return }
         let age = relativeRefreshAge(from: date)
         dataUpdatedText = age == "now" ? "Data Updated now" : "Data Updated \(age) ago"
