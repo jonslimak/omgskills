@@ -16,12 +16,15 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var twitterSearchIndex: SkillSearchIndex?
     @Published private(set) var searchIndexVersion = 0
     private var trendingEntries: [TrendingEntry] = []
+    private var trendingBaseSkills: [Skill] = []
     private var loadGeneration = 0
     private var availableIndexTask: Task<Void, Never>?
     private var trendingIndexTask: Task<Void, Never>?
     private var twitterIndexTask: Task<Void, Never>?
 
-    init() { load() }
+    init() {
+        load()
+    }
 
     func load() {
         Task { await loadLibraryData() }
@@ -73,6 +76,7 @@ final class SkillsStore: ObservableObject {
         async let twitterResult = decodeTwitterSkills()
 
         let available = await availableResult
+        let trendingBase = available
         let trending = await trendingResult
         let twitter = await twitterResult
         guard generation == loadGeneration else { return }
@@ -84,6 +88,13 @@ final class SkillsStore: ObservableObject {
             buildIndex(for: availableSkills, kind: .available, generation: generation)
         case .failure(let error):
             loadError = error
+        }
+
+        switch trendingBase {
+        case .success(let skills):
+            trendingBaseSkills = skills
+        case .failure:
+            trendingBaseSkills = []
         }
 
         switch trending {
@@ -113,6 +124,10 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeAvailableSkills() async -> LoadResult<[Skill]> {
+        await decodeProductionAvailableSkills()
+    }
+
+    private nonisolated func decodeProductionAvailableSkills() async -> LoadResult<[Skill]> {
         if let data = DataRefreshService.cachedData(for: .skills) {
             let decoded = await decode(data, as: [Skill].self, label: "skills.json")
             if case .success = decoded {
@@ -216,7 +231,7 @@ final class SkillsStore: ObservableObject {
     }
 
     private func rebuildTrending() {
-        let byId = Dictionary(uniqueKeysWithValues: availableSkills.map { ($0.id, $0) })
+        let byId = Dictionary(uniqueKeysWithValues: trendingBaseSkills.map { ($0.id, $0) })
         trendingSkills = trendingEntries.compactMap { entry in
             byId[entry.id]?.withTrending(entry)
         }

@@ -40,10 +40,21 @@ function parseGitHubRepoUrl(
     if (parts.length < 2) return null;
     const repo = `${parts[0]}/${parts[1]}`;
     const skillNameHint = label.split("/")[1];
+    if (parts.length >= 5 && parts[2] === "tree") {
+      const ref = parts[3];
+      const path = parts.slice(4).join("/").replace(/\/+$/, "");
+      if (!path) return null;
+      return {
+        repo,
+        ref,
+        path: path.endsWith("/SKILL.md") ? path : `${path}/SKILL.md`,
+        skill_name_hint: path.split("/").at(-1) === "SKILL.md" ? path.split("/").at(-2) : path.split("/").at(-1),
+      };
+    }
     if (skillNameHint && repo.endsWith("/skills")) {
       return { repo, path: "__RESOLVE__", skill_name_hint: skillNameHint };
     }
-    return { repo, path: "SKILL.md" };
+    return { repo, path: "__RESOLVE__", skill_name_hint: skillNameHint };
   } catch {
     return null;
   }

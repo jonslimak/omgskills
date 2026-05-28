@@ -1,0 +1,34 @@
+[
+  {
+    "repo": "sickn33/antigravity-awesome-skills",
+    "authorHandle": "",
+    "publisherHandle": "sickn33",
+    "provenanceType": "catalog",
+    "authorConfidence": "low",
+    "notes": "Largest catalog in the library. Unknown is better than attributing every child skill to the repo owner."
+  },
+  {
+    "repo": "openclaw/skills",
+    "authorHandle": "",
+    "publisherHandle": "openclaw",
+    "provenanceType": "repackaged",
+    "authorConfidence": "low",
+    "notes": "Current ids expose path-level upstream hints but not reliable author attribution yet."
+  },
+  {
+    "repo": "francostino/opencode-skills-collection",
+    "authorHandle": "",
+    "publisherHandle": "francostino",
+    "provenanceType": "repackaged",
+    "authorConfidence": "low",
+    "notes": "Bundled collection with mixed upstream sources. Avoid false repo-owner authorship until targeted overrides are added."
+  },
+  {
+    "repo": "aiskillstore/marketplace",
+    "authorHandle": "",
+    "publisherHandle": "aiskillstore",
+    "provenanceType": "repackaged",
+    "authorConfidence": "low",
+    "notes": "Marketplace bundle repo. Do not treat the repo owner as the original skill author."
+  }
+]

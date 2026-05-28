@@ -8,6 +8,25 @@ All notable changes to omgskills are documented here.
 - Add negative cache with configurable TTLs to skip recently-rejected candidates
 - Add minimum star floor to filter low-signal repos
 
+## [0.0.16] - 2026-05-28
+
+### Scraper
+- Add the cutover promotion flow and validation path for the new crawler outputs
+- Improve provenance handling so unresolved repackaged marketplace skills are excluded from the promoted library
+
+### App
+- Switch the new app track to `/data/v2/manifest.json`
+- Remove the temporary Library source switch from the app UI
+
+### Ops
+- Add versioned v2 data publishing and release-candidate Mac packaging support
+- Keep old app versions on the frozen `/data/manifest.json` track during rollout
+
+## [0.0.15] - 2026-05-25
+
+### App
+- Hide the data-updated toast when opening the app window
+
 ## [0.0.13] - 2026-05-19
 
 ### Scraper
@@ -47,7 +66,9 @@ All notable changes to omgskills are documented here.
 
 Versions 0.0.1 through 0.0.10 predate this changelog.
 
-[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.13...HEAD
+[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.16...HEAD
+[0.0.16]: https://github.com/jonslimak/omgskills/compare/v0.0.15...v0.0.16
+[0.0.15]: https://github.com/jonslimak/omgskills/compare/v0.0.13...v0.0.15
 [0.0.13]: https://github.com/jonslimak/omgskills/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/jonslimak/omgskills/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/jonslimak/omgskills/releases/tag/v0.0.11

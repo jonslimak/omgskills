@@ -9,11 +9,70 @@ APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 INDEX_SKILLS="../index/skills.json"
 TRENDING_SKILLS="../index/trending.json"
 X_TRENDING_SKILLS="../index/x-trending.json"
-DATA_MANIFEST="../site/data/manifest.json"
+DATA_TRACK_SUBDIR="${OMGSKILLS_DATA_SUBDIR:-v2}"
+if [ -n "${OMGSKILLS_DATA_MANIFEST_PATH:-}" ]; then
+    DATA_MANIFEST="$OMGSKILLS_DATA_MANIFEST_PATH"
+elif [ -n "$DATA_TRACK_SUBDIR" ]; then
+    DATA_MANIFEST="../site/data/$DATA_TRACK_SUBDIR/manifest.json"
+else
+    DATA_MANIFEST="../site/data/manifest.json"
+fi
 
 if [ ! -f "$INDEX_SKILLS" ]; then
     echo "✗ $INDEX_SKILLS missing — run 'cd ../index && npm run scrape' first." >&2
     exit 1
+fi
+
+if [ ! -f "$DATA_MANIFEST" ]; then
+    echo "✗ $DATA_MANIFEST missing — publish the target data track first." >&2
+    exit 1
+fi
+
+require_promoted_v2_library() {
+    export OMGSKILLS_REPO_ROOT="$(cd .. && pwd)"
+    python3 - <<'PY'
+import json, os, sys
+from pathlib import Path
+
+repo = Path(os.environ["OMGSKILLS_REPO_ROOT"])
+report_path = repo / "index/shadow/shadow-report.json"
+cutover_path = repo / "index/shadow/skills.cutover.shadow.json"
+skills_path = repo / "index/skills.json"
+
+for path, hint in [
+    (report_path, "Run the shadow cutover flow first."),
+    (cutover_path, "Run the shadow cutover flow first."),
+    (skills_path, "Run promote-cutover first."),
+]:
+    if not path.exists():
+        print(f"✗ Missing {path}", file=sys.stderr)
+        print(f"  {hint}", file=sys.stderr)
+        sys.exit(1)
+
+report = json.loads(report_path.read_text())
+if not report.get("cutoverValidationPassed"):
+    print("✗ v2 build requires a passing cutover validation.", file=sys.stderr)
+    print("  Run the shadow cutover flow and fix validation failures first.", file=sys.stderr)
+    sys.exit(1)
+
+cutover = json.loads(cutover_path.read_text())
+promoted = [
+    skill for skill in cutover
+    if not (not skill.get("author_handle") and skill.get("provenance_type") in {"catalog", "repackaged"})
+]
+current = json.loads(skills_path.read_text())
+
+promoted_ids = [skill["id"] for skill in promoted]
+current_ids = [skill["id"] for skill in current]
+if promoted_ids != current_ids:
+    print("✗ v2 build is not using the promoted library state.", file=sys.stderr)
+    print("  Run promote-cutover before building the v2 app bundle.", file=sys.stderr)
+    sys.exit(1)
+PY
+}
+
+if [ "$DATA_TRACK_SUBDIR" = "v2" ] || [ "${OMGSKILLS_DATA_MANIFEST_PATH:-}" = "../site/data/v2/manifest.json" ]; then
+    require_promoted_v2_library
 fi
 
 echo "→ swift build (release)"
@@ -34,9 +93,7 @@ fi
 if [ -f "$X_TRENDING_SKILLS" ]; then
     cp "$X_TRENDING_SKILLS" "$APP_BUNDLE/Contents/Resources/x-trending.json"
 fi
-if [ -f "$DATA_MANIFEST" ]; then
-    cp "$DATA_MANIFEST" "$APP_BUNDLE/Contents/Resources/manifest.json"
-fi
+cp "$DATA_MANIFEST" "$APP_BUNDLE/Contents/Resources/manifest.json"
 cp Assets/omgskills.icns "$APP_BUNDLE/Contents/Resources/omgskills.icns"
 cp Sources/omgskills/Resources/marked.min.js "$APP_BUNDLE/Contents/Resources/marked.min.js"
 cp Sources/omgskills/Resources/x-twitter-logo-block.png "$APP_BUNDLE/Contents/Resources/x-twitter-logo-block.png"

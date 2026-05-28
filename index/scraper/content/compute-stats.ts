@@ -42,6 +42,10 @@ function pct(n: number, total: number): string {
   return ((n / total) * 100).toFixed(1) + "%";
 }
 
+function repoLabel(githubUrl: string): string {
+  return githubUrl.replace(/^https?:\/\/github\.com\//, "").replace(/\/+$/, "");
+}
+
 function pearson(xs: number[], ys: number[]): number {
   const n = xs.length;
   if (n < 2) return 0;
@@ -547,9 +551,22 @@ console.log(`  ${skills.length.toLocaleString()} skills | ${trending.length} tre
       .sort((a, b) => a.avg_days - b.avg_days);
 
     // High-engagement repos
-    const highIssues = enriched
-      .filter((s) => (s as any).gh_open_issues > 100)
-      .sort((a, b) => (b as any).gh_open_issues - (a as any).gh_open_issues)
+    const highIssueRepos = new Map<string, { repo: string; author: string; open_issues: number }>();
+    for (const s of enriched) {
+      const openIssues = (s as any).gh_open_issues ?? 0;
+      if (openIssues <= 100) continue;
+      const repo = repoLabel(s.github_url);
+      const current = highIssueRepos.get(repo);
+      if (!current || openIssues > current.open_issues) {
+        highIssueRepos.set(repo, {
+          repo,
+          author: s.author_handle,
+          open_issues: openIssues,
+        });
+      }
+    }
+    const highIssues = [...highIssueRepos.values()]
+      .sort((a, b) => b.open_issues - a.open_issues)
       .slice(0, 5);
 
     // Correlations
@@ -575,7 +592,7 @@ console.log(`  ${skills.length.toLocaleString()} skills | ${trending.length} tre
       }),
       ``,
       `Most-discussed repos (open issues > 100):`,
-      ...highIssues.map((s) => `  ${s.name} — ${(s as any).gh_open_issues} open issues (@${s.author_handle})`),
+      ...highIssues.map((s) => `  ${s.repo} — ${s.open_issues} open issues (@${s.author})`),
       ``,
     ];
 
@@ -590,7 +607,7 @@ console.log(`  ${skills.length.toLocaleString()} skills | ${trending.length} tre
       ],
       {
         niche_age: nicheAge,
-        high_issue_repos: highIssues.map((s) => ({ name: s.name, author: s.author_handle, open_issues: (s as any).gh_open_issues })),
+        high_issue_repos: highIssues,
         correlations: { stars_installs: rStarsInstalls, stars_forks: rStarsForks, installs_watchers: rInstallsWatchers },
       },
     );

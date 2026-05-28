@@ -400,6 +400,37 @@ function parseOwnerRepo(candidateId: string): [string, string] | null {
   return [owner, repo];
 }
 
+export async function resolveCandidateSkillPath(c: Candidate): Promise<string | null> {
+  const parsed = parseOwnerRepo(c.id);
+  if (!parsed) return null;
+  const [owner, repo] = parsed;
+
+  if (c.skill_md_path !== "__RESOLVE__") {
+    return c.skill_md_path;
+  }
+
+  if (!c.skill_name_hint) {
+    return null;
+  }
+
+  const paths = await listSkillPaths(owner, repo, c.ref);
+  const commonPaths = buildSkillHintAliases(c.skill_name_hint).flatMap((alias) => [
+    `${alias}/SKILL.md`,
+    `skills/${alias}/SKILL.md`,
+    `.claude/skills/${alias}/SKILL.md`,
+    `claude/skills/${alias}/SKILL.md`,
+    `Claude/skills/${alias}/SKILL.md`,
+    `.codex/skills/${alias}/SKILL.md`,
+    `codex/skills/${alias}/SKILL.md`,
+  ]);
+
+  for (const candidatePath of commonPaths) {
+    if (paths.includes(candidatePath)) return candidatePath;
+  }
+
+  return resolveSkillPathFromHint(paths, c.skill_name_hint);
+}
+
 export async function enrichCandidate(
   c: Candidate,
   existingFirstSeen: Map<string, string>,

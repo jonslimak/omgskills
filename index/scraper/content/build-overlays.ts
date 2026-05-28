@@ -31,6 +31,7 @@ interface AuthorSignal {
   topSkillIds: string[];
 }
 
+const X_SOURCE_TAG = "x-top-skill-tweet";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..", "..");
 const skillsPath = join(root, "skills.json");
@@ -49,6 +50,11 @@ function writeAtomicJson(path: string, value: unknown) {
   const tempPath = `${path}.tmp`;
   writeFileSync(tempPath, JSON.stringify(value, null, 2) + "\n", "utf8");
   renameSync(tempPath, path);
+}
+
+function xSignalBaseId(skill: Skill): string {
+  if (skill.source_tag !== X_SOURCE_TAG) return skill.id;
+  return skill.id.replace(/:x:[^:]+$/, "");
 }
 
 function pruneSnapshots() {
@@ -85,10 +91,11 @@ function main() {
   const xById = new Map<string, { count: number; topLikes: number }>();
 
   for (const skill of xTrending) {
-    const current = xById.get(skill.id) ?? { count: 0, topLikes: 0 };
+    const baseId = xSignalBaseId(skill);
+    const current = xById.get(baseId) ?? { count: 0, topLikes: 0 };
     current.count += 1;
     current.topLikes = Math.max(current.topLikes, skill.tweet_likes ?? 0);
-    xById.set(skill.id, current);
+    xById.set(baseId, current);
   }
 
   const skillSignals: SkillSignal[] = skills.map((skill) => {

@@ -1,0 +1,341 @@
+export type RepoState = "library" | "rising" | "core";
+export type DiscoveryLane = "fast" | "periodic" | "background";
+export type ShadowCadence = DiscoveryLane | "combined";
+
+export type RepoOverride = {
+  repo: string;
+  state?: RepoState;
+  exclude?: boolean;
+  notes?: string;
+};
+
+export type AuthorConfidence = "high" | "low";
+
+export type ProvenanceType = "original" | "catalog" | "repackaged" | "mirrored" | "unknown";
+
+export type CatalogRepoRule = {
+  repo: string;
+  publisherHandle?: string;
+  defaultProvenanceType?: ProvenanceType;
+  notes?: string;
+};
+
+export type ProvenanceOverride = {
+  id?: string;
+  repo?: string;
+  authorHandle?: string;
+  publisherHandle?: string;
+  upstreamRepo?: string;
+  provenanceType?: ProvenanceType;
+  authorConfidence?: AuthorConfidence;
+  notes?: string;
+};
+
+export type TrustedSeeds = {
+  trustedVendorHandles: Set<string>;
+  trustedCreatorHandles: Set<string>;
+  repoOverrides: RepoOverride[];
+  catalogRepoRules: CatalogRepoRule[];
+  provenanceOverrides: ProvenanceOverride[];
+};
+
+export type ShadowSkillProvenance = {
+  authorHandle: string;
+  publisherHandle: string;
+  publisherRepo: string;
+  upstreamRepo: string | null;
+  provenanceType: ProvenanceType;
+  authorConfidence: AuthorConfidence;
+};
+
+export type ShadowSkillRecord = Omit<import("../types.js").Skill, "author_handle"> & {
+  author_handle: string;
+  publisher_handle: string;
+  publisher_repo: string;
+  upstream_repo: string | null;
+  provenance_type: ProvenanceType;
+  author_confidence: AuthorConfidence;
+};
+
+export type ShadowRepoIndexEntry = {
+  repo: string;
+  repoUrl: string;
+  state: RepoState;
+  discoveredSources: string[];
+  skillIds: string[];
+  skillCount: number;
+  stars: number;
+  lastSeenAt: string;
+  lastRefreshedAt: string;
+  trustSignals: string[];
+  promotionReasons: string[];
+  staleOrInvalidState: null;
+  isTrustedVendor: boolean;
+  isTrustedCreator: boolean;
+  isGoldBasketRepo: boolean;
+  topSkillId: string | null;
+  topSkillStars: number;
+};
+
+export type ShadowRepoIndex = {
+  generatedAt: string;
+  repoCount: number;
+  repos: ShadowRepoIndexEntry[];
+};
+
+export type ShadowRepoOverlay = {
+  generatedAt: string;
+  repoCount: number;
+  repos: ShadowRepoIndexEntry[];
+};
+
+export type ShadowSkillSignals = {
+  generatedAt: string;
+  signals: Record<string, never>;
+};
+
+export type ShadowCutoverSkillSignal = {
+  id: string;
+  isRising?: boolean;
+  isCore?: boolean;
+};
+
+export type CutoverValidationFailureKind =
+  | "repoSkillIdMissing"
+  | "duplicateCutoverSkillId"
+  | "cutoverSignalMissingSkill";
+
+export type CutoverValidationFailure = {
+  kind: CutoverValidationFailureKind;
+  repo?: string;
+  id?: string;
+  details?: string;
+};
+
+export type ShadowEnrichmentCounts = {
+  libraryReposChecked: number;
+  dailyPriorityRepoCount: number;
+  skillsDeepRefreshed: number;
+  carriedForwardCount: number;
+  correctedCount: number;
+  staleInvalidCandidateCount: number;
+};
+
+export type PriorityReason = "official" | "trustedVendor" | "goldBasket" | "stars";
+
+export type PriorityReasonCounts = Record<PriorityReason, number>;
+
+export type DailyPriorityRepoSample = {
+  repo: string;
+  reason: PriorityReason;
+};
+
+export type NextPromotionCandidateReason = "trustedVendor" | "goldBasket" | "periodic" | "background";
+
+export type BootstrapSource = "official" | "skillssh" | "awesome" | "registry" | "code";
+
+export type RepoBootstrapCandidate = {
+  source: BootstrapSource;
+  id: string;
+  skill_md_path: string;
+  skill_name_hint?: string;
+  ref?: string;
+  github_url: string;
+  stars?: number;
+  last_updated?: string;
+  tags?: string[];
+};
+
+export type NextPromotionCandidateSample = {
+  repo: string;
+  stars: number;
+  reason: NextPromotionCandidateReason;
+};
+
+export type PromotedRepoSample = {
+  repo: string;
+  priorState: RepoState;
+  newState: RepoState;
+  reason: NextPromotionCandidateReason;
+  stars: number;
+  promotionKind: "existing-library" | "new-discovery";
+};
+
+export type BootstrapRepoSample = {
+  repo: string;
+  source: BootstrapSource;
+  candidateId: string;
+  outcome: "bootstrapped" | "failed" | "skipped";
+  failureReason?: string;
+};
+
+export type RebootstrapEligibleRepoSample = {
+  repo: string;
+  missingSkillIds: string[];
+};
+
+export type ShadowStaleInvalidCandidate = {
+  id: string;
+  repo: string;
+  reason: "repoMissing" | "skillFileMissing" | "validationFailed";
+};
+
+export type StageTimings = Record<string, number>;
+export type SourceRunSummary = {
+  source: string;
+  lane: DiscoveryLane;
+  hitCount: number;
+  durationMs: number;
+};
+
+export type DiscoveryBudgetSummary = {
+  topics: {
+    maxQueries: number;
+    maxPagesPerQuery: number;
+  };
+  code: {
+    includeBroadQuery: boolean;
+    maxFingerprintQueries: number;
+    maxPagesPerQuery: number;
+  };
+  social: {
+    maxPagesPerQuery: number;
+  };
+  aggregators: {
+    maxRepos: number;
+  };
+};
+
+export type TopRepoSummary = {
+  repo: string;
+  stars: number;
+  topSkillId: string | null;
+};
+
+export type ShadowAuthorDiffExample = {
+  id: string;
+  currentAuthorHandle: string;
+  shadowAuthorHandle: string;
+  publisherHandle: string;
+  publisherRepo: string;
+  upstreamRepo: string | null;
+  provenanceType: ProvenanceType;
+  authorConfidence: AuthorConfidence;
+};
+
+export type ShadowCutoverAuthorDiffSample = {
+  id: string;
+  baselineAuthorHandle: string;
+  cutoverAuthorHandle: string;
+};
+
+export type ShadowCutoverCompare = {
+  checkedAt: string;
+  counts: {
+    baselineSkillCount: number;
+    cutoverSkillCount: number;
+    countDelta: number;
+    addedSkillCount: number;
+    missingSkillCount: number;
+  };
+  addedSkillIdsSample: string[];
+  missingSkillIdsSample: string[];
+  authorDiffSample: ShadowCutoverAuthorDiffSample[];
+  unresolvedAttributionSummary: {
+    baselineUnknownAuthorSkillCount: number;
+    cutoverUnknownAuthorSkillCount: number;
+    cutoverUnresolvedCatalogSkillCount: number;
+  };
+  signalSummary: {
+    cutoverSignalCount: number;
+    cutoverRisingSignalCount: number;
+    cutoverCoreSignalCount: number;
+  };
+  validationSummary: {
+    cutoverValidationPassed: boolean;
+    cutoverValidationFailureCount: number;
+  };
+};
+
+export type ShadowRunReport = {
+  checkedAt: string;
+  status: "ok";
+  cadence: ShadowCadence;
+  baselineSkillCount: number;
+  shadowSkillCount: number;
+  inspectableShadowSkillCount: number;
+  excludedInspectableCatalogSkillCount: number;
+  carriedForwardCount: number;
+  correctedCount: number;
+  newlyDiscoveredCount: number;
+  staleInvalidCandidateCount: number;
+  repoCount: number;
+  repoCountsByState: Record<RepoState, number>;
+  trustedVendorRepoCount: number;
+  trustedCreatorRepoCount: number;
+  goldBasketRepoCount: number;
+  unresolvedBaselineSkillCount: number;
+  authorPublisherMismatchCount: number;
+  provenanceCounts: Record<ProvenanceType, number>;
+  unknownAuthorSkillCount: number;
+  catalogRepoSkillCount: number;
+  unresolvedCatalogSkillCount: number;
+  unresolvedCatalogPublishers: {
+    publisherRepo: string;
+    count: number;
+  }[];
+  authorDiffExamples: ShadowAuthorDiffExample[];
+  catalogRepoExamples: ShadowAuthorDiffExample[];
+  topCoreRepos: TopRepoSummary[];
+  topRisingRepos: TopRepoSummary[];
+  sourceRuns: SourceRunSummary[];
+  discoveryBudgetApplied: boolean;
+  discoveryBudgetSummary: DiscoveryBudgetSummary | null;
+  partialDiscoveryWarnings: string[];
+  enrichmentCounts: ShadowEnrichmentCounts;
+  lowStarValidSkillCount: number;
+  lowStarValidSkillSample: string[];
+  trustedLowStarSkillCount: number;
+  officialLowStarSkillCount: number;
+  staleInvalidCandidatesSample: ShadowStaleInvalidCandidate[];
+  priorityReasonCounts: PriorityReasonCounts;
+  dailyPriorityRepoSample: DailyPriorityRepoSample[];
+  skippedMonitoredRepoCount: number;
+  nextPromotionCandidateCount: number;
+  nextPromotionCandidatesSample: NextPromotionCandidateSample[];
+  nextPromotionShortlistCount: number;
+  nextPromotionShortlistSample: NextPromotionCandidateSample[];
+  promotedRepoCount: number;
+  promotedToRisingCount: number;
+  newDiscoveredRepoPromotedCount: number;
+  promotedRepoSample: PromotedRepoSample[];
+  bootstrappedRepoCount: number;
+  bootstrappedRepoSample: BootstrapRepoSample[];
+  bootstrapFailedRepoCount: number;
+  bootstrapFailedRepoSample: BootstrapRepoSample[];
+  bootstrapSkippedRepoCount: number;
+  bootstrapSkippedRepoSample: BootstrapRepoSample[];
+  rebootstrapEligibleRepoCount: number;
+  rebootstrapEligibleRepoSample: RebootstrapEligibleRepoSample[];
+  shadowRepoOverlayLoaded: boolean;
+  shadowRepoOverlayEntryCount: number;
+  shadowRepoOverlayWrittenCount: number;
+  enrichmentWarnings: string[];
+  discoveredRepoCount: number;
+  discoveredRepoCountByLane: Record<DiscoveryLane, number>;
+  discoveredRepoCountBySource: Record<string, number>;
+  baselineRepoCountMatchedByDiscovery: number;
+  newDiscoveryRepoCount: number;
+  newDiscoveryReposSample: string[];
+  periodicOnlyReposSample: string[];
+  backgroundOnlyReposSample: string[];
+  bootstrapValueRepoCount: number;
+  bootstrapValueReposSample: string[];
+  fastOnlyRepoCount: number;
+  fastOnlyReposSample: string[];
+  cutoverValidationPassed: boolean;
+  cutoverValidationFailureCount: number;
+  cutoverValidationFailuresSample: CutoverValidationFailure[];
+  stageTimings: StageTimings;
+  productionWriteGuardPassed: true;
+};

@@ -10,6 +10,8 @@ if (!token) {
   throw new Error("GITHUB_TOKEN missing — create index/.env with GITHUB_TOKEN=<fine-grained PAT>");
 }
 
+const disableThrottleRetry = process.env.OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY === "1";
+
 const HardenedOctokit = Octokit.plugin(throttling, retry);
 
 export const octokit = new HardenedOctokit({
@@ -22,13 +24,14 @@ export const octokit = new HardenedOctokit({
       console.warn(
         `[rate-limit] ${options.method} ${options.url} — retrying after ${retryAfter}s (attempt ${retryCount + 1})`,
       );
+      if (disableThrottleRetry) return false;
       return retryCount < 2;
     },
     onSecondaryRateLimit: (retryAfter, options) => {
       console.warn(
         `[secondary-limit] ${options.method} ${options.url} — retrying after ${retryAfter}s`,
       );
-      return true;
+      return !disableThrottleRetry;
     },
   },
 });

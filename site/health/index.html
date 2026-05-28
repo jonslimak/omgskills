@@ -49,14 +49,6 @@
       .ok { background: #e8f7ec; color: #136c2e; }
       .degraded { background: #fff4e5; color: #8a5a00; }
       .failed { background: #fdecec; color: #9b1c1c; }
-      .grid {
-        margin: 20px 0 28px;
-      }
-      .card {
-        border: 1px solid #e5e5e5;
-        border-radius: 10px;
-        padding: 14px;
-      }
       .section-title {
         margin: 24px 0 12px;
         font-size: 13px;
@@ -65,7 +57,6 @@
         text-transform: uppercase;
         letter-spacing: .04em;
       }
-      ul { padding-left: 18px; }
       .kv-list {
         list-style: none;
         padding: 0;
@@ -106,9 +97,6 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 28px 28px;
-      }
-      .section-block {
-        min-width: 0;
       }
       .status-table {
         width: 100%;
@@ -173,7 +161,7 @@
   <body>
     <main>
       <h1>omgskills health</h1>
-      <p>Operator status for download, updates, data refresh, crawls, and search.</p>
+      <p>Operator status for release assets, the shipped v2 app data path, new crawler freshness, and cutover integrity.</p>
       <div class="top-row">
         <div id="status" class="status degraded">loading</div>
         <a class="button" href="https://github.com/jonslimak/omgskills/actions/workflows/pipeline-health.yml" target="_blank" rel="noopener">Test now</a>
@@ -190,44 +178,38 @@
         </thead>
         <tbody id="sectionSummary"></tbody>
       </table>
-      <div class="section-title">Marketing Funnel</div>
-      <ul id="marketingFunnel" class="kv-list"></ul>
       <div class="section-grid">
-        <details class="section-block">
-          <summary class="section-title">Download</summary>
-          <ul id="download" class="kv-list"></ul>
+        <details class="section-block" open>
+          <summary class="section-title">Release</summary>
+          <ul id="release" class="kv-list"></ul>
+        </details>
+        <details class="section-block" open>
+          <summary class="section-title">v2 App Data</summary>
+          <ul id="v2AppData" class="kv-list"></ul>
         </details>
         <details class="section-block">
-          <summary class="section-title">Updates</summary>
-          <ul id="updates" class="kv-list"></ul>
-        </details>
-        <details class="section-block">
-          <summary class="section-title">Data Refresh</summary>
-          <ul id="dataRefresh" class="kv-list"></ul>
+          <summary class="section-title">Legacy Data</summary>
+          <ul id="legacyData" class="kv-list"></ul>
         </details>
         <details class="section-block">
           <summary class="section-title">Search</summary>
           <ul id="search" class="kv-list"></ul>
         </details>
         <details class="section-block">
-          <summary class="section-title">Crawls</summary>
-          <ul id="crawl" class="kv-list"></ul>
+          <summary class="section-title">New Crawler Freshness</summary>
+          <ul id="crawlers" class="kv-list"></ul>
         </details>
         <details class="section-block">
-          <summary class="section-title">X Feed</summary>
-          <ul id="x" class="kv-list"></ul>
+          <summary class="section-title">Shadow/Cutover</summary>
+          <ul id="shadowCutover" class="kv-list"></ul>
         </details>
         <details class="section-block">
-          <summary class="section-title">Overlays</summary>
-          <ul id="overlays" class="kv-list"></ul>
+          <summary class="section-title">Content/Overlays</summary>
+          <ul id="contentOverlays" class="kv-list"></ul>
         </details>
         <details class="section-block">
-          <summary class="section-title">Content Reports</summary>
-          <ul id="content" class="kv-list"></ul>
-        </details>
-        <details class="section-block">
-          <summary class="section-title">Core Library</summary>
-          <ul id="core" class="kv-list"></ul>
+          <summary class="section-title">Marketing Funnel</summary>
+          <ul id="marketingFunnel" class="kv-list"></ul>
         </details>
         <details class="section-block">
           <summary class="section-title">Links</summary>
@@ -244,6 +226,9 @@
         ? new URL("../data/health.json", location.href).href
         : "/data/health.json";
       const assetUrl = (path) => location.protocol === "file:"
+        ? new URL(`../${path}`, location.href).href
+        : `/${path}`;
+      const dataAssetUrl = (path) => location.protocol === "file:"
         ? new URL(`../data/${path}`, location.href).href
         : `/data/${path}`;
       const dateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -292,16 +277,14 @@
         addSourceItem("Last passed", fmtSuccess(section?.lastPassedAt), href),
       ];
       const summaryRows = [
-        ["Download", "download"],
-        ["Updates", "updates"],
-        ["Data Refresh", "dataRefresh"],
+        ["Release", "release"],
+        ["v2 App Data", "v2AppData"],
+        ["Legacy Data", "legacyData"],
         ["Search", "search"],
-        ["Crawls", "crawl"],
-        ["X Feed", "x"],
-        ["Overlays", "overlays"],
+        ["New Crawler Freshness", "crawlers"],
+        ["Shadow/Cutover", "shadowCutover"],
+        ["Content/Overlays", "contentOverlays"],
         ["Marketing Funnel", "marketingFunnel"],
-        ["Content Reports", "contentReports"],
-        ["Core Library", "core"],
       ];
 
       fetch(dataUrl, { cache: "no-store" })
@@ -327,28 +310,35 @@
             return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${timeCell(fmtSuccess(section?.lastPassedAt))}</td></tr>`;
           }).join("");
 
-          document.getElementById("download").innerHTML = [
-            ...renderBase(health.sections?.download),
-            addItem("Download URL", health.sections?.download?.redirectLocation || "-"),
-            addItem("DMG size", bytes(health.sections?.download?.bytes)),
-            addItem("Message", issueText(health.sections?.download)),
+          document.getElementById("release").innerHTML = [
+            ...renderBase(health.sections?.release),
+            addItem("Download URL", health.sections?.release?.redirectLocation || "-"),
+            addItem("DMG size", bytes(health.sections?.release?.dmgBytes)),
+            addItem("Latest version", health.sections?.release?.latestVersion || "-"),
+            addItem("Update zip", health.sections?.release?.latestZipUrl || "-"),
+            addItem("Zip size", bytes(health.sections?.release?.latestZipBytes)),
+            addItem("Message", issueText(health.sections?.release)),
           ].join("");
 
-          document.getElementById("updates").innerHTML = [
-            ...renderBase(health.sections?.updates),
-            addItem("Latest version", health.sections?.updates?.latestVersion || "-"),
-            addItem("Update zip", health.sections?.updates?.latestZipUrl || "-"),
-            addItem("Zip size", bytes(health.sections?.updates?.latestZipBytes)),
-            addItem("Message", issueText(health.sections?.updates)),
+          document.getElementById("v2AppData").innerHTML = [
+            ...renderBase(health.sections?.v2AppData),
+            addItem("Manifest", health.sections?.v2AppData?.manifestPath || "-"),
+            addTimeItem("Manifest generated", fmtGenerated(health.sections?.v2AppData?.manifestGeneratedAt)),
+            addItem("Skills", health.sections?.v2AppData?.counts?.skills ?? "-"),
+            addItem("Trending", health.sections?.v2AppData?.counts?.trending ?? "-"),
+            addItem("X feed", health.sections?.v2AppData?.counts?.xTrending ?? "-"),
+            addItem("Assets", assetText(health.sections?.v2AppData)),
+            addItem("Message", issueText(health.sections?.v2AppData)),
           ].join("");
 
-          document.getElementById("dataRefresh").innerHTML = [
-            ...renderBase(health.sections?.dataRefresh),
-            addTimeItem("Manifest generated", fmtGenerated(health.sections?.dataRefresh?.manifestGeneratedAt)),
-            addItem("Skills", health.sections?.dataRefresh?.skillsCount ?? "-"),
-            addItem("Trending", health.sections?.dataRefresh?.trendingCount ?? "-"),
-            addItem("Assets", assetText(health.sections?.dataRefresh)),
-            addItem("Message", issueText(health.sections?.dataRefresh)),
+          document.getElementById("legacyData").innerHTML = [
+            ...renderBase(health.sections?.legacyData),
+            addItem("Manifest", health.sections?.legacyData?.manifestPath || "-"),
+            addTimeItem("Manifest generated", fmtGenerated(health.sections?.legacyData?.manifestGeneratedAt)),
+            addItem("Skills", health.sections?.legacyData?.counts?.skills ?? "-"),
+            addItem("Trending", health.sections?.legacyData?.counts?.trending ?? "-"),
+            addItem("Assets", assetText(health.sections?.legacyData)),
+            addItem("Message", issueText(health.sections?.legacyData)),
           ].join("");
 
           document.getElementById("search").innerHTML = [
@@ -357,35 +347,30 @@
             addItem("Message", issueText(health.sections?.search)),
           ].join("");
 
-          document.getElementById("crawl").innerHTML = [
-            ...renderBase(health.sections?.crawl),
-            addTimeItem("Last scrape", fmtSuccess(health.sections?.crawl?.lastSuccessfulScrapeAt)),
-            addTimeItem("Last X refresh", fmtSuccess(health.sections?.crawl?.lastSuccessfulXRefreshAt)),
-            addTimeItem("Last content run", fmtSuccess(health.sections?.crawl?.lastSuccessfulContentReportAt)),
-            addItem("Message", issueText(health.sections?.crawl)),
+          document.getElementById("crawlers").innerHTML = [
+            ...renderBase(health.sections?.crawlers),
+            addTimeItem("Last shadow crawl", fmtSuccess(health.sections?.crawlers?.lastSuccessfulShadowRunAt)),
+            addItem("Message", issueText(health.sections?.crawlers)),
           ].join("");
 
-          document.getElementById("core").innerHTML = [
-            ...renderBase(health.sections?.core),
-            addTimeItem("Last library publish", fmtGenerated(health.assets?.skills?.generatedAt)),
-            addItem("Skills", health.sections?.core?.skillsCount ?? "-"),
-            addItem("Trending", health.sections?.core?.trendingCount ?? "-"),
-            addTimeItem("Last successful scrape", fmtSuccess(health.sections?.core?.lastSuccessfulScrapeAt)),
+          document.getElementById("shadowCutover").innerHTML = [
+            ...renderBase(health.sections?.shadowCutover),
+            addItem("Cutover validation", health.sections?.shadowCutover?.cutoverValidationPassed ?? "-"),
+            addItem("Promoted matches cutover", health.sections?.shadowCutover?.promotedMatchesCutover ?? "-"),
+            addItem("v2 manifest aligned", health.sections?.shadowCutover?.v2ManifestMatchesLocal ?? "-"),
+            addItem("Message", issueText(health.sections?.shadowCutover)),
           ].join("");
 
-          document.getElementById("x").innerHTML = [
-            ...renderBase(health.sections?.x),
-            addTimeItem("Last X publish", fmtGenerated(health.assets?.xTrending?.generatedAt)),
-            addItem("X feed", health.sections?.x?.xTrendingCount ?? "-"),
-            addTimeItem("Last successful X refresh", fmtSuccess(health.sections?.x?.lastSuccessfulXRefreshAt)),
-          ].join("");
-
-          document.getElementById("overlays").innerHTML = [
-            ...renderBase(health.sections?.overlays),
-            addTimeItem("Last overlay publish", fmtGenerated(health.assets?.skillSignals?.generatedAt)),
-            addItem("Skill signals", health.sections?.overlays?.skillSignalsCount ?? "-"),
-            addItem("Author signals", health.sections?.overlays?.authorSignalsCount ?? "-"),
-            addItem("Author leaderboards", health.sections?.overlays?.authorLeaderboardsCount ?? "-"),
+          document.getElementById("contentOverlays").innerHTML = [
+            ...renderBase(health.sections?.contentOverlays),
+            addTimeItem("Skill signals publish", fmtGenerated(health.assets?.skillSignals?.generatedAt)),
+            addItem("Skill signals", health.sections?.contentOverlays?.skillSignalsCount ?? "-"),
+            addItem("Author signals", health.sections?.contentOverlays?.authorSignalsCount ?? "-"),
+            addItem("Author leaderboards", health.sections?.contentOverlays?.authorLeaderboardsCount ?? "-"),
+            addTimeItem("Last content run", fmtSuccess(health.sections?.contentOverlays?.lastSuccessfulContentReportAt)),
+            addTimeItem("Basket enriched", fmt(health.sections?.contentOverlays?.basketEnrichedAt)),
+            addItem("Trending snapshots", health.sections?.contentOverlays?.snapshotCount ?? "-"),
+            addItem("Message", issueText(health.sections?.contentOverlays)),
           ].join("");
 
           document.getElementById("marketingFunnel").innerHTML = [
@@ -404,27 +389,20 @@
             addSourceItem("Message", issueText(health.sections?.marketingFunnel), healthJsonUrl),
           ].join("");
 
-          document.getElementById("content").innerHTML = [
-            ...renderBase(health.sections?.contentReports),
-            addTimeItem("Last report publish", fmtGenerated(health.content?.dashboardGeneratedAt)),
-            addTimeItem("Last successful content run", fmtSuccess(health.sections?.contentReports?.lastSuccessfulContentReportAt)),
-            addTimeItem("Basket enriched", fmt(health.sections?.contentReports?.basketEnrichedAt)),
-            addItem("Trending snapshots", health.sections?.contentReports?.snapshotCount ?? "-"),
-          ].join("");
-
           document.getElementById("message").innerHTML = addItem("Status message", health.message || "OK");
 
           const links = [
-            [location.protocol === "file:" ? new URL("../data/manifest.json", location.href).href : "/data/manifest.json", "manifest"],
+            [location.protocol === "file:" ? new URL("../data/manifest.json", location.href).href : "/data/manifest.json", "legacy manifest"],
+            [location.protocol === "file:" ? new URL("../data/v2/manifest.json", location.href).href : "/data/v2/manifest.json", "v2 manifest"],
             [dataUrl, "health json"],
             ["https://github.com/jonslimak/omgskills/actions", "GitHub Actions"],
           ];
-          if (health.assets?.skills?.path) links.push([assetUrl(health.assets.skills.path), "skills asset"]);
-          if (health.assets?.trending?.path) links.push([assetUrl(health.assets.trending.path), "trending asset"]);
-          if (health.assets?.xTrending?.path) links.push([assetUrl(health.assets.xTrending.path), "x asset"]);
-          if (health.assets?.skillSignals?.path) links.push([assetUrl(health.assets.skillSignals.path), "skill signals asset"]);
-          if (health.assets?.authorSignals?.path) links.push([assetUrl(health.assets.authorSignals.path), "author signals asset"]);
-          if (health.assets?.authorLeaderboards?.path) links.push([assetUrl(health.assets.authorLeaderboards.path), "author leaderboards asset"]);
+          if (health.tracks?.v2?.skills?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.skills.path}`), "v2 skills asset"]);
+          if (health.tracks?.v2?.trending?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.trending.path}`), "v2 trending asset"]);
+          if (health.tracks?.v2?.xTrending?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.xTrending.path}`), "v2 x asset"]);
+          if (health.tracks?.legacy?.skills?.path) links.push([dataAssetUrl(health.tracks.legacy.skills.path), "legacy skills asset"]);
+          if (health.assets?.skillSignals?.path) links.push([dataAssetUrl(health.assets.skillSignals.path), "skill signals asset"]);
+          if (health.assets?.authorSignals?.path) links.push([dataAssetUrl(health.assets.authorSignals.path), "author signals asset"]);
           document.getElementById("links").innerHTML = links.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join("");
         })
         .catch((error) => {
@@ -439,7 +417,7 @@
             addItem("Error", error.message),
           ].join("");
           document.getElementById("summary").innerHTML = addItem("Health", "unavailable");
-          document.getElementById("links").innerHTML = `<li><a href="${location.protocol === "file:" ? new URL("../data/manifest.json", location.href).href : "/data/manifest.json"}">manifest</a></li>`;
+          document.getElementById("links").innerHTML = `<li><a href="${location.protocol === "file:" ? new URL("../data/health.json", location.href).href : "/data/health.json"}">health json</a></li>`;
         });
     </script>
   </body>

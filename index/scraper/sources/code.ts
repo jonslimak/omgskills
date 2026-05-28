@@ -7,6 +7,12 @@ export interface CodeHit {
   author_handle: string;
 }
 
+export interface CodeSearchOptions {
+  includeBroadQuery?: boolean;
+  maxFingerprintQueries?: number;
+  maxPagesPerQuery?: number;
+}
+
 function isValidSkillPath(path: string): boolean {
   return path === "SKILL.md" || path.endsWith("/SKILL.md");
 }
@@ -18,13 +24,20 @@ function deriveId(repoFullName: string, path: string): string {
   return `${repoFullName}:${skillName}`;
 }
 
-async function collectCodeHits(q: string, seen: Set<string>, results: CodeHit[]) {
+async function collectCodeHits(
+  q: string,
+  seen: Set<string>,
+  results: CodeHit[],
+  maxPagesPerQuery?: number,
+) {
   const iter = octokit.paginate.iterator(octokit.rest.search.code, {
     q,
     per_page: 100,
   });
+  let pageCount = 0;
   try {
     for await (const { data } of iter) {
+      pageCount += 1;
       for (const hit of data) {
         if (!isValidSkillPath(hit.path)) continue;
         const id = deriveId(hit.repository.full_name, hit.path);
@@ -37,6 +50,7 @@ async function collectCodeHits(q: string, seen: Set<string>, results: CodeHit[])
           author_handle: hit.repository.owner?.login ?? "",
         });
       }
+      if (maxPagesPerQuery && pageCount >= maxPagesPerQuery) break;
     }
   } catch (err: any) {
     // GitHub caps code search at 1000 results — 404 on page 11+ is expected
@@ -62,16 +76,22 @@ const FINGERPRINT_QUERIES = [
   "~/.claude/skills filename:SKILL.md size:>30000",
 ];
 
-export async function searchBySkillMdFilename(): Promise<CodeHit[]> {
+export async function searchBySkillMdFilename(options: CodeSearchOptions = {}): Promise<CodeHit[]> {
   const seen = new Set<string>();
   const results: CodeHit[] = [];
+  const includeBroadQuery = options.includeBroadQuery ?? true;
+  const fingerprintQueries = options.maxFingerprintQueries
+    ? FINGERPRINT_QUERIES.slice(0, options.maxFingerprintQueries)
+    : FINGERPRINT_QUERIES;
 
   // Broad search — catches skills in subdirectories (e.g. .claude/skills/*)
-  await collectCodeHits("filename:SKILL.md", seen, results);
+  if (includeBroadQuery) {
+    await collectCodeHits("filename:SKILL.md", seen, results, options.maxPagesPerQuery);
+  }
 
   // Fingerprint queries — high-precision, cover root-level and content-identified skills
-  for (const q of FINGERPRINT_QUERIES) {
-    await collectCodeHits(q, seen, results);
+  for (const q of fingerprintQueries) {
+    await collectCodeHits(q, seen, results, options.maxPagesPerQuery);
   }
 
   return results;

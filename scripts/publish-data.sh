@@ -10,7 +10,11 @@ X_TRENDING="$REPO_ROOT/index/x-trending.json"
 SKILL_SIGNALS="$REPO_ROOT/index/skill-signals.json"
 AUTHOR_SIGNALS="$REPO_ROOT/index/author-signals.json"
 AUTHOR_LEADERBOARDS="$REPO_ROOT/index/author-leaderboards.json"
+DATA_TRACK_SUBDIR="${OMGSKILLS_DATA_SUBDIR:-}"
 DATA_DIR="$REPO_ROOT/site/data"
+if [ -n "$DATA_TRACK_SUBDIR" ]; then
+    DATA_DIR="$DATA_DIR/$DATA_TRACK_SUBDIR"
+fi
 
 require_file() {
     local file="$1"
@@ -32,6 +36,53 @@ byte_count() {
 
 require_file "$SKILLS" "Run: cd index && npm run scrape"
 require_file "$TRENDING" "Run: cd index && npm run scrape:trending"
+
+require_promoted_v2_library() {
+    export OMGSKILLS_REPO_ROOT="$REPO_ROOT"
+    python3 - <<'PY'
+import json, os, sys
+from pathlib import Path
+
+repo = Path(os.environ["OMGSKILLS_REPO_ROOT"])
+report_path = repo / "index/shadow/shadow-report.json"
+cutover_path = repo / "index/shadow/skills.cutover.shadow.json"
+skills_path = repo / "index/skills.json"
+
+for path, hint in [
+    (report_path, "Run the shadow cutover flow first."),
+    (cutover_path, "Run the shadow cutover flow first."),
+    (skills_path, "Run promote-cutover first."),
+]:
+    if not path.exists():
+        print(f"✗ Missing {path}", file=sys.stderr)
+        print(f"  {hint}", file=sys.stderr)
+        sys.exit(1)
+
+report = json.loads(report_path.read_text())
+if not report.get("cutoverValidationPassed"):
+    print("✗ v2 publish requires a passing cutover validation.", file=sys.stderr)
+    print("  Run the shadow cutover flow and fix validation failures first.", file=sys.stderr)
+    sys.exit(1)
+
+cutover = json.loads(cutover_path.read_text())
+promoted = [
+    skill for skill in cutover
+    if not (not skill.get("author_handle") and skill.get("provenance_type") in {"catalog", "repackaged"})
+]
+current = json.loads(skills_path.read_text())
+
+promoted_ids = [skill["id"] for skill in promoted]
+current_ids = [skill["id"] for skill in current]
+if promoted_ids != current_ids:
+    print("✗ v2 publish is not using the promoted library state.", file=sys.stderr)
+    print("  Run promote-cutover before publishing the v2 data track.", file=sys.stderr)
+    sys.exit(1)
+PY
+}
+
+if [ "$DATA_TRACK_SUBDIR" = "v2" ]; then
+    require_promoted_v2_library
+fi
 
 mkdir -p "$DATA_DIR"
 manifest_generated_at="${MANIFEST_GENERATED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
@@ -164,9 +215,11 @@ fi)
 }
 JSON
 
-HEALTH_PUBLISHED_AT="${HEALTH_PUBLISHED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \
-HEALTH_CHECKED_AT="${HEALTH_CHECKED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \
-node "$REPO_ROOT/scripts/build-health.mjs"
+if [ -z "$DATA_TRACK_SUBDIR" ]; then
+    HEALTH_PUBLISHED_AT="${HEALTH_PUBLISHED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \
+    HEALTH_CHECKED_AT="${HEALTH_CHECKED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \
+    node "$REPO_ROOT/scripts/build-health.mjs"
+fi
 
 for prefix in skills trending trending-leaderboard leaderboard-view-data x-trending skill-signals author-signals author-leaderboards; do
     if ls "$DATA_DIR"/"$prefix"-*.json >/dev/null 2>&1; then
@@ -196,4 +249,6 @@ fi
 if [ -n "$author_leaderboards_file" ]; then
     echo "  $DATA_DIR/$author_leaderboards_file"
 fi
-echo "  $DATA_DIR/health.json"
+if [ -z "$DATA_TRACK_SUBDIR" ]; then
+    echo "  $DATA_DIR/health.json"
+fi
