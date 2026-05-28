@@ -173,7 +173,7 @@
           <tr>
             <th>Section</th>
             <th>Status</th>
-            <th>Last passed</th>
+            <th>Last tested</th>
           </tr>
         </thead>
         <tbody id="sectionSummary"></tbody>
@@ -269,12 +269,10 @@
       const renderBase = (section) => [
         addItem("Status", statusLabel(section?.status)),
         addTimeItem("Last tested", fmt(section?.checkedAt)),
-        addTimeItem("Last passed", fmtSuccess(section?.lastPassedAt)),
       ];
       const renderSourceBase = (section, href) => [
         addSourceItem("Status", statusLabel(section?.status), href),
         addSourceItem("Last tested", fmt(section?.checkedAt), href),
-        addSourceItem("Last passed", fmtSuccess(section?.lastPassedAt), href),
       ];
       const summaryRows = [
         ["Release", "release"],
@@ -307,7 +305,7 @@
 
           document.getElementById("sectionSummary").innerHTML = summaryRows.map(([label, key]) => {
             const section = health.sections?.[key];
-            return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${timeCell(fmtSuccess(section?.lastPassedAt))}</td></tr>`;
+            return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${timeCell(fmt(section?.checkedAt))}</td></tr>`;
           }).join("");
 
           document.getElementById("release").innerHTML = [
