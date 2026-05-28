@@ -1,0 +1,172 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import type { ShadowCutoverCompare, ShadowCutoverSkillSignal, ShadowRunReport, ShadowSkillRecord } from "./types.js";
+
+type ComparableCutoverSkill = Omit<ShadowSkillRecord, "stars" | "last_updated">;
+
+type ComparableCutoverCompare = Pick<
+  ShadowCutoverCompare,
+  | "counts"
+  | "addedSkillIdsSample"
+  | "missingSkillIdsSample"
+  | "authorDiffSample"
+  | "unresolvedAttributionSummary"
+  | "signalSummary"
+  | "validationSummary"
+>;
+
+type ComparableShadowReport = Pick<
+  ShadowRunReport,
+  | "cutoverValidationPassed"
+  | "cutoverValidationFailureCount"
+  | "shadowSkillCount"
+  | "inspectableShadowSkillCount"
+  | "rebootstrapEligibleRepoCount"
+>;
+
+type RerunSnapshot = {
+  skills: ComparableCutoverSkill[];
+  signals: ShadowCutoverSkillSignal[];
+  compareSummary: ComparableCutoverCompare;
+  reportSummary: ComparableShadowReport;
+};
+
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
+const INDEX_ROOT = join(SCRIPT_DIR, "..", "..");
+const SHADOW_ROOT = join(INDEX_ROOT, "shadow");
+
+export function selectComparableCutoverCompare(compare: ShadowCutoverCompare): ComparableCutoverCompare {
+  return {
+    counts: compare.counts,
+    addedSkillIdsSample: compare.addedSkillIdsSample,
+    missingSkillIdsSample: compare.missingSkillIdsSample,
+    authorDiffSample: compare.authorDiffSample,
+    unresolvedAttributionSummary: compare.unresolvedAttributionSummary,
+    signalSummary: compare.signalSummary,
+    validationSummary: compare.validationSummary,
+  };
+}
+
+export function selectComparableShadowReport(report: ShadowRunReport): ComparableShadowReport {
+  return {
+    cutoverValidationPassed: report.cutoverValidationPassed,
+    cutoverValidationFailureCount: report.cutoverValidationFailureCount,
+    shadowSkillCount: report.shadowSkillCount,
+    inspectableShadowSkillCount: report.inspectableShadowSkillCount,
+    rebootstrapEligibleRepoCount: report.rebootstrapEligibleRepoCount,
+  };
+}
+
+export function selectComparableCutoverSkills(skills: ShadowSkillRecord[]): ComparableCutoverSkill[] {
+  return skills.map(({ stars: _stars, last_updated: _lastUpdated, ...skill }) => skill);
+}
+
+export function firstDiffPath(left: unknown, right: unknown, path = "$"): string | null {
+  if (Object.is(left, right)) {
+    return null;
+  }
+
+  if (Array.isArray(left) && Array.isArray(right)) {
+    if (left.length !== right.length) {
+      return `${path}.length`;
+    }
+    for (let index = 0; index < left.length; index += 1) {
+      const diff = firstDiffPath(left[index], right[index], `${path}[${index}]`);
+      if (diff) {
+        return diff;
+      }
+    }
+    return null;
+  }
+
+  if (isPlainObject(left) && isPlainObject(right)) {
+    const leftKeys = Object.keys(left).sort();
+    const rightKeys = Object.keys(right).sort();
+    if (leftKeys.length !== rightKeys.length) {
+      return `${path}.__keys__`;
+    }
+    for (let index = 0; index < leftKeys.length; index += 1) {
+      if (leftKeys[index] !== rightKeys[index]) {
+        return `${path}.__keys__`;
+      }
+    }
+    for (const key of leftKeys) {
+      const diff = firstDiffPath(left[key], right[key], `${path}.${key}`);
+      if (diff) {
+        return diff;
+      }
+    }
+    return null;
+  }
+
+  return path;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function readJson<T>(path: string): T {
+  return JSON.parse(readFileSync(path, "utf8")) as T;
+}
+
+function captureSnapshot(): RerunSnapshot {
+  const skills = readJson<ShadowSkillRecord[]>(join(SHADOW_ROOT, "skills.cutover.shadow.json"));
+  const signals = readJson<ShadowCutoverSkillSignal[]>(join(SHADOW_ROOT, "skill-signals.cutover.shadow.json"));
+  const compare = readJson<ShadowCutoverCompare>(join(SHADOW_ROOT, "cutover-compare.shadow.json"));
+  const report = readJson<ShadowRunReport>(join(SHADOW_ROOT, "shadow-report.json"));
+
+  return {
+    skills: selectComparableCutoverSkills(skills),
+    signals,
+    compareSummary: selectComparableCutoverCompare(compare),
+    reportSummary: selectComparableShadowReport(report),
+  };
+}
+
+function runShadowBuild() {
+  execFileSync("npm", ["run", "scrape:shadow", "--", "--cadence=combined"], {
+    cwd: INDEX_ROOT,
+    stdio: "inherit",
+  });
+}
+
+function assertNoDiff(label: string, left: unknown, right: unknown) {
+  const diffPath = firstDiffPath(left, right);
+  if (diffPath) {
+    throw new Error(`${label} drifted at ${diffPath}`);
+  }
+}
+
+function verifyValidationPassed(snapshot: RerunSnapshot, label: string) {
+  assert.equal(snapshot.reportSummary.cutoverValidationPassed, true, `${label} cutover validation must pass`);
+  assert.equal(snapshot.compareSummary.validationSummary.cutoverValidationPassed, true, `${label} compare validation must pass`);
+}
+
+function main() {
+  console.log("Running shadow build 1/2...");
+  runShadowBuild();
+  const first = captureSnapshot();
+  verifyValidationPassed(first, "first run");
+
+  console.log("Running shadow build 2/2...");
+  runShadowBuild();
+  const second = captureSnapshot();
+  verifyValidationPassed(second, "second run");
+
+  assertNoDiff("skills.cutover.shadow.json", first.skills, second.skills);
+  assertNoDiff("skill-signals.cutover.shadow.json", first.signals, second.signals);
+  assertNoDiff("cutover-compare.shadow.json", first.compareSummary, second.compareSummary);
+  assertNoDiff("shadow-report.json", first.reportSummary, second.reportSummary);
+
+  console.log("Rerun stability verified.");
+  console.log(`Cutover skills: ${second.skills.length}`);
+  console.log(`Cutover signals: ${second.signals.length}`);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

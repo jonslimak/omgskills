@@ -1,4 +1,5 @@
 import type { SocialHit } from "./social.js";
+import { extractExactSkillRefs, type XGitHubSkillRef } from "../x-skill-mapping.js";
 
 const GITHUB_URL_RE = /https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)/g;
 const DEFAULT_MIN_LIKES = 50;
@@ -47,6 +48,7 @@ export interface XSkillTweetHit {
   posted_at: string | null;
   repo_ids: string[];
   repo_urls: string[];
+  skill_refs: XGitHubSkillRef[];
 }
 
 function enabled() {
@@ -91,6 +93,7 @@ function toTweetHit(tweet: ScrapedTweet): XSkillTweetHit | null {
   const text = tweetText(tweet);
   const repoIds = extractRepoIds(text);
   if (repoIds.length === 0) return null;
+  const skillRefs = extractExactSkillRefs(text);
 
   const tweetId = tweet.id ?? "";
   const username = tweet.username ?? "";
@@ -107,6 +110,7 @@ function toTweetHit(tweet: ScrapedTweet): XSkillTweetHit | null {
     posted_at: tweet.timestamp ? new Date(tweet.timestamp * 1000).toISOString() : null,
     repo_ids: repoIds,
     repo_urls: repoIds.map((id) => `https://github.com/${id}`),
+    skill_refs: skillRefs,
   };
 }
 

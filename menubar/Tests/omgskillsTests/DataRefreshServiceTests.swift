@@ -3,6 +3,10 @@ import Testing
 @testable import omgskills
 
 struct DataRefreshServiceTests {
+    @Test func manifestURLTargetsV2Track() {
+        #expect(DataRefreshService.manifestURL.absoluteString == "https://omgskills.com/data/v2/manifest.json")
+    }
+
     @Test func missingSkillsCacheBypassesThrottle() {
         let state = DataRefreshService.BootstrapState(
             hasSkillsCache: false,

@@ -106,6 +106,60 @@ test("parses NeverSight mirrored path", () => {
   assert.equal(result.authorConfidence, "high");
 });
 
+test("aiskillstore marketplace does not inherit repo owner authorship by default", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "aiskillstore/marketplace:skills/sickn33/2d-games",
+      github_url: "https://github.com/aiskillstore/marketplace",
+      author_handle: "aiskillstore",
+    }),
+    seeds({
+      catalogRepoRules: [{ repo: "aiskillstore/marketplace", defaultProvenanceType: "repackaged" }],
+      provenanceOverrides: [
+        {
+          repo: "aiskillstore/marketplace",
+          authorHandle: "",
+          publisherHandle: "aiskillstore",
+          provenanceType: "repackaged",
+          authorConfidence: "low",
+        },
+      ],
+    }),
+  );
+  assert.equal(result.authorHandle, "");
+  assert.equal(result.publisherHandle, "aiskillstore");
+  assert.equal(result.publisherRepo, "aiskillstore/marketplace");
+  assert.equal(result.provenanceType, "repackaged");
+  assert.equal(result.authorConfidence, "low");
+});
+
+test("aiskillstore marketplace can keep a trusted upstream author hint", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "aiskillstore/marketplace:skills/vercel-labs/nextjs",
+      github_url: "https://github.com/aiskillstore/marketplace",
+      author_handle: "aiskillstore",
+    }),
+    seeds({
+      trustedVendorHandles: new Set(["vercel-labs"]),
+      catalogRepoRules: [{ repo: "aiskillstore/marketplace", defaultProvenanceType: "repackaged" }],
+      provenanceOverrides: [
+        {
+          repo: "aiskillstore/marketplace",
+          authorHandle: "",
+          publisherHandle: "aiskillstore",
+          provenanceType: "repackaged",
+          authorConfidence: "low",
+        },
+      ],
+    }),
+  );
+  assert.equal(result.authorHandle, "vercel-labs");
+  assert.equal(result.publisherHandle, "aiskillstore");
+  assert.equal(result.provenanceType, "repackaged");
+  assert.equal(result.authorConfidence, "high");
+});
+
 test("unmatched openclaw/skills ids fall back safely", () => {
   const result = resolveShadowProvenance(
     skill({

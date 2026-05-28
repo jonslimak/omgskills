@@ -2,7 +2,7 @@ import CryptoKit
 import Foundation
 
 enum DataRefreshService {
-    private static let manifestURL = URL(string: "https://omgskills.com/data/manifest.json")!
+    static let manifestURL = URL(string: "https://omgskills.com/data/v2/manifest.json")!
     private static let backgroundCheckInterval: TimeInterval = 24 * 60 * 60
     private static let panelOpenDebounceInterval: TimeInterval = 60
 

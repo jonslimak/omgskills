@@ -52,6 +52,29 @@ struct InstalledSkillsScannerTests {
         #expect(result.summary.recentSkills.first?.name == "local-only")
     }
 
+    @Test func recentSkillsCapsAtTenNewestFirst() throws {
+        let root = try temporaryDirectory()
+        let codex = root.appendingPathComponent("codex", isDirectory: true)
+        try FileManager.default.createDirectory(at: codex, withIntermediateDirectories: true)
+
+        for index in 0..<11 {
+            let skill = codex.appendingPathComponent("skill-\(index)", isDirectory: true)
+            try FileManager.default.createDirectory(at: skill, withIntermediateDirectories: true)
+            try writeSkill(at: skill, name: "skill-\(index)")
+            let date = Date(timeIntervalSince1970: TimeInterval(index))
+            try FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: skill.appendingPathComponent("SKILL.md").path)
+            try FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: skill.path)
+        }
+
+        let result = InstalledSkillsScanner.scan(roots: [
+            InstalledSkillsScanner.Root(url: codex, origin: "Codex")
+        ])
+
+        #expect(result.summary.recentSkills.count == 10)
+        #expect(result.summary.recentSkills.first?.name == "skill-10")
+        #expect(result.summary.recentSkills.last?.name == "skill-1")
+    }
+
     private func temporaryDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)

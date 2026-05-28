@@ -1,6 +1,6 @@
 import type { Candidate, EnrichResult } from "../enrich.js";
 import type { Skill } from "../types.js";
-import type { BootstrapRepoSample, BootstrapSource, RepoBootstrapCandidate, ShadowCadence, ShadowRepoIndex } from "./types.js";
+import type { BootstrapRepoSample, BootstrapSource, RebootstrapEligibleRepoSample, RepoBootstrapCandidate, ShadowCadence, ShadowRepoIndex } from "./types.js";
 
 const BOOTSTRAP_SOURCE_PRIORITY: Record<BootstrapSource, number> = {
   official: 0,
@@ -10,9 +10,47 @@ const BOOTSTRAP_SOURCE_PRIORITY: Record<BootstrapSource, number> = {
   code: 4,
 };
 
+export function repairDeadPersistedRisingSkillLinks(
+  repoIndex: ShadowRepoIndex,
+  availableSkillIds: Set<string>,
+): {
+  repairedRepoSample: RebootstrapEligibleRepoSample[];
+  preservedFirstSeen: Map<string, string>;
+} {
+  const repaired: RebootstrapEligibleRepoSample[] = [];
+  const preservedFirstSeen = new Map<string, string>();
+
+  for (const repo of repoIndex.repos) {
+    if (repo.state !== "rising") continue;
+    if (repo.skillIds.length === 0) continue;
+    if (repo.skillIds.some((id) => availableSkillIds.has(id))) continue;
+    const preservedDate = repo.lastSeenAt.slice(0, 10);
+
+    repaired.push({
+      repo: repo.repo,
+      missingSkillIds: [...repo.skillIds],
+    });
+    for (const skillId of repo.skillIds) {
+      if (!preservedFirstSeen.has(skillId)) {
+        preservedFirstSeen.set(skillId, preservedDate);
+      }
+    }
+    repo.skillIds = [];
+    repo.skillCount = 0;
+    repo.topSkillId = null;
+    repo.topSkillStars = 0;
+  }
+
+  return {
+    repairedRepoSample: repaired,
+    preservedFirstSeen,
+  };
+}
+
 export function isBootstrapEligibleCandidate(candidate: RepoBootstrapCandidate): boolean {
   if (candidate.source === "registry" || candidate.source === "code") return true;
   if (candidate.source === "official") return candidate.skill_md_path !== "__RESOLVE__";
+  if (candidate.source === "skillssh" || candidate.source === "awesome") return candidate.skill_md_path !== "__RESOLVE__";
   return false;
 }
 
@@ -53,6 +91,7 @@ type BootstrapOptions = {
   repoAliasByCanonical: Map<string, string>;
   existingFirstSeen: Map<string, string>;
   existingSkills: Map<string, Skill>;
+  resolveCandidatePathFn: (candidate: RepoBootstrapCandidate) => Promise<string | null>;
   enrichCandidateFn: (
     candidate: Candidate,
     existingFirstSeen: Map<string, string>,
@@ -76,6 +115,7 @@ export async function bootstrapRisingRepos({
   repoAliasByCanonical,
   existingFirstSeen,
   existingSkills,
+  resolveCandidatePathFn,
   enrichCandidateFn,
 }: BootstrapOptions): Promise<BootstrapResult> {
   if (cadence !== "combined") {
@@ -101,18 +141,28 @@ export async function bootstrapRisingRepos({
     const aliasRepo = repoAliasByCanonical.get(repo.repo);
     const candidate = bootstrapCandidateByRepo.get(repo.repo) ?? (aliasRepo ? bootstrapCandidateByRepo.get(aliasRepo) : undefined);
     if (!candidate) continue;
-    if (!isBootstrapEligibleCandidate(candidate)) {
+    let resolvedCandidate = candidate;
+    if ((candidate.source === "skillssh" || candidate.source === "awesome") && candidate.skill_md_path === "__RESOLVE__") {
+      const resolvedPath = await resolveCandidatePathFn(candidate);
+      if (resolvedPath) {
+        resolvedCandidate = {
+          ...candidate,
+          skill_md_path: resolvedPath,
+        };
+      }
+    }
+    if (!isBootstrapEligibleCandidate(resolvedCandidate)) {
       bootstrapSkippedRepoSample.push({
         repo: repo.repo,
-        source: candidate.source,
-        candidateId: candidate.id,
+        source: resolvedCandidate.source,
+        candidateId: resolvedCandidate.id,
         outcome: "skipped",
         failureReason: "no-eligible-candidate",
       });
       continue;
     }
 
-    const result = await enrichCandidateFn(toEnrichCandidate(candidate), existingFirstSeen, existingSkills, today);
+    const result = await enrichCandidateFn(toEnrichCandidate(resolvedCandidate), existingFirstSeen, existingSkills, today);
     if (result.skill) {
       repo.skillIds = [result.skill.id];
       repo.skillCount = 1;
@@ -125,8 +175,8 @@ export async function bootstrapRisingRepos({
       bootstrappedSkills.push(result.skill);
       bootstrappedRepoSample.push({
         repo: repo.repo,
-        source: candidate.source,
-        candidateId: candidate.id,
+        source: resolvedCandidate.source,
+        candidateId: resolvedCandidate.id,
         outcome: "bootstrapped",
       });
       continue;
@@ -134,8 +184,8 @@ export async function bootstrapRisingRepos({
 
     bootstrapFailedRepoSample.push({
       repo: repo.repo,
-      source: candidate.source,
-      candidateId: candidate.id,
+      source: resolvedCandidate.source,
+      candidateId: resolvedCandidate.id,
       outcome: "failed",
       failureReason: result.failure?.reason ?? "enrich-failed",
     });

@@ -18,6 +18,7 @@ APPLICATIONS_ICON="$MENUBAR_DIR/Assets/Applications.ico"
 DMG_BACKGROUND_PNG="$MENUBAR_DIR/Assets/dmg-background.png"
 IDENTITY="${DEVELOPER_ID_APPLICATION:-}"
 VERSION="${1:-$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$INFO_PLIST")}"
+RC_MODE="${OMGSKILLS_RELEASE_RC:-0}"
 
 fail() {
     echo "✗ $*" >&2
@@ -88,6 +89,12 @@ package_dmg() {
     local output_dmg="$1"
     local rw_dmg="$MENUBAR_DIR/dist/omgskills-mac-rw.dmg"
     local mount_dir="$MENUBAR_DIR/dist/dmg-mount"
+    local mounted_device=""
+
+    if mount | grep -F "on $mount_dir " >/dev/null 2>&1; then
+        mounted_device="$(mount | awk -v target="$mount_dir" '$3 == "on" && $4 == target { print $1; exit }')"
+        hdiutil detach "$mount_dir" >/dev/null 2>&1 || hdiutil detach -force "$mount_dir" >/dev/null 2>&1 || true
+    fi
 
     rm -rf "$mount_dir" "$output_dmg" "$rw_dmg"
     mkdir -p "$mount_dir"
@@ -111,8 +118,12 @@ tell application "Finder"
     delay 1
     set dmgWindow to window of containerFolder
     set current view of dmgWindow to icon view
-    set toolbar visible of dmgWindow to false
-    set statusbar visible of dmgWindow to false
+    try
+        set toolbar visible of dmgWindow to false
+    end try
+    try
+        set statusbar visible of dmgWindow to false
+    end try
     set bounds of dmgWindow to {100, 100, 840, 520}
     set arrangement of icon view options of dmgWindow to not arranged
     set icon size of icon view options of dmgWindow to 128
@@ -121,12 +132,14 @@ tell application "Finder"
     set position of item "omgskills.app" of containerFolder to {615, 220}
     update containerFolder without registering applications
     delay 1
-    close dmgWindow
+    try
+        close dmgWindow
+    end try
 end tell
 APPLESCRIPT
     apply_custom_icon "$mount_dir/Applications" "$APPLICATIONS_ICON"
     sync
-    hdiutil detach "$mount_dir"
+    hdiutil detach "$mount_dir" || hdiutil detach -force "$mount_dir"
     hdiutil convert "$rw_dmg" -format UDZO -o "$output_dmg"
     rm -rf "$mount_dir" "$rw_dmg"
     require_file "$output_dmg" "DMG packaging failed."
@@ -148,7 +161,11 @@ verify_identity() {
 }
 
 preflight() {
-    echo "→ Running release preflight"
+    if [ "$RC_MODE" = "1" ]; then
+        echo "→ Running RC release preflight"
+    else
+        echo "→ Running release preflight"
+    fi
     require_tool codesign
     require_tool xcrun
     require_tool spctl
@@ -168,7 +185,9 @@ preflight() {
     require_file "$INFO_PLIST" "menubar/Info.plist must exist so the release version can be read."
     require_file "$APPLICATIONS_ICON" "Expected the DMG Applications icon asset to exist."
     require_file "$DMG_BACKGROUND_PNG" "Expected the DMG background asset to exist."
-    require_file "$SPARKLE_TOOLS/generate_appcast" "Build the app dependencies first so Sparkle tools are present."
+    if [ "$RC_MODE" != "1" ]; then
+        require_file "$SPARKLE_TOOLS/generate_appcast" "Build the app dependencies first so Sparkle tools are present."
+    fi
     if ! xcrun --find notarytool >/dev/null 2>&1; then
         fail "Apple notarytool is unavailable through xcrun."
     fi
@@ -248,41 +267,51 @@ DOWNLOAD_ZIP_CHECKSUM="$DOWNLOAD_ZIP.sha256"
 DOWNLOAD_DMG="omgskills-mac-$RELEASE_HASH.dmg"
 DOWNLOAD_DMG_CHECKSUM="$DOWNLOAD_DMG.sha256"
 
-echo "→ Updating site download and Sparkle appcast"
-mkdir -p "$SITE_DOWNLOADS" "$SITE_UPDATES"
-cp "$DMG" "$SITE_DOWNLOADS/omgskills-mac.dmg"
-cp "$DMG_CHECKSUM" "$SITE_DOWNLOADS/omgskills-mac.dmg.sha256"
-cp "$DMG" "$SITE_DOWNLOADS/$DOWNLOAD_DMG"
-cp "$DMG_CHECKSUM" "$SITE_DOWNLOADS/$DOWNLOAD_DMG_CHECKSUM"
-cp "$ZIP" "$SITE_DOWNLOADS/omgskills-mac.zip"
-cp "$ZIP_CHECKSUM" "$SITE_DOWNLOADS/omgskills-mac.zip.sha256"
-cp "$ZIP" "$SITE_DOWNLOADS/$DOWNLOAD_ZIP"
-cp "$ZIP_CHECKSUM" "$SITE_DOWNLOADS/$DOWNLOAD_ZIP_CHECKSUM"
-cp "$ZIP" "$SITE_UPDATES/omgskills-$VERSION.zip"
+if [ "$RC_MODE" != "1" ]; then
+    echo "→ Updating site download and Sparkle appcast"
+    mkdir -p "$SITE_DOWNLOADS" "$SITE_UPDATES"
+    cp "$DMG" "$SITE_DOWNLOADS/omgskills-mac.dmg"
+    cp "$DMG_CHECKSUM" "$SITE_DOWNLOADS/omgskills-mac.dmg.sha256"
+    cp "$DMG" "$SITE_DOWNLOADS/$DOWNLOAD_DMG"
+    cp "$DMG_CHECKSUM" "$SITE_DOWNLOADS/$DOWNLOAD_DMG_CHECKSUM"
+    cp "$ZIP" "$SITE_DOWNLOADS/omgskills-mac.zip"
+    cp "$ZIP_CHECKSUM" "$SITE_DOWNLOADS/omgskills-mac.zip.sha256"
+    cp "$ZIP" "$SITE_DOWNLOADS/$DOWNLOAD_ZIP"
+    cp "$ZIP_CHECKSUM" "$SITE_DOWNLOADS/$DOWNLOAD_ZIP_CHECKSUM"
+    cp "$ZIP" "$SITE_UPDATES/omgskills-$VERSION.zip"
 
-if grep -q '^/download ' "$REDIRECTS_FILE"; then
-    sed -i '' "s#^/download .*#/download /downloads/omgskills-mac.dmg 302#" "$REDIRECTS_FILE"
-else
-    printf '/download /downloads/omgskills-mac.dmg 302\n' >> "$REDIRECTS_FILE"
+    if grep -q '^/download ' "$REDIRECTS_FILE"; then
+        sed -i '' "s#^/download .*#/download /downloads/omgskills-mac.dmg 302#" "$REDIRECTS_FILE"
+    else
+        printf '/download /downloads/omgskills-mac.dmg 302\n' >> "$REDIRECTS_FILE"
+    fi
+    if grep -q '^/download/ ' "$REDIRECTS_FILE"; then
+        sed -i '' "s#^/download/ .*#/download/ /downloads/omgskills-mac.dmg 302#" "$REDIRECTS_FILE"
+    else
+        printf '/download/ /downloads/omgskills-mac.dmg 302\n' >> "$REDIRECTS_FILE"
+    fi
+
+    "$SPARKLE_TOOLS/generate_appcast" \
+        --download-url-prefix "https://omgskills.com/updates/" \
+        --link "https://omgskills.com" \
+        -o "$REPO_ROOT/site/appcast.xml" \
+        "$SITE_UPDATES"
 fi
-if grep -q '^/download/ ' "$REDIRECTS_FILE"; then
-    sed -i '' "s#^/download/ .*#/download/ /downloads/omgskills-mac.dmg 302#" "$REDIRECTS_FILE"
+
+if [ "$RC_MODE" = "1" ]; then
+    echo "✓ RC release ready"
 else
-    printf '/download/ /downloads/omgskills-mac.dmg 302\n' >> "$REDIRECTS_FILE"
+    echo "✓ Release ready"
 fi
-
-"$SPARKLE_TOOLS/generate_appcast" \
-    --download-url-prefix "https://omgskills.com/updates/" \
-    --link "https://omgskills.com" \
-    -o "$REPO_ROOT/site/appcast.xml" \
-    "$SITE_UPDATES"
-
-echo "✓ Release ready"
 echo "  Version: $VERSION"
 echo "  App: $APP"
 echo "  Zip: $ZIP"
 echo "  Zip checksum: $ZIP_CHECKSUM"
 echo "  DMG: $DMG"
 echo "  DMG checksum: $DMG_CHECKSUM"
-echo "  Download: $SITE_DOWNLOADS/$DOWNLOAD_DMG"
-echo "  Appcast: $REPO_ROOT/site/appcast.xml"
+if [ "$RC_MODE" != "1" ]; then
+    echo "  Download: $SITE_DOWNLOADS/$DOWNLOAD_DMG"
+    echo "  Appcast: $REPO_ROOT/site/appcast.xml"
+else
+    echo "  No site/appcast assets were updated."
+fi

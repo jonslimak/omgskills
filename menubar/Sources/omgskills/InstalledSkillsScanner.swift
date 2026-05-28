@@ -19,6 +19,8 @@ struct InstalledSkillSummary: Equatable, Sendable {
 }
 
 enum InstalledSkillsScanner {
+    private static let recentSkillLimit = 10
+
     struct ScanResult: Equatable, Sendable {
         let skills: [Skill]
         let installations: [Skill]
@@ -91,7 +93,7 @@ enum InstalledSkillsScanner {
             }
         }
 
-        summary.recentSkills = Array(recent.sorted { $0.installedAt > $1.installedAt }.prefix(6))
+        summary.recentSkills = Array(recent.sorted { $0.installedAt > $1.installedAt }.prefix(recentSkillLimit))
         return ScanResult(skills: skills, installations: installations, summary: summary)
     }
 

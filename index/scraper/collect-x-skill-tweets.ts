@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 import { octokit } from "./client.js";
 import { searchTopXSkillTweets, type XSkillTweetHit } from "./sources/x.js";
+import { repoKey, skillLookupKey, type XGitHubSkillRef } from "./x-skill-mapping.js";
 
 interface ValidSkillRepo {
   id: string;
@@ -63,8 +64,13 @@ async function fetchRaw(owner: string, repo: string, branch: string, path: strin
 }
 
 async function validateSkillRepo(id: string): Promise<ValidSkillRepo | null> {
+  const validSkills = await validateSkillRepoPaths(id);
+  return validSkills.length === 1 ? validSkills[0] : null;
+}
+
+async function validateSkillRepoPaths(id: string): Promise<ValidSkillRepo[]> {
   const [owner, repo] = id.split("/");
-  if (!owner || !repo) return null;
+  if (!owner || !repo) return [];
 
   try {
     const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
@@ -82,6 +88,7 @@ async function validateSkillRepo(id: string): Promise<ValidSkillRepo | null> {
       .filter((path) => path === "SKILL.md" || path.endsWith("/SKILL.md"))
       .sort((a, b) => a.length - b.length);
 
+    const validSkills: ValidSkillRepo[] = [];
     for (const path of skillPaths) {
       const content = await fetchRaw(owner, repo, branch, path);
       if (!content) continue;
@@ -89,20 +96,43 @@ async function validateSkillRepo(id: string): Promise<ValidSkillRepo | null> {
       const fm = parseFrontmatter(content);
       if (!fm?.name || !fm?.description) continue;
 
-      return {
+      validSkills.push({
         id,
         github_url: repoData.html_url,
         skill_md_path: path,
         name: fm.name,
         description: fm.description,
         stars: repoData.stargazers_count ?? 0,
-      };
+      });
     }
+    return validSkills;
+  } catch {
+    return [];
+  }
+  return [];
+}
+
+async function validateExactSkillRef(ref: XGitHubSkillRef): Promise<ValidSkillRepo | null> {
+  const [owner, repo] = ref.repoId.split("/");
+  if (!owner || !repo) return null;
+  try {
+    const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
+    const branch = repoData.default_branch;
+    const content = await fetchRaw(owner, repo, branch, ref.skillPath);
+    if (!content) return null;
+    const fm = parseFrontmatter(content);
+    if (!fm?.name || !fm?.description) return null;
+    return {
+      id: ref.repoId,
+      github_url: repoData.html_url,
+      skill_md_path: ref.skillPath,
+      name: fm.name,
+      description: fm.description,
+      stars: repoData.stargazers_count ?? 0,
+    };
   } catch {
     return null;
   }
-
-  return null;
 }
 
 async function main() {
@@ -128,24 +158,47 @@ async function main() {
     maxResults: Number.parseInt(process.env.X_MAX_RESULTS ?? "", 10) || Math.max(candidateLimit * 2, 300),
   });
 
-  const repoCache = new Map<string, ValidSkillRepo | null>();
-  const uniqueRepoIds = [...new Set(tweets.flatMap((tweet) => tweet.repo_ids))];
-  console.log(`found ${tweets.length} candidate tweets, validating ${uniqueRepoIds.length} repos`);
+  const exactRefCache = new Map<string, ValidSkillRepo | null>();
+  const repoFallbackCache = new Map<string, ValidSkillRepo | null>();
+  const uniqueExactRefs = [...new Map(
+    tweets
+      .flatMap((tweet) => tweet.skill_refs)
+      .map((ref) => [skillLookupKey(ref.githubUrl, ref.skillPath), ref] as const),
+  ).values()];
+  const uniqueFallbackRepoIds = [...new Set(
+    tweets
+      .filter((tweet) => tweet.skill_refs.length === 0)
+      .flatMap((tweet) => tweet.repo_ids.map((repoId) => repoKey(repoId))),
+  )];
+  console.log(`found ${tweets.length} candidate tweets, validating ${uniqueExactRefs.length} exact refs and ${uniqueFallbackRepoIds.length} fallback repos`);
 
-  for (let i = 0; i < uniqueRepoIds.length; i += VALIDATION_CONCURRENCY) {
-    const batch = uniqueRepoIds.slice(i, i + VALIDATION_CONCURRENCY);
+  for (let i = 0; i < uniqueExactRefs.length; i += VALIDATION_CONCURRENCY) {
+    const batch = uniqueExactRefs.slice(i, i + VALIDATION_CONCURRENCY);
+    const validated = await Promise.all(batch.map(async (ref) => [skillLookupKey(ref.githubUrl, ref.skillPath), await validateExactSkillRef(ref)] as const));
+    for (const [key, valid] of validated) {
+      exactRefCache.set(key, valid);
+    }
+    console.log(`validated exact refs ${Math.min(i + batch.length, uniqueExactRefs.length)}/${uniqueExactRefs.length}`);
+  }
+
+  for (let i = 0; i < uniqueFallbackRepoIds.length; i += VALIDATION_CONCURRENCY) {
+    const batch = uniqueFallbackRepoIds.slice(i, i + VALIDATION_CONCURRENCY);
     const validated = await Promise.all(batch.map(async (repoId) => [repoId, await validateSkillRepo(repoId)] as const));
     for (const [repoId, valid] of validated) {
-      repoCache.set(repoId, valid);
+      repoFallbackCache.set(repoId, valid);
     }
-    console.log(`validated ${Math.min(i + batch.length, uniqueRepoIds.length)}/${uniqueRepoIds.length} repos`);
+    console.log(`validated fallback repos ${Math.min(i + batch.length, uniqueFallbackRepoIds.length)}/${uniqueFallbackRepoIds.length}`);
   }
 
   const results: TopSkillTweet[] = [];
   for (const tweet of tweets) {
-    const validSkillRepos = tweet.repo_ids
-      .map((repoId) => repoCache.get(repoId))
-      .filter((repo): repo is ValidSkillRepo => Boolean(repo));
+    const validSkillRepos = tweet.skill_refs.length > 0
+      ? tweet.skill_refs
+        .map((ref) => exactRefCache.get(skillLookupKey(ref.githubUrl, ref.skillPath)) ?? null)
+        .filter((repo): repo is ValidSkillRepo => Boolean(repo))
+      : tweet.repo_ids
+        .map((repoId) => repoFallbackCache.get(repoKey(repoId)) ?? null)
+        .filter((repo): repo is ValidSkillRepo => Boolean(repo));
     if (validSkillRepos.length === 0) continue;
     results.push({ ...tweet, valid_skill_repos: validSkillRepos });
     if (results.length >= limit) break;

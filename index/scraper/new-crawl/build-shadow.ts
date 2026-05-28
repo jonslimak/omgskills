@@ -15,7 +15,9 @@ import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { resolveShadowProvenance } from "./provenance.js";
-import { bootstrapRisingRepos, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
+import { bootstrapRisingRepos, repairDeadPersistedRisingSkillLinks, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
+import { buildCutoverCompare, buildCutoverCompareSummary } from "./cutover-compare.js";
+import { validateCutoverOutputs } from "./cutover-validation.js";
 import {
   applyShadowRepoOverlay,
   buildShadowRepoOverlay,
@@ -32,6 +34,7 @@ import {
   NEXT_PROMOTION_SHORTLIST_LIMIT,
 } from "./daily-priority.js";
 import type {
+  CutoverValidationFailure,
   DailyPriorityRepoSample,
   DiscoveryBudgetSummary,
   DiscoveryLane,
@@ -48,6 +51,9 @@ import type {
   ShadowRepoIndex,
   ShadowRepoOverlay,
   ShadowAuthorDiffExample,
+  ShadowCutoverSkillSignal,
+  ShadowCutoverCompare,
+  RebootstrapEligibleRepoSample,
   ShadowRepoIndexEntry,
   ShadowSkillRecord,
   ShadowRunReport,
@@ -178,6 +184,65 @@ function buildSkillSignals(checkedAt: string): ShadowSkillSignals {
     generatedAt: checkedAt,
     signals: {},
   };
+}
+
+function buildCutoverShadowSkills(skills: ShadowSkillRecord[]): ShadowSkillRecord[] {
+  return skills;
+}
+
+export function buildCutoverSkillSignals(
+  skills: ShadowSkillRecord[],
+  repoIndex: ShadowRepoIndex,
+): ShadowCutoverSkillSignal[] {
+  const repoStateByRepo = new Map(repoIndex.repos.map((repo) => [repo.repo, repo.state] as const));
+
+  return skills.map((skill) => {
+    const repo = repoKeyFor(skill)?.repo;
+    const state = repo ? repoStateByRepo.get(repo) : undefined;
+    return {
+      id: skill.id,
+      ...(state === "rising" ? { isRising: true } : {}),
+      ...(state === "core" ? { isCore: true } : {}),
+    };
+  });
+}
+
+export function reconcileRepoIndexSkillIds(
+  repoIndex: ShadowRepoIndex,
+  skills: ShadowSkillRecord[],
+) {
+  const skillsByRepo = new Map<string, ShadowSkillRecord[]>();
+
+  for (const skill of skills) {
+    const repo = repoKeyFor(skill)?.repo;
+    if (!repo) continue;
+    const existing = skillsByRepo.get(repo);
+    if (existing) {
+      existing.push(skill);
+    } else {
+      skillsByRepo.set(repo, [skill]);
+    }
+  }
+
+  for (const repo of repoIndex.repos) {
+    const repoSkills = (skillsByRepo.get(repo.repo) ?? []).slice().sort(
+      (a, b) => b.stars - a.stars || a.id.localeCompare(b.id),
+    );
+    repo.skillIds = sortUnique(repoSkills.map((skill) => skill.id));
+    repo.skillCount = repo.skillIds.length;
+
+    if (repoSkills.length === 0) {
+      repo.topSkillId = null;
+      repo.topSkillStars = 0;
+      continue;
+    }
+
+    const topSkill = repoSkills[0]!;
+    repo.topSkillId = topSkill.id;
+    repo.topSkillStars = topSkill.stars;
+    repo.stars = Math.max(repo.stars, topSkill.stars);
+    repo.repoUrl = repoKeyFor(topSkill)?.repoUrl ?? repo.repoUrl;
+  }
 }
 
 function toShadowSkillRecord(skill: Skill): ShadowSkillRecord {
@@ -663,6 +728,7 @@ type ShadowRefreshResult = {
   bootstrappedRepoSample: BootstrapRepoSample[];
   bootstrapFailedRepoSample: BootstrapRepoSample[];
   bootstrapSkippedRepoSample: BootstrapRepoSample[];
+  rebootstrapEligibleRepoSample: RebootstrapEligibleRepoSample[];
   enrichmentWarnings: string[];
 };
 
@@ -705,6 +771,19 @@ async function runShadowRefresh(
   let libraryReposChecked = 0;
   let skillsDeepRefreshed = 0;
   let correctedCount = 0;
+  const availableSkillIds = new Set([
+    ...baselineSkills.map((skill) => skill.id),
+    ...shadowSkills.map((skill) => skill.id),
+  ]);
+  const {
+    repairedRepoSample: rebootstrapEligibleRepoSample,
+    preservedFirstSeen,
+  } = repairDeadPersistedRisingSkillLinks(repoIndex, availableSkillIds);
+  for (const [skillId, firstSeen] of preservedFirstSeen) {
+    if (!existingFirstSeen.has(skillId)) {
+      existingFirstSeen.set(skillId, firstSeen);
+    }
+  }
   const bootstrapCandidateByRepo = new Map(
     [...discovered.values()]
       .filter((repo) => repo.bootstrapCandidate)
@@ -865,6 +944,7 @@ async function runShadowRefresh(
     bootstrappedRepoSample: bootstrapResult.bootstrappedRepoSample,
     bootstrapFailedRepoSample: bootstrapResult.bootstrapFailedRepoSample,
     bootstrapSkippedRepoSample: bootstrapResult.bootstrapSkippedRepoSample,
+    rebootstrapEligibleRepoSample,
     enrichmentWarnings,
   };
 }
@@ -1147,9 +1227,13 @@ async function main() {
   const goldBasketPath = join(indexRoot, "gold-basket.json");
   const skillsOutPath = join(shadowRoot, "skills.shadow.json");
   const inspectableSkillsOutPath = join(shadowRoot, "skills.inspectable.shadow.json");
+  const cutoverSkillsOutPath = join(shadowRoot, "skills.cutover.shadow.json");
   const repoIndexOutPath = join(shadowRoot, "repo-index.shadow.json");
   const repoOverlayOutPath = join(shadowRoot, "repo-index.overlay.json");
   const skillSignalsOutPath = join(shadowRoot, "skill-signals.shadow.json");
+  const cutoverSkillSignalsOutPath = join(shadowRoot, "skill-signals.cutover.shadow.json");
+  const cutoverCompareOutPath = join(shadowRoot, "cutover-compare.shadow.json");
+  const cutoverCompareSummaryOutPath = join(shadowRoot, "cutover-compare.shadow.md");
   const reportOutPath = join(shadowRoot, "shadow-report.json");
   const summaryOutPath = join(shadowRoot, "shadow-summary.md");
 
@@ -1229,7 +1313,9 @@ async function main() {
   const refreshResult = await runShadowRefresh(cadence, baselineSkills, shadowSkills, repoIndex, discovered, checkedAt, repoAliasByCanonical);
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
+  reconcileRepoIndexSkillIds(repoIndex, shadowSkills);
   const inspectableShadowSkills = buildInspectableShadowSkills(shadowSkills);
+  const cutoverShadowSkills = buildCutoverShadowSkills(shadowSkills);
 
   const shadowRepoOverlay: ShadowRepoOverlay | null = shouldWriteShadowRepoOverlay(cadence)
     ? buildShadowRepoOverlay(repoIndex, baselineRepoIndexForOverlay, checkedAt)
@@ -1238,7 +1324,20 @@ async function main() {
 
   const skillSignalsStart = performance.now();
   const skillSignals = buildSkillSignals(checkedAt);
+  const cutoverSkillSignals = buildCutoverSkillSignals(cutoverShadowSkills, repoIndex);
   timings.buildSkillSignals = Math.round(performance.now() - skillSignalsStart);
+  const cutoverValidationFailures = validateCutoverOutputs(cutoverShadowSkills, cutoverSkillSignals, repoIndex);
+  const cutoverValidationFailuresSample: CutoverValidationFailure[] = cutoverValidationFailures.slice(0, 20);
+  const cutoverCompare: ShadowCutoverCompare = buildCutoverCompare(
+    checkedAt,
+    baselineSkills,
+    cutoverShadowSkills,
+    cutoverSkillSignals,
+    {
+      cutoverValidationPassed: cutoverValidationFailures.length === 0,
+      cutoverValidationFailureCount: cutoverValidationFailures.length,
+    },
+  );
 
   const baselineRepos = new Set(repoIndex.repos.map((repo) => repo.repo));
   const discoveredRepoCountByLane = countDiscoveredByLane(discovered);
@@ -1336,9 +1435,14 @@ async function main() {
     bootstrapFailedRepoSample: refreshResult.bootstrapFailedRepoSample.slice(0, 10),
     bootstrapSkippedRepoCount: refreshResult.bootstrapSkippedRepoSample.length,
     bootstrapSkippedRepoSample: refreshResult.bootstrapSkippedRepoSample.slice(0, 10),
+    rebootstrapEligibleRepoCount: refreshResult.rebootstrapEligibleRepoSample.length,
+    rebootstrapEligibleRepoSample: refreshResult.rebootstrapEligibleRepoSample.slice(0, 10),
     shadowRepoOverlayLoaded,
     shadowRepoOverlayEntryCount,
     shadowRepoOverlayWrittenCount,
+    cutoverValidationPassed: cutoverValidationFailures.length === 0,
+    cutoverValidationFailureCount: cutoverValidationFailures.length,
+    cutoverValidationFailuresSample,
     productionWriteGuardPassed: true,
   };
 
@@ -1347,11 +1451,15 @@ async function main() {
   const writeStart = performance.now();
   writeShadowFile(skillsOutPath, JSON.stringify(shadowSkills, null, 2) + "\n");
   writeShadowFile(inspectableSkillsOutPath, JSON.stringify(inspectableShadowSkills, null, 2) + "\n");
+  writeShadowFile(cutoverSkillsOutPath, JSON.stringify(cutoverShadowSkills, null, 2) + "\n");
   writeShadowFile(repoIndexOutPath, JSON.stringify(repoIndex, null, 2) + "\n");
   if (shadowRepoOverlay) {
     writeShadowFile(repoOverlayOutPath, JSON.stringify(shadowRepoOverlay, null, 2) + "\n");
   }
   writeShadowFile(skillSignalsOutPath, JSON.stringify(skillSignals, null, 2) + "\n");
+  writeShadowFile(cutoverSkillSignalsOutPath, JSON.stringify(cutoverSkillSignals, null, 2) + "\n");
+  writeShadowFile(cutoverCompareOutPath, JSON.stringify(cutoverCompare, null, 2) + "\n");
+  writeShadowFile(cutoverCompareSummaryOutPath, buildCutoverCompareSummary(cutoverCompare));
   writeShadowFile(reportOutPath, JSON.stringify(initialReport, null, 2) + "\n");
   writeShadowFile(summaryOutPath, buildSummary(initialReport, repoIndex));
   timings.writeOutputs = Math.round(performance.now() - writeStart);

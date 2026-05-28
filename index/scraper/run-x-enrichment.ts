@@ -2,6 +2,9 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { config } from "dotenv";
+
+config();
 
 const here = dirname(fileURLToPath(import.meta.url));
 const tweetsPath = join(here, "..", "top-x-skill-tweets.json");

@@ -458,35 +458,6 @@ struct ContentView: View {
 
                 Spacer()
 
-                Menu {
-                    ForEach(LibraryMode.allCases) { mode in
-                        Button {
-                            store.libraryMode = mode
-                        } label: {
-                            if store.libraryMode == mode {
-                                Label(mode.label, systemImage: "checkmark")
-                            } else {
-                                Text(mode.label)
-                            }
-                        }
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text("Library")
-                        Text(store.libraryMode.shortLabel)
-                            .foregroundStyle(.secondary)
-                    }
-                    .font(.system(size: 9))
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 4)
-                    .background(Color.primary.opacity(0.1))
-                    .cornerRadius(6)
-                }
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .controlSize(.small)
-                .help("Library: \(store.libraryMode.label). Discover uses this source only.")
-
                 if updateAvailable {
                     Button {
                         NotificationCenter.default.post(name: .checkForUpdates, object: nil)

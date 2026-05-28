@@ -6,7 +6,8 @@ import {
   shouldReadShadowRepoOverlay,
   shouldWriteShadowRepoOverlay,
 } from "./repo-overlay.js";
-import type { ShadowRepoIndex, ShadowRepoIndexEntry, ShadowRepoOverlay } from "./types.js";
+import type { ShadowCutoverSkillSignal, ShadowRepoIndex, ShadowRepoIndexEntry, ShadowRepoOverlay, ShadowSkillRecord } from "./types.js";
+import { buildCutoverSkillSignals, reconcileRepoIndexSkillIds } from "./build-shadow.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
   const { repo: repoName, stars, ...rest } = overrides;
@@ -203,4 +204,98 @@ test("overlay write count matches persisted repo entries", () => {
 
   assert.equal(result.repoCount, 2);
   assert.deepEqual(result.repos.map((row) => row.repo), ["changed/repo", "new/repo"]);
+});
+
+test("reconciliation rewrites stale overlay skill ids to current shadow skill ids", () => {
+  const index = repoIndex([
+    repo({
+      repo: "orcaqubits/agentic-commerce-skills-plugins",
+      stars: 31,
+      skillIds: [
+        "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-checkout-mcp",
+        "OrcaQubits/agentic-commerce-skills-plugins:acp-checkout-mcp",
+        "OrcaQubits/agentic-commerce-skills-plugins:medusa-payments",
+      ],
+      skillCount: 3,
+      topSkillId: "OrcaQubits/agentic-commerce-skills-plugins:medusa-payments",
+      topSkillStars: 31,
+    }),
+  ]);
+
+  const shadowSkills: ShadowSkillRecord[] = [
+    {
+      id: "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-checkout-mcp",
+      name: "acp-checkout-mcp",
+      description: "Desc",
+      github_url: "https://github.com/OrcaQubits/agentic-commerce-skills-plugins",
+      skill_md_path: "acp-agentic-commerce/skills/acp-checkout-mcp/SKILL.md",
+      install_cmd: "install",
+      author_handle: "orcaqubits",
+      tags: [],
+      stars: 23,
+      last_updated: "2026-05-01T00:00:00Z",
+      first_seen: "2026-05-01",
+      skill_md_sha: "sha-a",
+      publisher_handle: "orcaqubits",
+      publisher_repo: "orcaqubits/agentic-commerce-skills-plugins",
+      upstream_repo: "orcaqubits/agentic-commerce-claude-plugins",
+      provenance_type: "repackaged",
+      author_confidence: "high",
+    },
+    {
+      id: "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-setup",
+      name: "acp-setup",
+      description: "Desc",
+      github_url: "https://github.com/OrcaQubits/agentic-commerce-skills-plugins",
+      skill_md_path: "acp-agentic-commerce/skills/acp-setup/SKILL.md",
+      install_cmd: "install",
+      author_handle: "orcaqubits",
+      tags: [],
+      stars: 23,
+      last_updated: "2026-05-01T00:00:00Z",
+      first_seen: "2026-05-01",
+      skill_md_sha: "sha-b",
+      publisher_handle: "orcaqubits",
+      publisher_repo: "orcaqubits/agentic-commerce-skills-plugins",
+      upstream_repo: "orcaqubits/agentic-commerce-claude-plugins",
+      provenance_type: "repackaged",
+      author_confidence: "high",
+    },
+  ];
+
+  reconcileRepoIndexSkillIds(index, shadowSkills);
+
+  assert.deepEqual(index.repos[0]?.skillIds, [
+    "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-checkout-mcp",
+    "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-setup",
+  ]);
+  assert.equal(index.repos[0]?.skillCount, 2);
+  assert.equal(index.repos[0]?.topSkillId, "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-checkout-mcp");
+  assert.equal(index.repos[0]?.topSkillStars, 23);
+
+  const signals: ShadowCutoverSkillSignal[] = buildCutoverSkillSignals(shadowSkills, index);
+  assert.deepEqual(signals.map((row) => row.id), [
+    "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-checkout-mcp",
+    "OrcaQubits/agentic-commerce-claude-plugins:acp-agentic-commerce/skills/acp-setup",
+  ]);
+});
+
+test("reconciliation clears repo skill ids when no current shadow skills remain", () => {
+  const index = repoIndex([
+    repo({
+      repo: "owner/repo",
+      stars: 10,
+      skillIds: ["owner/repo:stale"],
+      skillCount: 1,
+      topSkillId: "owner/repo:stale",
+      topSkillStars: 10,
+    }),
+  ]);
+
+  reconcileRepoIndexSkillIds(index, []);
+
+  assert.deepEqual(index.repos[0]?.skillIds, []);
+  assert.equal(index.repos[0]?.skillCount, 0);
+  assert.equal(index.repos[0]?.topSkillId, null);
+  assert.equal(index.repos[0]?.topSkillStars, 0);
 });

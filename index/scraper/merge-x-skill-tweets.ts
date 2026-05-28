@@ -2,15 +2,7 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Skill } from "./types.js";
-
-interface ValidSkillRepo {
-  id: string;
-  github_url: string;
-  skill_md_path: string;
-  name: string;
-  description: string;
-  stars: number;
-}
+import { buildSkillLookup, matchValidatedRepoToSkill, type ValidSkillRepo } from "./x-skill-mapping.js";
 
 interface TopSkillTweet {
   tweet_id: string;
@@ -125,14 +117,7 @@ function main() {
   const skills = readJson<Skill[]>(skillsPath);
   const tweets = readJson<TopSkillTweet[]>(tweetsPath).slice(0, parseLimit());
   const baseSkills = skills.filter((skill) => skill.source_tag !== X_SOURCE_TAG);
-  const byGithub = new Map<string, Skill[]>();
-
-  for (const skill of baseSkills) {
-    const key = normalizeGitHubUrl(skill.github_url);
-    const bucket = byGithub.get(key) ?? [];
-    bucket.push(skill);
-    byGithub.set(key, bucket);
-  }
+  const skillLookup = buildSkillLookup(baseSkills);
 
   const twitterRows: Skill[] = [];
   let synthesized = 0;
@@ -143,8 +128,7 @@ function main() {
 
     let base: Skill | null = null;
     for (const repo of repos) {
-      const matches = byGithub.get(normalizeGitHubUrl(repo.github_url)) ?? [];
-      base = matches.find((skill) => skill.name === repo.name) ?? matches[0] ?? null;
+      base = matchValidatedRepoToSkill(repo, skillLookup);
       if (base) break;
     }
 

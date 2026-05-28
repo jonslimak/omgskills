@@ -30,6 +30,12 @@
     "notes": "Collection repo bundling other sources including antigravity-derived skills."
   },
   {
+    "repo": "aiskillstore/marketplace",
+    "publisherHandle": "aiskillstore",
+    "defaultProvenanceType": "repackaged",
+    "notes": "Marketplace collection repo. Publisher should remain separate from original skill authors unless trusted upstream authorship can be recovered."
+  },
+  {
     "repo": "orcaqubits/agentic-commerce-skills-plugins",
     "publisherHandle": "orcaqubits",
     "defaultProvenanceType": "repackaged",

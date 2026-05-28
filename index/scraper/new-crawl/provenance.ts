@@ -32,6 +32,10 @@ function ownerHandle(repo: string): string {
   return repo.split("/")[0] ?? "";
 }
 
+function isTrustedAuthorHint(handle: string, seeds: TrustedSeeds): boolean {
+  return seeds.trustedCreatorHandles.has(handle) || seeds.trustedVendorHandles.has(handle);
+}
+
 function parseOpenclawSkillAuthor(skill: Skill): ShadowSkillProvenance | null {
   const publisherRepo = repoKeyForSkill(skill);
   if (publisherRepo !== "openclaw/skills") return null;
@@ -49,6 +53,24 @@ function parseOpenclawSkillAuthor(skill: Skill): ShadowSkillProvenance | null {
     upstreamRepo: null,
     provenanceType: "repackaged",
     authorConfidence: "high",
+  };
+}
+
+function parseAiskillstoreMarketplaceAuthor(skill: Skill, seeds: TrustedSeeds): ShadowSkillProvenance | null {
+  const publisherRepo = repoKeyForSkill(skill);
+  if (publisherRepo !== "aiskillstore/marketplace") return null;
+
+  const match = skill.id.match(/^[^:]+:skills\/([^/]+)\//i);
+  const hintedAuthor = normalizeRepo(match?.[1] ?? "");
+  const trustedHint = hintedAuthor && isTrustedAuthorHint(hintedAuthor, seeds) ? hintedAuthor : "";
+
+  return {
+    authorHandle: trustedHint,
+    publisherHandle: "aiskillstore",
+    publisherRepo: "aiskillstore/marketplace",
+    upstreamRepo: null,
+    provenanceType: "repackaged",
+    authorConfidence: trustedHint ? "high" : "low",
   };
 }
 
@@ -108,6 +130,7 @@ export function resolveShadowProvenance(skill: Skill, seeds: TrustedSeeds): Shad
   const catalogRule = catalogRuleForRepo(publisherRepo, seeds.catalogRepoRules);
   const { repoOverride, idOverride } = overrideForSkill(skill, seeds.provenanceOverrides);
   const parsedOpenclaw = parseOpenclawSkillAuthor(skill);
+  const parsedAiskillstore = parseAiskillstoreMarketplaceAuthor(skill, seeds);
   const parsedNeverSight = parseNeverSightSkillAuthor(skill);
 
   let result: ShadowSkillProvenance;
@@ -126,6 +149,8 @@ export function resolveShadowProvenance(skill: Skill, seeds: TrustedSeeds): Shad
     );
   } else if (parsedNeverSight) {
     result = parsedNeverSight;
+  } else if (parsedAiskillstore) {
+    result = parsedAiskillstore;
   } else if (parsedOpenclaw) {
     result = parsedOpenclaw;
   } else if (repoOverride) {

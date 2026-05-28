@@ -2,8 +2,6 @@ import Foundation
 
 @MainActor
 final class SkillsStore: ObservableObject {
-    static let libraryModeDefaultsKey = "libraryMode"
-
     @Published private(set) var availableSkills: [Skill] = []
     @Published private(set) var trendingSkills: [Skill] = []
     @Published private(set) var twitterSkills: [Skill] = []
@@ -17,13 +15,6 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var trendingSearchIndex: SkillSearchIndex?
     @Published private(set) var twitterSearchIndex: SkillSearchIndex?
     @Published private(set) var searchIndexVersion = 0
-    @Published var libraryMode: LibraryMode {
-        didSet {
-            guard libraryMode != oldValue else { return }
-            UserDefaults.standard.set(libraryMode.rawValue, forKey: Self.libraryModeDefaultsKey)
-            load()
-        }
-    }
     private var trendingEntries: [TrendingEntry] = []
     private var trendingBaseSkills: [Skill] = []
     private var loadGeneration = 0
@@ -32,7 +23,6 @@ final class SkillsStore: ObservableObject {
     private var twitterIndexTask: Task<Void, Never>?
 
     init() {
-        libraryMode = Self.savedLibraryMode()
         load()
     }
 
@@ -81,12 +71,12 @@ final class SkillsStore: ObservableObject {
         trendingIndexTask?.cancel()
         twitterIndexTask?.cancel()
 
-        async let availableResult = decodeAvailableSkills(mode: libraryMode)
+        async let availableResult = decodeAvailableSkills()
         async let trendingResult = decodeTrendingEntries()
         async let twitterResult = decodeTwitterSkills()
 
         let available = await availableResult
-        let trendingBase = libraryMode == .production ? available : await decodeAvailableSkills(mode: .production)
+        let trendingBase = available
         let trending = await trendingResult
         let twitter = await twitterResult
         guard generation == loadGeneration else { return }
@@ -133,21 +123,8 @@ final class SkillsStore: ObservableObject {
         }
     }
 
-    private nonisolated func decodeAvailableSkills(mode: LibraryMode) async -> LoadResult<[Skill]> {
-        switch mode {
-        case .production:
-            return await decodeProductionAvailableSkills()
-        case .shadow:
-            guard let url = AppResource.shadowSkillsURL() else {
-                return .failure("\(AppResource.inspectableShadowSkillsFilename) not found. Run the shadow crawl first.")
-            }
-            do {
-                let data = try Data(contentsOf: url)
-                return await decode(data, as: [Skill].self, label: AppResource.inspectableShadowSkillsFilename)
-            } catch {
-                return .failure("Failed to load \(AppResource.inspectableShadowSkillsFilename): \(error)")
-            }
-        }
+    private nonisolated func decodeAvailableSkills() async -> LoadResult<[Skill]> {
+        await decodeProductionAvailableSkills()
     }
 
     private nonisolated func decodeProductionAvailableSkills() async -> LoadResult<[Skill]> {
@@ -295,13 +272,5 @@ final class SkillsStore: ObservableObject {
         case .twitter:
             twitterIndexTask = task
         }
-    }
-
-    private static func savedLibraryMode(defaults: UserDefaults = .standard) -> LibraryMode {
-        guard let rawValue = defaults.string(forKey: libraryModeDefaultsKey),
-              let mode = LibraryMode(rawValue: rawValue) else {
-            return .production
-        }
-        return mode
     }
 }

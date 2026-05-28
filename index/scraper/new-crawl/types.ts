@@ -94,6 +94,24 @@ export type ShadowSkillSignals = {
   signals: Record<string, never>;
 };
 
+export type ShadowCutoverSkillSignal = {
+  id: string;
+  isRising?: boolean;
+  isCore?: boolean;
+};
+
+export type CutoverValidationFailureKind =
+  | "repoSkillIdMissing"
+  | "duplicateCutoverSkillId"
+  | "cutoverSignalMissingSkill";
+
+export type CutoverValidationFailure = {
+  kind: CutoverValidationFailureKind;
+  repo?: string;
+  id?: string;
+  details?: string;
+};
+
 export type ShadowEnrichmentCounts = {
   libraryReposChecked: number;
   dailyPriorityRepoCount: number;
@@ -151,6 +169,11 @@ export type BootstrapRepoSample = {
   failureReason?: string;
 };
 
+export type RebootstrapEligibleRepoSample = {
+  repo: string;
+  missingSkillIds: string[];
+};
+
 export type ShadowStaleInvalidCandidate = {
   id: string;
   repo: string;
@@ -198,6 +221,40 @@ export type ShadowAuthorDiffExample = {
   upstreamRepo: string | null;
   provenanceType: ProvenanceType;
   authorConfidence: AuthorConfidence;
+};
+
+export type ShadowCutoverAuthorDiffSample = {
+  id: string;
+  baselineAuthorHandle: string;
+  cutoverAuthorHandle: string;
+};
+
+export type ShadowCutoverCompare = {
+  checkedAt: string;
+  counts: {
+    baselineSkillCount: number;
+    cutoverSkillCount: number;
+    countDelta: number;
+    addedSkillCount: number;
+    missingSkillCount: number;
+  };
+  addedSkillIdsSample: string[];
+  missingSkillIdsSample: string[];
+  authorDiffSample: ShadowCutoverAuthorDiffSample[];
+  unresolvedAttributionSummary: {
+    baselineUnknownAuthorSkillCount: number;
+    cutoverUnknownAuthorSkillCount: number;
+    cutoverUnresolvedCatalogSkillCount: number;
+  };
+  signalSummary: {
+    cutoverSignalCount: number;
+    cutoverRisingSignalCount: number;
+    cutoverCoreSignalCount: number;
+  };
+  validationSummary: {
+    cutoverValidationPassed: boolean;
+    cutoverValidationFailureCount: number;
+  };
 };
 
 export type ShadowRunReport = {
@@ -258,6 +315,8 @@ export type ShadowRunReport = {
   bootstrapFailedRepoSample: BootstrapRepoSample[];
   bootstrapSkippedRepoCount: number;
   bootstrapSkippedRepoSample: BootstrapRepoSample[];
+  rebootstrapEligibleRepoCount: number;
+  rebootstrapEligibleRepoSample: RebootstrapEligibleRepoSample[];
   shadowRepoOverlayLoaded: boolean;
   shadowRepoOverlayEntryCount: number;
   shadowRepoOverlayWrittenCount: number;
@@ -274,6 +333,9 @@ export type ShadowRunReport = {
   bootstrapValueReposSample: string[];
   fastOnlyRepoCount: number;
   fastOnlyReposSample: string[];
+  cutoverValidationPassed: boolean;
+  cutoverValidationFailureCount: number;
+  cutoverValidationFailuresSample: CutoverValidationFailure[];
   stageTimings: StageTimings;
   productionWriteGuardPassed: true;
 };

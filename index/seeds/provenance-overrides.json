@@ -22,5 +22,13 @@
     "provenanceType": "repackaged",
     "authorConfidence": "low",
     "notes": "Bundled collection with mixed upstream sources. Avoid false repo-owner authorship until targeted overrides are added."
+  },
+  {
+    "repo": "aiskillstore/marketplace",
+    "authorHandle": "",
+    "publisherHandle": "aiskillstore",
+    "provenanceType": "repackaged",
+    "authorConfidence": "low",
+    "notes": "Marketplace bundle repo. Do not treat the repo owner as the original skill author."
   }
 ]
