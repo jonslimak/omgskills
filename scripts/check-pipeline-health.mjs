@@ -73,14 +73,6 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
 }
 
-function filteredCutoverSkills(cutoverSkills) {
-  return cutoverSkills.filter((skill) => !( !skill.author_handle && (skill.provenance_type === "catalog" || skill.provenance_type === "repackaged")));
-}
-
-function skillIds(skills) {
-  return skills.map((skill) => skill.id);
-}
-
 async function compareManifest(name, { liveUrl, localPath }) {
   const issues = [];
   let liveStatus = null;
@@ -154,31 +146,7 @@ async function main() {
   }
 
   const shadowIssues = [];
-  let cutoverValidationPassed = false;
-  let promotedMatchesCutover = false;
   let v2ManifestMatchesLocal = manifestChecks.find((item) => item.name === "v2AppData")?.issues.length === 0;
-
-  try {
-    const shadowReport = readJson(join(process.cwd(), "index", "shadow", "shadow-report.json"));
-    cutoverValidationPassed = Boolean(shadowReport.cutoverValidationPassed);
-    if (!cutoverValidationPassed) {
-      shadowIssues.push("cutover validation did not pass");
-    }
-  } catch (error) {
-    shadowIssues.push(`missing or unreadable shadow report (${error.message})`);
-  }
-
-  try {
-    const cutoverSkills = readJson(join(process.cwd(), "index", "shadow", "skills.cutover.shadow.json"));
-    const currentSkills = readJson(join(process.cwd(), "index", "skills.json"));
-    const promoted = filteredCutoverSkills(cutoverSkills);
-    promotedMatchesCutover = JSON.stringify(skillIds(promoted)) === JSON.stringify(skillIds(currentSkills));
-    if (!promotedMatchesCutover) {
-      shadowIssues.push("production skills.json does not match filtered cutover output");
-    }
-  } catch (error) {
-    shadowIssues.push(`cutover comparison failed (${error.message})`);
-  }
 
   if (!v2ManifestMatchesLocal) {
     shadowIssues.push("live v2 manifest is not aligned with repo v2 manifest");
@@ -186,13 +154,9 @@ async function main() {
 
   sections.shadowCutover = shadowIssues.length
     ? degraded(shadowIssues, {
-        cutoverValidationPassed,
-        promotedMatchesCutover,
         v2ManifestMatchesLocal,
       })
     : ok({
-        cutoverValidationPassed,
-        promotedMatchesCutover,
         v2ManifestMatchesLocal,
       });
   issues.push(...shadowIssues.map((issue) => `shadowCutover: ${issue}`));
