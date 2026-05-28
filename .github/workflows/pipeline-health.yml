@@ -55,19 +55,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "last_scrape_success_at=$(gh run list --repo "${{ github.repository }}" --workflow scrape.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == "success") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
-          echo "last_x_refresh_success_at=$(gh run list --repo "${{ github.repository }}" --workflow x-refresh.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == "success") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
-          echo "last_content_report_success_at=$(gh run list --repo "${{ github.repository }}" --workflow content-reports.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == "success") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
+          echo "last_shadow_crawler_success_at=$(gh run list --repo "${{ github.repository }}" --workflow shadow-crawl-health.yml --limit 20 --json conclusion,updatedAt --jq '.[] | select(.conclusion == "success") | .updatedAt' | head -n1)" >> "$GITHUB_OUTPUT"
 
       - name: Update health snapshot
         env:
           HEALTH_PIPELINE_STATUS: ${{ steps.healthcheck.outputs.health_status || 'degraded' }}
           HEALTH_PIPELINE_MESSAGE: ${{ steps.healthcheck.outputs.health_message || 'Pipeline health check failed' }}
+          HEALTH_PIPELINE_JSON: ${{ steps.healthcheck.outputs.pipeline_health_json }}
           HEALTH_PRODUCT_JSON: ${{ steps.productcheck.outputs.product_health_json }}
           HEALTH_MARKETING_FUNNEL_JSON: ${{ steps.funnelcheck.outputs.marketing_funnel_json }}
-          HEALTH_LAST_SCRAPE_SUCCESS_AT: ${{ steps.runmeta.outputs.last_scrape_success_at }}
-          HEALTH_LAST_X_REFRESH_SUCCESS_AT: ${{ steps.runmeta.outputs.last_x_refresh_success_at }}
-          HEALTH_LAST_CONTENT_REPORT_SUCCESS_AT: ${{ steps.runmeta.outputs.last_content_report_success_at }}
+          HEALTH_LAST_SHADOW_CRAWLER_SUCCESS_AT: ${{ steps.runmeta.outputs.last_shadow_crawler_success_at }}
           HEALTH_WORKFLOW: pipeline-health
           HEALTH_RUN_ID: ${{ github.run_id }}
           HEALTH_GIT_SHA: ${{ github.sha }}

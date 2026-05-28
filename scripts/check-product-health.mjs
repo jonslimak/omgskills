@@ -6,6 +6,7 @@ const origin = (process.env.PRODUCT_HEALTH_ORIGIN ?? "https://omgskills.com").re
 const minDownloadBytes = Number(process.env.MIN_DOWNLOAD_BYTES ?? 1_000_000);
 const minSkillsCount = Number(process.env.MIN_SKILLS_COUNT ?? 40_000);
 const minTrendingCount = Number(process.env.MIN_TRENDING_COUNT ?? 100);
+const minXTrendingCount = Number(process.env.MIN_X_TRENDING_COUNT ?? 1);
 const searchQueries = (process.env.SEARCH_SMOKE_QUERIES ?? "swift,figma,mcp")
   .split(",")
   .map((query) => query.trim())
@@ -144,108 +145,134 @@ function searchSkills(skills, query) {
     .slice(0, 5);
 }
 
-async function checkDownload() {
+async function checkRelease() {
   const redirect = await fetchWithTimeout(absolute("/download"), { redirect: "manual" });
   const location = redirect.headers.get("location") ?? "";
   const redirectOk = [301, 302, 307, 308].includes(redirect.status) &&
     location.includes("/downloads/omgskills-mac.dmg");
 
-  const { response: dmg, bytes } = await assetSize(absolute("/downloads/omgskills-mac.dmg"));
+  const { response: dmg, bytes: dmgBytes } = await assetSize(absolute("/downloads/omgskills-mac.dmg"));
   const cacheControl = dmg.headers.get("cache-control") ?? "";
+  const appcastResponse = await fetchWithTimeout(absolute("/appcast.xml"));
   const issues = [];
+  const details = {
+    redirectStatus: redirect.status,
+    redirectLocation: location,
+    dmgStatus: dmg.status,
+    dmgBytes,
+    cacheControl,
+    appcastStatus: appcastResponse.status,
+    latestVersion: null,
+    latestZipUrl: null,
+    latestZipStatus: null,
+    latestZipBytes: null,
+  };
 
   if (!redirectOk) issues.push(`/download returned ${redirect.status} to ${location || "no location"}`);
   if (!dmg.ok) issues.push(`DMG returned ${dmg.status}`);
-  if (!bytes || bytes < minDownloadBytes) issues.push(`DMG size too small (${bytes ?? "missing"} bytes)`);
+  if (!dmgBytes || dmgBytes < minDownloadBytes) issues.push(`DMG size too small (${dmgBytes ?? "missing"} bytes)`);
   if (!cacheControl.includes("max-age=60")) issues.push(`DMG cache header unexpected (${cacheControl || "missing"})`);
 
-  sections.download = issues.length
-    ? degraded(issues, { redirectStatus: redirect.status, redirectLocation: location, dmgStatus: dmg.status, bytes, cacheControl })
-    : ok({ redirectStatus: redirect.status, redirectLocation: location, dmgStatus: dmg.status, bytes, cacheControl });
-}
-
-function extractAppcast(appcast) {
-  const itemMatch = appcast.match(/<item>[\s\S]*?<\/item>/);
-  const latestItem = itemMatch?.[0] ?? "";
-  const latestVersion = latestItem.match(/<sparkle:shortVersionString>([^<]+)<\/sparkle:shortVersionString>/)?.[1] ??
-    latestItem.match(/<title>([^<]+)<\/title>/)?.[1] ?? null;
-  const enclosureMatches = [...latestItem.matchAll(/<enclosure\b[^>]*\burl="([^"]+)"[^>]*\blength="([^"]+)"/g)];
-  const fullZip = enclosureMatches.find((match) => /\/updates\/omgskills-[^/]+\.zip$/.test(new URL(match[1], origin).pathname));
-  return {
-    latestVersion,
-    latestZipUrl: fullZip?.[1] ? new URL(fullZip[1], origin).toString() : null,
-    latestZipExpectedBytes: fullZip?.[2] ? Number(fullZip[2]) : null,
-  };
-}
-
-async function checkUpdates() {
-  const appcastResponse = await fetchWithTimeout(absolute("/appcast.xml"));
-  const issues = [];
-  let details = { appcastStatus: appcastResponse.status, latestVersion: null, latestZipUrl: null, latestZipStatus: null, latestZipBytes: null };
-
   if (!appcastResponse.ok) {
-    sections.updates = degraded([`appcast returned ${appcastResponse.status}`], details);
-    return;
-  }
+    issues.push(`appcast returned ${appcastResponse.status}`);
+  } else {
+    const appcast = await appcastResponse.text();
+    const itemMatch = appcast.match(/<item>[\s\S]*?<\/item>/);
+    const latestItem = itemMatch?.[0] ?? "";
+    details.latestVersion = latestItem.match(/<sparkle:shortVersionString>([^<]+)<\/sparkle:shortVersionString>/)?.[1] ??
+      latestItem.match(/<title>([^<]+)<\/title>/)?.[1] ?? null;
 
-  const appcast = await appcastResponse.text();
-  const parsed = extractAppcast(appcast);
-  details = { ...details, ...parsed };
+    const enclosureMatches = [...latestItem.matchAll(/<enclosure\b[^>]*\burl="([^"]+)"[^>]*\blength="([^"]+)"/g)];
+    const fullZip = enclosureMatches.find((match) => /\/updates\/omgskills-[^/]+\.zip$/.test(new URL(match[1], origin).pathname));
+    details.latestZipUrl = fullZip?.[1] ? new URL(fullZip[1], origin).toString() : null;
+    const latestZipExpectedBytes = fullZip?.[2] ? Number(fullZip[2]) : null;
 
-  if (!parsed.latestVersion) issues.push("appcast has no latest version");
-  if (!parsed.latestZipUrl) issues.push("appcast has no latest full update zip");
+    if (!details.latestVersion) issues.push("appcast has no latest version");
+    if (!details.latestZipUrl) issues.push("appcast has no latest full update zip");
 
-  if (parsed.latestZipUrl) {
-    const zip = await fetchWithTimeout(parsed.latestZipUrl, { method: "HEAD" });
-    const bytes = headerNumber(zip, "content-length");
-    details.latestZipStatus = zip.status;
-    details.latestZipBytes = bytes;
-    if (!zip.ok) issues.push(`latest update zip returned ${zip.status}`);
-    if (!bytes || bytes < minDownloadBytes) issues.push(`latest update zip size too small (${bytes ?? "missing"} bytes)`);
-    if (parsed.latestZipExpectedBytes && bytes && parsed.latestZipExpectedBytes !== bytes) {
-      issues.push(`latest update zip byte mismatch (${bytes} != ${parsed.latestZipExpectedBytes})`);
+    if (details.latestZipUrl) {
+      const zip = await fetchWithTimeout(details.latestZipUrl, { method: "HEAD" });
+      const zipBytes = headerNumber(zip, "content-length");
+      details.latestZipStatus = zip.status;
+      details.latestZipBytes = zipBytes;
+      if (!zip.ok) issues.push(`latest update zip returned ${zip.status}`);
+      if (!zipBytes || zipBytes < minDownloadBytes) issues.push(`latest update zip size too small (${zipBytes ?? "missing"} bytes)`);
+      if (latestZipExpectedBytes && zipBytes && latestZipExpectedBytes !== zipBytes) {
+        issues.push(`latest update zip byte mismatch (${zipBytes} != ${latestZipExpectedBytes})`);
+      }
     }
   }
 
-  sections.updates = issues.length ? degraded(issues, details) : ok(details);
+  sections.release = issues.length ? degraded(issues, details) : ok(details);
 }
 
-async function checkDataRefreshAndSearch() {
-  const manifestUrl = absolute("/data/manifest.json");
+async function checkManifestTrack(sectionName, manifestPath, options = {}) {
+  const manifestUrl = absolute(manifestPath);
   const manifest = await getJson(manifestUrl);
-  const assetNames = Object.entries(manifest)
-    .filter(([, value]) => value?.path && value?.sha256 && Number.isFinite(value?.bytes))
-    .map(([name]) => name);
-  const checkedAssets = [];
   const issues = [];
-  let skills = null;
-  let trending = null;
+  const checkedAssets = [];
+  const requiredAssets = options.requiredAssets ?? ["skills", "trending"];
+  const counts = {};
+  let parsedSkills = null;
 
-  for (const name of assetNames) {
-    const asset = manifest[name];
-    if (!asset?.path) continue;
+  for (const assetName of requiredAssets) {
+    if (!manifest[assetName]?.path || !manifest[assetName]?.sha256 || !Number.isFinite(manifest[assetName]?.bytes)) {
+      issues.push(`manifest missing ${assetName} asset`);
+    }
+  }
+
+  for (const [name, asset] of Object.entries(manifest)) {
+    if (!asset?.path || !asset?.sha256 || !Number.isFinite(asset?.bytes)) continue;
     const assetUrl = new URL(asset.path, manifestUrl).toString();
     const buffer = await getBuffer(assetUrl);
     const actualHash = sha256Hex(buffer);
     checkedAssets.push({ name, path: asset.path, bytes: buffer.length });
     if (buffer.length !== asset.bytes) issues.push(`${name} byte mismatch (${buffer.length} != ${asset.bytes})`);
     if (actualHash !== asset.sha256) issues.push(`${name} sha256 mismatch`);
-    if (name === "skills") skills = JSON.parse(buffer.toString("utf8"));
-    if (name === "trending") trending = JSON.parse(buffer.toString("utf8"));
+
+    try {
+      const decoded = JSON.parse(buffer.toString("utf8"));
+      if (Array.isArray(decoded)) {
+        counts[name] = decoded.length;
+        if (name === "skills") parsedSkills = decoded;
+      } else if (decoded?.topSkills && Array.isArray(decoded.topSkills)) {
+        counts[name] = decoded.topSkills.length;
+      }
+    } catch {
+      issues.push(`${name} failed to parse`);
+    }
   }
 
-  if (!Array.isArray(skills)) issues.push("skills asset did not parse as an array");
-  if (!Array.isArray(trending)) issues.push("trending asset did not parse as an array");
-  if (Array.isArray(skills) && skills.length < minSkillsCount) issues.push(`skills count too low (${skills.length})`);
-  if (Array.isArray(trending) && trending.length < minTrendingCount) issues.push(`trending count too low (${trending.length})`);
+  if ((counts.skills ?? 0) < minSkillsCount) issues.push(`skills count too low (${counts.skills ?? 0})`);
+  if ((counts.trending ?? 0) < minTrendingCount) issues.push(`trending count too low (${counts.trending ?? 0})`);
+  if (requiredAssets.includes("xTrending") && (counts.xTrending ?? 0) < minXTrendingCount) {
+    issues.push(`xTrending count too low (${counts.xTrending ?? 0})`);
+  }
 
-  sections.dataRefresh = issues.length
-    ? degraded(issues, { manifestGeneratedAt: manifest.generatedAt ?? null, checkedAssets, skillsCount: skills?.length ?? null, trendingCount: trending?.length ?? null })
-    : ok({ manifestGeneratedAt: manifest.generatedAt ?? null, checkedAssets, skillsCount: skills.length, trendingCount: trending.length });
+  sections[sectionName] = issues.length
+    ? degraded(issues, {
+        manifestPath,
+        manifestGeneratedAt: manifest.generatedAt ?? null,
+        checkedAssets,
+        counts,
+      })
+    : ok({
+        manifestPath,
+        manifestGeneratedAt: manifest.generatedAt ?? null,
+        checkedAssets,
+        counts,
+      });
 
-  const searchIssues = [];
+  return { manifest, skills: parsedSkills };
+}
+
+async function checkSearch(skills) {
   const queryResults = [];
-  if (Array.isArray(skills)) {
+  const issues = [];
+
+  if (!Array.isArray(skills)) {
+    issues.push("search skipped because v2 skills data was unavailable");
+  } else {
     for (const query of searchQueries) {
       const results = searchSkills(skills, query);
       queryResults.push({
@@ -253,23 +280,36 @@ async function checkDataRefreshAndSearch() {
         resultCount: results.length,
         topResult: results[0]?.skill?.id ?? null,
       });
-      if (results.length === 0) searchIssues.push(`search returned no results for "${query}"`);
+      if (results.length === 0) issues.push(`search returned no results for "${query}"`);
     }
-  } else {
-    searchIssues.push("search skipped because skills data was unavailable");
   }
 
-  sections.search = searchIssues.length ? degraded(searchIssues, { queryResults }) : ok({ queryResults });
+  sections.search = issues.length ? degraded(issues, { queryResults }) : ok({ queryResults });
 }
 
 async function main() {
   const topIssues = [];
-  for (const run of [checkDownload, checkUpdates, checkDataRefreshAndSearch]) {
+  let v2Skills = null;
+
+  for (const run of [
+    checkRelease,
+    async () => { await checkManifestTrack("legacyData", "/data/manifest.json", { requiredAssets: ["skills", "trending"] }); },
+    async () => {
+      const result = await checkManifestTrack("v2AppData", "/data/v2/manifest.json", { requiredAssets: ["skills", "trending", "xTrending"] });
+      v2Skills = result.skills;
+    },
+  ]) {
     try {
       await run();
     } catch (error) {
       topIssues.push(error.message);
     }
+  }
+
+  try {
+    await checkSearch(v2Skills);
+  } catch (error) {
+    topIssues.push(error.message);
   }
 
   if (topIssues.length) {
@@ -280,7 +320,7 @@ async function main() {
     .flatMap(([name, value]) => (value.issues ?? []).map((issue) => `${name}: ${issue}`));
   const status = issues.length === 0 ? "ok" : "degraded";
   const message = issues.length === 0 ? "All product checks passed" : issues.join("; ");
-  const result = { version: 1, status, message, checkedAt, origin, sections };
+  const result = { version: 2, status, message, checkedAt, origin, sections };
 
   if (process.env.GITHUB_OUTPUT) {
     const fs = await import("node:fs/promises");

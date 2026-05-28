@@ -5,12 +5,20 @@ import { join } from "node:path";
 
 const repo = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
-const scrapeMaxAgeHours = Number(process.env.SCRAPE_MAX_AGE_HOURS ?? 36);
-const xMaxAgeHours = Number(process.env.X_MAX_AGE_HOURS ?? 30);
-const contentMaxAgeHours = Number(process.env.CONTENT_MAX_AGE_HOURS ?? 192);
+const shadowMaxAgeHours = Number(process.env.SHADOW_MAX_AGE_HOURS ?? 12);
 const stuckMaxMinutes = Number(process.env.STUCK_MAX_MINUTES ?? 90);
-const liveManifestUrl = process.env.LIVE_MANIFEST_URL ?? "https://omgskills.com/data/manifest.json";
-const localManifestPath = join(process.cwd(), "site", "data", "manifest.json");
+const checkedAt = new Date().toISOString();
+
+const liveManifests = {
+  legacyData: {
+    liveUrl: process.env.LIVE_MANIFEST_URL ?? "https://omgskills.com/data/manifest.json",
+    localPath: join(process.cwd(), "site", "data", "manifest.json"),
+  },
+  v2AppData: {
+    liveUrl: process.env.LIVE_V2_MANIFEST_URL ?? "https://omgskills.com/data/v2/manifest.json",
+    localPath: join(process.cwd(), "site", "data", "v2", "manifest.json"),
+  },
+};
 
 if (!repo || !token) {
   console.error("check-pipeline-health: missing GITHUB_REPOSITORY or GITHUB_TOKEN");
@@ -35,11 +43,25 @@ function hoursSince(iso) {
   return (Date.now() - new Date(iso).getTime()) / 36e5;
 }
 
-const issues = [];
+function section(status, details = {}, issues = []) {
+  return {
+    status,
+    checkedAt,
+    issues,
+    ...details,
+  };
+}
+
+function ok(details = {}) {
+  return section("ok", details);
+}
+
+function degraded(issues, details = {}) {
+  return section("degraded", details, issues);
+}
+
 const workflows = {
-  scrape: "scrape.yml",
-  xRefresh: "x-refresh.yml",
-  contentReports: "content-reports.yml",
+  shadowCrawler: "shadow-crawl-health.yml",
 };
 
 async function latestSuccessful(filename) {
@@ -47,68 +69,167 @@ async function latestSuccessful(filename) {
   return (payload.workflow_runs ?? []).find((run) => run.conclusion === "success") ?? null;
 }
 
-const [scrapeRun, xRun, contentRun, inProgressRuns] = await Promise.all([
-  latestSuccessful(workflows.scrape),
-  latestSuccessful(workflows.xRefresh),
-  latestSuccessful(workflows.contentReports),
-  github(`/repos/${repo}/actions/runs?status=in_progress&per_page=100`),
-]);
-
-if (!scrapeRun) {
-  issues.push("No successful scrape run found");
-} else if (hoursSince(scrapeRun.updated_at) > scrapeMaxAgeHours) {
-  issues.push(`scrape is stale (${hoursSince(scrapeRun.updated_at).toFixed(1)}h)`);
+function readJson(path) {
+  return JSON.parse(readFileSync(path, "utf8"));
 }
 
-if (!xRun) {
-  issues.push("No successful x-refresh run found");
-} else if (hoursSince(xRun.updated_at) > xMaxAgeHours) {
-  issues.push(`x-refresh is stale (${hoursSince(xRun.updated_at).toFixed(1)}h)`);
+function filteredCutoverSkills(cutoverSkills) {
+  return cutoverSkills.filter((skill) => !( !skill.author_handle && (skill.provenance_type === "catalog" || skill.provenance_type === "repackaged")));
 }
 
-if (!contentRun) {
-  issues.push("No successful content-reports run found");
-} else if (hoursSince(contentRun.updated_at) > contentMaxAgeHours) {
-  issues.push(`content-reports is stale (${hoursSince(contentRun.updated_at).toFixed(1)}h)`);
+function skillIds(skills) {
+  return skills.map((skill) => skill.id);
 }
 
-for (const run of inProgressRuns.workflow_runs ?? []) {
-  const ageMinutes = (Date.now() - new Date(run.run_started_at).getTime()) / 6e4;
-  if (ageMinutes > stuckMaxMinutes) {
-    issues.push(`workflow stuck: ${run.name} for ${Math.round(ageMinutes)}m`);
+async function compareManifest(name, { liveUrl, localPath }) {
+  const issues = [];
+  let liveStatus = null;
+
+  try {
+    const liveManifestResponse = await fetch(liveUrl, { headers: { "cache-control": "no-cache" } });
+    liveStatus = liveManifestResponse.status;
+    if (!liveManifestResponse.ok) {
+      issues.push(`live manifest request failed (${liveManifestResponse.status})`);
+    } else {
+      const liveManifest = await liveManifestResponse.json();
+      const localManifest = readJson(localPath);
+      if (JSON.stringify(liveManifest) !== JSON.stringify(localManifest)) {
+        issues.push("live manifest differs from repo manifest");
+      }
+    }
+  } catch (error) {
+    issues.push(`live manifest check failed (${error.message})`);
   }
+
+  return {
+    name,
+    status: issues.length === 0 ? "ok" : "degraded",
+    liveUrl,
+    localPath,
+    liveStatus,
+    issues,
+  };
 }
 
-const liveManifestResponse = await fetch(liveManifestUrl, { headers: { "cache-control": "no-cache" } });
-if (!liveManifestResponse.ok) {
-  issues.push(`live manifest request failed (${liveManifestResponse.status})`);
-} else {
-  const liveManifest = await liveManifestResponse.json();
-  const localManifest = JSON.parse(readFileSync(localManifestPath, "utf8"));
-  if (JSON.stringify(liveManifest) !== JSON.stringify(localManifest)) {
-    issues.push("live manifest differs from repo manifest");
+async function main() {
+  const issues = [];
+  const sections = {};
+
+  const [shadowRun, inProgressRuns] = await Promise.all([
+    latestSuccessful(workflows.shadowCrawler),
+    github(`/repos/${repo}/actions/runs?status=in_progress&per_page=100`),
+  ]);
+
+  const crawlerIssues = [];
+  if (!shadowRun) {
+    crawlerIssues.push("No successful shadow-crawl-health run found");
+  } else if (hoursSince(shadowRun.updated_at) > shadowMaxAgeHours) {
+    crawlerIssues.push(`shadow-crawl-health is stale (${hoursSince(shadowRun.updated_at).toFixed(1)}h)`);
   }
-}
 
-const status = issues.length === 0 ? "ok" : "degraded";
-const message = issues.length === 0 ? "All pipeline checks passed" : issues.join("; ");
+  for (const run of inProgressRuns.workflow_runs ?? []) {
+    if (run.path?.endsWith(`/${workflows.shadowCrawler}`) === false && run.name !== "shadow-crawl-health") continue;
+    const ageMinutes = (Date.now() - new Date(run.run_started_at).getTime()) / 6e4;
+    if (ageMinutes > stuckMaxMinutes) {
+      crawlerIssues.push(`workflow stuck: ${run.name} for ${Math.round(ageMinutes)}m`);
+    }
+  }
 
-if (process.env.GITHUB_OUTPUT) {
-  const lines = [
-    `health_status=${status}`,
-    `health_message<<EOF`,
+  sections.crawlers = crawlerIssues.length
+    ? degraded(crawlerIssues, {
+        lastSuccessfulShadowRunAt: shadowRun?.updated_at ?? null,
+      })
+    : ok({
+        lastSuccessfulShadowRunAt: shadowRun?.updated_at ?? null,
+      });
+  issues.push(...crawlerIssues.map((issue) => `crawlers: ${issue}`));
+
+  const manifestChecks = await Promise.all(
+    Object.entries(liveManifests).map(([name, config]) => compareManifest(name, config)),
+  );
+  for (const manifestCheck of manifestChecks) {
+    if (manifestCheck.issues.length) {
+      issues.push(...manifestCheck.issues.map((issue) => `${manifestCheck.name}: ${issue}`));
+    }
+  }
+
+  const shadowIssues = [];
+  let cutoverValidationPassed = false;
+  let promotedMatchesCutover = false;
+  let v2ManifestMatchesLocal = manifestChecks.find((item) => item.name === "v2AppData")?.issues.length === 0;
+
+  try {
+    const shadowReport = readJson(join(process.cwd(), "index", "shadow", "shadow-report.json"));
+    cutoverValidationPassed = Boolean(shadowReport.cutoverValidationPassed);
+    if (!cutoverValidationPassed) {
+      shadowIssues.push("cutover validation did not pass");
+    }
+  } catch (error) {
+    shadowIssues.push(`missing or unreadable shadow report (${error.message})`);
+  }
+
+  try {
+    const cutoverSkills = readJson(join(process.cwd(), "index", "shadow", "skills.cutover.shadow.json"));
+    const currentSkills = readJson(join(process.cwd(), "index", "skills.json"));
+    const promoted = filteredCutoverSkills(cutoverSkills);
+    promotedMatchesCutover = JSON.stringify(skillIds(promoted)) === JSON.stringify(skillIds(currentSkills));
+    if (!promotedMatchesCutover) {
+      shadowIssues.push("production skills.json does not match filtered cutover output");
+    }
+  } catch (error) {
+    shadowIssues.push(`cutover comparison failed (${error.message})`);
+  }
+
+  if (!v2ManifestMatchesLocal) {
+    shadowIssues.push("live v2 manifest is not aligned with repo v2 manifest");
+  }
+
+  sections.shadowCutover = shadowIssues.length
+    ? degraded(shadowIssues, {
+        cutoverValidationPassed,
+        promotedMatchesCutover,
+        v2ManifestMatchesLocal,
+      })
+    : ok({
+        cutoverValidationPassed,
+        promotedMatchesCutover,
+        v2ManifestMatchesLocal,
+      });
+  issues.push(...shadowIssues.map((issue) => `shadowCutover: ${issue}`));
+
+  const status = issues.length === 0 ? "ok" : "degraded";
+  const message = issues.length === 0 ? "All pipeline checks passed" : issues.join("; ");
+  const result = {
+    version: 2,
+    status,
     message,
-    `EOF`,
-    `last_scrape_success_at=${scrapeRun?.updated_at ?? ""}`,
-    `last_x_refresh_success_at=${xRun?.updated_at ?? ""}`,
-    `last_content_report_success_at=${contentRun?.updated_at ?? ""}`,
-  ];
-  await import("node:fs/promises").then((fs) => fs.appendFile(process.env.GITHUB_OUTPUT, lines.join("\n") + "\n"));
+    checkedAt,
+    sections,
+    lastShadowCrawlerSuccessAt: shadowRun?.updated_at ?? null,
+  };
+
+  if (process.env.GITHUB_OUTPUT) {
+    const lines = [
+      `health_status=${status}`,
+      `health_message<<EOF`,
+      message,
+      `EOF`,
+      `last_shadow_crawler_success_at=${shadowRun?.updated_at ?? ""}`,
+      `pipeline_health_json<<EOF`,
+      JSON.stringify(result),
+      `EOF`,
+    ];
+    await import("node:fs/promises").then((fs) => fs.appendFile(process.env.GITHUB_OUTPUT, lines.join("\n") + "\n"));
+  }
+
+  console.log(JSON.stringify(result, null, 2));
+  if (issues.length) {
+    console.error(`check-pipeline-health: ${message}`);
+    process.exit(1);
+  }
 }
 
-if (issues.length) {
-  console.error(`check-pipeline-health: ${message}`);
+main().catch((error) => {
+  console.error(`check-pipeline-health: ${error.message}`);
   process.exit(1);
-}
-
-console.log("check-pipeline-health: ok");
+});
