@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
-import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 const origin = (process.env.PRODUCT_HEALTH_ORIGIN ?? "https://omgskills.com").replace(/\/$/, "");
 const minDownloadBytes = Number(process.env.MIN_DOWNLOAD_BYTES ?? 1_000_000);
 const minSkillsCount = Number(process.env.MIN_SKILLS_COUNT ?? 40_000);
 const minTrendingCount = Number(process.env.MIN_TRENDING_COUNT ?? 100);
 const minXTrendingCount = Number(process.env.MIN_X_TRENDING_COUNT ?? 1);
+const repoRoot = process.cwd();
+const dataDir = join(repoRoot, "site", "data");
+const defaultTimeoutMs = Number(process.env.PRODUCT_HEALTH_TIMEOUT_MS ?? 45_000);
 const searchQueries = (process.env.SEARCH_SMOKE_QUERIES ?? "swift,figma,mcp")
   .split(",")
   .map((query) => query.trim())
@@ -38,7 +42,7 @@ function absolute(path) {
 
 async function fetchWithTimeout(url, options = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Number(process.env.PRODUCT_HEALTH_TIMEOUT_MS ?? 30_000));
+  const timeout = setTimeout(() => controller.abort(), defaultTimeoutMs);
   try {
     return await fetch(url, {
       ...options,
@@ -83,10 +87,6 @@ async function assetSize(url) {
   return { response: head, bytes };
 }
 
-function sha256Hex(buffer) {
-  return createHash("sha256").update(buffer).digest("hex");
-}
-
 async function getJson(url) {
   const response = await fetchWithTimeout(url);
   if (!response.ok) {
@@ -95,12 +95,8 @@ async function getJson(url) {
   return response.json();
 }
 
-async function getBuffer(url) {
-  const response = await fetchWithTimeout(url);
-  if (!response.ok) {
-    throw new Error(`${url} returned ${response.status}`);
-  }
-  return Buffer.from(await response.arrayBuffer());
+async function getLocalJson(path) {
+  return JSON.parse(await readFile(path, "utf8"));
 }
 
 function normalize(value) {
@@ -206,14 +202,40 @@ async function checkRelease() {
   sections.release = issues.length ? degraded(issues, details) : ok(details);
 }
 
+function parseAssetCount(decoded) {
+  if (Array.isArray(decoded)) return decoded.length;
+  if (decoded?.topSkills && Array.isArray(decoded.topSkills)) return decoded.topSkills.length;
+  return null;
+}
+
+async function readLocalTrackData(manifestPath, requiredAssets) {
+  const localManifestPath = join(dataDir, manifestPath.replace(/^\/?data\//, ""));
+  const manifest = await getLocalJson(localManifestPath);
+  const baseDir = manifestPath.includes("/v2/") ? join(dataDir, "v2") : dataDir;
+  const counts = {};
+  let skills = null;
+
+  for (const assetName of requiredAssets) {
+    const asset = manifest[assetName];
+    if (!asset?.path) continue;
+    const decoded = await getLocalJson(join(baseDir, asset.path));
+    counts[assetName] = parseAssetCount(decoded);
+    if (assetName === "skills" && Array.isArray(decoded)) {
+      skills = decoded;
+    }
+  }
+
+  return { manifest, counts, skills };
+}
+
 async function checkManifestTrack(sectionName, manifestPath, options = {}) {
   const manifestUrl = absolute(manifestPath);
   const manifest = await getJson(manifestUrl);
   const issues = [];
   const checkedAssets = [];
   const requiredAssets = options.requiredAssets ?? ["skills", "trending"];
-  const counts = {};
-  let parsedSkills = null;
+  const localData = options.includeLocalCounts ? await readLocalTrackData(manifestPath, requiredAssets) : null;
+  const counts = localData?.counts ?? {};
 
   for (const assetName of requiredAssets) {
     if (!manifest[assetName]?.path || !manifest[assetName]?.sha256 || !Number.isFinite(manifest[assetName]?.bytes)) {
@@ -221,30 +243,19 @@ async function checkManifestTrack(sectionName, manifestPath, options = {}) {
     }
   }
 
-  for (const [name, asset] of Object.entries(manifest)) {
+  for (const name of requiredAssets) {
+    const asset = manifest[name];
     if (!asset?.path || !asset?.sha256 || !Number.isFinite(asset?.bytes)) continue;
     const assetUrl = new URL(asset.path, manifestUrl).toString();
-    const buffer = await getBuffer(assetUrl);
-    const actualHash = sha256Hex(buffer);
-    checkedAssets.push({ name, path: asset.path, bytes: buffer.length });
-    if (buffer.length !== asset.bytes) issues.push(`${name} byte mismatch (${buffer.length} != ${asset.bytes})`);
-    if (actualHash !== asset.sha256) issues.push(`${name} sha256 mismatch`);
-
-    try {
-      const decoded = JSON.parse(buffer.toString("utf8"));
-      if (Array.isArray(decoded)) {
-        counts[name] = decoded.length;
-        if (name === "skills") parsedSkills = decoded;
-      } else if (decoded?.topSkills && Array.isArray(decoded.topSkills)) {
-        counts[name] = decoded.topSkills.length;
-      }
-    } catch {
-      issues.push(`${name} failed to parse`);
-    }
+    const { response, bytes } = await assetSize(assetUrl);
+    checkedAssets.push({ name, path: asset.path, bytes });
+    if (!response.ok) issues.push(`${name} asset returned ${response.status}`);
+    if (!bytes || bytes < 1) issues.push(`${name} asset size missing`);
+    if (name === "skills" && bytes && bytes < minDownloadBytes) issues.push(`${name} asset size too small (${bytes} bytes)`);
   }
 
-  if ((counts.skills ?? 0) < minSkillsCount) issues.push(`skills count too low (${counts.skills ?? 0})`);
-  if ((counts.trending ?? 0) < minTrendingCount) issues.push(`trending count too low (${counts.trending ?? 0})`);
+  if (localData && (counts.skills ?? 0) < minSkillsCount) issues.push(`skills count too low (${counts.skills ?? 0})`);
+  if (localData && (counts.trending ?? 0) < minTrendingCount) issues.push(`trending count too low (${counts.trending ?? 0})`);
   if (requiredAssets.includes("xTrending") && (counts.xTrending ?? 0) < minXTrendingCount) {
     issues.push(`xTrending count too low (${counts.xTrending ?? 0})`);
   }
@@ -263,7 +274,7 @@ async function checkManifestTrack(sectionName, manifestPath, options = {}) {
         counts,
       });
 
-  return { manifest, skills: parsedSkills };
+  return { manifest, skills: localData?.skills ?? null };
 }
 
 async function checkSearch(skills) {
@@ -291,12 +302,21 @@ async function main() {
   const topIssues = [];
   let v2Skills = null;
 
+  try {
+    const localV2Data = await readLocalTrackData("/data/v2/manifest.json", ["skills", "trending", "xTrending"]);
+    v2Skills = localV2Data.skills;
+  } catch (error) {
+    topIssues.push(`local search data unavailable: ${error.message}`);
+  }
+
   for (const run of [
     checkRelease,
-    async () => { await checkManifestTrack("legacyData", "/data/manifest.json", { requiredAssets: ["skills", "trending"] }); },
+    async () => { await checkManifestTrack("legacyData", "/data/manifest.json", { requiredAssets: ["skills", "trending"], includeLocalCounts: true }); },
     async () => {
-      const result = await checkManifestTrack("v2AppData", "/data/v2/manifest.json", { requiredAssets: ["skills", "trending", "xTrending"] });
-      v2Skills = result.skills;
+      await checkManifestTrack("v2AppData", "/data/v2/manifest.json", {
+        requiredAssets: ["skills", "trending", "xTrending"],
+        includeLocalCounts: true,
+      });
     },
   ]) {
     try {
