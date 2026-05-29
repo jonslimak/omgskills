@@ -5,7 +5,10 @@ import { readFileSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
 const repoRoot = process.cwd();
-const dataDir = join(repoRoot, "site", "data");
+const dataTrackSubdir = process.env.OMGSKILLS_DATA_SUBDIR ?? "";
+const dataDir = dataTrackSubdir
+  ? join(repoRoot, "site", "data", dataTrackSubdir)
+  : join(repoRoot, "site", "data");
 const manifestPath = join(dataDir, "manifest.json");
 
 function sha256Hex(buffer) {

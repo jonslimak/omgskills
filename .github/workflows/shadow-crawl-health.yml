@@ -2,11 +2,12 @@ name: shadow-crawl-health
 
 on:
   schedule:
-    - cron: "15 */6 * * *"
+    - cron: "0 6 * * *"
+    - cron: "0 12 * * *"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: shadow-crawl-health
@@ -51,3 +52,59 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
         run: npx tsx scraper/new-crawl/verify-rerun-stability.ts
+
+      - name: Promote cutover
+        working-directory: index
+        run: npm run promote:cutover
+
+      - name: Build trending data
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:trending
+
+      - name: Build overlay data
+        working-directory: index
+        run: npm run content:overlays
+
+      - name: Build homepage leaderboard data
+        working-directory: index
+        run: |
+          npm run content:trending-leaderboard
+          npm run content:author-leaderboards
+          npm run content:leaderboard-view-data
+
+      - name: Publish hosted v2 app data
+        run: OMGSKILLS_DATA_SUBDIR=v2 ./scripts/publish-data.sh
+
+      - name: Verify local published data
+        env:
+          OMGSKILLS_DATA_SUBDIR: v2
+        run: node ./scripts/verify-published-data.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/v2/manifest.json site/data/v2/skills-*.json site/data/v2/trending-*.json site/data/v2/trending-leaderboard-*.json site/data/v2/leaderboard-view-data-*.json site/data/v2/x-trending-*.json site/data/v2/skill-signals-*.json site/data/v2/author-signals-*.json site/data/v2/author-leaderboards-*.json; then
+            echo "No v2 library data changes"
+          else
+            git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/v2/manifest.json site/data/v2/skills-*.json site/data/v2/trending-*.json site/data/v2/trending-leaderboard-*.json site/data/v2/leaderboard-view-data-*.json site/data/v2/x-trending-*.json site/data/v2/skill-signals-*.json site/data/v2/author-signals-*.json site/data/v2/author-leaderboards-*.json
+            git commit -m "shadow-crawl: publish v2 data ($(date -u +%Y-%m-%d))"
+            git pull --rebase --autostash origin main
+            git push
+          fi
+
+      - name: Prepare release assets for Netlify deploy
+        run: node ./scripts/prepare-netlify-site-deploy.mjs
+
+      - name: Deploy site to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npx netlify-cli deploy --prod --dir=site
+
+      - name: Verify live v2 manifest
+        env:
+          LIVE_MANIFEST_URL: https://omgskills.com/data/v2/manifest.json
+        run: node ./scripts/verify-live-manifest.mjs
