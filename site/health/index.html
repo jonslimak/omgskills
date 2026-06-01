@@ -180,6 +180,10 @@
       </table>
       <div class="section-grid">
         <details class="section-block" open>
+          <summary class="section-title">Crawler / Publish Summary</summary>
+          <ul id="crawlerPublishSummary" class="kv-list"></ul>
+        </details>
+        <details class="section-block" open>
           <summary class="section-title">Release</summary>
           <ul id="release" class="kv-list"></ul>
         </details>
@@ -252,6 +256,15 @@
       const timeCell = (value) => `<span class="time-value">${escapeHtml(value)}</span>`;
       const statusLabel = (value) => value ? value.toUpperCase() : "-";
       const bytes = (value) => typeof value === "number" ? `${(value / 1_000_000).toFixed(1)} MB` : "-";
+      const lagText = (value) => {
+        if (typeof value !== "number") return "-";
+        if (value === 0) return "0m";
+        const abs = Math.abs(value);
+        const hours = Math.floor(abs / 60);
+        const minutes = abs % 60;
+        const body = hours ? `${hours}h ${minutes}m` : `${minutes}m`;
+        return value < 0 ? `-${body}` : body;
+      };
       const issueText = (section) => (section?.issues && section.issues.length) ? section.issues.join("; ") : "OK";
       const queryText = (section) => (section?.queryResults || [])
         .map((item) => `${item.query}: ${item.resultCount}`)
@@ -275,6 +288,7 @@
         addSourceItem("Last tested", fmt(section?.checkedAt), href),
       ];
       const summaryRows = [
+        ["Crawler / Publish Summary", "crawlerPublishSummary"],
         ["Release", "release"],
         ["v2 App Data", "v2AppData"],
         ["Legacy Data", "legacyData"],
@@ -297,7 +311,10 @@
 
           document.getElementById("summary").innerHTML = [
             addTimeItem("Last checked", fmt(health.checkedAt)),
-            addTimeItem("Published", fmt(health.publishedAt)),
+            addTimeItem("Live v2 published", fmtGenerated(
+              health.sections?.crawlerPublishSummary?.liveV2ManifestGeneratedAt
+              || health.tracks?.v2?.manifestGeneratedAt
+            )),
             addItem("Workflow", health.workflow || "-"),
             addItem("Run ID", health.runId || "-"),
             addItem("Git SHA", health.gitSha || "-"),
@@ -307,6 +324,15 @@
             const section = health.sections?.[key];
             return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${timeCell(fmt(section?.checkedAt))}</td></tr>`;
           }).join("");
+
+          document.getElementById("crawlerPublishSummary").innerHTML = [
+            ...renderBase(health.sections?.crawlerPublishSummary),
+            addTimeItem("Last shadow crawl", fmtSuccess(health.sections?.crawlerPublishSummary?.lastSuccessfulShadowRunAt)),
+            addTimeItem("Live v2 published", fmtGenerated(health.sections?.crawlerPublishSummary?.liveV2ManifestGeneratedAt)),
+            addTimeItem("Last deploy", fmtGenerated(health.sections?.crawlerPublishSummary?.lastSuccessfulDeployAt)),
+            addItem("Publish lag", lagText(health.sections?.crawlerPublishSummary?.publishLagMinutes)),
+            addItem("Message", health.sections?.crawlerPublishSummary?.message || issueText(health.sections?.crawlerPublishSummary)),
+          ].join("");
 
           document.getElementById("release").innerHTML = [
             ...renderBase(health.sections?.release),

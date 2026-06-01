@@ -43,6 +43,14 @@ function hoursSince(iso) {
   return (Date.now() - new Date(iso).getTime()) / 36e5;
 }
 
+function diffMinutes(laterIso, earlierIso) {
+  if (!laterIso || !earlierIso) return null;
+  const later = new Date(laterIso).getTime();
+  const earlier = new Date(earlierIso).getTime();
+  if (Number.isNaN(later) || Number.isNaN(earlier)) return null;
+  return Math.round((later - earlier) / 6e4);
+}
+
 function withCheckMetadata(name, current) {
   const previousSection = previous.sections?.[name] ?? {};
   const status = current?.status ?? "degraded";
@@ -237,7 +245,61 @@ if (!health.content.statsGeneratedAt) contentOverlaysIssues.push("stats is missi
 if (!health.content.dashboardGeneratedAt) contentOverlaysIssues.push("dashboard is missing");
 if (!health.content.basketEnrichedAt) contentOverlaysIssues.push("gold-basket enrichment is missing");
 
+const lastSuccessfulShadowRunAt = health.lastSuccessfulShadowCrawlerAt;
+const liveV2ManifestGeneratedAt = health.tracks.v2?.manifestGeneratedAt ?? null;
+const lastSuccessfulDeployAt = health.deployedAt ?? null;
+const publishLagMinutes = diffMinutes(liveV2ManifestGeneratedAt, lastSuccessfulShadowRunAt);
+const crawlerPublishSkewMinutes = 10;
+const crawlerPublishIssues = [];
+let crawlerPublishStatus = "unknown";
+let crawlerPublishMessage = "crawler/publish status unavailable";
+
+if (lastSuccessfulShadowRunAt || liveV2ManifestGeneratedAt || lastSuccessfulDeployAt) {
+  crawlerPublishStatus = "degraded";
+  if (!lastSuccessfulShadowRunAt) {
+    crawlerPublishIssues.push("last shadow crawl timestamp unavailable");
+    crawlerPublishMessage = "last shadow crawl timestamp unavailable";
+  }
+  if (!liveV2ManifestGeneratedAt) {
+    crawlerPublishIssues.push("live v2 publish timestamp unavailable");
+    crawlerPublishMessage = "live v2 publish timestamp unavailable";
+  }
+  if (lastSuccessfulShadowRunAt && !lastSuccessfulDeployAt) {
+    crawlerPublishIssues.push("deploy timestamp unavailable");
+    crawlerPublishMessage = "deploy timestamp unavailable";
+  }
+  if (
+    lastSuccessfulShadowRunAt &&
+    liveV2ManifestGeneratedAt &&
+    publishLagMinutes !== null &&
+    publishLagMinutes < -crawlerPublishSkewMinutes
+  ) {
+    crawlerPublishIssues.push("shadow crawl is newer than live v2 publish");
+    crawlerPublishMessage = "shadow crawl is newer than live v2 publish";
+  }
+  if (
+    lastSuccessfulShadowRunAt &&
+    liveV2ManifestGeneratedAt &&
+    publishLagMinutes !== null &&
+    publishLagMinutes >= -crawlerPublishSkewMinutes &&
+    (!lastSuccessfulDeployAt || lastSuccessfulDeployAt >= lastSuccessfulShadowRunAt)
+  ) {
+    crawlerPublishStatus = "ok";
+    crawlerPublishIssues.length = 0;
+    crawlerPublishMessage = "v2 publish is current";
+  }
+}
+
 health.sections = {
+  crawlerPublishSummary: withCheckMetadata("crawlerPublishSummary", {
+    status: crawlerPublishStatus,
+    issues: crawlerPublishIssues,
+    message: crawlerPublishMessage,
+    lastSuccessfulShadowRunAt,
+    liveV2ManifestGeneratedAt,
+    lastSuccessfulDeployAt,
+    publishLagMinutes,
+  }),
   release: withCheckMetadata("release", productHealth?.sections?.release),
   v2AppData: withCheckMetadata("v2AppData", productHealth?.sections?.v2AppData),
   legacyData: withCheckMetadata("legacyData", productHealth?.sections?.legacyData),
