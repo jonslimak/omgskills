@@ -107,4 +107,5 @@ jobs:
       - name: Verify live v2 manifest
         env:
           LIVE_MANIFEST_URL: https://omgskills.com/data/v2/manifest.json
+          LOCAL_MANIFEST_PATH: site/data/v2/manifest.json
         run: node ./scripts/verify-live-manifest.mjs

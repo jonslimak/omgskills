@@ -126,8 +126,8 @@ const health = {
   status: "degraded",
   message: null,
   checkedAt,
-  publishedAt: envOrPrevious("HEALTH_PUBLISHED_AT", previous.publishedAt),
-  deployedAt: envOrPrevious("HEALTH_DEPLOYED_AT", previous.deployedAt),
+  publishedAt: envOrPrevious("HEALTH_PUBLISHED_AT", pipelineHealth?.lastV2PublishAt ?? previous.publishedAt),
+  deployedAt: envOrPrevious("HEALTH_DEPLOYED_AT", pipelineHealth?.lastV2DeployAt ?? previous.deployedAt),
   lastSuccessfulShadowCrawlerAt: envOrPrevious(
     "HEALTH_LAST_SHADOW_CRAWLER_SUCCESS_AT",
     pipelineHealth?.lastShadowCrawlerSuccessAt ?? previous.lastSuccessfulShadowCrawlerAt,

@@ -39,6 +39,8 @@ async function github(path) {
   return response.json();
 }
 
+const jobsCache = new Map();
+
 function hoursSince(iso) {
   return (Date.now() - new Date(iso).getTime()) / 36e5;
 }
@@ -64,9 +66,63 @@ const workflows = {
   shadowCrawler: "shadow-crawl-health.yml",
 };
 
-async function latestSuccessful(filename) {
+const shadowStageSteps = {
+  crawl: "Run shadow crawl",
+  publish: "Publish hosted v2 app data",
+  deploy: "Deploy site to Netlify",
+  verify: "Verify live v2 manifest",
+};
+
+async function workflowRuns(filename) {
   const payload = await github(`/repos/${repo}/actions/workflows/${filename}/runs?per_page=20`);
-  return (payload.workflow_runs ?? []).find((run) => run.conclusion === "success") ?? null;
+  return payload.workflow_runs ?? [];
+}
+
+async function jobsForRun(runId) {
+  if (!jobsCache.has(runId)) {
+    jobsCache.set(runId, github(`/repos/${repo}/actions/runs/${runId}/jobs?per_page=100`).then((payload) => payload.jobs ?? []));
+  }
+  return jobsCache.get(runId);
+}
+
+function latestSuccessfulStepAt(jobs, stepName) {
+  let latest = null;
+  for (const job of jobs) {
+    for (const step of job.steps ?? []) {
+      if (step.name !== stepName || step.conclusion !== "success" || !step.completed_at) continue;
+      if (!latest || step.completed_at > latest) {
+        latest = step.completed_at;
+      }
+    }
+  }
+  return latest;
+}
+
+function latestStepConclusion(jobs, stepName) {
+  let latestStep = null;
+  for (const job of jobs) {
+    for (const step of job.steps ?? []) {
+      if (step.name !== stepName) continue;
+      if (!latestStep || (step.started_at ?? "") > (latestStep.started_at ?? "")) {
+        latestStep = step;
+      }
+    }
+  }
+  return latestStep?.conclusion ?? null;
+}
+
+async function latestStageSuccess(runs, stepName) {
+  for (const run of runs) {
+    const jobs = await jobsForRun(run.id);
+    const completedAt = latestSuccessfulStepAt(jobs, stepName);
+    if (completedAt) {
+      return {
+        run,
+        completedAt,
+      };
+    }
+  }
+  return null;
 }
 
 function readJson(path) {
@@ -107,16 +163,23 @@ async function main() {
   const issues = [];
   const sections = {};
 
-  const [shadowRun, inProgressRuns] = await Promise.all([
-    latestSuccessful(workflows.shadowCrawler),
+  const [shadowRuns, inProgressRuns] = await Promise.all([
+    workflowRuns(workflows.shadowCrawler),
     github(`/repos/${repo}/actions/runs?status=in_progress&per_page=100`),
+  ]);
+  const latestShadowRun = shadowRuns[0] ?? null;
+  const latestShadowRunJobs = latestShadowRun ? await jobsForRun(latestShadowRun.id) : [];
+  const [latestShadowCrawl, latestV2Publish, latestV2Deploy] = await Promise.all([
+    latestStageSuccess(shadowRuns, shadowStageSteps.crawl),
+    latestStageSuccess(shadowRuns, shadowStageSteps.publish),
+    latestStageSuccess(shadowRuns, shadowStageSteps.deploy),
   ]);
 
   const crawlerIssues = [];
-  if (!shadowRun) {
-    crawlerIssues.push("No successful shadow-crawl-health run found");
-  } else if (hoursSince(shadowRun.updated_at) > shadowMaxAgeHours) {
-    crawlerIssues.push(`shadow-crawl-health is stale (${hoursSince(shadowRun.updated_at).toFixed(1)}h)`);
+  if (!latestShadowCrawl) {
+    crawlerIssues.push("No successful shadow crawl stage found");
+  } else if (hoursSince(latestShadowCrawl.completedAt) > shadowMaxAgeHours) {
+    crawlerIssues.push(`shadow crawl is stale (${hoursSince(latestShadowCrawl.completedAt).toFixed(1)}h)`);
   }
 
   for (const run of inProgressRuns.workflow_runs ?? []) {
@@ -129,10 +192,12 @@ async function main() {
 
   sections.crawlers = crawlerIssues.length
     ? degraded(crawlerIssues, {
-        lastSuccessfulShadowRunAt: shadowRun?.updated_at ?? null,
+        lastSuccessfulShadowRunAt: latestShadowCrawl?.completedAt ?? null,
+        latestWorkflowConclusion: latestShadowRun?.conclusion ?? null,
       })
     : ok({
-        lastSuccessfulShadowRunAt: shadowRun?.updated_at ?? null,
+        lastSuccessfulShadowRunAt: latestShadowCrawl?.completedAt ?? null,
+        latestWorkflowConclusion: latestShadowRun?.conclusion ?? null,
       });
   issues.push(...crawlerIssues.map((issue) => `crawlers: ${issue}`));
 
@@ -155,9 +220,11 @@ async function main() {
   sections.shadowCutover = shadowIssues.length
     ? degraded(shadowIssues, {
         v2ManifestMatchesLocal,
+        latestLiveVerifyConclusion: latestStepConclusion(latestShadowRunJobs, shadowStageSteps.verify),
       })
     : ok({
         v2ManifestMatchesLocal,
+        latestLiveVerifyConclusion: latestStepConclusion(latestShadowRunJobs, shadowStageSteps.verify),
       });
   issues.push(...shadowIssues.map((issue) => `shadowCutover: ${issue}`));
 
@@ -169,7 +236,10 @@ async function main() {
     message,
     checkedAt,
     sections,
-    lastShadowCrawlerSuccessAt: shadowRun?.updated_at ?? null,
+    lastShadowCrawlerSuccessAt: latestShadowCrawl?.completedAt ?? null,
+    lastV2PublishAt: latestV2Publish?.completedAt ?? null,
+    lastV2DeployAt: latestV2Deploy?.completedAt ?? null,
+    latestShadowWorkflowConclusion: latestShadowRun?.conclusion ?? null,
   };
 
   if (process.env.GITHUB_OUTPUT) {
@@ -178,7 +248,9 @@ async function main() {
       `health_message<<EOF`,
       message,
       `EOF`,
-      `last_shadow_crawler_success_at=${shadowRun?.updated_at ?? ""}`,
+      `last_shadow_crawler_success_at=${latestShadowCrawl?.completedAt ?? ""}`,
+      `last_v2_publish_at=${latestV2Publish?.completedAt ?? ""}`,
+      `last_v2_deploy_at=${latestV2Deploy?.completedAt ?? ""}`,
       `pipeline_health_json<<EOF`,
       JSON.stringify(result),
       `EOF`,

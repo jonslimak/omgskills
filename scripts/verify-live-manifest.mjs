@@ -4,7 +4,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const repoRoot = process.cwd();
-const localManifestPath = join(repoRoot, "site", "data", "manifest.json");
+const localManifestPath = process.env.LOCAL_MANIFEST_PATH
+  ? join(repoRoot, process.env.LOCAL_MANIFEST_PATH)
+  : join(repoRoot, "site", "data", "manifest.json");
 const liveUrl = process.env.LIVE_MANIFEST_URL ?? "https://omgskills.com/data/manifest.json";
 
 function stable(value) {
@@ -21,6 +23,15 @@ const maxAttempts = Number.parseInt(process.env.LIVE_MANIFEST_VERIFY_ATTEMPTS ??
 const delayMs = Number.parseInt(process.env.LIVE_MANIFEST_VERIFY_DELAY_MS ?? "5000", 10);
 const expected = JSON.stringify(stable(localManifest));
 
+function manifestSummary(manifest) {
+  return {
+    generatedAt: manifest?.generatedAt ?? null,
+    skillsPath: manifest?.skills?.path ?? null,
+    trendingPath: manifest?.trending?.path ?? null,
+    xTrendingPath: manifest?.xTrending?.path ?? null,
+  };
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -34,6 +45,10 @@ for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     if (JSON.stringify(stable(liveManifest)) === expected) {
       console.log("verify-live-manifest: ok");
       process.exit(0);
+    }
+    if (attempt === maxAttempts) {
+      console.error("verify-live-manifest: local summary", manifestSummary(localManifest));
+      console.error("verify-live-manifest: live summary", manifestSummary(liveManifest));
     }
   }
 
