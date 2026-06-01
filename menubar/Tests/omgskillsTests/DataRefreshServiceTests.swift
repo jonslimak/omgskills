@@ -110,11 +110,11 @@ struct DataRefreshServiceTests {
         ) == false)
     }
 
-    @Test func panelOpenDebounceHonors60Seconds() {
+    @Test func panelOpenChecksAreNeverThrottled() {
         #expect(DataRefreshService.shouldThrottlePanelOpenCheck(
             lastPanelOpenAttemptAt: 10_000,
             now: 10_030
-        ) == true)
+        ) == false)
         #expect(DataRefreshService.shouldThrottlePanelOpenCheck(
             lastPanelOpenAttemptAt: 10_000,
             now: 10_061
@@ -147,20 +147,9 @@ struct DataRefreshServiceTests {
         #expect(AppDelegate.shouldStartLibraryRefresh(isRefreshActive: true) == false)
     }
 
-    @Test func displayableDataUpdateDatePrefersRefreshTime() {
+    @Test func displayableDataUpdateDatePrefersActiveLibraryTime() {
         let date = DataRefreshService.displayableDataUpdateDate(
-            lastSuccessfulRefreshAt: 1_777_470_428,
-            lastLibraryGeneratedAt: "2026-04-28T21:07:21.568Z",
-            bundledGeneratedAt: "2026-04-27T21:07:21.568Z"
-        )
-
-        #expect(date?.timeIntervalSince1970 == 1_777_470_428)
-    }
-
-    @Test func displayableDataUpdateDateFallsBackToGeneratedTime() {
-        let date = DataRefreshService.displayableDataUpdateDate(
-            lastSuccessfulRefreshAt: nil,
-            lastLibraryGeneratedAt: "2026-04-28T21:07:21.568Z",
+            activeLibraryGeneratedAt: "2026-04-28T21:07:21.568Z",
             bundledGeneratedAt: "2026-04-27T21:07:21.568Z"
         )
         let formatter = ISO8601DateFormatter()
@@ -170,10 +159,21 @@ struct DataRefreshServiceTests {
         #expect(date == expected)
     }
 
+    @Test func displayableDataUpdateDateFallsBackToBundledGeneratedTime() {
+        let date = DataRefreshService.displayableDataUpdateDate(
+            activeLibraryGeneratedAt: nil,
+            bundledGeneratedAt: "2026-04-27T21:07:21.568Z"
+        )
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let expected = formatter.date(from: "2026-04-27T21:07:21.568Z")
+
+        #expect(date == expected)
+    }
+
     @Test func displayableDataUpdateDateReturnsNilWithoutMetadata() {
         let date = DataRefreshService.displayableDataUpdateDate(
-            lastSuccessfulRefreshAt: nil,
-            lastLibraryGeneratedAt: nil,
+            activeLibraryGeneratedAt: nil,
             bundledGeneratedAt: nil
         )
 

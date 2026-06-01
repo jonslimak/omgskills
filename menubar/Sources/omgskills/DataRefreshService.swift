@@ -4,7 +4,6 @@ import Foundation
 enum DataRefreshService {
     static let manifestURL = URL(string: "https://omgskills.com/data/v2/manifest.json")!
     private static let backgroundCheckInterval: TimeInterval = 24 * 60 * 60
-    private static let panelOpenDebounceInterval: TimeInterval = 60
 
     enum RefreshTrigger: Sendable {
         case launch
@@ -66,12 +65,12 @@ enum DataRefreshService {
         var activeSkillsHash: String?
         var activeTrendingHash: String?
         var activeXTrendingHash: String?
+        var activeLibraryGeneratedAt: String?
         var remoteXTrendingEnabled: Bool?
         var lastCheckedAt: TimeInterval?
         var lastManifestCheckAt: TimeInterval?
         var lastPanelOpenAttemptAt: TimeInterval?
         var lastSuccessfulRefreshAt: TimeInterval?
-        var lastLibraryGeneratedAt: String?
     }
 
     static func cachedData(for resource: Resource) -> Data? {
@@ -89,22 +88,17 @@ enum DataRefreshService {
     static func lastDisplayableDataUpdateDate() -> Date? {
         let metadata = loadMetadata()
         return displayableDataUpdateDate(
-            lastSuccessfulRefreshAt: metadata.lastSuccessfulRefreshAt,
-            lastLibraryGeneratedAt: metadata.lastLibraryGeneratedAt,
+            activeLibraryGeneratedAt: metadata.activeLibraryGeneratedAt,
             bundledGeneratedAt: bundledManifest()?.generatedAt
         )
     }
 
     static func displayableDataUpdateDate(
-        lastSuccessfulRefreshAt: TimeInterval?,
-        lastLibraryGeneratedAt: String?,
+        activeLibraryGeneratedAt: String?,
         bundledGeneratedAt: String?
     ) -> Date? {
-        if let lastSuccessfulRefreshAt {
-            return Date(timeIntervalSince1970: lastSuccessfulRefreshAt)
-        }
-        if let lastLibraryGeneratedAt,
-           let date = parseLibraryDate(lastLibraryGeneratedAt) {
+        if let activeLibraryGeneratedAt,
+           let date = parseLibraryDate(activeLibraryGeneratedAt) {
             return date
         }
         if let bundledGeneratedAt,
@@ -143,7 +137,7 @@ enum DataRefreshService {
             var didUpdate = false
             metadata.lastManifestCheckAt = now
             metadata.lastCheckedAt = now
-            metadata.lastLibraryGeneratedAt = manifest.generatedAt
+            metadata.activeLibraryGeneratedAt = manifest.generatedAt
             metadata.remoteXTrendingEnabled = manifest.xTrending != nil
 
             if shouldUpdateAsset(
@@ -215,11 +209,7 @@ enum DataRefreshService {
 
         switch trigger {
         case .panelOpen:
-            let lastPanelOpenAttemptAt = metadata.lastPanelOpenAttemptAt ?? metadata.lastCheckedAt
-            return shouldThrottlePanelOpenCheck(
-                lastPanelOpenAttemptAt: lastPanelOpenAttemptAt,
-                now: now
-            )
+            return false
         case .launch, .wake, .timer, .scheduler:
             let lastManifestCheckAt = metadata.lastManifestCheckAt ?? metadata.lastCheckedAt
             return shouldThrottleBackgroundRefresh(
@@ -243,10 +233,7 @@ enum DataRefreshService {
         lastPanelOpenAttemptAt: TimeInterval?,
         now: TimeInterval
     ) -> Bool {
-        guard let lastPanelOpenAttemptAt else {
-            return false
-        }
-        return now - lastPanelOpenAttemptAt < panelOpenDebounceInterval
+        false
     }
 
     static func shouldThrottleRefresh(
