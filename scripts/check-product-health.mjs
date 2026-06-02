@@ -11,6 +11,8 @@ const minXTrendingCount = Number(process.env.MIN_X_TRENDING_COUNT ?? 1);
 const repoRoot = process.cwd();
 const dataDir = join(repoRoot, "site", "data");
 const defaultTimeoutMs = Number(process.env.PRODUCT_HEALTH_TIMEOUT_MS ?? 45_000);
+const defaultRetryAttempts = Number(process.env.PRODUCT_HEALTH_RETRY_ATTEMPTS ?? 2);
+const retryBackoffMs = [500, 1_500];
 const searchQueries = (process.env.SEARCH_SMOKE_QUERIES ?? "swift,figma,mcp")
   .split(",")
   .map((query) => query.trim())
@@ -38,6 +40,46 @@ function degraded(issues, details = {}) {
 
 function absolute(path) {
   return new URL(path, `${origin}/`).toString();
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetriableStatus(status) {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+function isAbortError(error) {
+  return error?.name === "AbortError";
+}
+
+function isRetriableError(error) {
+  return isAbortError(error) || error instanceof TypeError;
+}
+
+function formatNetworkError(error, label) {
+  if (isAbortError(error)) return `${label} timed out`;
+  return `${label} failed: ${error.message}`;
+}
+
+async function fetchWithRetry(url, options = {}, retryOptions = {}) {
+  const retries = retryOptions.retries ?? defaultRetryAttempts;
+  const retryStatuses = retryOptions.retryStatuses ?? true;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(url, options);
+      if (attempt < retries && retryStatuses && isRetriableStatus(response.status)) {
+        await sleep(retryBackoffMs[Math.min(attempt, retryBackoffMs.length - 1)] ?? 1_500);
+        continue;
+      }
+      return response;
+    } catch (error) {
+      if (attempt >= retries || !isRetriableError(error)) throw error;
+      await sleep(retryBackoffMs[Math.min(attempt, retryBackoffMs.length - 1)] ?? 1_500);
+    }
+  }
 }
 
 async function fetchWithTimeout(url, options = {}) {
@@ -74,11 +116,11 @@ function contentRangeTotal(response) {
 }
 
 async function assetSize(url) {
-  const head = await fetchWithTimeout(url, { method: "HEAD" });
+  const head = await fetchWithRetry(url, { method: "HEAD" });
   let bytes = headerNumber(head, "content-length");
 
   if (!bytes && head.ok) {
-    const range = await fetchWithTimeout(url, {
+    const range = await fetchWithRetry(url, {
       headers: { range: "bytes=0-0" },
     });
     bytes = contentRangeTotal(range) ?? headerNumber(range, "content-length");
@@ -88,7 +130,7 @@ async function assetSize(url) {
 }
 
 async function getJson(url) {
-  const response = await fetchWithTimeout(url);
+  const response = await fetchWithRetry(url);
   if (!response.ok) {
     throw new Error(`${url} returned ${response.status}`);
   }
@@ -142,61 +184,83 @@ function searchSkills(skills, query) {
 }
 
 async function checkRelease() {
-  const redirect = await fetchWithTimeout(absolute("/download"), { redirect: "manual" });
-  const location = redirect.headers.get("location") ?? "";
-  const redirectOk = [301, 302, 307, 308].includes(redirect.status) &&
-    location.includes("/downloads/omgskills-mac.dmg");
-
-  const { response: dmg, bytes: dmgBytes } = await assetSize(absolute("/downloads/omgskills-mac.dmg"));
-  const cacheControl = dmg.headers.get("cache-control") ?? "";
-  const appcastResponse = await fetchWithTimeout(absolute("/appcast.xml"));
   const issues = [];
   const details = {
-    redirectStatus: redirect.status,
-    redirectLocation: location,
-    dmgStatus: dmg.status,
-    dmgBytes,
-    cacheControl,
-    appcastStatus: appcastResponse.status,
+    redirectStatus: null,
+    redirectLocation: "",
+    dmgStatus: null,
+    dmgBytes: null,
+    cacheControl: "",
+    appcastStatus: null,
     latestVersion: null,
     latestZipUrl: null,
     latestZipStatus: null,
     latestZipBytes: null,
   };
 
-  if (!redirectOk) issues.push(`/download returned ${redirect.status} to ${location || "no location"}`);
-  if (!dmg.ok) issues.push(`DMG returned ${dmg.status}`);
-  if (!dmgBytes || dmgBytes < minDownloadBytes) issues.push(`DMG size too small (${dmgBytes ?? "missing"} bytes)`);
-  if (!cacheControl.includes("max-age=60")) issues.push(`DMG cache header unexpected (${cacheControl || "missing"})`);
+  try {
+    const redirect = await fetchWithRetry(absolute("/download"), { redirect: "manual" }, { retryStatuses: false });
+    const location = redirect.headers.get("location") ?? "";
+    const redirectOk = [301, 302, 307, 308].includes(redirect.status) &&
+      location.includes("/downloads/omgskills-mac.dmg");
+    details.redirectStatus = redirect.status;
+    details.redirectLocation = location;
+    if (!redirectOk) issues.push(`/download returned ${redirect.status} to ${location || "no location"}`);
+  } catch (error) {
+    issues.push(formatNetworkError(error, "/download request"));
+  }
 
-  if (!appcastResponse.ok) {
-    issues.push(`appcast returned ${appcastResponse.status}`);
-  } else {
-    const appcast = await appcastResponse.text();
-    const itemMatch = appcast.match(/<item>[\s\S]*?<\/item>/);
-    const latestItem = itemMatch?.[0] ?? "";
-    details.latestVersion = latestItem.match(/<sparkle:shortVersionString>([^<]+)<\/sparkle:shortVersionString>/)?.[1] ??
-      latestItem.match(/<title>([^<]+)<\/title>/)?.[1] ?? null;
+  try {
+    const { response: dmg, bytes: dmgBytes } = await assetSize(absolute("/downloads/omgskills-mac.dmg"));
+    const cacheControl = dmg.headers.get("cache-control") ?? "";
+    details.dmgStatus = dmg.status;
+    details.dmgBytes = dmgBytes;
+    details.cacheControl = cacheControl;
+    if (!dmg.ok) issues.push(`DMG returned ${dmg.status}`);
+    if (!dmgBytes || dmgBytes < minDownloadBytes) issues.push(`DMG size too small (${dmgBytes ?? "missing"} bytes)`);
+    if (!cacheControl.includes("max-age=60")) issues.push(`DMG cache header unexpected (${cacheControl || "missing"})`);
+  } catch (error) {
+    issues.push(formatNetworkError(error, "DMG asset request"));
+  }
 
-    const enclosureMatches = [...latestItem.matchAll(/<enclosure\b[^>]*\burl="([^"]+)"[^>]*\blength="([^"]+)"/g)];
-    const fullZip = enclosureMatches.find((match) => /\/updates\/omgskills-[^/]+\.zip$/.test(new URL(match[1], origin).pathname));
-    details.latestZipUrl = fullZip?.[1] ? new URL(fullZip[1], origin).toString() : null;
-    const latestZipExpectedBytes = fullZip?.[2] ? Number(fullZip[2]) : null;
+  try {
+    const appcastResponse = await fetchWithRetry(absolute("/appcast.xml"));
+    details.appcastStatus = appcastResponse.status;
+    if (!appcastResponse.ok) {
+      issues.push(`appcast returned ${appcastResponse.status}`);
+    } else {
+      const appcast = await appcastResponse.text();
+      const itemMatch = appcast.match(/<item>[\s\S]*?<\/item>/);
+      const latestItem = itemMatch?.[0] ?? "";
+      details.latestVersion = latestItem.match(/<sparkle:shortVersionString>([^<]+)<\/sparkle:shortVersionString>/)?.[1] ??
+        latestItem.match(/<title>([^<]+)<\/title>/)?.[1] ?? null;
 
-    if (!details.latestVersion) issues.push("appcast has no latest version");
-    if (!details.latestZipUrl) issues.push("appcast has no latest full update zip");
+      const enclosureMatches = [...latestItem.matchAll(/<enclosure\b[^>]*\burl="([^"]+)"[^>]*\blength="([^"]+)"/g)];
+      const fullZip = enclosureMatches.find((match) => /\/updates\/omgskills-[^/]+\.zip$/.test(new URL(match[1], origin).pathname));
+      details.latestZipUrl = fullZip?.[1] ? new URL(fullZip[1], origin).toString() : null;
+      const latestZipExpectedBytes = fullZip?.[2] ? Number(fullZip[2]) : null;
 
-    if (details.latestZipUrl) {
-      const zip = await fetchWithTimeout(details.latestZipUrl, { method: "HEAD" });
-      const zipBytes = headerNumber(zip, "content-length");
-      details.latestZipStatus = zip.status;
-      details.latestZipBytes = zipBytes;
-      if (!zip.ok) issues.push(`latest update zip returned ${zip.status}`);
-      if (!zipBytes || zipBytes < minDownloadBytes) issues.push(`latest update zip size too small (${zipBytes ?? "missing"} bytes)`);
-      if (latestZipExpectedBytes && zipBytes && latestZipExpectedBytes !== zipBytes) {
-        issues.push(`latest update zip byte mismatch (${zipBytes} != ${latestZipExpectedBytes})`);
+      if (!details.latestVersion) issues.push("appcast has no latest version");
+      if (!details.latestZipUrl) issues.push("appcast has no latest full update zip");
+
+      if (details.latestZipUrl) {
+        try {
+          const zip = await fetchWithRetry(details.latestZipUrl, { method: "HEAD" });
+          const zipBytes = headerNumber(zip, "content-length");
+          details.latestZipStatus = zip.status;
+          details.latestZipBytes = zipBytes;
+          if (!zip.ok) issues.push(`latest update zip returned ${zip.status}`);
+          if (!zipBytes || zipBytes < minDownloadBytes) issues.push(`latest update zip size too small (${zipBytes ?? "missing"} bytes)`);
+          if (latestZipExpectedBytes && zipBytes && latestZipExpectedBytes !== zipBytes) {
+            issues.push(`latest update zip byte mismatch (${zipBytes} != ${latestZipExpectedBytes})`);
+          }
+        } catch (error) {
+          issues.push(formatNetworkError(error, "latest update zip request"));
+        }
       }
     }
+  } catch (error) {
+    issues.push(formatNetworkError(error, "appcast request"));
   }
 
   sections.release = issues.length ? degraded(issues, details) : ok(details);
@@ -230,12 +294,34 @@ async function readLocalTrackData(manifestPath, requiredAssets) {
 
 async function checkManifestTrack(sectionName, manifestPath, options = {}) {
   const manifestUrl = absolute(manifestPath);
-  const manifest = await getJson(manifestUrl);
   const issues = [];
   const checkedAssets = [];
   const requiredAssets = options.requiredAssets ?? ["skills", "trending"];
-  const localData = options.includeLocalCounts ? await readLocalTrackData(manifestPath, requiredAssets) : null;
-  const counts = localData?.counts ?? {};
+  let manifest = null;
+  let localData = null;
+  const counts = {};
+
+  if (options.includeLocalCounts) {
+    try {
+      localData = await readLocalTrackData(manifestPath, requiredAssets);
+      Object.assign(counts, localData.counts ?? {});
+    } catch (error) {
+      issues.push(`local ${sectionName} data unavailable: ${error.message}`);
+    }
+  }
+
+  try {
+    manifest = await getJson(manifestUrl);
+  } catch (error) {
+    issues.push(formatNetworkError(error, `${sectionName} manifest request`));
+    sections[sectionName] = degraded(issues, {
+      manifestPath,
+      manifestGeneratedAt: null,
+      checkedAssets,
+      counts,
+    });
+    return { manifest: null, skills: localData?.skills ?? null };
+  }
 
   for (const assetName of requiredAssets) {
     if (!manifest[assetName]?.path || !manifest[assetName]?.sha256 || !Number.isFinite(manifest[assetName]?.bytes)) {
@@ -247,11 +333,16 @@ async function checkManifestTrack(sectionName, manifestPath, options = {}) {
     const asset = manifest[name];
     if (!asset?.path || !asset?.sha256 || !Number.isFinite(asset?.bytes)) continue;
     const assetUrl = new URL(asset.path, manifestUrl).toString();
-    const { response, bytes } = await assetSize(assetUrl);
-    checkedAssets.push({ name, path: asset.path, bytes });
-    if (!response.ok) issues.push(`${name} asset returned ${response.status}`);
-    if (!bytes || bytes < 1) issues.push(`${name} asset size missing`);
-    if (name === "skills" && bytes && bytes < minDownloadBytes) issues.push(`${name} asset size too small (${bytes} bytes)`);
+    try {
+      const { response, bytes } = await assetSize(assetUrl);
+      checkedAssets.push({ name, path: asset.path, bytes });
+      if (!response.ok) issues.push(`${name} asset returned ${response.status}`);
+      if (!bytes || bytes < 1) issues.push(`${name} asset size missing`);
+      if (name === "skills" && bytes && bytes < minDownloadBytes) issues.push(`${name} asset size too small (${bytes} bytes)`);
+    } catch (error) {
+      checkedAssets.push({ name, path: asset.path, bytes: null });
+      issues.push(formatNetworkError(error, `${name} asset request`));
+    }
   }
 
   if (localData && (counts.skills ?? 0) < minSkillsCount) issues.push(`skills count too low (${counts.skills ?? 0})`);
@@ -332,7 +423,7 @@ async function main() {
     topIssues.push(error.message);
   }
 
-  if (topIssues.length) {
+  if (topIssues.length >= 2 || Object.keys(sections).length === 0) {
     sections.product = degraded(topIssues);
   }
 
