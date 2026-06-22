@@ -11,7 +11,6 @@ type ComparableCutoverSkill = {
   description: string;
   github_url: string;
   skill_md_path: string | null;
-  install_cmd: string;
   author_handle: string;
   tags: string[];
   first_seen: string;
@@ -95,7 +94,6 @@ export function selectComparableCutoverSkills(skills: ShadowSkillRecord[]): Comp
     description: skill.description,
     github_url: normalizeGithubUrl(skill.github_url),
     skill_md_path: skill.skill_md_path ?? null,
-    install_cmd: skill.install_cmd,
     author_handle: skill.author_handle,
     tags: skill.tags,
     first_seen: skill.first_seen,

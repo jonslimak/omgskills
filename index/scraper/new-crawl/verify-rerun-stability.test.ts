@@ -256,6 +256,33 @@ test("github url casing differences normalize away", () => {
   assert.equal(firstDiffPath(selectComparableCutoverSkills(left), selectComparableCutoverSkills(right)), null);
 });
 
+test("cutover skill install command differences normalize away", () => {
+  const left: ShadowSkillRecord[] = [
+    {
+      id: "owner/repo:one",
+      name: "Skill",
+      description: "Desc",
+      github_url: "https://github.com/owner/repo",
+      skill_md_path: "SKILL.md",
+      install_cmd: "install old",
+      author_handle: "owner",
+      tags: [],
+      stars: 10,
+      last_updated: "2026-05-27T00:00:00Z",
+      first_seen: "2026-05-27",
+      skill_md_sha: "sha",
+      publisher_handle: "owner",
+      publisher_repo: "owner/repo",
+      upstream_repo: null,
+      provenance_type: "original",
+      author_confidence: "high",
+    },
+  ];
+  const right: ShadowSkillRecord[] = [{ ...left[0]!, install_cmd: "install new" }];
+
+  assert.equal(firstDiffPath(selectComparableCutoverSkills(left), selectComparableCutoverSkills(right)), null);
+});
+
 test("changed skill ids still fail", () => {
   const diff = firstDiffPath([{ id: "owner/repo:one" }], [{ id: "owner/repo:two" }]);
   assert.equal(diff, "$[0].id");
