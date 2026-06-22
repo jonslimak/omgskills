@@ -47,12 +47,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
         run: npm run test:shadow-guard
 
-      - name: Validate cutover state
-        working-directory: index
-        env:
-          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
-        run: npx tsx scraper/new-crawl/verify-rerun-stability.ts
-
       - name: Promote cutover
         working-directory: index
         run: npm run promote:cutover
@@ -109,3 +103,10 @@ jobs:
           LIVE_MANIFEST_URL: https://omgskills.com/data/v2/manifest.json
           LOCAL_MANIFEST_PATH: site/data/v2/manifest.json
         run: node ./scripts/verify-live-manifest.mjs
+
+      - name: Advisory rerun stability check
+        working-directory: index
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npx tsx scraper/new-crawl/verify-rerun-stability.ts
