@@ -9,7 +9,6 @@ type ComparableCutoverSkill = {
   id: string;
   name: string;
   description: string;
-  github_url: string;
   skill_md_path: string | null;
   author_handle: string;
   tags: string[];
@@ -75,24 +74,11 @@ export function selectComparableShadowReport(report: ShadowRunReport): Comparabl
   };
 }
 
-function normalizeGithubUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-    if (parsed.hostname.toLowerCase() !== "github.com") return url;
-    const [owner, repo] = parsed.pathname.split("/").filter(Boolean);
-    if (!owner || !repo) return url;
-    return `https://github.com/${owner.toLowerCase()}/${repo.toLowerCase()}`;
-  } catch {
-    return url;
-  }
-}
-
 export function selectComparableCutoverSkills(skills: ShadowSkillRecord[]): ComparableCutoverSkill[] {
   return skills.map((skill) => ({
     id: skill.id,
     name: skill.name,
     description: skill.description,
-    github_url: normalizeGithubUrl(skill.github_url),
     skill_md_path: skill.skill_md_path ?? null,
     author_handle: skill.author_handle,
     tags: skill.tags,

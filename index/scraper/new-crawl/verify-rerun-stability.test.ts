@@ -229,7 +229,7 @@ test("optional cutover skill key shape differences normalize away", () => {
   assert.equal(firstDiffPath(normalizedLeft, selectComparableCutoverSkills(right)), null);
 });
 
-test("github url casing differences normalize away", () => {
+test("github url differences normalize away", () => {
   const left: ShadowSkillRecord[] = [
     {
       id: "owner/repo:one",
@@ -251,7 +251,7 @@ test("github url casing differences normalize away", () => {
       author_confidence: "high",
     },
   ];
-  const right: ShadowSkillRecord[] = [{ ...left[0]!, github_url: "https://github.com/owner/repo" }];
+  const right: ShadowSkillRecord[] = [{ ...left[0]!, github_url: "https://github.com/other/repo" }];
 
   assert.equal(firstDiffPath(selectComparableCutoverSkills(left), selectComparableCutoverSkills(right)), null);
 });
