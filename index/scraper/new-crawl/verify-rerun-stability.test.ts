@@ -197,6 +197,38 @@ test("cutover skill last_updated differences normalize away", () => {
   assert.equal(firstDiffPath(selectComparableCutoverSkills(left), selectComparableCutoverSkills(right)), null);
 });
 
+test("optional cutover skill key shape differences normalize away", () => {
+  const left: ShadowSkillRecord[] = [
+    {
+      id: "owner/repo:one",
+      name: "Skill",
+      description: "Desc",
+      github_url: "https://github.com/owner/repo",
+      skill_md_path: "SKILL.md",
+      install_cmd: "install",
+      author_handle: "owner",
+      tags: [],
+      stars: 10,
+      last_updated: "2026-05-27T00:00:00Z",
+      first_seen: "2026-05-27",
+      skill_md_sha: "sha",
+      publisher_handle: "owner",
+      publisher_repo: "owner/repo",
+      upstream_repo: null,
+      provenance_type: "original",
+      author_confidence: "high",
+    },
+  ];
+  const rightSkill = { ...left[0]! } as Partial<ShadowSkillRecord>;
+  delete rightSkill.skill_md_path;
+  delete rightSkill.skill_md_sha;
+  delete rightSkill.upstream_repo;
+  const right = [rightSkill as ShadowSkillRecord];
+  const normalizedLeft = [{ ...selectComparableCutoverSkills(left)[0]!, skill_md_path: null, skill_md_sha: null }];
+
+  assert.equal(firstDiffPath(normalizedLeft, selectComparableCutoverSkills(right)), null);
+});
+
 test("changed skill ids still fail", () => {
   const diff = firstDiffPath([{ id: "owner/repo:one" }], [{ id: "owner/repo:two" }]);
   assert.equal(diff, "$[0].id");

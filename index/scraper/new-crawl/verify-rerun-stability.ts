@@ -3,9 +3,25 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { ShadowCutoverCompare, ShadowCutoverSkillSignal, ShadowRunReport, ShadowSkillRecord } from "./types.js";
+import type { ProvenanceType, ShadowCutoverCompare, ShadowCutoverSkillSignal, ShadowRunReport, ShadowSkillRecord } from "./types.js";
 
-type ComparableCutoverSkill = Omit<ShadowSkillRecord, "stars" | "last_updated">;
+type ComparableCutoverSkill = {
+  id: string;
+  name: string;
+  description: string;
+  github_url: string;
+  skill_md_path: string | null;
+  install_cmd: string;
+  author_handle: string;
+  tags: string[];
+  first_seen: string;
+  skill_md_sha: string | null;
+  publisher_handle: string;
+  publisher_repo: string;
+  upstream_repo: string | null;
+  provenance_type: ProvenanceType;
+  author_confidence: "high" | "low";
+};
 
 type ComparableCutoverCompare = Pick<
   ShadowCutoverCompare,
@@ -61,7 +77,23 @@ export function selectComparableShadowReport(report: ShadowRunReport): Comparabl
 }
 
 export function selectComparableCutoverSkills(skills: ShadowSkillRecord[]): ComparableCutoverSkill[] {
-  return skills.map(({ stars: _stars, last_updated: _lastUpdated, ...skill }) => skill);
+  return skills.map((skill) => ({
+    id: skill.id,
+    name: skill.name,
+    description: skill.description,
+    github_url: skill.github_url,
+    skill_md_path: skill.skill_md_path ?? null,
+    install_cmd: skill.install_cmd,
+    author_handle: skill.author_handle,
+    tags: skill.tags,
+    first_seen: skill.first_seen,
+    skill_md_sha: skill.skill_md_sha ?? null,
+    publisher_handle: skill.publisher_handle,
+    publisher_repo: skill.publisher_repo,
+    upstream_repo: skill.upstream_repo ?? null,
+    provenance_type: skill.provenance_type,
+    author_confidence: skill.author_confidence,
+  }));
 }
 
 export function firstDiffPath(left: unknown, right: unknown, path = "$"): string | null {
