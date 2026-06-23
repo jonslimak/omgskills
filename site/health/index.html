@@ -192,10 +192,6 @@
           <ul id="v2AppData" class="kv-list"></ul>
         </details>
         <details class="section-block">
-          <summary class="section-title">Legacy Data</summary>
-          <ul id="legacyData" class="kv-list"></ul>
-        </details>
-        <details class="section-block">
           <summary class="section-title">App Search Smoke Test</summary>
           <ul id="search" class="kv-list"></ul>
         </details>
@@ -291,7 +287,6 @@
         ["Crawler / Publish Summary", "crawlerPublishSummary"],
         ["Release", "release"],
         ["v2 App Data", "v2AppData"],
-        ["Legacy Data", "legacyData"],
         ["App Search Smoke Test", "search"],
         ["New Crawler Freshness", "crawlers"],
         ["New Crawler Promotion Integrity", "shadowCutover"],
@@ -355,16 +350,6 @@
             addItem("Message", issueText(health.sections?.v2AppData)),
           ].join("");
 
-          document.getElementById("legacyData").innerHTML = [
-            ...renderBase(health.sections?.legacyData),
-            addItem("Manifest", health.sections?.legacyData?.manifestPath || "-"),
-            addTimeItem("Manifest generated", fmtGenerated(health.sections?.legacyData?.manifestGeneratedAt)),
-            addItem("Skills", health.sections?.legacyData?.counts?.skills ?? "-"),
-            addItem("Trending", health.sections?.legacyData?.counts?.trending ?? "-"),
-            addItem("Assets", assetText(health.sections?.legacyData)),
-            addItem("Message", issueText(health.sections?.legacyData)),
-          ].join("");
-
           document.getElementById("search").innerHTML = [
             ...renderBase(health.sections?.search),
             addItem("Queries", queryText(health.sections?.search)),
@@ -416,7 +401,6 @@
           document.getElementById("message").innerHTML = addItem("Status message", health.message || "OK");
 
           const links = [
-            [location.protocol === "file:" ? new URL("../data/manifest.json", location.href).href : "/data/manifest.json", "legacy manifest"],
             [location.protocol === "file:" ? new URL("../data/v2/manifest.json", location.href).href : "/data/v2/manifest.json", "v2 manifest"],
             [dataUrl, "health json"],
             ["https://github.com/jonslimak/omgskills/actions", "GitHub Actions"],
@@ -424,7 +408,6 @@
           if (health.tracks?.v2?.skills?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.skills.path}`), "v2 skills asset"]);
           if (health.tracks?.v2?.trending?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.trending.path}`), "v2 trending asset"]);
           if (health.tracks?.v2?.xTrending?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.xTrending.path}`), "v2 x asset"]);
-          if (health.tracks?.legacy?.skills?.path) links.push([dataAssetUrl(health.tracks.legacy.skills.path), "legacy skills asset"]);
           if (health.assets?.skillSignals?.path) links.push([dataAssetUrl(health.assets.skillSignals.path), "skill signals asset"]);
           if (health.assets?.authorSignals?.path) links.push([dataAssetUrl(health.assets.authorSignals.path), "author signals asset"]);
           document.getElementById("links").innerHTML = links.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join("");

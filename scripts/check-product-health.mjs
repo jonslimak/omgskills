@@ -402,7 +402,6 @@ async function main() {
 
   for (const run of [
     checkRelease,
-    async () => { await checkManifestTrack("legacyData", "/data/manifest.json", { requiredAssets: ["skills", "trending"], includeLocalCounts: true }); },
     async () => {
       await checkManifestTrack("v2AppData", "/data/v2/manifest.json", {
         requiredAssets: ["skills", "trending", "xTrending"],
