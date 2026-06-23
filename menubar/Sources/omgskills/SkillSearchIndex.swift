@@ -118,6 +118,7 @@ final class SkillSearchIndex: @unchecked Sendable {
         }
 
         score += log10(Double(document.skill.stars + 1)) * 20
+        score -= Double(document.skill.searchQualityPenalty)
         if document.skill.stars <= 3 {
             score -= 150
         }

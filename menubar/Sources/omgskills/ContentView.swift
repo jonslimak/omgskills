@@ -143,6 +143,8 @@ struct ContentView: View {
     @State private var githubInstallClaude = true
     @State private var githubInstallPromptStatus: GitHubInstallPromptStatus = .idle
     @State private var crossInstallState: CrossInstallState = .idle
+    @State private var libraryDataTrack = DataRefreshService.selectedTrack()
+    @State private var isSwitchingLibraryTrack = false
     @State private var savedSession: PopoverSessionState?
     @State private var isRestoringSession = false
     @State private var suppressSessionChangeHandlers = false
@@ -458,6 +460,21 @@ struct ContentView: View {
 
                 Spacer()
 
+                Button {
+                    switchLibraryDataTrack()
+                } label: {
+                    Text("Crawl 4")
+                        .font(.system(size: 9))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                        .background(libraryDataTrack == .crawl4 ? Color.primary.opacity(0.14) : Color.clear)
+                        .clipShape(.rect(cornerRadius: 6))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(libraryDataTrack == .crawl4 ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
+                .disabled(isSwitchingLibraryTrack)
+                .help(libraryDataTrack == .crawl4 ? "Using Crawl 4 library" : "Switch to Crawl 4 library")
+
                 if updateAvailable {
                     Button {
                         NotificationCenter.default.post(name: .checkForUpdates, object: nil)
@@ -496,6 +513,33 @@ struct ContentView: View {
 
     private var shouldShowSortMenu: Bool {
         !cachedResults.isEmpty
+    }
+
+    private func switchLibraryDataTrack() {
+        let nextTrack: LibraryDataTrack = libraryDataTrack == .crawl4 ? .productionV2 : .crawl4
+        libraryDataTrack = nextTrack
+        DataRefreshService.setSelectedTrack(nextTrack)
+        isSwitchingLibraryTrack = true
+        source = .available
+        sortKey = .stars
+        query = ""
+        debouncedQuery = ""
+        selectedCreatorHandle = nil
+        localDashboardFilter = nil
+        selectedId = nil
+        selectedSkill = nil
+        showDetail = false
+        cachedResults = []
+        postDetailVisibility(false)
+
+        Task { @MainActor in
+            await store.refreshRemoteDataIfNeeded(force: true)
+            await store.reloadLibraryData()
+            refreshResults(selectFirst: true)
+            showDataUpdatedToastIfPossible()
+            isSwitchingLibraryTrack = false
+            searchFocused = true
+        }
     }
 
     private var shouldSelectFirstResult: Bool {

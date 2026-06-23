@@ -61,6 +61,42 @@ struct SkillSearchIndexTests {
         #expect(results.map(\.name) == ["interface-design-review", "ui-design-workflow"])
     }
 
+    @Test func collectionLikeSkillsAreDemotedWithinComparableMatches() throws {
+        let results = try search("browser use", in: [
+            skill(name: "browser-use", description: "Browser automation skill.", stars: 500),
+            skill(name: "browser-use-catalog", description: "Browser use skill collection.", stars: 220_000, provenanceType: "repackaged"),
+        ])
+
+        #expect(results.map(\.name) == ["browser-use", "browser-use-catalog"])
+    }
+
+    @Test func collectionLikeSkillsRemainSearchable() throws {
+        let results = try search("browser use catalog", in: [
+            skill(name: "browser-use-catalog", description: "Browser use skill collection.", stars: 220_000, provenanceType: "catalog"),
+        ])
+
+        #expect(results.map(\.name) == ["browser-use-catalog"])
+    }
+
+    @Test func knownCollectionRepoIsDemotedEvenWhenMarkedOriginal() throws {
+        let results = try search("tools", in: [
+            skill(name: "ecc-tools-cost-audit", description: "ECC Tools burn audit.", stars: 174_000, publisherRepo: "affaan-m/everything-claude-code", provenanceType: "original"),
+            skill(name: "conversion-tools-automation", description: "Automate Conversion Tools tasks.", stars: 58_000),
+        ])
+
+        #expect(results.map(\.name) == ["conversion-tools-automation", "ecc-tools-cost-audit"])
+    }
+
+    @Test @MainActor func fallbackSearchDemotesCollectionLikeSkills() {
+        let store = SkillsStore()
+        let results = store.search(query: "browser use", in: [
+            skill(name: "browser-use", description: "Browser automation skill.", stars: 500),
+            skill(name: "browser-use-catalog", description: "Browser use skill collection.", stars: 220_000, provenanceType: "repackaged"),
+        ], source: .available, usingIndex: false)
+
+        #expect(results.map(\.name) == ["browser-use", "browser-use-catalog"])
+    }
+
     @Test func searchDoesNotNormalizeLargeReadmesPerKeystroke() throws {
         let readme = String(repeating: "long documentation text ", count: 250)
         let skills = (0..<5_000).map { i in
@@ -91,7 +127,9 @@ struct SkillSearchIndexTests {
         description: String,
         tags: [String] = [],
         readmeSnippet: String? = nil,
-        stars: Int
+        stars: Int,
+        publisherRepo: String? = nil,
+        provenanceType: String? = nil
     ) -> Skill {
         Skill(
             id: name,
@@ -111,7 +149,9 @@ struct SkillSearchIndexTests {
             trendingSource: nil,
             origin: nil,
             isSymlink: nil,
-            isLocalOnly: nil
+            isLocalOnly: nil,
+            publisherRepo: publisherRepo,
+            provenanceType: provenanceType
         )
     }
 }

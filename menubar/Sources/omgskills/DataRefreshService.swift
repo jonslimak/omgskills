@@ -1,9 +1,51 @@
 import CryptoKit
 import Foundation
 
+enum LibraryDataTrack: String, CaseIterable, Identifiable {
+    case productionV2
+    case crawl4
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .productionV2: return "Production"
+        case .crawl4: return "Crawl 4"
+        }
+    }
+
+    var manifestURL: URL {
+        switch self {
+        case .productionV2:
+            return URL(string: "https://omgskills.com/data/v2/manifest.json")!
+        case .crawl4:
+            return URL(string: "https://omgskills.com/data/crawl4/manifest.json")!
+        }
+    }
+
+    func cacheFilename(for resource: DataRefreshService.Resource) -> String {
+        switch (self, resource) {
+        case (.productionV2, .skills): return "skills.json"
+        case (.productionV2, .trending): return "trending.json"
+        case (.productionV2, .xTrending): return "x-trending.json"
+        case (.crawl4, .skills): return "crawl4-skills.json"
+        case (.crawl4, .trending): return "crawl4-trending.json"
+        case (.crawl4, .xTrending): return "crawl4-x-trending.json"
+        }
+    }
+
+    var metadataFilename: String {
+        switch self {
+        case .productionV2: return "metadata.json"
+        case .crawl4: return "crawl4-metadata.json"
+        }
+    }
+}
+
 enum DataRefreshService {
-    static let manifestURL = URL(string: "https://omgskills.com/data/v2/manifest.json")!
+    static let manifestURL = LibraryDataTrack.productionV2.manifestURL
     private static let backgroundCheckInterval: TimeInterval = 24 * 60 * 60
+    private static let selectedTrackKey = "LibraryDataTrack.selected"
 
     enum RefreshTrigger: Sendable {
         case launch
@@ -25,11 +67,7 @@ enum DataRefreshService {
         case xTrending
 
         var cacheFilename: String {
-            switch self {
-            case .skills: return "skills.json"
-            case .trending: return "trending.json"
-            case .xTrending: return "x-trending.json"
-            }
+            selectedTrack().cacheFilename(for: self)
         }
     }
 
@@ -73,23 +111,45 @@ enum DataRefreshService {
         var lastSuccessfulRefreshAt: TimeInterval?
     }
 
+    static func selectedTrack(
+        userDefaults: UserDefaults = .standard
+    ) -> LibraryDataTrack {
+        guard let rawValue = userDefaults.string(forKey: selectedTrackKey),
+              let track = LibraryDataTrack(rawValue: rawValue) else {
+            return .productionV2
+        }
+        return track
+    }
+
+    static func setSelectedTrack(
+        _ track: LibraryDataTrack,
+        userDefaults: UserDefaults = .standard
+    ) {
+        userDefaults.set(track.rawValue, forKey: selectedTrackKey)
+    }
+
+    static func manifestURL(for track: LibraryDataTrack = selectedTrack()) -> URL {
+        track.manifestURL
+    }
+
     static func cachedData(for resource: Resource) -> Data? {
-        try? Data(contentsOf: cacheURL(for: resource))
+        try? Data(contentsOf: cacheURL(for: resource, track: selectedTrack()))
     }
 
     static func removeCachedData(for resource: Resource) {
-        try? FileManager.default.removeItem(at: cacheURL(for: resource))
+        try? FileManager.default.removeItem(at: cacheURL(for: resource, track: selectedTrack()))
     }
 
     static func remoteXTrendingEnabled() -> Bool? {
-        loadMetadata().remoteXTrendingEnabled
+        loadMetadata(track: selectedTrack()).remoteXTrendingEnabled
     }
 
     static func lastDisplayableDataUpdateDate() -> Date? {
-        let metadata = loadMetadata()
+        let track = selectedTrack()
+        let metadata = loadMetadata(track: track)
         return displayableDataUpdateDate(
             activeLibraryGeneratedAt: metadata.activeLibraryGeneratedAt,
-            bundledGeneratedAt: bundledManifest()?.generatedAt
+            bundledGeneratedAt: track == .productionV2 ? bundledManifest()?.generatedAt : nil
         )
     }
 
@@ -112,9 +172,10 @@ enum DataRefreshService {
         trigger: RefreshTrigger,
         force: Bool = false
     ) async -> RefreshResult {
-        var metadata = loadMetadata()
+        let track = selectedTrack()
+        var metadata = loadMetadata(track: track)
         let now = Date().timeIntervalSince1970
-        let bootstrapState = bootstrapState(metadata: metadata)
+        let bootstrapState = bootstrapState(metadata: metadata, track: track)
 
         if !force,
            shouldThrottleRefresh(
@@ -129,10 +190,10 @@ enum DataRefreshService {
         if trigger == .panelOpen {
             metadata.lastPanelOpenAttemptAt = now
         }
-        saveMetadata(metadata)
+        saveMetadata(metadata, track: track)
 
         do {
-            let manifestData = try await download(from: manifestURL)
+            let manifestData = try await download(from: manifestURL(for: track))
             let manifest = try JSONDecoder().decode(Manifest.self, from: manifestData)
             var didUpdate = false
             metadata.lastManifestCheckAt = now
@@ -142,11 +203,11 @@ enum DataRefreshService {
 
             if shouldUpdateAsset(
                 activeHash: metadata.activeSkillsHash,
-                hasCachedData: cachedData(for: .skills) != nil,
+                hasCachedData: cachedData(for: .skills, track: track) != nil,
                 manifestHash: manifest.skills.sha256
             ) {
-                let data = try await fetchAndValidate(asset: manifest.skills, decodeAs: [Skill].self)
-                try writeCache(data, for: .skills)
+                let data = try await fetchAndValidate(asset: manifest.skills, decodeAs: [Skill].self, track: track)
+                try writeCache(data, for: .skills, track: track)
                 metadata.activeSkillsHash = manifest.skills.sha256
                 didUpdate = true
             }
@@ -154,11 +215,11 @@ enum DataRefreshService {
             if let trending = manifest.trending,
                shouldUpdateAsset(
                 activeHash: metadata.activeTrendingHash,
-                hasCachedData: cachedData(for: .trending) != nil,
+                hasCachedData: cachedData(for: .trending, track: track) != nil,
                 manifestHash: trending.sha256
                ) {
-                let data = try await fetchAndValidate(asset: trending, decodeAs: [TrendingEntry].self)
-                try writeCache(data, for: .trending)
+                let data = try await fetchAndValidate(asset: trending, decodeAs: [TrendingEntry].self, track: track)
+                try writeCache(data, for: .trending, track: track)
                 metadata.activeTrendingHash = trending.sha256
                 didUpdate = true
             }
@@ -166,20 +227,20 @@ enum DataRefreshService {
             if let xTrending = manifest.xTrending,
                shouldUpdateAsset(
                 activeHash: metadata.activeXTrendingHash,
-                hasCachedData: cachedData(for: .xTrending) != nil,
+                hasCachedData: cachedData(for: .xTrending, track: track) != nil,
                 manifestHash: xTrending.sha256
                ) {
                 do {
-                    let data = try await fetchAndValidate(asset: xTrending, decodeAs: [Skill].self)
-                    try writeCache(data, for: .xTrending)
+                    let data = try await fetchAndValidate(asset: xTrending, decodeAs: [Skill].self, track: track)
+                    try writeCache(data, for: .xTrending, track: track)
                     metadata.activeXTrendingHash = xTrending.sha256
                     didUpdate = true
                 } catch {
                     print("[DataRefreshService] xTrending refresh failed: \(error)")
                 }
             } else if manifest.xTrending == nil,
-                      (cachedData(for: .xTrending) != nil || metadata.activeXTrendingHash != nil) {
-                removeCachedData(for: .xTrending)
+                      (cachedData(for: .xTrending, track: track) != nil || metadata.activeXTrendingHash != nil) {
+                removeCachedData(for: .xTrending, track: track)
                 metadata.activeXTrendingHash = nil
                 didUpdate = true
             }
@@ -187,14 +248,14 @@ enum DataRefreshService {
             if didUpdate {
                 metadata.lastSuccessfulRefreshAt = Date().timeIntervalSince1970
             }
-            saveMetadata(metadata)
+            saveMetadata(metadata, track: track)
             return didUpdate ? .updated : .checkedNoChange
         } catch {
             print("[DataRefreshService] Refresh failed: \(error)")
             Analytics.signal("error.refresh_failed", parameters: [
                 "error": error.localizedDescription
             ])
-            saveMetadata(metadata)
+            saveMetadata(metadata, track: track)
             return .skipped
         }
     }
@@ -257,8 +318,8 @@ enum DataRefreshService {
         return activeHash != manifestHash
     }
 
-    private static func fetchAndValidate<T: Decodable>(asset: Asset, decodeAs type: T.Type) async throws -> Data {
-        let url = try assetURL(for: asset)
+    private static func fetchAndValidate<T: Decodable>(asset: Asset, decodeAs type: T.Type, track: LibraryDataTrack) async throws -> Data {
+        let url = try assetURL(for: asset, track: track)
         let data = try await download(from: url)
 
         guard data.count == asset.bytes else {
@@ -285,30 +346,38 @@ enum DataRefreshService {
         return data
     }
 
-    private static func assetURL(for asset: Asset) throws -> URL {
-        guard let url = URL(string: asset.path, relativeTo: manifestURL)?.absoluteURL else {
+    private static func assetURL(for asset: Asset, track: LibraryDataTrack = selectedTrack()) throws -> URL {
+        guard let url = URL(string: asset.path, relativeTo: manifestURL(for: track))?.absoluteURL else {
             throw RefreshError.badAssetPath(asset.path)
         }
         return url
     }
 
-    private static func bootstrapState(metadata: Metadata) -> BootstrapState {
-        let expectsTrending = bundledManifest()?.trending != nil
+    private static func bootstrapState(metadata: Metadata, track: LibraryDataTrack) -> BootstrapState {
+        let expectsTrending = track == .productionV2 ? bundledManifest()?.trending != nil : true
         return BootstrapState(
-            hasSkillsCache: cachedData(for: .skills) != nil,
+            hasSkillsCache: cachedData(for: .skills, track: track) != nil,
             hasActiveSkillsHash: metadata.activeSkillsHash != nil,
             expectsTrending: expectsTrending,
-            hasTrendingCache: cachedData(for: .trending) != nil,
+            hasTrendingCache: cachedData(for: .trending, track: track) != nil,
             hasActiveTrendingHash: metadata.activeTrendingHash != nil
         )
     }
 
-    private static func cacheURL(for resource: Resource) -> URL {
-        applicationSupportDirectory().appendingPathComponent(resource.cacheFilename)
+    private static func cacheURL(for resource: Resource, track: LibraryDataTrack) -> URL {
+        applicationSupportDirectory().appendingPathComponent(track.cacheFilename(for: resource))
     }
 
-    private static func metadataURL() -> URL {
-        applicationSupportDirectory().appendingPathComponent("metadata.json")
+    private static func cachedData(for resource: Resource, track: LibraryDataTrack) -> Data? {
+        try? Data(contentsOf: cacheURL(for: resource, track: track))
+    }
+
+    private static func removeCachedData(for resource: Resource, track: LibraryDataTrack) {
+        try? FileManager.default.removeItem(at: cacheURL(for: resource, track: track))
+    }
+
+    private static func metadataURL(track: LibraryDataTrack) -> URL {
+        applicationSupportDirectory().appendingPathComponent(track.metadataFilename)
     }
 
     private static func applicationSupportDirectory() -> URL {
@@ -318,24 +387,24 @@ enum DataRefreshService {
         return directory
     }
 
-    private static func loadMetadata() -> Metadata {
-        guard let data = try? Data(contentsOf: metadataURL()) else {
+    private static func loadMetadata(track: LibraryDataTrack) -> Metadata {
+        guard let data = try? Data(contentsOf: metadataURL(track: track)) else {
             return Metadata()
         }
         return (try? JSONDecoder().decode(Metadata.self, from: data)) ?? Metadata()
     }
 
-    private static func saveMetadata(_ metadata: Metadata) {
+    private static func saveMetadata(_ metadata: Metadata, track: LibraryDataTrack) {
         do {
             let data = try JSONEncoder().encode(metadata)
-            try data.write(to: metadataURL(), options: .atomic)
+            try data.write(to: metadataURL(track: track), options: .atomic)
         } catch {
             print("[DataRefreshService] Metadata write failed: \(error)")
         }
     }
 
-    private static func writeCache(_ data: Data, for resource: Resource) throws {
-        try data.write(to: cacheURL(for: resource), options: .atomic)
+    private static func writeCache(_ data: Data, for resource: Resource, track: LibraryDataTrack) throws {
+        try data.write(to: cacheURL(for: resource, track: track), options: .atomic)
     }
 
     private static func bundledManifest() -> Manifest? {

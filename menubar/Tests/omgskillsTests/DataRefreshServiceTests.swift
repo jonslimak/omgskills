@@ -3,8 +3,40 @@ import Testing
 @testable import omgskills
 
 struct DataRefreshServiceTests {
-    @Test func manifestURLTargetsV2Track() {
+    @Test func legacyManifestURLTargetsV2Track() {
         #expect(DataRefreshService.manifestURL.absoluteString == "https://omgskills.com/data/v2/manifest.json")
+    }
+
+    @Test func defaultTrackIsProductionV2() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        #expect(DataRefreshService.selectedTrack(userDefaults: defaults) == .productionV2)
+    }
+
+    @Test func selectedTrackPersistsInUserDefaults() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        DataRefreshService.setSelectedTrack(.crawl4, userDefaults: defaults)
+
+        #expect(DataRefreshService.selectedTrack(userDefaults: defaults) == .crawl4)
+    }
+
+    @Test func manifestURLUsesSelectedTrack() {
+        #expect(DataRefreshService.manifestURL(for: .productionV2).absoluteString == "https://omgskills.com/data/v2/manifest.json")
+        #expect(DataRefreshService.manifestURL(for: .crawl4).absoluteString == "https://omgskills.com/data/crawl4/manifest.json")
+    }
+
+    @Test func crawl4TrackUsesSeparateCacheFiles() {
+        #expect(LibraryDataTrack.productionV2.cacheFilename(for: .skills) == "skills.json")
+        #expect(LibraryDataTrack.productionV2.cacheFilename(for: .trending) == "trending.json")
+        #expect(LibraryDataTrack.productionV2.cacheFilename(for: .xTrending) == "x-trending.json")
+        #expect(LibraryDataTrack.crawl4.cacheFilename(for: .skills) == "crawl4-skills.json")
+        #expect(LibraryDataTrack.crawl4.cacheFilename(for: .trending) == "crawl4-trending.json")
+        #expect(LibraryDataTrack.crawl4.cacheFilename(for: .xTrending) == "crawl4-x-trending.json")
     }
 
     @Test func missingSkillsCacheBypassesThrottle() {
@@ -179,4 +211,5 @@ struct DataRefreshServiceTests {
 
         #expect(date == nil)
     }
+
 }

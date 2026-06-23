@@ -124,7 +124,30 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeAvailableSkills() async -> LoadResult<[Skill]> {
-        await decodeProductionAvailableSkills()
+        if DataRefreshService.selectedTrack() == .crawl4 {
+            return await decodeCrawl4AvailableSkills()
+        }
+        return await decodeProductionAvailableSkills()
+    }
+
+    private nonisolated func decodeCrawl4AvailableSkills() async -> LoadResult<[Skill]> {
+        if let data = DataRefreshService.cachedData(for: .skills) {
+            let decoded = await decode(data, as: [Skill].self, label: "crawl4-skills.json")
+            if case .success = decoded {
+                return decoded
+            }
+            DataRefreshService.removeCachedData(for: .skills)
+        }
+
+        guard let url = AppResource.shadowAssetURL(for: .cutoverSkills) else {
+            return .failure("Crawl 4 skills not found. Run npm run scrape:shadow or publish /data/crawl4.")
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            return await decode(data, as: [Skill].self, label: "skills.cutover.shadow.json")
+        } catch {
+            return .failure("Failed to load Crawl 4 skills: \(error)")
+        }
     }
 
     private nonisolated func decodeProductionAvailableSkills() async -> LoadResult<[Skill]> {
@@ -216,6 +239,14 @@ final class SkillsStore: ObservableObject {
         return skills.filter { skill in
             let blob = "\(skill.name) \(skill.description) \(skill.authorHandle) \(skill.tags.joined(separator: " "))".lowercased()
             return terms.allSatisfy { blob.contains($0) }
+        }.sorted { lhs, rhs in
+            if lhs.searchQualityPenalty != rhs.searchQualityPenalty {
+                return lhs.searchQualityPenalty < rhs.searchQualityPenalty
+            }
+            if lhs.stars != rhs.stars {
+                return lhs.stars > rhs.stars
+            }
+            return lhs.name.localizedCompare(rhs.name) == .orderedAscending
         }
     }
 

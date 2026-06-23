@@ -166,6 +166,18 @@ extension Skill {
         return provenanceType == "catalog" || provenanceType == "repackaged"
     }
 
+    var isCollectionLike: Bool {
+        if provenanceType == "catalog" || provenanceType == "repackaged" {
+            return true
+        }
+        guard let publisherRepo else { return false }
+        return Self.collectionLikePublisherRepos.contains(publisherRepo.lowercased())
+    }
+
+    var searchQualityPenalty: Int {
+        isCollectionLike ? 250 : 0
+    }
+
     var discoverAttributionText: String? {
         if hasResolvedAuthor {
             return "by @\(authorHandle)"
@@ -175,4 +187,16 @@ extension Skill {
         }
         return nil
     }
+
+    private static let collectionLikePublisherRepos: Set<String> = [
+        "affaan-m/ecc",
+        "affaan-m/everything-claude-code",
+        "aiskillstore/marketplace",
+        "francostino/opencode-skills-collection",
+        "neversight/learn-skills.dev",
+        "openclaw/openclaw",
+        "openclaw/skills",
+        "orcaqubits/agentic-commerce-skills-plugins",
+        "sickn33/antigravity-awesome-skills",
+    ]
 }
