@@ -419,7 +419,7 @@ Decision: Pass for code/deploy foundation. Follow-up required before production 
 ## Milestone 1 Evidence
 
 Date: 2026-06-23
-Branch/commit: `codex/skillgroups-mvp`, commit `5e6ce81`
+Branch/commit: `codex/skillgroups-mvp`, commit `97e552a`
 Preview URL: `https://codex-skillgroups-mvp--omgskills.netlify.app`
 Commands run:
 
@@ -432,6 +432,10 @@ Commands run:
 - `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js db init --assume-no`
 - `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js database init --yes`
 - `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js deploy --build --branch codex/skillgroups-mvp --site dfdb618d-b748-4c4f-a535-646dc5db449f`
+- `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js env:set NETLIFY_DB_URL ... --context branch:codex-skillgroups-mvp --secret`
+- `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js env:set CLERK_SECRET_KEY ... --context branch:codex-skillgroups-mvp --secret`
+- `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js deploy --build --branch codex-skillgroups-mvp --context branch:codex-skillgroups-mvp --site dfdb618d-b748-4c4f-a535-646dc5db449f`
+- Temporary Clerk dev-user E2E script against `https://codex-skillgroups-mvp--omgskills.netlify.app`
 
 Manual flows checked:
 
@@ -439,6 +443,7 @@ Manual flows checked:
 - Portal assets load at `/app/assets/*`.
 - The portal UI now includes sync token creation, Synced Skills, restricted group creation, allowed email entry, My Skill Groups, and Shared With Me surfaces.
 - macOS Local Dashboard now includes a sync token field and Sync button.
+- Temporary Clerk dev users were created for owner, allowed email, and wrong email, then deleted after the E2E check.
 
 DB/API evidence:
 
@@ -454,27 +459,34 @@ DB/API evidence:
 - Unauthenticated `GET /api/portal/synced-skills` returns `401`.
 - Unauthenticated `GET /api/portal/groups` returns `401`.
 - Unauthenticated `GET /api/portal/shared` returns `401`.
-- `POST /api/portal/sync-upload` with a bad token returns `503` on CLI branch deploys because the deploy is not attached to a Netlify DB branch.
+- `POST /api/portal/sync-upload` with a bad token returns `401`.
 - Preview DB branch `codex/skillgroups-mvp` is enabled and reachable.
 - Stage 1 migration was applied safely to the preview DB branch; tables `skill_groups` and `synced_skills` were verified.
+- E2E result:
+  - sync run ID: `216a531f-9544-4d60-9fe7-702471f446b1`
+  - synced skill count: `1`
+  - group ID: `824cd464-63d1-4b7b-865a-01ba41242694`
+  - allowed email could see the restricted group
+  - wrong email could not see the restricted group
+  - reused sync token was rejected
 
 Existing site regressions checked on draft deploy:
 
-- `/data/manifest.json` returns `200`.
-- `/data/v2/manifest.json` returns `200`.
-- `/download` returns `302` to `/downloads/omgskills-mac.dmg`.
-- `/downloads/omgskills-mac.dmg` returns `200`.
-- `/appcast.xml` returns `200`.
-- `/health/` returns `401`.
+- Production `/data/manifest.json` returns `200`.
+- Production `/data/v2/manifest.json` returns `200`.
+- Production `/download` returns `302` to `/downloads/omgskills-mac.dmg`.
+- Production `/downloads/omgskills-mac.dmg` returns `200`.
+- Production `/appcast.xml` returns `200`.
+- Production `/health/` returns `401`.
 - `/u/test-handle` returns `404`.
 
 Known gaps:
 
-- CLI-uploaded branch deploys are not automatically attached to Netlify Database (`database_branch_id: null`), so deployed Functions still return `503` for DB-only unauthenticated checks.
-- Authenticated Clerk browser flow and DB smoke checks still need a real signed-in preview session after Netlify creates a Git-backed branch/deploy-preview with DB attachment.
-- Owner sync -> create restricted group -> allowed email views group is implemented in code but not verified end-to-end in a deployed Function because CLI deploys do not attach the DB branch.
+- Netlify's Git mirror did not have `codex/skillgroups-mvp`, so API-triggered Git builds failed with `git ref refs/heads/codex/skillgroups-mvp does not exist`.
+- CLI branch deploys do not automatically attach `database_branch_id`, so the preview uses branch-only Netlify env vars for `NETLIFY_DB_URL`, `NETLIFY_DB_DRIVER`, and `CLERK_SECRET_KEY`.
+- The E2E used temporary Clerk dev users and API calls, not a visual browser walkthrough.
 
-Decision: Needs follow-up before Milestone 1 is passed.
+Decision: Pass for Stage 1 thin-slice API/app-sync foundation. Follow-up before production launch: replace branch-only DB env workaround with a Git-backed Netlify branch/deploy-preview if Netlify Git mirroring is fixed.
 
 ## DevOps And Access Requirements
 
@@ -512,6 +524,7 @@ Current prepared state as of 2026-06-23:
   - `netlify database init --yes` recognizes the built-in Netlify Database flow
   - `netlify database status --branch codex/skillgroups-mvp` reports enabled with the preview DB branch
   - CLI deploys can create a branch URL, but they do not attach a `database_branch_id`; use Git-backed Netlify branch/deploy-preview builds for full deployed DB verification
+  - current branch preview works by setting branch-only `NETLIFY_DB_URL`, `NETLIFY_DB_DRIVER`, and `CLERK_SECRET_KEY` in Netlify
   - slash branch names are sanitized in Netlify branch URLs (`codex/skillgroups-mvp` becomes `codex-skillgroups-mvp`)
 - Netlify environment variables configured:
   - `VITE_CLERK_PUBLISHABLE_KEY`, context `all`, scopes `builds`, `functions`, `runtime`
