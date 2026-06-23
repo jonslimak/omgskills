@@ -515,6 +515,11 @@ DB/API evidence:
   - public group slug: `shared-1782244167043-7hore9`
   - group ID: `7603f914-b844-41ff-8534-6bbee0beb893`
 - Public group page rendered the synced skill.
+- Favorites group result:
+  - group ID: `c9c99d33-6c9f-4c39-9f30-6782e48d7a19`
+  - slug: `favorites`
+  - visibility: public
+  - public profile included `Favorite Skills`
 - Private profile handle `private-1782244167043-7hore9` returned `200` with the generic private profile page.
 - Unknown handle `unknown-1782244167043-7hore9` returned `404`.
 - Duplicate group slug was rejected for the same owner.

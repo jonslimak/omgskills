@@ -161,6 +161,7 @@ function CreateGroupPanel({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [name, setName] = useState("Team Skills");
   const [email, setEmail] = useState("");
+  const [isFavorites, setIsFavorites] = useState(false);
   const [status, setStatus] = useState("");
 
   const selectedSkillIds = useMemo(() => [...selectedIds], [selectedIds]);
@@ -185,6 +186,7 @@ function CreateGroupPanel({
         body: JSON.stringify({
           name,
           visibility: "restricted",
+          isFavorites,
           syncedSkillIds: selectedSkillIds
         })
       });
@@ -198,6 +200,7 @@ function CreateGroupPanel({
 
       setStatus("Restricted group created.");
       setSelectedIds(new Set());
+      setIsFavorites(false);
       onCreated();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to create group");
@@ -215,6 +218,10 @@ function CreateGroupPanel({
         <label>
           Allowed email
           <input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="teammate@example.com" />
+        </label>
+        <label className="inline-check">
+          <input type="checkbox" checked={isFavorites} onChange={(event) => setIsFavorites(event.target.checked)} />
+          Favorites
         </label>
       </div>
       <div className="check-list">

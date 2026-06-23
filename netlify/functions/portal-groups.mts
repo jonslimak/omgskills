@@ -35,7 +35,12 @@ async function createGroup(req: Request) {
   const body = await req.json();
   const name = requireString(body?.name, "name", 120);
   const description = optionalString(body?.description, 1000);
-  const visibility = body?.visibility === "restricted" ? "restricted" : "private";
+  const isFavorites = body?.isFavorites === true;
+  const visibility = isFavorites
+    ? "public"
+    : ["private", "restricted", "public"].includes(body?.visibility)
+      ? body.visibility
+      : "private";
   const syncedSkillIds = Array.isArray(body?.syncedSkillIds) ? body.syncedSkillIds : [];
   if (syncedSkillIds.length === 0) {
     throw new Response("Select at least one synced skill", { status: 400 });
@@ -44,7 +49,7 @@ async function createGroup(req: Request) {
     throw new Response("syncedSkillIds must be strings", { status: 400 });
   }
 
-  let slug = slugify(typeof body?.slug === "string" ? body.slug : name);
+  let slug = isFavorites ? "favorites" : slugify(typeof body?.slug === "string" ? body.slug : name);
   if (isReservedHandleOrSlug(slug)) {
     throw new Response("Group slug is reserved", { status: 400 });
   }
@@ -55,11 +60,11 @@ async function createGroup(req: Request) {
     await client.query("BEGIN");
     const groupResult = await client.query<{ id: string }>(
       `
-        INSERT INTO skill_groups (owner_user_id, name, description, slug, visibility)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO skill_groups (owner_user_id, name, description, slug, visibility, is_favorites)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id
       `,
-      [user.id, name, description, slug, visibility]
+      [user.id, isFavorites ? "Favorite Skills" : name, description, slug, visibility, isFavorites]
     );
     const groupId = groupResult.rows[0].id;
 
