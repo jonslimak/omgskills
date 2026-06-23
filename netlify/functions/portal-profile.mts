@@ -10,6 +10,15 @@ function randomHandle(): string {
   return `user-${crypto.randomBytes(4).toString("hex")}`;
 }
 
+function publicSiteOrigin(req: Request): string {
+  const url = new URL(req.url);
+  if (url.hostname === "app.omgskills.com") {
+    return "https://omgskills.com";
+  }
+
+  return url.origin;
+}
+
 async function uniqueHandle(preferred: string): Promise<string> {
   const pool = getPgPool();
   let handle = slugify(preferred);
@@ -86,7 +95,7 @@ export default async (req: Request, _context: Context) => {
     return jsonResponse(req, {
       profile: {
         ...profile,
-        publicUrl: profile.handle ? `https://omgskills.com/u/${profile.handle}` : null
+        publicUrl: profile.handle ? `${publicSiteOrigin(req)}/u/${profile.handle}` : null
       }
     });
   } catch (error) {

@@ -22,6 +22,20 @@ struct SkillSyncResult: Decodable, Equatable, Sendable {
 
 enum SkillSyncService {
     static let defaultEndpoint = URL(string: "https://app.omgskills.com/api/portal/sync-upload")!
+    static let endpointInfoKey = "OMGSkillsSyncEndpoint"
+
+    static func configuredEndpoint(bundle: Bundle = .main) -> URL {
+        guard
+            let value = bundle.object(forInfoDictionaryKey: endpointInfoKey) as? String,
+            let endpoint = URL(string: value.trimmingCharacters(in: .whitespacesAndNewlines)),
+            endpoint.scheme == "https",
+            endpoint.host != nil
+        else {
+            return defaultEndpoint
+        }
+
+        return endpoint
+    }
 
     static func payload(token: String, scanResult: InstalledSkillsScanner.ScanResult) -> SkillSyncPayload {
         SkillSyncPayload(
@@ -50,7 +64,7 @@ enum SkillSyncService {
 
     static func upload(
         token: String,
-        endpoint: URL = defaultEndpoint,
+        endpoint: URL = configuredEndpoint(),
         session: URLSession = .shared
     ) async throws -> SkillSyncResult {
         let payload = payload(token: token, scanResult: InstalledSkillsScanner.scanWithSummary())

@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>OMGSkillsSyncEndpoint</key>
+	<string>https://app.omgskills.com/api/portal/sync-upload</string>
 	<key>SUAutomaticallyUpdate</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>

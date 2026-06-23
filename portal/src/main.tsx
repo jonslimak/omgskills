@@ -14,6 +14,18 @@ import "./styles.css";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
+function publicSiteOrigin() {
+  if (window.location.hostname === "app.omgskills.com") {
+    return "https://omgskills.com";
+  }
+
+  return window.location.origin;
+}
+
+function publicGroupUrl(handle: string, slug: string) {
+  return `${publicSiteOrigin()}/u/${handle}/${slug}`;
+}
+
 type SyncedSkill = {
   id: string;
   name: string;
@@ -403,7 +415,7 @@ function GroupsPanel({
                     {group.visibility === "public" ? "Unpublish" : "Publish"}
                   </button>
                   {group.visibility === "public" && profile?.handle ? (
-                    <a href={`https://omgskills.com/u/${profile.handle}/${group.slug}`}>Public URL</a>
+                    <a href={publicGroupUrl(profile.handle, group.slug)}>Public URL</a>
                   ) : null}
                   <a href={`/api/portal/groups/${group.id}/export`}>Export</a>
                   <button className="secondary" onClick={() => setDisabled(group, true)}>Disable</button>
