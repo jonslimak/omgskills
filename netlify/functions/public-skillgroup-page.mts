@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import { recordAnalytics } from "./_shared/group-items.js";
 
 function escapeHtml(value: unknown): string {
   return String(value ?? "")
@@ -15,7 +16,7 @@ function html(body: string, status = 200): Response {
     status,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=60"
+      "Cache-Control": "no-store"
     }
   });
 }
@@ -63,6 +64,11 @@ export default async (req: Request, _context: Context) => {
           g.name,
           g.description,
           g.slug,
+          i.id AS "itemId",
+          i.kind,
+          i.catalog_skill_id AS "catalogSkillId",
+          i.github_url AS "itemGithubUrl",
+          i.note,
           s.name AS "skillName",
           s.description AS "skillDescription",
           s.github_url AS "githubUrl",
@@ -82,9 +88,16 @@ export default async (req: Request, _context: Context) => {
       return notFound();
     }
     const first = groupResult.rows[0];
+    await recordAnalytics("public_group_view", { groupId: first.id, profileUserId: user.id });
     const skills = groupResult.rows
-      .filter((row) => row.skillName)
-      .map((row) => `<div class="item"><h2>${escapeHtml(row.skillName)}</h2><p class="muted">${escapeHtml(row.skillDescription || "No description")}</p>${row.githubUrl ? `<a href="${escapeHtml(row.githubUrl)}">GitHub</a>` : "<span class=\"muted\">Metadata only</span>"}</div>`)
+      .filter((row) => row.itemId)
+      .map((row) => {
+        const name = row.skillName || row.catalogSkillId || row.itemGithubUrl || "Skill";
+        const description = row.skillDescription || row.note || (row.kind === "catalog" ? "Catalog skill" : "No description");
+        const githubUrl = row.githubUrl || row.itemGithubUrl;
+        const link = githubUrl ? `/api/public/skill-open?itemId=${encodeURIComponent(row.itemId)}&url=${encodeURIComponent(githubUrl)}` : "";
+        return `<div class="item"><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(description)}</p>${link ? `<a href="${link}">GitHub</a>` : "<span class=\"muted\">Metadata only</span>"}</div>`;
+      })
       .join("");
     return html(`<a href="/u/${escapeHtml(user.handle)}">Back to profile</a><h1>${escapeHtml(first.name)}</h1><p class="muted">${escapeHtml(first.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`);
   }
@@ -106,6 +119,7 @@ export default async (req: Request, _context: Context) => {
     .map((group) => `<div class="item"><h2><a href="/u/${escapeHtml(user.handle)}/${escapeHtml(group.slug)}">${escapeHtml(group.name)}</a></h2><p class="muted">${escapeHtml(group.description || `${group.itemCount} skills`)}</p></div>`)
     .join("");
 
+  await recordAnalytics("public_profile_view", { profileUserId: user.id });
   return html(`<h1>${escapeHtml(user.displayName || user.handle)}</h1><p class="muted">@${escapeHtml(user.handle)}</p>${groupList || "<p>No public Skill Groups yet.</p>"}`);
 };
 

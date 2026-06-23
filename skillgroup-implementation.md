@@ -539,6 +539,70 @@ Known gaps:
 
 Decision: Pass for public profile and public group URL MVP behavior. Follow-up for richer Favorites UX can happen in Milestone 3 or later.
 
+## Milestone 3 Evidence
+
+Date: 2026-06-23
+Branch/commit: `codex/skillgroups-mvp`, uncommitted
+Preview URL: `https://codex-skillgroups-mvp--omgskills.netlify.app`
+Commands run:
+
+- `npm run check`
+- `npm run build:netlify`
+- `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js deploy --build --branch codex-skillgroups-mvp --context branch:codex-skillgroups-mvp --site dfdb618d-b748-4c4f-a535-646dc5db449f`
+- Temporary Clerk dev-user E2E script against `https://codex-skillgroups-mvp--omgskills.netlify.app`
+
+Manual flows checked:
+
+- Portal My Skill Groups rows now include catalog search/add controls.
+- Portal My Skill Groups rows now include GitHub skill URL add controls.
+- Portal My Skill Groups rows now include export links.
+- Portal My Skill Groups rows now include owner moderation disable controls.
+- Temporary Clerk dev users were created for owner and copier, then deleted after verification.
+
+DB/API evidence:
+
+- Catalog search used hosted manifest data and returned `12` results for `summarize`.
+- Catalog item add succeeded.
+- GitHub skill URL validation accepted `https://github.com/anthropics/skills/blob/main/skills/pdf/SKILL.md`.
+- GitHub validation rejected a non-GitHub URL.
+- GitHub validation rejected a GitHub URL without valid `SKILL.md` frontmatter.
+- Export JSON result:
+  - type: `omgskills.skill_group`
+  - version: `1`
+  - item count: `3`
+  - attachment filename header included `skillgroup-`
+- Duplicate public group result:
+  - source group ID: `b4087fd5-f048-4d1e-8c11-2eaeb573fc8c`
+  - copied group ID: `8350c372-3cbe-4852-85a9-364513f4436f`
+  - copied group visibility: private
+  - copied group allowed email count: `0`
+- Public group view rendered the synced skill and per-skill open redirect.
+- Analytics events verified in DB:
+  - `group_duplicate`
+  - `group_export`
+  - `public_group_view`
+  - `skill_open`
+- Disabled public group returned `404`.
+
+Existing site regressions checked:
+
+- Production `/data/manifest.json` returns `200`.
+- Production `/data/v2/manifest.json` returns `200`.
+- Production `/download` returns `302` to `/downloads/omgskills-mac.dmg`.
+- Production `/downloads/omgskills-mac.dmg` returns `200`.
+- Production `/appcast.xml` returns `200`.
+- Production `/updates/omgskills-0.0.13.zip` returns `200`.
+- Production `/health/` returns `401`.
+
+Known gaps:
+
+- Catalog search fetches the large hosted skills JSON directly and limits results in memory. This is acceptable for MVP but should be cached or indexed later if usage grows.
+- Duplicate snapshots preserve current item references; richer immutable metadata snapshots can be added later if source synced skill deletion becomes a concern.
+- Moderation is owner-facing disable/restore plumbing, not an admin review queue.
+- Browser screenshot verification was not run; API and HTML assertions covered the gate.
+
+Decision: Pass for full group management MVP behavior.
+
 ## DevOps And Access Requirements
 
 Goal: make sure an independent agent can build and deploy the portal without breaking the existing website, hosted app data, Mac downloads, or Sparkle updates.
