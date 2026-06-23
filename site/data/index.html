@@ -169,29 +169,42 @@
       return String(Math.round(n || 0));
     }
 
-    function manifestUrl() {
-      const separator = location.protocol === "file:" ? "?" : "?";
-      return (location.protocol === "file:" ? "manifest.json" : "/data/manifest.json") + separator + "v=" + Date.now();
+    function manifestUrl(track) {
+      const base = location.protocol === "file:"
+        ? (track === "v2" ? "v2/manifest.json" : "manifest.json")
+        : (track === "v2" ? "/data/v2/manifest.json" : "/data/manifest.json");
+      return base + "?v=" + Date.now();
     }
 
-    function assetUrl(path) {
-      const url = location.protocol === "file:" ? path : "/data/" + path;
-      return url + "?v=" + Date.now();
+    function assetUrl(path, track) {
+      const base = location.protocol === "file:"
+        ? (track === "v2" ? "v2/" : "")
+        : (track === "v2" ? "/data/v2/" : "/data/");
+      return base + path + "?v=" + Date.now();
     }
 
-    async function loadLeaderboards() {
-      const manifestResponse = await fetch(manifestUrl(), { cache: "no-cache" });
+    async function loadLeaderboardsFromTrack(track) {
+      const manifestResponse = await fetch(manifestUrl(track), { cache: "no-cache" });
       if (!manifestResponse.ok) throw new Error("Manifest request failed: " + manifestResponse.status);
       const manifest = await manifestResponse.json();
       if (!manifest.leaderboardViewData?.path) throw new Error("manifest.leaderboardViewData.path is missing");
 
-      const dataResponse = await fetch(assetUrl(manifest.leaderboardViewData.path), { cache: "no-cache" });
+      const dataResponse = await fetch(assetUrl(manifest.leaderboardViewData.path, track), { cache: "no-cache" });
       if (!dataResponse.ok) throw new Error("Leaderboard view data request failed: " + dataResponse.status);
       const viewData = await dataResponse.json();
       if (!Array.isArray(viewData.topSkills)) throw new Error("Leaderboard view data topSkills must be an array");
       if (!Array.isArray(viewData.creatorCategories)) throw new Error("Leaderboard view data creatorCategories must be an array");
       if (!Array.isArray(viewData.allRounders)) throw new Error("Leaderboard view data allRounders must be an array");
       return { manifest, viewData };
+    }
+
+    async function loadLeaderboards() {
+      try {
+        return await loadLeaderboardsFromTrack("v2");
+      } catch (error) {
+        console.warn("v2 data load failed; falling back to legacy data", error);
+        return loadLeaderboardsFromTrack("legacy");
+      }
     }
 
     function vendorDot(record) {
@@ -351,7 +364,7 @@
           <section class="trophy-grid">${viewData.creatorCategories.map((category) => renderTrophy(category)).join("")}</section>
         </section>
         ${renderGoats(viewData.allRounders)}
-        <div class="footer">Data source: <a href="/data/manifest.json">manifest.json</a> → <code>leaderboardViewData.path</code></div>
+        <div class="footer">Data source: <a href="/data/v2/manifest.json">manifest.json</a> → <code>leaderboardViewData.path</code></div>
       `;
       document.getElementById("show-corpos").addEventListener("change", (event) => {
         applyFilter(event.target.checked);

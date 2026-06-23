@@ -1242,14 +1242,34 @@
       return String(Math.round(n));
     }
 
-    function dataAssetUrl(path) {
-      const base = location.protocol === "file:" ? "data/" : "/data/";
+    function dataManifestUrl(track) {
+      const base = location.protocol === "file:"
+        ? (track === "v2" ? "data/v2/manifest.json" : "data/manifest.json")
+        : (track === "v2" ? "/data/v2/manifest.json" : "/data/manifest.json");
+      return base + "?v=" + Date.now();
+    }
+
+    function dataAssetUrl(path, track) {
+      const base = location.protocol === "file:"
+        ? (track === "v2" ? "data/v2/" : "data/")
+        : (track === "v2" ? "/data/v2/" : "/data/");
       return base + path + "?v=" + Date.now();
     }
 
-    function dataManifestUrl() {
-      const base = location.protocol === "file:" ? "data/manifest.json" : "/data/manifest.json";
-      return base + "?v=" + Date.now();
+    function loadHomepageData(track) {
+      return fetch(dataManifestUrl(track), { cache: "no-cache" })
+        .then(function(response) {
+          if (!response.ok) throw new Error(track + " manifest request failed");
+          return response.json();
+        })
+        .then(function(manifest) {
+          if (!manifest.leaderboardViewData || !manifest.leaderboardViewData.path) throw new Error("Missing leaderboard data");
+          return fetch(dataAssetUrl(manifest.leaderboardViewData.path, track), { cache: "no-cache" });
+        })
+        .then(function(response) {
+          if (!response.ok) throw new Error(track + " leaderboard request failed");
+          return response.json();
+        });
     }
 
     function dataVendorDot(record) {
@@ -1285,21 +1305,13 @@
 
     function renderHomepageData(viewData) {
       const updatedLabel = "Updated " + new Date(viewData.generatedAt).toLocaleDateString();
-      document.getElementById("homepage-data").innerHTML = '<section class="data-group data-skills"><img class="data-logo" src="/data-logo.png" alt="omgdata" width="378" height="223"><p class="data-kicker">Follow the latest growing repos and prolific creators every week</p><h2 class="data-section-title">Top Skills this Week</h2><span class="data-meta">' + dataEsc(updatedLabel) + '</span>' + renderDataTrending(viewData.topSkills) + '</section><section class="data-group data-creators"><h2 class="data-section-title">Top Skill Creators</h2><section class="data-trophy-grid">' + viewData.creatorCategories.map(renderDataTrophy).join("") + '</section></section>' + renderDataGoats(viewData.allRounders) + '<div class="data-footer">Data source: <a href="/data/manifest.json">manifest.json</a></div>';
+      document.getElementById("homepage-data").innerHTML = '<section class="data-group data-skills"><img class="data-logo" src="/data-logo.png" alt="omgdata" width="378" height="223"><p class="data-kicker">Follow the latest growing repos and prolific creators every week</p><h2 class="data-section-title">Top Skills this Week</h2><span class="data-meta">' + dataEsc(updatedLabel) + '</span>' + renderDataTrending(viewData.topSkills) + '</section><section class="data-group data-creators"><h2 class="data-section-title">Top Skill Creators</h2><section class="data-trophy-grid">' + viewData.creatorCategories.map(renderDataTrophy).join("") + '</section></section>' + renderDataGoats(viewData.allRounders) + '<div class="data-footer">Data source: <a href="/data/v2/manifest.json">manifest.json</a></div>';
     }
 
-    fetch(dataManifestUrl(), { cache: "no-cache" })
-      .then(function(response) {
-        if (!response.ok) throw new Error("Manifest request failed");
-        return response.json();
-      })
-      .then(function(manifest) {
-        if (!manifest.leaderboardViewData || !manifest.leaderboardViewData.path) throw new Error("Missing leaderboard data");
-        return fetch(dataAssetUrl(manifest.leaderboardViewData.path), { cache: "no-cache" });
-      })
-      .then(function(response) {
-        if (!response.ok) throw new Error("Leaderboard request failed");
-        return response.json();
+    loadHomepageData("v2")
+      .catch(function(error) {
+        console.warn("v2 data load failed; falling back to legacy data", error);
+        return loadHomepageData("legacy");
       })
       .then(renderHomepageData)
       .catch(function(error) {
