@@ -200,11 +200,30 @@ pre {
   margin: 0;
 }
 
+.row-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .form-grid {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 14px 0;
+}
+
+.inline-check {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.inline-check input {
+  min-height: auto;
+  width: auto;
 }
 
 .check-list {

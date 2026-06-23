@@ -46,7 +46,7 @@ async function createGroup(req: Request) {
 
   let slug = slugify(typeof body?.slug === "string" ? body.slug : name);
   if (isReservedHandleOrSlug(slug)) {
-    slug = `${slug}-group`;
+    throw new Response("Group slug is reserved", { status: 400 });
   }
 
   const pool = getPgPool();
@@ -93,6 +93,9 @@ async function createGroup(req: Request) {
     await client.query("ROLLBACK");
     if (error instanceof Response) {
       throw error;
+    }
+    if ((error as { code?: string }).code === "23505") {
+      throw new Response("Group slug is already used", { status: 409 });
     }
     throw new Response("Failed to create group", { status: 500 });
   } finally {

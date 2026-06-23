@@ -488,6 +488,57 @@ Known gaps:
 
 Decision: Pass for Stage 1 thin-slice API/app-sync foundation. Follow-up before production launch: replace branch-only DB env workaround with a Git-backed Netlify branch/deploy-preview if Netlify Git mirroring is fixed.
 
+## Milestone 2 Evidence
+
+Date: 2026-06-23
+Branch/commit: `codex/skillgroups-mvp`, uncommitted
+Preview URL: `https://codex-skillgroups-mvp--omgskills.netlify.app`
+Commands run:
+
+- `npm run check`
+- `npm run build:netlify`
+- `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js deploy --build --branch codex-skillgroups-mvp --context branch:codex-skillgroups-mvp --site dfdb618d-b748-4c4f-a535-646dc5db449f`
+- Temporary Clerk dev-user E2E script against `https://codex-skillgroups-mvp--omgskills.netlify.app`
+
+Manual flows checked:
+
+- Portal now has Public Profile controls for handle and published state.
+- Portal My Skill Groups rows can publish/unpublish a group and show a public URL when published.
+- Temporary Clerk dev users were created for public owner, private profile owner, and second public owner, then deleted after verification.
+
+DB/API evidence:
+
+- `PATCH /api/portal/profile` publishes a handle and rejects reserved handles.
+- `PATCH /api/portal/groups/:groupId` publishes a group.
+- Public profile result:
+  - handle: `public-1782244167043-7hore9`
+  - public group slug: `shared-1782244167043-7hore9`
+  - group ID: `7603f914-b844-41ff-8534-6bbee0beb893`
+- Public group page rendered the synced skill.
+- Private profile handle `private-1782244167043-7hore9` returned `200` with the generic private profile page.
+- Unknown handle `unknown-1782244167043-7hore9` returned `404`.
+- Duplicate group slug was rejected for the same owner.
+- Duplicate group slug was allowed across owners:
+  - second owner group ID: `e3dce2e0-3757-4b89-b6b7-0e3fd2ec643e`
+
+Existing site regressions checked:
+
+- Production `/data/manifest.json` returns `200`.
+- Production `/data/v2/manifest.json` returns `200`.
+- Production `/download` returns `302` to `/downloads/omgskills-mac.dmg`.
+- Production `/downloads/omgskills-mac.dmg` returns `200`.
+- Production `/appcast.xml` returns `200`.
+- Production `/updates/omgskills-0.0.13.zip` returns `200`.
+- Production `/health/` returns `401`.
+
+Known gaps:
+
+- Favorites uses the existing `is_favorites` schema path, but there is not yet a dedicated Favorites editor in the portal UI.
+- The E2E used API checks and HTML response assertions, not browser screenshots.
+- Handle-change redirects are intentionally not implemented.
+
+Decision: Pass for public profile and public group URL MVP behavior. Follow-up for richer Favorites UX can happen in Milestone 3 or later.
+
 ## DevOps And Access Requirements
 
 Goal: make sure an independent agent can build and deploy the portal without breaking the existing website, hosted app data, Mac downloads, or Sparkle updates.

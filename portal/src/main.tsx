@@ -35,10 +35,17 @@ type SkillGroup = {
   ownerDisplayName?: string;
 };
 
+type Profile = {
+  handle: string | null;
+  profilePublished: boolean;
+  publicUrl: string | null;
+};
+
 type ApiState = {
   syncedSkills: SyncedSkill[];
   groups: SkillGroup[];
   sharedGroups: SkillGroup[];
+  profile: Profile | null;
 };
 
 function usePortalApi() {
@@ -223,7 +230,85 @@ function CreateGroupPanel({
   );
 }
 
-function GroupsPanel({ title, groups }: { title: string; groups: SkillGroup[] }) {
+function ProfilePanel({ profile, onRefresh }: { profile: Profile | null; onRefresh: () => void }) {
+  const api = usePortalApi();
+  const [handle, setHandle] = useState(profile?.handle ?? "");
+  const [published, setPublished] = useState(profile?.profilePublished ?? false);
+  const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    setHandle(profile?.handle ?? "");
+    setPublished(profile?.profilePublished ?? false);
+  }, [profile]);
+
+  async function saveProfile() {
+    setStatus("Saving profile...");
+    try {
+      await api("/api/portal/profile", {
+        method: "PATCH",
+        body: JSON.stringify({ handle, profilePublished: published })
+      });
+      setStatus("Profile saved.");
+      onRefresh();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to save profile");
+    }
+  }
+
+  return (
+    <section className="panel">
+      <div className="panel-header">
+        <div>
+          <h2>Public Profile</h2>
+          <p>{profile?.publicUrl ? <a href={profile.publicUrl}>{profile.publicUrl}</a> : "Publish to create a public URL."}</p>
+        </div>
+        <button onClick={saveProfile}>Save</button>
+      </div>
+      <div className="form-grid">
+        <label>
+          Handle
+          <input value={handle} onChange={(event) => setHandle(event.target.value)} placeholder="your-handle" />
+        </label>
+        <label className="inline-check">
+          <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
+          Published
+        </label>
+      </div>
+      {status ? <p className="status">{status}</p> : null}
+    </section>
+  );
+}
+
+function GroupsPanel({
+  title,
+  groups,
+  onRefresh,
+  canManage = false,
+  profile
+}: {
+  title: string;
+  groups: SkillGroup[];
+  onRefresh?: () => void;
+  canManage?: boolean;
+  profile?: Profile | null;
+}) {
+  const api = usePortalApi();
+  const [status, setStatus] = useState("");
+
+  async function setVisibility(group: SkillGroup, visibility: string) {
+    setStatus("Updating group...");
+    try {
+      await api(`/api/portal/groups/${group.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ visibility })
+      });
+      setStatus("Group updated.");
+      onRefresh?.();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to update group");
+    }
+  }
+
   return (
     <section className="panel">
       <h2>{title}</h2>
@@ -238,11 +323,24 @@ function GroupsPanel({ title, groups }: { title: string; groups: SkillGroup[] })
                 {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
               </span>
             </div>
-            {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}
+            <div className="row-actions">
+              {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}
+              {canManage ? (
+                <>
+                  <button className="secondary" onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}>
+                    {group.visibility === "public" ? "Unpublish" : "Publish"}
+                  </button>
+                  {group.visibility === "public" && profile?.handle ? (
+                    <a href={`https://omgskills.com/u/${profile.handle}/${group.slug}`}>Public URL</a>
+                  ) : null}
+                </>
+              ) : null}
+            </div>
           </div>
         ))}
         {groups.length === 0 ? <p className="muted">No groups yet.</p> : null}
       </div>
+      {status ? <p className="status">{status}</p> : null}
     </section>
   );
 }
@@ -250,20 +348,22 @@ function GroupsPanel({ title, groups }: { title: string; groups: SkillGroup[] })
 function Dashboard() {
   const api = usePortalApi();
   const { user } = useUser();
-  const [state, setState] = useState<ApiState>({ syncedSkills: [], groups: [], sharedGroups: [] });
+  const [state, setState] = useState<ApiState>({ syncedSkills: [], groups: [], sharedGroups: [], profile: null });
   const [status, setStatus] = useState("Loading...");
 
   async function refresh() {
     try {
-      const [synced, groups, shared] = await Promise.all([
+      const [synced, groups, shared, profile] = await Promise.all([
         api<{ skills: SyncedSkill[] }>("/api/portal/synced-skills"),
         api<{ groups: SkillGroup[] }>("/api/portal/groups"),
-        api<{ groups: SkillGroup[] }>("/api/portal/shared")
+        api<{ groups: SkillGroup[] }>("/api/portal/shared"),
+        api<{ profile: Profile }>("/api/portal/profile")
       ]);
       setState({
         syncedSkills: synced.skills,
         groups: groups.groups,
-        sharedGroups: shared.groups
+        sharedGroups: shared.groups,
+        profile: profile.profile
       });
       setStatus("");
     } catch (error) {
@@ -288,9 +388,10 @@ function Dashboard() {
 
       {status ? <p className="status">{status}</p> : null}
       <SyncTokenPanel />
+      <ProfilePanel profile={state.profile} onRefresh={refresh} />
       <SyncedSkillsPanel skills={state.syncedSkills} onRefresh={refresh} />
       <CreateGroupPanel skills={state.syncedSkills} onCreated={refresh} />
-      <GroupsPanel title="My Skill Groups" groups={state.groups} />
+      <GroupsPanel title="My Skill Groups" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
       <GroupsPanel title="Shared With Me" groups={state.sharedGroups} />
     </main>
   );
