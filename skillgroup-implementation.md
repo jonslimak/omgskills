@@ -419,8 +419,8 @@ Decision: Pass for code/deploy foundation. Follow-up required before production 
 ## Milestone 1 Evidence
 
 Date: 2026-06-23
-Branch/commit: `codex/skillgroups-mvp`, uncommitted
-Preview URL: `https://6a3adb54c1552f0089d4bc6f--omgskills.netlify.app`
+Branch/commit: `codex/skillgroups-mvp`, commit `5e6ce81`
+Preview URL: `https://codex-skillgroups-mvp--omgskills.netlify.app`
 Commands run:
 
 - `npm run check`
@@ -430,6 +430,8 @@ Commands run:
 - `npx netlify-cli deploy --dir=dist/netlify-site --site dfdb618d-b748-4c4f-a535-646dc5db449f`
 - `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js database status`
 - `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js db init --assume-no`
+- `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js database init --yes`
+- `npx -p node@20 node ./node_modules/netlify-cli/bin/run.js deploy --build --branch codex/skillgroups-mvp --site dfdb618d-b748-4c4f-a535-646dc5db449f`
 
 Manual flows checked:
 
@@ -452,7 +454,9 @@ DB/API evidence:
 - Unauthenticated `GET /api/portal/synced-skills` returns `401`.
 - Unauthenticated `GET /api/portal/groups` returns `401`.
 - Unauthenticated `GET /api/portal/shared` returns `401`.
-- `POST /api/portal/sync-upload` with a bad token currently cannot prove token rejection because Netlify Database is not connected.
+- `POST /api/portal/sync-upload` with a bad token returns `503` on CLI branch deploys because the deploy is not attached to a Netlify DB branch.
+- Preview DB branch `codex/skillgroups-mvp` is enabled and reachable.
+- Stage 1 migration was applied safely to the preview DB branch; tables `skill_groups` and `synced_skills` were verified.
 
 Existing site regressions checked on draft deploy:
 
@@ -466,9 +470,9 @@ Existing site regressions checked on draft deploy:
 
 Known gaps:
 
-- Netlify Database is not connected according to `netlify database status`; DB-backed API flows cannot be end-to-end verified yet.
-- Authenticated Clerk browser flow and DB smoke checks still need a real signed-in preview session after DB is connected.
-- Owner sync -> create restricted group -> allowed email views group is implemented in code but not verified end-to-end because DB is not connected.
+- CLI-uploaded branch deploys are not automatically attached to Netlify Database (`database_branch_id: null`), so deployed Functions still return `503` for DB-only unauthenticated checks.
+- Authenticated Clerk browser flow and DB smoke checks still need a real signed-in preview session after Netlify creates a Git-backed branch/deploy-preview with DB attachment.
+- Owner sync -> create restricted group -> allowed email views group is implemented in code but not verified end-to-end in a deployed Function because CLI deploys do not attach the DB branch.
 
 Decision: Needs follow-up before Milestone 1 is passed.
 
@@ -490,7 +494,8 @@ Current prepared state as of 2026-06-23:
   - production URL: `https://omgskills.com`
   - domain alias: `https://app.omgskills.com`
   - current production deploy state: ready
-- Netlify Database has been initialized for the site. Implementation still needs `@netlify/database` installed when DB code is added.
+- Netlify Database has been initialized for the site.
+- `@netlify/database` is installed and DB helpers use its `getConnectionString()` API.
 - Clerk setup status:
   - Google OAuth is enabled.
   - Organizations are disabled and should stay disabled for MVP.
@@ -503,9 +508,11 @@ Current prepared state as of 2026-06-23:
 - Preview health protection:
   - `HEALTH_BASIC_AUTH_PASSWORD`, context `deploy-preview`, scopes `builds`, `functions`, `runtime`
 - Netlify Database status:
-  - `netlify database status` currently reports `Database status: not connected`
-  - `netlify database init --assume-no` through Node 20 installs the legacy Neon extension but fails because new database creation through that extension is no longer available
-  - Stage 1 DB-backed API code is implemented, but end-to-end DB verification needs current Netlify Database enablement or a branch deploy path that provisions the new built-in database
+  - project `netlify-cli` must stay on `26.1.0` or newer; older `22.x` uses the retired Neon extension flow
+  - `netlify database init --yes` recognizes the built-in Netlify Database flow
+  - `netlify database status --branch codex/skillgroups-mvp` reports enabled with the preview DB branch
+  - CLI deploys can create a branch URL, but they do not attach a `database_branch_id`; use Git-backed Netlify branch/deploy-preview builds for full deployed DB verification
+  - slash branch names are sanitized in Netlify branch URLs (`codex/skillgroups-mvp` becomes `codex-skillgroups-mvp`)
 - Netlify environment variables configured:
   - `VITE_CLERK_PUBLISHABLE_KEY`, context `all`, scopes `builds`, `functions`, `runtime`
   - `CLERK_SECRET_KEY`, context `production`, scopes `builds`, `functions`, `runtime`
