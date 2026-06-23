@@ -6,8 +6,12 @@ import {
   shouldReadShadowRepoOverlay,
   shouldWriteShadowRepoOverlay,
 } from "./repo-overlay.js";
+import {
+  applyShadowSkillOverlay,
+  buildShadowSkillOverlay,
+} from "./skill-overlay.js";
 import type { ShadowCutoverSkillSignal, ShadowRepoIndex, ShadowRepoIndexEntry, ShadowRepoOverlay, ShadowSkillRecord } from "./types.js";
-import { buildCutoverSkillSignals, reconcileRepoIndexSkillIds } from "./build-shadow.js";
+import { buildCutoverShadowSkills, buildCutoverSkillSignals, buildFinalShadowSkills, buildSkillFileMissingSample, reconcileRepoIndexSkillIds, removeFilteredCatalogOnlyRepos, shouldSuppressStableCheapRetry } from "./build-shadow.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
   const { repo: repoName, stars, ...rest } = overrides;
@@ -21,6 +25,8 @@ function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEnt
     stars,
     lastSeenAt: "2026-05-22T00:00:00Z",
     lastRefreshedAt: "2026-05-22T00:00:00Z",
+    lastCheapCheckedAt: null,
+    lastObservedRepoUpdatedAt: null,
     trustSignals: [],
     promotionReasons: [],
     staleOrInvalidState: null,
@@ -46,6 +52,26 @@ function overlay(repos: ShadowRepoIndexEntry[]): ShadowRepoOverlay {
     generatedAt: "2026-05-22T01:00:00Z",
     repoCount: repos.length,
     repos,
+  };
+}
+
+function shadowSkill(overrides: Partial<ShadowSkillRecord> & Pick<ShadowSkillRecord, "id" | "github_url">): ShadowSkillRecord {
+  return {
+    name: "skill",
+    description: "Desc",
+    install_cmd: "install",
+    author_handle: "owner",
+    tags: [],
+    stars: 1,
+    last_updated: "2026-05-01T00:00:00Z",
+    first_seen: "2026-05-01",
+    skill_md_sha: "sha",
+    publisher_handle: "owner",
+    publisher_repo: "owner/repo",
+    upstream_repo: null,
+    provenance_type: "original",
+    author_confidence: "high",
+    ...overrides,
   };
 }
 
@@ -108,6 +134,57 @@ test("periodic and background cadences ignore overlay", () => {
   assert.equal(backgroundResult.overlayLoaded, false);
   assert.equal(backgroundResult.overlayEntryCount, 0);
   assert.equal(index.repos[0]?.state, "library");
+});
+
+test("shouldSuppressStableCheapRetry only suppresses matching stable failures", () => {
+  assert.equal(
+    shouldSuppressStableCheapRetry(true, { reason: "skillFileMissing", observedRepoUpdatedAt: "2026-06-04T00:00:00Z" }, "2026-06-04T00:00:00Z"),
+    true,
+  );
+  assert.equal(
+    shouldSuppressStableCheapRetry(true, { reason: "repoMissing", observedRepoUpdatedAt: "2026-06-04T00:00:00Z" }, "2026-06-05T00:00:00Z"),
+    false,
+  );
+  assert.equal(
+    shouldSuppressStableCheapRetry(false, { reason: "repoMissing", observedRepoUpdatedAt: "2026-06-04T00:00:00Z" }, "2026-06-04T00:00:00Z"),
+    false,
+  );
+  assert.equal(shouldSuppressStableCheapRetry(true, null, "2026-06-04T00:00:00Z"), false);
+});
+
+test("buildSkillFileMissingSample reports current-run path failures with repo context", () => {
+  const index = repoIndex([
+    repo({
+      repo: "owner/one",
+      stars: 10,
+      skillIds: ["owner/one:a", "owner/one:b"],
+      skillCount: 2,
+      topSkillId: "owner/one:b",
+      lastObservedRepoUpdatedAt: "2026-06-04T00:00:00Z",
+    }),
+    repo({ repo: "owner/two", stars: 5 }),
+  ]);
+  const candidates = [
+    { id: "owner/one:b", repo: "owner/one", reason: "skillFileMissing" as const },
+    { id: "owner/two:skill", repo: "owner/two", reason: "repoMissing" as const },
+    ...Array.from({ length: 12 }, (_, i) => ({
+      id: `owner/extra-${i}:skill`,
+      repo: `owner/extra-${i}`,
+      reason: "skillFileMissing" as const,
+    })),
+  ];
+
+  const sample = buildSkillFileMissingSample(candidates, index);
+
+  assert.equal(sample.length, 10);
+  assert.deepEqual(sample[0], {
+    repo: "owner/one",
+    failedSkillId: "owner/one:b",
+    skillCount: 2,
+    topSkillId: "owner/one:b",
+    lastObservedRepoUpdatedAt: "2026-06-04T00:00:00Z",
+  });
+  assert.equal(sample.some((row) => row.repo === "owner/two"), false);
 });
 
 test("only combined writes overlay", () => {
@@ -187,6 +264,50 @@ test("bootstrapped skill ids survive into next combined-run starting state", () 
 
   assert.deepEqual(index.repos[0]?.skillIds, ["owner/repo:bootstrapped"]);
   assert.equal(index.repos[0]?.topSkillId, "owner/repo:bootstrapped");
+});
+
+test("bootstrapped skill records survive with repo and skill overlays", () => {
+  const baselineSkills = [shadowSkill({ id: "owner/repo:base", github_url: "https://github.com/owner/repo" })];
+  const bootstrappedSkill = shadowSkill({ id: "owner/repo:bootstrapped", github_url: "https://github.com/owner/repo" });
+  const currentIndex = repoIndex([
+    repo({
+      repo: "owner/repo",
+      stars: 10,
+      skillIds: ["owner/repo:bootstrapped"],
+      skillCount: 1,
+      topSkillId: "owner/repo:bootstrapped",
+    }),
+  ]);
+  const repoOverlay = buildShadowRepoOverlay(currentIndex, repoIndex([repo({ repo: "owner/repo", stars: 10 })]), "2026-05-22T02:00:00Z");
+  const skillOverlay = buildShadowSkillOverlay(
+    [bootstrappedSkill],
+    new Set(baselineSkills.map((skill) => skill.id)),
+    currentIndex,
+    "2026-05-22T02:00:00Z",
+  );
+
+  const nextIndex = repoIndex([repo({ repo: "owner/repo", stars: 10 })]);
+  applyShadowRepoOverlay("combined", nextIndex, repoOverlay);
+  const merged = applyShadowSkillOverlay("combined", baselineSkills, nextIndex, skillOverlay);
+  reconcileRepoIndexSkillIds(nextIndex, merged.shadowSkills);
+
+  assert.deepEqual(merged.shadowSkills.map((skill) => skill.id), ["owner/repo:base", "owner/repo:bootstrapped"]);
+  assert.deepEqual(nextIndex.repos[0]?.skillIds, ["owner/repo:base", "owner/repo:bootstrapped"]);
+});
+
+test("final shadow skill assembly carries forward overlay-only skills", () => {
+  const baselineSkill = shadowSkill({ id: "owner/repo:base", github_url: "https://github.com/owner/repo" });
+  const overlaySkill = shadowSkill({ id: "owner/repo:bootstrapped", github_url: "https://github.com/owner/repo" });
+  const result = buildFinalShadowSkills(
+    [baselineSkill],
+    new Map([
+      [baselineSkill.id, baselineSkill],
+      [overlaySkill.id, overlaySkill],
+    ]),
+    [],
+  );
+
+  assert.deepEqual(result.map((skill) => skill.id), ["owner/repo:base", "owner/repo:bootstrapped"]);
 });
 
 test("overlay write count matches persisted repo entries", () => {
@@ -298,4 +419,69 @@ test("reconciliation clears repo skill ids when no current shadow skills remain"
   assert.equal(index.repos[0]?.skillCount, 0);
   assert.equal(index.repos[0]?.topSkillId, null);
   assert.equal(index.repos[0]?.topSkillStars, 0);
+});
+
+test("cutover skills exclude unresolved catalog-like skills but keep resolved ones", () => {
+  const cutover = buildCutoverShadowSkills([
+    shadowSkill({
+      id: "catalog/repo:drop",
+      github_url: "https://github.com/catalog/repo",
+      author_handle: "",
+      provenance_type: "catalog",
+    }),
+    shadowSkill({
+      id: "repackaged/repo:drop",
+      github_url: "https://github.com/repackaged/repo",
+      author_handle: "",
+      provenance_type: "repackaged",
+    }),
+    shadowSkill({
+      id: "catalog/repo:keep",
+      github_url: "https://github.com/catalog/repo",
+      author_handle: "creator",
+      provenance_type: "catalog",
+    }),
+  ]);
+
+  assert.deepEqual(cutover.map((skill) => skill.id), ["catalog/repo:keep"]);
+});
+
+test("repo index removes entries whose only skills were filtered catalog-like skills", () => {
+  const index = repoIndex([
+    repo({
+      repo: "sickn33/antigravity-awesome-skills",
+      stars: 41394,
+      state: "rising",
+      skillIds: ["sickn33/antigravity-awesome-skills:docker-expert"],
+      skillCount: 1,
+      topSkillId: "sickn33/antigravity-awesome-skills:docker-expert",
+    }),
+    repo({
+      repo: "owner/kept",
+      stars: 5,
+      skillIds: ["owner/kept:skill"],
+      skillCount: 1,
+      topSkillId: "owner/kept:skill",
+    }),
+  ]);
+  const allSkills = [
+    shadowSkill({
+      id: "sickn33/antigravity-awesome-skills:docker-expert",
+      github_url: "https://github.com/sickn33/antigravity-awesome-skills",
+      author_handle: "",
+      provenance_type: "catalog",
+      publisher_repo: "sickn33/antigravity-awesome-skills",
+    }),
+    shadowSkill({
+      id: "owner/kept:skill",
+      github_url: "https://github.com/owner/kept",
+    }),
+  ];
+  const cutover = buildCutoverShadowSkills(allSkills);
+
+  removeFilteredCatalogOnlyRepos(index, allSkills, cutover);
+  reconcileRepoIndexSkillIds(index, cutover);
+
+  assert.deepEqual(index.repos.map((row) => row.repo), ["owner/kept"]);
+  assert.equal(index.repoCount, 1);
 });

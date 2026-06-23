@@ -281,6 +281,23 @@ test("stars break ties within the same candidate reason bucket", () => {
   assert.deepEqual(result.map((row) => row.repo), ["periodic/high", "periodic/low", "periodic/zero"]);
 });
 
+test("excluded catalog repos are not proposed for promotion", () => {
+  const result = buildNextPromotionCandidates(
+    repoIndex([
+      repo({ repo: "sickn33/antigravity-awesome-skills", stars: 50000, state: "library" }),
+      repo({ repo: "periodic/kept", stars: 500, state: "library" }),
+    ]),
+    candidateDiscovery([
+      { repo: "sickn33/antigravity-awesome-skills", lanes: ["periodic"] },
+      { repo: "periodic/kept", lanes: ["periodic"] },
+    ]),
+    [],
+    new Set(["sickn33/antigravity-awesome-skills"]),
+  );
+
+  assert.deepEqual(result.map((row) => row.repo), ["periodic/kept"]);
+});
+
 test("promotion shortlist respects total cap", () => {
   const candidates = [
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `vendor/${index}`, stars: 100 - index, reason: "trustedVendor" as const })),
@@ -342,7 +359,6 @@ test("only top 3 shortlist repos are promoted", async () => {
   ]);
 
   const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
     cadence: "combined",
     repoIndex: index,
     shortlist: [
@@ -351,14 +367,6 @@ test("only top 3 shortlist repos are promoted", async () => {
       { repo: "library/three", stars: 600, reason: "goldBasket" },
       { repo: "library/four", stars: 550, reason: "trustedVendor" },
     ],
-    getMissingRepoMeta: async () => null,
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: [],
-      isTrustedVendor: false,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
   });
 
   assert.equal(promoted.length, SHORTLIST_PROMOTION_LIMIT);
@@ -373,7 +381,6 @@ test("only library repos are promoted and they become rising", async () => {
   ]);
 
   const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
     cadence: "combined",
     repoIndex: index,
     shortlist: [
@@ -381,14 +388,6 @@ test("only library repos are promoted and they become rising", async () => {
       { repo: "rising/one", stars: 9, reason: "periodic" },
       { repo: "core/one", stars: 8, reason: "background" },
     ],
-    getMissingRepoMeta: async () => null,
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: [],
-      isTrustedVendor: false,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
   });
 
   assert.equal(promoted.length, 1);
@@ -407,122 +406,39 @@ test("promotion does not run on non-combined cadences", async () => {
   ]);
 
   const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
     cadence: "fast",
     repoIndex: index,
     shortlist: [{ repo: "library/one", stars: 700, reason: "periodic" }],
-    getMissingRepoMeta: async () => null,
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: [],
-      isTrustedVendor: false,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
   });
 
   assert.equal(promoted.length, 0);
   assert.equal(index.repos[0]?.state, "library");
 });
 
-test("missing repo with 100+ stars is created as rising", async () => {
+test("missing repo is not created by shortlist promotion", async () => {
   const index = repoIndex([]);
 
   const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
     cadence: "combined",
     repoIndex: index,
     shortlist: [{ repo: "new/repo", stars: PERIODIC_PROMOTION_MIN_STARS, reason: "periodic" }],
-    getMissingRepoMeta: async () => ({
-      canonicalRepo: "canonical/repo",
-      stars: PERIODIC_PROMOTION_MIN_STARS,
-      repoUrl: "https://github.com/Canonical/Repo",
-    }),
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: ["awesome", "registry"],
-      isTrustedVendor: true,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
-  });
-
-  assert.equal(promoted.length, 1);
-  assert.equal(promoted[0]?.promotionKind, "new-discovery");
-  assert.equal(index.repoCount, 1);
-  assert.equal(index.repos[0]?.repo, "canonical/repo");
-  assert.equal(index.repos[0]?.repoUrl, "https://github.com/Canonical/Repo");
-  assert.equal(index.repos[0]?.state, "rising");
-  assert.deepEqual(index.repos[0]?.skillIds, []);
-  assert.equal(index.repos[0]?.topSkillId, null);
-  assert.ok(index.repos[0]?.promotionReasons.includes("shortlist-promotion"));
-  assert.ok(index.repos[0]?.promotionReasons.includes("new-discovery"));
-});
-
-test("missing repo below 100 stars is not created", async () => {
-  const index = repoIndex([]);
-
-  const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
-    cadence: "combined",
-    repoIndex: index,
-    shortlist: [{ repo: "small/repo", stars: 99, reason: "background" }],
-    getMissingRepoMeta: async () => ({
-      canonicalRepo: "small/repo",
-      stars: 99,
-      repoUrl: "https://github.com/small/repo",
-    }),
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: ["social"],
-      isTrustedVendor: false,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
   });
 
   assert.equal(promoted.length, 0);
   assert.equal(index.repoCount, 0);
 });
 
-test("redirected alias that resolves to an existing canonical repo does not create a duplicate", async () => {
-  const index = repoIndex([
-    repo({
-      repo: "canonical/repo",
-      repoUrl: "https://github.com/canonical/repo",
-      stars: 10,
-      state: "library",
-      discoveredSources: ["baseline"],
-    }),
-  ]);
+test("missing repo below 100 stars is not created", async () => {
+  const index = repoIndex([]);
 
   const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
     cadence: "combined",
     repoIndex: index,
-    shortlist: [{ repo: "alias/repo", stars: PERIODIC_PROMOTION_MIN_STARS, reason: "periodic" }],
-    getMissingRepoMeta: async () => ({
-      canonicalRepo: "canonical/repo",
-      stars: PERIODIC_PROMOTION_MIN_STARS,
-      repoUrl: "https://github.com/Canonical/Repo",
-    }),
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: ["awesome", "topics"],
-      isTrustedVendor: false,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
+    shortlist: [{ repo: "small/repo", stars: 99, reason: "background" }],
   });
 
-  assert.equal(promoted.length, 1);
-  assert.equal(promoted[0]?.repo, "canonical/repo");
-  assert.equal(promoted[0]?.promotionKind, "existing-library");
-  assert.equal(index.repoCount, 1);
-  assert.equal(index.repos[0]?.state, "rising");
-  assert.equal(index.repos[0]?.repoUrl, "https://github.com/Canonical/Repo");
-  assert.equal(index.repos[0]?.stars, PERIODIC_PROMOTION_MIN_STARS);
-  assert.deepEqual(index.repos[0]?.discoveredSources, ["awesome", "baseline", "topics"]);
+  assert.equal(promoted.length, 0);
+  assert.equal(index.repoCount, 0);
 });
 
 test("background shortlist repos do not auto-promote", async () => {
@@ -531,18 +447,9 @@ test("background shortlist repos do not auto-promote", async () => {
   ]);
 
   const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
     cadence: "combined",
     repoIndex: index,
     shortlist: [{ repo: "library/one", stars: 5000, reason: "background" }],
-    getMissingRepoMeta: async () => null,
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: ["background"],
-      isTrustedVendor: false,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
   });
 
   assert.equal(promoted.length, 0);
@@ -555,18 +462,9 @@ test("plain periodic shortlist repos below 500 stars do not auto-promote", async
   ]);
 
   const promoted = await applyShortlistPromotions({
-    checkedAt: "2026-05-22T00:00:00Z",
     cadence: "combined",
     repoIndex: index,
     shortlist: [{ repo: "library/one", stars: 499, reason: "periodic" }],
-    getMissingRepoMeta: async () => null,
-    getMissingRepoContext: () => ({
-      checkedAt: "2026-05-22T00:00:00Z",
-      discoveredSources: ["periodic"],
-      isTrustedVendor: false,
-      isTrustedCreator: false,
-      isGoldBasketRepo: false,
-    }),
   });
 
   assert.equal(promoted.length, 0);

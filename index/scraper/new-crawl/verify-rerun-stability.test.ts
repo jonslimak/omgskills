@@ -73,9 +73,13 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     discoveryBudgetSummary: null,
     partialDiscoveryWarnings: [],
     enrichmentCounts: {
-      libraryReposChecked: 0,
+      cheapReposChecked: 0,
       dailyPriorityRepoCount: 0,
       skillsDeepRefreshed: 0,
+      monitoredDeepRefreshed: 0,
+      cheapTriggeredRefreshCandidateCount: 0,
+      cheapTriggeredRefreshDeferredCount: 0,
+      cheapTriggeredDeepRefreshed: 0,
       carriedForwardCount: 0,
       correctedCount: 0,
       staleInvalidCandidateCount: 0,
@@ -85,6 +89,8 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     trustedLowStarSkillCount: 0,
     officialLowStarSkillCount: 0,
     staleInvalidCandidatesSample: [],
+    skillFileMissingSample: [],
+    staleReasonCounts: { repoMissing: 0, skillFileMissing: 0, validationFailed: 0 },
     priorityReasonCounts: { official: 0, trustedVendor: 0, goldBasket: 0, stars: 0 },
     dailyPriorityRepoSample: [],
     skippedMonitoredRepoCount: 0,
@@ -98,6 +104,8 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     promotedRepoSample: [],
     bootstrappedRepoCount: 0,
     bootstrappedRepoSample: [],
+    catalogAdmissionCount: 0,
+    catalogAdmissionSample: [],
     bootstrapFailedRepoCount: 0,
     bootstrapFailedRepoSample: [],
     bootstrapSkippedRepoCount: 0,
@@ -107,6 +115,9 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     shadowRepoOverlayLoaded: false,
     shadowRepoOverlayEntryCount: 0,
     shadowRepoOverlayWrittenCount: 0,
+    shadowSkillOverlayLoaded: false,
+    shadowSkillOverlayEntryCount: 0,
+    shadowSkillOverlayWrittenCount: 0,
     enrichmentWarnings: [],
     discoveredRepoCount: 0,
     discoveredRepoCountByLane: { fast: 0, periodic: 0, background: 0 },
@@ -120,6 +131,23 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     bootstrapValueReposSample: [],
     fastOnlyRepoCount: 0,
     fastOnlyReposSample: [],
+    crawl4Preview: {
+      tierCounts: { tier1: 0, tier2: 0, longtail: 0 },
+      missingTier1Repos: [],
+      missingTier2Repos: [],
+      unresolvedCatalogRepos: [],
+      momentumCounts: { skillssh: 0, validatedX: 0, both: 0 },
+      momentumRepoSample: [],
+      currentDailyPriorityRepos: [],
+      proposedDailyPriorityRepos: [],
+      proposedDailyPriorityScoreSample: [],
+      dailyPriorityAdded: [],
+      dailyPriorityRemoved: [],
+      currentShortlistRepos: [],
+      proposedShortlistRepos: [],
+      shortlistAdded: [],
+      shortlistRemoved: [],
+    },
     cutoverValidationPassed: true,
     cutoverValidationFailureCount: 0,
     cutoverValidationFailuresSample: [],
@@ -139,6 +167,49 @@ test("timestamp-only compare differences normalize away", () => {
 test("stage timing differences normalize away", () => {
   const left = selectComparableShadowReport(shadowReport({ stageTimings: { build: 1 } }));
   const right = selectComparableShadowReport(shadowReport({ stageTimings: { build: 999 } }));
+
+  assert.equal(firstDiffPath(left, right), null);
+});
+
+test("crawl4 preview differences are compared deterministically", () => {
+  const left = selectComparableShadowReport(shadowReport({
+    crawl4Preview: {
+      tierCounts: { tier1: 1, tier2: 2, longtail: 3 },
+      missingTier1Repos: ["a/repo"],
+      missingTier2Repos: ["b/repo"],
+      unresolvedCatalogRepos: ["catalog/repo"],
+      momentumCounts: { skillssh: 1, validatedX: 2, both: 3 },
+      momentumRepoSample: ["x/repo"],
+      currentDailyPriorityRepos: ["old/repo"],
+      proposedDailyPriorityRepos: ["new/repo"],
+      proposedDailyPriorityScoreSample: [],
+      dailyPriorityAdded: ["new/repo"],
+      dailyPriorityRemoved: ["old/repo"],
+      currentShortlistRepos: ["old/shortlist"],
+      proposedShortlistRepos: ["new/shortlist"],
+      shortlistAdded: ["new/shortlist"],
+      shortlistRemoved: ["old/shortlist"],
+    },
+  }));
+  const right = selectComparableShadowReport(shadowReport({
+    crawl4Preview: {
+      tierCounts: { tier1: 1, tier2: 2, longtail: 3 },
+      missingTier1Repos: ["a/repo"],
+      missingTier2Repos: ["b/repo"],
+      unresolvedCatalogRepos: ["catalog/repo"],
+      momentumCounts: { skillssh: 1, validatedX: 2, both: 3 },
+      momentumRepoSample: ["x/repo"],
+      currentDailyPriorityRepos: ["old/repo"],
+      proposedDailyPriorityRepos: ["new/repo"],
+      proposedDailyPriorityScoreSample: [],
+      dailyPriorityAdded: ["new/repo"],
+      dailyPriorityRemoved: ["old/repo"],
+      currentShortlistRepos: ["old/shortlist"],
+      proposedShortlistRepos: ["new/shortlist"],
+      shortlistAdded: ["new/shortlist"],
+      shortlistRemoved: ["old/shortlist"],
+    },
+  }));
 
   assert.equal(firstDiffPath(left, right), null);
 });

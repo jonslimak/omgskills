@@ -44,27 +44,10 @@ export type NextPromotionCandidate = {
   reason: NextPromotionCandidateReason;
 };
 
-type MissingRepoMeta = {
-  canonicalRepo: string;
-  stars: number;
-  repoUrl: string;
-};
-
-type MissingRepoContext = {
-  checkedAt: string;
-  discoveredSources: string[];
-  isTrustedVendor: boolean;
-  isTrustedCreator: boolean;
-  isGoldBasketRepo: boolean;
-};
-
 type ApplyShortlistPromotionsOptions = {
-  checkedAt: string;
   cadence: ShadowCadence;
   repoIndex: ShadowRepoIndex;
   shortlist: NextPromotionCandidate[];
-  getMissingRepoMeta: (repo: string) => Promise<MissingRepoMeta | null>;
-  getMissingRepoContext: (repo: string) => MissingRepoContext;
 };
 
 export function buildDailyPriorityRepos(
@@ -148,17 +131,16 @@ export function buildNextPromotionCandidates(
   repoIndex: ShadowRepoIndex,
   discovered: Map<string, DailyPriorityDiscoveredRepo>,
   dailyPriorityRepos: ShadowRepoIndexEntry[],
+  excludedRepos = new Set<string>(),
 ): NextPromotionCandidate[] {
   const dailyPrioritySet = new Set(dailyPriorityRepos.map((repo) => repo.repo));
   const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
 
   return [...discovered.values()]
     .filter((repo) => !dailyPrioritySet.has(repo.repo))
+    .filter((repo) => !excludedRepos.has(repo.repo))
     .filter((repo) => repo.lanes.has("periodic") || repo.lanes.has("background"))
-    .filter((repo) => {
-      const existing = repoByName.get(repo.repo);
-      return !existing || existing.state === "library";
-    })
+    .filter((repo) => repoByName.get(repo.repo)?.state === "library")
     .map((discoveredRepo) => {
       const repo = repoByName.get(discoveredRepo.repo) ?? null;
       return {
@@ -196,35 +178,6 @@ export function buildNextPromotionShortlist(candidates: NextPromotionCandidate[]
   return shortlist;
 }
 
-function createNewDiscoveryRepoEntry(
-  meta: MissingRepoMeta,
-  context: MissingRepoContext,
-): ShadowRepoIndexEntry {
-  return {
-    repo: meta.canonicalRepo,
-    repoUrl: meta.repoUrl,
-    state: "rising",
-    discoveredSources: [...new Set(context.discoveredSources)].sort(),
-    skillIds: [],
-    skillCount: 0,
-    stars: meta.stars,
-    lastSeenAt: context.checkedAt,
-    lastRefreshedAt: context.checkedAt,
-    trustSignals: [
-      context.isTrustedVendor ? "trusted-vendor" : "",
-      context.isTrustedCreator ? "trusted-creator" : "",
-      context.isGoldBasketRepo ? "gold-basket" : "",
-    ].filter(Boolean),
-    promotionReasons: ["new-discovery", "shortlist-promotion"],
-    staleOrInvalidState: null,
-    isTrustedVendor: context.isTrustedVendor,
-    isTrustedCreator: context.isTrustedCreator,
-    isGoldBasketRepo: context.isGoldBasketRepo,
-    topSkillId: null,
-    topSkillStars: 0,
-  };
-}
-
 function isPromotionEligible(candidate: NextPromotionCandidate): boolean {
   if (candidate.reason === "trustedVendor" || candidate.reason === "goldBasket") return true;
   if (candidate.reason === "periodic") return candidate.stars >= PERIODIC_PROMOTION_MIN_STARS;
@@ -232,22 +185,18 @@ function isPromotionEligible(candidate: NextPromotionCandidate): boolean {
 }
 
 export async function applyShortlistPromotions({
-  checkedAt,
   cadence,
   repoIndex,
   shortlist,
-  getMissingRepoMeta,
-  getMissingRepoContext,
 }: ApplyShortlistPromotionsOptions): Promise<PromotedRepoSample[]> {
   if (cadence !== "combined") return [];
 
-  const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
   const promoted: PromotedRepoSample[] = [];
 
   for (const candidate of shortlist) {
     if (promoted.length >= SHORTLIST_PROMOTION_LIMIT) break;
     if (!isPromotionEligible(candidate)) continue;
-    const repo = repoByName.get(candidate.repo);
+    const repo = repoIndex.repos.find((row) => row.repo === candidate.repo);
     if (repo) {
       if (repo.state !== "library") continue;
 
@@ -263,51 +212,7 @@ export async function applyShortlistPromotions({
         stars: repo.stars,
         promotionKind: "existing-library",
       });
-      continue;
     }
-
-    const meta = await getMissingRepoMeta(candidate.repo);
-    if (!meta || meta.stars < 100) continue;
-
-    const context = getMissingRepoContext(candidate.repo);
-    const canonicalRepo = repoByName.get(meta.canonicalRepo);
-    if (canonicalRepo) {
-      canonicalRepo.discoveredSources = [...new Set([...canonicalRepo.discoveredSources, ...context.discoveredSources])].sort();
-      canonicalRepo.repoUrl = meta.repoUrl;
-      canonicalRepo.stars = Math.max(canonicalRepo.stars, meta.stars);
-      canonicalRepo.lastSeenAt = checkedAt;
-      canonicalRepo.lastRefreshedAt = checkedAt;
-      if (canonicalRepo.state !== "library") continue;
-
-      const priorState: RepoState = canonicalRepo.state;
-      canonicalRepo.state = "rising";
-      canonicalRepo.promotionReasons = [...new Set([...canonicalRepo.promotionReasons, "shortlist-promotion"])];
-
-      promoted.push({
-        repo: canonicalRepo.repo,
-        priorState,
-        newState: canonicalRepo.state,
-        reason: candidate.reason,
-        stars: canonicalRepo.stars,
-        promotionKind: "existing-library",
-      });
-      continue;
-    }
-
-    const created = createNewDiscoveryRepoEntry(meta, context);
-    created.lastSeenAt = checkedAt;
-    created.lastRefreshedAt = checkedAt;
-    repoIndex.repos.push(created);
-    repoByName.set(created.repo, created);
-
-    promoted.push({
-      repo: created.repo,
-      priorState: "library",
-      newState: created.state,
-      reason: candidate.reason,
-      stars: created.stars,
-      promotionKind: "new-discovery",
-    });
   }
 
   repoIndex.repos.sort((a, b) => a.repo.localeCompare(b.repo));

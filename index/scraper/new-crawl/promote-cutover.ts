@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { Skill } from "../types.js";
 import type { ShadowRunReport, ShadowSkillRecord } from "./types.js";
+import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const defaultIndexRoot = join(here, "..", "..");
@@ -54,7 +55,7 @@ function hasDuplicateIds(skills: Skill[]): string | null {
 }
 
 export function isPromotionFilteredSkill(skill: ShadowSkillRecord): boolean {
-  return !skill.author_handle && (skill.provenance_type === "catalog" || skill.provenance_type === "repackaged");
+  return isUnresolvedCatalogLikeSkill(skill);
 }
 
 export function buildPromotedSkills(

@@ -34,6 +34,9 @@ export type ProvenanceOverride = {
 export type TrustedSeeds = {
   trustedVendorHandles: Set<string>;
   trustedCreatorHandles: Set<string>;
+  officialTier1Repos: Set<string>;
+  officialTier2Repos: Set<string>;
+  manualIncludeRepos: Set<string>;
   repoOverrides: RepoOverride[];
   catalogRepoRules: CatalogRepoRule[];
   provenanceOverrides: ProvenanceOverride[];
@@ -67,9 +70,14 @@ export type ShadowRepoIndexEntry = {
   stars: number;
   lastSeenAt: string;
   lastRefreshedAt: string;
+  lastCheapCheckedAt?: string | null;
+  lastObservedRepoUpdatedAt?: string | null;
   trustSignals: string[];
   promotionReasons: string[];
-  staleOrInvalidState: null;
+  staleOrInvalidState: {
+    reason: "repoMissing" | "skillFileMissing";
+    observedRepoUpdatedAt: string;
+  } | null;
   isTrustedVendor: boolean;
   isTrustedCreator: boolean;
   isGoldBasketRepo: boolean;
@@ -89,6 +97,12 @@ export type ShadowRepoOverlay = {
   repos: ShadowRepoIndexEntry[];
 };
 
+export type ShadowSkillOverlay = {
+  generatedAt: string;
+  skillCount: number;
+  skills: ShadowSkillRecord[];
+};
+
 export type ShadowSkillSignals = {
   generatedAt: string;
   signals: Record<string, never>;
@@ -98,6 +112,12 @@ export type ShadowCutoverSkillSignal = {
   id: string;
   isRising?: boolean;
   isCore?: boolean;
+};
+
+export type ShadowStaleReasonCounts = {
+  repoMissing: number;
+  skillFileMissing: number;
+  validationFailed: number;
 };
 
 export type CutoverValidationFailureKind =
@@ -113,9 +133,13 @@ export type CutoverValidationFailure = {
 };
 
 export type ShadowEnrichmentCounts = {
-  libraryReposChecked: number;
+  cheapReposChecked: number;
   dailyPriorityRepoCount: number;
   skillsDeepRefreshed: number;
+  monitoredDeepRefreshed: number;
+  cheapTriggeredRefreshCandidateCount: number;
+  cheapTriggeredRefreshDeferredCount: number;
+  cheapTriggeredDeepRefreshed: number;
   carriedForwardCount: number;
   correctedCount: number;
   staleInvalidCandidateCount: number;
@@ -169,6 +193,14 @@ export type BootstrapRepoSample = {
   failureReason?: string;
 };
 
+export type CatalogAdmissionSample = {
+  id: string;
+  repo: string;
+  provenanceType: Extract<ProvenanceType, "catalog" | "repackaged">;
+  stars: number;
+  authorHandle: string;
+};
+
 export type RebootstrapEligibleRepoSample = {
   repo: string;
   missingSkillIds: string[];
@@ -178,6 +210,14 @@ export type ShadowStaleInvalidCandidate = {
   id: string;
   repo: string;
   reason: "repoMissing" | "skillFileMissing" | "validationFailed";
+};
+
+export type SkillFileMissingSample = {
+  repo: string;
+  failedSkillId: string;
+  skillCount: number;
+  topSkillId: string | null;
+  lastObservedRepoUpdatedAt: string | null;
 };
 
 export type StageTimings = Record<string, number>;
@@ -197,6 +237,12 @@ export type DiscoveryBudgetSummary = {
     includeBroadQuery: boolean;
     maxFingerprintQueries: number;
     maxPagesPerQuery: number;
+  };
+  highStarSkillMd: {
+    minStars: number;
+    maxSampledRepos: number;
+    maxPagesPerQuery: number;
+    requestDelayMs: number;
   };
   social: {
     maxPagesPerQuery: number;
@@ -257,6 +303,36 @@ export type ShadowCutoverCompare = {
   };
 };
 
+export type Crawl4Preview = {
+  tierCounts: {
+    tier1: number;
+    tier2: number;
+    longtail: number;
+  };
+  missingTier1Repos: string[];
+  missingTier2Repos: string[];
+  unresolvedCatalogRepos: string[];
+  momentumCounts: {
+    skillssh: number;
+    validatedX: number;
+    both: number;
+  };
+  momentumRepoSample: string[];
+  currentDailyPriorityRepos: string[];
+  proposedDailyPriorityRepos: string[];
+  proposedDailyPriorityScoreSample: Array<{
+    repo: string;
+    score: number;
+    reasons: string[];
+  }>;
+  dailyPriorityAdded: string[];
+  dailyPriorityRemoved: string[];
+  currentShortlistRepos: string[];
+  proposedShortlistRepos: string[];
+  shortlistAdded: string[];
+  shortlistRemoved: string[];
+};
+
 export type ShadowRunReport = {
   checkedAt: string;
   status: "ok";
@@ -298,6 +374,8 @@ export type ShadowRunReport = {
   trustedLowStarSkillCount: number;
   officialLowStarSkillCount: number;
   staleInvalidCandidatesSample: ShadowStaleInvalidCandidate[];
+  skillFileMissingSample: SkillFileMissingSample[];
+  staleReasonCounts: ShadowStaleReasonCounts;
   priorityReasonCounts: PriorityReasonCounts;
   dailyPriorityRepoSample: DailyPriorityRepoSample[];
   skippedMonitoredRepoCount: number;
@@ -311,6 +389,8 @@ export type ShadowRunReport = {
   promotedRepoSample: PromotedRepoSample[];
   bootstrappedRepoCount: number;
   bootstrappedRepoSample: BootstrapRepoSample[];
+  catalogAdmissionCount: number;
+  catalogAdmissionSample: CatalogAdmissionSample[];
   bootstrapFailedRepoCount: number;
   bootstrapFailedRepoSample: BootstrapRepoSample[];
   bootstrapSkippedRepoCount: number;
@@ -320,6 +400,9 @@ export type ShadowRunReport = {
   shadowRepoOverlayLoaded: boolean;
   shadowRepoOverlayEntryCount: number;
   shadowRepoOverlayWrittenCount: number;
+  shadowSkillOverlayLoaded: boolean;
+  shadowSkillOverlayEntryCount: number;
+  shadowSkillOverlayWrittenCount: number;
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;
@@ -333,6 +416,7 @@ export type ShadowRunReport = {
   bootstrapValueReposSample: string[];
   fastOnlyRepoCount: number;
   fastOnlyReposSample: string[];
+  crawl4Preview: Crawl4Preview;
   cutoverValidationPassed: boolean;
   cutoverValidationFailureCount: number;
   cutoverValidationFailuresSample: CutoverValidationFailure[];

@@ -24,6 +24,9 @@ function seeds(partial: Partial<TrustedSeeds> = {}): TrustedSeeds {
   return {
     trustedVendorHandles: new Set(),
     trustedCreatorHandles: new Set(),
+    officialTier1Repos: new Set(),
+    officialTier2Repos: new Set(),
+    manualIncludeRepos: new Set(),
     repoOverrides: [],
     catalogRepoRules: [],
     provenanceOverrides: [],

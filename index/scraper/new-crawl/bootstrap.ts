@@ -83,6 +83,29 @@ export function toEnrichCandidate(candidate: RepoBootstrapCandidate): Candidate 
   };
 }
 
+function repoKeyFromGithubUrl(githubUrl: string): string | null {
+  const match = githubUrl.match(/^https:\/\/github\.com\/([^/]+)\/([^/?#]+)/i);
+  if (!match) return null;
+  return `${match[1]!.toLowerCase()}/${match[2]!.toLowerCase()}`;
+}
+
+function skillBelongsToRepo(skill: Skill, repo: string): boolean {
+  return repoKeyFromGithubUrl(skill.github_url) === repo.toLowerCase();
+}
+
+export function removeFailedNewlyAdmittedRepos(repoIndex: ShadowRepoIndex, newlyAdmittedRepos: Set<string>): string[] {
+  const removed: string[] = [];
+  repoIndex.repos = repoIndex.repos.filter((repo) => {
+    const isAdmissionEntry = newlyAdmittedRepos.has(repo.repo) || repo.promotionReasons.includes("library-admission");
+    if (!isAdmissionEntry) return true;
+    if (repo.skillIds.length > 0) return true;
+    removed.push(repo.repo);
+    return false;
+  });
+  repoIndex.repoCount = repoIndex.repos.length;
+  return removed.sort();
+}
+
 type BootstrapOptions = {
   cadence: ShadowCadence;
   checkedAt: string;
@@ -134,7 +157,7 @@ export async function bootstrapRisingRepos({
   const bootstrapSkippedRepoSample: BootstrapRepoSample[] = [];
 
   const eligibleRepos = repoIndex.repos
-    .filter((repo) => repo.state === "rising" && repo.skillIds.length === 0)
+    .filter((repo) => repo.state !== "core" && repo.skillIds.length === 0)
     .sort((a, b) => a.repo.localeCompare(b.repo));
 
   for (const repo of eligibleRepos) {
@@ -163,7 +186,7 @@ export async function bootstrapRisingRepos({
     }
 
     const result = await enrichCandidateFn(toEnrichCandidate(resolvedCandidate), existingFirstSeen, existingSkills, today);
-    if (result.skill) {
+    if (result.skill && skillBelongsToRepo(result.skill, repo.repo)) {
       repo.skillIds = [result.skill.id];
       repo.skillCount = 1;
       repo.topSkillId = result.skill.id;
@@ -187,7 +210,7 @@ export async function bootstrapRisingRepos({
       source: resolvedCandidate.source,
       candidateId: resolvedCandidate.id,
       outcome: "failed",
-      failureReason: result.failure?.reason ?? "enrich-failed",
+      failureReason: result.skill ? "repo-mismatch" : result.failure?.reason ?? "enrich-failed",
     });
   }
 

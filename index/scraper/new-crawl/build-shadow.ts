@@ -1,11 +1,12 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { performance } from "node:perf_hooks";
+import { fileURLToPath } from "node:url";
 import type { Skill } from "../types.js";
-import type { Candidate, EnrichResult } from "../enrich.js";
+import type { EnrichResult } from "../enrich.js";
 import { enrichCandidate, getCandidateRepoMeta, resolveCandidateSkillPath } from "../enrich.js";
 import { searchByTopics } from "../sources/topics.js";
-import { searchBySkillMdFilename } from "../sources/code.js";
+import { searchBySkillMdFilename, searchHighStarSkillMdRepos } from "../sources/code.js";
 import { searchAggregators } from "../sources/aggregators.js";
 import { searchSocial } from "../sources/social.js";
 import { searchRegistry } from "../sources/registry.js";
@@ -13,11 +14,27 @@ import { searchSkillsSh } from "../sources/skillssh.js";
 import { searchAwesomeAgentSkills } from "../sources/awesome.js";
 import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
+import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible } from "./admission.js";
 import { loadTrustedSeeds } from "./seeds.js";
+import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
 import { resolveShadowProvenance } from "./provenance.js";
-import { bootstrapRisingRepos, repairDeadPersistedRisingSkillLinks, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
+import { buildMomentumSignals } from "./momentum.js";
+import { buildCandidateFromSkill } from "./candidate-path.js";
+import { bootstrapRisingRepos, removeFailedNewlyAdmittedRepos, repairDeadPersistedRisingSkillLinks, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
+import { assertGitHubQuotaAvailable } from "./github-quota-guard.js";
 import { buildCutoverCompare, buildCutoverCompareSummary } from "./cutover-compare.js";
 import { validateCutoverOutputs } from "./cutover-validation.js";
+import { buildCrawl4Preview } from "./crawl4-preview.js";
+import { buildCatalogAdmissionSample } from "./catalog-admission.js";
+import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
+import {
+  applyShadowSkillOverlay,
+  buildShadowSkillOverlay,
+  loadShadowSkillOverlay,
+  shouldReadShadowSkillOverlay,
+  shouldWriteShadowSkillOverlay,
+} from "./skill-overlay.js";
+import { buildCheapTriggeredRefreshSelection, buildWeeklyCheapCheckRepos, markRepoMissingCheapCheck, mergePriorShadowRepoTimestamps, repoMetaLooksChanged } from "./rolling-refresh.js";
 import {
   applyShadowRepoOverlay,
   buildShadowRepoOverlay,
@@ -47,9 +64,11 @@ import type {
   RepoOverride,
   RepoState,
   BootstrapRepoSample,
+  CatalogAdmissionSample,
   ShadowEnrichmentCounts,
   ShadowRepoIndex,
   ShadowRepoOverlay,
+  ShadowSkillOverlay,
   ShadowAuthorDiffExample,
   ShadowCutoverSkillSignal,
   ShadowCutoverCompare,
@@ -58,10 +77,13 @@ import type {
   ShadowSkillRecord,
   ShadowRunReport,
   ShadowSkillSignals,
+  SkillFileMissingSample,
   ShadowStaleInvalidCandidate,
+  ShadowStaleReasonCounts,
   SourceRunSummary,
   StageTimings,
   TopRepoSummary,
+  TrustedSeeds,
 } from "./types.js";
 
 type DiscoverySourceName =
@@ -71,6 +93,7 @@ type DiscoverySourceName =
   | "registry"
   | "topics"
   | "code"
+  | "high-star-skillmd"
   | "social"
   | "aggregators"
   | "trusted-vendors"
@@ -96,7 +119,7 @@ const CADENCE_LANES: Record<ShadowCadence, DiscoveryLane[]> = {
 const EXTERNAL_SOURCES_BY_LANE: Record<DiscoveryLane, DiscoverySourceName[]> = {
   fast: ["official"],
   periodic: ["skillssh", "awesome", "registry"],
-  background: ["topics", "code", "social", "aggregators"],
+  background: ["topics", "code", "high-star-skillmd", "social", "aggregators"],
 };
 
 const BACKGROUND_DISCOVERY_BUDGET: DiscoveryBudgetSummary = {
@@ -108,6 +131,12 @@ const BACKGROUND_DISCOVERY_BUDGET: DiscoveryBudgetSummary = {
     includeBroadQuery: false,
     maxFingerprintQueries: 3,
     maxPagesPerQuery: 2,
+  },
+  highStarSkillMd: {
+    minStars: 500,
+    maxSampledRepos: 50,
+    maxPagesPerQuery: 1,
+    requestDelayMs: 500,
   },
   social: {
     maxPagesPerQuery: 1,
@@ -139,6 +168,11 @@ function loadSkills(path: string): Skill[] {
   return JSON.parse(readFileSync(path, "utf8")) as Skill[];
 }
 
+function loadShadowRepoIndex(path: string): ShadowRepoIndex | null {
+  if (!existsSync(path)) return null;
+  return JSON.parse(readFileSync(path, "utf8")) as ShadowRepoIndex;
+}
+
 function cloneRepoIndex(repoIndex: ShadowRepoIndex): ShadowRepoIndex {
   return JSON.parse(JSON.stringify(repoIndex)) as ShadowRepoIndex;
 }
@@ -165,6 +199,13 @@ function repoKeyFor(skill: Skill): { repo: string; repoUrl: string } | null {
   return repoKeyFromGithubUrl(skill.github_url);
 }
 
+function codeCandidateId(repo: string, path: string): string {
+  if (path === "SKILL.md") return repo;
+  const parts = path.split("/");
+  const skillName = parts[parts.length - 2] ?? "skill";
+  return `${repo}:${skillName}`;
+}
+
 function ownerHandle(repo: string): string {
   return repo.split("/")[0] ?? "";
 }
@@ -186,8 +227,8 @@ function buildSkillSignals(checkedAt: string): ShadowSkillSignals {
   };
 }
 
-function buildCutoverShadowSkills(skills: ShadowSkillRecord[]): ShadowSkillRecord[] {
-  return skills;
+export function buildCutoverShadowSkills(skills: ShadowSkillRecord[]): ShadowSkillRecord[] {
+  return skills.filter((skill) => !isUnresolvedCatalogLikeSkill(skill));
 }
 
 export function buildCutoverSkillSignals(
@@ -245,6 +286,33 @@ export function reconcileRepoIndexSkillIds(
   }
 }
 
+export function removeFilteredCatalogOnlyRepos(
+  repoIndex: ShadowRepoIndex,
+  allSkills: ShadowSkillRecord[],
+  maintainedSkills: ShadowSkillRecord[],
+) {
+  const maintainedSkillIds = new Set(maintainedSkills.map((skill) => skill.id));
+  const filteredSkillIdsByRepo = new Map<string, Set<string>>();
+
+  for (const skill of allSkills) {
+    if (!isUnresolvedCatalogLikeSkill(skill)) continue;
+    if (maintainedSkillIds.has(skill.id)) continue;
+    const repo = repoKeyFor(skill)?.repo;
+    if (!repo) continue;
+    const existing = filteredSkillIdsByRepo.get(repo) ?? new Set<string>();
+    existing.add(skill.id);
+    filteredSkillIdsByRepo.set(repo, existing);
+  }
+
+  repoIndex.repos = repoIndex.repos.filter((repo) => {
+    const filteredSkillIds = filteredSkillIdsByRepo.get(repo.repo);
+    if (!filteredSkillIds) return true;
+    if (repo.skillIds.length === 0) return false;
+    return !repo.skillIds.every((skillId) => filteredSkillIds.has(skillId));
+  });
+  repoIndex.repoCount = repoIndex.repos.length;
+}
+
 function toShadowSkillRecord(skill: Skill): ShadowSkillRecord {
   const seeds = loadTrustedSeeds();
   const provenance = resolveShadowProvenance(skill, seeds);
@@ -263,6 +331,21 @@ function buildShadowSkills(skills: Skill[]): ShadowSkillRecord[] {
   return skills.map(toShadowSkillRecord);
 }
 
+export function buildFinalShadowSkills(
+  baselineSkills: Skill[],
+  shadowById: Map<string, ShadowSkillRecord>,
+  bootstrappedSkills: Skill[],
+): ShadowSkillRecord[] {
+  const baselineSkillIds = new Set(baselineSkills.map((skill) => skill.id));
+  const baselineShadowSkills = baselineSkills.map((skill) => shadowById.get(skill.id) ?? toShadowSkillRecord(skill));
+  const carriedForwardShadowSkills = [...shadowById.values()].filter((skill) => !baselineSkillIds.has(skill.id));
+  const bootstrappedShadowSkills = bootstrappedSkills.map((skill) => toShadowSkillRecord(skill));
+
+  return [...new Map(
+    [...baselineShadowSkills, ...carriedForwardShadowSkills, ...bootstrappedShadowSkills].map((skill) => [skill.id, skill] as const),
+  ).values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+
 function buildRepoCountsByState(repos: ShadowRepoIndexEntry[]): Record<RepoState, number> {
   return repos.reduce<Record<RepoState, number>>(
     (acc, repo) => {
@@ -276,8 +359,7 @@ function buildRepoCountsByState(repos: ShadowRepoIndexEntry[]): Record<RepoState
 function buildUnresolvedCatalogPublishers(skills: ShadowSkillRecord[]): { publisherRepo: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const skill of skills) {
-    if (skill.author_handle) continue;
-    if (skill.provenance_type !== "catalog" && skill.provenance_type !== "repackaged") continue;
+    if (!isUnresolvedCatalogLikeSkill(skill)) continue;
     if (!skill.publisher_repo) continue;
     counts.set(skill.publisher_repo, (counts.get(skill.publisher_repo) ?? 0) + 1);
   }
@@ -289,7 +371,7 @@ function buildUnresolvedCatalogPublishers(skills: ShadowSkillRecord[]): { publis
 }
 
 function shouldExcludeFromInspectableShadowLibrary(skill: ShadowSkillRecord): boolean {
-  return !skill.author_handle && (skill.provenance_type === "catalog" || skill.provenance_type === "repackaged");
+  return isUnresolvedCatalogLikeSkill(skill);
 }
 
 function buildInspectableShadowSkills(skills: ShadowSkillRecord[]): ShadowSkillRecord[] {
@@ -409,6 +491,8 @@ function buildRepoIndex(
       stars: skill.stars,
       lastSeenAt: checkedAt,
       lastRefreshedAt: checkedAt,
+      lastCheapCheckedAt: null,
+      lastObservedRepoUpdatedAt: null,
       trustSignals: sortUnique([
         trustedVendor ? "trusted-vendor" : "",
         trustedCreator ? "trusted-creator" : "",
@@ -535,6 +619,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
       ? [
           `- topics: maxQueries=${report.discoveryBudgetSummary.topics.maxQueries}, maxPagesPerQuery=${report.discoveryBudgetSummary.topics.maxPagesPerQuery}`,
           `- code: includeBroadQuery=${report.discoveryBudgetSummary.code.includeBroadQuery}, maxFingerprintQueries=${report.discoveryBudgetSummary.code.maxFingerprintQueries}, maxPagesPerQuery=${report.discoveryBudgetSummary.code.maxPagesPerQuery}`,
+          `- high-star-skillmd: minStars=${report.discoveryBudgetSummary.highStarSkillMd.minStars}, maxSampledRepos=${report.discoveryBudgetSummary.highStarSkillMd.maxSampledRepos}, maxPagesPerQuery=${report.discoveryBudgetSummary.highStarSkillMd.maxPagesPerQuery}`,
           `- social: maxPagesPerQuery=${report.discoveryBudgetSummary.social.maxPagesPerQuery}`,
           `- aggregators: maxRepos=${report.discoveryBudgetSummary.aggregators.maxRepos}`,
         ]
@@ -548,8 +633,8 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     "## Enrichment",
     "",
-    `- Daily priority rule: official (12), gold basket (10), trusted vendor (8), stars fill to ${DAILY_PRIORITY_REPO_LIMIT}`,
-    `- Library repos checked: ${report.enrichmentCounts.libraryReposChecked}`,
+    `- Active daily priority hotset rule: official (12), gold basket (10), trusted vendor (8), stars fill to ${DAILY_PRIORITY_REPO_LIMIT}`,
+    `- Cheap repos checked: ${report.enrichmentCounts.cheapReposChecked}`,
     `- Daily priority repos: ${report.enrichmentCounts.dailyPriorityRepoCount}`,
     `- Daily priority reasons: ${formatPriorityReasonCounts(report.priorityReasonCounts)}`,
     `- Next promotion candidates: ${report.nextPromotionCandidateCount}`,
@@ -558,15 +643,24 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Promoted to rising: ${report.promotedToRisingCount}`,
     `- New discovered repos promoted: ${report.newDiscoveredRepoPromotedCount}`,
     `- Bootstrapped repos: ${report.bootstrappedRepoCount}`,
+    `- Catalog-like admissions: ${report.catalogAdmissionCount}`,
     `- Bootstrap failures: ${report.bootstrapFailedRepoCount}`,
     `- Bootstrap skipped: ${report.bootstrapSkippedRepoCount}`,
     `- Shadow repo overlay loaded: ${report.shadowRepoOverlayLoaded ? "yes" : "no"}`,
     `- Shadow repo overlay entries: ${report.shadowRepoOverlayEntryCount}`,
     `- Shadow repo overlay written: ${report.shadowRepoOverlayWrittenCount}`,
+    `- Shadow skill overlay loaded: ${report.shadowSkillOverlayLoaded ? "yes" : "no"}`,
+    `- Shadow skill overlay entries: ${report.shadowSkillOverlayEntryCount}`,
+    `- Shadow skill overlay written: ${report.shadowSkillOverlayWrittenCount}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
+    `- Monitored deep-refreshed: ${report.enrichmentCounts.monitoredDeepRefreshed}`,
+    `- Cheap-triggered refresh candidates: ${report.enrichmentCounts.cheapTriggeredRefreshCandidateCount}`,
+    `- Cheap-triggered refresh deferred: ${report.enrichmentCounts.cheapTriggeredRefreshDeferredCount}`,
+    `- Cheap-triggered deep-refreshed: ${report.enrichmentCounts.cheapTriggeredDeepRefreshed}`,
     `- Carried forward: ${report.enrichmentCounts.carriedForwardCount}`,
     `- Corrected: ${report.enrichmentCounts.correctedCount}`,
     `- Stale/invalid candidates: ${report.enrichmentCounts.staleInvalidCandidateCount}`,
+    `- Stale/invalid reasons: repoMissing=${report.staleReasonCounts.repoMissing}, skillFileMissing=${report.staleReasonCounts.skillFileMissing}, validationFailed=${report.staleReasonCounts.validationFailed}`,
     `- Skipped monitored repos: ${report.skippedMonitoredRepoCount}`,
     "",
     "## Enrichment warnings",
@@ -598,11 +692,31 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Next promotion shortlist: ${report.nextPromotionShortlistSample.map((row) => `${row.repo} (${row.reason}, ${row.stars})`).join(", ") || "none"}`,
     `- Promoted repos: ${report.promotedRepoSample.map((row) => `${row.repo} (${row.promotionKind}, ${row.priorState}->${row.newState}, ${row.reason}, ${row.stars})`).join(", ") || "none"}`,
     `- Bootstrapped repos: ${report.bootstrappedRepoSample.map((row) => `${row.repo} (${row.source}, ${row.candidateId})`).join(", ") || "none"}`,
+    `- Catalog-like admissions: ${report.catalogAdmissionSample.map((row) => `${row.repo} (${row.id}, ${row.provenanceType}, stars=${row.stars}, author=@${row.authorHandle || "?"})`).join(", ") || "none"}`,
     `- Bootstrap failures: ${report.bootstrapFailedRepoSample.map((row) => `${row.repo} (${row.source}, ${row.failureReason ?? "failed"})`).join(", ") || "none"}`,
     `- Bootstrap skipped: ${report.bootstrapSkippedRepoSample.map((row) => `${row.repo} (${row.source}, ${row.failureReason ?? "skipped"})`).join(", ") || "none"}`,
     `- Low-star valid skills: ${report.lowStarValidSkillSample.join(", ") || "none"}`,
     `- Stale/invalid candidates: ${report.staleInvalidCandidatesSample.map((row) => `${row.id} (${row.reason})`).join(", ") || "none"}`,
+    `- Skill-file missing sample: ${report.skillFileMissingSample.map((row) => `${row.repo} (${row.failedSkillId}, skills=${row.skillCount}, top=${row.topSkillId ?? "none"}, observed=${row.lastObservedRepoUpdatedAt ?? "none"})`).join(", ") || "none"}`,
     `- Daily priority repos: ${report.dailyPriorityRepoSample.map((row) => `${row.repo} (${row.reason})`).join(", ") || "none"}`,
+    "",
+    "## Crawl v4 Preview",
+    "",
+    `- Tier counts: tier1=${report.crawl4Preview.tierCounts.tier1}, tier2=${report.crawl4Preview.tierCounts.tier2}, longtail=${report.crawl4Preview.tierCounts.longtail}`,
+    `- Missing Tier 1 repos: ${report.crawl4Preview.missingTier1Repos.join(", ") || "none"}`,
+    `- Missing Tier 2 repos: ${report.crawl4Preview.missingTier2Repos.join(", ") || "none"}`,
+    `- Unresolved catalog repos: ${report.crawl4Preview.unresolvedCatalogRepos.join(", ") || "none"}`,
+    `- Momentum counts: skillssh=${report.crawl4Preview.momentumCounts.skillssh}, validatedX=${report.crawl4Preview.momentumCounts.validatedX}, both=${report.crawl4Preview.momentumCounts.both}`,
+    `- Momentum repo sample: ${report.crawl4Preview.momentumRepoSample.join(", ") || "none"}`,
+    `- Current daily priority: ${report.crawl4Preview.currentDailyPriorityRepos.join(", ") || "none"}`,
+    `- Proposed daily priority: ${report.crawl4Preview.proposedDailyPriorityRepos.join(", ") || "none"}`,
+    `- Proposed daily priority scores: ${report.crawl4Preview.proposedDailyPriorityScoreSample.map((row) => `${row.repo} (${row.score}: ${row.reasons.join("/")})`).join(", ") || "none"}`,
+    `- Daily priority added: ${report.crawl4Preview.dailyPriorityAdded.join(", ") || "none"}`,
+    `- Daily priority removed: ${report.crawl4Preview.dailyPriorityRemoved.join(", ") || "none"}`,
+    `- Current shortlist: ${report.crawl4Preview.currentShortlistRepos.join(", ") || "none"}`,
+    `- Proposed shortlist: ${report.crawl4Preview.proposedShortlistRepos.join(", ") || "none"}`,
+    `- Shortlist added: ${report.crawl4Preview.shortlistAdded.join(", ") || "none"}`,
+    `- Shortlist removed: ${report.crawl4Preview.shortlistRemoved.join(", ") || "none"}`,
     "",
     "## Stage timings (ms)",
     "",
@@ -652,19 +766,11 @@ function observedStars(hit: unknown): number {
   return typeof value === "number" ? value : 0;
 }
 
-function buildPromotionCandidateMeta(repo: string, repoUrl?: string): Candidate {
-  return {
-    id: repo,
-    skill_md_path: "SKILL.md",
-    github_url: repoUrl,
-  };
-}
-
 function buildTrustSignalsForRepo(
   repo: string,
   goldBasketRepos: Set<string>,
+  seeds = loadTrustedSeeds(),
 ): Pick<ShadowRepoIndexEntry, "isTrustedVendor" | "isTrustedCreator" | "isGoldBasketRepo" | "trustSignals"> {
-  const seeds = loadTrustedSeeds();
   const trustedVendor = seeds.trustedVendorHandles.has(ownerHandle(repo));
   const trustedCreator = seeds.trustedCreatorHandles.has(ownerHandle(repo));
   const goldBasketRepo = goldBasketRepos.has(repo);
@@ -680,20 +786,40 @@ function buildTrustSignalsForRepo(
   };
 }
 
+function admitDiscoveredRepos(
+  cadence: ShadowCadence,
+  checkedAt: string,
+  repoIndex: ShadowRepoIndex,
+  discovered: Map<string, DiscoveredRepoRecord>,
+  goldBasketRepos: Set<string>,
+  seeds: TrustedSeeds,
+): Set<string> {
+  const admittedRepos = new Set<string>();
+  if (cadence !== "combined") return admittedRepos;
+
+  const existingRepos = new Set(repoIndex.repos.map((repo) => repo.repo));
+
+  for (const discoveredRepo of [...discovered.values()].sort((a, b) => a.repo.localeCompare(b.repo))) {
+    if (existingRepos.has(discoveredRepo.repo)) continue;
+    const trust = buildTrustSignalsForRepo(discoveredRepo.repo, goldBasketRepos, seeds);
+    if (!isDiscoveredRepoAdmissionEligible(discoveredRepo, seeds, trust)) continue;
+
+    repoIndex.repos.push(createAdmittedLibraryRepoEntry(discoveredRepo, checkedAt, trust));
+    existingRepos.add(discoveredRepo.repo);
+    admittedRepos.add(discoveredRepo.repo);
+  }
+
+  repoIndex.repos.sort((a, b) => a.repo.localeCompare(b.repo));
+  repoIndex.repoCount = repoIndex.repos.length;
+  return admittedRepos;
+}
+
 function formatDiscoveryWarning(source: DiscoverySourceName, error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   if (/rate limit/i.test(message)) {
     return `${source} rate-limited; returned 0 hits under background budget`;
   }
   return `${source} failed under background budget`;
-}
-
-function buildCandidateFromSkill(skill: Skill): Candidate {
-  return {
-    id: skill.id,
-    skill_md_path: skill.skill_md_path ?? "SKILL.md",
-    skill_name_hint: skill.name,
-  };
 }
 
 function toStaleReason(result: EnrichResult): ShadowStaleInvalidCandidate["reason"] {
@@ -722,10 +848,13 @@ type ShadowRefreshResult = {
   trustedLowStarSkillCount: number;
   officialLowStarSkillCount: number;
   staleInvalidCandidatesSample: ShadowStaleInvalidCandidate[];
+  skillFileMissingSample: SkillFileMissingSample[];
+  staleReasonCounts: ShadowStaleReasonCounts;
   priorityReasonCounts: PriorityReasonCounts;
   dailyPriorityRepoSample: DailyPriorityRepoSample[];
   skippedMonitoredRepoCount: number;
   bootstrappedRepoSample: BootstrapRepoSample[];
+  catalogAdmissionSample: CatalogAdmissionSample[];
   bootstrapFailedRepoSample: BootstrapRepoSample[];
   bootstrapSkippedRepoSample: BootstrapRepoSample[];
   rebootstrapEligibleRepoSample: RebootstrapEligibleRepoSample[];
@@ -741,8 +870,49 @@ function emptyPriorityReasonCounts(): PriorityReasonCounts {
   };
 }
 
+function emptyStaleReasonCounts(): ShadowStaleReasonCounts {
+  return {
+    repoMissing: 0,
+    skillFileMissing: 0,
+    validationFailed: 0,
+  };
+}
+
 function formatPriorityReasonCounts(counts: PriorityReasonCounts): string {
   return `official=${counts.official}, goldBasket=${counts.goldBasket}, trustedVendor=${counts.trustedVendor}, stars=${counts.stars}`;
+}
+
+export function shouldSuppressStableCheapRetry(
+  repoChanged: boolean,
+  staleOrInvalidState: ShadowRepoIndexEntry["staleOrInvalidState"],
+  observedRepoUpdatedAt: string,
+): boolean {
+  return Boolean(
+    repoChanged &&
+      staleOrInvalidState != null &&
+      staleOrInvalidState.observedRepoUpdatedAt === observedRepoUpdatedAt &&
+      (staleOrInvalidState.reason === "repoMissing" || staleOrInvalidState.reason === "skillFileMissing"),
+  );
+}
+
+export function buildSkillFileMissingSample(
+  staleInvalidCandidates: ShadowStaleInvalidCandidate[],
+  repoIndex: ShadowRepoIndex,
+): SkillFileMissingSample[] {
+  const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
+  return staleInvalidCandidates
+    .filter((candidate) => candidate.reason === "skillFileMissing")
+    .slice(0, 10)
+    .map((candidate) => {
+      const repo = repoByName.get(candidate.repo);
+      return {
+        repo: candidate.repo,
+        failedSkillId: candidate.id,
+        skillCount: repo?.skillCount ?? 0,
+        topSkillId: repo?.topSkillId ?? null,
+        lastObservedRepoUpdatedAt: repo?.lastObservedRepoUpdatedAt ?? null,
+      };
+    });
 }
 
 async function runShadowRefresh(
@@ -753,12 +923,12 @@ async function runShadowRefresh(
   discovered: Map<string, DiscoveredRepoRecord>,
   checkedAt: string,
   repoAliasByCanonical: Map<string, string>,
+  newlyAdmittedRepos: Set<string>,
 ): Promise<ShadowRefreshResult> {
   const baselineById = new Map(baselineSkills.map((skill) => [skill.id, skill]));
   const shadowById = new Map(shadowSkills.map((skill) => [skill.id, skill]));
   const existingFirstSeen = new Map(baselineSkills.map((skill) => [skill.id, skill.first_seen]));
   const existingSkills = new Map(baselineSkills.map((skill) => [skill.id, skill]));
-  const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
   const officialRepos = new Set(
     [...discovered.values()]
       .filter((repo) => repo.sources.has("official"))
@@ -766,10 +936,15 @@ async function runShadowRefresh(
   );
   const enrichmentWarnings: string[] = [];
   const staleInvalidCandidates: ShadowStaleInvalidCandidate[] = [];
+  const staleReasonCounts = emptyStaleReasonCounts();
   const missingPersistedSkillRefreshSample: string[] = [];
   const priorityReasonCounts = emptyPriorityReasonCounts();
-  let libraryReposChecked = 0;
+  let cheapReposChecked = 0;
   let skillsDeepRefreshed = 0;
+  let monitoredDeepRefreshed = 0;
+  let cheapTriggeredRefreshCandidateCount = 0;
+  let cheapTriggeredRefreshDeferredCount = 0;
+  let cheapTriggeredDeepRefreshed = 0;
   let correctedCount = 0;
   const availableSkillIds = new Set([
     ...baselineSkills.map((skill) => skill.id),
@@ -800,48 +975,15 @@ async function runShadowRefresh(
     resolveCandidatePathFn: async (candidate) => resolveCandidateSkillPath(toEnrichCandidate(candidate)),
     enrichCandidateFn: enrichCandidate,
   });
+  removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);
   for (const skill of bootstrapResult.bootstrappedSkills) {
     shadowById.set(skill.id, toShadowSkillRecord(skill));
   }
-
-  const libraryReposToCheck = repoIndex.repos
-    .filter((repo) => repo.state === "library" && discovered.has(repo.repo))
-    .sort((a, b) => a.repo.localeCompare(b.repo));
-
-  for (const repo of libraryReposToCheck) {
-    const skillId = repo.topSkillId ?? repo.skillIds[0];
-    if (!skillId) continue;
-    const baselineSkill = baselineById.get(skillId) ?? shadowById.get(skillId);
-    if (!baselineSkill) {
-      if (missingPersistedSkillRefreshSample.length < 10) {
-        missingPersistedSkillRefreshSample.push(`${repo.repo}:${skillId}`);
-      }
-      continue;
-    }
-    libraryReposChecked += 1;
-    try {
-      const meta = await getCandidateRepoMeta(buildCandidateFromSkill(baselineSkill), checkedAt.slice(0, 10));
-      if (meta) {
-        repo.stars = meta.stars;
-        repo.repoUrl = meta.githubUrl;
-        repo.lastRefreshedAt = checkedAt;
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (/not found/i.test(message)) {
-        staleInvalidCandidates.push({
-          id: skillId,
-          repo: repo.repo,
-          reason: "repoMissing",
-        });
-      } else {
-        enrichmentWarnings.push(`library refresh failed for ${repo.repo}`);
-      }
-    }
-  }
+  const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
 
   const hasFastLane = CADENCE_LANES[cadence].includes("fast");
   const { repos: dailyPriorityRepos, reasonByRepo, skippedMonitoredRepoCount } = buildDailyPriorityRepos(repoIndex, discovered);
+  const cheapCheckRepos = buildWeeklyCheapCheckRepos(cadence, repoIndex, dailyPriorityRepos);
 
   if (!hasFastLane) {
     enrichmentWarnings.push("monitored refresh skipped because cadence excludes fast lane");
@@ -851,8 +993,13 @@ async function runShadowRefresh(
 
   const reposToRefresh = hasFastLane ? dailyPriorityRepos : [];
   const today = checkedAt.slice(0, 10);
+  const changedReposToRefresh: ShadowRepoIndexEntry[] = [];
+  const cheapChangedRepoObservedUpdateByRepo = new Map<string, string>();
 
-  for (const repo of reposToRefresh) {
+  if (cheapCheckRepos.length > 0) {
+    console.log(`  cheap repo checks: ${cheapCheckRepos.length} repos`);
+  }
+  for (const [index, repo] of cheapCheckRepos.entries()) {
     const skillId = repo.topSkillId ?? repo.skillIds[0];
     if (!skillId) continue;
     const baselineSkill = baselineById.get(skillId) ?? shadowById.get(skillId);
@@ -863,39 +1010,140 @@ async function runShadowRefresh(
       continue;
     }
 
-    const result = await enrichCandidate(
-      buildCandidateFromSkill(baselineSkill),
-      existingFirstSeen,
-      existingSkills,
-      today,
-    );
-    repo.lastRefreshedAt = checkedAt;
-    const priorityReason = reasonByRepo.get(repo.repo);
-    if (priorityReason) {
-      priorityReasonCounts[priorityReason] += 1;
+    if (index === 0 || (index + 1) % 25 === 0 || index === cheapCheckRepos.length - 1) {
+      console.log(`  cheap repo checks [${index + 1}/${cheapCheckRepos.length}] ${repo.repo}`);
     }
 
-    if (result.skill) {
-      skillsDeepRefreshed += 1;
-      repo.stars = result.skill.stars;
-      repo.repoUrl = result.skill.github_url;
-      if (isMeaningfullyCorrected(baselineSkill, result.skill)) {
-        correctedCount += 1;
-        shadowById.set(skillId, toShadowSkillRecord(result.skill));
+    cheapReposChecked += 1;
+    try {
+      const meta = await getCandidateRepoMeta(buildCandidateFromSkill(baselineSkill), today);
+      if (!meta) continue;
+      const comparisonUpdatedAt = repo.lastObservedRepoUpdatedAt ?? baselineSkill.last_updated;
+      repo.lastCheapCheckedAt = checkedAt;
+      repo.stars = meta.stars;
+      repo.repoUrl = meta.githubUrl;
+      const repoChanged = repoMetaLooksChanged(meta.lastUpdated, comparisonUpdatedAt);
+      const suppressStableRetry = shouldSuppressStableCheapRetry(
+        repoChanged,
+        repo.staleOrInvalidState,
+        meta.lastUpdated,
+      );
+      if (repoChanged && !suppressStableRetry) {
+        changedReposToRefresh.push(repo);
+        cheapChangedRepoObservedUpdateByRepo.set(repo.repo, meta.lastUpdated);
+      } else {
+        repo.lastObservedRepoUpdatedAt = meta.lastUpdated;
       }
-      continue;
+    } catch (error) {
+      const status = typeof error === "object" && error !== null && "status" in error ? (error as { status?: number }).status : undefined;
+      const message = error instanceof Error ? error.message : String(error);
+      if (status === 404 || /not found/i.test(message)) {
+        markRepoMissingCheapCheck(repo, checkedAt);
+        staleInvalidCandidates.push({
+          id: skillId,
+          repo: repo.repo,
+          reason: "repoMissing",
+        });
+        staleReasonCounts.repoMissing += 1;
+      } else {
+        enrichmentWarnings.push(`cheap repo check failed for ${repo.repo}`);
+      }
     }
-
-    staleInvalidCandidates.push({
-      id: skillId,
-      repo: repo.repo,
-      reason: toStaleReason(result),
-    });
   }
 
-  const baselineShadowSkills = baselineSkills.map((skill) => shadowById.get(skill.id) ?? toShadowSkillRecord(skill));
+  const refreshRepoSet = async (
+    label: string,
+    rows: ShadowRepoIndexEntry[],
+    countPriorityReasons: boolean,
+  ) => {
+    if (rows.length > 0) {
+      console.log(`  ${label}: ${rows.length} repos`);
+    }
+    for (const [index, repo] of rows.entries()) {
+      const skillId = repo.topSkillId ?? repo.skillIds[0];
+      if (!skillId) continue;
+      const baselineSkill = baselineById.get(skillId) ?? shadowById.get(skillId);
+      if (!baselineSkill) {
+        if (missingPersistedSkillRefreshSample.length < 10) {
+          missingPersistedSkillRefreshSample.push(`${repo.repo}:${skillId}`);
+        }
+        continue;
+      }
+
+      const candidate = buildCandidateFromSkill(baselineSkill);
+      if (index === 0 || (index + 1) % 5 === 0 || index === rows.length - 1) {
+        const pathMode = baselineSkill.skill_md_path
+          ? "stored"
+          : candidate.skill_md_path === "__RESOLVE__"
+            ? "resolve"
+            : "derived";
+        console.log(`  ${label} [${index + 1}/${rows.length}] ${repo.repo} (${pathMode})`);
+      }
+
+      const result = await enrichCandidate(
+        candidate,
+        existingFirstSeen,
+        existingSkills,
+        today,
+      );
+      repo.lastRefreshedAt = checkedAt;
+      repo.lastCheapCheckedAt = checkedAt;
+      if (countPriorityReasons) {
+        const priorityReason = reasonByRepo.get(repo.repo);
+        if (priorityReason) priorityReasonCounts[priorityReason] += 1;
+      }
+
+      if (result.skill) {
+        skillsDeepRefreshed += 1;
+        if (countPriorityReasons) {
+          monitoredDeepRefreshed += 1;
+        } else {
+          cheapTriggeredDeepRefreshed += 1;
+        }
+        repo.stars = result.skill.stars;
+        repo.repoUrl = result.skill.github_url;
+        repo.lastObservedRepoUpdatedAt = result.skill.last_updated;
+        repo.staleOrInvalidState = null;
+        shadowById.set(skillId, toShadowSkillRecord(result.skill));
+        if (isMeaningfullyCorrected(baselineSkill, result.skill)) {
+          correctedCount += 1;
+        }
+        continue;
+      }
+
+      const staleReason = toStaleReason(result);
+      staleInvalidCandidates.push({
+        id: skillId,
+        repo: repo.repo,
+        reason: staleReason,
+      });
+      staleReasonCounts[staleReason] += 1;
+      if (!countPriorityReasons && (staleReason === "repoMissing" || staleReason === "skillFileMissing")) {
+        repo.staleOrInvalidState = {
+          reason: staleReason,
+          observedRepoUpdatedAt: repo.lastObservedRepoUpdatedAt ?? baselineSkill.last_updated,
+        };
+      }
+    }
+  };
+
+  const cheapTriggeredRefreshSelection = buildCheapTriggeredRefreshSelection(changedReposToRefresh);
+  cheapTriggeredRefreshCandidateCount = changedReposToRefresh.length;
+  cheapTriggeredRefreshDeferredCount = cheapTriggeredRefreshSelection.deferred.length;
+  if (cheapTriggeredRefreshDeferredCount > 0) {
+    enrichmentWarnings.push(`cheap-triggered refresh capped at ${cheapTriggeredRefreshSelection.selected.length} repos; deferred ${cheapTriggeredRefreshDeferredCount}`);
+  }
+  for (const repo of cheapTriggeredRefreshSelection.selected) {
+    const observedUpdate = cheapChangedRepoObservedUpdateByRepo.get(repo.repo);
+    if (observedUpdate) repo.lastObservedRepoUpdatedAt = observedUpdate;
+  }
+
+  await refreshRepoSet("monitored refresh", reposToRefresh, true);
+  await refreshRepoSet("cheap-triggered refresh", cheapTriggeredRefreshSelection.selected, false);
+
   const bootstrappedShadowSkills = bootstrapResult.bootstrappedSkills.map((skill) => toShadowSkillRecord(skill));
-  const refreshedShadowSkills = [...baselineShadowSkills, ...bootstrappedShadowSkills];
+  const catalogAdmissionSample = buildCatalogAdmissionSample(bootstrappedShadowSkills);
+  const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
   const lowStarValidSkills = refreshedShadowSkills
     .filter((skill) => skill.stars < LOW_STAR_FLOOR)
     .sort((a, b) => b.stars - a.stars || a.id.localeCompare(b.id));
@@ -922,9 +1170,13 @@ async function runShadowRefresh(
   return {
     shadowSkills: refreshedShadowSkills,
     enrichmentCounts: {
-      libraryReposChecked,
+      cheapReposChecked,
       dailyPriorityRepoCount: hasFastLane ? dailyPriorityRepos.length : 0,
       skillsDeepRefreshed,
+      monitoredDeepRefreshed,
+      cheapTriggeredRefreshCandidateCount,
+      cheapTriggeredRefreshDeferredCount,
+      cheapTriggeredDeepRefreshed,
       carriedForwardCount,
       correctedCount,
       staleInvalidCandidateCount: staleInvalidUnique.length,
@@ -935,6 +1187,8 @@ async function runShadowRefresh(
     trustedLowStarSkillCount,
     officialLowStarSkillCount,
     staleInvalidCandidatesSample: staleInvalidUnique.slice(0, 10),
+    skillFileMissingSample: buildSkillFileMissingSample(staleInvalidUnique, repoIndex),
+    staleReasonCounts,
     priorityReasonCounts,
     dailyPriorityRepoSample: dailyPriorityRepos.slice(0, 10).map((repo) => ({
       repo: repo.repo,
@@ -942,6 +1196,7 @@ async function runShadowRefresh(
     })),
     skippedMonitoredRepoCount,
     bootstrappedRepoSample: bootstrapResult.bootstrappedRepoSample,
+    catalogAdmissionSample,
     bootstrapFailedRepoSample: bootstrapResult.bootstrapFailedRepoSample,
     bootstrapSkippedRepoSample: bootstrapResult.bootstrapSkippedRepoSample,
     rebootstrapEligibleRepoSample,
@@ -986,6 +1241,7 @@ async function timeSource<T>(
 async function runDiscovery(
   cadence: ShadowCadence,
   repoIndex: ShadowRepoIndex,
+  checkedAt: string,
 ): Promise<{
   sourceRuns: SourceRunSummary[];
   discovered: Map<string, DiscoveredRepoRecord>;
@@ -1000,6 +1256,15 @@ async function runDiscovery(
   const discoveryBudgetApplied = cadence === "background" || cadence === "combined";
   const discoveryBudgetSummary = discoveryBudgetApplied ? BACKGROUND_DISCOVERY_BUDGET : null;
   const partialDiscoveryWarnings: string[] = [];
+  const runHighStarSkillMdDiscovery = shouldRunWeeklyHighStarSkillMdDiscovery(checkedAt);
+  const cachedHighStarRepoMeta = new Map(
+    repoIndex.repos.map((repo) => [
+      repo.repo,
+      {
+        stars: repo.stars,
+      },
+    ]),
+  );
 
   for (const lane of lanes) {
     if (lane === "fast") {
@@ -1095,7 +1360,7 @@ async function runDiscovery(
       continue;
     }
 
-    const [topicsRun, codeRun, socialRun, aggregatorsRun] = await Promise.all([
+    const [topicsRun, codeRun, highStarSkillMdRun, socialRun, aggregatorsRun] = await Promise.all([
       timeSource("topics", "background", () =>
         searchByTopics(
           discoveryBudgetSummary
@@ -1117,6 +1382,38 @@ async function runDiscovery(
             : {},
         ),
       { allowFailure: true }),
+      runHighStarSkillMdDiscovery
+        ? timeSource("high-star-skillmd", "background", () =>
+            searchHighStarSkillMdRepos(
+              discoveryBudgetSummary
+                ? {
+                    minStars: discoveryBudgetSummary.highStarSkillMd.minStars,
+                    maxSampledRepos: discoveryBudgetSummary.highStarSkillMd.maxSampledRepos,
+                    maxPagesPerQuery: discoveryBudgetSummary.highStarSkillMd.maxPagesPerQuery,
+                    requestDelayMs: discoveryBudgetSummary.highStarSkillMd.requestDelayMs,
+                    cachedRepoMetaByRepo: cachedHighStarRepoMeta,
+                  }
+                : { cachedRepoMetaByRepo: cachedHighStarRepoMeta },
+            ).then((result) =>
+              result.hits.filter(
+                (hit) =>
+                  typeof hit.stars === "number" &&
+                  hit.stars >= (discoveryBudgetSummary?.highStarSkillMd.minStars ?? 500) &&
+                  !hit.archived &&
+                  !hit.disabled,
+              ),
+            ),
+          { allowFailure: true })
+        : Promise.resolve({
+            hits: [],
+            summary: {
+              source: "high-star-skillmd",
+              lane: "background" as DiscoveryLane,
+              hitCount: 0,
+              durationMs: 0,
+            },
+            warning: "high-star-skillmd skipped by weekly schedule",
+          }),
       timeSource("social", "background", () =>
         searchSocial(
           discoveryBudgetSummary
@@ -1141,6 +1438,9 @@ async function runDiscovery(
         `code pages capped at ${discoveryBudgetSummary.code.maxPagesPerQuery}`,
       );
       partialDiscoveryWarnings.push(
+        `high-star-skillmd sampled repos capped at ${discoveryBudgetSummary.highStarSkillMd.maxSampledRepos}`,
+      );
+      partialDiscoveryWarnings.push(
         `topics queries capped at ${discoveryBudgetSummary.topics.maxQueries}`,
       );
       partialDiscoveryWarnings.push(
@@ -1153,14 +1453,20 @@ async function runDiscovery(
         `aggregators capped at ${discoveryBudgetSummary.aggregators.maxRepos} repos`,
       );
     }
-    for (const result of [topicsRun, codeRun, socialRun, aggregatorsRun] as const) {
+    for (const result of [topicsRun, codeRun, highStarSkillMdRun, socialRun, aggregatorsRun] as const) {
       sourceRuns.push(result.summary);
       if (result.warning) partialDiscoveryWarnings.push(result.warning);
       if (discoveryBudgetSummary && result.summary.durationMs >= 30000) {
         partialDiscoveryWarnings.push(`${result.summary.source} slow under budget (${result.summary.durationMs}ms)`);
       }
       for (const hit of result.hits) {
-        const repoInfo = repoKeyFromGithubUrl(hit.github_url);
+        const repoInfo =
+          result.summary.source === "high-star-skillmd"
+            ? {
+                repo: (hit as { repo: string }).repo,
+                repoUrl: `https://github.com/${(hit as { repo: string }).repo}`,
+              }
+            : repoKeyFromGithubUrl((hit as { github_url: string }).github_url);
         addDiscoveredRepo(
           discovered,
           repoInfo,
@@ -1175,6 +1481,15 @@ async function runDiscovery(
             id: codeHit.id,
             skill_md_path: codeHit.path,
             github_url: codeHit.github_url,
+          });
+        } else if (result.summary.source === "high-star-skillmd") {
+          const highStarHit = hit as { repo: string; path: string; url: string; stars: number | null };
+          maybeSetBootstrapCandidate(discovered, repoInfo, {
+            source: "code",
+            id: codeCandidateId(highStarHit.repo, highStarHit.path),
+            skill_md_path: highStarHit.path,
+            github_url: `https://github.com/${highStarHit.repo}`,
+            stars: highStarHit.stars ?? undefined,
           });
         }
       }
@@ -1222,12 +1537,14 @@ async function main() {
   const timings: StageTimings = {};
   const checkedAt = new Date().toISOString();
   const cadence = parseCadence(process.argv.slice(2));
+  await assertGitHubQuotaAvailable(cadence);
 
   const baselinePath = join(indexRoot, "skills.json");
   const goldBasketPath = join(indexRoot, "gold-basket.json");
   const skillsOutPath = join(shadowRoot, "skills.shadow.json");
   const inspectableSkillsOutPath = join(shadowRoot, "skills.inspectable.shadow.json");
   const cutoverSkillsOutPath = join(shadowRoot, "skills.cutover.shadow.json");
+  const skillOverlayOutPath = join(shadowRoot, "skills.overlay.json");
   const repoIndexOutPath = join(shadowRoot, "repo-index.shadow.json");
   const repoOverlayOutPath = join(shadowRoot, "repo-index.overlay.json");
   const skillSignalsOutPath = join(shadowRoot, "skill-signals.shadow.json");
@@ -1255,6 +1572,8 @@ async function main() {
   const repoIndexStart = performance.now();
   const { repoIndex, unresolvedBaselineSkillCount } = buildRepoIndex(baselineSkills, goldBasketSkills, checkedAt);
   const baselineRepoIndexForOverlay = cloneRepoIndex(repoIndex);
+  const priorShadowRepoIndex = loadShadowRepoIndex(repoIndexOutPath);
+  mergePriorShadowRepoTimestamps(baselineRepoIndexForOverlay, priorShadowRepoIndex, checkedAt);
   timings.buildRepoIndex = Math.round(performance.now() - repoIndexStart);
 
   const repoOverlay = shouldReadShadowRepoOverlay(cadence) ? loadShadowRepoOverlay(repoOverlayOutPath) : null;
@@ -1263,64 +1582,71 @@ async function main() {
     repoIndex,
     repoOverlay,
   );
+  mergePriorShadowRepoTimestamps(repoIndex, priorShadowRepoIndex, checkedAt);
+
+  const skillOverlay = shouldReadShadowSkillOverlay(cadence) ? loadShadowSkillOverlay(skillOverlayOutPath) : null;
+  const {
+    shadowSkills: overlayMergedShadowSkills,
+    overlayLoaded: shadowSkillOverlayLoaded,
+    overlayEntryCount: shadowSkillOverlayEntryCount,
+  } = applyShadowSkillOverlay(cadence, shadowSkills, repoIndex, skillOverlay);
+  shadowSkills = overlayMergedShadowSkills;
 
   const discoveryStart = performance.now();
   const repoAliasByCanonical = new Map<string, string>();
   const { sourceRuns, discovered, discoveryBudgetApplied, discoveryBudgetSummary, partialDiscoveryWarnings } =
-    await runDiscovery(cadence, repoIndex);
+    await runDiscovery(cadence, repoIndex, checkedAt);
   timings.runDiscovery = Math.round(performance.now() - discoveryStart);
+  const { momentumByRepo, warning: momentumWarning } = buildMomentumSignals(
+    discovered,
+    join(indexRoot, "top-x-skill-tweets.json"),
+  );
+  void momentumByRepo;
+  const combinedDiscoveryWarnings = momentumWarning
+    ? [...partialDiscoveryWarnings, momentumWarning]
+    : partialDiscoveryWarnings;
 
+  const seeds = loadTrustedSeeds();
+  const newlyAdmittedRepos = admitDiscoveredRepos(cadence, checkedAt, repoIndex, discovered, goldBasketRepos, seeds);
   const dailyPrioritySelection = buildDailyPriorityRepos(repoIndex, discovered);
-  const nextPromotionCandidates = buildNextPromotionCandidates(repoIndex, discovered, dailyPrioritySelection.repos);
+  const catalogRepoSet = new Set(seeds.catalogRepoRules.map((rule) => rule.repo));
+  const nextPromotionCandidates = buildNextPromotionCandidates(repoIndex, discovered, dailyPrioritySelection.repos, catalogRepoSet);
   const nextPromotionShortlist = buildNextPromotionShortlist(nextPromotionCandidates);
   const promotedRepoSample = await applyShortlistPromotions({
-    checkedAt,
     cadence,
     repoIndex,
     shortlist: nextPromotionShortlist,
-    getMissingRepoMeta: async (repo) => {
-      const discoveredRepo = discovered.get(repo);
-      const meta = await getCandidateRepoMeta(
-        buildPromotionCandidateMeta(repo, discoveredRepo?.repoUrl),
-        checkedAt.slice(0, 10),
-      );
-      const canonicalRepoInfo = meta ? repoKeyFromGithubUrl(meta.githubUrl) : null;
-      if (canonicalRepoInfo?.repo && canonicalRepoInfo.repo !== repo) {
-        repoAliasByCanonical.set(canonicalRepoInfo.repo, repo);
-      }
-      return meta
-        ? {
-            canonicalRepo: canonicalRepoInfo?.repo ?? repo.toLowerCase(),
-            stars: meta.stars,
-            repoUrl: meta.githubUrl,
-          }
-        : null;
-    },
-    getMissingRepoContext: (repo) => {
-      const discoveredRepo = discovered.get(repo);
-      const trust = buildTrustSignalsForRepo(repo, goldBasketRepos);
-      return {
-        checkedAt,
-        discoveredSources: sortUnique([...(discoveredRepo?.sources ?? [])]),
-        isTrustedVendor: trust.isTrustedVendor,
-        isTrustedCreator: trust.isTrustedCreator,
-        isGoldBasketRepo: trust.isGoldBasketRepo,
-      };
-    },
   });
 
   const refreshStart = performance.now();
-  const refreshResult = await runShadowRefresh(cadence, baselineSkills, shadowSkills, repoIndex, discovered, checkedAt, repoAliasByCanonical);
+  const refreshResult = await runShadowRefresh(
+    cadence,
+    baselineSkills,
+    shadowSkills,
+    repoIndex,
+    discovered,
+    checkedAt,
+    repoAliasByCanonical,
+    newlyAdmittedRepos,
+  );
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
   reconcileRepoIndexSkillIds(repoIndex, shadowSkills);
+  removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);
   const inspectableShadowSkills = buildInspectableShadowSkills(shadowSkills);
   const cutoverShadowSkills = buildCutoverShadowSkills(shadowSkills);
+  removeFilteredCatalogOnlyRepos(repoIndex, shadowSkills, cutoverShadowSkills);
+  reconcileRepoIndexSkillIds(repoIndex, cutoverShadowSkills);
 
   const shadowRepoOverlay: ShadowRepoOverlay | null = shouldWriteShadowRepoOverlay(cadence)
     ? buildShadowRepoOverlay(repoIndex, baselineRepoIndexForOverlay, checkedAt)
     : null;
   const shadowRepoOverlayWrittenCount = shadowRepoOverlay?.repoCount ?? 0;
+  const baselineSkillIds = new Set(baselineSkills.map((skill) => skill.id));
+  const shadowSkillOverlay: ShadowSkillOverlay | null = shouldWriteShadowSkillOverlay(cadence)
+    ? buildShadowSkillOverlay(cutoverShadowSkills, baselineSkillIds, repoIndex, checkedAt)
+    : null;
+  const shadowSkillOverlayWrittenCount = shadowSkillOverlay?.skillCount ?? 0;
 
   const skillSignalsStart = performance.now();
   const skillSignals = buildSkillSignals(checkedAt);
@@ -1394,13 +1720,15 @@ async function main() {
     sourceRuns,
     discoveryBudgetApplied,
     discoveryBudgetSummary,
-    partialDiscoveryWarnings,
+    partialDiscoveryWarnings: combinedDiscoveryWarnings,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
     lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,
     trustedLowStarSkillCount: refreshResult.trustedLowStarSkillCount,
     officialLowStarSkillCount: refreshResult.officialLowStarSkillCount,
     staleInvalidCandidatesSample: refreshResult.staleInvalidCandidatesSample,
+    skillFileMissingSample: refreshResult.skillFileMissingSample,
+    staleReasonCounts: refreshResult.staleReasonCounts,
     priorityReasonCounts: refreshResult.priorityReasonCounts,
     dailyPriorityRepoSample: refreshResult.dailyPriorityRepoSample,
     skippedMonitoredRepoCount: refreshResult.skippedMonitoredRepoCount,
@@ -1421,6 +1749,14 @@ async function main() {
       (repo) => repo.lanes.has("fast") && !repo.lanes.has("periodic") && !repo.lanes.has("background"),
     ).length,
     fastOnlyReposSample,
+    crawl4Preview: buildCrawl4Preview({
+      repoIndex,
+      shadowSkills,
+      unresolvedCatalogPublishers: buildUnresolvedCatalogPublishers(shadowSkills),
+      discovered,
+      momentumByRepo,
+      seeds: loadTrustedSeeds(),
+    }),
     nextPromotionCandidateCount: nextPromotionCandidates.length,
     nextPromotionCandidatesSample: nextPromotionCandidates.slice(0, 10),
     nextPromotionShortlistCount: nextPromotionShortlist.length,
@@ -1431,6 +1767,8 @@ async function main() {
     promotedRepoSample: promotedRepoSample.slice(0, 10),
     bootstrappedRepoCount: refreshResult.bootstrappedRepoSample.length,
     bootstrappedRepoSample: refreshResult.bootstrappedRepoSample.slice(0, 10),
+    catalogAdmissionCount: refreshResult.catalogAdmissionSample.length,
+    catalogAdmissionSample: refreshResult.catalogAdmissionSample,
     bootstrapFailedRepoCount: refreshResult.bootstrapFailedRepoSample.length,
     bootstrapFailedRepoSample: refreshResult.bootstrapFailedRepoSample.slice(0, 10),
     bootstrapSkippedRepoCount: refreshResult.bootstrapSkippedRepoSample.length,
@@ -1440,6 +1778,9 @@ async function main() {
     shadowRepoOverlayLoaded,
     shadowRepoOverlayEntryCount,
     shadowRepoOverlayWrittenCount,
+    shadowSkillOverlayLoaded,
+    shadowSkillOverlayEntryCount,
+    shadowSkillOverlayWrittenCount,
     cutoverValidationPassed: cutoverValidationFailures.length === 0,
     cutoverValidationFailureCount: cutoverValidationFailures.length,
     cutoverValidationFailuresSample,
@@ -1456,6 +1797,9 @@ async function main() {
   if (shadowRepoOverlay) {
     writeShadowFile(repoOverlayOutPath, JSON.stringify(shadowRepoOverlay, null, 2) + "\n");
   }
+  if (shadowSkillOverlay) {
+    writeShadowFile(skillOverlayOutPath, JSON.stringify(shadowSkillOverlay, null, 2) + "\n");
+  }
   writeShadowFile(skillSignalsOutPath, JSON.stringify(skillSignals, null, 2) + "\n");
   writeShadowFile(cutoverSkillSignalsOutPath, JSON.stringify(cutoverSkillSignals, null, 2) + "\n");
   writeShadowFile(cutoverCompareOutPath, JSON.stringify(cutoverCompare, null, 2) + "\n");
@@ -1471,7 +1815,9 @@ async function main() {
   console.log(`shadow crawl complete: ${baselineSkills.length} skills, ${repoIndex.repoCount} repos (${cadence})`);
 }
 
-main().catch((error) => {
-  console.error(`shadow crawl failed: ${error instanceof Error ? error.message : String(error)}`);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(`shadow crawl failed: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  });
+}

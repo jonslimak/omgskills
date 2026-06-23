@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { parse as parseYaml } from "yaml";
 import { octokit } from "./client.js";
+import { createRefreshReplayStoreFromEnv } from "./new-crawl/refresh-replay.js";
 import type { Skill } from "./types.js";
 
 export interface Candidate {
@@ -42,6 +43,7 @@ interface Frontmatter {
 }
 
 const repoCache = new Map<string, RepoMeta>();
+const refreshReplay = createRefreshReplayStoreFromEnv();
 
 class StableFailure extends Error {
   scope: "repo" | "candidate";
@@ -63,13 +65,15 @@ async function getRepoMeta(owner: string, repo: string): Promise<RepoMeta> {
   const cached = repoCache.get(key);
   if (cached) return cached;
 
-  const { data } = await octokit.rest.repos.get({ owner, repo });
-  const meta: RepoMeta = {
-    stars: data.stargazers_count ?? 0,
-    lastUpdated: data.pushed_at ?? data.updated_at ?? new Date().toISOString(),
-    tags: data.topics ?? [],
-    githubUrl: data.html_url,
-  };
+  const meta = await refreshReplay.repoMeta(key, async () => {
+    const { data } = await octokit.rest.repos.get({ owner, repo });
+    return {
+      stars: data.stargazers_count ?? 0,
+      lastUpdated: data.pushed_at ?? data.updated_at ?? new Date().toISOString(),
+      tags: data.topics ?? [],
+      githubUrl: data.html_url,
+    };
+  });
   repoCache.set(key, meta);
   return meta;
 }
@@ -155,18 +159,25 @@ async function fetchRawFile(
       : ["main", "master"];
 
   for (const candidateRef of refsToTry) {
-    const url = `https://raw.githubusercontent.com/${owner}/${repo}/${candidateRef}/${path}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      if (res.status === 404) continue;
-      throw new Error(`raw fetch failed (${res.status}) for ${owner}/${repo}/${path}@${candidateRef}`);
-    }
-    const content = await res.text();
+    const replayKey = `${owner}/${repo}@${candidateRef}:${path}`;
+    const fileData = await refreshReplay.rawFile(replayKey, async () => {
+      const url = `https://raw.githubusercontent.com/${owner}/${repo}/${candidateRef}/${path}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        if (res.status === 404) return null;
+        const error = new Error(`raw fetch failed (${res.status}) for ${owner}/${repo}/${path}@${candidateRef}`) as Error & { status?: number };
+        error.status = res.status;
+        throw error;
+      }
+      const content = await res.text();
+      return {
+        content,
+        sha: gitBlobSha(content),
+      };
+    });
+    if (!fileData) continue;
     branchGuessCache.set(`${owner}/${repo}`, candidateRef);
-    return {
-      content,
-      sha: gitBlobSha(content),
-    };
+    return fileData;
   }
 
   return null;
@@ -186,17 +197,19 @@ async function listSkillPaths(owner: string, repo: string, ref?: string): Promis
   let lastError: unknown;
   for (const candidateRef of refsToTry) {
     try {
-      const { data } = await octokit.rest.git.getTree({
-        owner,
-        repo,
-        tree_sha: candidateRef,
-        recursive: "1",
-      });
+      paths = await refreshReplay.tree(`${owner}/${repo}@${candidateRef}`, async () => {
+        const { data } = await octokit.rest.git.getTree({
+          owner,
+          repo,
+          tree_sha: candidateRef,
+          recursive: "1",
+        });
 
-      paths = (data.tree ?? [])
-        .filter((entry) => entry.type === "blob" && typeof entry.path === "string")
-        .map((entry) => entry.path!)
-        .filter((path) => path === "SKILL.md" || path.endsWith("/SKILL.md"));
+        return (data.tree ?? [])
+          .filter((entry) => entry.type === "blob" && typeof entry.path === "string")
+          .map((entry) => entry.path!)
+          .filter((path) => path === "SKILL.md" || path.endsWith("/SKILL.md"));
+      });
       branchGuessCache.set(`${owner}/${repo}`, candidateRef);
       break;
     } catch (err: unknown) {
@@ -212,6 +225,8 @@ async function listSkillPaths(owner: string, repo: string, ref?: string): Promis
 }
 
 function resolveSkillPathFromHint(paths: string[], hint: string): string | null {
+  if (paths.length === 1) return paths[0]!;
+
   for (const alias of buildSkillHintAliases(hint)) {
     const normalizedAlias = normalizeSkillKey(alias);
     const exactDirMatches = paths.filter((path) => path.split("/").at(-2) === alias);
@@ -383,6 +398,37 @@ function hasCompleteCachedSkill(skill: Skill): boolean {
   );
 }
 
+function preserveExistingOptionalMetadata(existing: Skill | undefined, next: Skill): Skill {
+  if (!existing) return next;
+
+  return {
+    ...next,
+    ...("source_tag" in existing && existing.source_tag !== undefined ? { source_tag: existing.source_tag } : {}),
+    ...("source_url" in existing && existing.source_url !== undefined ? { source_url: existing.source_url } : {}),
+    ...("tweet_url" in existing && existing.tweet_url !== undefined ? { tweet_url: existing.tweet_url } : {}),
+    ...("tweet_likes" in existing && existing.tweet_likes !== undefined ? { tweet_likes: existing.tweet_likes } : {}),
+    ...("tweet_retweets" in existing && existing.tweet_retweets !== undefined ? { tweet_retweets: existing.tweet_retweets } : {}),
+    ...("tweet_replies" in existing && existing.tweet_replies !== undefined ? { tweet_replies: existing.tweet_replies } : {}),
+    ...("tweet_views" in existing && existing.tweet_views !== undefined ? { tweet_views: existing.tweet_views } : {}),
+    ...(
+      "tweet_author_handle" in existing && existing.tweet_author_handle !== undefined
+        ? { tweet_author_handle: existing.tweet_author_handle }
+        : {}
+    ),
+    ...(
+      "tweet_author_name" in existing && existing.tweet_author_name !== undefined
+        ? { tweet_author_name: existing.tweet_author_name }
+        : {}
+    ),
+    ...(
+      "tweet_posted_at" in existing && existing.tweet_posted_at !== undefined
+        ? { tweet_posted_at: existing.tweet_posted_at }
+        : {}
+    ),
+    ...("tweet_text" in existing && existing.tweet_text !== undefined ? { tweet_text: existing.tweet_text } : {}),
+  };
+}
+
 function deriveInstallCmd(githubUrl: string, path: string, name: string): string {
   if (path === "SKILL.md") {
     return `git clone ${githubUrl} ~/.claude/skills/${name}`;
@@ -460,11 +506,13 @@ export async function enrichCandidate(
     if (existing?.skill_md_sha && existing.skill_md_sha === fileData.sha && hasCompleteCachedSkill(existing)) {
       const { readme_snippet: _readmeSnippet, ...lightweightExisting } = existing as Skill & { readme_snippet?: string };
       return {
-        skill: {
+        skill: preserveExistingOptionalMetadata(existing, {
           ...lightweightExisting,
+          skill_md_path: resolvedPath,
+          install_cmd: deriveInstallCmd(meta.githubUrl, resolvedPath, existing.name),
           stars: meta.stars,
           last_updated: meta.lastUpdated,
-        },
+        }),
       };
     }
 
@@ -482,7 +530,7 @@ export async function enrichCandidate(
     const first_seen = existingFirstSeen.get(c.id) ?? today;
 
     return {
-      skill: {
+      skill: preserveExistingOptionalMetadata(existing, {
         id: c.id,
         name,
         description,
@@ -495,7 +543,7 @@ export async function enrichCandidate(
         last_updated: meta.lastUpdated,
         first_seen,
         skill_md_sha: fileData.sha,
-      },
+      }),
     };
   } catch (err: unknown) {
     if (err instanceof StableFailure) {

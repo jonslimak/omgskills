@@ -2,7 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import type { EnrichResult } from "../enrich.js";
 import type { Skill } from "../types.js";
-import { bootstrapRisingRepos, isBootstrapEligibleCandidate, repairDeadPersistedRisingSkillLinks, selectBetterBootstrapCandidate } from "./bootstrap.js";
+import {
+  bootstrapRisingRepos,
+  isBootstrapEligibleCandidate,
+  removeFailedNewlyAdmittedRepos,
+  repairDeadPersistedRisingSkillLinks,
+  selectBetterBootstrapCandidate,
+} from "./bootstrap.js";
 import type { RepoBootstrapCandidate, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
@@ -143,6 +149,28 @@ test("bootstraps empty-skill rising repo on combined", async () => {
   assert.equal(index.repos[0]?.topSkillStars, 123);
 });
 
+test("bootstraps empty-skill library repo on combined", async () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 0, state: "library" })]);
+  const enrich = async (): Promise<EnrichResult> => ({ skill: skill("owner/repo:bootstrapped") });
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      ["owner/repo", candidate({ source: "registry", id: "owner/repo:bootstrapped", skill_md_path: "skills/bootstrapped/SKILL.md", skill_name_hint: "bootstrapped", github_url: "https://github.com/owner/repo" })],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    resolveCandidatePathFn: async () => null,
+    enrichCandidateFn: enrich,
+  });
+
+  assert.equal(result.bootstrappedSkills.length, 1);
+  assert.equal(index.repos[0]?.skillCount, 1);
+});
+
 test("failed bootstrap leaves repo empty and reports failure", async () => {
   const index = repoIndex([repo({ repo: "owner/repo", stars: 0 })]);
   const enrich = async (): Promise<EnrichResult> => ({ skill: null, failure: { scope: "candidate", key: "owner/repo", reason: "skill-path-unresolved" } });
@@ -164,6 +192,96 @@ test("failed bootstrap leaves repo empty and reports failure", async () => {
   assert.equal(result.bootstrappedSkills.length, 0);
   assert.equal(result.bootstrapFailedRepoSample.length, 1);
   assert.deepEqual(index.repos[0]?.skillIds, []);
+});
+
+test("bootstrap rejects enriched skill from a different repo", async () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 0, state: "library" })]);
+  const enrich = async (): Promise<EnrichResult> => ({
+    skill: skill("owner/repo:bootstrapped", "other/repo"),
+  });
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      ["owner/repo", candidate({ source: "registry", id: "owner/repo:bootstrapped", skill_md_path: "skills/x/SKILL.md", github_url: "https://github.com/owner/repo" })],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    resolveCandidatePathFn: async () => null,
+    enrichCandidateFn: enrich,
+  });
+
+  assert.equal(result.bootstrappedSkills.length, 0);
+  assert.equal(result.bootstrapFailedRepoSample[0]?.failureReason, "repo-mismatch");
+  assert.deepEqual(index.repos[0]?.skillIds, []);
+});
+
+test("removes failed newly admitted repo after bootstrap", () => {
+  const index = repoIndex([
+    repo({
+      repo: "new/repo",
+      stars: 500,
+      state: "library",
+      promotionReasons: ["new-discovery", "library-admission"],
+    }),
+  ]);
+
+  const removed = removeFailedNewlyAdmittedRepos(index, new Set(["new/repo"]));
+
+  assert.deepEqual(removed, ["new/repo"]);
+  assert.equal(index.repoCount, 0);
+  assert.deepEqual(index.repos, []);
+});
+
+test("keeps successful newly admitted and existing empty repos", () => {
+  const index = repoIndex([
+    repo({
+      repo: "new/success",
+      stars: 500,
+      state: "library",
+      skillIds: ["new/success:skill"],
+      skillCount: 1,
+      promotionReasons: ["new-discovery", "library-admission"],
+    }),
+    repo({
+      repo: "existing/empty",
+      stars: 500,
+      state: "library",
+      promotionReasons: [],
+    }),
+  ]);
+
+  const removed = removeFailedNewlyAdmittedRepos(index, new Set(["new/success"]));
+
+  assert.deepEqual(removed, []);
+  assert.equal(index.repoCount, 2);
+  assert.deepEqual(index.repos.map((entry) => entry.repo), ["new/success", "existing/empty"]);
+});
+
+test("removes prior empty library-admission entries", () => {
+  const index = repoIndex([
+    repo({
+      repo: "prior/failed",
+      stars: 500,
+      state: "library",
+      promotionReasons: ["new-discovery", "library-admission"],
+    }),
+    repo({
+      repo: "existing/empty",
+      stars: 500,
+      state: "library",
+      promotionReasons: [],
+    }),
+  ]);
+
+  const removed = removeFailedNewlyAdmittedRepos(index, new Set());
+
+  assert.deepEqual(removed, ["prior/failed"]);
+  assert.equal(index.repoCount, 1);
+  assert.equal(index.repos[0]?.repo, "existing/empty");
 });
 
 test("repo with only ineligible candidate is skipped, not failed", async () => {

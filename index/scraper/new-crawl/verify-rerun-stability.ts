@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { refreshReplayEnv } from "./refresh-replay.js";
 import type { ProvenanceType, ShadowCutoverCompare, ShadowCutoverSkillSignal, ShadowRunReport, ShadowSkillRecord } from "./types.js";
 
 type ComparableCutoverSkill = {
@@ -36,6 +37,7 @@ type ComparableShadowReport = Pick<
   ShadowRunReport,
   | "cutoverValidationPassed"
   | "cutoverValidationFailureCount"
+  | "crawl4Preview"
   | "shadowSkillCount"
   | "inspectableShadowSkillCount"
   | "rebootstrapEligibleRepoCount"
@@ -51,6 +53,7 @@ type RerunSnapshot = {
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const INDEX_ROOT = join(SCRIPT_DIR, "..", "..");
 const SHADOW_ROOT = join(INDEX_ROOT, "shadow");
+const REFRESH_REPLAY_ROOT = join(SHADOW_ROOT, "replay");
 
 export function selectComparableCutoverCompare(compare: ShadowCutoverCompare): ComparableCutoverCompare {
   return {
@@ -68,6 +71,7 @@ export function selectComparableShadowReport(report: ShadowRunReport): Comparabl
   return {
     cutoverValidationPassed: report.cutoverValidationPassed,
     cutoverValidationFailureCount: report.cutoverValidationFailureCount,
+    crawl4Preview: report.crawl4Preview,
     shadowSkillCount: report.shadowSkillCount,
     inspectableShadowSkillCount: report.inspectableShadowSkillCount,
     rebootstrapEligibleRepoCount: report.rebootstrapEligibleRepoCount,
@@ -155,9 +159,17 @@ function captureSnapshot(): RerunSnapshot {
   };
 }
 
-function runShadowBuild() {
+function runShadowBuild(options: { replayMode?: "record" | "replay" } = {}) {
+  const env = options.replayMode
+    ? {
+        ...process.env,
+        ...refreshReplayEnv(options.replayMode, REFRESH_REPLAY_ROOT),
+      }
+    : process.env;
+
   execFileSync("npm", ["run", "scrape:shadow", "--", "--cadence=combined"], {
     cwd: INDEX_ROOT,
+    env,
     stdio: "inherit",
   });
 }
@@ -175,13 +187,20 @@ function verifyValidationPassed(snapshot: RerunSnapshot, label: string) {
 }
 
 function main() {
+  rmSync(REFRESH_REPLAY_ROOT, { recursive: true, force: true });
+  mkdirSync(REFRESH_REPLAY_ROOT, { recursive: true });
+
+  console.log("Recording refresh replay seed...");
+  runShadowBuild({ replayMode: "record" });
+  assert.equal(existsSync(REFRESH_REPLAY_ROOT), true, "refresh replay cache should exist after seed build");
+
   console.log("Running shadow build 1/2...");
-  runShadowBuild();
+  runShadowBuild({ replayMode: "replay" });
   const first = captureSnapshot();
   verifyValidationPassed(first, "first run");
 
   console.log("Running shadow build 2/2...");
-  runShadowBuild();
+  runShadowBuild({ replayMode: "replay" });
   const second = captureSnapshot();
   verifyValidationPassed(second, "second run");
 
