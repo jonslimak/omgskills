@@ -1,5 +1,10 @@
 [build]
-  publish = "site"
+  command = "npm run build:netlify"
+  publish = "dist/netlify-site"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 [[edge_functions]]
   path = "/health/*"

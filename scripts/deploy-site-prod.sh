@@ -3,18 +3,19 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if ! git diff --quiet -- site .github/workflows scripts netlify.toml; then
+if ! git diff --quiet -- site portal netlify .github/workflows scripts netlify.toml package.json package-lock.json; then
   echo "Refusing production deploy: tracked deploy files have uncommitted changes." >&2
   echo "" >&2
   echo "Commit and push these changes first, then rerun:" >&2
   echo "  ./scripts/deploy-site-prod.sh" >&2
   echo "" >&2
-  git status --short -- site .github/workflows scripts netlify.toml >&2
+  git status --short -- site portal netlify .github/workflows scripts netlify.toml package.json package-lock.json >&2
   exit 1
 fi
 
-node ./scripts/prepare-netlify-site-deploy.mjs
-npx netlify-cli deploy --prod --dir=site
+npm run build:netlify
+SITE_DIR=dist/netlify-site node ./scripts/prepare-netlify-site-deploy.mjs
+npx netlify-cli deploy --prod --dir=dist/netlify-site
 
 VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' menubar/Info.plist 2>/dev/null || true)
 if [ -n "$VERSION" ] && ! git tag | grep -q "^v$VERSION$"; then
