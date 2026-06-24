@@ -26,6 +26,60 @@ function publicGroupUrl(handle: string, slug: string) {
   return `${publicSiteOrigin()}/u/${handle}/${slug}`;
 }
 
+function normalizedSkillText(value: string | null | undefined) {
+  return (value || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizedSource(value: string) {
+  return value.toLowerCase();
+}
+
+function hasSource(skill: GroupedSyncedSkill, source: string) {
+  const target = source.toLowerCase();
+  return skill.sources.some((item) => normalizedSource(item).includes(target));
+}
+
+function chooseRepresentativeSkill(skills: SyncedSkill[]) {
+  const representative =
+    skills.find((skill) => normalizedSource(skill.source).includes("codex")) ??
+    skills.find((skill) => Boolean(skill.githubUrl)) ??
+    [...skills].sort((first, second) => first.source.localeCompare(second.source))[0];
+
+  if (!representative) {
+    throw new Error("Cannot group empty synced skill set");
+  }
+
+  return representative;
+}
+
+function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
+  const groups = new Map<string, SyncedSkill[]>();
+  for (const skill of skills) {
+    const key = `${normalizedSkillText(skill.name)}::${normalizedSkillText(skill.description)}`;
+    groups.set(key, [...(groups.get(key) ?? []), skill]);
+  }
+
+  return [...groups.values()]
+    .map((group) => {
+      const representative = chooseRepresentativeSkill(group);
+      const sources = [...new Set(group.map((skill) => skill.source))].sort((first, second) =>
+        first.localeCompare(second)
+      );
+      return {
+        ...representative,
+        description: representative.description ?? group.find((skill) => skill.description)?.description ?? null,
+        githubUrl: representative.githubUrl ?? group.find((skill) => skill.githubUrl)?.githubUrl ?? null,
+        allSkillIds: group.map((skill) => skill.id),
+        sourceSkills: group,
+        sources
+      };
+    })
+    .sort((first, second) => first.name.localeCompare(second.name));
+}
+
 type SyncedSkill = {
   id: string;
   name: string;
@@ -34,6 +88,12 @@ type SyncedSkill = {
   isLocalOnly: boolean;
   source: string;
   lastSeenAt: string;
+};
+
+type GroupedSyncedSkill = SyncedSkill & {
+  allSkillIds: string[];
+  sourceSkills: SyncedSkill[];
+  sources: string[];
 };
 
 type SkillGroup = {
@@ -147,7 +207,7 @@ function SkillActions({
   groups,
   onRefresh
 }: {
-  skill: SyncedSkill;
+  skill: GroupedSyncedSkill;
   groups: SkillGroup[];
   onRefresh: () => void;
 }) {
@@ -155,7 +215,7 @@ function SkillActions({
   const [menuOpen, setMenuOpen] = useState(false);
   const [status, setStatus] = useState("");
   const favoritesGroup = groups.find((group) => group.isFavorites);
-  const isFavorite = Boolean(favoritesGroup?.syncedSkillIds?.includes(skill.id));
+  const isFavorite = Boolean(favoritesGroup?.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id)));
   const selectableGroups = groups.filter((group) => !group.isFavorites);
 
   async function addToFavorites() {
@@ -188,7 +248,7 @@ function SkillActions({
   }
 
   async function addToGroup(group: SkillGroup) {
-    if (group.syncedSkillIds?.includes(skill.id)) {
+    if (group.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id))) {
       return;
     }
     setStatus(`Adding to ${group.name}...`);
@@ -231,7 +291,7 @@ function SkillActions({
             <div className="group-menu">
               {selectableGroups.length === 0 ? <span>No groups yet</span> : null}
               {selectableGroups.map((group) => {
-                const alreadyAdded = group.syncedSkillIds?.includes(skill.id) ?? false;
+                const alreadyAdded = group.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id)) ?? false;
                 return (
                   <button
                     disabled={alreadyAdded}
@@ -258,7 +318,7 @@ function SyncedSkillRow({
   groups,
   onRefresh
 }: {
-  skill: SyncedSkill;
+  skill: GroupedSyncedSkill;
   groups: SkillGroup[];
   onRefresh: () => void;
 }) {
@@ -315,7 +375,11 @@ function SyncedSkillRow({
             Show less
           </button>
         ) : null}
-        <span>{skill.source}</span>
+        <div className="source-badges">
+          {skill.sources.map((source) => (
+            <span key={source}>{source}</span>
+          ))}
+        </div>
       </div>
       <SkillActions groups={groups} onRefresh={onRefresh} skill={skill} />
     </div>
@@ -327,7 +391,7 @@ function SyncedSkillsTable({
   groups,
   onRefresh
 }: {
-  skills: SyncedSkill[];
+  skills: GroupedSyncedSkill[];
   groups: SkillGroup[];
   onRefresh: () => void;
 }) {
@@ -337,7 +401,8 @@ function SyncedSkillsTable({
         <thead>
           <tr>
             <th>Skill</th>
-            <th>Source</th>
+            <th>Claude</th>
+            <th>Codex</th>
             <th>GitHub</th>
             <th>Actions</th>
           </tr>
@@ -346,7 +411,8 @@ function SyncedSkillsTable({
           {skills.map((skill) => (
             <tr key={skill.id}>
               <td className="skill-table-name">{skill.name}</td>
-              <td>{skill.source}</td>
+              <td>{hasSource(skill, "claude") ? "✓" : ""}</td>
+              <td>{hasSource(skill, "codex") ? "✓" : ""}</td>
               <td>
                 {skill.githubUrl ? (
                   <a href={skill.githubUrl} title="Open GitHub source">
@@ -383,12 +449,16 @@ function SyncedSkillsPanel({
     window.localStorage.setItem("syncedSkillsViewMode", nextViewMode);
   }
 
+  const groupedSkills = groupSyncedSkills(skills);
+
   return (
     <section className="panel">
       <div className="panel-header">
         <div>
           <h2>Synced Skills</h2>
-          <p>{skills.length} current skills from your local app inventory.</p>
+          <p>
+            {groupedSkills.length} skills from {skills.length} installs.
+          </p>
         </div>
         <div className="panel-controls">
           <div aria-label="Synced skills view" className="segmented-control">
@@ -414,14 +484,14 @@ function SyncedSkillsPanel({
           </button>
         </div>
       </div>
-      {viewMode === "table" && skills.length > 0 ? (
-        <SyncedSkillsTable groups={groups} onRefresh={onRefresh} skills={skills} />
+      {viewMode === "table" && groupedSkills.length > 0 ? (
+        <SyncedSkillsTable groups={groups} onRefresh={onRefresh} skills={groupedSkills} />
       ) : (
         <div className="list">
-          {skills.map((skill) => (
+          {groupedSkills.map((skill) => (
             <SyncedSkillRow groups={groups} key={skill.id} onRefresh={onRefresh} skill={skill} />
           ))}
-          {skills.length === 0 ? <p className="muted">No synced skills yet.</p> : null}
+          {groupedSkills.length === 0 ? <p className="muted">No synced skills yet.</p> : null}
         </div>
       )}
     </section>

@@ -499,6 +499,23 @@ pre {
   font-size: 13px;
 }
 
+.source-badges {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.source-badges span {
+  background: #eef3f8;
+  border-radius: 999px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 2px 7px;
+}
+
 .skill-table-wrap {
   margin-top: 12px;
   overflow-x: auto;
