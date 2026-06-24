@@ -60,15 +60,20 @@ function descriptionsMatch(first: string | null | undefined, second: string | nu
   const firstWords = new Set(normalizedDescriptionWords(normalizedFirst));
   const secondWords = new Set(normalizedDescriptionWords(normalizedSecond));
   const smallerSize = Math.min(firstWords.size, secondWords.size);
-  if (smallerSize < 5) {
-    return false;
-  }
 
   let shared = 0;
   for (const word of firstWords) {
     if (secondWords.has(word)) {
       shared += 1;
     }
+  }
+
+  if (smallerSize >= 3 && smallerSize < 5) {
+    return shared / smallerSize >= 0.8;
+  }
+
+  if (smallerSize < 5) {
+    return false;
   }
 
   return shared / smallerSize >= 0.72;
