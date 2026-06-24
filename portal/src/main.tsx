@@ -248,7 +248,18 @@ function SyncedSkillRow({
             </div>
           ) : null}
         </div>
-        {skill.githubUrl ? <a href={skill.githubUrl}>GitHub</a> : <span className="muted">Metadata only</span>}
+        {skill.githubUrl ? (
+          <a
+            aria-label="Open GitHub source"
+            className="plain-icon-link"
+            href={skill.githubUrl}
+            title="Open GitHub source"
+          >
+            ⎇
+          </a>
+        ) : (
+          <span aria-label="Metadata only" className="plain-icon" title="Metadata only">◌</span>
+        )}
       </div>
     </div>
   );

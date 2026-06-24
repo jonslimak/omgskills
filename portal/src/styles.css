@@ -113,6 +113,23 @@ a.icon-link {
   width: 34px;
 }
 
+a.plain-icon-link,
+.plain-icon {
+  align-items: center;
+  color: #64748b;
+  display: inline-flex;
+  font-size: 18px;
+  height: 34px;
+  justify-content: center;
+  line-height: 1;
+  text-decoration: none;
+  width: 34px;
+}
+
+a.plain-icon-link:hover {
+  color: #0b57d0;
+}
+
 pre {
   background: #111827;
   border-radius: 8px;
