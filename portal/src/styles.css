@@ -58,6 +58,16 @@ button.icon-button.active {
   color: #8a5b00;
 }
 
+button.icon-button.warning {
+  background: #f8edf0;
+  color: #8a2635;
+}
+
+button.icon-button.warning.active {
+  background: #263238;
+  color: #fff;
+}
+
 button:hover {
   filter: brightness(0.95);
 }
@@ -88,6 +98,19 @@ label {
 a {
   color: #0b57d0;
   font-weight: 650;
+}
+
+a.icon-link {
+  align-items: center;
+  background: #eef3f8;
+  border-radius: 8px;
+  color: #263238;
+  display: inline-flex;
+  font-size: 18px;
+  height: 34px;
+  justify-content: center;
+  text-decoration: none;
+  width: 34px;
 }
 
 pre {
@@ -217,6 +240,10 @@ pre {
   justify-content: space-between;
   min-width: 0;
   padding: 12px;
+}
+
+.disabled-row {
+  background: #f8fafc;
 }
 
 .row h3 {

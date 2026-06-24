@@ -43,6 +43,7 @@ type SkillGroup = {
   slug: string;
   visibility?: string;
   isFavorites?: boolean;
+  disabledAt?: string | null;
   itemCount: number;
   allowedEmailCount?: number;
   ownerDisplayName?: string;
@@ -433,12 +434,13 @@ function GroupsPanel({
       ) : null}
       <div className="list">
         {groups.map((group) => (
-          <div className="row" key={group.id}>
+          <div className={group.disabledAt ? "row disabled-row" : "row"} key={group.id}>
             <div>
               <h3>{group.name}</h3>
               <p>{group.description || `${group.itemCount} skills`}</p>
               <span>
                 {group.visibility || "restricted"}
+                {group.disabledAt ? " · hidden" : ""}
                 {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
               </span>
             </div>
@@ -446,14 +448,40 @@ function GroupsPanel({
               {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}
               {canManage ? (
                 <>
-                  <button className="secondary" onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}>
-                    {group.visibility === "public" ? "Unpublish" : "Publish"}
+                  <button
+                    aria-label={group.visibility === "public" ? "Unpublish group" : "Publish group"}
+                    className={group.visibility === "public" ? "icon-button active" : "icon-button"}
+                    onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}
+                    title={group.visibility === "public" ? "Public. Click to unpublish." : "Private/restricted. Click to publish."}
+                  >
+                    {group.visibility === "public" ? "●" : "○"}
                   </button>
-                  {group.visibility === "public" && profile?.handle ? (
-                    <a href={publicGroupUrl(profile.handle, group.slug)}>Public URL</a>
+                  {group.visibility === "public" && !group.disabledAt && profile?.handle ? (
+                    <a
+                      aria-label="Open public group URL"
+                      className="icon-link"
+                      href={publicGroupUrl(profile.handle, group.slug)}
+                      title="Open public URL"
+                    >
+                      ↗
+                    </a>
                   ) : null}
-                  <a href={`/api/portal/groups/${group.id}/export`}>Export</a>
-                  <button className="secondary" onClick={() => setDisabled(group, true)}>Disable</button>
+                  <a
+                    aria-label="Export group"
+                    className="icon-link"
+                    href={`/api/portal/groups/${group.id}/export`}
+                    title="Export group"
+                  >
+                    ↓
+                  </a>
+                  <button
+                    aria-label={group.disabledAt ? "Restore group" : "Hide group"}
+                    className={group.disabledAt ? "icon-button warning active" : "icon-button warning"}
+                    onClick={() => setDisabled(group, !group.disabledAt)}
+                    title={group.disabledAt ? "Hidden. Click to restore." : "Hide group from public pages."}
+                  >
+                    {group.disabledAt ? "↺" : "⊘"}
+                  </button>
                 </>
               ) : null}
             </div>

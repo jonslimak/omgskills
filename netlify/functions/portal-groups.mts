@@ -16,6 +16,7 @@ async function listGroups(req: Request) {
         g.slug,
         g.visibility,
         g.is_favorites AS "isFavorites",
+        g.disabled_at AS "disabledAt",
         count(DISTINCT i.id)::int AS "itemCount",
         count(DISTINCT a.id)::int AS "allowedEmailCount",
         COALESCE(
