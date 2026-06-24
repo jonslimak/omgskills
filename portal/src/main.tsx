@@ -565,12 +565,16 @@ function GroupsPanel({
           <div className={group.disabledAt ? "row disabled-row" : "row"} key={group.id}>
             <div>
               <h3>{group.name}</h3>
-              <p>{group.description || `${group.itemCount} skills`}</p>
-              <span>
-                {group.visibility || "restricted"}
-                {group.disabledAt ? " · hidden" : ""}
-                {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
-              </span>
+              <p className="group-meta">
+                <span>{group.description || `${group.itemCount} skills`}</span>
+                <span>{group.visibility || "restricted"}</span>
+              </p>
+              {group.disabledAt || group.ownerDisplayName ? (
+                <span>
+                  {group.disabledAt ? "hidden" : ""}
+                  {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
+                </span>
+              ) : null}
             </div>
             <div className="row-actions">
               {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}

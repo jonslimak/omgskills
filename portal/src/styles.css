@@ -318,6 +318,18 @@ pre {
   margin: 0;
 }
 
+.group-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.group-meta span + span {
+  color: #334155;
+  font-weight: 650;
+}
+
 .inline-status {
   color: #334155;
   font-size: 13px;
