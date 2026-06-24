@@ -113,23 +113,6 @@ a.icon-link {
   width: 34px;
 }
 
-a.plain-icon-link,
-.plain-icon {
-  align-items: center;
-  color: #64748b;
-  display: inline-flex;
-  font-size: 18px;
-  height: 34px;
-  justify-content: center;
-  line-height: 1;
-  text-decoration: none;
-  width: 34px;
-}
-
-a.plain-icon-link:hover {
-  color: #0b57d0;
-}
-
 pre {
   background: #111827;
   border-radius: 8px;
@@ -266,6 +249,19 @@ pre {
 .row h3 {
   font-size: 15px;
   margin: 0 0 4px;
+}
+
+.skill-title {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-title a {
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
 }
 
 .row-main {

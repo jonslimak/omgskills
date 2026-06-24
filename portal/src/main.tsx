@@ -195,7 +195,14 @@ function SyncedSkillRow({
   return (
     <div className="row">
       <div className="row-main">
-        <h3>{skill.name}</h3>
+        <h3 className="skill-title">
+          <span>{skill.name}</span>
+          {skill.githubUrl ? (
+            <a href={skill.githubUrl} title="Open GitHub source">
+              GitHub →
+            </a>
+          ) : null}
+        </h3>
         <p className={expanded ? "skill-description expanded" : "skill-description"}>{description}</p>
         {canExpand ? (
           <button className="text-button" onClick={() => setExpanded((current) => !current)}>
@@ -248,18 +255,6 @@ function SyncedSkillRow({
             </div>
           ) : null}
         </div>
-        {skill.githubUrl ? (
-          <a
-            aria-label="Open GitHub source"
-            className="plain-icon-link"
-            href={skill.githubUrl}
-            title="Open GitHub source"
-          >
-            ⎇
-          </a>
-        ) : (
-          <span aria-label="Metadata only" className="plain-icon" title="Metadata only">◌</span>
-        )}
       </div>
     </div>
   );
