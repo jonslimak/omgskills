@@ -145,6 +145,31 @@ function SyncedSkillRow({
   const isFavorite = Boolean(favoritesGroup?.syncedSkillIds?.includes(skill.id));
   const selectableGroups = groups.filter((group) => !group.isFavorites);
 
+  function isInteractiveTarget(target: EventTarget | null) {
+    return target instanceof HTMLElement
+      ? Boolean(target.closest("a, button, input, select, textarea"))
+      : false;
+  }
+
+  function expandFromRow(event: React.MouseEvent<HTMLDivElement>) {
+    if (!canExpand || expanded || isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    setExpanded(true);
+  }
+
+  function expandFromKeyboard(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (!canExpand || expanded || event.target !== event.currentTarget) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setExpanded(true);
+    }
+  }
+
   async function addToFavorites() {
     if (isFavorite) {
       return;
@@ -193,7 +218,14 @@ function SyncedSkillRow({
   }
 
   return (
-    <div className="row">
+    <div
+      aria-expanded={canExpand ? expanded : undefined}
+      className={canExpand && !expanded ? "row expandable-row" : "row"}
+      onClick={expandFromRow}
+      onKeyDown={expandFromKeyboard}
+      role={canExpand ? "button" : undefined}
+      tabIndex={canExpand && !expanded ? 0 : undefined}
+    >
       <div className="row-main">
         <h3 className="skill-title">
           <span>{skill.name}</span>
@@ -204,9 +236,9 @@ function SyncedSkillRow({
           ) : null}
         </h3>
         <p className={expanded ? "skill-description expanded" : "skill-description"}>{description}</p>
-        {canExpand ? (
-          <button className="text-button" onClick={() => setExpanded((current) => !current)}>
-            {expanded ? "Show less" : "Expand"}
+        {canExpand && expanded ? (
+          <button className="text-button" onClick={() => setExpanded(false)}>
+            Show less
           </button>
         ) : null}
         <span>
