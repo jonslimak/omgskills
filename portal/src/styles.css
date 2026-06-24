@@ -331,20 +331,6 @@ pre {
   width: auto;
 }
 
-.group-tools {
-  border-top: 1px solid #e2e8f0;
-  display: grid;
-  flex-basis: 100%;
-  gap: 8px;
-  padding-top: 10px;
-}
-
-.inline-form {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
 .check-list {
   display: grid;
   gap: 8px;

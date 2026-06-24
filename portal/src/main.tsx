@@ -49,13 +49,6 @@ type SkillGroup = {
   syncedSkillIds?: string[];
 };
 
-type CatalogSkill = {
-  id: string;
-  name: string;
-  description: string | null;
-  githubUrl: string | null;
-};
-
 type Profile = {
   handle: string | null;
   profilePublished: boolean;
@@ -354,9 +347,6 @@ function GroupsPanel({
 }) {
   const api = usePortalApi();
   const [status, setStatus] = useState("");
-  const [catalogQuery, setCatalogQuery] = useState<Record<string, string>>({});
-  const [catalogResults, setCatalogResults] = useState<Record<string, CatalogSkill[]>>({});
-  const [githubUrls, setGithubUrls] = useState<Record<string, string>>({});
   const [newGroupName, setNewGroupName] = useState("Team Skills");
   const [newGroupEmail, setNewGroupEmail] = useState("");
 
@@ -399,47 +389,6 @@ function GroupsPanel({
       onRefresh?.();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to update group");
-    }
-  }
-
-  async function searchCatalog(group: SkillGroup) {
-    setStatus("Searching catalog...");
-    try {
-      const query = catalogQuery[group.id] ?? "";
-      const result = await api<{ skills: CatalogSkill[] }>(`/api/portal/catalog-search?q=${encodeURIComponent(query)}`);
-      setCatalogResults((current) => ({ ...current, [group.id]: result.skills }));
-      setStatus(result.skills.length ? "Catalog results ready." : "No catalog results.");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Catalog search failed");
-    }
-  }
-
-  async function addCatalogSkill(group: SkillGroup, skill: CatalogSkill) {
-    setStatus("Adding catalog skill...");
-    try {
-      await api(`/api/portal/groups/${group.id}/items`, {
-        method: "POST",
-        body: JSON.stringify({ kind: "catalog", catalogSkillId: skill.id, note: skill.description })
-      });
-      setStatus("Catalog skill added.");
-      onRefresh?.();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to add catalog skill");
-    }
-  }
-
-  async function addGithubSkill(group: SkillGroup) {
-    setStatus("Validating GitHub skill...");
-    try {
-      await api(`/api/portal/groups/${group.id}/items`, {
-        method: "POST",
-        body: JSON.stringify({ kind: "github", githubUrl: githubUrls[group.id] ?? "" })
-      });
-      setStatus("GitHub skill added.");
-      setGithubUrls((current) => ({ ...current, [group.id]: "" }));
-      onRefresh?.();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to add GitHub skill");
     }
   }
 
@@ -508,31 +457,6 @@ function GroupsPanel({
                 </>
               ) : null}
             </div>
-            {canManage ? (
-              <div className="group-tools">
-                <div className="inline-form">
-                  <input
-                    value={catalogQuery[group.id] ?? ""}
-                    onChange={(event) => setCatalogQuery((current) => ({ ...current, [group.id]: event.target.value }))}
-                    placeholder="Search catalog"
-                  />
-                  <button className="secondary" onClick={() => searchCatalog(group)}>Search</button>
-                </div>
-                {(catalogResults[group.id] ?? []).slice(0, 3).map((skill) => (
-                  <button className="secondary" key={skill.id} onClick={() => addCatalogSkill(group, skill)}>
-                    Add {skill.name || skill.id}
-                  </button>
-                ))}
-                <div className="inline-form">
-                  <input
-                    value={githubUrls[group.id] ?? ""}
-                    onChange={(event) => setGithubUrls((current) => ({ ...current, [group.id]: event.target.value }))}
-                    placeholder="GitHub skill URL"
-                  />
-                  <button className="secondary" onClick={() => addGithubSkill(group)}>Add GitHub</button>
-                </div>
-              </div>
-            ) : null}
           </div>
         ))}
         {groups.length === 0 ? <p className="muted">No groups yet.</p> : null}
@@ -586,8 +510,8 @@ function Dashboard() {
       {status ? <p className="status">{status}</p> : null}
       <SyncTokenPanel />
       <ProfilePanel profile={state.profile} onRefresh={refresh} />
-      <SyncedSkillsPanel groups={state.groups} skills={state.syncedSkills} onRefresh={refresh} />
       <GroupsPanel title="My Skill Groups" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
+      <SyncedSkillsPanel groups={state.groups} skills={state.syncedSkills} onRefresh={refresh} />
       <GroupsPanel title="Shared With Me" groups={state.sharedGroups} />
     </main>
   );
