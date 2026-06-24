@@ -299,10 +299,7 @@ function SyncedSkillRow({
             Show less
           </button>
         ) : null}
-        <span>
-          {skill.source}
-          {skill.isLocalOnly ? " · local-only" : ""}
-        </span>
+        <span>{skill.source}</span>
       </div>
       <SkillActions groups={groups} onRefresh={onRefresh} skill={skill} />
     </div>
@@ -326,7 +323,6 @@ function SyncedSkillsTable({
             <th>Skill</th>
             <th>Source</th>
             <th>GitHub</th>
-            <th>Local</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -342,7 +338,6 @@ function SyncedSkillsTable({
                   </a>
                 ) : null}
               </td>
-              <td>{skill.isLocalOnly ? "local-only" : ""}</td>
               <td>
                 <SkillActions groups={groups} onRefresh={onRefresh} skill={skill} />
               </td>
