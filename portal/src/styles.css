@@ -117,6 +117,12 @@ a.icon-link {
   width: 34px;
 }
 
+.back-link {
+  display: inline-flex;
+  margin-bottom: 14px;
+  text-decoration: none;
+}
+
 pre {
   background: #111827;
   border-radius: 8px;

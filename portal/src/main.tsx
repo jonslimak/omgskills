@@ -61,6 +61,11 @@ type SkillGroupItem = {
   position: number;
 };
 
+type SkillGroupDetail = SkillGroup & {
+  accessRole: "owner" | "invited";
+  allowedEmails?: { id: string; email: string }[];
+};
+
 type Profile = {
   handle: string | null;
   profilePublished: boolean;
@@ -489,10 +494,6 @@ function GroupsPanel({
   const [status, setStatus] = useState("");
   const [newGroupName, setNewGroupName] = useState("Team Skills");
   const [newGroupEmail, setNewGroupEmail] = useState("");
-  const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
-  const [emailEditorGroupId, setEmailEditorGroupId] = useState<string | null>(null);
-  const [emailToAdd, setEmailToAdd] = useState("");
-  const [groupItems, setGroupItems] = useState<Record<string, SkillGroupItem[]>>({});
 
   async function createGroup() {
     setStatus("Creating group...");
@@ -550,74 +551,18 @@ function GroupsPanel({
     }
   }
 
-  async function addAllowedEmail(group: SkillGroup) {
-    const email = emailToAdd.trim();
-    if (!email) {
-      return;
-    }
-
-    setStatus("Adding email...");
-    try {
-      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
-        method: "POST",
-        body: JSON.stringify({ email })
-      });
-      setStatus("Email added.");
-      setEmailToAdd("");
-      setEmailEditorGroupId(null);
-      onRefresh?.();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to add email");
-    }
-  }
-
-  async function removeAllowedEmail(group: SkillGroup, emailId: string) {
-    setStatus("Removing email...");
-    try {
-      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
-        method: "DELETE",
-        body: JSON.stringify({ emailId })
-      });
-      setStatus("Email removed.");
-      onRefresh?.();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to remove email");
-    }
-  }
-
   function isInteractiveTarget(target: EventTarget | null) {
     return target instanceof HTMLElement
       ? Boolean(target.closest("a, button, input, select, textarea"))
       : false;
   }
 
-  async function loadGroupItems(groupId: string) {
-    if (groupItems[groupId]) {
-      return;
-    }
-
-    setStatus("Loading group skills...");
-    try {
-      const result = await api<{ items: SkillGroupItem[] }>(`/api/portal/groups/${groupId}/items`);
-      setGroupItems((current) => ({ ...current, [groupId]: result.items }));
-      setStatus("");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to load group skills");
-    }
-  }
-
-  function toggleGroup(groupId: string, event: React.MouseEvent<HTMLDivElement>) {
+  function openGroup(groupId: string, event: React.MouseEvent<HTMLDivElement>) {
     if (isInteractiveTarget(event.target)) {
       return;
     }
 
-    const nextExpandedGroupId = expandedGroupId === groupId ? null : groupId;
-    setExpandedGroupId(nextExpandedGroupId);
-    setEmailEditorGroupId(null);
-    setEmailToAdd("");
-    if (nextExpandedGroupId) {
-      loadGroupItems(nextExpandedGroupId);
-    }
+    window.location.href = `/app/groups/${groupId}`;
   }
 
   return (
@@ -646,19 +591,15 @@ function GroupsPanel({
         </div>
       ) : null}
       <div className="list">
-        {groups.map((group) => {
-          const expanded = expandedGroupId === group.id;
-          const items = groupItems[group.id] ?? [];
-          return (
+        {groups.map((group) => (
             <div
-              aria-expanded={expanded}
               className={
                 group.disabledAt
                   ? "row group-row disabled-row"
                   : "row group-row expandable-row"
               }
               key={group.id}
-              onClick={(event) => toggleGroup(group.id, event)}
+              onClick={(event) => openGroup(group.id, event)}
             >
               <div className="group-row-summary">
                 <div>
@@ -716,83 +657,184 @@ function GroupsPanel({
                   ) : null}
                 </div>
               </div>
-              {expanded ? (
-                <div className="group-detail-panel">
-                  <div className="group-skills-panel">
-                    {items.map((item) => (
-                      <div className="group-skill-row" key={item.id}>
-                        <div>
-                          <strong>{item.name}</strong>
-                          {item.description ? <p>{item.description}</p> : null}
-                        </div>
-                        {item.githubUrl ? (
-                          <a href={item.githubUrl} title="Open GitHub source">
-                            GitHub →
-                          </a>
-                        ) : null}
-                      </div>
-                    ))}
-                    {items.length === 0 ? <p className="muted">No skills in this group yet.</p> : null}
-                  </div>
-                  {canManage ? (
-                    <div className="group-email-panel">
-                      <div className="email-list">
-                        {(group.allowedEmails ?? []).map((allowedEmail) => (
-                          <div className="email-row" key={allowedEmail.id}>
-                            <span>{allowedEmail.email}</span>
-                            <button
-                              aria-label={`Remove ${allowedEmail.email}`}
-                              className="icon-button warning"
-                              onClick={() => removeAllowedEmail(group, allowedEmail.id)}
-                              title="Remove email"
-                              type="button"
-                            >
-                              ⌫
-                            </button>
-                          </div>
-                        ))}
-                        {(group.allowedEmails ?? []).length === 0 ? <p className="muted">No emails added.</p> : null}
-                      </div>
-                      {emailEditorGroupId === group.id ? (
-                        <div className="inline-email-form">
-                          <input
-                            autoFocus
-                            onChange={(event) => setEmailToAdd(event.target.value)}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter") {
-                                addAllowedEmail(group);
-                              }
-                            }}
-                            placeholder="teammate@example.com"
-                            value={emailToAdd}
-                          />
-                          <button disabled={!emailToAdd.trim()} onClick={() => addAllowedEmail(group)} type="button">
-                            Add
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          className="text-button"
-                          onClick={() => {
-                            setEmailEditorGroupId(group.id);
-                            setEmailToAdd("");
-                          }}
-                          type="button"
-                        >
-                          Add new email +
-                        </button>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
             </div>
-          );
-        })}
+        ))}
         {groups.length === 0 ? <p className="muted">No groups yet.</p> : null}
       </div>
       {status ? <p className="status">{status}</p> : null}
     </section>
+  );
+}
+
+function GroupDetailPage({ groupId }: { groupId: string }) {
+  const api = usePortalApi();
+  const { user } = useUser();
+  const [group, setGroup] = useState<SkillGroupDetail | null>(null);
+  const [items, setItems] = useState<SkillGroupItem[]>([]);
+  const [status, setStatus] = useState("Loading group...");
+  const [emailToAdd, setEmailToAdd] = useState("");
+  const [showEmailInput, setShowEmailInput] = useState(false);
+
+  async function loadGroup() {
+    setStatus("Loading group...");
+    try {
+      const result = await api<{
+        group: SkillGroupDetail;
+        items: SkillGroupItem[];
+        accessRole: "owner" | "invited";
+      }>(`/api/portal/groups/${groupId}`);
+      setGroup({ ...result.group, accessRole: result.accessRole });
+      setItems(result.items);
+      setStatus("");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to load group");
+    }
+  }
+
+  async function addAllowedEmail() {
+    const email = emailToAdd.trim();
+    if (!email || !group) {
+      return;
+    }
+
+    setStatus("Adding email...");
+    try {
+      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
+        method: "POST",
+        body: JSON.stringify({ email })
+      });
+      setEmailToAdd("");
+      setShowEmailInput(false);
+      await loadGroup();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to add email");
+    }
+  }
+
+  async function removeAllowedEmail(emailId: string) {
+    if (!group) {
+      return;
+    }
+
+    setStatus("Removing email...");
+    try {
+      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
+        method: "DELETE",
+        body: JSON.stringify({ emailId })
+      });
+      await loadGroup();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to remove email");
+    }
+  }
+
+  useEffect(() => {
+    void loadGroup();
+  }, [groupId]);
+
+  return (
+    <main className="shell">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">Skill Group</p>
+          <h1>{group?.name ?? "Skill Group"}</h1>
+          <p>{user?.primaryEmailAddress?.emailAddress}</p>
+        </div>
+        <UserButton />
+      </header>
+
+      <a href="/app/" className="back-link">← Back to portal</a>
+      {status ? <p className="status">{status}</p> : null}
+
+      {group ? (
+        <>
+          <section className="panel">
+            <div className="panel-header">
+              <div>
+                <h2>{group.name}</h2>
+                <p className="group-meta">
+                  <span>{group.itemCount} skills</span>
+                  <span>{group.visibility || "restricted"}</span>
+                  <span>{group.accessRole}</span>
+                  {group.ownerDisplayName ? <span>{group.ownerDisplayName}</span> : null}
+                </p>
+              </div>
+            </div>
+            {group.description ? <p>{group.description}</p> : null}
+          </section>
+
+          <section className="panel">
+            <h2>Skills</h2>
+            <div className="group-skills-panel">
+              {items.map((item) => (
+                <div className="group-skill-row" key={item.id}>
+                  <div>
+                    <strong>{item.name}</strong>
+                    {item.description ? <p>{item.description}</p> : null}
+                  </div>
+                  {item.githubUrl ? (
+                    <a href={item.githubUrl} title="Open GitHub source">
+                      GitHub →
+                    </a>
+                  ) : null}
+                </div>
+              ))}
+              {items.length === 0 ? <p className="muted">No skills in this group yet.</p> : null}
+            </div>
+          </section>
+
+          {group.accessRole === "owner" ? (
+            <section className="panel">
+              <div className="panel-header">
+                <div>
+                  <h2>Allowed Emails</h2>
+                  <p>People signed in with these emails can view this restricted group.</p>
+                </div>
+              </div>
+              <div className="email-list">
+                {(group.allowedEmails ?? []).map((allowedEmail) => (
+                  <div className="email-row" key={allowedEmail.id}>
+                    <span>{allowedEmail.email}</span>
+                    <button
+                      aria-label={`Remove ${allowedEmail.email}`}
+                      className="icon-button warning"
+                      onClick={() => removeAllowedEmail(allowedEmail.id)}
+                      title="Remove email"
+                      type="button"
+                    >
+                      ⌫
+                    </button>
+                  </div>
+                ))}
+                {(group.allowedEmails ?? []).length === 0 ? <p className="muted">No emails added.</p> : null}
+              </div>
+              {showEmailInput ? (
+                <div className="inline-email-form">
+                  <input
+                    autoFocus
+                    onChange={(event) => setEmailToAdd(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        addAllowedEmail();
+                      }
+                    }}
+                    placeholder="teammate@example.com"
+                    value={emailToAdd}
+                  />
+                  <button disabled={!emailToAdd.trim()} onClick={addAllowedEmail} type="button">
+                    Add
+                  </button>
+                </div>
+              ) : (
+                <button className="text-button" onClick={() => setShowEmailInput(true)} type="button">
+                  Add new email +
+                </button>
+              )}
+            </section>
+          ) : null}
+        </>
+      ) : null}
+    </main>
   );
 }
 
@@ -848,6 +890,8 @@ function Dashboard() {
 }
 
 function App() {
+  const groupDetailMatch = window.location.pathname.match(/^\/app\/groups\/([^/]+)\/?$/);
+
   return (
     <>
       <SignedOut>
@@ -868,7 +912,7 @@ function App() {
         </main>
       </SignedOut>
       <SignedIn>
-        <Dashboard />
+        {groupDetailMatch ? <GroupDetailPage groupId={decodeURIComponent(groupDetailMatch[1])} /> : <Dashboard />}
       </SignedIn>
     </>
   );
