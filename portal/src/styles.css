@@ -29,6 +29,10 @@ button.secondary {
   background: #263238;
 }
 
+button.secondary.compact {
+  min-height: 34px;
+}
+
 button.text-button {
   background: transparent;
   color: #0b57d0;
@@ -230,6 +234,35 @@ pre {
   margin-top: 12px;
 }
 
+.panel-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.segmented-control {
+  background: #eef3f8;
+  border: 1px solid #d7dee8;
+  border-radius: 8px;
+  display: inline-flex;
+  padding: 2px;
+}
+
+.segmented-control button {
+  background: transparent;
+  color: #475569;
+  min-height: 30px;
+  padding: 0 12px;
+}
+
+.segmented-control button.active {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+  color: #202124;
+}
+
 .row {
   align-items: center;
   border: 1px solid #e2e8f0;
@@ -320,6 +353,12 @@ pre {
   position: relative;
 }
 
+.skill-action-stack {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+}
+
 .menu-wrap {
   position: relative;
 }
@@ -352,6 +391,57 @@ pre {
 .group-menu span {
   color: #64748b;
   font-size: 13px;
+}
+
+.skill-table-wrap {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.skill-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 760px;
+  width: 100%;
+}
+
+.skill-table th,
+.skill-table td {
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 13px;
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.skill-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.skill-table th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.skill-table th:last-child {
+  border-top-right-radius: 8px;
+  text-align: right;
+}
+
+.skill-table td:last-child {
+  text-align: right;
+}
+
+.skill-table-name {
+  color: #202124;
+  font-weight: 700;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .compact-create {

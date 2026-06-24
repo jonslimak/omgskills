@@ -126,7 +126,7 @@ function SyncTokenPanel() {
   );
 }
 
-function SyncedSkillRow({
+function SkillActions({
   skill,
   groups,
   onRefresh
@@ -136,39 +136,11 @@ function SyncedSkillRow({
   onRefresh: () => void;
 }) {
   const api = usePortalApi();
-  const [expanded, setExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [status, setStatus] = useState("");
-  const description = skill.description || "No description";
-  const canExpand = description.length > 90;
   const favoritesGroup = groups.find((group) => group.isFavorites);
   const isFavorite = Boolean(favoritesGroup?.syncedSkillIds?.includes(skill.id));
   const selectableGroups = groups.filter((group) => !group.isFavorites);
-
-  function isInteractiveTarget(target: EventTarget | null) {
-    return target instanceof HTMLElement
-      ? Boolean(target.closest("a, button, input, select, textarea"))
-      : false;
-  }
-
-  function expandFromRow(event: React.MouseEvent<HTMLDivElement>) {
-    if (!canExpand || expanded || isInteractiveTarget(event.target)) {
-      return;
-    }
-
-    setExpanded(true);
-  }
-
-  function expandFromKeyboard(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (!canExpand || expanded || event.target !== event.currentTarget) {
-      return;
-    }
-
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setExpanded(true);
-    }
-  }
 
   async function addToFavorites() {
     if (isFavorite) {
@@ -218,35 +190,7 @@ function SyncedSkillRow({
   }
 
   return (
-    <div
-      aria-expanded={canExpand ? expanded : undefined}
-      className={canExpand && !expanded ? "row expandable-row" : "row"}
-      onClick={expandFromRow}
-      onKeyDown={expandFromKeyboard}
-      role={canExpand ? "button" : undefined}
-      tabIndex={canExpand && !expanded ? 0 : undefined}
-    >
-      <div className="row-main">
-        <h3 className="skill-title">
-          <span>{skill.name}</span>
-          {skill.githubUrl ? (
-            <a href={skill.githubUrl} title="Open GitHub source">
-              GitHub →
-            </a>
-          ) : null}
-        </h3>
-        <p className={expanded ? "skill-description expanded" : "skill-description"}>{description}</p>
-        {canExpand && expanded ? (
-          <button className="text-button" onClick={() => setExpanded(false)}>
-            Show less
-          </button>
-        ) : null}
-        <span>
-          {skill.source}
-          {skill.isLocalOnly ? " · local-only" : ""}
-        </span>
-        {status ? <p className="inline-status">{status}</p> : null}
-      </div>
+    <div className="skill-action-stack">
       <div className="skill-actions">
         <button
           aria-label={isFavorite ? "Already in Favorites" : "Add to Favorites"}
@@ -288,6 +232,124 @@ function SyncedSkillRow({
           ) : null}
         </div>
       </div>
+      {status ? <p className="inline-status">{status}</p> : null}
+    </div>
+  );
+}
+
+function SyncedSkillRow({
+  skill,
+  groups,
+  onRefresh
+}: {
+  skill: SyncedSkill;
+  groups: SkillGroup[];
+  onRefresh: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const description = skill.description || "No description";
+  const canExpand = description.length > 90;
+
+  function isInteractiveTarget(target: EventTarget | null) {
+    return target instanceof HTMLElement
+      ? Boolean(target.closest("a, button, input, select, textarea"))
+      : false;
+  }
+
+  function expandFromRow(event: React.MouseEvent<HTMLDivElement>) {
+    if (!canExpand || expanded || isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    setExpanded(true);
+  }
+
+  function expandFromKeyboard(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (!canExpand || expanded || event.target !== event.currentTarget) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setExpanded(true);
+    }
+  }
+
+  return (
+    <div
+      aria-expanded={canExpand ? expanded : undefined}
+      className={canExpand && !expanded ? "row expandable-row" : "row"}
+      onClick={expandFromRow}
+      onKeyDown={expandFromKeyboard}
+      role={canExpand ? "button" : undefined}
+      tabIndex={canExpand && !expanded ? 0 : undefined}
+    >
+      <div className="row-main">
+        <h3 className="skill-title">
+          <span>{skill.name}</span>
+          {skill.githubUrl ? (
+            <a href={skill.githubUrl} title="Open GitHub source">
+              GitHub →
+            </a>
+          ) : null}
+        </h3>
+        <p className={expanded ? "skill-description expanded" : "skill-description"}>{description}</p>
+        {canExpand && expanded ? (
+          <button className="text-button" onClick={() => setExpanded(false)}>
+            Show less
+          </button>
+        ) : null}
+        <span>
+          {skill.source}
+          {skill.isLocalOnly ? " · local-only" : ""}
+        </span>
+      </div>
+      <SkillActions groups={groups} onRefresh={onRefresh} skill={skill} />
+    </div>
+  );
+}
+
+function SyncedSkillsTable({
+  skills,
+  groups,
+  onRefresh
+}: {
+  skills: SyncedSkill[];
+  groups: SkillGroup[];
+  onRefresh: () => void;
+}) {
+  return (
+    <div className="skill-table-wrap">
+      <table className="skill-table">
+        <thead>
+          <tr>
+            <th>Skill</th>
+            <th>Source</th>
+            <th>GitHub</th>
+            <th>Local</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {skills.map((skill) => (
+            <tr key={skill.id}>
+              <td className="skill-table-name">{skill.name}</td>
+              <td>{skill.source}</td>
+              <td>
+                {skill.githubUrl ? (
+                  <a href={skill.githubUrl} title="Open GitHub source">
+                    GitHub →
+                  </a>
+                ) : null}
+              </td>
+              <td>{skill.isLocalOnly ? "local-only" : ""}</td>
+              <td>
+                <SkillActions groups={groups} onRefresh={onRefresh} skill={skill} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -301,6 +363,15 @@ function SyncedSkillsPanel({
   groups: SkillGroup[];
   onRefresh: () => void;
 }) {
+  const [viewMode, setViewMode] = useState<"list" | "table">(() =>
+    window.localStorage.getItem("syncedSkillsViewMode") === "table" ? "table" : "list"
+  );
+
+  function updateViewMode(nextViewMode: "list" | "table") {
+    setViewMode(nextViewMode);
+    window.localStorage.setItem("syncedSkillsViewMode", nextViewMode);
+  }
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -308,16 +379,40 @@ function SyncedSkillsPanel({
           <h2>Synced Skills</h2>
           <p>{skills.length} current skills from your local app inventory.</p>
         </div>
-        <button className="secondary" onClick={onRefresh}>
-          Refresh
-        </button>
+        <div className="panel-controls">
+          <div aria-label="Synced skills view" className="segmented-control">
+            <button
+              aria-pressed={viewMode === "list"}
+              className={viewMode === "list" ? "active" : ""}
+              onClick={() => updateViewMode("list")}
+              type="button"
+            >
+              List
+            </button>
+            <button
+              aria-pressed={viewMode === "table"}
+              className={viewMode === "table" ? "active" : ""}
+              onClick={() => updateViewMode("table")}
+              type="button"
+            >
+              Table
+            </button>
+          </div>
+          <button className="secondary" onClick={onRefresh}>
+            Refresh
+          </button>
+        </div>
       </div>
-      <div className="list">
-        {skills.map((skill) => (
-          <SyncedSkillRow groups={groups} key={skill.id} onRefresh={onRefresh} skill={skill} />
-        ))}
-        {skills.length === 0 ? <p className="muted">No synced skills yet.</p> : null}
-      </div>
+      {viewMode === "table" && skills.length > 0 ? (
+        <SyncedSkillsTable groups={groups} onRefresh={onRefresh} skills={skills} />
+      ) : (
+        <div className="list">
+          {skills.map((skill) => (
+            <SyncedSkillRow groups={groups} key={skill.id} onRefresh={onRefresh} skill={skill} />
+          ))}
+          {skills.length === 0 ? <p className="muted">No synced skills yet.</p> : null}
+        </div>
+      )}
     </section>
   );
 }
