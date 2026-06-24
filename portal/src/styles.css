@@ -342,12 +342,15 @@ pre {
 
 .group-row-summary {
   align-items: center;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 12px;
-  justify-content: space-between;
+  grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
   width: 100%;
+}
+
+.group-row-summary .row-actions {
+  justify-self: end;
 }
 
 .group-email-panel {
