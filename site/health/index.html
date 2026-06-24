@@ -283,16 +283,27 @@
         addSourceItem("Status", statusLabel(section?.status), href),
         addSourceItem("Last tested", fmt(section?.checkedAt), href),
       ];
-      const summaryRows = [
-        ["Crawler / Publish Summary", "crawlerPublishSummary"],
-        ["Release", "release"],
-        ["v2 App Data", "v2AppData"],
-        ["App Search Smoke Test", "search"],
-        ["New Crawler Freshness", "crawlers"],
-        ["New Crawler Promotion Integrity", "shadowCutover"],
-        ["Content/Overlays", "contentOverlays"],
-        ["Website To Install Funnel", "marketingFunnel"],
+      const sectionLabels = {
+        crawlerPublishSummary: "Crawler / Publish Summary",
+        release: "Release",
+        v2AppData: "v2 App Data",
+        search: "App Search Smoke Test",
+        crawlers: "New Crawler Freshness",
+        shadowCutover: "New Crawler Promotion Integrity",
+        contentOverlays: "Content/Overlays",
+        marketingFunnel: "Website To Install Funnel",
+      };
+      const sectionOrder = [
+        "crawlerPublishSummary",
+        "release",
+        "v2AppData",
+        "search",
+        "crawlers",
+        "shadowCutover",
+        "contentOverlays",
+        "marketingFunnel",
       ];
+      const labelForSection = (key) => sectionLabels[key] || key.replace(/([a-z])([A-Z])/g, "$1 $2");
 
       fetch(dataUrl, { cache: "no-store" })
         .then((res) => {
@@ -315,9 +326,13 @@
             addItem("Git SHA", health.gitSha || "-"),
           ].join("");
 
-          document.getElementById("sectionSummary").innerHTML = summaryRows.map(([label, key]) => {
+          const sectionKeys = [
+            ...sectionOrder.filter((key) => health.sections?.[key]),
+            ...Object.keys(health.sections || {}).filter((key) => !sectionOrder.includes(key)).sort(),
+          ];
+          document.getElementById("sectionSummary").innerHTML = sectionKeys.map((key) => {
             const section = health.sections?.[key];
-            return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${timeCell(fmt(section?.checkedAt))}</td></tr>`;
+            return `<tr><td>${escapeHtml(labelForSection(key))}</td><td>${escapeHtml(statusLabel(section?.status))}</td><td>${timeCell(fmt(section?.checkedAt))}</td></tr>`;
           }).join("");
 
           document.getElementById("crawlerPublishSummary").innerHTML = [
@@ -366,7 +381,9 @@
             ...renderBase(health.sections?.shadowCutover),
             addItem("Cutover validation", health.sections?.shadowCutover?.cutoverValidationPassed ?? "-"),
             addItem("Promoted matches cutover", health.sections?.shadowCutover?.promotedMatchesCutover ?? "-"),
-            addItem("v2 manifest aligned", health.sections?.shadowCutover?.v2ManifestMatchesLocal ?? "-"),
+            addTimeItem("Last v2 publish", fmtSuccess(health.sections?.shadowCutover?.lastSuccessfulV2PublishAt)),
+            addTimeItem("Last deploy", fmtSuccess(health.sections?.shadowCutover?.lastSuccessfulDeployAt)),
+            addItem("Live verify", health.sections?.shadowCutover?.latestLiveVerifyConclusion ?? "-"),
             addItem("Message", issueText(health.sections?.shadowCutover)),
           ].join("");
 

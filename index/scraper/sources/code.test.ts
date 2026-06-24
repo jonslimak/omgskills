@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { searchHighStarSkillMdRepos } from "./code.js";
+import { isHighStarBackfillPathAllowed, searchHighStarSkillMdRepos } from "./code.js";
 
 test("high-star SKILL.md search dedupes repos and respects sample cap", async () => {
   const seenQueries: string[] = [];
@@ -115,4 +115,40 @@ test("high-star SKILL.md search reuses cached repo metadata before fetching", as
       { repo: "owner/live", stars: 800 },
     ],
   );
+});
+
+test("high-star SKILL.md search keeps partial pages when later page throttles", async () => {
+  const pages: string[] = [];
+  const throttle = new Error("secondary rate limit");
+  (throttle as Error & { status?: number }).status = 403;
+
+  const result = await searchHighStarSkillMdRepos({
+    queries: ["q"],
+    maxPagesPerQuery: 3,
+    maxSampledRepos: 10,
+    requestDelayMs: 0,
+    sleepFn: async () => {},
+    searchCodeFn: async (query, page) => {
+      pages.push(`${query}:${page}`);
+      if (page === 2) throw throttle;
+      return [
+        { repo: "owner/one", path: "SKILL.md", url: "https://github.com/owner/one/blob/main/SKILL.md" },
+      ];
+    },
+    getRepoMetaFn: async () => ({ stars: 700 }),
+  });
+
+  assert.deepEqual(pages, ["q:1", "q:2"]);
+  assert.deepEqual(result.hits.map((hit) => hit.repo), ["owner/one"]);
+});
+
+test("high-star backfill path gate allows only direct skill locations", () => {
+  assert.equal(isHighStarBackfillPathAllowed("SKILL.md"), true);
+  assert.equal(isHighStarBackfillPathAllowed(".claude/skills/foo/SKILL.md"), true);
+  assert.equal(isHighStarBackfillPathAllowed(".agents/skills/foo/SKILL.md"), true);
+  assert.equal(isHighStarBackfillPathAllowed("skills/foo/SKILL.md"), true);
+
+  assert.equal(isHighStarBackfillPathAllowed("benchmarks/tasks/skills/foo/SKILL.md"), false);
+  assert.equal(isHighStarBackfillPathAllowed("assets/skills/foo/SKILL.md"), false);
+  assert.equal(isHighStarBackfillPathAllowed("plugins/foo/skills/bar/SKILL.md"), false);
 });

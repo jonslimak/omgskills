@@ -88,7 +88,12 @@ jobs:
         run: node ./scripts/verify-published-data.mjs
 
       - name: Reset transient health snapshot
-        run: git checkout -- site/data/health.json
+        run: |
+          if git ls-files --error-unmatch site/data/health.json >/dev/null 2>&1; then
+            git checkout -- site/data/health.json
+          else
+            rm -f site/data/health.json
+          fi
 
       - name: Commit if changed
         run: |

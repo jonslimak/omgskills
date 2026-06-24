@@ -78,6 +78,15 @@ function isValidSkillPath(path: string): boolean {
   return path === "SKILL.md" || path.endsWith("/SKILL.md");
 }
 
+export function isHighStarBackfillPathAllowed(path: string): boolean {
+  return (
+    path === "SKILL.md" ||
+    /^\.claude\/skills\/.+\/SKILL\.md$/.test(path) ||
+    /^\.agents\/skills\/.+\/SKILL\.md$/.test(path) ||
+    /^skills\/.+\/SKILL\.md$/.test(path)
+  );
+}
+
 function deriveId(repoFullName: string, path: string): string {
   if (path === "SKILL.md") return repoFullName;
   const parts = path.split("/");
@@ -172,6 +181,15 @@ function highStarSettings(options: HighStarSkillMdSearchOptions): HighStarSkillM
   };
 }
 
+function isSearchThrottleError(error: unknown): boolean {
+  const status = typeof error === "object" && error !== null && "status" in error
+    ? (error as { status?: unknown }).status
+    : undefined;
+  if (status === 403 || status === 429) return true;
+  const message = error instanceof Error ? error.message : String(error);
+  return /rate limit|secondary rate|abuse/i.test(message);
+}
+
 async function defaultSearchCode(query: string, page: number): Promise<HighStarSkillMdSearchItem[]> {
   const response = await octokit.rest.search.code({
     q: query,
@@ -209,7 +227,13 @@ export async function searchHighStarSkillMdRepos(
 
   for (const query of settings.queries) {
     for (let page = 1; page <= settings.maxPagesPerQuery; page += 1) {
-      const items = await searchCodeFn(query, page);
+      let items: HighStarSkillMdSearchItem[];
+      try {
+        items = await searchCodeFn(query, page);
+      } catch (error) {
+        if (isSearchThrottleError(error)) break;
+        throw error;
+      }
       for (const item of items) {
         if (!isValidSkillPath(item.path)) continue;
         const repo = item.repo.toLowerCase();

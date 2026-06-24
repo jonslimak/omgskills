@@ -1,24 +1,10 @@
 #!/usr/bin/env node
 
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 const repo = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
 const shadowMaxAgeHours = Number(process.env.SHADOW_MAX_AGE_HOURS ?? 12);
 const stuckMaxMinutes = Number(process.env.STUCK_MAX_MINUTES ?? 90);
 const checkedAt = new Date().toISOString();
-
-const liveManifests = {
-  legacyData: {
-    liveUrl: process.env.LIVE_MANIFEST_URL ?? "https://omgskills.com/data/manifest.json",
-    localPath: join(process.cwd(), "site", "data", "manifest.json"),
-  },
-  v2AppData: {
-    liveUrl: process.env.LIVE_V2_MANIFEST_URL ?? "https://omgskills.com/data/v2/manifest.json",
-    localPath: join(process.cwd(), "site", "data", "v2", "manifest.json"),
-  },
-};
 
 if (!repo || !token) {
   console.error("check-pipeline-health: missing GITHUB_REPOSITORY or GITHUB_TOKEN");
@@ -125,40 +111,6 @@ async function latestStageSuccess(runs, stepName) {
   return null;
 }
 
-function readJson(path) {
-  return JSON.parse(readFileSync(path, "utf8"));
-}
-
-async function compareManifest(name, { liveUrl, localPath }) {
-  const issues = [];
-  let liveStatus = null;
-
-  try {
-    const liveManifestResponse = await fetch(liveUrl, { headers: { "cache-control": "no-cache" } });
-    liveStatus = liveManifestResponse.status;
-    if (!liveManifestResponse.ok) {
-      issues.push(`live manifest request failed (${liveManifestResponse.status})`);
-    } else {
-      const liveManifest = await liveManifestResponse.json();
-      const localManifest = readJson(localPath);
-      if (JSON.stringify(liveManifest) !== JSON.stringify(localManifest)) {
-        issues.push("live manifest differs from repo manifest");
-      }
-    }
-  } catch (error) {
-    issues.push(`live manifest check failed (${error.message})`);
-  }
-
-  return {
-    name,
-    status: issues.length === 0 ? "ok" : "degraded",
-    liveUrl,
-    localPath,
-    liveStatus,
-    issues,
-  };
-}
-
 async function main() {
   const issues = [];
   const sections = {};
@@ -201,30 +153,24 @@ async function main() {
       });
   issues.push(...crawlerIssues.map((issue) => `crawlers: ${issue}`));
 
-  const manifestChecks = await Promise.all(
-    Object.entries(liveManifests).map(([name, config]) => compareManifest(name, config)),
-  );
-  for (const manifestCheck of manifestChecks) {
-    if (manifestCheck.issues.length) {
-      issues.push(...manifestCheck.issues.map((issue) => `${manifestCheck.name}: ${issue}`));
-    }
-  }
-
   const shadowIssues = [];
-  let v2ManifestMatchesLocal = manifestChecks.find((item) => item.name === "v2AppData")?.issues.length === 0;
-
-  if (!v2ManifestMatchesLocal) {
-    shadowIssues.push("live v2 manifest is not aligned with repo v2 manifest");
-  }
+  const publishAt = latestV2Publish?.completedAt ?? null;
+  const deployAt = latestV2Deploy?.completedAt ?? null;
+  const verifyConclusion = latestStepConclusion(latestShadowRunJobs, shadowStageSteps.verify);
+  if (!publishAt) shadowIssues.push("No successful v2 publish stage found");
+  if (!deployAt) shadowIssues.push("No successful deploy stage found");
+  if (verifyConclusion !== "success") shadowIssues.push("Latest live v2 verify step did not pass");
 
   sections.shadowCutover = shadowIssues.length
     ? degraded(shadowIssues, {
-        v2ManifestMatchesLocal,
-        latestLiveVerifyConclusion: latestStepConclusion(latestShadowRunJobs, shadowStageSteps.verify),
+        lastSuccessfulV2PublishAt: publishAt,
+        lastSuccessfulDeployAt: deployAt,
+        latestLiveVerifyConclusion: verifyConclusion,
       })
     : ok({
-        v2ManifestMatchesLocal,
-        latestLiveVerifyConclusion: latestStepConclusion(latestShadowRunJobs, shadowStageSteps.verify),
+        lastSuccessfulV2PublishAt: publishAt,
+        lastSuccessfulDeployAt: deployAt,
+        latestLiveVerifyConclusion: verifyConclusion,
       });
   issues.push(...shadowIssues.map((issue) => `shadowCutover: ${issue}`));
 

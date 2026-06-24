@@ -2,7 +2,7 @@ name: pipeline-health
 
 on:
   schedule:
-    - cron: "30 * * * *"
+    - cron: "30 */3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -51,6 +51,7 @@ jobs:
         run: node ./scripts/check-funnel-health.mjs || true
 
       - name: Update health snapshot
+        id: finalhealth
         env:
           HEALTH_PIPELINE_STATUS: ${{ steps.healthcheck.outputs.health_status || 'degraded' }}
           HEALTH_PIPELINE_MESSAGE: ${{ steps.healthcheck.outputs.health_message || 'Pipeline health check failed' }}
@@ -68,12 +69,12 @@ jobs:
           node ./scripts/build-health.mjs
 
       - name: Update health issue on failure
-        if: steps.healthcheck.outputs.health_status == 'degraded' || steps.productcheck.outputs.product_status == 'degraded'
+        if: steps.finalhealth.outputs.health_status == 'degraded'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TITLE="Pipeline health"
-          BODY="Health degraded on $(date -u +"%Y-%m-%dT%H:%M:%SZ").\n\nPipeline: ${{ steps.healthcheck.outputs.health_message || 'ok' }}\n\nProduct: ${{ steps.productcheck.outputs.product_message || 'ok' }}"
+          BODY="Health degraded on $(date -u +"%Y-%m-%dT%H:%M:%SZ").\n\n${{ steps.finalhealth.outputs.health_message || 'Health degraded' }}"
           ISSUE_NUMBER="$(gh issue list --repo "${{ github.repository }}" --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number // empty')"
           if [ -n "$ISSUE_NUMBER" ]; then
             gh issue edit "$ISSUE_NUMBER" --repo "${{ github.repository }}" --title "$TITLE" --body "$BODY"
@@ -82,7 +83,7 @@ jobs:
           fi
 
       - name: Close health issue on recovery
-        if: steps.healthcheck.outputs.health_status == 'ok' && steps.productcheck.outputs.product_status == 'ok'
+        if: steps.finalhealth.outputs.health_status == 'ok'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -105,5 +106,5 @@ jobs:
         run: npx netlify-cli deploy --prod --dir=dist/netlify-site --site "$NETLIFY_SITE_ID"
 
       - name: Fail on degraded health
-        if: steps.healthcheck.outputs.health_status == 'degraded' || steps.productcheck.outputs.product_status == 'degraded'
+        if: steps.finalhealth.outputs.health_status == 'degraded'
         run: exit 1

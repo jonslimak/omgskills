@@ -14,6 +14,25 @@ type AuditSkill = Skill & {
   upstream_repo?: string | null;
 };
 
+type QueryShard = {
+  name: string;
+  queries: string[];
+};
+
+const QUERY_SHARDS: QueryShard[] = [
+  { name: "current-core", queries: ["filename:SKILL.md"] },
+  { name: "current-claude", queries: ["filename:SKILL.md path:.claude/skills"] },
+  { name: "current-agents", queries: ["filename:SKILL.md path:.agents/skills"] },
+  { name: "current-skills", queries: ["filename:SKILL.md path:skills"] },
+  { name: "size-lt-1000", queries: ["filename:SKILL.md size:<1000"] },
+  { name: "size-1000-2000", queries: ["filename:SKILL.md size:1000..2000"] },
+  { name: "size-2001-5000", queries: ["filename:SKILL.md size:2001..5000"] },
+  { name: "size-5001-15000", queries: ["filename:SKILL.md size:5001..15000"] },
+  { name: "size-gt-15000", queries: ["filename:SKILL.md size:>15000"] },
+  { name: "fingerprint-preamble", queries: ["preamble-tier filename:SKILL.md"] },
+  { name: "fingerprint-use-when", queries: ['"Use when" filename:SKILL.md'] },
+];
+
 function repoFromGithubUrl(url: string | null | undefined): string | null {
   const match = String(url ?? "").match(/github\.com\/([^/]+\/[^/#?]+)/i);
   return match ? match[1]!.replace(/\.git$/i, "").toLowerCase() : null;
@@ -44,7 +63,7 @@ function annotateRows(
   }));
 }
 
-function summarize(rows: AuditRow[], skills: AuditSkill[], repoIndex: ShadowRepoIndex, settings: HighStarSkillMdSettings) {
+function summarizeRows(rows: AuditRow[], settings: HighStarSkillMdSettings) {
   const validRows = rows.filter((row) => typeof row.stars === "number" && !row.archived && !row.disabled);
   const highValueRows = validRows
     .filter((row) => (row.stars ?? 0) >= settings.minStars)
@@ -52,70 +71,117 @@ function summarize(rows: AuditRow[], skills: AuditSkill[], repoIndex: ShadowRepo
   const covered = highValueRows.filter((row) => row.inSkills || row.inRepoIndex);
   const missing = highValueRows.filter((row) => !row.inSkills && !row.inRepoIndex);
 
-  const byQuery: Record<string, { sampled: number; highStar: number; covered: number; missing: number }> = {};
-  for (const row of rows) {
-    byQuery[row.query] ??= { sampled: 0, highStar: 0, covered: 0, missing: 0 };
-    const bucket = byQuery[row.query]!;
-    bucket.sampled += 1;
-    if (typeof row.stars === "number" && row.stars >= settings.minStars && !row.archived && !row.disabled) {
-      bucket.highStar += 1;
-      if (row.inSkills || row.inRepoIndex) bucket.covered += 1;
-      else bucket.missing += 1;
-    }
-  }
-
   return {
-    settings: {
-      minStars: settings.minStars,
-      maxSampledRepos: settings.maxSampledRepos,
-      maxPagesPerQuery: settings.maxPagesPerQuery,
-      requestDelayMs: settings.requestDelayMs,
-      queries: settings.queries,
-    },
-    currentLibrary: {
-      skills: skills.length,
-      uniqueSkillRepos: buildCurrentSkillRepoSet(skills).size,
-      repoIndexRepos: repoIndex.repos.length,
-      repoIndexReposAtMinStars: repoIndex.repos.filter((repo) => repo.stars >= settings.minStars).length,
-    },
-    sample: {
-      sampledRepos: rows.length,
-      validRepos: validRows.length,
-      highStarRepos: highValueRows.length,
-      coveredHighStarRepos: covered.length,
-      missingHighStarRepos: missing.length,
-      coveragePct: highValueRows.length ? Math.round((covered.length / highValueRows.length) * 1000) / 10 : null,
-    },
-    byQuery,
-    missingTop: missing.slice(0, 30).map((row) => ({
+    sampledRepos: rows.length,
+    validRepos: validRows.length,
+    highStarRepos: highValueRows.length,
+    coveredHighStarRepos: covered.length,
+    missingHighStarRepos: missing.length,
+    coveragePct: highValueRows.length ? Math.round((covered.length / highValueRows.length) * 1000) / 10 : null,
+    missingTop: missing.slice(0, 20).map((row) => ({
       repo: row.repo,
       stars: row.stars,
       path: row.path,
       query: row.query,
       url: row.url,
     })),
-    coveredTop: covered.slice(0, 15).map((row) => ({
-      repo: row.repo,
-      stars: row.stars,
-      inSkills: row.inSkills,
-      inRepoIndex: row.inRepoIndex,
-    })),
   };
 }
 
+function parseNumberArg(argv: string[], name: string, fallback: number): number {
+  const raw = argv.find((arg) => arg.startsWith(`--${name}=`));
+  if (!raw) return fallback;
+  const value = Number(raw.split("=", 2)[1]);
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error(`--${name} must be a positive number`);
+  }
+  return value;
+}
+
+function parseShardFilter(argv: string[]): Set<string> | null {
+  const raw = argv.find((arg) => arg.startsWith("--shards="));
+  if (!raw) return null;
+  return new Set(
+    raw
+      .split("=", 2)[1]!
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean),
+  );
+}
+
 async function main() {
+  const argv = process.argv.slice(2);
+  const minStars = parseNumberArg(argv, "min-stars", 500);
+  const maxSampledRepos = parseNumberArg(argv, "max-sampled-repos", 100);
+  const maxPagesPerQuery = parseNumberArg(argv, "max-pages-per-query", 5);
+  const requestDelayMs = parseNumberArg(argv, "request-delay-ms", 500);
+  const shardFilter = parseShardFilter(argv);
+
   const skills = loadJson<AuditSkill[]>(join(indexRoot, "skills.json"));
   const repoIndex = loadJson<ShadowRepoIndex>(join(indexRoot, "shadow", "repo-index.shadow.json"));
   const skillRepos = buildCurrentSkillRepoSet(skills);
   const repoIndexRepos = new Set(repoIndex.repos.map((repo) => repo.repo.toLowerCase()));
+  const selectedShards = QUERY_SHARDS.filter((shard) => !shardFilter || shardFilter.has(shard.name));
 
-  const { settings, hits } = await searchHighStarSkillMdRepos({
-    onMetaProgress: (completed, total) => {
-      if (completed % 25 === 0) console.error(`repo meta ${completed}/${total}`);
+  if (selectedShards.length === 0) {
+    throw new Error("No matching shards selected");
+  }
+
+  const shardResults = [];
+  for (const shard of selectedShards) {
+    console.error(`audit shard ${shard.name}`);
+    const { settings, hits } = await searchHighStarSkillMdRepos({
+      minStars,
+      maxSampledRepos,
+      maxPagesPerQuery,
+      requestDelayMs,
+      queries: shard.queries,
+      onMetaProgress: (completed, total) => {
+        if (completed % 25 === 0) console.error(`  repo meta ${completed}/${total}`);
+      },
+    });
+    const rows = annotateRows(hits, skillRepos, repoIndexRepos);
+    shardResults.push({
+      shard: shard.name,
+      queries: shard.queries,
+      ...summarizeRows(rows, settings),
+    });
+  }
+
+  const totals = shardResults.reduce(
+    (acc, row) => {
+      acc.sampledRepos += row.sampledRepos;
+      acc.highStarRepos += row.highStarRepos;
+      acc.coveredHighStarRepos += row.coveredHighStarRepos;
+      acc.missingHighStarRepos += row.missingHighStarRepos;
+      return acc;
     },
-  });
-  const rows = annotateRows(hits, skillRepos, repoIndexRepos);
-  console.log(JSON.stringify(summarize(rows, skills, repoIndex, settings), null, 2));
+    {
+      sampledRepos: 0,
+      highStarRepos: 0,
+      coveredHighStarRepos: 0,
+      missingHighStarRepos: 0,
+    },
+  );
+
+  console.log(JSON.stringify({
+    settings: {
+      minStars,
+      maxSampledRepos,
+      maxPagesPerQuery,
+      requestDelayMs,
+      shardCount: selectedShards.length,
+    },
+    currentLibrary: {
+      skills: skills.length,
+      uniqueSkillRepos: skillRepos.size,
+      repoIndexRepos: repoIndex.repos.length,
+      repoIndexReposAtMinStars: repoIndex.repos.filter((repo) => repo.stars >= minStars).length,
+    },
+    totals,
+    shards: shardResults.sort((a, b) => b.missingHighStarRepos - a.missingHighStarRepos || b.highStarRepos - a.highStarRepos),
+  }, null, 2));
 }
 
 main().catch((error) => {

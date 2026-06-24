@@ -72,6 +72,8 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     discoveryBudgetApplied: false,
     discoveryBudgetSummary: null,
     partialDiscoveryWarnings: [],
+    highStarPathQualitySkippedCount: 0,
+    highStarPathQualitySkippedSample: [],
     enrichmentCounts: {
       cheapReposChecked: 0,
       dailyPriorityRepoCount: 0,
