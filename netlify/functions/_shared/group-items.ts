@@ -1,7 +1,8 @@
 import { getPgPool } from "./db.js";
 
 type GroupItemInput = {
-  kind: "catalog" | "github";
+  kind: "synced" | "catalog" | "github";
+  syncedSkillId?: string | null;
   catalogSkillId?: string | null;
   githubUrl?: string | null;
   note?: string | null;
@@ -21,6 +22,16 @@ export async function requireOwnedGroup(userId: string, groupId: string) {
 
 export async function addGroupItem(groupId: string, item: GroupItemInput) {
   const pool = getPgPool();
+  if (item.syncedSkillId) {
+    const existing = await pool.query<{ id: string }>(
+      "SELECT id FROM skill_group_items WHERE group_id = $1 AND synced_skill_id = $2 LIMIT 1",
+      [groupId, item.syncedSkillId]
+    );
+    if (existing.rowCount) {
+      throw new Response("Skill is already in this group", { status: 409 });
+    }
+  }
+
   const positionResult = await pool.query<{ next_position: number }>(
     "SELECT COALESCE(MAX(position) + 1, 0)::int AS next_position FROM skill_group_items WHERE group_id = $1",
     [groupId]
@@ -28,11 +39,19 @@ export async function addGroupItem(groupId: string, item: GroupItemInput) {
   const position = positionResult.rows[0]?.next_position ?? 0;
   const result = await pool.query<{ id: string }>(
     `
-      INSERT INTO skill_group_items (group_id, kind, catalog_skill_id, github_url, note, position)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO skill_group_items (group_id, kind, synced_skill_id, catalog_skill_id, github_url, note, position)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id
     `,
-    [groupId, item.kind, item.catalogSkillId ?? null, item.githubUrl ?? null, item.note ?? null, position]
+    [
+      groupId,
+      item.kind,
+      item.syncedSkillId ?? null,
+      item.catalogSkillId ?? null,
+      item.githubUrl ?? null,
+      item.note ?? null,
+      position
+    ]
   );
 
   return { itemId: result.rows[0].id, position };

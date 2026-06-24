@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ClerkProvider,
@@ -42,9 +42,11 @@ type SkillGroup = {
   description: string | null;
   slug: string;
   visibility?: string;
+  isFavorites?: boolean;
   itemCount: number;
   allowedEmailCount?: number;
   ownerDisplayName?: string;
+  syncedSkillIds?: string[];
 };
 
 type CatalogSkill = {
@@ -130,7 +132,143 @@ function SyncTokenPanel() {
   );
 }
 
-function SyncedSkillsPanel({ skills, onRefresh }: { skills: SyncedSkill[]; onRefresh: () => void }) {
+function SyncedSkillRow({
+  skill,
+  groups,
+  onRefresh
+}: {
+  skill: SyncedSkill;
+  groups: SkillGroup[];
+  onRefresh: () => void;
+}) {
+  const api = usePortalApi();
+  const [expanded, setExpanded] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [status, setStatus] = useState("");
+  const description = skill.description || "No description";
+  const canExpand = description.length > 90;
+  const favoritesGroup = groups.find((group) => group.isFavorites);
+  const isFavorite = Boolean(favoritesGroup?.syncedSkillIds?.includes(skill.id));
+  const selectableGroups = groups.filter((group) => !group.isFavorites);
+
+  async function addToFavorites() {
+    if (isFavorite) {
+      return;
+    }
+    setStatus("Adding to Favorites...");
+    try {
+      if (favoritesGroup) {
+        await api(`/api/portal/groups/${favoritesGroup.id}/items`, {
+          method: "POST",
+          body: JSON.stringify({ kind: "synced", syncedSkillId: skill.id })
+        });
+      } else {
+        await api("/api/portal/groups", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Favorite Skills",
+            visibility: "public",
+            isFavorites: true,
+            syncedSkillIds: [skill.id]
+          })
+        });
+      }
+      setStatus("");
+      onRefresh();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to add to Favorites");
+    }
+  }
+
+  async function addToGroup(group: SkillGroup) {
+    if (group.syncedSkillIds?.includes(skill.id)) {
+      return;
+    }
+    setStatus(`Adding to ${group.name}...`);
+    try {
+      await api(`/api/portal/groups/${group.id}/items`, {
+        method: "POST",
+        body: JSON.stringify({ kind: "synced", syncedSkillId: skill.id })
+      });
+      setStatus("");
+      setMenuOpen(false);
+      onRefresh();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to add to group");
+    }
+  }
+
+  return (
+    <div className="row">
+      <div className="row-main">
+        <h3>{skill.name}</h3>
+        <p className={expanded ? "skill-description expanded" : "skill-description"}>{description}</p>
+        {canExpand ? (
+          <button className="text-button" onClick={() => setExpanded((current) => !current)}>
+            {expanded ? "Show less" : "Expand"}
+          </button>
+        ) : null}
+        <span>
+          {skill.source}
+          {skill.isLocalOnly ? " · local-only" : ""}
+        </span>
+        {status ? <p className="inline-status">{status}</p> : null}
+      </div>
+      <div className="skill-actions">
+        <button
+          aria-label={isFavorite ? "Already in Favorites" : "Add to Favorites"}
+          className={isFavorite ? "icon-button active" : "icon-button"}
+          disabled={isFavorite}
+          onClick={addToFavorites}
+          title={isFavorite ? "Already in Favorites" : "Add to Favorites"}
+        >
+          {isFavorite ? "★" : "☆"}
+        </button>
+        <div className="menu-wrap">
+          <button
+            aria-expanded={menuOpen}
+            aria-label="Add to group"
+            className="icon-button"
+            onClick={() => setMenuOpen((current) => !current)}
+            title="Add to group"
+          >
+            ⊞
+          </button>
+          {menuOpen ? (
+            <div className="group-menu">
+              {selectableGroups.length === 0 ? <span>No groups yet</span> : null}
+              {selectableGroups.map((group) => {
+                const alreadyAdded = group.syncedSkillIds?.includes(skill.id) ?? false;
+                return (
+                  <button
+                    disabled={alreadyAdded}
+                    key={group.id}
+                    onClick={() => addToGroup(group)}
+                    type="button"
+                  >
+                    {group.name}
+                    {alreadyAdded ? " ✓" : ""}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+        {skill.githubUrl ? <a href={skill.githubUrl}>GitHub</a> : <span className="muted">Metadata only</span>}
+      </div>
+    </div>
+  );
+}
+
+function SyncedSkillsPanel({
+  skills,
+  groups,
+  onRefresh
+}: {
+  skills: SyncedSkill[];
+  groups: SkillGroup[];
+  onRefresh: () => void;
+}) {
   return (
     <section className="panel">
       <div className="panel-header">
@@ -144,114 +282,10 @@ function SyncedSkillsPanel({ skills, onRefresh }: { skills: SyncedSkill[]; onRef
       </div>
       <div className="list">
         {skills.map((skill) => (
-          <div className="row" key={skill.id}>
-            <div>
-              <h3>{skill.name}</h3>
-              <p>{skill.description || "No description"}</p>
-              <span>
-                {skill.source}
-                {skill.isLocalOnly ? " · local-only" : ""}
-              </span>
-            </div>
-            {skill.githubUrl ? <a href={skill.githubUrl}>GitHub</a> : <span className="muted">Metadata only</span>}
-          </div>
+          <SyncedSkillRow groups={groups} key={skill.id} onRefresh={onRefresh} skill={skill} />
         ))}
         {skills.length === 0 ? <p className="muted">No synced skills yet.</p> : null}
       </div>
-    </section>
-  );
-}
-
-function CreateGroupPanel({
-  skills,
-  onCreated
-}: {
-  skills: SyncedSkill[];
-  onCreated: () => void;
-}) {
-  const api = usePortalApi();
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [name, setName] = useState("Team Skills");
-  const [email, setEmail] = useState("");
-  const [isFavorites, setIsFavorites] = useState(false);
-  const [status, setStatus] = useState("");
-
-  const selectedSkillIds = useMemo(() => [...selectedIds], [selectedIds]);
-
-  function toggleSkill(id: string) {
-    setSelectedIds((current) => {
-      const next = new Set(current);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }
-
-  async function createGroup() {
-    setStatus("Creating group...");
-    try {
-      const created = await api<{ groupId: string }>("/api/portal/groups", {
-        method: "POST",
-        body: JSON.stringify({
-          name,
-          visibility: "restricted",
-          isFavorites,
-          syncedSkillIds: selectedSkillIds
-        })
-      });
-
-      if (email.trim()) {
-        await api(`/api/portal/groups/${created.groupId}/allowed-emails`, {
-          method: "POST",
-          body: JSON.stringify({ email })
-        });
-      }
-
-      setStatus("Restricted group created.");
-      setSelectedIds(new Set());
-      setIsFavorites(false);
-      onCreated();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to create group");
-    }
-  }
-
-  return (
-    <section className="panel">
-      <h2>Create restricted Skill Group</h2>
-      <div className="form-grid">
-        <label>
-          Group name
-          <input value={name} onChange={(event) => setName(event.target.value)} />
-        </label>
-        <label>
-          Allowed email
-          <input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="teammate@example.com" />
-        </label>
-        <label className="inline-check">
-          <input type="checkbox" checked={isFavorites} onChange={(event) => setIsFavorites(event.target.checked)} />
-          Favorites
-        </label>
-      </div>
-      <div className="check-list">
-        {skills.map((skill) => (
-          <label key={skill.id}>
-            <input
-              type="checkbox"
-              checked={selectedIds.has(skill.id)}
-              onChange={() => toggleSkill(skill.id)}
-            />
-            <span>{skill.name}</span>
-          </label>
-        ))}
-      </div>
-      <button disabled={selectedSkillIds.length === 0} onClick={createGroup}>
-        Create group
-      </button>
-      {status ? <p className="status">{status}</p> : null}
     </section>
   );
 }
@@ -323,6 +357,36 @@ function GroupsPanel({
   const [catalogQuery, setCatalogQuery] = useState<Record<string, string>>({});
   const [catalogResults, setCatalogResults] = useState<Record<string, CatalogSkill[]>>({});
   const [githubUrls, setGithubUrls] = useState<Record<string, string>>({});
+  const [newGroupName, setNewGroupName] = useState("Team Skills");
+  const [newGroupEmail, setNewGroupEmail] = useState("");
+
+  async function createGroup() {
+    setStatus("Creating group...");
+    try {
+      const created = await api<{ groupId: string }>("/api/portal/groups", {
+        method: "POST",
+        body: JSON.stringify({
+          name: newGroupName,
+          visibility: "restricted",
+          syncedSkillIds: []
+        })
+      });
+
+      if (newGroupEmail.trim()) {
+        await api(`/api/portal/groups/${created.groupId}/allowed-emails`, {
+          method: "POST",
+          body: JSON.stringify({ email: newGroupEmail })
+        });
+      }
+
+      setStatus("Group created.");
+      setNewGroupName("Team Skills");
+      setNewGroupEmail("");
+      onRefresh?.();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to create group");
+    }
+  }
 
   async function setVisibility(group: SkillGroup, visibility: string) {
     setStatus("Updating group...");
@@ -395,7 +459,29 @@ function GroupsPanel({
 
   return (
     <section className="panel">
-      <h2>{title}</h2>
+      <div className="panel-header">
+        <div>
+          <h2>{title}</h2>
+          {canManage ? <p>Create a group, then add skills from the synced feed above.</p> : null}
+        </div>
+      </div>
+      {canManage ? (
+        <div className="compact-create">
+          <label>
+            Group name
+            <input value={newGroupName} onChange={(event) => setNewGroupName(event.target.value)} />
+          </label>
+          <label>
+            Allowed email
+            <input
+              value={newGroupEmail}
+              onChange={(event) => setNewGroupEmail(event.target.value)}
+              placeholder="teammate@example.com"
+            />
+          </label>
+          <button disabled={!newGroupName.trim()} onClick={createGroup}>Create group</button>
+        </div>
+      ) : null}
       <div className="list">
         {groups.map((group) => (
           <div className="row" key={group.id}>
@@ -500,8 +586,7 @@ function Dashboard() {
       {status ? <p className="status">{status}</p> : null}
       <SyncTokenPanel />
       <ProfilePanel profile={state.profile} onRefresh={refresh} />
-      <SyncedSkillsPanel skills={state.syncedSkills} onRefresh={refresh} />
-      <CreateGroupPanel skills={state.syncedSkills} onCreated={refresh} />
+      <SyncedSkillsPanel groups={state.groups} skills={state.syncedSkills} onRefresh={refresh} />
       <GroupsPanel title="My Skill Groups" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
       <GroupsPanel title="Shared With Me" groups={state.sharedGroups} />
     </main>

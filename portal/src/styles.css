@@ -29,6 +29,35 @@ button.secondary {
   background: #263238;
 }
 
+button.text-button {
+  background: transparent;
+  color: #0b57d0;
+  display: inline;
+  font-size: 13px;
+  font-weight: 650;
+  min-height: auto;
+  padding: 0;
+  text-align: left;
+}
+
+button.icon-button {
+  align-items: center;
+  background: #eef3f8;
+  color: #263238;
+  display: inline-flex;
+  font-size: 18px;
+  height: 34px;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0;
+  width: 34px;
+}
+
+button.icon-button.active {
+  background: #fff3c4;
+  color: #8a5b00;
+}
+
 button:hover {
   filter: brightness(0.95);
 }
@@ -186,12 +215,18 @@ pre {
   flex-wrap: wrap;
   gap: 12px;
   justify-content: space-between;
+  min-width: 0;
   padding: 12px;
 }
 
 .row h3 {
   font-size: 15px;
   margin: 0 0 4px;
+}
+
+.row-main {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .row p,
@@ -201,12 +236,81 @@ pre {
   margin: 0;
 }
 
+.inline-status {
+  color: #334155;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.skill-description {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skill-description.expanded {
+  overflow: visible;
+  white-space: normal;
+}
+
 .row-actions {
   align-items: center;
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+}
+
+.skill-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  position: relative;
+}
+
+.menu-wrap {
+  position: relative;
+}
+
+.group-menu {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+  display: grid;
+  gap: 4px;
+  min-width: 190px;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: 40px;
+  z-index: 5;
+}
+
+.group-menu button {
+  background: transparent;
+  color: #202124;
+  justify-content: flex-start;
+  min-height: 34px;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.group-menu button:disabled,
+.group-menu span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.compact-create {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  margin-top: 14px;
 }
 
 .form-grid {
@@ -274,6 +378,7 @@ pre {
   }
 
   .form-grid,
+  .compact-create,
   .panel-header,
   .row {
     grid-template-columns: 1fr;
@@ -283,5 +388,14 @@ pre {
   .row {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .skill-actions {
+    justify-content: flex-start;
+  }
+
+  .group-menu {
+    left: 0;
+    right: auto;
   }
 }

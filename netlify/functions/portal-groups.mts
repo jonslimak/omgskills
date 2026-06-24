@@ -15,8 +15,13 @@ async function listGroups(req: Request) {
         g.description,
         g.slug,
         g.visibility,
-        count(i.id)::int AS "itemCount",
-        count(a.id)::int AS "allowedEmailCount"
+        g.is_favorites AS "isFavorites",
+        count(DISTINCT i.id)::int AS "itemCount",
+        count(DISTINCT a.id)::int AS "allowedEmailCount",
+        COALESCE(
+          array_agg(DISTINCT i.synced_skill_id) FILTER (WHERE i.synced_skill_id IS NOT NULL),
+          ARRAY[]::uuid[]
+        ) AS "syncedSkillIds"
       FROM skill_groups g
       LEFT JOIN skill_group_items i ON i.group_id = g.id
       LEFT JOIN skill_group_allowed_emails a ON a.group_id = g.id
@@ -42,7 +47,7 @@ async function createGroup(req: Request) {
       ? body.visibility
       : "private";
   const syncedSkillIds = Array.isArray(body?.syncedSkillIds) ? body.syncedSkillIds : [];
-  if (syncedSkillIds.length === 0) {
+  if (isFavorites && syncedSkillIds.length === 0) {
     throw new Response("Select at least one synced skill", { status: 400 });
   }
   if (syncedSkillIds.some((id: unknown) => typeof id !== "string")) {

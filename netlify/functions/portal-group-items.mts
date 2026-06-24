@@ -1,4 +1,5 @@
 import type { Config, Context } from "@netlify/functions";
+import { getPgPool } from "./_shared/db.js";
 import { addGroupItem, requireOwnedGroup } from "./_shared/group-items.js";
 import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
@@ -7,6 +8,21 @@ import { optionalString, requireString } from "./_shared/validation.js";
 function groupIdFromPath(req: Request): string | undefined {
   const parts = new URL(req.url).pathname.split("/").filter(Boolean);
   return parts[3];
+}
+
+async function getSyncedSkill(userId: string, syncedSkillId: string) {
+  const result = await getPgPool().query<{ id: string }>(
+    `
+      SELECT id
+      FROM synced_skills
+      WHERE id = $1
+        AND user_id = $2
+        AND is_current = true
+      LIMIT 1
+    `,
+    [syncedSkillId, userId]
+  );
+  return result.rows[0] ?? null;
 }
 
 function parseGithubSkillUrl(rawUrl: string): URL {
@@ -81,6 +97,16 @@ export default async (req: Request, _context: Context) => {
 
     const body = await req.json();
     const kind = body?.kind;
+    if (kind === "synced") {
+      const syncedSkillId = requireString(body?.syncedSkillId, "syncedSkillId", 80);
+      const available = await getSyncedSkill(user.id, syncedSkillId);
+      if (!available) {
+        throw new Response("Synced skill is unavailable", { status: 400 });
+      }
+      const note = optionalString(body?.note, 1000);
+      const item = await addGroupItem(groupId, { kind: "synced", syncedSkillId, note });
+      return jsonResponse(req, item, { status: 201 });
+    }
     if (kind === "catalog") {
       const catalogSkillId = requireString(body?.catalogSkillId, "catalogSkillId", 500);
       const note = optionalString(body?.note, 1000);
@@ -95,7 +121,7 @@ export default async (req: Request, _context: Context) => {
       return jsonResponse(req, item, { status: 201 });
     }
 
-    throw new Response("kind must be catalog or github", { status: 400 });
+    throw new Response("kind must be synced, catalog, or github", { status: 400 });
   } catch (error) {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());
