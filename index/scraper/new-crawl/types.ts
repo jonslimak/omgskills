@@ -368,6 +368,12 @@ export type ShadowRunReport = {
   discoveryBudgetApplied: boolean;
   discoveryBudgetSummary: DiscoveryBudgetSummary | null;
   partialDiscoveryWarnings: string[];
+  highStarPathQualitySkippedCount: number;
+  highStarPathQualitySkippedSample: {
+    repo: string;
+    path: string;
+    stars: number | null;
+  }[];
   enrichmentCounts: ShadowEnrichmentCounts;
   lowStarValidSkillCount: number;
   lowStarValidSkillSample: string[];

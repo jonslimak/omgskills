@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { admitDiscoveredRepos, HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, parseOnlyHighStarBackfill } from "./build-shadow.js";
+import { admitDiscoveredRepos, HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY, HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, parseHighStarQueryBatch, parseOnlyHighStarBackfill } from "./build-shadow.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
 import type { ShadowRepoIndex, TrustedSeeds } from "./types.js";
 
@@ -25,9 +25,25 @@ test("high-star backfill-only mode requires combined cadence", () => {
   );
 });
 
+test("high-star query batch requires backfill-only mode", () => {
+  assert.equal(parseHighStarQueryBatch(["--high-star-query-batch=core"], true), "core");
+  assert.equal(parseHighStarQueryBatch(["--high-star-query-batch=claude"], true), "claude");
+  assert.equal(parseHighStarQueryBatch(["--high-star-query-batch=size-1000-2000"], true), "size-1000-2000");
+  assert.equal(parseHighStarQueryBatch([], true), null);
+  assert.throws(
+    () => parseHighStarQueryBatch(["--high-star-query-batch=core"], false),
+    /requires --only-high-star-backfill/,
+  );
+  assert.throws(
+    () => parseHighStarQueryBatch(["--high-star-query-batch=bad"], true),
+    /Expected core, claude, agents, skills, or size-1000-2000/,
+  );
+});
+
 test("high-star backfill-only constants keep sampling larger than admission cap", () => {
   assert.equal(HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, 50);
   assert.equal(HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, 250);
+  assert.equal(HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY, 5);
 });
 
 test("admission cap prioritizes highest-star new repos", () => {

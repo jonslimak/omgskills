@@ -80,6 +80,8 @@ function shadowReport(cutoverValidationPassed: boolean): ShadowRunReport {
     discoveryBudgetApplied: false,
     discoveryBudgetSummary: null,
     partialDiscoveryWarnings: [],
+    highStarPathQualitySkippedCount: 0,
+    highStarPathQualitySkippedSample: [],
     enrichmentCounts: {
       cheapReposChecked: 0,
       dailyPriorityRepoCount: 0,

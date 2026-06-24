@@ -6,7 +6,7 @@ import type { Skill } from "../types.js";
 import type { EnrichResult } from "../enrich.js";
 import { enrichCandidate, getCandidateRepoMeta, resolveCandidateSkillPath } from "../enrich.js";
 import { searchByTopics } from "../sources/topics.js";
-import { searchBySkillMdFilename, searchHighStarSkillMdRepos } from "../sources/code.js";
+import { isHighStarBackfillPathAllowed, searchBySkillMdFilename, searchHighStarSkillMdRepos } from "../sources/code.js";
 import { searchAggregators } from "../sources/aggregators.js";
 import { searchSocial } from "../sources/social.js";
 import { searchRegistry } from "../sources/registry.js";
@@ -147,9 +147,20 @@ const BACKGROUND_DISCOVERY_BUDGET: DiscoveryBudgetSummary = {
 };
 
 export const HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS = 250;
+export const HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY = 5;
 export const HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS = 50;
 
 const LOW_STAR_FLOOR = 5;
+
+type HighStarQueryBatch = "core" | "claude" | "agents" | "skills" | "size-1000-2000";
+
+const HIGH_STAR_QUERY_BATCHES: Record<HighStarQueryBatch, string[]> = {
+  core: ["filename:SKILL.md"],
+  claude: ["filename:SKILL.md path:.claude/skills"],
+  agents: ["filename:SKILL.md path:.agents/skills"],
+  skills: ["filename:SKILL.md path:skills"],
+  "size-1000-2000": ["filename:SKILL.md size:1000..2000"],
+};
 
 function parseCadence(argv: string[]): ShadowCadence {
   const raw = argv.find((arg) => arg.startsWith("--cadence="));
@@ -171,6 +182,19 @@ export function parseOnlyHighStarBackfill(argv: string[], cadence: ShadowCadence
     throw new Error("--only-high-star-backfill requires --cadence=combined");
   }
   return enabled;
+}
+
+export function parseHighStarQueryBatch(argv: string[], onlyHighStarBackfill: boolean): HighStarQueryBatch | null {
+  const raw = argv.find((arg) => arg.startsWith("--high-star-query-batch="));
+  if (!raw) return null;
+  if (!onlyHighStarBackfill) {
+    throw new Error("--high-star-query-batch requires --only-high-star-backfill");
+  }
+  const value = raw.split("=", 2)[1]?.trim().toLowerCase();
+  if (value === "core" || value === "claude" || value === "agents" || value === "skills" || value === "size-1000-2000") {
+    return value;
+  }
+  throw new Error(`Unknown high-star query batch "${value}". Expected core, claude, agents, skills, or size-1000-2000.`);
 }
 
 function writeShadowFile(path: string, content: string) {
@@ -612,6 +636,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Bootstrap value repos: ${report.bootstrapValueRepoCount}`,
     `- Fast-only repos: ${report.fastOnlyRepoCount}`,
     `- Discovery budget applied: ${report.discoveryBudgetApplied ? "yes" : "no"}`,
+    `- High-star path-quality skipped: ${report.highStarPathQualitySkippedCount}`,
     `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
     `- Official low-star skills: ${report.officialLowStarSkillCount}`,
@@ -644,6 +669,12 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     ...(report.partialDiscoveryWarnings.length
       ? report.partialDiscoveryWarnings.map((warning) => `- ${warning}`)
+      : ["- none"]),
+    "",
+    "## High-star path-quality skipped sample",
+    "",
+    ...(report.highStarPathQualitySkippedSample.length
+      ? report.highStarPathQualitySkippedSample.map((row) => `- ${row.repo} (${row.stars ?? "?"}) ${row.path}`)
       : ["- none"]),
     "",
     "## Enrichment",
@@ -1305,12 +1336,15 @@ async function runDiscovery(
   checkedAt: string,
   forceHighStarSkillMd: boolean,
   onlyHighStarBackfill: boolean,
+  highStarQueryBatch: HighStarQueryBatch | null,
 ): Promise<{
   sourceRuns: SourceRunSummary[];
   discovered: Map<string, DiscoveredRepoRecord>;
   discoveryBudgetApplied: boolean;
   discoveryBudgetSummary: DiscoveryBudgetSummary | null;
   partialDiscoveryWarnings: string[];
+  highStarPathQualitySkippedCount: number;
+  highStarPathQualitySkippedSample: ShadowRunReport["highStarPathQualitySkippedSample"];
 }> {
   const lanes = CADENCE_LANES[cadence];
   const sourceRuns: SourceRunSummary[] = [];
@@ -1325,10 +1359,15 @@ async function runDiscovery(
           maxSampledRepos: onlyHighStarBackfill
             ? HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS
             : BACKGROUND_DISCOVERY_BUDGET.highStarSkillMd.maxSampledRepos,
+          maxPagesPerQuery: onlyHighStarBackfill
+            ? HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY
+            : BACKGROUND_DISCOVERY_BUDGET.highStarSkillMd.maxPagesPerQuery,
         },
       }
     : null;
   const partialDiscoveryWarnings: string[] = [];
+  let highStarPathQualitySkippedCount = 0;
+  const highStarPathQualitySkippedSample: ShadowRunReport["highStarPathQualitySkippedSample"] = [];
   const shouldRunScheduledHighStarSkillMdDiscovery = shouldRunWeeklyHighStarSkillMdDiscovery(checkedAt);
   const runHighStarSkillMdDiscovery = shouldRunScheduledHighStarSkillMdDiscovery || forceHighStarSkillMd;
   if (forceHighStarSkillMd && !shouldRunScheduledHighStarSkillMdDiscovery) {
@@ -1339,6 +1378,9 @@ async function runDiscovery(
     partialDiscoveryWarnings.push(
       `high-star backfill-only new admissions capped at ${HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS}`,
     );
+    if (highStarQueryBatch) {
+      partialDiscoveryWarnings.push(`high-star query batch: ${highStarQueryBatch}`);
+    }
   }
   const cachedHighStarRepoMeta = new Map(
     repoIndex.repos.map((repo) => [
@@ -1352,6 +1394,17 @@ async function runDiscovery(
   const addHighStarHits = (hits: unknown[], source: DiscoverySourceName, lane: DiscoveryLane) => {
     for (const hit of hits) {
       const highStarHit = hit as { repo: string; path: string; url: string; stars: number | null };
+      if (!isHighStarBackfillPathAllowed(highStarHit.path)) {
+        highStarPathQualitySkippedCount += 1;
+        if (highStarPathQualitySkippedSample.length < 10) {
+          highStarPathQualitySkippedSample.push({
+            repo: highStarHit.repo,
+            path: highStarHit.path,
+            stars: highStarHit.stars,
+          });
+        }
+        continue;
+      }
       const repoInfo = {
         repo: highStarHit.repo,
         repoUrl: `https://github.com/${highStarHit.repo}`,
@@ -1376,9 +1429,13 @@ async function runDiscovery(
               maxSampledRepos: discoveryBudgetSummary.highStarSkillMd.maxSampledRepos,
               maxPagesPerQuery: discoveryBudgetSummary.highStarSkillMd.maxPagesPerQuery,
               requestDelayMs: discoveryBudgetSummary.highStarSkillMd.requestDelayMs,
+              queries: highStarQueryBatch ? HIGH_STAR_QUERY_BATCHES[highStarQueryBatch] : undefined,
               cachedRepoMetaByRepo: cachedHighStarRepoMeta,
             }
-          : { cachedRepoMetaByRepo: cachedHighStarRepoMeta },
+          : {
+              queries: highStarQueryBatch ? HIGH_STAR_QUERY_BATCHES[highStarQueryBatch] : undefined,
+              cachedRepoMetaByRepo: cachedHighStarRepoMeta,
+            },
       ).then((result) =>
         result.hits.filter(
           (hit) =>
@@ -1406,6 +1463,8 @@ async function runDiscovery(
       discoveryBudgetApplied,
       discoveryBudgetSummary,
       partialDiscoveryWarnings,
+      highStarPathQualitySkippedCount,
+      highStarPathQualitySkippedSample,
     };
   }
 
@@ -1615,6 +1674,8 @@ async function runDiscovery(
     discoveryBudgetApplied,
     discoveryBudgetSummary,
     partialDiscoveryWarnings,
+    highStarPathQualitySkippedCount,
+    highStarPathQualitySkippedSample,
   };
 }
 
@@ -1653,6 +1714,7 @@ async function main() {
   const cadence = parseCadence(argv);
   const forceHighStarSkillMd = parseForceHighStarSkillMd(argv);
   const onlyHighStarBackfill = parseOnlyHighStarBackfill(argv, cadence);
+  const highStarQueryBatch = parseHighStarQueryBatch(argv, onlyHighStarBackfill);
   await assertGitHubQuotaAvailable(cadence);
 
   const baselinePath = join(indexRoot, "skills.json");
@@ -1710,8 +1772,23 @@ async function main() {
 
   const discoveryStart = performance.now();
   const repoAliasByCanonical = new Map<string, string>();
-  const { sourceRuns, discovered, discoveryBudgetApplied, discoveryBudgetSummary, partialDiscoveryWarnings } =
-    await runDiscovery(cadence, repoIndex, checkedAt, forceHighStarSkillMd || onlyHighStarBackfill, onlyHighStarBackfill);
+  const {
+    sourceRuns,
+    discovered,
+    discoveryBudgetApplied,
+    discoveryBudgetSummary,
+    partialDiscoveryWarnings,
+    highStarPathQualitySkippedCount,
+    highStarPathQualitySkippedSample,
+  } =
+    await runDiscovery(
+      cadence,
+      repoIndex,
+      checkedAt,
+      forceHighStarSkillMd || onlyHighStarBackfill,
+      onlyHighStarBackfill,
+      highStarQueryBatch,
+    );
   timings.runDiscovery = Math.round(performance.now() - discoveryStart);
   const { momentumByRepo, warning: momentumWarning } = buildMomentumSignals(
     discovered,
@@ -1850,6 +1927,8 @@ async function main() {
     discoveryBudgetApplied,
     discoveryBudgetSummary,
     partialDiscoveryWarnings: combinedDiscoveryWarnings,
+    highStarPathQualitySkippedCount,
+    highStarPathQualitySkippedSample,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
     lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,
