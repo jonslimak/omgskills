@@ -302,7 +302,6 @@ health.sections = {
   }),
   release: withCheckMetadata("release", productHealth?.sections?.release),
   v2AppData: withCheckMetadata("v2AppData", productHealth?.sections?.v2AppData),
-  legacyData: withCheckMetadata("legacyData", productHealth?.sections?.legacyData),
   search: withCheckMetadata("search", productHealth?.sections?.search),
   crawlers: withCheckMetadata("crawlers", pipelineHealth?.sections?.crawlers ?? {
     status: "degraded",
