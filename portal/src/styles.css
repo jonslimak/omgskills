@@ -338,6 +338,8 @@ pre {
 .group-row {
   align-items: stretch;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch;
 }
 
 .group-row-summary {
@@ -345,12 +347,18 @@ pre {
   display: grid;
   gap: 12px;
   grid-template-columns: minmax(0, 1fr) auto;
+  justify-self: stretch;
   min-width: 0;
   width: 100%;
 }
 
+.group-row-summary > div:first-child {
+  min-width: 0;
+}
+
 .group-row-summary .row-actions {
   justify-self: end;
+  margin-left: auto;
 }
 
 .group-email-panel {
