@@ -46,6 +46,7 @@ type SkillGroup = {
   disabledAt?: string | null;
   itemCount: number;
   allowedEmailCount?: number;
+  allowedEmails?: { id: string; email: string }[];
   ownerDisplayName?: string;
   syncedSkillIds?: string[];
 };
@@ -478,6 +479,9 @@ function GroupsPanel({
   const [status, setStatus] = useState("");
   const [newGroupName, setNewGroupName] = useState("Team Skills");
   const [newGroupEmail, setNewGroupEmail] = useState("");
+  const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
+  const [emailEditorGroupId, setEmailEditorGroupId] = useState<string | null>(null);
+  const [emailToAdd, setEmailToAdd] = useState("");
 
   async function createGroup() {
     setStatus("Creating group...");
@@ -535,6 +539,57 @@ function GroupsPanel({
     }
   }
 
+  async function addAllowedEmail(group: SkillGroup) {
+    const email = emailToAdd.trim();
+    if (!email) {
+      return;
+    }
+
+    setStatus("Adding email...");
+    try {
+      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
+        method: "POST",
+        body: JSON.stringify({ email })
+      });
+      setStatus("Email added.");
+      setEmailToAdd("");
+      setEmailEditorGroupId(null);
+      onRefresh?.();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to add email");
+    }
+  }
+
+  async function removeAllowedEmail(group: SkillGroup, emailId: string) {
+    setStatus("Removing email...");
+    try {
+      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
+        method: "DELETE",
+        body: JSON.stringify({ emailId })
+      });
+      setStatus("Email removed.");
+      onRefresh?.();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to remove email");
+    }
+  }
+
+  function isInteractiveTarget(target: EventTarget | null) {
+    return target instanceof HTMLElement
+      ? Boolean(target.closest("a, button, input, select, textarea"))
+      : false;
+  }
+
+  function toggleGroup(groupId: string, event: React.MouseEvent<HTMLDivElement>) {
+    if (!canManage || isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    setExpandedGroupId((current) => (current === groupId ? null : groupId));
+    setEmailEditorGroupId(null);
+    setEmailToAdd("");
+  }
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -561,64 +616,130 @@ function GroupsPanel({
         </div>
       ) : null}
       <div className="list">
-        {groups.map((group) => (
-          <div className={group.disabledAt ? "row disabled-row" : "row"} key={group.id}>
-            <div>
-              <h3>{group.name}</h3>
-              <p className="group-meta">
-                <span>{group.description || `${group.itemCount} skills`}</span>
-                <span>{group.visibility || "restricted"}</span>
-              </p>
-              {group.disabledAt || group.ownerDisplayName ? (
-                <span>
-                  {group.disabledAt ? "hidden" : ""}
-                  {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
-                </span>
-              ) : null}
-            </div>
-            <div className="row-actions">
-              {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}
-              {canManage ? (
-                <>
-                  <button
-                    aria-label={group.visibility === "public" ? "Unpublish group" : "Publish group"}
-                    className={group.visibility === "public" ? "icon-button active" : "icon-button"}
-                    onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}
-                    title={group.visibility === "public" ? "Public. Click to unpublish." : "Private/restricted. Click to publish."}
-                  >
-                    {group.visibility === "public" ? "●" : "○"}
-                  </button>
-                  {group.visibility === "public" && !group.disabledAt && profile?.handle ? (
-                    <a
-                      aria-label="Open public group URL"
-                      className="icon-link"
-                      href={publicGroupUrl(profile.handle, group.slug)}
-                      title="Open public URL"
-                    >
-                      ↗
-                    </a>
+        {groups.map((group) => {
+          const expanded = expandedGroupId === group.id;
+          return (
+            <div
+              aria-expanded={canManage ? expanded : undefined}
+              className={
+                group.disabledAt
+                  ? "row group-row disabled-row"
+                  : canManage
+                    ? "row group-row expandable-row"
+                    : "row group-row"
+              }
+              key={group.id}
+              onClick={(event) => toggleGroup(group.id, event)}
+            >
+              <div className="group-row-summary">
+                <div>
+                  <h3>{group.name}</h3>
+                  <p className="group-meta">
+                    <span>{group.description || `${group.itemCount} skills`}</span>
+                    <span>{group.visibility || "restricted"}</span>
+                  </p>
+                  {group.disabledAt || group.ownerDisplayName ? (
+                    <span>
+                      {group.disabledAt ? "hidden" : ""}
+                      {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
+                    </span>
                   ) : null}
-                  <a
-                    aria-label="Export group"
-                    className="icon-link"
-                    href={`/api/portal/groups/${group.id}/export`}
-                    title="Export group"
-                  >
-                    ↓
-                  </a>
-                  <button
-                    aria-label={group.disabledAt ? "Restore group" : "Hide group"}
-                    className={group.disabledAt ? "icon-button warning active" : "icon-button warning"}
-                    onClick={() => setDisabled(group, !group.disabledAt)}
-                    title={group.disabledAt ? "Hidden. Click to restore." : "Hide group from public pages."}
-                  >
-                    {group.disabledAt ? "↺" : "⊘"}
-                  </button>
-                </>
+                </div>
+                <div className="row-actions">
+                  {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}
+                  {canManage ? (
+                    <>
+                      <button
+                        aria-label={group.visibility === "public" ? "Unpublish group" : "Publish group"}
+                        className={group.visibility === "public" ? "icon-button active" : "icon-button"}
+                        onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}
+                        title={group.visibility === "public" ? "Public. Click to unpublish." : "Private/restricted. Click to publish."}
+                      >
+                        {group.visibility === "public" ? "●" : "○"}
+                      </button>
+                      {group.visibility === "public" && !group.disabledAt && profile?.handle ? (
+                        <a
+                          aria-label="Open public group URL"
+                          className="icon-link"
+                          href={publicGroupUrl(profile.handle, group.slug)}
+                          title="Open public URL"
+                        >
+                          ↗
+                        </a>
+                      ) : null}
+                      <a
+                        aria-label="Export group"
+                        className="icon-link"
+                        href={`/api/portal/groups/${group.id}/export`}
+                        title="Export group"
+                      >
+                        ↓
+                      </a>
+                      <button
+                        aria-label={group.disabledAt ? "Restore group" : "Hide group"}
+                        className={group.disabledAt ? "icon-button warning active" : "icon-button warning"}
+                        onClick={() => setDisabled(group, !group.disabledAt)}
+                        title={group.disabledAt ? "Hidden. Click to restore." : "Hide group from public pages."}
+                      >
+                        {group.disabledAt ? "↺" : "⊘"}
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+              {canManage && expanded ? (
+                <div className="group-email-panel">
+                  <div className="email-list">
+                    {(group.allowedEmails ?? []).map((allowedEmail) => (
+                      <div className="email-row" key={allowedEmail.id}>
+                        <span>{allowedEmail.email}</span>
+                        <button
+                          aria-label={`Remove ${allowedEmail.email}`}
+                          className="icon-button warning"
+                          onClick={() => removeAllowedEmail(group, allowedEmail.id)}
+                          title="Remove email"
+                          type="button"
+                        >
+                          ⌫
+                        </button>
+                      </div>
+                    ))}
+                    {(group.allowedEmails ?? []).length === 0 ? <p className="muted">No emails added.</p> : null}
+                  </div>
+                  {emailEditorGroupId === group.id ? (
+                    <div className="inline-email-form">
+                      <input
+                        autoFocus
+                        onChange={(event) => setEmailToAdd(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            addAllowedEmail(group);
+                          }
+                        }}
+                        placeholder="teammate@example.com"
+                        value={emailToAdd}
+                      />
+                      <button disabled={!emailToAdd.trim()} onClick={() => addAllowedEmail(group)} type="button">
+                        Add
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="text-button"
+                      onClick={() => {
+                        setEmailEditorGroupId(group.id);
+                        setEmailToAdd("");
+                      }}
+                      type="button"
+                    >
+                      Add new email +
+                    </button>
+                  )}
+                </div>
               ) : null}
             </div>
-          </div>
-        ))}
+          );
+        })}
         {groups.length === 0 ? <p className="muted">No groups yet.</p> : null}
       </div>
       {status ? <p className="status">{status}</p> : null}

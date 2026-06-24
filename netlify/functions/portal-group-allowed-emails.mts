@@ -2,7 +2,7 @@ import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
-import { normalizeEmail } from "./_shared/validation.js";
+import { normalizeEmail, requireString } from "./_shared/validation.js";
 
 function groupIdFromPath(req: Request): string | undefined {
   const parts = new URL(req.url).pathname.split("/").filter(Boolean);
@@ -13,7 +13,7 @@ export default async (req: Request, _context: Context) => {
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
-  if (req.method !== "POST") {
+  if (!["POST", "DELETE"].includes(req.method)) {
     return errorResponse(req, 405, "Method not allowed");
   }
 
@@ -34,6 +34,15 @@ export default async (req: Request, _context: Context) => {
       throw new Response("Group not found", { status: 404 });
     }
 
+    if (req.method === "DELETE") {
+      const emailId = requireString(body?.emailId, "emailId", 100);
+      await pool.query("DELETE FROM skill_group_allowed_emails WHERE id = $1 AND group_id = $2", [
+        emailId,
+        groupId
+      ]);
+      return jsonResponse(req, { emailId });
+    }
+
     await pool.query(
       `
         INSERT INTO skill_group_allowed_emails (group_id, email)
@@ -48,7 +57,7 @@ export default async (req: Request, _context: Context) => {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());
     }
-    return errorResponse(req, 500, "Failed to add allowed email");
+    return errorResponse(req, 500, "Failed to update allowed email");
   }
 };
 

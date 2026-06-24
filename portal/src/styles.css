@@ -329,6 +329,54 @@ pre {
   color: #334155;
 }
 
+.group-row {
+  align-items: stretch;
+  display: grid;
+}
+
+.group-row-summary {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  min-width: 0;
+  width: 100%;
+}
+
+.group-email-panel {
+  border-top: 1px solid #e2e8f0;
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.email-list {
+  display: grid;
+  gap: 6px;
+}
+
+.email-row {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  min-height: 38px;
+  padding: 4px 6px 4px 10px;
+}
+
+.inline-email-form {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  max-width: 460px;
+}
+
 .inline-status {
   color: #334155;
   font-size: 13px;

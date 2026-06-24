@@ -20,6 +20,10 @@ async function listGroups(req: Request) {
         count(DISTINCT i.id)::int AS "itemCount",
         count(DISTINCT a.id)::int AS "allowedEmailCount",
         COALESCE(
+          jsonb_agg(DISTINCT jsonb_build_object('id', a.id, 'email', a.email)) FILTER (WHERE a.id IS NOT NULL),
+          '[]'::jsonb
+        ) AS "allowedEmails",
+        COALESCE(
           array_agg(DISTINCT i.synced_skill_id) FILTER (WHERE i.synced_skill_id IS NOT NULL),
           ARRAY[]::uuid[]
         ) AS "syncedSkillIds"
