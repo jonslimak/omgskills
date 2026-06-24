@@ -33,6 +33,47 @@ function normalizedSkillText(value: string | null | undefined) {
     .trim();
 }
 
+function normalizedDescriptionWords(value: string | null | undefined) {
+  return normalizedSkillText(value)
+    .replace(/[^a-z0-9 ]/g, " ")
+    .split(" ")
+    .filter((word) => word.length > 2);
+}
+
+function descriptionsMatch(first: string | null | undefined, second: string | null | undefined) {
+  const normalizedFirst = normalizedSkillText(first);
+  const normalizedSecond = normalizedSkillText(second);
+
+  if (normalizedFirst === normalizedSecond) {
+    return true;
+  }
+  if (!normalizedFirst || !normalizedSecond) {
+    return false;
+  }
+  if (
+    Math.min(normalizedFirst.length, normalizedSecond.length) >= 35 &&
+    (normalizedFirst.includes(normalizedSecond) || normalizedSecond.includes(normalizedFirst))
+  ) {
+    return true;
+  }
+
+  const firstWords = new Set(normalizedDescriptionWords(normalizedFirst));
+  const secondWords = new Set(normalizedDescriptionWords(normalizedSecond));
+  const smallerSize = Math.min(firstWords.size, secondWords.size);
+  if (smallerSize < 5) {
+    return false;
+  }
+
+  let shared = 0;
+  for (const word of firstWords) {
+    if (secondWords.has(word)) {
+      shared += 1;
+    }
+  }
+
+  return shared / smallerSize >= 0.72;
+}
+
 function normalizedSource(value: string) {
   return value.toLowerCase();
 }
@@ -56,21 +97,41 @@ function chooseRepresentativeSkill(skills: SyncedSkill[]) {
 }
 
 function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
-  const groups = new Map<string, SyncedSkill[]>();
+  const groups: SyncedSkill[][] = [];
   for (const skill of skills) {
-    const key = `${normalizedSkillText(skill.name)}::${normalizedSkillText(skill.description)}`;
-    groups.set(key, [...(groups.get(key) ?? []), skill]);
+    const skillName = normalizedSkillText(skill.name);
+    const matchingGroup = groups.find((group) => {
+      const firstSkill = group[0];
+      if (normalizedSkillText(firstSkill.name) !== skillName) {
+        return false;
+      }
+      if (skill.githubUrl && firstSkill.githubUrl && skill.githubUrl === firstSkill.githubUrl) {
+        return true;
+      }
+      return group.some((groupSkill) => descriptionsMatch(groupSkill.description, skill.description));
+    });
+
+    if (matchingGroup) {
+      matchingGroup.push(skill);
+    } else {
+      groups.push([skill]);
+    }
   }
 
-  return [...groups.values()]
+  return groups
     .map((group) => {
       const representative = chooseRepresentativeSkill(group);
+      const bestDescription =
+        [...group]
+          .map((skill) => skill.description)
+          .filter((description): description is string => Boolean(description))
+          .sort((first, second) => second.length - first.length)[0] ?? null;
       const sources = [...new Set(group.map((skill) => skill.source))].sort((first, second) =>
         first.localeCompare(second)
       );
       return {
         ...representative,
-        description: representative.description ?? group.find((skill) => skill.description)?.description ?? null,
+        description: bestDescription,
         githubUrl: representative.githubUrl ?? group.find((skill) => skill.githubUrl)?.githubUrl ?? null,
         allSkillIds: group.map((skill) => skill.id),
         sourceSkills: group,
