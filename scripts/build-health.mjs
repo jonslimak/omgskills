@@ -341,7 +341,13 @@ if (marketingFunnel) {
 
 const sectionIssues = Object.entries(health.sections)
   .filter(([name]) => name !== "marketingFunnel")
-  .flatMap(([, section]) => Array.isArray(section.issues) ? section.issues : []);
+  .flatMap(([name, section]) => {
+    if (section.status === "ok") return [];
+    const issues = Array.isArray(section.issues) && section.issues.length
+      ? section.issues
+      : [section.message || "section degraded"];
+    return issues.map((issue) => `${name}: ${issue}`);
+  });
 const messages = [
   health.pipeline.status === "ok" ? null : health.pipeline.message,
   productHealth?.status === "ok" ? null : productHealth?.message,
@@ -358,3 +364,13 @@ health.message = health.status === "ok" ? "All health checks passed" : [...new S
 
 writeFileSync(healthPath, JSON.stringify(health, null, 2) + "\n", "utf8");
 console.log(healthPath);
+
+if (process.env.GITHUB_OUTPUT) {
+  const lines = [
+    `health_status=${health.status}`,
+    `health_message<<EOF`,
+    health.message,
+    `EOF`,
+  ];
+  await import("node:fs/promises").then((fs) => fs.appendFile(process.env.GITHUB_OUTPUT, lines.join("\n") + "\n"));
+}
