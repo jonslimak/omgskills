@@ -25,6 +25,67 @@ async function getSyncedSkill(userId: string, syncedSkillId: string) {
   return result.rows[0] ?? null;
 }
 
+async function canViewGroup(userId: string, email: string, groupId: string) {
+  const result = await getPgPool().query<{ id: string }>(
+    `
+      SELECT g.id
+      FROM skill_groups g
+      LEFT JOIN skill_group_allowed_emails a ON a.group_id = g.id
+      WHERE g.id = $1
+        AND g.disabled_at IS NULL
+        AND (
+          g.owner_user_id = $2
+          OR g.visibility = 'public'
+          OR (g.visibility = 'restricted' AND a.email = $3)
+        )
+      LIMIT 1
+    `,
+    [groupId, userId, email]
+  );
+  return Boolean(result.rows[0]);
+}
+
+async function listGroupItems(req: Request, groupId: string) {
+  const user = await requirePortalUser(req);
+  const canView = await canViewGroup(user.id, user.email, groupId);
+  if (!canView) {
+    throw new Response("Group not found", { status: 404 });
+  }
+
+  const result = await getPgPool().query(
+    `
+      SELECT
+        i.id,
+        i.kind,
+        i.catalog_skill_id AS "catalogSkillId",
+        i.github_url AS "itemGithubUrl",
+        i.note,
+        i.position,
+        s.name AS "skillName",
+        s.description AS "skillDescription",
+        s.github_url AS "githubUrl",
+        s.source
+      FROM skill_group_items i
+      LEFT JOIN synced_skills s ON s.id = i.synced_skill_id
+      WHERE i.group_id = $1
+      ORDER BY i.position ASC
+    `,
+    [groupId]
+  );
+
+  const items = result.rows.map((row: any) => ({
+    id: row.id,
+    kind: row.kind,
+    name: row.skillName || row.catalogSkillId || row.itemGithubUrl || "Skill",
+    description: row.skillDescription || row.note || "",
+    githubUrl: row.githubUrl || row.itemGithubUrl || null,
+    source: row.source || row.kind,
+    position: row.position
+  }));
+
+  return jsonResponse(req, { items });
+}
+
 function parseGithubSkillUrl(rawUrl: string): URL {
   let url: URL;
   try {
@@ -83,16 +144,20 @@ export default async (req: Request, _context: Context) => {
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
-  if (req.method !== "POST") {
+  if (!["GET", "POST"].includes(req.method)) {
     return errorResponse(req, 405, "Method not allowed");
   }
 
   try {
-    const user = await requirePortalUser(req);
     const groupId = groupIdFromPath(req);
     if (!groupId) {
       throw new Response("Missing group id", { status: 400 });
     }
+    if (req.method === "GET") {
+      return await listGroupItems(req, groupId);
+    }
+
+    const user = await requirePortalUser(req);
     await requireOwnedGroup(user.id, groupId);
 
     const body = await req.json();

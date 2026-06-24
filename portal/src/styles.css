@@ -352,6 +352,36 @@ pre {
   padding-top: 10px;
 }
 
+.group-detail-panel {
+  border-top: 1px solid #e2e8f0;
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.group-skills-panel {
+  display: grid;
+  gap: 6px;
+}
+
+.group-skill-row {
+  align-items: start;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 10px;
+}
+
+.group-skill-row p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .email-list {
   display: grid;
   gap: 6px;

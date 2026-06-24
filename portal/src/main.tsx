@@ -51,6 +51,16 @@ type SkillGroup = {
   syncedSkillIds?: string[];
 };
 
+type SkillGroupItem = {
+  id: string;
+  kind: string;
+  name: string;
+  description: string;
+  githubUrl: string | null;
+  source: string;
+  position: number;
+};
+
 type Profile = {
   handle: string | null;
   profilePublished: boolean;
@@ -482,6 +492,7 @@ function GroupsPanel({
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
   const [emailEditorGroupId, setEmailEditorGroupId] = useState<string | null>(null);
   const [emailToAdd, setEmailToAdd] = useState("");
+  const [groupItems, setGroupItems] = useState<Record<string, SkillGroupItem[]>>({});
 
   async function createGroup() {
     setStatus("Creating group...");
@@ -580,14 +591,33 @@ function GroupsPanel({
       : false;
   }
 
-  function toggleGroup(groupId: string, event: React.MouseEvent<HTMLDivElement>) {
-    if (!canManage || isInteractiveTarget(event.target)) {
+  async function loadGroupItems(groupId: string) {
+    if (groupItems[groupId]) {
       return;
     }
 
-    setExpandedGroupId((current) => (current === groupId ? null : groupId));
+    setStatus("Loading group skills...");
+    try {
+      const result = await api<{ items: SkillGroupItem[] }>(`/api/portal/groups/${groupId}/items`);
+      setGroupItems((current) => ({ ...current, [groupId]: result.items }));
+      setStatus("");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to load group skills");
+    }
+  }
+
+  function toggleGroup(groupId: string, event: React.MouseEvent<HTMLDivElement>) {
+    if (isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    const nextExpandedGroupId = expandedGroupId === groupId ? null : groupId;
+    setExpandedGroupId(nextExpandedGroupId);
     setEmailEditorGroupId(null);
     setEmailToAdd("");
+    if (nextExpandedGroupId) {
+      loadGroupItems(nextExpandedGroupId);
+    }
   }
 
   return (
@@ -618,15 +648,14 @@ function GroupsPanel({
       <div className="list">
         {groups.map((group) => {
           const expanded = expandedGroupId === group.id;
+          const items = groupItems[group.id] ?? [];
           return (
             <div
-              aria-expanded={canManage ? expanded : undefined}
+              aria-expanded={expanded}
               className={
                 group.disabledAt
                   ? "row group-row disabled-row"
-                  : canManage
-                    ? "row group-row expandable-row"
-                    : "row group-row"
+                  : "row group-row expandable-row"
               }
               key={group.id}
               onClick={(event) => toggleGroup(group.id, event)}
@@ -687,54 +716,74 @@ function GroupsPanel({
                   ) : null}
                 </div>
               </div>
-              {canManage && expanded ? (
-                <div className="group-email-panel">
-                  <div className="email-list">
-                    {(group.allowedEmails ?? []).map((allowedEmail) => (
-                      <div className="email-row" key={allowedEmail.id}>
-                        <span>{allowedEmail.email}</span>
-                        <button
-                          aria-label={`Remove ${allowedEmail.email}`}
-                          className="icon-button warning"
-                          onClick={() => removeAllowedEmail(group, allowedEmail.id)}
-                          title="Remove email"
-                          type="button"
-                        >
-                          ⌫
-                        </button>
+              {expanded ? (
+                <div className="group-detail-panel">
+                  <div className="group-skills-panel">
+                    {items.map((item) => (
+                      <div className="group-skill-row" key={item.id}>
+                        <div>
+                          <strong>{item.name}</strong>
+                          {item.description ? <p>{item.description}</p> : null}
+                        </div>
+                        {item.githubUrl ? (
+                          <a href={item.githubUrl} title="Open GitHub source">
+                            GitHub →
+                          </a>
+                        ) : null}
                       </div>
                     ))}
-                    {(group.allowedEmails ?? []).length === 0 ? <p className="muted">No emails added.</p> : null}
+                    {items.length === 0 ? <p className="muted">No skills in this group yet.</p> : null}
                   </div>
-                  {emailEditorGroupId === group.id ? (
-                    <div className="inline-email-form">
-                      <input
-                        autoFocus
-                        onChange={(event) => setEmailToAdd(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            addAllowedEmail(group);
-                          }
-                        }}
-                        placeholder="teammate@example.com"
-                        value={emailToAdd}
-                      />
-                      <button disabled={!emailToAdd.trim()} onClick={() => addAllowedEmail(group)} type="button">
-                        Add
-                      </button>
+                  {canManage ? (
+                    <div className="group-email-panel">
+                      <div className="email-list">
+                        {(group.allowedEmails ?? []).map((allowedEmail) => (
+                          <div className="email-row" key={allowedEmail.id}>
+                            <span>{allowedEmail.email}</span>
+                            <button
+                              aria-label={`Remove ${allowedEmail.email}`}
+                              className="icon-button warning"
+                              onClick={() => removeAllowedEmail(group, allowedEmail.id)}
+                              title="Remove email"
+                              type="button"
+                            >
+                              ⌫
+                            </button>
+                          </div>
+                        ))}
+                        {(group.allowedEmails ?? []).length === 0 ? <p className="muted">No emails added.</p> : null}
+                      </div>
+                      {emailEditorGroupId === group.id ? (
+                        <div className="inline-email-form">
+                          <input
+                            autoFocus
+                            onChange={(event) => setEmailToAdd(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                addAllowedEmail(group);
+                              }
+                            }}
+                            placeholder="teammate@example.com"
+                            value={emailToAdd}
+                          />
+                          <button disabled={!emailToAdd.trim()} onClick={() => addAllowedEmail(group)} type="button">
+                            Add
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="text-button"
+                          onClick={() => {
+                            setEmailEditorGroupId(group.id);
+                            setEmailToAdd("");
+                          }}
+                          type="button"
+                        >
+                          Add new email +
+                        </button>
+                      )}
                     </div>
-                  ) : (
-                    <button
-                      className="text-button"
-                      onClick={() => {
-                        setEmailEditorGroupId(group.id);
-                        setEmailToAdd("");
-                      }}
-                      type="button"
-                    >
-                      Add new email +
-                    </button>
-                  )}
+                  ) : null}
                 </div>
               ) : null}
             </div>
