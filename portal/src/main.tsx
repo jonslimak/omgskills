@@ -568,19 +568,24 @@ function ProfilePanel({ profile, onRefresh }: { profile: Profile | null; onRefre
   const api = usePortalApi();
   const [handle, setHandle] = useState(profile?.handle ?? "");
   const [published, setPublished] = useState(profile?.profilePublished ?? false);
+  const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState("");
+  const savedHandle = profile?.handle ?? "";
+  const hasSavedHandle = Boolean(savedHandle);
+  const mode = !hasSavedHandle ? "setup" : editing ? "edit" : "view";
 
   useEffect(() => {
     setHandle(profile?.handle ?? "");
     setPublished(profile?.profilePublished ?? false);
+    setEditing(false);
   }, [profile]);
 
-  async function saveProfile() {
+  async function saveProfile(nextPublished = published) {
     setStatus("Saving profile...");
     try {
       await api("/api/portal/profile", {
         method: "PATCH",
-        body: JSON.stringify({ handle, profilePublished: published })
+        body: JSON.stringify({ handle, profilePublished: nextPublished })
       });
       setStatus("Profile saved.");
       onRefresh();
@@ -589,25 +594,47 @@ function ProfilePanel({ profile, onRefresh }: { profile: Profile | null; onRefre
     }
   }
 
+  function cancelEdit() {
+    setHandle(savedHandle);
+    setPublished(profile?.profilePublished ?? false);
+    setStatus("");
+    setEditing(false);
+  }
+
+  async function updatePublished(nextPublished: boolean) {
+    setPublished(nextPublished);
+    await saveProfile(nextPublished);
+  }
+
   return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
+    <section className="panel profile-panel">
+      {mode === "view" ? (
+        <div className="profile-row profile-row-view">
           <h2>Public Profile</h2>
-          <p>{profile?.publicUrl ? <a href={profile.publicUrl}>{profile.publicUrl}</a> : "Publish to create a public URL."}</p>
+          {profile?.publicUrl ? <a className="profile-url" href={profile.publicUrl}>{profile.publicUrl}</a> : null}
+          <label className="inline-check profile-published">
+            <input
+              type="checkbox"
+              checked={published}
+              onChange={(event) => updatePublished(event.target.checked)}
+            />
+            Published
+          </label>
+          <button onClick={() => setEditing(true)}>Edit</button>
         </div>
-        <button onClick={saveProfile}>Save</button>
-      </div>
-      <div className="form-grid">
-        <label>
-          Handle
-          <input value={handle} onChange={(event) => setHandle(event.target.value)} placeholder="your-handle" />
-        </label>
-        <label className="inline-check">
-          <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
-          Published
-        </label>
-      </div>
+      ) : (
+        <div className="profile-row">
+          <h2>Public Profile</h2>
+          <label className="profile-handle">
+            Handle
+            <input value={handle} onChange={(event) => setHandle(event.target.value)} placeholder="your-handle" />
+          </label>
+          <div className="profile-actions">
+            {mode === "edit" ? <button className="secondary" onClick={cancelEdit}>Cancel</button> : null}
+            <button disabled={!handle.trim()} onClick={() => saveProfile()}>Save</button>
+          </div>
+        </div>
+      )}
       {status ? <p className="status">{status}</p> : null}
     </section>
   );
