@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const repoRoot = process.cwd();
@@ -33,13 +33,18 @@ function writeJsonAsset(prefix, value) {
   return { path: filename, sha256: hash, bytes: data.length };
 }
 
-function pruneOldAssets() {
+function pruneOldAssets(manifest) {
+  const manifestAssets = new Set(
+    [manifest.skills, manifest.trending, manifest.xTrending]
+      .map((asset) => asset?.path)
+      .filter(Boolean),
+  );
   for (const prefix of ["skills", "trending", "x-trending"]) {
     const files = readdirSync(dataDir)
       .filter((file) => file.startsWith(`${prefix}-`) && file.endsWith(".json"))
-      .sort()
-      .reverse();
-    for (const file of files.slice(2)) {
+      .filter((file) => !manifestAssets.has(file))
+      .sort((a, b) => statSync(join(dataDir, b)).mtimeMs - statSync(join(dataDir, a)).mtimeMs);
+    for (const file of files.slice(1)) {
       rmSync(join(dataDir, file), { force: true });
     }
   }
@@ -76,7 +81,7 @@ if (existsSync(xTrendingPath)) {
 }
 
 writeFileSync(join(dataDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
-pruneOldAssets();
+pruneOldAssets(manifest);
 
 console.log("✓ Published Crawl 4 data");
 console.log(`  ${join(dataDir, "manifest.json")}`);
