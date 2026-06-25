@@ -629,12 +629,11 @@ function GroupsPanel({
   const api = usePortalApi();
   const [status, setStatus] = useState("");
   const [newGroupName, setNewGroupName] = useState("Team Skills");
-  const [newGroupEmail, setNewGroupEmail] = useState("");
 
   async function createGroup() {
     setStatus("Creating group...");
     try {
-      const created = await api<{ groupId: string }>("/api/portal/groups", {
+      await api<{ groupId: string }>("/api/portal/groups", {
         method: "POST",
         body: JSON.stringify({
           name: newGroupName,
@@ -643,16 +642,8 @@ function GroupsPanel({
         })
       });
 
-      if (newGroupEmail.trim()) {
-        await api(`/api/portal/groups/${created.groupId}/allowed-emails`, {
-          method: "POST",
-          body: JSON.stringify({ email: newGroupEmail })
-        });
-      }
-
       setStatus("Group created.");
       setNewGroupName("Team Skills");
-      setNewGroupEmail("");
       onRefresh?.();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to create group");
@@ -706,7 +697,6 @@ function GroupsPanel({
       <div className="panel-header">
         <div>
           <h2>{title}</h2>
-          {canManage ? <p>Create a group, then add skills from the synced feed above.</p> : null}
         </div>
       </div>
       {canManage ? (
@@ -714,14 +704,6 @@ function GroupsPanel({
           <label>
             Group name
             <input value={newGroupName} onChange={(event) => setNewGroupName(event.target.value)} />
-          </label>
-          <label>
-            Allowed email
-            <input
-              value={newGroupEmail}
-              onChange={(event) => setNewGroupEmail(event.target.value)}
-              placeholder="teammate@example.com"
-            />
           </label>
           <button disabled={!newGroupName.trim()} onClick={createGroup}>Create group</button>
         </div>
