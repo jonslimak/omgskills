@@ -617,7 +617,15 @@ function SyncedSkillsPanel({
   );
 }
 
-function ProfileHeaderControls({ profile, onRefresh }: { profile: Profile | null; onRefresh: () => void }) {
+function ProfileHeaderControls({
+  profile,
+  onRefresh,
+  syncAction
+}: {
+  profile: Profile | null;
+  onRefresh: () => void;
+  syncAction?: React.ReactNode;
+}) {
   const api = usePortalApi();
   const [handle, setHandle] = useState(profile?.handle ?? "");
   const [published, setPublished] = useState(profile?.profilePublished ?? false);
@@ -658,6 +666,7 @@ function ProfileHeaderControls({ profile, onRefresh }: { profile: Profile | null
         <div className="username-row">
           <a className="username-link" href={profile.publicUrl}>/{savedHandle}</a>
           <button className="compact" onClick={() => setEditing(true)}>Edit</button>
+          {syncAction}
         </div>
       ) : (
         <div className="username-row">
@@ -670,6 +679,7 @@ function ProfileHeaderControls({ profile, onRefresh }: { profile: Profile | null
           <button className="compact" disabled={!handle.trim()} onClick={() => saveProfile()}>
             save
           </button>
+          {syncAction}
         </div>
       )}
       <div className="username-meta">
@@ -1065,11 +1075,10 @@ function Dashboard() {
       <header className="dashboard-header">
         <div className="dashboard-identity">
           <a aria-label="Home" className="eyes-logo" href="/app/">👀</a>
-          <ProfileHeaderControls profile={state.profile} onRefresh={refresh} />
+          <ProfileHeaderControls profile={state.profile} onRefresh={refresh} syncAction={<SyncAppButton />} />
         </div>
         <div className="dashboard-actions">
           <UserButton />
-          <SyncAppButton />
         </div>
       </header>
 

@@ -773,8 +773,7 @@ pre {
   }
 
   .username-row {
-    align-items: flex-start;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 8px;
   }
 
