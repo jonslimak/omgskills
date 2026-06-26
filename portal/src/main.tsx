@@ -229,22 +229,56 @@ function usePortalApi() {
 
 function SyncTokenPanel() {
   const api = usePortalApi();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [token, setToken] = useState<string>("");
-  const [expiresAt, setExpiresAt] = useState<string>("");
   const [status, setStatus] = useState<string>("");
+  const [copyStatus, setCopyStatus] = useState<string>("");
+
+  useEffect(() => {
+    if (!isPopoverOpen) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsPopoverOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isPopoverOpen]);
+
+  function openPopover() {
+    setIsPopoverOpen(true);
+    setStatus("");
+    setCopyStatus("");
+  }
 
   async function createToken() {
-    setStatus("Creating sync token...");
+    setStatus("Generating new token...");
+    setCopyStatus("");
     try {
       const result = await api<{ token: string; expiresAt: string }>("/api/portal/sync-token", {
         method: "POST",
         body: JSON.stringify({})
       });
       setToken(result.token);
-      setExpiresAt(result.expiresAt);
-      setStatus("Token ready. Use it in the macOS app Sync step.");
+      setStatus("Token is ready.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to create token");
+    }
+  }
+
+  async function copyToken() {
+    if (!token) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(token);
+      setCopyStatus("Copied.");
+    } catch {
+      setCopyStatus("Select and copy the token.");
     }
   }
 
@@ -255,15 +289,40 @@ function SyncTokenPanel() {
           <h2>Sync omgskills app</h2>
           <p>Generate a short-lived one-use token for your local app.</p>
         </div>
-        <button onClick={createToken}>Create token</button>
+        <button onClick={openPopover}>Create token</button>
       </div>
-      {token ? (
-        <div className="token-box">
-          <code>{token}</code>
-          <span>Expires {new Date(expiresAt).toLocaleTimeString()}</span>
+      {isPopoverOpen ? (
+        <div className="sync-modal-overlay" onClick={() => setIsPopoverOpen(false)} role="presentation">
+          <div
+            aria-modal="true"
+            className="sync-modal-card"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+          >
+            <h2>Sync your app</h2>
+            <div className="sync-step">
+              <h3>Step 1</h3>
+              <p>Generate a one time token for your local app</p>
+              <button onClick={createToken}>Generate new token</button>
+              <div className="sync-token-area">
+                {token ? (
+                  <button className="sync-token-button" onClick={copyToken} title="Copy token" type="button">
+                    {token}
+                  </button>
+                ) : null}
+                {status ? <p className="sync-status">{status}</p> : null}
+                {copyStatus ? <p className="sync-status">{copyStatus}</p> : null}
+              </div>
+            </div>
+            <div className="sync-step">
+              <h3>Step 2</h3>
+              <p>Open the app and tap on the user icon.</p>
+              <p>Paste the token in the token input box.</p>
+              <p>That's it!</p>
+            </div>
+          </div>
         </div>
       ) : null}
-      {status ? <p className="status">{status}</p> : null}
     </section>
   );
 }
