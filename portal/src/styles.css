@@ -33,6 +33,11 @@ button.secondary.compact {
   min-height: 34px;
 }
 
+button.compact {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
 button.text-button {
   background: transparent;
   color: #0b57d0;
@@ -152,6 +157,86 @@ pre {
   margin-bottom: 24px;
 }
 
+.dashboard-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 48px 10px 0;
+}
+
+.dashboard-identity {
+  display: grid;
+  gap: 8px;
+}
+
+.eyes-logo {
+  font-size: 20px;
+  line-height: 1;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.dashboard-actions {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+}
+
+.dashboard-profile {
+  display: grid;
+  gap: 6px;
+}
+
+.username-row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.username-link {
+  font-size: 26px;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.username-input {
+  background: #fff;
+  border-color: transparent;
+  min-height: 34px;
+  max-width: 230px;
+}
+
+.username-meta {
+  align-items: center;
+  color: #374151;
+  display: flex;
+  font-size: 13px;
+  gap: 22px;
+}
+
+.publish-toggle {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  font-weight: 750;
+}
+
+.publish-toggle.public {
+  color: #078321;
+}
+
+.publish-toggle.private {
+  color: #777f8c;
+}
+
+.publish-toggle input {
+  min-height: auto;
+  width: auto;
+}
+
 .hero {
   max-width: 640px;
 }
@@ -209,48 +294,6 @@ pre {
 .status {
   color: #334155;
   margin-top: 12px;
-}
-
-.profile-panel {
-  min-height: 150px;
-}
-
-.profile-row {
-  align-items: center;
-  display: grid;
-  gap: 18px;
-  grid-template-columns: max-content minmax(220px, 1fr) max-content;
-}
-
-.profile-row-view {
-  grid-template-columns: max-content minmax(220px, 1fr) max-content max-content;
-}
-
-.profile-row h2 {
-  margin: 0;
-  white-space: nowrap;
-}
-
-.profile-url {
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile-handle {
-  max-width: 560px;
-  width: 100%;
-}
-
-.profile-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.profile-published {
-  white-space: nowrap;
 }
 
 .actions {
@@ -718,26 +761,32 @@ pre {
     font-size: 30px;
   }
 
+  .dashboard-header {
+    flex-direction: column;
+    gap: 18px;
+    padding: 28px 0 0;
+  }
+
+  .dashboard-actions {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .username-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .username-input {
+    max-width: 100%;
+  }
+
   .form-grid,
   .compact-create,
-  .profile-row,
-  .profile-row-view,
   .panel-header,
   .row {
     grid-template-columns: 1fr;
-  }
-
-  .profile-row {
-    align-items: stretch;
-  }
-
-  .profile-url {
-    white-space: normal;
-    word-break: break-word;
-  }
-
-  .profile-actions {
-    justify-content: flex-start;
   }
 
   .sync-modal-overlay {

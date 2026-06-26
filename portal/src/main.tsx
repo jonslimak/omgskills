@@ -227,7 +227,7 @@ function usePortalApi() {
   };
 }
 
-function SyncTokenPanel() {
+function SyncAppButton() {
   const api = usePortalApi();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [token, setToken] = useState<string>("");
@@ -283,14 +283,8 @@ function SyncTokenPanel() {
   }
 
   return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
-          <h2>Sync omgskills app</h2>
-          <p>Generate a short-lived one-use token for your local app.</p>
-        </div>
-        <button onClick={openPopover}>Create token</button>
-      </div>
+    <>
+      <button onClick={openPopover}>Sync app</button>
       {isPopoverOpen ? (
         <div className="sync-modal-overlay" onClick={() => setIsPopoverOpen(false)} role="presentation">
           <div
@@ -323,7 +317,7 @@ function SyncTokenPanel() {
           </div>
         </div>
       ) : null}
-    </section>
+    </>
   );
 }
 
@@ -623,7 +617,7 @@ function SyncedSkillsPanel({
   );
 }
 
-function ProfilePanel({ profile, onRefresh }: { profile: Profile | null; onRefresh: () => void }) {
+function ProfileHeaderControls({ profile, onRefresh }: { profile: Profile | null; onRefresh: () => void }) {
   const api = usePortalApi();
   const [handle, setHandle] = useState(profile?.handle ?? "");
   const [published, setPublished] = useState(profile?.profilePublished ?? false);
@@ -653,49 +647,44 @@ function ProfilePanel({ profile, onRefresh }: { profile: Profile | null; onRefre
     }
   }
 
-  function cancelEdit() {
-    setHandle(savedHandle);
-    setPublished(profile?.profilePublished ?? false);
-    setStatus("");
-    setEditing(false);
-  }
-
   async function updatePublished(nextPublished: boolean) {
     setPublished(nextPublished);
     await saveProfile(nextPublished);
   }
 
   return (
-    <section className="panel profile-panel">
-      {mode === "view" ? (
-        <div className="profile-row profile-row-view">
-          <h2>Public Profile</h2>
-          {profile?.publicUrl ? <a className="profile-url" href={profile.publicUrl}>{profile.publicUrl}</a> : null}
-          <label className="inline-check profile-published">
-            <input
-              type="checkbox"
-              checked={published}
-              onChange={(event) => updatePublished(event.target.checked)}
-            />
-            Published
-          </label>
-          <button onClick={() => setEditing(true)}>Edit</button>
+    <div className="dashboard-profile">
+      {mode === "view" && profile?.publicUrl ? (
+        <div className="username-row">
+          <a className="username-link" href={profile.publicUrl}>/{savedHandle}</a>
+          <button className="compact" onClick={() => setEditing(true)}>Edit</button>
         </div>
       ) : (
-        <div className="profile-row">
-          <h2>Public Profile</h2>
-          <label className="profile-handle">
-            Handle
-            <input value={handle} onChange={(event) => setHandle(event.target.value)} placeholder="your-handle" />
-          </label>
-          <div className="profile-actions">
-            {mode === "edit" ? <button className="secondary" onClick={cancelEdit}>Cancel</button> : null}
-            <button disabled={!handle.trim()} onClick={() => saveProfile()}>Save</button>
-          </div>
+        <div className="username-row">
+          <input
+            className="username-input"
+            value={handle}
+            onChange={(event) => setHandle(event.target.value)}
+            placeholder="Set your username"
+          />
+          <button className="compact" disabled={!handle.trim()} onClick={() => saveProfile()}>
+            save
+          </button>
         </div>
       )}
-      {status ? <p className="status">{status}</p> : null}
-    </section>
+      <div className="username-meta">
+        <span>Username</span>
+        <label className={published ? "publish-toggle public" : "publish-toggle private"}>
+          {published ? "Public" : "Private"}
+          <input
+            type="checkbox"
+            checked={published}
+            onChange={(event) => updatePublished(event.target.checked)}
+          />
+        </label>
+      </div>
+      {status ? <p className="inline-status">{status}</p> : null}
+    </div>
   );
 }
 
@@ -1044,7 +1033,6 @@ function GroupDetailPage({ groupId }: { groupId: string }) {
 
 function Dashboard() {
   const api = usePortalApi();
-  const { user } = useUser();
   const [state, setState] = useState<ApiState>({ syncedSkills: [], groups: [], sharedGroups: [], profile: null });
   const [status, setStatus] = useState("Loading...");
 
@@ -1074,18 +1062,18 @@ function Dashboard() {
 
   return (
     <main className="shell">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Skill Groups</p>
-          <h1>omgskills portal</h1>
-          <p>{user?.primaryEmailAddress?.emailAddress}</p>
+      <header className="dashboard-header">
+        <div className="dashboard-identity">
+          <a aria-label="Home" className="eyes-logo" href="/app/">👀</a>
+          <ProfileHeaderControls profile={state.profile} onRefresh={refresh} />
         </div>
-        <UserButton />
+        <div className="dashboard-actions">
+          <UserButton />
+          <SyncAppButton />
+        </div>
       </header>
 
       {status ? <p className="status">{status}</p> : null}
-      <SyncTokenPanel />
-      <ProfilePanel profile={state.profile} onRefresh={refresh} />
       <GroupsPanel title="My Skill Groups" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
       <SyncedSkillsPanel groups={state.groups} skills={state.syncedSkills} onRefresh={refresh} />
       <GroupsPanel title="Shared With Me" groups={state.sharedGroups} />
