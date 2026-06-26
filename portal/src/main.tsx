@@ -227,7 +227,7 @@ function usePortalApi() {
   };
 }
 
-function SyncAppButton() {
+function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
   const api = usePortalApi();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [token, setToken] = useState<string>("");
@@ -284,7 +284,9 @@ function SyncAppButton() {
 
   return (
     <>
-      <button onClick={openPopover}>Sync app</button>
+      <button className={hasSynced ? "text-button sync-resync" : ""} onClick={openPopover}>
+        {hasSynced ? "Resync" : "Sync app"}
+      </button>
       {isPopoverOpen ? (
         <div className="sync-modal-overlay" onClick={() => setIsPopoverOpen(false)} role="presentation">
           <div
@@ -619,12 +621,10 @@ function SyncedSkillsPanel({
 
 function ProfileHeaderControls({
   profile,
-  onRefresh,
-  syncAction
+  onRefresh
 }: {
   profile: Profile | null;
   onRefresh: () => void;
-  syncAction?: React.ReactNode;
 }) {
   const api = usePortalApi();
   const [handle, setHandle] = useState(profile?.handle ?? "");
@@ -666,7 +666,6 @@ function ProfileHeaderControls({
         <div className="username-row">
           <a className="username-link" href={profile.publicUrl}>/{savedHandle}</a>
           <button className="compact" onClick={() => setEditing(true)}>Edit</button>
-          {syncAction}
         </div>
       ) : (
         <div className="username-row">
@@ -679,7 +678,6 @@ function ProfileHeaderControls({
           <button className="compact" disabled={!handle.trim()} onClick={() => saveProfile()}>
             save
           </button>
-          {syncAction}
         </div>
       )}
       <div className="username-meta">
@@ -1075,10 +1073,11 @@ function Dashboard() {
       <header className="dashboard-header">
         <div className="dashboard-identity">
           <a aria-label="Home" className="eyes-logo" href="/app/">👀</a>
-          <ProfileHeaderControls profile={state.profile} onRefresh={refresh} syncAction={<SyncAppButton />} />
+          <ProfileHeaderControls profile={state.profile} onRefresh={refresh} />
         </div>
         <div className="dashboard-actions">
           <UserButton />
+          <SyncAppButton hasSynced={state.syncedSkills.length > 0} />
         </div>
       </header>
 

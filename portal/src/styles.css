@@ -179,9 +179,10 @@ pre {
 
 .dashboard-actions {
   align-items: center;
-  display: flex;
-  gap: 14px;
+  display: grid;
+  gap: 12px;
   justify-content: flex-end;
+  justify-items: end;
 }
 
 .dashboard-profile {
@@ -235,6 +236,10 @@ pre {
 .publish-toggle input {
   min-height: auto;
   width: auto;
+}
+
+.sync-resync {
+  color: #0b57d0;
 }
 
 .hero {
@@ -769,7 +774,7 @@ pre {
 
   .dashboard-actions {
     align-items: center;
-    flex-direction: row;
+    display: flex;
   }
 
   .username-row {
