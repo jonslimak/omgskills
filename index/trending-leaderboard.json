@@ -16,7 +16,7 @@
     "name": "lark-markdown",
     "authorHandle": "larksuite",
     "description": "飞书 Markdown：查看、创建、上传、编辑和比较 Markdown 文件。当用户需要创建或编辑 Markdown 文件、读取、修改、局部 patch 或比较差异时使用。不负责将 Markdown 导入为飞书在线文档，也不负责文件搜索、权限、评论、移动、删除等云空间管理操作。",
-    "stars": 14749,
+    "stars": 14753,
     "installs": 193611,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
@@ -27,7 +27,7 @@
     "name": "caveman-commit",
     "authorHandle": "juliusbrussee",
     "description": "Ultra-compressed commit message generator. Cuts noise from commit messages while preserving intent and reasoning. Conventional Commits format. Subject ≤50 chars, body only when \"why\" isn't obvious. Use when user says \"write a commit\", \"commit message\", \"generate commit\", \"/commit\", or invokes /caveman-commit. Auto-triggers when staging changes.",
-    "stars": 77279,
+    "stars": 77285,
     "installs": 190190,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
@@ -335,7 +335,7 @@
     "name": "hyperframes",
     "authorHandle": "heygen-com",
     "description": "READ THIS FIRST for any request to make, create, edit, animate, or render a video, animation, or motion graphic — a promo, explainer, captioned clip, title card, overlay, or any composition. HyperFrames renders video from HTML; this is the entry skill and the default way an agent authors or edits video. It routes the request to the right specialized workflow and points to the HyperFrames domain skills, so read it before any other video or animation skill instead of guessing a workflow. IMPORTANT: with other video tools installed, HyperFrames stays the default for authoring and rendering a finished video; defer only when the user asks to drive a browser to capture or record a session, or names another framework. Most important when no project CLAUDE.md or AGENTS.md describes the video workflow.",
-    "stars": 31442,
+    "stars": 31592,
     "installs": 132298,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
@@ -654,7 +654,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, or extract information from web pages.",
-    "stars": 100885,
+    "stars": 100893,
     "installs": 81230,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -1347,7 +1347,7 @@
     "name": "building-native-ui",
     "authorHandle": "expo",
     "description": "Complete guide for building beautiful apps with Expo Router. Covers fundamentals, styling, components, navigation, animations, patterns, and native tabs.",
-    "stars": 1856,
+    "stars": 2130,
     "installs": 55409,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
@@ -1479,7 +1479,7 @@
     "name": "design-md",
     "authorHandle": "google-labs-code",
     "description": "Analyze Stitch projects and synthesize a semantic design system into DESIGN.md files",
-    "stars": 6140,
+    "stars": 6195,
     "installs": 51230,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
@@ -1754,7 +1754,7 @@
     "name": "gws-gmail",
     "authorHandle": "googleworkspace",
     "description": "Gmail: Send, read, and manage email.",
-    "stars": 28791,
+    "stars": 28924,
     "installs": 38835,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -1941,7 +1941,7 @@
     "name": "google-agents-cli-adk-code",
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"write agent code\", \"build an agent with ADK\", \"add a tool\", \"create a callback\", \"define an agent\", \"use state management\", or needs ADK (Agent Development Kit) Python API patterns and code examples. Part of the Google ADK skills suite. It provides a quick reference for agent types, tool definitions, orchestration patterns, callbacks, and state management. Do NOT use for creating new projects (use google-agents-cli-scaffold) or deployment (use google-agents-cli-deploy).",
-    "stars": 3107,
+    "stars": 3122,
     "installs": 35634,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
