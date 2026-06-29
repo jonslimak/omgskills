@@ -4,6 +4,17 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.17] - 2026-06-29
+
+### App
+- Add refresh retry/backoff, panel-open refresh cooldown, and clearer refresh telemetry
+- Preserve visible skill data when a later reload fails
+- Add app version and build metadata to launch analytics
+- Promote Crawl 4 as the primary data track with v2 fallback
+
+### Ops
+- Fix TelemetryDeck parsing for funnel and health reporting
+
 ### Scraper
 - Add negative cache with configurable TTLs to skip recently-rejected candidates
 - Add minimum star floor to filter low-signal repos
@@ -66,7 +77,8 @@ All notable changes to omgskills are documented here.
 
 Versions 0.0.1 through 0.0.10 predate this changelog.
 
-[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.16...HEAD
+[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.17...HEAD
+[0.0.17]: https://github.com/jonslimak/omgskills/compare/v0.0.16...v0.0.17
 [0.0.16]: https://github.com/jonslimak/omgskills/compare/v0.0.15...v0.0.16
 [0.0.15]: https://github.com/jonslimak/omgskills/compare/v0.0.13...v0.0.15
 [0.0.13]: https://github.com/jonslimak/omgskills/compare/v0.0.12...v0.0.13
