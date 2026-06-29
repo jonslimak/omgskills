@@ -230,6 +230,10 @@ function telemetryQuery(appID, dataSource, type, days) {
   };
 }
 
+function telemetryTopNBuckets(result) {
+  return Array.isArray(result) ? result : [];
+}
+
 async function telemetryCounts(days) {
   const token = requireEnv("TELEMETRYDECK_TOKEN");
   const appID = requireEnv("TELEMETRYDECK_APP_ID");
@@ -242,9 +246,9 @@ async function telemetryCounts(days) {
       headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
       body: JSON.stringify(telemetryQuery(appID, dataSource, type, days)),
     });
-    for (const row of result?.result?.rows ?? []) {
+    for (const row of telemetryTopNBuckets(result)) {
       const date = String(row.timestamp).slice(0, 10);
-      const count = Number(row.result?.[0]?.count) || 0;
+      const count = Number(row.result?.find((item) => item.type === type)?.count) || 0;
       const current = counts.get(date) ?? {};
       current[type] = count;
       counts.set(date, current);

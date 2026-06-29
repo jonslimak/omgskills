@@ -139,6 +139,12 @@ function telemetryQuery(appID, dataSource, type) {
   };
 }
 
+function telemetryTopNCount(result, type) {
+  const rows = Array.isArray(result) ? result.flatMap((bucket) => bucket.result ?? []) : [];
+  const row = rows.find((item) => item.type === type);
+  return Number(row?.count) || 0;
+}
+
 async function telemetryMetrics() {
   const token = requireEnv("TELEMETRYDECK_TOKEN");
   const appID = requireEnv("TELEMETRYDECK_APP_ID");
@@ -153,8 +159,7 @@ async function telemetryMetrics() {
       headers,
       body: JSON.stringify(telemetryQuery(appID, dataSource, type)),
     });
-    const row = result?.result?.rows?.[0];
-    counts[type] = Number(row?.result?.[0]?.count) || 0;
+    counts[type] = telemetryTopNCount(result, type);
   }
 
   return {
