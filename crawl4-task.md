@@ -6,9 +6,13 @@ The current source of truth is the implemented shadow behavior plus [`crawl-4.md
 
 Older bucketed-preview and rolling-TTL-only notes should not be treated as current policy.
 
-Crawl 4 should become a complete runnable shadow crawler track.
+Crawl 4 is moving from shadow/test into the primary client data track.
 
-Its output library should be generated, inspected, and tested while public clients stay on the current production library/crawler until a separate explicit cutover decision.
+The rollout model is Crawl 4 primary with v2 fallback.
+
+Public clients should load `/data/crawl4/manifest.json` first and fall back to `/data/v2/manifest.json` if Crawl 4 fails to load or validate.
+
+The v2 crawler/publish path stays active while it is the fallback.
 
 ## Done
 
@@ -84,7 +88,7 @@ Done.
 - unresolved-path churn has current-run visibility in the shadow summary
 - high-star `SKILL.md` discovery is weekly-gated to avoid daily search pressure
 - cheap-triggered deep refresh is capped at `150` repos per combined run
-- reopen tuning only if the parallel trial exceeds runtime/API thresholds
+- reopen tuning only if the public Crawl 4 primary trial exceeds runtime/API thresholds
 
 ### Library admission proof
 
@@ -95,6 +99,23 @@ Done.
 - clean mapping still requires successful bootstrap
 - failed admissions are cleaned up after bootstrap and final repo-index reconciliation
 - the temporary admission-validation flag was removed after proof
+
+### Crawl 4 client test toggle
+
+Done.
+
+- macOS client can switch between production v2 and Crawl 4 data
+- Crawl 4 uses separate cache files
+- local shadow fallback works for testing before hosted Crawl 4 data is fresh
+- catalog/repackaged collection-like results are demoted in search, not removed
+
+### Crawl 4 hosted publish path
+
+Done.
+
+- `shadow-crawl-health` publishes Crawl 4 data to `/data/crawl4`
+- v2 publish remains active at `/data/v2`
+- both tracks use the same client-facing data shape
 
 ## Current verification
 
@@ -134,70 +155,114 @@ Notes:
 - high-star `SKILL.md` discovery is skipped on normal non-weekly combined runs.
 - `verify-rerun-stability.ts` uses refresh replay only; discovery remains live in the verifier seed run.
 
-### Next verification
+### Latest Crawl 4 output check
 
-Before any Stage B activation, run:
+Done.
 
-- `npm run scrape:shadow`
-- `npm run test:shadow-guard`
-- `npx tsx scraper/new-crawl/verify-rerun-stability.ts`
-- `npx tsx scraper/new-crawl/verify-steady-state-acceptance.ts`
+Latest local shadow output, checked at `2026-06-23T15:47:52.704Z`:
 
-This should confirm:
+- `shadowSkillOverlayWrittenCount`: `5`
+- `bootstrappedRepoCount`: `0`
+- `catalogAdmissionCount`: `0`
+- `bootstrapFailedRepoCount`: `2`
+- `bootstrapSkippedRepoCount`: `179`
+- cutover validation: passed
 
-- the complete Crawl 4 shadow crawler can run end to end
-- the Crawl 4 output library can be inspected/tested independently
-- public clients remain on the current production library/crawler
-- cheap-check attempts are near weekly target
-- cheap-triggered refresh ratio is not a hard fail
-- repo-missing / unresolved-path churn is understood
-- no production contract drift
-- no cutover validation regression
+The current `+5` Crawl 4 skills persisted across a full combined cycle:
+
+- `huashu-design`
+- `anysearch`
+- `ai-avatar-video`
+- `mmx-cli`
+- `solana-dev`
+
+### Latest live rollout signal
+
+Latest checked live state on `2026-06-29`:
+
+- `shadow-crawl-health`: success
+- live health: OK
+- live v2 and live Crawl 4 skills assets currently match
+- live skill count: `50,488`
+- unresolved catalog/repackaged in live v2: `0`
+- `sickn33/antigravity-awesome-skills` in live v2: `0`
+- `verify-rerun-stability`: still advisory-only and drifted on provenance
+
+Current interpretation:
+
+- blocking publish gates are passing
+- rerun-stability remains useful but should not block fresh data
+- legacy `scrape` remains important while v2 is the fallback
 
 ## Pending decision gates
 
 ### Library admission / growth policy
 
-Still open:
+Defined for v1, but not fully validated at backfill scale.
 
-- what qualifies a discovered repo to enter the maintained library
-- what qualifies a repo to become `rising`
-- what stays out of the long tail even if discovered
+Current v1 policy:
 
-This should be decided before finalizing Crawl 4 as the long-term crawler policy.
-
-Decision inputs should include:
-
-- source quality
-- mapping quality / clean skill-path resolution
-- stars / trust / official signals
-- momentum / trending signals
-
-### Stage B complete crawler policy decision
+- discovery is not admission
+- value gate: manual include, official seed, trusted vendor, gold basket, or `500+` stars
+- clean gate: successful bootstrap / clean mapping
+- catalog-like unresolved repos stay out
+- manual include does not bypass clean mapping
 
 Still open:
 
-- whether the complete Crawl 4 policy should enter the parallel trial
-- whether the scored `50` repo hotset should replace the active `40` repo hotset
-- whether weekly cheap checks and cheap-triggered refresh are accepted long term
-- whether library admission/growth rules are accepted
-- whether output-library inspection is good enough to keep public clients safely on current data until cutover
+- whether `500+` stars is the right value threshold after a real backfill sample
+- whether the first bounded backfill has acceptable quality
+- whether newly admitted repos should default to `library` only, with `rising` decided separately
 
-This should be decided only after:
+This should be validated before finalizing Crawl 4 as the long-term crawler policy.
 
-- backlog burn-down verification
-- steady-state review
-- no cutover / contract regressions
+### Bounded backfill trial
 
-### Parallel trial acceptance
+Still open.
+
+Run a bounded admission/bootstrap pass before any larger growth push:
+
+- cap admitted/bootstrap candidates at `50`
+- use the existing v1 admission policy
+- inspect all newly admitted skills for quality
+- confirm catalog-like repos do not leak into maintained output
+- rerun one normal combined crawl to confirm persistence
+- only then decide whether to repeat another bounded batch
+
+### Stage B: Crawl 4 primary with v2 fallback
+
+Current rollout gate.
+
+Decision:
+
+- release clients should default to Crawl 4
+- clients must fall back to v2 on Crawl 4 fetch/parse/validation failure
+- v2 scrape/publish remains active
+- health must treat Crawl 4 primary and v2 fallback as separate responsibilities
+
+This is not v2 retirement.
+
+### Public Crawl 4 primary trial acceptance
 
 Still open:
 
 - safety gates pass across trial runs
-- Crawl 4 output library is better or acceptable versus current production data
-- test client works against Crawl 4 output
+- Crawl 4 output library remains acceptable versus v2 fallback
+- release client works against Crawl 4 output
+- fallback to v2 works when Crawl 4 is unavailable or invalid
 - no client-facing schema drift
 - runtime and API pressure are acceptable
+
+### v2 fallback retirement
+
+Later decision.
+
+Do not retire v2 until:
+
+- Crawl 4 has run as public primary for a sustained period
+- fallback has not been needed for normal operation
+- legacy `scrape` failures no longer affect rollback safety
+- a separate retirement decision is approved
 
 ### Long-term refresh-policy decision
 
@@ -234,7 +299,7 @@ Pass:
 
 ### Tuning decisions
 
-Done for v1; reopen only if parallel-trial runs exceed runtime/API thresholds:
+Done for v1; reopen only if public primary runs exceed runtime/API thresholds:
 
 - repo-missing quarantine
 - unresolved-path visibility
@@ -245,12 +310,12 @@ Done for v1; reopen only if parallel-trial runs exceed runtime/API thresholds:
 
 Recommended order:
 
-1. run safety gates if needed
-2. inspect/test the Crawl 4 output library
-3. set up/test a client version pointed at Crawl 4 output
-4. run Crawl 4 in parallel for a few days
-5. decide whether the complete Crawl 4 policy is ready for regular runs
-6. only later decide any public/client cutover
+1. update docs for Crawl 4 primary + v2 fallback rollout
+2. update client default/fallback behavior
+3. keep v2 scrape and publish alive while fallback exists
+4. monitor health/workflows for several days
+5. fix or downgrade any legacy `scrape` failures that make v2 fallback unreliable
+6. decide later whether v2 fallback can be retired
 
 ## What is no longer current
 
@@ -263,7 +328,7 @@ The following older ideas should not be treated as the current Crawl 4 plan:
 
 ## Acceptance checkpoint before more behavior changes
 
-Before any new Stage B activation or additional refresh-policy work:
+Before any additional refresh-policy work or v2 fallback retirement:
 
 - one full `combined` backlog burn-down run completes
 - one follow-up `combined` run shows steady-state behavior
@@ -272,4 +337,5 @@ Before any new Stage B activation or additional refresh-policy work:
 - no production JSON contract drift
 - no cutover validation regression
 - repo-missing and unresolved-path churn are reviewed
+- Crawl 4 primary and v2 fallback health are both understood
 - docs stay aligned with the implemented shadow design

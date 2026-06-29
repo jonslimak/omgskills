@@ -70,6 +70,33 @@ struct SkillSearchIndexTests {
         #expect(results.map(\.name) == ["browser-use", "browser-use-catalog"])
     }
 
+    @Test func cjkHeavyDescriptionsAreDemotedWithinComparableMatches() throws {
+        let results = try search("ui design", in: [
+            skill(name: "z-english-ui", description: "UI design workflow for frontend apps.", stars: 100),
+            skill(name: "a-cjk-ui", description: "UI design 抖音搜索优化短视频搜索排名关键词策略算法规则内容增长用户研究", stars: 100),
+        ])
+
+        #expect(results.map(\.name) == ["z-english-ui", "a-cjk-ui"])
+    }
+
+    @Test func mixedEnglishCJKDescriptionsAreNotDemoted() {
+        let mixed = skill(
+            name: "mixed-ui",
+            description: "UI design workflow for frontend apps with 抖音 notes.",
+            stars: 100
+        )
+
+        #expect(mixed.searchQualityPenalty == 0)
+    }
+
+    @Test func cjkHeavySkillsRemainSearchableByDirectQuery() throws {
+        let results = try search("douyin seo", in: [
+            skill(name: "douyin-seo", description: "抖音搜索优化短视频搜索排名关键词策略算法规则内容增长用户研究", stars: 100),
+        ])
+
+        #expect(results.map(\.name) == ["douyin-seo"])
+    }
+
     @Test func collectionLikeSkillsRemainSearchable() throws {
         let results = try search("browser use catalog", in: [
             skill(name: "browser-use-catalog", description: "Browser use skill collection.", stars: 220_000, provenanceType: "catalog"),

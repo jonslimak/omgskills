@@ -124,19 +124,22 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeAvailableSkills() async -> LoadResult<[Skill]> {
-        if DataRefreshService.selectedTrack() == .crawl4 {
-            return await decodeCrawl4AvailableSkills()
+        if DataRefreshService.activeTrack() == .crawl4 {
+            let crawl4 = await decodeCrawl4AvailableSkills()
+            if case .success = crawl4 {
+                return crawl4
+            }
         }
         return await decodeProductionAvailableSkills()
     }
 
     private nonisolated func decodeCrawl4AvailableSkills() async -> LoadResult<[Skill]> {
-        if let data = DataRefreshService.cachedData(for: .skills) {
+        if let data = DataRefreshService.cachedData(for: .skills, track: .crawl4) {
             let decoded = await decode(data, as: [Skill].self, label: "crawl4-skills.json")
             if case .success = decoded {
                 return decoded
             }
-            DataRefreshService.removeCachedData(for: .skills)
+            DataRefreshService.removeCachedData(for: .skills, track: .crawl4)
         }
 
         guard let url = AppResource.shadowAssetURL(for: .cutoverSkills) else {
@@ -151,12 +154,12 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeProductionAvailableSkills() async -> LoadResult<[Skill]> {
-        if let data = DataRefreshService.cachedData(for: .skills) {
+        if let data = DataRefreshService.cachedData(for: .skills, track: .productionV2) {
             let decoded = await decode(data, as: [Skill].self, label: "skills.json")
             if case .success = decoded {
                 return decoded
             }
-            DataRefreshService.removeCachedData(for: .skills)
+            DataRefreshService.removeCachedData(for: .skills, track: .productionV2)
         }
 
         guard let url = Bundle.main.url(forResource: "skills", withExtension: "json") else {
@@ -171,12 +174,21 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeTrendingEntries() async -> LoadResult<[TrendingEntry]> {
-        if let data = DataRefreshService.cachedData(for: .trending) {
+        if DataRefreshService.activeTrack() == .crawl4,
+           let data = DataRefreshService.cachedData(for: .trending, track: .crawl4) {
+            let decoded = await decode(data, as: [TrendingEntry].self, label: "crawl4-trending.json")
+            if case .success = decoded {
+                return decoded
+            }
+            DataRefreshService.removeCachedData(for: .trending, track: .crawl4)
+        }
+
+        if let data = DataRefreshService.cachedData(for: .trending, track: .productionV2) {
             let decoded = await decode(data, as: [TrendingEntry].self, label: "trending.json")
             if case .success = decoded {
                 return decoded
             }
-            DataRefreshService.removeCachedData(for: .trending)
+            DataRefreshService.removeCachedData(for: .trending, track: .productionV2)
         }
 
         guard let url = Bundle.main.url(forResource: "trending", withExtension: "json") else {
@@ -191,15 +203,25 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeTwitterSkills() async -> LoadResult<[Skill]> {
-        if let data = DataRefreshService.cachedData(for: .xTrending) {
+        if DataRefreshService.activeTrack() == .crawl4,
+           let data = DataRefreshService.cachedData(for: .xTrending, track: .crawl4) {
+            let decoded = await decode(data, as: [Skill].self, label: "crawl4-x-trending.json")
+            if case .success = decoded {
+                return decoded
+            }
+            DataRefreshService.removeCachedData(for: .xTrending, track: .crawl4)
+        }
+
+        if let data = DataRefreshService.cachedData(for: .xTrending, track: .productionV2) {
             let decoded = await decode(data, as: [Skill].self, label: "x-trending.json")
             if case .success = decoded {
                 return decoded
             }
-            DataRefreshService.removeCachedData(for: .xTrending)
+            DataRefreshService.removeCachedData(for: .xTrending, track: .productionV2)
         }
 
-        if DataRefreshService.remoteXTrendingEnabled() == false {
+        if DataRefreshService.activeTrack() == .productionV2,
+           DataRefreshService.remoteXTrendingEnabled() == false {
             return .success([])
         }
 

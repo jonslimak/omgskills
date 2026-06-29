@@ -6,6 +6,7 @@
   "scripts": {
     "scrape": "tsx scraper/build.ts",
     "scrape:shadow": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/build-shadow.ts",
+    "crawl4:add-skill": "tsx scraper/new-crawl/add-curated-skill.ts",
     "promote:cutover": "tsx scraper/new-crawl/promote-cutover.ts",
     "test:shadow-guard": "tsx --test scraper/new-crawl/*.test.ts",
     "scrape:debug": "tsx scraper/build.ts --sources=aggregators,social,registry,awesome,official --aggregator-repo-limit=10 --social-page-limit=1 --output-suffix=debug --max-enriched=200",

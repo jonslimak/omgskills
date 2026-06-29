@@ -15,6 +15,21 @@ struct DataRefreshServiceTests {
         #expect(DataRefreshService.selectedTrack(userDefaults: defaults) == .productionV2)
     }
 
+    @Test func activeTrackUsesCrawl4OnlyInDebugFallbackMode() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        #expect(DataRefreshService.activeTrack(
+            userDefaults: defaults,
+            mode: .crawl4PrimaryWithV2Fallback
+        ) == .crawl4)
+        #expect(DataRefreshService.activeTrack(
+            userDefaults: defaults,
+            mode: .productionV2Only
+        ) == .productionV2)
+    }
+
     @Test func selectedTrackPersistsInUserDefaults() {
         let suiteName = UUID().uuidString
         let defaults = UserDefaults(suiteName: suiteName)!
@@ -23,6 +38,54 @@ struct DataRefreshServiceTests {
         DataRefreshService.setSelectedTrack(.crawl4, userDefaults: defaults)
 
         #expect(DataRefreshService.selectedTrack(userDefaults: defaults) == .crawl4)
+    }
+
+    @Test func activeTrackPersistsInFallbackMode() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        DataRefreshService.setActiveTrack(.productionV2, userDefaults: defaults)
+
+        #expect(DataRefreshService.activeTrack(
+            userDefaults: defaults,
+            mode: .crawl4PrimaryWithV2Fallback
+        ) == .productionV2)
+    }
+
+    @Test func productionModeIgnoresPersistedActiveTrack() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        DataRefreshService.setSelectedTrack(.productionV2, userDefaults: defaults)
+        DataRefreshService.setActiveTrack(.crawl4, userDefaults: defaults)
+
+        #expect(DataRefreshService.activeTrack(
+            userDefaults: defaults,
+            mode: .productionV2Only
+        ) == .productionV2)
+    }
+
+    @Test func refreshTrackOrderDependsOnMode() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        #expect(DataRefreshService.refreshTracks(
+            mode: .crawl4PrimaryWithV2Fallback,
+            userDefaults: defaults
+        ) == [.crawl4, .productionV2])
+        #expect(DataRefreshService.refreshTracks(
+            mode: .productionV2Only,
+            userDefaults: defaults
+        ) == [.productionV2])
+    }
+
+    @Test func cancellationDoesNotTriggerFallback() {
+        #expect(DataRefreshService.shouldFallback(after: CancellationError()) == false)
+        #expect(DataRefreshService.shouldFallback(after: URLError(.cancelled)) == false)
+        #expect(DataRefreshService.shouldFallback(after: URLError(.badServerResponse)) == true)
     }
 
     @Test func manifestURLUsesSelectedTrack() {

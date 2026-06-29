@@ -175,7 +175,11 @@ extension Skill {
     }
 
     var searchQualityPenalty: Int {
-        isCollectionLike ? 250 : 0
+        var penalty = isCollectionLike ? 250 : 0
+        if hasCJKHeavyDescription {
+            penalty += 100
+        }
+        return penalty
     }
 
     var discoverAttributionText: String? {
@@ -199,4 +203,31 @@ extension Skill {
         "orcaqubits/agentic-commerce-skills-plugins",
         "sickn33/antigravity-awesome-skills",
     ]
+
+    private var hasCJKHeavyDescription: Bool {
+        var letterCount = 0
+        var cjkCount = 0
+
+        for scalar in description.unicodeScalars where scalar.properties.isAlphabetic {
+            letterCount += 1
+            if Self.isCJKScalar(scalar) {
+                cjkCount += 1
+            }
+        }
+
+        guard letterCount >= 20 else { return false }
+        return Double(cjkCount) / Double(letterCount) >= 0.4
+    }
+
+    private static func isCJKScalar(_ scalar: Unicode.Scalar) -> Bool {
+        switch scalar.value {
+        case 0x3040...0x30FF, // Hiragana + Katakana
+             0x3400...0x9FFF, // CJK unified ideographs
+             0xAC00...0xD7AF, // Hangul syllables
+             0xF900...0xFAFF: // CJK compatibility ideographs
+            return true
+        default:
+            return false
+        }
+    }
 }

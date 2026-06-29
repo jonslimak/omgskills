@@ -16,13 +16,13 @@ Older bucketed-preview and rolling-TTL-only language should not be treated as cu
 
 ## Operating goal
 
-Crawl 4 should become a complete runnable crawler track.
+Crawl 4 should become the primary client data track.
 
-It should be able to generate a complete candidate library output that can be inspected and tested through shadow and cutover artifacts.
+It should generate a complete library output that can be inspected through shadow/cutover artifacts and served from `/data/crawl4/manifest.json`.
 
-Public clients should stay pointed at the current production library and crawler until a separate explicit client/public cutover decision.
+During Stage B, public clients can default to Crawl 4 while keeping `/data/v2/manifest.json` as the active fallback.
 
-This work should not require a client-facing schema or data-contract change.
+This rollout should not require a client-facing schema or data-contract change.
 
 ## What stays the same
 
@@ -40,14 +40,14 @@ Discovery lanes stay:
 - `periodic`
 - `background`
 
-The current shadow/cutover/publish flow stays:
+The current Crawl 4 shadow/cutover/publish flow stays:
 
 - `scrape:shadow`
 - `promote:cutover`
 - `test:shadow-guard`
-- publish `v2`
+- publish Crawl 4
 
-The current app/library production contracts stay:
+The fallback v2 publishing flow stays active while clients can roll back to v2:
 
 - `skills.json`
 - `trending.json`
@@ -266,7 +266,7 @@ When this plan is implemented, verify:
 
 This section turns the strategy above into the actual rollout sequence.
 
-The implementation should happen in stages so we can run and test the Crawl 4 output library while public clients remain on the current production library.
+The implementation should happen in stages so we can run Crawl 4 publicly while keeping v2 as a real fallback path.
 
 ### Stage A: build and verify Crawl 4 in shadow
 
@@ -299,33 +299,32 @@ This stage should **not** change:
 - production contracts
 - cutover / publish / deploy behavior
 
-### Stage B: complete Crawl 4 policy decision
+### Stage B: Crawl 4 primary with v2 fallback
 
-Stage B should decide whether the complete Crawl 4 policy is ready for parallel testing.
+Stage B should make Crawl 4 the primary client data track.
 
-Stage B is not approved yet.
+Stage B does not retire v2.
 
-After Stage A verification and churn review are complete, Stage B should decide:
+After Stage A verification and churn review are complete, Stage B should:
 
-- whether the scored `50` repo hotset becomes active crawler selection logic
-- whether weekly cheap-check coverage is accepted as the long-term refresh policy
-- whether cheap-triggered deep refresh is accepted as the non-daily refresh path
-- whether library admission/growth rules are accepted
-- whether repo-missing and unresolved-path churn safeguards are sufficient
-- whether safety gates are strong enough to run the Crawl 4 track in parallel
+- point the release client at `/data/crawl4/manifest.json` first
+- fall back to `/data/v2/manifest.json` on fetch, parse, or validation failure
+- keep the legacy `scrape` / v2 publishing path active
+- keep weekly cheap-check coverage and capped cheap-triggered refresh as the Crawl 4 refresh policy
+- keep catalog and admission safeguards active
 
-Client/public cutover remains a separate decision after Crawl 4 is runnable and its output library has been inspected.
+Rollback means switching the client default back to v2. It should not require rebuilding Crawl 4.
 
-### Stage C: parallel trial
+### Stage C: public Crawl 4 primary trial
 
-After Stage B approval, run Crawl 4 in parallel for a few days.
+After Stage B, monitor public clients using Crawl 4 primary for several days.
 
 During the trial:
 
-- run Crawl 4 regularly through the shadow/cutover path
+- run Crawl 4 regularly through the shadow/cutover/publish path
+- keep v2 crawling and publishing as the fallback
 - inspect the Crawl 4 output library after each run
-- test a client build pointed at Crawl 4 output
-- keep public clients on current production data
+- test client fallback behavior against v2
 - record whether each run is keep, tune, or block
 
 Output-library inspection should include:
@@ -337,11 +336,26 @@ Output-library inspection should include:
 - spot-check app-consumable cutover files
 - confirm new additions are not dominated by obvious junk
 
-### Stage D: public client cutover
+### Stage D: v2 fallback retirement decision
 
-Only after the parallel trial is accepted, release the client version pointed at the Crawl 4 library.
+Only after the public Crawl 4 primary trial is accepted, decide whether v2 fallback can be retired.
 
-Keep a rollback path to the current production data until Crawl 4 is stable in public use.
+Until then, keep v2 crawling, publishing, and monitored.
+
+### Client fallback requirements
+
+The client rollout should:
+
+- try `/data/crawl4/manifest.json` first
+- fall back to `/data/v2/manifest.json` on manifest fetch, asset fetch, parse, or validation failure
+- preserve the same client-facing data schema
+- make rollback a client default/config change, not a crawler rebuild
+
+Health should monitor:
+
+- Crawl 4 primary freshness
+- v2 fallback freshness
+- publish/deploy validity for both tracks
 
 ### Planned implementation details
 
@@ -497,7 +511,7 @@ Verify:
 
 #### Stage B validation
 
-After Stage A review passes, and only after churn tuning is accepted, enable the complete Crawl 4 policy for parallel shadow/cutover testing and run:
+After Stage A review passes, and only after churn tuning is accepted, enable Crawl 4 primary with v2 fallback and run:
 
 - `npm run scrape:shadow`
 - `npm run test:shadow-guard`
@@ -507,30 +521,32 @@ After Stage A review passes, and only after churn tuning is accepted, enable the
 Verify:
 
 - cutover validation still passes
-- Crawl 4 output library can be inspected and tested independently
-- public clients remain on current production data unless a separate cutover is approved
+- Crawl 4 output library is published to `/data/crawl4`
+- v2 fallback is still published to `/data/v2`
+- client can load Crawl 4 first and fall back to v2
 - publish/deploy validation does not change client-facing data contracts
-- `/health/` remains green for the active production path
+- `/health/` remains green for both primary and fallback health
 - `skills.json`, `trending.json`, and `x-trending.json` shapes are unchanged
 - behavior differences are limited to approved Crawl 4 policy decisions
 
 #### Stage C validation
 
-During the parallel trial, verify:
+During the public Crawl 4 primary trial, verify:
 
 - safety gates pass across trial runs
-- the Crawl 4 output library is acceptable versus current production data
-- the test client works against Crawl 4 output
-- public clients remain on current production data
+- Crawl 4 remains acceptable versus v2 fallback
+- the release client works against Crawl 4 output
+- fallback to v2 works when Crawl 4 is unavailable or invalid
+- v2 scrape/publish remains healthy while it is the fallback
 - runtime and API pressure remain acceptable
 
 #### Stage D validation
 
-Before public client cutover, verify:
+Before retiring v2 fallback, verify:
 
-- the parallel trial has been accepted
-- the release client points at the Crawl 4 library
-- rollback to current production data is available
+- the public Crawl 4 primary trial has been accepted
+- rollback to v2 has not been needed for a sustained period
+- v2 retirement has a separate approval
 - no client-facing schema drift was introduced
 
 ### Acceptance rule

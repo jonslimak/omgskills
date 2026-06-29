@@ -42,10 +42,38 @@ enum LibraryDataTrack: String, CaseIterable, Identifiable {
     }
 }
 
+enum LibraryDataMode {
+    case productionV2Only
+    case crawl4PrimaryWithV2Fallback
+
+    var primaryTrack: LibraryDataTrack {
+        switch self {
+        case .productionV2Only: return .productionV2
+        case .crawl4PrimaryWithV2Fallback: return .crawl4
+        }
+    }
+
+    var fallbackTracks: [LibraryDataTrack] {
+        switch self {
+        case .productionV2Only:
+            return [.productionV2]
+        case .crawl4PrimaryWithV2Fallback:
+            return [.crawl4, .productionV2]
+        }
+    }
+}
+
 enum DataRefreshService {
     static let manifestURL = LibraryDataTrack.productionV2.manifestURL
     private static let backgroundCheckInterval: TimeInterval = 24 * 60 * 60
     private static let selectedTrackKey = "LibraryDataTrack.selected"
+    private static let activeTrackKey = "LibraryDataTrack.active"
+
+#if DEBUG
+    static let defaultDataMode: LibraryDataMode = .crawl4PrimaryWithV2Fallback
+#else
+    static let defaultDataMode: LibraryDataMode = .productionV2Only
+#endif
 
     enum RefreshTrigger: Sendable {
         case launch
@@ -67,7 +95,7 @@ enum DataRefreshService {
         case xTrending
 
         var cacheFilename: String {
-            selectedTrack().cacheFilename(for: self)
+            activeTrack().cacheFilename(for: self)
         }
     }
 
@@ -128,24 +156,61 @@ enum DataRefreshService {
         userDefaults.set(track.rawValue, forKey: selectedTrackKey)
     }
 
+    static func activeTrack(
+        userDefaults: UserDefaults = .standard,
+        mode: LibraryDataMode = defaultDataMode
+    ) -> LibraryDataTrack {
+        if mode == .productionV2Only {
+            return selectedTrack(userDefaults: userDefaults)
+        }
+        guard let rawValue = userDefaults.string(forKey: activeTrackKey),
+              let track = LibraryDataTrack(rawValue: rawValue) else {
+            return mode.primaryTrack
+        }
+        return track
+    }
+
+    static func setActiveTrack(
+        _ track: LibraryDataTrack,
+        userDefaults: UserDefaults = .standard
+    ) {
+        userDefaults.set(track.rawValue, forKey: activeTrackKey)
+    }
+
+    static func refreshTracks(
+        mode: LibraryDataMode = defaultDataMode,
+        userDefaults: UserDefaults = .standard
+    ) -> [LibraryDataTrack] {
+        switch mode {
+        case .productionV2Only:
+            return [selectedTrack(userDefaults: userDefaults)]
+        case .crawl4PrimaryWithV2Fallback:
+            return mode.fallbackTracks
+        }
+    }
+
+    static func shouldFallback(after error: Error) -> Bool {
+        !isCancellation(error)
+    }
+
     static func manifestURL(for track: LibraryDataTrack = selectedTrack()) -> URL {
         track.manifestURL
     }
 
     static func cachedData(for resource: Resource) -> Data? {
-        try? Data(contentsOf: cacheURL(for: resource, track: selectedTrack()))
+        cachedData(for: resource, track: activeTrack())
     }
 
     static func removeCachedData(for resource: Resource) {
-        try? FileManager.default.removeItem(at: cacheURL(for: resource, track: selectedTrack()))
+        removeCachedData(for: resource, track: activeTrack())
     }
 
     static func remoteXTrendingEnabled() -> Bool? {
-        loadMetadata(track: selectedTrack()).remoteXTrendingEnabled
+        loadMetadata(track: activeTrack()).remoteXTrendingEnabled
     }
 
     static func lastDisplayableDataUpdateDate() -> Date? {
-        let track = selectedTrack()
+        let track = activeTrack()
         let metadata = loadMetadata(track: track)
         return displayableDataUpdateDate(
             activeLibraryGeneratedAt: metadata.activeLibraryGeneratedAt,
@@ -172,7 +237,34 @@ enum DataRefreshService {
         trigger: RefreshTrigger,
         force: Bool = false
     ) async -> RefreshResult {
-        let track = selectedTrack()
+        let previousActiveTrack = activeTrack()
+        let tracks = refreshTracks()
+
+        for track in tracks {
+            do {
+                let result = try await refreshIfNeeded(trigger: trigger, force: force, track: track)
+                setActiveTrack(track)
+                return previousActiveTrack == track ? result : .updated
+            } catch {
+                if !shouldFallback(after: error) {
+                    return .skipped
+                }
+                print("[DataRefreshService] \(track.label) refresh failed: \(error)")
+                Analytics.signal("error.refresh_failed", parameters: [
+                    "track": track.rawValue,
+                    "error": error.localizedDescription
+                ])
+            }
+        }
+
+        return .skipped
+    }
+
+    private static func refreshIfNeeded(
+        trigger: RefreshTrigger,
+        force: Bool,
+        track: LibraryDataTrack
+    ) async throws -> RefreshResult {
         var metadata = loadMetadata(track: track)
         let now = Date().timeIntervalSince1970
         let bootstrapState = bootstrapState(metadata: metadata, track: track)
@@ -192,72 +284,63 @@ enum DataRefreshService {
         }
         saveMetadata(metadata, track: track)
 
-        do {
-            let manifestData = try await download(from: manifestURL(for: track))
-            let manifest = try JSONDecoder().decode(Manifest.self, from: manifestData)
-            var didUpdate = false
-            metadata.lastManifestCheckAt = now
-            metadata.lastCheckedAt = now
-            metadata.activeLibraryGeneratedAt = manifest.generatedAt
-            metadata.remoteXTrendingEnabled = manifest.xTrending != nil
+        let manifestData = try await download(from: manifestURL(for: track))
+        let manifest = try JSONDecoder().decode(Manifest.self, from: manifestData)
+        var didUpdate = false
+        metadata.lastManifestCheckAt = now
+        metadata.lastCheckedAt = now
+        metadata.activeLibraryGeneratedAt = manifest.generatedAt
+        metadata.remoteXTrendingEnabled = manifest.xTrending != nil
 
-            if shouldUpdateAsset(
-                activeHash: metadata.activeSkillsHash,
-                hasCachedData: cachedData(for: .skills, track: track) != nil,
-                manifestHash: manifest.skills.sha256
-            ) {
-                let data = try await fetchAndValidate(asset: manifest.skills, decodeAs: [Skill].self, track: track)
-                try writeCache(data, for: .skills, track: track)
-                metadata.activeSkillsHash = manifest.skills.sha256
-                didUpdate = true
-            }
-
-            if let trending = manifest.trending,
-               shouldUpdateAsset(
-                activeHash: metadata.activeTrendingHash,
-                hasCachedData: cachedData(for: .trending, track: track) != nil,
-                manifestHash: trending.sha256
-               ) {
-                let data = try await fetchAndValidate(asset: trending, decodeAs: [TrendingEntry].self, track: track)
-                try writeCache(data, for: .trending, track: track)
-                metadata.activeTrendingHash = trending.sha256
-                didUpdate = true
-            }
-
-            if let xTrending = manifest.xTrending,
-               shouldUpdateAsset(
-                activeHash: metadata.activeXTrendingHash,
-                hasCachedData: cachedData(for: .xTrending, track: track) != nil,
-                manifestHash: xTrending.sha256
-               ) {
-                do {
-                    let data = try await fetchAndValidate(asset: xTrending, decodeAs: [Skill].self, track: track)
-                    try writeCache(data, for: .xTrending, track: track)
-                    metadata.activeXTrendingHash = xTrending.sha256
-                    didUpdate = true
-                } catch {
-                    print("[DataRefreshService] xTrending refresh failed: \(error)")
-                }
-            } else if manifest.xTrending == nil,
-                      (cachedData(for: .xTrending, track: track) != nil || metadata.activeXTrendingHash != nil) {
-                removeCachedData(for: .xTrending, track: track)
-                metadata.activeXTrendingHash = nil
-                didUpdate = true
-            }
-
-            if didUpdate {
-                metadata.lastSuccessfulRefreshAt = Date().timeIntervalSince1970
-            }
-            saveMetadata(metadata, track: track)
-            return didUpdate ? .updated : .checkedNoChange
-        } catch {
-            print("[DataRefreshService] Refresh failed: \(error)")
-            Analytics.signal("error.refresh_failed", parameters: [
-                "error": error.localizedDescription
-            ])
-            saveMetadata(metadata, track: track)
-            return .skipped
+        if shouldUpdateAsset(
+            activeHash: metadata.activeSkillsHash,
+            hasCachedData: cachedData(for: .skills, track: track) != nil,
+            manifestHash: manifest.skills.sha256
+        ) {
+            let data = try await fetchAndValidate(asset: manifest.skills, decodeAs: [Skill].self, track: track)
+            try writeCache(data, for: .skills, track: track)
+            metadata.activeSkillsHash = manifest.skills.sha256
+            didUpdate = true
         }
+
+        if let trending = manifest.trending,
+           shouldUpdateAsset(
+            activeHash: metadata.activeTrendingHash,
+            hasCachedData: cachedData(for: .trending, track: track) != nil,
+            manifestHash: trending.sha256
+           ) {
+            let data = try await fetchAndValidate(asset: trending, decodeAs: [TrendingEntry].self, track: track)
+            try writeCache(data, for: .trending, track: track)
+            metadata.activeTrendingHash = trending.sha256
+            didUpdate = true
+        }
+
+        if let xTrending = manifest.xTrending,
+           shouldUpdateAsset(
+            activeHash: metadata.activeXTrendingHash,
+            hasCachedData: cachedData(for: .xTrending, track: track) != nil,
+            manifestHash: xTrending.sha256
+           ) {
+            do {
+                let data = try await fetchAndValidate(asset: xTrending, decodeAs: [Skill].self, track: track)
+                try writeCache(data, for: .xTrending, track: track)
+                metadata.activeXTrendingHash = xTrending.sha256
+                didUpdate = true
+            } catch {
+                print("[DataRefreshService] xTrending refresh failed: \(error)")
+            }
+        } else if manifest.xTrending == nil,
+                  (cachedData(for: .xTrending, track: track) != nil || metadata.activeXTrendingHash != nil) {
+            removeCachedData(for: .xTrending, track: track)
+            metadata.activeXTrendingHash = nil
+            didUpdate = true
+        }
+
+        if didUpdate {
+            metadata.lastSuccessfulRefreshAt = Date().timeIntervalSince1970
+        }
+        saveMetadata(metadata, track: track)
+        return didUpdate ? .updated : .checkedNoChange
     }
 
     private static func shouldThrottleRefresh(
@@ -368,11 +451,11 @@ enum DataRefreshService {
         applicationSupportDirectory().appendingPathComponent(track.cacheFilename(for: resource))
     }
 
-    private static func cachedData(for resource: Resource, track: LibraryDataTrack) -> Data? {
+    static func cachedData(for resource: Resource, track: LibraryDataTrack) -> Data? {
         try? Data(contentsOf: cacheURL(for: resource, track: track))
     }
 
-    private static func removeCachedData(for resource: Resource, track: LibraryDataTrack) {
+    static func removeCachedData(for resource: Resource, track: LibraryDataTrack) {
         try? FileManager.default.removeItem(at: cacheURL(for: resource, track: track))
     }
 
@@ -425,6 +508,17 @@ enum DataRefreshService {
 
     private static func sha256Hex(_ data: Data) -> String {
         SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func isCancellation(_ error: Error) -> Bool {
+        if error is CancellationError {
+            return true
+        }
+        if let urlError = error as? URLError,
+           urlError.code == .cancelled {
+            return true
+        }
+        return false
     }
 
     private enum RefreshError: Error {

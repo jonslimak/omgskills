@@ -112,6 +112,32 @@ private struct StarterSearch: Identifiable, Hashable {
     }
 }
 
+private struct DataUpdatedFooterView: View {
+    let text: String
+    private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text(text)
+                .fontWeight(.regular)
+            Spacer(minLength: 8)
+            Text("v\(appVersion)")
+                .fontWeight(.regular)
+        }
+        .font(.caption2)
+        .foregroundStyle(.tertiary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 18)
+        .padding(.bottom, 14)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityText)
+    }
+
+    private var accessibilityText: String {
+        "\(text.replacingOccurrences(of: "Data Updated", with: "Library data updated")), app version \(appVersion)"
+    }
+}
+
 struct ContentView: View {
     @StateObject private var store = SkillsStore()
     @State private var query = ""
@@ -130,7 +156,7 @@ struct ContentView: View {
     @State private var scrollTargetId: String?
     @State private var updateAvailable = false
     @State private var debouncedQuery = ""
-    @State private var showDataUpdatedToast = false
+    @State private var showDataUpdatedFooter = false
     @State private var dataUpdatedText = ""
     @State private var dataUpdatedTask: Task<Void, Never>?
     @State private var claudeInstallState: SkillInstallState = .idle
@@ -143,8 +169,10 @@ struct ContentView: View {
     @State private var githubInstallClaude = true
     @State private var githubInstallPromptStatus: GitHubInstallPromptStatus = .idle
     @State private var crossInstallState: CrossInstallState = .idle
+#if !DEBUG
     @State private var libraryDataTrack = DataRefreshService.selectedTrack()
     @State private var isSwitchingLibraryTrack = false
+#endif
     @State private var savedSession: PopoverSessionState?
     @State private var isRestoringSession = false
     @State private var suppressSessionChangeHandlers = false
@@ -273,17 +301,6 @@ struct ContentView: View {
             Divider()
             masterDetail
         }
-        .overlay(alignment: .top) {
-            if showDataUpdatedToast {
-                Text(dataUpdatedText)
-                    .font(.system(size: 9))
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 10)
-                    .allowsHitTesting(false)
-                    .transition(.opacity)
-                    .zIndex(10)
-            }
-        }
         .overlay {
             if skillPendingDelete != nil {
                 deleteConfirmationOverlay
@@ -314,7 +331,7 @@ struct ContentView: View {
             dataUpdatedTask?.cancel()
             readmeLoadTask?.cancel()
             resetInstallStates()
-            showDataUpdatedToast = false
+            showDataUpdatedFooter = false
         }
         .task(id: query) {
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -339,10 +356,6 @@ struct ContentView: View {
             } else {
                 resetToDefaultOpenState()
             }
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(250))
-                showDataUpdatedToastIfPossible()
-            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                 searchFocused = true
             }
@@ -350,6 +363,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .libraryDataDidRefresh)) { _ in
             Task { await store.reloadLibraryData() }
             refreshResults(selectFirst: selectedId == nil)
+            if source == .installed {
+                showDataUpdatedFooterIfPossible()
+            }
         }
         .onChange(of: query) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
@@ -380,12 +396,17 @@ struct ContentView: View {
             refreshResults(selectFirst: true)
             captureSessionIfNeeded()
         }
-        .onChange(of: source)   { _, _ in
+        .onChange(of: source)   { _, newSource in
             guard !suppressSessionChangeHandlers else { return }
             if isApplyingCreatorFilter {
                 isApplyingCreatorFilter = false
             } else {
                 selectedCreatorHandle = nil
+            }
+            if newSource == .installed {
+                showDataUpdatedFooterIfPossible()
+            } else {
+                showDataUpdatedFooter = false
             }
             if source != .installed { localDashboardFilter = nil }
             if source == .trending { sortKey = .trending }
@@ -460,6 +481,7 @@ struct ContentView: View {
 
                 Spacer()
 
+#if !DEBUG
                 Button {
                     switchLibraryDataTrack()
                 } label: {
@@ -474,6 +496,7 @@ struct ContentView: View {
                 .foregroundStyle(libraryDataTrack == .crawl4 ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
                 .disabled(isSwitchingLibraryTrack)
                 .help(libraryDataTrack == .crawl4 ? "Using Crawl 4 library" : "Switch to Crawl 4 library")
+#endif
 
                 if updateAvailable {
                     Button {
@@ -515,6 +538,7 @@ struct ContentView: View {
         !cachedResults.isEmpty
     }
 
+#if !DEBUG
     private func switchLibraryDataTrack() {
         let nextTrack: LibraryDataTrack = libraryDataTrack == .crawl4 ? .productionV2 : .crawl4
         libraryDataTrack = nextTrack
@@ -532,15 +556,15 @@ struct ContentView: View {
         cachedResults = []
         postDetailVisibility(false)
 
-        Task { @MainActor in
-            await store.refreshRemoteDataIfNeeded(force: true)
-            await store.reloadLibraryData()
-            refreshResults(selectFirst: true)
-            showDataUpdatedToastIfPossible()
-            isSwitchingLibraryTrack = false
-            searchFocused = true
-        }
+            Task { @MainActor in
+                await store.refreshRemoteDataIfNeeded(force: true)
+                await store.reloadLibraryData()
+                refreshResults(selectFirst: true)
+                isSwitchingLibraryTrack = false
+                searchFocused = true
+            }
     }
+#endif
 
     private var shouldSelectFirstResult: Bool {
         !(showDetail && selectedId != nil)
@@ -828,6 +852,10 @@ struct ContentView: View {
                     isInstalling: githubInstallPromptStatus == .installing,
                     onInstall: installGitHubPromptSkill
                 )
+                if showDataUpdatedFooter {
+                    DataUpdatedFooterView(text: dataUpdatedText)
+                        .transition(.opacity)
+                }
             }
         }
     }
@@ -1453,20 +1481,20 @@ struct ContentView: View {
         }
     }
 
-    private func showDataUpdatedToastIfPossible() {
+    private func showDataUpdatedFooterIfPossible() {
         guard let date = DataRefreshService.lastDisplayableDataUpdateDate() else { return }
         let age = relativeRefreshAge(from: date)
         dataUpdatedText = age == "now" ? "Data Updated now" : "Data Updated \(age) ago"
         dataUpdatedTask?.cancel()
         withAnimation(.easeInOut(duration: 0.15)) {
-            showDataUpdatedToast = true
+            showDataUpdatedFooter = true
         }
         dataUpdatedTask = Task {
             try? await Task.sleep(for: .seconds(3))
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 withAnimation(.easeInOut(duration: 0.15)) {
-                    showDataUpdatedToast = false
+                    showDataUpdatedFooter = false
                 }
             }
         }
