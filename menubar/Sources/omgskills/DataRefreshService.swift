@@ -66,14 +66,12 @@ enum LibraryDataMode {
 enum DataRefreshService {
     static let manifestURL = LibraryDataTrack.productionV2.manifestURL
     private static let backgroundCheckInterval: TimeInterval = 24 * 60 * 60
+    private static let panelOpenCheckInterval: TimeInterval = 5 * 60
+    private static let downloadRetryDelays: [TimeInterval] = [1, 2]
     private static let selectedTrackKey = "LibraryDataTrack.selected"
     private static let activeTrackKey = "LibraryDataTrack.active"
 
-#if DEBUG
     static let defaultDataMode: LibraryDataMode = .crawl4PrimaryWithV2Fallback
-#else
-    static let defaultDataMode: LibraryDataMode = .productionV2Only
-#endif
 
     enum RefreshTrigger: Sendable {
         case launch
@@ -81,12 +79,38 @@ enum DataRefreshService {
         case wake
         case timer
         case scheduler
+
+        var analyticsValue: String {
+            switch self {
+            case .launch: return "launch"
+            case .panelOpen: return "panel_open"
+            case .wake: return "wake"
+            case .timer: return "timer"
+            case .scheduler: return "scheduler"
+            }
+        }
     }
 
     enum RefreshResult: Sendable, Equatable {
         case skipped
         case checkedNoChange
         case updated
+
+        var analyticsValue: String {
+            switch self {
+            case .skipped: return "skipped"
+            case .checkedNoChange: return "checked_no_change"
+            case .updated: return "updated"
+            }
+        }
+
+        var refreshSignalName: String? {
+            switch self {
+            case .updated: return "refresh_updated"
+            case .checkedNoChange: return "refresh_checked_no_change"
+            case .skipped: return nil
+            }
+        }
     }
 
     enum Resource: String {
@@ -244,16 +268,18 @@ enum DataRefreshService {
             do {
                 let result = try await refreshIfNeeded(trigger: trigger, force: force, track: track)
                 setActiveTrack(track)
-                return previousActiveTrack == track ? result : .updated
+                let reportedResult: RefreshResult = previousActiveTrack == track ? result : .updated
+                signalRefreshResult(trigger: trigger, track: track, result: reportedResult)
+                return reportedResult
             } catch {
                 if !shouldFallback(after: error) {
                     return .skipped
                 }
                 print("[DataRefreshService] \(track.label) refresh failed: \(error)")
-                Analytics.signal("error.refresh_failed", parameters: [
-                    "track": track.rawValue,
-                    "error": error.localizedDescription
-                ])
+                Analytics.signal(
+                    "error.refresh_failed",
+                    parameters: refreshFailureParameters(trigger: trigger, track: track, error: error)
+                )
             }
         }
 
@@ -353,7 +379,10 @@ enum DataRefreshService {
 
         switch trigger {
         case .panelOpen:
-            return false
+            return shouldThrottlePanelOpenCheck(
+                lastPanelOpenAttemptAt: metadata.lastPanelOpenAttemptAt,
+                now: now
+            )
         case .launch, .wake, .timer, .scheduler:
             let lastManifestCheckAt = metadata.lastManifestCheckAt ?? metadata.lastCheckedAt
             return shouldThrottleBackgroundRefresh(
@@ -377,7 +406,10 @@ enum DataRefreshService {
         lastPanelOpenAttemptAt: TimeInterval?,
         now: TimeInterval
     ) -> Bool {
-        false
+        guard let lastPanelOpenAttemptAt else {
+            return false
+        }
+        return now - lastPanelOpenAttemptAt < panelOpenCheckInterval
     }
 
     static func shouldThrottleRefresh(
@@ -401,6 +433,89 @@ enum DataRefreshService {
         return activeHash != manifestHash
     }
 
+    static func downloadRetryDelay(afterAttempt attempt: Int) -> TimeInterval? {
+        guard attempt > 0,
+              attempt <= downloadRetryDelays.count else {
+            return nil
+        }
+        return downloadRetryDelays[attempt - 1]
+    }
+
+    static func isRetriableDownloadError(_ error: Error) -> Bool {
+        if isCancellation(error) {
+            return false
+        }
+
+        if let refreshError = error as? RefreshError {
+            switch refreshError {
+            case .badAssetPath, .byteCountMismatch, .hashMismatch, .downloadFailed:
+                return false
+            case .badHTTPResponse(let statusCode):
+                guard let statusCode else { return true }
+                return statusCode == 408 || statusCode == 429 || (500..<600).contains(statusCode)
+            }
+        }
+
+        guard let urlError = error as? URLError else {
+            return false
+        }
+        switch urlError.code {
+        case .timedOut,
+             .cannotFindHost,
+             .cannotConnectToHost,
+             .dnsLookupFailed,
+             .networkConnectionLost,
+             .notConnectedToInternet,
+             .secureConnectionFailed,
+             .cannotLoadFromNetwork,
+             .badServerResponse:
+            return true
+        default:
+            return false
+        }
+    }
+
+    static func refreshResultParameters(
+        trigger: RefreshTrigger,
+        track: LibraryDataTrack,
+        result: RefreshResult
+    ) -> [String: String] {
+        [
+            "trigger": trigger.analyticsValue,
+            "track": track.rawValue,
+            "result": result.analyticsValue
+        ]
+    }
+
+    static func refreshFailureParameters(
+        trigger: RefreshTrigger,
+        track: LibraryDataTrack,
+        error: Error
+    ) -> [String: String] {
+        [
+            "trigger": trigger.analyticsValue,
+            "track": track.rawValue,
+            "result": "failed",
+            "error_code": refreshErrorCode(for: error),
+            "error": error.localizedDescription,
+            "attempt_count": String(downloadAttemptCount(for: error))
+        ]
+    }
+
+    private static func signalRefreshResult(
+        trigger: RefreshTrigger,
+        track: LibraryDataTrack,
+        result: RefreshResult
+    ) {
+        guard let signalName = result.refreshSignalName else {
+            return
+        }
+        Analytics.signal(
+            signalName,
+            parameters: refreshResultParameters(trigger: trigger, track: track, result: result)
+        )
+    }
+
     private static func fetchAndValidate<T: Decodable>(asset: Asset, decodeAs type: T.Type, track: LibraryDataTrack) async throws -> Data {
         let url = try assetURL(for: asset, track: track)
         let data = try await download(from: url)
@@ -417,14 +532,50 @@ enum DataRefreshService {
     }
 
     private static func download(from url: URL) async throws -> Data {
+        try await downloadWithRetry(from: url)
+    }
+
+    private static func downloadWithRetry(
+        from url: URL,
+        sleep: (TimeInterval) async throws -> Void = { seconds in
+            try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+        }
+    ) async throws -> Data {
+        var attempt = 1
+
+        while true {
+            try Task.checkCancellation()
+
+            do {
+                return try await downloadOnce(from: url)
+            } catch {
+                if isCancellation(error) {
+                    throw error
+                }
+
+                guard let delay = downloadRetryDelay(afterAttempt: attempt),
+                      isRetriableDownloadError(error) else {
+                    throw RefreshError.downloadFailed(underlying: error, attemptCount: attempt)
+                }
+
+                try Task.checkCancellation()
+                try await sleep(delay)
+                attempt += 1
+            }
+        }
+    }
+
+    private static func downloadOnce(from url: URL) async throws -> Data {
         var request = URLRequest(url: url)
         request.cachePolicy = .reloadIgnoringLocalCacheData
         request.timeoutInterval = 30
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse,
-              (200..<300).contains(http.statusCode) else {
-            throw RefreshError.badHTTPResponse
+        guard let http = response as? HTTPURLResponse else {
+            throw RefreshError.badHTTPResponse(statusCode: nil)
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            throw RefreshError.badHTTPResponse(statusCode: http.statusCode)
         }
         return data
     }
@@ -521,11 +672,63 @@ enum DataRefreshService {
         return false
     }
 
-    private enum RefreshError: Error {
+    private static func downloadAttemptCount(for error: Error) -> Int {
+        if case let RefreshError.downloadFailed(_, attemptCount) = error {
+            return attemptCount
+        }
+        return 1
+    }
+
+    static func refreshErrorCode(for error: Error) -> String {
+        if isCancellation(error) {
+            return "cancelled"
+        }
+        if let urlError = error as? URLError {
+            return "url_\(urlError.errorCode)"
+        }
+        if let refreshError = error as? RefreshError {
+            switch refreshError {
+            case .badAssetPath:
+                return "bad_asset_path"
+            case .badHTTPResponse(let statusCode):
+                guard let statusCode else { return "http_unknown" }
+                return "http_\(statusCode)"
+            case .byteCountMismatch:
+                return "byte_count_mismatch"
+            case .downloadFailed(let underlying, _):
+                let underlyingCode = refreshErrorCode(for: underlying)
+                return underlyingCode == "unknown" ? "download_failed" : underlyingCode
+            case .hashMismatch:
+                return "hash_mismatch"
+            }
+        }
+        return "unknown"
+    }
+
+    enum RefreshError: Error, LocalizedError {
         case badAssetPath(String)
-        case badHTTPResponse
+        case badHTTPResponse(statusCode: Int?)
         case byteCountMismatch(expected: Int, actual: Int)
+        case downloadFailed(underlying: Error, attemptCount: Int)
         case hashMismatch
+
+        var errorDescription: String? {
+            switch self {
+            case .badAssetPath(let path):
+                return "Bad asset path: \(path)"
+            case .badHTTPResponse(let statusCode):
+                if let statusCode {
+                    return "Bad HTTP response: \(statusCode)"
+                }
+                return "Bad HTTP response"
+            case .byteCountMismatch(let expected, let actual):
+                return "Byte count mismatch: expected \(expected), got \(actual)"
+            case .downloadFailed(let underlying, _):
+                return underlying.localizedDescription
+            case .hashMismatch:
+                return "Hash mismatch"
+            }
+        }
     }
 }
 

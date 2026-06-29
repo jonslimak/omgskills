@@ -22,8 +22,10 @@ final class SkillsStore: ObservableObject {
     private var trendingIndexTask: Task<Void, Never>?
     private var twitterIndexTask: Task<Void, Never>?
 
-    init() {
-        load()
+    init(autoload: Bool = true) {
+        if autoload {
+            load()
+        }
     }
 
     func load() {
@@ -76,38 +78,47 @@ final class SkillsStore: ObservableObject {
         async let twitterResult = decodeTwitterSkills()
 
         let available = await availableResult
-        let trendingBase = available
         let trending = await trendingResult
         let twitter = await twitterResult
         guard generation == loadGeneration else { return }
 
+        applyDecodedLibraryData(
+            available: available,
+            trending: trending,
+            twitter: twitter,
+            generation: generation
+        )
+    }
+
+    func applyDecodedLibraryData(
+        available: LoadResult<[Skill]>,
+        trending: LoadResult<[TrendingEntry]>,
+        twitter: LoadResult<[Skill]>,
+        generation: Int? = nil,
+        buildIndexes: Bool = true
+    ) {
+        let generation = generation ?? loadGeneration
+
         switch available {
         case .success(let skills):
             availableSkills = skills.sorted { $0.stars > $1.stars }
+            trendingBaseSkills = skills
             loadError = nil
-            buildIndex(for: availableSkills, kind: .available, generation: generation)
+            if buildIndexes {
+                buildIndex(for: availableSkills, kind: .available, generation: generation)
+            }
         case .failure(let error):
             loadError = error
-        }
-
-        switch trendingBase {
-        case .success(let skills):
-            trendingBaseSkills = skills
-        case .failure:
-            trendingBaseSkills = []
         }
 
         switch trending {
         case .success(let entries):
             trendingEntries = entries
             trendingLoadError = nil
+            rebuildTrending(generation: generation, buildIndex: buildIndexes)
         case .failure(let error):
-            trendingEntries = []
-            trendingSkills = []
             trendingLoadError = error
         }
-
-        rebuildTrending()
 
         switch twitter {
         case .success(let skills):
@@ -116,9 +127,10 @@ final class SkillsStore: ObservableObject {
                 (($1.tweetLikes ?? 0), $1.stars, $1.name)
             }
             twitterLoadError = nil
-            buildIndex(for: twitterSkills, kind: .twitter, generation: generation)
+            if buildIndexes {
+                buildIndex(for: twitterSkills, kind: .twitter, generation: generation)
+            }
         case .failure(let error):
-            twitterSkills = []
             twitterLoadError = error
         }
     }
@@ -278,12 +290,12 @@ final class SkillsStore: ObservableObject {
         case twitter
     }
 
-    private enum LoadResult<T: Sendable>: Sendable {
+    enum LoadResult<T: Sendable>: Sendable {
         case success(T)
         case failure(String)
     }
 
-    private func rebuildTrending() {
+    private func rebuildTrending(generation: Int, buildIndex shouldBuildIndex: Bool = true) {
         let byId = Dictionary(uniqueKeysWithValues: trendingBaseSkills.map { ($0.id, $0) })
         trendingSkills = trendingEntries.compactMap { entry in
             byId[entry.id]?.withTrending(entry)
@@ -293,7 +305,9 @@ final class SkillsStore: ObservableObject {
         } else if trendingLoadError == nil || trendingLoadError == "No trending ids matched the local library" {
             trendingLoadError = nil
         }
-        buildIndex(for: trendingSkills, kind: .trending, generation: loadGeneration)
+        if shouldBuildIndex {
+            buildIndex(for: trendingSkills, kind: .trending, generation: generation)
+        }
     }
 
     private func buildIndex(for skills: [Skill], kind: IndexKind, generation: Int) {

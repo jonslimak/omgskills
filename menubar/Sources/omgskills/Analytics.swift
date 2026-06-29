@@ -11,7 +11,7 @@ enum Analytics {
         let config = TelemetryDeck.Config(appID: appID, namespace: namespace)
         TelemetryDeck.initialize(config: config)
         trackInstallState()
-        signal("app.launched")
+        signal("app.launched", parameters: appVersionParameters())
     }
 
     static func signal(_ name: String, parameters: [String: String] = [:]) {
@@ -52,7 +52,7 @@ enum Analytics {
         return parameters
     }
 
-    private static func appVersionParameters() -> [String: String] {
+    static func appVersionParameters() -> [String: String] {
         [
             "app_version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown",
             "build_number": Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"

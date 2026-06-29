@@ -88,6 +88,113 @@ struct DataRefreshServiceTests {
         #expect(DataRefreshService.shouldFallback(after: URLError(.badServerResponse)) == true)
     }
 
+    @Test func retryDelayScheduleUsesThreeTotalAttempts() {
+        #expect(DataRefreshService.downloadRetryDelay(afterAttempt: 1) == 1)
+        #expect(DataRefreshService.downloadRetryDelay(afterAttempt: 2) == 2)
+        #expect(DataRefreshService.downloadRetryDelay(afterAttempt: 3) == nil)
+    }
+
+    @Test func refreshTriggerAnalyticsValuesAreStable() {
+        #expect(DataRefreshService.RefreshTrigger.launch.analyticsValue == "launch")
+        #expect(DataRefreshService.RefreshTrigger.panelOpen.analyticsValue == "panel_open")
+        #expect(DataRefreshService.RefreshTrigger.wake.analyticsValue == "wake")
+        #expect(DataRefreshService.RefreshTrigger.timer.analyticsValue == "timer")
+        #expect(DataRefreshService.RefreshTrigger.scheduler.analyticsValue == "scheduler")
+    }
+
+    @Test func refreshResultAnalyticsValuesAreStable() {
+        #expect(DataRefreshService.RefreshResult.updated.analyticsValue == "updated")
+        #expect(DataRefreshService.RefreshResult.checkedNoChange.analyticsValue == "checked_no_change")
+        #expect(DataRefreshService.RefreshResult.skipped.analyticsValue == "skipped")
+        #expect(DataRefreshService.RefreshResult.updated.refreshSignalName == "refresh_updated")
+        #expect(DataRefreshService.RefreshResult.checkedNoChange.refreshSignalName == "refresh_checked_no_change")
+        #expect(DataRefreshService.RefreshResult.skipped.refreshSignalName == nil)
+    }
+
+    @Test func refreshResultParametersIncludeTriggerTrackAndResult() {
+        let parameters = DataRefreshService.refreshResultParameters(
+            trigger: .panelOpen,
+            track: .crawl4,
+            result: .checkedNoChange
+        )
+
+        #expect(parameters["trigger"] == "panel_open")
+        #expect(parameters["track"] == "crawl4")
+        #expect(parameters["result"] == "checked_no_change")
+    }
+
+    @Test func transientDownloadErrorsAreRetried() {
+        #expect(DataRefreshService.isRetriableDownloadError(URLError(.timedOut)) == true)
+        #expect(DataRefreshService.isRetriableDownloadError(URLError(.networkConnectionLost)) == true)
+        #expect(DataRefreshService.isRetriableDownloadError(URLError(.notConnectedToInternet)) == true)
+        #expect(DataRefreshService.isRetriableDownloadError(
+            DataRefreshService.RefreshError.badHTTPResponse(statusCode: 503)
+        ) == true)
+    }
+
+    @Test func cancellationAndValidationErrorsAreNotRetried() {
+        #expect(DataRefreshService.isRetriableDownloadError(CancellationError()) == false)
+        #expect(DataRefreshService.isRetriableDownloadError(URLError(.cancelled)) == false)
+        #expect(DataRefreshService.isRetriableDownloadError(
+            DataRefreshService.RefreshError.badAssetPath("bad path")
+        ) == false)
+        #expect(DataRefreshService.isRetriableDownloadError(
+            DataRefreshService.RefreshError.byteCountMismatch(expected: 10, actual: 5)
+        ) == false)
+        #expect(DataRefreshService.isRetriableDownloadError(
+            DataRefreshService.RefreshError.hashMismatch
+        ) == false)
+    }
+
+    @Test func clientHTTPFailuresAreNotRetriedExceptThrottleAndTimeoutStatuses() {
+        #expect(DataRefreshService.isRetriableDownloadError(
+            DataRefreshService.RefreshError.badHTTPResponse(statusCode: 404)
+        ) == false)
+        #expect(DataRefreshService.isRetriableDownloadError(
+            DataRefreshService.RefreshError.badHTTPResponse(statusCode: 408)
+        ) == true)
+        #expect(DataRefreshService.isRetriableDownloadError(
+            DataRefreshService.RefreshError.badHTTPResponse(statusCode: 429)
+        ) == true)
+    }
+
+    @Test func refreshFailureParametersIncludeTriggerResultErrorCodeAndAttemptCount() {
+        let error = DataRefreshService.RefreshError.downloadFailed(
+            underlying: URLError(.timedOut),
+            attemptCount: 3
+        )
+        let parameters = DataRefreshService.refreshFailureParameters(
+            trigger: .wake,
+            track: .productionV2,
+            error: error
+        )
+
+        #expect(parameters["trigger"] == "wake")
+        #expect(parameters["track"] == "productionV2")
+        #expect(parameters["result"] == "failed")
+        #expect(parameters["error_code"] == "url_-1001")
+        #expect(parameters["attempt_count"] == "3")
+        #expect(parameters["error"]?.isEmpty == false)
+    }
+
+    @Test func refreshErrorCodesAreStable() {
+        #expect(DataRefreshService.refreshErrorCode(for: CancellationError()) == "cancelled")
+        #expect(DataRefreshService.refreshErrorCode(for: URLError(.notConnectedToInternet)) == "url_-1009")
+        #expect(DataRefreshService.refreshErrorCode(for:
+            DataRefreshService.RefreshError.badHTTPResponse(statusCode: 503)
+        ) == "http_503")
+        #expect(DataRefreshService.refreshErrorCode(for:
+            DataRefreshService.RefreshError.badAssetPath("bad path")
+        ) == "bad_asset_path")
+        #expect(DataRefreshService.refreshErrorCode(for:
+            DataRefreshService.RefreshError.byteCountMismatch(expected: 10, actual: 5)
+        ) == "byte_count_mismatch")
+        #expect(DataRefreshService.refreshErrorCode(for:
+            DataRefreshService.RefreshError.hashMismatch
+        ) == "hash_mismatch")
+        #expect(DataRefreshService.refreshErrorCode(for: NSError(domain: "test", code: 1)) == "unknown")
+    }
+
     @Test func manifestURLUsesSelectedTrack() {
         #expect(DataRefreshService.manifestURL(for: .productionV2).absoluteString == "https://omgskills.com/data/v2/manifest.json")
         #expect(DataRefreshService.manifestURL(for: .crawl4).absoluteString == "https://omgskills.com/data/crawl4/manifest.json")
@@ -205,14 +312,18 @@ struct DataRefreshServiceTests {
         ) == false)
     }
 
-    @Test func panelOpenChecksAreNeverThrottled() {
+    @Test func panelOpenChecksThrottleForFiveMinutes() {
         #expect(DataRefreshService.shouldThrottlePanelOpenCheck(
-            lastPanelOpenAttemptAt: 10_000,
+            lastPanelOpenAttemptAt: nil,
             now: 10_030
         ) == false)
         #expect(DataRefreshService.shouldThrottlePanelOpenCheck(
             lastPanelOpenAttemptAt: 10_000,
-            now: 10_061
+            now: 10_030
+        ) == true)
+        #expect(DataRefreshService.shouldThrottlePanelOpenCheck(
+            lastPanelOpenAttemptAt: 10_000,
+            now: 10_000 + (5 * 60) + 1
         ) == false)
     }
 
