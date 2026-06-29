@@ -8,7 +8,7 @@
     "likes": 2209,
     "retweets": 335,
     "replies": 46,
-    "views": 182045,
+    "views": 182108,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -37,7 +37,36 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 156064
+        "stars": 156507
+      }
+    ]
+  },
+  {
+    "tweet_id": "2069253991846862932",
+    "tweet_url": "https://x.com/Dinosn/status/2069253991846862932",
+    "author_handle": "Dinosn",
+    "author_name": "Nicolas Krassas",
+    "text": "cloudflare/security-audit-skill: A coding-agent skill for multi-phase security audits with independently verified, machine-readable findings https://t.co/BY59yQcXlA https://github.com/cloudflare/security-audit-skill",
+    "likes": 839,
+    "retweets": 116,
+    "replies": 5,
+    "views": 56487,
+    "posted_at": "2026-06-23T02:59:31.000Z",
+    "repo_ids": [
+      "cloudflare/security-audit-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/cloudflare/security-audit-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "cloudflare/security-audit-skill",
+        "github_url": "https://github.com/cloudflare/security-audit-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "security-audit",
+        "description": "Security audit of a codebase — web apps, APIs, services, CLI tools, libraries, daemons, and more. Use when asked to find security bugs, do a security review, audit for vulnerabilities, or pen-test the code. Focuses on exploitable issues with real impact, not theoretical concerns or industry-standard behavior.",
+        "stars": 1719
       }
     ]
   },
@@ -50,7 +79,7 @@
     "likes": 619,
     "retweets": 34,
     "replies": 7,
-    "views": 71874,
+    "views": 72027,
     "posted_at": "2026-06-24T19:54:01.000Z",
     "repo_ids": [
       "nicobailon/visual-explainer"
@@ -66,7 +95,7 @@
         "skill_md_path": "plugins/visual-explainer/SKILL.md",
         "name": "visual-explainer",
         "description": "Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, comparison tables, slide decks, and other visual explanations.",
-        "stars": 9083
+        "stars": 9095
       }
     ]
   },
@@ -76,10 +105,10 @@
     "author_handle": "cnyzgkc",
     "author_name": "木马人",
     "text": "用AI 做PPT，我非常推荐两个人的skill\n\n1. 张咋啦 @zarazhangrui frontend-slides:：https://t.co/FwSBsa4Y3G\n\n2.归藏  @op7418 的 guizang-ppt-skill：https://t.co/StyX3G1VGh\n\n使用方式很简单：\n将上述两个地址发给Codex，然后跟agent说安装skill https://t.co/XOlZQFk5s8 https://github.com/zarazhangrui/frontend-slides https://github.com/op7418/guizang-ppt-skill",
-    "likes": 404,
-    "retweets": 107,
+    "likes": 407,
+    "retweets": 108,
     "replies": 12,
-    "views": 37775,
+    "views": 38461,
     "posted_at": "2026-06-23T15:37:49.000Z",
     "repo_ids": [
       "zarazhangrui/frontend-slides",
@@ -97,36 +126,7 @@
         "skill_md_path": "SKILL.md",
         "name": "guizang-ppt-skill",
         "description": "生成横向翻页网页 PPT（单 HTML 文件），含 WebGL 背景、章节幕封、数据大字报、图片网格等模板。提供两种风格：① \"电子杂志 × 电子墨水\"（衬线 + 流体背景 + 暖色） ② \"瑞士国际主义\"（无衬线 + 网格点阵 + IKB/柠檬黄/柠檬绿/安全橙高亮）。当用户需要制作分享 / 演讲 / 发布会风格的网页 PPT，或提到\"杂志风 PPT\"、\"瑞士风 PPT\"、\"Swiss Style\"、\"horizontal swipe deck\"时使用。",
-        "stars": 19238
-      }
-    ]
-  },
-  {
-    "tweet_id": "2041420401381691400",
-    "tweet_url": "https://x.com/akaclandestine/status/2041420401381691400",
-    "author_handle": "akaclandestine",
-    "author_name": "Clandestine",
-    "text": "GitHub - 7onez/cti-expert: CTI Expert — Cyber Threat Intelligence &amp; OSINT analysis skill for Claude Code. 50+ commands, 29 techniques, no API keys required. · GitHub https://t.co/8ijJgE01Ll https://github.com/7onez/cti-expert",
-    "likes": 232,
-    "retweets": 55,
-    "replies": 0,
-    "views": 12528,
-    "posted_at": "2026-04-07T07:38:46.000Z",
-    "repo_ids": [
-      "7onez/cti-expert"
-    ],
-    "repo_urls": [
-      "https://github.com/7onez/cti-expert"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "7onez/cti-expert",
-        "github_url": "https://github.com/7onez/cti-expert",
-        "skill_md_path": "SKILL.md",
-        "name": "cti-expert",
-        "description": "CTI Expert — cyber threat intelligence and OSINT analysis toolkit. Activates on: OSINT, CTI, threat intelligence, digital footprint, social media investigation, username enumeration, email tracing, domain recon, OPSEC, metadata analysis, people search, geolocation, breach checking, phone lookup, subdomain enumeration, case investigation, recon, due diligence, image forensics, face search, blockchain investigation, crypto tracing, flight tracking, maritime tracking, vehicle lookup, darknet search, WiFi SSID geolocation, vulnerability lookup, ransomware check, M365 recon, Azure tenant enumeration. Commands: /case, /sweep, /query, /subject, /timeline, /report, /brief, /exposure, /username, /phone, /breach-deep, /vuln-check, /wifi, /flow, /threat-model, /msftrecon. Techniques: social media platforms, advanced geolocation, web/DNS forensics, image forensics, blockchain, transport tracking, darknet, people search, cloud audit, incident triage, OWASP audit, prompt injection audit. Author: Hieu Ngo - chongluadao.vn",
-        "stars": 185
+        "stars": 19369
       }
     ]
   },
@@ -136,10 +136,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Manage Home Assistant configuration and automation via Claude Code\n\nhttps://t.co/G1MjygoshC https://t.co/sBGA3beHdJ https://github.com/komal-SkyNET/claude-skill-homeassistant",
-    "likes": 101,
+    "likes": 112,
     "retweets": 15,
-    "replies": 0,
-    "views": 10038,
+    "replies": 1,
+    "views": 11653,
     "posted_at": "2026-06-27T06:48:09.000Z",
     "repo_ids": [
       "komal-SkyNET/claude-skill-homeassistant"
@@ -155,154 +155,183 @@
         "skill_md_path": "skills/home-assistant-manager/SKILL.md",
         "name": "home-assistant-manager",
         "description": "Manage Home Assistant configuration safely and fast — edit and deploy YAML (automations, scripts, scenes, templates, MQTT), validate with ha core check, deploy via git or rapid scp, reload-vs-restart correctly, verify changes from logs and entity state, and build Lovelace dashboards. Use for any Home Assistant config, automation, template, or dashboard work over SSH/hass-cli/MCP.",
-        "stars": 569
+        "stars": 663
       }
     ]
   },
   {
-    "tweet_id": "2009678331281838245",
-    "tweet_url": "https://x.com/vista8/status/2009678331281838245",
-    "author_handle": "vista8",
-    "author_name": "向阳乔木",
-    "text": "如何快速共享一个Claude Code写的Skill\n\n你只需要跟Claude 说：\n\n“把某某 skill，用Github cli发布到github”\n\n（前提是先配置好Github cli，不复杂）\n\n等一会儿，Github就地址就有了。\n\nhttps://t.co/0SsskGXPTV https://t.co/p4UhD0lu0a https://github.com/joeseesun/multi-lens-thinking",
-    "likes": 87,
-    "retweets": 13,
+    "tweet_id": "2069003823729762815",
+    "tweet_url": "https://x.com/aronprins/status/2069003823729762815",
+    "author_handle": "aronprins",
+    "author_name": "Aron Prins",
+    "text": "BIG UPDATE! \n\nMy Claude Loop and Codex Loop now support parallel waves, making your development go smoother but more importantly... FASTER!\n\nGet these skills free 👇\nhttps://t.co/I9vxAtuZ9K\nhttps://t.co/7cO65ahvnT https://t.co/TzQczIf4qn https://github.com/aronprins/claude-loop https://github.com/aronprins/codex-loop",
+    "likes": 99,
+    "retweets": 6,
     "replies": 3,
-    "views": 13311,
-    "posted_at": "2026-01-09T17:27:06.000Z",
+    "views": 18004,
+    "posted_at": "2026-06-22T10:25:26.000Z",
     "repo_ids": [
-      "joeseesun/multi-lens-thinking"
+      "aronprins/claude-loop",
+      "aronprins/codex-loop"
     ],
     "repo_urls": [
-      "https://github.com/joeseesun/multi-lens-thinking"
+      "https://github.com/aronprins/claude-loop",
+      "https://github.com/aronprins/codex-loop"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "joeseesun/multi-lens-thinking",
-        "github_url": "https://github.com/joeseesun/multi-lens-thinking",
+        "id": "aronprins/codex-loop",
+        "github_url": "https://github.com/aronprins/codex-loop",
         "skill_md_path": "SKILL.md",
-        "name": "multi-lens-thinking",
-        "description": "Use when facing complex problems, making decisions, seeking creative solutions, or when single-perspective thinking feels limiting. Triggers include \"how should I think about this\", \"what am I missing\", \"need fresh perspective\", or when stuck on a problem.",
-        "stars": 27
+        "name": "codex-loop",
+        "description": "Autonomous Codex workflow that implements codex-loop/prd.json with one fresh Codex subagent per story. Use when the user asks to run Codex Loop, run the loop, work through a PRD, process prd.json, implement all stories, iterate through user stories autonomously, or complete a feature broken into PRD stories. Sequential mode is the default. Use parallel wave mode only when the user explicitly asks to run the loop in parallel, in tandem, as waves, or to fan out; parallel mode runs independent stories whose dependsOn entries are satisfied in isolated git worktrees with a merge and verification barrier between waves.",
+        "stars": 23
       }
     ]
   },
   {
-    "tweet_id": "2070816372238528987",
-    "tweet_url": "https://x.com/tom_doerr/status/2070816372238528987",
-    "author_handle": "tom_doerr",
-    "author_name": "Tom Dörr",
-    "text": "Creates robust Claude Code skills without manual ad-hoc engineering\n\nhttps://t.co/5zwFR7ACnk https://t.co/8UwPnaXiEs https://github.com/tripleyak/SkillForge",
-    "likes": 76,
+    "tweet_id": "2070800787542864054",
+    "tweet_url": "https://x.com/Dinosn/status/2070800787542864054",
+    "author_handle": "Dinosn",
+    "author_name": "Nicolas Krassas",
+    "text": "Agent Skill (Claude Code + OpenCode) for operating https://t.co/Ychy12N4Gj — Android ARM64 dynamic instrumentation: hook native/Java, patch memory, trace syscalls, bypass SSL pinning/root detection; port Frida &amp; GameGuardian scripts to renef Lua. https://t.co/9RazpLzduX http://renef.io https://github.com/vichhka-git/renef-skills",
+    "likes": 47,
     "retweets": 11,
     "replies": 2,
-    "views": 8272,
-    "posted_at": "2026-06-27T10:27:51.000Z",
+    "views": 5255,
+    "posted_at": "2026-06-27T09:25:56.000Z",
     "repo_ids": [
-      "tripleyak/SkillForge"
+      "vichhka-git/renef-skills"
     ],
     "repo_urls": [
-      "https://github.com/tripleyak/SkillForge"
+      "https://github.com/vichhka-git/renef-skills"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "tripleyak/skillforge",
-        "github_url": "https://github.com/tripleyak/SkillForge",
+        "id": "vichhka-git/renef-skills",
+        "github_url": "https://github.com/vichhka-git/renef-skills",
+        "skill_md_path": "skills/renef/SKILL.md",
+        "name": "renef",
+        "description": "Use when operating renef / renef.io to instrument Android ARM64 apps: hooking native and Java functions, scanning/reading/writing/patching process memory, tracing syscalls (renef-strace), stack backtraces, value/memory cheats, and writing Lua 5.4 scripts. Reach for this for SSL pinning bypass, root/debugger detection bypass, function tracing, crypto key logging, game memory editing/cheats, CTF native challenges, or porting Frida JS / GameGuardian (gg.*) scripts to renef. Triggers: \"renef\", \"renef.io\", \".renef script\", \"renef-strace\", \"hook this Android function\", \"bypass SSL pinning with renef\", \"port this Frida/GameGuardian script to renef\".",
+        "stars": 6
+      }
+    ]
+  },
+  {
+    "tweet_id": "2069688869046435913",
+    "tweet_url": "https://x.com/tom_doerr/status/2069688869046435913",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Recommends from 10,000+ curated Nano Banana Pro image prompts\n\nhttps://t.co/5FSgfzzjiK https://t.co/0OiiAQtPTp https://github.com/YouMind-OpenLab/nano-banana-pro-prompts-recommend-skill",
+    "likes": 47,
+    "retweets": 7,
+    "replies": 0,
+    "views": 6639,
+    "posted_at": "2026-06-24T07:47:33.000Z",
+    "repo_ids": [
+      "YouMind-OpenLab/nano-banana-pro-prompts-recommend-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/YouMind-OpenLab/nano-banana-pro-prompts-recommend-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "youmind-openlab/nano-banana-pro-prompts-recommend-skill",
+        "github_url": "https://github.com/YouMind-OpenLab/nano-banana-pro-prompts-recommend-skill",
         "skill_md_path": "SKILL.md",
-        "name": "skillforge",
-        "description": "Intelligent skill router, proactive advisor, and creator. Analyzes ANY input to recommend existing skills, improve them, or create new ones. Adds proactive Context Skill Advisor suggestions from session, project, and personal context using user-controlled Proactivity Levels.",
-        "stars": 719
+        "name": "nano-banana-pro-prompts-recommend-skill",
+        "description": "Recommend suitable prompts from 10,000+ Nano Banana Pro image generation prompts based on user needs.\nOptimized for Nano Banana Pro (Gemini), but prompts also work with Nano Banana 2, Seedream 5.0,\nGPT Image 1.5, Midjourney, DALL-E, Flux, Stable Diffusion, and any text-to-image AI model.\n\nUse this skill when users want to:\n- Generate images with AI (any model — Nano Banana Pro, Gemini, GPT Image, Seedream, etc.)\n- Find proven AI image generation prompts and prompt templates\n- Get prompt recommendations for specific use cases (portraits, products, social media, posters, etc.)\n- Create illustrations for articles, videos, podcasts, or marketing content\n- Browse a curated prompt library with sample images\n- Translate and understand prompt techniques\n\nAlso available: \"ai-image-prompts\" skill — a model-agnostic version of this library for universal image generation.\n",
+        "stars": 1724
       }
     ]
   },
   {
-    "tweet_id": "2070900212823122289",
-    "tweet_url": "https://x.com/huangyun_122/status/2070900212823122289",
-    "author_handle": "huangyun_122",
-    "author_name": "黄赟",
-    "text": "微信读书，居然出了官方 SKILL, 这下想象空间打开不小哇，读读书，画画线，那边公众号就出了文章，视频号就完成动画解释，脑袋成了最吃紧的工作引擎\n\n今晚又有工作流可以磨了，哈哈\n\nhttps://t.co/ewA2rjGxGF https://t.co/LyFfwXc0GO https://github.com/Tencent/WeChatReading",
-    "likes": 75,
+    "tweet_id": "2068993647404634409",
+    "tweet_url": "https://x.com/QingQ77/status/2068993647404634409",
+    "author_handle": "QingQ77",
+    "author_name": "Geek Lite",
+    "text": "给 Hermes Agent 的 SOUL.md 身份文件打分、审查和重写，靠评分标准说话，不靠感觉。\n\nhttps://t.co/7w8pXknbJF\n\nsoul-grader-skill 是个 Hermes Agent 社区技能，专门给 SOUL.md 身份文件做结构化评分，总分 https://github.com/cobibean/soul-grader-skill",
+    "likes": 26,
+    "retweets": 2,
+    "replies": 0,
+    "views": 1860,
+    "posted_at": "2026-06-22T09:45:00.000Z",
+    "repo_ids": [
+      "cobibean/soul-grader-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/cobibean/soul-grader-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "cobibean/soul-grader-skill",
+        "github_url": "https://github.com/cobibean/soul-grader-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "soul-grader",
+        "description": "Use when grading, reviewing, rewriting, or approving a Hermes Agent SOUL.md. Uses the SOUL.md field-guide research artifacts as the only normative source for what makes a good SOUL.md.",
+        "stars": 45
+      }
+    ]
+  },
+  {
+    "tweet_id": "2069969074680189049",
+    "tweet_url": "https://x.com/QingQ77/status/2069969074680189049",
+    "author_handle": "QingQ77",
+    "author_name": "Geek Lite",
+    "text": "把科研论文、图注、开题材料等研究内容，编译成面向不同 AI 绘图模型的结构化绘图提示词，按领域 x 图类型 x 模型特性自动路由。\n\nhttps://t.co/AjbohYkioq\n\n这是个 Claude Code / Codex 用的科研绘图 prompt https://t.co/cSfK6CBCNn https://github.com/BAIKEMARK/happy-figure-skill",
+    "likes": 25,
     "retweets": 8,
-    "replies": 5,
-    "views": 6902,
-    "posted_at": "2026-06-27T16:01:00.000Z",
+    "replies": 3,
+    "views": 2027,
+    "posted_at": "2026-06-25T02:21:00.000Z",
     "repo_ids": [
-      "Tencent/WeChatReading"
+      "BAIKEMARK/happy-figure-skill"
     ],
     "repo_urls": [
-      "https://github.com/Tencent/WeChatReading"
+      "https://github.com/BAIKEMARK/happy-figure-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "tencent/wechatreading",
-        "github_url": "https://github.com/Tencent/WeChatReading",
-        "skill_md_path": "skills/SKILL.md",
-        "name": "weread-skills",
-        "description": "微信读书助手 — 搜索书籍、管理书架、查看笔记划线、浏览书评、阅读统计、发现推荐好书",
-        "stars": 80
+        "id": "baikemark/happy-figure-skill",
+        "github_url": "https://github.com/BAIKEMARK/happy-figure-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "happy-figure-skill",
+        "description": "Use when 用户想根据论文、科研文档、研究文本、图注、开题/答辩材料或具备读图条件的参考图生成可复制的 AI 科研绘图提示词；触发场景包括论文配图、科研绘图、图形摘要、Graphical Abstract、机制图、技术路线图、实验装置图、模型架构图、多面板对比图、汇报总览图、参考图风格迁移、未知领域母版生成，或上传/引用 PDF、Word、LaTeX、Markdown、摘要、方法段、图注、课题说明、研究方案、参考图片。Also use when the user asks for scientific figure prompts, research illustration prompts, graphical abstract prompts, mechanism diagrams, technical roadmaps, experimental setup diagrams, model architecture diagrams, multi-panel scientific figures, paper/conference figures, or AI image prompts based on papers, research documents, abstracts, methods sections, figure captions, proposals, reference images, PDFs, Word docs, LaTeX files, Markdown files, or research plans.",
+        "stars": 69
       }
     ]
   },
   {
-    "tweet_id": "2069395294178193779",
-    "tweet_url": "https://x.com/Easycompany333/status/2069395294178193779",
-    "author_handle": "Easycompany333",
-    "author_name": "Easycompany",
-    "text": "发个玄学Skills收集，喜欢的收藏\n\n1. Numerologist_skills\n奇门遁甲 + 紫微斗数，适合研究传统术数怎么被拆成可执行流程。\nhttps://t.co/nr8E8e3zA5\n\n2. mingyu\n八字、紫微、奇门、六爻、梅花、大六壬一站式排盘，适合做综合命理数据接口。\nhttps://t.co/ZvHPGtrJLA\n\n3. bazi-skill\n对话式八字分析 https://t.co/49iDBNY8Ql https://github.com/FANzR-arch/Numerologist_skills https://github.com/Brhiza/mingyu",
-    "likes": 55,
-    "retweets": 18,
-    "replies": 2,
-    "views": 3508,
-    "posted_at": "2026-06-23T12:21:00.000Z",
+    "tweet_id": "2070139346108166534",
+    "tweet_url": "https://x.com/tom_doerr/status/2070139346108166534",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Generate semantic chapters and translate subtitles for YouTube videos via Claude Code\n\nhttps://t.co/QoJfejQXIJ https://t.co/Wjvd0JTYvD https://github.com/op7418/Youtube-clipper-skill",
+    "likes": 23,
+    "retweets": 2,
+    "replies": 0,
+    "views": 5636,
+    "posted_at": "2026-06-25T13:37:36.000Z",
     "repo_ids": [
-      "FANzR-arch/Numerologist_skills",
-      "Brhiza/mingyu"
+      "op7418/Youtube-clipper-skill"
     ],
     "repo_urls": [
-      "https://github.com/FANzR-arch/Numerologist_skills",
-      "https://github.com/Brhiza/mingyu"
+      "https://github.com/op7418/Youtube-clipper-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "brhiza/mingyu",
-        "github_url": "https://github.com/Brhiza/mingyu",
-        "skill_md_path": "public/skills/aov-mingyu-api/SKILL.md",
-        "name": "aov-mingyu-api",
-        "description": "通过 aov.cc 公开 API 调用命理、占卜和一站式提示词能力。用于需要八字排盘、紫微斗数排盘、六爻、梅花易数、奇门遁甲、大六壬、小六壬、塔罗、三山国王灵签、黄历择日、雷诺曼、星盘，或直接返回可交给 AI 解读的完整提示词的任务。",
-        "stars": 164
-      }
-    ]
-  },
-  {
-    "tweet_id": "2070088252367712415",
-    "tweet_url": "https://x.com/chengfeng240928/status/2070088252367712415",
-    "author_handle": "chengfeng240928",
-    "author_name": "Agent成峰",
-    "text": "用 @ianneo_ai  的https://t.co/qdbJbO9vMG  小黑 风格，实现了动画效果，加到 剪辑skills里！ https://t.co/DhUpz4KKUY https://github.com/helloianneo/ian-xiaohei-illustrations/tree/main",
-    "likes": 29,
-    "retweets": 0,
-    "replies": 8,
-    "views": 3850,
-    "posted_at": "2026-06-25T10:14:34.000Z",
-    "repo_ids": [
-      "helloianneo/ian-xiaohei-illustrations"
-    ],
-    "repo_urls": [
-      "https://github.com/helloianneo/ian-xiaohei-illustrations"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "helloianneo/ian-xiaohei-illustrations",
-        "github_url": "https://github.com/helloianneo/ian-xiaohei-illustrations",
-        "skill_md_path": "ian-xiaohei-illustrations/SKILL.md",
-        "name": "ian-xiaohei-illustrations",
-        "description": "生成 Ian 风格的中文正文配图。用于用户要求为中文文章、帖子、博客、Notion 文档、工作流文档、方法论、流程、结构、状态、隐喻或观点生成“怪诞”“小黑”“手绘”“正文配图”“文章插图”“配图建议”“shot list”“去标题/改图”等任务；默认使用小黑 IP、纯白手绘、少量红橙蓝批注、简洁清爽但天马行空的视觉风格。",
-        "stars": 6370
+        "id": "op7418/youtube-clipper-skill",
+        "github_url": "https://github.com/op7418/Youtube-clipper-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "youtube-clipper",
+        "description": "YouTube 视频智能剪辑工具。下载视频和字幕，AI 分析生成精细章节（几分钟级别）， 用户选择片段后自动剪辑、翻译字幕为中英双语、烧录字幕到视频，并生成总结文案。 使用场景：当用户需要剪辑 YouTube 视频、生成短视频片段、制作双语字幕版本时。 关键词：视频剪辑、YouTube、字幕翻译、双语字幕、视频下载、clip video\n",
+        "stars": 2029
       }
     ]
   },
@@ -315,7 +344,7 @@
     "likes": 15,
     "retweets": 7,
     "replies": 1,
-    "views": 1349,
+    "views": 1395,
     "posted_at": "2026-06-25T07:34:00.000Z",
     "repo_ids": [
       "AI272/speaker"
@@ -331,7 +360,7 @@
         "skill_md_path": "ppt-speech-writer/SKILL.md",
         "name": "ppt-speech-writer",
         "description": "Read a real .pptx using text extraction, OOXML inspection, slide rendering, OCR, visual inventory, and vision-capable screenshot review; then write academic speaker notes grounded in every visible slide element, generate a complete display-version document, and inject clean notes into the PowerPoint notes pane. Use when the user wants speaker notes, presenter notes, a speech script, narration, or annotated notes for an existing PowerPoint deck, especially when slides contain images, charts, tables, SmartArt, axes, legends, or screenshot text.",
-        "stars": 300
+        "stars": 302
       }
     ]
   },
@@ -341,10 +370,10 @@
     "author_handle": "QingQ77",
     "author_name": "Geek Lite",
     "text": "从 GitHub 筛出真正能写进简历、经得起面试追问的后端和 AI Agent 项目，基于源码证据生成简历项目包。\n\nhttps://t.co/q6R9O5QTtg\n\n牛肉项目雷达是个 Codex 用的 Skill，专门帮后端和 AI Agent https://github.com/lishuangqiang/backend-agent-resume-scout",
-    "likes": 11,
+    "likes": 13,
     "retweets": 4,
     "replies": 1,
-    "views": 1973,
+    "views": 2039,
     "posted_at": "2026-06-26T08:18:00.000Z",
     "repo_ids": [
       "lishuangqiang/backend-agent-resume-scout"
@@ -360,36 +389,36 @@
         "skill_md_path": "backend-agent-project-selector/SKILL.md",
         "name": "backend-agent-project-selector",
         "description": "Find suitable traditional software backend or business-grade AI agent projects from GitHub for students or early-career engineers, evaluate resume value, and generate a Markdown resume-writing package. Use when a user asks to choose backend projects, Java/Spring projects, distributed-system projects, complete AI agent business projects, multi-agent systems, LLM apps, GitHub projects for resumes, or turn selected projects into resume bullets/interview talking points. Supports modes: agent-only, backend-only, mixed, safe-mode, and challenge-mode. If no mode is specified, ask the user to choose before searching or recommending. Backend recommendations exclude IoT, embedded, hardware-integration, device-management, and industrial-control platforms unless requested. Avoid simple browser extensions, thin LLM wrappers, shallow AI plugins, and browser-automation libraries unless requested.",
-        "stars": 118
+        "stars": 128
       }
     ]
   },
   {
-    "tweet_id": "2070512855082787183",
-    "tweet_url": "https://x.com/technolagnos/status/2070512855082787183",
-    "author_handle": "technolagnos",
-    "author_name": "Georgios A",
-    "text": "If you just started lighting barbells, or maybe are coming back after a long break like me, and would like to check your form, with a video like the one below and a skill, here’s a little tool I built for myself - hope it’s helpful to those who need it\n\nhttps://t.co/HXOqHyOVS6 https://t.co/SMFw0111hD https://github.com/antikas/form-check",
-    "likes": 11,
+    "tweet_id": "2068965166402994615",
+    "tweet_url": "https://x.com/seekjourney/status/2068965166402994615",
+    "author_handle": "seekjourney",
+    "author_name": "极客杰尼",
+    "text": "复盘 md2wechat cli 从 0 到近 3k star的构建经验 ，今天正式开源一个 Go Agent-Native CLI 脚手架 Skill，覆盖开发，测试，发布全流程。\n\nhttps://t.co/Zm1n8gEGS0 https://t.co/U9PIHKKETR https://github.com/geekjourneyx/go-cli-ship",
+    "likes": 6,
     "retweets": 1,
-    "replies": 0,
-    "views": 593,
-    "posted_at": "2026-06-26T14:21:47.000Z",
+    "replies": 1,
+    "views": 1014,
+    "posted_at": "2026-06-22T07:51:49.000Z",
     "repo_ids": [
-      "antikas/form-check"
+      "geekjourneyx/go-cli-ship"
     ],
     "repo_urls": [
-      "https://github.com/antikas/form-check"
+      "https://github.com/geekjourneyx/go-cli-ship"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "antikas/form-check",
-        "github_url": "https://github.com/antikas/form-check",
-        "skill_md_path": ".claude/skills/form-check/SKILL.md",
-        "name": "form-check",
-        "description": "Analyse a lift video to check form. Side-on for squats / RDL / deadlift / OHP / bench / rows / pulldown / curls (joint angles, depth, tempo, rep count, ROM trend, bar path for presses); front-on for squats (knee tracking / valgus + left/right symmetry, via back-squat-front). Runs BlazePose pose-estimation for deterministic measurement (no model in the truth path), then gives a coached read. Use when the user shares a lifting clip and asks to check their form, or says \"/form-check\".",
-        "stars": 0
+        "id": "geekjourneyx/go-cli-ship",
+        "github_url": "https://github.com/geekjourneyx/go-cli-ship",
+        "skill_md_path": "SKILL.md",
+        "name": "go-cli-ship",
+        "description": "Use this skill to build, upgrade, or stabilize Go CLI projects for production release. It covers CLI contracts, Go engineering gates, npm-based binary distribution, GitHub Release automation, README quality, Agent Skill packaging, skills list/read support, version checks, release checks, and CI smoke-test closure. Use when a user asks to create a Go CLI from scratch, harden an existing CLI, fix CI/release drift, publish a version, or standardize a reusable CLI scaffold.",
+        "stars": 4
       }
     ]
   },
@@ -402,7 +431,7 @@
     "likes": 3,
     "retweets": 0,
     "replies": 0,
-    "views": 928,
+    "views": 938,
     "posted_at": "2026-06-25T06:34:00.000Z",
     "repo_ids": [
       "wwenj/zu-article-image-skill"
@@ -423,6 +452,93 @@
     ]
   },
   {
+    "tweet_id": "2070014624704176290",
+    "tweet_url": "https://x.com/QingQ77/status/2070014624704176290",
+    "author_handle": "QingQ77",
+    "author_name": "Geek Lite",
+    "text": "通过进化一个单一的元技能文件（SKILL.md），让 LLM 自动设计和编排多智能体系统，无需人工手动构建 MAS。\n\nhttps://t.co/ps64jjeYz8 https://t.co/p8NTIPxwz7 https://github.com/linhh29/Skill_MAS",
+    "likes": 3,
+    "retweets": 3,
+    "replies": 0,
+    "views": 841,
+    "posted_at": "2026-06-25T05:22:00.000Z",
+    "repo_ids": [
+      "linhh29/Skill_MAS"
+    ],
+    "repo_urls": [
+      "https://github.com/linhh29/Skill_MAS"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "linhh29/skill_mas",
+        "github_url": "https://github.com/linhh29/Skill_MAS",
+        "skill_md_path": "init_skill/SKILL.md",
+        "name": "unified_meta_agent_skill",
+        "description": "A foundational meta-agent skill for generating Multi-Agent Systems (MAS). It systematically drives the process from conceptual task decomposition to agent engineering, and finally to workflow orchestration.",
+        "stars": 24
+      }
+    ]
+  },
+  {
+    "tweet_id": "2070835274595107083",
+    "tweet_url": "https://x.com/1mp3ct_/status/2070835274595107083",
+    "author_handle": "1mp3ct_",
+    "author_name": "Viktor",
+    "text": "Built something on top of @klaudworks' skill-codex (the Claude Code skill that lets Claude drive Codex):\ncodex-coach — Codex reviews your code, Claude grades the review, and Codex learns from what it missed. It got sharper on its very first run.\nhttps://t.co/Ybjdz8Pmmz http://github.com/1mp3ctz/codex-coach",
+    "likes": 2,
+    "retweets": 0,
+    "replies": 1,
+    "views": 102,
+    "posted_at": "2026-06-27T11:42:58.000Z",
+    "repo_ids": [
+      "1mp3ctz/codex-coach"
+    ],
+    "repo_urls": [
+      "https://github.com/1mp3ctz/codex-coach"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "1mp3ctz/codex-coach",
+        "github_url": "https://github.com/1mp3ctz/codex-coach",
+        "skill_md_path": "SKILL.md",
+        "name": "codex-coach",
+        "description": "Grade-and-learn loop for Codex code reviews — have Codex review/debug your code, then Claude grades the review against its own trusted review and turns Codex's misses into durable lessons so Codex improves over time. Use when the user wants Codex to review or debug code, wants to track or improve Codex's review quality, or runs /codex-coach.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2070147993676750949",
+    "tweet_url": "https://x.com/Rayblancoeth/status/2070147993676750949",
+    "author_handle": "Rayblancoeth",
+    "author_name": "rayblanco.eth",
+    "text": "@bankrbot install GitHub Vesting skill at https://t.co/vqUdb7FKPk https://github.com/anondevv69/github-vesting/tree/main/skills/bankr-vesting",
+    "likes": 2,
+    "retweets": 0,
+    "replies": 1,
+    "views": 75,
+    "posted_at": "2026-06-25T14:11:57.000Z",
+    "repo_ids": [
+      "anondevv69/github-vesting"
+    ],
+    "repo_urls": [
+      "https://github.com/anondevv69/github-vesting"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "anondevv69/github-vesting",
+        "github_url": "https://github.com/anondevv69/github-vesting",
+        "skill_md_path": "skills/bankr-vesting/SKILL.md",
+        "name": "github-vesting",
+        "description": "GitHub-gated token vesting on proofofdev.xyz — lock ANY ERC-20 on Base via API at api.proofofdev.xyz, link GitHub, repo claims. Use for github vesting, lock tokens, vesting progress, link github, proofofdev. NEVER use github-vesting.vercel.app for API.",
+        "stars": 0
+      }
+    ]
+  },
+  {
     "tweet_id": "2070947313091256663",
     "tweet_url": "https://x.com/noahelhadedy/status/2070947313091256663",
     "author_handle": "noahelhadedy",
@@ -431,7 +547,7 @@
     "likes": 2,
     "retweets": 0,
     "replies": 0,
-    "views": 102,
+    "views": 152,
     "posted_at": "2026-06-27T19:08:10.000Z",
     "repo_ids": [
       "vercel-labs/skills",
@@ -455,130 +571,101 @@
         "skill_md_path": "skills/find-skills/SKILL.md",
         "name": "find-skills",
         "description": "Helps users discover and install agent skills when they ask questions like \"how do I do X\", \"find a skill for X\", \"is there a skill that can...\", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.",
-        "stars": 23932
+        "stars": 24239
       }
     ]
   },
   {
-    "tweet_id": "2070014624704176290",
-    "tweet_url": "https://x.com/QingQ77/status/2070014624704176290",
-    "author_handle": "QingQ77",
-    "author_name": "Geek Lite",
-    "text": "通过进化一个单一的元技能文件（SKILL.md），让 LLM 自动设计和编排多智能体系统，无需人工手动构建 MAS。\n\nhttps://t.co/ps64jjeYz8 https://t.co/p8NTIPxwz7 https://github.com/linhh29/Skill_MAS",
+    "tweet_id": "2069540718092399077",
+    "tweet_url": "https://x.com/sora19ai/status/2069540718092399077",
+    "author_handle": "sora19ai",
+    "author_name": "そら ☁️ AgentSkills 自動化オタク📱",
+    "text": "これ強い、Claude Codeで\nチーム設計から作れる。\n\nHarnessは7.4k starsの\nClaude Code plugin。\n\n「この案件のハーネス作って」\nで6パターンから\nagent teamとskillsを生成。\n\n導入は2コマンド。\nREADMEを見ながら試したい。\n\n複雑な調査や開発を\n役割分担したい時に刺さる。\nhttps://t.co/JhQYH17XKf https://github.com/revfactory/harness",
     "likes": 2,
-    "retweets": 2,
+    "retweets": 0,
     "replies": 0,
-    "views": 825,
-    "posted_at": "2026-06-25T05:22:00.000Z",
+    "views": 615,
+    "posted_at": "2026-06-23T21:58:52.000Z",
     "repo_ids": [
-      "linhh29/Skill_MAS"
+      "revfactory/harness"
     ],
     "repo_urls": [
-      "https://github.com/linhh29/Skill_MAS"
+      "https://github.com/revfactory/harness"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "linhh29/skill_mas",
-        "github_url": "https://github.com/linhh29/Skill_MAS",
-        "skill_md_path": "init_skill/SKILL.md",
-        "name": "unified_meta_agent_skill",
-        "description": "A foundational meta-agent skill for generating Multi-Agent Systems (MAS). It systematically drives the process from conceptual task decomposition to agent engineering, and finally to workflow orchestration.",
-        "stars": 24
+        "id": "revfactory/harness",
+        "github_url": "https://github.com/revfactory/harness",
+        "skill_md_path": "skills/harness/SKILL.md",
+        "name": "harness",
+        "description": "하네스를 구성합니다. 전문 에이전트를 정의하며, 해당 에이전트가 사용할 스킬을 생성하는 메타 스킬. (1) '하네스 구성해줘', '하네스 구축해줘' 요청 시, (2) '하네스 설계', '하네스 엔지니어링' 요청 시, (3) 새로운 도메인/프로젝트에 대한 하네스 기반 자동화 체계를 구축할 때, (4) 하네스 구성을 재구성하거나 확장할 때, (5) '하네스 점검', '하네스 감사', '하네스 현황', '에이전트/스킬 동기화' 등 기존 하네스 운영/유지보수 요청 시 사용.",
+        "stars": 8076
       }
     ]
   },
   {
-    "tweet_id": "2071181887389765997",
-    "tweet_url": "https://x.com/HireGrowsera/status/2071181887389765997",
-    "author_handle": "HireGrowsera",
-    "author_name": "Growsera",
-    "text": "Free Agent Skill for Magento 2 devs.\n\nIt makes Claude Code, Codex, and Cursor write upgrade-safe Magento code: plugins over preferences, no ObjectManager, no core or vendor edits, environment-aware.\n\nOpen source, MIT. Star it:\nhttps://t.co/YUtBiPDJHK\n\n#Magento #AdobeCommerce https://t.co/P1HkCqsbVq https://github.com/growsera/magento2-lead-engineer/",
-    "likes": 1,
+    "tweet_id": "2068952259095089471",
+    "tweet_url": "https://x.com/VishantShah10/status/2068952259095089471",
+    "author_handle": "VishantShah10",
+    "author_name": "Vishant Shah",
+    "text": "Bring the skills of @karpathy in your LLMs:\n\nhttps://t.co/Ly0hDMy8H1\n\nYou are welcome!! https://github.com/multica-ai/andrej-karpathy-skills",
+    "likes": 2,
     "retweets": 0,
     "replies": 0,
-    "views": 60,
-    "posted_at": "2026-06-28T10:40:17.000Z",
+    "views": 52,
+    "posted_at": "2026-06-22T07:00:32.000Z",
     "repo_ids": [
-      "growsera/magento2-lead-engineer"
+      "multica-ai/andrej-karpathy-skills"
     ],
     "repo_urls": [
-      "https://github.com/growsera/magento2-lead-engineer"
+      "https://github.com/multica-ai/andrej-karpathy-skills"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "growsera/magento2-lead-engineer",
-        "github_url": "https://github.com/growsera/magento2-lead-engineer",
-        "skill_md_path": "magento2-lead-engineer/SKILL.md",
-        "name": "magento2-lead-engineer",
-        "description": "Senior Magento 2/Adobe Commerce engineering for architecture analysis, trade-off evaluation, production-safe implementation, and debugging. Use for Magento 2.4.x module creation, behavior overrides without core hacks, frontend features across Luma/Blank/Hyva, Docker/markshust setups, or environment-aware commands.",
-        "stars": 0
+        "id": "multica-ai/andrej-karpathy-skills",
+        "github_url": "https://github.com/multica-ai/andrej-karpathy-skills",
+        "skill_md_path": "skills/karpathy-guidelines/SKILL.md",
+        "name": "karpathy-guidelines",
+        "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
+        "stars": 184431
       }
     ]
   },
   {
-    "tweet_id": "2070259314783133880",
-    "tweet_url": "https://x.com/ShaneRobinett/status/2070259314783133880",
-    "author_handle": "ShaneRobinett",
-    "author_name": "Shane",
-    "text": "Just shipped: Hermes Skill for https://t.co/cxUReOcj9T 📧\nSend emails, handle batches, retries, and idempotency straight from your Hermes agent.\n\nRepo: https://t.co/wfg0YC8NgS\n#HermesAgent #EmailForAgents https://t.co/8Myqsbqq4N http://Resend.com https://github.com/GumbyEnder/hermes-resend-skill",
-    "likes": 1,
-    "retweets": 0,
-    "replies": 1,
-    "views": 68,
-    "posted_at": "2026-06-25T21:34:18.000Z",
-    "repo_ids": [
-      "GumbyEnder/hermes-resend-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/GumbyEnder/hermes-resend-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "gumbyender/hermes-resend-skill",
-        "github_url": "https://github.com/GumbyEnder/hermes-resend-skill",
-        "skill_md_path": "skills/email/resend/SKILL.md",
-        "name": "resend",
-        "description": "Resend.com: transactional email via CLI, MCP server, REST API, and SDKs. Send emails, manage contacts, broadcasts, domains, webhooks, and templates.",
-        "stars": 1
-      }
-    ]
-  },
-  {
-    "tweet_id": "2070857337254896121",
-    "tweet_url": "https://x.com/jdzieciol_dev/status/2070857337254896121",
-    "author_handle": "jdzieciol_dev",
-    "author_name": "Janusz Dzięcioł 🐦",
-    "text": "discovered \"teach\" agent skill by @mattpocockuk today and damn it's so good\nlearning some iOS development/system design topics with it and I'm amazed so far - it gives you the structure, much needed when learning on your own\nhttps://t.co/a1hjOahpth https://github.com/mattpocock/skills/blob/main/skills/productivity/teach/SKILL.md",
-    "likes": 1,
+    "tweet_id": "2071377299216450017",
+    "tweet_url": "https://x.com/zen96k/status/2071377299216450017",
+    "author_handle": "zen96k",
+    "author_name": "Jolly",
+    "text": "https://t.co/rde3M6AkCP\n僕の可愛いスキル見て https://github.com/zen96k/sandbox/blob/main/.agents/skills/check-agents-md/SKILL.md",
+    "likes": 0,
     "retweets": 0,
     "replies": 0,
-    "views": 40,
-    "posted_at": "2026-06-27T13:10:38.000Z",
+    "views": 52,
+    "posted_at": "2026-06-28T23:36:47.000Z",
     "repo_ids": [
-      "mattpocock/skills"
+      "zen96k/sandbox"
     ],
     "repo_urls": [
-      "https://github.com/mattpocock/skills"
+      "https://github.com/zen96k/sandbox"
     ],
     "skill_refs": [
       {
-        "repoId": "mattpocock/skills",
-        "githubUrl": "https://github.com/mattpocock/skills",
-        "skillPath": "skills/productivity/teach/SKILL.md",
-        "sourceUrl": "https://github.com/mattpocock/skills/blob/main/skills/productivity/teach/SKILL.md"
+        "repoId": "zen96k/sandbox",
+        "githubUrl": "https://github.com/zen96k/sandbox",
+        "skillPath": ".agents/skills/check-agents-md/SKILL.md",
+        "sourceUrl": "https://github.com/zen96k/sandbox/blob/main/.agents/skills/check-agents-md/SKILL.md"
       }
     ],
     "valid_skill_repos": [
       {
-        "id": "mattpocock/skills",
-        "github_url": "https://github.com/mattpocock/skills",
-        "skill_md_path": "skills/productivity/teach/SKILL.md",
-        "name": "teach",
-        "description": "Teach the user a new skill or concept, within this workspace.",
-        "stars": 148797
+        "id": "zen96k/sandbox",
+        "github_url": "https://github.com/zen96k/sandbox",
+        "skill_md_path": ".agents/skills/check-agents-md/SKILL.md",
+        "name": "check-agents-md",
+        "description": "AGENTS.md（CLAUDE.md）とコードベースの実態を比較し、陳腐化した記述を洗い出す。",
+        "stars": 0
       }
     ]
   }
