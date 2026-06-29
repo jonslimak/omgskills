@@ -10,9 +10,44 @@ import {
   useAuth,
   useUser
 } from "@clerk/clerk-react";
+import {
+  ArrowUpRight,
+  Check,
+  Earth,
+  Eye,
+  EyeOff,
+  Grid2X2Plus,
+  Lock,
+  Pencil,
+  RefreshCcw,
+  Star,
+  Trash2
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import "./styles.css";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const iconClassName = "app-icon";
 
 function publicSiteOrigin() {
   if (window.location.hostname === "app.omgskills.com") {
@@ -24,6 +59,10 @@ function publicSiteOrigin() {
 
 function publicGroupUrl(handle: string, slug: string) {
   return `${publicSiteOrigin()}/u/${handle}/${slug}`;
+}
+
+function groupVisibilityLabel(visibility: string | undefined) {
+  return visibility === "public" ? "public" : "private";
 }
 
 function normalizedSkillText(value: string | null | undefined) {
@@ -234,21 +273,6 @@ function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
   const [status, setStatus] = useState<string>("");
   const [copyStatus, setCopyStatus] = useState<string>("");
 
-  useEffect(() => {
-    if (!isPopoverOpen) {
-      return;
-    }
-
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setIsPopoverOpen(false);
-      }
-    }
-
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [isPopoverOpen]);
-
   function openPopover() {
     setIsPopoverOpen(true);
     setStatus("");
@@ -284,41 +308,44 @@ function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
 
   return (
     <>
-      <button className={hasSynced ? "text-button sync-resync" : ""} onClick={openPopover}>
+      <Button
+        className={hasSynced ? "sync-resync" : ""}
+        onClick={openPopover}
+        size={hasSynced ? "sm" : "default"}
+        variant={hasSynced ? "link" : "default"}
+      >
         {hasSynced ? "Resync" : "Sync app"}
-      </button>
-      {isPopoverOpen ? (
-        <div className="sync-modal-overlay" onClick={() => setIsPopoverOpen(false)} role="presentation">
-          <div
-            aria-modal="true"
-            className="sync-modal-card"
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-          >
-            <h2>Sync your app</h2>
-            <div className="sync-step">
-              <h3>Step 1</h3>
-              <p>Generate a one time token for your local app</p>
-              <button onClick={createToken}>Generate new token</button>
-              <div className="sync-token-area">
-                {token ? (
-                  <button className="sync-token-button" onClick={copyToken} title="Copy token" type="button">
-                    {token}
-                  </button>
-                ) : null}
-                {status ? <p className="sync-status">{status}</p> : null}
-                {copyStatus ? <p className="sync-status">{copyStatus}</p> : null}
-              </div>
-            </div>
-            <div className="sync-step">
-              <h3>Step 2</h3>
-              <p>Open the app and tap on the user icon.</p>
-              <p>Paste the token in the token input box.</p>
-              <p>That's it!</p>
+      </Button>
+      <Dialog open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <DialogContent className="sync-modal-card" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Sync your app</DialogTitle>
+            <DialogDescription className="sr-only">
+              Generate a one time token and paste it into the local omgskills app.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="sync-step">
+            <h3>Step 1</h3>
+            <p>Generate a one time token for your local app</p>
+            <Button onClick={createToken}>Generate new token</Button>
+            <div className="sync-token-area">
+              {token ? (
+                <Button className="sync-token-button" onClick={copyToken} title="Copy token" type="button" variant="link">
+                  {token}
+                </Button>
+              ) : null}
+              {status ? <p className="sync-status">{status}</p> : null}
+              {copyStatus ? <p className="sync-status">{copyStatus}</p> : null}
             </div>
           </div>
-        </div>
-      ) : null}
+          <div className="sync-step">
+            <h3>Step 2</h3>
+            <p>Open the app and tap on the user icon.</p>
+            <p>Paste the token in the token input box.</p>
+            <p>That's it!</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -333,7 +360,6 @@ function SkillActions({
   onRefresh: () => void;
 }) {
   const api = usePortalApi();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [status, setStatus] = useState("");
   const favoritesGroup = groups.find((group) => group.isFavorites);
   const isFavorite = Boolean(favoritesGroup?.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id)));
@@ -379,7 +405,6 @@ function SkillActions({
         body: JSON.stringify({ kind: "synced", syncedSkillId: skill.id })
       });
       setStatus("");
-      setMenuOpen(false);
       onRefresh();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to add to group");
@@ -389,45 +414,43 @@ function SkillActions({
   return (
     <div className="skill-action-stack">
       <div className="skill-actions">
-        <button
+        <Button
           aria-label={isFavorite ? "Already in Favorites" : "Add to Favorites"}
           className={isFavorite ? "icon-button active" : "icon-button"}
           disabled={isFavorite}
           onClick={addToFavorites}
+          size="icon"
           title={isFavorite ? "Already in Favorites" : "Add to Favorites"}
+          variant="secondary"
         >
-          {isFavorite ? "★" : "☆"}
-        </button>
-        <div className="menu-wrap">
-          <button
-            aria-expanded={menuOpen}
-            aria-label="Add to group"
-            className="icon-button"
-            onClick={() => setMenuOpen((current) => !current)}
-            title="Add to group"
-          >
-            ⊞
-          </button>
-          {menuOpen ? (
-            <div className="group-menu">
-              {selectableGroups.length === 0 ? <span>No groups yet</span> : null}
-              {selectableGroups.map((group) => {
-                const alreadyAdded = group.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id)) ?? false;
-                return (
-                  <button
-                    disabled={alreadyAdded}
-                    key={group.id}
-                    onClick={() => addToGroup(group)}
-                    type="button"
-                  >
-                    {group.name}
-                    {alreadyAdded ? " ✓" : ""}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-        </div>
+          <Star className={iconClassName} fill={isFavorite ? "currentColor" : "none"} />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-label="Add to group" className="icon-button" size="icon" title="Add to group" variant="secondary">
+              <Grid2X2Plus className={iconClassName} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {selectableGroups.length === 0 ? <DropdownMenuItem disabled>No groups yet</DropdownMenuItem> : null}
+            {selectableGroups.map((group) => {
+              const alreadyAdded = group.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id)) ?? false;
+              return (
+                <DropdownMenuItem
+                  disabled={alreadyAdded}
+                  key={group.id}
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    void addToGroup(group);
+                  }}
+                >
+                  <span>{group.name}</span>
+                  {alreadyAdded ? <Check className={iconClassName} /> : null}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       {status ? <p className="inline-status">{status}</p> : null}
     </div>
@@ -492,13 +515,13 @@ function SyncedSkillRow({
         </h3>
         <p className={expanded ? "skill-description expanded" : "skill-description"}>{description}</p>
         {canExpand && expanded ? (
-          <button className="text-button" onClick={() => setExpanded(false)}>
+          <Button className="text-button" onClick={() => setExpanded(false)} size="sm" variant="link">
             Show less
-          </button>
+          </Button>
         ) : null}
         <div className="source-badges">
           {skill.sources.map((source) => (
-            <span key={source}>{source}</span>
+            <Badge key={source} variant="secondary">{source}</Badge>
           ))}
         </div>
       </div>
@@ -518,36 +541,36 @@ function SyncedSkillsTable({
 }) {
   return (
     <div className="skill-table-wrap">
-      <table className="skill-table">
-        <thead>
-          <tr>
-            <th>Skill</th>
-            <th>Claude</th>
-            <th>Codex</th>
-            <th>GitHub</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table className="skill-table">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Skill</TableHead>
+            <TableHead>Claude</TableHead>
+            <TableHead>Codex</TableHead>
+            <TableHead>GitHub</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {skills.map((skill) => (
-            <tr key={skill.id}>
-              <td className="skill-table-name">{skill.name}</td>
-              <td>{hasSource(skill, "claude") ? "✓" : ""}</td>
-              <td>{hasSource(skill, "codex") ? "✓" : ""}</td>
-              <td>
+            <TableRow key={skill.id}>
+              <TableCell className="skill-table-name">{skill.name}</TableCell>
+              <TableCell>{hasSource(skill, "claude") ? <Check className="app-icon table-check" /> : null}</TableCell>
+              <TableCell>{hasSource(skill, "codex") ? <Check className="app-icon table-check" /> : null}</TableCell>
+              <TableCell>
                 {skill.githubUrl ? (
                   <a href={skill.githubUrl} title="Open GitHub source">
                     GitHub →
                   </a>
                 ) : null}
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <SkillActions groups={groups} onRefresh={onRefresh} skill={skill} />
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
@@ -573,36 +596,28 @@ function SyncedSkillsPanel({
   const groupedSkills = groupSyncedSkills(skills);
 
   return (
-    <section className="panel">
+    <Card className="panel">
       <div className="panel-header">
         <div>
-          <h2>Synced Skills</h2>
+          <h2>SKILLS</h2>
           <p>
             {groupedSkills.length} skills from {skills.length} installs.
           </p>
         </div>
         <div className="panel-controls">
-          <div aria-label="Synced skills view" className="segmented-control">
-            <button
-              aria-pressed={viewMode === "list"}
-              className={viewMode === "list" ? "active" : ""}
-              onClick={() => updateViewMode("list")}
-              type="button"
-            >
+          <Tabs value={viewMode} onValueChange={(value) => updateViewMode(value === "table" ? "table" : "list")}>
+            <TabsList aria-label="Synced skills view" className="segmented-control">
+              <TabsTrigger value="list">
               List
-            </button>
-            <button
-              aria-pressed={viewMode === "table"}
-              className={viewMode === "table" ? "active" : ""}
-              onClick={() => updateViewMode("table")}
-              type="button"
-            >
+              </TabsTrigger>
+              <TabsTrigger value="table">
               Table
-            </button>
-          </div>
-          <button className="secondary" onClick={onRefresh}>
-            Refresh
-          </button>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button aria-label="Refresh synced skills" className="icon-button" onClick={onRefresh} size="icon" title="Refresh synced skills" variant="secondary">
+            <RefreshCcw className={iconClassName} />
+          </Button>
         </div>
       </div>
       {viewMode === "table" && groupedSkills.length > 0 ? (
@@ -615,7 +630,7 @@ function SyncedSkillsPanel({
           {groupedSkills.length === 0 ? <p className="muted">No synced skills yet.</p> : null}
         </div>
       )}
-    </section>
+    </Card>
   );
 }
 
@@ -665,31 +680,29 @@ function ProfileHeaderControls({
       {mode === "view" && profile?.publicUrl ? (
         <div className="username-row">
           <a className="username-link" href={profile.publicUrl}>/{savedHandle}</a>
-          <button className="compact" onClick={() => setEditing(true)}>Edit</button>
+          <Button aria-label="Edit username" className="icon-button" onClick={() => setEditing(true)} size="icon" title="Edit username" variant="secondary">
+            <Pencil className={iconClassName} />
+          </Button>
         </div>
       ) : (
         <div className="username-row">
-          <input
+          <Input
             className="username-input"
             value={handle}
             onChange={(event) => setHandle(event.target.value)}
             placeholder="Set your username"
           />
-          <button className="compact" disabled={!handle.trim()} onClick={() => saveProfile()}>
+          <Button className="compact" disabled={!handle.trim()} onClick={() => saveProfile()} size="sm">
             save
-          </button>
+          </Button>
         </div>
       )}
       <div className="username-meta">
         <span>Username</span>
-        <label className={published ? "publish-toggle public" : "publish-toggle private"}>
-          {published ? "Public" : "Private"}
-          <input
-            type="checkbox"
-            checked={published}
-            onChange={(event) => updatePublished(event.target.checked)}
-          />
-        </label>
+        <Label className={published ? "publish-toggle public" : "publish-toggle private"}>
+          <span>{published ? "Public" : "Private"}</span>
+          <Switch checked={published} onCheckedChange={(checked) => void updatePublished(checked)} />
+        </Label>
       </div>
       {status ? <p className="inline-status">{status}</p> : null}
     </div>
@@ -711,7 +724,8 @@ function GroupsPanel({
 }) {
   const api = usePortalApi();
   const [status, setStatus] = useState("");
-  const [newGroupName, setNewGroupName] = useState("Team Skills");
+  const [newGroupName, setNewGroupName] = useState("");
+  const [isEditingSets, setIsEditingSets] = useState(false);
 
   async function createGroup() {
     setStatus("Creating group...");
@@ -726,7 +740,8 @@ function GroupsPanel({
       });
 
       setStatus("Group created.");
-      setNewGroupName("Team Skills");
+      setNewGroupName("");
+      setIsEditingSets(false);
       onRefresh?.();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to create group");
@@ -754,7 +769,7 @@ function GroupsPanel({
         method: "PATCH",
         body: JSON.stringify({ disabled })
       });
-      setStatus(disabled ? "Group hidden." : "Group restored.");
+      setStatus(disabled ? "Group visibility disabled." : "Group restored.");
       onRefresh?.();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to update moderation state");
@@ -776,21 +791,33 @@ function GroupsPanel({
   }
 
   return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
+    <Card className="panel">
+      <div className={canManage && isEditingSets ? "panel-header sets-header editing" : "panel-header sets-header"}>
+        <div className="sets-title-row">
           <h2>{title}</h2>
+          {status ? <p className="inline-status">{status}</p> : null}
         </div>
+        {canManage && isEditingSets ? (
+          <div className="sets-create-inline">
+            <Input
+              aria-label="Set name"
+              onChange={(event) => setNewGroupName(event.target.value)}
+              placeholder="Enter set name..."
+              value={newGroupName}
+            />
+            <Button disabled={!newGroupName.trim()} onClick={createGroup}>Create new</Button>
+          </div>
+        ) : null}
+        {canManage ? (
+          <Button
+            className="sets-edit-button"
+            onClick={() => setIsEditingSets((current) => !current)}
+            variant="outline"
+          >
+            {isEditingSets ? "Done" : "Edit"}
+          </Button>
+        ) : null}
       </div>
-      {canManage ? (
-        <div className="compact-create">
-          <label>
-            Group name
-            <input value={newGroupName} onChange={(event) => setNewGroupName(event.target.value)} />
-          </label>
-          <button disabled={!newGroupName.trim()} onClick={createGroup}>Create group</button>
-        </div>
-      ) : null}
       <div className="list">
         {groups.map((group) => (
             <div
@@ -804,14 +831,15 @@ function GroupsPanel({
             >
               <div className="group-row-summary">
                 <div>
-                  <h3>{group.name}</h3>
-                  <p className="group-meta">
+                  <h3 className="group-title-line">
+                    <span>{group.name}</span>
+                    <span className="group-meta">
                     <span>{group.description || `${group.itemCount} skills`}</span>
-                    <span>{group.visibility || "restricted"}</span>
-                  </p>
-                  {group.disabledAt || group.ownerDisplayName ? (
+                      <span>{groupVisibilityLabel(group.visibility)}</span>
+                    </span>
+                  </h3>
+                  {group.ownerDisplayName ? (
                     <span>
-                      {group.disabledAt ? "hidden" : ""}
                       {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
                     </span>
                   ) : null}
@@ -820,40 +848,37 @@ function GroupsPanel({
                   {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}
                   {canManage ? (
                     <>
-                      <button
+                      {group.visibility === "public" && !group.disabledAt && profile?.handle ? (
+                        <Button aria-label="Open public group URL" asChild className="icon-link" size="icon" title="Open public URL" variant="secondary">
+                          <a href={publicGroupUrl(profile.handle, group.slug)}>
+                            <ArrowUpRight className={iconClassName} />
+                          </a>
+                        </Button>
+                      ) : null}
+                      <Button
                         aria-label={group.visibility === "public" ? "Unpublish group" : "Publish group"}
                         className={group.visibility === "public" ? "icon-button active" : "icon-button"}
                         onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}
-                        title={group.visibility === "public" ? "Public. Click to unpublish." : "Private/restricted. Click to publish."}
+                        size="icon"
+                        title={group.visibility === "public" ? "Public. Click to make private." : "Private. Click to publish."}
+                        variant="secondary"
                       >
-                        {group.visibility === "public" ? "●" : "○"}
-                      </button>
-                      {group.visibility === "public" && !group.disabledAt && profile?.handle ? (
-                        <a
-                          aria-label="Open public group URL"
-                          className="icon-link"
-                          href={publicGroupUrl(profile.handle, group.slug)}
-                          title="Open public URL"
-                        >
-                          ↗
-                        </a>
-                      ) : null}
-                      <a
-                        aria-label="Export group"
-                        className="icon-link"
-                        href={`/api/portal/groups/${group.id}/export`}
-                        title="Export group"
-                      >
-                        ↓
-                      </a>
-                      <button
+                        {group.visibility === "public" ? (
+                          <Earth className={`${iconClassName} public-icon`} />
+                        ) : (
+                          <Lock className={iconClassName} />
+                        )}
+                      </Button>
+                      <Button
                         aria-label={group.disabledAt ? "Restore group" : "Hide group"}
-                        className={group.disabledAt ? "icon-button warning active" : "icon-button warning"}
+                        className={group.disabledAt ? "icon-button active neutral-active" : "icon-button"}
                         onClick={() => setDisabled(group, !group.disabledAt)}
+                        size="icon"
                         title={group.disabledAt ? "Hidden. Click to restore." : "Hide group from public pages."}
+                        variant="secondary"
                       >
-                        {group.disabledAt ? "↺" : "⊘"}
-                      </button>
+                        {group.disabledAt ? <EyeOff className={iconClassName} /> : <Eye className={iconClassName} />}
+                      </Button>
                     </>
                   ) : null}
                 </div>
@@ -862,8 +887,7 @@ function GroupsPanel({
         ))}
         {groups.length === 0 ? <p className="muted">No groups yet.</p> : null}
       </div>
-      {status ? <p className="status">{status}</p> : null}
-    </section>
+    </Card>
   );
 }
 
@@ -949,22 +973,22 @@ function GroupDetailPage({ groupId }: { groupId: string }) {
 
       {group ? (
         <>
-          <section className="panel">
+          <Card className="panel">
             <div className="panel-header">
               <div>
                 <h2>{group.name}</h2>
                 <p className="group-meta">
                   <span>{group.itemCount} skills</span>
-                  <span>{group.visibility || "restricted"}</span>
+                  <span>{groupVisibilityLabel(group.visibility)}</span>
                   <span>{group.accessRole}</span>
                   {group.ownerDisplayName ? <span>{group.ownerDisplayName}</span> : null}
                 </p>
               </div>
             </div>
             {group.description ? <p>{group.description}</p> : null}
-          </section>
+          </Card>
 
-          <section className="panel">
+          <Card className="panel">
             <h2>Skills</h2>
             <div className="group-skills-panel">
               {items.map((item) => (
@@ -982,36 +1006,38 @@ function GroupDetailPage({ groupId }: { groupId: string }) {
               ))}
               {items.length === 0 ? <p className="muted">No skills in this group yet.</p> : null}
             </div>
-          </section>
+          </Card>
 
           {group.accessRole === "owner" ? (
-            <section className="panel">
+            <Card className="panel">
               <div className="panel-header">
                 <div>
                   <h2>Allowed Emails</h2>
-                  <p>People signed in with these emails can view this restricted group.</p>
+                  <p>People signed in with these emails can view this private group.</p>
                 </div>
               </div>
               <div className="email-list">
                 {(group.allowedEmails ?? []).map((allowedEmail) => (
                   <div className="email-row" key={allowedEmail.id}>
                     <span>{allowedEmail.email}</span>
-                    <button
+                    <Button
                       aria-label={`Remove ${allowedEmail.email}`}
                       className="icon-button warning"
                       onClick={() => removeAllowedEmail(allowedEmail.id)}
+                      size="icon"
                       title="Remove email"
                       type="button"
+                      variant="secondary"
                     >
-                      ⌫
-                    </button>
+                      <Trash2 className={iconClassName} />
+                    </Button>
                   </div>
                 ))}
                 {(group.allowedEmails ?? []).length === 0 ? <p className="muted">No emails added.</p> : null}
               </div>
               {showEmailInput ? (
                 <div className="inline-email-form">
-                  <input
+                  <Input
                     autoFocus
                     onChange={(event) => setEmailToAdd(event.target.value)}
                     onKeyDown={(event) => {
@@ -1022,16 +1048,16 @@ function GroupDetailPage({ groupId }: { groupId: string }) {
                     placeholder="teammate@example.com"
                     value={emailToAdd}
                   />
-                  <button disabled={!emailToAdd.trim()} onClick={addAllowedEmail} type="button">
+                  <Button disabled={!emailToAdd.trim()} onClick={addAllowedEmail} type="button">
                     Add
-                  </button>
+                  </Button>
                 </div>
               ) : (
-                <button className="text-button" onClick={() => setShowEmailInput(true)} type="button">
+                <Button className="text-button" onClick={() => setShowEmailInput(true)} size="sm" type="button" variant="link">
                   Add new email +
-                </button>
+                </Button>
               )}
-            </section>
+            </Card>
           ) : null}
         </>
       ) : null}
@@ -1072,8 +1098,10 @@ function Dashboard() {
     <main className="shell">
       <header className="dashboard-header">
         <div className="dashboard-identity">
-          <a aria-label="Home" className="eyes-logo" href="/app/">👀</a>
-          <ProfileHeaderControls profile={state.profile} onRefresh={refresh} />
+          <div className="dashboard-profile-line">
+            <a aria-label="Home" className="eyes-logo" href="/app/">👀</a>
+            <ProfileHeaderControls profile={state.profile} onRefresh={refresh} />
+          </div>
         </div>
         <div className="dashboard-actions">
           <UserButton />
@@ -1082,7 +1110,7 @@ function Dashboard() {
       </header>
 
       {status ? <p className="status">{status}</p> : null}
-      <GroupsPanel title="My Skill Groups" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
+      <GroupsPanel title="SETS" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
       <SyncedSkillsPanel groups={state.groups} skills={state.syncedSkills} onRefresh={refresh} />
       <GroupsPanel title="Shared With Me" groups={state.sharedGroups} />
     </main>
@@ -1099,13 +1127,13 @@ function App() {
           <section className="hero">
             <p className="eyebrow">omgskills</p>
             <h1>Sign in to manage Skill Groups</h1>
-            <p>Sync local skills, build a restricted group, and share it with a teammate by email.</p>
+            <p>Sync local skills, build a private group, and share it with a teammate by email.</p>
             <div className="actions">
               <SignInButton mode="modal">
-                <button>Sign in</button>
+                <Button>Sign in</Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="secondary">Create account</button>
+                <Button variant="secondary">Create account</Button>
               </SignUpButton>
             </div>
           </section>
