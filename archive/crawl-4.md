@@ -1,5 +1,7 @@
 # Crawl Strategy v4
 
+Historical note: this was the active Crawl 4 strategy/planning doc during implementation. The current crawl system guide is [`crawl.md`](/Users/jonslimak/Projects/omgskills/crawl.md).
+
 This doc is the concrete implementation plan that follows [`crawl-3.md`](/Users/jonslimak/Projects/omgskills/crawl-3.md).
 
 The goal is to tighten the current crawler, not rebuild it.
@@ -258,7 +260,7 @@ When this plan is implemented, verify:
 ## Assumptions
 
 - [`crawl-3.md`](/Users/jonslimak/Projects/omgskills/crawl-3.md) remains the strategy document
-- `crawl-4.md` is the actual build plan
+- this archived doc was the original build plan
 - the next implementation wave should be minimal and production-safe
 - separating strategy from implementation reduces ambiguity during build work
 

@@ -1,8 +1,10 @@
 # Crawl v4 Task Status
 
+Historical note: this was the Crawl 4 implementation/status checklist. The current crawl system guide is [`crawl.md`](/Users/jonslimak/Projects/omgskills/crawl.md).
+
 Crawl 4 evolved during implementation.
 
-The current source of truth is the implemented shadow behavior plus [`crawl-4.md`](/Users/jonslimak/Projects/omgskills/crawl-4.md).
+The current source of truth is [`crawl.md`](/Users/jonslimak/Projects/omgskills/crawl.md). This archived status doc should be treated as historical context.
 
 Older bucketed-preview and rolling-TTL-only notes should not be treated as current policy.
 
