@@ -76,7 +76,15 @@ manifest.skills = writeJsonAsset("skills", skills);
 manifest.trending = writeJsonAsset("trending", trending);
 
 if (existsSync(xTrendingPath)) {
-  const xTrending = loadJson(xTrendingPath).filter((skill) => skillIds.has(skill?.id));
+  const sourceXTrending = loadJson(xTrendingPath);
+  if (!Array.isArray(sourceXTrending)) {
+    fail("index/x-trending.json must be an array");
+  }
+  const filteredXTrending = sourceXTrending.filter((skill) => skillIds.has(skill?.id));
+  const xTrending = filteredXTrending.length > 0 ? filteredXTrending : sourceXTrending;
+  if (sourceXTrending.length > 0 && xTrending.length === 0) {
+    fail("refusing to publish empty xTrending from a non-empty source");
+  }
   manifest.xTrending = writeJsonAsset("x-trending", xTrending);
 }
 
