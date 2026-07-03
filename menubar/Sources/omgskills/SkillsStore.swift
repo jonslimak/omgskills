@@ -5,6 +5,7 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var availableSkills: [Skill] = []
     @Published private(set) var trendingSkills: [Skill] = []
     @Published private(set) var twitterSkills: [Skill] = []
+    @Published private(set) var collections: [SkillCollection] = []
     @Published private(set) var installedSkills: [Skill] = []
     @Published private(set) var installedSkillInstallations: [Skill] = []
     @Published private(set) var installedSummary = InstalledSkillSummary()
@@ -76,16 +77,19 @@ final class SkillsStore: ObservableObject {
         async let availableResult = decodeAvailableSkills()
         async let trendingResult = decodeTrendingEntries()
         async let twitterResult = decodeTwitterSkills()
+        async let collectionsResult = decodeCollections()
 
         let available = await availableResult
         let trending = await trendingResult
         let twitter = await twitterResult
+        let collections = await collectionsResult
         guard generation == loadGeneration else { return }
 
         applyDecodedLibraryData(
             available: available,
             trending: trending,
             twitter: twitter,
+            collections: collections,
             generation: generation
         )
     }
@@ -94,6 +98,7 @@ final class SkillsStore: ObservableObject {
         available: LoadResult<[Skill]>,
         trending: LoadResult<[TrendingEntry]>,
         twitter: LoadResult<[Skill]>,
+        collections: LoadResult<[SkillCollection]> = .success([]),
         generation: Int? = nil,
         buildIndexes: Bool = true
     ) {
@@ -132,6 +137,46 @@ final class SkillsStore: ObservableObject {
             }
         case .failure(let error):
             twitterLoadError = error
+        }
+
+        switch collections {
+        case .success(let collections):
+            self.collections = collections
+        case .failure:
+            break
+        }
+    }
+
+    func collection(id: String) -> SkillCollection? {
+        collections.first { $0.id == id }
+    }
+
+    func authorCollection(for handle: String) -> SkillCollection? {
+        let normalized = normalizeHandle(handle)
+        return collections.first {
+            $0.type == .author && normalizeHandle($0.authorHandle ?? "") == normalized
+        }
+    }
+
+    func featuredSkills(for collection: SkillCollection) -> [Skill] {
+        skills(for: collection.featuredSkillIds)
+    }
+
+    func allSkills(for collection: SkillCollection) -> [Skill] {
+        switch collection.type {
+        case .author:
+            guard let authorHandle = collection.authorHandle else { return featuredSkills(for: collection) }
+            let normalized = normalizeHandle(authorHandle)
+            return availableSkills
+                .filter { normalizeHandle($0.authorHandle) == normalized }
+                .sorted { lhs, rhs in
+                    if lhs.stars != rhs.stars {
+                        return lhs.stars > rhs.stars
+                    }
+                    return lhs.name.localizedCompare(rhs.name) == .orderedAscending
+                }
+        case .topic:
+            return skills(for: collection.skillIds ?? collection.featuredSkillIds)
         }
     }
 
@@ -248,6 +293,58 @@ final class SkillsStore: ObservableObject {
         }
     }
 
+    private nonisolated func decodeCollections() async -> LoadResult<[SkillCollection]> {
+        if DataRefreshService.activeTrack() == .crawl4,
+           let data = DataRefreshService.cachedData(for: .collections, track: .crawl4) {
+            let decoded = await decode(data, as: CollectionsAsset.self, label: "crawl4-collections.json")
+            switch decoded {
+            case .success(let asset):
+                return .success(asset.collections)
+            case .failure(let error):
+                DataRefreshService.removeCachedData(for: .collections, track: .crawl4)
+                return .failure(error)
+            }
+        }
+
+        if let data = DataRefreshService.cachedData(for: .collections, track: .productionV2) {
+            let decoded = await decode(data, as: CollectionsAsset.self, label: "collections.json")
+            switch decoded {
+            case .success(let asset):
+                return .success(asset.collections)
+            case .failure(let error):
+                DataRefreshService.removeCachedData(for: .collections, track: .productionV2)
+                return .failure(error)
+            }
+        }
+
+        if let bundled = bundledCollectionsData() {
+            let decoded = await decode(bundled.data, as: CollectionsAsset.self, label: bundled.label)
+            switch decoded {
+            case .success(let asset):
+                return .success(asset.collections)
+            case .failure(let error):
+                return .failure(error)
+            }
+        }
+
+        return .success([])
+    }
+
+    private nonisolated func bundledCollectionsData() -> (data: Data, label: String)? {
+        guard let manifestURL = Bundle.main.url(forResource: "manifest", withExtension: "json"),
+              let manifestData = try? Data(contentsOf: manifestURL),
+              let manifest = try? JSONDecoder().decode(DataRefreshService.Manifest.self, from: manifestData),
+              let collectionsPath = manifest.collections?.path else {
+            return nil
+        }
+
+        let collectionsURL = manifestURL.deletingLastPathComponent().appendingPathComponent(collectionsPath)
+        guard let data = try? Data(contentsOf: collectionsURL) else {
+            return nil
+        }
+        return (data, collectionsURL.lastPathComponent)
+    }
+
     private nonisolated func decode<T: Decodable & Sendable>(_ data: Data, as type: T.Type, label: String) async -> LoadResult<T> {
         await Task.detached(priority: .userInitiated) {
             do {
@@ -282,6 +379,19 @@ final class SkillsStore: ObservableObject {
             }
             return lhs.name.localizedCompare(rhs.name) == .orderedAscending
         }
+    }
+
+    private func skills(for ids: [String]) -> [Skill] {
+        let byId = Dictionary(uniqueKeysWithValues: availableSkills.map { ($0.id, $0) })
+        return ids.compactMap { byId[$0] }
+    }
+
+    private func normalizeHandle(_ handle: String) -> String {
+        var normalized = handle.trimmingCharacters(in: .whitespacesAndNewlines)
+        while normalized.hasPrefix("@") {
+            normalized.removeFirst()
+        }
+        return normalized.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
     private enum IndexKind {

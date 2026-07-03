@@ -94,6 +94,24 @@ if [ -f "$X_TRENDING_SKILLS" ]; then
     cp "$X_TRENDING_SKILLS" "$APP_BUNDLE/Contents/Resources/x-trending.json"
 fi
 cp "$DATA_MANIFEST" "$APP_BUNDLE/Contents/Resources/manifest.json"
+DATA_MANIFEST="$DATA_MANIFEST" \
+APP_RESOURCES="$APP_BUNDLE/Contents/Resources" \
+python3 - <<'PY'
+import json
+import os
+import shutil
+from pathlib import Path
+
+manifest_path = Path(os.environ["DATA_MANIFEST"])
+resources_dir = Path(os.environ["APP_RESOURCES"])
+manifest = json.loads(manifest_path.read_text())
+collections = manifest.get("collections")
+if collections and collections.get("path"):
+    source = manifest_path.parent / collections["path"]
+    if not source.exists():
+        raise SystemExit(f"✗ Missing collections asset referenced by manifest: {source}")
+    shutil.copy2(source, resources_dir / source.name)
+PY
 cp Assets/omgskills.icns "$APP_BUNDLE/Contents/Resources/omgskills.icns"
 cp Sources/omgskills/Resources/marked.min.js "$APP_BUNDLE/Contents/Resources/marked.min.js"
 cp Sources/omgskills/Resources/x-twitter-logo-block.png "$APP_BUNDLE/Contents/Resources/x-twitter-logo-block.png"

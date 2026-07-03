@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "featuredAuthors": [
+    "openai",
+    "anthropics",
+    "cursor"
+  ],
+  "authorOverrides": {
+    "openai": {
+      "title": "OpenAI",
+      "subtitle": "The Codex team",
+      "featuredSkillIds": [
+        "openai/codex:code-review",
+        "openai/codex:babysit-pr",
+        "openai/codex:plugin-creator"
+      ],
+      "description": "OpenAI's Codex skills focus on code review, pull request workflow, and building Codex extensions. Start here if you use Codex for day-to-day software work."
+    },
+    "anthropics": {
+      "title": "Anthropic",
+      "subtitle": "Official Claude skills",
+      "featuredSkillIds": [
+        "anthropics/skills:pdf",
+        "anthropics/skills:docx",
+        "anthropics/skills:frontend-design",
+        "anthropics/skills:webapp-testing"
+      ],
+      "description": "Anthropic's official skills cover documents, frontend design, testing, and Claude API work. They are a practical baseline for most Claude setups."
+    },
+    "cursor": {
+      "title": "Cursor",
+      "subtitle": "Cursor plugin workflows",
+      "featuredSkillIds": [
+        "cursor/plugins:deslop",
+        "cursor/plugins:fix-merge-conflicts",
+        "cursor/plugins:make-pr-easy-to-review",
+        "cursor/plugins:thermo-nuclear-code-quality-review"
+      ],
+      "description": "Cursor's plugin skills focus on review, merge conflicts, and keeping code changes easy to ship. Useful for teams already working inside Cursor."
+    }
+  },
+  "collections": [
+    {
+      "id": "starter-pack",
+      "type": "topic",
+      "title": "Starter Pack",
+      "subtitle": "Essential skills for a first setup",
+      "imageUrl": null,
+      "featuredSkillIds": [
+        "anthropics/skills:pdf",
+        "anthropics/skills:docx",
+        "obra/superpowers:systematic-debugging",
+        "openai/codex:code-review"
+      ],
+      "skillIds": [
+        "anthropics/skills:pdf",
+        "anthropics/skills:docx",
+        "anthropics/skills:xlsx",
+        "obra/superpowers:systematic-debugging",
+        "obra/superpowers:test-driven-development",
+        "obra/superpowers:requesting-code-review",
+        "openai/codex:code-review",
+        "anthropics/skills:webapp-testing"
+      ],
+      "description": "Covers documents, debugging, testing, review, and browser-based app checks. A good baseline for a new Claude or Codex setup."
+    },
+    {
+      "id": "design-essentials",
+      "type": "topic",
+      "title": "Design Essentials",
+      "subtitle": "UI, frontend, and product polish",
+      "imageUrl": null,
+      "featuredSkillIds": [
+        "pbakaus/impeccable:impeccable",
+        "anthropics/skills:frontend-design",
+        "leonxlnx/taste-skill:image-to-code",
+        "emilkowalski/skills:emil-design-eng"
+      ],
+      "skillIds": [
+        "pbakaus/impeccable:impeccable",
+        "anthropics/skills:frontend-design",
+        "leonxlnx/taste-skill:gpt-taste",
+        "leonxlnx/taste-skill:image-to-code",
+        "leonxlnx/taste-skill:imagegen-frontend-web",
+        "emilkowalski/skills:emil-design-eng",
+        "mattpocock/skills:design-an-interface",
+        "anthropics/skills:webapp-testing"
+      ],
+      "description": "Covers interface design, frontend implementation, visual critique, and product polish. Use this list when the output needs to look and feel considered."
+    }
+  ]
+}

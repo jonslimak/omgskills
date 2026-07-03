@@ -86,6 +86,10 @@ fi
 
 mkdir -p "$DATA_DIR"
 manifest_generated_at="${MANIFEST_GENERATED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
+existing_manifest_tmp="$(mktemp)"
+if [ -f "$DATA_DIR/manifest.json" ]; then
+    cp "$DATA_DIR/manifest.json" "$existing_manifest_tmp"
+fi
 
 skills_hash="$(hash_file "$SKILLS")"
 trending_hash="$(hash_file "$TRENDING")"
@@ -214,6 +218,38 @@ EOF
 fi)
 }
 JSON
+
+if [ -s "$existing_manifest_tmp" ]; then
+    MANIFEST_PATH="$DATA_DIR/manifest.json" \
+    EXISTING_MANIFEST_PATH="$existing_manifest_tmp" \
+    python3 - <<'PY'
+import json
+import os
+from pathlib import Path
+
+manifest_path = Path(os.environ["MANIFEST_PATH"])
+existing_path = Path(os.environ["EXISTING_MANIFEST_PATH"])
+manifest = json.loads(manifest_path.read_text())
+existing = json.loads(existing_path.read_text())
+owned = {
+    "version",
+    "generatedAt",
+    "skills",
+    "trending",
+    "trendingLeaderboard",
+    "leaderboardViewData",
+    "xTrending",
+    "skillSignals",
+    "authorSignals",
+    "authorLeaderboards",
+}
+for key, value in existing.items():
+    if key not in owned and key not in manifest:
+        manifest[key] = value
+manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+PY
+fi
+rm -f "$existing_manifest_tmp"
 
 if [ -z "$DATA_TRACK_SUBDIR" ]; then
     HEALTH_PUBLISHED_AT="${HEALTH_PUBLISHED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \

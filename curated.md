@@ -4,7 +4,7 @@ This doc captures the intended manual curation path for Crawl 4.
 
 ## Goal
 
-Manual curation should let an operator paste GitHub repo or `SKILL.md` links into Codex and have an agent add useful skills quickly.
+Manual curation lets an operator paste GitHub repo or `SKILL.md` links into Codex and have an agent add useful skills quickly.
 
 This path should:
 
@@ -23,11 +23,13 @@ Manual curation should write Crawl 4 shadow/manual overlay data, then publish Cr
 
 Once Crawl 4 is the primary client track, curated skills can appear in the primary track after publish.
 
-The agent should accept:
+The `/curate` Codex skill should accept:
 
 - GitHub repo URLs
 - GitHub `blob/.../SKILL.md` URLs
 - GitHub folder URLs containing multiple skills
+
+Exact `SKILL.md` links are implemented now. Repo and folder links are handled by resolving them to exact `SKILL.md` blob URLs first.
 
 Manual curation can bypass:
 
@@ -42,31 +44,38 @@ Manual curation cannot bypass:
 - unresolved catalog/repackaged exclusion
 - cutover validation
 
-## Future Mechanism
+## Current Mechanism
 
-Add fast operator commands:
+Implemented:
 
 ```bash
 npm run crawl4:add-skill -- <github-skill-md-url>
-npm run crawl4:add-repo -- <github-repo-url>
 ```
 
-Expected behavior:
+Behavior:
 
-- fetch only the linked skill or repo
+- fetch only the linked skill
 - extract repo metadata and raw `SKILL.md`
 - create or update Crawl 4 manual overlay records
 - update Crawl 4 data without full discovery, cheap checks, or daily refresh
 - report added, skipped, and failed items clearly
 
+Still future:
+
+```bash
+npm run crawl4:add-repo -- <github-repo-url>
+```
+
+For now, agents should resolve repo or folder URLs into exact `SKILL.md` blob URLs and call `crawl4:add-skill` for each one.
+
 ## Codex Skill
 
-After the commands exist, create a Codex skill named `crawl4-curator`.
+The Codex skill exists as `/curate`.
 
 The skill should instruct agents to:
 
 - normalize pasted GitHub links
-- choose `add-skill` vs `add-repo`
+- choose exact `add-skill` inputs
 - run the operator command
 - inspect output
 - publish Crawl 4 data if needed
@@ -75,16 +84,10 @@ The skill should instruct agents to:
 
 ## Test Plan
 
-For this doc-only step:
-
-- confirm this doc states intent, constraints, and future commands
-- confirm this doc does not imply full Crawl 4 is required for manual adds
-- confirm unresolved catalog/repackaged skills stay blocked
-
-For the later mechanism:
+For the implemented mechanism:
 
 - add one exact `SKILL.md` link
-- add one repo with multiple skills
+- resolve one repo with multiple skills into exact `SKILL.md` links
 - reject one unresolved catalog-like skill
 - confirm Crawl 4 output can see added skills
 - confirm v2 fallback output is not hand-edited
@@ -92,5 +95,5 @@ For the later mechanism:
 ## Assumptions
 
 - Manual curated skills target Crawl 4 output, not v2 fallback output.
-- First implementation step after this doc is the fast operator mechanism.
-- The Codex skill should be created after the operator commands exist.
+- Exact `SKILL.md` manual add is implemented.
+- Repo-level manual add is still future; agents resolve repo links manually for now.

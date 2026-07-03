@@ -28,9 +28,11 @@ enum LibraryDataTrack: String, CaseIterable, Identifiable {
         case (.productionV2, .skills): return "skills.json"
         case (.productionV2, .trending): return "trending.json"
         case (.productionV2, .xTrending): return "x-trending.json"
+        case (.productionV2, .collections): return "collections.json"
         case (.crawl4, .skills): return "crawl4-skills.json"
         case (.crawl4, .trending): return "crawl4-trending.json"
         case (.crawl4, .xTrending): return "crawl4-x-trending.json"
+        case (.crawl4, .collections): return "crawl4-collections.json"
         }
     }
 
@@ -117,6 +119,7 @@ enum DataRefreshService {
         case skills
         case trending
         case xTrending
+        case collections
 
         var cacheFilename: String {
             activeTrack().cacheFilename(for: self)
@@ -129,6 +132,7 @@ enum DataRefreshService {
         let skills: Asset
         let trending: Asset?
         let xTrending: Asset?
+        let collections: Asset?
     }
 
     struct Asset: Codable {
@@ -155,6 +159,7 @@ enum DataRefreshService {
         var activeSkillsHash: String?
         var activeTrendingHash: String?
         var activeXTrendingHash: String?
+        var activeCollectionsHash: String?
         var activeLibraryGeneratedAt: String?
         var remoteXTrendingEnabled: Bool?
         var lastCheckedAt: TimeInterval?
@@ -359,6 +364,27 @@ enum DataRefreshService {
                   (cachedData(for: .xTrending, track: track) != nil || metadata.activeXTrendingHash != nil) {
             removeCachedData(for: .xTrending, track: track)
             metadata.activeXTrendingHash = nil
+            didUpdate = true
+        }
+
+        if let collections = manifest.collections,
+           shouldUpdateAsset(
+            activeHash: metadata.activeCollectionsHash,
+            hasCachedData: cachedData(for: .collections, track: track) != nil,
+            manifestHash: collections.sha256
+           ) {
+            do {
+                let data = try await fetchAndValidate(asset: collections, decodeAs: CollectionsAsset.self, track: track)
+                try writeCache(data, for: .collections, track: track)
+                metadata.activeCollectionsHash = collections.sha256
+                didUpdate = true
+            } catch {
+                print("[DataRefreshService] collections refresh failed: \(error)")
+            }
+        } else if manifest.collections == nil,
+                  (cachedData(for: .collections, track: track) != nil || metadata.activeCollectionsHash != nil) {
+            removeCachedData(for: .collections, track: track)
+            metadata.activeCollectionsHash = nil
             didUpdate = true
         }
 

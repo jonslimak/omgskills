@@ -114,7 +114,7 @@ private struct StarterSearch: Identifiable, Hashable {
 
 private struct DataUpdatedFooterView: View {
     let text: String
-    private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
+    private let appVersion = "0.0.18"
 
     var body: some View {
         HStack(spacing: 8) {
@@ -143,6 +143,8 @@ struct ContentView: View {
     @State private var query = ""
     @State private var selectedCreatorHandle: String?
     @State private var selectedId: String?
+    @State private var selectedCollectionId: String?
+    @State private var activeCollectionListId: String?
     @State private var keyMonitor: Any?
     @State private var sortKey: SortKey = .stars
     @State private var source: Source = .available
@@ -173,6 +175,7 @@ struct ContentView: View {
     @State private var isRestoringSession = false
     @State private var suppressSessionChangeHandlers = false
     @State private var isApplyingCreatorFilter = false
+    @State private var isApplyingCollectionSelection = false
     @State private var lastTrackedSearchQuery = ""
     @State private var lastTrackedSearchErrorKey = ""
     @State private var lastTrackedOpenedSkillId = ""
@@ -256,8 +259,18 @@ struct ContentView: View {
     private var searchQueryForResults: String {
         queryMatchesSelectedCreator ? "" : debouncedQuery
     }
+
+    private var selectedCollection: SkillCollection? {
+        guard let selectedCollectionId else { return nil }
+        return store.collection(id: selectedCollectionId)
+    }
     
     private func computeResults() -> [Skill] {
+        if let activeCollectionListId,
+           let collection = store.collection(id: activeCollectionListId) {
+            return Array(store.allSkills(for: collection).prefix(150))
+        }
+
         let creatorFiltered = skillsFilteredBySelectedCreator(baseSkills)
         let searched = store.search(query: searchQueryForResults, in: creatorFiltered, source: source, usingIndex: source != .installed)
         let sorted: [Skill] = switch sortKey {
@@ -365,6 +378,10 @@ struct ContentView: View {
         }
         .onChange(of: query) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                selectedCollectionId = nil
+                activeCollectionListId = nil
+            }
             updateCreatorFilter(forQuery: newValue)
             if !newValue.isEmpty && source == .trending {
                 source = .available
@@ -394,6 +411,12 @@ struct ContentView: View {
         }
         .onChange(of: source)   { _, newSource in
             guard !suppressSessionChangeHandlers else { return }
+            if isApplyingCollectionSelection {
+                isApplyingCollectionSelection = false
+            } else {
+                selectedCollectionId = nil
+                activeCollectionListId = nil
+            }
             if isApplyingCreatorFilter {
                 isApplyingCreatorFilter = false
             } else {
@@ -518,11 +541,11 @@ struct ContentView: View {
     }
 
     private var shouldSelectFirstResult: Bool {
-        !(showDetail && selectedId != nil)
+        !(showDetail && (selectedId != nil || selectedCollectionId != nil))
     }
 
     private var isEmptyStartState: Bool {
-        shouldShowStarterSearches ||
+        (shouldShowStarterSearches && selectedCollectionId == nil) ||
         (source == .installed &&
          localDashboardFilter == nil &&
          query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -542,6 +565,8 @@ struct ContentView: View {
             if !query.isEmpty {
                 Button {
                     selectedCreatorHandle = nil
+                    selectedCollectionId = nil
+                    activeCollectionListId = nil
                     query = ""
                     debouncedQuery = ""
                     refreshResults(selectFirst: true)
@@ -571,6 +596,18 @@ struct ContentView: View {
             errorView(err)
         } else if shouldShowStarterSearches {
             starterSearchesView
+        } else if let collection = selectedCollection {
+            if shouldShowDetailPanel {
+                HStack(spacing: 0) {
+                    collectionPage(collection)
+                        .frame(width: 320)
+                    Divider()
+                    detailPane
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
+                collectionPage(collection)
+            }
         } else if shouldShowLocalDashboard {
             if shouldShowDetailPanel {
                 HStack(spacing: 0) {
@@ -600,6 +637,23 @@ struct ContentView: View {
         }
     }
 
+    private func collectionPage(_ collection: SkillCollection) -> some View {
+        CollectionPageView(
+            collection: collection,
+            featuredSkills: store.featuredSkills(for: collection),
+            onSelectSkill: { skill in
+                selectSkillFromCollection(skill)
+            },
+            onCreatorTap: { handle in
+                openAuthorOrFilter(handle)
+            },
+            onSeeAll: {
+                showAllSkills(in: collection)
+            },
+            onClose: closeCollectionPage
+        )
+    }
+
     private func errorView(_ msg: String) -> some View {
         VStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle")
@@ -614,7 +668,10 @@ struct ContentView: View {
     }
 
     private var shouldShowStarterSearches: Bool {
-        source == .available && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        source == .available &&
+        query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        activeCollectionListId == nil &&
+        selectedCollectionId == nil
     }
 
     private var shouldShowLocalDashboard: Bool {
@@ -625,6 +682,21 @@ struct ContentView: View {
     private var starterSearchesView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 26) {
+                if !store.collections.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Collections")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                        VStack(spacing: 5) {
+                            ForEach(store.collections.prefix(5)) { collection in
+                                CollectionCard(collection: collection) {
+                                    selectCollection(collection)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 ForEach(starterSearchGroups, id: \.0) { group in
                     VStack(alignment: .leading, spacing: 6) {
                         Text(group.0)
@@ -874,7 +946,7 @@ struct ContentView: View {
                         selectSkillFromRow(skill)
                     },
                     onCreatorTap: { handle in
-                        filterByCreator(handle)
+                        openAuthorOrFilter(handle)
                     }
                 )
                 .id(skill.id)
@@ -903,15 +975,7 @@ struct ContentView: View {
                                     .font(.title2)
                                     .fontWeight(.bold)
                             }
-                            if let attribution = skill.discoverAttributionText, source == .available {
-                                Text(attribution)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            } else if !skill.authorHandle.isEmpty {
-                                Text("by @\(skill.authorHandle)")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
+                            authorAttributionButton(for: skill)
                         }
                         Spacer()
                         Button("Close", systemImage: "arrow.left.to.line.compact") {
@@ -1170,6 +1234,26 @@ struct ContentView: View {
                         .foregroundStyle(.red)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func authorAttributionButton(for skill: Skill) -> some View {
+        if !skill.authorHandle.isEmpty {
+            Button {
+                openAuthorOrFilter(skill.authorHandle)
+            } label: {
+                Text("by @\(skill.authorHandle)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Show skills by @\(skill.authorHandle)")
+            .help("Show skills by @\(skill.authorHandle)")
+        } else if let attribution = skill.discoverAttributionText, source == .available {
+            Text(attribution)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -1811,6 +1895,8 @@ struct ContentView: View {
 
     private func runStarterSearch(_ term: String) {
         selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         source = .available
         sortKey = .stars
         showDetail = false
@@ -1822,6 +1908,8 @@ struct ContentView: View {
 
     private func showTrendingSkills() {
         selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         source = .trending
         sortKey = .trending
         localDashboardFilter = nil
@@ -1834,6 +1922,8 @@ struct ContentView: View {
 
     private func showTwitterSkills() {
         selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         source = .twitter
         sortKey = .stars
         localDashboardFilter = nil
@@ -1928,6 +2018,8 @@ struct ContentView: View {
         suppressSessionChangeHandlers = true
         query = ""
         selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         debouncedQuery = ""
         source = .available
         sortKey = .stars
@@ -1968,6 +2060,8 @@ struct ContentView: View {
         let handle = normalizedCreatorHandle(rawHandle)
         guard !handle.isEmpty else { return }
 
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         if source != .installed {
             if source != .available {
                 isApplyingCreatorFilter = true
@@ -1982,11 +2076,85 @@ struct ContentView: View {
         searchFocused = true
     }
 
+    private func openAuthorOrFilter(_ rawHandle: String) {
+        let handle = normalizedCreatorHandle(rawHandle)
+        guard !handle.isEmpty else { return }
+        if let collection = store.authorCollection(for: handle) {
+            selectCollection(collection)
+        } else {
+            filterByCreator(handle)
+        }
+    }
+
+    private func selectCollection(_ collection: SkillCollection) {
+        activeCollectionListId = nil
+        selectedCreatorHandle = nil
+        selectedId = nil
+        selectedSkill = nil
+        displayedReadme = nil
+        isLoadingReadme = false
+        deleteError = nil
+        crossInstallState = .idle
+        readmeHeight = 200
+        resetInstallStates()
+        readmeLoadTask?.cancel()
+        selectedCollectionId = collection.id
+        if source != .available {
+            isApplyingCollectionSelection = true
+        }
+        source = .available
+        localDashboardFilter = nil
+        query = ""
+        debouncedQuery = ""
+        showDetail = false
+    }
+
+    private func showAllSkills(in collection: SkillCollection) {
+        switch collection.type {
+        case .author:
+            if let authorHandle = collection.authorHandle {
+                filterByCreator(authorHandle)
+            }
+        case .topic:
+            selectedCollectionId = nil
+            activeCollectionListId = collection.id
+            selectedCreatorHandle = nil
+            if source != .available {
+                isApplyingCollectionSelection = true
+            }
+            source = .available
+            sortKey = .stars
+            localDashboardFilter = nil
+            query = ""
+            debouncedQuery = ""
+            showDetail = false
+            cachedResults = Array(store.allSkills(for: collection).prefix(150))
+            select(cachedResults.first, scroll: false)
+            searchFocused = true
+        }
+    }
+
     private func selectSkillFromRow(_ skill: Skill) {
         select(skill, scroll: false)
         withAnimation(.easeInOut(duration: 0.15)) {
             showDetail = true
         }
+    }
+
+    private func selectSkillFromCollection(_ skill: Skill) {
+        select(skill, scroll: false, preserveCollection: true)
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showDetail = true
+        }
+    }
+
+    private func closeCollectionPage() {
+        selectedCollectionId = nil
+        activeCollectionListId = nil
+        showDetail = false
+        clearSelection()
+        resetResultsForStarterState()
+        searchFocused = true
     }
 
     private func refreshResults(selectFirst: Bool) {
@@ -2013,6 +2181,8 @@ struct ContentView: View {
     private func resetResultsForStarterState() {
         cachedResults = []
         selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         selectedId = nil
         selectedSkill = nil
         displayedReadme = nil
@@ -2024,6 +2194,8 @@ struct ContentView: View {
     private func selectLocalDashboardFilter(_ filter: LocalDashboardFilter) {
         if localDashboardFilter == filter {
             selectedCreatorHandle = nil
+            selectedCollectionId = nil
+            activeCollectionListId = nil
             localDashboardFilter = nil
             showDetail = false
             query = ""
@@ -2034,6 +2206,8 @@ struct ContentView: View {
             return
         }
         selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         localDashboardFilter = filter
         showDetail = false
         query = ""
@@ -2051,6 +2225,8 @@ struct ContentView: View {
 
         source = .installed
         selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
         localDashboardFilter = .all
         showDetail = true
         query = ""
@@ -2061,6 +2237,7 @@ struct ContentView: View {
     }
 
     private func clearSelection() {
+        selectedCollectionId = nil
         selectedId = nil
         selectedSkill = nil
         displayedReadme = nil
@@ -2090,8 +2267,11 @@ struct ContentView: View {
         }
     }
 
-    private func select(_ skill: Skill?, scroll: Bool) {
+    private func select(_ skill: Skill?, scroll: Bool, preserveCollection: Bool = false) {
         guard selectedId != skill?.id else { return }
+        if !preserveCollection {
+            selectedCollectionId = nil
+        }
         selectedId = skill?.id
         selectedSkill = skill
         displayedReadme = nil

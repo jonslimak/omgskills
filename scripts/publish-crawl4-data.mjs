@@ -33,6 +33,22 @@ function writeJsonAsset(prefix, value) {
   return { path: filename, sha256: hash, bytes: data.length };
 }
 
+function loadExistingManifest() {
+  const manifestPath = join(dataDir, "manifest.json");
+  if (!existsSync(manifestPath)) return {};
+  return loadJson(manifestPath);
+}
+
+function preserveForeignManifestAssets(manifest, existingManifest) {
+  const ownedKeys = new Set(["version", "generatedAt", "skills", "trending", "xTrending"]);
+  for (const [key, value] of Object.entries(existingManifest)) {
+    if (!ownedKeys.has(key) && manifest[key] === undefined) {
+      manifest[key] = value;
+    }
+  }
+  return manifest;
+}
+
 function pruneOldAssets(manifest) {
   const manifestAssets = new Set(
     [manifest.skills, manifest.trending, manifest.xTrending]
@@ -70,6 +86,7 @@ const manifest = {
   version: 1,
   generatedAt: report.checkedAt ?? new Date().toISOString(),
 };
+const existingManifest = loadExistingManifest();
 
 mkdirSync(dataDir, { recursive: true });
 manifest.skills = writeJsonAsset("skills", skills);
@@ -88,6 +105,7 @@ if (existsSync(xTrendingPath)) {
   manifest.xTrending = writeJsonAsset("x-trending", xTrending);
 }
 
+preserveForeignManifestAssets(manifest, existingManifest);
 writeFileSync(join(dataDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 pruneOldAssets(manifest);
 

@@ -11,5 +11,5 @@
     "noEmit": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["scraper/**/*.ts", "scraper/content/**/*.ts"]
+  "include": ["scraper/**/*.ts", "scraper/content/**/*.ts", "scripts/**/*.ts"]
 }

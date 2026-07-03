@@ -204,9 +204,37 @@ struct DataRefreshServiceTests {
         #expect(LibraryDataTrack.productionV2.cacheFilename(for: .skills) == "skills.json")
         #expect(LibraryDataTrack.productionV2.cacheFilename(for: .trending) == "trending.json")
         #expect(LibraryDataTrack.productionV2.cacheFilename(for: .xTrending) == "x-trending.json")
+        #expect(LibraryDataTrack.productionV2.cacheFilename(for: .collections) == "collections.json")
         #expect(LibraryDataTrack.crawl4.cacheFilename(for: .skills) == "crawl4-skills.json")
         #expect(LibraryDataTrack.crawl4.cacheFilename(for: .trending) == "crawl4-trending.json")
         #expect(LibraryDataTrack.crawl4.cacheFilename(for: .xTrending) == "crawl4-x-trending.json")
+        #expect(LibraryDataTrack.crawl4.cacheFilename(for: .collections) == "crawl4-collections.json")
+    }
+
+    @Test func manifestDecodesWithAndWithoutCollections() throws {
+        let manifestWithoutCollections = """
+        {
+          "version": 2,
+          "generatedAt": "2026-07-03T00:00:00Z",
+          "skills": { "path": "skills.json", "sha256": "abc", "bytes": 10 }
+        }
+        """.data(using: .utf8)!
+        let decodedWithout = try JSONDecoder().decode(DataRefreshService.Manifest.self, from: manifestWithoutCollections)
+
+        #expect(decodedWithout.collections == nil)
+
+        let manifestWithCollections = """
+        {
+          "version": 2,
+          "generatedAt": "2026-07-03T00:00:00Z",
+          "skills": { "path": "skills.json", "sha256": "abc", "bytes": 10 },
+          "collections": { "path": "collections-def.json", "sha256": "def", "bytes": 20 }
+        }
+        """.data(using: .utf8)!
+        let decodedWith = try JSONDecoder().decode(DataRefreshService.Manifest.self, from: manifestWithCollections)
+
+        #expect(decodedWith.collections?.path == "collections-def.json")
+        #expect(decodedWith.collections?.sha256 == "def")
     }
 
     @Test func missingSkillsCacheBypassesThrottle() {
