@@ -599,6 +599,51 @@ test("unresolved skillssh candidate becomes eligible when path resolution succee
   assert.equal(result.bootstrapSkippedRepoSample.length, 0);
 });
 
+test("unresolved official candidate becomes eligible when path resolution succeeds", async () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 0 })]);
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      ["owner/repo", candidate({ source: "official", id: "owner/repo:bootstrapped", skill_md_path: "__RESOLVE__", skill_name_hint: "bootstrapped", github_url: "https://github.com/owner/repo" })],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    resolveCandidatePathFn: async () => "skills/bootstrapped/SKILL.md",
+    enrichCandidateFn: async () => ({ skill: skill("owner/repo:bootstrapped") }),
+  });
+
+  assert.equal(result.bootstrappedSkills.length, 1);
+  assert.equal(result.bootstrapSkippedRepoSample.length, 0);
+});
+
+test("candidate resolution error (e.g. deleted repo) skips the repo instead of failing the run", async () => {
+  const index = repoIndex([repo({ repo: "owner/gone", stars: 0 })]);
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      ["owner/gone", candidate({ source: "official", id: "owner/gone:skill", skill_md_path: "__RESOLVE__", skill_name_hint: "skill", github_url: "https://github.com/owner/gone" })],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    resolveCandidatePathFn: async () => {
+      throw new Error("Not Found - https://docs.github.com/rest/git/trees#get-a-tree");
+    },
+    enrichCandidateFn: async () => ({ skill: skill("owner/gone:skill") }),
+  });
+
+  assert.equal(result.bootstrappedSkills.length, 0);
+  assert.equal(result.bootstrapSkippedRepoSample.length, 1);
+  assert.equal(result.bootstrapSkippedRepoSample[0].failureReason, "no-eligible-candidate");
+});
+
 test("unresolved awesome candidate stays skipped when path resolution fails", async () => {
   const index = repoIndex([repo({ repo: "owner/repo", stars: 0 })]);
 

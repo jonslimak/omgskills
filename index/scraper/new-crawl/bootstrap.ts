@@ -165,8 +165,10 @@ export async function bootstrapRisingRepos({
     const candidate = bootstrapCandidateByRepo.get(repo.repo) ?? (aliasRepo ? bootstrapCandidateByRepo.get(aliasRepo) : undefined);
     if (!candidate) continue;
     let resolvedCandidate = candidate;
-    if ((candidate.source === "skillssh" || candidate.source === "awesome") && candidate.skill_md_path === "__RESOLVE__") {
-      const resolvedPath = await resolveCandidatePathFn(candidate);
+    if ((candidate.source === "skillssh" || candidate.source === "awesome" || candidate.source === "official") && candidate.skill_md_path === "__RESOLVE__") {
+      // Discovery lists can reference deleted/renamed repos (e.g. stale official-page
+      // entries); a failed lookup means unresolvable, not a failed crawl.
+      const resolvedPath = await resolveCandidatePathFn(candidate).catch(() => null);
       if (resolvedPath) {
         resolvedCandidate = {
           ...candidate,
