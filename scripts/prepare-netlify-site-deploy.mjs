@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
 import path from "node:path";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
@@ -63,6 +64,49 @@ async function ensureAsset(urlPath) {
   }
 }
 
+async function runWebLibraryBuild() {
+  await new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [path.join(repoRoot, "scripts", "build-web-library.mjs")], {
+      cwd: repoRoot,
+      env: {
+        ...process.env,
+        SITE_DIR: siteDir,
+        PRODUCTION_ORIGIN: productionOrigin,
+      },
+      stdio: "inherit",
+    });
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`Web library build failed with exit code ${code}`));
+    });
+  });
+}
+
+async function hasGeneratedIndex(dirName) {
+  const root = path.join(siteDir, dirName);
+  const entries = await readdir(root, { recursive: true, withFileTypes: true });
+  return entries.some((entry) => entry.isFile() && entry.name === "index.html");
+}
+
+async function verifyWebLibraryBuild() {
+  const requiredFiles = [
+    path.join(siteDir, "sitemap.xml"),
+  ];
+
+  for (const filePath of requiredFiles) {
+    if (!(await fileExists(filePath))) {
+      throw new Error(`Missing generated web library file: ${filePath}`);
+    }
+  }
+
+  for (const dirName of ["skills", "creators", "collections"]) {
+    if (!(await hasGeneratedIndex(dirName))) {
+      throw new Error(`Missing generated web library pages under site/${dirName}`);
+    }
+  }
+}
+
 async function readAppcast() {
   const appcastPath = path.join(siteDir, "appcast.xml");
   if (!(await fileExists(appcastPath))) {
@@ -93,6 +137,9 @@ function extractUpdatePaths(appcastXml) {
 }
 
 async function main() {
+  await runWebLibraryBuild();
+  await verifyWebLibraryBuild();
+
   const appcastXml = await readAppcast();
   const updateAssets = extractUpdatePaths(appcastXml);
 

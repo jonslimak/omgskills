@@ -1,16 +1,14 @@
 {
   "version": 1,
-  "featuredAuthors": [
-    "openai",
-    "anthropics",
-    "cursor",
-    "mattpocock",
-    "leonxlnx"
-  ],
-  "authorOverrides": {
-    "openai": {
+  "generatedAt": "2026-07-03T20:50:11.610Z",
+  "collections": [
+    {
+      "id": "author-openai",
+      "type": "author",
       "title": "OpenAI",
       "subtitle": "The Codex team",
+      "authorHandle": "openai",
+      "imageUrl": null,
       "featuredSkillIds": [
         "openai/codex:code-review",
         "openai/codex:babysit-pr",
@@ -18,9 +16,13 @@
       ],
       "description": "OpenAI's Codex skills focus on code review, pull request workflow, and building Codex extensions. Start here if you use Codex for day-to-day software work."
     },
-    "anthropics": {
+    {
+      "id": "author-anthropics",
+      "type": "author",
       "title": "Anthropic",
       "subtitle": "Official Claude skills",
+      "authorHandle": "anthropics",
+      "imageUrl": null,
       "featuredSkillIds": [
         "anthropics/skills:pdf",
         "anthropics/skills:docx",
@@ -29,9 +31,13 @@
       ],
       "description": "Anthropic's official skills cover documents, frontend design, testing, and Claude API work. They are a practical baseline for most Claude setups."
     },
-    "cursor": {
+    {
+      "id": "author-cursor",
+      "type": "author",
       "title": "Cursor",
       "subtitle": "Cursor plugin workflows",
+      "authorHandle": "cursor",
+      "imageUrl": null,
       "featuredSkillIds": [
         "cursor/plugins:deslop",
         "cursor/plugins:fix-merge-conflicts",
@@ -40,9 +46,13 @@
       ],
       "description": "Cursor's plugin skills focus on review, merge conflicts, and keeping code changes easy to ship. Useful for teams already working inside Cursor."
     },
-    "mattpocock": {
+    {
+      "id": "author-mattpocock",
+      "type": "author",
       "title": "Matt Pocock",
       "subtitle": "Engineering and writing workflows",
+      "authorHandle": "mattpocock",
+      "imageUrl": null,
       "featuredSkillIds": [
         "mattpocock/skills:write-a-skill",
         "mattpocock/skills:grill-with-docs",
@@ -51,9 +61,13 @@
       ],
       "description": "Matt Pocock's skills cover engineering critique, product planning, writing, and practical Claude workflows. Use this profile to test individual creator pages."
     },
-    "leonxlnx": {
+    {
+      "id": "author-leonxlnx",
+      "type": "author",
       "title": "Leon Lin",
       "subtitle": "Taste and image-to-code workflows",
+      "authorHandle": "leonxlnx",
+      "imageUrl": null,
       "featuredSkillIds": [
         "leonxlnx/taste-skill:brandkit",
         "leonxlnx/taste-skill:gpt-taste",
@@ -61,9 +75,7 @@
         "leonxlnx/taste-skill:imagegen-frontend-web"
       ],
       "description": "Leon Lin's skills focus on taste, brand direction, image-to-code work, and frontend generation. Use this profile as a design-focused creator example."
-    }
-  },
-  "collections": [
+    },
     {
       "id": "starter-pack",
       "type": "topic",

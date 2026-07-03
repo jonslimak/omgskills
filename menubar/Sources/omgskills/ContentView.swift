@@ -691,8 +691,15 @@ struct ContentView: View {
                         Text("Collections")
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(.tertiary)
-                        VStack(spacing: 5) {
-                            ForEach(store.collections.prefix(5)) { collection in
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(), spacing: 8),
+                                GridItem(.flexible(), spacing: 8)
+                            ],
+                            alignment: .leading,
+                            spacing: 5
+                        ) {
+                            ForEach(store.collections) { collection in
                                 CollectionCard(collection: collection) {
                                     selectCollection(collection)
                                 }
