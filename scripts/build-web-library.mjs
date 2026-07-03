@@ -8,7 +8,7 @@ const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site")
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const maxAuthorSkills = Number.parseInt(process.env.WEB_LIBRARY_AUTHOR_SKILL_LIMIT || "3", 10);
 
-const generatedDirs = ["skills", "creators", "collections"];
+const generatedDirs = ["skills", "profiles", "creators", "collections"];
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -39,8 +39,8 @@ function skillPathForId(id) {
   return `/skills/${[...repoSegments, ...skillSegments].join("/")}/`;
 }
 
-function creatorPath(handle) {
-  return `/creators/${slugSegment(handle)}/`;
+function profilePath(handle) {
+  return `/profiles/${slugSegment(handle)}/`;
 }
 
 function collectionPath(id) {
@@ -174,13 +174,13 @@ function renderSkillPage(skill, relatedSkills) {
     <h1>${escapeHtml(skill.name)}</h1>
     <p>${escapeHtml(descriptionForSkill(skill))}</p>
     <div class="meta">
-      ${skill.author_handle ? `<a href="${escapeHtml(creatorPath(skill.author_handle))}">@${escapeHtml(skill.author_handle)}</a>` : ""}
+      ${skill.author_handle ? `<a href="${escapeHtml(profilePath(skill.author_handle))}">@${escapeHtml(skill.author_handle)}</a>` : ""}
       <span>${compactNumber(skill.stars)} stars</span>
       ${skill.last_updated ? `<span>Updated ${escapeHtml(String(skill.last_updated).slice(0, 10))}</span>` : ""}
     </div>
     <pre class="install"><code>${escapeHtml(skill.install_cmd || "")}</code></pre>
     ${skill.github_url ? `<p><a href="${escapeHtml(skill.github_url)}">View on GitHub</a></p>` : ""}
-    ${relatedSkills.length ? `<div class="section"><div class="eyebrow">More by this creator</div><div class="grid">${skillCards(relatedSkills)}</div></div>` : ""}`;
+    ${relatedSkills.length ? `<div class="section"><div class="eyebrow">More skills</div><div class="grid">${skillCards(relatedSkills)}</div></div>` : ""}`;
   return pageShell({
     title: `${skill.name} skill - omgskills`,
     description,
@@ -198,12 +198,12 @@ function renderSkillPage(skill, relatedSkills) {
   });
 }
 
-function renderCreatorPage(collection, skills) {
+function renderProfilePage(collection, skills) {
   const handle = collection.authorHandle;
-  const urlPath = creatorPath(handle);
+  const urlPath = profilePath(handle);
   const description = collection.description || collection.subtitle || `Skills by @${handle}.`;
   const body = `    <img class="avatar" src="${escapeHtml(collection.imageUrl || `https://github.com/${handle}.png`)}" alt="">
-    <div class="eyebrow">Creator</div>
+    <div class="eyebrow">Profile</div>
     <h1>${escapeHtml(collection.title)}</h1>
     <p>${escapeHtml(description)}</p>
     <div class="meta"><span>@${escapeHtml(handle)}</span><span>${skills.length} featured skills</span></div>
@@ -309,9 +309,9 @@ async function main() {
       const authorSkills = (skillsByAuthor.get(collection.authorHandle.toLowerCase()) || [])
         .filter((skill) => includedSkillIds.has(skill.id))
         .slice(0, 12);
-      const urlPath = creatorPath(collection.authorHandle);
-      registerUrl(urls, urlPath, `creator ${collection.authorHandle}`);
-      await writePage(urlPath, renderCreatorPage(collection, authorSkills));
+      const urlPath = profilePath(collection.authorHandle);
+      registerUrl(urls, urlPath, `profile ${collection.authorHandle}`);
+      await writePage(urlPath, renderProfilePage(collection, authorSkills));
     } else {
       const featuredSkills = (collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
       const allSkills = (collection.skillIds || collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);

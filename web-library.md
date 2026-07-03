@@ -55,7 +55,7 @@ No system duplicates the library. Each layer stores only what it owns and points
 
 ### What it is
 
-A statically generated public page for every skill in the catalog, plus creator pages and editorial collection pages. Generated at publish time from the same JSON the clients read. Pure HTML, no runtime backend.
+A statically generated public page for every skill in the catalog, plus profile pages and editorial collection pages. Generated at publish time from the same JSON the clients read. Pure HTML, no runtime backend.
 
 ### URL structure
 
@@ -63,20 +63,20 @@ A statically generated public page for every skill in the catalog, plus creator 
 |---|---|---|
 | Skill | `/skills/{owner}/{repo}/{skill-slug}` | ~50K |
 | Repo-level skill | `/skills/{owner}/{repo}` | included above |
-| Creator | `/creators/{handle}` | ~9K |
+| Profile | `/profiles/{handle}` | ~9K |
 | Editorial collection | `/collections/{id}` | grows with editorial |
 | Library index | `/skills/` | 1 |
 
 Notes:
 - Skill IDs map to URLs by replacing `:` with `/` and slugifying path segments. The generator must produce a deterministic, collision-checked mapping.
-- `/u/{handle}` stays reserved for portal user profiles (app users ≠ skill creators). Creators get `/creators/` to avoid the clash.
+- `/u/{handle}` stays reserved for portal user profiles (app users ≠ skill authors/publishers). Catalog people, companies, and teams get `/profiles/` to avoid the clash.
 - Every page carries a canonical URL and appears in a sitemap index (chunked sitemaps, 10K URLs each).
 
 ### Page anatomy (skill page)
 
 Everything below already exists in the published data — zero new content required:
 
-- Name, description, author (linked to creator page)
+- Name, description, author (linked to profile page)
 - Install command with copy affordance
 - Stars, installs, last updated, trending badge if applicable
 - README snippet
@@ -84,7 +84,7 @@ Everything below already exists in the published data — zero new content requi
 - Related: other skills by this author, other skills in the same repo
 - App install CTA — the conversion goal of the whole surface
 
-Creator pages: avatar (GitHub), stats from `authorLeaderboards`, skill list, editorial subtitle/description when the handle is in `featuredAuthors`. This is the web manifestation of the editorial layer — one curation file feeds both the app and the web.
+Profile pages: avatar (GitHub), stats from `authorLeaderboards`, skill list, editorial subtitle/description when the handle is in `featuredAuthors`. This is the web manifestation of the editorial layer — one curation file feeds both the app and the web.
 
 Collection pages: rendered directly from `collections.json`. These target the highest-value queries ("best claude code skills", "essential design skills") and are the strongest SEO pages we'll have.
 
@@ -93,8 +93,8 @@ Collection pages: rendered directly from `collections.json`. These target the hi
 50K pages is only an asset if they don't read as thin content. Mitigations, all cheap:
 
 - **Index tiering**: skills with empty/near-empty descriptions and no stars get `noindex` until they earn signal. The sitemap leads with trending, gold basket, editorial, and high-star skills.
-- **Internal linking**: skill → creator → collection → related skills. No orphan pages.
-- **Structured data**: `SoftwareApplication` JSON-LD on skill pages, `Person`/`Organization` on creator pages.
+- **Internal linking**: skill → profile → collection → related skills. No orphan pages.
+- **Structured data**: `SoftwareApplication` JSON-LD on skill pages, `Person`/`Organization` on profile pages.
 - **Cross-agent variants**: a skill's Claude and Codex ports are near-duplicate content that would compete against each other in search. Once Crawl 4 publishes equivalence clusters (see [`identity.md`](identity.md)), variant pairs render as one page with both install commands. Until then, canonicalize the variant pair to the original/upstream variant's page.
 
 ### Generation pipeline
@@ -103,7 +103,7 @@ New script: `scripts/build-web-library.mjs`
 
 1. Read the current published catalog from `site/data/` (crawl4 manifest first, v2 fallback — same policy as clients)
 2. Read `collections.json` for editorial pages
-3. Emit `site/skills/**`, `site/creators/**`, `site/collections/**`, `site/sitemap.xml` + chunked sitemaps
+3. Emit `site/skills/**`, `site/profiles/**`, `site/collections/**`, `site/sitemap.xml` + chunked sitemaps
 4. Deterministic output — same input data produces byte-identical pages, so Netlify's per-file dedupe keeps repeat deploys incremental
 
 Generated pages are **gitignored** (like `site/downloads/`). They are build artifacts of the published data, not source.
@@ -146,7 +146,7 @@ Since the generator reads from `site/data/` (present in every checkout after a d
           ┌────────────┘           │            └────────────┐
           ▼                        ▼                         ▼
    macOS client            Web library (static)       Portal (app.omgskills.com)
-   reads manifests         /skills/ /creators/        Postgres refs catalog IDs
+   reads manifests         /skills/ /profiles/        Postgres refs catalog IDs
           ▲                /collections/                     ▲
           │                        ▲                         │
           └────────┬───────────────┘                         │
@@ -165,7 +165,7 @@ Later opportunities (not now):
 ## Phasing
 
 ### Phase 1 — prove the pipeline
-- Build `build-web-library.mjs` with skill + creator pages for a curated head (~2K pages: trending, gold basket, top authors)
+- Build `build-web-library.mjs` with skill + profile pages for a curated head (~2K pages: trending, gold basket, top authors)
 - Wire into `prepare-netlify-site-deploy.mjs` and both workflows
 - Ship sitemaps, canonical tags, JSON-LD, Search Console registration
 
@@ -188,7 +188,7 @@ Phase 1 before full scale because index tiering, URL mapping, and deploy wiring 
 1. `node scripts/build-web-library.mjs` — deterministic output on repeat runs (diff two runs, expect zero)
 2. URL mapping — no collisions across all 50K IDs; every catalog ID maps to exactly one URL
 3. Deploy each path (content-reports, shadow-crawl-health, release script) — pages present after every deploy
-4. `curl` spot checks: skill page, creator page, collection page, sitemap index all return 200 with correct canonicals
+4. `curl` spot checks: skill page, profile page, collection page, sitemap index all return 200 with correct canonicals
 5. Lighthouse SEO pass on sample pages
 6. Search Console: sitemap accepted, indexing begins on tier-1 pages
 7. Confirm `/data/` assets and client manifests are untouched

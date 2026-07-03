@@ -3,7 +3,17 @@
 
 [[redirects]]
   from = "/creators/:handle"
-  to = "/creators/:handle/"
+  to = "/profiles/:handle/"
+  status = 301
+
+[[redirects]]
+  from = "/creators/:handle/"
+  to = "/profiles/:handle/"
+  status = 301
+
+[[redirects]]
+  from = "/profiles/:handle"
+  to = "/profiles/:handle/"
   status = 301
 
 [[redirects]]

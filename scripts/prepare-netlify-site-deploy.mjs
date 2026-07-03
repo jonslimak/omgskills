@@ -100,7 +100,7 @@ async function verifyWebLibraryBuild() {
     }
   }
 
-  for (const dirName of ["skills", "creators", "collections"]) {
+  for (const dirName of ["skills", "profiles", "collections"]) {
     if (!(await hasGeneratedIndex(dirName))) {
       throw new Error(`Missing generated web library pages under site/${dirName}`);
     }

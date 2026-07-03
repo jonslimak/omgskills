@@ -45,7 +45,7 @@ Why now: smallest scoped project on the list, zero schema risk, immediately visi
 
 Plan: [`web-library.md`](web-library.md)
 
-- `scripts/build-web-library.mjs` — skill + creator pages for the curated head (trending, gold basket, top authors)
+- `scripts/build-web-library.mjs` — skill + profile pages for the curated head (trending, gold basket, top authors)
 - deploy wiring into `prepare-netlify-site-deploy.mjs` and both publish workflows
 - sitemaps, canonicals, JSON-LD, Search Console registration
 - exact Phase 1 inclusion rule should be decided before implementation: trending + gold basket + featured authors + a fixed top-author/top-skill cap
