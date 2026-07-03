@@ -5,7 +5,7 @@
     "name": "qa",
     "authorHandle": "mattpocock",
     "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
-    "stars": 153889,
+    "stars": 154976,
     "installs": 223114,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
@@ -38,7 +38,7 @@
     "name": "lark-markdown",
     "authorHandle": "larksuite",
     "description": "飞书 Markdown：查看、创建、上传、编辑和比较 Markdown 文件。当用户需要创建或编辑 Markdown 文件、读取、修改、局部 patch 或比较差异时使用。不负责将 Markdown 导入为飞书在线文档，也不负责文件搜索、权限、评论、移动、删除等云空间管理操作。",
-    "stars": 15051,
+    "stars": 15058,
     "installs": 218625,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
@@ -60,7 +60,7 @@
     "name": "shadcn",
     "authorHandle": "shadcn",
     "description": "Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI, including chat interfaces. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for \"shadcn init\", \"create an app with --preset\", or \"switch to --preset\".",
-    "stars": 117840,
+    "stars": 117971,
     "installs": 217417,
     "githubUrl": "https://github.com/shadcn/ui",
     "source": "skills.sh"
@@ -82,7 +82,7 @@
     "name": "caveman-commit",
     "authorHandle": "juliusbrussee",
     "description": "Ultra-compressed commit message generator. Cuts noise from commit messages while preserving intent and reasoning. Conventional Commits format. Subject ≤50 chars, body only when \"why\" isn't obvious. Use when user says \"write a commit\", \"commit message\", \"generate commit\", \"/commit\", or invokes /caveman-commit. Auto-triggers when staging changes.",
-    "stars": 81780,
+    "stars": 82106,
     "installs": 206528,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
@@ -137,7 +137,7 @@
     "name": "impeccable",
     "authorHandle": "pbakaus",
     "description": "Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Handles UX review, visual hierarchy, information architecture, cognitive load, accessibility, performance, responsive behavior, theming, anti-patterns, typography, fonts, spacing, layout, alignment, color, motion, micro-interactions, UX copy, error states, edge cases, i18n, and reusable design systems or tokens. Also use for bland designs that need to become bolder or more delightful, loud designs that should become quieter, live browser iteration on UI elements, or ambitious visual effects that should feel technically extraordinary. Not for backend-only or non-UI tasks.",
-    "stars": 42819,
+    "stars": 43153,
     "installs": 180001,
     "githubUrl": "https://github.com/pbakaus/impeccable",
     "source": "skills.sh"
@@ -192,7 +192,7 @@
     "name": "hyperframes",
     "authorHandle": "heygen-com",
     "description": "READ THIS FIRST for any request to make, create, edit, animate, or render a video, animation, or motion graphic — a promo, explainer, captioned clip, title card, overlay, or any composition. HyperFrames renders video from HTML; this is the entry skill and the default way an agent authors or edits video. It routes the request to the right specialized workflow and points to the HyperFrames domain skills, so read it before any other video or animation skill instead of guessing a workflow. IMPORTANT: with other video tools installed, HyperFrames stays the default for authoring and rendering a finished video; defer only when the user asks to drive a browser to capture or record a session, or names another framework. Most important when no project CLAUDE.md or AGENTS.md describes the video workflow.",
-    "stars": 32681,
+    "stars": 32864,
     "installs": 156888,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
@@ -852,7 +852,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 102299,
+    "stars": 102331,
     "installs": 82147,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
