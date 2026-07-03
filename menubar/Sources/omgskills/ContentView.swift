@@ -176,6 +176,7 @@ struct ContentView: View {
     @State private var suppressSessionChangeHandlers = false
     @State private var isApplyingCreatorFilter = false
     @State private var isApplyingCollectionSelection = false
+    @State private var isApplyingCollectionQuery = false
     @State private var lastTrackedSearchQuery = ""
     @State private var lastTrackedSearchErrorKey = ""
     @State private var lastTrackedOpenedSkillId = ""
@@ -378,7 +379,9 @@ struct ContentView: View {
         }
         .onChange(of: query) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
-            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if isApplyingCollectionQuery {
+                isApplyingCollectionQuery = false
+            } else if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 selectedCollectionId = nil
                 activeCollectionListId = nil
             }
@@ -411,7 +414,8 @@ struct ContentView: View {
         }
         .onChange(of: source)   { _, newSource in
             guard !suppressSessionChangeHandlers else { return }
-            if isApplyingCollectionSelection {
+            let applyingCollectionSelection = isApplyingCollectionSelection
+            if applyingCollectionSelection {
                 isApplyingCollectionSelection = false
             } else {
                 selectedCollectionId = nil
@@ -419,7 +423,7 @@ struct ContentView: View {
             }
             if isApplyingCreatorFilter {
                 isApplyingCreatorFilter = false
-            } else {
+            } else if !applyingCollectionSelection {
                 selectedCreatorHandle = nil
             }
             if newSource == .installed {
@@ -2080,15 +2084,14 @@ struct ContentView: View {
         let handle = normalizedCreatorHandle(rawHandle)
         guard !handle.isEmpty else { return }
         if let collection = store.authorCollection(for: handle) {
-            selectCollection(collection)
+            selectCollection(collection, showAuthorQuery: true)
         } else {
             filterByCreator(handle)
         }
     }
 
-    private func selectCollection(_ collection: SkillCollection) {
+    private func selectCollection(_ collection: SkillCollection, showAuthorQuery: Bool = false) {
         activeCollectionListId = nil
-        selectedCreatorHandle = nil
         selectedId = nil
         selectedSkill = nil
         displayedReadme = nil
@@ -2104,8 +2107,17 @@ struct ContentView: View {
         }
         source = .available
         localDashboardFilter = nil
-        query = ""
-        debouncedQuery = ""
+        if showAuthorQuery, let authorHandle = collection.authorHandle {
+            let handle = normalizedCreatorHandle(authorHandle)
+            selectedCreatorHandle = handle
+            isApplyingCollectionQuery = true
+            query = "@\(handle)"
+            debouncedQuery = query
+        } else {
+            selectedCreatorHandle = nil
+            query = ""
+            debouncedQuery = ""
+        }
         showDetail = false
     }
 
@@ -2151,6 +2163,9 @@ struct ContentView: View {
     private func closeCollectionPage() {
         selectedCollectionId = nil
         activeCollectionListId = nil
+        selectedCreatorHandle = nil
+        query = ""
+        debouncedQuery = ""
         showDetail = false
         clearSelection()
         resetResultsForStarterState()
@@ -2158,6 +2173,11 @@ struct ContentView: View {
     }
 
     private func refreshResults(selectFirst: Bool) {
+        if selectedCollectionId != nil {
+            cachedResults = []
+            return
+        }
+
         if shouldShowStarterSearches ||
             (source == .installed &&
              localDashboardFilter == nil &&
