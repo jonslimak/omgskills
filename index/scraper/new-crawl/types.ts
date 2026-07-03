@@ -31,12 +31,24 @@ export type ProvenanceOverride = {
   notes?: string;
 };
 
+export type DoNotCrawlReason = "catalog" | "spam" | "unsafe" | "duplicate" | "low-quality" | "other";
+
+export type DoNotCrawlRule = {
+  repo?: string;
+  owner?: string;
+  reason: DoNotCrawlReason;
+  notes?: string;
+};
+
 export type TrustedSeeds = {
   trustedVendorHandles: Set<string>;
   trustedCreatorHandles: Set<string>;
   officialTier1Repos: Set<string>;
   officialTier2Repos: Set<string>;
   manualIncludeRepos: Set<string>;
+  doNotCrawlRepos?: Set<string>;
+  doNotCrawlOwners?: Set<string>;
+  doNotCrawlRules?: DoNotCrawlRule[];
   repoOverrides: RepoOverride[];
   catalogRepoRules: CatalogRepoRule[];
   provenanceOverrides: ProvenanceOverride[];

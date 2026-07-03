@@ -1,5 +1,6 @@
 import type { RepoBootstrapCandidate, ShadowRepoIndexEntry, TrustedSeeds } from "./types.js";
 import { isKnownCatalogRepo } from "./catalog-policy.js";
+import { isDoNotCrawlRepo } from "./do-not-crawl.js";
 
 export const LIBRARY_ADMISSION_MIN_STARS = 500;
 
@@ -24,6 +25,7 @@ export function passesLibraryAdmissionValueGate(
   trust: Pick<AdmissionTrustSignals, "isTrustedVendor" | "isGoldBasketRepo">,
   sources: Set<string>,
 ): boolean {
+  if (isDoNotCrawlRepo(repo, seeds)) return false;
   const passesStars = stars >= LIBRARY_ADMISSION_MIN_STARS && !isKnownCatalogRepo(repo, seeds.catalogRepoRules);
   return (
     seeds.manualIncludeRepos.has(repo) ||

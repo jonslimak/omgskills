@@ -27,6 +27,7 @@ import { validateCutoverOutputs } from "./cutover-validation.js";
 import { buildCrawl4Preview } from "./crawl4-preview.js";
 import { buildCatalogAdmissionSample } from "./catalog-admission.js";
 import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
+import { isDoNotCrawlRepo, removeDoNotCrawlState } from "./do-not-crawl.js";
 import {
   applyShadowSkillOverlay,
   buildShadowSkillOverlay,
@@ -503,6 +504,7 @@ function buildRepoIndex(
       unresolvedBaselineSkillCount += 1;
       continue;
     }
+    if (isDoNotCrawlRepo(repoInfo.repo, seeds)) continue;
 
     const existing = byRepo.get(repoInfo.repo);
     if (existing) {
@@ -855,6 +857,7 @@ export function admitDiscoveredRepos(
   for (const discoveredRepo of candidates) {
     if (admittedRepos.size >= maxNewAdmissions) break;
     if (existingRepos.has(discoveredRepo.repo)) continue;
+    if (isDoNotCrawlRepo(discoveredRepo.repo, seeds)) continue;
     const trust = buildTrustSignalsForRepo(discoveredRepo.repo, goldBasketRepos, seeds);
     if (!isDiscoveredRepoAdmissionEligible(discoveredRepo, seeds, trust)) continue;
 
@@ -1741,6 +1744,7 @@ async function main() {
       .filter((repoInfo): repoInfo is { repo: string; repoUrl: string } => Boolean(repoInfo))
       .map((repoInfo) => repoInfo.repo),
   );
+  const seeds = loadTrustedSeeds();
   timings.loadBaseline = Math.round(performance.now() - baselineStart);
 
   const provenanceStart = performance.now();
@@ -1769,6 +1773,7 @@ async function main() {
     overlayEntryCount: shadowSkillOverlayEntryCount,
   } = applyShadowSkillOverlay(cadence, shadowSkills, repoIndex, skillOverlay);
   shadowSkills = overlayMergedShadowSkills;
+  shadowSkills = removeDoNotCrawlState(repoIndex, shadowSkills, seeds);
 
   const discoveryStart = performance.now();
   const repoAliasByCanonical = new Map<string, string>();
@@ -1789,6 +1794,9 @@ async function main() {
       onlyHighStarBackfill,
       highStarQueryBatch,
     );
+  for (const repo of [...discovered.keys()]) {
+    if (isDoNotCrawlRepo(repo, seeds)) discovered.delete(repo);
+  }
   timings.runDiscovery = Math.round(performance.now() - discoveryStart);
   const { momentumByRepo, warning: momentumWarning } = buildMomentumSignals(
     discovered,
@@ -1799,7 +1807,6 @@ async function main() {
     ? [...partialDiscoveryWarnings, momentumWarning]
     : partialDiscoveryWarnings;
 
-  const seeds = loadTrustedSeeds();
   const newlyAdmittedRepos = admitDiscoveredRepos(
     cadence,
     checkedAt,
@@ -1837,6 +1844,7 @@ async function main() {
   );
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
+  shadowSkills = removeDoNotCrawlState(repoIndex, shadowSkills, seeds);
   reconcileRepoIndexSkillIds(repoIndex, shadowSkills);
   removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);
   const inspectableShadowSkills = buildInspectableShadowSkills(shadowSkills);

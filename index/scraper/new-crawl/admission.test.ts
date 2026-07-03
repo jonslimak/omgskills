@@ -127,6 +127,22 @@ test("known catalog repo does not pass admission by stars alone", () => {
   );
 });
 
+test("do-not-crawl repo does not pass admission by manual include or stars", () => {
+  const blockedSeeds = seeds({
+    manualIncludeRepos: new Set(["davila7/claude-code-templates"]),
+    doNotCrawlRepos: new Set(["davila7/claude-code-templates"]),
+  });
+
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      discoveredRepo({ repo: "davila7/claude-code-templates", stars: 50000 }),
+      blockedSeeds,
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
+  );
+});
+
 test("low-value repo stays out and momentum alone does not admit", () => {
   assert.equal(
     isDiscoveredRepoAdmissionEligible(

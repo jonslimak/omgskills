@@ -21,6 +21,10 @@ test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
     manualIncludeJson: {
       include: [" Owner/Repo ", "owner/repo.git", ""],
     },
+    doNotCrawlJson: {
+      repos: [{ repo: " Blocked/Repo.git ", reason: "catalog" }],
+      owners: [{ owner: " BlockedOwner ", reason: "spam" }],
+    },
     overridesJson: [],
     catalogJson: [],
     provenanceJson: [],
@@ -29,4 +33,6 @@ test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
   assert.deepEqual([...seeds.officialTier1Repos], ["openai/codex"]);
   assert.deepEqual([...seeds.officialTier2Repos], ["browserbase/skills"]);
   assert.deepEqual([...seeds.manualIncludeRepos], ["owner/repo"]);
+  assert.deepEqual([...(seeds.doNotCrawlRepos ?? [])], ["blocked/repo"]);
+  assert.deepEqual([...(seeds.doNotCrawlOwners ?? [])], ["blockedowner"]);
 });

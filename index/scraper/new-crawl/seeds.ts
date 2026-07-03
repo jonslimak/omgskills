@@ -1,11 +1,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { indexRoot } from "./shadow-path-guard.js";
-import type { CatalogRepoRule, ProvenanceOverride, RepoOverride, TrustedSeeds } from "./types.js";
+import type { CatalogRepoRule, DoNotCrawlRule, ProvenanceOverride, RepoOverride, TrustedSeeds } from "./types.js";
 
 type HandleList = { handles: string[] };
 type OfficialRepoSeeds = { tier1?: string[]; tier2?: string[] };
 type ManualIncludeRepoSeeds = { include?: string[] };
+type DoNotCrawlSeeds = { repos?: DoNotCrawlRule[]; owners?: DoNotCrawlRule[] };
 
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
@@ -28,16 +29,33 @@ export function buildTrustedSeeds(input: {
   creatorJson: HandleList;
   officialJson: OfficialRepoSeeds;
   manualIncludeJson: ManualIncludeRepoSeeds;
+  doNotCrawlJson: DoNotCrawlSeeds;
   overridesJson: RepoOverride[];
   catalogJson: CatalogRepoRule[];
   provenanceJson: ProvenanceOverride[];
 }): TrustedSeeds {
+  const doNotCrawlRules = [
+    ...(input.doNotCrawlJson.repos ?? []).map((rule) => ({
+      ...rule,
+      repo: rule.repo ? normalizeRepo(rule.repo) : undefined,
+    })),
+    ...(input.doNotCrawlJson.owners ?? []).map((rule) => ({
+      ...rule,
+      owner: rule.owner ? normalizeHandle(rule.owner) : undefined,
+    })),
+  ].filter((rule) => rule.repo || rule.owner);
+
   return {
     trustedVendorHandles: new Set(input.vendorJson.handles.map(normalizeHandle).filter(Boolean)),
     trustedCreatorHandles: new Set(input.creatorJson.handles.map(normalizeHandle).filter(Boolean)),
     officialTier1Repos: normalizeRepoSet(input.officialJson.tier1),
     officialTier2Repos: normalizeRepoSet(input.officialJson.tier2),
     manualIncludeRepos: normalizeRepoSet(input.manualIncludeJson.include),
+    doNotCrawlRepos: new Set(doNotCrawlRules.map((rule) => rule.repo).filter((repo): repo is string => Boolean(repo))),
+    doNotCrawlOwners: new Set(
+      doNotCrawlRules.map((rule) => rule.owner).filter((owner): owner is string => Boolean(owner)),
+    ),
+    doNotCrawlRules,
     repoOverrides: input.overridesJson
       .map((override) => ({
         ...override,
@@ -70,6 +88,7 @@ export function loadTrustedSeeds(): TrustedSeeds {
   const creatorJson = readJson<HandleList>(join(seedsRoot, "trusted-creators.json"));
   const officialJson = readJson<OfficialRepoSeeds>(join(seedsRoot, "official-repos.json"));
   const manualIncludeJson = readJson<ManualIncludeRepoSeeds>(join(seedsRoot, "manual-include-repos.json"));
+  const doNotCrawlJson = readJson<DoNotCrawlSeeds>(join(seedsRoot, "do-not-crawl.json"));
   const overridesJson = readJson<RepoOverride[]>(join(seedsRoot, "repo-overrides.json"));
   const catalogJson = readJson<CatalogRepoRule[]>(join(seedsRoot, "catalog-repos.json"));
   const provenanceJson = readJson<ProvenanceOverride[]>(join(seedsRoot, "provenance-overrides.json"));
@@ -79,6 +98,7 @@ export function loadTrustedSeeds(): TrustedSeeds {
     creatorJson,
     officialJson,
     manualIncludeJson,
+    doNotCrawlJson,
     overridesJson,
     catalogJson,
     provenanceJson,
