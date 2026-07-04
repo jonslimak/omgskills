@@ -122,5 +122,8 @@ jobs:
           NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
         run: npx netlify-cli deploy --prod --dir=site
 
+      - name: Verify live web library pages
+        run: node ./scripts/verify-web-library-pages.mjs --live
+
       - name: Verify live manifest
         run: node ./scripts/verify-live-manifest.mjs

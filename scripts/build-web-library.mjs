@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
@@ -39,6 +40,12 @@ function skillPathForId(id) {
   return `/skills/${[...repoSegments, ...skillSegments].join("/")}/`;
 }
 
+function disambiguatedSkillPathForId(id) {
+  const basePath = skillPathForId(id);
+  const hash = createHash("sha256").update(String(id)).digest("hex").slice(0, 8);
+  return basePath.replace(/\/$/, `--${hash}/`);
+}
+
 function profilePath(handle) {
   return `/profiles/${slugSegment(handle)}/`;
 }
@@ -60,6 +67,35 @@ function registerUrl(urls, urlPath, source) {
     throw new Error(`URL collision for ${urlPath}: ${previousSource} and ${source}`);
   }
   urls.set(urlPath, source);
+}
+
+function buildSkillUrlMap(skills) {
+  const idsByBasePath = new Map();
+  for (const skill of skills) {
+    const basePath = skillPathForId(skill.id);
+    const ids = idsByBasePath.get(basePath) || [];
+    ids.push(skill.id);
+    idsByBasePath.set(basePath, ids);
+  }
+
+  const urls = new Map();
+  const urlById = new Map();
+  for (const [basePath, ids] of idsByBasePath) {
+    if (ids.length === 1) {
+      const id = ids[0];
+      registerUrl(urls, basePath, `skill ${id}`);
+      urlById.set(id, basePath);
+      continue;
+    }
+
+    for (const id of ids) {
+      const urlPath = disambiguatedSkillPathForId(id);
+      registerUrl(urls, urlPath, `skill ${id}`);
+      urlById.set(id, urlPath);
+    }
+  }
+
+  return urlById;
 }
 
 function compactNumber(value) {
@@ -156,9 +192,9 @@ async function writePage(urlPath, html) {
   await writeFile(filePath, html);
 }
 
-function skillCards(skills) {
+function skillCards(skills, skillUrlById) {
   return skills.map((skill) => {
-    const href = skillPathForId(skill.id);
+    const href = skillUrlById.get(skill.id) || skillPathForId(skill.id);
     return `<a class="card" href="${escapeHtml(href)}">
       <h2>${escapeHtml(skill.name)}</h2>
       <p>${escapeHtml(descriptionForSkill(skill))}</p>
@@ -167,8 +203,8 @@ function skillCards(skills) {
   }).join("\n");
 }
 
-function renderSkillPage(skill, relatedSkills) {
-  const urlPath = skillPathForId(skill.id);
+function renderSkillPage(skill, relatedSkills, skillUrlById) {
+  const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
   const description = descriptionForSkill(skill).slice(0, 155);
   const body = `    <div class="eyebrow">Skill</div>
     <h1>${escapeHtml(skill.name)}</h1>
@@ -180,7 +216,7 @@ function renderSkillPage(skill, relatedSkills) {
     </div>
     <pre class="install"><code>${escapeHtml(skill.install_cmd || "")}</code></pre>
     ${skill.github_url ? `<p><a href="${escapeHtml(skill.github_url)}">View on GitHub</a></p>` : ""}
-    ${relatedSkills.length ? `<div class="section"><div class="eyebrow">More skills</div><div class="grid">${skillCards(relatedSkills)}</div></div>` : ""}`;
+    ${relatedSkills.length ? `<div class="section"><div class="eyebrow">More skills</div><div class="grid">${skillCards(relatedSkills, skillUrlById)}</div></div>` : ""}`;
   return pageShell({
     title: `${skill.name} skill - omgskills`,
     description,
@@ -198,7 +234,7 @@ function renderSkillPage(skill, relatedSkills) {
   });
 }
 
-function renderProfilePage(collection, skills) {
+function renderProfilePage(collection, skills, skillUrlById) {
   const handle = collection.authorHandle;
   const urlPath = profilePath(handle);
   const description = collection.description || collection.subtitle || `Skills by @${handle}.`;
@@ -207,7 +243,7 @@ function renderProfilePage(collection, skills) {
     <h1>${escapeHtml(collection.title)}</h1>
     <p>${escapeHtml(description)}</p>
     <div class="meta"><span>@${escapeHtml(handle)}</span><span>${skills.length} featured skills</span></div>
-    <div class="section"><div class="eyebrow">Featured skills</div><div class="grid">${skillCards(skills)}</div></div>`;
+    <div class="section"><div class="eyebrow">Featured skills</div><div class="grid">${skillCards(skills, skillUrlById)}</div></div>`;
   return pageShell({
     title: `${collection.title} skills - omgskills`,
     description,
@@ -223,15 +259,15 @@ function renderProfilePage(collection, skills) {
   });
 }
 
-function renderCollectionPage(collection, featuredSkills, allSkills) {
+function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById) {
   const urlPath = collectionPath(collection.id);
   const description = collection.description || collection.subtitle;
   const body = `    <div class="eyebrow">Collection</div>
     <h1>${escapeHtml(collection.title)}</h1>
     <p>${escapeHtml(description)}</p>
     <div class="meta"><span>${allSkills.length} skills</span></div>
-    <div class="section"><div class="eyebrow">Featured skills</div><div class="grid">${skillCards(featuredSkills)}</div></div>
-    ${allSkills.length > featuredSkills.length ? `<div class="section"><div class="eyebrow">Full collection</div><div class="grid">${skillCards(allSkills)}</div></div>` : ""}`;
+    <div class="section"><div class="eyebrow">Featured skills</div><div class="grid">${skillCards(featuredSkills, skillUrlById)}</div></div>
+    ${allSkills.length > featuredSkills.length ? `<div class="section"><div class="eyebrow">Full collection</div><div class="grid">${skillCards(allSkills, skillUrlById)}</div></div>` : ""}`;
   return pageShell({
     title: `${collection.title} - omgskills`,
     description,
@@ -265,6 +301,8 @@ async function main() {
   await rm(path.join(siteDir, "sitemap.xml"), { force: true });
 
   const { skills, trending, collections } = await loadLibraryData();
+  const skillUrlById = buildSkillUrlMap(skills);
+
   const skillById = new Map(skills.map((skill) => [skill.id, skill]));
   const skillsByAuthor = new Map();
   for (const skill of skills) {
@@ -296,12 +334,12 @@ async function main() {
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
-    const urlPath = skillPathForId(skill.id);
+    const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
     registerUrl(urls, urlPath, `skill ${skill.id}`);
     const related = (skillsByAuthor.get(String(skill.author_handle || "").toLowerCase()) || [])
       .filter((candidate) => candidate.id !== skill.id)
       .slice(0, 3);
-    await writePage(urlPath, renderSkillPage(skill, related));
+    await writePage(urlPath, renderSkillPage(skill, related, skillUrlById));
   }
 
   for (const collection of collections.collections) {
@@ -311,13 +349,13 @@ async function main() {
         .slice(0, 12);
       const urlPath = profilePath(collection.authorHandle);
       registerUrl(urls, urlPath, `profile ${collection.authorHandle}`);
-      await writePage(urlPath, renderProfilePage(collection, authorSkills));
+      await writePage(urlPath, renderProfilePage(collection, authorSkills, skillUrlById));
     } else {
       const featuredSkills = (collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
       const allSkills = (collection.skillIds || collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
       const urlPath = collectionPath(collection.id);
       registerUrl(urls, urlPath, `collection ${collection.id}`);
-      await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills));
+      await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById));
     }
   }
 

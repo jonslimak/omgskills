@@ -68,7 +68,7 @@ A statically generated public page for every skill in the catalog, plus profile 
 | Library index | `/skills/` | 1 |
 
 Notes:
-- Skill IDs map to URLs by replacing `:` with `/` and slugifying path segments. The generator must produce a deterministic, collision-checked mapping.
+- Skill IDs map to URLs by replacing `:` with `/` and slugifying path segments. If multiple catalog IDs collide after slugging, the generator appends a short deterministic hash suffix to the colliding skill URLs.
 - `/u/{handle}` stays reserved for portal user profiles (app users ≠ skill authors/publishers). Catalog people, companies, and teams get `/profiles/` to avoid the clash.
 - Every page carries a canonical URL and appears in a sitemap index (chunked sitemaps, 10K URLs each).
 
@@ -110,11 +110,10 @@ Generated pages are **gitignored** (like `site/downloads/`). They are build arti
 
 ### Deploy-safety requirement (important)
 
-Netlify deploys replace the whole site. Any deploy path that doesn't generate the pages would silently delete ~50K URLs. Every deploy path must run generation:
+Netlify deploys replace the whole site. Any deploy path that doesn't generate the pages would silently delete the web library URLs. Every deploy path must run generation and verification:
 
-- `content-reports` workflow (weekly) — add a generation step before deploy
-- `shadow-crawl-health` workflow — same
-- `deploy-site-prod.sh` (Mac releases) — hook generation into `prepare-netlify-site-deploy.mjs`, which already exists to solve exactly this problem for download assets
+- `content-reports`, `scrape`, `x-refresh`, `pipeline-health`, and `shadow-crawl-health` workflows — generate before deploy and verify live pages after deploy
+- `deploy-site-prod.sh` (Mac releases) — generate through `prepare-netlify-site-deploy.mjs`, deploy local `site/`, then verify live pages before tagging
 
 Since the generator reads from `site/data/` (present in every checkout after a data pull, restorable from production like downloads are), any environment can regenerate the full page set deterministically.
 
@@ -169,6 +168,8 @@ Later opportunities (not now):
 - Wire into `prepare-netlify-site-deploy.mjs` and both workflows
 - Ship sitemaps, canonical tags, JSON-LD, Search Console registration
 
+Current MVP status: the generator intentionally emits a small fixed test set before expanding to 500-2K pages. Expansion is deferred until local and live web-library verification stays green across deploy paths.
+
 ### Phase 2 — full library
 - Expand to all catalog skills with index tiering
 - Add editorial collection pages (once `collections.json` ships)
@@ -186,12 +187,13 @@ Phase 1 before full scale because index tiering, URL mapping, and deploy wiring 
 ## Verification
 
 1. `node scripts/build-web-library.mjs` — deterministic output on repeat runs (diff two runs, expect zero)
-2. URL mapping — no collisions across all 50K IDs; every catalog ID maps to exactly one URL
-3. Deploy each path (content-reports, shadow-crawl-health, release script) — pages present after every deploy
-4. `curl` spot checks: skill page, profile page, collection page, sitemap index all return 200 with correct canonicals
-5. Lighthouse SEO pass on sample pages
-6. Search Console: sitemap accepted, indexing begins on tier-1 pages
-7. Confirm `/data/` assets and client manifests are untouched
+2. `node scripts/verify-web-library-pages.mjs` — local profiles, collection, skill page, sitemap, and canonicals exist
+3. `node scripts/verify-web-library-pages.mjs --live` — production pages return 200, legacy creator redirects return 301, and canonicals are correct
+4. URL mapping — no collisions across all catalog skill IDs; every catalog ID maps to exactly one URL
+5. Deploy each path (content-reports, shadow-crawl-health, release script) — pages present after every deploy
+6. Lighthouse SEO pass on sample pages
+7. Search Console: sitemap accepted, indexing begins on tier-1 pages
+8. Confirm `/data/` assets and client manifests are untouched
 
 ---
 
