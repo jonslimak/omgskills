@@ -94,13 +94,16 @@ jobs:
           fi
 
       - name: Prepare release assets for Netlify deploy
-        run: node ./scripts/prepare-netlify-site-deploy.mjs
+        run: |
+          npm ci
+          npm run build:netlify
+          SITE_DIR=dist/netlify-site node ./scripts/prepare-netlify-site-deploy.mjs
 
       - name: Deploy site to Netlify
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
-        run: npx netlify-cli deploy --prod --dir=site
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+        run: npx netlify-cli deploy --prod --dir=dist/netlify-site --site "$NETLIFY_SITE_ID"
 
       - name: Fail on degraded health
         if: steps.finalhealth.outputs.health_status == 'degraded'

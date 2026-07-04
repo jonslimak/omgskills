@@ -1,0 +1,34 @@
+{
+  "name": "omgskills",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
+  "workspaces": [
+    "portal"
+  ],
+  "scripts": {
+    "build": "npm run build:netlify",
+    "build:netlify": "node ./scripts/build-netlify-site.mjs",
+    "build:portal": "npm --workspace portal run build",
+    "check": "tsc --noEmit",
+    "dev": "netlify dev",
+    "dev:portal": "npm --workspace portal run dev",
+    "test": "npm run check"
+  },
+  "dependencies": {
+    "@clerk/backend": "^2.3.0",
+    "@netlify/database": "^1.0.0",
+    "@netlify/functions": "^3.0.0",
+    "drizzle-orm": "^0.44.2",
+    "pg": "^8.16.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.4",
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.2",
+    "netlify-cli": "^26.1.0",
+    "typescript": "^5.8.3"
+  }
+}
