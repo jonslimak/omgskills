@@ -8,7 +8,7 @@
     "likes": 2210,
     "retweets": 335,
     "replies": 46,
-    "views": 182288,
+    "views": 182310,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -37,7 +37,7 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 157887
+        "stars": 158086
       }
     ]
   },
@@ -47,10 +47,10 @@
     "author_handle": "DivyanshT91162",
     "author_name": "divyansh tiwari",
     "text": "50 USEFUL GITHUB REPOS \n\n1. iFixAi — AI misalignment testing\n→ https://t.co/Wks1mAkYxT\n\n2. public-apis — free APIs for everything\n→ https://t.co/Nz80IZVSMT\n\n3. build-your-own-x — learn by building\n→ https://t.co/QSwvi5Ljlx\n\n4. developer-roadmap — learn any tech skill\n→ https://t.co/GlTSGNUyVy https://github.com/ifixai-ai/iFixAI https://github.com/public-apis/public-apis https://github.com/codecrafters-io/build-your-own-x",
-    "likes": 587,
-    "retweets": 140,
+    "likes": 606,
+    "retweets": 142,
     "replies": 11,
-    "views": 27826,
+    "views": 29764,
     "posted_at": "2026-07-01T20:20:52.000Z",
     "repo_ids": [
       "ifixai-ai/iFixAI",
@@ -70,36 +70,36 @@
         "skill_md_path": "plugin/skills/ifixai/SKILL.md",
         "name": "ifixai",
         "description": "Guide the user through running iFixAi's operational-misalignment diagnostic on their own agent (discover its setup, author a fixture, then test ANY model on Anthropic, OpenAI, Gemini, Azure, Bedrock, etc.) graded by the judge(s) of their choice (the same model, one independent judge, or a cross-vendor panel). You are the operator who walks them through it and explains the scorecard, running the SAME `ifixai run` engine as the guided CLI. Use when the user asks to run iFixAi or to detect operational misalignment in an agent.",
-        "stars": 1036
+        "stars": 1194
       }
     ]
   },
   {
-    "tweet_id": "2072749170188783675",
-    "tweet_url": "https://x.com/JFPuget/status/2072749170188783675",
-    "author_handle": "JFPuget",
-    "author_name": "JFPuget 🇫🇷🇺🇦🇨🇦🇬🇱",
-    "text": "My team open sourced a set of agent skills to run an entire @kaggle competition workflow from plain language. We ship an easy to install plugin for your favorite coding agent.\n\n👉 Try it now: https://t.co/ayVnzYycLY https://github.com/NVIDIA/nvidia-kaggle",
-    "likes": 320,
-    "retweets": 49,
-    "replies": 4,
-    "views": 14500,
-    "posted_at": "2026-07-02T18:28:06.000Z",
+    "tweet_id": "2072392020312707167",
+    "tweet_url": "https://x.com/tom_doerr/status/2072392020312707167",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Transforms junior-level code into senior-quality software using SOLID principles and TDD\n\nhttps://t.co/2NYFCH7sOF https://t.co/R6u1PVGJyZ https://github.com/ramziddin/solid-skills",
+    "likes": 239,
+    "retweets": 48,
+    "replies": 0,
+    "views": 13404,
+    "posted_at": "2026-07-01T18:48:55.000Z",
     "repo_ids": [
-      "NVIDIA/nvidia-kaggle"
+      "ramziddin/solid-skills"
     ],
     "repo_urls": [
-      "https://github.com/NVIDIA/nvidia-kaggle"
+      "https://github.com/ramziddin/solid-skills"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "nvidia/nvidia-kaggle",
-        "github_url": "https://github.com/NVIDIA/nvidia-kaggle",
-        "skill_md_path": "skills/nvidia-kaggle-skill/SKILL.md",
-        "name": "nvidia-kaggle-skill",
-        "description": "Use for Kaggle competition overview fetches, writeups, discussion/kernel research, submissions, and dataset uploads. Not for unrelated ML code.",
-        "stars": 103
+        "id": "ramziddin/solid-skills",
+        "github_url": "https://github.com/ramziddin/solid-skills",
+        "skill_md_path": "skills/solid/SKILL.md",
+        "name": "solid",
+        "description": "Use this skill when writing code, implementing features, refactoring, planning architecture, designing systems, reviewing code, or debugging. This skill transforms junior-level code into senior-engineer quality software through SOLID principles, TDD, clean code practices, and professional software design.",
+        "stars": 529
       }
     ]
   },
@@ -109,10 +109,10 @@
     "author_handle": "akaclandestine",
     "author_name": "Clandestine",
     "text": "GitHub - 7onez/cti-expert: CTI Expert — Cyber Threat Intelligence &amp; OSINT analysis skill for Claude Code. 50+ commands, 29 techniques, no API keys required. · GitHub https://t.co/8ijJgE01Ll https://github.com/7onez/cti-expert",
-    "likes": 234,
-    "retweets": 55,
+    "likes": 233,
+    "retweets": 54,
     "replies": 0,
-    "views": 12539,
+    "views": 12541,
     "posted_at": "2026-04-07T07:38:46.000Z",
     "repo_ids": [
       "7onez/cti-expert"
@@ -128,7 +128,75 @@
         "skill_md_path": "SKILL.md",
         "name": "cti-expert",
         "description": "CTI Expert — cyber threat intelligence and OSINT analysis toolkit. Activates on: OSINT, CTI, threat intelligence, digital footprint, social media investigation, username enumeration, email tracing, domain recon, OPSEC, metadata analysis, people search, geolocation, breach checking, phone lookup, subdomain enumeration, case investigation, recon, due diligence, image forensics, face search, blockchain investigation, crypto tracing, flight tracking, maritime tracking, vehicle lookup, darknet search, WiFi SSID geolocation, vulnerability lookup, ransomware check, stealer log analysis, infostealer log triage, malware log attribution, admin panel discovery, sensitive endpoint detection, M365 recon, Azure tenant enumeration. Commands: /case, /sweep, /query, /subject, /timeline, /report, /brief, /exposure, /username, /phone, /breach-deep, /vuln-check, /wifi, /flow, /threat-model, /msftrecon, /stealer-log. Techniques: social media platforms, advanced geolocation, web/DNS forensics, image forensics, blockchain, transport tracking, darknet, people search, cloud audit, incident triage, OWASP audit, prompt injection audit. Author: Hieu Ngo - chongluadao.vn",
-        "stars": 240
+        "stars": 241
+      }
+    ]
+  },
+  {
+    "tweet_id": "2072511445154308488",
+    "tweet_url": "https://x.com/blader/status/2072511445154308488",
+    "author_handle": "blader",
+    "author_name": "Siqi Chen",
+    "text": "two handy skills on this, our resurrection of fable day:\n\n1. baton is a handy way to transfer context from one agent to another: https://t.co/JzkM2c9bvj\n\n2. arbitrage tells fable to plan and validate but use codex to write code: https://t.co/y9FkI41I76 https://github.com/blader/baton https://github.com/blader/arbitrage",
+    "likes": 212,
+    "retweets": 6,
+    "replies": 6,
+    "views": 17882,
+    "posted_at": "2026-07-02T02:43:28.000Z",
+    "repo_ids": [
+      "blader/baton",
+      "blader/arbitrage"
+    ],
+    "repo_urls": [
+      "https://github.com/blader/baton",
+      "https://github.com/blader/arbitrage"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "blader/baton",
+        "github_url": "https://github.com/blader/baton",
+        "skill_md_path": "SKILL.md",
+        "name": "baton",
+        "description": "Use when handing off an in-progress session to another agent or a future session — ending a session with unfinished work, \"pick up where I left off\", passing a task to a fresh agent/another window/codex, running low on context, or persisting intent + learnings before context is lost. Covers both dropping a baton (writing the handoff) and grabbing one (resuming from it).",
+        "stars": 49
+      },
+      {
+        "id": "blader/arbitrage",
+        "github_url": "https://github.com/blader/arbitrage",
+        "skill_md_path": "SKILL.md",
+        "name": "arbitrage",
+        "description": "Always active when coding in a Claude (Fable) session. Triggers whenever implementation work is being planned, scoped, or about to start — before writing any code — to decide where each piece of work executes.",
+        "stars": 130
+      }
+    ]
+  },
+  {
+    "tweet_id": "2072251701608784049",
+    "tweet_url": "https://x.com/tom_doerr/status/2072251701608784049",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Self-improving meta-skill that drafts and updates AI agent skills by observing work sessions\n\nhttps://t.co/bouY5cHg35 https://t.co/OyCOkbgouJ https://github.com/rebelytics/one-skill-to-rule-them-all",
+    "likes": 168,
+    "retweets": 19,
+    "replies": 4,
+    "views": 11120,
+    "posted_at": "2026-07-01T09:31:20.000Z",
+    "repo_ids": [
+      "rebelytics/one-skill-to-rule-them-all"
+    ],
+    "repo_urls": [
+      "https://github.com/rebelytics/one-skill-to-rule-them-all"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "rebelytics/one-skill-to-rule-them-all",
+        "github_url": "https://github.com/rebelytics/one-skill-to-rule-them-all",
+        "skill_md_path": "SKILL.md",
+        "name": "task-observer",
+        "description": "Monitors task execution for skill improvement opportunities. Use this skill during ANY multi-step task, agentic workflow, or substantive work session where the agent is using tools and producing deliverables. It captures patterns, user corrections, workflow insights, and methodology worth preserving as reusable skills. Also triggers during post-task feedback discussions and when the user explicitly mentions skill observations, improvements, the observation log, skill taxonomy, or asks the agent to watch for skill opportunities. Also known as \"One Skill to Rule Them All\" — trigger on this phrase too. IMPORTANT: this skill should be invoked at the start of every task-oriented session — if you are about to use tools to produce deliverables, invoke this skill first. For reliable activation, pair this description with a CLAUDE.md instruction or harness-level session-start hook (see Recommended Activation Setup) — description-level matching alone is not enforceable.\n",
+        "stars": 888
       }
     ]
   },
@@ -139,9 +207,9 @@
     "author_name": "Tom Dörr",
     "text": "Turns AI agents into financial operating systems for trading crypto and stocks\n\nhttps://t.co/ySCk8K98NP https://t.co/cuWGxa6wqX https://github.com/Minara-AI/skills",
     "likes": 148,
-    "retweets": 16,
+    "retweets": 17,
     "replies": 2,
-    "views": 7990,
+    "views": 8061,
     "posted_at": "2026-06-30T14:41:30.000Z",
     "repo_ids": [
       "Minara-AI/skills"
@@ -157,7 +225,36 @@
         "skill_md_path": "skills/minara/SKILL.md",
         "name": "minara",
         "description": "Crypto trading & wallet, and AI market analysis via Minara CLI. Swap, perps, transfer, deposit (credit card/crypto), withdraw, AI chat, market discovery, x402 payment, autopilot, limit orders, premium. EVM + Solana + Hyperliquid. Use when: (1) crypto tokens/tickers (ETH, BTC, SOL, USDC, $TICKER, contract addresses), (2) chain names (Ethereum, Solana, Base, Arbitrum, Hyperliquid), (3) trading actions (swap, buy, sell, long, short, perps, leverage, limit order, autopilot), (4) wallet actions (balance, portfolio, deposit, withdraw, transfer, send, pay, credit card), (5) market data (trending, price, analysis, fear & greed, BTC metrics, Polymarket, DeFi), (6) stock tickers in crypto context (AAPL, TSLA), (7) Minara/x402/MoonPay explicitly, (8) subscription/premium/credits.",
-        "stars": 311
+        "stars": 312
+      }
+    ]
+  },
+  {
+    "tweet_id": "2070761082919010367",
+    "tweet_url": "https://x.com/tom_doerr/status/2070761082919010367",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Manage Home Assistant configuration and automation via Claude Code\n\nhttps://t.co/G1MjygoshC https://t.co/sBGA3beHdJ https://github.com/komal-SkyNET/claude-skill-homeassistant",
+    "likes": 118,
+    "retweets": 15,
+    "replies": 2,
+    "views": 12656,
+    "posted_at": "2026-06-27T06:48:09.000Z",
+    "repo_ids": [
+      "komal-SkyNET/claude-skill-homeassistant"
+    ],
+    "repo_urls": [
+      "https://github.com/komal-SkyNET/claude-skill-homeassistant"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "komal-skynet/claude-skill-homeassistant",
+        "github_url": "https://github.com/komal-SkyNET/claude-skill-homeassistant",
+        "skill_md_path": "skills/home-assistant-manager/SKILL.md",
+        "name": "home-assistant-manager",
+        "description": "Manage Home Assistant configuration safely and fast — edit and deploy YAML (automations, scripts, scenes, templates, MQTT), validate with ha core check, deploy via git or rapid scp, reload-vs-restart correctly, verify changes from logs and entity state, and build Lovelace dashboards. Use for any Home Assistant config, automation, template, or dashboard work over SSH/hass-cli/MCP.",
+        "stars": 748
       }
     ]
   },
@@ -191,31 +288,60 @@
     ]
   },
   {
-    "tweet_id": "2009678331281838245",
-    "tweet_url": "https://x.com/vista8/status/2009678331281838245",
-    "author_handle": "vista8",
-    "author_name": "向阳乔木",
-    "text": "如何快速共享一个Claude Code写的Skill\n\n你只需要跟Claude 说：\n\n“把某某 skill，用Github cli发布到github”\n\n（前提是先配置好Github cli，不复杂）\n\n等一会儿，Github就地址就有了。\n\nhttps://t.co/0SsskGXPTV https://t.co/p4UhD0lu0a https://github.com/joeseesun/multi-lens-thinking",
-    "likes": 87,
-    "retweets": 13,
-    "replies": 3,
-    "views": 13312,
-    "posted_at": "2026-01-09T17:27:06.000Z",
+    "tweet_id": "2071556336983142428",
+    "tweet_url": "https://x.com/tom_doerr/status/2071556336983142428",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Generate parametric 3D-printable models with Claude Code and CadQuery\n\nhttps://t.co/f9LVyLIS4e https://t.co/XlLNsBDCVt https://github.com/flowful-ai/cad-skill",
+    "likes": 94,
+    "retweets": 7,
+    "replies": 2,
+    "views": 8705,
+    "posted_at": "2026-06-29T11:28:13.000Z",
     "repo_ids": [
-      "joeseesun/multi-lens-thinking"
+      "flowful-ai/cad-skill"
     ],
     "repo_urls": [
-      "https://github.com/joeseesun/multi-lens-thinking"
+      "https://github.com/flowful-ai/cad-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "joeseesun/multi-lens-thinking",
-        "github_url": "https://github.com/joeseesun/multi-lens-thinking",
+        "id": "flowful-ai/cad-skill",
+        "github_url": "https://github.com/flowful-ai/cad-skill",
         "skill_md_path": "SKILL.md",
-        "name": "multi-lens-thinking",
-        "description": "Use when facing complex problems, making decisions, seeking creative solutions, or when single-perspective thinking feels limiting. Triggers include \"how should I think about this\", \"what am I missing\", \"need fresh perspective\", or when stuck on a problem.",
-        "stars": 27
+        "name": "parametric-3d-printing",
+        "description": "Use this skill when the user wants to design a 3D-printable physical object they intend to manufacture. Triggers: any mention of '3D print', 'STL', 'parametric model', 'enclosure', 'bracket', 'mount', 'case', 'housing', 'CadQuery', 'OpenSCAD', or a specific FDM printer (Bambu Lab, Prusa, Ender); questions about print-friendly design, snap-fits, tolerances, or wall thickness; and requests for functional parts like Arduino enclosures, cable organizers, wall mounts, adapters, or mechanical components. Also fires when the user describes a real physical object to make, provided the goal is to manufacture it. Do NOT use for: 3D rendering, animation, game assets, digital-only art, photogrammetry, sculpting, editing an existing STL file the user already has, or any 3D work that is not heading toward a printer.",
+        "stars": 407
+      }
+    ]
+  },
+  {
+    "tweet_id": "2070816372238528987",
+    "tweet_url": "https://x.com/tom_doerr/status/2070816372238528987",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Creates robust Claude Code skills without manual ad-hoc engineering\n\nhttps://t.co/5zwFR7ACnk https://t.co/8UwPnaXiEs https://github.com/tripleyak/SkillForge",
+    "likes": 77,
+    "retweets": 11,
+    "replies": 2,
+    "views": 8811,
+    "posted_at": "2026-06-27T10:27:51.000Z",
+    "repo_ids": [
+      "tripleyak/SkillForge"
+    ],
+    "repo_urls": [
+      "https://github.com/tripleyak/SkillForge"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "tripleyak/skillforge",
+        "github_url": "https://github.com/tripleyak/SkillForge",
+        "skill_md_path": "SKILL.md",
+        "name": "skillforge",
+        "description": "Intelligent skill router, proactive advisor, and creator. Analyzes ANY input to recommend existing skills, improve them, or create new ones. Adds proactive Context Skill Advisor suggestions from session, project, and personal context using user-controlled Proactivity Levels.",
+        "stars": 782
       }
     ]
   },
@@ -228,7 +354,7 @@
     "likes": 61,
     "retweets": 12,
     "replies": 2,
-    "views": 8043,
+    "views": 8074,
     "posted_at": "2026-06-28T12:45:51.000Z",
     "repo_ids": [
       "antonbabenko/terraform-skill"
@@ -244,65 +370,36 @@
         "skill_md_path": "skills/terraform-skill/SKILL.md",
         "name": "terraform-skill",
         "description": "Use when writing, reviewing, or debugging Terraform/OpenTofu modules, tests, CI, scans, or state ops - diagnoses failure mode (identity churn, secrets, blast radius, CI drift, state corruption) with version-aware guards.",
-        "stars": 2138
+        "stars": 2140
       }
     ]
   },
   {
-    "tweet_id": "2072699664445645028",
-    "tweet_url": "https://x.com/laowangbabababa/status/2072699664445645028",
-    "author_handle": "laowangbabababa",
-    "author_name": "老王霸 AI Lab",
-    "text": "公众号发了一篇开源做流程图的 skill，阅读量 1.7w，但 github 上项目的星星数 17 个，访问量 700 个，可能真的绝大部分人，都没有用过 github，不知道我给的 github 连接是什么意思。\n项目地址：https://t.co/LFsiZqxrCr https://t.co/E4JX7qRjlq https://github.com/pmlaowangba-lab/drawio-generator",
-    "likes": 54,
-    "retweets": 13,
-    "replies": 26,
-    "views": 7743,
-    "posted_at": "2026-07-02T15:11:23.000Z",
+    "tweet_id": "2072081878312493139",
+    "tweet_url": "https://x.com/tom_doerr/status/2072081878312493139",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Claude Code skill covering the full job search lifecycle\n\nhttps://t.co/ONekdOj69v https://t.co/4eRmlOjUAB https://github.com/noamseg/interview-coach-skill",
+    "likes": 47,
+    "retweets": 2,
+    "replies": 0,
+    "views": 5308,
+    "posted_at": "2026-06-30T22:16:31.000Z",
     "repo_ids": [
-      "pmlaowangba-lab/drawio-generator"
+      "noamseg/interview-coach-skill"
     ],
     "repo_urls": [
-      "https://github.com/pmlaowangba-lab/drawio-generator"
+      "https://github.com/noamseg/interview-coach-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "pmlaowangba-lab/drawio-generator",
-        "github_url": "https://github.com/pmlaowangba-lab/drawio-generator",
+        "id": "noamseg/interview-coach-skill",
+        "github_url": "https://github.com/noamseg/interview-coach-skill",
         "skill_md_path": "SKILL.md",
-        "name": "drawio-generator",
-        "description": "AI draw.io 原生生成器，面向流程图、架构图、状态机等场景，输出标准 .drawio XML 文件。",
-        "stars": 32
-      }
-    ]
-  },
-  {
-    "tweet_id": "2071167380324049266",
-    "tweet_url": "https://x.com/interlap01/status/2071167380324049266",
-    "author_handle": "interlap01",
-    "author_name": "Interlap",
-    "text": "I got tired of recording product demos.\n\nSo I built a small AI agent skill that records them for me. Give the agent a rough idea of what you want to show, and it drives the app and records the demo, all in the background.\n\nOpen sourced it:\nhttps://t.co/ZClhmWvhce https://github.com/MobAI-App/desktop-recorder-skill",
-    "likes": 45,
-    "retweets": 5,
-    "replies": 8,
-    "views": 193813,
-    "posted_at": "2026-06-28T09:42:38.000Z",
-    "repo_ids": [
-      "MobAI-App/desktop-recorder-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/MobAI-App/desktop-recorder-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "mobai-app/desktop-recorder-skill",
-        "github_url": "https://github.com/MobAI-App/desktop-recorder-skill",
-        "skill_md_path": "skills/desktop-recorder/SKILL.md",
-        "name": "desktop-recorder",
-        "description": "Use when the user asks to record / produce / export a screencast or demo video of a macOS desktop or web app - for launch, marketing, social posts, landing pages, internal walkthroughs. Triggers on \"record a screencast\", \"screen recording\", \"desktop app demo\", \"web app demo\", \"record this Mac app\", \"make a screencast\", \"marketing video for the app\", \"record Chrome / Safari\". Enforces explore → script → dry-run → record → export. macOS only. For mobile demos use the sibling `mobile-recorder-skill`.",
-        "stars": 14
+        "name": "interview-coach",
+        "description": "High-rigor interview coaching skill for job seekers. Use when someone wants structured prep, transcript analysis, practice drills, storybank management, or performance tracking. Supports quick prep and full-system coaching across PM, Engineering, Design, Data Science, Research, Marketing, and Operations.",
+        "stars": 1518
       }
     ]
   },
@@ -312,10 +409,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Improves Claude Code behavior using Karpathy-inspired coding guidelines\n\nhttps://t.co/J3f4llTQx5 https://t.co/CbmddmkLSi https://github.com/forrestchang/andrej-karpathy-skills",
-    "likes": 40,
+    "likes": 41,
     "retweets": 6,
     "replies": 2,
-    "views": 6247,
+    "views": 6302,
     "posted_at": "2026-06-30T10:49:39.000Z",
     "repo_ids": [
       "forrestchang/andrej-karpathy-skills"
@@ -331,7 +428,36 @@
         "skill_md_path": "skills/karpathy-guidelines/SKILL.md",
         "name": "karpathy-guidelines",
         "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-        "stars": 187021
+        "stars": 187389
+      }
+    ]
+  },
+  {
+    "tweet_id": "2072340953822552343",
+    "tweet_url": "https://x.com/QingQ77/status/2072340953822552343",
+    "author_handle": "QingQ77",
+    "author_name": "Geek Lite",
+    "text": "恋爱教练 Dating Coach Skill\n给 AI 助手装上恋爱教练技能，能分析聊天记录、给建议，覆盖从搭讪到长期相处的全流程。\n\nhttps://t.co/PTOs14jGRB\n\nClaude 用的 AI 恋爱教练技能包，放在 .claude/skills/ https://github.com/Mayuqi-crypto/HowToGetAlongWithGirls",
+    "likes": 33,
+    "retweets": 1,
+    "replies": 4,
+    "views": 2215,
+    "posted_at": "2026-07-01T15:26:00.000Z",
+    "repo_ids": [
+      "Mayuqi-crypto/HowToGetAlongWithGirls"
+    ],
+    "repo_urls": [
+      "https://github.com/Mayuqi-crypto/HowToGetAlongWithGirls"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "mayuqi-crypto/howtogetalongwithgirls",
+        "github_url": "https://github.com/Mayuqi-crypto/HowToGetAlongWithGirls",
+        "skill_md_path": ".claude/skills/dating-coach/SKILL.md",
+        "name": "dating-coach",
+        "description": "男性恋爱/两性关系教练。两种触发场景：(1) 用户粘贴与女生的聊天记录、截图或对话片段，需要分析对方心理/兴趣并给出建议回复； (2) 用户询问任意两性话题——搭讪、约会、聊天、穿搭、展示面、朋友圈打造、女性心理、废物测试、表白、确定关系、异地、矛盾冷战、 见家长、求婚结婚等，贯穿\"认识—暧昧—恋爱—长期—结婚\"全过程。中文为主。 Dating coach for men: analyze chat logs and suggest replies; answer questions on flirting, dating, style, attraction, female psychology, and relationship strategy across the entire lifecycle.",
+        "stars": 169
       }
     ]
   },
@@ -344,7 +470,7 @@
     "likes": 29,
     "retweets": 3,
     "replies": 0,
-    "views": 5220,
+    "views": 5301,
     "posted_at": "2026-07-01T15:27:00.000Z",
     "repo_ids": [
       "balukosuri/Andrej-Karpathy-s-Autoresearch-As-a-Universal-Skill"
@@ -360,7 +486,36 @@
         "skill_md_path": "SKILL.md",
         "name": "autoresearch-universal",
         "description": "Self-improving prompt optimization using the Karpathy autoresearch pattern. Scans any repo, suggests optimization targets, auto-defines binary eval metrics, and runs an autonomous generate-eval-score-mutate loop to improve prompts over time. Use when the user asks to optimize, improve, or run autoresearch on anything in their codebase.",
-        "stars": 173
+        "stars": 177
+      }
+    ]
+  },
+  {
+    "tweet_id": "2071778696772432226",
+    "tweet_url": "https://x.com/tom_doerr/status/2071778696772432226",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Plans, runs, and synthesizes user research for AI agents\n\nhttps://t.co/oMyRaQJUzf https://t.co/1Qrww5zcD0 https://github.com/cookiy-ai/user-research-skill",
+    "likes": 28,
+    "retweets": 1,
+    "replies": 1,
+    "views": 5650,
+    "posted_at": "2026-06-30T02:11:47.000Z",
+    "repo_ids": [
+      "cookiy-ai/user-research-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/cookiy-ai/user-research-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "cookiy-ai/user-research-skill",
+        "github_url": "https://github.com/cookiy-ai/user-research-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "user-research-cookiy",
+        "description": "End-to-end user research assistant — qualitative and quantitative. Use this skill whenever the user mentions user research, user interviews, discussion guides, interview guides, research plans, qualitative research, quantitative research, user surveys, survey design, usability studies, participant recruitment, research synthesis, interview transcripts, research reports, running studies with AI, or explicitly mentions Cookiy AI. Also trigger when users want to talk to customers, conduct discovery research, create a study or survey, analyze interview data, run AI-moderated interviews, or collect survey responses. Covers the full lifecycle: planning studies, creating discussion guides, running AI-moderated interviews (real or synthetic) via Cookiy, designing and distributing surveys, and synthesizing results into reports.\n",
+        "stars": 955
       }
     ]
   },
@@ -373,7 +528,7 @@
     "likes": 23,
     "retweets": 4,
     "replies": 1,
-    "views": 5619,
+    "views": 5729,
     "posted_at": "2026-07-01T20:04:55.000Z",
     "repo_ids": [
       "buzhangsan/skill-manager"
@@ -394,38 +549,31 @@
     ]
   },
   {
-    "tweet_id": "2072279158546485635",
-    "tweet_url": "https://x.com/hajimehoshi/status/2072279158546485635",
-    "author_handle": "hajimehoshi",
-    "author_name": "Hajime Hoshi",
-    "text": "I've added a skill for 'headless' Ebitengine. You can test Ebitengine application without showing a window, and also you can control time and emulate inputs! https://t.co/VVLms63kBo https://github.com/hajimehoshi/ebiten/blob/main/.agents/skills/run-ebitengine-app-headless/SKILL.md",
-    "likes": 21,
-    "retweets": 1,
-    "replies": 1,
-    "views": 1431,
-    "posted_at": "2026-07-01T11:20:27.000Z",
+    "tweet_id": "2073281117134733655",
+    "tweet_url": "https://x.com/Dinosn/status/2073281117134733655",
+    "author_handle": "Dinosn",
+    "author_name": "Nicolas Krassas",
+    "text": "Unified real-time search engine skill for AI agents. https://t.co/tlNz3sH30i https://github.com/anysearch-ai/anysearch-skill",
+    "likes": 18,
+    "retweets": 0,
+    "replies": 0,
+    "views": 2320,
+    "posted_at": "2026-07-04T05:41:52.000Z",
     "repo_ids": [
-      "hajimehoshi/ebiten"
+      "anysearch-ai/anysearch-skill"
     ],
     "repo_urls": [
-      "https://github.com/hajimehoshi/ebiten"
+      "https://github.com/anysearch-ai/anysearch-skill"
     ],
-    "skill_refs": [
-      {
-        "repoId": "hajimehoshi/ebiten",
-        "githubUrl": "https://github.com/hajimehoshi/ebiten",
-        "skillPath": ".agents/skills/run-ebitengine-app-headless/SKILL.md",
-        "sourceUrl": "https://github.com/hajimehoshi/ebiten/blob/main/.agents/skills/run-ebitengine-app-headless/SKILL.md"
-      }
-    ],
+    "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "hajimehoshi/ebiten",
-        "github_url": "https://github.com/hajimehoshi/ebiten",
-        "skill_md_path": ".agents/skills/run-ebitengine-app-headless/SKILL.md",
-        "name": "run-ebitengine-app-headless",
-        "description": "Use this skill to run an Ebitengine app (anything implementing ebiten.Game) headlessly and programmatically — no visible window and no changes to the app's source — to test, debug, screenshot, or otherwise exercise it. It launches the app as a vmhost guest, drives it through its ticks faster than real time, injects keyboard / mouse / touch / gamepad / text input, reads the rendered frame back as pixels to assert on or dump as a PNG, and observes the audio the app plays. Use when you need input injection, deterministic multi-tick runs, golden-image checks, or audio assertions — for example to reproduce an input-dependent bug, verify behavior after a sequence of clicks or key presses, check that the right sound plays, capture a single rendered frame, or let an AI agent drive an app end-to-end.\n",
-        "stars": 13303
+        "id": "anysearch-ai/anysearch-skill",
+        "github_url": "https://github.com/anysearch-ai/anysearch-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "anysearch",
+        "description": "Real-time search engine supporting web search, vertical domain search, parallel batch search, and URL content extraction.",
+        "stars": 3929
       }
     ]
   },
@@ -435,10 +583,10 @@
     "author_handle": "zjp1997720",
     "author_name": "智见AI-大鹏",
     "text": "【开源一个开源skill的skill】\n看到这个标题你可能有点懵逼\n功能就一句话：一键把你本地的skill开源到github，并且支持npx skills。\n主打一个越分享越幸运！\n地址在这：\nhttps://t.co/jaI4CLAHVu https://t.co/WTPzHzG0yy https://github.com/zjp1997720/skill-open-sourcer",
-    "likes": 14,
-    "retweets": 3,
+    "likes": 15,
+    "retweets": 4,
     "replies": 1,
-    "views": 2185,
+    "views": 2770,
     "posted_at": "2026-07-02T15:11:24.000Z",
     "repo_ids": [
       "zjp1997720/skill-open-sourcer"
@@ -459,147 +607,110 @@
     ]
   },
   {
-    "tweet_id": "2072972499931800052",
-    "tweet_url": "https://x.com/PythonHub/status/2072972499931800052",
-    "author_handle": "PythonHub",
-    "author_name": "Python Hub",
-    "text": "virgiliojr94 / book-to-skill\n\nTurn any technical book PDF into a Claude Code skill — ready to study, reference, and use while you work.\n\nhttps://t.co/Guoicd6gDh https://github.com/virgiliojr94/book-to-skill",
-    "likes": 5,
-    "retweets": 0,
+    "tweet_id": "2073110132121022629",
+    "tweet_url": "https://x.com/tom_doerr/status/2073110132121022629",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Teaches AI coding agents Home Assistant best practices\n\nhttps://t.co/yr7Dla2oEb https://t.co/9XxUMk9NAB https://github.com/homeassistant-ai/skills",
+    "likes": 15,
+    "retweets": 1,
     "replies": 0,
-    "views": 865,
-    "posted_at": "2026-07-03T09:15:32.000Z",
+    "views": 4747,
+    "posted_at": "2026-07-03T18:22:26.000Z",
     "repo_ids": [
-      "virgiliojr94/book-to-skill"
+      "homeassistant-ai/skills"
     ],
     "repo_urls": [
-      "https://github.com/virgiliojr94/book-to-skill"
+      "https://github.com/homeassistant-ai/skills"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "virgiliojr94/book-to-skill",
-        "github_url": "https://github.com/virgiliojr94/book-to-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "book-to-skill",
-        "description": "Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured agent skills, extracting frameworks, mental models, principles, techniques, and anti-patterns. Use when the user wants to study a document through GitHub Copilot CLI, Amp, or Claude Code, apply an author's frameworks while working, or build a reusable knowledge base from a file.",
-        "stars": 7673
+        "id": "homeassistant-ai/skills",
+        "github_url": "https://github.com/homeassistant-ai/skills",
+        "skill_md_path": "skills/home-assistant-best-practices/SKILL.md",
+        "name": "home-assistant-best-practices",
+        "description": "Best practices for HA automations, helpers, scripts, controls, and dashboards.\nTRIGGER THIS SKILL WHEN: - Creating or editing automations, scripts, scenes, or dashboards - Choosing between template sensors and built-in helpers - Restructuring triggers, conditions, or automation modes - Setting up Zigbee button/remote automations - Renaming entities or migrating device_id to entity_id - Configuring dashboard cards or selecting helpers - Looking up card types or domain docs - Writing or reviewing AppDaemon apps\nSYMPTOMS: - Agent uses Jinja2 templates where native options exist - Agent uses device_id instead of entity_id - Agent changes entity IDs without checking consumers - Wrong automation mode - Agent hard-codes values or uses raw sensor over helper - Agent edits .storage, writes YAML, or generates YAML snippets - Agent tells user to edit configuration.yaml for UI integrations\n",
+        "stars": 577
       }
     ]
   },
   {
-    "tweet_id": "2072795130021412990",
-    "tweet_url": "https://x.com/scotty529/status/2072795130021412990",
-    "author_handle": "scotty529",
-    "author_name": "Scott Schindler",
-    "text": "I've had to think through agent design with eve by @vercel twice now, so I turned it into a skill.\n \nIt interviews you on what you're building, picks the right eve features (tools vs skills vs connections vs subagents), then builds step by step.\n\nhttps://t.co/M9xzmGwcGq https://github.com/scottschindler/eve-agent-design-skill",
+    "tweet_id": "2072356922053812272",
+    "tweet_url": "https://x.com/tom_doerr/status/2072356922053812272",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Generates 8-direction pixel art character spritesheets from reference images\n\nhttps://t.co/jbVBTIzeKU https://t.co/lsPfiG635T https://github.com/tachikomared/character-animation-creator-skill",
     "likes": 3,
-    "retweets": 0,
-    "replies": 2,
-    "views": 209,
-    "posted_at": "2026-07-02T21:30:44.000Z",
+    "retweets": 1,
+    "replies": 0,
+    "views": 4236,
+    "posted_at": "2026-07-01T16:29:27.000Z",
     "repo_ids": [
-      "scottschindler/eve-agent-design-skill"
+      "tachikomared/character-animation-creator-skill"
     ],
     "repo_urls": [
-      "https://github.com/scottschindler/eve-agent-design-skill"
+      "https://github.com/tachikomared/character-animation-creator-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "scottschindler/eve-agent-design-skill",
-        "github_url": "https://github.com/scottschindler/eve-agent-design",
+        "id": "tachikomared/character-animation-creator-skill",
+        "github_url": "https://github.com/tachikomared/character-animation-creator-skill",
         "skill_md_path": "SKILL.md",
-        "name": "eve-agent-design",
-        "description": "Design and build a working agent with Vercel's eve framework. Use when the user wants to build, plan, or architect an AI agent with eve — choosing the right eve features (tools, skills, connections, channels, subagents, schedules, sandbox), then building it step by step with auth, approvals, and evals. Complements the official vercel/eve skill, which covers API reference via bundled docs.",
-        "stars": 1
+        "name": "game-character-sprites",
+        "description": "Create game-ready fixed-cell pixel-art character spritesheets from text concepts, reference images, or existing character art. Use when Codex needs to design, generate, clean up, validate, and package 2D game characters with native 32x32, 64x64, or 128x128 cells; 4-way or 8-way directions; idle, walk/run, jump, attack, archer, caster, or other animation strips; transparent GIF/WebP previews; and per-direction targeted regeneration.",
+        "stars": 263
       }
     ]
   },
   {
-    "tweet_id": "2072707326226637264",
-    "tweet_url": "https://x.com/AlexCormeraie/status/2072707326226637264",
-    "author_handle": "AlexCormeraie",
-    "author_name": "Alexandre Cormeraie",
-    "text": "Finally, you can ask Claude Code to generate images for free! Based on your own ChatGPT subscription! \n\nNO API KEY\n\nDownload the skills now! \n\nhttps://t.co/sWgPk2NGBq https://t.co/TlFFE1ARA0 https://github.com/Connected-Mate/gptimage",
-    "likes": 3,
-    "retweets": 2,
-    "replies": 1,
-    "views": 454,
-    "posted_at": "2026-07-02T15:41:50.000Z",
-    "repo_ids": [
-      "Connected-Mate/gptimage"
-    ],
-    "repo_urls": [
-      "https://github.com/Connected-Mate/gptimage"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "connected-mate/gptimage",
-        "github_url": "https://github.com/Connected-Mate/gptimage",
-        "skill_md_path": "skill/gptimage/SKILL.md",
-        "name": "gptimage",
-        "description": "Generate and edit raster images (PNG) from text prompts using the user's ChatGPT subscription — no API key, billed to their ChatGPT plan. Use whenever the user asks to create, generate, draw, make, design, or illustrate an image, picture, logo, icon, illustration, texture, sprite, mockup, background, photo, or visual asset; or to edit/restyle/combine images using reference images. Powered by the gptimage MCP server.",
-        "stars": 1
-      }
-    ]
-  },
-  {
-    "tweet_id": "2070503597104865674",
-    "tweet_url": "https://x.com/XAMTO_AI/status/2070503597104865674",
-    "author_handle": "XAMTO_AI",
-    "author_name": "Amto",
-    "text": "Shadcn 作者搞出来的这个 improve 技能设计思路，确实让人眼前一亮，我之前就琢磨过类似的玩法：\n\n🔗 https://t.co/m1vDXwhHc5\n\n把最值钱的活交给最强的模型去干——比如啃代码库、定位问题、出高质量的计划方案，然后把实际动手执行那部分甩给便宜模型去做。skill 本身绝对不碰代码，只负责出计划。\n\n主 https://t.co/zYdy4ZuoPD https://github.com/shadcn/improve",
-    "likes": 2,
-    "retweets": 0,
-    "replies": 3,
-    "views": 1286,
-    "posted_at": "2026-06-26T13:45:00.000Z",
-    "repo_ids": [
-      "shadcn/improve"
-    ],
-    "repo_urls": [
-      "https://github.com/shadcn/improve"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "shadcn/improve",
-        "github_url": "https://github.com/shadcn/improve",
-        "skill_md_path": "skills/improve/SKILL.md",
-        "name": "improve",
-        "description": "Survey any codebase as a senior advisor and produce prioritized, self-contained implementation plans for OTHER models/agents to execute. Strictly read-only on source code — never implements, fixes, or refactors anything itself. Use when asked to audit a codebase, find improvement opportunities (bugs, security, performance, test coverage, tech debt, migrations, DX), suggest features or where to take the project next (roadmap, product direction), or generate handoff plans for another agent to implement.",
-        "stars": 6667
-      }
-    ]
-  },
-  {
-    "tweet_id": "2072844779210280983",
-    "tweet_url": "https://x.com/jingle2049/status/2072844779210280983",
-    "author_handle": "jingle2049",
-    "author_name": "Jingle",
-    "text": "https://t.co/snNb6ccc7j  此技(fu)能(ke)是真厉害。😍 https://t.co/7N4h0KD2tH https://github.com/Jane-xiaoer/claude-skill-web-clone",
+    "tweet_id": "2072984458928759192",
+    "tweet_url": "https://x.com/mrayhanfadil/status/2072984458928759192",
+    "author_handle": "mrayhanfadil",
+    "author_name": "Rayhan Fadillah",
+    "text": "@ikhwanuddin @obsdmd Saya pake Hermes Agent(@NousResearch ), Pak. Terus, pake skill https://t.co/og46QZa38M dan https://t.co/g7Paqwxzci https://github.com/NousResearch/hermes-agent/blob/main/skills/note-taking/obsidian/SKILL.md https://github.com/NousResearch/hermes-agent/blob/main/skills/research/llm-wiki/SKILL.md",
     "likes": 1,
     "retweets": 0,
     "replies": 0,
-    "views": 32,
-    "posted_at": "2026-07-03T00:48:01.000Z",
+    "views": 30,
+    "posted_at": "2026-07-03T10:03:03.000Z",
     "repo_ids": [
-      "Jane-xiaoer/claude-skill-web-clone"
+      "NousResearch/hermes-agent"
     ],
     "repo_urls": [
-      "https://github.com/Jane-xiaoer/claude-skill-web-clone"
+      "https://github.com/NousResearch/hermes-agent"
     ],
-    "skill_refs": [],
+    "skill_refs": [
+      {
+        "repoId": "NousResearch/hermes-agent",
+        "githubUrl": "https://github.com/NousResearch/hermes-agent",
+        "skillPath": "skills/note-taking/obsidian/SKILL.md",
+        "sourceUrl": "https://github.com/NousResearch/hermes-agent/blob/main/skills/note-taking/obsidian/SKILL.md"
+      },
+      {
+        "repoId": "NousResearch/hermes-agent",
+        "githubUrl": "https://github.com/NousResearch/hermes-agent",
+        "skillPath": "skills/research/llm-wiki/SKILL.md",
+        "sourceUrl": "https://github.com/NousResearch/hermes-agent/blob/main/skills/research/llm-wiki/SKILL.md"
+      }
+    ],
     "valid_skill_repos": [
       {
-        "id": "jane-xiaoer/claude-skill-web-clone",
-        "github_url": "https://github.com/Jane-xiaoer/claude-skill-web-clone",
-        "skill_md_path": "SKILL.md",
-        "name": "web-clone",
-        "description": "网站复刻 / 克隆方法论。USE WHEN 用户说 复刻网站、克隆网站、clone website、抄个站、仿站、 照着这个站做一个、reproduce site、还原某个网页效果、把这个站搬下来改成我的、 复刻某个交互/WebGL/Canvas/Three.js 效果。提供「先拿真源码 → 判路径 → 逆向拆解 → 搭工程 → 替换内容」的可移植决策树，覆盖静态站 / React-Vue-Next 内容站 / WebGL-Canvas 重前端站三大分支，并强制核对任何 AI 二手分析里的可执行代码。\n",
-        "stars": 471
+        "id": "NousResearch/hermes-agent",
+        "github_url": "https://github.com/NousResearch/hermes-agent",
+        "skill_md_path": "skills/note-taking/obsidian/SKILL.md",
+        "name": "obsidian",
+        "description": "Read, search, create, and edit notes in the Obsidian vault.",
+        "stars": 208965
+      },
+      {
+        "id": "NousResearch/hermes-agent",
+        "github_url": "https://github.com/NousResearch/hermes-agent",
+        "skill_md_path": "skills/research/llm-wiki/SKILL.md",
+        "name": "llm-wiki",
+        "description": "Karpathy's LLM Wiki: build/query interlinked markdown KB.",
+        "stars": 208965
       }
     ]
   }
