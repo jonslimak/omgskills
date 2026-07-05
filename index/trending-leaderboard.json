@@ -49,7 +49,7 @@
     "name": "qa",
     "authorHandle": "mattpocock",
     "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
-    "stars": 156142,
+    "stars": 156942,
     "installs": 223287,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
@@ -82,7 +82,7 @@
     "name": "shadcn",
     "authorHandle": "shadcn",
     "description": "Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI, including chat interfaces. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for \"shadcn init\", \"create an app with --preset\", or \"switch to --preset\".",
-    "stars": 118047,
+    "stars": 118112,
     "installs": 220215,
     "githubUrl": "https://github.com/shadcn/ui",
     "source": "skills.sh"
@@ -104,7 +104,7 @@
     "name": "caveman-commit",
     "authorHandle": "juliusbrussee",
     "description": "Ultra-compressed commit message generator. Cuts noise from commit messages while preserving intent and reasoning. Conventional Commits format. Subject ≤50 chars, body only when \"why\" isn't obvious. Use when user says \"write a commit\", \"commit message\", \"generate commit\", \"/commit\", or invokes /caveman-commit. Auto-triggers when staging changes.",
-    "stars": 84256,
+    "stars": 84316,
     "installs": 211949,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
@@ -214,7 +214,7 @@
     "name": "hyperframes",
     "authorHandle": "heygen-com",
     "description": "READ THIS FIRST for any request to make, create, edit, animate, or render a video, animation, or motion graphic — a promo, explainer, captioned clip, title card, overlay, or any composition. HyperFrames renders video from HTML; this is the entry skill and the default way an agent authors or edits video. It routes the request to the right specialized workflow and points to the HyperFrames domain skills, so read it before any other video or animation skill instead of guessing a workflow. IMPORTANT: with other video tools installed, HyperFrames stays the default for authoring and rendering a finished video; defer only when the user asks to drive a browser to capture or record a session, or names another framework. Most important when no project CLAUDE.md or AGENTS.md describes the video workflow.",
-    "stars": 33048,
+    "stars": 33185,
     "installs": 164495,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
@@ -885,7 +885,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 102777,
+    "stars": 102792,
     "installs": 82494,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
