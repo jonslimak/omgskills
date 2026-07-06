@@ -7,7 +7,8 @@ const BOOTSTRAP_SOURCE_PRIORITY: Record<BootstrapSource, number> = {
   skillssh: 1,
   awesome: 2,
   registry: 3,
-  code: 4,
+  "creator-watch": 4,
+  code: 5,
 };
 
 export function repairDeadPersistedRisingSkillLinks(

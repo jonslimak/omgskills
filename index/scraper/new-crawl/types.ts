@@ -183,7 +183,7 @@ export type DailyPriorityRepoSample = {
 
 export type NextPromotionCandidateReason = "trustedVendor" | "goldBasket" | "periodic" | "background";
 
-export type BootstrapSource = "official" | "skillssh" | "awesome" | "registry" | "code";
+export type BootstrapSource = "official" | "skillssh" | "awesome" | "registry" | "code" | "creator-watch";
 
 export type RepoBootstrapCandidate = {
   source: BootstrapSource;
@@ -401,6 +401,9 @@ export type ShadowRunReport = {
     path: string;
     stars: number | null;
   }[];
+  creatorWatchCheckedOwnerCount?: number;
+  creatorWatchDiscoveredRepoCount?: number;
+  creatorWatchNewRepoSample?: string[];
   enrichmentCounts: ShadowEnrichmentCounts;
   lowStarValidSkillCount: number;
   lowStarValidSkillSample: string[];

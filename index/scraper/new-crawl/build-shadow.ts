@@ -16,6 +16,7 @@ import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible } from "./admission.js";
 import { loadTrustedSeeds } from "./seeds.js";
+import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals } from "./momentum.js";
@@ -99,6 +100,7 @@ type DiscoverySourceName =
   | "aggregators"
   | "trusted-vendors"
   | "trusted-creators"
+  | "creator-watch"
   | "monitored-repos";
 
 type DiscoveredRepoRecord = {
@@ -639,6 +641,8 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Fast-only repos: ${report.fastOnlyRepoCount}`,
     `- Discovery budget applied: ${report.discoveryBudgetApplied ? "yes" : "no"}`,
     `- High-star path-quality skipped: ${report.highStarPathQualitySkippedCount}`,
+    `- Creator watch checked owners: ${report.creatorWatchCheckedOwnerCount ?? 0}`,
+    `- Creator watch discovered repos: ${report.creatorWatchDiscoveredRepoCount ?? 0}`,
     `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
     `- Official low-star skills: ${report.officialLowStarSkillCount}`,
@@ -677,6 +681,12 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     ...(report.highStarPathQualitySkippedSample.length
       ? report.highStarPathQualitySkippedSample.map((row) => `- ${row.repo} (${row.stars ?? "?"}) ${row.path}`)
+      : ["- none"]),
+    "",
+    "## Creator watch new repo sample",
+    "",
+    ...(report.creatorWatchNewRepoSample?.length
+      ? report.creatorWatchNewRepoSample.map((repo) => `- ${repo}`)
       : ["- none"]),
     "",
     "## Enrichment",
@@ -1348,6 +1358,9 @@ async function runDiscovery(
   partialDiscoveryWarnings: string[];
   highStarPathQualitySkippedCount: number;
   highStarPathQualitySkippedSample: ShadowRunReport["highStarPathQualitySkippedSample"];
+  creatorWatchCheckedOwnerCount: number;
+  creatorWatchDiscoveredRepoCount: number;
+  creatorWatchNewRepoSample: string[];
 }> {
   const lanes = CADENCE_LANES[cadence];
   const sourceRuns: SourceRunSummary[] = [];
@@ -1371,6 +1384,9 @@ async function runDiscovery(
   const partialDiscoveryWarnings: string[] = [];
   let highStarPathQualitySkippedCount = 0;
   const highStarPathQualitySkippedSample: ShadowRunReport["highStarPathQualitySkippedSample"] = [];
+  let creatorWatchCheckedOwnerCount = 0;
+  let creatorWatchDiscoveredRepoCount = 0;
+  const creatorWatchNewRepoSample: string[] = [];
   const shouldRunScheduledHighStarSkillMdDiscovery = shouldRunWeeklyHighStarSkillMdDiscovery(checkedAt);
   const runHighStarSkillMdDiscovery = shouldRunScheduledHighStarSkillMdDiscovery || forceHighStarSkillMd;
   if (forceHighStarSkillMd && !shouldRunScheduledHighStarSkillMdDiscovery) {
@@ -1393,6 +1409,9 @@ async function runDiscovery(
       },
     ]),
   );
+  const creatorWatchEnabled = process.env.CRAWL4_CREATOR_WATCH === "1";
+  const watchedCreatorHandles = seeds.watchedCreatorHandles ?? new Set<string>();
+  const existingRepoKeys = new Set(repoIndex.repos.map((repo) => repo.repo));
 
   const addHighStarHits = (hits: unknown[], source: DiscoverySourceName, lane: DiscoveryLane) => {
     for (const hit of hits) {
@@ -1468,6 +1487,9 @@ async function runDiscovery(
       partialDiscoveryWarnings,
       highStarPathQualitySkippedCount,
       highStarPathQualitySkippedSample,
+      creatorWatchCheckedOwnerCount,
+      creatorWatchDiscoveredRepoCount,
+      creatorWatchNewRepoSample,
     };
   }
 
@@ -1509,6 +1531,44 @@ async function runDiscovery(
       });
       for (const repo of trustedCreatorRepos) {
         addDiscoveredRepo(discovered, { repo: repo.repo, repoUrl: repo.repoUrl }, "trusted-creators", "fast", repo.stars);
+      }
+
+      if (creatorWatchEnabled && watchedCreatorHandles.size > 0) {
+        const startedAt = performance.now();
+        try {
+          const result = await searchCreatorWatchRepos({
+            watchedHandles: watchedCreatorHandles,
+            existingRepos: existingRepoKeys,
+          });
+          creatorWatchCheckedOwnerCount = result.checkedOwnerCount;
+          creatorWatchDiscoveredRepoCount = result.discoveredRepoCount;
+          sourceRuns.push({
+            source: "creator-watch",
+            lane: "fast",
+            hitCount: result.hits.length,
+            durationMs: Math.round(performance.now() - startedAt),
+          });
+          for (const hit of result.hits) {
+            const repoInfo = { repo: hit.repo, repoUrl: hit.repoUrl };
+            addDiscoveredRepo(discovered, repoInfo, "creator-watch", "fast", hit.stars);
+            maybeSetBootstrapCandidate(discovered, repoInfo, {
+              source: "creator-watch",
+              id: codeCandidateId(hit.repo, hit.path),
+              skill_md_path: hit.path,
+              github_url: hit.repoUrl,
+              stars: hit.stars,
+            });
+            if (creatorWatchNewRepoSample.length < 10) creatorWatchNewRepoSample.push(hit.repo);
+          }
+        } catch (error) {
+          sourceRuns.push({
+            source: "creator-watch",
+            lane: "fast",
+            hitCount: 0,
+            durationMs: Math.round(performance.now() - startedAt),
+          });
+          partialDiscoveryWarnings.push(formatDiscoveryWarning("creator-watch", error));
+        }
       }
 
       const monitoredRepos = repoIndex.repos.filter((repo) => repo.state === "rising" || repo.state === "core");
@@ -1679,6 +1739,9 @@ async function runDiscovery(
     partialDiscoveryWarnings,
     highStarPathQualitySkippedCount,
     highStarPathQualitySkippedSample,
+    creatorWatchCheckedOwnerCount,
+    creatorWatchDiscoveredRepoCount,
+    creatorWatchNewRepoSample,
   };
 }
 
@@ -1785,6 +1848,9 @@ async function main() {
     partialDiscoveryWarnings,
     highStarPathQualitySkippedCount,
     highStarPathQualitySkippedSample,
+    creatorWatchCheckedOwnerCount,
+    creatorWatchDiscoveredRepoCount,
+    creatorWatchNewRepoSample,
   } =
     await runDiscovery(
       cadence,
@@ -1937,6 +2003,9 @@ async function main() {
     partialDiscoveryWarnings: combinedDiscoveryWarnings,
     highStarPathQualitySkippedCount,
     highStarPathQualitySkippedSample,
+    creatorWatchCheckedOwnerCount,
+    creatorWatchDiscoveredRepoCount,
+    creatorWatchNewRepoSample,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
     lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,
