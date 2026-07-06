@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>editool — omgskills curation</title>
+<style>
+  :root { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 14px; }
+  body { margin: 0; background: #f6f6f4; color: #1a1a1a; }
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 16px; background: #1a1a1a; color: #eee; position: sticky; top: 0; z-index: 5; }
+  header h1 { font-size: 15px; margin: 0 12px 0 0; font-weight: 600; }
+  header .tab { background: none; border: none; color: #bbb; font-size: 14px; padding: 6px 10px; cursor: pointer; border-radius: 6px; }
+  header .tab.active { background: #3a3a3a; color: #fff; }
+  header .spacer { flex: 1; }
+  header .dirty { color: #f5c451; font-size: 12px; }
+  main { padding: 16px; max-width: 1280px; margin: 0 auto; }
+  section { display: none; }
+  section.active { display: block; }
+  .bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  input, select, textarea { font: inherit; padding: 5px 8px; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
+  input[type=number] { width: 80px; }
+  button { font: inherit; padding: 5px 10px; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; }
+  button:hover { background: #eee; }
+  button.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  button.small { font-size: 12px; padding: 2px 7px; }
+  button.danger { color: #b3261e; border-color: #d9a19d; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+  th { background: #fafafa; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: #666; }
+  tr:hover td { background: #fcfcf7; }
+  .muted { color: #888; font-size: 12px; }
+  .badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 10px; background: #eee; margin-left: 4px; }
+  .badge.gold { background: #f5e6b8; }
+  .badge.vendor { background: #d9e8fb; }
+  .badge.watch { background: #dcefdc; }
+  .badge.featured { background: #f3ddf5; }
+  .badge.warn { background: #fbe0dd; }
+  .errors { background: #fbe0dd; border: 1px solid #e8b3ae; border-radius: 8px; padding: 8px 12px; margin: 10px 0; white-space: pre-wrap; display: none; }
+  .toast { position: fixed; bottom: 16px; right: 16px; background: #1a1a1a; color: #fff; padding: 10px 16px; border-radius: 8px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .clicklink { color: #205da8; cursor: pointer; text-decoration: underline; }
+  .idlist li { margin: 2px 0; }
+  .idlist { list-style: none; padding: 0; margin: 6px 0; }
+  .panel { background: #fff; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .panel h3 { margin: 0 0 8px; font-size: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  footer { padding: 10px 16px; color: #888; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>editool</h1>
+  <button class="tab active" data-tab="library">Library</button>
+  <button class="tab" data-tab="collections">Collections</button>
+  <button class="tab" data-tab="creators">Creators</button>
+  <button class="tab" data-tab="removals">Removals</button>
+  <span class="spacer"></span>
+  <span id="dirty" class="dirty"></span>
+</header>
+<main>
+  <div id="errors" class="errors"></div>
+
+  <!-- ===================== LIBRARY ===================== -->
+  <section id="tab-library" class="active">
+    <div class="bar">
+      <input id="lib-q" placeholder="search name / id / description" size="34">
+      <input id="lib-author" placeholder="@author" size="16">
+      <input id="lib-minstars" type="number" placeholder="min ★" min="0">
+      <select id="lib-prov">
+        <option value="">any provenance</option>
+        <option>original</option><option>repackaged</option><option>mirrored</option><option>catalog</option>
+      </select>
+      <button id="lib-search" class="primary">Search</button>
+      <span id="lib-count" class="muted"></span>
+      <span class="spacer"></span>
+      <button id="lib-prev" class="small">‹ prev</button>
+      <button id="lib-next" class="small">next ›</button>
+    </div>
+    <table>
+      <thead><tr><th style="width:34%">Skill</th><th>Author</th><th>★</th><th>Provenance</th><th style="width:30%">Actions</th></tr></thead>
+      <tbody id="lib-rows"></tbody>
+    </table>
+  </section>
+
+  <!-- ===================== COLLECTIONS ===================== -->
+  <section id="tab-collections">
+    <div class="bar">
+      <button id="col-add" class="primary">+ New topic collection</button>
+      <span class="muted">Author profiles are managed from the Creators tab (featured toggle) and edited below via overrides.</span>
+      <span class="spacer"></span>
+      <button id="col-save" class="primary">Save collections.json</button>
+    </div>
+    <div id="col-list"></div>
+  </section>
+
+  <!-- ===================== CREATORS ===================== -->
+  <section id="tab-creators">
+    <div class="bar">
+      <input id="cr-newhandle" placeholder="add GitHub handle">
+      <button id="cr-add" class="primary">Add creator</button>
+      <span class="muted">featured ⊆ watched is enforced. Featured toggles also sync collections.json featuredAuthors.</span>
+      <span class="spacer"></span>
+      <button id="cr-save" class="primary">Save creators.json</button>
+    </div>
+    <div id="cr-detail"></div>
+    <table>
+      <thead><tr><th>Handle</th><th>Roles</th><th>Watch</th><th>Featured</th><th>Skills</th><th>★ total</th><th>Gold</th><th>Aliases</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="cr-rows"></tbody>
+    </table>
+  </section>
+
+  <!-- ===================== REMOVALS ===================== -->
+  <section id="tab-removals">
+    <div class="bar">
+      <span class="muted">Staged entries take effect after you commit and the crawler honors them (T0.1). Un-stage anything before committing.</span>
+      <span class="spacer"></span>
+      <button id="rm-save" class="primary">Save removal seeds</button>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Suppressed skills <span id="rm-sup-count" class="muted"></span></h3>
+        <table><thead><tr><th>Skill ID</th><th>Reason</th><th>Staged</th><th></th></tr></thead><tbody id="rm-sup-rows"></tbody></table>
+      </div>
+      <div class="panel">
+        <h3>Do not crawl <span id="rm-dnc-count" class="muted"></span></h3>
+        <table><thead><tr><th>Target</th><th>Level</th><th>Reason</th><th></th></tr></thead><tbody id="rm-dnc-rows"></tbody></table>
+        <div class="bar" style="margin-top:8px">
+          <input id="rm-manual-target" placeholder="owner or owner/repo" size="22">
+          <input id="rm-manual-reason" placeholder="reason" size="18">
+          <button id="rm-manual-add" class="small">Add block</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>v2 hardcoded blocklists <span class="muted">read-only — constants in scraper/build.ts, retire with v2</span></h3>
+      <div id="rm-v2"></div>
+    </div>
+  </section>
+</main>
+<datalist id="sf-names"></datalist>
+<datalist id="lucide-names"></datalist>
+<footer id="git-status"></footer>
+<div id="toast" class="toast"></div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+let state = null;          // { collections, creators, suppressedSkills, doNotCrawl, gitStatus, library }
+let dirty = { collections: false, creators: false, removals: false };
+let libPage = 0;
+
+function markDirty(which) {
+  dirty[which] = true;
+  const parts = Object.entries(dirty).filter(([, v]) => v).map(([k]) => k);
+  $("dirty").textContent = parts.length ? `unsaved: ${parts.join(", ")}` : "";
+}
+function clearDirty(which) {
+  dirty[which] = false;
+  markDirty(which); dirty[which] = false;
+  const parts = Object.entries(dirty).filter(([, v]) => v).map(([k]) => k);
+  $("dirty").textContent = parts.length ? `unsaved: ${parts.join(", ")}` : "";
+}
+function toast(msg) {
+  const el = $("toast");
+  el.textContent = msg; el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2200);
+}
+function showErrors(errors) {
+  const el = $("errors");
+  if (!errors || !errors.length) { el.style.display = "none"; el.textContent = ""; return; }
+  el.textContent = errors.join("\n");
+  el.style.display = "block";
+  window.scrollTo({ top: 0 });
+}
+
+// ---------- tabs ----------
+document.querySelectorAll("header .tab").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("header .tab").forEach((b) => b.classList.remove("active"));
+    document.querySelectorAll("main section").forEach((s) => s.classList.remove("active"));
+    btn.classList.add("active");
+    $("tab-" + btn.dataset.tab).classList.add("active");
+  });
+});
+
+// ---------- load ----------
+async function loadCuration() {
+  const res = await fetch("/api/curation");
+  state = await res.json();
+  renderCollections(); renderCreators(); renderRemovals(); renderGitStatus();
+}
+function renderGitStatus() {
+  const rows = state.gitStatus ?? [];
+  $("git-status").textContent = rows.length
+    ? "uncommitted curation edits: " + rows.map((r) => `${r.path} (${r.state})`).join(" · ")
+    : `library: ${state.library.skillCount.toLocaleString()} skills / ${state.library.authorCount.toLocaleString()} authors · curation files clean in git`;
+}
+
+// ---------- library ----------
+async function searchLib() {
+  const params = new URLSearchParams({
+    q: $("lib-q").value, author: $("lib-author").value.replace(/^@/, ""),
+    minStars: $("lib-minstars").value || "0", provenance: $("lib-prov").value,
+    page: String(libPage), pageSize: "50",
+  });
+  const res = await fetch("/api/skills?" + params);
+  const data = await res.json();
+  $("lib-count").textContent = `${data.total.toLocaleString()} matches · page ${libPage + 1}`;
+  $("lib-rows").innerHTML = data.rows.map((r) => `
+    <tr>
+      <td><b>${esc(r.name)}</b>${r.gold ? '<span class="badge gold">gold</span>' : ""}<br>
+        <span class="muted">${esc(r.id)}</span><br><span class="muted">${esc(r.description)}</span></td>
+      <td><span class="clicklink" data-author="${esc(r.author)}">@${esc(r.author)}</span></td>
+      <td>${r.stars.toLocaleString()}</td>
+      <td>${esc(r.provenance)}</td>
+      <td>
+        <button class="small" data-act="collect" data-id="${esc(r.id)}">+ collection</button>
+        <button class="small" data-act="feature" data-id="${esc(r.id)}" data-author="${esc(r.author)}">feature</button>
+        <button class="small danger" data-act="suppress" data-id="${esc(r.id)}">suppress</button>
+        <button class="small danger" data-act="block" data-repo="${esc(r.repo)}">block repo</button>
+      </td>
+    </tr>`).join("");
+}
+$("lib-search").addEventListener("click", () => { libPage = 0; searchLib(); });
+$("lib-q").addEventListener("keydown", (e) => { if (e.key === "Enter") { libPage = 0; searchLib(); } });
+$("lib-prev").addEventListener("click", () => { if (libPage > 0) { libPage--; searchLib(); } });
+$("lib-next").addEventListener("click", () => { libPage++; searchLib(); });
+
+$("lib-rows").addEventListener("click", (e) => {
+  const btn = e.target.closest("button, .clicklink");
+  if (!btn) return;
+  if (btn.dataset.author && !btn.dataset.act) {
+    document.querySelector('header .tab[data-tab="creators"]').click();
+    openCreatorDetail(btn.dataset.author);
+    return;
+  }
+  const act = btn.dataset.act;
+  if (act === "collect") {
+    const ids = state.collections.collections.map((c) => c.id);
+    if (!ids.length) return toast("no topic collections yet — create one first");
+    const target = prompt("Add to which collection?\n" + ids.join(", "), ids[0]);
+    const col = state.collections.collections.find((c) => c.id === target?.trim());
+    if (!col) return toast("no such collection");
+    if (col.skillIds.includes(btn.dataset.id)) return toast("already in " + col.id);
+    col.skillIds.push(btn.dataset.id);
+    markDirty("collections"); renderCollections(); toast(`added to ${col.id} — save collections`);
+  }
+  if (act === "feature") {
+    const handle = btn.dataset.author;
+    if (!state.collections.featuredAuthors.some((h) => h.toLowerCase() === handle.toLowerCase())) {
+      return toast(`@${handle} is not a featured author — feature them on the Creators tab first`);
+    }
+    state.collections.authorOverrides = state.collections.authorOverrides ?? {};
+    const key = Object.keys(state.collections.authorOverrides).find((k) => k.toLowerCase() === handle.toLowerCase()) ?? handle;
+    const override = state.collections.authorOverrides[key] ?? {};
+    override.featuredSkillIds = override.featuredSkillIds ?? [];
+    if (override.featuredSkillIds.includes(btn.dataset.id)) return toast("already featured");
+    override.featuredSkillIds.push(btn.dataset.id);
+    state.collections.authorOverrides[key] = override;
+    markDirty("collections"); renderCollections(); toast(`featured on @${handle} — save collections`);
+  }
+  if (act === "suppress") {
+    const reason = prompt(`Suppress ${btn.dataset.id}\nReason (required):`);
+    if (!reason?.trim()) return;
+    if (state.suppressedSkills.skills.some((s) => s.id === btn.dataset.id)) return toast("already suppressed");
+    state.suppressedSkills.skills.push({ id: btn.dataset.id, reason: reason.trim(), stagedAt: new Date().toISOString() });
+    markDirty("removals"); renderRemovals(); toast("staged suppression — save removals");
+  }
+  if (act === "block") {
+    const repo = btn.dataset.repo;
+    const level = prompt(`Block "${repo}"\nType "repo" to block the repo, or "owner" to block ${repo.split("/")[0]} entirely:`, "repo");
+    if (level !== "repo" && level !== "owner") return;
+    const reason = prompt("Reason (required):");
+    if (!reason?.trim()) return;
+    if (level === "repo") {
+      if (state.doNotCrawl.repos.some((r) => r.repo === repo)) return toast("already blocked");
+      state.doNotCrawl.repos.push({ repo, reason: reason.trim() });
+    } else {
+      const owner = repo.split("/")[0];
+      if (state.doNotCrawl.owners.some((o) => o.owner === owner)) return toast("already blocked");
+      state.doNotCrawl.owners.push({ owner, reason: reason.trim() });
+    }
+    markDirty("removals"); renderRemovals(); toast("staged block — save removals");
+  }
+});
+
+// ---------- collections ----------
+function renderCollections() {
+  const src = state.collections;
+  const featured = src.featuredAuthors.map((h) => `<span class="badge featured">@${esc(h)}</span>`).join(" ");
+  const authorPanels = src.featuredAuthors.map((handle) => {
+    const o = (src.authorOverrides ?? {})[handle] ?? {};
+    const ids = o.featuredSkillIds ?? [];
+    return `<div class="panel" data-author-panel="${esc(handle)}">
+      <h3>@${esc(handle)} <span class="muted">author profile override</span></h3>
+      <div class="bar">
+        <input data-f="subtitle" placeholder="subtitle" value="${esc(o.subtitle ?? "")}" size="28">
+        <input data-f="description" placeholder="description" value="${esc(o.description ?? "")}" size="52">
+      </div>
+      <ul class="idlist">${ids.map((id, i) => `<li><button class="small" data-move="-1" data-i="${i}">↑</button>
+        <button class="small" data-move="1" data-i="${i}">↓</button>
+        <button class="small danger" data-del="${i}">×</button> ${esc(id)}</li>`).join("")}</ul>
+    </div>`;
+  }).join("");
+
+  const topicPanels = src.collections.map((c, ci) => `
+    <div class="panel" data-col-panel="${ci}">
+      <h3>${esc(c.title)} <span class="muted">${esc(c.id)}</span>
+        <button class="small danger" data-delcol="${ci}" style="float:right">delete collection</button></h3>
+      <div class="bar">
+        <input data-f="title" value="${esc(c.title)}" size="20">
+        <input data-f="subtitle" value="${esc(c.subtitle)}" size="30">
+        <input data-f="description" placeholder="description" value="${esc(c.description ?? "")}" size="44">
+      </div>
+      <div class="bar">
+        <label class="muted">icons:</label>
+        <input data-f="sfSymbol" list="sf-names" placeholder="SF Symbol (app)" value="${esc(c.sfSymbol ?? "")}" size="22">
+        <input data-f="lucideIcon" list="lucide-names" placeholder="Lucide (web)" value="${esc(c.lucideIcon ?? "")}" size="22">
+        <img class="lucide-preview" src="${c.lucideIcon ? "/lucide/" + esc(c.lucideIcon) + ".svg" : ""}" width="20" height="20" style="${c.lucideIcon ? "" : "display:none"}" onerror="this.style.display='none'">
+        <span class="muted">SF Symbol previews in the app; verify the name in the SF Symbols app</span>
+      </div>
+      <div class="muted">featured (3–5 shown in preview):</div>
+      <ul class="idlist">${c.featuredSkillIds.map((id, i) => `<li><button class="small danger" data-delfeat="${i}">×</button> ${esc(id)}
+        </li>`).join("") || '<li class="muted">none</li>'}</ul>
+      <div class="muted">all skills (${c.skillIds.length}):</div>
+      <ul class="idlist">${c.skillIds.map((id, i) => `<li>
+        <button class="small" data-move="-1" data-i="${i}">↑</button>
+        <button class="small" data-move="1" data-i="${i}">↓</button>
+        <button class="small danger" data-del="${i}">×</button>
+        <button class="small" data-feat="${i}">☆ feature</button> ${esc(id)}</li>`).join("") || '<li class="muted">empty</li>'}</ul>
+    </div>`).join("");
+
+  $("col-list").innerHTML = `<div class="panel"><h3>Featured authors</h3>${featured || '<span class="muted">none</span>'}
+    <div class="muted" style="margin-top:4px">Toggle on the Creators tab.</div></div>` + authorPanels + topicPanels;
+}
+
+$("col-add").addEventListener("click", () => {
+  const id = prompt("Collection id (kebab-case, becomes URL slug — stable once published):");
+  if (!id?.trim()) return;
+  const title = prompt("Title:") ?? "";
+  const subtitle = prompt("Subtitle:") ?? "";
+  state.collections.collections.push({ id: id.trim(), type: "topic", title: title.trim(), subtitle: subtitle.trim(), imageUrl: null, featuredSkillIds: [], skillIds: [], description: null });
+  markDirty("collections"); renderCollections();
+});
+
+$("col-list").addEventListener("input", (e) => {
+  const field = e.target.dataset.f;
+  if (!field) return;
+  const authorPanel = e.target.closest("[data-author-panel]");
+  const colPanel = e.target.closest("[data-col-panel]");
+  if (authorPanel) {
+    const handle = authorPanel.dataset.authorPanel;
+    state.collections.authorOverrides = state.collections.authorOverrides ?? {};
+    const o = state.collections.authorOverrides[handle] ?? {};
+    o[field] = e.target.value || undefined;
+    state.collections.authorOverrides[handle] = o;
+  } else if (colPanel) {
+    const collection = state.collections.collections[Number(colPanel.dataset.colPanel)];
+    if (field === "sfSymbol" || field === "lucideIcon") {
+      collection[field] = e.target.value.trim() || null;
+      if (field === "lucideIcon") {
+        const img = colPanel.querySelector(".lucide-preview");
+        if (collection.lucideIcon) { img.src = "/lucide/" + encodeURIComponent(collection.lucideIcon) + ".svg"; img.style.display = ""; }
+        else img.style.display = "none";
+      }
+    } else {
+      collection[field] = e.target.value;
+    }
+  }
+  markDirty("collections");
+});
+
+$("col-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  const authorPanel = btn.closest("[data-author-panel]");
+  const colPanel = btn.closest("[data-col-panel]");
+  if (btn.dataset.delcol !== undefined) {
+    const ci = Number(btn.dataset.delcol);
+    if (!confirm(`Delete collection "${state.collections.collections[ci].id}"? Published URLs for it will break.`)) return;
+    state.collections.collections.splice(ci, 1);
+    markDirty("collections"); renderCollections(); return;
+  }
+  if (authorPanel) {
+    const handle = authorPanel.dataset.authorPanel;
+    const o = state.collections.authorOverrides?.[handle];
+    const ids = o?.featuredSkillIds ?? [];
+    if (btn.dataset.del !== undefined) ids.splice(Number(btn.dataset.del), 1);
+    if (btn.dataset.move !== undefined) {
+      const i = Number(btn.dataset.i), j = i + Number(btn.dataset.move);
+      if (j >= 0 && j < ids.length) [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    markDirty("collections"); renderCollections(); return;
+  }
+  if (colPanel) {
+    const c = state.collections.collections[Number(colPanel.dataset.colPanel)];
+    if (btn.dataset.delfeat !== undefined) c.featuredSkillIds.splice(Number(btn.dataset.delfeat), 1);
+    if (btn.dataset.del !== undefined) c.skillIds.splice(Number(btn.dataset.del), 1);
+    if (btn.dataset.feat !== undefined) {
+      const id = c.skillIds[Number(btn.dataset.feat)];
+      if (!c.featuredSkillIds.includes(id)) c.featuredSkillIds.push(id);
+    }
+    if (btn.dataset.move !== undefined) {
+      const i = Number(btn.dataset.i), j = i + Number(btn.dataset.move);
+      if (j >= 0 && j < c.skillIds.length) [c.skillIds[i], c.skillIds[j]] = [c.skillIds[j], c.skillIds[i]];
+    }
+    markDirty("collections"); renderCollections();
+  }
+});
+
+$("col-save").addEventListener("click", () => save("collections", "/api/save/collections", state.collections));
+
+// ---------- creators ----------
+async function renderCreators() {
+  const rows = state.creators.creators;
+  const stats = await Promise.all(rows.map((r) => fetch("/api/author?handle=" + encodeURIComponent(r.handle)).then((x) => x.json())));
+  $("cr-rows").innerHTML = rows.map((r, i) => {
+    const s = stats[i]?.stats ?? {};
+    const known = stats[i] !== null;
+    const effectiveFeatured = r.featured || state.collections.featuredAuthors.some((h) => h.toLowerCase() === r.handle.toLowerCase());
+    return `<tr>
+      <td><b class="clicklink" data-detail="${esc(r.handle)}">${esc(r.handle)}</b>${known ? "" : '<span class="badge warn">not in catalog</span>'}</td>
+      <td>${(r.roles ?? []).map((x) => `<span class="badge ${esc(x)}">${esc(x)}</span>`).join("")}</td>
+      <td><input type="checkbox" data-i="${i}" data-flag="watch" ${r.watch ? "checked" : ""}></td>
+      <td><input type="checkbox" data-i="${i}" data-flag="featured" ${effectiveFeatured ? "checked" : ""}>${!r.featured && effectiveFeatured ? '<span class="badge warn" title="featured in collections.json but not in the registry — re-toggle and save to reconcile">≠</span>' : ""}</td>
+      <td>${s.skillCount ?? "—"}</td>
+      <td>${(s.totalStars ?? 0).toLocaleString()}</td>
+      <td>${s.goldBasketCount ?? 0}</td>
+      <td>${(r.aliases ?? []).map(esc).join(", ")} <button class="small" data-i="${i}" data-act="alias">+</button></td>
+      <td><input data-i="${i}" data-act="notes" value="${esc(r.notes ?? "")}" size="16"></td>
+      <td><button class="small danger" data-i="${i}" data-act="remove">×</button></td>
+    </tr>`;
+  }).join("");
+}
+
+$("cr-add").addEventListener("click", () => {
+  const handle = $("cr-newhandle").value.trim().replace(/^@/, "");
+  if (!handle) return;
+  if (state.creators.creators.some((c) => c.handle.toLowerCase() === handle.toLowerCase())) return toast("already in registry");
+  state.creators.creators.push({ handle, roles: ["creator"], watch: true, featured: false });
+  $("cr-newhandle").value = "";
+  markDirty("creators"); renderCreators();
+});
+
+$("cr-rows").addEventListener("change", (e) => {
+  const i = Number(e.target.dataset.i);
+  const entry = state.creators.creators[i];
+  if (e.target.dataset.flag === "watch") {
+    entry.watch = e.target.checked;
+    if (!entry.watch && entry.featured) { entry.featured = false; syncFeaturedAuthors(entry.handle, false); toast("unfeatured too (featured requires watch)"); }
+  }
+  if (e.target.dataset.flag === "featured") {
+    entry.featured = e.target.checked;
+    if (entry.featured) entry.watch = true;
+    syncFeaturedAuthors(entry.handle, entry.featured);
+  }
+  if (e.target.dataset.act === "notes") entry.notes = e.target.value || undefined;
+  markDirty("creators"); renderCreators();
+});
+
+$("cr-rows").addEventListener("click", (e) => {
+  const link = e.target.closest("[data-detail]");
+  if (link) { openCreatorDetail(link.dataset.detail); return; }
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  const i = Number(btn.dataset.i);
+  if (btn.dataset.act === "alias") {
+    const alias = prompt("Old handle (GitHub rename alias):");
+    if (!alias?.trim()) return;
+    const entry = state.creators.creators[i];
+    entry.aliases = entry.aliases ?? [];
+    entry.aliases.push(alias.trim());
+    markDirty("creators"); renderCreators();
+  }
+  if (btn.dataset.act === "remove") {
+    const entry = state.creators.creators[i];
+    if (!confirm(`Remove @${entry.handle} from the registry?`)) return;
+    if (entry.featured) syncFeaturedAuthors(entry.handle, false);
+    state.creators.creators.splice(i, 1);
+    markDirty("creators"); renderCreators();
+  }
+});
+
+// ---------- creator detail (all skills + feature checkboxes) ----------
+let detailHandle = null;
+
+function overrideFor(handle) {
+  state.collections.authorOverrides = state.collections.authorOverrides ?? {};
+  const key = Object.keys(state.collections.authorOverrides).find((k) => k.toLowerCase() === handle.toLowerCase()) ?? handle;
+  state.collections.authorOverrides[key] = state.collections.authorOverrides[key] ?? {};
+  return state.collections.authorOverrides[key];
+}
+
+async function openCreatorDetail(handle) {
+  detailHandle = handle;
+  const data = await fetch("/api/skills?pageSize=1000&author=" + encodeURIComponent(handle)).then((r) => r.json());
+  renderCreatorDetail(data);
+}
+
+function registryEntryFor(handle) {
+  return state.creators.creators.find((c) => c.handle.toLowerCase() === handle.toLowerCase()) ?? null;
+}
+
+function renderCreatorDetail(data) {
+  const handle = detailHandle;
+  if (!handle) { $("cr-detail").innerHTML = ""; return; }
+  const entry = registryEntryFor(handle);
+  const isFeatured = state.collections.featuredAuthors.some((h) => h.toLowerCase() === handle.toLowerCase());
+  const featuredIds = overrideFor(handle).featuredSkillIds ?? [];
+  const hints = [];
+  if (!entry) hints.push('<span class="badge warn">not in registry — toggling below adds them</span>');
+  if (!isFeatured && featuredIds.length) hints.push('<span class="badge warn">selections save but only show once featured</span>');
+  if (featuredIds.length > 5) hints.push(`<span class="badge warn">${featuredIds.length} featured — profiles show 3–5</span>`);
+
+  $("cr-detail").innerHTML = `<div class="panel">
+    <h3>@${esc(handle)} — ${data.total} skills · ${featuredIds.length} featured ${hints.join(" ")}
+      <button class="small" id="cr-detail-close" style="float:right">close</button></h3>
+    <div class="bar">
+      <label><input type="checkbox" id="cr-detail-watch" ${entry?.watch ? "checked" : ""}> watch creator</label>
+      <label><input type="checkbox" id="cr-detail-feature" ${entry?.featured || isFeatured ? "checked" : ""}> feature creator</label>
+      <span class="muted">watch = crawler tracks their new repos · feature = public profile (implies watch)</span>
+      ${entry && !entry.featured && isFeatured ? '<span class="badge warn">registry says not featured but collections.json does — toggle off/on and save to reconcile</span>' : ""}
+    </div>
+    <table>
+      <thead><tr><th style="width:6%">Feature</th><th style="width:44%">Skill</th><th>★</th><th>Provenance</th><th>Updated</th></tr></thead>
+      <tbody>${data.rows.map((r) => `<tr>
+        <td><input type="checkbox" data-featskill="${esc(r.id)}" ${featuredIds.includes(r.id) ? "checked" : ""}></td>
+        <td><b>${esc(r.name)}</b>${r.gold ? '<span class="badge gold">gold</span>' : ""}<br><span class="muted">${esc(r.id)}</span></td>
+        <td>${r.stars.toLocaleString()}</td><td>${esc(r.provenance)}</td>
+        <td class="muted">${esc((r.lastUpdated ?? "").slice(0, 10))}</td>
+      </tr>`).join("")}</tbody>
+    </table>
+    <div class="bar" style="margin-top:8px">
+      <button id="cr-detail-save" class="primary">Save changes</button>
+      <span class="muted">saves creators.json + collections.json · featured-skill order = order checked; fine-tune on the Collections tab</span>
+    </div>
+  </div>`;
+
+  $("cr-detail-close").addEventListener("click", () => { detailHandle = null; $("cr-detail").innerHTML = ""; });
+  $("cr-detail-save").addEventListener("click", async () => {
+    if (dirty.creators) await save("creators", "/api/save/creators", state.creators);
+    if (dirty.collections) await save("collections", "/api/save/collections", state.collections);
+  });
+
+  function ensureEntry() {
+    let e = registryEntryFor(handle);
+    if (!e) {
+      e = { handle, roles: ["creator"], watch: false, featured: false };
+      state.creators.creators.push(e);
+    }
+    return e;
+  }
+  $("cr-detail-watch").addEventListener("change", (ev) => {
+    const e = ensureEntry();
+    e.watch = ev.target.checked;
+    if (!e.watch && e.featured) { e.featured = false; syncFeaturedAuthors(handle, false); toast("unfeatured too (featured requires watch)"); }
+    markDirty("creators"); renderCreators(); renderCreatorDetail(data);
+  });
+  $("cr-detail-feature").addEventListener("change", (ev) => {
+    const e = ensureEntry();
+    e.featured = ev.target.checked;
+    if (e.featured) e.watch = true;
+    syncFeaturedAuthors(handle, e.featured);
+    markDirty("creators"); renderCreators(); renderCreatorDetail(data);
+  });
+  $("cr-detail").querySelectorAll("[data-featskill]").forEach((box) => {
+    box.addEventListener("change", () => {
+      const o = overrideFor(handle);
+      o.featuredSkillIds = o.featuredSkillIds ?? [];
+      const id = box.dataset.featskill;
+      if (box.checked && !o.featuredSkillIds.includes(id)) o.featuredSkillIds.push(id);
+      if (!box.checked) o.featuredSkillIds = o.featuredSkillIds.filter((x) => x !== id);
+      markDirty("collections"); renderCollections();
+      openCreatorDetail(handle); // refresh counts/warnings
+    });
+  });
+}
+
+// keep collections.json featuredAuthors in sync with the registry featured flag
+function syncFeaturedAuthors(handle, featured) {
+  const list = state.collections.featuredAuthors;
+  const idx = list.findIndex((h) => h.toLowerCase() === handle.toLowerCase());
+  if (featured && idx === -1) { list.push(handle); markDirty("collections"); }
+  if (!featured && idx !== -1) { list.splice(idx, 1); markDirty("collections"); }
+  renderCollections();
+}
+
+$("cr-save").addEventListener("click", async () => {
+  await save("creators", "/api/save/creators", state.creators);
+  if (dirty.collections) await save("collections", "/api/save/collections", state.collections);
+});
+
+// ---------- removals ----------
+function renderRemovals() {
+  const sup = state.suppressedSkills.skills;
+  $("rm-sup-count").textContent = `(${sup.length})`;
+  $("rm-sup-rows").innerHTML = sup.map((s, i) => `<tr><td>${esc(s.id)}</td><td>${esc(s.reason)}</td>
+    <td class="muted">${esc((s.stagedAt ?? "").slice(0, 10))}</td>
+    <td><button class="small danger" data-unsup="${i}">un-stage</button></td></tr>`).join("") || '<tr><td colspan="4" class="muted">none</td></tr>';
+
+  const dnc = [
+    ...state.doNotCrawl.repos.map((r, i) => ({ target: r.repo, level: "repo", reason: r.reason, i })),
+    ...state.doNotCrawl.owners.map((o, i) => ({ target: o.owner, level: "owner", reason: o.reason, i })),
+  ];
+  $("rm-dnc-count").textContent = `(${dnc.length})`;
+  $("rm-dnc-rows").innerHTML = dnc.map((r) => `<tr><td>${esc(r.target)}</td><td>${esc(r.level)}</td><td>${esc(r.reason)}</td>
+    <td><button class="small danger" data-undnc="${r.level}:${r.i}">un-stage</button></td></tr>`).join("") || '<tr><td colspan="4" class="muted">none</td></tr>';
+
+  const v2 = state.v2Blocklists ?? { blockedRepos: [], knownInvalidRepos: [], blockedOwners: [] };
+  const chips = (items) => items.map((x) => `<span class="badge">${esc(x)}</span>`).join(" ") || '<span class="muted">none</span>';
+  $("rm-v2").innerHTML = `
+    <p><b>Blocked repos</b> <span class="muted">(fully excluded from v2)</span><br>${chips(v2.blockedRepos)}</p>
+    <p><b>Known invalid repos</b> <span class="muted">(root SKILL.md invalid — sub-skills still crawl; NOT a block)</span><br>${chips(v2.knownInvalidRepos)}</p>
+    <p><b>Blocked owners</b><br>${chips(v2.blockedOwners)}</p>`;
+}
+
+$("rm-sup-rows").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-unsup]");
+  if (!btn) return;
+  state.suppressedSkills.skills.splice(Number(btn.dataset.unsup), 1);
+  markDirty("removals"); renderRemovals();
+});
+$("rm-dnc-rows").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-undnc]");
+  if (!btn) return;
+  const [level, i] = btn.dataset.undnc.split(":");
+  (level === "repo" ? state.doNotCrawl.repos : state.doNotCrawl.owners).splice(Number(i), 1);
+  markDirty("removals"); renderRemovals();
+});
+$("rm-manual-add").addEventListener("click", () => {
+  const target = $("rm-manual-target").value.trim();
+  const reason = $("rm-manual-reason").value.trim();
+  if (!target || !reason) return toast("target and reason required");
+  if (target.includes("/")) state.doNotCrawl.repos.push({ repo: target, reason });
+  else state.doNotCrawl.owners.push({ owner: target, reason });
+  $("rm-manual-target").value = ""; $("rm-manual-reason").value = "";
+  markDirty("removals"); renderRemovals();
+});
+$("rm-save").addEventListener("click", () =>
+  save("removals", "/api/save/removals", { suppressedSkills: state.suppressedSkills, doNotCrawl: state.doNotCrawl }));
+
+// ---------- save ----------
+async function save(which, url, body) {
+  showErrors(null);
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const out = await res.json();
+  if (!out.ok) { showErrors(out.errors); toast("validation failed — nothing written"); return; }
+  clearDirty(which);
+  toast(`saved ${which} ✓ (review with git diff, then commit + publish)`);
+  const cur = await fetch("/api/curation").then((r) => r.json());
+  state.gitStatus = cur.gitStatus;
+  renderGitStatus();
+}
+
+window.addEventListener("beforeunload", (e) => {
+  if (Object.values(dirty).some(Boolean)) e.preventDefault();
+});
+
+async function loadIconLists() {
+  const icons = await fetch("/api/icons").then((r) => r.json());
+  $("sf-names").innerHTML = icons.sfSymbols.map((n) => `<option value="${esc(n)}">`).join("");
+  $("lucide-names").innerHTML = icons.lucide.map((n) => `<option value="${esc(n)}">`).join("");
+}
+
+loadCuration().then(searchLib);
+loadIconLists();
+</script>
+</body>
+</html>
