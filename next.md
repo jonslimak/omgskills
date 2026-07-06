@@ -59,6 +59,7 @@ Plan: [`identity.md`](identity.md)
 - client: ladder steps 1–3 (install provenance, git inspection, content-hash match) — all exact, no UX
 - crawler: append-only `sha → skill id` index as a small manifest asset
 - measure what share of installed skills resolves before deciding on the fuzzy confirm-once UX
+- **sha index shape requirement** (crawl-audit finding): one sha maps to multiple skill IDs for ~24% of the library, so publish `sha → [ids]` (a list), with room for a `canonicalId` marker later. Client rule: unique match → resolved; multiple matches → "ambiguous", not a guess. Ambiguous count is free telemetry for prioritizing the canonical-attribution work (`crawl-audit.md` Phase 3.1)
 
 Why before skill groups ship: groups are the first consumer. Resolution feeds `catalog_skill_id` on sync, so groups launch catalog-aware instead of full of unresolved rows.
 

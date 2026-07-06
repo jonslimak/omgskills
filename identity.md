@@ -45,11 +45,18 @@ Many pre-existing installs are symlinks into a cloned repo, or live inside one. 
 
 Exact, offline, zero network. Likely resolves a large share of pre-existing installs, because `git clone` was the default install method before the tool existed.
 
+Rename caveat: some catalog IDs were minted under a repo's old name (verified: ~770 rows are GitHub rename redirects). A clone under the new name won't match the old-name ID at this step — the content-hash step below usually catches it. Publishing the crawler's repo-alias map (old → new) as a small asset would make this step exact for renames too.
+
 ### 3. Content-hash match — exact, version-pinned
 
 Hash the local `SKILL.md` the same way the crawler computes `skill_md_sha`. Look it up in the cached catalog.
 
-Match → resolved, with the exact version identified.
+**One hash can match many catalog entries** — ~24% of the library is byte-identical copies (crawl-audit finding), skewed toward the most popular skills. The rule:
+
+- exactly one match → resolved, with the exact version identified
+- multiple matches → **ambiguous** — a distinct state, never a silent guess
+
+Ambiguous upgrades to resolved automatically once canonical attribution ships (`crawl-audit.md` Phase 3.1). Until then the ambiguous count is free telemetry for how urgent that work is.
 
 Limitation: the catalog only holds the latest sha per skill. A six-month-old install won't match after the skill updates upstream. The sha history index (below) removes this limitation.
 
@@ -78,10 +85,11 @@ The one new piece worth building.
 The crawler observes every skill version it crawls but only remembers the latest sha. Keep an append-only mapping instead:
 
 ```
-sha → skill id
+sha → [skill ids]          (list — one sha maps to multiple ids for ~24% of the library)
+sha → { ids, canonicalId? }  (later, once canonical attribution ships)
 ```
 
-Published as a small manifest asset alongside the existing data.
+Published as a small manifest asset alongside the existing data. Do **not** publish a flat `sha → single id` map — that shape is wrong today and reshaping a published asset later costs a version migration.
 
 Properties:
 
@@ -89,6 +97,8 @@ Properties:
 - append-only — shas are never removed while the skill exists
 - makes resolution version-proof: any `SKILL.md` the crawler has ever seen resolves, no matter how stale the local copy
 - client-side lookup against published data, same as everything else
+
+Start this early, independent of canonical work: it only records what the crawler sees going forward, so every crawl that runs before the index exists is version history lost forever.
 
 ## Design properties
 
@@ -103,6 +113,8 @@ Claude and Codex skills use slightly different formats. Ported skills are not wo
 - **File identity** — `skill_md_sha` (exact content)
 - **Catalog identity** — skill ID (a specific file at a specific URL)
 - **Logical identity** — the skill as a concept, spanning its Claude and Codex ports
+
+Note the missing link between the first two: one file identity can belong to **many** catalog identities (byte-identical copies across repos — ~24% of the library). **Canonical attribution** is the rule that picks the original author's copy as the winner (`crawl-audit.md` Phase 3.1). It is the sibling of the equivalence clusters below: duplicate clusters group same-content entries, equivalence clusters group same-concept entries. Same design — derived grouping metadata over catalog rows, never merging records — one shadow-validated publish path for both.
 
 ### What exists today
 
@@ -156,12 +168,13 @@ Resolution is one user's installed skills (typically 5–50) against lookup tabl
 
 Discussion-stage. When we decide to build, the natural order:
 
-1. **Verify hash compatibility** — confirm the client can compute `skill_md_sha` identically to the crawler (same normalization, same algorithm)
-2. **Ship the ladder in the client scanner** — steps 1–3 first (all exact, no UX needed); measure what share of installed skills resolve
-3. **Add the sha history index to Crawl 4 publishing** — small manifest asset, append-only
-4. **Add the confirm-once fuzzy UX** — only after measuring how much steps 1–3 leave unresolved
-5. **Propagate resolution into synced_skills** — resolved IDs flow into `catalog_skill_id` on sync, making groups catalog-aware for previously unresolvable skills
-6. **Add cross-agent equivalence clusters to Crawl 4 publishing** — shadow-first like every other Crawl 4 change; validate cluster quality in shadow reports before clients consume it
-7. **Extract the local-match heuristic into a shared spec** — document normalization, thresholds, and gate order from `groupSyncedSkills`; implement identically in the client when it gains the merged view
+1. **Verify hash compatibility** — confirm the client can compute `skill_md_sha` identically to the crawler (same normalization, same algorithm). The canonical-attribution work depends on the same answer — do it once, both consume it
+2. **Ship the ladder in the client scanner** — steps 1–3 first (all exact, no UX needed); measure what share of installed skills resolve, and how many land ambiguous (multi-id hash matches)
+3. **Add the sha history index to Crawl 4 publishing** — small manifest asset, append-only, `sha → [ids]` shape from day one
+4. **Canonical attribution** (`crawl-audit.md` Phase 3.1) — pick the original author's copy per duplicate cluster; annotate the sha index with `canonicalId`, upgrading ambiguous resolutions to resolved. Before or alongside this step is fine; it must land before multi-id hash matches are treated as authoritative
+5. **Add the confirm-once fuzzy UX** — only after measuring how much steps 1–4 leave unresolved
+6. **Propagate resolution into synced_skills** — resolved IDs flow into `catalog_skill_id` on sync, making groups catalog-aware for previously unresolvable skills
+7. **Add cross-agent equivalence clusters to Crawl 4 publishing** — shadow-first like every other Crawl 4 change, sharing the grouping-asset design with duplicate clusters (step 4); validate cluster quality in shadow reports before clients consume it
+8. **Extract the local-match heuristic into a shared spec** — document normalization, thresholds, and gate order from `groupSyncedSkills`; implement identically in the client when it gains the merged view
 
 No code changes until this is explicitly picked up.

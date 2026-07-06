@@ -50,6 +50,7 @@ Implemented:
 
 ```bash
 npm run crawl4:add-skill -- <github-skill-md-url>
+npm run crawl4:remove-repo -- <owner/repo>
 ```
 
 Behavior:
@@ -68,6 +69,27 @@ npm run crawl4:add-repo -- <github-repo-url>
 
 For now, agents should resolve repo or folder URLs into exact `SKILL.md` blob URLs and call `crawl4:add-skill` for each one.
 
+## Remove / Do Not Crawl
+
+Manual curation also supports removing a repo from the Crawl 4 maintained library.
+
+Use this when a repo is catalog-like, low quality, unsafe, duplicated, or otherwise should not re-enter Crawl 4.
+
+```bash
+cd /Users/jonslimak/Projects/omgskills/index
+npm run crawl4:remove-repo -- <owner/repo>
+```
+
+Behavior:
+
+- removes matching repo skills from Crawl 4 shadow/cutover output
+- removes the repo from Crawl 4 repo overlay/index state
+- adds the repo to `index/seeds/do-not-crawl.json`
+- prevents future Crawl 4 discovery/admission from re-adding it
+- does not edit production `skills.json`
+
+After removal, publish Crawl 4 data if the user wants the hosted/client-visible library updated.
+
 ## Codex Skill
 
 The Codex skill exists as `/curate`.
@@ -79,7 +101,9 @@ The skill should instruct agents to:
 - run the operator command
 - inspect output
 - publish Crawl 4 data if needed
+- remove repos with `crawl4:remove-repo` when asked
 - report exact added skill names
+- report removed repo and removed skill count
 - never edit production data directly
 
 ## Test Plan
@@ -89,7 +113,9 @@ For the implemented mechanism:
 - add one exact `SKILL.md` link
 - resolve one repo with multiple skills into exact `SKILL.md` links
 - reject one unresolved catalog-like skill
+- remove one catalog-like repo and confirm it stays blocked
 - confirm Crawl 4 output can see added skills
+- confirm removed repo has no Crawl 4 output entries
 - confirm v2 fallback output is not hand-edited
 
 ## Assumptions
