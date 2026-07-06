@@ -124,6 +124,21 @@ test("registry and code candidates are eligible for bootstrap", () => {
   );
 });
 
+test("creator-watch candidates with concrete paths are eligible for bootstrap", () => {
+  assert.equal(
+    isBootstrapEligibleCandidate(
+      candidate({ source: "creator-watch", id: "repo:skill", skill_md_path: "skills/x/SKILL.md", github_url: "https://github.com/repo" }),
+    ),
+    true,
+  );
+  assert.equal(
+    isBootstrapEligibleCandidate(
+      candidate({ source: "creator-watch", id: "repo:skill", skill_md_path: "__RESOLVE__", github_url: "https://github.com/repo" }),
+    ),
+    false,
+  );
+});
+
 test("bootstraps empty-skill rising repo on combined", async () => {
   const index = repoIndex([repo({ repo: "owner/repo", stars: 0 })]);
   const enrich = async (): Promise<EnrichResult> => ({ skill: skill("owner/repo:bootstrapped") });
@@ -169,6 +184,46 @@ test("bootstraps empty-skill library repo on combined", async () => {
 
   assert.equal(result.bootstrappedSkills.length, 1);
   assert.equal(index.repos[0]?.skillCount, 1);
+});
+
+test("bootstraps creator-watch library repo with concrete path on combined", async () => {
+  const index = repoIndex([
+    repo({
+      repo: "owner/repo",
+      stars: 1,
+      state: "library",
+      discoveredSources: ["creator-watch"],
+      promotionReasons: ["new-discovery", "library-admission"],
+    }),
+  ]);
+  const enrich = async (): Promise<EnrichResult> => ({ skill: skill("owner/repo:bootstrapped") });
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      [
+        "owner/repo",
+        candidate({
+          source: "creator-watch",
+          id: "owner/repo:bootstrapped",
+          skill_md_path: "skills/bootstrapped/SKILL.md",
+          skill_name_hint: "bootstrapped",
+          github_url: "https://github.com/owner/repo",
+        }),
+      ],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    resolveCandidatePathFn: async () => null,
+    enrichCandidateFn: enrich,
+  });
+
+  assert.equal(result.bootstrappedSkills.length, 1);
+  assert.equal(result.bootstrapSkippedRepoSample.length, 0);
+  assert.deepEqual(index.repos[0]?.skillIds, ["owner/repo:bootstrapped"]);
 });
 
 test("failed bootstrap leaves repo empty and reports failure", async () => {
@@ -304,6 +359,33 @@ test("repo with only ineligible candidate is skipped, not failed", async () => {
   assert.equal(result.bootstrappedSkills.length, 0);
   assert.equal(result.bootstrapFailedRepoSample.length, 0);
   assert.equal(result.bootstrapSkippedRepoSample.length, 1);
+  assert.equal(result.bootstrapSkippedRepoSample[0]?.failureReason, "no-eligible-candidate");
+});
+
+test("creator-watch unresolved candidate is skipped, not failed", async () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 0, state: "library" })]);
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      [
+        "owner/repo",
+        candidate({ source: "creator-watch", id: "owner/repo:bootstrapped", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" }),
+      ],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    resolveCandidatePathFn: async () => "skills/bootstrapped/SKILL.md",
+    enrichCandidateFn: async () => ({ skill: skill("owner/repo:bootstrapped") }),
+  });
+
+  assert.equal(result.bootstrappedSkills.length, 0);
+  assert.equal(result.bootstrapFailedRepoSample.length, 0);
+  assert.equal(result.bootstrapSkippedRepoSample.length, 1);
+  assert.equal(result.bootstrapSkippedRepoSample[0]?.source, "creator-watch");
   assert.equal(result.bootstrapSkippedRepoSample[0]?.failureReason, "no-eligible-candidate");
 });
 

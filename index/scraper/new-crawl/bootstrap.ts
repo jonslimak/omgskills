@@ -52,6 +52,7 @@ export function isBootstrapEligibleCandidate(candidate: RepoBootstrapCandidate):
   if (candidate.source === "registry" || candidate.source === "code") return true;
   if (candidate.source === "official") return candidate.skill_md_path !== "__RESOLVE__";
   if (candidate.source === "skillssh" || candidate.source === "awesome") return candidate.skill_md_path !== "__RESOLVE__";
+  if (candidate.source === "creator-watch") return candidate.skill_md_path !== "__RESOLVE__";
   return false;
 }
 
