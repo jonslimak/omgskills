@@ -107,14 +107,6 @@
     "source_count": 2
   },
   {
-    "repo": "anthropics/claude-code",
-    "sources": [
-      "developers-digest-best-skills",
-      "firecrawl-best-skills"
-    ],
-    "source_count": 2
-  },
-  {
     "repo": "anthropics/skills",
     "sources": [
       "awesome-claude-skills",
@@ -191,6 +183,14 @@
     "sources": [
       "awesome-claude-skills",
       "antigravity-sources"
+    ],
+    "source_count": 2
+  },
+  {
+    "repo": "firecrawl/cli",
+    "sources": [
+      "awesome-agent-skills-heilcheng",
+      "firecrawl-best-skills"
     ],
     "source_count": 2
   },
@@ -467,6 +467,13 @@
     "source_count": 2
   },
   {
+    "repo": "addyosmani/agent-skills",
+    "sources": [
+      "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "aklofas/kicad-happy",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -498,6 +505,13 @@
     "repo": "anthropics/claude-agent-sdk-python",
     "sources": [
       "awesome-claude-skills"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "anthropics/claude-code",
+    "sources": [
+      "developers-digest-best-skills"
     ],
     "source_count": 1
   },
@@ -565,13 +579,6 @@
     "source_count": 1
   },
   {
-    "repo": "BurntSushi/ripgrep",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "chadboyda/agent-gtm-skills",
     "sources": [
       "awesome-agent-skills-heilcheng"
@@ -586,9 +593,9 @@
     "source_count": 1
   },
   {
-    "repo": "chopratejas/headroom",
+    "repo": "chaunsin/agent-skills",
     "sources": [
-      "firecrawl-best-skills"
+      "antigravity-sources"
     ],
     "source_count": 1
   },
@@ -600,21 +607,7 @@
     "source_count": 1
   },
   {
-    "repo": "ChromeDevTools/chrome-devtools-mcp",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "cli/cli",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "cloudflare/skills",
     "sources": [
       "firecrawl-best-skills"
     ],
@@ -733,13 +726,6 @@
     "source_count": 1
   },
   {
-    "repo": "firecrawl/cli",
-    "sources": [
-      "awesome-agent-skills-heilcheng"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "firecrawl/firecrawl",
     "sources": [
       "firecrawl-best-skills"
@@ -747,28 +733,14 @@
     "source_count": 1
   },
   {
-    "repo": "firecrawl/firecrawl-blogs",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "firecrawl/firecrawl-grok-plugin",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "firecrawl/firecrawl-mcp-server",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "firecrawl/firecrawl-workflows",
+    "sources": [
+      "firecrawl-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "firecrawl/firesearch",
     "sources": [
       "firecrawl-best-skills"
     ],
@@ -799,13 +771,6 @@
     "repo": "garrytan/gstack",
     "sources": [
       "awesome-agent-skills-heilcheng"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "getsentry/plugin-grok",
-    "sources": [
-      "firecrawl-best-skills"
     ],
     "source_count": 1
   },
@@ -845,6 +810,13 @@
     "source_count": 1
   },
   {
+    "repo": "googleworkspace/cli",
+    "sources": [
+      "firecrawl-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "grittygrease/safe-encryption-skill",
     "sources": [
       "awesome-agent-skills-heilcheng"
@@ -862,13 +834,6 @@
     "repo": "hamelsmu/prompts",
     "sources": [
       "awesome-agent-skills-voltagent"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "hamzafarooq/token-optimizer",
-    "sources": [
-      "firecrawl-best-skills"
     ],
     "source_count": 1
   },
@@ -971,13 +936,6 @@
     "source_count": 1
   },
   {
-    "repo": "jqlang/jq",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "jthack/threat-hunting-with-sigma-rules-skill",
     "sources": [
       "awesome-agent-skills-heilcheng"
@@ -1058,13 +1016,6 @@
     "repo": "makenotion/notion-cookbook",
     "sources": [
       "awesome-agent-skills-voltagent"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "mendableai/firecrawl",
-    "sources": [
-      "firecrawl-best-skills"
     ],
     "source_count": 1
   },
@@ -1195,6 +1146,13 @@
     "source_count": 1
   },
   {
+    "repo": "officialzeroxyz/zero-plugins",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "ognjengt/founder-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -1230,7 +1188,7 @@
     "source_count": 1
   },
   {
-    "repo": "openai/symphony",
+    "repo": "openai/skills",
     "sources": [
       "firecrawl-best-skills"
     ],
@@ -1356,13 +1314,6 @@
     "source_count": 1
   },
   {
-    "repo": "rtk-ai/rtk",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "rudrankriyam/app-store-connect-cli-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -1408,6 +1359,13 @@
     "repo": "snyk/agent-scan",
     "sources": [
       "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "stareezy-1/frontend-architecture-skill",
+    "sources": [
+      "antigravity-sources"
     ],
     "source_count": 1
   },
@@ -1468,16 +1426,16 @@
     "source_count": 1
   },
   {
-    "repo": "vercel-labs/skills",
+    "repo": "vercel-labs/agent-browser",
     "sources": [
-      "awesome-agent-skills-heilcheng"
+      "firecrawl-best-skills"
     ],
     "source_count": 1
   },
   {
-    "repo": "vercel/vercel-plugin",
+    "repo": "vercel-labs/skills",
     "sources": [
-      "firecrawl-best-skills"
+      "awesome-agent-skills-heilcheng"
     ],
     "source_count": 1
   },
@@ -1524,6 +1482,13 @@
     "source_count": 1
   },
   {
+    "repo": "weaviate/agent-skills",
+    "sources": [
+      "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "whatiskadudoing/fp-ts-skills",
     "sources": [
       "antigravity-sources"
@@ -1534,13 +1499,6 @@
     "repo": "wshuyi/x-article-publisher-skill",
     "sources": [
       "awesome-agent-skills-voltagent"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "xai-org/plugin-marketplace",
-    "sources": [
-      "firecrawl-best-skills"
     ],
     "source_count": 1
   },
