@@ -168,7 +168,7 @@ Later opportunities (not now):
 - Wire into `prepare-netlify-site-deploy.mjs` and both workflows
 - Ship sitemaps, canonical tags, JSON-LD, Search Console registration
 
-Current MVP status: the generator intentionally emits a small fixed test set before expanding to 500-2K pages. Expansion is deferred until local and live web-library verification stays green across deploy paths.
+Current MVP status: the generator intentionally emits a small fixed test set before expanding to 500-2K pages. It also ships SEO/LLMO basics: `/robots.txt`, `/llms.txt`, `/skills/`, canonical tags, social metadata, JSON-LD, and deploy verification. Expansion is deferred until the page UI and indexing rules are ready. Search Console sitemap submission remains manual.
 
 ### Phase 2 — full library
 - Expand to all catalog skills with index tiering
@@ -187,8 +187,8 @@ Phase 1 before full scale because index tiering, URL mapping, and deploy wiring 
 ## Verification
 
 1. `node scripts/build-web-library.mjs` — deterministic output on repeat runs (diff two runs, expect zero)
-2. `node scripts/verify-web-library-pages.mjs` — local profiles, collection, skill page, sitemap, and canonicals exist
-3. `node scripts/verify-web-library-pages.mjs --live` — production pages return 200, legacy creator redirects return 301, and canonicals are correct
+2. `node scripts/verify-web-library-pages.mjs` — local profiles, collection, skill page, `/skills/`, root metadata files, sitemap, social metadata, and canonicals exist
+3. `node scripts/verify-web-library-pages.mjs --live` — production pages return 200, legacy creator redirects return 301, and metadata is correct
 4. URL mapping — no collisions across all catalog skill IDs; every catalog ID maps to exactly one URL
 5. Deploy each path (content-reports, shadow-crawl-health, release script) — pages present after every deploy
 6. Lighthouse SEO pass on sample pages

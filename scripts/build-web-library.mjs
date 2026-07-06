@@ -174,7 +174,7 @@ function titleize(value) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function pageShell({ title, description, path: urlPath, body, structuredData }) {
+function pageShell({ title, description, path: urlPath, body, structuredData, ogType = "website" }) {
   const canonical = `${origin}${urlPath}`;
   return `<!doctype html>
 <html lang="en">
@@ -188,6 +188,11 @@ function pageShell({ title, description, path: urlPath, body, structuredData }) 
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${escapeHtml(canonical)}">
+  <meta property="og:type" content="${escapeHtml(ogType)}">
+  <meta property="og:site_name" content="omgskills">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="${escapeHtml(title)}">
+  <meta name="twitter:description" content="${escapeHtml(description)}">
   <style>
     :root { color-scheme: light; --text: #111111; --muted: #6b7280; --line: #e5e7eb; --soft: #f7f7f8; --blue: #007aff; }
     * { box-sizing: border-box; }
@@ -373,6 +378,7 @@ function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
       applicationCategory: "DeveloperApplication",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
+    ogType: "article",
   });
 }
 
@@ -422,6 +428,37 @@ function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlByI
       name: collection.title,
       description,
       url: `${origin}${urlPath}`,
+    },
+  });
+}
+
+function renderSkillsIndexPage({ profileCollections, topicCollections, skills }, skillUrlById) {
+  const body = `    <div class="eyebrow">Library</div>
+    <h1>Skills</h1>
+    <p>Browse the current omgskills web library test set: featured profiles, editorial collections, and selected skills.</p>
+    <div class="section"><div class="eyebrow">Profiles</div><div class="grid">${profileCollections.map((collection) => `<a class="card" href="${escapeHtml(profilePath(collection.authorHandle))}">
+      <h2>${escapeHtml(collection.title)}</h2>
+      <p>${escapeHtml(collection.subtitle || collection.description || `Skills by @${collection.authorHandle}.`)}</p>
+      <div class="meta"><span>@${escapeHtml(collection.authorHandle)}</span></div>
+    </a>`).join("")}</div></div>
+    <div class="section"><div class="eyebrow">Collections</div><div class="grid">${topicCollections.map((collection) => `<a class="card" href="${escapeHtml(collectionPath(collection.id))}">
+      <h2>${escapeHtml(collection.title)}</h2>
+      <p>${escapeHtml(collection.subtitle || collection.description || "Editorial collection")}</p>
+      <div class="meta"><span>${(collection.skillIds || collection.featuredSkillIds || []).length} skills</span></div>
+    </a>`).join("")}</div></div>
+    <div class="section"><div class="eyebrow">Skills</div><div class="grid">${skillCards(skills, skillUrlById)}</div></div>`;
+
+  return pageShell({
+    title: "Skills - omgskills",
+    description: "Browse featured profiles, collections, and selected AI agent skills in the omgskills web library.",
+    path: "/skills/",
+    body,
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "omgskills web library",
+      description: "Featured profiles, collections, and selected AI agent skills.",
+      url: `${origin}/skills/`,
     },
   });
 }
@@ -484,11 +521,13 @@ async function main() {
   }
 
   const urls = new Map([["/", "home"]]);
+  const includedSkills = [];
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
     const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
     registerUrl(urls, urlPath, `skill ${skill.id}`);
+    includedSkills.push(skill);
     const repoSkills = (skillsByRepo.get(repoKeyForSkill(skill)) || [])
       .filter((candidate) => candidate.id !== skill.id)
       .slice(0, 3);
@@ -499,8 +538,11 @@ async function main() {
     await writePage(urlPath, renderSkillPage(skill, repoSkills, authorSkills, skillUrlById));
   }
 
+  const profileCollections = [];
+  const topicCollections = [];
   for (const collection of collections.collections) {
     if (collection.type === "author" && collection.authorHandle) {
+      profileCollections.push(collection);
       const authorSkills = (skillsByAuthor.get(collection.authorHandle.toLowerCase()) || [])
         .filter((skill) => includedSkillIds.has(skill.id))
         .slice(0, 12);
@@ -514,10 +556,14 @@ async function main() {
       const featuredSkills = (collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
       const allSkills = (collection.skillIds || collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
       const urlPath = collectionPath(collection.id);
+      topicCollections.push(collection);
       registerUrl(urls, urlPath, `collection ${collection.id}`);
       await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById));
     }
   }
+
+  registerUrl(urls, "/skills/", "skills index");
+  await writePage("/skills/", renderSkillsIndexPage({ profileCollections, topicCollections, skills: includedSkills }, skillUrlById));
 
   await writeSitemaps(urls.keys());
   console.log(`Built web library test set: ${urls.size - 1} pages`);
