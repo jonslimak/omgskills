@@ -105,11 +105,14 @@ from pathlib import Path
 manifest_path = Path(os.environ["DATA_MANIFEST"])
 resources_dir = Path(os.environ["APP_RESOURCES"])
 manifest = json.loads(manifest_path.read_text())
-collections = manifest.get("collections")
-if collections and collections.get("path"):
-    source = manifest_path.parent / collections["path"]
+
+for asset_key in ("collections", "shaHistory"):
+    asset = manifest.get(asset_key)
+    if not asset or not asset.get("path"):
+        continue
+    source = manifest_path.parent / asset["path"]
     if not source.exists():
-        raise SystemExit(f"✗ Missing collections asset referenced by manifest: {source}")
+        raise SystemExit(f"✗ Missing {asset_key} asset referenced by manifest: {source}")
     shutil.copy2(source, resources_dir / source.name)
 PY
 cp Assets/omgskills.icns "$APP_BUNDLE/Contents/Resources/omgskills.icns"

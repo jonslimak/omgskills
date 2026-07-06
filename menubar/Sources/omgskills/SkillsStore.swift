@@ -32,8 +32,10 @@ final class SkillsStore: ObservableObject {
     }
 
     func load() {
-        Task { await loadLibraryData() }
-        loadInstalled()
+        Task {
+            await loadLibraryData()
+            loadInstalled()
+        }
     }
 
     func refreshInstalled() {
