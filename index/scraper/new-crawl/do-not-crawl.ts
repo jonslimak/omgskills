@@ -12,13 +12,23 @@ export function repoFromSkillId(id: string): string {
   return normalizeRepoKey(id.includes(":") ? id.split(":")[0]! : id);
 }
 
+export function repoFromGithubUrl(value: string | null | undefined): string {
+  const match = (value ?? "").match(/^https:\/\/github\.com\/([^/]+)\/([^/?#]+)/i);
+  if (!match) return "";
+  return normalizeRepoKey(`${match[1]}/${match[2]!.replace(/\.git$/i, "")}`);
+}
+
 export function isDoNotCrawlRepo(repo: string, seeds: TrustedSeeds): boolean {
   const normalized = normalizeRepoKey(repo);
   return Boolean(seeds.doNotCrawlRepos?.has(normalized) || seeds.doNotCrawlOwners?.has(ownerFromRepo(normalized)));
 }
 
-export function filterDoNotCrawlSkills<T extends { id: string }>(skills: T[], seeds: TrustedSeeds): T[] {
-  return skills.filter((skill) => !isDoNotCrawlRepo(repoFromSkillId(skill.id), seeds));
+export function filterDoNotCrawlSkills<T extends { id: string; github_url?: string }>(skills: T[], seeds: TrustedSeeds): T[] {
+  return skills.filter((skill) => {
+    const idRepo = repoFromSkillId(skill.id);
+    const publisherRepo = repoFromGithubUrl(skill.github_url);
+    return !isDoNotCrawlRepo(idRepo, seeds) && (!publisherRepo || !isDoNotCrawlRepo(publisherRepo, seeds));
+  });
 }
 
 export function removeDoNotCrawlReposFromIndex(repoIndex: ShadowRepoIndex, seeds: TrustedSeeds): void {

@@ -7,6 +7,7 @@ import type {
   DoNotCrawlRule,
   ProvenanceOverride,
   RepoOverride,
+  SuppressedSkillRule,
   TrustedSeeds,
 } from "./types.js";
 
@@ -14,6 +15,7 @@ type HandleList = { handles: string[] };
 type OfficialRepoSeeds = { tier1?: string[]; tier2?: string[] };
 type ManualIncludeRepoSeeds = { include?: string[] };
 type DoNotCrawlSeeds = { repos?: DoNotCrawlRule[]; owners?: DoNotCrawlRule[] };
+type SuppressedSkillSeeds = { skills?: SuppressedSkillRule[] };
 type CreatorRegistrySeeds = { creators?: CreatorRegistryEntry[] } | CreatorRegistryEntry[];
 
 function readJson<T>(path: string): T {
@@ -26,6 +28,10 @@ function normalizeHandle(value: string): string {
 
 function normalizeRepo(value: string): string {
   return value.trim().replace(/\.git$/i, "").toLowerCase();
+}
+
+function normalizeSkillId(value: string): string {
+  return value.trim().toLowerCase();
 }
 
 function normalizeRepoSet(values: string[] | undefined): Set<string> {
@@ -84,6 +90,7 @@ export function buildTrustedSeeds(input: {
   officialJson: OfficialRepoSeeds;
   manualIncludeJson: ManualIncludeRepoSeeds;
   doNotCrawlJson: DoNotCrawlSeeds;
+  suppressedSkillsJson?: SuppressedSkillSeeds;
   overridesJson: RepoOverride[];
   catalogJson: CatalogRepoRule[];
   provenanceJson: ProvenanceOverride[];
@@ -98,6 +105,16 @@ export function buildTrustedSeeds(input: {
       owner: rule.owner ? normalizeHandle(rule.owner) : undefined,
     })),
   ].filter((rule) => rule.repo || rule.owner);
+  const suppressedSkillRules: SuppressedSkillRule[] = [];
+  for (const rule of input.suppressedSkillsJson?.skills ?? []) {
+    const id = rule.id?.trim();
+    if (!id) continue;
+    suppressedSkillRules.push({
+      ...rule,
+      id,
+      replacementId: rule.replacementId?.trim(),
+    });
+  }
 
   const creatorRegistry = buildCreatorRegistry(input.creatorRegistryJson);
   const trustedVendorHandles = new Set([
@@ -123,6 +140,8 @@ export function buildTrustedSeeds(input: {
       doNotCrawlRules.map((rule) => rule.owner).filter((owner): owner is string => Boolean(owner)),
     ),
     doNotCrawlRules,
+    suppressedSkillIds: new Set(suppressedSkillRules.map((rule) => normalizeSkillId(rule.id))),
+    suppressedSkillRules,
     repoOverrides: input.overridesJson
       .map((override) => ({
         ...override,
@@ -160,6 +179,7 @@ export function loadTrustedSeeds(): TrustedSeeds {
   const officialJson = readJson<OfficialRepoSeeds>(join(seedsRoot, "official-repos.json"));
   const manualIncludeJson = readJson<ManualIncludeRepoSeeds>(join(seedsRoot, "manual-include-repos.json"));
   const doNotCrawlJson = readJson<DoNotCrawlSeeds>(join(seedsRoot, "do-not-crawl.json"));
+  const suppressedSkillsJson = readJson<SuppressedSkillSeeds>(join(seedsRoot, "suppressed-skills.json"));
   const overridesJson = readJson<RepoOverride[]>(join(seedsRoot, "repo-overrides.json"));
   const catalogJson = readJson<CatalogRepoRule[]>(join(seedsRoot, "catalog-repos.json"));
   const provenanceJson = readJson<ProvenanceOverride[]>(join(seedsRoot, "provenance-overrides.json"));
@@ -171,6 +191,7 @@ export function loadTrustedSeeds(): TrustedSeeds {
     officialJson,
     manualIncludeJson,
     doNotCrawlJson,
+    suppressedSkillsJson,
     overridesJson,
     catalogJson,
     provenanceJson,

@@ -40,6 +40,15 @@ export type DoNotCrawlRule = {
   notes?: string;
 };
 
+export type SuppressedSkillRule = {
+  id: string;
+  reason: string;
+  replacementId?: string;
+  confidence?: "high" | "medium" | "low";
+  stagedAt?: string;
+  notes?: string;
+};
+
 export type CreatorRegistryRole = "vendor" | "creator";
 
 export type CreatorRegistryEntry = {
@@ -63,6 +72,8 @@ export type TrustedSeeds = {
   doNotCrawlRepos?: Set<string>;
   doNotCrawlOwners?: Set<string>;
   doNotCrawlRules?: DoNotCrawlRule[];
+  suppressedSkillIds?: Set<string>;
+  suppressedSkillRules?: SuppressedSkillRule[];
   repoOverrides: RepoOverride[];
   catalogRepoRules: CatalogRepoRule[];
   provenanceOverrides: ProvenanceOverride[];

@@ -29,6 +29,7 @@ import { buildCrawl4Preview } from "./crawl4-preview.js";
 import { buildCatalogAdmissionSample } from "./catalog-admission.js";
 import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
 import { isDoNotCrawlRepo, removeDoNotCrawlState } from "./do-not-crawl.js";
+import { filterSuppressedSkills } from "./suppressed-skills.js";
 import {
   applyShadowSkillOverlay,
   buildShadowSkillOverlay,
@@ -1941,6 +1942,7 @@ async function main() {
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
   shadowSkills = removeDoNotCrawlState(repoIndex, shadowSkills, seeds);
+  shadowSkills = filterSuppressedSkills(shadowSkills, seeds);
   reconcileRepoIndexSkillIds(repoIndex, shadowSkills);
   removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);
   const inspectableShadowSkills = buildInspectableShadowSkills(shadowSkills);

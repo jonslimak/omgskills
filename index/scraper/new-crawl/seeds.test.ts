@@ -9,6 +9,12 @@ test("loadTrustedSeeds reads official repo seed sets", () => {
   assert.ok(seeds.officialTier2Repos.has("browserbase/skills"));
   assert.ok(seeds.trustedVendorHandles.has("anthropics"));
   assert.ok(seeds.watchedCreatorHandles?.has("anthropics"));
+  assert.ok(seeds.doNotCrawlRepos?.has("majiayu000/claude-skill-registry"));
+  assert.ok(seeds.doNotCrawlRepos?.has("majiayu000/claude-skill-registry-data"));
+  assert.ok(seeds.doNotCrawlRepos?.has("supercent-io/skills-template"));
+  assert.ok(seeds.doNotCrawlRepos?.has("anthropics/claude-for-legal"));
+  assert.ok(seeds.doNotCrawlOwners?.has("user-attachments"));
+  assert.ok((seeds.suppressedSkillIds?.size ?? 0) > 0);
   assert.deepEqual([...seeds.manualIncludeRepos], []);
 });
 
@@ -27,6 +33,9 @@ test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
       repos: [{ repo: " Blocked/Repo.git ", reason: "catalog" }],
       owners: [{ owner: " BlockedOwner ", reason: "spam" }],
     },
+    suppressedSkillsJson: {
+      skills: [{ id: " Owner/Repo:Skill ", reason: "duplicate", replacementId: "owner/repo:canonical" }],
+    },
     overridesJson: [],
     catalogJson: [],
     provenanceJson: [],
@@ -37,6 +46,8 @@ test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
   assert.deepEqual([...seeds.manualIncludeRepos], ["owner/repo"]);
   assert.deepEqual([...(seeds.doNotCrawlRepos ?? [])], ["blocked/repo"]);
   assert.deepEqual([...(seeds.doNotCrawlOwners ?? [])], ["blockedowner"]);
+  assert.deepEqual([...(seeds.suppressedSkillIds ?? [])], ["owner/repo:skill"]);
+  assert.equal(seeds.suppressedSkillRules?.[0]?.id, "Owner/Repo:Skill");
 });
 
 test("buildTrustedSeeds unions legacy trusted seeds with creator registry", () => {

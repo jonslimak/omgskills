@@ -10,8 +10,10 @@ import {
   applyShadowSkillOverlay,
   buildShadowSkillOverlay,
 } from "./skill-overlay.js";
-import type { ShadowCutoverSkillSignal, ShadowRepoIndex, ShadowRepoIndexEntry, ShadowRepoOverlay, ShadowSkillRecord } from "./types.js";
+import type { ShadowCutoverSkillSignal, ShadowRepoIndex, ShadowRepoIndexEntry, ShadowRepoOverlay, ShadowSkillRecord, TrustedSeeds } from "./types.js";
 import { buildCutoverShadowSkills, buildCutoverSkillSignals, buildFinalShadowSkills, buildSkillFileMissingSample, reconcileRepoIndexSkillIds, removeFilteredCatalogOnlyRepos, shouldSuppressStableCheapRetry } from "./build-shadow.js";
+import { removeDoNotCrawlState } from "./do-not-crawl.js";
+import { filterSuppressedSkills } from "./suppressed-skills.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
   const { repo: repoName, stars, ...rest } = overrides;
@@ -150,6 +152,37 @@ test("shouldSuppressStableCheapRetry only suppresses matching stable failures", 
     false,
   );
   assert.equal(shouldSuppressStableCheapRetry(true, null, "2026-06-04T00:00:00Z"), false);
+});
+
+test("removeDoNotCrawlState removes blocked repos and owners from Crawl 4 state", () => {
+  const index = repoIndex([
+    repo({ repo: "blocked/repo", stars: 10 }),
+    repo({ repo: "blocked-owner/repo", stars: 9 }),
+    repo({ repo: "kept/repo", stars: 8 }),
+  ]);
+  const skills = [
+    shadowSkill({ id: "blocked/repo:skill", github_url: "https://github.com/blocked/repo" }),
+    shadowSkill({ id: "upstream/repo:skill", github_url: "https://github.com/blocked/repo" }),
+    shadowSkill({ id: "blocked-owner/repo:skill", github_url: "https://github.com/blocked-owner/repo" }),
+    shadowSkill({ id: "kept/repo:skill", github_url: "https://github.com/kept/repo" }),
+  ];
+
+  const filtered = removeDoNotCrawlState(index, skills, {
+    trustedVendorHandles: new Set(),
+    trustedCreatorHandles: new Set(),
+    officialTier1Repos: new Set(),
+    officialTier2Repos: new Set(),
+    manualIncludeRepos: new Set(),
+    doNotCrawlRepos: new Set(["blocked/repo"]),
+    doNotCrawlOwners: new Set(["blocked-owner"]),
+    repoOverrides: [],
+    catalogRepoRules: [],
+    provenanceOverrides: [],
+  });
+
+  assert.deepEqual(index.repos.map((entry) => entry.repo), ["kept/repo"]);
+  assert.equal(index.repoCount, 1);
+  assert.deepEqual(filtered.map((skill) => skill.id), ["kept/repo:skill"]);
 });
 
 test("buildSkillFileMissingSample reports current-run path failures with repo context", () => {
@@ -484,4 +517,31 @@ test("repo index removes entries whose only skills were filtered catalog-like sk
 
   assert.deepEqual(index.repos.map((row) => row.repo), ["owner/kept"]);
   assert.equal(index.repoCount, 1);
+});
+
+test("suppressed skills are removed before repo index reconciliation", () => {
+  const index = repoIndex([
+    repo({
+      repo: "owner/repo",
+      stars: 10,
+      skillIds: ["owner/repo:keep", "owner/repo:drop"],
+      skillCount: 2,
+      topSkillId: "owner/repo:drop",
+      topSkillStars: 10,
+    }),
+  ]);
+  const skills = [
+    shadowSkill({ id: "owner/repo:keep", github_url: "https://github.com/owner/repo" }),
+    shadowSkill({ id: "owner/repo:drop", github_url: "https://github.com/owner/repo" }),
+  ];
+  const filtered = filterSuppressedSkills(skills, {
+    suppressedSkillIds: new Set(["owner/repo:drop"]),
+  } as TrustedSeeds);
+
+  reconcileRepoIndexSkillIds(index, filtered);
+
+  assert.deepEqual(filtered.map((skill) => skill.id), ["owner/repo:keep"]);
+  assert.deepEqual(index.repos[0]?.skillIds, ["owner/repo:keep"]);
+  assert.equal(index.repos[0]?.skillCount, 1);
+  assert.equal(index.repos[0]?.topSkillId, "owner/repo:keep");
 });

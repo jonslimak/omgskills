@@ -4,7 +4,33 @@
       "repo": "davila7/claude-code-templates",
       "reason": "catalog",
       "notes": "Template marketplace/catalog with bundled third-party sources; do not admit by stars alone."
+    },
+    {
+      "repo": "majiayu000/claude-skill-registry",
+      "reason": "catalog",
+      "notes": "Registry/catalog source; exclude maintained library entries and prevent re-admission."
+    },
+    {
+      "repo": "majiayu000/claude-skill-registry-data",
+      "reason": "catalog",
+      "notes": "Registry data/catalog source; exclude maintained library entries and prevent re-admission."
+    },
+    {
+      "repo": "supercent-io/skills-template",
+      "reason": "catalog",
+      "notes": "Template/catalog source; exclude maintained library entries and prevent re-admission."
+    },
+    {
+      "repo": "anthropics/claude-for-legal",
+      "reason": "low-quality",
+      "notes": "Manually blocked from maintained library output."
     }
   ],
-  "owners": []
+  "owners": [
+    {
+      "owner": "user-attachments",
+      "reason": "spam",
+      "notes": "GitHub attachment pseudo-owner; never crawl or carry forward into library output."
+    }
+  ]
 }

@@ -18,6 +18,9 @@ import {
   type Candidate,
   type NegativeCacheFailure,
 } from "./enrich.js";
+import { loadTrustedSeeds } from "./new-crawl/seeds.js";
+import { isSuppressedSkillId } from "./new-crawl/suppressed-skills.js";
+import type { TrustedSeeds } from "./new-crawl/types.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CHECKPOINT_INTERVAL = 500;
@@ -342,11 +345,13 @@ function saveCheckpoint(paths: BuildPaths, skills: Skill[], existingSkills: Map<
   return snapshot.length;
 }
 
-function loadExisting(existingPath: string): { firstSeen: Map<string, string>; skills: Map<string, Skill> } {
+function loadExisting(existingPath: string, seeds: TrustedSeeds): { firstSeen: Map<string, string>; skills: Map<string, Skill> } {
   if (!existsSync(existingPath)) return { firstSeen: new Map(), skills: new Map() };
   try {
     const raw = readFileSync(existingPath, "utf8");
-    const arr = (JSON.parse(raw) as Skill[]).filter((s) => s.source_tag !== X_SOURCE_TAG);
+    const arr = (JSON.parse(raw) as Skill[]).filter(
+      (s) => s.source_tag !== X_SOURCE_TAG && !isBlockedSkill(s) && !isSuppressedSkillId(s.id, seeds),
+    );
     return {
       firstSeen: new Map(arr.map((s) => [s.id, s.first_seen])),
       skills: new Map(arr.map((s) => [s.id, s])),
@@ -361,8 +366,25 @@ function repoFromId(id: string): string {
   return id.includes(":") ? id.split(":")[0] : id;
 }
 
+function repoFromGithubUrl(value: string | null | undefined): string {
+  const match = (value ?? "").match(/^https:\/\/github\.com\/([^/]+)\/([^/?#]+)/i);
+  if (!match) return "";
+  return `${match[1]!.toLowerCase()}/${match[2]!.replace(/\.git$/i, "").toLowerCase()}`;
+}
+
 function isBlockedId(id: string): boolean {
-  return BLOCKED_REPOS.has(repoFromId(id));
+  const repo = repoFromId(id);
+  const [owner] = repo.split("/");
+  return BLOCKED_REPOS.has(repo) || Boolean(owner && BLOCKED_OWNERS.has(owner));
+}
+
+function isBlockedSkill(skill: Pick<Skill, "id" | "github_url">): boolean {
+  const publisherRepo = repoFromGithubUrl(skill.github_url);
+  return isBlockedId(skill.id) || Boolean(publisherRepo && isBlockedId(publisherRepo));
+}
+
+function isBlockedOrSuppressedId(id: string, seeds: TrustedSeeds): boolean {
+  return isBlockedId(id) || isSuppressedSkillId(id, seeds);
 }
 
 function isValidRepoFullName(repo: string): boolean {
@@ -454,6 +476,7 @@ async function timedSource<T>(name: SourceName, fn: () => Promise<T[]>): Promise
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const paths = buildPaths(options);
+  const trustedSeeds = loadTrustedSeeds();
   const today = new Date().toISOString().slice(0, 10);
   const buildStart = performance.now();
   const sourceSummaries: SourceResult[] = [];
@@ -478,7 +501,7 @@ async function main() {
     console.log(`Backed up skills.json → skills.backup.json`);
   }
 
-  const { firstSeen: existingFirstSeen, skills: existingSkills } = loadExisting(paths.existingPath);
+  const { firstSeen: existingFirstSeen, skills: existingSkills } = loadExisting(paths.existingPath, trustedSeeds);
   const shaCache = loadShaCache(paths.cacheReadPath);
   const negativeCache = loadNegativeCache(paths.negativeCachePath);
   const nowMs = Date.now();
@@ -552,7 +575,7 @@ async function main() {
   const officialHits = officialRun?.hits ?? [];
 
   for (const t of topicHits) {
-    if (isBlockedId(t.id)) continue;
+    if (isBlockedOrSuppressedId(t.id, trustedSeeds)) continue;
     seedRepoCache(t.id, {
       stars: t.stars,
       lastUpdated: t.last_updated,
@@ -564,12 +587,12 @@ async function main() {
   const candidates = new Map<string, Candidate>();
 
   for (const c of codeHits) {
-    if (isBlockedId(c.id)) continue;
+    if (isBlockedOrSuppressedId(c.id, trustedSeeds)) continue;
     candidates.set(c.id, { id: c.id, skill_md_path: c.path });
   }
 
   for (const t of topicHits) {
-    if (isBlockedId(t.id)) continue;
+    if (isBlockedOrSuppressedId(t.id, trustedSeeds)) continue;
     if (!candidates.has(t.id)) {
       candidates.set(t.id, { id: t.id, skill_md_path: "SKILL.md" });
     }
@@ -583,17 +606,17 @@ async function main() {
   }
 
   for (const a of aggregatorHits) {
-    if (isBlockedId(a.id)) continue;
+    if (isBlockedOrSuppressedId(a.id, trustedSeeds)) continue;
     if (!candidates.has(a.id)) candidates.set(a.id, { id: a.id, skill_md_path: "SKILL.md" });
   }
 
   for (const s of socialHits) {
-    if (isBlockedId(s.id)) continue;
+    if (isBlockedOrSuppressedId(s.id, trustedSeeds)) continue;
     if (!candidates.has(s.id)) candidates.set(s.id, { id: s.id, skill_md_path: "SKILL.md" });
   }
 
   for (const r of registryHits) {
-    if (isBlockedId(r.id)) continue;
+    if (isBlockedOrSuppressedId(r.id, trustedSeeds)) continue;
     if (!candidates.has(r.id)) {
       candidates.set(r.id, {
         id: r.id,
@@ -608,7 +631,7 @@ async function main() {
   }
 
   for (const s of skillsShHits) {
-    if (isBlockedId(s.id)) continue;
+    if (isBlockedOrSuppressedId(s.id, trustedSeeds)) continue;
     if (!candidates.has(s.id)) {
       candidates.set(s.id, {
         id: s.id,
@@ -621,7 +644,7 @@ async function main() {
   }
 
   for (const a of awesomeHits) {
-    if (isBlockedId(a.id)) continue;
+    if (isBlockedOrSuppressedId(a.id, trustedSeeds)) continue;
     if (!candidates.has(a.id)) {
       candidates.set(a.id, {
         id: a.id,
@@ -635,7 +658,7 @@ async function main() {
   }
 
   for (const o of officialHits) {
-    if (isBlockedId(o.id)) continue;
+    if (isBlockedOrSuppressedId(o.id, trustedSeeds)) continue;
     if (!candidates.has(o.id)) {
       candidates.set(o.id, {
         id: o.id,
@@ -744,6 +767,10 @@ async function main() {
     const enrichDurationMs = performance.now() - enrichStartedAt;
     const s = result.skill;
     if (s) {
+      if (isSuppressedSkillId(s.id, trustedSeeds)) {
+        skipped++;
+        continue;
+      }
       clearNegativeCacheForCandidate(negativeCache, c);
       skills.push(s);
       if (s.skill_md_sha && existingSkills.get(c.id)?.skill_md_sha === s.skill_md_sha) cached++;
@@ -791,7 +818,7 @@ async function main() {
   }
 
   skills.sort((a, b) => b.stars - a.stars);
-  const deduped = dedupeSkills(skills);
+  const deduped = dedupeSkills(skills.filter((skill) => !isSuppressedSkillId(skill.id, trustedSeeds)));
 
   // Sanity check: refuse to overwrite if the new index is <80% of the previous one.
   // This catches discovery regressions before they land.
