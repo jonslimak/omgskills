@@ -65,6 +65,7 @@ const xTrending = manifest.xTrending ? assertAsset("xTrending", manifest.xTrendi
 const skillSignals = manifest.skillSignals ? assertAsset("skillSignals", manifest.skillSignals) : null;
 const authorSignals = manifest.authorSignals ? assertAsset("authorSignals", manifest.authorSignals) : null;
 const authorLeaderboards = manifest.authorLeaderboards ? assertAsset("authorLeaderboards", manifest.authorLeaderboards) : null;
+const shaHistory = manifest.shaHistory ? assertAsset("shaHistory", manifest.shaHistory) : null;
 
 if (!Array.isArray(skills.decoded)) fail("skills payload must be an array");
 if (!Array.isArray(trending.decoded)) fail("trending payload must be an array");
@@ -78,6 +79,9 @@ if (xTrending && !Array.isArray(xTrending.decoded)) fail("xTrending payload must
 if (skillSignals && !Array.isArray(skillSignals.decoded)) fail("skillSignals payload must be an array");
 if (authorSignals && !Array.isArray(authorSignals.decoded)) fail("authorSignals payload must be an array");
 if (authorLeaderboards && !Array.isArray(authorLeaderboards.decoded)) fail("authorLeaderboards payload must be an array");
+if (shaHistory && (!shaHistory.decoded || Array.isArray(shaHistory.decoded))) {
+  fail("shaHistory payload must be an object");
+}
 
 const skillIds = new Set(skills.decoded.map((item) => item?.id).filter(Boolean));
 const authorHandles = new Set(skills.decoded.map((item) => item?.author_handle).filter(Boolean));
@@ -142,6 +146,25 @@ for (const entry of authorLeaderboards?.decoded ?? []) {
   }
 }
 
+if (shaHistory) {
+  if (shaHistory.decoded.version !== 1 || !shaHistory.decoded.shaToSkillIds || Array.isArray(shaHistory.decoded.shaToSkillIds)) {
+    fail("shaHistory must include version 1 and shaToSkillIds object");
+  }
+  for (const [sha, ids] of Object.entries(shaHistory.decoded.shaToSkillIds)) {
+    if (!/^[0-9a-f]{40}$/.test(sha)) {
+      fail(`shaHistory contains invalid git blob sha: ${sha}`);
+    }
+    if (!Array.isArray(ids) || ids.length === 0) {
+      fail(`shaHistory entry must map to a non-empty id array: ${sha}`);
+    }
+    for (const id of ids) {
+      if (typeof id !== "string" || id.length === 0) {
+        fail(`shaHistory entry contains invalid skill id for ${sha}`);
+      }
+    }
+  }
+}
+
 console.log(
   JSON.stringify(
     {
@@ -154,6 +177,7 @@ console.log(
       skillSignalsCount: skillSignals?.decoded.length ?? 0,
       authorSignalsCount: authorSignals?.decoded.length ?? 0,
       authorLeaderboardsCount: authorLeaderboards?.decoded.length ?? 0,
+      shaHistoryCount: shaHistory ? Object.keys(shaHistory.decoded.shaToSkillIds).length : 0,
     },
     null,
     2,

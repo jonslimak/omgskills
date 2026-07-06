@@ -66,7 +66,8 @@ enum InstalledSkillsScanner {
                 let skillMd = entry.appendingPathComponent("SKILL.md")
                 guard fm.fileExists(atPath: skillMd.path) else { continue }
                 let isSymlink = (try? entry.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false
-                guard let skill = parse(skillMd: skillMd, dir: entry, origin: root.origin, isSymlink: isSymlink) else { continue }
+                let provenance = installProvenance(for: entry, root: root.url)
+                guard let skill = parse(skillMd: skillMd, dir: entry, origin: root.origin, isSymlink: isSymlink, provenance: provenance) else { continue }
 
                 installations.append(skill)
                 summary.totalInstallations += 1
@@ -97,8 +98,9 @@ enum InstalledSkillsScanner {
         return ScanResult(skills: skills, installations: installations, summary: summary)
     }
 
-    private static func parse(skillMd: URL, dir: URL, origin: String, isSymlink: Bool) -> Skill? {
-        guard let content = try? String(contentsOf: skillMd, encoding: .utf8) else { return nil }
+    private static func parse(skillMd: URL, dir: URL, origin: String, isSymlink: Bool, provenance: SkillInstallProvenance?) -> Skill? {
+        guard let data = try? Data(contentsOf: skillMd),
+              let content = String(data: data, encoding: .utf8) else { return nil }
         guard let fm = parseFrontmatter(content) else { return nil }
         guard let name = (fm["name"] as? String).map(normalize), !name.isEmpty,
               let rawDesc = fm["description"] as? String else { return nil }
@@ -133,13 +135,14 @@ enum InstalledSkillsScanner {
             stars: 0,
             lastUpdated: iso.string(from: mod),
             firstSeen: "",
-            skillMdSha: nil,
+            skillMdSha: SkillIdentityResolver.gitBlobSHA(for: data),
             installs: nil,
             trendingRank: nil,
             trendingSource: nil,
             origin: origin,
             isSymlink: isSymlink,
-            isLocalOnly: isLocalOnly
+            isLocalOnly: isLocalOnly,
+            catalogSkillId: provenance?.catalogSkillId
         )
     }
 
@@ -153,7 +156,8 @@ enum InstalledSkillsScanner {
 
     private static func resolveGithubUrl(dir: URL) -> String {
         let resolved = dir.resolvingSymlinksInPath()
-        let gitConfig = resolved.appendingPathComponent(".git/config")
+        guard let gitRoot = enclosingGitRoot(from: resolved) else { return "" }
+        let gitConfig = gitRoot.appendingPathComponent(".git/config")
         guard let content = try? String(contentsOf: gitConfig, encoding: .utf8) else { return "" }
         for line in content.components(separatedBy: "\n") {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
@@ -166,6 +170,30 @@ enum InstalledSkillsScanner {
             if url.contains("github.com") { return url }
         }
         return ""
+    }
+
+    private static func enclosingGitRoot(from directory: URL) -> URL? {
+        var current = directory
+        let fm = FileManager.default
+        for _ in 0..<64 {
+            if fm.fileExists(atPath: current.appendingPathComponent(".git/config").path) {
+                return current
+            }
+            let parent = current.deletingLastPathComponent()
+            if parent.path == current.path {
+                return nil
+            }
+            current = parent
+        }
+        return nil
+    }
+
+    private static func installProvenance(for entry: URL, root: URL) -> SkillInstallProvenance? {
+        let metadataURL = root
+            .appendingPathComponent(".omgskills", isDirectory: true)
+            .appendingPathComponent("\(entry.lastPathComponent).json")
+        guard let data = try? Data(contentsOf: metadataURL) else { return nil }
+        return try? JSONDecoder().decode(SkillInstallProvenance.self, from: data)
     }
 
     private static func normalize(_ s: String) -> String {

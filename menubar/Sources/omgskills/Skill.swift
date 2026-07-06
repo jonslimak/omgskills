@@ -30,6 +30,8 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
     let publisherRepo: String?
     let provenanceType: String?
     let authorConfidence: String?
+    let catalogSkillId: String?
+    let identityStatus: SkillIdentityStatus?
     var sourceTag: String? = nil
     var sourceUrl: String? = nil
     var tweetUrl: String? = nil
@@ -65,6 +67,8 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         publisherRepo: String? = nil,
         provenanceType: String? = nil,
         authorConfidence: String? = nil,
+        catalogSkillId: String? = nil,
+        identityStatus: SkillIdentityStatus? = nil,
         sourceTag: String? = nil,
         sourceUrl: String? = nil,
         tweetUrl: String? = nil,
@@ -99,6 +103,8 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         self.publisherRepo = publisherRepo
         self.provenanceType = provenanceType
         self.authorConfidence = authorConfidence
+        self.catalogSkillId = catalogSkillId
+        self.identityStatus = identityStatus
         self.sourceTag = sourceTag
         self.sourceUrl = sourceUrl
         self.tweetUrl = tweetUrl
@@ -138,6 +144,8 @@ extension Skill {
             publisherRepo: publisherRepo,
             provenanceType: provenanceType,
             authorConfidence: authorConfidence,
+            catalogSkillId: catalogSkillId,
+            identityStatus: identityStatus,
             sourceTag: sourceTag,
             sourceUrl: sourceUrl,
             tweetUrl: tweetUrl,
@@ -230,4 +238,16 @@ extension Skill {
             return false
         }
     }
+}
+
+enum SkillIdentityStatus: Codable, Hashable, Sendable {
+    case resolved(method: SkillIdentityResolutionMethod)
+    case ambiguous(skillIds: [String])
+    case localOnly
+}
+
+enum SkillIdentityResolutionMethod: String, Codable, Hashable, Sendable {
+    case provenance
+    case git
+    case sha
 }

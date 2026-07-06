@@ -9,6 +9,7 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var installedSkills: [Skill] = []
     @Published private(set) var installedSkillInstallations: [Skill] = []
     @Published private(set) var installedSummary = InstalledSkillSummary()
+    @Published private(set) var identityMeasurement = SkillIdentityMeasurement()
     @Published private(set) var loadError: String?
     @Published private(set) var trendingLoadError: String?
     @Published private(set) var twitterLoadError: String?
@@ -18,6 +19,7 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var searchIndexVersion = 0
     private var trendingEntries: [TrendingEntry] = []
     private var trendingBaseSkills: [Skill] = []
+    private var shaHistory: ShaHistoryAsset?
     private var loadGeneration = 0
     private var availableIndexTask: Task<Void, Never>?
     private var trendingIndexTask: Task<Void, Never>?
@@ -78,11 +80,13 @@ final class SkillsStore: ObservableObject {
         async let trendingResult = decodeTrendingEntries()
         async let twitterResult = decodeTwitterSkills()
         async let collectionsResult = decodeCollections()
+        async let shaHistoryResult = decodeShaHistory()
 
         let available = await availableResult
         let trending = await trendingResult
         let twitter = await twitterResult
         let collections = await collectionsResult
+        let shaHistory = await shaHistoryResult
         guard generation == loadGeneration else { return }
 
         applyDecodedLibraryData(
@@ -90,6 +94,7 @@ final class SkillsStore: ObservableObject {
             trending: trending,
             twitter: twitter,
             collections: collections,
+            shaHistory: shaHistory,
             generation: generation
         )
     }
@@ -99,6 +104,7 @@ final class SkillsStore: ObservableObject {
         trending: LoadResult<[TrendingEntry]>,
         twitter: LoadResult<[Skill]>,
         collections: LoadResult<[SkillCollection]> = .success([]),
+        shaHistory: LoadResult<ShaHistoryAsset?> = .success(nil),
         generation: Int? = nil,
         buildIndexes: Bool = true
     ) {
@@ -145,6 +151,15 @@ final class SkillsStore: ObservableObject {
         case .failure:
             break
         }
+
+        switch shaHistory {
+        case .success(let shaHistory):
+            self.shaHistory = shaHistory
+        case .failure:
+            break
+        }
+
+        resolveInstalledIdentities()
     }
 
     func collection(id: String) -> SkillCollection? {
@@ -330,6 +345,43 @@ final class SkillsStore: ObservableObject {
         return .success([])
     }
 
+    private nonisolated func decodeShaHistory() async -> LoadResult<ShaHistoryAsset?> {
+        if DataRefreshService.activeTrack() == .crawl4,
+           let data = DataRefreshService.cachedData(for: .shaHistory, track: .crawl4) {
+            let decoded = await decode(data, as: ShaHistoryAsset.self, label: "crawl4-sha-history.json")
+            switch decoded {
+            case .success(let asset):
+                return .success(asset)
+            case .failure(let error):
+                DataRefreshService.removeCachedData(for: .shaHistory, track: .crawl4)
+                return .failure(error)
+            }
+        }
+
+        if let data = DataRefreshService.cachedData(for: .shaHistory, track: .productionV2) {
+            let decoded = await decode(data, as: ShaHistoryAsset.self, label: "sha-history.json")
+            switch decoded {
+            case .success(let asset):
+                return .success(asset)
+            case .failure(let error):
+                DataRefreshService.removeCachedData(for: .shaHistory, track: .productionV2)
+                return .failure(error)
+            }
+        }
+
+        if let bundled = bundledShaHistoryData() {
+            let decoded = await decode(bundled.data, as: ShaHistoryAsset.self, label: bundled.label)
+            switch decoded {
+            case .success(let asset):
+                return .success(asset)
+            case .failure(let error):
+                return .failure(error)
+            }
+        }
+
+        return .success(nil)
+    }
+
     private nonisolated func bundledCollectionsData() -> (data: Data, label: String)? {
         guard let manifestURL = Bundle.main.url(forResource: "manifest", withExtension: "json"),
               let manifestData = try? Data(contentsOf: manifestURL),
@@ -343,6 +395,21 @@ final class SkillsStore: ObservableObject {
             return nil
         }
         return (data, collectionsURL.lastPathComponent)
+    }
+
+    private nonisolated func bundledShaHistoryData() -> (data: Data, label: String)? {
+        guard let manifestURL = Bundle.main.url(forResource: "manifest", withExtension: "json"),
+              let manifestData = try? Data(contentsOf: manifestURL),
+              let manifest = try? JSONDecoder().decode(DataRefreshService.Manifest.self, from: manifestData),
+              let shaHistoryPath = manifest.shaHistory?.path else {
+            return nil
+        }
+
+        let shaHistoryURL = manifestURL.deletingLastPathComponent().appendingPathComponent(shaHistoryPath)
+        guard let data = try? Data(contentsOf: shaHistoryURL) else {
+            return nil
+        }
+        return (data, shaHistoryURL.lastPathComponent)
     }
 
     private nonisolated func decode<T: Decodable & Sendable>(_ data: Data, as type: T.Type, label: String) async -> LoadResult<T> {
@@ -362,6 +429,23 @@ final class SkillsStore: ObservableObject {
         installedSkills = result.skills
         installedSkillInstallations = result.installations
         installedSummary = result.summary
+        resolveInstalledIdentities()
+    }
+
+    private func resolveInstalledIdentities() {
+        guard !installedSkills.isEmpty || !installedSkillInstallations.isEmpty else {
+            identityMeasurement = SkillIdentityMeasurement()
+            return
+        }
+
+        let resolver = SkillIdentityResolver(catalogSkills: availableSkills, shaHistory: shaHistory)
+        let resolvedSkills = resolver.resolve(installedSkills)
+        let resolvedInstallations = resolver.resolve(installedSkillInstallations)
+
+        installedSkills = resolvedSkills.skills
+        installedSkillInstallations = resolvedInstallations.skills
+        identityMeasurement = resolvedInstallations.measurement
+        print("[SkillIdentityResolver] provenance=\(identityMeasurement.resolvedByProvenance) git=\(identityMeasurement.resolvedByGit) sha=\(identityMeasurement.resolvedBySha) ambiguous=\(identityMeasurement.ambiguous) localOnly=\(identityMeasurement.localOnly)")
     }
 
     private func linearSearch(query: String, in skills: [Skill]) -> [Skill] {

@@ -20,6 +20,7 @@
     "collect:x-skill-tweets": "tsx scraper/collect-x-skill-tweets.ts",
     "merge:x-skill-tweets": "tsx scraper/merge-x-skill-tweets.ts",
     "publish:collections": "tsx scripts/publish-collections.ts",
+    "publish:sha-history": "tsx scripts/publish-sha-history.ts",
     "typecheck": "tsc --noEmit",
     "content:stats": "tsx scraper/content/compute-stats.ts",
     "content:stats-html": "tsx scraper/content/build-stats-html.ts",

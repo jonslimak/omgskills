@@ -29,10 +29,12 @@ enum LibraryDataTrack: String, CaseIterable, Identifiable {
         case (.productionV2, .trending): return "trending.json"
         case (.productionV2, .xTrending): return "x-trending.json"
         case (.productionV2, .collections): return "collections.json"
+        case (.productionV2, .shaHistory): return "sha-history.json"
         case (.crawl4, .skills): return "crawl4-skills.json"
         case (.crawl4, .trending): return "crawl4-trending.json"
         case (.crawl4, .xTrending): return "crawl4-x-trending.json"
         case (.crawl4, .collections): return "crawl4-collections.json"
+        case (.crawl4, .shaHistory): return "crawl4-sha-history.json"
         }
     }
 
@@ -120,6 +122,7 @@ enum DataRefreshService {
         case trending
         case xTrending
         case collections
+        case shaHistory
 
         var cacheFilename: String {
             activeTrack().cacheFilename(for: self)
@@ -133,6 +136,7 @@ enum DataRefreshService {
         let trending: Asset?
         let xTrending: Asset?
         let collections: Asset?
+        let shaHistory: Asset?
     }
 
     struct Asset: Codable {
@@ -160,6 +164,7 @@ enum DataRefreshService {
         var activeTrendingHash: String?
         var activeXTrendingHash: String?
         var activeCollectionsHash: String?
+        var activeShaHistoryHash: String?
         var activeLibraryGeneratedAt: String?
         var remoteXTrendingEnabled: Bool?
         var lastCheckedAt: TimeInterval?
@@ -385,6 +390,27 @@ enum DataRefreshService {
                   (cachedData(for: .collections, track: track) != nil || metadata.activeCollectionsHash != nil) {
             removeCachedData(for: .collections, track: track)
             metadata.activeCollectionsHash = nil
+            didUpdate = true
+        }
+
+        if let shaHistory = manifest.shaHistory,
+           shouldUpdateAsset(
+            activeHash: metadata.activeShaHistoryHash,
+            hasCachedData: cachedData(for: .shaHistory, track: track) != nil,
+            manifestHash: shaHistory.sha256
+           ) {
+            do {
+                let data = try await fetchAndValidate(asset: shaHistory, decodeAs: ShaHistoryAsset.self, track: track)
+                try writeCache(data, for: .shaHistory, track: track)
+                metadata.activeShaHistoryHash = shaHistory.sha256
+                didUpdate = true
+            } catch {
+                print("[DataRefreshService] shaHistory refresh failed: \(error)")
+            }
+        } else if manifest.shaHistory == nil,
+                  (cachedData(for: .shaHistory, track: track) != nil || metadata.activeShaHistoryHash != nil) {
+            removeCachedData(for: .shaHistory, track: track)
+            metadata.activeShaHistoryHash = nil
             didUpdate = true
         }
 
