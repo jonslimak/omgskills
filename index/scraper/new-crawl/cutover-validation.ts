@@ -5,8 +5,17 @@ import type {
   ShadowRepoIndex,
 } from "./types.js";
 
+type CutoverSkillForValidation = Skill & {
+  provenance_type?: string;
+};
+
+function ownerFromSkillId(id: string): string | null {
+  const owner = id.split("/", 1)[0]?.trim();
+  return owner ? owner.toLowerCase() : null;
+}
+
 export function validateCutoverOutputs(
-  skills: Skill[],
+  skills: CutoverSkillForValidation[],
   signals: ShadowCutoverSkillSignal[],
   repoIndex: ShadowRepoIndex,
 ): CutoverValidationFailure[] {
@@ -23,6 +32,18 @@ export function validateCutoverOutputs(
       continue;
     }
     skillIds.add(skill.id);
+
+    if (skill.provenance_type === "original") {
+      const idOwner = ownerFromSkillId(skill.id);
+      const authorHandle = (skill.author_handle ?? "").trim().toLowerCase();
+      if (!idOwner || authorHandle !== idOwner) {
+        failures.push({
+          kind: "originalAuthorHandleMismatch",
+          id: skill.id,
+          details: `Original skill ${skill.id} has author_handle "${skill.author_handle ?? ""}" but id owner is "${idOwner ?? ""}"`,
+        });
+      }
+    }
   }
 
   for (const repo of repoIndex.repos) {

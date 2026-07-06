@@ -135,7 +135,8 @@ export type ShadowStaleReasonCounts = {
 export type CutoverValidationFailureKind =
   | "repoSkillIdMissing"
   | "duplicateCutoverSkillId"
-  | "cutoverSignalMissingSkill";
+  | "cutoverSignalMissingSkill"
+  | "originalAuthorHandleMismatch";
 
 export type CutoverValidationFailure = {
   kind: CutoverValidationFailureKind;

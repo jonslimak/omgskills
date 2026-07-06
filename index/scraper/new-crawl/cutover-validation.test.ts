@@ -4,7 +4,11 @@ import type { Skill } from "../types.js";
 import { validateCutoverOutputs } from "./cutover-validation.js";
 import type { ShadowCutoverSkillSignal, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
 
-function skill(id: string, repo = "owner/repo"): Skill {
+type CutoverSkillFixture = Skill & {
+  provenance_type?: string;
+};
+
+function skill(id: string, repo = "owner/repo", overrides: Partial<CutoverSkillFixture> = {}): CutoverSkillFixture {
   return {
     id,
     name: "Skill",
@@ -18,6 +22,7 @@ function skill(id: string, repo = "owner/repo"): Skill {
     last_updated: "2026-05-22T00:00:00Z",
     first_seen: "2026-05-22",
     skill_md_sha: "sha",
+    ...overrides,
   };
 }
 
@@ -105,6 +110,53 @@ test("empty-skill rising repo does not fail by itself", () => {
     [],
     [],
     repoIndex([repo({ repo: "owner/repo", stars: 10, skillIds: [], skillCount: 0 })]),
+  );
+
+  assert.deepEqual(failures, []);
+});
+
+test("original skill author_handle must match id owner", () => {
+  const failures = validateCutoverOutputs(
+    [
+      skill("akash-network/node:setup-env", "akash-network/node", {
+        author_handle: "Akasxh",
+        provenance_type: "original",
+      }),
+    ],
+    [],
+    repoIndex([]),
+  );
+
+  assert.equal(failures.length, 1);
+  assert.equal(failures[0]?.kind, "originalAuthorHandleMismatch");
+  assert.equal(failures[0]?.id, "akash-network/node:setup-env");
+});
+
+test("original skill author_handle comparison is case-insensitive", () => {
+  const failures = validateCutoverOutputs(
+    [
+      skill("Akasxh/claude-forge:promote", "Akasxh/claude-forge", {
+        author_handle: "akasxh",
+        provenance_type: "original",
+      }),
+    ],
+    [],
+    repoIndex([]),
+  );
+
+  assert.deepEqual(failures, []);
+});
+
+test("non-original skill author_handle may differ from id owner", () => {
+  const failures = validateCutoverOutputs(
+    [
+      skill("0010capacity/CoHalo:skills/cohalo", "a7garden/CoHalo", {
+        author_handle: "a7garden",
+        provenance_type: "repackaged",
+      }),
+    ],
+    [],
+    repoIndex([]),
   );
 
   assert.deepEqual(failures, []);
