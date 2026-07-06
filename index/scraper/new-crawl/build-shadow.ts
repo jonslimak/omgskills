@@ -49,6 +49,7 @@ import {
   buildDailyPriorityRepos,
   buildNextPromotionCandidates,
   buildNextPromotionShortlist,
+  type DailyPriorityOptions,
   DAILY_PRIORITY_REPO_LIMIT,
   NEXT_PROMOTION_SHORTLIST_LIMIT,
 } from "./daily-priority.js";
@@ -698,7 +699,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     "## Enrichment",
     "",
-    `- Active daily priority hotset rule: official (12), gold basket (10), trusted vendor (8), stars fill to ${DAILY_PRIORITY_REPO_LIMIT}`,
+    `- Active daily priority hotset rule: official (12), gold basket (10), trusted vendor (8), creator watch (5 when enabled), stars fill to ${DAILY_PRIORITY_REPO_LIMIT}`,
     `- Cheap repos checked: ${report.enrichmentCounts.cheapReposChecked}`,
     `- Daily priority repos: ${report.enrichmentCounts.dailyPriorityRepoCount}`,
     `- Daily priority reasons: ${formatPriorityReasonCounts(report.priorityReasonCounts)}`,
@@ -940,6 +941,7 @@ function emptyPriorityReasonCounts(): PriorityReasonCounts {
     official: 0,
     goldBasket: 0,
     trustedVendor: 0,
+    creatorWatch: 0,
     stars: 0,
   };
 }
@@ -953,7 +955,16 @@ function emptyStaleReasonCounts(): ShadowStaleReasonCounts {
 }
 
 function formatPriorityReasonCounts(counts: PriorityReasonCounts): string {
-  return `official=${counts.official}, goldBasket=${counts.goldBasket}, trustedVendor=${counts.trustedVendor}, stars=${counts.stars}`;
+  return `official=${counts.official}, goldBasket=${counts.goldBasket}, trustedVendor=${counts.trustedVendor}, creatorWatch=${counts.creatorWatch}, stars=${counts.stars}`;
+}
+
+function buildCreatorWatchDailyPriorityOptions(seeds: TrustedSeeds): DailyPriorityOptions | undefined {
+  if (process.env.CRAWL4_CREATOR_WATCH !== "1") return undefined;
+  return {
+    creatorWatchEnabled: true,
+    watchedCreatorHandles: seeds.watchedCreatorHandles ?? new Set<string>(),
+    creatorAliasToCanonicalHandle: seeds.creatorAliasToCanonicalHandle,
+  };
 }
 
 export function shouldSuppressStableCheapRetry(
@@ -1096,7 +1107,11 @@ async function runShadowRefresh(
   }
 
   const hasFastLane = CADENCE_LANES[cadence].includes("fast");
-  const { repos: dailyPriorityRepos, reasonByRepo, skippedMonitoredRepoCount } = buildDailyPriorityRepos(repoIndex, discovered);
+  const { repos: dailyPriorityRepos, reasonByRepo, skippedMonitoredRepoCount } = buildDailyPriorityRepos(
+    repoIndex,
+    discovered,
+    buildCreatorWatchDailyPriorityOptions(loadTrustedSeeds()),
+  );
   const cheapCheckRepos = buildWeeklyCheapCheckRepos(cadence, repoIndex, dailyPriorityRepos);
 
   if (!hasFastLane) {
@@ -1893,7 +1908,11 @@ async function main() {
     .filter((repo) => discovered.get(repo)?.sources.has("creator-watch"))
     .sort()
     .slice(0, 10);
-  const dailyPrioritySelection = buildDailyPriorityRepos(repoIndex, discovered);
+  const dailyPrioritySelection = buildDailyPriorityRepos(
+    repoIndex,
+    discovered,
+    buildCreatorWatchDailyPriorityOptions(seeds),
+  );
   const catalogRepoSet = new Set(seeds.catalogRepoRules.map((rule) => rule.repo));
   const nextPromotionCandidates = onlyHighStarBackfill
     ? []

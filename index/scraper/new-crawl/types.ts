@@ -172,7 +172,7 @@ export type ShadowEnrichmentCounts = {
   staleInvalidCandidateCount: number;
 };
 
-export type PriorityReason = "official" | "trustedVendor" | "goldBasket" | "stars";
+export type PriorityReason = "official" | "trustedVendor" | "goldBasket" | "creatorWatch" | "stars";
 
 export type PriorityReasonCounts = Record<PriorityReason, number>;
 

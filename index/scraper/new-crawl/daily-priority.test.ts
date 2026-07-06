@@ -69,6 +69,7 @@ function countReasons(reasonByRepo: Map<string, PriorityReason>): PriorityReason
     official: 0,
     goldBasket: 0,
     trustedVendor: 0,
+    creatorWatch: 0,
     stars: 0,
   };
   for (const reason of reasonByRepo.values()) {
@@ -102,6 +103,7 @@ test("caps daily priority selection by bucket and total size", () => {
   assert.equal(counts.official, 12);
   assert.equal(counts.goldBasket, 10);
   assert.equal(counts.trustedVendor, 8);
+  assert.equal(counts.creatorWatch, 0);
   assert.equal(counts.stars, 10);
 });
 
@@ -186,8 +188,100 @@ test("priority reason counts and sample reasons stay valid for report output", (
   assert.equal(Object.values(counts).reduce((sum, value) => sum + value, 0), result.repos.length);
   for (const row of sample) {
     assert.ok(row.reason);
-    assert.ok(["official", "goldBasket", "trustedVendor", "stars"].includes(row.reason));
+    assert.ok(["official", "goldBasket", "trustedVendor", "creatorWatch", "stars"].includes(row.reason));
   }
+});
+
+test("creator-watch is disabled unless options enable it", () => {
+  const watched = repo({ repo: "watched/repo", stars: 1 });
+  const highStars = repo({ repo: "plain/high", stars: 100 });
+
+  const result = buildDailyPriorityRepos(
+    repoIndex([watched, highStars]),
+    new Map(),
+    { watchedCreatorHandles: new Set(["watched"]) },
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["plain/high", "watched/repo"]);
+  assert.equal(result.reasonByRepo.get("watched/repo"), "stars");
+});
+
+test("creator-watch selects monitored repos before stars fill", () => {
+  const watched = repo({ repo: "watched/repo", stars: 1, lastRefreshedAt: "2026-05-01T00:00:00Z" });
+  const highStars = repo({ repo: "plain/high", stars: 100, lastRefreshedAt: "2026-05-02T00:00:00Z" });
+
+  const result = buildDailyPriorityRepos(
+    repoIndex([highStars, watched]),
+    new Map(),
+    { creatorWatchEnabled: true, watchedCreatorHandles: new Set(["watched"]) },
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["watched/repo", "plain/high"]);
+  assert.equal(result.reasonByRepo.get("watched/repo"), "creatorWatch");
+  assert.equal(result.reasonByRepo.get("plain/high"), "stars");
+});
+
+test("creator-watch is capped and sorted by refresh age, stars, then repo", () => {
+  const repos = [
+    repo({ repo: "watched/newer", stars: 999, lastRefreshedAt: "2026-05-03T00:00:00Z" }),
+    repo({ repo: "watched/old-high", stars: 20, lastRefreshedAt: "2026-05-01T00:00:00Z" }),
+    repo({ repo: "watched/old-low", stars: 10, lastRefreshedAt: "2026-05-01T00:00:00Z" }),
+    repo({ repo: "watched/old-alpha", stars: 10, lastRefreshedAt: "2026-05-01T00:00:00Z" }),
+  ];
+
+  const result = buildDailyPriorityRepos(
+    repoIndex(repos),
+    new Map(),
+    {
+      creatorWatchEnabled: true,
+      watchedCreatorHandles: new Set(["watched"]),
+      creatorWatchCap: 3,
+    },
+  );
+
+  assert.deepEqual(
+    result.repos.slice(0, 3).map((row) => row.repo),
+    ["watched/old-high", "watched/old-alpha", "watched/old-low"],
+  );
+  assert.equal(result.reasonByRepo.get("watched/newer"), "stars");
+});
+
+test("earlier buckets keep priority over creator-watch", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "watched/official", stars: 1 }),
+      repo({ repo: "watched/gold", stars: 2, isGoldBasketRepo: true }),
+      repo({ repo: "watched/vendor", stars: 3, isTrustedVendor: true }),
+      repo({ repo: "watched/plain", stars: 4 }),
+    ]),
+    discovered("watched/official"),
+    { creatorWatchEnabled: true, watchedCreatorHandles: new Set(["watched"]) },
+  );
+
+  assert.equal(result.reasonByRepo.get("watched/official"), "official");
+  assert.equal(result.reasonByRepo.get("watched/gold"), "goldBasket");
+  assert.equal(result.reasonByRepo.get("watched/vendor"), "trustedVendor");
+  assert.equal(result.reasonByRepo.get("watched/plain"), "creatorWatch");
+});
+
+test("creator-watch matches owner aliases and ignores library repos", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "oldhandle/repo", stars: 1 }),
+      repo({ repo: "watched/library", stars: 100, state: "library" }),
+      repo({ repo: "plain/repo", stars: 50 }),
+    ]),
+    new Map(),
+    {
+      creatorWatchEnabled: true,
+      watchedCreatorHandles: new Set(["canonical"]),
+      creatorAliasToCanonicalHandle: new Map([["oldhandle", "canonical"]]),
+    },
+  );
+
+  assert.equal(result.reasonByRepo.get("oldhandle/repo"), "creatorWatch");
+  assert.equal(result.reasonByRepo.get("watched/library"), undefined);
+  assert.equal(result.reasonByRepo.get("plain/repo"), "stars");
 });
 
 test("already-selected daily repos are excluded from next promotion candidates", () => {

@@ -10,7 +10,8 @@ import type {
 } from "./types.js";
 
 export const DAILY_PRIORITY_REPO_LIMIT = 40;
-export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason, "stars">; cap: number }> = [
+export const CREATOR_WATCH_DAILY_PRIORITY_CAP = 5;
+export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason, "creatorWatch" | "stars">; cap: number }> = [
   { reason: "official", cap: 12 },
   { reason: "goldBasket", cap: 10 },
   { reason: "trustedVendor", cap: 8 },
@@ -38,6 +39,13 @@ export type DailyPrioritySelection = {
   skippedMonitoredRepoCount: number;
 };
 
+export type DailyPriorityOptions = {
+  creatorWatchEnabled?: boolean;
+  watchedCreatorHandles?: ReadonlySet<string>;
+  creatorAliasToCanonicalHandle?: ReadonlyMap<string, string>;
+  creatorWatchCap?: number;
+};
+
 export type NextPromotionCandidate = {
   repo: string;
   stars: number;
@@ -50,12 +58,36 @@ type ApplyShortlistPromotionsOptions = {
   shortlist: NextPromotionCandidate[];
 };
 
+function repoOwner(repo: string): string {
+  return repo.split("/")[0]?.toLowerCase() ?? "";
+}
+
+function buildWatchedOwnerSet(options: DailyPriorityOptions): Set<string> {
+  if (!options.creatorWatchEnabled) return new Set();
+
+  const watched = new Set([...(options.watchedCreatorHandles ?? [])].map((handle) => handle.toLowerCase()));
+  for (const [alias, canonical] of options.creatorAliasToCanonicalHandle ?? []) {
+    if (watched.has(canonical.toLowerCase())) {
+      watched.add(alias.toLowerCase());
+    }
+  }
+  return watched;
+}
+
+function compareCreatorWatchRepos(a: ShadowRepoIndexEntry, b: ShadowRepoIndexEntry): number {
+  const refreshDelta = (a.lastRefreshedAt ?? "").localeCompare(b.lastRefreshedAt ?? "");
+  if (refreshDelta !== 0) return refreshDelta;
+  return b.stars - a.stars || a.repo.localeCompare(b.repo);
+}
+
 export function buildDailyPriorityRepos(
   repoIndex: ShadowRepoIndex,
   discovered: Map<string, DailyPriorityDiscoveredRepo>,
+  options: DailyPriorityOptions = {},
 ): DailyPrioritySelection {
   const monitoredRepos = repoIndex.repos.filter((repo) => repo.state === "core" || repo.state === "rising");
   const monitoredByName = new Map(monitoredRepos.map((repo) => [repo.repo, repo]));
+  const watchedOwners = buildWatchedOwnerSet(options);
   const reasonByRepo = new Map<string, PriorityReason>();
   const selected: ShadowRepoIndexEntry[] = [];
   const selectedNames = new Set<string>();
@@ -85,12 +117,19 @@ export function buildDailyPriorityRepos(
     .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
 
   for (const bucket of DAILY_PRIORITY_BUCKET_CAPS) {
-    const reposByReason: Record<Exclude<PriorityReason, "stars">, ShadowRepoIndexEntry[]> = {
+    const reposByReason: Record<Exclude<PriorityReason, "creatorWatch" | "stars">, ShadowRepoIndexEntry[]> = {
       official: officialRepos,
       goldBasket: goldBasketRepos,
       trustedVendor: trustedVendorRepos,
     };
     pushRepos(reposByReason[bucket.reason].slice(0, bucket.cap), bucket.reason);
+  }
+
+  if (watchedOwners.size > 0) {
+    const creatorWatchRepos = monitoredRepos
+      .filter((repo) => watchedOwners.has(repoOwner(repo.repo)))
+      .sort(compareCreatorWatchRepos);
+    pushRepos(creatorWatchRepos.slice(0, options.creatorWatchCap ?? CREATOR_WATCH_DAILY_PRIORITY_CAP), "creatorWatch");
   }
 
   const remainingMonitoredRepos = monitoredRepos
