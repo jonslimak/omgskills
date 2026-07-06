@@ -52,14 +52,16 @@ Plan: [`web-library.md`](web-library.md)
 
 Why this early: SEO compounds with time — indexing takes months to ramp, and every month the pages don't exist is growth that doesn't come back. No client dependency, so it parallelizes with #2.
 
-## 4. Identity — exact resolution ladder + sha history index
+## 4. Identity — exact resolution ladder + sha history index ✅
 
 Plan: [`identity.md`](identity.md)
 
-- client: ladder steps 1–3 (install provenance, git inspection, content-hash match) — all exact, no UX
-- crawler: append-only `sha → skill id` index as a small manifest asset
-- measure what share of installed skills resolves before deciding on the fuzzy confirm-once UX
-- **sha index shape requirement** (crawl-audit finding): one sha maps to multiple skill IDs for ~24% of the library, so publish `sha → [ids]` (a list), with room for a `canonicalId` marker later. Client rule: unique match → resolved; multiple matches → "ambiguous", not a guess. Ambiguous count is free telemetry for prioritizing the canonical-attribution work (`crawl-audit.md` Phase 3.1)
+- shipped: client ladder steps 1–3 (install provenance, git inspection, content-hash match) — all exact, no UX
+- shipped: append-only `sha → [ids]` history index as a manifest asset, published to both v2 and Crawl 4
+- shipped: measurement counters for provenance, git, sha, ambiguous, and local-only resolution
+- verified: app installs now record provenance, the bundled app carries `shaHistory`, and local cache/metadata load it correctly
+- deferred: fuzzy confirm-once UX until measurements prove it is needed
+- deferred: canonical attribution can later add a `canonicalId` marker and upgrade ambiguous multi-ID hash matches
 
 Why before skill groups ship: groups are the first consumer. Resolution feeds `catalog_skill_id` on sync, so groups launch catalog-aware instead of full of unresolved rows.
 
