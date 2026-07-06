@@ -100,3 +100,64 @@ test("admission cap prioritizes highest-star new repos", () => {
   assert.deepEqual([...admitted].sort(), ["owner/a", "owner/b"]);
   assert.deepEqual(repoIndex.repos.map((repo) => repo.repo), ["owner/a", "owner/b"]);
 });
+
+test("creator-watch admission remains combined-only", () => {
+  const repoIndex: ShadowRepoIndex = {
+    generatedAt: "2026-06-23T00:00:00.000Z",
+    repoCount: 0,
+    repos: [],
+  };
+  const seeds: TrustedSeeds = {
+    trustedVendorHandles: new Set(),
+    trustedCreatorHandles: new Set(),
+    officialTier1Repos: new Set(),
+    officialTier2Repos: new Set(),
+    manualIncludeRepos: new Set(),
+    repoOverrides: [],
+    catalogRepoRules: [],
+    provenanceOverrides: [],
+  };
+  const discovered = new Map<string, any>([
+    [
+      "creator/low-star-skill",
+      {
+        repo: "creator/low-star-skill",
+        repoUrl: "https://github.com/creator/low-star-skill",
+        sources: new Set(["creator-watch"]),
+        lanes: new Set(["fast"]),
+        stars: 1,
+        bootstrapCandidate: {
+          source: "creator-watch",
+          id: "creator/low-star-skill",
+          skill_md_path: "SKILL.md",
+          github_url: "https://github.com/creator/low-star-skill",
+          stars: 1,
+        },
+      },
+    ],
+  ]);
+
+  const fastAdmitted = admitDiscoveredRepos(
+    "fast",
+    "2026-06-23T00:00:00.000Z",
+    repoIndex,
+    discovered,
+    new Set(),
+    seeds,
+  );
+
+  assert.deepEqual([...fastAdmitted], []);
+  assert.equal(repoIndex.repos.length, 0);
+
+  const combinedAdmitted = admitDiscoveredRepos(
+    "combined",
+    "2026-06-23T00:00:00.000Z",
+    repoIndex,
+    discovered,
+    new Set(),
+    seeds,
+  );
+
+  assert.deepEqual([...combinedAdmitted], ["creator/low-star-skill"]);
+  assert.equal(repoIndex.repos[0]?.state, "library");
+});

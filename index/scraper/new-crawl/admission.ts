@@ -26,7 +26,9 @@ export function passesLibraryAdmissionValueGate(
   sources: Set<string>,
 ): boolean {
   if (isDoNotCrawlRepo(repo, seeds)) return false;
-  const passesStars = stars >= LIBRARY_ADMISSION_MIN_STARS && !isKnownCatalogRepo(repo, seeds.catalogRepoRules);
+  const knownCatalogRepo = isKnownCatalogRepo(repo, seeds.catalogRepoRules);
+  const passesStars = stars >= LIBRARY_ADMISSION_MIN_STARS && !knownCatalogRepo;
+  const passesCreatorWatch = sources.has("creator-watch") && !knownCatalogRepo;
   return (
     seeds.manualIncludeRepos.has(repo) ||
     seeds.officialTier1Repos.has(repo) ||
@@ -34,6 +36,7 @@ export function passesLibraryAdmissionValueGate(
     sources.has("official") ||
     trust.isTrustedVendor ||
     trust.isGoldBasketRepo ||
+    passesCreatorWatch ||
     passesStars
   );
 }

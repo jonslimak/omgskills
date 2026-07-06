@@ -643,6 +643,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- High-star path-quality skipped: ${report.highStarPathQualitySkippedCount}`,
     `- Creator watch checked owners: ${report.creatorWatchCheckedOwnerCount ?? 0}`,
     `- Creator watch discovered repos: ${report.creatorWatchDiscoveredRepoCount ?? 0}`,
+    `- Creator watch admissions: ${report.creatorWatchAdmissionCount ?? 0}`,
     `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
     `- Official low-star skills: ${report.officialLowStarSkillCount}`,
@@ -687,6 +688,12 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     ...(report.creatorWatchNewRepoSample?.length
       ? report.creatorWatchNewRepoSample.map((repo) => `- ${repo}`)
+      : ["- none"]),
+    "",
+    "## Creator watch admission sample",
+    "",
+    ...(report.creatorWatchAdmissionSample?.length
+      ? report.creatorWatchAdmissionSample.map((repo) => `- ${repo}`)
       : ["- none"]),
     "",
     "## Enrichment",
@@ -1882,6 +1889,10 @@ async function main() {
     seeds,
     onlyHighStarBackfill ? { maxNewAdmissions: HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS } : {},
   );
+  const creatorWatchAdmissionSample = [...newlyAdmittedRepos]
+    .filter((repo) => discovered.get(repo)?.sources.has("creator-watch"))
+    .sort()
+    .slice(0, 10);
   const dailyPrioritySelection = buildDailyPriorityRepos(repoIndex, discovered);
   const catalogRepoSet = new Set(seeds.catalogRepoRules.map((rule) => rule.repo));
   const nextPromotionCandidates = onlyHighStarBackfill
@@ -2006,6 +2017,8 @@ async function main() {
     creatorWatchCheckedOwnerCount,
     creatorWatchDiscoveredRepoCount,
     creatorWatchNewRepoSample,
+    creatorWatchAdmissionCount: creatorWatchAdmissionSample.length,
+    creatorWatchAdmissionSample,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
     lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,

@@ -404,6 +404,8 @@ export type ShadowRunReport = {
   creatorWatchCheckedOwnerCount?: number;
   creatorWatchDiscoveredRepoCount?: number;
   creatorWatchNewRepoSample?: string[];
+  creatorWatchAdmissionCount?: number;
+  creatorWatchAdmissionSample?: string[];
   enrichmentCounts: ShadowEnrichmentCounts;
   lowStarValidSkillCount: number;
   lowStarValidSkillSample: string[];

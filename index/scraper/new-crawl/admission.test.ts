@@ -127,6 +127,21 @@ test("known catalog repo does not pass admission by stars alone", () => {
   );
 });
 
+test("known catalog repo does not pass admission through creator-watch", () => {
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      discoveredRepo({
+        repo: "sickn33/antigravity-awesome-skills",
+        stars: 1,
+        sources: new Set(["creator-watch"]),
+      }),
+      seeds({ catalogRepoRules: [{ repo: "sickn33/antigravity-awesome-skills", defaultProvenanceType: "catalog" }] }),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
+  );
+});
+
 test("do-not-crawl repo does not pass admission by manual include or stars", () => {
   const blockedSeeds = seeds({
     manualIncludeRepos: new Set(["davila7/claude-code-templates"]),
@@ -143,10 +158,52 @@ test("do-not-crawl repo does not pass admission by manual include or stars", () 
   );
 });
 
+test("do-not-crawl repo does not pass admission through creator-watch", () => {
+  const blockedSeeds = seeds({
+    doNotCrawlRepos: new Set(["blocked/repo"]),
+  });
+
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      discoveredRepo({ repo: "blocked/repo", stars: 1, sources: new Set(["creator-watch"]) }),
+      blockedSeeds,
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
+  );
+});
+
 test("low-value repo stays out and momentum alone does not admit", () => {
   assert.equal(
     isDiscoveredRepoAdmissionEligible(
       discoveredRepo({ repo: "small/repo", stars: LIBRARY_ADMISSION_MIN_STARS - 1, sources: new Set(["social"]) }),
+      seeds(),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
+  );
+});
+
+test("creator-watch source admits clean low-star repo", () => {
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      discoveredRepo({ repo: "creator/low-star-skill", stars: 1, sources: new Set(["creator-watch"]) }),
+      seeds(),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    true,
+  );
+});
+
+test("creator-watch source does not bypass clean mapping gate", () => {
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      discoveredRepo({
+        repo: "creator/low-star-skill",
+        stars: 1,
+        sources: new Set(["creator-watch"]),
+        bootstrapCandidate: undefined,
+      }),
       seeds(),
       { isTrustedVendor: false, isGoldBasketRepo: false },
     ),
