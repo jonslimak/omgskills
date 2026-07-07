@@ -33,7 +33,7 @@ const BOT_ACCOUNTS = new Set([
 export function buildVendorSet(basket: BasketSkillLike[] = []): Set<string> {
   return new Set([
     ...TRUSTED_VENDOR_SET,
-    ...basket.filter((skill) => skill.official_vendor).map((skill) => skill.author_handle),
+    ...basket.filter((skill) => skill.official_vendor && skill.author_handle.trim()).map((skill) => skill.author_handle.trim()),
   ]);
 }
 
@@ -47,17 +47,21 @@ export function buildAuthorProfiles(
   const basketCounts = new Map<string, number>();
 
   for (const skill of basket) {
-    basketCounts.set(skill.author_handle, (basketCounts.get(skill.author_handle) ?? 0) + 1);
+    const authorHandle = skill.author_handle.trim();
+    if (!authorHandle) continue;
+    basketCounts.set(authorHandle, (basketCounts.get(authorHandle) ?? 0) + 1);
   }
 
   const authorData = new Map<string, { skills: Skill[]; installs: number }>();
 
   for (const skill of skills) {
-    if (BOT_ACCOUNTS.has(skill.author_handle)) continue;
-    if (!authorData.has(skill.author_handle)) {
-      authorData.set(skill.author_handle, { skills: [], installs: 0 });
+    const authorHandle = skill.author_handle.trim();
+    if (!authorHandle) continue;
+    if (BOT_ACCOUNTS.has(authorHandle)) continue;
+    if (!authorData.has(authorHandle)) {
+      authorData.set(authorHandle, { skills: [], installs: 0 });
     }
-    const data = authorData.get(skill.author_handle)!;
+    const data = authorData.get(authorHandle)!;
     data.skills.push(skill);
     data.installs += trendMap.get(skill.id) ?? 0;
   }

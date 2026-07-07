@@ -124,10 +124,12 @@ function main() {
 
   const skillsByAuthor = new Map<string, Skill[]>();
   for (const skill of skills) {
-    if (!skillsByAuthor.has(skill.author_handle)) {
-      skillsByAuthor.set(skill.author_handle, []);
+    const authorHandle = skill.author_handle.trim();
+    if (!authorHandle) continue;
+    if (!skillsByAuthor.has(authorHandle)) {
+      skillsByAuthor.set(authorHandle, []);
     }
-    skillsByAuthor.get(skill.author_handle)!.push(skill);
+    skillsByAuthor.get(authorHandle)!.push(skill);
   }
 
   const authorSignals: AuthorSignal[] = authors.map((author) => {
@@ -158,6 +160,9 @@ function main() {
     }
   }
   for (const author of authorSignals) {
+    if (!author.authorHandle.trim()) {
+      throw new Error("author-signals contains an empty authorHandle");
+    }
     for (const skillId of author.topSkillIds) {
       if (!skillIdSet.has(skillId)) {
         throw new Error(`author-signals cross-link failure: ${author.authorHandle} -> ${skillId}`);
