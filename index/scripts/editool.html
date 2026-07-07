@@ -98,7 +98,7 @@
     <div class="bar">
       <input id="cr-newhandle" placeholder="add GitHub handle">
       <button id="cr-add" class="primary">Add creator</button>
-      <span class="muted">featured ⊆ watched is enforced. Featured toggles also sync collections.json featuredAuthors.</span>
+      <span class="muted">featured ⊆ watched is enforced. Featured creators publish from creators.json.</span>
       <span class="spacer"></span>
       <button id="cr-save" class="primary">Save creators.json</button>
     </div>
@@ -250,7 +250,7 @@ $("lib-rows").addEventListener("click", (e) => {
   }
   if (act === "feature") {
     const handle = btn.dataset.author;
-    if (!state.collections.featuredAuthors.some((h) => h.toLowerCase() === handle.toLowerCase())) {
+    if (!isFeaturedCreator(handle)) {
       return toast(`@${handle} is not a featured author — feature them on the Creators tab first`);
     }
     state.collections.authorOverrides = state.collections.authorOverrides ?? {};
@@ -290,9 +290,14 @@ $("lib-rows").addEventListener("click", (e) => {
 // ---------- collections ----------
 function renderCollections() {
   const src = state.collections;
-  const featured = src.featuredAuthors.map((h) => `<span class="badge featured">@${esc(h)}</span>`).join(" ");
-  const authorPanels = src.featuredAuthors.map((handle) => {
-    const o = (src.authorOverrides ?? {})[handle] ?? {};
+  const featuredCreators = state.creators.creators.filter((entry) => entry.featured);
+  const featured = featuredCreators.map((entry) => `<span class="badge featured">@${esc(entry.handle)}</span>`).join(" ");
+  const legacy = new Set((src.featuredAuthors ?? []).map((handle) => handle.toLowerCase()));
+  const registryFeatured = new Set(featuredCreators.map((entry) => entry.handle.toLowerCase()));
+  const legacyMismatch = [...legacy].filter((handle) => !registryFeatured.has(handle));
+  const authorPanels = featuredCreators.map((entry) => {
+    const handle = entry.handle;
+    const o = overrideFor(handle);
     const ids = o.featuredSkillIds ?? [];
     return `<div class="panel" data-author-panel="${esc(handle)}">
       <h3>@${esc(handle)} <span class="muted">author profile override</span></h3>
@@ -334,7 +339,9 @@ function renderCollections() {
     </div>`).join("");
 
   $("col-list").innerHTML = `<div class="panel"><h3>Featured authors</h3>${featured || '<span class="muted">none</span>'}
-    <div class="muted" style="margin-top:4px">Toggle on the Creators tab.</div></div>` + authorPanels + topicPanels;
+    <div class="muted" style="margin-top:4px">Toggle on the Creators tab. Legacy collections.json featuredAuthors is ignored by publish.</div>
+    ${legacyMismatch.length ? `<div class="badge warn">legacy mismatch: ${legacyMismatch.map(esc).join(", ")}</div>` : ""}
+    </div>` + authorPanels + topicPanels;
 }
 
 $("col-add").addEventListener("click", () => {
@@ -490,12 +497,12 @@ async function renderCreators() {
   $("cr-rows").innerHTML = rows.map((r, i) => {
     const s = stats[i]?.stats ?? {};
     const known = stats[i] !== null;
-    const effectiveFeatured = r.featured || state.collections.featuredAuthors.some((h) => h.toLowerCase() === r.handle.toLowerCase());
+    const legacyFeatured = state.collections.featuredAuthors.some((h) => h.toLowerCase() === r.handle.toLowerCase());
     return `<tr>
       <td><b class="clicklink" data-detail="${esc(r.handle)}">${esc(r.handle)}</b>${known ? "" : '<span class="badge warn">not in catalog</span>'}</td>
       <td>${(r.roles ?? []).map((x) => `<span class="badge ${esc(x)}">${esc(x)}</span>`).join("")}</td>
       <td><input type="checkbox" data-i="${i}" data-flag="watch" ${r.watch ? "checked" : ""}></td>
-      <td><input type="checkbox" data-i="${i}" data-flag="featured" ${effectiveFeatured ? "checked" : ""}>${!r.featured && effectiveFeatured ? '<span class="badge warn" title="featured in collections.json but not in the registry — re-toggle and save to reconcile">≠</span>' : ""}</td>
+      <td><input type="checkbox" data-i="${i}" data-flag="featured" ${r.featured ? "checked" : ""}>${!r.featured && legacyFeatured ? '<span class="badge warn" title="legacy featuredAuthors contains this handle, but publish now uses creators.json">legacy</span>' : ""}</td>
       <td>${s.skillCount ?? "—"}</td>
       <td>${(s.totalStars ?? 0).toLocaleString()}</td>
       <td>${s.goldBasketCount ?? 0}</td>
@@ -573,12 +580,11 @@ $("cr-rows").addEventListener("change", (e) => {
   const entry = state.creators.creators[i];
   if (e.target.dataset.flag === "watch") {
     entry.watch = e.target.checked;
-    if (!entry.watch && entry.featured) { entry.featured = false; syncFeaturedAuthors(entry.handle, false); toast("unfeatured too (featured requires watch)"); }
+    if (!entry.watch && entry.featured) { entry.featured = false; toast("unfeatured too (featured requires watch)"); }
   }
   if (e.target.dataset.flag === "featured") {
     entry.featured = e.target.checked;
     if (entry.featured) entry.watch = true;
-    syncFeaturedAuthors(entry.handle, entry.featured);
   }
   if (e.target.dataset.act === "notes") entry.notes = e.target.value || undefined;
   markDirty("creators"); renderCreators();
@@ -601,7 +607,6 @@ $("cr-rows").addEventListener("click", (e) => {
   if (btn.dataset.act === "remove") {
     const entry = state.creators.creators[i];
     if (!confirm(`Remove @${entry.handle} from the registry?`)) return;
-    if (entry.featured) syncFeaturedAuthors(entry.handle, false);
     state.creators.creators.splice(i, 1);
     markDirty("creators"); renderCreators();
   }
@@ -612,7 +617,9 @@ let detailHandle = null;
 
 function overrideFor(handle) {
   state.collections.authorOverrides = state.collections.authorOverrides ?? {};
-  const key = Object.keys(state.collections.authorOverrides).find((k) => k.toLowerCase() === handle.toLowerCase()) ?? handle;
+  const entry = registryEntryFor(handle);
+  const variants = [handle, ...(entry?.aliases ?? [])].map((value) => value.toLowerCase());
+  const key = Object.keys(state.collections.authorOverrides).find((k) => variants.includes(k.toLowerCase())) ?? handle;
   state.collections.authorOverrides[key] = state.collections.authorOverrides[key] ?? {};
   return state.collections.authorOverrides[key];
 }
@@ -624,14 +631,21 @@ async function openCreatorDetail(handle) {
 }
 
 function registryEntryFor(handle) {
-  return state.creators.creators.find((c) => c.handle.toLowerCase() === handle.toLowerCase()) ?? null;
+  const key = handle.toLowerCase();
+  return state.creators.creators.find((c) =>
+    c.handle.toLowerCase() === key || (c.aliases ?? []).some((alias) => alias.toLowerCase() === key)
+  ) ?? null;
+}
+
+function isFeaturedCreator(handle) {
+  return Boolean(registryEntryFor(handle)?.featured);
 }
 
 function renderCreatorDetail(data) {
   const handle = detailHandle;
   if (!handle) { $("cr-detail").innerHTML = ""; return; }
   const entry = registryEntryFor(handle);
-  const isFeatured = state.collections.featuredAuthors.some((h) => h.toLowerCase() === handle.toLowerCase());
+  const isFeatured = Boolean(entry?.featured);
   const featuredIds = overrideFor(handle).featuredSkillIds ?? [];
   const hints = [];
   if (!entry) hints.push('<span class="badge warn">not in registry — toggling below adds them</span>');
@@ -643,9 +657,8 @@ function renderCreatorDetail(data) {
       <button class="small" id="cr-detail-close" style="float:right">close</button></h3>
     <div class="bar">
       <label><input type="checkbox" id="cr-detail-watch" ${entry?.watch ? "checked" : ""}> watch creator</label>
-      <label><input type="checkbox" id="cr-detail-feature" ${entry?.featured || isFeatured ? "checked" : ""}> feature creator</label>
+      <label><input type="checkbox" id="cr-detail-feature" ${isFeatured ? "checked" : ""}> feature creator</label>
       <span class="muted">watch = crawler tracks their new repos · feature = public profile (implies watch)</span>
-      ${entry && !entry.featured && isFeatured ? '<span class="badge warn">registry says not featured but collections.json does — toggle off/on and save to reconcile</span>' : ""}
     </div>
     <table>
       <thead><tr><th style="width:6%">Feature</th><th style="width:44%">Skill</th><th>★</th><th>Provenance</th><th>Updated</th></tr></thead>
@@ -679,14 +692,13 @@ function renderCreatorDetail(data) {
   $("cr-detail-watch").addEventListener("change", (ev) => {
     const e = ensureEntry();
     e.watch = ev.target.checked;
-    if (!e.watch && e.featured) { e.featured = false; syncFeaturedAuthors(handle, false); toast("unfeatured too (featured requires watch)"); }
+    if (!e.watch && e.featured) { e.featured = false; toast("unfeatured too (featured requires watch)"); }
     markDirty("creators"); renderCreators(); renderCreatorDetail(data);
   });
   $("cr-detail-feature").addEventListener("change", (ev) => {
     const e = ensureEntry();
     e.featured = ev.target.checked;
     if (e.featured) e.watch = true;
-    syncFeaturedAuthors(handle, e.featured);
     markDirty("creators"); renderCreators(); renderCreatorDetail(data);
   });
   $("cr-detail").querySelectorAll("[data-featskill]").forEach((box) => {
@@ -700,15 +712,6 @@ function renderCreatorDetail(data) {
       openCreatorDetail(handle); // refresh counts/warnings
     });
   });
-}
-
-// keep collections.json featuredAuthors in sync with the registry featured flag
-function syncFeaturedAuthors(handle, featured) {
-  const list = state.collections.featuredAuthors;
-  const idx = list.findIndex((h) => h.toLowerCase() === handle.toLowerCase());
-  if (featured && idx === -1) { list.push(handle); markDirty("collections"); }
-  if (!featured && idx !== -1) { list.splice(idx, 1); markDirty("collections"); }
-  renderCollections();
 }
 
 $("cr-save").addEventListener("click", async () => {

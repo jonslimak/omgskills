@@ -47,6 +47,19 @@ type CollectionsSource = {
   collections: SourceCollection[];
 };
 
+type CreatorEntry = {
+  handle: string;
+  roles?: string[];
+  watch?: boolean;
+  featured?: boolean;
+  aliases?: string[];
+  notes?: string;
+};
+
+type CreatorRegistrySource = {
+  creators: CreatorEntry[];
+};
+
 type SkillCollection = {
   id: string;
   type: "author" | "topic";
@@ -69,6 +82,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const indexRoot = resolve(scriptDir, "..");
 const repoRoot = resolve(indexRoot, "..");
 const sourcePath = join(indexRoot, "curations", "collections.json");
+const creatorsPath = join(indexRoot, "seeds", "creators.json");
 const skillsPath = join(indexRoot, "skills.json");
 const dataTrackDirs = [
   join(repoRoot, "site", "data", "crawl4"),
@@ -80,8 +94,7 @@ function readJson<T>(path: string): T {
 }
 
 function fail(message: string): never {
-  console.error(`publish-collections: ${message}`);
-  process.exit(1);
+  throw new Error(message);
 }
 
 function sha256(data: Buffer): string {
@@ -100,9 +113,27 @@ function normalizeHandle(handle: string): string {
   return handle.trim().toLowerCase();
 }
 
-function topSkillsForAuthor(skills: Skill[], handle: string, limit: number): string[] {
+function handleVariants(entry: CreatorEntry): string[] {
+  return [entry.handle, ...(entry.aliases ?? [])].map((value) => value.trim()).filter(Boolean);
+}
+
+function findCatalogHandle(skills: Skill[], variants: string[]): string | null {
+  const wanted = new Set(variants.map(normalizeHandle));
+  const match = skills.find((skill) => wanted.has(normalizeHandle(skill.author_handle)));
+  return match?.author_handle ?? null;
+}
+
+function findAuthorOverride(source: CollectionsSource, variants: string[]): AuthorOverride {
+  const overrides = source.authorOverrides ?? {};
+  const wanted = new Set(variants.map(normalizeHandle));
+  const key = Object.keys(overrides).find((candidate) => wanted.has(normalizeHandle(candidate)));
+  return key ? (overrides[key] ?? {}) : {};
+}
+
+function topSkillsForAuthor(skills: Skill[], variants: string[], limit: number): string[] {
+  const wanted = new Set(variants.map(normalizeHandle));
   return skills
-    .filter((skill) => normalizeHandle(skill.author_handle) === normalizeHandle(handle))
+    .filter((skill) => wanted.has(normalizeHandle(skill.author_handle)))
     .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0) || a.id.localeCompare(b.id))
     .slice(0, limit)
     .map((skill) => skill.id);
@@ -116,9 +147,12 @@ function validateSkillIds(ids: string[], skillIds: Set<string>, context: string)
   }
 }
 
-function validateSource(source: CollectionsSource, skills: Skill[]): void {
+export function featuredCreatorEntries(registry: CreatorRegistrySource): CreatorEntry[] {
+  return registry.creators.filter((entry) => entry.featured);
+}
+
+export function validateSource(source: CollectionsSource, registry: CreatorRegistrySource, skills: Skill[]): void {
   const skillIds = new Set(skills.map((skill) => skill.id));
-  const authorHandles = new Set(skills.map((skill) => normalizeHandle(skill.author_handle)).filter(Boolean));
 
   if (!Array.isArray(source.featuredAuthors)) {
     fail("featuredAuthors must be an array");
@@ -127,13 +161,23 @@ function validateSource(source: CollectionsSource, skills: Skill[]): void {
     fail("collections must be an array");
   }
 
-  for (const handle of source.featuredAuthors) {
-    if (!authorHandles.has(normalizeHandle(handle))) {
-      fail(`unknown featured author handle: ${handle}`);
+  const featured = featuredCreatorEntries(registry);
+  if (featured.length === 0 && source.featuredAuthors.length > 0) {
+    fail("creators.json has zero featured creators while legacy collections.json.featuredAuthors is non-empty");
+  }
+
+  for (const entry of featured) {
+    if (!entry.watch) {
+      fail(`${entry.handle}: featured creator must also be watched`);
     }
-    const override = source.authorOverrides?.[handle];
-    if (override?.featuredSkillIds) {
-      validateSkillIds(override.featuredSkillIds, skillIds, `authorOverrides.${handle}.featuredSkillIds`);
+    const variants = handleVariants(entry);
+    const catalogHandle = findCatalogHandle(skills, variants);
+    if (!catalogHandle) {
+      fail(`${entry.handle}: featured creator not found as a catalog author`);
+    }
+    const override = findAuthorOverride(source, variants);
+    if (override.featuredSkillIds) {
+      validateSkillIds(override.featuredSkillIds, skillIds, `authorOverrides.${entry.handle}.featuredSkillIds`);
     }
   }
 
@@ -148,16 +192,18 @@ function validateSource(source: CollectionsSource, skills: Skill[]): void {
   }
 }
 
-function buildCollectionsAsset(source: CollectionsSource, skills: Skill[]): CollectionsAsset {
-  const authorCollections: SkillCollection[] = source.featuredAuthors.map((handle) => {
-    const override = source.authorOverrides?.[handle] ?? {};
-    const featuredSkillIds = override.featuredSkillIds ?? topSkillsForAuthor(skills, handle, 5);
+export function buildCollectionsAsset(source: CollectionsSource, registry: CreatorRegistrySource, skills: Skill[]): CollectionsAsset {
+  const authorCollections: SkillCollection[] = featuredCreatorEntries(registry).map((entry) => {
+    const variants = handleVariants(entry);
+    const catalogHandle = findCatalogHandle(skills, variants) ?? entry.handle;
+    const override = findAuthorOverride(source, variants);
+    const featuredSkillIds = override.featuredSkillIds ?? topSkillsForAuthor(skills, variants, 5);
     return {
-      id: `author-${normalizeHandle(handle)}`,
+      id: `author-${normalizeHandle(catalogHandle)}`,
       type: "author",
-      title: override.title ?? titleFromHandle(handle),
-      subtitle: override.subtitle ?? `Skills by @${handle}`,
-      authorHandle: handle,
+      title: override.title ?? titleFromHandle(catalogHandle),
+      subtitle: override.subtitle ?? `Skills by @${catalogHandle}`,
+      authorHandle: catalogHandle,
       imageUrl: override.imageUrl ?? null,
       featuredSkillIds,
       description: override.description ?? null,
@@ -192,12 +238,14 @@ function patchManifest(dataDir: string, asset: Asset): void {
 
 function main() {
   if (!existsSync(sourcePath)) fail(`missing ${sourcePath}`);
+  if (!existsSync(creatorsPath)) fail(`missing ${creatorsPath}`);
   if (!existsSync(skillsPath)) fail(`missing ${skillsPath}`);
 
   const source = readJson<CollectionsSource>(sourcePath);
+  const registry = readJson<CreatorRegistrySource>(creatorsPath);
   const skills = readJson<Skill[]>(skillsPath);
-  validateSource(source, skills);
-  const asset = buildCollectionsAsset(source, skills);
+  validateSource(source, registry, skills);
+  const asset = buildCollectionsAsset(source, registry, skills);
 
   for (const dataDir of dataTrackDirs) {
     const written = writeCollectionsAsset(dataDir, asset);
@@ -207,4 +255,11 @@ function main() {
   console.log(`published ${asset.collections.length} collections`);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  try {
+    main();
+  } catch (error) {
+    console.error(`publish-collections: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  }
+}

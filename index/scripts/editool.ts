@@ -201,6 +201,19 @@ function knownAuthorHandles(creators?: CreatorEntry[]): Set<string> {
   return handles;
 }
 
+function creatorVariants(entry: CreatorEntry): string[] {
+  return [entry.handle, ...(entry.aliases ?? [])].map((value) => value?.trim().toLowerCase()).filter(Boolean);
+}
+
+function featuredCreatorOverrideKeys(creators?: CreatorEntry[]): Set<string> {
+  const keys = new Set<string>();
+  for (const entry of creators ?? readJson<{ creators: CreatorEntry[] }>(paths.creators).creators) {
+    if (!entry.featured) continue;
+    for (const variant of creatorVariants(entry)) keys.add(variant);
+  }
+  return keys;
+}
+
 // ---------- validation ----------
 
 type CollectionsSource = {
@@ -232,12 +245,9 @@ function validateCollections(source: CollectionsSource): string[] {
   if (!Array.isArray(source.collections)) errors.push("collections must be an array");
   if (errors.length) return errors;
 
-  for (const handle of source.featuredAuthors) {
-    if (!knownAuthorHandles().has(handle.trim().toLowerCase())) {
-      errors.push(`unknown featured author handle: ${handle}`);
-    }
-  }
+  const featuredOverrideKeys = featuredCreatorOverrideKeys();
   for (const [handle, override] of Object.entries(source.authorOverrides ?? {})) {
+    if (!featuredOverrideKeys.has(handle.trim().toLowerCase())) continue;
     for (const id of override.featuredSkillIds ?? []) {
       if (!skillIdSet.has(id)) errors.push(`unknown skill id in authorOverrides.${handle}: ${id}`);
     }
