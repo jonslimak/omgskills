@@ -43,6 +43,7 @@
   .panel { background: #fff; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
   .panel h3 { margin: 0 0 8px; font-size: 14px; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  .proposal-samples { max-width: 360px; }
   footer { padding: 10px 16px; color: #888; font-size: 12px; }
 </style>
 </head>
@@ -101,6 +102,7 @@
       <span class="spacer"></span>
       <button id="cr-save" class="primary">Save creators.json</button>
     </div>
+    <div id="cr-proposals"></div>
     <div id="cr-detail"></div>
     <table>
       <thead><tr><th>Handle</th><th>Roles</th><th>Watch</th><th>Featured</th><th>Skills</th><th>★ total</th><th>Gold</th><th>Aliases</th><th>Notes</th><th></th></tr></thead>
@@ -412,7 +414,77 @@ $("col-list").addEventListener("click", (e) => {
 $("col-save").addEventListener("click", () => save("collections", "/api/save/collections", state.collections));
 
 // ---------- creators ----------
+function creatorHandleKeys() {
+  const keys = new Set();
+  for (const entry of state.creators.creators) {
+    if (entry.handle) keys.add(entry.handle.trim().toLowerCase());
+    for (const alias of entry.aliases ?? []) {
+      if (alias) keys.add(alias.trim().toLowerCase());
+    }
+  }
+  return keys;
+}
+
+function proposalNote(proposal, dismissedReason = "") {
+  const generatedAt = state.proposedCreators?.generatedAt ?? "unknown date";
+  const base = dismissedReason
+    ? `dismissed proposal — ${dismissedReason.trim()}`
+    : "accepted proposal";
+  return `${base}; proposed ${generatedAt}; score ${proposal.score}; ${proposal.reasons.join(", ")}`;
+}
+
+function proposalOwnerUrl(handle) {
+  return `https://github.com/${encodeURIComponent(handle)}`;
+}
+
+function proposalSkillUrl(id) {
+  const repo = String(id ?? "").split(":")[0];
+  return repo.includes("/") ? `https://github.com/${repo}` : "#";
+}
+
+function visibleProposals() {
+  const report = state.proposedCreators;
+  if (!report?.candidates?.length) return [];
+  const existing = creatorHandleKeys();
+  return report.candidates.filter((proposal) => !existing.has(proposal.handle.trim().toLowerCase()));
+}
+
+function renderCreatorProposals() {
+  const report = state.proposedCreators;
+  if (!report) {
+    $("cr-proposals").innerHTML = `<div class="panel"><h3>Proposals</h3><span class="muted">No proposed-creators.json found. Run <code>npm run content:proposed-creators</code>.</span></div>`;
+    return;
+  }
+
+  const ageDays = (Date.now() - Date.parse(report.generatedAt)) / 86400000;
+  const warning = Number.isFinite(ageDays) && ageDays > 10
+    ? `<span class="badge warn">stale ${ageDays.toFixed(0)}d</span>`
+    : "";
+  const rows = visibleProposals();
+  $("cr-proposals").innerHTML = `<div class="panel">
+    <h3>Proposals ${warning} <span class="muted">generated ${esc(report.generatedAt)} · ${rows.length} visible / ${report.candidateCount ?? report.candidates.length} total</span></h3>
+    ${rows.length ? `<table>
+      <thead><tr><th>Handle</th><th>Score</th><th>Reasons</th><th>Skills</th><th>Gold</th><th>★ total</th><th>Samples</th><th>Actions</th></tr></thead>
+      <tbody>${rows.map((p, i) => `<tr>
+        <td><b><a href="${proposalOwnerUrl(p.handle)}" target="_blank" rel="noreferrer">${esc(p.handle)}</a></b></td>
+        <td>${p.score}</td>
+        <td>${esc((p.reasons ?? []).join(", "))}</td>
+        <td>${p.skillCount ?? 0}</td>
+        <td>${p.goldBasketCount ?? 0}</td>
+        <td>${(p.totalStars ?? 0).toLocaleString()}</td>
+        <td class="proposal-samples">${(p.sampleSkillIds ?? []).map((id) => `<a class="muted" href="${proposalSkillUrl(id)}" target="_blank" rel="noreferrer">${esc(id)}</a>`).join("<br>")}</td>
+        <td>
+          <button class="small primary" data-proposal="${i}" data-act="add">Add watched</button>
+          <button class="small" data-proposal="${i}" data-act="dismiss">Dismiss</button>
+          <button class="small danger" data-proposal="${i}" data-act="block-owner">Block owner</button>
+        </td>
+      </tr>`).join("")}</tbody>
+    </table>` : '<span class="muted">No new proposals. Existing handles and aliases are hidden.</span>'}
+  </div>`;
+}
+
 async function renderCreators() {
+  renderCreatorProposals();
   const rows = state.creators.creators;
   const stats = await Promise.all(rows.map((r) => fetch("/api/author?handle=" + encodeURIComponent(r.handle)).then((x) => x.json())));
   $("cr-rows").innerHTML = rows.map((r, i) => {
@@ -437,10 +509,63 @@ async function renderCreators() {
 $("cr-add").addEventListener("click", () => {
   const handle = $("cr-newhandle").value.trim().replace(/^@/, "");
   if (!handle) return;
-  if (state.creators.creators.some((c) => c.handle.toLowerCase() === handle.toLowerCase())) return toast("already in registry");
+  if (creatorHandleKeys().has(handle.toLowerCase())) return toast("already in registry");
   state.creators.creators.push({ handle, roles: ["creator"], watch: true, featured: false });
   $("cr-newhandle").value = "";
   markDirty("creators"); renderCreators();
+});
+
+$("cr-proposals").addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  const proposal = visibleProposals()[Number(btn.dataset.proposal)];
+  if (!proposal) return;
+  const key = proposal.handle.trim().toLowerCase();
+  if (creatorHandleKeys().has(key)) return toast("already in registry");
+
+  if (btn.dataset.act === "add") {
+    state.creators.creators.push({
+      handle: proposal.handle,
+      roles: ["creator"],
+      watch: true,
+      featured: false,
+      notes: proposalNote(proposal),
+    });
+    markDirty("creators"); renderCreators(); toast(`staged @${proposal.handle} as watched`);
+  }
+
+  if (btn.dataset.act === "dismiss") {
+    const reason = prompt(`Dismiss @${proposal.handle}\nReason (optional):`, "");
+    state.creators.creators.push({
+      handle: proposal.handle,
+      roles: ["creator"],
+      watch: false,
+      featured: false,
+      notes: proposalNote(proposal, reason || "no reason given"),
+    });
+    markDirty("creators"); renderCreators(); toast(`dismissed @${proposal.handle}`);
+  }
+
+  if (btn.dataset.act === "block-owner") {
+    const reason = prompt(`Block owner ${proposal.handle}\nReason (required):`, "catalog");
+    if (!reason?.trim()) return;
+    if (state.doNotCrawl.owners.some((owner) => owner.owner.toLowerCase() === key)) return toast("owner already blocked");
+    state.doNotCrawl.owners.push({
+      owner: proposal.handle,
+      reason: reason.trim(),
+      notes: `blocked from proposal; proposed ${state.proposedCreators?.generatedAt ?? "unknown date"}; score ${proposal.score}; ${proposal.reasons.join(", ")}`,
+    });
+    if (!creatorHandleKeys().has(key)) {
+      state.creators.creators.push({
+        handle: proposal.handle,
+        roles: ["creator"],
+        watch: false,
+        featured: false,
+        notes: proposalNote(proposal, `blocked owner: ${reason.trim()}`),
+      });
+    }
+    markDirty("creators"); markDirty("removals"); renderCreators(); renderRemovals(); toast(`staged owner block for @${proposal.handle}`);
+  }
 });
 
 $("cr-rows").addEventListener("change", (e) => {

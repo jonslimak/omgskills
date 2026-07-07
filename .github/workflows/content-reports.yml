@@ -55,6 +55,7 @@ jobs:
         run: |
           npm run content:trending-leaderboard
           npm run content:author-leaderboards
+          npm run content:proposed-creators
           npm run content:leaderboard-view-data
 
       - name: Publish hosted app data
@@ -91,10 +92,10 @@ jobs:
         run: |
           git config user.name "omgskills-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- index/external-essentials.json index/gold-basket.json index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data/manifest.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json; then
+          if git diff --quiet -- index/external-essentials.json index/gold-basket.json index/proposed-creators.json index/proposed-creators.md index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data/manifest.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json; then
             echo "No content report changes"
           else
-            git add index/external-essentials.json index/gold-basket.json index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data/manifest.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json
+            git add index/external-essentials.json index/gold-basket.json index/proposed-creators.json index/proposed-creators.md index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data/manifest.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json
             git commit -m "content: update reports ($(date -u +%Y-%m-%d))"
             git pull --rebase --autostash origin main
             git push

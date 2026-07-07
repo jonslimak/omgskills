@@ -31,6 +31,7 @@
     "content:enrich-basket": "tsx scraper/content/enrich-gold-basket.ts",
     "content:overlays": "tsx scraper/content/build-overlays.ts",
     "content:author-leaderboards": "tsx scraper/content/build-author-leaderboards.ts",
+    "content:proposed-creators": "tsx scraper/content/build-proposed-creators.ts",
     "content:trending-leaderboard": "tsx scraper/content/build-trending-leaderboard.ts",
     "content:leaderboard-view-data": "tsx scraper/content/build-leaderboard-view-data.ts",
     "content:reports": "tsx scraper/content/build-content-reports.ts",

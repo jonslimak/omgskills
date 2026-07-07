@@ -21,6 +21,7 @@ const paths = {
   skills: join(indexRoot, "skills.json"),
   goldBasket: join(indexRoot, "gold-basket.json"),
   authorLeaderboards: join(indexRoot, "author-leaderboards.json"),
+  proposedCreators: join(indexRoot, "proposed-creators.json"),
   collections: join(indexRoot, "curations", "collections.json"),
   creators: join(indexRoot, "seeds", "creators.json"),
   suppressedSkills: join(indexRoot, "seeds", "suppressed-skills.json"),
@@ -53,12 +54,32 @@ type CreatorEntry = {
   notes?: string;
 };
 
+type ProposedCreatorsReport = {
+  generatedAt: string;
+  candidateCount: number;
+  candidates: {
+    handle: string;
+    suggestedAction: string;
+    score: number;
+    reasons: string[];
+    skillCount: number;
+    goldBasketCount: number;
+    totalStars: number;
+    totalInstalls: number;
+    sampleSkillIds: string[];
+  }[];
+};
+
 type SuppressedSkillEntry = { id: string; reason: string; stagedAt: string };
 type DoNotCrawlRepoEntry = { repo: string; reason: string; notes?: string };
 type DoNotCrawlOwnerEntry = { owner: string; reason: string; notes?: string };
 
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
+}
+
+function readOptionalJson<T>(path: string): T | null {
+  return existsSync(path) ? readJson<T>(path) : null;
 }
 
 function atomicWrite(path: string, content: string): void {
@@ -433,6 +454,7 @@ const server = createServer(async (req, res) => {
       sendJson(res, 200, {
         collections: readJson(paths.collections),
         creators: readJson(paths.creators),
+        proposedCreators: readOptionalJson<ProposedCreatorsReport>(paths.proposedCreators),
         suppressedSkills: readJson(paths.suppressedSkills),
         doNotCrawl: readJson(paths.doNotCrawl),
         v2Blocklists: readV2Blocklists(),
