@@ -21,10 +21,15 @@ interface AuthorLeaderboardRecord {
     totalStars: number;
     avgStars: number;
     bestSkill: { id: string; name: string; stars: number };
+    distinctRepoCount: number;
+    medianRepoStars: number;
+    bestRepoStars: number;
     totalInstalls: number;
     skillsWithInstalls: number;
     avgInstallsPerSkill: number;
     goldBasketCount: number;
+    editorialScore: number;
+    editorialScoreReasons: string[];
   };
   leaderboardCategories: Partial<Record<CategoryId, { rank: number; value: string; detail: string }>>;
 }
@@ -107,10 +112,15 @@ function main() {
         totalStars: author.totalStars,
         avgStars: author.avgStars,
         bestSkill: author.bestSkill,
+        distinctRepoCount: author.distinctRepoCount,
+        medianRepoStars: author.medianRepoStars,
+        bestRepoStars: author.bestRepoStars,
         totalInstalls: author.totalInstalls,
         skillsWithInstalls: author.skillsWithInstalls,
         avgInstallsPerSkill: author.avgInstallsPerSkill,
         goldBasketCount: author.goldBasketCount,
+        editorialScore: author.editorialScore,
+        editorialScoreReasons: author.editorialScoreReasons,
       },
     });
   }

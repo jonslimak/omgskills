@@ -92,6 +92,30 @@ test("author leaderboard evidence and output are deterministic", () => {
   assert.match(formatProposedCreatorsMarkdown(report), /`alpha` \| 21 \| 1k\+ total stars, 3\+ skills/);
 });
 
+test("buildProposedCreatorsReport prefers editorial score when available", () => {
+  const report = buildProposedCreatorsReport({
+    generatedAt: "2026-07-07T00:00:00Z",
+    registry: { creators: [] },
+    goldBasket: [],
+    authorLeaderboards: [
+      {
+        authorHandle: "editorial",
+        stats: {
+          skillCount: 1,
+          totalStars: 0,
+          editorialScore: 123,
+          editorialScoreReasons: ["gold + installs"],
+          bestSkill: { id: "editorial/repo:skill" },
+        },
+      },
+    ],
+  });
+
+  assert.equal(report.candidates[0]?.handle, "editorial");
+  assert.equal(report.candidates[0]?.score, 123);
+  assert.deepEqual(report.candidates[0]?.reasons, ["gold + installs"]);
+});
+
 test("recent Crawl 4 bootstrap evidence contributes a reason", () => {
   const report = buildProposedCreatorsReport({
     generatedAt: "2026-07-07T00:00:00Z",

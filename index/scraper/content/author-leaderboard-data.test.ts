@@ -35,3 +35,46 @@ test("buildAuthorProfiles skips empty author handles", () => {
   assert.equal(authors[0]?.totalStars, 10);
   assert.equal(authors[0]?.totalInstalls, 5);
 });
+
+test("buildAuthorProfiles computes editorial score from deduped repo-level signals", () => {
+  const authors = buildAuthorProfiles(
+    [
+      skill({
+        id: "bulk/a:first",
+        author_handle: "bulk",
+        stars: 10_000,
+        skill_md_sha: "same",
+      }),
+      skill({
+        id: "bulk/b:copy",
+        author_handle: "bulk",
+        stars: 10_000,
+        skill_md_sha: "same",
+      }),
+      skill({
+        id: "quality/tool:main",
+        author_handle: "quality",
+        stars: 800,
+        skill_md_sha: "quality",
+      }),
+    ],
+    [{ id: "quality/tool:main", installs: 12_000 }],
+    [{ author_handle: "quality" }],
+  );
+
+  const bulk = authors.find((author) => author.handle === "bulk");
+  const quality = authors.find((author) => author.handle === "quality");
+
+  assert.equal(bulk?.skillCount, 2);
+  assert.equal(bulk?.distinctRepoCount, 1);
+  assert.equal(bulk?.medianRepoStars, 10_000);
+  assert.equal(quality?.goldBasketCount, 1);
+  assert.equal(quality?.totalInstalls, 12_000);
+  assert.ok((quality?.editorialScore ?? 0) > (bulk?.editorialScore ?? 0));
+  assert.deepEqual(quality?.editorialScoreReasons, [
+    "1 gold-basket skill",
+    "10k+ installs",
+    "500+ best repo stars",
+    "100+ median repo stars",
+  ]);
+});

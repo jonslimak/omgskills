@@ -12,10 +12,15 @@ export interface AuthorProfile {
   totalStars: number;
   avgStars: number;
   bestSkill: { id: string; name: string; stars: number };
+  distinctRepoCount: number;
+  medianRepoStars: number;
+  bestRepoStars: number;
   totalInstalls: number;
   skillsWithInstalls: number;
   avgInstallsPerSkill: number;
   goldBasketCount: number;
+  editorialScore: number;
+  editorialScoreReasons: string[];
   isVendor: boolean;
 }
 
@@ -35,6 +40,91 @@ export function buildVendorSet(basket: BasketSkillLike[] = []): Set<string> {
     ...TRUSTED_VENDOR_SET,
     ...basket.filter((skill) => skill.official_vendor && skill.author_handle.trim()).map((skill) => skill.author_handle.trim()),
   ]);
+}
+
+function repoFromSkill(skill: Skill): string {
+  const fromId = skill.id.split(":")[0];
+  if (fromId.includes("/")) return fromId.toLowerCase();
+  try {
+    const url = new URL(skill.github_url);
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (parts.length >= 2) return `${parts[0]}/${parts[1]}`.toLowerCase();
+  } catch {
+    // fall through
+  }
+  return fromId.toLowerCase();
+}
+
+function median(values: number[]): number {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? Math.round((sorted[middle - 1] + sorted[middle]) / 2) : sorted[middle];
+}
+
+function dedupeForEditorialScore(skills: Skill[]): Skill[] {
+  const byKey = new Map<string, Skill>();
+  for (const skill of skills) {
+    const key = skill.skill_md_sha ? `sha:${skill.skill_md_sha}` : `id:${skill.id}`;
+    const existing = byKey.get(key);
+    if (!existing || skill.stars > existing.stars || (skill.stars === existing.stars && skill.id.localeCompare(existing.id) < 0)) {
+      byKey.set(key, skill);
+    }
+  }
+  return [...byKey.values()];
+}
+
+function editorialScore(input: {
+  goldBasketCount: number;
+  totalInstalls: number;
+  distinctRepoCount: number;
+  medianRepoStars: number;
+  bestRepoStars: number;
+}): { score: number; reasons: string[] } {
+  let score = 0;
+  const reasons: string[] = [];
+
+  if (input.goldBasketCount > 0) {
+    const points = 80 + input.goldBasketCount * 12;
+    score += points;
+    reasons.push(`${input.goldBasketCount} gold-basket skill${input.goldBasketCount === 1 ? "" : "s"}`);
+  }
+  if (input.totalInstalls >= 100_000) {
+    score += 45;
+    reasons.push("100k+ installs");
+  } else if (input.totalInstalls >= 10_000) {
+    score += 30;
+    reasons.push("10k+ installs");
+  } else if (input.totalInstalls >= 1_000) {
+    score += 15;
+    reasons.push("1k+ installs");
+  }
+  if (input.bestRepoStars >= 10_000) {
+    score += 25;
+    reasons.push("10k+ best repo stars");
+  } else if (input.bestRepoStars >= 1_000) {
+    score += 15;
+    reasons.push("1k+ best repo stars");
+  } else if (input.bestRepoStars >= 500) {
+    score += 8;
+    reasons.push("500+ best repo stars");
+  }
+  if (input.medianRepoStars >= 1_000) {
+    score += 20;
+    reasons.push("1k+ median repo stars");
+  } else if (input.medianRepoStars >= 100) {
+    score += 10;
+    reasons.push("100+ median repo stars");
+  }
+  if (input.distinctRepoCount >= 10) {
+    score += 12;
+    reasons.push("10+ distinct repos");
+  } else if (input.distinctRepoCount >= 3) {
+    score += 6;
+    reasons.push("3+ distinct repos");
+  }
+
+  return { score, reasons };
 }
 
 export function buildAuthorProfiles(
@@ -76,6 +166,24 @@ export function buildAuthorProfiles(
     const bestSkill = authorSkills.reduce((best, skill) => (skill.stars > best.stars ? skill : best), authorSkills[0]);
     const skillsWithInstalls = authorSkills.filter((skill) => (trendMap.get(skill.id) ?? 0) > 0).length;
     const avgInstallsPerSkill = authorSkills.length > 0 ? Math.round(data.installs / authorSkills.length) : 0;
+    const editorialSkills = dedupeForEditorialScore(authorSkills);
+    const repoStars = new Map<string, number>();
+    for (const skill of editorialSkills) {
+      const repo = repoFromSkill(skill);
+      repoStars.set(repo, Math.max(repoStars.get(repo) ?? 0, skill.stars));
+    }
+    const distinctRepoCount = repoStars.size;
+    const repoStarValues = [...repoStars.values()];
+    const medianRepoStars = median(repoStarValues);
+    const bestRepoStars = Math.max(0, ...repoStarValues);
+    const goldBasketCount = basketCounts.get(handle) ?? 0;
+    const score = editorialScore({
+      goldBasketCount,
+      totalInstalls: data.installs,
+      distinctRepoCount,
+      medianRepoStars,
+      bestRepoStars,
+    });
 
     authors.push({
       handle,
@@ -83,10 +191,15 @@ export function buildAuthorProfiles(
       totalStars,
       avgStars,
       bestSkill: { id: bestSkill.id, name: bestSkill.name, stars: bestSkill.stars },
+      distinctRepoCount,
+      medianRepoStars,
+      bestRepoStars,
       totalInstalls: data.installs,
       skillsWithInstalls,
       avgInstallsPerSkill,
-      goldBasketCount: basketCounts.get(handle) ?? 0,
+      goldBasketCount,
+      editorialScore: score.score,
+      editorialScoreReasons: score.reasons,
       isVendor: vendorSet.has(handle),
     });
   }
@@ -100,8 +213,8 @@ export function buildLeaderboardCategories(authors: AuthorProfile[]): Leaderboar
       id: "influential",
       title: "Most Influential",
       ranked: authors
-        .filter((author) => author.skillCount >= 3)
-        .sort((a, b) => b.totalStars - a.totalStars),
+        .filter((author) => author.editorialScore > 0)
+        .sort((a, b) => b.editorialScore - a.editorialScore || b.goldBasketCount - a.goldBasketCount || b.totalInstalls - a.totalInstalls),
     },
     {
       id: "most-used",

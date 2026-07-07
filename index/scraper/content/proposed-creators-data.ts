@@ -19,6 +19,8 @@ export type AuthorLeaderboardRowLike = {
     totalStars?: number;
     goldBasketCount?: number;
     totalInstalls?: number;
+    editorialScore?: number;
+    editorialScoreReasons?: string[];
     bestSkill?: { id?: string; name?: string; stars?: number };
   };
 };
@@ -165,13 +167,15 @@ export function buildProposedCreatorsReport(input: {
       stats.bestSkill?.id ?? "",
     ]).slice(0, 5);
 
-    const { score, reasons } = scoreCandidate({
+    const fallback = scoreCandidate({
       skillCount,
       goldBasketCount,
       totalStars,
       totalInstalls,
       hasRecentBootstrapEvidence: recentBootstrapHandles.has(handle),
     });
+    const score = typeof stats.editorialScore === "number" ? stats.editorialScore : fallback.score;
+    const reasons = stats.editorialScoreReasons?.length ? stats.editorialScoreReasons : fallback.reasons;
 
     if (score <= 0) continue;
     byHandle.set(handle, {
