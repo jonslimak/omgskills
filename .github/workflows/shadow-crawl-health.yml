@@ -127,6 +127,7 @@ jobs:
         run: node ./scripts/verify-live-manifest.mjs
 
       - name: Advisory rerun stability check
+        timeout-minutes: 20
         working-directory: index
         continue-on-error: true
         env:
