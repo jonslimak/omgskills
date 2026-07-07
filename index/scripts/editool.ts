@@ -1,5 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { execFileSync } from "node:child_process";
+import { randomBytes, timingSafeEqual } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,6 +14,7 @@ const indexRoot = resolve(scriptDir, "..");
 
 const PORT = Number(process.env.EDITOOL_PORT ?? 4980);
 const HOST = "127.0.0.1";
+const saveToken = randomBytes(24).toString("base64url");
 
 const paths = {
   html: join(scriptDir, "editool.html"),
@@ -167,6 +169,17 @@ const authorStats = new Map<string, AuthorStats>(
 );
 console.log(`editool: ${skills.length} skills, ${authorHandleSet.size} authors loaded`);
 
+function knownAuthorHandles(creators?: CreatorEntry[]): Set<string> {
+  const handles = new Set(authorHandleSet);
+  for (const entry of creators ?? readJson<{ creators: CreatorEntry[] }>(paths.creators).creators) {
+    const variants = [entry.handle, ...(entry.aliases ?? [])].map((value) => value?.trim().toLowerCase()).filter(Boolean);
+    if (variants.some((value) => authorHandleSet.has(value))) {
+      for (const value of variants) handles.add(value);
+    }
+  }
+  return handles;
+}
+
 // ---------- validation ----------
 
 type CollectionsSource = {
@@ -199,7 +212,7 @@ function validateCollections(source: CollectionsSource): string[] {
   if (errors.length) return errors;
 
   for (const handle of source.featuredAuthors) {
-    if (!authorHandleSet.has(handle.trim().toLowerCase())) {
+    if (!knownAuthorHandles().has(handle.trim().toLowerCase())) {
       errors.push(`unknown featured author handle: ${handle}`);
     }
   }
@@ -232,6 +245,8 @@ function validateCreators(source: { creators: CreatorEntry[] }): string[] {
   const errors: string[] = [];
   if (!Array.isArray(source.creators)) return ["creators must be an array"];
   const seen = new Set<string>();
+  const aliasOwners = new Map<string, string>();
+  const knownHandles = knownAuthorHandles(source.creators);
   for (const entry of source.creators) {
     const handle = entry.handle?.trim();
     if (!handle) {
@@ -241,8 +256,16 @@ function validateCreators(source: { creators: CreatorEntry[] }): string[] {
     const key = handle.toLowerCase();
     if (seen.has(key)) errors.push(`duplicate creator handle: ${handle}`);
     seen.add(key);
+    for (const alias of entry.aliases ?? []) {
+      const aliasKey = alias.trim().toLowerCase();
+      if (!aliasKey) continue;
+      const existing = aliasOwners.get(aliasKey);
+      if (existing && existing !== key) errors.push(`alias ${alias} belongs to both ${existing} and ${handle}`);
+      aliasOwners.set(aliasKey, key);
+      if (seen.has(aliasKey)) errors.push(`alias ${alias} duplicates a creator handle`);
+    }
     if (entry.featured && !entry.watch) errors.push(`${handle}: featured requires watch (featured ⊆ watched)`);
-    if (entry.featured && !authorHandleSet.has(key)) {
+    if (entry.featured && !knownHandles.has(key)) {
       errors.push(`${handle}: featured but not found as a catalog author`);
     }
   }
@@ -263,6 +286,7 @@ function validateRemovals(source: {
 
   for (const entry of suppressedSkills.skills) {
     if (!entry.id?.trim()) errors.push("suppressed skill with empty id");
+    else if (!skillIdSet.has(entry.id)) errors.push(`suppressed skill does not exist in library: ${entry.id}`);
     if (!entry.reason?.trim()) errors.push(`suppressed skill ${entry.id}: reason required`);
   }
   for (const entry of doNotCrawl.repos) {
@@ -337,6 +361,32 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.end(data);
 }
 
+function isLocalOrigin(origin: string | undefined): boolean {
+  if (!origin) return true;
+  try {
+    const parsed = new URL(origin);
+    return ["127.0.0.1", "localhost", "::1", "[::1]"].includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function hasValidSaveToken(req: IncomingMessage): boolean {
+  const header = req.headers["x-editool-token"];
+  const value = Array.isArray(header) ? header[0] : header;
+  if (!value) return false;
+  const expected = Buffer.from(saveToken);
+  const actual = Buffer.from(value);
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
+}
+
+function validateSaveRequest(req: IncomingMessage): string[] {
+  const errors: string[] = [];
+  if (!isLocalOrigin(req.headers.origin)) errors.push("save request rejected: non-local Origin");
+  if (!hasValidSaveToken(req)) errors.push("save request rejected: missing or invalid editool token");
+  return errors;
+}
+
 async function readBody(req: IncomingMessage): Promise<unknown> {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(chunk as Buffer);
@@ -348,7 +398,7 @@ const server = createServer(async (req, res) => {
   try {
     if (req.method === "GET" && url.pathname === "/") {
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-      res.end(readFileSync(paths.html, "utf8"));
+      res.end(readFileSync(paths.html, "utf8").replace("</head>", `<script>window.EDITOOL_TOKEN=${JSON.stringify(saveToken)};</script>\n</head>`));
       return;
     }
 
@@ -393,6 +443,8 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/save/collections") {
+      const requestErrors = validateSaveRequest(req);
+      if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as CollectionsSource;
       const errors = validateCollections(body);
       if (errors.length) return sendJson(res, 422, { ok: false, errors });
@@ -401,6 +453,8 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/save/creators") {
+      const requestErrors = validateSaveRequest(req);
+      if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as { creators: CreatorEntry[] };
       const errors = validateCreators(body);
       if (errors.length) return sendJson(res, 422, { ok: false, errors });
@@ -409,6 +463,8 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/save/removals") {
+      const requestErrors = validateSaveRequest(req);
+      if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as {
         suppressedSkills: { skills: SuppressedSkillEntry[] };
         doNotCrawl: { repos: DoNotCrawlRepoEntry[]; owners: DoNotCrawlOwnerEntry[] };

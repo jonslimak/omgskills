@@ -13,6 +13,9 @@ it writes the files directly.
   no hosting, no deploy.
 - **Tool writes files, operator publishes.** Edits save to the source JSON files
   with validation. Review, git commit, and publish stay manual — git remains the CMS.
+- **Save requests are guarded.** The server generates a startup token, injects it
+  into the local page, and requires it on save requests. Non-local `Origin`
+  headers are rejected.
 - **Includes removal actions.** Suppress skill / do-not-crawl entries are staged
   from the same tool (Phase 0 mechanisms from `audit-task.md`).
 - **Reads local index files.** What you browse is exactly what a publish would ship.
@@ -102,10 +105,16 @@ Two small tables so staged removals are visible and reviewable:
 - save button per view; writes are atomic (temp file + rename)
 - validation before write, reusing publish-script rules:
   - every skill ID referenced exists in the loaded library
+  - every suppressed skill ID exists in the loaded library
   - every featured handle exists as a catalog author (case-insensitive, alias-aware)
   - `featured ⊆ watch` in the registry
+  - creator aliases cannot be owned by multiple registry rows
   - collection ids are kebab-case and unique
+  - do-not-crawl repo targets are `owner/repo`, owner targets are bare handles,
+    and removal reasons are required
 - on validation failure: nothing is written, errors shown inline
+- save requests also require the page's `X-Editool-Token`; this is a local
+  browser guard, not a hosted auth system
 - the tool never commits, never publishes, never calls the network
 - footer shows `git status` of the three editable files as a reminder of
   unpublished edits

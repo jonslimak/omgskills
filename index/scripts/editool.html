@@ -643,7 +643,11 @@ $("rm-save").addEventListener("click", () =>
 // ---------- save ----------
 async function save(which, url, body) {
   showErrors(null);
-  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Editool-Token": window.EDITOOL_TOKEN ?? "" },
+    body: JSON.stringify(body),
+  });
   const out = await res.json();
   if (!out.ok) { showErrors(out.errors); toast("validation failed — nothing written"); return; }
   clearDirty(which);
