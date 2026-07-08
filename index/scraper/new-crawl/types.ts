@@ -206,6 +206,9 @@ export type RepoBootstrapCandidate = {
   stars?: number;
   last_updated?: string;
   tags?: string[];
+  skillsshBoard?: "all-time" | "trending" | "hot";
+  skillsshRank?: number;
+  skillsshInstalls?: number;
 };
 
 export type NextPromotionCandidateSample = {

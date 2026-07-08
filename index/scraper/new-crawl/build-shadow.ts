@@ -10,7 +10,7 @@ import { isHighStarBackfillPathAllowed, searchBySkillMdFilename, searchHighStarS
 import { searchAggregators } from "../sources/aggregators.js";
 import { searchSocial } from "../sources/social.js";
 import { searchRegistry } from "../sources/registry.js";
-import { searchSkillsSh } from "../sources/skillssh.js";
+import { searchSkillsSh, type SkillsShHit } from "../sources/skillssh.js";
 import { searchAwesomeAgentSkills } from "../sources/awesome.js";
 import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
@@ -1366,6 +1366,37 @@ async function timeSource<T>(
   }
 }
 
+type SkillsShBoard = "all-time" | "trending" | "hot";
+
+const PERIODIC_SKILLSSH_BOARDS: Array<{ board: SkillsShBoard; topLimit: number }> = [
+  { board: "all-time", topLimit: 1000 },
+  { board: "trending", topLimit: 500 },
+  { board: "hot", topLimit: 500 },
+];
+
+async function runPeriodicSkillsShSources(): Promise<Array<{ hits: SkillsShHit[]; summary: SourceRunSummary; warning: string | null }>> {
+  const runs: Array<{ hits: SkillsShHit[]; summary: SourceRunSummary; warning: string | null }> = [];
+  for (const { board, topLimit } of PERIODIC_SKILLSSH_BOARDS) {
+    const run = await timeSource("skillssh", "periodic", () =>
+      searchSkillsSh({
+        board,
+        topLimit,
+        minRepoStars: 50,
+        pageConcurrency: 1,
+        repoConcurrency: 8,
+      }),
+    );
+    runs.push({
+      ...run,
+      summary: {
+        ...run.summary,
+        source: `skillssh:${board}`,
+      },
+    });
+  }
+  return runs;
+}
+
 async function runDiscovery(
   cadence: ShadowCadence,
   repoIndex: ShadowRepoIndex,
@@ -1608,32 +1639,24 @@ async function runDiscovery(
     }
 
     if (lane === "periodic") {
-      const [skillsshRun, awesomeRun, registryRun] = await Promise.all([
-        timeSource("skillssh", "periodic", () =>
-          searchSkillsSh({
-            board: "all-time",
-            topLimit: 500,
-            minRepoStars: 50,
-            pageConcurrency: 1,
-            repoConcurrency: 8,
-          }),
-        ),
+      const [skillsshRuns, awesomeRun, registryRun] = await Promise.all([
+        runPeriodicSkillsShSources(),
         timeSource("awesome", "periodic", searchAwesomeAgentSkills),
         timeSource("registry", "periodic", searchRegistry),
       ]);
-      for (const result of [skillsshRun, awesomeRun, registryRun] as const) {
+      for (const result of [...skillsshRuns, awesomeRun, registryRun] as const) {
         sourceRuns.push(result.summary);
         for (const hit of result.hits) {
           const repoInfo = repoKeyFromGithubUrl(hit.github_url);
           addDiscoveredRepo(
             discovered,
             repoInfo,
-            result.summary.source as DiscoverySourceName,
+            result.summary.source.startsWith("skillssh:") ? "skillssh" : (result.summary.source as DiscoverySourceName),
             "periodic",
             observedStars(hit),
           );
           maybeSetBootstrapCandidate(discovered, repoInfo, {
-            source: result.summary.source as "skillssh" | "awesome" | "registry",
+            source: result.summary.source.startsWith("skillssh:") ? "skillssh" : (result.summary.source as "awesome" | "registry"),
             id: hit.id,
             skill_md_path: hit.path,
             skill_name_hint: "skill_name_hint" in hit ? hit.skill_name_hint : undefined,
@@ -1642,6 +1665,9 @@ async function runDiscovery(
             stars: "stars" in hit ? hit.stars : undefined,
             last_updated: "last_updated" in hit ? hit.last_updated : undefined,
             tags: "tags" in hit ? hit.tags : undefined,
+            skillsshBoard: "board" in hit ? hit.board : undefined,
+            skillsshRank: "trending_rank" in hit ? hit.trending_rank : undefined,
+            skillsshInstalls: "installs" in hit ? hit.installs : undefined,
           });
         }
       }

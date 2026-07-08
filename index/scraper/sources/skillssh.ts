@@ -9,6 +9,7 @@ export interface SkillsShHit {
   installs: number;
   trending_rank: number;
   trending_source: string;
+  board?: "all-time" | "trending" | "hot";
   stars?: number;
   last_updated?: string;
   tags?: string[];
@@ -193,6 +194,7 @@ export async function searchSkillsSh(options: SkillsShOptions = {}): Promise<Ski
       installs: entry.installs,
       trending_rank: index + 1,
       trending_source: "skills.sh",
+      board,
       stars: meta.stars,
       last_updated: meta.lastUpdated,
       tags: meta.tags,
