@@ -17,6 +17,7 @@ import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js"
 import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible, passesInstallAdmissionArm } from "./admission.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
+import { loadXSocialDiscoveryCandidates } from "./x-social-discovery.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
@@ -100,6 +101,7 @@ type DiscoverySourceName =
   | "code"
   | "high-star-skillmd"
   | "social"
+  | "x-social"
   | "aggregators"
   | "trusted-vendors"
   | "trusted-creators"
@@ -648,6 +650,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Creator watch discovered repos: ${report.creatorWatchDiscoveredRepoCount ?? 0}`,
     `- Creator watch admissions: ${report.creatorWatchAdmissionCount ?? 0}`,
     `- Install-arm admissions: ${report.installArmAdmissionCount ?? 0}`,
+    `- X discovery candidates: ${report.xDiscoveryCandidateCount ?? 0}`,
     `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
     `- Official low-star skills: ${report.officialLowStarSkillCount}`,
@@ -706,6 +709,12 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
       ? report.installArmAdmissionSample.map((row) =>
           `- ${row.repo} (${row.board ?? "?"} rank=${row.rank ?? "?"}, installs=${row.installs ?? "?"})`,
         )
+      : ["- none"]),
+    "",
+    "## X discovery candidate sample",
+    "",
+    ...(report.xDiscoveryCandidateSample?.length
+      ? report.xDiscoveryCandidateSample.map((repo) => `- ${repo}`)
       : ["- none"]),
     "",
     "## Enrichment",
@@ -1463,6 +1472,8 @@ async function runDiscovery(
   creatorWatchCheckedOwnerCount: number;
   creatorWatchDiscoveredRepoCount: number;
   creatorWatchNewRepoSample: string[];
+  xDiscoveryCandidateCount: number;
+  xDiscoveryCandidateSample: string[];
 }> {
   const lanes = CADENCE_LANES[cadence];
   const sourceRuns: SourceRunSummary[] = [];
@@ -1489,6 +1500,8 @@ async function runDiscovery(
   let creatorWatchCheckedOwnerCount = 0;
   let creatorWatchDiscoveredRepoCount = 0;
   const creatorWatchNewRepoSample: string[] = [];
+  let xDiscoveryCandidateCount = 0;
+  const xDiscoveryCandidateSample: string[] = [];
   const shouldRunScheduledHighStarSkillMdDiscovery = shouldRunWeeklyHighStarSkillMdDiscovery(checkedAt);
   const runHighStarSkillMdDiscovery = shouldRunScheduledHighStarSkillMdDiscovery || forceHighStarSkillMd;
   if (forceHighStarSkillMd && !shouldRunScheduledHighStarSkillMdDiscovery) {
@@ -1592,6 +1605,8 @@ async function runDiscovery(
       creatorWatchCheckedOwnerCount,
       creatorWatchDiscoveredRepoCount,
       creatorWatchNewRepoSample,
+      xDiscoveryCandidateCount,
+      xDiscoveryCandidateSample,
     };
   }
 
@@ -1826,6 +1841,23 @@ async function runDiscovery(
         }
       }
     }
+
+    const xStartedAt = performance.now();
+    const xResult = loadXSocialDiscoveryCandidates(join(indexRoot, "top-x-skill-tweets.json"));
+    sourceRuns.push({
+      source: "x-social",
+      lane: "background",
+      hitCount: xResult.candidates.length,
+      durationMs: Math.round(performance.now() - xStartedAt),
+    });
+    if (xResult.warning) partialDiscoveryWarnings.push(xResult.warning);
+    xDiscoveryCandidateCount = xResult.candidates.length;
+    for (const hit of xResult.candidates) {
+      const repoInfo = { repo: hit.repo, repoUrl: hit.repoUrl };
+      addDiscoveredRepo(discovered, repoInfo, "x-social", "background", hit.stars);
+      maybeSetBootstrapCandidate(discovered, repoInfo, hit.candidate);
+      if (xDiscoveryCandidateSample.length < 10) xDiscoveryCandidateSample.push(hit.repo);
+    }
   }
 
   return {
@@ -1839,6 +1871,8 @@ async function runDiscovery(
     creatorWatchCheckedOwnerCount,
     creatorWatchDiscoveredRepoCount,
     creatorWatchNewRepoSample,
+    xDiscoveryCandidateCount,
+    xDiscoveryCandidateSample,
   };
 }
 
@@ -1948,6 +1982,8 @@ async function main() {
     creatorWatchCheckedOwnerCount,
     creatorWatchDiscoveredRepoCount,
     creatorWatchNewRepoSample,
+    xDiscoveryCandidateCount,
+    xDiscoveryCandidateSample,
   } =
     await runDiscovery(
       cadence,
@@ -2129,6 +2165,8 @@ async function main() {
     creatorWatchAdmissionSample,
     installArmAdmissionCount: installArmAdmissionSample.length,
     installArmAdmissionSample,
+    xDiscoveryCandidateCount,
+    xDiscoveryCandidateSample,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
     lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,

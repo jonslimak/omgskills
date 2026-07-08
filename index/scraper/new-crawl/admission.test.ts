@@ -362,6 +362,66 @@ test("creator-watch source does not bypass clean mapping gate", () => {
   );
 });
 
+test("x-social source admits clean low-star repo", () => {
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      discoveredRepo({
+        repo: "x/low-star-skill",
+        stars: 1,
+        sources: new Set(["x-social"]),
+        bootstrapCandidate: {
+          source: "x-social",
+          id: "x/low-star-skill:skill",
+          skill_md_path: "skills/x/SKILL.md",
+          github_url: "https://github.com/x/low-star-skill",
+        },
+      }),
+      seeds(),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    true,
+  );
+});
+
+test("x-social source does not bypass clean mapping catalog or do-not-crawl gates", () => {
+  const repo = discoveredRepo({
+    repo: "x/blocked-skill",
+    stars: 1,
+    sources: new Set(["x-social"]),
+    bootstrapCandidate: {
+      source: "x-social",
+      id: "x/blocked-skill:skill",
+      skill_md_path: "skills/x/SKILL.md",
+      github_url: "https://github.com/x/blocked-skill",
+    },
+  });
+
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      { ...repo, bootstrapCandidate: undefined },
+      seeds(),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
+  );
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      repo,
+      seeds({ catalogRepoRules: [{ repo: repo.repo, defaultProvenanceType: "catalog" }] }),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
+  );
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      repo,
+      seeds({ doNotCrawlRepos: new Set([repo.repo]) }),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
+  );
+});
+
 test("admitted repo entry starts as library", () => {
   const entry = createAdmittedLibraryRepoEntry(
     discoveredRepo({ repo: "owner/repo", stars: LIBRARY_ADMISSION_MIN_STARS, sources: new Set(["registry"]) }),

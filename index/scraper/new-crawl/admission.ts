@@ -55,6 +55,7 @@ export function passesLibraryAdmissionValueGate(
   const knownCatalogRepo = isKnownCatalogRepo(repo, seeds.catalogRepoRules);
   const passesStars = stars >= LIBRARY_ADMISSION_MIN_STARS && !knownCatalogRepo;
   const passesCreatorWatch = sources.has("creator-watch") && !knownCatalogRepo;
+  const passesXSocial = sources.has("x-social") && !knownCatalogRepo;
   return (
     seeds.manualIncludeRepos.has(repo) ||
     seeds.officialTier1Repos.has(repo) ||
@@ -63,6 +64,7 @@ export function passesLibraryAdmissionValueGate(
     trust.isTrustedVendor ||
     trust.isGoldBasketRepo ||
     passesCreatorWatch ||
+    passesXSocial ||
     passesStars
   );
 }

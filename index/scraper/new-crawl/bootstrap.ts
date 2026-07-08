@@ -8,7 +8,8 @@ const BOOTSTRAP_SOURCE_PRIORITY: Record<BootstrapSource, number> = {
   awesome: 2,
   registry: 3,
   "creator-watch": 4,
-  code: 5,
+  "x-social": 5,
+  code: 6,
 };
 
 export function repairDeadPersistedRisingSkillLinks(
@@ -53,6 +54,7 @@ export function isBootstrapEligibleCandidate(candidate: RepoBootstrapCandidate):
   if (candidate.source === "official") return candidate.skill_md_path !== "__RESOLVE__";
   if (candidate.source === "skillssh" || candidate.source === "awesome") return candidate.skill_md_path !== "__RESOLVE__";
   if (candidate.source === "creator-watch") return candidate.skill_md_path !== "__RESOLVE__";
+  if (candidate.source === "x-social") return candidate.skill_md_path !== "__RESOLVE__";
   return false;
 }
 

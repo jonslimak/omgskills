@@ -139,6 +139,21 @@ test("creator-watch candidates with concrete paths are eligible for bootstrap", 
   );
 });
 
+test("x-social candidates with concrete paths are eligible for bootstrap", () => {
+  assert.equal(
+    isBootstrapEligibleCandidate(
+      candidate({ source: "x-social", id: "repo:skill", skill_md_path: "skills/x/SKILL.md", github_url: "https://github.com/repo" }),
+    ),
+    true,
+  );
+  assert.equal(
+    isBootstrapEligibleCandidate(
+      candidate({ source: "x-social", id: "repo:skill", skill_md_path: "__RESOLVE__", github_url: "https://github.com/repo" }),
+    ),
+    false,
+  );
+});
+
 test("bootstraps empty-skill rising repo on combined", async () => {
   const index = repoIndex([repo({ repo: "owner/repo", stars: 0 })]);
   const enrich = async (): Promise<EnrichResult> => ({ skill: skill("owner/repo:bootstrapped") });
