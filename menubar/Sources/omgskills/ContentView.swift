@@ -728,7 +728,6 @@ struct ContentView: View {
                         .foregroundStyle(.tertiary)
                     HStack(alignment: .top, spacing: 8) {
                         trendingStarterButton("Twitter / X", icon: "chart.line.uptrend.xyaxis", action: showTwitterSkills)
-                        trendingStarterButton("Skills.sh", icon: "triangle", action: showTrendingSkills)
                     }
                 }
 

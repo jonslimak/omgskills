@@ -640,11 +640,10 @@ enum DataRefreshService {
     }
 
     private static func bootstrapState(metadata: Metadata, track: LibraryDataTrack) -> BootstrapState {
-        let expectsTrending = track == .productionV2 ? bundledManifest()?.trending != nil : true
         return BootstrapState(
             hasSkillsCache: cachedData(for: .skills, track: track) != nil,
             hasActiveSkillsHash: metadata.activeSkillsHash != nil,
-            expectsTrending: expectsTrending,
+            expectsTrending: false,
             hasTrendingCache: cachedData(for: .trending, track: track) != nil,
             hasActiveTrendingHash: metadata.activeTrendingHash != nil
         )

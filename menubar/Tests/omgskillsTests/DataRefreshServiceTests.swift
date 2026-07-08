@@ -314,6 +314,22 @@ struct DataRefreshServiceTests {
         ) == false)
     }
 
+    @Test func missingTrendingStateDoesNotBypassThrottleWhenTrendingIsSoftRetired() {
+        let state = DataRefreshService.BootstrapState(
+            hasSkillsCache: true,
+            hasActiveSkillsHash: true,
+            expectsTrending: false,
+            hasTrendingCache: false,
+            hasActiveTrendingHash: false
+        )
+
+        #expect(DataRefreshService.shouldThrottleRefresh(
+            lastCheckedAt: 1_000,
+            now: 2_000,
+            bootstrapState: state
+        ) == true)
+    }
+
     @Test func hydratedStateHonorsThrottleWindow() {
         let state = DataRefreshService.BootstrapState(
             hasSkillsCache: true,
