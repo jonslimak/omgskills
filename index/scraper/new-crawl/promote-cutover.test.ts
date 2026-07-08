@@ -101,7 +101,7 @@ function shadowReport(cutoverValidationPassed: boolean): ShadowRunReport {
     staleInvalidCandidatesSample: [],
     skillFileMissingSample: [],
     staleReasonCounts: { repoMissing: 0, skillFileMissing: 0, validationFailed: 0 },
-    priorityReasonCounts: { official: 0, trustedVendor: 0, goldBasket: 0, creatorWatch: 0, stars: 0 },
+    priorityReasonCounts: { official: 0, trustedVendor: 0, goldBasket: 0, creatorWatch: 0, momentum: 0, stars: 0 },
     dailyPriorityRepoSample: [],
     skippedMonitoredRepoCount: 0,
     nextPromotionCandidateCount: 0,

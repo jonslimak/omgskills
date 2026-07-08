@@ -19,7 +19,7 @@ import { loadTrustedSeeds } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
 import { resolveShadowProvenance } from "./provenance.js";
-import { buildMomentumSignals } from "./momentum.js";
+import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
 import { buildCandidateFromSkill } from "./candidate-path.js";
 import { bootstrapRisingRepos, removeFailedNewlyAdmittedRepos, repairDeadPersistedRisingSkillLinks, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
 import { assertGitHubQuotaAvailable } from "./github-quota-guard.js";
@@ -975,6 +975,7 @@ function emptyPriorityReasonCounts(): PriorityReasonCounts {
     goldBasket: 0,
     trustedVendor: 0,
     creatorWatch: 0,
+    momentum: 0,
     stars: 0,
   };
 }
@@ -988,7 +989,7 @@ function emptyStaleReasonCounts(): ShadowStaleReasonCounts {
 }
 
 function formatPriorityReasonCounts(counts: PriorityReasonCounts): string {
-  return `official=${counts.official}, goldBasket=${counts.goldBasket}, trustedVendor=${counts.trustedVendor}, creatorWatch=${counts.creatorWatch}, stars=${counts.stars}`;
+  return `official=${counts.official}, goldBasket=${counts.goldBasket}, trustedVendor=${counts.trustedVendor}, creatorWatch=${counts.creatorWatch}, momentum=${counts.momentum}, stars=${counts.stars}`;
 }
 
 function buildCreatorWatchDailyPriorityOptions(seeds: TrustedSeeds): DailyPriorityOptions | undefined {
@@ -998,6 +999,18 @@ function buildCreatorWatchDailyPriorityOptions(seeds: TrustedSeeds): DailyPriori
     watchedCreatorHandles: seeds.watchedCreatorHandles ?? new Set<string>(),
     creatorAliasToCanonicalHandle: seeds.creatorAliasToCanonicalHandle,
   };
+}
+
+function buildMomentumDailyPriorityOptions(momentumByRepo: Map<string, Set<MomentumSource>>): DailyPriorityOptions | undefined {
+  if (process.env.CRAWL4_MOMENTUM_PRIORITY !== "1") return undefined;
+  return {
+    momentumEnabled: true,
+    momentumByRepo,
+  };
+}
+
+function mergeDailyPriorityOptions(...options: Array<DailyPriorityOptions | undefined>): DailyPriorityOptions {
+  return Object.assign({}, ...options.filter(Boolean));
 }
 
 export function shouldSuppressStableCheapRetry(
@@ -1143,7 +1156,10 @@ async function runShadowRefresh(
   const { repos: dailyPriorityRepos, reasonByRepo, skippedMonitoredRepoCount } = buildDailyPriorityRepos(
     repoIndex,
     discovered,
-    buildCreatorWatchDailyPriorityOptions(loadTrustedSeeds()),
+    mergeDailyPriorityOptions(
+      buildCreatorWatchDailyPriorityOptions(loadTrustedSeeds()),
+      buildMomentumDailyPriorityOptions(buildMomentumSignals(discovered, join(indexRoot, "top-x-skill-tweets.json")).momentumByRepo),
+    ),
   );
   const cheapCheckRepos = buildWeeklyCheapCheckRepos(cadence, repoIndex, dailyPriorityRepos);
 
@@ -1949,7 +1965,6 @@ async function main() {
     discovered,
     join(indexRoot, "top-x-skill-tweets.json"),
   );
-  void momentumByRepo;
   const combinedDiscoveryWarnings = momentumWarning
     ? [...partialDiscoveryWarnings, momentumWarning]
     : partialDiscoveryWarnings;
@@ -1975,12 +1990,21 @@ async function main() {
   const dailyPrioritySelection = buildDailyPriorityRepos(
     repoIndex,
     discovered,
-    buildCreatorWatchDailyPriorityOptions(seeds),
+    mergeDailyPriorityOptions(
+      buildCreatorWatchDailyPriorityOptions(seeds),
+      buildMomentumDailyPriorityOptions(momentumByRepo),
+    ),
   );
   const catalogRepoSet = new Set(seeds.catalogRepoRules.map((rule) => rule.repo));
   const nextPromotionCandidates = onlyHighStarBackfill
     ? []
-    : buildNextPromotionCandidates(repoIndex, discovered, dailyPrioritySelection.repos, catalogRepoSet);
+    : buildNextPromotionCandidates(
+        repoIndex,
+        discovered,
+        dailyPrioritySelection.repos,
+        catalogRepoSet,
+        process.env.CRAWL4_MOMENTUM_PRIORITY === "1" ? momentumByRepo : undefined,
+      );
   const nextPromotionShortlist = onlyHighStarBackfill ? [] : buildNextPromotionShortlist(nextPromotionCandidates);
   const promotedRepoSample = onlyHighStarBackfill
     ? []

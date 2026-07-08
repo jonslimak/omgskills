@@ -183,7 +183,7 @@ export type ShadowEnrichmentCounts = {
   staleInvalidCandidateCount: number;
 };
 
-export type PriorityReason = "official" | "trustedVendor" | "goldBasket" | "creatorWatch" | "stars";
+export type PriorityReason = "official" | "trustedVendor" | "goldBasket" | "creatorWatch" | "momentum" | "stars";
 
 export type PriorityReasonCounts = Record<PriorityReason, number>;
 
@@ -192,7 +192,7 @@ export type DailyPriorityRepoSample = {
   reason: PriorityReason;
 };
 
-export type NextPromotionCandidateReason = "trustedVendor" | "goldBasket" | "periodic" | "background";
+export type NextPromotionCandidateReason = "trustedVendor" | "goldBasket" | "momentum" | "periodic" | "background";
 
 export type BootstrapSource = "official" | "skillssh" | "awesome" | "registry" | "code" | "creator-watch";
 

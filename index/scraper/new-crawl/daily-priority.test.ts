@@ -6,6 +6,7 @@ import {
   buildNextPromotionCandidates,
   buildNextPromotionShortlist,
   DAILY_PRIORITY_REPO_LIMIT,
+  MOMENTUM_PROMOTION_MIN_STARS,
   NEXT_PROMOTION_SHORTLIST_LIMIT,
   PERIODIC_PROMOTION_MIN_STARS,
   SHORTLIST_PROMOTION_LIMIT,
@@ -70,6 +71,7 @@ function countReasons(reasonByRepo: Map<string, PriorityReason>): PriorityReason
     goldBasket: 0,
     trustedVendor: 0,
     creatorWatch: 0,
+    momentum: 0,
     stars: 0,
   };
   for (const reason of reasonByRepo.values()) {
@@ -104,6 +106,7 @@ test("caps daily priority selection by bucket and total size", () => {
   assert.equal(counts.goldBasket, 10);
   assert.equal(counts.trustedVendor, 8);
   assert.equal(counts.creatorWatch, 0);
+  assert.equal(counts.momentum, 0);
   assert.equal(counts.stars, 10);
 });
 
@@ -188,7 +191,7 @@ test("priority reason counts and sample reasons stay valid for report output", (
   assert.equal(Object.values(counts).reduce((sum, value) => sum + value, 0), result.repos.length);
   for (const row of sample) {
     assert.ok(row.reason);
-    assert.ok(["official", "goldBasket", "trustedVendor", "creatorWatch", "stars"].includes(row.reason));
+    assert.ok(["official", "goldBasket", "trustedVendor", "creatorWatch", "momentum", "stars"].includes(row.reason));
   }
 });
 
@@ -284,6 +287,103 @@ test("creator-watch matches owner aliases and ignores library repos", () => {
   assert.equal(result.reasonByRepo.get("plain/repo"), "stars");
 });
 
+test("momentum is disabled unless options enable it", () => {
+  const moving = repo({ repo: "moving/repo", stars: 1 });
+  const highStars = repo({ repo: "plain/high", stars: 100 });
+
+  const result = buildDailyPriorityRepos(
+    repoIndex([moving, highStars]),
+    new Map(),
+    { momentumByRepo: new Map([["moving/repo", new Set(["validatedX"])]]) },
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["plain/high", "moving/repo"]);
+  assert.equal(result.reasonByRepo.get("moving/repo"), "stars");
+});
+
+test("momentum selects monitored repos before stars fill", () => {
+  const moving = repo({ repo: "moving/repo", stars: 1 });
+  const highStars = repo({ repo: "plain/high", stars: 100 });
+
+  const result = buildDailyPriorityRepos(
+    repoIndex([highStars, moving]),
+    new Map(),
+    { momentumEnabled: true, momentumByRepo: new Map([["moving/repo", new Set(["validatedX"])]]) },
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["moving/repo", "plain/high"]);
+  assert.equal(result.reasonByRepo.get("moving/repo"), "momentum");
+  assert.equal(result.reasonByRepo.get("plain/high"), "stars");
+});
+
+test("momentum is capped and sorted by source strength, stars, then repo", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "moving/both", stars: 1 }),
+      repo({ repo: "moving/x-high", stars: 10 }),
+      repo({ repo: "moving/x-low", stars: 2 }),
+      repo({ repo: "moving/skillssh", stars: 999 }),
+    ]),
+    new Map(),
+    {
+      momentumEnabled: true,
+      momentumCap: 3,
+      momentumByRepo: new Map([
+        ["moving/both", new Set(["skillssh", "validatedX"])],
+        ["moving/x-high", new Set(["validatedX"])],
+        ["moving/x-low", new Set(["validatedX"])],
+        ["moving/skillssh", new Set(["skillssh"])],
+      ]),
+    },
+  );
+
+  assert.deepEqual(
+    result.repos.slice(0, 3).map((row) => row.repo),
+    ["moving/both", "moving/x-high", "moving/x-low"],
+  );
+  assert.equal(result.reasonByRepo.get("moving/skillssh"), "stars");
+});
+
+test("earlier buckets keep priority over momentum", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "moving/official", stars: 1 }),
+      repo({ repo: "moving/gold", stars: 2, isGoldBasketRepo: true }),
+      repo({ repo: "moving/vendor", stars: 3, isTrustedVendor: true }),
+      repo({ repo: "moving/plain", stars: 4 }),
+    ]),
+    discovered("moving/official"),
+    {
+      momentumEnabled: true,
+      momentumByRepo: new Map([
+        ["moving/official", new Set(["validatedX"])],
+        ["moving/gold", new Set(["validatedX"])],
+        ["moving/vendor", new Set(["validatedX"])],
+        ["moving/plain", new Set(["validatedX"])],
+      ]),
+    },
+  );
+
+  assert.equal(result.reasonByRepo.get("moving/official"), "official");
+  assert.equal(result.reasonByRepo.get("moving/gold"), "goldBasket");
+  assert.equal(result.reasonByRepo.get("moving/vendor"), "trustedVendor");
+  assert.equal(result.reasonByRepo.get("moving/plain"), "momentum");
+});
+
+test("momentum daily priority ignores library repos", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "moving/library", stars: 1000, state: "library" }),
+      repo({ repo: "plain/repo", stars: 50 }),
+    ]),
+    new Map(),
+    { momentumEnabled: true, momentumByRepo: new Map([["moving/library", new Set(["validatedX"])]]) },
+  );
+
+  assert.equal(result.reasonByRepo.get("moving/library"), undefined);
+  assert.equal(result.reasonByRepo.get("plain/repo"), "stars");
+});
+
 test("already-selected daily repos are excluded from next promotion candidates", () => {
   const repos = repoIndex([
     repo({ repo: "daily/repo", stars: 100, isTrustedVendor: true, state: "library" }),
@@ -317,6 +417,27 @@ test("periodic candidates rank ahead of background candidates", () => {
   );
 
   assert.deepEqual(result.map((row) => row.repo), ["periodic/repo", "background/repo"]);
+});
+
+test("momentum library repos enter promotion candidates before periodic and background", () => {
+  const result = buildNextPromotionCandidates(
+    repoIndex([
+      repo({ repo: "moving/repo", stars: 100, state: "library" }),
+      repo({ repo: "periodic/repo", stars: 999, state: "library" }),
+      repo({ repo: "background/repo", stars: 998, state: "library" }),
+    ]),
+    candidateDiscovery([
+      { repo: "moving/repo", lanes: ["background"] },
+      { repo: "periodic/repo", lanes: ["periodic"] },
+      { repo: "background/repo", lanes: ["background"] },
+    ]),
+    [],
+    new Set(),
+    new Map([["moving/repo", new Set(["validatedX"])]]),
+  );
+
+  assert.deepEqual(result.map((row) => row.repo), ["moving/repo", "periodic/repo", "background/repo"]);
+  assert.equal(result[0]?.reason, "momentum");
 });
 
 test("trusted vendor ranks ahead of plain periodic and background candidates", () => {
@@ -396,6 +517,7 @@ test("promotion shortlist respects total cap", () => {
   const candidates = [
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `vendor/${index}`, stars: 100 - index, reason: "trustedVendor" as const })),
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `gold/${index}`, stars: 90 - index, reason: "goldBasket" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `momentum/${index}`, stars: 85 - index, reason: "momentum" as const })),
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `periodic/${index}`, stars: 80 - index, reason: "periodic" as const })),
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `background/${index}`, stars: 70 - index, reason: "background" as const })),
   ];
@@ -409,6 +531,7 @@ test("promotion shortlist respects per-reason caps", () => {
   const candidates = [
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `vendor/${index}`, stars: 100 - index, reason: "trustedVendor" as const })),
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `gold/${index}`, stars: 90 - index, reason: "goldBasket" as const })),
+    ...Array.from({ length: 10 }, (_, index) => ({ repo: `momentum/${index}`, stars: 85 - index, reason: "momentum" as const })),
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `periodic/${index}`, stars: 80 - index, reason: "periodic" as const })),
     ...Array.from({ length: 10 }, (_, index) => ({ repo: `background/${index}`, stars: 70 - index, reason: "background" as const })),
   ];
@@ -421,8 +544,9 @@ test("promotion shortlist respects per-reason caps", () => {
 
   assert.equal(counts.trustedVendor, 5);
   assert.equal(counts.goldBasket, 3);
-  assert.equal(counts.periodic, 8);
-  assert.equal(counts.background, 4);
+  assert.equal(counts.momentum, 5);
+  assert.equal(counts.periodic, 7);
+  assert.equal(counts.background ?? 0, 0);
 });
 
 test("promotion shortlist preserves ranked order within each reason bucket", () => {
@@ -492,6 +616,26 @@ test("only library repos are promoted and they become rising", async () => {
   const promotedRepo = index.repos.find((row) => row.repo === "library/one");
   assert.equal(promotedRepo?.state, "rising");
   assert.ok(promotedRepo?.promotionReasons.includes("shortlist-promotion"));
+});
+
+test("momentum promotion requires 100 stars", async () => {
+  const index = repoIndex([
+    repo({ repo: "moving/kept", stars: MOMENTUM_PROMOTION_MIN_STARS - 1, state: "library" }),
+    repo({ repo: "moving/promoted", stars: MOMENTUM_PROMOTION_MIN_STARS, state: "library" }),
+  ]);
+
+  const promoted = await applyShortlistPromotions({
+    cadence: "combined",
+    repoIndex: index,
+    shortlist: [
+      { repo: "moving/kept", stars: MOMENTUM_PROMOTION_MIN_STARS - 1, reason: "momentum" },
+      { repo: "moving/promoted", stars: MOMENTUM_PROMOTION_MIN_STARS, reason: "momentum" },
+    ],
+  });
+
+  assert.deepEqual(promoted.map((row) => row.repo), ["moving/promoted"]);
+  assert.equal(index.repos.find((row) => row.repo === "moving/kept")?.state, "library");
+  assert.equal(index.repos.find((row) => row.repo === "moving/promoted")?.state, "rising");
 });
 
 test("promotion does not run on non-combined cadences", async () => {

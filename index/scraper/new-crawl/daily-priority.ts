@@ -8,10 +8,12 @@ import type {
   ShadowRepoIndex,
   ShadowRepoIndexEntry,
 } from "./types.js";
+import type { MomentumSource } from "./momentum.js";
 
 export const DAILY_PRIORITY_REPO_LIMIT = 40;
 export const CREATOR_WATCH_DAILY_PRIORITY_CAP = 5;
-export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason, "creatorWatch" | "stars">; cap: number }> = [
+export const MOMENTUM_DAILY_PRIORITY_CAP = 5;
+export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason, "creatorWatch" | "momentum" | "stars">; cap: number }> = [
   { reason: "official", cap: 12 },
   { reason: "goldBasket", cap: 10 },
   { reason: "trustedVendor", cap: 8 },
@@ -22,9 +24,11 @@ export const PERIODIC_PROMOTION_MIN_STARS = 500;
 export const NEXT_PROMOTION_SHORTLIST_BUCKET_CAPS: Array<{ reason: NextPromotionCandidateReason; cap: number }> = [
   { reason: "trustedVendor", cap: 5 },
   { reason: "goldBasket", cap: 3 },
+  { reason: "momentum", cap: 5 },
   { reason: "periodic", cap: 8 },
   { reason: "background", cap: 4 },
 ];
+export const MOMENTUM_PROMOTION_MIN_STARS = 100;
 
 export type DailyPriorityDiscoveredRepo = {
   repo: string;
@@ -44,6 +48,9 @@ export type DailyPriorityOptions = {
   watchedCreatorHandles?: ReadonlySet<string>;
   creatorAliasToCanonicalHandle?: ReadonlyMap<string, string>;
   creatorWatchCap?: number;
+  momentumEnabled?: boolean;
+  momentumByRepo?: ReadonlyMap<string, ReadonlySet<MomentumSource>>;
+  momentumCap?: number;
 };
 
 export type NextPromotionCandidate = {
@@ -78,6 +85,24 @@ function compareCreatorWatchRepos(a: ShadowRepoIndexEntry, b: ShadowRepoIndexEnt
   const refreshDelta = (a.lastRefreshedAt ?? "").localeCompare(b.lastRefreshedAt ?? "");
   if (refreshDelta !== 0) return refreshDelta;
   return b.stars - a.stars || a.repo.localeCompare(b.repo);
+}
+
+function momentumStrength(sources: ReadonlySet<MomentumSource> | undefined): number {
+  if (!sources) return 0;
+  let score = 0;
+  if (sources.has("skillssh")) score += 1;
+  if (sources.has("validatedX")) score += 2;
+  return score;
+}
+
+function compareMomentumRepos(
+  momentumByRepo: ReadonlyMap<string, ReadonlySet<MomentumSource>>,
+  a: ShadowRepoIndexEntry,
+  b: ShadowRepoIndexEntry,
+): number {
+  return momentumStrength(momentumByRepo.get(b.repo)) - momentumStrength(momentumByRepo.get(a.repo)) ||
+    b.stars - a.stars ||
+    a.repo.localeCompare(b.repo);
 }
 
 export function buildDailyPriorityRepos(
@@ -117,7 +142,7 @@ export function buildDailyPriorityRepos(
     .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
 
   for (const bucket of DAILY_PRIORITY_BUCKET_CAPS) {
-    const reposByReason: Record<Exclude<PriorityReason, "creatorWatch" | "stars">, ShadowRepoIndexEntry[]> = {
+    const reposByReason: Record<Exclude<PriorityReason, "creatorWatch" | "momentum" | "stars">, ShadowRepoIndexEntry[]> = {
       official: officialRepos,
       goldBasket: goldBasketRepos,
       trustedVendor: trustedVendorRepos,
@@ -130,6 +155,14 @@ export function buildDailyPriorityRepos(
       .filter((repo) => watchedOwners.has(repoOwner(repo.repo)))
       .sort(compareCreatorWatchRepos);
     pushRepos(creatorWatchRepos.slice(0, options.creatorWatchCap ?? CREATOR_WATCH_DAILY_PRIORITY_CAP), "creatorWatch");
+  }
+
+  const momentumByRepo = options.momentumEnabled ? options.momentumByRepo : undefined;
+  if (momentumByRepo?.size) {
+    const momentumRepos = monitoredRepos
+      .filter((repo) => momentumByRepo.has(repo.repo))
+      .sort((a, b) => compareMomentumRepos(momentumByRepo, a, b));
+    pushRepos(momentumRepos.slice(0, options.momentumCap ?? MOMENTUM_DAILY_PRIORITY_CAP), "momentum");
   }
 
   const remainingMonitoredRepos = monitoredRepos
@@ -146,9 +179,11 @@ export function buildDailyPriorityRepos(
 function nextPromotionReason(
   repo: ShadowRepoIndexEntry | null,
   discoveredRepo: DailyPriorityDiscoveredRepo,
+  momentumByRepo?: ReadonlyMap<string, ReadonlySet<MomentumSource>>,
 ): NextPromotionCandidateReason {
   if (repo?.isTrustedVendor) return "trustedVendor";
   if (repo?.isGoldBasketRepo) return "goldBasket";
+  if (momentumByRepo?.has(discoveredRepo.repo)) return "momentum";
   if (discoveredRepo.lanes.has("periodic")) return "periodic";
   return "background";
 }
@@ -159,10 +194,12 @@ function nextPromotionRank(reason: NextPromotionCandidateReason): number {
       return 0;
     case "goldBasket":
       return 1;
-    case "periodic":
+    case "momentum":
       return 2;
-    case "background":
+    case "periodic":
       return 3;
+    case "background":
+      return 4;
   }
 }
 
@@ -171,6 +208,7 @@ export function buildNextPromotionCandidates(
   discovered: Map<string, DailyPriorityDiscoveredRepo>,
   dailyPriorityRepos: ShadowRepoIndexEntry[],
   excludedRepos = new Set<string>(),
+  momentumByRepo?: ReadonlyMap<string, ReadonlySet<MomentumSource>>,
 ): NextPromotionCandidate[] {
   const dailyPrioritySet = new Set(dailyPriorityRepos.map((repo) => repo.repo));
   const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
@@ -178,14 +216,14 @@ export function buildNextPromotionCandidates(
   return [...discovered.values()]
     .filter((repo) => !dailyPrioritySet.has(repo.repo))
     .filter((repo) => !excludedRepos.has(repo.repo))
-    .filter((repo) => repo.lanes.has("periodic") || repo.lanes.has("background"))
+    .filter((repo) => repo.lanes.has("periodic") || repo.lanes.has("background") || Boolean(momentumByRepo?.has(repo.repo)))
     .filter((repo) => repoByName.get(repo.repo)?.state === "library")
     .map((discoveredRepo) => {
       const repo = repoByName.get(discoveredRepo.repo) ?? null;
       return {
         repo: discoveredRepo.repo,
         stars: repo?.stars ?? discoveredRepo.stars,
-        reason: nextPromotionReason(repo, discoveredRepo),
+        reason: nextPromotionReason(repo, discoveredRepo, momentumByRepo),
       };
     })
     .sort((a, b) => {
@@ -219,6 +257,7 @@ export function buildNextPromotionShortlist(candidates: NextPromotionCandidate[]
 
 function isPromotionEligible(candidate: NextPromotionCandidate): boolean {
   if (candidate.reason === "trustedVendor" || candidate.reason === "goldBasket") return true;
+  if (candidate.reason === "momentum") return candidate.stars >= MOMENTUM_PROMOTION_MIN_STARS;
   if (candidate.reason === "periodic") return candidate.stars >= PERIODIC_PROMOTION_MIN_STARS;
   return false;
 }
