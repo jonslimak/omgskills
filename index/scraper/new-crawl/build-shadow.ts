@@ -14,7 +14,7 @@ import { searchSkillsSh, type SkillsShHit } from "../sources/skillssh.js";
 import { searchAwesomeAgentSkills } from "../sources/awesome.js";
 import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
-import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible } from "./admission.js";
+import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible, passesInstallAdmissionArm } from "./admission.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
@@ -59,6 +59,7 @@ import type {
   DailyPriorityRepoSample,
   DiscoveryBudgetSummary,
   DiscoveryLane,
+  InstallArmAdmissionSample,
   PriorityReason,
   PriorityReasonCounts,
   PromotedRepoSample,
@@ -646,6 +647,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Creator watch checked owners: ${report.creatorWatchCheckedOwnerCount ?? 0}`,
     `- Creator watch discovered repos: ${report.creatorWatchDiscoveredRepoCount ?? 0}`,
     `- Creator watch admissions: ${report.creatorWatchAdmissionCount ?? 0}`,
+    `- Install-arm admissions: ${report.installArmAdmissionCount ?? 0}`,
     `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
     `- Official low-star skills: ${report.officialLowStarSkillCount}`,
@@ -696,6 +698,14 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     ...(report.creatorWatchAdmissionSample?.length
       ? report.creatorWatchAdmissionSample.map((repo) => `- ${repo}`)
+      : ["- none"]),
+    "",
+    "## Install-arm admission sample",
+    "",
+    ...(report.installArmAdmissionSample?.length
+      ? report.installArmAdmissionSample.map((row) =>
+          `- ${row.repo} (${row.board ?? "?"} rank=${row.rank ?? "?"}, installs=${row.installs ?? "?"})`,
+        )
       : ["- none"]),
     "",
     "## Enrichment",
@@ -860,7 +870,7 @@ export function admitDiscoveredRepos(
   discovered: Map<string, DiscoveredRepoRecord>,
   goldBasketRepos: Set<string>,
   seeds: TrustedSeeds,
-  options: { maxNewAdmissions?: number } = {},
+  options: { maxNewAdmissions?: number; installAdmissionEnabled?: boolean } = {},
 ): Set<string> {
   const admittedRepos = new Set<string>();
   if (cadence !== "combined") return admittedRepos;
@@ -878,7 +888,9 @@ export function admitDiscoveredRepos(
     if (existingRepos.has(discoveredRepo.repo)) continue;
     if (isDoNotCrawlRepo(discoveredRepo.repo, seeds)) continue;
     const trust = buildTrustSignalsForRepo(discoveredRepo.repo, goldBasketRepos, seeds);
-    if (!isDiscoveredRepoAdmissionEligible(discoveredRepo, seeds, trust)) continue;
+    if (!isDiscoveredRepoAdmissionEligible(discoveredRepo, seeds, trust, {
+      installAdmissionEnabled: options.installAdmissionEnabled,
+    })) continue;
 
     repoIndex.repos.push(createAdmittedLibraryRepoEntry(discoveredRepo, checkedAt, trust));
     existingRepos.add(discoveredRepo.repo);
@@ -888,6 +900,26 @@ export function admitDiscoveredRepos(
   repoIndex.repos.sort((a, b) => a.repo.localeCompare(b.repo));
   repoIndex.repoCount = repoIndex.repos.length;
   return admittedRepos;
+}
+
+function buildInstallArmAdmissionSample(
+  admittedRepos: Set<string>,
+  discovered: Map<string, DiscoveredRepoRecord>,
+): InstallArmAdmissionSample[] {
+  return [...admittedRepos]
+    .flatMap((repo) => {
+      const discoveredRepo = discovered.get(repo);
+      return discoveredRepo ? [discoveredRepo] : [];
+    })
+    .filter((repo) => passesInstallAdmissionArm(repo, { installAdmissionEnabled: true }))
+    .sort((a, b) => a.repo.localeCompare(b.repo))
+    .slice(0, 10)
+    .map((repo) => ({
+      repo: repo.repo,
+      board: repo.bootstrapCandidate?.skillsshBoard,
+      rank: repo.bootstrapCandidate?.skillsshRank,
+      installs: repo.bootstrapCandidate?.skillsshInstalls,
+    }));
 }
 
 function formatDiscoveryWarning(source: DiscoverySourceName, error: unknown): string {
@@ -1921,6 +1953,7 @@ async function main() {
   const combinedDiscoveryWarnings = momentumWarning
     ? [...partialDiscoveryWarnings, momentumWarning]
     : partialDiscoveryWarnings;
+  const installAdmissionEnabled = process.env.CRAWL4_INSTALL_ADMISSION === "1";
 
   const newlyAdmittedRepos = admitDiscoveredRepos(
     cadence,
@@ -1929,12 +1962,16 @@ async function main() {
     discovered,
     goldBasketRepos,
     seeds,
-    onlyHighStarBackfill ? { maxNewAdmissions: HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS } : {},
+    {
+      ...(onlyHighStarBackfill ? { maxNewAdmissions: HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS } : {}),
+      installAdmissionEnabled,
+    },
   );
   const creatorWatchAdmissionSample = [...newlyAdmittedRepos]
     .filter((repo) => discovered.get(repo)?.sources.has("creator-watch"))
     .sort()
     .slice(0, 10);
+  const installArmAdmissionSample = buildInstallArmAdmissionSample(newlyAdmittedRepos, discovered);
   const dailyPrioritySelection = buildDailyPriorityRepos(
     repoIndex,
     discovered,
@@ -2066,6 +2103,8 @@ async function main() {
     creatorWatchNewRepoSample,
     creatorWatchAdmissionCount: creatorWatchAdmissionSample.length,
     creatorWatchAdmissionSample,
+    installArmAdmissionCount: installArmAdmissionSample.length,
+    installArmAdmissionSample,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
     lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,

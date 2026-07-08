@@ -32,6 +32,7 @@ interface SkillsShResponse {
 }
 
 interface RepoMeta {
+  repo: string;
   stars: number;
   lastUpdated: string;
   tags: string[];
@@ -58,6 +59,10 @@ const repoMetaCache = new Map<string, RepoMeta | null>();
 
 function isValidRepo(repo: string): boolean {
   return /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(repo);
+}
+
+function normalizeRepo(repo: string): string {
+  return repo.toLowerCase();
 }
 
 function deriveId(repo: string, skillId: string): string {
@@ -136,7 +141,14 @@ async function getRepoMeta(repoFullName: string): Promise<RepoMeta | null> {
 
   try {
     const { data } = await octokit.rest.repos.get({ owner, repo });
+    const canonicalRepo = typeof data.full_name === "string" && isValidRepo(data.full_name)
+      ? normalizeRepo(data.full_name)
+      : normalizeRepo(repoFullName);
+    if (canonicalRepo !== normalizeRepo(repoFullName)) {
+      console.warn(`  skills.sh canonicalized ${repoFullName} -> ${canonicalRepo}`);
+    }
     const meta: RepoMeta = {
+      repo: canonicalRepo,
       stars: data.stargazers_count ?? 0,
       lastUpdated: data.pushed_at ?? data.updated_at ?? new Date().toISOString(),
       tags: data.topics ?? [],
@@ -177,19 +189,29 @@ export async function searchSkillsSh(options: SkillsShOptions = {}): Promise<Ski
   });
   const repoMeta = new Map(repoMetaPairs);
 
-  const filtered = uniqueEntries.filter((entry) => {
+  const filteredByStars = uniqueEntries.filter((entry) => {
     const meta = repoMeta.get(entry.source);
     return Boolean(meta && meta.stars >= minRepoStars);
   });
 
-  const results = filtered.map((entry, index) => {
-    const [owner] = entry.source.split("/");
+  const canonicalEntries = new Map<string, { entry: SkillsShEntry; meta: RepoMeta }>();
+  for (const entry of filteredByStars) {
     const meta = repoMeta.get(entry.source)!;
+    const key = `${meta.repo}::${entry.skillId}`;
+    const existing = canonicalEntries.get(key);
+    if (!existing || entry.installs > existing.entry.installs) {
+      canonicalEntries.set(key, { entry, meta });
+    }
+  }
+
+  const filtered = [...canonicalEntries.values()];
+  const results = filtered.map(({ entry, meta }, index) => {
+    const [owner] = meta.repo.split("/");
     return {
-      id: deriveId(entry.source, entry.skillId),
+      id: deriveId(meta.repo, entry.skillId),
       path: RESOLVE_PATH,
       skill_name_hint: entry.skillId,
-      github_url: `https://github.com/${entry.source}`,
+      github_url: `https://github.com/${meta.repo}`,
       author_handle: owner,
       installs: entry.installs,
       trending_rank: index + 1,
@@ -201,7 +223,7 @@ export async function searchSkillsSh(options: SkillsShOptions = {}): Promise<Ski
     } satisfies SkillsShHit;
   });
 
-  const skippedForStars = uniqueEntries.length - filtered.length;
+  const skippedForStars = uniqueEntries.length - filteredByStars.length;
   console.log(
     `  skills.sh ${board}: kept ${results.length} from ${uniqueEntries.length} entries ` +
     `(${uniqueRepos.length} repos, ${skippedForStars} below ${minRepoStars} stars, total listed ${total})`,

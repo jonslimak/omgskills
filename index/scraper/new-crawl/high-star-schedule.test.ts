@@ -161,3 +161,77 @@ test("creator-watch admission remains combined-only", () => {
   assert.deepEqual([...combinedAdmitted], ["creator/low-star-skill"]);
   assert.equal(repoIndex.repos[0]?.state, "library");
 });
+
+test("install admission remains flag-gated and combined-only", () => {
+  const seeds: TrustedSeeds = {
+    trustedVendorHandles: new Set(),
+    trustedCreatorHandles: new Set(),
+    officialTier1Repos: new Set(),
+    officialTier2Repos: new Set(),
+    manualIncludeRepos: new Set(),
+    repoOverrides: [],
+    catalogRepoRules: [],
+    provenanceOverrides: [],
+  };
+  const discovered = new Map<string, any>([
+    [
+      "install/low-star-skill",
+      {
+        repo: "install/low-star-skill",
+        repoUrl: "https://github.com/install/low-star-skill",
+        sources: new Set(["skillssh"]),
+        lanes: new Set(["periodic"]),
+        stars: 1,
+        bootstrapCandidate: {
+          source: "skillssh",
+          id: "install/low-star-skill",
+          skill_md_path: "skills/x/SKILL.md",
+          github_url: "https://github.com/install/low-star-skill",
+          stars: 1,
+          skillsshBoard: "all-time",
+          skillsshRank: 1,
+          skillsshInstalls: 4000,
+        },
+      },
+    ],
+  ]);
+
+  const fastIndex: ShadowRepoIndex = { generatedAt: "2026-06-23T00:00:00.000Z", repoCount: 0, repos: [] };
+  assert.deepEqual(
+    [
+      ...admitDiscoveredRepos(
+        "fast",
+        "2026-06-23T00:00:00.000Z",
+        fastIndex,
+        discovered,
+        new Set(),
+        seeds,
+        { installAdmissionEnabled: true },
+      ),
+    ],
+    [],
+  );
+
+  const flagOffIndex: ShadowRepoIndex = { generatedAt: "2026-06-23T00:00:00.000Z", repoCount: 0, repos: [] };
+  assert.deepEqual(
+    [...admitDiscoveredRepos("combined", "2026-06-23T00:00:00.000Z", flagOffIndex, discovered, new Set(), seeds)],
+    [],
+  );
+
+  const flagOnIndex: ShadowRepoIndex = { generatedAt: "2026-06-23T00:00:00.000Z", repoCount: 0, repos: [] };
+  assert.deepEqual(
+    [
+      ...admitDiscoveredRepos(
+        "combined",
+        "2026-06-23T00:00:00.000Z",
+        flagOnIndex,
+        discovered,
+        new Set(),
+        seeds,
+        { installAdmissionEnabled: true },
+      ),
+    ],
+    ["install/low-star-skill"],
+  );
+  assert.equal(flagOnIndex.repos[0]?.state, "library");
+});

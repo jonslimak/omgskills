@@ -242,6 +242,13 @@ export type CatalogAdmissionSample = {
   authorHandle: string;
 };
 
+export type InstallArmAdmissionSample = {
+  repo: string;
+  board?: "all-time" | "trending" | "hot";
+  rank?: number;
+  installs?: number;
+};
+
 export type RebootstrapEligibleRepoSample = {
   repo: string;
   missingSkillIds: string[];
@@ -420,6 +427,8 @@ export type ShadowRunReport = {
   creatorWatchNewRepoSample?: string[];
   creatorWatchAdmissionCount?: number;
   creatorWatchAdmissionSample?: string[];
+  installArmAdmissionCount?: number;
+  installArmAdmissionSample?: InstallArmAdmissionSample[];
   enrichmentCounts: ShadowEnrichmentCounts;
   lowStarValidSkillCount: number;
   lowStarValidSkillSample: string[];

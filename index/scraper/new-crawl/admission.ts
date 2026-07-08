@@ -3,6 +3,8 @@ import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { isDoNotCrawlRepo } from "./do-not-crawl.js";
 
 export const LIBRARY_ADMISSION_MIN_STARS = 500;
+export const INSTALL_ADMISSION_MAX_ALL_TIME_RANK = 1000;
+export const INSTALL_ADMISSION_MIN_INSTALLS = 4000;
 
 export type AdmissionDiscoveredRepo = {
   repo: string;
@@ -17,6 +19,30 @@ type AdmissionTrustSignals = {
   isTrustedCreator: boolean;
   isGoldBasketRepo: boolean;
 };
+
+type AdmissionOptions = {
+  installAdmissionEnabled?: boolean;
+};
+
+export function passesInstallAdmissionArm(
+  discoveredRepo: AdmissionDiscoveredRepo,
+  options: AdmissionOptions = {},
+): boolean {
+  if (!options.installAdmissionEnabled) return false;
+  const candidate = discoveredRepo.bootstrapCandidate;
+  if (!candidate || candidate.source !== "skillssh") return false;
+  if (!discoveredRepo.sources.has("skillssh")) return false;
+
+  const passesRank =
+    candidate.skillsshBoard === "all-time" &&
+    typeof candidate.skillsshRank === "number" &&
+    candidate.skillsshRank <= INSTALL_ADMISSION_MAX_ALL_TIME_RANK;
+  const passesInstalls =
+    typeof candidate.skillsshInstalls === "number" &&
+    candidate.skillsshInstalls >= INSTALL_ADMISSION_MIN_INSTALLS;
+
+  return passesRank || passesInstalls;
+}
 
 export function passesLibraryAdmissionValueGate(
   repo: string,
@@ -49,11 +75,15 @@ export function isDiscoveredRepoAdmissionEligible(
   discoveredRepo: AdmissionDiscoveredRepo,
   seeds: TrustedSeeds,
   trust: Pick<AdmissionTrustSignals, "isTrustedVendor" | "isGoldBasketRepo">,
+  options: AdmissionOptions = {},
 ): boolean {
-  return (
-    passesLibraryAdmissionCleanMappingGate(discoveredRepo) &&
-    passesLibraryAdmissionValueGate(discoveredRepo.repo, discoveredRepo.stars, seeds, trust, discoveredRepo.sources)
-  );
+  if (!passesLibraryAdmissionCleanMappingGate(discoveredRepo)) return false;
+  if (passesLibraryAdmissionValueGate(discoveredRepo.repo, discoveredRepo.stars, seeds, trust, discoveredRepo.sources)) {
+    return true;
+  }
+  if (isDoNotCrawlRepo(discoveredRepo.repo, seeds)) return false;
+  if (isKnownCatalogRepo(discoveredRepo.repo, seeds.catalogRepoRules)) return false;
+  return passesInstallAdmissionArm(discoveredRepo, options);
 }
 
 export function createAdmittedLibraryRepoEntry(
