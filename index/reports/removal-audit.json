@@ -1,0 +1,519 @@
+{
+  "generatedAt": "2026-07-08T15:28:26.860Z",
+  "enforcementNote": [
+    "suppressed-skills.json prevents skill-level duplicates from returning.",
+    "do-not-crawl.json prevents blocked repos and owners from being re-crawled.",
+    "removal-audit is documentation only and does not control crawler behavior."
+  ],
+  "suppressedSkillCount": 2767,
+  "reasonCounts": {
+    "catalog-copy": 99,
+    "collection-like-copy": 171,
+    "low-signal-copy": 456,
+    "same-publisher": 1741,
+    "trusted-owner": 300
+  },
+  "confidenceCounts": {
+    "high": 2767
+  },
+  "batchCount": 5,
+  "batches": [
+    {
+      "stagedAt": "2026-07-06T20:25:56.680Z",
+      "count": 72,
+      "reasonCounts": {
+        "same-publisher": 6,
+        "trusted-owner": 66
+      },
+      "confidenceCounts": {
+        "high": 72
+      },
+      "sampleIds": [
+        "AWS-Educate/template-nextjs-sanity-tailwind-amplify:.agents/skills/agent-development",
+        "AWS-Educate/template-nextjs-sanity-tailwind-amplify:.agents/skills/command-development",
+        "AbdullahMalik17/Digital-FTE:.claude/skills/docx",
+        "AbdullahMalik17/Digital-FTE:.gemini/skills/docx",
+        "AbdullahMalik17/Hacathan_5:.claude/skills/docx",
+        "AbdullahMalik17/My_skills:.claude/skills/docx",
+        "Activer007/ordinary-claude-skills:skills_categorized/llm-ai/claude-opus-4-5-migration",
+        "Angelo0218/blocktic-backend:.agents/skills/agent-development",
+        "Angelo0218/blocktic-backend:.agents/skills/claude-opus-4-5-migration",
+        "Angelo0218/blocktic-backend:.agents/skills/command-development"
+      ]
+    },
+    {
+      "stagedAt": "2026-07-06T20:26:56.405Z",
+      "count": 1792,
+      "reasonCounts": {
+        "same-publisher": 1728,
+        "trusted-owner": 64
+      },
+      "confidenceCounts": {
+        "high": 1792
+      },
+      "sampleIds": [
+        "0xDarkMatter/claude-mods:skills/code-stats",
+        "23blocks-OS/ai-maestro-plugins:plugins/ai-maestro/skills/ai-maestro-agents-management",
+        "23blocks-OS/ai-maestro-plugins:plugins/ai-maestro/skills/docs-search",
+        "23blocks-OS/ai-maestro-plugins:src/skills/graph-query",
+        "420company/artemis:cco-zoom-plugin-phone",
+        "AIDotNet/MoYuCode:skills/tools/bilibili-analyzer",
+        "AR6420/Hail_Hydra:files",
+        "AWS-Educate/template-nextjs-sanity-tailwind-amplify:.agents/skills/claude-automation-recommender",
+        "Aaronontheweb/dotnet-skills:skills/csharp-coding-standards",
+        "Aaronontheweb/dotnet-skills:skills/csharp-concurrency-patterns"
+      ]
+    },
+    {
+      "stagedAt": "2026-07-06T20:52:25.119Z",
+      "count": 177,
+      "reasonCounts": {
+        "same-publisher": 7,
+        "trusted-owner": 170
+      },
+      "confidenceCounts": {
+        "high": 177
+      },
+      "sampleIds": [
+        "3172973615/skill-explore:gmail-skill",
+        "9aia/pachira:nuxt-seo",
+        "ArogyaReddy/alirezarezvani-claude-skills:ciso-advisor",
+        "ArogyaReddy/alirezarezvani-claude-skills:helm-chart-builder",
+        "ArogyaReddy/alirezarezvani-claude-skills:ra-qm-team",
+        "ArogyaReddy/alirezarezvani-claude-skills:research-summarizer",
+        "AxelMrak/ai:skills/app-store-optimization",
+        "BbgnsurfTech/claude-skills-collection:community/claude-code-skill-factory/generated-skills/agent-factory",
+        "BbgnsurfTech/claude-skills-collection:community/claude-code-skill-factory/generated-skills/codex-cli-bridge",
+        "BbgnsurfTech/claude-skills-collection:community/claude-code-skill-factory/generated-skills/hook-factory"
+      ]
+    },
+    {
+      "stagedAt": "2026-07-06T20:57:44.716Z",
+      "count": 627,
+      "reasonCounts": {
+        "collection-like-copy": 171,
+        "low-signal-copy": 456
+      },
+      "confidenceCounts": {
+        "high": 627
+      },
+      "sampleIds": [
+        "2670044605/agent-skills-hub:audiocut-keyword",
+        "2670044605/agent-skills-hub:image-generator",
+        "2670044605/agent-skills-hub:voice-changer",
+        "AIA-11-HN-MIB/MIB-MockInterviewAIBot:.claude/skills/aesthetic",
+        "AIA-11-HN-MIB/MIB-MockInterviewAIBot:.claude/skills/backend-development",
+        "AIA-11-HN-MIB/MIB-MockInterviewAIBot:.claude/skills/chrome-devtools",
+        "AIA-11-HN-MIB/MIB-MockInterviewAIBot:.claude/skills/ffmpeg",
+        "AIA-11-HN-MIB/MIB-MockInterviewAIBot:.claude/skills/problem-solving/collision-zone-thinking",
+        "AJBcoding/claude-skill-eval:.claude/skills/claude-d3js-skill-main",
+        "AJBcoding/claude-skill-eval:.claude/skills/csv-data-summarizer-claude-skill-main"
+      ]
+    },
+    {
+      "stagedAt": "2026-07-06T22:42:06.239Z",
+      "count": 99,
+      "reasonCounts": {
+        "catalog-copy": 99
+      },
+      "confidenceCounts": {
+        "high": 99
+      },
+      "sampleIds": [
+        "Activer007/ordinary-claude-skills:notebooklm-skill",
+        "Activer007/ordinary-claude-skills:skills_all/archon",
+        "Activer007/ordinary-claude-skills:skills_all/bioservices",
+        "Activer007/ordinary-claude-skills:skills_all/data-sourcing",
+        "Activer007/ordinary-claude-skills:skills_all/data-transform",
+        "Activer007/ordinary-claude-skills:skills_all/deal-desk",
+        "Activer007/ordinary-claude-skills:skills_all/deepchem",
+        "Activer007/ordinary-claude-skills:skills_all/ena-database",
+        "Activer007/ordinary-claude-skills:skills_all/lint",
+        "Activer007/ordinary-claude-skills:zapier-workflows"
+      ]
+    }
+  ],
+  "missingReplacementCount": 155,
+  "missingReplacementCategoryCounts": {
+    "case-only-id-difference": 30,
+    "catalog-like-replacement-filtered": 31,
+    "missing-replacement": 3,
+    "replacement-suppressed": 1,
+    "same-repo-replacement-filtered": 90
+  },
+  "missingReplacementIds": [
+    {
+      "id": "Activer007/ordinary-claude-skills:notebooklm-skill",
+      "replacementId": "PleasePrompto/notebooklm-skill"
+    },
+    {
+      "id": "akiojin/playfab-mcp-server:.claude/skills/writing-rules",
+      "replacementId": "Microck/ordinary-claude-skills:skills_categorized/mobile/rule-identifier"
+    },
+    {
+      "id": "Aradotso/trending-skills:openclaude-multi-llm",
+      "replacementId": "aradotso/trending-skills:openclaude-multi-llm"
+    },
+    {
+      "id": "BbgnsurfTech/claude-skills-collection:community/superpowers-skills/skills/meta/gardening-skills-wiki",
+      "replacementId": "BbgnsurfTech/claude-skills-collection:gardening-skills-wiki"
+    },
+    {
+      "id": "BbgnsurfTech/claude-skills-collection:docker-compose-generator",
+      "replacementId": "BbgnsurfTech/claude-skills-collection:plugins/claude-code-plugins-plus/plugins/devops/docker-compose-generator/skills/docker-compose-generator"
+    },
+    {
+      "id": "boisenoise/skills-collections:skills/context-eng-bdi-mental-states",
+      "replacementId": "guanyang/antigravity-skills:skills/bdi-mental-states"
+    },
+    {
+      "id": "boisenoise/skills-collections:skills/context-eng-context-fundamentals",
+      "replacementId": "guanyang/antigravity-skills:skills/context-fundamentals"
+    },
+    {
+      "id": "boisenoise/skills-collections:skills/context-eng-evaluation",
+      "replacementId": "guanyang/antigravity-skills:skills/evaluation"
+    },
+    {
+      "id": "boisenoise/skills-collections:skills/context-eng-filesystem-context",
+      "replacementId": "guanyang/antigravity-skills:skills/filesystem-context"
+    },
+    {
+      "id": "boisenoise/skills-collections:skills/context-eng-memory-systems",
+      "replacementId": "guanyang/antigravity-skills:skills/memory-systems"
+    },
+    {
+      "id": "boisenoise/skills-collections:skills/linear-claude-skill",
+      "replacementId": "boisenoise/skills-collections:linear-claude-skill"
+    },
+    {
+      "id": "brycewang-stanford/auto-empirical-research-skills:digital-humanities-guide",
+      "replacementId": "brycewang-stanford/Auto-Empirical-Research-Skills:digital-humanities-guide"
+    },
+    {
+      "id": "coderwanfeng/python-office:compress_image",
+      "replacementId": "CoderWanFeng/python-office:compress_image"
+    },
+    {
+      "id": "comeonzhj/auto-redbook-skills",
+      "replacementId": "comeonzhj/Auto-Redbook-Skills"
+    },
+    {
+      "id": "CoralShades/acm-ai:.claude/commands/agent-browser",
+      "replacementId": "shanraisshan/claude-code-best-practice:.claude/skills/agent-browser"
+    },
+    {
+      "id": "denissergeevitch/repo-task-proof-loop",
+      "replacementId": "DenisSergeevitch/repo-task-proof-loop"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:active-interleave-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:active-interleave"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:agency-researcher-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:agency-researcher"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:agent-protocol-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:agent-protocol"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:agentuity-cli-auth-login-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:agentuity-cli-auth-login"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:analyze-patterns-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:analyze-patterns"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:analyze-patterns-mattjefferson",
+      "replacementId": "diegosouzapw/awesome-omni-skill:analyze-patterns"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:api-admin-ops-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:api-admin-ops"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:api-documentor-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:api-documentor"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:bio-single-cell-cell-annotation-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:bio-single-cell-cell-annotation"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:browser-dev-tools-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:browser-dev-tools"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd-cap-go",
+      "replacementId": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd-neversight",
+      "replacementId": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd-yeohj0710",
+      "replacementId": "diegosouzapw/awesome-omni-skill:capacitor-ci-cd"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:cc-get-session-id-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:cc-get-session-id"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:ccn-create-topic",
+      "replacementId": "diegosouzapw/awesome-omni-skill:ccn-create-topic-majiayu000"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:compliance_check-kyteapp",
+      "replacementId": "diegosouzapw/awesome-omni-skill:compliance_check"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:content-marketer-neversight",
+      "replacementId": "diegosouzapw/awesome-omni-skill:content-marketer-majiayu000"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:core-life-ops-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:core-life-ops"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:dapr-integration-maneeshanif",
+      "replacementId": "diegosouzapw/awesome-omni-skill:dapr-integration"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:ddd-check-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:ddd-check"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:denote-org-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:denote-org"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:email-triage-draft-replies-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:email-triage-draft-replies"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:extracting-learned-skills-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:extracting-learned-skills"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:fdc-expert-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:fdc-expert"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:fix-markdown-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:fix-markdown"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:fullstack-feature-mgd34msu",
+      "replacementId": "diegosouzapw/awesome-omni-skill:fullstack-feature"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:gates-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:gates"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:google-docs-manager-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:google-docs-manager"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:iac-diagram-generator-johnpsasser",
+      "replacementId": "diegosouzapw/awesome-omni-skill:iac-diagram-generator"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:iac-diagram-generator-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:iac-diagram-generator"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:import-organization-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:import-organization"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:keynote-slides-dbmcco",
+      "replacementId": "diegosouzapw/awesome-omni-skill:keynote-slides"
+    },
+    {
+      "id": "diegosouzapw/awesome-omni-skill:keynote-slides-majiayu000",
+      "replacementId": "diegosouzapw/awesome-omni-skill:keynote-slides"
+    }
+  ],
+  "topRemovedRepos": [
+    {
+      "repo": "aj-geddes/useful-ai-prompts",
+      "count": 233
+    },
+    {
+      "repo": "diegosouzapw/awesome-omni-skill",
+      "count": 143
+    },
+    {
+      "repo": "ruvnet/claude-flow",
+      "count": 96
+    },
+    {
+      "repo": "gabrielmoreira/agent-skills-mirror",
+      "count": 74
+    },
+    {
+      "repo": "erichowens/some_claude_skills",
+      "count": 50
+    },
+    {
+      "repo": "adaptationio/Skrillz",
+      "count": 49
+    },
+    {
+      "repo": "K-Dense-AI/claude-scientific-skills",
+      "count": 41
+    },
+    {
+      "repo": "Jeffallan/claude-skills",
+      "count": 39
+    },
+    {
+      "repo": "github/awesome-copilot",
+      "count": 38
+    },
+    {
+      "repo": "giuseppe-trisciuoglio/developer-kit",
+      "count": 37
+    },
+    {
+      "repo": "RefoundAI/lenny-skills",
+      "count": 36
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "count": 34
+    },
+    {
+      "repo": "trailofbits/skills",
+      "count": 34
+    },
+    {
+      "repo": "wshobson/agents",
+      "count": 34
+    },
+    {
+      "repo": "parcadei/Continuous-Claude-v3",
+      "count": 33
+    },
+    {
+      "repo": "athina-ai/goose-skills",
+      "count": 31
+    },
+    {
+      "repo": "gooseworks-ai/goose-skills",
+      "count": 29
+    },
+    {
+      "repo": "microsoft/power-platform-skills",
+      "count": 29
+    },
+    {
+      "repo": "ilang-ai/autocode",
+      "count": 27
+    },
+    {
+      "repo": "jezweb/claude-skills",
+      "count": 27
+    }
+  ],
+  "topRemovedOwners": [
+    {
+      "owner": "aj-geddes",
+      "count": 234
+    },
+    {
+      "owner": "diegosouzapw",
+      "count": 143
+    },
+    {
+      "owner": "ruvnet",
+      "count": 96
+    },
+    {
+      "owner": "gabrielmoreira",
+      "count": 74
+    },
+    {
+      "owner": "posthog",
+      "count": 57
+    },
+    {
+      "owner": "K-Dense-AI",
+      "count": 55
+    },
+    {
+      "owner": "erichowens",
+      "count": 50
+    },
+    {
+      "owner": "adaptationio",
+      "count": 49
+    },
+    {
+      "owner": "github",
+      "count": 42
+    },
+    {
+      "owner": "Jeffallan",
+      "count": 39
+    },
+    {
+      "owner": "giuseppe-trisciuoglio",
+      "count": 37
+    },
+    {
+      "owner": "AutumnsGrove",
+      "count": 36
+    },
+    {
+      "owner": "RefoundAI",
+      "count": 36
+    },
+    {
+      "owner": "trailofbits",
+      "count": 34
+    },
+    {
+      "owner": "wshobson",
+      "count": 34
+    },
+    {
+      "owner": "parcadei",
+      "count": 33
+    },
+    {
+      "owner": "athina-ai",
+      "count": 31
+    },
+    {
+      "owner": "microsoft",
+      "count": 30
+    },
+    {
+      "owner": "gooseworks-ai",
+      "count": 29
+    },
+    {
+      "owner": "ilang-ai",
+      "count": 27
+    }
+  ],
+  "doNotCrawl": {
+    "repoCount": 5,
+    "ownerCount": 1,
+    "reasonCounts": {
+      "catalog": 4,
+      "low-quality": 1,
+      "spam": 1
+    }
+  }
+}
