@@ -592,10 +592,15 @@ export function buildCatalogCopySuppressionEntries(
   );
 }
 
-function writeHighConfidenceSuppressions(
+export function buildSamePublisherSuppressionEntries(
   plan: ExactShaCanonicalPlan,
-  skills: DuplicateAuditSkill[],
-  options: { catalogRepoRules?: CatalogRepoRule[] } = {},
+  nowIso: string,
+): SuggestedSuppressedSkillEntry[] {
+  return buildHighConfidenceSuppressionEntries(plan, nowIso).filter((entry) => entry.reason === "same-publisher");
+}
+
+function writeSamePublisherSuppressions(
+  plan: ExactShaCanonicalPlan,
   nowIso = new Date().toISOString(),
 ): {
   added: number;
@@ -604,10 +609,7 @@ function writeHighConfidenceSuppressions(
   const existing = readSuppressedSkillsSeedFile();
   const byId = new Map(existing.skills.map((entry) => [entry.id.trim().toLowerCase(), entry]));
 
-  for (const entry of [
-    ...buildHighConfidenceSuppressionEntries(plan, nowIso),
-    ...buildPartialMediumSuppressionEntries(plan, skills, nowIso, options),
-  ]) {
+  for (const entry of buildSamePublisherSuppressionEntries(plan, nowIso)) {
     const key = entry.id.trim().toLowerCase();
     if (byId.has(key)) continue;
     byId.set(key, entry);
@@ -736,9 +738,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     });
     printExactShaCanonicalPlan(plan);
     if (process.argv.includes("--write-high-confidence-suppressions")) {
-      const result = writeHighConfidenceSuppressions(plan, skills, { catalogRepoRules: seeds.catalogRepoRules });
+      console.error(
+        "Refusing broad write. Use --write-same-publisher-suppressions or --write-catalog-copy-suppressions.",
+      );
+      process.exitCode = 1;
+    }
+    if (process.argv.includes("--write-same-publisher-suppressions")) {
+      const result = writeSamePublisherSuppressions(plan);
       console.log("");
-      console.log(`wrote high-confidence suppressions: ${result.added} added, ${result.total} total`);
+      console.log(`wrote same-publisher suppressions: ${result.added} added, ${result.total} total`);
     }
     if (process.argv.includes("--write-catalog-copy-suppressions")) {
       const result = writeCatalogCopySuppressions(plan, skills, seeds.catalogRepoRules);

@@ -3522,6 +3522,27 @@
       "stagedAt": "2026-07-06T20:26:56.405Z"
     },
     {
+      "id": "anthropics/skills:skills/slack-gif-creator",
+      "reason": "same-publisher",
+      "replacementId": "anthropics/skills:slack-gif-creator",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "anthropics/skills:skills/theme-factory",
+      "reason": "same-publisher",
+      "replacementId": "anthropics/skills:theme-factory",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "anthropics/skills:skills/web-artifacts-builder",
+      "reason": "same-publisher",
+      "replacementId": "anthropics/skills:web-artifacts-builder",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "anthropics/skills:skills/xlsx",
       "reason": "same-publisher",
       "replacementId": "anthropics/skills:xlsx",
@@ -8219,6 +8240,13 @@
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
     {
+      "id": "dojoengine/book:skills/dojo-indexer",
+      "reason": "same-publisher",
+      "replacementId": "dojoengine/book:dojo-indexer",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "dotnet/skills:plugins/dotnet-diag/skills/analyzing-dotnet-performance",
       "reason": "same-publisher",
       "replacementId": "dotnet/skills:analyzing-dotnet-performance",
@@ -11418,6 +11446,20 @@
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
     {
+      "id": "guia-matthieu/clawfu-skills:skills/ai-design/image-to-3d-pipeline",
+      "reason": "same-publisher",
+      "replacementId": "guia-matthieu/clawfu-skills:image-to-3d-pipeline",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "guia-matthieu/clawfu-skills:skills/sales/challenger-sale",
+      "reason": "same-publisher",
+      "replacementId": "guia-matthieu/clawfu-skills:challenger-sale",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "GuillaumeBld/Skills_store:Skills/AI-Agents/context-engineering",
       "reason": "low-signal-copy",
       "replacementId": "mrgoonie/claudekit-skills:context-engineering",
@@ -12853,6 +12895,13 @@
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
     {
+      "id": "jpoutrin/product-forge:plugins/devops-data/skills/direnv",
+      "reason": "same-publisher",
+      "replacementId": "jpoutrin/product-forge:direnv",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "jqhnqdriqn/portfolio:research-summarizer",
       "reason": "trusted-owner",
       "replacementId": "alirezarezvani/claude-skills:research-summarizer",
@@ -13119,6 +13168,13 @@
       "stagedAt": "2026-07-06T20:26:56.405Z"
     },
     {
+      "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/ginkgo-cloud-lab",
+      "reason": "same-publisher",
+      "replacementId": "K-Dense-AI/scientific-agent-skills:scientific-skills/ginkgo-cloud-lab",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/glycoengineering",
       "reason": "same-publisher",
       "replacementId": "K-Dense-AI/scientific-agent-skills:scientific-skills/glycoengineering",
@@ -13145,6 +13201,13 @@
       "replacementId": "K-Dense-AI/scientific-agent-skills:scientific-skills/imaging-data-commons",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:26:56.405Z"
+    },
+    {
+      "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/infographics",
+      "reason": "same-publisher",
+      "replacementId": "K-Dense-AI/scientific-agent-skills:scientific-skills/infographics",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     },
     {
       "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/iso-13485-certification",
@@ -13847,11 +13910,39 @@
       "stagedAt": "2026-07-06T20:26:56.405Z"
     },
     {
+      "id": "meriley/claude-code-skills:skills/api-documentation-verify",
+      "reason": "same-publisher",
+      "replacementId": "meriley/claude-code-skills:api-documentation-verify",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "meriley/claude-code-skills:skills/cursor-rules-review",
+      "reason": "same-publisher",
+      "replacementId": "meriley/claude-code-skills:cursor-rules-review",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "metabase/metabase:.claude/skills/docs-review",
+      "reason": "same-publisher",
+      "replacementId": "metabase/metabase:docs-review",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "metabase/metabase:.claude/skills/docs-write",
       "reason": "same-publisher",
       "replacementId": "metabase/metabase:docs-write",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:26:56.405Z"
+    },
+    {
+      "id": "MetaMask/ocap-kernel:.claude/skills/commit",
+      "reason": "same-publisher",
+      "replacementId": "MetaMask/ocap-kernel:commit",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     },
     {
       "id": "mhattingpete/claude-skills-marketplace:code-operations-plugin/skills/file-operations",
@@ -14713,6 +14804,13 @@
       "replacementId": "ace-step/ACE-Step-1.5:.claude/skills/acestep-songwriting",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
+    },
+    {
+      "id": "nodnarbnitram/claude-code-extensions:.claude/skills/ha-api",
+      "reason": "same-publisher",
+      "replacementId": "nodnarbnitram/claude-code-extensions:ha-api",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     },
     {
       "id": "northseadl/skillwisp:skills/@anthropic/algorithmic-art",
@@ -16899,6 +16997,13 @@
       "stagedAt": "2026-07-06T20:26:56.405Z"
     },
     {
+      "id": "ruvnet/claude-flow:.agents/skills/agent-release-swarm",
+      "reason": "same-publisher",
+      "replacementId": "ruvnet/ruflo:.agents/skills/agent-release-swarm",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "ruvnet/claude-flow:.agents/skills/agent-repo-architect",
       "reason": "same-publisher",
       "replacementId": "ruvnet/ruflo:.agents/skills/agent-repo-architect",
@@ -18019,6 +18124,13 @@
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
     {
+      "id": "TermiX-official/cryptoclaw:skills/bird",
+      "reason": "same-publisher",
+      "replacementId": "TermiX-official/cryptoclaw:bird",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "terrylica/cc-skills:plugins/link-tools/skills/link-validator",
       "reason": "same-publisher",
       "replacementId": "terrylica/cc-skills:link-validator",
@@ -18075,11 +18187,25 @@
       "stagedAt": "2026-07-06T20:52:25.119Z"
     },
     {
+      "id": "Tibsfox/gsd-skill-creator:examples/skills/physical-education/inclusive-physical-education",
+      "reason": "same-publisher",
+      "replacementId": "Tibsfox/gsd-skill-creator:inclusive-physical-education",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "Tibsfox/gsd-skill-creator:examples/skills/writing/expository-writing",
       "reason": "same-publisher",
       "replacementId": "Tibsfox/gsd-skill-creator:expository-writing",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:26:56.405Z"
+    },
+    {
+      "id": "tikazyq/agentic-spec-forge:AGENTIC_SPEC_FORGE/spec_stage_skill/design/entry-point-check",
+      "reason": "same-publisher",
+      "replacementId": "tikazyq/agentic-spec-forge:entry-point-check",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     },
     {
       "id": "tradermonty/claude-trading-skills:skills/backtest-expert",
@@ -18936,6 +19062,27 @@
       "stagedAt": "2026-07-06T20:26:56.405Z"
     },
     {
+      "id": "wshobson/agents:plugins/blockchain-web3/skills/defi-protocol-templates",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:defi-protocol-templates",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/business-analytics/skills/data-storytelling",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:data-storytelling",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/business-analytics/skills/kpi-dashboard-design",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:kpi-dashboard-design",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "wshobson/agents:plugins/cicd-automation/skills/deployment-pipeline-design",
       "reason": "same-publisher",
       "replacementId": "wshobson/agents:deployment-pipeline-design",
@@ -18992,6 +19139,41 @@
       "stagedAt": "2026-07-06T20:26:56.405Z"
     },
     {
+      "id": "wshobson/agents:plugins/developer-essentials/skills/code-review-excellence",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:code-review-excellence",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/developer-essentials/skills/debugging-strategies",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:debugging-strategies",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/developer-essentials/skills/e2e-testing-patterns",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:e2e-testing-patterns",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/developer-essentials/skills/error-handling-patterns",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:error-handling-patterns",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/developer-essentials/skills/git-advanced-workflows",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:git-advanced-workflows",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "wshobson/agents:plugins/documentation-standards/skills/hads",
       "reason": "same-publisher",
       "replacementId": "wshobson/agents:hads",
@@ -19018,6 +19200,13 @@
       "replacementId": "wshobson/agents:dependency-upgrade",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:26:56.405Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/game-development/skills/godot-gdscript-patterns",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:godot-gdscript-patterns",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     },
     {
       "id": "wshobson/agents:plugins/hr-legal-compliance/skills/gdpr-data-handling",
@@ -19062,6 +19251,20 @@
       "stagedAt": "2026-07-06T20:26:56.405Z"
     },
     {
+      "id": "wshobson/agents:plugins/llm-application-dev/skills/embedding-strategies",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:embedding-strategies",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/llm-application-dev/skills/langchain-architecture",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:langchain-architecture",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
       "id": "wshobson/agents:plugins/observability-monitoring/skills/distributed-tracing",
       "reason": "same-publisher",
       "replacementId": "wshobson/agents:distributed-tracing",
@@ -19088,6 +19291,13 @@
       "replacementId": "wshobson/agents:evaluation-methodology",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:26:56.405Z"
+    },
+    {
+      "id": "wshobson/agents:plugins/python-development/skills/async-python-patterns",
+      "reason": "same-publisher",
+      "replacementId": "wshobson/agents:async-python-patterns",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     },
     {
       "id": "wshobson/agents:plugins/quantitative-trading/skills/backtesting-frameworks",
@@ -19193,6 +19403,13 @@
       "replacementId": "xquik-dev/x-twitter-scraper:x-twitter-scraper",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:26:56.405Z"
+    },
+    {
+      "id": "xu18961999959-sketch/zt:小红书封面生成器",
+      "reason": "same-publisher",
+      "replacementId": "xu18961999959-sketch/zt:xiaohongshu-cover-generator",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     },
     {
       "id": "ydchen0806/skill-economy-benchmark:docs-to-skill",
@@ -19368,6 +19585,20 @@
       "replacementId": "benchflow-ai/skillsbench:gmail-skill",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:52:25.119Z"
+    },
+    {
+      "id": "zxkane/aws-skills:plugins/aws-cdk/skills/aws-cdk-development",
+      "reason": "same-publisher",
+      "replacementId": "zxkane/aws-skills:aws-cdk-development",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "zxkane/aws-skills:plugins/aws-cost-ops/skills/aws-cost-operations",
+      "reason": "same-publisher",
+      "replacementId": "zxkane/aws-skills:aws-cost-operations",
+      "confidence": "high",
+      "stagedAt": "2026-07-08T15:42:32.679Z"
     }
   ]
 }

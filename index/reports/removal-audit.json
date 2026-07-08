@@ -1,22 +1,22 @@
 {
-  "generatedAt": "2026-07-08T15:28:26.860Z",
+  "generatedAt": "2026-07-08T15:47:12.150Z",
   "enforcementNote": [
     "suppressed-skills.json prevents skill-level duplicates from returning.",
     "do-not-crawl.json prevents blocked repos and owners from being re-crawled.",
     "removal-audit is documentation only and does not control crawler behavior."
   ],
-  "suppressedSkillCount": 2767,
+  "suppressedSkillCount": 2800,
   "reasonCounts": {
     "catalog-copy": 99,
     "collection-like-copy": 171,
     "low-signal-copy": 456,
-    "same-publisher": 1741,
+    "same-publisher": 1774,
     "trusted-owner": 300
   },
   "confidenceCounts": {
-    "high": 2767
+    "high": 2800
   },
-  "batchCount": 5,
+  "batchCount": 6,
   "batches": [
     {
       "stagedAt": "2026-07-06T20:25:56.680Z",
@@ -130,6 +130,28 @@
         "Activer007/ordinary-claude-skills:skills_all/ena-database",
         "Activer007/ordinary-claude-skills:skills_all/lint",
         "Activer007/ordinary-claude-skills:zapier-workflows"
+      ]
+    },
+    {
+      "stagedAt": "2026-07-08T15:42:32.679Z",
+      "count": 33,
+      "reasonCounts": {
+        "same-publisher": 33
+      },
+      "confidenceCounts": {
+        "high": 33
+      },
+      "sampleIds": [
+        "K-Dense-AI/claude-scientific-skills:scientific-skills/ginkgo-cloud-lab",
+        "K-Dense-AI/claude-scientific-skills:scientific-skills/infographics",
+        "MetaMask/ocap-kernel:.claude/skills/commit",
+        "TermiX-official/cryptoclaw:skills/bird",
+        "Tibsfox/gsd-skill-creator:examples/skills/physical-education/inclusive-physical-education",
+        "anthropics/skills:skills/slack-gif-creator",
+        "anthropics/skills:skills/theme-factory",
+        "anthropics/skills:skills/web-artifacts-builder",
+        "dojoengine/book:skills/dojo-indexer",
+        "guia-matthieu/clawfu-skills:skills/ai-design/image-to-3d-pipeline"
       ]
     }
   ],
@@ -354,7 +376,7 @@
     },
     {
       "repo": "ruvnet/claude-flow",
-      "count": 96
+      "count": 97
     },
     {
       "repo": "gabrielmoreira/agent-skills-mirror",
@@ -369,8 +391,12 @@
       "count": 49
     },
     {
+      "repo": "wshobson/agents",
+      "count": 46
+    },
+    {
       "repo": "K-Dense-AI/claude-scientific-skills",
-      "count": 41
+      "count": 43
     },
     {
       "repo": "Jeffallan/claude-skills",
@@ -394,10 +420,6 @@
     },
     {
       "repo": "trailofbits/skills",
-      "count": 34
-    },
-    {
-      "repo": "wshobson/agents",
       "count": 34
     },
     {
@@ -436,19 +458,19 @@
     },
     {
       "owner": "ruvnet",
-      "count": 96
+      "count": 97
     },
     {
       "owner": "gabrielmoreira",
       "count": 74
     },
     {
-      "owner": "posthog",
+      "owner": "K-Dense-AI",
       "count": 57
     },
     {
-      "owner": "K-Dense-AI",
-      "count": 55
+      "owner": "posthog",
+      "count": 57
     },
     {
       "owner": "erichowens",
@@ -457,6 +479,10 @@
     {
       "owner": "adaptationio",
       "count": 49
+    },
+    {
+      "owner": "wshobson",
+      "count": 46
     },
     {
       "owner": "github",
@@ -480,10 +506,6 @@
     },
     {
       "owner": "trailofbits",
-      "count": 34
-    },
-    {
-      "owner": "wshobson",
       "count": 34
     },
     {

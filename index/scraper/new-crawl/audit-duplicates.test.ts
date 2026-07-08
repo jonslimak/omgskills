@@ -6,6 +6,7 @@ import {
   buildExactShaCanonicalPlan,
   buildHighConfidenceSuppressionEntries,
   buildPartialMediumSuppressionEntries,
+  buildSamePublisherSuppressionEntries,
   isCollectionLikeDuplicateCopy,
   buildSameRepoSuppressionPlan,
   type DuplicateAuditSkill,
@@ -348,6 +349,70 @@ test("high-confidence suppression entries exclude medium-confidence star leaders
       replacementId: "owner/repo:base",
       confidence: "high",
       stagedAt: "2026-07-06T00:00:00.000Z",
+    },
+  ]);
+});
+
+test("high-confidence suppression entries do not include partial medium entries", () => {
+  const skills = [
+    skill({ id: "leader/repo:skill", github_url: "https://github.com/leader/repo", skill_md_sha: "same", stars: 500 }),
+    skill({ id: "copy/awesome-skills:skill", github_url: "https://github.com/copy/awesome-skills", skill_md_sha: "same", stars: 20 }),
+    skill({ id: "low/repo:skill", github_url: "https://github.com/low/repo", skill_md_sha: "same", stars: 5 }),
+  ];
+  const plan = buildExactShaCanonicalPlan(skills);
+  const now = "2026-07-06T00:00:00.000Z";
+
+  assert.deepEqual(buildHighConfidenceSuppressionEntries(plan, now), []);
+  assert.deepEqual(buildPartialMediumSuppressionEntries(plan, skills, now), [
+    {
+      id: "copy/awesome-skills:skill",
+      reason: "collection-like-copy",
+      replacementId: "leader/repo:skill",
+      confidence: "high",
+      stagedAt: now,
+    },
+    {
+      id: "low/repo:skill",
+      reason: "low-signal-copy",
+      replacementId: "leader/repo:skill",
+      confidence: "high",
+      stagedAt: now,
+    },
+  ]);
+});
+
+test("same-publisher suppression entries exclude other high-confidence reasons", () => {
+  const skills = [
+    skill({ id: "same/repo:base", github_url: "https://github.com/same/repo", author_handle: "same", skill_md_sha: "same" }),
+    skill({
+      id: "same/repo:skills/base",
+      github_url: "https://github.com/same/repo",
+      author_handle: "same",
+      skill_md_sha: "same",
+    }),
+    skill({
+      id: "github/repo:skill",
+      github_url: "https://github.com/github/repo",
+      author_handle: "github",
+      skill_md_sha: "trusted",
+    }),
+    skill({
+      id: "other/repo:skill",
+      github_url: "https://github.com/other/repo",
+      author_handle: "other",
+      skill_md_sha: "trusted",
+    }),
+  ];
+  const plan = buildExactShaCanonicalPlan(skills);
+  const now = "2026-07-06T00:00:00.000Z";
+
+  assert.deepEqual(buildSamePublisherSuppressionEntries(plan, now), [
+    {
+      id: "same/repo:skills/base",
+      reason: "same-publisher",
+      replacementId: "same/repo:base",
+      confidence: "high",
+      stagedAt: now,
     },
   ]);
 });

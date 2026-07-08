@@ -1,6 +1,6 @@
 # Crawl 4 Removal Audit
 
-Generated: 2026-07-08T15:28:26.860Z
+Generated: 2026-07-08T15:47:12.150Z
 
 ## Enforcement
 
@@ -10,8 +10,8 @@ Generated: 2026-07-08T15:28:26.860Z
 
 ## Summary
 
-- Suppressed skills: 2767
-- Suppression batches: 5
+- Suppressed skills: 2800
+- Suppression batches: 6
 - Missing replacement warnings: 155
 - Do-not-crawl repos: 5
 - Do-not-crawl owners: 1
@@ -21,12 +21,12 @@ Generated: 2026-07-08T15:28:26.860Z
 - catalog-copy: 99
 - collection-like-copy: 171
 - low-signal-copy: 456
-- same-publisher: 1741
+- same-publisher: 1774
 - trusted-owner: 300
 
 ## Suppressions by Confidence
 
-- high: 2767
+- high: 2800
 
 ## Batches
 
@@ -65,22 +65,29 @@ Generated: 2026-07-08T15:28:26.860Z
 - Confidence: high=99
 - Sample IDs: Activer007/ordinary-claude-skills:notebooklm-skill, Activer007/ordinary-claude-skills:skills_all/archon, Activer007/ordinary-claude-skills:skills_all/bioservices, Activer007/ordinary-claude-skills:skills_all/data-sourcing, Activer007/ordinary-claude-skills:skills_all/data-transform, Activer007/ordinary-claude-skills:skills_all/deal-desk, Activer007/ordinary-claude-skills:skills_all/deepchem, Activer007/ordinary-claude-skills:skills_all/ena-database, Activer007/ordinary-claude-skills:skills_all/lint, Activer007/ordinary-claude-skills:zapier-workflows
 
+### 2026-07-08T15:42:32.679Z
+
+- Count: 33
+- Reasons: same-publisher=33
+- Confidence: high=33
+- Sample IDs: K-Dense-AI/claude-scientific-skills:scientific-skills/ginkgo-cloud-lab, K-Dense-AI/claude-scientific-skills:scientific-skills/infographics, MetaMask/ocap-kernel:.claude/skills/commit, TermiX-official/cryptoclaw:skills/bird, Tibsfox/gsd-skill-creator:examples/skills/physical-education/inclusive-physical-education, anthropics/skills:skills/slack-gif-creator, anthropics/skills:skills/theme-factory, anthropics/skills:skills/web-artifacts-builder, dojoengine/book:skills/dojo-indexer, guia-matthieu/clawfu-skills:skills/ai-design/image-to-3d-pipeline
+
 ## Top Removed Repos
 
 - aj-geddes/useful-ai-prompts: 233
 - diegosouzapw/awesome-omni-skill: 143
-- ruvnet/claude-flow: 96
+- ruvnet/claude-flow: 97
 - gabrielmoreira/agent-skills-mirror: 74
 - erichowens/some_claude_skills: 50
 - adaptationio/Skrillz: 49
-- K-Dense-AI/claude-scientific-skills: 41
+- wshobson/agents: 46
+- K-Dense-AI/claude-scientific-skills: 43
 - Jeffallan/claude-skills: 39
 - github/awesome-copilot: 38
 - giuseppe-trisciuoglio/developer-kit: 37
 - RefoundAI/lenny-skills: 36
 - posthog/ai-plugin: 34
 - trailofbits/skills: 34
-- wshobson/agents: 34
 - parcadei/Continuous-Claude-v3: 33
 - athina-ai/goose-skills: 31
 - gooseworks-ai/goose-skills: 29
@@ -92,19 +99,19 @@ Generated: 2026-07-08T15:28:26.860Z
 
 - aj-geddes: 234
 - diegosouzapw: 143
-- ruvnet: 96
+- ruvnet: 97
 - gabrielmoreira: 74
+- K-Dense-AI: 57
 - posthog: 57
-- K-Dense-AI: 55
 - erichowens: 50
 - adaptationio: 49
+- wshobson: 46
 - github: 42
 - Jeffallan: 39
 - giuseppe-trisciuoglio: 37
 - AutumnsGrove: 36
 - RefoundAI: 36
 - trailofbits: 34
-- wshobson: 34
 - parcadei: 33
 - athina-ai: 31
 - microsoft: 30
