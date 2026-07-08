@@ -1,33 +1,9 @@
 [
   {
-    "repo": "sickn33/antigravity-awesome-skills",
-    "publisherHandle": "sickn33",
+    "repo": "activer007/ordinary-claude-skills",
+    "publisherHandle": "activer007",
     "defaultProvenanceType": "catalog",
-    "notes": "Curated collection/distribution repo with mixed provenance."
-  },
-  {
-    "repo": "openclaw/openclaw",
-    "publisherHandle": "openclaw",
-    "defaultProvenanceType": "catalog",
-    "notes": "Publishes bundled skills that can point back to upstream repos."
-  },
-  {
-    "repo": "neversight/learn-skills.dev",
-    "publisherHandle": "neversight",
-    "defaultProvenanceType": "mirrored",
-    "notes": "Feed-style mirrored library. Source repo owner should not be treated as the skill author."
-  },
-  {
-    "repo": "openclaw/skills",
-    "publisherHandle": "openclaw",
-    "defaultProvenanceType": "repackaged",
-    "notes": "Bundled skills repo with path-level upstream references that need better per-skill provenance later."
-  },
-  {
-    "repo": "francostino/opencode-skills-collection",
-    "publisherHandle": "francostino",
-    "defaultProvenanceType": "repackaged",
-    "notes": "Collection repo bundling other sources including antigravity-derived skills."
+    "notes": "Bundled ordinary skills collection; should not be treated as the canonical author for copied skills."
   },
   {
     "repo": "aiskillstore/marketplace",
@@ -36,10 +12,22 @@
     "notes": "Marketplace collection repo. Publisher should remain separate from original skill authors unless trusted upstream authorship can be recovered."
   },
   {
-    "repo": "orcaqubits/agentic-commerce-skills-plugins",
-    "publisherHandle": "orcaqubits",
-    "defaultProvenanceType": "repackaged",
-    "notes": "Packaged plugin/skills collection. Publisher should remain separate from the true skill author."
+    "repo": "bbgnsurftech/claude-skills-collection",
+    "publisherHandle": "bbgnsurftech",
+    "defaultProvenanceType": "catalog",
+    "notes": "Collection source; should not be treated as the canonical author for copied skills."
+  },
+  {
+    "repo": "boisenoise/skills-collections",
+    "publisherHandle": "boisenoise",
+    "defaultProvenanceType": "catalog",
+    "notes": "Collection source; should not be treated as the canonical author for copied skills."
+  },
+  {
+    "repo": "brycewang-stanford/awesome-agent-skills-for-empirical-research",
+    "publisherHandle": "brycewang-stanford",
+    "defaultProvenanceType": "catalog",
+    "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
   },
   {
     "repo": "composiohq/awesome-claude-skills",
@@ -54,46 +42,16 @@
     "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
   },
   {
-    "repo": "prat011/awesome-llm-skills",
-    "publisherHandle": "prat011",
-    "defaultProvenanceType": "catalog",
-    "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
-  },
-  {
-    "repo": "guanyang/antigravity-skills",
-    "publisherHandle": "guanyang",
-    "defaultProvenanceType": "catalog",
-    "notes": "Bundled antigravity skills collection; should not be treated as canonical by star count."
-  },
-  {
-    "repo": "lingxling/awesome-skills-cn",
-    "publisherHandle": "lingxling",
-    "defaultProvenanceType": "catalog",
-    "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
-  },
-  {
     "repo": "diegosouzapw/awesome-omni-skill",
     "publisherHandle": "diegosouzapw",
     "defaultProvenanceType": "catalog",
     "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
   },
   {
-    "repo": "gabrielmoreira/agent-skills-mirror",
-    "publisherHandle": "gabrielmoreira",
-    "defaultProvenanceType": "mirrored",
-    "notes": "Mirror source; should not be treated as the canonical author for copied skills."
-  },
-  {
-    "repo": "boisenoise/skills-collections",
-    "publisherHandle": "boisenoise",
+    "repo": "Eduard22222222/claude-skill-stack",
+    "publisherHandle": "Eduard22222222",
     "defaultProvenanceType": "catalog",
-    "notes": "Collection source; should not be treated as the canonical author for copied skills."
-  },
-  {
-    "repo": "bbgnsurftech/claude-skills-collection",
-    "publisherHandle": "bbgnsurftech",
-    "defaultProvenanceType": "catalog",
-    "notes": "Collection source; should not be treated as the canonical author for copied skills."
+    "notes": "Claude skill stack collection source found in exact-SHA duplicate clusters; should not be canonical by stars."
   },
   {
     "repo": "ericgrill/agents-skills-plugins",
@@ -102,8 +60,50 @@
     "notes": "Plugin/skills bundle; should not be treated as the canonical author for copied skills."
   },
   {
-    "repo": "onurkanbakirci/awesome-skills",
-    "publisherHandle": "onurkanbakirci",
+    "repo": "foryourhealth111-pixel/vibe-skills",
+    "publisherHandle": "foryourhealth111-pixel",
+    "defaultProvenanceType": "catalog",
+    "notes": "Bundled skills collection; should not be treated as the canonical author for copied skills."
+  },
+  {
+    "repo": "francostino/opencode-skills-collection",
+    "publisherHandle": "francostino",
+    "defaultProvenanceType": "repackaged",
+    "notes": "Collection repo bundling other sources including antigravity-derived skills."
+  },
+  {
+    "repo": "gabrielmoreira/agent-skills-mirror",
+    "publisherHandle": "gabrielmoreira",
+    "defaultProvenanceType": "mirrored",
+    "notes": "Mirror source; should not be treated as the canonical author for copied skills."
+  },
+  {
+    "repo": "guanyang/antigravity-skills",
+    "publisherHandle": "guanyang",
+    "defaultProvenanceType": "catalog",
+    "notes": "Bundled antigravity skills collection; should not be treated as canonical by star count."
+  },
+  {
+    "repo": "harmeet10000/skills",
+    "publisherHandle": "harmeet10000",
+    "defaultProvenanceType": "catalog",
+    "notes": "Bundled skills collection; should not be treated as the canonical author for copied skills."
+  },
+  {
+    "repo": "HIDORAKAI002/ai-workspace-archive",
+    "publisherHandle": "HIDORAKAI002",
+    "defaultProvenanceType": "catalog",
+    "notes": "Workspace archive/collection source found repeatedly in exact-SHA duplicate clusters; should not be canonical by stars."
+  },
+  {
+    "repo": "Infopibe/everything-claude-code",
+    "publisherHandle": "Infopibe",
+    "defaultProvenanceType": "catalog",
+    "notes": "Everything-Claude collection source found in exact-SHA duplicate clusters; should not be canonical by stars."
+  },
+  {
+    "repo": "lingxling/awesome-skills-cn",
+    "publisherHandle": "lingxling",
     "defaultProvenanceType": "catalog",
     "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
   },
@@ -114,14 +114,50 @@
     "notes": "External registry/catalog bundle; should not be treated as the canonical author for copied skills."
   },
   {
+    "repo": "microck/ordinary-claude-skills",
+    "publisherHandle": "microck",
+    "defaultProvenanceType": "catalog",
+    "notes": "Bundled ordinary skills collection; should not be treated as the canonical author for copied skills."
+  },
+  {
+    "repo": "neversight/learn-skills.dev",
+    "publisherHandle": "neversight",
+    "defaultProvenanceType": "mirrored",
+    "notes": "Feed-style mirrored library. Source repo owner should not be treated as the skill author."
+  },
+  {
+    "repo": "onurkanbakirci/awesome-skills",
+    "publisherHandle": "onurkanbakirci",
+    "defaultProvenanceType": "catalog",
+    "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
+  },
+  {
+    "repo": "openclaw/openclaw",
+    "publisherHandle": "openclaw",
+    "defaultProvenanceType": "catalog",
+    "notes": "Publishes bundled skills that can point back to upstream repos."
+  },
+  {
+    "repo": "openclaw/skills",
+    "publisherHandle": "openclaw",
+    "defaultProvenanceType": "repackaged",
+    "notes": "Bundled skills repo with path-level upstream references that need better per-skill provenance later."
+  },
+  {
+    "repo": "orcaqubits/agentic-commerce-skills-plugins",
+    "publisherHandle": "orcaqubits",
+    "defaultProvenanceType": "repackaged",
+    "notes": "Packaged plugin/skills collection. Publisher should remain separate from the true skill author."
+  },
+  {
     "repo": "panlm/awesome-skills-deepdive",
     "publisherHandle": "panlm",
     "defaultProvenanceType": "catalog",
     "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
   },
   {
-    "repo": "sundial-org/awesome-openclaw-skills",
-    "publisherHandle": "sundial-org",
+    "repo": "prat011/awesome-llm-skills",
+    "publisherHandle": "prat011",
     "defaultProvenanceType": "catalog",
     "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
   },
@@ -132,16 +168,10 @@
     "notes": "Awesome-list/toolkit catalog source; should not be treated as the canonical author for copied skills."
   },
   {
-    "repo": "microck/ordinary-claude-skills",
-    "publisherHandle": "microck",
+    "repo": "shajith003/awesome-claude-skills",
+    "publisherHandle": "shajith003",
     "defaultProvenanceType": "catalog",
-    "notes": "Bundled ordinary skills collection; should not be treated as the canonical author for copied skills."
-  },
-  {
-    "repo": "foryourhealth111-pixel/vibe-skills",
-    "publisherHandle": "foryourhealth111-pixel",
-    "defaultProvenanceType": "catalog",
-    "notes": "Bundled skills collection; should not be treated as the canonical author for copied skills."
+    "notes": "Awesome-list/catalog source found in exact-SHA duplicate clusters; should not be canonical by stars."
   },
   {
     "repo": "shanraisshan/claude-code-best-practice",
@@ -150,21 +180,27 @@
     "notes": "Best-practice collection repo with bundled copied skills; should not be treated as canonical by star count."
   },
   {
-    "repo": "brycewang-stanford/awesome-agent-skills-for-empirical-research",
-    "publisherHandle": "brycewang-stanford",
+    "repo": "sickn33/antigravity-awesome-skills",
+    "publisherHandle": "sickn33",
+    "defaultProvenanceType": "catalog",
+    "notes": "Curated collection/distribution repo with mixed provenance."
+  },
+  {
+    "repo": "sundial-org/awesome-openclaw-skills",
+    "publisherHandle": "sundial-org",
     "defaultProvenanceType": "catalog",
     "notes": "Awesome-list/catalog source; should not be treated as the canonical author for copied skills."
   },
   {
-    "repo": "activer007/ordinary-claude-skills",
-    "publisherHandle": "activer007",
+    "repo": "Zidong-IA/BIBLIOTECA",
+    "publisherHandle": "Zidong-IA",
     "defaultProvenanceType": "catalog",
-    "notes": "Bundled ordinary skills collection; should not be treated as the canonical author for copied skills."
+    "notes": "Biblioteca collection source found in exact-SHA duplicate clusters; should not be canonical by stars."
   },
   {
-    "repo": "harmeet10000/skills",
-    "publisherHandle": "harmeet10000",
+    "repo": "Zidong-LLC/BIBLIOTECA",
+    "publisherHandle": "Zidong-LLC",
     "defaultProvenanceType": "catalog",
-    "notes": "Bundled skills collection; should not be treated as the canonical author for copied skills."
+    "notes": "Biblioteca collection source found in exact-SHA duplicate clusters; should not be canonical by stars."
   }
 ]

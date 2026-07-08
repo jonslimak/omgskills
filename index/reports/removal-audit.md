@@ -1,6 +1,6 @@
 # Crawl 4 Removal Audit
 
-Generated: 2026-07-08T15:47:12.150Z
+Generated: 2026-07-08T16:13:22.403Z
 
 ## Enforcement
 
@@ -13,7 +13,7 @@ Generated: 2026-07-08T15:47:12.150Z
 - Suppressed skills: 2800
 - Suppression batches: 6
 - Missing replacement warnings: 155
-- Do-not-crawl repos: 5
+- Do-not-crawl repos: 13
 - Do-not-crawl owners: 1
 
 ## Suppressions by Reason
@@ -120,9 +120,11 @@ Generated: 2026-07-08T15:47:12.150Z
 
 ## Do Not Crawl
 
-- catalog: 4
+- catalog: 9
 - low-quality: 1
+- marketplace: 1
 - spam: 1
+- template-clone: 2
 
 ## Missing Replacement Warnings
 

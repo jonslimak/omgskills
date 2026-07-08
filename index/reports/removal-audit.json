@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-08T15:47:12.150Z",
+  "generatedAt": "2026-07-08T16:13:22.403Z",
   "enforcementNote": [
     "suppressed-skills.json prevents skill-level duplicates from returning.",
     "do-not-crawl.json prevents blocked repos and owners from being re-crawled.",
@@ -530,12 +530,14 @@
     }
   ],
   "doNotCrawl": {
-    "repoCount": 5,
+    "repoCount": 13,
     "ownerCount": 1,
     "reasonCounts": {
-      "catalog": 4,
+      "catalog": 9,
       "low-quality": 1,
-      "spam": 1
+      "marketplace": 1,
+      "spam": 1,
+      "template-clone": 2
     }
   }
 }

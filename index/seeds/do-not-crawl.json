@@ -1,9 +1,39 @@
 {
   "repos": [
     {
+      "repo": "adryanmoldokkr32-pixel/gstack",
+      "reason": "template-clone",
+      "notes": "Copied gstack skills/template clone found repeatedly in exact-SHA duplicate clusters."
+    },
+    {
+      "repo": "afnanpvt/ai-agent-skills",
+      "reason": "catalog",
+      "notes": "Bundled AI agent skills collection found in exact-SHA duplicate clusters."
+    },
+    {
+      "repo": "Anantha-236/Agent-Hunter",
+      "reason": "catalog",
+      "notes": "Bundled agent skills collection found repeatedly in exact-SHA duplicate clusters."
+    },
+    {
+      "repo": "anthropics/claude-for-legal",
+      "reason": "low-quality",
+      "notes": "Manually blocked from maintained library output."
+    },
+    {
+      "repo": "bereniketech/claude_kit",
+      "reason": "template-clone",
+      "notes": "Copied Claude kit/template repo found repeatedly in exact-SHA duplicate clusters."
+    },
+    {
       "repo": "davila7/claude-code-templates",
       "reason": "catalog",
       "notes": "Template marketplace/catalog with bundled third-party sources; do not admit by stars alone."
+    },
+    {
+      "repo": "deco31416/antigravity-awesome-skills",
+      "reason": "catalog",
+      "notes": "Copied antigravity skills collection found repeatedly in exact-SHA duplicate clusters."
     },
     {
       "repo": "majiayu000/claude-skill-registry",
@@ -16,14 +46,24 @@
       "notes": "Registry data/catalog source; exclude maintained library entries and prevent re-admission."
     },
     {
+      "repo": "mk-knight23/AGENTS-COLLECTION",
+      "reason": "catalog",
+      "notes": "Agent collection repo found in exact-SHA duplicate clusters."
+    },
+    {
+      "repo": "pinkpixel-dev/skills-collection-1",
+      "reason": "catalog",
+      "notes": "Skills collection repo found in exact-SHA duplicate clusters."
+    },
+    {
       "repo": "supercent-io/skills-template",
       "reason": "catalog",
       "notes": "Template/catalog source; exclude maintained library entries and prevent re-admission."
     },
     {
-      "repo": "anthropics/claude-for-legal",
-      "reason": "low-quality",
-      "notes": "Manually blocked from maintained library output."
+      "repo": "wegonbeok45/Fatiweb-MarketPlace",
+      "reason": "marketplace",
+      "notes": "Marketplace-style copied skills repo found in exact-SHA duplicate clusters."
     }
   ],
   "owners": [
