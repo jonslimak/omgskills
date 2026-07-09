@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
@@ -52,9 +52,27 @@ async function mergeRedirects() {
   const siteRedirects = (await exists(siteRedirectsPath))
     ? await readFile(siteRedirectsPath, "utf8")
     : "";
+  const staticProfileRedirects = [];
+  const profilesDir = path.join(outputDir, "profiles");
+  if (await exists(profilesDir)) {
+    const entries = await readdir(profilesDir, { withFileTypes: true });
+    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+      if (!entry.isDirectory() || !(await exists(path.join(profilesDir, entry.name, "index.html")))) {
+        continue;
+      }
+      staticProfileRedirects.push(
+        `/profiles/${entry.name}  /profiles/${entry.name}/index.html  200!`,
+        `/profiles/${entry.name}/  /profiles/${entry.name}/index.html  200!`
+      );
+    }
+  }
   const merged = [
     "# app.omgskills.com portal rewrites",
     ...appDomainRedirects,
+    "",
+    "# generated web library profiles",
+    ...staticProfileRedirects,
+    "/profiles/:handle  /__profile/:handle  200!",
     "",
     "# existing omgskills.com redirects",
     siteRedirects.trim(),

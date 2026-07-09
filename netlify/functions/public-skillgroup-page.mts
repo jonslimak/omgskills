@@ -30,8 +30,14 @@ function parseRoute(pathname: string): { handle: string; groupSlug: string | nul
   if (parts[0] === "u" && parts[1] && parts.length <= 3) {
     return { handle: parts[1], groupSlug: parts[2] ?? null };
   }
+  if (parts[0] === "profiles" && parts[1] && parts.length === 2) {
+    return { handle: parts[1], groupSlug: null };
+  }
   if (parts[0] === "profiles" && parts[1] && parts[2] === "sets" && parts[3] && parts.length === 4) {
     return { handle: parts[1], groupSlug: parts[3] };
+  }
+  if (parts[0] === "__profile" && parts[1] && parts.length === 2) {
+    return { handle: parts[1], groupSlug: null };
   }
   return null;
 }
@@ -60,8 +66,10 @@ function catalogSkillUrl(catalogSkillId: unknown): string | null {
   return `/skills/${path}/`;
 }
 
-export default async (req: Request, _context: Context) => {
-  const route = parseRoute(new URL(req.url).pathname);
+export default async (req: Request, context: Context) => {
+  const route = context.params.handle
+    ? { handle: context.params.handle, groupSlug: context.params.groupSlug ?? null }
+    : parseRoute(context.path || new URL(req.url).pathname);
   if (!route) {
     return notFound();
   }
@@ -169,6 +177,11 @@ export default async (req: Request, _context: Context) => {
 };
 
 export const config: Config = {
-  path: ["/u/:handle", "/u/:handle/:groupSlug", "/profiles/:handle", "/profiles/:handle/sets/:groupSlug"],
+  path: [
+    "/__profile/:handle",
+    "/u/:handle",
+    "/u/:handle/:groupSlug",
+    "/profiles/:handle/sets/:groupSlug"
+  ],
   preferStatic: true
 };
