@@ -244,7 +244,9 @@ OMGSKILLS_DATA_SUBDIR=v2 ./scripts/publish-data.sh
 
 Workflow note:
 
-- `shadow-crawl-health` runs the shadow crawl, validates output, publishes v2, publishes Crawl 4, deploys the site, and verifies live manifests.
+- `shadow-crawl-health` runs the shadow crawl, validates output, publishes v2,
+  publishes Crawl 4, appends SHA history, deploys the site, and verifies live
+  manifests. Unchanged SHA history reuses its existing hashed asset.
 
 This section is intentionally high-level. Use [`deploy.md`](/Users/jonslimak/Projects/omgskills/deploy.md) for Mac release and site deployment details.
 

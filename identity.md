@@ -125,9 +125,9 @@ Properties:
 - makes resolution version-proof: any `SKILL.md` the crawler has ever seen resolves, no matter how stale the local copy
 - client-side lookup against published data, same as everything else
 
-The initial asset is published. Wiring `publish:sha-history` into every scheduled
-publish remains a separate operational follow-up; until then newly observed
-versions are not guaranteed to be appended automatically.
+The asset is published by `shadow-crawl-health` after both data-track manifests
+are built. Unchanged mappings reuse the existing timestamp and hashed filename;
+changed mappings append new SHA/ID pairs and retain one prior asset for rollback.
 
 ## Design properties
 
@@ -233,7 +233,7 @@ Current implementation status and remaining order:
 
 1. **Done: verify hash compatibility** — Swift and Node use the same raw-byte Git blob SHA contract and known test vector
 2. **Done: ship the exact ladder in the client scanner** — install provenance, Git inspection, and SHA lookup resolve locally; multi-ID matches remain ambiguous
-3. **Partial: publish SHA history** — the v1 asset exists with `shaToSkillIds`; scheduled append automation remains to be wired separately
+3. **Done: publish SHA history** — the v1 asset exists with `shaToSkillIds` and scheduled publishes append new mappings without rewriting unchanged assets
 4. **Canonical attribution** (`crawl-audit.md` Phase 3.1) — pick the original author's copy per duplicate cluster; annotate the sha index with `canonicalId`, upgrading ambiguous resolutions to resolved. Before or alongside this step is fine; it must land before multi-id hash matches are treated as authoritative
 5. **Add the confirm-once fuzzy UX** — only after measuring how much steps 1–4 leave unresolved
 6. **Propagate resolution into synced_skills** — resolved IDs flow into `catalog_skill_id` on sync, making groups catalog-aware for previously unresolvable skills

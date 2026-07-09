@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-type Skill = {
+export type ShaHistorySkill = {
   id: string;
   skill_md_sha?: string | null;
 };
@@ -18,10 +18,16 @@ type Manifest = Record<string, unknown> & {
   shaHistory?: Asset;
 };
 
-type ShaHistoryAsset = {
+export type ShaHistoryAsset = {
   version: number;
   generatedAt: string;
   shaToSkillIds: Record<string, string[]>;
+};
+
+export type BuildShaHistoryResult = {
+  asset: ShaHistoryAsset;
+  changed: boolean;
+  previousCounts: { shaCount: number; pairCount: number };
 };
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -37,8 +43,7 @@ const dataTrackDirs = [
 ];
 
 function fail(message: string): never {
-  console.error(`publish-sha-history: ${message}`);
-  process.exit(1);
+  throw new Error(`publish-sha-history: ${message}`);
 }
 
 function readJson<T>(path: string): T {
@@ -57,7 +62,7 @@ function sha256(data: Buffer): string {
   return createHash("sha256").update(data).digest("hex");
 }
 
-function counts(asset: ShaHistoryAsset): { shaCount: number; pairCount: number } {
+export function countShaHistory(asset: ShaHistoryAsset): { shaCount: number; pairCount: number } {
   let pairCount = 0;
   for (const ids of Object.values(asset.shaToSkillIds)) {
     pairCount += ids.length;
@@ -102,24 +107,78 @@ async function loadExistingShaHistory(track: { name: string; dir: string; manife
   return await fetchJson<ShaHistoryAsset>(remoteAssetURL);
 }
 
-function buildAsset(map: Map<string, Set<string>>): ShaHistoryAsset {
+function buildAsset(map: Map<string, Set<string>>, generatedAt: string): ShaHistoryAsset {
   const shaToSkillIds: Record<string, string[]> = {};
   for (const sha of [...map.keys()].sort()) {
     shaToSkillIds[sha] = [...(map.get(sha) ?? [])].sort();
   }
   return {
     version: 1,
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     shaToSkillIds,
   };
 }
 
-function writeAsset(dataDir: string, asset: ShaHistoryAsset): Asset {
+function sameMappings(left: Record<string, string[]>, right: Record<string, string[]>): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function latestGeneratedAt(assets: ShaHistoryAsset[]): string | null {
+  return assets
+    .map((asset) => asset.generatedAt)
+    .filter(Boolean)
+    .sort()
+    .at(-1) ?? null;
+}
+
+export function buildShaHistoryAsset(
+  existingAssets: ShaHistoryAsset[],
+  skills: ShaHistorySkill[],
+  generatedAt: string,
+): BuildShaHistoryResult {
+  const map = new Map<string, Set<string>>();
+  for (const asset of existingAssets) mergeAsset(map, asset);
+
+  const mergedExisting = buildAsset(map, latestGeneratedAt(existingAssets) ?? generatedAt);
+  const previousCounts = countShaHistory(mergedExisting);
+  const existingConverged = existingAssets.some((asset) =>
+    sameMappings(asset.shaToSkillIds, mergedExisting.shaToSkillIds)
+  );
+
+  for (const skill of skills) {
+    if (skill.skill_md_sha) addMapping(map, skill.skill_md_sha, skill.id);
+  }
+
+  const finalMappings = buildAsset(map, generatedAt).shaToSkillIds;
+  const changed = !existingConverged || !sameMappings(mergedExisting.shaToSkillIds, finalMappings);
+  return {
+    asset: {
+      version: 1,
+      generatedAt: changed ? generatedAt : mergedExisting.generatedAt,
+      shaToSkillIds: finalMappings,
+    },
+    changed,
+    previousCounts,
+  };
+}
+
+export function assertShaHistoryDoesNotShrink(
+  before: { shaCount: number; pairCount: number },
+  after: { shaCount: number; pairCount: number },
+  allow: boolean,
+): void {
+  if (!allow && (after.shaCount < before.shaCount || after.pairCount < before.pairCount)) {
+    fail(`refusing to shrink sha history: ${before.shaCount}/${before.pairCount} -> ${after.shaCount}/${after.pairCount}`);
+  }
+}
+
+export function writeShaHistoryAsset(dataDir: string, asset: ShaHistoryAsset): Asset {
   mkdirSync(dataDir, { recursive: true });
   const data = Buffer.from(`${JSON.stringify(asset, null, 2)}\n`);
   const hash = sha256(data);
   const filename = `sha-history-${hash.slice(0, 12)}.json`;
-  writeFileSync(join(dataDir, filename), data);
+  const outputPath = join(dataDir, filename);
+  if (!existsSync(outputPath)) writeFileSync(outputPath, data);
   return { path: filename, sha256: hash, bytes: data.length };
 }
 
@@ -129,47 +188,52 @@ function patchManifest(dataDir: string, asset: Asset): void {
     fail(`missing manifest: ${manifestPath}`);
   }
   const manifest = readJson<Manifest>(manifestPath);
+  if (JSON.stringify(manifest.shaHistory) === JSON.stringify(asset)) return;
   manifest.shaHistory = asset;
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
+export function pruneSupersededShaHistoryAssets(dataDir: string, keepPaths: string[]): void {
+  const keep = new Set(keepPaths.filter(Boolean));
+  for (const file of readdirSync(dataDir)) {
+    if (!file.startsWith("sha-history-") || !file.endsWith(".json") || keep.has(file)) continue;
+    rmSync(join(dataDir, file), { force: true });
+  }
 }
 
 async function main() {
   if (!existsSync(skillsPath)) fail(`missing ${skillsPath}`);
 
-  const map = new Map<string, Set<string>>();
+  const existingAssets: ShaHistoryAsset[] = [];
+  const priorPaths = new Map<string, string>();
   for (const track of dataTrackDirs) {
     const existing = await loadExistingShaHistory(track);
     if (!existing) continue;
-    mergeAsset(map, existing);
-  }
-  const previousCounts = { shaCount: map.size, pairCount: [...map.values()].reduce((sum, ids) => sum + ids.size, 0) };
-
-  const skills = readJson<Skill[]>(skillsPath);
-  for (const skill of skills) {
-    if (skill.skill_md_sha) {
-      addMapping(map, skill.skill_md_sha, skill.id);
+    existingAssets.push(existing);
+    const manifestPath = join(track.dir, "manifest.json");
+    if (existsSync(manifestPath)) {
+      const priorPath = readJson<Manifest>(manifestPath).shaHistory?.path;
+      if (priorPath) priorPaths.set(track.name, priorPath);
     }
   }
 
-  const asset = buildAsset(map);
-  if ((previousCounts.shaCount > 0 || previousCounts.pairCount > 0) && !allowShrink) {
-    const before = previousCounts;
-    const after = counts(asset);
-    if (after.shaCount < before.shaCount || after.pairCount < before.pairCount) {
-      fail(`refusing to shrink sha history: ${before.shaCount}/${before.pairCount} -> ${after.shaCount}/${after.pairCount}`);
-    }
-  }
+  const skills = readJson<ShaHistorySkill[]>(skillsPath);
+  const result = buildShaHistoryAsset(existingAssets, skills, new Date().toISOString());
+  assertShaHistoryDoesNotShrink(result.previousCounts, countShaHistory(result.asset), allowShrink);
 
   for (const track of dataTrackDirs) {
-    const written = writeAsset(track.dir, asset);
+    const written = writeShaHistoryAsset(track.dir, result.asset);
     patchManifest(track.dir, written);
+    pruneSupersededShaHistoryAssets(track.dir, [written.path, priorPaths.get(track.name) ?? ""]);
     console.log(`wrote ${join(track.dir, written.path)}`);
   }
-  const finalCounts = counts(asset);
-  console.log(`published ${finalCounts.shaCount} shas and ${finalCounts.pairCount} sha/id pairs`);
+  const finalCounts = countShaHistory(result.asset);
+  console.log(`${result.changed ? "published" : "reused"} ${finalCounts.shaCount} shas and ${finalCounts.pairCount} sha/id pairs`);
 }
 
-main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  });
+}
