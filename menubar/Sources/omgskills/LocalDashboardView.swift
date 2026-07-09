@@ -27,6 +27,9 @@ struct LocalDashboardView: View {
     let selectedFilter: LocalDashboardFilter?
     let onSelectFilter: (LocalDashboardFilter) -> Void
     let onSelectRecentSkill: (InstalledSkillSummary.RecentSkill) -> Void
+    @State private var syncToken = ""
+    @State private var syncStatus = ""
+    @State private var isSyncing = false
 
     private var stats: [LocalDashboardStat] {
         [
@@ -67,11 +70,59 @@ struct LocalDashboardView: View {
                     }
                 }
             }
+
+            if selectedFilter == nil {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Sync with web portal")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+
+                    HStack(spacing: 8) {
+                        TextField("Paste sync token", text: $syncToken)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.system(size: 11))
+
+                        Button(isSyncing ? "Syncing" : "Sync") {
+                            syncInstalledSkills()
+                        }
+                        .disabled(isSyncing || syncToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+
+                    if !syncStatus.isEmpty {
+                        Text(syncStatus)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
+                }
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 18)
         .padding(.bottom, selectedFilter == nil ? 18 : 12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
+    }
+
+    private func syncInstalledSkills() {
+        isSyncing = true
+        syncStatus = "Uploading installed skill metadata..."
+        let token = syncToken
+
+        Task {
+            do {
+                let result = try await SkillSyncService.upload(token: token)
+                await MainActor.run {
+                    syncStatus = "Synced \(result.syncedSkillCount) skills."
+                    syncToken = ""
+                    isSyncing = false
+                }
+            } catch {
+                await MainActor.run {
+                    syncStatus = "Sync failed. Create a fresh token and try again."
+                    isSyncing = false
+                }
+            }
+        }
     }
 }
 
