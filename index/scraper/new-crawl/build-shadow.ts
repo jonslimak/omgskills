@@ -379,6 +379,14 @@ function buildShadowSkills(skills: Skill[]): ShadowSkillRecord[] {
   return skills.map(toShadowSkillRecord);
 }
 
+function capReadmeSnippet(skill: ShadowSkillRecord): ShadowSkillRecord {
+  if (!skill.readme_snippet || skill.readme_snippet.length <= 1000) return skill;
+  return {
+    ...skill,
+    readme_snippet: skill.readme_snippet.slice(0, 1000).trim(),
+  };
+}
+
 export function buildFinalShadowSkills(
   baselineSkills: Skill[],
   shadowById: Map<string, ShadowSkillRecord>,
@@ -391,7 +399,7 @@ export function buildFinalShadowSkills(
 
   return [...new Map(
     [...baselineShadowSkills, ...carriedForwardShadowSkills, ...bootstrappedShadowSkills].map((skill) => [skill.id, skill] as const),
-  ).values()].sort((a, b) => a.id.localeCompare(b.id));
+  ).values()].map(capReadmeSnippet).sort((a, b) => a.id.localeCompare(b.id));
 }
 
 function buildRepoCountsByState(repos: ShadowRepoIndexEntry[]): Record<RepoState, number> {

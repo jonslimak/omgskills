@@ -132,9 +132,9 @@ function stripFrontmatter(content: string): string {
   return content.slice(end + 4);
 }
 
-function truncateSnippet(text: string, maxLength = 300): string {
+function truncateSnippet(text: string, maxLength = 1000): string {
   if (text.length <= maxLength) return text;
-  const window = text.slice(0, maxLength + 1);
+  const window = text.slice(0, maxLength);
   const sentenceEnd = Math.max(
     window.lastIndexOf(". "),
     window.lastIndexOf("! "),
@@ -144,7 +144,8 @@ function truncateSnippet(text: string, maxLength = 300): string {
 
   const wordEnd = window.lastIndexOf(" ");
   const truncated = window.slice(0, wordEnd >= 180 ? wordEnd : maxLength).trim();
-  return /[.!?]$/.test(truncated) ? truncated : `${truncated.replace(/[,:;–-]+$/, "")}...`;
+  if (/[.!?]$/.test(truncated)) return truncated;
+  return `${truncated.slice(0, Math.max(0, maxLength - 3)).replace(/[,:;–-]+$/, "").trim()}...`;
 }
 
 function firstContentSection(content: string): string {

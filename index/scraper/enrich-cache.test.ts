@@ -200,7 +200,12 @@ Use this section as the snippet because it is the first real content heading.
   assert.equal(snippet, "Real Section Use this section as the snippet because it is the first real content heading.");
 });
 
-test("readme snippet truncates near 300 characters", () => {
+test("readme snippet truncates near 1000 characters", () => {
+  const repeatedDetail = Array.from(
+    { length: 18 },
+    (_, index) =>
+      `Detail sentence ${index + 1} explains how the skill collects evidence, compares repository state, and writes a concise implementation report for maintainers.`,
+  ).join(" ");
   const snippet = buildReadmeSnippetFromSkillContent(
     `---
 name: long-skill
@@ -208,15 +213,15 @@ description: Small summary.
 ---
 # Long Skill
 
-This first sentence gives useful context about a skill that helps developers inspect API behavior, collect evidence, compare inputs and outputs, and write a concise report for maintainers. This second sentence should survive because it still fits within the target window and gives more useful detail. This third sentence is intentionally very long and should not be included because the snippet should prefer a clean sentence boundary before it crosses the maximum size expected by the web library generator and search previews.
+${repeatedDetail} After limit marker should not appear because the snippet should stop cleanly near the maximum size expected by the web library generator and search previews.
 `,
     "Small summary.",
   );
 
   assert.ok(snippet);
   assert.ok(snippet!.endsWith("."));
-  assert.ok(snippet!.length <= 300);
-  assert.equal(snippet!.includes("This third sentence"), false);
+  assert.ok(snippet!.length <= 1000);
+  assert.equal(snippet!.includes("After limit marker"), false);
 });
 
 test("readme snippet falls back to body when no heading exists", () => {
