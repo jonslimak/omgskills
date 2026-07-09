@@ -71,7 +71,7 @@ async function verifyPublicGroupRoutes() {
 
 async function verifyProductionLibraryBaseline() {
   await expectText("/profiles/anthropics/", "Anthropic", { origin: productionOrigin });
-  await expectText("/skills/anthropics/skills/skills/algorithmic-art/", "algorithmic-art", {
+  await expectText("/skills/anthropics/skills/frontend-design/", "frontend-design", {
     origin: productionOrigin
   });
 }
@@ -82,7 +82,7 @@ async function verifyTargetLibraryPages() {
     return;
   }
   await expectText("/profiles/anthropics/", "Anthropic");
-  await expectText("/skills/anthropics/skills/skills/algorithmic-art/", "algorithmic-art");
+  await expectText("/skills/anthropics/skills/frontend-design/", "frontend-design");
 }
 
 await verifyTargetCore();
