@@ -3,6 +3,7 @@ import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { isDoNotCrawlRepo } from "./do-not-crawl.js";
 
 export const LIBRARY_ADMISSION_MIN_STARS = 500;
+export const X_SOCIAL_ADMISSION_MIN_STARS = 50;
 export const INSTALL_ADMISSION_MAX_ALL_TIME_RANK = 1000;
 export const INSTALL_ADMISSION_MIN_INSTALLS = 4000;
 
@@ -55,7 +56,7 @@ export function passesLibraryAdmissionValueGate(
   const knownCatalogRepo = isKnownCatalogRepo(repo, seeds.catalogRepoRules);
   const passesStars = stars >= LIBRARY_ADMISSION_MIN_STARS && !knownCatalogRepo;
   const passesCreatorWatch = sources.has("creator-watch") && !knownCatalogRepo;
-  const passesXSocial = sources.has("x-social") && !knownCatalogRepo;
+  const passesXSocial = sources.has("x-social") && stars >= X_SOCIAL_ADMISSION_MIN_STARS && !knownCatalogRepo;
   return (
     seeds.manualIncludeRepos.has(repo) ||
     seeds.officialTier1Repos.has(repo) ||

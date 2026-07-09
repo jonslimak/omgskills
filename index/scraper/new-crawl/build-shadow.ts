@@ -17,7 +17,7 @@ import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js"
 import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible, passesInstallAdmissionArm } from "./admission.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
-import { loadXSocialDiscoveryCandidates } from "./x-social-discovery.js";
+import { loadXSocialDiscoveryCandidates, removeBelowStarXSocialOnlyState } from "./x-social-discovery.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
@@ -1968,6 +1968,7 @@ async function main() {
   } = applyShadowSkillOverlay(cadence, shadowSkills, repoIndex, skillOverlay);
   shadowSkills = overlayMergedShadowSkills;
   shadowSkills = removeDoNotCrawlState(repoIndex, shadowSkills, seeds);
+  shadowSkills = removeBelowStarXSocialOnlyState(repoIndex, shadowSkills).skills;
 
   const discoveryStart = performance.now();
   const repoAliasByCanonical = new Map<string, string>();
@@ -2065,6 +2066,7 @@ async function main() {
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
   shadowSkills = removeDoNotCrawlState(repoIndex, shadowSkills, seeds);
+  shadowSkills = removeBelowStarXSocialOnlyState(repoIndex, shadowSkills).skills;
   shadowSkills = filterSuppressedSkills(shadowSkills, seeds);
   reconcileRepoIndexSkillIds(repoIndex, shadowSkills);
   removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);

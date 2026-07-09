@@ -6,6 +6,7 @@ import {
   INSTALL_ADMISSION_MIN_INSTALLS,
   isDiscoveredRepoAdmissionEligible,
   LIBRARY_ADMISSION_MIN_STARS,
+  X_SOCIAL_ADMISSION_MIN_STARS,
 } from "./admission.js";
 import type { AdmissionDiscoveredRepo } from "./admission.js";
 import type { TrustedSeeds } from "./types.js";
@@ -362,12 +363,12 @@ test("creator-watch source does not bypass clean mapping gate", () => {
   );
 });
 
-test("x-social source admits clean low-star repo", () => {
+test("x-social source admits clean repo at star floor", () => {
   assert.equal(
     isDiscoveredRepoAdmissionEligible(
       discoveredRepo({
         repo: "x/low-star-skill",
-        stars: 1,
+        stars: X_SOCIAL_ADMISSION_MIN_STARS,
         sources: new Set(["x-social"]),
         bootstrapCandidate: {
           source: "x-social",
@@ -380,6 +381,27 @@ test("x-social source admits clean low-star repo", () => {
       { isTrustedVendor: false, isGoldBasketRepo: false },
     ),
     true,
+  );
+});
+
+test("x-social source does not admit below star floor", () => {
+  assert.equal(
+    isDiscoveredRepoAdmissionEligible(
+      discoveredRepo({
+        repo: "x/low-star-skill",
+        stars: X_SOCIAL_ADMISSION_MIN_STARS - 1,
+        sources: new Set(["x-social"]),
+        bootstrapCandidate: {
+          source: "x-social",
+          id: "x/low-star-skill:skill",
+          skill_md_path: "skills/x/SKILL.md",
+          github_url: "https://github.com/x/low-star-skill",
+        },
+      }),
+      seeds(),
+      { isTrustedVendor: false, isGoldBasketRepo: false },
+    ),
+    false,
   );
 });
 

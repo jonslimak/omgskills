@@ -1,5 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
-import type { RepoBootstrapCandidate } from "./types.js";
+import { repoFromGithubUrl, repoFromSkillId } from "./do-not-crawl.js";
+import type { RepoBootstrapCandidate, ShadowRepoIndex, ShadowSkillRecord } from "./types.js";
+
+export const X_SOCIAL_MIN_STARS = 50;
 
 type TopSkillTweet = {
   valid_skill_repos?: Array<{
@@ -57,6 +60,11 @@ export function buildXSocialDiscoveryCandidates(tweets: TopSkillTweet[]): XSocia
       }
 
       const stars = typeof hit.stars === "number" ? hit.stars : 0;
+      if (stars < X_SOCIAL_MIN_STARS) {
+        skippedCount += 1;
+        continue;
+      }
+
       const key = `${repo}::${path.toLowerCase()}`;
       const next: XSocialDiscoveryCandidate = {
         repo,
@@ -98,4 +106,42 @@ export function loadXSocialDiscoveryCandidates(path: string): XSocialDiscoveryRe
 
   const tweets = JSON.parse(readFileSync(path, "utf8")) as TopSkillTweet[];
   return buildXSocialDiscoveryCandidates(tweets);
+}
+
+export function removeBelowStarXSocialOnlyState(
+  repoIndex: ShadowRepoIndex,
+  skills: ShadowSkillRecord[],
+): {
+  skills: ShadowSkillRecord[];
+  removedRepos: string[];
+} {
+  const removedRepos = new Set(
+    repoIndex.repos
+      .filter(
+        (repo) =>
+          repo.stars < X_SOCIAL_MIN_STARS &&
+          repo.discoveredSources.includes("x-social") &&
+          repo.promotionReasons.includes("library-admission") &&
+          !repo.isTrustedVendor &&
+          !repo.isTrustedCreator &&
+          !repo.isGoldBasketRepo,
+      )
+      .map((repo) => repo.repo),
+  );
+
+  if (removedRepos.size === 0) {
+    return { skills, removedRepos: [] };
+  }
+
+  repoIndex.repos = repoIndex.repos.filter((repo) => !removedRepos.has(repo.repo));
+  repoIndex.repoCount = repoIndex.repos.length;
+
+  return {
+    skills: skills.filter((skill) => {
+      const idRepo = repoFromSkillId(skill.id);
+      const urlRepo = repoFromGithubUrl(skill.github_url);
+      return !removedRepos.has(idRepo) && (!urlRepo || !removedRepos.has(urlRepo));
+    }),
+    removedRepos: [...removedRepos].sort(),
+  };
 }
