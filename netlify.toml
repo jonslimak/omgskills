@@ -18,8 +18,9 @@
 
 [[redirects]]
   from = "/profiles/:handle"
-  to = "/profiles/:handle/"
-  status = 301
+  to = "/u/:handle"
+  status = 200
+  force = false
 
 [[redirects]]
   from = "/collections/:id"

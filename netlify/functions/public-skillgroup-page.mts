@@ -25,10 +25,17 @@ function notFound(): Response {
   return html("<h1>Not found</h1>", 404);
 }
 
+function isValidHandle(value: string): boolean {
+  return value.length <= 80 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(value);
+}
+
 function parseRoute(pathname: string): { handle: string; groupSlug: string | null } | null {
   const parts = pathname.split("/").filter(Boolean);
   if (parts[0] === "u" && parts[1] && parts.length <= 3) {
     return { handle: parts[1], groupSlug: parts[2] ?? null };
+  }
+  if (parts[0] === "profiles" && parts[1] && parts.length === 2) {
+    return { handle: parts[1], groupSlug: null };
   }
   if (parts[0] === "profiles" && parts[1] && parts[2] === "sets" && parts[3] && parts.length === 4) {
     return { handle: parts[1], groupSlug: parts[3] };
@@ -63,6 +70,7 @@ function catalogSkillUrl(catalogSkillId: unknown): string | null {
 export default async (req: Request, context: Context) => {
   const requestPath = new URL(req.url).pathname;
   const route = parseRoute(requestPath);
+  const resolvedHandleIsValid = route ? isValidHandle(route.handle) : false;
   if (
     context.deploy.context !== "production" &&
     req.headers.get("x-omgskills-route-diagnostic") === "1"
@@ -73,12 +81,13 @@ export default async (req: Request, context: Context) => {
         contextPath: context.path || null,
         contextParams: context.params,
         resolvedHandle: route?.handle ?? null,
-        resolvedGroupSlug: route?.groupSlug ?? null
+        resolvedGroupSlug: route?.groupSlug ?? null,
+        resolvedHandleIsValid
       },
       { headers: { "Cache-Control": "no-store" } }
     );
   }
-  if (!route) {
+  if (!route || !resolvedHandleIsValid) {
     return notFound();
   }
   const { handle, groupSlug } = route;

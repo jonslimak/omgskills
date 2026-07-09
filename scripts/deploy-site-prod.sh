@@ -3,6 +3,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+if [ -f .netlify/netlify.toml ]; then
+  echo "Refusing production deploy: .netlify/netlify.toml is a stale generated config cache." >&2
+  echo "Move it aside for the deploy so the root netlify.toml is authoritative." >&2
+  exit 1
+fi
+
 if ! git diff --quiet -- site .github/workflows scripts netlify.toml; then
   echo "Refusing production deploy: tracked deploy files have uncommitted changes." >&2
   echo "" >&2

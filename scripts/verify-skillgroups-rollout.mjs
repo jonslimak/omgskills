@@ -5,6 +5,7 @@ const productionOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.co
 const handle = process.env.SKILLGROUP_HANDLE || "";
 const groupSlug = process.env.SKILLGROUP_SLUG || "";
 const verifyTargetLibrary = process.env.VERIFY_TARGET_WEB_LIBRARY === "1";
+const verifyProfileRouteDiagnostic = process.env.VERIFY_PROFILE_ROUTE_DIAGNOSTIC === "1";
 
 function fail(message) {
   console.error(`verify-skillgroups-rollout: ${message}`);
@@ -49,15 +50,40 @@ async function expectText(path, text, options = {}) {
 
 async function verifyTargetCore() {
   await expectStatus("/app/", 200);
-  await expectStatus("/api/portal/sync-upload", 401, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token: "bad", skills: [] })
-  });
+  if (verifyProfileRouteDiagnostic) {
+    console.log("skip database-backed sync check during profile route diagnostics");
+  } else {
+    await expectStatus("/api/portal/sync-upload", 401, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: "bad", skills: [] })
+    });
+  }
   await expectJsonAsset("/data/crawl4/manifest.json", "skills");
   await expectJsonAsset("/data/v2/manifest.json", "skills");
   await expectJsonAsset("/data/manifest.json", "skills");
   await expectStatus("/appcast.xml", 200);
+}
+
+async function verifyProfileDiagnostics() {
+  if (!verifyProfileRouteDiagnostic) {
+    return;
+  }
+  if (!handle) {
+    fail("VERIFY_PROFILE_ROUTE_DIAGNOSTIC requires SKILLGROUP_HANDLE");
+  }
+
+  for (const suffix of ["", "/"]) {
+    const response = await expectStatus(`/profiles/${encodeURIComponent(handle)}${suffix}`, 200, {
+      headers: { "x-omgskills-route-diagnostic": "1" }
+    });
+    const diagnostic = await response.json();
+    if (diagnostic.resolvedHandle !== handle || diagnostic.resolvedHandleIsValid !== true) {
+      fail(`profile diagnostic resolved ${JSON.stringify(diagnostic)}, expected handle ${handle}`);
+    }
+  }
+
+  await expectStatus("/profiles/logo.png", 404);
 }
 
 async function verifyPublicGroupRoutes() {
@@ -81,11 +107,22 @@ async function verifyTargetLibraryPages() {
     console.log("skip target web-library pages: set VERIFY_TARGET_WEB_LIBRARY=1 after merging latest main");
     return;
   }
-  await expectText("/profiles/anthropics/", "Anthropic");
+  const redirect = await expectStatus("/profiles/anthropics", 301);
+  if (redirect.headers.get("location") !== "/profiles/anthropics/") {
+    fail("static profile redirect did not preserve the canonical trailing-slash URL");
+  }
+  const staticProfile = await expectStatus("/profiles/anthropics/", 200);
+  if (!(staticProfile.headers.get("cache-control") || "").includes("public")) {
+    fail("static profile lost its public cache policy");
+  }
+  if (!(await staticProfile.text()).includes("Anthropic")) {
+    fail("static profile did not contain Anthropic");
+  }
   await expectText("/skills/anthropics/skills/frontend-design/", "frontend-design");
 }
 
 await verifyTargetCore();
+await verifyProfileDiagnostics();
 await verifyPublicGroupRoutes();
 await verifyProductionLibraryBaseline();
 await verifyTargetLibraryPages();
