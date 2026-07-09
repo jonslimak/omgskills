@@ -10,8 +10,8 @@ import type {
 } from "./types.js";
 import type { MomentumSource } from "./momentum.js";
 
-export const DAILY_PRIORITY_REPO_LIMIT = 40;
-export const CREATOR_WATCH_DAILY_PRIORITY_CAP = 5;
+export const DAILY_PRIORITY_REPO_LIMIT = 50;
+export const CREATOR_WATCH_DAILY_PRIORITY_CAP = 8;
 export const MOMENTUM_DAILY_PRIORITY_CAP = 5;
 export const DAILY_PRIORITY_BUCKET_CAPS: Array<{ reason: Exclude<PriorityReason, "creatorWatch" | "momentum" | "stars">; cap: number }> = [
   { reason: "official", cap: 12 },
@@ -105,6 +105,23 @@ function compareMomentumRepos(
     a.repo.localeCompare(b.repo);
 }
 
+function hasSkillFocusedRepoName(repo: string): boolean {
+  return /\b(skill|skills|agent|claude|mcp|prompt)\b/i.test(repo.replace(/[-_.\/]/g, " "));
+}
+
+function compareStarsFillRepos(watchedOwners: ReadonlySet<string>, a: ShadowRepoIndexEntry, b: ShadowRepoIndexEntry): number {
+  const watchedDelta = Number(watchedOwners.has(repoOwner(b.repo))) - Number(watchedOwners.has(repoOwner(a.repo)));
+  if (watchedDelta !== 0) return watchedDelta;
+
+  const multiSkillDelta = Number(b.skillCount >= 3) - Number(a.skillCount >= 3);
+  if (multiSkillDelta !== 0) return multiSkillDelta;
+
+  const skillNameDelta = Number(hasSkillFocusedRepoName(b.repo)) - Number(hasSkillFocusedRepoName(a.repo));
+  if (skillNameDelta !== 0) return skillNameDelta;
+
+  return b.stars - a.stars || a.repo.localeCompare(b.repo);
+}
+
 export function buildDailyPriorityRepos(
   repoIndex: ShadowRepoIndex,
   discovered: Map<string, DailyPriorityDiscoveredRepo>,
@@ -166,7 +183,7 @@ export function buildDailyPriorityRepos(
   }
 
   const remainingMonitoredRepos = monitoredRepos
-    .sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+    .sort((a, b) => compareStarsFillRepos(watchedOwners, a, b));
   pushRepos(remainingMonitoredRepos, "stars");
 
   return {

@@ -95,6 +95,7 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     staleReasonCounts: { repoMissing: 0, skillFileMissing: 0, validationFailed: 0 },
     priorityReasonCounts: { official: 0, trustedVendor: 0, goldBasket: 0, creatorWatch: 0, momentum: 0, stars: 0 },
     dailyPriorityRepoSample: [],
+    dailyPriorityStarsFillSample: [],
     skippedMonitoredRepoCount: 0,
     nextPromotionCandidateCount: 0,
     nextPromotionCandidatesSample: [],

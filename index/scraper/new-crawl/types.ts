@@ -441,6 +441,7 @@ export type ShadowRunReport = {
   staleReasonCounts: ShadowStaleReasonCounts;
   priorityReasonCounts: PriorityReasonCounts;
   dailyPriorityRepoSample: DailyPriorityRepoSample[];
+  dailyPriorityStarsFillSample: DailyPriorityRepoSample[];
   skippedMonitoredRepoCount: number;
   nextPromotionCandidateCount: number;
   nextPromotionCandidatesSample: NextPromotionCandidateSample[];

@@ -719,7 +719,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     "## Enrichment",
     "",
-    `- Active daily priority hotset rule: official (12), gold basket (10), trusted vendor (8), creator watch (5 when enabled), stars fill to ${DAILY_PRIORITY_REPO_LIMIT}`,
+    `- Active daily priority hotset rule: official (12), gold basket (10), trusted vendor (8), creator watch (8 when enabled), stars fill to ${DAILY_PRIORITY_REPO_LIMIT}`,
     `- Cheap repos checked: ${report.enrichmentCounts.cheapReposChecked}`,
     `- Daily priority repos: ${report.enrichmentCounts.dailyPriorityRepoCount}`,
     `- Daily priority reasons: ${formatPriorityReasonCounts(report.priorityReasonCounts)}`,
@@ -785,6 +785,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Stale/invalid candidates: ${report.staleInvalidCandidatesSample.map((row) => `${row.id} (${row.reason})`).join(", ") || "none"}`,
     `- Skill-file missing sample: ${report.skillFileMissingSample.map((row) => `${row.repo} (${row.failedSkillId}, skills=${row.skillCount}, top=${row.topSkillId ?? "none"}, observed=${row.lastObservedRepoUpdatedAt ?? "none"})`).join(", ") || "none"}`,
     `- Daily priority repos: ${report.dailyPriorityRepoSample.map((row) => `${row.repo} (${row.reason})`).join(", ") || "none"}`,
+    `- Daily priority stars-fill repos: ${report.dailyPriorityStarsFillSample.map((row) => row.repo).join(", ") || "none"}`,
     "",
     "## Crawl v4 Preview",
     "",
@@ -969,6 +970,7 @@ type ShadowRefreshResult = {
   staleReasonCounts: ShadowStaleReasonCounts;
   priorityReasonCounts: PriorityReasonCounts;
   dailyPriorityRepoSample: DailyPriorityRepoSample[];
+  dailyPriorityStarsFillSample: DailyPriorityRepoSample[];
   skippedMonitoredRepoCount: number;
   bootstrappedRepoSample: BootstrapRepoSample[];
   catalogAdmissionSample: CatalogAdmissionSample[];
@@ -1151,6 +1153,7 @@ async function runShadowRefresh(
       staleReasonCounts,
       priorityReasonCounts,
       dailyPriorityRepoSample: [],
+      dailyPriorityStarsFillSample: [],
       skippedMonitoredRepoCount: 0,
       bootstrappedRepoSample: bootstrapResult.bootstrappedRepoSample,
       catalogAdmissionSample,
@@ -1379,6 +1382,13 @@ async function runShadowRefresh(
       repo: repo.repo,
       reason: reasonByRepo.get(repo.repo) ?? "stars",
     })),
+    dailyPriorityStarsFillSample: dailyPriorityRepos
+      .filter((repo) => reasonByRepo.get(repo.repo) === "stars")
+      .slice(0, 10)
+      .map((repo) => ({
+        repo: repo.repo,
+        reason: "stars",
+      })),
     skippedMonitoredRepoCount,
     bootstrappedRepoSample: bootstrapResult.bootstrappedRepoSample,
     catalogAdmissionSample,
@@ -2179,6 +2189,7 @@ async function main() {
     staleReasonCounts: refreshResult.staleReasonCounts,
     priorityReasonCounts: refreshResult.priorityReasonCounts,
     dailyPriorityRepoSample: refreshResult.dailyPriorityRepoSample,
+    dailyPriorityStarsFillSample: refreshResult.dailyPriorityStarsFillSample,
     skippedMonitoredRepoCount: refreshResult.skippedMonitoredRepoCount,
     enrichmentWarnings: refreshResult.enrichmentWarnings,
     discoveredRepoCount: discovered.size,

@@ -63,6 +63,67 @@ Publish flows should keep one track from breaking the other:
 - v2 failure still matters while v2 is the fallback
 - advisory checks should not block fresh data when blocking validation already passed
 
+## Admission and Trust Model — the three doors
+
+Captured 2026-07-07 as the durable rulebook for how anything enters the system.
+Signals fill the library and write proposals; the operator grants trust; only
+the operator endorses.
+
+### Door 1 — Library admission (fully automatic)
+
+A skill enters the searchable library when any value-gate arm passes:
+
+- watched-creator repo (registry `watch: true`, flag-gated)
+- official / trusted-vendor source
+- install arm: skills.sh installs/rank above threshold (T2.2)
+- normal discovery + remaining star/value checks
+
+Plus always: clean-mapping gate, catalog/repackaged exclusion, not on
+do-not-crawl, not suppressed.
+
+No human review. The library is the wide base; a mediocre skill entering is
+cheap. Correction happens through the removal lists (do-not-crawl,
+suppressed-skills), not through pre-review.
+
+### Door 2 — Watch (machine proposes, operator ratifies)
+
+Watch is a trust grant: daily new-repo tracking, admission bypass, hotset
+slots. Entry process:
+
+- signals write `proposed-creators.json` (gold-basket authorship, skills.sh
+  boards, momentum, manual curation)
+- operator reviews in editool's proposals panel: **Add watched** or
+  **Dismiss** (both recorded in `creators.json` so decisions persist)
+
+Weekly batched review is not a bottleneck: **nothing waits for it.** A hot
+skill from an unknown creator enters through Door 1 the same day on its own
+merits. Watch only accelerates the creator's *future* repos.
+
+### Door 3 — Featured (fully human)
+
+Public endorsement: creator profiles, collections. Granted only by the
+operator (editool / `creators.json` `featured: true`, which implies `watch`).
+No signal ever auto-features anyone.
+
+### What each signal is allowed to do
+
+| Signal | Door 1 (library) | Door 2 (watch) | Door 3 (featured) |
+|---|---|---|---|
+| skills.sh installs/rank | admits a skill above threshold | proposal evidence | never |
+| skills.sh board movement (momentum) | refresh priority only | proposal evidence | never |
+| X validated mention | discovery candidate only, no bypass | corroborating evidence at most | never |
+| gold-basket / curation | — | strong proposal evidence | operator's call |
+| watched creator | admission bypass | — | operator's call |
+| stars | tie-breaker/evidence, no longer the gate | evidence | never |
+
+### The X (Twitter) rule
+
+A tweet counts as a signal only when it passes existing X validation:
+minimum engagement (≥50 likes) AND it links to a real repo whose `SKILL.md`
+parses. It then earns exactly one thing — a discovery candidate that goes
+through normal Door 1 admission. X never admits by itself, never watches a
+creator, never features anyone.
+
 ## Crawl 4 Policy Summary
 
 Crawl 4 is intentionally selective.
@@ -71,7 +132,7 @@ Main behavior:
 
 - daily priority focuses on high-value hotset repos
 - proposed Stage B hotset is `50` repos
-- active daily deep-refresh hotset remains `40` until explicitly flipped
+- active daily deep-refresh hotset is `50`
 - non-daily repos receive weekly cheap repo-meta checks
 - cheap-triggered deep refresh is capped at `150` repos per combined run
 - high-star `SKILL.md` discovery is weekly-gated

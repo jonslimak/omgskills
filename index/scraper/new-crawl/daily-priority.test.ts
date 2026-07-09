@@ -107,7 +107,7 @@ test("caps daily priority selection by bucket and total size", () => {
   assert.equal(counts.trustedVendor, 8);
   assert.equal(counts.creatorWatch, 0);
   assert.equal(counts.momentum, 0);
-  assert.equal(counts.stars, 10);
+  assert.equal(counts.stars, 20);
 });
 
 test("earlier buckets beat higher-star fallback repos", () => {
@@ -161,8 +161,59 @@ test("fills leftover slots by stars after earlier buckets", () => {
   assert.equal(result.reasonByRepo.get("plain/low"), "stars");
 });
 
+test("stars fill prefers watched creator repo over higher-star generic repo", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "watched/small", stars: 10 }),
+      repo({ repo: "generic/large", stars: 1000 }),
+    ]),
+    new Map(),
+    { creatorWatchEnabled: true, watchedCreatorHandles: new Set(["watched"]), creatorWatchCap: 0 },
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["watched/small", "generic/large"]);
+  assert.equal(result.reasonByRepo.get("watched/small"), "stars");
+});
+
+test("stars fill prefers multi-skill repo over higher-star single-skill generic repo", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "generic/large", stars: 1000, skillCount: 1 }),
+      repo({ repo: "focused/multi", stars: 10, skillCount: 3 }),
+    ]),
+    new Map(),
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["focused/multi", "generic/large"]);
+});
+
+test("stars fill prefers skill-focused repo name over higher-star generic repo", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "generic/large", stars: 1000, skillCount: 1 }),
+      repo({ repo: "small/claude-agent", stars: 10, skillCount: 1 }),
+    ]),
+    new Map(),
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["small/claude-agent", "generic/large"]);
+});
+
+test("generic mega repo can still be selected when enough slots remain", () => {
+  const result = buildDailyPriorityRepos(
+    repoIndex([
+      repo({ repo: "generic/large", stars: 1000, skillCount: 1 }),
+      repo({ repo: "focused/skills", stars: 10, skillCount: 1 }),
+    ]),
+    new Map(),
+  );
+
+  assert.deepEqual(result.repos.map((row) => row.repo), ["focused/skills", "generic/large"]);
+  assert.equal(result.reasonByRepo.get("generic/large"), "stars");
+});
+
 test("skipped monitored repo count matches total monitored minus selected", () => {
-  const repos = Array.from({ length: 45 }, (_, index) => repo({ repo: `plain/repo-${index}`, stars: 100 - index }));
+  const repos = Array.from({ length: 55 }, (_, index) => repo({ repo: `plain/repo-${index}`, stars: 100 - index }));
   repos.push(repo({ repo: "library/ignored", stars: 1, state: "library" }));
   repos[0] = repo({ repo: "official/one", stars: 500 });
 
@@ -247,6 +298,26 @@ test("creator-watch is capped and sorted by refresh age, stars, then repo", () =
     ["watched/old-high", "watched/old-alpha", "watched/old-low"],
   );
   assert.equal(result.reasonByRepo.get("watched/newer"), "stars");
+});
+
+test("creator-watch default cap selects up to eight repos", () => {
+  const repos = Array.from({ length: 10 }, (_, index) =>
+    repo({
+      repo: `watched/repo-${index}`,
+      stars: 100 - index,
+      lastRefreshedAt: `2026-05-${String(index + 1).padStart(2, "0")}T00:00:00Z`,
+    }),
+  );
+
+  const result = buildDailyPriorityRepos(
+    repoIndex(repos),
+    new Map(),
+    { creatorWatchEnabled: true, watchedCreatorHandles: new Set(["watched"]) },
+  );
+  const counts = countReasons(result.reasonByRepo);
+
+  assert.equal(counts.creatorWatch, 8);
+  assert.equal(counts.stars, 2);
 });
 
 test("earlier buckets keep priority over creator-watch", () => {
