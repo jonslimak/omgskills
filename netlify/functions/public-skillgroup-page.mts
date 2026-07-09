@@ -36,9 +36,6 @@ function parseRoute(pathname: string): { handle: string; groupSlug: string | nul
   if (parts[0] === "profiles" && parts[1] && parts[2] === "sets" && parts[3] && parts.length === 4) {
     return { handle: parts[1], groupSlug: parts[3] };
   }
-  if (parts[0] === "__profile" && parts[1] && parts.length === 2) {
-    return { handle: parts[1], groupSlug: null };
-  }
   return null;
 }
 
@@ -178,7 +175,6 @@ export default async (req: Request, context: Context) => {
 
 export const config: Config = {
   path: [
-    "/__profile/:handle",
     "/u/:handle",
     "/u/:handle/:groupSlug",
     "/profiles/:handle/sets/:groupSlug"

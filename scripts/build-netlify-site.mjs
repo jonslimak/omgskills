@@ -72,7 +72,7 @@ async function mergeRedirects() {
     "",
     "# generated web library profiles",
     ...staticProfileRedirects,
-    "/profiles/:handle  /__profile/:handle  200!",
+    "/profiles/:handle  /u/:handle  200!",
     "",
     "# existing omgskills.com redirects",
     siteRedirects.trim(),
