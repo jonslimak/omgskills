@@ -6,11 +6,6 @@ const shadowMaxAgeHours = Number(process.env.SHADOW_MAX_AGE_HOURS ?? 12);
 const stuckMaxMinutes = Number(process.env.STUCK_MAX_MINUTES ?? 90);
 const checkedAt = new Date().toISOString();
 
-if (!repo || !token) {
-  console.error("check-pipeline-health: missing GITHUB_REPOSITORY or GITHUB_TOKEN");
-  process.exit(1);
-}
-
 async function github(path) {
   const response = await fetch(`https://api.github.com${path}`, {
     headers: {
@@ -84,19 +79,6 @@ function latestSuccessfulStepAt(jobs, stepName) {
   return latest;
 }
 
-function latestStepConclusion(jobs, stepName) {
-  let latestStep = null;
-  for (const job of jobs) {
-    for (const step of job.steps ?? []) {
-      if (step.name !== stepName) continue;
-      if (!latestStep || (step.started_at ?? "") > (latestStep.started_at ?? "")) {
-        latestStep = step;
-      }
-    }
-  }
-  return latestStep?.conclusion ?? null;
-}
-
 async function latestStageSuccess(runs, stepName) {
   for (const run of runs) {
     const jobs = await jobsForRun(run.id);
@@ -111,7 +93,53 @@ async function latestStageSuccess(runs, stepName) {
   return null;
 }
 
+export function stuckShadowWorkflowIssues(inProgressRuns, nowMs = Date.now(), maxMinutes = stuckMaxMinutes) {
+  const issues = [];
+  for (const run of inProgressRuns ?? []) {
+    if (run.path?.endsWith(`/${workflows.shadowCrawler}`) === false && run.name !== "shadow-crawl-health") continue;
+    const ageMinutes = (nowMs - new Date(run.run_started_at).getTime()) / 6e4;
+    if (ageMinutes > maxMinutes) {
+      issues.push(`workflow stuck: ${run.name} for ${Math.round(ageMinutes)}m`);
+    }
+  }
+  return issues;
+}
+
+export function buildShadowCutoverState({ latestV2Publish, latestV2Deploy, latestLiveVerify, latestShadowRun }) {
+  const issues = [];
+  const publishAt = latestV2Publish?.completedAt ?? null;
+  const deployAt = latestV2Deploy?.completedAt ?? null;
+  const verifyAt = latestLiveVerify?.completedAt ?? null;
+  const requiredVerifyAt = [publishAt, deployAt].filter(Boolean).sort().at(-1) ?? null;
+  const latestRunPendingVerify =
+    latestShadowRun?.status !== "completed" &&
+    [latestV2Publish?.run?.id, latestV2Deploy?.run?.id].includes(latestShadowRun?.id) &&
+    requiredVerifyAt !== null &&
+    (verifyAt === null || verifyAt < requiredVerifyAt);
+
+  if (!publishAt) issues.push("No successful v2 publish stage found");
+  if (!deployAt) issues.push("No successful deploy stage found");
+  if (!verifyAt) {
+    issues.push("No successful live v2 verify stage found");
+  } else if (requiredVerifyAt && verifyAt < requiredVerifyAt && !latestRunPendingVerify) {
+    issues.push("Latest live v2 verify step did not pass");
+  }
+
+  return {
+    issues,
+    publishAt,
+    deployAt,
+    verifyAt,
+    verifyConclusion: verifyAt ? "success" : null,
+  };
+}
+
 async function main() {
+  if (!repo || !token) {
+    console.error("check-pipeline-health: missing GITHUB_REPOSITORY or GITHUB_TOKEN");
+    process.exit(1);
+  }
+
   const issues = [];
   const sections = {};
 
@@ -120,11 +148,11 @@ async function main() {
     github(`/repos/${repo}/actions/runs?status=in_progress&per_page=100`),
   ]);
   const latestShadowRun = shadowRuns[0] ?? null;
-  const latestShadowRunJobs = latestShadowRun ? await jobsForRun(latestShadowRun.id) : [];
-  const [latestShadowCrawl, latestV2Publish, latestV2Deploy] = await Promise.all([
+  const [latestShadowCrawl, latestV2Publish, latestV2Deploy, latestLiveVerify] = await Promise.all([
     latestStageSuccess(shadowRuns, shadowStageSteps.crawl),
     latestStageSuccess(shadowRuns, shadowStageSteps.publish),
     latestStageSuccess(shadowRuns, shadowStageSteps.deploy),
+    latestStageSuccess(shadowRuns, shadowStageSteps.verify),
   ]);
 
   const crawlerIssues = [];
@@ -134,13 +162,7 @@ async function main() {
     crawlerIssues.push(`shadow crawl is stale (${hoursSince(latestShadowCrawl.completedAt).toFixed(1)}h)`);
   }
 
-  for (const run of inProgressRuns.workflow_runs ?? []) {
-    if (run.path?.endsWith(`/${workflows.shadowCrawler}`) === false && run.name !== "shadow-crawl-health") continue;
-    const ageMinutes = (Date.now() - new Date(run.run_started_at).getTime()) / 6e4;
-    if (ageMinutes > stuckMaxMinutes) {
-      crawlerIssues.push(`workflow stuck: ${run.name} for ${Math.round(ageMinutes)}m`);
-    }
-  }
+  crawlerIssues.push(...stuckShadowWorkflowIssues(inProgressRuns.workflow_runs ?? []));
 
   sections.crawlers = crawlerIssues.length
     ? degraded(crawlerIssues, {
@@ -153,24 +175,21 @@ async function main() {
       });
   issues.push(...crawlerIssues.map((issue) => `crawlers: ${issue}`));
 
-  const shadowIssues = [];
-  const publishAt = latestV2Publish?.completedAt ?? null;
-  const deployAt = latestV2Deploy?.completedAt ?? null;
-  const verifyConclusion = latestStepConclusion(latestShadowRunJobs, shadowStageSteps.verify);
-  if (!publishAt) shadowIssues.push("No successful v2 publish stage found");
-  if (!deployAt) shadowIssues.push("No successful deploy stage found");
-  if (verifyConclusion !== "success") shadowIssues.push("Latest live v2 verify step did not pass");
+  const shadowCutover = buildShadowCutoverState({ latestV2Publish, latestV2Deploy, latestLiveVerify, latestShadowRun });
+  const shadowIssues = shadowCutover.issues;
 
   sections.shadowCutover = shadowIssues.length
     ? degraded(shadowIssues, {
-        lastSuccessfulV2PublishAt: publishAt,
-        lastSuccessfulDeployAt: deployAt,
-        latestLiveVerifyConclusion: verifyConclusion,
+        lastSuccessfulV2PublishAt: shadowCutover.publishAt,
+        lastSuccessfulDeployAt: shadowCutover.deployAt,
+        lastSuccessfulLiveVerifyAt: shadowCutover.verifyAt,
+        latestLiveVerifyConclusion: shadowCutover.verifyConclusion,
       })
     : ok({
-        lastSuccessfulV2PublishAt: publishAt,
-        lastSuccessfulDeployAt: deployAt,
-        latestLiveVerifyConclusion: verifyConclusion,
+        lastSuccessfulV2PublishAt: shadowCutover.publishAt,
+        lastSuccessfulDeployAt: shadowCutover.deployAt,
+        lastSuccessfulLiveVerifyAt: shadowCutover.verifyAt,
+        latestLiveVerifyConclusion: shadowCutover.verifyConclusion,
       });
   issues.push(...shadowIssues.map((issue) => `shadowCutover: ${issue}`));
 
@@ -185,6 +204,7 @@ async function main() {
     lastShadowCrawlerSuccessAt: latestShadowCrawl?.completedAt ?? null,
     lastV2PublishAt: latestV2Publish?.completedAt ?? null,
     lastV2DeployAt: latestV2Deploy?.completedAt ?? null,
+    lastLiveVerifyAt: latestLiveVerify?.completedAt ?? null,
     latestShadowWorkflowConclusion: latestShadowRun?.conclusion ?? null,
   };
 
@@ -197,6 +217,7 @@ async function main() {
       `last_shadow_crawler_success_at=${latestShadowCrawl?.completedAt ?? ""}`,
       `last_v2_publish_at=${latestV2Publish?.completedAt ?? ""}`,
       `last_v2_deploy_at=${latestV2Deploy?.completedAt ?? ""}`,
+      `last_live_verify_at=${latestLiveVerify?.completedAt ?? ""}`,
       `pipeline_health_json<<EOF`,
       JSON.stringify(result),
       `EOF`,
@@ -211,7 +232,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(`check-pipeline-health: ${error.message}`);
-  process.exit(1);
-});
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(`check-pipeline-health: ${error.message}`);
+    process.exit(1);
+  });
+}
