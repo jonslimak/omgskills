@@ -101,7 +101,8 @@ export default async (req: Request, _context: Context) => {
 
       const syncToken = tokenResult.rows[0];
       if (!syncToken) {
-        throw new Response("Sync token is invalid or expired", { status: 401 });
+        await client.query("ROLLBACK");
+        return errorResponse(req, 401, "Sync token is invalid or expired");
       }
 
       const runResult = await client.query<{ id: string }>(

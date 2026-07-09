@@ -6,12 +6,16 @@ import * as schema from "../../database/schema.js";
 let drizzlePool: pg.Pool | undefined;
 let pgPool: pg.Pool | undefined;
 
+function getSkillGroupsConnectionString() {
+  return process.env.SKILLGROUPS_DATABASE_URL || getConnectionString();
+}
+
 export function getSqlDatabase() {
-  return getDatabase();
+  return getDatabase({ connectionString: getSkillGroupsConnectionString() });
 }
 
 export function getPgPool() {
-  pgPool ??= new pg.Pool({ connectionString: getConnectionString() });
+  pgPool ??= new pg.Pool({ connectionString: getSkillGroupsConnectionString() });
   return pgPool;
 }
 
