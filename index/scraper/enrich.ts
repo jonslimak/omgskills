@@ -115,7 +115,6 @@ export async function getCandidateRepoMeta(c: Candidate, today: string): Promise
   }
 }
 
-const readmeCache = new Map<string, string | undefined>();
 const treeCache = new Map<string, string[]>();
 const branchGuessCache = new Map<string, string>();
 const failedSkillPathCache = new Map<string, Error>();
@@ -126,24 +125,72 @@ function gitBlobSha(content: string): string {
   return createHash("sha1").update(header).update(body).digest("hex");
 }
 
-async function getReadmeSnippet(owner: string, repo: string): Promise<string | undefined> {
-  const key = `${owner}/${repo}`;
-  if (readmeCache.has(key)) return readmeCache.get(key);
+function stripFrontmatter(content: string): string {
+  if (!content.startsWith("---")) return content;
+  const end = content.indexOf("\n---", 3);
+  if (end === -1) return content;
+  return content.slice(end + 4);
+}
 
-  let snippet: string | undefined;
-  try {
-    for (const name of ["README.md", "README.mdx", "README.txt", "README"]) {
-      const file = await fetchRawFile(owner, repo, name);
-      if (file?.content) {
-        snippet = file.content.slice(0, 5000);
-        break;
-      }
-    }
-  } catch {
-    // no README
-  }
-  readmeCache.set(key, snippet);
-  return snippet;
+function normalizeForSimilarity(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[`*_~[\](){}#>!:;.,'"|\\/-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isTooSimilarToDescription(snippet: string, description: string): boolean {
+  const left = normalizeForSimilarity(snippet);
+  const right = normalizeForSimilarity(description);
+  if (!left || !right) return false;
+  if (left === right) return true;
+  if (left.includes(right) || right.includes(left)) return true;
+  const leftWords = new Set(left.split(" ").filter((word) => word.length > 2));
+  const rightWords = right.split(" ").filter((word) => word.length > 2);
+  if (leftWords.size === 0 || rightWords.length === 0) return false;
+  const overlap = rightWords.filter((word) => leftWords.has(word)).length;
+  return overlap / rightWords.length >= 0.9;
+}
+
+function truncateSnippet(text: string, maxLength = 450): string {
+  if (text.length <= maxLength) return text;
+  const window = text.slice(0, maxLength + 1);
+  const sentenceEnd = Math.max(
+    window.lastIndexOf(". "),
+    window.lastIndexOf("! "),
+    window.lastIndexOf("? "),
+  );
+  if (sentenceEnd >= 280) return window.slice(0, sentenceEnd + 1).trim();
+
+  const wordEnd = window.lastIndexOf(" ");
+  const truncated = window.slice(0, wordEnd >= 280 ? wordEnd : maxLength).trim();
+  return /[.!?]$/.test(truncated) ? truncated : `${truncated.replace(/[,:;–-]+$/, "")}...`;
+}
+
+export function buildReadmeSnippetFromSkillContent(content: string, description: string): string | undefined {
+  let body = stripFrontmatter(content);
+  body = body
+    .replace(/^\s*(?:install|installation|quick start|setup|usage)\s*:?\s*(?:npm|pnpm|yarn|bun|pip|uv|brew|git)\s+(?:install|add|clone).*$/gim, " ")
+    .replace(/^\s*(?:npm|pnpm|yarn|bun|pip|uv|brew|git)\s+(?:install|add|clone).*$/gim, " ")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/~~~[\s\S]*?~~~/g, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/!\[[^\]]*]\([^)]*\)/g, " ")
+    .replace(/\[[^\]]*(?:badge|shield|build|status|coverage|version|license)[^\]]*]\([^)]*\)/gi, " ")
+    .replace(/^\s{0,3}#{1,6}\s*/gm, "")
+    .replace(/^\s{0,3}>\s?/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, " ")
+    .replace(/^\s*\d+\.\s+/gm, " ")
+    .replace(/\[(.*?)\]\([^)]*\)/g, "$1")
+    .replace(/[`*_~]/g, "")
+    .replace(/\b(?:install|installation|quick start|setup|usage)\b\s*:?\s*/gi, " ");
+
+  const snippet = truncateSnippet(normalize(body));
+  if (snippet.length < 120) return undefined;
+  if (isTooSimilarToDescription(snippet, description)) return undefined;
+  return stripSurrogates(snippet);
 }
 
 async function fetchRawFile(
@@ -503,11 +550,13 @@ export async function enrichCandidate(
 
     // SHA cache: if SKILL.md hasn't changed, reuse existing parsed data
     const existing = existingSkills.get(c.id);
+    const readme_snippet = buildReadmeSnippetFromSkillContent(fileData.content, existing?.description ?? "");
     if (existing?.skill_md_sha && existing.skill_md_sha === fileData.sha && hasCompleteCachedSkill(existing)) {
-      const { readme_snippet: _readmeSnippet, ...lightweightExisting } = existing as Skill & { readme_snippet?: string };
+      const { readme_snippet: _oldReadmeSnippet, ...existingWithoutSnippet } = existing;
       return {
         skill: preserveExistingOptionalMetadata(existing, {
-          ...lightweightExisting,
+          ...existingWithoutSnippet,
+          ...(readme_snippet ? { readme_snippet } : {}),
           skill_md_path: resolvedPath,
           install_cmd: deriveInstallCmd(meta.githubUrl, resolvedPath, existing.name),
           stars: meta.stars,
@@ -528,6 +577,7 @@ export async function enrichCandidate(
     const mergedTags = Array.from(new Set([...(fm.tags ?? []), ...meta.tags])).filter(Boolean).map(stripSurrogates);
     const install_cmd = deriveInstallCmd(meta.githubUrl, resolvedPath, name);
     const first_seen = existingFirstSeen.get(c.id) ?? today;
+    const freshReadmeSnippet = buildReadmeSnippetFromSkillContent(content, description);
 
     return {
       skill: preserveExistingOptionalMetadata(existing, {
@@ -543,6 +593,7 @@ export async function enrichCandidate(
         last_updated: meta.lastUpdated,
         first_seen,
         skill_md_sha: fileData.sha,
+        ...(freshReadmeSnippet ? { readme_snippet: freshReadmeSnippet } : {}),
       }),
     };
   } catch (err: unknown) {

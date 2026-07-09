@@ -11,6 +11,7 @@ export interface Skill {
   last_updated: string;
   first_seen: string;
   skill_md_sha?: string;
+  readme_snippet?: string;
   source_tag?: string;
   source_url?: string;
   tweet_url?: string;

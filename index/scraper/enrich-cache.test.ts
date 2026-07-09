@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { Skill } from "./types.js";
-import { enrichCandidate, seedRepoCache } from "./enrich.js";
+import { buildReadmeSnippetFromSkillContent, enrichCandidate, seedRepoCache } from "./enrich.js";
 
 function mockFetchOnce(handler: (url: string) => { ok: boolean; status: number; text: string }) {
   const originalFetch = globalThis.fetch;
@@ -148,6 +148,127 @@ test("refresh preserves existing optional source and tweet metadata", async () =
     assert.equal(result.skill?.tweet_author_name, "Example");
     assert.equal(result.skill?.tweet_posted_at, "2026-05-01T00:00:00Z");
     assert.equal(result.skill?.tweet_text, "tweet text");
+  } finally {
+    restoreFetch();
+  }
+});
+
+test("readme snippet strips frontmatter, markdown, code, images, and boilerplate", () => {
+  const snippet = buildReadmeSnippetFromSkillContent(
+    `---
+name: browser-helper
+description: Short description for search.
+---
+# Browser Helper
+
+![build badge](https://example.com/badge.svg)
+
+\`\`\`bash
+npm install browser-helper
+\`\`\`
+
+Install: git clone https://github.com/acme/browser-helper ~/.claude/skills/browser-helper
+
+<p>This skill helps agents inspect browser pages, capture structured page state, and summarize interactive UI behavior for debugging. It focuses on practical browser investigation workflows, clear evidence capture, and repeatable checks that are useful when validating web applications.</p>
+`,
+    "Short description for search.",
+  );
+
+  assert.equal(
+    snippet,
+    "Browser Helper This skill helps agents inspect browser pages, capture structured page state, and summarize interactive UI behavior for debugging. It focuses on practical browser investigation workflows, clear evidence capture, and repeatable checks that are useful when validating web applications.",
+  );
+});
+
+test("readme snippet truncates on sentence boundary", () => {
+  const snippet = buildReadmeSnippetFromSkillContent(
+    `---
+name: long-skill
+description: Small summary.
+---
+This first sentence gives useful context about a skill that helps developers inspect API behavior, collect evidence, compare inputs and outputs, and write a concise report for maintainers. This second sentence should survive because it still fits within the target window and gives more useful detail. This third sentence is intentionally very long and should not be included because the snippet should prefer a clean sentence boundary before it crosses the maximum size expected by the web library generator and search previews.
+`,
+    "Small summary.",
+  );
+
+  assert.ok(snippet);
+  assert.ok(snippet!.endsWith("."));
+  assert.ok(snippet!.length <= 450);
+  assert.equal(snippet!.includes("This third sentence"), false);
+});
+
+test("readme snippet omits same or near-same description", () => {
+  const description = "Use when debugging browser automation failures and collecting clear evidence.";
+  assert.equal(
+    buildReadmeSnippetFromSkillContent(
+      `---
+name: duplicate
+description: ${description}
+---
+${description}
+`,
+      description,
+    ),
+    undefined,
+  );
+});
+
+test("readme snippet omits short or empty source", () => {
+  assert.equal(
+    buildReadmeSnippetFromSkillContent(
+      `---
+name: tiny
+description: tiny
+---
+Too short.
+`,
+      "tiny",
+    ),
+    undefined,
+  );
+});
+
+test("fresh enrich emits readme_snippet from fetched SKILL.md content", async () => {
+  const restoreFetch = mockFetchOnce((url) => {
+    if (url.includes("raw.githubusercontent.com/acme/browser-tools/main/SKILL.md")) {
+      return {
+        ok: true,
+        status: 200,
+        text: `---
+name: browser-tools
+description: Browser testing helper.
+tags:
+  - browser
+---
+# Browser Tools
+
+This skill gives agents a practical workflow for inspecting web pages, collecting visible state, checking interactive behavior, and producing concise bug reports. It emphasizes repeatable validation steps, clear screenshots, and evidence that another engineer can use without rerunning the full investigation.
+`,
+      };
+    }
+    throw new Error(`unexpected fetch: ${url}`);
+  });
+
+  try {
+    const result = await enrichCandidate(
+      {
+        id: "acme/browser-tools",
+        skill_md_path: "SKILL.md",
+      },
+      new Map(),
+      new Map(),
+      "2026-07-09",
+      {
+        stars: 123,
+        lastUpdated: "2026-07-09T00:00:00Z",
+        tags: [],
+        githubUrl: "https://github.com/acme/browser-tools",
+      },
+    );
+
+    assert.ok(result.skill);
+    assert.ok(result.skill?.readme_snippet);
+    assert.match(result.skill!.readme_snippet!, /practical workflow/);
   } finally {
     restoreFetch();
   }
