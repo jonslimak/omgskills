@@ -153,12 +153,14 @@ test("refresh preserves existing optional source and tweet metadata", async () =
   }
 });
 
-test("readme snippet strips frontmatter, markdown, code, images, and boilerplate", () => {
+test("readme snippet starts at first heading after frontmatter and cleans markdown", () => {
   const snippet = buildReadmeSnippetFromSkillContent(
     `---
 name: browser-helper
 description: Short description for search.
 ---
+This opening prose repeats the frontmatter description and should not appear.
+
 # Browser Helper
 
 ![build badge](https://example.com/badge.svg)
@@ -180,12 +182,32 @@ Install: git clone https://github.com/acme/browser-helper ~/.claude/skills/brows
   );
 });
 
-test("readme snippet truncates on sentence boundary", () => {
+test("readme snippet ignores hash characters before the first markdown heading", () => {
+  const snippet = buildReadmeSnippetFromSkillContent(
+    `---
+name: hash-test
+description: A # symbol in frontmatter should not count.
+---
+This line mentions issue #123 before any heading and should be skipped.
+
+## Real Section
+
+Use this section as the snippet because it is the first real content heading.
+`,
+    "A # symbol in frontmatter should not count.",
+  );
+
+  assert.equal(snippet, "Real Section Use this section as the snippet because it is the first real content heading.");
+});
+
+test("readme snippet truncates near 300 characters", () => {
   const snippet = buildReadmeSnippetFromSkillContent(
     `---
 name: long-skill
 description: Small summary.
 ---
+# Long Skill
+
 This first sentence gives useful context about a skill that helps developers inspect API behavior, collect evidence, compare inputs and outputs, and write a concise report for maintainers. This second sentence should survive because it still fits within the target window and gives more useful detail. This third sentence is intentionally very long and should not be included because the snippet should prefer a clean sentence boundary before it crosses the maximum size expected by the web library generator and search previews.
 `,
     "Small summary.",
@@ -193,34 +215,48 @@ This first sentence gives useful context about a skill that helps developers ins
 
   assert.ok(snippet);
   assert.ok(snippet!.endsWith("."));
-  assert.ok(snippet!.length <= 450);
+  assert.ok(snippet!.length <= 300);
   assert.equal(snippet!.includes("This third sentence"), false);
 });
 
-test("readme snippet omits same or near-same description", () => {
+test("readme snippet falls back to body when no heading exists", () => {
   const description = "Use when debugging browser automation failures and collecting clear evidence.";
   assert.equal(
     buildReadmeSnippetFromSkillContent(
       `---
-name: duplicate
+name: no-heading
 description: ${description}
 ---
 ${description}
 `,
       description,
     ),
-    undefined,
+    description,
   );
 });
 
-test("readme snippet omits short or empty source", () => {
+test("readme snippet omits empty source but keeps short useful source", () => {
   assert.equal(
     buildReadmeSnippetFromSkillContent(
       `---
 name: tiny
 description: tiny
 ---
-Too short.
+# Tiny
+Short useful source.
+`,
+      "tiny",
+    ),
+    "Tiny Short useful source.",
+  );
+
+  assert.equal(
+    buildReadmeSnippetFromSkillContent(
+      `---
+name: tiny
+description: tiny
+---
+![badge](https://example.com/badge.svg)
 `,
       "tiny",
     ),

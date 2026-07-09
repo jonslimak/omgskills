@@ -132,28 +132,7 @@ function stripFrontmatter(content: string): string {
   return content.slice(end + 4);
 }
 
-function normalizeForSimilarity(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[`*_~[\](){}#>!:;.,'"|\\/-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function isTooSimilarToDescription(snippet: string, description: string): boolean {
-  const left = normalizeForSimilarity(snippet);
-  const right = normalizeForSimilarity(description);
-  if (!left || !right) return false;
-  if (left === right) return true;
-  if (left.includes(right) || right.includes(left)) return true;
-  const leftWords = new Set(left.split(" ").filter((word) => word.length > 2));
-  const rightWords = right.split(" ").filter((word) => word.length > 2);
-  if (leftWords.size === 0 || rightWords.length === 0) return false;
-  const overlap = rightWords.filter((word) => leftWords.has(word)).length;
-  return overlap / rightWords.length >= 0.9;
-}
-
-function truncateSnippet(text: string, maxLength = 450): string {
+function truncateSnippet(text: string, maxLength = 300): string {
   if (text.length <= maxLength) return text;
   const window = text.slice(0, maxLength + 1);
   const sentenceEnd = Math.max(
@@ -161,16 +140,22 @@ function truncateSnippet(text: string, maxLength = 450): string {
     window.lastIndexOf("! "),
     window.lastIndexOf("? "),
   );
-  if (sentenceEnd >= 280) return window.slice(0, sentenceEnd + 1).trim();
+  if (sentenceEnd >= 180) return window.slice(0, sentenceEnd + 1).trim();
 
   const wordEnd = window.lastIndexOf(" ");
-  const truncated = window.slice(0, wordEnd >= 280 ? wordEnd : maxLength).trim();
+  const truncated = window.slice(0, wordEnd >= 180 ? wordEnd : maxLength).trim();
   return /[.!?]$/.test(truncated) ? truncated : `${truncated.replace(/[,:;–-]+$/, "")}...`;
 }
 
-export function buildReadmeSnippetFromSkillContent(content: string, description: string): string | undefined {
-  let body = stripFrontmatter(content);
-  body = body
+function firstContentSection(content: string): string {
+  const body = stripFrontmatter(content);
+  const headingMatch = /^\s{0,3}#{1,6}\s+/m.exec(body);
+  if (!headingMatch || headingMatch.index === undefined) return body;
+  return body.slice(headingMatch.index);
+}
+
+function cleanSnippetSource(content: string): string {
+  return content
     .replace(/^\s*(?:install|installation|quick start|setup|usage)\s*:?\s*(?:npm|pnpm|yarn|bun|pip|uv|brew|git)\s+(?:install|add|clone).*$/gim, " ")
     .replace(/^\s*(?:npm|pnpm|yarn|bun|pip|uv|brew|git)\s+(?:install|add|clone).*$/gim, " ")
     .replace(/```[\s\S]*?```/g, " ")
@@ -186,10 +171,12 @@ export function buildReadmeSnippetFromSkillContent(content: string, description:
     .replace(/\[(.*?)\]\([^)]*\)/g, "$1")
     .replace(/[`*_~]/g, "")
     .replace(/\b(?:install|installation|quick start|setup|usage)\b\s*:?\s*/gi, " ");
+}
 
-  const snippet = truncateSnippet(normalize(body));
-  if (snippet.length < 120) return undefined;
-  if (isTooSimilarToDescription(snippet, description)) return undefined;
+export function buildReadmeSnippetFromSkillContent(content: string, _description: string): string | undefined {
+  const source = firstContentSection(content);
+  const snippet = truncateSnippet(normalize(cleanSnippetSource(source)));
+  if (!snippet) return undefined;
   return stripSurrogates(snippet);
 }
 
