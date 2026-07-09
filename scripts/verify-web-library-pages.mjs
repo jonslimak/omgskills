@@ -13,6 +13,9 @@ const pages = [
     path: "/profiles/openai/",
     canonical: "https://omgskills.com/profiles/openai/",
     text: "OpenAI",
+    titleText: "OpenAI&#39;s Claude &amp; Codex skills",
+    descriptionText: "Codex skills",
+    profileMetadata: true,
   },
   {
     path: "/profiles/mattpocock/",
@@ -23,11 +26,15 @@ const pages = [
     path: "/collections/starter-pack/",
     canonical: "https://omgskills.com/collections/starter-pack/",
     text: "Starter Pack",
+    titleText: "Starter Pack",
+    descriptionText: "Claude and Codex",
   },
   {
     path: "/skills/openai/codex/code-review/",
     canonical: "https://omgskills.com/skills/openai/codex/code-review/",
     text: "code-review",
+    titleText: "Claude skill by openai",
+    descriptionText: "Install code-review",
     metadata: true,
   },
   {
@@ -79,6 +86,65 @@ function assertIncludes(haystack, needle, label) {
   }
 }
 
+function internalLinks(html) {
+  return [...html.matchAll(/\s+href="([^"#][^"]*)"/g)]
+    .map((match) => match[1])
+    .filter((href) => href.startsWith("/") && !href.startsWith("//"));
+}
+
+async function localUrlExists(urlPath) {
+  const cleanPath = urlPath.split("?")[0];
+  const filePath = cleanPath.endsWith("/")
+    ? localPathForUrlPath(path.posix.join(cleanPath, "index.html"))
+    : localPathForUrlPath(cleanPath);
+  if (await fileExists(filePath)) return true;
+  if (!path.extname(cleanPath)) {
+    return fileExists(localPathForUrlPath(path.posix.join(cleanPath, "index.html")));
+  }
+  return false;
+}
+
+async function verifyLocalInternalLinks(html, label) {
+  for (const href of internalLinks(html)) {
+    if (!(await localUrlExists(href))) {
+      throw new Error(`${label} linked to missing local URL ${href}`);
+    }
+  }
+}
+
+async function verifyLiveInternalLinks(html, label) {
+  for (const href of internalLinks(html)) {
+    const response = await fetch(`${origin}${href}`, { redirect: "manual" });
+    if (![200, 301, 302, 308].includes(response.status)) {
+      throw new Error(`${label} linked to ${href}, which returned ${response.status}`);
+    }
+  }
+}
+
+function verifyMetadata(html, page, label) {
+  if (page.titleText) assertIncludes(html, page.titleText, label);
+  if (page.descriptionText) assertIncludes(html, page.descriptionText, label);
+  assertIncludes(html, '<meta property="og:title"', label);
+  assertIncludes(html, '<meta property="og:description"', label);
+  assertIncludes(html, '<meta name="twitter:title"', label);
+  assertIncludes(html, '<script type="application/ld+json">', label);
+
+  if (page.metadata) {
+    assertIncludes(html, '<meta property="og:type"', label);
+    assertIncludes(html, '<meta property="og:site_name" content="omgskills">', label);
+    assertIncludes(html, '<meta name="twitter:card" content="summary">', label);
+    assertIncludes(html, '"@type":"SoftwareApplication"', label);
+    assertIncludes(html, '"operatingSystem":"macOS"', label);
+    assertIncludes(html, '"@type":"BreadcrumbList"', label);
+    assertIncludes(html, '<h2>Install</h2>', label);
+  }
+
+  if (page.profileMetadata) {
+    assertIncludes(html, '<meta property="og:image"', label);
+    assertIncludes(html, '"sameAs":["https://github.com/openai"]', label);
+  }
+}
+
 async function verifyLocalPage(page) {
   const filePath = localPathForUrlPath(path.posix.join(page.path, "index.html"));
   if (!(await fileExists(filePath))) {
@@ -88,11 +154,8 @@ async function verifyLocalPage(page) {
   const html = await readFile(filePath, "utf8");
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, filePath);
   assertIncludes(html, page.text, filePath);
-  if (page.metadata) {
-    assertIncludes(html, '<meta property="og:type"', filePath);
-    assertIncludes(html, '<meta property="og:site_name" content="omgskills">', filePath);
-    assertIncludes(html, '<meta name="twitter:card" content="summary">', filePath);
-  }
+  verifyMetadata(html, page, filePath);
+  await verifyLocalInternalLinks(html, filePath);
 }
 
 async function verifyLocalSitemap() {
@@ -101,10 +164,11 @@ async function verifyLocalSitemap() {
     throw new Error(`Missing generated sitemap: ${sitemapPath}`);
   }
 
-  const sitemap = await readFile(sitemapPath, "utf8");
+  const sitemap = await localSitemapContents(sitemapPath);
   for (const page of pages) {
     assertIncludes(sitemap, `<loc>${page.canonical}</loc>`, sitemapPath);
   }
+  assertIncludes(sitemap, "<lastmod>", sitemapPath);
 }
 
 async function verifyLocalRootFile(file) {
@@ -125,11 +189,8 @@ async function verifyLivePage(page) {
   const html = await response.text();
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, url);
   assertIncludes(html, page.text, url);
-  if (page.metadata) {
-    assertIncludes(html, '<meta property="og:type"', url);
-    assertIncludes(html, '<meta property="og:site_name" content="omgskills">', url);
-    assertIncludes(html, '<meta name="twitter:card" content="summary">', url);
-  }
+  verifyMetadata(html, page, url);
+  await verifyLiveInternalLinks(html, url);
 }
 
 async function verifyLiveSitemap() {
@@ -139,10 +200,37 @@ async function verifyLiveSitemap() {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
 
-  const sitemap = await response.text();
+  const sitemap = await liveSitemapContents(url, await response.text());
   for (const page of pages) {
     assertIncludes(sitemap, `<loc>${page.canonical}</loc>`, url);
   }
+  assertIncludes(sitemap, "<lastmod>", url);
+}
+
+function sitemapChildPaths(xml) {
+  return [...xml.matchAll(/<loc>https:\/\/omgskills\.com(\/sitemap-\d+\.xml)<\/loc>/g)].map((match) => match[1]);
+}
+
+async function localSitemapContents(sitemapPath) {
+  const xml = await readFile(sitemapPath, "utf8");
+  const childPaths = sitemapChildPaths(xml);
+  if (!childPaths.length) return xml;
+  const children = await Promise.all(childPaths.map((urlPath) => readFile(localPathForUrlPath(urlPath), "utf8")));
+  return [xml, ...children].join("\n");
+}
+
+async function liveSitemapContents(rootUrl, xml) {
+  const childPaths = sitemapChildPaths(xml);
+  if (!childPaths.length) return xml;
+  const children = [];
+  for (const urlPath of childPaths) {
+    const response = await fetch(`${origin}${urlPath}`, { redirect: "manual" });
+    if (response.status !== 200) {
+      throw new Error(`${rootUrl} referenced ${urlPath}, which returned ${response.status}`);
+    }
+    children.push(await response.text());
+  }
+  return [xml, ...children].join("\n");
 }
 
 async function verifyLiveRootFile(file) {
@@ -152,6 +240,33 @@ async function verifyLiveRootFile(file) {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
   assertIncludes(await response.text(), file.text, url);
+}
+
+function llmsUrls(text) {
+  return [...text.matchAll(/https:\/\/omgskills\.com([^\s)]+)/g)]
+    .map((match) => match[1])
+    .filter((urlPath) => urlPath.startsWith("/"));
+}
+
+async function verifyLocalLlmsLinks() {
+  const filePath = localPathForUrlPath("/llms.txt");
+  const text = await readFile(filePath, "utf8");
+  for (const urlPath of llmsUrls(text)) {
+    if (!(await localUrlExists(urlPath))) {
+      throw new Error(`${filePath} linked to missing local URL ${urlPath}`);
+    }
+  }
+}
+
+async function verifyLiveLlmsLinks() {
+  const response = await fetch(`${origin}/llms.txt`, { redirect: "manual" });
+  const text = await response.text();
+  for (const urlPath of llmsUrls(text)) {
+    const linkResponse = await fetch(`${origin}${urlPath}`, { redirect: "manual" });
+    if (linkResponse.status !== 200) {
+      throw new Error(`${origin}/llms.txt linked to ${urlPath}, which returned ${linkResponse.status}`);
+    }
+  }
 }
 
 async function verifyLiveRedirect(redirect) {
@@ -171,6 +286,7 @@ async function main() {
   if (isLive) {
     for (const page of pages) await verifyLivePage(page);
     for (const file of rootFiles) await verifyLiveRootFile(file);
+    await verifyLiveLlmsLinks();
     await verifyLiveSitemap();
     for (const redirect of redirects) await verifyLiveRedirect(redirect);
     console.log("Live web library pages verified");
@@ -179,6 +295,7 @@ async function main() {
 
   for (const page of pages) await verifyLocalPage(page);
   for (const file of rootFiles) await verifyLocalRootFile(file);
+  await verifyLocalLlmsLinks();
   await verifyLocalSitemap();
   console.log("Local web library pages verified");
 }

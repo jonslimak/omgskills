@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 
@@ -8,6 +8,7 @@ const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const maxAuthorSkills = Number.parseInt(process.env.WEB_LIBRARY_AUTHOR_SKILL_LIMIT || "3", 10);
+const sitemapChunkSize = Number.parseInt(process.env.WEB_LIBRARY_SITEMAP_CHUNK_SIZE || "10000", 10);
 
 const generatedDirs = ["skills", "profiles", "creators", "collections"];
 
@@ -174,8 +175,9 @@ function titleize(value) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function pageShell({ title, description, path: urlPath, body, structuredData, ogType = "website" }) {
+function pageShell({ title, description, path: urlPath, body, structuredData, ogType = "website", ogImage = "" }) {
   const canonical = `${origin}${urlPath}`;
+  const structuredDataItems = Array.isArray(structuredData) ? structuredData : [structuredData];
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -190,9 +192,11 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
   <meta property="og:url" content="${escapeHtml(canonical)}">
   <meta property="og:type" content="${escapeHtml(ogType)}">
   <meta property="og:site_name" content="omgskills">
+  ${ogImage ? `<meta property="og:image" content="${escapeHtml(ogImage)}">` : ""}
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="${escapeHtml(title)}">
   <meta name="twitter:description" content="${escapeHtml(description)}">
+  ${ogImage ? `<meta name="twitter:image" content="${escapeHtml(ogImage)}">` : ""}
   <style>
     :root { color-scheme: light; --text: #111111; --muted: #6b7280; --line: #e5e7eb; --soft: #f7f7f8; --blue: #007aff; }
     * { box-sizing: border-box; }
@@ -204,6 +208,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .cta { border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; text-decoration: none; font-size: 13px; }
     .eyebrow { color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
     h1 { font-size: clamp(34px, 7vw, 64px); line-height: .95; margin: 12px 0 16px; letter-spacing: -0.04em; }
+    h2 { font-size: 20px; margin: 0 0 12px; letter-spacing: -0.02em; }
     p { color: var(--muted); line-height: 1.55; }
     .meta { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0; color: var(--muted); font-size: 14px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 24px; }
@@ -226,8 +231,10 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .install { overflow: auto; margin: 0; padding: 14px; background: var(--soft); font-size: 13px; }
     .about { max-width: 72ch; }
     .section { margin-top: 36px; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .tag { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; color: var(--muted); font-size: 13px; }
   </style>
-  <script type="application/ld+json">${jsonScript(structuredData)}</script>
+  ${structuredDataItems.map((item) => `<script type="application/ld+json">${jsonScript(item)}</script>`).join("\n  ")}
 </head>
 <body>
   <header>
@@ -312,6 +319,14 @@ async function writePage(urlPath, html) {
   await writeFile(filePath, html);
 }
 
+async function removeSitemapFiles() {
+  for (const entry of await readdir(siteDir)) {
+    if (/^sitemap(?:-\d+)?\.xml$/.test(entry)) {
+      await rm(path.join(siteDir, entry), { force: true });
+    }
+  }
+}
+
 function skillCards(skills, skillUrlById) {
   return skills.map((skill) => {
     const href = skillUrlById.get(skill.id) || skillPathForId(skill.id);
@@ -321,6 +336,104 @@ function skillCards(skills, skillUrlById) {
       <div class="meta"><span>${compactNumber(skill.stars)} stars</span>${skill.author_handle ? `<span>@${escapeHtml(skill.author_handle)}</span>` : ""}</div>
     </a>`;
   }).join("\n");
+}
+
+function skillAuthor(skill) {
+  return skill.author_handle || skill.publisher_handle || String(skill.id || "").split("/")[0] || "omgskills";
+}
+
+function skillTitle(skill) {
+  return `${skill.name} \u2014 Claude skill by ${skillAuthor(skill)} | omgskills`;
+}
+
+function skillMetaDescription(skill) {
+  const author = skillAuthor(skill);
+  const base = normalizeText(descriptionForSkill(skill));
+  const summary = base ? shortText(base, 95) : `Install and use ${skill.name} with Claude Code or Codex.`;
+  return shortText(`${summary} Install ${skill.name}, a Claude and Codex skill by ${author}, from the omgskills library.`, 155);
+}
+
+function profileMetaDescription(collection, skillCount) {
+  const handle = collection.authorHandle;
+  const description = collection.description || collection.subtitle || `Browse Claude and Codex skills by @${handle}.`;
+  return shortText(`${description} Explore ${skillCount} featured skills and install them with omgskills.`, 155);
+}
+
+function collectionMetaDescription(collection, skillCount) {
+  const description = collection.description || collection.subtitle || `${collection.title} is an editorial skill collection.`;
+  return shortText(`${description} Browse ${skillCount} Claude and Codex skills in this omgskills collection.`, 155);
+}
+
+function pageHeading(title) {
+  return `<h2>${escapeHtml(title)}</h2>`;
+}
+
+function tagsForSkill(skill) {
+  const tags = Array.isArray(skill.tags) ? skill.tags.filter(Boolean).slice(0, 8) : [];
+  if (!tags.length) return "";
+  return `<div class="tags">${tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>`;
+}
+
+function trendingBadge(skill) {
+  if (!skill.trending_rank) return "";
+  const source = skill.trending_source ? ` on ${titleize(skill.trending_source)}` : "";
+  return `<span>Trending #${escapeHtml(skill.trending_rank)}${escapeHtml(source)}</span>`;
+}
+
+function installsBadge(skill) {
+  if (!skill.installs) return "";
+  return `<span>${compactNumber(skill.installs)} installs</span>`;
+}
+
+function githubAvatarUrl(handle) {
+  return `https://github.com/${handle}.png`;
+}
+
+function profileSchemaType(collection) {
+  if (collection.schemaType === "Organization" || collection.entityType === "organization") return "Organization";
+  const handle = String(collection.authorHandle || "");
+  const title = String(collection.title || "");
+  const knownOrganizations = new Set(["openai", "anthropic", "cursor"]);
+  if (knownOrganizations.has(handle.toLowerCase())) return "Organization";
+  if (title === title.toUpperCase() && title.length > 1) return "Organization";
+  return "Person";
+}
+
+function skillStructuredData(skill, urlPath, description) {
+  const author = skillAuthor(skill);
+  const authorUrl = `${origin}${profilePath(author)}`;
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: skill.name,
+    description,
+    url: `${origin}${urlPath}`,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "macOS",
+    softwareRequirements: "Claude Code or Codex",
+    author: {
+      "@type": "Organization",
+      name: author,
+      url: authorUrl,
+      sameAs: `https://github.com/${author}`,
+    },
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  };
+  if (skill.last_updated) data.dateModified = String(skill.last_updated);
+  return data;
+}
+
+function skillBreadcrumbData(skill, urlPath) {
+  const author = skillAuthor(skill);
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Skills", item: `${origin}/skills/` },
+      { "@type": "ListItem", position: 2, name: author, item: `${origin}${profilePath(author)}` },
+      { "@type": "ListItem", position: 3, name: skill.name, item: `${origin}${urlPath}` },
+    ],
+  };
 }
 
 function profileStats(authorStats) {
@@ -345,7 +458,7 @@ function authorConfidenceBadge(skill) {
 
 function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
   const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
-  const description = subtitleForSkill(skill).slice(0, 155);
+  const description = skillMetaDescription(skill);
   const about = aboutForSkill(skill);
   const installId = `install-${createHash("sha256").update(skill.id).digest("hex").slice(0, 10)}`;
   const body = `    <div class="eyebrow">Skill</div>
@@ -353,31 +466,30 @@ function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
     <div class="meta">
       ${skill.author_handle ? `<a href="${escapeHtml(profilePath(skill.author_handle))}">@${escapeHtml(skill.author_handle)}</a>` : ""}
       <span>${compactNumber(skill.stars)} stars</span>
+      ${installsBadge(skill)}
+      ${trendingBadge(skill)}
       ${skill.last_updated ? `<span>Updated ${escapeHtml(String(skill.last_updated).slice(0, 10))}</span>` : ""}
       ${authorConfidenceBadge(skill)}
     </div>
-    ${about ? `<div class="section about"><div class="eyebrow">About</div><p>${escapeHtml(about)}</p></div>` : ""}
-    <div class="section install-box">
+    ${tagsForSkill(skill)}
+    ${about ? `<div class="section about">${pageHeading("About")}<p>${escapeHtml(about)}</p></div>` : ""}
+    <div class="section">
+      ${pageHeading("Install")}
+      <p>Install this Claude and Codex skill with the command below. The command stays visible even when copy support is unavailable.</p>
+      <div class="install-box">
       <div class="install-head"><span>Install command</span><button class="copy" type="button" data-copy="${escapeHtml(installId)}">Copy</button></div>
       <pre class="install"><code id="${escapeHtml(installId)}">${escapeHtml(skill.install_cmd || "")}</code></pre>
+      </div>
     </div>
     ${skill.github_url ? `<p><a href="${escapeHtml(skill.github_url)}">View on GitHub</a></p>` : ""}
-    ${repoSkills.length ? `<div class="section"><div class="eyebrow">More from this repo</div><div class="grid">${skillCards(repoSkills, skillUrlById)}</div></div>` : ""}
-    ${authorSkills.length ? `<div class="section"><div class="eyebrow">More skills</div><div class="grid">${skillCards(authorSkills, skillUrlById)}</div></div>` : ""}`;
+    ${repoSkills.length ? `<div class="section">${pageHeading("More from this repo")}<div class="grid">${skillCards(repoSkills, skillUrlById)}</div></div>` : ""}
+    ${authorSkills.length ? `<div class="section">${pageHeading("More skills")}<div class="grid">${skillCards(authorSkills, skillUrlById)}</div></div>` : ""}`;
   return pageShell({
-    title: `${skill.name} skill - omgskills`,
+    title: skillTitle(skill),
     description,
     path: urlPath,
     body,
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      name: skill.name,
-      description,
-      url: `${origin}${urlPath}`,
-      applicationCategory: "DeveloperApplication",
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    },
+    structuredData: [skillStructuredData(skill, urlPath, description), skillBreadcrumbData(skill, urlPath)],
     ogType: "article",
   });
 }
@@ -385,40 +497,43 @@ function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
 function renderProfilePage(collection, skills, skillUrlById, authorStats) {
   const handle = collection.authorHandle;
   const urlPath = profilePath(handle);
-  const description = collection.description || collection.subtitle || `Skills by @${handle}.`;
-  const body = `    <img class="avatar" src="${escapeHtml(collection.imageUrl || `https://github.com/${handle}.png`)}" alt="">
+  const description = profileMetaDescription(collection, skills.length);
+  const avatarUrl = collection.imageUrl || githubAvatarUrl(handle);
+  const body = `    <img class="avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(`${collection.title} profile image`)}">
     <div class="eyebrow">Profile</div>
     <h1>${escapeHtml(collection.title)}</h1>
-    <p>${escapeHtml(description)}</p>
+    <p>${escapeHtml(collection.description || collection.subtitle || `Skills by @${handle}.`)}</p>
     <div class="meta"><span>@${escapeHtml(handle)}</span><span>${skills.length} featured skills</span></div>
     ${profileStats(authorStats)}
-    <div class="section"><div class="eyebrow">Featured skills</div><div class="grid">${skillCards(skills, skillUrlById)}</div></div>`;
+    <div class="section">${pageHeading("Featured skills")}<div class="grid">${skillCards(skills, skillUrlById)}</div></div>`;
   return pageShell({
-    title: `${collection.title} skills - omgskills`,
+    title: `${collection.title}'s Claude & Codex skills (${skills.length}) | omgskills`,
     description,
     path: urlPath,
     body,
     structuredData: {
       "@context": "https://schema.org",
-      "@type": "Person",
+      "@type": profileSchemaType(collection),
       name: collection.title,
       url: `${origin}${urlPath}`,
-      image: collection.imageUrl || `https://github.com/${handle}.png`,
+      image: avatarUrl,
+      sameAs: [`https://github.com/${handle}`],
     },
+    ogImage: avatarUrl,
   });
 }
 
 function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById) {
   const urlPath = collectionPath(collection.id);
-  const description = collection.description || collection.subtitle;
+  const description = collectionMetaDescription(collection, allSkills.length);
   const body = `    <div class="eyebrow">Collection</div>
     <h1>${escapeHtml(collection.title)}</h1>
-    <p>${escapeHtml(description)}</p>
+    <p>${escapeHtml(collection.description || collection.subtitle || `${collection.title} skill collection.`)}</p>
     <div class="meta"><span>${allSkills.length} skills</span></div>
-    <div class="section"><div class="eyebrow">Featured skills</div><div class="grid">${skillCards(featuredSkills, skillUrlById)}</div></div>
-    ${allSkills.length > featuredSkills.length ? `<div class="section"><div class="eyebrow">Full collection</div><div class="grid">${skillCards(allSkills, skillUrlById)}</div></div>` : ""}`;
+    <div class="section">${pageHeading("Featured skills")}<div class="grid">${skillCards(featuredSkills, skillUrlById)}</div></div>
+    ${allSkills.length > featuredSkills.length ? `<div class="section">${pageHeading("Full collection")}<div class="grid">${skillCards(allSkills, skillUrlById)}</div></div>` : ""}`;
   return pageShell({
-    title: `${collection.title} - omgskills`,
+    title: `${collection.title} \u2014 skill collection | omgskills`,
     description,
     path: urlPath,
     body,
@@ -463,14 +578,46 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
   });
 }
 
+function sitemapLastmod(value) {
+  if (!value) return "";
+  const date = String(value).slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "";
+}
+
 async function writeSitemaps(urls) {
-  const sortedUrls = [...urls].sort();
-  const urlset = sortedUrls
-    .map((urlPath) => `  <url><loc>${escapeHtml(`${origin}${urlPath}`)}</loc></url>`)
+  const sortedEntries = [...urls.entries()].sort(([a], [b]) => a.localeCompare(b));
+  const urlsetForEntries = (entries) => entries
+    .map(([urlPath, metadata]) => {
+      const lastmod = sitemapLastmod(metadata?.lastmod);
+      return `  <url><loc>${escapeHtml(`${origin}${urlPath}`)}</loc>${lastmod ? `<lastmod>${escapeHtml(lastmod)}</lastmod>` : ""}</url>`;
+    })
+    .join("\n");
+
+  if (sortedEntries.length <= sitemapChunkSize) {
+    const urlset = urlsetForEntries(sortedEntries);
+    await writeFile(
+      path.join(siteDir, "sitemap.xml"),
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlset}\n</urlset>\n`,
+    );
+    return;
+  }
+
+  const chunks = [];
+  for (let index = 0; index < sortedEntries.length; index += sitemapChunkSize) {
+    chunks.push(sortedEntries.slice(index, index + sitemapChunkSize));
+  }
+
+  await Promise.all(chunks.map((entries, index) => writeFile(
+    path.join(siteDir, `sitemap-${index + 1}.xml`),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlsetForEntries(entries)}\n</urlset>\n`,
+  )));
+
+  const indexXml = chunks
+    .map((_, index) => `  <sitemap><loc>${escapeHtml(`${origin}/sitemap-${index + 1}.xml`)}</loc></sitemap>`)
     .join("\n");
   await writeFile(
     path.join(siteDir, "sitemap.xml"),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlset}\n</urlset>\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexXml}\n</sitemapindex>\n`,
   );
 }
 
@@ -478,12 +625,13 @@ async function main() {
   for (const dir of generatedDirs) {
     await rm(path.join(siteDir, dir), { recursive: true, force: true });
   }
-  await rm(path.join(siteDir, "sitemap.xml"), { force: true });
+  await removeSitemapFiles();
 
   const { skills, trending, collections, authorLeaderboards } = await loadLibraryData();
   const skillUrlById = buildSkillUrlMap(skills);
 
   const skillById = new Map(skills.map((skill) => [skill.id, skill]));
+  const trendingById = new Map(trending.map((entry) => [entry.id, entry]));
   const authorStatsByHandle = new Map(authorLeaderboards.map((entry) => [String(entry.authorHandle || "").toLowerCase(), entry]));
   const skillsByAuthor = new Map();
   const skillsByRepo = new Map();
@@ -525,15 +673,17 @@ async function main() {
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
+    Object.assign(skill, trendingById.get(skill.id) || {});
     const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
     registerUrl(urls, urlPath, `skill ${skill.id}`);
+    urls.set(urlPath, { source: `skill ${skill.id}`, lastmod: skill.last_updated });
     includedSkills.push(skill);
     const repoSkills = (skillsByRepo.get(repoKeyForSkill(skill)) || [])
-      .filter((candidate) => candidate.id !== skill.id)
+      .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id))
       .slice(0, 3);
     const repoSkillIds = new Set(repoSkills.map((candidate) => candidate.id));
     const authorSkills = uniqueSkills(skillsByAuthor.get(String(skill.author_handle || "").toLowerCase()) || [])
-      .filter((candidate) => candidate.id !== skill.id && !repoSkillIds.has(candidate.id))
+      .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id))
       .slice(0, Math.max(0, 3 - repoSkills.length));
     await writePage(urlPath, renderSkillPage(skill, repoSkills, authorSkills, skillUrlById));
   }
@@ -565,7 +715,7 @@ async function main() {
   registerUrl(urls, "/skills/", "skills index");
   await writePage("/skills/", renderSkillsIndexPage({ profileCollections, topicCollections, skills: includedSkills }, skillUrlById));
 
-  await writeSitemaps(urls.keys());
+  await writeSitemaps(urls);
   console.log(`Built web library test set: ${urls.size - 1} pages`);
 }
 
