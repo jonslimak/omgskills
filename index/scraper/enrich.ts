@@ -1,6 +1,6 @@
-import { createHash } from "node:crypto";
 import { parse as parseYaml } from "yaml";
 import { octokit } from "./client.js";
+import { gitBlobSha } from "./git-blob-sha.js";
 import { createRefreshReplayStoreFromEnv } from "./new-crawl/refresh-replay.js";
 import type { Skill } from "./types.js";
 
@@ -119,12 +119,6 @@ const treeCache = new Map<string, string[]>();
 const branchGuessCache = new Map<string, string>();
 const failedSkillPathCache = new Map<string, Error>();
 
-function gitBlobSha(content: string): string {
-  const body = Buffer.from(content, "utf8");
-  const header = Buffer.from(`blob ${body.length}\0`, "utf8");
-  return createHash("sha1").update(header).update(body).digest("hex");
-}
-
 function stripFrontmatter(content: string): string {
   if (!content.startsWith("---")) return content;
   const end = content.indexOf("\n---", 3);
@@ -204,10 +198,10 @@ async function fetchRawFile(
         error.status = res.status;
         throw error;
       }
-      const content = await res.text();
+      const bytes = Buffer.from(await res.arrayBuffer());
       return {
-        content,
-        sha: gitBlobSha(content),
+        content: bytes.toString("utf8"),
+        sha: gitBlobSha(bytes),
       };
     });
     if (!fileData) continue;

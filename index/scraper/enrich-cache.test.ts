@@ -2,22 +2,58 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import type { Skill } from "./types.js";
 import { buildReadmeSnippetFromSkillContent, enrichCandidate, seedRepoCache } from "./enrich.js";
+import { gitBlobSha } from "./git-blob-sha.js";
 
-function mockFetchOnce(handler: (url: string) => { ok: boolean; status: number; text: string }) {
+function mockFetchOnce(handler: (url: string) => { ok: boolean; status: number; text: string; bytes?: Uint8Array }) {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = (async (input: string | URL | Request) => {
     const url = String(input);
     const response = handler(url);
+    const bytes = response.bytes ?? new TextEncoder().encode(response.text);
     return {
       ok: response.ok,
       status: response.status,
       text: async () => response.text,
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer,
     } as Response;
   }) as typeof fetch;
   return () => {
     globalThis.fetch = originalFetch;
   };
 }
+
+test("enrich hashes raw response bytes before UTF-8 decoding", async () => {
+  const rawBytes = Buffer.concat([
+    Buffer.from("---\nname: raw-bytes\ndescription: desc\n---\n", "utf8"),
+    Buffer.from([0xff]),
+  ]);
+  const restoreFetch = mockFetchOnce(() => ({
+    ok: true,
+    status: 200,
+    text: rawBytes.toString("utf8"),
+    bytes: rawBytes,
+  }));
+
+  try {
+    const result = await enrichCandidate(
+      { id: "owner/repo:raw-bytes", skill_md_path: "SKILL.md" },
+      new Map(),
+      new Map(),
+      "2026-07-09",
+      {
+        stars: 1,
+        lastUpdated: "2026-07-09T00:00:00Z",
+        tags: [],
+        githubUrl: "https://github.com/owner/repo",
+      },
+    );
+
+    assert.ok(result.skill);
+    assert.equal(result.skill.skill_md_sha, gitBlobSha(rawBytes));
+  } finally {
+    restoreFetch();
+  }
+});
 
 test("cached enrich reuse preserves resolved skill_md_path and install_cmd", async () => {
   const restoreFetch = mockFetchOnce((url) => {

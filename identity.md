@@ -24,6 +24,20 @@ The catalog already stores `skill_md_sha` — a content hash of every `SKILL.md`
 
 Content addressing is the bridge between "a folder on someone's disk" and "a catalog entry with a github_url" — without hosting any content. If the client hashes a local `SKILL.md` the same way the crawler does, identity resolution becomes a lookup.
 
+### Hash contract
+
+`skill_md_sha` is the lowercase, 40-character Git blob SHA-1 of the exact
+`SKILL.md` bytes:
+
+```text
+SHA1("blob " + byteLength + NUL + rawBytes)
+```
+
+There is no newline, Unicode, whitespace, frontmatter, or Markdown normalization.
+The crawler hashes the downloaded bytes before decoding them as UTF-8, and the
+client hashes the local file bytes directly. The hash identifies one exact file
+version; it does not establish authorship or logical equivalence.
+
 ## The resolution ladder
 
 The client walks these steps locally, strongest signal first. Each skill ends in exactly one state: exact-resolved, user-confirmed, or local-only.
@@ -78,18 +92,31 @@ Genuinely local-only. The schema already models this correctly (`is_local_only`,
 
 Not a failure. No fabricated URLs.
 
-## Proposed system addition: sha history index
+## Current system: sha history index
 
-The one new piece worth building.
+The SHA history index and exact client lookup are implemented. The published v1
+asset keeps the deployed shape:
 
-The crawler observes every skill version it crawls but only remembers the latest sha. Keep an append-only mapping instead:
-
-```
-sha → [skill ids]          (list — one sha maps to multiple ids for ~24% of the library)
-sha → { ids, canonicalId? }  (later, once canonical attribution ships)
+```text
+shaToSkillIds: sha → [skill ids]
 ```
 
-Published as a small manifest asset alongside the existing data. Do **not** publish a flat `sha → single id` map — that shape is wrong today and reshaping a published asset later costs a version migration.
+It is append-only and intentionally allows multiple IDs for one SHA. The current
+client resolves one match and reports multiple matches as ambiguous.
+
+Canonical attribution must extend this contract additively rather than changing
+the existing map that clients already decode:
+
+```
+canonicalBySha?: sha → {
+  skillId,
+  confidence,
+  reason
+}
+```
+
+Do **not** replace `shaToSkillIds` with a flat `sha → single id` map. Existing
+clients need the full membership list, and unresolved ambiguity must remain honest.
 
 Properties:
 
@@ -98,7 +125,9 @@ Properties:
 - makes resolution version-proof: any `SKILL.md` the crawler has ever seen resolves, no matter how stale the local copy
 - client-side lookup against published data, same as everything else
 
-Start this early, independent of canonical work: it only records what the crawler sees going forward, so every crawl that runs before the index exists is version history lost forever.
+The initial asset is published. Wiring `publish:sha-history` into every scheduled
+publish remains a separate operational follow-up; until then newly observed
+versions are not guaranteed to be appended automatically.
 
 ## Design properties
 
@@ -143,6 +172,40 @@ The only case that cannot be precomputed: matching a user's local Claude copy ag
 **Never merge records.**
 Variants are genuinely different files with different install commands — a user installs the Codex variant into Codex. Logical identity is derived metadata over catalog entries, not a replacement for them. Each variant stays a real catalog row; equivalence is a grouping layer, consistent with the no-duplication principle.
 
+### Grouping asset design
+
+Exact duplicates and logical equivalents belong to the same derived-relations
+family, but they should not duplicate storage unnecessarily:
+
+- exact duplicate membership stays in `shaHistory`; future `canonicalBySha`
+  records the preferred current catalog ID
+- logical equivalents use a future `skillEquivalence` side asset because their
+  files have different SHAs and remain independently installable variants
+
+The future equivalence asset uses this minimal shape:
+
+```text
+{
+  version,
+  generatedAt,
+  groups: [{
+    id,
+    memberSkillIds,
+    confidence,
+    evidence
+  }]
+}
+```
+
+Shared invariants:
+
+- all member IDs exist in the current suppression-filtered Crawl 4 output
+- each group contains at least two unique, deterministically sorted IDs
+- group IDs are deterministic
+- grouping never rewrites, merges, or deletes skill records
+- unresolved or weak matches remain ungrouped
+- all new assets are shadow-generated and validated before publication
+
 ## Personal skills and P2P sharing (parked, direction noted)
 
 Set aside for now, but content hashing gives a clean seam when we get there:
@@ -166,15 +229,16 @@ Resolution is one user's installed skills (typically 5–50) against lookup tabl
 
 ## Path forward
 
-Discussion-stage. When we decide to build, the natural order:
+Current implementation status and remaining order:
 
-1. **Verify hash compatibility** — confirm the client can compute `skill_md_sha` identically to the crawler (same normalization, same algorithm). The canonical-attribution work depends on the same answer — do it once, both consume it
-2. **Ship the ladder in the client scanner** — steps 1–3 first (all exact, no UX needed); measure what share of installed skills resolve, and how many land ambiguous (multi-id hash matches)
-3. **Add the sha history index to Crawl 4 publishing** — small manifest asset, append-only, `sha → [ids]` shape from day one
+1. **Done: verify hash compatibility** — Swift and Node use the same raw-byte Git blob SHA contract and known test vector
+2. **Done: ship the exact ladder in the client scanner** — install provenance, Git inspection, and SHA lookup resolve locally; multi-ID matches remain ambiguous
+3. **Partial: publish SHA history** — the v1 asset exists with `shaToSkillIds`; scheduled append automation remains to be wired separately
 4. **Canonical attribution** (`crawl-audit.md` Phase 3.1) — pick the original author's copy per duplicate cluster; annotate the sha index with `canonicalId`, upgrading ambiguous resolutions to resolved. Before or alongside this step is fine; it must land before multi-id hash matches are treated as authoritative
 5. **Add the confirm-once fuzzy UX** — only after measuring how much steps 1–4 leave unresolved
 6. **Propagate resolution into synced_skills** — resolved IDs flow into `catalog_skill_id` on sync, making groups catalog-aware for previously unresolvable skills
 7. **Add cross-agent equivalence clusters to Crawl 4 publishing** — shadow-first like every other Crawl 4 change, sharing the grouping-asset design with duplicate clusters (step 4); validate cluster quality in shadow reports before clients consume it
 8. **Extract the local-match heuristic into a shared spec** — document normalization, thresholds, and gate order from `groupSyncedSkills`; implement identically in the client when it gains the merged view
 
-No code changes until this is explicitly picked up.
+Identity changes remain additive. Existing skill IDs and the deployed
+`shaToSkillIds` contract are compatibility boundaries.

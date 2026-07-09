@@ -205,6 +205,29 @@ Important shadow artifacts:
 - `index/shadow/shadow-report.json`
 - `index/shadow/shadow-summary.md`
 
+## Skill Identity Contract
+
+`skill_md_sha` is a Git blob SHA-1 over the exact raw `SKILL.md` bytes:
+
+```text
+SHA1("blob " + byteLength + NUL + rawBytes)
+```
+
+The crawler hashes bytes before UTF-8 decoding. It performs no newline,
+whitespace, Unicode, frontmatter, or Markdown normalization. The macOS client
+uses the same algorithm for local files.
+
+Identity layers stay separate:
+
+- `skill_md_sha` identifies one exact file version
+- skill ID identifies one catalog record and remains stable
+- canonical attribution chooses a preferred record among exact copies
+- logical equivalence groups related Claude/Codex variants without merging them
+
+The published `shaHistory` side asset retains `shaToSkillIds` for compatibility.
+Future canonical attribution must be additive; it must not replace the existing
+multi-ID map or rewrite skill IDs.
+
 ## Publishing Data Tracks
 
 Crawl 4 hosted data:
