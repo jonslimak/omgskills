@@ -249,7 +249,7 @@ function writeAtomic(path: string, content: string) {
 }
 
 function stringifySkills(skills: Skill[]) {
-  return JSON.stringify(skills, (key, value) => key === "readme_snippet" ? undefined : value, 2) + "\n";
+  return JSON.stringify(skills, null, 2) + "\n";
 }
 
 // SHA cache — stored separately from skills.json so it survives if skills.json is lost/corrupt.

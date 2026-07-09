@@ -19,6 +19,7 @@ import { loadTrustedSeeds } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { loadXSocialDiscoveryCandidates, removeBelowStarXSocialOnlyState } from "./x-social-discovery.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
+import { buildWebLibraryPilotSkillIds, loadWebLibraryPilotCollections } from "./web-library-pilot.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
 import { buildCandidateFromSkill } from "./candidate-path.js";
@@ -378,6 +379,14 @@ function buildShadowSkills(skills: Skill[]): ShadowSkillRecord[] {
   return skills.map(toShadowSkillRecord);
 }
 
+function capReadmeSnippet(skill: ShadowSkillRecord): ShadowSkillRecord {
+  if (!skill.readme_snippet || skill.readme_snippet.length <= 1000) return skill;
+  return {
+    ...skill,
+    readme_snippet: skill.readme_snippet.slice(0, 1000).trim(),
+  };
+}
+
 export function buildFinalShadowSkills(
   baselineSkills: Skill[],
   shadowById: Map<string, ShadowSkillRecord>,
@@ -390,7 +399,7 @@ export function buildFinalShadowSkills(
 
   return [...new Map(
     [...baselineShadowSkills, ...carriedForwardShadowSkills, ...bootstrappedShadowSkills].map((skill) => [skill.id, skill] as const),
-  ).values()].sort((a, b) => a.id.localeCompare(b.id));
+  ).values()].map(capReadmeSnippet).sort((a, b) => a.id.localeCompare(b.id));
 }
 
 function buildRepoCountsByState(repos: ShadowRepoIndexEntry[]): Record<RepoState, number> {
@@ -1185,6 +1194,7 @@ async function runShadowRefresh(
   const today = checkedAt.slice(0, 10);
   const changedReposToRefresh: ShadowRepoIndexEntry[] = [];
   const cheapChangedRepoObservedUpdateByRepo = new Map<string, string>();
+  const refreshedSkillIds = new Set<string>();
 
   if (cheapCheckRepos.length > 0) {
     console.log(`  cheap repo checks: ${cheapCheckRepos.length} repos`);
@@ -1295,6 +1305,7 @@ async function runShadowRefresh(
         repo.lastObservedRepoUpdatedAt = result.skill.last_updated;
         repo.staleOrInvalidState = null;
         shadowById.set(skillId, toShadowSkillRecord(result.skill));
+        refreshedSkillIds.add(result.skill.id);
         if (isMeaningfullyCorrected(baselineSkill, result.skill)) {
           correctedCount += 1;
         }
@@ -1330,6 +1341,49 @@ async function runShadowRefresh(
 
   await refreshRepoSet("monitored refresh", reposToRefresh, true);
   await refreshRepoSet("cheap-triggered refresh", cheapTriggeredRefreshSelection.selected, false);
+
+  if (cadence === "combined") {
+    const pilotCollections = loadWebLibraryPilotCollections(join(indexRoot, "curations", "collections.json"));
+    const currentShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
+    const currentSkillById = new Map(currentShadowSkills.map((skill) => [skill.id, skill] as const));
+    const pilotSkillIds = buildWebLibraryPilotSkillIds(pilotCollections, currentShadowSkills);
+    const pilotSkillIdsToRefresh = pilotSkillIds
+      .filter((skillId) => !refreshedSkillIds.has(skillId))
+      .filter((skillId) => !currentSkillById.get(skillId)?.readme_snippet);
+
+    if (pilotSkillIdsToRefresh.length > 0) {
+      console.log(`  web-library snippet refresh: ${pilotSkillIdsToRefresh.length} skills`);
+    }
+    for (const [index, skillId] of pilotSkillIdsToRefresh.entries()) {
+      const skill = currentSkillById.get(skillId);
+      if (!skill) continue;
+      if (index === 0 || (index + 1) % 5 === 0 || index === pilotSkillIdsToRefresh.length - 1) {
+        console.log(`  web-library snippet refresh [${index + 1}/${pilotSkillIdsToRefresh.length}] ${skillId}`);
+      }
+      const result = await enrichCandidate(
+        buildCandidateFromSkill(skill),
+        existingFirstSeen,
+        existingSkills,
+        today,
+      );
+      if (!result.skill) {
+        const staleReason = toStaleReason(result);
+        enrichmentWarnings.push(`web-library snippet refresh skipped ${skillId}: ${staleReason}`);
+        continue;
+      }
+      skillsDeepRefreshed += 1;
+      shadowById.set(result.skill.id, toShadowSkillRecord(result.skill));
+      const refreshedRepo = repoByName.get(repoKeyFor(result.skill)?.repo ?? "");
+      if (refreshedRepo) {
+        refreshedRepo.stars = result.skill.stars;
+        refreshedRepo.repoUrl = result.skill.github_url;
+        refreshedRepo.lastRefreshedAt = checkedAt;
+        refreshedRepo.lastCheapCheckedAt = checkedAt;
+        refreshedRepo.lastObservedRepoUpdatedAt = result.skill.last_updated;
+        refreshedRepo.staleOrInvalidState = null;
+      }
+    }
+  }
 
   const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
   const lowStarValidSkills = refreshedShadowSkills
