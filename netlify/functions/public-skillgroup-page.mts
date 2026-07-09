@@ -169,6 +169,6 @@ export default async (req: Request, _context: Context) => {
 };
 
 export const config: Config = {
-  path: ["/u/:handle", "/u/:handle/:groupSlug", "/profiles/:handle/sets/:groupSlug"],
+  path: ["/u/:handle", "/u/:handle/:groupSlug", "/profiles/:handle", "/profiles/:handle/sets/:groupSlug"],
   preferStatic: true
 };

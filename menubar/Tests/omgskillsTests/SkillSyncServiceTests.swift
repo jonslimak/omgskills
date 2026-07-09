@@ -3,6 +3,10 @@ import Foundation
 @testable import omgskills
 
 struct SkillSyncServiceTests {
+    @Test func defaultEndpointUsesProductionSiteAPI() {
+        #expect(SkillSyncService.defaultEndpoint.absoluteString == "https://omgskills.com/api/portal/sync-upload")
+    }
+
     @Test func configuredEndpointUsesBundleInfoPlistValue() throws {
         let bundleURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("PreviewSyncEndpoint-\(UUID().uuidString).bundle")
@@ -86,6 +90,16 @@ struct SkillSyncServiceTests {
         #expect(payload.skillMdSha == "abc123")
         #expect(payload.catalogSkillId == "acme/catalog-review:catalog-review")
         #expect(payload.identityStatus == "resolved")
+    }
+
+    @Test func invalidTokenResponseHasActionableError() {
+        #expect(throws: SkillSyncError.invalidOrExpiredToken) {
+            try SkillSyncService.validateStatusCode(401)
+        }
+    }
+
+    @Test func successfulResponseStatusDoesNotThrow() throws {
+        try SkillSyncService.validateStatusCode(200)
     }
 
     private func makeSkill(

@@ -27,10 +27,6 @@ struct LocalDashboardView: View {
     let selectedFilter: LocalDashboardFilter?
     let onSelectFilter: (LocalDashboardFilter) -> Void
     let onSelectRecentSkill: (InstalledSkillSummary.RecentSkill) -> Void
-    @State private var syncToken = ""
-    @State private var syncStatus = ""
-    @State private var isSyncing = false
-
     private var stats: [LocalDashboardStat] {
         [
             LocalDashboardStat(filter: .all, value: summary.totalInstallations, symbol: "square.stack.3d.up"),
@@ -71,31 +67,6 @@ struct LocalDashboardView: View {
                 }
             }
 
-            if selectedFilter == nil {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Sync with web portal")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.tertiary)
-
-                    HStack(spacing: 8) {
-                        TextField("Paste sync token", text: $syncToken)
-                            .textFieldStyle(.roundedBorder)
-                            .font(.system(size: 11))
-
-                        Button(isSyncing ? "Syncing" : "Sync") {
-                            syncInstalledSkills()
-                        }
-                        .disabled(isSyncing || syncToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    }
-
-                    if !syncStatus.isEmpty {
-                        Text(syncStatus)
-                            .font(.system(size: 10))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                    }
-                }
-            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 18)
@@ -103,25 +74,78 @@ struct LocalDashboardView: View {
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
+}
+
+struct SkillSyncView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var token = ""
+    @State private var status = ""
+    @State private var isError = false
+    @State private var isSyncing = false
+    @FocusState private var isTokenFocused: Bool
+
+    private var trimmedToken: String {
+        token.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Resync web portal")
+                    .font(.headline)
+                Spacer()
+                Button("Close", systemImage: "xmark", action: dismiss.callAsFunction)
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.plain)
+                    .help("Close")
+            }
+
+            Text("Generate a fresh token on your profile page, then paste it below. Tokens expire after 10 minutes and work once.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
+            SecureField("Paste access token", text: $token)
+                .textFieldStyle(.roundedBorder)
+                .focused($isTokenFocused)
+                .onSubmit(syncInstalledSkills)
+                .disabled(isSyncing)
+
+            if !status.isEmpty {
+                Text(status)
+                    .font(.caption)
+                    .foregroundStyle(isError ? .red : .secondary)
+                    .accessibilityLabel(status)
+            }
+
+            Button(isSyncing ? "Resyncing..." : "Resync", action: syncInstalledSkills)
+                .buttonStyle(.borderedProminent)
+                .disabled(isSyncing || trimmedToken.isEmpty)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .padding(20)
+        .frame(width: 380)
+        .defaultFocus($isTokenFocused, true)
+        .interactiveDismissDisabled(isSyncing)
+    }
+
     private func syncInstalledSkills() {
+        guard !trimmedToken.isEmpty, !isSyncing else { return }
+
         isSyncing = true
-        syncStatus = "Uploading installed skill metadata..."
-        let token = syncToken
+        isError = false
+        status = "Uploading installed skill metadata..."
+        let submittedToken = trimmedToken
 
         Task {
             do {
-                let result = try await SkillSyncService.upload(token: token)
-                await MainActor.run {
-                    syncStatus = "Synced \(result.syncedSkillCount) skills."
-                    syncToken = ""
-                    isSyncing = false
-                }
+                let result = try await SkillSyncService.upload(token: submittedToken)
+                status = "Synced \(result.syncedSkillCount) skills."
+                token = ""
             } catch {
-                await MainActor.run {
-                    syncStatus = "Sync failed. Create a fresh token and try again."
-                    isSyncing = false
-                }
+                status = error.localizedDescription
+                isError = true
             }
+            isSyncing = false
         }
     }
 }

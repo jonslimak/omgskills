@@ -114,7 +114,10 @@ private struct StarterSearch: Identifiable, Hashable {
 
 private struct DataUpdatedFooterView: View {
     let text: String
-    private let appVersion = "0.0.18"
+
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -180,6 +183,7 @@ struct ContentView: View {
     @State private var lastTrackedSearchQuery = ""
     @State private var lastTrackedSearchErrorKey = ""
     @State private var lastTrackedOpenedSkillId = ""
+    @State private var isSyncPanelPresented = false
     @FocusState private var searchFocused: Bool
 
     private let detailDescriptionFont: Font = .body
@@ -317,6 +321,9 @@ struct ContentView: View {
             }
         }
         .frame(width: shouldShowDetailPanel ? 750 : 400, height: 855)
+        .sheet(isPresented: $isSyncPanelPresented) {
+            SkillSyncView()
+        }
         .onChange(of: showDetail) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
             postDetailVisibility(newValue && !isEmptyStartState)
@@ -873,6 +880,29 @@ struct ContentView: View {
             .scrollIndicators(.never)
 
             if localDashboardFilter == nil {
+                Button {
+                    isSyncPanelPresented = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .foregroundStyle(.secondary)
+                        Text("Resync")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 8, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .font(.system(size: 11, weight: .medium))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 7)
+                    .background(Color.primary.opacity(0.055))
+                    .clipShape(.rect(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 18)
+                .padding(.bottom, 8)
+                .help("Resync installed skills with the web portal")
+
                 GitHubInstallPromptView(
                     urlText: $githubInstallURLText,
                     installCodex: $githubInstallCodex,

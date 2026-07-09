@@ -22,8 +22,22 @@ struct SkillSyncResult: Decodable, Equatable, Sendable {
     let syncedSkillCount: Int
 }
 
+enum SkillSyncError: LocalizedError, Equatable {
+    case invalidOrExpiredToken
+    case server(statusCode: Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidOrExpiredToken:
+            return "This token is invalid or expired. Generate a fresh token and try again."
+        case .server:
+            return "The web portal could not complete the sync. Try again shortly."
+        }
+    }
+}
+
 enum SkillSyncService {
-    static let defaultEndpoint = URL(string: "https://app.omgskills.com/api/portal/sync-upload")!
+    static let defaultEndpoint = URL(string: "https://omgskills.com/api/portal/sync-upload")!
     static let endpointInfoKey = "OMGSkillsSyncEndpoint"
 
     static func configuredEndpoint(bundle: Bundle = .main) -> URL {
@@ -82,10 +96,16 @@ enum SkillSyncService {
         guard let httpResponse = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
+        try validateStatusCode(httpResponse.statusCode)
         return try JSONDecoder().decode(SkillSyncResult.self, from: data)
+    }
+
+    static func validateStatusCode(_ statusCode: Int) throws {
+        guard !(200..<300).contains(statusCode) else { return }
+        if statusCode == 401 {
+            throw SkillSyncError.invalidOrExpiredToken
+        }
+        throw SkillSyncError.server(statusCode: statusCode)
     }
 
     private static func syncIdentityStatus(for skill: Skill) -> String {

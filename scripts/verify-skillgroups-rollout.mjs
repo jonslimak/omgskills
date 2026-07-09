@@ -61,8 +61,15 @@ async function verifyTargetCore() {
 }
 
 async function verifyPublicGroupRoutes() {
-  if (!handle || !groupSlug) {
-    console.log("skip public group routes: set SKILLGROUP_HANDLE and SKILLGROUP_SLUG to verify real set pages");
+  if (!handle) {
+    console.log("skip public profile routes: set SKILLGROUP_HANDLE to verify a real profile page");
+    return;
+  }
+  await expectStatus(`/profiles/${encodeURIComponent(handle)}`, 200);
+  await expectStatus(`/u/${encodeURIComponent(handle)}`, 200);
+
+  if (!groupSlug) {
+    console.log("skip public group routes: set SKILLGROUP_SLUG to verify real set pages");
     return;
   }
   await expectStatus(`/profiles/${encodeURIComponent(handle)}/sets/${encodeURIComponent(groupSlug)}`, 200);

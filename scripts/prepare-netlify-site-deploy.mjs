@@ -3,6 +3,7 @@
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import path from "node:path";
+import { verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -134,6 +135,7 @@ function extractUpdatePaths(appcastXml) {
 async function main() {
   await runWebLibraryBuild();
   await verifyWebLibraryBuild();
+  await verifyWebLibraryDeployArtifacts(siteDir, "site deploy source");
 
   const appcastXml = await readAppcast();
   const updateAssets = extractUpdatePaths(appcastXml);
