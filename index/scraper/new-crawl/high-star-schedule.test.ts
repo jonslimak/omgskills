@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { admitDiscoveredRepos, HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY, HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, parseHighStarQueryBatch, parseOnlyHighStarBackfill } from "./build-shadow.js";
-import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
+import { admitDiscoveredRepos, HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY, HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, parseForceWebLibrarySnippets, parseHighStarQueryBatch, parseOnlyHighStarBackfill } from "./build-shadow.js";
+import { shouldRunWeeklyHighStarSkillMdDiscovery, shouldRunWeeklyWebLibrarySnippetRefresh } from "./high-star-schedule.js";
 import type { ShadowRepoIndex, TrustedSeeds } from "./types.js";
 
 test("high-star SKILL.md discovery runs on Sunday UTC by default", () => {
@@ -14,6 +14,19 @@ test("high-star SKILL.md discovery skips on non-Sunday UTC days", () => {
 
 test("high-star SKILL.md discovery supports configured weekly UTC day", () => {
   assert.equal(shouldRunWeeklyHighStarSkillMdDiscovery("2026-06-22T12:00:00.000Z", 1), true);
+});
+
+test("web-library snippet refresh runs on Sunday UTC by default", () => {
+  assert.equal(shouldRunWeeklyWebLibrarySnippetRefresh("2026-06-21T12:00:00.000Z"), true);
+});
+
+test("web-library snippet refresh skips on non-Sunday UTC days", () => {
+  assert.equal(shouldRunWeeklyWebLibrarySnippetRefresh("2026-06-22T12:00:00.000Z"), false);
+});
+
+test("web-library snippet refresh supports manual force flag", () => {
+  assert.equal(parseForceWebLibrarySnippets(["--force-web-library-snippets"]), true);
+  assert.equal(parseForceWebLibrarySnippets([]), false);
 });
 
 test("high-star backfill-only mode requires combined cadence", () => {

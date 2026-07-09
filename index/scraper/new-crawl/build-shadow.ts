@@ -18,7 +18,7 @@ import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible, pass
 import { loadTrustedSeeds } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { loadXSocialDiscoveryCandidates, removeBelowStarXSocialOnlyState } from "./x-social-discovery.js";
-import { shouldRunWeeklyHighStarSkillMdDiscovery } from "./high-star-schedule.js";
+import { shouldRunWeeklyHighStarSkillMdDiscovery, shouldRunWeeklyWebLibrarySnippetRefresh } from "./high-star-schedule.js";
 import { buildWebLibraryPilotSkillIds, loadWebLibraryPilotCollections } from "./web-library-pilot.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
@@ -183,6 +183,10 @@ function parseCadence(argv: string[]): ShadowCadence {
 
 function parseForceHighStarSkillMd(argv: string[]): boolean {
   return argv.includes("--force-high-star-skillmd");
+}
+
+export function parseForceWebLibrarySnippets(argv: string[]): boolean {
+  return argv.includes("--force-web-library-snippets");
 }
 
 export function parseOnlyHighStarBackfill(argv: string[], cadence: ShadowCadence): boolean {
@@ -1075,7 +1079,7 @@ async function runShadowRefresh(
   checkedAt: string,
   repoAliasByCanonical: Map<string, string>,
   newlyAdmittedRepos: Set<string>,
-  options: { skipRefreshWork?: boolean } = {},
+  options: { forceWebLibrarySnippets?: boolean; skipRefreshWork?: boolean } = {},
 ): Promise<ShadowRefreshResult> {
   const baselineById = new Map(baselineSkills.map((skill) => [skill.id, skill]));
   const shadowById = new Map(shadowSkills.map((skill) => [skill.id, skill]));
@@ -1342,7 +1346,14 @@ async function runShadowRefresh(
   await refreshRepoSet("monitored refresh", reposToRefresh, true);
   await refreshRepoSet("cheap-triggered refresh", cheapTriggeredRefreshSelection.selected, false);
 
-  if (cadence === "combined") {
+  const shouldRunScheduledWebLibrarySnippetRefresh = shouldRunWeeklyWebLibrarySnippetRefresh(checkedAt);
+  const shouldRefreshWebLibrarySnippets =
+    cadence === "combined" &&
+    (shouldRunScheduledWebLibrarySnippetRefresh || options.forceWebLibrarySnippets === true);
+  if (cadence === "combined" && options.forceWebLibrarySnippets === true && !shouldRunScheduledWebLibrarySnippetRefresh) {
+    enrichmentWarnings.push("web-library snippet refresh forced outside weekly schedule");
+  }
+  if (shouldRefreshWebLibrarySnippets) {
     const pilotCollections = loadWebLibraryPilotCollections(join(indexRoot, "curations", "collections.json"));
     const currentShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
     const currentSkillById = new Map(currentShadowSkills.map((skill) => [skill.id, skill] as const));
@@ -1974,6 +1985,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const cadence = parseCadence(argv);
   const forceHighStarSkillMd = parseForceHighStarSkillMd(argv);
+  const forceWebLibrarySnippets = parseForceWebLibrarySnippets(argv);
   const onlyHighStarBackfill = parseOnlyHighStarBackfill(argv, cadence);
   const highStarQueryBatch = parseHighStarQueryBatch(argv, onlyHighStarBackfill);
   await assertGitHubQuotaAvailable(cadence);
@@ -2125,7 +2137,7 @@ async function main() {
     checkedAt,
     repoAliasByCanonical,
     newlyAdmittedRepos,
-    { skipRefreshWork: onlyHighStarBackfill },
+    { forceWebLibrarySnippets, skipRefreshWork: onlyHighStarBackfill },
   );
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);
