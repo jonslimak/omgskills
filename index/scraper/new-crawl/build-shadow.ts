@@ -32,6 +32,7 @@ import { buildCatalogAdmissionSample } from "./catalog-admission.js";
 import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
 import { isDoNotCrawlRepo, removeDoNotCrawlState } from "./do-not-crawl.js";
 import { filterSuppressedSkills } from "./suppressed-skills.js";
+import { buildShaCanonicalArtifact } from "./sha-canonical.js";
 import {
   applyShadowSkillOverlay,
   buildShadowSkillOverlay,
@@ -635,6 +636,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Cadence: ${report.cadence}`,
     `- Baseline skills: ${report.baselineSkillCount}`,
     `- Shadow skills: ${report.shadowSkillCount}`,
+    `- Exact-SHA canonical clusters: ${report.shaCanonicalClusterCount ?? 0} (${report.shaCanonicalHighConfidenceCount ?? 0} high confidence, ${report.shaCanonicalMediumCandidateCount ?? 0} medium candidates, ${report.shaCanonicalUnresolvedCount ?? 0} unresolved)`,
     `- Inspectable shadow skills: ${report.inspectableShadowSkillCount}`,
     `- Excluded inspectable catalog skills: ${report.excludedInspectableCatalogSkillCount}`,
     `- Carried forward: ${report.carriedForwardCount}`,
@@ -766,6 +768,15 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     ...(report.enrichmentWarnings.length
       ? report.enrichmentWarnings.map((warning) => `- ${warning}`)
+      : ["- none"]),
+    "",
+    "## Exact-SHA canonical sample",
+    "",
+    ...(report.shaCanonicalSample?.length
+      ? report.shaCanonicalSample.map(
+          (row) =>
+            `- ${row.skillMdSha} (${row.memberCount}) -> ${row.canonicalSkillId ?? "unresolved"} [${row.reason}]`,
+        )
       : ["- none"]),
     "",
     "## Top provisional core repos",
@@ -1995,6 +2006,7 @@ async function main() {
   const skillsOutPath = join(shadowRoot, "skills.shadow.json");
   const inspectableSkillsOutPath = join(shadowRoot, "skills.inspectable.shadow.json");
   const cutoverSkillsOutPath = join(shadowRoot, "skills.cutover.shadow.json");
+  const shaCanonicalOutPath = join(shadowRoot, "sha-canonical.shadow.json");
   const skillOverlayOutPath = join(shadowRoot, "skills.overlay.json");
   const repoIndexOutPath = join(shadowRoot, "repo-index.shadow.json");
   const repoOverlayOutPath = join(shadowRoot, "repo-index.overlay.json");
@@ -2150,6 +2162,16 @@ async function main() {
   const cutoverShadowSkills = buildCutoverShadowSkills(shadowSkills);
   removeFilteredCatalogOnlyRepos(repoIndex, shadowSkills, cutoverShadowSkills);
   reconcileRepoIndexSkillIds(repoIndex, cutoverShadowSkills);
+  const shaCanonicalStart = performance.now();
+  const shaCanonicalArtifact = buildShaCanonicalArtifact(cutoverShadowSkills, checkedAt, {
+    trustedCanonicalHandles: new Set([
+      ...seeds.trustedVendorHandles,
+      ...(seeds.watchedCreatorHandles ?? []),
+    ]),
+    aliasToCanonicalHandle: seeds.creatorAliasToCanonicalHandle,
+    catalogRepos: new Set(seeds.catalogRepoRules.map((rule) => rule.repo)),
+  });
+  timings.buildShaCanonical = Math.round(performance.now() - shaCanonicalStart);
 
   const shadowRepoOverlay: ShadowRepoOverlay | null = shouldWriteShadowRepoOverlay(cadence)
     ? buildShadowRepoOverlay(repoIndex, baselineRepoIndexForOverlay, checkedAt)
@@ -2306,6 +2328,25 @@ async function main() {
     shadowSkillOverlayLoaded,
     shadowSkillOverlayEntryCount,
     shadowSkillOverlayWrittenCount,
+    shaCanonicalClusterCount: shaCanonicalArtifact.clusterCount,
+    shaCanonicalCandidateCount: shaCanonicalArtifact.canonicalCandidateCount,
+    shaCanonicalHighConfidenceCount: shaCanonicalArtifact.highConfidenceCount,
+    shaCanonicalMediumCandidateCount: shaCanonicalArtifact.mediumCandidateCount,
+    shaCanonicalUnresolvedCount: shaCanonicalArtifact.unresolvedClusterCount,
+    shaCanonicalCandidateCountByReason: shaCanonicalArtifact.candidateCountByReason,
+    shaCanonicalSample: [...shaCanonicalArtifact.clusters]
+      .sort(
+        (a, b) =>
+          b.memberSkillIds.length - a.memberSkillIds.length ||
+          a.skillMdSha.localeCompare(b.skillMdSha),
+      )
+      .slice(0, 10)
+      .map((cluster) => ({
+        skillMdSha: cluster.skillMdSha,
+        memberCount: cluster.memberSkillIds.length,
+        canonicalSkillId: cluster.canonicalSkillId,
+        reason: cluster.reason,
+      })),
     cutoverValidationPassed: cutoverValidationFailures.length === 0,
     cutoverValidationFailureCount: cutoverValidationFailures.length,
     cutoverValidationFailuresSample,
@@ -2318,6 +2359,7 @@ async function main() {
   writeShadowFile(skillsOutPath, JSON.stringify(shadowSkills, null, 2) + "\n");
   writeShadowFile(inspectableSkillsOutPath, JSON.stringify(inspectableShadowSkills, null, 2) + "\n");
   writeShadowFile(cutoverSkillsOutPath, JSON.stringify(cutoverShadowSkills, null, 2) + "\n");
+  writeShadowFile(shaCanonicalOutPath, JSON.stringify(shaCanonicalArtifact, null, 2) + "\n");
   writeShadowFile(repoIndexOutPath, JSON.stringify(repoIndex, null, 2) + "\n");
   if (shadowRepoOverlay) {
     writeShadowFile(repoOverlayOutPath, JSON.stringify(shadowRepoOverlay, null, 2) + "\n");

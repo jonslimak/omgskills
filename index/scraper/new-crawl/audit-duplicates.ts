@@ -6,6 +6,7 @@ import { filterDoNotCrawlSkills } from "./do-not-crawl.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { filterSuppressedSkills } from "./suppressed-skills.js";
 import type { CatalogRepoRule, ProvenanceType, ShadowSkillRecord } from "./types.js";
+import { buildShaCanonicalArtifact } from "./sha-canonical.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const indexRoot = join(__filename, "..", "..", "..");
@@ -14,34 +15,9 @@ const FALLBACK_SKILLS_PATH = join(indexRoot, "skills.json");
 const SUPPRESSED_SKILLS_PATH = join(indexRoot, "seeds", "suppressed-skills.json");
 const SAMPLE_LIMIT = 8;
 const CLUSTER_LIMIT = 20;
-const TRUSTED_CANONICAL_OWNERS = new Set([
-  "anthropics",
-  "browserbase",
-  "cloudflare",
-  "expo",
-  "github",
-  "google-gemini",
-  "googleworkspace",
-  "microsoft",
-  "openai",
-]);
-const TRUSTED_CANONICAL_REPOS = new Set([
-  "alirezarezvani/claude-code-skill-factory",
-  "alirezarezvani/claude-skills",
-  "benchflow-ai/skillsbench",
-  "garrytan/gstack",
-  "langchain-ai/langchain",
-  "obra/superpowers",
-  "onmax/nuxt-skills",
-  "posthog/posthog",
-  "ruvnet/claude-flow",
-  "vercel-labs/ai-sdk-preview-python-streaming",
-  "wavetermdev/waveterm",
-]);
-
 export type DuplicateAuditSkill = Pick<
   Skill,
-  "id" | "name" | "github_url" | "skill_md_path" | "install_cmd" | "author_handle" | "stars"
+  "id" | "name" | "github_url" | "skill_md_path" | "install_cmd" | "author_handle" | "stars" | "first_seen"
 > & {
   skill_md_sha?: string | null;
   provenance_type?: ProvenanceType;
@@ -192,11 +168,6 @@ function normalizedRepoNameKey(skill: DuplicateAuditSkill): { repo: string; norm
   const repo = repoFromGithubUrl(skill.github_url);
   const normalizedName = normalizeText(skill.name);
   return { repo, normalizedName, key: repo && normalizedName ? `${repo}\t${normalizedName}` : "" };
-}
-
-function repoOwner(skill: DuplicateAuditSkill): string {
-  const repo = repoFromGithubUrl(skill.github_url);
-  return repo.split("/")[0] ?? "";
 }
 
 export function isCollectionLikeDuplicateCopy(id: string): boolean {
@@ -385,68 +356,37 @@ function catalogRepoSetFromRules(rules: CatalogRepoRule[] | undefined): Set<stri
   return new Set((rules ?? []).map((rule) => rule.repo.trim().replace(/\.git$/i, "").toLowerCase()).filter(Boolean));
 }
 
-function exactShaCanonicalDecision(rows: DuplicateAuditSkill[], catalogRepos = new Set<string>()): {
-  keep: DuplicateAuditSkill;
-  reason: ExactShaCanonicalReason;
-  confidence: ExactShaCanonicalConfidence;
-} | null {
-  const byPublisher = groupBy(rows, (skill) => repoFromGithubUrl(skill.github_url));
-  if (byPublisher.size === 1) {
-    return {
-      keep: [...rows].sort(compareCanonicalSkill)[0]!,
-      reason: "same-publisher",
-      confidence: "high",
-    };
-  }
-
-  const trusted = rows.filter((skill) => TRUSTED_CANONICAL_OWNERS.has(repoOwner(skill)));
-  if (trusted.length === 1) {
-    return {
-      keep: trusted[0]!,
-      reason: "trusted-owner",
-      confidence: "high",
-    };
-  }
-
-  const trustedRepo = rows.filter((skill) => TRUSTED_CANONICAL_REPOS.has(repoFromGithubUrl(skill.github_url)));
-  if (trustedRepo.length === 1) {
-    return {
-      keep: trustedRepo[0]!,
-      reason: "trusted-owner",
-      confidence: "high",
-    };
-  }
-
-  const sortedByStars = rows
-    .filter((skill) => !catalogRepos.has(repoFromGithubUrl(skill.github_url)))
-    .sort(compareCanonicalExactShaSkill);
-  const leader = sortedByStars[0]!;
-  const runnerUp = sortedByStars[1];
-  if (!leader) return null;
-  if (leader.stars >= 50 && (!runnerUp || leader.stars >= runnerUp.stars * 10)) {
-    return {
-      keep: leader,
-      reason: "clear-star-leader",
-      confidence: "medium",
-    };
-  }
-
-  return null;
-}
-
 export function buildExactShaCanonicalPlan(
   skills: DuplicateAuditSkill[],
-  options: { catalogRepoRules?: CatalogRepoRule[] } = {},
+  options: {
+    catalogRepoRules?: CatalogRepoRule[];
+    trustedCanonicalHandles?: Set<string>;
+    aliasToCanonicalHandle?: Map<string, string>;
+  } = {},
 ): ExactShaCanonicalPlan {
   const bySha = groupBy(skills, (skill) => normalizeText(skill.skill_md_sha));
   const catalogRepos = catalogRepoSetFromRules(options.catalogRepoRules);
+  const canonicalArtifact = buildShaCanonicalArtifact(skills, "audit", {
+    trustedCanonicalHandles: options.trustedCanonicalHandles,
+    aliasToCanonicalHandle: options.aliasToCanonicalHandle,
+    catalogRepos,
+  });
+  const canonicalBySha = new Map(canonicalArtifact.clusters.map((cluster) => [cluster.skillMdSha, cluster]));
   const candidates: ExactShaCanonicalCandidate[] = [];
   const reviewOnlyClusters: ExactShaReviewOnlyCluster[] = [];
 
   for (const [sha, rows] of bySha.entries()) {
     if (rows.length < 2) continue;
-    const decision = exactShaCanonicalDecision(rows, catalogRepos);
-    if (!decision) {
+    const cluster = canonicalBySha.get(sha);
+    const reason: ExactShaCanonicalReason | null =
+      cluster?.reason === "same-repo"
+        ? "same-publisher"
+        : cluster?.reason === "trusted-creator"
+          ? "trusted-owner"
+          : cluster?.reason === "clear-star-leader"
+            ? "clear-star-leader"
+            : null;
+    if (!cluster?.canonicalSkillId || !reason) {
       reviewOnlyClusters.push({
         skillMdSha: sha,
         reason: "ambiguous-exact-sha",
@@ -457,20 +397,20 @@ export function buildExactShaCanonicalPlan(
     }
 
     const suppressIds = rows
-      .filter((skill) => skill.id !== decision.keep.id)
+      .filter((skill) => skill.id !== cluster.canonicalSkillId)
       .map((skill) => skill.id)
       .sort();
     candidates.push({
       skillMdSha: sha,
-      reason: decision.reason,
-      confidence: decision.confidence,
-      keepId: decision.keep.id,
+      reason,
+      confidence: cluster.confidence as ExactShaCanonicalConfidence,
+      keepId: cluster.canonicalSkillId,
       suppressIds,
       suggestedSuppressionEntries: suppressIds.map((id) => ({
         id,
-        reason: decision.reason,
-        confidence: decision.confidence,
-        replacementId: decision.keep.id,
+        reason,
+        confidence: cluster.confidence as ExactShaCanonicalConfidence,
+        replacementId: cluster.canonicalSkillId!,
       })),
       samples: [...rows].sort(compareCanonicalExactShaSkill).slice(0, SAMPLE_LIMIT).map(sampleSkill),
     });
@@ -735,6 +675,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const seeds = loadTrustedSeeds();
     const plan = buildExactShaCanonicalPlan(filterSuppressedSkills(filterDoNotCrawlSkills(skills, seeds), seeds), {
       catalogRepoRules: seeds.catalogRepoRules,
+      trustedCanonicalHandles: new Set([
+        ...seeds.trustedVendorHandles,
+        ...(seeds.watchedCreatorHandles ?? []),
+      ]),
+      aliasToCanonicalHandle: seeds.creatorAliasToCanonicalHandle,
     });
     printExactShaCanonicalPlan(plan);
     if (process.argv.includes("--write-high-confidence-suppressions")) {

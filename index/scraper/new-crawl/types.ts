@@ -467,6 +467,21 @@ export type ShadowRunReport = {
   shadowSkillOverlayLoaded: boolean;
   shadowSkillOverlayEntryCount: number;
   shadowSkillOverlayWrittenCount: number;
+  shaCanonicalClusterCount?: number;
+  shaCanonicalCandidateCount?: number;
+  shaCanonicalHighConfidenceCount?: number;
+  shaCanonicalMediumCandidateCount?: number;
+  shaCanonicalUnresolvedCount?: number;
+  shaCanonicalCandidateCountByReason?: Record<
+    "same-repo" | "trusted-creator" | "clear-star-leader",
+    number
+  >;
+  shaCanonicalSample?: Array<{
+    skillMdSha: string;
+    memberCount: number;
+    canonicalSkillId: string | null;
+    reason: "same-repo" | "trusted-creator" | "clear-star-leader" | "ambiguous";
+  }>;
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;

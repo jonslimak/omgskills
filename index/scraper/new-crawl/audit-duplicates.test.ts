@@ -242,23 +242,32 @@ test("exact SHA canonical plan resolves same publisher clusters as high confiden
 });
 
 test("exact SHA canonical plan resolves unique trusted owner clusters as high confidence", () => {
-  const plan = buildExactShaCanonicalPlan([
-    skill({ id: "random/repo:skill", github_url: "https://github.com/random/repo", skill_md_sha: "same", stars: 500 }),
-    skill({ id: "openai/codex:skill", github_url: "https://github.com/openai/codex", skill_md_sha: "same", stars: 10 }),
-  ]);
+  const plan = buildExactShaCanonicalPlan(
+    [
+      skill({ id: "random/repo:skill", github_url: "https://github.com/random/repo", skill_md_sha: "same", stars: 500 }),
+      skill({ id: "openai/codex:skill", github_url: "https://github.com/openai/codex", skill_md_sha: "same", stars: 10 }),
+    ],
+    { trustedCanonicalHandles: new Set(["openai"]) },
+  );
 
   assert.equal(plan.candidates[0]?.keepId, "openai/codex:skill");
   assert.equal(plan.candidates[0]?.reason, "trusted-owner");
   assert.equal(plan.candidates[0]?.confidence, "high");
 });
 
-test("exact SHA canonical plan resolves unique trusted repo clusters as high confidence", () => {
-  const plan = buildExactShaCanonicalPlan([
-    skill({ id: "random/repo:skill", github_url: "https://github.com/random/repo", skill_md_sha: "same", stars: 500 }),
-    skill({ id: "posthog/posthog:skill", github_url: "https://github.com/posthog/posthog", skill_md_sha: "same", stars: 10 }),
-  ]);
+test("exact SHA canonical plan resolves watched creator aliases as high confidence", () => {
+  const plan = buildExactShaCanonicalPlan(
+    [
+      skill({ id: "random/repo:skill", github_url: "https://github.com/random/repo", skill_md_sha: "same", stars: 500 }),
+      skill({ id: "old-posthog/posthog:skill", github_url: "https://github.com/old-posthog/posthog", skill_md_sha: "same", stars: 10 }),
+    ],
+    {
+      trustedCanonicalHandles: new Set(["posthog"]),
+      aliasToCanonicalHandle: new Map([["old-posthog", "posthog"]]),
+    },
+  );
 
-  assert.equal(plan.candidates[0]?.keepId, "posthog/posthog:skill");
+  assert.equal(plan.candidates[0]?.keepId, "old-posthog/posthog:skill");
   assert.equal(plan.candidates[0]?.reason, "trusted-owner");
   assert.equal(plan.candidates[0]?.confidence, "high");
 });
