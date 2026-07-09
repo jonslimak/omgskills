@@ -17,6 +17,11 @@
   status = 301
 
 [[redirects]]
+  from = "/profiles/:handle"
+  to = "/profiles/:handle/"
+  status = 301
+
+[[redirects]]
   from = "/collections/:id"
   to = "/collections/:id/"
   status = 301
