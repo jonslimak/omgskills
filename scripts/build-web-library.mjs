@@ -9,6 +9,9 @@ const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site")
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const maxAuthorSkills = Number.parseInt(process.env.WEB_LIBRARY_AUTHOR_SKILL_LIMIT || "3", 10);
 const sitemapChunkSize = Number.parseInt(process.env.WEB_LIBRARY_SITEMAP_CHUNK_SIZE || "10000", 10);
+const minIndexableDescriptionLength = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_DESCRIPTION_LENGTH || "80", 10);
+const minIndexableSnippetLength = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_SNIPPET_LENGTH || "300", 10);
+const minIndexableStars = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_STARS || "10", 10);
 
 const generatedDirs = ["skills", "profiles", "creators", "collections"];
 
@@ -65,7 +68,8 @@ function registerUrl(urls, urlPath, source) {
   assertTrailingSlash(urlPath);
   const previousSource = urls.get(urlPath);
   if (previousSource) {
-    throw new Error(`URL collision for ${urlPath}: ${previousSource} and ${source}`);
+    const previousLabel = typeof previousSource === "object" ? previousSource.source : previousSource;
+    throw new Error(`URL collision for ${urlPath}: ${previousLabel} and ${source}`);
   }
   urls.set(urlPath, source);
 }
@@ -175,7 +179,7 @@ function titleize(value) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function pageShell({ title, description, path: urlPath, body, structuredData, ogType = "website", ogImage = "" }) {
+function pageShell({ title, description, path: urlPath, body, structuredData, ogType = "website", ogImage = "", indexTier = "indexable" }) {
   const canonical = `${origin}${urlPath}`;
   const structuredDataItems = Array.isArray(structuredData) ? structuredData : [structuredData];
   return `<!doctype html>
@@ -185,6 +189,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(description)}">
+  ${indexTier === "noindex" ? '<meta name="robots" content="noindex,follow">' : ""}
   <link rel="canonical" href="${escapeHtml(canonical)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:title" content="${escapeHtml(title)}">
@@ -233,6 +238,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .section { margin-top: 36px; }
     .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .tag { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; color: var(--muted); font-size: 13px; }
+    .lede { max-width: 68ch; font-size: 17px; }
   </style>
   ${structuredDataItems.map((item) => `<script type="application/ld+json">${jsonScript(item)}</script>`).join("\n  ")}
 </head>
@@ -374,6 +380,41 @@ function tagsForSkill(skill) {
   return `<div class="tags">${tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>`;
 }
 
+function visibleDescriptionForSkill(skill) {
+  return normalizeText(skill.description);
+}
+
+function readmeSnippetForSkill(skill) {
+  const snippet = normalizeText(skill.readme_snippet || skill.readmeSnippet);
+  const description = visibleDescriptionForSkill(skill);
+  if (!snippet || snippet === description) return "";
+  return snippet;
+}
+
+function indexableContentSignals(skill) {
+  const descriptionLength = visibleDescriptionForSkill(skill).length;
+  const snippetLength = readmeSnippetForSkill(skill).length;
+  return {
+    descriptionLength,
+    snippetLength,
+    hasUsefulContent: descriptionLength >= minIndexableDescriptionLength || snippetLength >= minIndexableSnippetLength,
+    hasStrongSnippet: snippetLength >= minIndexableSnippetLength,
+  };
+}
+
+function skillIndexDecision(skill, { isEditorial = false, isTrending = false } = {}) {
+  const signals = indexableContentSignals(skill);
+  const hasQualitySignal = isEditorial || isTrending || Number(skill.stars || 0) >= minIndexableStars || signals.hasStrongSnippet;
+  if (signals.hasUsefulContent && hasQualitySignal) {
+    return { tier: "indexable", reason: "indexable" };
+  }
+
+  const missing = [];
+  if (!signals.hasUsefulContent) missing.push("thin-content");
+  if (!hasQualitySignal) missing.push("low-signal");
+  return { tier: "noindex", reason: missing.join("+") || "noindex" };
+}
+
 function trendingBadge(skill) {
   if (!skill.trending_rank) return "";
   const source = skill.trending_source ? ` on ${titleize(skill.trending_source)}` : "";
@@ -456,10 +497,11 @@ function authorConfidenceBadge(skill) {
   return `<span>Author match: ${escapeHtml(titleize(skill.author_confidence))}</span>`;
 }
 
-function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
+function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById, indexDecision) {
   const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
   const description = skillMetaDescription(skill);
-  const about = aboutForSkill(skill);
+  const visibleDescription = visibleDescriptionForSkill(skill);
+  const readmeSnippet = readmeSnippetForSkill(skill);
   const installId = `install-${createHash("sha256").update(skill.id).digest("hex").slice(0, 10)}`;
   const body = `    <div class="eyebrow">Skill</div>
     <h1>${escapeHtml(skill.name)}</h1>
@@ -471,8 +513,8 @@ function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
       ${skill.last_updated ? `<span>Updated ${escapeHtml(String(skill.last_updated).slice(0, 10))}</span>` : ""}
       ${authorConfidenceBadge(skill)}
     </div>
+    ${visibleDescription ? `<p class="lede">${escapeHtml(visibleDescription)}</p>` : ""}
     ${tagsForSkill(skill)}
-    ${about ? `<div class="section about">${pageHeading("About")}<p>${escapeHtml(about)}</p></div>` : ""}
     <div class="section">
       ${pageHeading("Install")}
       <p>Install this Claude and Codex skill with the command below. The command stays visible even when copy support is unavailable.</p>
@@ -482,6 +524,7 @@ function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
       </div>
     </div>
     ${skill.github_url ? `<p><a href="${escapeHtml(skill.github_url)}">View on GitHub</a></p>` : ""}
+    ${readmeSnippet ? `<div class="section about">${pageHeading("From README")}<p>${escapeHtml(readmeSnippet)}</p></div>` : ""}
     ${repoSkills.length ? `<div class="section">${pageHeading("More from this repo")}<div class="grid">${skillCards(repoSkills, skillUrlById)}</div></div>` : ""}
     ${authorSkills.length ? `<div class="section">${pageHeading("More skills")}<div class="grid">${skillCards(authorSkills, skillUrlById)}</div></div>` : ""}`;
   return pageShell({
@@ -491,10 +534,11 @@ function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById) {
     body,
     structuredData: [skillStructuredData(skill, urlPath, description), skillBreadcrumbData(skill, urlPath)],
     ogType: "article",
+    indexTier: indexDecision.tier,
   });
 }
 
-function renderProfilePage(collection, skills, skillUrlById, authorStats) {
+function renderProfilePage(collection, skills, skillUrlById, authorStats, indexTier = "indexable") {
   const handle = collection.authorHandle;
   const urlPath = profilePath(handle);
   const description = profileMetaDescription(collection, skills.length);
@@ -520,10 +564,11 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats) {
       sameAs: [`https://github.com/${handle}`],
     },
     ogImage: avatarUrl,
+    indexTier,
   });
 }
 
-function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById) {
+function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, indexTier = "indexable") {
   const urlPath = collectionPath(collection.id);
   const description = collectionMetaDescription(collection, allSkills.length);
   const body = `    <div class="eyebrow">Collection</div>
@@ -544,6 +589,7 @@ function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlByI
       description,
       url: `${origin}${urlPath}`,
     },
+    indexTier,
   });
 }
 
@@ -655,9 +701,16 @@ async function main() {
   }
 
   const includedSkillIds = new Set();
+  const editorialSkillIds = new Set();
   for (const collection of collections.collections) {
-    for (const id of collection.featuredSkillIds || []) includedSkillIds.add(id);
-    for (const id of collection.skillIds || []) includedSkillIds.add(id);
+    for (const id of collection.featuredSkillIds || []) {
+      includedSkillIds.add(id);
+      editorialSkillIds.add(id);
+    }
+    for (const id of collection.skillIds || []) {
+      includedSkillIds.add(id);
+      editorialSkillIds.add(id);
+    }
     if (collection.type === "author" && collection.authorHandle) {
       for (const skill of (skillsByAuthor.get(collection.authorHandle.toLowerCase()) || []).slice(0, maxAuthorSkills)) {
         includedSkillIds.add(skill.id);
@@ -668,15 +721,31 @@ async function main() {
     if (entry.id) includedSkillIds.add(entry.id);
   }
 
-  const urls = new Map([["/", "home"]]);
+  const allUrls = new Map([["/", "home"]]);
+  const sitemapUrls = new Map([["/", { source: "home" }]]);
+  const noindexReasons = new Map();
+  let indexableCount = 0;
+  let noindexCount = 0;
+  const addNoindexReason = (reason) => noindexReasons.set(reason, (noindexReasons.get(reason) || 0) + 1);
   const includedSkills = [];
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
     Object.assign(skill, trendingById.get(skill.id) || {});
     const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
-    registerUrl(urls, urlPath, `skill ${skill.id}`);
-    urls.set(urlPath, { source: `skill ${skill.id}`, lastmod: skill.last_updated });
+    const indexDecision = skillIndexDecision(skill, {
+      isEditorial: editorialSkillIds.has(skill.id),
+      isTrending: trendingById.has(skill.id),
+    });
+    registerUrl(allUrls, urlPath, `skill ${skill.id}`);
+    allUrls.set(urlPath, { source: `skill ${skill.id}`, lastmod: skill.last_updated, indexTier: indexDecision.tier });
+    if (indexDecision.tier === "indexable") {
+      sitemapUrls.set(urlPath, { source: `skill ${skill.id}`, lastmod: skill.last_updated });
+      indexableCount += 1;
+    } else {
+      noindexCount += 1;
+      addNoindexReason(indexDecision.reason);
+    }
     includedSkills.push(skill);
     const repoSkills = (skillsByRepo.get(repoKeyForSkill(skill)) || [])
       .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id))
@@ -685,7 +754,7 @@ async function main() {
     const authorSkills = uniqueSkills(skillsByAuthor.get(String(skill.author_handle || "").toLowerCase()) || [])
       .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id))
       .slice(0, Math.max(0, 3 - repoSkills.length));
-    await writePage(urlPath, renderSkillPage(skill, repoSkills, authorSkills, skillUrlById));
+    await writePage(urlPath, renderSkillPage(skill, repoSkills, authorSkills, skillUrlById, indexDecision));
   }
 
   const profileCollections = [];
@@ -697,26 +766,52 @@ async function main() {
         .filter((skill) => includedSkillIds.has(skill.id))
         .slice(0, 12);
       const urlPath = profilePath(collection.authorHandle);
-      registerUrl(urls, urlPath, `profile ${collection.authorHandle}`);
+      const indexTier = authorSkills.length ? "indexable" : "noindex";
+      registerUrl(allUrls, urlPath, `profile ${collection.authorHandle}`);
+      allUrls.set(urlPath, { source: `profile ${collection.authorHandle}`, indexTier });
+      if (indexTier === "indexable") {
+        sitemapUrls.set(urlPath, { source: `profile ${collection.authorHandle}` });
+        indexableCount += 1;
+      } else {
+        noindexCount += 1;
+        addNoindexReason("empty-profile");
+      }
       await writePage(
         urlPath,
-        renderProfilePage(collection, authorSkills, skillUrlById, authorStatsByHandle.get(collection.authorHandle.toLowerCase())),
+        renderProfilePage(collection, authorSkills, skillUrlById, authorStatsByHandle.get(collection.authorHandle.toLowerCase()), indexTier),
       );
     } else {
       const featuredSkills = (collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
       const allSkills = (collection.skillIds || collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
       const urlPath = collectionPath(collection.id);
+      const indexTier = allSkills.length ? "indexable" : "noindex";
       topicCollections.push(collection);
-      registerUrl(urls, urlPath, `collection ${collection.id}`);
-      await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById));
+      registerUrl(allUrls, urlPath, `collection ${collection.id}`);
+      allUrls.set(urlPath, { source: `collection ${collection.id}`, indexTier });
+      if (indexTier === "indexable") {
+        sitemapUrls.set(urlPath, { source: `collection ${collection.id}` });
+        indexableCount += 1;
+      } else {
+        noindexCount += 1;
+        addNoindexReason("empty-collection");
+      }
+      await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, indexTier));
     }
   }
 
-  registerUrl(urls, "/skills/", "skills index");
+  registerUrl(allUrls, "/skills/", "skills index");
+  allUrls.set("/skills/", { source: "skills index", indexTier: "indexable" });
+  sitemapUrls.set("/skills/", { source: "skills index" });
+  indexableCount += 1;
   await writePage("/skills/", renderSkillsIndexPage({ profileCollections, topicCollections, skills: includedSkills }, skillUrlById));
 
-  await writeSitemaps(urls);
-  console.log(`Built web library test set: ${urls.size - 1} pages`);
+  await writeSitemaps(sitemapUrls);
+  const noindexSummary = [...noindexReasons.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 4)
+    .map(([reason, count]) => `${reason}:${count}`)
+    .join(", ") || "none";
+  console.log(`Built web library test set: ${allUrls.size - 1} pages (${indexableCount} indexable, ${noindexCount} noindex; noindex reasons: ${noindexSummary})`);
 }
 
 main().catch((error) => {
