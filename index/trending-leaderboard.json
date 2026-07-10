@@ -104,7 +104,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 104101,
+    "stars": 104108,
     "installs": 83679,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -574,10 +574,10 @@
   {
     "rank": 53,
     "id": "expo/skills:building-native-ui",
-    "name": "building-native-ui",
+    "name": "expo-native-ui",
     "authorHandle": "expo",
-    "description": "Complete guide for building beautiful apps with Expo Router. Covers fundamentals, styling, components, navigation, animations, patterns, and native tabs.",
-    "stars": 2160,
+    "description": "Framework (OSS). Build beautiful, native-feeling Expo screens. Covers Apple HIG styling, semantic colors, native controls, SF Symbols, media, animations, visual effects, gradients, storage, and responsive layout. For routing and navigation, use the expo-router skill.",
+    "stars": 2179,
     "installs": 58592,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
@@ -654,7 +654,7 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 40687,
+    "stars": 40690,
     "installs": 55748,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -665,7 +665,7 @@
     "name": "stripe-best-practices",
     "authorHandle": "stripe",
     "description": "Guides Stripe integration decisions — API selection (Checkout Sessions vs PaymentIntents), Connect platform setup (Accounts v2, controller properties), billing/subscriptions, Treasury financial accounts, integration surfaces (Checkout, Payment Element), migrating from deprecated Stripe APIs, and security best practices (API key management, restricted keys, webhooks, OAuth). Use when building, modifying, or reviewing any Stripe integration — including accepting payments, building marketplaces, integrating Stripe, processing payments, setting up subscriptions, creating connected accounts, or implementing secure key handling.",
-    "stars": 1650,
+    "stars": 1651,
     "installs": 55233,
     "githubUrl": "https://github.com/stripe/ai",
     "source": "skills.sh"
