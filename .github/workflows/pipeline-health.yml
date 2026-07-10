@@ -100,6 +100,8 @@ jobs:
         run: npm ci
 
       - name: Build combined Netlify artifact
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
         run: npm run build:netlify
 
       - name: Deploy site to Netlify
