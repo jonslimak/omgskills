@@ -46,6 +46,12 @@ function run(command, args, options = {}) {
   }
 }
 
+function verifyPortalBuildEnv() {
+  if (!process.env.VITE_CLERK_PUBLISHABLE_KEY) {
+    throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY. Build the Netlify site with the production portal environment.");
+  }
+}
+
 async function mergeRedirects() {
   const siteRedirectsPath = path.join(siteDir, "_redirects");
   const webLibraryRedirectsPath = path.join(siteDir, "_web-library-redirects");
@@ -98,6 +104,7 @@ async function verifyRequiredOutput() {
 }
 
 async function main() {
+  verifyPortalBuildEnv();
   run(process.execPath, ["./scripts/generate-creator-handle-reservations.mjs", "--check"]);
   run("npm", ["--workspace", "portal", "run", "build"]);
 
