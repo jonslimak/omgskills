@@ -27,6 +27,9 @@ export type SecurityAuditFailure = {
 
 export type SecurityAuditReport = {
   targetSkillCount: number;
+  fetchableSkillCount: number;
+  unscannableCount: number;
+  unscannableSample: SecurityAuditFailure[];
   offset: number;
   limit: number;
   selectedCount: number;
@@ -80,7 +83,7 @@ const PATTERN_RULES: PatternRule[] = [
   },
 ];
 
-const SECRET_SOURCE_PATTERN = /(?:\.env\b|id_rsa\b|\.aws\/credentials\b|\.ssh\/|api[_-]?key\b|access[_-]?token\b|secret[_-]?key\b)/i;
+const SECRET_SOURCE_PATTERN = /(?:\.env\b|id_rsa\b|\.aws\/credentials\b|\.ssh\/|\/proc\/self\/environ\b)/i;
 const OUTBOUND_PATTERN = /(?:\b(?:curl|wget)\b[^\n]{0,160}\bhttps?:\/\/|\b(?:send|post|upload|transmit|exfiltrat\w*)\b[^\n]{0,120}\b(?:to|https?:\/\/|webhook)\b|\b(?:nc|netcat)\s+\S+\s+\d+)/i;
 const DEFENSIVE_CONTEXT_PATTERN = /(?:\b(?:bad|unsafe|vulnerab\w*|attack|detect\w*|block\w*|prevent\w*|avoid|risk|sanitiz\w*|pattern)\b|\b(?:command|prompt|shell)\s+injection\b)/i;
 
@@ -125,7 +128,12 @@ export function selectSecurityAuditSkills(
   skills: ShadowSkillRecord[],
   offset: number,
   limit: number,
-): { targetSkillCount: number; selected: TieredAuditSkill[] } {
+): {
+  targetSkillCount: number;
+  fetchableSkillCount: number;
+  unscannable: SecurityAuditFailure[];
+  selected: TieredAuditSkill[];
+} {
   const target = skills
     .filter((skill): skill is TieredAuditSkill => skill.quality_tier === "curated" || skill.quality_tier === "creator")
     .sort((a, b) => {
@@ -133,9 +141,25 @@ export function selectSecurityAuditSkills(
       return tierOrder || a.id.localeCompare(b.id);
     });
 
+  const fetchable: TieredAuditSkill[] = [];
+  const unscannable: SecurityAuditFailure[] = [];
+  for (const skill of target) {
+    if (rawSkillUrl(skill)) {
+      fetchable.push(skill);
+    } else {
+      unscannable.push({
+        skillId: skill.id,
+        tier: skill.quality_tier,
+        reason: "missing concrete GitHub SKILL.md path",
+      });
+    }
+  }
+
   return {
     targetSkillCount: target.length,
-    selected: target.slice(offset, offset + limit),
+    fetchableSkillCount: fetchable.length,
+    unscannable,
+    selected: fetchable.slice(offset, offset + limit),
   };
 }
 
@@ -164,7 +188,11 @@ export async function runSecurityAudit(skills: ShadowSkillRecord[], options: Aud
   const concurrency = Math.max(1, Math.floor(options.concurrency ?? 2));
   const requestDelayMs = Math.max(0, Math.floor(options.requestDelayMs ?? 250));
   const sleep = options.sleep ?? defaultSleep;
-  const { targetSkillCount, selected } = selectSecurityAuditSkills(skills, options.offset, options.limit);
+  const { targetSkillCount, fetchableSkillCount, unscannable, selected } = selectSecurityAuditSkills(
+    skills,
+    options.offset,
+    options.limit,
+  );
   const findings: SecurityFinding[] = [];
   const failures: SecurityAuditFailure[] = [];
   let scannedCount = 0;
@@ -222,6 +250,9 @@ export async function runSecurityAudit(skills: ShadowSkillRecord[], options: Aud
 
   return {
     targetSkillCount,
+    fetchableSkillCount,
+    unscannableCount: unscannable.length,
+    unscannableSample: unscannable.slice(0, 20),
     offset: options.offset,
     limit: options.limit,
     selectedCount: selected.length,
@@ -240,6 +271,8 @@ export function renderSecurityAuditMarkdown(report: SecurityAuditReport): string
     "> Review-only static screening. Findings are not proof of malicious behavior and do not change crawler output.",
     "",
     `- Target tier skills: ${report.targetSkillCount}`,
+    `- Fetchable skills: ${report.fetchableSkillCount}`,
+    `- Missing concrete paths: ${report.unscannableCount}`,
     `- Selected: ${report.selectedCount} (offset ${report.offset}, limit ${report.limit})`,
     `- Scanned: ${report.scannedCount}`,
     `- Failed: ${report.failedCount}`,
@@ -264,6 +297,15 @@ export function renderSecurityAuditMarkdown(report: SecurityAuditReport): string
     lines.push("None.");
   } else {
     for (const failure of report.failures) {
+      lines.push(`- \`${failure.skillId}\` (${failure.tier}): ${failure.reason}`);
+    }
+  }
+
+  lines.push("", "## Missing Path Sample", "");
+  if (report.unscannableSample.length === 0) {
+    lines.push("None.");
+  } else {
+    for (const failure of report.unscannableSample) {
       lines.push(`- \`${failure.skillId}\` (${failure.tier}): ${failure.reason}`);
     }
   }

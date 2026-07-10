@@ -78,7 +78,22 @@ test("selection includes curated and creator tiers only with deterministic pagin
   ];
   const result = selectSecurityAuditSkills(skills, 1, 2);
   assert.equal(result.targetSkillCount, 3);
+  assert.equal(result.fetchableSkillCount, 3);
+  assert.equal(result.unscannable.length, 0);
   assert.deepEqual(result.selected.map((entry) => entry.id), ["b/repo:b", "z/repo:z"]);
+});
+
+test("missing paths are reported separately and do not consume batch capacity", () => {
+  const missing = { ...skill("a/repo:missing", "curated"), skill_md_path: undefined };
+  const skills = [missing, skill("b/repo:first", "curated"), skill("c/repo:second", "creator")];
+  const result = selectSecurityAuditSkills(skills, 0, 2);
+
+  assert.equal(result.targetSkillCount, 3);
+  assert.equal(result.fetchableSkillCount, 2);
+  assert.deepEqual(result.selected.map((entry) => entry.id), ["b/repo:first", "c/repo:second"]);
+  assert.deepEqual(result.unscannable, [
+    { skillId: "a/repo:missing", tier: "curated", reason: "missing concrete GitHub SKILL.md path" },
+  ]);
 });
 
 test("raw skill URL requires a concrete GitHub path", () => {
@@ -104,6 +119,8 @@ test("audit reports findings and visible fetch failures deterministically", asyn
   });
 
   assert.equal(report.targetSkillCount, 2);
+  assert.equal(report.fetchableSkillCount, 2);
+  assert.equal(report.unscannableCount, 0);
   assert.equal(report.scannedCount, 1);
   assert.equal(report.failedCount, 1);
   assert.deepEqual(report.findings.map((entry) => [entry.skillId, entry.category]), [
