@@ -7,6 +7,27 @@ const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const isLive = process.argv.includes("--live");
+const liveFetchAttempts = 3;
+
+const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+async function fetchLive(url, options = {}) {
+  let lastError;
+  for (let attempt = 1; attempt <= liveFetchAttempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (response.status < 500 || attempt === liveFetchAttempts) return response;
+      lastError = new Error(`${url} returned ${response.status}`);
+    } catch (error) {
+      lastError = error;
+    }
+    await sleep(500 * attempt);
+  }
+  throw new Error(`Failed to fetch ${url} after ${liveFetchAttempts} attempts: ${lastError?.message || lastError}`);
+}
 
 const pages = [
   {
@@ -129,7 +150,7 @@ async function verifyLocalInternalLinks(html, label) {
 
 async function verifyLiveInternalLinks(html, label) {
   for (const href of internalLinks(html)) {
-    const response = await fetch(`${origin}${href}`, { redirect: "manual" });
+    const response = await fetchLive(`${origin}${href}`, { redirect: "manual" });
     if (![200, 301, 302, 308].includes(response.status)) {
       throw new Error(`${label} linked to ${href}, which returned ${response.status}`);
     }
@@ -208,7 +229,7 @@ async function verifyLocalRootFile(file) {
 
 async function verifyLivePage(page) {
   const url = `${origin}${page.path}`;
-  const response = await fetch(url, { redirect: "manual" });
+  const response = await fetchLive(url, { redirect: "manual" });
   if (response.status !== 200) {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
@@ -222,7 +243,7 @@ async function verifyLivePage(page) {
 
 async function verifyLiveSitemap() {
   const url = `${origin}/sitemap.xml`;
-  const response = await fetch(url, { redirect: "manual" });
+  const response = await fetchLive(url, { redirect: "manual" });
   if (response.status !== 200) {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
@@ -257,7 +278,7 @@ async function liveSitemapContents(rootUrl, xml) {
   if (!childPaths.length) return xml;
   const children = [];
   for (const urlPath of childPaths) {
-    const response = await fetch(`${origin}${urlPath}`, { redirect: "manual" });
+    const response = await fetchLive(`${origin}${urlPath}`, { redirect: "manual" });
     if (response.status !== 200) {
       throw new Error(`${rootUrl} referenced ${urlPath}, which returned ${response.status}`);
     }
@@ -268,7 +289,7 @@ async function liveSitemapContents(rootUrl, xml) {
 
 async function verifyLiveRootFile(file) {
   const url = `${origin}${file.path}`;
-  const response = await fetch(url, { redirect: "manual" });
+  const response = await fetchLive(url, { redirect: "manual" });
   if (response.status !== 200) {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
@@ -292,10 +313,10 @@ async function verifyLocalLlmsLinks() {
 }
 
 async function verifyLiveLlmsLinks() {
-  const response = await fetch(`${origin}/llms.txt`, { redirect: "manual" });
+  const response = await fetchLive(`${origin}/llms.txt`, { redirect: "manual" });
   const text = await response.text();
   for (const urlPath of llmsUrls(text)) {
-    const linkResponse = await fetch(`${origin}${urlPath}`, { redirect: "manual" });
+    const linkResponse = await fetchLive(`${origin}${urlPath}`, { redirect: "manual" });
     if (linkResponse.status !== 200) {
       throw new Error(`${origin}/llms.txt linked to ${urlPath}, which returned ${linkResponse.status}`);
     }
@@ -304,7 +325,7 @@ async function verifyLiveLlmsLinks() {
 
 async function verifyLiveRedirect(redirect) {
   const url = `${origin}${redirect.path}`;
-  const response = await fetch(url, { redirect: "manual" });
+  const response = await fetchLive(url, { redirect: "manual" });
   if (response.status !== 301) {
     throw new Error(`${url} returned ${response.status}, expected 301`);
   }
