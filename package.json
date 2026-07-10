@@ -12,10 +12,13 @@
     "build": "npm run build:netlify",
     "build:netlify": "node ./scripts/build-netlify-site.mjs",
     "build:portal": "npm --workspace portal run build",
-    "check": "tsc --noEmit",
+    "check": "npm run check:creator-handle-reservations && npm run test:creator-handle-reservations && tsc --noEmit",
+    "check:creator-handle-reservations": "node ./scripts/generate-creator-handle-reservations.mjs --check",
     "dev": "netlify dev",
     "dev:portal": "npm --workspace portal run dev",
+    "generate:creator-handle-reservations": "node ./scripts/generate-creator-handle-reservations.mjs",
     "test": "npm run check",
+    "test:creator-handle-reservations": "node --test ./scripts/generate-creator-handle-reservations.test.mjs && tsx --test ./netlify/functions/_shared/reserved.test.ts",
     "verify:skillgroups-rollout": "node ./scripts/verify-skillgroups-rollout.mjs"
   },
   "dependencies": {
@@ -30,6 +33,7 @@
     "@types/pg": "^8.15.4",
     "drizzle-kit": "^0.31.2",
     "netlify-cli": "^26.1.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.8.3"
   }
 }

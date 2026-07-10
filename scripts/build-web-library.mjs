@@ -3,6 +3,10 @@
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import {
+  assertStaticProfileHandlesReserved,
+  loadCreatorHandleReservations,
+} from "./generate-creator-handle-reservations.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -668,12 +672,16 @@ async function writeSitemaps(urls) {
 }
 
 async function main() {
+  const reservedProfileHandles = loadCreatorHandleReservations();
+  const libraryData = await loadLibraryData();
+  assertStaticProfileHandlesReserved(libraryData.collections.collections, reservedProfileHandles);
+
   for (const dir of generatedDirs) {
     await rm(path.join(siteDir, dir), { recursive: true, force: true });
   }
   await removeSitemapFiles();
 
-  const { skills, trending, collections, authorLeaderboards } = await loadLibraryData();
+  const { skills, trending, collections, authorLeaderboards } = libraryData;
   const skillUrlById = buildSkillUrlMap(skills);
 
   const skillById = new Map(skills.map((skill) => [skill.id, skill]));

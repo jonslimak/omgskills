@@ -90,6 +90,7 @@ async function verifyRequiredOutput() {
 }
 
 async function main() {
+  run(process.execPath, ["./scripts/generate-creator-handle-reservations.mjs", "--check"]);
   run("npm", ["--workspace", "portal", "run", "build"]);
 
   await rm(outputDir, { recursive: true, force: true });

@@ -223,6 +223,11 @@ Tasks:
 - Add user handle setup.
 - Generate random default handles, not sequential handles.
 - Block reserved handles and slugs.
+- Reserve every canonical handle and alias in `index/seeds/creators.json` for profile claims. Registry membership protects identity; the `watch` flag only controls crawling.
+- Generate `netlify/functions/_shared/catalog-reserved-handles.ts` with `npm run generate:creator-handle-reservations`, and fail checks/builds when it is stale or contains a collision.
+- Apply creator reservations only to new profile claims or handle changes. An existing holder may save an unchanged handle, and creator handles do not reserve matching group slugs.
+- Keep static creator profiles registry-backed. Add trending or catalog authors to the curated registry before publishing a `/profiles/{handle}` page.
+- Before public handle claims launch, require a database collision check whenever a creator is added or removed. Reserved creator handles may later be assigned through an operator verification grant; reservation means verification required, not permanently unavailable.
 - Use public profile page:
 
 ```text

@@ -2,7 +2,7 @@ import type { Config, Context } from "@netlify/functions";
 import crypto from "node:crypto";
 import { getPgPool } from "./_shared/db.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
-import { isReservedHandleOrSlug } from "./_shared/reserved.js";
+import { isReservedProfileHandle } from "./_shared/reserved.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { optionalString, slugify } from "./_shared/validation.js";
 
@@ -22,7 +22,7 @@ function publicSiteOrigin(req: Request): string {
 async function uniqueHandle(preferred: string): Promise<string> {
   const pool = getPgPool();
   let handle = slugify(preferred);
-  if (isReservedHandleOrSlug(handle)) {
+  if (isReservedProfileHandle(handle)) {
     handle = randomHandle();
   }
 
@@ -55,8 +55,14 @@ export default async (req: Request, _context: Context) => {
       const profilePublished = body?.profilePublished === true;
       let handle = requestedHandle ? slugify(requestedHandle) : null;
 
-      if (handle && isReservedHandleOrSlug(handle)) {
-        throw new Response("Handle is reserved", { status: 400 });
+      if (handle && isReservedProfileHandle(handle)) {
+        const existing = await pool.query(
+          "SELECT 1 FROM users WHERE id = $1 AND handle = $2",
+          [user.id, handle]
+        );
+        if (existing.rowCount === 0) {
+          throw new Response("Handle is reserved", { status: 400 });
+        }
       }
       if (profilePublished && !handle) {
         handle = await uniqueHandle(user.email.split("@")[0] || randomHandle());

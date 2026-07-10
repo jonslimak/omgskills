@@ -83,6 +83,21 @@ async function runWebLibraryBuild() {
   });
 }
 
+async function verifyCreatorHandleReservations() {
+  await new Promise((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [path.join(repoRoot, "scripts", "generate-creator-handle-reservations.mjs"), "--check"],
+      { cwd: repoRoot, stdio: "inherit" },
+    );
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`Creator handle reservation check failed with exit code ${code}`));
+    });
+  });
+}
+
 async function verifyWebLibraryBuild() {
   await new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [path.join(repoRoot, "scripts", "verify-web-library-pages.mjs")], {
@@ -103,6 +118,7 @@ async function verifyWebLibraryBuild() {
 }
 
 async function main() {
+  await verifyCreatorHandleReservations();
   await runWebLibraryBuild();
   await verifyWebLibraryBuild();
   await verifyWebLibraryDeployArtifacts(siteDir, "site deploy source");
