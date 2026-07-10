@@ -74,7 +74,7 @@ async function verifyProfileDiagnostics() {
   }
 
   for (const suffix of ["", "/"]) {
-    const response = await expectStatus(`/profiles/${encodeURIComponent(handle)}${suffix}`, 200, {
+    const response = await expectStatus(`/u/${encodeURIComponent(handle)}${suffix}`, 200, {
       headers: { "x-omgskills-route-diagnostic": "1" }
     });
     const diagnostic = await response.json();
@@ -83,7 +83,7 @@ async function verifyProfileDiagnostics() {
     }
   }
 
-  await expectStatus("/profiles/logo.png", 404);
+  await expectStatus("/u/logo.png", 404);
 }
 
 async function verifyPublicGroupRoutes() {
@@ -91,12 +91,12 @@ async function verifyPublicGroupRoutes() {
     console.log("skip public group routes: set SKILLGROUP_HANDLE and SKILLGROUP_SLUG to verify real set pages");
     return;
   }
-  await expectStatus(`/profiles/${encodeURIComponent(handle)}/sets/${encodeURIComponent(groupSlug)}`, 200);
+  await expectStatus(`/u/${encodeURIComponent(handle)}/sets/${encodeURIComponent(groupSlug)}`, 200);
   await expectStatus(`/u/${encodeURIComponent(handle)}/${encodeURIComponent(groupSlug)}`, 200);
 }
 
 async function verifyProductionLibraryBaseline() {
-  await expectText("/profiles/anthropics/", "Anthropic", { origin: productionOrigin });
+  await expectText("/library/anthropics/", "Anthropic", { origin: productionOrigin });
   await expectText("/skills/anthropics/skills/frontend-design/", "frontend-design", {
     origin: productionOrigin
   });
@@ -108,10 +108,10 @@ async function verifyTargetLibraryPages() {
     return;
   }
   const redirect = await expectStatus("/profiles/anthropics", 301);
-  if (redirect.headers.get("location") !== "/profiles/anthropics/") {
-    fail("static profile redirect did not preserve the canonical trailing-slash URL");
+  if (redirect.headers.get("location") !== "/library/anthropics/") {
+    fail("static profile redirect did not point to the creator canonical URL");
   }
-  const staticProfile = await expectStatus("/profiles/anthropics/", 200);
+  const staticProfile = await expectStatus("/library/anthropics/", 200);
   if (!(staticProfile.headers.get("cache-control") || "").includes("public")) {
     fail("static profile lost its public cache policy");
   }

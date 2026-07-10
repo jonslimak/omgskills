@@ -58,7 +58,7 @@ function publicSiteOrigin() {
 }
 
 function publicGroupUrl(handle: string, slug: string) {
-  return `${publicSiteOrigin()}/profiles/${handle}/sets/${slug}`;
+  return `${publicSiteOrigin()}/u/${handle}/sets/${slug}`;
 }
 
 function groupVisibilityLabel(visibility: string | undefined) {

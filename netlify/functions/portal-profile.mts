@@ -101,7 +101,7 @@ export default async (req: Request, _context: Context) => {
     return jsonResponse(req, {
       profile: {
         ...profile,
-        publicUrl: profile.handle ? `${publicSiteOrigin(req)}/profiles/${profile.handle}` : null
+        publicUrl: profile.handle ? `${publicSiteOrigin(req)}/u/${profile.handle}` : null
       }
     });
   } catch (error) {

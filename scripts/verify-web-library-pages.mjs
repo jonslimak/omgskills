@@ -31,16 +31,16 @@ async function fetchLive(url, options = {}) {
 
 const pages = [
   {
-    path: "/profiles/openai/",
-    canonical: "https://omgskills.com/profiles/openai/",
+    path: "/library/openai/",
+    canonical: "https://omgskills.com/library/openai/",
     text: "OpenAI",
     titleText: "OpenAI&#39;s Claude &amp; Codex skills",
     descriptionText: "Codex skills",
     profileMetadata: true,
   },
   {
-    path: "/profiles/mattpocock/",
-    canonical: "https://omgskills.com/profiles/mattpocock/",
+    path: "/library/mattpocock/",
+    canonical: "https://omgskills.com/library/mattpocock/",
     text: "Matt Pocock",
   },
   {
@@ -87,12 +87,16 @@ const rootFiles = [
 
 const redirects = [
   {
-    path: "/creators/openai/",
-    location: "/profiles/openai/",
+    path: "/profiles/openai/",
+    location: "/library/openai/",
   },
   {
     path: "/profiles/openai",
-    location: "/profiles/openai/",
+    location: "/library/openai/",
+  },
+  {
+    path: "/profiles/jonslimak/",
+    location: "/u/jonslimak/",
   },
 ];
 

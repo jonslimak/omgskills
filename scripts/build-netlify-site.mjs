@@ -48,13 +48,21 @@ function run(command, args, options = {}) {
 
 async function mergeRedirects() {
   const siteRedirectsPath = path.join(siteDir, "_redirects");
+  const webLibraryRedirectsPath = path.join(siteDir, "_web-library-redirects");
   const outputRedirectsPath = path.join(outputDir, "_redirects");
   const siteRedirects = (await exists(siteRedirectsPath))
     ? await readFile(siteRedirectsPath, "utf8")
     : "";
+  if (!(await exists(webLibraryRedirectsPath))) {
+    throw new Error("Missing generated web-library redirects. Run scripts/build-web-library.mjs before building the Netlify site.");
+  }
+  const webLibraryRedirects = await readFile(webLibraryRedirectsPath, "utf8");
   const merged = [
     "# app.omgskills.com portal rewrites",
     ...appDomainRedirects,
+    "",
+    "# web-library redirects",
+    webLibraryRedirects.trim(),
     "",
     "# existing omgskills.com redirects",
     siteRedirects.trim(),

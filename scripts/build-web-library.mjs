@@ -17,7 +17,7 @@ const minIndexableDescriptionLength = Number.parseInt(process.env.WEB_LIBRARY_MI
 const minIndexableSnippetLength = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_SNIPPET_LENGTH || "300", 10);
 const minIndexableStars = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_STARS || "10", 10);
 
-const generatedDirs = ["skills", "profiles", "creators", "collections"];
+const generatedDirs = ["skills", "profiles", "creators", "library", "collections"];
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -55,6 +55,10 @@ function disambiguatedSkillPathForId(id) {
 }
 
 function profilePath(handle) {
+  return `/library/${slugSegment(handle)}/`;
+}
+
+function legacyProfilePath(handle) {
   return `/profiles/${slugSegment(handle)}/`;
 }
 
@@ -329,6 +333,22 @@ async function writePage(urlPath, html) {
   await writeFile(filePath, html);
 }
 
+async function writeWebLibraryRedirects(profileCollections) {
+  const lines = [
+    "# generated web-library legacy profile redirects",
+    "/library/:handle  /library/:handle/  301",
+  ];
+  for (const collection of profileCollections) {
+    if (!collection.authorHandle) continue;
+    const from = legacyProfilePath(collection.authorHandle);
+    const to = profilePath(collection.authorHandle);
+    lines.push(`${from.replace(/\/$/, "")}  ${to}  301`);
+    lines.push(`${from}  ${to}  301`);
+  }
+  lines.push("/profiles/*  /u/:splat  301");
+  await writeFile(path.join(siteDir, "_web-library-redirects"), `${lines.join("\n")}\n`);
+}
+
 async function removeSitemapFiles() {
   for (const entry of await readdir(siteDir)) {
     if (/^sitemap(?:-\d+)?\.xml$/.test(entry)) {
@@ -438,7 +458,7 @@ function profileSchemaType(collection) {
   if (collection.schemaType === "Organization" || collection.entityType === "organization") return "Organization";
   const handle = String(collection.authorHandle || "");
   const title = String(collection.title || "");
-  const knownOrganizations = new Set(["openai", "anthropic", "cursor"]);
+  const knownOrganizations = new Set(["openai", "anthropic", "anthropics", "cursor"]);
   if (knownOrganizations.has(handle.toLowerCase())) return "Organization";
   if (title === title.toUpperCase() && title.length > 1) return "Organization";
   return "Person";
@@ -812,6 +832,7 @@ async function main() {
   sitemapUrls.set("/skills/", { source: "skills index" });
   indexableCount += 1;
   await writePage("/skills/", renderSkillsIndexPage({ profileCollections, topicCollections, skills: includedSkills }, skillUrlById));
+  await writeWebLibraryRedirects(profileCollections);
 
   await writeSitemaps(sitemapUrls);
   const noindexSummary = [...noindexReasons.entries()]

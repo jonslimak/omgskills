@@ -31,8 +31,14 @@ function isValidHandle(value: string): boolean {
 
 function parseRoute(pathname: string): { handle: string; groupSlug: string | null } | null {
   const parts = pathname.split("/").filter(Boolean);
-  if (parts[0] === "u" && parts[1] && parts.length <= 3) {
-    return { handle: parts[1], groupSlug: parts[2] ?? null };
+  if (parts[0] === "u" && parts[1] && parts.length === 2) {
+    return { handle: parts[1], groupSlug: null };
+  }
+  if (parts[0] === "u" && parts[1] && parts[2] === "sets" && parts[3] && parts.length === 4) {
+    return { handle: parts[1], groupSlug: parts[3] };
+  }
+  if (parts[0] === "u" && parts[1] && parts[2] && parts.length === 3) {
+    return { handle: parts[1], groupSlug: parts[2] };
   }
   if (parts[0] === "profiles" && parts[1] && parts.length === 2) {
     return { handle: parts[1], groupSlug: null };
@@ -169,7 +175,7 @@ export default async (req: Request, context: Context) => {
         return `<div class="item"><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(description)}</p>${link}</div>`;
       })
       .join("");
-    return html(`<a href="/profiles/${escapeHtml(user.handle)}">Back to profile</a><h1>${escapeHtml(first.name)}</h1><p class="muted">${escapeHtml(first.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`);
+    return html(`<a href="/u/${escapeHtml(user.handle)}">Back to profile</a><h1>${escapeHtml(first.name)}</h1><p class="muted">${escapeHtml(first.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`);
   }
 
   const groups = await pool.query(
@@ -186,7 +192,7 @@ export default async (req: Request, context: Context) => {
     [user.id]
   );
   const groupList = groups.rows
-    .map((group) => `<div class="item"><h2><a href="/profiles/${escapeHtml(user.handle)}/sets/${escapeHtml(group.slug)}">${escapeHtml(group.name)}</a></h2><p class="muted">${escapeHtml(group.description || `${group.itemCount} skills`)}</p></div>`)
+    .map((group) => `<div class="item"><h2><a href="/u/${escapeHtml(user.handle)}/sets/${escapeHtml(group.slug)}">${escapeHtml(group.name)}</a></h2><p class="muted">${escapeHtml(group.description || `${group.itemCount} skills`)}</p></div>`)
     .join("");
 
   await recordAnalytics("public_profile_view", { profileUserId: user.id });
@@ -194,6 +200,6 @@ export default async (req: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: ["/u/:handle", "/u/:handle/:groupSlug", "/profiles/:handle/sets/:groupSlug"],
+  path: ["/u/:handle", "/u/:handle/sets/:groupSlug", "/u/:handle/:groupSlug", "/profiles/:handle/sets/:groupSlug"],
   preferStatic: true
 };

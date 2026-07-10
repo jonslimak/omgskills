@@ -2,7 +2,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 const requiredWebLibraryArtifacts = [
-  "profiles/anthropics/index.html",
+  "library/anthropics/index.html",
   "skills/anthropics/skills/frontend-design/index.html",
   "collections/starter-pack/index.html",
   "skills/index.html",
