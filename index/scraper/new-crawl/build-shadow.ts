@@ -33,6 +33,7 @@ import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
 import { isDoNotCrawlRepo, removeDoNotCrawlState } from "./do-not-crawl.js";
 import { filterSuppressedSkills } from "./suppressed-skills.js";
 import { buildShaCanonicalArtifact } from "./sha-canonical.js";
+import { applyQualityTiers, stripQualityTiers, summarizeQualityTiers } from "./quality-tier.js";
 import {
   applyShadowSkillOverlay,
   buildShadowSkillOverlay,
@@ -637,6 +638,9 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Baseline skills: ${report.baselineSkillCount}`,
     `- Shadow skills: ${report.shadowSkillCount}`,
     `- Exact-SHA canonical clusters: ${report.shaCanonicalClusterCount ?? 0} (${report.shaCanonicalHighConfidenceCount ?? 0} high confidence, ${report.shaCanonicalMediumCandidateCount ?? 0} medium candidates, ${report.shaCanonicalUnresolvedCount ?? 0} unresolved)`,
+    ...(report.qualityTierCounts
+      ? [`- Quality tiers: curated=${report.qualityTierCounts.curated}, creator=${report.qualityTierCounts.creator}, validated=${report.qualityTierCounts.validated}`]
+      : []),
     `- Inspectable shadow skills: ${report.inspectableShadowSkillCount}`,
     `- Excluded inspectable catalog skills: ${report.excludedInspectableCatalogSkillCount}`,
     `- Carried forward: ${report.carriedForwardCount}`,
@@ -778,6 +782,16 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
             `- ${row.skillMdSha} (${row.memberCount}) -> ${row.canonicalSkillId ?? "unresolved"} [${row.reason}]`,
         )
       : ["- none"]),
+    ...(report.qualityTierSamples
+      ? [
+          "",
+          "## Quality tier samples",
+          "",
+          `- curated: ${report.qualityTierSamples.curated.join(", ") || "none"}`,
+          `- creator: ${report.qualityTierSamples.creator.join(", ") || "none"}`,
+          `- validated: ${report.qualityTierSamples.validated.join(", ") || "none"}`,
+        ]
+      : []),
     "",
     "## Top provisional core repos",
     "",
@@ -2026,6 +2040,7 @@ async function main() {
       .filter((repoInfo): repoInfo is { repo: string; repoUrl: string } => Boolean(repoInfo))
       .map((repoInfo) => repoInfo.repo),
   );
+  const goldBasketSkillIds = new Set(goldBasketSkills.map((skill) => skill.id.toLowerCase()));
   const seeds = loadTrustedSeeds();
   timings.loadBaseline = Math.round(performance.now() - baselineStart);
 
@@ -2054,7 +2069,7 @@ async function main() {
     overlayLoaded: shadowSkillOverlayLoaded,
     overlayEntryCount: shadowSkillOverlayEntryCount,
   } = applyShadowSkillOverlay(cadence, shadowSkills, repoIndex, skillOverlay);
-  shadowSkills = overlayMergedShadowSkills;
+  shadowSkills = stripQualityTiers(overlayMergedShadowSkills);
   shadowSkills = removeDoNotCrawlState(repoIndex, shadowSkills, seeds);
   shadowSkills = removeBelowStarXSocialOnlyState(repoIndex, shadowSkills).skills;
 
@@ -2159,9 +2174,18 @@ async function main() {
   reconcileRepoIndexSkillIds(repoIndex, shadowSkills);
   removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);
   const inspectableShadowSkills = buildInspectableShadowSkills(shadowSkills);
-  const cutoverShadowSkills = buildCutoverShadowSkills(shadowSkills);
-  removeFilteredCatalogOnlyRepos(repoIndex, shadowSkills, cutoverShadowSkills);
-  reconcileRepoIndexSkillIds(repoIndex, cutoverShadowSkills);
+  const untieredCutoverShadowSkills = stripQualityTiers(buildCutoverShadowSkills(shadowSkills));
+  removeFilteredCatalogOnlyRepos(repoIndex, shadowSkills, untieredCutoverShadowSkills);
+  reconcileRepoIndexSkillIds(repoIndex, untieredCutoverShadowSkills);
+  const qualityTiersEnabled = process.env.CRAWL4_QUALITY_TIERS === "1";
+  const cutoverShadowSkills = applyQualityTiers(
+    untieredCutoverShadowSkills,
+    repoIndex,
+    seeds,
+    goldBasketSkillIds,
+    qualityTiersEnabled,
+  );
+  const qualityTierSummary = summarizeQualityTiers(cutoverShadowSkills);
   const shaCanonicalStart = performance.now();
   const shaCanonicalArtifact = buildShaCanonicalArtifact(cutoverShadowSkills, checkedAt, {
     trustedCanonicalHandles: new Set([
@@ -2179,7 +2203,7 @@ async function main() {
   const shadowRepoOverlayWrittenCount = shadowRepoOverlay?.repoCount ?? 0;
   const baselineSkillIds = new Set(baselineSkills.map((skill) => skill.id));
   const shadowSkillOverlay: ShadowSkillOverlay | null = shouldWriteShadowSkillOverlay(cadence)
-    ? buildShadowSkillOverlay(cutoverShadowSkills, baselineSkillIds, repoIndex, checkedAt)
+    ? buildShadowSkillOverlay(untieredCutoverShadowSkills, baselineSkillIds, repoIndex, checkedAt)
     : null;
   const shadowSkillOverlayWrittenCount = shadowSkillOverlay?.skillCount ?? 0;
 
@@ -2347,6 +2371,12 @@ async function main() {
         canonicalSkillId: cluster.canonicalSkillId,
         reason: cluster.reason,
       })),
+    ...(qualityTiersEnabled
+      ? {
+          qualityTierCounts: qualityTierSummary.counts,
+          qualityTierSamples: qualityTierSummary.samples,
+        }
+      : {}),
     cutoverValidationPassed: cutoverValidationFailures.length === 0,
     cutoverValidationFailureCount: cutoverValidationFailures.length,
     cutoverValidationFailuresSample,

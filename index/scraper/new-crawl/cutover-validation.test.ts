@@ -162,6 +162,14 @@ test("non-original skill author_handle may differ from id owner", () => {
   assert.deepEqual(failures, []);
 });
 
+test("invalid quality tier fails validation", () => {
+  const invalid = { ...skill("owner/repo:skill"), quality_tier: "popular" } as unknown as CutoverSkillFixture;
+  const failures = validateCutoverOutputs([invalid], [], repoIndex([]));
+
+  assert.equal(failures.length, 1);
+  assert.equal(failures[0]?.kind, "invalidQualityTier");
+});
+
 test("lum1104/understand-anything style mismatch is caught", () => {
   const failures = validateCutoverOutputs(
     [],

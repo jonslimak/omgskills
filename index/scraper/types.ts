@@ -12,6 +12,7 @@ export interface Skill {
   first_seen: string;
   skill_md_sha?: string;
   readme_snippet?: string;
+  quality_tier?: "curated" | "creator" | "validated";
   source_tag?: string;
   source_url?: string;
   tweet_url?: string;

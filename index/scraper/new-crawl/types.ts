@@ -97,6 +97,8 @@ export type ShadowSkillRecord = Omit<import("../types.js").Skill, "author_handle
   author_confidence: AuthorConfidence;
 };
 
+export type QualityTier = NonNullable<ShadowSkillRecord["quality_tier"]>;
+
 export type ShadowRepoIndexEntry = {
   repo: string;
   repoUrl: string;
@@ -161,7 +163,8 @@ export type CutoverValidationFailureKind =
   | "repoSkillIdMissing"
   | "duplicateCutoverSkillId"
   | "cutoverSignalMissingSkill"
-  | "originalAuthorHandleMismatch";
+  | "originalAuthorHandleMismatch"
+  | "invalidQualityTier";
 
 export type CutoverValidationFailure = {
   kind: CutoverValidationFailureKind;
@@ -482,6 +485,8 @@ export type ShadowRunReport = {
     canonicalSkillId: string | null;
     reason: "same-repo" | "trusted-creator" | "clear-star-leader" | "ambiguous";
   }>;
+  qualityTierCounts?: Record<QualityTier, number>;
+  qualityTierSamples?: Record<QualityTier, string[]>;
   enrichmentWarnings: string[];
   discoveredRepoCount: number;
   discoveredRepoCountByLane: Record<DiscoveryLane, number>;

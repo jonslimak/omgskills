@@ -4,6 +4,7 @@ import type {
   ShadowCutoverSkillSignal,
   ShadowRepoIndex,
 } from "./types.js";
+import { QUALITY_TIERS } from "./quality-tier.js";
 
 type CutoverSkillForValidation = Skill & {
   provenance_type?: string;
@@ -32,6 +33,15 @@ export function validateCutoverOutputs(
       continue;
     }
     skillIds.add(skill.id);
+
+    const qualityTier = (skill as { quality_tier?: unknown }).quality_tier;
+    if (qualityTier !== undefined && !QUALITY_TIERS.includes(qualityTier as (typeof QUALITY_TIERS)[number])) {
+      failures.push({
+        kind: "invalidQualityTier",
+        id: skill.id,
+        details: `Skill ${skill.id} has invalid quality_tier "${String(qualityTier)}"`,
+      });
+    }
 
     if (skill.provenance_type === "original") {
       const idOwner = ownerFromSkillId(skill.id);

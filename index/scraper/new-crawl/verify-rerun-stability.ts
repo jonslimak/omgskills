@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { refreshReplayEnv } from "./refresh-replay.js";
-import type { ProvenanceType, ShadowCutoverCompare, ShadowCutoverSkillSignal, ShadowRunReport, ShadowSkillRecord } from "./types.js";
+import type { ProvenanceType, QualityTier, ShadowCutoverCompare, ShadowCutoverSkillSignal, ShadowRunReport, ShadowSkillRecord } from "./types.js";
 
 type ComparableCutoverSkill = {
   id: string;
@@ -20,6 +20,7 @@ type ComparableCutoverSkill = {
   upstream_repo: string | null;
   provenance_type: ProvenanceType;
   author_confidence: "high" | "low";
+  quality_tier: QualityTier | null;
 };
 
 type ComparableCutoverCompare = Pick<
@@ -93,6 +94,7 @@ export function selectComparableCutoverSkills(skills: ShadowSkillRecord[]): Comp
     upstream_repo: skill.upstream_repo ?? null,
     provenance_type: skill.provenance_type,
     author_confidence: skill.author_confidence,
+    quality_tier: skill.quality_tier ?? null,
   }));
 }
 

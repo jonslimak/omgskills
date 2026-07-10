@@ -244,6 +244,37 @@ test("cutover skill star differences normalize away", () => {
   assert.equal(firstDiffPath(selectComparableCutoverSkills(left), selectComparableCutoverSkills(right)), null);
 });
 
+test("cutover quality tier differences remain comparable", () => {
+  const left: ShadowSkillRecord[] = [
+    {
+      id: "owner/repo:one",
+      name: "Skill",
+      description: "Desc",
+      github_url: "https://github.com/owner/repo",
+      skill_md_path: "SKILL.md",
+      install_cmd: "install",
+      author_handle: "owner",
+      tags: [],
+      stars: 10,
+      last_updated: "2026-05-27T00:00:00Z",
+      first_seen: "2026-05-27",
+      skill_md_sha: "sha",
+      publisher_handle: "owner",
+      publisher_repo: "owner/repo",
+      upstream_repo: null,
+      provenance_type: "original",
+      author_confidence: "high",
+      quality_tier: "curated",
+    },
+  ];
+  const right: ShadowSkillRecord[] = [{ ...left[0]!, quality_tier: "creator" }];
+
+  assert.equal(
+    firstDiffPath(selectComparableCutoverSkills(left), selectComparableCutoverSkills(right)),
+    "$[0].quality_tier",
+  );
+});
+
 test("cutover skill last_updated differences normalize away", () => {
   const left: ShadowSkillRecord[] = [
     {

@@ -1,7 +1,17 @@
+import Foundation
 import Testing
 @testable import omgskills
 
 struct SkillAttributionTests {
+    @Test func decoderIgnoresOptionalQualityTierField() throws {
+        let data = Data(#"{"id":"owner/repo:skill","name":"skill","description":"desc","github_url":"https://github.com/owner/repo","install_cmd":"git clone","author_handle":"owner","tags":[],"stars":10,"last_updated":"2026-07-01T00:00:00Z","first_seen":"2026-07-01","quality_tier":"creator"}"#.utf8)
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        let skill = try decoder.decode(Skill.self, from: data)
+        #expect(skill.id == "owner/repo:skill")
+    }
+
     @Test func resolvedAuthorWinsOverPublisherFallback() {
         let skill = makeSkill(
             authorHandle: "steipete",
