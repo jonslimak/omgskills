@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-10T09:52:39.989Z",
+  "generatedAt": "2026-07-10T14:40:07.864Z",
   "shaToSkillIds": {
     "0000298ae650d634180ad1b1ca38539b1e51def6": [
       "jeremylongshore/claude-code-plugins-plus-skills:navan-migration-deep-dive"
@@ -3065,6 +3065,9 @@
     ],
     "00908f7ce8827a98f7a6cdc6ac0eefe1167745ba": [
       "diegosouzapw/awesome-omni-skill:skills/cli-automation/google-calendar-automation"
+    ],
+    "0092227e966ac4a07b0d08c6fe425e883bba4ae3": [
+      "tw93/waza:check"
     ],
     "0093af697582116eda6c0607fe1e5fb8bdb839c5": [
       "0xBigBoss/claude-code:.claude/skills/react-best-practices",
@@ -29509,7 +29512,8 @@
       "yan-labs/serenity-aleabitoreddit:serenity-aleabitoreddit"
     ],
     "28ddd4e1676f4ea67d34a9d244a94164e088b80e": [
-      "affaan-m/ecc:content-engine"
+      "affaan-m/ecc:content-engine",
+      "affaan-m/everything-claude-code:content-engine"
     ],
     "28e060e4cd30cc53d6fb46856128f3063a45eb65": [
       "jongwony/cc-plugin:github-activity/skills/github-activity"
@@ -31248,6 +31252,9 @@
     "2be18a14751e7420f229c4fb3edfa69595bf274f": [
       "jeremylongshore/claude-code-plugins-plus-skills:plugins/community/jeremy-firebase/skills/firebase-vertex-ai"
     ],
+    "2be1b4a30d3f449b6d7b026dbb7b401f65290c4b": [
+      "callstackincubator/agent-device:agent-device"
+    ],
     "2be227a9470f40cc674c600d077e40a597236295": [
       "jeremylongshore/claude-code-plugins-plus-skills:plugins/saas-packs/clerk-pack/skills/clerk-core-workflow-b"
     ],
@@ -32771,6 +32778,9 @@
     ],
     "2ea287eef6bc0cc8ac15bdfa71b986ceb6c35952": [
       "googleworkspace/cli:recipe-save-email-attachments"
+    ],
+    "2ea4cb8cae6a370beb7bd4873e8eba8cb706ffc6": [
+      "mastra-ai/mastra:tailwind-best-practices"
     ],
     "2ea762d2b5441df7525062347c0b2ba989e05975": [
       "apify/awesome-skills:apify-market-research"
@@ -34338,6 +34348,9 @@
     ],
     "3119c9ecf6103b23d004c59bce8526f5fd3978f8": [
       "tjp2021/job-hunter"
+    ],
+    "311a54b08569273fb68e564765f1332dcd41e6b0": [
+      "mui/material-ui:material-ui-nextjs"
     ],
     "311d3101ea50315728aae038a0241ceaacb0e61d": [
       "deusyu/translate-book"
@@ -39416,7 +39429,8 @@
       "boisenoise/skills-collections:skills/antigravity-file-organizer"
     ],
     "39ebae93a851b868f6ea66a89545b8bf38d01248": [
-      "affaan-m/ecc:content-hash-cache-pattern"
+      "affaan-m/ecc:content-hash-cache-pattern",
+      "affaan-m/everything-claude-code:content-hash-cache-pattern"
     ],
     "39ec95fe03b76d06330c715fcc1e4ee632d622eb": [
       "duncankmckinnon/arize_toolkit:use-workbench"
@@ -63111,6 +63125,9 @@
     "6773e6e837eeee5113a998a71806ba8ed53e92a8": [
       "yaklang/hack-skills:prototype-pollution-advanced"
     ],
+    "6776315949da9fe1f085c4c1161cceb68804231e": [
+      "NVIDIA/Model-Optimizer:evaluation"
+    ],
     "67796850cdd3d348f86f4f1c476194cea2f9db24": [
       "forrany/Agent-configs:ai-config-architect"
     ],
@@ -64112,6 +64129,9 @@
     "698c2489c80a2cc5f246999a787f0d99a68d6d6f": [
       "plurigrid/asi:skills/latent-latency"
     ],
+    "698c39f5525c1e449a68f2c1323d28802eba2df2": [
+      "agents365-ai/drawio-skill:drawio-skill"
+    ],
     "698d9e5b9fe23e1fe249e0eab228912bdd4c0a6a": [
       "javicasper/memory-forge"
     ],
@@ -64481,6 +64501,9 @@
     ],
     "6a65a573697e2efbb45590a0ed1a2d1f7d2597a3": [
       "linehaul-ai/linehaulai-claude-marketplace:plugins/goth-oauth/skills/goth-fundamentals"
+    ],
+    "6a665a52f87ee117a728e996f1a0acb0bd18cba7": [
+      "vercel-labs/native:native-sdk"
     ],
     "6a66c19d436bbf56ca3b6e3988378bccaa800751": [
       "anthropics/financial-services-plugins:variance-commentary"
@@ -68185,6 +68208,9 @@
     ],
     "72141a6b52e9fb45f2de9452641a7777a24fbd9d": [
       "microsoft/a11y-llm-eval:building-accessible-ui"
+    ],
+    "72145f10bda917426a6ae22cf630aca0917ba112": [
+      "github/gh-aw:agentic-workflows"
     ],
     "7214c1280c0f3bbb9e34d2672c130442ee38011f": [
       "cliftonc/unwind:skills/analyzing-domain-model"
@@ -85747,6 +85773,9 @@
     "974c05523eab76bafdaa1f1e89c85d308dd420bc": [
       "boshu2/agentops:retro"
     ],
+    "974ce96e3bf7cacf052b69ffc53786ff08ac8c11": [
+      "miguok/fable-harness:adversarial-review"
+    ],
     "974f724f732c83a30084d90ded875eb90f6f2053": [
       "C0ntr0lledCha0s/claude-code-plugin-automations:self-improvement/skills/improving-components"
     ],
@@ -87347,6 +87376,9 @@
     ],
     "9a8951e24f45edc9c924ecd81ee3b8ad9fec195b": [
       "bcastelino/agent-skills-kit:skills/clean-code"
+    ],
+    "9a8a3af1d8ae1368a4f0679bde9a9aea14023c31": [
+      "hugohe3/ppt-master:ppt-master"
     ],
     "9a8b86c53692aee7928b17e9adc965da19fb48c5": [
       "ImperialAutomation/claude-code-toolkit:promote"
@@ -91549,6 +91581,9 @@
     ],
     "a2dd1e5041b0ea68d1369a37a5c2c2af3b5f1cbc": [
       "github/awesome-copilot:php-mcp-server-generator"
+    ],
+    "a2dd881d76f8d45eee505a08b585c378ea76b43f": [
+      "stas00/the-art-of-debugging"
     ],
     "a2dfeff2580027f5bc895359c52feafeecbbeaee": [
       "shinpr/claude-code-workflows:skills/documentation-criteria"
@@ -96100,6 +96135,9 @@
     "ac648deb25f8539c9e8370630f162585927ff9be": [
       "TerminalSkills/skills:skills/browser-use"
     ],
+    "ac650238f5136c12568bd03d38c160c8c0f980a0": [
+      "jihe520/mathmodelagent:2analysis-modeling"
+    ],
     "ac65b734f1da805b928a46d5906662de442841a4": [
       "samber/cc-skills-golang:golang-testing"
     ],
@@ -96834,6 +96872,9 @@
     ],
     "ae1b046d1f223d8b1cac2c7ab732db2a544a6f67": [
       "binance/binance-skills-hub:meme-rush"
+    ],
+    "ae1c13b2e6569318ec5e611add98e0450b72e6c9": [
+      "chuspeeism/dashiai-ppt-skill:dashiai-ppt"
     ],
     "ae1ed389a740f97906a215eb19411062f8dbd980": [
       "kagenti/kagenti:.claude/skills/auth:keycloak-confidential-client"
@@ -101403,6 +101444,9 @@
     "b7657c059900fe26947f4d4f9d6d2fe159573f9d": [
       "HouseGarofalo/claude-code-base:.claude/skills/code-review-mode"
     ],
+    "b765d8e86be86e735da67e3a425350073278c26a": [
+      "agricidaniel/claude-blog:blog"
+    ],
     "b76a292e182acc37ec73b6528d61de9a4abff034": [
       "SprocketLab/slop-code-bench:.claude/skills/fix-solution"
     ],
@@ -103285,6 +103329,9 @@
     "bb7e52fc52ae7370c8ac12f0b57ffaee035b6f99": [
       "nealcaren/social-data-analysis:plugins/lecture-designer/skills/lecture-designer"
     ],
+    "bb7f74634130eafe3337b9bdc0ca3268ab5145a5": [
+      "paperclipai/paperclip:paperclip"
+    ],
     "bb825ed7a9d8a75013fe8f3fdd9f9924e6d7a128": [
       "googleworkspace/cli:gws-events-renew"
     ],
@@ -104895,6 +104942,9 @@
     "bf0f34929d452429b5980669210e3e4ce847a88c": [
       "SpacePlushy/portfolio:.claude/skills/backend-migrations"
     ],
+    "bf101290d4b50a6947b8527553e3b4e00d67e9e9": [
+      "lijigang/ljg-skills:ljg-book"
+    ],
     "bf1556387902b0ba67358b9591f573f4cc128883": [
       "affaan-m/ecc:laravel-patterns"
     ],
@@ -105608,6 +105658,9 @@
     "c08b77f5c1c774139ff6dc3eb1d9e5a321631576": [
       "microsoft/power-platform-skills:add-server-logic",
       "microsoft/power-platform-skills:plugins/power-pages/skills/add-server-logic"
+    ],
+    "c08cfce7b45bdd574b17158bc4a9d684285d1464": [
+      "vercel/turborepo:turborepo"
     ],
     "c08d182636fe19e4d78a1aec6e9c08275297d4a4": [
       "affaan-m/everything-claude-code:perl-patterns"
@@ -109229,6 +109282,9 @@
     ],
     "c8593056705a04f0a9e2ee8ee04e747c7b67a171": [
       "voidborne-d/pure-love-skill"
+    ],
+    "c862f3f8d3da20134eb6b94e6507d9c067b4c9e6": [
+      "sunflower-of-parchman/codex-hygiene"
     ],
     "c8653f01aaaeb6a09eaca75e7ead9aed2828b44d": [
       "Klotzkette/claude-fuer-deutsches-recht:redteam-qualitygate"
@@ -122813,6 +122869,9 @@
     "e4cd12dd8af3186cbf37495f6e871d839d032d90": [
       "manutej/luxor-claude-marketplace:plugins/luxor-devops-suite/skills/ci-cd-pipeline-patterns"
     ],
+    "e4cda491580da7006c485315a9f9cbb864cf5e43": [
+      "rohitg00/agentmemory:agentmemory-agents"
+    ],
     "e4cf1c7825756157872d241e1d349331403226d5": [
       "kylezantos/design-motion-principles:design-motion-principles"
     ],
@@ -128397,6 +128456,9 @@
       "EvolutionAPI/EVO-METHOD:.claude/skills/evo-market-research",
       "EvolutionAPI/aula-meu-dinheiro:.claude/skills/evo-market-research"
     ],
+    "f0ffc2ded9776e86b6273b2f0bdaaa6b4db2fd32": [
+      "conorbronsdon/avoid-ai-writing"
+    ],
     "f103ff28fb00ad988a6ee2b022a2447a6714f54f": [
       "KarryViber/Orb:compliance-delivery-checklist"
     ],
@@ -129006,6 +129068,9 @@
     ],
     "f24bd7a062f42fd72f8361fc15e6a64dd2454063": [
       "clawdbot/skills:skills/cpojer/hn-digest"
+    ],
+    "f24c749943956c5f98eafa087e36ff84e7ab83b3": [
+      "agi-now/buffett-skills:buffett"
     ],
     "f24de6370806da414a3481a0939494d25fa57c01": [
       "a5c-ai/babysitter:library/specializations/game-development/skills/houdini"
@@ -131357,6 +131422,9 @@
     "f75caf02c709a84933b91bb2678d9b2647a2e964": [
       "dralgorhythm/claude-agentic-framework:.claude/skills/core-engineering/data-management"
     ],
+    "f75db478a4e459b299b02a2f95a6b8ba313965a1": [
+      "owenpawl/cerberus-re-skill"
+    ],
     "f75e894db26701cfd97c77d4818cf1232b182f3e": [
       "CaseMark/skills:skills/legal/eula"
     ],
@@ -132947,6 +133015,9 @@
     ],
     "fb30fb943cc7a780640f2e44001bb70dcf9d3d97": [
       "affaan-m/ecc:eval-harness"
+    ],
+    "fb31fd8353a82d03e0dc1d0085597dca1491dc9b": [
+      "hugohe3/ppt-master:ppt-master"
     ],
     "fb327f09083f451938eb3a8d4ddb8a18cb626957": [
       "jeremylongshore/claude-code-plugins-plus-skills:planned-skills/generated/11-data-pipelines/data-catalog-updater"
