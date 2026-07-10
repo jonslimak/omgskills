@@ -1,19 +1,18 @@
 #!/usr/bin/env node
 
-import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { mkdir, stat, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import path from "node:path";
-import { verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
+import {
+  requiredReleaseAssetPaths,
+  verifyReleaseDeployArtifacts,
+  verifyWebLibraryDeployArtifacts,
+} from "./deploy-artifact-guard.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
 const productionOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const isCi = process.env.CI === "true";
-
-const requiredStaticAssets = [
-  "/downloads/omgskills-mac.dmg",
-  "/downloads/omgskills-mac.dmg.sha256",
-];
 
 function localPathForUrlPath(urlPath) {
   const cleanPath = urlPath.replace(/^\/+/, "");
@@ -103,51 +102,16 @@ async function verifyWebLibraryBuild() {
   });
 }
 
-async function readAppcast() {
-  const appcastPath = path.join(siteDir, "appcast.xml");
-  if (!(await fileExists(appcastPath))) {
-    throw new Error(`Missing required appcast: ${appcastPath}`);
-  }
-  return readFile(appcastPath, "utf8");
-}
-
-function extractUpdatePaths(appcastXml) {
-  const paths = new Set();
-  const urlPattern = /\burl="([^"]+)"/g;
-
-  for (const match of appcastXml.matchAll(urlPattern)) {
-    const value = match[1];
-    let parsed;
-    try {
-      parsed = new URL(value, productionOrigin);
-    } catch {
-      continue;
-    }
-
-    if (parsed.pathname.startsWith("/updates/")) {
-      paths.add(parsed.pathname);
-    }
-  }
-
-  return [...paths].sort();
-}
-
 async function main() {
   await runWebLibraryBuild();
   await verifyWebLibraryBuild();
   await verifyWebLibraryDeployArtifacts(siteDir, "site deploy source");
 
-  const appcastXml = await readAppcast();
-  const updateAssets = extractUpdatePaths(appcastXml);
-
-  if (updateAssets.length === 0) {
-    throw new Error("No /updates/ assets were found in site/appcast.xml");
+  const requiredAssets = await requiredReleaseAssetPaths(siteDir);
+  for (const relativePath of requiredAssets) {
+    await ensureAsset(`/${relativePath}`);
   }
-
-  const requiredAssets = [...requiredStaticAssets, ...updateAssets];
-  for (const urlPath of requiredAssets) {
-    await ensureAsset(urlPath);
-  }
+  await verifyReleaseDeployArtifacts(siteDir, "site deploy source");
 
   console.log(`Netlify deploy assets ready: ${requiredAssets.length} files verified`);
 }

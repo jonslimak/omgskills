@@ -1,4 +1,4 @@
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 const requiredWebLibraryArtifacts = [
@@ -9,6 +9,11 @@ const requiredWebLibraryArtifacts = [
   "sitemap.xml",
   "robots.txt",
   "llms.txt",
+];
+
+const requiredStaticReleaseAssets = [
+  "downloads/omgskills-mac.dmg",
+  "downloads/omgskills-mac.dmg.sha256",
 ];
 
 async function isFile(filePath) {
@@ -33,5 +38,54 @@ export async function verifyWebLibraryDeployArtifacts(rootDir, label = "deploy a
     throw new Error(
       `${label} is unsafe: missing generated web library deploy artifacts: ${missing.join(", ")}`
     );
+  }
+}
+
+export function extractUpdateAssetPaths(appcastXml) {
+  const paths = new Set();
+  const urlPattern = /\burl="([^"]+)"/g;
+
+  for (const match of appcastXml.matchAll(urlPattern)) {
+    try {
+      const parsed = new URL(match[1]);
+      if (parsed.pathname.startsWith("/updates/")) {
+        paths.add(parsed.pathname.replace(/^\/+/, ""));
+      }
+    } catch {
+      // Ignore unrelated malformed URLs; the appcast update requirement below remains strict.
+    }
+  }
+
+  return [...paths].sort();
+}
+
+export async function requiredReleaseAssetPaths(rootDir) {
+  const appcastPath = path.join(rootDir, "appcast.xml");
+  let appcastXml;
+  try {
+    appcastXml = await readFile(appcastPath, "utf8");
+  } catch {
+    throw new Error(`release deploy artifact is unsafe: missing appcast.xml`);
+  }
+
+  const updateAssets = extractUpdateAssetPaths(appcastXml);
+  if (updateAssets.length === 0) {
+    throw new Error(`release deploy artifact is unsafe: appcast.xml has no /updates/ assets`);
+  }
+  return [...requiredStaticReleaseAssets, ...updateAssets];
+}
+
+export async function verifyReleaseDeployArtifacts(rootDir, label = "deploy artifact") {
+  const requiredAssets = await requiredReleaseAssetPaths(rootDir);
+  const missing = [];
+
+  for (const relativePath of requiredAssets) {
+    if (!(await isFile(path.join(rootDir, relativePath)))) {
+      missing.push(relativePath);
+    }
+  }
+
+  if (missing.length > 0) {
+    throw new Error(`${label} is unsafe: missing release assets: ${missing.join(", ")}`);
   }
 }
