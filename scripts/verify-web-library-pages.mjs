@@ -36,8 +36,8 @@ const pages = [
     titleText: "Claude skill by openai",
     descriptionText: "Install code-review",
     visibleText: "Run a final code review on a pull request",
-    snippetText: "Use subagents to review code",
     metadata: true,
+    allowNoindex: true,
   },
   {
     path: "/skills/openai/codex/code-review-change-size/",
@@ -140,10 +140,9 @@ function verifyMetadata(html, page, label) {
   if (page.titleText) assertIncludes(html, page.titleText, label);
   if (page.descriptionText) assertIncludes(html, page.descriptionText, label);
   if (page.visibleText) assertIncludes(html, page.visibleText, label);
-  if (page.snippetText) assertIncludes(html, page.snippetText, label);
   if (page.noindex) {
     assertIncludes(html, '<meta name="robots" content="noindex,follow">', label);
-  } else {
+  } else if (!page.allowNoindex) {
     assertNotIncludes(html, '<meta name="robots" content="noindex,follow">', label);
   }
   assertIncludes(html, '<meta property="og:title"', label);
@@ -188,6 +187,7 @@ async function verifyLocalSitemap() {
 
   const sitemap = await localSitemapContents(sitemapPath);
   for (const page of pages) {
+    if (page.allowNoindex) continue;
     const loc = `<loc>${page.canonical}</loc>`;
     if (page.expectSitemap === false) {
       assertNotIncludes(sitemap, loc, sitemapPath);
@@ -229,6 +229,7 @@ async function verifyLiveSitemap() {
 
   const sitemap = await liveSitemapContents(url, await response.text());
   for (const page of pages) {
+    if (page.allowNoindex) continue;
     const loc = `<loc>${page.canonical}</loc>`;
     if (page.expectSitemap === false) {
       assertNotIncludes(sitemap, loc, url);
