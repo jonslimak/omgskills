@@ -58,6 +58,11 @@ export function isPromotionFilteredSkill(skill: ShadowSkillRecord): boolean {
   return isUnresolvedCatalogLikeSkill(skill);
 }
 
+function toProductionSkill(skill: ShadowSkillRecord): Skill {
+  const { quality_tier: _qualityTier, ...productionSkill } = skill;
+  return productionSkill;
+}
+
 export function buildPromotedSkills(
   cutoverSkills: ShadowSkillRecord[],
   currentSkills: Skill[],
@@ -68,7 +73,9 @@ export function buildPromotedSkills(
   const filteredRepackagedCount = cutoverSkills.filter(
     (skill) => !skill.author_handle && skill.provenance_type === "repackaged",
   ).length;
-  const promotedSkills = cutoverSkills.filter((skill) => !isPromotionFilteredSkill(skill));
+  const promotedSkills = cutoverSkills
+    .filter((skill) => !isPromotionFilteredSkill(skill))
+    .map(toProductionSkill);
   const duplicateId = hasDuplicateIds(promotedSkills);
   if (duplicateId) {
     fail(`duplicate promoted skill id: ${duplicateId}`, "DUPLICATE_PROMOTED_SKILL_ID");

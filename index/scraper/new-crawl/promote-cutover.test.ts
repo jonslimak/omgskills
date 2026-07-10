@@ -240,6 +240,17 @@ test("skill with real author_handle is retained", () => {
   assert.equal(summary.filteredTotal, 0);
 });
 
+test("quality tier stays in Crawl 4 shadow output and is stripped from promoted v2 skills", () => {
+  const { promotedSkills } = buildPromotedSkills(
+    [skill("owner/repo:tiered", { quality_tier: "curated" })],
+    [currentSkill("owner/repo:existing")],
+  );
+
+  assert.equal(promotedSkills.length, 1);
+  assert.equal(promotedSkills[0]?.id, "owner/repo:tiered");
+  assert.equal(promotedSkills[0]?.quality_tier, undefined);
+});
+
 test("misclassified marketplace rows are filtered once provenance is corrected", () => {
   const { promotedSkills, summary } = buildPromotedSkills(
     [
