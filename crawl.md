@@ -6,12 +6,14 @@ Use this as the durable system guide. Historical Crawl 4 planning docs live unde
 
 ## Current Data Tracks
 
-The app data model now has two compatible tracks:
+The app data model has two client-compatible tracks:
 
 - Crawl 4 primary: `/data/crawl4/manifest.json`
 - v2 fallback: `/data/v2/manifest.json`
 
-Both tracks should keep the same client-facing data shape.
+Both tracks keep the same required client contract. Crawl 4 may add optional
+fields, such as `quality_tier`; v2 deliberately strips Crawl 4-only fields during
+promotion. Clients must tolerate optional fields being present or absent.
 
 The fallback exists to reduce rollout risk while Crawl 4 becomes the main library path. It is not a separate product strategy.
 
@@ -46,10 +48,15 @@ It should focus on:
 - bounded expensive refresh work
 - catalog-like unresolved content exclusion
 - manual curation when an operator intentionally adds a skill
+- creator-first trust through the creator registry
+- durable duplicate/source suppression
+- final-output quality tiers for editorial and web use
 
 ### v2 fallback
 
-The v2 crawler keeps fallback data fresh while clients can still fall back to v2.
+The v2 track stays fresh through its existing scrape/publish path and validated
+Crawl 4 promotion. It remains independently hosted so clients can fall back when
+the Crawl 4 track cannot be loaded.
 
 Do not stop crawling or publishing v2 until fallback retirement is explicitly approved.
 
@@ -75,11 +82,14 @@ A skill enters the searchable library when any value-gate arm passes:
 
 - watched-creator repo (registry `watch: true`, flag-gated)
 - official / trusted-vendor source
-- install arm: skills.sh installs/rank above threshold (T2.2)
-- normal discovery + remaining star/value checks
+- gold-basket or manual include
+- install arm when enabled: skills.sh all-time rank `<=1000` or installs `>=4000`
+- validated X discovery when the repo has `50+` stars
+- normal discovery when the repo has `500+` stars
 
-Plus always: clean-mapping gate, catalog/repackaged exclusion, not on
-do-not-crawl, not suppressed.
+Plus always: clean-mapping gate, catalog/provenance policy, not on do-not-crawl,
+and not individually suppressed. Unresolved catalog/repackaged rows are excluded
+from maintained output.
 
 No human review. The library is the wide base; a mediocre skill entering is
 cheap. Correction happens through the removal lists (do-not-crawl,
@@ -111,18 +121,18 @@ No signal ever auto-features anyone.
 |---|---|---|---|
 | skills.sh installs/rank | admits a skill above threshold | proposal evidence | never |
 | skills.sh board movement (momentum) | refresh priority only | proposal evidence | never |
-| X validated mention | discovery candidate only, no bypass | corroborating evidence at most | never |
-| gold-basket / curation | — | strong proposal evidence | operator's call |
+| X validated mention + `50+` repo stars | admits through the X arm | corroborating evidence at most | never |
+| gold-basket / curation | admits through trusted/manual value arm | strong proposal evidence | operator's call |
 | watched creator | admission bypass | — | operator's call |
-| stars | tie-breaker/evidence, no longer the gate | evidence | never |
+| stars | normal admission at `500+`; X arm at `50+`; ranking evidence elsewhere | evidence | never |
 
 ### The X (Twitter) rule
 
 A tweet counts as a signal only when it passes existing X validation:
 minimum engagement (≥50 likes) AND it links to a real repo whose `SKILL.md`
-parses. It then earns exactly one thing — a discovery candidate that goes
-through normal Door 1 admission. X never admits by itself, never watches a
-creator, never features anyone.
+parses. It then becomes an `x-social` discovery candidate. The repo must also
+have at least `50` stars and pass the normal clean-mapping, catalog, suppression,
+and do-not-crawl checks. X never watches or features a creator.
 
 ## Crawl 4 Policy Summary
 
@@ -131,15 +141,34 @@ Crawl 4 is intentionally selective.
 Main behavior:
 
 - daily priority focuses on high-value hotset repos
-- proposed Stage B hotset is `50` repos
 - active daily deep-refresh hotset is `50`
+- hotset order is official (`12`), gold basket (`10`), trusted vendor (`8`),
+  watched creator (up to `8` when enabled), momentum (up to `5` when enabled),
+  then a skill-focused stars fill
+- stars fill prefers watched owners when enabled, multi-skill repos, and skill-focused repo names
 - non-daily repos receive weekly cheap repo-meta checks
+- weekly cheap-check target is `ceil(eligible non-daily repos / 7)`
 - cheap-triggered deep refresh is capped at `150` repos per combined run
+- changed repos over the cap are deferred without advancing their observed update
+- repo 404s are quarantined from future weekly coverage
 - high-star `SKILL.md` discovery is weekly-gated
+- scheduled high-star discovery uses `500+` stars and samples up to `50` repos
 - discovery is not admission
 - new repos must pass value and clean-mapping gates
 - unresolved catalog/repackaged skills are excluded from maintained output
 - manual curation is supported through `/curate` and `crawl4:add-skill`
+
+### Active and opt-in behavior
+
+The scheduled Crawl 4 workflow enables `CRAWL4_QUALITY_TIERS=1`.
+
+These implemented behaviors remain explicit opt-ins:
+
+- `CRAWL4_CREATOR_WATCH=1`: creator-watch discovery, admission, and hotset slice
+- `CRAWL4_INSTALL_ADMISSION=1`: skills.sh rank/install admission arm
+- `CRAWL4_MOMENTUM_PRIORITY=1`: momentum hotset and promotion attention
+
+Local runs without these flags must not be assumed to exercise those paths.
 
 ## v2 Fallback Build
 
@@ -193,8 +222,9 @@ High-level flow:
 2. apply repo and skill overlays
 3. run admission and bootstrap
 4. run refresh policy for the current cadence
-5. write shadow outputs
-6. validate cutover output
+5. apply suppression, catalog, provenance, and final quality-tier policy
+6. write shadow outputs
+7. validate cutover output
 
 Important shadow artifacts:
 
@@ -204,6 +234,24 @@ Important shadow artifacts:
 - `index/shadow/skills.overlay.json`
 - `index/shadow/shadow-report.json`
 - `index/shadow/shadow-summary.md`
+
+Combined runs persist repo and non-baseline skill overlays. Quality tiers are
+never persisted in overlays; they are recomputed from current policy at final
+cutover.
+
+### Discovery and bounded backfill
+
+Normal combined runs keep broad discovery bounded. The weekly high-star lane
+accepts only direct skill paths:
+
+- `SKILL.md`
+- `.claude/skills/**/SKILL.md`
+- `.agents/skills/**/SKILL.md`
+- `skills/**/SKILL.md`
+
+The operator-only backfill mode can sample up to `250` repos and admit at most
+`50` new repos per run. It reuses normal admission, bootstrap, catalog, and
+cutover validation rather than creating a second ingestion path.
 
 ## Skill Identity Contract
 
@@ -228,6 +276,36 @@ The published `shaHistory` side asset retains `shaToSkillIds` for compatibility.
 Future canonical attribution must be additive; it must not replace the existing
 multi-ID map or rewrite skill IDs.
 
+Current identity/duplicate behavior:
+
+- exact-SHA duplicate clusters are generated as shadow metadata
+- durable skill removals live in `seeds/suppressed-skills.json`
+- blocked owners/repos live in `seeds/do-not-crawl.json`
+- known catalogs live in `seeds/catalog-repos.json` and cannot win canonical selection by stars
+- published canonical fields remain deferred until a product feature needs them
+
+## Quality, Snippets, and Safety Audits
+
+Crawl 4 publishes one optional quality tier per maintained skill:
+
+- `curated`: gold-basket skill, manual curation, or original skill from a featured creator
+- `creator`: original skill from an official repo, watched creator, or trusted vendor
+- `validated`: the remaining maintained library, including known catalog-classified rows that remain eligible
+
+Known catalog policy takes precedence over creator trust. Tier values are
+validated at cutover. Promotion strips `quality_tier` before writing the v2
+fallback source.
+
+`readme_snippet` is optional and capped at `1,000` characters. It is derived from
+already-fetched `SKILL.md` content, starting at the first real Markdown content
+section. The targeted web-library snippet backfill runs weekly on combined cadence
+or manually with `--force-web-library-snippets`; it does not add a separate repo
+README fetch.
+
+Security screening is an operator-only, read-only audit over `curated` and
+`creator` skills. It reports static risk patterns and fetch/path coverage. It does
+not grant trust, block admission, suppress skills, or modify published data.
+
 ## Publishing Data Tracks
 
 Crawl 4 hosted data:
@@ -247,6 +325,10 @@ Workflow note:
 - `shadow-crawl-health` runs the shadow crawl, validates output, publishes v2,
   publishes Crawl 4, appends SHA history, deploys the site, and verifies live
   manifests. Unchanged SHA history reuses its existing hashed asset.
+- `promote:cutover` writes validated Crawl 4 records into `index/skills.json` for
+  v2 publication while stripping Crawl 4-only `quality_tier`.
+- blocking crawl, cutover, publish, deploy, and live-manifest checks must pass;
+  rerun-stability remains advisory and has a bounded timeout.
 
 This section is intentionally high-level. Use [`deploy.md`](/Users/jonslimak/Projects/omgskills/deploy.md) for Mac release and site deployment details.
 
@@ -304,6 +386,19 @@ Manual curation can bypass normal discovery/value rules, but it cannot bypass:
 
 Manual curation should not hand-edit production `skills.json`.
 
+Curated additions enter through Crawl 4. They reach v2 only through the normal
+validated promotion path.
+
+Removal uses the existing durable operator path:
+
+```bash
+npm run crawl4:remove-repo -- owner/repo
+npm run crawl4:removal-audit
+```
+
+Use skill-level suppression for duplicate rows and repo/owner blocks only when
+the source itself should not be crawled again.
+
 ## Change Principles
 
 Use these principles for future crawler changes:
@@ -348,8 +443,24 @@ npm run scrape:shadow
 npm run promote:cutover
 npm run test:shadow-guard
 
+# Optional Crawl 4 behavior
+CRAWL4_CREATOR_WATCH=1 npm run scrape:shadow
+CRAWL4_INSTALL_ADMISSION=1 npm run scrape:shadow
+CRAWL4_MOMENTUM_PRIORITY=1 npm run scrape:shadow
+CRAWL4_QUALITY_TIERS=1 npm run scrape:shadow
+
+# Bounded operator runs
+npm run scrape:shadow -- --cadence=combined --only-high-star-backfill
+npm run scrape:shadow -- --cadence=combined --force-web-library-snippets
+
 # Manual curation
 npm run crawl4:add-skill -- <github-skill-md-url>
+npm run crawl4:remove-repo -- owner/repo
+
+# Read-only audits
+npm run crawl4:removal-audit
+npm run crawl4:audit-canonical-commits
+npm run crawl4:audit-security -- --limit=100 --offset=0
 ```
 
 From the repo root:
@@ -365,8 +476,10 @@ The current system is:
 
 - Crawl 4 is the primary intended library track
 - v2 remains the fallback track during transition
-- both tracks must stay client-compatible
-- v2 crawler keeps fallback data fresh
+- both tracks stay client-compatible but are not byte-for-byte identical
+- v2 stays fresh through its existing pipeline and validated Crawl 4 promotion
 - Crawl 4 crawler owns the new library policy
-- manual curation feeds Crawl 4, not v2
+- manual curation enters through Crawl 4 and reaches v2 through validated promotion
+- quality tiers exist only on the Crawl 4 hosted track
+- creator/install/momentum behavior remains opt-in unless explicitly enabled
 - X remains a separate feed, not extra rows inside `skills.json`
