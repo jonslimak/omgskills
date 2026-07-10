@@ -10,6 +10,7 @@
     "crawl4:remove-repo": "tsx scraper/new-crawl/remove-repo.ts",
     "crawl4:removal-audit": "tsx scraper/new-crawl/removal-audit.ts",
     "crawl4:audit-canonical-commits": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/audit-canonical-commits.ts",
+    "crawl4:audit-security": "tsx scraper/new-crawl/audit-security.ts",
     "promote:cutover": "tsx scraper/new-crawl/promote-cutover.ts",
     "test:shadow-guard": "tsx --test scraper/new-crawl/*.test.ts",
     "scrape:debug": "tsx scraper/build.ts --sources=aggregators,social,registry,awesome,official --aggregator-repo-limit=10 --social-page-limit=1 --output-suffix=debug --max-enriched=200",
