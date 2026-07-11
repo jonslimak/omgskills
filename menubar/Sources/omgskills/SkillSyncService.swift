@@ -53,10 +53,10 @@ enum SkillSyncService {
         return endpoint
     }
 
-    static func payload(token: String, scanResult: InstalledSkillsScanner.ScanResult) -> SkillSyncPayload {
+    static func payload(token: String, installations: [Skill]) -> SkillSyncPayload {
         SkillSyncPayload(
             token: token.trimmingCharacters(in: .whitespacesAndNewlines),
-            skills: scanResult.installations.map(payloadSkill)
+            skills: installations.map(payloadSkill)
         )
     }
 
@@ -82,10 +82,11 @@ enum SkillSyncService {
 
     static func upload(
         token: String,
+        installations: [Skill],
         endpoint: URL = configuredEndpoint(),
         session: URLSession = .shared
     ) async throws -> SkillSyncResult {
-        let payload = payload(token: token, scanResult: InstalledSkillsScanner.scanWithSummary())
+        let payload = payload(token: token, installations: installations)
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

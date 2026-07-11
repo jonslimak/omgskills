@@ -92,6 +92,35 @@ struct SkillSyncServiceTests {
         #expect(payload.identityStatus == "resolved")
     }
 
+    @Test func payloadPreservesEveryResolvedInstallation() {
+        let claude = makeSkill(
+            name: "catalog-review",
+            githubUrl: "https://github.com/acme/catalog-review",
+            installCmd: "/Users/test/.claude/skills/catalog-review",
+            origin: "Claude",
+            isLocalOnly: false,
+            catalogSkillId: "acme/catalog-review:catalog-review",
+            identityStatus: .resolved(method: .provenance)
+        )
+        let codex = makeSkill(
+            name: "catalog-review",
+            githubUrl: "https://github.com/acme/catalog-review",
+            installCmd: "/Users/test/.codex/skills/catalog-review",
+            origin: "Codex",
+            isLocalOnly: false,
+            catalogSkillId: "acme/catalog-review:catalog-review",
+            identityStatus: .resolved(method: .git)
+        )
+
+        let payload = SkillSyncService.payload(token: " token ", installations: [claude, codex])
+
+        #expect(payload.token == "token")
+        #expect(payload.skills.count == 2)
+        #expect(payload.skills.map(\.source) == ["Claude", "Codex"])
+        #expect(payload.skills.allSatisfy { $0.catalogSkillId == "acme/catalog-review:catalog-review" })
+        #expect(payload.skills.allSatisfy { $0.identityStatus == "resolved" })
+    }
+
     @Test func invalidTokenResponseHasActionableError() {
         #expect(throws: SkillSyncError.invalidOrExpiredToken) {
             try SkillSyncService.validateStatusCode(401)

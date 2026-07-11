@@ -143,6 +143,44 @@ struct SkillsStoreTests {
         #expect(store.allSkills(for: authorCollection).map(\.id) == [openAISkill.id])
     }
 
+    @Test func installedIdentitySnapshotIsReadyOnlyAfterScanAndPreservesInstallations() {
+        let store = SkillsStore(autoload: false)
+        let catalog = skill(name: "review", stars: 10)
+        store.applyDecodedLibraryData(
+            available: .success([catalog]),
+            trending: .success([]),
+            twitter: .success([]),
+            buildIndexes: false
+        )
+        #expect(store.isInstalledIdentityReady == false)
+
+        let claude = installedSkill(name: "review", origin: "Claude")
+        let codex = installedSkill(name: "review", origin: "Codex")
+        store.applyInstalledScanResult(.init(
+            skills: [claude],
+            installations: [claude, codex],
+            summary: InstalledSkillSummary(totalInstallations: 2)
+        ))
+
+        #expect(store.isInstalledIdentityReady)
+        #expect(store.installedSkillInstallations.count == 2)
+        #expect(store.installedSkillInstallations.allSatisfy { $0.catalogSkillId == catalog.id })
+        #expect(store.installedSkillInstallations.allSatisfy { $0.identityStatus == .resolved(method: .git) })
+    }
+
+    @Test func completedEmptyScanProducesReadyEmptySnapshot() {
+        let store = SkillsStore(autoload: false)
+
+        store.applyInstalledScanResult(.init(
+            skills: [],
+            installations: [],
+            summary: InstalledSkillSummary()
+        ))
+
+        #expect(store.isInstalledIdentityReady)
+        #expect(store.installedSkillInstallations.isEmpty)
+    }
+
     private func trendingEntry(id: String) -> TrendingEntry {
         TrendingEntry(
             id: id,
@@ -199,6 +237,29 @@ struct SkillsStoreTests {
             featuredSkillIds: featuredSkillIds,
             skillIds: skillIds,
             description: nil
+        )
+    }
+
+    private func installedSkill(name: String, origin: String) -> Skill {
+        Skill(
+            id: "installed:/Users/test/.\(origin.lowercased())/skills/\(name)",
+            name: name,
+            description: "Test skill",
+            githubUrl: "https://github.com/example/\(name)",
+            installCmd: "/Users/test/.\(origin.lowercased())/skills/\(name)",
+            authorHandle: "example",
+            tags: [],
+            readmeSnippet: nil,
+            stars: 0,
+            lastUpdated: "2026-04-23T00:00:00Z",
+            firstSeen: "",
+            skillMdSha: nil,
+            installs: nil,
+            trendingRank: nil,
+            trendingSource: nil,
+            origin: origin,
+            isSymlink: false,
+            isLocalOnly: false
         )
     }
 }

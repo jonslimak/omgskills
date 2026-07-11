@@ -8,6 +8,7 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var collections: [SkillCollection] = []
     @Published private(set) var installedSkills: [Skill] = []
     @Published private(set) var installedSkillInstallations: [Skill] = []
+    @Published private(set) var isInstalledIdentityReady = false
     @Published private(set) var installedSummary = InstalledSkillSummary()
     @Published private(set) var identityMeasurement = SkillIdentityMeasurement()
     @Published private(set) var loadError: String?
@@ -20,6 +21,7 @@ final class SkillsStore: ObservableObject {
     private var trendingEntries: [TrendingEntry] = []
     private var trendingBaseSkills: [Skill] = []
     private var shaHistory: ShaHistoryAsset?
+    private var hasScannedInstalledSkills = false
     private var loadGeneration = 0
     private var availableIndexTask: Task<Void, Never>?
     private var trendingIndexTask: Task<Void, Never>?
@@ -427,16 +429,21 @@ final class SkillsStore: ObservableObject {
     }
 
     private func loadInstalled() {
-        let result = InstalledSkillsScanner.scanWithSummary()
+        applyInstalledScanResult(InstalledSkillsScanner.scanWithSummary())
+    }
+
+    func applyInstalledScanResult(_ result: InstalledSkillsScanner.ScanResult) {
         installedSkills = result.skills
         installedSkillInstallations = result.installations
         installedSummary = result.summary
+        hasScannedInstalledSkills = true
         resolveInstalledIdentities()
     }
 
     private func resolveInstalledIdentities() {
         guard !installedSkills.isEmpty || !installedSkillInstallations.isEmpty else {
             identityMeasurement = SkillIdentityMeasurement()
+            isInstalledIdentityReady = hasScannedInstalledSkills
             return
         }
 
@@ -447,6 +454,7 @@ final class SkillsStore: ObservableObject {
         installedSkills = resolvedSkills.skills
         installedSkillInstallations = resolvedInstallations.skills
         identityMeasurement = resolvedInstallations.measurement
+        isInstalledIdentityReady = hasScannedInstalledSkills
         print("[SkillIdentityResolver] provenance=\(identityMeasurement.resolvedByProvenance) git=\(identityMeasurement.resolvedByGit) sha=\(identityMeasurement.resolvedBySha) ambiguous=\(identityMeasurement.ambiguous) localOnly=\(identityMeasurement.localOnly)")
     }
 

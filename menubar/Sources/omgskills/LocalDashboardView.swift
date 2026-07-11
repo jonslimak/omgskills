@@ -77,6 +77,9 @@ struct LocalDashboardView: View {
 }
 
 struct SkillSyncView: View {
+    let installations: [Skill]
+    let isReady: Bool
+
     @Environment(\.dismiss) private var dismiss
     @State private var token = ""
     @State private var status = ""
@@ -119,7 +122,7 @@ struct SkillSyncView: View {
 
             Button(isSyncing ? "Resyncing..." : "Resync", action: syncInstalledSkills)
                 .buttonStyle(.borderedProminent)
-                .disabled(isSyncing || trimmedToken.isEmpty)
+                .disabled(isSyncing || trimmedToken.isEmpty || !isReady)
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(20)
@@ -129,16 +132,20 @@ struct SkillSyncView: View {
     }
 
     private func syncInstalledSkills() {
-        guard !trimmedToken.isEmpty, !isSyncing else { return }
+        guard !trimmedToken.isEmpty, !isSyncing, isReady else { return }
 
         isSyncing = true
         isError = false
         status = "Uploading installed skill metadata..."
         let submittedToken = trimmedToken
+        let snapshot = installations
 
         Task {
             do {
-                let result = try await SkillSyncService.upload(token: submittedToken)
+                let result = try await SkillSyncService.upload(
+                    token: submittedToken,
+                    installations: snapshot
+                )
                 status = "Synced \(result.syncedSkillCount) skills."
                 token = ""
             } catch {

@@ -322,7 +322,10 @@ struct ContentView: View {
         }
         .frame(width: shouldShowDetailPanel ? 750 : 400, height: 855)
         .sheet(isPresented: $isSyncPanelPresented) {
-            SkillSyncView()
+            SkillSyncView(
+                installations: store.installedSkillInstallations,
+                isReady: store.isInstalledIdentityReady
+            )
         }
         .onChange(of: showDetail) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
@@ -881,6 +884,7 @@ struct ContentView: View {
 
             if localDashboardFilter == nil {
                 Button {
+                    store.refreshInstalled()
                     isSyncPanelPresented = true
                 } label: {
                     HStack(spacing: 8) {
@@ -899,6 +903,7 @@ struct ContentView: View {
                     .clipShape(.rect(cornerRadius: 8))
                 }
                 .buttonStyle(.plain)
+                .disabled(!store.isInstalledIdentityReady)
                 .padding(.horizontal, 18)
                 .padding(.bottom, 8)
                 .help("Resync installed skills with the web portal")
