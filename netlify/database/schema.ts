@@ -1,5 +1,6 @@
 import {
   boolean,
+  check,
   index,
   integer,
   pgTable,
@@ -8,6 +9,7 @@ import {
   uniqueIndex,
   uuid
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const users = pgTable(
   "users",
@@ -84,7 +86,13 @@ export const syncedSkills = pgTable(
   },
   (table) => [
     uniqueIndex("synced_skills_user_stable_key_unique").on(table.userId, table.stableKey),
-    index("synced_skills_user_current_idx").on(table.userId, table.isCurrent)
+    index("synced_skills_user_current_idx").on(table.userId, table.isCurrent),
+    check(
+      "synced_skills_identity_consistency_check",
+      sql`(${table.identityStatus} = 'resolved' AND ${table.catalogSkillId} IS NOT NULL AND ${table.isLocalOnly} = false)
+        OR (${table.identityStatus} = 'ambiguous' AND ${table.catalogSkillId} IS NULL AND ${table.isLocalOnly} = false)
+        OR (${table.identityStatus} = 'localOnly' AND ${table.catalogSkillId} IS NULL AND ${table.isLocalOnly} = true)`
+    )
   ]
 );
 

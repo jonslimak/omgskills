@@ -2,56 +2,8 @@ import type { Config, Context } from "@netlify/functions";
 import { hashToken } from "./_shared/crypto.js";
 import { getPgPool } from "./_shared/db.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
-import { optionalString, requireString } from "./_shared/validation.js";
-
-type SyncSkill = {
-  stableKey: string;
-  skillMdSha: string | null;
-  identityStatus: "resolved" | "ambiguous" | "localOnly";
-  name: string;
-  description: string | null;
-  catalogSkillId: string | null;
-  githubUrl: string | null;
-  isLocalOnly: boolean;
-  source: string;
-};
-
-function parseIdentityStatus(
-  value: unknown,
-  catalogSkillId: string | null,
-  isLocalOnly: boolean
-): SyncSkill["identityStatus"] {
-  if (value === "resolved" || value === "ambiguous" || value === "localOnly") {
-    return value;
-  }
-  if (catalogSkillId) {
-    return "resolved";
-  }
-  return isLocalOnly ? "localOnly" : "ambiguous";
-}
-
-function parseSkill(value: unknown): SyncSkill {
-  if (!value || typeof value !== "object") {
-    throw new Response("Each skill must be an object", { status: 400 });
-  }
-  const record = value as Record<string, unknown>;
-  const name = requireString(record.name, "name", 200);
-  const githubUrl = optionalString(record.githubUrl, 500);
-  const catalogSkillId = optionalString(record.catalogSkillId, 500);
-  const isLocalOnly = record.isLocalOnly === true;
-  const fallbackStableKey = requireString(record.stableKey, "stableKey", 1000);
-  return {
-    stableKey: githubUrl ? `${githubUrl}#${name}` : fallbackStableKey,
-    skillMdSha: optionalString(record.skillMdSha, 80),
-    identityStatus: parseIdentityStatus(record.identityStatus, catalogSkillId, isLocalOnly),
-    name,
-    description: optionalString(record.description, 2000),
-    catalogSkillId,
-    githubUrl,
-    isLocalOnly,
-    source: requireString(record.source, "source", 40)
-  };
-}
+import { parseSyncSkill } from "./_shared/sync-skill.js";
+import { requireString } from "./_shared/validation.js";
 
 export default async (req: Request, _context: Context) => {
   if (req.method === "OPTIONS") {
@@ -72,7 +24,10 @@ export default async (req: Request, _context: Context) => {
       throw new Response("skills array is too large", { status: 400 });
     }
 
-    const skills = skillsValue.map(parseSkill);
+    const skills = skillsValue.map(parseSyncSkill);
+    if (new Set(skills.map((skill) => skill.stableKey)).size !== skills.length) {
+      throw new Response("skills contain duplicate installation locations", { status: 400 });
+    }
     let pool;
     try {
       pool = getPgPool();

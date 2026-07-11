@@ -38,7 +38,7 @@ struct SkillSyncServiceTests {
         #expect(endpoint == SkillSyncService.defaultEndpoint)
     }
 
-    @Test func payloadUsesGithubUrlAndNameForGithubStableKey() {
+    @Test func payloadUsesLocationKeyForGithubSkill() {
         let skill = makeSkill(
             name: "review",
             githubUrl: "https://github.com/acme/review",
@@ -49,14 +49,15 @@ struct SkillSyncServiceTests {
 
         let payload = SkillSyncService.payloadSkill(skill)
 
-        #expect(payload.stableKey == "https://github.com/acme/review#review")
+        #expect(payload.stableKey == "location:v1:codex:review")
+        #expect(payload.installationPath == "review")
         #expect(payload.githubUrl == "https://github.com/acme/review")
         #expect(payload.source == "Codex")
         #expect(payload.isLocalOnly == false)
         #expect(payload.identityStatus == "ambiguous")
     }
 
-    @Test func payloadUsesOriginAndPathForLocalOnlyStableKey() {
+    @Test func payloadUsesLocationKeyForLocalOnlySkill() {
         let skill = makeSkill(
             name: "local-review",
             githubUrl: "",
@@ -67,7 +68,8 @@ struct SkillSyncServiceTests {
 
         let payload = SkillSyncService.payloadSkill(skill)
 
-        #expect(payload.stableKey == "Agents:/Users/test/.agents/skills/local-review")
+        #expect(payload.stableKey == "location:v1:agents:local-review")
+        #expect(payload.installationPath == "local-review")
         #expect(payload.githubUrl == nil)
         #expect(payload.isLocalOnly == true)
         #expect(payload.identityStatus == "localOnly")
@@ -90,6 +92,41 @@ struct SkillSyncServiceTests {
         #expect(payload.skillMdSha == "abc123")
         #expect(payload.catalogSkillId == "acme/catalog-review:catalog-review")
         #expect(payload.identityStatus == "resolved")
+        #expect(payload.isLocalOnly == false)
+    }
+
+    @Test func resolvedIdentityOverridesLegacyLocalOnlyFlag() {
+        let skill = makeSkill(
+            name: "catalog-review",
+            githubUrl: "",
+            installCmd: "/Users/test/.codex/skills/catalog-review",
+            origin: "Codex",
+            isLocalOnly: true,
+            catalogSkillId: "acme/catalog-review:catalog-review",
+            identityStatus: .resolved(method: .sha)
+        )
+
+        let payload = SkillSyncService.payloadSkill(skill)
+
+        #expect(payload.identityStatus == "resolved")
+        #expect(payload.isLocalOnly == false)
+    }
+
+    @Test func legacyCatalogIdentityWithoutStatusRemainsResolved() {
+        let skill = makeSkill(
+            name: "catalog-review",
+            githubUrl: "https://github.com/acme/catalog-review",
+            installCmd: "/Users/test/.claude/skills/catalog-review",
+            origin: "Claude",
+            isLocalOnly: true,
+            catalogSkillId: "acme/catalog-review:catalog-review"
+        )
+
+        let payload = SkillSyncService.payloadSkill(skill)
+
+        #expect(payload.identityStatus == "resolved")
+        #expect(payload.catalogSkillId == "acme/catalog-review:catalog-review")
+        #expect(payload.isLocalOnly == false)
     }
 
     @Test func payloadPreservesEveryResolvedInstallation() {
@@ -117,6 +154,10 @@ struct SkillSyncServiceTests {
         #expect(payload.token == "token")
         #expect(payload.skills.count == 2)
         #expect(payload.skills.map(\.source) == ["Claude", "Codex"])
+        #expect(payload.skills.map(\.stableKey) == [
+            "location:v1:claude:catalog-review",
+            "location:v1:codex:catalog-review"
+        ])
         #expect(payload.skills.allSatisfy { $0.catalogSkillId == "acme/catalog-review:catalog-review" })
         #expect(payload.skills.allSatisfy { $0.identityStatus == "resolved" })
     }

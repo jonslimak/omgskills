@@ -7,6 +7,7 @@ struct SkillSyncPayload: Codable, Equatable, Sendable {
 
 struct SkillSyncPayloadSkill: Codable, Equatable, Sendable {
     let stableKey: String
+    let installationPath: String
     let skillMdSha: String?
     let identityStatus: String
     let name: String
@@ -63,19 +64,20 @@ enum SkillSyncService {
     static func payloadSkill(_ skill: Skill) -> SkillSyncPayloadSkill {
         let githubUrl = skill.githubUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         let source = skill.origin ?? "Unknown"
-        let stableKey = githubUrl.isEmpty
-            ? "\(source):\(skill.installCmd)"
-            : "\(githubUrl)#\(skill.name)"
+        let installationPath = URL(fileURLWithPath: skill.installCmd).lastPathComponent
+        let stableKey = "location:v1:\(source.lowercased()):\(installationPath)"
+        let identityStatus = syncIdentityStatus(for: skill)
 
         return SkillSyncPayloadSkill(
             stableKey: stableKey,
+            installationPath: installationPath,
             skillMdSha: skill.skillMdSha,
-            identityStatus: syncIdentityStatus(for: skill),
+            identityStatus: identityStatus,
             name: skill.name,
             description: skill.description,
-            catalogSkillId: skill.catalogSkillId,
+            catalogSkillId: identityStatus == "resolved" ? skill.catalogSkillId : nil,
             githubUrl: githubUrl.isEmpty ? nil : githubUrl,
-            isLocalOnly: skill.isLocalOnly == true,
+            isLocalOnly: identityStatus == "localOnly",
             source: source
         )
     }
@@ -112,12 +114,15 @@ enum SkillSyncService {
     private static func syncIdentityStatus(for skill: Skill) -> String {
         switch skill.identityStatus {
         case .resolved:
-            return "resolved"
+            return skill.catalogSkillId == nil ? "ambiguous" : "resolved"
         case .ambiguous:
             return "ambiguous"
         case .localOnly:
             return "localOnly"
         case nil:
+            if skill.catalogSkillId != nil {
+                return "resolved"
+            }
             return skill.isLocalOnly == true ? "localOnly" : "ambiguous"
         }
     }

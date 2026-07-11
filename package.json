@@ -12,13 +12,15 @@
     "build": "npm run build:netlify",
     "build:netlify": "node ./scripts/build-netlify-site.mjs",
     "build:portal": "npm --workspace portal run build",
-    "check": "npm run check:creator-handle-reservations && npm run test:creator-handle-reservations && tsc --noEmit",
+    "check": "npm run check:creator-handle-reservations && npm run test:creator-handle-reservations && npm run test:sync-skill && npm run test:portal-grouping && tsc --noEmit",
     "check:creator-handle-reservations": "node ./scripts/generate-creator-handle-reservations.mjs --check",
     "dev": "netlify dev",
     "dev:portal": "npm --workspace portal run dev",
     "generate:creator-handle-reservations": "node ./scripts/generate-creator-handle-reservations.mjs",
     "test": "npm run check",
     "test:creator-handle-reservations": "node --test ./scripts/generate-creator-handle-reservations.test.mjs && tsx --test ./netlify/functions/_shared/reserved.test.ts",
+    "test:sync-skill": "tsx --test ./netlify/functions/_shared/sync-skill.test.ts",
+    "test:portal-grouping": "tsx --test ./portal/tests/synced-skill-grouping.test.ts",
     "verify:skillgroups-rollout": "node ./scripts/verify-skillgroups-rollout.mjs"
   },
   "dependencies": {
