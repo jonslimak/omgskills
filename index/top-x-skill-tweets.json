@@ -5,10 +5,10 @@
     "author_handle": "steipete",
     "author_name": "Peter Steinberger 🦞",
     "text": "If you run this workflow, ask Fable to make codex the workhorse. https://t.co/o20OwqaoAt https://github.com/steipete/agent-scripts/blob/main/skills/codex-first/SKILL.md",
-    "likes": 6411,
-    "retweets": 355,
+    "likes": 6410,
+    "retweets": 357,
     "replies": 217,
-    "views": 888950,
+    "views": 891843,
     "posted_at": "2026-07-07T23:35:57.000Z",
     "repo_ids": [
       "steipete/agent-scripts"
@@ -31,7 +31,7 @@
         "skill_md_path": "skills/codex-first/SKILL.md",
         "name": "codex-first",
         "description": "Route implementation work to Codex CLI; Claude specs, reviews, verifies.",
-        "stars": 6306
+        "stars": 6334
       }
     ]
   },
@@ -42,9 +42,9 @@
     "author_name": "Jahir Sheikh",
     "text": "Best GitHub repos for Claude Code that will 10x your next project:\n\n1. Supabase CLI  \nhttps://t.co/BJRk8de8Fb  \n\n2. Skill Creator  \nhttps://t.co/W9PhyTQNbc  \n\n3. Get Sh*t Done  \nhttps://t.co/MqdT6t9fc8  \n\n4. NotebookLM (Python)  \nhttps://t.co/IYu0QV6nQg  \n\n5. Obsidian https://t.co/OdZSCGx3YG https://github.com/supabase/cli https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md https://github.com/gsd-build/get-shit-done https://github.com/teng-lin/notebooklm-py",
     "likes": 2213,
-    "retweets": 334,
+    "retweets": 335,
     "replies": 46,
-    "views": 182554,
+    "views": 182593,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -73,7 +73,7 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 160244
+        "stars": 160461
       }
     ]
   },
@@ -86,7 +86,7 @@
     "likes": 471,
     "retweets": 18,
     "replies": 12,
-    "views": 101920,
+    "views": 102038,
     "posted_at": "2026-07-08T12:08:56.000Z",
     "repo_ids": [
       "sunflower-of-parchman/codex-hygiene"
@@ -102,7 +102,7 @@
         "skill_md_path": "SKILL.md",
         "name": "codex-hygiene",
         "description": "Audit Codex Desktop context and tool surfaces with compact read-only telemetry. Use when usage rises unexpectedly, `codex_apps` is large, many MCPs or plugins are enabled, snapshot rows repeat, project stanzas are stale, or long-running goals may be reloading unnecessary context.",
-        "stars": 230
+        "stars": 231
       }
     ]
   },
@@ -112,10 +112,10 @@
     "author_handle": "Krongggggg",
     "author_name": "크롱",
     "text": "레딧, 트위터, 유튜브 싹 다 뒤져서 교차 검증된 요약본 하나로 퉁쳐주는 에이전트 스킬임. 이 바닥 정보 과잉에 지친 개발자들 리서치 셔틀로 굴리기 딱 좋음.\nhttps://t.co/JeW6H3uYPV https://t.co/oDfRmqpog6 https://github.com/mvanhorn/last30days-skill",
-    "likes": 426,
+    "likes": 427,
     "retweets": 138,
     "replies": 8,
-    "views": 22347,
+    "views": 22434,
     "posted_at": "2026-07-06T23:22:00.000Z",
     "repo_ids": [
       "mvanhorn/last30days-skill"
@@ -131,36 +131,65 @@
         "skill_md_path": "skills/last30days/SKILL.md",
         "name": "last30days",
         "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
-        "stars": 51537
+        "stars": 51643
       }
     ]
   },
   {
-    "tweet_id": "2073711235527254099",
-    "tweet_url": "https://x.com/nyk_builderz/status/2073711235527254099",
-    "author_handle": "nyk_builderz",
-    "author_name": "Nyk 🌱",
-    "text": "My top open source repos:\n\n1. Mission Control\nself-hosted AI agent orchestration dashboard\ntasks, multi-agent workflows, spend, governance\n5.5k stars\nhttps://t.co/dpbCG20Jms\n\n2. awesome-hermes-agent\ncurated skills, tools, integrations, and resources for Hermes Agent\n4.4k stars https://t.co/OHTToVuWeF https://github.com/builderz-labs/mission-control",
-    "likes": 417,
-    "retweets": 71,
-    "replies": 26,
-    "views": 34968,
-    "posted_at": "2026-07-05T10:11:00.000Z",
+    "tweet_id": "2075919872937377834",
+    "tweet_url": "https://x.com/jshguo/status/2075919872937377834",
+    "author_handle": "jshguo",
+    "author_name": "Joshua Guo",
+    "text": "An illegal skill here. Super powerful, though.\n\nhttps://t.co/JoLCfgkw7h https://github.com/Jane-xiaoer/claude-skill-web-clone",
+    "likes": 399,
+    "retweets": 23,
+    "replies": 3,
+    "views": 28861,
+    "posted_at": "2026-07-11T12:27:21.000Z",
     "repo_ids": [
-      "builderz-labs/mission-control"
+      "Jane-xiaoer/claude-skill-web-clone"
     ],
     "repo_urls": [
-      "https://github.com/builderz-labs/mission-control"
+      "https://github.com/Jane-xiaoer/claude-skill-web-clone"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "builderz-labs/mission-control",
-        "github_url": "https://github.com/builderz-labs/mission-control",
+        "id": "jane-xiaoer/claude-skill-web-clone",
+        "github_url": "https://github.com/Jane-xiaoer/claude-skill-web-clone",
         "skill_md_path": "SKILL.md",
-        "name": "mission-control",
-        "description": "Interact with Mission Control — AI agent orchestration dashboard. Use when registering agents, managing tasks, syncing skills, or querying agent/task status via MC APIs.",
-        "stars": 5710
+        "name": "web-clone",
+        "description": "网站复刻 / 克隆方法论。USE WHEN 用户说 复刻网站、克隆网站、clone website、抄个站、仿站、 照着这个站做一个、reproduce site、还原某个网页效果、把这个站搬下来改成我的、 复刻某个交互/WebGL/Canvas/Three.js 效果。提供「先拿真源码 → 判路径 → 逆向拆解 → 搭工程 → 替换内容」的可移植决策树，覆盖静态站 / React-Vue-Next 内容站 / WebGL-Canvas 重前端站三大分支，并强制核对任何 AI 二手分析里的可执行代码。\n",
+        "stars": 748
+      }
+    ]
+  },
+  {
+    "tweet_id": "2074839723432886661",
+    "tweet_url": "https://x.com/twannl/status/2074839723432886661",
+    "author_handle": "twannl",
+    "author_name": "Antoine v.d. SwiftLee ",
+    "text": "I just released a new Agent Skill for iOS Development:\n\nhttps://t.co/FqHtCh8k9B https://github.com/AvdLee/Diagnostics/releases/tag/7.0.0",
+    "likes": 395,
+    "retweets": 29,
+    "replies": 2,
+    "views": 104469,
+    "posted_at": "2026-07-08T12:55:13.000Z",
+    "repo_ids": [
+      "AvdLee/Diagnostics"
+    ],
+    "repo_urls": [
+      "https://github.com/AvdLee/Diagnostics"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "avdlee/diagnostics",
+        "github_url": "https://github.com/AvdLee/Diagnostics",
+        "skill_md_path": "diagnostics-report-analyzer-skill/SKILL.md",
+        "name": "diagnostics-report-analyzer-skill",
+        "description": "Analyze AvdLee Diagnostics HTML reports for customer support and debugging. Use this skill whenever the user asks to inspect, summarize, triage, debug, or explain a Diagnostics-Report.html attachment, Diagnostics session logs, embedded diagnostics JSON, legacy HTML-only reports, MetricKit crash diagnostics, app/system metadata, or support reports generated by the Diagnostics framework.",
+        "stars": 1276
       }
     ]
   },
@@ -170,10 +199,10 @@
     "author_handle": "Easycompany333",
     "author_name": "Easycompany",
     "text": "book-to-skill\n读任何一本技能书，都可以直接转为Skill使用\n很好奇这个skill的description是怎么写的，skill.md又如何抓取书中的智慧呢？\n\n《穷查理芒格》这本书要怎么抓取里面的智慧呢？这个skill在GitHub快7K的星标了，感兴趣的去试试。\nhttps://t.co/2yGuvc3ZsS https://t.co/xBiOm1CPOn https://github.com/virgiliojr94/book-to-skill",
-    "likes": 377,
+    "likes": 378,
     "retweets": 94,
     "replies": 3,
-    "views": 26475,
+    "views": 26516,
     "posted_at": "2026-06-29T08:18:00.000Z",
     "repo_ids": [
       "virgiliojr94/book-to-skill"
@@ -189,7 +218,7 @@
         "skill_md_path": "SKILL.md",
         "name": "book-to-skill",
         "description": "Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured agent skills, extracting frameworks, mental models, principles, techniques, and anti-patterns. Use when the user wants to study a document through GitHub Copilot CLI, Amp, or Claude Code, apply an author's frameworks while working, or build a reusable knowledge base from a file.",
-        "stars": 8449
+        "stars": 8501
       }
     ]
   },
@@ -199,10 +228,10 @@
     "author_handle": "ricouii",
     "author_name": "RicoUI",
     "text": "这是我目前看到最好的公众号排版 SKILL 了，推荐。\n\nhttps://t.co/AgO47D9ksa\n\n发布仅 7 个小时。 内置了 6 套设计和组件复杂程度很高的主题，并且支持用一句话描述或一张参考图，生成一套全新组件库并保存本地复用。\n\n尤其是组件设计（含配图、引言卡、编号章节、金句、名词旁注等完整组件）。 https://t.co/3tFiDhqDTk https://github.com/isjiamu/gzh-design-skill",
-    "likes": 266,
+    "likes": 269,
     "retweets": 67,
     "replies": 1,
-    "views": 15956,
+    "views": 16129,
     "posted_at": "2026-07-07T02:24:05.000Z",
     "repo_ids": [
       "isjiamu/gzh-design-skill"
@@ -218,36 +247,72 @@
         "skill_md_path": "SKILL.md",
         "name": "gzh-design",
         "description": "微信公众号文章排版引擎，将 Markdown 转换为可直接粘贴到公众号编辑器的 HTML。主题风格从 references/theme-index.md 注册的自定义主题库中选取，自动章节编号、关键词下划线标记、引言卡片、目录导航、代码块、图片/GIF、作者签名。支持 Markdown / Word(.docx) / PDF / 纯文本输入（非 Markdown 先自动归一化），也支持\"一键自动排版\"（自动推断结构+选主题），还支持根据用户描述/参考图生成自定义主题组件库并保存本地复用。触发场景：(1) 用户提到\"公众号排版\"\"公众号文章\"\"微信排版\"\"gzh\"，(2) 用户想把文章（md/docx/pdf/纯文本）转成公众号 HTML，(3) 用户说\"自动排版\"\"一键排版\"公众号内容，(4) 用户想为公众号排版\"生成新主题/自定义风格/按这张图做一套组件库\"。不用于生成普通网页/落地页/PPT（用前端或 PPT 类 skill）。",
-        "stars": 1878
+        "stars": 1944
       }
     ]
   },
   {
-    "tweet_id": "2075521430880739617",
-    "tweet_url": "https://x.com/nyk_builderz/status/2075521430880739617",
-    "author_handle": "nyk_builderz",
-    "author_name": "Nyk 🌱",
-    "text": "My top open source repos:\n\n1. Mission Control\nself-hosted AI agent orchestration dashboard\ntasks, multi-agent workflows, spend, governance\n5.7k stars\nhttps://t.co/dpbCG21hc0\n\n2. awesome-hermes-agent\ncurated skills, tools, integrations, and resources for Hermes Agent\n4.6k stars https://t.co/HmnPZnM6yK https://github.com/builderz-labs/mission-control",
-    "likes": 259,
-    "retweets": 29,
-    "replies": 10,
-    "views": 17344,
-    "posted_at": "2026-07-10T10:04:05.000Z",
+    "tweet_id": "2075219337041109102",
+    "tweet_url": "https://x.com/SupremeUEFN/status/2075219337041109102",
+    "author_handle": "SupremeUEFN",
+    "author_name": "Supreme",
+    "text": "🔥 UEFN Python Verse Fields Tool is finally here!\n\nDirect Python Tool:\nhttps://t.co/Lni4RTrRM3\n\nClaude/Codex Skill:\nhttps://t.co/EVM75cMs75\n\nThis tool lets you create, manage, and bind Verse fields, either individually or in batches, making UI workflows much faster and easier. https://t.co/DPY0yNZnhB https://github.com/supremeuefn/uefn-python-tools/blob/main/tools/verse_field_tool.py https://github.com/supremeuefn/uefn-python-tools/tree/main/skills/uefn-verse-fields",
+    "likes": 264,
+    "retweets": 17,
+    "replies": 21,
+    "views": 17851,
+    "posted_at": "2026-07-09T14:03:40.000Z",
     "repo_ids": [
-      "builderz-labs/mission-control"
+      "supremeuefn/uefn-python-tools"
     ],
     "repo_urls": [
-      "https://github.com/builderz-labs/mission-control"
+      "https://github.com/supremeuefn/uefn-python-tools"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "builderz-labs/mission-control",
-        "github_url": "https://github.com/builderz-labs/mission-control",
-        "skill_md_path": "SKILL.md",
-        "name": "mission-control",
-        "description": "Interact with Mission Control — AI agent orchestration dashboard. Use when registering agents, managing tasks, syncing skills, or querying agent/task status via MC APIs.",
-        "stars": 5710
+        "id": "supremeuefn/uefn-python-tools",
+        "github_url": "https://github.com/supremeuefn/uefn-python-tools",
+        "skill_md_path": "skills/uefn-verse-fields/SKILL.md",
+        "name": "uefn-verse-fields",
+        "description": "Programmatically create, delete, read, and MVVM-bind Verse-exposed variables (\"Verse fields\") inside UEFN Widget Blueprints via execute_python. Covers the create → patch Verse metadata → compile → verify workflow, pin-type mapping (float/int/logic/string/ message/color/color_alpha/material/texture), safe deletion, and MVVM binding creation including which bindings can and cannot be made from Python. Trigger whenever the task involves adding/removing Verse variables on a WBP (Widget Blueprint), patching VerseVariable/FieldNotify metadata, VerseClassFields, or wiring MVVM bindings for a UEFN UI widget. These operations WILL crash UEFN if done wrong — follow the procedures exactly.",
+        "stars": 8
+      }
+    ]
+  },
+  {
+    "tweet_id": "2073784675282366628",
+    "tweet_url": "https://x.com/yamadashy/status/2073784675282366628",
+    "author_handle": "yamadashy",
+    "author_name": "yamadashy / やまだし",
+    "text": "only-you というスキルを作った\nリポジトリに対してFable などの最高性能のモデルにしかやれないことを考えさせるスキル\nhttps://t.co/7ubFPVSmAA https://github.com/yamadashy/skills/blob/main/skills/only-you/SKILL.md",
+    "likes": 155,
+    "retweets": 10,
+    "replies": 1,
+    "views": 17524,
+    "posted_at": "2026-07-05T15:02:50.000Z",
+    "repo_ids": [
+      "yamadashy/skills"
+    ],
+    "repo_urls": [
+      "https://github.com/yamadashy/skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "yamadashy/skills",
+        "githubUrl": "https://github.com/yamadashy/skills",
+        "skillPath": "skills/only-you/SKILL.md",
+        "sourceUrl": "https://github.com/yamadashy/skills/blob/main/skills/only-you/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "yamadashy/skills",
+        "github_url": "https://github.com/yamadashy/skills",
+        "skill_md_path": "skills/only-you/SKILL.md",
+        "name": "only-you",
+        "description": "Propose the tasks on a repository that only a frontier-tier model can execute — the work the model one tier below or a routine engineer would fail at or do shallowly. The deliverable is a numbered pitch list ('I can do this here, and nothing cheaper can') for the human to greenlight. Triggers on: 'what could only you do in this repo', 'only-you', 'find frontier-worthy tasks', 'what work is worth handing to you', or when the user wants to know what to give the most capable model available.",
+        "stars": 7
       }
     ]
   },
@@ -260,7 +325,7 @@
     "likes": 134,
     "retweets": 5,
     "replies": 7,
-    "views": 17928,
+    "views": 17954,
     "posted_at": "2026-07-05T08:08:35.000Z",
     "repo_ids": [
       "dzhng/skills"
@@ -283,36 +348,7 @@
         "skill_md_path": "skills/engineering/implement-spec-with-codex/SKILL.md",
         "name": "implement-spec-with-codex",
         "description": "Run [implement-spec](../implement-spec/SKILL.md) with Codex doing the implementation passes while you orchestrate, integrate, and review. Use when the user asks to implement a spec with Codex, or to run implement-spec with Codex as the implementer.",
-        "stars": 556
-      }
-    ]
-  },
-  {
-    "tweet_id": "2075193170401595643",
-    "tweet_url": "https://x.com/bonsai_poem/status/2075193170401595643",
-    "author_handle": "bonsai_poem",
-    "author_name": "ちるちる",
-    "text": "ガッツリ指定してますね\nスキル内にtemplatesディレクトリを用意して、デザイン・章立て・必須セクションを定義してます\n\nなおdeep-research skillはこちらのリポジトリのものを改造して使ってます\nフォーマットが小綺麗でオススメです\nhttps://t.co/GcFF9d1CEX https://t.co/ioLHunXtKN https://github.com/199-biotechnologies/claude-deep-research-skill",
-    "likes": 125,
-    "retweets": 4,
-    "replies": 1,
-    "views": 17587,
-    "posted_at": "2026-07-09T12:19:41.000Z",
-    "repo_ids": [
-      "199-biotechnologies/claude-deep-research-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/199-biotechnologies/claude-deep-research-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "199-biotechnologies/claude-deep-research-skill",
-        "github_url": "https://github.com/199-biotechnologies/claude-deep-research-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "deep-research",
-        "description": "Use when the user needs multi-source research with citation tracking, evidence persistence, and structured report generation. Triggers on \"deep research\", \"comprehensive analysis\", \"research report\", \"compare X vs Y\", \"analyze trends\", or \"state of the art\". Not for simple lookups, debugging, or questions answerable with 1-2 searches.",
-        "stars": 840
+        "stars": 560
       }
     ]
   },
@@ -322,10 +358,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Automates NotebookLM research workflows and artifact generation for AI agents\n\nhttps://t.co/B9D90YUGuk https://t.co/XETb6PJxst https://github.com/Toolsai/notebooklm-studio-Skill",
-    "likes": 98,
+    "likes": 99,
     "retweets": 14,
     "replies": 1,
-    "views": 8386,
+    "views": 8476,
     "posted_at": "2026-07-08T17:10:36.000Z",
     "repo_ids": [
       "Toolsai/notebooklm-studio-Skill"
@@ -341,7 +377,7 @@
         "skill_md_path": "SKILL.md",
         "name": "notebooklm-studio",
         "description": "Operate Google NotebookLM from Codex for authorized source ingestion, notebook setup, source-grounded Q&A, and Studio artifacts such as Audio Overviews, Video Overviews, reports, mind maps, quizzes, flashcards, slide decks, infographics, and data tables.",
-        "stars": 99
+        "stars": 102
       }
     ]
   },
@@ -354,7 +390,7 @@
     "likes": 95,
     "retweets": 11,
     "replies": 2,
-    "views": 9460,
+    "views": 9463,
     "posted_at": "2026-07-01T17:43:01.000Z",
     "repo_ids": [
       "stas00/the-art-of-debugging"
@@ -370,152 +406,36 @@
         "skill_md_path": "SKILL.md",
         "name": "art-of-debugging",
         "description": "Systematic methodology and concrete tool recipes for debugging Unix, Python, and PyTorch programs - crashes, hangs, segfaults, wrong output, CUDA OOM, NaN/Inf, slowness, and multi-node/multi-GPU issues. Use when a program crashes, hangs, deadlocks, segfaults, runs out of memory (OOM), produces NaN/Inf or wrong numbers, runs too slowly, or when the user mentions gdb, strace, py-spy, core files, CUDA_LAUNCH_BLOCKING, ldd/nm/LD_PRELOAD, cProfile, or distributed training hangs. Distilled from \"The Art of Debugging\", the latest version of which can be found at https://github.com/stas00/the-art-of-debugging\nThe latest SKILL.md version can be found at https://github.com/stas00/the-art-of-debugging/blob/master/SKILL.md",
-        "stars": 1657
+        "stars": 1659
       }
     ]
   },
   {
-    "tweet_id": "2074317527921099240",
-    "tweet_url": "https://x.com/canghe/status/2074317527921099240",
-    "author_handle": "canghe",
-    "author_name": "苍何",
-    "text": "开源地址：https://t.co/4yyGYUOpoK https://github.com/isjiamu/gzh-design-skill",
-    "likes": 89,
-    "retweets": 13,
-    "replies": 4,
-    "views": 9085,
-    "posted_at": "2026-07-07T02:20:12.000Z",
+    "tweet_id": "2074152470587085072",
+    "tweet_url": "https://x.com/tom_doerr/status/2074152470587085072",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Distills Slack and GitHub data into an AI teammate skill\n\nhttps://t.co/dt26VZCW2c https://t.co/YXFmUG8Vtq https://github.com/LeoYeAI/teammate-skill",
+    "likes": 62,
+    "retweets": 3,
+    "replies": 1,
+    "views": 7433,
+    "posted_at": "2026-07-06T15:24:19.000Z",
     "repo_ids": [
-      "isjiamu/gzh-design-skill"
+      "LeoYeAI/teammate-skill"
     ],
     "repo_urls": [
-      "https://github.com/isjiamu/gzh-design-skill"
+      "https://github.com/LeoYeAI/teammate-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "isjiamu/gzh-design-skill",
-        "github_url": "https://github.com/isjiamu/gzh-design-skill",
+        "id": "leoyeai/teammate-skill",
+        "github_url": "https://github.com/LeoYeAI/teammate-skill",
         "skill_md_path": "SKILL.md",
-        "name": "gzh-design",
-        "description": "微信公众号文章排版引擎，将 Markdown 转换为可直接粘贴到公众号编辑器的 HTML。主题风格从 references/theme-index.md 注册的自定义主题库中选取，自动章节编号、关键词下划线标记、引言卡片、目录导航、代码块、图片/GIF、作者签名。支持 Markdown / Word(.docx) / PDF / 纯文本输入（非 Markdown 先自动归一化），也支持\"一键自动排版\"（自动推断结构+选主题），还支持根据用户描述/参考图生成自定义主题组件库并保存本地复用。触发场景：(1) 用户提到\"公众号排版\"\"公众号文章\"\"微信排版\"\"gzh\"，(2) 用户想把文章（md/docx/pdf/纯文本）转成公众号 HTML，(3) 用户说\"自动排版\"\"一键排版\"公众号内容，(4) 用户想为公众号排版\"生成新主题/自定义风格/按这张图做一套组件库\"。不用于生成普通网页/落地页/PPT（用前端或 PPT 类 skill）。",
-        "stars": 1878
-      }
-    ]
-  },
-  {
-    "tweet_id": "2009678331281838245",
-    "tweet_url": "https://x.com/vista8/status/2009678331281838245",
-    "author_handle": "vista8",
-    "author_name": "向阳乔木",
-    "text": "如何快速共享一个Claude Code写的Skill\n\n你只需要跟Claude 说：\n\n“把某某 skill，用Github cli发布到github”\n\n（前提是先配置好Github cli，不复杂）\n\n等一会儿，Github就地址就有了。\n\nhttps://t.co/0SsskGXPTV https://t.co/p4UhD0lu0a https://github.com/joeseesun/multi-lens-thinking",
-    "likes": 87,
-    "retweets": 13,
-    "replies": 3,
-    "views": 13314,
-    "posted_at": "2026-01-09T17:27:06.000Z",
-    "repo_ids": [
-      "joeseesun/multi-lens-thinking"
-    ],
-    "repo_urls": [
-      "https://github.com/joeseesun/multi-lens-thinking"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "joeseesun/multi-lens-thinking",
-        "github_url": "https://github.com/joeseesun/multi-lens-thinking",
-        "skill_md_path": "SKILL.md",
-        "name": "multi-lens-thinking",
-        "description": "Use when facing complex problems, making decisions, seeking creative solutions, or when single-perspective thinking feels limiting. Triggers include \"how should I think about this\", \"what am I missing\", \"need fresh perspective\", or when stuck on a problem.",
-        "stars": 26
-      }
-    ]
-  },
-  {
-    "tweet_id": "2074827353151164880",
-    "tweet_url": "https://x.com/gippp69/status/2074827353151164880",
-    "author_handle": "gippp69",
-    "author_name": "Gipp 🦅",
-    "text": "HE FOUND KARPATHY’S 170,000 STAR CLAUDE SKILLS REPO, AND IT IS BASICALLY ONE FILE TEACHING CLAUDE HOW TO STOP GUESSING\n\n00:03 the repo screen loads on GitHub, https://t.co/Avc49T0mKW, and the star count jumps into frame at 170,000. no code demo yet, just the number sitting there. https://t.co/QpQC8EqeLH https://github.com/multica-ai/andrej-karpathy-skills",
-    "likes": 78,
-    "retweets": 7,
-    "replies": 32,
-    "views": 5518,
-    "posted_at": "2026-07-08T12:06:04.000Z",
-    "repo_ids": [
-      "multica-ai/andrej-karpathy-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/multica-ai/andrej-karpathy-skills"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "multica-ai/andrej-karpathy-skills",
-        "github_url": "https://github.com/multica-ai/andrej-karpathy-skills",
-        "skill_md_path": "skills/karpathy-guidelines/SKILL.md",
-        "name": "karpathy-guidelines",
-        "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-        "stars": 190772
-      }
-    ]
-  },
-  {
-    "tweet_id": "2073282867409605084",
-    "tweet_url": "https://x.com/Fenng/status/2073282867409605084",
-    "author_handle": "Fenng",
-    "author_name": "Fenng",
-    "text": "更新了一下 Chinese Tech Doc Style ，面向中文技术文档、产品文案与界面文案的写作 Skill。\n\n居然快 400 Stars 了……😂\n\nhttps://t.co/OtoXT4vMMc https://github.com/Fenng/tech-doc-style-chinese",
-    "likes": 76,
-    "retweets": 14,
-    "replies": 2,
-    "views": 12126,
-    "posted_at": "2026-07-04T05:48:49.000Z",
-    "repo_ids": [
-      "Fenng/tech-doc-style-chinese"
-    ],
-    "repo_urls": [
-      "https://github.com/Fenng/tech-doc-style-chinese"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "fenng/tech-doc-style-chinese",
-        "github_url": "https://github.com/Fenng/Tech-Doc-Style-Chinese",
-        "skill_md_path": "SKILL.md",
-        "name": "tech-doc-style-chinese",
-        "description": "在撰写、改写或审阅中文技术文档、文档首页、产品文案、界面文案、Markdown 文档或接口说明时使用。采用克制、准确、可扫读的中文技术写作风格：避免第二人称和宣传腔，统一使用直角引号，在可见正文中处理中文与英文或数字的留白，不改动代码字面量、JSON 键名、URL、API 路径等机器可读内容。如项目存在专属术语、版本展示或信息架构约定，再按需读取 references/Project-Overrides.md。",
-        "stars": 460
-      }
-    ]
-  },
-  {
-    "tweet_id": "2075213286568817133",
-    "tweet_url": "https://x.com/vikingmute/status/2075213286568817133",
-    "author_handle": "vikingmute",
-    "author_name": "Viking",
-    "text": "将自用的一个 skill 整理开源出来：https://t.co/IXUaP6dfg2\n\n就是最近一直使用的穷鬼组合思路，将它更加规范化：将复杂任务拆文档，让昂贵的模型负责规划和分解 比如 Fable5 或者 GPT5.5，这些模型绝不直接修改代码，只负责写 plans/ 目录下的文件。\n\n再交给便宜的模型去执行，比如 composer2.5 或者 https://github.com/vikingmute/shifu",
-    "likes": 69,
-    "retweets": 9,
-    "replies": 21,
-    "views": 8033,
-    "posted_at": "2026-07-09T13:39:37.000Z",
-    "repo_ids": [
-      "vikingmute/shifu"
-    ],
-    "repo_urls": [
-      "https://github.com/vikingmute/shifu"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "vikingmute/shifu",
-        "github_url": "https://github.com/vikingmute/shifu",
-        "skill_md_path": "skills/shifu/SKILL.md",
-        "name": "shifu",
-        "description": "General-purpose task decomposition and delegation. Use when a task is complex enough to benefit from being broken into sub-tasks, when the user wants to plan first and execute with cheaper/faster models, or when orchestrating multi-step work. Triggers include \"plan this\", \"break this down\", \"decompose\", \"delegate\", \"orchestrate\", multi-step feature requests, large refactors, or any complex work that benefits from structured planning before execution.",
-        "stars": 28
+        "name": "create-teammate",
+        "description": "Distill a teammate into an AI Skill. Auto-collect Slack/Teams/GitHub data, generate Work Skill + 5-layer Persona, with continuous evolution. Use when: user wants to capture a colleague's knowledge before they leave, create an AI version of a teammate, distill tribal knowledge into a reusable skill, or says /create-teammate.",
+        "stars": 224
       }
     ]
   },
@@ -528,7 +448,7 @@
     "likes": 54,
     "retweets": 5,
     "replies": 0,
-    "views": 6893,
+    "views": 6964,
     "posted_at": "2026-07-08T12:59:35.000Z",
     "repo_ids": [
       "sleekdotdesign/agent-skills"
@@ -549,16 +469,45 @@
     ]
   },
   {
-    "tweet_id": "2074520808446427331",
-    "tweet_url": "https://x.com/servasyy_ai/status/2074520808446427331",
-    "author_handle": "servasyy_ai",
-    "author_name": "huangserva",
-    "text": "最近都在吹这个👇\n\n我还没用过，但是有人给我讲了理念\n觉得和我做视频挺相近的\n\nmark一下，也推荐出来\n\nhttps://t.co/7daux21G3j https://github.com/isjiamu/gzh-design-skill",
-    "likes": 33,
-    "retweets": 3,
-    "replies": 4,
-    "views": 4108,
-    "posted_at": "2026-07-07T15:47:58.000Z",
+    "tweet_id": "2073655050115620973",
+    "tweet_url": "https://x.com/tom_doerr/status/2073655050115620973",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Bridges NotebookLM research with Claude content generation\n\nhttps://t.co/8rwIK2q9C9 https://t.co/pLuULHqzrI https://github.com/claude-world/notebooklm-skill",
+    "likes": 46,
+    "retweets": 7,
+    "replies": 1,
+    "views": 6490,
+    "posted_at": "2026-07-05T06:27:45.000Z",
+    "repo_ids": [
+      "claude-world/notebooklm-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/claude-world/notebooklm-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "claude-world/notebooklm-skill",
+        "github_url": "https://github.com/claude-world/notebooklm-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "notebooklm-research",
+        "description": "Full-autopilot AI research agent powered by Google NotebookLM (notebooklm-py v0.3.4). Ingests sources (URL, text, PDF, DOCX, YouTube, Google Drive), runs deep web research, asks cited questions, and generates 10 native artifact types (audio podcast, video, cinematic video, slide deck, report, quiz, flashcards, mind map, infographic, data table, study guide). Produces original content drafts via Claude, with optional publishing to social platforms via threads-viral-agent integration. Use this skill when the user mentions: NotebookLM, research with sources, create notebook, generate podcast from articles, turn research into content, trending topic research, research pipeline, source-based analysis, cited research answers, generate slides, generate quiz, make flashcards, deep web research, create infographic, compare sources, research report, study guide, source analysis, or knowledge synthesis.\n",
+        "stars": 333
+      }
+    ]
+  },
+  {
+    "tweet_id": "2075194201411826112",
+    "tweet_url": "https://x.com/fhwofjow51260/status/2075194201411826112",
+    "author_handle": "fhwofjow51260",
+    "author_name": "娜美知识库",
+    "text": "写公众号最费时间的，往往不是写内容。\n\n而是排版。\n\n推荐 GitHub 上一个很实用的 Agent Skill，可以把 Markdown 一键转换成适合微信公众号编辑器的 HTML，基本做到复制即用。\n\n它内置了 6 套排版主题，还提供主题生成器，可以根据自己的风格定制样式。\n\nhttps://t.co/j0fmJXfnbW https://t.co/OdIpmF5Zoh https://github.com/isjiamu/gzh-design-skill",
+    "likes": 37,
+    "retweets": 6,
+    "replies": 8,
+    "views": 5239,
+    "posted_at": "2026-07-09T12:23:47.000Z",
     "repo_ids": [
       "isjiamu/gzh-design-skill"
     ],
@@ -573,7 +522,36 @@
         "skill_md_path": "SKILL.md",
         "name": "gzh-design",
         "description": "微信公众号文章排版引擎，将 Markdown 转换为可直接粘贴到公众号编辑器的 HTML。主题风格从 references/theme-index.md 注册的自定义主题库中选取，自动章节编号、关键词下划线标记、引言卡片、目录导航、代码块、图片/GIF、作者签名。支持 Markdown / Word(.docx) / PDF / 纯文本输入（非 Markdown 先自动归一化），也支持\"一键自动排版\"（自动推断结构+选主题），还支持根据用户描述/参考图生成自定义主题组件库并保存本地复用。触发场景：(1) 用户提到\"公众号排版\"\"公众号文章\"\"微信排版\"\"gzh\"，(2) 用户想把文章（md/docx/pdf/纯文本）转成公众号 HTML，(3) 用户说\"自动排版\"\"一键排版\"公众号内容，(4) 用户想为公众号排版\"生成新主题/自定义风格/按这张图做一套组件库\"。不用于生成普通网页/落地页/PPT（用前端或 PPT 类 skill）。",
-        "stars": 1878
+        "stars": 1944
+      }
+    ]
+  },
+  {
+    "tweet_id": "2075495494802186446",
+    "tweet_url": "https://x.com/Crypto_QianXun/status/2075495494802186446",
+    "author_handle": "Crypto_QianXun",
+    "author_name": "千寻｜AI 分享 🌸",
+    "text": "这个 Skill 对内容创作者太有用了。\n\nAgent-Reach\n一个给 AI Agent 用的全网搜索工具。\n\n它能搜索：\nTwitter\nReddit\nYouTube\nGitHub\nBilibili\n小红书\n微博\n\n还能深度读取内容，不需要 API，不需要一个个网站复制链接。\n\n热点、爆文、竞品、选题、素材，一次全搞定。\n\nhttps://t.co/jxRsoi8Z7a https://github.com/Panniantong/Agent-Reach",
+    "likes": 32,
+    "retweets": 7,
+    "replies": 2,
+    "views": 2346,
+    "posted_at": "2026-07-10T08:21:01.000Z",
+    "repo_ids": [
+      "Panniantong/Agent-Reach"
+    ],
+    "repo_urls": [
+      "https://github.com/Panniantong/Agent-Reach"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "panniantong/agent-reach",
+        "github_url": "https://github.com/Panniantong/Agent-Reach",
+        "skill_md_path": "agent_reach/skill/SKILL.md",
+        "name": "agent-reach",
+        "description": "MUST USE when user wants to 调研/research/搜索/search/查/找/look up anything on the internet — e.g. 全网调研 X / 帮我调研一下 X / 查一下 X / 搜搜 X / 看看大家怎么评价 X / X 上有什么讨论 / research this topic。\nAlso MUST USE when user mentions any platform or shares any URL/链接: 小红书/xiaohongshu/xhs, Twitter/推特/X, B站/bilibili, Reddit, Facebook, Instagram, V2EX, LinkedIn/领英/招聘/求职/jobs, YouTube, GitHub code search, 小宇宙播客, 雪球/股票行情, RSS feeds, or any web URL.\n15 platforms, multi-backend routing (OpenCLI / per-platform CLIs / APIs). Zero config for 6 channels. Run `agent-reach doctor --json` to see which backend serves each platform right now.\nNOT for: 写报告/数据分析/翻译等内容加工（本 skill 只负责从互联网获取内容）； 发帖/评论/点赞等写操作；已有专门 skill 的平台（先用专门 skill）。\n【路由方式】SKILL.md 包含路由表和常用命令，复杂场景需按需阅读对应分类的 references/*.md。 分类：search / social (小红书/推特/B站/V2EX/Reddit/Facebook/Instagram) / career(LinkedIn) / dev(github) / web(网页/文章/RSS) / video(YouTube/B站/播客)。\n",
+        "stars": 55127
       }
     ]
   },
@@ -586,7 +564,7 @@
     "likes": 30,
     "retweets": 8,
     "replies": 1,
-    "views": 1960,
+    "views": 1986,
     "posted_at": "2026-07-08T12:39:00.000Z",
     "repo_ids": [
       "Miguok/fable-harness"
@@ -602,43 +580,65 @@
         "skill_md_path": ".claude/skills/adversarial-review/SKILL.md",
         "name": "adversarial-review",
         "description": "多方抗辯——對重大結論/架構決策/bug根因判定/安全判斷，平行派出 skeptic、red-team、simplifier 三個反方子代理獨立審查，過半存活才採信。觸發詞：「抗辯」「adversarial review」「多方審查」「/adversarial-review」，或 FABLE-PROTOCOL 第 2 節規定的觸發時機（架構決策、根因判定、影響生產的結論）。不適用於：瑣碎修改、純問答。",
-        "stars": 185
+        "stars": 187
       }
     ]
   },
   {
-    "tweet_id": "2074493055562809498",
-    "tweet_url": "https://x.com/ferminrp/status/2074493055562809498",
-    "author_handle": "ferminrp",
-    "author_name": "Fermin",
-    "text": "Estoy probando con un skill a partir del post de Thariq para ayudarme a darle forma al producto. Si lo prueban y pasan feedback me sirve.\n\nhttps://t.co/iUEM8My3qC\n\nO lo pueden instalar con \n\nnpx skills add https://t.co/xaEzsHSOKv --skill product-shaping https://t.co/DQZafQ3Lbl https://github.com/ferminrp/agent-skills/blob/main/skills/product-shaping/SKILL.md https://github.com/ferminrp/agent-skills",
+    "tweet_id": "2075359740914217439",
+    "tweet_url": "https://x.com/tom_doerr/status/2075359740914217439",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Scans iOS projects to catch common App Store review guideline violations before submission.\n\nhttps://t.co/iNSC6N8LXc https://t.co/cFZBhznAOu https://github.com/truongduy2611/app-store-preflight-skills",
     "likes": 30,
-    "retweets": 2,
-    "replies": 3,
-    "views": 6908,
-    "posted_at": "2026-07-07T13:57:41.000Z",
+    "retweets": 4,
+    "replies": 1,
+    "views": 6495,
+    "posted_at": "2026-07-09T23:21:35.000Z",
     "repo_ids": [
-      "ferminrp/agent-skills"
+      "truongduy2611/app-store-preflight-skills"
     ],
     "repo_urls": [
-      "https://github.com/ferminrp/agent-skills"
+      "https://github.com/truongduy2611/app-store-preflight-skills"
     ],
-    "skill_refs": [
-      {
-        "repoId": "ferminrp/agent-skills",
-        "githubUrl": "https://github.com/ferminrp/agent-skills",
-        "skillPath": "skills/product-shaping/SKILL.md",
-        "sourceUrl": "https://github.com/ferminrp/agent-skills/blob/main/skills/product-shaping/SKILL.md"
-      }
-    ],
+    "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "ferminrp/agent-skills",
-        "github_url": "https://github.com/ferminrp/agent-skills",
-        "skill_md_path": "skills/product-shaping/SKILL.md",
-        "name": "product-shaping",
-        "description": "Guided process for shaping product ideas, features, and specs by systematically uncovering the user's unknowns before anything gets built. Use this whenever the user wants to shape, spec, define, scope, or think through a product or feature — including phrases like \"I have an idea for...\", \"help me shape...\", \"let's spec out...\", \"write a PRD/brief for...\", \"should we build...\", or when they bring a vague product problem (churn, activation, a new market) and need to turn it into a concrete, buildable pitch. Also use when the user asks to brainstorm product directions or wants mockups to react to before committing to a spec.",
-        "stars": 37
+        "id": "truongduy2611/app-store-preflight-skills",
+        "github_url": "https://github.com/truongduy2611/app-store-preflight-skills",
+        "skill_md_path": "SKILL.md",
+        "name": "app-store-preflight-skills",
+        "description": "Scan an iOS/macOS Xcode project for common App Store rejection patterns before submission. Use when preparing an app for App Store review, after receiving a rejection from Apple, or when auditing metadata, subscriptions, privacy manifests, entitlements, or design compliance. Integrates with the asc CLI for metadata inspection.\n",
+        "stars": 1287
+      }
+    ]
+  },
+  {
+    "tweet_id": "2075978410229424328",
+    "tweet_url": "https://x.com/Gimi_min/status/2075978410229424328",
+    "author_handle": "Gimi_min",
+    "author_name": "Gimi 米未可",
+    "text": "准备为自己做配图 skill 整宣传视频内容\n其实上周末把这个 skill 做好，结果有别的事情给耽误～\n把 IP 配置为可插拔形式能够满足我做自媒体口播和上班汇报配图场景\n搭配 codex 中 image2 使用，效果太棒了\nskill 地址：https://t.co/tknSzJGPAp\n\n构建skill 灵感来源 @ianneo_ai 的小黑！ https://t.co/MzzoxxCi60 https://github.com/GiMi-Xiaomi/gimi-illustration-skill.git",
+    "likes": 28,
+    "retweets": 0,
+    "replies": 5,
+    "views": 3749,
+    "posted_at": "2026-07-11T16:19:57.000Z",
+    "repo_ids": [
+      "GiMi-Xiaomi/gimi-illustration-skill.git"
+    ],
+    "repo_urls": [
+      "https://github.com/GiMi-Xiaomi/gimi-illustration-skill.git"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "gimi-xiaomi/gimi-illustration-skill",
+        "github_url": "https://github.com/GiMi-Xiaomi/gimi-illustration-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "gimi-illustration",
+        "description": "Generate quirky hand-drawn style illustrations from Chinese article text. Use when the user invokes 配图, 给文章配图, 帮我配图, illustration, or similar.",
+        "stars": 15
       }
     ]
   },
@@ -651,7 +651,7 @@
     "likes": 24,
     "retweets": 4,
     "replies": 1,
-    "views": 5946,
+    "views": 5951,
     "posted_at": "2026-07-01T20:04:55.000Z",
     "repo_ids": [
       "buzhangsan/skill-manager"
@@ -672,176 +672,98 @@
     ]
   },
   {
-    "tweet_id": "2073559739242582432",
-    "tweet_url": "https://x.com/xiaoying_eth/status/2073559739242582432",
-    "author_handle": "xiaoying_eth",
-    "author_name": "小樱💞｜实用工具分享",
-    "text": "这个 Skill 对内容创作者太有用了。\n\nAgent-Reach\n一个给 AI Agent 用的全网搜索工具。\n\n它能搜索：\nTwitter\nReddit\nYouTube\nGitHub\nBilibili\n小红书\n微博\n\n还能深度读取内容，不需要 API，不需要一个个网站复制链接。\n\n热点、爆文、竞品、选题、素材，一次全搞定。\n\nhttps://t.co/CjdbJaoi9x https://github.com/Panniantong/Agent-Reach",
-    "likes": 21,
-    "retweets": 5,
-    "replies": 4,
-    "views": 3539,
-    "posted_at": "2026-07-05T00:09:01.000Z",
-    "repo_ids": [
-      "Panniantong/Agent-Reach"
-    ],
-    "repo_urls": [
-      "https://github.com/Panniantong/Agent-Reach"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "panniantong/agent-reach",
-        "github_url": "https://github.com/Panniantong/Agent-Reach",
-        "skill_md_path": "agent_reach/skill/SKILL.md",
-        "name": "agent-reach",
-        "description": "MUST USE when user wants to 调研/research/搜索/search/查/找/look up anything on the internet — e.g. 全网调研 X / 帮我调研一下 X / 查一下 X / 搜搜 X / 看看大家怎么评价 X / X 上有什么讨论 / research this topic。\nAlso MUST USE when user mentions any platform or shares any URL/链接: 小红书/xiaohongshu/xhs, Twitter/推特/X, B站/bilibili, Reddit, Facebook, Instagram, V2EX, LinkedIn/领英/招聘/求职/jobs, YouTube, GitHub code search, 小宇宙播客, 雪球/股票行情, RSS feeds, or any web URL.\n15 platforms, multi-backend routing (OpenCLI / per-platform CLIs / APIs). Zero config for 6 channels. Run `agent-reach doctor --json` to see which backend serves each platform right now.\nNOT for: 写报告/数据分析/翻译等内容加工（本 skill 只负责从互联网获取内容）； 发帖/评论/点赞等写操作；已有专门 skill 的平台（先用专门 skill）。\n【路由方式】SKILL.md 包含路由表和常用命令，复杂场景需按需阅读对应分类的 references/*.md。 分类：search / social (小红书/推特/B站/V2EX/Reddit/Facebook/Instagram) / career(LinkedIn) / dev(github) / web(网页/文章/RSS) / video(YouTube/B站/播客)。\n",
-        "stars": 54715
-      }
-    ]
-  },
-  {
-    "tweet_id": "2073627182585520325",
-    "tweet_url": "https://x.com/georgepickett/status/2073627182585520325",
-    "author_handle": "georgepickett",
-    "author_name": "George Pickett",
-    "text": "I wanted the transcript to this so I \n- googled, 'download x video'\n- downloaded it\n- pointed codex at the download, told it to use my openAI api key to get a transcript\n- turned it into a skill\n- tested it\n- told codex to make it a repo\n\nhere it is: https://t.co/hd71fdfsYA https://t.co/vbTNskQR4B https://github.com/grp06/get-x-video-transcript",
-    "likes": 12,
-    "retweets": 0,
-    "replies": 2,
-    "views": 2305,
-    "posted_at": "2026-07-05T04:37:01.000Z",
-    "repo_ids": [
-      "grp06/get-x-video-transcript"
-    ],
-    "repo_urls": [
-      "https://github.com/grp06/get-x-video-transcript"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "grp06/get-x-video-transcript",
-        "github_url": "https://github.com/grp06/get-x-video-transcript",
-        "skill_md_path": "SKILL.md",
-        "name": "get-x-video-transcript",
-        "description": "Download a public X/Twitter video via x-downloader.com-compatible API calls, extract its audio, and transcribe it with an OpenAI API key found on the user's computer. Use when the user asks to transcribe, summarize from audio, or get text from an X/Twitter video URL and wants the final output to be a transcript rather than a saved video.",
-        "stars": 3
-      }
-    ]
-  },
-  {
-    "tweet_id": "2073383038440833373",
-    "tweet_url": "https://x.com/ParthJadhav8/status/2073383038440833373",
-    "author_handle": "ParthJadhav8",
-    "author_name": "Parth Jadhav",
-    "text": "app-store-screenshots skill has now reached 6K stars on Github 🎉\n\nAnd it works amazingly well with Fable, I'd suggest everyone to re-run this skill with Fable and be prepared to be amazed.\n\nhttps://t.co/qM4DZOcvNb https://t.co/EufmMATqdI https://github.com/ParthJadhav/app-store-screenshots",
-    "likes": 6,
+    "tweet_id": "2075656969902289104",
+    "tweet_url": "https://x.com/ShahriyarRzayev/status/2075656969902289104",
+    "author_handle": "ShahriyarRzayev",
+    "author_name": "Shako",
+    "text": "Code as Agent Harness SKILL usage and obvious results, summarized in this article:\nhttps://t.co/1bPqAmQTm0\n\nYou can also experiment the SKILL in daily development tasks:\nhttps://t.co/ZvNA0tuBB3 https://devinternals.substack.com/p/the-day-my-coding-agent-didnt-repeat https://github.com/ShahriyarR/code-as-agent-harness-protocol",
+    "likes": 3,
     "retweets": 0,
     "replies": 0,
-    "views": 716,
-    "posted_at": "2026-07-04T12:26:52.000Z",
+    "views": 118,
+    "posted_at": "2026-07-10T19:02:40.000Z",
     "repo_ids": [
-      "ParthJadhav/app-store-screenshots"
+      "ShahriyarR/code-as-agent-harness-protocol"
     ],
     "repo_urls": [
-      "https://github.com/ParthJadhav/app-store-screenshots"
+      "https://github.com/ShahriyarR/code-as-agent-harness-protocol"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "parthjadhav/app-store-screenshots",
-        "github_url": "https://github.com/ParthJadhav/app-store-screenshots",
-        "skill_md_path": "skills/app-store-screenshots/SKILL.md",
-        "name": "app-store-screenshots",
-        "description": "Use when building App Store or Google Play screenshot pages, generating exportable marketing screenshots for iOS and/or Android apps, or scaffolding a screenshot editor with Next.js. Triggers on app store, play store, screenshots, marketing assets, html-to-image, phone mockup, android screenshots, feature graphic.",
-        "stars": 6031
+        "id": "shahriyarr/code-as-agent-harness-protocol",
+        "github_url": "https://github.com/ShahriyarR/code-as-agent-harness-protocol",
+        "skill_md_path": "agent-harness-protocol/SKILL.md",
+        "name": "agent-harness-protocol",
+        "description": "This file governs how this agent reasons, acts, manages memory, uses tools, verifies progress, and coordinates across all tasks in this repository.",
+        "stars": 11
       }
     ]
   },
   {
-    "tweet_id": "2073802336632209470",
-    "tweet_url": "https://x.com/runsonai/status/2073802336632209470",
-    "author_handle": "runsonai",
-    "author_name": "Thanh Pham",
-    "text": "If you ever get claude tell you it cannot do something in the browser for you because of privacy/sensitivity issues, now you can have it drive codex desktop app to do it for you. \nhttps://t.co/1ZTx3o7JyC https://github.com/humanrouter/codex-browser-skill",
-    "likes": 5,
+    "tweet_id": "2076267675496702135",
+    "tweet_url": "https://x.com/Smartpigai/status/2076267675496702135",
+    "author_handle": "Smartpigai",
+    "author_name": "Smartpig",
+    "text": "做了一个「会创建 Skill 的 Skill」：SkillSeed 🌱\n\n它不只是生成 SKILL.md，还会：\n\n✓ 校验该触发与不该触发的边界\n✓ 自动检查格式与规范\n✓ 记录每次创建的经验，越用越聪明\n✓ 一份 Skill 面向 Claude Code、Codex、Cursor 等工具\n\n目前已开源，希望大家多多提建议~\nhttps://t.co/qPZqGZtaty https://t.co/6tZ09EPv38 https://github.com/ht426/skillseed",
+    "likes": 1,
     "retweets": 0,
-    "replies": 3,
-    "views": 556,
-    "posted_at": "2026-07-05T16:13:01.000Z",
+    "replies": 2,
+    "views": 67,
+    "posted_at": "2026-07-12T11:29:23.000Z",
     "repo_ids": [
-      "humanrouter/codex-browser-skill"
+      "ht426/skillseed"
     ],
     "repo_urls": [
-      "https://github.com/humanrouter/codex-browser-skill"
+      "https://github.com/ht426/skillseed"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "humanrouter/codex-browser-skill",
-        "github_url": "https://github.com/humanrouter/codex-browser-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "codex-desktop",
-        "description": "Hand a browser task to the Codex DESKTOP APP and get the answer back automatically, with no human copy-paste relay. Use when a browser task needs Codex's Chrome control (your harness's own browser tools are blocked, limited, or you specifically want Codex to do it), e.g. \"have codex do this in the browser\", \"send this to the codex app\", \"codex browser task\". NOT for code questions/second opinions. This is specifically for steering the Codex app's browser/computer-use from another agent.",
+        "id": "ht426/skillseed",
+        "github_url": "https://github.com/ht426/skillseed",
+        "skill_md_path": "skills/processing-pdfs/SKILL.md",
+        "name": "processing-pdfs",
+        "description": "从 PDF 文档（尤其发票、收据、报表）中提取表格和文字，输出结构化数据。当用户需要解析 PDF 内容、提取 PDF 表格、读取 PDF 文字、或处理发票/收据数据时使用。触发词：\"提取 PDF\"、\"解析 PDF\"、\"PDF 表格\"、\"读取 PDF\"、\"解析发票\"、\"extract PDF\"。",
         "stars": 2
       }
     ]
   },
   {
-    "tweet_id": "2075670586328563994",
-    "tweet_url": "https://x.com/ade_oshineye/status/2075670586328563994",
-    "author_handle": "ade_oshineye",
-    "author_name": "Adewale Oshineye",
-    "text": "Skill Eval Harness 0.6.0 is out: https://t.co/GB31Ajh7Or\nNow with support for @MistralAI Vibe CLI.\n\nChangelog: https://t.co/wQhu8rjmyM https://pypi.org/project/skill-eval-harness/0.6.0/ https://github.com/adewale/skill-eval-harness/blob/main/CHANGELOG.md#v060--2026-07-10",
-    "likes": 1,
+    "tweet_id": "2076215884666806422",
+    "tweet_url": "https://x.com/dimsav/status/2076215884666806422",
+    "author_handle": "dimsav",
+    "author_name": "Dimitris Sav 🚀",
+    "text": "Installing these 2 skills is all it needed to change my opinion about how well can AI do web design.\n\n1. UI UX PRO MAX (https://t.co/bACSRbybmX)\n\n2. Frontend Design by Anthropic (https://t.co/yIRmg5QUL6)\n\n- Tell claude to install them\n- Then just type: /ui-ux-pro-max redesign https://t.co/Lt7cpcregK https://github.com/nextlevelbuilder/ui-ux-pro-max-skill https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+    "likes": 0,
     "retweets": 0,
     "replies": 0,
-    "views": 181,
-    "posted_at": "2026-07-10T19:56:46.000Z",
+    "views": 52,
+    "posted_at": "2026-07-12T08:03:35.000Z",
     "repo_ids": [
-      "adewale/skill-eval-harness"
+      "nextlevelbuilder/ui-ux-pro-max-skill",
+      "anthropics/skills"
     ],
     "repo_urls": [
-      "https://github.com/adewale/skill-eval-harness"
+      "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "https://github.com/anthropics/skills"
     ],
-    "skill_refs": [],
-    "valid_skill_repos": [
+    "skill_refs": [
       {
-        "id": "adewale/skill-eval-harness",
-        "github_url": "https://github.com/adewale/skill-eval-harness",
-        "skill_md_path": "examples/demo-skill/skills/demo/SKILL.md",
-        "name": "demo-reviewer",
-        "description": "Demo skill for the Skill Eval Harness example. Use it to review a proposed change and label the severity of each finding.",
-        "stars": 54
+        "repoId": "anthropics/skills",
+        "githubUrl": "https://github.com/anthropics/skills",
+        "skillPath": "skills/frontend-design/SKILL.md",
+        "sourceUrl": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md"
       }
-    ]
-  },
-  {
-    "tweet_id": "2075778103297601912",
-    "tweet_url": "https://x.com/QingQ77/status/2075778103297601912",
-    "author_handle": "QingQ77",
-    "author_name": "Geek Lite",
-    "text": "一个基于 Agent Skills 协议的品牌设计驱动幻灯片生成 Skill,把文章、BP、周报等内容按 62 种真实品牌设计语言生成可交付的 HTML/PPTX/PDF 演示稿。\n\nhttps://t.co/nAUMCwmtvl https://t.co/HNUjfAOARg https://github.com/SpaceZephyr/space-multi-design-ppt",
-    "likes": 1,
-    "retweets": 0,
-    "replies": 1,
-    "views": 393,
-    "posted_at": "2026-07-11T03:04:00.000Z",
-    "repo_ids": [
-      "SpaceZephyr/space-multi-design-ppt"
     ],
-    "repo_urls": [
-      "https://github.com/SpaceZephyr/space-multi-design-ppt"
-    ],
-    "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "spacezephyr/space-multi-design-ppt",
-        "github_url": "https://github.com/SpaceZephyr/space-multi-design-ppt",
-        "skill_md_path": "SKILL.md",
-        "name": "space-multi-design-ppt",
-        "description": "品牌设计风格驱动的幻灯片生成器。将用户内容智能匹配到 62 个顶级品牌设计系统（Apple、Notion、Claude、Stripe、Linear、Tesla 等），拉取真实品牌设计规范（DESIGN.md）后生成像素级还原品牌风格的 HTML 幻灯片，或用 python-pptx 原生构建可编辑 PPTX（制作前会询问用户要哪种输出）。用户要求\"做 PPT\"、\"做个 slide\"、\"生成演示文稿\"、\"design slide\"、\"用 XX 风格做幻灯片\"、\"把这篇文章做成 deck\"、\"输出 pptx\"、提到 presentation/keynote/路演/汇报材料，或发来一段内容希望变成幻灯片时，都应使用本 skill——即使用户没有提到\"品牌\"或\"设计风格\"。",
-        "stars": 40
+        "id": "anthropics/skills",
+        "github_url": "https://github.com/anthropics/skills",
+        "skill_md_path": "skills/frontend-design/SKILL.md",
+        "name": "frontend-design",
+        "description": "Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.",
+        "stars": 160461
       }
     ]
   }
