@@ -146,13 +146,54 @@ export const syncTokens = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
+    purpose: text("purpose").notNull().default("legacy_upload"),
+    codeChallenge: text("code_challenge"),
+    codeChallengeMethod: text("code_challenge_method"),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     usedAt: timestamp("used_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
   },
   (table) => [
     uniqueIndex("sync_tokens_token_hash_unique").on(table.tokenHash),
-    index("sync_tokens_user_idx").on(table.userId)
+    index("sync_tokens_user_idx").on(table.userId),
+    check(
+      "sync_tokens_purpose_check",
+      sql`${table.purpose} IN ('legacy_upload', 'device_exchange')`
+    ),
+    check(
+      "sync_tokens_challenge_check",
+      sql`(${table.codeChallenge} IS NULL AND ${table.codeChallengeMethod} IS NULL)
+        OR (${table.purpose} = 'device_exchange' AND ${table.codeChallenge} IS NOT NULL AND ${table.codeChallengeMethod} = 'S256')`
+    )
+  ]
+);
+
+export const deviceTokens = pgTable(
+  "device_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    deviceName: text("device_name").notNull(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    uniqueIndex("device_tokens_token_hash_unique").on(table.tokenHash),
+    index("device_tokens_user_idx").on(table.userId),
+    index("device_tokens_user_active_idx")
+      .on(table.userId, table.createdAt)
+      .where(sql`${table.revokedAt} IS NULL`),
+    check(
+      "device_tokens_name_check",
+      sql`char_length(${table.deviceName}) BETWEEN 1 AND 100 AND ${table.deviceName} = btrim(${table.deviceName})`
+    ),
+    check(
+      "device_tokens_expiry_check",
+      sql`${table.expiresAt} > ${table.createdAt}`
+    )
   ]
 );
 
