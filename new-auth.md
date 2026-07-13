@@ -1,7 +1,7 @@
 # App <-> Portal Sync Auth - Device Credential Plan
 
 Replaces per-sync token pasting with one-time pairing that yields a durable,
-sync-scoped device credential. Updated 2026-07-12 against `main`.
+sync-scoped device credential. Updated 2026-07-13 against `main`.
 
 Status legend: `todo` / `in progress` / `done` / `deferred`.
 
@@ -23,7 +23,7 @@ Implement and commit in these boundaries:
 1. **AUTH1 - Device schema and token model** (`done`)
 2. **AUTH2 - Exchange and device-auth backend** (`done`, depends on AUTH1)
 3. **AUTH3 - Device upload and revocation** (`done`, depends on AUTH2)
-4. **AUTH4 - Mac credential and connection core** (`todo`, depends on AUTH2)
+4. **AUTH4 - Mac credential and connection core** (`done`, depends on AUTH2)
 5. **AUTH5 - Manual one-time pairing** (`todo`, depends on AUTH3-AUTH4)
 6. **AUTH6 - Portal connected-device management** (`todo`, depends on AUTH3)
 7. **AUTH7 - Browser pairing** (`todo`, depends on stable AUTH5)
@@ -227,7 +227,7 @@ and a failed request cannot retire the previous successful inventory.
 
 ### AUTH4 - Mac credential and connection core
 
-`todo`
+`done`
 
 Primary files:
 

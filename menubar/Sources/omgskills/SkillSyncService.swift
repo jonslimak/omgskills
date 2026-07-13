@@ -5,6 +5,10 @@ struct SkillSyncPayload: Codable, Equatable, Sendable {
     let skills: [SkillSyncPayloadSkill]
 }
 
+struct DeviceSkillSyncPayload: Codable, Equatable, Sendable {
+    let skills: [SkillSyncPayloadSkill]
+}
+
 struct SkillSyncPayloadSkill: Codable, Equatable, Sendable {
     let stableKey: String
     let installationPath: String
@@ -57,8 +61,12 @@ enum SkillSyncService {
     static func payload(token: String, installations: [Skill]) -> SkillSyncPayload {
         SkillSyncPayload(
             token: token.trimmingCharacters(in: .whitespacesAndNewlines),
-            skills: installations.map(payloadSkill)
+            skills: payloadSkills(installations)
         )
+    }
+
+    static func payloadSkills(_ installations: [Skill]) -> [SkillSyncPayloadSkill] {
+        installations.map(payloadSkill)
     }
 
     static func payloadSkill(_ skill: Skill) -> SkillSyncPayloadSkill {
