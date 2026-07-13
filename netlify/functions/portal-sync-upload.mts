@@ -47,6 +47,7 @@ export default async (req: Request, _context: Context) => {
           SELECT id, user_id
           FROM sync_tokens
           WHERE token_hash = $1
+            AND purpose = 'legacy_upload'
             AND used_at IS NULL
             AND expires_at > now()
           FOR UPDATE

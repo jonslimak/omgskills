@@ -21,7 +21,7 @@ ID0.2 and ID0.5 may proceed independently and do not block this plan.
 Implement and commit in these boundaries:
 
 1. **AUTH1 - Device schema and token model** (`done`)
-2. **AUTH2 - Exchange and device-auth backend** (`todo`, depends on AUTH1)
+2. **AUTH2 - Exchange and device-auth backend** (`done`, depends on AUTH1)
 3. **AUTH3 - Device upload and revocation** (`todo`, depends on AUTH2)
 4. **AUTH4 - Mac credential and connection core** (`todo`, depends on AUTH2)
 5. **AUTH5 - Manual one-time pairing** (`todo`, depends on AUTH3-AUTH4)
@@ -130,7 +130,7 @@ pre-existing sync data.
 
 ### AUTH2 - Pairing code, exchange, and auth helper
 
-`todo`
+`done`
 
 Primary files:
 

@@ -12,6 +12,19 @@ export function requireString(value: unknown, field: string, maxLength = 500): s
   return trimmed;
 }
 
+export async function requireJsonObject(req: Request): Promise<Record<string, unknown>> {
+  let value: unknown;
+  try {
+    value = await req.json();
+  } catch {
+    throw new Response("Request body must be valid JSON", { status: 400 });
+  }
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new Response("Request body must be an object", { status: 400 });
+  }
+  return value as Record<string, unknown>;
+}
+
 export function optionalString(value: unknown, maxLength = 1000): string | null {
   if (value === undefined || value === null) {
     return null;

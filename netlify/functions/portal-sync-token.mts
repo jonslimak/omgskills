@@ -1,7 +1,7 @@
 import type { Config, Context } from "@netlify/functions";
 import { createSyncToken, hashToken } from "./_shared/crypto.js";
 import { getPgPool } from "./_shared/db.js";
-import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
+import { errorResponse, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 
 export default async (req: Request, _context: Context) => {
@@ -22,7 +22,7 @@ export default async (req: Request, _context: Context) => {
       [user.id, tokenHash, expiresAt]
     );
 
-    return jsonResponse(req, {
+    return secretJsonResponse(req, {
       token,
       expiresAt: expiresAt.toISOString()
     });
