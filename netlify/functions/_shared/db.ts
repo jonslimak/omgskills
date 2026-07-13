@@ -6,8 +6,20 @@ import * as schema from "../../database/schema.js";
 let drizzlePool: pg.Pool | undefined;
 let pgPool: pg.Pool | undefined;
 
+export function selectSkillGroupsConnectionString(
+  context: string | undefined,
+  override: string | undefined,
+  managed: () => string
+) {
+  return context === "production" ? managed() : override || managed();
+}
+
 function getSkillGroupsConnectionString() {
-  return process.env.SKILLGROUPS_DATABASE_URL || getConnectionString();
+  return selectSkillGroupsConnectionString(
+    process.env.CONTEXT,
+    process.env.SKILLGROUPS_DATABASE_URL,
+    getConnectionString
+  );
 }
 
 export function getSqlDatabase() {
