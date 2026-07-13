@@ -12,7 +12,6 @@ test("manual production deploy uses the guarded combined artifact in order", () 
     "npx netlify-cli deploy --prod --dir=dist/netlify-site --no-build",
     "node ./scripts/verify-production-deploy.mjs",
     "node ./scripts/verify-web-library-pages.mjs --live",
-    "git tag \"v$VERSION\"",
   ];
 
   let previousIndex = -1;
@@ -24,6 +23,19 @@ test("manual production deploy uses the guarded combined artifact in order", () 
   }
 
   assert.doesNotMatch(script, /--dir=site(?:\s|$)/);
+});
+
+test("manual production deploy never tags a Mac release without explicit opt-in", () => {
+  const optIn = 'if [ "${1:-}" = "--tag-release" ]';
+  const guard = 'if [ "$TAG_RELEASE" = true ]';
+  const tag = 'git tag "v$VERSION"';
+
+  assert.match(script, /TAG_RELEASE=false/);
+  assert.notEqual(script.indexOf(optIn), -1);
+  assert.notEqual(script.indexOf(guard), -1);
+  assert.ok(script.indexOf(tag) > script.indexOf(guard));
+  assert.match(script, /Mac release tagging skipped/);
+  assert.match(script, /Usage: \.\/scripts\/deploy-site-prod\.sh \[--tag-release\]/);
 });
 
 test("manual production deploy checks generated config and every deploy input", () => {
