@@ -2,6 +2,7 @@ import Foundation
 import Observation
 
 enum DeviceConnectionFailure: Equatable, Sendable {
+    case authorization(String)
     case exchange(String)
     case replacementRequired
     case credentialStorage
@@ -14,6 +15,7 @@ enum DeviceConnectionFailure: Equatable, Sendable {
 final class DeviceConnectionModel {
     enum State: Equatable, Sendable {
         case disconnected
+        case authorizing
         case exchanging
         case storingCredential
         case syncing
@@ -26,16 +28,25 @@ final class DeviceConnectionModel {
 
     @ObservationIgnored private let credentialStore: any DeviceCredentialStoring
     @ObservationIgnored private let api: any DeviceSyncServing
+    @ObservationIgnored private let browserAuthorizer: (any BrowserPairingAuthorizing)?
+    @ObservationIgnored private let pairingRequestGenerator: any BrowserPairingRequestGenerating
+    @ObservationIgnored private let portalConnectURL: URL
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeAttemptID: UUID?
     @ObservationIgnored private var connectedInfo: DeviceConnectionInfo?
 
     init(
         credentialStore: any DeviceCredentialStoring = DeviceCredentialStore(),
-        api: any DeviceSyncServing = DeviceSyncAPI()
+        api: any DeviceSyncServing = DeviceSyncAPI(),
+        browserAuthorizer: (any BrowserPairingAuthorizing)? = nil,
+        pairingRequestGenerator: any BrowserPairingRequestGenerating = SystemBrowserPairingRequestGenerator(),
+        portalConnectURL: URL = BrowserPairing.configuredConnectURL()
     ) {
         self.credentialStore = credentialStore
         self.api = api
+        self.browserAuthorizer = browserAuthorizer
+        self.pairingRequestGenerator = pairingRequestGenerator
+        self.portalConnectURL = portalConnectURL
     }
 
     @discardableResult
@@ -71,6 +82,23 @@ final class DeviceConnectionModel {
         startAttempt(initialState: .exchanging) { model, attemptID in
             await model.performConnect(
                 pairingCode: pairingCode,
+                codeVerifier: nil,
+                deviceName: deviceName,
+                installations: installations,
+                replacingExisting: replacingExisting,
+                attemptID: attemptID
+            )
+        }
+    }
+
+    @discardableResult
+    func connectWithBrowser(
+        deviceName: String,
+        installations: [Skill],
+        replacingExisting: Bool = false
+    ) -> Task<Void, Never> {
+        startAttempt(initialState: .authorizing) { model, attemptID in
+            await model.performBrowserConnect(
                 deviceName: deviceName,
                 installations: installations,
                 replacingExisting: replacingExisting,
@@ -117,6 +145,7 @@ final class DeviceConnectionModel {
     func disconnect() -> Task<Void, Never> {
         let previousTask = activeTask
         activeAttemptID = nil
+        browserAuthorizer?.cancel()
         previousTask?.cancel()
         let attemptID = UUID()
         activeAttemptID = attemptID
@@ -156,6 +185,7 @@ final class DeviceConnectionModel {
 
     func cancelCurrentOperation() {
         activeAttemptID = nil
+        browserAuthorizer?.cancel()
         activeTask?.cancel()
         if let connectedInfo {
             state = .connected(connectedInfo)
@@ -166,6 +196,7 @@ final class DeviceConnectionModel {
 
     private func performConnect(
         pairingCode: String,
+        codeVerifier: String?,
         deviceName: String,
         installations: [Skill],
         replacingExisting: Bool,
@@ -185,7 +216,7 @@ final class DeviceConnectionModel {
             let record = try await api.exchange(
                 pairingCode: pairingCode,
                 deviceName: deviceName,
-                codeVerifier: nil
+                codeVerifier: codeVerifier
             )
             exchanged = record
             guard isCurrent(attemptID) else {
@@ -255,6 +286,60 @@ final class DeviceConnectionModel {
         }
     }
 
+    private func performBrowserConnect(
+        deviceName: String,
+        installations: [Skill],
+        replacingExisting: Bool,
+        attemptID: UUID
+    ) async {
+        do {
+            let existing = try await credentialStore.load()
+            guard isCurrent(attemptID) else { return }
+            if existing != nil, !replacingExisting {
+                state = .failed(.replacementRequired)
+                finish(attemptID)
+                return
+            }
+            guard let browserAuthorizer else {
+                throw BrowserPairingError.unavailable
+            }
+
+            let request = try pairingRequestGenerator.makeRequest()
+            let authorizationURL = try BrowserPairing.authorizationURL(
+                connectURL: portalConnectURL,
+                request: request
+            )
+            let callbackURL = try await browserAuthorizer.authorize(
+                url: authorizationURL,
+                callbackScheme: BrowserPairing.callbackScheme
+            )
+            guard isCurrent(attemptID) else { return }
+            switch try BrowserPairing.parseCallback(callbackURL, expectedState: request.state) {
+            case .cancelled:
+                state = neutralState()
+                finish(attemptID)
+            case .approved(let pairingCode):
+                state = .exchanging
+                await performConnect(
+                    pairingCode: pairingCode,
+                    codeVerifier: request.codeVerifier,
+                    deviceName: deviceName,
+                    installations: installations,
+                    replacingExisting: replacingExisting,
+                    attemptID: attemptID
+                )
+            }
+        } catch is CancellationError {
+            guard isCurrent(attemptID) else { return }
+            state = neutralState()
+            finish(attemptID)
+        } catch {
+            guard isCurrent(attemptID) else { return }
+            state = .failed(.authorization(error.localizedDescription))
+            finish(attemptID)
+        }
+    }
+
     @discardableResult
     private func startAttempt(
         initialState: State,
@@ -262,6 +347,7 @@ final class DeviceConnectionModel {
     ) -> Task<Void, Never> {
         let previousTask = activeTask
         activeAttemptID = nil
+        browserAuthorizer?.cancel()
         previousTask?.cancel()
         let attemptID = UUID()
         activeAttemptID = attemptID
@@ -292,6 +378,13 @@ final class DeviceConnectionModel {
 
     private func isCurrent(_ attemptID: UUID) -> Bool {
         activeAttemptID == attemptID && !Task.isCancelled
+    }
+
+    private func neutralState() -> State {
+        if let connectedInfo {
+            return .connected(connectedInfo)
+        }
+        return .disconnected
     }
 
     private func finish(_ attemptID: UUID) {

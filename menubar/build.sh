@@ -86,6 +86,16 @@ mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources" "$APP_BUN
 
 cp "$BIN_DIR/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/"
 cp Info.plist "$APP_BUNDLE/Contents/"
+CALLBACK_SCHEME=$(/usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes:0:CFBundleURLSchemes:0" "$APP_BUNDLE/Contents/Info.plist")
+if [ "$CALLBACK_SCHEME" != "omgskills" ]; then
+    echo "✗ Built app is missing the omgskills callback scheme." >&2
+    exit 1
+fi
+PORTAL_CONNECT_URL=$(/usr/libexec/PlistBuddy -c "Print :OMGSkillsPortalConnectURL" "$APP_BUNDLE/Contents/Info.plist")
+if [[ "$PORTAL_CONNECT_URL" != https://* ]]; then
+    echo "✗ Built app has an invalid portal connect URL." >&2
+    exit 1
+fi
 cp "$INDEX_SKILLS" "$APP_BUNDLE/Contents/Resources/skills.json"
 if [ -f "$TRENDING_SKILLS" ]; then
     cp "$TRENDING_SKILLS" "$APP_BUNDLE/Contents/Resources/trending.json"

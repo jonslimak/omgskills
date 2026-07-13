@@ -31,7 +31,7 @@ struct DeviceSyncAPITests {
         let result = try await api.exchange(
             pairingCode: "  pair-code\n",
             deviceName: " Jon's Mac  ",
-            codeVerifier: nil
+            codeVerifier: "pkce-verifier"
         )
         let request = try #require(await session.requests().first)
         let body = try #require(request.httpBody)
@@ -43,6 +43,7 @@ struct DeviceSyncAPITests {
         #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
         #expect(json["pairingCode"] as? String == "pair-code")
         #expect(json["deviceName"] as? String == "Jon's Mac")
+        #expect(json["codeVerifier"] as? String == "pkce-verifier")
         #expect(result.credential == "device-secret")
         #expect(result.connection.deviceID == "device-1")
     }

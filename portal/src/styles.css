@@ -275,6 +275,45 @@ pre {
   max-width: 640px;
 }
 
+.connect-shell {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.connect-panel {
+  max-width: 460px;
+  width: 100%;
+}
+
+.connect-panel h1 {
+  font-size: 30px;
+  margin: 0 0 12px;
+}
+
+.connect-panel > p:not(.eyebrow, .status, .connect-error) {
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.connect-permission {
+  border-bottom: 1px solid #dfe4ea;
+  border-top: 1px solid #dfe4ea;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding: 16px 0;
+}
+
+.connect-permission span {
+  color: #4b5563;
+}
+
+.connect-error {
+  color: #b42318;
+  margin-top: 16px;
+}
+
 .hero h1,
 .topbar h1 {
   font-size: 36px;

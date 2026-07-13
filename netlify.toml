@@ -35,6 +35,18 @@
     Cache-Control = "private, no-store"
 
 [[headers]]
+  for = "/connect"
+  [headers.values]
+    Cache-Control = "private, no-store"
+    Referrer-Policy = "no-referrer"
+
+[[headers]]
+  for = "/app/connect"
+  [headers.values]
+    Cache-Control = "private, no-store"
+    Referrer-Policy = "no-referrer"
+
+[[headers]]
   for = "/data/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"

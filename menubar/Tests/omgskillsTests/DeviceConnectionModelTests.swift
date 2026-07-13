@@ -4,6 +4,94 @@ import Testing
 
 @MainActor
 struct DeviceConnectionModelTests {
+    @Test func browserConnectExchangesWithVerifierAndPerformsFirstSync() async {
+        let record = makeCredential()
+        let store = MockDeviceCredentialStore()
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        let request = makeBrowserRequest()
+        let authorizer = MockBrowserPairingAuthorizer(
+            result: .success(approvedCallback(for: request))
+        )
+        let model = DeviceConnectionModel(
+            credentialStore: store,
+            api: api,
+            browserAuthorizer: authorizer,
+            pairingRequestGenerator: FixedBrowserPairingRequestGenerator(request: request)
+        )
+
+        await model.connectWithBrowser(
+            deviceName: "Test Mac",
+            installations: []
+        ).value
+
+        #expect(model.state == .connected(record.connection))
+        #expect(await api.exchangedCodeVerifiers() == [request.codeVerifier])
+        #expect(await api.uploadedCredentials() == [record.credential])
+        #expect(authorizer.authorizationCount == 1)
+    }
+
+    @Test func browserCancellationReturnsToDisconnectedWithoutExchange() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        let request = makeBrowserRequest()
+        let authorizer = MockBrowserPairingAuthorizer(
+            result: .success(cancelledCallback(for: request))
+        )
+        let model = DeviceConnectionModel(
+            credentialStore: MockDeviceCredentialStore(),
+            api: api,
+            browserAuthorizer: authorizer,
+            pairingRequestGenerator: FixedBrowserPairingRequestGenerator(request: request)
+        )
+
+        await model.connectWithBrowser(deviceName: "Test Mac", installations: []).value
+
+        #expect(model.state == .disconnected)
+        #expect(await api.exchangeCallCount() == 0)
+    }
+
+    @Test func browserStateMismatchFailsBeforeExchange() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        let request = makeBrowserRequest()
+        let authorizer = MockBrowserPairingAuthorizer(result: .success(URL(
+            string: "omgskills://pair?code=pair_\(String(repeating: "a", count: 43))&state=wrong"
+        )!))
+        let model = DeviceConnectionModel(
+            credentialStore: MockDeviceCredentialStore(),
+            api: api,
+            browserAuthorizer: authorizer,
+            pairingRequestGenerator: FixedBrowserPairingRequestGenerator(request: request)
+        )
+
+        await model.connectWithBrowser(deviceName: "Test Mac", installations: []).value
+
+        guard case .failed(.authorization) = model.state else {
+            Issue.record("Expected an authorization failure")
+            return
+        }
+        #expect(await api.exchangeCallCount() == 0)
+    }
+
+    @Test func browserReplacementCheckRunsBeforeAuthorization() async {
+        let oldRecord = makeCredential(deviceID: "old-device", credential: "old-secret")
+        let newRecord = makeCredential(deviceID: "new-device", credential: "new-secret")
+        let authorizer = MockBrowserPairingAuthorizer(
+            result: .success(approvedCallback(for: makeBrowserRequest()))
+        )
+        let model = DeviceConnectionModel(
+            credentialStore: MockDeviceCredentialStore(record: oldRecord),
+            api: MockDeviceSyncAPI(exchangeRecord: newRecord),
+            browserAuthorizer: authorizer,
+            pairingRequestGenerator: FixedBrowserPairingRequestGenerator(request: makeBrowserRequest())
+        )
+
+        await model.connectWithBrowser(deviceName: "Test Mac", installations: []).value
+
+        #expect(model.state == .failed(.replacementRequired))
+        #expect(authorizer.authorizationCount == 0)
+    }
+
     @Test func connectsStoresCredentialAndPerformsFirstSync() async {
         let record = makeCredential()
         let store = MockDeviceCredentialStore()
@@ -270,6 +358,51 @@ struct DeviceConnectionModelTests {
             )
         )
     }
+
+    private func makeBrowserRequest() -> BrowserPairingRequest {
+        BrowserPairingRequest(
+            state: String(repeating: "s", count: 43),
+            codeVerifier: String(repeating: "v", count: 43),
+            codeChallenge: String(repeating: "c", count: 43)
+        )
+    }
+
+    private func approvedCallback(for request: BrowserPairingRequest) -> URL {
+        URL(string: "omgskills://pair?code=pair_\(String(repeating: "a", count: 43))&state=\(request.state)")!
+    }
+
+    private func cancelledCallback(for request: BrowserPairingRequest) -> URL {
+        URL(string: "omgskills://pair?error=access_denied&state=\(request.state)")!
+    }
+}
+
+private struct FixedBrowserPairingRequestGenerator: BrowserPairingRequestGenerating {
+    let request: BrowserPairingRequest
+
+    func makeRequest() throws -> BrowserPairingRequest {
+        request
+    }
+}
+
+@MainActor
+private final class MockBrowserPairingAuthorizer: BrowserPairingAuthorizing {
+    let result: Result<URL, Error>
+    private(set) var authorizationCount = 0
+
+    init(result: Result<URL, Error>) {
+        self.result = result
+    }
+
+    func authorize(url: URL, callbackScheme: String) async throws -> URL {
+        authorizationCount += 1
+        return try result.get()
+    }
+
+    func cancel() {}
+
+    func handleCallback(_ url: URL) -> Bool {
+        false
+    }
 }
 
 private enum MockCredentialStoreFailure: Error, Sendable {
@@ -322,6 +455,7 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
     private let uploadFailure: DeviceSyncAPIError?
     private let revokeFailure: DeviceSyncAPIError?
     private var exchangeCount = 0
+    private var codeVerifiers: [String?] = []
     private var uploads: [String] = []
     private var revocations: [String] = []
 
@@ -358,6 +492,7 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
         deviceName: String,
         codeVerifier: String?
     ) async throws -> StoredDeviceCredential {
+        codeVerifiers.append(codeVerifier)
         let index = exchangeCount
         exchangeCount += 1
         let record = exchangeRecords[min(index, exchangeRecords.count - 1)]
@@ -395,6 +530,10 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
 
     func exchangeCallCount() -> Int {
         exchangeCount
+    }
+
+    func exchangedCodeVerifiers() -> [String?] {
+        codeVerifiers
     }
 }
 

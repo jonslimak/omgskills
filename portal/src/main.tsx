@@ -46,6 +46,10 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  browserPairingCancelUrl,
+  parseBrowserPairingRequest
+} from "@/browser-pairing";
+import {
   groupSyncedSkills,
   hasSource,
   type GroupedSyncedSkill,
@@ -1285,30 +1289,106 @@ function Dashboard() {
   );
 }
 
+function ConnectPage() {
+  const api = usePortalApi();
+  const [request] = useState(() => parseBrowserPairingRequest(window.location.hash));
+  const [status, setStatus] = useState(request ? "" : "This connection request is invalid or expired.");
+  const [isApproving, setIsApproving] = useState(false);
+
+  async function approve() {
+    if (!request || isApproving) return;
+    setIsApproving(true);
+    setStatus("Approving connection...");
+    try {
+      const result = await api<{ callbackUrl: string; expiresAt: string }>(
+        "/api/portal/sync-pairing-code",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            state: request.state,
+            codeChallenge: request.codeChallenge,
+            codeChallengeMethod: "S256"
+          })
+        }
+      );
+      setStatus("Returning to omgskills...");
+      window.location.assign(result.callbackUrl);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to approve connection");
+      setIsApproving(false);
+    }
+  }
+
+  function cancel() {
+    if (!request) return;
+    window.location.assign(browserPairingCancelUrl(request.state));
+  }
+
+  return (
+    <main className="shell auth-shell connect-shell">
+      <section className="connect-panel">
+        <p className="eyebrow">omgskills</p>
+        <h1>Connect this Mac?</h1>
+        <p>The app will be able to sync installed skill metadata to your account.</p>
+        <div className="connect-permission">
+          <strong>Access</strong>
+          <span>Sync installed skills</span>
+        </div>
+        {status ? <p className={request ? "status" : "connect-error"}>{status}</p> : null}
+        <div className="actions">
+          <Button disabled={!request || isApproving} onClick={approve}>
+            {isApproving ? "Approving..." : "Approve"}
+          </Button>
+          <Button disabled={!request || isApproving} onClick={cancel} variant="outline">
+            Cancel
+          </Button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function SignedOutPage({ isConnectRoute }: { isConnectRoute: boolean }) {
+  return (
+    <main className="shell auth-shell">
+      <section className="hero">
+        <p className="eyebrow">omgskills</p>
+        <h1>{isConnectRoute ? "Sign in to connect your Mac" : "Sign in to manage Skill Groups"}</h1>
+        <p>
+          {isConnectRoute
+            ? "After signing in, you can review and approve the connection."
+            : "Sync local skills, build a private group, and share it with a teammate by email."}
+        </p>
+        <div className="actions">
+          <SignInButton mode="modal">
+            <Button>Sign in</Button>
+          </SignInButton>
+          {!isConnectRoute ? (
+            <SignUpButton mode="modal">
+              <Button variant="secondary">Create account</Button>
+            </SignUpButton>
+          ) : null}
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function App() {
+  const isConnectRoute = /^\/(?:app\/)?connect\/?$/.test(window.location.pathname);
   const groupDetailMatch = window.location.pathname.match(/^\/app\/groups\/([^/]+)\/?$/);
 
   return (
     <>
       <SignedOut>
-        <main className="shell auth-shell">
-          <section className="hero">
-            <p className="eyebrow">omgskills</p>
-            <h1>Sign in to manage Skill Groups</h1>
-            <p>Sync local skills, build a private group, and share it with a teammate by email.</p>
-            <div className="actions">
-              <SignInButton mode="modal">
-                <Button>Sign in</Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button variant="secondary">Create account</Button>
-              </SignUpButton>
-            </div>
-          </section>
-        </main>
+        <SignedOutPage isConnectRoute={isConnectRoute} />
       </SignedOut>
       <SignedIn>
-        {groupDetailMatch ? <GroupDetailPage groupId={decodeURIComponent(groupDetailMatch[1])} /> : <Dashboard />}
+        {isConnectRoute
+          ? <ConnectPage />
+          : groupDetailMatch
+            ? <GroupDetailPage groupId={decodeURIComponent(groupDetailMatch[1])} />
+            : <Dashboard />}
       </SignedIn>
     </>
   );

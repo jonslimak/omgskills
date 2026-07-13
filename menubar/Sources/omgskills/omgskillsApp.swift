@@ -29,8 +29,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var libraryRefreshTimer: Timer?
     private var workspaceDidWakeObserver: NSObjectProtocol?
     private var isSharePickerActive = false
-    private let deviceConnectionModel = DeviceConnectionModel(
-        credentialStore: DeviceCredentialStore(service: DeviceCredentialStore.configuredService())
+    private lazy var browserPairingSession = WebAuthenticationSession(
+        anchorProvider: { [weak self] in self?.panel },
+        onReturn: { [weak self] in self?.showPanelAfterAuthentication() }
+    )
+    private lazy var deviceConnectionModel = DeviceConnectionModel(
+        credentialStore: DeviceCredentialStore(service: DeviceCredentialStore.configuredService()),
+        browserAuthorizer: browserPairingSession
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -87,6 +92,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         if let workspaceDidWakeObserver {
             NSWorkspace.shared.notificationCenter.removeObserver(workspaceDidWakeObserver)
         }
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        guard let callbackURL = urls.first else { return }
+        _ = browserPairingSession.handleCallback(callbackURL)
     }
 
     private func setupUpdater() {
@@ -237,6 +247,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
     }
 
+    private func showPanelAfterAuthentication() {
+        let width = panel.frame.width > 0 ? panel.frame.width : 400
+        repositionPanel(width: width, animate: false)
+        panel.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        NotificationCenter.default.post(name: .popoverDidOpen, object: nil)
+        addClickOutsideMonitor()
+    }
+
     private func probeForUpdateOnPanelOpen(now: Date = Date()) {
         guard updaterController.updater.canCheckForUpdates else { return }
         guard !updaterController.updater.sessionInProgress else { return }
@@ -285,6 +304,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     private func addClickOutsideMonitor() {
+        guard clickMonitor == nil else { return }
         clickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             guard self?.isSharePickerActive != true else { return }
             self?.closePopover()

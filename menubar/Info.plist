@@ -18,6 +18,17 @@
 	<string>omgskills</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.jonslimak.omgskills.portal-pairing</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>omgskills</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleShortVersionString</key>
 	<string>0.0.18</string>
 	<key>CFBundleVersion</key>
@@ -30,6 +41,8 @@
 	<true/>
 	<key>OMGSkillsSyncEndpoint</key>
 	<string>https://omgskills.com/api/portal/sync-upload</string>
+	<key>OMGSkillsPortalConnectURL</key>
+	<string>https://app.omgskills.com/connect</string>
 	<key>SUAutomaticallyUpdate</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>

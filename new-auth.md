@@ -26,7 +26,7 @@ Implement and commit in these boundaries:
 4. **AUTH4 - Mac credential and connection core** (`done`, depends on AUTH2)
 5. **AUTH5 - Manual one-time pairing** (`done`, depends on AUTH3-AUTH4)
 6. **AUTH6 - Portal connected-device management** (`done`, depends on AUTH3)
-7. **AUTH7 - Browser pairing** (`todo`, depends on stable AUTH5)
+7. **AUTH7 - Browser pairing** (`done`)
 8. **AUTH8 - Migration, release, and production verification** (`todo`, depends
    on AUTH1-AUTH7 and `tiein.md` T5)
 9. **AUTH9 - Remove legacy tokens** (`deferred`, requires an adoption cutoff)
@@ -334,7 +334,15 @@ the first resolved sync, relaunch still connected, and disconnect cleanly.
 
 ### AUTH7 - Browser pairing
 
-`todo`
+`done`
+
+Completed and verified on 2026-07-13 against the isolated Netlify site,
+database, Keychain service, and signed Mac test app. Browser approval returned
+through the private URL scheme, exchanged the PKCE-bound code, stored the device
+credential, and completed the first sync. Strict-concurrency and automated Mac,
+portal, and backend tests pass. The authentication callback uses a nonisolated
+relay before hopping to `@MainActor`, matching the callback queue used by
+`ASWebAuthenticationSession` on macOS.
 
 Primary files:
 
@@ -357,7 +365,7 @@ only a short-lived authorization code protected by state and a PKCE-style verifi
 2. The app computes the `S256` challenge and opens:
 
    ```text
-   https://app.omgskills.com/connect?state=<state>&code_challenge=<challenge>
+   https://app.omgskills.com/connect#state=<state>&code_challenge=<challenge>
    ```
 
 3. The Clerk-authenticated page explains that the Mac will receive `sync:write`

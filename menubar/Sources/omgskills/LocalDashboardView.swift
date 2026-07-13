@@ -78,6 +78,11 @@ struct LocalDashboardView: View {
 }
 
 struct SkillSyncView: View {
+    private enum ConnectionMethod {
+        case browser
+        case manual
+    }
+
     let connectionModel: DeviceConnectionModel
     let installations: [Skill]
     let isReady: Bool
@@ -86,19 +91,11 @@ struct SkillSyncView: View {
     @State private var pairingCode = ""
     @State private var legacyExpanded = false
     @State private var showReplacementConfirmation = false
+    @State private var replacementMethod = ConnectionMethod.browser
     @State private var legacyModel = LegacySkillSyncModel()
 
     private var trimmedPairingCode: String {
         pairingCode.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private var isDeviceOperationActive: Bool {
-        switch connectionModel.state {
-        case .exchanging, .storingCredential, .syncing:
-            return true
-        default:
-            return false
-        }
     }
 
     private var deviceName: String {
@@ -135,13 +132,17 @@ struct SkillSyncView: View {
         }
         .padding(20)
         .frame(width: 380)
-        .interactiveDismissDisabled(isDeviceOperationActive || legacyModel.isSyncing)
+        .interactiveDismissDisabled(legacyModel.isSyncing)
         .confirmationDialog(
             "Replace current connection?",
             isPresented: $showReplacementConfirmation
         ) {
             Button("Replace connection", role: .destructive) {
-                connect(replacingExisting: true)
+                if replacementMethod == .browser {
+                    connectWithBrowser(replacingExisting: true)
+                } else {
+                    connectManually(replacingExisting: true)
+                }
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -165,6 +166,8 @@ struct SkillSyncView: View {
         switch connectionModel.state {
         case .connected(let info):
             connectedContent(info)
+        case .authorizing:
+            progressContent("Waiting for approval in your browser...")
         case .exchanging:
             progressContent("Connecting to your portal account...")
         case .storingCredential:
@@ -185,7 +188,8 @@ struct SkillSyncView: View {
             pairingCode: $pairingCode,
             errorMessage: errorMessage,
             isReady: isReady,
-            onConnect: { connect(replacingExisting: false) }
+            onConnectWithBrowser: { connectWithBrowser(replacingExisting: false) },
+            onConnectManually: { connectManually(replacingExisting: false) }
         )
     }
 
@@ -238,21 +242,27 @@ struct SkillSyncView: View {
     }
 
     private func progressContent(_ message: String) -> some View {
-        HStack(spacing: 10) {
-            ProgressView()
-                .controlSize(.small)
-            Text(message)
-                .font(.callout)
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                ProgressView()
+                    .controlSize(.small)
+                Text(message)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+
+            Button("Cancel") {
+                connectionModel.cancelCurrentOperation()
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 8)
-        .accessibilityElement(children: .combine)
     }
 
     private func message(for failure: DeviceConnectionFailure) -> String? {
         switch failure {
-        case .exchange(let message), .sync(let message):
+        case .authorization(let message), .exchange(let message), .sync(let message):
             return message
         case .replacementRequired:
             return "Confirm replacement to connect this portal account."
@@ -263,8 +273,19 @@ struct SkillSyncView: View {
         }
     }
 
-    private func connect(replacingExisting: Bool) {
+    private func connectWithBrowser(replacingExisting: Bool) {
+        guard isReady else { return }
+        replacementMethod = .browser
+        connectionModel.connectWithBrowser(
+            deviceName: deviceName,
+            installations: installations,
+            replacingExisting: replacingExisting
+        )
+    }
+
+    private func connectManually(replacingExisting: Bool) {
         guard !trimmedPairingCode.isEmpty, isReady else { return }
+        replacementMethod = .manual
         connectionModel.connect(
             pairingCode: trimmedPairingCode,
             deviceName: deviceName,
@@ -274,7 +295,6 @@ struct SkillSyncView: View {
     }
 
     private func close() {
-        connectionModel.cancelCurrentOperation()
         legacyModel.cancel()
         pairingCode = ""
         dismiss()
@@ -285,9 +305,11 @@ private struct DevicePairingSection: View {
     @Binding var pairingCode: String
     let errorMessage: String?
     let isReady: Bool
-    let onConnect: () -> Void
+    let onConnectWithBrowser: () -> Void
+    let onConnectManually: () -> Void
 
     @FocusState private var isPairingCodeFocused: Bool
+    @State private var manualPairingExpanded = false
 
     private var trimmedPairingCode: String {
         pairingCode.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -295,15 +317,39 @@ private struct DevicePairingSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Generate a connection code on your profile page, then paste it below. Codes expire after 10 minutes and work once.")
+            Text("Sign in and approve the connection in your browser.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
-            SecureField("Paste connection code", text: $pairingCode)
-                .textFieldStyle(.roundedBorder)
-                .focused($isPairingCodeFocused)
-                .onSubmit(onConnect)
-                .accessibilityLabel("Portal connection code")
+            Button("Connect with browser", action: onConnectWithBrowser)
+                .buttonStyle(.borderedProminent)
+                .disabled(!isReady)
+
+            DisclosureGroup("Use connection code instead", isExpanded: $manualPairingExpanded) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Generate a connection code in the portal, then paste it here.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    HStack {
+                        SecureField("Paste connection code", text: $pairingCode)
+                            .textFieldStyle(.roundedBorder)
+                            .focused($isPairingCodeFocused)
+                            .onSubmit(onConnectManually)
+                            .accessibilityLabel("Portal connection code")
+
+                        PasteButton(payloadType: String.self) { values in
+                            pairingCode = values.first ?? ""
+                        }
+                        .labelStyle(.iconOnly)
+                        .help("Paste connection code")
+                    }
+
+                    Button("Connect with code", action: onConnectManually)
+                        .disabled(trimmedPairingCode.isEmpty || !isReady)
+                }
+                .padding(.top, 8)
+            }
 
             if let errorMessage, !errorMessage.isEmpty {
                 Text(errorMessage)
@@ -316,12 +362,12 @@ private struct DevicePairingSection: View {
                     .foregroundStyle(.secondary)
             }
 
-            Button("Connect", action: onConnect)
-                .buttonStyle(.borderedProminent)
-                .disabled(trimmedPairingCode.isEmpty || !isReady)
-                .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .defaultFocus($isPairingCodeFocused, true)
+        .onChange(of: manualPairingExpanded) { _, isExpanded in
+            if isExpanded {
+                isPairingCodeFocused = true
+            }
+        }
     }
 }
 
