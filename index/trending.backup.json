@@ -1,1969 +1,2035 @@
 [
   {
-    "id": "microsoft/azure-skills:azure-cost",
-    "installs": 232477,
-    "trending_rank": 1,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:diagnose",
-    "installs": 231379,
-    "trending_rank": 2,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "roin-orca/skills:simple",
-    "installs": 225833,
-    "trending_rank": 4,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "larksuite/cli:lark-markdown",
-    "installs": 225612,
-    "trending_rank": 5,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:write-a-skill",
-    "installs": 223304,
-    "trending_rank": 6,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:zoom-out",
-    "installs": 222712,
-    "trending_rank": 7,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "xixu-me/skills:develop-userscripts",
-    "installs": 221332,
-    "trending_rank": 9,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "shadcn/ui:shadcn",
-    "installs": 220676,
-    "trending_rank": 10,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:caveman",
-    "installs": 217826,
-    "trending_rank": 12,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "juliusbrussee/caveman:caveman-commit",
-    "installs": 212697,
-    "trending_rank": 13,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "juliusbrussee/caveman:caveman-review",
-    "installs": 210994,
-    "trending_rank": 14,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "juliusbrussee/caveman:caveman-compress",
-    "installs": 209053,
-    "trending_rank": 15,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "juliusbrussee/caveman:caveman-help",
-    "installs": 204041,
-    "trending_rank": 17,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "larksuite/cli:lark-vc-agent",
-    "installs": 197891,
-    "trending_rank": 18,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "pbakaus/impeccable:impeccable",
-    "installs": 182457,
-    "trending_rank": 19,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "microsoft/azure-skills:airunway-aks-setup",
-    "installs": 177158,
-    "trending_rank": 20,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:systematic-debugging",
-    "installs": 172362,
-    "trending_rank": 22,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:writing-plans",
-    "installs": 170786,
-    "trending_rank": 24,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:pptx",
-    "installs": 167269,
-    "trending_rank": 26,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:hyperframes",
-    "installs": 165506,
-    "trending_rank": 28,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "juliusbrussee/caveman:cavecrew",
-    "installs": 161938,
-    "trending_rank": 29,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "juliusbrussee/caveman:caveman-stats",
-    "installs": 161761,
-    "trending_rank": 30,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:hyperframes-cli",
-    "installs": 161323,
-    "trending_rank": 31,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "larksuite/cli:lark-apps",
-    "installs": 157755,
-    "trending_rank": 34,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:hyperframes-registry",
-    "installs": 157123,
-    "trending_rank": 35,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:requesting-code-review",
-    "installs": 154218,
-    "trending_rank": 36,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:seo-audit",
-    "installs": 153166,
-    "trending_rank": 37,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "supabase/agent-skills:supabase",
-    "installs": 152831,
-    "trending_rank": 38,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:test-driven-development",
-    "installs": 152720,
-    "trending_rank": 39,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "microsoft/azure-skills:entra-agent-id",
-    "installs": 151365,
-    "trending_rank": 41,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:pdf",
-    "installs": 149427,
-    "trending_rank": 42,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:docx",
-    "installs": 143549,
-    "trending_rank": 45,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "leonxlnx/taste-skill:gpt-taste",
-    "installs": 141626,
-    "trending_rank": 47,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:executing-plans",
-    "installs": 141568,
-    "trending_rank": 48,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/ai-paper-reproduction-skill:paper-context-resolver",
-    "installs": 140375,
-    "trending_rank": 49,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/ai-paper-reproduction-skill:repo-intake-and-plan",
-    "installs": 139848,
-    "trending_rank": 50,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/ai-paper-reproduction-skill:minimal-run-and-audit",
-    "installs": 139801,
-    "trending_rank": 51,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/ai-paper-reproduction-skill:env-and-assets-bootstrap",
-    "installs": 139798,
-    "trending_rank": 52,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:remotion-to-hyperframes",
-    "installs": 139494,
-    "trending_rank": 53,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:hyperframes-media",
-    "installs": 135116,
-    "trending_rank": 54,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:subagent-driven-development",
-    "installs": 134210,
-    "trending_rank": 55,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:verification-before-completion",
-    "installs": 132067,
-    "trending_rank": 57,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "leonxlnx/taste-skill:brandkit",
-    "installs": 129227,
-    "trending_rank": 58,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "leonxlnx/taste-skill:image-to-code",
-    "installs": 127981,
-    "trending_rank": 59,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:xlsx",
-    "installs": 126882,
-    "trending_rank": 60,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "leonxlnx/taste-skill:imagegen-frontend-web",
-    "installs": 126784,
-    "trending_rank": 61,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:receiving-code-review",
-    "installs": 126734,
-    "trending_rank": 62,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:writing-skills",
-    "installs": 125691,
-    "trending_rank": 63,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:dispatching-parallel-agents",
-    "installs": 123901,
-    "trending_rank": 65,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "leonxlnx/taste-skill:imagegen-frontend-mobile",
-    "installs": 123866,
-    "trending_rank": 66,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:using-git-worktrees",
-    "installs": 123407,
-    "trending_rank": 67,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "obra/superpowers:finishing-a-development-branch",
-    "installs": 121218,
-    "trending_rank": 74,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "emilkowalski/skills:emil-design-eng",
-    "installs": 117109,
-    "trending_rank": 75,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:webapp-testing",
-    "installs": 109694,
-    "trending_rank": 77,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:marketing-psychology",
-    "installs": 105478,
-    "trending_rank": 78,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:design-an-interface",
-    "installs": 105210,
-    "trending_rank": 79,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:request-refactor-plan",
-    "installs": 102811,
-    "trending_rank": 80,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:ubiquitous-language",
-    "installs": 99773,
-    "trending_rank": 82,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/rigorpilot-skills:analyze-project",
-    "installs": 99223,
-    "trending_rank": 83,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/rigorpilot-skills:ai-research-explore",
-    "installs": 99178,
-    "trending_rank": 84,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/rigorpilot-skills:explore-code",
-    "installs": 99052,
-    "trending_rank": 85,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/rigorpilot-skills:ai-research-reproduction",
-    "installs": 99039,
-    "trending_rank": 86,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/rigorpilot-skills:safe-debug",
-    "installs": 98998,
-    "trending_rank": 88,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/rigorpilot-skills:run-train",
-    "installs": 98994,
-    "trending_rank": 89,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "lllllllama/rigorpilot-skills:explore-run",
-    "installs": 98985,
-    "trending_rank": 94,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:qa",
-    "installs": 98406,
-    "trending_rank": 95,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:git-guardrails-claude-code",
-    "installs": 97151,
-    "trending_rank": 99,
-    "trending_source": "skills.sh"
-  },
-  {
     "id": "coreyhaines31/marketingskills:programmatic-seo",
-    "installs": 97082,
-    "trending_rank": 100,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:obsidian-vault",
-    "installs": 96612,
-    "trending_rank": 101,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:edit-article",
-    "installs": 94499,
-    "trending_rank": 105,
+    "installs": 100585,
+    "trending_rank": 3,
     "trending_source": "skills.sh"
   },
   {
     "id": "coreyhaines31/marketingskills:marketing-ideas",
-    "installs": 94375,
-    "trending_rank": 106,
+    "installs": 97791,
+    "trending_rank": 8,
     "trending_source": "skills.sh"
   },
   {
-    "id": "mattpocock/skills:setup-pre-commit",
-    "installs": 93150,
-    "trending_rank": 107,
+    "id": "inference-sh/skills:ai-video-generation",
+    "installs": 93167,
+    "trending_rank": 10,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "inference-sh/skills:ai-image-generation",
+    "installs": 92988,
+    "trending_rank": 11,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "inference-sh/skills:ai-avatar-video",
+    "installs": 92974,
+    "trending_rank": 12,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "inference-sh/skills:twitter-automation",
+    "installs": 92962,
+    "trending_rank": 13,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "inference-sh/skills:remotion-render",
+    "installs": 92961,
+    "trending_rank": 14,
     "trending_source": "skills.sh"
   },
   {
     "id": "heygen-com/hyperframes:gsap",
-    "installs": 92413,
-    "trending_rank": 109,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:scaffold-exercises",
-    "installs": 91330,
-    "trending_rank": 110,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:website-to-hyperframes",
-    "installs": 89657,
-    "trending_rank": 115,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mattpocock/skills:migrate-to-shoehorn",
-    "installs": 89482,
-    "trending_rank": 116,
+    "installs": 92657,
+    "trending_rank": 15,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/cli:firecrawl",
-    "installs": 86808,
-    "trending_rank": 122,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "vercel-labs/agent-skills:deploy-to-vercel",
-    "installs": 85381,
-    "trending_rank": 124,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "larksuite/cli:lark-note",
-    "installs": 84994,
-    "trending_rank": 125,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:mcp-builder",
-    "installs": 84935,
-    "trending_rank": 126,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "browser-use/browser-use:browser-use",
-    "installs": 82524,
-    "trending_rank": 133,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:canvas-design",
-    "installs": 82293,
-    "trending_rank": 135,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "get-convex/agent-skills:convex-quickstart",
-    "installs": 79339,
-    "trending_rank": 142,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "get-convex/agent-skills:convex-performance-audit",
-    "installs": 78950,
-    "trending_rank": 143,
+    "installs": 91594,
+    "trending_rank": 19,
     "trending_source": "skills.sh"
   },
   {
     "id": "browser-act/skills:browser-act",
-    "installs": 78894,
-    "trending_rank": 144,
+    "installs": 90002,
+    "trending_rank": 24,
     "trending_source": "skills.sh"
   },
   {
-    "id": "get-convex/agent-skills:convex-setup-auth",
-    "installs": 78653,
-    "trending_rank": 145,
+    "id": "heygen-com/hyperframes:website-to-hyperframes",
+    "installs": 89888,
+    "trending_rank": 25,
     "trending_source": "skills.sh"
   },
   {
-    "id": "get-convex/agent-skills:convex-migration-helper",
-    "installs": 78618,
-    "trending_rank": 146,
+    "id": "vercel-labs/agent-skills:deploy-to-vercel",
+    "installs": 89827,
+    "trending_rank": 27,
     "trending_source": "skills.sh"
   },
   {
-    "id": "get-convex/agent-skills:convex-create-component",
-    "installs": 78585,
-    "trending_rank": 147,
+    "id": "anthropics/skills:mcp-builder",
+    "installs": 88324,
+    "trending_rank": 30,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "anthropics/skills:canvas-design",
+    "installs": 85434,
+    "trending_rank": 32,
     "trending_source": "skills.sh"
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-generate",
-    "installs": 78067,
-    "trending_rank": 148,
+    "installs": 84366,
+    "trending_rank": 33,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "browser-use/browser-use:browser-use",
+    "installs": 84030,
+    "trending_rank": 34,
     "trending_source": "skills.sh"
   },
   {
     "id": "microsoft/playwright-cli:playwright-cli",
-    "installs": 76436,
-    "trending_rank": 150,
+    "installs": 83672,
+    "trending_rank": 36,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "get-convex/agent-skills:convex-quickstart",
+    "installs": 82929,
+    "trending_rank": 40,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "get-convex/agent-skills:convex-performance-audit",
+    "installs": 82551,
+    "trending_rank": 41,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "get-convex/agent-skills:convex-setup-auth",
+    "installs": 82242,
+    "trending_rank": 45,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "get-convex/agent-skills:convex-migration-helper",
+    "installs": 82192,
+    "trending_rank": 46,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "get-convex/agent-skills:convex-create-component",
+    "installs": 82167,
+    "trending_rank": 47,
     "trending_source": "skills.sh"
   },
   {
     "id": "anthropics/skills:web-artifacts-builder",
-    "installs": 76126,
-    "trending_rank": 151,
+    "installs": 79473,
+    "trending_rank": 54,
     "trending_source": "skills.sh"
   },
   {
     "id": "coreyhaines31/marketingskills:cold-email",
-    "installs": 75559,
-    "trending_rank": 152,
+    "installs": 78661,
+    "trending_rank": 55,
     "trending_source": "skills.sh"
   },
   {
     "id": "coreyhaines31/marketingskills:site-architecture",
-    "installs": 72997,
-    "trending_rank": 153,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:css-animations",
-    "installs": 72536,
-    "trending_rank": 155,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:churn-prevention",
-    "installs": 71682,
-    "trending_rank": 156,
+    "installs": 76117,
+    "trending_rank": 59,
     "trending_source": "skills.sh"
   },
   {
     "id": "coreyhaines31/marketingskills:sales-enablement",
-    "installs": 71626,
-    "trending_rank": 157,
+    "installs": 74695,
+    "trending_rank": 61,
     "trending_source": "skills.sh"
   },
   {
-    "id": "heygen-com/hyperframes:tailwind",
-    "installs": 70769,
-    "trending_rank": 158,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:animejs",
-    "installs": 70222,
-    "trending_rank": 159,
+    "id": "coreyhaines31/marketingskills:churn-prevention",
+    "installs": 74591,
+    "trending_rank": 62,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/cli:firecrawl-scrape",
-    "installs": 69823,
-    "trending_rank": 160,
+    "installs": 74258,
+    "trending_rank": 63,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/cli:firecrawl-search",
-    "installs": 69736,
-    "trending_rank": 161,
+    "installs": 74187,
+    "trending_rank": 64,
     "trending_source": "skills.sh"
   },
   {
-    "id": "heygen-com/hyperframes:three",
-    "installs": 69527,
-    "trending_rank": 162,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:lottie",
-    "installs": 69268,
-    "trending_rank": 163,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:revops",
-    "installs": 68940,
-    "trending_rank": 164,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "heygen-com/hyperframes:waapi",
-    "installs": 68905,
-    "trending_rank": 165,
+    "id": "heygen-com/hyperframes:css-animations",
+    "installs": 72700,
+    "trending_rank": 66,
     "trending_source": "skills.sh"
   },
   {
     "id": "better-auth/skills:better-auth-best-practices",
-    "installs": 68459,
-    "trending_rank": 167,
+    "installs": 72695,
+    "trending_rank": 67,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/cli:firecrawl-crawl",
-    "installs": 68289,
-    "trending_rank": 168,
+    "installs": 72647,
+    "trending_rank": 68,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/cli:firecrawl-agent",
-    "installs": 68282,
-    "trending_rank": 169,
+    "installs": 72626,
+    "trending_rank": 69,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/cli:firecrawl-map",
-    "installs": 67988,
-    "trending_rank": 172,
+    "installs": 72326,
+    "trending_rank": 70,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/cli:firecrawl-download",
-    "installs": 67773,
-    "trending_rank": 174,
+    "installs": 72094,
+    "trending_rank": 71,
     "trending_source": "skills.sh"
   },
   {
-    "id": "coreyhaines31/marketingskills:social-content",
-    "installs": 67431,
-    "trending_rank": 177,
+    "id": "coreyhaines31/marketingskills:revops",
+    "installs": 71801,
+    "trending_rank": 72,
     "trending_source": "skills.sh"
   },
   {
-    "id": "halt-catch-fire/skills:agent-browser",
-    "installs": 66232,
-    "trending_rank": 182,
+    "id": "heygen-com/hyperframes:tailwind",
+    "installs": 70928,
+    "trending_rank": 74,
     "trending_source": "skills.sh"
   },
   {
-    "id": "anthropics/skills:theme-factory",
-    "installs": 64830,
-    "trending_rank": 184,
+    "id": "heygen-com/hyperframes:animejs",
+    "installs": 70381,
+    "trending_rank": 75,
     "trending_source": "skills.sh"
   },
   {
-    "id": "coreyhaines31/marketingskills:lead-magnets",
-    "installs": 64753,
-    "trending_rank": 185,
+    "id": "heygen-com/hyperframes:three",
+    "installs": 69681,
+    "trending_rank": 76,
     "trending_source": "skills.sh"
   },
   {
-    "id": "anthropics/skills:doc-coauthoring",
-    "installs": 64635,
-    "trending_rank": 186,
+    "id": "heygen-com/hyperframes:lottie",
+    "installs": 69422,
+    "trending_rank": 77,
     "trending_source": "skills.sh"
   },
   {
-    "id": "anthropics/skills:brand-guidelines",
-    "installs": 63435,
-    "trending_rank": 188,
+    "id": "heygen-com/hyperframes:waapi",
+    "installs": 69060,
+    "trending_rank": 78,
     "trending_source": "skills.sh"
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-product-photoshoot",
-    "installs": 63070,
-    "trending_rank": 190,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "vercel-labs/agent-skills:vercel-cli-with-tokens",
-    "installs": 63039,
-    "trending_rank": 191,
+    "installs": 68345,
+    "trending_rank": 79,
     "trending_source": "skills.sh"
   },
   {
     "id": "firebase/agent-skills:firebase-security-rules-auditor",
-    "installs": 62745,
-    "trending_rank": 192,
+    "installs": 68158,
+    "trending_rank": 80,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:lead-magnets",
+    "installs": 67769,
+    "trending_rank": 81,
     "trending_source": "skills.sh"
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-soul-id",
-    "installs": 62290,
-    "trending_rank": 194,
+    "installs": 67504,
+    "trending_rank": 82,
     "trending_source": "skills.sh"
   },
   {
-    "id": "firebase/agent-skills:developing-genkit-js",
-    "installs": 62166,
-    "trending_rank": 196,
+    "id": "coreyhaines31/marketingskills:social-content",
+    "installs": 67462,
+    "trending_rank": 83,
     "trending_source": "skills.sh"
   },
   {
-    "id": "firebase/agent-skills:developing-genkit-dart",
-    "installs": 61903,
-    "trending_rank": 197,
+    "id": "anthropics/skills:theme-factory",
+    "installs": 67309,
+    "trending_rank": 84,
     "trending_source": "skills.sh"
   },
   {
-    "id": "coreyhaines31/marketingskills:product-marketing-context",
-    "installs": 61592,
-    "trending_rank": 199,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:pricing-strategy",
-    "installs": 61591,
-    "trending_rank": 200,
+    "id": "anthropics/skills:doc-coauthoring",
+    "installs": 67102,
+    "trending_rank": 86,
     "trending_source": "skills.sh"
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-marketplace-cards",
-    "installs": 61317,
-    "trending_rank": 201,
+    "installs": 66469,
+    "trending_rank": 88,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "anthropics/skills:brand-guidelines",
+    "installs": 65635,
+    "trending_rank": 91,
     "trending_source": "skills.sh"
   },
   {
     "id": "coreyhaines31/marketingskills:customer-research",
-    "installs": 58906,
-    "trending_rank": 204,
+    "installs": 62182,
+    "trending_rank": 97,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "firebase/agent-skills:developing-genkit-js",
+    "installs": 62169,
+    "trending_rank": 98,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "firebase/agent-skills:developing-genkit-dart",
+    "installs": 61907,
+    "trending_rank": 99,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:pricing-strategy",
+    "installs": 61620,
+    "trending_rank": 100,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:product-marketing-context",
+    "installs": 61619,
+    "trending_rank": 101,
     "trending_source": "skills.sh"
   },
   {
     "id": "squirrelscan/skills:audit-website",
-    "installs": 58464,
-    "trending_rank": 205,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "expo/skills:building-native-ui",
-    "installs": 57906,
-    "trending_rank": 208,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:page-cro",
-    "installs": 57857,
-    "trending_rank": 209,
+    "installs": 59862,
+    "trending_rank": 103,
     "trending_source": "skills.sh"
   },
   {
     "id": "currents-dev/playwright-best-practices-skill:playwright-best-practices",
-    "installs": 57392,
-    "trending_rank": 211,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:internal-comms",
-    "installs": 56124,
-    "trending_rank": 213,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:schema-markup",
-    "installs": 55867,
-    "trending_rank": 214,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:paid-ads",
-    "installs": 55053,
-    "trending_rank": 219,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:onboarding-cro",
-    "installs": 54016,
-    "trending_rank": 222,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/skills:slack-gif-creator",
-    "installs": 53411,
-    "trending_rank": 227,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "degausai/wonda:wonda-cli",
-    "installs": 53201,
-    "trending_rank": 228,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "firecrawl/cli:firecrawl-interact",
-    "installs": 53200,
-    "trending_rank": 229,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "stripe/ai:stripe-best-practices",
-    "installs": 52894,
-    "trending_rank": 231,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "google-labs-code/stitch-skills:design-md",
-    "installs": 52751,
-    "trending_rank": 232,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:referral-program",
-    "installs": 52643,
-    "trending_rank": 234,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "kepano/obsidian-skills:obsidian-markdown",
-    "installs": 52642,
-    "trending_rank": 235,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "wshobson/agents:tailwind-design-system",
-    "installs": 52524,
-    "trending_rank": 236,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "intellectronica/agent-skills:notion-api",
-    "installs": 52452,
-    "trending_rank": 238,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:signup-flow-cro",
-    "installs": 52197,
-    "trending_rank": 239,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:paywall-upgrade-cro",
-    "installs": 51797,
-    "trending_rank": 240,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "wshobson/agents:typescript-advanced-types",
-    "installs": 51475,
-    "trending_rank": 241,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:popup-cro",
-    "installs": 51468,
-    "trending_rank": 242,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "genkit-ai/skills:developing-genkit-js",
-    "installs": 50479,
-    "trending_rank": 249,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "msmps/opentui-skill:opentui",
-    "installs": 49537,
-    "trending_rank": 253,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "firebase/agent-skills:developing-genkit-go",
-    "installs": 49323,
-    "trending_rank": 254,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "anthropics/claude-code:frontend-design",
-    "installs": 49101,
-    "trending_rank": 255,
+    "installs": 59767,
+    "trending_rank": 104,
     "trending_source": "skills.sh"
   },
   {
     "id": "nexscope-ai/amazon-skills:amazon-product-research",
-    "installs": 48009,
-    "trending_rank": 257,
+    "installs": 58975,
+    "trending_rank": 105,
     "trending_source": "skills.sh"
   },
   {
-    "id": "google-labs-code/stitch-skills:enhance-prompt",
-    "installs": 47807,
-    "trending_rank": 259,
+    "id": "expo/skills:building-native-ui",
+    "installs": 58604,
+    "trending_rank": 107,
     "trending_source": "skills.sh"
   },
   {
-    "id": "anthropics/skills:claude-api",
-    "installs": 46912,
-    "trending_rank": 260,
+    "id": "degausai/wonda:wonda-cli",
+    "installs": 58298,
+    "trending_rank": 108,
     "trending_source": "skills.sh"
   },
   {
-    "id": "google-labs-code/stitch-skills:stitch-loop",
-    "installs": 46592,
-    "trending_rank": 261,
+    "id": "anthropics/skills:internal-comms",
+    "installs": 58294,
+    "trending_rank": 109,
     "trending_source": "skills.sh"
   },
   {
-    "id": "vercel/turborepo:turborepo",
-    "installs": 46379,
-    "trending_rank": 262,
+    "id": "coreyhaines31/marketingskills:page-cro",
+    "installs": 57885,
+    "trending_rank": 111,
     "trending_source": "skills.sh"
   },
   {
-    "id": "expo/skills:native-data-fetching",
-    "installs": 46188,
-    "trending_rank": 264,
+    "id": "firecrawl/cli:firecrawl-interact",
+    "installs": 57513,
+    "trending_rank": 112,
     "trending_source": "skills.sh"
   },
   {
-    "id": "neondatabase/agent-skills:neon-postgres",
-    "installs": 45807,
-    "trending_rank": 265,
+    "id": "kepano/obsidian-skills:obsidian-markdown",
+    "installs": 56827,
+    "trending_rank": 115,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:schema-markup",
+    "installs": 55893,
+    "trending_rank": 117,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "stripe/ai:stripe-best-practices",
+    "installs": 55819,
+    "trending_rank": 118,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "anthropics/skills:slack-gif-creator",
+    "installs": 55145,
+    "trending_rank": 122,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:paid-ads",
+    "installs": 55077,
+    "trending_rank": 123,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:onboarding-cro",
+    "installs": 54040,
+    "trending_rank": 130,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "google-labs-code/stitch-skills:design-md",
+    "installs": 53843,
+    "trending_rank": 134,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:tailwind-design-system",
+    "installs": 53721,
+    "trending_rank": 135,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "intellectronica/agent-skills:notion-api",
+    "installs": 53403,
+    "trending_rank": 136,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:typescript-advanced-types",
+    "installs": 52792,
+    "trending_rank": 140,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:referral-program",
+    "installs": 52667,
+    "trending_rank": 142,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:signup-flow-cro",
+    "installs": 52219,
+    "trending_rank": 144,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:paywall-upgrade-cro",
+    "installs": 51820,
+    "trending_rank": 145,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "genkit-ai/skills:developing-genkit-js",
+    "installs": 51640,
+    "trending_rank": 146,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:popup-cro",
+    "installs": 51490,
+    "trending_rank": 147,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "msmps/opentui-skill:opentui",
+    "installs": 51131,
+    "trending_rank": 149,
     "trending_source": "skills.sh"
   },
   {
     "id": "google/agents-cli:google-agents-cli-adk-code",
-    "installs": 44740,
-    "trending_rank": 266,
+    "installs": 50474,
+    "trending_rank": 152,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "anthropics/claude-code:frontend-design",
+    "installs": 50282,
+    "trending_rank": 154,
     "trending_source": "skills.sh"
   },
   {
     "id": "google/agents-cli:google-agents-cli-workflow",
-    "installs": 44548,
-    "trending_rank": 267,
+    "installs": 50262,
+    "trending_rank": 155,
     "trending_source": "skills.sh"
   },
   {
     "id": "google/agents-cli:google-agents-cli-eval",
-    "installs": 44516,
-    "trending_rank": 268,
+    "installs": 50227,
+    "trending_rank": 156,
     "trending_source": "skills.sh"
   },
   {
     "id": "google/agents-cli:google-agents-cli-scaffold",
-    "installs": 44504,
-    "trending_rank": 269,
+    "installs": 50209,
+    "trending_rank": 157,
     "trending_source": "skills.sh"
   },
   {
     "id": "google/agents-cli:google-agents-cli-observability",
-    "installs": 44496,
-    "trending_rank": 270,
+    "installs": 50200,
+    "trending_rank": 159,
     "trending_source": "skills.sh"
   },
   {
     "id": "google/agents-cli:google-agents-cli-deploy",
-    "installs": 44489,
-    "trending_rank": 271,
+    "installs": 50196,
+    "trending_rank": 160,
     "trending_source": "skills.sh"
   },
   {
     "id": "google/agents-cli:google-agents-cli-publish",
-    "installs": 44430,
-    "trending_rank": 272,
+    "installs": 50125,
+    "trending_rank": 161,
     "trending_source": "skills.sh"
   },
   {
-    "id": "halt-catch-fire/skills:web-search",
-    "installs": 44322,
-    "trending_rank": 273,
+    "id": "firebase/agent-skills:developing-genkit-go",
+    "installs": 49325,
+    "trending_rank": 162,
     "trending_source": "skills.sh"
   },
   {
-    "id": "stripe/ai:upgrade-stripe",
-    "installs": 44251,
-    "trending_rank": 274,
+    "id": "vercel/turborepo:turborepo",
+    "installs": 49103,
+    "trending_rank": 163,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "anthropics/skills:claude-api",
+    "installs": 48910,
+    "trending_rank": 164,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "google-labs-code/stitch-skills:enhance-prompt",
+    "installs": 48772,
+    "trending_rank": 165,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "neondatabase/agent-skills:neon-postgres",
+    "installs": 48139,
+    "trending_rank": 166,
     "trending_source": "skills.sh"
   },
   {
     "id": "kepano/obsidian-skills:obsidian-cli",
-    "installs": 44208,
-    "trending_rank": 275,
+    "installs": 48048,
+    "trending_rank": 167,
     "trending_source": "skills.sh"
   },
   {
-    "id": "halt-catch-fire/skills:agent-tools",
-    "installs": 44182,
-    "trending_rank": 276,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "halt-catch-fire/skills:python-executor",
-    "installs": 44176,
-    "trending_rank": 277,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "halt-catch-fire/skills:infsh-cli",
-    "installs": 44160,
-    "trending_rank": 278,
+    "id": "google-labs-code/stitch-skills:stitch-loop",
+    "installs": 47478,
+    "trending_rank": 168,
     "trending_source": "skills.sh"
   },
   {
     "id": "kepano/obsidian-skills:obsidian-bases",
-    "installs": 43415,
-    "trending_rank": 279,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "google-labs-code/stitch-skills:shadcn-ui",
-    "installs": 43355,
-    "trending_rank": 280,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-gmail",
-    "installs": 42457,
-    "trending_rank": 283,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "expo/skills:upgrading-expo",
-    "installs": 42049,
-    "trending_rank": 284,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:competitor-profiling",
-    "installs": 41463,
-    "trending_rank": 285,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "stripe/ai:stripe-projects",
-    "installs": 41112,
-    "trending_rank": 286,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "expo/skills:expo-tailwind-setup",
-    "installs": 41108,
-    "trending_rank": 287,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:community-marketing",
-    "installs": 40307,
-    "trending_rank": 288,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "expo/skills:expo-deployment",
-    "installs": 39994,
-    "trending_rank": 290,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "expo/skills:expo-dev-client",
-    "installs": 39838,
-    "trending_rank": 291,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "solana-foundation/solana-dev-skill:solana-dev",
-    "installs": 39791,
-    "trending_rank": 292,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "kepano/obsidian-skills:json-canvas",
-    "installs": 39635,
-    "trending_rank": 294,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "firecrawl/cli:firecrawl-parse",
-    "installs": 39297,
-    "trending_rank": 295,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "expo/skills:expo-cicd-workflows",
-    "installs": 39076,
-    "trending_rank": 296,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:directory-submissions",
-    "installs": 38946,
-    "trending_rank": 297,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:image",
-    "installs": 38851,
-    "trending_rank": 298,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-drive",
-    "installs": 38831,
-    "trending_rank": 299,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "wshobson/agents:nodejs-backend-patterns",
-    "installs": 38773,
-    "trending_rank": 300,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "pexoai/pexo-skills:pexo-agent",
-    "installs": 38770,
-    "trending_rank": 301,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "coreyhaines31/marketingskills:video",
-    "installs": 38664,
-    "trending_rank": 302,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
-    "installs": 38652,
-    "trending_rank": 303,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "kepano/obsidian-skills:defuddle",
-    "installs": 38633,
-    "trending_rank": 304,
+    "installs": 47237,
+    "trending_rank": 169,
     "trending_source": "skills.sh"
   },
   {
     "id": "nexscope-ai/ecommerce-skills:cross-border-ecommerce",
-    "installs": 38387,
-    "trending_rank": 305,
+    "installs": 47174,
+    "trending_rank": 170,
     "trending_source": "skills.sh"
   },
   {
-    "id": "github/awesome-copilot:git-commit",
-    "installs": 37818,
-    "trending_rank": 308,
+    "id": "expo/skills:native-data-fetching",
+    "installs": 46758,
+    "trending_rank": 171,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "stripe/ai:upgrade-stripe",
+    "installs": 46707,
+    "trending_rank": 172,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "juliusbrussee/caveman:compress",
+    "installs": 46408,
+    "trending_rank": 173,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:competitor-profiling",
+    "installs": 44524,
+    "trending_rank": 174,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "google-labs-code/stitch-skills:shadcn-ui",
+    "installs": 44283,
+    "trending_rank": 175,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-gmail",
+    "installs": 43939,
+    "trending_rank": 176,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "stripe/ai:stripe-projects",
+    "installs": 43644,
+    "trending_rank": 177,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "firecrawl/cli:firecrawl-parse",
+    "installs": 43616,
+    "trending_rank": 178,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "kepano/obsidian-skills:json-canvas",
+    "installs": 43350,
+    "trending_rank": 179,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:community-marketing",
+    "installs": 43241,
+    "trending_rank": 180,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "expo/skills:expo-tailwind-setup",
+    "installs": 42593,
+    "trending_rank": 183,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "expo/skills:upgrading-expo",
+    "installs": 42580,
+    "trending_rank": 184,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "solana-foundation/solana-dev-skill:solana-dev",
+    "installs": 42535,
+    "trending_rank": 185,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "kepano/obsidian-skills:defuddle",
+    "installs": 42378,
+    "trending_rank": 187,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:image",
+    "installs": 41865,
+    "trending_rank": 188,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:directory-submissions",
+    "installs": 41788,
+    "trending_rank": 189,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
+    "installs": 41716,
+    "trending_rank": 190,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "coreyhaines31/marketingskills:video",
+    "installs": 41678,
+    "trending_rank": 191,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "expo/skills:expo-dev-client",
+    "installs": 41443,
+    "trending_rank": 192,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "expo/skills:expo-deployment",
+    "installs": 40541,
+    "trending_rank": 193,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-drive",
+    "installs": 40304,
+    "trending_rank": 195,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "expo/skills:expo-cicd-workflows",
+    "installs": 39570,
+    "trending_rank": 198,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:nodejs-backend-patterns",
+    "installs": 39418,
+    "trending_rank": 199,
     "trending_source": "skills.sh"
   },
   {
     "id": "googleworkspace/cli:gws-docs",
-    "installs": 37548,
-    "trending_rank": 309,
+    "installs": 38902,
+    "trending_rank": 200,
     "trending_source": "skills.sh"
   },
   {
-    "id": "expo/skills:expo-api-routes",
-    "installs": 37092,
-    "trending_rank": 310,
+    "id": "pexoai/pexo-skills:pexo-agent",
+    "installs": 38876,
+    "trending_rank": 201,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "github/awesome-copilot:git-commit",
+    "installs": 38621,
+    "trending_rank": 202,
     "trending_source": "skills.sh"
   },
   {
     "id": "googleworkspace/cli:gws-calendar",
-    "installs": 36789,
-    "trending_rank": 311,
+    "installs": 38128,
+    "trending_rank": 204,
     "trending_source": "skills.sh"
   },
   {
     "id": "googleworkspace/cli:gws-sheets",
-    "installs": 36242,
-    "trending_rank": 313,
+    "installs": 37698,
+    "trending_rank": 206,
     "trending_source": "skills.sh"
   },
   {
-    "id": "firebase/agent-skills:firebase-firestore-enterprise-native-mode",
-    "installs": 35790,
-    "trending_rank": 315,
+    "id": "expo/skills:expo-api-routes",
+    "installs": 37533,
+    "trending_rank": 207,
     "trending_source": "skills.sh"
   },
   {
     "id": "op7418/humanizer-zh:humanizer-zh",
-    "installs": 35656,
-    "trending_rank": 316,
+    "installs": 37456,
+    "trending_rank": 208,
     "trending_source": "skills.sh"
   },
   {
-    "id": "hugmouse/skills:value",
-    "installs": 35499,
-    "trending_rank": 318,
+    "id": "wind-information-co-ltd/wind-skills:wind-mcp-skill",
+    "installs": 36950,
+    "trending_rank": 210,
     "trending_source": "skills.sh"
   },
   {
     "id": "othmanadi/planning-with-files:planning-with-files",
-    "installs": 35425,
-    "trending_rank": 319,
+    "installs": 36664,
+    "trending_rank": 212,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "firebase/agent-skills:firebase-firestore-enterprise-native-mode",
+    "installs": 35793,
+    "trending_rank": 213,
     "trending_source": "skills.sh"
   },
   {
     "id": "addyosmani/web-quality-skills:accessibility",
-    "installs": 33971,
-    "trending_rank": 321,
+    "installs": 35726,
+    "trending_rank": 214,
     "trending_source": "skills.sh"
   },
   {
-    "id": "samber/cc-skills-golang:golang-code-style",
-    "installs": 33550,
-    "trending_rank": 322,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "firebase/agent-skills:developing-genkit-python",
-    "installs": 33464,
-    "trending_rank": 323,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-error-handling",
-    "installs": 33261,
-    "trending_rank": 324,
+    "id": "hugmouse/skills:value",
+    "installs": 35501,
+    "trending_rank": 215,
     "trending_source": "skills.sh"
   },
   {
     "id": "resciencelab/opc-skills:seo-geo",
-    "installs": 33234,
-    "trending_rank": 325,
+    "installs": 34456,
+    "trending_rank": 223,
     "trending_source": "skills.sh"
   },
   {
-    "id": "samber/cc-skills-golang:golang-performance",
-    "installs": 33119,
-    "trending_rank": 326,
+    "id": "samber/cc-skills-golang:golang-code-style",
+    "installs": 34354,
+    "trending_rank": 224,
     "trending_source": "skills.sh"
   },
   {
-    "id": "samber/cc-skills-golang:golang-design-patterns",
-    "installs": 32969,
-    "trending_rank": 327,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-testing",
-    "installs": 32949,
-    "trending_rank": 328,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-security",
-    "installs": 32783,
-    "trending_rank": 332,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-gmail-send",
-    "installs": 32580,
-    "trending_rank": 333,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-concurrency",
-    "installs": 32559,
-    "trending_rank": 334,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-naming",
-    "installs": 32440,
-    "trending_rank": 336,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-context",
-    "installs": 32402,
-    "trending_rank": 338,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "google-labs-code/stitch-skills:remotion",
-    "installs": 32395,
-    "trending_rank": 339,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-data-structures",
-    "installs": 32367,
-    "trending_rank": 340,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-documentation",
-    "installs": 32349,
-    "trending_rank": 341,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-database",
-    "installs": 32346,
-    "trending_rank": 342,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-safety",
-    "installs": 32340,
-    "trending_rank": 343,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-modernize",
-    "installs": 32282,
-    "trending_rank": 344,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-project-layout",
-    "installs": 32263,
-    "trending_rank": 345,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-lint",
-    "installs": 32197,
-    "trending_rank": 346,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-troubleshooting",
-    "installs": 32194,
-    "trending_rank": 347,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-popular-libraries",
-    "installs": 32176,
-    "trending_rank": 348,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-dependency-management",
-    "installs": 32137,
-    "trending_rank": 349,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-structs-interfaces",
-    "installs": 32129,
-    "trending_rank": 350,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-observability",
-    "installs": 32124,
-    "trending_rank": 351,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-dependency-injection",
-    "installs": 32082,
-    "trending_rank": 352,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-cli",
-    "installs": 32071,
-    "trending_rank": 353,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-grpc",
-    "installs": 32037,
-    "trending_rank": 354,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-benchmark",
-    "installs": 32018,
-    "trending_rank": 355,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-continuous-integration",
-    "installs": 31951,
-    "trending_rank": 358,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-stretchr-testify",
-    "installs": 31938,
-    "trending_rank": 359,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-stay-updated",
-    "installs": 31803,
-    "trending_rank": 362,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-docs-write",
-    "installs": 31750,
-    "trending_rank": 363,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-samber-lo",
-    "installs": 31747,
-    "trending_rank": 364,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-samber-do",
-    "installs": 31694,
-    "trending_rank": 365,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-samber-oops",
-    "installs": 31675,
-    "trending_rank": 366,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-samber-slog",
-    "installs": 31670,
-    "trending_rank": 367,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-samber-mo",
-    "installs": 31646,
-    "trending_rank": 368,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-samber-ro",
-    "installs": 31643,
-    "trending_rank": 369,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-sheets-read",
-    "installs": 31641,
-    "trending_rank": 370,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "samber/cc-skills-golang:golang-samber-hot",
-    "installs": 31628,
-    "trending_rank": 371,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "charon-fan/agent-playbook:self-improving-agent",
-    "installs": 31544,
-    "trending_rank": 372,
+    "id": "samber/cc-skills-golang:golang-error-handling",
+    "installs": 33990,
+    "trending_rank": 226,
     "trending_source": "skills.sh"
   },
   {
     "id": "greensock/gsap-skills:gsap-core",
-    "installs": 31480,
-    "trending_rank": 373,
+    "installs": 33840,
+    "trending_rank": 228,
     "trending_source": "skills.sh"
   },
   {
-    "id": "googleworkspace/cli:gws-drive-upload",
-    "installs": 31047,
-    "trending_rank": 375,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-calendar-agenda",
-    "installs": 30973,
-    "trending_rank": 376,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "addyosmani/web-quality-skills:seo",
-    "installs": 30827,
-    "trending_rank": 377,
+    "id": "samber/cc-skills-golang:golang-performance",
+    "installs": 33797,
+    "trending_rank": 229,
     "trending_source": "skills.sh"
   },
   {
     "id": "cloudflare/skills:cloudflare",
-    "installs": 30800,
-    "trending_rank": 378,
+    "installs": 33735,
+    "trending_rank": 231,
     "trending_source": "skills.sh"
   },
   {
-    "id": "jimliu/baoyu-skills:baoyu-post-to-wechat",
-    "installs": 30604,
-    "trending_rank": 379,
+    "id": "googleworkspace/cli:gws-gmail-send",
+    "installs": 33733,
+    "trending_rank": 232,
     "trending_source": "skills.sh"
   },
   {
-    "id": "samber/cc-skills-golang:golang-graphql",
-    "installs": 30239,
-    "trending_rank": 383,
+    "id": "samber/cc-skills-golang:golang-design-patterns",
+    "installs": 33687,
+    "trending_rank": 233,
     "trending_source": "skills.sh"
   },
   {
-    "id": "expo/skills:use-dom",
-    "installs": 30230,
-    "trending_rank": 384,
+    "id": "samber/cc-skills-golang:golang-testing",
+    "installs": 33658,
+    "trending_rank": 234,
     "trending_source": "skills.sh"
   },
   {
-    "id": "samber/cc-skills-golang:golang-uber-fx",
-    "installs": 30145,
-    "trending_rank": 388,
+    "id": "samber/cc-skills-golang:golang-security",
+    "installs": 33467,
+    "trending_rank": 236,
     "trending_source": "skills.sh"
   },
   {
-    "id": "samber/cc-skills-golang:golang-uber-dig",
-    "installs": 30120,
-    "trending_rank": 389,
+    "id": "google-labs-code/stitch-skills:remotion",
+    "installs": 33245,
+    "trending_rank": 240,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-concurrency",
+    "installs": 33198,
+    "trending_rank": 241,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-naming",
+    "installs": 33071,
+    "trending_rank": 243,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-data-structures",
+    "installs": 33003,
+    "trending_rank": 244,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-context",
+    "installs": 32998,
+    "trending_rank": 245,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "anysearch-ai/anysearch-skill:anysearch",
+    "installs": 32991,
+    "trending_rank": 246,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-documentation",
+    "installs": 32983,
+    "trending_rank": 247,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-database",
+    "installs": 32945,
+    "trending_rank": 248,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-docs-write",
+    "installs": 32938,
+    "trending_rank": 249,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-safety",
+    "installs": 32922,
+    "trending_rank": 250,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-modernize",
+    "installs": 32910,
+    "trending_rank": 251,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-sheets-read",
+    "installs": 32859,
+    "trending_rank": 252,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-project-layout",
+    "installs": 32856,
+    "trending_rank": 253,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-lint",
+    "installs": 32796,
+    "trending_rank": 254,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-troubleshooting",
+    "installs": 32794,
+    "trending_rank": 256,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-popular-libraries",
+    "installs": 32756,
+    "trending_rank": 257,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-structs-interfaces",
+    "installs": 32707,
+    "trending_rank": 258,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-observability",
+    "installs": 32703,
+    "trending_rank": 259,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-dependency-management",
+    "installs": 32690,
+    "trending_rank": 260,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-dependency-injection",
+    "installs": 32656,
+    "trending_rank": 261,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-cli",
+    "installs": 32620,
+    "trending_rank": 262,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-grpc",
+    "installs": 32614,
+    "trending_rank": 263,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-benchmark",
+    "installs": 32582,
+    "trending_rank": 264,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-continuous-integration",
+    "installs": 32495,
+    "trending_rank": 265,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-stretchr-testify",
+    "installs": 32490,
+    "trending_rank": 267,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-stay-updated",
+    "installs": 32328,
+    "trending_rank": 270,
     "trending_source": "skills.sh"
   },
   {
     "id": "greensock/gsap-skills:gsap-scrolltrigger",
-    "installs": 30049,
-    "trending_rank": 392,
+    "installs": 32318,
+    "trending_rank": 271,
     "trending_source": "skills.sh"
   },
   {
-    "id": "googleworkspace/cli:gws-shared",
-    "installs": 30021,
-    "trending_rank": 393,
+    "id": "samber/cc-skills-golang:golang-samber-lo",
+    "installs": 32290,
+    "trending_rank": 272,
     "trending_source": "skills.sh"
   },
   {
-    "id": "googleworkspace/cli:gws-calendar-insert",
-    "installs": 29908,
-    "trending_rank": 394,
+    "id": "addyosmani/web-quality-skills:seo",
+    "installs": 32284,
+    "trending_rank": 273,
     "trending_source": "skills.sh"
   },
   {
-    "id": "googleworkspace/cli:gws-sheets-append",
-    "installs": 29293,
-    "trending_rank": 399,
+    "id": "samber/cc-skills-golang:golang-samber-do",
+    "installs": 32230,
+    "trending_rank": 274,
     "trending_source": "skills.sh"
   },
   {
-    "id": "greensock/gsap-skills:gsap-performance",
-    "installs": 28997,
-    "trending_rank": 403,
+    "id": "samber/cc-skills-golang:golang-samber-oops",
+    "installs": 32202,
+    "trending_rank": 275,
     "trending_source": "skills.sh"
   },
   {
-    "id": "googleworkspace/cli:gws-gmail-triage",
-    "installs": 28890,
-    "trending_rank": 404,
+    "id": "samber/cc-skills-golang:golang-samber-slog",
+    "installs": 32198,
+    "trending_rank": 276,
     "trending_source": "skills.sh"
   },
   {
-    "id": "greensock/gsap-skills:gsap-timeline",
-    "installs": 28884,
-    "trending_rank": 405,
+    "id": "samber/cc-skills-golang:golang-samber-mo",
+    "installs": 32180,
+    "trending_rank": 277,
     "trending_source": "skills.sh"
   },
   {
-    "id": "jimliu/baoyu-skills:baoyu-image-gen",
-    "installs": 28801,
-    "trending_rank": 408,
+    "id": "googleworkspace/cli:gws-drive-upload",
+    "installs": 32176,
+    "trending_rank": 278,
     "trending_source": "skills.sh"
   },
   {
-    "id": "better-auth/skills:create-auth-skill",
-    "installs": 28742,
-    "trending_rank": 409,
+    "id": "samber/cc-skills-golang:golang-samber-ro",
+    "installs": 32171,
+    "trending_rank": 279,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-samber-hot",
+    "installs": 32162,
+    "trending_rank": 280,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-calendar-agenda",
+    "installs": 32107,
+    "trending_rank": 281,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "zhaono1/agent-playbook:self-improving-agent",
+    "installs": 31785,
+    "trending_rank": 286,
     "trending_source": "skills.sh"
   },
   {
     "id": "cloudflare/skills:wrangler",
-    "installs": 28579,
-    "trending_rank": 410,
+    "installs": 31476,
+    "trending_rank": 289,
     "trending_source": "skills.sh"
   },
   {
-    "id": "antfu/skills:vite",
-    "installs": 28568,
-    "trending_rank": 411,
+    "id": "googleworkspace/cli:gws-shared",
+    "installs": 31290,
+    "trending_rank": 292,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "greensock/gsap-skills:gsap-performance",
+    "installs": 31154,
+    "trending_rank": 294,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-post-to-wechat",
+    "installs": 31093,
+    "trending_rank": 295,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "greensock/gsap-skills:gsap-timeline",
+    "installs": 31033,
+    "trending_rank": 298,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-calendar-insert",
+    "installs": 30978,
+    "trending_rank": 299,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-graphql",
+    "installs": 30791,
+    "trending_rank": 301,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-uber-fx",
+    "installs": 30662,
+    "trending_rank": 304,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "samber/cc-skills-golang:golang-uber-dig",
+    "installs": 30633,
+    "trending_rank": 305,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "expo/skills:use-dom",
+    "installs": 30626,
+    "trending_rank": 307,
     "trending_source": "skills.sh"
   },
   {
     "id": "greensock/gsap-skills:gsap-plugins",
-    "installs": 28374,
-    "trending_rank": 413,
+    "installs": 30459,
+    "trending_rank": 309,
     "trending_source": "skills.sh"
   },
   {
-    "id": "jimliu/baoyu-skills:baoyu-markdown-to-html",
-    "installs": 28245,
-    "trending_rank": 414,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "antfu/skills:vue",
-    "installs": 28245,
-    "trending_rank": 415,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "wshobson/agents:python-performance-optimization",
-    "installs": 28199,
-    "trending_rank": 417,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-infographic",
-    "installs": 27938,
-    "trending_rank": 421,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "greensock/gsap-skills:gsap-utils",
-    "installs": 27887,
-    "trending_rank": 423,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-cover-image",
-    "installs": 27843,
-    "trending_rank": 424,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-article-illustrator",
-    "installs": 27687,
-    "trending_rank": 426,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "greensock/gsap-skills:gsap-react",
-    "installs": 27389,
-    "trending_rank": 428,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-xhs-images",
-    "installs": 27322,
-    "trending_rank": 429,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-tasks",
-    "installs": 27220,
-    "trending_rank": 430,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-slide-deck",
-    "installs": 27002,
-    "trending_rank": 433,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-slides",
-    "installs": 26788,
-    "trending_rank": 437,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-url-to-markdown",
-    "installs": 26550,
-    "trending_rank": 441,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "greensock/gsap-skills:gsap-frameworks",
-    "installs": 26398,
-    "trending_rank": 444,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "wshobson/agents:python-testing-patterns",
-    "installs": 26334,
-    "trending_rank": 445,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "aaron-he-zhu/seo-geo-claude-skills:backlink-analyzer",
-    "installs": 26068,
-    "trending_rank": 446,
+    "id": "googleworkspace/cli:gws-sheets-append",
+    "installs": 30365,
+    "trending_rank": 311,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-deep-research",
-    "installs": 26029,
-    "trending_rank": 447,
+    "installs": 30054,
+    "trending_rank": 313,
     "trending_source": "skills.sh"
   },
   {
-    "id": "jimliu/baoyu-skills:baoyu-comic",
-    "installs": 25919,
-    "trending_rank": 448,
+    "id": "googleworkspace/cli:gws-gmail-triage",
+    "installs": 29937,
+    "trending_rank": 315,
     "trending_source": "skills.sh"
   },
   {
-    "id": "antfu/skills:vitest",
-    "installs": 25837,
-    "trending_rank": 449,
+    "id": "greensock/gsap-skills:gsap-utils",
+    "installs": 29933,
+    "trending_rank": 316,
     "trending_source": "skills.sh"
   },
   {
-    "id": "github/awesome-copilot:excalidraw-diagram-generator",
-    "installs": 25772,
-    "trending_rank": 450,
+    "id": "better-auth/skills:create-auth-skill",
+    "installs": 29703,
+    "trending_rank": 319,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-research-papers",
-    "installs": 25708,
-    "trending_rank": 451,
+    "installs": 29648,
+    "trending_rank": 321,
     "trending_source": "skills.sh"
   },
   {
-    "id": "avdlee/swiftui-agent-skill:swiftui-expert-skill",
-    "installs": 25594,
-    "trending_rank": 452,
+    "id": "greensock/gsap-skills:gsap-react",
+    "installs": 29436,
+    "trending_rank": 326,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "antfu/skills:vite",
+    "installs": 29432,
+    "trending_rank": 327,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-image-gen",
+    "installs": 29412,
+    "trending_rank": 328,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-website-design-clone",
-    "installs": 25404,
-    "trending_rank": 453,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-post-to-x",
-    "installs": 25369,
-    "trending_rank": 454,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "google-labs-code/stitch-skills:stitch-design",
-    "installs": 25328,
-    "trending_rank": 455,
+    "installs": 29319,
+    "trending_rank": 330,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-market-research",
-    "installs": 25192,
-    "trending_rank": 456,
+    "installs": 29084,
+    "trending_rank": 332,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "antfu/skills:vue",
+    "installs": 28980,
+    "trending_rank": 333,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-knowledge-base",
-    "installs": 25031,
-    "trending_rank": 457,
+    "installs": 28865,
+    "trending_rank": 334,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-seo-audit",
-    "installs": 25009,
-    "trending_rank": 458,
+    "installs": 28851,
+    "trending_rank": 335,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-dashboard-reporting",
-    "installs": 24999,
-    "trending_rank": 459,
+    "installs": 28815,
+    "trending_rank": 336,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-lead-gen",
-    "installs": 24984,
-    "trending_rank": 460,
+    "installs": 28788,
+    "trending_rank": 337,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-markdown-to-html",
+    "installs": 28755,
+    "trending_rank": 338,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-shop",
-    "installs": 24948,
-    "trending_rank": 461,
+    "installs": 28747,
+    "trending_rank": 339,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-lead-research",
-    "installs": 24940,
-    "trending_rank": 462,
+    "installs": 28746,
+    "trending_rank": 340,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-workflows",
-    "installs": 24929,
-    "trending_rank": 463,
+    "installs": 28743,
+    "trending_rank": 341,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:python-performance-optimization",
+    "installs": 28742,
+    "trending_rank": 342,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-qa",
-    "installs": 24920,
-    "trending_rank": 464,
+    "installs": 28721,
+    "trending_rank": 343,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-competitive-intel",
-    "installs": 24902,
-    "trending_rank": 465,
+    "installs": 28707,
+    "trending_rank": 344,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-knowledge-ingest",
-    "installs": 24901,
-    "trending_rank": 466,
+    "installs": 28704,
+    "trending_rank": 345,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-company-directories",
-    "installs": 24883,
-    "trending_rank": 467,
+    "installs": 28681,
+    "trending_rank": 346,
     "trending_source": "skills.sh"
   },
   {
     "id": "firecrawl/firecrawl-workflows:firecrawl-demo-walkthrough",
-    "installs": 24881,
-    "trending_rank": 468,
+    "installs": 28679,
+    "trending_rank": 347,
     "trending_source": "skills.sh"
   },
   {
-    "id": "jimliu/baoyu-skills:baoyu-danger-x-to-markdown",
-    "installs": 24648,
-    "trending_rank": 469,
+    "id": "jimliu/baoyu-skills:baoyu-infographic",
+    "installs": 28524,
+    "trending_rank": 348,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-cover-image",
+    "installs": 28377,
+    "trending_rank": 350,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "greensock/gsap-skills:gsap-frameworks",
+    "installs": 28343,
+    "trending_rank": 351,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-tasks",
+    "installs": 28306,
+    "trending_rank": 352,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-article-illustrator",
+    "installs": 28202,
+    "trending_rank": 353,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-xhs-images",
+    "installs": 27814,
+    "trending_rank": 356,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-slides",
+    "installs": 27680,
+    "trending_rank": 357,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-slide-deck",
+    "installs": 27509,
+    "trending_rank": 358,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-url-to-markdown",
+    "installs": 27031,
+    "trending_rank": 359,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:python-testing-patterns",
+    "installs": 27002,
+    "trending_rank": 360,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "antfu/skills:vitest",
+    "installs": 26793,
+    "trending_rank": 361,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-comic",
+    "installs": 26420,
+    "trending_rank": 365,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "github/awesome-copilot:excalidraw-diagram-generator",
+    "installs": 26168,
+    "trending_rank": 366,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "avdlee/swiftui-agent-skill:swiftui-expert-skill",
+    "installs": 26161,
+    "trending_rank": 367,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "aaron-he-zhu/seo-geo-claude-skills:backlink-analyzer",
+    "installs": 26073,
+    "trending_rank": 368,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "firecrawl/cli:firecrawl-monitor",
+    "installs": 25894,
+    "trending_rank": 369,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-post-to-x",
+    "installs": 25844,
+    "trending_rank": 370,
     "trending_source": "skills.sh"
   },
   {
     "id": "googleworkspace/cli:gws-meet",
-    "installs": 24623,
-    "trending_rank": 470,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-compress-image",
-    "installs": 24594,
-    "trending_rank": 471,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-danger-gemini-web",
-    "installs": 24510,
-    "trending_rank": 472,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "tavily-ai/skills:tavily-search",
-    "installs": 24398,
-    "trending_rank": 473,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:baoyu-format-markdown",
-    "installs": 24308,
-    "trending_rank": 474,
+    "installs": 25584,
+    "trending_rank": 371,
     "trending_source": "skills.sh"
   },
   {
     "id": "googleworkspace/cli:gws-forms",
-    "installs": 24304,
-    "trending_rank": 475,
+    "installs": 25409,
+    "trending_rank": 372,
     "trending_source": "skills.sh"
   },
   {
-    "id": "hyf0/vue-skills:vue-best-practices",
-    "installs": 24168,
-    "trending_rank": 476,
+    "id": "google-labs-code/stitch-skills:stitch-design",
+    "installs": 25344,
+    "trending_rank": 373,
     "trending_source": "skills.sh"
   },
   {
-    "id": "wshobson/agents:code-review-excellence",
-    "installs": 24109,
-    "trending_rank": 477,
+    "id": "jimliu/baoyu-skills:baoyu-danger-x-to-markdown",
+    "installs": 25098,
+    "trending_rank": 374,
     "trending_source": "skills.sh"
   },
   {
-    "id": "wshobson/agents:api-design-principles",
-    "installs": 24071,
-    "trending_rank": 478,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-gmail-watch",
-    "installs": 23843,
-    "trending_rank": 479,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "wshobson/agents:nextjs-app-router-patterns",
-    "installs": 23285,
-    "trending_rank": 481,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "mastra-ai/skills:mastra",
-    "installs": 23113,
-    "trending_rank": 482,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "googleworkspace/cli:gws-keep",
-    "installs": 23067,
-    "trending_rank": 483,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "halt-catch-fire/skills:landing-page-design",
-    "installs": 22675,
-    "trending_rank": 485,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "jimliu/baoyu-skills:release-skills",
-    "installs": 22356,
-    "trending_rank": 488,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "github/awesome-copilot:documentation-writer",
-    "installs": 22319,
-    "trending_rank": 489,
-    "trending_source": "skills.sh"
-  },
-  {
-    "id": "halt-catch-fire/skills:youtube-thumbnail-design",
-    "installs": 22268,
-    "trending_rank": 490,
+    "id": "jimliu/baoyu-skills:baoyu-compress-image",
+    "installs": 25060,
+    "trending_rank": 375,
     "trending_source": "skills.sh"
   },
   {
     "id": "cloudflare/skills:workers-best-practices",
-    "installs": 22265,
-    "trending_rank": 491,
+    "installs": 25032,
+    "trending_rank": 376,
     "trending_source": "skills.sh"
   },
   {
-    "id": "halt-catch-fire/skills:product-photography",
-    "installs": 22258,
-    "trending_rank": 492,
+    "id": "jimliu/baoyu-skills:baoyu-danger-gemini-web",
+    "installs": 24971,
+    "trending_rank": 377,
     "trending_source": "skills.sh"
   },
   {
-    "id": "halt-catch-fire/skills:app-store-screenshots",
-    "installs": 22253,
-    "trending_rank": 493,
+    "id": "tavily-ai/skills:tavily-search",
+    "installs": 24921,
+    "trending_rank": 378,
     "trending_source": "skills.sh"
   },
   {
-    "id": "halt-catch-fire/skills:storyboard-creation",
-    "installs": 22239,
-    "trending_rank": 495,
+    "id": "jimliu/baoyu-skills:baoyu-format-markdown",
+    "installs": 24804,
+    "trending_rank": 379,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-gmail-watch",
+    "installs": 24591,
+    "trending_rank": 380,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:code-review-excellence",
+    "installs": 24578,
+    "trending_rank": 381,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:api-design-principles",
+    "installs": 24460,
+    "trending_rank": 383,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "vuejs-ai/skills:vue-best-practices",
+    "installs": 24441,
+    "trending_rank": 384,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:nextjs-app-router-patterns",
+    "installs": 24080,
+    "trending_rank": 385,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "clerk/skills:clerk-nextjs-patterns",
+    "installs": 24067,
+    "trending_rank": 386,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "mastra-ai/skills:mastra",
+    "installs": 24035,
+    "trending_rank": 387,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "tencent/wechatreading:weread-skills",
+    "installs": 23987,
+    "trending_rank": 388,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-keep",
+    "installs": 23923,
+    "trending_rank": 389,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-apply-architecture-best-practices",
+    "installs": 23550,
+    "trending_rank": 391,
     "trending_source": "skills.sh"
   },
   {
     "id": "minimax-ai/cli:mmx-cli",
-    "installs": 22226,
+    "installs": 23201,
+    "trending_rank": 396,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-build-responsive-layout",
+    "installs": 22853,
+    "trending_rank": 397,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "github/awesome-copilot:documentation-writer",
+    "installs": 22815,
+    "trending_rank": 398,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:release-skills",
+    "installs": 22735,
+    "trending_rank": 399,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "twostraws/swiftui-agent-skill:swiftui-pro",
+    "installs": 22721,
+    "trending_rank": 400,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "addyosmani/web-quality-skills:performance",
+    "installs": 22466,
+    "trending_rank": 401,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "clerk/skills:clerk-setup",
+    "installs": 22284,
+    "trending_rank": 403,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "mvanhorn/last30days-skill:last30days",
+    "installs": 22002,
+    "trending_rank": 405,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-fix-layout-issues",
+    "installs": 21933,
+    "trending_rank": 406,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "clerk/skills:clerk-custom-ui",
+    "installs": 21933,
+    "trending_rank": 407,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "shadcn/improve:improve",
+    "installs": 21796,
+    "trending_rank": 410,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-gmail-reply",
+    "installs": 21768,
+    "trending_rank": 412,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "angular/skills:angular-developer",
+    "installs": 21741,
+    "trending_rank": 413,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "jimliu/baoyu-skills:baoyu-translate",
+    "installs": 21717,
+    "trending_rank": 414,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "spillwavesolutions/design-doc-mermaid:design-doc-mermaid",
+    "installs": 21714,
+    "trending_rank": 415,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "github/awesome-copilot:gh-cli",
+    "installs": 21711,
+    "trending_rank": 416,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "cloudflare/skills:web-perf",
+    "installs": 21656,
+    "trending_rank": 417,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-add-widget-test",
+    "installs": 21465,
+    "trending_rank": 418,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-gmail-read",
+    "installs": 21445,
+    "trending_rank": 419,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-workflow",
+    "installs": 21427,
+    "trending_rank": 420,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "expo/skills:expo-module",
+    "installs": 21304,
+    "trending_rank": 422,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-gmail-forward",
+    "installs": 21264,
+    "trending_rank": 423,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-add-integration-test",
+    "installs": 21210,
+    "trending_rank": 424,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-setup-declarative-routing",
+    "installs": 21205,
+    "trending_rank": 425,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:fastapi-templates",
+    "installs": 21176,
+    "trending_rank": 426,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "cloudflare/skills:durable-objects",
+    "installs": 21130,
+    "trending_rank": 427,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-people",
+    "installs": 20984,
+    "trending_rank": 428,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-chat",
+    "installs": 20979,
+    "trending_rank": 429,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-gmail-reply-all",
+    "installs": 20851,
+    "trending_rank": 430,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-implement-json-serialization",
+    "installs": 20744,
+    "trending_rank": 432,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-create-presentation",
+    "installs": 20737,
+    "trending_rank": 433,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-workflow-email-to-task",
+    "installs": 20736,
+    "trending_rank": 434,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-setup-localization",
+    "installs": 20608,
+    "trending_rank": 435,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-add-widget-preview",
+    "installs": 20564,
+    "trending_rank": 436,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "github/awesome-copilot:prd",
+    "installs": 20521,
+    "trending_rank": 437,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "flutter/skills:flutter-use-http-package",
+    "installs": 20352,
+    "trending_rank": 438,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "clerk/skills:clerk-webhooks",
+    "installs": 20293,
+    "trending_rank": 439,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "useai-pro/openclaw-skills-security:skill-vetter",
+    "installs": 20283,
+    "trending_rank": 440,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-workflow-meeting-prep",
+    "installs": 20263,
+    "trending_rank": 442,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "clerk/skills:clerk-backend-api",
+    "installs": 20139,
+    "trending_rank": 443,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "antfu/skills:vue-best-practices",
+    "installs": 20067,
+    "trending_rank": 444,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-workflow-standup-report",
+    "installs": 20041,
+    "trending_rank": 445,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-workflow-weekly-digest",
+    "installs": 20037,
+    "trending_rank": 446,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-chat-send",
+    "installs": 20020,
+    "trending_rank": 447,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:persona-project-manager",
+    "installs": 20011,
+    "trending_rank": 448,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "dammyjay93/interface-design:interface-design",
+    "installs": 19976,
+    "trending_rank": 449,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-events",
+    "installs": 19920,
+    "trending_rank": 450,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-create-gmail-filter",
+    "installs": 19918,
+    "trending_rank": 451,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:persona-researcher",
+    "installs": 19776,
+    "trending_rank": 452,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "stablyai/orca:orchestration",
+    "installs": 19694,
+    "trending_rank": 453,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "callstackincubator/agent-skills:react-native-best-practices",
+    "installs": 19686,
+    "trending_rank": 454,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-backup-sheet-as-csv",
+    "installs": 19616,
+    "trending_rank": 456,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:persona-exec-assistant",
+    "installs": 19610,
+    "trending_rank": 457,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-save-email-attachments",
+    "installs": 19547,
+    "trending_rank": 458,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "clerk/skills:clerk-testing",
+    "installs": 19527,
+    "trending_rank": 460,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "cloudflare/skills:agents-sdk",
+    "installs": 19525,
+    "trending_rank": 461,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-find-free-time",
+    "installs": 19496,
+    "trending_rank": 463,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-organize-drive-folder",
+    "installs": 19471,
+    "trending_rank": 464,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-draft-email-from-doc",
+    "installs": 19470,
+    "trending_rank": 465,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-sync-contacts-to-sheet",
+    "installs": 19454,
+    "trending_rank": 466,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-compare-sheet-tabs",
+    "installs": 19408,
+    "trending_rank": 467,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-create-doc-from-template",
+    "installs": 19406,
+    "trending_rank": 468,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-workflow-file-announce",
+    "installs": 19397,
+    "trending_rank": 469,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-plan-weekly-schedule",
+    "installs": 19389,
+    "trending_rank": 470,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-bulk-download-folder",
+    "installs": 19368,
+    "trending_rank": 471,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-email-drive-link",
+    "installs": 19363,
+    "trending_rank": 472,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-events-renew",
+    "installs": 19352,
+    "trending_rank": 473,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-events-subscribe",
+    "installs": 19338,
+    "trending_rank": 474,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "github/awesome-copilot:refactor",
+    "installs": 19290,
+    "trending_rank": 475,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:persona-content-creator",
+    "installs": 19284,
+    "trending_rank": 476,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "wshobson/agents:e2e-testing-patterns",
+    "installs": 19256,
+    "trending_rank": 477,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "antfu/skills:nuxt",
+    "installs": 19236,
+    "trending_rank": 478,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-generate-report-from-sheet",
+    "installs": 19219,
+    "trending_rank": 479,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:gws-admin-reports",
+    "installs": 19203,
+    "trending_rank": 481,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-reschedule-meeting",
+    "installs": 19128,
+    "trending_rank": 482,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-label-and-archive-emails",
+    "installs": 19124,
+    "trending_rank": 483,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-save-email-to-doc",
+    "installs": 19099,
+    "trending_rank": 484,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-watch-drive-changes",
+    "installs": 19084,
+    "trending_rank": 485,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:persona-team-lead",
+    "installs": 19067,
+    "trending_rank": 486,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-create-shared-drive",
+    "installs": 19046,
+    "trending_rank": 487,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-block-focus-time",
+    "installs": 19033,
+    "trending_rank": 488,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-create-task-list",
+    "installs": 18999,
+    "trending_rank": 489,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "giuseppe-trisciuoglio/developer-kit:shadcn-ui",
+    "installs": 18990,
+    "trending_rank": 490,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-schedule-recurring-event",
+    "installs": 18975,
+    "trending_rank": 491,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-share-doc-and-notify",
+    "installs": 18973,
+    "trending_rank": 492,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-find-large-files",
+    "installs": 18960,
+    "trending_rank": 494,
+    "trending_source": "skills.sh"
+  },
+  {
+    "id": "googleworkspace/cli:recipe-copy-sheet-for-new-month",
+    "installs": 18895,
     "trending_rank": 496,
     "trending_source": "skills.sh"
   }
