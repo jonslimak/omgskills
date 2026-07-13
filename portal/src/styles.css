@@ -400,18 +400,34 @@ pre {
   margin: 0;
 }
 
-.sync-token-area {
-  min-height: 44px;
+.sync-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: auto;
+  margin-top: 20px;
+  width: 100%;
 }
 
-.sync-token-button {
-  background: transparent;
-  color: #7895ff;
-  font-size: 13px;
-  font-weight: 750;
-  min-height: auto;
-  overflow-wrap: anywhere;
-  padding: 0;
+.sync-mode-tabs [data-slot="tabs-trigger"] {
+  line-height: 1.2;
+  min-height: 32px;
+  white-space: normal;
+}
+
+.sync-secret-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: 100%;
+}
+
+.sync-secret-row input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.sync-token-area {
+  min-height: 44px;
 }
 
 .sync-status {
@@ -799,6 +815,10 @@ pre {
 
   .sync-modal-card {
     padding: 24px 18px;
+  }
+
+  .sync-mode-tabs {
+    grid-template-columns: 1fr;
   }
 
   .panel-header,

@@ -142,6 +142,8 @@ private struct DataUpdatedFooterView: View {
 }
 
 struct ContentView: View {
+    let deviceConnectionModel: DeviceConnectionModel
+
     @StateObject private var store = SkillsStore()
     @State private var query = ""
     @State private var selectedCreatorHandle: String?
@@ -322,10 +324,7 @@ struct ContentView: View {
         }
         .frame(width: shouldShowDetailPanel ? 750 : 400, height: 855)
         .sheet(isPresented: $isSyncPanelPresented) {
-            SkillSyncView(
-                installations: store.installedSkillInstallations,
-                isReady: store.isInstalledIdentityReady
-            )
+            syncPanel
         }
         .onChange(of: showDetail) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
@@ -462,6 +461,14 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .updateAvailabilityChanged)) { note in
             updateAvailable = (note.userInfo?["available"] as? Bool) ?? false
         }
+    }
+
+    private var syncPanel: some View {
+        SkillSyncView(
+            connectionModel: deviceConnectionModel,
+            installations: store.installedSkillInstallations,
+            isReady: store.isInstalledIdentityReady
+        )
     }
 
     // MARK: - Header

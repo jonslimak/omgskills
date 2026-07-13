@@ -1,4 +1,5 @@
 import SwiftUI
+import Observation
 
 enum LocalDashboardFilter: String, CaseIterable, Identifiable, Equatable {
     case all
@@ -77,14 +78,259 @@ struct LocalDashboardView: View {
 }
 
 struct SkillSyncView: View {
+    let connectionModel: DeviceConnectionModel
     let installations: [Skill]
     let isReady: Bool
 
     @Environment(\.dismiss) private var dismiss
+    @State private var pairingCode = ""
+    @State private var legacyExpanded = false
+    @State private var showReplacementConfirmation = false
+    @State private var legacyModel = LegacySkillSyncModel()
+
+    private var trimmedPairingCode: String {
+        pairingCode.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var isDeviceOperationActive: Bool {
+        switch connectionModel.state {
+        case .exchanging, .storingCredential, .syncing:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var deviceName: String {
+        Host.current().localizedName ?? "Mac"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Sync web portal")
+                    .font(.headline)
+                Spacer()
+                Button("Close", systemImage: "xmark", action: close)
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.plain)
+                    .help("Close")
+            }
+
+            deviceContent
+
+            Divider()
+
+            DisclosureGroup(isExpanded: $legacyExpanded) {
+                LegacySkillSyncSection(
+                    model: legacyModel,
+                    installations: installations,
+                    isReady: isReady
+                )
+                .padding(.top, 10)
+            } label: {
+                Text("Legacy one-time sync")
+                    .font(.callout.weight(.medium))
+            }
+        }
+        .padding(20)
+        .frame(width: 380)
+        .interactiveDismissDisabled(isDeviceOperationActive || legacyModel.isSyncing)
+        .confirmationDialog(
+            "Replace current connection?",
+            isPresented: $showReplacementConfirmation
+        ) {
+            Button("Replace connection", role: .destructive) {
+                connect(replacingExisting: true)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("The current portal connection stays active unless the new pairing succeeds.")
+        }
+        .onChange(of: connectionModel.state) { _, state in
+            if state == .failed(.replacementRequired) {
+                showReplacementConfirmation = true
+            }
+            if case .connected = state {
+                pairingCode = ""
+            }
+        }
+        .onDisappear {
+            legacyModel.cancel()
+        }
+    }
+
+    @ViewBuilder
+    private var deviceContent: some View {
+        switch connectionModel.state {
+        case .connected(let info):
+            connectedContent(info)
+        case .exchanging:
+            progressContent("Connecting to your portal account...")
+        case .storingCredential:
+            progressContent("Securing this connection in Keychain...")
+        case .syncing:
+            progressContent("Syncing installed skill metadata...")
+        case .failed(.sync(let message)):
+            retryContent(message)
+        case .failed(let failure):
+            pairingContent(errorMessage: message(for: failure))
+        case .disconnected:
+            pairingContent(errorMessage: connectionModel.disconnectWarning)
+        }
+    }
+
+    private func pairingContent(errorMessage: String?) -> some View {
+        DevicePairingSection(
+            pairingCode: $pairingCode,
+            errorMessage: errorMessage,
+            isReady: isReady,
+            onConnect: { connect(replacingExisting: false) }
+        )
+    }
+
+    private func connectedContent(_ info: DeviceConnectionInfo) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Connected", systemImage: "checkmark.circle.fill")
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.green)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(info.accountLabel)
+                    .font(.callout)
+                Text("Connection expires \(info.expiresAt.formatted(date: .abbreviated, time: .omitted))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack {
+                Button("Disconnect", role: .destructive) {
+                    connectionModel.disconnect()
+                }
+                Spacer()
+                Button("Sync now") {
+                    connectionModel.retrySync(installations: installations)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!isReady)
+            }
+        }
+    }
+
+    private func retryContent(_ message: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.red)
+
+            HStack {
+                Button("Disconnect", role: .destructive) {
+                    connectionModel.disconnect()
+                }
+                Spacer()
+                Button("Retry sync") {
+                    connectionModel.retrySync(installations: installations)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!isReady)
+            }
+        }
+    }
+
+    private func progressContent(_ message: String) -> some View {
+        HStack(spacing: 10) {
+            ProgressView()
+                .controlSize(.small)
+            Text(message)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func message(for failure: DeviceConnectionFailure) -> String? {
+        switch failure {
+        case .exchange(let message), .sync(let message):
+            return message
+        case .replacementRequired:
+            return "Confirm replacement to connect this portal account."
+        case .credentialStorage:
+            return "The connection could not be saved securely. Try again."
+        case .reconnectRequired:
+            return "This Mac needs a fresh pairing code."
+        }
+    }
+
+    private func connect(replacingExisting: Bool) {
+        guard !trimmedPairingCode.isEmpty, isReady else { return }
+        connectionModel.connect(
+            pairingCode: trimmedPairingCode,
+            deviceName: deviceName,
+            installations: installations,
+            replacingExisting: replacingExisting
+        )
+    }
+
+    private func close() {
+        connectionModel.cancelCurrentOperation()
+        legacyModel.cancel()
+        pairingCode = ""
+        dismiss()
+    }
+}
+
+private struct DevicePairingSection: View {
+    @Binding var pairingCode: String
+    let errorMessage: String?
+    let isReady: Bool
+    let onConnect: () -> Void
+
+    @FocusState private var isPairingCodeFocused: Bool
+
+    private var trimmedPairingCode: String {
+        pairingCode.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Generate a connection code on your profile page, then paste it below. Codes expire after 10 minutes and work once.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
+            SecureField("Paste connection code", text: $pairingCode)
+                .textFieldStyle(.roundedBorder)
+                .focused($isPairingCodeFocused)
+                .onSubmit(onConnect)
+                .accessibilityLabel("Portal connection code")
+
+            if let errorMessage, !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .accessibilityLabel(errorMessage)
+            } else if !isReady {
+                Text("Scanning installed skills...")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Button("Connect", action: onConnect)
+                .buttonStyle(.borderedProminent)
+                .disabled(trimmedPairingCode.isEmpty || !isReady)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .defaultFocus($isPairingCodeFocused, true)
+    }
+}
+
+private struct LegacySkillSyncSection: View {
+    let model: LegacySkillSyncModel
+    let installations: [Skill]
+    let isReady: Bool
+
     @State private var token = ""
-    @State private var status = ""
-    @State private var isError = false
-    @State private var isSyncing = false
     @FocusState private var isTokenFocused: Bool
 
     private var trimmedToken: String {
@@ -92,68 +338,91 @@ struct SkillSyncView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Resync web portal")
-                    .font(.headline)
-                Spacer()
-                Button("Close", systemImage: "xmark", action: dismiss.callAsFunction)
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(.plain)
-                    .help("Close")
-            }
-
-            Text("Generate a fresh token on your profile page, then paste it below. Tokens expire after 10 minutes and work once.")
-                .font(.callout)
+        VStack(alignment: .leading, spacing: 10) {
+            Text("For older portal tokens. Tokens expire after 10 minutes and work once.")
+                .font(.caption)
                 .foregroundStyle(.secondary)
 
-            SecureField("Paste access token", text: $token)
+            SecureField("Paste legacy access token", text: $token)
                 .textFieldStyle(.roundedBorder)
                 .focused($isTokenFocused)
-                .onSubmit(syncInstalledSkills)
-                .disabled(isSyncing)
+                .onSubmit(sync)
+                .disabled(model.isSyncing)
+                .accessibilityLabel("Legacy portal access token")
 
-            if !status.isEmpty {
-                Text(status)
+            if !model.status.isEmpty {
+                Text(model.status)
                     .font(.caption)
-                    .foregroundStyle(isError ? .red : .secondary)
-                    .accessibilityLabel(status)
+                    .foregroundStyle(model.isError ? .red : .secondary)
+                    .accessibilityLabel(model.status)
             }
 
-            Button(isSyncing ? "Resyncing..." : "Resync", action: syncInstalledSkills)
-                .buttonStyle(.borderedProminent)
-                .disabled(isSyncing || trimmedToken.isEmpty || !isReady)
+            Button(model.isSyncing ? "Syncing..." : "Sync once", action: sync)
+                .buttonStyle(.bordered)
+                .disabled(model.isSyncing || trimmedToken.isEmpty || !isReady)
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(20)
-        .frame(width: 380)
         .defaultFocus($isTokenFocused, true)
-        .interactiveDismissDisabled(isSyncing)
+        .onChange(of: model.completedSyncCount) {
+            token = ""
+        }
     }
 
-    private func syncInstalledSkills() {
-        guard !trimmedToken.isEmpty, !isSyncing, isReady else { return }
+    private func sync() {
+        guard !trimmedToken.isEmpty, isReady else { return }
+        model.sync(token: trimmedToken, installations: installations)
+    }
+}
 
+@MainActor
+@Observable
+private final class LegacySkillSyncModel {
+    private(set) var status = ""
+    private(set) var isError = false
+    private(set) var isSyncing = false
+    private(set) var completedSyncCount = 0
+
+    @ObservationIgnored private var task: Task<Void, Never>?
+    @ObservationIgnored private var attemptID: UUID?
+
+    func sync(token: String, installations: [Skill]) {
+        cancel()
+        let currentAttemptID = UUID()
+        attemptID = currentAttemptID
         isSyncing = true
         isError = false
         status = "Uploading installed skill metadata..."
-        let submittedToken = trimmedToken
         let snapshot = installations
 
-        Task {
+        task = Task { @MainActor [weak self] in
+            guard let self else { return }
             do {
                 let result = try await SkillSyncService.upload(
-                    token: submittedToken,
+                    token: token,
                     installations: snapshot
                 )
+                guard attemptID == currentAttemptID, !Task.isCancelled else { return }
                 status = "Synced \(result.syncedSkillCount) skills."
-                token = ""
+                completedSyncCount += 1
+            } catch is CancellationError {
+                return
             } catch {
+                guard attemptID == currentAttemptID, !Task.isCancelled else { return }
                 status = error.localizedDescription
                 isError = true
             }
+            guard attemptID == currentAttemptID else { return }
             isSyncing = false
+            attemptID = nil
+            task = nil
         }
+    }
+
+    func cancel() {
+        attemptID = nil
+        task?.cancel()
+        task = nil
+        isSyncing = false
     }
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ClerkProvider,
@@ -13,6 +13,7 @@ import {
 import {
   ArrowUpRight,
   Check,
+  Copy,
   Earth,
   Eye,
   EyeOff,
@@ -43,7 +44,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   groupSyncedSkills,
   hasSource,
@@ -160,40 +161,90 @@ function usePortalApi() {
 function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
   const api = usePortalApi();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [token, setToken] = useState<string>("");
+  const [syncMode, setSyncMode] = useState<"latest" | "legacy">("latest");
+  const [pairingCode, setPairingCode] = useState<string>("");
+  const [legacyToken, setLegacyToken] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [copyStatus, setCopyStatus] = useState<string>("");
+  const requestGeneration = useRef(0);
 
   function openPopover() {
+    requestGeneration.current += 1;
     setIsPopoverOpen(true);
+    setSyncMode("latest");
+    setPairingCode("");
+    setLegacyToken("");
     setStatus("");
     setCopyStatus("");
   }
 
-  async function createToken() {
-    setStatus("Generating new token...");
+  function updatePopoverOpen(open: boolean) {
+    setIsPopoverOpen(open);
+    if (!open) {
+      requestGeneration.current += 1;
+      setPairingCode("");
+      setLegacyToken("");
+      setStatus("");
+      setCopyStatus("");
+    }
+  }
+
+  function updateSyncMode(value: string) {
+    requestGeneration.current += 1;
+    setSyncMode(value === "legacy" ? "legacy" : "latest");
+    setPairingCode("");
+    setLegacyToken("");
+    setStatus("");
+    setCopyStatus("");
+  }
+
+  async function createPairingCode() {
+    const generation = requestGeneration.current + 1;
+    requestGeneration.current = generation;
+    setStatus("Generating connection code...");
+    setCopyStatus("");
+    try {
+      const result = await api<{ pairingCode: string; expiresAt: string }>("/api/portal/sync-pairing-code", {
+        method: "POST",
+        body: JSON.stringify({})
+      });
+      if (requestGeneration.current !== generation) return;
+      setPairingCode(result.pairingCode);
+      setStatus("Connection code is ready and expires in 10 minutes.");
+    } catch (error) {
+      if (requestGeneration.current !== generation) return;
+      setStatus(error instanceof Error ? error.message : "Failed to create connection code");
+    }
+  }
+
+  async function createLegacyToken() {
+    const generation = requestGeneration.current + 1;
+    requestGeneration.current = generation;
+    setStatus("Generating legacy token...");
     setCopyStatus("");
     try {
       const result = await api<{ token: string; expiresAt: string }>("/api/portal/sync-token", {
         method: "POST",
         body: JSON.stringify({})
       });
-      setToken(result.token);
-      setStatus("Token is ready.");
+      if (requestGeneration.current !== generation) return;
+      setLegacyToken(result.token);
+      setStatus("Legacy token is ready and expires in 10 minutes.");
     } catch (error) {
+      if (requestGeneration.current !== generation) return;
       setStatus(error instanceof Error ? error.message : "Failed to create token");
     }
   }
 
-  async function copyToken() {
-    if (!token) {
+  async function copySecret(secret: string) {
+    if (!secret) {
       return;
     }
     try {
-      await navigator.clipboard.writeText(token);
+      await navigator.clipboard.writeText(secret);
       setCopyStatus("Copied.");
     } catch {
-      setCopyStatus("Select and copy the token.");
+      setCopyStatus("Select and copy the value.");
     }
   }
 
@@ -207,37 +258,74 @@ function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
       >
         {hasSynced ? "Resync" : "Sync app"}
       </Button>
-      <Dialog open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+      <Dialog open={isPopoverOpen} onOpenChange={updatePopoverOpen}>
         <DialogContent className="sync-modal-card" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Sync your app</DialogTitle>
             <DialogDescription className="sr-only">
-              Generate a one time token and paste it into the local omgskills app.
+              Connect the latest app or generate a legacy one-time sync token.
             </DialogDescription>
           </DialogHeader>
-          <div className="sync-step">
-            <h3>Step 1</h3>
-            <p>Generate a one time token for your local app</p>
-            <Button onClick={createToken}>Generate new token</Button>
-            <div className="sync-token-area">
-              {token ? (
-                <Button className="sync-token-button" onClick={copyToken} title="Copy token" type="button" variant="link">
-                  {token}
-                </Button>
-              ) : null}
-              {status ? <p className="sync-status">{status}</p> : null}
-              {copyStatus ? <p className="sync-status">{copyStatus}</p> : null}
-            </div>
-          </div>
-          <div className="sync-step">
-            <h3>Step 2</h3>
-            <p>Open the app and tap on the user icon.</p>
-            <p>Paste the token in the token input box.</p>
-            <p>That's it!</p>
+          <Tabs value={syncMode} onValueChange={updateSyncMode}>
+            <TabsList className="sync-mode-tabs">
+              <TabsTrigger value="latest">Connect latest app</TabsTrigger>
+              <TabsTrigger value="legacy">Legacy one-time sync</TabsTrigger>
+            </TabsList>
+            <TabsContent value="latest">
+              <div className="sync-step">
+                <h3>Step 1</h3>
+                <p>Generate a connection code for the latest Mac app.</p>
+                <Button onClick={createPairingCode}>Generate connection code</Button>
+                <SyncSecret
+                  label="Connection code"
+                  secret={pairingCode}
+                  onCopy={() => copySecret(pairingCode)}
+                />
+              </div>
+              <div className="sync-step">
+                <h3>Step 2</h3>
+                <p>Open the app, select the user page, and choose Resync.</p>
+                <p>Paste the connection code and select Connect.</p>
+              </div>
+            </TabsContent>
+            <TabsContent value="legacy">
+              <div className="sync-step">
+                <h3>Legacy fallback</h3>
+                <p>Use this only with an older app or the Legacy one-time sync section.</p>
+                <Button onClick={createLegacyToken}>Generate legacy token</Button>
+                <SyncSecret
+                  label="Legacy token"
+                  secret={legacyToken}
+                  onCopy={() => copySecret(legacyToken)}
+                />
+              </div>
+              <div className="sync-step">
+                <p>Open Resync in the app and expand Legacy one-time sync.</p>
+              </div>
+            </TabsContent>
+          </Tabs>
+          <div className="sync-token-area" aria-live="polite">
+            {status ? <p className="sync-status">{status}</p> : null}
+            {copyStatus ? <p className="sync-status">{copyStatus}</p> : null}
           </div>
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function SyncSecret({ label, secret, onCopy }: { label: string; secret: string; onCopy: () => void }) {
+  if (!secret) {
+    return null;
+  }
+
+  return (
+    <div className="sync-secret-row">
+      <Input aria-label={label} readOnly value={secret} />
+      <Button aria-label={`Copy ${label.toLowerCase()}`} onClick={onCopy} size="icon" type="button" variant="outline">
+        <Copy aria-hidden="true" className={iconClassName} />
+      </Button>
+    </div>
   );
 }
 
@@ -961,8 +1049,9 @@ function Dashboard() {
   const { isLoaded, user } = useUser();
   const [state, setState] = useState<ApiState>({ syncedSkills: [], groups: [], sharedGroups: [], profile: null });
   const [status, setStatus] = useState("Loading...");
+  const refreshInFlight = useRef<Promise<void> | null>(null);
 
-  async function refresh() {
+  async function performRefresh() {
     try {
       const [synced, groups, shared, profile] = await Promise.all([
         api<{ skills: SyncedSkill[] }>("/api/portal/synced-skills"),
@@ -986,6 +1075,21 @@ function Dashboard() {
     }
   }
 
+  function refresh() {
+    if (refreshInFlight.current) {
+      return refreshInFlight.current;
+    }
+
+    const request = performRefresh();
+    refreshInFlight.current = request;
+    void request.finally(() => {
+      if (refreshInFlight.current === request) {
+        refreshInFlight.current = null;
+      }
+    });
+    return request;
+  }
+
   useEffect(() => {
     if (!isLoaded) {
       return;
@@ -998,6 +1102,25 @@ function Dashboard() {
       }
     }
     void refresh();
+  }, [isLoaded, user?.id]);
+
+  useEffect(() => {
+    if (!isLoaded || !user?.id) {
+      return;
+    }
+
+    function refreshWhenActive() {
+      if (!document.hidden) {
+        void refresh();
+      }
+    }
+
+    window.addEventListener("focus", refreshWhenActive);
+    document.addEventListener("visibilitychange", refreshWhenActive);
+    return () => {
+      window.removeEventListener("focus", refreshWhenActive);
+      document.removeEventListener("visibilitychange", refreshWhenActive);
+    };
   }, [isLoaded, user?.id]);
 
   return (

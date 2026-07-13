@@ -29,9 +29,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var libraryRefreshTimer: Timer?
     private var workspaceDidWakeObserver: NSObjectProtocol?
     private var isSharePickerActive = false
+    private let deviceConnectionModel = DeviceConnectionModel(
+        credentialStore: DeviceCredentialStore(service: DeviceCredentialStore.configuredService())
+    )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Analytics.start()
+        deviceConnectionModel.restore()
         setupUpdater()
         setupStatusItem()
         setupPanel()
@@ -196,7 +200,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     private func setupPanel() {
-        let hostingView = NSHostingView(rootView: ContentView())
+        let hostingView = NSHostingView(
+            rootView: ContentView(deviceConnectionModel: deviceConnectionModel)
+        )
         hostingView.wantsLayer = true
         hostingView.layer?.cornerRadius = 20
         hostingView.layer?.masksToBounds = true

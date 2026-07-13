@@ -26,6 +26,15 @@ protocol DeviceCredentialStoring: Sendable {
 
 actor DeviceCredentialStore: DeviceCredentialStoring {
     static let defaultService = "com.jonslimak.omgskills.portal-sync"
+    static let serviceInfoKey = "OMGSkillsPortalSyncKeychainService"
+
+    static func configuredService(bundle: Bundle = .main) -> String {
+        guard let value = bundle.object(forInfoDictionaryKey: serviceInfoKey) as? String else {
+            return defaultService
+        }
+        let service = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return service.isEmpty ? defaultService : service
+    }
 
     private let service: String
     private let encoder = JSONEncoder()

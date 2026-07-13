@@ -28,6 +28,7 @@ final class DeviceConnectionModel {
     @ObservationIgnored private let api: any DeviceSyncServing
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeAttemptID: UUID?
+    @ObservationIgnored private var connectedInfo: DeviceConnectionInfo?
 
     init(
         credentialStore: any DeviceCredentialStoring = DeviceCredentialStore(),
@@ -44,6 +45,7 @@ final class DeviceConnectionModel {
                 let stored = try await model.credentialStore.load()
                 guard model.isCurrent(attemptID) else { return }
                 if let stored, stored.connection.expiresAt > Date() {
+                    model.connectedInfo = stored.connection
                     model.state = .connected(stored.connection)
                 } else if stored != nil {
                     model.state = .failed(.reconnectRequired)
@@ -92,11 +94,17 @@ final class DeviceConnectionModel {
                     installations: installations
                 )
                 guard model.isCurrent(attemptID) else { return }
+                model.connectedInfo = stored.connection
                 model.state = .connected(stored.connection)
             } catch is CancellationError {
                 return
             } catch DeviceSyncAPIError.reconnectRequired {
                 guard model.isCurrent(attemptID) else { return }
+                if let stored = try? await model.credentialStore.load() {
+                    try? await model.credentialStore.delete(deviceID: stored.connection.deviceID)
+                }
+                guard model.isCurrent(attemptID) else { return }
+                model.connectedInfo = nil
                 model.state = .failed(.reconnectRequired)
             } catch {
                 guard model.isCurrent(attemptID) else { return }
@@ -138,6 +146,7 @@ final class DeviceConnectionModel {
             disconnectWarning = remoteRevocationFailed
                 ? "This Mac was disconnected locally. Revoke it from the web portal when you are online."
                 : nil
+            connectedInfo = nil
             state = .disconnected
             finish(attemptID)
         }
@@ -148,11 +157,11 @@ final class DeviceConnectionModel {
     func cancelCurrentOperation() {
         activeAttemptID = nil
         activeTask?.cancel()
-        activeTask = nil
-        if case .connected = state {
-            return
+        if let connectedInfo {
+            state = .connected(connectedInfo)
+        } else {
+            state = .disconnected
         }
-        state = .disconnected
     }
 
     private func performConnect(
@@ -165,6 +174,14 @@ final class DeviceConnectionModel {
         var exchanged: StoredDeviceCredential?
         var credentialStored = false
         do {
+            let existing = try await credentialStore.load()
+            guard isCurrent(attemptID) else { return }
+            if existing != nil, !replacingExisting {
+                state = .failed(.replacementRequired)
+                finish(attemptID)
+                return
+            }
+
             let record = try await api.exchange(
                 pairingCode: pairingCode,
                 deviceName: deviceName,
@@ -207,6 +224,7 @@ final class DeviceConnectionModel {
                 await cleanup(record, credentialStored: true)
                 return
             }
+            connectedInfo = record.connection
             state = .connected(record.connection)
             finish(attemptID)
         } catch is CancellationError {
@@ -218,6 +236,7 @@ final class DeviceConnectionModel {
                 await cleanup(exchanged, credentialStored: credentialStored)
             }
             guard isCurrent(attemptID) else { return }
+            connectedInfo = nil
             state = .failed(.reconnectRequired)
             finish(attemptID)
         } catch {

@@ -24,7 +24,7 @@ Implement and commit in these boundaries:
 2. **AUTH2 - Exchange and device-auth backend** (`done`, depends on AUTH1)
 3. **AUTH3 - Device upload and revocation** (`done`, depends on AUTH2)
 4. **AUTH4 - Mac credential and connection core** (`done`, depends on AUTH2)
-5. **AUTH5 - Manual one-time pairing** (`todo`, depends on AUTH3-AUTH4)
+5. **AUTH5 - Manual one-time pairing** (`done`, depends on AUTH3-AUTH4)
 6. **AUTH6 - Portal connected-device management** (`todo`, depends on AUTH3)
 7. **AUTH7 - Browser pairing** (`todo`, depends on stable AUTH5)
 8. **AUTH8 - Migration, release, and production verification** (`todo`, depends
@@ -306,7 +306,15 @@ placing secrets in observable view state or local files.
 
 ### AUTH5 - Manual one-time pairing UI
 
-`todo`
+`done`
+
+Completed and verified on 2026-07-13 against an isolated Netlify site and
+database branch. The signed test app paired, stored its credential in an isolated
+Keychain service, performed first sync, restored the connection after relaunch,
+disconnected cleanly, and reconnected. The portal refreshes when it regains focus
+or visibility, so returning from the Mac app shows new sync data without a hard
+refresh. Automated Mac lifecycle, Keychain, API, isolated-database integration,
+strict-concurrency, portal type-check, and portal production-build checks pass.
 
 Primary files:
 

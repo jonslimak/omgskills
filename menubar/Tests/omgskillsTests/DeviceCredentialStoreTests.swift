@@ -3,6 +3,38 @@ import Testing
 @testable import omgskills
 
 struct DeviceCredentialStoreTests {
+    @Test func configuredServiceUsesBundleOverride() throws {
+        let bundleURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("KeychainService-\(UUID().uuidString).bundle")
+        let contentsURL = bundleURL.appendingPathComponent("Contents")
+        try FileManager.default.createDirectory(at: contentsURL, withIntermediateDirectories: true)
+        try """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleIdentifier</key>
+            <string>com.jonslimak.omgskills.tests.keychain-service</string>
+            <key>OMGSkillsPortalSyncKeychainService</key>
+            <string>com.jonslimak.omgskills.portal-sync.auth5-draft</string>
+        </dict>
+        </plist>
+        """.write(to: contentsURL.appendingPathComponent("Info.plist"), atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: bundleURL) }
+        let bundle = try #require(Bundle(url: bundleURL))
+
+        #expect(
+            DeviceCredentialStore.configuredService(bundle: bundle)
+                == "com.jonslimak.omgskills.portal-sync.auth5-draft"
+        )
+    }
+
+    @Test func configuredServiceFallsBackWhenOverrideIsMissing() {
+        let service = DeviceCredentialStore.configuredService(bundle: Bundle(for: EmptyKeychainBundleMarker.self))
+
+        #expect(service == DeviceCredentialStore.defaultService)
+    }
+
     @Test func persistsAndDeletesCredentialInKeychain() async throws {
         let store = DeviceCredentialStore(service: uniqueService())
         let record = makeCredential(deviceID: "device-1", credential: "secret-1")
@@ -49,3 +81,5 @@ struct DeviceCredentialStoreTests {
         )
     }
 }
+
+private final class EmptyKeychainBundleMarker {}
