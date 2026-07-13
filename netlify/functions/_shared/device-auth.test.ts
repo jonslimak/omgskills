@@ -10,6 +10,8 @@ import {
   isPairingCode,
   verifyCodeChallenge
 } from "./crypto.js";
+import { DeviceAuthError, deviceCredentialFromRequest } from "./device-auth.js";
+import { uploadAuthenticationFromRequest } from "./sync-upload.js";
 import { requireJsonObject } from "./validation.js";
 
 const verifier = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
@@ -51,5 +53,32 @@ test("rejects malformed and non-object JSON payloads", async () => {
   await assert.rejects(
     requireJsonObject(new Request("https://example.com", { method: "POST", body: "[]" })),
     (error) => error instanceof Response && error.status === 400
+  );
+});
+
+test("extracts only a valid device bearer credential", () => {
+  const credential = createDeviceCredential();
+  const request = new Request("https://example.com", {
+    headers: { Authorization: `Bearer ${credential}` }
+  });
+
+  assert.equal(deviceCredentialFromRequest(request), credential);
+  for (const authorization of ["Bearer pair_short", "Bearer legacy", "Basic value", "Bearer"]) {
+    assert.throws(
+      () => deviceCredentialFromRequest(new Request("https://example.com", {
+        headers: { Authorization: authorization }
+      })),
+      (error) => error instanceof DeviceAuthError && error.status === 401
+    );
+  }
+});
+
+test("never falls back to a legacy body token when authorization is present", () => {
+  assert.throws(
+    () => uploadAuthenticationFromRequest(
+      new Request("https://example.com", { headers: { Authorization: "Bearer invalid" } }),
+      { token: "valid-legacy-token" }
+    ),
+    (error) => error instanceof DeviceAuthError && error.status === 401
   );
 });

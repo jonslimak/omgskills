@@ -22,7 +22,7 @@ Implement and commit in these boundaries:
 
 1. **AUTH1 - Device schema and token model** (`done`)
 2. **AUTH2 - Exchange and device-auth backend** (`done`, depends on AUTH1)
-3. **AUTH3 - Device upload and revocation** (`todo`, depends on AUTH2)
+3. **AUTH3 - Device upload and revocation** (`done`, depends on AUTH2)
 4. **AUTH4 - Mac credential and connection core** (`todo`, depends on AUTH2)
 5. **AUTH5 - Manual one-time pairing** (`todo`, depends on AUTH3-AUTH4)
 6. **AUTH6 - Portal connected-device management** (`todo`, depends on AUTH3)
@@ -176,7 +176,7 @@ concurrent exchange are covered by isolated-database tests.
 
 ### AUTH3 - Device upload and revocation
 
-`todo`
+`done`
 
 Primary files:
 

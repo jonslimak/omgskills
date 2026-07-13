@@ -22,6 +22,7 @@
     "test:sync-skill": "tsx --test ./netlify/functions/_shared/sync-skill.test.ts",
     "test:device-auth": "tsx --test ./netlify/functions/_shared/device-auth.test.ts",
     "test:device-auth-integration": "tsx --test ./netlify/functions/_shared/device-pairing.integration.test.ts",
+    "test:device-upload-integration": "tsx --test ./netlify/functions/_shared/device-upload.integration.test.ts",
     "test:portal-grouping": "tsx --test ./portal/tests/synced-skill-grouping.test.ts",
     "verify:skillgroups-rollout": "node ./scripts/verify-skillgroups-rollout.mjs"
   },
