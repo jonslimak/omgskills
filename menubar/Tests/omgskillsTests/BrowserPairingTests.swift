@@ -9,6 +9,10 @@ struct BrowserPairingTests {
         codeChallenge: String(repeating: "c", count: 43)
     )
 
+    @Test func defaultConnectURLUsesPortalAPIOrigin() {
+        #expect(BrowserPairing.defaultConnectURL.absoluteString == "https://omgskills.com/app/connect")
+    }
+
     @Test func systemRequestUsesPKCECompatibleValues() throws {
         let request = try SystemBrowserPairingRequestGenerator().makeRequest()
 
@@ -21,7 +25,7 @@ struct BrowserPairingTests {
 
     @Test func authorizationURLKeepsSecretsOutOfQuery() throws {
         let url = try BrowserPairing.authorizationURL(
-            connectURL: URL(string: "https://app.omgskills.com/connect")!,
+            connectURL: BrowserPairing.defaultConnectURL,
             request: request
         )
         let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))

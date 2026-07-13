@@ -63,7 +63,7 @@ struct SystemBrowserPairingRequestGenerator: BrowserPairingRequestGenerating {
 
 enum BrowserPairing {
     static let callbackScheme = "omgskills"
-    static let defaultConnectURL = URL(string: "https://app.omgskills.com/connect")!
+    static let defaultConnectURL = URL(string: "https://omgskills.com/app/connect")!
     static let connectURLInfoKey = "OMGSkillsPortalConnectURL"
 
     static func configuredConnectURL(bundle: Bundle = .main) -> URL {
