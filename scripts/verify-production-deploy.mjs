@@ -1,0 +1,80 @@
+#!/usr/bin/env node
+
+import { fileURLToPath } from "node:url";
+import { extractUpdateAssetPaths } from "./deploy-artifact-guard.mjs";
+
+const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
+const requiredStaticReleaseAssets = [
+  "downloads/omgskills-mac.dmg",
+  "downloads/omgskills-mac.dmg.sha256",
+];
+
+async function expectStatus(fetchImpl, origin, path, expected, options = {}) {
+  const url = `${origin}${path}`;
+  const response = await fetchImpl(url, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(20_000),
+    ...options,
+  });
+  if (response.status !== expected) {
+    throw new Error(`${url} returned ${response.status}, expected ${expected}`);
+  }
+  console.log(`ok ${expected} ${url}`);
+  return response;
+}
+
+async function verifyManifest(fetchImpl, origin, path) {
+  const response = await expectStatus(fetchImpl, origin, path, 200);
+  const manifest = await response.json();
+  if (!manifest?.skills?.path) {
+    throw new Error(`${origin}${path} is missing skills.path`);
+  }
+}
+
+export async function verifyProductionDeploy({
+  origin = defaultOrigin,
+  fetchImpl = fetch,
+} = {}) {
+  await expectStatus(fetchImpl, origin, "/app/", 200);
+  await expectStatus(fetchImpl, origin, "/api/portal/sync-upload", 401, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer invalid-production-smoke-token",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ skills: [] }),
+  });
+
+  for (const path of [
+    "/data/manifest.json",
+    "/data/v2/manifest.json",
+    "/data/crawl4/manifest.json",
+  ]) {
+    await verifyManifest(fetchImpl, origin, path);
+  }
+
+  const download = await expectStatus(fetchImpl, origin, "/download", 302);
+  const downloadLocation = download.headers.get("location");
+  if (downloadLocation !== "/downloads/omgskills-mac.dmg") {
+    throw new Error(`${origin}/download redirected to ${downloadLocation || "no location"}`);
+  }
+
+  const appcast = await expectStatus(fetchImpl, origin, "/appcast.xml", 200);
+  const updateAssets = extractUpdateAssetPaths(await appcast.text());
+  if (updateAssets.length === 0) {
+    throw new Error(`${origin}/appcast.xml has no /updates/ assets`);
+  }
+
+  for (const relativePath of [...requiredStaticReleaseAssets, ...updateAssets]) {
+    await expectStatus(fetchImpl, origin, `/${relativePath}`, 200, { method: "HEAD" });
+  }
+
+  console.log("Production deploy verified");
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  verifyProductionDeploy().catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}
