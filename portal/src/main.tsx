@@ -115,6 +115,21 @@ type ApiState = {
   profile: Profile | null;
 };
 
+type PortalDevice = {
+  id: string;
+  deviceName: string;
+  lastUsedAt: string | null;
+  expiresAt: string;
+  revokedAt: string | null;
+  createdAt: string;
+  status: "active" | "revoked" | "expired" | "inactive";
+};
+
+function formatDeviceDate(value: string | null) {
+  if (!value) return "Never";
+  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
+}
+
 function dashboardCacheKey(userId: string) {
   return `omgskills.portal.dashboard.${userId}.v1`;
 }
@@ -161,11 +176,16 @@ function usePortalApi() {
 function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
   const api = usePortalApi();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [syncMode, setSyncMode] = useState<"latest" | "legacy">("latest");
+  const [syncMode, setSyncMode] = useState<"latest" | "devices" | "legacy">("latest");
   const [pairingCode, setPairingCode] = useState<string>("");
   const [legacyToken, setLegacyToken] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [copyStatus, setCopyStatus] = useState<string>("");
+  const [devices, setDevices] = useState<PortalDevice[]>([]);
+  const [devicesLoading, setDevicesLoading] = useState(false);
+  const [deviceStatus, setDeviceStatus] = useState("");
+  const [confirmRevokeId, setConfirmRevokeId] = useState<string | null>(null);
+  const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null);
   const requestGeneration = useRef(0);
 
   function openPopover() {
@@ -176,6 +196,11 @@ function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
     setLegacyToken("");
     setStatus("");
     setCopyStatus("");
+    setDevices([]);
+    setDevicesLoading(false);
+    setDeviceStatus("");
+    setConfirmRevokeId(null);
+    setRevokingDeviceId(null);
   }
 
   function updatePopoverOpen(open: boolean) {
@@ -186,16 +211,72 @@ function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
       setLegacyToken("");
       setStatus("");
       setCopyStatus("");
+      setDevices([]);
+      setDevicesLoading(false);
+      setDeviceStatus("");
+      setConfirmRevokeId(null);
+      setRevokingDeviceId(null);
     }
   }
 
   function updateSyncMode(value: string) {
+    const mode = value === "legacy" ? "legacy" : value === "devices" ? "devices" : "latest";
     requestGeneration.current += 1;
-    setSyncMode(value === "legacy" ? "legacy" : "latest");
+    setSyncMode(mode);
     setPairingCode("");
     setLegacyToken("");
     setStatus("");
     setCopyStatus("");
+    setDeviceStatus("");
+    setConfirmRevokeId(null);
+    if (mode === "devices") {
+      void loadDevices();
+    }
+  }
+
+  async function loadDevices() {
+    const generation = requestGeneration.current + 1;
+    requestGeneration.current = generation;
+    setDevicesLoading(true);
+    setDeviceStatus("");
+    try {
+      const result = await api<{ devices: PortalDevice[] }>("/api/portal/devices");
+      if (requestGeneration.current !== generation) return;
+      setDevices(result.devices);
+    } catch (error) {
+      if (requestGeneration.current !== generation) return;
+      setDeviceStatus(error instanceof Error ? error.message : "Failed to load connected devices");
+    } finally {
+      if (requestGeneration.current === generation) setDevicesLoading(false);
+    }
+  }
+
+  async function revokeDevice(deviceId: string) {
+    const generation = requestGeneration.current + 1;
+    requestGeneration.current = generation;
+    setRevokingDeviceId(deviceId);
+    setDeviceStatus("");
+    let revoked = false;
+    try {
+      await api(`/api/portal/devices/${deviceId}`, { method: "DELETE" });
+      revoked = true;
+      if (requestGeneration.current !== generation) return;
+      setDevices((current) => current.map((device) => (
+        device.id === deviceId ? { ...device, status: "revoked" } : device
+      )));
+      setConfirmRevokeId(null);
+      setDeviceStatus("Device revoked.");
+      const result = await api<{ devices: PortalDevice[] }>("/api/portal/devices");
+      if (requestGeneration.current !== generation) return;
+      setDevices(result.devices);
+    } catch (error) {
+      if (requestGeneration.current !== generation) return;
+      setDeviceStatus(revoked
+        ? "Device revoked, but the list could not refresh."
+        : error instanceof Error ? error.message : "Failed to revoke device");
+    } finally {
+      if (requestGeneration.current === generation) setRevokingDeviceId(null);
+    }
   }
 
   async function createPairingCode() {
@@ -268,8 +349,9 @@ function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
           </DialogHeader>
           <Tabs value={syncMode} onValueChange={updateSyncMode}>
             <TabsList className="sync-mode-tabs">
-              <TabsTrigger value="latest">Connect latest app</TabsTrigger>
-              <TabsTrigger value="legacy">Legacy one-time sync</TabsTrigger>
+              <TabsTrigger value="latest">Connect app</TabsTrigger>
+              <TabsTrigger value="devices">Devices</TabsTrigger>
+              <TabsTrigger value="legacy">Legacy</TabsTrigger>
             </TabsList>
             <TabsContent value="latest">
               <div className="sync-step">
@@ -286,6 +368,63 @@ function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
                 <h3>Step 2</h3>
                 <p>Open the app, select the user page, and choose Resync.</p>
                 <p>Paste the connection code and select Connect.</p>
+              </div>
+            </TabsContent>
+            <TabsContent value="devices">
+              <div className="device-list" aria-live="polite">
+                {devicesLoading ? <p className="sync-status">Loading devices...</p> : null}
+                {!devicesLoading && devices.length === 0 && !deviceStatus ? (
+                  <p className="sync-status">No connected devices.</p>
+                ) : null}
+                {devices.map((device) => (
+                  <div className="device-row" key={device.id}>
+                    <div className="device-row-heading">
+                      <strong>{device.deviceName}</strong>
+                      <span className={`device-state device-state-${device.status}`}>{device.status}</span>
+                    </div>
+                    <dl className="device-meta">
+                      <div>
+                        <dt>Connected</dt>
+                        <dd>{formatDeviceDate(device.createdAt)}</dd>
+                      </div>
+                      <div>
+                        <dt>Last sync</dt>
+                        <dd>{formatDeviceDate(device.lastUsedAt)}</dd>
+                      </div>
+                      <div>
+                        <dt>Expires</dt>
+                        <dd>{formatDeviceDate(device.expiresAt)}</dd>
+                      </div>
+                    </dl>
+                    {device.status !== "revoked" && confirmRevokeId !== device.id ? (
+                      <Button onClick={() => setConfirmRevokeId(device.id)} size="sm" variant="outline">
+                        Revoke
+                      </Button>
+                    ) : null}
+                    {device.status !== "revoked" && confirmRevokeId === device.id ? (
+                      <div className="device-revoke-confirm">
+                        <span>Revoke this device?</span>
+                        <Button
+                          disabled={revokingDeviceId === device.id}
+                          onClick={() => void revokeDevice(device.id)}
+                          size="sm"
+                          variant="destructive"
+                        >
+                          {revokingDeviceId === device.id ? "Revoking..." : "Confirm revoke"}
+                        </Button>
+                        <Button
+                          disabled={revokingDeviceId === device.id}
+                          onClick={() => setConfirmRevokeId(null)}
+                          size="sm"
+                          variant="ghost"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+                {deviceStatus ? <p className="sync-status">{deviceStatus}</p> : null}
               </div>
             </TabsContent>
             <TabsContent value="legacy">

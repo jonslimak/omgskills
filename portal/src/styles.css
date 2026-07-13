@@ -402,7 +402,7 @@ pre {
 
 .sync-mode-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   height: auto;
   margin-top: 20px;
   width: 100%;
@@ -434,6 +434,82 @@ pre {
   color: #444b55;
   font-size: 12px;
   margin-top: 4px;
+}
+
+.device-list {
+  display: grid;
+  max-height: min(55vh, 520px);
+  margin-top: 20px;
+  overflow-y: auto;
+  padding-right: 4px;
+  text-align: left;
+}
+
+.device-row {
+  border-bottom: 1px solid #e5e7eb;
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.device-row:first-child {
+  padding-top: 4px;
+}
+
+.device-row-heading,
+.device-revoke-confirm {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.device-row-heading {
+  justify-content: space-between;
+}
+
+.device-state {
+  color: #596273;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.device-state-active {
+  color: #078321;
+}
+
+.device-state-revoked,
+.device-state-expired,
+.device-state-inactive {
+  color: #a13b32;
+}
+
+.device-meta {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.device-meta div {
+  display: grid;
+  gap: 2px;
+}
+
+.device-meta dt {
+  color: #697386;
+  font-size: 11px;
+}
+
+.device-meta dd {
+  font-size: 12px;
+  margin: 0;
+}
+
+.device-revoke-confirm span {
+  font-size: 12px;
+  margin-right: auto;
 }
 
 .list {
@@ -818,6 +894,10 @@ pre {
   }
 
   .sync-mode-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .device-meta {
     grid-template-columns: 1fr;
   }
 

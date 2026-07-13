@@ -258,19 +258,36 @@ test("revocation serializes with upload and blocks every later use", async () =>
   }
 });
 
-test("device listing excludes token hashes", async () => {
+test("device listing excludes token hashes and derives credential status", async () => {
   const userId = await createUser("List Mac");
   try {
-    await createDevice(userId);
-    const devices = await listUserDevices(pool, userId);
-    assert.equal(devices.length, 1);
+    const now = new Date("2026-07-13T12:00:00Z");
+    await createDevice(userId, { createdAt: new Date("2026-07-01T12:00:00Z") });
+    await createDevice(userId, { createdAt: new Date("2025-12-01T12:00:00Z") });
+    await createDevice(userId, {
+      createdAt: new Date("2026-01-01T12:00:00Z"),
+      expiresAt: new Date("2026-07-01T12:00:00Z")
+    });
+    await createDevice(userId, {
+      createdAt: new Date("2026-07-01T12:00:00Z"),
+      revokedAt: new Date("2026-07-10T12:00:00Z")
+    });
+    const devices = await listUserDevices(pool, userId, now);
+    assert.equal(devices.length, 4);
+    assert.deepEqual(new Set(devices.map((device) => device.status)), new Set([
+      "active",
+      "inactive",
+      "expired",
+      "revoked"
+    ]));
     assert.deepEqual(Object.keys(devices[0]).sort(), [
       "createdAt",
       "deviceName",
       "expiresAt",
       "id",
       "lastUsedAt",
-      "revokedAt"
+      "revokedAt",
+      "status"
     ]);
   } finally {
     await removeUser(userId);

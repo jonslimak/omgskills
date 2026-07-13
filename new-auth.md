@@ -25,7 +25,7 @@ Implement and commit in these boundaries:
 3. **AUTH3 - Device upload and revocation** (`done`, depends on AUTH2)
 4. **AUTH4 - Mac credential and connection core** (`done`, depends on AUTH2)
 5. **AUTH5 - Manual one-time pairing** (`done`, depends on AUTH3-AUTH4)
-6. **AUTH6 - Portal connected-device management** (`todo`, depends on AUTH3)
+6. **AUTH6 - Portal connected-device management** (`done`, depends on AUTH3)
 7. **AUTH7 - Browser pairing** (`todo`, depends on stable AUTH5)
 8. **AUTH8 - Migration, release, and production verification** (`todo`, depends
    on AUTH1-AUTH7 and `tiein.md` T5)
@@ -412,7 +412,7 @@ alternative only if URL-scheme behavior proves unreliable.
 
 ### AUTH6 - Portal connected-device management
 
-`todo`
+`done`
 
 Primary files:
 
@@ -429,6 +429,11 @@ Add two revocation paths:
 
 Portal settings show device name, created date, last sync, expiry, and revoked
 state. Apply output escaping and never expose hashes or credential fragments.
+
+Implemented in the existing Sync app modal. The Devices tab loads only when
+selected, derives active/revoked/expired/inactive status on the server using the
+same six-month inactivity rule as device authentication, and requires inline
+confirmation before owner revocation.
 
 Disconnect behavior:
 

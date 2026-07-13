@@ -88,7 +88,7 @@ export async function revokePresentedDevice(pool: Pool, req: Request, now = new 
   }
 }
 
-export async function listUserDevices(pool: Pool, userId: string) {
+export async function listUserDevices(pool: Pool, userId: string, now = new Date()) {
   const result = await pool.query(
     `
       SELECT
@@ -97,12 +97,18 @@ export async function listUserDevices(pool: Pool, userId: string) {
         last_used_at AS "lastUsedAt",
         expires_at AS "expiresAt",
         revoked_at AS "revokedAt",
-        created_at AS "createdAt"
+        created_at AS "createdAt",
+        CASE
+          WHEN revoked_at IS NOT NULL THEN 'revoked'
+          WHEN expires_at <= $2 THEN 'expired'
+          WHEN COALESCE(last_used_at, created_at) <= $2::timestamptz - $3::interval THEN 'inactive'
+          ELSE 'active'
+        END AS status
       FROM device_tokens
       WHERE user_id = $1
       ORDER BY created_at DESC
     `,
-    [userId]
+    [userId, now, DEVICE_INACTIVITY_INTERVAL]
   );
   return result.rows;
 }
