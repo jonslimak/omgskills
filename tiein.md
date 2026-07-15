@@ -379,21 +379,24 @@ canonical SHA attribution.
 
 ### ID1.1 - Surface privacy-safe identity measurements
 
-`todo`
+`done`
 
-The client computes provenance/Git/SHA/ambiguous/local-only counters and prints
-them locally. It does not yet provide production measurements.
+Implemented:
 
-- Emit total installed plus provenance, Git, SHA, ambiguous, and local-only
-  buckets through TelemetryDeck.
-- Record app version and active data track.
-- Do not emit names, paths, hashes, URLs, or catalog IDs.
-- Optionally expose the same counters in a debug-only dashboard row.
-- Measure only after ID0.1-ID0.5 so correctness bugs do not distort the
-  baseline.
+- The client emits one `identity.resolution_snapshot` per app session after a
+  valid catalog load and completed installed-skill scan.
+- The signal includes total installed, provenance, Git, SHA, ambiguous, and
+  local-only counts, plus app version, build number, and active data track.
+- A fixed parameter whitelist prevents names, paths, hashes, URLs, catalog IDs,
+  or user identifiers from entering the custom payload.
+- Empty installations emit a valid zero-count snapshot. Re-resolution in the
+  same session does not emit duplicate snapshots.
+- The optional debug-only dashboard row remains deferred.
 
-Verify: one controlled fixture emits the total and all five buckets, the buckets
-sum to the total, and the signal contains no user or skill identifiers.
+Verification completed: a controlled emitter fixture covers the signal name,
+all five buckets, total equality, track/version metadata, and exact privacy
+whitelist. Store tests cover readiness gating, zero installs, and duplicate
+suppression.
 
 Gate: do not build fuzzy matching until production measurements show that the
 unresolved population is material.
@@ -651,7 +654,7 @@ above:
 
 - Root TypeScript and creator-reservation checks
 - 332 Crawl 4 tests
-- 143 Swift tests with complete concurrency checking
+- 146 Swift tests with complete concurrency checking
 - Sync payload/parser and portal location-grouping regression tests
 - Local web-library fixture verification
 - Live web-library fixture verification

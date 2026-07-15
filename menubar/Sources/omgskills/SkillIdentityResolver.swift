@@ -19,6 +19,10 @@ struct SkillIdentityMeasurement: Equatable, Sendable {
     var resolvedBySha = 0
     var ambiguous = 0
     var localOnly = 0
+
+    var totalInstalled: Int {
+        resolvedByProvenance + resolvedByGit + resolvedBySha + ambiguous + localOnly
+    }
 }
 
 struct SkillIdentityResolver: Sendable {

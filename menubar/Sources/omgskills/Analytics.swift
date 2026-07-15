@@ -6,6 +6,7 @@ enum Analytics {
     private static let namespace = "com.omgskills"
     private static let installTrackedKey = "com.omgskills.telemetry.installTracked"
     private static let installTrackedV2Key = "com.omgskills.telemetry.installTracked.v2"
+    static let identityResolutionSignalName = "identity.resolution_snapshot"
 
     static func start() {
         let config = TelemetryDeck.Config(appID: appID, namespace: namespace)
@@ -17,6 +18,41 @@ enum Analytics {
     static func signal(_ name: String, parameters: [String: String] = [:]) {
         TelemetryDeck.signal(name, parameters: parameters)
         TelemetryDeck.requestImmediateSync()
+    }
+
+    static func signalIdentityResolution(
+        _ measurement: SkillIdentityMeasurement,
+        track: LibraryDataTrack
+    ) {
+        signalIdentityResolution(measurement, track: track) { name, parameters in
+            signal(name, parameters: parameters)
+        }
+    }
+
+    static func signalIdentityResolution(
+        _ measurement: SkillIdentityMeasurement,
+        track: LibraryDataTrack,
+        emit: (_ name: String, _ parameters: [String: String]) -> Void
+    ) {
+        emit(
+            identityResolutionSignalName,
+            identityResolutionParameters(measurement, track: track)
+        )
+    }
+
+    static func identityResolutionParameters(
+        _ measurement: SkillIdentityMeasurement,
+        track: LibraryDataTrack
+    ) -> [String: String] {
+        var parameters = appVersionParameters()
+        parameters["track"] = track.rawValue
+        parameters["total_installed"] = String(measurement.totalInstalled)
+        parameters["resolved_by_provenance"] = String(measurement.resolvedByProvenance)
+        parameters["resolved_by_git"] = String(measurement.resolvedByGit)
+        parameters["resolved_by_sha"] = String(measurement.resolvedBySha)
+        parameters["ambiguous"] = String(measurement.ambiguous)
+        parameters["local_only"] = String(measurement.localOnly)
+        return parameters
     }
 
     private static func trackInstallState() {

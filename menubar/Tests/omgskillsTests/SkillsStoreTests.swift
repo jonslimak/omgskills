@@ -4,7 +4,7 @@ import Testing
 @MainActor
 struct SkillsStoreTests {
     @Test func failedAvailableReloadKeepsVisibleSkills() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
         let existing = skill(name: "existing", stars: 10)
 
         store.applyDecodedLibraryData(
@@ -25,7 +25,7 @@ struct SkillsStoreTests {
     }
 
     @Test func failedTrendingReloadKeepsVisibleTrendingSkills() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
         let existing = skill(name: "existing", stars: 10)
 
         store.applyDecodedLibraryData(
@@ -46,7 +46,7 @@ struct SkillsStoreTests {
     }
 
     @Test func failedTwitterReloadKeepsVisibleTwitterSkills() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
         let existing = skill(name: "existing", stars: 10, tweetLikes: 50)
 
         store.applyDecodedLibraryData(
@@ -67,7 +67,7 @@ struct SkillsStoreTests {
     }
 
     @Test func successfulEmptyTwitterReloadClearsVisibleTwitterSkills() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
         let existing = skill(name: "existing", stars: 10, tweetLikes: 50)
 
         store.applyDecodedLibraryData(
@@ -88,7 +88,7 @@ struct SkillsStoreTests {
     }
 
     @Test func failedCollectionsReloadKeepsVisibleCollections() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
         let existing = collection(id: "author-openai", type: .author, title: "OpenAI", authorHandle: "openai")
 
         store.applyDecodedLibraryData(
@@ -110,7 +110,7 @@ struct SkillsStoreTests {
     }
 
     @Test func collectionHelpersLookupAuthorsAndSkills() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
         let openAISkill = skill(name: "openai-skill", stars: 20, authorHandle: "openai")
         let cursorSkill = skill(name: "cursor-skill", stars: 10, authorHandle: "cursor")
         let authorCollection = collection(
@@ -144,7 +144,7 @@ struct SkillsStoreTests {
     }
 
     @Test func installedIdentitySnapshotIsReadyOnlyAfterScanAndPreservesInstallations() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
         let catalog = skill(name: "review", stars: 10)
         store.applyDecodedLibraryData(
             available: .success([catalog]),
@@ -169,7 +169,7 @@ struct SkillsStoreTests {
     }
 
     @Test func completedEmptyScanProducesReadyEmptySnapshot() {
-        let store = SkillsStore(autoload: false)
+        let store = makeStore()
 
         store.applyInstalledScanResult(.init(
             skills: [],
@@ -181,12 +181,94 @@ struct SkillsStoreTests {
         #expect(store.installedSkillInstallations.isEmpty)
     }
 
+    @Test func identityMeasurementReportsOnceAfterCatalogAndScanAreReady() {
+        var reports: [(SkillIdentityMeasurement, LibraryDataTrack)] = []
+        let store = SkillsStore(
+            autoload: false,
+            identityMeasurementReporter: { measurement, track in
+                reports.append((measurement, track))
+            }
+        )
+        let catalog = skill(name: "review", stars: 10)
+        let installed = installedSkill(name: "review", origin: "Claude")
+
+        store.applyDecodedLibraryData(
+            available: .failure("catalog unavailable"),
+            trending: .success([]),
+            twitter: .success([]),
+            buildIndexes: false
+        )
+        store.applyInstalledScanResult(.init(
+            skills: [installed],
+            installations: [installed],
+            summary: InstalledSkillSummary(totalInstallations: 1)
+        ))
+        #expect(reports.isEmpty)
+
+        store.applyDecodedLibraryData(
+            available: .success([catalog]),
+            trending: .success([]),
+            twitter: .success([]),
+            buildIndexes: false
+        )
+        #expect(reports.count == 1)
+        #expect(reports.first?.0.totalInstalled == 1)
+        #expect(reports.first?.0.resolvedByGit == 1)
+
+        store.applyInstalledScanResult(.init(
+            skills: [installed],
+            installations: [installed],
+            summary: InstalledSkillSummary(totalInstallations: 1)
+        ))
+        #expect(reports.count == 1)
+    }
+
+    @Test func completedEmptyScanReportsZeroMeasurement() {
+        var reports: [SkillIdentityMeasurement] = []
+        let store = SkillsStore(
+            autoload: false,
+            identityMeasurementReporter: { measurement, _ in
+                reports.append(measurement)
+            }
+        )
+
+        store.applyDecodedLibraryData(
+            available: .success([]),
+            trending: .success([]),
+            twitter: .success([]),
+            buildIndexes: false
+        )
+        store.applyInstalledScanResult(.init(
+            skills: [],
+            installations: [],
+            summary: InstalledSkillSummary()
+        ))
+        #expect(reports.isEmpty)
+
+        store.applyDecodedLibraryData(
+            available: .success([skill(name: "catalog-skill", stars: 10)]),
+            trending: .success([]),
+            twitter: .success([]),
+            buildIndexes: false
+        )
+
+        #expect(reports.count == 1)
+        #expect(reports.first?.totalInstalled == 0)
+    }
+
     private func trendingEntry(id: String) -> TrendingEntry {
         TrendingEntry(
             id: id,
             installs: 100,
             trendingRank: 1,
             trendingSource: "test"
+        )
+    }
+
+    private func makeStore() -> SkillsStore {
+        SkillsStore(
+            autoload: false,
+            identityMeasurementReporter: { _, _ in }
         )
     }
 

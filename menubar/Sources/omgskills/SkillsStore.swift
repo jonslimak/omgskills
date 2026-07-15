@@ -2,6 +2,8 @@ import Foundation
 
 @MainActor
 final class SkillsStore: ObservableObject {
+    typealias IdentityMeasurementReporter = (SkillIdentityMeasurement, LibraryDataTrack) -> Void
+
     @Published private(set) var availableSkills: [Skill] = []
     @Published private(set) var trendingSkills: [Skill] = []
     @Published private(set) var twitterSkills: [Skill] = []
@@ -23,11 +25,20 @@ final class SkillsStore: ObservableObject {
     private var shaHistory: ShaHistoryAsset?
     private var hasScannedInstalledSkills = false
     private var loadGeneration = 0
+    private var hasLoadedIdentityCatalog = false
+    private var hasReportedIdentityMeasurement = false
     private var availableIndexTask: Task<Void, Never>?
     private var trendingIndexTask: Task<Void, Never>?
     private var twitterIndexTask: Task<Void, Never>?
+    private let identityMeasurementReporter: IdentityMeasurementReporter
 
-    init(autoload: Bool = true) {
+    init(
+        autoload: Bool = true,
+        identityMeasurementReporter: @escaping IdentityMeasurementReporter = { measurement, track in
+            Analytics.signalIdentityResolution(measurement, track: track)
+        }
+    ) {
+        self.identityMeasurementReporter = identityMeasurementReporter
         if autoload {
             load()
         }
@@ -116,6 +127,7 @@ final class SkillsStore: ObservableObject {
 
         switch available {
         case .success(let skills):
+            hasLoadedIdentityCatalog = !skills.isEmpty
             availableSkills = skills.sorted { $0.stars > $1.stars }
             trendingBaseSkills = skills
             loadError = nil
@@ -444,6 +456,7 @@ final class SkillsStore: ObservableObject {
         guard !installedSkills.isEmpty || !installedSkillInstallations.isEmpty else {
             identityMeasurement = SkillIdentityMeasurement()
             isInstalledIdentityReady = hasScannedInstalledSkills
+            reportIdentityMeasurementIfReady()
             return
         }
 
@@ -456,6 +469,19 @@ final class SkillsStore: ObservableObject {
         identityMeasurement = resolvedInstallations.measurement
         isInstalledIdentityReady = hasScannedInstalledSkills
         print("[SkillIdentityResolver] provenance=\(identityMeasurement.resolvedByProvenance) git=\(identityMeasurement.resolvedByGit) sha=\(identityMeasurement.resolvedBySha) ambiguous=\(identityMeasurement.ambiguous) localOnly=\(identityMeasurement.localOnly)")
+        reportIdentityMeasurementIfReady()
+    }
+
+    private func reportIdentityMeasurementIfReady() {
+        guard hasLoadedIdentityCatalog,
+              isInstalledIdentityReady,
+              !hasReportedIdentityMeasurement,
+              identityMeasurement.totalInstalled == installedSkillInstallations.count else {
+            return
+        }
+
+        hasReportedIdentityMeasurement = true
+        identityMeasurementReporter(identityMeasurement, DataRefreshService.activeTrack())
     }
 
     private func linearSearch(query: String, in skills: [Skill]) -> [Skill] {
