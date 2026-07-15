@@ -82,6 +82,9 @@ jobs:
 
       - name: Publish SHA history
         working-directory: index
+        # Keep this after promote:cutover: canonical policy reads the current
+        # suppression-filtered skills.json. SHA_CANONICAL_PUBLISH stays unset
+        # until the canonical rollout is explicitly approved.
         run: npm run publish:sha-history
 
       - name: Verify local published data

@@ -12,7 +12,7 @@
     "build": "npm run build:netlify",
     "build:netlify": "node ./scripts/build-netlify-site.mjs",
     "build:portal": "npm --workspace portal run build",
-    "check": "npm run check:creator-handle-reservations && npm run test:creator-handle-reservations && npm run test:sync-skill && npm run test:database-routing && npm run test:device-auth && npm run test:deploy-safety && npm run test:portal-grouping && tsc --noEmit",
+    "check": "npm run check:creator-handle-reservations && npm run test:creator-handle-reservations && npm run test:sync-skill && npm run test:database-routing && npm run test:device-auth && npm run test:deploy-safety && npm run test:published-data && npm run test:portal-grouping && tsc --noEmit",
     "check:creator-handle-reservations": "node ./scripts/generate-creator-handle-reservations.mjs --check",
     "dev": "netlify dev",
     "dev:portal": "npm --workspace portal run dev",
@@ -25,6 +25,7 @@
     "test:device-auth-integration": "tsx --test ./netlify/functions/_shared/device-pairing.integration.test.ts",
     "test:device-upload-integration": "tsx --test ./netlify/functions/_shared/device-upload.integration.test.ts",
     "test:deploy-safety": "node --test ./scripts/deploy-artifact-guard.test.mjs ./scripts/deploy-site-prod.test.mjs ./scripts/health-snapshot-guard.test.mjs ./scripts/verify-production-deploy.test.mjs",
+    "test:published-data": "node --test ./scripts/verify-published-data.test.mjs",
     "test:portal-grouping": "tsx --test ./portal/tests/synced-skill-grouping.test.ts ./portal/tests/browser-pairing.test.ts",
     "verify:skillgroups-rollout": "node ./scripts/verify-skillgroups-rollout.mjs"
   },

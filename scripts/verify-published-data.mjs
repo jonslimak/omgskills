@@ -83,7 +83,8 @@ if (shaHistory && (!shaHistory.decoded || Array.isArray(shaHistory.decoded))) {
   fail("shaHistory payload must be an object");
 }
 
-const skillIds = new Set(skills.decoded.map((item) => item?.id).filter(Boolean));
+const skillsById = new Map(skills.decoded.map((item) => [item?.id, item]).filter(([id]) => Boolean(id)));
+const skillIds = new Set(skillsById.keys());
 const authorHandles = new Set(skills.decoded.map((item) => item?.author_handle).filter(Boolean));
 for (const entry of trending.decoded) {
   if (!entry?.id || !skillIds.has(entry.id)) {
@@ -163,6 +164,38 @@ if (shaHistory) {
       }
     }
   }
+
+  const canonicalBySha = shaHistory.decoded.canonicalBySha;
+  if (canonicalBySha !== undefined) {
+    if (!canonicalBySha || Array.isArray(canonicalBySha) || typeof canonicalBySha !== "object") {
+      fail("shaHistory canonicalBySha must be an object when present");
+    }
+    for (const [sha, entry] of Object.entries(canonicalBySha)) {
+      if (!/^[0-9a-f]{40}$/.test(sha)) {
+        fail(`canonicalBySha contains invalid git blob sha: ${sha}`);
+      }
+      if (!entry || Array.isArray(entry) || typeof entry !== "object") {
+        fail(`canonicalBySha entry must be an object: ${sha}`);
+      }
+      if (typeof entry.skillId !== "string" || entry.skillId.length === 0) {
+        fail(`canonicalBySha entry is missing skillId: ${sha}`);
+      }
+      if (entry.confidence !== "high" || entry.reason !== "same-repo") {
+        fail(`canonicalBySha entry must be high-confidence same-repo: ${sha}`);
+      }
+      const memberIds = shaHistory.decoded.shaToSkillIds[sha];
+      if (!Array.isArray(memberIds) || !memberIds.includes(entry.skillId)) {
+        fail(`canonicalBySha skill is not a member of ${sha}: ${entry.skillId}`);
+      }
+      const liveSkill = skillsById.get(entry.skillId);
+      if (!liveSkill) {
+        fail(`canonicalBySha skill is not live: ${entry.skillId}`);
+      }
+      if (String(liveSkill.skill_md_sha ?? "").trim().toLowerCase() !== sha) {
+        fail(`canonicalBySha skill SHA does not match ${sha}: ${entry.skillId}`);
+      }
+    }
+  }
 }
 
 console.log(
@@ -178,6 +211,7 @@ console.log(
       authorSignalsCount: authorSignals?.decoded.length ?? 0,
       authorLeaderboardsCount: authorLeaderboards?.decoded.length ?? 0,
       shaHistoryCount: shaHistory ? Object.keys(shaHistory.decoded.shaToSkillIds).length : 0,
+      canonicalByShaCount: shaHistory ? Object.keys(shaHistory.decoded.canonicalBySha ?? {}).length : 0,
     },
     null,
     2,

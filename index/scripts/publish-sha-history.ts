@@ -3,9 +3,24 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { loadTrustedSeeds } from "../scraper/new-crawl/seeds.js";
+import {
+  buildShaCanonicalArtifact,
+  shaCanonicalOptionsFromSeeds,
+  type ShaCanonicalOptions,
+  type ShaCanonicalSkill,
+} from "../scraper/new-crawl/sha-canonical.js";
+import { validateShaCanonicalArtifact } from "../scraper/new-crawl/validate-canonical-policy.js";
+
 export type ShaHistorySkill = {
   id: string;
   skill_md_sha?: string | null;
+};
+
+export type CanonicalShaEntry = {
+  skillId: string;
+  confidence: "high";
+  reason: "same-repo";
 };
 
 type Asset = {
@@ -22,6 +37,7 @@ export type ShaHistoryAsset = {
   version: number;
   generatedAt: string;
   shaToSkillIds: Record<string, string[]>;
+  canonicalBySha?: Record<string, CanonicalShaEntry>;
 };
 
 export type BuildShaHistoryResult = {
@@ -60,6 +76,10 @@ async function fetchJson<T>(url: string): Promise<T> {
 
 function sha256(data: Buffer): string {
   return createHash("sha256").update(data).digest("hex");
+}
+
+export function shouldPublishCanonicalBySha(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.SHA_CANONICAL_PUBLISH === "1";
 }
 
 export function countShaHistory(asset: ShaHistoryAsset): { shaCount: number; pairCount: number } {
@@ -107,56 +127,89 @@ async function loadExistingShaHistory(track: { name: string; dir: string; manife
   return await fetchJson<ShaHistoryAsset>(remoteAssetURL);
 }
 
-function buildAsset(map: Map<string, Set<string>>, generatedAt: string): ShaHistoryAsset {
+function buildAsset(
+  map: Map<string, Set<string>>,
+  generatedAt: string,
+  canonicalBySha?: Record<string, CanonicalShaEntry>,
+): ShaHistoryAsset {
   const shaToSkillIds: Record<string, string[]> = {};
   for (const sha of [...map.keys()].sort()) {
     shaToSkillIds[sha] = [...(map.get(sha) ?? [])].sort();
   }
-  return {
+  const asset: ShaHistoryAsset = {
     version: 1,
     generatedAt,
     shaToSkillIds,
   };
+  if (canonicalBySha !== undefined) asset.canonicalBySha = canonicalBySha;
+  return asset;
 }
 
-function sameMappings(left: Record<string, string[]>, right: Record<string, string[]>): boolean {
-  return JSON.stringify(left) === JSON.stringify(right);
+function assetContent(asset: ShaHistoryAsset): Omit<ShaHistoryAsset, "generatedAt"> {
+  const content: Omit<ShaHistoryAsset, "generatedAt"> = {
+    version: asset.version,
+    shaToSkillIds: asset.shaToSkillIds,
+  };
+  if (asset.canonicalBySha !== undefined) content.canonicalBySha = asset.canonicalBySha;
+  return content;
 }
 
-function latestGeneratedAt(assets: ShaHistoryAsset[]): string | null {
-  return assets
-    .map((asset) => asset.generatedAt)
-    .filter(Boolean)
-    .sort()
-    .at(-1) ?? null;
+function sameAssetContent(left: ShaHistoryAsset, right: ShaHistoryAsset): boolean {
+  return JSON.stringify(assetContent(left)) === JSON.stringify(assetContent(right));
+}
+
+export function buildCanonicalBySha(
+  skills: ShaCanonicalSkill[],
+  options: ShaCanonicalOptions,
+): Record<string, CanonicalShaEntry> {
+  const artifact = buildShaCanonicalArtifact(skills, "publish", options);
+  const failures = validateShaCanonicalArtifact(artifact, skills);
+  if (failures.length > 0) {
+    const first = failures[0]!;
+    fail(`canonical policy validation failed (${first.code}): ${first.detail}`);
+  }
+
+  const canonicalBySha: Record<string, CanonicalShaEntry> = {};
+  for (const cluster of artifact.clusters) {
+    if (
+      cluster.confidence !== "high" ||
+      cluster.reason !== "same-repo" ||
+      !cluster.canonicalSkillId
+    ) {
+      continue;
+    }
+    canonicalBySha[cluster.skillMdSha] = {
+      skillId: cluster.canonicalSkillId,
+      confidence: "high",
+      reason: "same-repo",
+    };
+  }
+  return canonicalBySha;
 }
 
 export function buildShaHistoryAsset(
   existingAssets: ShaHistoryAsset[],
   skills: ShaHistorySkill[],
   generatedAt: string,
+  canonicalBySha?: Record<string, CanonicalShaEntry>,
 ): BuildShaHistoryResult {
   const map = new Map<string, Set<string>>();
   for (const asset of existingAssets) mergeAsset(map, asset);
 
-  const mergedExisting = buildAsset(map, latestGeneratedAt(existingAssets) ?? generatedAt);
+  const mergedExisting = buildAsset(map, generatedAt);
   const previousCounts = countShaHistory(mergedExisting);
-  const existingConverged = existingAssets.some((asset) =>
-    sameMappings(asset.shaToSkillIds, mergedExisting.shaToSkillIds)
-  );
 
   for (const skill of skills) {
     if (skill.skill_md_sha) addMapping(map, skill.skill_md_sha, skill.id);
   }
 
-  const finalMappings = buildAsset(map, generatedAt).shaToSkillIds;
-  const changed = !existingConverged || !sameMappings(mergedExisting.shaToSkillIds, finalMappings);
+  const proposed = buildAsset(map, generatedAt, canonicalBySha);
+  const matchingExisting = existingAssets
+    .filter((asset) => sameAssetContent(asset, proposed))
+    .sort((left, right) => right.generatedAt.localeCompare(left.generatedAt))[0];
+  const changed = matchingExisting === undefined;
   return {
-    asset: {
-      version: 1,
-      generatedAt: changed ? generatedAt : mergedExisting.generatedAt,
-      shaToSkillIds: finalMappings,
-    },
+    asset: buildAsset(map, matchingExisting?.generatedAt ?? generatedAt, canonicalBySha),
     changed,
     previousCounts,
   };
@@ -182,7 +235,7 @@ export function writeShaHistoryAsset(dataDir: string, asset: ShaHistoryAsset): A
   return { path: filename, sha256: hash, bytes: data.length };
 }
 
-function patchManifest(dataDir: string, asset: Asset): void {
+export function patchManifest(dataDir: string, asset: Asset): void {
   const manifestPath = join(dataDir, "manifest.json");
   if (!existsSync(manifestPath)) {
     fail(`missing manifest: ${manifestPath}`);
@@ -217,8 +270,19 @@ async function main() {
     }
   }
 
-  const skills = readJson<ShaHistorySkill[]>(skillsPath);
-  const result = buildShaHistoryAsset(existingAssets, skills, new Date().toISOString());
+  // shadow-crawl-health runs this after promote:cutover. Keep that ordering: the
+  // canonical policy must use the suppression-filtered skills.json being published.
+  const skills = readJson<ShaCanonicalSkill[]>(skillsPath);
+  const canonicalEnabled = shouldPublishCanonicalBySha();
+  const canonicalBySha = canonicalEnabled
+    ? buildCanonicalBySha(skills, shaCanonicalOptionsFromSeeds(loadTrustedSeeds()))
+    : undefined;
+  const result = buildShaHistoryAsset(
+    existingAssets,
+    skills,
+    new Date().toISOString(),
+    canonicalBySha,
+  );
   assertShaHistoryDoesNotShrink(result.previousCounts, countShaHistory(result.asset), allowShrink);
 
   for (const track of dataTrackDirs) {
@@ -228,7 +292,10 @@ async function main() {
     console.log(`wrote ${join(track.dir, written.path)}`);
   }
   const finalCounts = countShaHistory(result.asset);
-  console.log(`${result.changed ? "published" : "reused"} ${finalCounts.shaCount} shas and ${finalCounts.pairCount} sha/id pairs`);
+  const canonicalCount = Object.keys(result.asset.canonicalBySha ?? {}).length;
+  console.log(
+    `${result.changed ? "published" : "reused"} ${finalCounts.shaCount} shas, ${finalCounts.pairCount} sha/id pairs, and ${canonicalCount} canonical mappings (${canonicalEnabled ? "enabled" : "disabled"})`,
+  );
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
