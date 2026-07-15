@@ -46,15 +46,21 @@ function cluster(
 }
 
 function artifact(clusters: ShaCanonicalCluster[]): ShaCanonicalArtifact {
+  const high = clusters.filter((row) => row.confidence === "high").length;
+  const medium = clusters.filter((row) => row.confidence === "medium").length;
   return {
     version: 1,
     generatedAt: "fixed",
     clusterCount: clusters.length,
-    canonicalCandidateCount: clusters.filter((row) => row.canonicalSkillId).length,
-    highConfidenceCount: 0,
-    mediumCandidateCount: clusters.filter((row) => row.confidence === "medium").length,
-    unresolvedClusterCount: clusters.filter((row) => row.confidence === "unresolved").length,
-    candidateCountByReason: { "same-repo": 0, "trusted-creator": 0, "clear-star-leader": 0 },
+    canonicalCandidateCount: high + medium,
+    highConfidenceCount: high,
+    mediumCandidateCount: medium,
+    unresolvedClusterCount: clusters.length - high - medium,
+    candidateCountByReason: {
+      "same-repo": clusters.filter((row) => row.reason === "same-repo").length,
+      "trusted-creator": clusters.filter((row) => row.reason === "trusted-creator").length,
+      "clear-star-leader": clusters.filter((row) => row.reason === "clear-star-leader").length,
+    },
     clusters,
   };
 }
@@ -181,4 +187,46 @@ test("selection offset advances both balanced buckets", () => {
     offsetPerBucket: 1,
   });
   assert.deepEqual(selected.selected.map((row) => row.cluster.skillMdSha), ["m2", "u2"]);
+});
+
+test("trusted candidate audit bucket excludes same-repo and star-leader clusters", () => {
+  const trustedCandidate: ShaCanonicalCluster = {
+    skillMdSha: "trusted",
+    memberSkillIds: ["trusted/source:a", "copy/repo:a"],
+    canonicalSkillId: "trusted/source:a",
+    confidence: "medium",
+    reason: "trusted-creator",
+  };
+  const sameRepoHigh: ShaCanonicalCluster = {
+    skillMdSha: "same",
+    memberSkillIds: ["same/repo:a", "same/repo:b"],
+    canonicalSkillId: "same/repo:a",
+    confidence: "high",
+    reason: "same-repo",
+  };
+  const medium = cluster("medium", ["medium/one:a", "medium/two:a"], "medium", "medium/one:a");
+  const clusters = [trustedCandidate, sameRepoHigh, medium];
+  const skills = clusters.flatMap((row) => row.memberSkillIds.map((id) => skill(id)));
+  const selected = selectCommitPilotClusters(artifact(clusters), skills, {
+    buckets: ["trusted-candidate"],
+  });
+  assert.deepEqual(selected.selected.map((row) => row.cluster.skillMdSha), ["trusted"]);
+  assert.equal(selected.eligibleTrustedCandidateCount, 1);
+  assert.equal(selected.eligibleMediumCount, 1);
+});
+
+test("commit evidence can confirm a trusted candidate", () => {
+  const trustedCandidate: ShaCanonicalCluster = {
+    skillMdSha: "trusted",
+    memberSkillIds: ["trusted/source:a", "copy/repo:a"],
+    canonicalSkillId: "trusted/source:a",
+    confidence: "medium",
+    reason: "trusted-creator",
+  };
+  const result = evaluateCommitEvidence(trustedCandidate, [
+    evidence("trusted/source:a", "2025-01-01T00:00:00Z"),
+    evidence("copy/repo:a", "2025-02-01T00:00:00Z"),
+  ]);
+  assert.equal(result.priorConfidence, "medium");
+  assert.equal(result.result, "confirmed");
 });

@@ -241,7 +241,7 @@ test("exact SHA canonical plan resolves same publisher clusters as high confiden
   ]);
 });
 
-test("exact SHA canonical plan resolves unique trusted owner clusters as high confidence", () => {
+test("exact SHA canonical plan keeps unique trusted owner clusters advisory", () => {
   const plan = buildExactShaCanonicalPlan(
     [
       skill({ id: "random/repo:skill", github_url: "https://github.com/random/repo", skill_md_sha: "same", stars: 500 }),
@@ -252,10 +252,10 @@ test("exact SHA canonical plan resolves unique trusted owner clusters as high co
 
   assert.equal(plan.candidates[0]?.keepId, "openai/codex:skill");
   assert.equal(plan.candidates[0]?.reason, "trusted-owner");
-  assert.equal(plan.candidates[0]?.confidence, "high");
+  assert.equal(plan.candidates[0]?.confidence, "medium");
 });
 
-test("exact SHA canonical plan resolves watched creator aliases as high confidence", () => {
+test("exact SHA canonical plan keeps watched creator aliases advisory", () => {
   const plan = buildExactShaCanonicalPlan(
     [
       skill({ id: "random/repo:skill", github_url: "https://github.com/random/repo", skill_md_sha: "same", stars: 500 }),
@@ -269,7 +269,7 @@ test("exact SHA canonical plan resolves watched creator aliases as high confiden
 
   assert.equal(plan.candidates[0]?.keepId, "old-posthog/posthog:skill");
   assert.equal(plan.candidates[0]?.reason, "trusted-owner");
-  assert.equal(plan.candidates[0]?.confidence, "high");
+  assert.equal(plan.candidates[0]?.confidence, "medium");
 });
 
 test("exact SHA canonical plan resolves clear star leaders as medium confidence", () => {

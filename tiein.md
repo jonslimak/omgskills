@@ -403,19 +403,32 @@ unresolved population is material.
 
 ### ID2.1 - Validate the shadow canonical policy
 
-`in progress`
+`done`
 
-`sha-canonical.ts` and the commit-age audit already produce shadow candidates.
+The shadow policy now separates publishable identity from advisory attribution:
 
-- Review high-confidence same-repo and trusted-creator selections.
-- Define promotion rules separately for high- and medium-confidence candidates.
-- Initially publish only validated high-confidence mappings.
-- Keep unresolved and weak candidates ambiguous.
+- identical SHAs inside one concrete repository are high-confidence and
+  publishable
+- a unique watched/trusted owner in one concrete repository is medium-confidence
+  and advisory; watched status alone is not authorship proof
+- trusted-owner candidates spanning multiple repositories remain ambiguous
+- clear star leaders remain medium-confidence and advisory
+- complete commit-history evidence with a unique lead of at least seven days can
+  support a future reviewed promotion; it does not promote automatically
+- unresolved, tied, weak-lead, and incomplete candidates remain ambiguous
 - Keep canonical data additive; never remove `shaToSkillIds` membership.
 
-Verify: sampled promoted mappings identify the original or authoritative skill,
-all canonical IDs exist in current Crawl 4 output, and each canonical ID belongs
-to its SHA membership list.
+Current shadow measurement: 1,898 clusters; 9 publishable same-repo mappings,
+141 advisory trusted-owner candidates, 195 advisory star-leader candidates, and
+1,553 ambiguous clusters. `crawl4:validate-canonical-policy` reports every
+excluded candidate and verifies that canonical IDs are live, belong to their SHA
+membership list, and match that SHA.
+
+Verification completed: the read-only validator reported zero failures. A
+bounded live commit audit found 2 confirmed, 1 overturned, 2 tied, and 1
+incomplete trusted-owner candidates. The overturned result demonstrated why
+trusted ownership remains advisory. Typecheck and all 338 shadow-guard tests
+pass. No manifest, client, or production output changed.
 
 ### ID2.2 - Publish additive `canonicalBySha`
 
@@ -426,6 +439,7 @@ to its SHA membership list.
 - Preserve the deployed v1 `shaToSkillIds` contract and append-only history.
 - Patch both Crawl 4 and v2 manifests through the existing publisher.
 - Retain current and previous assets for rollback.
+- Initially publish only ID2.1's validated high-confidence same-repo mappings.
 - Do not duplicate canonical fields onto every skill row unless a concrete
   consumer requires it.
 

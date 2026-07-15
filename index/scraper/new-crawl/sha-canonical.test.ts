@@ -44,6 +44,33 @@ test("watched creator and aliases beat a higher-star copy", () => {
   });
   assert.equal(result.clusters[0]?.canonicalSkillId, "old-handle/source:skill");
   assert.equal(result.clusters[0]?.reason, "trusted-creator");
+  assert.equal(result.clusters[0]?.confidence, "medium");
+});
+
+test("trusted creator requires one concrete trusted repository", () => {
+  const result = buildShaCanonicalArtifact([
+    skill("trusted/older:skill", { stars: 1 }),
+    skill("trusted/newer:skill", { stars: 500 }),
+    skill("copy/repo:skill", { stars: 5_000 }),
+  ], "2026-07-09T00:00:00Z", {
+    trustedCanonicalHandles: new Set(["trusted"]),
+  });
+  assert.equal(result.clusters[0]?.canonicalSkillId, null);
+  assert.equal(result.clusters[0]?.confidence, "unresolved");
+  assert.equal(result.clusters[0]?.reason, "ambiguous");
+});
+
+test("trusted aliases in one concrete repository remain advisory", () => {
+  const result = buildShaCanonicalArtifact([
+    skill("trusted/old-id:skill", { github_url: "https://github.com/trusted/current" }),
+    skill("trusted/current:skill", { github_url: "https://github.com/trusted/current" }),
+    skill("copy/repo:skill", { stars: 5_000 }),
+  ], "2026-07-09T00:00:00Z", {
+    trustedCanonicalHandles: new Set(["trusted"]),
+  });
+  assert.equal(result.clusters[0]?.canonicalSkillId, "trusted/current:skill");
+  assert.equal(result.clusters[0]?.confidence, "medium");
+  assert.equal(result.clusters[0]?.reason, "trusted-creator");
 });
 
 test("multiple trusted creators remain unresolved", () => {

@@ -3,7 +3,14 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Skill } from "../types.js";
 import { indexRoot } from "./shadow-path-guard.js";
-import type { ShaCanonicalArtifact, ShaCanonicalCluster } from "./sha-canonical.js";
+import {
+  buildShaCanonicalArtifact,
+  shaCanonicalOptionsFromSeeds,
+  type ShaCanonicalArtifact,
+  type ShaCanonicalCluster,
+  type ShaCanonicalConfidence,
+} from "./sha-canonical.js";
+import { loadTrustedSeeds } from "./seeds.js";
 
 const DEFAULT_MAX_PER_BUCKET = 10;
 const DEFAULT_MAX_MEMBERS = 100;
@@ -43,7 +50,7 @@ export type CommitEvidence = {
 export type CommitPilotClusterResult = {
   skillMdSha: string;
   priorCanonicalSkillId: string | null;
-  priorConfidence: "medium" | "unresolved";
+  priorConfidence: ShaCanonicalConfidence;
   proposedCanonicalSkillId: string | null;
   result: "confirmed" | "overturned" | "resolved" | "weak-lead" | "tie" | "incomplete";
   leadSeconds: number | null;
@@ -54,6 +61,8 @@ type PilotCluster = {
   cluster: ShaCanonicalCluster;
   skills: Skill[];
 };
+
+export type CommitPilotBucket = "trusted-candidate" | "medium" | "unresolved";
 
 type RateLimitClient = {
   rest: {
@@ -94,9 +103,15 @@ function compareClusterPriority(a: ShaCanonicalCluster, b: ShaCanonicalCluster):
 export function selectCommitPilotClusters(
   artifact: ShaCanonicalArtifact,
   skills: Skill[],
-  options: { maxPerBucket?: number; maxMembers?: number; offsetPerBucket?: number } = {},
+  options: {
+    maxPerBucket?: number;
+    maxMembers?: number;
+    offsetPerBucket?: number;
+    buckets?: CommitPilotBucket[];
+  } = {},
 ): {
   selected: PilotCluster[];
+  eligibleTrustedCandidateCount: number;
   eligibleMediumCount: number;
   eligibleUnresolvedCount: number;
   skippedMissingPathCount: number;
@@ -105,14 +120,28 @@ export function selectCommitPilotClusters(
   const maxMembers = options.maxMembers ?? DEFAULT_MAX_MEMBERS;
   const offsetPerBucket = options.offsetPerBucket ?? 0;
   const skillsById = new Map(skills.map((skill) => [skill.id, skill]));
-  const considered = artifact.clusters.filter(
-    (cluster) => cluster.confidence === "medium" || cluster.confidence === "unresolved",
-  );
+  const bucketsToInclude = options.buckets ?? ["medium", "unresolved"];
+  const bucketFor = (cluster: ShaCanonicalCluster): CommitPilotBucket | null => {
+    if (cluster.confidence === "medium" && cluster.reason === "trusted-creator") return "trusted-candidate";
+    if (cluster.confidence === "medium") return "medium";
+    if (cluster.confidence === "unresolved") return "unresolved";
+    return null;
+  };
+  const considered = artifact.clusters.filter((cluster) => {
+    const bucket = bucketFor(cluster);
+    return bucket !== null && bucketsToInclude.includes(bucket);
+  });
   const fetchable = considered.filter((cluster) => isClusterFetchable(cluster, skillsById));
-  const buckets = [
-    fetchable.filter((cluster) => cluster.confidence === "medium").sort(compareClusterPriority),
-    fetchable.filter((cluster) => cluster.confidence === "unresolved").sort(compareClusterPriority),
-  ];
+  const eligibleByBucket = new Map<CommitPilotBucket, ShaCanonicalCluster[]>(
+    (["trusted-candidate", "medium", "unresolved"] as const).map((bucket) => [
+      bucket,
+      artifact.clusters
+        .filter((cluster) => bucketFor(cluster) === bucket)
+        .filter((cluster) => isClusterFetchable(cluster, skillsById))
+        .sort(compareClusterPriority),
+    ]),
+  );
+  const buckets = bucketsToInclude.map((bucket) => eligibleByBucket.get(bucket) ?? []);
   const selected: PilotCluster[] = [];
   let memberCount = 0;
 
@@ -133,8 +162,9 @@ export function selectCommitPilotClusters(
 
   return {
     selected,
-    eligibleMediumCount: buckets[0]!.length,
-    eligibleUnresolvedCount: buckets[1]!.length,
+    eligibleTrustedCandidateCount: eligibleByBucket.get("trusted-candidate")!.length,
+    eligibleMediumCount: eligibleByBucket.get("medium")!.length,
+    eligibleUnresolvedCount: eligibleByBucket.get("unresolved")!.length,
     skippedMissingPathCount: considered.length - fetchable.length,
   };
 }
@@ -242,7 +272,7 @@ export function evaluateCommitEvidence(
     return {
       skillMdSha: cluster.skillMdSha,
       priorCanonicalSkillId: cluster.canonicalSkillId,
-      priorConfidence: cluster.confidence as "medium" | "unresolved",
+      priorConfidence: cluster.confidence,
       proposedCanonicalSkillId: null,
       result: "incomplete",
       leadSeconds: null,
@@ -272,7 +302,7 @@ export function evaluateCommitEvidence(
   return {
     skillMdSha: cluster.skillMdSha,
     priorCanonicalSkillId: cluster.canonicalSkillId,
-    priorConfidence: cluster.confidence as "medium" | "unresolved",
+    priorConfidence: cluster.confidence,
     proposedCanonicalSkillId,
     result,
     leadSeconds,
@@ -288,6 +318,17 @@ function integerArg(argv: string[], name: string, fallback: number): number {
     throw new Error(`${name} must be a non-negative integer`);
   }
   return value;
+}
+
+function bucketArgs(argv: string[]): CommitPilotBucket[] {
+  const raw = argv.find((arg) => arg.startsWith("--buckets="));
+  if (!raw) return ["medium", "unresolved"];
+  const values = raw.slice("--buckets=".length).split(",").filter(Boolean);
+  const allowed = new Set<CommitPilotBucket>(["trusted-candidate", "medium", "unresolved"]);
+  if (values.length === 0 || values.some((value) => !allowed.has(value as CommitPilotBucket))) {
+    throw new Error("--buckets must contain trusted-candidate, medium, and/or unresolved");
+  }
+  return [...new Set(values)] as CommitPilotBucket[];
 }
 
 async function assertPilotQuota(client: RateLimitClient, estimatedRequests: number): Promise<{
@@ -315,14 +356,17 @@ function sleep(ms: number): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const artifact = JSON.parse(
-    readFileSync(join(indexRoot, "shadow", "sha-canonical.shadow.json"), "utf8"),
-  ) as ShaCanonicalArtifact;
   const skills = JSON.parse(
     readFileSync(join(indexRoot, "shadow", "skills.cutover.shadow.json"), "utf8"),
   ) as Skill[];
+  const artifact = buildShaCanonicalArtifact(
+    skills,
+    new Date().toISOString(),
+    shaCanonicalOptionsFromSeeds(loadTrustedSeeds()),
+  );
   const offsetPerBucket = integerArg(process.argv.slice(2), "--offset-per-bucket", 0);
-  const selection = selectCommitPilotClusters(artifact, skills, { offsetPerBucket });
+  const buckets = bucketArgs(process.argv.slice(2));
+  const selection = selectCommitPilotClusters(artifact, skills, { offsetPerBucket, buckets });
   const selectedMemberCount = selection.selected.reduce((sum, row) => sum + row.skills.length, 0);
   const estimatedRequests = selectedMemberCount * 2;
   const { octokit } = await import("../client.js");
@@ -365,7 +409,9 @@ async function main(): Promise<void> {
       maxPerBucket: DEFAULT_MAX_PER_BUCKET,
       maxMembers: DEFAULT_MAX_MEMBERS,
       offsetPerBucket,
+      buckets,
       minimumCanonicalLeadSeconds: MINIMUM_CANONICAL_LEAD_SECONDS,
+      eligibleTrustedCandidateCount: selection.eligibleTrustedCandidateCount,
       eligibleMediumCount: selection.eligibleMediumCount,
       eligibleUnresolvedCount: selection.eligibleUnresolvedCount,
       skippedMissingPathCount: selection.skippedMissingPathCount,

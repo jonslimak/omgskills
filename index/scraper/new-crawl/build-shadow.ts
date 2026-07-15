@@ -32,7 +32,7 @@ import { buildCatalogAdmissionSample } from "./catalog-admission.js";
 import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
 import { isDoNotCrawlRepo, removeDoNotCrawlState } from "./do-not-crawl.js";
 import { filterSuppressedSkills } from "./suppressed-skills.js";
-import { buildShaCanonicalArtifact } from "./sha-canonical.js";
+import { buildShaCanonicalArtifact, shaCanonicalOptionsFromSeeds } from "./sha-canonical.js";
 import { applyQualityTiers, stripQualityTiers, summarizeQualityTiers } from "./quality-tier.js";
 import {
   applyShadowSkillOverlay,
@@ -2187,14 +2187,11 @@ async function main() {
   );
   const qualityTierSummary = summarizeQualityTiers(cutoverShadowSkills);
   const shaCanonicalStart = performance.now();
-  const shaCanonicalArtifact = buildShaCanonicalArtifact(cutoverShadowSkills, checkedAt, {
-    trustedCanonicalHandles: new Set([
-      ...seeds.trustedVendorHandles,
-      ...(seeds.watchedCreatorHandles ?? []),
-    ]),
-    aliasToCanonicalHandle: seeds.creatorAliasToCanonicalHandle,
-    catalogRepos: new Set(seeds.catalogRepoRules.map((rule) => rule.repo)),
-  });
+  const shaCanonicalArtifact = buildShaCanonicalArtifact(
+    cutoverShadowSkills,
+    checkedAt,
+    shaCanonicalOptionsFromSeeds(seeds),
+  );
   timings.buildShaCanonical = Math.round(performance.now() - shaCanonicalStart);
 
   const shadowRepoOverlay: ShadowRepoOverlay | null = shouldWriteShadowRepoOverlay(cadence)

@@ -1,4 +1,5 @@
 import type { Skill } from "../types.js";
+import type { TrustedSeeds } from "./types.js";
 
 export type ShaCanonicalSkill = Pick<
   Skill,
@@ -40,6 +41,17 @@ export type ShaCanonicalOptions = {
   aliasToCanonicalHandle?: Map<string, string>;
   catalogRepos?: Set<string>;
 };
+
+export function shaCanonicalOptionsFromSeeds(seeds: TrustedSeeds): ShaCanonicalOptions {
+  return {
+    trustedCanonicalHandles: new Set([
+      ...seeds.trustedVendorHandles,
+      ...(seeds.watchedCreatorHandles ?? []),
+    ]),
+    aliasToCanonicalHandle: seeds.creatorAliasToCanonicalHandle,
+    catalogRepos: new Set(seeds.catalogRepoRules.map((rule) => rule.repo)),
+  };
+}
 
 function normalize(value: string | null | undefined): string {
   return (value ?? "").trim().toLowerCase();
@@ -102,9 +114,15 @@ function resolveCluster(
     const trustedRows = nonCatalogRows.filter(
       (skill) => canonicalOwner(skill, options.aliasToCanonicalHandle) === trustedOwner,
     );
+    const trustedRepos = new Set(
+      trustedRows.map((skill) => repoFromGithubUrl(skill.github_url)).filter(Boolean),
+    );
+    if (trustedRepos.size !== 1) {
+      return { canonicalSkillId: null, confidence: "unresolved", reason: "ambiguous" };
+    }
     return {
       canonicalSkillId: [...trustedRows].sort(compareRepresentative)[0]!.id,
-      confidence: "high",
+      confidence: "medium",
       reason: "trusted-creator",
     };
   }
