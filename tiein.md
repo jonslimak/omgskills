@@ -430,6 +430,10 @@ incomplete trusted-owner candidates. The overturned result demonstrated why
 trusted ownership remains advisory. Typecheck and all 338 shadow-guard tests
 pass. No manifest, client, or production output changed.
 
+Release gate: completed identity tasks may be landed and pushed independently,
+but do not deploy canonical identity changes or release a client update until
+ID2.2 and ID2.3 are both complete and verified together.
+
 ### ID2.2 - Publish additive `canonicalBySha`
 
 `todo`
