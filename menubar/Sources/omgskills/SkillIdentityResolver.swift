@@ -23,20 +23,25 @@ struct SkillIdentityMeasurement: Equatable, Sendable {
 
 struct SkillIdentityResolver: Sendable {
     private let catalogIds: Set<String>
-    private let catalogByNormalizedRepoAndName: [String: Skill]
+    private let catalogByNormalizedRepoAndPath: [String: [String]]
+    private let catalogByNormalizedRepoAndName: [String: [String]]
     private let shaHistory: [String: [String]]
 
     init(catalogSkills: [Skill], shaHistory: ShaHistoryAsset?) {
         let catalogIds = Set(catalogSkills.map(\.id))
         self.catalogIds = catalogIds
 
-        var byRepoAndName: [String: Skill] = [:]
+        var byRepoAndPath: [String: Set<String>] = [:]
+        var byRepoAndName: [String: Set<String>] = [:]
         for skill in catalogSkills {
             guard let repo = Self.normalizedRepo(from: skill.githubUrl) else { continue }
+            let path = Self.normalizedRelativePath(Self.catalogRelativePath(from: skill.id))
             let name = Self.normalizedName(skill.name)
-            byRepoAndName["\(repo):\(name)"] = skill
+            byRepoAndPath["\(repo):\(path)", default: []].insert(skill.id)
+            byRepoAndName["\(repo):\(name)", default: []].insert(skill.id)
         }
-        catalogByNormalizedRepoAndName = byRepoAndName
+        catalogByNormalizedRepoAndPath = byRepoAndPath.mapValues { $0.sorted() }
+        catalogByNormalizedRepoAndName = byRepoAndName.mapValues { $0.sorted() }
 
         var validShaHistory: [String: [String]] = [:]
         for (sha, ids) in shaHistory?.shaToSkillIds ?? [:] {
@@ -75,19 +80,49 @@ struct SkillIdentityResolver: Sendable {
             return (catalogSkillId, .resolved(method: .provenance))
         }
 
+        var ambiguousGitIds: [String] = []
         if let repo = Self.normalizedRepo(from: skill.githubUrl) {
-            let key = "\(repo):\(Self.normalizedName(skill.name))"
-            if let matched = catalogByNormalizedRepoAndName[key] {
-                return (matched.id, .resolved(method: .git))
+            if let relativePath = skill.gitRelativePath {
+                let pathKey = "\(repo):\(Self.normalizedRelativePath(relativePath))"
+                let pathMatches = catalogByNormalizedRepoAndPath[pathKey] ?? []
+                if pathMatches.count == 1, let id = pathMatches.first {
+                    return (id, .resolved(method: .git))
+                }
+                if !pathMatches.isEmpty {
+                    ambiguousGitIds = pathMatches
+                }
+            }
+
+            if ambiguousGitIds.isEmpty {
+                let nameKey = "\(repo):\(Self.normalizedName(skill.name))"
+                let nameMatches = catalogByNormalizedRepoAndName[nameKey] ?? []
+                if nameMatches.count == 1, let id = nameMatches.first {
+                    return (id, .resolved(method: .git))
+                }
+                ambiguousGitIds = nameMatches
             }
         }
 
         if let sha = skill.skillMdSha?.lowercased(),
            let ids = shaHistory[sha] {
-            if ids.count == 1, let id = ids.first {
+            let compatibleIds: [String]
+            if ambiguousGitIds.isEmpty {
+                compatibleIds = ids
+            } else {
+                let gitIds = Set(ambiguousGitIds)
+                compatibleIds = ids.filter(gitIds.contains)
+            }
+
+            if compatibleIds.count == 1, let id = compatibleIds.first {
                 return (id, .resolved(method: .sha))
             }
-            return (nil, .ambiguous(skillIds: ids))
+            if compatibleIds.count > 1 {
+                return (nil, .ambiguous(skillIds: compatibleIds))
+            }
+        }
+
+        if !ambiguousGitIds.isEmpty {
+            return (nil, .ambiguous(skillIds: ambiguousGitIds))
         }
 
         return (nil, .localOnly)
@@ -114,6 +149,22 @@ struct SkillIdentityResolver: Sendable {
     static func normalizedName(_ value: String) -> String {
         value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
+
+    static func catalogRelativePath(from catalogSkillId: String) -> String {
+        guard let separator = catalogSkillId.firstIndex(of: ":") else { return "." }
+        return String(catalogSkillId[catalogSkillId.index(after: separator)...])
+    }
+
+    static func normalizedRelativePath(_ value: String) -> String {
+        var path = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if path.hasPrefix("./") {
+            path.removeFirst(2)
+        }
+        while path.count > 1, path.hasSuffix("/") {
+            path.removeLast()
+        }
+        return path.isEmpty ? "." : path.lowercased()
+    }
 }
 
 private extension Skill {
@@ -137,6 +188,7 @@ private extension Skill {
             origin: origin,
             isSymlink: isSymlink,
             isLocalOnly: isLocalOnly,
+            gitRelativePath: gitRelativePath,
             publisherHandle: publisherHandle,
             publisherRepo: publisherRepo,
             provenanceType: provenanceType,

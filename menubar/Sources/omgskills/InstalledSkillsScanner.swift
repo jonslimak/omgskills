@@ -21,6 +21,11 @@ struct InstalledSkillSummary: Equatable, Sendable {
 enum InstalledSkillsScanner {
     private static let recentSkillLimit = 10
 
+    private struct GitLocation {
+        let githubURL: String
+        let relativePath: String
+    }
+
     struct ScanResult: Equatable, Sendable {
         let skills: [Skill]
         let installations: [Skill]
@@ -119,7 +124,8 @@ enum InstalledSkillsScanner {
         let iso = ISO8601DateFormatter()
         iso.formatOptions = [.withInternetDateTime]
 
-        let githubUrl = resolveGithubUrl(dir: dir)
+        let gitLocation = resolveGitLocation(dir: dir)
+        let githubUrl = gitLocation?.githubURL ?? ""
         let authorHandle = githubUrl.split(separator: "/").dropLast().last.map(String.init) ?? ""
         let isLocalOnly = !isSymlink && githubUrl.isEmpty
 
@@ -142,6 +148,7 @@ enum InstalledSkillsScanner {
             origin: origin,
             isSymlink: isSymlink,
             isLocalOnly: isLocalOnly,
+            gitRelativePath: gitLocation?.relativePath,
             catalogSkillId: provenance?.catalogSkillId
         )
     }
@@ -154,11 +161,11 @@ enum InstalledSkillsScanner {
         return (try? Yams.load(yaml: block)) as? [String: Any]
     }
 
-    private static func resolveGithubUrl(dir: URL) -> String {
+    private static func resolveGitLocation(dir: URL) -> GitLocation? {
         let resolved = dir.resolvingSymlinksInPath()
-        guard let gitRoot = enclosingGitRoot(from: resolved) else { return "" }
+        guard let gitRoot = enclosingGitRoot(from: resolved) else { return nil }
         let gitConfig = gitRoot.appendingPathComponent(".git/config")
-        guard let content = try? String(contentsOf: gitConfig, encoding: .utf8) else { return "" }
+        guard let content = try? String(contentsOf: gitConfig, encoding: .utf8) else { return nil }
         for line in content.components(separatedBy: "\n") {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             guard trimmed.hasPrefix("url = ") else { continue }
@@ -167,9 +174,24 @@ enum InstalledSkillsScanner {
                 url = url.replacingOccurrences(of: "git@github.com:", with: "https://github.com/")
             }
             if url.hasSuffix(".git") { url = String(url.dropLast(4)) }
-            if url.contains("github.com") { return url }
+            if url.contains("github.com"),
+               let relativePath = relativePath(from: gitRoot, to: resolved) {
+                return GitLocation(githubURL: url, relativePath: relativePath)
+            }
         }
-        return ""
+        return nil
+    }
+
+    private static func relativePath(from root: URL, to directory: URL) -> String? {
+        let rootComponents = root.standardizedFileURL.pathComponents
+        let directoryComponents = directory.standardizedFileURL.pathComponents
+        guard directoryComponents.count >= rootComponents.count,
+              Array(directoryComponents.prefix(rootComponents.count)) == rootComponents else {
+            return nil
+        }
+
+        let relativeComponents = directoryComponents.dropFirst(rootComponents.count)
+        return relativeComponents.isEmpty ? "." : relativeComponents.joined(separator: "/")
     }
 
     private static func enclosingGitRoot(from directory: URL) -> URL? {

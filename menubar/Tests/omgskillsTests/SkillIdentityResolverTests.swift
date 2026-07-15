@@ -39,6 +39,89 @@ struct SkillIdentityResolverTests {
         #expect(result.status == .resolved(method: .git))
     }
 
+    @Test func exactNestedGitPathResolvesBeforeDuplicateName() {
+        let catalog = [
+            skill(id: "owner/repo:skills/first", name: "shared", githubUrl: "https://github.com/owner/repo"),
+            skill(id: "owner/repo:skills/second", name: "shared", githubUrl: "https://github.com/owner/repo")
+        ]
+        let installed = installedSkill(
+            name: "shared",
+            githubUrl: "https://github.com/owner/repo",
+            gitRelativePath: "skills/second"
+        )
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: nil).resolve(installed)
+
+        #expect(result.catalogSkillId == "owner/repo:skills/second")
+        #expect(result.status == .resolved(method: .git))
+    }
+
+    @Test func rootGitPathMatchesCatalogIDWithoutSuffix() {
+        let catalog = [
+            skill(id: "owner/repo", name: "root-skill", githubUrl: "https://github.com/owner/repo")
+        ]
+        let installed = installedSkill(
+            name: "root-skill",
+            githubUrl: "https://github.com/owner/repo",
+            gitRelativePath: "."
+        )
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: nil).resolve(installed)
+
+        #expect(result.catalogSkillId == "owner/repo")
+        #expect(result.status == .resolved(method: .git))
+    }
+
+    @Test func leadingDotGitPathIsPreservedAndComparedCaseInsensitively() {
+        let catalog = [
+            skill(
+                id: "Owner/Repo:.Claude/Skills/Foo",
+                name: "foo",
+                githubUrl: "https://github.com/Owner/Repo"
+            )
+        ]
+        let installed = installedSkill(
+            name: "different-local-name",
+            githubUrl: "https://github.com/owner/repo",
+            gitRelativePath: ".claude/skills/foo"
+        )
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: nil).resolve(installed)
+
+        #expect(result.catalogSkillId == "Owner/Repo:.Claude/Skills/Foo")
+        #expect(result.status == .resolved(method: .git))
+    }
+
+    @Test func pathMissFallsBackToUniqueRepoAndName() {
+        let catalog = [
+            skill(id: "owner/repo:skills/new-path", name: "moved", githubUrl: "https://github.com/owner/repo")
+        ]
+        let installed = installedSkill(
+            name: "moved",
+            githubUrl: "https://github.com/owner/repo",
+            gitRelativePath: "skills/old-path"
+        )
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: nil).resolve(installed)
+
+        #expect(result.catalogSkillId == "owner/repo:skills/new-path")
+        #expect(result.status == .resolved(method: .git))
+    }
+
+    @Test func duplicateRepoAndNameIsOrderIndependentAndAmbiguous() {
+        let first = skill(id: "owner/repo:skills/a", name: "shared", githubUrl: "https://github.com/owner/repo")
+        let second = skill(id: "owner/repo:skills/b", name: "shared", githubUrl: "https://github.com/owner/repo")
+        let installed = installedSkill(name: "shared", githubUrl: "https://github.com/owner/repo")
+
+        let forward = SkillIdentityResolver(catalogSkills: [first, second], shaHistory: nil).resolve(installed)
+        let reversed = SkillIdentityResolver(catalogSkills: [second, first], shaHistory: nil).resolve(installed)
+
+        let expected = SkillIdentityStatus.ambiguous(skillIds: ["owner/repo:skills/a", "owner/repo:skills/b"])
+        #expect(forward.catalogSkillId == nil)
+        #expect(forward.status == expected)
+        #expect(reversed.status == expected)
+    }
+
     @Test func uniqueShaResolves() {
         let sha = "2222222222222222222222222222222222222222"
         let catalog = [skill(id: "owner/repo:example", name: "different", githubUrl: "https://github.com/owner/repo")]
@@ -49,6 +132,71 @@ struct SkillIdentityResolverTests {
 
         #expect(result.catalogSkillId == "owner/repo:example")
         #expect(result.status == .resolved(method: .sha))
+    }
+
+    @Test func gitMissLeavesUniqueShaUnrestrictedForRenamedRepo() {
+        let sha = "2323232323232323232323232323232323232323"
+        let catalog = [skill(id: "owner/old-repo:example", name: "example", githubUrl: "https://github.com/owner/old-repo")]
+        let history = ShaHistoryAsset(version: 1, generatedAt: nil, shaToSkillIds: [sha: ["owner/old-repo:example"]])
+        let installed = installedSkill(
+            name: "example",
+            githubUrl: "https://github.com/owner/new-repo",
+            gitRelativePath: "skills/example",
+            skillMdSha: sha
+        )
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(installed)
+
+        #expect(result.catalogSkillId == "owner/old-repo:example")
+        #expect(result.status == .resolved(method: .sha))
+    }
+
+    @Test func ambiguousGitCandidatesAreResolvedBySingletonShaIntersection() {
+        let sha = "2424242424242424242424242424242424242424"
+        let catalog = [
+            skill(id: "owner/repo:skills/a", name: "shared", githubUrl: "https://github.com/owner/repo"),
+            skill(id: "owner/repo:skills/b", name: "shared", githubUrl: "https://github.com/owner/repo")
+        ]
+        let history = ShaHistoryAsset(version: 1, generatedAt: nil, shaToSkillIds: [sha: ["owner/repo:skills/b"]])
+        let installed = installedSkill(name: "shared", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(installed)
+
+        #expect(result.catalogSkillId == "owner/repo:skills/b")
+        #expect(result.status == .resolved(method: .sha))
+    }
+
+    @Test func disjointShaDoesNotOverrideAmbiguousGitCandidates() {
+        let sha = "2525252525252525252525252525252525252525"
+        let catalog = [
+            skill(id: "owner/repo:skills/a", name: "shared", githubUrl: "https://github.com/owner/repo"),
+            skill(id: "owner/repo:skills/b", name: "shared", githubUrl: "https://github.com/owner/repo"),
+            skill(id: "other/repo:skill", name: "other", githubUrl: "https://github.com/other/repo")
+        ]
+        let history = ShaHistoryAsset(version: 1, generatedAt: nil, shaToSkillIds: [sha: ["other/repo:skill"]])
+        let installed = installedSkill(name: "shared", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(installed)
+
+        #expect(result.catalogSkillId == nil)
+        #expect(result.status == .ambiguous(skillIds: ["owner/repo:skills/a", "owner/repo:skills/b"]))
+    }
+
+    @Test func multiIDShaIntersectionRemainsAmbiguous() {
+        let sha = "2626262626262626262626262626262626262626"
+        let catalog = [
+            skill(id: "owner/repo:skills/a", name: "shared", githubUrl: "https://github.com/owner/repo"),
+            skill(id: "owner/repo:skills/b", name: "shared", githubUrl: "https://github.com/owner/repo")
+        ]
+        let history = ShaHistoryAsset(version: 1, generatedAt: nil, shaToSkillIds: [sha: [
+            "owner/repo:skills/b", "owner/repo:skills/a"
+        ]])
+        let installed = installedSkill(name: "shared", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(installed)
+
+        #expect(result.catalogSkillId == nil)
+        #expect(result.status == .ambiguous(skillIds: ["owner/repo:skills/a", "owner/repo:skills/b"]))
     }
 
     @Test func multiIDShaReturnsAmbiguous() {
@@ -109,10 +257,28 @@ struct SkillIdentityResolverTests {
         #expect(result.measurement.localOnly == 1)
     }
 
+    @Test func skillWithoutGitRelativePathStillDecodes() throws {
+        let original = installedSkill(
+            name: "example",
+            githubUrl: "https://github.com/owner/repo",
+            gitRelativePath: "skills/example"
+        )
+        let encoded = try JSONEncoder().encode(original)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "gitRelativePath")
+        let legacyData = try JSONSerialization.data(withJSONObject: object)
+
+        let decoded = try JSONDecoder().decode(Skill.self, from: legacyData)
+
+        #expect(decoded.gitRelativePath == nil)
+        #expect(decoded.id == original.id)
+    }
+
     private func installedSkill(
         name: String,
         githubUrl: String,
         catalogSkillId: String? = nil,
+        gitRelativePath: String? = nil,
         skillMdSha: String? = nil
     ) -> Skill {
         skill(
@@ -121,7 +287,8 @@ struct SkillIdentityResolverTests {
             githubUrl: githubUrl,
             skillMdSha: skillMdSha,
             origin: "Claude",
-            catalogSkillId: catalogSkillId
+            catalogSkillId: catalogSkillId,
+            gitRelativePath: gitRelativePath
         )
     }
 
@@ -131,7 +298,8 @@ struct SkillIdentityResolverTests {
         githubUrl: String,
         skillMdSha: String? = nil,
         origin: String? = nil,
-        catalogSkillId: String? = nil
+        catalogSkillId: String? = nil,
+        gitRelativePath: String? = nil
     ) -> Skill {
         Skill(
             id: id,
@@ -152,6 +320,7 @@ struct SkillIdentityResolverTests {
             origin: origin,
             isSymlink: nil,
             isLocalOnly: nil,
+            gitRelativePath: gitRelativePath,
             catalogSkillId: catalogSkillId
         )
     }

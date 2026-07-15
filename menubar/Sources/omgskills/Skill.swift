@@ -26,6 +26,7 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
     let origin: String?  // "Claude" | "Codex" | "Agents" — set for installed skills only
     let isSymlink: Bool?
     let isLocalOnly: Bool?
+    let gitRelativePath: String?
     let publisherHandle: String?
     let publisherRepo: String?
     let provenanceType: String?
@@ -63,6 +64,7 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         origin: String?,
         isSymlink: Bool?,
         isLocalOnly: Bool?,
+        gitRelativePath: String? = nil,
         publisherHandle: String? = nil,
         publisherRepo: String? = nil,
         provenanceType: String? = nil,
@@ -99,6 +101,7 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         self.origin = origin
         self.isSymlink = isSymlink
         self.isLocalOnly = isLocalOnly
+        self.gitRelativePath = gitRelativePath
         self.publisherHandle = publisherHandle
         self.publisherRepo = publisherRepo
         self.provenanceType = provenanceType
@@ -140,6 +143,7 @@ extension Skill {
             origin: origin,
             isSymlink: isSymlink,
             isLocalOnly: isLocalOnly,
+            gitRelativePath: gitRelativePath,
             publisherHandle: publisherHandle,
             publisherRepo: publisherRepo,
             provenanceType: provenanceType,

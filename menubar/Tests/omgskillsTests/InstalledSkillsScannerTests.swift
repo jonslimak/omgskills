@@ -91,6 +91,30 @@ struct InstalledSkillsScannerTests {
 
         #expect(result.installations.first?.githubUrl == "https://github.com/Owner/Repo")
         #expect(result.installations.first?.authorHandle == "Owner")
+        #expect(result.installations.first?.gitRelativePath == "skills/design")
+    }
+
+    @Test func scanRecordsDotForSkillAtGitRoot() throws {
+        let root = try temporaryDirectory()
+        let codex = root.appendingPathComponent("codex", isDirectory: true)
+        let repo = root.appendingPathComponent("repo", isDirectory: true)
+        try FileManager.default.createDirectory(at: codex, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: repo.appendingPathComponent(".git", isDirectory: true), withIntermediateDirectories: true)
+        try """
+        [remote "origin"]
+            url = https://github.com/owner/root-skill.git
+        """.write(to: repo.appendingPathComponent(".git/config"), atomically: true, encoding: .utf8)
+        try writeSkill(at: repo, name: "root-skill")
+        try FileManager.default.createSymbolicLink(
+            at: codex.appendingPathComponent("root-skill"),
+            withDestinationURL: repo
+        )
+
+        let result = InstalledSkillsScanner.scan(roots: [
+            InstalledSkillsScanner.Root(url: codex, origin: "Codex")
+        ])
+
+        #expect(result.installations.first?.gitRelativePath == ".")
     }
 
     @Test func scanReadsInstallProvenanceMetadata() throws {
