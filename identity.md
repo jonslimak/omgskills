@@ -55,7 +55,10 @@ Many pre-existing installs are symlinks into a cloned repo, or live inside one. 
 - follow the symlink to its target
 - find the enclosing `.git`
 - read `remote origin` → `owner/repo`
-- combine with the skill folder name → catalog ID
+- combine `owner/repo` with the skill path relative to the Git root; `.` maps to
+  the repo-level catalog ID
+- if the exact path misses, use the frontmatter name only when it identifies one
+  catalog skill in that repo
 
 Exact, offline, zero network. Likely resolves a large share of pre-existing installs, because `git clone` was the default install method before the tool existed.
 
@@ -149,9 +152,16 @@ Note the missing link between the first two: one file identity can belong to **m
 
 The skill groups dashboard solved this locally (`groupSyncedSkills` in `portal/src/main.tsx`):
 
-- hard gate: normalized name equality
-- then: same `githubUrl`, or fuzzy description match (exact / containment / word-overlap ≥ 72–80%)
-- display merge: prefer codex variant as representative, longest description, union of sources, all underlying IDs kept
+1. Normalize names and descriptions by lowercasing, collapsing whitespace, and trimming. Names must match exactly after normalization.
+2. After the name gate, merge when both non-empty `githubUrl` values match exactly, or when the candidate description matches any description already in the group.
+3. Description matching uses this order:
+   - exact normalized equality
+   - containment when the shorter normalized description is at least 35 characters
+   - word overlap after replacing non-alphanumeric characters with spaces, dropping words of two characters or fewer, and deduplicating words into sets
+4. Word overlap divides shared words by the smaller set size. Require at least `0.80` for sets of 3–4 words, reject sets below 3 words, and require at least `0.72` for sets of 5 or more words.
+5. Display merge prefers the first Codex variant, then the first variant with a GitHub URL, then source-name order. Use the longest description, sorted unique sources, and retain every underlying synced-skill ID.
+
+This is the shared local-scope rule. Any Swift merged view must reproduce the same normalization, gate order, thresholds, and representative selection. Catalog-wide grouping must not reuse this fuzzy rule.
 
 ### Why the heuristic cannot be generalized as-is
 
@@ -232,7 +242,7 @@ Resolution is one user's installed skills (typically 5–50) against lookup tabl
 Current implementation status and remaining order:
 
 1. **Done: verify hash compatibility** — Swift and Node use the same raw-byte Git blob SHA contract and known test vector
-2. **Done: ship the exact ladder in the client scanner** — install provenance, Git inspection, and SHA lookup resolve locally; multi-ID matches remain ambiguous
+2. **Done: ship the exact ladder in the client scanner** — install provenance, path-aware Git inspection, and SHA lookup resolve locally; Git/SHA candidate intersections prevent ambiguous matches from becoming silent guesses
 3. **Done: publish SHA history** — the v1 asset exists with `shaToSkillIds` and scheduled publishes append new mappings without rewriting unchanged assets
 4. **Canonical attribution** (`crawl-audit.md` Phase 3.1) — pick the original author's copy per duplicate cluster; annotate the sha index with `canonicalId`, upgrading ambiguous resolutions to resolved. Before or alongside this step is fine; it must land before multi-id hash matches are treated as authoritative
 5. **Add the confirm-once fuzzy UX** — only after measuring how much steps 1–4 leave unresolved
