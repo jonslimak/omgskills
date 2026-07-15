@@ -408,9 +408,11 @@ enum DataRefreshService {
                 print("[DataRefreshService] shaHistory refresh failed: \(error)")
             }
         } else if manifest.shaHistory == nil,
-                  (cachedData(for: .shaHistory, track: track) != nil || metadata.activeShaHistoryHash != nil) {
-            removeCachedData(for: .shaHistory, track: track)
-            metadata.activeShaHistoryHash = nil
+                  clearOmittedOptionalAssetIfNeeded(
+                    activeHash: &metadata.activeShaHistoryHash,
+                    hasCachedData: cachedData(for: .shaHistory, track: track) != nil,
+                    removeCache: { removeCachedData(for: .shaHistory, track: track) }
+                  ) {
             didUpdate = true
         }
 
@@ -442,6 +444,17 @@ enum DataRefreshService {
                 now: now
             )
         }
+    }
+
+    static func clearOmittedOptionalAssetIfNeeded(
+        activeHash: inout String?,
+        hasCachedData: Bool,
+        removeCache: () -> Void
+    ) -> Bool {
+        guard hasCachedData || activeHash != nil else { return false }
+        removeCache()
+        activeHash = nil
+        return true
     }
 
     static func shouldThrottleBackgroundRefresh(

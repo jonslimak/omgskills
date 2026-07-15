@@ -239,7 +239,18 @@ struct DataRefreshServiceTests {
         #expect(decodedWith.collections?.sha256 == "def")
     }
 
-    @Test func manifestDecodesWithShaHistory() throws {
+    @Test func manifestDecodesWithAndWithoutShaHistory() throws {
+        let manifestWithoutShaHistory = """
+        {
+          "version": 2,
+          "generatedAt": "2026-07-03T00:00:00Z",
+          "skills": { "path": "skills.json", "sha256": "abc", "bytes": 10 }
+        }
+        """.data(using: .utf8)!
+        let decodedWithout = try JSONDecoder().decode(DataRefreshService.Manifest.self, from: manifestWithoutShaHistory)
+
+        #expect(decodedWithout.shaHistory == nil)
+
         let manifestWithShaHistory = """
         {
           "version": 2,
@@ -252,6 +263,55 @@ struct DataRefreshServiceTests {
 
         #expect(decoded.shaHistory?.path == "sha-history-def.json")
         #expect(decoded.shaHistory?.sha256 == "def")
+    }
+
+    @Test func omittedShaHistoryClearsItsCachedState() {
+        var activeHash: String? = "sha-history-hash"
+        var removedCache = false
+
+        let changed = DataRefreshService.clearOmittedOptionalAssetIfNeeded(
+            activeHash: &activeHash,
+            hasCachedData: true,
+            removeCache: { removedCache = true }
+        )
+
+        #expect(changed)
+        #expect(removedCache)
+        #expect(activeHash == nil)
+    }
+
+    @Test func absentShaHistoryStateDoesNotReportAnUpdate() {
+        var activeHash: String?
+        var removedCache = false
+
+        let changed = DataRefreshService.clearOmittedOptionalAssetIfNeeded(
+            activeHash: &activeHash,
+            hasCachedData: false,
+            removeCache: { removedCache = true }
+        )
+
+        #expect(!changed)
+        #expect(!removedCache)
+        #expect(activeHash == nil)
+    }
+
+    @Test func optionalShaHistoryDoesNotAffectBootstrapOrTrackFallback() {
+        let state = DataRefreshService.BootstrapState(
+            hasSkillsCache: true,
+            hasActiveSkillsHash: true,
+            expectsTrending: false,
+            hasTrendingCache: false,
+            hasActiveTrendingHash: false
+        )
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        #expect(!state.isIncomplete)
+        #expect(DataRefreshService.refreshTracks(
+            mode: .crawl4PrimaryWithV2Fallback,
+            userDefaults: defaults
+        ) == [.crawl4, .productionV2])
     }
 
     @Test func missingSkillsCacheBypassesThrottle() {

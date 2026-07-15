@@ -1,10 +1,40 @@
 import CryptoKit
 import Foundation
 
+struct CanonicalShaEntry: Codable, Equatable, Sendable {
+    let skillId: String
+    let confidence: String
+    let reason: String
+}
+
 struct ShaHistoryAsset: Codable, Sendable {
     let version: Int
     let generatedAt: String?
     let shaToSkillIds: [String: [String]]
+    let canonicalBySha: [String: CanonicalShaEntry]?
+
+    init(
+        version: Int,
+        generatedAt: String?,
+        shaToSkillIds: [String: [String]],
+        canonicalBySha: [String: CanonicalShaEntry]? = nil
+    ) {
+        self.version = version
+        self.generatedAt = generatedAt
+        self.shaToSkillIds = shaToSkillIds
+        self.canonicalBySha = canonicalBySha
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decode(Int.self, forKey: .version)
+        generatedAt = try container.decodeIfPresent(String.self, forKey: .generatedAt)
+        shaToSkillIds = try container.decode([String: [String]].self, forKey: .shaToSkillIds)
+        canonicalBySha = try? container.decodeIfPresent(
+            [String: CanonicalShaEntry].self,
+            forKey: .canonicalBySha
+        )
+    }
 }
 
 struct SkillInstallProvenance: Codable, Equatable, Sendable {
@@ -30,6 +60,7 @@ struct SkillIdentityResolver: Sendable {
     private let catalogByNormalizedRepoAndPath: [String: [String]]
     private let catalogByNormalizedRepoAndName: [String: [String]]
     private let shaHistory: [String: [String]]
+    private let canonicalSkillIdBySha: [String: String]
 
     init(catalogSkills: [Skill], shaHistory: ShaHistoryAsset?) {
         let catalogIds = Set(catalogSkills.map(\.id))
@@ -55,6 +86,26 @@ struct SkillIdentityResolver: Sendable {
             }
         }
         self.shaHistory = validShaHistory
+
+        var catalogShaById: [String: String] = [:]
+        for skill in catalogSkills {
+            if let sha = skill.skillMdSha?.lowercased() {
+                catalogShaById[skill.id] = sha
+            }
+        }
+        var validCanonicalIds: [String: String] = [:]
+        for (sha, entry) in shaHistory?.canonicalBySha ?? [:] {
+            guard Self.isGitBlobSHA(sha),
+                  entry.confidence == "high",
+                  entry.reason == "same-repo",
+                  shaHistory?.shaToSkillIds[sha]?.contains(entry.skillId) == true,
+                  catalogIds.contains(entry.skillId),
+                  catalogShaById[entry.skillId] == sha else {
+                continue
+            }
+            validCanonicalIds[sha] = entry.skillId
+        }
+        canonicalSkillIdBySha = validCanonicalIds
     }
 
     func resolve(_ skills: [Skill]) -> (skills: [Skill], measurement: SkillIdentityMeasurement) {
@@ -121,6 +172,10 @@ struct SkillIdentityResolver: Sendable {
                 return (id, .resolved(method: .sha))
             }
             if compatibleIds.count > 1 {
+                if let canonicalId = canonicalSkillIdBySha[sha],
+                   compatibleIds.contains(canonicalId) {
+                    return (canonicalId, .resolved(method: .sha))
+                }
                 return (nil, .ambiguous(skillIds: compatibleIds))
             }
         }
@@ -138,6 +193,12 @@ struct SkillIdentityResolver: Sendable {
         blob.append(header)
         blob.append(data)
         return Insecure.SHA1.hash(data: blob).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func isGitBlobSHA(_ value: String) -> Bool {
+        value.utf8.count == 40 && value.utf8.allSatisfy { byte in
+            (48...57).contains(byte) || (97...102).contains(byte)
+        }
     }
 
     static func normalizedRepo(from githubURL: String) -> String? {

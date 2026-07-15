@@ -199,6 +199,155 @@ struct SkillIdentityResolverTests {
         #expect(result.status == .ambiguous(skillIds: ["owner/repo:skills/a", "owner/repo:skills/b"]))
     }
 
+    @Test func validCanonicalShaUpgradesAmbiguousMatch() {
+        let sha = "2727272727272727272727272727272727272727"
+        let catalog = [
+            skill(id: "owner/repo:first", name: "first", githubUrl: "https://github.com/owner/repo", skillMdSha: sha),
+            skill(id: "owner/repo:second", name: "second", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+        ]
+        let history = ShaHistoryAsset(
+            version: 1,
+            generatedAt: nil,
+            shaToSkillIds: [sha: ["owner/repo:first", "owner/repo:second"]],
+            canonicalBySha: [sha: canonical("owner/repo:first")]
+        )
+
+        let resolver = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history)
+        let installed = installedSkill(name: "local-name", githubUrl: "", skillMdSha: sha)
+        let result = resolver.resolve(installed)
+        let measured = resolver.resolve([installed])
+
+        #expect(result.catalogSkillId == "owner/repo:first")
+        #expect(result.status == .resolved(method: .sha))
+        #expect(measured.measurement.resolvedBySha == 1)
+        #expect(measured.measurement.ambiguous == 0)
+    }
+
+    @Test func publishedCanonicalWireFormatDecodes() throws {
+        let sha = "2727272727272727272727272727272727272727"
+        let data = """
+        {
+          "version": 1,
+          "generatedAt": "2026-07-15T00:00:00.000Z",
+          "shaToSkillIds": {
+            "\(sha)": ["owner/repo:first", "owner/repo:second"]
+          },
+          "canonicalBySha": {
+            "\(sha)": {
+              "skillId": "owner/repo:first",
+              "confidence": "high",
+              "reason": "same-repo"
+            }
+          }
+        }
+        """.data(using: .utf8)!
+
+        let history = try JSONDecoder().decode(ShaHistoryAsset.self, from: data)
+
+        #expect(history.canonicalBySha?[sha] == canonical("owner/repo:first"))
+    }
+
+    @Test func canonicalShaMustBelongToGitCandidateIntersection() {
+        let sha = "2828282828282828282828282828282828282828"
+        let catalog = [
+            skill(id: "owner/repo:skills/a", name: "shared", githubUrl: "https://github.com/owner/repo", skillMdSha: sha),
+            skill(id: "owner/repo:skills/b", name: "shared", githubUrl: "https://github.com/owner/repo", skillMdSha: sha),
+            skill(id: "other/repo:copy", name: "copy", githubUrl: "https://github.com/other/repo", skillMdSha: sha)
+        ]
+        let history = ShaHistoryAsset(
+            version: 1,
+            generatedAt: nil,
+            shaToSkillIds: [sha: catalog.map(\.id)],
+            canonicalBySha: [sha: canonical("other/repo:copy")]
+        )
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(
+            installedSkill(name: "shared", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+        )
+
+        #expect(result.catalogSkillId == nil)
+        #expect(result.status == .ambiguous(skillIds: ["owner/repo:skills/a", "owner/repo:skills/b"]))
+    }
+
+    @Test func invalidCanonicalPolicyValuesRemainAmbiguous() {
+        let sha = "2929292929292929292929292929292929292929"
+        let catalog = [
+            skill(id: "owner/repo:first", name: "first", githubUrl: "https://github.com/owner/repo", skillMdSha: sha),
+            skill(id: "owner/repo:second", name: "second", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+        ]
+        let history = ShaHistoryAsset(
+            version: 1,
+            generatedAt: nil,
+            shaToSkillIds: [sha: catalog.map(\.id)],
+            canonicalBySha: [sha: CanonicalShaEntry(
+                skillId: "owner/repo:first",
+                confidence: "medium",
+                reason: "trusted-creator"
+            )]
+        )
+
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(
+            installedSkill(name: "local-name", githubUrl: "", skillMdSha: sha)
+        )
+
+        #expect(result.status == .ambiguous(skillIds: catalog.map(\.id).sorted()))
+    }
+
+    @Test func staleNonMemberAndShaMismatchedCanonicalIDsRemainAmbiguous() {
+        let sha = "3030303030303030303030303030303030303030"
+        let otherSha = "3131313131313131313131313131313131313131"
+        let baseCatalog = [
+            skill(id: "owner/repo:first", name: "first", githubUrl: "https://github.com/owner/repo", skillMdSha: sha),
+            skill(id: "owner/repo:second", name: "second", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+        ]
+        let installed = installedSkill(name: "local-name", githubUrl: "", skillMdSha: sha)
+        let fixtures: [([Skill], [String], String, [String])] = [
+            (baseCatalog, baseCatalog.map(\.id), "owner/repo:removed", baseCatalog.map(\.id)),
+            (baseCatalog + [skill(id: "other/repo:copy", name: "copy", githubUrl: "https://github.com/other/repo", skillMdSha: sha)], baseCatalog.map(\.id), "other/repo:copy", baseCatalog.map(\.id)),
+            (baseCatalog + [skill(id: "owner/repo:mismatch", name: "mismatch", githubUrl: "https://github.com/owner/repo", skillMdSha: otherSha)], baseCatalog.map(\.id) + ["owner/repo:mismatch"], "owner/repo:mismatch", baseCatalog.map(\.id) + ["owner/repo:mismatch"])
+        ]
+
+        for (catalog, members, canonicalId, expectedIds) in fixtures {
+            let history = ShaHistoryAsset(
+                version: 1,
+                generatedAt: nil,
+                shaToSkillIds: [sha: members],
+                canonicalBySha: [sha: canonical(canonicalId)]
+            )
+            let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(installed)
+
+            #expect(result.catalogSkillId == nil)
+            #expect(result.status == .ambiguous(skillIds: expectedIds.sorted()))
+        }
+    }
+
+    @Test func malformedCanonicalExtensionDoesNotRejectCoreShaHistory() throws {
+        let sha = "3232323232323232323232323232323232323232"
+        let data = """
+        {
+          "version": 1,
+          "shaToSkillIds": {
+            "\(sha)": ["owner/repo:first", "owner/repo:second"]
+          },
+          "canonicalBySha": {
+            "\(sha)": "malformed"
+          }
+        }
+        """.data(using: .utf8)!
+
+        let history = try JSONDecoder().decode(ShaHistoryAsset.self, from: data)
+        let catalog = [
+            skill(id: "owner/repo:first", name: "first", githubUrl: "https://github.com/owner/repo", skillMdSha: sha),
+            skill(id: "owner/repo:second", name: "second", githubUrl: "https://github.com/owner/repo", skillMdSha: sha)
+        ]
+        let result = SkillIdentityResolver(catalogSkills: catalog, shaHistory: history).resolve(
+            installedSkill(name: "local-name", githubUrl: "", skillMdSha: sha)
+        )
+
+        #expect(history.canonicalBySha == nil)
+        #expect(result.status == .ambiguous(skillIds: catalog.map(\.id).sorted()))
+    }
+
     @Test func multiIDShaReturnsAmbiguous() {
         let sha = "3333333333333333333333333333333333333333"
         let catalog = [
@@ -290,6 +439,10 @@ struct SkillIdentityResolverTests {
             catalogSkillId: catalogSkillId,
             gitRelativePath: gitRelativePath
         )
+    }
+
+    private func canonical(_ skillId: String) -> CanonicalShaEntry {
+        CanonicalShaEntry(skillId: skillId, confidence: "high", reason: "same-repo")
     }
 
     private func skill(
