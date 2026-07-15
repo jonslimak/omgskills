@@ -87,6 +87,7 @@ async function verifyRequiredOutput() {
     "index.html",
     "app/index.html",
     "data/manifest.json",
+    "data/health.json",
     "data/v2/manifest.json",
     "appcast.xml"
   ];

@@ -8,6 +8,7 @@ import {
   verifyReleaseDeployArtifacts,
   verifyWebLibraryDeployArtifacts,
 } from "./deploy-artifact-guard.mjs";
+import { ensureHealthSnapshot } from "./health-snapshot-guard.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -122,6 +123,11 @@ async function main() {
   await runWebLibraryBuild();
   await verifyWebLibraryBuild();
   await verifyWebLibraryDeployArtifacts(siteDir, "site deploy source");
+
+  const healthSnapshot = await ensureHealthSnapshot({ siteDir, productionOrigin });
+  if (healthSnapshot.restored) {
+    console.log(`Restored /data/health.json from ${healthSnapshot.source}`);
+  }
 
   const requiredAssets = await requiredReleaseAssetPaths(siteDir);
   for (const relativePath of requiredAssets) {
