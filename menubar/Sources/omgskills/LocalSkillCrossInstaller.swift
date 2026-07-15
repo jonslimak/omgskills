@@ -46,6 +46,22 @@ enum LocalSkillCrossInstaller {
 
         try fm.createDirectory(at: targetRoot, withIntermediateDirectories: true)
         try fm.createSymbolicLink(at: targetURL, withDestinationURL: sourceURL)
+
+        if case .resolved = skill.identityStatus,
+           let catalogSkillId = skill.catalogSkillId {
+            do {
+                try SkillInstallProvenanceWriter.write(
+                    catalogSkillId: catalogSkillId,
+                    githubUrl: skill.githubUrl,
+                    targetRoot: targetRoot,
+                    targetName: sourceInstallURL.lastPathComponent
+                )
+            } catch {
+                try? fm.removeItem(at: targetURL)
+                throw error
+            }
+        }
+
         return .installed
     }
 }

@@ -62,7 +62,12 @@ enum SkillInstaller {
         let targetSkill = targetURL.appendingPathComponent("SKILL.md")
 
         if fm.fileExists(atPath: targetSkill.path) {
-            try? writeInstallProvenance(for: skill, targetRoot: targetRoot, targetName: spec.targetName)
+            try? SkillInstallProvenanceWriter.write(
+                catalogSkillId: skill.id,
+                githubUrl: skill.githubUrl,
+                targetRoot: targetRoot,
+                targetName: spec.targetName
+            )
             return .alreadyInstalled
         }
 
@@ -87,7 +92,12 @@ enum SkillInstaller {
         }
 
         try fm.createSymbolicLink(at: targetURL, withDestinationURL: source)
-        try writeInstallProvenance(for: skill, targetRoot: targetRoot, targetName: spec.targetName)
+        try SkillInstallProvenanceWriter.write(
+            catalogSkillId: skill.id,
+            githubUrl: skill.githubUrl,
+            targetRoot: targetRoot,
+            targetName: spec.targetName
+        )
         return .installed
     }
 
@@ -164,21 +174,6 @@ enum SkillInstaller {
         }
     }
 
-    private static func writeInstallProvenance(for skill: Skill, targetRoot: URL, targetName: String) throws {
-        let metadataRoot = targetRoot.appendingPathComponent(".omgskills", isDirectory: true)
-        try FileManager.default.createDirectory(at: metadataRoot, withIntermediateDirectories: true)
-
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        let provenance = SkillInstallProvenance(
-            catalogSkillId: skill.id,
-            githubUrl: skill.githubUrl,
-            installedAt: formatter.string(from: Date())
-        )
-        let data = try JSONEncoder().encode(provenance)
-        try data.write(to: metadataRoot.appendingPathComponent("\(targetName).json"), options: .atomic)
-    }
-
     private static func gitExecutableURL() throws -> URL {
         for path in ["/usr/bin/git", "/opt/homebrew/bin/git", "/usr/local/bin/git"] {
             if FileManager.default.isExecutableFile(atPath: path) {
@@ -186,5 +181,27 @@ enum SkillInstaller {
             }
         }
         throw InstallError.missingGit
+    }
+}
+
+enum SkillInstallProvenanceWriter {
+    static func write(
+        catalogSkillId: String,
+        githubUrl: String,
+        targetRoot: URL,
+        targetName: String
+    ) throws {
+        let metadataRoot = targetRoot.appendingPathComponent(".omgskills", isDirectory: true)
+        try FileManager.default.createDirectory(at: metadataRoot, withIntermediateDirectories: true)
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        let provenance = SkillInstallProvenance(
+            catalogSkillId: catalogSkillId,
+            githubUrl: githubUrl,
+            installedAt: formatter.string(from: Date())
+        )
+        let data = try JSONEncoder().encode(provenance)
+        try data.write(to: metadataRoot.appendingPathComponent("\(targetName).json"), options: .atomic)
     }
 }
