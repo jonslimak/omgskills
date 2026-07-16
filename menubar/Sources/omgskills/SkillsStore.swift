@@ -11,6 +11,7 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var skillEquivalence = SkillEquivalenceIndex.empty
     @Published private(set) var installedSkills: [Skill] = []
     @Published private(set) var installedSkillInstallations: [Skill] = []
+    @Published private(set) var installedDisplayItems: [InstalledSkillDisplayItem] = []
     @Published private(set) var isInstalledIdentityReady = false
     @Published private(set) var installedSummary = InstalledSkillSummary()
     @Published private(set) var identityMeasurement = SkillIdentityMeasurement()
@@ -244,6 +245,15 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeAvailableCatalog() async -> LoadResult<LoadedCatalog> {
+        if AppRuntimeConfiguration.usesBundledLibraryPreview {
+            switch await decodeBundledProductionAvailableSkills() {
+            case .success(let skills):
+                return .success(LoadedCatalog(skills: skills, track: .productionV2))
+            case .failure(let error):
+                return .failure(error)
+            }
+        }
+
         if DataRefreshService.activeTrack() == .crawl4 {
             let crawl4 = await decodeCrawl4AvailableSkills()
             if case .success(let skills) = crawl4 {
@@ -288,6 +298,10 @@ final class SkillsStore: ObservableObject {
             DataRefreshService.removeCachedData(for: .skills, track: .productionV2)
         }
 
+        return await decodeBundledProductionAvailableSkills()
+    }
+
+    private nonisolated func decodeBundledProductionAvailableSkills() async -> LoadResult<[Skill]> {
         guard let url = Bundle.main.url(forResource: "skills", withExtension: "json") else {
             return .failure("skills.json not found in app bundle")
         }
@@ -439,6 +453,23 @@ final class SkillsStore: ObservableObject {
     private nonisolated func decodeSkillEquivalence(
         using plan: SkillEquivalenceLoadPlan
     ) async -> LoadResult<SkillEquivalenceAsset?> {
+        if AppRuntimeConfiguration.usesBundledLibraryPreview {
+            guard let bundled = bundledSkillEquivalenceData() else {
+                return .failure("Bundled skill equivalence asset not found")
+            }
+            let decoded = await decode(
+                bundled.data,
+                as: SkillEquivalenceAsset.self,
+                label: bundled.label
+            )
+            switch decoded {
+            case .success(let asset):
+                return .success(asset)
+            case .failure(let error):
+                return .failure(error)
+            }
+        }
+
         let track = plan.track
         if DataRefreshService.remoteSkillEquivalenceEnabled(for: track) == false {
             DataRefreshService.removeCachedData(for: .skillEquivalence, track: track)
@@ -546,6 +577,7 @@ final class SkillsStore: ObservableObject {
 
     private func resolveInstalledIdentities() {
         guard !installedSkills.isEmpty || !installedSkillInstallations.isEmpty else {
+            installedDisplayItems = []
             identityMeasurement = SkillIdentityMeasurement()
             isInstalledIdentityReady = hasScannedInstalledSkills
             reportIdentityMeasurementIfReady()
@@ -558,6 +590,10 @@ final class SkillsStore: ObservableObject {
 
         installedSkills = resolvedSkills.skills
         installedSkillInstallations = resolvedInstallations.skills
+        installedDisplayItems = InstalledSkillGrouper.group(
+            installations: installedSkillInstallations,
+            equivalence: skillEquivalence
+        )
         identityMeasurement = resolvedInstallations.measurement
         isInstalledIdentityReady = hasScannedInstalledSkills
         print("[SkillIdentityResolver] provenance=\(identityMeasurement.resolvedByProvenance) git=\(identityMeasurement.resolvedByGit) sha=\(identityMeasurement.resolvedBySha) ambiguous=\(identityMeasurement.ambiguous) localOnly=\(identityMeasurement.localOnly)")

@@ -39,16 +39,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        let usesBundledLibraryPreview = AppRuntimeConfiguration.usesBundledLibraryPreview
         Analytics.start()
         deviceConnectionModel.restore()
-        setupUpdater()
+        setupUpdater(startingUpdater: !usesBundledLibraryPreview)
         setupStatusItem()
         setupPanel()
         setupGlobalHotkey()
-        setupLibraryRefreshObservers()
-        setupLibraryRefreshTimer()
-        setupLibraryRefreshScheduler()
-        triggerLibraryRefreshIfNeeded()
+        if !usesBundledLibraryPreview {
+            setupLibraryRefreshObservers()
+            setupLibraryRefreshTimer()
+            setupLibraryRefreshScheduler()
+            triggerLibraryRefreshIfNeeded()
+        }
 
         NotificationCenter.default.addObserver(
             forName: .detailToggled, object: nil, queue: .main
@@ -99,13 +102,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         _ = browserPairingSession.handleCallback(callbackURL)
     }
 
-    private func setupUpdater() {
+    private func setupUpdater(startingUpdater: Bool) {
         updaterController = SPUStandardUpdaterController(
-            startingUpdater: true,
+            startingUpdater: startingUpdater,
             updaterDelegate: self,
             userDriverDelegate: nil
         )
-        scheduleUpdateAvailabilityProbe()
+        if startingUpdater {
+            scheduleUpdateAvailabilityProbe()
+        }
     }
 
     private func setupLibraryRefreshObservers() {
@@ -150,6 +155,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         force: Bool = false,
         onCompletion: (() -> Void)? = nil
     ) {
+        guard !AppRuntimeConfiguration.usesBundledLibraryPreview else {
+            onCompletion?()
+            return
+        }
         guard Self.shouldStartLibraryRefresh(isRefreshActive: libraryRefreshTask != nil) else {
             onCompletion?()
             return
