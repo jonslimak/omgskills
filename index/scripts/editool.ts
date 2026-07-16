@@ -4,6 +4,13 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  validateRemovals,
+  type DoNotCrawlOwnerEntry,
+  type DoNotCrawlRepoEntry,
+  type RemovalsSource,
+  type SuppressedSkillEntry,
+} from "./editool-validation.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -69,10 +76,6 @@ type ProposedCreatorsReport = {
     sampleSkillIds: string[];
   }[];
 };
-
-type SuppressedSkillEntry = { id: string; reason: string; stagedAt: string };
-type DoNotCrawlRepoEntry = { repo: string; reason: string; notes?: string };
-type DoNotCrawlOwnerEntry = { owner: string; reason: string; notes?: string };
 
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
@@ -303,34 +306,6 @@ function validateCreators(source: { creators: CreatorEntry[] }): string[] {
   return errors;
 }
 
-function validateRemovals(source: {
-  suppressedSkills: { skills: SuppressedSkillEntry[] };
-  doNotCrawl: { repos: DoNotCrawlRepoEntry[]; owners: DoNotCrawlOwnerEntry[] };
-}): string[] {
-  const errors: string[] = [];
-  const { suppressedSkills, doNotCrawl } = source;
-  if (!Array.isArray(suppressedSkills?.skills)) errors.push("suppressedSkills.skills must be an array");
-  if (!Array.isArray(doNotCrawl?.repos) || !Array.isArray(doNotCrawl?.owners)) {
-    errors.push("doNotCrawl must have repos and owners arrays");
-  }
-  if (errors.length) return errors;
-
-  for (const entry of suppressedSkills.skills) {
-    if (!entry.id?.trim()) errors.push("suppressed skill with empty id");
-    else if (!skillIdSet.has(entry.id)) errors.push(`suppressed skill does not exist in library: ${entry.id}`);
-    if (!entry.reason?.trim()) errors.push(`suppressed skill ${entry.id}: reason required`);
-  }
-  for (const entry of doNotCrawl.repos) {
-    if (!/^[^/\s]+\/[^/\s]+$/.test(entry.repo ?? "")) errors.push(`do-not-crawl repo must be owner/repo: ${entry.repo}`);
-    if (!entry.reason?.trim()) errors.push(`do-not-crawl repo ${entry.repo}: reason required`);
-  }
-  for (const entry of doNotCrawl.owners) {
-    if (!entry.owner?.trim() || entry.owner.includes("/")) errors.push(`do-not-crawl owner must be a bare handle: ${entry.owner}`);
-    if (!entry.reason?.trim()) errors.push(`do-not-crawl owner ${entry.owner}: reason required`);
-  }
-  return errors;
-}
-
 // ---------- skill search ----------
 
 function searchSkills(query: URLSearchParams): { total: number; rows: unknown[] } {
@@ -497,11 +472,14 @@ const server = createServer(async (req, res) => {
     if (req.method === "POST" && url.pathname === "/api/save/removals") {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
-      const body = (await readBody(req)) as {
-        suppressedSkills: { skills: SuppressedSkillEntry[] };
-        doNotCrawl: { repos: DoNotCrawlRepoEntry[]; owners: DoNotCrawlOwnerEntry[] };
-      };
-      const errors = validateRemovals(body);
+      const body = (await readBody(req)) as RemovalsSource;
+      const existingSuppressedSkillIds = new Set(
+        readJson<{ skills: SuppressedSkillEntry[] }>(paths.suppressedSkills).skills.map((entry) => entry.id),
+      );
+      const errors = validateRemovals(body, {
+        librarySkillIds: skillIdSet,
+        existingSuppressedSkillIds,
+      });
       if (errors.length) return sendJson(res, 422, { ok: false, errors });
       atomicWriteJson(paths.suppressedSkills, body.suppressedSkills);
       atomicWriteJson(paths.doNotCrawl, body.doNotCrawl);

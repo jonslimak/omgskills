@@ -1,9 +1,9 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import { resolveCreateGroupSlug } from "./_shared/group-slug.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
-import { isReservedHandleOrSlug } from "./_shared/reserved.js";
 import { requirePortalUser } from "./_shared/user.js";
-import { optionalString, requireString, slugify } from "./_shared/validation.js";
+import { optionalString, requireString } from "./_shared/validation.js";
 
 async function listGroups(req: Request) {
   const user = await requirePortalUser(req);
@@ -59,10 +59,7 @@ async function createGroup(req: Request) {
     throw new Response("syncedSkillIds must be strings", { status: 400 });
   }
 
-  let slug = isFavorites ? "favorites" : slugify(typeof body?.slug === "string" ? body.slug : name);
-  if (isReservedHandleOrSlug(slug)) {
-    throw new Response("Group slug is reserved", { status: 400 });
-  }
+  const slug = resolveCreateGroupSlug(name, body?.slug, isFavorites);
 
   const pool = getPgPool();
   const client = await pool.connect();

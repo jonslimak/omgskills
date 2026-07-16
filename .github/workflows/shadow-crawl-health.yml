@@ -87,6 +87,12 @@ jobs:
         # until the canonical rollout is explicitly approved.
         run: npm run publish:sha-history
 
+      - name: Publish skill equivalence
+        working-directory: index
+        # This runs after both data publishers so its manifest patch survives.
+        # SKILL_EQUIVALENCE_PUBLISH stays unset for a strict no-op until rollout.
+        run: npm run publish:skill-equivalence
+
       - name: Verify local published data
         env:
           OMGSKILLS_DATA_SUBDIR: v2
@@ -101,11 +107,11 @@ jobs:
         run: |
           git config user.name "omgskills-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/v2/manifest.json site/data/v2/skills-*.json site/data/v2/trending-*.json site/data/v2/trending-leaderboard-*.json site/data/v2/leaderboard-view-data-*.json site/data/v2/x-trending-*.json site/data/v2/skill-signals-*.json site/data/v2/author-signals-*.json site/data/v2/author-leaderboards-*.json 'site/data/v2/sha-history-*.json' site/data/crawl4/manifest.json site/data/crawl4/skills-*.json site/data/crawl4/trending-*.json site/data/crawl4/x-trending-*.json 'site/data/crawl4/sha-history-*.json'; then
+          if git diff --quiet -- index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/v2/manifest.json site/data/v2/skills-*.json site/data/v2/trending-*.json site/data/v2/trending-leaderboard-*.json site/data/v2/leaderboard-view-data-*.json site/data/v2/x-trending-*.json site/data/v2/skill-signals-*.json site/data/v2/author-signals-*.json site/data/v2/author-leaderboards-*.json 'site/data/v2/sha-history-*.json' 'site/data/v2/skill-equivalence-*.json' site/data/crawl4/manifest.json site/data/crawl4/skills-*.json site/data/crawl4/trending-*.json site/data/crawl4/x-trending-*.json 'site/data/crawl4/sha-history-*.json' 'site/data/crawl4/skill-equivalence-*.json'; then
             echo "No v2 or Crawl 4 library data changes"
           else
             git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/v2/manifest.json site/data/v2/skills-*.json site/data/v2/trending-*.json site/data/v2/trending-leaderboard-*.json site/data/v2/leaderboard-view-data-*.json site/data/v2/x-trending-*.json site/data/v2/skill-signals-*.json site/data/v2/author-signals-*.json site/data/v2/author-leaderboards-*.json site/data/v2/sha-history-*.json site/data/crawl4/manifest.json site/data/crawl4/skills-*.json site/data/crawl4/trending-*.json site/data/crawl4/x-trending-*.json site/data/crawl4/sha-history-*.json
-            git add -A -- 'site/data/v2/sha-history-*.json' 'site/data/crawl4/sha-history-*.json'
+            git add -A -- 'site/data/v2/sha-history-*.json' 'site/data/crawl4/sha-history-*.json' 'site/data/v2/skill-equivalence-*.json' 'site/data/crawl4/skill-equivalence-*.json'
             git commit -m "shadow-crawl: publish app data ($(date -u +%Y-%m-%d))"
             git pull --rebase --autostash origin main
             git push

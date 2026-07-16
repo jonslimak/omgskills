@@ -111,7 +111,8 @@ Two small tables so staged removals are visible and reviewable:
 - save button per view; writes are atomic (temp file + rename)
 - validation before write, reusing publish-script rules:
   - every skill ID referenced exists in the loaded library
-  - every suppressed skill ID exists in the loaded library
+  - every newly suppressed skill ID exists in the loaded library; historical
+    suppression entries remain valid after suppression removes them from it
   - every featured handle exists as a catalog author (case-insensitive, alias-aware)
   - `featured ⊆ watch` in the registry
   - creator aliases cannot be owned by multiple registry rows

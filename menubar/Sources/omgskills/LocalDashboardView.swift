@@ -25,12 +25,13 @@ enum LocalDashboardFilter: String, CaseIterable, Identifiable, Equatable {
 
 struct LocalDashboardView: View {
     let summary: InstalledSkillSummary
+    let logicalSkillCount: Int
     let selectedFilter: LocalDashboardFilter?
     let onSelectFilter: (LocalDashboardFilter) -> Void
     let onSelectRecentSkill: (InstalledSkillSummary.RecentSkill) -> Void
     private var stats: [LocalDashboardStat] {
         [
-            LocalDashboardStat(filter: .all, value: summary.totalInstallations, symbol: "square.stack.3d.up"),
+            LocalDashboardStat(filter: .all, value: logicalSkillCount, symbol: "square.stack.3d.up"),
             LocalDashboardStat(filter: .codex, value: summary.codexCount, symbol: "person"),
             LocalDashboardStat(filter: .claude, value: summary.claudeCount, symbol: "sparkles"),
             LocalDashboardStat(filter: .other, value: summary.agentsCount, symbol: "tray")

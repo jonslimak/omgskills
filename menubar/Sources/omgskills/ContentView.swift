@@ -99,6 +99,7 @@ private struct PopoverSessionState: Equatable {
     let debouncedQuery: String
     let localDashboardFilter: LocalDashboardFilter?
     let selectedId: String
+    let installedSelectionAnchor: InstalledSkillSelectionResolver.Anchor?
 }
 
 private struct StarterSearch: Identifiable, Hashable {
@@ -155,7 +156,9 @@ struct ContentView: View {
     @State private var source: Source = .available
     @State private var showDetail = false
     @State private var cachedResults: [Skill] = []
+    @State private var cachedInstalledResults: [InstalledSkillDisplayItem] = []
     @State private var selectedSkill: Skill?
+    @State private var installedSelectionAnchor: InstalledSkillSelectionResolver.Anchor?
     @State private var displayedReadme: String?
     @State private var isLoadingReadme = false
     @State private var readmeHeight: CGFloat = 200
@@ -310,7 +313,44 @@ struct ContentView: View {
         return Array(sorted.prefix(150))
     }
 
+    private func computeInstalledResults() -> [InstalledSkillDisplayItem] {
+        let matching = store.installedDisplayItems.filter {
+            $0.matches(query: searchQueryForResults)
+        }
+        let sorted: [InstalledSkillDisplayItem] = switch sortKey {
+        case .lastUpdated:
+            matching.sorted { $0.representative.lastUpdated > $1.representative.lastUpdated }
+        case .firstSeen:
+            matching.sorted { $0.representative.firstSeen > $1.representative.firstSeen }
+        case .trending, .stars, .name:
+            matching.sorted {
+                let order = $0.displayName.localizedCompare($1.displayName)
+                if order != .orderedSame {
+                    return order == .orderedAscending
+                }
+                return $0.id < $1.id
+            }
+        }
+        return Array(sorted.prefix(150))
+    }
+
+    private var usesUnifiedInstalledResults: Bool {
+        source == .installed && localDashboardFilter == .all
+    }
+
+    private var visibleResultsAreEmpty: Bool {
+        usesUnifiedInstalledResults ? cachedInstalledResults.isEmpty : cachedResults.isEmpty
+    }
+
+    private var visibleResultCount: Int {
+        usesUnifiedInstalledResults ? cachedInstalledResults.count : cachedResults.count
+    }
+
     var body: some View {
+        dataObservedContent
+    }
+
+    private var baseContent: some View {
         VStack(spacing: 0) {
             toolbar
             searchField
@@ -366,6 +406,10 @@ struct ContentView: View {
             debouncedQuery = query
             refreshResults(selectFirst: shouldSelectFirstResult)
         }
+    }
+
+    private var sessionObservedContent: some View {
+        baseContent
         .onReceive(NotificationCenter.default.publisher(for: .popoverDidOpen)) { _ in
             resetTelemetryDedupe()
             Analytics.signal("popover.opened")
@@ -380,10 +424,12 @@ struct ContentView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .libraryDataDidRefresh)) { _ in
-            Task { await store.reloadLibraryData() }
-            refreshResults(selectFirst: selectedId == nil)
-            if source == .installed {
-                showDataUpdatedFooterIfPossible()
+            Task {
+                await store.reloadLibraryData()
+                refreshResults(selectFirst: selectedId == nil)
+                if source == .installed {
+                    showDataUpdatedFooterIfPossible()
+                }
             }
         }
         .onChange(of: query) { _, newValue in
@@ -416,6 +462,10 @@ struct ContentView: View {
             trackOpenedSkillIfNeeded()
             captureSessionIfNeeded()
         }
+    }
+
+    private var dataObservedContent: some View {
+        sessionObservedContent
         .onChange(of: sortKey)  { _, _ in
             guard !suppressSessionChangeHandlers else { return }
             refreshResults(selectFirst: true)
@@ -454,7 +504,9 @@ struct ContentView: View {
             }
             captureSessionIfNeeded()
         }
-        .onChange(of: store.searchIndexVersion) { _, _ in refreshResults(selectFirst: true) }
+        .onChange(of: store.searchIndexVersion) { _, _ in
+            refreshResults(selectFirst: source != .installed)
+        }
         .onChange(of: githubInstallURLText) { _, _ in resetGitHubInstallPromptStatus() }
         .onChange(of: githubInstallCodex) { _, _ in resetGitHubInstallPromptStatus() }
         .onChange(of: githubInstallClaude) { _, _ in resetGitHubInstallPromptStatus() }
@@ -558,7 +610,7 @@ struct ContentView: View {
     }
 
     private var shouldShowSortMenu: Bool {
-        !cachedResults.isEmpty
+        !visibleResultsAreEmpty
     }
 
     private var shouldSelectFirstResult: Bool {
@@ -641,9 +693,9 @@ struct ContentView: View {
             } else {
                 localDashboardContent
             }
-        } else if source == .installed, localDashboardFilter != nil, cachedResults.isEmpty {
+        } else if source == .installed, localDashboardFilter != nil, visibleResultsAreEmpty {
             localFilteredList
-        } else if cachedResults.isEmpty {
+        } else if visibleResultsAreEmpty {
             emptyView
         } else if shouldShowDetailPanel {
             HStack(spacing: 0) {
@@ -874,13 +926,14 @@ struct ContentView: View {
             ScrollView {
                 LocalDashboardView(
                     summary: store.installedSummary,
+                    logicalSkillCount: store.installedDisplayItems.count,
                     selectedFilter: localDashboardFilter,
                     onSelectFilter: selectLocalDashboardFilter,
                     onSelectRecentSkill: selectRecentInstalledSkill
                 )
 
                 if localDashboardFilter != nil {
-                    if cachedResults.isEmpty {
+                    if visibleResultsAreEmpty {
                         emptyView
                     } else {
                         skillsListRows
@@ -960,7 +1013,7 @@ struct ContentView: View {
                 .padding(.vertical, 7)
 
                 Divider()
-                if cachedResults.isEmpty {
+                if visibleResultsAreEmpty {
                     emptyView
                 } else {
                     skillsList
@@ -989,20 +1042,36 @@ struct ContentView: View {
 
     private var skillsListRows: some View {
         LazyVStack(spacing: 0) {
-            ForEach(cachedResults) { skill in
-                SkillRow(
-                    skill: skill,
-                    selected: skill.id == selectedId,
-                    source: source,
-                    onSelect: {
-                        selectSkillFromRow(skill)
-                    },
-                    onCreatorTap: { handle in
-                        openAuthorOrFilter(handle)
-                    }
-                )
-                .id(skill.id)
-                .padding(.bottom, source == .twitter ? 10 : 0)
+            if usesUnifiedInstalledResults {
+                ForEach(cachedInstalledResults) { item in
+                    InstalledSkillRow(
+                        item: item,
+                        selectedSkillId: selectedId,
+                        onSelectSkill: { skill in
+                            selectInstalledSkill(skill, in: item)
+                        },
+                        onCreatorTap: { handle in
+                            openAuthorOrFilter(handle)
+                        }
+                    )
+                    .id(item.id)
+                }
+            } else {
+                ForEach(cachedResults) { skill in
+                    SkillRow(
+                        skill: skill,
+                        selected: skill.id == selectedId,
+                        source: source,
+                        onSelect: {
+                            selectSkillFromRow(skill)
+                        },
+                        onCreatorTap: { handle in
+                            openAuthorOrFilter(handle)
+                        }
+                    )
+                    .id(skill.id)
+                    .padding(.bottom, source == .twitter ? 10 : 0)
+                }
             }
         }
         .padding(.vertical, 4)
@@ -1647,6 +1716,17 @@ struct ContentView: View {
     }
 
     private func moveSelection(by delta: Int) {
+        if usesUnifiedInstalledResults {
+            guard !cachedInstalledResults.isEmpty else { return }
+            let currentIdx = cachedInstalledResults.firstIndex {
+                $0.contains(skillId: selectedId) || $0.id == installedSelectionAnchor?.itemId
+            } ?? -1
+            let nextIdx = max(0, min(cachedInstalledResults.count - 1, currentIdx + delta))
+            let item = cachedInstalledResults[nextIdx]
+            select(item.representative, scroll: true, installedItem: item)
+            return
+        }
+
         guard !cachedResults.isEmpty else { return }
         let currentIdx = cachedResults.firstIndex { $0.id == selectedId } ?? -1
         let nextIdx = max(0, min(cachedResults.count - 1, currentIdx + delta))
@@ -1787,9 +1867,10 @@ struct ContentView: View {
             skillPendingDelete = nil
             deleteError = nil
             store.refreshInstalled()
-            showDetail = false
-            clearSelection()
             refreshResults(selectFirst: false)
+            if selectedSkill == nil {
+                showDetail = false
+            }
         } catch {
             deleteError = error.localizedDescription
             skillPendingDelete = nil
@@ -2015,7 +2096,8 @@ struct ContentView: View {
             query: query,
             debouncedQuery: debouncedQuery,
             localDashboardFilter: localDashboardFilter,
-            selectedId: selectedId
+            selectedId: selectedId,
+            installedSelectionAnchor: usesUnifiedInstalledResults ? installedSelectionAnchor : nil
         )
     }
 
@@ -2041,19 +2123,49 @@ struct ContentView: View {
         query = session.query
         debouncedQuery = session.debouncedQuery
         localDashboardFilter = session.localDashboardFilter
-        cachedResults = computeResults()
-
-        guard let skill = cachedResults.first(where: { $0.id == session.selectedId }) else {
-            savedSession = nil
-            showDetail = false
-            clearSelection()
-            return false
+        if usesUnifiedInstalledResults {
+            cachedResults = []
+            cachedInstalledResults = computeInstalledResults()
+            guard let resolution = InstalledSkillSelectionResolver.resolve(
+                items: cachedInstalledResults,
+                selectedSkillId: session.selectedId,
+                anchor: session.installedSelectionAnchor
+            ) else {
+                savedSession = nil
+                showDetail = false
+                clearSelection()
+                return false
+            }
+            selectedId = nil
+            installedSelectionAnchor = nil
+            select(
+                resolution.skill,
+                scroll: true,
+                installedItem: resolution.item
+            )
+        } else {
+            cachedInstalledResults = []
+            cachedResults = computeResults()
+            guard let skill = cachedResults.first(where: { $0.id == session.selectedId }) else {
+                savedSession = nil
+                showDetail = false
+                clearSelection()
+                return false
+            }
+            selectedId = nil
+            installedSelectionAnchor = nil
+            select(skill, scroll: true)
         }
-
-        selectedId = nil
-        select(skill, scroll: true)
         showDetail = true
-        savedSession = session
+        savedSession = PopoverSessionState(
+            source: source,
+            sortKey: sortKey,
+            query: query,
+            debouncedQuery: debouncedQuery,
+            localDashboardFilter: localDashboardFilter,
+            selectedId: selectedId ?? session.selectedId,
+            installedSelectionAnchor: installedSelectionAnchor
+        )
         return true
     }
 
@@ -2188,6 +2300,7 @@ struct ContentView: View {
             query = ""
             debouncedQuery = ""
             showDetail = false
+            cachedInstalledResults = []
             cachedResults = Array(store.allSkills(for: collection).prefix(150))
             select(cachedResults.first, scroll: false)
             searchFocused = true
@@ -2196,6 +2309,13 @@ struct ContentView: View {
 
     private func selectSkillFromRow(_ skill: Skill) {
         select(skill, scroll: false)
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showDetail = true
+        }
+    }
+
+    private func selectInstalledSkill(_ skill: Skill, in item: InstalledSkillDisplayItem) {
+        select(skill, scroll: false, installedItem: item)
         withAnimation(.easeInOut(duration: 0.15)) {
             showDetail = true
         }
@@ -2223,6 +2343,7 @@ struct ContentView: View {
     private func refreshResults(selectFirst: Bool) {
         if selectedCollectionId != nil {
             cachedResults = []
+            cachedInstalledResults = []
             return
         }
 
@@ -2234,6 +2355,29 @@ struct ContentView: View {
             return
         }
 
+        if usesUnifiedInstalledResults {
+            cachedResults = []
+            cachedInstalledResults = computeInstalledResults()
+            if selectFirst, let firstItem = cachedInstalledResults.first {
+                select(firstItem.representative, scroll: false, installedItem: firstItem)
+            } else if let resolution = InstalledSkillSelectionResolver.resolve(
+                items: cachedInstalledResults,
+                selectedSkillId: selectedId,
+                anchor: installedSelectionAnchor
+            ) {
+                select(
+                    resolution.skill,
+                    scroll: false,
+                    installedItem: resolution.item
+                )
+            } else {
+                clearSelection()
+            }
+            return
+        }
+
+        cachedInstalledResults = []
+        installedSelectionAnchor = nil
         cachedResults = computeResults()
         let shouldSelectFirst = selectFirst && !(source == .twitter && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         if shouldSelectFirst {
@@ -2248,11 +2392,13 @@ struct ContentView: View {
 
     private func resetResultsForStarterState() {
         cachedResults = []
+        cachedInstalledResults = []
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
         selectedId = nil
         selectedSkill = nil
+        installedSelectionAnchor = nil
         displayedReadme = nil
         isLoadingReadme = false
         resetInstallStates()
@@ -2299,8 +2445,13 @@ struct ContentView: View {
         showDetail = true
         query = ""
         debouncedQuery = ""
-        cachedResults = filteredInstalledSkills(for: .all)
-        select(skill, scroll: true)
+        cachedResults = []
+        cachedInstalledResults = computeInstalledResults()
+        if let item = cachedInstalledResults.first(where: { $0.contains(skillId: skill.id) }) {
+            select(skill, scroll: true, installedItem: item)
+        } else {
+            select(skill, scroll: true)
+        }
         searchFocused = true
     }
 
@@ -2308,6 +2459,7 @@ struct ContentView: View {
         selectedCollectionId = nil
         selectedId = nil
         selectedSkill = nil
+        installedSelectionAnchor = nil
         displayedReadme = nil
         isLoadingReadme = false
         deleteError = nil
@@ -2335,13 +2487,27 @@ struct ContentView: View {
         }
     }
 
-    private func select(_ skill: Skill?, scroll: Bool, preserveCollection: Bool = false) {
-        guard selectedId != skill?.id else { return }
+    private func select(
+        _ skill: Skill?,
+        scroll: Bool,
+        preserveCollection: Bool = false,
+        installedItem: InstalledSkillDisplayItem? = nil
+    ) {
+        let nextInstalledSelectionAnchor = installedItem?.selectionAnchor
+        if selectedId == skill?.id {
+            selectedSkill = skill
+            installedSelectionAnchor = nextInstalledSelectionAnchor
+            if scroll {
+                scrollTargetId = installedItem?.id ?? skill?.id
+            }
+            return
+        }
         if !preserveCollection {
             selectedCollectionId = nil
         }
         selectedId = skill?.id
         selectedSkill = skill
+        installedSelectionAnchor = nextInstalledSelectionAnchor
         displayedReadme = nil
         isLoadingReadme = false
         deleteError = nil
@@ -2351,7 +2517,7 @@ struct ContentView: View {
         readmeLoadTask?.cancel()
 
         if scroll {
-            scrollTargetId = skill?.id
+            scrollTargetId = installedItem?.id ?? skill?.id
         }
 
         guard let skill else { return }
@@ -2384,7 +2550,7 @@ struct ContentView: View {
         Analytics.signal("skill.searched", parameters: [
             "query": trimmed,
             "source": source.rawValue,
-            "result_count": "\(cachedResults.count)"
+            "result_count": "\(visibleResultCount)"
         ])
         if let currentLoadError {
             let errorKey = "\(source.rawValue):\(trimmed):\(currentLoadError)"

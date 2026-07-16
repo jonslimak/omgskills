@@ -5,7 +5,10 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import {
   assertStaticProfileHandlesReserved,
+  buildProfilePathByCreatorHandle,
+  loadCreatorHandleOwners,
   loadCreatorHandleReservations,
+  normalizedCreatorHandle,
 } from "./generate-creator-handle-reservations.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
@@ -454,6 +457,19 @@ function githubAvatarUrl(handle) {
   return `https://github.com/${handle}.png`;
 }
 
+function githubProfileUrl(handle) {
+  return `https://github.com/${encodeURIComponent(String(handle ?? ""))}`;
+}
+
+function skillAuthorReference(skill, profilePathByCreatorHandle) {
+  const handle = skillAuthor(skill);
+  return {
+    handle,
+    githubUrl: githubProfileUrl(handle),
+    profilePath: profilePathByCreatorHandle.get(normalizedCreatorHandle(handle)) ?? null,
+  };
+}
+
 function profileSchemaType(collection) {
   if (collection.schemaType === "Organization" || collection.entityType === "organization") return "Organization";
   const handle = String(collection.authorHandle || "");
@@ -464,9 +480,8 @@ function profileSchemaType(collection) {
   return "Person";
 }
 
-function skillStructuredData(skill, urlPath, description) {
-  const author = skillAuthor(skill);
-  const authorUrl = `${origin}${profilePath(author)}`;
+function skillStructuredData(skill, urlPath, description, profilePathByCreatorHandle) {
+  const author = skillAuthorReference(skill, profilePathByCreatorHandle);
   const data = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -478,9 +493,9 @@ function skillStructuredData(skill, urlPath, description) {
     softwareRequirements: "Claude Code or Codex",
     author: {
       "@type": "Organization",
-      name: author,
-      url: authorUrl,
-      sameAs: `https://github.com/${author}`,
+      name: author.handle,
+      url: author.profilePath ? `${origin}${author.profilePath}` : author.githubUrl,
+      sameAs: author.githubUrl,
     },
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
@@ -488,16 +503,29 @@ function skillStructuredData(skill, urlPath, description) {
   return data;
 }
 
-function skillBreadcrumbData(skill, urlPath) {
-  const author = skillAuthor(skill);
+function skillBreadcrumbData(skill, urlPath, profilePathByCreatorHandle) {
+  const author = skillAuthorReference(skill, profilePathByCreatorHandle);
+  const itemListElement = [
+    { "@type": "ListItem", position: 1, name: "Skills", item: `${origin}/skills/` },
+  ];
+  if (author.profilePath) {
+    itemListElement.push({
+      "@type": "ListItem",
+      position: 2,
+      name: author.handle,
+      item: `${origin}${author.profilePath}`,
+    });
+  }
+  itemListElement.push({
+    "@type": "ListItem",
+    position: itemListElement.length + 1,
+    name: skill.name,
+    item: `${origin}${urlPath}`,
+  });
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Skills", item: `${origin}/skills/` },
-      { "@type": "ListItem", position: 2, name: author, item: `${origin}${profilePath(author)}` },
-      { "@type": "ListItem", position: 3, name: skill.name, item: `${origin}${urlPath}` },
-    ],
+    itemListElement,
   };
 }
 
@@ -521,16 +549,26 @@ function authorConfidenceBadge(skill) {
   return `<span>Author match: ${escapeHtml(titleize(skill.author_confidence))}</span>`;
 }
 
-function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById, indexDecision) {
+function renderSkillPage(
+  skill,
+  repoSkills,
+  authorSkills,
+  skillUrlById,
+  profilePathByCreatorHandle,
+  indexDecision,
+) {
   const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
   const description = skillMetaDescription(skill);
   const visibleDescription = visibleDescriptionForSkill(skill);
   const readmeSnippet = readmeSnippetForSkill(skill);
   const installId = `install-${createHash("sha256").update(skill.id).digest("hex").slice(0, 10)}`;
+  const author = skill.author_handle
+    ? skillAuthorReference(skill, profilePathByCreatorHandle)
+    : null;
   const body = `    <div class="eyebrow">Skill</div>
     <h1>${escapeHtml(skill.name)}</h1>
     <div class="meta">
-      ${skill.author_handle ? `<a href="${escapeHtml(profilePath(skill.author_handle))}">@${escapeHtml(skill.author_handle)}</a>` : ""}
+      ${author ? `<a href="${escapeHtml(author.profilePath ?? author.githubUrl)}">@${escapeHtml(skill.author_handle)}</a>` : ""}
       <span>${compactNumber(skill.stars)} stars</span>
       ${installsBadge(skill)}
       ${trendingBadge(skill)}
@@ -556,7 +594,10 @@ function renderSkillPage(skill, repoSkills, authorSkills, skillUrlById, indexDec
     description,
     path: urlPath,
     body,
-    structuredData: [skillStructuredData(skill, urlPath, description), skillBreadcrumbData(skill, urlPath)],
+    structuredData: [
+      skillStructuredData(skill, urlPath, description, profilePathByCreatorHandle),
+      skillBreadcrumbData(skill, urlPath, profilePathByCreatorHandle),
+    ],
     ogType: "article",
     indexTier: indexDecision.tier,
   });
@@ -703,6 +744,17 @@ async function main() {
 
   const { skills, trending, collections, authorLeaderboards } = libraryData;
   const skillUrlById = buildSkillUrlMap(skills);
+  const profilePages = collections.collections
+    .filter((collection) => collection.type === "author" && collection.authorHandle)
+    .map((collection) => ({
+      authorHandle: collection.authorHandle,
+      collection,
+      urlPath: profilePath(collection.authorHandle),
+    }));
+  const profilePathByCreatorHandle = buildProfilePathByCreatorHandle(
+    profilePages,
+    loadCreatorHandleOwners(),
+  );
 
   const skillById = new Map(skills.map((skill) => [skill.id, skill]));
   const trendingById = new Map(trending.map((entry) => [entry.id, entry]));
@@ -782,49 +834,64 @@ async function main() {
     const authorSkills = uniqueSkills(skillsByAuthor.get(String(skill.author_handle || "").toLowerCase()) || [])
       .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id))
       .slice(0, Math.max(0, 3 - repoSkills.length));
-    await writePage(urlPath, renderSkillPage(skill, repoSkills, authorSkills, skillUrlById, indexDecision));
+    await writePage(
+      urlPath,
+      renderSkillPage(
+        skill,
+        repoSkills,
+        authorSkills,
+        skillUrlById,
+        profilePathByCreatorHandle,
+        indexDecision,
+      ),
+    );
   }
 
-  const profileCollections = [];
+  const profileCollections = profilePages.map((page) => page.collection);
   const topicCollections = [];
-  for (const collection of collections.collections) {
-    if (collection.type === "author" && collection.authorHandle) {
-      profileCollections.push(collection);
-      const authorSkills = (skillsByAuthor.get(collection.authorHandle.toLowerCase()) || [])
-        .filter((skill) => includedSkillIds.has(skill.id))
-        .slice(0, 12);
-      const urlPath = profilePath(collection.authorHandle);
-      const indexTier = authorSkills.length ? "indexable" : "noindex";
-      registerUrl(allUrls, urlPath, `profile ${collection.authorHandle}`);
-      allUrls.set(urlPath, { source: `profile ${collection.authorHandle}`, indexTier });
-      if (indexTier === "indexable") {
-        sitemapUrls.set(urlPath, { source: `profile ${collection.authorHandle}` });
-        indexableCount += 1;
-      } else {
-        noindexCount += 1;
-        addNoindexReason("empty-profile");
-      }
-      await writePage(
-        urlPath,
-        renderProfilePage(collection, authorSkills, skillUrlById, authorStatsByHandle.get(collection.authorHandle.toLowerCase()), indexTier),
-      );
+  for (const { collection, urlPath } of profilePages) {
+    const authorSkills = (skillsByAuthor.get(collection.authorHandle.toLowerCase()) || [])
+      .filter((skill) => includedSkillIds.has(skill.id))
+      .slice(0, 12);
+    const indexTier = authorSkills.length ? "indexable" : "noindex";
+    registerUrl(allUrls, urlPath, `profile ${collection.authorHandle}`);
+    allUrls.set(urlPath, { source: `profile ${collection.authorHandle}`, indexTier });
+    if (indexTier === "indexable") {
+      sitemapUrls.set(urlPath, { source: `profile ${collection.authorHandle}` });
+      indexableCount += 1;
     } else {
-      const featuredSkills = (collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
-      const allSkills = (collection.skillIds || collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
-      const urlPath = collectionPath(collection.id);
-      const indexTier = allSkills.length ? "indexable" : "noindex";
-      topicCollections.push(collection);
-      registerUrl(allUrls, urlPath, `collection ${collection.id}`);
-      allUrls.set(urlPath, { source: `collection ${collection.id}`, indexTier });
-      if (indexTier === "indexable") {
-        sitemapUrls.set(urlPath, { source: `collection ${collection.id}` });
-        indexableCount += 1;
-      } else {
-        noindexCount += 1;
-        addNoindexReason("empty-collection");
-      }
-      await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, indexTier));
+      noindexCount += 1;
+      addNoindexReason("empty-profile");
     }
+    await writePage(
+      urlPath,
+      renderProfilePage(
+        collection,
+        authorSkills,
+        skillUrlById,
+        authorStatsByHandle.get(collection.authorHandle.toLowerCase()),
+        indexTier,
+      ),
+    );
+  }
+
+  for (const collection of collections.collections) {
+    if (collection.type === "author") continue;
+    const featuredSkills = (collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
+    const allSkills = (collection.skillIds || collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
+    const urlPath = collectionPath(collection.id);
+    const indexTier = allSkills.length ? "indexable" : "noindex";
+    topicCollections.push(collection);
+    registerUrl(allUrls, urlPath, `collection ${collection.id}`);
+    allUrls.set(urlPath, { source: `collection ${collection.id}`, indexTier });
+    if (indexTier === "indexable") {
+      sitemapUrls.set(urlPath, { source: `collection ${collection.id}` });
+      indexableCount += 1;
+    } else {
+      noindexCount += 1;
+      addNoindexReason("empty-collection");
+    }
+    await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, indexTier));
   }
 
   registerUrl(allUrls, "/skills/", "skills index");

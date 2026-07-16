@@ -18,7 +18,7 @@
     "dev:portal": "npm --workspace portal run dev",
     "generate:creator-handle-reservations": "node ./scripts/generate-creator-handle-reservations.mjs",
     "test": "npm run check",
-    "test:creator-handle-reservations": "node --test ./scripts/generate-creator-handle-reservations.test.mjs && tsx --test ./netlify/functions/_shared/reserved.test.ts",
+    "test:creator-handle-reservations": "node --test ./scripts/generate-creator-handle-reservations.test.mjs && tsx --test ./netlify/functions/_shared/reserved.test.ts ./netlify/functions/_shared/group-slug.test.ts",
     "test:sync-skill": "tsx --test ./netlify/functions/_shared/sync-skill.test.ts",
     "test:database-routing": "tsx --test ./netlify/functions/_shared/db.test.ts",
     "test:device-auth": "tsx --test ./netlify/functions/_shared/device-auth.test.ts ./netlify/functions/_shared/browser-pairing.test.ts",

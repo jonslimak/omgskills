@@ -116,7 +116,7 @@ manifest_path = Path(os.environ["DATA_MANIFEST"])
 resources_dir = Path(os.environ["APP_RESOURCES"])
 manifest = json.loads(manifest_path.read_text())
 
-for asset_key in ("collections", "shaHistory"):
+for asset_key in ("collections", "shaHistory", "skillEquivalence"):
     asset = manifest.get(asset_key)
     if not asset or not asset.get("path"):
         continue

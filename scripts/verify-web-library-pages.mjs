@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFile, stat } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
@@ -58,7 +58,21 @@ const pages = [
     descriptionText: "Install code-review",
     visibleText: "Run a final code review on a pull request",
     metadata: true,
+    profileAuthor: {
+      handle: "openai",
+      path: "/library/openai/",
+    },
     allowNoindex: true,
+  },
+  {
+    path: "/skills/obra/superpowers/systematic-debugging/",
+    canonical: "https://omgskills.com/skills/obra/superpowers/systematic-debugging/",
+    text: "systematic-debugging",
+    allowNoindex: true,
+    githubAuthor: {
+      handle: "obra",
+      url: "https://github.com/obra",
+    },
   },
   {
     path: "/skills/openai/codex/code-review-change-size/",
@@ -132,8 +146,17 @@ function internalLinks(html) {
     .filter((href) => href.startsWith("/") && !href.startsWith("//"));
 }
 
+function sameOriginPaths(text) {
+  const references = new Set(internalLinks(text));
+  const escapedOrigin = origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  for (const match of text.matchAll(new RegExp(`${escapedOrigin}(/[^\\s"'<>]*)`, "g"))) {
+    references.add(match[1]);
+  }
+  return [...references];
+}
+
 async function localUrlExists(urlPath) {
-  const cleanPath = urlPath.split("?")[0];
+  const cleanPath = urlPath.split(/[?#]/)[0];
   const filePath = cleanPath.endsWith("/")
     ? localPathForUrlPath(path.posix.join(cleanPath, "index.html"))
     : localPathForUrlPath(cleanPath);
@@ -144,11 +167,50 @@ async function localUrlExists(urlPath) {
   return false;
 }
 
-async function verifyLocalInternalLinks(html, label) {
-  for (const href of internalLinks(html)) {
-    if (!(await localUrlExists(href))) {
-      throw new Error(`${label} linked to missing local URL ${href}`);
+async function collectHtmlFiles(directory) {
+  const files = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await collectHtmlFiles(entryPath));
+    } else if (entry.isFile() && entry.name.endsWith(".html")) {
+      files.push(entryPath);
     }
+  }
+  return files;
+}
+
+async function collectLocalReferenceFailures(text, label, failures) {
+  for (const urlPath of sameOriginPaths(text)) {
+    if (urlPath === "/profiles" || urlPath.startsWith("/profiles/")) {
+      failures.add(`${label}: redirect-only URL ${urlPath}`);
+    } else if (!(await localUrlExists(urlPath))) {
+      failures.add(`${label}: missing local URL ${urlPath}`);
+    }
+  }
+}
+
+async function verifyAllLocalReferences() {
+  const failures = new Set();
+  const htmlRoots = ["skills", "library", "collections"].map((directory) => path.join(siteDir, directory));
+  const htmlFiles = (await Promise.all(htmlRoots.map(collectHtmlFiles))).flat().sort();
+  for (const filePath of htmlFiles) {
+    await collectLocalReferenceFailures(await readFile(filePath, "utf8"), filePath, failures);
+  }
+
+  const sitemapPath = path.join(siteDir, "sitemap.xml");
+  const rootSitemap = await readFile(sitemapPath, "utf8");
+  await collectLocalReferenceFailures(rootSitemap, sitemapPath, failures);
+  for (const urlPath of sitemapChildPaths(rootSitemap)) {
+    const childPath = localPathForUrlPath(urlPath);
+    await collectLocalReferenceFailures(await readFile(childPath, "utf8"), childPath, failures);
+  }
+
+  const llmsPath = localPathForUrlPath("/llms.txt");
+  await collectLocalReferenceFailures(await readFile(llmsPath, "utf8"), llmsPath, failures);
+
+  if (failures.size) {
+    throw new Error(`Generated web library has unsafe internal references:\n${[...failures].sort().join("\n")}`);
   }
 }
 
@@ -189,6 +251,25 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, '<meta property="og:image"', label);
     assertIncludes(html, '"sameAs":["https://github.com/openai"]', label);
   }
+
+  if (page.profileAuthor) {
+    assertIncludes(
+      html,
+      `href="${page.profileAuthor.path}">@${page.profileAuthor.handle}</a>`,
+      label,
+    );
+    assertIncludes(html, `${origin}${page.profileAuthor.path}`, label);
+  }
+
+  if (page.githubAuthor) {
+    assertIncludes(
+      html,
+      `href="${page.githubAuthor.url}">@${page.githubAuthor.handle}</a>`,
+      label,
+    );
+    assertNotIncludes(html, `/library/${page.githubAuthor.handle}/`, label);
+    assertNotIncludes(html, `/profiles/${page.githubAuthor.handle}/`, label);
+  }
 }
 
 async function verifyLocalPage(page) {
@@ -201,7 +282,6 @@ async function verifyLocalPage(page) {
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, filePath);
   assertIncludes(html, page.text, filePath);
   verifyMetadata(html, page, filePath);
-  await verifyLocalInternalLinks(html, filePath);
 }
 
 async function verifyLocalSitemap() {
@@ -306,16 +386,6 @@ function llmsUrls(text) {
     .filter((urlPath) => urlPath.startsWith("/"));
 }
 
-async function verifyLocalLlmsLinks() {
-  const filePath = localPathForUrlPath("/llms.txt");
-  const text = await readFile(filePath, "utf8");
-  for (const urlPath of llmsUrls(text)) {
-    if (!(await localUrlExists(urlPath))) {
-      throw new Error(`${filePath} linked to missing local URL ${urlPath}`);
-    }
-  }
-}
-
 async function verifyLiveLlmsLinks() {
   const response = await fetchLive(`${origin}/llms.txt`, { redirect: "manual" });
   const text = await response.text();
@@ -353,8 +423,8 @@ async function main() {
 
   for (const page of pages) await verifyLocalPage(page);
   for (const file of rootFiles) await verifyLocalRootFile(file);
-  await verifyLocalLlmsLinks();
   await verifyLocalSitemap();
+  await verifyAllLocalReferences();
   console.log("Local web library pages verified");
 }
 
