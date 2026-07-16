@@ -16,24 +16,24 @@ export const generatedReservationsPath = path.join(
 
 const handlePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-function normalizedHandle(value) {
+export function normalizedCreatorHandle(value) {
   return String(value ?? "").trim().toLowerCase();
 }
 
-export function buildCreatorHandleReservations(registry) {
+export function buildCreatorHandleOwners(registry) {
   if (!Array.isArray(registry?.creators)) {
     throw new Error("creators.json must contain a creators array");
   }
 
   const ownersByHandle = new Map();
   for (const entry of registry.creators) {
-    const owner = normalizedHandle(entry?.handle);
+    const owner = normalizedCreatorHandle(entry?.handle);
     if (!owner) {
       throw new Error("Creator handle cannot be empty");
     }
 
     for (const rawHandle of [entry.handle, ...(entry.aliases ?? [])]) {
-      const handle = normalizedHandle(rawHandle);
+      const handle = normalizedCreatorHandle(rawHandle);
       if (!handlePattern.test(handle) || handle.length > 80) {
         throw new Error(`Invalid creator handle or alias: ${rawHandle}`);
       }
@@ -46,7 +46,11 @@ export function buildCreatorHandleReservations(registry) {
     }
   }
 
-  return [...ownersByHandle.keys()].sort((a, b) => a.localeCompare(b));
+  return ownersByHandle;
+}
+
+export function buildCreatorHandleReservations(registry) {
+  return [...buildCreatorHandleOwners(registry).keys()].sort((a, b) => a.localeCompare(b));
 }
 
 export function loadCreatorHandleReservations() {
@@ -54,11 +58,44 @@ export function loadCreatorHandleReservations() {
   return buildCreatorHandleReservations(registry);
 }
 
+export function loadCreatorHandleOwners() {
+  const registry = JSON.parse(readFileSync(creatorRegistryPath, "utf8"));
+  return buildCreatorHandleOwners(registry);
+}
+
+export function buildProfilePathByCreatorHandle(profilePages, ownersByHandle) {
+  const profilePathByOwner = new Map();
+  const profilePathByHandle = new Map();
+
+  for (const page of profilePages) {
+    const handle = normalizedCreatorHandle(page?.authorHandle);
+    const urlPath = String(page?.urlPath ?? "");
+    if (!handle || !urlPath) {
+      throw new Error("Generated profile page must include authorHandle and urlPath");
+    }
+
+    const owner = ownersByHandle.get(handle) ?? handle;
+    const existingPath = profilePathByOwner.get(owner);
+    if (existingPath && existingPath !== urlPath) {
+      throw new Error(`Creator profile collision: ${owner} maps to both ${existingPath} and ${urlPath}`);
+    }
+    profilePathByOwner.set(owner, urlPath);
+    profilePathByHandle.set(handle, urlPath);
+  }
+
+  for (const [handle, owner] of ownersByHandle) {
+    const urlPath = profilePathByOwner.get(owner);
+    if (urlPath) profilePathByHandle.set(handle, urlPath);
+  }
+
+  return profilePathByHandle;
+}
+
 export function assertStaticProfileHandlesReserved(collections, reservedHandles) {
-  const reserved = new Set(reservedHandles.map(normalizedHandle));
+  const reserved = new Set(reservedHandles.map(normalizedCreatorHandle));
   for (const collection of collections) {
     if (collection?.type !== "author" || !collection.authorHandle) continue;
-    if (!reserved.has(normalizedHandle(collection.authorHandle))) {
+    if (!reserved.has(normalizedCreatorHandle(collection.authorHandle))) {
       throw new Error(
         `Static profile handle is not reserved: ${collection.authorHandle}. Add it to index/seeds/creators.json first.`,
       );

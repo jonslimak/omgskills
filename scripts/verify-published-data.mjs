@@ -66,6 +66,7 @@ const skillSignals = manifest.skillSignals ? assertAsset("skillSignals", manifes
 const authorSignals = manifest.authorSignals ? assertAsset("authorSignals", manifest.authorSignals) : null;
 const authorLeaderboards = manifest.authorLeaderboards ? assertAsset("authorLeaderboards", manifest.authorLeaderboards) : null;
 const shaHistory = manifest.shaHistory ? assertAsset("shaHistory", manifest.shaHistory) : null;
+const collections = manifest.collections ? assertAsset("collections", manifest.collections) : null;
 
 if (!Array.isArray(skills.decoded)) fail("skills payload must be an array");
 if (!Array.isArray(trending.decoded)) fail("trending payload must be an array");
@@ -82,10 +83,66 @@ if (authorLeaderboards && !Array.isArray(authorLeaderboards.decoded)) fail("auth
 if (shaHistory && (!shaHistory.decoded || Array.isArray(shaHistory.decoded))) {
   fail("shaHistory payload must be an object");
 }
+if (collections && (!collections.decoded || Array.isArray(collections.decoded))) {
+  fail("collections payload must be an object");
+}
 
 const skillsById = new Map(skills.decoded.map((item) => [item?.id, item]).filter(([id]) => Boolean(id)));
 const skillIds = new Set(skillsById.keys());
 const authorHandles = new Set(skills.decoded.map((item) => item?.author_handle).filter(Boolean));
+let staleCollectionReferenceCount = 0;
+
+if (collections) {
+  const data = collections.decoded;
+  if (data.version !== 1 || typeof data.generatedAt !== "string" || !data.generatedAt) {
+    fail("collections must include version 1 and generatedAt");
+  }
+  if (!Array.isArray(data.collections)) {
+    fail("collections.collections must be an array");
+  }
+
+  const collectionIds = new Set();
+  for (const entry of data.collections) {
+    if (!entry || Array.isArray(entry) || typeof entry !== "object") {
+      fail("collections contains a non-object entry");
+    }
+    if (typeof entry.id !== "string" || !entry.id) {
+      fail("collections entry is missing id");
+    }
+    if (collectionIds.has(entry.id)) {
+      fail(`collections contains duplicate id: ${entry.id}`);
+    }
+    collectionIds.add(entry.id);
+    if (!["author", "topic"].includes(entry.type)) {
+      fail(`collections entry has invalid type: ${entry.id}`);
+    }
+    if (typeof entry.title !== "string" || !entry.title || typeof entry.subtitle !== "string" || !entry.subtitle) {
+      fail(`collections entry is missing title or subtitle: ${entry.id}`);
+    }
+    if (!Array.isArray(entry.featuredSkillIds) || entry.featuredSkillIds.some((id) => typeof id !== "string" || !id)) {
+      fail(`collections entry has invalid featuredSkillIds: ${entry.id}`);
+    }
+    if (entry.type === "author" && (typeof entry.authorHandle !== "string" || !entry.authorHandle)) {
+      fail(`author collection is missing authorHandle: ${entry.id}`);
+    }
+    if (entry.type === "topic" && !Array.isArray(entry.skillIds)) {
+      fail(`topic collection is missing skillIds: ${entry.id}`);
+    }
+    if (entry.skillIds !== undefined && (!Array.isArray(entry.skillIds) || entry.skillIds.some((id) => typeof id !== "string" || !id))) {
+      fail(`collections entry has invalid skillIds: ${entry.id}`);
+    }
+
+    for (const skillId of new Set([...(entry.featuredSkillIds ?? []), ...(entry.skillIds ?? [])])) {
+      if (!skillIds.has(skillId)) {
+        staleCollectionReferenceCount += 1;
+        console.error(
+          `verify-published-data: warning: ${entry.id} references ${skillId}, which is absent from the ${dataTrackSubdir || "root"} skills asset`,
+        );
+      }
+    }
+  }
+}
+
 for (const entry of trending.decoded) {
   if (!entry?.id || !skillIds.has(entry.id)) {
     fail(`trending entry missing matching skill id: ${entry?.id ?? "<missing>"}`);
@@ -210,6 +267,8 @@ console.log(
       skillSignalsCount: skillSignals?.decoded.length ?? 0,
       authorSignalsCount: authorSignals?.decoded.length ?? 0,
       authorLeaderboardsCount: authorLeaderboards?.decoded.length ?? 0,
+      collectionsCount: collections?.decoded.collections.length ?? 0,
+      staleCollectionReferenceCount,
       shaHistoryCount: shaHistory ? Object.keys(shaHistory.decoded.shaToSkillIds).length : 0,
       canonicalByShaCount: shaHistory ? Object.keys(shaHistory.decoded.canonicalBySha ?? {}).length : 0,
     },

@@ -21,7 +21,7 @@ function writeAsset(dataDir, name, value) {
   };
 }
 
-function verifyFixture({ skills, shaHistory }) {
+function verifyFixture({ skills, shaHistory, collections }) {
   const root = mkdtempSync(join(tmpdir(), "verify-published-data-test-"));
   const dataDir = join(root, "site", "data", "test");
   mkdirSync(dataDir, { recursive: true });
@@ -33,6 +33,9 @@ function verifyFixture({ skills, shaHistory }) {
       trending: writeAsset(dataDir, "trending.json", []),
       shaHistory: writeAsset(dataDir, "sha-history.json", shaHistory),
     };
+    if (collections !== undefined) {
+      manifest.collections = writeAsset(dataDir, "collections.json", collections);
+    }
     writeFileSync(join(dataDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
     return spawnSync(process.execPath, [scriptPath], {
       cwd: root,
@@ -68,6 +71,7 @@ test("accepts historical SHA assets without canonicalBySha", () => {
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(JSON.parse(result.stdout).canonicalByShaCount, 0);
+  assert.equal(JSON.parse(result.stdout).collectionsCount, 0);
 });
 
 test("accepts a live high-confidence same-repository canonical mapping", () => {
@@ -115,6 +119,129 @@ test("rejects invalid canonical mappings", async (t) => {
       const result = verifyFixture({
         skills: fixture.skills,
         shaHistory: history({ [shaA]: fixture.entry }),
+      });
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, new RegExp(fixture.error));
+    });
+  }
+});
+
+test("accepts a structurally valid collections asset", () => {
+  const result = verifyFixture({
+    skills: [skill("owner/repo:one", shaA)],
+    shaHistory: history(undefined),
+    collections: {
+      version: 1,
+      generatedAt: "2026-07-16T00:00:00.000Z",
+      collections: [
+        {
+          id: "author-owner",
+          type: "author",
+          title: "Owner",
+          subtitle: "Skills by @owner",
+          authorHandle: "owner",
+          featuredSkillIds: ["owner/repo:one"],
+        },
+        {
+          id: "starter",
+          type: "topic",
+          title: "Starter",
+          subtitle: "Starter skills",
+          featuredSkillIds: ["owner/repo:one"],
+          skillIds: ["owner/repo:one"],
+        },
+      ],
+    },
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).collectionsCount, 2);
+  assert.equal(JSON.parse(result.stdout).staleCollectionReferenceCount, 0);
+});
+
+test("warns without blocking when a collection references a missing track skill", () => {
+  const result = verifyFixture({
+    skills: [skill("owner/repo:one", shaA)],
+    shaHistory: history(undefined),
+    collections: {
+      version: 1,
+      generatedAt: "2026-07-16T00:00:00.000Z",
+      collections: [
+        {
+          id: "starter",
+          type: "topic",
+          title: "Starter",
+          subtitle: "Starter skills",
+          featuredSkillIds: ["owner/repo:missing"],
+          skillIds: ["owner/repo:missing"],
+        },
+      ],
+    },
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stderr, /warning: starter references owner\/repo:missing/);
+  assert.equal(JSON.parse(result.stdout).staleCollectionReferenceCount, 1);
+});
+
+test("rejects malformed collections assets", async (t) => {
+  const cases = [
+    {
+      name: "array payload",
+      collections: [],
+      error: "collections payload must be an object",
+    },
+    {
+      name: "duplicate collection IDs",
+      collections: {
+        version: 1,
+        generatedAt: "2026-07-16T00:00:00.000Z",
+        collections: [
+          {
+            id: "duplicate",
+            type: "topic",
+            title: "One",
+            subtitle: "One",
+            featuredSkillIds: [],
+            skillIds: [],
+          },
+          {
+            id: "duplicate",
+            type: "topic",
+            title: "Two",
+            subtitle: "Two",
+            featuredSkillIds: [],
+            skillIds: [],
+          },
+        ],
+      },
+      error: "duplicate id",
+    },
+    {
+      name: "author without handle",
+      collections: {
+        version: 1,
+        generatedAt: "2026-07-16T00:00:00.000Z",
+        collections: [
+          {
+            id: "author-owner",
+            type: "author",
+            title: "Owner",
+            subtitle: "Owner skills",
+            featuredSkillIds: [],
+          },
+        ],
+      },
+      error: "missing authorHandle",
+    },
+  ];
+
+  for (const fixture of cases) {
+    await t.test(fixture.name, () => {
+      const result = verifyFixture({
+        skills: [skill("owner/repo:one", shaA)],
+        shaHistory: history(undefined),
+        collections: fixture.collections,
       });
       assert.notEqual(result.status, 0);
       assert.match(result.stderr, new RegExp(fixture.error));

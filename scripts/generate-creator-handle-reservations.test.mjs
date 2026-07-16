@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   assertStaticProfileHandlesReserved,
+  buildCreatorHandleOwners,
   buildCreatorHandleReservations,
+  buildProfilePathByCreatorHandle,
   renderCreatorHandleReservations,
 } from "./generate-creator-handle-reservations.mjs";
 
@@ -16,6 +18,26 @@ test("normalizes and sorts creator handles and aliases", () => {
 
   assert.deepEqual(handles, ["alpha", "old-zulu", "zulu"]);
   assert.match(renderCreatorHandleReservations(handles), /"old-zulu"/);
+});
+
+test("maps case and aliases to the exact generated profile path", () => {
+  const owners = buildCreatorHandleOwners({
+    creators: [
+      { handle: "JimLiu" },
+      { handle: "NewHandle", aliases: ["OldHandle"] },
+    ],
+  });
+  const paths = buildProfilePathByCreatorHandle(
+    [
+      { authorHandle: "JIMLIU", urlPath: "/library/jimliu/" },
+      { authorHandle: "oldhandle", urlPath: "/library/oldhandle/" },
+    ],
+    owners,
+  );
+
+  assert.equal(paths.get("jimliu"), "/library/jimliu/");
+  assert.equal(paths.get("newhandle"), "/library/oldhandle/");
+  assert.equal(paths.get("oldhandle"), "/library/oldhandle/");
 });
 
 test("rejects invalid handles", () => {
