@@ -1,44 +1,7 @@
 import type { Config, Context } from "@netlify/functions";
-import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
+import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
+import { loadPublishedSkills } from "./_shared/published-catalog.js";
 import { requirePortalUser } from "./_shared/user.js";
-
-type CatalogSkill = {
-  id?: string;
-  name?: string;
-  description?: string;
-  github_url?: string;
-  githubUrl?: string;
-};
-
-const DATA_MANIFESTS = [
-  "https://omgskills.com/data/crawl4/manifest.json",
-  "https://omgskills.com/data/v2/manifest.json"
-];
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const response = await withTimeout(fetch(url), 8000);
-  if (!response.ok) {
-    throw new Error(`Fetch failed with ${response.status}`);
-  }
-  return response.json() as Promise<T>;
-}
-
-async function fetchSkills() {
-  for (const manifestUrl of DATA_MANIFESTS) {
-    try {
-      const manifest = await fetchJson<{ skills?: { path?: string } }>(manifestUrl);
-      const path = manifest.skills?.path;
-      if (!path) {
-        throw new Error("Manifest missing skills path");
-      }
-      return await fetchJson<CatalogSkill[]>(new URL(path, manifestUrl).toString());
-    } catch {
-      // Try next hosted manifest. Catalog lookup is non-blocking by design.
-    }
-  }
-
-  throw new Error("Catalog unavailable");
-}
 
 export default async (req: Request, _context: Context) => {
   if (req.method === "OPTIONS") {
@@ -55,7 +18,7 @@ export default async (req: Request, _context: Context) => {
       return jsonResponse(req, { skills: [] });
     }
 
-    const skills = await fetchSkills();
+    const skills = await loadPublishedSkills();
     const results = skills
       .filter((skill) => {
         const haystack = `${skill.id ?? ""} ${skill.name ?? ""} ${skill.description ?? ""}`.toLowerCase();

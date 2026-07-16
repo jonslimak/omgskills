@@ -1,7 +1,13 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import {
+  GithubSkillValidationError,
+  groupItemForValidatedGithubSkill,
+  validateGithubSkill,
+} from "./_shared/github-skill-resolution.js";
 import { addGroupItem, requireOwnedGroup } from "./_shared/group-items.js";
 import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
+import { loadPublishedCatalogIdentity } from "./_shared/published-catalog.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { optionalString, requireString } from "./_shared/validation.js";
 
@@ -88,70 +94,6 @@ async function listGroupItems(req: Request, groupId: string) {
   return jsonResponse(req, { items });
 }
 
-function parseGithubSkillUrl(rawUrl: string): URL {
-  let url: URL;
-  try {
-    url = new URL(rawUrl);
-  } catch {
-    throw new Response("GitHub URL is invalid", { status: 400 });
-  }
-
-  if (url.hostname !== "github.com") {
-    throw new Response("Only github.com URLs are supported", { status: 400 });
-  }
-  const parts = url.pathname.split("/").filter(Boolean);
-  if (parts.length < 2) {
-    throw new Response("GitHub URL must include owner and repo", { status: 400 });
-  }
-  return url;
-}
-
-function rawSkillMdCandidates(url: URL): string[] {
-  const parts = url.pathname.split("/").filter(Boolean);
-  const [owner, repo] = parts;
-  const blobIndex = parts.indexOf("blob");
-  if (blobIndex >= 0 && parts[blobIndex + 1]) {
-    const branch = parts[blobIndex + 1];
-    const path = parts.slice(blobIndex + 2).join("/");
-    return [`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`];
-  }
-  return [
-    `https://raw.githubusercontent.com/${owner}/${repo}/main/SKILL.md`,
-    `https://raw.githubusercontent.com/${owner}/${repo}/master/SKILL.md`
-  ];
-}
-
-function hasFrontmatterField(markdown: string, field: string): boolean {
-  const frontmatter = markdown.match(/^---\n([\s\S]*?)\n---/);
-  return Boolean(frontmatter?.[1].match(new RegExp(`^${field}:\\s*.+$`, "m")));
-}
-
-function frontmatterField(markdown: string, field: string): string | null {
-  const frontmatter = markdown.match(/^---\n([\s\S]*?)\n---/);
-  const match = frontmatter?.[1].match(new RegExp(`^${field}:\\s*(.+)$`, "m"));
-  return match?.[1]?.trim().replace(/^["']|["']$/g, "") || null;
-}
-
-async function validateGithubSkill(rawUrl: string) {
-  const url = parseGithubSkillUrl(rawUrl);
-  for (const candidate of rawSkillMdCandidates(url)) {
-    const response = await withTimeout(fetch(candidate), 8000);
-    if (!response.ok) {
-      continue;
-    }
-    const markdown = await response.text();
-    if (!hasFrontmatterField(markdown, "name") || !hasFrontmatterField(markdown, "description")) {
-      throw new Response("SKILL.md must include name and description frontmatter", { status: 400 });
-    }
-    return {
-      rawSkillUrl: candidate,
-      name: frontmatterField(markdown, "name"),
-      description: frontmatterField(markdown, "description")
-    };
-  }
-  throw new Response("Could not find a valid public SKILL.md", { status: 400 });
-}
-
 export default async (req: Request, _context: Context) => {
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
@@ -196,11 +138,12 @@ export default async (req: Request, _context: Context) => {
       const githubUrl = requireString(body?.githubUrl, "githubUrl", 500);
       const validated = await validateGithubSkill(githubUrl);
       const note = optionalString(body?.note, 1000);
+      // GitHub validation succeeded, so catalog enrichment remains non-blocking.
+      const catalogIdentity = await withTimeout(loadPublishedCatalogIdentity(), 5_000)
+        .catch(() => null);
+      const resolvedItem = groupItemForValidatedGithubSkill(validated, catalogIdentity);
       const item = await addGroupItem(groupId, {
-        kind: "github",
-        githubUrl,
-        name: validated.name,
-        description: validated.description,
+        ...resolvedItem,
         note
       });
       return jsonResponse(req, item, { status: 201 });
@@ -210,6 +153,9 @@ export default async (req: Request, _context: Context) => {
   } catch (error) {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());
+    }
+    if (error instanceof GithubSkillValidationError) {
+      return errorResponse(req, 400, error.message);
     }
     return errorResponse(req, 500, "Failed to add group item");
   }
