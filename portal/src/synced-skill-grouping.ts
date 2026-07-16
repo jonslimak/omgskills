@@ -4,6 +4,7 @@ export type SyncedSkill = {
   description: string | null;
   skillMdSha?: string | null;
   identityStatus?: "resolved" | "ambiguous" | "localOnly";
+  catalogSkillId?: string | null;
   githubUrl: string | null;
   isLocalOnly: boolean;
   source: string;
@@ -89,10 +90,24 @@ function chooseRepresentativeSkill(skills: SyncedSkill[]) {
 }
 
 export function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
-  const groups: SyncedSkill[][] = [];
+  const catalogGroups = new Map<string, SyncedSkill[]>();
+  const unresolvedSkills: SyncedSkill[] = [];
+
   for (const skill of skills) {
+    const catalogSkillId = skill.catalogSkillId?.trim();
+    if (catalogSkillId) {
+      const group = catalogGroups.get(catalogSkillId) ?? [];
+      group.push(skill);
+      catalogGroups.set(catalogSkillId, group);
+    } else {
+      unresolvedSkills.push(skill);
+    }
+  }
+
+  const unresolvedGroups: SyncedSkill[][] = [];
+  for (const skill of unresolvedSkills) {
     const skillName = normalizedSkillText(skill.name);
-    const matchingGroup = groups.find((group) => {
+    const matchingGroup = unresolvedGroups.find((group) => {
       const firstSkill = group[0];
       if (normalizedSkillText(firstSkill.name) !== skillName) {
         return false;
@@ -106,11 +121,11 @@ export function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
     if (matchingGroup) {
       matchingGroup.push(skill);
     } else {
-      groups.push([skill]);
+      unresolvedGroups.push([skill]);
     }
   }
 
-  return groups
+  return [...catalogGroups.values(), ...unresolvedGroups]
     .map((group) => {
       const representative = chooseRepresentativeSkill(group);
       const bestDescription =
