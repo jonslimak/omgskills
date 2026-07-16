@@ -24,6 +24,27 @@ function loadJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
 }
 
+function normalizedSkillName(value) {
+  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function repoFromGithubUrl(value) {
+  try {
+    const url = new URL(String(value ?? ""));
+    if (url.hostname.toLowerCase() !== "github.com") return "";
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (parts.length < 2) return "";
+    return `${parts[0].toLowerCase()}/${parts[1].replace(/\.git$/i, "").toLowerCase()}`;
+  } catch {
+    return "";
+  }
+}
+
+function skillEquivalenceGroupId(memberSkillIds) {
+  const members = [...new Set(memberSkillIds)].sort();
+  return `eq-${sha256Hex(Buffer.from(members.join("\n")))}`;
+}
+
 function assertAsset(name, asset) {
   if (!asset?.path || !asset?.sha256 || typeof asset.bytes !== "number") {
     fail(`${name} asset is incomplete in manifest`);
@@ -67,6 +88,9 @@ const authorSignals = manifest.authorSignals ? assertAsset("authorSignals", mani
 const authorLeaderboards = manifest.authorLeaderboards ? assertAsset("authorLeaderboards", manifest.authorLeaderboards) : null;
 const shaHistory = manifest.shaHistory ? assertAsset("shaHistory", manifest.shaHistory) : null;
 const collections = manifest.collections ? assertAsset("collections", manifest.collections) : null;
+const skillEquivalence = manifest.skillEquivalence
+  ? assertAsset("skillEquivalence", manifest.skillEquivalence)
+  : null;
 
 if (!Array.isArray(skills.decoded)) fail("skills payload must be an array");
 if (!Array.isArray(trending.decoded)) fail("trending payload must be an array");
@@ -86,11 +110,104 @@ if (shaHistory && (!shaHistory.decoded || Array.isArray(shaHistory.decoded))) {
 if (collections && (!collections.decoded || Array.isArray(collections.decoded))) {
   fail("collections payload must be an object");
 }
+if (skillEquivalence && (!skillEquivalence.decoded || Array.isArray(skillEquivalence.decoded))) {
+  fail("skillEquivalence payload must be an object");
+}
 
 const skillsById = new Map(skills.decoded.map((item) => [item?.id, item]).filter(([id]) => Boolean(id)));
 const skillIds = new Set(skillsById.keys());
 const authorHandles = new Set(skills.decoded.map((item) => item?.author_handle).filter(Boolean));
 let staleCollectionReferenceCount = 0;
+let skillEquivalenceGroupCount = 0;
+
+if (skillEquivalence) {
+  const data = skillEquivalence.decoded;
+  if (data.version !== 1 || typeof data.generatedAt !== "string" || !data.generatedAt) {
+    fail("skillEquivalence must include version 1 and generatedAt");
+  }
+  if (!Array.isArray(data.groups)) {
+    fail("skillEquivalence.groups must be an array");
+  }
+
+  const claimedSkillIds = new Set();
+  for (const group of data.groups) {
+    if (!group || Array.isArray(group) || typeof group !== "object") {
+      fail("skillEquivalence contains a non-object group");
+    }
+    if (!Array.isArray(group.memberSkillIds)) {
+      fail(`skillEquivalence group is missing memberSkillIds: ${group.id ?? "<missing>"}`);
+    }
+    if (group.memberSkillIds.some((member) => typeof member !== "string" || !member)) {
+      fail(`skillEquivalence group contains an invalid member ID: ${group.id ?? "<missing>"}`);
+    }
+    const sortedMembers = [...new Set(group.memberSkillIds)].sort();
+    if (
+      sortedMembers.length !== 2 ||
+      sortedMembers.length !== group.memberSkillIds.length ||
+      sortedMembers.some((member, index) => member !== group.memberSkillIds[index])
+    ) {
+      fail(`skillEquivalence v1 group must contain two sorted unique members: ${group.id ?? "<missing>"}`);
+    }
+    const expectedGroupId = skillEquivalenceGroupId(group.memberSkillIds);
+    if (group.id !== expectedGroupId) {
+      fail(`skillEquivalence group ID does not match its members: ${group.id ?? "<missing>"}`);
+    }
+    if (!group.memberSkillIds.includes(group.representativeSkillId)) {
+      fail(`skillEquivalence representative is not a member: ${group.id}`);
+    }
+    if (
+      !group.preferredSkillIds ||
+      Array.isArray(group.preferredSkillIds) ||
+      typeof group.preferredSkillIds !== "object"
+    ) {
+      fail(`skillEquivalence preferredSkillIds must be an object: ${group.id}`);
+    }
+    for (const [agent, preferredSkillId] of Object.entries(group.preferredSkillIds)) {
+      if (typeof preferredSkillId !== "string" || !group.memberSkillIds.includes(preferredSkillId)) {
+        fail(`skillEquivalence preferred ${agent} skill is not a member: ${group.id}`);
+      }
+    }
+    if (group.confidence !== "high") {
+      fail(`skillEquivalence group must be high confidence: ${group.id}`);
+    }
+    if (
+      !Array.isArray(group.evidence) ||
+      group.evidence.length === 0 ||
+      group.evidence.some((entry) => typeof entry !== "string" || !entry)
+    ) {
+      fail(`skillEquivalence group has invalid evidence: ${group.id}`);
+    }
+
+    const memberSkills = group.memberSkillIds.map((memberSkillId) => skillsById.get(memberSkillId));
+    if (memberSkills.some((member) => !member)) {
+      fail(`skillEquivalence group contains a non-live member: ${group.id}`);
+    }
+    const memberRepos = memberSkills.map((member) => repoFromGithubUrl(member.github_url));
+    if (memberRepos.some((repo) => !repo) || new Set(memberRepos).size !== 1) {
+      fail(`skillEquivalence members must share one GitHub repository: ${group.id}`);
+    }
+    const memberNames = memberSkills.map((member) => normalizedSkillName(member.name));
+    if (memberNames.some((name) => !name) || new Set(memberNames).size !== 1) {
+      fail(`skillEquivalence members must share one normalized name: ${group.id}`);
+    }
+    const shas = new Set(
+      memberSkills
+        .map((member) => String(member.skill_md_sha ?? "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+    if (shas.size !== 2) {
+      fail(`skillEquivalence members must have distinct non-empty SHAs: ${group.id}`);
+    }
+
+    for (const memberSkillId of group.memberSkillIds) {
+      if (claimedSkillIds.has(memberSkillId)) {
+        fail(`skillEquivalence member belongs to multiple groups: ${memberSkillId}`);
+      }
+      claimedSkillIds.add(memberSkillId);
+    }
+  }
+  skillEquivalenceGroupCount = data.groups.length;
+}
 
 if (collections) {
   const data = collections.decoded;
@@ -271,6 +388,7 @@ console.log(
       staleCollectionReferenceCount,
       shaHistoryCount: shaHistory ? Object.keys(shaHistory.decoded.shaToSkillIds).length : 0,
       canonicalByShaCount: shaHistory ? Object.keys(shaHistory.decoded.canonicalBySha ?? {}).length : 0,
+      skillEquivalenceGroupCount,
     },
     null,
     2,

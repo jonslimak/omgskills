@@ -189,7 +189,7 @@ export function skillEquivalenceDescriptionsMatch(
 }
 
 function sortedUnique(values: string[]): string[] {
-  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+  return [...new Set(values)].sort();
 }
 
 export function skillEquivalenceGroupId(memberSkillIds: string[]): string {

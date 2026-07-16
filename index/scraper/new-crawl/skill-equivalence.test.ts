@@ -159,6 +159,10 @@ test("group IDs are deterministic and change with membership", () => {
   const first = skillEquivalenceGroupId(["b", "a"]);
   assert.equal(first, skillEquivalenceGroupId(["a", "b"]));
   assert.notEqual(first, skillEquivalenceGroupId(["a", "c"]));
+  assert.equal(
+    skillEquivalenceGroupId(["a", "B"]),
+    "eq-52958ed70d5d066708f7e77ec157d5df490e3f1a597fa14d0d41b513824564b6",
+  );
 });
 
 test("override parsing normalizes order and rejects duplicate decisions", () => {
