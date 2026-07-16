@@ -485,6 +485,19 @@ export type ShadowRunReport = {
     canonicalSkillId: string | null;
     reason: "same-repo" | "trusted-creator" | "clear-star-leader" | "ambiguous";
   }>;
+  skillEquivalenceGroupCount?: number;
+  skillEquivalenceAutomaticCount?: number;
+  skillEquivalenceManuallyApprovedCount?: number;
+  skillEquivalencePendingReviewCount?: number;
+  skillEquivalenceRejectedCount?: number;
+  skillEquivalenceExcludedCount?: number;
+  skillEquivalenceStaleOverrideCount?: number;
+  skillEquivalencePendingReviewSample?: Array<{
+    id: string;
+    repo: string;
+    normalizedName: string;
+    memberSkillIds: string[];
+  }>;
   qualityTierCounts?: Record<QualityTier, number>;
   qualityTierSamples?: Record<QualityTier, string[]>;
   enrichmentWarnings: string[];

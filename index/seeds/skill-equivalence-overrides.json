@@ -1,0 +1,306 @@
+{
+  "version": 1,
+  "decisions": [
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/invention-structuring",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/invention-structuring"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-queue",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-queue"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/heal-skill",
+        "boshu2/agentops:skills/heal-skill"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/forge",
+        "boshu2/agentops:skills/forge"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/deps",
+        "boshu2/agentops:skills/deps"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/evolve",
+        "boshu2/agentops:skills/evolve"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/converter",
+        "boshu2/agentops:skills/converter"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-llm",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-llm"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/analyze-results",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/analyze-results"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/discovery",
+        "boshu2/agentops:skills/discovery"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing",
+        "Chachamaru127/claude-code-harness:skills/breezing"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-plan",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-plan"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/bug-hunt",
+        "boshu2/agentops:skills/bug-hunt"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/dream",
+        "boshu2/agentops:skills/dream"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/beads",
+        "boshu2/agentops:skills/beads"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/ablation-planner",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/ablation-planner"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/dse-loop",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/dse-loop"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/knowledge-activation",
+        "boshu2/agentops:skills/knowledge-activation"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/complexity",
+        "boshu2/agentops:skills/complexity"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/figure-spec",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/figure-spec"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/compile",
+        "boshu2/agentops:skills/compile"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/goals",
+        "boshu2/agentops:skills/goals"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:handoff",
+        "boshu2/agentops:skills-codex/handoff"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/claims-drafting",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/claims-drafting"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/autodev",
+        "boshu2/agentops:skills/autodev"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/brainstorm",
+        "boshu2/agentops:skills/brainstorm"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/inject",
+        "boshu2/agentops:skills/inject"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/grafana-platform-dashboard",
+        "boshu2/agentops:skills/grafana-platform-dashboard"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/flywheel",
+        "boshu2/agentops:skills/flywheel"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/feishu-notify",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/feishu-notify"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/doc",
+        "boshu2/agentops:skills/doc"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/alphaxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/alphaxiv"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-audit",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-audit"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/harvest",
+        "boshu2/agentops:skills/harvest"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/codex-team",
+        "boshu2/agentops:skills/codex-team"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-minimax",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-minimax"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/implement",
+        "boshu2/agentops:skills/implement"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/bootstrap",
+        "boshu2/agentops:skills/bootstrap"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/arxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/arxiv"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/citation-audit",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/citation-audit"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-bridge",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-bridge"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/deepxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/deepxiv"
+      ],
+      "decision": "approve"
+    },
+    {
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/design",
+        "boshu2/agentops:skills/design"
+      ],
+      "decision": "approve"
+    }
+  ]
+}

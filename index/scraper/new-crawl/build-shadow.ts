@@ -33,6 +33,10 @@ import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
 import { isDoNotCrawlRepo, removeDoNotCrawlState } from "./do-not-crawl.js";
 import { filterSuppressedSkills } from "./suppressed-skills.js";
 import { buildShaCanonicalArtifact, shaCanonicalOptionsFromSeeds } from "./sha-canonical.js";
+import {
+  buildSkillEquivalenceShadow,
+  loadSkillEquivalenceOverrides,
+} from "./skill-equivalence.js";
 import { applyQualityTiers, stripQualityTiers, summarizeQualityTiers } from "./quality-tier.js";
 import {
   applyShadowSkillOverlay,
@@ -638,6 +642,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Baseline skills: ${report.baselineSkillCount}`,
     `- Shadow skills: ${report.shadowSkillCount}`,
     `- Exact-SHA canonical clusters: ${report.shaCanonicalClusterCount ?? 0} (${report.shaCanonicalHighConfidenceCount ?? 0} high confidence, ${report.shaCanonicalMediumCandidateCount ?? 0} medium candidates, ${report.shaCanonicalUnresolvedCount ?? 0} unresolved)`,
+    `- Cross-agent equivalence groups: ${report.skillEquivalenceGroupCount ?? 0} (${report.skillEquivalenceAutomaticCount ?? 0} automatic, ${report.skillEquivalenceManuallyApprovedCount ?? 0} approved, ${report.skillEquivalencePendingReviewCount ?? 0} pending review)`,
     ...(report.qualityTierCounts
       ? [`- Quality tiers: curated=${report.qualityTierCounts.curated}, creator=${report.qualityTierCounts.creator}, validated=${report.qualityTierCounts.validated}`]
       : []),
@@ -2021,6 +2026,8 @@ async function main() {
   const inspectableSkillsOutPath = join(shadowRoot, "skills.inspectable.shadow.json");
   const cutoverSkillsOutPath = join(shadowRoot, "skills.cutover.shadow.json");
   const shaCanonicalOutPath = join(shadowRoot, "sha-canonical.shadow.json");
+  const skillEquivalenceOutPath = join(shadowRoot, "skill-equivalence.shadow.json");
+  const skillEquivalenceReviewOutPath = join(shadowRoot, "skill-equivalence-review.shadow.json");
   const skillOverlayOutPath = join(shadowRoot, "skills.overlay.json");
   const repoIndexOutPath = join(shadowRoot, "repo-index.shadow.json");
   const repoOverlayOutPath = join(shadowRoot, "repo-index.overlay.json");
@@ -2193,6 +2200,13 @@ async function main() {
     shaCanonicalOptionsFromSeeds(seeds),
   );
   timings.buildShaCanonical = Math.round(performance.now() - shaCanonicalStart);
+  const skillEquivalenceStart = performance.now();
+  const skillEquivalence = buildSkillEquivalenceShadow(
+    cutoverShadowSkills,
+    checkedAt,
+    loadSkillEquivalenceOverrides(join(indexRoot, "seeds", "skill-equivalence-overrides.json")),
+  );
+  timings.buildSkillEquivalence = Math.round(performance.now() - skillEquivalenceStart);
 
   const shadowRepoOverlay: ShadowRepoOverlay | null = shouldWriteShadowRepoOverlay(cadence)
     ? buildShadowRepoOverlay(repoIndex, baselineRepoIndexForOverlay, checkedAt)
@@ -2368,6 +2382,19 @@ async function main() {
         canonicalSkillId: cluster.canonicalSkillId,
         reason: cluster.reason,
       })),
+    skillEquivalenceGroupCount: skillEquivalence.artifact.groups.length,
+    skillEquivalenceAutomaticCount: skillEquivalence.review.summary.automaticCount,
+    skillEquivalenceManuallyApprovedCount: skillEquivalence.review.summary.manuallyApprovedCount,
+    skillEquivalencePendingReviewCount: skillEquivalence.review.summary.pendingReviewCount,
+    skillEquivalenceRejectedCount: skillEquivalence.review.summary.rejectedCount,
+    skillEquivalenceExcludedCount: skillEquivalence.review.summary.excludedCount,
+    skillEquivalenceStaleOverrideCount: skillEquivalence.review.summary.staleOverrideCount,
+    skillEquivalencePendingReviewSample: skillEquivalence.review.pendingReview.slice(0, 10).map((candidate) => ({
+      id: candidate.id,
+      repo: candidate.repo,
+      normalizedName: candidate.normalizedName,
+      memberSkillIds: candidate.memberSkillIds,
+    })),
     ...(qualityTiersEnabled
       ? {
           qualityTierCounts: qualityTierSummary.counts,
@@ -2387,6 +2414,8 @@ async function main() {
   writeShadowFile(inspectableSkillsOutPath, JSON.stringify(inspectableShadowSkills, null, 2) + "\n");
   writeShadowFile(cutoverSkillsOutPath, JSON.stringify(cutoverShadowSkills, null, 2) + "\n");
   writeShadowFile(shaCanonicalOutPath, JSON.stringify(shaCanonicalArtifact, null, 2) + "\n");
+  writeShadowFile(skillEquivalenceOutPath, JSON.stringify(skillEquivalence.artifact, null, 2) + "\n");
+  writeShadowFile(skillEquivalenceReviewOutPath, JSON.stringify(skillEquivalence.review, null, 2) + "\n");
   writeShadowFile(repoIndexOutPath, JSON.stringify(repoIndex, null, 2) + "\n");
   if (shadowRepoOverlay) {
     writeShadowFile(repoOverlayOutPath, JSON.stringify(shadowRepoOverlay, null, 2) + "\n");
