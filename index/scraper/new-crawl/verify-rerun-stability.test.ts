@@ -157,6 +157,13 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     stageTimings: { build: 1 },
     productionWriteGuardPassed: true,
     ...overrides,
+    webLibraryPilotSnippetCoverage: overrides.webLibraryPilotSnippetCoverage ?? {
+      selectedSkillCount: 0,
+      snippetPresentCount: 0,
+      fetchFailureCount: 0,
+      intentionalExemptionCount: 0,
+      entries: [],
+    },
   };
 }
 

@@ -434,6 +434,7 @@ export type ShadowRunReport = {
   installArmAdmissionSample?: InstallArmAdmissionSample[];
   xDiscoveryCandidateCount?: number;
   xDiscoveryCandidateSample?: string[];
+  webLibraryPilotSnippetCoverage: WebLibraryPilotSnippetCoverage;
   enrichmentCounts: ShadowEnrichmentCounts;
   lowStarValidSkillCount: number;
   lowStarValidSkillSample: string[];
@@ -519,4 +520,33 @@ export type ShadowRunReport = {
   cutoverValidationFailuresSample: CutoverValidationFailure[];
   stageTimings: StageTimings;
   productionWriteGuardPassed: true;
+};
+
+export type WebLibraryPilotSnippetCoverageEntry =
+  | {
+      skillId: string;
+      status: "snippetPresent";
+    }
+  | {
+      skillId: string;
+      status: "fetchFailure";
+      reason: ShadowStaleInvalidCandidate["reason"];
+    }
+  | {
+      skillId: string;
+      status: "intentionalExemption";
+      reason:
+        | "missingFromCatalog"
+        | "refreshNotScheduled"
+        | "refreshWorkSkipped"
+        | "alreadyRefreshedThisRun"
+        | "noUsableReadme";
+    };
+
+export type WebLibraryPilotSnippetCoverage = {
+  selectedSkillCount: number;
+  snippetPresentCount: number;
+  fetchFailureCount: number;
+  intentionalExemptionCount: number;
+  entries: WebLibraryPilotSnippetCoverageEntry[];
 };

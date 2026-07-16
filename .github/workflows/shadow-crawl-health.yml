@@ -40,6 +40,12 @@ jobs:
         working-directory: index
         run: npm ci
 
+      - name: Build trending data
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:trending
+
       - name: Run shadow crawl
         working-directory: index
         env:
@@ -56,12 +62,6 @@ jobs:
       - name: Promote cutover
         working-directory: index
         run: npm run promote:cutover
-
-      - name: Build trending data
-        working-directory: index
-        env:
-          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
-        run: npm run scrape:trending
 
       - name: Build overlay data
         working-directory: index

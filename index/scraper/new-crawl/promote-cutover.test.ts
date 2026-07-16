@@ -82,6 +82,13 @@ function shadowReport(cutoverValidationPassed: boolean): ShadowRunReport {
     partialDiscoveryWarnings: [],
     highStarPathQualitySkippedCount: 0,
     highStarPathQualitySkippedSample: [],
+    webLibraryPilotSnippetCoverage: {
+      selectedSkillCount: 0,
+      snippetPresentCount: 0,
+      fetchFailureCount: 0,
+      intentionalExemptionCount: 0,
+      entries: [],
+    },
     enrichmentCounts: {
       cheapReposChecked: 0,
       dailyPriorityRepoCount: 0,

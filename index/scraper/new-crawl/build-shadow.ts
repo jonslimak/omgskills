@@ -19,7 +19,11 @@ import { loadTrustedSeeds } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { loadXSocialDiscoveryCandidates, removeBelowStarXSocialOnlyState } from "./x-social-discovery.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery, shouldRunWeeklyWebLibrarySnippetRefresh } from "./high-star-schedule.js";
-import { buildWebLibraryPilotSkillIds, loadWebLibraryPilotCollections } from "./web-library-pilot.js";
+import {
+  buildWebLibraryPilotSkillIds,
+  buildWebLibraryPilotSnippetCoverage,
+  loadWebLibraryPilotAssets,
+} from "./web-library-pilot.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
 import { buildCandidateFromSkill } from "./candidate-path.js";
@@ -97,6 +101,7 @@ import type {
   StageTimings,
   TopRepoSummary,
   TrustedSeeds,
+  WebLibraryPilotSnippetCoverage,
 } from "./types.js";
 
 type DiscoverySourceName =
@@ -675,6 +680,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Creator watch admissions: ${report.creatorWatchAdmissionCount ?? 0}`,
     `- Install-arm admissions: ${report.installArmAdmissionCount ?? 0}`,
     `- X discovery candidates: ${report.xDiscoveryCandidateCount ?? 0}`,
+    `- Web-library pilot snippets: ${report.webLibraryPilotSnippetCoverage.snippetPresentCount}/${report.webLibraryPilotSnippetCoverage.selectedSkillCount} present, ${report.webLibraryPilotSnippetCoverage.fetchFailureCount} fetch failures, ${report.webLibraryPilotSnippetCoverage.intentionalExemptionCount} intentional exemptions`,
     `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
     `- Official low-star skills: ${report.officialLowStarSkillCount}`,
@@ -772,6 +778,16 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Stale/invalid candidates: ${report.enrichmentCounts.staleInvalidCandidateCount}`,
     `- Stale/invalid reasons: repoMissing=${report.staleReasonCounts.repoMissing}, skillFileMissing=${report.staleReasonCounts.skillFileMissing}, validationFailed=${report.staleReasonCounts.validationFailed}`,
     `- Skipped monitored repos: ${report.skippedMonitoredRepoCount}`,
+    "",
+    "## Web-library pilot README coverage",
+    "",
+    `- Selected skills: ${report.webLibraryPilotSnippetCoverage.selectedSkillCount}`,
+    `- Snippet present: ${report.webLibraryPilotSnippetCoverage.snippetPresentCount}`,
+    `- Fetch failures: ${report.webLibraryPilotSnippetCoverage.fetchFailureCount}`,
+    `- Intentional exemptions: ${report.webLibraryPilotSnippetCoverage.intentionalExemptionCount}`,
+    ...report.webLibraryPilotSnippetCoverage.entries
+      .filter((entry) => entry.status !== "snippetPresent")
+      .map((entry) => `- ${entry.skillId}: ${entry.status} (${entry.reason})`),
     "",
     "## Enrichment warnings",
     "",
@@ -1002,6 +1018,7 @@ function isMeaningfullyCorrected(previous: Skill, next: Skill): boolean {
 
 type ShadowRefreshResult = {
   shadowSkills: ShadowSkillRecord[];
+  webLibraryPilotSnippetCoverage: WebLibraryPilotSnippetCoverage;
   enrichmentCounts: ShadowEnrichmentCounts;
   newlyDiscoveredCount: number;
   lowStarValidSkillCount: number;
@@ -1121,6 +1138,21 @@ async function runShadowRefresh(
       .map((repo) => repo.repo),
   );
   const enrichmentWarnings: string[] = [];
+  const trustedSeeds = loadTrustedSeeds();
+  const pilotAssets = loadWebLibraryPilotAssets([
+    join(indexRoot, "..", "site", "data", "crawl4", "manifest.json"),
+    join(indexRoot, "..", "site", "data", "v2", "manifest.json"),
+  ], join(indexRoot, "trending.json"));
+  const buildPilotSkillIds = (skills: ShadowSkillRecord[]) => {
+    const projectedRepoIndex = cloneRepoIndex(repoIndex);
+    let publishableSkills = removeDoNotCrawlState(projectedRepoIndex, skills, trustedSeeds);
+    publishableSkills = removeBelowStarXSocialOnlyState(projectedRepoIndex, publishableSkills).skills;
+    publishableSkills = filterSuppressedSkills(publishableSkills, trustedSeeds);
+    publishableSkills = buildCutoverShadowSkills(publishableSkills);
+    return buildWebLibraryPilotSkillIds(pilotAssets.collections, publishableSkills, {
+      trendingSkillIds: pilotAssets.trendingSkillIds,
+    });
+  };
   const staleInvalidCandidates: ShadowStaleInvalidCandidate[] = [];
   const staleReasonCounts = emptyStaleReasonCounts();
   const missingPersistedSkillRefreshSample: string[] = [];
@@ -1174,6 +1206,11 @@ async function runShadowRefresh(
     enrichmentWarnings.push("high-star backfill-only mode skipped monitored and cheap refresh work");
     return {
       shadowSkills: refreshedShadowSkills,
+      webLibraryPilotSnippetCoverage: buildWebLibraryPilotSnippetCoverage({
+        skillIds: buildPilotSkillIds(refreshedShadowSkills),
+        skills: refreshedShadowSkills,
+        refreshMode: "skipped",
+      }),
       enrichmentCounts: {
         cheapReposChecked: 0,
         dailyPriorityRepoCount: 0,
@@ -1212,7 +1249,7 @@ async function runShadowRefresh(
     repoIndex,
     discovered,
     mergeDailyPriorityOptions(
-      buildCreatorWatchDailyPriorityOptions(loadTrustedSeeds()),
+      buildCreatorWatchDailyPriorityOptions(trustedSeeds),
       buildMomentumDailyPriorityOptions(buildMomentumSignals(discovered, join(indexRoot, "top-x-skill-tweets.json")).momentumByRepo),
     ),
   );
@@ -1383,50 +1420,67 @@ async function runShadowRefresh(
   if (cadence === "combined" && options.forceWebLibrarySnippets === true && !shouldRunScheduledWebLibrarySnippetRefresh) {
     enrichmentWarnings.push("web-library snippet refresh forced outside weekly schedule");
   }
+  const pilotSnippetFetchFailures = new Map<string, ShadowStaleInvalidCandidate["reason"]>();
+  const successfulPilotSnippetRefreshSkillIds = new Set<string>();
+  const attemptedPilotSnippetRefreshSkillIds = new Set<string>();
+  let pilotSkillIds: string[] = [];
   if (shouldRefreshWebLibrarySnippets) {
-    const pilotCollections = loadWebLibraryPilotCollections(join(indexRoot, "curations", "collections.json"));
-    const currentShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
-    const currentSkillById = new Map(currentShadowSkills.map((skill) => [skill.id, skill] as const));
-    const pilotSkillIds = buildWebLibraryPilotSkillIds(pilotCollections, currentShadowSkills);
-    const pilotSkillIdsToRefresh = pilotSkillIds
-      .filter((skillId) => !refreshedSkillIds.has(skillId))
-      .filter((skillId) => !currentSkillById.get(skillId)?.readme_snippet);
+    while (true) {
+      const currentShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
+      const currentSkillById = new Map(currentShadowSkills.map((skill) => [skill.id, skill] as const));
+      pilotSkillIds = buildPilotSkillIds(currentShadowSkills);
+      const pilotSkillIdsToRefresh = pilotSkillIds
+        .filter((skillId) => !refreshedSkillIds.has(skillId))
+        .filter((skillId) => !attemptedPilotSnippetRefreshSkillIds.has(skillId))
+        .filter((skillId) => !currentSkillById.get(skillId)?.readme_snippet);
+      if (pilotSkillIdsToRefresh.length === 0) break;
 
-    if (pilotSkillIdsToRefresh.length > 0) {
       console.log(`  web-library snippet refresh: ${pilotSkillIdsToRefresh.length} skills`);
-    }
-    for (const [index, skillId] of pilotSkillIdsToRefresh.entries()) {
-      const skill = currentSkillById.get(skillId);
-      if (!skill) continue;
-      if (index === 0 || (index + 1) % 5 === 0 || index === pilotSkillIdsToRefresh.length - 1) {
-        console.log(`  web-library snippet refresh [${index + 1}/${pilotSkillIdsToRefresh.length}] ${skillId}`);
-      }
-      const result = await enrichCandidate(
-        buildCandidateFromSkill(skill),
-        existingFirstSeen,
-        existingSkills,
-        today,
-      );
-      if (!result.skill) {
-        const staleReason = toStaleReason(result);
-        enrichmentWarnings.push(`web-library snippet refresh skipped ${skillId}: ${staleReason}`);
-        continue;
-      }
-      skillsDeepRefreshed += 1;
-      shadowById.set(result.skill.id, toShadowSkillRecord(result.skill));
-      const refreshedRepo = repoByName.get(repoKeyFor(result.skill)?.repo ?? "");
-      if (refreshedRepo) {
-        refreshedRepo.stars = result.skill.stars;
-        refreshedRepo.repoUrl = result.skill.github_url;
-        refreshedRepo.lastRefreshedAt = checkedAt;
-        refreshedRepo.lastCheapCheckedAt = checkedAt;
-        refreshedRepo.lastObservedRepoUpdatedAt = result.skill.last_updated;
-        refreshedRepo.staleOrInvalidState = null;
+      for (const [index, skillId] of pilotSkillIdsToRefresh.entries()) {
+        attemptedPilotSnippetRefreshSkillIds.add(skillId);
+        const skill = currentSkillById.get(skillId);
+        if (!skill) continue;
+        if (index === 0 || (index + 1) % 5 === 0 || index === pilotSkillIdsToRefresh.length - 1) {
+          console.log(`  web-library snippet refresh [${index + 1}/${pilotSkillIdsToRefresh.length}] ${skillId}`);
+        }
+        const result = await enrichCandidate(
+          buildCandidateFromSkill(skill),
+          existingFirstSeen,
+          existingSkills,
+          today,
+        );
+        if (!result.skill) {
+          const staleReason = toStaleReason(result);
+          pilotSnippetFetchFailures.set(skillId, staleReason);
+          enrichmentWarnings.push(`web-library snippet refresh skipped ${skillId}: ${staleReason}`);
+          continue;
+        }
+        skillsDeepRefreshed += 1;
+        successfulPilotSnippetRefreshSkillIds.add(skillId);
+        shadowById.set(result.skill.id, toShadowSkillRecord(result.skill));
+        const refreshedRepo = repoByName.get(repoKeyFor(result.skill)?.repo ?? "");
+        if (refreshedRepo) {
+          refreshedRepo.stars = result.skill.stars;
+          refreshedRepo.repoUrl = result.skill.github_url;
+          refreshedRepo.lastRefreshedAt = checkedAt;
+          refreshedRepo.lastCheapCheckedAt = checkedAt;
+          refreshedRepo.lastObservedRepoUpdatedAt = result.skill.last_updated;
+          refreshedRepo.staleOrInvalidState = null;
+        }
       }
     }
   }
 
   const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
+  pilotSkillIds = buildPilotSkillIds(refreshedShadowSkills);
+  const webLibraryPilotSnippetCoverage = buildWebLibraryPilotSnippetCoverage({
+    skillIds: pilotSkillIds,
+    skills: refreshedShadowSkills,
+    refreshMode: shouldRefreshWebLibrarySnippets ? "scheduled" : "notScheduled",
+    fetchFailures: pilotSnippetFetchFailures,
+    refreshedEarlierSkillIds: refreshedSkillIds,
+    successfulSnippetRefreshSkillIds: successfulPilotSnippetRefreshSkillIds,
+  });
   const lowStarValidSkills = refreshedShadowSkills
     .filter((skill) => skill.stars < LOW_STAR_FLOOR)
     .sort((a, b) => b.stars - a.stars || a.id.localeCompare(b.id));
@@ -1452,6 +1506,7 @@ async function runShadowRefresh(
 
   return {
     shadowSkills: refreshedShadowSkills,
+    webLibraryPilotSnippetCoverage,
     enrichmentCounts: {
       cheapReposChecked,
       dailyPriorityRepoCount: hasFastLane ? dailyPriorityRepos.length : 0,
@@ -2302,6 +2357,7 @@ async function main() {
     installArmAdmissionSample,
     xDiscoveryCandidateCount,
     xDiscoveryCandidateSample,
+    webLibraryPilotSnippetCoverage: refreshResult.webLibraryPilotSnippetCoverage,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,
     lowStarValidSkillSample: refreshResult.lowStarValidSkillSample,
