@@ -10,6 +10,12 @@ import {
   loadCreatorHandleReservations,
   normalizedCreatorHandle,
 } from "./generate-creator-handle-reservations.mjs";
+import {
+  buildCatalogSkillUrlsAsset,
+  buildSkillUrlMap,
+  catalogSkillUrlsFilename,
+  skillPathForId,
+} from "./web-library-skill-urls.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -44,19 +50,6 @@ function slugSegment(value) {
   return slug || "item";
 }
 
-function skillPathForId(id) {
-  const [repoPart, skillPart] = String(id).split(":");
-  const repoSegments = repoPart.split("/").map(slugSegment);
-  const skillSegments = skillPart ? skillPart.split("/").map(slugSegment) : [];
-  return `/skills/${[...repoSegments, ...skillSegments].join("/")}/`;
-}
-
-function disambiguatedSkillPathForId(id) {
-  const basePath = skillPathForId(id);
-  const hash = createHash("sha256").update(String(id)).digest("hex").slice(0, 8);
-  return basePath.replace(/\/$/, `--${hash}/`);
-}
-
 function profilePath(handle) {
   return `/library/${slugSegment(handle)}/`;
 }
@@ -83,35 +76,6 @@ function registerUrl(urls, urlPath, source) {
     throw new Error(`URL collision for ${urlPath}: ${previousLabel} and ${source}`);
   }
   urls.set(urlPath, source);
-}
-
-function buildSkillUrlMap(skills) {
-  const idsByBasePath = new Map();
-  for (const skill of skills) {
-    const basePath = skillPathForId(skill.id);
-    const ids = idsByBasePath.get(basePath) || [];
-    ids.push(skill.id);
-    idsByBasePath.set(basePath, ids);
-  }
-
-  const urls = new Map();
-  const urlById = new Map();
-  for (const [basePath, ids] of idsByBasePath) {
-    if (ids.length === 1) {
-      const id = ids[0];
-      registerUrl(urls, basePath, `skill ${id}`);
-      urlById.set(id, basePath);
-      continue;
-    }
-
-    for (const id of ids) {
-      const urlPath = disambiguatedSkillPathForId(id);
-      registerUrl(urls, urlPath, `skill ${id}`);
-      urlById.set(id, urlPath);
-    }
-  }
-
-  return urlById;
 }
 
 function compactNumber(value) {
@@ -740,6 +704,7 @@ async function main() {
   for (const dir of generatedDirs) {
     await rm(path.join(siteDir, dir), { recursive: true, force: true });
   }
+  await rm(path.join(siteDir, catalogSkillUrlsFilename), { force: true });
   await removeSitemapFiles();
 
   const { skills, trending, collections, authorLeaderboards } = libraryData;
@@ -808,6 +773,7 @@ async function main() {
   let noindexCount = 0;
   const addNoindexReason = (reason) => noindexReasons.set(reason, (noindexReasons.get(reason) || 0) + 1);
   const includedSkills = [];
+  const generatedSkillUrlById = new Map();
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
@@ -845,6 +811,7 @@ async function main() {
         indexDecision,
       ),
     );
+    generatedSkillUrlById.set(skill.id, urlPath);
   }
 
   const profileCollections = profilePages.map((page) => page.collection);
@@ -900,6 +867,10 @@ async function main() {
   indexableCount += 1;
   await writePage("/skills/", renderSkillsIndexPage({ profileCollections, topicCollections, skills: includedSkills }, skillUrlById));
   await writeWebLibraryRedirects(profileCollections);
+  await writeFile(
+    path.join(siteDir, catalogSkillUrlsFilename),
+    `${JSON.stringify(buildCatalogSkillUrlsAsset(generatedSkillUrlById), null, 2)}\n`,
+  );
 
   await writeSitemaps(sitemapUrls);
   const noindexSummary = [...noindexReasons.entries()]

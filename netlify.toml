@@ -35,6 +35,11 @@
     Cache-Control = "private, no-store"
 
 [[headers]]
+  for = "/catalog-skill-urls.json"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
   for = "/connect"
   [headers.values]
     Cache-Control = "private, no-store"

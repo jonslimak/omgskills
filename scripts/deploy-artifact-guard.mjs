@@ -9,6 +9,7 @@ const requiredWebLibraryArtifacts = [
   "sitemap.xml",
   "robots.txt",
   "llms.txt",
+  "catalog-skill-urls.json",
 ];
 
 const requiredStaticReleaseAssets = [

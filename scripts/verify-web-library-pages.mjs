@@ -2,6 +2,10 @@
 
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import {
+  catalogSkillUrlEntries,
+  catalogSkillUrlsFilename,
+} from "./web-library-skill-urls.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -311,6 +315,33 @@ async function verifyLocalRootFile(file) {
   assertIncludes(await readFile(filePath, "utf8"), file.text, filePath);
 }
 
+function verifyCatalogSkillUrlCoverage(asset, label) {
+  const entries = catalogSkillUrlEntries(asset);
+  if (entries.length === 0) {
+    throw new Error(`${label} contained no generated skill URLs`);
+  }
+  const generatedPaths = new Set(entries.map(([, urlPath]) => urlPath));
+  for (const page of pages) {
+    if (page.path.startsWith("/skills/") && page.path !== "/skills/" && !generatedPaths.has(page.path)) {
+      throw new Error(`${label} did not map a generated page: ${page.path}`);
+    }
+  }
+  return entries;
+}
+
+async function verifyLocalCatalogSkillUrls() {
+  const filePath = path.join(siteDir, catalogSkillUrlsFilename);
+  if (!(await fileExists(filePath))) {
+    throw new Error(`Missing generated catalog skill URL asset: ${filePath}`);
+  }
+  const entries = verifyCatalogSkillUrlCoverage(JSON.parse(await readFile(filePath, "utf8")), filePath);
+  for (const [, urlPath] of entries) {
+    if (!(await localUrlExists(urlPath))) {
+      throw new Error(`${filePath} mapped a missing generated page: ${urlPath}`);
+    }
+  }
+}
+
 async function verifyLivePage(page) {
   const url = `${origin}${page.path}`;
   const response = await fetchLive(url, { redirect: "manual" });
@@ -380,6 +411,15 @@ async function verifyLiveRootFile(file) {
   assertIncludes(await response.text(), file.text, url);
 }
 
+async function verifyLiveCatalogSkillUrls() {
+  const url = `${origin}/${catalogSkillUrlsFilename}`;
+  const response = await fetchLive(url, { redirect: "manual" });
+  if (response.status !== 200) {
+    throw new Error(`${url} returned ${response.status}, expected 200`);
+  }
+  verifyCatalogSkillUrlCoverage(await response.json(), url);
+}
+
 function llmsUrls(text) {
   return [...text.matchAll(/https:\/\/omgskills\.com([^\s)]+)/g)]
     .map((match) => match[1])
@@ -414,6 +454,7 @@ async function main() {
   if (isLive) {
     for (const page of pages) await verifyLivePage(page);
     for (const file of rootFiles) await verifyLiveRootFile(file);
+    await verifyLiveCatalogSkillUrls();
     await verifyLiveLlmsLinks();
     await verifyLiveSitemap();
     for (const redirect of redirects) await verifyLiveRedirect(redirect);
@@ -423,6 +464,7 @@ async function main() {
 
   for (const page of pages) await verifyLocalPage(page);
   for (const file of rootFiles) await verifyLocalRootFile(file);
+  await verifyLocalCatalogSkillUrls();
   await verifyLocalSitemap();
   await verifyAllLocalReferences();
   console.log("Local web library pages verified");

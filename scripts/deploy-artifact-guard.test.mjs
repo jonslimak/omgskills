@@ -7,6 +7,7 @@ import {
   extractUpdateAssetPaths,
   requiredReleaseAssetPaths,
   verifyReleaseDeployArtifacts,
+  verifyWebLibraryDeployArtifacts,
 } from "./deploy-artifact-guard.mjs";
 
 async function fixture() {
@@ -68,6 +69,34 @@ test("release artifact verification rejects appcasts without update assets", asy
   try {
     await writeFile(join(root, "appcast.xml"), "<rss></rss>");
     await assert.rejects(requiredReleaseAssetPaths(root), /appcast\.xml has no \/updates\/ assets/);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("web library verification requires the generated catalog skill URL asset", async () => {
+  const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
+  const files = [
+    "library/anthropics/index.html",
+    "skills/anthropics/skills/frontend-design/index.html",
+    "collections/starter-pack/index.html",
+    "skills/index.html",
+    "sitemap.xml",
+    "robots.txt",
+    "llms.txt",
+    "catalog-skill-urls.json",
+  ];
+  try {
+    for (const relativePath of files) {
+      await mkdir(join(root, relativePath, ".."), { recursive: true });
+      await writeFile(join(root, relativePath), "fixture");
+    }
+    await verifyWebLibraryDeployArtifacts(root);
+    await rm(join(root, "catalog-skill-urls.json"));
+    await assert.rejects(
+      verifyWebLibraryDeployArtifacts(root, "test artifact"),
+      /test artifact is unsafe: missing generated web library deploy artifacts: catalog-skill-urls\.json/,
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }

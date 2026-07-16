@@ -1,6 +1,10 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
 import { recordAnalytics } from "./_shared/group-items.js";
+import {
+  loadCatalogSkillUrls,
+  resolvePublicSkillLink,
+} from "./_shared/public-skill-links.js";
 
 function escapeHtml(value: unknown): string {
   return String(value ?? "")
@@ -47,30 +51,6 @@ function parseRoute(pathname: string): { handle: string; groupSlug: string | nul
     return { handle: parts[1], groupSlug: parts[3] };
   }
   return null;
-}
-
-function catalogSkillUrl(catalogSkillId: unknown): string | null {
-  if (typeof catalogSkillId !== "string") {
-    return null;
-  }
-  const [repoId, rawSkillPath] = catalogSkillId.split(":");
-  if (!repoId || !rawSkillPath) {
-    return null;
-  }
-  const repoParts = repoId.split("/").filter(Boolean);
-  if (repoParts.length !== 2) {
-    return null;
-  }
-  const skillParts = rawSkillPath
-    .replace(/\/SKILL\.md$/i, "")
-    .replace(/^SKILL\.md$/i, "")
-    .split("/")
-    .filter(Boolean);
-  if (skillParts.length === 0) {
-    return null;
-  }
-  const path = [...repoParts, ...skillParts].map((part) => encodeURIComponent(part)).join("/");
-  return `/skills/${path}/`;
 }
 
 export default async (req: Request, context: Context) => {
@@ -157,20 +137,22 @@ export default async (req: Request, context: Context) => {
     }
     const first = groupResult.rows[0];
     await recordAnalytics("public_group_view", { groupId: first.id, profileUserId: user.id });
+    const catalogSkillUrls = await loadCatalogSkillUrls(req.url).catch(() => new Map<string, string>());
     const skills = groupResult.rows
       .filter((row) => row.itemId)
       .map((row) => {
         const name = row.skillName || row.snapshotName || row.catalogSkillId || row.itemGithubUrl || "Skill";
         const description = row.skillDescription || row.snapshotDescription || row.note || (row.kind === "catalog" ? "Catalog skill" : "No description");
-        const skillPageUrl = catalogSkillUrl(row.catalogSkillId || row.syncedCatalogSkillId);
         const githubUrl = row.githubUrl || row.itemGithubUrl;
-        const githubLink = !row.isLocalOnly && githubUrl
-          ? `/api/public/skill-open?itemId=${encodeURIComponent(row.itemId)}&url=${encodeURIComponent(githubUrl)}`
-          : "";
-        const link = skillPageUrl
-          ? `<a href="${skillPageUrl}">Skill page</a>`
-          : githubLink
-            ? `<a href="${githubLink}">GitHub</a>`
+        const resolvedLink = resolvePublicSkillLink({
+          catalogSkillId: row.catalogSkillId || row.syncedCatalogSkillId,
+          githubUrl,
+          isLocalOnly: row.isLocalOnly,
+        }, catalogSkillUrls);
+        const link = resolvedLink.kind === "skillPage"
+          ? `<a href="${escapeHtml(resolvedLink.url)}">Skill page</a>`
+          : resolvedLink.kind === "github"
+            ? `<a href="/api/public/skill-open?itemId=${encodeURIComponent(row.itemId)}&url=${encodeURIComponent(resolvedLink.url)}">GitHub</a>`
             : "<span class=\"muted\">Metadata only</span>";
         return `<div class="item"><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(description)}</p>${link}</div>`;
       })
