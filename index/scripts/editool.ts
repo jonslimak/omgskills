@@ -11,6 +11,11 @@ import {
   type RemovalsSource,
   type SuppressedSkillEntry,
 } from "./editool-validation.js";
+import {
+  buildEditoolPreview,
+  createEditoolPreviewServer,
+  defaultEditoolPreviewDir,
+} from "./editool-preview.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -18,10 +23,15 @@ import {
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const indexRoot = resolve(scriptDir, "..");
+const repoRoot = resolve(indexRoot, "..");
 
 const PORT = Number(process.env.EDITOOL_PORT ?? 4980);
+const PREVIEW_PORT = Number(process.env.EDITOOL_PREVIEW_PORT ?? 8787);
 const HOST = "127.0.0.1";
 const saveToken = randomBytes(24).toString("base64url");
+const previewDir = defaultEditoolPreviewDir();
+let previewBuildInProgress = false;
+let previewServerError: string | null = null;
 
 const paths = {
   html: join(scriptDir, "editool.html"),
@@ -310,7 +320,9 @@ function validateCreators(source: { creators: CreatorEntry[] }): string[] {
 
 function searchSkills(query: URLSearchParams): { total: number; rows: unknown[] } {
   const q = (query.get("q") ?? "").trim().toLowerCase();
-  const author = (query.get("author") ?? "").trim().toLowerCase();
+  const authors = new Set(
+    query.getAll("author").map((value) => value.trim().replace(/^@/, "").toLowerCase()).filter(Boolean),
+  );
   const minStars = Number(query.get("minStars") ?? 0);
   const provenance = (query.get("provenance") ?? "").trim();
   const page = Math.max(0, Number(query.get("page") ?? 0));
@@ -318,7 +330,7 @@ function searchSkills(query: URLSearchParams): { total: number; rows: unknown[] 
 
   const matches: Skill[] = [];
   for (const skill of skills) {
-    if (author && skill.author_handle.toLowerCase() !== author) continue;
+    if (authors.size && !authors.has(skill.author_handle.toLowerCase())) continue;
     if ((skill.stars ?? 0) < minStars) continue;
     if (provenance && (skill.provenance_type ?? "original") !== provenance) continue;
     if (q && !skill.id.toLowerCase().includes(q) && !skill.name.toLowerCase().includes(q) && !skill.description.toLowerCase().includes(q)) {
@@ -449,6 +461,37 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "POST" && url.pathname === "/api/build-preview") {
+      const requestErrors = validateSaveRequest(req);
+      if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
+      if (previewServerError) {
+        return sendJson(res, 503, { ok: false, errors: [previewServerError] });
+      }
+      if (previewBuildInProgress) {
+        return sendJson(res, 409, { ok: false, errors: ["preview build already running"] });
+      }
+
+      previewBuildInProgress = true;
+      try {
+        const result = await buildEditoolPreview({
+          repoRoot,
+          indexRoot,
+          sourceSiteDir: join(repoRoot, "site"),
+          previewDir,
+        });
+        const previewOrigin = `http://${HOST}:${PREVIEW_PORT}`;
+        return sendJson(res, 200, {
+          ok: true,
+          builtAt: result.builtAt,
+          indexUrl: `${previewOrigin}${result.indexPath}`,
+          profileUrls: result.profilePaths.map((path) => `${previewOrigin}${path}`),
+          collectionUrls: result.collectionPaths.map((path) => `${previewOrigin}${path}`),
+        });
+      } finally {
+        previewBuildInProgress = false;
+      }
+    }
+
     if (req.method === "POST" && url.pathname === "/api/save/collections") {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
@@ -490,6 +533,15 @@ const server = createServer(async (req, res) => {
   } catch (error) {
     sendJson(res, 500, { ok: false, errors: [error instanceof Error ? error.message : String(error)] });
   }
+});
+
+const previewServer = createEditoolPreviewServer(previewDir);
+previewServer.on("error", (error) => {
+  previewServerError = `preview server could not use http://${HOST}:${PREVIEW_PORT}: ${error.message}`;
+  console.error(`editool: ${previewServerError}`);
+});
+previewServer.listen(PREVIEW_PORT, HOST, () => {
+  console.log(`editool preview: http://${HOST}:${PREVIEW_PORT}`);
 });
 
 server.listen(PORT, HOST, () => {

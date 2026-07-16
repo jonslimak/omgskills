@@ -81,12 +81,13 @@ type CollectionsAsset = {
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const indexRoot = resolve(scriptDir, "..");
 const repoRoot = resolve(indexRoot, "..");
+const siteRoot = resolve(process.env.SITE_DIR ?? join(repoRoot, "site"));
 const sourcePath = join(indexRoot, "curations", "collections.json");
 const creatorsPath = join(indexRoot, "seeds", "creators.json");
 const skillsPath = join(indexRoot, "skills.json");
 const dataTrackDirs = [
-  join(repoRoot, "site", "data", "crawl4"),
-  join(repoRoot, "site", "data", "v2"),
+  join(siteRoot, "data", "crawl4"),
+  join(siteRoot, "data", "v2"),
 ];
 
 function readJson<T>(path: string): T {

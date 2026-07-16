@@ -20,9 +20,13 @@
   input[type=number] { width: 80px; }
   button { font: inherit; padding: 5px 10px; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; }
   button:hover { background: #eee; }
+  button:disabled { cursor: default; opacity: .55; }
   button.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
   button.small { font-size: 12px; padding: 2px 7px; }
   button.danger { color: #b3261e; border-color: #d9a19d; }
+  header select { padding: 4px 7px; font-size: 12px; }
+  .preview-link { color: #fff; font-size: 12px; }
+  .preview-status { color: #bbb; font-size: 12px; }
   table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
   th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
   th { background: #fafafa; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: #666; }
@@ -42,6 +46,7 @@
   .idlist { list-style: none; padding: 0; margin: 6px 0; }
   .panel { background: #fff; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
   .panel h3 { margin: 0 0 8px; font-size: 14px; }
+  .creator-detail-inline { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
   .proposal-samples { max-width: 360px; }
   footer { padding: 10px 16px; color: #888; font-size: 12px; }
@@ -55,6 +60,10 @@
   <button class="tab" data-tab="creators">Creators</button>
   <button class="tab" data-tab="removals">Removals</button>
   <span class="spacer"></span>
+  <button id="preview-build" class="small">Build local preview</button>
+  <select id="preview-route" hidden></select>
+  <a id="preview-open" class="preview-link" href="#" target="_blank" rel="noopener" hidden>Open preview</a>
+  <span id="preview-status" class="preview-status"></span>
   <span id="dirty" class="dirty"></span>
 </header>
 <main>
@@ -288,6 +297,8 @@ $("lib-rows").addEventListener("click", (e) => {
 });
 
 // ---------- collections ----------
+let collectionDetailHandle = null;
+
 function renderCollections() {
   const src = state.collections;
   const featuredCreators = state.creators.creators.filter((entry) => entry.featured);
@@ -300,7 +311,8 @@ function renderCollections() {
     const o = overrideFor(handle);
     const ids = o.featuredSkillIds ?? [];
     return `<div class="panel" data-author-panel="${esc(handle)}">
-      <h3>@${esc(handle)} <span class="muted">author profile override</span></h3>
+      <h3>@${esc(handle)} <span class="muted">author profile override</span>
+        <button class="small" data-see-all="${esc(handle)}" style="float:right">${collectionDetailHandle?.toLowerCase() === handle.toLowerCase() ? "Hide skills" : "See all skills"}</button></h3>
       <div class="bar">
         <input data-f="subtitle" placeholder="subtitle" value="${esc(o.subtitle ?? "")}" size="28">
         <input data-f="description" placeholder="description" value="${esc(o.description ?? "")}" size="52">
@@ -308,6 +320,7 @@ function renderCollections() {
       <ul class="idlist">${ids.map((id, i) => `<li><button class="small" data-move="-1" data-i="${i}">↑</button>
         <button class="small" data-move="1" data-i="${i}">↓</button>
         <button class="small danger" data-del="${i}">×</button> ${esc(id)}</li>`).join("")}</ul>
+      <div data-collection-detail="${esc(handle)}"></div>
     </div>`;
   }).join("");
 
@@ -342,6 +355,7 @@ function renderCollections() {
     <div class="muted" style="margin-top:4px">Toggle on the Creators tab. Legacy collections.json featuredAuthors is ignored by publish.</div>
     ${legacyMismatch.length ? `<div class="badge warn">legacy mismatch: ${legacyMismatch.map(esc).join(", ")}</div>` : ""}
     </div>` + authorPanels + topicPanels;
+  if (collectionDetailHandle) refreshCreatorDetail("collections");
 }
 
 $("col-add").addEventListener("click", () => {
@@ -385,6 +399,12 @@ $("col-list").addEventListener("click", (e) => {
   if (!btn) return;
   const authorPanel = btn.closest("[data-author-panel]");
   const colPanel = btn.closest("[data-col-panel]");
+  if (btn.dataset.seeAll !== undefined) {
+    const handle = btn.dataset.seeAll;
+    collectionDetailHandle = collectionDetailHandle?.toLowerCase() === handle.toLowerCase() ? null : handle;
+    renderCollections();
+    return;
+  }
   if (btn.dataset.delcol !== undefined) {
     const ci = Number(btn.dataset.delcol);
     if (!confirm(`Delete collection "${state.collections.collections[ci].id}"? Published URLs for it will break.`)) return;
@@ -612,8 +632,9 @@ $("cr-rows").addEventListener("click", (e) => {
   }
 });
 
-// ---------- creator detail (all skills + feature checkboxes) ----------
-let detailHandle = null;
+// ---------- shared creator detail (all skills + feature checkboxes) ----------
+let creatorDetailHandle = null;
+const creatorSkillCache = new Map();
 
 function overrideFor(handle) {
   state.collections.authorOverrides = state.collections.authorOverrides ?? {};
@@ -624,12 +645,6 @@ function overrideFor(handle) {
   return state.collections.authorOverrides[key];
 }
 
-async function openCreatorDetail(handle) {
-  detailHandle = handle;
-  const data = await fetch("/api/skills?pageSize=1000&author=" + encodeURIComponent(handle)).then((r) => r.json());
-  renderCreatorDetail(data);
-}
-
 function registryEntryFor(handle) {
   const key = handle.toLowerCase();
   return state.creators.creators.find((c) =>
@@ -637,13 +652,76 @@ function registryEntryFor(handle) {
   ) ?? null;
 }
 
+function creatorHandleVariants(handle) {
+  const entry = registryEntryFor(handle);
+  return [...new Set([handle, entry?.handle, ...(entry?.aliases ?? [])]
+    .filter(Boolean)
+    .map((value) => value.trim().toLowerCase()))];
+}
+
 function isFeaturedCreator(handle) {
   return Boolean(registryEntryFor(handle)?.featured);
 }
 
-function renderCreatorDetail(data) {
-  const handle = detailHandle;
-  if (!handle) { $("cr-detail").innerHTML = ""; return; }
+function activeCreatorDetailHandle(context) {
+  return context === "collections" ? collectionDetailHandle : creatorDetailHandle;
+}
+
+function creatorDetailHost(context, handle) {
+  if (context === "creators") return $("cr-detail");
+  return [...$("col-list").querySelectorAll("[data-collection-detail]")]
+    .find((element) => element.dataset.collectionDetail.toLowerCase() === handle.toLowerCase()) ?? null;
+}
+
+async function loadCreatorSkillData(handle) {
+  const variants = creatorHandleVariants(handle);
+  const cacheKey = variants.slice().sort().join("|");
+  if (!creatorSkillCache.has(cacheKey)) {
+    const params = new URLSearchParams({ pageSize: "1000" });
+    variants.forEach((variant) => params.append("author", variant));
+    const request = fetch("/api/skills?" + params).then(async (response) => {
+      if (!response.ok) throw new Error(`creator skill lookup failed: ${response.status}`);
+      return response.json();
+    }).catch((error) => {
+      creatorSkillCache.delete(cacheKey);
+      throw error;
+    });
+    creatorSkillCache.set(cacheKey, request);
+  }
+  return creatorSkillCache.get(cacheKey);
+}
+
+async function openCreatorDetail(handle, context = "creators") {
+  if (context === "collections") collectionDetailHandle = handle;
+  else creatorDetailHandle = handle;
+  await refreshCreatorDetail(context);
+}
+
+async function refreshCreatorDetail(context) {
+  const handle = activeCreatorDetailHandle(context);
+  if (!handle) {
+    if (context === "creators") $("cr-detail").innerHTML = "";
+    return;
+  }
+  const host = creatorDetailHost(context, handle);
+  if (!host) return;
+  host.innerHTML = '<div class="muted">Loading skills...</div>';
+
+  try {
+    const data = await loadCreatorSkillData(handle);
+    if (activeCreatorDetailHandle(context)?.toLowerCase() !== handle.toLowerCase()) return;
+    renderCreatorDetail(context, data);
+  } catch (error) {
+    showErrors([error instanceof Error ? error.message : String(error)]);
+  }
+}
+
+function renderCreatorDetail(context, data) {
+  const handle = activeCreatorDetailHandle(context);
+  if (!handle) return;
+  const host = creatorDetailHost(context, handle);
+  if (!host) return;
+
   const entry = registryEntryFor(handle);
   const isFeatured = Boolean(entry?.featured);
   const featuredIds = overrideFor(handle).featuredSkillIds ?? [];
@@ -652,12 +730,16 @@ function renderCreatorDetail(data) {
   if (!isFeatured && featuredIds.length) hints.push('<span class="badge warn">selections save but only show once featured</span>');
   if (featuredIds.length > 5) hints.push(`<span class="badge warn">${featuredIds.length} featured — profiles show 3–5</span>`);
 
-  $("cr-detail").innerHTML = `<div class="panel">
+  host.innerHTML = `<div class="${context === "collections" ? "creator-detail-inline" : "panel"}">
     <h3>@${esc(handle)} — ${data.total} skills · ${featuredIds.length} featured ${hints.join(" ")}
-      <button class="small" id="cr-detail-close" style="float:right">close</button></h3>
+      <button class="small" data-detail-close style="float:right">close</button></h3>
     <div class="bar">
-      <label><input type="checkbox" id="cr-detail-watch" ${entry?.watch ? "checked" : ""}> watch creator</label>
-      <label><input type="checkbox" id="cr-detail-feature" ${isFeatured ? "checked" : ""}> feature creator</label>
+      <button data-detail-save class="primary">Save changes</button>
+      <span class="muted">saves creators.json + collections.json · featured-skill order = order checked; fine-tune on the Collections tab</span>
+    </div>
+    <div class="bar">
+      <label><input type="checkbox" data-detail-watch ${entry?.watch ? "checked" : ""}> watch creator</label>
+      <label><input type="checkbox" data-detail-feature ${isFeatured ? "checked" : ""}> feature creator</label>
       <span class="muted">watch = crawler tracks their new repos · feature = public profile (implies watch)</span>
     </div>
     <table>
@@ -669,47 +751,62 @@ function renderCreatorDetail(data) {
         <td class="muted">${esc((r.lastUpdated ?? "").slice(0, 10))}</td>
       </tr>`).join("")}</tbody>
     </table>
-    <div class="bar" style="margin-top:8px">
-      <button id="cr-detail-save" class="primary">Save changes</button>
-      <span class="muted">saves creators.json + collections.json · featured-skill order = order checked; fine-tune on the Collections tab</span>
-    </div>
   </div>`;
 
-  $("cr-detail-close").addEventListener("click", () => { detailHandle = null; $("cr-detail").innerHTML = ""; });
-  $("cr-detail-save").addEventListener("click", async () => {
+  host.querySelector("[data-detail-close]").addEventListener("click", () => {
+    if (context === "collections") {
+      collectionDetailHandle = null;
+      renderCollections();
+    } else {
+      creatorDetailHandle = null;
+      host.innerHTML = "";
+    }
+  });
+  host.querySelector("[data-detail-save]").addEventListener("click", async () => {
     if (dirty.creators) await save("creators", "/api/save/creators", state.creators);
     if (dirty.collections) await save("collections", "/api/save/collections", state.collections);
   });
 
   function ensureEntry() {
-    let e = registryEntryFor(handle);
-    if (!e) {
-      e = { handle, roles: ["creator"], watch: false, featured: false };
-      state.creators.creators.push(e);
+    let current = registryEntryFor(handle);
+    if (!current) {
+      current = { handle, roles: ["creator"], watch: false, featured: false };
+      state.creators.creators.push(current);
     }
-    return e;
+    return current;
   }
-  $("cr-detail-watch").addEventListener("change", (ev) => {
-    const e = ensureEntry();
-    e.watch = ev.target.checked;
-    if (!e.watch && e.featured) { e.featured = false; toast("unfeatured too (featured requires watch)"); }
-    markDirty("creators"); renderCreators(); renderCreatorDetail(data);
+
+  host.querySelector("[data-detail-watch]").addEventListener("change", (event) => {
+    const current = ensureEntry();
+    current.watch = event.target.checked;
+    if (!current.watch && current.featured) {
+      current.featured = false;
+      toast("unfeatured too (featured requires watch)");
+    }
+    markDirty("creators");
+    renderCreators();
+    renderCollections();
+    if (context === "creators") renderCreatorDetail(context, data);
   });
-  $("cr-detail-feature").addEventListener("change", (ev) => {
-    const e = ensureEntry();
-    e.featured = ev.target.checked;
-    if (e.featured) e.watch = true;
-    markDirty("creators"); renderCreators(); renderCreatorDetail(data);
+  host.querySelector("[data-detail-feature]").addEventListener("change", (event) => {
+    const current = ensureEntry();
+    current.featured = event.target.checked;
+    if (current.featured) current.watch = true;
+    markDirty("creators");
+    renderCreators();
+    renderCollections();
+    if (context === "creators") renderCreatorDetail(context, data);
   });
-  $("cr-detail").querySelectorAll("[data-featskill]").forEach((box) => {
+  host.querySelectorAll("[data-featskill]").forEach((box) => {
     box.addEventListener("change", () => {
-      const o = overrideFor(handle);
-      o.featuredSkillIds = o.featuredSkillIds ?? [];
+      const override = overrideFor(handle);
+      override.featuredSkillIds = override.featuredSkillIds ?? [];
       const id = box.dataset.featskill;
-      if (box.checked && !o.featuredSkillIds.includes(id)) o.featuredSkillIds.push(id);
-      if (!box.checked) o.featuredSkillIds = o.featuredSkillIds.filter((x) => x !== id);
-      markDirty("collections"); renderCollections();
-      openCreatorDetail(handle); // refresh counts/warnings
+      if (box.checked && !override.featuredSkillIds.includes(id)) override.featuredSkillIds.push(id);
+      if (!box.checked) override.featuredSkillIds = override.featuredSkillIds.filter((value) => value !== id);
+      markDirty("collections");
+      renderCollections();
+      if (context === "creators") renderCreatorDetail(context, data);
     });
   });
 }
@@ -784,6 +881,64 @@ async function save(which, url, body) {
   state.gitStatus = cur.gitStatus;
   renderGitStatus();
 }
+
+// ---------- local web preview ----------
+function previewLabel(url, kind) {
+  const path = new URL(url).pathname;
+  const slug = path.split("/").filter(Boolean).at(-1) ?? path;
+  return `${kind}: ${slug}`;
+}
+
+$("preview-build").addEventListener("click", async () => {
+  showErrors(null);
+  const unsaved = Object.entries(dirty).filter(([, value]) => value).map(([key]) => key);
+  if (unsaved.length) {
+    showErrors([`Save ${unsaved.join(", ")} before building the preview.`]);
+    return;
+  }
+
+  const button = $("preview-build");
+  button.disabled = true;
+  $("preview-status").textContent = "building and verifying...";
+  $("preview-open").hidden = true;
+  $("preview-route").hidden = true;
+
+  try {
+    const res = await fetch("/api/build-preview", {
+      method: "POST",
+      headers: { "X-Editool-Token": window.EDITOOL_TOKEN ?? "" },
+    });
+    const out = await res.json();
+    if (!out.ok) {
+      showErrors(out.errors);
+      $("preview-status").textContent = "preview failed";
+      return;
+    }
+
+    const options = [
+      { label: "Skills index", url: out.indexUrl },
+      ...out.profileUrls.map((url) => ({ label: previewLabel(url, "Profile"), url })),
+      ...out.collectionUrls.map((url) => ({ label: previewLabel(url, "Collection"), url })),
+    ];
+    $("preview-route").innerHTML = options
+      .map((item) => `<option value="${esc(item.url)}">${esc(item.label)}</option>`)
+      .join("");
+    $("preview-route").hidden = false;
+    $("preview-open").href = options[0].url;
+    $("preview-open").hidden = false;
+    $("preview-status").textContent = `${out.profileUrls.length} profiles · ${out.collectionUrls.length} collections`;
+    toast("local preview built and verified");
+  } catch (error) {
+    showErrors([error instanceof Error ? error.message : String(error)]);
+    $("preview-status").textContent = "preview failed";
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("preview-route").addEventListener("change", () => {
+  $("preview-open").href = $("preview-route").value;
+});
 
 window.addEventListener("beforeunload", (e) => {
   if (Object.values(dirty).some(Boolean)) e.preventDefault();

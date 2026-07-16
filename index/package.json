@@ -25,7 +25,7 @@
     "merge:x-skill-tweets": "tsx scraper/merge-x-skill-tweets.ts",
     "publish:collections": "tsx scripts/publish-collections.ts",
     "editool": "tsx scripts/editool.ts",
-    "test:editool": "tsx --test scripts/editool-validation.test.ts",
+    "test:editool": "tsx --test scripts/editool-*.test.ts",
     "publish:sha-history": "tsx scripts/publish-sha-history.ts",
     "publish:skill-equivalence": "tsx scripts/publish-skill-equivalence.ts",
     "typecheck": "tsc --noEmit",
