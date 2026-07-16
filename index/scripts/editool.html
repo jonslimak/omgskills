@@ -147,8 +147,6 @@
     </div>
   </section>
 </main>
-<datalist id="sf-names"></datalist>
-<datalist id="lucide-names"></datalist>
 <footer id="git-status"></footer>
 <div id="toast" class="toast"></div>
 
@@ -333,13 +331,6 @@ function renderCollections() {
         <input data-f="subtitle" value="${esc(c.subtitle)}" size="30">
         <input data-f="description" placeholder="description" value="${esc(c.description ?? "")}" size="44">
       </div>
-      <div class="bar">
-        <label class="muted">icons:</label>
-        <input data-f="sfSymbol" list="sf-names" placeholder="SF Symbol (app)" value="${esc(c.sfSymbol ?? "")}" size="22">
-        <input data-f="lucideIcon" list="lucide-names" placeholder="Lucide (web)" value="${esc(c.lucideIcon ?? "")}" size="22">
-        <img class="lucide-preview" src="${c.lucideIcon ? "/lucide/" + esc(c.lucideIcon) + ".svg" : ""}" width="20" height="20" style="${c.lucideIcon ? "" : "display:none"}" onerror="this.style.display='none'">
-        <span class="muted">SF Symbol previews in the app; verify the name in the SF Symbols app</span>
-      </div>
       <div class="muted">featured (3–5 shown in preview):</div>
       <ul class="idlist">${c.featuredSkillIds.map((id, i) => `<li><button class="small danger" data-delfeat="${i}">×</button> ${esc(id)}
         </li>`).join("") || '<li class="muted">none</li>'}</ul>
@@ -380,16 +371,7 @@ $("col-list").addEventListener("input", (e) => {
     state.collections.authorOverrides[handle] = o;
   } else if (colPanel) {
     const collection = state.collections.collections[Number(colPanel.dataset.colPanel)];
-    if (field === "sfSymbol" || field === "lucideIcon") {
-      collection[field] = e.target.value.trim() || null;
-      if (field === "lucideIcon") {
-        const img = colPanel.querySelector(".lucide-preview");
-        if (collection.lucideIcon) { img.src = "/lucide/" + encodeURIComponent(collection.lucideIcon) + ".svg"; img.style.display = ""; }
-        else img.style.display = "none";
-      }
-    } else {
-      collection[field] = e.target.value;
-    }
+    collection[field] = e.target.value;
   }
   markDirty("collections");
 });
@@ -944,14 +926,7 @@ window.addEventListener("beforeunload", (e) => {
   if (Object.values(dirty).some(Boolean)) e.preventDefault();
 });
 
-async function loadIconLists() {
-  const icons = await fetch("/api/icons").then((r) => r.json());
-  $("sf-names").innerHTML = icons.sfSymbols.map((n) => `<option value="${esc(n)}">`).join("");
-  $("lucide-names").innerHTML = icons.lucide.map((n) => `<option value="${esc(n)}">`).join("");
-}
-
 loadCuration().then(searchLib);
-loadIconLists();
 </script>
 </body>
 </html>

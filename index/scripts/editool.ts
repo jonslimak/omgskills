@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { execFileSync } from "node:child_process";
 import { randomBytes, timingSafeEqual } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -146,41 +146,6 @@ function readV2Blocklists(): { blockedRepos: string[]; knownInvalidRepos: string
   }
 }
 
-// ---------- icon name lists (loaded once, both fully local) ----------
-// SF Symbols: macOS ships the canonical name list in the CoreGlyphs bundle.
-// Lucide: names + SVGs come from the lucide-static dev dependency.
-
-function loadSfSymbolNames(): string[] {
-  try {
-    const out = execFileSync(
-      "plutil",
-      ["-convert", "json", "-o", "-", "/System/Library/CoreServices/CoreGlyphs.bundle/Contents/Resources/name_availability.plist"],
-      { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
-    );
-    return Object.keys((JSON.parse(out) as { symbols: Record<string, string> }).symbols).sort();
-  } catch {
-    return [];
-  }
-}
-
-const lucideIconsDir = join(indexRoot, "node_modules", "lucide-static", "icons");
-
-function loadLucideNames(): string[] {
-  try {
-    return readdirSync(lucideIconsDir)
-      .filter((f) => f.endsWith(".svg"))
-      .map((f) => f.slice(0, -4))
-      .sort();
-  } catch {
-    return [];
-  }
-}
-
-const sfSymbolNames = loadSfSymbolNames();
-const lucideNames = loadLucideNames();
-const sfSymbolSet = new Set(sfSymbolNames);
-const lucideSet = new Set(lucideNames);
-
 // ---------- library data (loaded once) ----------
 
 console.log("editool: loading library data…");
@@ -242,8 +207,6 @@ type CollectionsSource = {
     title: string;
     subtitle: string;
     imageUrl?: string | null;
-    sfSymbol?: string | null;
-    lucideIcon?: string | null;
     featuredSkillIds: string[];
     skillIds: string[];
     description?: string | null;
@@ -272,12 +235,6 @@ function validateCollections(source: CollectionsSource): string[] {
     seen.add(collection.id);
     if (!collection.title?.trim()) errors.push(`collection ${collection.id}: title required`);
     if (!collection.subtitle?.trim()) errors.push(`collection ${collection.id}: subtitle required`);
-    if (collection.sfSymbol && sfSymbolSet.size && !sfSymbolSet.has(collection.sfSymbol)) {
-      errors.push(`collection ${collection.id}: unknown SF Symbol "${collection.sfSymbol}"`);
-    }
-    if (collection.lucideIcon && lucideSet.size && !lucideSet.has(collection.lucideIcon)) {
-      errors.push(`collection ${collection.id}: unknown Lucide icon "${collection.lucideIcon}"`);
-    }
     for (const id of [...(collection.featuredSkillIds ?? []), ...(collection.skillIds ?? [])]) {
       if (!skillIdSet.has(id)) errors.push(`unknown skill id in collection ${collection.id}: ${id}`);
     }
@@ -422,22 +379,6 @@ const server = createServer(async (req, res) => {
 
     if (req.method === "GET" && url.pathname === "/api/skills") {
       sendJson(res, 200, searchSkills(url.searchParams));
-      return;
-    }
-
-    if (req.method === "GET" && url.pathname === "/api/icons") {
-      sendJson(res, 200, { sfSymbols: sfSymbolNames, lucide: lucideNames });
-      return;
-    }
-
-    if (req.method === "GET" && url.pathname.startsWith("/lucide/")) {
-      const name = url.pathname.slice("/lucide/".length).replace(/\.svg$/, "");
-      if (!lucideSet.has(name)) {
-        res.writeHead(404); res.end();
-        return;
-      }
-      res.writeHead(200, { "Content-Type": "image/svg+xml", "Cache-Control": "max-age=3600" });
-      res.end(readFileSync(join(lucideIconsDir, `${name}.svg`)));
       return;
     }
 
