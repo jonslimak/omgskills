@@ -1846,26 +1846,10 @@ struct ContentView: View {
     }
 
     private func deleteInstalledSkill(_ skill: Skill) {
-        let fm = FileManager.default
-        let installURL = URL(fileURLWithPath: skill.installCmd, isDirectory: true)
-        guard isSafeInstalledSkillURL(installURL) else {
-            deleteError = "Delete blocked: unexpected skill path"
-            skillPendingDelete = nil
-            return
-        }
-
         do {
-            let isSymlink = skill.isSymlink == true ||
-                ((try? installURL.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false)
-            if isSymlink {
-                try fm.removeItem(at: installURL)
-            } else {
-                var trashedURL: NSURL?
-                try fm.trashItem(at: installURL, resultingItemURL: &trashedURL)
-            }
-
+            let result = try InstalledSkillUninstaller.uninstall(skill)
             skillPendingDelete = nil
-            deleteError = nil
+            deleteError = result.provenanceCleanupWarning
             store.refreshInstalled()
             refreshResults(selectFirst: false)
             if selectedSkill == nil {
@@ -1875,17 +1859,6 @@ struct ContentView: View {
             deleteError = error.localizedDescription
             skillPendingDelete = nil
         }
-    }
-
-    private func isSafeInstalledSkillURL(_ url: URL) -> Bool {
-        let path = url.standardizedFileURL.path
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        let allowedRoots = [
-            home.appendingPathComponent(".codex/skills", isDirectory: true),
-            home.appendingPathComponent(".claude/skills", isDirectory: true),
-            home.appendingPathComponent(".agents/skills", isDirectory: true)
-        ].map { $0.standardizedFileURL.path + "/" }
-        return allowedRoots.contains { path.hasPrefix($0) }
     }
 
     private func installGitHubPromptSkill() {

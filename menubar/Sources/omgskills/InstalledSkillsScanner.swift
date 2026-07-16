@@ -71,7 +71,10 @@ enum InstalledSkillsScanner {
                 let skillMd = entry.appendingPathComponent("SKILL.md")
                 guard fm.fileExists(atPath: skillMd.path) else { continue }
                 let isSymlink = (try? entry.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false
-                let provenance = installProvenance(for: entry, root: root.url)
+                let provenance = SkillInstallProvenanceStore.read(
+                    targetRoot: root.url,
+                    targetName: entry.lastPathComponent
+                )
                 guard let skill = parse(skillMd: skillMd, dir: entry, origin: root.origin, isSymlink: isSymlink, provenance: provenance) else { continue }
 
                 installations.append(skill)
@@ -208,14 +211,6 @@ enum InstalledSkillsScanner {
             current = parent
         }
         return nil
-    }
-
-    private static func installProvenance(for entry: URL, root: URL) -> SkillInstallProvenance? {
-        let metadataURL = root
-            .appendingPathComponent(".omgskills", isDirectory: true)
-            .appendingPathComponent("\(entry.lastPathComponent).json")
-        guard let data = try? Data(contentsOf: metadataURL) else { return nil }
-        return try? JSONDecoder().decode(SkillInstallProvenance.self, from: data)
     }
 
     private static func normalize(_ s: String) -> String {

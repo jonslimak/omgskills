@@ -50,7 +50,7 @@ enum LocalSkillCrossInstaller {
         if case .resolved = skill.identityStatus,
            let catalogSkillId = skill.catalogSkillId {
             do {
-                try SkillInstallProvenanceWriter.write(
+                try SkillInstallProvenanceStore.write(
                     catalogSkillId: catalogSkillId,
                     githubUrl: skill.githubUrl,
                     targetRoot: targetRoot,

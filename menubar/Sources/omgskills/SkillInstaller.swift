@@ -62,7 +62,7 @@ enum SkillInstaller {
         let targetSkill = targetURL.appendingPathComponent("SKILL.md")
 
         if fm.fileExists(atPath: targetSkill.path) {
-            try? SkillInstallProvenanceWriter.write(
+            try? SkillInstallProvenanceStore.write(
                 catalogSkillId: skill.id,
                 githubUrl: skill.githubUrl,
                 targetRoot: targetRoot,
@@ -92,7 +92,7 @@ enum SkillInstaller {
         }
 
         try fm.createSymbolicLink(at: targetURL, withDestinationURL: source)
-        try SkillInstallProvenanceWriter.write(
+        try SkillInstallProvenanceStore.write(
             catalogSkillId: skill.id,
             githubUrl: skill.githubUrl,
             targetRoot: targetRoot,
@@ -181,27 +181,5 @@ enum SkillInstaller {
             }
         }
         throw InstallError.missingGit
-    }
-}
-
-enum SkillInstallProvenanceWriter {
-    static func write(
-        catalogSkillId: String,
-        githubUrl: String,
-        targetRoot: URL,
-        targetName: String
-    ) throws {
-        let metadataRoot = targetRoot.appendingPathComponent(".omgskills", isDirectory: true)
-        try FileManager.default.createDirectory(at: metadataRoot, withIntermediateDirectories: true)
-
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        let provenance = SkillInstallProvenance(
-            catalogSkillId: catalogSkillId,
-            githubUrl: githubUrl,
-            installedAt: formatter.string(from: Date())
-        )
-        let data = try JSONEncoder().encode(provenance)
-        try data.write(to: metadataRoot.appendingPathComponent("\(targetName).json"), options: .atomic)
     }
 }
