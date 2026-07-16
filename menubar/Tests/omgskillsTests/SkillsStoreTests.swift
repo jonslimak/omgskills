@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import omgskills
 
@@ -141,6 +142,108 @@ struct SkillsStoreTests {
         #expect(store.featuredSkills(for: topicCollection).map(\.id) == [cursorSkill.id])
         #expect(store.allSkills(for: topicCollection).map(\.id) == [cursorSkill.id, openAISkill.id])
         #expect(store.allSkills(for: authorCollection).map(\.id) == [openAISkill.id])
+    }
+
+    @Test func skillEquivalenceBuildsAgainstTheLoadedCatalogWithoutChangingRows() throws {
+        let store = makeStore()
+        let claude = skill(name: "claude", stars: 20)
+        let codex = skill(name: "codex", stars: 10)
+        let asset = try skillEquivalenceAsset(
+            memberSkillIds: [claude.id, codex.id],
+            representativeSkillId: claude.id
+        )
+
+        store.applyDecodedLibraryData(
+            available: .success([claude, codex]),
+            trending: .success([]),
+            twitter: .success([]),
+            skillEquivalence: .success(asset),
+            buildIndexes: false
+        )
+
+        #expect(store.availableSkills.map(\.id) == [claude.id, codex.id])
+        #expect(store.skillEquivalence.groups.count == 1)
+        #expect(store.skillEquivalence.group(containing: codex.id)?.representativeSkillId == claude.id)
+    }
+
+    @Test func failedSkillEquivalenceClearsGroupingAndPreservesCatalogRows() throws {
+        let store = makeStore()
+        let claude = skill(name: "claude", stars: 20)
+        let codex = skill(name: "codex", stars: 10)
+        let asset = try skillEquivalenceAsset(
+            memberSkillIds: [claude.id, codex.id],
+            representativeSkillId: claude.id
+        )
+
+        store.applyDecodedLibraryData(
+            available: .success([claude, codex]),
+            trending: .success([]),
+            twitter: .success([]),
+            skillEquivalence: .success(asset),
+            buildIndexes: false
+        )
+        store.applyDecodedLibraryData(
+            available: .success([claude, codex]),
+            trending: .success([]),
+            twitter: .success([]),
+            skillEquivalence: .failure("invalid asset"),
+            buildIndexes: false
+        )
+
+        #expect(store.availableSkills.map(\.id) == [claude.id, codex.id])
+        #expect(store.skillEquivalence.groups.isEmpty)
+    }
+
+    @Test func failedCatalogReloadDoesNotMixAReplacementEquivalenceAssetIntoOldRows() throws {
+        let store = makeStore()
+        let claude = skill(name: "claude", stars: 20)
+        let codex = skill(name: "codex", stars: 10)
+        let initialAsset = try skillEquivalenceAsset(
+            memberSkillIds: [claude.id, codex.id],
+            representativeSkillId: claude.id
+        )
+        let replacementAsset = try skillEquivalenceAsset(
+            memberSkillIds: ["other-a", "other-b"],
+            representativeSkillId: "other-a"
+        )
+
+        store.applyDecodedLibraryData(
+            available: .success([claude, codex]),
+            trending: .success([]),
+            twitter: .success([]),
+            skillEquivalence: .success(initialAsset),
+            buildIndexes: false
+        )
+        store.applyDecodedLibraryData(
+            available: .failure("catalog failed"),
+            trending: .success([]),
+            twitter: .success([]),
+            skillEquivalence: .success(replacementAsset),
+            buildIndexes: false
+        )
+
+        #expect(store.availableSkills.map(\.id) == [claude.id, codex.id])
+        #expect(store.skillEquivalence.group(containing: codex.id)?.id == "group-a")
+        #expect(store.skillEquivalence.group(containing: "other-a") == nil)
+    }
+
+    @Test func skillEquivalenceLoadPlanUsesTheResolvedCatalogTrack() {
+        let fallbackCatalog = SkillsStore.LoadedCatalog(
+            skills: [skill(name: "production", stars: 10)],
+            track: .productionV2
+        )
+        let crawl4Catalog = SkillsStore.LoadedCatalog(
+            skills: [skill(name: "crawl4", stars: 10)],
+            track: .crawl4
+        )
+
+        let fallbackPlan = SkillsStore.SkillEquivalenceLoadPlan(catalog: fallbackCatalog)
+        let crawl4Plan = SkillsStore.SkillEquivalenceLoadPlan(catalog: crawl4Catalog)
+
+        #expect(fallbackPlan.track == .productionV2)
+        #expect(fallbackPlan.allowsBundledFallback)
+        #expect(crawl4Plan.track == .crawl4)
+        #expect(!crawl4Plan.allowsBundledFallback)
     }
 
     @Test func installedIdentitySnapshotIsReadyOnlyAfterScanAndPreservesInstallations() {
@@ -320,6 +423,27 @@ struct SkillsStoreTests {
             skillIds: skillIds,
             description: nil
         )
+    }
+
+    private func skillEquivalenceAsset(
+        memberSkillIds: [String],
+        representativeSkillId: String
+    ) throws -> SkillEquivalenceAsset {
+        let members = memberSkillIds.map { "\"\($0)\"" }.joined(separator: ",")
+        let data = Data("""
+        {
+          "version": 1,
+          "groups": [{
+            "id": "group-a",
+            "memberSkillIds": [\(members)],
+            "representativeSkillId": "\(representativeSkillId)",
+            "preferredSkillIds": {},
+            "confidence": "high",
+            "evidence": ["same-repo"]
+          }]
+        }
+        """.utf8)
+        return try JSONDecoder().decode(SkillEquivalenceAsset.self, from: data)
     }
 
     private func installedSkill(name: String, origin: String) -> Skill {

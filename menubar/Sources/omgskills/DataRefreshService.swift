@@ -30,11 +30,13 @@ enum LibraryDataTrack: String, CaseIterable, Identifiable {
         case (.productionV2, .xTrending): return "x-trending.json"
         case (.productionV2, .collections): return "collections.json"
         case (.productionV2, .shaHistory): return "sha-history.json"
+        case (.productionV2, .skillEquivalence): return "skill-equivalence.json"
         case (.crawl4, .skills): return "crawl4-skills.json"
         case (.crawl4, .trending): return "crawl4-trending.json"
         case (.crawl4, .xTrending): return "crawl4-x-trending.json"
         case (.crawl4, .collections): return "crawl4-collections.json"
         case (.crawl4, .shaHistory): return "crawl4-sha-history.json"
+        case (.crawl4, .skillEquivalence): return "crawl4-skill-equivalence.json"
         }
     }
 
@@ -123,6 +125,7 @@ enum DataRefreshService {
         case xTrending
         case collections
         case shaHistory
+        case skillEquivalence
 
         var cacheFilename: String {
             activeTrack().cacheFilename(for: self)
@@ -137,6 +140,7 @@ enum DataRefreshService {
         let xTrending: Asset?
         let collections: Asset?
         let shaHistory: Asset?
+        let skillEquivalence: Asset?
     }
 
     struct Asset: Codable {
@@ -165,8 +169,10 @@ enum DataRefreshService {
         var activeXTrendingHash: String?
         var activeCollectionsHash: String?
         var activeShaHistoryHash: String?
+        var activeSkillEquivalenceHash: String?
         var activeLibraryGeneratedAt: String?
         var remoteXTrendingEnabled: Bool?
+        var remoteSkillEquivalenceEnabled: Bool?
         var lastCheckedAt: TimeInterval?
         var lastManifestCheckAt: TimeInterval?
         var lastPanelOpenAttemptAt: TimeInterval?
@@ -241,6 +247,17 @@ enum DataRefreshService {
 
     static func remoteXTrendingEnabled() -> Bool? {
         loadMetadata(track: activeTrack()).remoteXTrendingEnabled
+    }
+
+    static func remoteSkillEquivalenceEnabled(for track: LibraryDataTrack) -> Bool? {
+        loadMetadata(track: track).remoteSkillEquivalenceEnabled
+    }
+
+    static func resolvedRemoteAssetEnabled(
+        previous: Bool?,
+        validatedManifestHasAsset: Bool?
+    ) -> Bool? {
+        validatedManifestHasAsset ?? previous
     }
 
     static func lastDisplayableDataUpdateDate() -> Date? {
@@ -327,6 +344,14 @@ enum DataRefreshService {
         metadata.lastCheckedAt = now
         metadata.activeLibraryGeneratedAt = manifest.generatedAt
         metadata.remoteXTrendingEnabled = manifest.xTrending != nil
+        let remoteSkillEquivalenceEnabled = resolvedRemoteAssetEnabled(
+            previous: metadata.remoteSkillEquivalenceEnabled,
+            validatedManifestHasAsset: manifest.skillEquivalence != nil
+        )
+        if metadata.remoteSkillEquivalenceEnabled != remoteSkillEquivalenceEnabled {
+            didUpdate = true
+        }
+        metadata.remoteSkillEquivalenceEnabled = remoteSkillEquivalenceEnabled
 
         if shouldUpdateAsset(
             activeHash: metadata.activeSkillsHash,
@@ -412,6 +437,33 @@ enum DataRefreshService {
                     activeHash: &metadata.activeShaHistoryHash,
                     hasCachedData: cachedData(for: .shaHistory, track: track) != nil,
                     removeCache: { removeCachedData(for: .shaHistory, track: track) }
+                  ) {
+            didUpdate = true
+        }
+
+        if let skillEquivalence = manifest.skillEquivalence,
+           shouldUpdateAsset(
+            activeHash: metadata.activeSkillEquivalenceHash,
+            hasCachedData: cachedData(for: .skillEquivalence, track: track) != nil,
+            manifestHash: skillEquivalence.sha256
+           ) {
+            do {
+                let data = try await fetchAndValidate(
+                    asset: skillEquivalence,
+                    decodeAs: SkillEquivalenceAsset.self,
+                    track: track
+                )
+                try writeCache(data, for: .skillEquivalence, track: track)
+                metadata.activeSkillEquivalenceHash = skillEquivalence.sha256
+                didUpdate = true
+            } catch {
+                print("[DataRefreshService] skillEquivalence refresh failed: \(error)")
+            }
+        } else if manifest.skillEquivalence == nil,
+                  clearOmittedOptionalAssetIfNeeded(
+                    activeHash: &metadata.activeSkillEquivalenceHash,
+                    hasCachedData: cachedData(for: .skillEquivalence, track: track) != nil,
+                    removeCache: { removeCachedData(for: .skillEquivalence, track: track) }
                   ) {
             didUpdate = true
         }

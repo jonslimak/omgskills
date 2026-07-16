@@ -8,6 +8,7 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var trendingSkills: [Skill] = []
     @Published private(set) var twitterSkills: [Skill] = []
     @Published private(set) var collections: [SkillCollection] = []
+    @Published private(set) var skillEquivalence = SkillEquivalenceIndex.empty
     @Published private(set) var installedSkills: [Skill] = []
     @Published private(set) var installedSkillInstallations: [Skill] = []
     @Published private(set) var isInstalledIdentityReady = false
@@ -91,17 +92,29 @@ final class SkillsStore: ObservableObject {
         trendingIndexTask?.cancel()
         twitterIndexTask?.cancel()
 
-        async let availableResult = decodeAvailableSkills()
+        async let catalogResult = decodeAvailableCatalog()
         async let trendingResult = decodeTrendingEntries()
         async let twitterResult = decodeTwitterSkills()
         async let collectionsResult = decodeCollections()
         async let shaHistoryResult = decodeShaHistory()
 
-        let available = await availableResult
+        let catalog = await catalogResult
         let trending = await trendingResult
         let twitter = await twitterResult
         let collections = await collectionsResult
         let shaHistory = await shaHistoryResult
+        let available: LoadResult<[Skill]>
+        let skillEquivalence: LoadResult<SkillEquivalenceAsset?>
+        switch catalog {
+        case .success(let catalog):
+            available = .success(catalog.skills)
+            skillEquivalence = await decodeSkillEquivalence(
+                using: SkillEquivalenceLoadPlan(catalog: catalog)
+            )
+        case .failure(let error):
+            available = .failure(error)
+            skillEquivalence = .failure("Skill equivalence skipped because the catalog failed to load")
+        }
         guard generation == loadGeneration else { return }
 
         applyDecodedLibraryData(
@@ -110,6 +123,7 @@ final class SkillsStore: ObservableObject {
             twitter: twitter,
             collections: collections,
             shaHistory: shaHistory,
+            skillEquivalence: skillEquivalence,
             generation: generation
         )
     }
@@ -120,13 +134,16 @@ final class SkillsStore: ObservableObject {
         twitter: LoadResult<[Skill]>,
         collections: LoadResult<[SkillCollection]> = .success([]),
         shaHistory: LoadResult<ShaHistoryAsset?> = .success(nil),
+        skillEquivalence: LoadResult<SkillEquivalenceAsset?> = .success(nil),
         generation: Int? = nil,
         buildIndexes: Bool = true
     ) {
         let generation = generation ?? loadGeneration
+        var loadedAvailableCatalog = false
 
         switch available {
         case .success(let skills):
+            loadedAvailableCatalog = true
             hasLoadedIdentityCatalog = !skills.isEmpty
             availableSkills = skills.sorted { $0.stars > $1.stars }
             trendingBaseSkills = skills
@@ -175,6 +192,21 @@ final class SkillsStore: ObservableObject {
             break
         }
 
+        if loadedAvailableCatalog {
+            switch skillEquivalence {
+            case .success(let asset):
+                self.skillEquivalence = asset.map {
+                    SkillEquivalenceIndex(
+                        asset: $0,
+                        liveSkillIds: Set(availableSkills.map(\.id))
+                    )
+                } ?? .empty
+            case .failure(let error):
+                self.skillEquivalence = .empty
+                print("[SkillsStore] skillEquivalence load failed: \(error)")
+            }
+        }
+
         resolveInstalledIdentities()
     }
 
@@ -211,14 +243,20 @@ final class SkillsStore: ObservableObject {
         }
     }
 
-    private nonisolated func decodeAvailableSkills() async -> LoadResult<[Skill]> {
+    private nonisolated func decodeAvailableCatalog() async -> LoadResult<LoadedCatalog> {
         if DataRefreshService.activeTrack() == .crawl4 {
             let crawl4 = await decodeCrawl4AvailableSkills()
-            if case .success = crawl4 {
-                return crawl4
+            if case .success(let skills) = crawl4 {
+                return .success(LoadedCatalog(skills: skills, track: .crawl4))
             }
         }
-        return await decodeProductionAvailableSkills()
+
+        switch await decodeProductionAvailableSkills() {
+        case .success(let skills):
+            return .success(LoadedCatalog(skills: skills, track: .productionV2))
+        case .failure(let error):
+            return .failure(error)
+        }
     }
 
     private nonisolated func decodeCrawl4AvailableSkills() async -> LoadResult<[Skill]> {
@@ -398,6 +436,45 @@ final class SkillsStore: ObservableObject {
         return .success(nil)
     }
 
+    private nonisolated func decodeSkillEquivalence(
+        using plan: SkillEquivalenceLoadPlan
+    ) async -> LoadResult<SkillEquivalenceAsset?> {
+        let track = plan.track
+        if DataRefreshService.remoteSkillEquivalenceEnabled(for: track) == false {
+            DataRefreshService.removeCachedData(for: .skillEquivalence, track: track)
+            return .success(nil)
+        }
+
+        if let data = DataRefreshService.cachedData(for: .skillEquivalence, track: track) {
+            let label = track.cacheFilename(for: .skillEquivalence)
+            let decoded = await decode(data, as: SkillEquivalenceAsset.self, label: label)
+            switch decoded {
+            case .success(let asset):
+                return .success(asset)
+            case .failure(let error):
+                DataRefreshService.removeCachedData(for: .skillEquivalence, track: track)
+                return .failure(error)
+            }
+        }
+
+        guard plan.allowsBundledFallback,
+              let bundled = bundledSkillEquivalenceData() else {
+            return .success(nil)
+        }
+
+        let decoded = await decode(
+            bundled.data,
+            as: SkillEquivalenceAsset.self,
+            label: bundled.label
+        )
+        switch decoded {
+        case .success(let asset):
+            return .success(asset)
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+
     private nonisolated func bundledCollectionsData() -> (data: Data, label: String)? {
         guard let manifestURL = Bundle.main.url(forResource: "manifest", withExtension: "json"),
               let manifestData = try? Data(contentsOf: manifestURL),
@@ -426,6 +503,21 @@ final class SkillsStore: ObservableObject {
             return nil
         }
         return (data, shaHistoryURL.lastPathComponent)
+    }
+
+    private nonisolated func bundledSkillEquivalenceData() -> (data: Data, label: String)? {
+        guard let manifestURL = Bundle.main.url(forResource: "manifest", withExtension: "json"),
+              let manifestData = try? Data(contentsOf: manifestURL),
+              let manifest = try? JSONDecoder().decode(DataRefreshService.Manifest.self, from: manifestData),
+              let skillEquivalencePath = manifest.skillEquivalence?.path else {
+            return nil
+        }
+
+        let assetURL = manifestURL.deletingLastPathComponent().appendingPathComponent(skillEquivalencePath)
+        guard let data = try? Data(contentsOf: assetURL) else {
+            return nil
+        }
+        return (data, assetURL.lastPathComponent)
     }
 
     private nonisolated func decode<T: Decodable & Sendable>(_ data: Data, as type: T.Type, label: String) async -> LoadResult<T> {
@@ -523,6 +615,21 @@ final class SkillsStore: ObservableObject {
     enum LoadResult<T: Sendable>: Sendable {
         case success(T)
         case failure(String)
+    }
+
+    struct LoadedCatalog: Sendable {
+        let skills: [Skill]
+        let track: LibraryDataTrack
+    }
+
+    struct SkillEquivalenceLoadPlan: Equatable, Sendable {
+        let track: LibraryDataTrack
+        let allowsBundledFallback: Bool
+
+        init(catalog: LoadedCatalog) {
+            track = catalog.track
+            allowsBundledFallback = catalog.track == .productionV2
+        }
     }
 
     private func rebuildTrending(generation: Int, buildIndex shouldBuildIndex: Bool = true) {
