@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-16T14:01:41.685Z",
+  "generatedAt": "2026-07-17T19:28:22.952Z",
   "shaToSkillIds": {
     "0000298ae650d634180ad1b1ca38539b1e51def6": [
       "jeremylongshore/claude-code-plugins-plus-skills:navan-migration-deep-dive"
@@ -15071,6 +15071,9 @@
     "11b13dd52e66733a8930c90a93d4aaaa7f1aac94": [
       "jzOcb/config-guard"
     ],
+    "11b2107f9084eea6eebce06e8a02d5278ec5b2a3": [
+      "paperclipai/paperclip:paperclip"
+    ],
     "11b27a5bd72e8a39fd0444fb46f464feacb9bfe7": [
       "dylantarre/design-system-skills:skills/tokens/color-scale"
     ],
@@ -16056,6 +16059,9 @@
     ],
     "13266a62991ce260585eb902b7cd3eb90cbc7dba": [
       "PaulRBerg/agent-skills:skills/commit"
+    ],
+    "1327e71d998da3927888de3a353d54942d5e8d00": [
+      "spacezephyr/space-multi-design-ppt"
     ],
     "1328222e3df5dab381a78b13f9a566ab42f78e62": [
       "tsensei/ReelMistri:plan-design-review"
@@ -18282,6 +18288,9 @@
     ],
     "168319d89ad000a253a4ef2a086fbde57d783263": [
       "elsvv/yandex-cloud-cli-skill"
+    ],
+    "168479a7d5523ea918c56063e0e7b85bc013931f": [
+      "egonex-ai/understand-anything:understand"
     ],
     "1684a5741cdabf5909c6647a4499f12089bc1fab": [
       "Dmccarty30/Journeyman-Jobs:.claude/skills/condition-based-waiting",
@@ -30723,6 +30732,9 @@
     "29b61bf8c1c2b21ab90dffe5ed0b3814224d50c8": [
       "ComposioHQ/awesome-claude-plugins:frontend-design/skills/frontend-design"
     ],
+    "29b8bd2c35e81afcd98ef6139be4e367677c59ce": [
+      "steipete/oracle:oracle"
+    ],
     "29ba754972ddfb4180ceba3a7f9a0823b281e0d9": [
       "fsilavong/agent-eval"
     ],
@@ -31408,6 +31420,9 @@
     ],
     "2aeda85d2ecf40f750eb1eb0076a05f994b8f37b": [
       "OutlineDriven/odin-codex-plugin:skills/code-simplifier"
+    ],
+    "2aeef5a6f26315dd69ee3dc06f5620e42e5fbaa7": [
+      "ruvnet/ruflo:trader-risk"
     ],
     "2aefdf865ec2388fe6f2239c29295903f307706a": [
       "Luispitik/salgadoia-web-design-engineer-pro"
@@ -37398,6 +37413,9 @@
     "34bde80b0f1174b99ec23d49a4c44ed82e03a98f": [
       "cameronapak/bknd-skills:skills/bknd-crud-read"
     ],
+    "34bec95394baff49b263ad931e747a464c628782": [
+      "heygen-com/hyperframes:hyperframes"
+    ],
     "34c0ead5ac60ac211c8e184404792d4ceb5500d6": [
       "Asreonn/godot-superpowers:mini-skills/godot-setup-animationtree"
     ],
@@ -40876,6 +40894,9 @@
     "3ac96383fda9f9da8cbc8a208100f8eb1036191a": [
       "beel-collab/presets:software-engineering/architecture-blueprint-generator"
     ],
+    "3acc06f43e68a3ad38c0aef4867d3aa2148ee22c": [
+      "microsoft/vscode:sessions"
+    ],
     "3acff03e27a0c6070ad9efe50117e32a2b4b4b9a": [
       "jpoutrin/product-forge:plugins/claude-code-dev/skills/create-agent"
     ],
@@ -43253,6 +43274,9 @@
     ],
     "3ee1300e9954d3934087734a71f54435843458ec": [
       "everyinc/compound-engineering-plugin:ce-plan"
+    ],
+    "3ee1d9145d64af4e725176a6d74f8edec34eceac": [
+      "shaom/infocard-skills:editorial-card-screenshot"
     ],
     "3ee1de82c68645be4353328271b7954aa7f4d200": [
       "CANTAGESTUDIO/CosmicAtlasPacker:.claude/skills/refactor-git-plan"
@@ -46658,6 +46682,9 @@
     ],
     "45170fa38ef3ef48e7e261750d5053224ca690b2": [
       "vinvcn/mattpocock-skills-zh-cn:triage"
+    ],
+    "451922ea011a5c46fc88d27a7fa8112bdaa28496": [
+      "kappaemme-git/codex-first-customer-finder-skill:first-customer-finder"
     ],
     "4519673ce500b172ab29c2894fe0c418e8fbc915": [
       "cliftonc/unwind:skills/analyzing-integration-tests"
@@ -60019,6 +60046,9 @@
     ],
     "5eb00446284e8c68ba80e16ee50fd02fcb253a3d": [
       "kostja94/marketing-skills:google-search-console"
+    ],
+    "5eb00fcfba49d2d0d40e7f22b48925e1eefa0b57": [
+      "qwibitai/nanoclaw:.claude/skills/add-karpathy-llm-wiki"
     ],
     "5eb28be8a7048751739adea05a00a29f2f088717": [
       "owl-listener/designer-skills:user-persona"
@@ -81570,6 +81600,9 @@
     "8982be5074358aad833bfa6ca50840b2029639e4": [
       "MelbourneDeveloper/dart_node:.claude/skills/build-extension"
     ],
+    "8985009ab586842369d407e591b559a968a735d0": [
+      "gitbutlerapp/gitbutler:but"
+    ],
     "89874666fe98318673ac7de9296d0af62222fcf1": [
       "HoraceLuBFA/en-zh-translation-polish"
     ],
@@ -88632,6 +88665,9 @@
       "cxuu/golang-skills:go-packages",
       "cxuu/golang-skills:skills/go-packages"
     ],
+    "980b7b070d1212102738b84bd9f4dc7f2c6eac58": [
+      "yizhiyanhua-ai/fireworks-tech-graph"
+    ],
     "980cdcac37867b4f29b2db1dcd0e1dc2f24c3cdc": [
       "secondsky/claude-skills:plugins/design-system-creation/skills/design-system-creation"
     ],
@@ -93254,6 +93290,9 @@
     "a0de6911ec2d6ddf3ebd87d4c22e09cbbb151947": [
       "lyndonkl/claude:skills/metrics-tree"
     ],
+    "a0e05e415350762be5a1d314fee702b87865e5c1": [
+      "dontbesilent2025/dbskill:dbs"
+    ],
     "a0e1aab6e96bdf818aa13c4ca2f61b43ac43b5ea": [
       "Affitor/affiliate-skills:skills/analytics/internal-linking-optimizer"
     ],
@@ -93422,6 +93461,9 @@
     ],
     "a137d5dccbfd0403350694cc58778386e0f0ee2a": [
       "codebar-ag/coding-guidelines:resources/boost/skills/blade"
+    ],
+    "a13875380d8e394ffbe875f78bcb14b979987771": [
+      "jakubkrehel/skills:better-colors"
     ],
     "a139a4dbe32900d6d8860b6268c5c2effab6aef4": [
       "anthropics/knowledge-work-plugins:scientific-problem-selection",
@@ -97039,6 +97081,9 @@
     ],
     "a830911102f8db4943a7a2103120628799d544b8": [
       "flutter/skills:dart-package-maintenance"
+    ],
+    "a831259d79b4caa08e80df40643b1d3d353e1db4": [
+      "hugohe3/ppt-master:ppt-master"
     ],
     "a8322d955da9b83b0b84fc8828426b080a465cb2": [
       "CoralShades/CurryDash-Central-Hub:.agents/skills/bmad-agent-cis-innovation-strategist"
@@ -106926,7 +106971,8 @@
       "Dragoon0x/dragoon-skills:brief"
     ],
     "bca3c18c5b7f0f8ce34c31c2bad07c4b42c2c4e3": [
-      "affaan-m/ecc:database-migrations"
+      "affaan-m/ecc:database-migrations",
+      "affaan-m/everything-claude-code:database-migrations"
     ],
     "bca3c8641830507e72f705585e30890387114d4d": [
       "foryourhealth111-pixel/Vibe-Skills:bundled/skills/alphafold-database"
@@ -116311,6 +116357,9 @@
     "d041ae177b229625e73370cadb2416eab9f3c50d": [
       "krzemienski/shannon-framework:skills/honest-reflections"
     ],
+    "d04250b6639b971c044ec008636cd1074f07fee3": [
+      "browser-use/browser-harness"
+    ],
     "d042c8464888218f351d34a940e052b280fe5040": [
       "OneWave-AI/claude-skills:highlight-reel-scripter"
     ],
@@ -116641,6 +116690,9 @@
     ],
     "d0e4d55a24c67342bff9020975a914b31fc5d9a6": [
       "tdhopper/dotfiles2.0:.claude/skills/commit"
+    ],
+    "d0e8f950caaad8acb907d8dc68db1102dcb0bb22": [
+      "browser-use/browser-use:browser-use"
     ],
     "d0eb0922077e3ec5fbadd298b44b15c3df98d3c5": [
       "Mcafee123/affolterNET.Web:plugins/affolternet-web-api/skills/api-setup"
@@ -118780,6 +118832,9 @@
     ],
     "d5301580a135bfc3f04c3b5781dbcd88244b7ba9": [
       "BrianRWagner/ai-marketing-claude-code-skills:cold-outreach-sequence"
+    ],
+    "d53116b066178bff698e155b1f110ac227878f8c": [
+      "vercel/turbo:turborepo"
     ],
     "d531a110dcbe53849fd2e13504e28c435fc6cd72": [
       "jpoutrin/product-forge:plugins/git-workflow/skills/bl-init"
@@ -127156,6 +127211,9 @@
     "e5c2ded3214371c43aa1be967d90d4b64e8c33a0": [
       "cornmanwtf/ABANG-COLEK:skills/devops-infra/build-optimization"
     ],
+    "e5c764e8ce5b7cc616a166bd0569ac4da979153a": [
+      "tobiaslee/rebuttal-skill"
+    ],
     "e5c9427875e22953d7f6b63a7ac608a8d9c482b8": [
       "amanik/sailor-app:setup-deploy",
       "amanik/sailor-score-debug:setup-deploy",
@@ -128608,6 +128666,9 @@
     "e8ed358711f5e1f9199a7ab5a41189afa0911301": [
       "agentuity/sdk-explorer:.agents/skills/agentuity-cli-cloud-sandbox-rm"
     ],
+    "e8f06c555dc116d3c172eebd6fd08ff3657c863f": [
+      "everyinc/compound-engineering-plugin:ce-brainstorm"
+    ],
     "e8f0a18bbef90a31cb3e7f49957ce23a0f2741fd": [
       "romanmesicek/agent-skills:academic-research"
     ],
@@ -130000,6 +130061,9 @@
     ],
     "ebe83fdd9a1d87d3f84348221ecd382fd591bd54": [
       "jasonhnd/life_OS"
+    ],
+    "ebea796769ccf2c7a50f5aa994e48df0292fad28": [
+      "mastra-ai/mastra:react-best-practices"
     ],
     "ebeebe4652343873489d848a50ea2735cd83e78d": [
       "noizai/skills:template-skill"
@@ -137400,6 +137464,9 @@
     "fb915189d2c1545ec7575838cccbcd2ca3eb614f": [
       "mahidalhan/claude-hacks:.claude/skills/exa-code-context"
     ],
+    "fb954a460a1ea2294e9595e87fecce8df043eeba": [
+      "anthropics/skills:docx"
+    ],
     "fb981f556d26edbef477f79bc626d055330f2a1f": [
       "butttons/dora:src/templates/docs"
     ],
@@ -139617,5 +139684,72 @@
     "fffefd4dbd069f8cbf38b18309dcd8bf566f2ad5": [
       "realaman90/ai-film-skills"
     ]
+  },
+  "canonicalBySha": {
+    "2ab0cac93e1dd92b96982e19b6810c21d7c138b2": {
+      "skillId": "affaan-m/everything-claude-code:data-scraper-agent",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "3fc5f5254efe9dd653b6b0e1a4cf1720f4b1bf4d": {
+      "skillId": "nexscope-ai/ecommerce-skills:dropshipping-product-research",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "4ac3ff2953b29f33ad27638ee0033d91ad8c826e": {
+      "skillId": "affaan-m/everything-claude-code:dashboard-builder",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "530a7b92632f7607f71f92d5e5d4b4d68c73210b": {
+      "skillId": "whawkinsiv/solo-founder-superpowers:accounting",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "7bf3d5359b92d621a8090d40de5064bb3caca486": {
+      "skillId": "affaan-m/everything-claude-code:dart-flutter-patterns",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "9f5fb4cff8a580b3493e5a9674044fde705b2452": {
+      "skillId": "ForceInjection/domain-driven-design-skills:holistic-linting",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "a0d6925af522395a1f0171e6ced901c50f590275": {
+      "skillId": "getsentry/sentry-for-ai:sentry-create-alert",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "bca3c18c5b7f0f8ce34c31c2bad07c4b42c2c4e3": {
+      "skillId": "affaan-m/everything-claude-code:database-migrations",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "d3fdc55d0dd249ff5691faee2cae70ca3cb6ba98": {
+      "skillId": "getsentry/sentry-for-ai:sentry-sdk-upgrade",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "d63c61425479ceb4f52559499589c720e0afdd7d": {
+      "skillId": "affaan-m/everything-claude-code:customs-trade-compliance",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "f0ffc2ded9776e86b6273b2f0bdaaa6b4db2fd32": {
+      "skillId": "conorbronsdon/avoid-ai-writing:avoid-ai-writing",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "f332bc640ff7065d59de8c5148337cf1978fc3f1": {
+      "skillId": "glittercowboy/taches-cc-resources:debug-like-expert",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "f724e76be79fffd62c70996c705639c9b77dcf01": {
+      "skillId": "getsentry/sentry-for-ai:sentry-feature-setup",
+      "confidence": "high",
+      "reason": "same-repo"
+    }
   }
 }

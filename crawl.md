@@ -273,8 +273,8 @@ Identity layers stay separate:
 - logical equivalence groups related Claude/Codex variants without merging them
 
 The published `shaHistory` side asset retains `shaToSkillIds` for compatibility.
-Future canonical attribution must be additive; it must not replace the existing
-multi-ID map or rewrite skill IDs.
+Canonical attribution is an additive `canonicalBySha` annotation; it does not
+replace the existing multi-ID map or rewrite skill IDs.
 
 Current identity/duplicate behavior:
 
@@ -282,7 +282,8 @@ Current identity/duplicate behavior:
 - durable skill removals live in `seeds/suppressed-skills.json`
 - blocked owners/repos live in `seeds/do-not-crawl.json`
 - known catalogs live in `seeds/catalog-repos.json` and cannot win canonical selection by stars
-- published canonical fields remain deferred until a product feature needs them
+- canonical publication is limited to validated high-confidence same-repository
+  mappings; malformed or stale annotations fail publication
 
 ## Quality, Snippets, and Safety Audits
 

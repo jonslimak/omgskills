@@ -23,7 +23,8 @@ function writeAsset(dataDir, name, value) {
 
 function verifyFixture({ skills, shaHistory, collections, skillEquivalence }) {
   const root = mkdtempSync(join(tmpdir(), "verify-published-data-test-"));
-  const dataDir = join(root, "site", "data", "test");
+  const dataRoot = join(root, "isolated-data");
+  const dataDir = join(dataRoot, "test");
   mkdirSync(dataDir, { recursive: true });
 
   try {
@@ -42,7 +43,11 @@ function verifyFixture({ skills, shaHistory, collections, skillEquivalence }) {
     writeFileSync(join(dataDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
     return spawnSync(process.execPath, [scriptPath], {
       cwd: root,
-      env: { ...process.env, OMGSKILLS_DATA_SUBDIR: "test" },
+      env: {
+        ...process.env,
+        OMGSKILLS_DATA_ROOT: dataRoot,
+        OMGSKILLS_DATA_SUBDIR: "test",
+      },
       encoding: "utf8",
     });
   } finally {

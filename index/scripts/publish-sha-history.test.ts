@@ -8,6 +8,7 @@ import {
   buildCanonicalBySha,
   buildShaHistoryAsset,
   patchManifest,
+  previousShaHistoryAssetPath,
   pruneSupersededShaHistoryAssets,
   shouldPublishCanonicalBySha,
   writeShaHistoryAsset,
@@ -230,6 +231,27 @@ test("pruning keeps only current and immediately previous assets", () => {
     pruneSupersededShaHistoryAssets(dir, [current, previous]);
 
     assert.deepEqual(readdirSync(dir).sort(), [current, previous, "skills-unrelated.json"].sort());
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a no-op rerun retains the newest real previous asset", () => {
+  const dir = mkdtempSync(join(tmpdir(), "sha-history-rerun-prune-test-"));
+  const current = asset("2026-07-03T00:00:00.000Z", { [shaA]: ["owner/repo:one"] });
+  const previous = asset("2026-07-02T00:00:00.000Z", { [shaA]: ["owner/repo:one"] });
+  const oldest = asset("2026-07-01T00:00:00.000Z", { [shaA]: ["owner/repo:one"] });
+
+  try {
+    const currentFile = writeShaHistoryAsset(dir, current).path;
+    const previousFile = writeShaHistoryAsset(dir, previous).path;
+    writeShaHistoryAsset(dir, oldest);
+
+    const retainedPrevious = previousShaHistoryAssetPath(dir, currentFile);
+    pruneSupersededShaHistoryAssets(dir, [currentFile, retainedPrevious ?? ""]);
+
+    assert.equal(retainedPrevious, previousFile);
+    assert.deepEqual(readdirSync(dir).sort(), [currentFile, previousFile].sort());
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

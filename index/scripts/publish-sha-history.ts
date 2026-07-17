@@ -254,6 +254,21 @@ export function pruneSupersededShaHistoryAssets(dataDir: string, keepPaths: stri
   }
 }
 
+export function previousShaHistoryAssetPath(dataDir: string, currentPath: string): string | undefined {
+  return readdirSync(dataDir)
+    .filter((file) => file.startsWith("sha-history-") && file.endsWith(".json") && file !== currentPath)
+    .map((file) => {
+      try {
+        return { file, generatedAt: readJson<ShaHistoryAsset>(join(dataDir, file)).generatedAt ?? "" };
+      } catch {
+        return { file, generatedAt: "" };
+      }
+    })
+    .sort((left, right) =>
+      right.generatedAt.localeCompare(left.generatedAt) || right.file.localeCompare(left.file)
+    )[0]?.file;
+}
+
 async function main() {
   if (!existsSync(skillsPath)) fail(`missing ${skillsPath}`);
 
@@ -288,7 +303,11 @@ async function main() {
   for (const track of dataTrackDirs) {
     const written = writeShaHistoryAsset(track.dir, result.asset);
     patchManifest(track.dir, written);
-    pruneSupersededShaHistoryAssets(track.dir, [written.path, priorPaths.get(track.name) ?? ""]);
+    const priorManifestPath = priorPaths.get(track.name);
+    const previousPath = priorManifestPath && priorManifestPath !== written.path && existsSync(join(track.dir, priorManifestPath))
+      ? priorManifestPath
+      : previousShaHistoryAssetPath(track.dir, written.path);
+    pruneSupersededShaHistoryAssets(track.dir, [written.path, previousPath ?? ""]);
     console.log(`wrote ${join(track.dir, written.path)}`);
   }
   const finalCounts = countShaHistory(result.asset);

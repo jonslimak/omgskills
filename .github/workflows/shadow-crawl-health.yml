@@ -83,8 +83,10 @@ jobs:
       - name: Publish SHA history
         working-directory: index
         # Keep this after promote:cutover: canonical policy reads the current
-        # suppression-filtered skills.json. SHA_CANONICAL_PUBLISH stays unset
-        # until the canonical rollout is explicitly approved.
+        # suppression-filtered skills.json. Scope the rollout flag to this step
+        # so unrelated publishers and Mac release commands cannot enable it.
+        env:
+          SHA_CANONICAL_PUBLISH: "1"
         run: npm run publish:sha-history
 
       - name: Publish skill equivalence

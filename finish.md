@@ -12,8 +12,8 @@ Completed implementation history does not belong here.
 
 - A web deploy never authorizes a public Mac release.
 - A data publication never authorizes a public Mac release.
-- Keep `SHA_CANONICAL_PUBLISH` and `SKILL_EQUIVALENCE_PUBLISH` off until their
-  explicit rollout tasks are approved.
+- Keep optional data flags scoped to their approved publisher steps. Never
+  enable them globally or in Mac release commands.
 - Never enable dormant crawler flags as part of unrelated catalog work.
 - Every production web deploy must use the guarded combined
   `dist/netlify-site` artifact.
@@ -53,10 +53,20 @@ command.
 - verify old clients still accept the additive asset
 - verify malformed or stale mappings fail closed to ambiguity
 - use flag-off publication to remove canonical annotations without shrinking
-  append-only SHA membership if rollback is required
+  append-only SHA membership if rollback is required; compare against the
+  pre-rollback asset rather than fixed catalog counts
+- require the scheduled v2 and Crawl 4 verifiers to validate every regenerated
+  canonical annotation while the flag remains enabled
 
 Immediate ambiguity reduction is expected to be small under the conservative
-same-repository policy.
+same-repository policy. After two clean scheduled publications, review the
+trusted-creator single-repository candidates as the next explicit batch. Other
+medium-confidence candidates remain deferred rather than being promoted
+automatically.
+
+Identity-resolution telemetry is already implemented. The production effect on
+`ambiguous` and `resolved_by_sha` becomes measurable after the 0.0.18 Mac client
+is publicly released; it is not an immediate rollout success gate.
 
 ### 18.3 - Publish Claude/Codex equivalence
 

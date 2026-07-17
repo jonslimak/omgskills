@@ -264,8 +264,9 @@ The client accepts a canonical entry only when it is live, belongs to the SHA
 membership, matches the local candidate constraints, and uses a supported
 confidence policy. Invalid annotations fail closed to ambiguity.
 
-`SHA_CANONICAL_PUBLISH=1` enables canonical emission. Unset preserves the
-membership-only asset and acts as the rollback switch.
+`SHA_CANONICAL_PUBLISH=1` enables canonical emission in the SHA-history
+publisher step. Publishing with the flag unset removes the optional annotation
+while preserving append-only membership, which is the rollback path.
 
 ### Location identity and sync stability
 
