@@ -38,6 +38,14 @@ test("manual production deploy never tags a Mac release without explicit opt-in"
   assert.match(script, /Usage: \.\/scripts\/deploy-site-prod\.sh \[--tag-release\]/);
 });
 
+test("manual production deploy keeps Skill Groups auth disabled", () => {
+  const gate = "export VITE_SKILLGROUPS_AUTH_ENABLED=0";
+  const build = "npm run build:netlify";
+
+  assert.notEqual(script.indexOf(gate), -1);
+  assert.ok(script.indexOf(gate) < script.indexOf(build));
+});
+
 test("manual production deploy checks generated config and every deploy input", () => {
   assert.match(script, /\.netlify\/netlify\.toml/);
   assert.match(script, /PRODUCTION_ORIGIN="https:\/\/omgskills\.com"/);

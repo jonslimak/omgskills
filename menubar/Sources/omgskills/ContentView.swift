@@ -144,6 +144,7 @@ private struct DataUpdatedFooterView: View {
 
 struct ContentView: View {
     let deviceConnectionModel: DeviceConnectionModel
+    let skillGroupsAuthEnabled: Bool
 
     @StateObject private var store = SkillsStore()
     @State private var query = ""
@@ -364,7 +365,9 @@ struct ContentView: View {
         }
         .frame(width: shouldShowDetailPanel ? 750 : 400, height: 855)
         .sheet(isPresented: $isSyncPanelPresented) {
-            syncPanel
+            if skillGroupsAuthEnabled {
+                syncPanel
+            }
         }
         .onChange(of: showDetail) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
@@ -943,30 +946,32 @@ struct ContentView: View {
             .scrollIndicators(.never)
 
             if localDashboardFilter == nil {
-                Button {
-                    store.refreshInstalled()
-                    isSyncPanelPresented = true
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                            .foregroundStyle(.secondary)
-                        Text("Resync")
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 8, weight: .semibold))
-                            .foregroundStyle(.tertiary)
+                if skillGroupsAuthEnabled {
+                    Button {
+                        store.refreshInstalled()
+                        isSyncPanelPresented = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .foregroundStyle(.secondary)
+                            Text("Resync")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 8, weight: .semibold))
+                                .foregroundStyle(.tertiary)
+                        }
+                        .font(.system(size: 11, weight: .medium))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 7)
+                        .background(Color.primary.opacity(0.055))
+                        .clipShape(.rect(cornerRadius: 8))
                     }
-                    .font(.system(size: 11, weight: .medium))
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 7)
-                    .background(Color.primary.opacity(0.055))
-                    .clipShape(.rect(cornerRadius: 8))
+                    .buttonStyle(.plain)
+                    .disabled(!store.isInstalledIdentityReady)
+                    .padding(.horizontal, 18)
+                    .padding(.bottom, 8)
+                    .help("Resync installed skills with the web portal")
                 }
-                .buttonStyle(.plain)
-                .disabled(!store.isInstalledIdentityReady)
-                .padding(.horizontal, 18)
-                .padding(.bottom, 8)
-                .help("Resync installed skills with the web portal")
 
                 GitHubInstallPromptView(
                     urlText: $githubInstallURLText,

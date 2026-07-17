@@ -17,6 +17,7 @@ struct OmgskillsApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private static let libraryRefreshTimerInterval: TimeInterval = 60 * 60
+    private let skillGroupsAuthEnabled = AppRuntimeConfiguration.skillGroupsAuthEnabled
     private var statusItem: NSStatusItem!
     private var panel: NSPanel!
     private var clickMonitor: Any?
@@ -41,7 +42,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let usesBundledLibraryPreview = AppRuntimeConfiguration.usesBundledLibraryPreview
         Analytics.start()
-        deviceConnectionModel.restore()
+        if skillGroupsAuthEnabled {
+            deviceConnectionModel.restore()
+        }
         setupUpdater(startingUpdater: !usesBundledLibraryPreview)
         setupStatusItem()
         setupPanel()
@@ -98,6 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        guard skillGroupsAuthEnabled else { return }
         guard let callbackURL = urls.first else { return }
         _ = browserPairingSession.handleCallback(callbackURL)
     }
@@ -220,7 +224,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
 
     private func setupPanel() {
         let hostingView = NSHostingView(
-            rootView: ContentView(deviceConnectionModel: deviceConnectionModel)
+            rootView: ContentView(
+                deviceConnectionModel: deviceConnectionModel,
+                skillGroupsAuthEnabled: skillGroupsAuthEnabled
+            )
         )
         hostingView.wantsLayer = true
         hostingView.layer?.cornerRadius = 20

@@ -55,9 +55,13 @@ import {
   type GroupedSyncedSkill,
   type SyncedSkill
 } from "@/synced-skill-grouping";
+import { isEnabledConnectRoute, isSkillGroupsAuthEnabled } from "@/feature-flags";
 import "./styles.css";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const skillGroupsAuthEnabled = isSkillGroupsAuthEnabled(
+  import.meta.env.VITE_SKILLGROUPS_AUTH_ENABLED
+);
 const iconClassName = "app-icon";
 
 function publicSiteOrigin() {
@@ -1277,7 +1281,9 @@ function Dashboard() {
         </div>
         <div className="dashboard-actions">
           <UserButton />
-          <SyncAppButton hasSynced={state.syncedSkills.length > 0} />
+          {skillGroupsAuthEnabled ? (
+            <SyncAppButton hasSynced={state.syncedSkills.length > 0} />
+          ) : null}
         </div>
       </header>
 
@@ -1375,7 +1381,10 @@ function SignedOutPage({ isConnectRoute }: { isConnectRoute: boolean }) {
 }
 
 function App() {
-  const isConnectRoute = /^\/(?:app\/)?connect\/?$/.test(window.location.pathname);
+  const isConnectRoute = isEnabledConnectRoute(
+    window.location.pathname,
+    skillGroupsAuthEnabled
+  );
   const groupDetailMatch = window.location.pathname.match(/^\/app\/groups\/([^/]+)\/?$/);
 
   return (

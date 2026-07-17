@@ -55,6 +55,9 @@ if [[ "$VITE_CLERK_PUBLISHABLE_KEY" != pk_* ]]; then
   exit 1
 fi
 
+# Device pairing stays dark in production until its dedicated release approval.
+export VITE_SKILLGROUPS_AUTH_ENABLED=0
+
 PRODUCTION_ORIGIN="https://omgskills.com" node ./scripts/prepare-netlify-site-deploy.mjs
 npm ci
 npm run build:netlify

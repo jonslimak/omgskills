@@ -160,6 +160,25 @@ verify_identity() {
     fi
 }
 
+verify_skillgroups_auth_release_gate() {
+    local enabled
+    enabled=$(/usr/libexec/PlistBuddy -c 'Print :OMGSkillsSkillGroupsAuthEnabled' "$INFO_PLIST" 2>/dev/null) \
+        || fail "menubar/Info.plist must declare OMGSkillsSkillGroupsAuthEnabled."
+
+    case "$enabled" in
+        false)
+            ;;
+        true)
+            if [ "${OMGSKILLS_ALLOW_SKILLGROUPS_AUTH_RELEASE:-0}" != "1" ]; then
+                fail "Skill Groups auth is enabled. Set OMGSKILLS_ALLOW_SKILLGROUPS_AUTH_RELEASE=1 only for its explicitly approved release."
+            fi
+            ;;
+        *)
+            fail "OMGSkillsSkillGroupsAuthEnabled must be a plist boolean."
+            ;;
+    esac
+}
+
 preflight() {
     if [ "$RC_MODE" = "1" ]; then
         echo "→ Running RC release preflight"
@@ -185,6 +204,7 @@ preflight() {
     require_file "$INFO_PLIST" "menubar/Info.plist must exist so the release version can be read."
     require_file "$APPLICATIONS_ICON" "Expected the DMG Applications icon asset to exist."
     require_file "$DMG_BACKGROUND_PNG" "Expected the DMG background asset to exist."
+    verify_skillgroups_auth_release_gate
     if [ "$RC_MODE" != "1" ]; then
         require_file "$SPARKLE_TOOLS/generate_appcast" "Build the app dependencies first so Sparkle tools are present."
     fi
