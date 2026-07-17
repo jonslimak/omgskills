@@ -17,13 +17,35 @@ Completed implementation history does not belong here.
 - Never enable dormant crawler flags as part of unrelated catalog work.
 - Every production web deploy must use the guarded combined
   `dist/netlify-site` artifact.
+- A Mac release changes the DMG and appcast only after explicit release approval.
 
-## Explicit Data Rollouts
+## Release 0.0.18
 
-These are public data changes and require separate approval even though their
-code is already implemented.
+Release 0.0.18 is the Crawl 4, editorial, identity, and unified installed-skills
+release. Skill Groups authentication remains implemented but unavailable to
+public users until its later polish and release task.
 
-### R1 - Publish canonical SHA attribution
+### 18.1 - Gate Skill Groups authentication
+
+**Complete.** Landed as `d494504` and deployed with the production Mac release
+assets unchanged.
+
+- add an off-by-default production release flag for the Mac auth UI
+- hide the `Resync` entry and sync sheet when the flag is off
+- prevent browser pairing and saved-device restoration from becoming public
+  entry points while disabled
+- hide the portal sync entry and connect approval UI from public users
+- keep backend routes and database state intact for later testing
+- allow local or private builds to enable the flow deliberately
+- verify disabling the feature does not affect local scanning, catalog browsing,
+  installation, deletion, or updates
+
+Do not remove auth code or migrations as part of this gate.
+
+### 18.2 - Publish canonical SHA attribution
+
+This is a separately approved data rollout, not part of the Mac publication
+command.
 
 - privately regenerate and validate `canonicalBySha`
 - set `SHA_CANONICAL_PUBLISH=1` only in the intended publisher workflow
@@ -36,7 +58,10 @@ code is already implemented.
 Immediate ambiguity reduction is expected to be small under the conservative
 same-repository policy.
 
-### R2 - Publish Claude/Codex equivalence
+### 18.3 - Publish Claude/Codex equivalence
+
+This is a separately approved data rollout. Complete it before the final 0.0.18
+release-candidate test so unified rows can be checked against production data.
 
 - privately regenerate and review the equivalence report and override decisions
 - set `SKILL_EQUIVALENCE_PUBLISH=1` only in the intended publisher workflow
@@ -44,16 +69,63 @@ same-repository policy.
 - verify full data publishes preserve the manifest entry and rollback files
 - verify omission or explicit removal returns clients to separate physical rows
 - use explicit `0` or `remove` as the kill switch; unset remains a no-op
+- confirm old clients ignore the optional asset
 
-Do not combine this rollout with a public Mac release unless explicitly planned.
+Do not combine this rollout with the public Mac release command.
 
-### R3 - Roll out dormant Crawl 4 flags
+### 18.4 - Verify a private release candidate
 
-Evaluate these independently:
+**Detailed release-candidate checklist requires planning.** At minimum verify:
 
-- `CRAWL4_CREATOR_WATCH=1`
-- `CRAWL4_INSTALL_ADMISSION=1`
-- `CRAWL4_MOMENTUM_PRIORITY=1`
+- Crawl 4 loads as primary and v2 still works as fallback
+- editorial collections and creator links load correctly
+- the installed `All` view merges equivalent Claude/Codex skills
+- logical counts match the rows shown in `All`
+- source-specific views and physical install counts remain correct
+- install, cross-install, open, and delete actions target the intended variant
+- the Skill Groups/auth UI and pairing routes are unavailable publicly
+- existing library refresh, update checks, and session restoration still work
+- `swift test` and a release build pass
+
+Use a private build first. Do not publish the appcast during this step.
+
+### 18.5 - Publish 0.0.18
+
+Requires explicit release approval.
+
+- use the signed and notarized process in `deploy.md`
+- update the DMG, checksum, and appcast only in this release step
+- deploy with the guarded combined artifact so existing portal, data, profile,
+  skill, collection, sitemap, and update files remain present
+- run the production verification checklist from `deploy.md`
+- confirm the public build still has Skill Groups authentication disabled
+
+## After 0.0.18
+
+### P1 - Harden crawler and list ownership
+
+**Planning required.** Stabilize how crawler output, manual admission,
+suppression, creator watching, editorial inputs, and Editool changes interact.
+
+The plan should define:
+
+- the owner and update path for each maintained list
+- which inputs are authoritative and which are generated
+- conflict precedence and validation
+- review requirements for automated list changes
+- recovery from partial or stale runs
+- production observability and rollback thresholds
+
+Keep v2 available as fallback during this work.
+
+### P2 - Roll out dormant Crawl 4 flags
+
+Depends on P1. Evaluate each flag independently, in this order unless the P1
+review changes the risk assessment:
+
+1. `CRAWL4_MOMENTUM_PRIORITY=1`
+2. `CRAWL4_CREATOR_WATCH=1`
+3. `CRAWL4_INSTALL_ADMISSION=1`
 
 For each flag:
 
@@ -61,6 +133,43 @@ For each flag:
 2. enable only that flag
 3. inspect at least two scheduled reports
 4. keep or disable it before testing the next flag
+
+### P3 - Polish and release Skill Groups authentication
+
+**Planning required.** This is a dedicated post-0.0.18 feature release and
+requires explicit public-release approval.
+
+- review the Mac and portal UX end to end
+- test pairing, durable sync, relaunch/reconnect, disconnect, revoke, and
+  reconnect with a temporary device
+- confirm the callback scheme works in the signed and notarized build
+- smoke-test app-owned uninstall provenance cleanup
+- confirm a legacy client still syncs during the migration window
+- verify downloads, appcast, update assets, manifests, portal, and generated
+  library pages after the combined-artifact deploy
+- revoke the temporary device
+
+Rollback must not delete durable device rows or weaken device-token scopes.
+
+### P4 - Remove legacy one-time sync
+
+Depends on measured adoption of P3.
+
+- define the minimum supported app version and adoption cutoff
+- preserve legacy upload through the cutoff and rollback window
+- remove the legacy portal UI and direct-upload acceptance first
+- retire legacy token/schema fields later through a separate additive migration
+- verify durable pairing, upload, revocation, and reconnect remain unaffected
+
+### P5 - Retire the v2 fallback
+
+**Planning required.** Do not retire v2 during or immediately after 0.0.18.
+
+- require sustained Crawl 4 production health
+- confirm supported public clients operate correctly on Crawl 4
+- define adoption, health, and rollback thresholds
+- remove fallback use before removing hosted v2 assets
+- retain a recovery path through the agreed rollback window
 
 ## Measurement-Gated Work
 
@@ -91,42 +200,6 @@ global canonical data.
 Influential creators are ordered by `editorialScore` while the headline displays
 stars. Decide whether the public number should explain rank, popularity, or
 another metric before changing either ordering or display.
-
-## Public Mac Release
-
-### AUTH8 - Release the device-authenticated client
-
-Requires explicit release approval.
-
-- plan the version and release scope separately from web/data work
-- use the signed and notarized process in `deploy.md`
-- confirm the bundle contains the `omgskills` callback scheme
-- test pairing, durable sync, relaunch/reconnect, disconnect, revoke, and
-  reconnect with a temporary device
-- smoke-test app-owned uninstall provenance cleanup
-- confirm a legacy client still syncs during the migration window
-- verify downloads, appcast, update assets, manifests, portal, and generated
-  library pages after the combined-artifact deploy
-- revoke the temporary device
-
-Rollback must not delete durable device rows or weaken device-token scopes.
-
-### AUTH9 - Remove legacy one-time sync
-
-Depends on AUTH8 adoption.
-
-- define the minimum supported app version and measured adoption cutoff
-- preserve legacy upload through the cutoff and rollback window
-- remove the legacy portal UI and direct-upload acceptance first
-- retire legacy token/schema fields later through a separate additive migration
-- verify durable pairing, upload, revocation, and reconnect remain unaffected
-
-## Suggested Order
-
-1. R1, R2, and R3 only through separately approved data rollouts.
-2. AUTH8 only through a separately approved public Mac release.
-3. AUTH9 after measured adoption.
-4. D1-D4 only when their evidence gates are met.
 
 ## Verification Baseline
 
