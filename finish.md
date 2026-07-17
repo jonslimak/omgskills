@@ -18,16 +18,6 @@ Completed implementation history does not belong here.
 - Every production web deploy must use the guarded combined
   `dist/netlify-site` artifact.
 
-### F7 - Remove obsolete worktrees
-
-Inspect each worktree before removal. Remove only worktrees whose changes are
-committed and whose required commits are already on `main`.
-
-The visible T7 and T21 temporary worktrees are likely cleanup candidates. Audit
-the Skill Groups integration and Claude worktrees separately because they may
-still contain unmerged commits. Do not delete unmerged branches or historical
-backup branches as part of cleanup.
-
 ## Explicit Data Rollouts
 
 These are public data changes and require separate approval even though their
@@ -133,11 +123,10 @@ Depends on AUTH8 adoption.
 
 ## Suggested Order
 
-1. F7.
-2. R1, R2, and R3 only through separately approved data rollouts.
-3. AUTH8 only through a separately approved public Mac release.
-4. AUTH9 after measured adoption.
-5. D1-D4 only when their evidence gates are met.
+1. R1, R2, and R3 only through separately approved data rollouts.
+2. AUTH8 only through a separately approved public Mac release.
+3. AUTH9 after measured adoption.
+4. D1-D4 only when their evidence gates are met.
 
 ## Verification Baseline
 
