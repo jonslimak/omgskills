@@ -19,7 +19,7 @@ import {
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
-// the network. See editool.md at the repo root.
+// the network. See arch.md at the repo root.
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const indexRoot = resolve(scriptDir, "..");

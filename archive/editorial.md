@@ -2,9 +2,9 @@
 
 ## Goal
 
-Transform omgskills from a flat skill library into an editorially curated discovery experience — closer to an App Store than a search engine.
+Maintain an editorially curated discovery experience on top of the full skill library — closer to an App Store than a search engine.
 
-The current app surfaces 50,000+ skills sorted by trending, stars, or recency. There is no editorial layer — no context about who made what, no curated starting points, no way to say "these are the skills that matter." The editorial layer adds that without touching the crawler or the skill data model.
+The editorial MVP is implemented in the macOS client and the pilot web library. It adds creator profiles and topic collections without changing the core skill schema.
 
 ### What it enables
 
@@ -18,25 +18,32 @@ The current app surfaces 50,000+ skills sorted by trending, stars, or recency. T
 
 ### Design principles
 
-- The skill library is untouched — no schema changes, no crawler changes
+- The core skill schema is untouched; editorial collections remain a side asset
+- The creator registry is shared with the separately flag-gated creator-watch crawl lane
 - The editorial layer is a side file (`collections.json`) that references existing skill IDs
-- Activating a creator profile is a single line — add their handle to `featuredAuthors`
+- Activating a creator profile is a registry change — set `watch: true` and `featured: true` in `index/seeds/creators.json`
 - Everything else (avatar, stats, skill list) is derived automatically from existing data
 - Richer profiles (custom subtitle, pinned skills, description) are opt-in overrides
 - Topic collections require explicit curation but stay in the same file
 - No CMS until the volume or team size justifies it
 
-### One curation file, two surfaces
+### One published asset, two surfaces
 
-`collections.json` feeds the macOS client **and** the web library (`web-library.md`): creator pages render at `/creators/{handle}` and collection pages at `/collections/{id}`. Write curation data with both in mind:
+The published `collections` asset feeds the macOS client **and** the web library (`web-library.md`). Library profiles render at `/library/{handle}/` and topic collections at `/collections/{id}/`. Write curation data with both in mind:
 
 - `subtitle` and `description` double as SEO copy — collection pages target the highest-value search queries we have ("best claude code skills", "essential design skills")
-- `imageUrl` doubles as the page's `og:image` for link sharing
+- Author `imageUrl` overrides the GitHub avatar and becomes the library profile's `og:image`; topic collection social images are not generated yet
 - collection `id` becomes a public URL slug — kebab-case, descriptive, and stable once published (no redirects planned)
 
 ### Handle namespaces
 
-`featuredAuthors` entries are **GitHub handles** (the catalog's `authorHandle` field). They are unrelated to portal user handles at `omgskills.com/u/{handle}` (skill groups / public profiles — see `skillgroup.md`). On the web, creators live at `/creators/{handle}`; `/u/` stays reserved for portal users.
+Editorial creator entries are **GitHub handles** matched case-insensitively against the catalog's `author_handle` field and registry aliases. They are separate from portal user handles:
+
+- `/library/{handle}/` — static editorial/library profile
+- `/u/{handle}` — portal user profile
+- `/u/{handle}/sets/{slug}` — public user skill group
+
+Legacy `/profiles/{handle}` URLs redirect deterministically to a known library profile or fall back to the corresponding `/u/` profile.
 
 ### Cross-agent variants
 
@@ -44,7 +51,7 @@ Some skills exist as both Claude and Codex ports with distinct catalog IDs. When
 
 ## What we're building
 
-A `collections.json` side file published alongside skills/trending in the manifest, plus a new collection page view in the macOS client. Collections reference existing skill IDs — no changes to `skills.json`, no crawler changes.
+A `collections.json` side file published alongside skills/trending in the manifest, plus collection/profile views in the macOS client and static pages in the web library. Collections reference existing skill IDs; no `skills.json` schema change is required.
 
 Not to be confused with [`curated.md`](curated.md), which is about manually admitting skills **into** the catalog (a Crawl 4 operator path). This doc is about curating how existing catalog skills are **presented**. Different layers: curated.md changes what's in the library; editorial changes what's featured.
 
@@ -52,32 +59,37 @@ Not to be confused with [`curated.md`](curated.md), which is about manually admi
 
 ## Data layer
 
-### Source file
+### Source files
 
-`index/curations/collections.json` — hand-edited, the canonical source. Deploy by running `npm run publish:collections` and pushing to git.
+- `index/seeds/creators.json` — canonical creator registry. `watch` controls the opt-in creator-watch crawl lane; `featured` controls editorial profile publication. Featured creators must also be watched. Aliases map alternate catalog handles to one registry owner.
+- `index/curations/collections.json` — canonical editorial copy, author overrides, pinned skills, and topic collections.
+
+Use Editool for normal changes, review the resulting diff, then run `npm run publish:collections`. Publishing remains an explicit operator action.
 
 ### Creator activation — how it works
 
-To activate an editorial profile for any creator, add their handle to `featuredAuthors`. That's it.
+To activate an editorial profile, add or update the creator in `index/seeds/creators.json`:
 
 ```json
 {
-  "featuredAuthors": ["openai", "anthropics", "steipete", "obra", "mattpocock"]
+  "handle": "openai",
+  "watch": true,
+  "featured": true,
+  "aliases": []
 }
 ```
 
-The app checks if a tapped author handle is in `featuredAuthors`:
+The publish script expands each featured registry creator into an app-ready author collection. The app checks whether a tapped author has a published author collection:
 - **Yes** → opens editorial profile page
 - **No** → plain author search (existing behavior, unchanged)
 
-Everything on the profile is derived automatically:
+Default profile data is derived automatically:
 - **Avatar** — `https://github.com/{handle}.png`
 - **Skill list** — existing `@handle` author search
-- **Stats** — pulled from `authorLeaderboards` already in the manifest
+- **Featured skills** — highest-star skills unless explicitly pinned
+- **Web stats** — pulled from `authorLeaderboards` when available
 
-**To add a creator:** add their handle to the array and push. Done in under a minute.
-
-`featuredAuthors` is source-only authoring convenience. The publish script expands each featured author into an app-ready author collection record, so the macOS client only needs to decode one normalized `collections` array.
+`collections.json.featuredAuthors` remains as legacy compatibility data, but it is not the activation source. New creator activation must happen in `creators.json`.
 
 ### Optional overrides
 
@@ -125,7 +137,7 @@ Topic lists (Starter Pack, recommended-by-X, etc.) are separate from author page
 
 ### Fields
 
-**`featuredAuthors`** — string array of GitHub handles. Minimum viable activation.
+**`featuredAuthors`** — legacy compatibility array. Keep it valid while present, but use `creators.json` for activation.
 
 **`authorOverrides`** — object keyed by handle. All fields optional.
 
@@ -174,19 +186,26 @@ Headlines (`subtitle`) and descriptions (`description`) should be short, factual
 
 ### When to add a CMS
 
-Not now. A CMS makes sense when the list exceeds ~50 creators or a non-technical editor needs to manage it. Until then, the JSON file is the CMS.
+Not now. A hosted CMS makes sense when the list exceeds ~50 creators or remote collaboration requires it. Until then, Editool and the tracked JSON files are the CMS.
 
 ---
 
 ## Curation workflow
 
-### The friction point
+### Primary method — Editool
 
-The schema already supports `featuredSkillIds` on both author overrides and topic collections. The only friction is finding the right skill IDs — they look like `obra/superpowers:systematic-debugging` and require looking up the live data to get right.
+Run `cd index && npm run editool`, then open `http://127.0.0.1:4980/`. Editool searches the loaded library and edits collections, creator registry entries, and removal controls. It is localhost-only, token-protected, file-based, and does not publish or commit automatically. See `editool.md` for its exact validation and save behavior.
 
-### Primary method — agent-assisted
+After editing:
 
-Ask an agent (Claude Code / Codex) to curate. The agent has direct access to the live skill data and can search, rank, and write to `collections.json` in one step.
+1. Review the changes with `git diff`.
+2. Run `cd index && npm run typecheck`.
+3. Run `cd index && npm run publish:collections`.
+4. Review the generated manifest changes before committing.
+
+### Agent-assisted alternative
+
+An agent can also search the live skill data, update `creators.json` or `collections.json`, validate the result, and publish it.
 
 Examples:
 
@@ -199,38 +218,19 @@ Examples:
 > "Add Garry Tan's recommended skills — use his top 3 own skills plus obra/superpowers and mattpocock/qa"
 > → agent mixes author's own skills with cross-library picks, writes the topic collection
 
-This fits the existing workflow and requires no extra tooling.
-
-### Fallback — CLI search helper (add when needed)
-
-When you want to curate without an agent, two small scripts reduce the ID lookup friction:
-
-```bash
-# Search skills by author or keyword, get IDs back
-npm run editorial:search "steipete"
-npm run editorial:search "typescript"
-
-# Add featured skills to an author override or collection
-npm run editorial:feature steipete steipete/summarize steipete/peter-explains-typescript
-```
-
-These are worth adding once manual curation becomes frequent enough that asking an agent feels slow.
-
-### Future — local visual picker (add when volume justifies)
-
-A single `editorial-tool.html` file — open in browser, search skills, click to build `featuredSkillIds` lists, copy JSON snippet into `collections.json`. No server, no deploy. Worth building when there are multiple people curating or the collection count exceeds ~20.
+The previously proposed `editorial:search` and `editorial:feature` CLI helpers were not built because Editool now covers that workflow.
 
 ### Publish script
 
 `index/scripts/publish-collections.ts` — run via `npm run publish:collections`.
 
 Steps:
-1. Read `index/curations/collections.json`
-2. **Validate against the current catalog** — every ID in `featuredSkillIds` / `skillIds` must exist in the published skills data, and every `featuredAuthors` handle must exist as a catalog `authorHandle`. Unknown references fail the publish. Skill IDs are a cross-system contract (see `web-library.md`), and this is where broken references get caught.
-3. SHA256 hash + byte count
-4. Write `site/data/crawl4/collections-{hash}.json` **and** `site/data/v2/collections-{hash}.json` — manifest asset paths resolve relative to the manifest's own directory, so each track needs its own copy (same content, same hash; the file is tiny)
-5. Patch `site/data/crawl4/manifest.json` — add/update `collections` entry
-6. Patch `site/data/v2/manifest.json` — same
+1. Read `index/curations/collections.json`, `index/seeds/creators.json`, and the current catalog.
+2. **Validate references** — every featured creator must also be watched and match a catalog author directly or through an alias; every ID in `featuredSkillIds` / `skillIds` must exist. Unknown references fail the publish.
+3. Expand featured registry creators into normalized author collection records, applying optional overrides and otherwise selecting their highest-star skills.
+4. SHA256 hash + byte count.
+5. Write byte-identical `collections-{hash}.json` assets to `site/data/crawl4/` and `site/data/v2/`.
+6. Patch both manifests with the same asset metadata.
 
 The crawler publish scripts must preserve an existing `collections` field in the manifest (patch, not overwrite).
 
@@ -255,9 +255,9 @@ Client-side rule: a `featuredSkillIds` entry that no longer matches a loaded ski
 
 ## macOS client
 
-### New files
+### Implemented files
 
-**`Collection.swift`** — data model
+**`menubar/Sources/omgskills/SkillCollection.swift`** — data model
 
 ```swift
 struct SkillCollection: Codable, Identifiable {
@@ -282,21 +282,25 @@ struct CollectionsAsset: Codable {
 }
 ```
 
-Use `SkillCollection` or `EditorialCollection`, not `Collection`, to avoid shadowing Swift's standard `Collection` protocol.
+The implementation uses `SkillCollection`, avoiding a collision with Swift's standard `Collection` protocol.
 
-**`CollectionPageView.swift`** — fits the existing detail pane pattern
+**`menubar/Sources/omgskills/CollectionViews.swift`** — contains the small collection views used by Discover:
+
+- `CollectionPageView`
+- `CollectionCard`
+- `CollectionAvatarView`
+
+The collection page replaces the main feed area while it is open. Selecting one of its featured skills keeps the collection page visible and opens the skill detail in the right pane.
 
 Structure:
 - Header: avatar/image + title + subtitle
 - Optional editorial description paragraph
 - 3–5 featured skill rows (reuse existing `SkillRow` component)
-- "See all →" button
+- "See all" button
   - Author: triggers `@{handle}` author search
   - Topic: filtered list of `skillIds`
 
-**`CollectionCard.swift`** — compact empty-state card for Discover.
-
-**`CollectionAvatarView.swift`** — avatar/image loader. Use `AsyncImage` with loading and failure states. For author pages, fall back to `https://github.com/{handle}.png`. Do not add custom image caching in v1.
+Avatars use `AsyncImage` with loading and failure fallbacks. Author pages fall back to `https://github.com/{handle}.png`; there is no custom image cache.
 
 ### Modified files
 
@@ -327,7 +331,7 @@ Structure:
   - `allSkills(for:)`
 
 **`ContentView.swift`** — two entry points:
-1. **Empty search page** — collection cards above the existing search suggestion chips. Tapping opens `CollectionPageView`.
+1. **Empty Discover page** — collection cards render in a two-column grid at the bottom, below the “Send to a friend” action. Tapping opens `CollectionPageView` in the feed area.
 2. **Author attribution link** — if a skill's `authorHandle` matches a known author collection, clicking the author name opens that collection page instead of a plain author search.
 
 Implementation notes:
@@ -345,26 +349,32 @@ Implementation notes:
 
 ## Collections
 
-### MVP — launch with these
+The tables below the current published set are candidate inventory, not committed launch scope. Their metrics are historical snapshots; use current library data when deciding what to feature.
+
+### Current published set
 
 **Author pages:**
 
-| ID | Handle | Type | Installs | Stars |
-|---|---|---|---|---|
-| `author-openai` | `openai` | author/vendor | — | 3.2M |
-| `author-anthropic` | `anthropics` | author/vendor | 1.3M | 11M |
-| `author-cursor` | `cursor-editor` | author/vendor | — | — |
+| ID | Handle | Title |
+|---|---|---|
+| `author-anthropics` | `anthropics` | Anthropic |
+| `author-openai` | `openai` | OpenAI |
+| `author-cursor` | `cursor` | Cursor |
+| `author-mattpocock` | `mattpocock` | Matt Pocock |
+| `author-leonxlnx` | `leonxlnx` | Leon Lin |
 
 **Topic lists:**
 
-| ID | Concept |
+| ID | Current scope |
 |---|---|
-| `starter-pack` | 8–10 must-have skills for new users |
-| `design-essentials` | UI/design focused skills |
+| `starter-pack` | 8 baseline document, debugging, testing, and review skills |
+| `design-essentials` | 8 UI, frontend, critique, and product-polish skills |
+
+Both track manifests currently point to the same hashed collections asset.
 
 ---
 
-### Post-MVP — company / vendor pages
+### Candidate expansion — company / vendor pages
 
 Sorted by installs. All have `type: author` — "see all" triggers author search.
 
@@ -400,7 +410,7 @@ Sorted by installs. All have `type: author` — "see all" triggers author search
 
 ---
 
-### Post-MVP — independent creator pages
+### Candidate expansion — independent creator pages
 
 Sorted by installs. All have `type: author`.
 
@@ -432,7 +442,7 @@ Sorted by installs. All have `type: author`.
 
 ---
 
-### Post-MVP — topic / list collections
+### Candidate expansion — topic / list collections
 
 All have `type: topic` with explicit `skillIds`.
 
@@ -457,26 +467,43 @@ Skill IDs for `featuredSkillIds` and `skillIds` come from the live library (`id`
 ## What this does not change
 
 - `skills.json` schema — untouched
-- Crawler pipeline — publish script is standalone
+- Core crawler output — the collections publisher is standalone; the shared creator registry only affects creator-watch crawling when its explicit flag is enabled
 - v2/crawl4 data contracts — manifest gets one new optional field
 - Skill search, sort, trending — untouched
 
 ---
 
+## Implementation status
+
+The editorial MVP is live and includes:
+
+- One normalized collections asset published identically to v2 and Crawl 4
+- Optional, non-blocking macOS download and track-specific caches
+- Five author profiles and two topic collections
+- Two-column Discover cards, collection pages in the feed area, and skill details in the right pane
+- Featured-author routing with the author query shown in search; non-featured authors retain normal filtering
+- Static `/library/{handle}/`, `/collections/{id}/`, and skill pages generated from the same data
+- Editool for local curation and creator-registry maintenance
+
+Remaining editorial work is non-blocking:
+
+- Add focused regression tests for foreign-manifest asset preservation and optional collection refresh failure behavior
+- Add automated coverage for featured/non-featured author routing; keyboard and VoiceOver checks are currently manual
+- Connect cross-agent equivalence clusters to editorial display so Claude/Codex variants can be grouped
+- Expand creator and topic coverage only after the pilot UI and web page format are settled
+
 ## Verification
 
-1. Run `npm run publish:collections` — confirm hash file appears in `site/data/`, both manifests updated
-2. Build and run the macOS app in debug (Crawl 4 mode)
-3. Confirm empty search page shows collection cards
-4. Tap an author collection → `CollectionPageView` opens with correct avatar and featured skills
-5. Tap "See all" → author search filters correctly
-6. Tap a topic collection → featured skills appear, "see all" shows full list
-7. Disable network → app loads gracefully, collections absent without crash
-8. Confirm `skills.json` and existing manifest fields are unchanged after publish
-9. Confirm manifests decode with and without `collections`
-10. Confirm collection cache filenames are track-specific
-11. Confirm failed collection refresh does not fail the full refresh
-12. Confirm `SkillsStore` keeps previous collections after collection decode failure
-13. Confirm featured author taps open the author profile
-14. Confirm non-featured author taps keep the existing author-filter behavior
-15. Confirm collection cards and author buttons are keyboard and VoiceOver accessible
+1. Run `cd index && npm run typecheck`.
+2. Run `cd index && npm run publish:collections` — confirm matching hash files appear in `site/data/v2/` and `site/data/crawl4/`, and both manifests are updated.
+3. Run `cd menubar && swift test`.
+4. Build and run the macOS app in debug (Crawl 4 mode).
+5. Confirm empty Discover shows the two-column collection grid below “Send to a friend”.
+6. Tap an author collection — confirm its page replaces the feed and selecting a skill opens the right detail pane.
+7. Tap "See all" — confirm author or topic filtering is correct.
+8. Tap a featured author name — confirm the profile opens and `@handle` appears in search.
+9. Tap a non-featured author — confirm the existing author-filter behavior remains.
+10. Disable network — confirm skills still load and collection failure does not trigger fallback or crash.
+11. Confirm `skills.json` and unrelated manifest fields are unchanged after publishing.
+12. Run `node scripts/build-web-library.mjs` and `node scripts/verify-web-library-pages.mjs` for the static web surface.
+13. Confirm collection cards and author buttons are keyboard reachable and have useful VoiceOver labels.

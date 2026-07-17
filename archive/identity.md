@@ -124,13 +124,17 @@ clients need the full membership list, and unresolved ambiguity must remain hone
 Properties:
 
 - a few bytes per version — an index, not a mirror; does not make us a content host
-- append-only — shas are never removed while the skill exists
+- `shaToSkillIds` membership is append-only history
+- `canonicalBySha` is recomputed from current live data and may shrink or disappear
 - makes resolution version-proof: any `SKILL.md` the crawler has ever seen resolves, no matter how stale the local copy
 - client-side lookup against published data, same as everything else
 
 The asset is published by `shadow-crawl-health` after both data-track manifests
-are built. Unchanged mappings reuse the existing timestamp and hashed filename;
-changed mappings append new SHA/ID pairs and retain one prior asset for rollback.
+are built and `promote:cutover` has refreshed the suppression-filtered
+`index/skills.json`. Canonical emission is gated by
+`SHA_CANONICAL_PUBLISH=1`; unset preserves the v1 shape and also acts as the
+rollback switch. Unchanged complete payloads reuse the existing timestamp and
+hashed filename; changed mappings retain one prior asset for rollback.
 
 ## Design properties
 
@@ -161,7 +165,7 @@ The skill groups dashboard solved this locally (`groupSyncedSkills` in `portal/s
 4. Word overlap divides shared words by the smaller set size. Require at least `0.80` for sets of 3–4 words, reject sets below 3 words, and require at least `0.72` for sets of 5 or more words.
 5. Display merge prefers the first Codex variant, then the first variant with a GitHub URL, then source-name order. Use the longest description, sorted unique sources, and retain every underlying synced-skill ID.
 
-This is the shared local-scope rule. Any Swift merged view must reproduce the same normalization, gate order, thresholds, and representative selection. Catalog-wide grouping must not reuse this fuzzy rule.
+The macOS app does not yet apply this grouping. This is the shared local-scope rule. Any Swift merged view must reproduce the same normalization, gate order, thresholds, and representative selection. Catalog-wide grouping must not reuse this fuzzy rule.
 
 ### Why the heuristic cannot be generalized as-is
 
@@ -187,12 +191,12 @@ Variants are genuinely different files with different install commands — a use
 Exact duplicates and logical equivalents belong to the same derived-relations
 family, but they should not duplicate storage unnecessarily:
 
-- exact duplicate membership stays in `shaHistory`; future `canonicalBySha`
+- exact duplicate membership stays in `shaHistory`; optional `canonicalBySha`
   records the preferred current catalog ID
-- logical equivalents use a future `skillEquivalence` side asset because their
+- logical equivalents use the optional `skillEquivalence` side asset because their
   files have different SHAs and remain independently installable variants
 
-The future equivalence asset uses this minimal shape:
+The v1 equivalence asset uses this shape:
 
 ```text
 {
@@ -201,6 +205,11 @@ The future equivalence asset uses this minimal shape:
   groups: [{
     id,
     memberSkillIds,
+    representativeSkillId,
+    preferredSkillIds: {
+      claude?,
+      codex?
+    },
     confidence,
     evidence
   }]
@@ -210,11 +219,30 @@ The future equivalence asset uses this minimal shape:
 Shared invariants:
 
 - all member IDs exist in the current suppression-filtered Crawl 4 output
-- each group contains at least two unique, deterministically sorted IDs
-- group IDs are deterministic
+- each v1 group contains exactly two unique, code-point-sorted IDs
+- group IDs are the SHA-256 of the newline-joined sorted member IDs and change
+  when membership changes; they are presentation identifiers, not persistent
+  user state
+- `representativeSkillId` and every preferred-skill value belong to the group
+- clients filter stale members against their live catalog; groups with fewer
+  than two live members dissolve, otherwise a stale representative falls back
+  to the first code-point-sorted live member
+- v1 groups stay inside one concrete repository and require different SHAs;
+  same-SHA membership remains owned by duplicate/canonical identity
 - grouping never rewrites, merges, or deletes skill records
 - unresolved or weak matches remain ungrouped
 - all new assets are shadow-generated and validated before publication
+
+ID4.1, the guarded publisher, Swift transport, and the merged macOS view are
+implemented. The initial reviewed shadow set contains 55 groups. Publication is
+tri-state:
+`SKILL_EQUIVALENCE_PUBLISH` unset performs no writes, `1` publishes, and explicit
+`0` or `remove` removes the manifest entry while retaining rollback files. The
+flag remains unset. The macOS installed `All` list and its dashboard counter use
+logical groups. Claude, Codex, and Other counters and source-specific lists
+remain physical, while merged rows retain access to every installation. A
+private standalone build loaded the 55-group asset and verified the merged view
+without a production deploy or public Mac release.
 
 ## Personal skills and P2P sharing (parked, direction noted)
 
@@ -233,7 +261,7 @@ Resolution is one user's installed skills (typically 5–50) against lookup tabl
 - **Build lookups in the existing decode pass.** The client already decodes the full catalog at launch and builds an FTS index. Build the `sha → id` and `normalized name → ids` dictionaries in that same loop — no separate pass over the library.
 - **Bulk pass runs once, in the background.** First resolution runs as a detached background task after library load, same pattern as the FTS index build. Never blocks UI.
 - **Cache by local content sha.** Persist resolved mappings keyed by the local `SKILL.md` sha. A skill re-resolves only when its content changes or it is newly discovered. Unchanged skills are a cache read.
-- **Catalog updates do not invalidate resolutions.** Already-resolved skills stay resolved. A fresh catalog only triggers a retry of the *unresolved* leftovers — a handful of items, not the full set.
+- **Catalog updates do not invalidate every resolution.** Already-resolved skills stay cached while their catalog ID remains live. A fresh catalog retries unresolved or ambiguous entries and re-resolves any cached entry whose catalog ID disappeared.
 - **Name-gate before any description comparison.** Fuzzy matching only compares against catalog skills sharing the normalized name — never scans the library.
 - **No server involvement.** The entire ladder runs client-side against published data. Per-user cost to us: zero API calls, zero backend compute.
 
@@ -244,11 +272,11 @@ Current implementation status and remaining order:
 1. **Done: verify hash compatibility** — Swift and Node use the same raw-byte Git blob SHA contract and known test vector
 2. **Done: ship the exact ladder in the client scanner** — install provenance, path-aware Git inspection, and SHA lookup resolve locally; Git/SHA candidate intersections prevent ambiguous matches from becoming silent guesses
 3. **Done: publish SHA history** — the v1 asset exists with `shaToSkillIds` and scheduled publishes append new mappings without rewriting unchanged assets
-4. **Canonical attribution** (`crawl-audit.md` Phase 3.1) — pick the original author's copy per duplicate cluster; annotate the sha index with `canonicalId`, upgrading ambiguous resolutions to resolved. Before or alongside this step is fine; it must land before multi-id hash matches are treated as authoritative
-5. **Add the confirm-once fuzzy UX** — only after measuring how much steps 1–4 leave unresolved
-6. **Propagate resolution into synced_skills** — resolved IDs flow into `catalog_skill_id` on sync, making groups catalog-aware for previously unresolvable skills
-7. **Add cross-agent equivalence clusters to Crawl 4 publishing** — shadow-first like every other Crawl 4 change, sharing the grouping-asset design with duplicate clusters (step 4); validate cluster quality in shadow reports before clients consume it
-8. **Extract the local-match heuristic into a shared spec** — document normalization, thresholds, and gate order from `groupSyncedSkills`; implement identically in the client when it gains the merged view
+4. **Done: canonical attribution** — validated high-confidence same-repository mappings publish as optional `canonicalBySha` entries behind a disabled flag; the client validates live SHA membership and upgrades only otherwise-ambiguous compatible candidates
+5. **Done: propagate resolution into synced_skills** — resolved IDs flow into `catalog_skill_id` on sync, making groups catalog-aware for previously unresolvable skills
+6. **Done: cross-agent equivalence implementation** — the reviewed shadow policy, tri-state publisher, optional Swift transport/decoding, and local grouping contract are complete while publication remains disabled
+7. **Done: merged macOS view** — the installed `All` list and counter use logical groups, preserve physical variants and actions, and reproduce the documented local-match heuristic; a private 55-group build passed without triggering a public Mac release
+8. **Add the confirm-once fuzzy UX** — only after measuring how much the exact and equivalence paths leave unresolved
 
 Identity changes remain additive. Existing skill IDs and the deployed
 `shaToSkillIds` contract are compatibility boundaries.

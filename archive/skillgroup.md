@@ -1,10 +1,10 @@
 # Skill Groups MVP
 
-## Alignment addendum — 2026-07-08
+## Alignment addendum — updated 2026-07-10
 
-This section was added after the public web library shipped profile and skill pages. It supersedes older public URL guidance in this doc.
+This section reflects the final namespace split after the public web library shipped creator and skill pages. It supersedes older public URL guidance in this doc.
 
-### Recommendation 11 — public Skill Group URLs should fit the web library
+### Recommendation 11 — separate curated creator and portal-user namespaces
 
 The original MVP used:
 
@@ -13,20 +13,21 @@ The original MVP used:
 /u/{handle}/{groupSlug}
 ```
 
-The current public web library uses profile and skill routes like:
+The current public web library uses creator and skill routes like:
 
 ```text
-/profiles/{handle}/
+/library/{handle}/
 /skills/{owner}/{repo}/.../{skill}/
 ```
 
-Rule: target public Skill Group pages under the profile namespace:
+Portal users and their Skill Groups use:
 
 ```text
-/profiles/{handle}/sets/{groupSlug}
+/u/{handle}
+/u/{handle}/sets/{groupSlug}
 ```
 
-Keep `/u/{handle}` and `/u/{handle}/{groupSlug}` as legacy compatibility routes during the transition. They can redirect or render the same content, but new UI links and docs should prefer `/profiles/{handle}` and `/profiles/{handle}/sets/{groupSlug}`.
+This avoids collisions between generated creator pages and database-backed user profiles. `/profiles/{handle}` remains a compatibility route: known curated creators redirect to `/library/{handle}/`, while other handles redirect to `/u/{handle}/`. Keep `/u/{handle}/{groupSlug}` and `/profiles/{handle}/sets/{groupSlug}` only as legacy group compatibility routes. New UI links use `/u/{handle}` and `/u/{handle}/sets/{groupSlug}`.
 
 ### Recommendation 12 — Skill Group public pages should use catalog links when possible
 
@@ -39,7 +40,7 @@ This keeps Skill Groups aligned with the library experience and avoids turning p
 Do the alignment in this order:
 
 1. Update docs/specs.
-2. Add route compatibility for `/profiles/{handle}/sets/{groupSlug}` while preserving `/u/*`.
+2. Serve users and groups from `/u/*`, keep `/profiles/*` compatibility redirects, and serve curated creators from `/library/*`.
 3. Update catalog reads to prefer `/data/crawl4/manifest.json`, then `/data/v2/manifest.json`.
 4. Add sync identity fields: `skillMdSha` and `identityStatus`.
 5. Add group item display snapshots.
@@ -69,12 +70,12 @@ The dashboard groups a user's Claude and Codex copies of the same skill into one
 
 `stableKey` identifies the same installed skill across repeat syncs. It is location identity (where the skill is installed), distinct from content identity (`skill_md_sha`, which changes when the skill updates). Keep these axes separate; conflating them breaks re-sync dedupe when a skill updates upstream.
 
-### Concrete fixes to the built MVP
+### Concrete fixes to the built MVP — shipped
 
-1. **`netlify/functions/portal-catalog-search.mts`** — `fetchSkills()` reads the legacy root manifest (line ~24) and tries assets from `["/data/v2", "/data"]`. Change to: try `/data/crawl4/manifest.json`, fall back to `/data/v2/manifest.json`, and fetch the skills asset from the matching base. Keep the non-blocking failure behavior.
-2. **`menubar/Sources/omgskills/SkillSyncService.swift`** — the sync payload hardcodes `catalogSkillId: nil` (line ~58). This is the direct consumer of the identity resolution ladder: once ladder steps 1–3 ship in the client, populate `catalogSkillId` from the resolved mapping. Until then `nil` is honest — do not add portal-side matching to compensate.
-3. **`menubar/Sources/omgskills/SkillSyncService.swift`** — `stableKey` falls back to `"\(source):\(skill.installCmd)"` for skills without a GitHub URL. `installCmd` is a brittle identity (it changes if install tooling or paths change, breaking re-sync dedupe). Prefer the install location (source + skill folder path) as the fallback key. The primary key `"\(githubUrl)#\(name)"` is fine.
-4. **`portal/src/main.tsx`** — `groupSyncedSkills` and its helpers (`descriptionsMatch`, `normalizedSkillText`, thresholds 0.72/0.80, gate order) are the de facto local matching rule. Extract them into a written spec (per `identity.md`, path-forward step 7) before the macOS client implements its merged view, so both implementations give identical answers.
+1. **`netlify/functions/portal-catalog-search.mts`** reads `/data/crawl4/manifest.json`, falls back to `/data/v2/manifest.json`, and fetches the skills asset from the selected manifest base without blocking core portal flows.
+2. **`menubar/Sources/omgskills/SkillSyncService.swift`** uploads the `catalogSkillId` produced by the client identity ladder.
+3. **`menubar/Sources/omgskills/SkillSyncService.swift`** uses source plus installed folder path for the local `stableKey`; GitHub-backed skills continue to use `"\(githubUrl)#\(name)"`.
+4. **`identity.md`** specifies the exact local `groupSyncedSkills` normalization, gate order, thresholds, and representative selection.
 
 ## Alignment addendum — 2026-07-06
 
@@ -100,9 +101,9 @@ GitHub URL validation already fetches `SKILL.md`. Compute its blob sha in the sa
 
 Items are references only, so a skill removed from the catalog leaves a public group page with nothing to render. Store a small display snapshot (`name`, `description`) on `skill_group_items` at add-time — the export format already carries these fields, and a snapshot is metadata, not hosted content. Render the snapshot with no install action when the catalog reference no longer resolves; never break the page.
 
-### Recommendation 10 — extend the reserved-handle blocklist
+### Recommendation 10 — keep reservation policies separate
 
-Add `creators` and `collections` to the reserved handles/slugs list. Both are now public web-library routes (`/creators/{handle}`, `/collections/{id}` — see `editorial.md`).
+Profile handles protect explicit product/system identities plus watched creator handles and aliases. Group slugs use an independent list: `sets` is structural because of the legacy `/u/{handle}/{groupSlug}` route, and `favorites` belongs to the app-owned Favorites group. Catalog creator names remain valid group slugs. Do not reserve `library`, `collections`, or other top-level routes as user handles solely because those routes exist outside `/u/`.
 
 ### Deferred, noted for later
 
@@ -160,10 +161,10 @@ Handles can be changed, but there are no redirects in MVP. The UI should warn th
 URL:
 
 ```text
-omgskills.com/profiles/{handle}
+omgskills.com/u/{handle}
 ```
 
-Legacy compatibility: `omgskills.com/u/{handle}` may continue to work, but new UI links should use `/profiles/{handle}`.
+Compatibility: `omgskills.com/profiles/{handle}` redirects curated creators to `/library/{handle}/` and other handles to `/u/{handle}/`.
 
 ### Public Skill Group Page
 
@@ -172,10 +173,10 @@ A public view of one Skill Group.
 URL:
 
 ```text
-omgskills.com/profiles/{handle}/sets/{groupSlug}
+omgskills.com/u/{handle}/sets/{groupSlug}
 ```
 
-Legacy compatibility: `omgskills.com/u/{handle}/{groupSlug}` may continue to work, but new UI links should use `/profiles/{handle}/sets/{groupSlug}`.
+Legacy compatibility: `omgskills.com/u/{handle}/{groupSlug}` and `/profiles/{handle}/sets/{groupSlug}` may continue to work, but new UI links use `/u/{handle}/sets/{groupSlug}`.
 
 Group slugs are unique per owner in the MVP.
 
@@ -439,9 +440,10 @@ Why this stack:
 
 Public pages:
 
-- `/profiles/{handle}/sets/{groupSlug}` can be served by a Netlify Function returning HTML
-- `/profiles/{handle}` can be served by the public web library profile route
-- `/u/{handle}` and `/u/{handle}/{groupSlug}` remain legacy compatibility routes
+- `/u/{handle}` serves a database-backed public user profile
+- `/u/{handle}/sets/{groupSlug}` serves a database-backed public Skill Group
+- `/library/{handle}/` serves a generated curated-creator page
+- `/profiles/*` and `/u/{handle}/{groupSlug}` remain compatibility routes
 - public sharing stays on `omgskills.com`
 
 App pages:
@@ -503,7 +505,8 @@ Handle rules:
 - user handles are unique
 - default handles are random, not sequential
 - reserved handles are blocked
-- minimum reserved list: `u`, `g`, `data`, `health`, `admin`, `api`, `auth`, `sync`, `shared`, `profile`, `groups`, `skills`, `catalog`
+- protected product/system identities and watched creator handles/aliases are reserved
+- unrelated top-level route names are not automatically reserved under `/u/`
 
 ### skill_groups
 
@@ -522,7 +525,9 @@ Handle rules:
 Group slug rules:
 
 - `UNIQUE(ownerUserId, slug)`
-- reserved slugs are blocked using the same blocklist as handles
+- group reservations are independent from profile handles
+- `sets` is structural and `favorites` is reserved for the app-owned group
+- catalog creator handles remain available as group slugs
 
 ### skill_group_items
 
@@ -603,10 +608,11 @@ No personal viewer tracking in MVP.
 
 Public:
 
-- `/profiles/{handle}`: public user profile
-- `/profiles/{handle}/sets/{groupSlug}`: public Skill Group page
-- `/u/{handle}`: legacy public profile compatibility route
-- `/u/{handle}/{groupSlug}`: legacy public Skill Group compatibility route
+- `/u/{handle}`: public user profile
+- `/u/{handle}/sets/{groupSlug}`: public Skill Group page
+- `/library/{handle}/`: generated curated-creator page
+- `/profiles/{handle}`: compatibility redirect to the matching creator or user namespace
+- `/u/{handle}/{groupSlug}` and `/profiles/{handle}/sets/{groupSlug}`: legacy public group compatibility routes
 
 Authed:
 
@@ -759,9 +765,9 @@ USER FLOW COVERAGE
 - create private, restricted, and public groups
 - add catalog and GitHub URL items
 - confirm public group opens logged out
-- publish profile and confirm `/profiles/{handle}` works
-- confirm public group URL works at `/profiles/{handle}/sets/{groupSlug}`
-- confirm legacy `/u/{handle}` and `/u/{handle}/{groupSlug}` still work during transition
+- publish profile and confirm `/u/{handle}` works
+- confirm public group URL works at `/u/{handle}/sets/{groupSlug}`
+- confirm `/profiles/{handle}` compatibility routing and legacy `/u/{handle}/{groupSlug}` still work
 - confirm private profile returns generic `200`
 - confirm Favorites appears on public profile only after publishing
 - confirm profile shows only selected public groups

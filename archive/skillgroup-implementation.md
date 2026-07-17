@@ -33,15 +33,16 @@ Branch rule:
 Routing decision:
 
 - `https://app.omgskills.com/*` serves the portal SPA.
-- `https://omgskills.com/profiles/{handle}` serves public profile pages.
-- `https://omgskills.com/profiles/{handle}/sets/{groupSlug}` serves public Skill Group pages.
-- `https://omgskills.com/u/*` remains a legacy compatibility route during the transition.
+- `https://omgskills.com/u/{handle}` serves database-backed public user profiles.
+- `https://omgskills.com/u/{handle}/sets/{groupSlug}` serves database-backed public Skill Group pages.
+- `https://omgskills.com/library/{handle}/` serves generated curated-creator pages.
+- `https://omgskills.com/profiles/*` remains compatibility routing into the creator or user namespace.
 - Existing `https://omgskills.com/data/*`, downloads, updates, health, and appcast routes must keep their current behavior.
 
 System alignment rule:
 
-- New UI links and docs should prefer `/profiles/{handle}` and `/profiles/{handle}/sets/{groupSlug}`.
-- Keep `/u/{handle}` and `/u/{handle}/{groupSlug}` working until redirects/legacy policy is intentionally removed.
+- New user-profile links should use `/u/{handle}` and `/u/{handle}/sets/{groupSlug}`.
+- Keep `/profiles/*` and `/u/{handle}/{groupSlug}` only as compatibility routes until that policy is intentionally removed.
 - Catalog lookup must read `/data/crawl4/manifest.json` first, then `/data/v2/manifest.json`, and fetch assets from the same base as the selected manifest.
 - Sync identity must preserve `stableKey` as install-location identity and store `skillMdSha` as content identity.
 - Synced skills should store `identityStatus`: `resolved`, `ambiguous`, or `localOnly`.
@@ -63,6 +64,7 @@ Tasks:
   - `/updates/*`
   - `/health/*`
   - `/.netlify/functions/*`
+  - `/library/*`
   - `/profiles/*`
   - `/u/*`
 - Add SPA fallback routing only for the portal/app surface:
@@ -104,7 +106,7 @@ Acceptance checks:
 - A function can read/write the database.
 - Portal routes survive direct browser refresh.
 - Existing `omgskills.com/data/*`, downloads, updates, and health routes still behave as before.
-- Public `/profiles/*` and legacy `/u/*` route precedence is verified.
+- Public `/library/*`, `/u/*`, and compatibility `/profiles/*` route precedence is verified.
 - Deploy preview runs Drizzle migrations and exposes functions.
 - Production deploy still preserves release assets required by current Mac app downloads/updates.
 - Local setup is documented enough for the next agent to run the portal, functions, and migrations.
@@ -114,14 +116,14 @@ Tests:
 - Auth helper accepts valid Clerk bearer token and rejects missing/invalid token.
 - CORS helper handles `OPTIONS` and sets allowed origin.
 - DB helper can run a simple query in test/dev.
-- SPA fallback does not shadow `/data/*`, `/downloads/*`, `/updates/*`, `/health/*`, `/.netlify/functions/*`, `/profiles/*`, or `/u/*`.
+- SPA fallback does not shadow `/data/*`, `/downloads/*`, `/updates/*`, `/health/*`, `/.netlify/functions/*`, `/library/*`, `/profiles/*`, or `/u/*`.
 - Deploy script dry-run/check confirms portal output and required release assets are present.
 
 Verification gate:
 
 - Done when portal, Clerk auth, Netlify Functions, DB access, routing, and deploy preview basics work together.
 - Verify with local start/build commands, an authenticated smoke function that returns the current Clerk user, and a DB smoke check that can insert/read/delete a test row.
-- Verify these routes in preview before production: `app.omgskills.com/*`, `/profiles/*`, `/u/*`, `/data/crawl4/manifest.json`, `/data/v2/manifest.json`, `/download`, `/downloads/omgskills-mac.dmg`, `/appcast.xml`, `/updates/*`, `/health/`, and `/.netlify/functions/*`.
+- Verify these routes in preview before production: `app.omgskills.com/*`, `/library/*`, `/u/*`, compatibility `/profiles/*`, `/data/crawl4/manifest.json`, `/data/v2/manifest.json`, `/download`, `/downloads/omgskills-mac.dmg`, `/appcast.xml`, `/updates/*`, `/health/`, and `/.netlify/functions/*`.
 - Capture evidence: command output summary, deploy preview URL, checked route/status list, and DB/auth smoke result.
 - Manual fallback: temporary smoke endpoints are acceptable for auth/DB proof, but remove them before merge unless they become permanent health checks.
 - Not required yet: macOS sync, synced skills UI, restricted groups, public profiles, catalog add, export, copy, or analytics.
@@ -216,7 +218,7 @@ Verification gate:
 
 ## Milestone 2: Public Sharing
 
-Goal: make public profiles and owner-scoped public set URLs work in the web-library route model.
+Goal: make public user profiles and owner-scoped public set URLs work without colliding with generated creator pages.
 
 Tasks:
 
@@ -226,30 +228,31 @@ Tasks:
 - Reserve every canonical handle and alias in `index/seeds/creators.json` for profile claims. Registry membership protects identity; the `watch` flag only controls crawling.
 - Generate `netlify/functions/_shared/catalog-reserved-handles.ts` with `npm run generate:creator-handle-reservations`, and fail checks/builds when it is stale or contains a collision.
 - Apply creator reservations only to new profile claims or handle changes. An existing holder may save an unchanged handle, and creator handles do not reserve matching group slugs.
-- Keep static creator profiles registry-backed. Add trending or catalog authors to the curated registry before publishing a `/profiles/{handle}` page.
+- Keep static creator profiles registry-backed. Add trending or catalog authors to the curated registry before publishing a `/library/{handle}/` page.
 - Before public handle claims launch, require a database collision check whenever a creator is added or removed. Reserved creator handles may later be assigned through an operator verification grant; reservation means verification required, not permanently unavailable.
 - Use public profile page:
 
 ```text
-/profiles/{handle}
+/u/{handle}
 ```
 
 - Add public Skill Group page:
 
 ```text
-/profiles/{handle}/sets/{groupSlug}
+/u/{handle}/sets/{groupSlug}
 ```
 
 - Keep legacy compatibility routes:
 
 ```text
-/u/{handle}
 /u/{handle}/{groupSlug}
+/profiles/{handle}
+/profiles/{handle}/sets/{groupSlug}
 ```
 
 - Resolve public groups with owner-scoped slug lookup: `UNIQUE(ownerUserId, slug)`.
-- Prefer new `/profiles/*` links in portal UI.
-- Legacy `/u/*` routes can redirect or render equivalent content, but must not become the canonical URL in new UI.
+- Use `/u/*` links in portal UI.
+- Use `/library/*` for generated creator pages. `/profiles/*` may redirect or render compatibility behavior but is not canonical for either namespace.
 - Public group items with resolved canonical catalog IDs should link to existing web-library skill pages.
 - Public group items with stale/missing references should render stored snapshots with no install action.
 - Add Favorites as a special personal Skill Group.
@@ -262,9 +265,9 @@ Tasks:
 
 Acceptance checks:
 
-- Published profile loads at `/profiles/{handle}`.
-- Public group loads at `/profiles/{handle}/sets/{groupSlug}`.
-- Legacy `/u/{handle}` and `/u/{handle}/{groupSlug}` still work.
+- Published profile loads at `/u/{handle}`.
+- Public group loads at `/u/{handle}/sets/{groupSlug}`.
+- `/profiles/{handle}` compatibility routing and legacy `/u/{handle}/{groupSlug}` still work.
 - Public group items link to catalog skill pages when canonical catalog IDs are available.
 - Stale references render item snapshots instead of breaking the page.
 - Two users can reuse the same group slug.
@@ -284,9 +287,9 @@ Tests:
 Verification gate:
 
 - Done when published profile and public group URLs work without leaking private profile state.
-- Verify `/profiles/{handle}` returns `200` for a public profile and renders selected public groups.
-- Verify `/profiles/{handle}/sets/{groupSlug}` returns `200` for a public group and resolves the group by owner plus slug.
-- Verify legacy `/u/{handle}` and `/u/{handle}/{groupSlug}` still work during transition.
+- Verify `/u/{handle}` returns `200` for a public profile and renders selected public groups.
+- Verify `/u/{handle}/sets/{groupSlug}` returns `200` for a public group and resolves the group by owner plus slug.
+- Verify `/profiles/{handle}` compatibility routing and legacy `/u/{handle}/{groupSlug}` still work.
 - Verify a private profile returns `200` with a generic private page and an unknown handle returns `404`.
 - Verify reserved handles/slugs are rejected, duplicate group slugs are allowed across owners, and duplicate slugs are rejected for the same owner.
 - Capture evidence: tested handles/slugs, status-code list, public profile screenshot, public group screenshot, and private/unknown behavior notes.
@@ -370,12 +373,12 @@ Verification gate:
 - Drag/drop and fractional indexing are later unless explicitly pulled forward.
 - Handle redirects are later. MVP warns that changed URLs break.
 - Keep scraper, MCP package, and existing catalog generation unchanged.
-- Keep web-library route conventions: public profiles under `/profiles/*`, public sets under `/profiles/{handle}/sets/*`, skills under existing `/skills/*`.
+- Keep route namespaces separate: curated creators under `/library/*`, portal users and sets under `/u/*`, and skills under `/skills/*`.
 - Prefer small, testable endpoints over broad generic APIs.
 - Every Netlify Function should use shared auth/CORS/error helpers.
 - Keep sync networking in a dedicated macOS service layer.
 - Treat Netlify routing as order-sensitive. Public data/download/update/health/function routes must stay ahead of SPA fallback rules.
-- Treat `/u/*` as legacy compatibility, not the canonical public route for new work.
+- Treat `/profiles/*` as compatibility routing, not a canonical namespace for new work.
 
 ## Verification Rules
 
@@ -791,9 +794,10 @@ Preview verification checklist:
 - `/health/` is still Basic Auth protected
 - `app.omgskills.com` loads the portal
 - direct portal navigation refresh works
-- `/profiles/{handle}` public profile behavior works once Milestone 2 lands
-- `/profiles/{handle}/sets/{groupSlug}` public set behavior works once Milestone 2 lands
-- legacy `/u/{handle}` behavior still works during transition
+- `/u/{handle}` public user profile behavior works
+- `/u/{handle}/sets/{groupSlug}` public set behavior works
+- `/library/{handle}/` generated creator behavior works
+- `/profiles/{handle}` compatibility routing reaches the intended namespace
 - Netlify Functions respond
 - Drizzle migrations are present and applied in preview
 

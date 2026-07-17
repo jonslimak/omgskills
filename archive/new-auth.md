@@ -1,7 +1,10 @@
 # App <-> Portal Sync Auth - Device Credential Plan
 
+> Archived 2026-07-16. AUTH1-AUTH7 are complete. Active AUTH8 and AUTH9
+> responsibilities now live in `../finish.md`.
+
 Replaces per-sync token pasting with one-time pairing that yields a durable,
-sync-scoped device credential. Updated 2026-07-13 against `main`.
+sync-scoped device credential. Updated 2026-07-15 against `main`.
 
 Status legend: `todo` / `in progress` / `done` / `deferred`.
 
@@ -27,26 +30,26 @@ Implement and commit in these boundaries:
 5. **AUTH5 - Manual one-time pairing** (`done`, depends on AUTH3-AUTH4)
 6. **AUTH6 - Portal connected-device management** (`done`, depends on AUTH3)
 7. **AUTH7 - Browser pairing** (`done`)
-8. **AUTH8 - Migration, release, and production verification** (`todo`, depends
+8. **AUTH8 - Migration, release, and production verification** (`in progress`, depends
    on AUTH1-AUTH7 and `tiein.md` T5)
 9. **AUTH9 - Remove legacy tokens** (`deferred`, requires an adoption cutoff)
 
 AUTH3 and AUTH4 may proceed in parallel after AUTH2. Keep AUTH7 separate from
 manual pairing so URL-scheme or browser-session issues cannot delay the durable
-credential launch. Do not deploy any auth task until `tiein.md` T5 makes the
-manual production deploy path safe.
+credential launch. `tiein.md` T5 is complete; AUTH8 must use that guarded manual
+production deploy path.
 
 ## Current State
 
-- A Clerk-authenticated portal user mints a random 10-minute token through
-  `portal-sync-token.mts`.
-- Only its SHA-256 hash is stored in `sync_tokens`.
-- The user pastes the token into the Mac app.
-- `portal-sync-upload.mts` locks the unused token, uploads skill metadata, marks
-  it used, and commits those actions in one transaction.
-- Every later sync requires another portal visit and token paste.
-- No URL scheme, browser pairing flow, device credential, or Keychain storage
-  exists yet.
+- AUTH1-AUTH7 are implemented and committed.
+- Durable device credentials, exchange, upload, revocation, connected-device
+  management, Keychain storage, manual pairing, and browser pairing pass automated
+  and isolated end-to-end verification.
+- Durable pairing, connected-device management, and browser pairing are live in
+  production and verified with the private signed test app.
+- Legacy one-time upload remains available during migration.
+- The public Mac release remains `v0.0.17`; shipping the new Mac client is the only
+  remaining AUTH8 rollout step and requires a separately planned public release.
 
 The resolved-installation handoff and sync identity consistency work are already
 committed. Auth changes must preserve those payload, stable-key, and dedupe
@@ -485,16 +488,25 @@ Disconnect behavior:
 
 ### AUTH8 - Migration, release, and verification
 
-`todo`
+`in progress`
 
-1. Confirm `tiein.md` T5 is complete and the guarded combined artifact is used.
-2. Apply the schema migration and deploy the shared device-auth helper.
-3. Deploy exchange, device upload, connected-device, and revoke endpoints with
+1. `done` - Confirm `tiein.md` T5 is complete and the guarded combined artifact is used.
+2. `done` - Apply the schema migration and deploy the shared device-auth helper.
+3. `done` - Deploy exchange, device upload, connected-device, and revoke endpoints with
    legacy behavior still available.
-4. Ship the Mac Keychain/exchange client.
-5. Switch the portal's primary connect UI to exchange-only pairing codes.
-6. Add browser pairing independently after manual exchange is stable.
-7. Verify production with a temporary device and revoke it afterward.
+4. `in progress` - The private signed Mac client passes production verification;
+   shipping it publicly remains intentionally pending.
+5. `done` - Switch the portal's primary connect UI to exchange-only pairing codes.
+6. `done` - Add browser pairing independently after manual exchange is stable.
+7. `done` - Verify production with a temporary device and revoke it afterward.
+
+Production verification completed through deploy `6a578f9e0ab7ed72596b10c2`. Pairing,
+exchange, durable upload, disconnect, revocation, reconnect, and browser callback
+were exercised end to end. The database migrations and runtime now use the same
+managed production database, and commit `399d2f6` prevents a production
+`SKILLGROUPS_DATABASE_URL` override from splitting those paths again. Combined
+artifact guards, production smoke checks, generated library pages, and existing
+Mac release assets all passed without publishing a new app version.
 
 Complete when the verification matrix below passes, legacy clients still work,
 the combined deploy artifact passes its guards, and production smoke checks show
