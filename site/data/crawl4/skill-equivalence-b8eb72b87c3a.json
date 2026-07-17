@@ -1,0 +1,1094 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-17T20:37:33.122Z",
+  "groups": [
+    {
+      "id": "eq-012f2167b9e2b890ef5dcff05a89e09f420110f3d28533470ac3a35164a4e425",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/kubernetes-operations",
+        "hippocampus-dev/hippocampus:.codex/skills/kubernetes-operations"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/kubernetes-operations",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/kubernetes-operations",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/kubernetes-operations"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-16cb26e200229499e8b5c043b258b29142d6bb14d73fe7a0202ea6f1824b09ce",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/invention-structuring",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/invention-structuring"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/invention-structuring",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/invention-structuring",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/invention-structuring"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-1b7b9a47910e6ba71622165fda13e0217223da950e200aba66e34492cf4512ca",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-queue",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-queue"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-queue",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-queue",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-queue"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-2020ee6819fc89d3488b05095183ee69ebdbdaf7369208ea6cec800a0d238272",
+      "memberSkillIds": [
+        "dartsim/dart:.claude/skills/dart-build",
+        "dartsim/dart:.codex/skills/dart-build"
+      ],
+      "representativeSkillId": "dartsim/dart:.codex/skills/dart-build",
+      "preferredSkillIds": {
+        "claude": "dartsim/dart:.claude/skills/dart-build",
+        "codex": "dartsim/dart:.codex/skills/dart-build"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-22f1ed2b60ad69c1dd142f269a0c8f5e16d9d116d1c33888ce3cf07f45ddcf92",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/heal-skill",
+        "boshu2/agentops:skills/heal-skill"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/heal-skill",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/heal-skill",
+        "codex": "boshu2/agentops:skills-codex/heal-skill"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-2f6a43bbc56623930da6729da644a174b3f9baea0c3c23182476c3fb68504720",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/forge",
+        "boshu2/agentops:skills/forge"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/forge",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/forge",
+        "codex": "boshu2/agentops:skills-codex/forge"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-38fe3b7dbea50724851522aed30eb8cd26bd513368171ff03adc20410fdcbfd1",
+      "memberSkillIds": [
+        "dartsim/dart:.claude/skills/dart-python",
+        "dartsim/dart:.codex/skills/dart-python"
+      ],
+      "representativeSkillId": "dartsim/dart:.codex/skills/dart-python",
+      "preferredSkillIds": {
+        "claude": "dartsim/dart:.claude/skills/dart-python",
+        "codex": "dartsim/dart:.codex/skills/dart-python"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-3a477c6cf35ce4726d33974ba7c564b938ae61e8409e07f04fc17add412c17e9",
+      "memberSkillIds": [
+        "dartsim/dart:.claude/skills/dart-ci",
+        "dartsim/dart:.codex/skills/dart-ci"
+      ],
+      "representativeSkillId": "dartsim/dart:.codex/skills/dart-ci",
+      "preferredSkillIds": {
+        "claude": "dartsim/dart:.claude/skills/dart-ci",
+        "codex": "dartsim/dart:.codex/skills/dart-ci"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-3b96f42b462d069211f14a64853b42d97dc0f0b69d541bb9d1d59b4500c03c41",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/deps",
+        "boshu2/agentops:skills/deps"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/deps",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/deps",
+        "codex": "boshu2/agentops:skills-codex/deps"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-3ee2131e69b548519c7517c01624d6b2b334418a8a4c460db605b7f6a90ac7d7",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/evolve",
+        "boshu2/agentops:skills/evolve"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/evolve",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/evolve",
+        "codex": "boshu2/agentops:skills-codex/evolve"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-414b2e3313c3a7fc69e8379d8d452099b28bf7041a9414bfe509cb0f0265db6f",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/converter",
+        "boshu2/agentops:skills/converter"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/converter",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/converter",
+        "codex": "boshu2/agentops:skills-codex/converter"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-44bf6ae671ea0615c9a08fc4a0deb0fb42f55753d903191b7e8d9adcb529a81a",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-llm",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-llm"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-llm",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-llm",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-llm"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-4507aa418467858ec443d28aaf0b8005fe49dc55786081d0b2d0cb0551d4e177",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/analyze-results",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/analyze-results"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/analyze-results",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/analyze-results",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/analyze-results"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-4b8fa2ec019238a1decd807c6ac62a6a32d7402e0d8e12de321def44cb21d6b8",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/discovery",
+        "boshu2/agentops:skills/discovery"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/discovery",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/discovery",
+        "codex": "boshu2/agentops:skills-codex/discovery"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-4f80c874709699a6712d51214c4fb227da4d16bd5a09e8429d8c63b9dad58dae",
+      "memberSkillIds": [
+        "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing",
+        "Chachamaru127/claude-code-harness:skills/breezing"
+      ],
+      "representativeSkillId": "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing",
+      "preferredSkillIds": {
+        "claude": "Chachamaru127/claude-code-harness:skills/breezing",
+        "codex": "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-591e2963804ffdec95345c49de12b6abbe33d9c5cf7873fec7996996a012d1f7",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-plan",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-plan"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-plan",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-plan",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-plan"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-5af9ec86191af758d18b38c21d36b9ebcdc9e2b52843e12d3a9680c095ba83ed",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/bug-hunt",
+        "boshu2/agentops:skills/bug-hunt"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/bug-hunt",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/bug-hunt",
+        "codex": "boshu2/agentops:skills-codex/bug-hunt"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-60fa5008962f28d1ecf6c1ff58d61e144412e6efa553dc1e7a7891900491b13e",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/dream",
+        "boshu2/agentops:skills/dream"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/dream",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/dream",
+        "codex": "boshu2/agentops:skills-codex/dream"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-63a080721905a2c2cc151fb9ad20c04a06ba65756bb4adce7496392afa085c3a",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/beads",
+        "boshu2/agentops:skills/beads"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/beads",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/beads",
+        "codex": "boshu2/agentops:skills-codex/beads"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-657d63fa3237ef19987c1e5036b6b9b342cbed3174956ffbef3cbfd98bf7242c",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/ablation-planner",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/ablation-planner"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/ablation-planner",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/ablation-planner",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/ablation-planner"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-67faa0782205b69fb987d1ae57f4a2cc31b88e4985ee899681d994067e1adf01",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/dse-loop",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/dse-loop"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/dse-loop",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/dse-loop",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/dse-loop"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-6b5868d4b30bd7174d2a36411e0ef4ac7021aee357de60a8f049ef6c5ab3076a",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/knowledge-activation",
+        "boshu2/agentops:skills/knowledge-activation"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/knowledge-activation",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/knowledge-activation",
+        "codex": "boshu2/agentops:skills-codex/knowledge-activation"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-6da8965ca09a4a0f3bb4045d86a32ead88ab9290207943460d56b25d3d37f598",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/complexity",
+        "boshu2/agentops:skills/complexity"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/complexity",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/complexity",
+        "codex": "boshu2/agentops:skills-codex/complexity"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-6e93b8d2a70375a9ddeb517e8f53ce9d3ebbcb9345c57545c48c66d39fb8afe4",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/docker-compose-operations",
+        "hippocampus-dev/hippocampus:.codex/skills/docker-compose-operations"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/docker-compose-operations",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/docker-compose-operations",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/docker-compose-operations"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-6eac388d2db0547beb420a0145a4ecb6782b029ca1446e5312a4d9156dd454c3",
+      "memberSkillIds": [
+        "dartsim/dart:.claude/skills/dart-io",
+        "dartsim/dart:.codex/skills/dart-io"
+      ],
+      "representativeSkillId": "dartsim/dart:.codex/skills/dart-io",
+      "preferredSkillIds": {
+        "claude": "dartsim/dart:.claude/skills/dart-io",
+        "codex": "dartsim/dart:.codex/skills/dart-io"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-7531fa101f84d3a9aa2f577aecbe0d0d309fc705c0d40838490f8dcb523fdfb5",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/figure-spec",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/figure-spec"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/figure-spec",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/figure-spec",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/figure-spec"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-7c7f88f33deef37bf3df48a7ee200909b47eb038b010425d1ac700100fd85b70",
+      "memberSkillIds": [
+        "CongDon1207/AGENTS.md:.claude/skills/ai-artist",
+        "CongDon1207/AGENTS.md:.codex/skills/ai-artist"
+      ],
+      "representativeSkillId": "CongDon1207/AGENTS.md:.codex/skills/ai-artist",
+      "preferredSkillIds": {
+        "claude": "CongDon1207/AGENTS.md:.claude/skills/ai-artist",
+        "codex": "CongDon1207/AGENTS.md:.codex/skills/ai-artist"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-8066e629c6eaa2f43dacb434daabe6ed91b1ebaaf9833f713fddf2cc3427d3bd",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/compile",
+        "boshu2/agentops:skills/compile"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/compile",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/compile",
+        "codex": "boshu2/agentops:skills-codex/compile"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-823929e8f1349282ba968d76568398ce62a0b6c22d2930e1c2b9478e24ec3c39",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/goals",
+        "boshu2/agentops:skills/goals"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/goals",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/goals",
+        "codex": "boshu2/agentops:skills-codex/goals"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-87295fa3d06877136d8f0959678f72ed36dcf3b134f2cde1de5114287c273747",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/frontend",
+        "hippocampus-dev/hippocampus:.codex/skills/frontend"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/frontend",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/frontend",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/frontend"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-8c3bfdb052a8fa26d443360dc98fba6525ba53df4c5244a13d8ccf95eddc1c30",
+      "memberSkillIds": [
+        "boshu2/agentops:handoff",
+        "boshu2/agentops:skills-codex/handoff"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/handoff",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:handoff",
+        "codex": "boshu2/agentops:skills-codex/handoff"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-9ad188ef2873299e2e7b19de63b26daa06f09cac7f0b586ff831367d8e2310c9",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/claims-drafting",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/claims-drafting"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/claims-drafting",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/claims-drafting",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/claims-drafting"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-9bd4c69674308af729019272a3109afb50898d9e3ecf76fb14e62840fbfd2419",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/autodev",
+        "boshu2/agentops:skills/autodev"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/autodev",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/autodev",
+        "codex": "boshu2/agentops:skills-codex/autodev"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-9f020c2daabeb92d5bdc860f998d20943d2c273c7bca0aaf11e01b169bf05d2a",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/brainstorm",
+        "boshu2/agentops:skills/brainstorm"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/brainstorm",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/brainstorm",
+        "codex": "boshu2/agentops:skills-codex/brainstorm"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-9f4c02d444f5a9bc1f49f8a8d557e056ce0e4e35b04fe625ceef902cceb5e127",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/inject",
+        "boshu2/agentops:skills/inject"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/inject",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/inject",
+        "codex": "boshu2/agentops:skills-codex/inject"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-9ff9bfaec90118024e0686f1063372a5e1759bb96f455dcf58a294cb2fa34bc4",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/grafana-platform-dashboard",
+        "boshu2/agentops:skills/grafana-platform-dashboard"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/grafana-platform-dashboard",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/grafana-platform-dashboard",
+        "codex": "boshu2/agentops:skills-codex/grafana-platform-dashboard"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-a5da5b4dbe556c5830fa7daf6c6c975d2e0e7c3e30889babdc28e5e48e7c8348",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/flywheel",
+        "boshu2/agentops:skills/flywheel"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/flywheel",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/flywheel",
+        "codex": "boshu2/agentops:skills-codex/flywheel"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-a6dae46bdc5ad42e1ff46f0fd879067d89196cfa356108be0a541dda9988ec96",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/feishu-notify",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/feishu-notify"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/feishu-notify",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/feishu-notify",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/feishu-notify"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-b007eb19a801fee669192598eab78ee26fcad61178f0b4345c5fa1f8da8f87de",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/doc",
+        "boshu2/agentops:skills/doc"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/doc",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/doc",
+        "codex": "boshu2/agentops:skills-codex/doc"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-bc97f46b2664fac1798d35b687e0a95ba9682f3df4cd051c78ff454ceeac8361",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/alphaxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/alphaxiv"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/alphaxiv",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/alphaxiv",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/alphaxiv"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-bd7dc5d7f6c8c00372b632f1a74bb919c8fde9c43b61f40b4e036aebe48696aa",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-audit",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-audit"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-audit",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-audit",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-audit"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-c20f1b86df6608d7513e094e083b7eb39038550aab57396731e7c3c68306c8ea",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/harvest",
+        "boshu2/agentops:skills/harvest"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/harvest",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/harvest",
+        "codex": "boshu2/agentops:skills-codex/harvest"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-c874c373988f8d57873fdb1988186c63ba73f3e518eb428742810b7c7d44676a",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/codex-team",
+        "boshu2/agentops:skills/codex-team"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/codex-team",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/codex-team",
+        "codex": "boshu2/agentops:skills-codex/codex-team"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-c8878c80a6c75c8b4d38959805c615559f8787a71219c303c889830689a473dc",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-minimax",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-minimax"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-minimax",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-minimax",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-minimax"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-cd77b2daade0c3670764823857d98070a9ee04e8aabfbd82d003faf2c99f05e7",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/implement",
+        "boshu2/agentops:skills/implement"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/implement",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/implement",
+        "codex": "boshu2/agentops:skills-codex/implement"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-d2f8f9e9f2acaeeba81f415556dea1b60b5ec9f7905ade86f5c343030e3d0b12",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/bootstrap",
+        "boshu2/agentops:skills/bootstrap"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/bootstrap",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/bootstrap",
+        "codex": "boshu2/agentops:skills-codex/bootstrap"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-d37b34f26ede9e8af5e57de3a7f4ae0aab2bb6f2bff86d3cdf67c07538b4a345",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/arxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/arxiv"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/arxiv",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/arxiv",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/arxiv"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-d778ded559f7d56c59466189fbcaca0355b807fe7ac0b66254d2739e97b86928",
+      "memberSkillIds": [
+        "Moffran/calibrated_explanations:.claude/skills/ce-payload-governance",
+        "Moffran/calibrated_explanations:ce-payload-governance"
+      ],
+      "representativeSkillId": "Moffran/calibrated_explanations:ce-payload-governance",
+      "preferredSkillIds": {
+        "claude": "Moffran/calibrated_explanations:.claude/skills/ce-payload-governance",
+        "codex": "Moffran/calibrated_explanations:ce-payload-governance"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-dadde328c850ad4ec5cbab1dc186439aa5b63cfb02fcfe7549264bb6348d08cc",
+      "memberSkillIds": [
+        "dartsim/dart:.claude/skills/dart-contribute",
+        "dartsim/dart:.codex/skills/dart-contribute"
+      ],
+      "representativeSkillId": "dartsim/dart:.codex/skills/dart-contribute",
+      "preferredSkillIds": {
+        "claude": "dartsim/dart:.claude/skills/dart-contribute",
+        "codex": "dartsim/dart:.codex/skills/dart-contribute"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-db503cdfb3f709f81f5a7551c5c33f2588deec6d8f8d34e806e697c7a0696cee",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/citation-audit",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/citation-audit"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/citation-audit",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/citation-audit",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/citation-audit"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-e40b1ef2c6ec7b3c331c5ce0864ac04dc6a657a3ee0b6858748d8a3530f0b07d",
+      "memberSkillIds": [
+        "dartsim/dart:.claude/skills/dart-test",
+        "dartsim/dart:.codex/skills/dart-test"
+      ],
+      "representativeSkillId": "dartsim/dart:.codex/skills/dart-test",
+      "preferredSkillIds": {
+        "claude": "dartsim/dart:.claude/skills/dart-test",
+        "codex": "dartsim/dart:.codex/skills/dart-test"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-eabb36d06ab5bd1e5b6f21b26c7f6f48791f678d559008144630c190cfb11aec",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/browser-automation",
+        "hippocampus-dev/hippocampus:.codex/skills/browser-automation"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/browser-automation",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/browser-automation",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/browser-automation"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-edb44c2581c60361862592ce3e63343c588095640e8d8f7a51bf27aea0bb9092",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-bridge",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-bridge"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-bridge",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-bridge",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-bridge"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-f98e5565926686380408bf65ad26a217d5588dad8936757dd36bb25aac3f7519",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/deepxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/deepxiv"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/deepxiv",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/deepxiv",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/deepxiv"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-fc846311f00cdf646aed157477cc8bb1d565b3a4edebdbb92ce1e9a0b90ea92b",
+      "memberSkillIds": [
+        "boshu2/agentops:skills-codex/design",
+        "boshu2/agentops:skills/design"
+      ],
+      "representativeSkillId": "boshu2/agentops:skills-codex/design",
+      "preferredSkillIds": {
+        "claude": "boshu2/agentops:skills/design",
+        "codex": "boshu2/agentops:skills-codex/design"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    }
+  ]
+}

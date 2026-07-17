@@ -12,8 +12,14 @@ test("shadow crawl stages generated data directories instead of optional asset g
   assert.doesNotMatch(workflow, /git add -A --[^\n]*\*\.json/);
 });
 
-test("optional skill equivalence publishing remains in the workflow", () => {
-  assert.match(workflow, /npm run publish:skill-equivalence/);
+test("skill equivalence publication is enabled only for its publisher step", () => {
+  const step = workflow.match(
+    /      - name: Publish skill equivalence\n[\s\S]*?(?=\n      - name:)/,
+  )?.[0];
+
+  assert.ok(step, "Publish skill equivalence step missing");
+  assert.match(step, /SKILL_EQUIVALENCE_PUBLISH: "1"/);
+  assert.equal(workflow.match(/SKILL_EQUIVALENCE_PUBLISH:/g)?.length, 1);
 });
 
 test("canonical SHA publication is enabled only for its publisher step", () => {

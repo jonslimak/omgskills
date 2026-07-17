@@ -92,7 +92,10 @@ jobs:
       - name: Publish skill equivalence
         working-directory: index
         # This runs after both data publishers so its manifest patch survives.
-        # SKILL_EQUIVALENCE_PUBLISH stays unset for a strict no-op until rollout.
+        # Scope the rollout flag to this step so unrelated publishers and Mac
+        # release commands cannot enable it.
+        env:
+          SKILL_EQUIVALENCE_PUBLISH: "1"
         run: npm run publish:skill-equivalence
 
       - name: Verify local published data

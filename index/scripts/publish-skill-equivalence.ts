@@ -179,6 +179,31 @@ export function pruneSupersededSkillEquivalenceAssets(
   }
 }
 
+export function previousSkillEquivalenceAssetPath(
+  dataDir: string,
+  currentPath: string,
+): string | undefined {
+  return readdirSync(dataDir)
+    .filter((file) =>
+      file.startsWith("skill-equivalence-") &&
+      file.endsWith(".json") &&
+      file !== currentPath
+    )
+    .map((file) => {
+      try {
+        return {
+          file,
+          generatedAt: readJson<SkillEquivalenceArtifact>(join(dataDir, file)).generatedAt ?? "",
+        };
+      } catch {
+        return { file, generatedAt: "" };
+      }
+    })
+    .sort((left, right) =>
+      right.generatedAt.localeCompare(left.generatedAt) || right.file.localeCompare(left.file)
+    )[0]?.file;
+}
+
 export function publishSkillEquivalence(
   options: PublishSkillEquivalenceOptions,
 ): PublishSkillEquivalenceResult {
@@ -217,7 +242,10 @@ export function publishSkillEquivalence(
     const priorPath = readManifest(track.dir).skillEquivalence?.path ?? "";
     const written = writeSkillEquivalenceAsset(track.dir, artifact);
     changed = patchSkillEquivalenceManifest(track.dir, written) || changed;
-    pruneSupersededSkillEquivalenceAssets(track.dir, [written.path, priorPath]);
+    const previousPath = priorPath && priorPath !== written.path && existsSync(join(track.dir, priorPath))
+      ? priorPath
+      : previousSkillEquivalenceAssetPath(track.dir, written.path);
+    pruneSupersededSkillEquivalenceAssets(track.dir, [written.path, previousPath ?? ""]);
   }
 
   return {

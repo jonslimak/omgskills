@@ -44,8 +44,10 @@ Do not remove auth code or migrations as part of this gate.
 
 ### 18.2 - Publish canonical SHA attribution
 
-This is a separately approved data rollout, not part of the Mac publication
-command.
+**Complete.** Landed as `d28f6a6`. The guarded production rollout and scheduled
+publisher run both passed with identical v2 and Crawl 4 assets, non-shrinking
+SHA membership, and unchanged Mac appcast and DMG assets. The scheduled data
+refresh landed as `fa0c845`.
 
 - privately regenerate and validate `canonicalBySha`
 - set `SHA_CANONICAL_PUBLISH=1` only in the intended publisher workflow
@@ -68,7 +70,15 @@ Identity-resolution telemetry is already implemented. The production effect on
 `ambiguous` and `resolved_by_sha` becomes measurable after the 0.0.18 Mac client
 is publicly released; it is not an immediate rollout success gate.
 
+The next automatic scheduled publication supplies the second clean observation
+before any broader canonical policy batch is considered. It does not block the
+separate skill-equivalence rollout.
+
 ### 18.3 - Publish Claude/Codex equivalence
+
+**Implementation ready; not yet published.** The scoped workflow flag, identical
+v2 and Crawl 4 assets, no-op retention fix, rollback path, full-publish
+preservation checks, and private Mac build have passed locally.
 
 This is a separately approved data rollout. Complete it before the final 0.0.18
 release-candidate test so unified rows can be checked against production data.

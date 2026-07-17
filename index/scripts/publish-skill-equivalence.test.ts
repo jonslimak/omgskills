@@ -17,9 +17,11 @@ import test from "node:test";
 
 import {
   patchSkillEquivalenceManifest,
+  previousSkillEquivalenceAssetPath,
   pruneSupersededSkillEquivalenceAssets,
   publishSkillEquivalence,
   skillEquivalencePublishMode,
+  writeSkillEquivalenceAsset,
   type SkillEquivalenceTrack,
 } from "./publish-skill-equivalence.js";
 
@@ -252,6 +254,35 @@ test("pruning keeps current and previous equivalence assets only", () => {
       "skill-equivalence-previous.json",
       "skills-unrelated.json",
     ]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a no-op publish rerun retains the newest real previous asset", () => {
+  const root = mkdtempSync(join(tmpdir(), "skill-equivalence-rerun-prune-test-"));
+  try {
+    const current = writeSkillEquivalenceAsset(root, {
+      version: 1,
+      generatedAt: "2026-07-03T00:00:00.000Z",
+      groups: [],
+    });
+    const previous = writeSkillEquivalenceAsset(root, {
+      version: 1,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      groups: [],
+    });
+    writeSkillEquivalenceAsset(root, {
+      version: 1,
+      generatedAt: "2026-07-01T00:00:00.000Z",
+      groups: [],
+    });
+
+    const retainedPrevious = previousSkillEquivalenceAssetPath(root, current.path);
+    pruneSupersededSkillEquivalenceAssets(root, [current.path, retainedPrevious ?? ""]);
+
+    assert.equal(retainedPrevious, previous.path);
+    assert.deepEqual(readdirSync(root).sort(), [current.path, previous.path].sort());
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
