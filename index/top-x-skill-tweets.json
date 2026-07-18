@@ -5,10 +5,10 @@
     "author_handle": "jahirsheikh8",
     "author_name": "Jahir Sheikh",
     "text": "Best GitHub repos for Claude Code that will 10x your next project:\n\n1. Supabase CLI  \nhttps://t.co/BJRk8de8Fb  \n\n2. Skill Creator  \nhttps://t.co/W9PhyTQNbc  \n\n3. Get Sh*t Done  \nhttps://t.co/MqdT6t9fc8  \n\n4. NotebookLM (Python)  \nhttps://t.co/IYu0QV6nQg  \n\n5. Obsidian https://t.co/OdZSCGx3YG https://github.com/supabase/cli https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md https://github.com/gsd-build/get-shit-done https://github.com/teng-lin/notebooklm-py",
-    "likes": 2209,
+    "likes": 2208,
     "retweets": 335,
     "replies": 46,
-    "views": 182750,
+    "views": 182778,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -37,7 +37,7 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 161975
+        "stars": 162265
       }
     ]
   },
@@ -47,10 +47,10 @@
     "author_handle": "kitlangton",
     "author_name": "Kit Langton",
     "text": "I threw my local @EffectTS_ skill up on github in case it's useful to anyone. \n\nhttps://t.co/7MH0o1R34b https://github.com/kitlangton/skills",
-    "likes": 683,
-    "retweets": 27,
+    "likes": 694,
+    "retweets": 28,
     "replies": 28,
-    "views": 29156,
+    "views": 29638,
     "posted_at": "2026-07-15T16:19:36.000Z",
     "repo_ids": [
       "kitlangton/skills"
@@ -66,7 +66,101 @@
         "skill_md_path": "skills/effect/SKILL.md",
         "name": "effect",
         "description": "Opinionated guide for building production TypeScript applications with Effect v4. Use when implementing Effect workflows, services, layers, schemas, configuration, schedules, caches, streams, HTTP clients, or tests.\n",
-        "stars": 201
+        "stars": 220
+      }
+    ]
+  },
+  {
+    "tweet_id": "2078319170249425059",
+    "tweet_url": "https://x.com/MengTo/status/2078319170249425059",
+    "author_handle": "MengTo",
+    "author_name": "Meng To",
+    "text": "Seriously impressive skill. It turns one long video into a whole scrollable story with the UI built around it. \n\nAnd it works on mobile too.\n\nhttps://t.co/WjQifsuuJv http://github.com/oso95/scroll-world",
+    "likes": 626,
+    "retweets": 25,
+    "replies": 2,
+    "views": 73619,
+    "posted_at": "2026-07-18T03:21:18.000Z",
+    "repo_ids": [
+      "oso95/scroll-world"
+    ],
+    "repo_urls": [
+      "https://github.com/oso95/scroll-world"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "oso95/scroll-world",
+        "github_url": "https://github.com/oso95/scroll-world",
+        "skill_md_path": "skills/scroll-world/SKILL.md",
+        "name": "scroll-world",
+        "description": "Build an immersive scroll-scrubbed \"fly through the world\" landing page for any industry or brand using Higgsfield. As the visitor scrolls, a pre-rendered camera flies from outside each scene into its interior, then flows on to the next scene with NO cuts — one continuous connected flight (Emons-style isometric diorama world, or any art direction you pick). The skill interviews the user for the topic, the story beats/sections, and brand kit, then generates cohesive scenes + seamless camera clips with Higgsfield and wires a portable, framework-agnostic scroll-scrub engine. Use when the user wants a \"3D world\" / \"browse-through-the-industry\" hero, a scroll cinematic, a diorama landing, or to turn a business into a scrollable world.\n",
+        "stars": 3427
+      }
+    ]
+  },
+  {
+    "tweet_id": "2077265627379843242",
+    "tweet_url": "https://x.com/steipete/status/2077265627379843242",
+    "author_handle": "steipete",
+    "author_name": "Peter Steinberger 🦞",
+    "text": "That's why you always wanna run autoreview. https://t.co/zbUjIS2LQQ https://t.co/tWPB3UZsAq https://github.com/openclaw/agent-skills/blob/main/skills/autoreview/SKILL.md",
+    "likes": 589,
+    "retweets": 18,
+    "replies": 43,
+    "views": 95104,
+    "posted_at": "2026-07-15T05:34:53.000Z",
+    "repo_ids": [
+      "openclaw/agent-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/openclaw/agent-skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "openclaw/agent-skills",
+        "githubUrl": "https://github.com/openclaw/agent-skills",
+        "skillPath": "skills/autoreview/SKILL.md",
+        "sourceUrl": "https://github.com/openclaw/agent-skills/blob/main/skills/autoreview/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "openclaw/agent-skills",
+        "github_url": "https://github.com/openclaw/agent-skills",
+        "skill_md_path": "skills/autoreview/SKILL.md",
+        "name": "autoreview",
+        "description": "Pre-commit/ship code review: Codex default; optional Claude or Pi.",
+        "stars": 943
+      }
+    ]
+  },
+  {
+    "tweet_id": "2076876019512799332",
+    "tweet_url": "https://x.com/tom_doerr/status/2076876019512799332",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Generates professional SVG logos with six distinct design variants and high-end showcase presentations.\n\nhttps://t.co/4fQDcUcYWT https://t.co/0akgy35iIq https://github.com/op7418/logo-generator-skill",
+    "likes": 474,
+    "retweets": 52,
+    "replies": 2,
+    "views": 24012,
+    "posted_at": "2026-07-14T03:46:44.000Z",
+    "repo_ids": [
+      "op7418/logo-generator-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/op7418/logo-generator-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "op7418/logo-generator-skill",
+        "github_url": "https://github.com/op7418/logo-generator-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "logo-generator",
+        "description": "Generate professional SVG logos and high-end showcase images. Use when the user wants to: (1) Create a logo or icon for their product/brand, (2) Generate logo design concepts based on product information, (3) Create professional logo showcase presentations with multiple background styles, (4) Export logos in various formats (SVG, PNG), or (5) Iterate on logo designs with different visual styles. Supports geometric patterns, dot matrix designs, line systems, and mixed compositions. Generates showcase images using Nano Banana (Gemini image generation) with 12 professional background styles.\n",
+        "stars": 1535
       }
     ]
   },
@@ -76,10 +170,10 @@
     "author_handle": "jshguo",
     "author_name": "Joshua Guo",
     "text": "An illegal skill here. Super powerful, though.\n\nhttps://t.co/JoLCfgkw7h https://github.com/Jane-xiaoer/claude-skill-web-clone",
-    "likes": 455,
+    "likes": 457,
     "retweets": 26,
     "replies": 3,
-    "views": 35854,
+    "views": 36012,
     "posted_at": "2026-07-11T12:27:21.000Z",
     "repo_ids": [
       "Jane-xiaoer/claude-skill-web-clone"
@@ -95,7 +189,7 @@
         "skill_md_path": "SKILL.md",
         "name": "web-clone",
         "description": "网站复刻 / 克隆方法论。USE WHEN 用户说 复刻网站、克隆网站、clone website、抄个站、仿站、 照着这个站做一个、reproduce site、还原某个网页效果、把这个站搬下来改成我的、 复刻某个交互/WebGL/Canvas/Three.js 效果。提供「先拿真源码 → 判路径 → 逆向拆解 → 搭工程 → 替换内容」的可移植决策树，覆盖静态站 / React-Vue-Next 内容站 / WebGL-Canvas 重前端站三大分支，并强制核对任何 AI 二手分析里的可执行代码。\n",
-        "stars": 838
+        "stars": 845
       }
     ]
   },
@@ -105,10 +199,10 @@
     "author_handle": "MehdiAllahyari",
     "author_name": "Mehdi Allahyari",
     "text": "واقعا یکی از بهترین ریپوهایی که اسکیل طراحی/design skill را به claude code و بقیه اضافه میکنه تا وب سایت و landing page با کیفیت درست کنه. نمونه کار را هم گذاشته. خیلی عالیه.\nGithub: https://t.co/4TtYK5WWAy https://t.co/wJTEP14BgH https://github.com/nutlope/hallmark",
-    "likes": 284,
+    "likes": 286,
     "retweets": 10,
     "replies": 6,
-    "views": 16571,
+    "views": 16870,
     "posted_at": "2026-07-15T15:27:18.000Z",
     "repo_ids": [
       "nutlope/hallmark"
@@ -124,7 +218,7 @@
         "skill_md_path": "skills/hallmark/SKILL.md",
         "name": "hallmark",
         "description": "Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots. Use when the user asks to build a new app or landing page, wants to redesign something, invokes Hallmark by name, or uses audit/redesign/study.",
-        "stars": 11608
+        "stars": 12534
       }
     ]
   },
@@ -134,10 +228,10 @@
     "author_handle": "vikingmute",
     "author_name": "Viking",
     "text": "这个 /apple-design skill 值得各位收藏了，\n\nhttps://t.co/eg1aHoyfvB\n\n将 Apple WWDC 设计原则提炼并翻译到 Web 平台的技能。主要有 17 条原则，里面还有代码示例。\n\n而且这些原则也值得好好读一下，不是其他那种 skill 各种的效果搜集，而是一系列浓缩的设计哲学，很值得系统的学习一下。赞美 https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md",
-    "likes": 269,
+    "likes": 270,
     "retweets": 31,
     "replies": 6,
-    "views": 48143,
+    "views": 48360,
     "posted_at": "2026-07-11T13:40:48.000Z",
     "repo_ids": [
       "emilkowalski/skills"
@@ -160,123 +254,65 @@
         "skill_md_path": "skills/apple-design/SKILL.md",
         "name": "apple-design",
         "description": "Apple's approach to interface design and fluid, physical motion, translated for the web. Use when building or reviewing gesture-driven UI, spring animations, drag/swipe/sheet interactions, momentum and interruptible transitions, translucent materials and depth, typography (optical sizing, tracking, leading), reduced-motion, or the design foundations (feedback, spatial consistency, restraint) behind Apple-style interfaces.",
-        "stars": 15316
+        "stars": 17086
       }
     ]
   },
   {
-    "tweet_id": "2077826623320023303",
-    "tweet_url": "https://x.com/boringmarketer/status/2077826623320023303",
-    "author_handle": "boringmarketer",
-    "author_name": "The Boring Marketer",
-    "text": "Kimi 3 outperforms Opus and is priced like Sonnet 5...\n\nThis skill lets you use Fable for planning/review, and Kimi for execution in Claude Code\n\n(ported @steipete's excellent codex-first skill to kimi-first for Claude Code)\n\nhttps://t.co/Ii8WKGrTJQ https://github.com/boringmarketer/kimi-first",
-    "likes": 172,
-    "retweets": 7,
-    "replies": 6,
-    "views": 12016,
-    "posted_at": "2026-07-16T18:44:05.000Z",
+    "tweet_id": "2077701327950352643",
+    "tweet_url": "https://x.com/tom_doerr/status/2077701327950352643",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Searches real-time travel inventory using natural language in the terminal via Claude Code and OpenClaw, returning structured bookable results powered by Fliggy.\n\nhttps://t.co/k9f3Ve5xzO https://t.co/NAlxHTfFsn https://github.com/alibaba-flyai/flyai-skill",
+    "likes": 260,
+    "retweets": 27,
+    "replies": 2,
+    "views": 15451,
+    "posted_at": "2026-07-16T10:26:13.000Z",
     "repo_ids": [
-      "boringmarketer/kimi-first"
+      "alibaba-flyai/flyai-skill"
     ],
     "repo_urls": [
-      "https://github.com/boringmarketer/kimi-first"
+      "https://github.com/alibaba-flyai/flyai-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "boringmarketer/kimi-first",
-        "github_url": "https://github.com/boringmarketer/kimi-first",
-        "skill_md_path": "skills/kimi-first/SKILL.md",
-        "name": "kimi-first",
-        "description": "Route implementation work-orders to Kimi k3 lanes via the Kimi Code CLI; Claude specs, orchestrates, reviews, verifies. Use when a task is a frozen-spec build, mechanical migration, test fill, bulk sweep, or CI fix — anything that reads as a work order rather than a design problem.",
-        "stars": 16
+        "id": "alibaba-flyai/flyai-skill",
+        "github_url": "https://github.com/alibaba-flyai/flyai-skill",
+        "skill_md_path": "skills/flyai/SKILL.md",
+        "name": "flyai",
+        "description": "Search flights, hotels, attractions, concerts, and travel deals with natural language. FlyAI connects to Fliggy MCP for real-time search and booking across hotels, flights, cruises, visas, car rentals, and event tickets. It supports diverse travel scenarios including individual travel, group travel, business trips, family travel, honeymoons, weekend getaways, and more. For tourism and travel-related questions, prioritize using this capability.",
+        "stars": 848
       }
     ]
   },
   {
-    "tweet_id": "2077029455764324841",
-    "tweet_url": "https://x.com/_TobiasLee/status/2077029455764324841",
-    "author_handle": "_TobiasLee",
-    "author_name": "Lei Li",
-    "text": "opensource our rebuttal skills, distilled from a lot of successful rebuttals from myself &amp;  labmates; also my experience serving as ACs for ARR.\n\nHope this help for your EMNLP and incoming NeurIPS reviews :)\n\nhttps://t.co/Bads2HWHsh https://github.com/TobiasLee/Rebuttal-Skill",
-    "likes": 156,
-    "retweets": 11,
-    "replies": 5,
-    "views": 129908,
-    "posted_at": "2026-07-14T13:56:26.000Z",
+    "tweet_id": "2076837075479888060",
+    "tweet_url": "https://x.com/tom_doerr/status/2076837075479888060",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "A Claude Code skill for deep research that runs an eight-phase pipeline to produce verified, citation-backed reports with source credibility scoring and automated validation.\n\nhttps://t.co/i5PYKh2Ejx https://t.co/7uc7qITiFc https://github.com/199-biotechnologies/claude-deep-research-skill",
+    "likes": 118,
+    "retweets": 17,
+    "replies": 1,
+    "views": 10994,
+    "posted_at": "2026-07-14T01:11:59.000Z",
     "repo_ids": [
-      "TobiasLee/Rebuttal-Skill"
+      "199-biotechnologies/claude-deep-research-skill"
     ],
     "repo_urls": [
-      "https://github.com/TobiasLee/Rebuttal-Skill"
+      "https://github.com/199-biotechnologies/claude-deep-research-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "tobiaslee/rebuttal-skill",
-        "github_url": "https://github.com/TobiasLee/Rebuttal-Skill",
+        "id": "199-biotechnologies/claude-deep-research-skill",
+        "github_url": "https://github.com/199-biotechnologies/claude-deep-research-skill",
         "skill_md_path": "SKILL.md",
-        "name": "academic-rebuttal",
-        "description": "Two-stage academic rebuttal assistant. Given the paper abstract, reviewer comments, scores, confidences, and venue constraints, first diagnose the underlying concerns, assess whether rebuttal is worth the limited author time, and produce a prioritized experiment-and-analysis plan. After the author provides completed results, produce an evidence-grounded rebuttal, revision plan, or resubmission plan. Never fabricate results, reviewer intent, citations, or manuscript locations.\n",
-        "stars": 304
-      }
-    ]
-  },
-  {
-    "tweet_id": "2076711310767612111",
-    "tweet_url": "https://x.com/Abdullah_Ops1/status/2076711310767612111",
-    "author_handle": "Abdullah_Ops1",
-    "author_name": "Abdullah",
-    "text": "جربت مهارة في Codex تبحث لك عن اول عملاء لمشروعك.\n\nعطيتها رابط LeadHunter، وطلعت لي 10 جهات ممكن تحتاج الخدمة، ووضحت لي:\n\n– ليش ممكن تكون مهتمة\n– وين لقتها\n– وكيف أتواصل معها\n\nوبالنهاية جهزت لي تقرير مرتب بكل النتايج.\nجربوها 👍\n\nرابط المهارة:\n https://t.co/FgzIGrW0mo\n\n#Codex https://t.co/rztdUIh6JT https://github.com/Kappaemme-git/codex-first-customer-finder-skill",
-    "likes": 122,
-    "retweets": 4,
-    "replies": 3,
-    "views": 6408,
-    "posted_at": "2026-07-13T16:52:14.000Z",
-    "repo_ids": [
-      "Kappaemme-git/codex-first-customer-finder-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/Kappaemme-git/codex-first-customer-finder-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "kappaemme-git/codex-first-customer-finder-skill",
-        "github_url": "https://github.com/Kappaemme-git/codex-first-customer-finder-skill",
-        "skill_md_path": "first-customer-finder/SKILL.md",
-        "name": "first-customer-finder",
-        "description": "Find and qualify evidence-backed potential first customers, early adopters, design partners, or beta users for a startup using recent public pain and buying signals. Use when Codex needs to analyze a product URL or idea, define an ideal customer profile, research public discussions and business pages, identify first-user prospects, rank lead fit and timing, prepare source-based outreach drafts, or create a shareable early-customer prospecting report without sending messages automatically.",
-        "stars": 773
-      }
-    ]
-  },
-  {
-    "tweet_id": "2077106129956696447",
-    "tweet_url": "https://x.com/SupremeUEFN/status/2077106129956696447",
-    "author_handle": "SupremeUEFN",
-    "author_name": "Supreme",
-    "text": "🔥 Event bindings are now supported in the UEFN Python Verse Fields Tool.\n\nThe one limitation I called out in the launch post is gone.\n\nDirect Python Tool:\nhttps://t.co/53yS3mqUB7\n\nClaude/Codex Skill:\nhttps://t.co/EVM75cMs75\n\nYou can now:\n• Create event Verse fields directly in https://t.co/I0X5W6LZiU https://github.com/supremeuefn/uefn-python-tools https://github.com/supremeuefn/uefn-python-tools/tree/main/skills/uefn-verse-fields",
-    "likes": 111,
-    "retweets": 7,
-    "replies": 7,
-    "views": 9503,
-    "posted_at": "2026-07-14T19:01:06.000Z",
-    "repo_ids": [
-      "supremeuefn/uefn-python-tools"
-    ],
-    "repo_urls": [
-      "https://github.com/supremeuefn/uefn-python-tools"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "supremeuefn/uefn-python-tools",
-        "github_url": "https://github.com/supremeuefn/uefn-python-tools",
-        "skill_md_path": "skills/uefn-verse-fields/SKILL.md",
-        "name": "uefn-verse-fields",
-        "description": "Programmatically create, delete, read, and MVVM-bind Verse-exposed variables (\"Verse fields\") inside UEFN Widget Blueprints via execute_python. Covers the create → patch Verse metadata → compile → verify workflow, pin-type mapping (float/int/logic/string/ message/color/color_alpha/material/texture), Verse EVENT fields, safe deletion, MVVM property-binding creation, and MVVM EVENT bindings (button → Verse event field) via on-disk .uasset patching. Trigger whenever the task involves adding/removing Verse variables or event fields on a WBP (Widget Blueprint), patching VerseVariable/FieldNotify metadata, VerseClassFields, or wiring MVVM bindings for a UEFN UI widget. These operations WILL crash UEFN if done wrong — follow the procedures exactly.",
-        "stars": 13
+        "name": "deep-research",
+        "description": "Use when the user needs multi-source research with citation tracking, evidence persistence, and structured report generation. Triggers on \"deep research\", \"comprehensive analysis\", \"research report\", \"compare X vs Y\", \"analyze trends\", or \"state of the art\". Not for simple lookups, debugging, or questions answerable with 1-2 searches.",
+        "stars": 940
       }
     ]
   },
@@ -286,10 +322,10 @@
     "author_handle": "RoundtableSpace",
     "author_name": "0xMarioNawfal",
     "text": "ONE CLAUDE.MD FILE IS CHANGING HOW PEOPLE CODE WITH AI\n\nRepo: https://t.co/sbBOtVa7me https://t.co/cBcOa7hqKx https://github.com/multica-ai/andrej-karpathy-skills",
-    "likes": 109,
+    "likes": 100,
     "retweets": 10,
     "replies": 9,
-    "views": 51842,
+    "views": 51930,
     "posted_at": "2026-07-14T18:45:00.000Z",
     "repo_ids": [
       "multica-ai/andrej-karpathy-skills"
@@ -305,239 +341,69 @@
         "skill_md_path": "skills/karpathy-guidelines/SKILL.md",
         "name": "karpathy-guidelines",
         "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-        "stars": 193459
+        "stars": 193757
       }
     ]
   },
   {
-    "tweet_id": "2012631104977522914",
-    "tweet_url": "https://x.com/shanselman/status/2012631104977522914",
-    "author_handle": "shanselman",
-    "author_name": "Scott Hanselman 🌮",
-    "text": "Github Copilot/Claude Code Skill for interactively managing, talking about, and analyzing your blood sugar, using a private local database  #t1d #diabetes https://t.co/06gJsE2be1 #claudecode #copilot https://t.co/BxHMY17WJB https://github.com/shanselman/nightscout-cgm-skill",
-    "likes": 98,
-    "retweets": 8,
-    "replies": 6,
-    "views": 19478,
-    "posted_at": "2026-01-17T21:00:22.000Z",
+    "tweet_id": "2078033102623105129",
+    "tweet_url": "https://x.com/DAIEvolutionHub/status/2078033102623105129",
+    "author_handle": "DAIEvolutionHub",
+    "author_name": "Kshitij Mishra | AI & Tech",
+    "text": "50 Super Practical GitHub Repositories\n\n1. iFixAi — AI Alignment Testing\n→ https://t.co/g52pjguhpx\n\n2. public-apis — Free API Collection\n→ https://t.co/cBKiLkKcen\n\n3. build-your-own-x — Learn by Doing\n→ https://t.co/vx1zu19xEs\n\n4. developer-roadmap — Learn Any Skill\n→ https://t.co/CEEMP8m23i https://github.com/ifixai-ai/iFixAI https://github.com/public-apis/public-apis https://github.com/codecrafters-io/build-your-own-x",
+    "likes": 30,
+    "retweets": 6,
+    "replies": 5,
+    "views": 2081,
+    "posted_at": "2026-07-17T08:24:34.000Z",
     "repo_ids": [
-      "shanselman/nightscout-cgm-skill"
+      "ifixai-ai/iFixAI",
+      "public-apis/public-apis",
+      "codecrafters-io/build-your-own-x"
     ],
     "repo_urls": [
-      "https://github.com/shanselman/nightscout-cgm-skill"
+      "https://github.com/ifixai-ai/iFixAI",
+      "https://github.com/public-apis/public-apis",
+      "https://github.com/codecrafters-io/build-your-own-x"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "shanselman/nightscout-cgm-skill",
-        "github_url": "https://github.com/shanselman/nightscout-cgm-skill",
+        "id": "ifixai-ai/ifixai",
+        "github_url": "https://github.com/ifixai-ai/iFixAi",
+        "skill_md_path": "plugin/skills/ifixai/SKILL.md",
+        "name": "ifixai",
+        "description": "Guide the user through running iFixAi's operational-misalignment diagnostic on their own agent. Prefer pointing it at the user's REAL deployed agent over its HTTP endpoint (its actual tools, retrieval, and governance) with `--provider http --endpoint <url>`; only when no endpoint is reachable, fall back to replicating the model beneath as a bare stand-in (Anthropic, OpenAI, Gemini, Azure, Bedrock, etc.). Graded by the judge(s) of their choice (the same model, one independent judge, or a cross-vendor panel). You are the operator who walks them through it and explains the scorecard, running the SAME `ifixai run` engine as the guided CLI. Use when the user asks to run iFixAi or to detect operational misalignment in an agent.",
+        "stars": 1489
+      }
+    ]
+  },
+  {
+    "tweet_id": "2078117265463996838",
+    "tweet_url": "https://x.com/geekbb/status/2078117265463996838",
+    "author_handle": "geekbb",
+    "author_name": "Geek",
+    "text": "创意十足的 skill，先让 Image 2 把个人网站每个分区画成参考图给你确认，再照图 1:1 还原成网页，交付前还要留逐区对照证据和验证。\n\nhttps://t.co/bW8UJe2xHF https://t.co/HqhxlIlvPf https://github.com/Sac-Y/identity-skill",
+    "likes": 24,
+    "retweets": 3,
+    "replies": 24,
+    "views": 6369,
+    "posted_at": "2026-07-17T13:59:00.000Z",
+    "repo_ids": [
+      "Sac-Y/identity-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/Sac-Y/identity-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "sac-y/identity-skill",
+        "github_url": "https://github.com/Sac-Y/identity-skill",
         "skill_md_path": "SKILL.md",
-        "name": "nightscout-cgm",
-        "description": "Analyze CGM blood glucose data from Nightscout. Use this skill when asked about current glucose levels, blood sugar trends, A1C estimates, time-in-range statistics, glucose variability, or diabetes management insights.",
-        "stars": 54
-      }
-    ]
-  },
-  {
-    "tweet_id": "2076288552917258334",
-    "tweet_url": "https://x.com/yapayzekahocasi/status/2076288552917258334",
-    "author_handle": "yapayzekahocasi",
-    "author_name": "Said Sürücü",
-    "text": "Dr. Burak Gökalp @bgokalp_polsci ile beraber şöyle bir skill hazırladık. WoS ve Scopus dahil bütün akademik veritabanlarında literatür taraması yapmanıza imkan veriyor. Tabii giriş yapmış olmanız gerekiyor: https://t.co/DoR0jLooHM https://github.com/saidsurucu/literature-review-skills",
-    "likes": 48,
-    "retweets": 7,
-    "replies": 1,
-    "views": 4502,
-    "posted_at": "2026-07-12T12:52:21.000Z",
-    "repo_ids": [
-      "saidsurucu/literature-review-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/saidsurucu/literature-review-skills"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "saidsurucu/literature-review-skills",
-        "github_url": "https://github.com/saidsurucu/literature-review-skills",
-        "skill_md_path": "literature-review/SKILL.md",
-        "name": "literature-review",
-        "description": "Use when the user wants to search or read academic literature across PubMed, OpenAlex, Crossref, Europe PMC, Semantic Scholar, arXiv, bioRxiv/medRxiv, DOAJ, DataCite, HAL, Open Library, Google Books, CORE, Unpaywall, OpenCitations, Google Scholar, Taylor & Francis (incl. Routledge journals & books), Wiley, Brill, Emerald, Scopus, or Web of Science — keyword/advanced search, read full text/PDF, or extract references — via free open APIs and by driving the user's own Chrome. Scopus & Web of Science need institutional login (Scopus via its gateway API; WoS hybrid API+DOM, anti-bot gated → returns \"challenge\"); unimplemented source×op combos return \"unsupported\".",
-        "stars": 12
-      }
-    ]
-  },
-  {
-    "tweet_id": "2077279987413983460",
-    "tweet_url": "https://x.com/AbuRasheed12/status/2077279987413983460",
-    "author_handle": "AbuRasheed12",
-    "author_name": "Abdullah Alduraibi|عبدالله رشيد الدريبي",
-    "text": "🚀 بدل أن تبحث يدويًا بين آلاف برومبتات الصور…\nهذا المشروع يفعلها عنك تلقائيًا!\nhttps://t.co/kKSt0gEZ6m\n\nAI Image Prompts Skill\nمهارة مفتوحة المصدر من YouMind OpenLab تبحث داخل مكتبة ضخمة تضم أكثر من 10,000 برومبت للصور، ثم تقترح لك أفضل النتائج مع أمثلة بصرية وإمكانية تخصيص https://t.co/IQ1bmsYfqC https://github.com/YouMind-OpenLab/ai-image-prompts-skill",
-    "likes": 28,
-    "retweets": 7,
-    "replies": 1,
-    "views": 1943,
-    "posted_at": "2026-07-15T06:31:57.000Z",
-    "repo_ids": [
-      "YouMind-OpenLab/ai-image-prompts-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/YouMind-OpenLab/ai-image-prompts-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "youmind-openlab/ai-image-prompts-skill",
-        "github_url": "https://github.com/YouMind-OpenLab/ai-image-prompts-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "ai-image-prompts-skill",
-        "description": "Recommend curated prompts from a 10,000+ real-world image generation prompt library.\nWorks with ANY AI image model — Nano Banana Pro, Nano Banana 2, Seedream 5.0, GPT Image 1.5,\nMidjourney, DALL-E 3, Flux, Stable Diffusion, and more.\n\nUse this skill when users want to:\n- Find proven image generation prompts (any model)\n- Get prompt inspiration for portraits, products, social media, posters, etc.\n- Create illustrations for articles, videos, podcasts, or marketing content\n- Browse categorized prompt templates with sample images\n- Translate and understand prompt techniques\n",
-        "stars": 485
-      }
-    ]
-  },
-  {
-    "tweet_id": "2077371687805325328",
-    "tweet_url": "https://x.com/cblatts/status/2077371687805325328",
-    "author_handle": "cblatts",
-    "author_name": "Chris Blattman",
-    "text": "Install the Oracle skill https://t.co/VsHOXnT4rs https://github.com/steipete/oracle",
-    "likes": 16,
-    "retweets": 0,
-    "replies": 1,
-    "views": 7679,
-    "posted_at": "2026-07-15T12:36:20.000Z",
-    "repo_ids": [
-      "steipete/oracle"
-    ],
-    "repo_urls": [
-      "https://github.com/steipete/oracle"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "steipete/oracle",
-        "github_url": "https://github.com/steipete/oracle",
-        "skill_md_path": "skills/oracle/SKILL.md",
-        "name": "oracle",
-        "description": "Oracle second-model review: bundle prompts/files, debug, refactor, design.",
-        "stars": 3276
-      }
-    ]
-  },
-  {
-    "tweet_id": "2077206046313968103",
-    "tweet_url": "https://x.com/leventiscrypto/status/2077206046313968103",
-    "author_handle": "leventiscrypto",
-    "author_name": "Leventis",
-    "text": "The Savings Agent on @bankrbot.\n\nJoseph is a specialized Bankr skill that monitors your trading performance and ensures you save a portion of your realized profits.\n\n@bankrbot deploy Joseph with ticker JOSEPH on Robinhood\n\nInstall this skill https://t.co/NljNOFSoir https://github.com/0xleventis/JosephAgent/blob/main/SKILL.md",
-    "likes": 4,
-    "retweets": 1,
-    "replies": 4,
-    "views": 784,
-    "posted_at": "2026-07-15T01:38:08.000Z",
-    "repo_ids": [
-      "0xleventis/JosephAgent"
-    ],
-    "repo_urls": [
-      "https://github.com/0xleventis/JosephAgent"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "0xleventis/josephagent",
-        "github_url": "https://github.com/0xleventis/JosephAgent",
-        "skill_md_path": "SKILL.md",
-        "name": "Joseph",
-        "description": "A financial discipline agent that sweeps a percentage of your trading profits to a designated savings wallet and manages community tasks.",
-        "stars": 0
-      }
-    ]
-  },
-  {
-    "tweet_id": "2075778103297601912",
-    "tweet_url": "https://x.com/QingQ77/status/2075778103297601912",
-    "author_handle": "QingQ77",
-    "author_name": "Geek Lite",
-    "text": "一个基于 Agent Skills 协议的品牌设计驱动幻灯片生成 Skill,把文章、BP、周报等内容按 62 种真实品牌设计语言生成可交付的 HTML/PPTX/PDF 演示稿。\n\nhttps://t.co/nAUMCwmtvl https://t.co/HNUjfAOARg https://github.com/SpaceZephyr/space-multi-design-ppt",
-    "likes": 4,
-    "retweets": 0,
-    "replies": 1,
-    "views": 915,
-    "posted_at": "2026-07-11T03:04:00.000Z",
-    "repo_ids": [
-      "SpaceZephyr/space-multi-design-ppt"
-    ],
-    "repo_urls": [
-      "https://github.com/SpaceZephyr/space-multi-design-ppt"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "spacezephyr/space-multi-design-ppt",
-        "github_url": "https://github.com/SpaceZephyr/space-multi-design-ppt",
-        "skill_md_path": "SKILL.md",
-        "name": "space-multi-design-ppt",
-        "description": "品牌设计风格驱动的幻灯片生成器。将用户内容智能匹配到 62 个顶级品牌设计系统（Apple、Notion、Claude、Stripe、Linear、Tesla 等），拉取真实品牌设计规范（DESIGN.md）后生成像素级还原品牌风格的 HTML 幻灯片，或用 python-pptx 原生构建可编辑 PPTX（制作前会询问用户要哪种输出）。用户要求\"做 PPT\"、\"做个 slide\"、\"生成演示文稿\"、\"design slide\"、\"用 XX 风格做幻灯片\"、\"把这篇文章做成 deck\"、\"输出 pptx\"、提到 presentation/keynote/路演/汇报材料，或发来一段内容希望变成幻灯片时，都应使用本 skill——即使用户没有提到\"品牌\"或\"设计风格\"。",
-        "stars": 56
-      }
-    ]
-  },
-  {
-    "tweet_id": "2075379284240118032",
-    "tweet_url": "https://x.com/dabit3/status/2075379284240118032",
-    "author_handle": "dabit3",
-    "author_name": "nader dabit",
-    "text": "@SOntheotherside @ThePrimeagen @cognition been experimenting with a skill for this, frontier orchestrator, lightning executor: https://t.co/kLEne8oKgB\n\nDevin Local inside the IDE supports foreground and background subagents, is there some reason why you think there will be some type of memory leak? https://github.com/dabit3/lightning-orchestrator",
-    "likes": 2,
-    "retweets": 0,
-    "replies": 1,
-    "views": 271,
-    "posted_at": "2026-07-10T00:39:14.000Z",
-    "repo_ids": [
-      "dabit3/lightning-orchestrator"
-    ],
-    "repo_urls": [
-      "https://github.com/dabit3/lightning-orchestrator"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "dabit3/lightning-orchestrator",
-        "github_url": "https://github.com/dabit3/lightning-orchestrator",
-        "skill_md_path": ".devin/skills/lightning/SKILL.md",
-        "name": "lightning",
-        "description": "Use the active model as a lean planner and reviewer while SWE-1.7 Lightning executes concrete software-engineering work.",
-        "stars": 30
-      }
-    ]
-  },
-  {
-    "tweet_id": "2078058861932507150",
-    "tweet_url": "https://x.com/shao__meng/status/2078058861932507150",
-    "author_handle": "shao__meng",
-    "author_name": "meng shao",
-    "text": "别手搓排版了，这个Skill 让 AI 直接产出杂志级信息卡！  \n\n你只管把文字丢给 AI，排版交给 infocard-skills：\nhttps://t.co/jCrTwUBZLx\n\n这是一套开源的 Agent Skill，让 AI 学会「编辑部级排版」：读入任意自然语言内容，自动判断信息密度、挑选布局骨架，按现代杂志与瑞士国际主义风格生成定版 HTML https://t.co/SxVI4VCTUH https://github.com/shaom/infocard-skills",
-    "likes": 1,
-    "retweets": 0,
-    "replies": 1,
-    "views": 338,
-    "posted_at": "2026-07-17T10:06:55.000Z",
-    "repo_ids": [
-      "shaom/infocard-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/shaom/infocard-skills"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "shaom/infocard-skills",
-        "github_url": "https://github.com/shaom/infocard-skills",
-        "skill_md_path": "skills/editorial-card-screenshot/SKILL.md",
-        "name": "editorial-card-screenshot",
-        "description": "Generate high-density editorial HTML info cards in a modern magazine and Swiss-international style, then capture them as ratio-specific screenshots. Use when the user provides text or core information and wants: (1) a complete responsive HTML info card, (2) the design to follow the stored editorial prompt, (3) output in fixed visual ratios such as 3:4, 4:3, 1:1, 16:9, 9:16, 2.35:1, 3:1, or 5:2, or (4) both HTML and a rendered PNG cover/card from the same content.",
-        "stars": 459
+        "name": "identity-skill",
+        "description": "通过分阶段参考图驱动流程创建有辨识度的个人网站：内容与风格锁定、参考图锁定、素材拆分确认、素材生成审核，然后高保真复刻与 QA。适用于用 Codex、Image 2、参考图、生成素材或高质量 image-to-code 流程制作、重设计或复刻个人网站、作品集、创作者网站、创始人网站或个人 IP 网站。",
+        "stars": 188
       }
     ]
   }
