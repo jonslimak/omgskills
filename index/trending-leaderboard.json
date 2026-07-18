@@ -203,7 +203,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 105309,
+    "stars": 105323,
     "installs": 85241,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -654,7 +654,7 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 42384,
+    "stars": 42461,
     "installs": 59549,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1875,7 +1875,7 @@
     "name": "golang-benchmark",
     "authorHandle": "samber",
     "description": "Golang benchmarking, profiling, and performance measurement. Use when writing, running, or comparing Go benchmarks, profiling hot paths with pprof, interpreting CPU/memory/trace profiles, analyzing results with benchstat, setting up CI benchmark regression detection, or investigating production performance with Prometheus runtime metrics. Also use when the developer needs deep analysis on a specific performance indicator - this skill provides the measurement methodology, while `samber/cc-skills-golang@golang-performance` provides the optimization patterns.",
-    "stars": 2451,
+    "stars": 2641,
     "installs": 33079,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2062,7 +2062,7 @@
     "name": "baoyu-post-to-wechat",
     "authorHandle": "jimliu",
     "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
-    "stars": 23785,
+    "stars": 23792,
     "installs": 31447,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
@@ -2128,7 +2128,7 @@
     "name": "orchestration",
     "authorHandle": "stablyai",
     "description": "Use Orca orchestration for structured multi-agent coordination: threaded messages, blocking ask/reply flows, task dispatch, worker_done/escalation waits, task DAGs, decision gates, coordinator loops, or decomposing work across agents. Use `orca-cli` instead for full ownership handoffs, including requests phrased as \"hand off\", \"handoff\", \"handover\", \"give this to another agent\", or \"another worktree\" when the user did not explicitly ask to supervise, monitor, wait for results, or coordinate a DAG. Use `orca-cli` for ordinary terminal control, lightweight terminal prompts, shell commands, Orca worktree management, reading or waiting on terminals, and automation of the browser embedded inside Orca. Use Computer Use for browser windows, webviews, Orca app UI, or desktop UI outside Orca's embedded browser.",
-    "stars": 21295,
+    "stars": 21346,
     "installs": 30964,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
