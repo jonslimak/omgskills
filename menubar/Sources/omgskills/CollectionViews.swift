@@ -1,5 +1,46 @@
 import SwiftUI
 
+struct CollectionsIndexView: View {
+    let collections: [SkillCollection]
+    let onOpen: (SkillCollection) -> Void
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Collections")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+
+                if collections.isEmpty {
+                    VStack(spacing: 8) {
+                        Image(systemName: "square.grid.2x2")
+                            .font(.title2)
+                            .foregroundStyle(.tertiary)
+                        Text("No collections available")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+                    .accessibilityElement(children: .combine)
+                } else {
+                    LazyVStack(spacing: 0) {
+                        ForEach(collections) { collection in
+                            CollectionCard(collection: collection) {
+                                onOpen(collection)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 18)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+        }
+        .scrollIndicators(.never)
+    }
+}
+
 struct CollectionCard: View {
     let collection: SkillCollection
     let onOpen: () -> Void

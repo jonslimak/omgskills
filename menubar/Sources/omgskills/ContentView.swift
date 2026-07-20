@@ -186,6 +186,7 @@ struct ContentView: View {
     @State private var isApplyingCreatorFilter = false
     @State private var isApplyingCollectionSelection = false
     @State private var isApplyingCollectionQuery = false
+    @State private var isCollectionsIndexPresented = false
     @State private var lastTrackedSearchQuery = ""
     @State private var lastTrackedSearchErrorKey = ""
     @State private var lastTrackedOpenedSkillId = ""
@@ -233,7 +234,7 @@ struct ContentView: View {
             StarterSearch("MCP server", symbol: "server.rack"),
             StarterSearch("Deep research", symbol: "doc.text.magnifyingglass"),
             StarterSearch("Humanizer", symbol: "person.crop.circle.badge.checkmark"),
-            StarterSearch("Slides", symbol: "rectangle.on.rectangle"),
+            StarterSearch("Deck", symbol: "rectangle.on.rectangle"),
             StarterSearch("PDF", symbol: "doc.text"),
             StarterSearch("Excel", symbol: "tablecells")
         ])
@@ -396,6 +397,7 @@ struct ContentView: View {
             showDataUpdatedFooter = false
         }
         .task(id: query) {
+            guard !isCollectionsIndexPresented else { return }
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 debouncedQuery = query
                 refreshResults(selectFirst: shouldSelectFirstResult)
@@ -437,6 +439,7 @@ struct ContentView: View {
         }
         .onChange(of: query) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
+            guard !isCollectionsIndexPresented else { return }
             if isApplyingCollectionQuery {
                 isApplyingCollectionQuery = false
             } else if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -552,7 +555,7 @@ struct ContentView: View {
                     .help("Sort: \(sortKey.label)")
                 }
 
-                if source == .twitter || source == .trending {
+                if source == .twitter || source == .trending || isCollectionsIndexPresented {
                     Button {
                         resetToDefaultOpenState()
                         postDetailVisibility(false)
@@ -592,7 +595,15 @@ struct ContentView: View {
 
                 HStack(spacing: 2) {
                     ForEach(toolbarSources) { s in
-                        Button { source = s } label: {
+                        Button {
+                            if isCollectionsIndexPresented && s == .available {
+                                resetToDefaultOpenState()
+                                postDetailVisibility(false)
+                            } else {
+                                isCollectionsIndexPresented = false
+                                source = s
+                            }
+                        } label: {
                             Image(systemName: sourceIcon(s))
                                 .font(.system(size: 11))
                                 .padding(.horizontal, 7)
@@ -613,7 +624,7 @@ struct ContentView: View {
     }
 
     private var shouldShowSortMenu: Bool {
-        !visibleResultsAreEmpty
+        !isCollectionsIndexPresented && !visibleResultsAreEmpty
     }
 
     private var shouldSelectFirstResult: Bool {
@@ -670,8 +681,6 @@ struct ContentView: View {
     private var masterDetail: some View {
         if let err = currentLoadError {
             errorView(err)
-        } else if shouldShowStarterSearches {
-            starterSearchesView
         } else if let collection = selectedCollection {
             if shouldShowDetailPanel {
                 HStack(spacing: 0) {
@@ -684,6 +693,15 @@ struct ContentView: View {
             } else {
                 collectionPage(collection)
             }
+        } else if isCollectionsIndexPresented {
+            CollectionsIndexView(
+                collections: store.collections,
+                onOpen: { collection in
+                    selectCollection(collection)
+                }
+            )
+        } else if shouldShowStarterSearches {
+            starterSearchesView
         } else if shouldShowLocalDashboard {
             if shouldShowDetailPanel {
                 HStack(spacing: 0) {
@@ -744,6 +762,7 @@ struct ContentView: View {
     }
 
     private var shouldShowStarterSearches: Bool {
+        !isCollectionsIndexPresented &&
         source == .available &&
         query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         activeCollectionListId == nil &&
@@ -778,6 +797,7 @@ struct ContentView: View {
                         .foregroundStyle(.tertiary)
                     HStack(alignment: .top, spacing: 8) {
                         trendingStarterButton("Twitter / X", icon: "chart.line.uptrend.xyaxis", action: showTwitterSkills)
+                        trendingStarterButton("Collections", icon: "square.grid.2x2", action: showCollections)
                     }
                 }
 
@@ -1983,6 +2003,7 @@ struct ContentView: View {
     }
 
     private func runStarterSearch(_ term: String) {
+        isCollectionsIndexPresented = false
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
@@ -1996,6 +2017,7 @@ struct ContentView: View {
     }
 
     private func showTrendingSkills() {
+        isCollectionsIndexPresented = false
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
@@ -2010,6 +2032,7 @@ struct ContentView: View {
     }
 
     private func showTwitterSkills() {
+        isCollectionsIndexPresented = false
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
@@ -2021,6 +2044,21 @@ struct ContentView: View {
         debouncedQuery = ""
         refreshResults(selectFirst: true)
         searchFocused = true
+    }
+
+    private func showCollections() {
+        selectedCreatorHandle = nil
+        selectedCollectionId = nil
+        activeCollectionListId = nil
+        localDashboardFilter = nil
+        showDetail = false
+        query = ""
+        debouncedQuery = ""
+        clearSelection()
+        isCollectionsIndexPresented = true
+        source = .available
+        sortKey = .stars
+        searchFocused = false
     }
 
     private func closePopover() {
@@ -2136,6 +2174,7 @@ struct ContentView: View {
     private func resetToDefaultOpenState() {
         isRestoringSession = true
         suppressSessionChangeHandlers = true
+        isCollectionsIndexPresented = false
         query = ""
         selectedCreatorHandle = nil
         selectedCollectionId = nil
@@ -2180,6 +2219,7 @@ struct ContentView: View {
         let handle = normalizedCreatorHandle(rawHandle)
         guard !handle.isEmpty else { return }
 
+        isCollectionsIndexPresented = false
         selectedCollectionId = nil
         activeCollectionListId = nil
         if source != .installed {
@@ -2244,6 +2284,7 @@ struct ContentView: View {
                 filterByCreator(authorHandle)
             }
         case .topic:
+            isCollectionsIndexPresented = false
             selectedCollectionId = nil
             activeCollectionListId = collection.id
             selectedCreatorHandle = nil
@@ -2285,6 +2326,7 @@ struct ContentView: View {
     }
 
     private func closeCollectionPage() {
+        let returnsToCollectionsIndex = isCollectionsIndexPresented
         selectedCollectionId = nil
         activeCollectionListId = nil
         selectedCreatorHandle = nil
@@ -2292,11 +2334,23 @@ struct ContentView: View {
         debouncedQuery = ""
         showDetail = false
         clearSelection()
-        resetResultsForStarterState()
-        searchFocused = true
+        if returnsToCollectionsIndex {
+            cachedResults = []
+            cachedInstalledResults = []
+            searchFocused = false
+        } else {
+            resetResultsForStarterState()
+            searchFocused = true
+        }
     }
 
     private func refreshResults(selectFirst: Bool) {
+        if isCollectionsIndexPresented {
+            cachedResults = []
+            cachedInstalledResults = []
+            return
+        }
+
         if selectedCollectionId != nil {
             cachedResults = []
             cachedInstalledResults = []
