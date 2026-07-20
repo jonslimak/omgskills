@@ -75,9 +75,9 @@ const pages = [
     canonical: "https://omgskills.com/skills/obra/superpowers/systematic-debugging/",
     text: "systematic-debugging",
     allowNoindex: true,
-    githubAuthor: {
+    profileAuthor: {
       handle: "obra",
-      url: "https://github.com/obra",
+      path: "/library/obra/",
     },
   },
   {
