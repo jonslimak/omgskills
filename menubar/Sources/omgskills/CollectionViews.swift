@@ -4,6 +4,11 @@ struct CollectionsIndexView: View {
     let collections: [SkillCollection]
     let onOpen: (SkillCollection) -> Void
 
+    private let columns = [
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8)
+    ]
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -24,7 +29,7 @@ struct CollectionsIndexView: View {
                     .padding(.vertical, 40)
                     .accessibilityElement(children: .combine)
                 } else {
-                    LazyVStack(spacing: 0) {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 5) {
                         ForEach(collections) { collection in
                             CollectionCard(collection: collection) {
                                 onOpen(collection)
