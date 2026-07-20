@@ -6,12 +6,14 @@ import {
   catalogSkillUrlEntries,
   catalogSkillUrlsFilename,
 } from "./web-library-skill-urls.mjs";
+import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const isLive = process.argv.includes("--live");
 const liveFetchAttempts = 3;
+const livePageHtmlByPath = new Map();
 
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -82,8 +84,7 @@ const pages = [
     path: "/skills/openai/codex/code-review-change-size/",
     canonical: "https://omgskills.com/skills/openai/codex/code-review-change-size/",
     text: "code-review-change-size",
-    noindex: true,
-    expectSitemap: false,
+    allowNoindex: true,
   },
   {
     path: "/skills/",
@@ -296,13 +297,13 @@ async function verifyLocalSitemap() {
 
   const sitemap = await localSitemapContents(sitemapPath);
   for (const page of pages) {
-    if (page.allowNoindex) continue;
-    const loc = `<loc>${page.canonical}</loc>`;
-    if (page.expectSitemap === false) {
-      assertNotIncludes(sitemap, loc, sitemapPath);
-    } else {
-      assertIncludes(sitemap, loc, sitemapPath);
-    }
+    const pagePath = localPathForUrlPath(path.posix.join(page.path, "index.html"));
+    assertIndexStateMatchesSitemap({
+      html: await readFile(pagePath, "utf8"),
+      sitemap,
+      canonical: page.canonical,
+      label: sitemapPath,
+    });
   }
   assertIncludes(sitemap, "<lastmod>", sitemapPath);
 }
@@ -350,6 +351,7 @@ async function verifyLivePage(page) {
   }
 
   const html = await response.text();
+  livePageHtmlByPath.set(page.path, html);
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, url);
   assertIncludes(html, page.text, url);
   verifyMetadata(html, page, url);
@@ -365,13 +367,14 @@ async function verifyLiveSitemap() {
 
   const sitemap = await liveSitemapContents(url, await response.text());
   for (const page of pages) {
-    if (page.allowNoindex) continue;
-    const loc = `<loc>${page.canonical}</loc>`;
-    if (page.expectSitemap === false) {
-      assertNotIncludes(sitemap, loc, url);
-    } else {
-      assertIncludes(sitemap, loc, url);
-    }
+    const html = livePageHtmlByPath.get(page.path);
+    if (!html) throw new Error(`Missing fetched page content for ${origin}${page.path}`);
+    assertIndexStateMatchesSitemap({
+      html,
+      sitemap,
+      canonical: page.canonical,
+      label: url,
+    });
   }
   assertIncludes(sitemap, "<lastmod>", url);
 }
