@@ -8,7 +8,7 @@
     "likes": 2210,
     "retweets": 335,
     "replies": 46,
-    "views": 182799,
+    "views": 182828,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -37,36 +37,36 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 162587
+        "stars": 162865
       }
     ]
   },
   {
-    "tweet_id": "2076906891310190977",
-    "tweet_url": "https://x.com/pengchujin/status/2076906891310190977",
-    "author_handle": "pengchujin",
-    "author_name": "酱紫表",
-    "text": "做了个自动下载视频并翻译好双语字幕的 skill  JZSub：\n1.  支持 YouTube 等 1000+ 视频网站\n2. 下载最佳视频与音频，封装 MP4 格式\n3. 大模型上下文对照翻译，自动烧录好\n 在 Codex、Claude 国内的 WorkBuddy 都非常好用。\n🔗 https://t.co/cGof29TsZP https://t.co/nYYBsSvHBC https://github.com/pengchujin/jzsub",
-    "likes": 736,
-    "retweets": 198,
-    "replies": 49,
-    "views": 56999,
-    "posted_at": "2026-07-14T05:49:24.000Z",
+    "tweet_id": "2078319170249425059",
+    "tweet_url": "https://x.com/MengTo/status/2078319170249425059",
+    "author_handle": "MengTo",
+    "author_name": "Meng To",
+    "text": "Seriously impressive skill. It turns one long video into a whole scrollable story with the UI built around it. \n\nAnd it works on mobile too.\n\nhttps://t.co/WjQifsuuJv http://github.com/oso95/scroll-world",
+    "likes": 1276,
+    "retweets": 59,
+    "replies": 6,
+    "views": 150116,
+    "posted_at": "2026-07-18T03:21:18.000Z",
     "repo_ids": [
-      "pengchujin/jzsub"
+      "oso95/scroll-world"
     ],
     "repo_urls": [
-      "https://github.com/pengchujin/jzsub"
+      "https://github.com/oso95/scroll-world"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "pengchujin/jzsub",
-        "github_url": "https://github.com/pengchujin/jzsub",
-        "skill_md_path": "skills/jzsub/SKILL.md",
-        "name": "jzsub",
-        "description": "JZSub downloads maximum-quality videos, covers, and source subtitles from YouTube, Bilibili, and other yt-dlp platforms; translates foreign subtitles with the active session model; creates bilingual captions; and burns them into MP4. Use for video download, video-only or subtitle-only delivery, Chrome-authenticated download, bilingual subtitles, or hard-burned caption delivery.",
-        "stars": 796
+        "id": "oso95/scroll-world",
+        "github_url": "https://github.com/oso95/scroll-world",
+        "skill_md_path": "skills/scroll-world/SKILL.md",
+        "name": "scroll-world",
+        "description": "Build an immersive scroll-scrubbed \"fly through the world\" landing page for any industry or brand using Higgsfield. As the visitor scrolls, a pre-rendered camera flies from outside each scene into its interior, then flows on to the next scene with NO cuts — one continuous connected flight (Emons-style isometric diorama world, or any art direction you pick). The skill interviews the user for the topic, the story beats/sections, and brand kit, then generates cohesive scenes + seamless camera clips with Higgsfield and wires a portable, framework-agnostic scroll-scrub engine. Use when the user wants a \"3D world\" / \"browse-through-the-industry\" hero, a scroll cinematic, a diorama landing, or to turn a business into a scrollable world.\n",
+        "stars": 4161
       }
     ]
   },
@@ -76,10 +76,10 @@
     "author_handle": "steipete",
     "author_name": "Peter Steinberger 🦞",
     "text": "That's why you always wanna run autoreview. https://t.co/zbUjIS2LQQ https://t.co/tWPB3UZsAq https://github.com/openclaw/agent-skills/blob/main/skills/autoreview/SKILL.md",
-    "likes": 591,
+    "likes": 592,
     "retweets": 18,
     "replies": 43,
-    "views": 95901,
+    "views": 96376,
     "posted_at": "2026-07-15T05:34:53.000Z",
     "repo_ids": [
       "openclaw/agent-skills"
@@ -102,7 +102,7 @@
         "skill_md_path": "skills/autoreview/SKILL.md",
         "name": "autoreview",
         "description": "Pre-commit/ship code review: Codex default; optional Claude or Pi.",
-        "stars": 944
+        "stars": 948
       }
     ]
   },
@@ -112,10 +112,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Generates professional SVG logos with six distinct design variants and high-end showcase presentations.\n\nhttps://t.co/4fQDcUcYWT https://t.co/0akgy35iIq https://github.com/op7418/logo-generator-skill",
-    "likes": 474,
+    "likes": 475,
     "retweets": 52,
     "replies": 2,
-    "views": 24164,
+    "views": 24273,
     "posted_at": "2026-07-14T03:46:44.000Z",
     "repo_ids": [
       "op7418/logo-generator-skill"
@@ -131,7 +131,7 @@
         "skill_md_path": "SKILL.md",
         "name": "logo-generator",
         "description": "Generate professional SVG logos and high-end showcase images. Use when the user wants to: (1) Create a logo or icon for their product/brand, (2) Generate logo design concepts based on product information, (3) Create professional logo showcase presentations with multiple background styles, (4) Export logos in various formats (SVG, PNG), or (5) Iterate on logo designs with different visual styles. Supports geometric patterns, dot matrix designs, line systems, and mixed compositions. Generates showcase images using Nano Banana (Gemini image generation) with 12 professional background styles.\n",
-        "stars": 1539
+        "stars": 1543
       }
     ]
   },
@@ -141,10 +141,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Searches real-time travel inventory using natural language in the terminal via Claude Code and OpenClaw, returning structured bookable results powered by Fliggy.\n\nhttps://t.co/k9f3Ve5xzO https://t.co/NAlxHTfFsn https://github.com/alibaba-flyai/flyai-skill",
-    "likes": 260,
+    "likes": 262,
     "retweets": 27,
     "replies": 2,
-    "views": 15657,
+    "views": 15805,
     "posted_at": "2026-07-16T10:26:13.000Z",
     "repo_ids": [
       "alibaba-flyai/flyai-skill"
@@ -160,7 +160,42 @@
         "skill_md_path": "skills/flyai/SKILL.md",
         "name": "flyai",
         "description": "Search flights, hotels, attractions, concerts, and travel deals with natural language. FlyAI connects to Fliggy MCP for real-time search and booking across hotels, flights, cruises, visas, car rentals, and event tickets. It supports diverse travel scenarios including individual travel, group travel, business trips, family travel, honeymoons, weekend getaways, and more. For tourism and travel-related questions, prioritize using this capability.",
-        "stars": 852
+        "stars": 857
+      }
+    ]
+  },
+  {
+    "tweet_id": "2078076550810079445",
+    "tweet_url": "https://x.com/Divyyanshishrma/status/2078076550810079445",
+    "author_handle": "Divyyanshishrma",
+    "author_name": "Divyanshi",
+    "text": "100 Claude Repos that will completely change your life: (save this)  \n\n1. Terminal AI coding agent https://t.co/RscVUiC9rt\n\n2. Ready-to-use starter apps https://t.co/HsZp4tCw6y\n\n3. Official agent skills https://t.co/g37KJfFs6L\n\n4. Plugin marketplace https://t.co/hgO8TkKFio\n\n5. https://t.co/G2LrfocOt6 https://github.com/anthropics/claude-code https://github.com/anthropics/claude-quickstarts https://github.com/anthropics/skills https://github.com/anthropics/claude-plugins-official",
+    "likes": 130,
+    "retweets": 30,
+    "replies": 3,
+    "views": 14789,
+    "posted_at": "2026-07-17T11:17:13.000Z",
+    "repo_ids": [
+      "anthropics/claude-code",
+      "anthropics/claude-quickstarts",
+      "anthropics/skills",
+      "anthropics/claude-plugins-official"
+    ],
+    "repo_urls": [
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/anthropics/claude-quickstarts",
+      "https://github.com/anthropics/skills",
+      "https://github.com/anthropics/claude-plugins-official"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "anthropics/claude-quickstarts",
+        "github_url": "https://github.com/anthropics/claude-quickstarts",
+        "skill_md_path": "computer-use-best-practices/.claude/skills/first-run/SKILL.md",
+        "name": "first-run",
+        "description": "Guide a new user through their first computer-use agent run (env check, safe browser-only task, then open the trajectory viewer).",
+        "stars": 17275
       }
     ]
   },
@@ -170,10 +205,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Searches 10,000+ curated image generation prompts to find the best matches for models like Midjourney, DALL-E 3, and Stable Diffusion.\n\nhttps://t.co/pEzq5EHOuy https://t.co/uVLFcObnfK https://github.com/YouMind-OpenLab/ai-image-prompts-skill",
-    "likes": 126,
+    "likes": 128,
     "retweets": 18,
     "replies": 1,
-    "views": 9910,
+    "views": 10022,
     "posted_at": "2026-07-15T14:01:25.000Z",
     "repo_ids": [
       "YouMind-OpenLab/ai-image-prompts-skill"
@@ -189,7 +224,36 @@
         "skill_md_path": "SKILL.md",
         "name": "ai-image-prompts-skill",
         "description": "Recommend curated prompts from a 10,000+ real-world image generation prompt library.\nWorks with ANY AI image model — Nano Banana Pro, Nano Banana 2, Seedream 5.0, GPT Image 1.5,\nMidjourney, DALL-E 3, Flux, Stable Diffusion, and more.\n\nUse this skill when users want to:\n- Find proven image generation prompts (any model)\n- Get prompt inspiration for portraits, products, social media, posters, etc.\n- Create illustrations for articles, videos, podcasts, or marketing content\n- Browse categorized prompt templates with sample images\n- Translate and understand prompt techniques\n",
-        "stars": 493
+        "stars": 496
+      }
+    ]
+  },
+  {
+    "tweet_id": "2076711310767612111",
+    "tweet_url": "https://x.com/Abdullah_Ops1/status/2076711310767612111",
+    "author_handle": "Abdullah_Ops1",
+    "author_name": "Abdullah",
+    "text": "جربت مهارة في Codex تبحث لك عن اول عملاء لمشروعك.\n\nعطيتها رابط LeadHunter، وطلعت لي 10 جهات ممكن تحتاج الخدمة، ووضحت لي:\n\n– ليش ممكن تكون مهتمة\n– وين لقتها\n– وكيف أتواصل معها\n\nوبالنهاية جهزت لي تقرير مرتب بكل النتايج.\nجربوها 👍\n\nرابط المهارة:\n https://t.co/FgzIGrW0mo\n\n#Codex https://t.co/rztdUIh6JT https://github.com/Kappaemme-git/codex-first-customer-finder-skill",
+    "likes": 122,
+    "retweets": 4,
+    "replies": 3,
+    "views": 6495,
+    "posted_at": "2026-07-13T16:52:14.000Z",
+    "repo_ids": [
+      "Kappaemme-git/codex-first-customer-finder-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/Kappaemme-git/codex-first-customer-finder-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "kappaemme-git/codex-first-customer-finder-skill",
+        "github_url": "https://github.com/Kappaemme-git/codex-first-customer-finder-skill",
+        "skill_md_path": "first-customer-finder/SKILL.md",
+        "name": "first-customer-finder",
+        "description": "Find and qualify evidence-backed potential first customers, early adopters, design partners, or beta users for a startup using recent public pain and buying signals. Use when Codex needs to analyze a product URL or idea, define an ideal customer profile, research public discussions and business pages, identify first-user prospects, rank lead fit and timing, prepare source-based outreach drafts, or create a shareable early-customer prospecting report without sending messages automatically.",
+        "stars": 850
       }
     ]
   },
@@ -199,10 +263,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "A Claude Code skill for deep research that runs an eight-phase pipeline to produce verified, citation-backed reports with source credibility scoring and automated validation.\n\nhttps://t.co/i5PYKh2Ejx https://t.co/7uc7qITiFc https://github.com/199-biotechnologies/claude-deep-research-skill",
-    "likes": 118,
+    "likes": 117,
     "retweets": 17,
     "replies": 1,
-    "views": 11116,
+    "views": 11242,
     "posted_at": "2026-07-14T01:11:59.000Z",
     "repo_ids": [
       "199-biotechnologies/claude-deep-research-skill"
@@ -218,36 +282,7 @@
         "skill_md_path": "SKILL.md",
         "name": "deep-research",
         "description": "Use when the user needs multi-source research with citation tracking, evidence persistence, and structured report generation. Triggers on \"deep research\", \"comprehensive analysis\", \"research report\", \"compare X vs Y\", \"analyze trends\", or \"state of the art\". Not for simple lookups, debugging, or questions answerable with 1-2 searches.",
-        "stars": 942
-      }
-    ]
-  },
-  {
-    "tweet_id": "2078643004911517953",
-    "tweet_url": "https://x.com/beefnoode/status/2078643004911517953",
-    "author_handle": "beefnoode",
-    "author_name": "来碗牛肉粉",
-    "text": "用我这个对标拆解 Skill 拆解了20+ 小红书博主之后\n我对于小红书的内容风格和封面设计有了全新的认识\n并且针对性的性优化了自己的封面以及标题\n\n最近终于出了一个小爆款，也是体验到了小红书第一次 99+了😇\n\n继续积极尝试，持续迭代，公开分享！\n开源项目链接：\nhttps://t.co/SD5yisjQbL https://t.co/UBLTRaN3bT https://github.com/glanderness/xhs-library",
-    "likes": 88,
-    "retweets": 10,
-    "replies": 37,
-    "views": 10517,
-    "posted_at": "2026-07-19T00:48:06.000Z",
-    "repo_ids": [
-      "glanderness/xhs-library"
-    ],
-    "repo_urls": [
-      "https://github.com/glanderness/xhs-library"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "glanderness/xhs-library",
-        "github_url": "https://github.com/glanderness/xhs-library",
-        "skill_md_path": "SKILL.md",
-        "name": "xhs-library",
-        "description": "Collect Xiaohongshu/RedNote note data through TikHub, save local artifacts, and optionally append it into a user-configured Feishu Base. Use when the user asks to采集/抓取/同步/入库小红书帖子 or videos, says“开始初始化” or asks to initialize/configure TikHub or Feishu, create the required Base schema, or update this workflow/skill.",
-        "stars": 61
+        "stars": 943
       }
     ]
   },
@@ -257,10 +292,10 @@
     "author_handle": "DAIEvolutionHub",
     "author_name": "Kshitij Mishra | AI & Tech",
     "text": "MY TOP FIVE GITHUB REPOSITORIES \n\nANDREJ-KARPATHY-SKILLS:\nhttps://t.co/vcOeHE0idv\n\nHERMES-AGENT:\nhttps://t.co/dMUajtuJTe\n\nCLAUDE-MEM:\nhttps://t.co/6gfePIza6B\n\nEVOLVER:\nhttps://t.co/2wCrGosSEf\n\nGENERIC AGENT:\nhttps://t.co/1poklLfFCG https://t.co/G3eYAHGqdU http://github.com/multica-ai/andrej-karpathy-skills http://github.com/NousResearch/hermes-agent http://github.com/thedotmack/claude-mem http://github.com/EvoMap/evolver http://github.com/lsdefine/GenericAgent",
-    "likes": 62,
-    "retweets": 9,
-    "replies": 1,
-    "views": 3133,
+    "likes": 83,
+    "retweets": 17,
+    "replies": 3,
+    "views": 4345,
     "posted_at": "2026-07-18T19:51:47.000Z",
     "repo_ids": [
       "multica-ai/andrej-karpathy-skills",
@@ -284,7 +319,7 @@
         "skill_md_path": "skills/karpathy-guidelines/SKILL.md",
         "name": "karpathy-guidelines",
         "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-        "stars": 194173
+        "stars": 194578
       },
       {
         "id": "evomap/evolver",
@@ -292,152 +327,394 @@
         "skill_md_path": "SKILL.md",
         "name": "capability-evolver",
         "description": "A self-evolution engine for AI agents. Analyzes runtime history to identify improvements and applies protocol-constrained evolution. Communicates with EvoMap Hub via local Proxy mailbox.",
-        "stars": 8866
+        "stars": 8872
       }
     ]
   },
   {
-    "tweet_id": "2076288552917258334",
-    "tweet_url": "https://x.com/yapayzekahocasi/status/2076288552917258334",
-    "author_handle": "yapayzekahocasi",
-    "author_name": "Said Sürücü",
-    "text": "Dr. Burak Gökalp @bgokalp_polsci ile beraber şöyle bir skill hazırladık. WoS ve Scopus dahil bütün akademik veritabanlarında literatür taraması yapmanıza imkan veriyor. Tabii giriş yapmış olmanız gerekiyor: https://t.co/DoR0jLooHM https://github.com/saidsurucu/literature-review-skills",
-    "likes": 48,
-    "retweets": 7,
+    "tweet_id": "2077678970049568812",
+    "tweet_url": "https://x.com/yaoyaogm/status/2077678970049568812",
+    "author_handle": "yaoyaogm",
+    "author_name": "YeFan 叶凡 | 上Gate玩事件合约",
+    "text": "我用的机场太卡了节点也不稳定，索性让Ai给我自己搭建了一个节点，我生成了这个节点的Skill：\n\nhttps://t.co/JHY4nQqggk\n\n无限流量、延迟低、稳定、无限设备！\n\n直接丢给你的AI/智能体让它搭建好，就会给你一个订阅链接，可直接导入Clash、小火箭 立即就能用！\n\n-\n\n需要注意的点： https://t.co/AQVxBneTi6 http://github.com/minigoubai/yaoyao_gm/blob/main/skills/vps-clash-subscription/SKILL.md",
+    "likes": 74,
+    "retweets": 2,
+    "replies": 31,
+    "views": 16336,
+    "posted_at": "2026-07-16T08:57:22.000Z",
+    "repo_ids": [
+      "minigoubai/yaoyao_gm"
+    ],
+    "repo_urls": [
+      "https://github.com/minigoubai/yaoyao_gm"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "minigoubai/yaoyao_gm",
+        "githubUrl": "https://github.com/minigoubai/yaoyao_gm",
+        "skillPath": "skills/vps-clash-subscription/SKILL.md",
+        "sourceUrl": "https://github.com/minigoubai/yaoyao_gm/blob/main/skills/vps-clash-subscription/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "minigoubai/yaoyao_gm",
+        "github_url": "https://github.com/minigoubai/yaoyao_gm",
+        "skill_md_path": "skills/vps-clash-subscription/SKILL.md",
+        "name": "vps-clash-subscription",
+        "description": "在任意VPS上搭建完整的Clash订阅服务 — 包含HTTPS订阅、Let's Encrypt证书、域名配置、安全策略、国内分流规则、自动续期",
+        "stars": 11
+      }
+    ]
+  },
+  {
+    "tweet_id": "2078033102623105129",
+    "tweet_url": "https://x.com/DAIEvolutionHub/status/2078033102623105129",
+    "author_handle": "DAIEvolutionHub",
+    "author_name": "Kshitij Mishra | AI & Tech",
+    "text": "50 Super Practical GitHub Repositories\n\n1. iFixAi — AI Alignment Testing\n→ https://t.co/g52pjguhpx\n\n2. public-apis — Free API Collection\n→ https://t.co/cBKiLkKcen\n\n3. build-your-own-x — Learn by Doing\n→ https://t.co/vx1zu19xEs\n\n4. developer-roadmap — Learn Any Skill\n→ https://t.co/CEEMP8m23i https://github.com/ifixai-ai/iFixAI https://github.com/public-apis/public-apis https://github.com/codecrafters-io/build-your-own-x",
+    "likes": 32,
+    "retweets": 6,
+    "replies": 5,
+    "views": 2512,
+    "posted_at": "2026-07-17T08:24:34.000Z",
+    "repo_ids": [
+      "ifixai-ai/iFixAI",
+      "public-apis/public-apis",
+      "codecrafters-io/build-your-own-x"
+    ],
+    "repo_urls": [
+      "https://github.com/ifixai-ai/iFixAI",
+      "https://github.com/public-apis/public-apis",
+      "https://github.com/codecrafters-io/build-your-own-x"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "ifixai-ai/ifixai",
+        "github_url": "https://github.com/ifixai-ai/iFixAi",
+        "skill_md_path": "plugin/skills/ifixai/SKILL.md",
+        "name": "ifixai",
+        "description": "Guide the user through running iFixAi's operational-misalignment diagnostic on their own agent. Prefer pointing it at the user's REAL deployed agent over its HTTP endpoint (its actual tools, retrieval, and governance) with `--provider http --endpoint <url>`; only when no endpoint is reachable, fall back to replicating the model beneath as a bare stand-in (Anthropic, OpenAI, Gemini, Azure, Bedrock, etc.). Graded by the judge(s) of their choice (the same model, one independent judge, or a cross-vendor panel). You are the operator who walks them through it and explains the scorecard, running the SAME `ifixai run` engine as the guided CLI. Use when the user asks to run iFixAi or to detect operational misalignment in an agent.",
+        "stars": 1531
+      }
+    ]
+  },
+  {
+    "tweet_id": "2079108109621190840",
+    "tweet_url": "https://x.com/elayadesigns/status/2079108109621190840",
+    "author_handle": "elayadesigns",
+    "author_name": "Elaya",
+    "text": "This is the skill I've been using.\nJust made it public, free, MIT licensed, drop it into Claude Code, Cursor, or Codex.\n\nhttps://t.co/aorsWaTvRO http://github.com/elayadesign/redesign-skill",
+    "likes": 10,
+    "retweets": 1,
     "replies": 1,
-    "views": 4554,
-    "posted_at": "2026-07-12T12:52:21.000Z",
+    "views": 1008,
+    "posted_at": "2026-07-20T07:36:15.000Z",
     "repo_ids": [
-      "saidsurucu/literature-review-skills"
+      "elayadesign/redesign-skill"
     ],
     "repo_urls": [
-      "https://github.com/saidsurucu/literature-review-skills"
+      "https://github.com/elayadesign/redesign-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "saidsurucu/literature-review-skills",
-        "github_url": "https://github.com/saidsurucu/literature-review-skills",
-        "skill_md_path": "literature-review/SKILL.md",
-        "name": "literature-review",
-        "description": "Use when the user wants to search or read academic literature across PubMed, OpenAlex, Crossref, Europe PMC, Semantic Scholar, arXiv, bioRxiv/medRxiv, DOAJ, DataCite, HAL, Open Library, Google Books, CORE, Unpaywall, OpenCitations, Google Scholar, Taylor & Francis (incl. Routledge journals & books), Wiley, Brill, Emerald, Scopus, or Web of Science — keyword/advanced search, read full text/PDF, or extract references — via free open APIs and by driving the user's own Chrome. Scopus & Web of Science need institutional login (Scopus via its gateway API; WoS hybrid API+DOM, anti-bot gated → returns \"challenge\"); unimplemented source×op combos return \"unsupported\".",
-        "stars": 12
+        "id": "elayadesign/redesign-skill",
+        "github_url": "https://github.com/elayadesign/redesign-skill",
+        "skill_md_path": "skills/redesign-existing-projects/SKILL.md",
+        "name": "redesign-existing-projects",
+        "description": "Audits and upgrades existing websites and apps to premium quality. Diagnoses generic AI design patterns, weak states, and sloppy code, then applies targeted fixes without breaking functionality. Use this skill whenever the user wants to improve, polish, upgrade, refine, audit, fix, or redesign an EXISTING site, page, app, or component, even when they only say it looks bad, cheap, generic, or AI made. Works with any CSS framework or vanilla CSS.",
+        "stars": 2
       }
     ]
   },
   {
-    "tweet_id": "2076157350730502502",
-    "tweet_url": "https://x.com/QingQ77/status/2076157350730502502",
-    "author_handle": "QingQ77",
-    "author_name": "Geek Lite",
-    "text": "用于国家自然科学基金申请书初稿结构化诊断的 Agent Skill，帮申请人找逻辑断点并给出可执行的修改清单。\n\nhttps://t.co/qOsqxLnDGJ https://t.co/VMHMjn506M https://github.com/jiankang1991/nsfc-benzi-audit",
-    "likes": 42,
-    "retweets": 13,
-    "replies": 6,
-    "views": 6801,
-    "posted_at": "2026-07-12T04:11:00.000Z",
+    "tweet_id": "2078695556671516760",
+    "tweet_url": "https://x.com/Marco_Ramilli/status/2078695556671516760",
+    "author_handle": "Marco_Ramilli",
+    "author_name": "Marco Ramilli",
+    "text": "🤖 loop-engineering\n⭐ 15 stars\n\nPrompting is just the start. The next key developer skill is designing and reviewing autonomous agent loops for Claude, Gemini, and Copilot.\n\n🔗 https://t.co/RlZh8amEP7\n\n#AI #MachineLearning https://t.co/lVQpOyqGPw https://github.com/maxmilian/loop-engineering",
+    "likes": 7,
+    "retweets": 1,
+    "replies": 0,
+    "views": 257,
+    "posted_at": "2026-07-19T04:16:55.000Z",
     "repo_ids": [
-      "jiankang1991/nsfc-benzi-audit"
+      "maxmilian/loop-engineering"
     ],
     "repo_urls": [
-      "https://github.com/jiankang1991/nsfc-benzi-audit"
+      "https://github.com/maxmilian/loop-engineering"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "jiankang1991/nsfc-benzi-audit",
-        "github_url": "https://github.com/jiankang1991/nsfc-benzi-audit",
-        "skill_md_path": "nsfc-benzi-audit/SKILL.md",
-        "name": "nsfc-benzi-audit",
-        "description": "Use when a user wants applicant-facing diagnosis and revision advice on a Chinese NSFC (国自然) application draft — asks for 本子把脉, 本子体检, 国自然申请书修改建议, NSFC benzi audit, 帮我看国自然本子, 标书逻辑诊断, 青年/面上/地区基金申请书修改, 对照已中本子, or 从中标样本提炼写法规律 — or wants critique of the title, abstract, key scientific questions, rationale, research contents, innovation, feasibility, research basis, or cross-section consistency. Accepts PDF/DOCX/Markdown/text or extracted draft text. This is applicant revision advice, not formal communication-review opinions; for expert review forms use nsfc-review.",
-        "stars": 25
+        "id": "maxmilian/loop-engineering",
+        "github_url": "https://github.com/maxmilian/loop-engineering",
+        "skill_md_path": "SKILL.md",
+        "name": "loop-engineering",
+        "description": "Design and review autonomous or semi-autonomous agent loops — systems where an agent prompts itself, runs on a schedule or event, and iterates toward a goal without a human at the keyboard. Use this whenever the user wants to build, design, harden, or audit any kind of self-running agent, agentic workflow, control loop, background worker, cron/heartbeat/webhook-driven agent, \"Ralph loop\", auto-PR-fixer, monitoring agent, or any long-running task that should keep going on its own until done. Trigger this even when the user says \"agentic workflow\", \"automation that runs itself\", \"an agent that keeps trying until X\", or \"make my agent stop running away / burning tokens\" without using the word \"loop\". Also use it to review an existing loop's stopping conditions, guardrails, verification, and escalation paths.",
+        "stars": 19
       }
     ]
   },
   {
-    "tweet_id": "2076637291024654382",
-    "tweet_url": "https://x.com/grgerwcwetwet/status/2076637291024654382",
-    "author_handle": "grgerwcwetwet",
-    "author_name": "周览资源",
-    "text": "推荐一个把倪海厦中医课程整理成可检索、可追溯、有安全边界的 Agent Skill。\n装进 agent 后，可以用自然语言按症状、方剂、穴位、课程模块、课次或板书截图检索倪海厦课程资料，输出学习型辨证梳理、方证/穴位/药性对比、逐课复习计划和截图证据索引。\n\nhttps://t.co/sTnq2eZjfr https://t.co/5o68J08zwg https://github.com/JuneYaooo/nihaisha-nishi-tcm",
-    "likes": 42,
-    "retweets": 12,
+    "tweet_id": "2078832474990297253",
+    "tweet_url": "https://x.com/ali2000hos/status/2078832474990297253",
+    "author_handle": "ali2000hos",
+    "author_name": "علیه! Aliiiiiii",
+    "text": "اگه شما هم با خروجی های زبان فارسی ایجنت ها مثل کلاد مشکل دارید و نگارش و راستچین و انتخاب کلماتش براتون دردسر شده این اسکیل رو برای همین ساختم و گذاشتم که همه بتونن استفاده کنن. لطفا اگه استفاده کردید استار فراموش نشه :)‌\n\nhttps://t.co/9O8FFrldYa\n\n#claude #ai #aiagent #skill https://github.com/ali2000hos/persian-writing",
+    "likes": 7,
+    "retweets": 1,
     "replies": 1,
-    "views": 5660,
-    "posted_at": "2026-07-13T11:58:06.000Z",
+    "views": 212,
+    "posted_at": "2026-07-19T13:20:59.000Z",
     "repo_ids": [
-      "JuneYaooo/nihaisha-nishi-tcm"
+      "ali2000hos/persian-writing"
     ],
     "repo_urls": [
-      "https://github.com/JuneYaooo/nihaisha-nishi-tcm"
+      "https://github.com/ali2000hos/persian-writing"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "juneyaooo/nihaisha-nishi-tcm",
-        "github_url": "https://github.com/JuneYaooo/nihaisha-nishi-tcm",
+        "id": "ali2000hos/persian-writing",
+        "github_url": "https://github.com/ali2000hos/persian-writing",
         "skill_md_path": "SKILL.md",
-        "name": "nihaisha",
-        "description": "Use this skill when the user asks about Ni Haisha / 倪海厦 TCM course material, especially Shang Han Lun / 伤寒论, Jingui / 金匮要略, Zhongjing Xinfa / 仲景心法, clinical cases / 临床案例 / 倪师医案, Bagang Bianzheng / 八纲辨证, Fuyang Forum / 扶阳论坛, Yijinjing / 易筋经, Liang Dong dialogue / 梁冬对话倪师, Stanford lecture / 斯坦福大学演讲, Tianji / 天纪 / 易经 / 阳宅 / 紫微斗数, Huangdi Neijing / 黄帝内经, Shennong Bencao / 神农本草, acupuncture / 针灸, meridians, acupoints, six-channel pattern identification, symptom-to-formula routing, formula comparison, lesson review, board/PPT screenshot evidence, or course-derived study notes. This skill is for educational distillation and study support only, not medical diagnosis, prescriptions, dosage, or individualized treatment.",
-        "stars": 1619
+        "name": "persian-writing",
+        "description": "Write natural, human-sounding Persian (Farsi) and build correct right-to-left Persian deliverables. Use for ANY task involving Persian text or an Iranian audience: writing, editing, translating, humanizing, SEO content and copywriting (سئو، کپی‌رایتینگ، لندینگ), academic papers/theses, and Persian output in Word/.docx, PDF, PowerPoint, HTML, Excel, images/posters, emails, social posts. Covers register detection (رسمی/اداری/محاوره/علمی — errors here are costly), Persian AI-tell removal, orthography (نیم‌فاصله/ZWNJ، اعداد فارسی، «گیومه»), cleanup and spell-check (ویرایش، پاکسازی — bundled paknevis+davat toolkit), RTL layout/pagination fixes, and Persian fonts (Vazirmatn bundled). Trigger whenever you see Persian/Arabic script or words like فارسی, Farsi, Persian, Iran, RTL, راست‌چین, نیم‌فاصله, ویرایش, مقاله, پایان‌نامه, سئو, کپشن, Vazirmatn — even if the user never mentions this skill.\n",
+        "stars": 10
       }
     ]
   },
   {
-    "tweet_id": "2076148291096498398",
-    "tweet_url": "https://x.com/geekbb/status/2076148291096498398",
-    "author_handle": "geekbb",
-    "author_name": "Geek",
-    "text": "speak-human-tw（說人話）是个给繁体中文去 AI 味的改写 skill，能抓出 35 种以上的 AI 写作套路，顺手把中国用语和半形标点改成台湾写法，给 Claude Code / Codex / Cursor 用。\n\nhttps://t.co/PQZfigy9BO https://t.co/5baxl0hatq https://github.com/Raymondhou0917/speak-human-tw",
-    "likes": 36,
-    "retweets": 8,
-    "replies": 10,
-    "views": 6574,
-    "posted_at": "2026-07-12T03:35:00.000Z",
+    "tweet_id": "2078545079707582707",
+    "tweet_url": "https://x.com/The_AtulMishra/status/2078545079707582707",
+    "author_handle": "The_AtulMishra",
+    "author_name": "Atul Mishra",
+    "text": "Going to experiement with  https://t.co/PLKA4jHq7Y tonight. Lot of my folks suggested me and it's trending as No.1 in github. I think i may have couple of use cases to integrate with. https://github.com/mvanhorn/last30days-skill",
+    "likes": 4,
+    "retweets": 0,
+    "replies": 0,
+    "views": 84,
+    "posted_at": "2026-07-18T18:18:59.000Z",
     "repo_ids": [
-      "Raymondhou0917/speak-human-tw"
+      "mvanhorn/last30days-skill"
     ],
     "repo_urls": [
-      "https://github.com/Raymondhou0917/speak-human-tw"
+      "https://github.com/mvanhorn/last30days-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "raymondhou0917/speak-human-tw",
-        "github_url": "https://github.com/Raymondhou0917/speak-human-tw",
-        "skill_md_path": "SKILL.md",
-        "name": "speak-human-tw",
-        "description": "「說人話」：繁體中文的去 AI 味改寫 skill。審查與改寫文字，去除 AI 味道、校正中國用語與半形標點，讓文字讀起來像真人寫的。\n觸發時機：用戶說「去 AI 味」「說人話」「這段好 AI」「改自然一點」「幫我潤稿去掉 AI 感」「校對一下再發」，或要求檢查電子報、社群貼文、銷售頁、課程文案、客服回信、簡報、公告、Email 等對外文字的語感。\n不要觸發：逐字翻譯、模仿特定品牌 voice、事實查核（非風格問題）、程式碼／log／設定檔、要求「潤成雷蒙的語氣」（那是 content-writing skill 的事，本 skill 只去 AI 味、不加個人風格）。\n",
-        "stars": 609
+        "id": "mvanhorn/last30days-skill",
+        "github_url": "https://github.com/mvanhorn/last30days-skill",
+        "skill_md_path": "skills/last30days/SKILL.md",
+        "name": "last30days",
+        "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
+        "stars": 52853
       }
     ]
   },
   {
-    "tweet_id": "2076267675496702135",
-    "tweet_url": "https://x.com/Smartpigai/status/2076267675496702135",
-    "author_handle": "Smartpigai",
-    "author_name": "Smartpig",
-    "text": "做了一个「会创建 Skill 的 Skill」：SkillSeed 🌱\n\n它不只是生成 SKILL.md，还会：\n\n✓ 校验该触发与不该触发的边界\n✓ 自动检查格式与规范\n✓ 记录每次创建的经验，越用越聪明\n✓ 一份 Skill 面向 Claude Code、Codex、Cursor 等工具\n\n目前已开源，希望大家多多提建议~\nhttps://t.co/qPZqGZtaty https://t.co/6tZ09EPv38 https://github.com/ht426/skillseed",
-    "likes": 16,
-    "retweets": 4,
-    "replies": 7,
-    "views": 2125,
-    "posted_at": "2026-07-12T11:29:23.000Z",
+    "tweet_id": "2079135456764277087",
+    "tweet_url": "https://x.com/viggyvas/status/2079135456764277087",
+    "author_handle": "viggyvas",
+    "author_name": "Vignesh",
+    "text": "I had 40 Claude Code skills installed. Claude was using almost none of them.\n\nSo I built one that fixes the routing: give it a rough prompt, it shortlists the best skills per task and shows you why.\n\nhttps://t.co/W4vCcA4wgq http://github.com/vignesh2699v/claude-rebuild-prompt",
+    "likes": 3,
+    "retweets": 0,
+    "replies": 1,
+    "views": 63,
+    "posted_at": "2026-07-20T09:24:56.000Z",
     "repo_ids": [
-      "ht426/skillseed"
+      "vignesh2699v/claude-rebuild-prompt"
     ],
     "repo_urls": [
-      "https://github.com/ht426/skillseed"
+      "https://github.com/vignesh2699v/claude-rebuild-prompt"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "ht426/skillseed",
-        "github_url": "https://github.com/ht426/skillseed",
-        "skill_md_path": "skills/processing-pdfs/SKILL.md",
-        "name": "processing-pdfs",
-        "description": "从 PDF 文档（尤其发票、收据、报表）中提取表格和文字，输出结构化数据。当用户需要解析 PDF 内容、提取 PDF 表格、读取 PDF 文字、或处理发票/收据数据时使用。触发词：\"提取 PDF\"、\"解析 PDF\"、\"PDF 表格\"、\"读取 PDF\"、\"解析发票\"、\"extract PDF\"。",
-        "stars": 8
+        "id": "vignesh2699v/claude-rebuild-prompt",
+        "github_url": "https://github.com/vignesh2699v/claude-rebuild-prompt",
+        "skill_md_path": "skills/rebuild-prompt/SKILL.md",
+        "name": "rebuild-prompt",
+        "description": "Use when the user runs /rebuild-prompt or asks to \"rebuild\", \"polish\", \"optimize\", or \"add the right skills/agents to\" a rough prompt. Takes a vague or multi-task prompt and routes it to the best-fit installed Skills / subagents / MCP tools, then immediately RETURNS a polished ready-to-paste prompt with the /skill invocations embedded per task (unresolved ambiguity is flagged inline with a default, not gated behind questions). Code-writing tasks automatically get a trailing code-review + verify pass; plan/spec-producing tasks are routed to render as a commentable HTML artifact instead of a bare .md. It never executes the prompt — the user runs it themselves.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2079187729598890469",
+    "tweet_url": "https://x.com/joreilly/status/2079187729598890469",
+    "author_handle": "joreilly",
+    "author_name": "John O'Reilly",
+    "text": "I've been migrating my KMP/CMP samples to (among other things) AGP 9 and this skill has been invaluable! https://t.co/09Jq1H944H https://github.com/Kotlin/kotlin-agent-skills/blob/main/skills/kotlin-tooling-agp9-migration/SKILL.md",
+    "likes": 2,
+    "retweets": 0,
+    "replies": 0,
+    "views": 75,
+    "posted_at": "2026-07-20T12:52:38.000Z",
+    "repo_ids": [
+      "Kotlin/kotlin-agent-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/Kotlin/kotlin-agent-skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "Kotlin/kotlin-agent-skills",
+        "githubUrl": "https://github.com/Kotlin/kotlin-agent-skills",
+        "skillPath": "skills/kotlin-tooling-agp9-migration/SKILL.md",
+        "sourceUrl": "https://github.com/Kotlin/kotlin-agent-skills/blob/main/skills/kotlin-tooling-agp9-migration/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "Kotlin/kotlin-agent-skills",
+        "github_url": "https://github.com/Kotlin/kotlin-agent-skills",
+        "skill_md_path": "skills/kotlin-tooling-agp9-migration/SKILL.md",
+        "name": "kotlin-tooling-agp9-migration",
+        "description": "Migrates Kotlin Multiplatform (KMP) projects to Android Gradle Plugin 9.0+. Handles plugin replacement (com.android.kotlin.multiplatform.library), module splitting, DSL migration, and the new default project structure. Use when upgrading AGP, when build fails due to KMP+AGP incompatibility, or when the user mentions AGP 9.0, android multiplatform plugin, KMP migration, or com.android.kotlin.multiplatform.library.\n",
+        "stars": 947
+      }
+    ]
+  },
+  {
+    "tweet_id": "2078666038107832747",
+    "tweet_url": "https://x.com/yedidyaRashi/status/2078666038107832747",
+    "author_handle": "yedidyaRashi",
+    "author_name": "Yedidya Rashi",
+    "text": "הרבה אנשים שואלים אותי איזה שכר כדאי להם לבקש כדי למקסם את ההצעה. אחרי שראיתי את הסדרה של @amsterdamski2  על שכר ושקיפות, בניתי סקיל שעוזר להבין מה השכר שמגיע לכם. ככל שתיתנו ל-AI יותר קונטקסט, הוא כנראה יעשה עבודה טובה ממני ברוב המקרים.\n\nhttps://t.co/ZARElNamY2 https://github.com/Yedidyar/agent-skills/blob/main/skills/salary-compass/SKILL.md",
+    "likes": 2,
+    "retweets": 0,
+    "replies": 1,
+    "views": 62,
+    "posted_at": "2026-07-19T02:19:37.000Z",
+    "repo_ids": [
+      "Yedidyar/agent-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/Yedidyar/agent-skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "Yedidyar/agent-skills",
+        "githubUrl": "https://github.com/Yedidyar/agent-skills",
+        "skillPath": "skills/salary-compass/SKILL.md",
+        "sourceUrl": "https://github.com/Yedidyar/agent-skills/blob/main/skills/salary-compass/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "Yedidyar/agent-skills",
+        "github_url": "https://github.com/Yedidyar/agent-skills",
+        "skill_md_path": "skills/salary-compass/SKILL.md",
+        "name": "salary-compass",
+        "description": "Research and estimate market compensation, evaluate offers and current pay, calculate employee or freelance total compensation, and prepare salary negotiations. Use for salary expectations, promotions, job offers, relocation packages, contractor or freelance rates, public-person market estimates, compensation comparisons, and questions about base pay, bonuses, commission, equity, benefits, or negotiation targets.",
+        "stars": 2
+      }
+    ]
+  },
+  {
+    "tweet_id": "2078607431232270696",
+    "tweet_url": "https://x.com/nicholasjconn/status/2078607431232270696",
+    "author_handle": "nicholasjconn",
+    "author_name": "Nick Conn, PhD",
+    "text": "Before posting more, I want to share how my personal agent Stew turns raw thoughts into X posts. I pick a topic or idea, type/dictate a free-form stream of consciousness. Stew uses my x-write skill (https://t.co/MkSRruXJdF) to write using my words. I edit and approve. Stew posts. https://t.co/7MvzC1uVw4 https://github.com/nicholasjconn/skills/blob/main/steward/x-write/SKILL.md",
+    "likes": 1,
+    "retweets": 1,
+    "replies": 1,
+    "views": 21,
+    "posted_at": "2026-07-18T22:26:44.000Z",
+    "repo_ids": [
+      "nicholasjconn/skills"
+    ],
+    "repo_urls": [
+      "https://github.com/nicholasjconn/skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "nicholasjconn/skills",
+        "githubUrl": "https://github.com/nicholasjconn/skills",
+        "skillPath": "steward/x-write/SKILL.md",
+        "sourceUrl": "https://github.com/nicholasjconn/skills/blob/main/steward/x-write/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "nicholasjconn/skills",
+        "github_url": "https://github.com/nicholasjconn/skills",
+        "skill_md_path": "steward/x-write/SKILL.md",
+        "name": "x-write",
+        "description": "Use Steward's ./steward x write workflow to turn Nick's rough dictation or source material into an initial pending X post or reply. Trigger on /x-write or an initial-draft request. Do not use for direct revisions to an existing draft unless Nick asks to rerun; otherwise edit it directly and use ./steward x count. Excludes X setup or research, target discovery, scheduling, queueing, and posting.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2078713786693992896",
+    "tweet_url": "https://x.com/to4iki/status/2078713786693992896",
+    "author_handle": "to4iki",
+    "author_name": "takezawa",
+    "text": "https://t.co/4y1FWd1cUp\n\nappleっぽいデザインを実現するスキル https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 117,
+    "posted_at": "2026-07-19T05:29:22.000Z",
+    "repo_ids": [
+      "emilkowalski/skills"
+    ],
+    "repo_urls": [
+      "https://github.com/emilkowalski/skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "emilkowalski/skills",
+        "githubUrl": "https://github.com/emilkowalski/skills",
+        "skillPath": "skills/apple-design/SKILL.md",
+        "sourceUrl": "https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "emilkowalski/skills",
+        "github_url": "https://github.com/emilkowalski/skills",
+        "skill_md_path": "skills/apple-design/SKILL.md",
+        "name": "apple-design",
+        "description": "Apple's approach to interface design and fluid, physical motion, translated for the web. Use when building or reviewing gesture-driven UI, spring animations, drag/swipe/sheet interactions, momentum and interruptible transitions, translucent materials and depth, typography (optical sizing, tracking, leading), reduced-motion, or the design foundations (feedback, spatial consistency, restraint) behind Apple-style interfaces.",
+        "stars": 18632
+      }
+    ]
+  },
+  {
+    "tweet_id": "2079183634284564855",
+    "tweet_url": "https://x.com/emanatale/status/2079183634284564855",
+    "author_handle": "emanatale",
+    "author_name": "Emanuele Natale",
+    "text": "My institute uses @Zimbra, for which none of the major LLM providers offer a connector. So I built zmail: a zero-dependency CLI + skill.md that lets any AI agent read, search &amp; \ndraft email in a Zimbra mailbox over IMAP. 👇\nhttps://t.co/f0BSjOw2md https://t.co/DgbRn6Ktx3 http://github.com/natema/zimbra-skill",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 6,
+    "posted_at": "2026-07-20T12:36:22.000Z",
+    "repo_ids": [
+      "natema/zimbra-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/natema/zimbra-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "natema/zimbra-skill",
+        "github_url": "https://github.com/natema/zimbra-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "zimbra-mail",
+        "description": "Read, search, and draft email on any Zimbra mailbox (e.g. university/lab Zimbra, RENATER Partage, Inria, CNRS) via IMAP/SMTP using the dependency-free zmail.py CLI. Use when the user wants to check their Zimbra inbox, summarize or find messages, or prepare a reply as a draft they can review in webmail. Drafts are staged by default; sending is separate and requires explicit confirmation.",
+        "stars": 0
       }
     ]
   }
