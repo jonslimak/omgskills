@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-13T08:10:43.409Z",
+  "generatedAt": "2026-07-20T07:53:18.248Z",
   "candidateCount": 50,
   "candidates": [
     {
@@ -13,7 +13,7 @@
       ],
       "skillCount": 65,
       "goldBasketCount": 7,
-      "totalStars": 724141,
+      "totalStars": 724599,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "phuryn/pm-skills:ansoff-matrix",
@@ -35,7 +35,7 @@
       ],
       "skillCount": 23,
       "goldBasketCount": 5,
-      "totalStars": 1671240,
+      "totalStars": 1684491,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "lobehub/lobehub:drizzle",
@@ -55,55 +55,53 @@
         "500+ best repo stars",
         "100+ median repo stars"
       ],
-      "skillCount": 5,
+      "skillCount": 7,
       "goldBasketCount": 4,
-      "totalStars": 2740,
-      "totalInstalls": 289154,
+      "totalStars": 4011,
+      "totalInstalls": 309635,
       "sampleSkillIds": [
         "higgsfield-ai/skills:higgsfield-generate",
         "higgsfield-ai/skills:higgsfield-product-photoshoot",
         "higgsfield-ai/skills:higgsfield-soul-id",
-        "higgsfield-ai/skills:higgsfield-marketplace-cards"
+        "higgsfield-ai/skills:higgsfield-marketplace-cards",
+        "higgsfield-ai/skills:higgsfield-game-generation"
       ]
     },
     {
-      "handle": "flutter",
+      "handle": "stablyai",
       "suggestedAction": "review-for-watch",
-      "score": 188,
+      "score": 179,
+      "reasons": [
+        "2 gold-basket skills",
+        "10k+ installs",
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 5,
+      "goldBasketCount": 2,
+      "totalStars": 86437,
+      "totalInstalls": 95456,
+      "sampleSkillIds": [
+        "stablyai/orca:orchestration",
+        "stablyai/orca:orca-cli"
+      ]
+    },
+    {
+      "handle": "browser-act",
+      "suggestedAction": "review-for-watch",
+      "score": 172,
       "reasons": [
         "1 gold-basket skill",
         "100k+ installs",
-        "10k+ best repo stars",
-        "1k+ median repo stars",
-        "3+ distinct repos"
+        "1k+ best repo stars",
+        "1k+ median repo stars"
       ],
-      "skillCount": 31,
+      "skillCount": 17,
       "goldBasketCount": 1,
-      "totalStars": 931870,
-      "totalInstalls": 215974,
+      "totalStars": 21973,
+      "totalInstalls": 105020,
       "sampleSkillIds": [
-        "flutter/skills:flutter-fix-layout-issues",
-        "flutter/flutter:dart-log-failure-parser"
-      ]
-    },
-    {
-      "handle": "op7418",
-      "suggestedAction": "review-for-watch",
-      "score": 173,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ installs",
-        "10k+ best repo stars",
-        "1k+ median repo stars",
-        "3+ distinct repos"
-      ],
-      "skillCount": 9,
-      "goldBasketCount": 1,
-      "totalStars": 46642,
-      "totalInstalls": 37631,
-      "sampleSkillIds": [
-        "op7418/humanizer-zh:humanizer-zh",
-        "op7418/guizang-ppt-skill"
+        "browser-act/skills:browser-act"
       ]
     },
     {
@@ -119,48 +117,11 @@
       ],
       "skillCount": 8,
       "goldBasketCount": 1,
-      "totalStars": 2259,
-      "totalInstalls": 103089,
+      "totalStars": 2283,
+      "totalInstalls": 106169,
       "sampleSkillIds": [
         "better-auth/skills:better-auth-best-practices",
         "better-auth/better-icons:better-icons"
-      ]
-    },
-    {
-      "handle": "angular",
-      "suggestedAction": "review-for-watch",
-      "score": 167,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ installs",
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 7,
-      "goldBasketCount": 1,
-      "totalStars": 504236,
-      "totalInstalls": 21838,
-      "sampleSkillIds": [
-        "angular/skills:angular-developer",
-        "angular/angular:adev-writing-guide"
-      ]
-    },
-    {
-      "handle": "othmanadi",
-      "suggestedAction": "review-for-watch",
-      "score": 167,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ installs",
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 6,
-      "goldBasketCount": 1,
-      "totalStars": 151268,
-      "totalInstalls": 36810,
-      "sampleSkillIds": [
-        "othmanadi/planning-with-files:planning-with-files"
       ]
     },
     {
@@ -176,8 +137,8 @@
       ],
       "skillCount": 12,
       "goldBasketCount": 1,
-      "totalStars": 17096,
-      "totalInstalls": 26227,
+      "totalStars": 17195,
+      "totalInstalls": 26798,
       "sampleSkillIds": [
         "avdlee/swiftui-agent-skill:swiftui-expert-skill"
       ]
@@ -193,30 +154,13 @@
       ],
       "skillCount": 8,
       "goldBasketCount": 3,
-      "totalStars": 586120,
+      "totalStars": 599828,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "egonex-ai/understand-anything:understand-chat",
         "egonex-ai/understand-anything:understand-dashboard",
-        "egonex-ai/understand-anything:understand-domain"
-      ]
-    },
-    {
-      "handle": "browser-act",
-      "suggestedAction": "review-for-watch",
-      "score": 157,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ installs",
-        "1k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 17,
-      "goldBasketCount": 1,
-      "totalStars": 21666,
-      "totalInstalls": 91483,
-      "sampleSkillIds": [
-        "browser-act/skills:browser-act"
+        "egonex-ai/understand-anything:understand-domain",
+        "egonex-ai/understand-anything:understand"
       ]
     },
     {
@@ -231,28 +175,10 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 4092,
-      "totalInstalls": 33019,
+      "totalStars": 4506,
+      "totalInstalls": 33645,
       "sampleSkillIds": [
         "anysearch-ai/anysearch-skill:anysearch"
-      ]
-    },
-    {
-      "handle": "jakubkrehel",
-      "suggestedAction": "review-for-watch",
-      "score": 157,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ installs",
-        "1k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 2,
-      "goldBasketCount": 1,
-      "totalStars": 2481,
-      "totalInstalls": 41976,
-      "sampleSkillIds": [
-        "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better"
       ]
     },
     {
@@ -267,11 +193,29 @@
       ],
       "skillCount": 75,
       "goldBasketCount": 1,
-      "totalStars": 36041,
-      "totalInstalls": 129516,
+      "totalStars": 36639,
+      "totalInstalls": 172921,
       "sampleSkillIds": [
-        "inference-sh/skills:twitter-automation",
         "inference-sh/skills:agent-browser"
+      ]
+    },
+    {
+      "handle": "jakubkrehel",
+      "suggestedAction": "review-for-watch",
+      "score": 153,
+      "reasons": [
+        "1 gold-basket skill",
+        "10k+ installs",
+        "1k+ best repo stars",
+        "100+ median repo stars",
+        "3+ distinct repos"
+      ],
+      "skillCount": 5,
+      "goldBasketCount": 1,
+      "totalStars": 4141,
+      "totalInstalls": 44108,
+      "sampleSkillIds": [
+        "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better"
       ]
     },
     {
@@ -285,11 +229,12 @@
       ],
       "skillCount": 7,
       "goldBasketCount": 2,
-      "totalStars": 1725045,
+      "totalStars": 1725895,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "react/react:feature-flags",
-        "react/react:fix"
+        "react/react:fix",
+        "react/react:extract-errors"
       ]
     },
     {
@@ -303,11 +248,11 @@
       ],
       "skillCount": 49,
       "goldBasketCount": 1,
-      "totalStars": 7939,
-      "totalInstalls": 108831,
+      "totalStars": 8125,
+      "totalInstalls": 133198,
       "sampleSkillIds": [
         "nexscope-ai/amazon-skills:amazon-product-research",
-        "nexscope-ai/amazon-skills:amazon-keyword-research"
+        "nexscope-ai/ecommerce-skills:cross-border-ecommerce"
       ]
     },
     {
@@ -323,9 +268,27 @@
       "skillCount": 1,
       "goldBasketCount": 1,
       "totalStars": 523,
-      "totalInstalls": 42818,
+      "totalInstalls": 46438,
       "sampleSkillIds": [
         "solana-foundation/solana-dev-skill:solana-dev"
+      ]
+    },
+    {
+      "handle": "thedotmack",
+      "suggestedAction": "review-for-watch",
+      "score": 137,
+      "reasons": [
+        "1 gold-basket skill",
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 10,
+      "goldBasketCount": 1,
+      "totalStars": 669875,
+      "totalInstalls": 0,
+      "sampleSkillIds": [
+        "thedotmack/claude-mem:mem-search",
+        "thedotmack/claude-mem:plugin/skills/do"
       ]
     },
     {
@@ -339,7 +302,7 @@
       ],
       "skillCount": 3,
       "goldBasketCount": 1,
-      "totalStars": 492261,
+      "totalStars": 492744,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "f/awesome-chatgpt-prompts:prompt-lookup",
@@ -357,7 +320,7 @@
       ],
       "skillCount": 8,
       "goldBasketCount": 1,
-      "totalStars": 367391,
+      "totalStars": 370260,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "paperclipai/paperclip:paperclip-create-agent",
@@ -375,7 +338,7 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 213521,
+      "totalStars": 217092,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "nousresearch/hermes-agent:dogfood"
@@ -392,7 +355,7 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 189857,
+      "totalStars": 194218,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "multica-ai/andrej-karpathy-skills:karpathy-guidelines"
@@ -409,7 +372,7 @@
       ],
       "skillCount": 4,
       "goldBasketCount": 1,
-      "totalStars": 187944,
+      "totalStars": 188711,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "shareAI-lab/learn-claude-code:skills/pdf",
@@ -427,7 +390,7 @@
       ],
       "skillCount": 11,
       "goldBasketCount": 1,
-      "totalStars": 184673,
+      "totalStars": 186806,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "muratcankoylan/Agent-Skills-for-Context-Engineering:examples/digital-brain-skill",
@@ -445,11 +408,10 @@
       ],
       "skillCount": 4,
       "goldBasketCount": 1,
-      "totalStars": 176032,
+      "totalStars": 177280,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "abhigyanpatwari/gitnexus:gitnexus-impact-analysis",
-        "abhigyanpatwari/gitnexus:gitnexus-debugging"
+        "abhigyanpatwari/gitnexus:gitnexus-impact-analysis"
       ]
     },
     {
@@ -463,7 +425,7 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 103933,
+      "totalStars": 105754,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max"
@@ -480,7 +442,7 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 64559,
+      "totalStars": 64793,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "cline/cline:create-pull-request"
@@ -497,7 +459,7 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 55029,
+      "totalStars": 57564,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "panniantong/agent-reach:agent-reach"
@@ -515,28 +477,10 @@
       "skillCount": 20,
       "goldBasketCount": 1,
       "totalStars": 5140,
-      "totalInstalls": 53582,
+      "totalInstalls": 57608,
       "sampleSkillIds": [
         "intellectronica/agent-skills:notion-api",
         "intellectronica/agent-skills:anki-connect"
-      ]
-    },
-    {
-      "handle": "tavily-ai",
-      "suggestedAction": "review-for-watch",
-      "score": 132,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ installs",
-        "100+ median repo stars"
-      ],
-      "skillCount": 8,
-      "goldBasketCount": 1,
-      "totalStars": 3312,
-      "totalInstalls": 24981,
-      "sampleSkillIds": [
-        "tavily-ai/skills:tavily-search",
-        "tavily-ai/skills:tavily-best-practices"
       ]
     },
     {
@@ -550,8 +494,8 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 331,
-      "totalInstalls": 60027,
+      "totalStars": 334,
+      "totalInstalls": 62599,
       "sampleSkillIds": [
         "currents-dev/playwright-best-practices-skill:playwright-best-practices"
       ]
@@ -567,8 +511,8 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 221,
-      "totalInstalls": 51210,
+      "totalStars": 222,
+      "totalInstalls": 51699,
       "sampleSkillIds": [
         "msmps/opentui-skill:opentui"
       ]
@@ -583,10 +527,10 @@
         "1k+ median repo stars",
         "3+ distinct repos"
       ],
-      "skillCount": 24,
+      "skillCount": 25,
       "goldBasketCount": 0,
-      "totalStars": 107979,
-      "totalInstalls": 354771,
+      "totalStars": 109081,
+      "totalInstalls": 390629,
       "sampleSkillIds": [
         "google/skills:cloud-run-basics"
       ]
@@ -603,10 +547,62 @@
       ],
       "skillCount": 57,
       "goldBasketCount": 0,
-      "totalStars": 138930,
-      "totalInstalls": 49526,
+      "totalStars": 139712,
+      "totalInstalls": 51731,
       "sampleSkillIds": [
         "vercel/turborepo:turborepo"
+      ]
+    },
+    {
+      "handle": "flutter",
+      "suggestedAction": "review-for-watch",
+      "score": 81,
+      "reasons": [
+        "10k+ installs",
+        "10k+ best repo stars",
+        "1k+ median repo stars",
+        "3+ distinct repos"
+      ],
+      "skillCount": 42,
+      "goldBasketCount": 0,
+      "totalStars": 961275,
+      "totalInstalls": 48282,
+      "sampleSkillIds": [
+        "flutter/flutter:find-release"
+      ]
+    },
+    {
+      "handle": "angular",
+      "suggestedAction": "review-for-watch",
+      "score": 75,
+      "reasons": [
+        "10k+ installs",
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 7,
+      "goldBasketCount": 0,
+      "totalStars": 504019,
+      "totalInstalls": 23172,
+      "sampleSkillIds": [
+        "angular/angular:adev-writing-guide"
+      ]
+    },
+    {
+      "handle": "minimax-ai",
+      "suggestedAction": "review-for-watch",
+      "score": 75,
+      "reasons": [
+        "10k+ installs",
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 19,
+      "goldBasketCount": 0,
+      "totalStars": 237944,
+      "totalInstalls": 24159,
+      "sampleSkillIds": [
+        "minimax-ai/skills:android-native-dev"
       ]
     },
     {
@@ -620,27 +616,10 @@
       ],
       "skillCount": 2,
       "goldBasketCount": 0,
-      "totalStars": 126071,
-      "totalInstalls": 22491,
+      "totalStars": 126539,
+      "totalInstalls": 24991,
       "sampleSkillIds": [
         "shadcn/ui:shadcn"
-      ]
-    },
-    {
-      "handle": "stablyai",
-      "suggestedAction": "review-for-watch",
-      "score": 75,
-      "reasons": [
-        "10k+ installs",
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 4,
-      "goldBasketCount": 0,
-      "totalStars": 50040,
-      "totalInstalls": 41800,
-      "sampleSkillIds": [
-        "stablyai/orca:orchestration"
       ]
     },
     {
@@ -654,8 +633,8 @@
       ],
       "skillCount": 22,
       "goldBasketCount": 0,
-      "totalStars": 34691,
-      "totalInstalls": 26073,
+      "totalStars": 34743,
+      "totalInstalls": 26074,
       "sampleSkillIds": [
         "aaron-he-zhu/aaron-marketing-skills:attribution-reconciler"
       ]
@@ -672,26 +651,9 @@
       "skillCount": 4,
       "goldBasketCount": 0,
       "totalStars": 9416,
-      "totalInstalls": 24471,
+      "totalInstalls": 24781,
       "sampleSkillIds": [
         "vuejs-ai/skills:vue-best-practices"
-      ]
-    },
-    {
-      "handle": "dammyjay93",
-      "suggestedAction": "review-for-watch",
-      "score": 65,
-      "reasons": [
-        "10k+ installs",
-        "1k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 1,
-      "goldBasketCount": 0,
-      "totalStars": 5247,
-      "totalInstalls": 20054,
-      "sampleSkillIds": [
-        "dammyjay93/interface-design:interface-design"
       ]
     },
     {
@@ -705,28 +667,27 @@
       ],
       "skillCount": 13,
       "goldBasketCount": 0,
-      "totalStars": 286718,
-      "totalInstalls": 24118,
+      "totalStars": 289441,
+      "totalInstalls": 24983,
       "sampleSkillIds": [
-        "mastra-ai/mastra:builder-smoke-test"
+        "mastra-ai/mastra:tailwind-best-practices"
       ]
     },
     {
-      "handle": "callstackincubator",
+      "handle": "remotion-dev",
       "suggestedAction": "review-for-watch",
-      "score": 61,
+      "score": 51,
       "reasons": [
-        "10k+ installs",
-        "1k+ best repo stars",
-        "100+ median repo stars",
+        "10k+ best repo stars",
+        "1k+ median repo stars",
         "3+ distinct repos"
       ],
-      "skillCount": 17,
+      "skillCount": 19,
       "goldBasketCount": 0,
-      "totalStars": 21688,
-      "totalInstalls": 19738,
+      "totalStars": 853327,
+      "totalInstalls": 0,
       "sampleSkillIds": [
-        "callstackincubator/agent-device:agent-device"
+        "remotion-dev/remotion:web-renderer-test"
       ]
     },
     {
@@ -740,7 +701,7 @@
       ],
       "skillCount": 10,
       "goldBasketCount": 0,
-      "totalStars": 166639,
+      "totalStars": 168897,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "jackwener/opencli:opencli-adapter-author"
@@ -757,7 +718,7 @@
       ],
       "skillCount": 53,
       "goldBasketCount": 0,
-      "totalStars": 161019,
+      "totalStars": 161766,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "bitwarden/clients:angular-modernization"
@@ -774,7 +735,7 @@
       ],
       "skillCount": 30,
       "goldBasketCount": 0,
-      "totalStars": 62427,
+      "totalStars": 62542,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "dotnet/efcore:make-skill"
@@ -791,10 +752,27 @@
       ],
       "skillCount": 18,
       "goldBasketCount": 0,
-      "totalStars": 55108,
+      "totalStars": 55537,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "rohitg00/agentmemory:agentmemory-agents"
+      ]
+    },
+    {
+      "handle": "op7418",
+      "suggestedAction": "review-for-watch",
+      "score": 51,
+      "reasons": [
+        "10k+ best repo stars",
+        "1k+ median repo stars",
+        "3+ distinct repos"
+      ],
+      "skillCount": 9,
+      "goldBasketCount": 0,
+      "totalStars": 48229,
+      "totalInstalls": 0,
+      "sampleSkillIds": [
+        "op7418/guizang-ppt-skill"
       ]
     },
     {
@@ -808,7 +786,7 @@
       ],
       "skillCount": 6,
       "goldBasketCount": 0,
-      "totalStars": 33691,
+      "totalStars": 33837,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "supermemoryai/supermemory:supermemory"
@@ -825,7 +803,7 @@
       ],
       "skillCount": 3,
       "goldBasketCount": 0,
-      "totalStars": 31711,
+      "totalStars": 32662,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "blader/humanizer"
@@ -840,9 +818,9 @@
         "1k+ median repo stars",
         "3+ distinct repos"
       ],
-      "skillCount": 5,
+      "skillCount": 7,
       "goldBasketCount": 0,
-      "totalStars": 26533,
+      "totalStars": 26977,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "pydantic/pydantic-ai:building-pydantic-ai-agents"
@@ -859,8 +837,8 @@
       ],
       "skillCount": 5,
       "goldBasketCount": 0,
-      "totalStars": 3720,
-      "totalInstalls": 38889,
+      "totalStars": 3740,
+      "totalInstalls": 38995,
       "sampleSkillIds": [
         "pexoai/pexo-skills:pexo-agent"
       ]
@@ -876,10 +854,26 @@
       ],
       "skillCount": 32,
       "goldBasketCount": 0,
-      "totalStars": 74816,
+      "totalStars": 76256,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "alchaincyf/nuwa-skill"
+      ]
+    },
+    {
+      "handle": "qwibitai",
+      "suggestedAction": "review-for-watch",
+      "score": 45,
+      "reasons": [
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 35,
+      "goldBasketCount": 0,
+      "totalStars": 1029688,
+      "totalInstalls": 0,
+      "sampleSkillIds": [
+        "qwibitai/nanoclaw:.claude/skills/add-macos-statusbar"
       ]
     },
     {
