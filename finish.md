@@ -1,6 +1,7 @@
 # Remaining Work
 
-Validated 2026-07-17 against `origin/main`.
+Validated 2026-07-20 against `origin/main`, the current production data assets,
+and the private 0.0.18 build.
 
 This is the short backlog for unfinished cross-system work. Durable architecture
 belongs in `arch.md`; crawler operations in `crawl.md`; production and Mac
@@ -70,18 +71,16 @@ Identity-resolution telemetry is already implemented. The production effect on
 `ambiguous` and `resolved_by_sha` becomes measurable after the 0.0.18 Mac client
 is publicly released; it is not an immediate rollout success gate.
 
-The next automatic scheduled publication supplies the second clean observation
-before any broader canonical policy batch is considered. It does not block the
-separate skill-equivalence rollout.
+Subsequent scheduled publications have preserved identical canonical assets
+across v2 and Crawl 4. Broader canonical policy batches remain separate,
+explicitly reviewed work.
 
 ### 18.3 - Publish Claude/Codex equivalence
 
-**Implementation ready; not yet published.** The scoped workflow flag, identical
-v2 and Crawl 4 assets, no-op retention fix, rollback path, full-publish
-preservation checks, and private Mac build have passed locally.
-
-This is a separately approved data rollout. Complete it before the final 0.0.18
-release-candidate test so unified rows can be checked against production data.
+**Complete.** Landed as `9110bee` and published through the guarded combined
+artifact without changing the public Mac appcast or DMG. Production v2 and
+Crawl 4 manifests reference the same validated 55-group asset, and subsequent
+scheduled data publications have preserved it.
 
 - privately regenerate and review the equivalence report and override decisions
 - set `SKILL_EQUIVALENCE_PUBLISH=1` only in the intended publisher workflow
@@ -95,17 +94,21 @@ Do not combine this rollout with the public Mac release command.
 
 ### 18.4 - Verify a private release candidate
 
-**Detailed release-candidate checklist requires planning.** At minimum verify:
+**In progress.** A private Crawl 4 build has been built, installed, and used to
+verify the unified installed-skills view, logical `All` count, and hidden Skill
+Groups entry point. The full Swift test suite and release build pass. Discover
+page cleanup and direct starter searches are implemented in `effbe1c`; the
+collection browser and final chip labels are implemented in `3f4270a`. Both
+commits still need to be landed before the final candidate.
 
-- Crawl 4 loads as primary and v2 still works as fallback
+Remaining release-candidate checks:
+
+- deliberately test v2 fallback from a Crawl 4 failure
 - editorial collections and creator links load correctly
-- the installed `All` view merges equivalent Claude/Codex skills
-- logical counts match the rows shown in `All`
 - source-specific views and physical install counts remain correct
 - install, cross-install, open, and delete actions target the intended variant
-- the Skill Groups/auth UI and pairing routes are unavailable publicly
 - existing library refresh, update checks, and session restoration still work
-- `swift test` and a release build pass
+- land the Discover cleanup and run one final clean private build
 
 Use a private build first. Do not publish the appcast during this step.
 
