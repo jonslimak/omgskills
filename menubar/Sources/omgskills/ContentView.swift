@@ -107,7 +107,7 @@ private struct StarterSearch: Identifiable, Hashable {
     let symbol: String
     var id: String { title }
 
-    init(_ title: String, _ symbol: String) {
+    init(_ title: String, symbol: String) {
         self.title = title
         self.symbol = symbol
     }
@@ -198,44 +198,44 @@ struct ContentView: View {
 
     private let starterSearchGroups: [(String, [StarterSearch])] = [
         ("Design + Apps", [
-            StarterSearch("UI design", "paintbrush"),
-            StarterSearch("Swift iOS", "swift"),
-            StarterSearch("App Store", "app.badge"),
-            StarterSearch("React UI", "atom"),
-            StarterSearch("Video Motion", "play.rectangle"),
-            StarterSearch("Screenshots", "camera.viewfinder")
+            StarterSearch("Design system", symbol: "paintbrush"),
+            StarterSearch("SwiftUI", symbol: "swift"),
+            StarterSearch("App Store", symbol: "app.badge"),
+            StarterSearch("React", symbol: "atom"),
+            StarterSearch("Remotion", symbol: "play.rectangle"),
+            StarterSearch("Landing page", symbol: "macwindow")
         ]),
         ("Marketing", [
-            StarterSearch("Google ads", "megaphone"),
-            StarterSearch("SEO content", "text.magnifyingglass"),
-            StarterSearch("Social media", "person.2"),
-            StarterSearch("Content writing", "text.quote"),
-            StarterSearch("Email marketing", "envelope"),
-            StarterSearch("Competitor research", "scope")
+            StarterSearch("Brand", symbol: "paintpalette"),
+            StarterSearch("SEO", symbol: "text.magnifyingglass"),
+            StarterSearch("Social media", symbol: "person.2"),
+            StarterSearch("Blog", symbol: "text.quote"),
+            StarterSearch("Newsletter", symbol: "envelope"),
+            StarterSearch("Market research", symbol: "scope")
         ]),
         ("Coding", [
-            StarterSearch("Code review", "checkmark.seal"),
-            StarterSearch("Test automation", "checklist"),
-            StarterSearch("Debugging", "ladybug"),
-            StarterSearch("Security audit", "lock.shield"),
-            StarterSearch("API design", "point.3.connected.trianglepath.dotted"),
-            StarterSearch("Refactoring", "arrow.triangle.2.circlepath")
+            StarterSearch("Code review", symbol: "checkmark.seal"),
+            StarterSearch("Playwright", symbol: "checklist"),
+            StarterSearch("Debugging", symbol: "ladybug"),
+            StarterSearch("Security audit", symbol: "lock.shield"),
+            StarterSearch("API design", symbol: "point.3.connected.trianglepath.dotted"),
+            StarterSearch("Refactoring", symbol: "arrow.triangle.2.circlepath")
         ]),
         ("Automation", [
-            StarterSearch("Image generation", "photo"),
-            StarterSearch("Web scraping", "globe"),
-            StarterSearch("Spreadsheet", "tablecells"),
-            StarterSearch("Browser automation", "safari"),
-            StarterSearch("GitHub", "chevron.left.forwardslash.chevron.right"),
-            StarterSearch("CI/CD", "hammer")
+            StarterSearch("Image generation", symbol: "photo"),
+            StarterSearch("Scraping", symbol: "globe"),
+            StarterSearch("n8n", symbol: "point.3.connected.trianglepath.dotted"),
+            StarterSearch("Browser automation", symbol: "safari"),
+            StarterSearch("Git workflow", symbol: "chevron.left.forwardslash.chevron.right"),
+            StarterSearch("CI/CD", symbol: "hammer")
         ]),
         ("Practical", [
-            StarterSearch("MCP server", "server.rack"),
-            StarterSearch("Research", "doc.text.magnifyingglass"),
-            StarterSearch("Humanizer", "person.crop.circle.badge.checkmark"),
-            StarterSearch("Youtube", "play.tv"),
-            StarterSearch("Docs", "doc.text"),
-            StarterSearch("Memory", "brain")
+            StarterSearch("MCP server", symbol: "server.rack"),
+            StarterSearch("Deep research", symbol: "doc.text.magnifyingglass"),
+            StarterSearch("Humanizer", symbol: "person.crop.circle.badge.checkmark"),
+            StarterSearch("Slides", symbol: "rectangle.on.rectangle"),
+            StarterSearch("PDF", symbol: "doc.text"),
+            StarterSearch("Excel", symbol: "tablecells")
         ])
     ]
 
@@ -758,28 +758,6 @@ struct ContentView: View {
     private var starterSearchesView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 26) {
-                if !store.collections.isEmpty {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Collections")
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(.tertiary)
-                        LazyVGrid(
-                            columns: [
-                                GridItem(.flexible(), spacing: 8),
-                                GridItem(.flexible(), spacing: 8)
-                            ],
-                            alignment: .leading,
-                            spacing: 5
-                        ) {
-                            ForEach(store.collections) { collection in
-                                CollectionCard(collection: collection) {
-                                    selectCollection(collection)
-                                }
-                            }
-                        }
-                    }
-                }
-
                 ForEach(starterSearchGroups, id: \.0) { group in
                     VStack(alignment: .leading, spacing: 6) {
                         Text(group.0)
