@@ -4,6 +4,22 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.18] - 2026-07-21
+
+### App
+- Merge equivalent Claude Code and Codex installations into one row in All while preserving source-specific actions and counts
+- Add Claude and Codex origin badges and keep six-action skill toolbars legible
+- Add a two-column collections browser and simplify Discover starter searches
+- Improve installed-skill identity resolution and preserve provenance across cross-installs and removals
+
+### Data
+- Consume canonical SHA attribution and Claude/Codex equivalence assets across Crawl 4 and the v2 fallback
+- Improve curated creator, collection, and generated profile links
+
+### Ops
+- Keep unfinished Skill Groups authentication behind an explicit release gate
+- Strengthen Mac release, combined-site deploy, generated-page, and published-data safety checks
+
 ## [0.0.17] - 2026-06-29
 
 ### App
@@ -77,7 +93,8 @@ All notable changes to omgskills are documented here.
 
 Versions 0.0.1 through 0.0.10 predate this changelog.
 
-[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.17...HEAD
+[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.18...HEAD
+[0.0.18]: https://github.com/jonslimak/omgskills/compare/v0.0.17...v0.0.18
 [0.0.17]: https://github.com/jonslimak/omgskills/compare/v0.0.16...v0.0.17
 [0.0.16]: https://github.com/jonslimak/omgskills/compare/v0.0.15...v0.0.16
 [0.0.15]: https://github.com/jonslimak/omgskills/compare/v0.0.13...v0.0.15
