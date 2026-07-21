@@ -3,6 +3,11 @@ import Testing
 @testable import omgskills
 
 struct AppResourceTests {
+    @Test func skillOriginIconsAreAvailable() {
+        #expect(AppResource.url(forResource: "claude-origin", withExtension: "png") != nil)
+        #expect(AppResource.url(forResource: "codex-origin", withExtension: "png") != nil)
+    }
+
     @Test func shadowSkillsURLUsesEnvironmentOverride() throws {
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)

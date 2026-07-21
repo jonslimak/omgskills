@@ -117,27 +117,11 @@ struct InstalledSkillRow: View {
         }
 
         private var badgeLabel: some View {
-            Text(sourceGroup.badgeTitle)
-                .font(.caption2)
-                .fontWeight(.medium)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Capsule().fill(originColor.opacity(0.18)))
-                .foregroundStyle(originColor)
-                .overlay {
-                    if sourceGroup.members.contains(where: { $0.id == selectedSkillId }) {
-                        Capsule().stroke(originColor.opacity(0.65), lineWidth: 1)
-                    }
-                }
-        }
-
-        private var originColor: Color {
-            switch sourceGroup.source.lowercased() {
-            case "claude": return .blue
-            case "codex": return .green
-            case "agents": return .purple
-            default: return .secondary
-            }
+            SkillOriginBadge(
+                origin: sourceGroup.source,
+                count: sourceGroup.members.count,
+                selected: sourceGroup.members.contains(where: { $0.id == selectedSkillId })
+            )
         }
 
         private func compactPath(_ path: String) -> String {

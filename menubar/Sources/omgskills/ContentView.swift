@@ -1179,16 +1179,6 @@ struct ContentView: View {
                                 .font(.caption)
                                 .foregroundStyle(.tertiary)
                         }
-                    } else if let origin = skill.origin {
-                        HStack(spacing: 8) {
-                            Text(origin)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 3)
-                                .background(Capsule().fill(originColor(origin).opacity(0.18)))
-                                .foregroundStyle(originColor(origin))
-                        }
                     }
 
                     // Action buttons
@@ -1249,27 +1239,42 @@ struct ContentView: View {
     @ViewBuilder
     private func detailActions(_ skill: Skill) -> some View {
         if source == .installed {
+            let githubURL = skill.githubUrl.isEmpty ? nil : URL(string: skill.githubUrl)
+            let shareText = skillShareText(skill)
+            let crossInstallTarget = crossInstallTarget(for: skill)
+            let actionLayout = InstalledDetailActionLayout(
+                showsGitHub: githubURL != nil,
+                showsShare: shareText != nil,
+                showsCrossInstall: crossInstallTarget != nil
+            )
+
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 10) {
                     Button {
                         NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: skill.installCmd)])
                     } label: {
-                        Label("Open", systemImage: "folder")
+                        DetailActionLabel(
+                            title: "Open",
+                            systemImage: "folder",
+                            showsTitle: !actionLayout.usesCompactBookendLabels
+                        )
                     }
+                    .accessibilityLabel("Open in Finder")
+                    .help("Open in Finder")
                     Button {
                         let url = URL(fileURLWithPath: skill.installCmd).appendingPathComponent("SKILL.md")
                         NSWorkspace.shared.open(url)
                     } label: {
                         Label("SKILL.md", systemImage: "doc.text")
                     }
-                    if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
+                    if let githubURL {
                         Button {
-                            NSWorkspace.shared.open(url)
+                            NSWorkspace.shared.open(githubURL)
                         } label: {
                             Label("GitHub", systemImage: "arrow.up.right")
                         }
                     }
-                    if let shareText = skillShareText(skill) {
+                    if let shareText {
                         NativeShareButton(
                             title: "Share",
                             systemImage: "square.and.arrow.up",
@@ -1280,20 +1285,31 @@ struct ContentView: View {
                         )
                             .frame(height: 21)
                     }
-                    if let target = crossInstallTarget(for: skill) {
+                    if let crossInstallTarget {
                         Button {
-                            crossInstallSkill(skill, target: target)
+                            crossInstallSkill(skill, target: crossInstallTarget)
                         } label: {
-                            Label(crossInstallButtonTitle(for: target), systemImage: "arrow.triangle.branch")
+                            Label(
+                                crossInstallButtonTitle(for: crossInstallTarget),
+                                systemImage: "arrow.triangle.branch"
+                            )
                         }
                         .disabled(crossInstallState.isInstalling)
-                        .accessibilityLabel(crossInstallAccessibilityLabel(for: skill, target: target))
+                        .accessibilityLabel(
+                            crossInstallAccessibilityLabel(for: skill, target: crossInstallTarget)
+                        )
                     }
                     Button(role: .destructive) {
                         requestDeleteInstalledSkill(skill)
                     } label: {
-                        Label("Delete", systemImage: "trash")
+                        DetailActionLabel(
+                            title: "Delete",
+                            systemImage: "trash",
+                            showsTitle: !actionLayout.usesCompactBookendLabels
+                        )
                     }
+                    .accessibilityLabel("Delete installed skill")
+                    .help("Delete installed skill")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -1456,15 +1472,6 @@ struct ContentView: View {
             return "\(Int(rounded))"
         }
         return String(format: "%.1f", rounded)
-    }
-
-    private func originColor(_ origin: String) -> Color {
-        switch origin {
-        case "Claude": return .blue
-        case "Codex":  return .green
-        case "Agents": return .purple
-        default:       return .secondary
-        }
     }
 
     private func twitterAuthorLabel(_ skill: Skill) -> String {
@@ -2699,13 +2706,7 @@ struct SkillRow: View {
                         .monospacedDigit()
                         .frame(width: trailingMetricWidth, alignment: .leading)
                     } else if let origin = skill.origin {
-                        Text(origin)
-                            .font(.caption2)
-                            .fontWeight(.medium)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Capsule().fill(originColor(origin).opacity(0.18)))
-                            .foregroundStyle(originColor(origin))
+                        SkillOriginBadge(origin: origin, selected: selected)
                     }
                 }
                 rowTextButton(skill.description, font: .system(size: 10), color: .secondary.opacity(0.7), lineLimit: 2, fillWidth: true)
@@ -2752,15 +2753,6 @@ struct SkillRow: View {
                 .lineLimit(1)
         }
     }
-
-    private func originColor(_ origin: String) -> Color {
-        switch origin {
-        case "Claude": return .blue
-        case "Codex":  return .green
-        case "Agents": return .purple
-        default:       return .secondary
-    }
-}
 
 private func twitterAuthorLabel(_ skill: Skill) -> String {
     if let handle = skill.tweetAuthorHandle, !handle.isEmpty {
