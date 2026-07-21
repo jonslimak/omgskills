@@ -29,46 +29,8 @@ if [ ! -f "$DATA_MANIFEST" ]; then
 fi
 
 require_promoted_v2_library() {
-    export OMGSKILLS_REPO_ROOT="$(cd .. && pwd)"
-    python3 - <<'PY'
-import json, os, sys
-from pathlib import Path
-
-repo = Path(os.environ["OMGSKILLS_REPO_ROOT"])
-report_path = repo / "index/shadow/shadow-report.json"
-cutover_path = repo / "index/shadow/skills.cutover.shadow.json"
-skills_path = repo / "index/skills.json"
-
-for path, hint in [
-    (report_path, "Run the shadow cutover flow first."),
-    (cutover_path, "Run the shadow cutover flow first."),
-    (skills_path, "Run promote-cutover first."),
-]:
-    if not path.exists():
-        print(f"✗ Missing {path}", file=sys.stderr)
-        print(f"  {hint}", file=sys.stderr)
-        sys.exit(1)
-
-report = json.loads(report_path.read_text())
-if not report.get("cutoverValidationPassed"):
-    print("✗ v2 build requires a passing cutover validation.", file=sys.stderr)
-    print("  Run the shadow cutover flow and fix validation failures first.", file=sys.stderr)
-    sys.exit(1)
-
-cutover = json.loads(cutover_path.read_text())
-promoted = [
-    skill for skill in cutover
-    if not (not skill.get("author_handle") and skill.get("provenance_type") in {"catalog", "repackaged"})
-]
-current = json.loads(skills_path.read_text())
-
-promoted_ids = [skill["id"] for skill in promoted]
-current_ids = [skill["id"] for skill in current]
-if promoted_ids != current_ids:
-    print("✗ v2 build is not using the promoted library state.", file=sys.stderr)
-    print("  Run promote-cutover before building the v2 app bundle.", file=sys.stderr)
-    sys.exit(1)
-PY
+    OMGSKILLS_DATA_MANIFEST_PATH="$DATA_MANIFEST" \
+        node ../scripts/verify-menubar-library-input.mjs
 }
 
 if [ "$DATA_TRACK_SUBDIR" = "v2" ] || [ "${OMGSKILLS_DATA_MANIFEST_PATH:-}" = "../site/data/v2/manifest.json" ]; then
