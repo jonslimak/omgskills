@@ -316,6 +316,8 @@ if [ "$RC_MODE" != "1" ]; then
         --link "https://omgskills.com" \
         -o "$REPO_ROOT/site/appcast.xml" \
         "$SITE_UPDATES"
+
+    node "$REPO_ROOT/scripts/finalize-release-assets.mjs" "$REPO_ROOT/site"
 fi
 
 if [ "$RC_MODE" = "1" ]; then

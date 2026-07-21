@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { access, mkdtemp, mkdir, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -9,6 +9,7 @@ import {
   verifyReleaseDeployArtifacts,
   verifyWebLibraryDeployArtifacts,
 } from "./deploy-artifact-guard.mjs";
+import { finalizeReleaseAssets } from "./finalize-release-assets.mjs";
 
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "omgskills-deploy-guard-"));
@@ -69,6 +70,23 @@ test("release artifact verification rejects appcasts without update assets", asy
   try {
     await writeFile(join(root, "appcast.xml"), "<rss></rss>");
     await assert.rejects(requiredReleaseAssetPaths(root), /appcast\.xml has no \/updates\/ assets/);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("release finalization restores referenced Sparkle assets and removes its archive", async () => {
+  const { root } = await fixture();
+  const archivedDir = join(root, "updates", "old_updates");
+  const delta = "omgskills1-09.delta";
+  try {
+    await mkdir(archivedDir, { recursive: true });
+    await rename(join(root, "updates", delta), join(archivedDir, delta));
+    await writeFile(join(archivedDir, "obsolete.delta"), "fixture");
+
+    assert.deepEqual(await finalizeReleaseAssets(root), [`updates/${delta}`]);
+    await verifyReleaseDeployArtifacts(root);
+    await assert.rejects(access(archivedDir));
   } finally {
     await rm(root, { recursive: true, force: true });
   }

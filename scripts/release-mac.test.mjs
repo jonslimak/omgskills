@@ -21,3 +21,9 @@ test("the checked-in Mac release keeps Skill Groups auth disabled", () => {
     /<key>OMGSkillsSkillGroupsAuthEnabled<\/key>\s*<false\/>/
   );
 });
+
+test("public releases finalize appcast assets after Sparkle generation", () => {
+  const appcastCall = script.indexOf('"$SPARKLE_TOOLS/generate_appcast"');
+  const finalizeCall = script.indexOf("finalize-release-assets.mjs");
+  assert.ok(appcastCall >= 0 && finalizeCall > appcastCall);
+});
