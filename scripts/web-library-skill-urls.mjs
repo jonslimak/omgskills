@@ -1,14 +1,22 @@
 import { createHash } from "node:crypto";
 
 export const catalogSkillUrlsFilename = "catalog-skill-urls.json";
-const generatedSkillPathPattern = /^\/skills\/[a-z0-9._-]+(?:\/[a-z0-9._-]+)*\/$/;
+const generatedSkillPathPattern = /^\/skills\/(?!\.)[a-z0-9._-]+(?:\/(?!\.)[a-z0-9._-]+)*\/$/;
 
 function slugSegment(value) {
-  const slug = String(value ?? "")
+  let slug = String(value ?? "")
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9._-]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+  const leadingDots = slug.match(/^\.+/)?.[0];
+  if (leadingDots) {
+    const remainder = slug.slice(leadingDots.length).replace(/^-+/, "");
+    const dotPrefix = Array.from(leadingDots, () => "dot").join("-");
+    slug = remainder ? `${dotPrefix}-${remainder}` : dotPrefix;
+  }
+
   return slug || "item";
 }
 

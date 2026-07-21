@@ -15,6 +15,17 @@ test("builds normal and repository-root skill paths", () => {
   assert.equal(skillPathForId("owner/repo"), "/skills/owner/repo/");
 });
 
+test("converts hidden skill path segments into public URL segments", () => {
+  assert.equal(
+    skillPathForId("disler/claude-code-damage-control:.claude/skills/damage-control"),
+    "/skills/disler/claude-code-damage-control/dot-claude/skills/damage-control/",
+  );
+  assert.equal(
+    skillPathForId("owner/repo:.github/skills/example"),
+    "/skills/owner/repo/dot-github/skills/example/",
+  );
+});
+
 test("disambiguates catalog IDs whose normalized paths collide", () => {
   const urls = buildSkillUrlMap([
     { id: "Owner/Repo:skills/Foo Bar" },
@@ -52,6 +63,18 @@ test("rejects malformed published URL entries", () => {
     () => catalogSkillUrlEntries({
       version: 1,
       skills: { "owner/repo": "https://example.com/skills/owner/repo/" },
+    }),
+    /invalid entry/,
+  );
+});
+
+test("rejects published URLs containing hidden path segments", () => {
+  assert.throws(
+    () => catalogSkillUrlEntries({
+      version: 1,
+      skills: {
+        "owner/repo:.claude/skills/example": "/skills/owner/repo/.claude/skills/example/",
+      },
     }),
     /invalid entry/,
   );
