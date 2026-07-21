@@ -94,39 +94,28 @@ Do not combine this rollout with the public Mac release command.
 
 ### 18.4 - Verify a private release candidate
 
-**In progress.** A private Crawl 4 build has been built, installed, and used to
-verify the unified installed-skills view, logical `All` count, and hidden Skill
-Groups entry point. Discover cleanup and direct starter searches are implemented
-in `effbe1c`; the collection browser and final chip labels in `3f4270a`; the
-two-column collection index in `4ec1d4a`; and installed-profile origin badges
-and six-action compaction in `c645c5c`. Light mode, dark mode, selected badge
-state, collection navigation, and the compact detail-action layout have been
-checked in installed private builds. The full Swift suite passes with 190 tests,
-and the release build passes.
+**Complete.** The final 0.0.18 RC was built from the clean integration branch on
+the latest `origin/main`, signed, notarized, installed, and manually verified.
+The root suite, 378 crawler tests, 190 Swift tests, release build, and release
+guards pass. The reproducible Mac build guard verifies exact equality between
+the promoted catalog and the hashed v2 fallback asset.
 
-These release-candidate commits are assembled on a fresh integration branch
-based on the latest `origin/main`. Final verification and one last
-`origin/main` refresh remain required before landing because scheduled data and
-editorial commits continue to move main.
+Manual verification covered the unified installed-skills view, logical `All`
+count, source-specific views and physical counts, Discover and collection
+navigation, creator links, install and file actions, refresh behavior, update
+checks, and session restoration. Deliberate Crawl 4 failure fell back to v2.
+Light and dark origin badges and the compact six-action layout were also checked.
 
-Remaining release-candidate checks:
-
-- land the verified integration commit on the latest `origin/main`
-- produce one clean private build from the integrated main commit
-- deliberately test v2 fallback from a Crawl 4 failure
-- editorial collections and creator links load correctly
-- source-specific views and physical install counts remain correct
-- install, cross-install, open, and delete actions target the intended variant
-- existing library refresh, update checks, and session restoration still work
-- confirm the final public configuration still hides Skill Groups authentication
-
-Use a private build first. Do not publish the appcast during this step.
+The packaged app is version `0.0.18` build `18`, Skill Groups authentication is
+disabled, and the public appcast remains byte-identical at `0.0.17`. No public
+release assets were changed during RC verification.
 
 ### 18.5 - Publish 0.0.18
 
 Requires explicit release approval.
 
-- add 0.0.18 release notes to `CHANGELOG.md`
+The 0.0.18 release notes are prepared in `CHANGELOG.md`.
+
 - use the signed and notarized process in `deploy.md`
 - update the DMG, checksum, and appcast only in this release step
 - deploy with the guarded combined artifact so existing portal, data, profile,
