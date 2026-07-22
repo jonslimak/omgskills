@@ -145,6 +145,28 @@ Creator and vendor authority is consolidated. The removed
 `index/scraper/creator-registry.ts` loader owns case normalization, alias
 ownership, role sets, and `featured => watch` validation.
 
+The shared policy layer is `index/scraper/policy/`. Its loader reads all
+authoritative JSON sources but deliberately does not load a catalog. Consumers
+inject the catalog view they already own when reference checks are needed.
+`scripts/policy-identifiers.mjs` provides the same case-insensitive handle,
+repository, and skill-ID parsing to TypeScript consumers and the generated
+handle-reservation script.
+
+Validation failure profiles keep editorial freshness separate from data
+freshness:
+
+| Consumer | Blocking findings |
+|---|---|
+| Scheduled v2 and Crawl 4 jobs | Structural errors only; stale editorial references and conflicts are reported but do not stop fresh catalog data. |
+| Collections publisher | Structural errors plus stale or conflicting editorial references. |
+| Editool saves and strict local validation | Every error and warning. |
+| Manual add/remove commands and deploy preparation | Structural errors only; no new precedence is applied. |
+
+`npm run policy:validate -- --profile strict` performs the complete local check.
+Suppression reference checks use the union of promoted, cutover, and overlay
+skills. Existing suppressions remain valid after their catalog rows disappear;
+Editool requires newly proposed suppressions to resolve in that union.
+
 #### Transitional active policy
 
 | Input | Current behavior | Required P1 disposition |
@@ -193,8 +215,8 @@ Current conflict precedence is incomplete:
 - skill suppression filters both maintained paths
 - manual include, official, trusted-vendor, and gold-basket admission arms can
   bypass part of known-catalog policy; P1.4 requires a reviewed shadow diff
-- creator validation is centralized, but creator/editorial state is not yet
-  checked against every exclusion list as one effective policy
+- creator/editorial overlaps with exclusion policy are now reported by the
+  shared validator; P1.4 still decides and enforces the final precedence
 - Editool writes related removal files as separate atomic operations; pair-level
   recovery remains P1.6
 

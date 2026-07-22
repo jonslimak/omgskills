@@ -8,6 +8,13 @@ import {
   type CreatorRegistryEntry,
   type CreatorRegistrySource,
 } from "../scraper/creator-registry.js";
+import { loadPolicySources, typedPolicySources } from "../scraper/policy/loader.js";
+import { assertPolicyValid, validatePolicy } from "../scraper/policy/validator.js";
+import type {
+  AuthorOverride,
+  CollectionsPolicySource as CollectionsSource,
+  SourceCollection,
+} from "../scraper/policy/types.js";
 
 type Skill = {
   id: string;
@@ -25,31 +32,6 @@ type Asset = {
 
 type Manifest = Record<string, unknown> & {
   collections?: Asset;
-};
-
-type SourceCollection = {
-  id: string;
-  type: "topic";
-  title: string;
-  subtitle: string;
-  imageUrl?: string | null;
-  featuredSkillIds: string[];
-  skillIds: string[];
-  description?: string | null;
-};
-
-type AuthorOverride = {
-  title?: string;
-  subtitle?: string;
-  imageUrl?: string | null;
-  featuredSkillIds?: string[];
-  description?: string | null;
-};
-
-type CollectionsSource = {
-  version?: number;
-  authorOverrides?: Record<string, AuthorOverride>;
-  collections: SourceCollection[];
 };
 
 type SkillCollection = {
@@ -226,9 +208,16 @@ function main() {
   if (!existsSync(creatorsPath)) fail(`missing ${creatorsPath}`);
   if (!existsSync(skillsPath)) fail(`missing ${skillsPath}`);
 
-  const source = readJson<CollectionsSource>(sourcePath);
-  const registry = readJson<CreatorRegistrySource>(creatorsPath);
   const skills = readJson<Skill[]>(skillsPath);
+  const loadedPolicy = loadPolicySources();
+  const policy = typedPolicySources(loadedPolicy);
+  const policyIssues = validatePolicy(loadedPolicy, {
+    publishedSkillIds: new Set(skills.map((skill) => skill.id)),
+    publishedAuthorHandles: new Set(skills.map((skill) => skill.author_handle)),
+  });
+  assertPolicyValid(policyIssues, "collections-publish");
+  const source = policy.collections;
+  const registry = policy.creators;
   validateSource(source, registry, skills);
   const asset = buildCollectionsAsset(source, registry, skills);
 

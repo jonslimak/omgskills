@@ -164,14 +164,28 @@ replaced six lower-ranked rows with six Greensock skills.
 
 #### P1.3 - Add one shared policy loader and validator
 
-- [ ] Centralize case normalization, repo/owner/skill-ID parsing, schemas, and
-  cross-list validation beyond the completed creator-registry loader.
-- [ ] Reuse it from Crawl 4, v2, Editool, publishers, manual admission/removal
-  commands, and CI.
-- [ ] Reject malformed entries, duplicates, stale references, and unexplained
-  include/exclude conflicts before writing output.
-- [ ] Keep historical suppressions valid while requiring new suppressions to
-  resolve against the current or reviewed historical catalog.
+**Complete.** `index/scraper/policy/` now loads and validates all authoritative
+policy sources without loading catalog data itself. Shared identifier helpers
+own case-insensitive handle, repository, and skill-ID parsing.
+
+- [x] Reuse the loader from Crawl 4, v2 seed loading, Editool, collections
+  publishing, manual admission/removal, handle reservations, CI, and deploy
+  preparation.
+- [x] Reject malformed entries, normalized duplicates, invalid enums, and
+  creator-registry violations. Report include/exclude and editorial conflicts
+  without changing P1.4 precedence.
+- [x] Apply consumer-specific failure profiles: scheduled crawls and deploys
+  block structural errors; collection publishing also blocks stale editorial
+  references; Editool and strict local validation block every finding.
+- [x] Validate new suppressions against the union of promoted, cutover, and
+  overlay catalogs while allowing already-recorded historical suppressions to
+  remain after their catalog rows disappear.
+- [x] Keep v2 `KNOWN_INVALID_REPOS` modeled as distinct root-path discovery
+  policy, not do-not-crawl exclusion policy.
+
+Run `cd index && npm run policy:validate -- --profile strict` for the full local
+check. This task adds validation and visibility only; admission precedence and
+v2 blocklist migration remain P1.4 and P1.5.
 
 #### P1.4 - Encode and test conflict precedence
 

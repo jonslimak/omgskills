@@ -5,23 +5,25 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  validateRemovals,
-  type DoNotCrawlOwnerEntry,
-  type DoNotCrawlRepoEntry,
-  type RemovalsSource,
-  type SuppressedSkillEntry,
-} from "./editool-validation.js";
-import {
   buildEditoolPreview,
   createEditoolPreviewServer,
   defaultEditoolPreviewDir,
 } from "./editool-preview.js";
+import type { CreatorRegistrySource } from "../scraper/creator-registry.js";
 import {
-  buildCreatorRegistry,
-  normalizeCreatorHandle,
-  type CreatorRegistryEntry,
-  type CreatorRegistrySource,
-} from "../scraper/creator-registry.js";
+  loadPolicySources,
+  replacePolicySource,
+} from "../scraper/policy/loader.js";
+import {
+  blockingPolicyIssues,
+  validatePolicy,
+} from "../scraper/policy/validator.js";
+import type {
+  CollectionsPolicySource,
+  DoNotCrawlPolicySource,
+  PolicySources,
+  SuppressedSkillsPolicySource,
+} from "../scraper/policy/types.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -49,6 +51,8 @@ const paths = {
   creators: join(indexRoot, "seeds", "creators.json"),
   suppressedSkills: join(indexRoot, "seeds", "suppressed-skills.json"),
   doNotCrawl: join(indexRoot, "seeds", "do-not-crawl.json"),
+  cutoverSkills: join(indexRoot, "shadow", "skills.cutover.shadow.json"),
+  skillOverlay: join(indexRoot, "shadow", "skills.overlay.json"),
 };
 
 // The only files POST /api/save/* may write.
@@ -149,6 +153,13 @@ console.log("editool: loading library data…");
 const skills = readJson<Skill[]>(paths.skills);
 const skillIdSet = new Set(skills.map((s) => s.id));
 const authorHandleSet = new Set(skills.map((s) => s.author_handle.toLowerCase()).filter(Boolean));
+const suppressionCandidateSkillIds = new Set(skillIdSet);
+for (const row of readOptionalJson<Array<{ id: string }>>(paths.cutoverSkills) ?? []) {
+  suppressionCandidateSkillIds.add(row.id);
+}
+for (const row of readOptionalJson<{ skills: Array<{ id: string }> }>(paths.skillOverlay)?.skills ?? []) {
+  suppressionCandidateSkillIds.add(row.id);
+}
 const goldBasketIds = new Set(
   existsSync(paths.goldBasket) ? readJson<{ id: string }[]>(paths.goldBasket).map((s) => s.id) : [],
 );
@@ -165,95 +176,30 @@ const authorStats = new Map<string, AuthorStats>(
 );
 console.log(`editool: ${skills.length} skills, ${authorHandleSet.size} authors loaded`);
 
-function knownAuthorHandles(creators?: CreatorRegistryEntry[]): Set<string> {
-  const handles = new Set(authorHandleSet);
-  for (const entry of creators ?? readJson<CreatorRegistrySource>(paths.creators).creators) {
-    const variants = [entry.handle, ...(entry.aliases ?? [])].map(normalizeCreatorHandle).filter(Boolean);
-    if (variants.some((value) => authorHandleSet.has(value))) {
-      for (const value of variants) handles.add(value);
-    }
-  }
-  return handles;
-}
-
-function creatorVariants(entry: CreatorRegistryEntry): string[] {
-  return [entry.handle, ...(entry.aliases ?? [])].map(normalizeCreatorHandle).filter(Boolean);
-}
-
-function featuredCreatorOverrideKeys(creators?: CreatorRegistryEntry[]): Set<string> {
-  const keys = new Set<string>();
-  for (const entry of creators ?? readJson<CreatorRegistrySource>(paths.creators).creators) {
-    if (!entry.featured) continue;
-    for (const variant of creatorVariants(entry)) keys.add(variant);
-  }
-  return keys;
-}
-
 // ---------- validation ----------
 
-type CollectionsSource = {
-  version?: number;
-  authorOverrides?: Record<
-    string,
-    { title?: string; subtitle?: string; imageUrl?: string | null; featuredSkillIds?: string[]; description?: string | null }
-  >;
-  collections: {
-    id: string;
-    type: string;
-    title: string;
-    subtitle: string;
-    imageUrl?: string | null;
-    featuredSkillIds: string[];
-    skillIds: string[];
-    description?: string | null;
-  }[];
+type RemovalsSource = {
+  suppressedSkills: SuppressedSkillsPolicySource;
+  doNotCrawl: DoNotCrawlPolicySource;
 };
 
-const KEBAB_CASE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-
-function validateCollections(source: CollectionsSource): string[] {
-  const errors: string[] = [];
-  if (!Array.isArray(source.collections)) errors.push("collections must be an array");
-  if (errors.length) return errors;
-
-  const featuredOverrideKeys = featuredCreatorOverrideKeys();
-  for (const [handle, override] of Object.entries(source.authorOverrides ?? {})) {
-    if (!featuredOverrideKeys.has(handle.trim().toLowerCase())) continue;
-    for (const id of override.featuredSkillIds ?? []) {
-      if (!skillIdSet.has(id)) errors.push(`unknown skill id in authorOverrides.${handle}: ${id}`);
-    }
+function validateEditoolPolicy(replacements: Partial<PolicySources>): string[] {
+  let loaded = loadPolicySources();
+  for (const [key, value] of Object.entries(replacements) as Array<
+    [keyof PolicySources, PolicySources[keyof PolicySources]]
+  >) {
+    loaded = replacePolicySource(loaded, key, value);
   }
-  const seen = new Set<string>();
-  for (const collection of source.collections) {
-    if (!collection.id || !KEBAB_CASE.test(collection.id)) errors.push(`collection id must be kebab-case: ${collection.id}`);
-    if (seen.has(collection.id)) errors.push(`duplicate collection id: ${collection.id}`);
-    seen.add(collection.id);
-    if (!collection.title?.trim()) errors.push(`collection ${collection.id}: title required`);
-    if (!collection.subtitle?.trim()) errors.push(`collection ${collection.id}: subtitle required`);
-    for (const id of [...(collection.featuredSkillIds ?? []), ...(collection.skillIds ?? [])]) {
-      if (!skillIdSet.has(id)) errors.push(`unknown skill id in collection ${collection.id}: ${id}`);
-    }
-  }
-  return errors;
-}
-
-function validateCreators(source: CreatorRegistrySource): string[] {
-  try {
-    buildCreatorRegistry(source);
-  } catch (error) {
-    return [error instanceof Error ? error.message : String(error)];
-  }
-
-  const errors: string[] = [];
-  const knownHandles = knownAuthorHandles(source.creators);
-  for (const entry of source.creators) {
-    const handle = entry.handle?.trim();
-    const key = normalizeCreatorHandle(handle);
-    if (entry.featured && !knownHandles.has(key)) {
-      errors.push(`${handle}: featured but not found as a catalog author`);
-    }
-  }
-  return errors;
+  const existingSuppressedSkillIds = new Set(
+    readJson<SuppressedSkillsPolicySource>(paths.suppressedSkills).skills.map((entry) => entry.id),
+  );
+  const issues = validatePolicy(loaded, {
+    publishedSkillIds: skillIdSet,
+    publishedAuthorHandles: authorHandleSet,
+    suppressionCandidateSkillIds,
+    existingSuppressedSkillIds,
+  });
+  return blockingPolicyIssues(issues, "editool").map((entry) => `${entry.code}: ${entry.message}`);
 }
 
 // ---------- skill search ----------
@@ -419,8 +365,8 @@ const server = createServer(async (req, res) => {
     if (req.method === "POST" && url.pathname === "/api/save/collections") {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
-      const body = (await readBody(req)) as CollectionsSource;
-      const errors = validateCollections(body);
+      const body = (await readBody(req)) as CollectionsPolicySource;
+      const errors = validateEditoolPolicy({ collections: body });
       if (errors.length) return sendJson(res, 422, { ok: false, errors });
       atomicWriteJson(paths.collections, body);
       return sendJson(res, 200, { ok: true });
@@ -430,7 +376,7 @@ const server = createServer(async (req, res) => {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as CreatorRegistrySource;
-      const errors = validateCreators(body);
+      const errors = validateEditoolPolicy({ creators: body });
       if (errors.length) return sendJson(res, 422, { ok: false, errors });
       atomicWrite(paths.creators, formatCreators(body));
       return sendJson(res, 200, { ok: true });
@@ -440,12 +386,9 @@ const server = createServer(async (req, res) => {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as RemovalsSource;
-      const existingSuppressedSkillIds = new Set(
-        readJson<{ skills: SuppressedSkillEntry[] }>(paths.suppressedSkills).skills.map((entry) => entry.id),
-      );
-      const errors = validateRemovals(body, {
-        librarySkillIds: skillIdSet,
-        existingSuppressedSkillIds,
+      const errors = validateEditoolPolicy({
+        suppressedSkills: body.suppressedSkills,
+        doNotCrawl: body.doNotCrawl,
       });
       if (errors.length) return sendJson(res, 422, { ok: false, errors });
       atomicWriteJson(paths.suppressedSkills, body.suppressedSkills);

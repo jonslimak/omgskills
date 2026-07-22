@@ -1,7 +1,8 @@
 import type { TrustedSeeds } from "./types.js";
+import { normalizePolicySkillId } from "../../../scripts/policy-identifiers.mjs";
 
 export function normalizeSkillId(value: string): string {
-  return value.trim().toLowerCase();
+  return normalizePolicySkillId(value);
 }
 
 export function isSuppressedSkillId(id: string, seeds: TrustedSeeds): boolean {

@@ -3,6 +3,10 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  isValidPolicyHandle,
+  normalizePolicyHandle,
+} from "./policy-identifiers.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 export const creatorRegistryPath = path.join(repoRoot, "index", "seeds", "creators.json");
@@ -14,10 +18,8 @@ export const generatedReservationsPath = path.join(
   "catalog-reserved-handles.ts",
 );
 
-const handlePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
 export function normalizedCreatorHandle(value) {
-  return String(value ?? "").trim().toLowerCase();
+  return normalizePolicyHandle(value);
 }
 
 export function buildCreatorHandleOwners(registry) {
@@ -34,7 +36,7 @@ export function buildCreatorHandleOwners(registry) {
 
     for (const rawHandle of [entry.handle, ...(entry.aliases ?? [])]) {
       const handle = normalizedCreatorHandle(rawHandle);
-      if (!handlePattern.test(handle) || handle.length > 80) {
+      if (!isValidPolicyHandle(handle)) {
         throw new Error(`Invalid creator handle or alias: ${rawHandle}`);
       }
 

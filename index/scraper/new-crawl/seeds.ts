@@ -1,11 +1,15 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import {
   buildCreatorRegistry,
   normalizeCreatorHandle,
   type CreatorRegistrySource,
 } from "../creator-registry.js";
-import { indexRoot } from "./shadow-path-guard.js";
+import {
+  normalizePolicyRepo,
+  normalizePolicySkillId,
+} from "../../../scripts/policy-identifiers.mjs";
+import { loadPolicySources, typedPolicySources } from "../policy/loader.js";
+import { assertPolicyValid, validatePolicy } from "../policy/validator.js";
+import type { PolicyValidationProfile } from "../policy/types.js";
 import type {
   CatalogRepoRule,
   DoNotCrawlRule,
@@ -20,20 +24,16 @@ type ManualIncludeRepoSeeds = { include?: string[] };
 type DoNotCrawlSeeds = { repos?: DoNotCrawlRule[]; owners?: DoNotCrawlRule[] };
 type SuppressedSkillSeeds = { skills?: SuppressedSkillRule[] };
 
-function readJson<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf8")) as T;
-}
-
 function normalizeHandle(value: string): string {
   return normalizeCreatorHandle(value);
 }
 
 function normalizeRepo(value: string): string {
-  return value.trim().replace(/\.git$/i, "").toLowerCase();
+  return normalizePolicyRepo(value);
 }
 
 function normalizeSkillId(value: string): string {
-  return value.trim().toLowerCase();
+  return normalizePolicySkillId(value);
 }
 
 function normalizeRepoSet(values: string[] | undefined): Set<string> {
@@ -120,25 +120,20 @@ export function buildTrustedSeeds(input: {
   };
 }
 
-export function loadTrustedSeeds(): TrustedSeeds {
-  const seedsRoot = join(indexRoot, "seeds");
-  const creatorRegistryJson = readJson<CreatorRegistrySource>(join(seedsRoot, "creators.json"));
-  const officialJson = readJson<OfficialRepoSeeds>(join(seedsRoot, "official-repos.json"));
-  const manualIncludeJson = readJson<ManualIncludeRepoSeeds>(join(seedsRoot, "manual-include-repos.json"));
-  const doNotCrawlJson = readJson<DoNotCrawlSeeds>(join(seedsRoot, "do-not-crawl.json"));
-  const suppressedSkillsJson = readJson<SuppressedSkillSeeds>(join(seedsRoot, "suppressed-skills.json"));
-  const overridesJson = readJson<RepoOverride[]>(join(seedsRoot, "repo-overrides.json"));
-  const catalogJson = readJson<CatalogRepoRule[]>(join(seedsRoot, "catalog-repos.json"));
-  const provenanceJson = readJson<ProvenanceOverride[]>(join(seedsRoot, "provenance-overrides.json"));
+export function loadTrustedSeeds(profile: PolicyValidationProfile = "scheduled-data"): TrustedSeeds {
+  const loaded = loadPolicySources();
+  const issues = validatePolicy(loaded);
+  assertPolicyValid(issues, profile);
+  const sources = typedPolicySources(loaded);
 
   return buildTrustedSeeds({
-    creatorRegistryJson,
-    officialJson,
-    manualIncludeJson,
-    doNotCrawlJson,
-    suppressedSkillsJson,
-    overridesJson,
-    catalogJson,
-    provenanceJson,
+    creatorRegistryJson: sources.creators,
+    officialJson: sources.officialRepos,
+    manualIncludeJson: sources.manualIncludeRepos,
+    doNotCrawlJson: sources.doNotCrawl,
+    suppressedSkillsJson: sources.suppressedSkills,
+    overridesJson: sources.repoOverrides,
+    catalogJson: sources.catalogRepos,
+    provenanceJson: sources.provenanceOverrides,
   });
 }

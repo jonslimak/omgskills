@@ -105,7 +105,7 @@ export function parseGithubSkillUrl(input: string): ParsedGithubSkillUrl {
   };
 }
 
-export function toShadowSkillRecord(skill: Skill, seeds = loadTrustedSeeds()): ShadowSkillRecord {
+export function toShadowSkillRecord(skill: Skill, seeds = loadTrustedSeeds("manual-command")): ShadowSkillRecord {
   const provenance = resolveShadowProvenance(skill, seeds);
   return {
     ...skill,

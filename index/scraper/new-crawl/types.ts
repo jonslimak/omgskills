@@ -31,7 +31,15 @@ export type ProvenanceOverride = {
   notes?: string;
 };
 
-export type DoNotCrawlReason = "catalog" | "spam" | "unsafe" | "duplicate" | "low-quality" | "other";
+export type DoNotCrawlReason =
+  | "catalog"
+  | "spam"
+  | "unsafe"
+  | "duplicate"
+  | "low-quality"
+  | "marketplace"
+  | "template-clone"
+  | "other";
 
 export type DoNotCrawlRule = {
   repo?: string;

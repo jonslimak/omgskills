@@ -1,7 +1,11 @@
 import type { ShadowRepoIndex, ShadowSkillRecord, TrustedSeeds } from "./types.js";
+import {
+  normalizePolicyRepo,
+  policyRepoFromSkillId,
+} from "../../../scripts/policy-identifiers.mjs";
 
 export function normalizeRepoKey(value: string): string {
-  return value.trim().replace(/^https:\/\/github\.com\//i, "").replace(/\.git$/i, "").toLowerCase();
+  return normalizePolicyRepo(value);
 }
 
 export function ownerFromRepo(repo: string): string {
@@ -9,7 +13,7 @@ export function ownerFromRepo(repo: string): string {
 }
 
 export function repoFromSkillId(id: string): string {
-  return normalizeRepoKey(id.includes(":") ? id.split(":")[0]! : id);
+  return policyRepoFromSkillId(id);
 }
 
 export function repoFromGithubUrl(value: string | null | undefined): string {

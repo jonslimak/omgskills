@@ -84,6 +84,22 @@ async function runWebLibraryBuild() {
   });
 }
 
+async function verifyPolicy() {
+  await new Promise((resolve, reject) => {
+    const command = process.platform === "win32" ? "npm.cmd" : "npm";
+    const child = spawn(
+      command,
+      ["--prefix", path.join(repoRoot, "index"), "run", "policy:validate", "--", "--profile", "deploy"],
+      { cwd: repoRoot, stdio: "inherit" },
+    );
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`Policy validation failed with exit code ${code}`));
+    });
+  });
+}
+
 async function verifyCreatorHandleReservations() {
   await new Promise((resolve, reject) => {
     const child = spawn(
@@ -119,6 +135,7 @@ async function verifyWebLibraryBuild() {
 }
 
 async function main() {
+  await verifyPolicy();
   await verifyCreatorHandleReservations();
   await runWebLibraryBuild();
   await verifyWebLibraryBuild();

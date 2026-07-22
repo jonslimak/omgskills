@@ -58,6 +58,7 @@ fi
 # Device pairing stays dark in production until its dedicated release approval.
 export VITE_SKILLGROUPS_AUTH_ENABLED=0
 
+npm --prefix index ci
 PRODUCTION_ORIGIN="https://omgskills.com" node ./scripts/prepare-netlify-site-deploy.mjs
 npm ci
 npm run build:netlify

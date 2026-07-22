@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizePolicyHandle } from "../../scripts/policy-identifiers.mjs";
 
 export type CreatorRegistryRole = "vendor" | "creator";
 
@@ -32,7 +33,7 @@ export const creatorRegistryPath = join(scraperRoot, "..", "seeds", "creators.js
 let cachedRegistry: CreatorRegistry | null = null;
 
 export function normalizeCreatorHandle(value: string): string {
-  return value.trim().toLowerCase();
+  return normalizePolicyHandle(value);
 }
 
 export function buildCreatorRegistry(source: CreatorRegistrySource): CreatorRegistry {

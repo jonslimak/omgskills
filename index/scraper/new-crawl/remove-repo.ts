@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "
 import { dirname, join } from "node:path";
 import { validateCutoverOutputs } from "./cutover-validation.js";
 import { normalizeRepoKey, repoFromSkillId } from "./do-not-crawl.js";
+import { loadTrustedSeeds } from "./seeds.js";
 import { indexRoot, shadowRoot, assertShadowPath } from "./shadow-path-guard.js";
 import type {
   DoNotCrawlReason,
@@ -110,6 +111,7 @@ export function removeRepoFromShadowState(state: RemoveRepoState, repoInput: str
 }
 
 async function main() {
+  loadTrustedSeeds("manual-command");
   const repoArg = process.argv[2];
   if (!repoArg) {
     throw new Error("Usage: npm run crawl4:remove-repo -- owner/repo");

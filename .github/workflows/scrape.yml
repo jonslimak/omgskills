@@ -47,6 +47,10 @@ jobs:
         working-directory: index
         run: npm ci
 
+      - name: Validate policy inputs
+        working-directory: index
+        run: npm run policy:validate -- --profile scheduled-data
+
       - name: Run scraper
         working-directory: index
         env:
