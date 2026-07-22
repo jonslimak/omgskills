@@ -89,8 +89,30 @@ export type LoadedPolicySources = {
 export type PolicyIssueSeverity = "error" | "warning";
 export type PolicyIssueScope = "core" | "editorial" | "conflict";
 
+export const POLICY_REASON_CODES = [
+  "invalid-mapping",
+  "do-not-crawl",
+  "repo-override-exclude",
+  "suppressed-skill",
+  "catalog-repo",
+  "non-original-provenance",
+  "manual-include",
+  "official",
+  "trusted-vendor",
+  "trusted-creator",
+  "gold-basket",
+  "creator-watch",
+  "x-social",
+  "stars",
+  "install-signal",
+  "below-value-threshold",
+] as const;
+
+export type PolicyReasonCode = typeof POLICY_REASON_CODES[number];
+
 export type PolicyIssue = {
   code: string;
+  reasonCode?: PolicyReasonCode;
   severity: PolicyIssueSeverity;
   scope: PolicyIssueScope;
   source: PolicySourceKey;

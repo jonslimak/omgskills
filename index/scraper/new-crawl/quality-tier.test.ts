@@ -99,6 +99,23 @@ test("collection-like copies do not inherit creator trust", () => {
   }
 });
 
+test("enforced precedence prevents non-original gold skills from becoming curated", () => {
+  const copied = skill({ provenance_type: "repackaged" });
+  assert.equal(classifySkillQualityTier({
+    skill: copied,
+    repo: repo({ isGoldBasketRepo: true }),
+    seeds: seeds(),
+    goldBasketSkillIds: new Set([copied.id]),
+  }), "curated");
+  assert.equal(classifySkillQualityTier({
+    skill: copied,
+    repo: repo({ isGoldBasketRepo: true }),
+    seeds: seeds(),
+    goldBasketSkillIds: new Set([copied.id]),
+    enforcePolicyPrecedence: true,
+  }), "validated");
+});
+
 test("known catalog repo policy overrides gold and creator trust", () => {
   const catalogSeeds = seeds({
     featuredCreatorHandles: new Set(["owner"]),

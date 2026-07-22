@@ -31,3 +31,17 @@ test("canonical SHA publication is enabled only for its publisher step", () => {
   assert.match(step, /SHA_CANONICAL_PUBLISH: "1"/);
   assert.equal(workflow.match(/SHA_CANONICAL_PUBLISH:/g)?.length, 1);
 });
+
+test("policy precedence is observe-only and uploaded for scheduled review", () => {
+  const crawlStep = workflow.match(
+    /      - name: Run shadow crawl\n[\s\S]*?(?=\n      - name:)/,
+  )?.[0];
+
+  assert.ok(crawlStep, "Run shadow crawl step missing");
+  assert.match(crawlStep, /CRAWL4_POLICY_PRECEDENCE: "observe"/);
+  assert.equal(workflow.match(/CRAWL4_POLICY_PRECEDENCE:/g)?.length, 1);
+  assert.match(workflow, /Upload policy precedence observation/);
+  assert.match(workflow, /policy-precedence\.shadow\.json/);
+  assert.match(workflow, /policy-precedence\.shadow\.md/);
+  assert.doesNotMatch(workflow, /CRAWL4_POLICY_PRECEDENCE: "(?:admission|enforce)"/);
+});

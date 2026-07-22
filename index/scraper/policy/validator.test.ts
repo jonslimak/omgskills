@@ -98,7 +98,7 @@ test("reports policy conflicts without changing scheduled crawler behavior", () 
     doNotCrawl: { repos: [{ repo: "openai/codex", reason: "other" }], owners: [] },
   });
   const issues = validatePolicy(loaded, catalogContext);
-  assert.ok(issues.some((entry) => entry.code === "blocked-official-repo"));
+  assert.ok(issues.some((entry) => entry.code === "blocked-official-repo" && entry.reasonCode === "do-not-crawl"));
   assert.equal(blockingPolicyIssues(issues, "scheduled-data").length, 0);
   assert.ok(blockingPolicyIssues(issues, "editool").length > 0);
 });

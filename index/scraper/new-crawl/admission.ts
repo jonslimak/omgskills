@@ -1,6 +1,9 @@
+import type { PolicyReasonCode } from "../policy/types.js";
+import { sortBootstrapCandidates } from "./bootstrap.js";
 import type { RepoBootstrapCandidate, ShadowRepoIndexEntry, TrustedSeeds } from "./types.js";
 import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { isDoNotCrawlRepo } from "./do-not-crawl.js";
+import { isSuppressedSkillId } from "./suppressed-skills.js";
 
 export const LIBRARY_ADMISSION_MIN_STARS = 500;
 export const X_SOCIAL_ADMISSION_MIN_STARS = 50;
@@ -13,9 +16,10 @@ export type AdmissionDiscoveredRepo = {
   sources: Set<string>;
   stars: number;
   bootstrapCandidate?: RepoBootstrapCandidate;
+  bootstrapCandidates?: RepoBootstrapCandidate[];
 };
 
-type AdmissionTrustSignals = {
+export type AdmissionTrustSignals = {
   isTrustedVendor: boolean;
   isTrustedCreator: boolean;
   isGoldBasketRepo: boolean;
@@ -23,7 +27,30 @@ type AdmissionTrustSignals = {
 
 type AdmissionOptions = {
   installAdmissionEnabled?: boolean;
+  policyPrecedenceMode?: PolicyPrecedenceMode;
 };
+
+export type PolicyPrecedenceMode = "observe" | "admission" | "enforce";
+
+export type AdmissionDecision = {
+  eligible: boolean;
+  reasonCode: PolicyReasonCode;
+  matchedSource: string;
+  candidate: RepoBootstrapCandidate | null;
+};
+
+export type AdmissionEvaluation = {
+  legacy: AdmissionDecision;
+  proposed: AdmissionDecision;
+  effective: AdmissionDecision;
+  skippedSuppressedCandidateIds: string[];
+};
+
+export function parsePolicyPrecedenceMode(value = process.env.CRAWL4_POLICY_PRECEDENCE): PolicyPrecedenceMode {
+  const normalized = value?.trim().toLowerCase() || "observe";
+  if (normalized === "observe" || normalized === "admission" || normalized === "enforce") return normalized;
+  throw new Error(`Invalid CRAWL4_POLICY_PRECEDENCE: ${value}. Expected observe, admission, or enforce.`);
+}
 
 export function passesInstallAdmissionArm(
   discoveredRepo: AdmissionDiscoveredRepo,
@@ -74,19 +101,157 @@ export function passesLibraryAdmissionCleanMappingGate(discoveredRepo: Admission
   return Boolean(discoveredRepo.bootstrapCandidate);
 }
 
+function acceptedDecision(
+  reasonCode: PolicyReasonCode,
+  matchedSource: string,
+  candidate: RepoBootstrapCandidate,
+): AdmissionDecision {
+  return { eligible: true, reasonCode, matchedSource, candidate };
+}
+
+function rejectedDecision(
+  reasonCode: PolicyReasonCode,
+  matchedSource: string,
+  candidate: RepoBootstrapCandidate | null,
+): AdmissionDecision {
+  return { eligible: false, reasonCode, matchedSource, candidate };
+}
+
+function valueDecision(
+  discoveredRepo: AdmissionDiscoveredRepo,
+  seeds: TrustedSeeds,
+  trust: AdmissionTrustSignals,
+  candidate: RepoBootstrapCandidate,
+  options: AdmissionOptions,
+): AdmissionDecision {
+  const repo = discoveredRepo.repo;
+  if (seeds.manualIncludeRepos.has(repo)) return acceptedDecision("manual-include", "manualIncludeRepos", candidate);
+  if (seeds.officialTier1Repos.has(repo) || seeds.officialTier2Repos.has(repo) || discoveredRepo.sources.has("official")) {
+    return acceptedDecision("official", "officialRepos", candidate);
+  }
+  if (trust.isTrustedVendor) return acceptedDecision("trusted-vendor", "creators", candidate);
+  if (trust.isTrustedCreator) return acceptedDecision("trusted-creator", "creators", candidate);
+  if (trust.isGoldBasketRepo) return acceptedDecision("gold-basket", "goldBasket", candidate);
+  if (discoveredRepo.sources.has("creator-watch")) return acceptedDecision("creator-watch", "creators", candidate);
+  if (discoveredRepo.sources.has("x-social") && discoveredRepo.stars >= X_SOCIAL_ADMISSION_MIN_STARS) {
+    return acceptedDecision("x-social", "xSocial", candidate);
+  }
+  if (discoveredRepo.stars >= LIBRARY_ADMISSION_MIN_STARS) return acceptedDecision("stars", "githubStars", candidate);
+  if (passesInstallAdmissionArm({ ...discoveredRepo, bootstrapCandidate: candidate }, options)) {
+    return acceptedDecision("install-signal", "skillsSh", candidate);
+  }
+  return rejectedDecision("below-value-threshold", "admissionThresholds", candidate);
+}
+
+function legacyAdmissionDecision(
+  discoveredRepo: AdmissionDiscoveredRepo,
+  seeds: TrustedSeeds,
+  trust: AdmissionTrustSignals,
+  options: AdmissionOptions,
+): AdmissionDecision {
+  const candidate = discoveredRepo.bootstrapCandidate ?? null;
+  if (!candidate) return rejectedDecision("invalid-mapping", "bootstrapCandidate", null);
+  if (isDoNotCrawlRepo(discoveredRepo.repo, seeds)) return rejectedDecision("do-not-crawl", "doNotCrawl", candidate);
+  if (passesLibraryAdmissionValueGate(discoveredRepo.repo, discoveredRepo.stars, seeds, trust, discoveredRepo.sources)) {
+    return valueDecision(discoveredRepo, seeds, trust, candidate, options);
+  }
+  if (isKnownCatalogRepo(discoveredRepo.repo, seeds.catalogRepoRules)) {
+    return rejectedDecision("catalog-repo", "catalogRepos", candidate);
+  }
+  if (passesInstallAdmissionArm(discoveredRepo, options)) {
+    return acceptedDecision("install-signal", "skillsSh", candidate);
+  }
+  return rejectedDecision("below-value-threshold", "admissionThresholds", candidate);
+}
+
+function candidatePool(discoveredRepo: AdmissionDiscoveredRepo): RepoBootstrapCandidate[] {
+  return sortBootstrapCandidates([
+    ...(discoveredRepo.bootstrapCandidates ?? []),
+    ...(discoveredRepo.bootstrapCandidate ? [discoveredRepo.bootstrapCandidate] : []),
+  ]);
+}
+
+function unsafeProvenanceSource(
+  repo: string,
+  candidate: RepoBootstrapCandidate,
+  seeds: TrustedSeeds,
+): string | null {
+  const normalizedId = candidate.id.toLowerCase();
+  const override = seeds.provenanceOverrides.find((entry) =>
+    entry.id?.toLowerCase() === normalizedId || entry.repo === repo
+  );
+  return override?.provenanceType && override.provenanceType !== "original"
+    ? "provenanceOverrides"
+    : null;
+}
+
+function proposedAdmissionDecision(
+  discoveredRepo: AdmissionDiscoveredRepo,
+  seeds: TrustedSeeds,
+  trust: AdmissionTrustSignals,
+  options: AdmissionOptions,
+): { decision: AdmissionDecision; skippedSuppressedCandidateIds: string[] } {
+  const candidates = candidatePool(discoveredRepo);
+  const skippedSuppressedCandidateIds = candidates
+    .filter((candidate) => isSuppressedSkillId(candidate.id, seeds))
+    .map((candidate) => candidate.id);
+  const candidate = candidates.find((row) => !isSuppressedSkillId(row.id, seeds)) ?? null;
+  if (!candidate) {
+    const reason = candidates.length > 0 ? "suppressed-skill" : "invalid-mapping";
+    const source = candidates.length > 0 ? "suppressedSkills" : "bootstrapCandidate";
+    return { decision: rejectedDecision(reason, source, null), skippedSuppressedCandidateIds };
+  }
+  if (isDoNotCrawlRepo(discoveredRepo.repo, seeds)) {
+    return { decision: rejectedDecision("do-not-crawl", "doNotCrawl", candidate), skippedSuppressedCandidateIds };
+  }
+  if (seeds.repoOverrides.some((entry) => entry.repo === discoveredRepo.repo && entry.exclude === true)) {
+    return { decision: rejectedDecision("repo-override-exclude", "repoOverrides", candidate), skippedSuppressedCandidateIds };
+  }
+  if (isKnownCatalogRepo(discoveredRepo.repo, seeds.catalogRepoRules)) {
+    return { decision: rejectedDecision("catalog-repo", "catalogRepos", candidate), skippedSuppressedCandidateIds };
+  }
+  const provenanceSource = unsafeProvenanceSource(discoveredRepo.repo, candidate, seeds);
+  if (provenanceSource) {
+    return {
+      decision: rejectedDecision("non-original-provenance", provenanceSource, candidate),
+      skippedSuppressedCandidateIds,
+    };
+  }
+  return {
+    decision: valueDecision({ ...discoveredRepo, bootstrapCandidate: candidate }, seeds, trust, candidate, options),
+    skippedSuppressedCandidateIds,
+  };
+}
+
+export function evaluateDiscoveredRepoAdmission(
+  discoveredRepo: AdmissionDiscoveredRepo,
+  seeds: TrustedSeeds,
+  trust: AdmissionTrustSignals,
+  options: AdmissionOptions = {},
+): AdmissionEvaluation {
+  const legacy = legacyAdmissionDecision(discoveredRepo, seeds, trust, options);
+  const proposed = proposedAdmissionDecision(discoveredRepo, seeds, trust, options);
+  const mode = options.policyPrecedenceMode ?? "observe";
+  return {
+    legacy,
+    proposed: proposed.decision,
+    effective: mode === "observe" ? legacy : proposed.decision,
+    skippedSuppressedCandidateIds: proposed.skippedSuppressedCandidateIds,
+  };
+}
+
 export function isDiscoveredRepoAdmissionEligible(
   discoveredRepo: AdmissionDiscoveredRepo,
   seeds: TrustedSeeds,
   trust: Pick<AdmissionTrustSignals, "isTrustedVendor" | "isGoldBasketRepo">,
   options: AdmissionOptions = {},
 ): boolean {
-  if (!passesLibraryAdmissionCleanMappingGate(discoveredRepo)) return false;
-  if (passesLibraryAdmissionValueGate(discoveredRepo.repo, discoveredRepo.stars, seeds, trust, discoveredRepo.sources)) {
-    return true;
-  }
-  if (isDoNotCrawlRepo(discoveredRepo.repo, seeds)) return false;
-  if (isKnownCatalogRepo(discoveredRepo.repo, seeds.catalogRepoRules)) return false;
-  return passesInstallAdmissionArm(discoveredRepo, options);
+  return evaluateDiscoveredRepoAdmission(
+    discoveredRepo,
+    seeds,
+    { ...trust, isTrustedCreator: false },
+    options,
+  ).effective.eligible;
 }
 
 export function createAdmittedLibraryRepoEntry(

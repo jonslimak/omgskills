@@ -8,6 +8,7 @@ import {
   removeFailedNewlyAdmittedRepos,
   repairDeadPersistedRisingSkillLinks,
   selectBetterBootstrapCandidate,
+  sortBootstrapCandidates,
 } from "./bootstrap.js";
 import type { RepoBootstrapCandidate, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
 
@@ -80,6 +81,20 @@ test("best candidate uses higher stars within same source", () => {
   );
 
   assert.equal(better.id, "repo:high");
+});
+
+test("candidate ordering is deterministic and keeps alternatives", () => {
+  const ordered = sortBootstrapCandidates([
+    candidate({ source: "code", id: "repo/code:skill", skill_md_path: "skills/code/SKILL.md", github_url: "https://github.com/repo/code", stars: 500 }),
+    candidate({ source: "official", id: "repo/code:primary", skill_md_path: "skills/primary/SKILL.md", github_url: "https://github.com/repo/code", stars: 1 }),
+    candidate({ source: "registry", id: "repo/code:secondary", skill_md_path: "skills/secondary/SKILL.md", github_url: "https://github.com/repo/code", stars: 20 }),
+  ]);
+
+  assert.deepEqual(ordered.map((row) => row.id), [
+    "repo/code:primary",
+    "repo/code:secondary",
+    "repo/code:skill",
+  ]);
 });
 
 test("skillssh candidates are excluded from bootstrap eligibility", () => {

@@ -189,15 +189,26 @@ v2 blocklist migration remain P1.4 and P1.5.
 
 #### P1.4 - Encode and test conflict precedence
 
-- [ ] Make do-not-crawl and skill suppression override every admission or trust
-  signal.
-- [ ] Make catalog/provenance safety policy override trust and popularity.
-- [ ] Allow manual inclusion to bypass value thresholds only, never parsing,
-  provenance, suppression, or do-not-crawl policy.
-- [ ] Keep watch flag-gated, require watch for featured, and prevent editorial
-  collections from admitting catalog rows.
-- [ ] Treat the precedence change as a Crawl 4 policy change and review a
-  before/after shadow diff grouped by reason before promotion.
+**Implementation complete; rollout observation pending.** Scheduled Crawl 4 is
+explicitly in `observe` mode, so current output behavior is preserved.
+
+- [x] Encode do-not-crawl, repo exclusion, suppression, catalog, and explicit
+  non-original provenance ahead of every value or trust signal.
+- [x] Keep suppression skill-scoped: skip a suppressed primary bootstrap
+  candidate and deterministically try the next eligible candidate.
+- [x] Limit manual inclusion to bypassing value thresholds; it cannot bypass
+  mapping, exclusion, suppression, catalog, or provenance policy.
+- [x] Prevent unsafe repositories and non-original skills from inheriting
+  rising/core or curated classification through stars, trust, or gold signals.
+- [x] Keep creator watch flag-gated, `featured => watch` validated, and
+  editorial collections outside admission inputs.
+- [x] Emit JSON and Markdown observations using shared policy reason codes for
+  admission, repo-state, and quality-tier changes.
+- [x] Support `observe`, admission-only `admission`, and full `enforce` modes;
+  unknown values fail closed.
+- [ ] Review artifacts from at least two successful scheduled combined runs.
+- [ ] Approve either admission-only or full enforcement based on observed
+  counts. Any mode change is a separate reviewed change.
 
 #### P1.5 - Align catalog mutation paths
 

@@ -2,10 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   createAdmittedLibraryRepoEntry,
+  evaluateDiscoveredRepoAdmission,
   INSTALL_ADMISSION_MAX_ALL_TIME_RANK,
   INSTALL_ADMISSION_MIN_INSTALLS,
   isDiscoveredRepoAdmissionEligible,
   LIBRARY_ADMISSION_MIN_STARS,
+  parsePolicyPrecedenceMode,
   X_SOCIAL_ADMISSION_MIN_STARS,
 } from "./admission.js";
 import type { AdmissionDiscoveredRepo } from "./admission.js";
@@ -143,6 +145,95 @@ test("known catalog repo does not pass admission through creator-watch", () => {
     ),
     false,
   );
+});
+
+test("observe preserves a legacy official catalog admission while admission mode rejects it", () => {
+  const repo = discoveredRepo({ repo: "catalog/repo", sources: new Set(["official"]) });
+  const catalogSeeds = seeds({ catalogRepoRules: [{ repo: repo.repo, defaultProvenanceType: "catalog" }] });
+  const trust = { isTrustedVendor: false, isTrustedCreator: false, isGoldBasketRepo: false };
+
+  const observed = evaluateDiscoveredRepoAdmission(repo, catalogSeeds, trust, { policyPrecedenceMode: "observe" });
+  const enforced = evaluateDiscoveredRepoAdmission(repo, catalogSeeds, trust, { policyPrecedenceMode: "admission" });
+
+  assert.equal(observed.legacy.eligible, true);
+  assert.equal(observed.effective.eligible, true);
+  assert.equal(observed.proposed.reasonCode, "catalog-repo");
+  assert.equal(enforced.effective.eligible, false);
+});
+
+test("manual inclusion cannot bypass explicit non-original provenance", () => {
+  const repo = discoveredRepo({ repo: "mirror/repo" });
+  const result = evaluateDiscoveredRepoAdmission(
+    repo,
+    seeds({
+      manualIncludeRepos: new Set([repo.repo]),
+      provenanceOverrides: [{ repo: repo.repo, provenanceType: "mirrored" }],
+    }),
+    { isTrustedVendor: false, isTrustedCreator: false, isGoldBasketRepo: false },
+    { policyPrecedenceMode: "admission" },
+  );
+
+  assert.equal(result.legacy.eligible, true);
+  assert.equal(result.effective.eligible, false);
+  assert.equal(result.effective.reasonCode, "non-original-provenance");
+});
+
+test("suppressed primary candidate falls back to the next eligible candidate", () => {
+  const primary = discoveredRepo({ repo: "owner/repo" }).bootstrapCandidate!;
+  const secondary = { ...primary, id: "owner/repo:secondary", source: "registry" as const };
+  const repo = discoveredRepo({
+    repo: "owner/repo",
+    stars: LIBRARY_ADMISSION_MIN_STARS,
+    bootstrapCandidate: primary,
+    bootstrapCandidates: [primary, secondary],
+  });
+  const result = evaluateDiscoveredRepoAdmission(
+    repo,
+    seeds({ suppressedSkillIds: new Set([primary.id.toLowerCase()]) }),
+    { isTrustedVendor: false, isTrustedCreator: false, isGoldBasketRepo: false },
+    { policyPrecedenceMode: "admission" },
+  );
+
+  assert.equal(result.effective.eligible, true);
+  assert.equal(result.effective.candidate?.id, secondary.id);
+  assert.deepEqual(result.skippedSuppressedCandidateIds, [primary.id]);
+});
+
+test("repo exclusion overrides every value signal", () => {
+  const repo = discoveredRepo({ repo: "owner/repo", stars: 100_000, sources: new Set(["official", "creator-watch"]) });
+  const result = evaluateDiscoveredRepoAdmission(
+    repo,
+    seeds({
+      manualIncludeRepos: new Set([repo.repo]),
+      repoOverrides: [{ repo: repo.repo, exclude: true }],
+    }),
+    { isTrustedVendor: true, isTrustedCreator: true, isGoldBasketRepo: true },
+    { policyPrecedenceMode: "enforce", installAdmissionEnabled: true },
+  );
+
+  assert.equal(result.effective.eligible, false);
+  assert.equal(result.effective.reasonCode, "repo-override-exclude");
+});
+
+test("editorial collection membership is not an admission signal", () => {
+  const repo = discoveredRepo({
+    repo: "editorial/repo",
+    stars: 1,
+    sources: new Set(["collection"]),
+  });
+  const result = evaluateDiscoveredRepoAdmission(
+    repo,
+    seeds(),
+    { isTrustedVendor: false, isTrustedCreator: false, isGoldBasketRepo: false },
+    { policyPrecedenceMode: "admission" },
+  );
+
+  assert.equal(result.effective.eligible, false);
+  assert.equal(result.effective.reasonCode, "below-value-threshold");
+});
+
+test("invalid policy precedence mode fails clearly", () => {
+  assert.throws(() => parsePolicyPrecedenceMode("yes"), /Expected observe, admission, or enforce/);
 });
 
 test("do-not-crawl repo does not pass admission by manual include or stars", () => {

@@ -208,15 +208,21 @@ Editool requires newly proposed suppressions to resolve in that union.
 | Skill-equivalence overrides | Regenerate and review equivalence output, then use its separately guarded publisher. |
 | Generated evidence | Regenerate through its owning job and review impact where it can affect admission. |
 
-Current conflict precedence is incomplete:
+Conflict precedence is implemented in Crawl 4 but remains in scheduled
+observation before enforcement:
 
 - do-not-crawl wins in Crawl 4 admission and final filtering, but v2 does not
   yet consume the complete shared owner/repo policy
-- skill suppression filters both maintained paths
-- manual include, official, trusted-vendor, and gold-basket admission arms can
-  bypass part of known-catalog policy; P1.4 requires a reviewed shadow diff
+- skill suppression remains skill-scoped; bootstrap selection skips a
+  suppressed candidate and tries the next deterministic candidate
+- proposed Crawl 4 precedence places repository exclusions and catalog or
+  explicit non-original provenance ahead of manual, official, trust, gold,
+  creator-watch, X, star, and install signals
+- `CRAWL4_POLICY_PRECEDENCE=observe` preserves current output while producing
+  `policy-precedence.shadow.json` and `.md`; `admission` enforces admission only
+  and `enforce` also applies repo-state and quality-tier changes
 - creator/editorial overlaps with exclusion policy are now reported by the
-  shared validator; P1.4 still decides and enforces the final precedence
+  shared validator using the same policy reason vocabulary
 - Editool writes related removal files as separate atomic operations; pair-level
   recovery remains P1.6
 

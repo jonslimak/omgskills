@@ -8,6 +8,7 @@ type ClassifyQualityTierInput = {
   repo: ShadowRepoIndexEntry | null;
   seeds: TrustedSeeds;
   goldBasketSkillIds: Set<string>;
+  enforcePolicyPrecedence?: boolean;
 };
 
 export function classifySkillQualityTier({
@@ -15,10 +16,12 @@ export function classifySkillQualityTier({
   repo,
   seeds,
   goldBasketSkillIds,
+  enforcePolicyPrecedence = false,
 }: ClassifyQualityTierInput): QualityTier {
   const repoName = repo?.repo ?? skill.publisher_repo;
   const isKnownCatalogRepo = seeds.catalogRepoRules.some((rule) => rule.repo === repoName.toLowerCase());
   if (isKnownCatalogRepo) return "validated";
+  if (enforcePolicyPrecedence && skill.provenance_type !== "original") return "validated";
 
   const author = resolveCreatorHandle(seeds, skill.author_handle);
   const isOriginal = skill.provenance_type === "original";
@@ -56,6 +59,7 @@ export function applyQualityTiers(
   seeds: TrustedSeeds,
   goldBasketSkillIds: Set<string>,
   enabled: boolean,
+  enforcePolicyPrecedence = false,
 ): ShadowSkillRecord[] {
   const untieredSkills = stripQualityTiers(skills);
   if (!enabled) return untieredSkills;
@@ -72,6 +76,7 @@ export function applyQualityTiers(
       repo: repoBySkillId.get(skill.id) ?? null,
       seeds,
       goldBasketSkillIds,
+      enforcePolicyPrecedence,
     }),
   }));
 }

@@ -14,7 +14,13 @@ import { searchSkillsSh, type SkillsShHit } from "../sources/skillssh.js";
 import { searchAwesomeAgentSkills } from "../sources/awesome.js";
 import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
-import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible, passesInstallAdmissionArm } from "./admission.js";
+import {
+  createAdmittedLibraryRepoEntry,
+  evaluateDiscoveredRepoAdmission,
+  parsePolicyPrecedenceMode,
+  passesInstallAdmissionArm,
+  type PolicyPrecedenceMode,
+} from "./admission.js";
 import { loadTrustedSeeds, resolveCreatorHandle } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { loadXSocialDiscoveryCandidates, removeBelowStarXSocialOnlyState } from "./x-social-discovery.js";
@@ -27,7 +33,7 @@ import {
 import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
 import { buildCandidateFromSkill } from "./candidate-path.js";
-import { bootstrapRisingRepos, removeFailedNewlyAdmittedRepos, repairDeadPersistedRisingSkillLinks, selectBetterBootstrapCandidate, toEnrichCandidate } from "./bootstrap.js";
+import { bootstrapRisingRepos, removeFailedNewlyAdmittedRepos, repairDeadPersistedRisingSkillLinks, sortBootstrapCandidates, toEnrichCandidate } from "./bootstrap.js";
 import { assertGitHubQuotaAvailable } from "./github-quota-guard.js";
 import { buildCutoverCompare, buildCutoverCompareSummary } from "./cutover-compare.js";
 import { validateCutoverOutputs } from "./cutover-validation.js";
@@ -42,6 +48,15 @@ import {
   loadSkillEquivalenceOverrides,
 } from "./skill-equivalence.js";
 import { applyQualityTiers, stripQualityTiers, summarizeQualityTiers } from "./quality-tier.js";
+import {
+  admissionObservation,
+  applyRepoStatePrecedence,
+  buildPolicyPrecedenceReport,
+  renderPolicyPrecedenceReport,
+  type AdmissionPolicyObservation,
+  type QualityTierPolicyObservation,
+  type RepoStatePolicyObservation,
+} from "./policy-precedence.js";
 import {
   applyShadowSkillOverlay,
   buildShadowSkillOverlay,
@@ -127,6 +142,7 @@ type DiscoveredRepoRecord = {
   lanes: Set<DiscoveryLane>;
   stars: number;
   bootstrapCandidate?: RepoBootstrapCandidate;
+  bootstrapCandidates?: RepoBootstrapCandidate[];
 };
 
 const CADENCE_LANES: Record<ShadowCadence, DiscoveryLane[]> = {
@@ -904,7 +920,11 @@ function maybeSetBootstrapCandidate(
   if (!repoInfo) return;
   const existing = discovered.get(repoInfo.repo);
   if (!existing) return;
-  existing.bootstrapCandidate = selectBetterBootstrapCandidate(existing.bootstrapCandidate, candidate);
+  existing.bootstrapCandidates = sortBootstrapCandidates([
+    ...(existing.bootstrapCandidates ?? []),
+    candidate,
+  ]);
+  existing.bootstrapCandidate = existing.bootstrapCandidates[0];
 }
 
 function observedStars(hit: unknown): number {
@@ -941,10 +961,16 @@ export function admitDiscoveredRepos(
   discovered: Map<string, DiscoveredRepoRecord>,
   goldBasketRepos: Set<string>,
   seeds: TrustedSeeds,
-  options: { maxNewAdmissions?: number; installAdmissionEnabled?: boolean } = {},
+  options: {
+    maxNewAdmissions?: number;
+    installAdmissionEnabled?: boolean;
+    policyPrecedenceMode?: PolicyPrecedenceMode;
+    policyObservations?: AdmissionPolicyObservation[];
+  } = {},
 ): Set<string> {
   const admittedRepos = new Set<string>();
   if (cadence !== "combined") return admittedRepos;
+  const policyPrecedenceMode = options.policyPrecedenceMode ?? "observe";
 
   const existingRepos = new Set(repoIndex.repos.map((repo) => repo.repo));
   const maxNewAdmissions = options.maxNewAdmissions ?? Number.POSITIVE_INFINITY;
@@ -957,11 +983,17 @@ export function admitDiscoveredRepos(
   for (const discoveredRepo of candidates) {
     if (admittedRepos.size >= maxNewAdmissions) break;
     if (existingRepos.has(discoveredRepo.repo)) continue;
-    if (isDoNotCrawlRepo(discoveredRepo.repo, seeds)) continue;
     const trust = buildTrustSignalsForRepo(discoveredRepo.repo, goldBasketRepos, seeds);
-    if (!isDiscoveredRepoAdmissionEligible(discoveredRepo, seeds, trust, {
+    const evaluation = evaluateDiscoveredRepoAdmission(discoveredRepo, seeds, trust, {
       installAdmissionEnabled: options.installAdmissionEnabled,
-    })) continue;
+      policyPrecedenceMode,
+    });
+    const observation = admissionObservation(discoveredRepo.repo, evaluation);
+    if (observation) options.policyObservations?.push(observation);
+    if (!evaluation.effective.eligible) continue;
+    if (evaluation.effective.candidate && policyPrecedenceMode !== "observe") {
+      discoveredRepo.bootstrapCandidate = evaluation.effective.candidate;
+    }
 
     repoIndex.repos.push(createAdmittedLibraryRepoEntry(discoveredRepo, checkedAt, trust));
     existingRepos.add(discoveredRepo.repo);
@@ -2077,6 +2109,7 @@ async function main() {
   const forceWebLibrarySnippets = parseForceWebLibrarySnippets(argv);
   const onlyHighStarBackfill = parseOnlyHighStarBackfill(argv, cadence);
   const highStarQueryBatch = parseHighStarQueryBatch(argv, onlyHighStarBackfill);
+  const policyPrecedenceMode = parsePolicyPrecedenceMode();
   await assertGitHubQuotaAvailable(cadence);
 
   const baselinePath = join(indexRoot, "skills.json");
@@ -2094,6 +2127,8 @@ async function main() {
   const cutoverSkillSignalsOutPath = join(shadowRoot, "skill-signals.cutover.shadow.json");
   const cutoverCompareOutPath = join(shadowRoot, "cutover-compare.shadow.json");
   const cutoverCompareSummaryOutPath = join(shadowRoot, "cutover-compare.shadow.md");
+  const policyPrecedenceOutPath = join(shadowRoot, "policy-precedence.shadow.json");
+  const policyPrecedenceSummaryOutPath = join(shadowRoot, "policy-precedence.shadow.md");
   const reportOutPath = join(shadowRoot, "shadow-report.json");
   const summaryOutPath = join(shadowRoot, "shadow-summary.md");
 
@@ -2175,6 +2210,7 @@ async function main() {
     ? [...partialDiscoveryWarnings, momentumWarning]
     : partialDiscoveryWarnings;
   const installAdmissionEnabled = process.env.CRAWL4_INSTALL_ADMISSION === "1";
+  const admissionPolicyObservations: AdmissionPolicyObservation[] = [];
 
   const newlyAdmittedRepos = admitDiscoveredRepos(
     cadence,
@@ -2186,6 +2222,8 @@ async function main() {
     {
       ...(onlyHighStarBackfill ? { maxNewAdmissions: HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS } : {}),
       installAdmissionEnabled,
+      policyPrecedenceMode,
+      policyObservations: admissionPolicyObservations,
     },
   );
   const creatorWatchAdmissionSample = [...newlyAdmittedRepos]
@@ -2243,14 +2281,50 @@ async function main() {
   const untieredCutoverShadowSkills = stripQualityTiers(buildCutoverShadowSkills(shadowSkills));
   removeFilteredCatalogOnlyRepos(repoIndex, shadowSkills, untieredCutoverShadowSkills);
   reconcileRepoIndexSkillIds(repoIndex, untieredCutoverShadowSkills);
+  const repoStatePolicyObservations: RepoStatePolicyObservation[] = applyRepoStatePrecedence(
+    repoIndex,
+    seeds,
+    policyPrecedenceMode === "enforce",
+  );
   const qualityTiersEnabled = process.env.CRAWL4_QUALITY_TIERS === "1";
-  const cutoverShadowSkills = applyQualityTiers(
+  const currentQualityTierSkills = applyQualityTiers(
     untieredCutoverShadowSkills,
     repoIndex,
     seeds,
     goldBasketSkillIds,
     qualityTiersEnabled,
   );
+  const proposedQualityTierSkills = applyQualityTiers(
+    untieredCutoverShadowSkills,
+    repoIndex,
+    seeds,
+    goldBasketSkillIds,
+    qualityTiersEnabled,
+    true,
+  );
+  const proposedQualityById = new Map(proposedQualityTierSkills.map((skill) => [skill.id, skill.quality_tier]));
+  const qualityTierPolicyObservations: QualityTierPolicyObservation[] = qualityTiersEnabled
+    ? currentQualityTierSkills.flatMap((skill) => {
+        const proposedTier = proposedQualityById.get(skill.id);
+        if (!skill.quality_tier || !proposedTier || skill.quality_tier === proposedTier) return [];
+        return [{
+          skillId: skill.id,
+          currentTier: skill.quality_tier,
+          proposedTier,
+          reasonCode: "non-original-provenance" as const,
+        }];
+      })
+    : [];
+  const cutoverShadowSkills = policyPrecedenceMode === "enforce"
+    ? proposedQualityTierSkills
+    : currentQualityTierSkills;
+  const policyPrecedenceReport = buildPolicyPrecedenceReport({
+    generatedAt: checkedAt,
+    mode: policyPrecedenceMode,
+    admissions: admissionPolicyObservations,
+    repoStates: repoStatePolicyObservations,
+    qualityTiers: qualityTierPolicyObservations,
+  });
   const qualityTierSummary = summarizeQualityTiers(cutoverShadowSkills);
   const shaCanonicalStart = performance.now();
   const shaCanonicalArtifact = buildShaCanonicalArtifact(
@@ -2487,6 +2561,8 @@ async function main() {
   writeShadowFile(cutoverSkillSignalsOutPath, JSON.stringify(cutoverSkillSignals, null, 2) + "\n");
   writeShadowFile(cutoverCompareOutPath, JSON.stringify(cutoverCompare, null, 2) + "\n");
   writeShadowFile(cutoverCompareSummaryOutPath, buildCutoverCompareSummary(cutoverCompare));
+  writeShadowFile(policyPrecedenceOutPath, JSON.stringify(policyPrecedenceReport, null, 2) + "\n");
+  writeShadowFile(policyPrecedenceSummaryOutPath, renderPolicyPrecedenceReport(policyPrecedenceReport));
   writeShadowFile(reportOutPath, JSON.stringify(initialReport, null, 2) + "\n");
   writeShadowFile(summaryOutPath, buildSummary(initialReport, repoIndex));
   timings.writeOutputs = Math.round(performance.now() - writeStart);

@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { DoNotCrawlRule, ShadowSkillRecord, SuppressedSkillRule } from "./types.js";
+import type { PolicyReasonCode } from "../policy/types.js";
 
 const indexRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const suppressedSkillsPath = join(indexRoot, "seeds", "suppressed-skills.json");
@@ -33,6 +34,7 @@ export type RemovalAuditReport = {
   enforcementNote: string[];
   suppressedSkillCount: number;
   reasonCounts: Record<string, number>;
+  policyReasonCounts: Partial<Record<PolicyReasonCode, number>>;
   confidenceCounts: Record<string, number>;
   batchCount: number;
   batches: RemovalAuditBatch[];
@@ -149,6 +151,12 @@ export function buildRemovalAuditReport(input: {
     ],
     suppressedSkillCount: suppressedSkills.length,
     reasonCounts: sortedRecord(reasonCounts),
+    policyReasonCounts: {
+      ...(suppressedSkills.length ? { "suppressed-skill": suppressedSkills.length } : {}),
+      ...((input.doNotCrawl.repos?.length ?? 0) + (input.doNotCrawl.owners?.length ?? 0)
+        ? { "do-not-crawl": (input.doNotCrawl.repos?.length ?? 0) + (input.doNotCrawl.owners?.length ?? 0) }
+        : {}),
+    },
     confidenceCounts: sortedRecord(confidenceCounts),
     batchCount: batches.length,
     batches,
@@ -182,6 +190,9 @@ export function renderRemovalAuditMarkdown(report: RemovalAuditReport): string {
   lines.push(`- Missing replacement warnings: ${report.missingReplacementCount}`);
   lines.push(`- Do-not-crawl repos: ${report.doNotCrawl.repoCount}`);
   lines.push(`- Do-not-crawl owners: ${report.doNotCrawl.ownerCount}`);
+  for (const [reason, count] of Object.entries(report.policyReasonCounts)) {
+    lines.push(`- Policy reason ${reason}: ${count}`);
+  }
   lines.push("");
   lines.push("## Suppressions by Reason");
   lines.push("");

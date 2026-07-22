@@ -16,6 +16,7 @@ import {
   type PolicyIssue,
   type PolicyIssueScope,
   type PolicyIssueSeverity,
+  type PolicyReasonCode,
   type PolicySourceKey,
   type PolicySources,
   type PolicyValidationProfile,
@@ -36,11 +37,13 @@ type MutableIssueInput = {
   location: string;
   key?: string;
   message: string;
+  reasonCode?: PolicyReasonCode;
 };
 
 function issue(loaded: LoadedPolicySources, input: MutableIssueInput): PolicyIssue {
   return {
     code: input.code,
+    ...(input.reasonCode ? { reasonCode: input.reasonCode } : {}),
     severity: input.severity ?? "error",
     scope: input.scope ?? "core",
     source: input.source,
@@ -589,6 +592,7 @@ export function validatePolicyConflicts(loaded: LoadedPolicySources): PolicyIssu
       if (!isBlocked(repo)) continue;
       issues.push(issue(loaded, {
         code,
+        reasonCode: "do-not-crawl",
         severity: "warning",
         scope: "conflict",
         source,
@@ -613,6 +617,7 @@ export function validatePolicyConflicts(loaded: LoadedPolicySources): PolicyIssu
     if (!variants.some((handle) => blockedOwners.has(handle))) continue;
     issues.push(issue(loaded, {
       code: "blocked-creator",
+      reasonCode: "do-not-crawl",
       severity: "warning",
       scope: "conflict",
       source: "creators",
@@ -641,6 +646,7 @@ export function validatePolicyConflicts(loaded: LoadedPolicySources): PolicyIssu
     if (!suppressedIds.has(id)) continue;
     issues.push(issue(loaded, {
       code: "suppressed-editorial-skill",
+      reasonCode: "suppressed-skill",
       severity: "warning",
       scope: "editorial",
       source: "collections",

@@ -74,6 +74,21 @@ export function selectBetterBootstrapCandidate(
   return next.id.localeCompare(current.id) < 0 ? next : current;
 }
 
+export function sortBootstrapCandidates(candidates: RepoBootstrapCandidate[]): RepoBootstrapCandidate[] {
+  const byKey = new Map<string, RepoBootstrapCandidate>();
+  for (const candidate of candidates) {
+    const key = `${candidate.id.toLowerCase()}\n${candidate.skill_md_path.toLowerCase()}`;
+    const current = byKey.get(key);
+    byKey.set(key, current ? selectBetterBootstrapCandidate(current, candidate) : candidate);
+  }
+  return [...byKey.values()].sort((left, right) => {
+    const preferred = selectBetterBootstrapCandidate(left, right);
+    if (preferred === left && preferred !== right) return -1;
+    if (preferred === right && preferred !== left) return 1;
+    return left.id.localeCompare(right.id);
+  });
+}
+
 export function toEnrichCandidate(candidate: RepoBootstrapCandidate): Candidate {
   return {
     id: candidate.id,

@@ -34,6 +34,7 @@ test("groups suppressions by reason confidence and stagedAt", () => {
   });
 
   assert.equal(report.suppressedSkillCount, 3);
+  assert.equal(report.policyReasonCounts["suppressed-skill"], 3);
   assert.deepEqual(report.reasonCounts, { "same-publisher": 2, "trusted-owner": 1 });
   assert.deepEqual(report.confidenceCounts, { high: 2, medium: 1 });
   assert.equal(report.batchCount, 2);
@@ -103,6 +104,7 @@ test("includes do-not-crawl repo and owner counts", () => {
   assert.equal(report.doNotCrawl.repoCount, 2);
   assert.equal(report.doNotCrawl.ownerCount, 1);
   assert.deepEqual(report.doNotCrawl.reasonCounts, { catalog: 1, spam: 1, unsafe: 1 });
+  assert.equal(report.policyReasonCounts["do-not-crawl"], 3);
 });
 
 test("reports top removed repos and owners deterministically", () => {
