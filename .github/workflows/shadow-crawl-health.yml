@@ -5,6 +5,12 @@ on:
     - cron: "0 6 * * *"
     - cron: "0 12 * * *"
   workflow_dispatch:
+    inputs:
+      report_only:
+        description: Generate policy-precedence reports without publishing or deploying
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -14,7 +20,79 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  policy-precedence-report-only:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.report_only == true }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main --depth=1
+          git reset --hard origin/main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: index/package-lock.json
+
+      - name: Install deps
+        working-directory: index
+        run: npm ci
+
+      - name: Validate policy inputs
+        working-directory: index
+        run: npm run policy:validate -- --profile scheduled-data
+
+      - name: Build trending data
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:trending
+
+      - name: Run report-only shadow crawl
+        working-directory: index
+        env:
+          CRAWL4_POLICY_PRECEDENCE: "observe"
+          CRAWL4_QUALITY_TIERS: "1"
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:shadow
+
+      - name: Summarize report-only policy precedence observation
+        if: always()
+        run: |
+          if [ -f index/shadow/policy-precedence.shadow.md ]; then
+            cat index/shadow/policy-precedence.shadow.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload report-only policy precedence observation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: policy-precedence-report-only-${{ github.run_id }}
+          path: |
+            index/shadow/policy-precedence.shadow.json
+            index/shadow/policy-precedence.shadow.md
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Run shadow guard tests
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run test:shadow-guard
+
   shadow-crawl-health:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.report_only != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
 

@@ -33,15 +33,34 @@ test("canonical SHA publication is enabled only for its publisher step", () => {
 });
 
 test("policy precedence is observe-only and uploaded for scheduled review", () => {
-  const crawlStep = workflow.match(
-    /      - name: Run shadow crawl\n[\s\S]*?(?=\n      - name:)/,
-  )?.[0];
+  const crawlSteps = workflow.match(
+    /      - name: Run(?: report-only)? shadow crawl\n[\s\S]*?(?=\n      - name:)/g,
+  ) ?? [];
 
-  assert.ok(crawlStep, "Run shadow crawl step missing");
-  assert.match(crawlStep, /CRAWL4_POLICY_PRECEDENCE: "observe"/);
-  assert.equal(workflow.match(/CRAWL4_POLICY_PRECEDENCE:/g)?.length, 1);
+  assert.equal(crawlSteps.length, 2, "scheduled and report-only crawl steps are required");
+  for (const crawlStep of crawlSteps) {
+    assert.match(crawlStep, /CRAWL4_POLICY_PRECEDENCE: "observe"/);
+  }
+  assert.equal(workflow.match(/CRAWL4_POLICY_PRECEDENCE:/g)?.length, 2);
   assert.match(workflow, /Upload policy precedence observation/);
+  assert.match(workflow, /Upload report-only policy precedence observation/);
   assert.match(workflow, /policy-precedence\.shadow\.json/);
   assert.match(workflow, /policy-precedence\.shadow\.md/);
   assert.doesNotMatch(workflow, /CRAWL4_POLICY_PRECEDENCE: "(?:admission|enforce)"/);
+});
+
+test("report-only dispatch cannot enter the production writer job", () => {
+  assert.match(workflow, /report_only:\n[\s\S]*?default: true\n[\s\S]*?type: boolean/);
+  assert.match(
+    workflow,
+    /policy-precedence-report-only:\n    if: \$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.report_only == true \}\}/,
+  );
+  assert.match(
+    workflow,
+    /policy-precedence-report-only:[\s\S]*?permissions:\n      contents: read/,
+  );
+  assert.match(
+    workflow,
+    /shadow-crawl-health:\n    if: \$\{\{ github\.event_name != 'workflow_dispatch' \|\| inputs\.report_only != true \}\}/,
+  );
 });
