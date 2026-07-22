@@ -22,6 +22,7 @@ import type {
 type OfficialRepoSeeds = { tier1?: string[]; tier2?: string[] };
 type ManualIncludeRepoSeeds = { include?: string[] };
 type DoNotCrawlSeeds = { repos?: DoNotCrawlRule[]; owners?: DoNotCrawlRule[] };
+type RootSkillInvalidSeeds = { repos?: Array<{ repo: string }> };
 type SuppressedSkillSeeds = { skills?: SuppressedSkillRule[] };
 
 function normalizeHandle(value: string): string {
@@ -50,6 +51,7 @@ export function buildTrustedSeeds(input: {
   officialJson: OfficialRepoSeeds;
   manualIncludeJson: ManualIncludeRepoSeeds;
   doNotCrawlJson: DoNotCrawlSeeds;
+  rootSkillInvalidJson?: RootSkillInvalidSeeds;
   suppressedSkillsJson?: SuppressedSkillSeeds;
   overridesJson: RepoOverride[];
   catalogJson: CatalogRepoRule[];
@@ -92,6 +94,7 @@ export function buildTrustedSeeds(input: {
       doNotCrawlRules.map((rule) => rule.owner).filter((owner): owner is string => Boolean(owner)),
     ),
     doNotCrawlRules,
+    rootSkillInvalidRepos: normalizeRepoSet(input.rootSkillInvalidJson?.repos?.map((rule) => rule.repo)),
     suppressedSkillIds: new Set(suppressedSkillRules.map((rule) => normalizeSkillId(rule.id))),
     suppressedSkillRules,
     repoOverrides: input.overridesJson
@@ -131,6 +134,7 @@ export function loadTrustedSeeds(profile: PolicyValidationProfile = "scheduled-d
     officialJson: sources.officialRepos,
     manualIncludeJson: sources.manualIncludeRepos,
     doNotCrawlJson: sources.doNotCrawl,
+    rootSkillInvalidJson: sources.rootSkillInvalid,
     suppressedSkillsJson: sources.suppressedSkills,
     overridesJson: sources.repoOverrides,
     catalogJson: sources.catalogRepos,

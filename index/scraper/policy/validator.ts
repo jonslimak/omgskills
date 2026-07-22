@@ -379,6 +379,37 @@ function validateDoNotCrawl(loaded: LoadedPolicySources, issues: PolicyIssue[]):
   }
 }
 
+function validateRootSkillInvalid(loaded: LoadedPolicySources, issues: PolicyIssue[]): void {
+  const value = loaded.raw.rootSkillInvalid;
+  if (!requireRecord(loaded, "rootSkillInvalid", value, issues)) return;
+  if (!requireArray(loaded, "rootSkillInvalid", value.repos, "/repos", issues)) return;
+  const seen = new Set<string>();
+  value.repos.forEach((entry, index) => {
+    const location = `/repos/${index}`;
+    if (!isRecord(entry)) {
+      issues.push(issue(loaded, {
+        code: "invalid-root-skill-entry",
+        source: "rootSkillInvalid",
+        location,
+        message: "Root-skill-invalid entries must be objects.",
+      }));
+      return;
+    }
+    const repo = validateRepoValue(loaded, "rootSkillInvalid", entry.repo, `${location}/repo`, issues);
+    if (repo && seen.has(repo)) addDuplicate(loaded, "rootSkillInvalid", location, repo, issues);
+    if (repo) seen.add(repo);
+    if (entry.reason !== "root-skill-invalid") {
+      issues.push(issue(loaded, {
+        code: "invalid-root-skill-reason",
+        source: "rootSkillInvalid",
+        location: `${location}/reason`,
+        reasonCode: "root-skill-invalid",
+        message: "Root-skill-invalid entries require reason root-skill-invalid.",
+      }));
+    }
+  });
+}
+
 function validateSuppressedSkills(loaded: LoadedPolicySources, issues: PolicyIssue[]): void {
   const value = loaded.raw.suppressedSkills;
   if (!requireRecord(loaded, "suppressedSkills", value, issues)) return;
@@ -565,6 +596,7 @@ export function validatePolicyStructure(loaded: LoadedPolicySources): PolicyIssu
   validateCollections(loaded, issues);
   validateOfficialAndManual(loaded, issues);
   validateDoNotCrawl(loaded, issues);
+  validateRootSkillInvalid(loaded, issues);
   validateSuppressedSkills(loaded, issues);
   validateRepoOverrides(loaded, issues);
   validateCatalogRepos(loaded, issues);

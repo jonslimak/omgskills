@@ -2,12 +2,32 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { ShadowRepoIndex, ShadowSkillOverlay, ShadowSkillRecord } from "./types.js";
 import {
+  assertManualCandidateAllowed,
+  findIdempotentManualSkill,
   normalizeSkillSlug,
   parseGithubSkillUrl,
   upsertCutoverSkill,
   upsertRepoEntry,
   upsertShadowSkillOverlay,
 } from "./add-curated-skill.js";
+import type { TrustedSeeds } from "./types.js";
+
+function seeds(overrides: Partial<TrustedSeeds> = {}): TrustedSeeds {
+  return {
+    trustedVendorHandles: new Set(),
+    trustedCreatorHandles: new Set(),
+    officialTier1Repos: new Set(),
+    officialTier2Repos: new Set(),
+    manualIncludeRepos: new Set(),
+    doNotCrawlRepos: new Set(),
+    doNotCrawlOwners: new Set(),
+    suppressedSkillIds: new Set(),
+    repoOverrides: [],
+    catalogRepoRules: [],
+    provenanceOverrides: [],
+    ...overrides,
+  };
+}
 
 function skill(id: string, overrides: Partial<ShadowSkillRecord> = {}): ShadowSkillRecord {
   return {
@@ -61,6 +81,36 @@ test("parseGithubSkillUrl rejects non SKILL.md links", () => {
 
 test("normalizeSkillSlug is deterministic", () => {
   assert.equal(normalizeSkillSlug(" Foo_Bar!! "), "foo-bar");
+});
+
+test("manual candidate cannot bypass exclusion, suppression, catalog, or provenance policy", () => {
+  const parsed = parseGithubSkillUrl("https://github.com/owner/repo/blob/main/skills/foo/SKILL.md");
+  assert.throws(() => assertManualCandidateAllowed(parsed, seeds({
+    doNotCrawlRepos: new Set(["owner/repo"]),
+  })), /do-not-crawl/);
+  assert.throws(() => assertManualCandidateAllowed(parsed, seeds({
+    suppressedSkillIds: new Set(["owner/repo:foo"]),
+  })), /suppressed-skill/);
+  assert.throws(() => assertManualCandidateAllowed(parsed, seeds({
+    catalogRepoRules: [{ repo: "owner/repo", defaultProvenanceType: "catalog" }],
+  })), /catalog policy/);
+  assert.throws(() => assertManualCandidateAllowed(parsed, seeds({
+    provenanceOverrides: [{ repo: "owner/repo", provenanceType: "mirrored" }],
+  })), /non-original provenance/);
+});
+
+test("manual re-add is a no-op only for the same repository path", () => {
+  const parsed = parseGithubSkillUrl("https://github.com/owner/repo/blob/main/skills/foo/SKILL.md");
+  const existing = skill("owner/repo:foo", {
+    github_url: "https://github.com/owner/repo",
+    skill_md_path: "skills/foo/SKILL.md",
+  });
+  assert.equal(findIdempotentManualSkill(parsed, [existing]), existing);
+  assert.equal(findIdempotentManualSkill(parsed, []), null);
+  assert.throws(() => findIdempotentManualSkill(parsed, [{
+    ...existing,
+    skill_md_path: "other/foo/SKILL.md",
+  }]), /id conflict/);
 });
 
 test("upsertShadowSkillOverlay inserts and replaces by id", () => {

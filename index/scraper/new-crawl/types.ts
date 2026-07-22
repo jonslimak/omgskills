@@ -71,6 +71,7 @@ export type TrustedSeeds = {
   doNotCrawlRepos?: Set<string>;
   doNotCrawlOwners?: Set<string>;
   doNotCrawlRules?: DoNotCrawlRule[];
+  rootSkillInvalidRepos?: Set<string>;
   suppressedSkillIds?: Set<string>;
   suppressedSkillRules?: SuppressedSkillRule[];
   repoOverrides: RepoOverride[];

@@ -2,7 +2,9 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "
 import { basename, dirname, join } from "node:path";
 import { enrichCandidate, type Candidate } from "../enrich.js";
 import type { Skill } from "../types.js";
-import { isUnresolvedCatalogLikeSkill } from "./catalog-policy.js";
+import { normalizePolicySkillId } from "../../../scripts/policy-identifiers.mjs";
+import { evaluateEffectiveSkillPolicy, repoFromGithubUrl } from "../policy/effective-policy.js";
+import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { validateCutoverOutputs } from "./cutover-validation.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { loadTrustedSeeds } from "./seeds.js";
@@ -14,6 +16,7 @@ import type {
   ShadowRepoOverlay,
   ShadowSkillOverlay,
   ShadowSkillRecord,
+  TrustedSeeds,
 } from "./types.js";
 
 const MANUAL_SOURCE = "manual-curation";
@@ -105,6 +108,42 @@ export function parseGithubSkillUrl(input: string): ParsedGithubSkillUrl {
   };
 }
 
+export function assertManualCandidateAllowed(parsed: ParsedGithubSkillUrl, seeds: TrustedSeeds): void {
+  const decision = evaluateEffectiveSkillPolicy({ id: parsed.skillId, github_url: parsed.repoUrl }, seeds);
+  if (decision.excluded) {
+    throw new Error(`Manual curation blocked by ${decision.reasonCode}: ${decision.matchedKey ?? parsed.skillId}`);
+  }
+  if (isKnownCatalogRepo(parsed.repoKey, seeds.catalogRepoRules)) {
+    throw new Error(`Manual curation blocked by catalog policy: ${parsed.repoKey}`);
+  }
+  const normalizedId = normalizePolicySkillId(parsed.skillId);
+  const unsafeOverride = seeds.provenanceOverrides.find((entry) =>
+    (entry.id && normalizePolicySkillId(entry.id) === normalizedId) || entry.repo === parsed.repoKey
+  );
+  if (unsafeOverride?.provenanceType && unsafeOverride.provenanceType !== "original") {
+    throw new Error(`Manual curation blocked by non-original provenance: ${parsed.skillId}`);
+  }
+}
+
+function normalizedPath(value: string | null | undefined): string {
+  return (value ?? "").trim().replace(/^\.\//, "").toLowerCase();
+}
+
+export function findIdempotentManualSkill(
+  parsed: ParsedGithubSkillUrl,
+  skills: Skill[],
+): Skill | null {
+  const normalizedId = normalizePolicySkillId(parsed.skillId);
+  const existing = skills.find((skill) => normalizePolicySkillId(skill.id) === normalizedId);
+  if (!existing) return null;
+  const sameRepo = repoFromGithubUrl(existing.github_url) === parsed.repoKey;
+  const samePath = normalizedPath(existing.skill_md_path) === normalizedPath(parsed.path);
+  if (sameRepo && samePath) return existing;
+  throw new Error(
+    `Manual curation id conflict for ${parsed.skillId}: existing row points to ${existing.github_url}#${existing.skill_md_path ?? "unknown"}.`,
+  );
+}
+
 export function toShadowSkillRecord(skill: Skill, seeds = loadTrustedSeeds("manual-command")): ShadowSkillRecord {
   const provenance = resolveShadowProvenance(skill, seeds);
   return {
@@ -187,6 +226,8 @@ async function main() {
   const generatedAt = new Date().toISOString();
   const today = generatedAt.slice(0, 10);
   const parsed = parseGithubSkillUrl(input);
+  const seeds = loadTrustedSeeds("manual-command");
+  assertManualCandidateAllowed(parsed, seeds);
 
   const baselineSkillsPath = join(indexRoot, "skills.json");
   const skillOverlayPath = join(shadowRoot, "skills.overlay.json");
@@ -196,11 +237,6 @@ async function main() {
   const signalsPath = join(shadowRoot, "skill-signals.cutover.shadow.json");
 
   const baselineSkills = readJson<Skill[]>(baselineSkillsPath, []);
-  const baselineIds = new Set(baselineSkills.map((skill) => skill.id));
-  if (baselineIds.has(parsed.skillId)) {
-    throw new Error(`Skill already exists in production skills.json: ${parsed.skillId}`);
-  }
-
   const skillOverlay = readJson<ShadowSkillOverlay>(skillOverlayPath, { generatedAt, skillCount: 0, skills: [] });
   const cutoverSkills = readJson<ShadowSkillRecord[]>(cutoverSkillsPath, []);
   if (cutoverSkills.length === 0) {
@@ -208,6 +244,11 @@ async function main() {
   }
 
   const priorSkills = [...baselineSkills, ...skillOverlay.skills, ...cutoverSkills];
+  const existing = findIdempotentManualSkill(parsed, priorSkills);
+  if (existing) {
+    console.log(`already present: ${existing.id}`);
+    return;
+  }
   const candidate: Candidate = {
     id: parsed.skillId,
     skill_md_path: parsed.path,
@@ -219,9 +260,9 @@ async function main() {
     throw new Error(`Could not enrich ${parsed.skillId}. The SKILL.md must parse cleanly with name and description.`);
   }
 
-  const shadowSkill = toShadowSkillRecord(enriched.skill);
-  if (isUnresolvedCatalogLikeSkill(shadowSkill)) {
-    throw new Error(`Blocked unresolved catalog/repackaged skill: ${shadowSkill.id}`);
+  const shadowSkill = toShadowSkillRecord(enriched.skill, seeds);
+  if (shadowSkill.provenance_type !== "original") {
+    throw new Error(`Manual curation blocked by non-original provenance: ${shadowSkill.id}`);
   }
 
   const repoOverlay = readJson<ShadowRepoOverlay>(repoOverlayPath, { generatedAt, repoCount: 0, repos: [] });

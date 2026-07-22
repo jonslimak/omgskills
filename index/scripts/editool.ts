@@ -13,6 +13,7 @@ import type { CreatorRegistrySource } from "../scraper/creator-registry.js";
 import {
   loadPolicySources,
   replacePolicySource,
+  typedPolicySources,
 } from "../scraper/policy/loader.js";
 import {
   blockingPolicyIssues,
@@ -24,6 +25,10 @@ import type {
   PolicySources,
   SuppressedSkillsPolicySource,
 } from "../scraper/policy/types.js";
+import {
+  LEGACY_BLOCKED_OWNERS,
+  LEGACY_BLOCKED_REPOS,
+} from "../scraper/v2-policy.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -124,23 +129,17 @@ function formatCreators(source: CreatorRegistrySource): string {
   return `{\n  "creators": [\n${lines.join(",\n")}\n  ]\n}\n`;
 }
 
-// ---------- v2 hardcoded blocklists (read-only display) ----------
-// These live as constants in scraper/build.ts, not in a seed file — shown in the
-// tool for visibility only; they retire with the v2 crawler.
-
-function extractStringSet(source: string, constName: string): string[] {
-  const match = source.match(new RegExp(`const ${constName} = new Set\\(\\[([\\s\\S]*?)\\]\\);`));
-  if (!match) return [];
-  return [...match[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
-}
+// ---------- v2 transitional policy (read-only display) ----------
+// Legacy exclusions remain effective until observe reports approve enforcement.
+// Root-path invalidity already comes from its maintained policy source.
 
 function readV2Blocklists(): { blockedRepos: string[]; knownInvalidRepos: string[]; blockedOwners: string[] } {
   try {
-    const source = readFileSync(join(indexRoot, "scraper", "build.ts"), "utf8");
+    const policy = typedPolicySources(loadPolicySources());
     return {
-      blockedRepos: extractStringSet(source, "BLOCKED_REPOS"),
-      knownInvalidRepos: extractStringSet(source, "KNOWN_INVALID_REPOS"),
-      blockedOwners: extractStringSet(source, "BLOCKED_OWNERS"),
+      blockedRepos: [...LEGACY_BLOCKED_REPOS].sort(),
+      knownInvalidRepos: policy.rootSkillInvalid.repos.map((entry) => entry.repo),
+      blockedOwners: [...LEGACY_BLOCKED_OWNERS].sort(),
     };
   } catch {
     return { blockedRepos: [], knownInvalidRepos: [], blockedOwners: [] };

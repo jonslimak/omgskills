@@ -200,6 +200,15 @@ Important behavior:
 - checkpoints are written during large runs
 - SHA reuse avoids reparsing unchanged `SKILL.md` files
 - safety checks prevent catastrophic library shrinkage
+- scheduled runs set `V2_POLICY_MODE=observe`, preserving legacy output while
+  comparing it with the shared exclusion policy
+- each run writes `shadow/v2-policy-diff.shadow.json` and `.md` before publish;
+  reports include the source commit, policy digest, migration coverage, reason
+  counts, and bounded samples
+- `root-skill-invalid.json` rejects only a repository-root `SKILL.md` under the
+  proposed policy; nested skill paths remain eligible
+- enforcement stays blocked until two consecutive scheduled reports are
+  reviewed and the mode change is approved separately
 
 ## Crawl 4 Build
 

@@ -20,6 +20,7 @@ export function defaultPolicySourcePaths(indexRoot = policyIndexRoot): PolicySou
     officialRepos: join(seeds, "official-repos.json"),
     manualIncludeRepos: join(seeds, "manual-include-repos.json"),
     doNotCrawl: join(seeds, "do-not-crawl.json"),
+    rootSkillInvalid: join(seeds, "root-skill-invalid.json"),
     suppressedSkills: join(seeds, "suppressed-skills.json"),
     repoOverrides: join(seeds, "repo-overrides.json"),
     catalogRepos: join(seeds, "catalog-repos.json"),

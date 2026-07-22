@@ -126,6 +126,7 @@ logical matching.
 | `index/seeds/creators.json` | Editorial/catalog operator through Editool or reviewed file edit | Shared creator-registry loader, Crawl 4 seeds and provenance, content overlays, gold basket, leaderboards, collections publisher, and handle reservations. Roles affect trust; `watch` affects flag-gated discovery; `featured` affects profiles and curated tiers. | discovery, catalog, identity, editorial |
 | `index/curations/collections.json` | Editorial operator through Editool or reviewed file edit | Collections publisher and isolated Editool preview; feeds Mac and web presentation but never admits catalog rows. | editorial |
 | `index/seeds/do-not-crawl.json` | Catalog operator through Editool, reviewed edit, or `crawl4:remove-repo` | Crawl 4 admission, final filtering, removal audit, and removal command. | catalog |
+| `index/seeds/root-skill-invalid.json` | Catalog operator through reviewed file edit; read-only in Editool until P1.6 | v2 root-path discovery only. It never blocks eligible nested skills by itself. | discovery |
 | `index/seeds/suppressed-skills.json` | Catalog operator through Editool or reviewed file edit | Crawl 4 and v2 filtering, duplicate audit, and removal audit. Historical entries remain durable after a row leaves the catalog. | catalog |
 | `index/seeds/manual-include-repos.json` | Catalog operator through reviewed file edit | Crawl 4 admission; intended to bypass value thresholds only. | catalog |
 | `index/seeds/official-repos.json` | Catalog operator through reviewed file edit | Crawl 4 admission, priority, and quality tiers. | discovery, catalog |
@@ -171,8 +172,8 @@ Editool requires newly proposed suppressions to resolve in that union.
 
 | Input | Current behavior | Required P1 disposition |
 |---|---|---|
-| v2 `BLOCKED_REPOS` and `BLOCKED_OWNERS` in `index/scraper/build.ts` | Hardcoded v2 exclusions can drift from `do-not-crawl.json`. | Replace with shared exclusion policy only after the required v2 one-run diff. |
-| v2 `KNOWN_INVALID_REPOS` in `index/scraper/build.ts` | Means the root `SKILL.md` is invalid while nested skills may remain eligible. | Keep as a separate path-discovery category; never migrate it into do-not-crawl. |
+| Legacy v2 block constants in `index/scraper/v2-policy.ts` | Remain effective while scheduled v2 runs in `observe`; migration audit confirms every entry is represented in shared policy. | Review two consecutive scheduled reports, then switch mode and remove the compatibility constants. |
+| `index/seeds/root-skill-invalid.json` plus its legacy v2 comparison set | Proposed policy rejects only root `SKILL.md`; legacy comparison still rejects the whole repository. | Keep the JSON source as path-discovery policy and remove only the comparison set after enforcement. |
 
 #### Generated evidence
 
@@ -204,15 +205,16 @@ Editool requires newly proposed suppressions to resolve in that union.
 |---|---|
 | Creator roles, aliases, watch, or featured state | Validate through the shared registry; regenerate handle reservations for handle/alias changes; publish collections for featured changes; regenerate web pages. Watch changes do not enable its dormant crawl flag. |
 | Collection copy or membership | Validate catalog references; publish identical collections data to v2 and Crawl 4; regenerate and verify web pages. |
-| Do-not-crawl, suppression, manual include, official/catalog, provenance, or repo policy | Validate and review the Crawl 4 shadow comparison before guarded promotion. v2 parity remains P1.5. |
+| Do-not-crawl, suppression, manual include, official/catalog, provenance, or repo policy | Validate and review the Crawl 4 shadow comparison before guarded promotion. v2 shared-policy parity is implemented but remains in scheduled observation. |
 | Skill-equivalence overrides | Regenerate and review equivalence output, then use its separately guarded publisher. |
 | Generated evidence | Regenerate through its owning job and review impact where it can affect admission. |
 
 Conflict precedence is implemented in Crawl 4 but remains in scheduled
 observation before enforcement:
 
-- do-not-crawl wins in Crawl 4 admission and final filtering, but v2 does not
-  yet consume the complete shared owner/repo policy
+- do-not-crawl wins in Crawl 4 admission and final filtering; v2 compares the
+  complete shared owner/repo policy while legacy behavior remains effective in
+  `V2_POLICY_MODE=observe`
 - skill suppression remains skill-scoped; bootstrap selection skips a
   suppressed candidate and tries the next deterministic candidate
 - proposed Crawl 4 precedence places repository exclusions and catalog or
@@ -221,6 +223,9 @@ observation before enforcement:
 - `CRAWL4_POLICY_PRECEDENCE=observe` preserves current output while producing
   `policy-precedence.shadow.json` and `.md`; `admission` enforces admission only
   and `enforce` also applies repo-state and quality-tier changes
+- v2 writes `v2-policy-diff.shadow.json` and `.md` with migration coverage,
+  source commit, policy digest, reason counts, and bounded samples before its
+  publish step
 - creator/editorial overlaps with exclusion policy are now reported by the
   shared validator using the same policy reason vocabulary
 - Editool writes related removal files as separate atomic operations; pair-level

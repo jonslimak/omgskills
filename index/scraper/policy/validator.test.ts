@@ -4,6 +4,7 @@ import type { LoadedPolicySources, PolicySources } from "./types.js";
 import {
   blockingPolicyIssues,
   validatePolicy,
+  validatePolicyStructure,
 } from "./validator.js";
 
 function fixture(overrides: Partial<PolicySources> = {}): LoadedPolicySources {
@@ -23,6 +24,7 @@ function fixture(overrides: Partial<PolicySources> = {}): LoadedPolicySources {
     officialRepos: { tier1: ["openai/codex"], tier2: [] },
     manualIncludeRepos: { include: [] },
     doNotCrawl: { repos: [], owners: [] },
+    rootSkillInvalid: { repos: [] },
     suppressedSkills: { skills: [] },
     repoOverrides: [],
     catalogRepos: [],
@@ -111,6 +113,18 @@ test("keeps root-skill-invalid separate from exclusion reasons", () => {
     },
   });
   assert.ok(validatePolicy(loaded).some((entry) => entry.code === "invalid-do-not-crawl-reason"));
+});
+
+test("validates root-skill-invalid as root-path policy", () => {
+  const valid = validatePolicyStructure(fixture({
+    rootSkillInvalid: { repos: [{ repo: "obra/superpowers", reason: "root-skill-invalid" }] },
+  }));
+  assert.equal(valid.length, 0);
+
+  const invalid = validatePolicyStructure(fixture({
+    rootSkillInvalid: { repos: [{ repo: "obra/superpowers", reason: "wrong" as "root-skill-invalid" }] },
+  }));
+  assert.equal(invalid.some((entry) => entry.code === "invalid-root-skill-reason"), true);
 });
 
 test("requires stored repository policy to use owner/repo form", () => {

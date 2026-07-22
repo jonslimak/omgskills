@@ -212,15 +212,24 @@ explicitly in `observe` mode, so current output behavior is preserved.
 
 #### P1.5 - Align catalog mutation paths
 
-- [ ] Replace v2 `BLOCKED_REPOS` and `BLOCKED_OWNERS` with the shared exclusion
-  policy.
-- [ ] Keep `KNOWN_INVALID_REPOS` as a separate path-discovery category; it does
-  not mean nested skills should be blocked.
-- [ ] Make manual add/remove commands apply the complete effective policy and
-  update all relevant state idempotently.
-- [ ] Add v2/Crawl 4 exclusion parity tests.
-- [ ] Review a one-run v2 previous/new catalog diff grouped by removal reason
-  before landing the v2 migration.
+**Implementation complete; rollout observation pending.** Scheduled v2 remains
+in `observe`, so its catalog output still uses the legacy rules.
+
+- [x] Add `root-skill-invalid.json` as distinct root-path discovery policy;
+  nested skills from those repositories remain eligible under proposed policy.
+- [x] Audit all legacy `BLOCKED_REPOS`, `BLOCKED_OWNERS`, and root-invalid
+  entries against shared sources. Enforcement fails closed if coverage drifts.
+- [x] Implement shared v2 exclusion evaluation and an `observe`/`enforce` mode;
+  unknown mode values fail clearly.
+- [x] Make manual add reject shared exclusions, catalog repositories, and
+  non-original provenance; exact re-adds are no-ops and ID conflicts fail.
+- [x] Keep manual removal idempotent across do-not-crawl and Crawl 4 state.
+- [x] Add v2/Crawl 4 exclusion parity and root-path behavior tests.
+- [x] Emit scheduled JSON/Markdown v2 diffs with source commit, policy digest,
+  migration coverage, counts, reasons, and bounded samples before publishing.
+- [ ] Review artifacts from two consecutive successful scheduled v2 runs.
+- [ ] In a separate reviewed change, switch to `enforce`, then remove the
+  legacy constants and Editool's read-only compatibility parser.
 
 #### P1.6 - Make Editool changes coherent and recoverable
 
@@ -234,12 +243,14 @@ explicitly in `observe` mode, so current output behavior is preserved.
 #### P1.7 - Add minimum policy impact reports and safety thresholds
 
 - [ ] Produce the Crawl 4 shadow comparison required by P1.4.
-- [ ] Produce the v2 comparison required by P1.5.
+- [x] Implement the v2 comparison required by P1.5; scheduled review is still
+  pending.
 - [ ] Compare generated catalog and editorial outputs with the last known-good
   publication.
 - [ ] Block unexpected shrink, large removals, missing referenced assets, or
   stale-source publication unless an explicit reviewed override is present.
-- [ ] Record the source commit and effective-policy digest in run output.
+- [ ] Record the source commit and effective-policy digest in every relevant
+  run output. v2 is complete; Crawl 4 remains.
 
 #### P1.8 - Deferred: reviewed change-request automation
 

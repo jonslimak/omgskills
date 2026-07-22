@@ -1,0 +1,19 @@
+{
+  "repos": [
+    { "repo": "user-attachments/assets", "reason": "root-skill-invalid", "notes": "GitHub attachment pseudo-repository; owner-level do-not-crawl also applies." },
+    { "repo": "anthropics/skills", "reason": "root-skill-invalid", "notes": "Repository root is not a skill; nested skill directories remain eligible." },
+    { "repo": "smerchek/claude-epub-skill", "reason": "root-skill-invalid" },
+    { "repo": "zxkane/aws-skills", "reason": "root-skill-invalid", "notes": "Repository root is not a skill; nested skill directories remain eligible." },
+    { "repo": "bluzername/claude-code-terminal-title", "reason": "root-skill-invalid" },
+    { "repo": "jthack/ffuf_claude_skill", "reason": "root-skill-invalid" },
+    { "repo": "obra/superpowers", "reason": "root-skill-invalid", "notes": "Repository root is not a skill; nested skill directories remain eligible." },
+    { "repo": "avelikiy/great_cto", "reason": "root-skill-invalid" },
+    { "repo": "conorluddy/ios-simulator-skill", "reason": "root-skill-invalid" },
+    { "repo": "sanjay3290/ai-skills", "reason": "root-skill-invalid", "notes": "Repository root is not a skill; nested skill directories remain eligible." },
+    { "repo": "yvgude/lean-ctx", "reason": "root-skill-invalid" },
+    { "repo": "openweb-org/openweb", "reason": "root-skill-invalid" },
+    { "repo": "lackeyjb/playwright-skill", "reason": "root-skill-invalid" },
+    { "repo": "NeoLabHQ/context-engineering-kit", "reason": "root-skill-invalid", "notes": "Repository root is not a skill; nested skill directories remain eligible." },
+    { "repo": "ykdojo/claude-code-tips", "reason": "root-skill-invalid" }
+  ]
+}

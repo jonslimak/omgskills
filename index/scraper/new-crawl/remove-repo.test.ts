@@ -113,4 +113,9 @@ test("removeRepoFromShadowState removes repo skills and keeps unrelated state", 
   assert.deepEqual(state.shadowSkills.map((entry) => entry.id), ["good/repo:two"]);
   assert.deepEqual(state.signals.map((entry) => entry.id), ["good/repo:two"]);
   assert.deepEqual(state.removedSkills.map((entry) => entry.id), ["davila7/claude-code-templates:one"]);
+
+  const repeated = removeRepoFromShadowState(state, "davila7/claude-code-templates");
+  assert.deepEqual(repeated.repoIndex, state.repoIndex);
+  assert.deepEqual(repeated.skillOverlay, state.skillOverlay);
+  assert.deepEqual(repeated.removedSkills, []);
 });

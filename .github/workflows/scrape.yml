@@ -55,7 +55,26 @@ jobs:
         working-directory: index
         env:
           GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+          V2_POLICY_MODE: "observe"
         run: npm run scrape
+
+      - name: Summarize v2 policy observation
+        if: always()
+        run: |
+          if [ -f index/shadow/v2-policy-diff.shadow.md ]; then
+            cat index/shadow/v2-policy-diff.shadow.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload v2 policy observation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-policy-diff-${{ github.run_id }}
+          path: |
+            index/shadow/v2-policy-diff.shadow.json
+            index/shadow/v2-policy-diff.shadow.md
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Build trending data
         working-directory: index

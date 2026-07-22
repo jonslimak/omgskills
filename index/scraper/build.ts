@@ -21,6 +21,24 @@ import {
 import { loadTrustedSeeds } from "./new-crawl/seeds.js";
 import { isSuppressedSkillId } from "./new-crawl/suppressed-skills.js";
 import type { TrustedSeeds } from "./new-crawl/types.js";
+import { loadPolicySources, typedPolicySources } from "./policy/loader.js";
+import { effectivePolicyDigest } from "./policy/digest.js";
+import {
+  LEGACY_BLOCKED_OWNERS,
+  LEGACY_BLOCKED_REPOS,
+  assertV2PolicyEnforcementReady,
+  buildV2LegacyMigrationAudit,
+  buildV2PolicyReport,
+  currentSourceCommit,
+  evaluateLegacyV2Candidate,
+  evaluateProposedV2Candidate,
+  evaluateProposedV2Skill,
+  observeCandidatePolicy,
+  parseV2PolicyMode,
+  writeV2PolicyReport,
+  type V2CandidatePolicyObservation,
+  type V2PolicyMode,
+} from "./v2-policy.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CHECKPOINT_INTERVAL = 500;
@@ -28,30 +46,6 @@ const MIN_REPO_STARS = 5;
 const SKILLS_SH_MIN_REPO_STARS = 50;
 const REPO_NEGATIVE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const CANDIDATE_NEGATIVE_CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
-const BLOCKED_REPOS = new Set([
-  "majiayu000/claude-skill-registry",
-  "majiayu000/claude-skill-registry-data",
-  "supercent-io/skills-template",
-  "anthropics/claude-for-legal",
-]);
-const KNOWN_INVALID_REPOS = new Set([
-  "user-attachments/assets",
-  "anthropics/skills",
-  "smerchek/claude-epub-skill",
-  "zxkane/aws-skills",
-  "bluzername/claude-code-terminal-title",
-  "jthack/ffuf_claude_skill",
-  "obra/superpowers",
-  "avelikiy/great_cto",
-  "conorluddy/ios-simulator-skill",
-  "sanjay3290/ai-skills",
-  "yvgude/lean-ctx",
-  "openweb-org/openweb",
-  "lackeyjb/playwright-skill",
-  "NeoLabHQ/context-engineering-kit",
-  "ykdojo/claude-code-tips",
-]);
-const BLOCKED_OWNERS = new Set(["user-attachments"]);
 const X_SOURCE_TAG = "x-top-skill-tweet";
 const ALL_SOURCES = ["topics", "code", "aggregators", "social", "registry", "skillssh", "awesome", "official"] as const;
 type SourceName = typeof ALL_SOURCES[number];
@@ -345,12 +339,16 @@ function saveCheckpoint(paths: BuildPaths, skills: Skill[], existingSkills: Map<
   return snapshot.length;
 }
 
-function loadExisting(existingPath: string, seeds: TrustedSeeds): { firstSeen: Map<string, string>; skills: Map<string, Skill> } {
+function loadExisting(
+  existingPath: string,
+  seeds: TrustedSeeds,
+  policyMode: V2PolicyMode,
+): { firstSeen: Map<string, string>; skills: Map<string, Skill> } {
   if (!existsSync(existingPath)) return { firstSeen: new Map(), skills: new Map() };
   try {
     const raw = readFileSync(existingPath, "utf8");
     const arr = (JSON.parse(raw) as Skill[]).filter(
-      (s) => s.source_tag !== X_SOURCE_TAG && !isBlockedSkill(s) && !isSuppressedSkillId(s.id, seeds),
+      (s) => s.source_tag !== X_SOURCE_TAG && !isEffectiveExcludedSkill(s, seeds, policyMode),
     );
     return {
       firstSeen: new Map(arr.map((s) => [s.id, s.first_seen])),
@@ -375,7 +373,7 @@ function repoFromGithubUrl(value: string | null | undefined): string {
 function isBlockedId(id: string): boolean {
   const repo = repoFromId(id);
   const [owner] = repo.split("/");
-  return BLOCKED_REPOS.has(repo) || Boolean(owner && BLOCKED_OWNERS.has(owner));
+  return LEGACY_BLOCKED_REPOS.has(repo) || Boolean(owner && LEGACY_BLOCKED_OWNERS.has(owner));
 }
 
 function isBlockedSkill(skill: Pick<Skill, "id" | "github_url">): boolean {
@@ -383,20 +381,31 @@ function isBlockedSkill(skill: Pick<Skill, "id" | "github_url">): boolean {
   return isBlockedId(skill.id) || Boolean(publisherRepo && isBlockedId(publisherRepo));
 }
 
-function isBlockedOrSuppressedId(id: string, seeds: TrustedSeeds): boolean {
-  return isBlockedId(id) || isSuppressedSkillId(id, seeds);
+function isEffectiveExcludedSkill(skill: Skill, seeds: TrustedSeeds, policyMode: V2PolicyMode): boolean {
+  if (isSuppressedSkillId(skill.id, seeds)) return true;
+  return policyMode === "enforce"
+    ? evaluateProposedV2Skill(skill, seeds).excluded
+    : isBlockedSkill(skill);
 }
 
 function isValidRepoFullName(repo: string): boolean {
   return /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(repo);
 }
 
-function candidateValidationFailure(candidate: Candidate): string | null {
+function candidateValidationFailure(
+  candidate: Candidate,
+  seeds: TrustedSeeds,
+  policyMode: V2PolicyMode,
+  observations: V2CandidatePolicyObservation[],
+): string | null {
   const repo = repoFromId(candidate.id);
   if (!isValidRepoFullName(repo)) return "invalid repo name";
-  const [owner] = repo.split("/");
-  if (BLOCKED_OWNERS.has(owner)) return `blocked owner ${owner}`;
-  if (KNOWN_INVALID_REPOS.has(repo)) return "known invalid repo";
+  const observation = observeCandidatePolicy(candidate, seeds);
+  if (observation) observations.push(observation);
+  const decision = policyMode === "enforce"
+    ? evaluateProposedV2Candidate(candidate, seeds)
+    : evaluateLegacyV2Candidate(candidate);
+  if (decision.excluded) return `${decision.reasonCode} (${decision.matchedSource})`;
   return null;
 }
 
@@ -476,12 +485,18 @@ async function timedSource<T>(name: SourceName, fn: () => Promise<T[]>): Promise
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const paths = buildPaths(options);
+  const policyMode = parseV2PolicyMode();
+  const loadedPolicy = loadPolicySources();
   const trustedSeeds = loadTrustedSeeds();
+  const migrationAudit = buildV2LegacyMigrationAudit(trustedSeeds);
+  if (policyMode === "enforce") assertV2PolicyEnforcementReady(migrationAudit);
+  const candidatePolicyObservations: V2CandidatePolicyObservation[] = [];
   const today = new Date().toISOString().slice(0, 10);
   const buildStart = performance.now();
   const sourceSummaries: SourceResult[] = [];
 
   console.log(`[mode] ${options.dryRun ? "dry-run" : options.outputSuffix ? `debug (${options.outputSuffix})` : "production"}`);
+  console.log(`[v2-policy] ${policyMode}`);
   console.log(`[sources] ${[...options.sources].join(", ")}`);
   if (options.maxCandidates) console.log(`[limit] max candidates: ${options.maxCandidates}`);
   if (options.maxEnriched) console.log(`[limit] max enriched: ${options.maxEnriched}`);
@@ -501,7 +516,11 @@ async function main() {
     console.log(`Backed up skills.json → skills.backup.json`);
   }
 
-  const { firstSeen: existingFirstSeen, skills: existingSkills } = loadExisting(paths.existingPath, trustedSeeds);
+  const { firstSeen: existingFirstSeen, skills: existingSkills } = loadExisting(
+    paths.existingPath,
+    trustedSeeds,
+    policyMode,
+  );
   const shaCache = loadShaCache(paths.cacheReadPath);
   const negativeCache = loadNegativeCache(paths.negativeCachePath);
   const nowMs = Date.now();
@@ -575,7 +594,7 @@ async function main() {
   const officialHits = officialRun?.hits ?? [];
 
   for (const t of topicHits) {
-    if (isBlockedOrSuppressedId(t.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(t.id, trustedSeeds)) continue;
     seedRepoCache(t.id, {
       stars: t.stars,
       lastUpdated: t.last_updated,
@@ -587,12 +606,12 @@ async function main() {
   const candidates = new Map<string, Candidate>();
 
   for (const c of codeHits) {
-    if (isBlockedOrSuppressedId(c.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(c.id, trustedSeeds)) continue;
     candidates.set(c.id, { id: c.id, skill_md_path: c.path });
   }
 
   for (const t of topicHits) {
-    if (isBlockedOrSuppressedId(t.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(t.id, trustedSeeds)) continue;
     if (!candidates.has(t.id)) {
       candidates.set(t.id, { id: t.id, skill_md_path: "SKILL.md" });
     }
@@ -606,17 +625,17 @@ async function main() {
   }
 
   for (const a of aggregatorHits) {
-    if (isBlockedOrSuppressedId(a.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(a.id, trustedSeeds)) continue;
     if (!candidates.has(a.id)) candidates.set(a.id, { id: a.id, skill_md_path: "SKILL.md" });
   }
 
   for (const s of socialHits) {
-    if (isBlockedOrSuppressedId(s.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(s.id, trustedSeeds)) continue;
     if (!candidates.has(s.id)) candidates.set(s.id, { id: s.id, skill_md_path: "SKILL.md" });
   }
 
   for (const r of registryHits) {
-    if (isBlockedOrSuppressedId(r.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(r.id, trustedSeeds)) continue;
     if (!candidates.has(r.id)) {
       candidates.set(r.id, {
         id: r.id,
@@ -631,7 +650,7 @@ async function main() {
   }
 
   for (const s of skillsShHits) {
-    if (isBlockedOrSuppressedId(s.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(s.id, trustedSeeds)) continue;
     if (!candidates.has(s.id)) {
       candidates.set(s.id, {
         id: s.id,
@@ -644,7 +663,7 @@ async function main() {
   }
 
   for (const a of awesomeHits) {
-    if (isBlockedOrSuppressedId(a.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(a.id, trustedSeeds)) continue;
     if (!candidates.has(a.id)) {
       candidates.set(a.id, {
         id: a.id,
@@ -658,7 +677,7 @@ async function main() {
   }
 
   for (const o of officialHits) {
-    if (isBlockedOrSuppressedId(o.id, trustedSeeds)) continue;
+    if (isSuppressedSkillId(o.id, trustedSeeds)) continue;
     if (!candidates.has(o.id)) {
       candidates.set(o.id, {
         id: o.id,
@@ -674,7 +693,7 @@ async function main() {
   {
     let invalidRemoved = 0;
     for (const [id, candidate] of [...candidates.entries()]) {
-      const invalidReason = candidateValidationFailure(candidate);
+      const invalidReason = candidateValidationFailure(candidate, trustedSeeds, policyMode, candidatePolicyObservations);
       if (!invalidReason) continue;
       candidates.delete(id);
       invalidRemoved++;
@@ -767,7 +786,9 @@ async function main() {
     const enrichDurationMs = performance.now() - enrichStartedAt;
     const s = result.skill;
     if (s) {
-      if (isSuppressedSkillId(s.id, trustedSeeds)) {
+      if (isSuppressedSkillId(s.id, trustedSeeds) || (
+        policyMode === "enforce" && evaluateProposedV2Skill(s, trustedSeeds).excluded
+      )) {
         skipped++;
         continue;
       }
@@ -818,14 +839,34 @@ async function main() {
   }
 
   skills.sort((a, b) => b.stars - a.stars);
-  const deduped = dedupeSkills(skills.filter((skill) => !isSuppressedSkillId(skill.id, trustedSeeds)));
+  const legacySkills = dedupeSkills(skills.filter((skill) => !isSuppressedSkillId(skill.id, trustedSeeds))).skills;
+  const proposedSkills = dedupeSkills(
+    legacySkills.filter((skill) => !evaluateProposedV2Skill(skill, trustedSeeds).excluded),
+  ).skills;
+  const effectiveSkills = policyMode === "enforce" ? proposedSkills : legacySkills;
+  const policyReport = buildV2PolicyReport({
+    generatedAt: nowIso,
+    mode: policyMode,
+    sourceCommit: currentSourceCommit(),
+    policyDigest: effectivePolicyDigest(typedPolicySources(loadedPolicy)),
+    legacySkills,
+    proposedSkills,
+    candidateObservations: candidatePolicyObservations,
+    migration: migrationAudit,
+    seeds: trustedSeeds,
+  });
+  writeV2PolicyReport(
+    join(here, "..", "shadow", "v2-policy-diff.shadow.json"),
+    join(here, "..", "shadow", "v2-policy-diff.shadow.md"),
+    policyReport,
+  );
 
   // Sanity check: refuse to overwrite if the new index is <80% of the previous one.
   // This catches discovery regressions before they land.
   const previousCount = existingFirstSeen.size;
-  if (!options.dryRun && previousCount > 0 && deduped.skills.length < previousCount * 0.8) {
+  if (!options.dryRun && previousCount > 0 && effectiveSkills.length < previousCount * 0.8) {
     console.error(
-      `\n[abort] New count (${deduped.skills.length}) is less than 80% of previous (${previousCount}). ` +
+      `\n[abort] New count (${effectiveSkills.length}) is less than 80% of previous (${previousCount}). ` +
       `Not overwriting skills.json. Restore from skills.backup.json if needed.`
     );
     process.exit(1);
@@ -833,17 +874,17 @@ async function main() {
 
   if (!options.dryRun) {
     // Atomic write — temp file + rename prevents truncated output on kill
-    writeAtomic(paths.outPath, stringifySkills(deduped.skills));
+    writeAtomic(paths.outPath, stringifySkills(effectiveSkills));
     saveShaCache(paths.cachePath, shaCache);
     saveNegativeCache(paths.negativeCachePath, negativeCache);
   }
 
-  const newCount = deduped.skills.filter((s) => !existingFirstSeen.has(s.id)).length;
+  const newCount = effectiveSkills.filter((s) => !existingFirstSeen.has(s.id)).length;
   const totalMs = performance.now() - buildStart;
-  console.log(`\nDone. ${deduped.skills.length} skills (${newCount} new, ${cached} cached, ${skipped} skipped, ${starFiltered} star-filtered, ${negativeCached} negative-cached, ${carriedForward} carried forward, ${deduped.removed} deduped).`);
+  console.log(`\nDone. ${effectiveSkills.length} skills (${newCount} new, ${cached} cached, ${skipped} skipped, ${starFiltered} star-filtered, ${negativeCached} negative-cached, ${carriedForward} carried forward).`);
   console.log(`Summary: ${sourceSummaries.length} sources, ${candidates.size} candidates, ${enrichedKept} enriched kept, ${totalMs.toFixed(0)}ms total.`);
   if (options.dryRun) {
-    console.log("→ dry run: no files written");
+    console.log("→ dry run: catalog/cache unchanged; policy observation report updated");
   } else {
     console.log(`→ ${paths.outPath}`);
   }

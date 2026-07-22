@@ -34,6 +34,8 @@ export type RootSkillInvalidRule = {
   notes?: string;
 };
 
+export type RootSkillInvalidPolicySource = { repos: RootSkillInvalidRule[] };
+
 export type OfficialRepoPolicySource = { tier1: string[]; tier2: string[] };
 export type ManualIncludePolicySource = { include: string[] };
 export type DoNotCrawlPolicySource = { repos: DoNotCrawlRule[]; owners: DoNotCrawlRule[] };
@@ -70,6 +72,7 @@ export type PolicySources = {
   officialRepos: OfficialRepoPolicySource;
   manualIncludeRepos: ManualIncludePolicySource;
   doNotCrawl: DoNotCrawlPolicySource;
+  rootSkillInvalid: RootSkillInvalidPolicySource;
   suppressedSkills: SuppressedSkillsPolicySource;
   repoOverrides: RepoOverride[];
   catalogRepos: CatalogRepoRule[];
@@ -94,6 +97,7 @@ export const POLICY_REASON_CODES = [
   "do-not-crawl",
   "repo-override-exclude",
   "suppressed-skill",
+  "root-skill-invalid",
   "catalog-repo",
   "non-original-provenance",
   "manual-include",
