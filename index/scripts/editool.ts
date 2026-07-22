@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { execFileSync } from "node:child_process";
 import { randomBytes, timingSafeEqual } from "node:crypto";
-import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -12,23 +12,31 @@ import {
 import type { CreatorRegistrySource } from "../scraper/creator-registry.js";
 import {
   loadPolicySources,
-  replacePolicySource,
   typedPolicySources,
 } from "../scraper/policy/loader.js";
-import {
-  blockingPolicyIssues,
-  validatePolicy,
-} from "../scraper/policy/validator.js";
 import type {
   CollectionsPolicySource,
   DoNotCrawlPolicySource,
-  PolicySources,
   SuppressedSkillsPolicySource,
 } from "../scraper/policy/types.js";
 import {
   LEGACY_BLOCKED_OWNERS,
   LEGACY_BLOCKED_REPOS,
 } from "../scraper/v2-policy.js";
+import {
+  prepareEditoolPolicySave,
+  parseEditoolPolicyReplacements,
+  type EditoolCatalogSkill,
+  type EditoolPolicyReplacements,
+  type EditoolPolicySourceKey,
+} from "./editool-policy-save.js";
+import {
+  EditoolSaveBusyError,
+  EditoolStaleRevisionError,
+  editoolFileRevision,
+  recoverEditoolPolicyTransaction,
+  runEditoolPolicyTransaction,
+} from "./editool-policy-transaction.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -43,8 +51,13 @@ const PREVIEW_PORT = Number(process.env.EDITOOL_PREVIEW_PORT ?? 8787);
 const HOST = "127.0.0.1";
 const saveToken = randomBytes(24).toString("base64url");
 const previewDir = defaultEditoolPreviewDir();
+const policyTransactionDir = join(indexRoot, ".editool-state");
 let previewBuildInProgress = false;
 let previewServerError: string | null = null;
+const recoveredPolicyTransaction = recoverEditoolPolicyTransaction(policyTransactionDir);
+if (recoveredPolicyTransaction === "rolled-back") {
+  console.warn("editool: recovered and rolled back an interrupted policy save");
+}
 
 const paths = {
   html: join(scriptDir, "editool.html"),
@@ -61,7 +74,13 @@ const paths = {
 };
 
 // The only files POST /api/save/* may write.
-const editablePaths = [paths.collections, paths.creators, paths.suppressedSkills, paths.doNotCrawl];
+const editablePolicyPaths: Record<EditoolPolicySourceKey, string> = {
+  creators: paths.creators,
+  collections: paths.collections,
+  suppressedSkills: paths.suppressedSkills,
+  doNotCrawl: paths.doNotCrawl,
+};
+const editablePaths = Object.values(editablePolicyPaths);
 
 type Skill = {
   id: string;
@@ -99,19 +118,6 @@ function readJson<T>(path: string): T {
 
 function readOptionalJson<T>(path: string): T | null {
   return existsSync(path) ? readJson<T>(path) : null;
-}
-
-function atomicWrite(path: string, content: string): void {
-  if (!editablePaths.includes(path)) {
-    throw new Error(`refusing to write non-editable path: ${path}`);
-  }
-  const tmp = `${path}.editool-tmp`;
-  writeFileSync(tmp, content);
-  renameSync(tmp, path);
-}
-
-function atomicWriteJson(path: string, value: unknown): void {
-  atomicWrite(path, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 // creators.json keeps its one-entry-per-line style so tool saves don't churn
@@ -182,23 +188,92 @@ type RemovalsSource = {
   doNotCrawl: DoNotCrawlPolicySource;
 };
 
-function validateEditoolPolicy(replacements: Partial<PolicySources>): string[] {
-  let loaded = loadPolicySources();
-  for (const [key, value] of Object.entries(replacements) as Array<
-    [keyof PolicySources, PolicySources[keyof PolicySources]]
-  >) {
-    loaded = replacePolicySource(loaded, key, value);
-  }
-  const existingSuppressedSkillIds = new Set(
-    readJson<SuppressedSkillsPolicySource>(paths.suppressedSkills).skills.map((entry) => entry.id),
-  );
-  const issues = validatePolicy(loaded, {
-    publishedSkillIds: skillIdSet,
-    publishedAuthorHandles: authorHandleSet,
-    suppressionCandidateSkillIds,
-    existingSuppressedSkillIds,
+function serializeEditoolPolicySource(key: EditoolPolicySourceKey, value: unknown): string {
+  return key === "creators"
+    ? formatCreators(value as CreatorRegistrySource)
+    : `${JSON.stringify(value, null, 2)}\n`;
+}
+
+function editoolPolicyRevisions(): Record<EditoolPolicySourceKey, string> {
+  return Object.fromEntries(
+    Object.entries(editablePolicyPaths).map(([key, path]) => [key, editoolFileRevision(path)]),
+  ) as Record<EditoolPolicySourceKey, string>;
+}
+
+function saveEditoolPolicy(input: {
+  replacements: EditoolPolicyReplacements;
+  acknowledgements?: string[];
+  expectedRevisions?: Partial<Record<EditoolPolicySourceKey, string>>;
+}) {
+  const loaded = loadPolicySources();
+  const acknowledgements = new Set(input.acknowledgements ?? []);
+  const prepared = prepareEditoolPolicySave({
+    loaded,
+    replacements: input.replacements,
+    catalogContext: {
+      publishedSkillIds: skillIdSet,
+      publishedAuthorHandles: authorHandleSet,
+      suppressionCandidateSkillIds,
+    },
+    catalogSkills: skills as EditoolCatalogSkill[],
+    acknowledgements,
   });
-  return blockingPolicyIssues(issues, "editool").map((entry) => `${entry.code}: ${entry.message}`);
+  if (!prepared.ok) return prepared;
+
+  runEditoolPolicyTransaction({
+    stateDir: policyTransactionDir,
+    guards: Object.values(loaded.paths).map((path) => ({
+      path,
+      expectedRevision: editoolFileRevision(path),
+    })),
+    mutations: prepared.entries.map((entry) => {
+      const path = editablePolicyPaths[entry.key];
+      return {
+        path,
+        content: serializeEditoolPolicySource(entry.key, entry.value),
+        expectedRevision: input.expectedRevisions?.[entry.key] ?? editoolFileRevision(path),
+      };
+    }),
+    verifyAfterApply: () => {
+      const verified = prepareEditoolPolicySave({
+        loaded: loadPolicySources(),
+        replacements: input.replacements,
+        catalogContext: {
+          publishedSkillIds: skillIdSet,
+          publishedAuthorHandles: authorHandleSet,
+          suppressionCandidateSkillIds,
+        },
+        catalogSkills: skills as EditoolCatalogSkill[],
+        acknowledgements,
+      });
+      if (!verified.ok) throw new Error(`post-save policy validation failed: ${verified.errors.join("; ")}`);
+      execFileSync("git", ["diff", "--check", "--", ...editablePaths], {
+        cwd: indexRoot,
+        stdio: "pipe",
+      });
+    },
+  });
+  return {
+    ok: true as const,
+    savedKeys: prepared.savedKeys,
+    findings: prepared.findings,
+    revisions: editoolPolicyRevisions(),
+  };
+}
+
+function currentEditoolPolicyFindings() {
+  const loaded = loadPolicySources();
+  const sources = typedPolicySources(loaded);
+  return prepareEditoolPolicySave({
+    loaded,
+    replacements: { creators: sources.creators },
+    catalogContext: {
+      publishedSkillIds: skillIdSet,
+      publishedAuthorHandles: authorHandleSet,
+      suppressionCandidateSkillIds,
+    },
+    catalogSkills: skills as EditoolCatalogSkill[],
+  }).findings;
 }
 
 // ---------- skill search ----------
@@ -296,6 +371,65 @@ async function readBody(req: IncomingMessage): Promise<unknown> {
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parsePolicySaveEnvelope(value: unknown):
+  | {
+      replacements: EditoolPolicyReplacements;
+      acknowledgements: string[];
+      expectedRevisions: Partial<Record<EditoolPolicySourceKey, string>>;
+      errors: [];
+    }
+  | { replacements: null; acknowledgements: []; expectedRevisions: {}; errors: string[] } {
+  if (!isRecord(value)) {
+    return { replacements: null, acknowledgements: [], expectedRevisions: {}, errors: ["policy save body must be an object"] };
+  }
+  const hasEnvelope = Object.hasOwn(value, "replacements");
+  const parsed = parseEditoolPolicyReplacements(hasEnvelope ? value.replacements : value);
+  if (!parsed.replacements) {
+    return { replacements: null, acknowledgements: [], expectedRevisions: {}, errors: parsed.errors };
+  }
+  if (!hasEnvelope) {
+    return { replacements: parsed.replacements, acknowledgements: [], expectedRevisions: {}, errors: [] };
+  }
+  const allowedEnvelopeKeys = new Set(["replacements", "acknowledgements", "expectedRevisions"]);
+  const unknown = Object.keys(value).filter((key) => !allowedEnvelopeKeys.has(key));
+  if (unknown.length) {
+    return {
+      replacements: null,
+      acknowledgements: [],
+      expectedRevisions: {},
+      errors: [`unsupported policy save fields: ${unknown.sort().join(", ")}`],
+    };
+  }
+  const acknowledgements = value.acknowledgements ?? [];
+  if (!Array.isArray(acknowledgements) || acknowledgements.some((entry) => typeof entry !== "string")) {
+    return { replacements: null, acknowledgements: [], expectedRevisions: {}, errors: ["acknowledgements must be strings"] };
+  }
+  const expectedRevisions = value.expectedRevisions ?? {};
+  if (!isRecord(expectedRevisions) || Object.values(expectedRevisions).some((entry) => typeof entry !== "string")) {
+    return { replacements: null, acknowledgements: [], expectedRevisions: {}, errors: ["expectedRevisions must contain revision strings"] };
+  }
+  const supportedRevisionKeys = new Set<string>(Object.keys(editablePolicyPaths));
+  const unknownRevisionKeys = Object.keys(expectedRevisions).filter((key) => !supportedRevisionKeys.has(key));
+  if (unknownRevisionKeys.length) {
+    return {
+      replacements: null,
+      acknowledgements: [],
+      expectedRevisions: {},
+      errors: [`unsupported expected revision sources: ${unknownRevisionKeys.sort().join(", ")}`],
+    };
+  }
+  return {
+    replacements: parsed.replacements,
+    acknowledgements,
+    expectedRevisions: expectedRevisions as Partial<Record<EditoolPolicySourceKey, string>>,
+    errors: [],
+  };
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://${HOST}:${PORT}`);
   try {
@@ -324,6 +458,8 @@ const server = createServer(async (req, res) => {
         suppressedSkills: readJson(paths.suppressedSkills),
         doNotCrawl: readJson(paths.doNotCrawl),
         v2Blocklists: readV2Blocklists(),
+        policyFindings: currentEditoolPolicyFindings(),
+        policyRevisions: editoolPolicyRevisions(),
         gitStatus: editableGitStatus(),
         library: { skillCount: skills.length, authorCount: authorHandleSet.size },
       });
@@ -361,38 +497,54 @@ const server = createServer(async (req, res) => {
       }
     }
 
+    if (req.method === "POST" && url.pathname === "/api/save/policy") {
+      const requestErrors = validateSaveRequest(req);
+      if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
+      const parsed = parsePolicySaveEnvelope(await readBody(req));
+      if (!parsed.replacements) return sendJson(res, 422, { ok: false, errors: parsed.errors });
+      try {
+        const result = saveEditoolPolicy(parsed);
+        return sendJson(res, result.ok ? 200 : 422, result.ok
+          ? { ...result, commitReady: true, gitStatus: editableGitStatus() }
+          : result);
+      } catch (error) {
+        if (error instanceof EditoolStaleRevisionError) {
+          return sendJson(res, 409, { ok: false, errors: [error.message], stale: true });
+        }
+        if (error instanceof EditoolSaveBusyError) {
+          return sendJson(res, 409, { ok: false, errors: [error.message], busy: true });
+        }
+        throw error;
+      }
+    }
+
     if (req.method === "POST" && url.pathname === "/api/save/collections") {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as CollectionsPolicySource;
-      const errors = validateEditoolPolicy({ collections: body });
-      if (errors.length) return sendJson(res, 422, { ok: false, errors });
-      atomicWriteJson(paths.collections, body);
-      return sendJson(res, 200, { ok: true });
+      const result = saveEditoolPolicy({ replacements: { collections: body } });
+      return sendJson(res, result.ok ? 200 : 422, result);
     }
 
     if (req.method === "POST" && url.pathname === "/api/save/creators") {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as CreatorRegistrySource;
-      const errors = validateEditoolPolicy({ creators: body });
-      if (errors.length) return sendJson(res, 422, { ok: false, errors });
-      atomicWrite(paths.creators, formatCreators(body));
-      return sendJson(res, 200, { ok: true });
+      const result = saveEditoolPolicy({ replacements: { creators: body } });
+      return sendJson(res, result.ok ? 200 : 422, result);
     }
 
     if (req.method === "POST" && url.pathname === "/api/save/removals") {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
       const body = (await readBody(req)) as RemovalsSource;
-      const errors = validateEditoolPolicy({
-        suppressedSkills: body.suppressedSkills,
-        doNotCrawl: body.doNotCrawl,
+      const result = saveEditoolPolicy({
+        replacements: {
+          suppressedSkills: body.suppressedSkills,
+          doNotCrawl: body.doNotCrawl,
+        },
       });
-      if (errors.length) return sendJson(res, 422, { ok: false, errors });
-      atomicWriteJson(paths.suppressedSkills, body.suppressedSkills);
-      atomicWriteJson(paths.doNotCrawl, body.doNotCrawl);
-      return sendJson(res, 200, { ok: true });
+      return sendJson(res, result.ok ? 200 : 422, result);
     }
 
     sendJson(res, 404, { ok: false, errors: ["not found"] });

@@ -39,6 +39,13 @@
   .badge.featured { background: #f3ddf5; }
   .badge.warn { background: #fbe0dd; }
   .errors { background: #fbe0dd; border: 1px solid #e8b3ae; border-radius: 8px; padding: 8px 12px; margin: 10px 0; white-space: pre-wrap; display: none; }
+  .policy-findings { display: none; border: 1px solid #d8d8d3; }
+  .policy-finding { padding: 9px 0; border-top: 1px solid #eee; }
+  .policy-finding:first-of-type { border-top: 0; }
+  .policy-finding.blocking strong { color: #b3261e; }
+  .policy-finding.warning strong { color: #765600; }
+  .policy-finding label { display: flex; align-items: flex-start; gap: 7px; margin-top: 5px; }
+  .policy-finding code { font-size: 11px; }
   .toast { position: fixed; bottom: 16px; right: 16px; background: #1a1a1a; color: #fff; padding: 10px 16px; border-radius: 8px; opacity: 0; transition: opacity .25s; pointer-events: none; }
   .toast.show { opacity: 1; }
   .clicklink { color: #205da8; cursor: pointer; text-decoration: underline; }
@@ -68,6 +75,10 @@
 </header>
 <main>
   <div id="errors" class="errors"></div>
+  <div id="policy-findings" class="panel policy-findings">
+    <h3>Policy conflicts</h3>
+    <div id="policy-finding-rows"></div>
+  </div>
 
   <!-- ===================== LIBRARY ===================== -->
   <section id="tab-library" class="active">
@@ -155,20 +166,26 @@
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-let state = null;          // { collections, creators, suppressedSkills, doNotCrawl, gitStatus, library }
+let state = null;          // { collections, creators, suppressedSkills, doNotCrawl, policyFindings, policyRevisions, gitStatus, library }
 let dirty = { collections: false, creators: false, removals: false };
+let policyAcknowledgements = new Set();
 let libPage = 0;
 
+function updateDirtyLabel() {
+  const parts = Object.entries(dirty).filter(([, value]) => value).map(([key]) => key);
+  $("dirty").textContent = parts.length ? `unsaved: ${parts.join(", ")}` : "";
+}
 function markDirty(which) {
   dirty[which] = true;
-  const parts = Object.entries(dirty).filter(([, v]) => v).map(([k]) => k);
-  $("dirty").textContent = parts.length ? `unsaved: ${parts.join(", ")}` : "";
+  policyAcknowledgements.clear();
+  document.querySelectorAll("[data-policy-ack]").forEach((checkbox) => { checkbox.checked = false; });
+  state.commitReady = false;
+  updateDirtyLabel();
+  renderGitStatus();
 }
 function clearDirty(which) {
   dirty[which] = false;
-  markDirty(which); dirty[which] = false;
-  const parts = Object.entries(dirty).filter(([, v]) => v).map(([k]) => k);
-  $("dirty").textContent = parts.length ? `unsaved: ${parts.join(", ")}` : "";
+  updateDirtyLabel();
 }
 function toast(msg) {
   const el = $("toast");
@@ -181,6 +198,40 @@ function showErrors(errors) {
   el.textContent = errors.join("\n");
   el.style.display = "block";
   window.scrollTo({ top: 0 });
+}
+
+function renderPolicyFindings(findings = []) {
+  state.policyFindings = findings;
+  const panel = $("policy-findings");
+  const rows = $("policy-finding-rows");
+  if (!findings.length) {
+    panel.style.display = "none";
+    rows.innerHTML = "";
+    return;
+  }
+  panel.style.display = "block";
+  rows.innerHTML = findings.map((finding) => {
+    const acknowledgeable = finding.disposition === "acknowledgeable-deny-wins";
+    const affected = finding.affectedSkillCount
+      ? `${finding.affectedSkillCount.toLocaleString()} affected skill${finding.affectedSkillCount === 1 ? "" : "s"}`
+      : "no current catalog rows";
+    const samples = finding.affectedSkillIds?.length
+      ? `<div class="muted">${finding.affectedSkillIds.map(esc).join(" · ")}</div>`
+      : "";
+    const acknowledgement = acknowledgeable
+      ? `<label><input type="checkbox" data-policy-ack="${esc(finding.fingerprint)}" ${policyAcknowledgements.has(finding.fingerprint) ? "checked" : ""}>Acknowledge that ${esc(finding.winner ?? "deny policy")} wins</label>`
+      : `<div class="muted">Resolve before saving</div>`;
+    return `<div class="policy-finding ${acknowledgeable ? "warning" : "blocking"}">
+      <strong>${acknowledgeable ? "Deny wins" : "Blocked"}</strong> · <code>${esc(finding.code)}</code><br>
+      ${esc(finding.message)}<div class="muted">${esc(affected)}</div>${samples}${acknowledgement}
+    </div>`;
+  }).join("");
+  rows.querySelectorAll("[data-policy-ack]").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) policyAcknowledgements.add(checkbox.dataset.policyAck);
+      else policyAcknowledgements.delete(checkbox.dataset.policyAck);
+    });
+  });
 }
 
 // ---------- tabs ----------
@@ -197,12 +248,13 @@ document.querySelectorAll("header .tab").forEach((btn) => {
 async function loadCuration() {
   const res = await fetch("/api/curation");
   state = await res.json();
-  renderCollections(); renderCreators(); renderRemovals(); renderGitStatus();
+  renderCollections(); renderCreators(); renderRemovals(); renderPolicyFindings(state.policyFindings); renderGitStatus();
 }
 function renderGitStatus() {
   const rows = state.gitStatus ?? [];
+  const prefix = state.commitReady ? "validated curation diff ready for Git review: " : "uncommitted curation edits: ";
   $("git-status").textContent = rows.length
-    ? "uncommitted curation edits: " + rows.map((r) => `${r.path} (${r.state})`).join(" · ")
+    ? prefix + rows.map((r) => `${r.path} (${r.state})`).join(" · ")
     : `library: ${state.library.skillCount.toLocaleString()} skills / ${state.library.authorCount.toLocaleString()} authors · curation files clean in git`;
 }
 
@@ -416,7 +468,8 @@ $("col-list").addEventListener("click", (e) => {
   }
 });
 
-$("col-save").addEventListener("click", () => save("collections", "/api/save/collections", state.collections));
+$("col-save").addEventListener("click", () =>
+  savePolicy(["collections"], { collections: state.collections }));
 
 // ---------- creators ----------
 function creatorHandleKeys() {
@@ -740,8 +793,7 @@ function renderCreatorDetail(context, data) {
     }
   });
   host.querySelector("[data-detail-save]").addEventListener("click", async () => {
-    if (dirty.creators) await save("creators", "/api/save/creators", state.creators);
-    if (dirty.collections) await save("collections", "/api/save/collections", state.collections);
+    await saveCreatorCollectionPolicy(false);
   });
 
   function ensureEntry() {
@@ -788,10 +840,7 @@ function renderCreatorDetail(context, data) {
   });
 }
 
-$("cr-save").addEventListener("click", async () => {
-  await save("creators", "/api/save/creators", state.creators);
-  if (dirty.collections) await save("collections", "/api/save/collections", state.collections);
-});
+$("cr-save").addEventListener("click", () => saveCreatorCollectionPolicy(true));
 
 // ---------- removals ----------
 function renderRemovals() {
@@ -840,22 +889,61 @@ $("rm-manual-add").addEventListener("click", () => {
   markDirty("removals"); renderRemovals();
 });
 $("rm-save").addEventListener("click", () =>
-  save("removals", "/api/save/removals", { suppressedSkills: state.suppressedSkills, doNotCrawl: state.doNotCrawl }));
+  savePolicy(["removals"], {
+    suppressedSkills: state.suppressedSkills,
+    doNotCrawl: state.doNotCrawl,
+  }));
 
 // ---------- save ----------
-async function save(which, url, body) {
+async function saveCreatorCollectionPolicy(includeCreators) {
+  const replacements = {};
+  const dirtyKeys = [];
+  if (includeCreators || dirty.creators) {
+    replacements.creators = state.creators;
+    dirtyKeys.push("creators");
+  }
+  if (dirty.collections) {
+    replacements.collections = state.collections;
+    dirtyKeys.push("collections");
+  }
+  if (!dirtyKeys.length) return toast("no creator or collection changes to save");
+  await savePolicy(dirtyKeys, replacements);
+}
+
+async function savePolicy(dirtyKeys, replacements) {
   showErrors(null);
-  const res = await fetch(url, {
+  const expectedRevisions = Object.fromEntries(
+    Object.keys(replacements)
+      .filter((key) => state.policyRevisions?.[key])
+      .map((key) => [key, state.policyRevisions[key]]),
+  );
+  const res = await fetch("/api/save/policy", {
     method: "POST",
     headers: { "Content-Type": "application/json", "X-Editool-Token": window.EDITOOL_TOKEN ?? "" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      replacements,
+      acknowledgements: [...policyAcknowledgements],
+      expectedRevisions,
+    }),
   });
   const out = await res.json();
-  if (!out.ok) { showErrors(out.errors); toast("validation failed — nothing written"); return; }
-  clearDirty(which);
-  toast(`saved ${which} ✓ (review with git diff, then commit + publish)`);
-  const cur = await fetch("/api/curation").then((r) => r.json());
-  state.gitStatus = cur.gitStatus;
+  renderPolicyFindings(out.findings ?? state.policyFindings ?? []);
+  if (!out.ok) {
+    showErrors(out.errors);
+    toast(out.stale
+      ? "files changed on disk — reload and review before saving"
+      : out.requiredAcknowledgements?.length
+        ? "review and acknowledge deny-wins conflicts, then save again"
+        : "validation failed — nothing written");
+    return;
+  }
+  for (const key of dirtyKeys) clearDirty(key);
+  state.policyRevisions = out.revisions;
+  state.policyFindings = out.findings ?? [];
+  state.gitStatus = out.gitStatus ?? state.gitStatus;
+  state.commitReady = true;
+  toast(`saved ${dirtyKeys.join(" + ")} ✓ (review with git diff, then commit + publish)`);
+  renderPolicyFindings(state.policyFindings);
   renderGitStatus();
 }
 
