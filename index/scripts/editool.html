@@ -301,9 +301,6 @@ function renderCollections() {
   const src = state.collections;
   const featuredCreators = state.creators.creators.filter((entry) => entry.featured);
   const featured = featuredCreators.map((entry) => `<span class="badge featured">@${esc(entry.handle)}</span>`).join(" ");
-  const legacy = new Set((src.featuredAuthors ?? []).map((handle) => handle.toLowerCase()));
-  const registryFeatured = new Set(featuredCreators.map((entry) => entry.handle.toLowerCase()));
-  const legacyMismatch = [...legacy].filter((handle) => !registryFeatured.has(handle));
   const authorPanels = featuredCreators.map((entry) => {
     const handle = entry.handle;
     const o = overrideFor(handle);
@@ -343,8 +340,7 @@ function renderCollections() {
     </div>`).join("");
 
   $("col-list").innerHTML = `<div class="panel"><h3>Featured authors</h3>${featured || '<span class="muted">none</span>'}
-    <div class="muted" style="margin-top:4px">Toggle on the Creators tab. Legacy collections.json featuredAuthors is ignored by publish.</div>
-    ${legacyMismatch.length ? `<div class="badge warn">legacy mismatch: ${legacyMismatch.map(esc).join(", ")}</div>` : ""}
+    <div class="muted" style="margin-top:4px">Toggle on the Creators tab.</div>
     </div>` + authorPanels + topicPanels;
   if (collectionDetailHandle) refreshCreatorDetail("collections");
 }
@@ -499,12 +495,11 @@ async function renderCreators() {
   $("cr-rows").innerHTML = rows.map((r, i) => {
     const s = stats[i]?.stats ?? {};
     const known = stats[i] !== null;
-    const legacyFeatured = state.collections.featuredAuthors.some((h) => h.toLowerCase() === r.handle.toLowerCase());
     return `<tr>
       <td><b class="clicklink" data-detail="${esc(r.handle)}">${esc(r.handle)}</b>${known ? "" : '<span class="badge warn">not in catalog</span>'}</td>
       <td>${(r.roles ?? []).map((x) => `<span class="badge ${esc(x)}">${esc(x)}</span>`).join("")}</td>
       <td><input type="checkbox" data-i="${i}" data-flag="watch" ${r.watch ? "checked" : ""}></td>
-      <td><input type="checkbox" data-i="${i}" data-flag="featured" ${r.featured ? "checked" : ""}>${!r.featured && legacyFeatured ? '<span class="badge warn" title="legacy featuredAuthors contains this handle, but publish now uses creators.json">legacy</span>' : ""}</td>
+      <td><input type="checkbox" data-i="${i}" data-flag="featured" ${r.featured ? "checked" : ""}></td>
       <td>${s.skillCount ?? "—"}</td>
       <td>${(s.totalStars ?? 0).toLocaleString()}</td>
       <td>${s.goldBasketCount ?? 0}</td>

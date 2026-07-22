@@ -20,8 +20,7 @@ test("loadTrustedSeeds reads official repo seed sets", () => {
 
 test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
   const seeds = buildTrustedSeeds({
-    vendorJson: { handles: [] },
-    creatorJson: { handles: [] },
+    creatorRegistryJson: { creators: [] },
     officialJson: {
       tier1: [" OpenAI/Codex ", "openai/codex.git", ""],
       tier2: ["Browserbase/Skills", "browserbase/skills", "   "],
@@ -50,10 +49,8 @@ test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
   assert.equal(seeds.suppressedSkillRules?.[0]?.id, "Owner/Repo:Skill");
 });
 
-test("buildTrustedSeeds unions legacy trusted seeds with creator registry", () => {
+test("buildTrustedSeeds derives trust only from the creator registry", () => {
   const seeds = buildTrustedSeeds({
-    vendorJson: { handles: [" LegacyVendor "] },
-    creatorJson: { handles: [" LegacyCreator "] },
     creatorRegistryJson: {
       creators: [
         { handle: "RegistryVendor", roles: ["vendor"], watch: true },
@@ -68,28 +65,14 @@ test("buildTrustedSeeds unions legacy trusted seeds with creator registry", () =
     provenanceJson: [],
   });
 
-  assert.ok(seeds.trustedVendorHandles.has("legacyvendor"));
   assert.ok(seeds.trustedVendorHandles.has("registryvendor"));
-  assert.ok(seeds.trustedCreatorHandles.has("legacycreator"));
   assert.ok(seeds.trustedCreatorHandles.has("registrycreator"));
   assert.ok(seeds.watchedCreatorHandles?.has("registryvendor"));
   assert.ok(seeds.watchedCreatorHandles?.has("registrycreator"));
 });
 
-test("buildTrustedSeeds supports empty or missing creator registry without behavior changes", () => {
-  const withoutRegistry = buildTrustedSeeds({
-    vendorJson: { handles: ["Vendor"] },
-    creatorJson: { handles: ["Creator"] },
-    officialJson: {},
-    manualIncludeJson: {},
-    doNotCrawlJson: {},
-    overridesJson: [],
-    catalogJson: [],
-    provenanceJson: [],
-  });
-  const emptyRegistry = buildTrustedSeeds({
-    vendorJson: { handles: ["Vendor"] },
-    creatorJson: { handles: ["Creator"] },
+test("buildTrustedSeeds supports an empty creator registry", () => {
+  const seeds = buildTrustedSeeds({
     creatorRegistryJson: { creators: [] },
     officialJson: {},
     manualIncludeJson: {},
@@ -99,14 +82,12 @@ test("buildTrustedSeeds supports empty or missing creator registry without behav
     provenanceJson: [],
   });
 
-  assert.deepEqual([...withoutRegistry.trustedVendorHandles], [...emptyRegistry.trustedVendorHandles]);
-  assert.deepEqual([...withoutRegistry.trustedCreatorHandles], [...emptyRegistry.trustedCreatorHandles]);
+  assert.deepEqual([...seeds.trustedVendorHandles], []);
+  assert.deepEqual([...seeds.trustedCreatorHandles], []);
 });
 
 test("creator aliases resolve case-insensitively to canonical handles", () => {
   const seeds = buildTrustedSeeds({
-    vendorJson: { handles: [] },
-    creatorJson: { handles: [] },
     creatorRegistryJson: {
       creators: [{ handle: "NewHandle", roles: ["creator"], watch: true, aliases: ["OldHandle"] }],
     },
@@ -126,8 +107,6 @@ test("creator registry rejects duplicate alias ownership", () => {
   assert.throws(
     () =>
       buildTrustedSeeds({
-        vendorJson: { handles: [] },
-        creatorJson: { handles: [] },
         creatorRegistryJson: {
           creators: [
             { handle: "First", roles: ["creator"], watch: true, aliases: ["Shared"] },
@@ -141,7 +120,7 @@ test("creator registry rejects duplicate alias ownership", () => {
         catalogJson: [],
         provenanceJson: [],
       }),
-    /alias shared maps to both first and second/,
+    /handle or alias shared maps to both first and second/,
   );
 });
 
@@ -149,8 +128,6 @@ test("creator registry rejects featured creators that are not watched", () => {
   assert.throws(
     () =>
       buildTrustedSeeds({
-        vendorJson: { handles: [] },
-        creatorJson: { handles: [] },
         creatorRegistryJson: {
           creators: [{ handle: "Featured", roles: ["creator"], watch: false, featured: true }],
         },
@@ -162,5 +139,23 @@ test("creator registry rejects featured creators that are not watched", () => {
         provenanceJson: [],
       }),
     /featured creators must be watched/,
+  );
+});
+
+test("creator registry rejects unknown roles", () => {
+  assert.throws(
+    () =>
+      buildTrustedSeeds({
+        creatorRegistryJson: {
+          creators: [{ handle: "Unknown", roles: ["partner" as never], watch: true }],
+        },
+        officialJson: {},
+        manualIncludeJson: {},
+        doNotCrawlJson: {},
+        overridesJson: [],
+        catalogJson: [],
+        provenanceJson: [],
+      }),
+    /unknown role partner/,
   );
 });

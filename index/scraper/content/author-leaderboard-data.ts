@@ -1,5 +1,10 @@
 import type { Skill } from "../types.js";
-import { TRUSTED_VENDOR_SET } from "./vendors.js";
+import {
+  loadCreatorRegistry,
+  normalizeCreatorHandle,
+  vendorHandleVariants,
+  type CreatorRegistry,
+} from "../creator-registry.js";
 
 export interface BasketSkillLike {
   author_handle: string;
@@ -35,10 +40,15 @@ const BOT_ACCOUNTS = new Set([
   "boisenoise", "diegosouzapw",
 ]);
 
-export function buildVendorSet(basket: BasketSkillLike[] = []): Set<string> {
+export function buildVendorSet(
+  basket: BasketSkillLike[] = [],
+  registry: CreatorRegistry = loadCreatorRegistry(),
+): Set<string> {
   return new Set([
-    ...TRUSTED_VENDOR_SET,
-    ...basket.filter((skill) => skill.official_vendor && skill.author_handle.trim()).map((skill) => skill.author_handle.trim()),
+    ...vendorHandleVariants(registry),
+    ...basket
+      .filter((skill) => skill.official_vendor && skill.author_handle.trim())
+      .map((skill) => normalizeCreatorHandle(skill.author_handle)),
   ]);
 }
 
@@ -200,7 +210,7 @@ export function buildAuthorProfiles(
       goldBasketCount,
       editorialScore: score.score,
       editorialScoreReasons: score.reasons,
-      isVendor: vendorSet.has(handle),
+      isVendor: vendorSet.has(normalizeCreatorHandle(handle)),
     });
   }
 

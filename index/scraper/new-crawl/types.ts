@@ -49,16 +49,7 @@ export type SuppressedSkillRule = {
   notes?: string;
 };
 
-export type CreatorRegistryRole = "vendor" | "creator";
-
-export type CreatorRegistryEntry = {
-  handle: string;
-  roles?: CreatorRegistryRole[];
-  watch?: boolean;
-  featured?: boolean;
-  aliases?: string[];
-  notes?: string;
-};
+export type { CreatorRegistryEntry, CreatorRegistryRole } from "../creator-registry.js";
 
 export type TrustedSeeds = {
   trustedVendorHandles: Set<string>;

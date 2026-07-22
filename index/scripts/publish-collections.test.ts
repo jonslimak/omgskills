@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import type { CreatorRegistrySource } from "../scraper/creator-registry.js";
 import { buildCollectionsAsset, validateSource } from "./publish-collections.js";
 
 const skills = [
@@ -19,14 +20,13 @@ const skills = [
   },
 ];
 
-test("featured creators come from registry, not legacy featuredAuthors", () => {
+test("featured creators come from the creator registry", () => {
   const source = {
     version: 1,
-    featuredAuthors: ["legacy"],
     authorOverrides: {},
     collections: [],
   };
-  const registry = {
+  const registry: CreatorRegistrySource = {
     creators: [{ handle: "OldHandle", roles: ["creator"], watch: true, featured: true }],
   };
 
@@ -36,33 +36,29 @@ test("featured creators come from registry, not legacy featuredAuthors", () => {
   assert.deepEqual(asset.collections.map((collection) => collection.authorHandle), ["OldHandle"]);
 });
 
-test("zero featured registry fails when legacy featuredAuthors is non-empty", () => {
-  assert.throws(
-    () =>
-      validateSource(
-        { version: 1, featuredAuthors: ["legacy"], authorOverrides: {}, collections: [] },
-        { creators: [] },
-        skills,
-      ),
-    /zero featured creators/,
-  );
+test("an empty featured registry produces no author collections", () => {
+  const source = { version: 1, authorOverrides: {}, collections: [] };
+  const registry: CreatorRegistrySource = { creators: [] };
+
+  validateSource(source, registry, skills);
+  assert.deepEqual(buildCollectionsAsset(source, registry, skills).collections, []);
 });
 
 test("featured creator must be watched", () => {
   assert.throws(
     () =>
       validateSource(
-        { version: 1, featuredAuthors: [], authorOverrides: {}, collections: [] },
+        { version: 1, authorOverrides: {}, collections: [] },
         { creators: [{ handle: "OldHandle", roles: ["creator"], watch: false, featured: true }] },
         skills,
       ),
-    /must also be watched/,
+    /must be watched/,
   );
 });
 
 test("alias-only creator validates and generates a non-empty profile", () => {
-  const source = { version: 1, featuredAuthors: [], authorOverrides: {}, collections: [] };
-  const registry = {
+  const source = { version: 1, authorOverrides: {}, collections: [] };
+  const registry: CreatorRegistrySource = {
     creators: [{ handle: "NewHandle", roles: ["creator"], watch: true, featured: true, aliases: ["oldhandle"] }],
   };
 
@@ -76,7 +72,6 @@ test("alias-only creator validates and generates a non-empty profile", () => {
 test("author override lookup is case-insensitive and alias-aware", () => {
   const source = {
     version: 1,
-    featuredAuthors: [],
     authorOverrides: {
       oldhandle: {
         title: "Custom",
@@ -85,7 +80,7 @@ test("author override lookup is case-insensitive and alias-aware", () => {
     },
     collections: [],
   };
-  const registry = {
+  const registry: CreatorRegistrySource = {
     creators: [{ handle: "NewHandle", roles: ["creator"], watch: true, featured: true, aliases: ["OldHandle"] }],
   };
 
@@ -94,4 +89,24 @@ test("author override lookup is case-insensitive and alias-aware", () => {
 
   assert.equal(asset.collections[0].title, "Custom");
   assert.deepEqual(asset.collections[0].featuredSkillIds, ["oldhandle/repo:one"]);
+});
+
+test("duplicate skill ids within one curated list are rejected", () => {
+  const source = {
+    version: 1,
+    authorOverrides: {},
+    collections: [{
+      id: "starter-pack",
+      type: "topic" as const,
+      title: "Starter Pack",
+      subtitle: "Start here",
+      featuredSkillIds: [],
+      skillIds: ["oldhandle/repo:one", "oldhandle/repo:one"],
+    }],
+  };
+
+  assert.throws(
+    () => validateSource(source, { creators: [] }, skills),
+    /duplicate skill id in starter-pack\.skillIds: oldhandle\/repo:one/,
+  );
 });

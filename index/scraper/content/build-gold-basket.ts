@@ -11,8 +11,8 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isTrustedVendor } from "../creator-registry.js";
 import type { Skill } from "../types.js";
-import { TRUSTED_VENDOR_SET } from "./vendors.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const skillsPath = join(here, "..", "..", "skills.json");
@@ -273,7 +273,7 @@ function main() {
 
     const repoId = skill.github_url.replace("https://github.com/", "");
     const listCount = externalRepos.get(repoId) ?? 0;
-    const isVendor = TRUSTED_VENDOR_SET.has(skill.author_handle);
+    const isVendor = isTrustedVendor(skill.author_handle);
     const sourceCount = listCount + (isVendor ? 1 : 0);
     const isExternal = sourceCount >= 2;
 

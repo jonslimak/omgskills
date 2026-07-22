@@ -127,19 +127,115 @@ The 0.0.18 release notes are prepared in `CHANGELOG.md`.
 
 ### P1 - Harden crawler and list ownership
 
-**Planning required.** Stabilize how crawler output, manual admission,
-suppression, creator watching, editorial inputs, and Editool changes interact.
+**In progress.** Stabilize how crawler output, manual admission, suppression,
+creator watching, editorial inputs, and Editool changes interact. Keep v2
+available as fallback throughout this work.
 
-The plan should define:
+Critical path to P2:
 
-- the owner and update path for each maintained list
-- which inputs are authoritative and which are generated
-- conflict precedence and validation
-- review requirements for automated list changes
-- recovery from partial or stale runs
-- production observability and rollback thresholds
+`P1.1 -> P1.2 + P1.3 -> P1.4 -> minimum P1.7 -> P1.5 -> P1.10`
 
-Keep v2 available as fallback during this work.
+P1.6 and P1.9 may run in parallel. P1.9 must finish before the first production
+flag rollout. P1.8 is deferred until after P2 and does not block it.
+
+#### P1.1 - Define the policy inventory and ownership contract
+
+**Complete.** The maintained inputs, owners, edit paths, consumers, risk
+classes, generated evidence, and derived outputs are documented in `arch.md`.
+
+#### P1.2 - Consolidate creator and trust sources
+
+**Complete.** `index/seeds/creators.json` is the sole authority for creator and
+vendor roles, aliases, watch state, and featured state.
+
+- [x] Remove the legacy trusted-vendor and trusted-creator lists.
+- [x] Remove the independent content vendor set and load vendor status from the
+  creator registry for gold-basket, overlay, and leaderboard generation.
+- [x] Remove `collections.json.featuredAuthors`; collections use registry
+  `featured` entries exclusively.
+- [x] Centralize creator normalization, alias ownership, and
+  `featured => watch` validation in the shared registry loader.
+- [x] Keep creator-watch flag-gated; this consolidation does not enable it.
+
+The intentional content delta is that `cursor` and `greensock` now receive the
+vendor role already declared in the registry, while the misspelled legacy
+`supabas` entry is gone. Same-input gold-basket comparison retained 420 rows and
+replaced six lower-ranked rows with six Greensock skills.
+
+#### P1.3 - Add one shared policy loader and validator
+
+- [ ] Centralize case normalization, repo/owner/skill-ID parsing, schemas, and
+  cross-list validation beyond the completed creator-registry loader.
+- [ ] Reuse it from Crawl 4, v2, Editool, publishers, manual admission/removal
+  commands, and CI.
+- [ ] Reject malformed entries, duplicates, stale references, and unexplained
+  include/exclude conflicts before writing output.
+- [ ] Keep historical suppressions valid while requiring new suppressions to
+  resolve against the current or reviewed historical catalog.
+
+#### P1.4 - Encode and test conflict precedence
+
+- [ ] Make do-not-crawl and skill suppression override every admission or trust
+  signal.
+- [ ] Make catalog/provenance safety policy override trust and popularity.
+- [ ] Allow manual inclusion to bypass value thresholds only, never parsing,
+  provenance, suppression, or do-not-crawl policy.
+- [ ] Keep watch flag-gated, require watch for featured, and prevent editorial
+  collections from admitting catalog rows.
+- [ ] Treat the precedence change as a Crawl 4 policy change and review a
+  before/after shadow diff grouped by reason before promotion.
+
+#### P1.5 - Align catalog mutation paths
+
+- [ ] Replace v2 `BLOCKED_REPOS` and `BLOCKED_OWNERS` with the shared exclusion
+  policy.
+- [ ] Keep `KNOWN_INVALID_REPOS` as a separate path-discovery category; it does
+  not mean nested skills should be blocked.
+- [ ] Make manual add/remove commands apply the complete effective policy and
+  update all relevant state idempotently.
+- [ ] Add v2/Crawl 4 exclusion parity tests.
+- [ ] Review a one-run v2 previous/new catalog diff grouped by removal reason
+  before landing the v2 migration.
+
+#### P1.6 - Make Editool changes coherent and recoverable
+
+- [ ] Validate the complete proposed policy state before writing related files.
+- [ ] Show cross-list conflicts, the winning rule, affected rows, and whether
+  each conflict blocks saving or is an acknowledged deny-wins warning.
+- [ ] Stage multi-file saves together and recover cleanly if any write fails.
+- [ ] Leave a validated, commit-ready working-tree diff for Git review.
+- [ ] Keep Editool local and unable to publish or deploy production directly.
+
+#### P1.7 - Add minimum policy impact reports and safety thresholds
+
+- [ ] Produce the Crawl 4 shadow comparison required by P1.4.
+- [ ] Produce the v2 comparison required by P1.5.
+- [ ] Compare generated catalog and editorial outputs with the last known-good
+  publication.
+- [ ] Block unexpected shrink, large removals, missing referenced assets, or
+  stale-source publication unless an explicit reviewed override is present.
+- [ ] Record the source commit and effective-policy digest in run output.
+
+#### P1.8 - Deferred: reviewed change-request automation
+
+Reassess after P2 when multiple operators or remote curation justify it. Until
+then, Editool produces validated local changes and Git remains the review path.
+
+#### P1.9 - Close remaining deployment and rollback gaps
+
+- [ ] Prevent health-only or stale workflows from racing the serialized data
+  publication and production deploy path.
+- [ ] Preserve a last-known-good manifest/deploy artifact through live
+  verification and document the immediate rollback command.
+
+#### P1.10 - Verify readiness for flag rollout
+
+- [ ] Add fixtures covering precedence, aliases, stale data, partial writes,
+  reruns, conflicts, and both data tracks.
+- [ ] Expose production counts and changes by admission/removal source, plus
+  validation and publication failures.
+- [ ] Define acceptance and rollback thresholds for the dormant Crawl 4 flags.
+- [ ] Update architecture, crawler, deploy, and Editool operating docs.
 
 ### P2 - Roll out dormant Crawl 4 flags
 

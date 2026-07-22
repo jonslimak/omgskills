@@ -1,12 +1,5 @@
 {
   "version": 1,
-  "featuredAuthors": [
-    "openai",
-    "anthropics",
-    "cursor",
-    "mattpocock",
-    "leonxlnx"
-  ],
   "authorOverrides": {
     "openai": {
       "title": "OpenAI",
@@ -157,8 +150,7 @@
         "clawdbot/skills:skills/steipete/github",
         "clawdbot/skills:skills/steipete/obsidian",
         "steipete/agent-scripts:brave-search",
-        "steipete/clawdis:tmux",
-        "steipete/clawdis:weather",
+        "clawdbot/skills:skills/steipete/weather",
         "steipete/clawdis:bluebubbles",
         "clawdbot/skills:skills/steipete/apple-reminders",
         "clawdbot/skills:skills/steipete/bear-notes",
@@ -274,8 +266,7 @@
     },
     "emilkowalski": {
       "featuredSkillIds": [
-        "emilkowalski/skill:emil-design-eng",
-        "emilkowalski/skills:emil-design-eng"
+        "emilkowalski/skill:emil-design-eng"
       ]
     },
     "coreyhaines31": {
@@ -668,7 +659,7 @@
         "pbakaus/impeccable:impeccable",
         "anthropics/skills:frontend-design",
         "leonxlnx/taste-skill:image-to-code",
-        "emilkowalski/skills:emil-design-eng"
+        "emilkowalski/skill:emil-design-eng"
       ],
       "skillIds": [
         "pbakaus/impeccable:impeccable",
@@ -676,7 +667,7 @@
         "leonxlnx/taste-skill:gpt-taste",
         "leonxlnx/taste-skill:image-to-code",
         "leonxlnx/taste-skill:imagegen-frontend-web",
-        "emilkowalski/skills:emil-design-eng",
+        "emilkowalski/skill:emil-design-eng",
         "mattpocock/skills:design-an-interface",
         "anthropics/skills:webapp-testing"
       ],

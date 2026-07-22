@@ -169,15 +169,15 @@ npm run content:leaderboards
 
 **Filter buttons:** All / Community only / Official only
 - Each category stores 20 entries so filtering to Community always shows 10 results
-- "Official" = accounts in the hardcoded `VENDOR_HANDLES` set in `build-leaderboards-html.ts`
+- "Official" = accounts with the `vendor` role in `index/seeds/creators.json`
 
 **GOAT section:** Authors who rank in the top 5 of 3+ categories get promoted to an "All-Rounders" section at the top.
 
 **PNG download:** Each trophy card has a **↓ PNG** button. Clicking it hides UI chrome, renders the card at 2× resolution via html2canvas, and downloads `omgskills-{id}-leaderboard.png`. The filter state is respected — filter to Community first to get a community-only card.
 
-**Adding a new trusted vendor:** The vendor set is hardcoded in **two places** — keep them in sync:
-1. `build-gold-basket.ts` → `TRUSTED_VENDORS` Set
-2. `build-leaderboards-html.ts` → `vendorSet` (inline Set + `official_vendor` flag merge)
+**Adding a new trusted vendor:** Add or update the creator entry in
+`index/seeds/creators.json` with `roles: ["vendor"]`. The crawler, gold basket,
+signals, and leaderboards all derive vendor status from that registry.
 
 **Inputs required:** `skills.json`, `trending.json`, `gold-basket.json`
 

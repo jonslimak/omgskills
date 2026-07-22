@@ -15,7 +15,7 @@ import { searchAwesomeAgentSkills } from "../sources/awesome.js";
 import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import { createAdmittedLibraryRepoEntry, isDiscoveredRepoAdmissionEligible, passesInstallAdmissionArm } from "./admission.js";
-import { loadTrustedSeeds } from "./seeds.js";
+import { loadTrustedSeeds, resolveCreatorHandle } from "./seeds.js";
 import { searchCreatorWatchRepos } from "./creator-watch.js";
 import { loadXSocialDiscoveryCandidates, removeBelowStarXSocialOnlyState } from "./x-social-discovery.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery, shouldRunWeeklyWebLibrarySnippetRefresh } from "./high-star-schedule.js";
@@ -549,8 +549,9 @@ function buildRepoIndex(
       continue;
     }
 
-    const trustedVendor = seeds.trustedVendorHandles.has(ownerHandle(repoInfo.repo));
-    const trustedCreator = seeds.trustedCreatorHandles.has(ownerHandle(repoInfo.repo));
+    const owner = resolveCreatorHandle(seeds, ownerHandle(repoInfo.repo));
+    const trustedVendor = seeds.trustedVendorHandles.has(owner);
+    const trustedCreator = seeds.trustedCreatorHandles.has(owner);
     const goldBasketRepo = goldBasketRepos.has(repoInfo.repo);
 
     byRepo.set(repoInfo.repo, {
@@ -917,8 +918,9 @@ function buildTrustSignalsForRepo(
   goldBasketRepos: Set<string>,
   seeds = loadTrustedSeeds(),
 ): Pick<ShadowRepoIndexEntry, "isTrustedVendor" | "isTrustedCreator" | "isGoldBasketRepo" | "trustSignals"> {
-  const trustedVendor = seeds.trustedVendorHandles.has(ownerHandle(repo));
-  const trustedCreator = seeds.trustedCreatorHandles.has(ownerHandle(repo));
+  const owner = resolveCreatorHandle(seeds, ownerHandle(repo));
+  const trustedVendor = seeds.trustedVendorHandles.has(owner);
+  const trustedCreator = seeds.trustedCreatorHandles.has(owner);
   const goldBasketRepo = goldBasketRepos.has(repo);
   return {
     isTrustedVendor: trustedVendor,
@@ -1798,7 +1800,9 @@ async function runDiscovery(
       }
 
       const trustedCreatorRepos = repoIndex.repos.filter(
-        (repo) => repo.isTrustedCreator || seeds.trustedCreatorHandles.has(ownerHandle(repo.repo)),
+        (repo) => repo.isTrustedCreator || seeds.trustedCreatorHandles.has(
+          resolveCreatorHandle(seeds, ownerHandle(repo.repo)),
+        ),
       );
       sourceRuns.push({
         source: "trusted-creators",

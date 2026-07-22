@@ -16,6 +16,12 @@ import {
   createEditoolPreviewServer,
   defaultEditoolPreviewDir,
 } from "./editool-preview.js";
+import {
+  buildCreatorRegistry,
+  normalizeCreatorHandle,
+  type CreatorRegistryEntry,
+  type CreatorRegistrySource,
+} from "../scraper/creator-registry.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -62,15 +68,6 @@ type Skill = {
   skill_md_sha?: string;
 };
 
-type CreatorEntry = {
-  handle: string;
-  roles?: string[];
-  watch?: boolean;
-  featured?: boolean;
-  aliases?: string[];
-  notes?: string;
-};
-
 type ProposedCreatorsReport = {
   generatedAt: string;
   candidateCount: number;
@@ -110,7 +107,7 @@ function atomicWriteJson(path: string, value: unknown): void {
 
 // creators.json keeps its one-entry-per-line style so tool saves don't churn
 // formatting on a committed file. Keys in fixed order, JSON-safe per value.
-function formatCreators(source: { creators: CreatorEntry[] }): string {
+function formatCreators(source: CreatorRegistrySource): string {
   const lines = source.creators.map((entry) => {
     const parts = [`"handle": ${JSON.stringify(entry.handle)}`];
     if (entry.roles !== undefined) parts.push(`"roles": ${JSON.stringify(entry.roles)}`);
@@ -168,10 +165,10 @@ const authorStats = new Map<string, AuthorStats>(
 );
 console.log(`editool: ${skills.length} skills, ${authorHandleSet.size} authors loaded`);
 
-function knownAuthorHandles(creators?: CreatorEntry[]): Set<string> {
+function knownAuthorHandles(creators?: CreatorRegistryEntry[]): Set<string> {
   const handles = new Set(authorHandleSet);
-  for (const entry of creators ?? readJson<{ creators: CreatorEntry[] }>(paths.creators).creators) {
-    const variants = [entry.handle, ...(entry.aliases ?? [])].map((value) => value?.trim().toLowerCase()).filter(Boolean);
+  for (const entry of creators ?? readJson<CreatorRegistrySource>(paths.creators).creators) {
+    const variants = [entry.handle, ...(entry.aliases ?? [])].map(normalizeCreatorHandle).filter(Boolean);
     if (variants.some((value) => authorHandleSet.has(value))) {
       for (const value of variants) handles.add(value);
     }
@@ -179,13 +176,13 @@ function knownAuthorHandles(creators?: CreatorEntry[]): Set<string> {
   return handles;
 }
 
-function creatorVariants(entry: CreatorEntry): string[] {
-  return [entry.handle, ...(entry.aliases ?? [])].map((value) => value?.trim().toLowerCase()).filter(Boolean);
+function creatorVariants(entry: CreatorRegistryEntry): string[] {
+  return [entry.handle, ...(entry.aliases ?? [])].map(normalizeCreatorHandle).filter(Boolean);
 }
 
-function featuredCreatorOverrideKeys(creators?: CreatorEntry[]): Set<string> {
+function featuredCreatorOverrideKeys(creators?: CreatorRegistryEntry[]): Set<string> {
   const keys = new Set<string>();
-  for (const entry of creators ?? readJson<{ creators: CreatorEntry[] }>(paths.creators).creators) {
+  for (const entry of creators ?? readJson<CreatorRegistrySource>(paths.creators).creators) {
     if (!entry.featured) continue;
     for (const variant of creatorVariants(entry)) keys.add(variant);
   }
@@ -196,7 +193,6 @@ function featuredCreatorOverrideKeys(creators?: CreatorEntry[]): Set<string> {
 
 type CollectionsSource = {
   version?: number;
-  featuredAuthors: string[];
   authorOverrides?: Record<
     string,
     { title?: string; subtitle?: string; imageUrl?: string | null; featuredSkillIds?: string[]; description?: string | null }
@@ -217,7 +213,6 @@ const KEBAB_CASE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 function validateCollections(source: CollectionsSource): string[] {
   const errors: string[] = [];
-  if (!Array.isArray(source.featuredAuthors)) errors.push("featuredAuthors must be an array");
   if (!Array.isArray(source.collections)) errors.push("collections must be an array");
   if (errors.length) return errors;
 
@@ -242,30 +237,18 @@ function validateCollections(source: CollectionsSource): string[] {
   return errors;
 }
 
-function validateCreators(source: { creators: CreatorEntry[] }): string[] {
+function validateCreators(source: CreatorRegistrySource): string[] {
+  try {
+    buildCreatorRegistry(source);
+  } catch (error) {
+    return [error instanceof Error ? error.message : String(error)];
+  }
+
   const errors: string[] = [];
-  if (!Array.isArray(source.creators)) return ["creators must be an array"];
-  const seen = new Set<string>();
-  const aliasOwners = new Map<string, string>();
   const knownHandles = knownAuthorHandles(source.creators);
   for (const entry of source.creators) {
     const handle = entry.handle?.trim();
-    if (!handle) {
-      errors.push("creator entry with empty handle");
-      continue;
-    }
-    const key = handle.toLowerCase();
-    if (seen.has(key)) errors.push(`duplicate creator handle: ${handle}`);
-    seen.add(key);
-    for (const alias of entry.aliases ?? []) {
-      const aliasKey = alias.trim().toLowerCase();
-      if (!aliasKey) continue;
-      const existing = aliasOwners.get(aliasKey);
-      if (existing && existing !== key) errors.push(`alias ${alias} belongs to both ${existing} and ${handle}`);
-      aliasOwners.set(aliasKey, key);
-      if (seen.has(aliasKey)) errors.push(`alias ${alias} duplicates a creator handle`);
-    }
-    if (entry.featured && !entry.watch) errors.push(`${handle}: featured requires watch (featured ⊆ watched)`);
+    const key = normalizeCreatorHandle(handle);
     if (entry.featured && !knownHandles.has(key)) {
       errors.push(`${handle}: featured but not found as a catalog author`);
     }
@@ -446,7 +429,7 @@ const server = createServer(async (req, res) => {
     if (req.method === "POST" && url.pathname === "/api/save/creators") {
       const requestErrors = validateSaveRequest(req);
       if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
-      const body = (await readBody(req)) as { creators: CreatorEntry[] };
+      const body = (await readBody(req)) as CreatorRegistrySource;
       const errors = validateCreators(body);
       if (errors.length) return sendJson(res, 422, { ok: false, errors });
       atomicWrite(paths.creators, formatCreators(body));

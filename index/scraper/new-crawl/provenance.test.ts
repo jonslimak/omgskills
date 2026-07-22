@@ -163,6 +163,33 @@ test("aiskillstore marketplace can keep a trusted upstream author hint", () => {
   assert.equal(result.authorConfidence, "high");
 });
 
+test("aiskillstore marketplace resolves trusted creator aliases", () => {
+  const result = resolveShadowProvenance(
+    skill({
+      id: "aiskillstore/marketplace:skills/old-vendor/nextjs",
+      github_url: "https://github.com/aiskillstore/marketplace",
+      author_handle: "aiskillstore",
+    }),
+    seeds({
+      trustedVendorHandles: new Set(["new-vendor"]),
+      creatorAliasToCanonicalHandle: new Map([["old-vendor", "new-vendor"]]),
+      catalogRepoRules: [{ repo: "aiskillstore/marketplace", defaultProvenanceType: "repackaged" }],
+      provenanceOverrides: [
+        {
+          repo: "aiskillstore/marketplace",
+          authorHandle: "",
+          publisherHandle: "aiskillstore",
+          provenanceType: "repackaged",
+          authorConfidence: "low",
+        },
+      ],
+    }),
+  );
+
+  assert.equal(result.authorHandle, "old-vendor");
+  assert.equal(result.authorConfidence, "high");
+});
+
 test("unmatched openclaw/skills ids fall back safely", () => {
   const result = resolveShadowProvenance(
     skill({

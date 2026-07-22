@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildAuthorProfiles } from "./author-leaderboard-data.js";
+import { buildCreatorRegistry } from "../creator-registry.js";
+import { buildAuthorProfiles, buildVendorSet } from "./author-leaderboard-data.js";
 import type { Skill } from "../types.js";
 
 function skill(overrides: Partial<Skill> & Pick<Skill, "id" | "author_handle">): Skill {
@@ -77,4 +78,24 @@ test("buildAuthorProfiles computes editorial score from deduped repo-level signa
     "500+ best repo stars",
     "100+ median repo stars",
   ]);
+});
+
+test("buildVendorSet derives vendor roles from the creator registry", () => {
+  const registry = buildCreatorRegistry({
+    creators: [
+      { handle: "Official", roles: ["vendor"], watch: true },
+      { handle: "RenamedVendor", roles: ["vendor"], watch: true, aliases: ["OldVendor"] },
+      { handle: "Community", roles: ["creator"], watch: true },
+    ],
+  });
+
+  const vendors = buildVendorSet(
+    [{ author_handle: "BasketVendor", official_vendor: true }],
+    registry,
+  );
+
+  assert.deepEqual(
+    [...vendors],
+    ["official", "renamedvendor", "oldvendor", "basketvendor"],
+  );
 });

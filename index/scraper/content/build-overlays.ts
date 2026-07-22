@@ -2,8 +2,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, w
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Skill } from "../types.js";
+import { isTrustedVendor } from "../creator-registry.js";
 import { buildAuthorProfiles } from "./author-leaderboard-data.js";
-import { isTrustedVendor } from "./vendors.js";
 
 interface TrendingEntry {
   id: string;

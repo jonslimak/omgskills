@@ -2,6 +2,12 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  buildCreatorRegistry,
+  normalizeCreatorHandle,
+  type CreatorRegistryEntry,
+  type CreatorRegistrySource,
+} from "../scraper/creator-registry.js";
 
 type Skill = {
   id: string;
@@ -42,22 +48,8 @@ type AuthorOverride = {
 
 type CollectionsSource = {
   version?: number;
-  featuredAuthors: string[];
   authorOverrides?: Record<string, AuthorOverride>;
   collections: SourceCollection[];
-};
-
-type CreatorEntry = {
-  handle: string;
-  roles?: string[];
-  watch?: boolean;
-  featured?: boolean;
-  aliases?: string[];
-  notes?: string;
-};
-
-type CreatorRegistrySource = {
-  creators: CreatorEntry[];
 };
 
 type SkillCollection = {
@@ -110,67 +102,59 @@ function titleFromHandle(handle: string): string {
     .join(" ");
 }
 
-function normalizeHandle(handle: string): string {
-  return handle.trim().toLowerCase();
-}
-
-function handleVariants(entry: CreatorEntry): string[] {
+function handleVariants(entry: CreatorRegistryEntry): string[] {
   return [entry.handle, ...(entry.aliases ?? [])].map((value) => value.trim()).filter(Boolean);
 }
 
 function findCatalogHandle(skills: Skill[], variants: string[]): string | null {
-  const wanted = new Set(variants.map(normalizeHandle));
-  const match = skills.find((skill) => wanted.has(normalizeHandle(skill.author_handle)));
+  const wanted = new Set(variants.map(normalizeCreatorHandle));
+  const match = skills.find((skill) => wanted.has(normalizeCreatorHandle(skill.author_handle)));
   return match?.author_handle ?? null;
 }
 
 function findAuthorOverride(source: CollectionsSource, variants: string[]): AuthorOverride {
   const overrides = source.authorOverrides ?? {};
-  const wanted = new Set(variants.map(normalizeHandle));
-  const key = Object.keys(overrides).find((candidate) => wanted.has(normalizeHandle(candidate)));
+  const wanted = new Set(variants.map(normalizeCreatorHandle));
+  const key = Object.keys(overrides).find((candidate) => wanted.has(normalizeCreatorHandle(candidate)));
   return key ? (overrides[key] ?? {}) : {};
 }
 
 function topSkillsForAuthor(skills: Skill[], variants: string[], limit: number): string[] {
-  const wanted = new Set(variants.map(normalizeHandle));
+  const wanted = new Set(variants.map(normalizeCreatorHandle));
   return skills
-    .filter((skill) => wanted.has(normalizeHandle(skill.author_handle)))
+    .filter((skill) => wanted.has(normalizeCreatorHandle(skill.author_handle)))
     .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0) || a.id.localeCompare(b.id))
     .slice(0, limit)
     .map((skill) => skill.id);
 }
 
 function validateSkillIds(ids: string[], skillIds: Set<string>, context: string): void {
+  const seen = new Set<string>();
   for (const id of ids) {
+    if (seen.has(id)) {
+      fail(`duplicate skill id in ${context}: ${id}`);
+    }
+    seen.add(id);
     if (!skillIds.has(id)) {
       fail(`unknown skill id in ${context}: ${id}`);
     }
   }
 }
 
-export function featuredCreatorEntries(registry: CreatorRegistrySource): CreatorEntry[] {
+export function featuredCreatorEntries(registry: CreatorRegistrySource): CreatorRegistryEntry[] {
   return registry.creators.filter((entry) => entry.featured);
 }
 
 export function validateSource(source: CollectionsSource, registry: CreatorRegistrySource, skills: Skill[]): void {
   const skillIds = new Set(skills.map((skill) => skill.id));
 
-  if (!Array.isArray(source.featuredAuthors)) {
-    fail("featuredAuthors must be an array");
-  }
   if (!Array.isArray(source.collections)) {
     fail("collections must be an array");
   }
 
+  buildCreatorRegistry(registry);
   const featured = featuredCreatorEntries(registry);
-  if (featured.length === 0 && source.featuredAuthors.length > 0) {
-    fail("creators.json has zero featured creators while legacy collections.json.featuredAuthors is non-empty");
-  }
-
   for (const entry of featured) {
-    if (!entry.watch) {
-      fail(`${entry.handle}: featured creator must also be watched`);
-    }
     const variants = handleVariants(entry);
     const catalogHandle = findCatalogHandle(skills, variants);
     if (!catalogHandle) {
@@ -200,7 +184,7 @@ export function buildCollectionsAsset(source: CollectionsSource, registry: Creat
     const override = findAuthorOverride(source, variants);
     const featuredSkillIds = override.featuredSkillIds ?? topSkillsForAuthor(skills, variants, 5);
     return {
-      id: `author-${normalizeHandle(catalogHandle)}`,
+      id: `author-${normalizeCreatorHandle(catalogHandle)}`,
       type: "author",
       title: override.title ?? titleFromHandle(catalogHandle),
       subtitle: override.subtitle ?? `Skills by @${catalogHandle}`,

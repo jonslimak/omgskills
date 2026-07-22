@@ -33,7 +33,8 @@ function ownerHandle(repo: string): string {
 }
 
 function isTrustedAuthorHint(handle: string, seeds: TrustedSeeds): boolean {
-  return seeds.trustedCreatorHandles.has(handle) || seeds.trustedVendorHandles.has(handle);
+  const canonical = seeds.creatorAliasToCanonicalHandle?.get(handle) ?? handle;
+  return seeds.trustedCreatorHandles.has(canonical) || seeds.trustedVendorHandles.has(canonical);
 }
 
 function parseOpenclawSkillAuthor(skill: Skill): ShadowSkillProvenance | null {
