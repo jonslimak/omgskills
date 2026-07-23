@@ -62,9 +62,7 @@ npm --prefix index ci
 PRODUCTION_ORIGIN="https://omgskills.com" node ./scripts/prepare-netlify-site-deploy.mjs
 npm ci
 npm run build:netlify
-npx netlify-cli deploy --prod --dir=dist/netlify-site --no-build
-PRODUCTION_ORIGIN="https://omgskills.com" node ./scripts/verify-production-deploy.mjs
-PRODUCTION_ORIGIN="https://omgskills.com" node ./scripts/verify-web-library-pages.mjs --live
+npm run deploy:production
 
 if [ "$TAG_RELEASE" = true ]; then
   VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' menubar/Info.plist 2>/dev/null || true)

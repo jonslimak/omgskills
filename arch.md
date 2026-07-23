@@ -83,6 +83,20 @@ These rules are compatibility boundaries:
   catalog quality alone, determines whether a generated page is indexable.
 - Production web deploys use the guarded combined `dist/netlify-site` artifact,
   never a partial `site/` artifact.
+- Every production deploy runs through `scripts/deploy-netlify-production.mjs`
+  after the workflow's own push and build. The helper requires
+  `HEAD == origin/main`, serializes with data writers, verifies all public
+  surfaces and exact manifests, and records the previous and candidate Netlify
+  deploy IDs.
+- Structural verification failure restores the previous Netlify deploy only
+  when the failed candidate is still live. A `Production deploy rollback` issue
+  then blocks later deploys until an operator closes it. Crawler and marketing
+  health remain advisory and do not trigger this rollback.
+- Deploy rollback never rolls back the production database. Database migrations
+  must remain additive and backward-compatible with the previous deploy's
+  functions; destructive migrations require a separate rollout.
+- Exact verification of the root manifest remains part of the deploy gate until
+  the legacy root data track is retired.
 
 ## Sources Of Truth
 

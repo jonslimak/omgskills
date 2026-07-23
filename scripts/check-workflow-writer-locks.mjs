@@ -12,6 +12,11 @@ function hasGitPush(source) {
   });
 }
 
+function hasProductionDeploy(source) {
+  return /\bnpm\s+run\s+deploy:production\b/.test(source) ||
+    /\bnetlify-cli\s+deploy\b/.test(source);
+}
+
 function syncStep(source) {
   const lines = source.split("\n");
   const start = lines.findIndex((line) =>
@@ -36,7 +41,9 @@ function syncStep(source) {
 }
 
 export function validateWorkflowWriterSafety(source, filename = "workflow") {
-  if (!hasGitPush(source)) return [];
+  const pushes = hasGitPush(source);
+  const deploys = hasProductionDeploy(source);
+  if (!pushes && !deploys) return [];
 
   const errors = [];
   const publishesRootData = /^\s*run:\s+\.\/scripts\/publish-data\.sh\s*$/m.test(source);
@@ -45,12 +52,12 @@ export function validateWorkflowWriterSafety(source, filename = "workflow") {
     "m",
   ).test(source);
   if (!hasSharedLock) {
-    errors.push(`${filename}: git push requires concurrency group ${WRITER_LOCK}`);
+    errors.push(`${filename}: production writes require concurrency group ${WRITER_LOCK}`);
   }
 
   const step = syncStep(source);
   if (!step) {
-    errors.push(`${filename}: git push requires a ${SYNC_STEP_NAME} step`);
+    errors.push(`${filename}: production writes require a ${SYNC_STEP_NAME} step`);
     return errors;
   }
   if (!/\bgit\s+fetch\s+origin\s+main\b/.test(step)) {
@@ -61,6 +68,29 @@ export function validateWorkflowWriterSafety(source, filename = "workflow") {
   }
   if (publishesRootData && !/\bgit\s+add\s+-A\s+--\s+site\/data\b/.test(source)) {
     errors.push(`${filename}: root data publishers must stage the complete site/data directory`);
+  }
+  if (deploys) {
+    if (/\bnetlify-cli\s+deploy\b/.test(source)) {
+      errors.push(`${filename}: production deploys must use npm run deploy:production`);
+    }
+    if (!/\bnpm\s+run\s+deploy:production\b/.test(source)) {
+      errors.push(`${filename}: production deploy is missing the shared deploy helper`);
+    }
+    if (!/^\s*issues:\s*write\s*$/m.test(source)) {
+      errors.push(`${filename}: production deploy requires issues: write`);
+    }
+    if (!/name:\s*Upload production deploy receipt[\s\S]*?if:\s*always\(\)[^\n]*production_deploy\.outcome\s*!=\s*'skipped'[\s\S]*?dist\/netlify-deploy-receipt\.json/.test(source)) {
+      errors.push(`${filename}: production deploy must always upload its receipt`);
+    }
+    const deployIndex = source.indexOf("npm run deploy:production");
+    const buildIndex = source.lastIndexOf("npm run build:netlify", deployIndex);
+    const pushIndex = source.lastIndexOf("git push", deployIndex);
+    if (buildIndex === -1 || buildIndex > deployIndex) {
+      errors.push(`${filename}: shared deploy helper must run after the production build`);
+    }
+    if (pushes && (pushIndex === -1 || pushIndex > deployIndex)) {
+      errors.push(`${filename}: shared deploy helper must run after the workflow's git push`);
+    }
   }
 
   return errors;

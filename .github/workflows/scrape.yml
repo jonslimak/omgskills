@@ -25,6 +25,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: app-data-writers
@@ -188,13 +189,18 @@ jobs:
         run: npm run build:netlify
 
       - name: Deploy site to Netlify
+        id: production_deploy
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
-        run: npx netlify-cli deploy --prod --dir=dist/netlify-site --no-build
+        run: npm run deploy:production
 
-      - name: Verify live web library pages
-        run: node ./scripts/verify-web-library-pages.mjs --live
-
-      - name: Verify live manifest
-        run: node ./scripts/verify-live-manifest.mjs
+      - name: Upload production deploy receipt
+        if: always() && steps.production_deploy.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deploy-${{ github.workflow }}-${{ github.run_id }}
+          path: dist/netlify-deploy-receipt.json
+          if-no-files-found: error
+          retention-days: 30

@@ -10,19 +10,24 @@ permissions:
   issues: write
 
 concurrency:
-  group: pipeline-health
+  group: app-data-writers
   cancel-in-progress: false
 
 jobs:
   health:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main --depth=1
+          git reset --hard origin/main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -109,13 +114,21 @@ jobs:
         run: npm run build:netlify
 
       - name: Deploy site to Netlify
+        id: production_deploy
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
-        run: npx netlify-cli deploy --prod --dir=dist/netlify-site --no-build
+        run: npm run deploy:production
 
-      - name: Verify live web library pages
-        run: node ./scripts/verify-web-library-pages.mjs --live
+      - name: Upload production deploy receipt
+        if: always() && steps.production_deploy.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deploy-${{ github.workflow }}-${{ github.run_id }}
+          path: dist/netlify-deploy-receipt.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Fail on degraded health
         if: steps.finalhealth.outputs.health_status == 'degraded'
