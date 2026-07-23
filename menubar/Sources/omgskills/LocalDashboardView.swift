@@ -492,10 +492,11 @@ private struct LocalDashboardStatCard: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("\(stat.value)")
                         .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(valueColor)
                         .monospacedDigit()
                     Text(stat.title)
                         .font(.system(size: 9))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(titleColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
                 }
@@ -506,13 +507,21 @@ private struct LocalDashboardStatCard: View {
             .padding(.vertical, 9)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(selected ? Color.accentColor.opacity(0.14) : Color.primary.opacity(0.055))
+                    .fill(selected ? AppUIStyle.activeBlue : Color.primary.opacity(0.055))
             )
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(stat.title) skills, \(stat.value)")
         .accessibilityHint("Shows matching installed skills")
+    }
+
+    private var valueColor: Color {
+        selected ? AppUIStyle.selectedPrimaryText : .primary
+    }
+
+    private var titleColor: Color {
+        selected ? AppUIStyle.selectedSecondaryText : .secondary
     }
 }
 

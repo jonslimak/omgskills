@@ -70,7 +70,8 @@ struct ReadmeWebView: NSViewRepresentable {
 
     private var css: String { """
         :root {
-          --text: #1c1c1e;
+          --text: #3a3a3c;
+          --heading: #1d1d1f;
           --muted: rgba(0,0,0,0.5);
           --code-bg: rgba(0,0,0,0.06);
           --pre-bg: rgba(0,0,0,0.04);
@@ -79,7 +80,8 @@ struct ReadmeWebView: NSViewRepresentable {
         }
         @media (prefers-color-scheme: dark) {
           :root {
-            --text: rgba(255,255,255,0.85);
+            --text: rgba(255,255,255,0.86);
+            --heading: rgba(255,255,255,0.94);
             --muted: rgba(255,255,255,0.45);
             --code-bg: rgba(255,255,255,0.1);
             --pre-bg: rgba(255,255,255,0.06);
@@ -89,16 +91,27 @@ struct ReadmeWebView: NSViewRepresentable {
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-          font-size: 13px;
-          line-height: 1.6;
+          font-family: "New York", ui-serif, Georgia, serif;
+          font-size: 12.5px;
+          line-height: 1.68;
           color: var(--text);
           background: transparent;
           word-wrap: break-word;
           overflow: hidden;
         }
-        h1,h2,h3,h4,h5,h6 { font-weight: 600; line-height: 1.3; margin: 10px 0 4px; }
-        h1 { font-size: 17px; } h2 { font-size: 15px; } h3 { font-size: 13px; }
+        h1,h2,h3,h4,h5,h6 {
+          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+          color: var(--heading);
+          font-weight: 600;
+          line-height: 1.3;
+          margin: 10px 0 4px;
+        }
+        h1 {
+          font-size: 16px;
+          font-weight: 700;
+          letter-spacing: -0.2px;
+        }
+        h2 { font-size: 15px; } h3 { font-size: 13px; }
         h4,h5,h6 { font-size: 12px; }
         p { margin: 5px 0; }
         a { color: var(--link); text-decoration: none; }
@@ -119,7 +132,7 @@ struct ReadmeWebView: NSViewRepresentable {
         }
         pre code { background: none; padding: 0; }
         ul, ol { padding-left: 18px; margin: 4px 0; }
-        li { margin: 2px 0; }
+        li { margin: 2px 0; line-height: 1.68; }
         blockquote {
           border-left: 3px solid var(--border);
           padding-left: 10px;

@@ -3,6 +3,7 @@ import AppKit
 
 struct TwitterSkillContextView: View {
     let skill: Skill
+    var selected = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -10,7 +11,7 @@ struct TwitterSkillContextView: View {
                 XTwitterLogoView(size: 12)
 
                 Text(authorLabel)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(selected ? Color.white : .blue)
                     .lineLimit(1)
                     .font(.headline)
                     .fontWeight(.regular)
@@ -19,7 +20,7 @@ struct TwitterSkillContextView: View {
             if let tweetText = skill.tweetText, !tweetText.isEmpty {
                 Text(tweetText)
                     .font(.system(size: 10))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(selected ? Color.white.opacity(0.78) : .primary)
                     .lineLimit(2)
             }
         }

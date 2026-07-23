@@ -12,7 +12,7 @@ struct InstalledSkillRow: View {
                 rowTextButton(
                     item.displayName,
                     font: .headline,
-                    color: .primary,
+                    color: rowPrimaryColor,
                     lineLimit: 1
                 )
                 .layoutPriority(1)
@@ -25,6 +25,7 @@ struct InstalledSkillRow: View {
                         SourceBadge(
                             sourceGroup: sourceGroup,
                             selectedSkillId: selectedSkillId,
+                            rowSelected: isSelected,
                             onSelectSkill: onSelectSkill
                         )
                     }
@@ -34,7 +35,7 @@ struct InstalledSkillRow: View {
             rowTextButton(
                 item.displayDescription,
                 font: .system(size: 10),
-                color: .secondary.opacity(0.7),
+                color: rowDescriptionColor,
                 lineLimit: 2,
                 fillWidth: true
             )
@@ -42,9 +43,29 @@ struct InstalledSkillRow: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(item.contains(skillId: selectedSkillId) ? Color.accentColor.opacity(0.18) : .clear)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(isSelected ? AppUIStyle.activeBlue : .clear)
+        )
+        .padding(.horizontal, 8)
         .contentShape(.rect)
         .help(item.installationSummary)
+    }
+
+    private var isSelected: Bool {
+        item.contains(skillId: selectedSkillId)
+    }
+
+    private var rowPrimaryColor: Color {
+        isSelected ? AppUIStyle.selectedPrimaryText : .primary
+    }
+
+    private var rowTertiaryColor: Color {
+        isSelected ? AppUIStyle.selectedTertiaryText : Color(nsColor: .tertiaryLabelColor)
+    }
+
+    private var rowDescriptionColor: Color {
+        isSelected ? AppUIStyle.selectedSecondaryText : .secondary.opacity(0.7)
     }
 
     private func rowTextButton(
@@ -74,7 +95,7 @@ struct InstalledSkillRow: View {
             } label: {
                 Text("@\(item.representative.authorHandle)")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(rowTertiaryColor)
                     .lineLimit(1)
             }
             .buttonStyle(.plain)
@@ -86,6 +107,7 @@ struct InstalledSkillRow: View {
     private struct SourceBadge: View {
         let sourceGroup: InstalledSkillDisplayItem.SourceGroup
         let selectedSkillId: String?
+        let rowSelected: Bool
         let onSelectSkill: (Skill) -> Void
 
         var body: some View {
@@ -120,7 +142,8 @@ struct InstalledSkillRow: View {
             SkillOriginBadge(
                 origin: sourceGroup.source,
                 count: sourceGroup.members.count,
-                selected: sourceGroup.members.contains(where: { $0.id == selectedSkillId })
+                selected: sourceGroup.members.contains(where: { $0.id == selectedSkillId }),
+                selectedRow: rowSelected
             )
         }
 

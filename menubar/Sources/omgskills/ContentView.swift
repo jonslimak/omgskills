@@ -113,6 +113,11 @@ private struct StarterSearch: Identifiable, Hashable {
     }
 }
 
+private struct DescriptionParagraph: Identifiable {
+    let id: String
+    let text: String
+}
+
 private struct DataUpdatedFooterView: View {
     let text: String
 
@@ -193,7 +198,8 @@ struct ContentView: View {
     @State private var isSyncPanelPresented = false
     @FocusState private var searchFocused: Bool
 
-    private let detailDescriptionFont: Font = .body
+    private let detailDescriptionBoxFont: Font = .system(size: 13.5, design: .serif).italic()
+    private let tweetDescriptionFont: Font = .body
     private let toolbarSources: [Source] = [.installed, .available]
     private let friendShareText = "I use omgskills.com to find skills and it doesn't suck"
 
@@ -1087,19 +1093,11 @@ struct ContentView: View {
         if let skill = selectedSkill {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Name + author
+                    // Name + metadata
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
                         VStack(alignment: .leading, spacing: 4) {
-                            if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
-                                Link(skill.name, destination: url)
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                            } else {
-                                Text(skill.name)
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                            }
-                            authorAttributionButton(for: skill)
+                            skillTitleView(for: skill)
+                            detailMetadataLine(for: skill)
                         }
                         Spacer()
                         Button("Close", systemImage: "arrow.left.to.line.compact") {
@@ -1116,31 +1114,8 @@ struct ContentView: View {
                         .help("Close")
                     }
 
-                    // Tags
-                    if !skill.tags.isEmpty {
-                        FlowLayout(spacing: 6) {
-                            ForEach(skill.tags, id: \.self) { tag in
-                                Text(tag)
-                                    .font(.system(size: 9))
-                                    .padding(.horizontal, 5)
-                                    .padding(.vertical, 2)
-                                    .background(Capsule().fill(.quaternary.opacity(0.5)))
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-
                     // Stats
-                    if source == .available {
-                        HStack(spacing: 16) {
-                            Label(formatCompactCount(skill.stars), systemImage: "star")
-                                .font(.callout)
-                                .foregroundStyle(.secondary)
-                            Label(formatDate(skill.lastUpdated), systemImage: "clock")
-                                .font(.callout)
-                                .foregroundStyle(.secondary)
-                        }
-                    } else if source == .trending {
+                    if source == .trending {
                         HStack(spacing: 16) {
                             Label(formatCompactCount(skill.installs ?? 0), systemImage: "triangle.fill")
                                 .font(.callout)
@@ -1190,32 +1165,49 @@ struct ContentView: View {
                         twitterTweetCard(skill, tweetText: tweetText)
                     }
 
-                    Divider()
-
                     // Full description
-                    VStack(alignment: .leading, spacing: 9) {
-                        ForEach(descriptionBullets(skill.description), id: \.self) { sentence in
-                            HStack(alignment: .top, spacing: 6) {
-                                Text("•").foregroundStyle(.secondary)
-                                Text(sentence)
+                    if !skill.description.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            ForEach(descriptionParagraphs(skill.description)) { paragraph in
+                                Text(paragraph.text)
+                                    .tracking(0.1)
+                                    .lineSpacing(1)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                            .font(detailDescriptionBoxFont)
+                            .foregroundStyle(AppUIStyle.detailBodyText)
+                            .textSelection(.enabled)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(AppUIStyle.descriptionBoxBackground)
+                            )
+                    }
+
+                    // Tags
+                    if !skill.tags.isEmpty {
+                        FlowLayout(spacing: 6) {
+                            ForEach(skill.tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.system(size: 9))
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(Capsule().fill(.quaternary.opacity(0.5)))
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
-                    .font(detailDescriptionFont)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .textSelection(.enabled)
+
+                    updatedAgeLabel(for: skill)
 
                     if isLoadingReadme {
-                        Divider()
                         ProgressView()
                             .controlSize(.small)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else if let readme = displayedReadme, !readme.isEmpty {
-                        Divider()
-                        Text("README")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.tertiary)
                         ReadmeWebView(markdown: readme, height: $readmeHeight)
                             .frame(height: readmeHeight)
                     }
@@ -1234,6 +1226,67 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+    }
+
+    @ViewBuilder
+    private func skillTitleView(for skill: Skill) -> some View {
+        if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
+            Link(skill.name, destination: url)
+                .font(.system(size: 22, weight: .semibold))
+                .tracking(-0.2)
+                .lineSpacing(4)
+                .foregroundStyle(AppUIStyle.detailTitleText)
+        } else {
+            Text(skill.name)
+                .font(.system(size: 22, weight: .semibold))
+                .tracking(-0.2)
+                .lineSpacing(4)
+                .foregroundStyle(AppUIStyle.detailTitleText)
+        }
+    }
+
+    private func detailMetadataLine(for skill: Skill) -> some View {
+        HStack(spacing: 5) {
+            if hasDetailAttribution(for: skill) {
+                authorAttributionButton(for: skill)
+                Text("•")
+                    .foregroundStyle(.tertiary)
+            }
+
+            Label(formatCompactCount(skill.stars), systemImage: "star.fill")
+                .labelStyle(.titleAndIcon)
+        }
+        .font(.system(size: 12.5))
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
+    }
+
+    @ViewBuilder
+    private func updatedAgeLabel(for skill: Skill) -> some View {
+        if let updatedAge = relativeUpdatedAge(skill.lastUpdated) {
+            Text("Updated \(updatedAge) ago")
+                .font(.system(size: 9))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+    }
+
+    private func hasDetailAttribution(for skill: Skill) -> Bool {
+        !skill.authorHandle.isEmpty || (skill.discoverAttributionText != nil && source == .available)
+    }
+
+    private func installButtonTitle(for target: SkillInstaller.Target, state: SkillInstallState) -> String {
+        if case .installed = state {
+            return target.rawValue
+        }
+        return state.buttonTitle(for: target)
+    }
+
+    private func installButtonSystemImage(for state: SkillInstallState) -> String {
+        if case .installed = state {
+            return "checkmark"
+        }
+        return "square.and.arrow.down"
     }
 
     @ViewBuilder
@@ -1261,30 +1314,16 @@ struct ContentView: View {
                     }
                     .accessibilityLabel("Open in Finder")
                     .help("Open in Finder")
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
                     Button {
                         let url = URL(fileURLWithPath: skill.installCmd).appendingPathComponent("SKILL.md")
                         NSWorkspace.shared.open(url)
                     } label: {
                         Label("SKILL.md", systemImage: "doc.text")
                     }
-                    if let githubURL {
-                        Button {
-                            NSWorkspace.shared.open(githubURL)
-                        } label: {
-                            Label("GitHub", systemImage: "arrow.up.right")
-                        }
-                    }
-                    if let shareText {
-                        NativeShareButton(
-                            title: "Share",
-                            systemImage: "square.and.arrow.up",
-                            item: shareText,
-                            onShareStarted: {
-                                trackSkillShareStarted(skill, location: "detail_actions")
-                            }
-                        )
-                            .frame(height: 21)
-                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
                     if let crossInstallTarget {
                         Button {
                             crossInstallSkill(skill, target: crossInstallTarget)
@@ -1298,6 +1337,8 @@ struct ContentView: View {
                         .accessibilityLabel(
                             crossInstallAccessibilityLabel(for: skill, target: crossInstallTarget)
                         )
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                     }
                     Button(role: .destructive) {
                         requestDeleteInstalledSkill(skill)
@@ -1310,9 +1351,33 @@ struct ContentView: View {
                     }
                     .accessibilityLabel("Delete installed skill")
                     .help("Delete installed skill")
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+
+                    if let githubURL {
+                        Button {
+                            NSWorkspace.shared.open(githubURL)
+                        } label: {
+                            Label("GitHub", systemImage: "arrow.up.right")
+                        }
+                        .buttonStyle(DetailPlainActionButtonStyle())
+                        .controlSize(.small)
+                        .fixedSize(horizontal: true, vertical: false)
+                    }
+                    if let shareText {
+                        NativeShareButton(
+                            title: "Share",
+                            systemImage: "square.and.arrow.up",
+                            item: shareText,
+                            style: .borderless,
+                            onShareStarted: {
+                                trackSkillShareStarted(skill, location: "detail_actions")
+                            }
+                        )
+                            .frame(height: 21)
+                            .fixedSize(horizontal: true, vertical: false)
+                    }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
 
                 if let deleteError {
                     Text(deleteError)
@@ -1331,19 +1396,29 @@ struct ContentView: View {
                     Button {
                         installSkill(skill, target: .claude)
                     } label: {
-                        Label(claudeInstallState.buttonTitle(for: .claude), systemImage: "square.and.arrow.down")
+                        Label(
+                            installButtonTitle(for: .claude, state: claudeInstallState),
+                            systemImage: installButtonSystemImage(for: claudeInstallState)
+                        )
                     }
                     .disabled(claudeInstallState.isDisabled)
-                    .accessibilityLabel(claudeInstallState.buttonTitle(for: .claude))
+                    .buttonStyle(DetailInstallButtonStyle(state: claudeInstallState))
+                    .controlSize(.small)
+                    .accessibilityLabel(installButtonTitle(for: .claude, state: claudeInstallState))
                     .accessibilityHint("Installs this skill as a global Claude skill")
 
                     Button {
                         installSkill(skill, target: .codex)
                     } label: {
-                        Label(codexInstallState.buttonTitle(for: .codex), systemImage: "square.and.arrow.down")
+                        Label(
+                            installButtonTitle(for: .codex, state: codexInstallState),
+                            systemImage: installButtonSystemImage(for: codexInstallState)
+                        )
                     }
                     .disabled(codexInstallState.isDisabled)
-                    .accessibilityLabel(codexInstallState.buttonTitle(for: .codex))
+                    .buttonStyle(DetailInstallButtonStyle(state: codexInstallState))
+                    .controlSize(.small)
+                    .accessibilityLabel(installButtonTitle(for: .codex, state: codexInstallState))
                     .accessibilityHint("Installs this skill as a global Codex skill")
 
                     if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
@@ -1352,12 +1427,15 @@ struct ContentView: View {
                         } label: {
                             Label("GitHub", systemImage: "arrow.up.right")
                         }
+                        .buttonStyle(DetailPlainActionButtonStyle())
+                        .controlSize(.small)
                     }
                     if let shareText = skillShareText(skill) {
                         NativeShareButton(
                             title: "Share",
                             systemImage: "square.and.arrow.up",
                             item: shareText,
+                            style: .borderless,
                             onShareStarted: {
                                 trackSkillShareStarted(skill, location: "detail_actions")
                             }
@@ -1365,8 +1443,6 @@ struct ContentView: View {
                             .frame(height: 21)
                     }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
 
                 if let message = claudeInstallState.errorMessage ?? codexInstallState.errorMessage {
                     Text(message)
@@ -1383,16 +1459,16 @@ struct ContentView: View {
             Button {
                 openAuthorOrFilter(skill.authorHandle)
             } label: {
-                Text("by @\(skill.authorHandle)")
-                    .font(.subheadline)
+                Text("@\(skill.authorHandle)")
                     .foregroundStyle(.secondary)
             }
+            .font(.system(size: 12.5))
             .buttonStyle(.plain)
             .accessibilityLabel("Show skills by @\(skill.authorHandle)")
             .help("Show skills by @\(skill.authorHandle)")
         } else if let attribution = skill.discoverAttributionText, source == .available {
             Text(attribution)
-                .font(.subheadline)
+                    .font(.system(size: 12.5))
                 .foregroundStyle(.secondary)
         }
     }
@@ -1422,7 +1498,7 @@ struct ContentView: View {
             }
 
             Text(tweetText)
-                .font(detailDescriptionFont)
+                .font(tweetDescriptionFont)
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
                 .textSelection(.enabled)
@@ -1441,19 +1517,62 @@ struct ContentView: View {
         .accessibilityLabel("Tweet by \(twitterAuthorLabel(skill)): \(tweetText)")
     }
 
-    private func descriptionBullets(_ text: String) -> [String] {
-        text.components(separatedBy: ". ")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
+    private func descriptionParagraphs(_ text: String) -> [DescriptionParagraph] {
+        let normalized = text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        let explicitParagraphs = normalized
+            .components(separatedBy: .newlines)
+            .map(cleanDescriptionParagraph)
             .filter { !$0.isEmpty }
-            .map { $0.hasSuffix(".") ? $0 : $0 + "." }
+
+        let paragraphs: [String]
+        if explicitParagraphs.count > 1 {
+            paragraphs = explicitParagraphs
+        } else {
+            paragraphs = normalized
+                .components(separatedBy: ". ")
+                .map(cleanDescriptionParagraph)
+                .filter { !$0.isEmpty }
+                .map { $0.hasSuffix(".") ? $0 : $0 + "." }
+        }
+
+        return paragraphs.enumerated().map { index, paragraph in
+            DescriptionParagraph(id: "\(index)-\(paragraph)", text: paragraph)
+        }
     }
 
-    private func formatDate(_ iso: String) -> String {
-        let df = ISO8601DateFormatter()
-        guard let date = df.date(from: iso) else { return String(iso.prefix(10)) }
-        let out = DateFormatter()
-        out.dateStyle = .medium
-        return out.string(from: date)
+    private func cleanDescriptionParagraph(_ text: String) -> String {
+        var cleaned = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        for prefix in ["• ", "- ", "* "] where cleaned.hasPrefix(prefix) {
+            cleaned.removeFirst(prefix.count)
+            return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return cleaned
+    }
+
+    private func relativeUpdatedAge(_ iso: String, now: Date = Date()) -> String? {
+        guard let date = parseSkillDate(iso) else { return nil }
+        let elapsedDays = max(0, Calendar.current.dateComponents([.day], from: date, to: now).day ?? 0)
+
+        if elapsedDays == 0 { return "today" }
+        if elapsedDays < 21 { return "\(elapsedDays)d" }
+        if elapsedDays < 56 { return "\(elapsedDays / 7)w" }
+        if elapsedDays < 365 { return "\(max(1, elapsedDays / 30))mo" }
+        return "\(max(1, elapsedDays / 365))y"
+    }
+
+    private func parseSkillDate(_ rawValue: String) -> Date? {
+        let isoFormatter = ISO8601DateFormatter()
+        if let date = isoFormatter.date(from: rawValue) {
+            return date
+        }
+
+        let dateOnlyFormatter = DateFormatter()
+        dateOnlyFormatter.calendar = Calendar(identifier: .gregorian)
+        dateOnlyFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateOnlyFormatter.dateFormat = "yyyy-MM-dd"
+        return dateOnlyFormatter.date(from: String(rawValue.prefix(10)))
     }
 
     private func formatCompactCount(_ value: Int) -> String {
@@ -2017,9 +2136,10 @@ struct ContentView: View {
         source = .available
         sortKey = .stars
         showDetail = false
+        clearSkillSelection()
         query = term
         debouncedQuery = term
-        refreshResults(selectFirst: true)
+        refreshResults(selectFirst: false)
         searchFocused = true
     }
 
@@ -2032,6 +2152,7 @@ struct ContentView: View {
         sortKey = .trending
         localDashboardFilter = nil
         showDetail = false
+        clearSkillSelection()
         query = ""
         debouncedQuery = ""
         refreshResults(selectFirst: true)
@@ -2047,6 +2168,7 @@ struct ContentView: View {
         sortKey = .stars
         localDashboardFilter = nil
         showDetail = false
+        clearSkillSelection()
         query = ""
         debouncedQuery = ""
         refreshResults(selectFirst: true)
@@ -2306,7 +2428,7 @@ struct ContentView: View {
             showDetail = false
             cachedInstalledResults = []
             cachedResults = Array(store.allSkills(for: collection).prefix(150))
-            select(cachedResults.first, scroll: false)
+            clearSkillSelection()
             searchFocused = true
         }
     }
@@ -2373,11 +2495,13 @@ struct ContentView: View {
         }
 
         if usesUnifiedInstalledResults {
+            let shouldSelectFirst = selectFirst && showDetail
             cachedResults = []
             cachedInstalledResults = computeInstalledResults()
-            if selectFirst, let firstItem = cachedInstalledResults.first {
+            if shouldSelectFirst, let firstItem = cachedInstalledResults.first {
                 select(firstItem.representative, scroll: false, installedItem: firstItem)
-            } else if let resolution = InstalledSkillSelectionResolver.resolve(
+            } else if showDetail,
+                      let resolution = InstalledSkillSelectionResolver.resolve(
                 items: cachedInstalledResults,
                 selectedSkillId: selectedId,
                 anchor: installedSelectionAnchor
@@ -2388,7 +2512,7 @@ struct ContentView: View {
                     installedItem: resolution.item
                 )
             } else {
-                clearSelection()
+                clearSkillSelection()
             }
             return
         }
@@ -2396,14 +2520,17 @@ struct ContentView: View {
         cachedInstalledResults = []
         installedSelectionAnchor = nil
         cachedResults = computeResults()
-        let shouldSelectFirst = selectFirst && !(source == .twitter && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        let shouldSelectFirst = selectFirst &&
+            showDetail &&
+            !(source == .twitter && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         if shouldSelectFirst {
             select(cachedResults.first, scroll: false)
-        } else if let selectedId,
+        } else if showDetail,
+                  let selectedId,
                   let skill = cachedResults.first(where: { $0.id == selectedId }) {
             selectedSkill = skill
         } else {
-            clearSelection()
+            clearSkillSelection()
         }
     }
 
@@ -2474,6 +2601,10 @@ struct ContentView: View {
 
     private func clearSelection() {
         selectedCollectionId = nil
+        clearSkillSelection()
+    }
+
+    private func clearSkillSelection() {
         selectedId = nil
         selectedSkill = nil
         installedSelectionAnchor = nil
@@ -2646,7 +2777,7 @@ struct SkillRow: View {
             if source == .twitter {
                 HStack(alignment: .top, spacing: 6) {
                     Button(action: onSelect) {
-                        TwitterSkillContextView(skill: skill)
+                        TwitterSkillContextView(skill: skill, selected: selected)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .contentShape(Rectangle())
                     }
@@ -2655,7 +2786,7 @@ struct SkillRow: View {
                     Spacer(minLength: 4)
                     Text(relativeTweetPostedAt(skill.tweetPostedAt) ?? "")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(rowTertiaryColor)
                         .monospacedDigit()
                         .frame(width: tweetPostedAgeWidth, alignment: .trailing)
                     HStack(spacing: 4) {
@@ -2663,13 +2794,13 @@ struct SkillRow: View {
                         Text(formatCompactCount(skill.tweetLikes ?? 0))
                     }
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(rowTertiaryColor)
                     .monospacedDigit()
                     .frame(width: trailingMetricWidth, alignment: .leading)
                 }
 
                 HStack(spacing: 6) {
-                    rowTextButton(skill.name, font: .headline, color: .primary, lineLimit: 1)
+                    rowTextButton(skill.name, font: .headline, color: rowPrimaryColor, lineLimit: 1)
                     creatorButton
                     Spacer(minLength: 4)
                     HStack(spacing: 4) {
@@ -2677,14 +2808,14 @@ struct SkillRow: View {
                         Text(formatCompactCount(skill.stars))
                     }
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(rowSecondaryColor)
                     .monospacedDigit()
                     .frame(width: trailingMetricWidth, alignment: .leading)
                 }
-                rowTextButton(skill.description, font: .system(size: 10), color: .secondary.opacity(0.7), lineLimit: 2, fillWidth: true)
+                rowTextButton(skill.description, font: .system(size: 10), color: rowDescriptionColor, lineLimit: 2, fillWidth: true)
             } else {
                 HStack(spacing: 6) {
-                    rowTextButton(skill.name, font: .headline, color: .primary, lineLimit: 1)
+                    rowTextButton(skill.name, font: .headline, color: rowPrimaryColor, lineLimit: 1)
                     creatorButton
                     Spacer(minLength: 4)
                     if source == .available {
@@ -2693,7 +2824,7 @@ struct SkillRow: View {
                             Text(formatCompactCount(skill.stars))
                         }
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(rowSecondaryColor)
                         .monospacedDigit()
                         .frame(width: trailingMetricWidth, alignment: .leading)
                     } else if source == .trending {
@@ -2702,20 +2833,24 @@ struct SkillRow: View {
                             Text(formatCompactCount(skill.installs ?? 0))
                         }
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(rowSecondaryColor)
                         .monospacedDigit()
                         .frame(width: trailingMetricWidth, alignment: .leading)
                     } else if let origin = skill.origin {
                         SkillOriginBadge(origin: origin, selected: selected)
                     }
                 }
-                rowTextButton(skill.description, font: .system(size: 10), color: .secondary.opacity(0.7), lineLimit: 2, fillWidth: true)
+                rowTextButton(skill.description, font: .system(size: 10), color: rowDescriptionColor, lineLimit: 2, fillWidth: true)
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(selected ? Color.accentColor.opacity(0.18) : .clear)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(selected ? AppUIStyle.activeBlue : .clear)
+        )
+        .padding(.horizontal, 8)
         .contentShape(Rectangle())
     }
 
@@ -2740,7 +2875,7 @@ struct SkillRow: View {
             } label: {
                 Text("@\(skill.authorHandle)")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(rowTertiaryColor)
                     .lineLimit(1)
             }
             .buttonStyle(.plain)
@@ -2749,9 +2884,25 @@ struct SkillRow: View {
         } else if source == .available, let attribution = skill.discoverAttributionText {
             Text(attribution.replacingOccurrences(of: "via ", with: ""))
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(rowTertiaryColor)
                 .lineLimit(1)
         }
+    }
+
+    private var rowPrimaryColor: Color {
+        selected ? AppUIStyle.selectedPrimaryText : .primary
+    }
+
+    private var rowSecondaryColor: Color {
+        selected ? AppUIStyle.selectedSecondaryText : .secondary
+    }
+
+    private var rowTertiaryColor: Color {
+        selected ? AppUIStyle.selectedTertiaryText : Color(nsColor: .tertiaryLabelColor)
+    }
+
+    private var rowDescriptionColor: Color {
+        selected ? AppUIStyle.selectedSecondaryText : .secondary.opacity(0.7)
     }
 
 private func twitterAuthorLabel(_ skill: Skill) -> String {
@@ -2855,9 +3006,53 @@ struct FlowLayout: Layout {
     }
 }
 
+private struct DetailInstallButtonStyle: ButtonStyle {
+    let state: SkillInstallState
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: NSFont.systemFontSize(for: .small), weight: .medium))
+            .foregroundStyle(foregroundColor)
+            .padding(.horizontal, 12)
+            .frame(height: 21)
+            .background(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(backgroundColor.opacity(configuration.isPressed ? 0.82 : 1))
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+    }
+
+    private var foregroundColor: Color {
+        if case .installed = state {
+            return .secondary
+        }
+        return .white
+    }
+
+    private var backgroundColor: Color {
+        if case .installed = state {
+            return Color.primary.opacity(0.08)
+        }
+        return AppUIStyle.activeBlue
+    }
+}
+
+private struct DetailPlainActionButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: NSFont.systemFontSize(for: .small), weight: .medium))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 8)
+            .frame(height: 21)
+            .opacity(configuration.isPressed ? 0.65 : 1)
+            .contentShape(Rectangle())
+    }
+}
+
 private struct NativeShareButton: NSViewRepresentable {
     enum Style {
         case bordered
+        case borderless
         case plain
     }
 
@@ -2876,7 +3071,7 @@ private struct NativeShareButton: NSViewRepresentable {
         let button = NSButton(title: "", target: context.coordinator, action: #selector(Coordinator.share(_:)))
         button.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: title)
         button.imagePosition = .imageLeading
-        button.imageHugsTitle = style == .plain
+        button.imageHugsTitle = style != .bordered
         button.controlSize = .small
         button.bezelStyle = .rounded
         button.isBordered = style == .bordered
@@ -2895,7 +3090,7 @@ private struct NativeShareButton: NSViewRepresentable {
         context.coordinator.item = item
         context.coordinator.onShareStarted = onShareStarted
         button.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: title)
-        button.imageHugsTitle = style == .plain
+        button.imageHugsTitle = style != .bordered
         button.isBordered = style == .bordered
         configureTitle(for: button)
         context.coordinator.configureShine(for: button, title: title, style: style)
@@ -2905,9 +3100,13 @@ private struct NativeShareButton: NSViewRepresentable {
     }
 
     private func configureTitle(for button: NSButton) {
-        let font = NSFont.systemFont(ofSize: style == .plain ? 11 : NSFont.systemFontSize(for: .small))
+        let font = NSFont.systemFont(
+            ofSize: style == .plain ? 11 : NSFont.systemFontSize(for: .small),
+            weight: style == .borderless ? .medium : .regular
+        )
         button.font = font
-        if style == .plain {
+        switch style {
+        case .plain:
             button.contentTintColor = .tertiaryLabelColor
             let titleAttributes: [NSAttributedString.Key: Any] = [
                 .font: font,
@@ -2916,7 +3115,10 @@ private struct NativeShareButton: NSViewRepresentable {
             let spacer = NSMutableAttributedString(string: " ", attributes: titleAttributes)
             spacer.append(NSAttributedString(string: title, attributes: titleAttributes))
             button.attributedTitle = spacer
-        } else {
+        case .borderless:
+            button.contentTintColor = .labelColor
+            button.title = title
+        case .bordered:
             button.contentTintColor = nil
             button.title = title
         }

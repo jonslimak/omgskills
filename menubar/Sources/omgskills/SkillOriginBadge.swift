@@ -5,19 +5,20 @@ struct SkillOriginBadge: View {
     let origin: String
     var count = 1
     var selected = false
+    var selectedRow = false
 
     var body: some View {
         if let iconImage {
             HStack(spacing: 3) {
                 ZStack {
                     Circle()
-                        .fill(selected ? Color.accentColor : Color.primary.opacity(0.055))
+                        .fill(iconBackgroundColor)
 
                     Image(nsImage: iconImage)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundStyle(selected ? Color.white : Color.primary.opacity(0.5))
+                        .foregroundStyle(iconForegroundColor)
                         .frame(width: 10, height: 10)
                         .accessibilityHidden(true)
                 }
@@ -26,7 +27,7 @@ struct SkillOriginBadge: View {
                 if count > 1 {
                     Text("\(count)")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(countColor)
                         .monospacedDigit()
                 }
             }
@@ -42,6 +43,24 @@ struct SkillOriginBadge: View {
                 .foregroundStyle(.secondary)
                 .accessibilityLabel(accessibilityLabel)
         }
+    }
+
+    private var iconBackgroundColor: Color {
+        if selectedRow {
+            return selected ? .white : AppUIStyle.activeBlue
+        }
+        return selected ? Color.accentColor : Color.primary.opacity(0.055)
+    }
+
+    private var iconForegroundColor: Color {
+        if selectedRow {
+            return selected ? AppUIStyle.activeBlue : .white
+        }
+        return selected ? .white : Color.primary.opacity(0.5)
+    }
+
+    private var countColor: Color {
+        selectedRow ? AppUIStyle.selectedSecondaryText : .secondary
     }
 
     private var accessibilityLabel: String {
