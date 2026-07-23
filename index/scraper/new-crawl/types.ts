@@ -386,6 +386,8 @@ export type Crawl4Preview = {
 
 export type ShadowRunReport = {
   checkedAt: string;
+  sourceCommit: string;
+  policyDigest: string;
   status: "ok";
   cadence: ShadowCadence;
   baselineSkillCount: number;

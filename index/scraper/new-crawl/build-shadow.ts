@@ -48,6 +48,8 @@ import {
   loadSkillEquivalenceOverrides,
 } from "./skill-equivalence.js";
 import { applyQualityTiers, stripQualityTiers, summarizeQualityTiers } from "./quality-tier.js";
+import { loadPolicySources, typedPolicySources } from "../policy/loader.js";
+import { policyRunMetadata } from "../policy/metadata.js";
 import {
   admissionObservation,
   applyRepoStatePrecedence,
@@ -659,6 +661,8 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "# Shadow Crawl Summary",
     "",
     `- Checked at: ${report.checkedAt}`,
+    `- Source commit: ${report.sourceCommit}`,
+    `- Policy digest: ${report.policyDigest}`,
     `- Status: ${report.status.toUpperCase()}`,
     `- Cadence: ${report.cadence}`,
     `- Baseline skills: ${report.baselineSkillCount}`,
@@ -2143,6 +2147,7 @@ async function main() {
   );
   const goldBasketSkillIds = new Set(goldBasketSkills.map((skill) => skill.id.toLowerCase()));
   const seeds = loadTrustedSeeds();
+  const policyMetadata = policyRunMetadata(typedPolicySources(loadPolicySources()));
   timings.loadBaseline = Math.round(performance.now() - baselineStart);
 
   const provenanceStart = performance.now();
@@ -2320,6 +2325,7 @@ async function main() {
     : currentQualityTierSkills;
   const policyPrecedenceReport = buildPolicyPrecedenceReport({
     generatedAt: checkedAt,
+    ...policyMetadata,
     mode: policyPrecedenceMode,
     admissions: admissionPolicyObservations,
     repoStates: repoStatePolicyObservations,
@@ -2394,6 +2400,7 @@ async function main() {
 
   const reportBase: Omit<ShadowRunReport, "stageTimings"> = {
     checkedAt,
+    ...policyMetadata,
     status: "ok",
     cadence,
     baselineSkillCount: baselineSkills.length,

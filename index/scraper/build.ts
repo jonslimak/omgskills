@@ -23,13 +23,13 @@ import { isSuppressedSkillId } from "./new-crawl/suppressed-skills.js";
 import type { TrustedSeeds } from "./new-crawl/types.js";
 import { loadPolicySources, typedPolicySources } from "./policy/loader.js";
 import { effectivePolicyDigest } from "./policy/digest.js";
+import { currentSourceCommit } from "./policy/metadata.js";
 import {
   LEGACY_BLOCKED_OWNERS,
   LEGACY_BLOCKED_REPOS,
   assertV2PolicyEnforcementReady,
   buildV2LegacyMigrationAudit,
   buildV2PolicyReport,
-  currentSourceCommit,
   evaluateLegacyV2Candidate,
   evaluateProposedV2Candidate,
   evaluateProposedV2Skill,

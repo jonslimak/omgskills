@@ -50,6 +50,8 @@ function currentSkill(id: string): Skill {
 function shadowReport(cutoverValidationPassed: boolean): ShadowRunReport {
   return {
     checkedAt: "2026-05-26T00:00:00Z",
+    sourceCommit: "test-commit",
+    policyDigest: "sha256:test",
     status: "ok",
     cadence: "combined",
     baselineSkillCount: 0,

@@ -1,7 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { CreatorRegistrySource } from "../scraper/creator-registry.js";
-import { buildCollectionsAsset, validateSource } from "./publish-collections.js";
+import {
+  buildCollectionsAsset,
+  collectionsPublishMode,
+  evaluateCollectionsImpact,
+  validateSource,
+} from "./publish-collections.js";
+import { summarizeCollections } from "./publication-impact.js";
 
 const skills = [
   {
@@ -109,4 +115,85 @@ test("duplicate skill ids within one curated list are rejected", () => {
     () => validateSource(source, { creators: [] }, skills),
     /duplicate skill id in starter-pack\.skillIds: oldhandle\/repo:one/,
   );
+});
+
+test("collections publish mode defaults to publish and supports explicit removal", () => {
+  assert.equal(collectionsPublishMode({}), "publish");
+  assert.equal(collectionsPublishMode({ COLLECTIONS_PUBLISH: "1" }), "publish");
+  assert.equal(collectionsPublishMode({ COLLECTIONS_PUBLISH: "publish" }), "publish");
+  assert.equal(collectionsPublishMode({ COLLECTIONS_PUBLISH: "0" }), "remove");
+  assert.equal(collectionsPublishMode({ COLLECTIONS_PUBLISH: "remove" }), "remove");
+  assert.throws(
+    () => collectionsPublishMode({ COLLECTIONS_PUBLISH: "true" }),
+    /invalid COLLECTIONS_PUBLISH/,
+  );
+});
+
+test("collections impact blocks collection removal without review", () => {
+  const previous = summarizeCollections({
+    collections: [{
+      id: "starter-pack",
+      featuredSkillIds: ["oldhandle/repo:one"],
+      skillIds: [],
+    }],
+  });
+  const report = evaluateCollectionsImpact({
+    mode: "publish",
+    tracks: [{ name: "v2", previous }, { name: "crawl4", previous }],
+    proposed: summarizeCollections({ collections: [] }),
+    metadata: { sourceCommit: "abc", policyDigest: "sha256:test" },
+  });
+
+  assert.equal(report.blocked, true);
+  assert.equal(report.tracks.every((track) => track.blocked), true);
+});
+
+test("explicit collections removal is authorized without the general override", () => {
+  const previous = summarizeCollections({
+    collections: [{
+      id: "starter-pack",
+      featuredSkillIds: ["oldhandle/repo:one"],
+      skillIds: [],
+    }],
+  });
+  const report = evaluateCollectionsImpact({
+    mode: "remove",
+    tracks: [{ name: "v2", previous }, { name: "crawl4", previous }],
+    proposed: null,
+    metadata: { sourceCommit: "abc", policyDigest: "sha256:test" },
+  });
+
+  assert.equal(report.blocked, false);
+  assert.equal(report.authorizedRemoval, true);
+});
+
+test("reviewed impact override permits a large membership edit and records its reason", () => {
+  const previous = summarizeCollections({
+    collections: [{
+      id: "starter-pack",
+      featuredSkillIds: ["oldhandle/repo:one", "other/repo:two"],
+      skillIds: [],
+    }],
+  });
+  const proposed = summarizeCollections({
+    collections: [{
+      id: "starter-pack",
+      featuredSkillIds: ["oldhandle/repo:one"],
+      skillIds: [],
+    }],
+  });
+  const report = evaluateCollectionsImpact({
+    mode: "publish",
+    tracks: [{ name: "v2", previous }, { name: "crawl4", previous }],
+    proposed,
+    override: {
+      enabled: true,
+      reason: "reviewed editorial cleanup",
+      errors: [],
+    },
+    metadata: { sourceCommit: "abc", policyDigest: "sha256:test" },
+  });
+
+  assert.equal(report.blocked, false);
+  assert.equal(report.override.reason, "reviewed editorial cleanup");
 });

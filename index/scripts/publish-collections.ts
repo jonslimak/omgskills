@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -10,6 +10,14 @@ import {
 } from "../scraper/creator-registry.js";
 import { loadPolicySources, typedPolicySources } from "../scraper/policy/loader.js";
 import { assertPolicyValid, validatePolicy } from "../scraper/policy/validator.js";
+import { policyRunMetadata } from "../scraper/policy/metadata.js";
+import {
+  collectionDelta,
+  parsePublicationImpactOverride,
+  summarizeCollections,
+  type CollectionSummary,
+  type PublicationImpactOverride,
+} from "./publication-impact.js";
 import type {
   AuthorOverride,
   CollectionsPolicySource as CollectionsSource,
@@ -63,6 +71,41 @@ const dataTrackDirs = [
   join(siteRoot, "data", "crawl4"),
   join(siteRoot, "data", "v2"),
 ];
+const impactJsonPath = join(indexRoot, "shadow", "publication-impact.collections.json");
+const impactMarkdownPath = join(indexRoot, "shadow", "publication-impact.collections.md");
+const COLLECTION_MEMBERSHIP_REMOVAL_PERCENT = 0.2;
+
+export type CollectionsPublishMode = "publish" | "remove";
+
+export type CollectionsTrack = {
+  name: string;
+  dir: string;
+};
+
+export type CollectionsImpactTrack = {
+  name: string;
+  previous: CollectionSummary | null;
+  proposed: CollectionSummary | null;
+  addedIds: string[];
+  removedIds: string[];
+  removedMembershipCount: number;
+  removedMembershipPercent: number;
+  blocked: boolean;
+};
+
+export type CollectionsImpactReport = {
+  version: 1;
+  generatedAt: string;
+  sourceCommit: string;
+  policyDigest: string;
+  mode: CollectionsPublishMode;
+  authorizedRemoval: boolean;
+  authorizedRemovalReason: string | null;
+  override: { enabled: boolean; reason: string | null };
+  tracks: CollectionsImpactTrack[];
+  errors: string[];
+  blocked: boolean;
+};
 
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
@@ -74,6 +117,15 @@ function fail(message: string): never {
 
 function sha256(data: Buffer): string {
   return createHash("sha256").update(data).digest("hex");
+}
+
+export function collectionsPublishMode(
+  env: NodeJS.ProcessEnv = process.env,
+): CollectionsPublishMode {
+  const value = env.COLLECTIONS_PUBLISH?.trim().toLowerCase();
+  if (!value || value === "1" || value === "publish") return "publish";
+  if (value === "0" || value === "remove") return "remove";
+  fail(`invalid COLLECTIONS_PUBLISH value "${value}"; expected 1, publish, 0, remove, or unset`);
 }
 
 function titleFromHandle(handle: string): string {
@@ -184,26 +236,164 @@ export function buildCollectionsAsset(source: CollectionsSource, registry: Creat
   };
 }
 
-function writeCollectionsAsset(dataDir: string, asset: CollectionsAsset): Asset {
-  mkdirSync(dataDir, { recursive: true });
-  const data = Buffer.from(`${JSON.stringify(asset, null, 2)}\n`);
-  const hash = sha256(data);
-  const filename = `collections-${hash.slice(0, 12)}.json`;
-  writeFileSync(join(dataDir, filename), data);
-  return { path: filename, sha256: hash, bytes: data.length };
+function collectionsAssetBuffer(asset: CollectionsAsset): Buffer {
+  return Buffer.from(`${JSON.stringify(asset, null, 2)}\n`);
 }
 
-function patchManifest(dataDir: string, asset: Asset): void {
+function collectionsAssetDescriptor(data: Buffer): Asset {
+  const hash = sha256(data);
+  return {
+    path: `collections-${hash.slice(0, 12)}.json`,
+    sha256: hash,
+    bytes: data.length,
+  };
+}
+
+function writeCollectionsAsset(dataDir: string, data: Buffer, descriptor: Asset): Asset {
+  mkdirSync(dataDir, { recursive: true });
+  writeFileSync(join(dataDir, descriptor.path), data);
+  return descriptor;
+}
+
+function readManifest(dataDir: string): Manifest {
   const manifestPath = join(dataDir, "manifest.json");
   if (!existsSync(manifestPath)) {
     fail(`missing manifest: ${manifestPath}`);
   }
-  const manifest = readJson<Manifest>(manifestPath);
-  manifest.collections = asset;
+  return readJson<Manifest>(manifestPath);
+}
+
+function patchManifest(dataDir: string, asset: Asset | null, generatedAt: string): void {
+  const manifestPath = join(dataDir, "manifest.json");
+  const manifest = readManifest(dataDir);
+  if (asset) manifest.collections = asset;
+  else delete manifest.collections;
+  manifest.generatedAt = generatedAt;
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
+function loadPublishedCollections(track: CollectionsTrack): CollectionSummary | null {
+  const descriptor = readManifest(track.dir).collections;
+  if (!descriptor) return null;
+  const path = resolve(track.dir, descriptor.path);
+  if (!path.startsWith(`${resolve(track.dir)}/`)) {
+    fail(`${track.name} collections asset escapes its data directory`);
+  }
+  if (!existsSync(path)) {
+    fail(`${track.name} manifest references missing collections asset: ${descriptor.path}`);
+  }
+  const data = readFileSync(path);
+  if (statSync(path).size !== descriptor.bytes) {
+    fail(`${track.name} collections asset byte count mismatch`);
+  }
+  if (sha256(data) !== descriptor.sha256) {
+    fail(`${track.name} collections asset sha256 mismatch`);
+  }
+  return summarizeCollections(JSON.parse(data.toString("utf8")));
+}
+
+export function evaluateCollectionsImpact(input: {
+  mode: CollectionsPublishMode;
+  tracks: Array<{ name: string; previous: CollectionSummary | null }>;
+  proposed: CollectionSummary | null;
+  override?: PublicationImpactOverride;
+  metadata: { sourceCommit: string; policyDigest: string };
+  generatedAt?: string;
+}): CollectionsImpactReport {
+  const override = input.override ?? parsePublicationImpactOverride({});
+  const authorizedRemoval = input.mode === "remove";
+  const tracks = input.tracks.map((track): CollectionsImpactTrack => {
+    const delta = collectionDelta(track.previous, input.proposed);
+    const blocked = !authorizedRemoval
+      && !override.enabled
+      && (
+        delta.removedIds.length > 0
+        || (
+          delta.removedMembershipCount > 0
+          && delta.removedMembershipPercent >= COLLECTION_MEMBERSHIP_REMOVAL_PERCENT
+        )
+      );
+    return {
+      name: track.name,
+      previous: track.previous,
+      proposed: input.proposed,
+      ...delta,
+      blocked,
+    };
+  });
+  const errors = [...override.errors];
+  return {
+    version: 1,
+    generatedAt: input.generatedAt ?? new Date().toISOString(),
+    ...input.metadata,
+    mode: input.mode,
+    authorizedRemoval,
+    authorizedRemovalReason: authorizedRemoval
+      ? "explicit COLLECTIONS_PUBLISH removal mode"
+      : null,
+    override: { enabled: override.enabled, reason: override.reason },
+    tracks,
+    errors,
+    blocked: errors.length > 0 || tracks.some((track) => track.blocked),
+  };
+}
+
+function renderCollectionsImpact(report: CollectionsImpactReport): string {
+  return `${[
+    "# Collections Publication Impact",
+    "",
+    `- Generated: ${report.generatedAt}`,
+    `- Source commit: ${report.sourceCommit}`,
+    `- Policy digest: ${report.policyDigest}`,
+    `- Mode: ${report.mode}`,
+    `- Decision: ${report.blocked ? "BLOCKED" : "PASS"}`,
+    `- Authorized removal: ${report.authorizedRemovalReason ?? "no"}`,
+    `- Override: ${report.override.enabled ? report.override.reason : "none"}`,
+    ...report.errors.map((error) => `- BLOCK invalid-override: ${error}`),
+    ...report.tracks.flatMap((track) => [
+      `- ${track.name}: ${(track.previous?.ids.length ?? 0)} -> ${(track.proposed?.ids.length ?? 0)} collections`,
+      `- ${track.name}: removed ${track.removedMembershipCount} memberships (${(track.removedMembershipPercent * 100).toFixed(1)}%)`,
+      ...track.removedIds.map((id) => `- ${track.blocked ? "BLOCK" : "INFO"} ${track.name} removed collection: ${id}`),
+    ]),
+    "",
+  ].join("\n")}\n`;
+}
+
+function writeCollectionsImpact(report: CollectionsImpactReport): void {
+  mkdirSync(dirname(impactJsonPath), { recursive: true });
+  writeFileSync(impactJsonPath, `${JSON.stringify(report, null, 2)}\n`);
+  writeFileSync(impactMarkdownPath, renderCollectionsImpact(report));
+}
+
 function main() {
+  const mode = collectionsPublishMode();
+  const tracks = dataTrackDirs.map((dir) => ({
+    name: dir.endsWith("/crawl4") ? "crawl4" : "v2",
+    dir,
+  }));
+  const previous = tracks.map((track) => ({
+    name: track.name,
+    previous: loadPublishedCollections(track),
+  }));
+
+  if (mode === "remove") {
+    const loadedPolicy = typedPolicySources(loadPolicySources());
+    const generatedAt = new Date().toISOString();
+    const report = evaluateCollectionsImpact({
+      mode,
+      tracks: previous,
+      proposed: null,
+      override: parsePublicationImpactOverride(),
+      metadata: policyRunMetadata(loadedPolicy),
+      generatedAt,
+    });
+    writeCollectionsImpact(report);
+    if (report.blocked) fail("publication impact check blocked collections removal");
+    for (const track of tracks) patchManifest(track.dir, null, generatedAt);
+    console.log("removed collections manifest entries; asset files retained");
+    return;
+  }
+
   if (!existsSync(sourcePath)) fail(`missing ${sourcePath}`);
   if (!existsSync(creatorsPath)) fail(`missing ${creatorsPath}`);
   if (!existsSync(skillsPath)) fail(`missing ${skillsPath}`);
@@ -220,11 +410,22 @@ function main() {
   const registry = policy.creators;
   validateSource(source, registry, skills);
   const asset = buildCollectionsAsset(source, registry, skills);
+  const data = collectionsAssetBuffer(asset);
+  const descriptor = collectionsAssetDescriptor(data);
+  const report = evaluateCollectionsImpact({
+    mode,
+    tracks: previous,
+    proposed: summarizeCollections(asset),
+    override: parsePublicationImpactOverride(),
+    metadata: policyRunMetadata(policy),
+  });
+  writeCollectionsImpact(report);
+  if (report.blocked) fail("publication impact check blocked collections publish");
 
-  for (const dataDir of dataTrackDirs) {
-    const written = writeCollectionsAsset(dataDir, asset);
-    patchManifest(dataDir, written);
-    console.log(`wrote ${join(dataDir, written.path)}`);
+  for (const track of tracks) {
+    const written = writeCollectionsAsset(track.dir, data, descriptor);
+    patchManifest(track.dir, written, asset.generatedAt);
+    console.log(`wrote ${join(track.dir, written.path)}`);
   }
   console.log(`published ${asset.collections.length} collections`);
 }

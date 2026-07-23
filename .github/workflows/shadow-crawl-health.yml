@@ -11,6 +11,15 @@ on:
         required: true
         default: true
         type: boolean
+      publication_impact_override:
+        description: Allow a reviewed publication impact that exceeds a threshold
+        required: true
+        default: false
+        type: boolean
+      publication_impact_override_reason:
+        description: Required reason when the publication impact override is enabled
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -95,6 +104,11 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.report_only != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    env:
+      # Keep publish and final impact verification on the same explicit mode.
+      SKILL_EQUIVALENCE_PUBLISH: "1"
+      PUBLICATION_IMPACT_OVERRIDE: ${{ inputs.publication_impact_override == true && '1' || '' }}
+      PUBLICATION_IMPACT_OVERRIDE_REASON: ${{ inputs.publication_impact_override_reason || '' }}
 
     steps:
       - name: Checkout
@@ -121,6 +135,12 @@ jobs:
       - name: Validate policy inputs
         working-directory: index
         run: npm run policy:validate -- --profile scheduled-data
+
+      - name: Capture publication baselines
+        working-directory: index
+        run: |
+          npm run publication:impact -- snapshot --track v2 --output "$RUNNER_TEMP/publication-impact-v2.json"
+          npm run publication:impact -- snapshot --track crawl4 --output "$RUNNER_TEMP/publication-impact-crawl4.json"
 
       - name: Build trending data
         working-directory: index
@@ -193,10 +213,6 @@ jobs:
       - name: Publish skill equivalence
         working-directory: index
         # This runs after both data publishers so its manifest patch survives.
-        # Scope the rollout flag to this step so unrelated publishers and Mac
-        # release commands cannot enable it.
-        env:
-          SKILL_EQUIVALENCE_PUBLISH: "1"
         run: npm run publish:skill-equivalence
 
       - name: Verify local published data
@@ -208,6 +224,38 @@ jobs:
         env:
           OMGSKILLS_DATA_SUBDIR: crawl4
         run: node ./scripts/verify-published-data.mjs
+
+      - name: Check publication impact
+        working-directory: index
+        run: |
+          set +e
+          npm run publication:impact -- check --track v2 --baseline "$RUNNER_TEMP/publication-impact-v2.json" --json shadow/publication-impact.v2.json --markdown shadow/publication-impact.v2.md
+          v2_status=$?
+          npm run publication:impact -- check --track crawl4 --baseline "$RUNNER_TEMP/publication-impact-crawl4.json" --json shadow/publication-impact.crawl4.json --markdown shadow/publication-impact.crawl4.md
+          crawl4_status=$?
+          exit $((v2_status || crawl4_status))
+
+      - name: Summarize publication impact
+        if: always()
+        run: |
+          for report in index/shadow/publication-impact.v2.md index/shadow/publication-impact.crawl4.md; do
+            if [ -f "$report" ]; then
+              cat "$report" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Upload publication impact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-impact-app-tracks-${{ github.run_id }}
+          path: |
+            index/shadow/publication-impact.v2.json
+            index/shadow/publication-impact.v2.md
+            index/shadow/publication-impact.crawl4.json
+            index/shadow/publication-impact.crawl4.md
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Commit if changed
         run: |

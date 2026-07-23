@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import {
@@ -286,13 +285,5 @@ export function writeV2PolicyReport(jsonPath: string, markdownPath: string, repo
     const temporary = `${path}.tmp`;
     writeFileSync(temporary, content, "utf8");
     renameSync(temporary, path);
-  }
-}
-
-export function currentSourceCommit(): string {
-  try {
-    return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-  } catch {
-    return process.env.GITHUB_SHA?.trim() || "unknown";
   }
 }

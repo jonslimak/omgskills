@@ -30,6 +30,8 @@ export type QualityTierPolicyObservation = {
 
 export type PolicyPrecedenceReport = {
   generatedAt: string;
+  sourceCommit: string;
+  policyDigest: string;
   mode: PolicyPrecedenceMode;
   admissionChangeCount: number;
   skippedSuppressedCandidateCount: number;
@@ -98,6 +100,8 @@ function increment(counts: Partial<Record<PolicyReasonCode, number>>, reason: Po
 
 export function buildPolicyPrecedenceReport(input: {
   generatedAt: string;
+  sourceCommit: string;
+  policyDigest: string;
   mode: PolicyPrecedenceMode;
   admissions: AdmissionPolicyObservation[];
   repoStates: RepoStatePolicyObservation[];
@@ -117,6 +121,8 @@ export function buildPolicyPrecedenceReport(input: {
   for (const row of qualityTiers) increment(countsByReason, row.reasonCode);
   return {
     generatedAt: input.generatedAt,
+    sourceCommit: input.sourceCommit,
+    policyDigest: input.policyDigest,
     mode: input.mode,
     admissionChangeCount: admissions.filter((row) => row.legacyEligible !== row.proposedEligible).length,
     skippedSuppressedCandidateCount: admissions.reduce(
@@ -137,6 +143,8 @@ export function renderPolicyPrecedenceReport(report: PolicyPrecedenceReport): st
     "# Crawl 4 Policy Precedence",
     "",
     `- Generated: ${report.generatedAt}`,
+    `- Source commit: ${report.sourceCommit}`,
+    `- Policy digest: ${report.policyDigest}`,
     `- Mode: ${report.mode}`,
     `- Admission changes: ${report.admissionChangeCount}`,
     `- Suppressed bootstrap candidates skipped: ${report.skippedSuppressedCandidateCount}`,

@@ -12,13 +12,13 @@ test("shadow crawl stages generated data directories instead of optional asset g
   assert.doesNotMatch(workflow, /git add -A --[^\n]*\*\.json/);
 });
 
-test("skill equivalence publication is enabled only for its publisher step", () => {
-  const step = workflow.match(
-    /      - name: Publish skill equivalence\n[\s\S]*?(?=\n      - name:)/,
+test("skill equivalence publication and impact verification share one explicit mode", () => {
+  const writerJob = workflow.match(
+    /  shadow-crawl-health:\n[\s\S]*?(?=\n  [a-zA-Z0-9_-]+:|\s*$)/,
   )?.[0];
 
-  assert.ok(step, "Publish skill equivalence step missing");
-  assert.match(step, /SKILL_EQUIVALENCE_PUBLISH: "1"/);
+  assert.ok(writerJob, "shadow-crawl-health job missing");
+  assert.match(writerJob, /env:\n      # Keep publish and final impact verification[\s\S]*?SKILL_EQUIVALENCE_PUBLISH: "1"/);
   assert.equal(workflow.match(/SKILL_EQUIVALENCE_PUBLISH:/g)?.length, 1);
 });
 

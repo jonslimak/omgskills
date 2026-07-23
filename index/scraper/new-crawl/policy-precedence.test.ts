@@ -68,6 +68,8 @@ test("enforce demotes unsafe repo state", () => {
 test("report groups changes by shared reason and bounds samples", () => {
   const report = buildPolicyPrecedenceReport({
     generatedAt: "2026-07-22T00:00:00Z",
+    sourceCommit: "abc123",
+    policyDigest: "sha256:test",
     mode: "observe",
     admissions: [{
       repo: "catalog/repo",
@@ -86,4 +88,5 @@ test("report groups changes by shared reason and bounds samples", () => {
   assert.equal(report.countsByReason["catalog-repo"], 2);
   assert.equal(report.countsByReason["suppressed-skill"], 1);
   assert.match(renderPolicyPrecedenceReport(report), /Mode: observe/);
+  assert.match(renderPolicyPrecedenceReport(report), /Source commit: abc123/);
 });

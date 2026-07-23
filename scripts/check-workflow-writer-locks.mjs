@@ -39,6 +39,7 @@ export function validateWorkflowWriterSafety(source, filename = "workflow") {
   if (!hasGitPush(source)) return [];
 
   const errors = [];
+  const publishesRootData = /^\s*run:\s+\.\/scripts\/publish-data\.sh\s*$/m.test(source);
   const hasSharedLock = new RegExp(
     `^\\s*group:\\s*["']?${WRITER_LOCK}["']?\\s*(?:#.*)?$`,
     "m",
@@ -57,6 +58,9 @@ export function validateWorkflowWriterSafety(source, filename = "workflow") {
   }
   if (!/\bgit\s+reset\s+--hard\s+origin\/main\b/.test(step)) {
     errors.push(`${filename}: ${SYNC_STEP_NAME} must reset to origin/main`);
+  }
+  if (publishesRootData && !/\bgit\s+add\s+-A\s+--\s+site\/data\b/.test(source)) {
+    errors.push(`${filename}: root data publishers must stage the complete site/data directory`);
   }
 
   return errors;

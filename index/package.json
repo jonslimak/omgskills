@@ -30,6 +30,7 @@
     "policy:validate": "tsx scripts/validate-policy.ts",
     "publish:sha-history": "tsx scripts/publish-sha-history.ts",
     "publish:skill-equivalence": "tsx scripts/publish-skill-equivalence.ts",
+    "publication:impact": "tsx scripts/publication-impact.ts",
     "typecheck": "tsc --noEmit",
     "content:stats": "tsx scraper/content/compute-stats.ts",
     "content:stats-html": "tsx scraper/content/build-stats-html.ts",

@@ -12,6 +12,16 @@ on:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
+    inputs:
+      publication_impact_override:
+        description: Allow a reviewed publication impact that exceeds a threshold
+        required: true
+        default: false
+        type: boolean
+      publication_impact_override_reason:
+        description: Required reason when the publication impact override is enabled
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -24,6 +34,9 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    env:
+      PUBLICATION_IMPACT_OVERRIDE: ${{ inputs.publication_impact_override == true && '1' || '' }}
+      PUBLICATION_IMPACT_OVERRIDE_REASON: ${{ inputs.publication_impact_override_reason || '' }}
 
     steps:
       - name: Checkout
@@ -50,6 +63,10 @@ jobs:
       - name: Validate policy inputs
         working-directory: index
         run: npm run policy:validate -- --profile scheduled-data
+
+      - name: Capture publication baseline
+        working-directory: index
+        run: npm run publication:impact -- snapshot --track root --output "$RUNNER_TEMP/publication-impact-root.json"
 
       - name: Run scraper
         working-directory: index
@@ -123,6 +140,28 @@ jobs:
             rm -f site/data/health.json
           fi
 
+      - name: Check publication impact
+        working-directory: index
+        run: npm run publication:impact -- check --track root --baseline "$RUNNER_TEMP/publication-impact-root.json" --json shadow/publication-impact.root.json --markdown shadow/publication-impact.root.md
+
+      - name: Summarize publication impact
+        if: always()
+        run: |
+          if [ -f index/shadow/publication-impact.root.md ]; then
+            cat index/shadow/publication-impact.root.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload publication impact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-impact-root-${{ github.run_id }}
+          path: |
+            index/shadow/publication-impact.root.json
+            index/shadow/publication-impact.root.md
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Commit if changed
         run: |
           git config user.name "omgskills-bot"
@@ -130,7 +169,8 @@ jobs:
           if git diff --quiet -- index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/manifest.json site/data/skills-*.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/x-trending-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json; then
             echo "No library data changes"
           else
-            git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/manifest.json site/data/skills-*.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/x-trending-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json
+            git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots
+            git add -A -- site/data
             git commit -m "scrape: update library data ($(date -u +%Y-%m-%d))"
             git pull --rebase --autostash origin main
             git push

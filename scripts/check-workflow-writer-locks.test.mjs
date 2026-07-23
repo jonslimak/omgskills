@@ -43,3 +43,21 @@ test("rejects an incomplete sync step", () => {
   const source = compliantWriter.replace("          git reset --hard origin/main\n", "");
   assert.match(validateWorkflowWriterSafety(source, "writer.yml").join("\n"), /reset to origin\/main/);
 });
+
+test("root data publishers must stage the complete data directory", () => {
+  const source = compliantWriter.replace(
+    "      - name: Commit",
+    "      - name: Publish\n        run: ./scripts/publish-data.sh\n      - name: Commit",
+  );
+  assert.match(
+    validateWorkflowWriterSafety(source, "writer.yml").join("\n"),
+    /stage the complete site\/data directory/,
+  );
+  assert.deepEqual(
+    validateWorkflowWriterSafety(
+      source.replace("        run: git push", "        run: |\n          git add -A -- site/data\n          git push"),
+      "writer.yml",
+    ),
+    [],
+  );
+});

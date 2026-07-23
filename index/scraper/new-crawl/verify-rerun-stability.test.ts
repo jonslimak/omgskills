@@ -42,6 +42,8 @@ function cutoverCompare(overrides: Partial<ShadowCutoverCompare> = {}): ShadowCu
 function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport {
   return {
     checkedAt: "2026-05-27T00:00:00Z",
+    sourceCommit: "test-commit",
+    policyDigest: "sha256:test",
     status: "ok",
     cadence: "combined",
     baselineSkillCount: 1,
