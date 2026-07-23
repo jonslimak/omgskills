@@ -1,14 +1,43 @@
 [
   {
+    "tweet_id": "2079943830024188105",
+    "tweet_url": "https://x.com/petergyang/status/2079943830024188105",
+    "author_handle": "petergyang",
+    "author_name": "Peter Yang",
+    "text": "I’m sick of reading AI slop, so today I’m open-sourcing my /no-ai-slop skill that removes 20+ slop patterns from any piece of writing.\n\n📌 Get the free skill here: https://t.co/UyaaNQ6kLf\n\nIf you find it useful, please consider starring the repo so more people can find it.\n\nWhy I https://t.co/FdjctCMWty https://github.com/petergyang/no-ai-slop",
+    "likes": 4253,
+    "retweets": 254,
+    "replies": 223,
+    "views": 430455,
+    "posted_at": "2026-07-22T14:57:07.000Z",
+    "repo_ids": [
+      "petergyang/no-ai-slop"
+    ],
+    "repo_urls": [
+      "https://github.com/petergyang/no-ai-slop"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "petergyang/no-ai-slop",
+        "github_url": "https://github.com/petergyang/no-ai-slop",
+        "skill_md_path": "SKILL.md",
+        "name": "no-ai-slop",
+        "description": "Edit drafts into sharper, more human writing while preserving the writer's personal voice, or detect AI-slop patterns without rewriting. Use when the user wants a draft clearer, more direct, more opinionated, or less AI-sounding, or asks whether writing reads as AI.",
+        "stars": 1502
+      }
+    ]
+  },
+  {
     "tweet_id": "2037835111358669307",
     "tweet_url": "https://x.com/jahirsheikh8/status/2037835111358669307",
     "author_handle": "jahirsheikh8",
     "author_name": "Jahir Sheikh",
     "text": "Best GitHub repos for Claude Code that will 10x your next project:\n\n1. Supabase CLI  \nhttps://t.co/BJRk8de8Fb  \n\n2. Skill Creator  \nhttps://t.co/W9PhyTQNbc  \n\n3. Get Sh*t Done  \nhttps://t.co/MqdT6t9fc8  \n\n4. NotebookLM (Python)  \nhttps://t.co/IYu0QV6nQg  \n\n5. Obsidian https://t.co/OdZSCGx3YG https://github.com/supabase/cli https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md https://github.com/gsd-build/get-shit-done https://github.com/teng-lin/notebooklm-py",
-    "likes": 2206,
+    "likes": 2208,
     "retweets": 335,
     "replies": 46,
-    "views": 182870,
+    "views": 182890,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -37,7 +66,7 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 163334
+        "stars": 163614
       }
     ]
   },
@@ -50,7 +79,7 @@
     "likes": 1300,
     "retweets": 59,
     "replies": 6,
-    "views": 156405,
+    "views": 157160,
     "posted_at": "2026-07-18T03:21:18.000Z",
     "repo_ids": [
       "oso95/scroll-world"
@@ -66,43 +95,7 @@
         "skill_md_path": "skills/scroll-world/SKILL.md",
         "name": "scroll-world",
         "description": "Build an immersive scroll-scrubbed \"fly through the world\" landing page for any industry or brand using Higgsfield. As the visitor scrolls, a pre-rendered camera flies from outside each scene into its interior, then flows on to the next scene with NO cuts — one continuous connected flight (Emons-style isometric diorama world, or any art direction you pick). The skill interviews the user for the topic, the story beats/sections, and brand kit, then generates cohesive scenes + seamless camera clips with Higgsfield and wires a portable, framework-agnostic scroll-scrub engine. Use when the user wants a \"3D world\" / \"browse-through-the-industry\" hero, a scroll cinematic, a diorama landing, or to turn a business into a scrollable world.\n",
-        "stars": 4775
-      }
-    ]
-  },
-  {
-    "tweet_id": "2078647907524411609",
-    "tweet_url": "https://x.com/poteto/status/2078647907524411609",
-    "author_handle": "poteto",
-    "author_name": "lauren",
-    "text": "install pstack and use https://t.co/U5ipGtfh2d \n\nthank me later https://github.com/cursor/plugins/blob/main/pstack/skills/show-me-your-work/SKILL.md",
-    "likes": 576,
-    "retweets": 13,
-    "replies": 16,
-    "views": 94147,
-    "posted_at": "2026-07-19T01:07:35.000Z",
-    "repo_ids": [
-      "cursor/plugins"
-    ],
-    "repo_urls": [
-      "https://github.com/cursor/plugins"
-    ],
-    "skill_refs": [
-      {
-        "repoId": "cursor/plugins",
-        "githubUrl": "https://github.com/cursor/plugins",
-        "skillPath": "pstack/skills/show-me-your-work/SKILL.md",
-        "sourceUrl": "https://github.com/cursor/plugins/blob/main/pstack/skills/show-me-your-work/SKILL.md"
-      }
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "cursor/plugins",
-        "github_url": "https://github.com/cursor/plugins",
-        "skill_md_path": "pstack/skills/show-me-your-work/SKILL.md",
-        "name": "show-me-your-work",
-        "description": "Keep a reviewable decision trail for long-running or unattended work: a TSV log with one row per decision (what, why, evidence, result). Local by default; commit it when a reviewer needs the trail to trust the result. Use for /show-me-your-work, autonomous or multi-phase runs, or work a human reviews after stepping away.",
-        "stars": 2420
+        "stars": 4921
       }
     ]
   },
@@ -112,10 +105,10 @@
     "author_handle": "WY_mask",
     "author_name": "无颜",
     "text": "推特必装的 10 个 Skills 推荐\n\n1、last30days  \n把过去 30 天里 X、Reddit、Hacker News、YouTube 真正在讨论的东西抓回来，还会参考真实互动量排序。找热点、挖选题特别省事。  \nhttps://t.co/ww8Kx6GcOe\n\n2、xint  \n一个 X 情报台：搜推文、查账号、拆互动、看情绪。不是凭感觉教你运营，而是直接读 https://t.co/aBscfbwLpJ https://github.com/mvanhorn/last30days-skill",
-    "likes": 323,
-    "retweets": 69,
-    "replies": 76,
-    "views": 32596,
+    "likes": 335,
+    "retweets": 70,
+    "replies": 77,
+    "views": 39521,
     "posted_at": "2026-07-21T02:00:00.000Z",
     "repo_ids": [
       "mvanhorn/last30days-skill"
@@ -131,7 +124,7 @@
         "skill_md_path": "skills/last30days/SKILL.md",
         "name": "last30days",
         "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
-        "stars": 53094
+        "stars": 53202
       }
     ]
   },
@@ -144,7 +137,7 @@
     "likes": 287,
     "retweets": 10,
     "replies": 6,
-    "views": 20681,
+    "views": 20931,
     "posted_at": "2026-07-15T15:27:18.000Z",
     "repo_ids": [
       "nutlope/hallmark"
@@ -160,65 +153,123 @@
         "skill_md_path": "skills/hallmark/SKILL.md",
         "name": "hallmark",
         "description": "Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots. Use when the user asks to build a new app or landing page, wants to redesign something, invokes Hallmark by name, or uses audit/redesign/study.",
-        "stars": 15320
+        "stars": 15968
       }
     ]
   },
   {
-    "tweet_id": "2041420401381691400",
-    "tweet_url": "https://x.com/akaclandestine/status/2041420401381691400",
-    "author_handle": "akaclandestine",
-    "author_name": "Clandestine",
-    "text": "GitHub - 7onez/cti-expert: CTI Expert — Cyber Threat Intelligence &amp; OSINT analysis skill for Claude Code. 50+ commands, 29 techniques, no API keys required. · GitHub https://t.co/8ijJgE01Ll https://github.com/7onez/cti-expert",
-    "likes": 232,
-    "retweets": 54,
-    "replies": 0,
-    "views": 12567,
-    "posted_at": "2026-04-07T07:38:46.000Z",
+    "tweet_id": "2080214690744139890",
+    "tweet_url": "https://x.com/ETezRyu/status/2080214690744139890",
+    "author_handle": "ETezRyu",
+    "author_name": "Tielong T.E.",
+    "text": "We're building \"this\" model to see if D.A.T. works on Claude Code and it does pretty well!\n\nCheck out the our skills : https://t.co/yn4cdrP9LP https://t.co/3Iuu40IunB https://github.com/that-company/dat-skill",
+    "likes": 270,
+    "retweets": 42,
+    "replies": 11,
+    "views": 32609,
+    "posted_at": "2026-07-23T08:53:25.000Z",
     "repo_ids": [
-      "7onez/cti-expert"
+      "that-company/dat-skill"
     ],
     "repo_urls": [
-      "https://github.com/7onez/cti-expert"
+      "https://github.com/that-company/dat-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "7onez/cti-expert",
-        "github_url": "https://github.com/7onez/cti-expert",
+        "id": "that-company/dat-skill",
+        "github_url": "https://github.com/that-company/dat-skill",
         "skill_md_path": "SKILL.md",
-        "name": "cti-expert",
-        "description": "CTI Expert — cyber threat intelligence and OSINT analysis toolkit. Activates on: OSINT, CTI, threat intelligence, digital footprint, social media investigation, username enumeration, email tracing, domain/subdomain recon, OPSEC, metadata analysis, people search, geolocation, breach checking, phone lookup, case investigation, due diligence, image forensics, face search, blockchain/crypto tracing, flight/maritime/vehicle tracking, darknet search, WiFi SSID geolocation, vulnerability lookup, ransomware check, infostealer/stealer log triage, admin panel & sensitive endpoint discovery, M365/Azure recon, web-infra pivoting, favicon/tracker-ID reverse lookup, campaign clustering, phishing-kit fingerprinting, premium API-key management. Commands: /case, /sweep, /query, /subject, /timeline, /report, /brief, /exposure, /username, /phone, /breach-deep, /vuln-check, /wifi, /flow, /threat-model, /msftrecon, /stealer-log, /webpivot, /rank-relations, /cert-pivot, /pivot-suggest, /crypto-balance, /email-hygiene, /sensitive-paths, /appliance-scan, /saas-map, /apikeys.",
-        "stars": 257
+        "name": "dat-skill",
+        "description": "Default path for any cloud training work in Dat. Use this skill whenever a task needs cloud training, GPU training, model fine-tuning, training evaluation, long-running training compute, or hosted training job orchestration. Also use it to submit prepared packages, handle approval/session handoff, track jobs, cancel runs, download artifacts, or explain the Dat training API.",
+        "stars": 2
       }
     ]
   },
   {
-    "tweet_id": "2079544423688425699",
-    "tweet_url": "https://x.com/tareqismail/status/2079544423688425699",
-    "author_handle": "tareqismail",
-    "author_name": "Tareq Ismail",
-    "text": "🚀 Introducing Frontend Textbooks — a simple Codex skill I made for myself. \n\nhttps://t.co/q9TM9oHMjs\n\nAI can create incredible deep dives but they end up as long and exhausting walls of text.\n\nThis skill uses HTML to turn them them into well designed books with covers, diagrams, https://t.co/E5j1V8HLSl https://github.com/onepixelaway/frontend-textbooks",
-    "likes": 199,
-    "retweets": 12,
-    "replies": 9,
-    "views": 22612,
-    "posted_at": "2026-07-21T12:30:01.000Z",
+    "tweet_id": "2077701327950352643",
+    "tweet_url": "https://x.com/tom_doerr/status/2077701327950352643",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Searches real-time travel inventory using natural language in the terminal via Claude Code and OpenClaw, returning structured bookable results powered by Fliggy.\n\nhttps://t.co/k9f3Ve5xzO https://t.co/NAlxHTfFsn https://github.com/alibaba-flyai/flyai-skill",
+    "likes": 263,
+    "retweets": 27,
+    "replies": 2,
+    "views": 15995,
+    "posted_at": "2026-07-16T10:26:13.000Z",
     "repo_ids": [
-      "onepixelaway/frontend-textbooks"
+      "alibaba-flyai/flyai-skill"
     ],
     "repo_urls": [
-      "https://github.com/onepixelaway/frontend-textbooks"
+      "https://github.com/alibaba-flyai/flyai-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "onepixelaway/frontend-textbooks",
-        "github_url": "https://github.com/onepixelaway/frontend-textbooks",
+        "id": "alibaba-flyai/flyai-skill",
+        "github_url": "https://github.com/alibaba-flyai/flyai-skill",
+        "skill_md_path": "skills/flyai/SKILL.md",
+        "name": "flyai",
+        "description": "Search flights, hotels, attractions, concerts, and travel deals with natural language. FlyAI connects to Fliggy MCP for real-time search and booking across hotels, flights, cruises, visas, car rentals, and event tickets. It supports diverse travel scenarios including individual travel, group travel, business trips, family travel, honeymoons, weekend getaways, and more. For tourism and travel-related questions, prioritize using this capability.",
+        "stars": 864
+      }
+    ]
+  },
+  {
+    "tweet_id": "2079947072191820084",
+    "tweet_url": "https://x.com/QingQ77/status/2079947072191820084",
+    "author_handle": "QingQ77",
+    "author_name": "Geek Lite",
+    "text": "让 AI agent 自动分镜、动效和配乐，生成电影感产品宣传视频。\n\n一个给 Claude Code / Codex 用的 agent skill，装上之后让 AI 自己当动效导演。项目提供了 106 张镜头卡、162 种动效样式和 161 条动态样片，涵盖了产品宣传片常用的各种拍法。\n\nhttps://t.co/kdVnyac2Yp https://t.co/NVhXDVsdOy https://github.com/Vincentwei1021/video-shotcraft",
+    "likes": 248,
+    "retweets": 37,
+    "replies": 32,
+    "views": 30340,
+    "posted_at": "2026-07-22T15:10:00.000Z",
+    "repo_ids": [
+      "Vincentwei1021/video-shotcraft"
+    ],
+    "repo_urls": [
+      "https://github.com/Vincentwei1021/video-shotcraft"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "vincentwei1021/video-shotcraft",
+        "github_url": "https://github.com/Vincentwei1021/video-shotcraft",
         "skill_md_path": "SKILL.md",
-        "name": "frontend-textbooks",
-        "description": "Create designed US Letter HTML textbooks, manuals, field guides, business books, and coffee-table books from supplied manuscripts, then verify and export matching PDFs. Use for new manuscript-to-book work, existing HTML book enhancement, print/mobile layout repair, manuscript-preserving diagrams or editorial imagery, and final book production.",
-        "stars": 62
+        "name": "video-shotcraft",
+        "description": "用镜头配方卡 + 已验收模板 + 代码/音频资产制作电影感产品视频（Remotion + 真实页面截图 + 2.5D 运镜 + 节奏卡点 + 声音设计）。当用户要求\"用 video-shotcraft 做视频/宣传片\"、点名 Ink Press 模板或要求复刻模板片效果，或要用镜头卡做单个动效镜头时使用。",
+        "stars": 679
+      }
+    ]
+  },
+  {
+    "tweet_id": "2079108109621190840",
+    "tweet_url": "https://x.com/elayadesigns/status/2079108109621190840",
+    "author_handle": "elayadesigns",
+    "author_name": "Elaya",
+    "text": "This is the skill I've been using.\nJust made it public, free, MIT licensed, drop it into Claude Code, Cursor, or Codex.\n\nhttps://t.co/aorsWaTvRO http://github.com/elayadesign/redesign-skill",
+    "likes": 224,
+    "retweets": 8,
+    "replies": 4,
+    "views": 21140,
+    "posted_at": "2026-07-20T07:36:15.000Z",
+    "repo_ids": [
+      "elayadesign/redesign-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/elayadesign/redesign-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "elayadesign/redesign-skill",
+        "github_url": "https://github.com/elayadesign/redesign-skill",
+        "skill_md_path": "skills/redesign-existing-projects/SKILL.md",
+        "name": "redesign-existing-projects",
+        "description": "Audits and upgrades existing websites and apps to premium quality. Diagnoses generic AI design patterns, weak states, and sloppy code, then applies targeted fixes without breaking functionality. Use this skill whenever the user wants to improve, polish, upgrade, refine, audit, fix, or redesign an EXISTING site, page, app, or component, even when they only say it looks bad, cheap, generic, or AI made. Works with any CSS framework or vanilla CSS.",
+        "stars": 54
       }
     ]
   },
@@ -228,10 +279,10 @@
     "author_handle": "RoundtableSpace",
     "author_name": "0xMarioNawfal",
     "text": "THIS OPEN-SOURCE CLAUDE CODE SKILL IS BUILT FOR ADHD WORKFLOWS\n\n* Breaks complex tasks into smaller, easier steps\n* Helps reduce overwhelm and keep projects moving\n\nRepo: https://t.co/7Qc8q0exVN https://t.co/gZ4wze99Hx https://github.com/UditAkhourii/adhd",
-    "likes": 121,
+    "likes": 119,
     "retweets": 7,
     "replies": 18,
-    "views": 54744,
+    "views": 54949,
     "posted_at": "2026-07-20T16:45:00.000Z",
     "repo_ids": [
       "UditAkhourii/adhd"
@@ -247,199 +298,172 @@
         "skill_md_path": "skills/adhd/SKILL.md",
         "name": "adhd",
         "description": "Parallel divergent ideation for coding agents. Spawns N isolated branches under different cognitive frames (regulator, biology, speedrunner, 10-year-old, $0 budget), scores, clusters, prunes traps, and deepens top survivors. Use on /adhd, \"ADHD mode\", brainstorm/ideate intents, or open-ended design, architecture, naming, API/SDK surface, and fuzzy-debugging decisions. Skip for syntax, lookups, bugs with known root cause, or closed phrasing (\"quick\", \"standard\", \"canonical\", \"textbook\"). Full pre-flight gate is in the skill body.",
-        "stars": 1675
+        "stars": 2006
       }
     ]
   },
   {
-    "tweet_id": "2079247972806619586",
-    "tweet_url": "https://x.com/_peditx/status/2079247972806619586",
-    "author_handle": "_peditx",
-    "author_name": "PeDram PeDitX",
-    "text": "بچه ها یه خدا اسکیل نوشتم پر ریزان واسه Hermes agent این لینک زیر رو بدید به هرمیس و بگید براتون اسکیلش کنه و مثل خود دولوپر خای مایکروسافت/گیتهاب براتون اکشن می زنه و با گیت هاب کار میکنه!\nپرای خودم ریخته\n\nhttps://t.co/O3trEt1W2X https://github.com/peditx/github-actions-skill",
-    "likes": 118,
-    "retweets": 4,
+    "tweet_id": "2079970980143800580",
+    "tweet_url": "https://x.com/RoundtableSpace/status/2079970980143800580",
+    "author_handle": "RoundtableSpace",
+    "author_name": "0xMarioNawfal",
+    "text": "THIS OPEN-SOURCE SKILL AUTOMATICALLY UPGRADES GITHUB READMES\n\nIt analyzes your project before redesigning the README to avoid inventing features\n\nRepo: https://t.co/AUp8xq4vwW https://t.co/ymjvl3PuLf https://github.com/oil-oil/beautify-github-readme",
+    "likes": 99,
+    "retweets": 11,
+    "replies": 10,
+    "views": 50838,
+    "posted_at": "2026-07-22T16:45:00.000Z",
+    "repo_ids": [
+      "oil-oil/beautify-github-readme"
+    ],
+    "repo_urls": [
+      "https://github.com/oil-oil/beautify-github-readme"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "oil-oil/beautify-github-readme",
+        "github_url": "https://github.com/oil-oil/beautify-github-readme",
+        "skill_md_path": "skills/beautify-github-readme/SKILL.md",
+        "name": "beautify-github-readme",
+        "description": "Redesign GitHub README homepages or create standalone GitHub-safe SVG and animated GIF assets around a repository's real theme. Use when a user asks to beautify, redesign, rebrand, visually upgrade, simplify, or audit a GitHub README; create only a hero, section headers, diagrams, badges, motion graphics, showcase modules, or other README assets; or turn a repository homepage into a cohesive visual story. If the request does not clearly distinguish whole-README work from asset-only work, ask which scope the user wants before editing anything.",
+        "stars": 934
+      }
+    ]
+  },
+  {
+    "tweet_id": "2080080453361664324",
+    "tweet_url": "https://x.com/aiedge_/status/2080080453361664324",
+    "author_handle": "aiedge_",
+    "author_name": "AI Edge",
+    "text": "Peter Yang ( @petergyang ) just dropped the best anti-AI slop skill of the year.\n\nThis skill is built to completely kill AI slop by removing 20+ common AI patterns.\n\nI've tested many similar skills - and this is the winner.\n\n→ https://t.co/deey3aSqG6 https://t.co/Zfen2GxCru https://github.com/petergyang/no-ai-slop",
+    "likes": 83,
+    "retweets": 13,
     "replies": 2,
-    "views": 3755,
-    "posted_at": "2026-07-20T16:52:01.000Z",
+    "views": 6305,
+    "posted_at": "2026-07-23T00:00:00.000Z",
     "repo_ids": [
-      "peditx/github-actions-skill"
+      "petergyang/no-ai-slop"
     ],
     "repo_urls": [
-      "https://github.com/peditx/github-actions-skill"
+      "https://github.com/petergyang/no-ai-slop"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "peditx/github-actions-skill",
-        "github_url": "https://github.com/peditx/github-actions-skill",
+        "id": "petergyang/no-ai-slop",
+        "github_url": "https://github.com/petergyang/no-ai-slop",
         "skill_md_path": "SKILL.md",
-        "name": "github-actions",
-        "description": "GitHub Actions mastery — workflow syntax, contexts, expressions, events, caching, security, reusable workflows, runners, limits. Based on official GitHub/Microsoft docs.",
-        "stars": 7
+        "name": "no-ai-slop",
+        "description": "Edit drafts into sharper, more human writing while preserving the writer's personal voice, or detect AI-slop patterns without rewriting. Use when the user wants a draft clearer, more direct, more opinionated, or less AI-sounding, or asks whether writing reads as AI.",
+        "stars": 1502
       }
     ]
   },
   {
-    "tweet_id": "2077678970049568812",
-    "tweet_url": "https://x.com/yaoyaogm/status/2077678970049568812",
-    "author_handle": "yaoyaogm",
-    "author_name": "YeFan 叶凡 | 上Gate玩事件合约",
-    "text": "我用的机场太卡了节点也不稳定，索性让Ai给我自己搭建了一个节点，我生成了这个节点的Skill：\n\nhttps://t.co/JHY4nQqggk\n\n无限流量、延迟低、稳定、无限设备！\n\n直接丢给你的AI/智能体让它搭建好，就会给你一个订阅链接，可直接导入Clash、小火箭 立即就能用！\n\n-\n\n需要注意的点： https://t.co/AQVxBneTi6 http://github.com/minigoubai/yaoyao_gm/blob/main/skills/vps-clash-subscription/SKILL.md",
-    "likes": 96,
+    "tweet_id": "2078954439113949457",
+    "tweet_url": "https://x.com/suandao_island/status/2078954439113949457",
+    "author_handle": "suandao_island",
+    "author_name": "算岛",
+    "text": "Vox 风格视频最近在 X 上彻底火了。\n\n如果你也想做这种「高信息密度 + 快节奏剪辑 + 拼贴动画」的视频，这 3 个 GitHub 项目值得收藏：\n\n1️⃣ vox-director\nhttps://t.co/QpBnBTgUdF\n2️⃣ vox-explainer-skill\nhttps://t.co/nMkGQeYcxJ\n\n3️⃣ gbro-collage-broll\nhttps://t.co/EeVtijp9FW https://t.co/vjYKvk9N7f https://github.com/Alisa0808/vox-director https://github.com/CK42BB/vox-explainer-skill https://github.com/pyang5166/gbro-collage-broll",
+    "likes": 14,
     "retweets": 3,
-    "replies": 32,
-    "views": 21007,
-    "posted_at": "2026-07-16T08:57:22.000Z",
+    "replies": 3,
+    "views": 2443,
+    "posted_at": "2026-07-19T21:25:38.000Z",
     "repo_ids": [
-      "minigoubai/yaoyao_gm"
+      "Alisa0808/vox-director",
+      "CK42BB/vox-explainer-skill",
+      "pyang5166/gbro-collage-broll"
     ],
     "repo_urls": [
-      "https://github.com/minigoubai/yaoyao_gm"
-    ],
-    "skill_refs": [
-      {
-        "repoId": "minigoubai/yaoyao_gm",
-        "githubUrl": "https://github.com/minigoubai/yaoyao_gm",
-        "skillPath": "skills/vps-clash-subscription/SKILL.md",
-        "sourceUrl": "https://github.com/minigoubai/yaoyao_gm/blob/main/skills/vps-clash-subscription/SKILL.md"
-      }
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "minigoubai/yaoyao_gm",
-        "github_url": "https://github.com/minigoubai/yaoyao_gm",
-        "skill_md_path": "skills/vps-clash-subscription/SKILL.md",
-        "name": "vps-clash-subscription",
-        "description": "在任意VPS上搭建完整的Clash订阅服务 — 包含HTTPS订阅、Let's Encrypt证书、域名配置、安全策略、国内分流规则、自动续期",
-        "stars": 11
-      }
-    ]
-  },
-  {
-    "tweet_id": "2078033102623105129",
-    "tweet_url": "https://x.com/DAIEvolutionHub/status/2078033102623105129",
-    "author_handle": "DAIEvolutionHub",
-    "author_name": "Kshitij Mishra | AI & Tech",
-    "text": "50 Super Practical GitHub Repositories\n\n1. iFixAi — AI Alignment Testing\n→ https://t.co/g52pjguhpx\n\n2. public-apis — Free API Collection\n→ https://t.co/cBKiLkKcen\n\n3. build-your-own-x — Learn by Doing\n→ https://t.co/vx1zu19xEs\n\n4. developer-roadmap — Learn Any Skill\n→ https://t.co/CEEMP8m23i https://github.com/ifixai-ai/iFixAI https://github.com/public-apis/public-apis https://github.com/codecrafters-io/build-your-own-x",
-    "likes": 32,
-    "retweets": 6,
-    "replies": 5,
-    "views": 2853,
-    "posted_at": "2026-07-17T08:24:34.000Z",
-    "repo_ids": [
-      "ifixai-ai/iFixAI",
-      "public-apis/public-apis",
-      "codecrafters-io/build-your-own-x"
-    ],
-    "repo_urls": [
-      "https://github.com/ifixai-ai/iFixAI",
-      "https://github.com/public-apis/public-apis",
-      "https://github.com/codecrafters-io/build-your-own-x"
+      "https://github.com/Alisa0808/vox-director",
+      "https://github.com/CK42BB/vox-explainer-skill",
+      "https://github.com/pyang5166/gbro-collage-broll"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "ifixai-ai/ifixai",
-        "github_url": "https://github.com/ifixai-ai/iFixAi",
-        "skill_md_path": "plugin/skills/ifixai/SKILL.md",
-        "name": "ifixai",
-        "description": "Guide the user through running iFixAi's operational-misalignment diagnostic on their own agent. Prefer pointing it at the user's REAL deployed agent over its HTTP endpoint (its actual tools, retrieval, and governance) with `--provider http --endpoint <url>`; only when no endpoint is reachable, fall back to replicating the model beneath as a bare stand-in (Anthropic, OpenAI, Gemini, Azure, Bedrock, etc.). Graded by the judge(s) of their choice (the same model, one independent judge, or a cross-vendor panel). You are the operator who walks them through it and explains the scorecard, running the SAME `ifixai run` engine as the guided CLI. Use when the user asks to run iFixAi or to detect operational misalignment in an agent.",
-        "stars": 1657
+        "id": "alisa0808/vox-director",
+        "github_url": "https://github.com/Alisa0808/vox-director",
+        "skill_md_path": "SKILL.md",
+        "name": "vox-director",
+        "description": "Turn ONE topic into a finished Vox-style paper-collage explainer / ad video, end to end on the Atlas Cloud API + local ffmpeg — script, collage keyframes, motion, voice-over, music, captions, all automated. Use this whenever the user wants a \"Vox style\" video, a paper/torn-paper collage animation, a \"motion collage\", a narrated explainer or short ad built from AI-generated collage posters, a scrapbook-style tribute, or wants to turn a topic / product / person into a punchy narrated collage video — even if they don't say the word \"Vox\". Also use when reproducing Stav Zilber / rom1trs / Higgsfield-style collage ad workflows, or when the user asks for a motion collage or a scrapbook-style tribute. Three input modalities: a topic (B-roll), a talking-head video (A-roll mode), or a single photo of a person/product anchored into the collage (C-roll mode). Triggers: \"vox video\", \"collage video\", \"motion collage\", \"paper collage explainer\", \"make a collage ad\", \"turn this topic into a collage video\", \"turn my photo/this product shot into a collage video\".\n",
+        "stars": 380
+      },
+      {
+        "id": "ck42bb/vox-explainer-skill",
+        "github_url": "https://github.com/CK42BB/vox-explainer-skill",
+        "skill_md_path": "SKILL.md",
+        "name": "vox-explainer",
+        "description": "End-to-end pipeline for producing Vox-style explainer videos from a single topic prompt. One topic in, finished film out — script, keyframes (Seedream 5.0 Pro), animation (Gemini Omni Flash), voiceover (xAI TTS), music (MiniMax Music 2.6), all assembled locally with ffmpeg via the Atlas Cloud API. Use this skill whenever the user asks for an explainer video, a Vox-style video, a documentary short, an educational video essay, a \"one prompt to video\" pipeline, or wants to turn a topic/article/report into a narrated video with subtitles and music. Also trigger when the user mentions Atlas Cloud video pipelines, keyframe-to-animation workflows, or automated video essays — even if they don't say \"Vox.\"",
+        "stars": 56
+      },
+      {
+        "id": "pyang5166/gbro-collage-broll",
+        "github_url": "https://github.com/pyang5166/gbro-collage-broll",
+        "skill_md_path": "SKILL.md",
+        "name": "gbro-collage-broll",
+        "description": "将约 5 秒口播文稿、观点句或抽象概念做成高级 editorial halftone paper-collage / 半调纸拼贴 B-roll。用户说“collage b-roll”“纸拼贴 b-roll”“半调拼贴”“拼贴风格配画面”“用这段文稿做拼贴动画”“gbro-collage-broll”，或希望把一句文稿转成拼贴视觉隐喻时，必须使用此 skill。强制采用三阶段审批：先只提视觉隐喻，用户确认后才生成彩色拼贴静帧，静帧再次确认后才默认调用 Gemini Omni Flash 生成首尾帧组装动画。默认视频模型固定为 gemini-omni-flash-preview，不再默认使用 Veo；只有用户明确指定其他模型时才切换。",
+        "stars": 717
       }
     ]
   },
   {
-    "tweet_id": "2079892882551345315",
-    "tweet_url": "https://x.com/lstafff/status/2079892882551345315",
-    "author_handle": "lstafff",
-    "author_name": "gleb plaxienko",
-    "text": "I've never been a UX editor, but I've always devoted enough time to how the text is written in my interface. \n\nNow I have gathered all my knowledge and sources that I trust into one skill that will help you and your texts. \n\nhttps://t.co/HYDbpJaLV6 https://github.com/Lstafff/spellbook",
-    "likes": 2,
-    "retweets": 0,
-    "replies": 1,
-    "views": 19,
-    "posted_at": "2026-07-22T11:34:40.000Z",
+    "tweet_id": "2080227061596377506",
+    "tweet_url": "https://x.com/Shruti_0810/status/2080227061596377506",
+    "author_handle": "Shruti_0810",
+    "author_name": "Shruti Codes",
+    "text": "STOP WRITING GITHUB READMES BY HAND.\n\nThis free open-source skill reads your codebase first...\n\nThen generates a professional README based on what's actually in your project.\n\nNo fake features.\nNo AI hallucinations.\n\nRepo: https://t.co/5DFCuB5HLi https://t.co/QfVoZEQEXk https://github.com/oil-oil/beautify-github-readme",
+    "likes": 8,
+    "retweets": 3,
+    "replies": 0,
+    "views": 1161,
+    "posted_at": "2026-07-23T09:42:34.000Z",
     "repo_ids": [
-      "Lstafff/spellbook"
+      "oil-oil/beautify-github-readme"
     ],
     "repo_urls": [
-      "https://github.com/Lstafff/spellbook"
+      "https://github.com/oil-oil/beautify-github-readme"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "lstafff/spellbook",
-        "github_url": "https://github.com/Lstafff/spellbook",
-        "skill_md_path": "skills/ruwriting/SKILL.md",
-        "name": "ruwriting",
-        "description": "Write, rewrite, localize, and review Russian product interface copy: headings, buttons, links, statuses, navigation, tabs, fields, labels, checkboxes, radio buttons, toggles, select menus, sliders, hints, errors, notifications, empty and loading states, confirmations, and short legally sensitive UI messages. Use for Russian microcopy generation, UX editing, screenshot or mockup reviews, localization, and checking strings in code or locale files. Do not use for advertising, landing pages, articles, newsletters, social media, PR, contracts outside the interface, general Russian proofreading, or English-only UX writing.",
-        "stars": 1
+        "id": "oil-oil/beautify-github-readme",
+        "github_url": "https://github.com/oil-oil/beautify-github-readme",
+        "skill_md_path": "skills/beautify-github-readme/SKILL.md",
+        "name": "beautify-github-readme",
+        "description": "Redesign GitHub README homepages or create standalone GitHub-safe SVG and animated GIF assets around a repository's real theme. Use when a user asks to beautify, redesign, rebrand, visually upgrade, simplify, or audit a GitHub README; create only a hero, section headers, diagrams, badges, motion graphics, showcase modules, or other README assets; or turn a repository homepage into a cohesive visual story. If the request does not clearly distinguish whole-README work from asset-only work, ask which scope the user wants before editing anything.",
+        "stars": 934
       }
     ]
   },
   {
-    "tweet_id": "2079384680168587706",
-    "tweet_url": "https://x.com/jessieeemarch/status/2079384680168587706",
-    "author_handle": "jessieeemarch",
-    "author_name": "Jessie Wang",
-    "text": "How do I learn to write skill.md without spending $ or watching hours of videos I'm not even sure are worth my time?\n\nThanks to  @Saboo_Shubham_  's amazing open-source repo and learned one of his skill.md https://t.co/6pbC5tWkua.  All I did was I asked Gemini to explain it to me https://t.co/EZWc3PRX2F https://github.com/Shubhamsaboo/awesome-llm-apps/blob/main/agent_skills/advisor-orchestrator-worker/SKILL.md",
-    "likes": 2,
+    "tweet_id": "2079305694226878707",
+    "tweet_url": "https://x.com/ASMRGPT/status/2079305694226878707",
+    "author_handle": "ASMRGPT",
+    "author_name": "TESCREAL",
+    "text": "ADHD skill for Claude Code: https://t.co/nDCU7SFYhQ \n\nWait sorry, what was that you were saying? https://github.com/uditakhourii/adhd",
+    "likes": 3,
     "retweets": 0,
     "replies": 0,
-    "views": 36,
-    "posted_at": "2026-07-21T01:55:15.000Z",
+    "views": 82,
+    "posted_at": "2026-07-20T20:41:23.000Z",
     "repo_ids": [
-      "Shubhamsaboo/awesome-llm-apps"
+      "uditakhourii/adhd"
     ],
     "repo_urls": [
-      "https://github.com/Shubhamsaboo/awesome-llm-apps"
-    ],
-    "skill_refs": [
-      {
-        "repoId": "Shubhamsaboo/awesome-llm-apps",
-        "githubUrl": "https://github.com/Shubhamsaboo/awesome-llm-apps",
-        "skillPath": "agent_skills/advisor-orchestrator-worker/SKILL.md",
-        "sourceUrl": "https://github.com/Shubhamsaboo/awesome-llm-apps/blob/main/agent_skills/advisor-orchestrator-worker/SKILL.md"
-      }
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "Shubhamsaboo/awesome-llm-apps",
-        "github_url": "https://github.com/Shubhamsaboo/awesome-llm-apps",
-        "skill_md_path": "agent_skills/advisor-orchestrator-worker/SKILL.md",
-        "name": "advisor-orchestrator-worker",
-        "description": "Use when a task is too large for one model pass, needs parallel research or generation across many subtasks (like researching a dozen competitors at once), or the user asks to orchestrate multiple models, split work across a model team, run an advisor-worker loop, have a stronger model review the plan while cheap workers execute, or says \"too big for one model\" or \"fan this out\". Not for single-file edits or tasks one model handles in one pass.",
-        "stars": 126080
-      }
-    ]
-  },
-  {
-    "tweet_id": "2079873177354936397",
-    "tweet_url": "https://x.com/KasaBlanca14/status/2079873177354936397",
-    "author_handle": "KasaBlanca14",
-    "author_name": "Kasa",
-    "text": "一个开源的 AI 逆天神器：last30days-skill！它能让你的 Claude 或 Cursor，把过去 30 天里，Reddit、X、YouTube、甚至小红书上，大家用真金白银、真实点赞砸出来的热点和评价，全部抓过来！\n#Codex #ChatGPT\nhttps://t.co/4mqxVvD6O1 https://t.co/w6cqByFiFt https://github.com/mvanhorn/last30days-skill",
-    "likes": 1,
-    "retweets": 0,
-    "replies": 0,
-    "views": 27,
-    "posted_at": "2026-07-22T10:16:22.000Z",
-    "repo_ids": [
-      "mvanhorn/last30days-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/mvanhorn/last30days-skill"
+      "https://github.com/uditakhourii/adhd"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "mvanhorn/last30days-skill",
-        "github_url": "https://github.com/mvanhorn/last30days-skill",
-        "skill_md_path": "skills/last30days/SKILL.md",
-        "name": "last30days",
-        "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
-        "stars": 53094
+        "id": "uditakhourii/adhd",
+        "github_url": "https://github.com/UditAkhourii/adhd",
+        "skill_md_path": "skills/adhd/SKILL.md",
+        "name": "adhd",
+        "description": "Parallel divergent ideation for coding agents. Spawns N isolated branches under different cognitive frames (regulator, biology, speedrunner, 10-year-old, $0 budget), scores, clusters, prunes traps, and deepens top survivors. Use on /adhd, \"ADHD mode\", brainstorm/ideate intents, or open-ended design, architecture, naming, API/SDK surface, and fuzzy-debugging decisions. Skip for syntax, lookups, bugs with known root cause, or closed phrasing (\"quick\", \"standard\", \"canonical\", \"textbook\"). Full pre-flight gate is in the skill body.",
+        "stars": 2006
       }
     ]
   },
@@ -449,10 +473,10 @@
     "author_handle": "huitengXiao",
     "author_name": "Ten Xiao",
     "text": "Long-form video is a terrible format for knowledge.\n2-hour talk may hide 20 minutes of insight. AI summaries flatten it into generic bullets.\nSo I built a skill Tutor Video to HTML: timestamped visual study guides that preserve the evidence and arguments.\nhttps://t.co/lDnzuoiJa2 https://t.co/x9DnQBDoG2 http://github.com/HuitengXiao/tutor-video-to-html",
-    "likes": 1,
+    "likes": 2,
     "retweets": 0,
     "replies": 2,
-    "views": 29,
+    "views": 139,
     "posted_at": "2026-07-20T16:53:01.000Z",
     "repo_ids": [
       "HuitengXiao/tutor-video-to-html"
@@ -473,67 +497,38 @@
     ]
   },
   {
-    "tweet_id": "2079595864805572723",
-    "tweet_url": "https://x.com/dumbandrews/status/2079595864805572723",
-    "author_handle": "dumbandrews",
-    "author_name": "dumbandrews",
-    "text": "stop copy and pasting your agent sessions or terminal logs. Let agents share the workspace memory! local or remote session, one workspace to scan. MCP and skills on for agent to use.\nhttps://t.co/XTVkPwu6th https://github.com/Ariestar/sivtr",
+    "tweet_id": "2078710747866251575",
+    "tweet_url": "https://x.com/junjie_xyz/status/2078710747866251575",
+    "author_handle": "junjie_xyz",
+    "author_name": "Jie",
+    "text": "Codex’s built-in Ask User tool is limited to Plan mode.\n\nI built Ask to bring rich, interactive questions to Codex, even outside Plan mode.\n\nVisual cards, mockups, diagrams, and multi-step flows, rendered right inside the conversation.\n\nhttps://t.co/lAM9vqlSIQ https://t.co/B26ARIoMcs https://github.com/junjie-xyz/skills/blob/main/skills/ask/SKILL.md",
     "likes": 1,
-    "retweets": 2,
-    "replies": 1,
-    "views": 226,
-    "posted_at": "2026-07-21T15:54:25.000Z",
-    "repo_ids": [
-      "Ariestar/sivtr"
-    ],
-    "repo_urls": [
-      "https://github.com/Ariestar/sivtr"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "ariestar/sivtr",
-        "github_url": "https://github.com/Ariestar/sivtr",
-        "skill_md_path": "skills/sivtr-memory/SKILL.md",
-        "name": "sivtr-memory",
-        "description": "Retrieve shared local work memory: terminal activity, AI conversation history, prior decisions, validation evidence, debugging trails, recaps, and handoff context. Use before asking the user to repeat local work context.",
-        "stars": 116
-      }
-    ]
-  },
-  {
-    "tweet_id": "2079694236459704476",
-    "tweet_url": "https://x.com/seiei_sogen/status/2079694236459704476",
-    "author_handle": "seiei_sogen",
-    "author_name": "聖永宗玄",
-    "text": "skills/skills/engineering/grill-with-docs/SKILL.md at main · mattpocock/skills https://t.co/UimVV5haup https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md",
-    "likes": 0,
     "retweets": 0,
-    "replies": 0,
-    "views": 18,
-    "posted_at": "2026-07-21T22:25:19.000Z",
+    "replies": 2,
+    "views": 47,
+    "posted_at": "2026-07-19T05:17:17.000Z",
     "repo_ids": [
-      "mattpocock/skills"
+      "junjie-xyz/skills"
     ],
     "repo_urls": [
-      "https://github.com/mattpocock/skills"
+      "https://github.com/junjie-xyz/skills"
     ],
     "skill_refs": [
       {
-        "repoId": "mattpocock/skills",
-        "githubUrl": "https://github.com/mattpocock/skills",
-        "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
-        "sourceUrl": "https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md"
+        "repoId": "junjie-xyz/skills",
+        "githubUrl": "https://github.com/junjie-xyz/skills",
+        "skillPath": "skills/ask/SKILL.md",
+        "sourceUrl": "https://github.com/junjie-xyz/skills/blob/main/skills/ask/SKILL.md"
       }
     ],
     "valid_skill_repos": [
       {
-        "id": "mattpocock/skills",
-        "github_url": "https://github.com/mattpocock/skills",
-        "skill_md_path": "skills/engineering/grill-with-docs/SKILL.md",
-        "name": "grill-with-docs",
-        "description": "A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.",
-        "stars": 181512
+        "id": "junjie-xyz/skills",
+        "github_url": "https://github.com/junjie-xyz/skills",
+        "skill_md_path": "skills/ask/SKILL.md",
+        "name": "ask",
+        "description": "Clarify requirements through batched interactive HTML questionnaires. Use when the user explicitly invokes @Ask or @ask, selects the Ask Skill, or explicitly says \"ask me questions.\" Do not trigger for ordinary clarification requests without one of these explicit signals. Supports localized text, rich HTML, SVG, flowchart, and mockup options, with direct submission in Codex or copy-only standalone output.",
+        "stars": 0
       }
     ]
   }
