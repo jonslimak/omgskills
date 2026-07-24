@@ -1,0 +1,54 @@
+{
+  "admissionCandidates": [
+    {
+      "repo": "openclaw/openclaw",
+      "repoUrl": "https://github.com/openclaw/openclaw",
+      "sources": ["official"],
+      "stars": 1000,
+      "bootstrapCandidate": {
+        "source": "official",
+        "id": "openclaw/openclaw:skill",
+        "skill_md_path": "skills/skill/SKILL.md",
+        "github_url": "https://github.com/openclaw/openclaw"
+      }
+    }
+  ],
+  "repoIndex": {
+    "generatedAt": "2026-07-24T12:00:00.000Z",
+    "repoCount": 1,
+    "repos": [
+      {
+        "repo": "openclaw/openclaw",
+        "repoUrl": "https://github.com/openclaw/openclaw",
+        "state": "core",
+        "discoveredSources": ["official"],
+        "skillIds": ["openclaw/openclaw:skill"],
+        "skillCount": 1,
+        "stars": 1000,
+        "lastSeenAt": "2026-07-24T12:00:00.000Z",
+        "lastRefreshedAt": "2026-07-24T12:00:00.000Z",
+        "trustSignals": [],
+        "promotionReasons": ["official"],
+        "staleOrInvalidState": null,
+        "isTrustedVendor": false,
+        "isTrustedCreator": false,
+        "isGoldBasketRepo": false,
+        "topSkillId": "openclaw/openclaw:skill",
+        "topSkillStars": 1000
+      }
+    ]
+  },
+  "qualitySkills": [
+    {
+      "id": "openclaw/openclaw:skill",
+      "github_url": "https://github.com/openclaw/openclaw",
+      "publisher_repo": "openclaw/openclaw",
+      "provenance_type": "catalog",
+      "author_handle": "openclaw"
+    }
+  ],
+  "goldBasketRepos": [],
+  "goldBasketSkillIds": [],
+  "installAdmissionEnabled": false,
+  "qualityTiersEnabled": true
+}

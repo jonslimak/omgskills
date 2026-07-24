@@ -32,8 +32,14 @@ export type PolicyPrecedenceReport = {
   generatedAt: string;
   sourceCommit: string;
   policyDigest: string;
+  snapshotId?: string;
+  snapshotCapturedAt?: string;
+  snapshotSourceCommit?: string;
   mode: PolicyPrecedenceMode;
+  admissionObservationCount: number;
   admissionChangeCount: number;
+  admissionAdditionCount: number;
+  admissionRemovalCount: number;
   skippedSuppressedCandidateCount: number;
   repoStateChangeCount: number;
   qualityTierChangeCount: number;
@@ -106,6 +112,9 @@ export function buildPolicyPrecedenceReport(input: {
   admissions: AdmissionPolicyObservation[];
   repoStates: RepoStatePolicyObservation[];
   qualityTiers: QualityTierPolicyObservation[];
+  snapshotId?: string;
+  snapshotCapturedAt?: string;
+  snapshotSourceCommit?: string;
 }): PolicyPrecedenceReport {
   const admissions = [...input.admissions].sort((a, b) => a.repo.localeCompare(b.repo));
   const repoStates = [...input.repoStates].sort((a, b) => a.repo.localeCompare(b.repo));
@@ -123,8 +132,14 @@ export function buildPolicyPrecedenceReport(input: {
     generatedAt: input.generatedAt,
     sourceCommit: input.sourceCommit,
     policyDigest: input.policyDigest,
+    snapshotId: input.snapshotId,
+    snapshotCapturedAt: input.snapshotCapturedAt,
+    snapshotSourceCommit: input.snapshotSourceCommit,
     mode: input.mode,
+    admissionObservationCount: admissions.length,
     admissionChangeCount: admissions.filter((row) => row.legacyEligible !== row.proposedEligible).length,
+    admissionAdditionCount: admissions.filter((row) => !row.legacyEligible && row.proposedEligible).length,
+    admissionRemovalCount: admissions.filter((row) => row.legacyEligible && !row.proposedEligible).length,
     skippedSuppressedCandidateCount: admissions.reduce(
       (total, row) => total + row.skippedSuppressedCandidateIds.length,
       0,
@@ -145,8 +160,14 @@ export function renderPolicyPrecedenceReport(report: PolicyPrecedenceReport): st
     `- Generated: ${report.generatedAt}`,
     `- Source commit: ${report.sourceCommit}`,
     `- Policy digest: ${report.policyDigest}`,
+    ...(report.snapshotId ? [`- Snapshot: ${report.snapshotId}`] : []),
+    ...(report.snapshotCapturedAt ? [`- Snapshot captured: ${report.snapshotCapturedAt}`] : []),
+    ...(report.snapshotSourceCommit ? [`- Snapshot source commit: ${report.snapshotSourceCommit}`] : []),
     `- Mode: ${report.mode}`,
+    `- Admission observations: ${report.admissionObservationCount}`,
     `- Admission changes: ${report.admissionChangeCount}`,
+    `- Admission additions: ${report.admissionAdditionCount}`,
+    `- Admission removals: ${report.admissionRemovalCount}`,
     `- Suppressed bootstrap candidates skipped: ${report.skippedSuppressedCandidateCount}`,
     `- Repo-state changes: ${report.repoStateChangeCount}`,
     `- Quality-tier changes: ${report.qualityTierChangeCount}`,

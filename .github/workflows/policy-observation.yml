@@ -1,0 +1,150 @@
+name: policy-observation
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: Policy track to observe
+        required: true
+        default: crawl4
+        type: choice
+        options:
+          - crawl4
+          - v2
+          - both
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: policy-observation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main --depth=1
+          git reset --hard origin/main
+
+      # Check once before crawler work. A writer that starts later may overlap:
+      # this workflow is read-only and does not hold the production writer lock.
+      - name: Refuse to start while a production writer is active
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          writer_workflows=(
+            scrape.yml
+            shadow-crawl-health.yml
+            content-reports.yml
+            x-refresh.yml
+            pipeline-health.yml
+          )
+          for workflow in "${writer_workflows[@]}"; do
+            active="$(
+              gh run list \
+                --repo "$GITHUB_REPOSITORY" \
+                --workflow "$workflow" \
+                --limit 20 \
+                --json status \
+                --jq '[.[] | select(.status == "in_progress" or .status == "queued")] | length'
+            )"
+            if [ "$active" -gt 0 ]; then
+              echo "::error::Production writer $workflow is active; retry this observation later."
+              exit 1
+            fi
+          done
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: index/package-lock.json
+
+      - name: Install dependencies
+        working-directory: index
+        run: npm ci
+
+      - name: Validate policy inputs
+        working-directory: index
+        run: npm run policy:validate -- --profile scheduled-data
+
+      - name: Run v2 report-only observation
+        if: ${{ inputs.track == 'v2' || inputs.track == 'both' }}
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+          V2_POLICY_MODE: observe
+        run: npm run scrape -- --dry-run
+
+      - name: Summarize v2 observation
+        if: ${{ always() && (inputs.track == 'v2' || inputs.track == 'both') }}
+        run: |
+          if [ -f index/shadow/v2-policy-diff.shadow.md ]; then
+            cat index/shadow/v2-policy-diff.shadow.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload v2 observation
+        if: ${{ always() && (inputs.track == 'v2' || inputs.track == 'both') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-policy-observation-${{ github.run_id }}
+          path: |
+            index/shadow/v2-policy-input.shadow.json
+            index/shadow/v2-policy-diff.shadow.json
+            index/shadow/v2-policy-diff.shadow.md
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Build Crawl 4 trending inputs
+        if: ${{ inputs.track == 'crawl4' || inputs.track == 'both' }}
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:trending
+
+      - name: Run Crawl 4 report-only observation
+        if: ${{ inputs.track == 'crawl4' || inputs.track == 'both' }}
+        working-directory: index
+        env:
+          CRAWL4_POLICY_PRECEDENCE: observe
+          CRAWL4_QUALITY_TIERS: "1"
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:shadow
+
+      - name: Summarize Crawl 4 observation
+        if: ${{ always() && (inputs.track == 'crawl4' || inputs.track == 'both') }}
+        run: |
+          if [ -f index/shadow/policy-precedence.shadow.md ]; then
+            cat index/shadow/policy-precedence.shadow.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Crawl 4 observation
+        if: ${{ always() && (inputs.track == 'crawl4' || inputs.track == 'both') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: crawl4-policy-observation-${{ github.run_id }}
+          path: |
+            index/shadow/policy-precedence-input.shadow.json
+            index/shadow/policy-precedence.shadow.json
+            index/shadow/policy-precedence.shadow.md
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Run policy and workflow safety tests
+        if: always()
+        run: |
+          npm run test:deploy-safety
+          cd index
+          npm run test:policy

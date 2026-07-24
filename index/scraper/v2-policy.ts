@@ -6,11 +6,14 @@ import {
   normalizePolicySkillId,
   policyRepoFromSkillId,
 } from "../../scripts/policy-identifiers.mjs";
-import type { Candidate } from "./enrich.js";
 import { evaluateEffectiveSkillPolicy, type EffectivePolicyDecision } from "./policy/effective-policy.js";
 import type { PolicyReasonCode } from "./policy/types.js";
 import type { Skill } from "./types.js";
 import type { TrustedSeeds } from "./new-crawl/types.js";
+import type {
+  V2PolicyCandidateFact,
+  V2PolicySkillFact,
+} from "./policy/observation-snapshot.js";
 
 export const LEGACY_BLOCKED_REPOS = new Set([
   "majiayu000/claude-skill-registry",
@@ -65,6 +68,9 @@ export type V2PolicyReport = {
   mode: V2PolicyMode;
   sourceCommit: string;
   policyDigest: string;
+  snapshotId?: string;
+  snapshotCapturedAt?: string;
+  snapshotSourceCommit?: string;
   legacySkillCount: number;
   proposedSkillCount: number;
   effectiveSkillCount: number;
@@ -96,11 +102,11 @@ export function isRootSkillPath(path: string | null | undefined): boolean {
   return (path ?? "").trim().replace(/^\.\//, "").toLowerCase() === "skill.md";
 }
 
-function candidateRepo(candidate: Pick<Candidate, "id">): string {
+function candidateRepo(candidate: Pick<V2PolicyCandidateFact, "id">): string {
   return policyRepoFromSkillId(candidate.id);
 }
 
-export function evaluateLegacyV2Candidate(candidate: Candidate): EffectivePolicyDecision {
+export function evaluateLegacyV2Candidate(candidate: V2PolicyCandidateFact): EffectivePolicyDecision {
   const repo = candidateRepo(candidate);
   const owner = repo.split("/")[0] ?? "";
   if (LEGACY_BLOCKED_REPOS.has(repo)) return excludedDecision("do-not-crawl", "legacy.BLOCKED_REPOS", repo);
@@ -111,7 +117,7 @@ export function evaluateLegacyV2Candidate(candidate: Candidate): EffectivePolicy
   return allowedDecision();
 }
 
-export function evaluateProposedV2Candidate(candidate: Candidate, seeds: TrustedSeeds): EffectivePolicyDecision {
+export function evaluateProposedV2Candidate(candidate: V2PolicyCandidateFact, seeds: TrustedSeeds): EffectivePolicyDecision {
   const shared = evaluateEffectiveSkillPolicy({ id: candidate.id, github_url: candidate.github_url }, seeds);
   if (shared.excluded) return shared;
   const repo = candidateRepo(candidate);
@@ -121,7 +127,7 @@ export function evaluateProposedV2Candidate(candidate: Candidate, seeds: Trusted
   return allowedDecision();
 }
 
-export function evaluateProposedV2Skill(skill: Skill, seeds: TrustedSeeds): EffectivePolicyDecision {
+export function evaluateProposedV2Skill(skill: V2PolicySkillFact, seeds: TrustedSeeds): EffectivePolicyDecision {
   const shared = evaluateEffectiveSkillPolicy(skill, seeds);
   if (shared.excluded) return shared;
   const repo = policyRepoFromSkillId(skill.id);
@@ -131,7 +137,7 @@ export function evaluateProposedV2Skill(skill: Skill, seeds: TrustedSeeds): Effe
   return allowedDecision();
 }
 
-export function observeCandidatePolicy(candidate: Candidate, seeds: TrustedSeeds): V2CandidatePolicyObservation | null {
+export function observeCandidatePolicy(candidate: V2PolicyCandidateFact, seeds: TrustedSeeds): V2CandidatePolicyObservation | null {
   const legacy = evaluateLegacyV2Candidate(candidate);
   const proposed = evaluateProposedV2Candidate(candidate, seeds);
   if (legacy.excluded === proposed.excluded) return null;
@@ -186,7 +192,7 @@ export function assertV2PolicyEnforcementReady(audit: V2LegacyMigrationAudit): v
   );
 }
 
-function skillById(skills: Skill[]): Map<string, Skill> {
+function skillById(skills: V2PolicySkillFact[]): Map<string, V2PolicySkillFact> {
   return new Map(skills.map((skill) => [normalizePolicySkillId(skill.id), skill]));
 }
 
@@ -199,11 +205,14 @@ export function buildV2PolicyReport(input: {
   mode: V2PolicyMode;
   sourceCommit: string;
   policyDigest: string;
-  legacySkills: Skill[];
-  proposedSkills: Skill[];
+  legacySkills: V2PolicySkillFact[];
+  proposedSkills: V2PolicySkillFact[];
   candidateObservations: V2CandidatePolicyObservation[];
   migration: V2LegacyMigrationAudit;
   seeds: TrustedSeeds;
+  snapshotId?: string;
+  snapshotCapturedAt?: string;
+  snapshotSourceCommit?: string;
 }): V2PolicyReport {
   const legacy = skillById(input.legacySkills);
   const proposed = skillById(input.proposedSkills);
@@ -233,6 +242,9 @@ export function buildV2PolicyReport(input: {
     mode: input.mode,
     sourceCommit: input.sourceCommit,
     policyDigest: input.policyDigest,
+    snapshotId: input.snapshotId,
+    snapshotCapturedAt: input.snapshotCapturedAt,
+    snapshotSourceCommit: input.snapshotSourceCommit,
     legacySkillCount: input.legacySkills.length,
     proposedSkillCount: input.proposedSkills.length,
     effectiveSkillCount: effectiveCount,
@@ -255,6 +267,9 @@ export function renderV2PolicyReport(report: V2PolicyReport): string {
     `- Mode: ${report.mode}`,
     `- Source commit: ${report.sourceCommit}`,
     `- Policy digest: ${report.policyDigest}`,
+    ...(report.snapshotId ? [`- Snapshot: ${report.snapshotId}`] : []),
+    ...(report.snapshotCapturedAt ? [`- Snapshot captured: ${report.snapshotCapturedAt}`] : []),
+    ...(report.snapshotSourceCommit ? [`- Snapshot source commit: ${report.snapshotSourceCommit}`] : []),
     `- Legacy skills: ${report.legacySkillCount}`,
     `- Proposed skills: ${report.proposedSkillCount}`,
     `- Effective skills: ${report.effectiveSkillCount}`,

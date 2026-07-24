@@ -1,10 +1,11 @@
 import { resolveCreatorHandle } from "./seeds.js";
 import type { QualityTier, ShadowRepoIndex, ShadowRepoIndexEntry, ShadowSkillRecord, TrustedSeeds } from "./types.js";
+import type { Crawl4QualitySkillFact } from "../policy/observation-snapshot.js";
 
 export const QUALITY_TIERS = ["curated", "creator", "validated"] as const;
 
 type ClassifyQualityTierInput = {
-  skill: ShadowSkillRecord;
+  skill: Crawl4QualitySkillFact;
   repo: ShadowRepoIndexEntry | null;
   seeds: TrustedSeeds;
   goldBasketSkillIds: Set<string>;

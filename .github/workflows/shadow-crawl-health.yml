@@ -90,6 +90,7 @@ jobs:
         with:
           name: policy-precedence-report-only-${{ github.run_id }}
           path: |
+            index/shadow/policy-precedence-input.shadow.json
             index/shadow/policy-precedence.shadow.json
             index/shadow/policy-precedence.shadow.md
           if-no-files-found: error
@@ -170,6 +171,7 @@ jobs:
         with:
           name: policy-precedence-${{ github.run_id }}
           path: |
+            index/shadow/policy-precedence-input.shadow.json
             index/shadow/policy-precedence.shadow.json
             index/shadow/policy-precedence.shadow.md
           if-no-files-found: warn

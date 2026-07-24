@@ -89,6 +89,7 @@ jobs:
         with:
           name: v2-policy-diff-${{ github.run_id }}
           path: |
+            index/shadow/v2-policy-input.shadow.json
             index/shadow/v2-policy-diff.shadow.json
             index/shadow/v2-policy-diff.shadow.md
           if-no-files-found: error

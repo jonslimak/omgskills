@@ -205,6 +205,8 @@ Important behavior:
 - each run writes `shadow/v2-policy-diff.shadow.json` and `.md` before publish;
   reports include the source commit, policy digest, migration coverage, reason
   counts, and bounded samples
+- each run also writes `shadow/v2-policy-input.shadow.json`, a content-addressed
+  compact input snapshot that can reproduce the policy report without crawling
 - `root-skill-invalid.json` rejects only a repository-root `SKILL.md` under the
   proposed policy; nested skill paths remain eligible
 - enforcement stays blocked until two consecutive scheduled reports are
@@ -243,10 +245,60 @@ Important shadow artifacts:
 - `index/shadow/skills.overlay.json`
 - `index/shadow/shadow-report.json`
 - `index/shadow/shadow-summary.md`
+- `index/shadow/policy-precedence-input.shadow.json`
+- `index/shadow/policy-precedence.shadow.json`
+- `index/shadow/policy-precedence.shadow.md`
 
 Combined runs persist repo and non-baseline skill overlays. Quality tiers are
 never persisted in overlays; they are recomputed from current policy at final
 cutover.
+
+### Policy observation and replay
+
+Policy input snapshots contain only the facts needed by the existing v2 and
+Crawl 4 evaluators. The snapshot ID hashes the complete policy-relevant fact
+set, excluding capture and refresh timestamps. Snapshots and reports are
+generated evidence, not policy inputs or authoring surfaces.
+
+Replay is local, deterministic, and network-free:
+
+```bash
+cd /Users/jonslimak/Projects/omgskills/index
+npm run policy:replay -- \
+  --snapshot shadow/policy-precedence-input.shadow.json \
+  --output-dir shadow/replay
+```
+
+Use `shadow/v2-policy-input.shadow.json` for the v2 track. A snapshot older than
+72 hours remains valid for regression testing, but the command warns and the
+evidence verifier will not count it toward rollout readiness.
+
+Evidence comparisons have two explicit modes:
+
+```bash
+# Same facts, changed policy.
+npm run policy:evidence -- --mode policy-diff \
+  --first <before-report.json> --second <after-report.json>
+
+# Same policy, changed catalog facts.
+npm run policy:evidence -- --mode drift \
+  --first <first-report.json> --second <second-report.json> --require-ready
+```
+
+`policy-diff` requires the same snapshot ID and different policy digests.
+`drift` requires the same digest and different snapshot IDs. Identical inputs
+are rejected as a no-op. For v2, migration coverage is complete only when the
+existing P1.5 audit reports `enforcementReady: true`.
+
+The manual `policy-observation` GitHub workflow runs either or both tracks and
+uploads snapshots plus reports. It checks once at startup for an active
+production data writer, then stays read-only. It cannot commit, publish, deploy,
+or occupy the `app-data-writers` lock. A writer that starts later may safely
+overlap because the observation has no production write path.
+
+Manual evidence shortens development feedback, but it does not eliminate live
+validation. After two fresh independent observations pass under one policy
+digest, run one normal scheduled canary before changing an enforcement flag.
 
 ### Discovery and bounded backfill
 
@@ -471,6 +523,11 @@ npm run crawl4:remove-repo -- owner/repo
 npm run crawl4:removal-audit
 npm run crawl4:audit-canonical-commits
 npm run crawl4:audit-security -- --limit=100 --offset=0
+
+# Offline policy evidence
+npm run policy:replay -- --snapshot <snapshot.json> --output-dir shadow/replay
+npm run policy:evidence -- --mode <policy-diff|drift> \
+  --first <first-report.json> --second <second-report.json>
 ```
 
 From the repo root:

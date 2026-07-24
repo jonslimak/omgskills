@@ -25,6 +25,13 @@ import { loadPolicySources, typedPolicySources } from "./policy/loader.js";
 import { effectivePolicyDigest } from "./policy/digest.js";
 import { currentSourceCommit } from "./policy/metadata.js";
 import {
+  createPolicyObservationSnapshot,
+  writePolicyObservationSnapshot,
+  type V2PolicyCandidateFact,
+  type V2PolicySkillFact,
+} from "./policy/observation-snapshot.js";
+import { SKILLS_SH_MIN_REPO_STARS } from "./policy/rollout-criteria.js";
+import {
   LEGACY_BLOCKED_OWNERS,
   LEGACY_BLOCKED_REPOS,
   assertV2PolicyEnforcementReady,
@@ -43,7 +50,6 @@ import {
 const here = dirname(fileURLToPath(import.meta.url));
 const CHECKPOINT_INTERVAL = 500;
 const MIN_REPO_STARS = 5;
-const SKILLS_SH_MIN_REPO_STARS = 50;
 const REPO_NEGATIVE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const CANDIDATE_NEGATIVE_CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 const X_SOURCE_TAG = "x-top-skill-tweet";
@@ -690,6 +696,14 @@ async function main() {
   }
 
   console.log(`  merged: ${candidates.size} unique candidates`);
+  const policySnapshotCandidates = [...candidates.values()]
+    .map((candidate): V2PolicyCandidateFact => ({
+      id: candidate.id,
+      github_url: candidate.github_url,
+      skill_md_path: candidate.skill_md_path,
+    }))
+    .sort((left, right) =>
+      left.id.localeCompare(right.id) || left.skill_md_path.localeCompare(right.skill_md_path));
   {
     let invalidRemoved = 0;
     for (const [id, candidate] of [...candidates.entries()]) {
@@ -844,16 +858,44 @@ async function main() {
     legacySkills.filter((skill) => !evaluateProposedV2Skill(skill, trustedSeeds).excluded),
   ).skills;
   const effectiveSkills = policyMode === "enforce" ? proposedSkills : legacySkills;
+  const sourceCommit = currentSourceCommit();
+  const policyDigest = effectivePolicyDigest(typedPolicySources(loadedPolicy));
+  const policySnapshot = createPolicyObservationSnapshot({
+    version: 1,
+    track: "v2",
+    capturedAt: nowIso,
+    sourceCommit,
+    policyDigest,
+    payload: {
+      legacySkills: legacySkills
+        .map((skill): V2PolicySkillFact => ({
+          id: skill.id,
+          github_url: skill.github_url,
+          skill_md_path: skill.skill_md_path,
+        }))
+        .sort((left, right) =>
+          left.id.localeCompare(right.id) ||
+          (left.skill_md_path ?? "").localeCompare(right.skill_md_path ?? "")),
+      candidates: policySnapshotCandidates,
+    },
+  });
+  writePolicyObservationSnapshot(
+    join(here, "..", "shadow", "v2-policy-input.shadow.json"),
+    policySnapshot,
+  );
   const policyReport = buildV2PolicyReport({
     generatedAt: nowIso,
     mode: policyMode,
-    sourceCommit: currentSourceCommit(),
-    policyDigest: effectivePolicyDigest(typedPolicySources(loadedPolicy)),
+    sourceCommit,
+    policyDigest,
     legacySkills,
     proposedSkills,
     candidateObservations: candidatePolicyObservations,
     migration: migrationAudit,
     seeds: trustedSeeds,
+    snapshotId: policySnapshot.snapshotId,
+    snapshotCapturedAt: policySnapshot.capturedAt,
+    snapshotSourceCommit: policySnapshot.sourceCommit,
   });
   writeV2PolicyReport(
     join(here, "..", "shadow", "v2-policy-diff.shadow.json"),

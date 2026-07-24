@@ -199,6 +199,7 @@ Editool requires newly proposed suppressions to resolve in that union.
 | `index/top-x-skill-tweets.json` and `index/x-trending.json` | X collection and enrichment jobs | Discovery/reporting evidence. Admission still requires validation, `50+` repo stars, clean mapping, and safety policy. |
 | `index/proposed-creators.json` and `.md` | Creator proposal builder | Read-only Editool proposals; a human must update `creators.json`. |
 | Skill, author, trending, and leaderboard signals | Content and overlay builders | Display, ranking, health, and proposals; they do not rewrite operator policy. |
+| Policy observation snapshots and replay reports | v2/Crawl 4 builders and replay CLI | Content-addressed compact facts and deterministic policy evidence. They may prove behavior but never authorize or change policy. |
 
 #### Derived state and outputs
 
@@ -240,6 +241,13 @@ observation before enforcement:
 - v2 writes `v2-policy-diff.shadow.json` and `.md` with migration coverage,
   source commit, policy digest, reason counts, and bounded samples before its
   publish step
+- both tracks write content-addressed policy-input snapshots; replay calls the
+  same evaluators without crawling, publishing, deployment, or network access
+- evidence comparison supports policy-diff (same snapshot, changed digest) and
+  drift (same digest, changed snapshot) modes; identical comparisons fail
+- snapshots older than 72 hours remain useful for regression tests but cannot
+  satisfy readiness, and one scheduled canary remains required after manual
+  evidence passes
 - creator/editorial overlaps with exclusion policy are now reported by the
   shared validator using the same policy reason vocabulary
 - Editool writes related removal files as separate atomic operations; pair-level
@@ -731,6 +739,9 @@ After an Editool save:
 5. commit intentionally
 
 Editool never commits, pushes, deploys, or publishes automatically.
+
+Saved Editool policy changes can be evaluated with the policy replay tools, but
+Editool does not invoke the manual CI workflow or grant rollout approval.
 
 ## Portal And Skill Groups
 

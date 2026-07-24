@@ -51,6 +51,13 @@ import { applyQualityTiers, stripQualityTiers, summarizeQualityTiers } from "./q
 import { loadPolicySources, typedPolicySources } from "../policy/loader.js";
 import { policyRunMetadata } from "../policy/metadata.js";
 import {
+  createPolicyObservationSnapshot,
+  writePolicyObservationSnapshot,
+  type Crawl4AdmissionFact,
+  type Crawl4QualitySkillFact,
+} from "../policy/observation-snapshot.js";
+import { SKILLS_SH_MIN_REPO_STARS } from "../policy/rollout-criteria.js";
+import {
   admissionObservation,
   applyRepoStatePrecedence,
   buildPolicyPrecedenceReport,
@@ -1636,7 +1643,7 @@ async function runPeriodicSkillsShSources(): Promise<Array<{ hits: SkillsShHit[]
       searchSkillsSh({
         board,
         topLimit,
-        minRepoStars: 50,
+        minRepoStars: SKILLS_SH_MIN_REPO_STARS,
         pageConcurrency: 1,
         repoConcurrency: 8,
       }),
@@ -2133,6 +2140,7 @@ async function main() {
   const cutoverCompareSummaryOutPath = join(shadowRoot, "cutover-compare.shadow.md");
   const policyPrecedenceOutPath = join(shadowRoot, "policy-precedence.shadow.json");
   const policyPrecedenceSummaryOutPath = join(shadowRoot, "policy-precedence.shadow.md");
+  const policyPrecedenceInputOutPath = join(shadowRoot, "policy-precedence-input.shadow.json");
   const reportOutPath = join(shadowRoot, "shadow-report.json");
   const summaryOutPath = join(shadowRoot, "shadow-summary.md");
 
@@ -2216,6 +2224,20 @@ async function main() {
     : partialDiscoveryWarnings;
   const installAdmissionEnabled = process.env.CRAWL4_INSTALL_ADMISSION === "1";
   const admissionPolicyObservations: AdmissionPolicyObservation[] = [];
+  const existingReposBeforeAdmission = new Set(repoIndex.repos.map((repo) => repo.repo));
+  const policyAdmissionCandidates = [...discovered.values()]
+    .filter((repo) => !existingReposBeforeAdmission.has(repo.repo))
+    .map((repo): Crawl4AdmissionFact => ({
+      repo: repo.repo,
+      repoUrl: repo.repoUrl,
+      sources: [...repo.sources].sort(),
+      stars: repo.stars,
+      bootstrapCandidate: repo.bootstrapCandidate,
+      bootstrapCandidates: repo.bootstrapCandidates
+        ? sortBootstrapCandidates(repo.bootstrapCandidates)
+        : undefined,
+    }))
+    .sort((left, right) => left.repo.localeCompare(right.repo));
 
   const newlyAdmittedRepos = admitDiscoveredRepos(
     cadence,
@@ -2286,6 +2308,41 @@ async function main() {
   const untieredCutoverShadowSkills = stripQualityTiers(buildCutoverShadowSkills(shadowSkills));
   removeFilteredCatalogOnlyRepos(repoIndex, shadowSkills, untieredCutoverShadowSkills);
   reconcileRepoIndexSkillIds(repoIndex, untieredCutoverShadowSkills);
+  const policySnapshot = createPolicyObservationSnapshot({
+    version: 1,
+    track: "crawl4",
+    capturedAt: checkedAt,
+    sourceCommit: policyMetadata.sourceCommit,
+    policyDigest: policyMetadata.policyDigest,
+    payload: {
+      admissionCandidates: policyAdmissionCandidates,
+      repoIndex: {
+        ...structuredClone(repoIndex),
+        repos: structuredClone(repoIndex.repos)
+          .map((repo) => ({
+            ...repo,
+            discoveredSources: [...repo.discoveredSources].sort(),
+            skillIds: [...repo.skillIds].sort(),
+            trustSignals: [...repo.trustSignals].sort(),
+            promotionReasons: [...repo.promotionReasons].sort(),
+          }))
+          .sort((left, right) => left.repo.localeCompare(right.repo)),
+      },
+      qualitySkills: untieredCutoverShadowSkills
+        .map((skill): Crawl4QualitySkillFact => ({
+          id: skill.id,
+          github_url: skill.github_url,
+          publisher_repo: skill.publisher_repo,
+          provenance_type: skill.provenance_type,
+          author_handle: skill.author_handle,
+        }))
+        .sort((left, right) => left.id.localeCompare(right.id)),
+      goldBasketRepos: [...goldBasketRepos].sort(),
+      goldBasketSkillIds: [...goldBasketSkillIds].sort(),
+      installAdmissionEnabled,
+      qualityTiersEnabled: process.env.CRAWL4_QUALITY_TIERS === "1",
+    },
+  });
   const repoStatePolicyObservations: RepoStatePolicyObservation[] = applyRepoStatePrecedence(
     repoIndex,
     seeds,
@@ -2330,6 +2387,9 @@ async function main() {
     admissions: admissionPolicyObservations,
     repoStates: repoStatePolicyObservations,
     qualityTiers: qualityTierPolicyObservations,
+    snapshotId: policySnapshot.snapshotId,
+    snapshotCapturedAt: policySnapshot.capturedAt,
+    snapshotSourceCommit: policySnapshot.sourceCommit,
   });
   const qualityTierSummary = summarizeQualityTiers(cutoverShadowSkills);
   const shaCanonicalStart = performance.now();
@@ -2570,6 +2630,7 @@ async function main() {
   writeShadowFile(cutoverCompareSummaryOutPath, buildCutoverCompareSummary(cutoverCompare));
   writeShadowFile(policyPrecedenceOutPath, JSON.stringify(policyPrecedenceReport, null, 2) + "\n");
   writeShadowFile(policyPrecedenceSummaryOutPath, renderPolicyPrecedenceReport(policyPrecedenceReport));
+  writePolicyObservationSnapshot(policyPrecedenceInputOutPath, policySnapshot);
   writeShadowFile(reportOutPath, JSON.stringify(initialReport, null, 2) + "\n");
   writeShadowFile(summaryOutPath, buildSummary(initialReport, repoIndex));
   timings.writeOutputs = Math.round(performance.now() - writeStart);

@@ -1,0 +1,21 @@
+{
+  "legacySkills": [
+    {
+      "id": "allowed/repo:skill",
+      "github_url": "https://github.com/allowed/repo",
+      "skill_md_path": "skills/skill/SKILL.md"
+    },
+    {
+      "id": "davepoon/repo:skill",
+      "github_url": "https://github.com/davepoon/repo",
+      "skill_md_path": "skills/skill/SKILL.md"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "obra/superpowers:skills/foo",
+      "github_url": "https://github.com/obra/superpowers",
+      "skill_md_path": "skills/foo/SKILL.md"
+    }
+  ]
+}
