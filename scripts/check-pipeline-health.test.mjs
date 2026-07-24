@@ -6,48 +6,46 @@ import { buildShadowCutoverState, stuckShadowWorkflowIssues } from "./check-pipe
 const run = (id, status = "completed") => ({ id, status });
 const stage = (id, completedAt) => ({ run: run(id), completedAt });
 
-test("keeps health ok when latest shadow run is still waiting for live verify", () => {
+test("keeps health ok while the latest shadow run is waiting for its guarded deploy", () => {
   const state = buildShadowCutoverState({
     latestShadowRun: run(2, "in_progress"),
     latestV2Publish: stage(2, "2026-07-09T10:03:00.000Z"),
-    latestV2Deploy: stage(2, "2026-07-09T10:04:00.000Z"),
-    latestLiveVerify: stage(1, "2026-07-09T04:00:00.000Z"),
+    latestVerifiedDeploy: stage(1, "2026-07-09T04:00:00.000Z"),
   });
 
   assert.deepEqual(state.issues, []);
 });
 
-test("degrades when latest completed publish/deploy has no later successful live verify", () => {
+test("degrades when a completed publish has no later successful guarded deploy", () => {
   const state = buildShadowCutoverState({
     latestShadowRun: run(2, "completed"),
     latestV2Publish: stage(2, "2026-07-09T10:03:00.000Z"),
-    latestV2Deploy: stage(2, "2026-07-09T10:04:00.000Z"),
-    latestLiveVerify: stage(1, "2026-07-09T04:00:00.000Z"),
+    latestVerifiedDeploy: stage(1, "2026-07-09T04:00:00.000Z"),
   });
 
-  assert.deepEqual(state.issues, ["Latest live v2 verify step did not pass"]);
+  assert.deepEqual(state.issues, ["Latest v2 publish has no successful verified production deploy"]);
 });
 
-test("keeps health ok when live verify is newer than publish and deploy", () => {
+test("keeps health ok when the guarded deploy completes after publish", () => {
   const state = buildShadowCutoverState({
     latestShadowRun: run(2, "completed"),
     latestV2Publish: stage(2, "2026-07-09T10:03:00.000Z"),
-    latestV2Deploy: stage(2, "2026-07-09T10:04:00.000Z"),
-    latestLiveVerify: stage(2, "2026-07-09T10:05:00.000Z"),
+    latestVerifiedDeploy: stage(2, "2026-07-09T10:05:00.000Z"),
   });
 
   assert.deepEqual(state.issues, []);
+  assert.equal(state.deployAt, "2026-07-09T10:05:00.000Z");
+  assert.equal(state.verifyAt, "2026-07-09T10:05:00.000Z");
 });
 
-test("degrades when there is no successful live verify in recent runs", () => {
+test("degrades when there is no successful guarded deploy in recent runs", () => {
   const state = buildShadowCutoverState({
     latestShadowRun: run(2, "completed"),
     latestV2Publish: stage(2, "2026-07-09T10:03:00.000Z"),
-    latestV2Deploy: stage(2, "2026-07-09T10:04:00.000Z"),
-    latestLiveVerify: null,
+    latestVerifiedDeploy: null,
   });
 
-  assert.deepEqual(state.issues, ["No successful live v2 verify stage found"]);
+  assert.deepEqual(state.issues, ["No successful verified production deploy found"]);
 });
 
 test("stuck shadow crawl still degrades crawler section", () => {

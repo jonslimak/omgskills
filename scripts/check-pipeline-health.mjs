@@ -50,8 +50,8 @@ const workflows = {
 const shadowStageSteps = {
   crawl: "Run shadow crawl",
   publish: "Publish hosted v2 app data",
-  deploy: "Deploy site to Netlify",
-  verify: "Verify live v2 manifest",
+  // The shared production deploy succeeds only after structural and live manifest verification.
+  verifiedDeploy: "Deploy site to Netlify",
 };
 
 async function workflowRuns(filename) {
@@ -105,32 +105,29 @@ export function stuckShadowWorkflowIssues(inProgressRuns, nowMs = Date.now(), ma
   return issues;
 }
 
-export function buildShadowCutoverState({ latestV2Publish, latestV2Deploy, latestLiveVerify, latestShadowRun }) {
+export function buildShadowCutoverState({ latestV2Publish, latestVerifiedDeploy, latestShadowRun }) {
   const issues = [];
   const publishAt = latestV2Publish?.completedAt ?? null;
-  const deployAt = latestV2Deploy?.completedAt ?? null;
-  const verifyAt = latestLiveVerify?.completedAt ?? null;
-  const requiredVerifyAt = [publishAt, deployAt].filter(Boolean).sort().at(-1) ?? null;
-  const latestRunPendingVerify =
+  const verifiedDeployAt = latestVerifiedDeploy?.completedAt ?? null;
+  const latestRunPendingDeploy =
     latestShadowRun?.status !== "completed" &&
-    [latestV2Publish?.run?.id, latestV2Deploy?.run?.id].includes(latestShadowRun?.id) &&
-    requiredVerifyAt !== null &&
-    (verifyAt === null || verifyAt < requiredVerifyAt);
+    latestV2Publish?.run?.id === latestShadowRun?.id &&
+    publishAt !== null &&
+    (verifiedDeployAt === null || verifiedDeployAt < publishAt);
 
   if (!publishAt) issues.push("No successful v2 publish stage found");
-  if (!deployAt) issues.push("No successful deploy stage found");
-  if (!verifyAt) {
-    issues.push("No successful live v2 verify stage found");
-  } else if (requiredVerifyAt && verifyAt < requiredVerifyAt && !latestRunPendingVerify) {
-    issues.push("Latest live v2 verify step did not pass");
+  if (!verifiedDeployAt) {
+    issues.push("No successful verified production deploy found");
+  } else if (publishAt && verifiedDeployAt < publishAt && !latestRunPendingDeploy) {
+    issues.push("Latest v2 publish has no successful verified production deploy");
   }
 
   return {
     issues,
     publishAt,
-    deployAt,
-    verifyAt,
-    verifyConclusion: verifyAt ? "success" : null,
+    deployAt: verifiedDeployAt,
+    verifyAt: verifiedDeployAt,
+    verifyConclusion: verifiedDeployAt ? "success" : null,
   };
 }
 
@@ -148,11 +145,10 @@ async function main() {
     github(`/repos/${repo}/actions/runs?status=in_progress&per_page=100`),
   ]);
   const latestShadowRun = shadowRuns[0] ?? null;
-  const [latestShadowCrawl, latestV2Publish, latestV2Deploy, latestLiveVerify] = await Promise.all([
+  const [latestShadowCrawl, latestV2Publish, latestVerifiedDeploy] = await Promise.all([
     latestStageSuccess(shadowRuns, shadowStageSteps.crawl),
     latestStageSuccess(shadowRuns, shadowStageSteps.publish),
-    latestStageSuccess(shadowRuns, shadowStageSteps.deploy),
-    latestStageSuccess(shadowRuns, shadowStageSteps.verify),
+    latestStageSuccess(shadowRuns, shadowStageSteps.verifiedDeploy),
   ]);
 
   const crawlerIssues = [];
@@ -175,7 +171,7 @@ async function main() {
       });
   issues.push(...crawlerIssues.map((issue) => `crawlers: ${issue}`));
 
-  const shadowCutover = buildShadowCutoverState({ latestV2Publish, latestV2Deploy, latestLiveVerify, latestShadowRun });
+  const shadowCutover = buildShadowCutoverState({ latestV2Publish, latestVerifiedDeploy, latestShadowRun });
   const shadowIssues = shadowCutover.issues;
 
   sections.shadowCutover = shadowIssues.length
@@ -203,8 +199,8 @@ async function main() {
     sections,
     lastShadowCrawlerSuccessAt: latestShadowCrawl?.completedAt ?? null,
     lastV2PublishAt: latestV2Publish?.completedAt ?? null,
-    lastV2DeployAt: latestV2Deploy?.completedAt ?? null,
-    lastLiveVerifyAt: latestLiveVerify?.completedAt ?? null,
+    lastV2DeployAt: latestVerifiedDeploy?.completedAt ?? null,
+    lastLiveVerifyAt: latestVerifiedDeploy?.completedAt ?? null,
     latestShadowWorkflowConclusion: latestShadowRun?.conclusion ?? null,
   };
 
@@ -216,8 +212,8 @@ async function main() {
       `EOF`,
       `last_shadow_crawler_success_at=${latestShadowCrawl?.completedAt ?? ""}`,
       `last_v2_publish_at=${latestV2Publish?.completedAt ?? ""}`,
-      `last_v2_deploy_at=${latestV2Deploy?.completedAt ?? ""}`,
-      `last_live_verify_at=${latestLiveVerify?.completedAt ?? ""}`,
+      `last_v2_deploy_at=${latestVerifiedDeploy?.completedAt ?? ""}`,
+      `last_live_verify_at=${latestVerifiedDeploy?.completedAt ?? ""}`,
       `pipeline_health_json<<EOF`,
       JSON.stringify(result),
       `EOF`,
