@@ -120,7 +120,7 @@ struct ReadmeWebView: NSViewRepresentable {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
           font-family: ui-serif, Georgia, serif;
-          font-size: 12.5px;
+          font-size: 11.5px;
           line-height: 1.68;
           color: var(--text);
           -webkit-font-smoothing: antialiased;
@@ -136,7 +136,7 @@ struct ReadmeWebView: NSViewRepresentable {
           margin: 10px 0 4px;
         }
         h1 {
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 700;
           letter-spacing: -0.2px;
         }
