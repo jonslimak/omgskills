@@ -101,6 +101,16 @@
       "owner": "user-attachments",
       "reason": "spam",
       "notes": "GitHub attachment pseudo-owner; never crawl or carry forward into library output."
+    },
+    {
+      "owner": "jeremylongshore",
+      "reason": "catalog",
+      "notes": "3,677-skill / 470-plugin marketplace (tonsofskills.com) mixing community + forge-generated skills; 636 skills flooded catalog from one repo. Validated 2026-07-14."
+    },
+    {
+      "owner": "davepoon",
+      "reason": "catalog",
+      "notes": "buildwithclaude is a pure directory aggregating other creators' skills; crawling creates duplicates of originals we already index. Validated 2026-07-14."
     }
   ]
 }
