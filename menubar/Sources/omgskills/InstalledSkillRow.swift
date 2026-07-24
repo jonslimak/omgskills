@@ -49,7 +49,6 @@ struct InstalledSkillRow: View {
         )
         .padding(.horizontal, 8)
         .contentShape(.rect)
-        .help(item.installationSummary)
     }
 
     private var isSelected: Bool {
@@ -117,7 +116,6 @@ struct InstalledSkillRow: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Open \(sourceGroup.source) installation")
-                .help("Open \(sourceGroup.source) installation")
             } else {
                 Menu {
                     ForEach(sourceGroup.members) { skill in
@@ -134,7 +132,6 @@ struct InstalledSkillRow: View {
                 .accessibilityLabel(
                     "Choose \(sourceGroup.source) installation, \(sourceGroup.members.count) locations"
                 )
-                .help("Choose a \(sourceGroup.source) installation")
             }
         }
 

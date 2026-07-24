@@ -31,28 +31,17 @@ struct LocalDashboardView: View {
     let onSelectRecentSkill: (InstalledSkillSummary.RecentSkill) -> Void
     private var stats: [LocalDashboardStat] {
         [
-            LocalDashboardStat(filter: .all, value: logicalSkillCount, symbol: "square.stack.3d.up"),
-            LocalDashboardStat(filter: .codex, value: summary.codexCount, symbol: "person"),
-            LocalDashboardStat(filter: .claude, value: summary.claudeCount, symbol: "sparkles"),
-            LocalDashboardStat(filter: .other, value: summary.agentsCount, symbol: "tray")
+            LocalDashboardStat(filter: .all, value: logicalSkillCount),
+            LocalDashboardStat(filter: .codex, value: summary.codexCount),
+            LocalDashboardStat(filter: .claude, value: summary.claudeCount),
+            LocalDashboardStat(filter: .other, value: summary.agentsCount)
         ]
     }
 
-    private let columns = [
-        GridItem(.flexible(), spacing: 8),
-        GridItem(.flexible(), spacing: 8),
-        GridItem(.flexible(), spacing: 8),
-        GridItem(.flexible(), spacing: 8)
-    ]
-
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 18) {
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
-                ForEach(stats) { stat in
-                    LocalDashboardStatCard(stat: stat, selected: stat.filter == selectedFilter) {
-                        onSelectFilter(stat.filter)
-                    }
-                }
+        LazyVStack(alignment: .leading, spacing: 15) {
+            LocalDashboardStatTabs(stats: stats, selectedFilter: selectedFilter) { filter in
+                onSelectFilter(filter)
             }
 
             if selectedFilter == nil, !summary.recentSkills.isEmpty {
@@ -71,7 +60,7 @@ struct LocalDashboardView: View {
 
         }
         .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.top, 7)
         .padding(.bottom, selectedFilter == nil ? 18 : 12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
@@ -476,52 +465,73 @@ private final class LegacySkillSyncModel {
 private struct LocalDashboardStat: Identifiable, Equatable {
     let filter: LocalDashboardFilter
     let value: Int
-    let symbol: String
     var title: String { filter.title }
     var id: String { filter.id }
 }
 
-private struct LocalDashboardStatCard: View {
+private struct LocalDashboardStatTabs: View {
+    let stats: [LocalDashboardStat]
+    let selectedFilter: LocalDashboardFilter?
+    let onSelect: (LocalDashboardFilter) -> Void
+
+    var body: some View {
+        ZStack {
+            HStack(spacing: 0) {
+                ForEach(stats) { stat in
+                    LocalDashboardStatTab(stat: stat, selected: stat.filter == selectedFilter) {
+                        onSelect(stat.filter)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                ForEach(0..<3, id: \.self) { _ in
+                    Rectangle()
+                        .fill(Color.primary.opacity(0.12))
+                        .frame(width: 1, height: 14)
+                    Spacer(minLength: 0)
+                }
+            }
+            .allowsHitTesting(false)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 28)
+    }
+}
+
+private struct LocalDashboardStatTab: View {
     let stat: LocalDashboardStat
     let selected: Bool
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .bottom, spacing: 0) {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("\(stat.value)")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(valueColor)
-                        .monospacedDigit()
-                    Text(stat.title)
-                        .font(.system(size: 9))
-                        .foregroundStyle(titleColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
-                }
-                Spacer(minLength: 0)
+            HStack(spacing: 4) {
+                Text(stat.title)
+                    .font(.system(size: 11, weight: .regular))
+                Text("\(stat.value)")
+                    .font(.system(size: 11, weight: .bold))
+                    .monospacedDigit()
             }
-            .padding(.leading, 15)
-            .padding(.trailing, 7)
-            .padding(.vertical, 9)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .foregroundStyle(selected ? AppUIStyle.selectedPrimaryText : .primary)
+            .padding(.horizontal, 12)
+            .frame(height: 22)
             .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(selected ? AppUIStyle.activeBlue : Color.primary.opacity(0.055))
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(selected ? AppUIStyle.activeBlue : Color.clear)
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(stat.title) skills, \(stat.value)")
         .accessibilityHint("Shows matching installed skills")
-    }
-
-    private var valueColor: Color {
-        selected ? AppUIStyle.selectedPrimaryText : .primary
-    }
-
-    private var titleColor: Color {
-        selected ? AppUIStyle.selectedSecondaryText : .secondary
+        .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 }
 

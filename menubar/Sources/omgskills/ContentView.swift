@@ -198,7 +198,7 @@ struct ContentView: View {
     @State private var isSyncPanelPresented = false
     @FocusState private var searchFocused: Bool
 
-    private let detailDescriptionBoxFont: Font = .system(size: 14.5, design: .serif).italic()
+    private let detailDescriptionBoxFont: Font = .system(size: 13.5, design: .serif).italic()
     private let tweetDescriptionFont: Font = .body
     private let toolbarSources: [Source] = [.installed, .available]
     private let friendShareText = "I use omgskills.com to find skills and it doesn't suck"
