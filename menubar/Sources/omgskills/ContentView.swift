@@ -1099,6 +1099,8 @@ struct ContentView: View {
                             skillTitleView(for: skill)
                             detailMetadataLine(for: skill)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .layoutPriority(1)
                         Spacer()
                         Button("Close", systemImage: "arrow.left.to.line.compact") {
                             withAnimation(.easeInOut(duration: 0.15)) { showDetail = false }
@@ -1187,22 +1189,6 @@ struct ContentView: View {
                             )
                     }
 
-                    // Tags
-                    if !skill.tags.isEmpty {
-                        FlowLayout(spacing: 6) {
-                            ForEach(skill.tags, id: \.self) { tag in
-                                Text(tag)
-                                    .font(.system(size: 9))
-                                    .padding(.horizontal, 5)
-                                    .padding(.vertical, 2)
-                                    .background(Capsule().fill(.quaternary.opacity(0.5)))
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-
-                    updatedAgeLabel(for: skill)
-
                     if isLoadingReadme {
                         ProgressView()
                             .controlSize(.small)
@@ -1231,18 +1217,28 @@ struct ContentView: View {
     @ViewBuilder
     private func skillTitleView(for skill: Skill) -> some View {
         if !skill.githubUrl.isEmpty, let url = URL(string: skill.githubUrl) {
-            Link(skill.name, destination: url)
-                .font(.system(size: 22, weight: .semibold))
-                .tracking(-0.2)
-                .lineSpacing(4)
-                .foregroundStyle(AppUIStyle.detailTitleText)
+            Button {
+                NSWorkspace.shared.open(url)
+            } label: {
+                skillTitleText(skill.name)
+            }
+            .buttonStyle(.plain)
+            .help("Open GitHub")
         } else {
-            Text(skill.name)
-                .font(.system(size: 22, weight: .semibold))
-                .tracking(-0.2)
-                .lineSpacing(4)
-                .foregroundStyle(AppUIStyle.detailTitleText)
+            skillTitleText(skill.name)
         }
+    }
+
+    private func skillTitleText(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 22, weight: .semibold))
+            .tracking(-0.2)
+            .lineLimit(1)
+            .minimumScaleFactor(0.35)
+            .allowsTightening(true)
+            .truncationMode(.tail)
+            .foregroundStyle(AppUIStyle.detailTitleText)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func detailMetadataLine(for skill: Skill) -> some View {
@@ -1255,6 +1251,12 @@ struct ContentView: View {
 
             Label(formatCompactCount(skill.stars), systemImage: "star.fill")
                 .labelStyle(.titleAndIcon)
+
+            if relativeUpdatedAge(skill.lastUpdated) != nil {
+                Text("•")
+                    .foregroundStyle(.tertiary)
+                updatedAgeLabel(for: skill)
+            }
         }
         .font(.system(size: 12.5))
         .foregroundStyle(.secondary)
@@ -1266,7 +1268,7 @@ struct ContentView: View {
         if let updatedAge = relativeUpdatedAge(skill.lastUpdated) {
             Text("Updated \(updatedAge) ago")
                 .font(.system(size: 9))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.tertiary)
                 .lineLimit(1)
         }
     }

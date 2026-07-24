@@ -11,7 +11,7 @@ enum AppUIStyle {
     static let descriptionBoxBackground = Color(
         nsColor: .dynamicColor(
             light: .hex(0xF7F7F7),
-            dark: NSColor.controlBackgroundColor.withAlphaComponent(0.36)
+            dark: .white.withAlphaComponent(0.055)
         )
     )
 }
