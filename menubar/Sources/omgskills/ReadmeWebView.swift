@@ -56,6 +56,34 @@ struct ReadmeWebView: NSViewRepresentable {
           } else {
             document.getElementById('root').textContent = `\(escaped)`;
           }
+          function isEmptyDecorativeBlock(element) {
+            if (!['P', 'DIV'].includes(element.tagName)) {
+              return false;
+            }
+
+            const clone = element.cloneNode(true);
+            clone.querySelectorAll('img, picture, svg, br').forEach((node) => node.remove());
+            clone.querySelectorAll('a, span').forEach((node) => {
+              if (!node.textContent.trim() && node.children.length === 0) {
+                node.remove();
+              }
+            });
+
+            return clone.textContent.trim().length === 0 &&
+              clone.querySelectorAll('img, picture, svg, a, span').length === 0;
+          }
+
+          function removeLeadingDecorations() {
+            const root = document.getElementById('root');
+            Array.from(root.children).slice(0, 10).forEach((element) => {
+              if (isEmptyDecorativeBlock(element)) {
+                element.remove();
+              }
+            });
+          }
+
+          removeLeadingDecorations();
+
           function reportHeight() {
             window.webkit.messageHandlers.heightBridge.postMessage(document.documentElement.scrollHeight);
           }
@@ -141,7 +169,7 @@ struct ReadmeWebView: NSViewRepresentable {
           color: var(--muted);
         }
         hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
-        img { display: none; }
+        img, picture, svg { display: none; }
         table { border-collapse: collapse; width: 100%; font-size: 12px; margin: 6px 0; }
         th, td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
         th { background: var(--code-bg); font-weight: 600; }
