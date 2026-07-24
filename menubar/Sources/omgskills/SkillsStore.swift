@@ -22,6 +22,7 @@ final class SkillsStore: ObservableObject {
     @Published private(set) var trendingSearchIndex: SkillSearchIndex?
     @Published private(set) var twitterSearchIndex: SkillSearchIndex?
     @Published private(set) var searchIndexVersion = 0
+    private var availableSkillsById: [String: Skill] = [:]
     private var trendingEntries: [TrendingEntry] = []
     private var trendingBaseSkills: [Skill] = []
     private var shaHistory: ShaHistoryAsset?
@@ -147,6 +148,7 @@ final class SkillsStore: ObservableObject {
             loadedAvailableCatalog = true
             hasLoadedIdentityCatalog = !skills.isEmpty
             availableSkills = skills.sorted { $0.stars > $1.stars }
+            availableSkillsById = Dictionary(uniqueKeysWithValues: skills.map { ($0.id, $0) })
             trendingBaseSkills = skills
             loadError = nil
             if buildIndexes {
@@ -213,6 +215,11 @@ final class SkillsStore: ObservableObject {
 
     func collection(id: String) -> SkillCollection? {
         collections.first { $0.id == id }
+    }
+
+    func catalogSkill(for installedSkill: Skill) -> Skill? {
+        guard let catalogSkillId = installedSkill.catalogSkillId else { return nil }
+        return availableSkillsById[catalogSkillId]
     }
 
     func authorCollection(for handle: String) -> SkillCollection? {

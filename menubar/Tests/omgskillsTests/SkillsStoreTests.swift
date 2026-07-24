@@ -319,6 +319,39 @@ struct SkillsStoreTests {
         #expect(store.installedSkillInstallations.allSatisfy { $0.identityStatus == .resolved(method: .git) })
     }
 
+    @Test func resolvedInstalledSkillExposesCatalogMetadata() {
+        let store = makeStore()
+        let catalog = skill(name: "review", stars: 42)
+        store.applyDecodedLibraryData(
+            available: .success([catalog]),
+            trending: .success([]),
+            twitter: .success([]),
+            buildIndexes: false
+        )
+
+        let installed = installedSkill(
+            name: "review",
+            origin: "Codex",
+            catalogSkillId: catalog.id
+        )
+
+        #expect(store.catalogSkill(for: installed)?.stars == 42)
+    }
+
+    @Test func unresolvedInstalledSkillHasNoCatalogMetadata() {
+        let store = makeStore()
+        store.applyDecodedLibraryData(
+            available: .success([skill(name: "catalog-skill", stars: 42)]),
+            trending: .success([]),
+            twitter: .success([]),
+            buildIndexes: false
+        )
+
+        let installed = installedSkill(name: "local-skill", origin: "Codex")
+
+        #expect(store.catalogSkill(for: installed) == nil)
+    }
+
     @Test func completedEmptyScanProducesReadyEmptySnapshot() {
         let store = makeStore()
 

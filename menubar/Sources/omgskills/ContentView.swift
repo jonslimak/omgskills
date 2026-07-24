@@ -1242,25 +1242,42 @@ struct ContentView: View {
     }
 
     private func detailMetadataLine(for skill: Skill) -> some View {
-        HStack(spacing: 5) {
-            if hasDetailAttribution(for: skill) {
+        let hasAttribution = hasDetailAttribution(for: skill)
+        let starCount = detailStarCount(for: skill)
+        let hasUpdatedAge = relativeUpdatedAge(skill.lastUpdated) != nil
+
+        return HStack(spacing: 5) {
+            if hasAttribution {
                 authorAttributionButton(for: skill)
-                Text("•")
-                    .foregroundStyle(.tertiary)
             }
 
-            Label(formatCompactCount(skill.stars), systemImage: "star.fill")
-                .labelStyle(.titleAndIcon)
+            if let starCount {
+                if hasAttribution {
+                    metadataSeparator
+                }
+                Label(formatCompactCount(starCount), systemImage: "star.fill")
+                    .labelStyle(.titleAndIcon)
+            }
 
-            if relativeUpdatedAge(skill.lastUpdated) != nil {
-                Text("•")
-                    .foregroundStyle(.tertiary)
+            if hasUpdatedAge {
+                if hasAttribution || starCount != nil {
+                    metadataSeparator
+                }
                 updatedAgeLabel(for: skill)
             }
         }
         .font(.system(size: 12.5))
         .foregroundStyle(.secondary)
         .lineLimit(1)
+    }
+
+    private var metadataSeparator: some View {
+        Text("•")
+            .foregroundStyle(.tertiary)
+    }
+
+    private func detailStarCount(for skill: Skill) -> Int? {
+        source == .installed ? store.catalogSkill(for: skill)?.stars : skill.stars
     }
 
     @ViewBuilder
