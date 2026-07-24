@@ -91,10 +91,11 @@ struct ReadmeWebView: NSViewRepresentable {
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-          font-family: "New York", ui-serif, Georgia, serif;
+          font-family: ui-serif, Georgia, serif;
           font-size: 12.5px;
           line-height: 1.68;
           color: var(--text);
+          -webkit-font-smoothing: antialiased;
           background: transparent;
           word-wrap: break-word;
           overflow: hidden;

@@ -87,6 +87,7 @@ struct CollectionCard: View {
 struct CollectionPageView: View {
     let collection: SkillCollection
     let featuredSkills: [Skill]
+    let selectedSkillId: String?
     let onSelectSkill: (Skill) -> Void
     let onCreatorTap: (String) -> Void
     let onSeeAll: () -> Void
@@ -105,20 +106,25 @@ struct CollectionPageView: View {
                         .textSelection(.enabled)
                 }
 
-                Button(action: onSeeAll) {
-                    Label(seeAllTitle, systemImage: "arrow.right")
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .accessibilityHint("Shows every skill in this collection")
-
                 Divider()
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Featured")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.tertiary)
+                    HStack {
+                        Text("Featured")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.tertiary)
+
+                        Spacer()
+
+                        Button("See all", action: onSeeAll)
+                            .buttonStyle(.plain)
+                            .font(.caption)
+                            .foregroundStyle(AppUIStyle.activeBlue)
+                            .accessibilityLabel(seeAllTitle)
+                            .accessibilityHint("Shows every skill in this collection")
+                    }
+                    .frame(maxWidth: .infinity)
 
                     if featuredSkills.isEmpty {
                         Text("No matching skills found")
@@ -129,8 +135,9 @@ struct CollectionPageView: View {
                             ForEach(featuredSkills) { skill in
                                 SkillRow(
                                     skill: skill,
-                                    selected: false,
+                                    selected: skill.id == selectedSkillId,
                                     source: .available,
+                                    showsCreator: false,
                                     onSelect: { onSelectSkill(skill) },
                                     onCreatorTap: onCreatorTap
                                 )
@@ -156,7 +163,9 @@ struct CollectionPageView: View {
                         .foregroundStyle(.tertiary)
                     Text(collection.title)
                         .font(.system(size: 28, weight: .bold))
-                        .lineLimit(2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .allowsTightening(true)
                     Text(collection.subtitle)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -174,8 +183,6 @@ struct CollectionPageView: View {
                     .contentShape(Circle())
                     .help("Close")
             }
-
-            Divider()
         }
         .accessibilityElement(children: .combine)
     }

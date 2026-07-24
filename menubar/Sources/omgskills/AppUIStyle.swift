@@ -7,7 +7,12 @@ enum AppUIStyle {
     static let selectedSecondaryText = Color.white.opacity(0.78)
     static let selectedTertiaryText = Color.white.opacity(0.62)
     static let detailTitleText = Color(nsColor: .dynamicColor(light: .hex(0x1D1D1F), dark: .labelColor))
-    static let detailBodyText = Color(nsColor: .dynamicColor(light: .hex(0x3A3A3C), dark: .labelColor))
+    static let detailBodyText = Color(
+        nsColor: .dynamicColor(
+            light: .hex(0x3A3A3C),
+            dark: .white.withAlphaComponent(0.85)
+        )
+    )
     static let descriptionBoxBackground = Color(
         nsColor: .dynamicColor(
             light: .hex(0xF7F7F7),

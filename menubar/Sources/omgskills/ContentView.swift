@@ -198,7 +198,7 @@ struct ContentView: View {
     @State private var isSyncPanelPresented = false
     @FocusState private var searchFocused: Bool
 
-    private let detailDescriptionBoxFont: Font = .system(size: 13.5, design: .serif).italic()
+    private let detailDescriptionBoxFont: Font = .system(size: 14.5, design: .serif).italic()
     private let tweetDescriptionFont: Font = .body
     private let toolbarSources: [Source] = [.installed, .available]
     private let friendShareText = "I use omgskills.com to find skills and it doesn't suck"
@@ -741,6 +741,7 @@ struct ContentView: View {
         CollectionPageView(
             collection: collection,
             featuredSkills: store.featuredSkills(for: collection),
+            selectedSkillId: selectedId,
             onSelectSkill: { skill in
                 selectSkillFromCollection(skill)
             },
@@ -1172,7 +1173,6 @@ struct ContentView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             ForEach(descriptionParagraphs(skill.description)) { paragraph in
                                 Text(paragraph.text)
-                                    .tracking(0.1)
                                     .lineSpacing(1)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
@@ -2769,6 +2769,7 @@ struct SkillRow: View {
     let skill: Skill
     let selected: Bool
     let source: Source
+    var showsCreator = true
     let onSelect: () -> Void
     let onCreatorTap: (String) -> Void
     private let tweetPostedAgeWidth: CGFloat = 30
@@ -2871,7 +2872,7 @@ struct SkillRow: View {
 
     @ViewBuilder
     private var creatorButton: some View {
-        if !skill.authorHandle.isEmpty {
+        if showsCreator, !skill.authorHandle.isEmpty {
             Button {
                 onCreatorTap(skill.authorHandle)
             } label: {
@@ -2883,7 +2884,7 @@ struct SkillRow: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Show all skills by @\(skill.authorHandle)")
             .help("Show all skills by @\(skill.authorHandle)")
-        } else if source == .available, let attribution = skill.discoverAttributionText {
+        } else if showsCreator, source == .available, let attribution = skill.discoverAttributionText {
             Text(attribution.replacingOccurrences(of: "via ", with: ""))
                 .font(.caption)
                 .foregroundStyle(rowTertiaryColor)
