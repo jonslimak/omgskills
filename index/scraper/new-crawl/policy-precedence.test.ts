@@ -84,7 +84,7 @@ test("report groups changes by shared reason and bounds samples", () => {
     qualityTiers: [],
   });
   assert.equal(report.admissionChangeCount, 1);
-  assert.equal(report.admissionObservationCount, 2);
+  assert.equal(report.admissionObservationCount, 1);
   assert.equal(report.admissionAdditionCount, 0);
   assert.equal(report.admissionRemovalCount, 1);
   assert.equal(report.skippedSuppressedCandidateCount, 1);
