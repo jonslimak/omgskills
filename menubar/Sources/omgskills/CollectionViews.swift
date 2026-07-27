@@ -229,7 +229,7 @@ struct CollectionAvatarView: View {
         }
         if collection.type == .author,
            let authorHandle = collection.authorHandle {
-            return URL(string: "https://github.com/\(authorHandle).png")
+            return GitHubAvatar.url(for: authorHandle)
         }
         return nil
     }

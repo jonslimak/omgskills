@@ -2893,10 +2893,13 @@ struct SkillRow: View {
             Button {
                 onCreatorTap(skill.authorHandle)
             } label: {
-                Text("@\(skill.authorHandle)")
-                    .font(.caption)
-                    .foregroundStyle(rowTertiaryColor)
-                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    GitHubAvatarView(handle: skill.authorHandle, size: 18)
+                    Text("@\(skill.authorHandle)")
+                        .font(.caption)
+                        .foregroundStyle(rowTertiaryColor)
+                        .lineLimit(1)
+                }
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Show all skills by @\(skill.authorHandle)")
