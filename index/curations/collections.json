@@ -622,6 +622,404 @@
       "featuredSkillIds": [
         "disler/claude-code-damage-control:.claude/skills/damage-control"
       ]
+    },
+    "github": {
+      "featuredSkillIds": [
+        "github/spec-kit:add-community-extension",
+        "github/awesome-copilot:skills/agent-governance",
+        "github/awesome-copilot:acquire-codebase-knowledge",
+        "github/awesome-copilot:acreadiness-assess",
+        "github/awesome-copilot:acreadiness-generate-instructions",
+        "github/awesome-copilot:acreadiness-policy",
+        "github/awesome-copilot:add-educational-comments",
+        "github/awesome-copilot:adobe-illustrator-scripting",
+        "github/awesome-copilot:agent-owasp-compliance",
+        "github/awesome-copilot:agent-supply-chain"
+      ]
+    },
+    "microsoft": {
+      "featuredSkillIds": [
+        "microsoft/vscode:fix-errors",
+        "microsoft/vscode:accessibility",
+        "microsoft/vscode:act-on-feedback",
+        "microsoft/vscode:add-policy",
+        "microsoft/vscode:agent-customization",
+        "microsoft/vscode:anthropic-sdk-upgrader",
+        "microsoft/vscode:author-contributions",
+        "microsoft/vscode:auto-perf-optimize",
+        "microsoft/vscode:azure-pipelines",
+        "microsoft/vscode:chat-customizations-editor"
+      ]
+    },
+    "google-gemini": {
+      "featuredSkillIds": [
+        "google-gemini/gemini-cli:code-reviewer",
+        "google-gemini/gemini-cli:async-pr-review",
+        "google-gemini/gemini-cli:behavioral-evals",
+        "google-gemini/gemini-cli:ci",
+        "google-gemini/gemini-cli:docs-changelog",
+        "google-gemini/gemini-cli:docs-writer",
+        "google-gemini/gemini-cli:github-issue-creator",
+        "google-gemini/gemini-cli:greeter",
+        "google-gemini/gemini-cli:pirate-skill",
+        "google-gemini/gemini-cli:pr-address-comments"
+      ]
+    },
+    "googleworkspace": {
+      "featuredSkillIds": [
+        "googleworkspace/cli:gws-gmail",
+        "googleworkspace/cli:gws-admin-reports",
+        "googleworkspace/cli:gws-calendar",
+        "googleworkspace/cli:gws-calendar-agenda",
+        "googleworkspace/cli:gws-calendar-insert",
+        "googleworkspace/cli:gws-chat",
+        "googleworkspace/cli:gws-chat-send",
+        "googleworkspace/cli:gws-classroom",
+        "googleworkspace/cli:gws-docs",
+        "googleworkspace/cli:gws-docs-write"
+      ]
+    },
+    "facebook": {
+      "featuredSkillIds": [
+        "facebook/react:extract-errors",
+        "facebook/react:feature-flags",
+        "facebook/react:flags",
+        "facebook/react:flow",
+        "facebook/react:test",
+        "facebook/react:verify",
+        "facebook/react:.claude/skills/fix",
+        "facebook/relay:relay-best-practices",
+        "facebook/buck2:buck2-rule-basics"
+      ]
+    },
+    "react": {
+      "featuredSkillIds": [
+        "react/react:extract-errors",
+        "react/react:feature-flags",
+        "react/react:fix",
+        "react/react:flags",
+        "react/react:flow",
+        "react/react:test",
+        "react/react:verify"
+      ]
+    },
+    "google-labs-code": {
+      "featuredSkillIds": [
+        "google-labs-code/design.md:typed-service-contracts",
+        "google-labs-code/design.md:agent-dx-cli-scale",
+        "google-labs-code/design.md:ink",
+        "google-labs-code/stitch-skills:design-md",
+        "google-labs-code/stitch-skills:enhance-prompt",
+        "google-labs-code/stitch-skills:react-components",
+        "google-labs-code/stitch-skills:remotion",
+        "google-labs-code/stitch-skills:shadcn-ui",
+        "google-labs-code/stitch-skills:stitch-design",
+        "google-labs-code/stitch-skills:stitch-loop"
+      ]
+    },
+    "n8n-io": {
+      "featuredSkillIds": [
+        "n8n-io/n8n:create-pr",
+        "n8n-io/n8n:content-design",
+        "n8n-io/n8n:create-issue",
+        "n8n-io/n8n:create-skill",
+        "n8n-io/n8n:data-table-manager",
+        "n8n-io/n8n:experiments",
+        "n8n-io/n8n:linear-issue",
+        "n8n-io/n8n:loom-transcript",
+        "n8n-io/n8n:n8n-cli",
+        "n8n-io/n8n:n8n:create-community-node-lint-rule"
+      ]
+    },
+    "expo": {
+      "featuredSkillIds": [
+        "expo/expo:android-e2e-testing",
+        "expo/expo:deep-code-review",
+        "expo/expo:expo-api-docs",
+        "expo/skills:building-native-ui",
+        "expo/skills:eas-update-insights",
+        "expo/skills:expo-api-routes",
+        "expo/skills:expo-cicd-workflows",
+        "expo/skills:expo-deployment",
+        "expo/skills:expo-dev-client",
+        "expo/skills:expo-module"
+      ]
+    },
+    "pytorch": {
+      "featuredSkillIds": [
+        "pytorch/pytorch:skill-writer",
+        "pytorch/pytorch:add-uint-support",
+        "pytorch/pytorch:aoti-debug",
+        "pytorch/pytorch:at-dispatch-v2",
+        "pytorch/pytorch:distributed-triage",
+        "pytorch/pytorch:docstring",
+        "pytorch/pytorch:document-public-apis",
+        "pytorch/pytorch:fix-issue",
+        "pytorch/pytorch:metal-kernel",
+        "pytorch/pytorch:pr-review"
+      ]
+    },
+    "firecrawl": {
+      "featuredSkillIds": [
+        "firecrawl/firecrawl-agent:competitor-analysis",
+        "firecrawl/firecrawl-agent:deep-research",
+        "firecrawl/firecrawl-agent:e-commerce",
+        "firecrawl/firecrawl-agent:financial-research",
+        "firecrawl/firecrawl-agent:pricing-tracker",
+        "firecrawl/firecrawl-agent:structured-extraction",
+        "firecrawl/cli:firecrawl",
+        "firecrawl/cli:firecrawl-agent",
+        "firecrawl/cli:firecrawl-crawl",
+        "firecrawl/cli:firecrawl-download"
+      ]
+    },
+    "firebase": {
+      "featuredSkillIds": [
+        "firebase/genkit:developing-genkit-tooling",
+        "firebase/firebase-tools:resolve-docker-vulnerabilities",
+        "firebase/skills:firebase-ai-logic",
+        "firebase/skills:firebase-app-hosting-basics",
+        "firebase/skills:firebase-auth-basics",
+        "firebase/skills:firebase-basics",
+        "firebase/skills:firebase-crashlytics",
+        "firebase/skills:firebase-data-connect",
+        "firebase/skills:firebase-firestore",
+        "firebase/skills:firebase-hosting-basics"
+      ]
+    },
+    "supabase": {
+      "featuredSkillIds": [
+        "supabase/supabase:vitest",
+        "supabase/supabase:dev-toolbar-review",
+        "supabase/supabase:e2e-studio-tests",
+        "supabase/supabase:safe-sql-execution",
+        "supabase/supabase:studio-error-handling",
+        "supabase/supabase:studio-queries",
+        "supabase/supabase:studio-testing",
+        "supabase/supabase:studio-ui-patterns",
+        "supabase/supabase:telemetry-standards",
+        "supabase/supabase:vercel-composition-patterns"
+      ]
+    },
+    "stripe": {
+      "featuredSkillIds": [
+        "stripe/ai:connect-recommend",
+        "stripe/ai:stripe-best-practices",
+        "stripe/ai:stripe-directory",
+        "stripe/ai:stripe-projects",
+        "stripe/ai:upgrade-stripe",
+        "stripe/link-cli:create-payment-credential",
+        "stripe/purl:pay-for-http-request"
+      ]
+    },
+    "cloudflare": {
+      "featuredSkillIds": [
+        "cloudflare/moltworker:cloudflare-browser",
+        "cloudflare/moltworker:skills/cloudflare-browser",
+        "cloudflare/vinext:migrate-to-vinext",
+        "cloudflare/workerd:add-autogate",
+        "cloudflare/workerd:add-compat-flag",
+        "cloudflare/workerd:bazel-test-hygiene",
+        "cloudflare/workerd:commit-categories",
+        "cloudflare/workerd:dad-jokes",
+        "cloudflare/workerd:find-and-run-tests",
+        "cloudflare/workerd:identify-reviewer"
+      ]
+    },
+    "getsentry": {
+      "featuredSkillIds": [
+        "getsentry/sentry:cell-architecture",
+        "getsentry/sentry:cmdk-actions",
+        "getsentry/sentry:design-system",
+        "getsentry/sentry:django-models",
+        "getsentry/sentry:generate-frontend-forms",
+        "getsentry/sentry:generate-migration",
+        "getsentry/sentry:generate-snapshot-tests",
+        "getsentry/sentry:hybrid-cloud-outboxes",
+        "getsentry/sentry:hybrid-cloud-rpc",
+        "getsentry/sentry:hybrid-cloud-test-gen"
+      ]
+    },
+    "vercel": {
+      "featuredSkillIds": [
+        "vercel/turbo:turborepo",
+        "vercel/ai:add-provider-package",
+        "vercel/ai:adr-skill",
+        "vercel/vercel:vercel-cli",
+        "vercel/next-forge:next-forge",
+        "vercel/streamdown:streamdown",
+        "vercel/examples:web-design-guidelines",
+        "vercel/eve:eve",
+        "vercel/ai-elements:ai-elements",
+        "vercel/workflow:internal-dev-workbench"
+      ]
+    },
+    "vercel-labs": {
+      "featuredSkillIds": [
+        "vercel-labs/agent-browser:skills/agent-browser",
+        "vercel-labs/agent-browser:agentcore",
+        "vercel-labs/agent-browser:core",
+        "vercel-labs/agent-browser:dogfood",
+        "vercel-labs/agent-browser:electron",
+        "vercel-labs/agent-browser:slack",
+        "vercel-labs/agent-browser:vercel-sandbox",
+        "vercel-labs/claude-skills:deploy-to-vercel",
+        "vercel-labs/claude-skills:vercel-cli-with-tokens",
+        "vercel-labs/claude-skills:vercel-composition-patterns"
+      ]
+    },
+    "posthog": {
+      "featuredSkillIds": [
+        "posthog/posthog:implementing-agent-modes",
+        "posthog/posthog:adding-personhog-rpc",
+        "posthog/posthog:adopting-generated-api-types",
+        "posthog/posthog:analyzing-experiment-session-replays",
+        "posthog/posthog:auditing-experiments-flags",
+        "posthog/posthog:authoring-log-alerts",
+        "posthog/posthog:check-posthog-loading",
+        "posthog/posthog:cleaning-up-stale-feature-flags",
+        "posthog/posthog:clickhouse-migrations",
+        "posthog/posthog:configuring-experiment-analytics"
+      ]
+    },
+    "huggingface": {
+      "featuredSkillIds": [
+        "huggingface/transformers:add-or-fix-type-checking",
+        "huggingface/sentence-transformers:train-sentence-transformers",
+        "huggingface/trl:trl-training",
+        "huggingface/skills:hf-cli",
+        "huggingface/chat-ui:add-model-descriptions",
+        "huggingface/skills:hf-mcp",
+        "huggingface/skills:huggingface-best",
+        "huggingface/skills:huggingface-community-evals",
+        "huggingface/skills:huggingface-datasets",
+        "huggingface/skills:huggingface-gradio"
+      ]
+    },
+    "flutter": {
+      "featuredSkillIds": [
+        "flutter/flutter:rebuilding-flutter-tool",
+        "flutter/flutter:upgrade-browser",
+        "flutter/flutter:dart-log-failure-parser",
+        "flutter/flutter:find-release",
+        "flutter/flutter:flutter-pr-checks-finder",
+        "flutter/website:proofread-markdown",
+        "flutter/website:update-llms-text",
+        "flutter/website:validate-pr",
+        "flutter/skills:add-dart-lint-validation-rule",
+        "flutter/agent-plugins:dart-add-unit-test"
+      ]
+    },
+    "automattic": {
+      "featuredSkillIds": [
+        "automattic/wp-calypso:calypso-react-query-migration",
+        "automattic/wp-calypso:dashboard-create-screen",
+        "automattic/wp-calypso:fix-e2e-tests",
+        "automattic/wp-calypso:help-center-ui-test",
+        "automattic/wp-calypso:reader-protocol-pr-review",
+        "automattic/wordpress-activitypub:code-style",
+        "automattic/wordpress-activitypub:dev",
+        "automattic/wordpress-activitypub:federation",
+        "automattic/wordpress-activitypub:gitattributes",
+        "automattic/wordpress-activitypub:integrations"
+      ]
+    },
+    "trailofbits": {
+      "featuredSkillIds": [
+        "trailofbits/skills:address-sanitizer",
+        "trailofbits/skills:aflpp",
+        "trailofbits/skills:agentic-actions-auditor",
+        "trailofbits/skills:algorand-vulnerability-scanner",
+        "trailofbits/skills:ask-questions-if-underspecified",
+        "trailofbits/skills:atheris",
+        "trailofbits/skills:audit-augmentation",
+        "trailofbits/skills:audit-context-building",
+        "trailofbits/skills:audit-prep-assistant",
+        "trailofbits/skills:burpsuite-project-parser"
+      ]
+    },
+    "langchain-ai": {
+      "featuredSkillIds": [
+        "langchain-ai/deepagents:arxiv-search",
+        "langchain-ai/deepagents:blog-post",
+        "langchain-ai/deepagents:code-review",
+        "langchain-ai/deepagents:coding-prefs",
+        "langchain-ai/deepagents:competitor-analysis",
+        "langchain-ai/deepagents:cudf-analytics",
+        "langchain-ai/deepagents:cuml-machine-learning",
+        "langchain-ai/deepagents:data-visualization",
+        "langchain-ai/deepagents:gpu-document-processing",
+        "langchain-ai/deepagents:langgraph-docs"
+      ]
+    },
+    "clickhouse": {
+      "featuredSkillIds": [
+        "clickhouse/clickhouse:review",
+        "clickhouse/clickhouse:alloc-profile",
+        "clickhouse/clickhouse:bisect",
+        "clickhouse/clickhouse:clickhouse-pr-description",
+        "clickhouse/clickhouse:close-flaky-issues",
+        "clickhouse/clickhouse:continue-pr",
+        "clickhouse/clickhouse:cpu-profile",
+        "clickhouse/clickhouse:create-worktree",
+        "clickhouse/clickhouse:edit-changelog",
+        "clickhouse/clickhouse:fix-sync"
+      ]
+    },
+    "lobehub": {
+      "featuredSkillIds": [
+        "lobehub/lobehub:zustand",
+        "lobehub/lobehub:add-provider-doc",
+        "lobehub/lobehub:add-setting-env",
+        "lobehub/lobehub:data-fetching",
+        "lobehub/lobehub:debug",
+        "lobehub/lobehub:desktop",
+        "lobehub/lobehub:drizzle",
+        "lobehub/lobehub:hotkey",
+        "lobehub/lobehub:i18n",
+        "lobehub/lobehub:linear"
+      ]
+    },
+    "heygen-com": {
+      "featuredSkillIds": [
+        "heygen-com/hyperframes:hyperframes",
+        "heygen-com/hyperframes:website-to-hyperframes",
+        "heygen-com/hyperframes:animejs",
+        "heygen-com/hyperframes:css-animations",
+        "heygen-com/hyperframes:gsap",
+        "heygen-com/hyperframes:hyperframes-cli",
+        "heygen-com/hyperframes:hyperframes-media",
+        "heygen-com/hyperframes:hyperframes-registry",
+        "heygen-com/hyperframes:lottie",
+        "heygen-com/hyperframes:tailwind"
+      ]
+    },
+    "browser-use": {
+      "featuredSkillIds": [
+        "browser-use/browser-use:browser-use",
+        "browser-use/browser-use:cloud",
+        "browser-use/browser-use:open-source",
+        "browser-use/browser-use:remote-browser",
+        "browser-use/video-use:manim-video",
+        "browser-use/video-use",
+        "browser-use/browser-harness",
+        "browser-use/browser-harness-js",
+        "browser-use/browsercode:effect"
+      ]
+    },
+    "warpdotdev": {
+      "featuredSkillIds": [
+        "warpdotdev/warp:add-telemetry",
+        "warpdotdev/oz-skills:seo-aeo-audit",
+        "warpdotdev/oz-for-oss:triage-issue",
+        "warpdotdev/common-skills:brandalf",
+        "warpdotdev/common-skills:check-impl-against-spec",
+        "warpdotdev/common-skills:complain",
+        "warpdotdev/common-skills:council",
+        "warpdotdev/common-skills:create-pr",
+        "warpdotdev/common-skills:cross-critique",
+        "warpdotdev/common-skills:diagnose-ci-failures"
+      ]
     }
   },
   "collections": [
