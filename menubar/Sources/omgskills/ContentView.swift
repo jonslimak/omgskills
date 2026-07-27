@@ -1502,9 +1502,7 @@ struct ContentView: View {
                 openAuthorOrFilter(skill.authorHandle)
             } label: {
                 HStack(spacing: 5) {
-                    if let featuredCollection {
-                        CollectionAvatarView(collection: featuredCollection, size: 18)
-                    }
+                    GitHubAvatarView(handle: skill.authorHandle, size: 18)
                     Text("@\(skill.authorHandle)")
                 }
                 .foregroundStyle(.secondary)
