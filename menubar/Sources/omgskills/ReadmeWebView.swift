@@ -52,34 +52,53 @@ struct ReadmeWebView: NSViewRepresentable {
         <script>
           if (window.marked) {
             marked.use({ breaks: true, gfm: true });
-            document.getElementById('root').innerHTML = marked.parse(`\(escaped)`);
+            const renderer = new marked.Renderer();
+            renderer.image = () => '';
+            document.getElementById('root').innerHTML = marked.parse(`\(escaped)`, { renderer });
           } else {
             document.getElementById('root').textContent = `\(escaped)`;
           }
+          function pruneEmptyWrappers(root) {
+            const selectors = 'a, span, figure, p, div, td, th, tr, tbody, thead, table';
+            const decorativeTags = new Set(['A', 'SPAN', 'BR', 'FIGURE', 'P', 'DIV', 'TD', 'TH', 'TR', 'TBODY', 'THEAD', 'TABLE']);
+            function hasOnlyDecorativeDescendants(node) {
+              return Array.from(node.querySelectorAll('*')).every((child) => decorativeTags.has(child.tagName));
+            }
+            let removed = true;
+            while (removed) {
+              removed = false;
+              Array.from(root.querySelectorAll(selectors)).reverse().forEach((node) => {
+                if (!node.textContent.trim() && (node.children.length === 0 || hasOnlyDecorativeDescendants(node))) {
+                  node.remove();
+                  removed = true;
+                }
+              });
+            }
+          }
+
           function isEmptyDecorativeBlock(element) {
-            if (!['P', 'DIV'].includes(element.tagName)) {
+            if (!['P', 'DIV', 'FIGURE', 'TABLE'].includes(element.tagName)) {
               return false;
             }
 
             const clone = element.cloneNode(true);
             clone.querySelectorAll('img, picture, svg, br').forEach((node) => node.remove());
-            clone.querySelectorAll('a, span').forEach((node) => {
-              if (!node.textContent.trim() && node.children.length === 0) {
-                node.remove();
-              }
-            });
+            pruneEmptyWrappers(clone);
 
             return clone.textContent.trim().length === 0 &&
-              clone.querySelectorAll('img, picture, svg, a, span').length === 0;
+              clone.querySelectorAll('img, picture, svg, a, span, figure, table').length === 0;
           }
 
           function removeLeadingDecorations() {
             const root = document.getElementById('root');
-            Array.from(root.children).slice(0, 10).forEach((element) => {
+            root.querySelectorAll('img, picture, svg').forEach((node) => node.remove());
+            pruneEmptyWrappers(root);
+            Array.from(root.children).slice(0, 12).forEach((element) => {
               if (isEmptyDecorativeBlock(element)) {
                 element.remove();
               }
             });
+            pruneEmptyWrappers(root);
           }
 
           removeLeadingDecorations();
