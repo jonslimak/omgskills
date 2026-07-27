@@ -1096,7 +1096,7 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     // Name + metadata
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 6) {
                             skillTitleView(for: skill)
                             detailMetadataLine(for: skill)
                         }
@@ -1187,6 +1187,7 @@ struct ContentView: View {
                                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                                     .fill(AppUIStyle.descriptionBoxBackground)
                             )
+                            .padding(.bottom, 16)
                     }
 
                     if isLoadingReadme {
@@ -1244,23 +1245,37 @@ struct ContentView: View {
     private func detailMetadataLine(for skill: Skill) -> some View {
         let hasAttribution = hasDetailAttribution(for: skill)
         let starCount = detailStarCount(for: skill)
+        let featuredAuthorCollection = featuredAuthorCollection(for: skill)
+        let isFeaturedCreator = featuredAuthorCollection != nil
         let hasUpdatedAge = relativeUpdatedAge(skill.lastUpdated) != nil
 
         return HStack(spacing: 5) {
             if hasAttribution {
-                authorAttributionButton(for: skill)
+                authorAttributionButton(for: skill, featuredCollection: featuredAuthorCollection)
             }
 
             if let starCount {
                 if hasAttribution {
                     metadataSeparator
                 }
-                Label(formatCompactCount(starCount), systemImage: "star.fill")
-                    .labelStyle(.titleAndIcon)
+                HStack(spacing: 4) {
+                    Image(systemName: "star")
+                        .font(.system(size: 11))
+                    Text(formatCompactCount(starCount))
+                }
+            }
+
+            if isFeaturedCreator {
+                if hasAttribution || starCount != nil {
+                    metadataSeparator
+                }
+                Image(systemName: "crown")
+                    .font(.system(size: 11))
+                    .accessibilityLabel("Featured creator")
             }
 
             if hasUpdatedAge {
-                if hasAttribution || starCount != nil {
+                if hasAttribution || starCount != nil || isFeaturedCreator {
                     metadataSeparator
                 }
                 updatedAgeLabel(for: skill)
@@ -1278,6 +1293,11 @@ struct ContentView: View {
 
     private func detailStarCount(for skill: Skill) -> Int? {
         source == .installed ? store.catalogSkill(for: skill)?.stars : skill.stars
+    }
+
+    private func featuredAuthorCollection(for skill: Skill) -> SkillCollection? {
+        guard !skill.authorHandle.isEmpty else { return nil }
+        return store.authorCollection(for: skill.authorHandle)
     }
 
     @ViewBuilder
@@ -1473,13 +1493,21 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    private func authorAttributionButton(for skill: Skill) -> some View {
+    private func authorAttributionButton(
+        for skill: Skill,
+        featuredCollection: SkillCollection? = nil
+    ) -> some View {
         if !skill.authorHandle.isEmpty {
             Button {
                 openAuthorOrFilter(skill.authorHandle)
             } label: {
-                Text("@\(skill.authorHandle)")
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 5) {
+                    if let featuredCollection {
+                        CollectionAvatarView(collection: featuredCollection, size: 18)
+                    }
+                    Text("@\(skill.authorHandle)")
+                }
+                .foregroundStyle(.secondary)
             }
             .font(.system(size: 12.5))
             .buttonStyle(.plain)
