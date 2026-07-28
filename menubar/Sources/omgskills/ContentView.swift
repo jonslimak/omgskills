@@ -147,6 +147,26 @@ private struct DataUpdatedFooterView: View {
     }
 }
 
+private enum CollectionsIndexKind {
+    case all
+    case creators
+    case companies
+
+    var title: String {
+        switch self {
+        case .all: return "Collections"
+        case .creators: return "Creators"
+        case .companies: return "Companies"
+        }
+    }
+}
+
+private extension Array where Element == SkillCollection {
+    func sortedByTitle() -> [SkillCollection] {
+        sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+}
+
 struct ContentView: View {
     let deviceConnectionModel: DeviceConnectionModel
     let skillGroupsAuthEnabled: Bool
@@ -191,7 +211,7 @@ struct ContentView: View {
     @State private var isApplyingCreatorFilter = false
     @State private var isApplyingCollectionSelection = false
     @State private var isApplyingCollectionQuery = false
-    @State private var isCollectionsIndexPresented = false
+    @State private var activeCollectionsIndex: CollectionsIndexKind?
     @State private var lastTrackedSearchQuery = ""
     @State private var lastTrackedSearchErrorKey = ""
     @State private var lastTrackedOpenedSkillId = ""
@@ -202,6 +222,16 @@ struct ContentView: View {
     private let tweetDescriptionFont: Font = .body
     private let toolbarSources: [Source] = [.installed, .available]
     private let friendShareText = "I use omgskills.com to find skills and it doesn't suck"
+    private let companyCollectionIds: Set<String> = [
+        "author-anthropics",
+        "author-openai",
+        "author-cursor",
+        "author-shadcn",
+        "author-nousresearch",
+        "author-paperclipai",
+        "author-higgsfield-ai",
+        "author-everyinc"
+    ]
 
     private let starterSearchGroups: [(String, [StarterSearch])] = [
         ("Design + Apps", [
@@ -289,7 +319,10 @@ struct ContentView: View {
             return Array(store.allSkills(for: collection).prefix(150))
         }
 
-        let creatorFiltered = skillsFilteredBySelectedCreator(baseSkills)
+        let languageFilteredBaseSkills = source == .twitter
+            ? baseSkills.filter(\.hasEnglishLikeTweetText)
+            : baseSkills
+        let creatorFiltered = skillsFilteredBySelectedCreator(languageFilteredBaseSkills)
         let searched = store.search(query: searchQueryForResults, in: creatorFiltered, source: source, usingIndex: source != .installed)
         let sorted: [Skill] = switch sortKey {
         case .trending:
@@ -344,6 +377,26 @@ struct ContentView: View {
 
     private var usesUnifiedInstalledResults: Bool {
         source == .installed && localDashboardFilter == .all
+    }
+
+    private var isCollectionsIndexPresented: Bool {
+        activeCollectionsIndex != nil
+    }
+
+    private var collectionsForActiveIndex: [SkillCollection] {
+        guard let activeCollectionsIndex else { return [] }
+        switch activeCollectionsIndex {
+        case .all:
+            return store.collections
+        case .creators:
+            return store.collections.filter {
+                $0.type == .author && !companyCollectionIds.contains($0.id)
+            }.sortedByTitle()
+        case .companies:
+            return store.collections.filter {
+                companyCollectionIds.contains($0.id)
+            }.sortedByTitle()
+        }
     }
 
     private var visibleResultsAreEmpty: Bool {
@@ -602,7 +655,7 @@ struct ContentView: View {
                                 resetToDefaultOpenState()
                                 postDetailVisibility(false)
                             } else {
-                                isCollectionsIndexPresented = false
+                                activeCollectionsIndex = nil
                                 source = s
                             }
                         } label: {
@@ -697,7 +750,8 @@ struct ContentView: View {
             }
         } else if isCollectionsIndexPresented {
             CollectionsIndexView(
-                collections: store.collections,
+                title: activeCollectionsIndex?.title ?? "Collections",
+                collections: collectionsForActiveIndex,
                 onOpen: { collection in
                     selectCollection(collection)
                 }
@@ -780,6 +834,17 @@ struct ContentView: View {
     private var starterSearchesView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 26) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Top Creators")
+                        .font(.system(size: 10, weight: .semibold))
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.tertiary)
+                    HStack(alignment: .top, spacing: 8) {
+                        trendingStarterButton("Creators", icon: "person.crop.square", action: showCreatorCollections)
+                        trendingStarterButton("Companies", icon: "building.2", action: showCompanyCollections)
+                    }
+                }
+
                 ForEach(starterSearchGroups, id: \.0) { group in
                     VStack(alignment: .leading, spacing: 6) {
                         Text(group.0)
@@ -2170,7 +2235,7 @@ struct ContentView: View {
     }
 
     private func runStarterSearch(_ term: String) {
-        isCollectionsIndexPresented = false
+        activeCollectionsIndex = nil
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
@@ -2185,7 +2250,7 @@ struct ContentView: View {
     }
 
     private func showTrendingSkills() {
-        isCollectionsIndexPresented = false
+        activeCollectionsIndex = nil
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
@@ -2201,7 +2266,7 @@ struct ContentView: View {
     }
 
     private func showTwitterSkills() {
-        isCollectionsIndexPresented = false
+        activeCollectionsIndex = nil
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
@@ -2217,6 +2282,18 @@ struct ContentView: View {
     }
 
     private func showCollections() {
+        showCollectionsIndex(.all)
+    }
+
+    private func showCreatorCollections() {
+        showCollectionsIndex(.creators)
+    }
+
+    private func showCompanyCollections() {
+        showCollectionsIndex(.companies)
+    }
+
+    private func showCollectionsIndex(_ kind: CollectionsIndexKind) {
         selectedCreatorHandle = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
@@ -2225,7 +2302,7 @@ struct ContentView: View {
         query = ""
         debouncedQuery = ""
         clearSelection()
-        isCollectionsIndexPresented = true
+        activeCollectionsIndex = kind
         source = .available
         sortKey = .stars
         searchFocused = false
@@ -2344,7 +2421,7 @@ struct ContentView: View {
     private func resetToDefaultOpenState() {
         isRestoringSession = true
         suppressSessionChangeHandlers = true
-        isCollectionsIndexPresented = false
+        activeCollectionsIndex = nil
         query = ""
         selectedCreatorHandle = nil
         selectedCollectionId = nil
@@ -2395,7 +2472,7 @@ struct ContentView: View {
         let handle = normalizedCreatorHandle(rawHandle)
         guard !handle.isEmpty else { return }
 
-        isCollectionsIndexPresented = false
+        activeCollectionsIndex = nil
         selectedCollectionId = nil
         activeCollectionListId = nil
         if source != .installed {
@@ -2460,7 +2537,7 @@ struct ContentView: View {
                 filterByCreator(authorHandle)
             }
         case .topic:
-            isCollectionsIndexPresented = false
+            activeCollectionsIndex = nil
             selectedCollectionId = nil
             activeCollectionListId = collection.id
             selectedCreatorHandle = nil
@@ -2860,7 +2937,6 @@ struct SkillRow: View {
                     .monospacedDigit()
                     .frame(width: trailingMetricWidth, alignment: .leading)
                 }
-                rowTextButton(skill.description, font: .system(size: 10), color: rowDescriptionColor, lineLimit: 2, fillWidth: true)
             } else {
                 HStack(spacing: 6) {
                     rowTextButton(skill.name, font: .headline, color: rowPrimaryColor, lineLimit: 1)
