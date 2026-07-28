@@ -81,6 +81,7 @@ test("author override lookup is case-insensitive and alias-aware", () => {
     authorOverrides: {
       oldhandle: {
         title: "Custom",
+        xUrl: "https://x.com/OldHandle",
         featuredSkillIds: ["oldhandle/repo:one"],
       },
     },
@@ -94,6 +95,7 @@ test("author override lookup is case-insensitive and alias-aware", () => {
   const asset = buildCollectionsAsset(source, registry, skills);
 
   assert.equal(asset.collections[0].title, "Custom");
+  assert.equal(asset.collections[0].xUrl, "https://x.com/OldHandle");
   assert.deepEqual(asset.collections[0].featuredSkillIds, ["oldhandle/repo:one"]);
 });
 

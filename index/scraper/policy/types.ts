@@ -56,6 +56,7 @@ export type AuthorOverride = {
   title?: string;
   subtitle?: string;
   imageUrl?: string | null;
+  xUrl?: string | null;
   featuredSkillIds?: string[];
   description?: string | null;
 };

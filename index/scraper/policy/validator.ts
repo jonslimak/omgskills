@@ -28,6 +28,7 @@ const AUTHOR_CONFIDENCE = new Set(["high", "low"]);
 const SUPPRESSION_CONFIDENCE = new Set(["high", "medium", "low"]);
 const DO_NOT_CRAWL_REASON_SET = new Set<string>(DO_NOT_CRAWL_REASONS);
 const COLLECTION_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const X_HANDLE_PATTERN = /^[A-Za-z0-9_]{1,15}$/;
 
 type MutableIssueInput = {
   code: string;
@@ -145,6 +146,23 @@ function validateSkillIdValue(
     return null;
   }
   return normalizePolicySkillId(value);
+}
+
+function isValidXProfileUrl(value: unknown): value is string {
+  if (typeof value !== "string" || !value.trim()) return false;
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    const pathParts = url.pathname.split("/").filter(Boolean);
+    return url.protocol === "https:"
+      && (hostname === "x.com" || hostname === "twitter.com")
+      && pathParts.length === 1
+      && X_HANDLE_PATTERN.test(pathParts[0])
+      && !url.search
+      && !url.hash;
+  } catch {
+    return false;
+  }
 }
 
 function addDuplicate(
@@ -274,6 +292,15 @@ function validateCollections(loaded: LoadedPolicySources, issues: PolicyIssue[])
             `/authorOverrides/${handle}/featuredSkillIds`,
             issues,
           );
+        }
+        if (override.xUrl !== undefined && override.xUrl !== null && !isValidXProfileUrl(override.xUrl)) {
+          issues.push(issue(loaded, {
+            code: "invalid-x-profile-url",
+            source: "collections",
+            location: `/authorOverrides/${handle}/xUrl`,
+            scope: "editorial",
+            message: `Author override ${handle} xUrl must be an https://x.com/{handle} or https://twitter.com/{handle} profile URL.`,
+          }));
         }
       }
     }

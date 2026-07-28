@@ -49,6 +49,34 @@ test("accepts a valid complete policy", () => {
   assert.deepEqual(validatePolicy(fixture(), catalogContext), []);
 });
 
+test("validates author X profile URLs", () => {
+  const valid = fixture({
+    collections: {
+      authorOverrides: {
+        openai: {
+          xUrl: "https://x.com/OpenAI",
+          featuredSkillIds: ["openai/codex:review"],
+        },
+      },
+      collections: [],
+    },
+  });
+  assert.ok(!validatePolicy(valid, catalogContext).some((entry) => entry.code === "invalid-x-profile-url"));
+
+  const invalid = fixture({
+    collections: {
+      authorOverrides: {
+        openai: {
+          xUrl: "https://x.com/OpenAI/status/123",
+          featuredSkillIds: ["openai/codex:review"],
+        },
+      },
+      collections: [],
+    },
+  });
+  assert.ok(validatePolicy(invalid, catalogContext).some((entry) => entry.code === "invalid-x-profile-url"));
+});
+
 test("normalizes keys before detecting duplicates", () => {
   const loaded = fixture({ officialRepos: { tier1: ["OpenAI/Codex"], tier2: ["openai/codex"] } });
   assert.ok(validatePolicy(loaded).some((entry) => entry.code === "duplicate-normalized-key"));

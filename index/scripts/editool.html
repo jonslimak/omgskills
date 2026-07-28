@@ -165,6 +165,19 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function xProfileHref(value) {
+  try {
+    const url = new URL(String(value ?? ""));
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (url.protocol !== "https:" || !["x.com", "twitter.com"].includes(hostname)) return null;
+    if (parts.length !== 1 || !/^[A-Za-z0-9_]{1,15}$/.test(parts[0])) return null;
+    if (url.search || url.hash) return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}
 
 let state = null;          // { collections, creators, suppressedSkills, doNotCrawl, policyFindings, policyRevisions, gitStatus, library }
 let dirty = { collections: false, creators: false, removals: false };
@@ -357,12 +370,17 @@ function renderCollections() {
     const handle = entry.handle;
     const o = overrideFor(handle);
     const ids = o.featuredSkillIds ?? [];
+    const xHref = xProfileHref(o.xUrl);
     return `<div class="panel" data-author-panel="${esc(handle)}">
       <h3>@${esc(handle)} <span class="muted">author profile override</span>
         <button class="small" data-see-all="${esc(handle)}" style="float:right">${collectionDetailHandle?.toLowerCase() === handle.toLowerCase() ? "Hide skills" : "See all skills"}</button></h3>
       <div class="bar">
         <input data-f="subtitle" placeholder="subtitle" value="${esc(o.subtitle ?? "")}" size="28">
         <input data-f="description" placeholder="description" value="${esc(o.description ?? "")}" size="52">
+      </div>
+      <div class="bar">
+        <input data-f="xUrl" placeholder="https://x.com/handle" value="${esc(o.xUrl ?? "")}" size="34">
+        ${xHref ? `<a class="clicklink" href="${esc(xHref)}" target="_blank" rel="noopener noreferrer">Open X</a>` : '<span class="muted">Optional X profile URL</span>'}
       </div>
       <ul class="idlist">${ids.map((id, i) => `<li><button class="small" data-move="-1" data-i="${i}">↑</button>
         <button class="small" data-move="1" data-i="${i}">↓</button>
@@ -422,6 +440,10 @@ $("col-list").addEventListener("input", (e) => {
     collection[field] = e.target.value;
   }
   markDirty("collections");
+});
+
+$("col-list").addEventListener("change", (e) => {
+  if (e.target.dataset.f === "xUrl") renderCollections();
 });
 
 $("col-list").addEventListener("click", (e) => {

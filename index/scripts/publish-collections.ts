@@ -49,6 +49,7 @@ type SkillCollection = {
   subtitle: string;
   authorHandle?: string;
   imageUrl?: string | null;
+  xUrl?: string | null;
   featuredSkillIds: string[];
   skillIds?: string[];
   description?: string | null;
@@ -224,6 +225,7 @@ export function buildCollectionsAsset(source: CollectionsSource, registry: Creat
       subtitle: override.subtitle ?? `Skills by @${catalogHandle}`,
       authorHandle: catalogHandle,
       imageUrl: override.imageUrl ?? null,
+      xUrl: override.xUrl ?? null,
       featuredSkillIds,
       description: override.description ?? null,
     };
