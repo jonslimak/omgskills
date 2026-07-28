@@ -6,6 +6,12 @@ enum AppUIStyle {
     static let selectedPrimaryText = Color.white
     static let selectedSecondaryText = Color.white.opacity(0.78)
     static let selectedTertiaryText = Color.white.opacity(0.62)
+    static let feedDescriptionText = Color(
+        nsColor: .dynamicColor(
+            light: .hex(0x86868B),
+            dark: .secondaryLabelColor
+        )
+    )
     static let detailTitleText = Color(nsColor: .dynamicColor(light: .hex(0x1D1D1F), dark: .labelColor))
     static let detailBodyText = Color(
         nsColor: .dynamicColor(
