@@ -21,6 +21,17 @@ const CONTEXT_TERMS = [
   "github",
 ];
 
+export function englishOnlyXQuery(query: string): string {
+  return /(?:^|\s)lang:en(?:\s|$)/i.test(query) ? query : `${query} lang:en`;
+}
+
+export function isEnglishOnlyTweetText(text: string): boolean {
+  for (const character of text) {
+    if (/\p{Letter}/u.test(character) && !/[A-Za-z]/.test(character)) return false;
+  }
+  return true;
+}
+
 interface ScrapedTweet {
   id?: string;
   text?: string;
@@ -160,12 +171,14 @@ export async function searchXSocial(): Promise<SocialHit[]> {
     const x = await createScraper();
     if (!x) return [];
 
-    for (const query of X_QUERIES) {
+    for (const rawQuery of X_QUERIES) {
+      const query = englishOnlyXQuery(rawQuery);
       const tweets = await searchXQuery(x, query, perQuery);
       for (const tweet of tweets) {
         if ((tweet.likes ?? 0) < min) continue;
 
         const text = tweetText(tweet);
+        if (!isEnglishOnlyTweetText(text)) continue;
         if (!isRelevantSkillTweet(text)) continue;
 
         for (const id of extractRepoIds(text)) {
@@ -196,14 +209,14 @@ export async function searchTopXSkillTweets(options: {
     return [];
   }
 
-  const queries = options.queries ?? [
+  const queries = (options.queries ?? [
     '"skill" "github.com"',
     '"skills" "github.com"',
     '"SKILL.md"',
     '"skill repo" github',
     '"Claude Code" skill github',
     '"OpenAI skills" github',
-  ];
+  ]).map(englishOnlyXQuery);
   const limit = options.limit ?? DEFAULT_TOP_TWEET_LIMIT;
   const min = options.minLikes ?? minLikes();
   const max = options.maxResults ?? Math.max(DEFAULT_MAX_RESULTS, limit * 4);
@@ -221,6 +234,7 @@ export async function searchTopXSkillTweets(options: {
         if ((tweet.likes ?? 0) < min) continue;
 
         const text = tweetText(tweet);
+        if (!isEnglishOnlyTweetText(text)) continue;
         if (!text.toLowerCase().includes("skill")) continue;
 
         const hit = toTweetHit(tweet);
