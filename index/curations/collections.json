@@ -200,7 +200,7 @@
     },
     "shadcn": {
       "featuredSkillIds": [
-        "shadcn/ui:shadcn",
+        "shadcn-ui/ui:shadcn",
         "shadcn/improve:improve"
       ]
     },
@@ -842,7 +842,7 @@
     },
     "vercel": {
       "featuredSkillIds": [
-        "vercel/turbo:turborepo",
+        "vercel/turborepo:turborepo",
         "vercel/ai:add-provider-package",
         "vercel/ai:adr-skill",
         "vercel/vercel:vercel-cli",
@@ -1020,6 +1020,73 @@
         "warpdotdev/common-skills:cross-critique",
         "warpdotdev/common-skills:diagnose-ci-failures"
       ]
+    },
+    "davidondrej": {
+      "title": "David Ondrej",
+      "subtitle": "Agent orchestration and research",
+      "featuredSkillIds": [
+        "davidondrej/skills:codex-subagent",
+        "davidondrej/skills:git-worktree",
+        "davidondrej/skills:goal-loop",
+        "davidondrej/skills:gpt-review",
+        "davidondrej/skills:handoff",
+        "davidondrej/skills:launch-subagent",
+        "davidondrej/skills:browser-harness",
+        "davidondrej/skills:deep-research",
+        "davidondrej/skills:effective-agent-skills",
+        "davidondrej/skills:global-agent-guardrails"
+      ],
+      "description": "David Ondrej's skills cover agent orchestration, research, code review, worktrees, handoffs, and practical agent configuration."
+    },
+    "mengto": {
+      "title": "Meng To",
+      "subtitle": "Design and frontend workflows",
+      "featuredSkillIds": [
+        "MengTo/Skills:article-prompts-to-skills",
+        "MengTo/Skills:audit-reference-originality",
+        "MengTo/Skills:iterate-until-verified",
+        "MengTo/Skills:optimize-web-animations",
+        "MengTo/Skills:performance-profiling",
+        "MengTo/Skills:design-first-ui-prompting",
+        "MengTo/Skills:build-awwwards-quality-sites",
+        "MengTo/Skills:animation-systems",
+        "MengTo/Skills:landing-page",
+        "MengTo/Skills:threejs"
+      ],
+      "description": "Meng To's skills cover design-led prompting, frontend performance, animation systems, Three.js, landing pages, and visual quality."
+    },
+    "sunflower-of-parchman": {
+      "title": "Michael Wall",
+      "subtitle": "Codex maintenance and hygiene",
+      "featuredSkillIds": [
+        "sunflower-of-parchman/codex-hygiene"
+      ],
+      "description": "Michael Wall's Codex hygiene skill audits local context, enabled tools, plugins, and project settings when usage or configuration needs review."
+    },
+    "thedotmack": {
+      "title": "Alex Newman",
+      "subtitle": "Memory and agent workflows",
+      "featuredSkillIds": [
+        "thedotmack/claude-mem:knowledge-agent",
+        "thedotmack/claude-mem:make-plan",
+        "thedotmack/claude-mem:mem-search",
+        "thedotmack/claude-mem:pathfinder",
+        "thedotmack/claude-mem:plugin/skills/do",
+        "thedotmack/claude-mem:plugin/skills/how-it-works",
+        "thedotmack/claude-mem:plugin/skills/learn-codebase",
+        "thedotmack/claude-mem:smart-explore",
+        "thedotmack/claude-mem:timeline-report",
+        "thedotmack/crabspace-skill"
+      ],
+      "description": "Alex Newman's skills cover persistent project memory, implementation planning, codebase exploration, and agent execution workflows."
+    },
+    "onepixelaway": {
+      "title": "Tareq Ismail",
+      "subtitle": "Frontend publishing workflows",
+      "featuredSkillIds": [
+        "onepixelaway/frontend-textbooks"
+      ],
+      "description": "Tareq Ismail's frontend textbook skill turns manuscripts into designed HTML books and print-ready PDFs with layout verification."
     }
   },
   "collections": [
