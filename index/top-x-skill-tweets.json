@@ -1,5 +1,34 @@
 [
   {
+    "tweet_id": "2079943830024188105",
+    "tweet_url": "https://x.com/petergyang/status/2079943830024188105",
+    "author_handle": "petergyang",
+    "author_name": "Peter Yang",
+    "text": "I’m sick of reading AI slop, so today I’m open-sourcing my /no-ai-slop skill that removes 20+ slop patterns from any piece of writing.\n\n📌 Get the free skill here: https://t.co/UyaaNQ6kLf\n\nIf you find it useful, please consider starring the repo so more people can find it.\n\nWhy I https://t.co/FdjctCMWty https://github.com/petergyang/no-ai-slop",
+    "likes": 5293,
+    "retweets": 331,
+    "replies": 288,
+    "views": 663333,
+    "posted_at": "2026-07-22T14:57:07.000Z",
+    "repo_ids": [
+      "petergyang/no-ai-slop"
+    ],
+    "repo_urls": [
+      "https://github.com/petergyang/no-ai-slop"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "petergyang/no-ai-slop",
+        "github_url": "https://github.com/petergyang/no-ai-slop",
+        "skill_md_path": "SKILL.md",
+        "name": "no-ai-slop",
+        "description": "Edit drafts into sharper, more human writing while preserving the writer's personal voice, or detect AI-slop patterns without rewriting. Use when the user wants a draft clearer, more direct, more opinionated, or less AI-sounding, or asks whether writing reads as AI.",
+        "stars": 3151
+      }
+    ]
+  },
+  {
     "tweet_id": "2037835111358669307",
     "tweet_url": "https://x.com/jahirsheikh8/status/2037835111358669307",
     "author_handle": "jahirsheikh8",
@@ -8,7 +37,7 @@
     "likes": 2207,
     "retweets": 335,
     "replies": 46,
-    "views": 183013,
+    "views": 183016,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -37,7 +66,7 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 164730
+        "stars": 164787
       }
     ]
   },
@@ -47,10 +76,10 @@
     "author_handle": "steipete",
     "author_name": "Peter Steinberger 🦞",
     "text": "Hit a new record with our autoreview skill. 66 rounds on a gnarly refactor. https://t.co/zbUjIS2LQQ https://github.com/openclaw/agent-skills/blob/main/skills/autoreview/SKILL.md",
-    "likes": 1264,
+    "likes": 1265,
     "retweets": 74,
     "replies": 64,
-    "views": 152824,
+    "views": 153144,
     "posted_at": "2026-07-25T06:13:48.000Z",
     "repo_ids": [
       "openclaw/agent-skills"
@@ -78,286 +107,60 @@
     ]
   },
   {
-    "tweet_id": "2080494332528976233",
-    "tweet_url": "https://x.com/laobaishare/status/2080494332528976233",
-    "author_handle": "laobaishare",
-    "author_name": "老白（每日 AI 干货✊）",
-    "text": "中文内容创作者，必装的 10 个 skill\n\n1｜Humanizer-zh\n中文\"去 AI 味\"神器，专抓空话、套话、三段式、过度排比那股机器腔，改得像人写的（归藏做的汉化版）。\nhttps://t.co/VVbMotQ5EV\n\n2｜dbskill\n内容\"选题诊断器\"，帮你诊断商业表达、抠 hook、拆爆款、想小红书标题。\nhttps://t.co/NZ4qxoBL2L https://t.co/eZLsz3lE6H http://github.com/op7418/Humanizer-zh http://github.com/dontbesilent2025/dbskill",
-    "likes": 1081,
-    "retweets": 311,
-    "replies": 78,
-    "views": 57051,
-    "posted_at": "2026-07-24T03:24:37.000Z",
+    "tweet_id": "2082108076128444658",
+    "tweet_url": "https://x.com/MengTo/status/2082108076128444658",
+    "author_handle": "MengTo",
+    "author_name": "Meng To",
+    "text": "AI is terrible at writing in your voice by default.\n\nI pair these two skills together. One removes the fake insights and robotic phrasing. Mine studies my past writing and gives me five different versions that still sound like me.\n\nNo AI slop:\nhttps://t.co/jYUAvsXTUr\n\nWrite like http://github.com/petergyang/no-ai-slop",
+    "likes": 266,
+    "retweets": 8,
+    "replies": 8,
+    "views": 35031,
+    "posted_at": "2026-07-28T14:17:03.000Z",
     "repo_ids": [
-      "op7418/Humanizer-zh",
-      "dontbesilent2025/dbskill"
+      "petergyang/no-ai-slop"
     ],
     "repo_urls": [
-      "https://github.com/op7418/Humanizer-zh",
-      "https://github.com/dontbesilent2025/dbskill"
+      "https://github.com/petergyang/no-ai-slop"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "op7418/humanizer-zh",
-        "github_url": "https://github.com/op7418/Humanizer-zh",
+        "id": "petergyang/no-ai-slop",
+        "github_url": "https://github.com/petergyang/no-ai-slop",
         "skill_md_path": "SKILL.md",
-        "name": "humanizer-zh",
-        "description": "去除文本中的 AI 生成痕迹。适用于编辑或审阅文本，使其听起来更自然、更像人类书写。\n基于维基百科的\"AI 写作特征\"综合指南。检测并修复以下模式：夸大的象征意义、\n宣传性语言、以 -ing 结尾的肤浅分析、模糊的归因、破折号过度使用、三段式法则、\nAI 词汇、否定式排比、过多的连接性短语。\n",
-        "stars": 14049
+        "name": "no-ai-slop",
+        "description": "Edit drafts into sharper, more human writing while preserving the writer's personal voice, or detect AI-slop patterns without rewriting. Use when the user wants a draft clearer, more direct, more opinionated, or less AI-sounding, or asks whether writing reads as AI.",
+        "stars": 3151
       }
     ]
   },
   {
-    "tweet_id": "2081038973217145233",
-    "tweet_url": "https://x.com/yaojingang/status/2081038973217145233",
-    "author_handle": "yaojingang",
-    "author_name": "姚金刚",
-    "text": "第三场GEO公开课的相关资料合集，数据与工具越来越全了，欢迎收藏：\n\n一、数据仓库、工具与skill\n1、geo-citation-lab\nhttps://t.co/MNtFi8yNC1\n2、《国内生成式AI引用生态全景报告》\nhttps://t.co/TSqevhoLcA\n3、GEOFlow\nhttps://t.co/LYdvqIahvv\n4、yao-geo-skills\nhttps://t.co/vx2PNuN0e9 https://github.com/yaojingang/geo-citation-lab https://doc.laoyao.cn/qty18p https://github.com/yaojingang/GEOFlow https://github.com/yaojingang/yao-geo-skills",
-    "likes": 361,
-    "retweets": 73,
-    "replies": 53,
-    "views": 67967,
-    "posted_at": "2026-07-25T15:28:49.000Z",
+    "tweet_id": "2029462509317718434",
+    "tweet_url": "https://x.com/nicopreme/status/2029462509317718434",
+    "author_handle": "nicopreme",
+    "author_name": "Nico Bailon",
+    "text": "visual-explainer agent skill has crossed 5.6K stars on github🤯\n\njust updated with /share command, mermaid diagram enhancements, proper claude code plugin and codex support\nhttps://t.co/qzde42tVEV https://github.com/nicobailon/visual-explainer",
+    "likes": 115,
+    "retweets": 9,
+    "replies": 4,
+    "views": 13235,
+    "posted_at": "2026-03-05T07:42:22.000Z",
     "repo_ids": [
-      "yaojingang/geo-citation-lab",
-      "yaojingang/GEOFlow",
-      "yaojingang/yao-geo-skills"
+      "nicobailon/visual-explainer"
     ],
     "repo_urls": [
-      "https://github.com/yaojingang/geo-citation-lab",
-      "https://github.com/yaojingang/GEOFlow",
-      "https://github.com/yaojingang/yao-geo-skills"
+      "https://github.com/nicobailon/visual-explainer"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "yaojingang/geo-citation-lab",
-        "github_url": "https://github.com/yaojingang/geo-citation-lab",
-        "skill_md_path": "skills/geo-citation-lab/SKILL.md",
-        "name": "geo-citation-lab",
-        "description": "Install, open, download, or deploy GEO Citation Lab from its GitHub repository. Use when a user asks to install the lightweight offline viewer, open the research reports locally, download the full GEO citation dataset, prepare the analysis environment, or publish the viewer to GitHub Pages.",
-        "stars": 614
-      }
-    ]
-  },
-  {
-    "tweet_id": "2081397285381144950",
-    "tweet_url": "https://x.com/0xCheshire/status/2081397285381144950",
-    "author_handle": "0xCheshire",
-    "author_name": "柴郡🔔｜Crypto+AI Plus",
-    "text": "研究了一下到底该怎么去 AI 味，找到了 7 个不同的 GitHub 项目：\n\n中文改稿、英文改稿、技术写作和完整写作流程，都有对应选择。\n\n1. qu-ai-wei（299 star）\n\n中文去 AI 味 Skill，会一起处理套话、抽象表达、句子节奏和语体，改稿时也不会凭空补充事实。\n\n🔗https://t.co/CtMTDprUF4\n\n2. 说人话（818 https://t.co/IDSNQaaCw0 https://github.com/LifelongLazyLearner/qu-ai-wei",
-    "likes": 339,
-    "retweets": 79,
-    "replies": 62,
-    "views": 32966,
-    "posted_at": "2026-07-26T15:12:37.000Z",
-    "repo_ids": [
-      "LifelongLazyLearner/qu-ai-wei"
-    ],
-    "repo_urls": [
-      "https://github.com/LifelongLazyLearner/qu-ai-wei"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "lifelonglazylearner/qu-ai-wei",
-        "github_url": "https://github.com/LifelongLazyLearner/qu-ai-wei",
-        "skill_md_path": "SKILL.md",
-        "name": "qu-ai-wei",
-        "description": "去除简体中文文本里的 AI 写作痕迹,不虚构事实,让终稿干净、精准。\n触发:显式 `/qu-ai-wei`,或用户说「去 AI 味 / 改得说人话 / humanize 中文 / 改自然点 / 读着别扭 / 太生硬了」时自动调用。\n约束:按「冲突仲裁顺序」六级执行;终稿强制附打磨报告。\n范围:只支持简体中文;繁體(台 / 港用字)不自动处理。\n",
-        "stars": 320
-      }
-    ]
-  },
-  {
-    "tweet_id": "2079385875721465902",
-    "tweet_url": "https://x.com/WY_mask/status/2079385875721465902",
-    "author_handle": "WY_mask",
-    "author_name": "无颜",
-    "text": "推特必装的 10 个 Skills 推荐\n\n1、last30days  \n把过去 30 天里 X、Reddit、Hacker News、YouTube 真正在讨论的东西抓回来，还会参考真实互动量排序。找热点、挖选题特别省事。  \nhttps://t.co/ww8Kx6GcOe\n\n2、xint  \n一个 X 情报台：搜推文、查账号、拆互动、看情绪。不是凭感觉教你运营，而是直接读 https://t.co/aBscfbwLpJ https://github.com/mvanhorn/last30days-skill",
-    "likes": 337,
-    "retweets": 72,
-    "replies": 77,
-    "views": 43914,
-    "posted_at": "2026-07-21T02:00:00.000Z",
-    "repo_ids": [
-      "mvanhorn/last30days-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/mvanhorn/last30days-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "mvanhorn/last30days-skill",
-        "github_url": "https://github.com/mvanhorn/last30days-skill",
-        "skill_md_path": "skills/last30days/SKILL.md",
-        "name": "last30days",
-        "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
-        "stars": 54477
-      }
-    ]
-  },
-  {
-    "tweet_id": "2081398729274224769",
-    "tweet_url": "https://x.com/robiartec/status/2081398729274224769",
-    "author_handle": "robiartec",
-    "author_name": "rob.",
-    "text": "Lista de Skills que MÁS uso.\n\ncrea código de más calidad, mejores interfaces, código con menos errores.\n\n🎨 Frontend Design: Mejora el diseño visual y la experiencia de usuarios\n\n➡️ https://t.co/r9nbuSfTVT\n\n🧱 Interface Design: Estructura layouts, jerarquía visual y componentes https://t.co/jZfcsZIbHI https://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md",
-    "likes": 323,
-    "retweets": 29,
-    "replies": 30,
-    "views": 17197,
-    "posted_at": "2026-07-26T15:18:22.000Z",
-    "repo_ids": [
-      "anthropics/claude-code"
-    ],
-    "repo_urls": [
-      "https://github.com/anthropics/claude-code"
-    ],
-    "skill_refs": [
-      {
-        "repoId": "anthropics/claude-code",
-        "githubUrl": "https://github.com/anthropics/claude-code",
-        "skillPath": "plugins/frontend-design/skills/frontend-design/SKILL.md",
-        "sourceUrl": "https://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md"
-      }
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "anthropics/claude-code",
-        "github_url": "https://github.com/anthropics/claude-code",
-        "skill_md_path": "plugins/frontend-design/skills/frontend-design/SKILL.md",
-        "name": "frontend-design",
-        "description": "Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.",
-        "stars": 139380
-      }
-    ]
-  },
-  {
-    "tweet_id": "2077414710090113443",
-    "tweet_url": "https://x.com/MehdiAllahyari/status/2077414710090113443",
-    "author_handle": "MehdiAllahyari",
-    "author_name": "Mehdi Allahyari",
-    "text": "واقعا یکی از بهترین ریپوهایی که اسکیل طراحی/design skill را به claude code و بقیه اضافه میکنه تا وب سایت و landing page با کیفیت درست کنه. نمونه کار را هم گذاشته. خیلی عالیه.\nGithub: https://t.co/4TtYK5WWAy https://t.co/wJTEP14BgH https://github.com/nutlope/hallmark",
-    "likes": 289,
-    "retweets": 10,
-    "replies": 6,
-    "views": 21329,
-    "posted_at": "2026-07-15T15:27:18.000Z",
-    "repo_ids": [
-      "nutlope/hallmark"
-    ],
-    "repo_urls": [
-      "https://github.com/nutlope/hallmark"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "nutlope/hallmark",
-        "github_url": "https://github.com/Nutlope/hallmark",
-        "skill_md_path": "skills/hallmark/SKILL.md",
-        "name": "hallmark",
-        "description": "Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots. Use when the user asks to build a new app or landing page, wants to redesign something, invokes Hallmark by name, or uses audit/redesign/study.",
-        "stars": 19158
-      }
-    ]
-  },
-  {
-    "tweet_id": "2080214690744139890",
-    "tweet_url": "https://x.com/ETezRyu/status/2080214690744139890",
-    "author_handle": "ETezRyu",
-    "author_name": "Tielong T.E.",
-    "text": "We're building \"this\" model to see if D.A.T. works on Claude Code and it does pretty well!\n\nCheck out the our skills : https://t.co/yn4cdrP9LP https://t.co/3Iuu40IunB https://github.com/that-company/dat-skill",
-    "likes": 233,
-    "retweets": 34,
-    "replies": 15,
-    "views": 33272,
-    "posted_at": "2026-07-23T08:53:25.000Z",
-    "repo_ids": [
-      "that-company/dat-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/that-company/dat-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "that-company/dat-skill",
-        "github_url": "https://github.com/that-company/dat-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "dat-skill",
-        "description": "Default path for any cloud training work in Dat. Use this skill whenever a task needs cloud training, GPU training, model fine-tuning, training evaluation, long-running training compute, or hosted training job orchestration. Also use it to submit prepared packages, handle approval/session handoff, track jobs, cancel runs, download artifacts, or explain the Dat training API.",
-        "stars": 131
-      }
-    ]
-  },
-  {
-    "tweet_id": "2080494948441342297",
-    "tweet_url": "https://x.com/AlchainHust/status/2080494948441342297",
-    "author_handle": "AlchainHust",
-    "author_name": "花叔",
-    "text": "一个有趣的产品值得一个更酷的宣传片。\n\n于是我又把Huashu Design skill（https://t.co/rMvLbPQBiX）的动画制作能力做了大幅。\n\n于是我越来越爱做产品宣传片了，甚至胜过了vibe新产品。可以看下这期FanBox宣传片的运镜！ https://t.co/DqtgrcDef8 https://github.com/alchaincyf/huashu-design",
-    "likes": 179,
-    "retweets": 29,
-    "replies": 68,
-    "views": 19187,
-    "posted_at": "2026-07-24T03:27:04.000Z",
-    "repo_ids": [
-      "alchaincyf/huashu-design"
-    ],
-    "repo_urls": [
-      "https://github.com/alchaincyf/huashu-design"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "alchaincyf/huashu-design",
-        "github_url": "https://github.com/alchaincyf/huashu-design",
-        "skill_md_path": "SKILL.md",
-        "name": "huashu-design",
-        "description": "花叔Design——用HTML做高保真原型、幻灯片、动画、可视化与专家评审。任何新设计100%先出三个方向初稿给用户选（指定风格/品牌也不豁免），选定后才执行。触发词：做原型、PPT、幻灯片、动画、设计风格、评审、做个HTML页面、UI mockup、导出MP4/GIF、做个好看的。生产级Web App/需后端的系统不适用。",
-        "stars": 22149
-      }
-    ]
-  },
-  {
-    "tweet_id": "2079713242742706366",
-    "tweet_url": "https://x.com/zstmfhy/status/2079713242742706366",
-    "author_handle": "zstmfhy",
-    "author_name": "AI奶爸",
-    "text": "找PPT的AI Skill找到头秃，刷到 @Dengshan666 的整理，8个项目全在这：\n\n✅ ppt-master — 原生可编辑PPTX，真实形状+动画，数据本地\nhttps://t.co/3BqORgqQJz\n✅ ppt-director — PPT总导演，先导演再生成，HTML预览审查后转PPTX\nhttps://t.co/Z0MxK8RE8J\n✅ guizang-ppt-skill — 杂志风+瑞士风HTML https://github.com/hugohe3/ppt-master https://github.com/Hermess/ppt-director",
-    "likes": 138,
-    "retweets": 39,
-    "replies": 64,
-    "views": 10217,
-    "posted_at": "2026-07-21T23:40:50.000Z",
-    "repo_ids": [
-      "hugohe3/ppt-master",
-      "Hermess/ppt-director"
-    ],
-    "repo_urls": [
-      "https://github.com/hugohe3/ppt-master",
-      "https://github.com/Hermess/ppt-director"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "hugohe3/ppt-master",
-        "github_url": "https://github.com/hugohe3/ppt-master",
-        "skill_md_path": "skills/ppt-master/SKILL.md",
-        "name": "ppt-master",
-        "description": "AI-driven presentation workflow for generating editable PPTX decks, creating reusable Brand/Layout/Deck workspaces, filling native PPTX templates, and enhancing finished PPTX files. Use when the user asks to create, regenerate, template, fill, or enhance a presentation, or mentions ppt-master.\n",
-        "stars": 41578
-      },
-      {
-        "id": "hermess/ppt-director",
-        "github_url": "https://github.com/Hermess/ppt-director",
-        "skill_md_path": "SKILL.md",
-        "name": "ppt-director",
-        "description": "Use when planning, optimizing, generating, reviewing, or packaging PPT/PPTX decks, especially with page MD,\ndesign language docs, Nuwa/Darwin skills, HTML previews, generation-ready director briefs, PPTX mapping,\nor rendered PPTX screenshot comparison.\n",
-        "stars": 25
+        "id": "nicobailon/visual-explainer",
+        "github_url": "https://github.com/nicobailon/visual-explainer",
+        "skill_md_path": "plugins/visual-explainer/SKILL.md",
+        "name": "visual-explainer",
+        "description": "Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, comparison tables, slide decks, and other visual explanations.",
+        "stars": 9348
       }
     ]
   },
@@ -367,10 +170,10 @@
     "author_handle": "mgechev",
     "author_name": "Minko Gechev",
     "text": "Skill to get your agent to create excellent skills! :)\n\nhttps://t.co/NJDUNFyH6B https://github.com/mgechev/skills-best-practices/tree/main/skill",
-    "likes": 59,
-    "retweets": 3,
+    "likes": 67,
+    "retweets": 4,
     "replies": 1,
-    "views": 6585,
+    "views": 7580,
     "posted_at": "2026-07-27T16:28:38.000Z",
     "repo_ids": [
       "mgechev/skills-best-practices"
@@ -391,31 +194,147 @@
     ]
   },
   {
-    "tweet_id": "2081780464122024201",
-    "tweet_url": "https://x.com/puckeditor/status/2081780464122024201",
-    "author_handle": "puckeditor",
-    "author_name": "Puck",
-    "text": "puckeditor/skills is here. Prompt:\n\nRun `npx skills use \"https://t.co/Txb05Q4nem\" --skill \"puck\"` and add Puck to this app https://t.co/DC2xF30Bln https://github.com/puckeditor/skills",
-    "likes": 5,
-    "retweets": 0,
-    "replies": 1,
-    "views": 484,
-    "posted_at": "2026-07-27T16:35:14.000Z",
+    "tweet_id": "2081653104131404086",
+    "tweet_url": "https://x.com/wieslawsoltes/status/2081653104131404086",
+    "author_handle": "wieslawsoltes",
+    "author_name": "Wiesław Šoltés",
+    "text": "I have created cross-platform .NET performance engineering skill for coding agents, covering CPU, memory, GC, benchmarking, concurrency, startup, native profiling, GPU rendering, and production diagnostics on macOS, Windows, and Linux. https://t.co/3wpRxtWcDj https://github.com/wieslawsoltes/Performance-Skill",
+    "likes": 38,
+    "retweets": 7,
+    "replies": 0,
+    "views": 1136,
+    "posted_at": "2026-07-27T08:09:09.000Z",
     "repo_ids": [
-      "puckeditor/skills"
+      "wieslawsoltes/Performance-Skill"
     ],
     "repo_urls": [
-      "https://github.com/puckeditor/skills"
+      "https://github.com/wieslawsoltes/Performance-Skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "puckeditor/skills",
-        "github_url": "https://github.com/puckeditor/skills",
-        "skill_md_path": "skills/puck/SKILL.md",
-        "name": "puck",
-        "description": "Build with Puck, the visual editor for React. Use when needing to (1) add Puck, a page builder, or a visual/drag-and-drop editor to an application, new or existing, (2) author or extend a Puck config so the app's own components become editable, (3) debug a Puck integration — unstyled previews, RSC errors, iframe or persistence problems, or (4) look up how any Puck API, field, or plugin works.",
-        "stars": 3
+        "id": "wieslawsoltes/performance-skill",
+        "github_url": "https://github.com/wieslawsoltes/Performance-Skill",
+        "skill_md_path": "SKILL.md",
+        "name": "dotnet-performance",
+        "description": "Evidence-first performance engineering workflow for coding agents combining portable .NET diagnostics with platform-native profiling, BenchmarkDotNet, application benchmarking, statistical validation, deployment, container, graphics, and GPU procedures.",
+        "stars": 19
+      }
+    ]
+  },
+  {
+    "tweet_id": "2080227061596377506",
+    "tweet_url": "https://x.com/Shruti_0810/status/2080227061596377506",
+    "author_handle": "Shruti_0810",
+    "author_name": "Shruti Codes",
+    "text": "STOP WRITING GITHUB READMES BY HAND.\n\nThis free open-source skill reads your codebase first...\n\nThen generates a professional README based on what's actually in your project.\n\nNo fake features.\nNo AI hallucinations.\n\nRepo: https://t.co/5DFCuB5HLi https://t.co/QfVoZEQEXk https://github.com/oil-oil/beautify-github-readme",
+    "likes": 13,
+    "retweets": 3,
+    "replies": 2,
+    "views": 2133,
+    "posted_at": "2026-07-23T09:42:34.000Z",
+    "repo_ids": [
+      "oil-oil/beautify-github-readme"
+    ],
+    "repo_urls": [
+      "https://github.com/oil-oil/beautify-github-readme"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "oil-oil/beautify-github-readme",
+        "github_url": "https://github.com/oil-oil/beautify-github-readme",
+        "skill_md_path": "skills/beautify-github-readme/SKILL.md",
+        "name": "beautify-github-readme",
+        "description": "Redesign GitHub README homepages or create project-native pure SVG, hybrid SVG-composed PNG/WebP, and opt-in animated GIF assets. Use when a user asks to beautify, redesign, rebrand, visually upgrade, simplify, or audit a GitHub README; create only a hero, section headers, diagrams, badges, motion graphics, showcase modules, or other README assets; or turn a repository homepage into a cohesive visual story. If whole-README work versus asset-only work is unclear, ask which scope the user wants. For hero-like assets where pure SVG and generated raster material are both viable, explain the tradeoffs and confirm the implementation before creating the asset.",
+        "stars": 1339
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081767734086693159",
+    "tweet_url": "https://x.com/saishankar404/status/2081767734086693159",
+    "author_handle": "saishankar404",
+    "author_name": "sai",
+    "text": "built debrief skill after watching @geoffreylitt 's explain-diff talk.\n\nwell what if we optimized for teaching, not just explaining?\n\ndebrief turns AI-generated diffs into explanations designed to build the right mental model to understand\n\ngithub: https://t.co/3UREZSbFvs https://t.co/WDQOhe6rBx https://github.com/saishankar404/debrief",
+    "likes": 10,
+    "retweets": 3,
+    "replies": 3,
+    "views": 403,
+    "posted_at": "2026-07-27T15:44:39.000Z",
+    "repo_ids": [
+      "saishankar404/debrief"
+    ],
+    "repo_urls": [
+      "https://github.com/saishankar404/debrief"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "saishankar404/debrief",
+        "github_url": "https://github.com/saishankar404/debrief",
+        "skill_md_path": "SKILL.md",
+        "name": "debrief",
+        "description": "Use when the user shares a git diff, patch, before-and-after file pair, or an agentic coding session transcript and wants to understand, document, explain, or write up what changed and why. Trigger on \"explain this diff\", \"write an article about this change\", \"what did this PR actually do\", \"turn this session into something I can learn from\", or when a diff is pasted with \"what happened here\" — even without the word \"skill\" or \"article\". Do NOT use for simple one-line explanations of a single line of code with no background or purpose story.",
+        "stars": 1
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081817994750046371",
+    "tweet_url": "https://x.com/when_robots_cry/status/2081817994750046371",
+    "author_handle": "when_robots_cry",
+    "author_name": "PHALANX",
+    "text": "https://t.co/mBJ4vcHC3U\n\nAn autonomous, looping, multi-altitude security vulnerability hunt for a code-base, packaged as a Claude Code skill: by @Dinosn https://github.com/dinosn/raptor-loop-hunt/",
+    "likes": 8,
+    "retweets": 5,
+    "replies": 0,
+    "views": 404,
+    "posted_at": "2026-07-27T19:04:22.000Z",
+    "repo_ids": [
+      "dinosn/raptor-loop-hunt"
+    ],
+    "repo_urls": [
+      "https://github.com/dinosn/raptor-loop-hunt"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "dinosn/raptor-loop-hunt",
+        "github_url": "https://github.com/dinosn/raptor-loop-hunt",
+        "skill_md_path": "SKILL.md",
+        "name": "raptor-loop-hunt",
+        "description": "Autonomous, looping, multi-altitude security vulnerability hunt for a codebase — the RAPTOR \"Karpathy auto-research\" methodology that finds far more bugs than a single-pass scan. Make this the default whenever the user points you at source code (a repo, service, app, module, or directory) and wants vulnerabilities found: any request to audit, pentest, or security-review it, or to \"find bugs\" / \"find anything exploitable\". Depth and coverage cues strengthen the match — \"go deep\", \"find every bug\", \"exhaustively audit\", \"maximum coverage\", \"keep hunting until you've got them all\", \"don't stop after the first pass\", \"verified not guessed\", \"auto-research\", \"file by file / function by function\" — but a plain \"audit this codebase for security\" already qualifies; users rarely name the looping, generate-then-judge discipline that is the actual value. Do NOT use for webserver/config-file audits, reproducing a single known CVE, a one-file or one-function sanity check, dependency/SCA CVE lookups, PR or style review, debugging one specific crash, or only mapping attack surface without hunting.",
+        "stars": 158
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081819998289359298",
+    "tweet_url": "https://x.com/taylandemirkaya/status/2081819998289359298",
+    "author_handle": "taylandemirkaya",
+    "author_name": "Taylan Demirkaya",
+    "text": "I published a Claude skill that verifies thesis and article citations against the source PDFs. It finds the supporting passage, quotes it verbatim, and suggests the printed page number. No evidence, no \"verified\" stamp.\n\nOpen source,\nhttps://t.co/013OxCFW13 https://github.com/demirka-phd/tez-atif-dogrulama",
+    "likes": 5,
+    "retweets": 0,
+    "replies": 1,
+    "views": 203,
+    "posted_at": "2026-07-27T19:12:20.000Z",
+    "repo_ids": [
+      "demirka-phd/tez-atif-dogrulama"
+    ],
+    "repo_urls": [
+      "https://github.com/demirka-phd/tez-atif-dogrulama"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "demirka-phd/tez-atif-dogrulama",
+        "github_url": "https://github.com/demirka-phd/tez-atif-dogrulama",
+        "skill_md_path": "tez-atif-dogrulama/SKILL.md",
+        "name": "tez-atif-dogrulama",
+        "description": "Akademik metinlerdeki (tez, makale) metin içi atıfları kaynak PDF'lerinden kanıtla doğrular ve projenin atıf biçimine uygun sayfa numarası önerir. Şu durumlarda MUTLAKA bu skill'i kullan: kullanıcı \"atıf\", \"atıfları kontrol et / doğrula\", \"sayfa numarası ekle / bul\", \"kaynak doğrulama\", \"atıf doğrulama\", \"kaynakça kontrolü\", \"citation check\" gibi ifadeler kullandığında; metnin herhangi bir bölümündeki atıfların kaynaklarla uyumu, künye doğruluğu, sayfa numarası tespiti, kaynakça–metin çapraz kontrolü veya katılımcı alıntısı doğrulaması istendiğinde — kullanıcı skill adını anmasa bile. Skill rapor üretir; kullanıcı onayı olmadan hiçbir dosyayı değiştirmez.\n",
+        "stars": 0
       }
     ]
   },
@@ -428,7 +347,7 @@
     "likes": 4,
     "retweets": 0,
     "replies": 0,
-    "views": 88,
+    "views": 111,
     "posted_at": "2026-07-27T18:00:43.000Z",
     "repo_ids": [
       "virgiliojr94/book-to-skill"
@@ -444,36 +363,43 @@
         "skill_md_path": "SKILL.md",
         "name": "book-to-skill",
         "description": "Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured agent skills, extracting frameworks, mental models, principles, techniques, and anti-patterns. Use when the user wants to study a document through GitHub Copilot CLI, Amp, or Claude Code, apply an author's frameworks while working, or build a reusable knowledge base from a file.",
-        "stars": 10783
+        "stars": 11095
       }
     ]
   },
   {
-    "tweet_id": "2079517121521053698",
-    "tweet_url": "https://x.com/fei1919/status/2079517121521053698",
-    "author_handle": "fei1919",
-    "author_name": "ⓐ FEI",
-    "text": "npx skills add brickhu/markai\n\n🤖 ChatGPT remembers, Claude doesn't. 🧩 Drop fragments into MarkAI → shared memory across every agent.\n\n🔒 Local \n💸 Free \n🧱 Zero deps\n\n 🔗 https://t.co/0wuQwd2EZA\n\n #LocalFirst #MemoryLayer #agents https://github.com/brickhu/markai",
+    "tweet_id": "2082084500796780595",
+    "tweet_url": "https://x.com/leastsquared_/status/2082084500796780595",
+    "author_handle": "leastsquared_",
+    "author_name": "Alysson",
+    "text": "Based on this gist, I create this general purpose skill to simulate a REAL USER trying to use a project for the first time, identify pain points, bugs, and problems, then report them properly.\n\nhttps://t.co/2zRUpPPI9X https://github.com/k3ybladewielder/skills/blob/main/test/simulate-user-testing/SKILL.md",
     "likes": 3,
     "retweets": 1,
     "replies": 0,
-    "views": 141,
-    "posted_at": "2026-07-21T10:41:31.000Z",
+    "views": 61,
+    "posted_at": "2026-07-28T12:43:22.000Z",
     "repo_ids": [
-      "brickhu/markai"
+      "k3ybladewielder/skills"
     ],
     "repo_urls": [
-      "https://github.com/brickhu/markai"
+      "https://github.com/k3ybladewielder/skills"
     ],
-    "skill_refs": [],
+    "skill_refs": [
+      {
+        "repoId": "k3ybladewielder/skills",
+        "githubUrl": "https://github.com/k3ybladewielder/skills",
+        "skillPath": "test/simulate-user-testing/SKILL.md",
+        "sourceUrl": "https://github.com/k3ybladewielder/skills/blob/main/test/simulate-user-testing/SKILL.md"
+      }
+    ],
     "valid_skill_repos": [
       {
-        "id": "brickhu/markai",
-        "github_url": "https://github.com/brickhu/markai",
-        "skill_md_path": "SKILL.md",
-        "name": "markai",
-        "description": "Capture sparks in every agent. AI that knows you. A personal knowledge base / second brain. Triggers when the user says \"remember\", \"save this\", \"note to self\", \"memorize\", \"记住\", \"存一下\", \"备忘\", \"기억해\", \"覚えて\", \"/markai\", or sends content that looks like a knowledge fragment or inspiration worth keeping. Stores text, images, and URLs, then automatically retrieves relevant entries to augment every conversation.",
-        "stars": 4
+        "id": "k3ybladewielder/skills",
+        "github_url": "https://github.com/k3ybladewielder/skills",
+        "skill_md_path": "test/simulate-user-testing/SKILL.md",
+        "name": "simulate-user-testing",
+        "description": "Simulate a REAL USER trying to use a project for the first time, identify pain points, bugs, and problems, then report them properly.",
+        "stars": 0
       }
     ]
   },
@@ -486,7 +412,7 @@
     "likes": 2,
     "retweets": 0,
     "replies": 1,
-    "views": 34,
+    "views": 36,
     "posted_at": "2026-07-22T11:34:40.000Z",
     "repo_ids": [
       "Lstafff/spellbook"
@@ -507,6 +433,35 @@
     ]
   },
   {
+    "tweet_id": "2081731844207149074",
+    "tweet_url": "https://x.com/sztwiorok/status/2081731844207149074",
+    "author_handle": "sztwiorok",
+    "author_name": "Raphael Sztwiorok",
+    "text": "Hey @vercel @rauchg — https://t.co/9HqFBj8uNI audit badges come from cache. False positive: an author loses installs. False negative: a vulnerability ships with your badge on it.\n\nFound it chasing a rescan of our own skill. 13+ open issues, one fix 🙏\n\nhttps://t.co/wTBZOav2uh http://skills.sh http://github.com/vercel-labs/skills/issues/707",
+    "likes": 2,
+    "retweets": 0,
+    "replies": 0,
+    "views": 50,
+    "posted_at": "2026-07-27T13:22:03.000Z",
+    "repo_ids": [
+      "vercel-labs/skills"
+    ],
+    "repo_urls": [
+      "https://github.com/vercel-labs/skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "vercel-labs/skills",
+        "github_url": "https://github.com/vercel-labs/skills",
+        "skill_md_path": "skills/find-skills/SKILL.md",
+        "name": "find-skills",
+        "description": "Helps users discover and install agent skills when they ask questions like \"how do I do X\", \"find a skill for X\", \"is there a skill that can...\", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.",
+        "stars": 27452
+      }
+    ]
+  },
+  {
     "tweet_id": "2081252085421731869",
     "tweet_url": "https://x.com/kumarsachin_dev/status/2081252085421731869",
     "author_handle": "kumarsachin_dev",
@@ -515,7 +470,7 @@
     "likes": 2,
     "retweets": 1,
     "replies": 1,
-    "views": 222,
+    "views": 224,
     "posted_at": "2026-07-26T05:35:39.000Z",
     "repo_ids": [
       "sachinkmr57/ios-unvibe"
@@ -531,35 +486,6 @@
         "skill_md_path": "ios-unvibe/SKILL.md",
         "name": "ios-unvibe",
         "description": "Diagnoses vibe-coding ownership loss in iOS/macOS Swift apps (cognitive and verification debt, Massive Views, force-unwraps, concurrency silencers, Keychain/UserDefaults secrets, unnecessary SwiftData/Core Data migrations, git mega-diffs, XCTest theater) and writes IOS_UNVIBE_REPORT.md with a reclaim plan. Use when the user says ios-unvibe, vibe-checks an Apple app, asks whether they have lost control of a SwiftUI/UIKit/AppKit codebase, or wants refactor-vs-rewrite guidance before unvibing. Do not use for generic a11y, performance, or App Review checklists.",
-        "stars": 0
-      }
-    ]
-  },
-  {
-    "tweet_id": "2080246452459372975",
-    "tweet_url": "https://x.com/Herobri68651525/status/2080246452459372975",
-    "author_handle": "Herobri68651525",
-    "author_name": "R & H",
-    "text": "针对Codex更新或异常退出后，项目、聊天记录或配置消失问题写的一个Skill--通过codex一般任务进行修复。\nhttps://t.co/0AWVkR7YMv https://github.com/MrH0v0/Codex-Windows-State-Recovery",
-    "likes": 2,
-    "retweets": 1,
-    "replies": 1,
-    "views": 28,
-    "posted_at": "2026-07-23T10:59:38.000Z",
-    "repo_ids": [
-      "MrH0v0/Codex-Windows-State-Recovery"
-    ],
-    "repo_urls": [
-      "https://github.com/MrH0v0/Codex-Windows-State-Recovery"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "mrh0v0/codex-windows-state-recovery",
-        "github_url": "https://github.com/MrH0v0/Codex-Windows-State-Recovery",
-        "skill_md_path": "SKILL.md",
-        "name": "repair-codex-windows-state",
-        "description": "Diagnose, recover, and harden Codex Desktop state after an update, restart, reset, or configuration incident. Use the full automated workflow on Windows when config.toml or the chat process registry is empty, NUL-filled, unparseable, or regenerated; sidebar projects or task history disappear; project-order, SQLite projections, rollout cwd paths, bundled plugin caches, runtime paths, Windows sandbox settings, or package-version transitions drift; or a last-known-good guard and validation-only restore are needed. On macOS, use the bundled manual recovery guide for evidence-preserving backup, read-only inspection, hidden-history triage, and SQLite quarantine; do not run the Windows PowerShell guard.",
         "stars": 0
       }
     ]
@@ -594,6 +520,37 @@
     ]
   },
   {
+    "tweet_id": "2082117545490780659",
+    "tweet_url": "https://x.com/yysun/status/2082117545490780659",
+    "author_handle": "yysun",
+    "author_name": "yysun",
+    "text": "Make a web spreadsheet using Fable5/Sonnet5/GPT5.6 in a few days https://t.co/wjevlM7uY7 and deployed to ChatGPT sites https://t.co/i9uHDTzVHE with the rpd loop skill https://t.co/jlCQlSPPJJ https://t.co/EYu9gfwgZY https://github.com/yysun/excel-grid https://excel-grid-demo.eric-sun739956.chatgpt.site/ https://github.com/yysun/rpd",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 37,
+    "posted_at": "2026-07-28T14:54:41.000Z",
+    "repo_ids": [
+      "yysun/excel-grid",
+      "yysun/rpd"
+    ],
+    "repo_urls": [
+      "https://github.com/yysun/excel-grid",
+      "https://github.com/yysun/rpd"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "yysun/rpd",
+        "github_url": "https://github.com/yysun/rpd",
+        "skill_md_path": "skills/rpd/SKILL.md",
+        "name": "rpd",
+        "description": "Run or explain the RPD workflow for repository software work, including codebase explanation and diagnosis, requirements, architecture planning and review, implementation, debugging, unit and E2E testing, code review, acceptance verification, completion documentation, and scoped commits. Also use when the user invokes an RPD command with command-like intent: RPD, REQ, AP, AR, SS, TT, ET, CR, VR, DD, GC, or !!. A command token must be bounded by message boundaries, punctuation, or whitespace; do not match when a letter, digit, or underscore touches it. Recognize forms such as `RPD`, `RPD:`, `RPD-`, `RPD,`, and `'RPD'`, anywhere in the message. Several tokens are also common initialisms, so match only when the token reads as an instruction, not when prose uses it as a noun such as \"the GC pauses\" or \"that CR was rejected\". Trailing `!!` is emphasis, not an invocation. Tokens inside fenced or inline code are mentions unless the request asks to execute them.\n",
+        "stars": 0
+      }
+    ]
+  },
+  {
     "tweet_id": "2081356872121237838",
     "tweet_url": "https://x.com/raj_cipher/status/2081356872121237838",
     "author_handle": "raj_cipher",
@@ -618,42 +575,643 @@
         "skill_md_path": "SKILL.md",
         "name": "itr-prep-skill",
         "description": "End-to-end assistant for filing Indian Income Tax Returns (ITR-1/2/3/4) for any assessment year. Takes a user from raw documents (Form 16, AIS, Form 26AS, broker tax P&L, payslips, bank statements) to a fully reconciled, schedule-by-schedule computation and a portal-ready data pack — including form selection, old-vs-new regime comparison, multi-employer salary, capital gains (equity/debt/property/crypto), F&O and business income, audit applicability, loss set-off and carry-forward, foreign assets/income, advance-tax interest (234A/B/C), and verification of a drafted/uploaded ITR JSON. Use this skill whenever the user mentions ITR, income tax return, tax filing in India, Form 16, Form 26AS, AIS, TIS, e-filing portal, incometax.gov.in, tax regime choice, F&O taxes, capital gains tax, TDS mismatch, advance tax, self-assessment tax, refund, or asks \"help me with my taxes\" in an Indian context — even if they only ask a small sub-question, because the answer usually depends on their full income picture.\n",
-        "stars": 18
+        "stars": 20
       }
     ]
   },
   {
-    "tweet_id": "2082084500796780595",
-    "tweet_url": "https://x.com/leastsquared_/status/2082084500796780595",
-    "author_handle": "leastsquared_",
-    "author_name": "Alysson",
-    "text": "Based on this gist, I create this general purpose skill to simulate a REAL USER trying to use a project for the first time, identify pain points, bugs, and problems, then report them properly.\n\nhttps://t.co/2zRUpPPI9X https://github.com/k3ybladewielder/skills/blob/main/test/simulate-user-testing/SKILL.md",
-    "likes": 0,
+    "tweet_id": "2082093555028234283",
+    "tweet_url": "https://x.com/JackQianAI/status/2082093555028234283",
+    "author_handle": "JackQianAI",
+    "author_name": "Jack Qian",
+    "text": "Open sourced Google Business profile checklist with best practices,\n\nhttps://t.co/kqoshnX0uU https://github.com/qianquandong/google-business-profile-skill",
+    "likes": 1,
     "retweets": 0,
     "replies": 0,
-    "views": 4,
-    "posted_at": "2026-07-28T12:43:22.000Z",
+    "views": 9,
+    "posted_at": "2026-07-28T13:19:21.000Z",
     "repo_ids": [
-      "k3ybladewielder/skills"
+      "qianquandong/google-business-profile-skill"
     ],
     "repo_urls": [
-      "https://github.com/k3ybladewielder/skills"
+      "https://github.com/qianquandong/google-business-profile-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "qianquandong/google-business-profile-skill",
+        "github_url": "https://github.com/qianquandong/google-business-profile-skill",
+        "skill_md_path": "skills/manage-google-business-profile/SKILL.md",
+        "name": "manage-google-business-profile",
+        "description": "Guide merchants and agencies through compliant Google Business Profile setup, claim, verification, video verification, optimization, reviews, local SEO, tracking, access, suspension appeals, and multi-location operations. Use when a user mentions Google Business Profile, GBP, Google My Business, GMB, a Google Maps listing, Google 商家资料, 谷歌商家档案, 地图商家, 视频验证, 停权, 申诉, 本地 SEO, or wants a bilingual Chinese-English GBP plan, audit, template, or troubleshooting workflow.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082151392777548076",
+    "tweet_url": "https://x.com/Abyrd_9/status/2082151392777548076",
+    "author_handle": "Abyrd_9",
+    "author_name": "Andrew Byrd",
+    "text": "Also I always pass my code review (and just everything) through my \"Writing Rules\" skill:\nhttps://t.co/OOkCkstMgc\n\nWhich is a distillation or rules from:\nhttps://t.co/Lxzwlm5xFb\n\nAnd it works very very well. https://github.com/Abyrd9/skills/blob/main/skills/personal/writing-rules/SKILL.md https://www.writingclasses.com/toolbox/tips-masters",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 17,
+    "posted_at": "2026-07-28T17:09:11.000Z",
+    "repo_ids": [
+      "Abyrd9/skills"
+    ],
+    "repo_urls": [
+      "https://github.com/Abyrd9/skills"
     ],
     "skill_refs": [
       {
-        "repoId": "k3ybladewielder/skills",
-        "githubUrl": "https://github.com/k3ybladewielder/skills",
-        "skillPath": "test/simulate-user-testing/SKILL.md",
-        "sourceUrl": "https://github.com/k3ybladewielder/skills/blob/main/test/simulate-user-testing/SKILL.md"
+        "repoId": "Abyrd9/skills",
+        "githubUrl": "https://github.com/Abyrd9/skills",
+        "skillPath": "skills/personal/writing-rules/SKILL.md",
+        "sourceUrl": "https://github.com/Abyrd9/skills/blob/main/skills/personal/writing-rules/SKILL.md"
       }
     ],
     "valid_skill_repos": [
       {
-        "id": "k3ybladewielder/skills",
-        "github_url": "https://github.com/k3ybladewielder/skills",
-        "skill_md_path": "test/simulate-user-testing/SKILL.md",
-        "name": "simulate-user-testing",
-        "description": "Simulate a REAL USER trying to use a project for the first time, identify pain points, bugs, and problems, then report them properly.",
+        "id": "Abyrd9/skills",
+        "github_url": "https://github.com/Abyrd9/skills",
+        "skill_md_path": "skills/personal/writing-rules/SKILL.md",
+        "name": "writing-rules",
+        "description": "Apply distilled rules for clear, useful prose.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082150619263963451",
+    "tweet_url": "https://x.com/yysun/status/2082150619263963451",
+    "author_handle": "yysun",
+    "author_name": "yysun",
+    "text": "You will love the RPD loop skill for coding.  https://t.co/jlCQlSPPJJ https://t.co/1PVzTy3wxX https://github.com/yysun/rpd",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 7,
+    "posted_at": "2026-07-28T17:06:06.000Z",
+    "repo_ids": [
+      "yysun/rpd"
+    ],
+    "repo_urls": [
+      "https://github.com/yysun/rpd"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "yysun/rpd",
+        "github_url": "https://github.com/yysun/rpd",
+        "skill_md_path": "skills/rpd/SKILL.md",
+        "name": "rpd",
+        "description": "Run or explain the RPD workflow for repository software work, including codebase explanation and diagnosis, requirements, architecture planning and review, implementation, debugging, unit and E2E testing, code review, acceptance verification, completion documentation, and scoped commits. Also use when the user invokes an RPD command with command-like intent: RPD, REQ, AP, AR, SS, TT, ET, CR, VR, DD, GC, or !!. A command token must be bounded by message boundaries, punctuation, or whitespace; do not match when a letter, digit, or underscore touches it. Recognize forms such as `RPD`, `RPD:`, `RPD-`, `RPD,`, and `'RPD'`, anywhere in the message. Several tokens are also common initialisms, so match only when the token reads as an instruction, not when prose uses it as a noun such as \"the GC pauses\" or \"that CR was rejected\". Trailing `!!` is emphasis, not an invocation. Tokens inside fenced or inline code are mentions unless the request asks to execute them.\n",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082114017070301470",
+    "tweet_url": "https://x.com/mindfultime_/status/2082114017070301470",
+    "author_handle": "mindfultime_",
+    "author_name": "Mindfultime",
+    "text": "I like to know what exact agent codex is spawning when I work on the task. \n\nIf you want, you can do this too \nhttps://t.co/AosmkPa8D1\n\nI know @pvncher worked on a skill repo here now , but the one I wrote was before the changes to the codex. \n\nhttps://t.co/n9dMyksOna https://t.co/k4vmYhXDAx https://h3li.com/articles/codex-subagents-routing/ https://github.com/provencher/codex-skills/blob/main/orchestrate/SKILL.md",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 20,
+    "posted_at": "2026-07-28T14:40:40.000Z",
+    "repo_ids": [
+      "provencher/codex-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/provencher/codex-skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "provencher/codex-skills",
+        "githubUrl": "https://github.com/provencher/codex-skills",
+        "skillPath": "orchestrate/SKILL.md",
+        "sourceUrl": "https://github.com/provencher/codex-skills/blob/main/orchestrate/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "provencher/codex-skills",
+        "github_url": "https://github.com/provencher/codex-skills",
+        "skill_md_path": "orchestrate/SKILL.md",
+        "name": "orchestrate",
+        "description": "Coordinate multiple agents on large-scope tasks. Use whenever the work is substantial; trivial tasks do not require this skill.",
+        "stars": 116
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082052104706023561",
+    "tweet_url": "https://x.com/nedeadins1de/status/2082052104706023561",
+    "author_handle": "nedeadins1de",
+    "author_name": "nedeadins1de",
+    "text": "I built a skill that’s been a real lifesaver at work whenever I need to plan, document, and present project or module architectures. \n\nIt covers both the theory and syntax for C4, Deployment, and Sequence diagrams.\n\nnpx skills add nedeadinside/likec4-skill\nhttps://t.co/YI2naKOvM5 https://github.com/nedeadinside/likec4-skill",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 64,
+    "posted_at": "2026-07-28T10:34:39.000Z",
+    "repo_ids": [
+      "nedeadinside/likec4-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/nedeadinside/likec4-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "nedeadinside/likec4-skill",
+        "github_url": "https://github.com/nedeadinside/likec4-skill",
+        "skill_md_path": "likec4-skill/SKILL.md",
+        "name": "likec4-skill",
+        "description": "Turn a plain-language architecture description or a source repository into correct, validated C4 diagrams written in the LikeC4 DSL (.c4 / .likec4 files). Use when the user wants to model or document software architecture, draw a C4 diagram, produce a System Context / Container / Component / Deployment / Dynamic (data flow) view, \"diagram the architecture\", \"document this system\", \"generate C4 from this code\", set up a LikeC4 project, fix or review .c4 files, or mentions C4, LikeC4, likec4, Structurizr, architecture-as-code, or architecture diagrams. Validates output with the LikeC4 CLI (pinned version) before delivery.",
+        "stars": 1
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081757133830275099",
+    "tweet_url": "https://x.com/sergeonsamui/status/2081757133830275099",
+    "author_handle": "sergeonsamui",
+    "author_name": "Serge Bulaev",
+    "text": "Archify: an agent skill for Cursor, Claude Code, Codex CLI and OpenCode that renders 5 diagram types (architecture, workflow, sequence, data flow, lifecycle) to self-contained HTML with PNG/SVG/WebM export and a typed JSON IR. 📐 https://t.co/JBf6OTl49q https://t.co/xgt3YZDMTk https://github.com/tt-a1i/archify",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 1,
+    "views": 97,
+    "posted_at": "2026-07-27T15:02:32.000Z",
+    "repo_ids": [
+      "tt-a1i/archify"
+    ],
+    "repo_urls": [
+      "https://github.com/tt-a1i/archify"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "tt-a1i/archify",
+        "github_url": "https://github.com/tt-a1i/archify",
+        "skill_md_path": "archify/SKILL.md",
+        "name": "archify",
+        "description": "Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.",
+        "stars": 7815
+      }
+    ]
+  },
+  {
+    "tweet_id": "2080255735854670054",
+    "tweet_url": "https://x.com/clarkchenkai/status/2080255735854670054",
+    "author_handle": "clarkchenkai",
+    "author_name": "Cubic",
+    "text": "Inspired by @rennsong’s Codex thread-title automation, I made an open-source Skill:\n⏳ working\n🚨 needs you\n✅ done\nIt tracks topic changes too, works across workspaces, and needs no daemon or polling.\nhttps://t.co/RPi4AWxpbT https://github.com/clarkchenkai/manage-codex-thread-status",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 60,
+    "posted_at": "2026-07-23T11:36:31.000Z",
+    "repo_ids": [
+      "clarkchenkai/manage-codex-thread-status"
+    ],
+    "repo_urls": [
+      "https://github.com/clarkchenkai/manage-codex-thread-status"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "clarkchenkai/manage-codex-thread-status",
+        "github_url": "https://github.com/clarkchenkai/manage-codex-thread-status",
+        "skill_md_path": "skills/manage-codex-thread-status/SKILL.md",
+        "name": "manage-codex-thread-status",
+        "description": "Keep Codex thread titles synchronized with live work using `⏳`, `🚨`, and `✅`. Use when installing or running the 20-minute cross-thread status coordinator, auditing sidebar title drift, repairing stale prefixes, or updating one thread from an interactive task or tool-less automation.",
+        "stars": 2
+      }
+    ]
+  },
+  {
+    "tweet_id": "2079420662788354123",
+    "tweet_url": "https://x.com/carbon_2s2_2p2/status/2079420662788354123",
+    "author_handle": "carbon_2s2_2p2",
+    "author_name": "EvanLuo42",
+    "text": "I built a skill that turns the problems you encounter while coding into a personal benchmark for AI agents, so you can see whether upgrading to the latest model is actually worth it.\n\nGive it a try and build your own agent bench👇\n\nhttps://t.co/6AbwPr7rvO https://github.com/EvanLuo42/bench-creator",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 48,
+    "posted_at": "2026-07-21T04:18:14.000Z",
+    "repo_ids": [
+      "EvanLuo42/bench-creator"
+    ],
+    "repo_urls": [
+      "https://github.com/EvanLuo42/bench-creator"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "evanluo42/bench-creator",
+        "github_url": "https://github.com/EvanLuo42/bench-creator",
+        "skill_md_path": "skills/bench-creator/SKILL.md",
+        "name": "bench-creator",
+        "description": "Maintain a private global AI-work benchmark across repositories by checkpointing code before AI mutation, harvesting reusable difficulties afterward, validating privacy and capture policy, and running candidates in restored evaluator-isolated workspaces. Use before the first file mutation in a substantive repository task when an initialized global Bench enables auto or suggest capture; use after surprising failures, hidden constraints, fragile integrations, or specialized verification; and use whenever the user asks to initialize, register, capture, curate, validate, export, promote, or run Bench cases. Never use a solved live workspace as candidate input.",
+        "stars": 5
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081736910494392754",
+    "tweet_url": "https://x.com/dnesdan/status/2081736910494392754",
+    "author_handle": "dnesdan",
+    "author_name": "Dan Urbánek",
+    "text": "New skill inspired by @emilkowalski and @ParthJadhav8. It uses Codex image gen. For iOS and Android. First screenshot is the input one, the rest is from image gen.\n\nTrying it on my unreleased project.\n\nhttps://t.co/DH6SylAMrX https://t.co/VGN5mOOvyv https://github.com/dnesdan/Skills/blob/main/prototype-ui-with-imagegen/SKILL.md",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 1,
+    "views": 207,
+    "posted_at": "2026-07-27T13:42:10.000Z",
+    "repo_ids": [
+      "dnesdan/Skills"
+    ],
+    "repo_urls": [
+      "https://github.com/dnesdan/Skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "dnesdan/Skills",
+        "githubUrl": "https://github.com/dnesdan/Skills",
+        "skillPath": "prototype-ui-with-imagegen/SKILL.md",
+        "sourceUrl": "https://github.com/dnesdan/Skills/blob/main/prototype-ui-with-imagegen/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "dnesdan/Skills",
+        "github_url": "https://github.com/dnesdan/Skills",
+        "skill_md_path": "prototype-ui-with-imagegen/SKILL.md",
+        "name": "prototype-ui-with-imagegen",
+        "description": "Explore genuinely different visual directions for one native Apple or Android UI surface with Codex's built-in image generation, compare the generated concepts against product and platform constraints, and optionally rebuild a user-selected direction in SwiftUI or Jetpack Compose. Use when the user asks for UI concepts, image-generated redesign variants, a native component or screen prototype, more options around a chosen concept, or implementation of a selected generated direction. Keep exploration read-only and stop before production changes unless the user explicitly selects a variant to keep. Do not use for web, HTML, CSS, or generated production UI assets.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2079554017877717130",
+    "tweet_url": "https://x.com/iam_zachi/status/2079554017877717130",
+    "author_handle": "iam_zachi",
+    "author_name": "Zachi",
+    "text": "New skill: /chit-chat\n\nThe bottleneck in agentic coding isn’t the code, it’s that you don’t know what you want yet. \n\nThis skill makes your agent interview you first: scope, trade-offs, hidden decisions. \n\nYou end with a spec, not a half-built guess.\n\nhttps://t.co/mkJHfyv1gB https://github.com/realZachi/chit-chat",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 58,
+    "posted_at": "2026-07-21T13:08:08.000Z",
+    "repo_ids": [
+      "realZachi/chit-chat"
+    ],
+    "repo_urls": [
+      "https://github.com/realZachi/chit-chat"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "realzachi/chit-chat",
+        "github_url": "https://github.com/realZachi/chit-chat",
+        "skill_md_path": "skills/chit-chat/SKILL.md",
+        "name": "chit-chat",
+        "description": "Turns a large or fuzzy feature idea into a settled specification by thinking the idea through end to end, then interviewing the user about purpose, scope, consequences, and trade-offs before any code exists. Use when the user proposes a big feature without a clear spec, says things like \"I want something like X but I'm not sure\", asks to think an idea through together, or when a request is too underspecified to implement responsibly. Produces a written decision summary; never writes or edits code.",
+        "stars": 1
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081612021389459776",
+    "tweet_url": "https://x.com/chrmina/status/2081612021389459776",
+    "author_handle": "chrmina",
+    "author_name": "クρίス",
+    "text": "GitHub - Nutlope/hallmark: Anti-AI-slop design skill for Claude Code, Cursor, and Codex. · GitHub https://t.co/6XEXELjOQq https://github.com/Nutlope/hallmark",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 50,
+    "posted_at": "2026-07-27T05:25:55.000Z",
+    "repo_ids": [
+      "Nutlope/hallmark"
+    ],
+    "repo_urls": [
+      "https://github.com/Nutlope/hallmark"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "nutlope/hallmark",
+        "github_url": "https://github.com/Nutlope/hallmark",
+        "skill_md_path": "skills/hallmark/SKILL.md",
+        "name": "hallmark",
+        "description": "Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots. Use when the user asks to build a new app or landing page, wants to redesign something, invokes Hallmark by name, or uses audit/redesign/study.",
+        "stars": 19250
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082163355158999178",
+    "tweet_url": "https://x.com/raulriera/status/2082163355158999178",
+    "author_handle": "raulriera",
+    "author_name": "Raul",
+    "text": "I built something similar, I was wasting around 300Gb of space due to @claudeai not fully cleaning up after deleting or archiving sessions.\n\nTime to see if I should just delete mine and add this to my @twannl skills collection\n\nhttps://t.co/Z3Ppqhshu5 https://github.com/raulriera/skills/blob/main/reclaim-dev-disk-space/SKILL.md",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 21,
+    "posted_at": "2026-07-28T17:56:43.000Z",
+    "repo_ids": [
+      "raulriera/skills"
+    ],
+    "repo_urls": [
+      "https://github.com/raulriera/skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "raulriera/skills",
+        "githubUrl": "https://github.com/raulriera/skills",
+        "skillPath": "reclaim-dev-disk-space/SKILL.md",
+        "sourceUrl": "https://github.com/raulriera/skills/blob/main/reclaim-dev-disk-space/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "raulriera/skills",
+        "github_url": "https://github.com/raulriera/skills",
+        "skill_md_path": "reclaim-dev-disk-space/SKILL.md",
+        "name": "reclaim-dev-disk-space",
+        "description": "Diagnose and safely reclaim disk space on a macOS developer machine, and audit/remove git worktrees. Use whenever the user is low on disk, asks what's eating their storage or \"System Data\", wants to free up / recover space, mentions a huge System Data, Xcode, DerivedData, or simulator footprint, or wants to clean up, prune, or remove git worktrees. Also use proactively right after deleting git worktrees — their XcodeBuildMCP build caches are orphaned and must be pruned separately, and that orphaned cache is frequently the single largest consumer on a dev Mac. Drives an investigate → tiered-approval → dry-run → verify workflow so nothing irreplaceable is deleted.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082058619453903065",
+    "tweet_url": "https://x.com/gitrepos/status/2082058619453903065",
+    "author_handle": "gitrepos",
+    "author_name": "Gitrepos",
+    "text": "last30days-skill  ⭐ 54k\n\nAn Alexa skill that researches social media topics to generate daily prompts.\n\n🔗 https://t.co/woFyNmAPL0\n\n#opensource https://t.co/GYLYwXvnwF https://github.com/mvanhorn/last30days-skill",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 7,
+    "posted_at": "2026-07-28T11:00:32.000Z",
+    "repo_ids": [
+      "mvanhorn/last30days-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/mvanhorn/last30days-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "mvanhorn/last30days-skill",
+        "github_url": "https://github.com/mvanhorn/last30days-skill",
+        "skill_md_path": "skills/last30days/SKILL.md",
+        "name": "last30days",
+        "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
+        "stars": 54518
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082017378519650629",
+    "tweet_url": "https://x.com/javierguzmandev/status/2082017378519650629",
+    "author_handle": "javierguzmandev",
+    "author_name": "Javier Guzmán",
+    "text": "Have you ever read tech, sales or marketing books? This might be interesting for you then.\n\nI've created my very first Claude skill. A generator of agents based on documents you give to it.\n\nhttps://t.co/yO3zl0kjeL\n\nBasically, I have a ton of software and marketing books, a lot https://github.com/javierguzman/skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 21,
+    "posted_at": "2026-07-28T08:16:39.000Z",
+    "repo_ids": [
+      "javierguzman/skills"
+    ],
+    "repo_urls": [
+      "https://github.com/javierguzman/skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "javierguzman/skills",
+        "github_url": "https://github.com/javierguzman/skills",
+        "skill_md_path": "plugins/create-agent-from-docs/skills/create-agent-from-docs/SKILL.md",
+        "name": "create-agent-from-docs",
+        "description": "This skill should be used when the user wants to \"turn these PDFs into an agent\", \"create an agent from this documentation\", \"distill these docs into a Claude Code subagent\", \"build a specialized agent from this reference material\", \"make an expert out of this manual\", or provides one or more documents (PDFs, markdown, plain text) and asks for a subagent grounded in their content. Also use when the user asks to expand or update an existing agent's reference material with additional documents. Trigger even when the user does not say \"agent\" explicitly but describes wanting Claude to \"know\", \"be an expert in\", or \"have read\" a body of documents they are providing.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081986959610982469",
+    "tweet_url": "https://x.com/lesue123/status/2081986959610982469",
+    "author_handle": "lesue123",
+    "author_name": "lesue",
+    "text": "Claude Code's fatal flaw: it can't review code it just wrote. Builder's context blinds the reviewer.\n\nI built a skill that spawns a fresh Claude with ZERO build context, armed to break every line.\n\nIt caught 2 critical bugs normal review completely missed\n\nhttps://t.co/NjsKrw4dym http://github.com/lesue1/adversarial-review",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 5,
+    "posted_at": "2026-07-28T06:15:47.000Z",
+    "repo_ids": [
+      "lesue1/adversarial-review"
+    ],
+    "repo_urls": [
+      "https://github.com/lesue1/adversarial-review"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "lesue1/adversarial-review",
+        "github_url": "https://github.com/lesue1/adversarial-review",
+        "skill_md_path": "SKILL.md",
+        "name": "adversarial-review",
+        "description": "The builder is the worst reviewer. When the user finishes writing code, adding a feature, fixing a bug, or says \"review this\"/\"check my code\"/\"looks good?\", spawn a FRESH subagent with ZERO context from the build session. The subagent's job is adversarial: assume every line is wrong until proven correct. Only report findings that can be reproduced with concrete inputs. Do NOT trigger for trivial changes (typos, comments, formatting only).\n",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081551425377808854",
+    "tweet_url": "https://x.com/lushimiku/status/2081551425377808854",
+    "author_handle": "lushimiku",
+    "author_name": "路逝",
+    "text": "I open-sourced a Codex skill for high-stakes decisions.\n\nCodex verifies local facts and executes. ChatGPT Pro challenges assumptions and finds blind spots. You make the final call.\n\nNo raw-file uploads by default. No extra review for routine tasks.\n\nMIT: https://t.co/0mrY7zw10H https://github.com/kermars39-web/web-pro-decision-review",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 1,
+    "posted_at": "2026-07-27T01:25:07.000Z",
+    "repo_ids": [
+      "kermars39-web/web-pro-decision-review"
+    ],
+    "repo_urls": [
+      "https://github.com/kermars39-web/web-pro-decision-review"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "kermars39-web/web-pro-decision-review",
+        "github_url": "https://github.com/kermars39-web/web-pro-decision-review",
+        "skill_md_path": "SKILL.md",
+        "name": "web-pro-decision-review",
+        "description": "Use the user's signed-in ChatGPT Pro through the Codex in-app browser as a second reviewer for high-cognition work, including core planning, information architecture, folder or knowledge governance, workflow or system architecture, consequential tradeoffs, high-risk execution plans, and the narrative or framework of formal Word, PPT, or Markdown deliverables. Invoke implicitly when the task would materially affect long-term structure, many downstream files, time, budget, or management decisions, and invoke whenever the user explicitly asks for webpage Pro participation. Do not invoke for simple Q&A, focused fact lookup, routine renames or format conversion, small edits, or mechanical execution of an already-confirmed plan.",
+        "stars": 1
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081791453722976274",
+    "tweet_url": "https://x.com/fusionaivisuals/status/2081791453722976274",
+    "author_handle": "fusionaivisuals",
+    "author_name": "vibecodetools.net",
+    "text": "Every AI-generated site looks the same because the model defaults to the same look.  Hallmark refuses those defaults — a free skill for Claude Code, Cursor &amp; Codex that runs 57 anti-slop checks before returning your UI.  Build / audit / redesign / study\nhttps://t.co/d0E9bNDVKY https://t.co/7RwshrTUe0 http://github.com/Nutlope/hallmark",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 1,
+    "views": 37,
+    "posted_at": "2026-07-27T17:18:55.000Z",
+    "repo_ids": [
+      "Nutlope/hallmark"
+    ],
+    "repo_urls": [
+      "https://github.com/Nutlope/hallmark"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "nutlope/hallmark",
+        "github_url": "https://github.com/Nutlope/hallmark",
+        "skill_md_path": "skills/hallmark/SKILL.md",
+        "name": "hallmark",
+        "description": "Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots. Use when the user asks to build a new app or landing page, wants to redesign something, invokes Hallmark by name, or uses audit/redesign/study.",
+        "stars": 19250
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081555639810351113",
+    "tweet_url": "https://x.com/happySarahss/status/2081555639810351113",
+    "author_handle": "happySarahss",
+    "author_name": "HS",
+    "text": "Found a genuinely useful agent skill and sharing: last30days\n\n/last30days &lt;topic&gt; sweeps Reddit, X, YouTube, HN, Polymarket, GitHub, arXiv in parallel — scores everything by real engagement, not editorial pick. Zero config to start, no API key needed.\n\nhttps://t.co/a7xjtvknEU https://t.co/BLs6HUX9vb http://github.com/mvanhorn/last30days-skill",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 28,
+    "posted_at": "2026-07-27T01:41:52.000Z",
+    "repo_ids": [
+      "mvanhorn/last30days-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/mvanhorn/last30days-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "mvanhorn/last30days-skill",
+        "github_url": "https://github.com/mvanhorn/last30days-skill",
+        "skill_md_path": "skills/last30days/SKILL.md",
+        "name": "last30days",
+        "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
+        "stars": 54518
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082161681874997448",
+    "tweet_url": "https://x.com/Imiel_Visser/status/2082161681874997448",
+    "author_handle": "Imiel_Visser",
+    "author_name": "Imiël Visser",
+    "text": "I turned Claude into an autonomous project manager with a single skill file.\n\nOne command: \"/buildthis Prompt/PRD/Spec/Planning Doc\". \n\nThat's it.\n\nTell Claude: \"Install the /buildthis skill from https://t.co/cs6HrNul8M\"\n\nRestart Claude, and then \"/buildthis https://t.co/uOZE8WU2VE https://github.com/imielvisser/buildthis_Claude_Skill",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 17,
+    "posted_at": "2026-07-28T17:50:04.000Z",
+    "repo_ids": [
+      "imielvisser/buildthis_Claude_Skill"
+    ],
+    "repo_urls": [
+      "https://github.com/imielvisser/buildthis_Claude_Skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "imielvisser/buildthis_claude_skill",
+        "github_url": "https://github.com/imielvisser/buildthis_Claude_Skill",
+        "skill_md_path": "SKILL.md",
+        "name": "buildthis",
+        "description": "Autonomous project orchestrator that turns a build request into a fully executed, verified, and reported build — sub-agents in isolated git worktrees, a strict task state machine, per-phase QA and cost tracking, a tabbed HTML report, and an optional production-readiness review. The input can be a plan file, PRD, scope folder, task list, a doc URL, or just an inline description of a feature or change. Use whenever the user runs `/buildthis` with anything after it, or asks to build, implement, execute, or ship a plan / PRD / spec / scope / backlog / feature — even phrased casually like \"buildthis: add dark mode\" or \"resume the build\" — whether or not a file is involved.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082078203519123559",
+    "tweet_url": "https://x.com/item_v1/status/2082078203519123559",
+    "author_handle": "item_v1",
+    "author_name": "Ivan Mayorov",
+    "text": "I connected the Webflow MCP to Codex and used it to rebuild the Blumberger landing page from Figma directly in Webflow. https://t.co/MZDopzbLvC\n\nReusable skill:\nhttps://t.co/YrZhXZUk7K\n\n#WebflowMCP https://t.co/28De4EA0UH https://www.loom.com/share/e49e137b394049f68afb957348d0c7de https://github.com/IvanMayorov/figma-to-webflow",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 29,
+    "posted_at": "2026-07-28T12:18:21.000Z",
+    "repo_ids": [
+      "IvanMayorov/figma-to-webflow"
+    ],
+    "repo_urls": [
+      "https://github.com/IvanMayorov/figma-to-webflow"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "ivanmayorov/figma-to-webflow",
+        "github_url": "https://github.com/IvanMayorov/figma-to-webflow",
+        "skill_md_path": "SKILL.md",
+        "name": "figma-to-webflow",
+        "description": "Use when transferring Figma screens into Webflow through Webflow MCP, especially with section-scoped class naming, rem-based sizing, Webflow variables, object Image elements instead of background images, PNG 2x logo assets, HTML Embed global CSS, OAuth/session handling, and Designer element operations.",
+        "stars": 1
+      }
+    ]
+  },
+  {
+    "tweet_id": "2082004805799522488",
+    "tweet_url": "https://x.com/andfanilo/status/2082004805799522488",
+    "author_handle": "andfanilo",
+    "author_name": "Fanilo Andrianasolo",
+    "text": "🌸 Streamlit theme for font, color and spacing configuration is defined inside .streamlit/config.toml\nCoding agents with Streamlit agent skills have an easy time editing it with inspiration from external references!\n\nCode: https://t.co/slxGSBtzB8 https://t.co/TZbCg25tO5 https://github.com/andfanilo/streamlit-uber-nyc-pickups",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 134,
+    "posted_at": "2026-07-28T07:26:42.000Z",
+    "repo_ids": [
+      "andfanilo/streamlit-uber-nyc-pickups"
+    ],
+    "repo_urls": [
+      "https://github.com/andfanilo/streamlit-uber-nyc-pickups"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "andfanilo/streamlit-uber-nyc-pickups",
+        "github_url": "https://github.com/andfanilo/streamlit-uber-nyc-pickups",
+        "skill_md_path": ".claude/skills/developing-with-streamlit/SKILL.md",
+        "name": "developing-with-streamlit",
+        "description": "Use for ALL Streamlit tasks: creating, editing, debugging, beautifying, styling, theming, optimizing, or deploying Streamlit apps. Also custom components, st.components.v2, HTML/JS/CSS work. Discovers and loads version-matched reference docs from the user's installed Streamlit (>=1.57). Triggers: streamlit, st., dashboard, app.py, beautify, style, CSS, color, background, theme, button, widget styling, custom component, st.components, CCv2, session state, performance, cache, fragment, slow rerun, deploy.",
         "stars": 0
       }
     ]
