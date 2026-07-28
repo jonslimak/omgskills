@@ -390,9 +390,7 @@ struct ContentView: View {
         .onAppear {
             refreshResults(selectFirst: selectedId == nil)
             addKeyMonitor()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                searchFocused = true
-            }
+            updateSearchFocusAfterOpen()
         }
         .onDisappear {
             captureSessionIfNeeded()
@@ -430,9 +428,7 @@ struct ContentView: View {
             } else {
                 resetToDefaultOpenState()
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                searchFocused = true
-            }
+            updateSearchFocusAfterOpen()
         }
         .onReceive(NotificationCenter.default.publisher(for: .libraryDataDidRefresh)) { _ in
             Task {
@@ -2366,6 +2362,12 @@ struct ContentView: View {
         }
     }
 
+    private func updateSearchFocusAfterOpen() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            searchFocused = !shouldShowDetailPanel && !isCollectionsIndexPresented
+        }
+    }
+
     // MARK: - Selection
 
     private func normalizedCreatorHandle(_ rawHandle: String) -> String {
@@ -2948,7 +2950,7 @@ struct SkillRow: View {
     }
 
     private var rowDescriptionColor: Color {
-        selected ? AppUIStyle.selectedSecondaryText : .secondary.opacity(0.7)
+        selected ? AppUIStyle.selectedSecondaryText : AppUIStyle.feedDescriptionText
     }
 
 private func twitterAuthorLabel(_ skill: Skill) -> String {
