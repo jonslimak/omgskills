@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CollectionsIndexView: View {
+    let title: String
     let collections: [SkillCollection]
     let onOpen: (SkillCollection) -> Void
 
@@ -12,7 +13,7 @@ struct CollectionsIndexView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Collections")
+                Text(title)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.tertiary)
 

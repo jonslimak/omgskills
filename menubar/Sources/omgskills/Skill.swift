@@ -204,6 +204,21 @@ extension Skill {
         return nil
     }
 
+    var hasEnglishLikeTweetText: Bool {
+        guard let tweetText else { return true }
+        var letterCount = 0
+
+        for scalar in tweetText.unicodeScalars where scalar.properties.isAlphabetic {
+            letterCount += 1
+            if !Self.isLatinScalar(scalar) {
+                return false
+            }
+        }
+
+        guard letterCount >= 12 else { return true }
+        return true
+    }
+
     private static let collectionLikePublisherRepos: Set<String> = [
         "affaan-m/ecc",
         "affaan-m/everything-claude-code",
@@ -237,6 +252,18 @@ extension Skill {
              0x3400...0x9FFF, // CJK unified ideographs
              0xAC00...0xD7AF, // Hangul syllables
              0xF900...0xFAFF: // CJK compatibility ideographs
+            return true
+        default:
+            return false
+        }
+    }
+
+    private static func isLatinScalar(_ scalar: Unicode.Scalar) -> Bool {
+        switch scalar.value {
+        case 0x0041...0x005A,
+             0x0061...0x007A,
+             0x00C0...0x024F,
+             0x1E00...0x1EFF:
             return true
         default:
             return false
