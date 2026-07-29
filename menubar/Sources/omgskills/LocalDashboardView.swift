@@ -56,10 +56,10 @@ struct LocalDashboardView: View {
                         }
                     }
                 }
+                .padding(.horizontal, 18)
             }
 
         }
-        .padding(.horizontal, 18)
         .padding(.top, 7)
         .padding(.bottom, selectedFilter == nil ? 18 : 12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -475,26 +475,35 @@ private struct LocalDashboardStatTabs: View {
     let onSelect: (LocalDashboardFilter) -> Void
 
     var body: some View {
-        ZStack {
-            HStack(spacing: 0) {
-                ForEach(stats) { stat in
-                    LocalDashboardStatTab(stat: stat, selected: stat.filter == selectedFilter) {
-                        onSelect(stat.filter)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            }
+        GeometryReader { proxy in
+            let slotWidth = proxy.size.width / CGFloat(max(stats.count, 1))
+            let labelSize = slotWidth < 78 ? 10.0 : 11.0
+            let horizontalPadding = slotWidth < 78 ? 6.0 : 8.0
 
-            HStack(spacing: 0) {
-                Spacer(minLength: 0)
-                ForEach(0..<3, id: \.self) { _ in
+            ZStack {
+                HStack(spacing: 0) {
+                    ForEach(stats) { stat in
+                        LocalDashboardStatTab(
+                            stat: stat,
+                            selected: stat.filter == selectedFilter,
+                            labelSize: labelSize,
+                            horizontalPadding: horizontalPadding
+                        ) {
+                            onSelect(stat.filter)
+                        }
+                        .frame(width: slotWidth)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                ForEach(1..<stats.count, id: \.self) { index in
                     Rectangle()
                         .fill(Color.primary.opacity(0.12))
                         .frame(width: 1, height: 14)
-                    Spacer(minLength: 0)
+                        .position(x: slotWidth * CGFloat(index), y: 14)
                 }
+                .allowsHitTesting(false)
             }
-            .allowsHitTesting(false)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 28)
@@ -504,21 +513,27 @@ private struct LocalDashboardStatTabs: View {
 private struct LocalDashboardStatTab: View {
     let stat: LocalDashboardStat
     let selected: Bool
+    let labelSize: Double
+    let horizontalPadding: Double
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Text(stat.title)
-                    .font(.system(size: 11, weight: .regular))
+                    .font(.system(size: labelSize, weight: .regular))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.9)
+                    .allowsTightening(true)
                 Text("\(stat.value)")
                     .font(.system(size: 11, weight: .bold))
                     .monospacedDigit()
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             .lineLimit(1)
-            .minimumScaleFactor(0.75)
             .foregroundStyle(selected ? AppUIStyle.selectedPrimaryText : .primary)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, horizontalPadding)
             .frame(height: 22)
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
