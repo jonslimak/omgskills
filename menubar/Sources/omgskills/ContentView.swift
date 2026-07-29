@@ -168,6 +168,8 @@ private extension Array where Element == SkillCollection {
 }
 
 struct ContentView: View {
+    private let manualUpdateUIEnabled = false
+
     let deviceConnectionModel: DeviceConnectionModel
     let updateInstallCoordinator: UpdateInstallCoordinator
     let skillGroupsAuthEnabled: Bool
@@ -659,7 +661,7 @@ struct ContentView: View {
 
                 Spacer()
 
-                if updateAvailable {
+                if manualUpdateUIEnabled && updateAvailable {
                     Button {
                         NotificationCenter.default.post(name: .checkForUpdates, object: nil)
                     } label: {
