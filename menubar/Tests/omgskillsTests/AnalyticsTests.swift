@@ -1,4 +1,5 @@
 import Testing
+import Foundation
 @testable import omgskills
 
 struct AnalyticsTests {
@@ -59,5 +60,103 @@ struct AnalyticsTests {
         #expect(parameters["local_only"] == "5")
         #expect(bucketValues.count == bucketKeys.count)
         #expect(bucketValues.reduce(0, +) == measurement.totalInstalled)
+    }
+
+    @Test func pendingUpdateCompletionEmitsCompletedAndClearsStore() throws {
+        let context = makePendingUpdateContext()
+        defer { context.cleanup() }
+        context.store.save(
+            sourceVersion: "0.0.19",
+            sourceBuild: "19",
+            targetVersion: "0.0.20",
+            targetBuild: "20"
+        )
+        var emittedName: String?
+        var emittedParameters: [String: String]?
+
+        let handled = Analytics.signalPendingUpdateCompletionIfNeeded(
+            pendingStore: context.store,
+            currentVersion: "0.0.20",
+            currentBuild: "20"
+        ) { name, parameters in
+            emittedName = name
+            emittedParameters = parameters
+        }
+
+        let parameters = try #require(emittedParameters)
+        #expect(handled == true)
+        #expect(emittedName == "app.update_completed")
+        #expect(parameters["source_version"] == "0.0.19")
+        #expect(parameters["source_build"] == "19")
+        #expect(parameters["target_version"] == "0.0.20")
+        #expect(parameters["target_build"] == "20")
+        #expect(parameters["app_version"] == "0.0.20")
+        #expect(parameters["build_number"] == "20")
+        #expect(context.store.load() == nil)
+    }
+
+    @Test func pendingUpdateMismatchEmitsFailureAndClearsStore() throws {
+        let context = makePendingUpdateContext()
+        defer { context.cleanup() }
+        context.store.save(
+            sourceVersion: "0.0.19",
+            sourceBuild: "19",
+            targetVersion: "0.0.20",
+            targetBuild: "20"
+        )
+        var emittedName: String?
+        var emittedParameters: [String: String]?
+
+        let handled = Analytics.signalPendingUpdateCompletionIfNeeded(
+            pendingStore: context.store,
+            currentVersion: "0.0.19",
+            currentBuild: "19"
+        ) { name, parameters in
+            emittedName = name
+            emittedParameters = parameters
+        }
+
+        let parameters = try #require(emittedParameters)
+        #expect(handled == true)
+        #expect(emittedName == "error.update_failed")
+        #expect(parameters["reason"] == "launched_version_mismatch")
+        #expect(context.store.load() == nil)
+    }
+
+    @Test func noPendingUpdateCompletionEmitsNothing() {
+        let context = makePendingUpdateContext()
+        defer { context.cleanup() }
+        var emittedCount = 0
+
+        let handled = Analytics.signalPendingUpdateCompletionIfNeeded(
+            pendingStore: context.store,
+            currentVersion: "0.0.20",
+            currentBuild: "20"
+        ) { _, _ in
+            emittedCount += 1
+        }
+
+        #expect(handled == false)
+        #expect(emittedCount == 0)
+    }
+
+    private func makePendingUpdateContext() -> PendingUpdateContext {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        return PendingUpdateContext(
+            suiteName: suiteName,
+            defaults: defaults,
+            store: PendingUpdateInstallStore(userDefaults: defaults)
+        )
+    }
+
+    private struct PendingUpdateContext {
+        let suiteName: String
+        let defaults: UserDefaults
+        let store: PendingUpdateInstallStore
+
+        func cleanup() {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
     }
 }

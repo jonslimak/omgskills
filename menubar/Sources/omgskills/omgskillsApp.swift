@@ -344,6 +344,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        Analytics.signal(
+            "app.update_found",
+            parameters: Analytics.updateParameters(
+                targetVersion: item.displayVersionString,
+                targetBuild: item.versionString
+            )
+        )
         postUpdateAvailability(true)
     }
 

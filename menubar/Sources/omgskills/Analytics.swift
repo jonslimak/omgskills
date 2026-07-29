@@ -13,6 +13,7 @@ enum Analytics {
         TelemetryDeck.initialize(config: config)
         trackInstallState()
         signal("app.launched", parameters: appVersionParameters())
+        signalPendingUpdateCompletionIfNeeded()
     }
 
     static func signal(_ name: String, parameters: [String: String] = [:]) {
@@ -93,5 +94,61 @@ enum Analytics {
             "app_version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown",
             "build_number": Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         ]
+    }
+
+    static func updateParameters(
+        appVersionParameters: [String: String] = appVersionParameters(),
+        targetVersion: String?,
+        targetBuild: String?
+    ) -> [String: String] {
+        var parameters = appVersionParameters
+        parameters["target_version"] = targetVersion ?? "unknown"
+        parameters["target_build"] = targetBuild ?? "unknown"
+        return parameters
+    }
+
+    @discardableResult
+    static func signalPendingUpdateCompletionIfNeeded(
+        pendingStore: PendingUpdateInstallStore = PendingUpdateInstallStore(),
+        currentVersion: String = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown",
+        currentBuild: String = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown",
+        emit: (_ name: String, _ parameters: [String: String]) -> Void = { name, parameters in
+            signal(name, parameters: parameters)
+        }
+    ) -> Bool {
+        guard let pending = pendingStore.load() else { return false }
+
+        var parameters: [String: String] = [
+            "app_version": currentVersion,
+            "build_number": currentBuild,
+            "source_version": pending.sourceVersion ?? "unknown",
+            "source_build": pending.sourceBuild ?? "unknown",
+            "target_version": pending.targetVersion ?? "unknown",
+            "target_build": pending.targetBuild ?? "unknown"
+        ]
+
+        if pending.matches(currentVersion: currentVersion, currentBuild: currentBuild) {
+            emit("app.update_completed", parameters)
+        } else {
+            parameters["reason"] = "launched_version_mismatch"
+            emit("error.update_failed", parameters)
+        }
+
+        pendingStore.clear()
+        return true
+    }
+}
+
+extension PendingUpdateInstall {
+    func matches(currentVersion: String, currentBuild: String) -> Bool {
+        if let targetBuild {
+            return targetBuild == currentBuild
+        }
+
+        if let targetVersion {
+            return targetVersion == currentVersion
+        }
+
+        return false
     }
 }
