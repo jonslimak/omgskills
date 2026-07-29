@@ -73,7 +73,7 @@ jobs:
         working-directory: index
         env:
           GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
-          V2_POLICY_MODE: "observe"
+          V2_POLICY_MODE: "enforce"
           V2_SCRAPER_SOFT_DEADLINE_MINUTES: "300"
           V2_SCRAPER_REQUEST_TIMEOUT_MS: "30000"
         run: npm run scrape
