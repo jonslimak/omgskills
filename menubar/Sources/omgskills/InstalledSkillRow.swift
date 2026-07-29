@@ -21,7 +21,7 @@ struct InstalledSkillRow: View {
                 Spacer(minLength: 4)
 
                 HStack(spacing: 4) {
-                    ForEach(item.sourceGroups) { sourceGroup in
+                    ForEach(item.sourceGroups.filter { $0.source != "Agents" }) { sourceGroup in
                         SourceBadge(
                             sourceGroup: sourceGroup,
                             selectedSkillId: selectedSkillId,

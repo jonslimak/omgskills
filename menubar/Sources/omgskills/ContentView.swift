@@ -645,19 +645,13 @@ struct ContentView: View {
                         postDetailVisibility(false)
                         searchFocused = true
                     } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.left")
-                                .font(.system(size: 9))
-                            Text("Exit")
-                                .font(.system(size: 9))
-                        }
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 11))
                         .padding(.horizontal, 7)
                         .padding(.vertical, 4)
-                        .background(Color.primary.opacity(0.1))
-                        .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tertiary)
                     .help("Back")
                 }
 
@@ -2989,7 +2983,7 @@ struct SkillRow: View {
                         .foregroundStyle(rowSecondaryColor)
                         .monospacedDigit()
                         .frame(width: trailingMetricWidth, alignment: .leading)
-                    } else if let origin = skill.origin {
+                    } else if let origin = skill.origin, origin != "Agents" {
                         SkillOriginBadge(origin: origin, selected: selected)
                     }
                 }
