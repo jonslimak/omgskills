@@ -26,6 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private let updateProbeInterval: TimeInterval = 30 * 60
     private var lastUpdateProbeAt: Date?
     private let updateInstallCoordinator = UpdateInstallCoordinator()
+    private lazy var updateInstallHandler = UpdateInstallHandler(coordinator: updateInstallCoordinator)
     private var libraryRefreshScheduler: NSBackgroundActivityScheduler?
     private var libraryRefreshTask: Task<Void, Never>?
     private var libraryRefreshTimer: Timer?
@@ -344,6 +345,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         postUpdateAvailability(true)
+    }
+
+    func updater(
+        _ updater: SPUUpdater,
+        willInstallUpdateOnQuit item: SUAppcastItem,
+        immediateInstallationBlock immediateInstallHandler: @escaping () -> Void
+    ) -> Bool {
+        updateInstallHandler.handleInstallOnQuit(
+            targetVersion: item.displayVersionString,
+            targetBuild: item.versionString
+        ) {
+            immediateInstallHandler()
+        }
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
