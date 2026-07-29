@@ -19,7 +19,10 @@ let package = Package(
                 .product(name: "Sparkle", package: "Sparkle"),
                 .product(name: "TelemetryDeck", package: "SwiftSDK"),
             ],
-            resources: [.copy("Resources")]
+            resources: [.copy("Resources")],
+            swiftSettings: [
+                .define("OMGSKILLS_DEBUG_APPCAST_OVERRIDE", .when(configuration: .debug))
+            ]
         ),
         .testTarget(
             name: "omgskillsTests",

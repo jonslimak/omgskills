@@ -16,6 +16,7 @@ struct OmgskillsApp: App {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
+    nonisolated static let debugAppcastURLEnvironmentKey = "OMGSKILLS_DEBUG_APPCAST_URL"
     private static let libraryRefreshTimerInterval: TimeInterval = 60 * 60
     private let skillGroupsAuthEnabled = AppRuntimeConfiguration.skillGroupsAuthEnabled
     private var statusItem: NSStatusItem!
@@ -298,6 +299,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         return now.timeIntervalSince(lastProbeAt) >= interval
     }
 
+    nonisolated static func debugAppcastFeedURLString(environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
+        #if OMGSKILLS_DEBUG_APPCAST_OVERRIDE
+        guard let rawValue = environment[debugAppcastURLEnvironmentKey]?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !rawValue.isEmpty,
+              let url = URL(string: rawValue),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https"
+        else {
+            return nil
+        }
+
+        return rawValue
+        #else
+        return nil
+        #endif
+    }
+
     private func repositionPanel(width: CGFloat, animate: Bool) {
         guard let button = statusItem.button, let buttonWindow = button.window else { return }
         let buttonRect = button.convert(button.bounds, to: nil)
@@ -352,6 +370,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             )
         )
         postUpdateAvailability(true)
+    }
+
+    func feedURLString(for updater: SPUUpdater) -> String? {
+        Self.debugAppcastFeedURLString()
     }
 
     func updater(
