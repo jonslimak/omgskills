@@ -34,7 +34,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     env:
       PUBLICATION_IMPACT_OVERRIDE: ${{ inputs.publication_impact_override == true && '1' || '' }}
       PUBLICATION_IMPACT_OVERRIDE_REASON: ${{ inputs.publication_impact_override_reason || '' }}
@@ -74,6 +74,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
           V2_POLICY_MODE: "observe"
+          V2_SCRAPER_SOFT_DEADLINE_MINUTES: "300"
+          V2_SCRAPER_REQUEST_TIMEOUT_MS: "30000"
         run: npm run scrape
 
       - name: Summarize v2 policy observation

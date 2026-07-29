@@ -2,6 +2,10 @@ import { parse as parseYaml } from "yaml";
 import { octokit } from "./client.js";
 import { gitBlobSha } from "./git-blob-sha.js";
 import { createRefreshReplayStoreFromEnv } from "./new-crawl/refresh-replay.js";
+import {
+  isRequestTimeoutError,
+  parseOptionalPositiveDurationMs,
+} from "./runtime-guard.js";
 import type { Skill } from "./types.js";
 
 export interface Candidate {
@@ -44,6 +48,11 @@ interface Frontmatter {
 
 const repoCache = new Map<string, RepoMeta>();
 const refreshReplay = createRefreshReplayStoreFromEnv();
+const requestTimeoutMs = parseOptionalPositiveDurationMs(
+  "V2_SCRAPER_REQUEST_TIMEOUT_MS",
+  process.env.V2_SCRAPER_REQUEST_TIMEOUT_MS,
+  1,
+);
 
 class StableFailure extends Error {
   scope: "repo" | "candidate";
@@ -104,6 +113,10 @@ export async function getCandidateRepoMeta(c: Candidate, today: string): Promise
     return await getRepoMeta(owner, repo);
   } catch (err: unknown) {
     const e = err as { status?: number; message?: string };
+    if (isRequestTimeoutError(err)) {
+      console.warn(`[meta-timeout] ${c.id}: using candidate metadata`);
+      return fallbackRepoMeta(c, owner, today);
+    }
     if (e.status === 403 && c.github_url) {
       console.warn(`[meta-fallback] ${c.id}: ${e.message ?? "GitHub repo metadata unavailable"}`);
       return fallbackRepoMeta(c, owner, today);
@@ -191,7 +204,9 @@ async function fetchRawFile(
     const replayKey = `${owner}/${repo}@${candidateRef}:${path}`;
     const fileData = await refreshReplay.rawFile(replayKey, async () => {
       const url = `https://raw.githubusercontent.com/${owner}/${repo}/${candidateRef}/${path}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        ...(requestTimeoutMs === null ? {} : { signal: AbortSignal.timeout(requestTimeoutMs) }),
+      });
       if (!res.ok) {
         if (res.status === 404) return null;
         const error = new Error(`raw fetch failed (${res.status}) for ${owner}/${repo}/${path}@${candidateRef}`) as Error & { status?: number };

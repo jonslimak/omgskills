@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, existsSync, renameSync, copyFileSync } from "node:fs";
+import { appendFileSync, writeFileSync, readFileSync, existsSync, renameSync, copyFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { performance } from "node:perf_hooks";
@@ -18,6 +18,7 @@ import {
   type Candidate,
   type NegativeCacheFailure,
 } from "./enrich.js";
+import { carryForwardExistingSkills } from "./carry-forward.js";
 import { loadTrustedSeeds } from "./new-crawl/seeds.js";
 import { isSuppressedSkillId } from "./new-crawl/suppressed-skills.js";
 import type { TrustedSeeds } from "./new-crawl/types.js";
@@ -31,6 +32,12 @@ import {
   type V2PolicySkillFact,
 } from "./policy/observation-snapshot.js";
 import { SKILLS_SH_MIN_REPO_STARS } from "./policy/rollout-criteria.js";
+import {
+  calculateRuntimeProgress,
+  formatRuntimeDuration,
+  parseOptionalPositiveDurationMs,
+  runtimeBudgetExpired,
+} from "./runtime-guard.js";
 import {
   LEGACY_BLOCKED_OWNERS,
   LEGACY_BLOCKED_REPOS,
@@ -499,6 +506,11 @@ async function main() {
   const candidatePolicyObservations: V2CandidatePolicyObservation[] = [];
   const today = new Date().toISOString().slice(0, 10);
   const buildStart = performance.now();
+  const softDeadlineMs = parseOptionalPositiveDurationMs(
+    "V2_SCRAPER_SOFT_DEADLINE_MINUTES",
+    process.env.V2_SCRAPER_SOFT_DEADLINE_MINUTES,
+    60_000,
+  );
   const sourceSummaries: SourceResult[] = [];
 
   console.log(`[mode] ${options.dryRun ? "dry-run" : options.outputSuffix ? `debug (${options.outputSuffix})` : "production"}`);
@@ -515,6 +527,9 @@ async function main() {
   if (options.idPrefix) console.log(`[filter] id prefix: ${options.idPrefix}`);
   if (options.ignoreNegativeCache) console.log("[cache] ignoring negative cache");
   if (options.resumeFrom) console.log(`[resume] loading existing snapshot from ${options.resumeFrom}`);
+  if (softDeadlineMs !== null) {
+    console.log(`[deadline] stop new enrichment after ${formatRuntimeDuration(softDeadlineMs)}`);
+  }
 
   // Back up the current index before touching anything
   if (!options.dryRun && existsSync(paths.outPath)) {
@@ -752,8 +767,31 @@ async function main() {
   let negativeCached = 0;
   let i = 0;
   const total = candidates.size;
+  const enrichmentStart = performance.now();
+  let softDeadlineReached = false;
+
+  const maybeLogEnrichmentProgress = (force = false) => {
+    if (!force && i % 50 !== 0 && i !== total) return;
+    const progress = calculateRuntimeProgress(i, total, performance.now() - enrichmentStart);
+    const estimatedFinish = progress.estimatedRemainingMs === null
+      ? "unknown"
+      : new Date(Date.now() + progress.estimatedRemainingMs).toISOString();
+    console.log(
+      `  enriched ${i}/${total} (kept ${skills.length}, cached ${cached}, skipped ${skipped}, ` +
+      `${progress.ratePerMinute.toFixed(1)}/min, remaining ${formatRuntimeDuration(progress.estimatedRemainingMs)}, ` +
+      `estimated finish ${estimatedFinish})`,
+    );
+  };
 
   for (const c of candidates.values()) {
+    if (runtimeBudgetExpired(buildStart, softDeadlineMs, performance.now())) {
+      softDeadlineReached = true;
+      console.warn(
+        `[deadline] Reached ${formatRuntimeDuration(softDeadlineMs)} soft deadline; ` +
+        `deferring ${total - i} candidates and preserving the existing catalog.`,
+      );
+      break;
+    }
     i++;
     if (!options.ignoreNegativeCache) {
       const cachedFailure = negativeCacheEntryForCandidate(c, negativeCache);
@@ -763,6 +801,7 @@ async function main() {
         if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
           console.log(`  [pre-skip] ${c.id}: negative cache (${cachedFailure.reason})`);
         }
+        maybeLogEnrichmentProgress();
         continue;
       }
     }
@@ -778,12 +817,14 @@ async function main() {
         if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
           console.log(`  [pre-skip] ${c.id}: ${failure.reason}`);
         }
+        maybeLogEnrichmentProgress();
         continue;
       }
       throw err;
     }
     if (!prefetchedMeta) {
       skipped++;
+      maybeLogEnrichmentProgress();
       continue;
     }
     if (prefetchedMeta.stars < MIN_REPO_STARS) {
@@ -792,6 +833,7 @@ async function main() {
       if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
         console.log(`  [pre-skip] ${c.id}: below ${MIN_REPO_STARS} stars (${prefetchedMeta.stars})`);
       }
+      maybeLogEnrichmentProgress();
       continue;
     }
 
@@ -804,6 +846,7 @@ async function main() {
         policyMode === "enforce" && evaluateProposedV2Skill(s, trustedSeeds).excluded
       )) {
         skipped++;
+        maybeLogEnrichmentProgress();
         continue;
       }
       clearNegativeCacheForCandidate(negativeCache, c);
@@ -818,6 +861,7 @@ async function main() {
       }
       if (options.maxEnriched && skills.length >= options.maxEnriched) {
         console.log(`  reached --max-enriched=${options.maxEnriched}`);
+        maybeLogEnrichmentProgress(true);
         break;
       }
     } else {
@@ -833,24 +877,16 @@ async function main() {
     ) {
       console.log(`  [enrich-time] ${c.id} ${Math.round(enrichDurationMs)}ms ${s ? "kept" : "skipped"}`);
     }
-    if (i % 50 === 0 || i === total) {
-      console.log(`  enriched ${i}/${total} (kept ${skills.length}, cached ${cached}, skipped ${skipped})`);
-    }
+    maybeLogEnrichmentProgress();
   }
+  if (softDeadlineReached) maybeLogEnrichmentProgress(true);
 
   // Carry forward existing skills that weren't rediscovered this run.
   // Skills only leave the index when enrichment explicitly fails (returns null).
   // If a skill was never a candidate, it stays — silently dropping it when code
   // search caps out would shrink the index every run.
   const enrichedKept = skills.length;
-  const enrichedIds = new Set(skills.map((s) => s.id));
-  let carriedForward = 0;
-  for (const [id, existing] of existingSkills) {
-    if (!enrichedIds.has(id) && existing.name) {
-      skills.push(existing as Skill);
-      carriedForward++;
-    }
-  }
+  const carriedForward = carryForwardExistingSkills(skills, existingSkills);
 
   skills.sort((a, b) => b.stars - a.stars);
   const legacySkills = dedupeSkills(skills.filter((skill) => !isSuppressedSkillId(skill.id, trustedSeeds))).skills;
@@ -923,8 +959,33 @@ async function main() {
 
   const newCount = effectiveSkills.filter((s) => !existingFirstSeen.has(s.id)).length;
   const totalMs = performance.now() - buildStart;
+  const enrichmentProgress = calculateRuntimeProgress(i, total, performance.now() - enrichmentStart);
+  const deferredCandidates = Math.max(0, total - i);
+  const estimatedCompletionAt = enrichmentProgress.estimatedRemainingMs === null
+    ? "unknown"
+    : new Date(Date.now() + enrichmentProgress.estimatedRemainingMs).toISOString();
   console.log(`\nDone. ${effectiveSkills.length} skills (${newCount} new, ${cached} cached, ${skipped} skipped, ${starFiltered} star-filtered, ${negativeCached} negative-cached, ${carriedForward} carried forward).`);
   console.log(`Summary: ${sourceSummaries.length} sources, ${candidates.size} candidates, ${enrichedKept} enriched kept, ${totalMs.toFixed(0)}ms total.`);
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (summaryPath) {
+    appendFileSync(
+      summaryPath,
+      [
+        "",
+        "## v2 scraper runtime",
+        "",
+        `- Runtime: ${formatRuntimeDuration(totalMs)}`,
+        `- Candidates processed: ${i}/${total}`,
+        `- Average throughput: ${enrichmentProgress.ratePerMinute.toFixed(1)} candidates/minute`,
+        `- Soft deadline reached: ${softDeadlineReached ? "yes" : "no"}`,
+        `- Candidates deferred: ${deferredCandidates}`,
+        `- Estimated time remaining at exit: ${formatRuntimeDuration(enrichmentProgress.estimatedRemainingMs)}`,
+        `- Estimated completion without cutoff: ${estimatedCompletionAt}`,
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+  }
   if (options.dryRun) {
     console.log("→ dry run: catalog/cache unchanged; policy observation report updated");
   } else {

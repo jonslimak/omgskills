@@ -2,6 +2,7 @@ import { Octokit } from "@octokit/rest";
 import { throttling } from "@octokit/plugin-throttling";
 import { retry } from "@octokit/plugin-retry";
 import { config } from "dotenv";
+import { parseOptionalPositiveDurationMs } from "./runtime-guard.js";
 
 config();
 
@@ -11,11 +12,17 @@ if (!token) {
 }
 
 const disableThrottleRetry = process.env.OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY === "1";
+const requestTimeoutMs = parseOptionalPositiveDurationMs(
+  "V2_SCRAPER_REQUEST_TIMEOUT_MS",
+  process.env.V2_SCRAPER_REQUEST_TIMEOUT_MS,
+  1,
+);
 
 const HardenedOctokit = Octokit.plugin(throttling, retry);
 
 export const octokit = new HardenedOctokit({
   auth: token,
+  ...(requestTimeoutMs === null ? {} : { request: { timeout: requestTimeoutMs } }),
   retry: {
     doNotRetry: [400, 401, 403, 404, 409, 422, 429],
   },

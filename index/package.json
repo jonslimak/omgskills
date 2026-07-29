@@ -13,7 +13,7 @@
     "crawl4:validate-canonical-policy": "tsx scraper/new-crawl/validate-canonical-policy.ts",
     "crawl4:audit-security": "tsx scraper/new-crawl/audit-security.ts",
     "promote:cutover": "tsx scraper/new-crawl/promote-cutover.ts",
-    "test:shadow-guard": "tsx --test scraper/new-crawl/*.test.ts scraper/policy/*.test.ts scripts/publish-sha-history.test.ts scripts/publish-skill-equivalence.test.ts",
+    "test:shadow-guard": "tsx --test scraper/carry-forward.test.ts scraper/runtime-guard.test.ts scraper/new-crawl/*.test.ts scraper/policy/*.test.ts scripts/publish-sha-history.test.ts scripts/publish-skill-equivalence.test.ts",
     "scrape:debug": "tsx scraper/build.ts --sources=aggregators,social,registry,awesome,official --aggregator-repo-limit=10 --social-page-limit=1 --output-suffix=debug --max-enriched=200",
     "scrape:debug:official": "tsx scraper/build.ts --sources=official --output-suffix=debug --max-enriched=100 --max-candidates=150",
     "scrape:debug:skillssh": "tsx scraper/build.ts --sources=skillssh --output-suffix=debug --max-enriched=100 --max-candidates=150",
