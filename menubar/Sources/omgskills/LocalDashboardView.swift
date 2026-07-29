@@ -74,6 +74,7 @@ struct SkillSyncView: View {
     }
 
     let connectionModel: DeviceConnectionModel
+    let updateCoordinator: UpdateInstallCoordinator
     let installations: [Skill]
     let isReady: Bool
 
@@ -82,7 +83,20 @@ struct SkillSyncView: View {
     @State private var legacyExpanded = false
     @State private var showReplacementConfirmation = false
     @State private var replacementMethod = ConnectionMethod.browser
-    @State private var legacyModel = LegacySkillSyncModel()
+    @State private var legacyModel: LegacySkillSyncModel
+
+    init(
+        connectionModel: DeviceConnectionModel,
+        updateCoordinator: UpdateInstallCoordinator,
+        installations: [Skill],
+        isReady: Bool
+    ) {
+        self.connectionModel = connectionModel
+        self.updateCoordinator = updateCoordinator
+        self.installations = installations
+        self.isReady = isReady
+        _legacyModel = State(initialValue: LegacySkillSyncModel(updateCoordinator: updateCoordinator))
+    }
 
     private var trimmedPairingCode: String {
         pairingCode.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -420,6 +434,11 @@ private final class LegacySkillSyncModel {
 
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored private var attemptID: UUID?
+    @ObservationIgnored private let updateCoordinator: UpdateInstallCoordinator?
+
+    init(updateCoordinator: UpdateInstallCoordinator? = nil) {
+        self.updateCoordinator = updateCoordinator
+    }
 
     func sync(token: String, installations: [Skill]) {
         cancel()
@@ -429,8 +448,10 @@ private final class LegacySkillSyncModel {
         isError = false
         status = "Uploading installed skill metadata..."
         let snapshot = installations
+        let activity = updateCoordinator?.beginActivity(.legacySync)
 
         task = Task { @MainActor [weak self] in
+            defer { activity?.finish() }
             guard let self else { return }
             do {
                 let result = try await SkillSyncService.upload(

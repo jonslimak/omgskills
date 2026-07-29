@@ -25,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var updateProbeAttempts = 0
     private let updateProbeInterval: TimeInterval = 30 * 60
     private var lastUpdateProbeAt: Date?
+    private let updateInstallCoordinator = UpdateInstallCoordinator()
     private var libraryRefreshScheduler: NSBackgroundActivityScheduler?
     private var libraryRefreshTask: Task<Void, Never>?
     private var libraryRefreshTimer: Timer?
@@ -36,7 +37,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     )
     private lazy var deviceConnectionModel = DeviceConnectionModel(
         credentialStore: DeviceCredentialStore(service: DeviceCredentialStore.configuredService()),
-        browserAuthorizer: browserPairingSession
+        browserAuthorizer: browserPairingSession,
+        updateCoordinator: updateInstallCoordinator
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -226,6 +228,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         let hostingView = NSHostingView(
             rootView: ContentView(
                 deviceConnectionModel: deviceConnectionModel,
+                updateInstallCoordinator: updateInstallCoordinator,
                 skillGroupsAuthEnabled: skillGroupsAuthEnabled
             )
         )

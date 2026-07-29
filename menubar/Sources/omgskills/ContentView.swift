@@ -169,6 +169,7 @@ private extension Array where Element == SkillCollection {
 
 struct ContentView: View {
     let deviceConnectionModel: DeviceConnectionModel
+    let updateInstallCoordinator: UpdateInstallCoordinator
     let skillGroupsAuthEnabled: Bool
 
     @StateObject private var store = SkillsStore()
@@ -608,6 +609,7 @@ struct ContentView: View {
     private var syncPanel: some View {
         SkillSyncView(
             connectionModel: deviceConnectionModel,
+            updateCoordinator: updateInstallCoordinator,
             installations: store.installedSkillInstallations,
             isReady: store.isInstalledIdentityReady
         )
@@ -2049,22 +2051,40 @@ struct ContentView: View {
     private func crossInstallSkill(_ skill: Skill, target: SkillInstaller.Target) {
         guard crossInstallState.isInstalling == false else { return }
         crossInstallState = .installing
-        Task.detached {
+        Task { @MainActor in
+            let activity = updateInstallCoordinator.beginActivity(.localCrossInstall)
+            defer { activity.finish() }
             do {
-                _ = try LocalSkillCrossInstaller.install(skill, target: target)
-                await MainActor.run {
-                    Analytics.signal(crossInstallSignalName(for: target), parameters: analyticsParameters(for: skill, target: target))
-                    crossInstallState = .idle
-                    store.refreshInstalled()
-                    refreshResults(selectFirst: false)
-                }
+                _ = try await Task.detached {
+                    try LocalSkillCrossInstaller.install(skill, target: target)
+                }.value
+                Analytics.signal(crossInstallSignalName(for: target), parameters: analyticsParameters(for: skill, target: target))
+                crossInstallState = .idle
+                store.refreshInstalled()
+                refreshResults(selectFirst: false)
             } catch {
-                await MainActor.run {
-                    Analytics.signal("error.copy_failed", parameters: analyticsParameters(for: skill, target: target, error: error))
-                    crossInstallState = .failed(error.localizedDescription)
-                    store.refreshInstalled()
+                Analytics.signal("error.copy_failed", parameters: analyticsParameters(for: skill, target: target, error: error))
+                crossInstallState = .failed(error.localizedDescription)
+                store.refreshInstalled()
+            }
+        }
+    }
+
+    private func deleteInstalledSkill(_ skill: Skill) {
+        do {
+            try updateInstallCoordinator.withActivity(.localSkillDelete) {
+                let result = try InstalledSkillUninstaller.uninstall(skill)
+                skillPendingDelete = nil
+                deleteError = result.provenanceCleanupWarning
+                store.refreshInstalled()
+                refreshResults(selectFirst: false)
+                if selectedSkill == nil {
+                    showDetail = false
                 }
             }
+        } catch {
+            deleteError = error.localizedDescription
+            skillPendingDelete = nil
         }
     }
 
@@ -2103,22 +2123,6 @@ struct ContentView: View {
         "Install this \(skill.origin ?? "local") skill on \(target.rawValue)"
     }
 
-    private func deleteInstalledSkill(_ skill: Skill) {
-        do {
-            let result = try InstalledSkillUninstaller.uninstall(skill)
-            skillPendingDelete = nil
-            deleteError = result.provenanceCleanupWarning
-            store.refreshInstalled()
-            refreshResults(selectFirst: false)
-            if selectedSkill == nil {
-                showDetail = false
-            }
-        } catch {
-            deleteError = error.localizedDescription
-            skillPendingDelete = nil
-        }
-    }
-
     private func installGitHubPromptSkill() {
         guard case .ready(let skill) = githubInstallPromptResolution else { return }
         let targets: [SkillInstaller.Target] = [
@@ -2128,26 +2132,24 @@ struct ContentView: View {
         guard !targets.isEmpty else { return }
 
         githubInstallPromptStatus = .installing
-        Task.detached {
+        Task { @MainActor in
+            let activity = updateInstallCoordinator.beginActivity(.gitHubInstallPrompt)
+            defer { activity.finish() }
             do {
                 for target in targets {
-                    _ = try await SkillInstaller.install(skill, target: target)
-                    await MainActor.run {
-                        Analytics.signal("skill.installed", parameters: analyticsParameters(for: skill, target: target))
-                    }
+                    _ = try await Task.detached {
+                        try await SkillInstaller.install(skill, target: target)
+                    }.value
+                    Analytics.signal("skill.installed", parameters: analyticsParameters(for: skill, target: target))
                 }
-                await MainActor.run {
-                    githubInstallPromptStatus = .success("Installed")
-                    store.refreshInstalled()
-                    localDashboardFilter = nil
-                    refreshResults(selectFirst: false)
-                }
+                githubInstallPromptStatus = .success("Installed")
+                store.refreshInstalled()
+                localDashboardFilter = nil
+                refreshResults(selectFirst: false)
             } catch {
-                await MainActor.run {
-                    Analytics.signal("error.install_failed", parameters: analyticsParameters(for: skill, error: error))
-                    githubInstallPromptStatus = .failed(error.localizedDescription)
-                    store.refreshInstalled()
-                }
+                Analytics.signal("error.install_failed", parameters: analyticsParameters(for: skill, error: error))
+                githubInstallPromptStatus = .failed(error.localizedDescription)
+                store.refreshInstalled()
             }
         }
     }
@@ -2219,21 +2221,21 @@ struct ContentView: View {
     private func installSkill(_ skill: Skill, target: SkillInstaller.Target) {
         guard installState(for: target).isDisabled == false else { return }
         setInstallState(.installing, for: target)
-        Task.detached {
+        Task { @MainActor in
+            let activity = updateInstallCoordinator.beginActivity(.skillInstall)
+            defer { activity.finish() }
             do {
-                _ = try await SkillInstaller.install(skill, target: target)
-                await MainActor.run {
-                    guard selectedId == skill.id else { return }
-                    Analytics.signal("skill.installed", parameters: analyticsParameters(for: skill, target: target))
-                    setInstallState(.installed, for: target)
-                    store.refreshInstalled()
-                }
+                _ = try await Task.detached {
+                    try await SkillInstaller.install(skill, target: target)
+                }.value
+                guard selectedId == skill.id else { return }
+                Analytics.signal("skill.installed", parameters: analyticsParameters(for: skill, target: target))
+                setInstallState(.installed, for: target)
+                store.refreshInstalled()
             } catch {
-                await MainActor.run {
-                    guard selectedId == skill.id else { return }
-                    Analytics.signal("error.install_failed", parameters: analyticsParameters(for: skill, target: target, error: error))
-                    setInstallState(.failed(error.localizedDescription), for: target)
-                }
+                guard selectedId == skill.id else { return }
+                Analytics.signal("error.install_failed", parameters: analyticsParameters(for: skill, target: target, error: error))
+                setInstallState(.failed(error.localizedDescription), for: target)
             }
         }
     }

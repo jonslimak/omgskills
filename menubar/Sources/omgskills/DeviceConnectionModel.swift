@@ -31,6 +31,7 @@ final class DeviceConnectionModel {
     @ObservationIgnored private let browserAuthorizer: (any BrowserPairingAuthorizing)?
     @ObservationIgnored private let pairingRequestGenerator: any BrowserPairingRequestGenerating
     @ObservationIgnored private let portalConnectURL: URL
+    @ObservationIgnored private let updateCoordinator: UpdateInstallCoordinator?
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeAttemptID: UUID?
     @ObservationIgnored private var connectedInfo: DeviceConnectionInfo?
@@ -40,13 +41,15 @@ final class DeviceConnectionModel {
         api: any DeviceSyncServing = DeviceSyncAPI(),
         browserAuthorizer: (any BrowserPairingAuthorizing)? = nil,
         pairingRequestGenerator: any BrowserPairingRequestGenerating = SystemBrowserPairingRequestGenerator(),
-        portalConnectURL: URL = BrowserPairing.configuredConnectURL()
+        portalConnectURL: URL = BrowserPairing.configuredConnectURL(),
+        updateCoordinator: UpdateInstallCoordinator? = nil
     ) {
         self.credentialStore = credentialStore
         self.api = api
         self.browserAuthorizer = browserAuthorizer
         self.pairingRequestGenerator = pairingRequestGenerator
         self.portalConnectURL = portalConnectURL
+        self.updateCoordinator = updateCoordinator
     }
 
     @discardableResult
@@ -79,7 +82,7 @@ final class DeviceConnectionModel {
         installations: [Skill],
         replacingExisting: Bool = false
     ) -> Task<Void, Never> {
-        startAttempt(initialState: .exchanging) { model, attemptID in
+        startAttempt(initialState: .exchanging, trackedActivity: .portalConnection) { model, attemptID in
             await model.performConnect(
                 pairingCode: pairingCode,
                 codeVerifier: nil,
@@ -97,7 +100,7 @@ final class DeviceConnectionModel {
         installations: [Skill],
         replacingExisting: Bool = false
     ) -> Task<Void, Never> {
-        startAttempt(initialState: .authorizing) { model, attemptID in
+        startAttempt(initialState: .authorizing, trackedActivity: .portalConnection) { model, attemptID in
             await model.performBrowserConnect(
                 deviceName: deviceName,
                 installations: installations,
@@ -109,7 +112,7 @@ final class DeviceConnectionModel {
 
     @discardableResult
     func retrySync(installations: [Skill]) -> Task<Void, Never> {
-        startAttempt(initialState: .syncing) { model, attemptID in
+        startAttempt(initialState: .syncing, trackedActivity: .portalConnection) { model, attemptID in
             do {
                 guard let stored = try await model.credentialStore.load() else {
                     guard model.isCurrent(attemptID) else { return }
@@ -150,8 +153,10 @@ final class DeviceConnectionModel {
         let attemptID = UUID()
         activeAttemptID = attemptID
         disconnectWarning = nil
+        let activity = updateCoordinator?.beginActivity(.portalConnection)
 
         let task = Task { @MainActor [weak self] in
+            defer { activity?.finish() }
             guard let self else { return }
             await previousTask?.value
             guard isCurrent(attemptID) else { return }
@@ -343,6 +348,7 @@ final class DeviceConnectionModel {
     @discardableResult
     private func startAttempt(
         initialState: State,
+        trackedActivity: UpdateInstallCoordinator.Activity? = nil,
         operation: @escaping @MainActor (DeviceConnectionModel, UUID) async -> Void
     ) -> Task<Void, Never> {
         let previousTask = activeTask
@@ -353,7 +359,9 @@ final class DeviceConnectionModel {
         activeAttemptID = attemptID
         state = initialState
         disconnectWarning = nil
+        let activity = trackedActivity.flatMap { updateCoordinator?.beginActivity($0) }
         let task = Task { @MainActor [weak self] in
+            defer { activity?.finish() }
             guard let self else { return }
             await previousTask?.value
             guard self.isCurrent(attemptID) else { return }

@@ -199,6 +199,57 @@ struct DeviceConnectionModelTests {
         #expect(await api.revokedCredentials() == [record.credential])
     }
 
+    @Test func portalConnectMarksUpdateCoordinatorBusyUntilFinished() async {
+        let record = makeCredential()
+        let gate = TestGate()
+        let coordinator = UpdateInstallCoordinator()
+        let model = DeviceConnectionModel(
+            credentialStore: MockDeviceCredentialStore(),
+            api: MockDeviceSyncAPI(exchangeRecord: record, exchangeGate: gate),
+            updateCoordinator: coordinator
+        )
+
+        let task = model.connect(
+            pairingCode: "pair-code",
+            deviceName: "Test Mac",
+            installations: []
+        )
+        await gate.waitUntilBlocked()
+
+        #expect(coordinator.isBusy == true)
+
+        await gate.open()
+        await task.value
+
+        #expect(coordinator.isBusy == false)
+    }
+
+    @Test func cancelledPortalConnectClearsUpdateCoordinatorBusyState() async {
+        let record = makeCredential()
+        let gate = TestGate()
+        let coordinator = UpdateInstallCoordinator()
+        let model = DeviceConnectionModel(
+            credentialStore: MockDeviceCredentialStore(),
+            api: MockDeviceSyncAPI(exchangeRecord: record, exchangeGate: gate),
+            updateCoordinator: coordinator
+        )
+
+        let task = model.connect(
+            pairingCode: "pair-code",
+            deviceName: "Test Mac",
+            installations: []
+        )
+        await gate.waitUntilBlocked()
+
+        #expect(coordinator.isBusy == true)
+
+        model.cancelCurrentOperation()
+        await gate.open()
+        await task.value
+
+        #expect(coordinator.isBusy == false)
+    }
+
     @Test func newerConnectAttemptWinsOverSuspendedExchange() async {
         let firstRecord = makeCredential(deviceID: "device-1", credential: "secret-1")
         let secondRecord = makeCredential(deviceID: "device-2", credential: "secret-2")
