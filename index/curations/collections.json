@@ -34,9 +34,9 @@
       "featuredSkillIds": [
         "anthropics/skills:pdf",
         "anthropics/skills:docx",
-        "anthropics/skills:frontend-design",
+        "anthropics/skills:skills/frontend-design",
         "anthropics/skills:webapp-testing",
-        "anthropics/skills:skills/algorithmic-art",
+        "anthropics/skills:algorithmic-art",
         "anthropics/skills:xlsx",
         "anthropics/claude-code:plugins/claude-opus-4-5-migration/skills/claude-opus-4-5-migration",
         "anthropics/skills:brand-guidelines",
@@ -46,12 +46,8 @@
         "anthropics/skills:internal-comms",
         "anthropics/skills:mcp-builder",
         "anthropics/skills:pptx",
-        "anthropics/skills:skill-creator",
-        "anthropics/skills:skills/brand-guidelines",
-        "anthropics/skills:skills/canvas-design",
-        "anthropics/skills:skills/claude-api",
-        "anthropics/skills:skills/doc-coauthoring",
-        "anthropics/skills:skills/docx"
+        "anthropics/skills:skills/skill-creator",
+        "anthropics/skills:skills/claude-api"
       ],
       "description": "Anthropic's official skills cover documents, frontend design, testing, and Claude API work. They are a practical baseline for most Claude setups."
     },
@@ -296,7 +292,7 @@
     "obra": {
       "featuredSkillIds": [
         "obra/superpowers:requesting-code-review",
-        "obra/superpowers:skills/using-superpowers",
+        "obra/superpowers:using-superpowers",
         "obra/superpowers:systematic-debugging",
         "obra/superpowers:test-driven-development",
         "obra/superpowers:receiving-code-review",
@@ -696,7 +692,7 @@
       "featuredSkillIds": [
         "react/react:extract-errors",
         "react/react:feature-flags",
-        "react/react:fix",
+        "facebook/react:.claude/skills/fix",
         "react/react:flags",
         "react/react:flow",
         "react/react:test",
@@ -1122,13 +1118,13 @@
       "imageUrl": null,
       "featuredSkillIds": [
         "pbakaus/impeccable:impeccable",
-        "anthropics/skills:frontend-design",
+        "anthropics/skills:skills/frontend-design",
         "leonxlnx/taste-skill:image-to-code",
         "emilkowalski/skill:emil-design-eng"
       ],
       "skillIds": [
         "pbakaus/impeccable:impeccable",
-        "anthropics/skills:frontend-design",
+        "anthropics/skills:skills/frontend-design",
         "leonxlnx/taste-skill:gpt-taste",
         "leonxlnx/taste-skill:image-to-code",
         "leonxlnx/taste-skill:imagegen-frontend-web",

@@ -53,6 +53,7 @@
   .idlist { list-style: none; padding: 0; margin: 6px 0; }
   .panel { background: #fff; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
   .panel h3 { margin: 0 0 8px; font-size: 14px; }
+  .panel h3.author-collection-title { font-size: 17px; }
   .creator-detail-inline { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
   .proposal-samples { max-width: 360px; }
@@ -361,35 +362,43 @@ $("lib-rows").addEventListener("click", (e) => {
 
 // ---------- collections ----------
 let collectionDetailHandle = null;
+const expandedFeaturedAuthors = new Set();
 
 function renderCollections() {
   const src = state.collections;
-  const featuredCreators = state.creators.creators.filter((entry) => entry.featured);
+  const featuredCreators = state.creators.creators
+    .filter((entry) => entry.featured)
+    .sort((a, b) => a.handle.localeCompare(b.handle, undefined, { sensitivity: "base" }));
   const featured = featuredCreators.map((entry) => `<span class="badge featured">@${esc(entry.handle)}</span>`).join(" ");
   const authorPanels = featuredCreators.map((entry) => {
     const handle = entry.handle;
     const o = overrideFor(handle);
     const ids = o.featuredSkillIds ?? [];
     const xHref = xProfileHref(o.xUrl);
+    const featuredExpanded = expandedFeaturedAuthors.has(handle.toLowerCase());
     return `<div class="panel" data-author-panel="${esc(handle)}">
-      <h3>@${esc(handle)} <span class="muted">author profile override</span>
-        <button class="small" data-see-all="${esc(handle)}" style="float:right">${collectionDetailHandle?.toLowerCase() === handle.toLowerCase() ? "Hide skills" : "See all skills"}</button></h3>
+      <h3 class="author-collection-title">@${esc(handle)}</h3>
       <div class="bar">
         <input data-f="subtitle" placeholder="subtitle" value="${esc(o.subtitle ?? "")}" size="28">
         <input data-f="description" placeholder="description" value="${esc(o.description ?? "")}" size="52">
-      </div>
-      <div class="bar">
         <input data-f="xUrl" placeholder="https://x.com/handle" value="${esc(o.xUrl ?? "")}" size="34">
-        ${xHref ? `<a class="clicklink" href="${esc(xHref)}" target="_blank" rel="noopener noreferrer">Open X</a>` : '<span class="muted">Optional X profile URL</span>'}
+        ${xHref ? `<a class="clicklink" href="${esc(xHref)}" target="_blank" rel="noopener noreferrer">Open X</a>` : ""}
+        <button class="small" data-see-all="${esc(handle)}">${collectionDetailHandle?.toLowerCase() === handle.toLowerCase() ? "Hide skills" : "See all skills"}</button>
+        <button class="small" data-toggle-featured="${esc(handle)}" aria-expanded="${featuredExpanded}">${featuredExpanded ? "Collapse" : "Expand"}</button>
       </div>
-      <ul class="idlist">${ids.map((id, i) => `<li><button class="small" data-move="-1" data-i="${i}">↑</button>
+      ${featuredExpanded ? `<ul class="idlist">${ids.map((id, i) => `<li><button class="small" data-move="-1" data-i="${i}">↑</button>
         <button class="small" data-move="1" data-i="${i}">↓</button>
-        <button class="small danger" data-del="${i}">×</button> ${esc(id)}</li>`).join("")}</ul>
+        <button class="small danger" data-del="${i}">×</button> ${esc(id)}</li>`).join("") || '<li class="muted">No featured skills</li>'}</ul>` : ""}
       <div data-collection-detail="${esc(handle)}"></div>
     </div>`;
   }).join("");
 
-  const topicPanels = src.collections.map((c, ci) => `
+  const topicPanels = src.collections
+    .map((collection, index) => ({ collection, index }))
+    .sort((a, b) =>
+      a.collection.title.localeCompare(b.collection.title, undefined, { sensitivity: "base" })
+      || a.collection.id.localeCompare(b.collection.id, undefined, { sensitivity: "base" }))
+    .map(({ collection: c, index: ci }) => `
     <div class="panel" data-col-panel="${ci}">
       <h3>${esc(c.title)} <span class="muted">${esc(c.id)}</span>
         <button class="small danger" data-delcol="${ci}" style="float:right">delete collection</button></h3>
@@ -409,9 +418,9 @@ function renderCollections() {
         <button class="small" data-feat="${i}">☆ feature</button> ${esc(id)}</li>`).join("") || '<li class="muted">empty</li>'}</ul>
     </div>`).join("");
 
-  $("col-list").innerHTML = `<div class="panel"><h3>Featured authors</h3>${featured || '<span class="muted">none</span>'}
+  $("col-list").innerHTML = authorPanels + topicPanels + `<div class="panel"><h3>Featured authors</h3>${featured || '<span class="muted">none</span>'}
     <div class="muted" style="margin-top:4px">Toggle on the Creators tab.</div>
-    </div>` + authorPanels + topicPanels;
+    </div>`;
   if (collectionDetailHandle) refreshCreatorDetail("collections");
 }
 
@@ -454,6 +463,13 @@ $("col-list").addEventListener("click", (e) => {
   if (btn.dataset.seeAll !== undefined) {
     const handle = btn.dataset.seeAll;
     collectionDetailHandle = collectionDetailHandle?.toLowerCase() === handle.toLowerCase() ? null : handle;
+    renderCollections();
+    return;
+  }
+  if (btn.dataset.toggleFeatured !== undefined) {
+    const handle = btn.dataset.toggleFeatured.toLowerCase();
+    if (expandedFeaturedAuthors.has(handle)) expandedFeaturedAuthors.delete(handle);
+    else expandedFeaturedAuthors.add(handle);
     renderCollections();
     return;
   }
