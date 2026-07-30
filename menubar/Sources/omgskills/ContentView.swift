@@ -279,7 +279,7 @@ struct ContentView: View {
             StarterSearch("SEO", symbol: "text.magnifyingglass"),
             StarterSearch("Social media", symbol: "person.2"),
             StarterSearch("Blog", symbol: "text.quote"),
-            StarterSearch("Newsletter", symbol: "envelope"),
+            StarterSearch("Scraping", symbol: "globe"),
             StarterSearch("Market research", symbol: "scope")
         ]),
         ("Coding", [
@@ -289,14 +289,6 @@ struct ContentView: View {
             StarterSearch("Security audit", symbol: "lock.shield"),
             StarterSearch("API design", symbol: "point.3.connected.trianglepath.dotted"),
             StarterSearch("Refactoring", symbol: "arrow.triangle.2.circlepath")
-        ]),
-        ("Automation", [
-            StarterSearch("Image generation", symbol: "photo"),
-            StarterSearch("Scraping", symbol: "globe"),
-            StarterSearch("n8n", symbol: "point.3.connected.trianglepath.dotted"),
-            StarterSearch("Browser automation", symbol: "safari"),
-            StarterSearch("Git workflow", symbol: "chevron.left.forwardslash.chevron.right"),
-            StarterSearch("CI/CD", symbol: "hammer")
         ]),
         ("Practical", [
             StarterSearch("MCP server", symbol: "server.rack"),
@@ -878,9 +870,10 @@ struct ContentView: View {
                             .font(.system(size: 10, weight: .semibold))
                             .fontWeight(.semibold)
                             .foregroundStyle(.tertiary)
+                        let columns = balancedStarterSearchColumns(group.1)
                         HStack(alignment: .top, spacing: 8) {
-                            starterSearchColumn(Array(group.1.prefix(3)))
-                            starterSearchColumn(Array(group.1.dropFirst(3).prefix(3)))
+                            starterSearchColumn(columns.left)
+                            starterSearchColumn(columns.right)
                         }
                     }
                 }
@@ -972,6 +965,14 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
+    }
+
+    private func balancedStarterSearchColumns(_ searches: [StarterSearch]) -> (left: [StarterSearch], right: [StarterSearch]) {
+        let leftCount = (searches.count + 1) / 2
+        return (
+            Array(searches.prefix(leftCount)),
+            Array(searches.dropFirst(leftCount))
+        )
     }
 
     private var emptyView: some View {
