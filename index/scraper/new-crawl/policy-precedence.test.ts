@@ -80,6 +80,8 @@ test("report groups changes by shared reason and bounds samples", () => {
       matchedSource: "catalogRepos",
       skippedSuppressedCandidateIds: ["catalog/repo:suppressed"],
     }],
+    appliedAdmissionRepos: new Set(),
+    finalRepoIndex: { generatedAt: "now", repoCount: 0, repos: [] },
     repoStates: [{ repo: "catalog/repo", currentState: "core", proposedState: "library", reasonCode: "catalog-repo" }],
     qualityTiers: [],
   });
@@ -87,9 +89,82 @@ test("report groups changes by shared reason and bounds samples", () => {
   assert.equal(report.admissionObservationCount, 1);
   assert.equal(report.admissionAdditionCount, 0);
   assert.equal(report.admissionRemovalCount, 1);
+  assert.equal(report.appliedAdmissionAdditionCount, 0);
+  assert.equal(report.persistedAdmissionAdditionCount, 0);
+  assert.equal(report.droppedAdmissionAdditionCount, 0);
   assert.equal(report.skippedSuppressedCandidateCount, 1);
   assert.equal(report.countsByReason["catalog-repo"], 2);
   assert.equal(report.countsByReason["suppressed-skill"], 1);
   assert.match(renderPolicyPrecedenceReport(report), /Mode: observe/);
   assert.match(renderPolicyPrecedenceReport(report), /Source commit: abc123/);
+});
+
+test("report distinguishes eligible applied persisted and dropped admissions", () => {
+  const admissions = ["Owner/Persisted", "owner/dropped"].map((repoName) => ({
+    repo: repoName,
+    legacyEligible: false,
+    proposedEligible: true,
+    legacyReasonCode: "below-value-threshold" as const,
+    proposedReasonCode: "trusted-creator" as const,
+    matchedSource: "creators",
+    skippedSuppressedCandidateIds: [],
+  }));
+  const report = buildPolicyPrecedenceReport({
+    generatedAt: "2026-07-22T00:00:00Z",
+    sourceCommit: "abc123",
+    policyDigest: "sha256:test",
+    mode: "admission",
+    admissions,
+    appliedAdmissionRepos: new Set(["owner/persisted", "OWNER/DROPPED", "other/repo"]),
+    finalRepoIndex: {
+      generatedAt: "now",
+      repoCount: 1,
+      repos: [repo("owner/persisted", "library")],
+    },
+    repoStates: [],
+    qualityTiers: [],
+  });
+
+  assert.equal(report.admissionAdditionCount, 2);
+  assert.equal(report.appliedAdmissionAdditionCount, 2);
+  assert.equal(report.persistedAdmissionAdditionCount, 1);
+  assert.equal(report.droppedAdmissionAdditionCount, 1);
+  assert.deepEqual(report.persistedAdmissionSample, [{
+    repo: "owner/persisted",
+    skillCount: 1,
+    skillIds: ["owner/persisted:skill"],
+  }]);
+  assert.deepEqual(report.droppedAdmissionSample, [{
+    repo: "owner/dropped",
+    reason: "no-publishable-skills-after-refresh",
+  }]);
+  assert.match(renderPolicyPrecedenceReport(report), /Persisted admission additions: 1/);
+  assert.match(renderPolicyPrecedenceReport(report), /owner\/dropped: no-publishable-skills-after-refresh/);
+});
+
+test("observe mode does not classify an unapplied eligible addition as dropped", () => {
+  const report = buildPolicyPrecedenceReport({
+    generatedAt: "2026-07-22T00:00:00Z",
+    sourceCommit: "abc123",
+    policyDigest: "sha256:test",
+    mode: "observe",
+    admissions: [{
+      repo: "owner/eligible",
+      legacyEligible: false,
+      proposedEligible: true,
+      legacyReasonCode: "below-value-threshold",
+      proposedReasonCode: "trusted-creator",
+      matchedSource: "creators",
+      skippedSuppressedCandidateIds: [],
+    }],
+    appliedAdmissionRepos: new Set(),
+    finalRepoIndex: { generatedAt: "now", repoCount: 0, repos: [] },
+    repoStates: [],
+    qualityTiers: [],
+  });
+
+  assert.equal(report.admissionAdditionCount, 1);
+  assert.equal(report.appliedAdmissionAdditionCount, 0);
+  assert.equal(report.persistedAdmissionAdditionCount, 0);
+  assert.equal(report.droppedAdmissionAdditionCount, 0);
 });

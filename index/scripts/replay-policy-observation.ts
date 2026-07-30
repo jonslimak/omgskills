@@ -169,6 +169,8 @@ function replayCrawl4(
     policyDigest,
     mode: "observe",
     admissions,
+    appliedAdmissionRepos: new Set(),
+    finalRepoIndex: repoIndex,
     repoStates,
     qualityTiers,
     snapshotId: snapshot.snapshotId,

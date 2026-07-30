@@ -2385,6 +2385,8 @@ async function main() {
     ...policyMetadata,
     mode: policyPrecedenceMode,
     admissions: admissionPolicyObservations,
+    appliedAdmissionRepos: newlyAdmittedRepos,
+    finalRepoIndex: repoIndex,
     repoStates: repoStatePolicyObservations,
     qualityTiers: qualityTierPolicyObservations,
     snapshotId: policySnapshot.snapshotId,

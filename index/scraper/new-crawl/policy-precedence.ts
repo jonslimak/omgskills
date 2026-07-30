@@ -1,6 +1,7 @@
 import type { PolicyReasonCode } from "../policy/types.js";
 import type { PolicyPrecedenceMode, AdmissionEvaluation } from "./admission.js";
 import type { QualityTier, RepoState, ShadowRepoIndex, TrustedSeeds } from "./types.js";
+import { normalizePolicyRepo } from "../../../scripts/policy-identifiers.mjs";
 
 const SAMPLE_LIMIT = 20;
 
@@ -28,6 +29,17 @@ export type QualityTierPolicyObservation = {
   reasonCode: PolicyReasonCode;
 };
 
+export type PersistedAdmissionSample = {
+  repo: string;
+  skillCount: number;
+  skillIds: string[];
+};
+
+export type DroppedAdmissionSample = {
+  repo: string;
+  reason: "no-publishable-skills-after-refresh";
+};
+
 export type PolicyPrecedenceReport = {
   generatedAt: string;
   sourceCommit: string;
@@ -40,11 +52,16 @@ export type PolicyPrecedenceReport = {
   admissionChangeCount: number;
   admissionAdditionCount: number;
   admissionRemovalCount: number;
+  appliedAdmissionAdditionCount: number;
+  persistedAdmissionAdditionCount: number;
+  droppedAdmissionAdditionCount: number;
   skippedSuppressedCandidateCount: number;
   repoStateChangeCount: number;
   qualityTierChangeCount: number;
   countsByReason: Partial<Record<PolicyReasonCode, number>>;
   admissionSample: AdmissionPolicyObservation[];
+  persistedAdmissionSample: PersistedAdmissionSample[];
+  droppedAdmissionSample: DroppedAdmissionSample[];
   repoStateSample: RepoStatePolicyObservation[];
   qualityTierSample: QualityTierPolicyObservation[];
 };
@@ -104,12 +121,62 @@ function increment(counts: Partial<Record<PolicyReasonCode, number>>, reason: Po
   counts[reason] = (counts[reason] ?? 0) + 1;
 }
 
+export function buildAdmissionOutcomeSummary(input: {
+  admissions: AdmissionPolicyObservation[];
+  appliedAdmissionRepos: ReadonlySet<string>;
+  finalRepoIndex: ShadowRepoIndex;
+}): {
+  appliedCount: number;
+  persistedCount: number;
+  droppedCount: number;
+  persistedSample: PersistedAdmissionSample[];
+  droppedSample: DroppedAdmissionSample[];
+} {
+  const eligibleAdditionRepos = new Set(
+    input.admissions
+      .filter((row) => !row.legacyEligible && row.proposedEligible)
+      .map((row) => normalizePolicyRepo(row.repo)),
+  );
+  const appliedRepos = [...input.appliedAdmissionRepos]
+    .map(normalizePolicyRepo)
+    .filter((repo) => eligibleAdditionRepos.has(repo))
+    .sort();
+  const finalRepoByName = new Map(
+    input.finalRepoIndex.repos.map((entry) => [normalizePolicyRepo(entry.repo), entry]),
+  );
+  const persisted: PersistedAdmissionSample[] = [];
+  const dropped: DroppedAdmissionSample[] = [];
+
+  for (const repo of appliedRepos) {
+    const entry = finalRepoByName.get(repo);
+    if (!entry || entry.skillIds.length === 0) {
+      dropped.push({ repo, reason: "no-publishable-skills-after-refresh" });
+      continue;
+    }
+    persisted.push({
+      repo,
+      skillCount: entry.skillIds.length,
+      skillIds: [...entry.skillIds].sort().slice(0, SAMPLE_LIMIT),
+    });
+  }
+
+  return {
+    appliedCount: appliedRepos.length,
+    persistedCount: persisted.length,
+    droppedCount: dropped.length,
+    persistedSample: persisted.slice(0, SAMPLE_LIMIT),
+    droppedSample: dropped.slice(0, SAMPLE_LIMIT),
+  };
+}
+
 export function buildPolicyPrecedenceReport(input: {
   generatedAt: string;
   sourceCommit: string;
   policyDigest: string;
   mode: PolicyPrecedenceMode;
   admissions: AdmissionPolicyObservation[];
+  appliedAdmissionRepos: ReadonlySet<string>;
+  finalRepoIndex: ShadowRepoIndex;
   repoStates: RepoStatePolicyObservation[];
   qualityTiers: QualityTierPolicyObservation[];
   snapshotId?: string;
@@ -119,6 +186,7 @@ export function buildPolicyPrecedenceReport(input: {
   const admissions = [...input.admissions].sort((a, b) => a.repo.localeCompare(b.repo));
   const repoStates = [...input.repoStates].sort((a, b) => a.repo.localeCompare(b.repo));
   const qualityTiers = [...input.qualityTiers].sort((a, b) => a.skillId.localeCompare(b.skillId));
+  const admissionOutcomes = buildAdmissionOutcomeSummary(input);
   const countsByReason: Partial<Record<PolicyReasonCode, number>> = {};
   for (const row of admissions) {
     increment(countsByReason, row.proposedReasonCode);
@@ -140,6 +208,9 @@ export function buildPolicyPrecedenceReport(input: {
     admissionChangeCount: admissions.filter((row) => row.legacyEligible !== row.proposedEligible).length,
     admissionAdditionCount: admissions.filter((row) => !row.legacyEligible && row.proposedEligible).length,
     admissionRemovalCount: admissions.filter((row) => row.legacyEligible && !row.proposedEligible).length,
+    appliedAdmissionAdditionCount: admissionOutcomes.appliedCount,
+    persistedAdmissionAdditionCount: admissionOutcomes.persistedCount,
+    droppedAdmissionAdditionCount: admissionOutcomes.droppedCount,
     skippedSuppressedCandidateCount: admissions.reduce(
       (total, row) => total + row.skippedSuppressedCandidateIds.length,
       0,
@@ -148,6 +219,8 @@ export function buildPolicyPrecedenceReport(input: {
     qualityTierChangeCount: qualityTiers.length,
     countsByReason: Object.fromEntries(Object.entries(countsByReason).sort(([a], [b]) => a.localeCompare(b))),
     admissionSample: admissions.slice(0, SAMPLE_LIMIT),
+    persistedAdmissionSample: admissionOutcomes.persistedSample,
+    droppedAdmissionSample: admissionOutcomes.droppedSample,
     repoStateSample: repoStates.slice(0, SAMPLE_LIMIT),
     qualityTierSample: qualityTiers.slice(0, SAMPLE_LIMIT),
   };
@@ -168,6 +241,9 @@ export function renderPolicyPrecedenceReport(report: PolicyPrecedenceReport): st
     `- Admission changes: ${report.admissionChangeCount}`,
     `- Admission additions: ${report.admissionAdditionCount}`,
     `- Admission removals: ${report.admissionRemovalCount}`,
+    `- Applied admission additions: ${report.appliedAdmissionAdditionCount}`,
+    `- Persisted admission additions: ${report.persistedAdmissionAdditionCount}`,
+    `- Dropped admission additions after refresh: ${report.droppedAdmissionAdditionCount}`,
     `- Suppressed bootstrap candidates skipped: ${report.skippedSuppressedCandidateCount}`,
     `- Repo-state changes: ${report.repoStateChangeCount}`,
     `- Quality-tier changes: ${report.qualityTierChangeCount}`,
@@ -176,6 +252,16 @@ export function renderPolicyPrecedenceReport(report: PolicyPrecedenceReport): st
     "## Admission sample",
     ...(report.admissionSample.length
       ? report.admissionSample.map((row) => `- ${row.repo}: ${row.legacyEligible}/${row.legacyReasonCode} -> ${row.proposedEligible}/${row.proposedReasonCode}`)
+      : ["- none"]),
+    "",
+    "## Persisted admission sample",
+    ...(report.persistedAdmissionSample.length
+      ? report.persistedAdmissionSample.map((row) => `- ${row.repo}: ${row.skillCount} publishable skills`)
+      : ["- none"]),
+    "",
+    "## Dropped admission sample",
+    ...(report.droppedAdmissionSample.length
+      ? report.droppedAdmissionSample.map((row) => `- ${row.repo}: ${row.reason}`)
       : ["- none"]),
     "",
     "## Repo-state sample",
