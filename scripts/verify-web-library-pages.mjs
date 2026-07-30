@@ -5,6 +5,7 @@ import path from "node:path";
 import {
   catalogSkillUrlEntries,
   catalogSkillUrlsFilename,
+  legacyCatalogSkillRedirects,
 } from "./web-library-skill-urls.mjs";
 import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
 
@@ -343,6 +344,27 @@ async function verifyLocalCatalogSkillUrls() {
   }
 }
 
+async function verifyLocalGeneratedRedirects() {
+  const filePath = path.join(siteDir, "_web-library-redirects");
+  if (!(await fileExists(filePath))) {
+    throw new Error(`Missing generated web library redirects: ${filePath}`);
+  }
+  const contents = await readFile(filePath, "utf8");
+  const catalogAsset = JSON.parse(
+    await readFile(path.join(siteDir, catalogSkillUrlsFilename), "utf8"),
+  );
+  const generatedUrlById = new Map(catalogSkillUrlEntries(catalogAsset));
+  for (const redirect of legacyCatalogSkillRedirects) {
+    const location = generatedUrlById.get(redirect.catalogSkillId);
+    if (!location) {
+      throw new Error(
+        `${catalogSkillUrlsFilename} did not map legacy redirect target ${redirect.catalogSkillId}`,
+      );
+    }
+    assertIncludes(contents, `${redirect.path}  ${location}  301`, filePath);
+  }
+}
+
 async function verifyLivePage(page) {
   const url = `${origin}${page.path}`;
   const response = await fetchLive(url, { redirect: "manual" });
@@ -420,7 +442,7 @@ async function verifyLiveCatalogSkillUrls() {
   if (response.status !== 200) {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
-  verifyCatalogSkillUrlCoverage(await response.json(), url);
+  return verifyCatalogSkillUrlCoverage(await response.json(), url);
 }
 
 function llmsUrls(text) {
@@ -457,9 +479,18 @@ async function main() {
   if (isLive) {
     for (const page of pages) await verifyLivePage(page);
     for (const file of rootFiles) await verifyLiveRootFile(file);
-    await verifyLiveCatalogSkillUrls();
+    const generatedUrlById = new Map(await verifyLiveCatalogSkillUrls());
     await verifyLiveLlmsLinks();
     await verifyLiveSitemap();
+    for (const redirect of legacyCatalogSkillRedirects) {
+      const location = generatedUrlById.get(redirect.catalogSkillId);
+      if (!location) {
+        throw new Error(
+          `${origin}/${catalogSkillUrlsFilename} did not map legacy redirect target ${redirect.catalogSkillId}`,
+        );
+      }
+      await verifyLiveRedirect({ path: redirect.path, location });
+    }
     for (const redirect of redirects) await verifyLiveRedirect(redirect);
     console.log("Live web library pages verified");
     return;
@@ -468,6 +499,7 @@ async function main() {
   for (const page of pages) await verifyLocalPage(page);
   for (const file of rootFiles) await verifyLocalRootFile(file);
   await verifyLocalCatalogSkillUrls();
+  await verifyLocalGeneratedRedirects();
   await verifyLocalSitemap();
   await verifyAllLocalReferences();
   console.log("Local web library pages verified");

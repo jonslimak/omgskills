@@ -1,6 +1,12 @@
 import { createHash } from "node:crypto";
 
 export const catalogSkillUrlsFilename = "catalog-skill-urls.json";
+export const legacyCatalogSkillRedirects = [
+  {
+    path: "/skills/anthropics/skills/frontend-design/",
+    catalogSkillId: "anthropics/skills:skills/frontend-design",
+  },
+];
 const generatedSkillPathPattern = /^\/skills\/(?!\.)[a-z0-9._-]+(?:\/(?!\.)[a-z0-9._-]+)*\/$/;
 
 function slugSegment(value) {

@@ -96,24 +96,101 @@ test("web library verification requires the generated catalog skill URL asset", 
   const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
   const files = [
     "library/anthropics/index.html",
-    "skills/anthropics/skills/frontend-design/index.html",
     "collections/starter-pack/index.html",
     "skills/index.html",
     "sitemap.xml",
     "robots.txt",
     "llms.txt",
-    "catalog-skill-urls.json",
+    "skills/example/repo/useful-skill/index.html",
   ];
   try {
     for (const relativePath of files) {
       await mkdir(join(root, relativePath, ".."), { recursive: true });
       await writeFile(join(root, relativePath), "fixture");
     }
+    await writeFile(
+      join(root, "catalog-skill-urls.json"),
+      JSON.stringify({
+        version: 1,
+        skills: {
+          "example/repo:useful-skill": "/skills/example/repo/useful-skill/",
+        },
+      }),
+    );
     await verifyWebLibraryDeployArtifacts(root);
     await rm(join(root, "catalog-skill-urls.json"));
     await assert.rejects(
       verifyWebLibraryDeployArtifacts(root, "test artifact"),
       /test artifact is unsafe: missing generated web library deploy artifacts: catalog-skill-urls\.json/,
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("web library verification rejects invalid or empty catalog skill URL assets", async () => {
+  const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
+  const files = [
+    "library/anthropics/index.html",
+    "collections/starter-pack/index.html",
+    "skills/index.html",
+    "sitemap.xml",
+    "robots.txt",
+    "llms.txt",
+  ];
+  try {
+    for (const relativePath of files) {
+      await mkdir(join(root, relativePath, ".."), { recursive: true });
+      await writeFile(join(root, relativePath), "fixture");
+    }
+
+    await writeFile(join(root, "catalog-skill-urls.json"), "{");
+    await assert.rejects(
+      verifyWebLibraryDeployArtifacts(root, "test artifact"),
+      /test artifact is unsafe: invalid catalog-skill-urls\.json/,
+    );
+
+    await writeFile(
+      join(root, "catalog-skill-urls.json"),
+      JSON.stringify({ version: 1, skills: {} }),
+    );
+    await assert.rejects(
+      verifyWebLibraryDeployArtifacts(root, "test artifact"),
+      /test artifact is unsafe: catalog-skill-urls\.json contains no generated skill URLs/,
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("web library verification rejects catalog URLs whose generated pages are missing", async () => {
+  const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
+  const files = [
+    "library/anthropics/index.html",
+    "collections/starter-pack/index.html",
+    "skills/index.html",
+    "sitemap.xml",
+    "robots.txt",
+    "llms.txt",
+  ];
+  try {
+    for (const relativePath of files) {
+      await mkdir(join(root, relativePath, ".."), { recursive: true });
+      await writeFile(join(root, relativePath), "fixture");
+    }
+    await writeFile(
+      join(root, "catalog-skill-urls.json"),
+      JSON.stringify({
+        version: 1,
+        skills: {
+          "example/repo:missing-skill": "/skills/example/repo/missing-skill/",
+        },
+      }),
+    );
+
+    await assert.rejects(
+      verifyWebLibraryDeployArtifacts(root, "test artifact"),
+      /example\/repo:missing-skill -> skills\/example\/repo\/missing-skill\/index\.html/,
     );
   } finally {
     await rm(root, { recursive: true, force: true });

@@ -1,15 +1,17 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import {
+  catalogSkillUrlEntries,
+  catalogSkillUrlsFilename,
+} from "./web-library-skill-urls.mjs";
 
 const requiredWebLibraryArtifacts = [
   "library/anthropics/index.html",
-  "skills/anthropics/skills/frontend-design/index.html",
   "collections/starter-pack/index.html",
   "skills/index.html",
   "sitemap.xml",
   "robots.txt",
   "llms.txt",
-  "catalog-skill-urls.json",
 ];
 
 const requiredStaticReleaseAssets = [
@@ -38,6 +40,41 @@ export async function verifyWebLibraryDeployArtifacts(rootDir, label = "deploy a
   if (missing.length > 0) {
     throw new Error(
       `${label} is unsafe: missing generated web library deploy artifacts: ${missing.join(", ")}`
+    );
+  }
+
+  const catalogSkillUrlsPath = path.join(rootDir, catalogSkillUrlsFilename);
+  if (!(await isFile(catalogSkillUrlsPath))) {
+    throw new Error(
+      `${label} is unsafe: missing generated web library deploy artifacts: ${catalogSkillUrlsFilename}`
+    );
+  }
+
+  let entries;
+  try {
+    const asset = JSON.parse(await readFile(catalogSkillUrlsPath, "utf8"));
+    entries = catalogSkillUrlEntries(asset);
+  } catch (error) {
+    throw new Error(
+      `${label} is unsafe: invalid ${catalogSkillUrlsFilename}: ${error.message}`
+    );
+  }
+
+  if (entries.length === 0) {
+    throw new Error(`${label} is unsafe: ${catalogSkillUrlsFilename} contains no generated skill URLs`);
+  }
+
+  const missingSkillPages = [];
+  for (const [catalogSkillId, urlPath] of entries) {
+    const relativePath = path.posix.join(urlPath.replace(/^\/+/, ""), "index.html");
+    if (!(await isFile(path.join(rootDir, relativePath)))) {
+      missingSkillPages.push(`${catalogSkillId} -> ${relativePath}`);
+    }
+  }
+
+  if (missingSkillPages.length > 0) {
+    throw new Error(
+      `${label} is unsafe: catalog skill URL asset maps missing generated pages: ${missingSkillPages.join(", ")}`
     );
   }
 }

@@ -14,6 +14,7 @@ import {
   buildCatalogSkillUrlsAsset,
   buildSkillUrlMap,
   catalogSkillUrlsFilename,
+  legacyCatalogSkillRedirects,
   skillPathForId,
 } from "./web-library-skill-urls.mjs";
 
@@ -300,11 +301,20 @@ async function writePage(urlPath, html) {
   await writeFile(filePath, html);
 }
 
-async function writeWebLibraryRedirects(profileCollections) {
+async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlById) {
   const lines = [
     "# generated web-library legacy profile redirects",
     "/library/:handle  /library/:handle/  301",
   ];
+  for (const redirect of legacyCatalogSkillRedirects) {
+    const targetPath = generatedSkillUrlById.get(redirect.catalogSkillId);
+    if (!targetPath) {
+      throw new Error(
+        `Cannot preserve legacy skill URL ${redirect.path}: ${redirect.catalogSkillId} was not generated`,
+      );
+    }
+    lines.push(`${redirect.path}  ${targetPath}  301`);
+  }
   for (const collection of profileCollections) {
     if (!collection.authorHandle) continue;
     const from = legacyProfilePath(collection.authorHandle);
@@ -765,6 +775,9 @@ async function main() {
   for (const entry of trending.slice(0, 25)) {
     if (entry.id) includedSkillIds.add(entry.id);
   }
+  for (const redirect of legacyCatalogSkillRedirects) {
+    includedSkillIds.add(redirect.catalogSkillId);
+  }
 
   const allUrls = new Map([["/", "home"]]);
   const sitemapUrls = new Map([["/", { source: "home" }]]);
@@ -866,7 +879,7 @@ async function main() {
   sitemapUrls.set("/skills/", { source: "skills index" });
   indexableCount += 1;
   await writePage("/skills/", renderSkillsIndexPage({ profileCollections, topicCollections, skills: includedSkills }, skillUrlById));
-  await writeWebLibraryRedirects(profileCollections);
+  await writeWebLibraryRedirects(profileCollections, generatedSkillUrlById);
   await writeFile(
     path.join(siteDir, catalogSkillUrlsFilename),
     `${JSON.stringify(buildCatalogSkillUrlsAsset(generatedSkillUrlById), null, 2)}\n`,

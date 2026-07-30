@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+import {
+  catalogSkillUrlEntries,
+  legacyCatalogSkillRedirects,
+} from "./web-library-skill-urls.mjs";
+
 const targetOrigin = (process.env.TARGET_ORIGIN || "https://codex-skillgroups-mvp--omgskills.netlify.app").replace(/\/$/, "");
 const productionOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const handle = process.env.SKILLGROUP_HANDLE || "";
@@ -46,6 +51,35 @@ async function expectText(path, text, options = {}) {
   if (!body.includes(text)) {
     fail(`${options.origin || targetOrigin}${path} did not contain ${text}`);
   }
+}
+
+async function catalogSkillPage(origin) {
+  const response = await expectStatus("/catalog-skill-urls.json", 200, { origin });
+  const entries = catalogSkillUrlEntries(await response.json());
+  if (entries.length === 0) {
+    fail(`${origin}/catalog-skill-urls.json contained no generated skill URLs`);
+  }
+  return entries[0][1];
+}
+
+async function verifyGeneratedSkillPage(origin) {
+  await expectStatus(await catalogSkillPage(origin), 200, { origin });
+}
+
+async function verifyFrontendDesignRedirect(origin) {
+  const [legacyRoute] = legacyCatalogSkillRedirects;
+  const response = await expectStatus("/catalog-skill-urls.json", 200, { origin });
+  const currentPath = new Map(catalogSkillUrlEntries(await response.json())).get(
+    legacyRoute.catalogSkillId,
+  );
+  if (!currentPath) {
+    fail(`${origin}/catalog-skill-urls.json did not map ${legacyRoute.catalogSkillId}`);
+  }
+  const redirect = await expectStatus(legacyRoute.path, 301, { origin });
+  if (redirect.headers.get("location") !== currentPath) {
+    fail(`frontend-design redirect did not point to ${currentPath}`);
+  }
+  await expectText(currentPath, "frontend-design", { origin });
 }
 
 async function verifyTargetCore() {
@@ -97,9 +131,8 @@ async function verifyPublicGroupRoutes() {
 
 async function verifyProductionLibraryBaseline() {
   await expectText("/library/anthropics/", "Anthropic", { origin: productionOrigin });
-  await expectText("/skills/anthropics/skills/frontend-design/", "frontend-design", {
-    origin: productionOrigin
-  });
+  await verifyGeneratedSkillPage(productionOrigin);
+  await verifyFrontendDesignRedirect(productionOrigin);
 }
 
 async function verifyTargetLibraryPages() {
@@ -118,7 +151,8 @@ async function verifyTargetLibraryPages() {
   if (!(await staticProfile.text()).includes("Anthropic")) {
     fail("static profile did not contain Anthropic");
   }
-  await expectText("/skills/anthropics/skills/frontend-design/", "frontend-design");
+  await verifyGeneratedSkillPage(targetOrigin);
+  await verifyFrontendDesignRedirect(targetOrigin);
 }
 
 await verifyTargetCore();
