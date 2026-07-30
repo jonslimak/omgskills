@@ -32,21 +32,28 @@ test("canonical SHA publication is enabled only for its publisher step", () => {
   assert.equal(workflow.match(/SHA_CANONICAL_PUBLISH:/g)?.length, 1);
 });
 
-test("policy precedence is observe-only and uploaded for scheduled review", () => {
-  const crawlSteps = workflow.match(
-    /      - name: Run(?: report-only)? shadow crawl\n[\s\S]*?(?=\n      - name:)/g,
-  ) ?? [];
+test("production enforces admission while report-only keeps observing", () => {
+  const reportOnlyStep = workflow.match(
+    /      - name: Run report-only shadow crawl\n[\s\S]*?(?=\n      - name:)/,
+  )?.[0];
+  const writerStep = workflow.match(
+    /      - name: Run shadow crawl\n[\s\S]*?(?=\n      - name:)/,
+  )?.[0];
 
-  assert.equal(crawlSteps.length, 2, "scheduled and report-only crawl steps are required");
-  for (const crawlStep of crawlSteps) {
-    assert.match(crawlStep, /CRAWL4_POLICY_PRECEDENCE: "observe"/);
-  }
+  assert.ok(reportOnlyStep, "report-only shadow crawl step missing");
+  assert.ok(writerStep, "production shadow crawl step missing");
+  assert.match(reportOnlyStep, /CRAWL4_POLICY_PRECEDENCE: "observe"/);
+  assert.match(writerStep, /CRAWL4_POLICY_PRECEDENCE: "admission"/);
+  assert.match(reportOnlyStep, /CRAWL4_QUALITY_TIERS: "1"/);
+  assert.match(writerStep, /CRAWL4_QUALITY_TIERS: "1"/);
   assert.equal(workflow.match(/CRAWL4_POLICY_PRECEDENCE:/g)?.length, 2);
+  assert.equal(workflow.match(/CRAWL4_POLICY_PRECEDENCE: "observe"/g)?.length, 1);
+  assert.equal(workflow.match(/CRAWL4_POLICY_PRECEDENCE: "admission"/g)?.length, 1);
   assert.match(workflow, /Upload policy precedence observation/);
   assert.match(workflow, /Upload report-only policy precedence observation/);
   assert.match(workflow, /policy-precedence\.shadow\.json/);
   assert.match(workflow, /policy-precedence\.shadow\.md/);
-  assert.doesNotMatch(workflow, /CRAWL4_POLICY_PRECEDENCE: "(?:admission|enforce)"/);
+  assert.doesNotMatch(workflow, /CRAWL4_POLICY_PRECEDENCE: "enforce"/);
 });
 
 test("report-only dispatch cannot enter the production writer job", () => {
