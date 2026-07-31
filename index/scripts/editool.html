@@ -24,6 +24,8 @@
   button.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
   button.small { font-size: 12px; padding: 2px 7px; }
   button.danger { color: #b3261e; border-color: #d9a19d; }
+  button.header-save.save-dirty { background: #238636; color: #fff; border-color: #238636; }
+  button.header-save.save-dirty:hover { background: #1f7731; }
   header select { padding: 4px 7px; font-size: 12px; }
   .preview-link { color: #fff; font-size: 12px; }
   .preview-status { color: #bbb; font-size: 12px; }
@@ -54,6 +56,13 @@
   .panel { background: #fff; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
   .panel h3 { margin: 0 0 8px; font-size: 14px; }
   .panel h3.author-collection-title { font-size: 17px; }
+  .author-collection-heading { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .author-collection-heading h3 { margin: 0; }
+  .creator-avatar { width: 32px; height: 32px; flex: 0 0 32px; display: grid; place-items: center; overflow: hidden; border-radius: 7px; background: #ececea; color: #777; font-size: 12px; font-weight: 600; }
+  .creator-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .creator-avatar-fallback { display: none; }
+  .creator-avatar.is-fallback img { display: none; }
+  .creator-avatar.is-fallback .creator-avatar-fallback { display: inline; }
   .creator-detail-inline { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
   .proposal-samples { max-width: 360px; }
@@ -63,12 +72,15 @@
 <body>
 <header>
   <h1>editool</h1>
-  <button class="tab active" data-tab="library">Library</button>
-  <button class="tab" data-tab="collections">Collections</button>
+  <button class="tab active" data-tab="collections">Collections</button>
   <button class="tab" data-tab="creators">Creators</button>
+  <button class="tab" data-tab="library">Library</button>
   <button class="tab" data-tab="removals">Removals</button>
   <span class="spacer"></span>
   <button id="preview-build" class="small">Build local preview</button>
+  <button id="col-save" class="small header-save">Save collections.json</button>
+  <button id="cr-save" class="small header-save" hidden>Save creators.json</button>
+  <button id="rm-save" class="small header-save" hidden>Save removal seeds</button>
   <select id="preview-route" hidden></select>
   <a id="preview-open" class="preview-link" href="#" target="_blank" rel="noopener" hidden>Open preview</a>
   <span id="preview-status" class="preview-status"></span>
@@ -82,7 +94,7 @@
   </div>
 
   <!-- ===================== LIBRARY ===================== -->
-  <section id="tab-library" class="active">
+  <section id="tab-library">
     <div class="bar">
       <input id="lib-q" placeholder="search name / id / description" size="34">
       <input id="lib-author" placeholder="@author" size="16">
@@ -104,12 +116,10 @@
   </section>
 
   <!-- ===================== COLLECTIONS ===================== -->
-  <section id="tab-collections">
+  <section id="tab-collections" class="active">
     <div class="bar">
       <button id="col-add" class="primary">+ New topic collection</button>
       <span class="muted">Author profiles are managed from the Creators tab (featured toggle) and edited below via overrides.</span>
-      <span class="spacer"></span>
-      <button id="col-save" class="primary">Save collections.json</button>
     </div>
     <div id="col-list"></div>
   </section>
@@ -120,8 +130,6 @@
       <input id="cr-newhandle" placeholder="add GitHub handle">
       <button id="cr-add" class="primary">Add creator</button>
       <span class="muted">featured ⊆ watched is enforced. Featured creators publish from creators.json.</span>
-      <span class="spacer"></span>
-      <button id="cr-save" class="primary">Save creators.json</button>
     </div>
     <div id="cr-proposals"></div>
     <div id="cr-detail"></div>
@@ -135,8 +143,6 @@
   <section id="tab-removals">
     <div class="bar">
       <span class="muted">Staged entries take effect after you commit and the crawler honors them (T0.1). Un-stage anything before committing.</span>
-      <span class="spacer"></span>
-      <button id="rm-save" class="primary">Save removal seeds</button>
     </div>
     <div class="grid2">
       <div class="panel">
@@ -179,6 +185,13 @@ function xProfileHref(value) {
     return null;
   }
 }
+function creatorAvatarHref(value, handle) {
+  try {
+    const override = new URL(String(value ?? ""));
+    if (override.protocol === "https:") return override.href;
+  } catch {}
+  return `https://github.com/${encodeURIComponent(handle)}.png?size=64`;
+}
 
 let state = null;          // { collections, creators, suppressedSkills, doNotCrawl, policyFindings, policyRevisions, gitStatus, library }
 let dirty = { collections: false, creators: false, removals: false };
@@ -188,6 +201,21 @@ let libPage = 0;
 function updateDirtyLabel() {
   const parts = Object.entries(dirty).filter(([, value]) => value).map(([key]) => key);
   $("dirty").textContent = parts.length ? `unsaved: ${parts.join(", ")}` : "";
+  updateHeaderSaveButtons();
+}
+function updateHeaderSaveButtons(activeTab = document.querySelector("header .tab.active")?.dataset.tab) {
+  const buttons = {
+    collections: $("col-save"),
+    creators: $("cr-save"),
+    removals: $("rm-save"),
+  };
+  for (const [key, button] of Object.entries(buttons)) {
+    button.hidden = key !== activeTab;
+    const hasUnsavedChanges = key === "creators"
+      ? dirty.creators || dirty.collections
+      : Boolean(dirty[key]);
+    button.classList.toggle("save-dirty", hasUnsavedChanges);
+  }
 }
 function markDirty(which) {
   dirty[which] = true;
@@ -255,6 +283,7 @@ document.querySelectorAll("header .tab").forEach((btn) => {
     document.querySelectorAll("main section").forEach((s) => s.classList.remove("active"));
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
+    updateHeaderSaveButtons(btn.dataset.tab);
   });
 });
 
@@ -263,6 +292,7 @@ async function loadCuration() {
   const res = await fetch("/api/curation");
   state = await res.json();
   renderCollections(); renderCreators(); renderRemovals(); renderPolicyFindings(state.policyFindings); renderGitStatus();
+  updateHeaderSaveButtons();
 }
 function renderGitStatus() {
   const rows = state.gitStatus ?? [];
@@ -375,9 +405,16 @@ function renderCollections() {
     const o = overrideFor(handle);
     const ids = o.featuredSkillIds ?? [];
     const xHref = xProfileHref(o.xUrl);
+    const avatarHref = creatorAvatarHref(o.imageUrl, handle);
     const featuredExpanded = expandedFeaturedAuthors.has(handle.toLowerCase());
     return `<div class="panel" data-author-panel="${esc(handle)}">
-      <h3 class="author-collection-title">@${esc(handle)}</h3>
+      <div class="author-collection-heading">
+        <span class="creator-avatar">
+          <img src="${esc(avatarHref)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentElement.classList.add('is-fallback')">
+          <span class="creator-avatar-fallback" aria-hidden="true">${esc(handle.charAt(0).toUpperCase())}</span>
+        </span>
+        <h3 class="author-collection-title">@${esc(handle)}</h3>
+      </div>
       <div class="bar">
         <input data-f="subtitle" placeholder="subtitle" value="${esc(o.subtitle ?? "")}" size="28">
         <input data-f="description" placeholder="description" value="${esc(o.description ?? "")}" size="52">
