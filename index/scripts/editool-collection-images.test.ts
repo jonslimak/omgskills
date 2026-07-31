@@ -10,6 +10,7 @@ import {
   collectionImageHash,
   collectionImagePublicUrl,
   verifyCollectionImageReferences,
+  verifyLiveCollectionImageReferences,
   writeCollectionImage,
 } from "./collection-images.js";
 
@@ -75,6 +76,38 @@ test("verifies referenced files and content hashes", (t) => {
   assert.deepEqual(verifyCollectionImageReferences(source(imageUrl), root), { checked: 1, errors: [] });
   assert.match(
     verifyCollectionImageReferences(source(imageUrl.replace(/v=[a-f0-9]{12}/, "v=000000000000")), root).errors[0] ?? "",
+    /hash does not match/,
+  );
+});
+
+test("verifies live image type, bytes, and hash", async () => {
+  const data = webp();
+  const imageUrl = collectionImagePublicUrl("starter-pack", data);
+  const validFetch = async () => new Response(data.toString("latin1"), {
+    status: 200,
+    headers: { "Content-Type": "image/webp", "Content-Length": String(data.length) },
+  });
+  assert.deepEqual(
+    await verifyLiveCollectionImageReferences(source(imageUrl), validFetch),
+    { checked: 1, errors: [] },
+  );
+
+  const wrongTypeFetch = async () => new Response(data.toString("latin1"), {
+    status: 200,
+    headers: { "Content-Type": "image/png" },
+  });
+  assert.match(
+    (await verifyLiveCollectionImageReferences(source(imageUrl), wrongTypeFetch)).errors[0] ?? "",
+    /content-type/,
+  );
+
+  const changedData = webp("changed");
+  const changedFetch = async () => new Response(changedData.toString("latin1"), {
+    status: 200,
+    headers: { "Content-Type": "image/webp" },
+  });
+  assert.match(
+    (await verifyLiveCollectionImageReferences(source(imageUrl), changedFetch)).errors[0] ?? "",
     /hash does not match/,
   );
 });

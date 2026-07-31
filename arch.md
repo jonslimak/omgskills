@@ -656,6 +656,21 @@ cd index
 npm run publish:collections
 ```
 
+The command above is the low-level local publisher. For a reviewed production
+update, commit the collection source and images to `main`, then run from the
+repository root:
+
+```bash
+./scripts/publish-collections-prod.sh
+```
+
+The dispatcher requires a clean checkout at `origin/main`, runs local policy
+and image checks, and starts the `publish-collections` GitHub workflow for that
+exact commit. The workflow holds the shared `app-data-writers` lock, publishes
+one asset to both tracks, commits only the generated collection assets, runs the
+guarded combined-site deploy, verifies live images, and confirms the appcast is
+unchanged. It never tags a Mac release.
+
 The publisher:
 
 1. reads collections, creators, and the current catalog

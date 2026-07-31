@@ -9,6 +9,7 @@ const workflowPaths = [
   "../.github/workflows/x-refresh.yml",
   "../.github/workflows/shadow-crawl-health.yml",
   "../.github/workflows/pipeline-health.yml",
+  "../.github/workflows/publish-collections.yml",
 ];
 
 test("manual production deploy uses the guarded combined artifact in order", () => {
@@ -61,7 +62,7 @@ test("manual production deploy checks generated config and every deploy input", 
   }
 });
 
-test("all six production paths use the shared deploy helper", async () => {
+test("all seven production paths use the shared deploy helper", async () => {
   assert.match(script, /npm run deploy:production/);
   assert.doesNotMatch(script, /netlify-cli deploy --prod/);
 

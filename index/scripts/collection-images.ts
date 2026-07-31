@@ -144,3 +144,55 @@ export function verifyCollectionImageReferences(
 
   return { checked, errors };
 }
+
+export async function verifyLiveCollectionImageReferences(
+  source: CollectionsPolicySource,
+  fetchImpl: typeof fetch = fetch,
+  origin = COLLECTION_IMAGE_ORIGIN,
+): Promise<CollectionImageVerification> {
+  const errors: string[] = [];
+  let checked = 0;
+
+  for (const collection of source.collections) {
+    if (!collection.imageUrl) continue;
+    checked += 1;
+    const parsed = parseCollectionImageUrl(collection.imageUrl, collection.id, origin);
+    if (!parsed) {
+      errors.push(`${collection.id}: invalid collection image URL`);
+      continue;
+    }
+    try {
+      const response = await fetchImpl(collection.imageUrl, {
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!response.ok) {
+        errors.push(`${collection.id}: live image returned HTTP ${response.status}`);
+        continue;
+      }
+      const contentType = response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+      if (contentType !== "image/webp") {
+        errors.push(`${collection.id}: live image content-type must be image/webp`);
+        continue;
+      }
+      const contentLength = Number(response.headers.get("content-length") ?? 0);
+      if (Number.isFinite(contentLength) && contentLength > COLLECTION_IMAGE_MAX_BYTES) {
+        errors.push(`${collection.id}: live image exceeds ${COLLECTION_IMAGE_MAX_BYTES} bytes`);
+        continue;
+      }
+      const data = Buffer.from(await response.arrayBuffer());
+      try {
+        validateCollectionImageData(data);
+      } catch (error) {
+        errors.push(`${collection.id}: ${error instanceof Error ? error.message : String(error)}`);
+        continue;
+      }
+      if (!collectionImageHash(data).startsWith(parsed.hash)) {
+        errors.push(`${collection.id}: live image hash does not match imageUrl`);
+      }
+    } catch (error) {
+      errors.push(`${collection.id}: live image request failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  return { checked, errors };
+}

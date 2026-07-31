@@ -1,0 +1,178 @@
+name: publish-collections
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact origin/main commit containing the reviewed collection sources
+        required: true
+        type: string
+      publication_impact_override:
+        description: Allow a reviewed collections impact that exceeds a threshold
+        required: true
+        default: false
+        type: boolean
+      publication_impact_override_reason:
+        description: Required reason when the publication impact override is enabled
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: app-data-writers
+  cancel-in-progress: false
+
+jobs:
+  publish-collections:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+      PUBLICATION_IMPACT_OVERRIDE: ${{ inputs.publication_impact_override == true && '1' || '' }}
+      PUBLICATION_IMPACT_OVERRIDE_REASON: ${{ inputs.publication_impact_override_reason || '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main --depth=1
+          git reset --hard origin/main
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "expected_sha must be a full Git commit SHA" >&2
+            exit 1
+          fi
+          if [ "$(git rev-parse HEAD)" != "$EXPECTED_SHA" ]; then
+            echo "main changed after review; sync, review, and dispatch again" >&2
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.5"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            index/package-lock.json
+
+      - name: Install collection publisher dependencies
+        working-directory: index
+        run: npm ci
+
+      - name: Validate collection sources and images
+        working-directory: index
+        run: |
+          npm run policy:validate -- --profile strict
+          npm run collections:verify-images
+
+      - name: Capture live appcast baseline
+        run: curl -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.sha256"
+
+      - name: Publish collection assets
+        working-directory: index
+        run: npm run publish:collections
+
+      - name: Summarize collections impact
+        if: always()
+        run: |
+          if [ -f index/shadow/publication-impact.collections.md ]; then
+            cat index/shadow/publication-impact.collections.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload collections impact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-impact-collections-${{ github.run_id }}
+          path: |
+            index/shadow/publication-impact.collections.json
+            index/shadow/publication-impact.collections.md
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Verify generated collection assets
+        run: |
+          node ./scripts/verify-published-data.mjs
+
+          v2_asset="$(jq -r '.collections.path' site/data/v2/manifest.json)"
+          crawl4_asset="$(jq -r '.collections.path' site/data/crawl4/manifest.json)"
+          if [[ ! "$v2_asset" =~ ^collections-[0-9a-f]{12}\.json$ ]] || [ "$v2_asset" != "$crawl4_asset" ]; then
+            echo "v2 and Crawl 4 must reference one shared collections asset" >&2
+            exit 1
+          fi
+          cmp "site/data/v2/$v2_asset" "site/data/crawl4/$crawl4_asset"
+
+          while IFS= read -r path; do
+            case "$path" in
+              site/data/v2/manifest.json|site/data/crawl4/manifest.json) ;;
+              *)
+                if [ "$path" != "site/data/v2/$v2_asset" ] && [ "$path" != "site/data/crawl4/$crawl4_asset" ]; then
+                  echo "unexpected publisher change: $path" >&2
+                  exit 1
+                fi
+                ;;
+            esac
+          done < <(git status --porcelain | cut -c4-)
+
+      - name: Commit and push collection assets
+        run: |
+          v2_asset="$(jq -r '.collections.path' site/data/v2/manifest.json)"
+          crawl4_asset="$(jq -r '.collections.path' site/data/crawl4/manifest.json)"
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add site/data/v2/manifest.json "site/data/v2/$v2_asset"
+          git add site/data/crawl4/manifest.json "site/data/crawl4/$crawl4_asset"
+          git diff --cached --quiet && { echo "publisher produced no changes" >&2; exit 1; }
+          git commit -m "Publish updated collection data"
+
+          git fetch origin main --depth=1
+          if [ "$(git rev-parse origin/main)" != "$EXPECTED_SHA" ]; then
+            echo "main changed during publication; refusing to rebase generated data" >&2
+            exit 1
+          fi
+          git push origin HEAD:main
+
+      - name: Prepare release assets for Netlify deploy
+        run: node ./scripts/prepare-netlify-site-deploy.mjs
+
+      - name: Install site dependencies
+        run: npm ci
+
+      - name: Build combined Netlify artifact
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          VITE_SKILLGROUPS_AUTH_ENABLED: "0"
+        run: npm run build:netlify
+
+      - name: Deploy site to Netlify
+        id: production_deploy
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npm run deploy:production
+
+      - name: Upload production deploy receipt
+        if: always() && steps.production_deploy.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deploy-${{ github.workflow }}-${{ github.run_id }}
+          path: dist/netlify-deploy-receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Verify live collection images
+        working-directory: index
+        run: npm run collections:verify-images -- --live
+
+      - name: Confirm public appcast is unchanged
+        run: |
+          curl -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.after.sha256"
+          diff -u "$RUNNER_TEMP/appcast.sha256" "$RUNNER_TEMP/appcast.after.sha256"
