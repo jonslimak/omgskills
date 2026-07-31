@@ -191,7 +191,8 @@
       "featuredSkillIds": [
         "blader/humanizer",
         "blader/Claudeception",
-        "blader/napkin"
+        "blader/napkin",
+        "blader/arbitrage"
       ]
     },
     "shadcn": {
@@ -806,7 +807,8 @@
         "stripe/ai:upgrade-stripe",
         "stripe/link-cli:create-payment-credential",
         "stripe/purl:pay-for-http-request"
-      ]
+      ],
+      "xUrl": "https://x.com/stripe"
     },
     "cloudflare": {
       "featuredSkillIds": [
@@ -1133,6 +1135,81 @@
         "anthropics/skills:webapp-testing"
       ],
       "description": "Covers interface design, frontend implementation, visual critique, and product polish. Use this list when the output needs to look and feel considered."
+    },
+    {
+      "id": "the-goat-list",
+      "type": "topic",
+      "title": "The GOAT List",
+      "subtitle": "Standout skills worth keeping close",
+      "imageUrl": null,
+      "featuredSkillIds": [
+        "garrytan/gstack",
+        "mattpocock/skills:grill-me",
+        "mattpocock/skills:design-an-interface",
+        "blader/humanizer"
+      ],
+      "skillIds": [
+        "garrytan/gstack",
+        "mattpocock/skills:grill-me",
+        "mattpocock/skills:design-an-interface",
+        "blader/humanizer",
+        "coreyhaines31/marketingskills:customer-research",
+        "coreyhaines31/marketingskills:marketing-ideas",
+        "coreyhaines31/marketingskills:skills/ad-creative",
+        "mvanhorn/last30days-skill",
+        "davidondrej/skills:effective-agent-skills",
+        "anthropics/skills:skills/frontend-design",
+        "twostraws/swiftui-agent-skill:swiftui-pro"
+      ],
+      "description": "A personal shortlist spanning product development, research, marketing, interface design, and agent workflows."
+    },
+    {
+      "id": "build-ios-apps",
+      "type": "topic",
+      "title": "Build iOS Apps",
+      "subtitle": "SwiftUI, testing, data, and App Store workflows",
+      "imageUrl": null,
+      "featuredSkillIds": [
+        "twostraws/swiftui-agent-skill:swiftui-pro",
+        "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
+        "twostraws/swift-testing-agent-skill:swift-testing-pro",
+        "twostraws/swiftdata-agent-skill:swiftdata-pro"
+      ],
+      "skillIds": [
+        "twostraws/swiftui-agent-skill:swiftui-pro",
+        "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
+        "twostraws/swift-testing-agent-skill:swift-testing-pro",
+        "twostraws/swiftdata-agent-skill:swiftdata-pro",
+        "coreyhaines31/marketingskills:aso-audit",
+        "dimillian/skills:swiftui-performance-audit",
+        "wshobson/agents:mobile-ios-design",
+        "github/awesome-copilot:apple-appstore-reviewer"
+      ],
+      "description": "A focused toolkit for designing, building, testing, reviewing, and shipping native iOS apps."
+    },
+    {
+      "id": "elite-ui-design",
+      "type": "topic",
+      "title": "Elite UI Design",
+      "subtitle": "Interface systems, visual polish, and design craft",
+      "imageUrl": null,
+      "featuredSkillIds": [
+        "anthropics/skills:canvas-design",
+        "pbakaus/impeccable:impeccable",
+        "vercel/examples:web-design-guidelines",
+        "emilkowalski/skill:emil-design-eng"
+      ],
+      "skillIds": [
+        "anthropics/skills:canvas-design",
+        "pbakaus/impeccable:impeccable",
+        "vercel/examples:web-design-guidelines",
+        "emilkowalski/skill:emil-design-eng",
+        "ibelick/ui-skills:baseline-ui",
+        "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
+        "jakubkrehel/oklch-skill:oklch-skill",
+        "arvindrk/extract-design-system:skills/extract-design-system"
+      ],
+      "description": "A compact set of skills for stronger visual systems, interface details, color, consistency, and frontend design quality."
     }
   ]
 }
