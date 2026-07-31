@@ -24,6 +24,7 @@
     "collect:x-skill-tweets": "tsx scraper/collect-x-skill-tweets.ts",
     "merge:x-skill-tweets": "tsx scraper/merge-x-skill-tweets.ts",
     "publish:collections": "tsx scripts/publish-collections.ts",
+    "collections:verify-images": "tsx scripts/verify-collection-images.ts",
     "editool": "tsx scripts/editool.ts",
     "test:editool": "tsx --test scripts/editool-*.test.ts scraper/policy/*.test.ts",
     "test:policy": "tsx --test scraper/policy/*.test.ts scripts/replay-policy-observation.test.ts scripts/verify-policy-evidence.test.ts",

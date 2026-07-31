@@ -77,6 +77,20 @@ test("validates author X profile URLs", () => {
   assert.ok(validatePolicy(invalid, catalogContext).some((entry) => entry.code === "invalid-x-profile-url"));
 });
 
+test("validates topic collection image URLs", () => {
+  const valid = fixture();
+  (valid.raw.collections as PolicySources["collections"]).collections[0].imageUrl = "https://omgskills.com/images/collections/starter-pack.webp?v=0123456789ab";
+  assert.ok(!validatePolicy(valid, catalogContext).some((entry) => entry.code === "invalid-collection-image-url"));
+
+  const wrongCollection = fixture();
+  (wrongCollection.raw.collections as PolicySources["collections"]).collections[0].imageUrl = "https://omgskills.com/images/collections/other.webp?v=0123456789ab";
+  assert.ok(validatePolicy(wrongCollection, catalogContext).some((entry) => entry.code === "invalid-collection-image-url"));
+
+  const unversioned = fixture();
+  (unversioned.raw.collections as PolicySources["collections"]).collections[0].imageUrl = "https://omgskills.com/images/collections/starter-pack.webp";
+  assert.ok(validatePolicy(unversioned, catalogContext).some((entry) => entry.code === "invalid-collection-image-url"));
+});
+
 test("normalizes keys before detecting duplicates", () => {
   const loaded = fixture({ officialRepos: { tier1: ["OpenAI/Codex"], tier2: ["openai/codex"] } });
   assert.ok(validatePolicy(loaded).some((entry) => entry.code === "duplicate-normalized-key"));

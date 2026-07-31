@@ -100,6 +100,26 @@ async function verifyPolicy() {
   });
 }
 
+async function verifyCollectionImages() {
+  await new Promise((resolve, reject) => {
+    const command = process.platform === "win32" ? "npm.cmd" : "npm";
+    const child = spawn(
+      command,
+      ["--prefix", path.join(repoRoot, "index"), "run", "collections:verify-images"],
+      {
+        cwd: repoRoot,
+        env: { ...process.env, SITE_DIR: siteDir },
+        stdio: "inherit",
+      },
+    );
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`Collection image verification failed with exit code ${code}`));
+    });
+  });
+}
+
 async function verifyCreatorHandleReservations() {
   await new Promise((resolve, reject) => {
     const child = spawn(
@@ -136,6 +156,7 @@ async function verifyWebLibraryBuild() {
 
 async function main() {
   await verifyPolicy();
+  await verifyCollectionImages();
   await verifyCreatorHandleReservations();
   await runWebLibraryBuild();
   await verifyWebLibraryBuild();

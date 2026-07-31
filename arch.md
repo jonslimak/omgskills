@@ -637,6 +637,11 @@ Optional fields:
 - `description`
 - `imageUrl`
 
+Topic collection images are maintained as 512 x 512 WebP files under
+`site/images/collections/{collection-id}.webp`. Editool uploads them locally and
+stores a content-hash query in `imageUrl`. Publishing and deploy preparation
+fail if a referenced file is missing or its hash does not match.
+
 Copy should be factual and short:
 
 - subtitles are one phrase without hype
@@ -706,6 +711,7 @@ Editool writes only:
 - `index/seeds/creators.json`
 - the suppressed-skills seed
 - `index/seeds/do-not-crawl.json`
+- `site/images/collections/*.webp`
 
 Writes are atomic and validated. Editool never writes catalog output, shadow
 output, manifests, generated pages, or database state.
@@ -729,6 +735,9 @@ Editool can build an isolated local web preview:
 - generated profile and collection pages are verified
 - preview assets do not modify `site/data`
 - the preview server is read-only
+
+Uploading an image does not save `collections.json`, publish, commit, or deploy.
+The operator must save Collections after reviewing the thumbnail.
 
 After an Editool save:
 

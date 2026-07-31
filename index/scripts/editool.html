@@ -63,6 +63,13 @@
   .creator-avatar-fallback { display: none; }
   .creator-avatar.is-fallback img { display: none; }
   .creator-avatar.is-fallback .creator-avatar-fallback { display: inline; }
+  .topic-collection-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .topic-collection-heading h3 { margin: 0; flex: 1; }
+  .collection-image { width: 48px; height: 48px; flex: 0 0 48px; display: grid; place-items: center; overflow: hidden; border-radius: 7px; background: #ececea; color: #777; font-size: 16px; font-weight: 600; }
+  .collection-image img { width: 100%; height: 100%; object-fit: cover; }
+  .collection-image-fallback { display: none; }
+  .collection-image.is-fallback img { display: none; }
+  .collection-image.is-fallback .collection-image-fallback { display: inline; }
   .creator-detail-inline { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
   .proposal-samples { max-width: 360px; }
@@ -167,6 +174,7 @@
 </main>
 <footer id="git-status"></footer>
 <div id="toast" class="toast"></div>
+<input id="collection-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
 
 <script>
 "use strict";
@@ -191,6 +199,36 @@ function creatorAvatarHref(value, handle) {
     if (override.protocol === "https:") return override.href;
   } catch {}
   return `https://github.com/${encodeURIComponent(handle)}.png?size=64`;
+}
+function collectionImagePreviewHref(collection) {
+  if (!collection.imageUrl) return null;
+  try {
+    const url = new URL(collection.imageUrl);
+    if (url.hostname === "omgskills.com" && url.pathname === `/images/collections/${collection.id}.webp`) {
+      return `/api/collection-image?id=${encodeURIComponent(collection.id)}&v=${encodeURIComponent(url.searchParams.get("v") ?? "")}`;
+    }
+    if (url.protocol === "https:") return url.href;
+  } catch {}
+  return null;
+}
+
+async function cropCollectionImage(file) {
+  const image = await createImageBitmap(file);
+  try {
+    const size = Math.min(image.width, image.height);
+    const sourceX = Math.floor((image.width - size) / 2);
+    const sourceY = Math.floor((image.height - size) / 2);
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 512;
+    canvas.getContext("2d").drawImage(image, sourceX, sourceY, size, size, 0, 0, 512, 512);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", .85));
+    if (!blob) throw new Error("could not convert image to WebP");
+    if (blob.size > 1_000_000) throw new Error("converted image is larger than 1 MB");
+    return blob;
+  } finally {
+    image.close();
+  }
 }
 
 let state = null;          // { collections, creators, suppressedSkills, doNotCrawl, policyFindings, policyRevisions, gitStatus, library }
@@ -437,12 +475,20 @@ function renderCollections() {
       || a.collection.id.localeCompare(b.collection.id, undefined, { sensitivity: "base" }))
     .map(({ collection: c, index: ci }) => `
     <div class="panel" data-col-panel="${ci}">
-      <h3>${esc(c.title)} <span class="muted">${esc(c.id)}</span>
-        <button class="small danger" data-delcol="${ci}" style="float:right">delete collection</button></h3>
+      <div class="topic-collection-heading">
+        <span class="collection-image ${collectionImagePreviewHref(c) ? "" : "is-fallback"}">
+          ${collectionImagePreviewHref(c) ? `<img src="${esc(collectionImagePreviewHref(c))}" alt="${esc(c.title)} collection image" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('is-fallback')">` : ""}
+          <span class="collection-image-fallback" aria-hidden="true">${esc(c.title.charAt(0).toUpperCase())}</span>
+        </span>
+        <h3>${esc(c.title)} <span class="muted">${esc(c.id)}</span></h3>
+        <button class="small danger" data-delcol="${ci}">delete collection</button>
+      </div>
       <div class="bar">
         <input data-f="title" value="${esc(c.title)}" size="20">
         <input data-f="subtitle" value="${esc(c.subtitle)}" size="30">
         <input data-f="description" placeholder="description" value="${esc(c.description ?? "")}" size="44">
+        <button class="small" data-upload-image="${ci}">${c.imageUrl ? "Replace image" : "Upload image"}</button>
+        ${c.imageUrl ? `<button class="small danger" data-remove-image="${ci}">Remove image</button>` : ""}
       </div>
       <div class="muted">featured (3–5 shown in preview):</div>
       <ul class="idlist">${c.featuredSkillIds.map((id, i) => `<li><button class="small danger" data-delfeat="${i}">×</button> ${esc(id)}
@@ -516,6 +562,18 @@ $("col-list").addEventListener("click", (e) => {
     state.collections.collections.splice(ci, 1);
     markDirty("collections"); renderCollections(); return;
   }
+  if (btn.dataset.uploadImage !== undefined) {
+    pendingCollectionImageIndex = Number(btn.dataset.uploadImage);
+    $("collection-image-file").value = "";
+    $("collection-image-file").click();
+    return;
+  }
+  if (btn.dataset.removeImage !== undefined) {
+    state.collections.collections[Number(btn.dataset.removeImage)].imageUrl = null;
+    markDirty("collections");
+    renderCollections();
+    return;
+  }
   if (authorPanel) {
     const handle = authorPanel.dataset.authorPanel;
     const o = state.collections.authorOverrides?.[handle];
@@ -540,6 +598,38 @@ $("col-list").addEventListener("click", (e) => {
       if (j >= 0 && j < c.skillIds.length) [c.skillIds[i], c.skillIds[j]] = [c.skillIds[j], c.skillIds[i]];
     }
     markDirty("collections"); renderCollections();
+  }
+});
+
+let pendingCollectionImageIndex = null;
+$("collection-image-file").addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  const index = pendingCollectionImageIndex;
+  pendingCollectionImageIndex = null;
+  if (!file || index === null) return;
+  const collection = state.collections.collections[index];
+  if (!collection) return;
+  showErrors(null);
+  try {
+    const blob = await cropCollectionImage(file);
+    const res = await fetch(`/api/upload/collection-image?id=${encodeURIComponent(collection.id)}`, {
+      method: "POST",
+      headers: { "Content-Type": "image/webp", "X-Editool-Token": window.EDITOOL_TOKEN ?? "" },
+      body: blob,
+    });
+    const out = await res.json();
+    if (!out.ok) {
+      showErrors(out.errors);
+      return toast("image upload failed");
+    }
+    collection.imageUrl = out.imageUrl;
+    state.gitStatus = out.gitStatus ?? state.gitStatus;
+    markDirty("collections");
+    renderCollections();
+    toast("image uploaded — save collections");
+  } catch (error) {
+    showErrors([error instanceof Error ? error.message : String(error)]);
+    toast("image upload failed");
   }
 });
 

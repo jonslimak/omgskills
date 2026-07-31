@@ -23,6 +23,7 @@ import type {
   CollectionsPolicySource as CollectionsSource,
   SourceCollection,
 } from "../scraper/policy/types.js";
+import { verifyCollectionImageReferences } from "./collection-images.js";
 
 type Skill = {
   id: string;
@@ -411,6 +412,8 @@ function main() {
   const source = policy.collections;
   const registry = policy.creators;
   validateSource(source, registry, skills);
+  const imageVerification = verifyCollectionImageReferences(source, siteRoot);
+  if (imageVerification.errors.length) fail(imageVerification.errors.join("\n"));
   const asset = buildCollectionsAsset(source, registry, skills);
   const data = collectionsAssetBuffer(asset);
   const descriptor = collectionsAssetDescriptor(data);

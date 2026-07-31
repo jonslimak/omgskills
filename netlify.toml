@@ -25,6 +25,11 @@
     Cache-Control = "public, max-age=60, must-revalidate"
 
 [[headers]]
+  for = "/images/collections/*"
+  [headers.values]
+    Cache-Control = "public, max-age=60, must-revalidate"
+
+[[headers]]
   for = "/updates/*"
   [headers.values]
     Cache-Control = "public, max-age=60, must-revalidate"

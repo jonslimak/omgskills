@@ -2,7 +2,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { execFileSync } from "node:child_process";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildEditoolPreview,
@@ -37,6 +37,11 @@ import {
   recoverEditoolPolicyTransaction,
   runEditoolPolicyTransaction,
 } from "./editool-policy-transaction.js";
+import {
+  COLLECTION_IMAGE_MAX_BYTES,
+  collectionImageFilePath,
+  writeCollectionImage,
+} from "./collection-images.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -71,6 +76,8 @@ const paths = {
   doNotCrawl: join(indexRoot, "seeds", "do-not-crawl.json"),
   cutoverSkills: join(indexRoot, "shadow", "skills.cutover.shadow.json"),
   skillOverlay: join(indexRoot, "shadow", "skills.overlay.json"),
+  site: join(repoRoot, "site"),
+  collectionImages: join(repoRoot, "site", "images", "collections"),
 };
 
 // The only files POST /api/save/* may write.
@@ -81,6 +88,10 @@ const editablePolicyPaths: Record<EditoolPolicySourceKey, string> = {
   doNotCrawl: paths.doNotCrawl,
 };
 const editablePaths = Object.values(editablePolicyPaths);
+const editableStatusPaths = [
+  ...editablePaths.map((path) => relative(repoRoot, path)),
+  relative(repoRoot, paths.collectionImages),
+];
 
 type Skill = {
   id: string;
@@ -318,8 +329,8 @@ function searchSkills(query: URLSearchParams): { total: number; rows: unknown[] 
 
 function editableGitStatus(): { path: string; state: string }[] {
   try {
-    const out = execFileSync("git", ["status", "--porcelain", "--", ...editablePaths], {
-      cwd: indexRoot,
+    const out = execFileSync("git", ["status", "--porcelain", "--", ...editableStatusPaths], {
+      cwd: repoRoot,
       encoding: "utf8",
     });
     return out
@@ -369,6 +380,22 @@ async function readBody(req: IncomingMessage): Promise<unknown> {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(chunk as Buffer);
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+}
+
+async function readRawBody(req: IncomingMessage, maxBytes: number): Promise<Buffer> {
+  const declaredLength = Number(req.headers["content-length"] ?? 0);
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
+    throw new Error(`request body exceeds ${maxBytes} bytes`);
+  }
+  const chunks: Buffer[] = [];
+  let total = 0;
+  for await (const chunk of req) {
+    const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    total += data.length;
+    if (total > maxBytes) throw new Error(`request body exceeds ${maxBytes} bytes`);
+    chunks.push(data);
+  }
+  return Buffer.concat(chunks);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -464,6 +491,51 @@ const server = createServer(async (req, res) => {
         library: { skillCount: skills.length, authorCount: authorHandleSet.size },
       });
       return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/collection-image") {
+      const id = url.searchParams.get("id") ?? "";
+      try {
+        const filePath = collectionImageFilePath(paths.site, id);
+        if (!existsSync(filePath)) return sendJson(res, 404, { ok: false, errors: ["image not found"] });
+        const data = readFileSync(filePath);
+        res.writeHead(200, {
+          "Content-Type": "image/webp",
+          "Content-Length": data.length,
+          "Cache-Control": "no-store",
+        });
+        res.end(data);
+      } catch (error) {
+        return sendJson(res, 400, { ok: false, errors: [error instanceof Error ? error.message : String(error)] });
+      }
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/upload/collection-image") {
+      const requestErrors = validateSaveRequest(req);
+      if (requestErrors.length) return sendJson(res, 403, { ok: false, errors: requestErrors });
+      const id = url.searchParams.get("id") ?? "";
+      const contentType = String(req.headers["content-type"] ?? "").split(";", 1)[0]?.trim().toLowerCase();
+      if (contentType !== "image/webp") {
+        return sendJson(res, 415, { ok: false, errors: ["collection image upload must use image/webp"] });
+      }
+      const source = readJson<CollectionsPolicySource>(paths.collections);
+      if (!source.collections.some((collection) => collection.id === id)) {
+        return sendJson(res, 404, { ok: false, errors: [`unknown topic collection: ${id}`] });
+      }
+      try {
+        const data = await readRawBody(req, COLLECTION_IMAGE_MAX_BYTES);
+        const result = writeCollectionImage({ siteRoot: paths.site, id, data });
+        return sendJson(res, 200, {
+          ok: true,
+          imageUrl: result.imageUrl,
+          previewUrl: `/api/collection-image?id=${encodeURIComponent(id)}&v=${result.hash.slice(0, 12)}`,
+          gitStatus: editableGitStatus(),
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return sendJson(res, message.includes("exceeds") ? 413 : 422, { ok: false, errors: [message] });
+      }
     }
 
     if (req.method === "POST" && url.pathname === "/api/build-preview") {
@@ -564,6 +636,6 @@ previewServer.listen(PREVIEW_PORT, HOST, () => {
 
 server.listen(PORT, HOST, () => {
   console.log(`editool: http://${HOST}:${PORT}`);
-  console.log("editool: writes only collections.json, creators.json, suppressed-skills.json, do-not-crawl.json");
+  console.log("editool: writes only editorial policy files and site/images/collections/*.webp");
   console.log("editool: review with git diff, then commit/publish manually");
 });

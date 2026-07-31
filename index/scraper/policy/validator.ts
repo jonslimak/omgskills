@@ -8,6 +8,7 @@ import {
 } from "../../../scripts/policy-identifiers.mjs";
 import { buildCreatorRegistry } from "../creator-registry.js";
 import { parseSkillEquivalenceOverrides } from "../new-crawl/skill-equivalence.js";
+import { parseCollectionImageUrl } from "../../scripts/collection-images.js";
 import { typedPolicySources } from "./loader.js";
 import {
   DO_NOT_CRAWL_REASONS,
@@ -349,6 +350,17 @@ function validateCollections(loaded: LoadedPolicySources, issues: PolicyIssue[])
           location: `${location}/${field}`,
           scope: "editorial",
           message: `Collection ${id || index} requires ${field}.`,
+        }));
+      }
+    }
+    if (entry.imageUrl !== undefined && entry.imageUrl !== null) {
+      if (typeof entry.imageUrl !== "string" || !parseCollectionImageUrl(entry.imageUrl, id)) {
+        issues.push(issue(loaded, {
+          code: "invalid-collection-image-url",
+          source: "collections",
+          location: `${location}/imageUrl`,
+          scope: "editorial",
+          message: `Collection ${id || index} imageUrl must reference its versioned omgskills WebP image.`,
         }));
       }
     }
