@@ -168,8 +168,6 @@ private extension Array where Element == SkillCollection {
 }
 
 struct ContentView: View {
-    private let manualUpdateUIEnabled = false
-
     let deviceConnectionModel: DeviceConnectionModel
     let updateInstallCoordinator: UpdateInstallCoordinator
     let skillGroupsAuthEnabled: Bool
@@ -193,7 +191,6 @@ struct ContentView: View {
     @State private var readmeHeight: CGFloat = 200
     @State private var readmeLoadTask: Task<Void, Never>?
     @State private var scrollTargetId: String?
-    @State private var updateAvailable = false
     @State private var debouncedQuery = ""
     @State private var showDataUpdatedFooter = false
     @State private var dataUpdatedText = ""
@@ -595,9 +592,6 @@ struct ContentView: View {
         .onChange(of: githubInstallURLText) { _, _ in resetGitHubInstallPromptStatus() }
         .onChange(of: githubInstallCodex) { _, _ in resetGitHubInstallPromptStatus() }
         .onChange(of: githubInstallClaude) { _, _ in resetGitHubInstallPromptStatus() }
-        .onReceive(NotificationCenter.default.publisher(for: .updateAvailabilityChanged)) { note in
-            updateAvailable = (note.userInfo?["available"] as? Bool) ?? false
-        }
     }
 
     private var syncPanel: some View {
@@ -652,20 +646,6 @@ struct ContentView: View {
                 }
 
                 Spacer()
-
-                if manualUpdateUIEnabled && updateAvailable {
-                    Button {
-                        NotificationCenter.default.post(name: .checkForUpdates, object: nil)
-                    } label: {
-                        Text("Update")
-                            .font(.system(size: 9))
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 4)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.primary)
-                    .help("Install Update")
-                }
 
                 HStack(spacing: 2) {
                     ForEach(toolbarSources) { s in

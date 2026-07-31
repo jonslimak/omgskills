@@ -23,9 +23,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var panel: NSPanel!
     private var clickMonitor: Any?
     private var updaterController: SPUStandardUpdaterController!
-    private var updateProbeAttempts = 0
-    private let updateProbeInterval: TimeInterval = 30 * 60
-    private var lastUpdateProbeAt: Date?
     private let updateInstallCoordinator = UpdateInstallCoordinator()
     private lazy var updateInstallHandler = UpdateInstallHandler(coordinator: updateInstallCoordinator)
     private var libraryRefreshScheduler: NSBackgroundActivityScheduler?
@@ -71,14 +68,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
 
         NotificationCenter.default.addObserver(
-            forName: .checkForUpdates, object: nil, queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.updaterController.checkForUpdates(nil)
-            }
-        }
-
-        NotificationCenter.default.addObserver(
             forName: .sharePickerDidOpen, object: nil, queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
@@ -116,9 +105,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             updaterDelegate: self,
             userDriverDelegate: nil
         )
-        if startingUpdater {
-            scheduleUpdateAvailabilityProbe()
-        }
     }
 
     private func setupLibraryRefreshObservers() {
@@ -192,23 +178,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         interval > 0
     }
 
-    private func scheduleUpdateAvailabilityProbe() {
-        updateProbeAttempts += 1
-        let attempt = updateProbeAttempts
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-            guard let self else { return }
-
-            if self.updaterController.updater.canCheckForUpdates,
-               !self.updaterController.updater.sessionInProgress {
-                self.lastUpdateProbeAt = Date()
-                self.updaterController.updater.checkForUpdateInformation()
-            } else if attempt < 6 {
-                self.scheduleUpdateAvailabilityProbe()
-            }
-        }
-    }
-
     private func setupGlobalHotkey() {
         KeyboardShortcuts.onKeyDown(for: .togglePopover) { [weak self] in
             self?.togglePanel()
@@ -262,7 +231,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             panel.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             NotificationCenter.default.post(name: .popoverDidOpen, object: nil)
-            probeForUpdateOnPanelOpen()
             triggerLibraryRefreshIfNeeded(trigger: .panelOpen)
             addClickOutsideMonitor()
         }
@@ -275,28 +243,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         NSApp.activate(ignoringOtherApps: true)
         NotificationCenter.default.post(name: .popoverDidOpen, object: nil)
         addClickOutsideMonitor()
-    }
-
-    private func probeForUpdateOnPanelOpen(now: Date = Date()) {
-        guard updaterController.updater.canCheckForUpdates else { return }
-        guard !updaterController.updater.sessionInProgress else { return }
-        guard Self.shouldProbeForUpdates(
-            now: now,
-            lastProbeAt: lastUpdateProbeAt,
-            interval: updateProbeInterval
-        ) else { return }
-
-        lastUpdateProbeAt = now
-        updaterController.updater.checkForUpdateInformation()
-    }
-
-    nonisolated static func shouldProbeForUpdates(
-        now: Date,
-        lastProbeAt: Date?,
-        interval: TimeInterval
-    ) -> Bool {
-        guard let lastProbeAt else { return true }
-        return now.timeIntervalSince(lastProbeAt) >= interval
     }
 
     nonisolated static func debugAppcastFeedURLString(environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
@@ -369,7 +315,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
                 targetBuild: item.versionString
             )
         )
-        postUpdateAvailability(true)
     }
 
     func feedURLString(for updater: SPUUpdater) -> String? {
@@ -389,21 +334,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
     }
 
-    func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
-        postUpdateAvailability(false)
-    }
-
-    func updaterDidNotFindUpdate(_ updater: SPUUpdater) {
-        postUpdateAvailability(false)
-    }
-
-    private func postUpdateAvailability(_ available: Bool) {
-        NotificationCenter.default.post(
-            name: .updateAvailabilityChanged,
-            object: nil,
-            userInfo: ["available": available]
-        )
-    }
 }
 
 final class FloatingPanel: NSPanel {
@@ -415,8 +345,6 @@ final class FloatingPanel: NSPanel {
 extension Notification.Name {
     static let popoverDidOpen = Notification.Name("popoverDidOpen")
     static let detailToggled = Notification.Name("detailToggled")
-    static let checkForUpdates = Notification.Name("checkForUpdates")
-    static let updateAvailabilityChanged = Notification.Name("updateAvailabilityChanged")
     static let libraryDataDidRefresh = Notification.Name("libraryDataDidRefresh")
     static let sharePickerDidOpen = Notification.Name("sharePickerDidOpen")
     static let sharePickerDidClose = Notification.Name("sharePickerDidClose")
