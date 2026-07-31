@@ -182,7 +182,6 @@ test("bootstraps empty-skill rising repo on combined", async () => {
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "registry", id: "owner/repo:bootstrapped", skill_md_path: "skills/bootstrapped/SKILL.md", skill_name_hint: "bootstrapped", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -207,7 +206,6 @@ test("bootstraps empty-skill library repo on combined", async () => {
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "registry", id: "owner/repo:bootstrapped", skill_md_path: "skills/bootstrapped/SKILL.md", skill_name_hint: "bootstrapped", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -246,7 +244,6 @@ test("bootstraps creator-watch library repo with concrete path on combined", asy
         }),
       ],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -269,7 +266,6 @@ test("failed bootstrap leaves repo empty and reports failure", async () => {
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "code", id: "owner/repo:bootstrapped", skill_md_path: "skills/x/SKILL.md", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -294,7 +290,6 @@ test("bootstrap rejects enriched skill from a different repo", async () => {
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "registry", id: "owner/repo:bootstrapped", skill_md_path: "skills/x/SKILL.md", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -381,7 +376,6 @@ test("repo with only ineligible candidate is skipped, not failed", async () => {
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "skillssh", id: "owner/repo:bootstrapped", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -407,7 +401,6 @@ test("creator-watch unresolved candidate is skipped, not failed", async () => {
         candidate({ source: "creator-watch", id: "owner/repo:bootstrapped", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" }),
       ],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => "skills/bootstrapped/SKILL.md",
@@ -431,7 +424,6 @@ test("no bootstrap runs on non-combined cadences", async () => {
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "registry", id: "owner/repo:bootstrapped", skill_md_path: "skills/bootstrapped/SKILL.md", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -519,7 +511,6 @@ test("stale persisted rising repo with valid bootstrap candidate gets bootstrapp
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "registry", id: "owner/repo:bootstrapped", skill_md_path: "skills/bootstrapped/SKILL.md", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -549,7 +540,6 @@ test("stale persisted rising repo with no candidate remains empty and follows no
     checkedAt: "2026-05-22T00:00:00Z",
     repoIndex: index,
     bootstrapCandidateByRepo: new Map(),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -656,7 +646,6 @@ test("same-run re-bootstrap of repaired skill id preserves first_seen instead of
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "registry", id: "owner/repo:missing", skill_md_path: "skills/missing/SKILL.md", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen,
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -671,27 +660,6 @@ test("same-run re-bootstrap of repaired skill id preserves first_seen instead of
   assert.equal(result.bootstrappedSkills[0]?.first_seen, "2026-05-22");
 });
 
-test("canonical repo can bootstrap through alias mapping", async () => {
-  const index = repoIndex([repo({ repo: "canonical/repo", stars: 0 })]);
-
-  const result = await bootstrapRisingRepos({
-    cadence: "combined",
-    checkedAt: "2026-05-22T00:00:00Z",
-    repoIndex: index,
-    bootstrapCandidateByRepo: new Map([
-      ["alias/repo", candidate({ source: "registry", id: "alias/repo:bootstrapped", skill_md_path: "skills/bootstrapped/SKILL.md", github_url: "https://github.com/alias/repo" })],
-    ]),
-    repoAliasByCanonical: new Map([["canonical/repo", "alias/repo"]]),
-    existingFirstSeen: new Map(),
-    existingSkills: new Map<string, Skill>(),
-    resolveCandidatePathFn: async () => null,
-    enrichCandidateFn: async (c) => ({ skill: skill(c.id, "canonical/repo") }),
-  });
-
-  assert.equal(result.bootstrappedSkills.length, 1);
-  assert.equal(index.repos[0]?.topSkillId, "alias/repo:bootstrapped");
-});
-
 test("unresolved skillssh candidate becomes eligible when path resolution succeeds", async () => {
   const index = repoIndex([repo({ repo: "owner/repo", stars: 0 })]);
 
@@ -702,7 +670,6 @@ test("unresolved skillssh candidate becomes eligible when path resolution succee
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "skillssh", id: "owner/repo:bootstrapped", skill_md_path: "__RESOLVE__", skill_name_hint: "bootstrapped", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => "skills/bootstrapped/SKILL.md",
@@ -723,7 +690,6 @@ test("unresolved official candidate becomes eligible when path resolution succee
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "official", id: "owner/repo:bootstrapped", skill_md_path: "__RESOLVE__", skill_name_hint: "bootstrapped", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => "skills/bootstrapped/SKILL.md",
@@ -744,7 +710,6 @@ test("candidate resolution error (e.g. deleted repo) skips the repo instead of f
     bootstrapCandidateByRepo: new Map([
       ["owner/gone", candidate({ source: "official", id: "owner/gone:skill", skill_md_path: "__RESOLVE__", skill_name_hint: "skill", github_url: "https://github.com/owner/gone" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => {
@@ -768,7 +733,6 @@ test("unresolved awesome candidate stays skipped when path resolution fails", as
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "awesome", id: "owner/repo:bootstrapped", skill_md_path: "__RESOLVE__", skill_name_hint: "bootstrapped", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     resolveCandidatePathFn: async () => null,
@@ -824,7 +788,6 @@ test("newly admitted trusted creator falls back to the first valid nested skill"
         github_url: "https://github.com/owner/repo",
       })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     newlyAdmittedRepos: new Set(["owner/repo"]),
@@ -856,7 +819,6 @@ test("trusted creator fallback reapplies candidate policy before enrichment", as
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "awesome", id: "owner/repo:repo", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     newlyAdmittedRepos: new Set(["owner/repo"]),
@@ -888,7 +850,6 @@ test("fallback remains unavailable to existing or untrusted repos", async () => 
       bootstrapCandidateByRepo: new Map([
         ["owner/repo", candidate({ source: "awesome", id: "owner/repo:repo", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" })],
       ]),
-      repoAliasByCanonical: new Map(),
       existingFirstSeen: new Map(),
       existingSkills: new Map<string, Skill>(),
       newlyAdmittedRepos,
@@ -919,7 +880,6 @@ test("trusted creator fallback caps enrichment attempts", async () => {
     bootstrapCandidateByRepo: new Map([
       ["owner/repo", candidate({ source: "awesome", id: "owner/repo:repo", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" })],
     ]),
-    repoAliasByCanonical: new Map(),
     existingFirstSeen: new Map(),
     existingSkills: new Map<string, Skill>(),
     newlyAdmittedRepos: new Set(["owner/repo"]),

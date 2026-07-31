@@ -214,6 +214,51 @@ export type RepoBootstrapCandidate = {
   skillsshInstalls?: number;
 };
 
+export type DiscoverySourceName =
+  | "official"
+  | "skillssh"
+  | "awesome"
+  | "registry"
+  | "topics"
+  | "code"
+  | "high-star-skillmd"
+  | "social"
+  | "x-social"
+  | "aggregators"
+  | "trusted-vendors"
+  | "trusted-creators"
+  | "creator-watch"
+  | "monitored-repos";
+
+export type DiscoveredRepoRecord = {
+  repo: string;
+  repoUrl: string;
+  sources: Set<DiscoverySourceName>;
+  lanes: Set<DiscoveryLane>;
+  stars: number;
+  bootstrapCandidate?: RepoBootstrapCandidate;
+  bootstrapCandidates?: RepoBootstrapCandidate[];
+};
+
+export type RepoCanonicalizationSample = {
+  aliasRepo: string;
+  canonicalRepo: string | null;
+  outcome: "renamed" | "merged-existing" | "merged-discovery" | "deferred-error" | "deferred-cap";
+  detail?: string;
+};
+
+export type RepoCanonicalizationReport = {
+  candidateCount: number;
+  checkedCount: number;
+  unchangedCount: number;
+  renamedCount: number;
+  mergedIntoExistingCount: number;
+  mergedIntoDiscoveryCount: number;
+  deferredByErrorCount: number;
+  deferredByCapCount: number;
+  sample: RepoCanonicalizationSample[];
+};
+
 export type NextPromotionCandidateSample = {
   repo: string;
   stars: number;
@@ -437,6 +482,7 @@ export type ShadowRunReport = {
   installArmAdmissionSample?: InstallArmAdmissionSample[];
   xDiscoveryCandidateCount?: number;
   xDiscoveryCandidateSample?: string[];
+  repoCanonicalization: RepoCanonicalizationReport;
   webLibraryPilotSnippetCoverage: WebLibraryPilotSnippetCoverage;
   enrichmentCounts: ShadowEnrichmentCounts;
   lowStarValidSkillCount: number;

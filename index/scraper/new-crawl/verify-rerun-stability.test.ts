@@ -76,6 +76,17 @@ function shadowReport(overrides: Partial<ShadowRunReport> = {}): ShadowRunReport
     partialDiscoveryWarnings: [],
     highStarPathQualitySkippedCount: 0,
     highStarPathQualitySkippedSample: [],
+    repoCanonicalization: {
+      candidateCount: 0,
+      checkedCount: 0,
+      unchangedCount: 0,
+      renamedCount: 0,
+      mergedIntoExistingCount: 0,
+      mergedIntoDiscoveryCount: 0,
+      deferredByErrorCount: 0,
+      deferredByCapCount: 0,
+      sample: [],
+    },
     enrichmentCounts: {
       cheapReposChecked: 0,
       dailyPriorityRepoCount: 0,

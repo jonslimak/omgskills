@@ -100,6 +100,21 @@ export function seedRepoCache(repoFullName: string, meta: RepoMeta) {
   repoCache.set(repoFullName, meta);
 }
 
+export async function resolveCanonicalRepoIdentity(repoFullName: string): Promise<{ repo: string; repoUrl: string }> {
+  const [owner, repo] = repoFullName.split("/");
+  if (!owner || !repo) throw new Error(`Invalid GitHub repository: ${repoFullName}`);
+  const meta = await getRepoMeta(owner, repo);
+  const url = new URL(meta.githubUrl);
+  const [canonicalOwner, canonicalRepo] = url.pathname.split("/").filter(Boolean);
+  if (url.hostname !== "github.com" || !canonicalOwner || !canonicalRepo) {
+    throw new Error(`Invalid canonical GitHub URL: ${meta.githubUrl}`);
+  }
+  return {
+    repo: `${canonicalOwner}/${canonicalRepo.replace(/\.git$/i, "")}`.toLowerCase(),
+    repoUrl: `https://github.com/${canonicalOwner}/${canonicalRepo.replace(/\.git$/i, "")}`,
+  };
+}
+
 export async function getCandidateRepoMeta(c: Candidate, today: string): Promise<RepoMeta | null> {
   const parsed = parseOwnerRepo(c.id);
   if (!parsed) return null;

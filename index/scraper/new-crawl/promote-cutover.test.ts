@@ -84,6 +84,17 @@ function shadowReport(cutoverValidationPassed: boolean): ShadowRunReport {
     partialDiscoveryWarnings: [],
     highStarPathQualitySkippedCount: 0,
     highStarPathQualitySkippedSample: [],
+    repoCanonicalization: {
+      candidateCount: 0,
+      checkedCount: 0,
+      unchangedCount: 0,
+      renamedCount: 0,
+      mergedIntoExistingCount: 0,
+      mergedIntoDiscoveryCount: 0,
+      deferredByErrorCount: 0,
+      deferredByCapCount: 0,
+      sample: [],
+    },
     webLibraryPilotSnippetCoverage: {
       selectedSkillCount: 0,
       snippetPresentCount: 0,

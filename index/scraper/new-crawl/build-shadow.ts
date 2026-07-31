@@ -4,7 +4,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import type { Skill } from "../types.js";
 import type { EnrichResult } from "../enrich.js";
-import { enrichCandidate, getCandidateRepoMeta, listRepoSkillPaths, resolveCandidateSkillPath } from "../enrich.js";
+import { enrichCandidate, getCandidateRepoMeta, listRepoSkillPaths, resolveCandidateSkillPath, resolveCanonicalRepoIdentity } from "../enrich.js";
 import { searchByTopics } from "../sources/topics.js";
 import { isHighStarBackfillPathAllowed, searchBySkillMdFilename, searchHighStarSkillMdRepos } from "../sources/code.js";
 import { searchAggregators } from "../sources/aggregators.js";
@@ -35,6 +35,7 @@ import { resolveShadowProvenance } from "./provenance.js";
 import { buildMomentumSignals, type MomentumSource } from "./momentum.js";
 import { buildCandidateFromSkill } from "./candidate-path.js";
 import { bootstrapRisingRepos, removeFailedNewlyAdmittedRepos, repairDeadPersistedRisingSkillLinks, sortBootstrapCandidates, toEnrichCandidate } from "./bootstrap.js";
+import { canonicalizeAdmissionRepos } from "./repo-canonicalization.js";
 import { assertGitHubQuotaAvailable } from "./github-quota-guard.js";
 import { buildCutoverCompare, buildCutoverCompareSummary } from "./cutover-compare.js";
 import { validateCutoverOutputs } from "./cutover-validation.js";
@@ -96,6 +97,8 @@ import type {
   DailyPriorityRepoSample,
   DiscoveryBudgetSummary,
   DiscoveryLane,
+  DiscoverySourceName,
+  DiscoveredRepoRecord,
   InstallArmAdmissionSample,
   PriorityReason,
   PriorityReasonCounts,
@@ -128,32 +131,6 @@ import type {
   TrustedSeeds,
   WebLibraryPilotSnippetCoverage,
 } from "./types.js";
-
-type DiscoverySourceName =
-  | "official"
-  | "skillssh"
-  | "awesome"
-  | "registry"
-  | "topics"
-  | "code"
-  | "high-star-skillmd"
-  | "social"
-  | "x-social"
-  | "aggregators"
-  | "trusted-vendors"
-  | "trusted-creators"
-  | "creator-watch"
-  | "monitored-repos";
-
-type DiscoveredRepoRecord = {
-  repo: string;
-  repoUrl: string;
-  sources: Set<DiscoverySourceName>;
-  lanes: Set<DiscoveryLane>;
-  stars: number;
-  bootstrapCandidate?: RepoBootstrapCandidate;
-  bootstrapCandidates?: RepoBootstrapCandidate[];
-};
 
 const CADENCE_LANES: Record<ShadowCadence, DiscoveryLane[]> = {
   fast: ["fast"],
@@ -709,6 +686,7 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Creator watch admissions: ${report.creatorWatchAdmissionCount ?? 0}`,
     `- Install-arm admissions: ${report.installArmAdmissionCount ?? 0}`,
     `- X discovery candidates: ${report.xDiscoveryCandidateCount ?? 0}`,
+    `- Admission repo canonicalization: checked=${report.repoCanonicalization.checkedCount}, renamed=${report.repoCanonicalization.renamedCount}, mergedExisting=${report.repoCanonicalization.mergedIntoExistingCount}, deferred=${report.repoCanonicalization.deferredByErrorCount + report.repoCanonicalization.deferredByCapCount}`,
     `- Web-library pilot snippets: ${report.webLibraryPilotSnippetCoverage.snippetPresentCount}/${report.webLibraryPilotSnippetCoverage.selectedSkillCount} present, ${report.webLibraryPilotSnippetCoverage.fetchFailureCount} fetch failures, ${report.webLibraryPilotSnippetCoverage.intentionalExemptionCount} intentional exemptions`,
     `- Low-star valid skills: ${report.lowStarValidSkillCount}`,
     `- Trusted low-star skills: ${report.trustedLowStarSkillCount}`,
@@ -724,6 +702,14 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     "",
     ...(report.sourceRuns.length
       ? report.sourceRuns.map((run) => `- ${run.source} [${run.lane}] ${run.hitCount} hits ${run.durationMs}ms`)
+      : ["- none"]),
+    "",
+    "## Repository canonicalization",
+    "",
+    ...(report.repoCanonicalization.sample.length
+      ? report.repoCanonicalization.sample.map((row) =>
+          `- ${row.aliasRepo} -> ${row.canonicalRepo ?? "deferred"}: ${row.outcome}${row.detail ? ` (${row.detail})` : ""}`,
+        )
       : ["- none"]),
     "",
     "## Discovery budget",
@@ -966,6 +952,30 @@ function buildTrustSignalsForRepo(
   };
 }
 
+export function buildAdmissionCanonicalizationCandidates(
+  cadence: ShadowCadence,
+  repoIndex: ShadowRepoIndex,
+  discovered: Map<string, DiscoveredRepoRecord>,
+  goldBasketRepos: Set<string>,
+  seeds: TrustedSeeds,
+  options: {
+    installAdmissionEnabled?: boolean;
+    policyPrecedenceMode?: PolicyPrecedenceMode;
+  } = {},
+): string[] {
+  if (cadence !== "combined") return [];
+  const existingRepos = new Set(repoIndex.repos.map((repo) => repo.repo));
+  return [...discovered.values()]
+    .filter((repo) => !existingRepos.has(repo.repo))
+    .filter((repo) => {
+      const trust = buildTrustSignalsForRepo(repo.repo, goldBasketRepos, seeds);
+      const evaluation = evaluateDiscoveredRepoAdmission(repo, seeds, trust, options);
+      return evaluation.legacy.eligible || evaluation.proposed.eligible;
+    })
+    .map((repo) => repo.repo)
+    .sort();
+}
+
 export function admitDiscoveredRepos(
   cadence: ShadowCadence,
   checkedAt: string,
@@ -1170,7 +1180,6 @@ async function runShadowRefresh(
   repoIndex: ShadowRepoIndex,
   discovered: Map<string, DiscoveredRepoRecord>,
   checkedAt: string,
-  repoAliasByCanonical: Map<string, string>,
   newlyAdmittedRepos: Set<string>,
   options: { forceWebLibrarySnippets?: boolean; skipRefreshWork?: boolean } = {},
 ): Promise<ShadowRefreshResult> {
@@ -1233,7 +1242,6 @@ async function runShadowRefresh(
     checkedAt,
     repoIndex,
     bootstrapCandidateByRepo,
-    repoAliasByCanonical,
     existingFirstSeen,
     existingSkills,
     newlyAdmittedRepos,
@@ -2197,7 +2205,6 @@ async function main() {
   shadowSkills = removeBelowStarXSocialOnlyState(repoIndex, shadowSkills).skills;
 
   const discoveryStart = performance.now();
-  const repoAliasByCanonical = new Map<string, string>();
   const {
     sourceRuns,
     discovered,
@@ -2224,14 +2231,44 @@ async function main() {
     if (isDoNotCrawlRepo(repo, seeds)) discovered.delete(repo);
   }
   timings.runDiscovery = Math.round(performance.now() - discoveryStart);
+  const installAdmissionEnabled = process.env.CRAWL4_INSTALL_ADMISSION === "1";
+  const canonicalizationStart = performance.now();
+  const existingRepoKeysBeforeCanonicalization = new Set(repoIndex.repos.map((repo) => repo.repo));
+  const canonicalizationCandidates = buildAdmissionCanonicalizationCandidates(
+    cadence,
+    repoIndex,
+    discovered,
+    goldBasketRepos,
+    seeds,
+    { installAdmissionEnabled, policyPrecedenceMode },
+  );
+  const repoCanonicalization = await canonicalizeAdmissionRepos({
+    discovered,
+    candidateRepos: canonicalizationCandidates,
+    existingRepoKeys: existingRepoKeysBeforeCanonicalization,
+    resolveCanonicalRepoFn: resolveCanonicalRepoIdentity,
+  });
+  for (const repo of [...discovered.keys()]) {
+    if (isDoNotCrawlRepo(repo, seeds)) discovered.delete(repo);
+  }
+  timings.canonicalizeAdmissionRepos = Math.round(performance.now() - canonicalizationStart);
   const { momentumByRepo, warning: momentumWarning } = buildMomentumSignals(
     discovered,
     join(indexRoot, "top-x-skill-tweets.json"),
   );
-  const combinedDiscoveryWarnings = momentumWarning
-    ? [...partialDiscoveryWarnings, momentumWarning]
-    : partialDiscoveryWarnings;
-  const installAdmissionEnabled = process.env.CRAWL4_INSTALL_ADMISSION === "1";
+  const canonicalizationWarnings = [
+    ...(repoCanonicalization.deferredByErrorCount > 0
+      ? [`repository canonicalization deferred ${repoCanonicalization.deferredByErrorCount} admission candidates after lookup errors`]
+      : []),
+    ...(repoCanonicalization.deferredByCapCount > 0
+      ? [`repository canonicalization deferred ${repoCanonicalization.deferredByCapCount} admission candidates after reaching the per-run cap`]
+      : []),
+  ];
+  const combinedDiscoveryWarnings = [
+    ...partialDiscoveryWarnings,
+    ...canonicalizationWarnings,
+    ...(momentumWarning ? [momentumWarning] : []),
+  ];
   const admissionPolicyObservations: AdmissionPolicyObservation[] = [];
   const existingReposBeforeAdmission = new Set(repoIndex.repos.map((repo) => repo.repo));
   const policyAdmissionCandidates = [...discovered.values()]
@@ -2302,7 +2339,6 @@ async function main() {
     repoIndex,
     discovered,
     checkedAt,
-    repoAliasByCanonical,
     newlyAdmittedRepos,
     { forceWebLibrarySnippets, skipRefreshWork: onlyHighStarBackfill },
   );
@@ -2513,6 +2549,7 @@ async function main() {
     installArmAdmissionSample,
     xDiscoveryCandidateCount,
     xDiscoveryCandidateSample,
+    repoCanonicalization,
     webLibraryPilotSnippetCoverage: refreshResult.webLibraryPilotSnippetCoverage,
     enrichmentCounts: refreshResult.enrichmentCounts,
     lowStarValidSkillCount: refreshResult.lowStarValidSkillCount,

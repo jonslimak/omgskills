@@ -165,7 +165,6 @@ type BootstrapOptions = {
   checkedAt: string;
   repoIndex: ShadowRepoIndex;
   bootstrapCandidateByRepo: Map<string, RepoBootstrapCandidate>;
-  repoAliasByCanonical: Map<string, string>;
   existingFirstSeen: Map<string, string>;
   existingSkills: Map<string, Skill>;
   newlyAdmittedRepos?: Set<string>;
@@ -192,7 +191,6 @@ export async function bootstrapRisingRepos({
   checkedAt,
   repoIndex,
   bootstrapCandidateByRepo,
-  repoAliasByCanonical,
   existingFirstSeen,
   existingSkills,
   newlyAdmittedRepos = new Set(),
@@ -221,8 +219,7 @@ export async function bootstrapRisingRepos({
     .sort((a, b) => a.repo.localeCompare(b.repo));
 
   for (const repo of eligibleRepos) {
-    const aliasRepo = repoAliasByCanonical.get(repo.repo);
-    const candidate = bootstrapCandidateByRepo.get(repo.repo) ?? (aliasRepo ? bootstrapCandidateByRepo.get(aliasRepo) : undefined);
+    const candidate = bootstrapCandidateByRepo.get(repo.repo);
     if (!candidate) continue;
     let resolvedCandidate = candidate;
     const resolvesDiscoveryPath =
