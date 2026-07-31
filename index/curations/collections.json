@@ -1117,7 +1117,11 @@
         "pbakaus/impeccable:impeccable",
         "anthropics/skills:skills/frontend-design",
         "leonxlnx/taste-skill:image-to-code",
-        "emilkowalski/skill:emil-design-eng"
+        "emilkowalski/skill:emil-design-eng",
+        "leonxlnx/taste-skill:gpt-taste",
+        "leonxlnx/taste-skill:imagegen-frontend-web",
+        "mattpocock/skills:design-an-interface",
+        "anthropics/skills:webapp-testing"
       ],
       "skillIds": [
         "pbakaus/impeccable:impeccable",
@@ -1141,7 +1145,14 @@
         "garrytan/gstack",
         "mattpocock/skills:grill-me",
         "mattpocock/skills:design-an-interface",
-        "blader/humanizer"
+        "blader/humanizer",
+        "coreyhaines31/marketingskills:customer-research",
+        "coreyhaines31/marketingskills:marketing-ideas",
+        "coreyhaines31/marketingskills:skills/ad-creative",
+        "mvanhorn/last30days-skill",
+        "davidondrej/skills:effective-agent-skills",
+        "anthropics/skills:skills/frontend-design",
+        "twostraws/swiftui-agent-skill:swiftui-pro"
       ],
       "skillIds": [
         "garrytan/gstack",
@@ -1168,7 +1179,11 @@
         "twostraws/swiftui-agent-skill:swiftui-pro",
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
         "twostraws/swift-testing-agent-skill:swift-testing-pro",
-        "twostraws/swiftdata-agent-skill:swiftdata-pro"
+        "twostraws/swiftdata-agent-skill:swiftdata-pro",
+        "coreyhaines31/marketingskills:aso-audit",
+        "dimillian/skills:swiftui-performance-audit",
+        "wshobson/agents:mobile-ios-design",
+        "github/awesome-copilot:apple-appstore-reviewer"
       ],
       "skillIds": [
         "twostraws/swiftui-agent-skill:swiftui-pro",
@@ -1187,12 +1202,16 @@
       "type": "topic",
       "title": "Elite UI Design",
       "subtitle": "Interface systems, visual polish, and design craft",
-      "imageUrl": null,
+      "imageUrl": "https://omgskills.com/images/collections/elite-ui-design.webp?v=61e28d4b05f0",
       "featuredSkillIds": [
         "anthropics/skills:canvas-design",
         "pbakaus/impeccable:impeccable",
         "vercel/examples:web-design-guidelines",
-        "emilkowalski/skill:emil-design-eng"
+        "emilkowalski/skill:emil-design-eng",
+        "ibelick/ui-skills:baseline-ui",
+        "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
+        "jakubkrehel/oklch-skill:oklch-skill",
+        "arvindrk/extract-design-system:skills/extract-design-system"
       ],
       "skillIds": [
         "anthropics/skills:canvas-design",
