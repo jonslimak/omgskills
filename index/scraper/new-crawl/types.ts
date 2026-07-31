@@ -235,6 +235,7 @@ export type BootstrapRepoSample = {
   candidateId: string;
   outcome: "bootstrapped" | "failed" | "skipped";
   failureReason?: string;
+  fallbackUsed?: boolean;
 };
 
 export type CatalogAdmissionSample = {

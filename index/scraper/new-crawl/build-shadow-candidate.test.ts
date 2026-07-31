@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { Skill } from "../types.js";
-import { buildCandidateFromSkill, deriveSkillPathFromId } from "./candidate-path.js";
+import { buildCandidateFromSkill, deriveSkillIdFromPath, deriveSkillPathFromId } from "./candidate-path.js";
 
 function skill(overrides: Partial<Skill> & Pick<Skill, "id" | "name" | "description" | "github_url" | "install_cmd" | "author_handle" | "tags" | "stars" | "last_updated" | "first_seen">): Skill {
   return {
@@ -37,6 +37,15 @@ test("deriveSkillPathFromId derives repo-relative path when id suffix is path-li
     deriveSkillPathFromId("pytorch/pytorch:.claude/skills/add-uint-support"),
     ".claude/skills/add-uint-support/SKILL.md",
   );
+});
+
+test("deriveSkillIdFromPath preserves nested paths and root IDs", () => {
+  assert.equal(deriveSkillIdFromPath("owner/repo", "SKILL.md"), "owner/repo");
+  assert.equal(
+    deriveSkillIdFromPath("owner/repo", "skills/scientific-writing/SKILL.md"),
+    "owner/repo:skills/scientific-writing",
+  );
+  assert.throws(() => deriveSkillIdFromPath("owner/repo", "README.md"), /Invalid SKILL\.md path/);
 });
 
 test("candidate builder uses __RESOLVE__ when path is missing and not derivable", () => {

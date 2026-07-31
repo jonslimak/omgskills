@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  bootstrapCandidatePolicyRejectionReason,
   createAdmittedLibraryRepoEntry,
   evaluateDiscoveredRepoAdmission,
   INSTALL_ADMISSION_MAX_ALL_TIME_RANK,
@@ -197,6 +198,28 @@ test("suppressed primary candidate falls back to the next eligible candidate", (
   assert.equal(result.effective.eligible, true);
   assert.equal(result.effective.candidate?.id, secondary.id);
   assert.deepEqual(result.skippedSuppressedCandidateIds, [primary.id]);
+});
+
+test("fallback bootstrap candidates reapply suppression and provenance policy", () => {
+  const candidate = discoveredRepo({ repo: "owner/repo" }).bootstrapCandidate!;
+
+  assert.equal(
+    bootstrapCandidatePolicyRejectionReason(
+      "owner/repo",
+      candidate,
+      seeds({ suppressedSkillIds: new Set([candidate.id.toLowerCase()]) }),
+    ),
+    "suppressed-skill",
+  );
+  assert.equal(
+    bootstrapCandidatePolicyRejectionReason(
+      "owner/repo",
+      candidate,
+      seeds({ provenanceOverrides: [{ id: candidate.id, provenanceType: "repackaged" }] }),
+    ),
+    "non-original-provenance",
+  );
+  assert.equal(bootstrapCandidatePolicyRejectionReason("owner/repo", candidate, seeds()), null);
 });
 
 test("repo exclusion overrides every value signal", () => {

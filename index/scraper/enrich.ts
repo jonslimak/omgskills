@@ -227,7 +227,7 @@ async function fetchRawFile(
   return null;
 }
 
-async function listSkillPaths(owner: string, repo: string, ref?: string): Promise<string[]> {
+export async function listRepoSkillPaths(owner: string, repo: string, ref?: string): Promise<string[]> {
   const key = `${owner}/${repo}@${ref ?? ""}`;
   if (treeCache.has(key)) return treeCache.get(key)!;
 
@@ -349,7 +349,7 @@ async function fetchSkillFile(
   }
 
   const resolvedPath = resolveSkillPathFromHint(
-    await listSkillPaths(owner, repo, ref),
+    await listRepoSkillPaths(owner, repo, ref),
     skillNameHint,
   );
   if (!resolvedPath) {
@@ -503,7 +503,7 @@ export async function resolveCandidateSkillPath(c: Candidate): Promise<string | 
     return null;
   }
 
-  const paths = await listSkillPaths(owner, repo, c.ref);
+  const paths = await listRepoSkillPaths(owner, repo, c.ref);
   const commonPaths = buildSkillHintAliases(c.skill_name_hint).flatMap((alias) => [
     `${alias}/SKILL.md`,
     `skills/${alias}/SKILL.md`,

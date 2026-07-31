@@ -185,6 +185,21 @@ function unsafeProvenanceSource(
     : null;
 }
 
+export function bootstrapCandidatePolicyRejectionReason(
+  repo: string,
+  candidate: RepoBootstrapCandidate,
+  seeds: TrustedSeeds,
+): PolicyReasonCode | null {
+  if (isDoNotCrawlRepo(repo, seeds)) return "do-not-crawl";
+  if (seeds.repoOverrides.some((entry) => entry.repo === repo && entry.exclude === true)) {
+    return "repo-override-exclude";
+  }
+  if (isKnownCatalogRepo(repo, seeds.catalogRepoRules)) return "catalog-repo";
+  if (isSuppressedSkillId(candidate.id, seeds)) return "suppressed-skill";
+  if (unsafeProvenanceSource(repo, candidate, seeds)) return "non-original-provenance";
+  return null;
+}
+
 function proposedAdmissionDecision(
   discoveredRepo: AdmissionDiscoveredRepo,
   seeds: TrustedSeeds,

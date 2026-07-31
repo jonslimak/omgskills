@@ -4,7 +4,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import type { Skill } from "../types.js";
 import type { EnrichResult } from "../enrich.js";
-import { enrichCandidate, getCandidateRepoMeta, resolveCandidateSkillPath } from "../enrich.js";
+import { enrichCandidate, getCandidateRepoMeta, listRepoSkillPaths, resolveCandidateSkillPath } from "../enrich.js";
 import { searchByTopics } from "../sources/topics.js";
 import { isHighStarBackfillPathAllowed, searchBySkillMdFilename, searchHighStarSkillMdRepos } from "../sources/code.js";
 import { searchAggregators } from "../sources/aggregators.js";
@@ -15,6 +15,7 @@ import { searchAwesomeAgentSkills } from "../sources/awesome.js";
 import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import {
+  bootstrapCandidatePolicyRejectionReason,
   createAdmittedLibraryRepoEntry,
   evaluateDiscoveredRepoAdmission,
   parsePolicyPrecedenceMode,
@@ -1235,7 +1236,15 @@ async function runShadowRefresh(
     repoAliasByCanonical,
     existingFirstSeen,
     existingSkills,
+    newlyAdmittedRepos,
     resolveCandidatePathFn: async (candidate) => resolveCandidateSkillPath(toEnrichCandidate(candidate)),
+    listCandidatePathsFn: async (repo, candidate) => {
+      const [owner, repoName] = repo.split("/");
+      if (!owner || !repoName) return [];
+      return listRepoSkillPaths(owner, repoName, candidate.ref);
+    },
+    fallbackCandidateRejectionFn: (repo, candidate) =>
+      bootstrapCandidatePolicyRejectionReason(repo, candidate, trustedSeeds),
     enrichCandidateFn: enrichCandidate,
   });
   removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);

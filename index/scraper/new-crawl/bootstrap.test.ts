@@ -3,12 +3,14 @@ import assert from "node:assert/strict";
 import type { EnrichResult } from "../enrich.js";
 import type { Skill } from "../types.js";
 import {
+  buildTrustedCreatorFallbackCandidates,
   bootstrapRisingRepos,
   isBootstrapEligibleCandidate,
   removeFailedNewlyAdmittedRepos,
   repairDeadPersistedRisingSkillLinks,
   selectBetterBootstrapCandidate,
   sortBootstrapCandidates,
+  TRUSTED_CREATOR_FALLBACK_ATTEMPT_LIMIT,
 } from "./bootstrap.js";
 import type { RepoBootstrapCandidate, ShadowRepoIndex, ShadowRepoIndexEntry } from "./types.js";
 
@@ -775,4 +777,162 @@ test("unresolved awesome candidate stays skipped when path resolution fails", as
 
   assert.equal(result.bootstrappedSkills.length, 0);
   assert.equal(result.bootstrapSkippedRepoSample.length, 1);
+});
+
+test("trusted creator fallback paths use stable priority and path-based IDs", () => {
+  const fallback = buildTrustedCreatorFallbackCandidates(
+    "owner/repo",
+    candidate({
+      source: "awesome",
+      id: "Owner/Repo:repo",
+      skill_md_path: "__RESOLVE__",
+      skill_name_hint: "repo",
+      github_url: "https://github.com/Owner/Repo",
+    }),
+    [
+      ".claude/skills/hidden/SKILL.md",
+      "skills/zeta/SKILL.md",
+      "README.md",
+      "SKILL.md",
+      "skills/alpha/SKILL.md",
+      "skills/alpha/SKILL.md",
+    ],
+  );
+
+  assert.deepEqual(fallback.map((row) => row.id), [
+    "Owner/Repo",
+    "Owner/Repo:skills/alpha",
+    "Owner/Repo:skills/zeta",
+    "Owner/Repo:.claude/skills/hidden",
+  ]);
+});
+
+test("newly admitted trusted creator falls back to the first valid nested skill", async () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 0, state: "library", isTrustedCreator: true })]);
+  const attemptedIds: string[] = [];
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      ["owner/repo", candidate({
+        source: "awesome",
+        id: "owner/repo:repo",
+        skill_md_path: "__RESOLVE__",
+        skill_name_hint: "repo",
+        github_url: "https://github.com/owner/repo",
+      })],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    newlyAdmittedRepos: new Set(["owner/repo"]),
+    resolveCandidatePathFn: async () => null,
+    listCandidatePathsFn: async () => ["skills/zeta/SKILL.md", "skills/alpha/SKILL.md"],
+    fallbackCandidateRejectionFn: () => null,
+    enrichCandidateFn: async (c): Promise<EnrichResult> => {
+      attemptedIds.push(c.id);
+      return c.id.endsWith("/zeta")
+        ? { skill: skill(c.id) }
+        : { skill: null, failure: { scope: "candidate", key: c.id, reason: "missing-frontmatter" } };
+    },
+  });
+
+  assert.deepEqual(attemptedIds, ["owner/repo:skills/alpha", "owner/repo:skills/zeta"]);
+  assert.equal(result.bootstrappedSkills[0]?.id, "owner/repo:skills/zeta");
+  assert.equal(result.bootstrappedRepoSample[0]?.fallbackUsed, true);
+  assert.equal(index.repos[0]?.topSkillId, "owner/repo:skills/zeta");
+});
+
+test("trusted creator fallback reapplies candidate policy before enrichment", async () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 0, state: "library", isTrustedCreator: true })]);
+  const attemptedIds: string[] = [];
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      ["owner/repo", candidate({ source: "awesome", id: "owner/repo:repo", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" })],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    newlyAdmittedRepos: new Set(["owner/repo"]),
+    resolveCandidatePathFn: async () => null,
+    listCandidatePathsFn: async () => ["skills/blocked/SKILL.md", "skills/allowed/SKILL.md"],
+    fallbackCandidateRejectionFn: (_repo, fallbackCandidate) =>
+      fallbackCandidate.id.endsWith("/blocked") ? "suppressed-skill" : null,
+    enrichCandidateFn: async (c) => {
+      attemptedIds.push(c.id);
+      return { skill: skill(c.id) };
+    },
+  });
+
+  assert.deepEqual(attemptedIds, ["owner/repo:skills/allowed"]);
+  assert.equal(result.bootstrappedSkills[0]?.id, "owner/repo:skills/allowed");
+});
+
+test("fallback remains unavailable to existing or untrusted repos", async () => {
+  let pathListCalls = 0;
+  for (const [isTrustedCreator, newlyAdmittedRepos] of [
+    [false, new Set(["owner/repo"])],
+    [true, new Set<string>()],
+  ] as const) {
+    const index = repoIndex([repo({ repo: "owner/repo", stars: 0, state: "library", isTrustedCreator })]);
+    const result = await bootstrapRisingRepos({
+      cadence: "combined",
+      checkedAt: "2026-05-22T00:00:00Z",
+      repoIndex: index,
+      bootstrapCandidateByRepo: new Map([
+        ["owner/repo", candidate({ source: "awesome", id: "owner/repo:repo", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" })],
+      ]),
+      repoAliasByCanonical: new Map(),
+      existingFirstSeen: new Map(),
+      existingSkills: new Map<string, Skill>(),
+      newlyAdmittedRepos,
+      resolveCandidatePathFn: async () => null,
+      listCandidatePathsFn: async () => {
+        pathListCalls += 1;
+        return ["skills/valid/SKILL.md"];
+      },
+      fallbackCandidateRejectionFn: () => null,
+      enrichCandidateFn: async (c) => ({ skill: skill(c.id) }),
+    });
+    assert.equal(result.bootstrappedSkills.length, 0);
+    assert.equal(result.bootstrapSkippedRepoSample.length, 1);
+  }
+  assert.equal(pathListCalls, 0);
+});
+
+test("trusted creator fallback caps enrichment attempts", async () => {
+  const index = repoIndex([repo({ repo: "owner/repo", stars: 0, state: "library", isTrustedCreator: true })]);
+  let attempts = 0;
+  const paths = Array.from({ length: TRUSTED_CREATOR_FALLBACK_ATTEMPT_LIMIT + 3 }, (_, index) =>
+    `skills/skill-${String(index).padStart(2, "0")}/SKILL.md`);
+
+  const result = await bootstrapRisingRepos({
+    cadence: "combined",
+    checkedAt: "2026-05-22T00:00:00Z",
+    repoIndex: index,
+    bootstrapCandidateByRepo: new Map([
+      ["owner/repo", candidate({ source: "awesome", id: "owner/repo:repo", skill_md_path: "__RESOLVE__", github_url: "https://github.com/owner/repo" })],
+    ]),
+    repoAliasByCanonical: new Map(),
+    existingFirstSeen: new Map(),
+    existingSkills: new Map<string, Skill>(),
+    newlyAdmittedRepos: new Set(["owner/repo"]),
+    resolveCandidatePathFn: async () => null,
+    listCandidatePathsFn: async () => paths,
+    fallbackCandidateRejectionFn: () => null,
+    enrichCandidateFn: async (c): Promise<EnrichResult> => {
+      attempts += 1;
+      return { skill: null, failure: { scope: "candidate", key: c.id, reason: "missing-frontmatter" } };
+    },
+  });
+
+  assert.equal(attempts, TRUSTED_CREATOR_FALLBACK_ATTEMPT_LIMIT);
+  assert.equal(result.bootstrapFailedRepoSample.length, 1);
+  assert.equal(result.bootstrapFailedRepoSample[0]?.fallbackUsed, true);
 });

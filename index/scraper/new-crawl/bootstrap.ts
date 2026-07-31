@@ -1,6 +1,9 @@
 import type { Candidate, EnrichResult } from "../enrich.js";
 import type { Skill } from "../types.js";
+import { deriveSkillIdFromPath } from "./candidate-path.js";
 import type { BootstrapRepoSample, BootstrapSource, RebootstrapEligibleRepoSample, RepoBootstrapCandidate, ShadowCadence, ShadowRepoIndex } from "./types.js";
+
+export const TRUSTED_CREATOR_FALLBACK_ATTEMPT_LIMIT = 10;
 
 const BOOTSTRAP_SOURCE_PRIORITY: Record<BootstrapSource, number> = {
   official: 0,
@@ -102,6 +105,38 @@ export function toEnrichCandidate(candidate: RepoBootstrapCandidate): Candidate 
   };
 }
 
+function isSkillPath(path: string): boolean {
+  return path === "SKILL.md" || path.endsWith("/SKILL.md");
+}
+
+function fallbackPathRank(path: string): number {
+  if (path === "SKILL.md") return 0;
+  if (/^skills\/[^/]+\/SKILL\.md$/.test(path)) return 1;
+  if (!path.split("/").some((part) => part.startsWith("."))) return 2;
+  return 3;
+}
+
+export function buildTrustedCreatorFallbackCandidates(
+  repo: string,
+  candidate: RepoBootstrapCandidate,
+  paths: string[],
+): RepoBootstrapCandidate[] {
+  const sourceRepoId = candidate.id.split(":", 1)[0]?.trim() || repo;
+  return [...new Set(paths)]
+    .filter(isSkillPath)
+    .sort((left, right) =>
+      fallbackPathRank(left) - fallbackPathRank(right) ||
+      left.split("/").length - right.split("/").length ||
+      left.localeCompare(right),
+    )
+    .map((path) => ({
+      ...candidate,
+      id: deriveSkillIdFromPath(sourceRepoId, path),
+      skill_md_path: path,
+      skill_name_hint: path === "SKILL.md" ? candidate.skill_name_hint : path.split("/").at(-2),
+    }));
+}
+
 function repoKeyFromGithubUrl(githubUrl: string): string | null {
   const match = githubUrl.match(/^https:\/\/github\.com\/([^/]+)\/([^/?#]+)/i);
   if (!match) return null;
@@ -133,7 +168,10 @@ type BootstrapOptions = {
   repoAliasByCanonical: Map<string, string>;
   existingFirstSeen: Map<string, string>;
   existingSkills: Map<string, Skill>;
+  newlyAdmittedRepos?: Set<string>;
   resolveCandidatePathFn: (candidate: RepoBootstrapCandidate) => Promise<string | null>;
+  listCandidatePathsFn?: (repo: string, candidate: RepoBootstrapCandidate) => Promise<string[]>;
+  fallbackCandidateRejectionFn?: (repo: string, candidate: RepoBootstrapCandidate) => string | null;
   enrichCandidateFn: (
     candidate: Candidate,
     existingFirstSeen: Map<string, string>,
@@ -157,7 +195,10 @@ export async function bootstrapRisingRepos({
   repoAliasByCanonical,
   existingFirstSeen,
   existingSkills,
+  newlyAdmittedRepos = new Set(),
   resolveCandidatePathFn,
+  listCandidatePathsFn,
+  fallbackCandidateRejectionFn,
   enrichCandidateFn,
 }: BootstrapOptions): Promise<BootstrapResult> {
   if (cadence !== "combined") {
@@ -184,7 +225,9 @@ export async function bootstrapRisingRepos({
     const candidate = bootstrapCandidateByRepo.get(repo.repo) ?? (aliasRepo ? bootstrapCandidateByRepo.get(aliasRepo) : undefined);
     if (!candidate) continue;
     let resolvedCandidate = candidate;
-    if ((candidate.source === "skillssh" || candidate.source === "awesome" || candidate.source === "official") && candidate.skill_md_path === "__RESOLVE__") {
+    const resolvesDiscoveryPath =
+      candidate.source === "skillssh" || candidate.source === "awesome" || candidate.source === "official";
+    if (resolvesDiscoveryPath && candidate.skill_md_path === "__RESOLVE__") {
       // Discovery lists can reference deleted/renamed repos (e.g. stale official-page
       // entries); a failed lookup means unresolvable, not a failed crawl.
       const resolvedPath = await resolveCandidatePathFn(candidate).catch(() => null);
@@ -195,7 +238,26 @@ export async function bootstrapRisingRepos({
         };
       }
     }
-    if (!isBootstrapEligibleCandidate(resolvedCandidate)) {
+
+    const candidatesToTry: Array<{ candidate: RepoBootstrapCandidate; fallbackUsed: boolean }> = [];
+    if (isBootstrapEligibleCandidate(resolvedCandidate)) {
+      candidatesToTry.push({ candidate: resolvedCandidate, fallbackUsed: false });
+    } else if (
+      resolvesDiscoveryPath &&
+      candidate.skill_md_path === "__RESOLVE__" &&
+      newlyAdmittedRepos.has(repo.repo) &&
+      repo.isTrustedCreator &&
+      listCandidatePathsFn &&
+      fallbackCandidateRejectionFn
+    ) {
+      const paths = await listCandidatePathsFn(repo.repo, candidate).catch(() => []);
+      candidatesToTry.push(
+        ...buildTrustedCreatorFallbackCandidates(repo.repo, candidate, paths)
+          .map((fallbackCandidate) => ({ candidate: fallbackCandidate, fallbackUsed: true })),
+      );
+    }
+
+    if (candidatesToTry.length === 0) {
       bootstrapSkippedRepoSample.push({
         repo: repo.repo,
         source: resolvedCandidate.source,
@@ -206,8 +268,34 @@ export async function bootstrapRisingRepos({
       continue;
     }
 
-    const result = await enrichCandidateFn(toEnrichCandidate(resolvedCandidate), existingFirstSeen, existingSkills, today);
-    if (result.skill && skillBelongsToRepo(result.skill, repo.repo)) {
+    let fallbackAttempts = 0;
+    let lastFailureReason = "enrich-failed";
+    let lastCandidate = candidatesToTry[0]!;
+    let policyRejectionReason: string | null = null;
+    let bootstrapped = false;
+
+    for (const candidateAttempt of candidatesToTry) {
+      if (candidateAttempt.fallbackUsed) {
+        policyRejectionReason = fallbackCandidateRejectionFn
+          ? fallbackCandidateRejectionFn(repo.repo, candidateAttempt.candidate)
+          : "policy-validation-unavailable";
+        if (policyRejectionReason) continue;
+        if (fallbackAttempts >= TRUSTED_CREATOR_FALLBACK_ATTEMPT_LIMIT) break;
+        fallbackAttempts += 1;
+      }
+      lastCandidate = candidateAttempt;
+
+      const result = await enrichCandidateFn(
+        toEnrichCandidate(candidateAttempt.candidate),
+        existingFirstSeen,
+        existingSkills,
+        today,
+      );
+      if (!result.skill || !skillBelongsToRepo(result.skill, repo.repo)) {
+        lastFailureReason = result.skill ? "repo-mismatch" : result.failure?.reason ?? "enrich-failed";
+        continue;
+      }
+
       repo.skillIds = [result.skill.id];
       repo.skillCount = 1;
       repo.topSkillId = result.skill.id;
@@ -219,19 +307,36 @@ export async function bootstrapRisingRepos({
       bootstrappedSkills.push(result.skill);
       bootstrappedRepoSample.push({
         repo: repo.repo,
-        source: resolvedCandidate.source,
-        candidateId: resolvedCandidate.id,
+        source: candidateAttempt.candidate.source,
+        candidateId: candidateAttempt.candidate.id,
         outcome: "bootstrapped",
+        ...(candidateAttempt.fallbackUsed ? { fallbackUsed: true } : {}),
+      });
+      bootstrapped = true;
+      break;
+    }
+
+    if (bootstrapped) continue;
+
+    if (fallbackAttempts === 0 && candidatesToTry.every((row) => row.fallbackUsed)) {
+      bootstrapSkippedRepoSample.push({
+        repo: repo.repo,
+        source: candidate.source,
+        candidateId: candidate.id,
+        outcome: "skipped",
+        failureReason: policyRejectionReason ?? "no-eligible-candidate",
+        fallbackUsed: true,
       });
       continue;
     }
 
     bootstrapFailedRepoSample.push({
       repo: repo.repo,
-      source: resolvedCandidate.source,
-      candidateId: resolvedCandidate.id,
+      source: lastCandidate.candidate.source,
+      candidateId: lastCandidate.candidate.id,
       outcome: "failed",
-      failureReason: result.skill ? "repo-mismatch" : result.failure?.reason ?? "enrich-failed",
+      failureReason: lastFailureReason,
+      ...(lastCandidate.fallbackUsed ? { fallbackUsed: true } : {}),
     });
   }
 

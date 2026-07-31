@@ -1,6 +1,14 @@
 import type { Skill } from "../types.js";
 import type { Candidate } from "../enrich.js";
 
+export function deriveSkillIdFromPath(repo: string, skillPath: string): string {
+  if (skillPath === "SKILL.md") return repo;
+  if (!skillPath.endsWith("/SKILL.md")) {
+    throw new Error(`Invalid SKILL.md path: ${skillPath}`);
+  }
+  return `${repo}:${skillPath.replace(/\/SKILL\.md$/, "")}`;
+}
+
 export function deriveSkillPathFromId(skillId: string): string | null {
   const colonIndex = skillId.indexOf(":");
   if (colonIndex === -1) return null;
