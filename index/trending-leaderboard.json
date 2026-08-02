@@ -5,7 +5,7 @@
     "name": "subagent-driven-development",
     "authorHandle": "obra",
     "description": "Use when executing implementation plans with independent tasks in the current session",
-    "stars": 264873,
+    "stars": 264896,
     "installs": 164182,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
@@ -27,7 +27,7 @@
     "name": "docx",
     "authorHandle": "anthropics",
     "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', '.dotx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx or .dotx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
-    "stars": 165685,
+    "stars": 165702,
     "installs": 163708,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -456,7 +456,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 107539,
+    "stars": 107543,
     "installs": 88575,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -577,7 +577,7 @@
     "name": "orca-cli",
     "authorHandle": "stablyai",
     "description": "Use the public `orca` CLI to operate Orca-managed worktrees, folder contexts, terminals, repos, automations, worktree comments, and the browser embedded inside the Orca app. Use when the user says \"$orca-cli\", \"use orca cli\", \"Orca worktree\", \"child worktree\", \"cardStatus\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"terminal send\", \"full handoff\", \"handover\", \"give this to another agent\", \"another worktree\", \"Orca browser\", or \"control the browser inside Orca\". Prefer this over raw `git worktree`, ad hoc PTYs, Playwright, or Computer Use when the task touches Orca-managed state. Use Computer Use for browser windows, webviews, or desktop UI outside Orca's embedded browser.",
-    "stars": 35330,
+    "stars": 35373,
     "installs": 81060,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
@@ -587,8 +587,8 @@
     "id": "coreyhaines31/marketingskills:revops",
     "name": "revops",
     "authorHandle": "coreyhaines31",
-    "description": "When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. Also use when the user mentions 'RevOps,' 'revenue operations,' 'lead scoring,' 'lead routing,' 'MQL,' 'SQL,' 'pipeline stages,' 'deal desk,' 'CRM automation,' 'marketing-to-sales handoff,' 'data hygiene,' 'leads aren't getting to sales,' 'pipeline management,' 'lead qualification,' or 'when should marketing hand off to sales.' Use this for anything involving the systems and processes that connect marketing to revenue. For cold outreach emails, see cold-email. For email drip campaigns, see email-sequence. For pricing decisions, see pricing-strategy.",
-    "stars": 26909,
+    "description": "When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. Also use when the user mentions 'RevOps,' 'revenue operations,' 'lead scoring,' 'lead routing,' 'MQL,' 'SQL,' 'pipeline stages,' 'deal desk,' 'CRM automation,' 'marketing-to-sales handoff,' 'data hygiene,' 'leads aren't getting to sales,' 'pipeline management,' 'lead qualification,' or 'when should marketing hand off to sales.' Use this for anything involving the systems and processes that connect marketing to revenue. For cold outreach emails, see cold-email. For email drip campaigns, see emails. For pricing decisions, see pricing.",
+    "stars": 42675,
     "installs": 81030,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -609,8 +609,8 @@
     "id": "coreyhaines31/marketingskills:lead-magnets",
     "name": "lead-magnets",
     "authorHandle": "coreyhaines31",
-    "description": "When the user wants to create, plan, or optimize a lead magnet for email capture or lead generation. Also use when the user mentions \"lead magnet,\" \"gated content,\" \"content upgrade,\" \"downloadable,\" \"ebook,\" \"cheat sheet,\" \"checklist,\" \"template download,\" \"opt-in,\" \"freebie,\" \"PDF download,\" \"resource library,\" \"content offer,\" \"email capture content,\" \"Notion template,\" \"spreadsheet template,\" or \"what should I give away for emails.\" Use this for planning what to create and how to distribute it. For interactive tools as lead magnets, see free-tool-strategy. For writing the actual content, see copywriting. For the email sequence after capture, see email-sequence.",
-    "stars": 26909,
+    "description": "When the user wants to create, plan, or optimize a lead magnet for email capture or lead generation. Also use when the user mentions \"lead magnet,\" \"gated content,\" \"content upgrade,\" \"downloadable,\" \"ebook,\" \"cheat sheet,\" \"checklist,\" \"template download,\" \"opt-in,\" \"freebie,\" \"PDF download,\" \"resource library,\" \"content offer,\" \"email capture content,\" \"Notion template,\" \"spreadsheet template,\" or \"what should I give away for emails.\" Use this for planning what to create and how to distribute it. For interactive tools as lead magnets, see free-tools. For writing the actual content, see copywriting. For the email sequence after capture, see emails.",
+    "stars": 42675,
     "installs": 77444,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -730,8 +730,8 @@
     "id": "coreyhaines31/marketingskills:customer-research",
     "name": "customer-research",
     "authorHandle": "coreyhaines31",
-    "description": "When the user wants to conduct, analyze, or synthesize customer research. Use when the user mentions \"customer research,\" \"ICP research,\" \"talk to customers,\" \"analyze transcripts,\" \"customer interviews,\" \"survey analysis,\" \"support ticket analysis,\" \"voice of customer,\" \"VOC,\" \"build personas,\" \"customer personas,\" \"jobs to be done,\" \"JTBD,\" \"what do customers say,\" \"what are customers struggling with,\" \"Reddit mining,\" \"G2 reviews,\" \"review mining,\" \"digital watering holes,\" \"community research,\" \"forum research,\" \"competitor reviews,\" \"customer sentiment,\" or \"find out why customers churn/convert/buy.\" Use for both analyzing existing research assets AND gathering new research from online sources. For writing copy informed by research, see copywriting. For acting on research to improve pages, see page-cro.",
-    "stars": 26909,
+    "description": "When the user wants to conduct, analyze, or synthesize customer research. Use when the user mentions \"customer research,\" \"ICP research,\" \"talk to customers,\" \"analyze transcripts,\" \"customer interviews,\" \"survey analysis,\" \"support ticket analysis,\" \"voice of customer,\" \"VOC,\" \"build personas,\" \"customer personas,\" \"jobs to be done,\" \"JTBD,\" \"what do customers say,\" \"what are customers struggling with,\" \"Reddit mining,\" \"G2 reviews,\" \"review mining,\" \"digital watering holes,\" \"community research,\" \"forum research,\" \"competitor reviews,\" \"customer sentiment,\" or \"find out why customers churn/convert/buy.\" Use for both analyzing existing research assets AND gathering new research from online sources. For writing copy informed by research, see copywriting. For acting on research to improve pages, see cro.",
+    "stars": 42675,
     "installs": 72944,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -1017,7 +1017,7 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 43837,
+    "stars": 43901,
     "installs": 66576,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1226,7 +1226,7 @@
     "name": "expo-native-ui",
     "authorHandle": "expo",
     "description": "Framework (OSS). Build beautiful, native-feeling Expo screens. Covers Apple HIG styling, semantic colors, native controls, SF Symbols, media, animations, visual effects, gradients, storage, and responsive layout. For routing and navigation, use the expo-router skill.",
-    "stars": 2349,
+    "stars": 2348,
     "installs": 58816,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
@@ -1281,7 +1281,7 @@
     "name": "obsidian-cli",
     "authorHandle": "kepano",
     "description": "Interact with Obsidian vaults using the Obsidian CLI to read, create, search, and manage notes, tasks, properties, and more. Also supports plugin and theme development with commands to reload plugins, run JavaScript, capture errors, take screenshots, and inspect the DOM. Use when the user asks to interact with their Obsidian vault, manage notes, search vault content, perform vault operations from the command line, or develop and debug Obsidian plugins and themes.",
-    "stars": 29243,
+    "stars": 43901,
     "installs": 57140,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1358,7 +1358,7 @@
     "name": "obsidian-bases",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.",
-    "stars": 29243,
+    "stars": 43901,
     "installs": 56239,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1390,8 +1390,8 @@
     "id": "coreyhaines31/marketingskills:competitor-profiling",
     "name": "competitor-profiling",
     "authorHandle": "coreyhaines31",
-    "description": "When the user wants to research, profile, or analyze competitors from their URLs. Also use when the user mentions 'competitor profile,' 'competitor research,' 'competitor analysis,' 'profile this competitor,' 'analyze competitor,' 'competitive intelligence,' 'competitor deep dive,' 'who are my competitors,' 'competitor landscape,' 'competitor dossier,' 'competitive audit,' or 'research these competitors.' Input is a list of competitor URLs. Output is structured competitor profile markdown files. For creating comparison/alternative pages from profiles, see competitor-alternatives. For sales-specific battle cards, see sales-enablement.",
-    "stars": 26909,
+    "description": "When the user wants to research, profile, or analyze competitors from their URLs. Also use when the user mentions 'competitor profile,' 'competitor research,' 'competitor analysis,' 'profile this competitor,' 'analyze competitor,' 'competitive intelligence,' 'competitor deep dive,' 'who are my competitors,' 'competitor landscape,' 'competitor dossier,' 'competitive audit,' or 'research these competitors.' Input is a list of competitor URLs. Output is structured competitor profile markdown files. For creating comparison/alternative pages from profiles, see competitors. For sales-specific battle cards, see sales-enablement.",
+    "stars": 42675,
     "installs": 54496,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -1501,7 +1501,7 @@
     "name": "community-marketing",
     "authorHandle": "coreyhaines31",
     "description": "Build and leverage online communities to drive product growth and brand loyalty. Use when the user wants to create a community strategy, grow a Discord or Slack community, manage a forum or subreddit, build brand advocates, increase word-of-mouth, drive community-led growth, engage users post-signup, or turn customers into evangelists. Trigger phrases: \"build a community,\" \"community strategy,\" \"Discord community,\" \"Slack community,\" \"community-led growth,\" \"brand advocates,\" \"user community,\" \"forum strategy,\" \"community engagement,\" \"grow our community,\" \"ambassador program,\" \"community flywheel.\"",
-    "stars": 26909,
+    "stars": 42675,
     "installs": 52758,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -1523,7 +1523,7 @@
     "name": "json-canvas",
     "authorHandle": "kepano",
     "description": "Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps, flowcharts, or when the user mentions Canvas files in Obsidian.",
-    "stars": 29243,
+    "stars": 43901,
     "installs": 51955,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1545,7 +1545,7 @@
     "name": "enhance-prompt",
     "authorHandle": "google-labs-code",
     "description": "Transforms vague UI ideas into polished, Stitch-optimized prompts. Enhances specificity, adds UI/UX keywords, injects design system context, and structures output for better generation results.",
-    "stars": 5242,
+    "stars": 7889,
     "installs": 51648,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
@@ -1577,8 +1577,8 @@
     "id": "coreyhaines31/marketingskills:image",
     "name": "image",
     "authorHandle": "coreyhaines31",
-    "description": "When the user wants to create, generate, edit, or optimize images for marketing — blog heroes, social graphics, product mockups, profile banners, listing visuals, or brand assets. Also use when the user mentions 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' 'social media graphic,' 'banner image,' 'cover photo,' 'profile banner,' 'listing screenshot,' 'Flux,' 'Midjourney,' 'DALL-E,' 'GPT Image,' 'Ideogram,' 'Gemini image,' 'Canva,' 'Figma,' 'image optimization,' 'compress images,' 'WebP,' or 'OG image.' Use this for general-purpose marketing image creation and optimization. For paid ad image creative and platform-specific ad specs, see ad-creative. For video production, see video.",
-    "stars": 26909,
+    "description": "When the user wants to create, generate, edit, or optimize images for marketing — blog heroes, social graphics, product mockups, profile banners, listing visuals, or brand assets. Also use when the user mentions 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' 'social media graphic,' 'banner image,' 'cover photo,' 'profile banner,' 'listing screenshot,' 'Flux,' 'Flux Kontext,' 'Midjourney,' 'DALL-E,' 'GPT Image,' 'ChatGPT Images,' 'Ideogram,' 'Gemini image,' 'Nano Banana,' 'Recraft,' 'Stable Diffusion,' 'Canva,' 'Figma,' 'image optimization,' 'compress images,' 'WebP,' or 'OG image.' Use this for general-purpose marketing image creation and optimization. For paid ad image creative and platform-specific ad specs, see ad-creative. For video production, see video.",
+    "stars": 42675,
     "installs": 51565,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -1599,8 +1599,8 @@
     "id": "coreyhaines31/marketingskills:directory-submissions",
     "name": "directory-submissions",
     "authorHandle": "coreyhaines31",
-    "description": "When the user wants to submit their product to startup, SaaS, AI, agent, MCP, no-code, or review directories for backlinks, domain rating, and discovery. Also use when the user mentions \"directory submissions,\" \"submit to directories,\" \"backlinks from directories,\" \"list my product,\" \"submit to Product Hunt,\" \"BetaList,\" \"TAAFT,\" \"Futurepedia,\" \"G2 listing,\" \"Capterra listing,\" \"AlternativeTo,\" \"SaaSHub,\" \"AI directories,\" \"MCP registry,\" \"agent directory,\" \"dofollow backlinks,\" \"launch directories,\" or \"directory tracker.\" Use this whenever someone is planning the directory layer of a product launch or an ongoing backlink campaign. For the broader launch moment, see launch-strategy. For programmatic SEO pages that should live behind these backlinks, see programmatic-seo. For AI citation optimization, see ai-seo.",
-    "stars": 26909,
+    "description": "When the user wants to submit their product to startup, SaaS, AI, agent, MCP, no-code, or review directories for backlinks, domain rating, and discovery. Also use when the user mentions \"directory submissions,\" \"submit to directories,\" \"backlinks from directories,\" \"list my product,\" \"submit to Product Hunt,\" \"BetaList,\" \"TAAFT,\" \"Futurepedia,\" \"G2 listing,\" \"Capterra listing,\" \"AlternativeTo,\" \"SaaSHub,\" \"AI directories,\" \"MCP registry,\" \"agent directory,\" \"dofollow backlinks,\" \"launch directories,\" or \"directory tracker.\" Use this whenever someone is planning the directory layer of a product launch or an ongoing backlink campaign. For the broader launch moment, see launch. For programmatic SEO pages that should live behind these backlinks, see programmatic-seo. For AI citation optimization, see ai-seo.",
+    "stars": 42675,
     "installs": 51053,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -1611,7 +1611,7 @@
     "name": "defuddle",
     "authorHandle": "kepano",
     "description": "Extract clean markdown content from web pages using Defuddle CLI, removing clutter and navigation to save tokens. Use instead of WebFetch when the user provides a URL to read or analyze, for online documentation, articles, blog posts, or any standard web page. Do NOT use for URLs ending in .md — those are already markdown, use WebFetch directly.",
-    "stars": 29243,
+    "stars": 43901,
     "installs": 51020,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1622,7 +1622,7 @@
     "name": "stitch-loop",
     "authorHandle": "google-labs-code",
     "description": "Teaches agents to iteratively build websites using Stitch with an autonomous baton-passing loop pattern",
-    "stars": 5242,
+    "stars": 7889,
     "installs": 50120,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
@@ -1633,7 +1633,7 @@
     "name": "gws-calendar",
     "authorHandle": "googleworkspace",
     "description": "Google Calendar: Manage calendars and events.",
-    "stars": 25810,
+    "stars": 30146,
     "installs": 50114,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -1688,7 +1688,7 @@
     "name": "shadcn-ui",
     "authorHandle": "google-labs-code",
     "description": "Expert guidance for integrating and building applications with shadcn/ui components, including component discovery, installation, customization, and best practices.",
-    "stars": 5242,
+    "stars": 7889,
     "installs": 46989,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
@@ -1710,7 +1710,7 @@
     "name": "gws-docs",
     "authorHandle": "googleworkspace",
     "description": "Read and write Google Docs.",
-    "stars": 25810,
+    "stars": 30146,
     "installs": 46799,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -1720,8 +1720,8 @@
     "id": "expo/skills:expo-dev-client",
     "name": "expo-dev-client",
     "authorHandle": "expo",
-    "description": "Build and distribute Expo development clients locally or via TestFlight",
-    "stars": 1856,
+    "description": "Framework (OSS). Build and distribute Expo development clients locally or via TestFlight for internal testing. For production TestFlight releases and store submission, use the eas-app-stores skill.",
+    "stars": 2348,
     "installs": 46792,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
@@ -1787,7 +1787,7 @@
     "name": "gsap-core",
     "authorHandle": "greensock",
     "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions.",
-    "stars": 12813,
+    "stars": 12847,
     "installs": 41552,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
@@ -1853,7 +1853,7 @@
     "name": "gws-docs-write",
     "authorHandle": "googleworkspace",
     "description": "Google Docs: Append text to a document.",
-    "stars": 25810,
+    "stars": 30146,
     "installs": 40054,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -1864,7 +1864,7 @@
     "name": "gws-calendar-agenda",
     "authorHandle": "googleworkspace",
     "description": "Google Calendar: Show upcoming events across all calendars.",
-    "stars": 25810,
+    "stars": 30146,
     "installs": 40001,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -1930,7 +1930,7 @@
     "name": "gws-calendar-insert",
     "authorHandle": "googleworkspace",
     "description": "Google Calendar: Create a new event.",
-    "stars": 25810,
+    "stars": 30146,
     "installs": 39019,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -2050,8 +2050,8 @@
     "id": "samber/cc-skills-golang:golang-code-style",
     "name": "golang-code-style",
     "authorHandle": "samber",
-    "description": "Golang code style, formatting and conventions. Use when writing Go code, reviewing style, configuring linters, writing comments, or establishing project standards.",
-    "stars": 1541,
+    "description": "Golang code style conventions — line length and breaking, variable declarations, control flow clarity, when comments help vs hurt. Use when writing or reviewing Go code, asking about style or clarity, or establishing project coding standards. Not for naming conventions (→ See `samber/cc-skills-golang@golang-naming` skill), linter configuration (→ See `samber/cc-skills-golang@golang-lint` skill), or doc comments (→ See `samber/cc-skills-golang@golang-documentation` skill).",
+    "stars": 2824,
     "installs": 36409,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2072,8 +2072,8 @@
     "id": "samber/cc-skills-golang:golang-error-handling",
     "name": "golang-error-handling",
     "authorHandle": "samber",
-    "description": "Idiomatic Golang error handling — creation, wrapping with %w, errors.Is/As, errors.Join, custom error types, sentinel errors, panic/recover, the single handling rule, structured logging with slog, HTTP request logging middleware, and samber/oops for production errors. Built to make logs usable at scale with log aggregation 3rd-party tools. Apply when creating, wrapping, inspecting, or logging errors in Go code.",
-    "stars": 1541,
+    "description": "Idiomatic Golang error handling — creation, wrapping with %w, errors.Is/As, errors.Join, custom error types, sentinel errors, panic/recover, the single handling rule, structured logging with slog, HTTP request logging middleware, and samber/oops for production errors. Built to make logs usable at scale with log aggregation 3rd-party tools. Apply when creating, wrapping, inspecting, or logging errors in Go code. For samber/oops specifics → See `samber/cc-skills-golang@golang-samber-oops` skill; for slog handler ecosystem → See `samber/cc-skills-golang@golang-samber-slog` skill.",
+    "stars": 2824,
     "installs": 35870,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2095,7 +2095,7 @@
     "name": "remotion",
     "authorHandle": "google-labs-code",
     "description": "Generate walkthrough videos from Stitch projects using Remotion with smooth transitions, zooming, and text overlays",
-    "stars": 5242,
+    "stars": 7889,
     "installs": 35762,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
@@ -2127,8 +2127,8 @@
     "id": "samber/cc-skills-golang:golang-performance",
     "name": "golang-performance",
     "authorHandle": "samber",
-    "description": "Golang performance optimization patterns and methodology - if X bottleneck, then apply Y. Covers allocation reduction, CPU efficiency, memory layout, GC tuning, pooling, caching, and hot-path optimization. Use when profiling or benchmarks have identified a bottleneck and you need the right optimization pattern to fix it. Also use when performing performance code review to suggest improvements or benchmarks that could help identify quick performance gains. Not for measurement methodology (see golang-benchmark skill) or debugging workflow (see golang-troubleshooting skill).",
-    "stars": 1541,
+    "description": "Golang performance optimization patterns and methodology - if X bottleneck, then apply Y. Covers allocation reduction, CPU efficiency, memory layout, GC tuning, pooling, caching, and hot-path optimization. Use when profiling or benchmarks have identified a bottleneck and you need the right optimization pattern to fix it. Also use when performing performance code review to suggest improvements or benchmarks that could help identify quick performance gains. Not for measurement methodology (→ See `samber/cc-skills-golang@golang-benchmark` skill) or debugging workflow (→ See `samber/cc-skills-golang@golang-troubleshooting` skill).",
+    "stars": 2824,
     "installs": 35476,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2150,7 +2150,7 @@
     "name": "golang-design-patterns",
     "authorHandle": "samber",
     "description": "Idiomatic Golang design patterns — functional options, constructors, error flow and cascading, resource management and lifecycle, graceful shutdown, resilience, architecture, dependency injection, data handling, streaming, and more. Apply when explicitly choosing between architectural patterns, implementing functional options, designing constructor APIs, setting up graceful shutdown, applying resilience patterns, or asking which idiomatic Go pattern fits a specific problem.",
-    "stars": 1541,
+    "stars": 2824,
     "installs": 35452,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2194,7 +2194,7 @@
     "name": "golang-concurrency",
     "authorHandle": "samber",
     "description": "Golang concurrency patterns. Use when writing or reviewing concurrent Go code involving goroutines, channels, select, locks, sync primitives, errgroup, singleflight, worker pools, or fan-out/fan-in pipelines. Also triggers when you detect goroutine leaks, race conditions, channel ownership issues, or need to choose between channels and mutexes.",
-    "stars": 1541,
+    "stars": 2824,
     "installs": 34751,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2205,7 +2205,7 @@
     "name": "golang-naming",
     "authorHandle": "samber",
     "description": "Go (Golang) naming conventions — covers packages, constructors, structs, interfaces, constants, enums, errors, booleans, receivers, getters/setters, functional options, acronyms, test functions, and subtest names. Use this skill when writing new Go code, reviewing or refactoring, choosing between naming alternatives (New vs NewTypeName, isConnected vs connected, ErrNotFound vs NotFoundError, StatusReady vs StatusUnknown at iota 0), debating Go package names (utils/helpers anti-patterns), or asking about Go naming best practices. Also trigger when the user mentions MixedCaps vs snake_case, ALL_CAPS constants, Get-prefix on getters, or error string casing. Do NOT use for general Go implementation questions that don't involve naming decisions.",
-    "stars": 1541,
+    "stars": 2824,
     "installs": 34623,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2216,7 +2216,7 @@
     "name": "golang-documentation",
     "authorHandle": "samber",
     "description": "Comprehensive documentation guide for Golang projects, covering godoc comments, README, CONTRIBUTING, CHANGELOG, Go Playground, Example tests, API docs, and llms.txt. Use when writing or reviewing doc comments, documentation, adding code examples, setting up doc sites, or discussing documentation best practices. Triggers for both libraries and applications/CLIs.",
-    "stars": 1541,
+    "stars": 2824,
     "installs": 34516,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2227,7 +2227,7 @@
     "name": "golang-data-structures",
     "authorHandle": "samber",
     "description": "Golang data structures — slices (internals, capacity growth, preallocation, slices package), maps (internals, hash buckets, maps package), arrays, container/list/heap/ring, strings.Builder vs bytes.Buffer, generic collections, pointers (unsafe.Pointer, weak.Pointer), and copy semantics. Use when choosing or optimizing Go data structures, implementing generic containers, using container/ packages, unsafe or weak pointers, or questioning slice/map internals.",
-    "stars": 1541,
+    "stars": 2824,
     "installs": 34487,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2237,8 +2237,8 @@
     "id": "samber/cc-skills-golang:golang-context",
     "name": "golang-context",
     "authorHandle": "samber",
-    "description": "Idiomatic context.Context usage in Golang — creation, propagation, cancellation, timeouts, deadlines, context values, and cross-service tracing. Apply when working with context.Context in any Go code.",
-    "stars": 1541,
+    "description": "Idiomatic context.Context usage in Golang — propagation through API boundaries, cancellation, timeouts and deadlines, request-scoped values, context.WithoutCancel for background work outliving requests. Apply when designing context propagation across layers, debugging leaked or unexpired contexts, choosing between context.Background/TODO/WithoutCancel, or storing values in context. Not for code that merely accepts ctx as first parameter.",
+    "stars": 2824,
     "installs": 34464,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2248,8 +2248,8 @@
     "id": "samber/cc-skills-golang:golang-database",
     "name": "golang-database",
     "authorHandle": "samber",
-    "description": "Comprehensive guide for Go database access. Covers parameterized queries, struct scanning, NULLable column handling, error patterns, transactions, isolation levels, SELECT FOR UPDATE, connection pool, batch processing, context propagation, and migration tooling. Use this skill whenever writing, reviewing, or debugging Golang code that interacts with PostgreSQL, MariaDB, MySQL, or SQLite. Also triggers for database testing or any question about database/sql, sqlx, pgx, or SQL queries in Golang. This skill explicitly does NOT generate database schemas or migration SQL.",
-    "stars": 1541,
+    "description": "Comprehensive guide for Go database access — parameterized queries, struct scanning, NULLable columns, transactions, isolation levels, SELECT FOR UPDATE, connection pool, batch processing, context propagation, and migration tooling. Use when writing, reviewing, or debugging Golang code that interacts with PostgreSQL, MariaDB, MySQL, or SQLite; for database testing; or for questions about database/sql, sqlx, or pgx. Does NOT generate database schemas or migration SQL.",
+    "stars": 2824,
     "installs": 34414,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2259,8 +2259,8 @@
     "id": "samber/cc-skills-golang:golang-modernize",
     "name": "golang-modernize",
     "authorHandle": "samber",
-    "description": "Continuously modernize Golang code to use the latest language features, standard library improvements, and idiomatic patterns. Use this skill whenever writing, reviewing, or refactoring Go code to ensure it leverages modern Go idioms. Also use when the user asks about Go upgrades, migration, modernization, deprecation, or when modernize linter reports issues. Also covers tooling modernization: linters, SAST, AI-powered code review in CI, and modern development practices. Trigger this skill proactively when you notice old-style Go patterns that have modern replacements.",
-    "stars": 1541,
+    "description": "Modernize Golang code to use recent language features, standard library improvements, and idiomatic patterns. Trigger proactively when writing or reviewing Go code and old-style patterns are detected, or when encountering a deprecation warning. Also use when the user explicitly asks for modernization, a Go version upgrade, or a CI/tooling refresh.",
+    "stars": 2824,
     "installs": 34400,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2303,8 +2303,8 @@
     "id": "samber/cc-skills-golang:golang-lint",
     "name": "golang-lint",
     "authorHandle": "samber",
-    "description": "Provides linting best practices and golangci-lint configuration for Go projects. Covers running linters, configuring .golangci.yml, suppressing warnings with nolint directives, interpreting lint output, and managing linter settings. Use this skill whenever the user runs linters, configures golangci-lint, asks about lint warnings or suppressions, sets up code quality tooling, or asks which linters to enable for a Go project. Also use when the user mentions golangci-lint, go vet, staticcheck, revive, or any Go linting tool.",
-    "stars": 1541,
+    "description": "Linting best practices and golangci-lint configuration for Golang projects — running linters, configuring .golangci.yml, suppressing warnings with nolint directives, interpreting lint output, and selecting linters. Use when configuring golangci-lint, asking about lint warnings or nolint suppressions, setting up code quality tooling, or choosing linters. Also use when the user mentions golangci-lint, go vet, staticcheck, or revive.",
+    "stars": 2824,
     "installs": 34193,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2325,8 +2325,8 @@
     "id": "samber/cc-skills-golang:golang-observability",
     "name": "golang-observability",
     "authorHandle": "samber",
-    "description": "Golang everyday observability — the always-on signals in production. Covers structured logging with slog, Prometheus metrics, OpenTelemetry distributed tracing, continuous profiling with pprof/Pyroscope, server-side RUM event tracking, alerting, and Grafana dashboards. Apply when instrumenting Go services for production monitoring, setting up metrics or alerting, adding OpenTelemetry tracing, correlating logs with traces, migrating legacy loggers (zap/logrus/zerolog) to slog, adding observability to new features, or implementing GDPR/CCPA-compliant tracking with Customer Data Platforms (CDP). Not for temporary deep-dive performance investigation (→ See golang-benchmark and golang-performance skills).",
-    "stars": 1541,
+    "description": "Golang everyday observability — the always-on signals in production. Covers structured logging with slog, Prometheus metrics, OpenTelemetry distributed tracing, continuous profiling with pprof/Pyroscope, server-side RUM event tracking, alerting, and Grafana dashboards. Apply when instrumenting Go services for production monitoring, setting up metrics or alerting, adding OpenTelemetry tracing, correlating logs with traces, migrating legacy loggers (zap/logrus/zerolog) to slog, adding observability to new features, or implementing GDPR/CCPA-compliant tracking with Customer Data Platforms (CDP). Not for temporary deep-dive performance investigation (→ See `samber/cc-skills-golang@golang-benchmark` and `samber/cc-skills-golang@golang-performance` skills).",
+    "stars": 2824,
     "installs": 34085,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2347,8 +2347,8 @@
     "id": "samber/cc-skills-golang:golang-dependency-management",
     "name": "golang-dependency-management",
     "authorHandle": "samber",
-    "description": "Provides dependency management strategies for Golang projects including go.mod management, installing/upgrading packages, semantic versioning, Minimal Version Selection, vulnerability scanning, outdated dependency tracking, dependency size analysis, automated updates with Dependabot/Renovate, conflict resolution, and dependency graph visualization. Use this skill whenever adding, removing, updating, or auditing Go dependencies, resolving version conflicts, setting up automated dependency updates, analyzing binary size, or working with go.work workspaces.",
-    "stars": 1541,
+    "description": "Dependency management strategies for Golang projects — go.mod management, installing/upgrading packages, Minimal Version Selection, vulnerability scanning, outdated dependency tracking, binary size analysis, Dependabot/Renovate setup, conflict resolution, and go.work workspaces. Use when adding, removing, or upgrading Go dependencies, auditing vulnerabilities, resolving version conflicts, or setting up automated dependency updates.",
+    "stars": 2824,
     "installs": 34074,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2380,8 +2380,8 @@
     "id": "samber/cc-skills-golang:golang-dependency-injection",
     "name": "golang-dependency-injection",
     "authorHandle": "samber",
-    "description": "Comprehensive guide for dependency injection (DI) in Golang. Covers why DI matters (testability, loose coupling, separation of concerns, lifecycle management), manual constructor injection, and DI library comparison (google/wire, uber-go/dig, uber-go/fx, samber/do). Use this skill when designing service architecture, setting up dependency injection, refactoring tightly coupled code, managing singletons or service factories, or when the user asks about inversion of control, service containers, or wiring dependencies in Go.",
-    "stars": 1541,
+    "description": "Comprehensive guide for dependency injection (DI) in Golang. Covers why DI matters (testability, loose coupling, separation of concerns, lifecycle management), manual constructor injection, and DI library comparison (google/wire, uber-go/dig, uber-go/fx, samber/do). Use this skill when designing service architecture, setting up dependency injection, refactoring tightly coupled code, managing singletons or service factories, or when the user asks about inversion of control, service containers, or wiring dependencies in Go. For a specific DI library, → See `samber/cc-skills-golang@golang-google-wire`, `samber/cc-skills-golang@golang-uber-dig`, `samber/cc-skills-golang@golang-uber-fx`, or `samber/cc-skills-golang@golang-samber-do` skills.",
+    "stars": 2824,
     "installs": 33988,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2402,8 +2402,8 @@
     "id": "samber/cc-skills-golang:golang-cli",
     "name": "golang-cli",
     "authorHandle": "samber",
-    "description": "Golang CLI application development. Use when building, modifying, or reviewing a Go CLI tool — especially for command structure, flag handling, configuration layering, version embedding, exit codes, I/O patterns, signal handling, shell completion, argument validation, and CLI unit testing. Also triggers when code uses cobra, viper, or urfave/cli.",
-    "stars": 1541,
+    "description": "Golang CLI application development. Use when building, modifying, or reviewing a Go CLI tool — especially for command structure, flag handling, configuration layering, version embedding, exit codes, I/O patterns, signal handling, shell completion, argument validation, and CLI unit testing. Also triggers when code uses cobra, viper, or urfave/cli. For cobra-specific APIs → See `samber/cc-skills-golang@golang-spf13-cobra` skill; for viper configuration layering → See `samber/cc-skills-golang@golang-spf13-viper` skill.",
+    "stars": 2824,
     "installs": 33922,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2414,7 +2414,7 @@
     "name": "golang-grpc",
     "authorHandle": "samber",
     "description": "Provides gRPC usage guidelines, protobuf organization, and production-ready patterns for Golang microservices. Use when implementing, reviewing, or debugging gRPC servers/clients, writing proto files, setting up interceptors, handling gRPC errors with status codes, configuring TLS/mTLS, testing with bufconn, or working with streaming RPCs.",
-    "stars": 1541,
+    "stars": 2824,
     "installs": 33882,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2424,8 +2424,8 @@
     "id": "samber/cc-skills-golang:golang-continuous-integration",
     "name": "golang-continuous-integration",
     "authorHandle": "samber",
-    "description": "Provides CI/CD pipeline configuration using GitHub Actions for Golang projects. Covers testing, linting, SAST, security scanning, code coverage, Dependabot, Renovate, GoReleaser, code review automation, and release pipelines. Use this whenever setting up CI for a Go project, configuring workflows, adding linters or security scanners, setting up Dependabot or Renovate, automating releases, or improving an existing CI pipeline. Also use when the user wants to add quality gates to their Go project.",
-    "stars": 1541,
+    "description": "CI/CD pipeline configuration using GitHub Actions for Golang projects — testing, linting, SAST, security scanning, code coverage, Dependabot, Renovate, GoReleaser, code review automation, and release pipelines. Use when setting up or improving Go project CI, configuring GitHub Actions workflows, adding linters or security scanners, automating dependency updates, or adding quality gates.",
+    "stars": 2824,
     "installs": 33835,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2689,7 +2689,7 @@
     "name": "baoyu-post-to-wechat",
     "authorHandle": "jimliu",
     "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
-    "stars": 24440,
+    "stars": 24443,
     "installs": 32161,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
@@ -2700,7 +2700,7 @@
     "name": "golang-graphql",
     "authorHandle": "samber",
     "description": "Implements GraphQL APIs in Golang using gqlgen or graphql-go. Apply when building GraphQL servers, designing schemas, writing resolvers, handling subscriptions, or integrating GraphQL with existing Go HTTP services. Also apply when the codebase imports `github.com/99designs/gqlgen` or `github.com/graph-gophers/graphql-go`.",
-    "stars": 1541,
+    "stars": 2824,
     "installs": 32005,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
@@ -2766,7 +2766,7 @@
     "name": "vite",
     "authorHandle": "antfu",
     "description": "Vite build tool configuration, plugin API, SSR, and Vite 8 Rolldown migration. Use when working with Vite projects, vite.config.ts, Vite plugins, or building libraries/SSR apps with Vite.",
-    "stars": 4821,
+    "stars": 5692,
     "installs": 31651,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
@@ -2810,7 +2810,7 @@
     "name": "vue",
     "authorHandle": "antfu",
     "description": "Vue 3 Composition API, script setup macros, reactivity system, and built-in components. Use when writing Vue SFCs, defineProps/defineEmits/defineModel, watchers, or using Transition/Teleport/Suspense/KeepAlive.",
-    "stars": 4821,
+    "stars": 5692,
     "installs": 30897,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
@@ -2909,7 +2909,7 @@
     "name": "vitest",
     "authorHandle": "antfu",
     "description": "Vitest fast unit testing framework powered by Vite with Jest-compatible API. Use when writing tests, mocking, configuring coverage, or working with test filtering and fixtures.",
-    "stars": 4821,
+    "stars": 5692,
     "installs": 30269,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
@@ -3283,7 +3283,7 @@
     "name": "improve",
     "authorHandle": "shadcn",
     "description": "Survey any codebase as a senior advisor and produce prioritized, self-contained implementation plans for OTHER models/agents to execute. Strictly read-only on source code — never implements, fixes, or refactors anything itself. Use when asked to audit a codebase, find improvement opportunities (bugs, security, performance, test coverage, tech debt, migrations, DX), suggest features or where to take the project next (roadmap, product direction), or generate handoff plans for another agent to implement.",
-    "stars": 7350,
+    "stars": 8727,
     "installs": 27298,
     "githubUrl": "https://github.com/shadcn/improve",
     "source": "skills.sh"
@@ -3349,7 +3349,7 @@
     "name": "gws-chat",
     "authorHandle": "googleworkspace",
     "description": "Google Chat: Manage Chat spaces and messages.",
-    "stars": 25810,
+    "stars": 30146,
     "installs": 26822,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -3525,7 +3525,7 @@
     "name": "code-review-excellence",
     "authorHandle": "wshobson",
     "description": "Master effective code review practices to provide constructive feedback, catch bugs early, and foster knowledge sharing while maintaining team morale. Use when reviewing pull requests, establishing review standards, or mentoring developers.",
-    "stars": 34867,
+    "stars": 38429,
     "installs": 25911,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
@@ -3558,7 +3558,7 @@
     "name": "gws-chat-send",
     "authorHandle": "googleworkspace",
     "description": "Google Chat: Send a message to a space.",
-    "stars": 25810,
+    "stars": 30146,
     "installs": 25800,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -3612,8 +3612,8 @@
     "id": "expo/skills:expo-module",
     "name": "expo-module",
     "authorHandle": "expo",
-    "description": "Guide for writing Expo native modules and views using the Expo Modules API (Swift, Kotlin, TypeScript). Covers module definition DSL, native views, shared objects, config plugins, lifecycle hooks, autolinking, and type system. Use when building or modifying native modules for Expo.",
-    "stars": 1856,
+    "description": "Framework (OSS). Guide for creating and writing Expo native modules and views using the Expo Modules API (Swift, Kotlin, TypeScript). Covers module definition DSL, native views, shared objects, config plugins, lifecycle hooks, autolinking, and type system. Use when building or modifying native modules for Expo. Not for migrating an existing Swift module from the definition DSL to the Expo Modules API 2.0 macros; use expo-migrate-module (from the expo-experiments plugin) for that.",
+    "stars": 2348,
     "installs": 25721,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
@@ -3646,7 +3646,7 @@
     "name": "api-design-principles",
     "authorHandle": "wshobson",
     "description": "Master REST and GraphQL API design principles to build intuitive, scalable, and maintainable APIs that delight developers. Use when designing new APIs, reviewing API specifications, or establishing API design standards.",
-    "stars": 34867,
+    "stars": 38429,
     "installs": 25651,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
