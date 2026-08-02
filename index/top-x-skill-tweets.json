@@ -8,7 +8,7 @@
     "likes": 2208,
     "retweets": 335,
     "replies": 46,
-    "views": 183097,
+    "views": 183112,
     "posted_at": "2026-03-28T10:12:06.000Z",
     "repo_ids": [
       "supabase/cli",
@@ -37,43 +37,7 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 165557
-      }
-    ]
-  },
-  {
-    "tweet_id": "2080899298838098034",
-    "tweet_url": "https://x.com/steipete/status/2080899298838098034",
-    "author_handle": "steipete",
-    "author_name": "Peter Steinberger 🦞",
-    "text": "Hit a new record with our autoreview skill. 66 rounds on a gnarly refactor. https://t.co/zbUjIS2LQQ https://github.com/openclaw/agent-skills/blob/main/skills/autoreview/SKILL.md",
-    "likes": 1264,
-    "retweets": 74,
-    "replies": 64,
-    "views": 155596,
-    "posted_at": "2026-07-25T06:13:48.000Z",
-    "repo_ids": [
-      "openclaw/agent-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/openclaw/agent-skills"
-    ],
-    "skill_refs": [
-      {
-        "repoId": "openclaw/agent-skills",
-        "githubUrl": "https://github.com/openclaw/agent-skills",
-        "skillPath": "skills/autoreview/SKILL.md",
-        "sourceUrl": "https://github.com/openclaw/agent-skills/blob/main/skills/autoreview/SKILL.md"
-      }
-    ],
-    "valid_skill_repos": [
-      {
-        "id": "openclaw/agent-skills",
-        "github_url": "https://github.com/openclaw/agent-skills",
-        "skill_md_path": "skills/autoreview/SKILL.md",
-        "name": "autoreview",
-        "description": "Pre-commit/ship code review: Codex default; optional Claude or Pi.",
-        "stars": 1029
+        "stars": 165724
       }
     ]
   },
@@ -83,10 +47,10 @@
     "author_handle": "elayadesigns",
     "author_name": "Elaya",
     "text": "My Landing page design skill, open source \nintake, structure, copy, and a full visual system in one file, for Claude Code, Cursor, and Codex. \n\nhttps://t.co/K1PrFSRr87 http://github.com/elayadesign/ai-design-skills",
-    "likes": 1115,
+    "likes": 1129,
     "retweets": 53,
     "replies": 23,
-    "views": 144378,
+    "views": 146606,
     "posted_at": "2026-07-29T07:04:35.000Z",
     "repo_ids": [
       "elayadesign/ai-design-skills"
@@ -102,36 +66,49 @@
         "skill_md_path": "skills/landing-page-design/SKILL.md",
         "name": "landing-page-design",
         "description": "Complete system for building high converting landing pages: intake questions, page structure, layout selection, conversion copywriting, SEO, plus strict visual rules for typography, spacing, corner radius, backgrounds, hero layout, icons, and motion. Use this skill whenever building, editing, styling, reviewing, or writing copy for ANY landing page, marketing site, web UI, page section, component, or prototype, even when the user does not mention design, conversion, tokens, or a design system. Always consult it before choosing page sections, headlines, CTAs, fonts, font sizes, spacing values, border radii, background colors, icons, or transitions.",
-        "stars": 248
+        "stars": 254
       }
     ]
   },
   {
-    "tweet_id": "2082108076128444658",
-    "tweet_url": "https://x.com/MengTo/status/2082108076128444658",
-    "author_handle": "MengTo",
-    "author_name": "Meng To",
-    "text": "AI is terrible at writing in your voice by default.\n\nI pair these two skills together. One removes the fake insights and robotic phrasing. Mine studies my past writing and gives me five different versions that still sound like me.\n\nNo AI slop:\nhttps://t.co/jYUAvsXTUr\n\nWrite like http://github.com/petergyang/no-ai-slop",
-    "likes": 807,
-    "retweets": 40,
-    "replies": 17,
-    "views": 122495,
-    "posted_at": "2026-07-28T14:17:03.000Z",
+    "tweet_id": "2038698896051023921",
+    "tweet_url": "https://x.com/Shruti_0810/status/2038698896051023921",
+    "author_handle": "Shruti_0810",
+    "author_name": "Shruti Codes",
+    "text": "Best GitHub repos for Claude Code that will 10x your next project:\n\n1. Supabase CLI  \nhttps://t.co/JJDsdIJ3nc  \n\n2. Skill Creator  \nhttps://t.co/cjrHclMkme  \n\n3. Get Sh*t Done  \nhttps://t.co/k2kYujGjH6  \n\n4. NotebookLM (Python)  \nhttps://t.co/UYKzw5CF5Z  \n\n5. Obsidian https://t.co/orruilaJfr https://github.com/supabase/cli https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md https://github.com/gsd-build/get-shit-done https://github.com/teng-lin/notebooklm-py",
+    "likes": 310,
+    "retweets": 64,
+    "replies": 10,
+    "views": 21372,
+    "posted_at": "2026-03-30T19:24:28.000Z",
     "repo_ids": [
-      "petergyang/no-ai-slop"
+      "supabase/cli",
+      "anthropics/skills",
+      "gsd-build/get-shit-done",
+      "teng-lin/notebooklm-py"
     ],
     "repo_urls": [
-      "https://github.com/petergyang/no-ai-slop"
+      "https://github.com/supabase/cli",
+      "https://github.com/anthropics/skills",
+      "https://github.com/gsd-build/get-shit-done",
+      "https://github.com/teng-lin/notebooklm-py"
     ],
-    "skill_refs": [],
+    "skill_refs": [
+      {
+        "repoId": "anthropics/skills",
+        "githubUrl": "https://github.com/anthropics/skills",
+        "skillPath": "skills/skill-creator/SKILL.md",
+        "sourceUrl": "https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md"
+      }
+    ],
     "valid_skill_repos": [
       {
-        "id": "petergyang/no-ai-slop",
-        "github_url": "https://github.com/petergyang/no-ai-slop",
-        "skill_md_path": "SKILL.md",
-        "name": "no-ai-slop",
-        "description": "Edit drafts into sharper, more human writing while preserving the writer's personal voice, or detect AI-slop patterns without rewriting. Use when the user wants a draft clearer, more direct, more opinionated, or less AI-sounding, or asks whether writing reads as AI.",
-        "stars": 3694
+        "id": "anthropics/skills",
+        "github_url": "https://github.com/anthropics/skills",
+        "skill_md_path": "skills/skill-creator/SKILL.md",
+        "name": "skill-creator",
+        "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
+        "stars": 165724
       }
     ]
   },
@@ -160,7 +137,7 @@
         "skill_md_path": "SKILL.md",
         "name": "cti-expert",
         "description": "Cyber threat intelligence and OSINT analysis toolkit. Runs structured investigations and delivers analyst-grade intelligence products with sourced, trust-scored findings. Use for OSINT and CTI cases, digital-footprint and exposure review, domain/subdomain/DNS/certificate recon, web-infrastructure pivoting (favicon hashes, tracker IDs, TLS certs, phishing-kit fingerprinting, campaign clustering), username/email/phone enumeration, breach and infostealer-log triage, image forensics, geolocation, crypto-wallet and IBAN/bank-account tracing, darknet search, M365/Azure and SaaS tenant recon, China/Sinophone recon (ICP filings, PRC corporate registries, Baidu/FOFA/Quake/ZoomEye), vulnerability and ransomware lookup, threat modeling, PII redaction, and structured reporting. Commands include /case, /sweep, /query, /webpivot, /username, /phone, /email-deep, /breach-deep, /icp, /cn-corp, /iban, /stealer-log, /exposure, /threat-model, /report, /brief, /redact, /apikeys.",
-        "stars": 436
+        "stars": 437
       }
     ]
   },
@@ -189,65 +166,7 @@
         "skill_md_path": "plugins/visual-explainer/SKILL.md",
         "name": "visual-explainer",
         "description": "Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, comparison tables, slide decks, and other visual explanations.",
-        "stars": 9383
-      }
-    ]
-  },
-  {
-    "tweet_id": "2081778801038790833",
-    "tweet_url": "https://x.com/mgechev/status/2081778801038790833",
-    "author_handle": "mgechev",
-    "author_name": "Minko Gechev",
-    "text": "Skill to get your agent to create excellent skills! :)\n\nhttps://t.co/NJDUNFyH6B https://github.com/mgechev/skills-best-practices/tree/main/skill",
-    "likes": 78,
-    "retweets": 4,
-    "replies": 1,
-    "views": 9238,
-    "posted_at": "2026-07-27T16:28:38.000Z",
-    "repo_ids": [
-      "mgechev/skills-best-practices"
-    ],
-    "repo_urls": [
-      "https://github.com/mgechev/skills-best-practices"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "mgechev/skills-best-practices",
-        "github_url": "https://github.com/mgechev/skills-best-practices",
-        "skill_md_path": "skill/SKILL.md",
-        "name": "skill-creator",
-        "description": "Authors and structures professional-grade agent skills following the agentskills.io spec. Use when creating new skill directories, drafting procedural instructions, or optimizing metadata for discoverability. Don't use for general documentation, non-agentic library code, or README files.",
-        "stars": 2161
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083095736967737514",
-    "tweet_url": "https://x.com/tom_doerr/status/2083095736967737514",
-    "author_handle": "tom_doerr",
-    "author_name": "Tom Dörr",
-    "text": "Packages Nothing's monochrome design language into a reusable skill for Claude Code.\n\nhttps://t.co/etLIYu9JI2 https://t.co/FgH56jYg3o https://github.com/dominikmartn/nothing-design-skill",
-    "likes": 28,
-    "retweets": 3,
-    "replies": 0,
-    "views": 5339,
-    "posted_at": "2026-07-31T07:41:40.000Z",
-    "repo_ids": [
-      "dominikmartn/nothing-design-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/dominikmartn/nothing-design-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "dominikmartn/nothing-design-skill",
-        "github_url": "https://github.com/dominikmartn/nothing-design-skill",
-        "skill_md_path": "nothing-design/SKILL.md",
-        "name": "nothing-design",
-        "description": "This skill should be used when the user explicitly says \"Nothing style\", \"Nothing design\", \"/nothing-design\", or directly asks to use/apply the Nothing design system. NEVER trigger automatically for generic UI or design tasks.",
-        "stars": 2676
+        "stars": 9388
       }
     ]
   },
@@ -257,10 +176,10 @@
     "author_handle": "tom_doerr",
     "author_name": "Tom Dörr",
     "text": "Best practices for creating professional-grade agent skills, including LLM-based validation and strategies for maintaining lean context windows.\n\nhttps://t.co/0Gpzz4XKkt https://t.co/VUmjPV3yta https://github.com/mgechev/skills-best-practices",
-    "likes": 24,
-    "retweets": 5,
-    "replies": 0,
-    "views": 3897,
+    "likes": 86,
+    "retweets": 11,
+    "replies": 1,
+    "views": 7078,
     "posted_at": "2026-08-01T05:13:24.000Z",
     "repo_ids": [
       "mgechev/skills-best-practices"
@@ -276,7 +195,94 @@
         "skill_md_path": "skill/SKILL.md",
         "name": "skill-creator",
         "description": "Authors and structures professional-grade agent skills following the agentskills.io spec. Use when creating new skill directories, drafting procedural instructions, or optimizing metadata for discoverability. Don't use for general documentation, non-agentic library code, or README files.",
-        "stars": 2161
+        "stars": 2172
+      }
+    ]
+  },
+  {
+    "tweet_id": "2081778801038790833",
+    "tweet_url": "https://x.com/mgechev/status/2081778801038790833",
+    "author_handle": "mgechev",
+    "author_name": "Minko Gechev",
+    "text": "Skill to get your agent to create excellent skills! :)\n\nhttps://t.co/NJDUNFyH6B https://github.com/mgechev/skills-best-practices/tree/main/skill",
+    "likes": 78,
+    "retweets": 4,
+    "replies": 1,
+    "views": 9302,
+    "posted_at": "2026-07-27T16:28:38.000Z",
+    "repo_ids": [
+      "mgechev/skills-best-practices"
+    ],
+    "repo_urls": [
+      "https://github.com/mgechev/skills-best-practices"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "mgechev/skills-best-practices",
+        "github_url": "https://github.com/mgechev/skills-best-practices",
+        "skill_md_path": "skill/SKILL.md",
+        "name": "skill-creator",
+        "description": "Authors and structures professional-grade agent skills following the agentskills.io spec. Use when creating new skill directories, drafting procedural instructions, or optimizing metadata for discoverability. Don't use for general documentation, non-agentic library code, or README files.",
+        "stars": 2172
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083779831062470790",
+    "tweet_url": "https://x.com/aiedge_/status/2083779831062470790",
+    "author_handle": "aiedge_",
+    "author_name": "AI Edge",
+    "text": "F*ck, I can't believe I'm just now finding out about this.\n\nPrompt Master is a Claude skill that writes insanely accurate prompts for any AI tool.\n\nIt reduces token spend and works with Claude/Code, ChatGPT, Gemini, Cursor, and more.\n\nGenius.\n\n→ https://t.co/cc7vKJI03m https://github.com/nidhinjs/prompt-master?tab=readme-ov-file",
+    "likes": 60,
+    "retweets": 2,
+    "replies": 1,
+    "views": 6807,
+    "posted_at": "2026-08-02T05:00:01.000Z",
+    "repo_ids": [
+      "nidhinjs/prompt-master"
+    ],
+    "repo_urls": [
+      "https://github.com/nidhinjs/prompt-master"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "nidhinjs/prompt-master",
+        "github_url": "https://github.com/nidhinjs/prompt-master",
+        "skill_md_path": "SKILL.md",
+        "name": "prompt-master",
+        "description": "Generates optimized prompts for AI tools. Activates only when the user explicitly asks to write, fix, improve, or adapt a prompt for a specific AI tool (LLM, Cursor, Midjourney, image AI, video AI, coding agents, etc.). Does not activate for general conversation, coding tasks, document writing, or other non-prompt-engineering work.",
+        "stars": 10946
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083095736967737514",
+    "tweet_url": "https://x.com/tom_doerr/status/2083095736967737514",
+    "author_handle": "tom_doerr",
+    "author_name": "Tom Dörr",
+    "text": "Packages Nothing's monochrome design language into a reusable skill for Claude Code.\n\nhttps://t.co/etLIYu9JI2 https://t.co/FgH56jYg3o https://github.com/dominikmartn/nothing-design-skill",
+    "likes": 32,
+    "retweets": 3,
+    "replies": 0,
+    "views": 5919,
+    "posted_at": "2026-07-31T07:41:40.000Z",
+    "repo_ids": [
+      "dominikmartn/nothing-design-skill"
+    ],
+    "repo_urls": [
+      "https://github.com/dominikmartn/nothing-design-skill"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "dominikmartn/nothing-design-skill",
+        "github_url": "https://github.com/dominikmartn/nothing-design-skill",
+        "skill_md_path": "nothing-design/SKILL.md",
+        "name": "nothing-design",
+        "description": "This skill should be used when the user explicitly says \"Nothing style\", \"Nothing design\", \"/nothing-design\", or directly asks to use/apply the Nothing design system. NEVER trigger automatically for generic UI or design tasks.",
+        "stars": 2682
       }
     ]
   },
@@ -289,7 +295,7 @@
     "likes": 24,
     "retweets": 4,
     "replies": 1,
-    "views": 6000,
+    "views": 6001,
     "posted_at": "2026-07-01T20:04:55.000Z",
     "repo_ids": [
       "buzhangsan/skill-manager"
@@ -310,60 +316,31 @@
     ]
   },
   {
-    "tweet_id": "2082987659782209596",
-    "tweet_url": "https://x.com/pinchenchong/status/2082987659782209596",
-    "author_handle": "pinchenchong",
-    "author_name": "Pin Chen",
-    "text": "I'm open-sourcing my system design skill.\n\nIt reads your repo, interviews you to understand the requirements, then generates three distinct architecture, compares the tradeoffs, and tells you which one to build.\n\nhttps://t.co/qTuTDICC28 https://t.co/IwVJMDkAgr https://github.com/pinchen147/system-design-skill",
-    "likes": 13,
-    "retweets": 5,
-    "replies": 3,
-    "views": 667,
-    "posted_at": "2026-07-31T00:32:12.000Z",
+    "tweet_id": "2083303663754162246",
+    "tweet_url": "https://x.com/chaliy/status/2083303663754162246",
+    "author_handle": "chaliy",
+    "author_name": "Mykhailo Chalyi",
+    "text": "First really helpful skill! \n\nhttps://t.co/DqhvzsdEHn https://github.com/AminBlg/SimpleEnglish/blob/main/README.md",
+    "likes": 9,
+    "retweets": 0,
+    "replies": 1,
+    "views": 1442,
+    "posted_at": "2026-07-31T21:27:54.000Z",
     "repo_ids": [
-      "pinchen147/system-design-skill"
+      "AminBlg/SimpleEnglish"
     ],
     "repo_urls": [
-      "https://github.com/pinchen147/system-design-skill"
+      "https://github.com/AminBlg/SimpleEnglish"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "pinchen147/system-design-skill",
-        "github_url": "https://github.com/pinchen147/system-design-skill",
-        "skill_md_path": "skills/system-design/SKILL.md",
-        "name": "system-design",
-        "description": "Design or evolve a production system from repository evidence, measurable requirements, capacity math, protected invariants, and explicit trade-offs. Reads an existing codebase as the current architecture, closes the requirements it cannot recover on its own, then draws structurally distinct candidates and recommends one with a chained evidence argument. Produces an interactive HTML report, a structured design.json, and a durable DESIGN.md a later session can resume. Use for repository architecture work, greenfield systems, scaling and sharding plans, datastore or consistency choices, capacity and cost sizing, or recording a decision as an ADR. Answers directly when the numbers already settle the choice instead of manufacturing a document.",
-        "stars": 0
-      }
-    ]
-  },
-  {
-    "tweet_id": "2082560472411455936",
-    "tweet_url": "https://x.com/Aurelien_Gz/status/2082560472411455936",
-    "author_handle": "Aurelien_Gz",
-    "author_name": "Aurelien",
-    "text": "this might be the coolest thing i’ve seen today..\n\na claude skill that creates a real font from a single photo of your handwriting\n\nskill » https://t.co/FYDxtYnrM4 https://t.co/DEhy8D8SOH http://github.com/danilo-znamerovszkij/draw-your-font",
-    "likes": 10,
-    "retweets": 1,
-    "replies": 0,
-    "views": 1274,
-    "posted_at": "2026-07-29T20:14:43.000Z",
-    "repo_ids": [
-      "danilo-znamerovszkij/draw-your-font"
-    ],
-    "repo_urls": [
-      "https://github.com/danilo-znamerovszkij/draw-your-font"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "danilo-znamerovszkij/draw-your-font",
-        "github_url": "https://github.com/danilo-znamerovszkij/draw-your-font",
-        "skill_md_path": "skills/draw-your-font/SKILL.md",
-        "name": "draw-your-font",
-        "description": "Turn a photo of handwriting into a real installable font (TTF/WOFF/WOFF2). Use when the user shares a photo of handwritten letters and wants a font, asks to \"make my font\", \"handwriting font\", \"turn my handwriting into a font\", \"font from this photo/image\", asks for a handwriting font template, or wants to refine a font made earlier (smoother, thicker, fix a letter). Not for choosing, recommending, or identifying existing fonts - only for creating a font from the user's own handwriting.",
-        "stars": 522
+        "id": "aminblg/simpleenglish",
+        "github_url": "https://github.com/AminBlg/SimpleEnglish",
+        "skill_md_path": "skills/simple-english/SKILL.md",
+        "name": "simple-english",
+        "description": "Write or rewrite technical text with the rules of ASD-STE100 Simplified\nTechnical English so it is clear, unambiguous, and free of AI slop. Use for\ndocumentation, READMEs, runbooks, procedures, error messages, release notes,\nincident reports, and API guides. Also use when the user says \"STE\",\n\"Simplified Technical English\", \"ASD-STE100\", \"de-slop\", \"make this\nreadable\", \"write for non-native readers\", or asks for docs that translate\nwell. Enforces the standard's 53 rules: 20/25-word sentence limits, one word\none meaning, simple tenses, active voice, condition before command.\n",
+        "stars": 1313
       }
     ]
   },
@@ -376,7 +353,7 @@
     "likes": 8,
     "retweets": 1,
     "replies": 0,
-    "views": 1502,
+    "views": 1532,
     "posted_at": "2026-07-28T14:28:28.000Z",
     "repo_ids": [
       "Hexens/glider-skills"
@@ -393,93 +370,6 @@
         "name": "glider-query-writing",
         "description": "Write Glider queries to analyze Solidity smart contracts for security vulnerabilities, labeling, and pattern detection. Use when the user asks to write, create, fix, or improve a Glider query, or mentions Glider, smart contract analysis, or Solidity security scanning.",
         "stars": 8
-      }
-    ]
-  },
-  {
-    "tweet_id": "2081280433036120351",
-    "tweet_url": "https://x.com/_AliceMain_/status/2081280433036120351",
-    "author_handle": "_AliceMain_",
-    "author_name": "Alice Me",
-    "text": "videro-skill turns video into files, not fluff.\n\ntimeline.​json\nhttps://t.co/qyI9LDTwnA\nhls/master.m3u8\nposter.jpg\n\nThat is the useful pattern in AI media tooling. Standardize the output, then automate the rest.\nhttps://t.co/opTk8251sC https://t.co/cefTBmoPcH http://subtitles.srt https://github.com/vakovalskii/videro-skill",
-    "likes": 8,
-    "retweets": 0,
-    "replies": 13,
-    "views": 122,
-    "posted_at": "2026-07-26T07:28:18.000Z",
-    "repo_ids": [
-      "vakovalskii/videro-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/vakovalskii/videro-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "vakovalskii/videro-skill",
-        "github_url": "https://github.com/vakovalskii/videro-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "videro-video-markup",
-        "description": "Превратить видеофайл в структурированную AI-разметку — главы/сцены, хайлайты, транскрипт с таймкодами, субтитры (.srt) и адаптивный HLS-стрим. Используй, когда пользователь просит «разметить видео», «сделать главы/тайм-коды», «субтитры к видео», «нарезать хайлайты», «обработать лекцию/урок/запись экрана» или подготовить видео к плееру. Работает поверх OpenAI-совместимого API NeuralDeep Hub (api.neuraldeep.ru) по sk-ключу пользователя.",
-        "stars": 9
-      }
-    ]
-  },
-  {
-    "tweet_id": "2080928494964424731",
-    "tweet_url": "https://x.com/Dinosn/status/2080928494964424731",
-    "author_handle": "Dinosn",
-    "author_name": "Nicolas Krassas",
-    "text": "vincentwei1021/video-shotcraft: AI video skill for Claude Code &amp; Codex — cinematic product videos with Remotion: 106 shot recipe cards, 161 motion previews, a production-ready template https://t.co/W4oSGiQLXx https://github.com/Vincentwei1021/video-shotcraft",
-    "likes": 6,
-    "retweets": 0,
-    "replies": 1,
-    "views": 4382,
-    "posted_at": "2026-07-25T08:09:49.000Z",
-    "repo_ids": [
-      "Vincentwei1021/video-shotcraft"
-    ],
-    "repo_urls": [
-      "https://github.com/Vincentwei1021/video-shotcraft"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "vincentwei1021/video-shotcraft",
-        "github_url": "https://github.com/Vincentwei1021/video-shotcraft",
-        "skill_md_path": "SKILL.md",
-        "name": "video-shotcraft",
-        "description": "Create cinematic product videos from shot recipe cards, a validated template, and code/audio assets (Remotion + real page screenshots + 2.5D camera moves + beat-synced cuts + sound design). Use when the user asks to turn a frontend project or webpage into a product video, says \"use video-shotcraft to make a video/promo\", names the Ink Press template or asks to reproduce its effect, or wants a single shot card's motion. 用镜头配方卡 + 已验收模板 + 代码/音频资产制作电影感产品视频（Remotion + 真实页面截图 + 2.5D 运镜 + 节奏卡点 + 声音设计）。当用户要求\"用 video-shotcraft 做视频/宣传片\"、把前端项目/网页做成产品视频、点名 Ink Press 模板或要求复刻模板片效果，或要用镜头卡做单个动效镜头时使用。",
-        "stars": 3102
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083303663754162246",
-    "tweet_url": "https://x.com/chaliy/status/2083303663754162246",
-    "author_handle": "chaliy",
-    "author_name": "Mykhailo Chalyi",
-    "text": "First really helpful skill! \n\nhttps://t.co/DqhvzsdEHn https://github.com/AminBlg/SimpleEnglish/blob/main/README.md",
-    "likes": 5,
-    "retweets": 0,
-    "replies": 0,
-    "views": 637,
-    "posted_at": "2026-07-31T21:27:54.000Z",
-    "repo_ids": [
-      "AminBlg/SimpleEnglish"
-    ],
-    "repo_urls": [
-      "https://github.com/AminBlg/SimpleEnglish"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "aminblg/simpleenglish",
-        "github_url": "https://github.com/AminBlg/SimpleEnglish",
-        "skill_md_path": "skills/simple-english/SKILL.md",
-        "name": "simple-english",
-        "description": "Write or rewrite technical text with the rules of ASD-STE100 Simplified\nTechnical English so it is clear, unambiguous, and free of AI slop. Use for\ndocumentation, READMEs, runbooks, procedures, error messages, release notes,\nincident reports, and API guides. Also use when the user says \"STE\",\n\"Simplified Technical English\", \"ASD-STE100\", \"de-slop\", \"make this\nreadable\", \"write for non-native readers\", or asks for docs that translate\nwell. Enforces the standard's 53 rules: 20/25-word sentence limits, one word\none meaning, simple tenses, active voice, condition before command.\n",
-        "stars": 1225
       }
     ]
   },
@@ -508,7 +398,7 @@
         "skill_md_path": "SKILL.md",
         "name": "book-to-skill",
         "description": "Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured agent skills, extracting frameworks, mental models, principles, techniques, and anti-patterns. Use when the user wants to study a document through GitHub Copilot CLI, Amp, or Claude Code, apply an author's frameworks while working, or build a reusable knowledge base from a file.",
-        "stars": 14556
+        "stars": 15100
       }
     ]
   },
@@ -542,117 +432,37 @@
     ]
   },
   {
-    "tweet_id": "2082919594847592870",
-    "tweet_url": "https://x.com/0xal0ke/status/2082919594847592870",
-    "author_handle": "0xal0ke",
-    "author_name": "Ali ⚡️",
-    "text": "tool drop: last30days\n\nClaude Code's search problem has a 55,203-star fix.\n\nlast30days researches Reddit, X, YouTube, Hacker News and the web, then returns one sourced brief.\n\nUse it when fresh context matters more than another generic search summary.\n\nhttps://t.co/2cY1UxHujq https://t.co/oHWFKXLxgk https://github.com/mvanhorn/last30days-skill",
+    "tweet_id": "2082151392777548076",
+    "tweet_url": "https://x.com/Abyrd_9/status/2082151392777548076",
+    "author_handle": "Abyrd_9",
+    "author_name": "Andrew Byrd",
+    "text": "Also I always pass my code review (and just everything) through my \"Writing Rules\" skill:\nhttps://t.co/OOkCkstMgc\n\nWhich is a distillation or rules from:\nhttps://t.co/Lxzwlm5xFb\n\nAnd it works very very well. https://github.com/Abyrd9/skills/blob/main/skills/personal/writing-rules/SKILL.md https://www.writingclasses.com/toolbox/tips-masters",
     "likes": 2,
     "retweets": 0,
     "replies": 0,
     "views": 62,
-    "posted_at": "2026-07-30T20:01:44.000Z",
+    "posted_at": "2026-07-28T17:09:11.000Z",
     "repo_ids": [
-      "mvanhorn/last30days-skill"
+      "Abyrd9/skills"
     ],
     "repo_urls": [
-      "https://github.com/mvanhorn/last30days-skill"
+      "https://github.com/Abyrd9/skills"
     ],
-    "skill_refs": [],
-    "valid_skill_repos": [
+    "skill_refs": [
       {
-        "id": "mvanhorn/last30days-skill",
-        "github_url": "https://github.com/mvanhorn/last30days-skill",
-        "skill_md_path": "skills/last30days/SKILL.md",
-        "name": "last30days",
-        "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
-        "stars": 56499
+        "repoId": "Abyrd9/skills",
+        "githubUrl": "https://github.com/Abyrd9/skills",
+        "skillPath": "skills/personal/writing-rules/SKILL.md",
+        "sourceUrl": "https://github.com/Abyrd9/skills/blob/main/skills/personal/writing-rules/SKILL.md"
       }
-    ]
-  },
-  {
-    "tweet_id": "2083099817765675332",
-    "tweet_url": "https://x.com/novitckii/status/2083099817765675332",
-    "author_handle": "novitckii",
-    "author_name": "Artëm",
-    "text": "I built a skill that turns books + videos into your own personal advisor\n\nPick a person (e.g., Naval) \nPaste books and YouTube links\nIt will analyse everything and generate you a skill (e.g., /ask-naval)\n\nWorks both in claude code and codex\n\nhttps://t.co/Y8OplSfnEi https://t.co/cSC26JxBvd https://github.com/artemnovitckii/person-to-skill",
-    "likes": 2,
-    "retweets": 0,
-    "replies": 2,
-    "views": 57,
-    "posted_at": "2026-07-31T07:57:53.000Z",
-    "repo_ids": [
-      "artemnovitckii/person-to-skill"
     ],
-    "repo_urls": [
-      "https://github.com/artemnovitckii/person-to-skill"
-    ],
-    "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "artemnovitckii/person-to-skill",
-        "github_url": "https://github.com/artemnovitckii/person-to-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "person-to-skill",
-        "description": "Builds or updates a source-grounded advisor skill from one person's books, documents, local transcript files, and YouTube video URLs. Extracts PDF/EPUB/DOCX/HTML/Markdown/text/RTF/MOBI/AZW sources, retrieves available YouTube captions, reconciles evolving or conflicting ideas, and generates a compact `/ask-name`-style skill with citations, framework notes, decision rules, source provenance, and clear limits. Use when the user wants to turn a creator, author, founder, researcher, or public expert's body of work into a reusable Claude Code, Codex, Copilot CLI, or Amp skill.",
-        "stars": 1
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083192089446117809",
-    "tweet_url": "https://x.com/Jimmy_Byrd/status/2083192089446117809",
-    "author_handle": "Jimmy_Byrd",
-    "author_name": "Jimmy Byrd 🦡",
-    "text": "Just published my version of the ASD-STE100 Simplified Technical English skill to reduce LLM word slop.\n\nhttps://t.co/MLm5YNp8jN https://github.com/TheAngryByrd/simplified-technical-english-skill/tree/master",
-    "likes": 2,
-    "retweets": 1,
-    "replies": 0,
-    "views": 136,
-    "posted_at": "2026-07-31T14:04:32.000Z",
-    "repo_ids": [
-      "TheAngryByrd/simplified-technical-english-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/TheAngryByrd/simplified-technical-english-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "theangrybyrd/simplified-technical-english-skill",
-        "github_url": "https://github.com/TheAngryByrd/simplified-technical-english-skill",
-        "skill_md_path": "skills/simplified-technical-english/SKILL.md",
-        "name": "simplified-technical-english",
-        "description": "Write and review technical text with project-aware ASD-STE100 Issue 9 guidance. Use for technical documentation, code comments, procedures, software text, safety instructions, and controlled-language reviews. Do not use for creative writing, casual conversation, or general translation.",
-        "stars": 2
-      }
-    ]
-  },
-  {
-    "tweet_id": "2082601584010117248",
-    "tweet_url": "https://x.com/jiriurbasek/status/2082601584010117248",
-    "author_handle": "jiriurbasek",
-    "author_name": "Jiří Urbášek",
-    "text": "I've released the very opinionated Swift Testing skill I've been using myself for months.\n\nIt distills 8+ years of doing TDD into one thing: unit tests that verify real behavior, not implementation details.\n\nhttps://t.co/bJmLkdr4RT https://github.com/ibru/swift-testing-skill",
-    "likes": 2,
-    "retweets": 0,
-    "replies": 0,
-    "views": 69,
-    "posted_at": "2026-07-29T22:58:05.000Z",
-    "repo_ids": [
-      "ibru/swift-testing-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/ibru/swift-testing-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "ibru/swift-testing-skill",
-        "github_url": "https://github.com/ibru/swift-testing-skill",
-        "skill_md_path": "swifttesting/SKILL.md",
-        "name": "swifttesting",
-        "description": "Write and review Swift unit tests using the Swift Testing framework with a domain-first mindset. Very opinionated, suited to TDD and BDD workflows. Use when creating or refactoring tests, practicing TDD/BDD, enforcing WHEN_THEN naming, designing test doubles, validating async/error behavior, improving readability with helpers/factories, and guiding production code toward testable architecture that avoids implementation-coupled assertions.",
+        "id": "Abyrd9/skills",
+        "github_url": "https://github.com/Abyrd9/skills",
+        "skill_md_path": "skills/personal/writing-rules/SKILL.md",
+        "name": "writing-rules",
+        "description": "Apply distilled rules for clear, useful prose.",
         "stars": 0
       }
     ]
@@ -666,7 +476,7 @@
     "likes": 1,
     "retweets": 0,
     "replies": 9,
-    "views": 23,
+    "views": 101,
     "posted_at": "2026-08-01T08:28:32.000Z",
     "repo_ids": [
       "lora-sys/free-vision-skill"
@@ -682,65 +492,7 @@
         "skill_md_path": "SKILL.md",
         "name": "free-vision",
         "description": "Give text-only coding agents low-token image understanding through compact Visual Evidence Packets.",
-        "stars": 1
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083223335417381109",
-    "tweet_url": "https://x.com/sanskarjajoo13/status/2083223335417381109",
-    "author_handle": "sanskarjajoo13",
-    "author_name": "sanskar maheshwari",
-    "text": "697 questions a senior engineer asks before writing code - packaged as a Claude/Codex skill and a portable prompt.- https://t.co/lsbuDrNEE6 https://t.co/icadsiodPT https://github.com/m4vic/socratic",
-    "likes": 1,
-    "retweets": 0,
-    "replies": 0,
-    "views": 24,
-    "posted_at": "2026-07-31T16:08:42.000Z",
-    "repo_ids": [
-      "m4vic/socratic"
-    ],
-    "repo_urls": [
-      "https://github.com/m4vic/socratic"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "m4vic/socratic",
-        "github_url": "https://github.com/m4vic/socratic",
-        "skill_md_path": "SKILL.md",
-        "name": "socratic",
-        "description": "Meta — questioning about questioning. Question yourself till you're left with only answers. Use whenever the user asks to build, design, scaffold, or architect any system, feature, service, app, agent, pipeline, connector, or tool — especially when the request is short, vague, or underspecified. By default the agent interrogates ITSELF silently across the relevant engineering domains (frontend, backend, data, security, infra, AI/LLM, mobile, API, testing, product, cost, compliance) and reasons its way to answers, surfacing only the few decisions that truly need the user's input. Also use when reviewing an existing design for gaps, or when the user says \"what am I missing,\" \"review this architecture,\" or \"ask me the right questions.\"",
-        "stars": 52
-      }
-    ]
-  },
-  {
-    "tweet_id": "2081356872121237838",
-    "tweet_url": "https://x.com/raj_cipher/status/2081356872121237838",
-    "author_handle": "raj_cipher",
-    "author_name": "Cipher",
-    "text": "This claude code skill helped me a lot with tax filing. Ask Claude code to import the skill from the url, have all related docs related in a folder and ask Claude to analyse and give filing details\n\nhttps://t.co/WBfdWzUGm9\n\nReddit link where I found this - https://t.co/09ymaOVNyi https://github.com/NidheeshJain/itr-prep-skill https://www.reddit.com/r/IncomeTaxReturnIndia/comments/1v0opup/itr_filing_claude_code_skill/",
-    "likes": 1,
-    "retweets": 1,
-    "replies": 0,
-    "views": 75,
-    "posted_at": "2026-07-26T12:32:02.000Z",
-    "repo_ids": [
-      "NidheeshJain/itr-prep-skill"
-    ],
-    "repo_urls": [
-      "https://github.com/NidheeshJain/itr-prep-skill"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "nidheeshjain/itr-prep-skill",
-        "github_url": "https://github.com/NidheeshJain/itr-prep-skill",
-        "skill_md_path": "SKILL.md",
-        "name": "itr-prep-skill",
-        "description": "End-to-end assistant for filing Indian Income Tax Returns (ITR-1/2/3/4) for any assessment year. Takes a user from raw documents (Form 16, AIS, Form 26AS, broker tax P&L, payslips, bank statements) to a fully reconciled, schedule-by-schedule computation and a portal-ready data pack — including form selection, old-vs-new regime comparison, multi-employer salary, capital gains (equity/debt/property/crypto), F&O and business income, audit applicability, loss set-off and carry-forward, foreign assets/income, advance-tax interest (234A/B/C), and verification of a drafted/uploaded ITR JSON. Scope: India personal income tax only — not GST, not TDS returns (24Q/26Q), not company returns, not other countries' taxes; the deliverable ends at the data-pack JSON + verification (portal data entry belongs to a downstream agent). Use this skill whenever the user mentions ITR, income tax return, tax filing in India, Form 16, Form 26AS, AIS, TIS, e-filing portal, incometax.gov.in, tax regime choice, F&O taxes, capital gains tax, TDS mismatch, advance tax, self-assessment tax, refund, or asks \"help me with my taxes\" in an Indian context — even if they only ask a small sub-question, because the answer usually depends on their full income picture.\n",
-        "stars": 25
+        "stars": 3
       }
     ]
   },
@@ -753,7 +505,7 @@
     "likes": 1,
     "retweets": 0,
     "replies": 0,
-    "views": 76,
+    "views": 78,
     "posted_at": "2026-07-28T14:54:41.000Z",
     "repo_ids": [
       "yysun/excel-grid",
@@ -784,7 +536,7 @@
     "likes": 1,
     "retweets": 0,
     "replies": 1,
-    "views": 85,
+    "views": 86,
     "posted_at": "2026-07-29T19:54:48.000Z",
     "repo_ids": [
       "nedeadinside/likec4-skill"
@@ -813,7 +565,7 @@
     "likes": 1,
     "retweets": 0,
     "replies": 1,
-    "views": 80,
+    "views": 84,
     "posted_at": "2026-07-28T21:10:11.000Z",
     "repo_ids": [
       "SylphAI-Inc/skills"
@@ -836,7 +588,94 @@
         "skill_md_path": "skills/glowmotion/SKILL.md",
         "name": "glowmotion",
         "description": "Create premium animated technical diagrams as single self-contained HTML+SVG files — flowcharts whose connectors visibly flow and architecture diagrams where requests travel as glowing comet dots with fading trails, pulsing module highlights, and a built-in light/dark theme toggle (dark themes midnight/neon/aurora + light theme daylight). Use this skill whenever the user asks for a flowchart, workflow, pipeline, process diagram, state machine, system architecture, infrastructure, cloud, microservices, or network topology diagram — especially when they mention \"animated\", \"glowing\", \"premium\", \"flowing\", \"dynamic\", \"alive\", \"GIF-like\", \"light mode\", \"dark mode\", or want a diagram for a landing page, README, docs, or product demo. Also converts Mermaid source (flowchart/graph and stateDiagram-v2) into an animated diagram. Prefer this over static output whenever the diagram represents anything that moves: requests, events, data, jobs, messages, or control flow.",
-        "stars": 82
+        "stars": 83
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083223335417381109",
+    "tweet_url": "https://x.com/sanskarjajoo13/status/2083223335417381109",
+    "author_handle": "sanskarjajoo13",
+    "author_name": "sanskar maheshwari",
+    "text": "697 questions a senior engineer asks before writing code - packaged as a Claude/Codex skill and a portable prompt.- https://t.co/lsbuDrNEE6 https://t.co/icadsiodPT https://github.com/m4vic/socratic",
+    "likes": 1,
+    "retweets": 0,
+    "replies": 0,
+    "views": 27,
+    "posted_at": "2026-07-31T16:08:42.000Z",
+    "repo_ids": [
+      "m4vic/socratic"
+    ],
+    "repo_urls": [
+      "https://github.com/m4vic/socratic"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "m4vic/socratic",
+        "github_url": "https://github.com/m4vic/socratic",
+        "skill_md_path": "SKILL.md",
+        "name": "socratic",
+        "description": "Meta — questioning about questioning. Question yourself till you're left with only answers. Use whenever the user asks to build, design, scaffold, or architect any system, feature, service, app, agent, pipeline, connector, or tool — especially when the request is short, vague, or underspecified. By default the agent interrogates ITSELF silently across the relevant engineering domains (frontend, backend, data, security, infra, AI/LLM, mobile, API, testing, product, cost, compliance) and reasons its way to answers, surfacing only the few decisions that truly need the user's input. Also use when reviewing an existing design for gaps, or when the user says \"what am I missing,\" \"review this architecture,\" or \"ask me the right questions.\"",
+        "stars": 61
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083590271087120577",
+    "tweet_url": "https://x.com/itzbandhan/status/2083590271087120577",
+    "author_handle": "itzbandhan",
+    "author_name": "Bandhan Pokhrel",
+    "text": "Read all 15,000 words of Wikipedia's field guide on AI writing (the doc editors use to catch AI submissions) and built a skill that fixes it instead of flagging it.\n\nCore insight: AI text fails by smoothing facts into filler.\n\nLink below 👇\nhttps://t.co/Tqh06OOsgR https://github.com/itzbandhan/de-ai-by-bandhan",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 0,
+    "posted_at": "2026-08-01T16:26:46.000Z",
+    "repo_ids": [
+      "itzbandhan/de-ai-by-bandhan"
+    ],
+    "repo_urls": [
+      "https://github.com/itzbandhan/de-ai-by-bandhan"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "itzbandhan/de-ai-by-bandhan",
+        "github_url": "https://github.com/itzbandhan/de-ai-by-bandhan",
+        "skill_md_path": "SKILL.md",
+        "name": "de-ai-by-bandhan",
+        "description": "Rewrites AI-drafted, robotic, or \"ChatGPT-sounding\" text so it reads like it was written by a sharp, experienced human professional, while raising the overall quality and professionalism of the writing. Use this whenever the user asks to make text sound \"more human,\" \"less AI,\" \"less robotic,\" wants an \"AI detector\"-proof rewrite, asks to remove \"AI vibes\" or \"GPT smell,\" or hands over a blog post / article / email / product description / README / report / LinkedIn post / proposal that currently reads generic, over-explained, puffed-up, or synthetic. Also trigger this proactively any time Claude is about to hand back a long piece of prose (blog posts, marketing copy, documentation, reports) — run the final self-check from this skill before delivering, even if the user didn't explicitly ask for \"de-AI-ing.\" Built from Wikipedia's WikiProject AI Cleanup field guide on AI writing tells, turned into an active rewriting discipline rather than a detection checklist.",
+        "stars": 1
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083247041913016819",
+    "tweet_url": "https://x.com/BrookMerli31633/status/2083247041913016819",
+    "author_handle": "BrookMerli31633",
+    "author_name": "Brook Merlin",
+    "text": "The preheat story is the open resource, not an API availability claim. For Seedance 2.5, the GitHub project includes an installable Agent Skill for prompt and storyboard work. Atlas Cloud is sharing the public resource. https://t.co/96na0oCLNl http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 1,
+    "posted_at": "2026-07-31T17:42:54.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
       }
     ]
   },
@@ -865,7 +704,130 @@
         "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
         "name": "seedance-2-5-skill",
         "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083213928373625155",
+    "tweet_url": "https://x.com/TylerMiner/status/2083213928373625155",
+    "author_handle": "TylerMiner",
+    "author_name": "Tyler Miner",
+    "text": "A camera-heavy social ad needs more than a one-line adjective stack. For Seedance 2.5, the GitHub project includes an installable Agent Skill for prompt and storyboard work. Atlas Cloud is sharing the public resource. https://t.co/LeZUMFnpaw http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 30,
+    "posted_at": "2026-07-31T15:31:19.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083594001320677874",
+    "tweet_url": "https://x.com/RobbinsReg19600/status/2083594001320677874",
+    "author_handle": "RobbinsReg19600",
+    "author_name": "Reg Robbins",
+    "text": "An inspectable GitHub resource is the right companion for this claim. Seedance 2.5 study note: the GitHub project includes an installable Agent Skill for prompt and storyboard work. Curated by Atlas Cloud. https://t.co/BRrhGhVl2E http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 0,
+    "posted_at": "2026-08-01T16:41:35.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083486141567967410",
+    "tweet_url": "https://x.com/windshockr/status/2083486141567967410",
+    "author_handle": "windshockr",
+    "author_name": "windshock",
+    "text": "AI systems may have no direct internet access but still rely on Artifactory or Nexus for packages—making package repositories a new egress boundary.\n\nI built repository-ssrf-audit, an open-source Codex Skill to analyze it.\n\nhttps://t.co/nFXnH5mXYd\n\n#ai #skills #SSRF #nexus #Jfrog https://github.com/windshock/repository-ssrf-audit",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 21,
+    "posted_at": "2026-08-01T09:33:00.000Z",
+    "repo_ids": [
+      "windshock/repository-ssrf-audit"
+    ],
+    "repo_urls": [
+      "https://github.com/windshock/repository-ssrf-audit"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "windshock/repository-ssrf-audit",
+        "github_url": "https://github.com/windshock/repository-ssrf-audit",
+        "skill_md_path": "SKILL.md",
+        "name": "repository-ssrf-audit",
+        "description": "Audit artifact and package repository managers for known and variant server-side request forgery paths. Use for source, patch, decompiled-code, or authorized lab review of products such as Sonatype Nexus Repository, JFrog Artifactory, and other registry/proxy/cache services; remote repository fetching; package metadata or manifest URLs; redirect revalidation; webhooks; TLS certificate retrieval; replication; CVE duplicate triage; version-boundary analysis; or review of an SSRF vulnerability report and its evidence.",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083576236970811606",
+    "tweet_url": "https://x.com/dnesdan/status/2083576236970811606",
+    "author_handle": "dnesdan",
+    "author_name": "Dan Urbánek",
+    "text": "Claude is using my skill for prototyping UI with Codex.\n\nJust redesigning my hobby project bike computer for iPhone.\n\nhttps://t.co/DH6SylAMrX https://t.co/DHEJqhIOJi https://github.com/dnesdan/Skills/blob/main/prototype-ui-with-imagegen/SKILL.md",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 23,
+    "posted_at": "2026-08-01T15:31:00.000Z",
+    "repo_ids": [
+      "dnesdan/Skills"
+    ],
+    "repo_urls": [
+      "https://github.com/dnesdan/Skills"
+    ],
+    "skill_refs": [
+      {
+        "repoId": "dnesdan/Skills",
+        "githubUrl": "https://github.com/dnesdan/Skills",
+        "skillPath": "prototype-ui-with-imagegen/SKILL.md",
+        "sourceUrl": "https://github.com/dnesdan/Skills/blob/main/prototype-ui-with-imagegen/SKILL.md"
+      }
+    ],
+    "valid_skill_repos": [
+      {
+        "id": "dnesdan/Skills",
+        "github_url": "https://github.com/dnesdan/Skills",
+        "skill_md_path": "prototype-ui-with-imagegen/SKILL.md",
+        "name": "prototype-ui-with-imagegen",
+        "description": "Explore distinct visual directions for one native Apple or Android UI surface with built-in or delegated Codex image generation, compare them against real product and platform constraints, and optionally rebuild a selected direction in SwiftUI or Jetpack Compose. Runs in Codex or in any host that can call `codex exec`. Use for UI concepts, image-generated redesign variants, native component or screen prototypes, riffs on a concept, or implementation of a selected direction. Support system-native, hybrid-native, and custom-native strategies while preserving behavior, accessibility, the app shell, project components, symbols, and design tokens unless explicitly in scope. Report a screenshot-backed current-state audit, independent subagent review, labeled contact sheet, tradeoffs, detailed next steps, and downstream skill recommendations. Keep exploration read-only until the user explicitly selects a variant. Do not use for web, HTML, CSS, or generated production UI assets.",
+        "stars": 0
       }
     ]
   },
@@ -901,36 +863,94 @@
         "skill_md_path": "skills/skill-creator/SKILL.md",
         "name": "skill-creator",
         "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
-        "stars": 165557
+        "stars": 165724
       }
     ]
   },
   {
-    "tweet_id": "2082819877757497366",
-    "tweet_url": "https://x.com/JingkunNing/status/2082819877757497366",
-    "author_handle": "JingkunNing",
-    "author_name": "Jingkun Ning",
-    "text": "You know when a UI feels right—but not how to explain why.\n\nUI Style Discovery turns screenshots, links, and plain-language reactions into a UI Style Brief for designers and frontend agents.\n\nOpen-source Codex Skill:\nhttps://t.co/KaUY80Zt3P https://t.co/NL03AX9hGz https://github.com/AresNing/ui-style-discovery",
+    "tweet_id": "2082887719735468474",
+    "tweet_url": "https://x.com/sanjay_as_ssk/status/2082887719735468474",
+    "author_handle": "sanjay_as_ssk",
+    "author_name": "SSK",
+    "text": "Tell Claude to reply to your Instagram comments and DMs. \nWe added Instagram automation, MCP and skill. If you're still using ManyChat and find it hard to connect with your AI agents? Switch to InstantDM.\n\nhttps://t.co/S33wpnb5SC https://github.com/sanjaykhanssk/instagram-mcp",
     "likes": 0,
     "retweets": 0,
     "replies": 1,
-    "views": 29,
-    "posted_at": "2026-07-30T13:25:30.000Z",
+    "views": 24,
+    "posted_at": "2026-07-30T17:55:05.000Z",
     "repo_ids": [
-      "AresNing/ui-style-discovery"
+      "sanjaykhanssk/instagram-mcp"
     ],
     "repo_urls": [
-      "https://github.com/AresNing/ui-style-discovery"
+      "https://github.com/sanjaykhanssk/instagram-mcp"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "aresning/ui-style-discovery",
-        "github_url": "https://github.com/AresNing/ui-style-discovery",
-        "skill_md_path": "skills/ui-style-discovery/SKILL.md",
-        "name": "ui-style-discovery",
-        "description": "Help non-designers discover, compare, and articulate a coherent visual direction for an App, Web App, responsive product, SaaS interface, dashboard, calculator, form, result page, or landing page. Use when a user has vague visual reactions, screenshots, product links, conflicting references, or no design vocabulary and needs an evidence-based UI Style Brief, reference mapping, explicit avoid list, or downstream design and frontend handoff before implementation.",
+        "id": "sanjaykhanssk/instagram-mcp",
+        "github_url": "https://github.com/sanjaykhanssk/instagram-mcp",
+        "skill_md_path": "plugins/instantdm-instagram/skills/instagram-manager/SKILL.md",
+        "name": "instagram-manager",
+        "description": "Manage an Instagram creator or business account through the InstantDM MCP tools — triage and reply to comments, answer DMs, monitor and reply to ad comments, pull account/post insights and follower trends, and work with the linked Facebook Page. Use whenever the user asks to check Instagram engagement, reply to followers, review comments, send DMs, report on Instagram performance, or handle comments on their Meta ads.",
         "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083214110691557561",
+    "tweet_url": "https://x.com/CGold25667/status/2083214110691557561",
+    "author_handle": "CGold25667",
+    "author_name": "Carllyle Gold",
+    "text": "Study subject continuity through an example, not a launch rumor. Seedance 2.5 study note: the GitHub project includes an installable Agent Skill for prompt and storyboard work. Curated by Atlas Cloud. https://t.co/taqkSTWrNP http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 6,
+    "posted_at": "2026-07-31T15:32:02.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083698793099452874",
+    "tweet_url": "https://x.com/so_sthbryan/status/2083698793099452874",
+    "author_handle": "so_sthbryan",
+    "author_name": "Bryan",
+    "text": "Claude just got an empathy skill on GitHub.\n\ndanielroe's empathy gives AI agents a structured way to read and respond to human emotion, framing EQ as a tool you can ship.\nSoft skills just became a callable API.\n\nhttps://t.co/V20uQdoCPU https://github.com/danielroe/empathy",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 24,
+    "posted_at": "2026-08-01T23:38:00.000Z",
+    "repo_ids": [
+      "danielroe/empathy"
+    ],
+    "repo_urls": [
+      "https://github.com/danielroe/empathy"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "danielroe/empathy",
+        "github_url": "https://github.com/danielroe/empathy",
+        "skill_md_path": "SKILL.md",
+        "name": "empathy",
+        "description": "Rules for communicating with humans as an AI agent. Read in full BEFORE composing any text another person will read: PR titles and descriptions, issues, code review replies, comments, discussion summaries, emails, chat and forum posts, commit messages, changelogs. Also before replying when someone responds to you, and before deciding whether to post at all. Do not draft first and check after. Minimum rules that always apply, even unread: never pretend to be human; disclose in the artifact itself that you are an agent and whether a human reviewed it; use people's stated pronouns and never guess from names; make no promises you cannot keep; claim no experience, effort, time spent, or verification you do not have; never assign work, set deadlines, or declare consensus; be brief; when in doubt, do not post.",
+        "stars": 58
       }
     ]
   },
@@ -943,7 +963,7 @@
     "likes": 0,
     "retweets": 0,
     "replies": 1,
-    "views": 91,
+    "views": 96,
     "posted_at": "2026-07-31T01:56:00.000Z",
     "repo_ids": [
       "AminBlg/SimpleEnglish"
@@ -959,152 +979,94 @@
         "skill_md_path": "skills/simple-english/SKILL.md",
         "name": "simple-english",
         "description": "Write or rewrite technical text with the rules of ASD-STE100 Simplified\nTechnical English so it is clear, unambiguous, and free of AI slop. Use for\ndocumentation, READMEs, runbooks, procedures, error messages, release notes,\nincident reports, and API guides. Also use when the user says \"STE\",\n\"Simplified Technical English\", \"ASD-STE100\", \"de-slop\", \"make this\nreadable\", \"write for non-native readers\", or asks for docs that translate\nwell. Enforces the standard's 53 rules: 20/25-word sentence limits, one word\none meaning, simple tenses, active voice, condition before command.\n",
-        "stars": 1225
+        "stars": 1313
       }
     ]
   },
   {
-    "tweet_id": "2083486141567967410",
-    "tweet_url": "https://x.com/windshockr/status/2083486141567967410",
-    "author_handle": "windshockr",
-    "author_name": "windshock",
-    "text": "AI systems may have no direct internet access but still rely on Artifactory or Nexus for packages—making package repositories a new egress boundary.\n\nI built repository-ssrf-audit, an open-source Codex Skill to analyze it.\n\nhttps://t.co/nFXnH5mXYd\n\n#ai #skills #SSRF #nexus #Jfrog https://github.com/windshock/repository-ssrf-audit",
+    "tweet_id": "2083684054642065725",
+    "tweet_url": "https://x.com/_sergi_io/status/2083684054642065725",
+    "author_handle": "_sergi_io",
+    "author_name": "Sergi Ortega M.",
+    "text": "A workmate recommended this skill to me, and I’ve been using it for a week. I have to say, it’s amazing for staying up to date on any topic you’re interested in:\n\nhttps://t.co/QuP7GmCu7M https://github.com/mvanhorn/last30days-skill",
     "likes": 0,
     "retweets": 0,
     "replies": 0,
-    "views": 10,
-    "posted_at": "2026-08-01T09:33:00.000Z",
+    "views": 9,
+    "posted_at": "2026-08-01T22:39:26.000Z",
     "repo_ids": [
-      "windshock/repository-ssrf-audit"
+      "mvanhorn/last30days-skill"
     ],
     "repo_urls": [
-      "https://github.com/windshock/repository-ssrf-audit"
+      "https://github.com/mvanhorn/last30days-skill"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "windshock/repository-ssrf-audit",
-        "github_url": "https://github.com/windshock/repository-ssrf-audit",
+        "id": "mvanhorn/last30days-skill",
+        "github_url": "https://github.com/mvanhorn/last30days-skill",
+        "skill_md_path": "skills/last30days/SKILL.md",
+        "name": "last30days",
+        "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
+        "stars": 56696
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083101191135740074",
+    "tweet_url": "https://x.com/sergeonsamui/status/2083101191135740074",
+    "author_handle": "sergeonsamui",
+    "author_name": "Serge Bulaev",
+    "text": "Agent skill that forces LLMs to write docs in ASD-STE100 Simplified Technical English (the aerospace standard since 1983). Tests on Claude cut STE violations by 72.9% and avg sentence length from 11.2 to 9.7 words. https://t.co/YgDEN0rlRA https://t.co/S5AGufaVaL https://github.com/AminBlg/SimpleEnglish",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 43,
+    "posted_at": "2026-07-31T08:03:20.000Z",
+    "repo_ids": [
+      "AminBlg/SimpleEnglish"
+    ],
+    "repo_urls": [
+      "https://github.com/AminBlg/SimpleEnglish"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "aminblg/simpleenglish",
+        "github_url": "https://github.com/AminBlg/SimpleEnglish",
+        "skill_md_path": "skills/simple-english/SKILL.md",
+        "name": "simple-english",
+        "description": "Write or rewrite technical text with the rules of ASD-STE100 Simplified\nTechnical English so it is clear, unambiguous, and free of AI slop. Use for\ndocumentation, READMEs, runbooks, procedures, error messages, release notes,\nincident reports, and API guides. Also use when the user says \"STE\",\n\"Simplified Technical English\", \"ASD-STE100\", \"de-slop\", \"make this\nreadable\", \"write for non-native readers\", or asks for docs that translate\nwell. Enforces the standard's 53 rules: 20/25-word sentence limits, one word\none meaning, simple tenses, active voice, condition before command.\n",
+        "stars": 1313
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083543844814299156",
+    "tweet_url": "https://x.com/miao5168/status/2083543844814299156",
+    "author_handle": "miao5168",
+    "author_name": "miaowmiaow",
+    "text": "Ask an AI to research a product space and somewhere in the report it quietly decides your feature set for you.\n\nSo I built murPick: an agent skill that serves research as an a la carte menu instead — checked = scope, unchecked = explicit boundaries.\n\nMIT: https://t.co/lLrmJlDV2J https://t.co/3vkRghmK9F https://github.com/ymustc/murPick",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 3,
+    "posted_at": "2026-08-01T13:22:17.000Z",
+    "repo_ids": [
+      "ymustc/murPick"
+    ],
+    "repo_urls": [
+      "https://github.com/ymustc/murPick"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "ymustc/murpick",
+        "github_url": "https://github.com/ymustc/murPick",
         "skill_md_path": "SKILL.md",
-        "name": "repository-ssrf-audit",
-        "description": "Audit artifact and package repository managers for known and variant server-side request forgery paths. Use for source, patch, decompiled-code, or authorized lab review of products such as Sonatype Nexus Repository, JFrog Artifactory, and other registry/proxy/cache services; remote repository fetching; package metadata or manifest URLs; redirect revalidation; webhooks; TLS certificate retrieval; replication; CVE duplicate triage; version-boundary analysis; or review of an SSRF vulnerability report and its evidence.",
-        "stars": 0
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083205128119894120",
-    "tweet_url": "https://x.com/CharlesFerqlrm/status/2083205128119894120",
-    "author_handle": "CharlesFerqlrm",
-    "author_name": "Charles Ferguson",
-    "text": "The resource link is the call to action for this preheat post. Seedance 2.5 preheat: the GitHub project includes an installable Agent Skill for prompt and storyboard work. Shared by Atlas Cloud. https://t.co/8jCmtYZoEq http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-    "likes": 0,
-    "retweets": 0,
-    "replies": 0,
-    "views": 8,
-    "posted_at": "2026-07-31T14:56:21.000Z",
-    "repo_ids": [
-      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
-        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
-        "name": "seedance-2-5-skill",
-        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083205158096556536",
-    "tweet_url": "https://x.com/DoyleMaaik93620/status/2083205158096556536",
-    "author_handle": "DoyleMaaik93620",
-    "author_name": "Maaike Doyle",
-    "text": "For cost per rendered second, study the prompt and output together. Atlas Cloud resource for Seedance 2.5: the GitHub project includes an installable Agent Skill for prompt and storyboard work. https://t.co/6z6vN4Scm8 http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-    "likes": 0,
-    "retweets": 0,
-    "replies": 0,
-    "views": 8,
-    "posted_at": "2026-07-31T14:56:28.000Z",
-    "repo_ids": [
-      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
-        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
-        "name": "seedance-2-5-skill",
-        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083213928373625155",
-    "tweet_url": "https://x.com/TylerMiner/status/2083213928373625155",
-    "author_handle": "TylerMiner",
-    "author_name": "Tyler Miner",
-    "text": "A camera-heavy social ad needs more than a one-line adjective stack. For Seedance 2.5, the GitHub project includes an installable Agent Skill for prompt and storyboard work. Atlas Cloud is sharing the public resource. https://t.co/LeZUMFnpaw http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-    "likes": 0,
-    "retweets": 0,
-    "replies": 0,
-    "views": 30,
-    "posted_at": "2026-07-31T15:31:19.000Z",
-    "repo_ids": [
-      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
-        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
-        "name": "seedance-2-5-skill",
-        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
-      }
-    ]
-  },
-  {
-    "tweet_id": "2083247041913016819",
-    "tweet_url": "https://x.com/BrookMerli31633/status/2083247041913016819",
-    "author_handle": "BrookMerli31633",
-    "author_name": "Brook Merlin",
-    "text": "The preheat story is the open resource, not an API availability claim. For Seedance 2.5, the GitHub project includes an installable Agent Skill for prompt and storyboard work. Atlas Cloud is sharing the public resource. https://t.co/96na0oCLNl http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-    "likes": 0,
-    "retweets": 0,
-    "replies": 0,
-    "views": 1,
-    "posted_at": "2026-07-31T17:42:54.000Z",
-    "repo_ids": [
-      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "repo_urls": [
-      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
-        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
-        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
-        "name": "seedance-2-5-skill",
-        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
+        "name": "murpick",
+        "description": "Use when the user shares reference materials (screenshots, screen recordings, links, or a local folder) about products they like and wants competitive research or feature selection before building something similar; when they ask for a \"feature menu\", \"à la carte\" picking, or say they want to choose which features to build; when they send back a checked/filled menu file and want the selection report; or during pre-project discovery research.",
+        "stars": 2
       }
     ]
   },
@@ -1117,7 +1079,7 @@
     "likes": 0,
     "retweets": 0,
     "replies": 0,
-    "views": 76,
+    "views": 78,
     "posted_at": "2026-07-30T21:59:54.000Z",
     "repo_ids": [
       "AminBlg/SimpleEnglish"
@@ -1133,65 +1095,36 @@
         "skill_md_path": "skills/simple-english/SKILL.md",
         "name": "simple-english",
         "description": "Write or rewrite technical text with the rules of ASD-STE100 Simplified\nTechnical English so it is clear, unambiguous, and free of AI slop. Use for\ndocumentation, READMEs, runbooks, procedures, error messages, release notes,\nincident reports, and API guides. Also use when the user says \"STE\",\n\"Simplified Technical English\", \"ASD-STE100\", \"de-slop\", \"make this\nreadable\", \"write for non-native readers\", or asks for docs that translate\nwell. Enforces the standard's 53 rules: 20/25-word sentence limits, one word\none meaning, simple tenses, active voice, condition before command.\n",
-        "stars": 1225
+        "stars": 1313
       }
     ]
   },
   {
-    "tweet_id": "2083153703599554782",
-    "tweet_url": "https://x.com/betterhn300/status/2083153703599554782",
-    "author_handle": "betterhn300",
-    "author_name": "Hacker News 300",
-    "text": "Agent Skill to Force Docs in ASD-STE100 Simplified Technical English https://t.co/XQdJbOZhw5 (https://t.co/oURggMCygj) https://github.com/AminBlg/SimpleEnglish https://news.ycombinator.com/item?id=49114639",
+    "tweet_id": "2083436356685255064",
+    "tweet_url": "https://x.com/hemran_7282/status/2083436356685255064",
+    "author_handle": "hemran_7282",
+    "author_name": "MD Emran Hossain",
+    "text": "Best practices for creating professional-grade agent skills, including LLM-based validation and strategies for maintaining lean context windows\nhttps://t.co/GkQ2QtWNc5\n\n#CyberSecurity #InfoSec #e0xsecops #TechLeadershi https://t.co/LtzeIKPcBB https://github.com/mgechev/skills-best-practices",
     "likes": 0,
     "retweets": 0,
     "replies": 0,
-    "views": 256,
-    "posted_at": "2026-07-31T11:32:00.000Z",
+    "views": 10,
+    "posted_at": "2026-08-01T06:15:10.000Z",
     "repo_ids": [
-      "AminBlg/SimpleEnglish"
+      "mgechev/skills-best-practices"
     ],
     "repo_urls": [
-      "https://github.com/AminBlg/SimpleEnglish"
+      "https://github.com/mgechev/skills-best-practices"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "aminblg/simpleenglish",
-        "github_url": "https://github.com/AminBlg/SimpleEnglish",
-        "skill_md_path": "skills/simple-english/SKILL.md",
-        "name": "simple-english",
-        "description": "Write or rewrite technical text with the rules of ASD-STE100 Simplified\nTechnical English so it is clear, unambiguous, and free of AI slop. Use for\ndocumentation, READMEs, runbooks, procedures, error messages, release notes,\nincident reports, and API guides. Also use when the user says \"STE\",\n\"Simplified Technical English\", \"ASD-STE100\", \"de-slop\", \"make this\nreadable\", \"write for non-native readers\", or asks for docs that translate\nwell. Enforces the standard's 53 rules: 20/25-word sentence limits, one word\none meaning, simple tenses, active voice, condition before command.\n",
-        "stars": 1225
-      }
-    ]
-  },
-  {
-    "tweet_id": "2082880066078285831",
-    "tweet_url": "https://x.com/JohnLin1394478/status/2082880066078285831",
-    "author_handle": "JohnLin1394478",
-    "author_name": "John Lin",
-    "text": "Research Quest is an open-source gamified research Skill.\n\nIt reads docs, maps Known/Unknowns, asks one key question per turn, and keeps answers focused—then hands Context + Goal to Codex.\n\nDemo: https://t.co/8sOUdVaNEk\nGitHub: https://t.co/ckETTRQbZ6\n\nStars/follows welcome. https://john-lin98.github.io/ai-research-quest/ https://github.com/John-Lin98/ai-research-quest",
-    "likes": 0,
-    "retweets": 0,
-    "replies": 2,
-    "views": 15,
-    "posted_at": "2026-07-30T17:24:40.000Z",
-    "repo_ids": [
-      "John-Lin98/ai-research-quest"
-    ],
-    "repo_urls": [
-      "https://github.com/John-Lin98/ai-research-quest"
-    ],
-    "skill_refs": [],
-    "valid_skill_repos": [
-      {
-        "id": "john-lin98/ai-research-quest",
-        "github_url": "https://github.com/John-Lin98/ai-research-quest",
-        "skill_md_path": "skills/research-quest/SKILL.md",
-        "name": "research-quest",
-        "description": "使用 Known–Unknown 四象限认知地图和 grill-me-with-docs 小步提问，把用户的真实科研需求、文档与历史讨论整理成可追溯 Context，再生成可交给 Codex、ChatGPT 或多 Agent 执行的完整 Goal。AI 先读材料，每轮默认只问一个最影响最终结果的问题；用户可随时提问，也可主动追加资料、约束、偏好和任务线索，AI 会分类、更新认知地图并重写下一问。",
-        "stars": 0
+        "id": "mgechev/skills-best-practices",
+        "github_url": "https://github.com/mgechev/skills-best-practices",
+        "skill_md_path": "skill/SKILL.md",
+        "name": "skill-creator",
+        "description": "Authors and structures professional-grade agent skills following the agentskills.io spec. Use when creating new skill directories, drafting procedural instructions, or optimizing metadata for discoverability. Don't use for general documentation, non-agentic library code, or README files.",
+        "stars": 2172
       }
     ]
   },
@@ -1203,8 +1136,8 @@
     "text": "I don't like skills but this one might have changed my life in the short-term.\n\nhttps://t.co/9QwA6AKINT https://github.com/AminBlg/SimpleEnglish",
     "likes": 0,
     "retweets": 0,
-    "replies": 1,
-    "views": 107,
+    "replies": 2,
+    "views": 138,
     "posted_at": "2026-08-01T02:27:33.000Z",
     "repo_ids": [
       "AminBlg/SimpleEnglish"
@@ -1220,7 +1153,94 @@
         "skill_md_path": "skills/simple-english/SKILL.md",
         "name": "simple-english",
         "description": "Write or rewrite technical text with the rules of ASD-STE100 Simplified\nTechnical English so it is clear, unambiguous, and free of AI slop. Use for\ndocumentation, READMEs, runbooks, procedures, error messages, release notes,\nincident reports, and API guides. Also use when the user says \"STE\",\n\"Simplified Technical English\", \"ASD-STE100\", \"de-slop\", \"make this\nreadable\", \"write for non-native readers\", or asks for docs that translate\nwell. Enforces the standard's 53 rules: 20/25-word sentence limits, one word\none meaning, simple tenses, active voice, condition before command.\n",
-        "stars": 1225
+        "stars": 1313
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083214074255700381",
+    "tweet_url": "https://x.com/rock_fitch84572/status/2083214074255700381",
+    "author_handle": "rock_fitch84572",
+    "author_name": "Fitch Rock",
+    "text": "The preheat story is the open resource, not an API availability claim. For Seedance 2.5, the public GitHub repository collects 100+ curated prompts and real video previews. Atlas Cloud is sharing the public resource. https://t.co/6OskyksFKH http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 7,
+    "posted_at": "2026-07-31T15:31:54.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083214231814771047",
+    "tweet_url": "https://x.com/DonneMarcu97490/status/2083214231814771047",
+    "author_handle": "DonneMarcu97490",
+    "author_name": "Donne Marcus",
+    "text": "When the problem is unclear camera direction, the workflow needs a narrower public promise. Atlas Cloud resource for Seedance 2.5: the open resource can help turn a scene idea into a more structured prompt. https://t.co/HfAytuFTQn http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 5,
+    "posted_at": "2026-07-31T15:32:31.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083205031785099297",
+    "tweet_url": "https://x.com/DonneMarcu97490/status/2083205031785099297",
+    "author_handle": "DonneMarcu97490",
+    "author_name": "Donne Marcus",
+    "text": "The preheat story is the open resource, not an API availability claim. For Seedance 2.5, the public GitHub repository collects 100+ curated prompts and real video previews. Atlas Cloud is sharing the public resource. https://t.co/HfAytuFTQn http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 22,
+    "posted_at": "2026-07-31T14:55:58.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
       }
     ]
   },
@@ -1233,7 +1253,7 @@
     "likes": 0,
     "retweets": 0,
     "replies": 0,
-    "views": 24,
+    "views": 25,
     "posted_at": "2026-07-31T14:56:21.000Z",
     "repo_ids": [
       "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
@@ -1249,7 +1269,7 @@
         "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
         "name": "seedance-2-5-skill",
         "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
+        "stars": 112
       }
     ]
   },
@@ -1278,7 +1298,152 @@
         "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
         "name": "seedance-2-5-skill",
         "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083593980215009673",
+    "tweet_url": "https://x.com/QuentinSte70377/status/2083593980215009673",
+    "author_handle": "QuentinSte70377",
+    "author_name": "Stella Quentin",
+    "text": "The public version should stay specific about first-frame lock. Seedance 2.5 preheat: the public GitHub repository collects 100+ curated prompts and real video previews. Shared by Atlas Cloud. https://t.co/cMoHPFUT6C http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 1,
+    "posted_at": "2026-08-01T16:41:30.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083205236773331081",
+    "tweet_url": "https://x.com/rock_fitch84572/status/2083205236773331081",
+    "author_handle": "rock_fitch84572",
+    "author_name": "Fitch Rock",
+    "text": "When the problem is unclear camera direction, the workflow needs a narrower public promise. Atlas Cloud resource for Seedance 2.5: the open resource can help turn a scene idea into a more structured prompt. https://t.co/6OskyksFKH http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 5,
+    "posted_at": "2026-07-31T14:56:47.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083714011292430728",
+    "tweet_url": "https://x.com/ItsnotAILabs/status/2083714011292430728",
+    "author_handle": "ItsnotAILabs",
+    "author_name": "ITSNOTAILABS",
+    "text": "Your local research server skills, real charts, real Python, on your machine.\n\nUse a desk in the browser. Coding agents call the same host with tools.\n\nhttps://t.co/tBbhPATWMx https://t.co/ajDxq2ARqk https://github.com/ItsNotAILABS/ResearchersHub",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 9,
+    "posted_at": "2026-08-02T00:38:28.000Z",
+    "repo_ids": [
+      "ItsNotAILABS/ResearchersHub"
+    ],
+    "repo_urls": [
+      "https://github.com/ItsNotAILABS/ResearchersHub"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "itsnotailabs/researchershub",
+        "github_url": "https://github.com/ItsNotAILABS/ResearchersHub",
+        "skill_md_path": "skills/researchershub/SKILL.md",
+        "name": "researchershub",
+        "description": "ResearchersHub — sovereign research desk for Claude, Grok, Codex, Cursor, and all coding agents. 970+ research skills (ML, comp bio, cheminformatics, clinical). Full PNG charts + real Python. Atlas shared research graph. MCP + REST tools. Triggers: /researchershub, research skills, titration chart, QSAR, Atlas claim, RH_MODEL, science construct, coding agent research.\n",
+        "stars": 0
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083205159728140757",
+    "tweet_url": "https://x.com/dean_carme1620/status/2083205159728140757",
+    "author_handle": "dean_carme1620",
+    "author_name": "Carmen Dean",
+    "text": "Study cost per rendered second through an example, not a launch rumor. Seedance 2.5 study note: the open resource can help turn a scene idea into a more structured prompt. Curated by Atlas Cloud. https://t.co/60oLF12Xga http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 8,
+    "posted_at": "2026-07-31T14:56:28.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
+      }
+    ]
+  },
+  {
+    "tweet_id": "2083213841111101837",
+    "tweet_url": "https://x.com/LiloKrause/status/2083213841111101837",
+    "author_handle": "LiloKrause",
+    "author_name": "Lilo Krause",
+    "text": "The strongest Seedance 2.5 preheat asset is a usable prompt resource. Seedance 2.5 preheat: the public GitHub repository collects 100+ curated prompts and real video previews. Shared by Atlas Cloud. https://t.co/vYZj8EriZV http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+    "likes": 0,
+    "retweets": 0,
+    "replies": 0,
+    "views": 18,
+    "posted_at": "2026-07-31T15:30:58.000Z",
+    "repo_ids": [
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "repo_urls": [
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
+    ],
+    "skill_refs": [],
+    "valid_skill_repos": [
+      {
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
       }
     ]
   },
@@ -1307,36 +1472,36 @@
         "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
         "name": "seedance-2-5-skill",
         "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
-        "stars": 110
+        "stars": 112
       }
     ]
   },
   {
-    "tweet_id": "2083436356685255064",
-    "tweet_url": "https://x.com/hemran_7282/status/2083436356685255064",
-    "author_handle": "hemran_7282",
-    "author_name": "MD Emran Hossain",
-    "text": "Best practices for creating professional-grade agent skills, including LLM-based validation and strategies for maintaining lean context windows\nhttps://t.co/GkQ2QtWNc5\n\n#CyberSecurity #InfoSec #e0xsecops #TechLeadershi https://t.co/LtzeIKPcBB https://github.com/mgechev/skills-best-practices",
+    "tweet_id": "2083594030638907433",
+    "tweet_url": "https://x.com/BblytheD29173/status/2083594030638907433",
+    "author_handle": "BblytheD29173",
+    "author_name": "Bblythe Dryden",
+    "text": "Open resources make edit preservation easier to discuss with the team. For Seedance 2.5, the open resource can help turn a scene idea into a more structured prompt. Atlas Cloud is sharing the public resource. https://t.co/Ou7WmeZpKh http://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
     "likes": 0,
     "retweets": 0,
     "replies": 0,
-    "views": 9,
-    "posted_at": "2026-08-01T06:15:10.000Z",
+    "views": 0,
+    "posted_at": "2026-08-01T16:41:42.000Z",
     "repo_ids": [
-      "mgechev/skills-best-practices"
+      "AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
     ],
     "repo_urls": [
-      "https://github.com/mgechev/skills-best-practices"
+      "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills"
     ],
     "skill_refs": [],
     "valid_skill_repos": [
       {
-        "id": "mgechev/skills-best-practices",
-        "github_url": "https://github.com/mgechev/skills-best-practices",
-        "skill_md_path": "skill/SKILL.md",
-        "name": "skill-creator",
-        "description": "Authors and structures professional-grade agent skills following the agentskills.io spec. Use when creating new skill directories, drafting procedural instructions, or optimizing metadata for discoverability. Don't use for general documentation, non-agentic library code, or README files.",
-        "stars": 2161
+        "id": "atlascloudai/awesome-seedance-2.5-prompts-skills",
+        "github_url": "https://github.com/AtlasCloudAI/awesome-seedance-2.5-prompts-skills",
+        "skill_md_path": "skills/seedance-2-5-skill/SKILL.md",
+        "name": "seedance-2-5-skill",
+        "description": "Plan and generate controllable Seedance video using Seedream 5.0 Pro storyboards and Seedance 2.0 today, with a Seedance 2.5 route when available. Use for consistent people, products, objects, food, or scenes; storyboard-to- video; reference-to-video; first-and-last-frame image-to-video; extensions; and Atlas Cloud media generation.",
+        "stars": 112
       }
     ]
   }
