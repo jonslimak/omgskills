@@ -834,13 +834,19 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 26) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Top Creators")
+                    Text("Featured")
                         .font(.system(size: 10, weight: .semibold))
                         .fontWeight(.semibold)
                         .foregroundStyle(.tertiary)
-                    HStack(alignment: .top, spacing: 8) {
-                        trendingStarterButton("Creators", icon: "person.crop.square", action: showCreatorCollections)
-                        trendingStarterButton("Companies", icon: "building.2", action: showCompanyCollections)
+                    VStack(spacing: 5) {
+                        HStack(alignment: .top, spacing: 8) {
+                            trendingStarterButton("Creators", icon: "person.crop.square", action: showCreatorCollections)
+                            trendingStarterButton("Companies", icon: "building.2", action: showCompanyCollections)
+                        }
+                        HStack(alignment: .top, spacing: 8) {
+                            trendingStarterButton("The GOAT List", icon: "trophy", action: showGoatListCollection)
+                            trendingStarterButton("Elite UI Design", icon: "paintbrush", action: showEliteUIDesignCollection)
+                        }
                     }
                 }
 
@@ -2299,6 +2305,19 @@ struct ContentView: View {
 
     private func showCompanyCollections() {
         showCollectionsIndex(.companies)
+    }
+
+    private func showGoatListCollection() {
+        showCollection(id: "the-goat-list")
+    }
+
+    private func showEliteUIDesignCollection() {
+        showCollection(id: "elite-ui-design")
+    }
+
+    private func showCollection(id: String) {
+        guard let collection = store.collection(id: id) else { return }
+        selectCollection(collection)
     }
 
     private func showCollectionsIndex(_ kind: CollectionsIndexKind) {

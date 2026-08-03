@@ -203,24 +203,25 @@ struct CollectionAvatarView: View {
     let size: CGFloat
 
     var body: some View {
-        AsyncImage(url: imageURL) { phase in
-            switch phase {
-            case .empty:
-                fallback
-                    .redacted(reason: .placeholder)
-            case .success(let image):
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            case .failure:
-                fallback
-            @unknown default:
-                fallback
+        if let imageURL {
+            AsyncImage(url: imageURL) { phase in
+                switch phase {
+                case .empty:
+                    Color.clear
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                case .failure:
+                    Color.clear
+                @unknown default:
+                    Color.clear
+                }
             }
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .accessibilityHidden(true)
         }
-        .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .accessibilityHidden(true)
     }
 
     private var imageURL: URL? {
@@ -235,13 +236,4 @@ struct CollectionAvatarView: View {
         return nil
     }
 
-    private var fallback: some View {
-        RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .fill(.quaternary.opacity(0.6))
-            .overlay {
-                Image(systemName: collection.type == .author ? "person.crop.square" : "square.grid.2x2")
-                    .font(.system(size: size * 0.42))
-                    .foregroundStyle(.secondary)
-            }
-    }
 }
