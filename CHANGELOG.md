@@ -4,6 +4,18 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.19] - 2026-08-03
+
+### App
+- Enable automatic Sparkle update checks and installs
+- Remove the manual Update button flow
+- Add Featured collection links and collection-open telemetry
+- Sort the X feed by tweet date instead of engagement
+- Refine collection page headers and navigation
+
+### Ops
+- Add debug-only appcast override support for private automatic update testing
+
 ## [0.0.18] - 2026-07-21
 
 ### App
@@ -93,7 +105,8 @@ All notable changes to omgskills are documented here.
 
 Versions 0.0.1 through 0.0.10 predate this changelog.
 
-[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.18...HEAD
+[Unreleased]: https://github.com/jonslimak/omgskills/compare/v0.0.19...HEAD
+[0.0.19]: https://github.com/jonslimak/omgskills/compare/v0.0.18...v0.0.19
 [0.0.18]: https://github.com/jonslimak/omgskills/compare/v0.0.17...v0.0.18
 [0.0.17]: https://github.com/jonslimak/omgskills/compare/v0.0.16...v0.0.17
 [0.0.16]: https://github.com/jonslimak/omgskills/compare/v0.0.15...v0.0.16
