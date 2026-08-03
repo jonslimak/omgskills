@@ -46,9 +46,11 @@
 	<key>OMGSkillsSkillGroupsAuthEnabled</key>
 	<false/>
 	<key>SUAutomaticallyUpdate</key>
-	<false/>
+	<true/>
+	<key>SUAllowsAutomaticUpdates</key>
+	<true/>
 	<key>SUEnableAutomaticChecks</key>
-	<false/>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>https://omgskills.com/appcast.xml</string>
 	<key>SUPublicEDKey</key>

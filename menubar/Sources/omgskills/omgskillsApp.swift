@@ -46,7 +46,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         if skillGroupsAuthEnabled {
             deviceConnectionModel.restore()
         }
-        setupUpdater(startingUpdater: !usesBundledLibraryPreview)
+        let shouldStartUpdater = !usesBundledLibraryPreview
+        setupUpdater(startingUpdater: shouldStartUpdater)
+        if Self.shouldCheckForUpdatesInBackground(updaterStarted: shouldStartUpdater) {
+            checkForUpdatesInBackground()
+        }
         setupStatusItem()
         setupPanel()
         setupGlobalHotkey()
@@ -105,6 +109,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             updaterDelegate: self,
             userDriverDelegate: nil
         )
+    }
+
+    nonisolated static func shouldCheckForUpdatesInBackground(updaterStarted: Bool) -> Bool {
+        updaterStarted
+    }
+
+    private func checkForUpdatesInBackground() {
+        updaterController.updater.checkForUpdatesInBackground()
     }
 
     private func setupLibraryRefreshObservers() {
