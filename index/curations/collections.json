@@ -33,7 +33,7 @@
       "subtitle": "Official Claude skills",
       "featuredSkillIds": [
         "anthropics/skills:pdf",
-        "anthropics/skills:docx",
+        "anthropics/skills:skills/docx",
         "anthropics/skills:skills/frontend-design",
         "anthropics/skills:webapp-testing",
         "anthropics/skills:algorithmic-art",
@@ -46,8 +46,7 @@
         "anthropics/skills:internal-comms",
         "anthropics/skills:mcp-builder",
         "anthropics/skills:pptx",
-        "anthropics/skills:skills/skill-creator",
-        "anthropics/skills:skills/claude-api"
+        "anthropics/skills:skills/skill-creator"
       ],
       "description": "Anthropic's official skills cover documents, frontend design, testing, and Claude API work. They are a practical baseline for most Claude setups."
     },
@@ -449,7 +448,6 @@
     },
     "mvanhorn": {
       "featuredSkillIds": [
-        "mvanhorn/last30days-skill:last30days",
         "mvanhorn/last30days-skill",
         "clawdbot/skills:skills/mvanhorn/search-x",
         "mvanhorn/cli-printing-press:printing-press",
@@ -807,7 +805,6 @@
     },
     "cloudflare": {
       "featuredSkillIds": [
-        "cloudflare/moltworker:cloudflare-browser",
         "cloudflare/moltworker:skills/cloudflare-browser",
         "cloudflare/vinext:migrate-to-vinext",
         "cloudflare/workerd:add-autogate",
@@ -835,9 +832,9 @@
     },
     "vercel": {
       "featuredSkillIds": [
-        "vercel/turborepo:turborepo",
-        "vercel/ai:add-provider-package",
-        "vercel/ai:adr-skill",
+        "vercel/turbo:turborepo",
+        "vercel-labs/ai:add-provider-package",
+        "vercel-labs/ai:adr-skill",
         "vercel/vercel:vercel-cli",
         "vercel/next-forge:next-forge",
         "vercel/streamdown:streamdown",
@@ -1091,13 +1088,13 @@
       "imageUrl": null,
       "featuredSkillIds": [
         "anthropics/skills:pdf",
-        "anthropics/skills:docx",
+        "anthropics/skills:skills/docx",
         "obra/superpowers:systematic-debugging",
         "openai/codex:code-review"
       ],
       "skillIds": [
         "anthropics/skills:pdf",
-        "anthropics/skills:docx",
+        "anthropics/skills:skills/docx",
         "anthropics/skills:xlsx",
         "obra/superpowers:systematic-debugging",
         "obra/superpowers:test-driven-development",
@@ -1140,7 +1137,7 @@
       "type": "topic",
       "title": "The GOAT List",
       "subtitle": "Standout skills worth keeping close",
-      "imageUrl": null,
+      "imageUrl": "https://omgskills.com/images/collections/the-goat-list.webp?v=2e8c1aa6feac",
       "featuredSkillIds": [
         "garrytan/gstack",
         "mattpocock/skills:grill-me",
@@ -1174,7 +1171,7 @@
       "type": "topic",
       "title": "Build iOS Apps",
       "subtitle": "SwiftUI, testing, data, and App Store workflows",
-      "imageUrl": null,
+      "imageUrl": "https://omgskills.com/images/collections/build-ios-apps.webp?v=c05b7c3e9733",
       "featuredSkillIds": [
         "twostraws/swiftui-agent-skill:swiftui-pro",
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
@@ -1202,7 +1199,7 @@
       "type": "topic",
       "title": "Elite UI Design",
       "subtitle": "Interface systems, visual polish, and design craft",
-      "imageUrl": "https://omgskills.com/images/collections/elite-ui-design.webp?v=61e28d4b05f0",
+      "imageUrl": "https://omgskills.com/images/collections/elite-ui-design.webp?v=59f558a5a2ab",
       "featuredSkillIds": [
         "anthropics/skills:canvas-design",
         "pbakaus/impeccable:impeccable",
