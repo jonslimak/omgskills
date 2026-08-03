@@ -56,13 +56,6 @@ if [ "$expected_sha" != "$origin_sha" ]; then
   exit 1
 fi
 
-source_sha="$(git log -1 --format=%H -- index/curations/collections.json index/seeds/creators.json site/images/collections)"
-publish_sha="$(git log -1 --format=%H -- site/data/v2/manifest.json site/data/crawl4/manifest.json)"
-if [ -n "$source_sha" ] && [ -n "$publish_sha" ] && git merge-base --is-ancestor "$source_sha" "$publish_sha"; then
-  echo "refusing collection publication: no collection source or image changes exist after the latest published manifests" >&2
-  exit 1
-fi
-
 echo "Running local collection preflight..."
 npm --prefix index ci
 npm --prefix index run policy:validate -- --profile strict

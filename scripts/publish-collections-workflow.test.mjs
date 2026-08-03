@@ -35,6 +35,7 @@ test("collection publisher validates, publishes one shared asset, then pushes", 
   assert.match(workflow, /v2 and Crawl 4 must reference one shared collections asset/);
   assert.match(workflow, /cmp "site\/data\/v2\/\$v2_asset" "site\/data\/crawl4\/\$crawl4_asset"/);
   assert.match(workflow, /unexpected publisher change/);
+  assert.match(workflow, /publisher produced no changes/);
   assert.match(workflow, /PUBLICATION_IMPACT_OVERRIDE: \$\{\{ inputs\.publication_impact_override == true && '1' \|\| '' \}\}/);
   assert.match(workflow, /PUBLICATION_IMPACT_OVERRIDE_REASON: \$\{\{ inputs\.publication_impact_override_reason \|\| '' \}\}/);
 });

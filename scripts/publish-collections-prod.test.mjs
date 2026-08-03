@@ -12,7 +12,7 @@ test("collection dispatcher is executable and requires reviewed main", async () 
   assert.match(script, /git fetch origin main/);
   assert.match(script, /expected_sha="\$\(git rev-parse HEAD\)"/);
   assert.match(script, /origin_sha="\$\(git rev-parse origin\/main\)"/);
-  assert.match(script, /no collection source or image changes exist after the latest published manifests/);
+  assert.doesNotMatch(script, /git merge-base --is-ancestor/);
 });
 
 test("collection dispatcher validates, dispatches the exact SHA, and waits", () => {
