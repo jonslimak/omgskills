@@ -169,10 +169,7 @@ final class SkillsStore: ObservableObject {
 
         switch twitter {
         case .success(let skills):
-            twitterSkills = skills.sorted {
-                (($0.tweetLikes ?? 0), $0.stars, $0.name) >
-                (($1.tweetLikes ?? 0), $1.stars, $1.name)
-            }
+            twitterSkills = skills.sorted(by: Self.twitterChronologicalOrder)
             twitterLoadError = nil
             if buildIndexes {
                 buildIndex(for: twitterSkills, kind: .twitter, generation: generation)
@@ -647,6 +644,43 @@ final class SkillsStore: ObservableObject {
             normalized.removeFirst()
         }
         return normalized.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+
+    private static func twitterChronologicalOrder(_ lhs: Skill, _ rhs: Skill) -> Bool {
+        let lhsDate = parseTweetPostedAt(lhs.tweetPostedAt)
+        let rhsDate = parseTweetPostedAt(rhs.tweetPostedAt)
+
+        switch (lhsDate, rhsDate) {
+        case let (lhsDate?, rhsDate?):
+            if lhsDate != rhsDate {
+                return lhsDate > rhsDate
+            }
+        case (_?, nil):
+            return true
+        case (nil, _?):
+            return false
+        case (nil, nil):
+            break
+        }
+
+        if lhs.stars != rhs.stars {
+            return lhs.stars > rhs.stars
+        }
+        return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+    }
+
+    private static func parseTweetPostedAt(_ value: String?) -> Date? {
+        guard let value else { return nil }
+
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: value) {
+            return date
+        }
+
+        let standard = ISO8601DateFormatter()
+        standard.formatOptions = [.withInternetDateTime]
+        return standard.date(from: value)
     }
 
     private enum IndexKind {

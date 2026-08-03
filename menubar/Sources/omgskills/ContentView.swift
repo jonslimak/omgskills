@@ -752,7 +752,7 @@ struct ContentView: View {
                 title: activeCollectionsIndex?.title ?? "Collections",
                 collections: collectionsForActiveIndex,
                 onOpen: { collection in
-                    selectCollection(collection)
+                    selectCollection(collection, entryPoint: "collections_index")
                 }
             )
         } else if shouldShowStarterSearches {
@@ -2308,16 +2308,16 @@ struct ContentView: View {
     }
 
     private func showGoatListCollection() {
-        showCollection(id: "the-goat-list")
+        showCollection(id: "the-goat-list", entryPoint: "featured_home")
     }
 
     private func showEliteUIDesignCollection() {
-        showCollection(id: "elite-ui-design")
+        showCollection(id: "elite-ui-design", entryPoint: "featured_home")
     }
 
-    private func showCollection(id: String) {
+    private func showCollection(id: String, entryPoint: String) {
         guard let collection = store.collection(id: id) else { return }
-        selectCollection(collection)
+        selectCollection(collection, entryPoint: entryPoint)
     }
 
     private func showCollectionsIndex(_ kind: CollectionsIndexKind) {
@@ -2520,13 +2520,17 @@ struct ContentView: View {
         let handle = normalizedCreatorHandle(rawHandle)
         guard !handle.isEmpty else { return }
         if let collection = store.authorCollection(for: handle) {
-            selectCollection(collection, showAuthorQuery: true)
+            selectCollection(collection, showAuthorQuery: true, entryPoint: "creator_username")
         } else {
             filterByCreator(handle)
         }
     }
 
-    private func selectCollection(_ collection: SkillCollection, showAuthorQuery: Bool = false) {
+    private func selectCollection(
+        _ collection: SkillCollection,
+        showAuthorQuery: Bool = false,
+        entryPoint: String
+    ) {
         activeCollectionListId = nil
         selectedId = nil
         selectedSkill = nil
@@ -2555,6 +2559,18 @@ struct ContentView: View {
             debouncedQuery = ""
         }
         showDetail = false
+        trackCollectionOpened(collection, entryPoint: entryPoint)
+    }
+
+    private func trackCollectionOpened(_ collection: SkillCollection, entryPoint: String) {
+        Analytics.signal("collection.opened", parameters: [
+            "collection_id": collection.id,
+            "collection_title": collection.title,
+            "collection_type": collection.type.rawValue,
+            "entry_point": entryPoint,
+            "featured_skill_count": String(collection.featuredSkillIds.count),
+            "skill_count": String(store.allSkills(for: collection).count)
+        ])
     }
 
     private func showAllSkills(in collection: SkillCollection) {

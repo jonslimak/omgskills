@@ -158,10 +158,6 @@ struct CollectionPageView: View {
                 CollectionAvatarView(collection: collection, size: 72)
 
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("Collection")
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.tertiary)
                     Text(collection.title)
                         .font(.system(size: 28, weight: .bold))
                         .lineLimit(1)
@@ -175,13 +171,14 @@ struct CollectionPageView: View {
 
                 Spacer()
 
-                Button("Close", systemImage: "arrow.left.to.line.compact", action: onClose)
-                    .labelStyle(.iconOnly)
+                Button(action: onClose) {
+                    Image(systemName: "arrow.left")
+                        .font(.system(size: 11))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                }
                     .buttonStyle(.plain)
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 24, height: 24)
-                    .contentShape(Circle())
+                    .foregroundStyle(.tertiary)
                     .help("Close")
             }
         }

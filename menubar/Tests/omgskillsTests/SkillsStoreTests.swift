@@ -88,6 +88,31 @@ struct SkillsStoreTests {
         #expect(store.twitterLoadError == nil)
     }
 
+    @Test func twitterSkillsLoadNewestTweetsFirst() {
+        let store = makeStore()
+        let olderPopular = skill(
+            name: "older-popular",
+            stars: 1_000,
+            tweetLikes: 10_000,
+            tweetPostedAt: "2026-07-29T10:00:00.000Z"
+        )
+        let newerQuiet = skill(
+            name: "newer-quiet",
+            stars: 1,
+            tweetLikes: 1,
+            tweetPostedAt: "2026-08-03T10:00:00.000Z"
+        )
+
+        store.applyDecodedLibraryData(
+            available: .success([]),
+            trending: .success([]),
+            twitter: .success([olderPopular, newerQuiet]),
+            buildIndexes: false
+        )
+
+        #expect(store.twitterSkills.map(\.id) == ["newer-quiet", "older-popular"])
+    }
+
     @Test func failedCollectionsReloadKeepsVisibleCollections() {
         let store = makeStore()
         let existing = collection(id: "author-openai", type: .author, title: "OpenAI", authorHandle: "openai")
@@ -460,7 +485,8 @@ struct SkillsStoreTests {
         name: String,
         stars: Int,
         authorHandle: String = "example",
-        tweetLikes: Int? = nil
+        tweetLikes: Int? = nil,
+        tweetPostedAt: String? = nil
     ) -> Skill {
         Skill(
             id: name,
@@ -481,7 +507,8 @@ struct SkillsStoreTests {
             origin: nil,
             isSymlink: nil,
             isLocalOnly: nil,
-            tweetLikes: tweetLikes
+            tweetLikes: tweetLikes,
+            tweetPostedAt: tweetPostedAt
         )
     }
 
