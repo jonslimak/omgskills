@@ -16,6 +16,21 @@ const isLive = process.argv.includes("--live");
 const liveFetchAttempts = 3;
 const livePageHtmlByPath = new Map();
 
+const editorialCollections = JSON.parse(
+  await readFile(path.join(repoRoot, "index", "curations", "collections.json"), "utf8"),
+);
+const starterPack = editorialCollections.collections?.find((collection) => collection.id === "starter-pack");
+if (!starterPack?.title) {
+  throw new Error("Editorial collections did not contain a titled starter-pack fixture");
+}
+
+const escapeHtml = (value) => String(value)
+  .replaceAll("&", "&amp;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#39;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;");
+
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function fetchLive(url, options = {}) {
@@ -53,8 +68,8 @@ const pages = [
   {
     path: "/collections/starter-pack/",
     canonical: "https://omgskills.com/collections/starter-pack/",
-    text: "Starter Pack",
-    titleText: "Starter Pack",
+    text: escapeHtml(starterPack.title),
+    titleText: escapeHtml(starterPack.title),
     descriptionText: "Claude and Codex",
   },
   {
