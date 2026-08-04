@@ -245,6 +245,17 @@ async function verifyLiveInternalLinks(html, label) {
 }
 
 function verifyMetadata(html, page, label) {
+  assertIncludes(
+    html,
+    '<a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>',
+    label,
+  );
+  assertIncludes(
+    html,
+    '<a class="cta" href="/downloads/omgskills-mac.dmg"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>',
+    label,
+  );
+  assertNotIncludes(html, '<a class="cta" href="/">', label);
   if (page.titleText) assertIncludes(html, page.titleText, label);
   if (page.descriptionText) assertIncludes(html, page.descriptionText, label);
   if (page.visibleText) assertIncludes(html, page.visibleText, label);

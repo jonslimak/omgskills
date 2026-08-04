@@ -185,8 +185,12 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     header, main { max-width: 880px; margin: 0 auto; padding: 24px; }
     header { display: flex; justify-content: space-between; align-items: center; }
     a { color: inherit; }
-    .brand { font-size: 13px; font-weight: 700; text-decoration: none; }
-    .cta { border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; text-decoration: none; font-size: 13px; }
+    .brand { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; min-height: 28px; font-size: 18px; line-height: 1; text-decoration: none; }
+    .brand:hover { opacity: .72; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 38px; padding: 0 16px; border-radius: 999px; background: var(--blue); color: #fff; text-decoration: none; font-size: 10px; font-weight: 400; letter-spacing: 0; transition: opacity .15s; }
+    .cta:hover { opacity: .82; }
+    .brand:focus-visible, .cta:focus-visible { outline: 3px solid rgba(0, 122, 255, .3); outline-offset: 3px; }
+    .apple-icon { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; line-height: 1; transform: translateY(-1px); }
     .eyebrow { color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
     h1 { font-size: clamp(34px, 7vw, 64px); line-height: .95; margin: 12px 0 16px; letter-spacing: -0.04em; }
     h2 { font-size: 20px; margin: 0 0 12px; letter-spacing: -0.02em; }
@@ -220,8 +224,8 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
 </head>
 <body>
   <header>
-    <a class="brand" href="/">omgskills</a>
-    <a class="cta" href="/">Get the Mac app</a>
+    <a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
+    <a class="cta" href="/downloads/omgskills-mac.dmg"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>
   </header>
   <main>
 ${body}
