@@ -59,6 +59,7 @@ const pages = [
     titleText: "OpenAI&#39;s Claude &amp; Codex skills",
     descriptionText: "Codex skills",
     profileMetadata: true,
+    skillLayout: true,
   },
   {
     path: "/library/mattpocock/",
@@ -71,6 +72,9 @@ const pages = [
     text: escapeHtml(starterPack.title),
     titleText: escapeHtml(starterPack.title),
     descriptionText: "Claude and Codex",
+    collectionMetadata: true,
+    collectionSkillCount: (starterPack.skillIds || starterPack.featuredSkillIds || []).length,
+    skillLayout: true,
   },
   {
     path: "/skills/openai/codex/code-review/",
@@ -80,6 +84,7 @@ const pages = [
     descriptionText: "Install code-review",
     visibleText: "Run a final code review on a pull request",
     metadata: true,
+    skillLayout: true,
     profileAuthor: {
       handle: "openai",
       path: "/library/openai/",
@@ -106,6 +111,8 @@ const pages = [
     path: "/skills/",
     canonical: "https://omgskills.com/skills/",
     text: "Browse the current omgskills web library test set",
+    directoryImages: true,
+    skillLayout: true,
   },
 ];
 
@@ -247,7 +254,7 @@ async function verifyLiveInternalLinks(html, label) {
 function verifyMetadata(html, page, label) {
   assertIncludes(
     html,
-    '<a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>',
+    '<a class="brand" href="/skills/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>',
     label,
   );
   assertIncludes(
@@ -282,6 +289,17 @@ function verifyMetadata(html, page, label) {
   if (page.profileMetadata) {
     assertIncludes(html, '<meta property="og:image"', label);
     assertIncludes(html, '"sameAs":["https://github.com/openai"]', label);
+    assertIncludes(html, '<div class="entity-hero">', label);
+    assertIncludes(html, 'class="avatar entity-avatar"', label);
+    assertNotIncludes(html, '<div class="eyebrow">Profile</div>', label);
+    assertNotIncludes(html, '<div class="meta"><span>@openai</span>', label);
+  }
+
+  if (page.collectionMetadata) {
+    assertIncludes(html, '<div class="entity-hero">', label);
+    assertIncludes(html, 'class="avatar entity-avatar"', label);
+    assertNotIncludes(html, '<div class="eyebrow">Collection</div>', label);
+    assertNotIncludes(html, `<div class="meta"><span>${page.collectionSkillCount} skills</span></div>`, label);
   }
 
   if (page.profileAuthor) {
@@ -291,6 +309,31 @@ function verifyMetadata(html, page, label) {
       label,
     );
     assertIncludes(html, `${origin}${page.profileAuthor.path}`, label);
+  }
+
+  if (page.skillLayout) {
+    assertIncludes(html, 'class="section skill-section" data-skill-section', label);
+    assertIncludes(html, 'data-skill-view-toggle data-next-view="list" aria-label="Switch to list view"', label);
+    assertIncludes(html, 'data-skill-view-icon="list"', label);
+    assertIncludes(html, 'data-skill-view-icon="grid" hidden', label);
+    assertIncludes(html, 'class="grid skill-grid" data-skill-grid data-view="grid"', label);
+    assertIncludes(html, 'class="card skill-card"', label);
+    assertIncludes(html, 'class="skill-card-heading"', label);
+    assertIncludes(html, 'class="skill-card-stars" aria-label="', label);
+    assertIncludes(html, 'class="skill-card-star-icon"', label);
+    assertIncludes(html, 'class="skill-card-author"', label);
+    assertIncludes(html, 'class="skill-card-author-avatar" aria-hidden="true"', label);
+    assertIncludes(html, 'loading="lazy" decoding="async"', label);
+    assertIncludes(html, 'grid-column: 3; grid-row: 1;', label);
+    assertIncludes(html, 'grid-column: 4; grid-row: 1;', label);
+    assertIncludes(html, 'const skillViewStorageKey = "omgskills-skill-view";', label);
+  }
+
+  if (page.directoryImages) {
+    assertIncludes(html, 'class="directory-card-heading"', label);
+    assertIncludes(html, 'class="directory-card-image"', label);
+    assertIncludes(html, 'profile image" loading="lazy" decoding="async"', label);
+    assertIncludes(html, 'collection image" loading="lazy" decoding="async"', label);
   }
 
   if (page.githubAuthor) {

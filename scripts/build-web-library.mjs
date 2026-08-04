@@ -197,6 +197,28 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     p { color: var(--muted); line-height: 1.55; }
     .meta { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0; color: var(--muted); font-size: 14px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 24px; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .section-heading h2, .section-heading .eyebrow { margin: 0; }
+    .view-toggle { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; }
+    .view-toggle:hover { color: var(--text); background: var(--soft); }
+    .view-toggle:focus-visible { outline: 3px solid rgba(0, 122, 255, .3); outline-offset: 2px; }
+    .view-toggle [hidden] { display: none; }
+    .view-icon { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .skill-grid { margin-top: 0; }
+    .skill-grid[data-view="list"] { grid-template-columns: 1fr; gap: 8px; }
+    .card.skill-card { border: 0; }
+    .skill-card-author { display: inline-flex; align-items: center; gap: 5px; }
+    .skill-card-author-avatar { width: 18px; height: 18px; overflow: hidden; flex: none; border-radius: 50%; background: var(--soft); }
+    .skill-card-author-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .skill-card-stars { display: inline-flex; align-items: center; gap: 4px; }
+    .skill-card-star-icon { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .skill-grid[data-view="list"] .skill-card { display: grid; grid-template-columns: minmax(140px, 170px) minmax(110px, 128px) minmax(0, 1fr) max-content; align-items: center; gap: 12px; padding: 13px 16px; }
+    .skill-grid[data-view="list"] .skill-card-heading { display: contents; }
+    .skill-grid[data-view="list"] .skill-card h2 { overflow: hidden; grid-column: 1; grid-row: 1; min-width: 0; margin: 0; text-overflow: ellipsis; white-space: nowrap; }
+    .skill-grid[data-view="list"] .skill-card .meta { display: contents; }
+    .skill-grid[data-view="list"] .skill-card .meta .skill-card-author { grid-column: 2; grid-row: 1; justify-self: start; color: var(--muted); font-size: 11px; }
+    .skill-grid[data-view="list"] .skill-card p { overflow: hidden; grid-column: 3; grid-row: 1; color: #9ca3af; text-overflow: ellipsis; white-space: nowrap; }
+    .skill-grid[data-view="list"] .skill-card .meta .skill-card-stars { grid-column: 4; grid-row: 1; justify-self: end; white-space: nowrap; }
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 10px; margin: 26px 0 4px; }
     .stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: #fff; }
     .stat strong { display: block; font-size: 22px; letter-spacing: -0.03em; }
@@ -207,7 +229,21 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .card:hover { background: var(--soft); }
     .card h2 { font-size: 18px; margin: 0 0 8px; letter-spacing: -0.02em; }
     .card p { margin: 0; font-size: 14px; }
+    .directory-card-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .directory-card-heading h2 { margin: 0; font-size: 13px; }
+    .directory-card-image { position: relative; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex: none; width: 32px; height: 32px; border-radius: 8px; background: var(--soft); font-size: 14px; }
+    .directory-card-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .directory-card p, .directory-card .meta { font-size: 11px; }
+    .skill-section .section-heading h2 { font-size: 13px; font-weight: 400; }
+    .skill-card h2 { font-size: 13px; }
+    .skill-card p { font-size: 11px; }
+    .skill-card .meta { font-size: 11px; }
     .avatar { width: 72px; height: 72px; border-radius: 14px; vertical-align: middle; background: var(--soft); }
+    .entity-hero { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: center; gap: 24px; }
+    .entity-avatar { width: 100px; height: 100px; border-radius: 18px; object-fit: cover; }
+    .entity-avatar-fallback { display: flex; align-items: center; justify-content: center; font-size: 36px; }
+    .entity-copy h1 { margin: 0 0 14px; font-size: clamp(28px, 5vw, 42px); }
+    .entity-copy p { max-width: 68ch; margin: 0; font-size: 13px; }
     .install-box { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
     .install-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
     .install-head span { font-size: 13px; font-weight: 700; }
@@ -219,12 +255,23 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .tag { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; color: var(--muted); font-size: 13px; }
     .lede { max-width: 68ch; font-size: 17px; }
+    @media (max-width: 620px) {
+      .entity-hero { grid-template-columns: 72px minmax(0, 1fr); align-items: start; gap: 16px; }
+      .entity-avatar { width: 72px; height: 72px; border-radius: 14px; }
+      .entity-avatar-fallback { font-size: 24px; }
+      .entity-copy h1 { margin-bottom: 10px; }
+      .skill-grid[data-view="list"] .skill-card { grid-template-columns: minmax(0, 1fr) 112px max-content; gap: 6px 12px; }
+      .skill-grid[data-view="list"] .skill-card h2 { grid-column: 1; grid-row: 1; }
+      .skill-grid[data-view="list"] .skill-card .meta .skill-card-author { grid-column: 2; grid-row: 1; }
+      .skill-grid[data-view="list"] .skill-card p { grid-column: 1 / -1; grid-row: 2; }
+      .skill-grid[data-view="list"] .skill-card .meta .skill-card-stars { grid-column: 3; grid-row: 1; }
+    }
   </style>
   ${structuredDataItems.map((item) => `<script type="application/ld+json">${jsonScript(item)}</script>`).join("\n  ")}
 </head>
 <body>
   <header>
-    <a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
+    <a class="brand" href="/skills/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>
     <a class="cta" href="/downloads/omgskills-mac.dmg"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>
   </header>
   <main>
@@ -239,6 +286,33 @@ ${body}
         button.textContent = "Copied";
         window.setTimeout(() => { button.textContent = "Copy"; }, 1200);
       });
+    });
+
+    const skillViewStorageKey = "omgskills-skill-view";
+    const validSkillViews = new Set(["grid", "list"]);
+    const applySkillView = (view, persist = false) => {
+      const nextView = validSkillViews.has(view) ? view : "grid";
+      document.querySelectorAll("[data-skill-grid]").forEach((grid) => {
+        grid.dataset.view = nextView;
+      });
+      document.querySelectorAll("[data-skill-view-toggle]").forEach((button) => {
+        const targetView = nextView === "grid" ? "list" : "grid";
+        button.dataset.nextView = targetView;
+        button.setAttribute("aria-label", "Switch to " + targetView + " view");
+        button.setAttribute("title", "Switch to " + targetView + " view");
+        button.querySelectorAll("[data-skill-view-icon]").forEach((icon) => {
+          icon.hidden = icon.dataset.skillViewIcon !== targetView;
+        });
+      });
+      if (persist) {
+        try { window.localStorage.setItem(skillViewStorageKey, nextView); } catch {}
+      }
+    };
+    let savedSkillView = "grid";
+    try { savedSkillView = window.localStorage.getItem(skillViewStorageKey) || "grid"; } catch {}
+    applySkillView(savedSkillView);
+    document.querySelectorAll("[data-skill-view-toggle]").forEach((button) => {
+      button.addEventListener("click", () => applySkillView(button.dataset.nextView, true));
     });
   </script>
 </body>
@@ -341,12 +415,46 @@ async function removeSitemapFiles() {
 function skillCards(skills, skillUrlById) {
   return skills.map((skill) => {
     const href = skillUrlById.get(skill.id) || skillPathForId(skill.id);
-    return `<a class="card" href="${escapeHtml(href)}">
-      <h2>${escapeHtml(skill.name)}</h2>
+    const starCount = compactNumber(skill.stars);
+    const author = skill.author_handle;
+    const authorMarkup = author
+      ? `<span class="skill-card-author"><span class="skill-card-author-avatar" aria-hidden="true"><img src="${escapeHtml(githubAvatarUrl(author))}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'"></span>@${escapeHtml(author)}</span>`
+      : "";
+    return `<a class="card skill-card" href="${escapeHtml(href)}">
+      <div class="skill-card-heading">
+        <h2>${escapeHtml(skill.name)}</h2>
+      </div>
       <p>${escapeHtml(subtitleForSkill(skill))}</p>
-      <div class="meta"><span>${compactNumber(skill.stars)} stars</span>${skill.author_handle ? `<span>@${escapeHtml(skill.author_handle)}</span>` : ""}</div>
+      <div class="meta">${authorMarkup}<span class="skill-card-stars" aria-label="${escapeHtml(`${starCount} stars`)}"><span aria-hidden="true">${escapeHtml(starCount)}</span>${skillStarIcon()}</span></div>
     </a>`;
   }).join("\n");
+}
+
+function skillStarIcon() {
+  return `<svg class="skill-card-star-icon" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+}
+
+function skillViewIcon(view) {
+  if (view === "list") {
+    return `<svg class="view-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`;
+  }
+  return `<svg class="view-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>`;
+}
+
+function skillSection(title, skills, skillUrlById, { eyebrow = false } = {}) {
+  const heading = eyebrow
+    ? `<h2 class="eyebrow">${escapeHtml(title)}</h2>`
+    : pageHeading(title);
+  return `<div class="section skill-section" data-skill-section>
+      <div class="section-heading">
+        ${heading}
+        <button class="view-toggle" type="button" data-skill-view-toggle data-next-view="list" aria-label="Switch to list view" title="Switch to list view">
+          <span data-skill-view-icon="list">${skillViewIcon("list")}</span>
+          <span data-skill-view-icon="grid" hidden>${skillViewIcon("grid")}</span>
+        </button>
+      </div>
+      <div class="grid skill-grid" data-skill-grid data-view="grid">${skillCards(skills, skillUrlById)}</div>
+    </div>`;
 }
 
 function skillAuthor(skill) {
@@ -377,6 +485,26 @@ function collectionMetaDescription(collection, skillCount) {
 
 function pageHeading(title) {
   return `<h2>${escapeHtml(title)}</h2>`;
+}
+
+function entityHero({ title, description, imageUrl = "", imageAlt }) {
+  const image = imageUrl
+    ? `<img class="avatar entity-avatar" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}">`
+    : `<div class="avatar entity-avatar entity-avatar-fallback" role="img" aria-label="${escapeHtml(imageAlt)}"><span aria-hidden="true">&#128064;</span></div>`;
+  return `<div class="entity-hero">
+      ${image}
+      <div class="entity-copy">
+        <h1>${escapeHtml(title)}</h1>
+        <p>${escapeHtml(description)}</p>
+      </div>
+    </div>`;
+}
+
+function directoryCardHeading({ title, imageUrl = "", imageAlt }) {
+  return `<div class="directory-card-heading">
+      <span class="directory-card-image"><span aria-hidden="true">&#128064;</span>${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" onerror="this.style.display='none'">` : ""}</span>
+      <h2>${escapeHtml(title)}</h2>
+    </div>`;
 }
 
 function tagsForSkill(skill) {
@@ -565,8 +693,8 @@ function renderSkillPage(
     </div>
     ${skill.github_url ? `<p><a href="${escapeHtml(skill.github_url)}">View on GitHub</a></p>` : ""}
     ${readmeSnippet ? `<div class="section about">${pageHeading("From README")}<p>${escapeHtml(readmeSnippet)}</p></div>` : ""}
-    ${repoSkills.length ? `<div class="section">${pageHeading("More from this repo")}<div class="grid">${skillCards(repoSkills, skillUrlById)}</div></div>` : ""}
-    ${authorSkills.length ? `<div class="section">${pageHeading("More skills")}<div class="grid">${skillCards(authorSkills, skillUrlById)}</div></div>` : ""}`;
+    ${repoSkills.length ? skillSection("More from this repo", repoSkills, skillUrlById) : ""}
+    ${authorSkills.length ? skillSection("More skills", authorSkills, skillUrlById) : ""}`;
   return pageShell({
     title: skillTitle(skill),
     description,
@@ -586,13 +714,14 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, indexT
   const urlPath = profilePath(handle);
   const description = profileMetaDescription(collection, skills.length);
   const avatarUrl = collection.imageUrl || githubAvatarUrl(handle);
-  const body = `    <img class="avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(`${collection.title} profile image`)}">
-    <div class="eyebrow">Profile</div>
-    <h1>${escapeHtml(collection.title)}</h1>
-    <p>${escapeHtml(collection.description || collection.subtitle || `Skills by @${handle}.`)}</p>
-    <div class="meta"><span>@${escapeHtml(handle)}</span><span>${skills.length} featured skills</span></div>
+  const body = `    ${entityHero({
+    title: collection.title,
+    description: collection.description || collection.subtitle || `Skills by @${handle}.`,
+    imageUrl: avatarUrl,
+    imageAlt: `${collection.title} profile image`,
+  })}
     ${profileStats(authorStats)}
-    <div class="section">${pageHeading("Featured skills")}<div class="grid">${skillCards(skills, skillUrlById)}</div></div>`;
+    ${skillSection("Featured skills", skills, skillUrlById)}`;
   return pageShell({
     title: `${collection.title}'s Claude & Codex skills (${skills.length}) | omgskills`,
     description,
@@ -614,12 +743,14 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, indexT
 function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, indexTier = "indexable") {
   const urlPath = collectionPath(collection.id);
   const description = collectionMetaDescription(collection, allSkills.length);
-  const body = `    <div class="eyebrow">Collection</div>
-    <h1>${escapeHtml(collection.title)}</h1>
-    <p>${escapeHtml(collection.description || collection.subtitle || `${collection.title} skill collection.`)}</p>
-    <div class="meta"><span>${allSkills.length} skills</span></div>
-    <div class="section">${pageHeading("Featured skills")}<div class="grid">${skillCards(featuredSkills, skillUrlById)}</div></div>
-    ${allSkills.length > featuredSkills.length ? `<div class="section">${pageHeading("Full collection")}<div class="grid">${skillCards(allSkills, skillUrlById)}</div></div>` : ""}`;
+  const body = `    ${entityHero({
+    title: collection.title,
+    description: collection.description || collection.subtitle || `${collection.title} skill collection.`,
+    imageUrl: collection.imageUrl,
+    imageAlt: `${collection.title} collection image`,
+  })}
+    ${skillSection("Featured skills", featuredSkills, skillUrlById)}
+    ${allSkills.length > featuredSkills.length ? skillSection("Full collection", allSkills, skillUrlById) : ""}`;
   return pageShell({
     title: `${collection.title} \u2014 skill collection | omgskills`,
     description,
@@ -640,17 +771,25 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
   const body = `    <div class="eyebrow">Library</div>
     <h1>Skills</h1>
     <p>Browse the current omgskills web library test set: featured profiles, editorial collections, and selected skills.</p>
-    <div class="section"><div class="eyebrow">Profiles</div><div class="grid">${profileCollections.map((collection) => `<a class="card" href="${escapeHtml(profilePath(collection.authorHandle))}">
-      <h2>${escapeHtml(collection.title)}</h2>
+    <div class="section"><div class="eyebrow">Profiles</div><div class="grid">${profileCollections.map((collection) => `<a class="card directory-card" href="${escapeHtml(profilePath(collection.authorHandle))}">
+      ${directoryCardHeading({
+    title: collection.title,
+    imageUrl: collection.imageUrl || githubAvatarUrl(collection.authorHandle),
+    imageAlt: `${collection.title} profile image`,
+  })}
       <p>${escapeHtml(collection.subtitle || collection.description || `Skills by @${collection.authorHandle}.`)}</p>
       <div class="meta"><span>@${escapeHtml(collection.authorHandle)}</span></div>
     </a>`).join("")}</div></div>
-    <div class="section"><div class="eyebrow">Collections</div><div class="grid">${topicCollections.map((collection) => `<a class="card" href="${escapeHtml(collectionPath(collection.id))}">
-      <h2>${escapeHtml(collection.title)}</h2>
+    <div class="section"><div class="eyebrow">Collections</div><div class="grid">${topicCollections.map((collection) => `<a class="card directory-card" href="${escapeHtml(collectionPath(collection.id))}">
+      ${directoryCardHeading({
+    title: collection.title,
+    imageUrl: collection.imageUrl,
+    imageAlt: `${collection.title} collection image`,
+  })}
       <p>${escapeHtml(collection.subtitle || collection.description || "Editorial collection")}</p>
       <div class="meta"><span>${(collection.skillIds || collection.featuredSkillIds || []).length} skills</span></div>
     </a>`).join("")}</div></div>
-    <div class="section"><div class="eyebrow">Skills</div><div class="grid">${skillCards(skills, skillUrlById)}</div></div>`;
+    ${skillSection("Skills", skills, skillUrlById, { eyebrow: true })}`;
 
   return pageShell({
     title: "Skills - omgskills",
