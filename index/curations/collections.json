@@ -3,7 +3,7 @@
   "authorOverrides": {
     "openai": {
       "title": "OpenAI",
-      "subtitle": "The Codex team",
+      "subtitle": "Codex developer tools",
       "featuredSkillIds": [
         "openai/codex:code-review",
         "openai/codex:babysit-pr",
@@ -26,7 +26,7 @@
         "openai/openai-agents-python:examples-auto-run",
         "openai/openai-agents-python:final-release-review"
       ],
-      "description": "OpenAI's Codex skills focus on code review, pull request workflow, and building Codex extensions. Start here if you use Codex for day-to-day software work."
+      "description": "OpenAI skills for code review, pull requests, testing, and Codex extensions."
     },
     "anthropics": {
       "title": "Anthropic",
@@ -48,11 +48,11 @@
         "anthropics/skills:pptx",
         "anthropics/skills:skills/skill-creator"
       ],
-      "description": "Anthropic's official skills cover documents, frontend design, testing, and Claude API work. They are a practical baseline for most Claude setups."
+      "description": "Official skills for documents, frontend work, testing, and Claude API tasks."
     },
     "cursor": {
       "title": "Cursor",
-      "subtitle": "Cursor plugin workflows",
+      "subtitle": "AI code development",
       "featuredSkillIds": [
         "cursor/plugins:deslop",
         "cursor/plugins:fix-merge-conflicts",
@@ -72,11 +72,12 @@
         "cursor/plugins:what-did-i-get-done",
         "cursor/plugins:workflow-from-chats"
       ],
-      "description": "Cursor's plugin skills focus on review, merge conflicts, and keeping code changes easy to ship. Useful for teams already working inside Cursor."
+      "description": "Skills for reviews, CI, merge cleanup, and shipping reliable code.",
+      "xUrl": "https://x.com/cursor_ai"
     },
     "mattpocock": {
       "title": "Matt Pocock",
-      "subtitle": "Engineering and writing workflows",
+      "subtitle": "Practical TypeScript education",
       "featuredSkillIds": [
         "mattpocock/skills:grill-with-docs",
         "mattpocock/skills:prototype",
@@ -93,11 +94,12 @@
         "mattpocock/skills:zoom-out",
         "mattpocock/skills:to-prd"
       ],
-      "description": "Matt Pocock's skills cover engineering critique, product planning, writing, and practical Claude workflows. Use this profile to test individual creator pages."
+      "description": "Practical skills for diagnosis, prototyping, TDD, planning, and interface design.",
+      "xUrl": "https://x.com/mattpocockuk"
     },
     "leonxlnx": {
       "title": "Leon Lin",
-      "subtitle": "Taste and image-to-code workflows",
+      "subtitle": "Design-driven interface tools",
       "featuredSkillIds": [
         "leonxlnx/taste-skill:brandkit",
         "leonxlnx/taste-skill:gpt-taste",
@@ -105,7 +107,8 @@
         "leonxlnx/taste-skill:imagegen-frontend-web",
         "leonxlnx/taste-skill:imagegen-frontend-mobile"
       ],
-      "description": "Leon Lin's skills focus on taste, brand direction, image-to-code work, and frontend generation. Use this profile as a design-focused creator example."
+      "description": "Skills for brand direction, image-to-code, and distinctive frontend design.",
+      "xUrl": "https://x.com/lexnlin"
     },
     "garrytan": {
       "featuredSkillIds": [
@@ -129,7 +132,10 @@
         "garrytan/gstack:gstack",
         "garrytan/gstack:guard",
         "garrytan/gstack:investigate"
-      ]
+      ],
+      "subtitle": "Founder execution systems",
+      "xUrl": "https://x.com/garrytan",
+      "description": "GStack tools for planning, research, benchmarking, and founder-led execution."
     },
     "steipete": {
       "featuredSkillIds": [
@@ -152,7 +158,10 @@
         "clawdbot/skills:skills/steipete/nano-pdf",
         "clawdbot/skills:skills/steipete/notion",
         "clawdbot/skills:skills/steipete/openai-whisper"
-      ]
+      ],
+      "subtitle": "Personal automation tools",
+      "description": "Practical agent tools for everyday applications, research, and development.",
+      "xUrl": "https://x.com/steipete"
     },
     "shubhamsaboo": {},
     "danielmiessler": {
@@ -177,7 +186,10 @@
         "danielmiessler/LifeOS:Optimize",
         "danielmiessler/LifeOS:PrivateInvestigator",
         "danielmiessler/LifeOS:Prompting"
-      ]
+      ],
+      "subtitle": "Security and AI research",
+      "description": "LifeOS tools for research, reconnaissance, documents, and structured prompting.",
+      "xUrl": "https://x.com/danielmiessler"
     },
     "ruvnet": {},
     "blader": {
@@ -187,18 +199,26 @@
         "blader/napkin",
         "blader/arbitrage"
       ],
-      "xUrl": "https://x.com/blader"
+      "xUrl": "https://x.com/blader",
+      "subtitle": "Practical writing tools",
+      "description": "Concise skills for clearer writing, note capture, and decision support."
     },
     "shadcn": {
       "featuredSkillIds": [
         "shadcn-ui/ui:shadcn",
         "shadcn/improve:improve"
-      ]
+      ],
+      "subtitle": "Interface component systems",
+      "description": "Tools for building and improving clean, consistent frontend interfaces.",
+      "xUrl": "https://x.com/shadcn"
     },
     "nousresearch": {
       "featuredSkillIds": [
         "nousresearch/hermes-agent:dogfood"
-      ]
+      ],
+      "subtitle": "Open model research",
+      "description": "Skills for open models, Hermes agents, evaluations, and infrastructure.",
+      "xUrl": "https://x.com/nousresearch"
     },
     "paperclipai": {
       "featuredSkillIds": [
@@ -210,13 +230,19 @@
         "paperclipai/companies:biopython",
         "paperclipai/companies:consciousness-council",
         "paperclipai/companies:pennylane"
-      ]
+      ],
+      "subtitle": "Agent team orchestration",
+      "description": "Skills for operating, diagnosing, and extending teams of AI agents.",
+      "xUrl": "https://x.com/papercliping"
     },
     "jakubkrehel": {
       "featuredSkillIds": [
         "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
         "jakubkrehel/oklch-skill:oklch-skill"
-      ]
+      ],
+      "subtitle": "Interface polish and color",
+      "description": "Skills for better-feeling interfaces, color systems, and interaction quality.",
+      "xUrl": "https://x.com/jakubkrehel"
     },
     "higgsfield-ai": {
       "featuredSkillIds": [
@@ -225,7 +251,9 @@
         "higgsfield-ai/skills:higgsfield-product-photoshoot",
         "higgsfield-ai/skills:higgsfield-soul-id",
         "higgsfield-ai/skills:higgsfield-websites"
-      ]
+      ],
+      "subtitle": "Generative media creation",
+      "description": "Skills for AI imagery, video, product photography, and creator tools."
     },
     "othmanadi": {
       "featuredSkillIds": [
@@ -238,7 +266,9 @@
         "othmanadi/planning-with-files:planning-with-files-zht",
         "OthmanAdi/langsmith-fetch-skill",
         "OthmanAdi/chronos"
-      ]
+      ],
+      "subtitle": "Persistent planning tools",
+      "description": "File-based planning tools for long-running agent work and reliable recovery."
     },
     "muratcankoylan": {
       "featuredSkillIds": [
@@ -253,12 +283,17 @@
         "muratcankoylan/Agent-Skills-for-Context-Engineering:skills/multi-agent-patterns",
         "muratcankoylan/Agent-Skills-for-Context-Engineering:skills/tool-design",
         "muratcankoylan/Agent-Skills-for-Context-Engineering:skills/hosted-agents"
-      ]
+      ],
+      "subtitle": "Context engineering research",
+      "description": "Skills for memory, compression, evaluation, and agent tool design."
     },
     "emilkowalski": {
       "featuredSkillIds": [
         "emilkowalski/skill:emil-design-eng"
-      ]
+      ],
+      "subtitle": "Interface design engineering",
+      "description": "A distinctive collection focused on interaction details and frontend quality.",
+      "xUrl": "https://x.com/emilkowalski"
     },
     "coreyhaines31": {
       "featuredSkillIds": [
@@ -282,7 +317,10 @@
         "coreyhaines31/marketingskills:skills/content-strategy",
         "coreyhaines31/marketingskills:skills/copy-editing",
         "coreyhaines31/marketingskills:skills/copywriting"
-      ]
+      ],
+      "subtitle": "SaaS marketing strategy",
+      "description": "Practical skills for SEO, growth, positioning, and revenue.",
+      "xUrl": "https://x.com/coreyhainesco"
     },
     "obra": {
       "featuredSkillIds": [
@@ -306,7 +344,9 @@
         "obra/superpowers-lab:using-tmux-for-interactive-commands",
         "obra/superpowers-chrome:skills/browsing",
         "obra/clank:creating-skills"
-      ]
+      ],
+      "subtitle": "Agentic engineering practices",
+      "description": "Skills for debugging, reviews, planning, testing, and parallel execution."
     },
     "samber": {
       "featuredSkillIds": [
@@ -330,7 +370,10 @@
         "samber/cc-skills-golang:golang-naming",
         "samber/cc-skills-golang:golang-observability",
         "samber/cc-skills-golang:golang-performance"
-      ]
+      ],
+      "subtitle": "Go engineering tools",
+      "description": "Open-source skills for Go development, architecture, testing, and AI systems.",
+      "xUrl": "https://x.com/samuelberthe"
     },
     "juliusbrussee": {
       "featuredSkillIds": [
@@ -353,7 +396,9 @@
         "juliusbrussee/skills:interface-kit",
         "juliusbrussee/skills:junior-to-senior",
         "juliusbrussee/skills:loop-factory"
-      ]
+      ],
+      "subtitle": "Caveman engineering tools",
+      "description": "Focused tools for reviews, specifications, context management, and clearer engineering."
     },
     "wshobson": {
       "featuredSkillIds": [
@@ -377,7 +422,9 @@
         "wshobson/agents:changelog-automation",
         "wshobson/agents:code-review-excellence",
         "wshobson/agents:competitive-landscape"
-      ]
+      ],
+      "subtitle": "Agent skill architecture",
+      "description": "A broad skill library spanning architecture, security, testing, and operations."
     },
     "kepano": {
       "featuredSkillIds": [
@@ -386,12 +433,18 @@
         "kepano/obsidian-skills:json-canvas",
         "kepano/obsidian-skills:obsidian-bases",
         "kepano/obsidian-skills:obsidian-cli"
-      ]
+      ],
+      "subtitle": "Knowledge management tools",
+      "description": "Thoughtful tools for notes, Markdown, canvases, and personal knowledge.",
+      "xUrl": "https://x.com/kepano"
     },
     "pbakaus": {
       "featuredSkillIds": [
         "pbakaus/impeccable:impeccable"
-      ]
+      ],
+      "subtitle": "Design quality systems",
+      "description": "Impeccable brings design vocabulary and quality checks into coding agents.",
+      "xUrl": "https://x.com/pbakaus"
     },
     "antfu": {
       "featuredSkillIds": [
@@ -412,7 +465,9 @@
         "antfu/skills:vue-testing-best-practices",
         "antfu/skills:vueuse-functions",
         "antfu/skills:web-design-guidelines"
-      ]
+      ],
+      "subtitle": "Vue ecosystem tooling",
+      "description": "Open-source skills for Vue, Vite, Nuxt, and modern web development."
     },
     "addyosmani": {
       "featuredSkillIds": [
@@ -436,7 +491,10 @@
         "addyosmani/agent-skills:source-driven-development",
         "addyosmani/agent-skills:spec-driven-development",
         "addyosmani/agent-skills:test-driven-development"
-      ]
+      ],
+      "subtitle": "Web performance engineering",
+      "description": "Skills for performance, planning, quality, migrations, and frontend execution.",
+      "xUrl": "https://x.com/addyosmani"
     },
     "twostraws": {
       "featuredSkillIds": [
@@ -444,7 +502,10 @@
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
         "twostraws/swift-testing-agent-skill:swift-testing-pro",
         "twostraws/swiftdata-agent-skill:swiftdata-pro"
-      ]
+      ],
+      "subtitle": "Swift development education",
+      "description": "Practical guidance for SwiftUI, concurrency, testing, and SwiftData.",
+      "xUrl": "https://x.com/twostraws"
     },
     "mvanhorn": {
       "featuredSkillIds": [
@@ -467,7 +528,10 @@
         "mvanhorn/printing-press-library:pp-movie-goat",
         "mvanhorn/printing-press-library:pp-recipe-goat",
         "mvanhorn/printing-press-library:pp-hackernews"
-      ]
+      ],
+      "subtitle": "Agent publishing systems",
+      "description": "Reusable tools for publishing, cataloging, research, and content creation.",
+      "xUrl": "https://x.com/mvanhorn"
     },
     "yeachan-heo": {
       "featuredSkillIds": [
@@ -491,7 +555,9 @@
         "yeachan-heo/oh-my-claudecode:sciomc",
         "yeachan-heo/oh-my-claudecode:team",
         "yeachan-heo/oh-my-claudecode:trace"
-      ]
+      ],
+      "subtitle": "Agent power tools",
+      "description": "Skills for agent setup, autopilot, quality assurance, and team operations."
     },
     "phuryn": {
       "featuredSkillIds": [
@@ -515,7 +581,10 @@
         "phuryn/pm-skills:dummy-dataset",
         "phuryn/pm-skills:grammar-check",
         "phuryn/pm-skills:growth-loops"
-      ]
+      ],
+      "subtitle": "Product strategy tools",
+      "description": "Practical tools for PRDs, experiments, analysis, and product decisions.",
+      "xUrl": "https://x.com/PawelHuryn"
     },
     "avdlee": {
       "featuredSkillIds": [
@@ -531,7 +600,10 @@
         "avdlee/xcode-build-optimization-agent-skill:xcode-project-analyzer",
         "avdlee/swift-testing-agent-skill:swift-testing-expert",
         "avdlee/core-data-agent-skill:core-data-expert"
-      ]
+      ],
+      "subtitle": "Swift performance engineering",
+      "description": "Advanced skills for SwiftUI, concurrency, testing, and Xcode optimization.",
+      "xUrl": "https://x.com/twannl"
     },
     "rohitg00": {
       "featuredSkillIds": [
@@ -553,12 +625,18 @@
         "rohitg00/skillkit:packages/core/src/methodology/packs/planning/design-first",
         "rohitg00/skillkit:packages/core/src/methodology/packs/testing/anti-patterns",
         "rohitg00/skillkit:skills/find-skills"
-      ]
+      ],
+      "subtitle": "Agent infrastructure tools",
+      "description": "Skills for context, orchestration, memory, and reliable agent operations.",
+      "xUrl": "https://x.com/ghumare64"
     },
     "simonw": {
       "featuredSkillIds": [
         "simonw/research:datasette-plugin-skill"
-      ]
+      ],
+      "subtitle": "Data and AI research",
+      "description": "Research-driven tools for data systems, agents, and practical experimentation.",
+      "xUrl": "https://x.com/simonw"
     },
     "agricidaniel": {
       "featuredSkillIds": [
@@ -582,7 +660,9 @@
         "agricidaniel/claude-seo:seo-maps",
         "agricidaniel/claude-seo:seo-page",
         "agricidaniel/claude-seo:seo-plan"
-      ]
+      ],
+      "subtitle": "SEO and advertising",
+      "description": "Open-source tools for SEO, advertising, content, and marketing analysis."
     },
     "kieranklaassen": {
       "featuredSkillIds": [
@@ -606,12 +686,17 @@
         "everyinc/compound-engineering-plugin:ce-worktree",
         "everyinc/compound-engineering-plugin:lfg",
         "everyinc/compound-engineering-plugin:ce-doc-review"
-      ]
+      ],
+      "subtitle": "Compound engineering practices",
+      "description": "Skills for strategy, code review, execution, and continuous improvement.",
+      "xUrl": "https://x.com/kieranklaassen"
     },
     "disler": {
       "featuredSkillIds": [
         "disler/claude-code-damage-control:.claude/skills/damage-control"
-      ]
+      ],
+      "subtitle": "Agentic engineering education",
+      "description": "Practical skills for agent engineering, guardrails, and safer execution."
     },
     "github": {
       "featuredSkillIds": [
@@ -625,7 +710,9 @@
         "github/awesome-copilot:adobe-illustrator-scripting",
         "github/awesome-copilot:agent-owasp-compliance",
         "github/awesome-copilot:agent-supply-chain"
-      ]
+      ],
+      "subtitle": "Developer platform tooling",
+      "description": "Skills for specifications, governance, repositories, and developer operations."
     },
     "microsoft": {
       "featuredSkillIds": [
@@ -639,7 +726,10 @@
         "microsoft/vscode:auto-perf-optimize",
         "microsoft/vscode:azure-pipelines",
         "microsoft/vscode:chat-customizations-editor"
-      ]
+      ],
+      "subtitle": "Open source engineering",
+      "description": "Engineering skills for accessibility, pipelines, agents, and developer tooling.",
+      "xUrl": "https://x.com/OpenAtMicrosoft"
     },
     "google-gemini": {
       "featuredSkillIds": [
@@ -653,7 +743,10 @@
         "google-gemini/gemini-cli:greeter",
         "google-gemini/gemini-cli:pirate-skill",
         "google-gemini/gemini-cli:pr-address-comments"
-      ]
+      ],
+      "subtitle": "Gemini developer tools",
+      "description": "Gemini skills for reviews, documentation, CI, and issue handling.",
+      "xUrl": "https://x.com/googleaidevs"
     },
     "googleworkspace": {
       "featuredSkillIds": [
@@ -667,7 +760,10 @@
         "googleworkspace/cli:gws-classroom",
         "googleworkspace/cli:gws-docs",
         "googleworkspace/cli:gws-docs-write"
-      ]
+      ],
+      "subtitle": "Google Workspace automation",
+      "description": "Automation for Gmail, Calendar, Chat, Docs, and administration.",
+      "xUrl": "https://x.com/workspacedevs"
     },
     "facebook": {
       "featuredSkillIds": [
@@ -680,7 +776,10 @@
         "facebook/react:.claude/skills/fix",
         "facebook/relay:relay-best-practices",
         "facebook/buck2:buck2-rule-basics"
-      ]
+      ],
+      "subtitle": "React platform engineering",
+      "description": "Engineering skills for React, Relay, testing, and feature flags.",
+      "xUrl": "https://x.com/MetaOpenSource"
     },
     "react": {
       "featuredSkillIds": [
@@ -691,7 +790,9 @@
         "react/react:flow",
         "react/react:test",
         "react/react:verify"
-      ]
+      ],
+      "subtitle": "Component interface development",
+      "description": "Official skills for React maintenance, testing, flags, and verification."
     },
     "google-labs-code": {
       "featuredSkillIds": [
@@ -705,7 +806,9 @@
         "google-labs-code/stitch-skills:shadcn-ui",
         "google-labs-code/stitch-skills:stitch-design",
         "google-labs-code/stitch-skills:stitch-loop"
-      ]
+      ],
+      "subtitle": "Experimental coding tools",
+      "description": "Experiments in agentic coding, design systems, and component generation."
     },
     "n8n-io": {
       "featuredSkillIds": [
@@ -719,7 +822,10 @@
         "n8n-io/n8n:loom-transcript",
         "n8n-io/n8n:n8n-cli",
         "n8n-io/n8n:n8n:create-community-node-lint-rule"
-      ]
+      ],
+      "subtitle": "Visual workflow automation",
+      "description": "Skills for integrations, automation, experiments, and community nodes.",
+      "xUrl": "https://x.com/n8n_io"
     },
     "expo": {
       "featuredSkillIds": [
@@ -733,7 +839,10 @@
         "expo/skills:expo-deployment",
         "expo/skills:expo-dev-client",
         "expo/skills:expo-module"
-      ]
+      ],
+      "subtitle": "React Native development",
+      "description": "Expo skills for native UI, deployment, modules, and application development.",
+      "xUrl": "https://x.com/expo"
     },
     "pytorch": {
       "featuredSkillIds": [
@@ -747,7 +856,9 @@
         "pytorch/pytorch:fix-issue",
         "pytorch/pytorch:metal-kernel",
         "pytorch/pytorch:pr-review"
-      ]
+      ],
+      "subtitle": "Deep learning development",
+      "description": "PyTorch skills for kernels, debugging, documentation, and model infrastructure."
     },
     "firecrawl": {
       "featuredSkillIds": [
@@ -761,7 +872,10 @@
         "firecrawl/cli:firecrawl-agent",
         "firecrawl/cli:firecrawl-crawl",
         "firecrawl/cli:firecrawl-download"
-      ]
+      ],
+      "subtitle": "Web data extraction",
+      "description": "Skills for crawling, structured extraction, research, and web-scale context collection.",
+      "xUrl": "https://x.com/firecrawl_dev"
     },
     "firebase": {
       "featuredSkillIds": [
@@ -775,7 +889,9 @@
         "firebase/skills:firebase-data-connect",
         "firebase/skills:firebase-firestore",
         "firebase/skills:firebase-hosting-basics"
-      ]
+      ],
+      "subtitle": "Modern app development",
+      "description": "Firebase skills for auth, hosting, Firestore, AI, and application tooling."
     },
     "supabase": {
       "featuredSkillIds": [
@@ -789,7 +905,10 @@
         "supabase/supabase:studio-ui-patterns",
         "supabase/supabase:telemetry-standards",
         "supabase/supabase:vercel-composition-patterns"
-      ]
+      ],
+      "subtitle": "Postgres app development",
+      "description": "Supabase skills for SQL, Studio testing, interfaces, and telemetry.",
+      "xUrl": "https://x.com/supabase"
     },
     "stripe": {
       "featuredSkillIds": [
@@ -801,7 +920,9 @@
         "stripe/link-cli:create-payment-credential",
         "stripe/purl:pay-for-http-request"
       ],
-      "xUrl": "https://x.com/stripe"
+      "xUrl": "https://x.com/stripe",
+      "subtitle": "Payments infrastructure tools",
+      "description": "Stripe skills for payments, integrations, upgrades, and AI commerce."
     },
     "cloudflare": {
       "featuredSkillIds": [
@@ -814,7 +935,9 @@
         "cloudflare/workerd:dad-jokes",
         "cloudflare/workerd:find-and-run-tests",
         "cloudflare/workerd:identify-reviewer"
-      ]
+      ],
+      "subtitle": "Edge application development",
+      "description": "Cloudflare skills for Workers, browser tooling, migrations, and testing."
     },
     "getsentry": {
       "featuredSkillIds": [
@@ -828,11 +951,14 @@
         "getsentry/sentry:hybrid-cloud-outboxes",
         "getsentry/sentry:hybrid-cloud-rpc",
         "getsentry/sentry:hybrid-cloud-test-gen"
-      ]
+      ],
+      "subtitle": "Application error monitoring",
+      "description": "Engineering skills for error monitoring, migrations, interfaces, and infrastructure.",
+      "xUrl": "https://x.com/sentry"
     },
     "vercel": {
       "featuredSkillIds": [
-        "vercel/turbo:turborepo",
+        "vercel/turborepo:turborepo",
         "vercel-labs/ai:add-provider-package",
         "vercel-labs/ai:adr-skill",
         "vercel/vercel:vercel-cli",
@@ -842,7 +968,10 @@
         "vercel/eve:eve",
         "vercel/ai-elements:ai-elements",
         "vercel/workflow:internal-dev-workbench"
-      ]
+      ],
+      "subtitle": "Web application infrastructure",
+      "description": "Skills for Vercel, Next.js, AI SDK, Turborepo, and deployment.",
+      "xUrl": "https://x.com/vercel"
     },
     "vercel-labs": {
       "featuredSkillIds": [
@@ -856,7 +985,10 @@
         "vercel-labs/claude-skills:deploy-to-vercel",
         "vercel-labs/claude-skills:vercel-cli-with-tokens",
         "vercel-labs/claude-skills:vercel-composition-patterns"
-      ]
+      ],
+      "subtitle": "Experimental agent tools",
+      "description": "Experimental tools for agent browsers, deployment, and application development.",
+      "xUrl": "https://x.com/vercel"
     },
     "posthog": {
       "featuredSkillIds": [
@@ -870,7 +1002,10 @@
         "posthog/posthog:cleaning-up-stale-feature-flags",
         "posthog/posthog:clickhouse-migrations",
         "posthog/posthog:configuring-experiment-analytics"
-      ]
+      ],
+      "subtitle": "Product analytics engineering",
+      "description": "Skills for analytics, experiments, feature flags, and product operations.",
+      "xUrl": "https://x.com/PostHog"
     },
     "huggingface": {
       "featuredSkillIds": [
@@ -884,7 +1019,10 @@
         "huggingface/skills:huggingface-community-evals",
         "huggingface/skills:huggingface-datasets",
         "huggingface/skills:huggingface-gradio"
-      ]
+      ],
+      "subtitle": "Open model development",
+      "description": "Skills for models, datasets, evaluations, training, and community tooling.",
+      "xUrl": "https://x.com/huggingface"
     },
     "flutter": {
       "featuredSkillIds": [
@@ -898,7 +1036,10 @@
         "flutter/website:validate-pr",
         "flutter/skills:add-dart-lint-validation-rule",
         "flutter/agent-plugins:dart-add-unit-test"
-      ]
+      ],
+      "subtitle": "Cross-platform app development",
+      "description": "Official skills for Flutter tooling, releases, validation, and Dart engineering.",
+      "xUrl": "https://x.com/FlutterDev"
     },
     "automattic": {
       "featuredSkillIds": [
@@ -912,7 +1053,10 @@
         "automattic/wordpress-activitypub:federation",
         "automattic/wordpress-activitypub:gitattributes",
         "automattic/wordpress-activitypub:integrations"
-      ]
+      ],
+      "subtitle": "Publishing platform engineering",
+      "description": "Skills for WordPress, Calypso, testing, dashboards, and federation.",
+      "xUrl": "https://x.com/automatticeng"
     },
     "trailofbits": {
       "featuredSkillIds": [
@@ -926,7 +1070,10 @@
         "trailofbits/skills:audit-context-building",
         "trailofbits/skills:audit-prep-assistant",
         "trailofbits/skills:burpsuite-project-parser"
-      ]
+      ],
+      "subtitle": "Applied security engineering",
+      "description": "Security skills for audits, fuzzing, sanitizers, and code review.",
+      "xUrl": "https://x.com/trailofbits"
     },
     "langchain-ai": {
       "featuredSkillIds": [
@@ -940,7 +1087,10 @@
         "langchain-ai/deepagents:data-visualization",
         "langchain-ai/deepagents:gpu-document-processing",
         "langchain-ai/deepagents:langgraph-docs"
-      ]
+      ],
+      "subtitle": "Agent application development",
+      "description": "Skills for agent evaluation, deployment, observability, research, and coding.",
+      "xUrl": "https://x.com/LangChain"
     },
     "clickhouse": {
       "featuredSkillIds": [
@@ -954,7 +1104,10 @@
         "clickhouse/clickhouse:create-worktree",
         "clickhouse/clickhouse:edit-changelog",
         "clickhouse/clickhouse:fix-sync"
-      ]
+      ],
+      "subtitle": "Database performance engineering",
+      "description": "Skills for profiling, maintenance, code review, and flaky issue cleanup.",
+      "xUrl": "https://x.com/ClickHouseDB"
     },
     "lobehub": {
       "featuredSkillIds": [
@@ -968,7 +1121,10 @@
         "lobehub/lobehub:hotkey",
         "lobehub/lobehub:i18n",
         "lobehub/lobehub:linear"
-      ]
+      ],
+      "subtitle": "Agent team operations",
+      "description": "Skills for agent hiring, scheduling, reporting, and operator workflows.",
+      "xUrl": "https://x.com/lobehub"
     },
     "heygen-com": {
       "featuredSkillIds": [
@@ -982,7 +1138,9 @@
         "heygen-com/hyperframes:hyperframes-registry",
         "heygen-com/hyperframes:lottie",
         "heygen-com/hyperframes:tailwind"
-      ]
+      ],
+      "subtitle": "AI video creation",
+      "description": "Skills for HyperFrames, animation systems, and media-rich website creation."
     },
     "browser-use": {
       "featuredSkillIds": [
@@ -995,7 +1153,10 @@
         "browser-use/browser-harness",
         "browser-use/browser-harness-js",
         "browser-use/browsercode:effect"
-      ]
+      ],
+      "subtitle": "Browser agent infrastructure",
+      "description": "Skills for browser automation, remote browsing, and agent testing.",
+      "xUrl": "https://x.com/browser_use"
     },
     "warpdotdev": {
       "featuredSkillIds": [
@@ -1009,11 +1170,14 @@
         "warpdotdev/common-skills:create-pr",
         "warpdotdev/common-skills:cross-critique",
         "warpdotdev/common-skills:diagnose-ci-failures"
-      ]
+      ],
+      "subtitle": "Agentic terminal development",
+      "description": "Skills for terminal-native agents, reviews, telemetry, and development loops.",
+      "xUrl": "https://x.com/warpdotdev"
     },
     "davidondrej": {
       "title": "David Ondrej",
-      "subtitle": "Agent orchestration and research",
+      "subtitle": "Agent research tools",
       "featuredSkillIds": [
         "davidondrej/skills:codex-subagent",
         "davidondrej/skills:git-worktree",
@@ -1026,11 +1190,12 @@
         "davidondrej/skills:effective-agent-skills",
         "davidondrej/skills:global-agent-guardrails"
       ],
-      "description": "David Ondrej's skills cover agent orchestration, research, code review, worktrees, handoffs, and practical agent configuration."
+      "description": "Skills for subagents, code reviews, worktrees, handoffs, and research.",
+      "xUrl": "https://x.com/DavidOndrej1"
     },
     "mengto": {
       "title": "Meng To",
-      "subtitle": "Design and frontend workflows",
+      "subtitle": "Visual design-to-code systems",
       "featuredSkillIds": [
         "MengTo/Skills:article-prompts-to-skills",
         "MengTo/Skills:audit-reference-originality",
@@ -1043,19 +1208,21 @@
         "MengTo/Skills:landing-page",
         "MengTo/Skills:threejs"
       ],
-      "description": "Meng To's skills cover design-led prompting, frontend performance, animation systems, Three.js, landing pages, and visual quality."
+      "description": "Skills for visual design, animation, landing pages, and frontend polish.",
+      "xUrl": "https://x.com/MengTo"
     },
     "sunflower-of-parchman": {
       "title": "Michael Wall",
-      "subtitle": "Codex maintenance and hygiene",
+      "subtitle": "Codex hygiene audits",
       "featuredSkillIds": [
         "sunflower-of-parchman/codex-hygiene"
       ],
-      "description": "Michael Wall's Codex hygiene skill audits local context, enabled tools, plugins, and project settings when usage or configuration needs review."
+      "description": "A read-only tool for reviewing Codex configuration, context, and usage.",
+      "xUrl": "https://x.com/sound4movement"
     },
     "thedotmack": {
       "title": "Alex Newman",
-      "subtitle": "Memory and agent workflows",
+      "subtitle": "Persistent memory tools",
       "featuredSkillIds": [
         "thedotmack/claude-mem:knowledge-agent",
         "thedotmack/claude-mem:make-plan",
@@ -1068,15 +1235,17 @@
         "thedotmack/claude-mem:timeline-report",
         "thedotmack/crabspace-skill"
       ],
-      "description": "Alex Newman's skills cover persistent project memory, implementation planning, codebase exploration, and agent execution workflows."
+      "description": "Skills for project memory, planning, exploration, and agent execution.",
+      "xUrl": "https://x.com/Claude_Memory"
     },
     "onepixelaway": {
       "title": "Tareq Ismail",
-      "subtitle": "Frontend publishing workflows",
+      "subtitle": "Frontend publishing design",
       "featuredSkillIds": [
         "onepixelaway/frontend-textbooks"
       ],
-      "description": "Tareq Ismail's frontend textbook skill turns manuscripts into designed HTML books and print-ready PDFs with layout verification."
+      "description": "Tools for turning manuscripts into polished web and print publications.",
+      "xUrl": "https://x.com/tareqismail"
     }
   },
   "collections": [
