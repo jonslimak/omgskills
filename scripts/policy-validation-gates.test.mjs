@@ -9,8 +9,9 @@ async function source(path) {
 test("deploy preparation validates policy before generating artifacts", async () => {
   const value = await source("./prepare-netlify-site-deploy.mjs");
   assert.match(value, /--profile", "deploy"/);
-  assert.ok(value.indexOf("await verifyPolicy()") < value.indexOf("await verifyCreatorHandleReservations()"));
-  assert.ok(value.indexOf("await verifyCollectionImages()") < value.indexOf("await runWebLibraryBuild()"));
+  assert.match(value, /runPreparationSequence\(\{[\s\S]*?verifyPolicy,/);
+  assert.ok(value.indexOf("await steps.verifyPolicy()") < value.indexOf("await steps.verifyCreatorHandleReservations()"));
+  assert.ok(value.indexOf("await steps.verifyCollectionImages()") < value.indexOf("await steps.runWebLibraryBuild()"));
 });
 
 test("scheduled v2 crawl validates policy before scraping", async () => {

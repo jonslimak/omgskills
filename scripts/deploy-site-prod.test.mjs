@@ -62,12 +62,21 @@ test("manual production deploy checks generated config and every deploy input", 
   }
 });
 
-test("all seven production paths use the shared deploy helper", async () => {
+test("all seven production paths prepare, build, and use the shared deploy helper in order", async () => {
   assert.match(script, /npm run deploy:production/);
   assert.doesNotMatch(script, /netlify-cli deploy --prod/);
 
   for (const workflowPath of workflowPaths) {
     const source = await readFile(new URL(workflowPath, import.meta.url), "utf8");
+    const prepareIndex = source.indexOf("node ./scripts/prepare-netlify-site-deploy.mjs");
+    const buildIndex = source.indexOf("npm run build:netlify");
+    const deployIndex = source.indexOf("npm run deploy:production");
+
+    assert.notEqual(prepareIndex, -1, `${workflowPath}: missing prepare step`);
+    assert.notEqual(buildIndex, -1, `${workflowPath}: missing build step`);
+    assert.notEqual(deployIndex, -1, `${workflowPath}: missing deploy step`);
+    assert.ok(prepareIndex < buildIndex, `${workflowPath}: prepare must run before build`);
+    assert.ok(buildIndex < deployIndex, `${workflowPath}: build must run before deploy`);
     assert.match(source, /npm run deploy:production/, workflowPath);
     assert.doesNotMatch(source, /netlify-cli deploy --prod/, workflowPath);
     assert.match(source, /dist\/netlify-deploy-receipt\.json/, workflowPath);
