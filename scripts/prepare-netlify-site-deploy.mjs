@@ -3,6 +3,7 @@
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   requiredReleaseAssetPaths,
   verifyReleaseDeployArtifacts,
@@ -154,14 +155,18 @@ async function verifyWebLibraryBuild() {
   });
 }
 
-async function main() {
-  await verifyPolicy();
-  await verifyCollectionImages();
-  await verifyCreatorHandleReservations();
-  await runWebLibraryBuild();
-  await verifyWebLibraryBuild();
-  await verifyWebLibraryDeployArtifacts(siteDir, "site deploy source");
+export async function runPreparationSequence(steps) {
+  await steps.verifyPolicy();
+  await steps.verifyCollectionImages();
+  await steps.verifyCreatorHandleReservations();
+  await steps.restoreRequiredAssets();
+  await steps.runWebLibraryBuild();
+  await steps.verifyWebLibraryBuild();
+  await steps.verifyWebLibraryDeployArtifacts();
+  await steps.verifyReleaseDeployArtifacts();
+}
 
+async function restoreRequiredAssets() {
   const healthSnapshot = await ensureHealthSnapshot({ siteDir, productionOrigin });
   if (healthSnapshot.restored) {
     console.log(`Restored /data/health.json from ${healthSnapshot.source}`);
@@ -171,12 +176,31 @@ async function main() {
   for (const relativePath of requiredAssets) {
     await ensureAsset(`/${relativePath}`);
   }
-  await verifyReleaseDeployArtifacts(siteDir, "site deploy source");
+
+  return requiredAssets;
+}
+
+async function main() {
+  let requiredAssets = [];
+  await runPreparationSequence({
+    verifyPolicy,
+    verifyCollectionImages,
+    verifyCreatorHandleReservations,
+    restoreRequiredAssets: async () => {
+      requiredAssets = await restoreRequiredAssets();
+    },
+    runWebLibraryBuild,
+    verifyWebLibraryBuild,
+    verifyWebLibraryDeployArtifacts: () => verifyWebLibraryDeployArtifacts(siteDir, "site deploy source"),
+    verifyReleaseDeployArtifacts: () => verifyReleaseDeployArtifacts(siteDir, "site deploy source"),
+  });
 
   console.log(`Netlify deploy assets ready: ${requiredAssets.length} files verified`);
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}
