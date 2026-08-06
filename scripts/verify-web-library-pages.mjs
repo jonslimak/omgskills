@@ -77,6 +77,8 @@ const pages = [
     titleText: escapeHtml(starterPack.title),
     descriptionText: "Claude and Codex",
     collectionMetadata: true,
+    collectionSubtitle: starterPack.subtitle,
+    collectionDescription: starterPack.description,
     collectionSkillCount: (starterPack.skillIds || starterPack.featuredSkillIds || []).length,
     skillLayout: true,
   },
@@ -114,7 +116,7 @@ const pages = [
   {
     path: "/skills/",
     canonical: "https://omgskills.com/skills/",
-    text: "Browse the current omgskills web library test set",
+    text: "The best &amp; latest skills from the most trusted sources",
     directoryImages: true,
     skillLayout: true,
   },
@@ -295,6 +297,7 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, '"sameAs":["https://github.com/openai"]', label);
     assertIncludes(html, '<div class="entity-hero">', label);
     assertIncludes(html, 'class="avatar entity-avatar"', label);
+    assertIncludes(html, 'class="stat stat-best-skill"', label);
     assertNotIncludes(html, '<div class="eyebrow">Profile</div>', label);
     assertNotIncludes(html, '<div class="meta"><span>@openai</span>', label);
   }
@@ -310,6 +313,12 @@ function verifyMetadata(html, page, label) {
   if (page.collectionMetadata) {
     assertIncludes(html, '<div class="entity-hero">', label);
     assertIncludes(html, 'class="avatar entity-avatar"', label);
+    if (page.collectionSubtitle) {
+      assertIncludes(html, `<p class="entity-subtitle">${escapeHtml(page.collectionSubtitle)}</p>`, label);
+    }
+    if (page.collectionDescription) {
+      assertIncludes(html, `<p>${escapeHtml(page.collectionDescription)}</p>`, label);
+    }
     assertNotIncludes(html, '<div class="eyebrow">Collection</div>', label);
     assertNotIncludes(html, `<div class="meta"><span>${page.collectionSkillCount} skills</span></div>`, label);
   }
@@ -344,6 +353,9 @@ function verifyMetadata(html, page, label) {
   if (page.directoryImages) {
     assertIncludes(html, 'class="directory-card-heading"', label);
     assertIncludes(html, 'class="directory-card-image"', label);
+    assertIncludes(html, 'class="directory-card-subtitle"', label);
+    assertIncludes(html, 'class="directory-card-description"', label);
+    assertNotIncludes(html, '<div class="meta"><span>@anthropics</span></div>', label);
     assertIncludes(html, 'profile image" loading="lazy" decoding="async"', label);
     assertIncludes(html, 'collection image" loading="lazy" decoding="async"', label);
   }

@@ -220,8 +220,10 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .skill-grid[data-view="list"] .skill-card p { overflow: hidden; grid-column: 3; grid-row: 1; color: #9ca3af; text-overflow: ellipsis; white-space: nowrap; }
     .skill-grid[data-view="list"] .skill-card .meta .skill-card-stars { grid-column: 4; grid-row: 1; justify-self: end; white-space: nowrap; }
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 10px; margin: 26px 0 4px; }
-    .stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: #fff; }
+    .stat { border: 0; border-radius: 10px; padding: 12px; background: var(--soft); }
     .stat strong { display: block; font-size: 22px; letter-spacing: -0.03em; }
+    .stat-best-skill { container-type: inline-size; }
+    .stat-best-skill strong { overflow: hidden; font-size: clamp(10px, 8cqi, 22px); text-overflow: ellipsis; white-space: nowrap; }
     .stat span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; }
     .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
     .badge { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: 13px; color: #3f3f46; background: #fff; }
@@ -230,10 +232,13 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .card h2 { font-size: 18px; margin: 0 0 8px; letter-spacing: -0.02em; }
     .card p { margin: 0; font-size: 14px; }
     .directory-card-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .directory-card { border: 0; }
     .directory-card-heading h2 { margin: 0; font-size: 13px; }
     .directory-card-image { position: relative; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex: none; width: 32px; height: 32px; border-radius: 8px; background: var(--soft); font-size: 14px; }
     .directory-card-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .directory-card p, .directory-card .meta { font-size: 11px; }
+    .directory-card .directory-card-subtitle { color: var(--text); font-weight: 600; }
+    .directory-card .directory-card-description { margin-top: 5px; }
     .skill-section .section-heading h2 { font-size: 13px; font-weight: 400; }
     .skill-card h2 { font-size: 13px; }
     .skill-card p { font-size: 11px; }
@@ -665,11 +670,11 @@ function profileStats(authorStats) {
     ["Skills", compactNumber(stats.skillCount)],
     ["Stars", compactNumber(stats.totalStars)],
     stats.totalInstalls ? ["Installs", compactNumber(stats.totalInstalls)] : null,
-    stats.bestSkill?.name ? ["Best skill", stats.bestSkill.name] : null,
+    stats.bestSkill?.name ? ["Best skill", stats.bestSkill.name, " stat-best-skill"] : null,
   ].filter(Boolean);
   const badges = Object.entries(authorStats.leaderboardCategories || {}).slice(0, 3);
 
-  return `    <div class="stats">${cells.map(([label, value]) => `<div class="stat"><strong>${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span></div>`).join("")}</div>
+  return `    <div class="stats">${cells.map(([label, value, className = ""]) => `<div class="stat${className}"><strong title="${escapeHtml(value)}">${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span></div>`).join("")}</div>
     ${badges.length ? `<div class="badges">${badges.map(([name, badge]) => `<span class="badge">#${escapeHtml(badge.rank)} ${escapeHtml(name)} - ${escapeHtml(badge.value)}</span>`).join("")}</div>` : ""}`;
 }
 
@@ -775,7 +780,8 @@ function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlByI
   const description = collectionMetaDescription(collection, allSkills.length);
   const body = `    ${entityHero({
     title: collection.title,
-    description: collection.description || collection.subtitle || `${collection.title} skill collection.`,
+    subtitle: collection.subtitle,
+    description: collection.description || `${collection.title} skill collection.`,
     imageUrl: collection.imageUrl,
     imageAlt: `${collection.title} collection image`,
   })}
@@ -798,17 +804,16 @@ function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlByI
 }
 
 function renderSkillsIndexPage({ profileCollections, topicCollections, skills }, skillUrlById) {
-  const body = `    <div class="eyebrow">Library</div>
-    <h1>Skills</h1>
-    <p>Browse the current omgskills web library test set: featured profiles, editorial collections, and selected skills.</p>
-    <div class="section"><div class="eyebrow">Profiles</div><div class="grid">${profileCollections.map((collection) => `<a class="card directory-card" href="${escapeHtml(profilePath(collection.authorHandle))}">
+  const body = `    <h1>Skills</h1>
+    <p>The best &amp; latest skills from the most trusted sources</p>
+    <div class="section"><div class="eyebrow">Featured</div><div class="grid">${profileCollections.map((collection) => `<a class="card directory-card" href="${escapeHtml(profilePath(collection.authorHandle))}">
       ${directoryCardHeading({
     title: collection.title,
     imageUrl: collection.imageUrl || githubAvatarUrl(collection.authorHandle),
     imageAlt: `${collection.title} profile image`,
   })}
-      <p>${escapeHtml(collection.subtitle || collection.description || `Skills by @${collection.authorHandle}.`)}</p>
-      <div class="meta"><span>@${escapeHtml(collection.authorHandle)}</span></div>
+      <p class="directory-card-subtitle">${escapeHtml(collection.subtitle || `Skills by ${collection.title}`)}</p>
+      ${collection.description && collection.description !== collection.subtitle ? `<p class="directory-card-description">${escapeHtml(collection.description)}</p>` : ""}
     </a>`).join("")}</div></div>
     <div class="section"><div class="eyebrow">Collections</div><div class="grid">${topicCollections.map((collection) => `<a class="card directory-card" href="${escapeHtml(collectionPath(collection.id))}">
       ${directoryCardHeading({
@@ -816,7 +821,8 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
     imageUrl: collection.imageUrl,
     imageAlt: `${collection.title} collection image`,
   })}
-      <p>${escapeHtml(collection.subtitle || collection.description || "Editorial collection")}</p>
+      <p class="directory-card-subtitle">${escapeHtml(collection.subtitle || "Editorial collection")}</p>
+      ${collection.description && collection.description !== collection.subtitle ? `<p class="directory-card-description">${escapeHtml(collection.description)}</p>` : ""}
       <div class="meta"><span>${(collection.skillIds || collection.featuredSkillIds || []).length} skills</span></div>
     </a>`).join("")}</div></div>
     ${skillSection("Skills", skills, skillUrlById, { eyebrow: true })}`;
