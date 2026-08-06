@@ -40,6 +40,7 @@ test("featured creators come from the creator registry", () => {
   const asset = buildCollectionsAsset(source, registry, skills);
 
   assert.deepEqual(asset.collections.map((collection) => collection.authorHandle), ["OldHandle"]);
+  assert.deepEqual(asset.collections.map((collection) => collection.githubUrl), ["https://github.com/OldHandle"]);
 });
 
 test("an empty featured registry produces no author collections", () => {
@@ -72,6 +73,7 @@ test("alias-only creator validates and generates a non-empty profile", () => {
   const asset = buildCollectionsAsset(source, registry, skills);
 
   assert.equal(asset.collections[0].authorHandle, "OldHandle");
+  assert.equal(asset.collections[0].githubUrl, "https://github.com/NewHandle");
   assert.deepEqual(asset.collections[0].featuredSkillIds, ["oldhandle/repo:one"]);
 });
 

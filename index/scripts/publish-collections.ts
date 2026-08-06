@@ -50,6 +50,7 @@ type SkillCollection = {
   subtitle: string;
   authorHandle?: string;
   imageUrl?: string | null;
+  githubUrl?: string | null;
   xUrl?: string | null;
   featuredSkillIds: string[];
   skillIds?: string[];
@@ -136,6 +137,10 @@ function titleFromHandle(handle: string): string {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function githubProfileUrl(handle: string): string {
+  return `https://github.com/${encodeURIComponent(handle)}`;
 }
 
 function handleVariants(entry: CreatorRegistryEntry): string[] {
@@ -226,6 +231,7 @@ export function buildCollectionsAsset(source: CollectionsSource, registry: Creat
       subtitle: override.subtitle ?? `Skills by @${catalogHandle}`,
       authorHandle: catalogHandle,
       imageUrl: override.imageUrl ?? null,
+      githubUrl: githubProfileUrl(entry.handle),
       xUrl: override.xUrl ?? null,
       featuredSkillIds,
       description: override.description ?? null,

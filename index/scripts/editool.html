@@ -193,6 +193,11 @@ function xProfileHref(value) {
     return null;
   }
 }
+function githubProfileHref(handle) {
+  const value = String(handle ?? "").trim();
+  if (!/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(value)) return null;
+  return `https://github.com/${encodeURIComponent(value)}`;
+}
 function creatorAvatarHref(value, handle) {
   try {
     const override = new URL(String(value ?? ""));
@@ -443,6 +448,7 @@ function renderCollections() {
     const o = overrideFor(handle);
     const ids = o.featuredSkillIds ?? [];
     const xHref = xProfileHref(o.xUrl);
+    const githubHref = githubProfileHref(entry.handle);
     const avatarHref = creatorAvatarHref(o.imageUrl, handle);
     const featuredExpanded = expandedFeaturedAuthors.has(handle.toLowerCase());
     return `<div class="panel" data-author-panel="${esc(handle)}">
@@ -458,6 +464,8 @@ function renderCollections() {
         <input data-f="description" placeholder="description" value="${esc(o.description ?? "")}" size="52">
         <input data-f="xUrl" placeholder="https://x.com/handle" value="${esc(o.xUrl ?? "")}" size="34">
         ${xHref ? `<a class="clicklink" href="${esc(xHref)}" target="_blank" rel="noopener noreferrer">Open X</a>` : ""}
+        ${githubHref ? `<input aria-label="GitHub profile URL" value="${esc(githubHref)}" size="34" readonly>
+        <a class="clicklink" href="${esc(githubHref)}" target="_blank" rel="noopener noreferrer">Open GitHub</a>` : ""}
         <button class="small" data-see-all="${esc(handle)}">${collectionDetailHandle?.toLowerCase() === handle.toLowerCase() ? "Hide skills" : "See all skills"}</button>
         <button class="small" data-toggle-featured="${esc(handle)}" aria-expanded="${featuredExpanded}">${featuredExpanded ? "Collapse" : "Expand"}</button>
       </div>
