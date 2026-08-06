@@ -239,7 +239,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .directory-card p, .directory-card .meta { font-size: 11px; }
     .directory-card .directory-card-subtitle { color: var(--text); font-weight: 600; }
     .directory-card .directory-card-description { margin-top: 5px; }
-    .skill-section .section-heading h2 { font-size: 13px; font-weight: 400; }
+    .skill-section .section-heading h2, .directory-recommendations .eyebrow { color: var(--text); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: uppercase; }
     .skill-card h2 { font-size: 13px; }
     .skill-card p { font-size: 11px; }
     .skill-card .meta { font-size: 11px; }
@@ -264,6 +264,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .install { overflow: auto; margin: 0; padding: 14px; background: var(--soft); font-size: 13px; }
     .about { max-width: 72ch; }
     .section { margin-top: 36px; }
+    .directory-recommendations { margin-top: 66px; }
     .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .tag { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; color: var(--muted); font-size: 13px; }
     .lede { max-width: 68ch; font-size: 17px; }
@@ -535,6 +536,51 @@ function directoryCardHeading({ title, imageUrl = "", imageAlt }) {
     </div>`;
 }
 
+function directoryCard(collection, { recommendation = false } = {}) {
+  const isProfile = collection.type === "author" && collection.authorHandle;
+  const href = isProfile ? profilePath(collection.authorHandle) : collectionPath(collection.id);
+  const imageUrl = isProfile
+    ? collection.imageUrl || githubAvatarUrl(collection.authorHandle)
+    : collection.imageUrl;
+  const imageAlt = `${collection.title} ${isProfile ? "profile" : "collection"} image`;
+  const subtitle = collection.subtitle || (isProfile ? `Skills by ${collection.title}` : "Editorial collection");
+  const description = collection.description && collection.description !== collection.subtitle
+    ? `<p class="directory-card-description">${escapeHtml(collection.description)}</p>`
+    : "";
+  const skillCount = isProfile
+    ? ""
+    : `<div class="meta"><span>${(collection.skillIds || collection.featuredSkillIds || []).length} skills</span></div>`;
+
+  return `<a class="card directory-card"${recommendation ? " data-recommendation-card" : ""} href="${escapeHtml(href)}">
+      ${directoryCardHeading({ title: collection.title, imageUrl, imageAlt })}
+      <p class="directory-card-subtitle">${escapeHtml(subtitle)}</p>
+      ${description}
+      ${skillCount}
+    </a>`;
+}
+
+function nextAlphabeticalCollections(currentCollection, collections, limit = 3) {
+  const sorted = [...collections].sort((a, b) =>
+    a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
+  if (sorted.length < 2) return [];
+  const currentIndex = sorted.findIndex((collection) => collection.id === currentCollection.id);
+  const startIndex = currentIndex >= 0 ? currentIndex : -1;
+  const recommendations = [];
+  for (let offset = 1; offset < sorted.length && recommendations.length < limit; offset += 1) {
+    const candidate = sorted[(startIndex + offset + sorted.length) % sorted.length];
+    if (candidate.id !== currentCollection.id) recommendations.push(candidate);
+  }
+  return recommendations;
+}
+
+function recommendationSection(collections) {
+  if (!collections.length) return "";
+  return `<div class="section directory-recommendations">
+      <div class="eyebrow">Others you might like</div>
+      <div class="grid">${collections.map((collection) => directoryCard(collection, { recommendation: true })).join("")}</div>
+    </div>`;
+}
+
 function tagsForSkill(skill) {
   const tags = Array.isArray(skill.tags) ? skill.tags.filter(Boolean).slice(0, 8) : [];
   if (!tags.length) return "";
@@ -737,7 +783,7 @@ function renderSkillPage(
   });
 }
 
-function renderProfilePage(collection, skills, skillUrlById, authorStats, indexTier = "indexable") {
+function renderProfilePage(collection, skills, skillUrlById, authorStats, recommendations = [], indexTier = "indexable") {
   const handle = collection.authorHandle;
   const urlPath = profilePath(handle);
   const description = profileMetaDescription(collection, skills.length);
@@ -756,7 +802,8 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, indexT
     links: socialLinks,
   })}
     ${profileStats(authorStats)}
-    ${skillSection("Featured skills", skills, skillUrlById)}`;
+    ${skillSection("Featured skills", skills, skillUrlById)}
+    ${recommendationSection(recommendations)}`;
   return pageShell({
     title: `${collection.title}'s Claude & Codex skills (${skills.length}) | omgskills`,
     description,
@@ -775,7 +822,7 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, indexT
   });
 }
 
-function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, indexTier = "indexable") {
+function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, recommendations = [], indexTier = "indexable") {
   const urlPath = collectionPath(collection.id);
   const description = collectionMetaDescription(collection, allSkills.length);
   const body = `    ${entityHero({
@@ -786,7 +833,8 @@ function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlByI
     imageAlt: `${collection.title} collection image`,
   })}
     ${skillSection("Featured skills", featuredSkills, skillUrlById)}
-    ${allSkills.length > featuredSkills.length ? skillSection("Full collection", allSkills, skillUrlById) : ""}`;
+    ${allSkills.length > featuredSkills.length ? skillSection("Full collection", allSkills, skillUrlById) : ""}
+    ${recommendationSection(recommendations)}`;
   return pageShell({
     title: `${collection.title} \u2014 skill collection | omgskills`,
     description,
@@ -806,25 +854,8 @@ function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlByI
 function renderSkillsIndexPage({ profileCollections, topicCollections, skills }, skillUrlById) {
   const body = `    <h1>Skills</h1>
     <p>The best &amp; latest skills from the most trusted sources</p>
-    <div class="section"><div class="eyebrow">Featured</div><div class="grid">${profileCollections.map((collection) => `<a class="card directory-card" href="${escapeHtml(profilePath(collection.authorHandle))}">
-      ${directoryCardHeading({
-    title: collection.title,
-    imageUrl: collection.imageUrl || githubAvatarUrl(collection.authorHandle),
-    imageAlt: `${collection.title} profile image`,
-  })}
-      <p class="directory-card-subtitle">${escapeHtml(collection.subtitle || `Skills by ${collection.title}`)}</p>
-      ${collection.description && collection.description !== collection.subtitle ? `<p class="directory-card-description">${escapeHtml(collection.description)}</p>` : ""}
-    </a>`).join("")}</div></div>
-    <div class="section"><div class="eyebrow">Collections</div><div class="grid">${topicCollections.map((collection) => `<a class="card directory-card" href="${escapeHtml(collectionPath(collection.id))}">
-      ${directoryCardHeading({
-    title: collection.title,
-    imageUrl: collection.imageUrl,
-    imageAlt: `${collection.title} collection image`,
-  })}
-      <p class="directory-card-subtitle">${escapeHtml(collection.subtitle || "Editorial collection")}</p>
-      ${collection.description && collection.description !== collection.subtitle ? `<p class="directory-card-description">${escapeHtml(collection.description)}</p>` : ""}
-      <div class="meta"><span>${(collection.skillIds || collection.featuredSkillIds || []).length} skills</span></div>
-    </a>`).join("")}</div></div>
+    <div class="section"><div class="eyebrow">Featured</div><div class="grid">${profileCollections.map((collection) => directoryCard(collection)).join("")}</div></div>
+    <div class="section"><div class="eyebrow">Collections</div><div class="grid">${topicCollections.map((collection) => directoryCard(collection)).join("")}</div></div>
     ${skillSection("Skills", skills, skillUrlById, { eyebrow: true })}`;
 
   return pageShell({
@@ -1007,7 +1038,7 @@ async function main() {
   }
 
   const profileCollections = profilePages.map((page) => page.collection);
-  const topicCollections = [];
+  const topicCollections = collections.collections.filter((collection) => collection.type !== "author");
   for (const { collection, urlPath } of profilePages) {
     const authorSkills = (skillsByAuthor.get(collection.authorHandle.toLowerCase()) || [])
       .filter((skill) => includedSkillIds.has(skill.id))
@@ -1029,6 +1060,7 @@ async function main() {
         authorSkills,
         skillUrlById,
         authorStatsByHandle.get(collection.authorHandle.toLowerCase()),
+        nextAlphabeticalCollections(collection, profileCollections),
         indexTier,
       ),
     );
@@ -1040,7 +1072,6 @@ async function main() {
     const allSkills = (collection.skillIds || collection.featuredSkillIds || []).map((id) => skillById.get(id)).filter(Boolean);
     const urlPath = collectionPath(collection.id);
     const indexTier = allSkills.length ? "indexable" : "noindex";
-    topicCollections.push(collection);
     registerUrl(allUrls, urlPath, `collection ${collection.id}`);
     allUrls.set(urlPath, { source: `collection ${collection.id}`, indexTier });
     if (indexTier === "indexable") {
@@ -1050,7 +1081,17 @@ async function main() {
       noindexCount += 1;
       addNoindexReason("empty-collection");
     }
-    await writePage(urlPath, renderCollectionPage(collection, featuredSkills, allSkills, skillUrlById, indexTier));
+    await writePage(
+      urlPath,
+      renderCollectionPage(
+        collection,
+        featuredSkills,
+        allSkills,
+        skillUrlById,
+        nextAlphabeticalCollections(collection, topicCollections),
+        indexTier,
+      ),
+    );
   }
 
   registerUrl(allUrls, "/skills/", "skills index");

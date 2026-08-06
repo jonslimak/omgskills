@@ -59,6 +59,7 @@ const pages = [
     titleText: "OpenAI&#39;s Claude &amp; Codex skills",
     descriptionText: "Codex skills",
     profileMetadata: true,
+    recommendations: { currentPath: "/library/openai/" },
     skillLayout: true,
   },
   {
@@ -80,6 +81,7 @@ const pages = [
     collectionSubtitle: starterPack.subtitle,
     collectionDescription: starterPack.description,
     collectionSkillCount: (starterPack.skillIds || starterPack.featuredSkillIds || []).length,
+    recommendations: { currentPath: "/collections/starter-pack/" },
     skillLayout: true,
   },
   {
@@ -171,6 +173,13 @@ function assertIncludes(haystack, needle, label) {
 function assertNotIncludes(haystack, needle, label) {
   if (haystack.includes(needle)) {
     throw new Error(`${label} unexpectedly contained ${needle}`);
+  }
+}
+
+function assertOccurrenceCount(haystack, needle, expected, label) {
+  const actual = haystack.split(needle).length - 1;
+  if (actual !== expected) {
+    throw new Error(`${label} contained ${actual} occurrences of ${needle}; expected ${expected}`);
   }
 }
 
@@ -320,7 +329,14 @@ function verifyMetadata(html, page, label) {
       assertIncludes(html, `<p>${escapeHtml(page.collectionDescription)}</p>`, label);
     }
     assertNotIncludes(html, '<div class="eyebrow">Collection</div>', label);
-    assertNotIncludes(html, `<div class="meta"><span>${page.collectionSkillCount} skills</span></div>`, label);
+    const collectionHeader = html.slice(html.indexOf('<div class="entity-hero">'), html.indexOf('<div class="section skill-section"'));
+    assertNotIncludes(collectionHeader, `<div class="meta"><span>${page.collectionSkillCount} skills</span></div>`, label);
+  }
+
+  if (page.recommendations) {
+    assertIncludes(html, '<div class="eyebrow">Others you might like</div>', label);
+    assertOccurrenceCount(html, "data-recommendation-card", 3, label);
+    assertNotIncludes(html, `data-recommendation-card href="${page.recommendations.currentPath}"`, label);
   }
 
   if (page.profileAuthor) {
