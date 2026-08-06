@@ -65,6 +65,10 @@ const pages = [
     path: "/library/mattpocock/",
     canonical: "https://omgskills.com/library/mattpocock/",
     text: "Matt Pocock",
+    profileSocialLinks: {
+      github: "https://github.com/mattpocock",
+      x: "https://x.com/mattpocockuk",
+    },
   },
   {
     path: "/collections/starter-pack/",
@@ -293,6 +297,14 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, 'class="avatar entity-avatar"', label);
     assertNotIncludes(html, '<div class="eyebrow">Profile</div>', label);
     assertNotIncludes(html, '<div class="meta"><span>@openai</span>', label);
+  }
+
+  if (page.profileSocialLinks) {
+    assertIncludes(html, `class="entity-social-link" href="${page.profileSocialLinks.github}"`, label);
+    assertIncludes(html, `aria-label="${page.text} on GitHub"`, label);
+    assertIncludes(html, `class="entity-social-link" href="${page.profileSocialLinks.x}"`, label);
+    assertIncludes(html, `aria-label="${page.text} on X"`, label);
+    assertIncludes(html, '.entity-social-link svg { display: block; width: 18px; height: 18px; }', label);
   }
 
   if (page.collectionMetadata) {

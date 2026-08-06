@@ -242,7 +242,13 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .entity-hero { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: center; gap: 24px; }
     .entity-avatar { width: 100px; height: 100px; border-radius: 18px; object-fit: cover; }
     .entity-avatar-fallback { display: flex; align-items: center; justify-content: center; font-size: 36px; }
-    .entity-copy h1 { margin: 0 0 14px; font-size: clamp(28px, 5vw, 42px); }
+    .entity-title-row { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 8px 30px; margin-bottom: 14px; }
+    .entity-copy h1 { margin: 0; font-size: clamp(28px, 5vw, 42px); }
+    .entity-social-links { display: inline-flex; align-items: center; gap: 8px; }
+    .entity-social-link { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; color: #a8adb8; }
+    .entity-social-link:hover { color: var(--text); }
+    .entity-social-link:focus-visible { border-radius: 3px; outline: 3px solid rgba(0, 122, 255, .3); outline-offset: 2px; }
+    .entity-social-link svg { display: block; width: 18px; height: 18px; }
     .entity-copy p { max-width: 68ch; margin: 0; font-size: 13px; }
     .entity-copy .entity-subtitle { margin-bottom: 5px; color: var(--text); font-weight: 600; }
     .install-box { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
@@ -260,7 +266,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
       .entity-hero { grid-template-columns: 72px minmax(0, 1fr); align-items: start; gap: 16px; }
       .entity-avatar { width: 72px; height: 72px; border-radius: 14px; }
       .entity-avatar-fallback { font-size: 24px; }
-      .entity-copy h1 { margin-bottom: 10px; }
+      .entity-title-row { margin-bottom: 10px; }
       .skill-grid[data-view="list"] .skill-card { grid-template-columns: minmax(0, 1fr) 112px max-content; gap: 6px 12px; }
       .skill-grid[data-view="list"] .skill-card h2 { grid-column: 1; grid-row: 1; }
       .skill-grid[data-view="list"] .skill-card .meta .skill-card-author { grid-column: 2; grid-row: 1; }
@@ -488,14 +494,29 @@ function pageHeading(title) {
   return `<h2>${escapeHtml(title)}</h2>`;
 }
 
-function entityHero({ title, subtitle = "", description, imageUrl = "", imageAlt }) {
+const entitySocialIcons = {
+  github: `<svg aria-hidden="true" viewBox="0 0 32 32"><path fill="currentColor" d="M26.0387 9.46002C26.3444 8.47401 26.4425 7.43537 26.3267 6.40958C26.211 5.3838 25.8839 4.39312 25.3662 3.50002C25.2785 3.34796 25.1522 3.22171 25.0001 3.13393C24.8481 3.04616 24.6756 2.99998 24.5 3.00002C23.3352 2.99758 22.186 3.2676 21.1442 3.7885C20.1024 4.3094 19.1969 5.06674 18.5 6.00002H15.5C14.8031 5.06674 13.8976 4.3094 12.8558 3.7885C11.814 3.2676 10.6648 2.99758 9.5 3.00002C9.32443 2.99998 9.15193 3.04616 8.99987 3.13393C8.84781 3.22171 8.72154 3.34796 8.63375 3.50002C8.11606 4.39312 7.78903 5.3838 7.67329 6.40958C7.55754 7.43537 7.65559 8.47401 7.96125 9.46002C7.34341 10.5384 7.01245 11.7572 7 13V14C7.0021 15.692 7.61634 17.3261 8.72928 18.6006C9.84222 19.875 11.3787 20.7038 13.055 20.9338C12.3708 21.8093 11.9994 22.8888 12 24V25H9C8.20435 25 7.44129 24.6839 6.87868 24.1213C6.31607 23.5587 6 22.7957 6 22C6 21.3434 5.87067 20.6932 5.6194 20.0866C5.36812 19.48 4.99983 18.9288 4.53553 18.4645C4.07124 18.0002 3.52005 17.6319 2.91342 17.3806C2.30679 17.1293 1.65661 17 1 17C0.734784 17 0.48043 17.1054 0.292893 17.2929C0.105357 17.4804 0 17.7348 0 18C0 18.2652 0.105357 18.5196 0.292893 18.7071C0.48043 18.8947 0.734784 19 1 19C1.79565 19 2.55871 19.3161 3.12132 19.8787C3.68393 20.4413 4 21.2044 4 22C4 23.3261 4.52678 24.5979 5.46447 25.5356C6.40215 26.4732 7.67392 27 9 27H12V29C12 29.2652 12.1054 29.5196 12.2929 29.7071C12.4804 29.8947 12.7348 30 13 30C13.2652 30 13.5196 29.8947 13.7071 29.7071C13.8946 29.5196 14 29.2652 14 29V24C14 23.2044 14.3161 22.4413 14.8787 21.8787C15.4413 21.3161 16.2044 21 17 21C17.7956 21 18.5587 21.3161 19.1213 21.8787C19.6839 22.4413 20 23.2044 20 24V29C20 29.2652 20.1054 29.5196 20.2929 29.7071C20.4804 29.8947 20.7348 30 21 30C21.2652 30 21.5196 29.8947 21.7071 29.7071C21.8946 29.5196 22 29.2652 22 29V24C22.0006 22.8888 21.6292 21.8093 20.945 20.9338C22.6213 20.7038 24.1578 19.875 25.2707 18.6006C26.3837 17.3261 26.9979 15.692 27 14V13C26.9875 11.7572 26.6566 10.5384 26.0387 9.46002ZM25 14C25 15.3261 24.4732 16.5979 23.5355 17.5356C22.5979 18.4732 21.3261 19 20 19H14C12.6739 19 11.4021 18.4732 10.4645 17.5356C9.52678 16.5979 9 15.3261 9 14V13C9.01226 12 9.31164 11.0247 9.8625 10.19C9.96519 10.0547 10.0317 9.89538 10.0558 9.7272C10.0798 9.55902 10.0606 9.38748 10 9.22877C9.73953 8.55701 9.61417 7.84046 9.63112 7.12018C9.64806 6.39989 9.80698 5.69003 10.0988 5.03127C10.9171 5.11931 11.7052 5.39041 12.4046 5.82448C13.104 6.25855 13.6966 6.84446 14.1388 7.53877C14.2288 7.67965 14.3528 7.79569 14.4994 7.87627C14.6459 7.95685 14.8103 7.99939 14.9775 8.00002H19.0212C19.1891 8.00002 19.3543 7.95777 19.5015 7.87716C19.6487 7.79656 19.7733 7.68018 19.8638 7.53877C20.3058 6.84439 20.8985 6.25844 21.5978 5.82436C22.2972 5.39029 23.0853 5.11922 23.9037 5.03127C24.1951 5.69019 24.3536 6.40014 24.3701 7.12043C24.3866 7.84071 24.2609 8.55718 24 9.22877C23.9396 9.38596 23.9193 9.55576 23.9412 9.72275C23.963 9.88974 24.0262 10.0486 24.125 10.185C24.6813 11.0197 24.9851 11.9971 25 13V14Z"></path><path fill="#fff" d="M25 14C25 15.3261 24.4732 16.5979 23.5355 17.5356C22.5979 18.4732 21.3261 19 20 19H14C12.6739 19 11.4021 18.4732 10.4645 17.5356C9.52678 16.5979 9 15.3261 9 14V13C9.01226 12 9.31164 11.0247 9.8625 10.19C9.96519 10.0547 10.0317 9.89538 10.0558 9.7272C10.0798 9.55902 10.0606 9.38748 10 9.22877C9.73953 8.55701 9.61417 7.84046 9.63112 7.12018C9.64806 6.39989 9.80698 5.69003 10.0988 5.03127C10.9171 5.11931 11.7052 5.39041 12.4046 5.82448C13.104 6.25855 13.6966 6.84446 14.1388 7.53877C14.2288 7.67965 14.3528 7.79569 14.4994 7.87627C14.6459 7.95685 14.8103 7.99939 14.9775 8.00002H19.0212C19.1891 8.00002 19.3543 7.95777 19.5015 7.87716C19.6487 7.79656 19.7733 7.68018 19.8638 7.53877C20.3058 6.84439 20.8985 6.25844 21.5978 5.82436C22.2972 5.39029 23.0853 5.11922 23.9037 5.03127C24.1951 5.69019 24.3536 6.40014 24.3701 7.12043C24.3866 7.84071 24.2609 8.55718 24 9.22877C23.9396 9.38596 23.9193 9.55576 23.9412 9.72275C23.963 9.88974 24.0262 10.0486 24.125 10.185C24.6813 11.0197 24.9851 11.9971 25 13V14Z"></path></svg>`,
+  x: `<svg aria-hidden="true" viewBox="0 0 32 32"><path fill="currentColor" d="M26.8438 26.4638L19.0188 14.1663L26.74 5.6725C26.9146 5.47565 27.0046 5.21791 26.9905 4.95515C26.9764 4.69239 26.8592 4.44579 26.6645 4.26882C26.4698 4.09185 26.2131 3.99876 25.9502 4.00974C25.6873 4.02073 25.4393 4.1349 25.26 4.3275L17.905 12.4175L12.8438 4.46375C12.7535 4.32169 12.6289 4.20471 12.4814 4.12365C12.3339 4.04258 12.1683 4.00005 12 4H6.00001C5.82071 3.99991 5.64468 4.04803 5.49037 4.13932C5.33605 4.23062 5.20911 4.36172 5.12285 4.5189C5.03659 4.67609 4.99418 4.85357 5.00006 5.03278C5.00593 5.21198 5.05988 5.3863 5.15626 5.5375L12.9813 17.8337L5.26001 26.3337C5.16984 26.4306 5.09979 26.5444 5.05393 26.6685C5.00806 26.7927 4.98729 26.9247 4.99282 27.0569C4.99834 27.1891 5.03005 27.3189 5.08611 27.4388C5.14217 27.5586 5.22146 27.6662 5.3194 27.7552C5.41733 27.8442 5.53195 27.9129 5.65662 27.9572C5.78129 28.0016 5.91352 28.0208 6.04566 28.0137C6.1778 28.0066 6.30722 27.9733 6.42641 27.9158C6.5456 27.8583 6.65219 27.7777 6.74001 27.6787L14.095 19.5888L19.1563 27.5425C19.2472 27.6834 19.3722 27.7991 19.5197 27.8791C19.6671 27.959 19.8323 28.0006 20 28H26C26.1791 27.9999 26.3549 27.9518 26.509 27.8606C26.6632 27.7693 26.79 27.6384 26.8762 27.4814C26.9624 27.3244 27.0049 27.1472 26.9992 26.9681C26.9935 26.7891 26.9398 26.6149 26.8438 26.4638ZM20.5488 26L7.82126 6H11.4463L24.1788 26H20.5488Z"></path><path fill="#fff" d="M20.5488 26L7.82126 6H11.4463L24.1788 26H20.5488Z"></path></svg>`,
+};
+
+function entitySocialLink({ href, label, icon }) {
+  const svg = entitySocialIcons[icon];
+  if (!href || !svg) return "";
+  return `<a class="entity-social-link" href="${escapeHtml(href)}" aria-label="${escapeHtml(label)}" target="_blank" rel="noopener noreferrer">${svg}</a>`;
+}
+
+function entityHero({ title, subtitle = "", description, imageUrl = "", imageAlt, links = [] }) {
   const image = imageUrl
     ? `<img class="avatar entity-avatar" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}">`
     : `<div class="avatar entity-avatar entity-avatar-fallback" role="img" aria-label="${escapeHtml(imageAlt)}"><span aria-hidden="true">&#128064;</span></div>`;
+  const socialLinks = links.map(entitySocialLink).filter(Boolean).join("");
   return `<div class="entity-hero">
       ${image}
       <div class="entity-copy">
-        <h1>${escapeHtml(title)}</h1>
+        <div class="entity-title-row">
+          <h1>${escapeHtml(title)}</h1>
+          ${socialLinks ? `<span class="entity-social-links">${socialLinks}</span>` : ""}
+        </div>
         ${subtitle ? `<p class="entity-subtitle">${escapeHtml(subtitle)}</p>` : ""}
         <p>${escapeHtml(description)}</p>
       </div>
@@ -716,12 +737,18 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, indexT
   const urlPath = profilePath(handle);
   const description = profileMetaDescription(collection, skills.length);
   const avatarUrl = collection.imageUrl || githubAvatarUrl(handle);
+  const githubUrl = collection.githubUrl || githubProfileUrl(handle);
+  const socialLinks = [
+    { href: githubUrl, label: `${collection.title} on GitHub`, icon: "github" },
+    collection.xUrl ? { href: collection.xUrl, label: `${collection.title} on X`, icon: "x" } : null,
+  ].filter(Boolean);
   const body = `    ${entityHero({
     title: collection.title,
     subtitle: collection.subtitle,
     description: collection.description || `Skills by @${handle}.`,
     imageUrl: avatarUrl,
     imageAlt: `${collection.title} profile image`,
+    links: socialLinks,
   })}
     ${profileStats(authorStats)}
     ${skillSection("Featured skills", skills, skillUrlById)}`;
@@ -736,7 +763,7 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, indexT
       name: collection.title,
       url: `${origin}${urlPath}`,
       image: avatarUrl,
-      sameAs: [`https://github.com/${handle}`],
+      sameAs: [githubUrl, collection.xUrl].filter(Boolean),
     },
     ogImage: avatarUrl,
     indexTier,
