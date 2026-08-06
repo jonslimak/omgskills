@@ -1,31 +1,42 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-06T07:52:56.264Z",
+  "generatedAt": "2026-08-06T08:56:10.437Z",
   "topSkills": [
     {
       "rank": 1,
-      "id": "anthropics/skills:xlsx",
-      "name": "xlsx",
-      "authorHandle": "anthropics",
-      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
-      "stars": 166535,
-      "installs": 147703,
-      "githubUrl": "https://github.com/anthropics/skills",
+      "id": "obra/superpowers:finishing-a-development-branch",
+      "name": "finishing-a-development-branch",
+      "authorHandle": "obra",
+      "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
+      "stars": 267541,
+      "installs": 153567,
+      "githubUrl": "https://github.com/obra/superpowers",
       "source": "skills.sh"
     },
     {
       "rank": 2,
+      "id": "anthropics/skills:xlsx",
+      "name": "xlsx",
+      "authorHandle": "anthropics",
+      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
+      "stars": 166574,
+      "installs": 147775,
+      "githubUrl": "https://github.com/anthropics/skills",
+      "source": "skills.sh"
+    },
+    {
+      "rank": 3,
       "id": "heygen-com/hyperframes:hyperframes-media",
       "name": "hyperframes-media",
       "authorHandle": "heygen-com",
       "description": "Asset preprocessing for HyperFrames compositions — text-to-speech narration (Kokoro), audio/video transcription (Whisper), and background removal for transparent overlays (u2net). Use when generating voiceover from text, transcribing speech for captions, removing the background from a video or image to use as a transparent overlay, choosing a TTS voice or whisper model, or chaining these (TTS → transcribe → captions). Each command downloads its own model on first run.",
       "stars": 15037,
-      "installs": 146621,
+      "installs": 146629,
       "githubUrl": "https://github.com/heygen-com/hyperframes",
       "source": "skills.sh"
     },
     {
-      "rank": 3,
+      "rank": 4,
       "id": "lllllllama/rigorpilot-skills:paper-context-resolver",
       "name": "paper-context-resolver",
       "authorHandle": "lllllllama",
@@ -36,7 +47,7 @@
       "source": "skills.sh"
     },
     {
-      "rank": 4,
+      "rank": 5,
       "id": "lllllllama/rigorpilot-skills:repo-intake-and-plan",
       "name": "repo-intake-and-plan",
       "authorHandle": "lllllllama",
@@ -47,18 +58,18 @@
       "source": "skills.sh"
     },
     {
-      "rank": 5,
+      "rank": 6,
       "id": "lllllllama/rigorpilot-skills:minimal-run-and-audit",
       "name": "minimal-run-and-audit",
       "authorHandle": "lllllllama",
       "description": "Rigor Run skill for README-first deep learning repo reproduction. Use when the task is specifically to capture or normalize evidence from the selected smoke test or documented inference or evaluation command and write standardized `repro_outputs/` files, including patch notes when repository files changed. Do not use for training execution, initial repo intake, generic environment setup, paper lookup, target selection, hidden scientific-meaning changes, or end-to-end orchestration by itself.",
       "stars": 514,
-      "installs": 139904,
+      "installs": 139905,
       "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
       "source": "skills.sh"
     },
     {
-      "rank": 6,
+      "rank": 7,
       "id": "lllllllama/rigorpilot-skills:env-and-assets-bootstrap",
       "name": "env-and-assets-bootstrap",
       "authorHandle": "lllllllama",
@@ -69,47 +80,36 @@
       "source": "skills.sh"
     },
     {
-      "rank": 7,
+      "rank": 8,
       "id": "anthropics/skills:webapp-testing",
       "name": "webapp-testing",
       "authorHandle": "anthropics",
       "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
       "stars": 166535,
-      "installs": 127830,
+      "installs": 127897,
       "githubUrl": "https://github.com/anthropics/skills",
       "source": "skills.sh"
     },
     {
-      "rank": 8,
+      "rank": 9,
       "id": "prisma/skills:prisma-database-setup",
       "name": "prisma-database-setup",
       "authorHandle": "prisma",
       "description": "Guides for configuring Prisma with different database providers (PostgreSQL, MySQL, SQLite, MongoDB, etc.). Use when setting up a new project, changing databases, or troubleshooting connection issues. Triggers on \"configure postgres\", \"connect to mysql\", \"setup mongodb\", \"sqlite setup\".",
       "stars": 50,
-      "installs": 124463,
-      "githubUrl": "https://github.com/prisma/skills",
-      "source": "skills.sh"
-    },
-    {
-      "rank": 9,
-      "id": "prisma/skills:prisma-client-api",
-      "name": "prisma-client-api",
-      "authorHandle": "prisma",
-      "description": "Prisma Client API reference covering model queries, filters, operators, and client methods. Use when writing database queries, using CRUD operations, filtering data, or configuring Prisma Client. Triggers on \"prisma query\", \"findMany\", \"create\", \"update\", \"delete\", \"$transaction\".",
-      "stars": 50,
-      "installs": 123693,
+      "installs": 125085,
       "githubUrl": "https://github.com/prisma/skills",
       "source": "skills.sh"
     },
     {
       "rank": 10,
-      "id": "coreyhaines31/marketingskills:marketing-psychology",
-      "name": "marketing-psychology",
-      "authorHandle": "coreyhaines31",
-      "description": "When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' 'consumer behavior,' 'anchoring,' 'social proof,' 'scarcity,' 'loss aversion,' 'framing,' or 'nudge.' Use this whenever someone wants to understand or leverage how people think and make decisions in a marketing context. For applying psychology to specific pages, see cro; for pricing tactics, see pricing; for copy framing, see copywriting.",
-      "stars": 40643,
-      "installs": 123665,
-      "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+      "id": "prisma/skills:prisma-client-api",
+      "name": "prisma-client-api",
+      "authorHandle": "prisma",
+      "description": "Prisma Client API reference covering model queries, filters, operators, and client methods. Use when writing database queries, using CRUD operations, filtering data, or configuring Prisma Client. Triggers on \"prisma query\", \"findMany\", \"create\", \"update\", \"delete\", \"$transaction\".",
+      "stars": 50,
+      "installs": 124319,
+      "githubUrl": "https://github.com/prisma/skills",
       "source": "skills.sh"
     }
   ],
@@ -164,6 +164,12 @@
           "detail": "95 skills · avg 26.3k ⭐"
         },
         {
+          "authorHandle": "obra",
+          "isVendor": false,
+          "value": "3.7M ⭐",
+          "detail": "22 skills · avg 170.4k ⭐"
+        },
+        {
           "authorHandle": "garrytan",
           "isVendor": false,
           "value": "6.5M ⭐",
@@ -176,15 +182,9 @@
           "detail": "28 skills · avg 121.3k ⭐"
         },
         {
-          "authorHandle": "obra",
-          "isVendor": false,
-          "value": "3.7M ⭐",
-          "detail": "22 skills · avg 170.4k ⭐"
-        },
-        {
           "authorHandle": "heygen-com",
           "isVendor": true,
-          "value": "274.6k ⭐",
+          "value": "274.7k ⭐",
           "detail": "13 skills · avg 21.1k ⭐"
         },
         {
@@ -208,7 +208,7 @@
         {
           "authorHandle": "greensock",
           "isVendor": true,
-          "value": "56.6k ⭐",
+          "value": "56.7k ⭐",
           "detail": "15 skills · avg 3.8k ⭐"
         },
         {
@@ -272,7 +272,7 @@
           "authorHandle": "googleworkspace",
           "isVendor": true,
           "value": "1.7M",
-          "detail": "95 skills · 53 with installs"
+          "detail": "95 skills · 52 with installs"
         },
         {
           "authorHandle": "firecrawl",
@@ -295,7 +295,7 @@
         {
           "authorHandle": "prisma",
           "isVendor": false,
-          "value": "1.0M",
+          "value": "1.1M",
           "detail": "75 skills · 9 with installs"
         },
         {
@@ -313,13 +313,13 @@
         {
           "authorHandle": "google",
           "isVendor": false,
-          "value": "520.9k",
+          "value": "522.1k",
           "detail": "26 skills · 7 with installs"
         },
         {
           "authorHandle": "inference-sh",
           "isVendor": false,
-          "value": "495.1k",
+          "value": "499.6k",
           "detail": "75 skills · 5 with installs"
         },
         {
@@ -331,13 +331,13 @@
         {
           "authorHandle": "higgsfield-ai",
           "isVendor": false,
-          "value": "466.3k",
+          "value": "467.0k",
           "detail": "9 skills · 6 with installs"
         },
         {
           "authorHandle": "jimliu",
           "isVendor": false,
-          "value": "428.3k",
+          "value": "428.5k",
           "detail": "26 skills · 15 with installs"
         },
         {
@@ -349,37 +349,37 @@
         {
           "authorHandle": "greensock",
           "isVendor": true,
-          "value": "313.6k",
+          "value": "314.0k",
           "detail": "15 skills · 8 with installs"
         },
         {
           "authorHandle": "cloudflare",
           "isVendor": true,
-          "value": "305.7k",
+          "value": "306.2k",
           "detail": "47 skills · 8 with installs"
         },
         {
           "authorHandle": "wshobson",
           "isVendor": false,
-          "value": "296.6k",
+          "value": "296.8k",
           "detail": "156 skills · 8 with installs"
         },
         {
           "authorHandle": "kepano",
           "isVendor": false,
-          "value": "295.8k",
+          "value": "296.0k",
           "detail": "5 skills · 5 with installs"
         },
         {
           "authorHandle": "firebase",
           "isVendor": true,
-          "value": "295.5k",
+          "value": "295.6k",
           "detail": "20 skills · 5 with installs"
         },
         {
           "authorHandle": "google-labs-code",
           "isVendor": true,
-          "value": "269.9k",
+          "value": "270.0k",
           "detail": "19 skills · 6 with installs"
         }
       ]
@@ -398,12 +398,6 @@
       },
       "rows": [
         {
-          "authorHandle": "openclaw",
-          "isVendor": true,
-          "value": "385.3k ⭐",
-          "detail": "\"summarize\""
-        },
-        {
           "authorHandle": "steipete",
           "isVendor": false,
           "value": "369.0k ⭐",
@@ -412,7 +406,7 @@
         {
           "authorHandle": "obra",
           "isVendor": false,
-          "value": "267.5k ⭐",
+          "value": "267.6k ⭐",
           "detail": "\"brainstorming\""
         },
         {
@@ -455,7 +449,7 @@
           "authorHandle": "flutter",
           "isVendor": false,
           "value": "178.2k ⭐",
-          "detail": "\"find-release\""
+          "detail": "\"dart-log-failure-parser\""
         },
         {
           "authorHandle": "f",
@@ -466,7 +460,7 @@
         {
           "authorHandle": "anthropics",
           "isVendor": true,
-          "value": "166.5k ⭐",
+          "value": "166.6k ⭐",
           "detail": "\"xlsx\""
         },
         {
@@ -485,12 +479,12 @@
           "authorHandle": "garrytan",
           "isVendor": false,
           "value": "126.5k ⭐",
-          "detail": "\"land-and-deploy\""
+          "detail": "\"gstack\""
         },
         {
           "authorHandle": "github",
           "isVendor": true,
-          "value": "125.4k ⭐",
+          "value": "125.5k ⭐",
           "detail": "\"add-community-extension\""
         },
         {
@@ -516,6 +510,12 @@
           "isVendor": true,
           "value": "107.6k ⭐",
           "detail": "\"vitest\""
+        },
+        {
+          "authorHandle": "google-gemini",
+          "isVendor": true,
+          "value": "106.4k ⭐",
+          "detail": "\"async-pr-review\""
         }
       ]
     },
@@ -532,12 +532,6 @@
         "medal": "#3b82f6"
       },
       "rows": [
-        {
-          "authorHandle": "openclaw",
-          "isVendor": true,
-          "value": "377.5k avg ⭐",
-          "detail": "49 skills · 18.5M total ⭐"
-        },
         {
           "authorHandle": "react",
           "isVendor": false,
@@ -614,7 +608,7 @@
           "authorHandle": "thedotmack",
           "isVendor": false,
           "value": "80.4k avg ⭐",
-          "detail": "10 skills · 804.0k total ⭐"
+          "detail": "10 skills · 804.1k total ⭐"
         },
         {
           "authorHandle": "egonex-ai",
@@ -647,10 +641,16 @@
           "detail": "21 skills · 1.5M total ⭐"
         },
         {
-          "authorHandle": "composiohq",
-          "isVendor": true,
-          "value": "66.4k avg ⭐",
-          "detail": "26 skills · 1.7M total ⭐"
+          "authorHandle": "leonxlnx",
+          "isVendor": false,
+          "value": "65.9k avg ⭐",
+          "detail": "5 skills · 329.6k total ⭐"
+        },
+        {
+          "authorHandle": "ruvnet",
+          "isVendor": false,
+          "value": "60.4k avg ⭐",
+          "detail": "193 skills · 11.7M total ⭐"
         }
       ]
     },
@@ -823,7 +823,7 @@
         {
           "authorHandle": "higgsfield-ai",
           "isVendor": false,
-          "value": "51.8k",
+          "value": "51.9k",
           "detail": "6 skills with installs"
         },
         {
@@ -841,7 +841,7 @@
         {
           "authorHandle": "stablyai",
           "isVendor": false,
-          "value": "41.7k",
+          "value": "41.8k",
           "detail": "3 skills with installs"
         },
         {
@@ -871,14 +871,14 @@
         {
           "authorHandle": "google",
           "isVendor": false,
-          "value": "20.0k",
+          "value": "20.1k",
           "detail": "7 skills with installs"
         },
         {
           "authorHandle": "googleworkspace",
           "isVendor": true,
-          "value": "18.3k",
-          "detail": "53 skills with installs"
+          "value": "18.0k",
+          "detail": "52 skills with installs"
         },
         {
           "authorHandle": "jimliu",
@@ -901,7 +901,7 @@
         {
           "authorHandle": "prisma",
           "isVendor": false,
-          "value": "14.0k",
+          "value": "14.1k",
           "detail": "9 skills with installs"
         },
         {
@@ -919,7 +919,7 @@
         {
           "authorHandle": "inference-sh",
           "isVendor": false,
-          "value": "6.6k",
+          "value": "6.7k",
           "detail": "5 skills with installs"
         }
       ]
@@ -930,7 +930,7 @@
       "authorHandle": "affaan-m",
       "isVendor": false,
       "skillCount": 407,
-      "totalStars": 88651908,
+      "totalStars": 88652119,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -943,8 +943,8 @@
       "authorHandle": "anthropics",
       "isVendor": true,
       "skillCount": 311,
-      "totalStars": 9409629,
-      "totalInstalls": 1141831,
+      "totalStars": 9409780,
+      "totalInstalls": 1142306,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -956,8 +956,8 @@
       "authorHandle": "github",
       "isVendor": true,
       "skillCount": 402,
-      "totalStars": 11899447,
-      "totalInstalls": 69043,
+      "totalStars": 11899589,
+      "totalInstalls": 69065,
       "trophies": [
         "🏆 Most Influential",
         "💎 Peak Achiever",
@@ -965,11 +965,23 @@
       ]
     },
     {
+      "authorHandle": "ruvnet",
+      "isVendor": false,
+      "skillCount": 193,
+      "totalStars": 11657010,
+      "totalInstalls": 0,
+      "trophies": [
+        "🏆 Most Influential",
+        "🎯 Most Consistent",
+        "📚 Most Prolific"
+      ]
+    },
+    {
       "authorHandle": "microsoft",
       "isVendor": true,
       "skillCount": 526,
-      "totalStars": 11166730,
-      "totalInstalls": 110468,
+      "totalStars": 11166740,
+      "totalInstalls": 110589,
       "trophies": [
         "🏆 Most Influential",
         "💎 Peak Achiever",
@@ -992,8 +1004,8 @@
       "authorHandle": "obra",
       "isVendor": false,
       "skillCount": 22,
-      "totalStars": 3747760,
-      "totalInstalls": 0,
+      "totalStars": 3747842,
+      "totalInstalls": 153567,
       "trophies": [
         "🏆 Most Influential",
         "💎 Peak Achiever",
@@ -1004,7 +1016,7 @@
       "authorHandle": "n8n-io",
       "isVendor": true,
       "skillCount": 28,
-      "totalStars": 3396226,
+      "totalStars": 3396235,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -1017,7 +1029,7 @@
       "isVendor": true,
       "skillCount": 95,
       "totalStars": 2495289,
-      "totalInstalls": 1738267,
+      "totalInstalls": 1713424,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1028,7 +1040,19 @@
       "authorHandle": "facebook",
       "isVendor": true,
       "skillCount": 9,
-      "totalStars": 1752497,
+      "totalStars": 1752498,
+      "totalInstalls": 0,
+      "trophies": [
+        "🏆 Most Influential",
+        "💎 Peak Achiever",
+        "🎯 Most Consistent"
+      ]
+    },
+    {
+      "authorHandle": "google-gemini",
+      "isVendor": true,
+      "skillCount": 21,
+      "totalStars": 1498035,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -1041,7 +1065,7 @@
       "isVendor": false,
       "skillCount": 40,
       "totalStars": 1344720,
-      "totalInstalls": 1830845,
+      "totalInstalls": 1831400,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1052,8 +1076,8 @@
       "authorHandle": "heygen-com",
       "isVendor": true,
       "skillCount": 13,
-      "totalStars": 274561,
-      "totalInstalls": 758804,
+      "totalStars": 274651,
+      "totalInstalls": 758838,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1064,8 +1088,8 @@
       "authorHandle": "kepano",
       "isVendor": false,
       "skillCount": 5,
-      "totalStars": 219757,
-      "totalInstalls": 295836,
+      "totalStars": 219819,
+      "totalInstalls": 295960,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1077,7 +1101,7 @@
       "isVendor": true,
       "skillCount": 16,
       "totalStars": 180218,
-      "totalInstalls": 420486,
+      "totalInstalls": 420545,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1089,7 +1113,7 @@
       "isVendor": true,
       "skillCount": 19,
       "totalStars": 151482,
-      "totalInstalls": 269855,
+      "totalInstalls": 269973,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1100,8 +1124,8 @@
       "authorHandle": "greensock",
       "isVendor": true,
       "skillCount": 15,
-      "totalStars": 56620,
-      "totalInstalls": 313590,
+      "totalStars": 56653,
+      "totalInstalls": 313978,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1113,7 +1137,7 @@
       "isVendor": true,
       "skillCount": 157,
       "totalStars": 17281,
-      "totalInstalls": 1402813,
+      "totalInstalls": 1403070,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1124,8 +1148,8 @@
       "authorHandle": "firebase",
       "isVendor": true,
       "skillCount": 20,
-      "totalStars": 16999,
-      "totalInstalls": 295489,
+      "totalStars": 17000,
+      "totalInstalls": 295559,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1133,33 +1157,11 @@
       ]
     },
     {
-      "authorHandle": "openclaw",
-      "isVendor": true,
-      "skillCount": 49,
-      "totalStars": 18495474,
-      "totalInstalls": 0,
-      "trophies": [
-        "💎 Peak Achiever",
-        "🎯 Most Consistent"
-      ]
-    },
-    {
-      "authorHandle": "ruvnet",
-      "isVendor": false,
-      "skillCount": 193,
-      "totalStars": 11657010,
-      "totalInstalls": 0,
-      "trophies": [
-        "🏆 Most Influential",
-        "📚 Most Prolific"
-      ]
-    },
-    {
       "authorHandle": "wshobson",
       "isVendor": false,
       "skillCount": 156,
       "totalStars": 5513865,
-      "totalInstalls": 296593,
+      "totalInstalls": 296760,
       "trophies": [
         "⚡ Most Used",
         "📚 Most Prolific"
@@ -1191,7 +1193,7 @@
       "authorHandle": "pytorch",
       "isVendor": true,
       "skillCount": 18,
-      "totalStars": 1730609,
+      "totalStars": 1730607,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -1202,7 +1204,7 @@
       "authorHandle": "react",
       "isVendor": false,
       "skillCount": 7,
-      "totalStars": 1729357,
+      "totalStars": 1729359,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever",
@@ -1210,21 +1212,10 @@
       ]
     },
     {
-      "authorHandle": "google-gemini",
-      "isVendor": true,
-      "skillCount": 21,
-      "totalStars": 1498023,
-      "totalInstalls": 0,
-      "trophies": [
-        "🏆 Most Influential",
-        "🎯 Most Consistent"
-      ]
-    },
-    {
       "authorHandle": "supabase",
       "isVendor": true,
       "skillCount": 14,
-      "totalStars": 1287338,
+      "totalStars": 1287343,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever",
@@ -1235,7 +1226,7 @@
       "authorHandle": "langgenius",
       "isVendor": false,
       "skillCount": 5,
-      "totalStars": 594965,
+      "totalStars": 594990,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever",
@@ -1246,8 +1237,8 @@
       "authorHandle": "jimliu",
       "isVendor": false,
       "skillCount": 26,
-      "totalStars": 582662,
-      "totalInstalls": 428330,
+      "totalStars": 582669,
+      "totalInstalls": 428460,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1257,8 +1248,8 @@
       "authorHandle": "google",
       "isVendor": false,
       "skillCount": 26,
-      "totalStars": 110903,
-      "totalInstalls": 520947,
+      "totalStars": 110936,
+      "totalInstalls": 522124,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1269,7 +1260,7 @@
       "isVendor": false,
       "skillCount": 58,
       "totalStars": 87406,
-      "totalInstalls": 1303340,
+      "totalInstalls": 1303589,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1280,7 +1271,7 @@
       "isVendor": false,
       "skillCount": 75,
       "totalStars": 38147,
-      "totalInstalls": 495076,
+      "totalInstalls": 499630,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1291,7 +1282,7 @@
       "isVendor": false,
       "skillCount": 75,
       "totalStars": 11664,
-      "totalInstalls": 1048760,
+      "totalInstalls": 1054347,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1302,7 +1293,7 @@
       "isVendor": false,
       "skillCount": 9,
       "totalStars": 5904,
-      "totalInstalls": 466319,
+      "totalInstalls": 466969,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1313,7 +1304,7 @@
       "isVendor": false,
       "skillCount": 11,
       "totalStars": 5584,
-      "totalInstalls": 560362,
+      "totalInstalls": 560363,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1324,7 +1315,7 @@
       "isVendor": true,
       "skillCount": 5,
       "totalStars": 195,
-      "totalInstalls": 476062,
+      "totalInstalls": 476127,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1334,7 +1325,7 @@
       "authorHandle": "k-dense-ai",
       "isVendor": false,
       "skillCount": 140,
-      "totalStars": 4509753,
+      "totalStars": 4509763,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1344,7 +1335,7 @@
       "authorHandle": "openai",
       "isVendor": true,
       "skillCount": 259,
-      "totalStars": 3835651,
+      "totalStars": 3835840,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1354,7 +1345,7 @@
       "authorHandle": "posthog",
       "isVendor": false,
       "skillCount": 197,
-      "totalStars": 2516567,
+      "totalStars": 2516568,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1364,17 +1355,7 @@
       "authorHandle": "bytedance",
       "isVendor": false,
       "skillCount": 23,
-      "totalStars": 1732864,
-      "totalInstalls": 0,
-      "trophies": [
-        "🎯 Most Consistent"
-      ]
-    },
-    {
-      "authorHandle": "composiohq",
-      "isVendor": true,
-      "skillCount": 26,
-      "totalStars": 1725996,
+      "totalStars": 1732873,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1384,7 +1365,7 @@
       "authorHandle": "lobehub",
       "isVendor": false,
       "skillCount": 23,
-      "totalStars": 1700590,
+      "totalStars": 1700593,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1394,7 +1375,7 @@
       "authorHandle": "alirezarezvani",
       "isVendor": false,
       "skillCount": 134,
-      "totalStars": 1590961,
+      "totalStars": 1590985,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1404,7 +1385,7 @@
       "authorHandle": "vercel-labs",
       "isVendor": true,
       "skillCount": 131,
-      "totalStars": 1406095,
+      "totalStars": 1406196,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1435,7 +1416,7 @@
       "isVendor": false,
       "skillCount": 52,
       "totalStars": 993926,
-      "totalInstalls": 51375,
+      "totalInstalls": 51395,
       "trophies": [
         "💎 Peak Achiever"
       ]
@@ -1444,7 +1425,7 @@
       "authorHandle": "thedotmack",
       "isVendor": false,
       "skillCount": 10,
-      "totalStars": 803993,
+      "totalStars": 804069,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1485,7 +1466,7 @@
       "isVendor": false,
       "skillCount": 6,
       "totalStars": 581724,
-      "totalInstalls": 29069,
+      "totalInstalls": 29128,
       "trophies": [
         "🎯 Most Consistent"
       ]
@@ -1505,7 +1486,7 @@
       "isVendor": false,
       "skillCount": 7,
       "totalStars": 505958,
-      "totalInstalls": 26713,
+      "totalInstalls": 26751,
       "trophies": [
         "🎯 Most Consistent"
       ]
@@ -1514,7 +1495,7 @@
       "authorHandle": "f",
       "isVendor": false,
       "skillCount": 3,
-      "totalStars": 493510,
+      "totalStars": 493554,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever"
@@ -1524,8 +1505,8 @@
       "authorHandle": "browser-use",
       "isVendor": false,
       "skillCount": 9,
-      "totalStars": 485633,
-      "totalInstalls": 89502,
+      "totalStars": 485642,
+      "totalInstalls": 89520,
       "trophies": [
         "💎 Peak Achiever"
       ]
@@ -1544,10 +1525,20 @@
       "authorHandle": "huggingface",
       "isVendor": true,
       "skillCount": 25,
-      "totalStars": 367540,
+      "totalStars": 367541,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever"
+      ]
+    },
+    {
+      "authorHandle": "leonxlnx",
+      "isVendor": false,
+      "skillCount": 5,
+      "totalStars": 329648,
+      "totalInstalls": 0,
+      "trophies": [
+        "🎯 Most Consistent"
       ]
     },
     {
@@ -1555,7 +1546,7 @@
       "isVendor": true,
       "skillCount": 47,
       "totalStars": 249562,
-      "totalInstalls": 305653,
+      "totalInstalls": 306182,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1574,8 +1565,8 @@
       "authorHandle": "stablyai",
       "isVendor": false,
       "skillCount": 6,
-      "totalStars": 192451,
-      "totalInstalls": 249944,
+      "totalStars": 192548,
+      "totalInstalls": 250599,
       "trophies": [
         "🚀 Install Efficiency"
       ]
@@ -1625,7 +1616,7 @@
       "isVendor": true,
       "skillCount": 7,
       "totalStars": 9413,
-      "totalInstalls": 177059,
+      "totalInstalls": 177152,
       "trophies": [
         "🚀 Install Efficiency"
       ]
@@ -1635,7 +1626,7 @@
       "isVendor": false,
       "skillCount": 24,
       "totalStars": 1500,
-      "totalInstalls": 199411,
+      "totalInstalls": 199518,
       "trophies": [
         "🚀 Install Efficiency"
       ]
