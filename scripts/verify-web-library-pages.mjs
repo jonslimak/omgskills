@@ -299,6 +299,11 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, '"operatingSystem":"macOS"', label);
     assertIncludes(html, '"@type":"BreadcrumbList"', label);
     assertIncludes(html, '<h2>Install</h2>', label);
+    assertNotIncludes(html, 'Install this Claude and Codex skill with the command below.', label);
+    assertNotIncludes(html, 'class="install-head"', label);
+    assertIncludes(html, 'aria-label="Copy install command" title="Copy install command"', label);
+    assertIncludes(html, 'class="copy-icon" data-copy-icon', label);
+    assertIncludes(html, 'class="copy-icon" data-copied-icon', label);
   }
 
   if (page.profileMetadata) {
@@ -342,9 +347,20 @@ function verifyMetadata(html, page, label) {
   if (page.profileAuthor) {
     assertIncludes(
       html,
-      `href="${page.profileAuthor.path}">@${page.profileAuthor.handle}</a>`,
+      `class="skill-detail-author" href="${page.profileAuthor.path}"`,
       label,
     );
+    assertIncludes(html, 'class="skill-detail-title"', label);
+    assertIncludes(html, 'class="skill-detail-author-avatar" aria-hidden="true"', label);
+    assertIncludes(html, `src="https://github.com/${page.profileAuthor.handle}.png"`, label);
+    assertIncludes(html, 'class="skill-detail-stars" aria-label="', label);
+    assertIncludes(html, 'class="entity-social-link skill-detail-github-link"', label);
+    assertIncludes(html, `aria-label="View ${page.text} on GitHub"`, label);
+    assertIncludes(html, '.skill-detail-author { color: var(--blue); }', label);
+    assertIncludes(html, '.skill-detail > .section > h2, .skill-detail > .skill-section .section-heading h2 { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }', label);
+    assertIncludes(html, '.skill-detail > .section:not(.skill-section) > p { font-size: 13px; }', label);
+    assertNotIncludes(html, 'Author match:', label);
+    assertNotIncludes(html, ' stars</span>', label);
     assertIncludes(html, `${origin}${page.profileAuthor.path}`, label);
   }
 

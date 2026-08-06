@@ -212,6 +212,13 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .skill-card-author-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .skill-card-stars { display: inline-flex; align-items: center; gap: 4px; }
     .skill-card-star-icon { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .skill-detail-title { font-size: clamp(28px, 5vw, 42px); }
+    .skill-detail-author, .skill-detail-stars { display: inline-flex; align-items: center; gap: 5px; }
+    .skill-detail-author { color: var(--blue); }
+    .skill-detail-author-avatar { width: 18px; height: 18px; overflow: hidden; flex: none; border-radius: 50%; background: var(--soft); }
+    .skill-detail-author-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .skill-detail > .section > h2, .skill-detail > .skill-section .section-heading h2 { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .skill-detail > .section:not(.skill-section) > p { font-size: 13px; }
     .skill-grid[data-view="list"] .skill-card { display: grid; grid-template-columns: minmax(140px, 170px) minmax(110px, 128px) minmax(0, 1fr) max-content; align-items: center; gap: 12px; padding: 13px 16px; }
     .skill-grid[data-view="list"] .skill-card-heading { display: contents; }
     .skill-grid[data-view="list"] .skill-card h2 { overflow: hidden; grid-column: 1; grid-row: 1; min-width: 0; margin: 0; text-overflow: ellipsis; white-space: nowrap; }
@@ -256,12 +263,14 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .entity-social-link svg { display: block; width: 18px; height: 18px; }
     .entity-copy p { max-width: 68ch; margin: 0; font-size: 13px; }
     .entity-copy .entity-subtitle { margin-bottom: 5px; color: var(--text); font-weight: 600; }
-    .install-box { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
-    .install-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
-    .install-head span { font-size: 13px; font-weight: 700; }
-    .copy { border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; background: #fff; color: var(--blue); font: inherit; font-size: 13px; cursor: pointer; }
-    .copy:hover { background: var(--soft); }
-    .install { overflow: auto; margin: 0; padding: 14px; background: var(--soft); font-size: 13px; }
+    .install-box { display: flex; align-items: center; gap: 12px; overflow: hidden; border: 0; border-radius: 8px; padding: 6px 8px 6px 14px; background: var(--soft); }
+    .copy { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 30px; height: 30px; border: 0; padding: 0; background: transparent; color: var(--blue); cursor: pointer; }
+    .copy:hover { color: var(--text); }
+    .copy:focus-visible { outline: 3px solid rgba(0, 122, 255, .3); outline-offset: 2px; }
+    .copy-icon { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .copy-icon[hidden] { display: none; }
+    .install { overflow: auto; flex: 1; min-width: 0; margin: 0; padding: 0; background: transparent; font-size: 13px; scrollbar-width: none; }
+    .install::-webkit-scrollbar { display: none; }
     .about { max-width: 72ch; }
     .section { margin-top: 36px; }
     .directory-recommendations { margin-top: 66px; }
@@ -296,8 +305,18 @@ ${body}
         const target = document.getElementById(button.dataset.copy);
         if (!target || !navigator.clipboard) return;
         await navigator.clipboard.writeText(target.textContent.trim());
-        button.textContent = "Copied";
-        window.setTimeout(() => { button.textContent = "Copy"; }, 1200);
+        const copyIcon = button.querySelector("[data-copy-icon]");
+        const copiedIcon = button.querySelector("[data-copied-icon]");
+        if (copyIcon) copyIcon.hidden = true;
+        if (copiedIcon) copiedIcon.hidden = false;
+        button.setAttribute("aria-label", "Copied");
+        button.setAttribute("title", "Copied");
+        window.setTimeout(() => {
+          if (copyIcon) copyIcon.hidden = false;
+          if (copiedIcon) copiedIcon.hidden = true;
+          button.setAttribute("aria-label", "Copy install command");
+          button.setAttribute("title", "Copy install command");
+        }, 1200);
       });
     });
 
@@ -505,10 +524,10 @@ const entitySocialIcons = {
   x: `<svg aria-hidden="true" viewBox="0 0 32 32"><path fill="currentColor" d="M26.8438 26.4638L19.0188 14.1663L26.74 5.6725C26.9146 5.47565 27.0046 5.21791 26.9905 4.95515C26.9764 4.69239 26.8592 4.44579 26.6645 4.26882C26.4698 4.09185 26.2131 3.99876 25.9502 4.00974C25.6873 4.02073 25.4393 4.1349 25.26 4.3275L17.905 12.4175L12.8438 4.46375C12.7535 4.32169 12.6289 4.20471 12.4814 4.12365C12.3339 4.04258 12.1683 4.00005 12 4H6.00001C5.82071 3.99991 5.64468 4.04803 5.49037 4.13932C5.33605 4.23062 5.20911 4.36172 5.12285 4.5189C5.03659 4.67609 4.99418 4.85357 5.00006 5.03278C5.00593 5.21198 5.05988 5.3863 5.15626 5.5375L12.9813 17.8337L5.26001 26.3337C5.16984 26.4306 5.09979 26.5444 5.05393 26.6685C5.00806 26.7927 4.98729 26.9247 4.99282 27.0569C4.99834 27.1891 5.03005 27.3189 5.08611 27.4388C5.14217 27.5586 5.22146 27.6662 5.3194 27.7552C5.41733 27.8442 5.53195 27.9129 5.65662 27.9572C5.78129 28.0016 5.91352 28.0208 6.04566 28.0137C6.1778 28.0066 6.30722 27.9733 6.42641 27.9158C6.5456 27.8583 6.65219 27.7777 6.74001 27.6787L14.095 19.5888L19.1563 27.5425C19.2472 27.6834 19.3722 27.7991 19.5197 27.8791C19.6671 27.959 19.8323 28.0006 20 28H26C26.1791 27.9999 26.3549 27.9518 26.509 27.8606C26.6632 27.7693 26.79 27.6384 26.8762 27.4814C26.9624 27.3244 27.0049 27.1472 26.9992 26.9681C26.9935 26.7891 26.9398 26.6149 26.8438 26.4638ZM20.5488 26L7.82126 6H11.4463L24.1788 26H20.5488Z"></path><path fill="#fff" d="M20.5488 26L7.82126 6H11.4463L24.1788 26H20.5488Z"></path></svg>`,
 };
 
-function entitySocialLink({ href, label, icon }) {
+function entitySocialLink({ href, label, icon, className = "" }) {
   const svg = entitySocialIcons[icon];
   if (!href || !svg) return "";
-  return `<a class="entity-social-link" href="${escapeHtml(href)}" aria-label="${escapeHtml(label)}" target="_blank" rel="noopener noreferrer">${svg}</a>`;
+  return `<a class="entity-social-link${className ? ` ${escapeHtml(className)}` : ""}" href="${escapeHtml(href)}" aria-label="${escapeHtml(label)}" target="_blank" rel="noopener noreferrer">${svg}</a>`;
 }
 
 function entityHero({ title, subtitle = "", description, imageUrl = "", imageAlt, links = [] }) {
@@ -724,11 +743,6 @@ function profileStats(authorStats) {
     ${badges.length ? `<div class="badges">${badges.map(([name, badge]) => `<span class="badge">#${escapeHtml(badge.rank)} ${escapeHtml(name)} - ${escapeHtml(badge.value)}</span>`).join("")}</div>` : ""}`;
 }
 
-function authorConfidenceBadge(skill) {
-  if (!skill.author_confidence) return "";
-  return `<span>Author match: ${escapeHtml(titleize(skill.author_confidence))}</span>`;
-}
-
 function renderSkillPage(
   skill,
   repoSkills,
@@ -745,30 +759,30 @@ function renderSkillPage(
   const author = skill.author_handle
     ? skillAuthorReference(skill, profilePathByCreatorHandle)
     : null;
-  const body = `    <div class="eyebrow">Skill</div>
-    <h1>${escapeHtml(skill.name)}</h1>
+  const body = `    <div class="skill-detail">
+    <div class="eyebrow">Skill</div>
+    <h1 class="skill-detail-title">${escapeHtml(skill.name)}</h1>
     <div class="meta">
-      ${author ? `<a href="${escapeHtml(author.profilePath ?? author.githubUrl)}">@${escapeHtml(skill.author_handle)}</a>` : ""}
-      <span>${compactNumber(skill.stars)} stars</span>
+      ${author ? `<a class="skill-detail-author" href="${escapeHtml(author.profilePath ?? author.githubUrl)}"><span class="skill-detail-author-avatar" aria-hidden="true"><img src="${escapeHtml(githubAvatarUrl(author.handle))}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'"></span>@${escapeHtml(skill.author_handle)}</a>` : ""}
+      <span class="skill-detail-stars" aria-label="${escapeHtml(`${compactNumber(skill.stars)} stars`)}"><span aria-hidden="true">${compactNumber(skill.stars)}</span>${skillStarIcon()}</span>
       ${installsBadge(skill)}
       ${trendingBadge(skill)}
       ${skill.last_updated ? `<span>Updated ${escapeHtml(String(skill.last_updated).slice(0, 10))}</span>` : ""}
-      ${authorConfidenceBadge(skill)}
+      ${skill.github_url ? entitySocialLink({ href: skill.github_url, label: `View ${skill.name} on GitHub`, icon: "github", className: "skill-detail-github-link" }) : ""}
     </div>
     ${visibleDescription ? `<p class="lede">${escapeHtml(visibleDescription)}</p>` : ""}
     ${tagsForSkill(skill)}
     <div class="section">
       ${pageHeading("Install")}
-      <p>Install this Claude and Codex skill with the command below. The command stays visible even when copy support is unavailable.</p>
       <div class="install-box">
-      <div class="install-head"><span>Install command</span><button class="copy" type="button" data-copy="${escapeHtml(installId)}">Copy</button></div>
       <pre class="install"><code id="${escapeHtml(installId)}">${escapeHtml(skill.install_cmd || "")}</code></pre>
+      <button class="copy" type="button" data-copy="${escapeHtml(installId)}" aria-label="Copy install command" title="Copy install command"><svg class="copy-icon" data-copy-icon viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="copy-icon" data-copied-icon viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m20 6-11 11-5-5"/></svg></button>
       </div>
     </div>
-    ${skill.github_url ? `<p><a href="${escapeHtml(skill.github_url)}">View on GitHub</a></p>` : ""}
     ${readmeSnippet ? `<div class="section about">${pageHeading("From README")}<p>${escapeHtml(readmeSnippet)}</p></div>` : ""}
     ${repoSkills.length ? skillSection("More from this repo", repoSkills, skillUrlById) : ""}
-    ${authorSkills.length ? skillSection("More skills", authorSkills, skillUrlById) : ""}`;
+    ${authorSkills.length ? skillSection("More skills", authorSkills, skillUrlById) : ""}
+    </div>`;
   return pageShell({
     title: skillTitle(skill),
     description,
