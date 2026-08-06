@@ -244,6 +244,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .entity-avatar-fallback { display: flex; align-items: center; justify-content: center; font-size: 36px; }
     .entity-copy h1 { margin: 0 0 14px; font-size: clamp(28px, 5vw, 42px); }
     .entity-copy p { max-width: 68ch; margin: 0; font-size: 13px; }
+    .entity-copy .entity-subtitle { margin-bottom: 5px; color: var(--text); font-weight: 600; }
     .install-box { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
     .install-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
     .install-head span { font-size: 13px; font-weight: 700; }
@@ -487,7 +488,7 @@ function pageHeading(title) {
   return `<h2>${escapeHtml(title)}</h2>`;
 }
 
-function entityHero({ title, description, imageUrl = "", imageAlt }) {
+function entityHero({ title, subtitle = "", description, imageUrl = "", imageAlt }) {
   const image = imageUrl
     ? `<img class="avatar entity-avatar" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}">`
     : `<div class="avatar entity-avatar entity-avatar-fallback" role="img" aria-label="${escapeHtml(imageAlt)}"><span aria-hidden="true">&#128064;</span></div>`;
@@ -495,6 +496,7 @@ function entityHero({ title, description, imageUrl = "", imageAlt }) {
       ${image}
       <div class="entity-copy">
         <h1>${escapeHtml(title)}</h1>
+        ${subtitle ? `<p class="entity-subtitle">${escapeHtml(subtitle)}</p>` : ""}
         <p>${escapeHtml(description)}</p>
       </div>
     </div>`;
@@ -716,7 +718,8 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, indexT
   const avatarUrl = collection.imageUrl || githubAvatarUrl(handle);
   const body = `    ${entityHero({
     title: collection.title,
-    description: collection.description || collection.subtitle || `Skills by @${handle}.`,
+    subtitle: collection.subtitle,
+    description: collection.description || `Skills by @${handle}.`,
     imageUrl: avatarUrl,
     imageAlt: `${collection.title} profile image`,
   })}
