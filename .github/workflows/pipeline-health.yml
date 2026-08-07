@@ -6,17 +6,19 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: write
   issues: write
 
-concurrency:
-  group: app-data-writers
-  cancel-in-progress: false
-
 jobs:
   health:
+    concurrency:
+      group: pipeline-health-check-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      writer_busy: ${{ steps.writercheck.outputs.busy }}
 
     steps:
       - name: Checkout
@@ -98,12 +100,61 @@ jobs:
             gh issue close "$ISSUE_NUMBER" --repo "${{ github.repository }}" --comment "Pipeline healthy again on $(date -u +"%Y-%m-%dT%H:%M:%SZ")."
           fi
 
+      - name: Check data writer activity
+        id: writercheck
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node ./scripts/check-active-data-writers.mjs
+
+      - name: Upload generated health snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-health-snapshot-${{ github.run_id }}
+          path: site/data/health.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Fail on degraded health
+        if: steps.finalhealth.outputs.health_status == 'degraded'
+        run: exit 1
+
+  deploy-health:
+    needs: health
+    if: always() && needs.health.outputs.writer_busy == 'false'
+    concurrency:
+      group: app-data-writers
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main --depth=1
+          git reset --hard origin/main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Install policy validation dependencies
         working-directory: index
         run: npm ci
 
       - name: Prepare release assets for Netlify deploy
         run: node ./scripts/prepare-netlify-site-deploy.mjs
+
+      - name: Download generated health snapshot
+        uses: actions/download-artifact@v4
+        with:
+          name: pipeline-health-snapshot-${{ github.run_id }}
+          path: site/data
 
       - name: Install site dependencies
         run: npm ci
@@ -129,7 +180,3 @@ jobs:
           path: dist/netlify-deploy-receipt.json
           if-no-files-found: error
           retention-days: 30
-
-      - name: Fail on degraded health
-        if: steps.finalhealth.outputs.health_status == 'degraded'
-        run: exit 1
