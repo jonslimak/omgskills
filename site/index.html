@@ -154,6 +154,18 @@
     .subheadline-highlight {
       color: #1591ff;
       font-weight: 700;
+      text-decoration: none;
+    }
+
+    .subheadline-highlight:hover {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .subheadline-highlight:focus-visible {
+      border-radius: 2px;
+      outline: 3px solid rgba(21, 145, 255, 0.25);
+      outline-offset: 2px;
     }
 
     a.primary-button {
@@ -1010,7 +1022,7 @@
     <section class="hero" aria-label="omgskills hero">
       <img class="logo" src="logo.png" alt="omgskills" width="404" height="195">
       <h1><span class="headline-strong">Find trending skills</span><br>for Claude &amp; Codex in seconds</h1>
-      <p class="subheadline">Search <span class="subheadline-highlight">49,000+</span> skills on Github &amp; X, read docs, install in one click and manage all your skills in one place</p>
+      <p class="subheadline">Search <a class="subheadline-highlight" href="/skills/">49,000+ skills</a> on Github &amp; X, read docs, install in one click and manage all your skills in one place</p>
       <div class="banner-actions">
         <a class="primary-button" href="/downloads/omgskills-mac.dmg" data-humblytics="Hero Download Mac DMG"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>
         <div class="hero-cta-note">it&rsquo;s free - no signup required</div>
