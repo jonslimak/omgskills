@@ -5,7 +5,7 @@
     "name": "finishing-a-development-branch",
     "authorHandle": "obra",
     "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
-    "stars": 268850,
+    "stars": 268924,
     "installs": 155169,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
@@ -16,7 +16,7 @@
     "name": "xlsx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
-    "stars": 166912,
+    "stars": 166935,
     "installs": 148901,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -367,8 +367,8 @@
     "id": "stablyai/orca:orca-cli",
     "name": "orca-cli",
     "authorHandle": "stablyai",
-    "description": "Use the public `orca` CLI to operate Orca-managed worktrees, folder contexts, terminals, repos, automations, worktree comments, and the browser embedded inside the Orca app. Use when the user says \"$orca-cli\", \"use orca cli\", \"Orca worktree\", \"child worktree\", \"cardStatus\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"terminal send\", \"full handoff\", \"handover\", \"give this to another agent\", \"another worktree\", \"Orca browser\", or \"control the browser inside Orca\". Prefer this over raw `git worktree`, ad hoc PTYs, Playwright, or Computer Use when the task touches Orca-managed state. Use Computer Use for browser windows, webviews, or desktop UI outside Orca's embedded browser.",
-    "stars": 39784,
+    "description": "Use the public `orca` CLI to operate Orca-managed worktrees, folder contexts, terminals, repos, automations, artifacts, worktree comments, and the browser embedded inside the Orca app. Use when the user says \"$orca-cli\", \"use orca cli\", \"Orca worktree\", \"child worktree\", \"cardStatus\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"terminal send\", \"full handoff\", \"handover\", \"give this to another agent\", \"another worktree\", \"Orca browser\", \"orca artifacts\", \"share HTML/Markdown\", \"public artifact link\", or \"control the browser inside Orca\". Prefer this over raw `git worktree`, ad hoc PTYs, Playwright, or Computer Use when the task touches Orca-managed state. Use Computer Use for browser windows, webviews, or desktop UI outside Orca's embedded browser.",
+    "stars": 39849,
     "installs": 97069,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
@@ -478,7 +478,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 108226,
+    "stars": 108239,
     "installs": 89902,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -1347,7 +1347,7 @@
     "name": "defuddle",
     "authorHandle": "kepano",
     "description": "Extract clean markdown content from web pages using Defuddle CLI, removing clutter and navigation to save tokens. Use instead of WebFetch when the user provides a URL to read or analyze, for online documentation, articles, blog posts, or any standard web page. Do NOT use for URLs ending in .md — those are already markdown, use WebFetch directly.",
-    "stars": 44337,
+    "stars": 44399,
     "installs": 54639,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1644,7 +1644,7 @@
     "name": "gsap-core",
     "authorHandle": "greensock",
     "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions.",
-    "stars": 13178,
+    "stars": 13220,
     "installs": 43693,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
@@ -2513,7 +2513,7 @@
     "name": "baoyu-post-to-wechat",
     "authorHandle": "jimliu",
     "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
-    "stars": 24710,
+    "stars": 24714,
     "installs": 32432,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
