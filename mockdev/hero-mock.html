@@ -101,20 +101,21 @@
 
   /* ── body: columns ── */
   .cols { flex: 1; display: flex; min-height: 0; }
-  .listcol { width: 420px; flex: none; overflow: hidden; padding: 4px 0 0; display: flex; flex-direction: column; }
+  .listcol { width: 420px; flex: none; overflow: hidden; padding: 4px 0 0; display: flex; flex-direction: column; transition: width .55s var(--exp); }
+  .stage.detail .listcol { width: 330px; }
 
   /* categories (discover / empty state) */
-  .cats { flex: 1; padding: 18px 30px 10px; display: flex; flex-direction: column; }
-  .cat-section { margin-bottom: 15px; }
-  .cat-h { font-size: 13px; font-weight: 500; color: rgba(0,0,0,.32); margin: 0 0 7px 2px; }
+  .cats { flex: 1; padding: 20px 34px 10px; display: flex; flex-direction: column; }
+  .cat-section { margin-bottom: 19px; }
+  .cat-h { font-size: 12.5px; font-weight: 500; color: rgba(0,0,0,.32); margin: 0 0 7px 2px; }
   .cat-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 34px; }
   .cat {
     display: flex; align-items: center; gap: 10px;
-    font-size: 14px; color: var(--ink); padding: 8px 2px;
+    font-size: 13px; color: var(--ink); padding: 8px 2px;
   }
-  .cat .lucide { font-size: 13px; color: rgba(0,0,0,.55); flex: none; }
+  .cat .lucide { font-size: 12.5px; color: rgba(0,0,0,.55); flex: none; }
   .cat .chev { margin-left: auto; font-size: 10px; color: rgba(0,0,0,.2); }
-  .cat-send { margin-top: auto; padding: 8px 2px 14px; font-size: 13.5px; color: rgba(0,0,0,.35); display: flex; align-items: center; gap: 10px; }
+  .cat-send { margin-top: auto; padding: 8px 2px 14px; font-size: 13px; color: rgba(0,0,0,.35); display: flex; align-items: center; gap: 10px; }
   .stage.results .cats { display: none; }
 
   /* result rows */
