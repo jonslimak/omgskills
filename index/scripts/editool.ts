@@ -42,6 +42,7 @@ import {
   collectionImageFilePath,
   writeCollectionImage,
 } from "./collection-images.js";
+import { formatCreatorRegistry } from "./editool-creator-format.js";
 
 // Local-only editorial tool server. Serves editool.html and read/save endpoints
 // over the curation source files. Never commits, never publishes, never touches
@@ -131,21 +132,6 @@ function readOptionalJson<T>(path: string): T | null {
   return existsSync(path) ? readJson<T>(path) : null;
 }
 
-// creators.json keeps its one-entry-per-line style so tool saves don't churn
-// formatting on a committed file. Keys in fixed order, JSON-safe per value.
-function formatCreators(source: CreatorRegistrySource): string {
-  const lines = source.creators.map((entry) => {
-    const parts = [`"handle": ${JSON.stringify(entry.handle)}`];
-    if (entry.roles !== undefined) parts.push(`"roles": ${JSON.stringify(entry.roles)}`);
-    parts.push(`"watch": ${JSON.stringify(entry.watch ?? false)}`);
-    parts.push(`"featured": ${JSON.stringify(entry.featured ?? false)}`);
-    if (entry.aliases?.length) parts.push(`"aliases": ${JSON.stringify(entry.aliases)}`);
-    if (entry.notes) parts.push(`"notes": ${JSON.stringify(entry.notes)}`);
-    return `    { ${parts.join(", ")} }`;
-  });
-  return `{\n  "creators": [\n${lines.join(",\n")}\n  ]\n}\n`;
-}
-
 // ---------- v2 transitional policy (read-only display) ----------
 // Legacy exclusions remain effective until observe reports approve enforcement.
 // Root-path invalidity already comes from its maintained policy source.
@@ -201,7 +187,7 @@ type RemovalsSource = {
 
 function serializeEditoolPolicySource(key: EditoolPolicySourceKey, value: unknown): string {
   return key === "creators"
-    ? formatCreators(value as CreatorRegistrySource)
+    ? formatCreatorRegistry(value as CreatorRegistrySource)
     : `${JSON.stringify(value, null, 2)}\n`;
 }
 

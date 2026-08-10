@@ -247,6 +247,43 @@ function validateCreators(loaded: LoadedPolicySources, issues: PolicyIssue[]): v
         message: "Creator roles must be an array.",
       }));
     }
+    if (
+      entry.skillCoverage !== undefined
+      && entry.skillCoverage !== "all"
+      && entry.skillCoverage !== "selected"
+    ) {
+      issues.push(issue(loaded, {
+        code: "invalid-creator-skill-coverage",
+        source: "creators",
+        location: `/creators/${index}/skillCoverage`,
+        message: "Creator skillCoverage must be all or selected.",
+      }));
+    }
+    if (entry.skillRepos !== undefined) {
+      if (requireArray(loaded, "creators", entry.skillRepos, `/creators/${index}/skillRepos`, issues)) {
+        const seen = new Set<string>();
+        entry.skillRepos.forEach((repo, repoIndex) => {
+          const normalized = validateRepoValue(
+            loaded,
+            "creators",
+            repo,
+            `/creators/${index}/skillRepos/${repoIndex}`,
+            issues,
+          );
+          if (!normalized) return;
+          if (seen.has(normalized)) {
+            addDuplicate(
+              loaded,
+              "creators",
+              `/creators/${index}/skillRepos/${repoIndex}`,
+              normalized,
+              issues,
+            );
+          }
+          seen.add(normalized);
+        });
+      }
+    }
   });
   try {
     buildCreatorRegistry(value as PolicySources["creators"]);

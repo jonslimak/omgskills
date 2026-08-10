@@ -183,3 +183,44 @@ test("rejects malformed policy entries instead of silently skipping them", () =>
   const loaded = fixture({ repoOverrides: ["not-an-object" as never] });
   assert.ok(validatePolicy(loaded).some((entry) => entry.code === "invalid-repo-override-entry"));
 });
+
+test("validates creator coverage fields through shared policy validation", () => {
+  const valid = fixture({
+    creators: {
+      creators: [{
+        handle: "openai",
+        roles: ["vendor"],
+        watch: true,
+        featured: true,
+        skillCoverage: "selected",
+        skillRepos: ["openai/codex"],
+      }],
+    },
+  });
+  assert.equal(validatePolicyStructure(valid).length, 0);
+
+  const invalidRepo = fixture({
+    creators: {
+      creators: [{
+        handle: "openai",
+        watch: true,
+        skillCoverage: "selected",
+        skillRepos: ["https://github.com/openai/codex"],
+      }],
+    },
+  });
+  assert.ok(validatePolicyStructure(invalidRepo).some((entry) => entry.code === "invalid-repo"));
+
+  const invalidCoverage = fixture({
+    creators: {
+      creators: [{
+        handle: "openai",
+        watch: true,
+        skillCoverage: "sometimes" as "all",
+      }],
+    },
+  });
+  assert.ok(validatePolicyStructure(invalidCoverage).some((entry) =>
+    entry.code === "invalid-creator-skill-coverage"
+  ));
+});

@@ -159,3 +159,103 @@ test("creator registry rejects unknown roles", () => {
     /unknown role partner/,
   );
 });
+
+test("creator registry accepts reviewed all and selected skill coverage", () => {
+  const seeds = buildTrustedSeeds({
+    creatorRegistryJson: {
+      creators: [
+        {
+          handle: "FullCoverage",
+          roles: ["creator"],
+          watch: true,
+          skillCoverage: "all",
+          skillRepos: ["FullCoverage/oversized-skills"],
+        },
+        {
+          handle: "SelectedCoverage",
+          roles: ["creator"],
+          watch: true,
+          skillCoverage: "selected",
+          skillRepos: ["SelectedCoverage/skills"],
+        },
+      ],
+    },
+    officialJson: {},
+    manualIncludeJson: {},
+    doNotCrawlJson: {},
+    overridesJson: [],
+    catalogJson: [],
+    provenanceJson: [],
+  });
+
+  assert.ok(seeds.watchedCreatorHandles?.has("fullcoverage"));
+  assert.ok(seeds.watchedCreatorHandles?.has("selectedcoverage"));
+});
+
+test("creator registry requires watch for skill coverage", () => {
+  assert.throws(
+    () => buildTrustedSeeds({
+      creatorRegistryJson: {
+        creators: [{ handle: "Unwatched", watch: false, skillCoverage: "all" }],
+      },
+      officialJson: {},
+      manualIncludeJson: {},
+      doNotCrawlJson: {},
+      overridesJson: [],
+      catalogJson: [],
+      provenanceJson: [],
+    }),
+    /skill coverage requires watch=true/,
+  );
+});
+
+test("creator registry requires repos for selected coverage", () => {
+  assert.throws(
+    () => buildTrustedSeeds({
+      creatorRegistryJson: {
+        creators: [{ handle: "Selected", watch: true, skillCoverage: "selected" }],
+      },
+      officialJson: {},
+      manualIncludeJson: {},
+      doNotCrawlJson: {},
+      overridesJson: [],
+      catalogJson: [],
+      provenanceJson: [],
+    }),
+    /selected coverage requires skillRepos/,
+  );
+});
+
+test("creator registry rejects skill repos without coverage and normalized duplicates", () => {
+  const base = {
+    officialJson: {},
+    manualIncludeJson: {},
+    doNotCrawlJson: {},
+    overridesJson: [],
+    catalogJson: [],
+    provenanceJson: [],
+  };
+  assert.throws(
+    () => buildTrustedSeeds({
+      ...base,
+      creatorRegistryJson: {
+        creators: [{ handle: "MissingMode", watch: true, skillRepos: ["owner/repo"] }],
+      },
+    }),
+    /skillRepos requires skillCoverage/,
+  );
+  assert.throws(
+    () => buildTrustedSeeds({
+      ...base,
+      creatorRegistryJson: {
+        creators: [{
+          handle: "DuplicateRepos",
+          watch: true,
+          skillCoverage: "selected",
+          skillRepos: ["Owner/Repo", "owner/repo"],
+        }],
+      },
+    }),
+    /duplicate skill repo owner\/repo/,
+  );
+});

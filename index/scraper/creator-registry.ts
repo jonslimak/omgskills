@@ -1,9 +1,14 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { normalizePolicyHandle } from "../../scripts/policy-identifiers.mjs";
+import {
+  isValidPolicyRepo,
+  normalizePolicyHandle,
+  normalizePolicyRepo,
+} from "../../scripts/policy-identifiers.mjs";
 
 export type CreatorRegistryRole = "vendor" | "creator";
+export type CreatorSkillCoverage = "all" | "selected";
 
 export type CreatorRegistryEntry = {
   handle: string;
@@ -11,6 +16,8 @@ export type CreatorRegistryEntry = {
   watch?: boolean;
   featured?: boolean;
   aliases?: string[];
+  skillCoverage?: CreatorSkillCoverage;
+  skillRepos?: string[];
   notes?: string;
 };
 
@@ -78,6 +85,36 @@ export function buildCreatorRegistry(source: CreatorRegistrySource): CreatorRegi
 
     if (entry.featured && !entry.watch) {
       throw new Error(`Invalid creators.json entry for ${canonical}: featured creators must be watched.`);
+    }
+
+    const coverage = entry.skillCoverage;
+    if (coverage !== undefined && coverage !== "all" && coverage !== "selected") {
+      throw new Error(`Invalid creators.json entry for ${canonical}: skillCoverage must be all or selected.`);
+    }
+    if (coverage && !entry.watch) {
+      throw new Error(`Invalid creators.json entry for ${canonical}: skill coverage requires watch=true.`);
+    }
+    if (entry.skillRepos !== undefined && !coverage) {
+      throw new Error(`Invalid creators.json entry for ${canonical}: skillRepos requires skillCoverage.`);
+    }
+    if (entry.skillRepos !== undefined) {
+      if (!Array.isArray(entry.skillRepos) || entry.skillRepos.length === 0) {
+        throw new Error(`Invalid creators.json entry for ${canonical}: skillRepos must be a non-empty array.`);
+      }
+      const repos = new Set<string>();
+      for (const rawRepo of entry.skillRepos) {
+        if (typeof rawRepo !== "string" || !isValidPolicyRepo(rawRepo)) {
+          throw new Error(`Invalid creators.json entry for ${canonical}: skillRepos must use owner/repo.`);
+        }
+        const repo = normalizePolicyRepo(rawRepo);
+        if (repos.has(repo)) {
+          throw new Error(`Invalid creators.json entry for ${canonical}: duplicate skill repo ${repo}.`);
+        }
+        repos.add(repo);
+      }
+    }
+    if (coverage === "selected" && !entry.skillRepos?.length) {
+      throw new Error(`Invalid creators.json entry for ${canonical}: selected coverage requires skillRepos.`);
     }
   }
 
