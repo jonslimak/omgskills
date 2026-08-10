@@ -368,110 +368,119 @@
       color: rgba(29, 29, 31, 0.68);
     }
 
-    /* ── Reviews ── */
+    /* ── Library preview ── */
 
-    .reviews {
-      max-width: 800px;
+    .post-features {
+      max-width: 1100px;
       margin: 0 auto;
       padding: 104px 0 0;
     }
 
-    .reviews-header {
-      max-width: 620px;
-      margin: 0 auto 34px;
-      text-align: center;
-    }
-
-    .reviews-eyebrow {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .reviews h2 {
+    .library-preview h2 {
       font-family: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 32px;
       font-weight: 600;
       line-height: 1.1;
       letter-spacing: -0.04em;
       color: var(--text);
-      margin-bottom: 12px;
+      margin-bottom: 28px;
+      text-align: center;
     }
 
-    .reviews-intro {
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--muted);
+    .library-preview {
+      width: min(100%, 880px);
+      margin: 88px auto 0;
     }
 
-    .reviews-grid {
+    .library-preview-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
+      gap: 12px;
     }
 
-    .reviews-actions {
+    .post-features-actions {
       display: flex;
       justify-content: center;
-      margin-top: 74px;
     }
 
-    .review-card {
-      display: flex;
-      flex-direction: column;
-      padding: 22px;
-      border-radius: 20px;
-      background: #f4f4f7;
-    }
-
-    .review-card blockquote {
-      font-size: 12px;
-      line-height: 1.45;
+    .library-profile-card {
+      display: block;
+      padding: 16px;
+      border-radius: 10px;
+      background: #f5f5f7;
       color: var(--text);
+      text-decoration: none;
+      transition: background 0.15s ease;
     }
 
-    .review-stars {
-      color: #f5b301;
-      font-size: 15px;
-      letter-spacing: 0.08em;
-      margin-bottom: 14px;
+    .library-profile-card:hover,
+    .library-profile-card:focus-visible {
+      background: #f5f5f7;
     }
 
-    .review-author {
+    .library-profile-heading {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-top: 18px;
+      margin-bottom: 8px;
     }
 
-    .review-avatar {
-      width: 34px;
-      height: 34px;
+    .library-profile-heading h3 {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .library-profile-image {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      background: var(--text);
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #f5f5f7;
+      font-size: 14px;
     }
 
-    .review-name {
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.2;
-      color: var(--text);
+    .library-profile-image img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .review-role {
-      font-size: 12px;
-      line-height: 1.3;
+    .library-profile-card p {
+      font-size: 11px;
+      line-height: 1.45;
       color: var(--muted);
-      margin-top: 2px;
+    }
+
+    .library-profile-card .library-profile-subtitle {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .library-profile-description {
+      margin-top: 5px;
+    }
+
+    .library-preview-more {
+      display: block;
+      width: fit-content;
+      margin: 28px auto 0;
+      color: var(--muted);
+      font-size: 11px;
+      text-decoration: none;
+    }
+
+    .library-preview-more:hover,
+    .library-preview-more:focus-visible {
+      color: var(--text);
+      text-decoration: underline;
     }
 
     .faq {
@@ -890,6 +899,12 @@
 
     /* ── Mobile ── */
 
+    @media (min-width: 501px) and (max-width: 900px) {
+      .library-preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
     @media (max-width: 500px) {
       header {
         padding: 16px 20px;
@@ -965,7 +980,7 @@
         align-items: start;
       }
 
-      .reviews {
+      .post-features {
         padding-top: 80px;
       }
 
@@ -983,7 +998,7 @@
         padding: 0 16px;
       }
 
-      .reviews h2 {
+      .library-preview h2 {
         font-size: 28px;
       }
 
@@ -1007,7 +1022,7 @@
         min-width: 520px;
       }
 
-      .reviews-grid {
+      .library-preview-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1140,53 +1155,16 @@
       </div>
     </section>
 
-    <section class="reviews" aria-label="omgskills reviews">
-      <div class="reviews-header">
-        <h2>Its a SKILL.md issue</h2>
-        <p class="reviews-intro">Less repo-hopping, less copy-paste, more useful skills</p>
-      </div>
-
-      <div class="reviews-grid">
-        <article class="review-card">
-          <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <blockquote>“I stopped losing skills in bookmarks. omgskills gives me one place to find, read, and install the ones I actually use.”</blockquote>
-          <div class="review-author">
-            <span class="review-avatar" aria-hidden="true">JS</span>
-            <div>
-              <p class="review-name">Jon S.</p>
-              <p class="review-role">Agent workflow builder</p>
-            </div>
-          </div>
-        </article>
-
-        <article class="review-card">
-          <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <blockquote>“The trending feed makes discovery feel alive. I can see what people are sharing instead of guessing which repos matter.”</blockquote>
-          <div class="review-author">
-            <span class="review-avatar" aria-hidden="true">AC</span>
-            <div>
-              <p class="review-name">Alex C.</p>
-              <p class="review-role">Claude Code user</p>
-            </div>
-          </div>
-        </article>
-
-        <article class="review-card">
-          <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <blockquote>“Moving a skill from Claude to Codex used to be annoying. Now it feels like managing apps, not folders.”</blockquote>
-          <div class="review-author">
-            <span class="review-avatar" aria-hidden="true">MR</span>
-            <div>
-              <p class="review-name">Maya R.</p>
-              <p class="review-role">Independent developer</p>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="reviews-actions">
+    <section class="post-features">
+      <div class="post-features-actions">
         <a class="primary-button" href="/downloads/omgskills-mac.dmg" data-humblytics="Reviews Download Mac DMG"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download free - no signup required</a>
       </div>
+
+      <section class="library-preview" aria-labelledby="library-preview-title">
+        <h2 id="library-preview-title">The latest skills by trusted sources</h2>
+        <div class="library-preview-grid" id="library-preview-grid" aria-live="polite"></div>
+        <a class="library-preview-more" href="/skills/">See more skills by top creators</a>
+      </section>
 
       <section class="faq" aria-label="Frequently asked questions">
         <h2>Questions?</h2>
@@ -1261,6 +1239,68 @@
       return base + path + "?v=" + Date.now();
     }
 
+    const homepageProfiles = [
+      ["anthropics", "Anthropic"],
+      ["openai", "OpenAI"],
+      ["shadcn", "shadcn"],
+      ["github", "GitHub"],
+      ["mattpocock", "Matt Pocock"],
+      ["google-gemini", "Google Gemini"],
+      ["simonw", "Simon Willison"],
+      ["microsoft", "Microsoft"],
+      ["addyosmani", "Addy Osmani"],
+      ["stripe", "Stripe"],
+      ["steipete", "Peter Steinberger"],
+      ["huggingface", "Hugging Face"],
+      ["antfu", "Anthony Fu"],
+      ["supabase", "Supabase"],
+      ["obra", "Jesse Vincent (obra)"],
+      ["vercel-labs", "Vercel Labs"],
+      ["kepano", "Steph Ango (kepano)"],
+      ["garrytan", "Garry Tan"]
+    ];
+
+    function loadHomepageProfiles(track) {
+      return fetch(dataManifestUrl(track), { cache: "no-cache" })
+        .then(function(response) {
+          if (!response.ok) throw new Error(track + " manifest request failed");
+          return response.json();
+        })
+        .then(function(manifest) {
+          if (!manifest.collections || !manifest.collections.path) throw new Error("Missing collections data");
+          return fetch(dataAssetUrl(manifest.collections.path, track), { cache: "no-cache" });
+        })
+        .then(function(response) {
+          if (!response.ok) throw new Error(track + " collections request failed");
+          return response.json();
+        });
+    }
+
+    function renderHomepageProfiles(payload) {
+      const collections = Array.isArray(payload) ? payload : payload.collections;
+      const profilesByHandle = new Map((collections || [])
+        .filter(function(collection) { return collection.type === "author" && collection.authorHandle; })
+        .map(function(collection) { return [collection.authorHandle.toLowerCase(), collection]; }));
+
+      const cards = homepageProfiles.map(function(entry) {
+        const handle = entry[0];
+        const displayName = entry[1];
+        const profile = profilesByHandle.get(handle);
+        if (!profile) return "";
+        const imageUrl = profile.imageUrl || "https://github.com/" + encodeURIComponent(handle) + ".png?size=128";
+        const description = profile.description && profile.description !== profile.subtitle
+          ? '<p class="library-profile-description">' + dataEsc(profile.description) + '</p>'
+          : "";
+        return '<a class="library-profile-card" href="/library/' + encodeURIComponent(handle) + '/">' +
+          '<div class="library-profile-heading"><span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="' + dataEsc(imageUrl) + '" alt="' + dataEsc(displayName) + ' profile image" loading="lazy" decoding="async" onerror="this.remove()"></span><h3>' + dataEsc(displayName) + '</h3></div>' +
+          '<p class="library-profile-subtitle">' + dataEsc(profile.subtitle || ("Skills by " + displayName)) + '</p>' +
+          description + '</a>';
+      }).filter(Boolean);
+
+      if (!cards.length) throw new Error("No homepage profiles found");
+      document.getElementById("library-preview-grid").innerHTML = cards.join("");
+    }
+
     function loadHomepageData(track) {
       return fetch(dataManifestUrl(track), { cache: "no-cache" })
         .then(function(response) {
@@ -1321,6 +1361,17 @@
       .then(renderHomepageData)
       .catch(function(error) {
         document.getElementById("homepage-data").innerHTML = '<div class="data-status">Could not load leaderboards.</div>';
+        console.warn(error);
+      });
+
+    loadHomepageProfiles("v2")
+      .catch(function(error) {
+        console.warn("v2 profile load failed; falling back to legacy data", error);
+        return loadHomepageProfiles("legacy");
+      })
+      .then(renderHomepageProfiles)
+      .catch(function(error) {
+        document.querySelector(".library-preview").hidden = true;
         console.warn(error);
       });
 
