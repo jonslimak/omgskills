@@ -55,6 +55,38 @@ test("enrich hashes raw response bytes before UTF-8 decoding", async () => {
   }
 });
 
+test("missing required frontmatter is reported as a stable candidate failure", async () => {
+  const restoreFetch = mockFetchOnce(() => ({
+    ok: true,
+    status: 200,
+    text: "# Missing required frontmatter\n\nThis file cannot be admitted as a skill.",
+  }));
+
+  try {
+    const result = await enrichCandidate(
+      { id: "owner/repo:invalid", skill_md_path: "SKILL.md" },
+      new Map(),
+      new Map(),
+      "2026-08-10",
+      {
+        stars: 1,
+        lastUpdated: "2026-08-10T00:00:00Z",
+        tags: [],
+        githubUrl: "https://github.com/owner/repo",
+      },
+    );
+
+    assert.equal(result.skill, null);
+    assert.deepEqual(result.failure, {
+      scope: "candidate",
+      key: "owner/repo:invalid",
+      reason: "missing-frontmatter",
+    });
+  } finally {
+    restoreFetch();
+  }
+});
+
 test("cached enrich reuse preserves resolved skill_md_path and install_cmd", async () => {
   const restoreFetch = mockFetchOnce((url) => {
     if (url.includes("raw.githubusercontent.com/facebook/react/main/extract-errors/SKILL.md")) {

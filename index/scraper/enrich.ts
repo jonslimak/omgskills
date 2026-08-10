@@ -581,7 +581,14 @@ export async function enrichCandidate(
     const fm = parseFrontmatter(content);
     if (!fm?.name || !fm?.description) {
       console.warn(`[skip] ${c.id}: missing name/description in frontmatter`);
-      return { skill: null };
+      return {
+        skill: null,
+        failure: {
+          scope: "candidate",
+          key: c.id,
+          reason: "missing-frontmatter",
+        },
+      };
     }
 
     const name = stripSurrogates(normalize(fm.name));
