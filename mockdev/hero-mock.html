@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>omgskills — hero mock dev</title>
+<style>
+  /* ── Dev harness (black stage) ─────────────────────────────── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: #000;
+    display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  .stage { display: flex; flex-direction: column; align-items: center; }
+
+  /* ── Easing tokens (the getbb recipe) ──────────────────────── */
+  :root {
+    --exp: cubic-bezier(.16, 1, .3, 1);      /* expo-out: entrances */
+    --pop: cubic-bezier(.34, 1.56, .64, 1);  /* overshoot: pops */
+    --blue: #0a7aff;
+    --ink: #1d1d1f;
+    --desc: #86868b;
+  }
+
+  /* ── macOS menu bar fragment ───────────────────────────────── */
+  .menubar {
+    width: 460px; height: 30px;
+    background: rgba(28,28,30,.7);
+    backdrop-filter: blur(20px);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 4px; padding: 0 10px;
+    animation: .55s var(--exp) both mb-in;
+  }
+  .mb-glyph {
+    color: rgba(255,255,255,.75); font-size: 12px;
+    padding: 3px 7px; border-radius: 5px; line-height: 1;
+  }
+  .mb-glyph.owl {
+    background: rgba(255,255,255,0);
+    transition: background .18s;
+  }
+  .stage.open .mb-glyph.owl { background: rgba(255,255,255,.24); }
+  @keyframes mb-in { from { opacity: 0; transform: translateY(-8px); } }
+
+  /* ── Popover ───────────────────────────────────────────────── */
+  .pop-wrap { position: relative; margin-top: 10px; width: 400px; }
+  .pop-arrow {
+    position: absolute; top: -5px; right: 32px;
+    width: 14px; height: 14px; transform: rotate(45deg);
+    background: #f6f6f6; border-radius: 3px;
+    opacity: 0;
+  }
+  .popover {
+    width: 400px;
+    background: #f6f6f6;
+    border-radius: 12px;
+    box-shadow: 0 22px 70px rgba(0,0,0,.55), 0 2px 12px rgba(0,0,0,.35);
+    overflow: hidden;
+    padding-bottom: 8px;
+    opacity: 0;
+    transform-origin: top right;
+  }
+  .stage.open .popover { animation: .5s var(--pop) both pop-in; }
+  .stage.open .pop-arrow { animation: .3s var(--exp) .1s both arrow-in; }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(.96) translateY(-8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes arrow-in { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Toolbar: icon tabs, right-aligned (matches ContentView.toolbar) */
+  .toolbar {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 2px; padding: 14px 10px 6px;
+  }
+  .tab {
+    font-size: 12px; line-height: 1;
+    padding: 4px 7px; border-radius: 6px;
+    color: rgba(0,0,0,.28);
+  }
+  .tab.active { background: rgba(0,0,0,.1); color: var(--ink); }
+
+  /* Search field (matches searchField: leading 14, size 12) */
+  .search {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px 12px 14px;
+  }
+  .search-glyph { font-size: 12px; color: rgba(0,0,0,.35); }
+  .search-line { flex: 1; display: flex; align-items: center; font-size: 12px; color: var(--ink); }
+  .search-line .placeholder { color: rgba(0,0,0,.3); position: absolute; }
+  .stage.typing .placeholder, .stage.results .placeholder { opacity: 0; }
+  .qtext { white-space: pre; }
+  .caret {
+    width: 1px; height: 14px; margin-left: 1px;
+    background: var(--blue);
+    animation: caret-blink 1s steps(1) infinite;
+  }
+  @keyframes caret-blink { 50% { opacity: 0; } }
+
+  /* Rows (matches SkillRow: pad h12 v10, outer h8, radius 8, blue selection) */
+  .rows { padding: 0 8px; min-height: 288px; }
+  .row {
+    padding: 10px 12px; border-radius: 8px;
+    opacity: 0;
+  }
+  .stage.results .row { animation: .45s var(--exp) both row-in; }
+  .stage.results .row:nth-child(1) { animation-delay: .05s; }
+  .stage.results .row:nth-child(2) { animation-delay: .12s; }
+  .stage.results .row:nth-child(3) { animation-delay: .19s; }
+  .stage.results .row:nth-child(4) { animation-delay: .26s; }
+  @keyframes row-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .row-top { display: flex; align-items: baseline; gap: 6px; }
+  .rname { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .rauthor { font-size: 11px; color: rgba(0,0,0,.45); }
+  .rstars {
+    margin-left: auto; font-size: 11px; color: rgba(0,0,0,.45);
+    font-variant-numeric: tabular-nums; display: flex; gap: 4px; align-items: center;
+  }
+  .rdesc {
+    margin-top: 3px; font-size: 10px; line-height: 1.35; color: var(--desc);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  /* Selection + install morph */
+  .row.selected { background: var(--blue); transition: background .18s; }
+  .row.selected .rname { color: #fff; }
+  .row.selected .rauthor { color: rgba(255,255,255,.78); }
+  .row.selected .rstars { color: rgba(255,255,255,.78); }
+  .row.selected .rdesc { color: rgba(255,255,255,.62); }
+
+  .install {
+    display: none;
+    margin-left: 8px; font-size: 10px; font-weight: 600;
+    padding: 3px 8px; border-radius: 999px;
+    background: rgba(255,255,255,.22); color: #fff;
+  }
+  .row.selected .install { display: inline-block; animation: .34s var(--pop) both inst-in; }
+  .row.selected.installed .install { background: rgba(255,255,255,.92); color: var(--blue); }
+  @keyframes inst-in { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
+
+  /* Footer hint (matches app footer hints) */
+  .foot {
+    display: flex; justify-content: space-between;
+    padding: 10px 18px 6px; font-size: 9px; color: rgba(0,0,0,.3);
+  }
+
+  /* Dev HUD */
+  .hud {
+    position: fixed; bottom: 14px; left: 14px;
+    color: rgba(255,255,255,.35); font-size: 11px; font-family: ui-monospace, monospace;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .popover, .row, .pop-arrow, .menubar { animation: none !important; opacity: 1 !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="menubar">
+      <span class="mb-glyph">&#9889;</span>
+      <span class="mb-glyph">&#128246;</span>
+      <span class="mb-glyph owl">&#128064;</span>
+      <span class="mb-glyph">&#128267;</span>
+      <span class="mb-glyph">&#128269;</span>
+      <span class="mb-glyph" style="font-size:11px">Mon&nbsp;Aug&nbsp;10&nbsp;&nbsp;2:41&nbsp;PM</span>
+    </div>
+    <div class="pop-wrap">
+      <div class="pop-arrow"></div>
+      <div class="popover">
+        <div class="toolbar">
+          <span class="tab active">&#128269;</span>
+          <span class="tab">&#128293;</span>
+          <span class="tab">&#120143;</span>
+          <span class="tab">&#128229;</span>
+        </div>
+        <div class="search">
+          <span class="search-glyph">&#128269;</span>
+          <div class="search-line">
+            <span class="placeholder">Search for skills on Github...</span>
+            <span class="qtext" id="qtext"></span>
+            <span class="caret"></span>
+          </div>
+        </div>
+        <div class="rows" id="rows"></div>
+        <div class="foot"><span>&#8593;&#8595; navigate</span><span>&#9166; install</span><span>49,012 skills indexed</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="hud" id="hud">phase: boot</div>
+
+<script>
+/* Orchestrator: JS drives phases by toggling classes; CSS owns all motion.
+   Real catalog data baked in (names, authors, stars from the crawl4 index). */
+const SCENARIOS = [
+  { q: "design", rows: [
+    ["frontend-design", "@anthropics", "161k", "Create distinctive, production-grade frontend interfaces with high design quality."],
+    ["impeccable", "@pbakaus", "47k", "Design taste for AI harnesses — spacing, hierarchy, and restraint that make interfaces feel right."],
+    ["emil-design-eng", "@emilkowalski", "14k", "Skills for design engineers: motion, micro-interaction, and component craft."],
+    ["canvas-design", "@anthropics", "129k", "Guidelines for visual design work on canvas artifacts — layout, color, typography."],
+  ]},
+  { q: "playwright", rows: [
+    ["playwright-cli", "@microsoft", "188k", "Drive Playwright from the command line: run suites, trace failures, manage browsers."],
+    ["webapp-testing", "@anthropics", "129k", "Test web applications end-to-end: interactions, assertions, and visual verification."],
+    ["e2e-testing", "@affaan-m", "230k", "End-to-end testing patterns with Playwright — fixtures, parallelism, and CI wiring."],
+    ["playwright-skill", "@lackeyjb", "2.5k", "Browser automation for agents: navigate, click, extract, and verify with Playwright."],
+  ]},
+  { q: "seo", rows: [
+    ["seo", "@addyosmani", "78k", "Technical SEO audits: crawlability, metadata, structured data, and Core Web Vitals."],
+    ["aso-audit", "@coreyhaines31", "27k", "Audit App Store listings: keywords, screenshots, conversion drivers, and ratings."],
+    ["claude-seo", "@agricidaniel", "11k", "SEO workflows for Claude: content briefs, internal linking, and SERP analysis."],
+    ["seo-content-brief", "@coreyhaines31", "11k", "Generate data-backed content briefs with target queries, outlines, and entities."],
+  ]},
+];
+
+const stage = document.getElementById("stage");
+const qtext = document.getElementById("qtext");
+const rowsEl = document.getElementById("rows");
+const hud = document.getElementById("hud");
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+const setPhase = (p) => { hud.textContent = "phase: " + p; };
+
+function renderRows(rows) {
+  rowsEl.innerHTML = rows.map(([name, author, stars, desc]) => `
+    <div class="row">
+      <div class="row-top">
+        <span class="rname">${name}</span>
+        <span class="rauthor">${author}</span>
+        <span class="install">Install</span>
+        <span class="rstars">&#9733; ${stars}</span>
+      </div>
+      <div class="rdesc">${desc}</div>
+    </div>`).join("");
+}
+
+async function typeQuery(q) {
+  stage.classList.add("typing");
+  for (const ch of q) {
+    qtext.textContent += ch;
+    await wait(85 + Math.random() * 55);
+  }
+}
+
+async function runScenario(s, isFirst) {
+  setPhase("type: " + s.q);
+  await typeQuery(s.q);
+  await wait(220);
+
+  setPhase("results");
+  renderRows(s.rows);
+  stage.classList.add("results");
+  await wait(900);
+
+  setPhase("select");
+  const first = rowsEl.querySelector(".row");
+  first.classList.add("selected");
+  await wait(950);
+
+  setPhase("install");
+  first.classList.add("installed");
+  first.querySelector(".install").innerHTML = "&#10003; Installed";
+  await wait(1400);
+
+  setPhase("clear");
+  stage.classList.remove("results");
+  await wait(350);
+  rowsEl.innerHTML = "";
+  // erase query
+  while (qtext.textContent.length) {
+    qtext.textContent = qtext.textContent.slice(0, -2);
+    await wait(24);
+  }
+  stage.classList.remove("typing");
+  await wait(500);
+}
+
+async function loop() {
+  await wait(600);
+  setPhase("open");
+  stage.classList.add("open");
+  await wait(750);
+  let i = 0;
+  for (;;) {
+    await runScenario(SCENARIOS[i % SCENARIOS.length], i === 0);
+    i++;
+  }
+}
+loop();
+</script>
+</body>
+</html>
