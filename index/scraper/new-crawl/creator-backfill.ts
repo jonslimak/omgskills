@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { octokit } from "../client.js";
+import { enrichCandidate, type Candidate } from "../enrich.js";
 import {
   loadCreatorRegistry,
   normalizeCreatorHandle,
@@ -9,26 +10,54 @@ import {
 } from "../creator-registry.js";
 import type { Skill } from "../types.js";
 import { effectivePolicyDigest } from "../policy/digest.js";
-import { evaluateEffectiveRepoPolicy } from "../policy/effective-policy.js";
+import {
+  evaluateEffectiveRepoPolicy,
+  evaluateEffectiveSkillPolicy,
+  repoFromGithubUrl,
+} from "../policy/effective-policy.js";
 import { loadPolicySources, typedPolicySources } from "../policy/loader.js";
+import { toShadowSkillRecord } from "./add-curated-skill.js";
 import { isKnownCatalogRepo } from "./catalog-policy.js";
+import {
+  executeCreatorBackfillApply,
+  parseCreatorBackfillApplyLimit,
+  type CreatorBackfillApplyProgress,
+  type CreatorBackfillPersistResult,
+} from "./creator-backfill-apply.js";
 import {
   buildCreatorBackfillPlan,
   CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM,
+  CREATOR_BACKFILL_PLAN_VERSION,
   CREATOR_BACKFILL_QUOTA_RESERVE,
   executeCreatorBackfillPlan,
   selectCreatorBackfillCoverageEntries,
   type CreatorBackfillPlan,
   type CreatorBackfillRepoScan,
 } from "./creator-backfill-plan.js";
-import { assertGitHubCoreQuotaAvailable } from "./github-quota-guard.js";
+import {
+  assertGitHubCoreQuotaAvailable,
+  getGitHubCoreQuota,
+} from "./github-quota-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import type { ShadowSkillOverlay, TrustedSeeds } from "./types.js";
-import { normalizePolicyRepo } from "../../../scripts/policy-identifiers.mjs";
+import {
+  normalizePolicyRepo,
+  normalizePolicySkillId,
+} from "../../../scripts/policy-identifiers.mjs";
+import { deriveSkillPathFromId } from "./candidate-path.js";
+import {
+  commitShadowSkillPersistence,
+  CREATOR_BACKFILL_SOURCE,
+  loadShadowSkillPersistenceSnapshot,
+  prepareShadowSkillPersistence,
+  type ShadowSkillPersistenceAddition,
+} from "./shadow-skill-persistence.js";
 
 const planPath = join(shadowRoot, "creator-backfill.plan.json");
+const progressPath = join(shadowRoot, "creator-backfill.apply.json");
 const quotaRecheckTreeInterval = 25;
+const applyQuotaSafetyBuffer = 100;
 
 type RepoMetadata = {
   repo: string;
@@ -46,11 +75,11 @@ function readJson<T>(path: string, fallback: T): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
 }
 
-function atomicWritePlan(path: string, plan: CreatorBackfillPlan): void {
+function atomicWriteShadowJson(path: string, value: unknown): void {
   assertShadowPath(path);
   mkdirSync(dirname(path), { recursive: true });
   const temporaryPath = `${path}.tmp-${process.pid}`;
-  writeFileSync(temporaryPath, `${JSON.stringify(plan, null, 2)}\n`, "utf8");
+  writeFileSync(temporaryPath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
   renameSync(temporaryPath, path);
 }
 
@@ -59,18 +88,39 @@ function sourceCommit(): string {
   return execFileSync("git", ["rev-parse", "HEAD"], { cwd: join(indexRoot, ".."), encoding: "utf8" }).trim();
 }
 
-function parseArguments(args: string[]): { creatorFilters: string[] } {
-  if (!args.includes("--plan")) {
-    throw new Error("Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner]");
+export function parseCreatorBackfillArguments(args: string[]): {
+  mode: "plan" | "apply";
+  creatorFilters: string[];
+  limit: number;
+} {
+  const plan = args.includes("--plan");
+  const apply = args.includes("--apply");
+  if (plan === apply) {
+    throw new Error(
+      "Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner] or --apply [--limit=125]",
+    );
   }
-  const unsupported = args.filter((arg) => arg !== "--plan" && !arg.startsWith("--creators="));
+  const supported = (arg: string) => arg === "--plan" || arg === "--apply"
+    || arg.startsWith("--creators=") || arg.startsWith("--limit=");
+  const unsupported = args.filter((arg) => !supported(arg));
   if (unsupported.length) throw new Error(`Unsupported creator backfill option: ${unsupported[0]}`);
+  if (plan && args.some((arg) => arg.startsWith("--limit="))) {
+    throw new Error("--limit is supported only with --apply.");
+  }
+  if (apply && args.some((arg) => arg.startsWith("--creators="))) {
+    throw new Error("--creators is supported only with --plan; apply uses the reviewed plan file.");
+  }
   const creatorFilters = args
     .filter((arg) => arg.startsWith("--creators="))
     .flatMap((arg) => arg.slice("--creators=".length).split(","))
     .map(normalizeCreatorHandle)
     .filter(Boolean);
-  return { creatorFilters: [...new Set(creatorFilters)].sort() };
+  const limitValue = args.find((arg) => arg.startsWith("--limit="))?.slice("--limit=".length);
+  return {
+    mode: plan ? "plan" : "apply",
+    creatorFilters: [...new Set(creatorFilters)].sort(),
+    limit: parseCreatorBackfillApplyLimit(limitValue),
+  };
 }
 
 function toRepoMetadata(repo: {
@@ -203,8 +253,55 @@ function loadExistingSkills(): Skill[] {
   return [...baseline, ...cutover, ...overlay.skills];
 }
 
-async function main(): Promise<void> {
-  const { creatorFilters } = parseArguments(process.argv.slice(2));
+function loadReviewedPlan(): CreatorBackfillPlan {
+  if (!existsSync(planPath)) {
+    throw new Error(`Missing reviewed creator backfill plan: ${planPath}. Run --plan first.`);
+  }
+  const plan = readJson<CreatorBackfillPlan | null>(planPath, null);
+  if (
+    !plan
+    || plan.version !== CREATOR_BACKFILL_PLAN_VERSION
+    || plan.complete !== true
+    || !Array.isArray(plan.candidates)
+  ) {
+    throw new Error(`Invalid or incomplete creator backfill plan: ${planPath}`);
+  }
+  return plan;
+}
+
+function normalizePath(value: string | null | undefined): string {
+  return (value ?? "").trim().replace(/^\.\//, "").toLowerCase();
+}
+
+function skillPath(skill: Skill): string | null {
+  if (skill.skill_md_path) return skill.skill_md_path;
+  const derived = deriveSkillPathFromId(skill.id);
+  if (derived) return derived;
+  return skill.id.includes(":") ? null : "SKILL.md";
+}
+
+function findExistingCandidate(
+  skills: Skill[],
+  candidate: CreatorBackfillPlan["candidates"][number],
+): Skill | null {
+  const normalizedId = normalizePolicySkillId(candidate.proposedId);
+  const repo = normalizePolicyRepo(candidate.repo);
+  const path = normalizePath(candidate.path);
+  return skills.find((skill) => {
+    if (normalizePolicySkillId(skill.id) === normalizedId) return true;
+    return repoFromGithubUrl(skill.github_url) === repo && normalizePath(skillPath(skill)) === path;
+  }) ?? null;
+}
+
+function firstSeenById(skills: Skill[]): Map<string, string> {
+  return new Map(skills.map((skill) => [skill.id, skill.first_seen]));
+}
+
+function skillsById(skills: Skill[]): Map<string, Skill> {
+  return new Map(skills.map((skill) => [skill.id, skill]));
+}
+
+async function runPlan(creatorFilters: string[]): Promise<void> {
   const registry = loadCreatorRegistry();
   const entries = selectCreatorBackfillCoverageEntries(registry.entries, creatorFilters, registry.aliasToCanonical);
   if (!entries.length) throw new Error("No creator skill coverage entries are configured.");
@@ -231,7 +328,7 @@ async function main(): Promise<void> {
       existingSkills,
       seeds,
     }),
-    write: (value) => atomicWritePlan(planPath, value),
+    write: (value) => atomicWriteShadowJson(planPath, value),
   });
 
   console.log(`creator backfill plan: ${planPath}`);
@@ -240,6 +337,142 @@ async function main(): Promise<void> {
   console.log(`  discovered SKILL.md files: ${plan.summary.discoveredSkillCount}`);
   console.log(`  candidates: ${plan.summary.candidateCount}`);
   console.log(`  excluded/review: ${plan.summary.excludedCount}`);
+}
+
+async function runApply(limit: number): Promise<void> {
+  const plan = loadReviewedPlan();
+  const registry = loadCreatorRegistry();
+  const seeds = loadTrustedSeeds("manual-command");
+  const loadedPolicy = loadPolicySources();
+  const currentPolicyDigest = effectivePolicyDigest(typedPolicySources(loadedPolicy));
+  if (currentPolicyDigest !== plan.policyDigest) {
+    console.warn("creator backfill policy changed since planning; candidates will use current policy");
+  }
+
+  const coverageCreators = new Set(
+    registry.entries
+      .filter((entry) => entry.watch && entry.skillCoverage)
+      .map((entry) => normalizeCreatorHandle(entry.handle)),
+  );
+  let currentSkills = loadExistingSkills();
+  const priorProgress = readJson<CreatorBackfillApplyProgress | null>(progressPath, null);
+
+  const progress = await executeCreatorBackfillApply({
+    plan,
+    progress: priorProgress,
+    limit,
+    now: () => new Date().toISOString(),
+    initialQuotaPreflight: async () => {
+      await assertGitHubCoreQuotaAvailable(
+        CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM,
+        "creator backfill apply",
+      );
+    },
+    reserveQuotaAvailable: async () => {
+      const quota = await getGitHubCoreQuota();
+      const minimum = CREATOR_BACKFILL_QUOTA_RESERVE + applyQuotaSafetyBuffer;
+      console.log(`  GitHub core quota recheck: ${quota.remaining} remaining; stop floor ${minimum}`);
+      return quota.remaining >= minimum;
+    },
+    reconcile: async (candidate) => {
+      const creator = registry.aliasToCanonical.get(normalizeCreatorHandle(candidate.creator))
+        ?? normalizeCreatorHandle(candidate.creator);
+      if (!coverageCreators.has(creator)) {
+        return { status: "policy-skipped", reason: "creator-coverage-removed" };
+      }
+      const repoPolicy = evaluateEffectiveRepoPolicy(candidate.repo, seeds);
+      if (repoPolicy.excluded) {
+        return { status: "policy-skipped", reason: repoPolicy.reasonCode ?? "repo-policy" };
+      }
+      if (isKnownCatalogRepo(candidate.repo, seeds.catalogRepoRules)) {
+        return { status: "policy-skipped", reason: "catalog-repo" };
+      }
+      const skillPolicy = evaluateEffectiveSkillPolicy({
+        id: candidate.proposedId,
+        github_url: candidate.repoUrl,
+      }, seeds);
+      if (skillPolicy.excluded) {
+        return { status: "policy-skipped", reason: skillPolicy.reasonCode ?? "skill-policy" };
+      }
+      const existing = findExistingCandidate(currentSkills, candidate);
+      return existing
+        ? { status: "existing", existingId: existing.id, reason: "current-shadow-state" }
+        : null;
+    },
+    enrich: async (candidate) => {
+      const enrichInput: Candidate = {
+        id: candidate.proposedId,
+        skill_md_path: candidate.path,
+        skill_name_hint: candidate.path.split("/").at(-2),
+        ref: candidate.defaultBranch,
+        github_url: candidate.repoUrl,
+        author_handle: candidate.creator,
+      };
+      const result = await enrichCandidate(
+        enrichInput,
+        firstSeenById(currentSkills),
+        skillsById(currentSkills),
+        new Date().toISOString().slice(0, 10),
+      );
+      if (!result.skill) {
+        return result.failure
+          ? { status: "stable-failed", reason: result.failure.reason }
+          : { status: "transient-failed", reason: "enrich-failed" };
+      }
+      if (repoFromGithubUrl(result.skill.github_url) !== normalizePolicyRepo(candidate.repo)) {
+        return { status: "policy-skipped", reason: "canonical-repo-mismatch" };
+      }
+      const shadowSkill = toShadowSkillRecord(result.skill, seeds);
+      if (shadowSkill.provenance_type !== "original") {
+        return { status: "policy-skipped", reason: `non-original-${shadowSkill.provenance_type}` };
+      }
+      return {
+        status: "addition",
+        addition: {
+          skill: shadowSkill,
+          repoKey: candidate.repo,
+          repoUrl: candidate.repoUrl,
+          source: CREATOR_BACKFILL_SOURCE,
+          isTrustedCreator: true,
+        },
+      };
+    },
+    persist: async (additions: ShadowSkillPersistenceAddition[]): Promise<CreatorBackfillPersistResult[]> => {
+      const generatedAt = new Date().toISOString();
+      const snapshot = loadShadowSkillPersistenceSnapshot(undefined, generatedAt);
+      const prepared = prepareShadowSkillPersistence({
+        snapshot,
+        additions,
+        generatedAt,
+        dedupeExactSha: true,
+      });
+      commitShadowSkillPersistence({ snapshot, prepared });
+      currentSkills = loadExistingSkills();
+      return prepared.outcomes.map((outcome) => ({
+        id: outcome.id,
+        status: outcome.status === "added" ? "added" : "existing",
+        existingId: outcome.existingId,
+        reason: outcome.status === "exact-sha-existing" ? "exact-sha-existing" : outcome.status,
+      }));
+    },
+    writeProgress: (value) => atomicWriteShadowJson(progressPath, value),
+  });
+
+  console.log(`creator backfill apply: ${progressPath}`);
+  console.log(`  stopped: ${progress.stoppedReason}`);
+  console.log(`  added: ${progress.summary.addedCount}`);
+  console.log(`  existing: ${progress.summary.existingCount}`);
+  console.log(`  policy skipped: ${progress.summary.policySkippedCount}`);
+  console.log(`  stable failed: ${progress.summary.stableFailedCount}`);
+  console.log(`  transient failed: ${progress.summary.transientFailedCount}`);
+  console.log(`  pending: ${progress.summary.pendingCount}`);
+  console.log("  publish: not run");
+}
+
+async function main(): Promise<void> {
+  const args = parseCreatorBackfillArguments(process.argv.slice(2));
+  if (args.mode === "plan") await runPlan(args.creatorFilters);
+  else await runApply(args.limit);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

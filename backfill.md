@@ -256,14 +256,18 @@ Completion gate:
 
 ### B4. Bounded apply runner
 
-- add `crawl4:creator-backfill -- --apply`
-- process `125` attempts by default with a hard maximum of `150`
-- reconcile the plan against current overlays before every batch
-- record added, existing, policy-skipped, stable-failed, and transient-failed outcomes
-- let stable failures advance without blocking later candidates
-- keep transient failures retryable
-- preserve the scheduled crawler's GitHub quota reserve
-- never publish automatically
+Status: complete and validated on 2026-08-10. No live backfill batch has been applied yet.
+
+- [x] add `crawl4:creator-backfill -- --apply`
+- [x] process `125` attempts by default with a hard maximum of `150`
+- [x] reconcile the plan against current overlays and policy before enrichment
+- [x] record added, existing, policy-skipped, stable-failed, and transient-failed outcomes
+- [x] persist resumable progress in `shadow/creator-backfill.apply.json`
+- [x] let stable failures advance without blocking later candidates
+- [x] keep transient failures retryable
+- [x] preserve the scheduled crawler's GitHub quota reserve
+- [x] validate and write successful additions transactionally in batches of `10`
+- [x] never publish automatically
 
 Completion gate:
 

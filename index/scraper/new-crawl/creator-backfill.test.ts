@@ -7,6 +7,7 @@ import {
   selectCreatorBackfillCoverageEntries,
   type CreatorBackfillRepoScan,
 } from "./creator-backfill-plan.js";
+import { parseCreatorBackfillArguments } from "./creator-backfill.js";
 import type { TrustedSeeds } from "./types.js";
 
 function seeds(overrides: Partial<TrustedSeeds> = {}): TrustedSeeds {
@@ -68,6 +69,22 @@ function build(scans: CreatorBackfillRepoScan[], existingSkills: Skill[] = [], t
     seeds: trustedSeeds,
   });
 }
+
+test("CLI keeps plan and bounded apply modes separate", () => {
+  assert.deepEqual(parseCreatorBackfillArguments(["--plan", "--creators=B,A"]), {
+    mode: "plan",
+    creatorFilters: ["a", "b"],
+    limit: 125,
+  });
+  assert.deepEqual(parseCreatorBackfillArguments(["--apply", "--limit=50"]), {
+    mode: "apply",
+    creatorFilters: [],
+    limit: 50,
+  });
+  assert.throws(() => parseCreatorBackfillArguments(["--plan", "--limit=2"]), /only with --apply/);
+  assert.throws(() => parseCreatorBackfillArguments(["--apply", "--creators=a"]), /only with --plan/);
+  assert.throws(() => parseCreatorBackfillArguments(["--plan", "--apply"]), /Usage/);
+});
 
 test("selects all and selected coverage entries and resolves alias filters", () => {
   const entries = [
