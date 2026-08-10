@@ -7,6 +7,10 @@ import {
   catalogSkillUrlsFilename,
   legacyCatalogSkillRedirects,
 } from "./web-library-skill-urls.mjs";
+import {
+  homepageLibraryPaths,
+  verifyHomepageLibraryPreview,
+} from "./homepage-library-preview.mjs";
 import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
@@ -490,6 +494,19 @@ async function verifyLocalGeneratedRedirects() {
   }
 }
 
+async function verifyLocalHomepageLibraryPreview() {
+  const filePath = path.join(siteDir, "index.html");
+  if (!(await fileExists(filePath))) {
+    throw new Error(`Missing homepage: ${filePath}`);
+  }
+  verifyHomepageLibraryPreview(await readFile(filePath, "utf8"), filePath);
+  for (const urlPath of homepageLibraryPaths) {
+    if (!(await localUrlExists(urlPath))) {
+      throw new Error(`${filePath} linked to a missing profile page: ${urlPath}`);
+    }
+  }
+}
+
 async function verifyLivePage(page) {
   const url = `${origin}${page.path}`;
   const response = await fetchLive(url, { redirect: "manual" });
@@ -502,6 +519,17 @@ async function verifyLivePage(page) {
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, url);
   assertIncludes(html, page.text, url);
   verifyMetadata(html, page, url);
+  await verifyLiveInternalLinks(html, url);
+}
+
+async function verifyLiveHomepageLibraryPreview() {
+  const url = `${origin}/`;
+  const response = await fetchLive(url, { redirect: "manual" });
+  if (response.status !== 200) {
+    throw new Error(`${url} returned ${response.status}, expected 200`);
+  }
+  const html = await response.text();
+  verifyHomepageLibraryPreview(html, url);
   await verifyLiveInternalLinks(html, url);
 }
 
@@ -602,6 +630,7 @@ async function verifyLiveRedirect(redirect) {
 
 async function main() {
   if (isLive) {
+    await verifyLiveHomepageLibraryPreview();
     for (const page of pages) await verifyLivePage(page);
     for (const file of rootFiles) await verifyLiveRootFile(file);
     const generatedUrlById = new Map(await verifyLiveCatalogSkillUrls());
@@ -622,6 +651,7 @@ async function main() {
   }
 
   for (const page of pages) await verifyLocalPage(page);
+  await verifyLocalHomepageLibraryPreview();
   for (const file of rootFiles) await verifyLocalRootFile(file);
   await verifyLocalCatalogSkillUrls();
   await verifyLocalGeneratedRedirects();

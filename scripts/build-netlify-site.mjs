@@ -4,6 +4,7 @@ import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { verifyReleaseDeployArtifacts, verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
+import { refreshHomepageLibraryPreview } from "./homepage-library-preview.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.join(repoRoot, "site");
@@ -112,6 +113,10 @@ async function main() {
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(outputDir, { recursive: true });
   await cp(siteDir, outputDir, { recursive: true });
+  await refreshHomepageLibraryPreview({
+    homepagePath: path.join(outputDir, "index.html"),
+    siteDir: outputDir,
+  });
   await verifyWebLibraryDeployArtifacts(outputDir, "Netlify deploy artifact");
   await verifyReleaseDeployArtifacts(outputDir, "Netlify deploy artifact");
   await rm(outputAppDir, { recursive: true, force: true });
