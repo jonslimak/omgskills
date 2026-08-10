@@ -1,25 +1,25 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { basename, join } from "node:path";
 import { enrichCandidate, type Candidate } from "../enrich.js";
 import type { Skill } from "../types.js";
 import { normalizePolicySkillId } from "../../../scripts/policy-identifiers.mjs";
 import { evaluateEffectiveSkillPolicy, repoFromGithubUrl } from "../policy/effective-policy.js";
 import { isKnownCatalogRepo } from "./catalog-policy.js";
-import { validateCutoverOutputs } from "./cutover-validation.js";
 import { resolveShadowProvenance } from "./provenance.js";
 import { loadTrustedSeeds } from "./seeds.js";
-import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
+import { indexRoot } from "./shadow-path-guard.js";
+import {
+  commitShadowSkillPersistence,
+  loadShadowSkillPersistenceSnapshot,
+  MANUAL_CURATION_SOURCE,
+  prepareShadowSkillPersistence,
+} from "./shadow-skill-persistence.js";
 import type {
-  ShadowCutoverSkillSignal,
-  ShadowRepoIndex,
-  ShadowRepoIndexEntry,
-  ShadowRepoOverlay,
-  ShadowSkillOverlay,
   ShadowSkillRecord,
   TrustedSeeds,
 } from "./types.js";
 
-const MANUAL_SOURCE = "manual-curation";
+export { upsertCutoverSkill, upsertRepoEntry, upsertShadowSkillOverlay } from "./shadow-skill-persistence.js";
 
 export type ParsedGithubSkillUrl = {
   owner: string;
@@ -34,18 +34,6 @@ export type ParsedGithubSkillUrl = {
 function readJson<T>(path: string, fallback: T): T {
   if (!existsSync(path)) return fallback;
   return JSON.parse(readFileSync(path, "utf8")) as T;
-}
-
-function writeShadowJson(path: string, value: unknown): void {
-  assertShadowPath(path);
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.tmp`;
-  writeFileSync(tmp, JSON.stringify(value, null, 2) + "\n", "utf8");
-  renameSync(tmp, path);
-}
-
-function sortUnique(values: string[]): string[] {
-  return [...new Set(values.filter(Boolean))].sort();
 }
 
 export function normalizeSkillSlug(value: string): string {
@@ -157,58 +145,6 @@ export function toShadowSkillRecord(skill: Skill, seeds = loadTrustedSeeds("manu
   };
 }
 
-export function upsertShadowSkillOverlay(
-  overlay: ShadowSkillOverlay,
-  skill: ShadowSkillRecord,
-  generatedAt: string,
-): ShadowSkillOverlay {
-  const byId = new Map(overlay.skills.map((existing) => [existing.id, existing]));
-  byId.set(skill.id, skill);
-  const skills = [...byId.values()].sort((a, b) => a.id.localeCompare(b.id));
-  return { generatedAt, skillCount: skills.length, skills };
-}
-
-export function upsertCutoverSkill(skills: ShadowSkillRecord[], skill: ShadowSkillRecord): ShadowSkillRecord[] {
-  const byId = new Map(skills.map((existing) => [existing.id, existing]));
-  byId.set(skill.id, skill);
-  return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id));
-}
-
-export function upsertRepoEntry(
-  repoIndex: ShadowRepoIndex,
-  skill: ShadowSkillRecord,
-  parsed: Pick<ParsedGithubSkillUrl, "repoKey" | "repoUrl">,
-  generatedAt: string,
-): ShadowRepoIndex {
-  const byRepo = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
-  const existing = byRepo.get(parsed.repoKey);
-  const skillIds = sortUnique([...(existing?.skillIds ?? []), skill.id]);
-  const entry: ShadowRepoIndexEntry = {
-    repo: parsed.repoKey,
-    repoUrl: existing?.repoUrl ?? parsed.repoUrl,
-    state: existing?.state ?? "library",
-    discoveredSources: sortUnique([...(existing?.discoveredSources ?? []), MANUAL_SOURCE]),
-    skillIds,
-    skillCount: skillIds.length,
-    stars: Math.max(existing?.stars ?? 0, skill.stars),
-    lastSeenAt: generatedAt,
-    lastRefreshedAt: generatedAt,
-    lastCheapCheckedAt: generatedAt,
-    lastObservedRepoUpdatedAt: skill.last_updated,
-    trustSignals: sortUnique(existing?.trustSignals ?? []),
-    promotionReasons: sortUnique([...(existing?.promotionReasons ?? []), MANUAL_SOURCE]),
-    staleOrInvalidState: null,
-    isTrustedVendor: existing?.isTrustedVendor ?? false,
-    isTrustedCreator: existing?.isTrustedCreator ?? false,
-    isGoldBasketRepo: existing?.isGoldBasketRepo ?? false,
-    topSkillId: existing?.topSkillId && skillIds.includes(existing.topSkillId) ? existing.topSkillId : skill.id,
-    topSkillStars: Math.max(existing?.topSkillStars ?? 0, skill.stars),
-  };
-  byRepo.set(parsed.repoKey, entry);
-  const repos = [...byRepo.values()].sort((a, b) => a.repo.localeCompare(b.repo));
-  return { generatedAt, repoCount: repos.length, repos };
-}
-
 function existingFirstSeen(skills: Skill[]): Map<string, string> {
   return new Map(skills.map((skill) => [skill.id, skill.first_seen]));
 }
@@ -230,20 +166,13 @@ async function main() {
   assertManualCandidateAllowed(parsed, seeds);
 
   const baselineSkillsPath = join(indexRoot, "skills.json");
-  const skillOverlayPath = join(shadowRoot, "skills.overlay.json");
-  const cutoverSkillsPath = join(shadowRoot, "skills.cutover.shadow.json");
-  const repoOverlayPath = join(shadowRoot, "repo-index.overlay.json");
-  const repoIndexPath = join(shadowRoot, "repo-index.shadow.json");
-  const signalsPath = join(shadowRoot, "skill-signals.cutover.shadow.json");
-
   const baselineSkills = readJson<Skill[]>(baselineSkillsPath, []);
-  const skillOverlay = readJson<ShadowSkillOverlay>(skillOverlayPath, { generatedAt, skillCount: 0, skills: [] });
-  const cutoverSkills = readJson<ShadowSkillRecord[]>(cutoverSkillsPath, []);
-  if (cutoverSkills.length === 0) {
+  const snapshot = loadShadowSkillPersistenceSnapshot(undefined, generatedAt);
+  if (snapshot.cutoverSkills.length === 0) {
     throw new Error("Missing shadow/skills.cutover.shadow.json. Run a Crawl 4 shadow crawl once before manual curation.");
   }
 
-  const priorSkills = [...baselineSkills, ...skillOverlay.skills, ...cutoverSkills];
+  const priorSkills = [...baselineSkills, ...snapshot.skillOverlay.skills, ...snapshot.cutoverSkills];
   const existing = findIdempotentManualSkill(parsed, priorSkills);
   if (existing) {
     console.log(`already present: ${existing.id}`);
@@ -265,23 +194,17 @@ async function main() {
     throw new Error(`Manual curation blocked by non-original provenance: ${shadowSkill.id}`);
   }
 
-  const repoOverlay = readJson<ShadowRepoOverlay>(repoOverlayPath, { generatedAt, repoCount: 0, repos: [] });
-  const repoIndex = readJson<ShadowRepoIndex>(repoIndexPath, { generatedAt, repoCount: 0, repos: [] });
-  const signals = readJson<ShadowCutoverSkillSignal[]>(signalsPath, []);
-
-  const nextOverlay = upsertShadowSkillOverlay(skillOverlay, shadowSkill, generatedAt);
-  const nextCutoverSkills = upsertCutoverSkill(cutoverSkills, shadowSkill);
-  const nextRepoOverlay = upsertRepoEntry(repoOverlay, shadowSkill, parsed, generatedAt);
-  const nextRepoIndex = upsertRepoEntry(repoIndex, shadowSkill, parsed, generatedAt);
-  const validationFailures = validateCutoverOutputs(nextCutoverSkills, signals, nextRepoIndex);
-  if (validationFailures.length > 0) {
-    throw new Error(`Manual curation would break cutover validation: ${validationFailures[0]?.details}`);
-  }
-
-  writeShadowJson(skillOverlayPath, nextOverlay);
-  writeShadowJson(cutoverSkillsPath, nextCutoverSkills);
-  writeShadowJson(repoOverlayPath, nextRepoOverlay);
-  writeShadowJson(repoIndexPath, nextRepoIndex);
+  const prepared = prepareShadowSkillPersistence({
+    snapshot,
+    additions: [{
+      skill: shadowSkill,
+      repoKey: parsed.repoKey,
+      repoUrl: parsed.repoUrl,
+      source: MANUAL_CURATION_SOURCE,
+    }],
+    generatedAt,
+  });
+  commitShadowSkillPersistence({ snapshot, prepared });
 
   console.log(`added ${shadowSkill.id}`);
   console.log(`name: ${shadowSkill.name}`);

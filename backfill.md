@@ -216,15 +216,17 @@ Completion gate:
 
 ### B2. Read-only backfill planner
 
-- add `crawl4:creator-backfill -- --plan`
-- enumerate approved creators and repositories
-- inspect repository trees for exact `SKILL.md` filenames at any depth
-- canonicalize redirected repository names
-- exclude existing, suppressed, catalog, and do-not-crawl candidates
-- apply the large-repository review guard
-- report candidate counts by creator and repository
-- run the GitHub quota preflight
-- write only `shadow/creator-backfill.plan.json`
+Status: complete and validated on 2026-08-10. The reviewed plan found `85` candidates across `3` creators; exact-SHA checks remain required during apply.
+
+- [x] add `crawl4:creator-backfill -- --plan`
+- [x] enumerate approved creators and repositories
+- [x] inspect repository trees for exact `SKILL.md` filenames at any depth
+- [x] canonicalize redirected repository names
+- [x] exclude existing, suppressed, catalog, and do-not-crawl candidates
+- [x] apply the large-repository review guard
+- [x] report candidate counts by creator and repository
+- [x] run the GitHub quota preflight
+- [x] write only `shadow/creator-backfill.plan.json`
 
 Completion gate:
 
@@ -235,12 +237,15 @@ Completion gate:
 
 ### B3. Shared batch persistence helper
 
-- extract reusable shadow persistence from `crawl4:add-skill`
-- support multiple skills in the same existing repository
-- preserve existing repository state
-- set `creator-backfill` source/reason for backfill additions
-- validate the complete proposed cutover before atomic writes
-- keep `crawl4:add-skill` behavior unchanged
+Status: complete and validated on 2026-08-10.
+
+- [x] extract reusable shadow persistence from `crawl4:add-skill`
+- [x] support multiple skills in the same existing repository
+- [x] preserve existing repository state
+- [x] set `creator-backfill` source/reason for backfill additions
+- [x] skip exact-SHA backfill duplicates before persistence
+- [x] validate the complete proposed cutover before guarded transactional writes
+- [x] keep `crawl4:add-skill` behavior unchanged
 
 Completion gate:
 
