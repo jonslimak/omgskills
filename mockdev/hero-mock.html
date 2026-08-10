@@ -133,6 +133,9 @@
   .stage.results .row:nth-child(8)  { animation-delay: .39s; }
   .stage.results .row:nth-child(9)  { animation-delay: .44s; }
   .stage.results .row:nth-child(10) { animation-delay: .49s; }
+  .stage.results .row:nth-child(11) { animation-delay: .54s; }
+  .stage.results .row:nth-child(12) { animation-delay: .59s; }
+  .stage.results .row:nth-child(13) { animation-delay: .64s; }
   @keyframes row-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   .row-top { display: flex; align-items: baseline; gap: 7px; }
   .rname { font-size: 13px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -385,6 +388,9 @@ const SCENARIOS = [
       ["ios-app-intents", "@openai", "5k", "Design App Intents, app entities, and App Shortcuts for iOS system surfaces."],
       ["ios-debugger-agent", "@openai", "5k", "Build, run, and debug iOS apps on Simulator with XcodeBuildMCP."],
       ["ios-memgraph-leaks", "@openai", "5k", "Capture and inspect iOS leaks and memgraphs when debugging leaked objects and retain cycles."],
+      ["ios-ettrace-performance", "@openai", "5k", "Capture and interpret iOS Simulator ETTrace profiles when profiling launch or runtime latency."],
+      ["ios-debugger-agent", "@dimillian", "3.9k", "Use XcodeBuildMCP to build, run, launch, and debug the current iOS project on a booted simulator."],
+      ["argent-ios-simulator-setup", "@software-mansion", "1.9k", "Set up and manage iOS Simulator environments for agent-driven build and test workflows."],
     ],
     detail: {
       name: "ios-clean", author: "@garrytan", stars: "123.8k", updated: "Updated 3w ago",
@@ -413,6 +419,9 @@ const SCENARIOS = [
       ["brand-guidelines", "@anthropics", "128.9k", "Applies official brand colors and typography to any artifact that benefits from consistent branding."],
       ["design-md", "@google-labs-code", "25.9k", "Design specs as markdown — components, tokens, and layout described for agents."],
       ["make-interfaces-feel-better", "@jakubkrehel", "2.4k", "Micro-interaction and motion polish for interfaces that feel alive."],
+      ["web-artifacts-builder", "@anthropics", "128.9k", "Build interactive web artifacts — components, pages, and visualizations with production polish."],
+      ["liquid-glass-design", "@affaan-m", "228.7k", "Liquid-glass visual language: translucency, depth, and refraction for modern interfaces."],
+      ["frontend-slides", "@anthropics", "228.7k", "Presentation slides as web pages — typography-first deck design for talks and demos."],
     ],
     detail: {
       name: "frontend-design", author: "@anthropics", stars: "161k", updated: "Updated 1w ago",
