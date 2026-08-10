@@ -75,11 +75,11 @@
 
   /* ── top controls ── */
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 0; }
-  .fav { font-size: 14px; color: var(--faint); }
+  .fav { font-size: 13px; color: var(--faint); }
   .mode { display: flex; gap: 6px; }
   .mode span {
-    font-size: 13px; color: var(--faint);
-    width: 30px; height: 24px; border-radius: 7px;
+    font-size: 12px; color: var(--faint);
+    width: 28px; height: 22px; border-radius: 6px;
     display: inline-flex; align-items: center; justify-content: center;
     transition: background .2s, color .2s;
   }
@@ -90,7 +90,7 @@
     display: flex; align-items: center;
     padding: 10px 16px 12px; border-bottom: 1px solid var(--line);
   }
-  .search-line { flex: 1; position: relative; display: flex; align-items: center; font-size: 12.5px; color: var(--ink); }
+  .search-line { flex: 1; position: relative; display: flex; align-items: center; font-size: 12px; color: var(--ink); }
   .placeholder { position: absolute; color: rgba(0,0,0,.28); transition: opacity .15s; }
   .stage.hasquery .placeholder { opacity: 0; }
   .qtext { white-space: pre; }
@@ -198,15 +198,15 @@
   .stage.deviceview .device { display: flex; }
   .stage.deviceview .cols { display: none; }
   .tabs { display: flex; justify-content: center; padding: 10px 16px 12px; }
-  .tabitem { font-size: 12.5px; color: var(--gray); padding: 0 20px; border-left: 1px solid var(--line); }
+  .tabitem { font-size: 11.5px; color: var(--gray); padding: 0 18px; border-left: 1px solid var(--line); }
   .tabitem:first-child { border-left: none; }
   .tabitem b { color: var(--ink); font-weight: 700; margin-left: 5px; }
-  .dev-h { font-size: 11.5px; font-weight: 500; color: rgba(0,0,0,.3); padding: 8px 26px 4px; }
+  .dev-h { font-size: 10.5px; font-weight: 500; color: rgba(0,0,0,.3); padding: 8px 26px 4px; }
   .dev-rows { padding: 0 10px; }
   .drow {
     display: flex; align-items: center;
-    padding: 8.5px 16px; border-radius: 9px;
-    font-size: 13px; font-weight: 600; color: var(--ink);
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; color: var(--ink);
     opacity: 0;
   }
   .stage.deviceview .drow { animation: .4s var(--exp) both row-in; }
@@ -220,15 +220,15 @@
   .stage.deviceview .drow:nth-child(8)  { animation-delay: .33s; }
   .stage.deviceview .drow:nth-child(9)  { animation-delay: .37s; }
   .stage.deviceview .drow:nth-child(10) { animation-delay: .41s; }
-  .drow .harness { margin-left: auto; font-weight: 600; font-size: 11px; color: var(--gray); }
-  .drow .age { width: 46px; text-align: right; font-weight: 400; font-size: 11px; color: rgba(0,0,0,.3); }
+  .drow .harness { margin-left: auto; font-weight: 600; font-size: 10px; color: var(--gray); }
+  .drow .age { width: 42px; text-align: right; font-weight: 400; font-size: 10px; color: rgba(0,0,0,.3); }
   .drow.fresh { background: rgba(10,122,255,.08); }
   .drow.fresh .age { color: var(--blue); font-weight: 600; }
   .dev-foot { margin-top: auto; padding: 12px 26px 16px; }
-  .dev-foot .fh { font-size: 11.5px; font-weight: 500; color: rgba(0,0,0,.3); margin-bottom: 6px; }
+  .dev-foot .fh { font-size: 10.5px; font-weight: 500; color: rgba(0,0,0,.3); margin-bottom: 6px; }
   .dev-foot .field {
     border: 1px solid var(--line); border-radius: 9px;
-    padding: 8px 12px; font-size: 12.5px; color: rgba(0,0,0,.28);
+    padding: 7px 11px; font-size: 11.5px; color: rgba(0,0,0,.28);
     background: #fff;
   }
 
