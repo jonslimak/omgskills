@@ -3,6 +3,11 @@ import type { ShadowCadence } from "./types.js";
 
 export const COMBINED_GITHUB_CORE_QUOTA_MINIMUM = 2000;
 
+export type GitHubCoreQuota = {
+  remaining: number;
+  reset: number | undefined;
+};
+
 type GitHubRateLimitClient = {
   rest: {
     rateLimit: {
@@ -33,6 +38,32 @@ function formatResetTime(resetSeconds: number | undefined): string {
   return new Date(resetSeconds * 1000).toISOString();
 }
 
+export async function getGitHubCoreQuota(
+  client: GitHubRateLimitClient = octokit,
+): Promise<GitHubCoreQuota> {
+  const { data } = await client.rest.rateLimit.get();
+  const core = data.resources?.core ?? data.rate;
+  return {
+    remaining: core?.remaining ?? 0,
+    reset: core?.reset,
+  };
+}
+
+export async function assertGitHubCoreQuotaAvailable(
+  minimumRemaining: number,
+  operation: string,
+  client: GitHubRateLimitClient = octokit,
+): Promise<GitHubCoreQuota> {
+  const quota = await getGitHubCoreQuota(client);
+  if (quota.remaining < minimumRemaining) {
+    throw new Error(
+      `GitHub core quota too low for ${operation}: remaining=${quota.remaining}, required=${minimumRemaining}, reset=${formatResetTime(quota.reset)}`,
+    );
+  }
+  console.log(`  GitHub core quota preflight: ${quota.remaining} remaining`);
+  return quota;
+}
+
 export async function assertGitHubQuotaAvailable(
   cadence: ShadowCadence,
   client: GitHubRateLimitClient = octokit,
@@ -40,16 +71,5 @@ export async function assertGitHubQuotaAvailable(
 ): Promise<void> {
   if (!shouldCheckGitHubQuota(cadence)) return;
 
-  const { data } = await client.rest.rateLimit.get();
-  const core = data.resources?.core ?? data.rate;
-  const remaining = core?.remaining ?? 0;
-  const reset = core?.reset;
-
-  if (remaining < minimumRemaining) {
-    throw new Error(
-      `GitHub core quota too low for combined crawl: remaining=${remaining}, required=${minimumRemaining}, reset=${formatResetTime(reset)}`,
-    );
-  }
-
-  console.log(`  GitHub core quota preflight: ${remaining} remaining`);
+  await assertGitHubCoreQuotaAvailable(minimumRemaining, "combined crawl", client);
 }

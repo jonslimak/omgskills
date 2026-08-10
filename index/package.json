@@ -7,6 +7,7 @@
     "scrape": "tsx scraper/build.ts",
     "scrape:shadow": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/build-shadow.ts",
     "crawl4:add-skill": "tsx scraper/new-crawl/add-curated-skill.ts",
+    "crawl4:creator-backfill": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/creator-backfill.ts",
     "crawl4:remove-repo": "tsx scraper/new-crawl/remove-repo.ts",
     "crawl4:removal-audit": "tsx scraper/new-crawl/removal-audit.ts",
     "crawl4:audit-canonical-commits": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/audit-canonical-commits.ts",

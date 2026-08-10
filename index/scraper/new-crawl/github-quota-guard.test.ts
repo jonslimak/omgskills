@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { assertGitHubQuotaAvailable, shouldCheckGitHubQuota } from "./github-quota-guard.js";
+import {
+  assertGitHubCoreQuotaAvailable,
+  assertGitHubQuotaAvailable,
+  getGitHubCoreQuota,
+  shouldCheckGitHubQuota,
+} from "./github-quota-guard.js";
 
 function client(remaining: number, reset = 1782164564) {
   return {
@@ -51,4 +56,13 @@ test("non-combined quota guard does not call GitHub", async () => {
   };
 
   await assertGitHubQuotaAvailable("fast", failingClient, 2000);
+});
+
+test("generic quota guard supports operator-specific thresholds", async () => {
+  assert.deepEqual(await getGitHubCoreQuota(client(4000)), { remaining: 4000, reset: 1782164564 });
+  await assertGitHubCoreQuotaAvailable(3500, "creator backfill planning", client(3500));
+  await assert.rejects(
+    () => assertGitHubCoreQuotaAvailable(3500, "creator backfill planning", client(3499)),
+    /GitHub core quota too low for creator backfill planning: remaining=3499, required=3500/,
+  );
 });
