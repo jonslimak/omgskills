@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>omgskills — hero mock dev (pass 2)</title>
+<title>omgskills — hero mock dev (pass 3)</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
     background: #000;
     display: flex; align-items: flex-start; justify-content: center;
-    padding-top: 28px;
+    padding-top: 24px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
@@ -47,15 +47,16 @@
   /* ── popover shell ── */
   .pop-anchor { position: relative; margin-top: 9px; width: 820px; display: flex; justify-content: flex-end; }
   .pop-arrow {
-    position: absolute; top: -5px; right: 118px; z-index: 2;
+    position: absolute; top: -5px; z-index: 2;
     width: 14px; height: 14px; transform: rotate(45deg);
     background: #fbfbfb; border-radius: 3px; opacity: 0;
+    right: 118px; /* JS re-anchors under the owl icon */
   }
   .stage.open .pop-arrow { animation: .3s var(--exp) .12s both fade; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
   .popover {
-    width: 420px; height: 640px;
+    width: 420px; height: 700px;
     background: #fbfbfb;
     border-radius: 14px;
     box-shadow: 0 22px 70px rgba(0,0,0,.55), 0 2px 12px rgba(0,0,0,.35);
@@ -72,7 +73,7 @@
     to   { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  /* ── top controls: star left, person/globe right ── */
+  /* ── top controls ── */
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 0; }
   .fav { font-size: 15px; color: var(--faint); }
   .mode { display: flex; gap: 6px; }
@@ -100,38 +101,49 @@
 
   /* ── body: columns ── */
   .cols { flex: 1; display: flex; min-height: 0; }
-  .listcol { width: 420px; flex: none; overflow: hidden; padding: 6px 0; }
+  .listcol { width: 420px; flex: none; overflow: hidden; padding: 4px 0 0; display: flex; flex-direction: column; }
 
-  /* categories (empty state) */
-  .cats { padding: 10px 24px; column-count: 2; column-gap: 28px; }
-  .cats.hide { display: none; }
-  .cat-section { break-inside: avoid; margin-bottom: 18px; }
-  .cat-h { font-size: 12px; font-weight: 600; color: rgba(0,0,0,.32); margin: 0 0 6px 2px; }
+  /* categories (discover / empty state) */
+  .cats { flex: 1; padding: 12px 26px 8px; display: flex; flex-direction: column; }
+  .cat-section { margin-bottom: 7px; }
+  .cat-h { font-size: 12.5px; font-weight: 500; color: rgba(0,0,0,.3); margin: 0 0 3px 2px; }
+  .cat-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 30px; }
   .cat {
-    display: flex; align-items: center; gap: 9px;
-    font-size: 13px; color: var(--ink); padding: 7px 2px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13.5px; color: var(--ink); padding: 6px 2px;
   }
-  .cat .lucide { font-size: 13px; color: var(--gray); }
+  .cat .lucide { font-size: 13px; color: rgba(0,0,0,.55); flex: none; }
   .cat .chev { margin-left: auto; font-size: 10px; color: rgba(0,0,0,.2); }
+  .cat-send { margin-top: auto; padding: 6px 2px 10px; font-size: 13.5px; color: rgba(0,0,0,.35); display: flex; align-items: center; gap: 10px; }
   .stage.results .cats { display: none; }
 
   /* result rows */
   .rows { display: none; padding: 2px 8px; }
   .stage.results .rows { display: block; }
-  .row { padding: 9px 12px; border-radius: 9px; opacity: 0; }
+  .row { padding: 8px 12px; border-radius: 9px; opacity: 0; }
   .stage.results .row { animation: .45s var(--exp) both row-in; }
-  .stage.results .row:nth-child(1) { animation-delay: .04s; }
-  .stage.results .row:nth-child(2) { animation-delay: .1s; }
-  .stage.results .row:nth-child(3) { animation-delay: .16s; }
-  .stage.results .row:nth-child(4) { animation-delay: .22s; }
-  .stage.results .row:nth-child(5) { animation-delay: .28s; }
-  .stage.results .row:nth-child(6) { animation-delay: .34s; }
+  .stage.results .row:nth-child(1)  { animation-delay: .04s; }
+  .stage.results .row:nth-child(2)  { animation-delay: .09s; }
+  .stage.results .row:nth-child(3)  { animation-delay: .14s; }
+  .stage.results .row:nth-child(4)  { animation-delay: .19s; }
+  .stage.results .row:nth-child(5)  { animation-delay: .24s; }
+  .stage.results .row:nth-child(6)  { animation-delay: .29s; }
+  .stage.results .row:nth-child(7)  { animation-delay: .34s; }
+  .stage.results .row:nth-child(8)  { animation-delay: .39s; }
+  .stage.results .row:nth-child(9)  { animation-delay: .44s; }
+  .stage.results .row:nth-child(10) { animation-delay: .49s; }
   @keyframes row-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   .row-top { display: flex; align-items: baseline; gap: 7px; }
-  .rname { font-size: 14px; font-weight: 700; color: var(--ink); }
-  .rauthor { font-size: 12px; color: rgba(0,0,0,.35); }
-  .rstars { margin-left: auto; font-size: 12px; color: var(--gray); display: flex; gap: 4px; align-items: center; font-variant-numeric: tabular-nums; }
-  .rdesc { margin-top: 2px; font-size: 12px; line-height: 1.4; color: var(--desc); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .rname { font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rauthor { font-size: 11.5px; color: rgba(0,0,0,.35); white-space: nowrap; }
+  /* fixed-width, leading-aligned metric column (matches SwiftUI frame(width:60, .leading)) */
+  .rstars {
+    margin-left: auto; flex: none; width: 62px;
+    font-size: 11.5px; color: var(--gray);
+    display: flex; gap: 4px; align-items: center; justify-content: flex-start;
+    font-variant-numeric: tabular-nums;
+  }
+  .rdesc { margin-top: 1px; font-size: 11.5px; line-height: 1.4; color: var(--desc); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .row.selected { background: var(--blue); }
   .row.selected .rname, .row.selected .rstars { color: #fff; }
   .row.selected .rauthor { color: rgba(255,255,255,.75); }
@@ -140,12 +152,13 @@
   /* ── detail panel ── */
   .detailcol {
     flex: 1; min-width: 0; border-left: 1px solid var(--line);
-    padding: 22px 26px; overflow: hidden;
+    padding: 22px 26px 0; overflow: hidden;
     opacity: 0; transform: translateX(14px);
+    display: flex; flex-direction: column;
   }
   .stage.detail .detailcol { animation: .5s var(--exp) .18s both slide-in; }
   @keyframes slide-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
-  .dtitle { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+  .dtitle { font-size: 29px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
   .dmeta { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: var(--gray); }
   .avatar { width: 20px; height: 20px; border-radius: 50%; background: #d8d8dc center/cover; }
   .dactions { display: flex; gap: 8px; margin-top: 14px; align-items: center; }
@@ -163,45 +176,52 @@
   .btn.pressing { animation: .3s var(--pop) press; }
   @keyframes press { 50% { transform: scale(.93); } }
   .dquote {
-    margin-top: 18px; padding: 16px 18px;
+    margin-top: 18px; padding: 15px 18px;
     background: rgba(0,0,0,.045); border-radius: 12px;
     font-family: "New York", Georgia, "Times New Roman", serif;
-    font-style: italic; font-size: 15px; line-height: 1.5; color: #3a3a3c;
+    font-style: italic; font-size: 14.5px; line-height: 1.5; color: #3a3a3c;
   }
-  .dreadme { margin-top: 20px; font-family: "New York", Georgia, serif; font-size: 13.5px; line-height: 1.6; color: #3a3a3c; }
+  .dreadme { margin-top: 18px; flex: 1; overflow: hidden; font-family: "New York", Georgia, serif; font-size: 13px; line-height: 1.62; color: #3a3a3c;
+    -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent); mask-image: linear-gradient(to bottom, #000 82%, transparent); }
   .dreadme h3 { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-  .dreadme blockquote { border-left: 3px solid rgba(0,0,0,.15); padding-left: 12px; color: rgba(0,0,0,.55); margin: 8px 0; }
+  .dreadme p { margin-bottom: 10px; }
+  .dreadme blockquote { border-left: 3px solid rgba(0,0,0,.15); padding-left: 12px; color: rgba(0,0,0,.55); margin: 10px 0; font-style: italic; }
   .dreadme a { color: var(--blue); text-decoration: none; }
+  .dreadme b { font-weight: 700; }
 
-  /* ── device view (person mode) ── */
-  .device { display: none; flex: 1; flex-direction: column; padding: 4px 0; }
+  /* ── device view ── */
+  .device { display: none; flex: 1; flex-direction: column; padding: 4px 0 0; min-height: 0; }
   .stage.deviceview .device { display: flex; }
   .stage.deviceview .cols { display: none; }
-  .tabs { display: flex; justify-content: center; gap: 0; padding: 10px 16px 12px; }
+  .tabs { display: flex; justify-content: center; padding: 10px 16px 12px; }
   .tabitem { font-size: 13px; color: var(--gray); padding: 0 20px; border-left: 1px solid var(--line); }
   .tabitem:first-child { border-left: none; }
   .tabitem b { color: var(--ink); font-weight: 700; margin-left: 5px; }
-  .tabitem.on { color: var(--ink); }
-  .dev-h { font-size: 12px; font-weight: 600; color: rgba(0,0,0,.3); padding: 8px 26px 4px; }
+  .dev-h { font-size: 12px; font-weight: 500; color: rgba(0,0,0,.3); padding: 8px 26px 4px; }
   .dev-rows { padding: 0 10px; }
   .drow {
     display: flex; align-items: center;
-    padding: 9px 16px; border-radius: 9px;
-    font-size: 14px; font-weight: 600; color: var(--ink);
+    padding: 8.5px 16px; border-radius: 9px;
+    font-size: 13.5px; font-weight: 600; color: var(--ink);
     opacity: 0;
   }
   .stage.deviceview .drow { animation: .4s var(--exp) both row-in; }
-  .stage.deviceview .drow:nth-child(1) { animation-delay: .05s; }
-  .stage.deviceview .drow:nth-child(2) { animation-delay: .1s; }
-  .stage.deviceview .drow:nth-child(3) { animation-delay: .15s; }
-  .stage.deviceview .drow:nth-child(4) { animation-delay: .2s; }
-  .stage.deviceview .drow:nth-child(5) { animation-delay: .25s; }
+  .stage.deviceview .drow:nth-child(1)  { animation-delay: .05s; }
+  .stage.deviceview .drow:nth-child(2)  { animation-delay: .09s; }
+  .stage.deviceview .drow:nth-child(3)  { animation-delay: .13s; }
+  .stage.deviceview .drow:nth-child(4)  { animation-delay: .17s; }
+  .stage.deviceview .drow:nth-child(5)  { animation-delay: .21s; }
+  .stage.deviceview .drow:nth-child(6)  { animation-delay: .25s; }
+  .stage.deviceview .drow:nth-child(7)  { animation-delay: .29s; }
+  .stage.deviceview .drow:nth-child(8)  { animation-delay: .33s; }
+  .stage.deviceview .drow:nth-child(9)  { animation-delay: .37s; }
+  .stage.deviceview .drow:nth-child(10) { animation-delay: .41s; }
   .drow .harness { margin-left: auto; font-weight: 600; font-size: 12px; color: var(--gray); }
-  .drow .age { width: 44px; text-align: right; font-weight: 400; font-size: 12px; color: rgba(0,0,0,.3); }
+  .drow .age { width: 46px; text-align: right; font-weight: 400; font-size: 12px; color: rgba(0,0,0,.3); }
   .drow.fresh { background: rgba(10,122,255,.08); }
   .drow.fresh .age { color: var(--blue); font-weight: 600; }
   .dev-foot { margin-top: auto; padding: 12px 26px 16px; }
-  .dev-foot .fh { font-size: 12px; font-weight: 600; color: rgba(0,0,0,.3); margin-bottom: 6px; }
+  .dev-foot .fh { font-size: 12px; font-weight: 500; color: rgba(0,0,0,.3); margin-bottom: 6px; }
   .dev-foot .field {
     border: 1px solid var(--line); border-radius: 9px;
     padding: 8px 12px; font-size: 13px; color: rgba(0,0,0,.28);
@@ -217,7 +237,6 @@
 </style>
 </head>
 <body>
-<!-- lucide icon defs -->
 <svg width="0" height="0" style="position:absolute">
   <defs>
     <g id="i-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g>
@@ -238,20 +257,42 @@
     <g id="i-film"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18M17 3v18M3 7.5h4M3 12h18M3 16.5h4M17 7.5h4M17 16.5h4"/></g>
     <g id="i-layout"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></g>
     <g id="i-palette"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.4-.15-.74-.42-1-.26-.26-.42-.62-.42-1 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-4.96-4.5-9-10-9Z"/></g>
+    <g id="i-feather"><path d="M12.67 19a2 2 0 0 0 1.42-.59l4.32-4.32A9.05 9.05 0 0 0 21 7.75c.16-2.62-.85-4.76-2.15-6.06-1.3-1.3-3.44-2.31-6.06-2.15h-.02A9.05 9.05 0 0 0 6.4 2.09"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></g>
+    <g id="i-bird"><path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/><path d="M10 18v3"/><path d="M14 17.75V21"/><path d="M7 18a6 6 0 0 0 3.84-10.61"/></g>
+    <g id="i-appwindow"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></g>
+    <g id="i-scan"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></g>
+    <g id="i-blog"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V9"/><path d="M12 6h6M12 10h6M12 14h6M12 18h6"/></g>
+    <g id="i-net"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></g>
+    <g id="i-target"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g>
+    <g id="i-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></g>
+    <g id="i-shield"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></g>
+    <g id="i-listchecks"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></g>
+    <g id="i-api"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v3a3 3 0 0 0 3 3h3"/><path d="M18 15V9"/></g>
+    <g id="i-bug"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></g>
+    <g id="i-refresh"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></g>
+    <g id="i-server"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><path d="M6 6h.01M6 18h.01"/></g>
+    <g id="i-deck"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></g>
+    <g id="i-doc"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></g>
+    <g id="i-mask"><path d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></g>
+    <g id="i-table"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></g>
+    <g id="i-trend"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></g>
+    <g id="i-grid"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></g>
+    <g id="i-send"><path d="M12 3v13"/><path d="m8 7 4-4 4 4"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></g>
+    <g id="i-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></g>
   </defs>
 </svg>
 
 <div class="stage" id="stage">
   <div class="menubar">
     <span class="mb">&#10059;</span>
-    <span class="mb owl">&#128064;</span>
+    <span class="mb owl" id="owl">&#128064;</span>
     <span class="mb"><svg class="lucide" viewBox="0 0 24 24" style="color:#fff"><use href="#i-search"/></svg></span>
     <span class="mb">&#9889;</span>
     <span class="mb clock">Mon Aug 10&nbsp;&nbsp;5:14 PM</span>
   </div>
 
-  <div class="pop-anchor">
-    <div class="pop-arrow"></div>
+  <div class="pop-anchor" id="anchor">
+    <div class="pop-arrow" id="arrow"></div>
     <div class="popover">
       <div class="topbar">
         <span class="fav"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-star"/></svg></span>
@@ -271,30 +312,7 @@
 
       <div class="cols">
         <div class="listcol">
-          <div class="cats" id="cats">
-            <div class="cat-section">
-              <div class="cat-h">Featured</div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-users"/></svg>Creators<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-trophy"/></svg>The GOAT List<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-            </div>
-            <div class="cat-section">
-              <div class="cat-h">Design + Apps</div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-pen"/></svg>Design system<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-film"/></svg>Remotion<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-layout"/></svg>Landing page<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-            </div>
-            <div class="cat-section">
-              <div class="cat-h">&nbsp;</div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-building"/></svg>Companies<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-pen"/></svg>Elite UI Design<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-            </div>
-            <div class="cat-section">
-              <div class="cat-h">&nbsp;</div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-atom"/></svg>React<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-palette"/></svg>Brand<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-              <div class="cat"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-search"/></svg>SEO<span class="chev"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-chev"/></svg></span></div>
-            </div>
-          </div>
+          <div class="cats" id="cats"></div>
           <div class="rows" id="rows"></div>
         </div>
         <div class="detailcol" id="detail"></div>
@@ -302,9 +320,9 @@
 
       <div class="device" id="device">
         <div class="tabs">
-          <span class="tabitem on">All<b>79</b></span>
+          <span class="tabitem">All<b>80</b></span>
           <span class="tabitem">Codex<b>43</b></span>
-          <span class="tabitem">Claude<b>50</b></span>
+          <span class="tabitem">Claude<b>51</b></span>
           <span class="tabitem">Other<b>3</b></span>
         </div>
         <div class="dev-h">Recently installed</div>
@@ -320,6 +338,37 @@
 <div class="hud" id="hud">phase: boot</div>
 
 <script>
+/* ── data ─────────────────────────────────────────────────── */
+const CATS = [
+  ["Featured", [
+    ["i-users", "Creators"], ["i-building", "Companies"],
+    ["i-trophy", "The GOAT List"], ["i-pen", "Elite UI Design"],
+  ]],
+  ["Design + Apps", [
+    ["i-pen", "Design system"], ["i-atom", "React"],
+    ["i-feather", "SwiftUI"], ["i-film", "Remotion"],
+    ["i-appwindow", "App Store"], ["i-layout", "Landing page"],
+  ]],
+  ["Marketing", [
+    ["i-palette", "Brand"], ["i-blog", "Blog"],
+    ["i-search", "SEO"], ["i-net", "Scraping"],
+    ["i-users", "Social media"], ["i-target", "Market research"],
+  ]],
+  ["Coding", [
+    ["i-listchecks", "Code review"], ["i-shield", "Security audit"],
+    ["i-scan", "Playwright"], ["i-api", "API design"],
+    ["i-bug", "Debugging"], ["i-refresh", "Refactoring"],
+  ]],
+  ["Practical", [
+    ["i-server", "MCP server"], ["i-deck", "Deck"],
+    ["i-doc", "Deep research"], ["i-doc", "PDF"],
+    ["i-mask", "Humanizer"], ["i-table", "Excel"],
+  ]],
+  ["Trending", [
+    ["i-trend", "Twitter / X"], ["i-grid", "Collections"],
+  ]],
+];
+
 const SCENARIOS = [
   {
     q: "ios",
@@ -331,13 +380,21 @@ const SCENARIOS = [
       ["ios-clean", "@garrytan", "123.8k", "Remove the DebugBridge SPM package and all #if DEBUG wiring from an iOS app. (gstack)"],
       ["ios-fix", "@garrytan", "121.1k", "Autonomous iOS bug fixer. (gstack)"],
       ["mobile-ios-design", "@wshobson", "38.4k", "Master iOS Human Interface Guidelines and SwiftUI patterns for building native iOS apps."],
+      ["ios-application-dev", "@minimax-ai", "13.3k", "iOS application development guide covering UIKit, SnapKit, and SwiftUI. Includes touch targets, safe areas."],
+      ["ios-app-intents", "@openai", "5k", "Design App Intents, app entities, and App Shortcuts for iOS system surfaces."],
+      ["ios-debugger-agent", "@openai", "5k", "Build, run, and debug iOS apps on Simulator with XcodeBuildMCP."],
+      ["ios-memgraph-leaks", "@openai", "5k", "Capture and inspect iOS leaks and memgraphs when debugging leaked objects and retain cycles."],
     ],
     detail: {
       name: "ios-clean", author: "@garrytan", stars: "123.8k", updated: "Updated 3w ago",
       avatar: "https://github.com/garrytan.png?size=64",
-      quote: "Remove the DebugBridge SPM package and all #if DEBUG wiring from an iOS app.",
+      quote: "Remove the DebugBridge SPM package and all #if DEBUG wiring from an iOS app. <br><span style='font-style:normal'>(gstack)</span>",
       readmeTitle: "gstack",
-      readme: 'How does one person ship like a team of twenty? <a>gstack</a> is my answer — the tooling I use to ship more products than I ever have: 3 production services and 40+ features in the last 60 days, part-time.',
+      readme: `
+        <blockquote>"I don't think I've typed like a line of code probably since December, basically, which is an extremely large change." &mdash; <a>Andrej Karpathy</a>, No Priors podcast, March 2026</blockquote>
+        <p>When I heard Karpathy say this, I wanted to find out how. How does one person ship like a team of twenty? Peter Steinberger built <a>OpenClaw</a> &mdash; 247K GitHub stars &mdash; essentially solo with AI agents. The revolution is here. A single builder with the right tooling can move faster than a traditional team.</p>
+        <p>I'm <a>Garry Tan</a>, President &amp; CEO of <a>Y Combinator</a>. I've worked with thousands of startups &mdash; Coinbase, Instacart, Rippling &mdash; when they were one or two people in a garage.</p>
+        <p><b>gstack is my answer.</b> In the last 60 days: 3 production services, 40+ shipped features, part-time, while running YC full-time. On logical code change my 2026 run rate is <b>~810&times; my 2013 pace</b>.</p>`,
     },
     installedRow: ["ios-clean", "Claude", "now"],
   },
@@ -351,13 +408,21 @@ const SCENARIOS = [
       ["canvas-design", "@anthropics", "129k", "Guidelines for visual design work on canvas artifacts — layout, color, typography."],
       ["design-system", "@affaan-m", "230k", "Design-system patterns: tokens, primitives, and component API conventions."],
       ["taste-skill", "@leonxlnx", "64.1k", "Anti-slop design taste — image-to-code with opinionated aesthetics."],
+      ["ui-ux-pro-max", "@nextlevelbuilder", "104.9k", "Pro-grade UI/UX generation with design-quality guardrails and layout systems."],
+      ["brand-guidelines", "@anthropics", "128.9k", "Applies official brand colors and typography to any artifact that benefits from consistent branding."],
+      ["design-md", "@google-labs-code", "25.9k", "Design specs as markdown — components, tokens, and layout described for agents."],
+      ["make-interfaces-feel-better", "@jakubkrehel", "2.4k", "Micro-interaction and motion polish for interfaces that feel alive."],
     ],
     detail: {
       name: "frontend-design", author: "@anthropics", stars: "161k", updated: "Updated 1w ago",
       avatar: "https://github.com/anthropics.png?size=64",
       quote: "Create distinctive, production-grade frontend interfaces with high design quality.",
       readmeTitle: "Frontend Design",
-      readme: 'Anthropic&rsquo;s official skill for building web interfaces that avoid generic AI aesthetics — typography, color, spacing, and motion guidance distilled from production work.',
+      readme: `
+        <p>Anthropic&rsquo;s official skill for building web interfaces that avoid generic AI aesthetics &mdash; typography, color, spacing, and motion guidance distilled from production work.</p>
+        <p><b>What it covers:</b> layout systems and hierarchy, expressive but restrained type pairings, color systems that survive dark mode, and motion that communicates state instead of decorating it.</p>
+        <p>Use when building landing pages, dashboards, or components where design quality matters. Pairs well with <a>canvas-design</a> and <a>web-artifacts-builder</a> from the same library.</p>
+        <p>Part of <a>anthropics/skills</a> &mdash; the canonical skill library maintained by Anthropic.</p>`,
     },
     installedRow: ["frontend-design", "Claude", "now"],
   },
@@ -368,11 +433,18 @@ const DEVICE_BASE = [
   ["pp-espn", "Claude", "20d"],
   ["printing-press", "Codex", "20d"],
   ["zoom-out", "Codex", "24d"],
+  ["gpt-taste", "Codex", "35d"],
+  ["image-to-code", "Codex", "35d"],
+  ["improve-codebase-architecture", "Codex", "35d"],
+  ["seo-audit", "Codex", "35d"],
+  ["ai-seo", "Codex", "35d"],
 ];
 
+/* ── render helpers ───────────────────────────────────────── */
 const stage = document.getElementById("stage");
 const qtext = document.getElementById("qtext");
 const rowsEl = document.getElementById("rows");
+const catsEl = document.getElementById("cats");
 const detailEl = document.getElementById("detail");
 const devrowsEl = document.getElementById("devrows");
 const hud = document.getElementById("hud");
@@ -380,6 +452,18 @@ const modeUser = document.getElementById("mode-user");
 const modeGlobe = document.getElementById("mode-globe");
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
 const ph = (p) => { hud.textContent = "phase: " + p; };
+const icon = (id, extra = "") => `<svg class="lucide" viewBox="0 0 24 24"${extra}><use href="#${id}"/></svg>`;
+
+function renderCats() {
+  catsEl.innerHTML = CATS.map(([h, items]) => `
+    <div class="cat-section">
+      <div class="cat-h">${h}</div>
+      <div class="cat-grid">${items.map(([ic, label]) => `
+        <div class="cat">${icon(ic)}${label}<span class="chev">${icon("i-chev")}</span></div>`).join("")}
+      </div>
+    </div>`).join("") +
+    `<div class="cat-send">${icon("i-send")}Send to a friend</div>`;
+}
 
 function renderRows(rows) {
   rowsEl.innerHTML = rows.map(([name, author, stars, desc]) => `
@@ -387,7 +471,7 @@ function renderRows(rows) {
       <div class="row-top">
         <span class="rname">${name}</span>
         <span class="rauthor">${author}</span>
-        <span class="rstars"><svg class="lucide" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><use href="#i-star"/></svg>${stars}</span>
+        <span class="rstars">${icon("i-star", ' style="fill:currentColor;stroke:none"')}${stars}</span>
       </div>
       <div class="rdesc">${desc}</div>
     </div>`).join("");
@@ -399,17 +483,17 @@ function renderDetail(d) {
     <div class="dmeta">
       <span class="avatar" style="background-image:url('${d.avatar}')"></span>
       <span>${d.author}</span><span>&middot;</span>
-      <span><svg class="lucide" viewBox="0 0 24 24"><use href="#i-star"/></svg> ${d.stars}</span><span>&middot;</span>
+      <span>${icon("i-star")} ${d.stars}</span><span>&middot;</span>
       <span>${d.updated}</span>
     </div>
     <div class="dactions">
-      <span class="btn claude" id="btn-claude"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-down"/></svg>Claude</span>
-      <span class="btn codex"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-down"/></svg>Codex</span>
-      <span class="btn plain"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-up"/></svg>GitHub</span>
-      <span class="btn plain"><svg class="lucide" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share</span>
+      <span class="btn claude" id="btn-claude">${icon("i-down")}Claude</span>
+      <span class="btn codex">${icon("i-down")}Codex</span>
+      <span class="btn plain">${icon("i-up")}GitHub</span>
+      <span class="btn plain">${icon("i-share")}Share</span>
     </div>
     <div class="dquote">${d.quote}</div>
-    <div class="dreadme"><h3>${d.readmeTitle}</h3><p>${d.readme}</p></div>`;
+    <div class="dreadme"><h3>${d.readmeTitle}</h3>${d.readme}</div>`;
 }
 
 function renderDevice(freshRow) {
@@ -422,6 +506,25 @@ function renderDevice(freshRow) {
     </div>`).join("");
 }
 
+/* arrow: center under the owl icon */
+function anchorArrow() {
+  const owl = document.getElementById("owl").getBoundingClientRect();
+  const anchor = document.getElementById("anchor").getBoundingClientRect();
+  const scale = anchor.width / 820; /* account for stage scale */
+  const rightPx = (anchor.right - (owl.left + owl.width / 2)) / scale - 7;
+  document.getElementById("arrow").style.right = rightPx + "px";
+}
+
+function fit() {
+  const w = document.documentElement.clientWidth;
+  const scale = Math.min(1, (w - 40) / 840);
+  stage.style.transform = `scale(${scale})`;
+  stage.style.transformOrigin = "top center";
+  requestAnimationFrame(anchorArrow);
+}
+addEventListener("resize", fit);
+
+/* ── phases ───────────────────────────────────────────────── */
 async function typeQuery(q) {
   stage.classList.add("hasquery");
   for (const ch of q) {
@@ -430,15 +533,10 @@ async function typeQuery(q) {
   }
 }
 
-async function eraseQuery() {
-  while (qtext.textContent.length) {
-    qtext.textContent = qtext.textContent.slice(0, -1);
-    await wait(28);
-  }
-  stage.classList.remove("hasquery");
-}
-
 async function runScenario(s) {
+  ph("discover");
+  await wait(1600);
+
   ph("type: " + s.q);
   await typeQuery(s.q);
   await wait(180);
@@ -446,7 +544,7 @@ async function runScenario(s) {
   ph("results");
   renderRows(s.rows);
   stage.classList.add("results");
-  await wait(850);
+  await wait(950);
 
   ph("navigate");
   const rows = [...rowsEl.querySelectorAll(".row")];
@@ -459,16 +557,16 @@ async function runScenario(s) {
   ph("detail");
   renderDetail(s.detail);
   stage.classList.add("detail");
-  await wait(1500);
+  await wait(1600);
 
   ph("install");
   const btn = document.getElementById("btn-claude");
   btn.classList.add("pressing", "installing");
-  btn.innerHTML = '<svg class="lucide" viewBox="0 0 24 24"><use href="#i-down"/></svg>Installing&hellip;';
+  btn.innerHTML = icon("i-down") + "Installing&hellip;";
   await wait(900);
   btn.classList.remove("pressing", "installing");
   btn.classList.add("done");
-  btn.innerHTML = '<svg class="lucide" viewBox="0 0 24 24"><use href="#i-check"/></svg>Claude';
+  btn.innerHTML = icon("i-check") + "Claude";
   await wait(1200);
 
   ph("device view");
@@ -488,14 +586,16 @@ async function runScenario(s) {
   modeUser.classList.remove("active");
   modeGlobe.classList.add("active");
   document.getElementById("ph").textContent = "Search for skills on Github...";
-  await wait(900);
+  await wait(400);
 }
 
 async function loop() {
+  renderCats();
+  fit();
   await wait(500);
   ph("open");
   stage.classList.add("open");
-  await wait(1400);
+  requestAnimationFrame(anchorArrow);
   let i = 0;
   for (;;) {
     await runScenario(SCENARIOS[i % SCENARIOS.length]);
@@ -503,15 +603,6 @@ async function loop() {
   }
 }
 loop();
-
-// scale stage to fit viewport width
-function fit() {
-  const w = document.documentElement.clientWidth;
-  const scale = Math.min(1, (w - 40) / 840);
-  stage.style.transform = `scale(${scale})`;
-  stage.style.transformOrigin = "top center";
-}
-addEventListener("resize", fit); fit();
 </script>
 </body>
 </html>
