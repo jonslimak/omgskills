@@ -25,9 +25,16 @@ export const homepageLibraryProfiles = [
   { handle: "garrytan", title: "Garry Tan" },
 ];
 
-export const homepageLibraryPaths = homepageLibraryProfiles.map(
-  ({ handle }) => `/library/${handle}/`,
-);
+export const homepageLibraryCollections = [
+  { id: "build-ios-apps" },
+  { id: "elite-ui-design" },
+  { id: "the-goat-list" },
+];
+
+export const homepageLibraryPaths = [
+  ...homepageLibraryProfiles.map(({ handle }) => `/library/${handle}/`),
+  ...homepageLibraryCollections.map(({ id }) => `/collections/${id}/`),
+];
 
 export const homepageLibraryStartMarker = "<!-- homepage-library-preview:start -->";
 export const homepageLibraryEndMarker = "<!-- homepage-library-preview:end -->";
@@ -70,16 +77,24 @@ export async function loadHomepageCollections(siteDir) {
 
 export function renderHomepageLibraryCards(collections) {
   const profilesByHandle = new Map();
+  const topicsById = new Map();
   for (const collection of collections) {
-    if (collection.type !== "author" || !collection.authorHandle) continue;
-    const handle = String(collection.authorHandle).toLowerCase();
-    if (profilesByHandle.has(handle)) {
-      throw new Error(`Duplicate homepage profile data for ${handle}`);
+    if (collection.type === "author" && collection.authorHandle) {
+      const handle = String(collection.authorHandle).toLowerCase();
+      if (profilesByHandle.has(handle)) {
+        throw new Error(`Duplicate homepage profile data for ${handle}`);
+      }
+      profilesByHandle.set(handle, collection);
+    } else if (collection.type === "topic" && collection.id) {
+      const id = String(collection.id);
+      if (topicsById.has(id)) {
+        throw new Error(`Duplicate homepage collection data for ${id}`);
+      }
+      topicsById.set(id, collection);
     }
-    profilesByHandle.set(handle, collection);
   }
 
-  return homepageLibraryProfiles.map(({ handle, title }) => {
+  const profileCards = homepageLibraryProfiles.map(({ handle, title }) => {
     const profile = profilesByHandle.get(handle);
     if (!profile) throw new Error(`Missing homepage profile data for ${handle}`);
     const imageUrl = profile.imageUrl || `https://github.com/${encodeURIComponent(handle)}.png?size=128`;
@@ -94,7 +109,28 @@ export function renderHomepageLibraryCards(collections) {
           </div>
           <p class="library-profile-subtitle">${escapeHtml(subtitle)}</p>${description}
         </a>`;
-  }).join("\n");
+  });
+
+  const collectionCards = homepageLibraryCollections.map(({ id }) => {
+    const collection = topicsById.get(id);
+    if (!collection) throw new Error(`Missing homepage collection data for ${id}`);
+    const title = collection.title;
+    const image = collection.imageUrl
+      ? `<img src="${escapeHtml(collection.imageUrl)}" alt="${escapeHtml(title)} collection image" loading="lazy" decoding="async" onerror="this.remove()">`
+      : "";
+    const description = collection.description && collection.description !== collection.subtitle
+      ? `\n          <p class="library-profile-description">${escapeHtml(collection.description)}</p>`
+      : "";
+    return `        <a class="library-profile-card" href="/collections/${encodeURIComponent(id)}/">
+          <div class="library-profile-heading">
+            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span>${image}</span>
+            <h3>${escapeHtml(title)}</h3>
+          </div>
+          <p class="library-profile-subtitle">${escapeHtml(collection.subtitle || title)}</p>${description}
+        </a>`;
+  });
+
+  return [...profileCards, ...collectionCards].join("\n");
 }
 
 export function injectHomepageLibraryPreview(html, cards) {
@@ -109,17 +145,17 @@ export function verifyHomepageLibraryPreview(html, label = "homepage") {
   if (/<script\b/i.test(block)) {
     throw new Error(`${label} placed homepage profile links inside a script`);
   }
-  const paths = [...block.matchAll(/<a\b[^>]*\bhref="(\/library\/[^"#?]+\/)"[^>]*>/gi)]
+  const paths = [...block.matchAll(/<a\b[^>]*\bhref="(\/(?:library|collections)\/[^"#?]+\/)"[^>]*>/gi)]
     .map((match) => match[1]);
   if (paths.length !== homepageLibraryPaths.length) {
     throw new Error(
-      `${label} contained ${paths.length} static homepage profile links; expected ${homepageLibraryPaths.length}`,
+      `${label} contained ${paths.length} static homepage library links; expected ${homepageLibraryPaths.length}`,
     );
   }
   for (let index = 0; index < homepageLibraryPaths.length; index += 1) {
     if (paths[index] !== homepageLibraryPaths[index]) {
       throw new Error(
-        `${label} homepage profile ${index + 1} was ${paths[index]}; expected ${homepageLibraryPaths[index]}`,
+        `${label} homepage card ${index + 1} was ${paths[index]}; expected ${homepageLibraryPaths[index]}`,
       );
     }
   }

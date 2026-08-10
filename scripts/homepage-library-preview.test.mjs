@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   homepageLibraryEndMarker,
+  homepageLibraryCollections,
   homepageLibraryPaths,
   homepageLibraryProfiles,
   homepageLibraryStartMarker,
@@ -12,13 +13,23 @@ import {
 } from "./homepage-library-preview.mjs";
 
 function fixtureCollections() {
-  return homepageLibraryProfiles.map(({ handle, title }) => ({
-    type: "author",
-    authorHandle: handle,
-    title,
-    subtitle: `${title} subtitle`,
-    description: `${title} description`,
-  }));
+  return [
+    ...homepageLibraryProfiles.map(({ handle, title }) => ({
+      type: "author",
+      authorHandle: handle,
+      title,
+      subtitle: `${title} subtitle`,
+      description: `${title} description`,
+    })),
+    ...homepageLibraryCollections.map(({ id }) => ({
+      id,
+      type: "topic",
+      title: `${id} title`,
+      subtitle: `${id} subtitle`,
+      description: `${id} description`,
+      imageUrl: `https://example.test/${id}.webp`,
+    })),
+  ];
 }
 
 const homepage = `<div id="library-preview-grid">
@@ -26,14 +37,16 @@ ${homepageLibraryStartMarker}
 ${homepageLibraryEndMarker}
 </div>`;
 
-test("renders all homepage profiles as static links in the required order", () => {
+test("renders all homepage profiles and collections as static links in the required order", () => {
   const rendered = injectHomepageLibraryPreview(
     homepage,
     renderHomepageLibraryCards(fixtureCollections()),
   );
   assert.deepEqual(verifyHomepageLibraryPreview(rendered), homepageLibraryPaths);
   assert.match(rendered, /<a class="library-profile-card" href="\/library\/anthropics\/">/);
+  assert.match(rendered, /<a class="library-profile-card" href="\/collections\/build-ios-apps\/">/);
   assert.match(rendered, /Anthropic description/);
+  assert.match(rendered, /build-ios-apps description/);
 });
 
 test("rejects a missing homepage profile", () => {
@@ -49,6 +62,22 @@ test("rejects duplicate homepage profile data", () => {
   assert.throws(
     () => renderHomepageLibraryCards(collections),
     /Duplicate homepage profile data for anthropics/,
+  );
+});
+
+test("rejects a missing homepage collection", () => {
+  assert.throws(
+    () => renderHomepageLibraryCards(fixtureCollections().filter(({ id }) => id !== "build-ios-apps")),
+    /Missing homepage collection data for build-ios-apps/,
+  );
+});
+
+test("rejects duplicate homepage collection data", () => {
+  const collections = fixtureCollections();
+  collections.push(collections.find(({ id }) => id === "build-ios-apps"));
+  assert.throws(
+    () => renderHomepageLibraryCards(collections),
+    /Duplicate homepage collection data for build-ios-apps/,
   );
 });
 
@@ -68,7 +97,7 @@ test("rejects reordered homepage links", () => {
   );
   assert.throws(
     () => verifyHomepageLibraryPreview(injectHomepageLibraryPreview(homepage, reordered)),
-    /homepage profile 1 was \/library\/openai\//,
+    /homepage card 1 was \/library\/openai\//,
   );
 });
 
