@@ -231,6 +231,47 @@
     background: #fff;
   }
 
+
+  /* ── creators list view ── */
+  .creators { display: none; flex: 1; padding: 14px 24px 0; }
+  .stage.creatorsview .creators { display: block; }
+  .stage.creatorsview .cats { display: none; }
+  .cre-h { font-size: 11.5px; font-weight: 500; color: rgba(0,0,0,.3); margin: 2px 0 10px 2px; }
+  .cre-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+  .ccell { display: flex; align-items: center; gap: 9px; padding: 6px 4px; border-radius: 8px; opacity: 0; }
+  .stage.creatorsview .ccell { animation: .4s var(--exp) both row-in; }
+  .ccell img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; background: #e8e8ea; flex: none; }
+  .ccell .cmeta { min-width: 0; }
+  .ccell .cname { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ccell .csub { font-size: 10px; color: var(--desc); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ccell .chev { margin-left: auto; font-size: 9px; color: rgba(0,0,0,.2); flex: none; }
+  .ccell.selected { background: rgba(10,122,255,.12); }
+  .cat.tapped { background: rgba(10,122,255,.1); border-radius: 7px; }
+
+  /* ── creator profile view ── */
+  .profile { display: none; flex: 1; min-height: 0; flex-direction: column; padding: 16px 20px 0; overflow: hidden; }
+  .stage.profileview .profile { display: flex; }
+  .stage.profileview .cats, .stage.profileview .creators, .stage.profileview .rows { display: none; }
+  .p-head { display: flex; gap: 13px; align-items: center; }
+  .p-avatar { width: 62px; height: 62px; border-radius: 14px; object-fit: cover; background: #e8e8ea; flex: none; transition: width .4s var(--exp), height .4s var(--exp); }
+  .stage.detail .p-avatar { width: 44px; height: 44px; border-radius: 10px; }
+  .p-name { font-size: 25px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
+  .stage.detail .p-name { font-size: 19px; }
+  .p-sub { font-size: 11.5px; color: var(--desc); margin-top: 2px; }
+  .p-bio { font-size: 12px; margin-top: 11px; color: var(--ink); line-height: 1.45; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .p-featured { display: flex; justify-content: space-between; margin: 10px 4px 4px; font-size: 10.5px; }
+  .p-featured .lab { color: rgba(0,0,0,.3); font-weight: 500; }
+  .p-featured .see { color: var(--blue); }
+  .prows { margin: 0 -8px; }
+  .stage.profileview .prows .row { animation: .4s var(--exp) both row-in; }
+
+  /* readme extras: code + lists */
+  .dreadme code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; background: rgba(0,0,0,.055); padding: 1px 5px; border-radius: 5px; font-style: normal; }
+  .dreadme pre { background: rgba(0,0,0,.045); border-radius: 10px; padding: 11px 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; margin: 9px 0; overflow: hidden; }
+  .dreadme ol { padding-left: 18px; margin: 6px 0; }
+  .dreadme li { margin-bottom: 6px; }
+  .dreadme h3 + p { margin-top: 0; }
+
   .hud { position: fixed; bottom: 12px; left: 14px; color: rgba(0,0,0,.3); font-size: 11px; font-family: ui-monospace, monospace; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -281,6 +322,7 @@
     <g id="i-trend"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></g>
     <g id="i-grid"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></g>
     <g id="i-send"><path d="M12 3v13"/><path d="m8 7 4-4 4 4"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></g>
+    <g id="i-back"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></g>
     <g id="i-wifi"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></g>
     <g id="i-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></g>
   </defs>
@@ -317,6 +359,8 @@
         <div class="listcol">
           <div class="cats" id="cats"></div>
           <div class="rows" id="rows"></div>
+          <div class="creators" id="creators"></div>
+          <div class="profile" id="profile"></div>
         </div>
         <div class="detailcol" id="detail"></div>
       </div>
@@ -522,6 +566,148 @@ function renderDevice(freshRow) {
     </div>`).join("");
 }
 
+
+const CREATORS = [
+  ["addyosmani", "Addyosmani", "Web performance engineering"],
+  ["agricidaniel", "Agricidaniel", "SEO and advertising"],
+  ["antfu", "Antfu", "Vue ecosystem tooling"],
+  ["avdlee", "Avdlee", "Swift performance engineering"],
+  ["blader", "Blader", "Practical writing tools"],
+  ["coreyhaines31", "Coreyhaines31", "SaaS marketing strategy"],
+  ["danielmiessler", "Danielmiessler", "Security and AI research"],
+  ["disler", "Disler", "Agentic engineering education"],
+  ["emilkowalski", "Emilkowalski", "Interface design engineering"],
+  ["garrytan", "Garrytan", "Founder execution systems"],
+  ["jakubkrehel", "Jakubkrehel", "Interface polish and color"],
+  ["juliusbrussee", "Juliusbrussee", "Caveman engineering tools"],
+  ["kepano", "Kepano", "Knowledge management tools"],
+  ["leonxlnx", "Leon Lin", "Design-driven interface tools"],
+  ["mattpocock", "Matt Pocock", "Practical TypeScript education"],
+  ["mengto", "Meng To", "Visual design-to-code systems"],
+  ["mvanhorn", "Mvanhorn", "Agent publishing systems"],
+  ["obra", "Obra", "Agentic engineering practice"],
+  ["othmanadi", "OthmanAdi", "Persistent planning tools"],
+  ["pbakaus", "Pbakaus", "Design quality systems"],
+];
+
+const MATT = {
+  name: "Matt Pocock", handle: "mattpocock", sub: "Practical TypeScript education",
+  bio: "Practical skills for diagnosis, prototyping, TDD, planning, and interface design.",
+  skills: [
+    ["grill-with-docs", "176.9k", "A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go."],
+    ["prototype", "176.9k", "Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model holds up."],
+    ["tdd", "176.9k", "Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions red-green-refactor."],
+    ["design-an-interface", "204k", "Generate multiple radically different interface designs for a module using parallel sub-agents."],
+    ["caveman", "62.4k", "Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler, articles, and pleasantries."],
+    ["diagnose", "62.4k", "Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce, minimise, hypothesise, instrument."],
+    ["edit-article", "199.3k", "Edit and improve articles by restructuring sections, improving clarity, and tightening prose."],
+    ["migrate-to-shoehorn", "199.3k", "Migrate test files from `as` type assertions to @total-typescript/shoehorn."],
+    ["qa", "199.3k", "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues."],
+  ],
+  detail: {
+    name: "grill-with-docs", author: "@mattpocock", stars: "176.9k", updated: "Updated 3w ago",
+    avatar: "https://github.com/mattpocock.png?size=64",
+    quote: "A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.",
+    readmeTitle: "Skills For Real Engineers",
+    readme: `
+      <p>My agent skills that I use every day to do real engineering &mdash; not vibe coding.</p>
+      <p>Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit try to help by owning the process. But while doing so, they take away your control and make bugs in the process hard to resolve.</p>
+      <p>These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy.</p>
+      <p>If you want to keep up with changes to these skills, you can join ~60,000 other devs on my newsletter: <a>Sign Up To The Newsletter</a></p>
+      <h3>Quickstart (30-second setup)</h3>
+      <ol>
+        <li>Run the skills.sh installer:<pre>npx skills@latest add mattpocock/skills</pre></li>
+        <li>Pick the skills you want, and which coding agents you want to install them on. <b>Make sure you select</b> <code>/setup-matt-pocock-skills</code>.</li>
+        <li>Run <code>/setup-matt-pocock-skills</code> in your agent. It will ask which issue tracker you use (GitHub, Linear, or local files) and where to save the docs we create.</li>
+      </ol>`,
+  },
+};
+
+function renderCreators() {
+  const el = document.getElementById("creators");
+  el.innerHTML = '<div class="cre-h">Creators</div><div class="cre-grid">' +
+    CREATORS.map(([h, name, sub], i) => `
+      <div class="ccell" data-handle="${h}" style="animation-delay:${(i * 0.03).toFixed(2)}s">
+        <img src="https://github.com/${h}.png?size=64" alt="">
+        <span class="cmeta"><span class="cname">${name}</span><span class="csub">${sub}</span></span>
+        <span class="chev">${icon("i-chev")}</span>
+      </div>`).join("") + '</div>';
+}
+
+function renderProfile(c) {
+  document.getElementById("profile").innerHTML = `
+    <div class="p-head">
+      <img class="p-avatar" src="https://github.com/${c.handle}.png?size=128" alt="">
+      <div><div class="p-name">${c.name}</div><div class="p-sub">${c.sub}</div></div>
+    </div>
+    <div class="p-bio">${c.bio}</div>
+    <div class="p-featured"><span class="lab">Featured</span><span class="see">See all</span></div>
+    <div class="prows">${c.skills.map(([name, stars, desc], i) => `
+      <div class="row" style="animation-delay:${(i * 0.05).toFixed(2)}s">
+        <div class="row-top">
+          <span class="rname">${name}</span>
+          <span class="rstars">${icon("i-star", ' style="fill:currentColor;stroke:none"')}${stars}</span>
+        </div>
+        <div class="rdesc">${desc}</div>
+      </div>`).join("")}</div>`;
+}
+
+async function runCreatorScenario() {
+  ph("discover");
+  await wait(1500);
+
+  ph("tap creators");
+  const creatorsCat = catsEl.querySelector(".cat");
+  creatorsCat.classList.add("tapped");
+  await wait(450);
+  creatorsCat.classList.remove("tapped");
+
+  ph("creators list");
+  document.querySelector(".fav").innerHTML = icon("i-back");
+  renderCreators();
+  stage.classList.add("creatorsview");
+  await wait(2100);
+
+  ph("select matt");
+  const mattCell = document.querySelector('.ccell[data-handle="mattpocock"]');
+  mattCell.classList.add("selected");
+  mattCell.scrollIntoView({ block: "nearest" });
+  await wait(700);
+
+  ph("profile");
+  stage.classList.remove("creatorsview");
+  renderProfile(MATT);
+  stage.classList.add("profileview");
+  await wait(2100);
+
+  ph("select skill");
+  const first = document.querySelector("#profile .prows .row");
+  first.classList.add("selected");
+  await wait(600);
+
+  ph("detail");
+  renderDetail(MATT.detail);
+  stage.classList.add("detail");
+  await wait(2400);
+
+  ph("install");
+  const btn = document.getElementById("btn-claude");
+  btn.classList.add("pressing", "installing");
+  btn.innerHTML = icon("i-down") + "Installing&hellip;";
+  await wait(900);
+  btn.classList.remove("pressing", "installing");
+  btn.classList.add("done");
+  btn.innerHTML = icon("i-check") + "Claude";
+  await wait(1600);
+
+  ph("reset");
+  stage.classList.remove("profileview", "detail");
+  document.getElementById("profile").innerHTML = "";
+  detailEl.innerHTML = "";
+  document.querySelector(".fav").innerHTML = icon("i-star");
+  await wait(400);
+}
+
 /* arrow: center under the owl icon */
 function anchorArrow() {
   const owl = document.getElementById("owl").getBoundingClientRect();
@@ -613,9 +799,10 @@ async function loop() {
   ph("open");
   stage.classList.add("open");
   requestAnimationFrame(anchorArrow);
+  const flows = [() => runScenario(SCENARIOS[0]), () => runScenario(SCENARIOS[1]), runCreatorScenario];
   let i = 0;
   for (;;) {
-    await runScenario(SCENARIOS[i % SCENARIOS.length]);
+    await flows[i % flows.length]();
     i++;
   }
 }
