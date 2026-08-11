@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   applyShadowSkillOverlay,
+  buildShadowSkillRefreshState,
   buildShadowSkillOverlay,
   shouldReadShadowSkillOverlay,
   shouldWriteShadowSkillOverlay,
@@ -109,6 +110,20 @@ test("baseline skill wins over duplicate overlay skill id", () => {
   );
 
   assert.equal(result.shadowSkills[0]?.name, "baseline");
+});
+
+test("refresh state preserves overlay-only source and first-seen metadata", () => {
+  const overlaySkill = skill({
+    id: "owner/repo:backfilled",
+    github_url: "https://github.com/owner/repo",
+    first_seen: "2026-08-10",
+    source_tag: "creator-backfill",
+  });
+
+  const state = buildShadowSkillRefreshState([overlaySkill]);
+
+  assert.equal(state.existingFirstSeen.get(overlaySkill.id), "2026-08-10");
+  assert.equal(state.existingSkills.get(overlaySkill.id)?.source_tag, "creator-backfill");
 });
 
 test("builds overlay from non-baseline maintained skills only", () => {

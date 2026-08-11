@@ -47,6 +47,16 @@ export function applyShadowSkillOverlay(
   };
 }
 
+export function buildShadowSkillRefreshState(shadowSkills: ShadowSkillRecord[]): {
+  existingFirstSeen: Map<string, string>;
+  existingSkills: Map<string, ShadowSkillRecord>;
+} {
+  return {
+    existingFirstSeen: new Map(shadowSkills.map((skill) => [skill.id, skill.first_seen])),
+    existingSkills: new Map(shadowSkills.map((skill) => [skill.id, skill])),
+  };
+}
+
 export function buildShadowSkillOverlay(
   maintainedSkills: ShadowSkillRecord[],
   baselineSkillIds: Set<string>,

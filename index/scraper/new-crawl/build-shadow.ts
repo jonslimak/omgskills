@@ -70,6 +70,7 @@ import {
 } from "./policy-precedence.js";
 import {
   applyShadowSkillOverlay,
+  buildShadowSkillRefreshState,
   buildShadowSkillOverlay,
   loadShadowSkillOverlay,
   shouldReadShadowSkillOverlay,
@@ -1185,8 +1186,7 @@ async function runShadowRefresh(
 ): Promise<ShadowRefreshResult> {
   const baselineById = new Map(baselineSkills.map((skill) => [skill.id, skill]));
   const shadowById = new Map(shadowSkills.map((skill) => [skill.id, skill]));
-  const existingFirstSeen = new Map(baselineSkills.map((skill) => [skill.id, skill.first_seen]));
-  const existingSkills = new Map(baselineSkills.map((skill) => [skill.id, skill]));
+  const { existingFirstSeen, existingSkills } = buildShadowSkillRefreshState(shadowSkills);
   const officialRepos = new Set(
     [...discovered.values()]
       .filter((repo) => repo.sources.has("official"))
