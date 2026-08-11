@@ -400,7 +400,10 @@ const SCENARIOS = [
         <blockquote>"I don't think I've typed like a line of code probably since December, basically, which is an extremely large change." &mdash; <a>Andrej Karpathy</a>, No Priors podcast, March 2026</blockquote>
         <p>When I heard Karpathy say this, I wanted to find out how. How does one person ship like a team of twenty? Peter Steinberger built <a>OpenClaw</a> &mdash; 247K GitHub stars &mdash; essentially solo with AI agents. The revolution is here. A single builder with the right tooling can move faster than a traditional team.</p>
         <p>I'm <a>Garry Tan</a>, President &amp; CEO of <a>Y Combinator</a>. I've worked with thousands of startups &mdash; Coinbase, Instacart, Rippling &mdash; when they were one or two people in a garage.</p>
-        <p><b>gstack is my answer.</b> In the last 60 days: 3 production services, 40+ shipped features, part-time, while running YC full-time. On logical code change my 2026 run rate is <b>~810&times; my 2013 pace</b>.</p>`,
+        <p><b>gstack is my answer.</b> In the last 60 days: 3 production services, 40+ shipped features, part-time, while running YC full-time. On logical code change &mdash; not raw LOC, which AI inflates &mdash; my 2026 run rate is <b>~810&times; my 2013 pace</b> (11,417 vs 14 logical lines/day). Year-to-date, 2026 has already produced <b>240&times; the entire 2013 year</b>. Measured across 40 public + private <a>garrytan/*</a> repos including Bookface. AI wrote most of it. The point isn't who typed it, it's what shipped.</p>
+        <blockquote>The LOC critics aren't wrong that raw line counts inflate with AI. They are wrong that normalized-for-inflation I'm less productive.</blockquote>
+        <p><b>What's inside:</b> the exact skills I run daily &mdash; <a>ios-design-review</a> for visual audits on real hardware, <a>ios-qa</a> for live-device testing, <a>ios-clean</a> for stripping debug wiring before release, and <a>ios-fix</a> for autonomous bug fixing. Each one is battle-tested on shipping apps, not demos.</p>
+        <p>Install it, point it at your Xcode project, and ship. The stack assumes Claude Code or Codex and a booted simulator &mdash; everything else it sets up itself.</p>`,
     },
     installedRow: ["ios-clean", "Claude", "now"],
   },
@@ -431,7 +434,11 @@ const SCENARIOS = [
         <p>Anthropic&rsquo;s official skill for building web interfaces that avoid generic AI aesthetics &mdash; typography, color, spacing, and motion guidance distilled from production work.</p>
         <p><b>What it covers:</b> layout systems and hierarchy, expressive but restrained type pairings, color systems that survive dark mode, and motion that communicates state instead of decorating it.</p>
         <p>Use when building landing pages, dashboards, or components where design quality matters. Pairs well with <a>canvas-design</a> and <a>web-artifacts-builder</a> from the same library.</p>
-        <p>Part of <a>anthropics/skills</a> &mdash; the canonical skill library maintained by Anthropic.</p>`,
+        <p>Part of <a>anthropics/skills</a> &mdash; the canonical skill library maintained by Anthropic.</p>
+        <blockquote>Generic AI design is a choice, not a default. The difference between a template and a product is a hundred small decisions made on purpose.</blockquote>
+        <p><b>The principles:</b> commit to a typographic point of view instead of hedging with system defaults; build color as a system of roles, not a palette of favorites; let spacing carry hierarchy so borders don't have to; and reserve motion for state changes &mdash; if it doesn't communicate, it decorates.</p>
+        <p><b>In practice:</b> the skill reviews your layout before styling begins, proposes a type scale and spacing grid, then holds every component to it. It flags AI-slop patterns &mdash; gradient hero text, glassmorphism-by-default, purple-on-dark &mdash; and suggests distinctive alternatives grounded in your product's voice.</p>
+        <p>Works in any web stack: vanilla CSS, Tailwind, styled-components, or design tokens. Pairs with <a>brand-guidelines</a> when a brand system already exists.</p>`,
     },
     installedRow: ["frontend-design", "Claude", "now"],
   },
