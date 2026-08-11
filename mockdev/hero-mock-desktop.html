@@ -9,8 +9,8 @@
   html, body { height: 100%; }
   body {
     background: #fff;
-    display: flex; align-items: flex-start; justify-content: center;
-    padding-top: 24px;
+    display: flex; align-items: flex-start; justify-content: flex-end;
+    padding-top: 24px; padding-right: 18px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
@@ -31,6 +31,7 @@
   /* ── screen fragment: right side of a Mac display (back.png) ── */
   .screen {
     position: relative;
+    flex: none;
     width: 918px; height: 907px;
     background: url(back.png) no-repeat top right / 918px 907px;
     filter: drop-shadow(0 26px 50px rgba(0,0,0,.28));
@@ -736,12 +737,11 @@ function anchorArrow() {
 }
 
 function fit() {
-  const w = document.documentElement.clientWidth;
   const h = document.documentElement.clientHeight;
-  const scale = Math.min(1, (w - 40) / 950, (h - 48) / 955);
+  const scale = Math.min(1, (h - 48) / 955);
   const screen = document.querySelector(".screen");
   screen.style.transform = `scale(${scale})`;
-  screen.style.transformOrigin = "top center";
+  screen.style.transformOrigin = "top right";
   requestAnimationFrame(anchorArrow);
 }
 addEventListener("resize", fit);
