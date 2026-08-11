@@ -28,23 +28,16 @@
   svg.lucide { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.12em; }
 
 
-  /* ── screen fragment: right side of a Mac display ── */
+  /* ── screen fragment: right side of a Mac display (back.png) ── */
   .screen {
     position: relative;
-    width: 1000px;
-    border: solid #161616;
-    border-width: 12px 12px 0 0;
-    border-radius: 0 30px 0 0;
+    width: 918px; height: 907px;
+    background: url(back.png) no-repeat top right / 918px 907px;
+    filter: drop-shadow(0 26px 50px rgba(0,0,0,.28));
+    padding: 22px 34px 0 64px;
     overflow: hidden;
-    padding: 4px 30px 34px 90px;
-    box-shadow: 0 24px 70px rgba(0,0,0,.25);
   }
-  .wall {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-  }
-  .screen > .stage { position: relative; z-index: 1; }
+  .screen > .stage { position: relative; z-index: 1; transform: scale(.965); transform-origin: top right; }
 
   .stage { display: flex; flex-direction: column; align-items: flex-end; width: 820px; }
 
@@ -348,36 +341,6 @@
 </svg>
 
 <div class="screen">
-<svg class="wall" viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-  <defs>
-    <linearGradient id="sky" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#a89bf2"/><stop offset=".5" stop-color="#5f6ef4"/><stop offset="1" stop-color="#1e49ee"/>
-    </linearGradient>
-    <linearGradient id="haze" x1="0" y1="0" x2="1" y2=".6">
-      <stop offset="0" stop-color="#c9b8f5"/><stop offset="1" stop-color="#8f9df6"/>
-    </linearGradient>
-    <linearGradient id="coral" x1="0" y1="0" x2="1" y2=".4">
-      <stop offset="0" stop-color="#f2503c"/><stop offset=".55" stop-color="#f4776d"/><stop offset="1" stop-color="#eb9ad0"/>
-    </linearGradient>
-    <linearGradient id="dgreen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0b4022"/><stop offset="1" stop-color="#1d6e2e"/>
-    </linearGradient>
-    <linearGradient id="lgreen" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#a9e424"/><stop offset=".5" stop-color="#7ac81e"/><stop offset="1" stop-color="#3f9718"/>
-    </linearGradient>
-  </defs>
-  <rect width="1000" height="950" fill="url(#sky)"/>
-  <path d="M0 240 C 220 140 420 260 640 190 C 800 140 920 170 1000 120 L 1000 460 C 780 520 560 470 340 520 C 180 555 60 540 0 560 Z" fill="url(#haze)" opacity=".75"/>
-  <path d="M0 300 C 200 230 430 330 660 270 C 830 228 940 258 1000 235 L 1000 560 C 800 610 560 560 320 610 C 160 642 60 630 0 650 Z" fill="url(#coral)" opacity=".95"/>
-  <path d="M0 430 C 240 360 480 470 700 420 C 860 385 950 415 1000 400 L 1000 950 L 0 950 Z" fill="url(#dgreen)"/>
-  <path d="M0 620 C 200 545 420 660 640 610 C 820 570 930 605 1000 585 L 1000 950 L 0 950 Z" fill="url(#lgreen)"/>
-  <g fill="none" stroke="#c8f04c" stroke-width="10" opacity=".28">
-    <path d="M-40 700 C 140 660 280 740 460 705"/>
-    <path d="M-60 760 C 150 715 320 800 520 760"/>
-    <path d="M-40 820 C 170 775 340 860 560 815"/>
-    <path d="M-20 880 C 190 835 360 915 590 870"/>
-  </g>
-</svg>
 <div class="stage" id="stage">
   <div class="menubar">
     <span class="mb owl" id="owl">&#128064;</span>
@@ -775,7 +738,7 @@ function anchorArrow() {
 function fit() {
   const w = document.documentElement.clientWidth;
   const h = document.documentElement.clientHeight;
-  const scale = Math.min(1, (w - 40) / 1020, (h - 48) / 960);
+  const scale = Math.min(1, (w - 40) / 950, (h - 48) / 955);
   const screen = document.querySelector(".screen");
   screen.style.transform = `scale(${scale})`;
   screen.style.transformOrigin = "top center";
