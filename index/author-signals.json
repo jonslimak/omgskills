@@ -353,7 +353,7 @@
     "authorHandle": "0xNyk",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 3890,
+    "totalStars": 3939,
     "totalInstalls": 0,
     "topSkillIds": [
       "0xNyk/council-of-high-intelligence",
@@ -1054,7 +1054,7 @@
     "authorHandle": "6551team",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 3719,
+    "totalStars": 3834,
     "totalInstalls": 0,
     "topSkillIds": [
       "6551team/opennews-mcp:opennews",
@@ -1384,7 +1384,7 @@
     "authorHandle": "a5c-ai",
     "isOfficialVendor": false,
     "skillCount": 75,
-    "totalStars": 65077,
+    "totalStars": 65079,
     "totalInstalls": 0,
     "topSkillIds": [
       "a5c-ai/babysitter:click-scaffolder",
@@ -1624,7 +1624,7 @@
     "authorHandle": "aas-ee",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 1695,
+    "totalStars": 1700,
     "totalInstalls": 0,
     "topSkillIds": [
       "aas-ee/open-websearch:open-websearch"
@@ -1975,7 +1975,7 @@
     "authorHandle": "abhigyanpatwari",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 181042,
+    "totalStars": 181051,
     "totalInstalls": 0,
     "topSkillIds": [
       "abhigyanpatwari/gitnexus:gitnexus-debugging",
@@ -2550,14 +2550,14 @@
     "authorHandle": "addyosmani",
     "isOfficialVendor": false,
     "skillCount": 29,
-    "totalStars": 1675268,
-    "totalInstalls": 110553,
+    "totalStars": 1680146,
+    "totalInstalls": 110780,
     "topSkillIds": [
+      "addyosmani/agent-skills:skills/api-and-interface-design",
       "addyosmani/agent-skills:browser-testing-with-devtools",
       "addyosmani/agent-skills:ci-cd-and-automation",
       "addyosmani/agent-skills:code-review-and-quality",
-      "addyosmani/agent-skills:code-simplification",
-      "addyosmani/agent-skills:context-engineering"
+      "addyosmani/agent-skills:code-simplification"
     ]
   },
   {
@@ -3100,14 +3100,14 @@
     "authorHandle": "affaan-m",
     "isOfficialVendor": false,
     "skillCount": 414,
-    "totalStars": 90646238,
+    "totalStars": 90646464,
     "totalInstalls": 0,
     "topSkillIds": [
-      "affaan-m/ecc:security-review",
+      "affaan-m/ecc:frontend-patterns",
       "affaan-m/everything-claude-code:docs/zh-TW/skills/continuous-learning",
+      "affaan-m/ecc:security-review",
       "affaan-m/ecc:accessibility",
-      "affaan-m/ecc:agent-architecture-audit",
-      "affaan-m/ecc:agent-eval"
+      "affaan-m/ecc:agent-architecture-audit"
     ]
   },
   {
@@ -3508,7 +3508,7 @@
     "authorHandle": "agents365-ai",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 7425,
+    "totalStars": 7459,
     "totalInstalls": 0,
     "topSkillIds": [
       "agents365-ai/drawio-skill:drawio-skill"
@@ -3582,7 +3582,7 @@
     "authorHandle": "AgentsMesh",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 6204,
+    "totalStars": 6201,
     "totalInstalls": 0,
     "topSkillIds": [
       "AgentsMesh/AgentsMesh:.claude/skills/e2e",
@@ -3803,7 +3803,7 @@
     "authorHandle": "agno-agi",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 121541,
+    "totalStars": 121545,
     "totalInstalls": 0,
     "topSkillIds": [
       "agno-agi/agno:git-workflow",
@@ -3849,7 +3849,7 @@
     "authorHandle": "agricidaniel",
     "isOfficialVendor": false,
     "skillCount": 78,
-    "totalStars": 578911,
+    "totalStars": 578935,
     "totalInstalls": 0,
     "topSkillIds": [
       "agricidaniel/claude-seo:seo",
@@ -4649,7 +4649,7 @@
     "authorHandle": "aipoch",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 2511,
+    "totalStars": 2671,
     "totalInstalls": 0,
     "topSkillIds": [
       "aipoch/medical-research-skills:peer-review",
@@ -5019,6 +5019,16 @@
       "akaihola/skills-akaihola:mcp-to-skill",
       "akaihola/skills-akaihola:read-as-markdown",
       "akaihola/skills-akaihola:youtube-frame-analysis"
+    ]
+  },
+  {
+    "authorHandle": "akash-network",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1097,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "akash-network/node:setup-env"
     ]
   },
   {
@@ -5422,15 +5432,15 @@
   {
     "authorHandle": "alchaincyf",
     "isOfficialVendor": false,
-    "skillCount": 32,
-    "totalStars": 80835,
-    "totalInstalls": 0,
+    "skillCount": 33,
+    "totalStars": 100313,
+    "totalInstalls": 42309,
     "topSkillIds": [
       "alchaincyf/nuwa-skill",
       "alchaincyf/huashu-design",
+      "alchaincyf/huashu-design:huashu-design",
       "alchaincyf/zhangxuefeng-skill:zhangxuefeng-perspective",
-      "alchaincyf/darwin-skill",
-      "alchaincyf/huashu-skills:huashu-data-pro"
+      "alchaincyf/darwin-skill"
     ]
   },
   {
@@ -6137,7 +6147,7 @@
     "authorHandle": "alirezarezvani",
     "isOfficialVendor": false,
     "skillCount": 134,
-    "totalStars": 1591367,
+    "totalStars": 1591383,
     "totalInstalls": 0,
     "topSkillIds": [
       "alirezarezvani/claude-skills:quality-documentation-manager",
@@ -6519,7 +6529,7 @@
     "authorHandle": "alpic-ai",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 3936,
+    "totalStars": 3937,
     "totalInstalls": 0,
     "topSkillIds": [
       "alpic-ai/skybridge:chatgpt-app-builder",
@@ -7241,7 +7251,7 @@
     "authorHandle": "anbeime",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 11497,
+    "totalStars": 11545,
     "totalInstalls": 0,
     "topSkillIds": [
       "anbeime/skill",
@@ -7687,7 +7697,7 @@
     "authorHandle": "android",
     "isOfficialVendor": false,
     "skillCount": 9,
-    "totalStars": 60165,
+    "totalStars": 60174,
     "totalInstalls": 0,
     "topSkillIds": [
       "android/skills:adaptive",
@@ -7896,8 +7906,8 @@
     "authorHandle": "angular",
     "isOfficialVendor": false,
     "skillCount": 7,
-    "totalStars": 506025,
-    "totalInstalls": 27650,
+    "totalStars": 506027,
+    "totalInstalls": 27752,
     "topSkillIds": [
       "angular/angular:adev-writing-guide",
       "angular/angular:angular-developer",
@@ -8169,7 +8179,7 @@
     "isOfficialVendor": false,
     "skillCount": 17,
     "totalStars": 96764,
-    "totalInstalls": 95866,
+    "totalInstalls": 95972,
     "topSkillIds": [
       "antfu/skills:vite",
       "antfu/skills:vitest",
@@ -8201,14 +8211,14 @@
   {
     "authorHandle": "anthropics",
     "isOfficialVendor": true,
-    "skillCount": 311,
-    "totalStars": 9445220,
-    "totalInstalls": 1709055,
+    "skillCount": 312,
+    "totalStars": 9452215,
+    "totalInstalls": 1711572,
     "topSkillIds": [
+      "anthropics/skills:xlsx",
       "anthropics/skills:pptx",
       "anthropics/skills:pdf",
       "anthropics/skills:docx",
-      "anthropics/skills:xlsx",
       "anthropics/skills:webapp-testing"
     ]
   },
@@ -8444,15 +8454,15 @@
   {
     "authorHandle": "antvis",
     "isOfficialVendor": false,
-    "skillCount": 7,
-    "totalStars": 3196,
+    "skillCount": 8,
+    "totalStars": 7222,
     "totalInstalls": 0,
     "topSkillIds": [
+      "antvis/l7:l7",
       "antvis/chart-visualization-skills:antv-g2-chart",
       "antvis/chart-visualization-skills:antv-skills-maintainer",
       "antvis/chart-visualization-skills:chart-visualization",
-      "antvis/chart-visualization-skills:icon-retrieval",
-      "antvis/chart-visualization-skills:infographic-creator"
+      "antvis/chart-visualization-skills:icon-retrieval"
     ]
   },
   {
@@ -8576,7 +8586,7 @@
     "isOfficialVendor": false,
     "skillCount": 1,
     "totalStars": 5304,
-    "totalInstalls": 35996,
+    "totalInstalls": 36031,
     "topSkillIds": [
       "anysearch-ai/anysearch-skill:anysearch"
     ]
@@ -8754,7 +8764,7 @@
     "authorHandle": "apify",
     "isOfficialVendor": false,
     "skillCount": 25,
-    "totalStars": 19178,
+    "totalStars": 19268,
     "totalInstalls": 0,
     "topSkillIds": [
       "apify/apify-mcp-server:bug-triage",
@@ -9045,7 +9055,7 @@
     "authorHandle": "ar9av",
     "isOfficialVendor": false,
     "skillCount": 35,
-    "totalStars": 106592,
+    "totalStars": 106603,
     "totalInstalls": 0,
     "topSkillIds": [
       "ar9av/obsidian-wiki:claude-history-ingest",
@@ -10639,7 +10649,7 @@
     "authorHandle": "Astro-Han",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 1851,
+    "totalStars": 1864,
     "totalInstalls": 0,
     "topSkillIds": [
       "Astro-Han/karpathy-llm-wiki"
@@ -11298,7 +11308,7 @@
     "isOfficialVendor": false,
     "skillCount": 12,
     "totalStars": 17594,
-    "totalInstalls": 28652,
+    "totalInstalls": 28678,
     "topSkillIds": [
       "avdlee/swiftui-agent-skill:swiftui-expert-skill",
       "avdlee/swiftui-agent-skill:update-swiftui-apis",
@@ -11497,7 +11507,7 @@
     "authorHandle": "awesome-skills",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 1674,
+    "totalStars": 1682,
     "totalInstalls": 0,
     "topSkillIds": [
       "awesome-skills/code-review-skill",
@@ -11542,11 +11552,12 @@
   {
     "authorHandle": "aws",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 2267,
+    "skillCount": 2,
+    "totalStars": 4070,
     "totalInstalls": 0,
     "topSkillIds": [
-      "aws/agent-toolkit-for-aws:amazon-bedrock"
+      "aws/agent-toolkit-for-aws:amazon-bedrock",
+      "aws/agent-toolkit-for-aws:aws-serverless"
     ]
   },
   {
@@ -12113,11 +12124,12 @@
   {
     "authorHandle": "backnotprop",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 7639,
+    "skillCount": 2,
+    "totalStars": 14528,
     "totalInstalls": 0,
     "topSkillIds": [
-      "backnotprop/plannotator:plannotator-compound"
+      "backnotprop/plannotator:plannotator-compound",
+      "backnotprop/plannotator:plannotator-visual-explainer"
     ]
   },
   {
@@ -13288,7 +13300,7 @@
     "authorHandle": "benchflow-ai",
     "isOfficialVendor": false,
     "skillCount": 13,
-    "totalStars": 10742,
+    "totalStars": 10784,
     "totalInstalls": 0,
     "topSkillIds": [
       "benchflow-ai/skillsbench:tasks/exoplanet-detection-period/environment/skills/box-least-squares",
@@ -13612,6 +13624,16 @@
     ]
   },
   {
+    "authorHandle": "bergside",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 2294,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "bergside/awesome-design-skills:agentic"
+    ]
+  },
+  {
     "authorHandle": "beriberikix",
     "isOfficialVendor": false,
     "skillCount": 12,
@@ -13781,15 +13803,15 @@
   {
     "authorHandle": "better-auth",
     "isOfficialVendor": false,
-    "skillCount": 8,
-    "totalStars": 2371,
-    "totalInstalls": 120179,
+    "skillCount": 9,
+    "totalStars": 3483,
+    "totalInstalls": 120523,
     "topSkillIds": [
       "better-auth/better-icons:better-icons",
+      "better-auth/better-icons:skills",
       "better-auth/skills:better-auth-best-practices",
       "better-auth/skills:create-auth-skill",
-      "better-auth/skills:better-auth/emailAndPassword",
-      "better-auth/skills:better-auth/organization"
+      "better-auth/skills:better-auth/emailAndPassword"
     ]
   },
   {
@@ -14056,7 +14078,7 @@
     "authorHandle": "BidingCC",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 1853,
+    "totalStars": 1856,
     "totalInstalls": 0,
     "topSkillIds": [
       "BidingCC/BuildingAI:skill-writer"
@@ -14768,14 +14790,15 @@
   {
     "authorHandle": "blader",
     "isOfficialVendor": false,
-    "skillCount": 4,
-    "totalStars": 37898,
+    "skillCount": 6,
+    "totalStars": 38071,
     "totalInstalls": 0,
     "topSkillIds": [
       "blader/humanizer",
       "blader/Claudeception",
       "blader/napkin",
-      "blader/arbitrage"
+      "blader/arbitrage",
+      "blader/arbitrage:arbitrage"
     ]
   },
   {
@@ -15178,7 +15201,7 @@
     "authorHandle": "bmad-code-org",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 51744,
+    "totalStars": 51767,
     "totalInstalls": 0,
     "topSkillIds": [
       "bmad-code-org/BMAD-METHOD:bmad-help"
@@ -16395,8 +16418,8 @@
     "authorHandle": "browser-act",
     "isOfficialVendor": false,
     "skillCount": 17,
-    "totalStars": 22783,
-    "totalInstalls": 107573,
+    "totalStars": 22887,
+    "totalInstalls": 107580,
     "topSkillIds": [
       "browser-act/skills:browser-act",
       "browser-act/skills:solutions/ecommerce/amazon-asin-lookup-api-skill",
@@ -16409,8 +16432,8 @@
     "authorHandle": "browser-use",
     "isOfficialVendor": false,
     "skillCount": 9,
-    "totalStars": 489261,
-    "totalInstalls": 90523,
+    "totalStars": 489306,
+    "totalInstalls": 90585,
     "topSkillIds": [
       "browser-use/browser-use:browser-use",
       "browser-use/browser-use:cloud",
@@ -16841,7 +16864,7 @@
     "authorHandle": "BuilderIO",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 4467,
+    "totalStars": 4470,
     "totalInstalls": 0,
     "topSkillIds": [
       "BuilderIO/agent-native:embeds"
@@ -17169,7 +17192,7 @@
     "authorHandle": "bytedance",
     "isOfficialVendor": false,
     "skillCount": 23,
-    "totalStars": 1739413,
+    "totalStars": 1739426,
     "totalInstalls": 0,
     "topSkillIds": [
       "bytedance/deer-flow:ppt-generation",
@@ -17485,7 +17508,7 @@
     "authorHandle": "callstackincubator",
     "isOfficialVendor": false,
     "skillCount": 17,
-    "totalStars": 23528,
+    "totalStars": 23531,
     "totalInstalls": 0,
     "topSkillIds": [
       "callstackincubator/agent-device:agent-device",
@@ -17661,6 +17684,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "NeverSight/skills_feed:data/skills-md/camronh/evals-skill/evals"
+    ]
+  },
+  {
+    "authorHandle": "camunda",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 4181,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "camunda/camunda:ci-security-compliance"
     ]
   },
   {
@@ -18681,7 +18714,7 @@
     "authorHandle": "ccxt",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 213518,
+    "totalStars": 213524,
     "totalInstalls": 0,
     "topSkillIds": [
       "ccxt/ccxt:ccxt-python",
@@ -18856,7 +18889,7 @@
     "authorHandle": "centminmod",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 7050,
+    "totalStars": 7089,
     "totalInstalls": 0,
     "topSkillIds": [
       "centminmod/my-claude-code-setup:.claude/skills/claude-docs-consultant",
@@ -19026,7 +19059,7 @@
     "authorHandle": "Chachamaru127",
     "isOfficialVendor": false,
     "skillCount": 18,
-    "totalStars": 15848,
+    "totalStars": 15851,
     "totalInstalls": 0,
     "topSkillIds": [
       "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing",
@@ -19134,12 +19167,12 @@
     "authorHandle": "chakra-ui",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 121701,
+    "totalStars": 121700,
     "totalInstalls": 0,
     "topSkillIds": [
-      "chakra-ui/chakra-ui:chakra-ui-builder",
       "chakra-ui/chakra-ui:chakra-ui-migrate",
-      "chakra-ui/chakra-ui:chakra-ui-refactor"
+      "chakra-ui/chakra-ui:chakra-ui-refactor",
+      "chakra-ui/chakra-ui:chakra-ui-builder"
     ]
   },
   {
@@ -19851,7 +19884,7 @@
     "authorHandle": "CherryHQ",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 50286,
+    "totalStars": 50299,
     "totalInstalls": 0,
     "topSkillIds": [
       "CherryHQ/cherry-studio:skills-manager"
@@ -20394,8 +20427,8 @@
   {
     "authorHandle": "chromedevtools",
     "isOfficialVendor": false,
-    "skillCount": 6,
-    "totalStars": 293335,
+    "skillCount": 7,
+    "totalStars": 297306,
     "totalInstalls": 0,
     "topSkillIds": [
       "chromedevtools/chrome-devtools-mcp:chrome-devtools",
@@ -20619,7 +20652,7 @@
     "authorHandle": "cisco-ai-defense",
     "isOfficialVendor": false,
     "skillCount": 10,
-    "totalStars": 19705,
+    "totalStars": 19717,
     "totalInstalls": 0,
     "topSkillIds": [
       "cisco-ai-defense/skill-scanner:evals/skills/command-injection/eval-execution",
@@ -21108,7 +21141,7 @@
     "isOfficialVendor": false,
     "skillCount": 24,
     "totalStars": 1502,
-    "totalInstalls": 205740,
+    "totalInstalls": 206650,
     "topSkillIds": [
       "clerk/skills:clerk-nextjs-patterns",
       "clerk/skills:clerk-setup",
@@ -21164,7 +21197,7 @@
     "authorHandle": "clickhouse",
     "isOfficialVendor": false,
     "skillCount": 36,
-    "totalStars": 647453,
+    "totalStars": 647459,
     "totalInstalls": 0,
     "topSkillIds": [
       "clickhouse/clickhouse:review",
@@ -21212,7 +21245,7 @@
     "authorHandle": "cline",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 65997,
+    "totalStars": 66014,
     "totalInstalls": 0,
     "topSkillIds": [
       "cline/cline:create-pull-request"
@@ -21268,7 +21301,7 @@
     "authorHandle": "cloudai-x",
     "isOfficialVendor": false,
     "skillCount": 10,
-    "totalStars": 29600,
+    "totalStars": 29605,
     "totalInstalls": 0,
     "topSkillIds": [
       "cloudai-x/threejs-skills:threejs-animation",
@@ -21317,9 +21350,9 @@
   {
     "authorHandle": "cloudflare",
     "isOfficialVendor": true,
-    "skillCount": 50,
-    "totalStars": 259065,
-    "totalInstalls": 337609,
+    "skillCount": 52,
+    "totalStars": 259115,
+    "totalInstalls": 367027,
     "topSkillIds": [
       "cloudflare/moltworker:skills/cloudflare-browser",
       "cloudflare/vinext:migrate-to-vinext",
@@ -21617,7 +21650,7 @@
     "authorHandle": "cocoindex-io",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 2737,
+    "totalStars": 2739,
     "totalInstalls": 0,
     "topSkillIds": [
       "cocoindex-io/cocoindex-code:ccc",
@@ -21900,7 +21933,7 @@
     "authorHandle": "coder",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 3675,
+    "totalStars": 3676,
     "totalInstalls": 0,
     "topSkillIds": [
       "coder/mux:.mux/skills/dev-desktop-sandbox",
@@ -22011,6 +22044,16 @@
       "CodeWithBehnam/cc-docs:skills/api-architecture/api-design-principles",
       "CodeWithBehnam/cc-docs:skills/api-architecture/architecture-patterns",
       "CodeWithBehnam/cc-docs:skills/backend-development/angular-migration"
+    ]
+  },
+  {
+    "authorHandle": "codewithmukesh",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 647,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "codewithmukesh/dotnet-claude-kit:api-versioning"
     ]
   },
   {
@@ -22450,12 +22493,13 @@
   {
     "authorHandle": "composiohq",
     "isOfficialVendor": true,
-    "skillCount": 2,
+    "skillCount": 3,
     "totalStars": 204,
     "totalInstalls": 0,
     "topSkillIds": [
       "composiohq/skills:composio",
-      "composiohq/skills:skill-creator"
+      "composiohq/skills:skill-creator",
+      "composiohq/composio-mcp-plugin:composio-activity-summary"
     ]
   },
   {
@@ -22608,7 +22652,7 @@
     "authorHandle": "conorbronsdon",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 5822,
+    "totalStars": 5844,
     "totalInstalls": 0,
     "topSkillIds": [
       "conorbronsdon/avoid-ai-writing",
@@ -22921,15 +22965,15 @@
   {
     "authorHandle": "coreyhaines31",
     "isOfficialVendor": false,
-    "skillCount": 40,
-    "totalStars": 1344720,
-    "totalInstalls": 2047101,
+    "skillCount": 89,
+    "totalStars": 2669513,
+    "totalInstalls": 2050464,
     "topSkillIds": [
-      "coreyhaines31/marketingskills:revops",
-      "coreyhaines31/marketingskills:lead-magnets",
-      "coreyhaines31/marketingskills:customer-research",
-      "coreyhaines31/marketingskills:competitor-profiling",
-      "coreyhaines31/marketingskills:community-marketing"
+      "coreyhaines31/marketingskills:skills/ab-testing",
+      "coreyhaines31/marketingskills:skills/ads",
+      "coreyhaines31/marketingskills:skills/analytics",
+      "coreyhaines31/marketingskills:skills/aso",
+      "coreyhaines31/marketingskills:skills/attribution"
     ]
   },
   {
@@ -23172,6 +23216,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "clawdbot/skills:skills/cotyledonlab/irish-takeaway"
+    ]
+  },
+  {
+    "authorHandle": "couchers-org",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 552,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "couchers-org/couchers:pr"
     ]
   },
   {
@@ -23688,7 +23742,7 @@
     "authorHandle": "cryfs",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 4541,
+    "totalStars": 4553,
     "totalInstalls": 0,
     "topSkillIds": [
       "cryfs/cryfs:.claude/skills/async-drop",
@@ -23941,7 +23995,7 @@
     "isOfficialVendor": false,
     "skillCount": 1,
     "totalStars": 352,
-    "totalInstalls": 70323,
+    "totalInstalls": 70453,
     "topSkillIds": [
       "currents-dev/playwright-best-practices-skill:playwright-best-practices"
     ]
@@ -23960,7 +24014,7 @@
     "authorHandle": "cursor",
     "isOfficialVendor": true,
     "skillCount": 23,
-    "totalStars": 59869,
+    "totalStars": 59877,
     "totalInstalls": 0,
     "topSkillIds": [
       "cursor/plugins:architect",
@@ -24239,7 +24293,7 @@
     "authorHandle": "CyberStrikeus",
     "isOfficialVendor": false,
     "skillCount": 14,
-    "totalStars": 16047,
+    "totalStars": 16073,
     "totalInstalls": 0,
     "topSkillIds": [
       "CyberStrikeus/CyberStrike:cis-aws-database-3.8",
@@ -24538,7 +24592,7 @@
     "authorHandle": "d4vinci",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 73440,
+    "totalStars": 73522,
     "totalInstalls": 0,
     "topSkillIds": [
       "d4vinci/scrapling:scrapling-official"
@@ -25121,15 +25175,15 @@
   {
     "authorHandle": "danielmiessler",
     "isOfficialVendor": false,
-    "skillCount": 104,
-    "totalStars": 1374499,
+    "skillCount": 150,
+    "totalStars": 2195369,
     "totalInstalls": 0,
     "topSkillIds": [
       "danielmiessler/LifeOS:Art",
-      "danielmiessler/LifeOS:Aphorisms",
-      "danielmiessler/LifeOS:Interceptor",
-      "danielmiessler/LifeOS:Loop",
-      "danielmiessler/LifeOS:Harvest"
+      "danielmiessler/LifeOS:LifeOS",
+      "danielmiessler/LifeOS:LifeOS/install/skills/ApertureOscillation",
+      "danielmiessler/LifeOS:LifeOS/install/skills/Apify",
+      "danielmiessler/LifeOS:LifeOS/install/skills/ArXiv"
     ]
   },
   {
@@ -25982,15 +26036,15 @@
   {
     "authorHandle": "davidondrej",
     "isOfficialVendor": false,
-    "skillCount": 10,
-    "totalStars": 27922,
+    "skillCount": 63,
+    "totalStars": 134993,
     "totalInstalls": 0,
     "topSkillIds": [
-      "davidondrej/skills:browser-harness",
-      "davidondrej/skills:codex-subagent",
-      "davidondrej/skills:deep-research",
-      "davidondrej/skills:effective-agent-skills",
-      "davidondrej/skills:git-worktree"
+      "davidondrej/skills:skills/agent-orchestration/corral-launch-agents",
+      "davidondrej/skills:skills/agent-orchestration/fable-review",
+      "davidondrej/skills:skills/agent-orchestration/herdr",
+      "davidondrej/skills:skills/ops-and-setup/create-readonly-db-role",
+      "davidondrej/skills:skills/ops-and-setup/github-outside-sandbox"
     ]
   },
   {
@@ -26496,6 +26550,16 @@
     ]
   },
   {
+    "authorHandle": "decolua",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 21087,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "decolua/9router:9router-web-fetch"
+    ]
+  },
+  {
     "authorHandle": "dedalus-erp-pas",
     "isOfficialVendor": false,
     "skillCount": 7,
@@ -26807,7 +26871,7 @@
     "authorHandle": "DenisSergeevitch",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 2204,
+    "totalStars": 2206,
     "totalInstalls": 0,
     "topSkillIds": [
       "DenisSergeevitch/agents-best-practices"
@@ -27857,7 +27921,7 @@
     "isOfficialVendor": false,
     "skillCount": 6,
     "totalStars": 601722,
-    "totalInstalls": 32477,
+    "totalInstalls": 32863,
     "topSkillIds": [
       "dietrichgebert/ponytail:ponytail",
       "dietrichgebert/ponytail:ponytail-audit",
@@ -27875,6 +27939,16 @@
     "topSkillIds": [
       "different-ai/agent-bank:skill-authoring",
       "different-ai/agent-bank:writing-style"
+    ]
+  },
+  {
+    "authorHandle": "diffusionstudio",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 4670,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "diffusionstudio/lottie:text-to-lottie"
     ]
   },
   {
@@ -28164,7 +28238,7 @@
     "authorHandle": "discourse",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 47632,
+    "totalStars": 47631,
     "totalInstalls": 0,
     "topSkillIds": [
       "discourse/discourse:discourse-upcoming-changes"
@@ -29020,7 +29094,7 @@
     "authorHandle": "Donchitos",
     "isOfficialVendor": false,
     "skillCount": 12,
-    "totalStars": 215337,
+    "totalStars": 215353,
     "totalInstalls": 0,
     "topSkillIds": [
       "Donchitos/Claude-Code-Game-Studios:.claude/skills/architecture-decision",
@@ -29296,15 +29370,15 @@
   {
     "authorHandle": "dotnet",
     "isOfficialVendor": false,
-    "skillCount": 30,
-    "totalStars": 63037,
+    "skillCount": 31,
+    "totalStars": 65915,
     "totalInstalls": 0,
     "topSkillIds": [
       "dotnet/efcore:make-skill",
       "dotnet/skills:.agents/skills/create-custom-agent",
+      "dotnet/macios:macios-xcode-beta-update",
       "dotnet/skills:.agents/skills/create-skill",
-      "dotnet/skills:.agents/skills/create-skill-test",
-      "dotnet/skills:analyzing-dotnet-performance"
+      "dotnet/skills:.agents/skills/create-skill-test"
     ]
   },
   {
@@ -30678,6 +30752,16 @@
     ]
   },
   {
+    "authorHandle": "easyeda",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 250,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "easyeda/easyeda-api-skill"
+    ]
+  },
+  {
     "authorHandle": "easyteacher",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -31167,7 +31251,7 @@
     "authorHandle": "egonex-ai",
     "isOfficialVendor": false,
     "skillCount": 8,
-    "totalStars": 630848,
+    "totalStars": 630959,
     "totalInstalls": 0,
     "topSkillIds": [
       "egonex-ai/understand-anything:understand",
@@ -31496,7 +31580,7 @@
     "authorHandle": "electron",
     "isOfficialVendor": true,
     "skillCount": 1,
-    "totalStars": 122430,
+    "totalStars": 122432,
     "totalInstalls": 0,
     "topSkillIds": [
       "electron/electron:.claude/skills/electron-chromium-upgrade"
@@ -31923,11 +32007,15 @@
   {
     "authorHandle": "emilkowalski",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 28289,
-    "totalInstalls": 0,
+    "skillCount": 10,
+    "totalStars": 256392,
+    "totalInstalls": 93673,
     "topSkillIds": [
-      "emilkowalski/skill:emil-design-eng"
+      "emilkowalski/skills:skills/animate",
+      "emilkowalski/skill:emil-design-eng",
+      "emilkowalski/skills:skills/animation-vocabulary",
+      "emilkowalski/skills:skills/apple-design",
+      "emilkowalski/skills:skills/ask-sonner"
     ]
   },
   {
@@ -31946,7 +32034,7 @@
     "authorHandle": "Emily2040",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 6224,
+    "totalStars": 6565,
     "totalInstalls": 0,
     "topSkillIds": [
       "Emily2040/seedance-2.0:seedance-vocab-ru",
@@ -32813,7 +32901,7 @@
     "authorHandle": "eronred",
     "isOfficialVendor": false,
     "skillCount": 39,
-    "totalStars": 67782,
+    "totalStars": 67787,
     "totalInstalls": 0,
     "topSkillIds": [
       "eronred/aso-skills:ab-test-store-listing",
@@ -33244,7 +33332,7 @@
     "authorHandle": "eugeniughelbur",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 3962,
+    "totalStars": 3969,
     "totalInstalls": 0,
     "topSkillIds": [
       "eugeniughelbur/obsidian-second-brain",
@@ -33411,10 +33499,11 @@
   {
     "authorHandle": "EveryInc",
     "isOfficialVendor": false,
-    "skillCount": 3,
-    "totalStars": 32721,
+    "skillCount": 4,
+    "totalStars": 55052,
     "totalInstalls": 0,
     "topSkillIds": [
+      "EveryInc/compound-engineering-plugin:ce-pov",
       "EveryInc/compound-engineering-plugin:plugins/coding-tutor/skills/coding-tutor",
       "EveryInc/compound-engineering-plugin:ce-setup",
       "EveryInc/charlie-cfo-skill:charlie-cfo-skill"
@@ -33509,7 +33598,7 @@
     "authorHandle": "evomap",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 8958,
+    "totalStars": 8959,
     "totalInstalls": 0,
     "topSkillIds": [
       "evomap/evolver:capability-evolver"
@@ -33633,8 +33722,8 @@
     "authorHandle": "expo",
     "isOfficialVendor": true,
     "skillCount": 16,
-    "totalStars": 180701,
-    "totalInstalls": 424156,
+    "totalStars": 180722,
+    "totalInstalls": 424467,
     "topSkillIds": [
       "expo/expo:android-e2e-testing",
       "expo/expo:deep-code-review",
@@ -33876,11 +33965,11 @@
     "authorHandle": "facebook",
     "isOfficialVendor": true,
     "skillCount": 9,
-    "totalStars": 1752973,
+    "totalStars": 1753002,
     "totalInstalls": 0,
     "topSkillIds": [
-      "facebook/react:extract-errors",
       "facebook/react:feature-flags",
+      "facebook/react:extract-errors",
       "facebook/react:flags",
       "facebook/react:flow",
       "facebook/react:test"
@@ -34200,10 +34289,11 @@
   {
     "authorHandle": "fastclaw-ai",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 77,
+    "skillCount": 2,
+    "totalStars": 1224,
     "totalInstalls": 0,
     "topSkillIds": [
+      "fastclaw-ai/fastclaw:code-runner",
       "fastclaw-ai/anyclaw"
     ]
   },
@@ -34368,6 +34458,16 @@
     "topSkillIds": [
       "fearovex/agent-config:config-export",
       "fearovex/agent-config:sdd-archive"
+    ]
+  },
+  {
+    "authorHandle": "feature-sliced",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 63,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "feature-sliced/skills:feature-sliced-design"
     ]
   },
   {
@@ -34665,10 +34765,11 @@
   {
     "authorHandle": "ferdinandobons",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 5,
+    "skillCount": 2,
+    "totalStars": 530,
     "totalInstalls": 0,
     "topSkillIds": [
+      "ferdinandobons/startup-skill:startup-design",
       "ferdinandobons/knowledge-transfer"
     ]
   },
@@ -34707,7 +34808,7 @@
     "authorHandle": "fern-api",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 3743,
+    "totalStars": 3747,
     "totalInstalls": 0,
     "topSkillIds": [
       "fern-api/fern:custom-commands"
@@ -34810,7 +34911,7 @@
     "authorHandle": "figma",
     "isOfficialVendor": true,
     "skillCount": 11,
-    "totalStars": 20089,
+    "totalStars": 20091,
     "totalInstalls": 0,
     "topSkillIds": [
       "figma/dev-mode-mcp-server-guide:figma-code-connect",
@@ -34941,7 +35042,7 @@
     "isOfficialVendor": true,
     "skillCount": 20,
     "totalStars": 17077,
-    "totalInstalls": 300782,
+    "totalInstalls": 301075,
     "topSkillIds": [
       "firebase/genkit:developing-genkit-tooling",
       "firebase/firebase-tools:resolve-docker-vulnerabilities",
@@ -34955,7 +35056,7 @@
     "isOfficialVendor": true,
     "skillCount": 158,
     "totalStars": 31604,
-    "totalInstalls": 1417891,
+    "totalInstalls": 1418809,
     "topSkillIds": [
       "firecrawl/anydoc:convert-documents-to-markdown",
       "firecrawl/firecrawl-agent:competitor-analysis",
@@ -35404,8 +35505,8 @@
     "authorHandle": "flutter",
     "isOfficialVendor": false,
     "skillCount": 52,
-    "totalStars": 994815,
-    "totalInstalls": 111157,
+    "totalStars": 994820,
+    "totalInstalls": 111425,
     "topSkillIds": [
       "flutter/flutter:find-release",
       "flutter/flutter:dart-log-failure-parser",
@@ -35989,7 +36090,7 @@
     "authorHandle": "FrancyJGLisboa",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 2202,
+    "totalStars": 2214,
     "totalInstalls": 0,
     "topSkillIds": [
       "FrancyJGLisboa/agent-skill-creator"
@@ -36207,7 +36308,7 @@
     "authorHandle": "FreedomIntelligence",
     "isOfficialVendor": false,
     "skillCount": 50,
-    "totalStars": 120879,
+    "totalStars": 120932,
     "totalInstalls": 0,
     "topSkillIds": [
       "FreedomIntelligence/OpenClaw-Medical-Skills:bio-hi-c-analysis-tad-detection",
@@ -36241,7 +36342,7 @@
     "authorHandle": "freestylefly",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 11086,
+    "totalStars": 11136,
     "totalInstalls": 0,
     "topSkillIds": [
       "freestylefly/awesome-gpt-image-2:gpt-image-2-style-library",
@@ -36848,6 +36949,16 @@
     ]
   },
   {
+    "authorHandle": "fzyzcjy",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 5300,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "fzyzcjy/flutter_rust_bridge:frb-debugging"
+    ]
+  },
+  {
     "authorHandle": "g-akshay",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -37318,6 +37429,16 @@
     ]
   },
   {
+    "authorHandle": "ganyuanran",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 570,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "ganyuanran/aegis:systematic-debugging"
+    ]
+  },
+  {
     "authorHandle": "gaojiongwenv587-beep",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -37647,7 +37768,7 @@
     "authorHandle": "GCWing",
     "isOfficialVendor": false,
     "skillCount": 6,
-    "totalStars": 4665,
+    "totalStars": 4716,
     "totalInstalls": 0,
     "topSkillIds": [
       "GCWing/BitFun:gstack-design-consultation",
@@ -37702,7 +37823,7 @@
     "authorHandle": "geekjourneyx",
     "isOfficialVendor": false,
     "skillCount": 15,
-    "totalStars": 4566,
+    "totalStars": 4598,
     "totalInstalls": 0,
     "topSkillIds": [
       "geekjourneyx/md2wechat-skill:md2wechat",
@@ -37867,7 +37988,7 @@
     "isOfficialVendor": false,
     "skillCount": 1,
     "totalStars": 12,
-    "totalInstalls": 54935,
+    "totalInstalls": 54973,
     "topSkillIds": [
       "genkit-ai/skills:developing-genkit-js"
     ]
@@ -38086,7 +38207,7 @@
     "isOfficialVendor": true,
     "skillCount": 5,
     "totalStars": 195,
-    "totalInstalls": 481189,
+    "totalInstalls": 481622,
     "topSkillIds": [
       "get-convex/agent-skills:convex-quickstart",
       "get-convex/agent-skills:convex-create-component",
@@ -38154,6 +38275,16 @@
     ]
   },
   {
+    "authorHandle": "getkyo",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 782,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "getkyo/kyo:readme"
+    ]
+  },
+  {
     "authorHandle": "getmochify",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -38181,7 +38312,7 @@
     "authorHandle": "getsentry",
     "isOfficialVendor": true,
     "skillCount": 182,
-    "totalStars": 1106647,
+    "totalStars": 1106652,
     "totalInstalls": 0,
     "topSkillIds": [
       "getsentry/sentry:design-system",
@@ -38563,8 +38694,8 @@
     "authorHandle": "github",
     "isOfficialVendor": true,
     "skillCount": 402,
-    "totalStars": 11901517,
-    "totalInstalls": 69729,
+    "totalStars": 11901515,
+    "totalInstalls": 69770,
     "topSkillIds": [
       "github/spec-kit:add-community-extension",
       "github/awesome-copilot:acquire-codebase-knowledge",
@@ -39148,8 +39279,8 @@
     "authorHandle": "google",
     "isOfficialVendor": false,
     "skillCount": 26,
-    "totalStars": 113000,
-    "totalInstalls": 566790,
+    "totalStars": 113109,
+    "totalInstalls": 571342,
     "topSkillIds": [
       "google/skills:cloud-run-basics",
       "google/skills:alloydb-basics",
@@ -39172,13 +39303,13 @@
     "authorHandle": "google-gemini",
     "isOfficialVendor": true,
     "skillCount": 21,
-    "totalStars": 1498140,
+    "totalStars": 1498303,
     "totalInstalls": 0,
     "topSkillIds": [
+      "google-gemini/gemini-cli:code-reviewer",
       "google-gemini/gemini-cli:async-pr-review",
       "google-gemini/gemini-cli:behavioral-evals",
       "google-gemini/gemini-cli:ci",
-      "google-gemini/gemini-cli:code-reviewer",
       "google-gemini/gemini-cli:docs-changelog"
     ]
   },
@@ -39186,8 +39317,8 @@
     "authorHandle": "google-labs-code",
     "isOfficialVendor": true,
     "skillCount": 19,
-    "totalStars": 151514,
-    "totalInstalls": 248000,
+    "totalStars": 151515,
+    "totalInstalls": 248199,
     "topSkillIds": [
       "google-labs-code/design.md:agent-dx-cli-scale",
       "google-labs-code/design.md:ink",
@@ -39213,7 +39344,7 @@
     "authorHandle": "googlechrome",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 3332,
+    "totalStars": 3340,
     "totalInstalls": 0,
     "topSkillIds": [
       "googlechrome/modern-web-guidance:chrome-extensions",
@@ -39239,7 +39370,7 @@
     "isOfficialVendor": true,
     "skillCount": 95,
     "totalStars": 2495289,
-    "totalInstalls": 1219431,
+    "totalInstalls": 1220935,
     "topSkillIds": [
       "googleworkspace/cli:gws-calendar",
       "googleworkspace/cli:gws-docs",
@@ -39436,6 +39567,16 @@
     ]
   },
   {
+    "authorHandle": "gradio-app",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1568,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "gradio-app/trackio:trackio"
+    ]
+  },
+  {
     "authorHandle": "gradion-ai",
     "isOfficialVendor": false,
     "skillCount": 2,
@@ -39509,6 +39650,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "grantiva/swift-assist:install"
+    ]
+  },
+  {
+    "authorHandle": "graphif",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 4170,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "graphif/project-graph:ui"
     ]
   },
   {
@@ -39612,8 +39763,8 @@
     "authorHandle": "greensock",
     "isOfficialVendor": true,
     "skillCount": 15,
-    "totalStars": 56972,
-    "totalInstalls": 327427,
+    "totalStars": 56990,
+    "totalInstalls": 328395,
     "topSkillIds": [
       "greensock/gsap-skills:gsap-core",
       "greensock/gsap-skills:gsap-scrolltrigger",
@@ -40764,11 +40915,12 @@
   {
     "authorHandle": "halt-catch-fire",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 664,
+    "skillCount": 2,
+    "totalStars": 1221,
     "totalInstalls": 0,
     "topSkillIds": [
-      "halt-catch-fire/skills:agent-browser"
+      "halt-catch-fire/skills:agent-browser",
+      "halt-catch-fire/skills:ai-avatar-video"
     ]
   },
   {
@@ -41126,7 +41278,7 @@
     "authorHandle": "harbor-framework",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 4100,
+    "totalStars": 4118,
     "totalInstalls": 0,
     "topSkillIds": [
       "harbor-framework/harbor:rewardkit"
@@ -41178,7 +41330,7 @@
     "authorHandle": "HarleyCoops",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 2444,
+    "totalStars": 2450,
     "totalInstalls": 0,
     "topSkillIds": [
       "HarleyCoops/Math-To-Manim:.claude/plugins/math-to-manim/skills/math-to-manim"
@@ -42036,8 +42188,8 @@
     "authorHandle": "heygen-com",
     "isOfficialVendor": true,
     "skillCount": 13,
-    "totalStars": 275483,
-    "totalInstalls": 760416,
+    "totalStars": 275533,
+    "totalInstalls": 760557,
     "topSkillIds": [
       "heygen-com/hyperframes:hyperframes",
       "heygen-com/hyperframes:hyperframes-cli",
@@ -42245,13 +42397,23 @@
     "isOfficialVendor": false,
     "skillCount": 9,
     "totalStars": 6022,
-    "totalInstalls": 533273,
+    "totalInstalls": 536504,
     "topSkillIds": [
       "higgsfield-ai/skills:higgsfield-generate",
       "higgsfield-ai/skills:higgsfield-product-photoshoot",
       "higgsfield-ai/skills:higgsfield-soul-id",
       "higgsfield-ai/skills:higgsfield-marketplace-cards",
       "higgsfield-ai/skills:higgsfield-websites"
+    ]
+  },
+  {
+    "authorHandle": "highcharts",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 12465,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "highcharts/highcharts:tooling"
     ]
   },
   {
@@ -42334,7 +42496,7 @@
     "authorHandle": "himself65",
     "isOfficialVendor": false,
     "skillCount": 14,
-    "totalStars": 21834,
+    "totalStars": 21855,
     "totalInstalls": 0,
     "topSkillIds": [
       "himself65/finance-skills:discord-reader",
@@ -43431,7 +43593,7 @@
     "authorHandle": "huangwb8",
     "isOfficialVendor": false,
     "skillCount": 21,
-    "totalStars": 7779,
+    "totalStars": 7782,
     "totalInstalls": 0,
     "topSkillIds": [
       "huangwb8/chineseresearchlatex:systematic-literature-review",
@@ -43526,7 +43688,7 @@
     "authorHandle": "huggingface",
     "isOfficialVendor": true,
     "skillCount": 25,
-    "totalStars": 367839,
+    "totalStars": 367966,
     "totalInstalls": 0,
     "topSkillIds": [
       "huggingface/transformers:add-or-fix-type-checking",
@@ -43600,7 +43762,7 @@
     "authorHandle": "hugorcd",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 4837,
+    "totalStars": 4848,
     "totalInstalls": 0,
     "topSkillIds": [
       "hugorcd/evlog:create-evlog-adapter",
@@ -44470,7 +44632,7 @@
     "authorHandle": "ibelick",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 13643,
+    "totalStars": 13650,
     "totalInstalls": 0,
     "topSkillIds": [
       "ibelick/ui-skills:baseline-ui",
@@ -44795,6 +44957,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "ifixai-ai/ifixai:ifixai"
+    ]
+  },
+  {
+    "authorHandle": "iflytek",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 3577,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "iflytek/skillhub:code-conventions"
     ]
   },
   {
@@ -45219,7 +45391,7 @@
     "authorHandle": "imbad0202",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 175557,
+    "totalStars": 175606,
     "totalInstalls": 0,
     "topSkillIds": [
       "imbad0202/academic-research-skills:academic-paper",
@@ -45783,15 +45955,15 @@
   {
     "authorHandle": "intellectronica",
     "isOfficialVendor": false,
-    "skillCount": 20,
-    "totalStars": 5140,
-    "totalInstalls": 64959,
+    "skillCount": 28,
+    "totalStars": 5773,
+    "totalInstalls": 65051,
     "topSkillIds": [
+      "intellectronica/agent-skills:plugins/monologue-notes-api/skills",
+      "intellectronica/agent-skills:plugins/upstash-redis-kv/skills",
       "intellectronica/agent-skills:notion-api",
       "intellectronica/agent-skills:anki-connect",
-      "intellectronica/agent-skills:beautiful-mermaid",
-      "intellectronica/agent-skills:context7",
-      "intellectronica/agent-skills:copilot-sdk"
+      "intellectronica/agent-skills:beautiful-mermaid"
     ]
   },
   {
@@ -45998,7 +46170,7 @@
     "authorHandle": "iPlug2",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 9284,
+    "totalStars": 9298,
     "totalInstalls": 0,
     "topSkillIds": [
       "iPlug2/iPlug2:.claude/skills/build",
@@ -46828,8 +47000,8 @@
   {
     "authorHandle": "jackwener",
     "isOfficialVendor": false,
-    "skillCount": 11,
-    "totalStars": 204068,
+    "skillCount": 12,
+    "totalStars": 204972,
     "totalInstalls": 0,
     "topSkillIds": [
       "jackwener/opencli:opencli-adapter-author",
@@ -47131,7 +47303,7 @@
     "authorHandle": "jakubantalik",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 5232,
+    "totalStars": 5251,
     "totalInstalls": 0,
     "topSkillIds": [
       "jakubantalik/transitions.dev:transitions-dev",
@@ -47153,8 +47325,8 @@
     "authorHandle": "jakubkrehel",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 7156,
-    "totalInstalls": 50337,
+    "totalStars": 7570,
+    "totalInstalls": 50403,
     "topSkillIds": [
       "jakubkrehel/skills:better-colors",
       "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
@@ -48556,6 +48728,20 @@
     ]
   },
   {
+    "authorHandle": "Jeffallan",
+    "isOfficialVendor": false,
+    "skillCount": 17,
+    "totalStars": 44164,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "Jeffallan/claude-skills:skills/django-storages-s3",
+      "Jeffallan/claude-skills:skills/rag-architect",
+      "Jeffallan/claude-skills:skills/terraform-engineer",
+      "Jeffallan/claude-skills:skills/vue-expert-js",
+      "Jeffallan/writing-with-agents:skills/architect"
+    ]
+  },
+  {
     "authorHandle": "jefflinshu",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -48898,10 +49084,11 @@
   {
     "authorHandle": "jetbrains",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 801,
+    "skillCount": 2,
+    "totalStars": 2449,
     "totalInstalls": 0,
     "topSkillIds": [
+      "jetbrains/mps:ssr",
       "jetbrains/go-modern-guidelines:use-modern-go"
     ]
   },
@@ -49467,14 +49654,14 @@
     "authorHandle": "jimliu",
     "isOfficialVendor": false,
     "skillCount": 26,
-    "totalStars": 587406,
-    "totalInstalls": 352685,
+    "totalStars": 587452,
+    "totalInstalls": 326363,
     "topSkillIds": [
+      "jimliu/baoyu-skills:baoyu-article-illustrator",
       "jimliu/baoyu-skills:baoyu-post-to-wechat",
       "jimliu/baoyu-skills:baoyu-image-gen",
       "jimliu/baoyu-skills:baoyu-infographic",
-      "jimliu/baoyu-skills:baoyu-markdown-to-html",
-      "jimliu/baoyu-skills:baoyu-cover-image"
+      "jimliu/baoyu-skills:baoyu-markdown-to-html"
     ]
   },
   {
@@ -51885,8 +52072,8 @@
     "authorHandle": "juliusbrussee",
     "isOfficialVendor": false,
     "skillCount": 19,
-    "totalStars": 675038,
-    "totalInstalls": 46624,
+    "totalStars": 675095,
+    "totalInstalls": 46628,
     "topSkillIds": [
       "juliusbrussee/caveman:compress",
       "juliusbrussee/caveman:cavecrew",
@@ -51919,7 +52106,7 @@
     "authorHandle": "JuneYaooo",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 3407,
+    "totalStars": 3415,
     "totalInstalls": 0,
     "topSkillIds": [
       "JuneYaooo/nihaisha-nishi-tcm",
@@ -52347,11 +52534,11 @@
     "authorHandle": "k-dense-ai",
     "isOfficialVendor": false,
     "skillCount": 142,
-    "totalStars": 4631679,
+    "totalStars": 4631739,
     "totalInstalls": 0,
     "topSkillIds": [
-      "k-dense-ai/scientific-agent-skills:scientific-writing",
       "k-dense-ai/scientific-agent-skills:adaptyv",
+      "k-dense-ai/scientific-agent-skills:scientific-writing",
       "k-dense-ai/scientific-agent-skills:aeon",
       "k-dense-ai/scientific-agent-skills:anndata",
       "k-dense-ai/scientific-agent-skills:arboreto"
@@ -52361,7 +52548,7 @@
     "authorHandle": "K-Dense-AI",
     "isOfficialVendor": false,
     "skillCount": 60,
-    "totalStars": 1010254,
+    "totalStars": 1010304,
     "totalInstalls": 0,
     "topSkillIds": [
       "K-Dense-AI/scientific-agent-skills:scientific-skills/adaptyv",
@@ -52633,7 +52820,7 @@
     "authorHandle": "kaitranntt",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 2790,
+    "totalStars": 2796,
     "totalInstalls": 0,
     "topSkillIds": [
       "kaitranntt/ccs:.claude/skills/ccs-delegation"
@@ -53831,11 +54018,11 @@
     "authorHandle": "kepano",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 220445,
-    "totalInstalls": 307505,
+    "totalStars": 221416,
+    "totalInstalls": 308945,
     "topSkillIds": [
-      "kepano/obsidian-skills:defuddle",
       "kepano/obsidian-skills:obsidian-markdown",
+      "kepano/obsidian-skills:defuddle",
       "kepano/obsidian-skills:obsidian-cli",
       "kepano/obsidian-skills:obsidian-bases",
       "kepano/obsidian-skills:json-canvas"
@@ -54928,11 +55115,11 @@
     "authorHandle": "kkkkhazix",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 97562,
+    "totalStars": 97601,
     "totalInstalls": 0,
     "topSkillIds": [
-      "kkkkhazix/khazix-skills:neat-freak",
       "kkkkhazix/khazix-skills:aihot",
+      "kkkkhazix/khazix-skills:neat-freak",
       "kkkkhazix/khazix-skills:hv-analysis",
       "kkkkhazix/khazix-skills:khazix-writer",
       "kkkkhazix/khazix-skills:storage-analyzer"
@@ -55022,6 +55209,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "klirix/jig"
+    ]
+  },
+  {
+    "authorHandle": "klotzkette",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1167,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "klotzkette/claude-fuer-deutsches-recht:gefluegelmast-bussgeld-tiertransport"
     ]
   },
   {
@@ -55538,6 +55735,16 @@
     ]
   },
   {
+    "authorHandle": "krillinai",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 10386,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "krillinai/krillinai:krillinai-pipeline"
+    ]
+  },
+  {
     "authorHandle": "krishagel",
     "isOfficialVendor": false,
     "skillCount": 5,
@@ -55840,11 +56047,11 @@
     "authorHandle": "kucherenko",
     "isOfficialVendor": false,
     "skillCount": 3,
-    "totalStars": 11980,
+    "totalStars": 11979,
     "totalInstalls": 0,
     "topSkillIds": [
-      "kucherenko/jscpd:dry-refactoring",
       "kucherenko/jscpd:jscpd",
+      "kucherenko/jscpd:dry-refactoring",
       "kucherenko/petropowers:writing-skills"
     ]
   },
@@ -55971,7 +56178,7 @@
     "authorHandle": "kunchenguid",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 12605,
+    "totalStars": 12631,
     "totalInstalls": 0,
     "topSkillIds": [
       "kunchenguid/no-mistakes:no-mistakes",
@@ -56542,6 +56749,16 @@
     ]
   },
   {
+    "authorHandle": "lalitmaganti",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 789,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "lalitmaganti/syntaqlite:cp"
+    ]
+  },
+  {
     "authorHandle": "Lallapallooza",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -56713,7 +56930,7 @@
     "authorHandle": "langgenius",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 596620,
+    "totalStars": 596644,
     "totalInstalls": 0,
     "topSkillIds": [
       "langgenius/dify:frontend-code-review",
@@ -56800,8 +57017,8 @@
     "authorHandle": "larksuite",
     "isOfficialVendor": true,
     "skillCount": 31,
-    "totalStars": 278179,
-    "totalInstalls": 177564,
+    "totalStars": 278201,
+    "totalInstalls": 177855,
     "topSkillIds": [
       "larksuite/cli:lark-note",
       "larksuite/cli:lark-apps",
@@ -56890,6 +57107,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "LatentEvals/hty:hty"
+    ]
+  },
+  {
+    "authorHandle": "latitude-dev",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 4255,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "latitude-dev/latitude-llm:notifications"
     ]
   },
   {
@@ -57709,11 +57936,11 @@
     "authorHandle": "leonxlnx",
     "isOfficialVendor": false,
     "skillCount": 5,
-    "totalStars": 336909,
-    "totalInstalls": 199832,
+    "totalStars": 337439,
+    "totalInstalls": 200678,
     "topSkillIds": [
-      "leonxlnx/taste-skill:imagegen-frontend-mobile",
       "leonxlnx/taste-skill:brandkit",
+      "leonxlnx/taste-skill:imagegen-frontend-mobile",
       "leonxlnx/taste-skill:gpt-taste",
       "leonxlnx/taste-skill:image-to-code",
       "leonxlnx/taste-skill:imagegen-frontend-web"
@@ -57733,7 +57960,7 @@
     "authorHandle": "LeoYeAI",
     "isOfficialVendor": false,
     "skillCount": 18,
-    "totalStars": 31567,
+    "totalStars": 31569,
     "totalInstalls": 0,
     "topSkillIds": [
       "LeoYeAI/openclaw-master-skills:agentaudit",
@@ -57826,7 +58053,7 @@
     "authorHandle": "letta-ai",
     "isOfficialVendor": false,
     "skillCount": 7,
-    "totalStars": 12857,
+    "totalStars": 12869,
     "totalInstalls": 0,
     "topSkillIds": [
       "letta-ai/letta-code:.skills/adding-models",
@@ -58813,6 +59040,16 @@
     ]
   },
   {
+    "authorHandle": "linkedin",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 6453,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "linkedin/liger-kernel:liger-kernel-dev"
+    ]
+  },
+  {
     "authorHandle": "linkfox-ai",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -59209,7 +59446,7 @@
     "authorHandle": "ljagiello",
     "isOfficialVendor": false,
     "skillCount": 11,
-    "totalStars": 21645,
+    "totalStars": 21729,
     "totalInstalls": 0,
     "topSkillIds": [
       "ljagiello/ctf-skills:ctf-ai-ml",
@@ -59445,7 +59682,7 @@
     "authorHandle": "lobehub",
     "isOfficialVendor": false,
     "skillCount": 23,
-    "totalStars": 1704109,
+    "totalStars": 1704117,
     "totalInstalls": 0,
     "topSkillIds": [
       "lobehub/lobehub:zustand",
@@ -60749,7 +60986,7 @@
     "authorHandle": "luongnv89",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 104579,
+    "totalStars": 104580,
     "totalInstalls": 0,
     "topSkillIds": [
       "luongnv89/claude-howto:03-skills/brand-voice",
@@ -63242,7 +63479,7 @@
     "isOfficialVendor": false,
     "skillCount": 13,
     "totalStars": 298103,
-    "totalInstalls": 28948,
+    "totalInstalls": 29232,
     "topSkillIds": [
       "mastra-ai/mastra:tailwind-best-practices",
       "mastra-ai/mastra:builder-smoke-test",
@@ -63634,15 +63871,15 @@
   {
     "authorHandle": "mattpocock",
     "isOfficialVendor": false,
-    "skillCount": 22,
-    "totalStars": 2794353,
-    "totalInstalls": 1002745,
+    "skillCount": 64,
+    "totalStars": 8127825,
+    "totalInstalls": 1004076,
     "topSkillIds": [
-      "mattpocock/skills:design-an-interface",
-      "mattpocock/skills:migrate-to-shoehorn",
-      "mattpocock/skills:qa",
-      "mattpocock/skills:ubiquitous-language",
-      "mattpocock/skills:edit-article"
+      "mattpocock/skills:skills/engineering/ask-matt",
+      "mattpocock/skills:skills/engineering/code-review",
+      "mattpocock/skills:skills/engineering/codebase-design",
+      "mattpocock/skills:skills/engineering/diagnosing-bugs",
+      "mattpocock/skills:skills/engineering/domain-modeling"
     ]
   },
   {
@@ -63946,6 +64183,16 @@
     ]
   },
   {
+    "authorHandle": "mayuqi-crypto",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 187,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "mayuqi-crypto/howtogetalongwithgirls:dating-coach"
+    ]
+  },
+  {
     "authorHandle": "mayurrathi",
     "isOfficialVendor": false,
     "skillCount": 5,
@@ -64203,7 +64450,7 @@
     "authorHandle": "mcollina",
     "isOfficialVendor": false,
     "skillCount": 10,
-    "totalStars": 18925,
+    "totalStars": 18926,
     "totalInstalls": 0,
     "topSkillIds": [
       "mcollina/skills:documentation",
@@ -64625,7 +64872,7 @@
     "authorHandle": "mem0ai",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 63029,
+    "totalStars": 63051,
     "totalInstalls": 0,
     "topSkillIds": [
       "mem0ai/mem0:mem0"
@@ -64756,15 +65003,15 @@
   {
     "authorHandle": "MengTo",
     "isOfficialVendor": false,
-    "skillCount": 10,
-    "totalStars": 38613,
+    "skillCount": 124,
+    "totalStars": 566289,
     "totalInstalls": 0,
     "topSkillIds": [
-      "MengTo/Skills:animation-systems",
-      "MengTo/Skills:article-prompts-to-skills",
-      "MengTo/Skills:audit-reference-originality",
-      "MengTo/Skills:build-awwwards-quality-sites",
-      "MengTo/Skills:design-first-ui-prompting"
+      "MengTo/Skills:agent-skills/web-design/thinking-orbs",
+      "MengTo/Skills:agent-skills/web-design/unicorn-studio",
+      "MengTo/Skills:agent-skills/web-design/vantajs",
+      "MengTo/Skills:agent-skills/web-design/webgl-3d-object",
+      "MengTo/Skills:agent-skills/web-design/webgl-landing-steering"
     ]
   },
   {
@@ -64949,7 +65196,7 @@
     "authorHandle": "metabase",
     "isOfficialVendor": false,
     "skillCount": 10,
-    "totalStars": 483674,
+    "totalStars": 483682,
     "totalInstalls": 0,
     "topSkillIds": [
       "metabase/metabase:typescript-review",
@@ -65457,6 +65704,16 @@
     ]
   },
   {
+    "authorHandle": "michaelliv",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1279,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "michaelliv/markit"
+    ]
+  },
+  {
     "authorHandle": "michaelsvanbeek",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -65555,11 +65812,11 @@
     "authorHandle": "microsoft",
     "isOfficialVendor": true,
     "skillCount": 526,
-    "totalStars": 11178443,
-    "totalInstalls": 115881,
+    "totalStars": 11178495,
+    "totalInstalls": 116231,
     "topSkillIds": [
-      "microsoft/vscode:fix-errors",
       "microsoft/vscode:accessibility",
+      "microsoft/vscode:fix-errors",
       "microsoft/vscode:act-on-feedback",
       "microsoft/vscode:agent-customization",
       "microsoft/vscode:author-contributions"
@@ -66286,11 +66543,11 @@
     "authorHandle": "minimax-ai",
     "isOfficialVendor": false,
     "skillCount": 28,
-    "totalStars": 283306,
-    "totalInstalls": 26939,
+    "totalStars": 283320,
+    "totalInstalls": 26975,
     "topSkillIds": [
-      "minimax-ai/skills:pptx-generator",
       "minimax-ai/skills:android-native-dev",
+      "minimax-ai/skills:pptx-generator",
       "minimax-ai/skills:buddy-sings",
       "minimax-ai/skills:flutter-dev",
       "minimax-ai/skills:frontend-dev"
@@ -66577,7 +66834,7 @@
     "authorHandle": "mitsuhiko",
     "isOfficialVendor": false,
     "skillCount": 6,
-    "totalStars": 14155,
+    "totalStars": 14211,
     "totalInstalls": 0,
     "topSkillIds": [
       "mitsuhiko/agent-stuff:openscad",
@@ -67117,7 +67374,7 @@
     "authorHandle": "modelcontextprotocol",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 10565,
+    "totalStars": 10574,
     "totalInstalls": 0,
     "topSkillIds": [
       "modelcontextprotocol/ext-apps:create-mcp-app",
@@ -67144,7 +67401,7 @@
     "authorHandle": "modem-dev",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 8213,
+    "totalStars": 8224,
     "totalInstalls": 0,
     "topSkillIds": [
       "modem-dev/hunk:hunk-review"
@@ -67979,10 +68236,11 @@
   {
     "authorHandle": "mozilla",
     "isOfficialVendor": false,
-    "skillCount": 2,
-    "totalStars": 18,
+    "skillCount": 3,
+    "totalStars": 1762,
     "totalInstalls": 0,
     "topSkillIds": [
+      "mozilla/fx-private-relay:ble",
       "mozilla/bigquery-etl-skills:skills/bigconfig-generator",
       "mozilla/bigquery-etl-skills:skills/bigquery-etl-core"
     ]
@@ -68428,7 +68686,7 @@
     "isOfficialVendor": false,
     "skillCount": 1,
     "totalStars": 226,
-    "totalInstalls": 54213,
+    "totalInstalls": 54216,
     "topSkillIds": [
       "msmps/opentui-skill:opentui"
     ]
@@ -68586,7 +68844,7 @@
     "authorHandle": "mui",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 98739,
+    "totalStars": 98741,
     "totalInstalls": 0,
     "topSkillIds": [
       "mui/material-ui:material-ui-nextjs"
@@ -68605,23 +68863,23 @@
   {
     "authorHandle": "mukul975",
     "isOfficialVendor": false,
-    "skillCount": 6,
-    "totalStars": 105891,
+    "skillCount": 7,
+    "totalStars": 128036,
     "totalInstalls": 0,
     "topSkillIds": [
+      "mukul975/Anthropic-Cybersecurity-Skills:hunting-for-cobalt-strike-beacons",
       "mukul975/Anthropic-Cybersecurity-Skills:conducting-domain-persistence-with-dcsync",
       "mukul975/Anthropic-Cybersecurity-Skills:testing-api-for-broken-object-level-authorization",
-      "mukul975/Anthropic-Cybersecurity-Skills:hunting-for-cobalt-strike-beacons",
       "mukul975/Anthropic-Cybersecurity-Skills:testing-for-json-web-token-vulnerabilities",
-      "mukul975/Privacy-Data-Protection-Skills:implementing-secure-multi-party-computation"
+      "mukul975/anthropic-cybersecurity-skills:hunting-for-cobalt-strike-beacons"
     ]
   },
   {
     "authorHandle": "multica-ai",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 201461,
-    "totalInstalls": 31040,
+    "totalStars": 201571,
+    "totalInstalls": 31148,
     "topSkillIds": [
       "multica-ai/andrej-karpathy-skills:karpathy-guidelines"
     ]
@@ -68678,7 +68936,7 @@
     "authorHandle": "muratcankoylan",
     "isOfficialVendor": false,
     "skillCount": 11,
-    "totalStars": 194220,
+    "totalStars": 194221,
     "totalInstalls": 0,
     "topSkillIds": [
       "muratcankoylan/Agent-Skills-for-Context-Engineering",
@@ -68810,7 +69068,7 @@
     "authorHandle": "mvanhorn",
     "isOfficialVendor": false,
     "skillCount": 21,
-    "totalStars": 120545,
+    "totalStars": 120550,
     "totalInstalls": 0,
     "topSkillIds": [
       "mvanhorn/last30days-skill",
@@ -69234,7 +69492,7 @@
     "authorHandle": "n8n-io",
     "isOfficialVendor": true,
     "skillCount": 28,
-    "totalStars": 3407632,
+    "totalStars": 3407668,
     "totalInstalls": 0,
     "topSkillIds": [
       "n8n-io/n8n:create-pr",
@@ -70091,6 +70349,16 @@
     ]
   },
   {
+    "authorHandle": "near",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 2593,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "near/nearcore:pr"
+    ]
+  },
+  {
     "authorHandle": "nebrass",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -70307,7 +70575,7 @@
     "isOfficialVendor": true,
     "skillCount": 18,
     "totalStars": 2054,
-    "totalInstalls": 82361,
+    "totalInstalls": 83197,
     "topSkillIds": [
       "neondatabase/mcp-server-neon:claimable-postgres",
       "neondatabase/mcp-server-neon:logging-best-practices",
@@ -70686,7 +70954,7 @@
     "isOfficialVendor": false,
     "skillCount": 62,
     "totalStars": 16043,
-    "totalInstalls": 139522,
+    "totalInstalls": 139531,
     "topSkillIds": [
       "nexscope-ai/ecommerce-skills:cross-border-ecommerce",
       "nexscope-ai/ecommerce-skills:dropshipping-product-research",
@@ -70752,11 +71020,12 @@
   {
     "authorHandle": "nexu-io",
     "isOfficialVendor": false,
-    "skillCount": 3,
-    "totalStars": 85594,
+    "skillCount": 4,
+    "totalStars": 162358,
     "totalInstalls": 0,
     "topSkillIds": [
       "nexu-io/open-design:emilkowalski-motion",
+      "nexu-io/open-design:creative-director",
       "nexu-io/motion-anything:particles",
       "nexu-io/looper:looper"
     ]
@@ -72186,7 +72455,7 @@
     "authorHandle": "nolangz",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 2009,
+    "totalStars": 2012,
     "totalInstalls": 0,
     "topSkillIds": [
       "nolangz/pixel2motion",
@@ -72429,7 +72698,7 @@
     "authorHandle": "nousresearch",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 228806,
+    "totalStars": 228966,
     "totalInstalls": 0,
     "topSkillIds": [
       "nousresearch/hermes-agent:dogfood"
@@ -72488,7 +72757,7 @@
     "authorHandle": "nowork-studio",
     "isOfficialVendor": false,
     "skillCount": 6,
-    "totalStars": 14761,
+    "totalStars": 14769,
     "totalInstalls": 0,
     "topSkillIds": [
       "nowork-studio/NotFair:seo-analysis",
@@ -72691,8 +72960,8 @@
     "authorHandle": "nutlope",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 23587,
-    "totalInstalls": 39121,
+    "totalStars": 23945,
+    "totalInstalls": 39358,
     "topSkillIds": [
       "nutlope/hallmark:hallmark"
     ]
@@ -72774,7 +73043,7 @@
     "authorHandle": "NVIDIA",
     "isOfficialVendor": false,
     "skillCount": 8,
-    "totalStars": 23100,
+    "totalStars": 23118,
     "totalInstalls": 0,
     "topSkillIds": [
       "NVIDIA/Megatron-LM:cicd",
@@ -72788,7 +73057,7 @@
     "authorHandle": "NVIDIA-NeMo",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 6236,
+    "totalStars": 6272,
     "totalInstalls": 0,
     "topSkillIds": [
       "NVIDIA-NeMo/DataDesigner:skills/data-designer",
@@ -73014,10 +73283,11 @@
   {
     "authorHandle": "obot-platform",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 85,
+    "skillCount": 2,
+    "totalStars": 932,
     "totalInstalls": 0,
     "topSkillIds": [
+      "obot-platform/obot:draft-release-blog",
       "obot-platform/discobot:upgrade-deps"
     ]
   },
@@ -73025,8 +73295,8 @@
     "authorHandle": "obra",
     "isOfficialVendor": false,
     "skillCount": 22,
-    "totalStars": 3787193,
-    "totalInstalls": 1722370,
+    "totalStars": 3787318,
+    "totalInstalls": 1725383,
     "topSkillIds": [
       "obra/superpowers:requesting-code-review",
       "obra/superpowers:test-driven-development",
@@ -74112,7 +74382,7 @@
     "isOfficialVendor": false,
     "skillCount": 10,
     "totalStars": 53549,
-    "totalInstalls": 43203,
+    "totalInstalls": 43273,
     "topSkillIds": [
       "op7418/guizang-ppt-skill",
       "op7418/humanizer-zh:humanizer-zh",
@@ -74148,10 +74418,11 @@
   {
     "authorHandle": "open-gsd",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 982,
+    "skillCount": 2,
+    "totalStars": 5951,
     "totalInstalls": 0,
     "topSkillIds": [
+      "open-gsd/gsd-core:gsd-debug",
       "open-gsd/gsd-pi:forensics"
     ]
   },
@@ -74195,7 +74466,7 @@
     "authorHandle": "openai",
     "isOfficialVendor": true,
     "skillCount": 259,
-    "totalStars": 3864891,
+    "totalStars": 3864988,
     "totalInstalls": 0,
     "topSkillIds": [
       "openai/codex:babysit-pr",
@@ -74281,10 +74552,11 @@
   {
     "authorHandle": "openclaw",
     "isOfficialVendor": true,
-    "skillCount": 1,
-    "totalStars": 1026,
+    "skillCount": 2,
+    "totalStars": 2224,
     "totalInstalls": 0,
     "topSkillIds": [
+      "openclaw/imsg:imsg",
       "openclaw/agent-skills:autoreview"
     ]
   },
@@ -74439,7 +74711,7 @@
     "authorHandle": "openprose",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 1669,
+    "totalStars": 1670,
     "totalInstalls": 0,
     "topSkillIds": [
       "openprose/prose:open-prose"
@@ -74525,6 +74797,16 @@
       "OpenSourceSam/v2_heras_garden:.claude/skills/brainstorming",
       "OpenSourceSam/v2_heras_garden:.claude/skills/confident-language-guard",
       "OpenSourceSam/v2_heras_garden:.codex/skills/clarify"
+    ]
+  },
+  {
+    "authorHandle": "openstatushq",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 2050,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "openstatushq/data-table-filters:skills"
     ]
   },
   {
@@ -74949,7 +75231,7 @@
     "isOfficialVendor": false,
     "skillCount": 6,
     "totalStars": 156552,
-    "totalInstalls": 40027,
+    "totalInstalls": 40047,
     "topSkillIds": [
       "othmanadi/planning-with-files:planning-with-files",
       "othmanadi/planning-with-files:planning-with-files-ar",
@@ -75073,7 +75355,7 @@
     "authorHandle": "oven-sh",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 185049,
+    "totalStars": 185053,
     "totalInstalls": 0,
     "topSkillIds": [
       "oven-sh/bun:.claude/skills/implementing-jsc-classes-cpp",
@@ -75155,7 +75437,7 @@
     "authorHandle": "owl-listener",
     "isOfficialVendor": false,
     "skillCount": 63,
-    "totalStars": 127323,
+    "totalStars": 127346,
     "totalInstalls": 0,
     "topSkillIds": [
       "owl-listener/designer-skills:a-b-test-design",
@@ -75570,7 +75852,7 @@
     "authorHandle": "paperclipai",
     "isOfficialVendor": false,
     "skillCount": 8,
-    "totalStars": 384796,
+    "totalStars": 384944,
     "totalInstalls": 0,
     "topSkillIds": [
       "paperclipai/paperclip:paperclip",
@@ -76137,7 +76419,7 @@
     "authorHandle": "payloadcms",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 86608,
+    "totalStars": 86610,
     "totalInstalls": 0,
     "topSkillIds": [
       "payloadcms/payload:.claude/skills/generate-translations",
@@ -76150,7 +76432,7 @@
     "authorHandle": "pbakaus",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 58051,
+    "totalStars": 58219,
     "totalInstalls": 0,
     "topSkillIds": [
       "pbakaus/impeccable:impeccable"
@@ -76192,7 +76474,7 @@
     "authorHandle": "pchalasani",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 3731,
+    "totalStars": 3735,
     "totalInstalls": 0,
     "topSkillIds": [
       "pchalasani/claude-code-tools:plugins/langroid/skills/patterns",
@@ -76495,7 +76777,7 @@
     "authorHandle": "penglonghuang",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 2621,
+    "totalStars": 2638,
     "totalInstalls": 0,
     "topSkillIds": [
       "penglonghuang/chinese-novelist-skill:chinese-novelist"
@@ -76831,7 +77113,7 @@
     "isOfficialVendor": false,
     "skillCount": 5,
     "totalStars": 3810,
-    "totalInstalls": 39372,
+    "totalInstalls": 39382,
     "topSkillIds": [
       "pexoai/pexo-skills:pexo-agent",
       "pexoai/pexo-skills:seedance-2.0-prompter",
@@ -77069,10 +77351,11 @@
   {
     "authorHandle": "photostructure",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 8,
+    "skillCount": 2,
+    "totalStars": 559,
     "totalInstalls": 0,
     "topSkillIds": [
+      "photostructure/exiftool-vendored.js:tpp",
       "photostructure/fs-metadata:review"
     ]
   },
@@ -77123,15 +77406,15 @@
   {
     "authorHandle": "phuryn",
     "isOfficialVendor": false,
-    "skillCount": 65,
-    "totalStars": 988244,
+    "skillCount": 68,
+    "totalStars": 1063712,
     "totalInstalls": 0,
     "topSkillIds": [
+      "phuryn/pm-skills:pm-ai-shipping/skills/intended-vs-implemented",
+      "phuryn/pm-skills:pm-ai-shipping/skills/shipping-artifacts",
+      "phuryn/pm-skills:pm-execution/skills/strategy-red-team",
       "phuryn/pm-skills:ab-test-analysis",
-      "phuryn/pm-skills:analyze-feature-requests",
-      "phuryn/pm-skills:ansoff-matrix",
-      "phuryn/pm-skills:beachhead-segment",
-      "phuryn/pm-skills:brainstorm-experiments-existing"
+      "phuryn/pm-skills:analyze-feature-requests"
     ]
   },
   {
@@ -77258,6 +77541,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "pigbiglong/xiaohongshu-ops-skill"
+    ]
+  },
+  {
+    "authorHandle": "pigweed-project",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 501,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "pigweed-project/pigweed:docs"
     ]
   },
   {
@@ -77572,6 +77865,16 @@
     ]
   },
   {
+    "authorHandle": "plannotator",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1330,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "plannotator/effective-html:html-diagram"
+    ]
+  },
+  {
     "authorHandle": "plastic-labs",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -77873,6 +78176,16 @@
       "poindexter12/waypoint:claire/skills/doc-validator",
       "poindexter12/waypoint:workflows/skills/gh-issue-templates",
       "poindexter12/waypoint:workflows/skills/gh-issue-triage"
+    ]
+  },
+  {
+    "authorHandle": "poingstudios",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 584,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "poingstudios/godot-admob-plugin:sync"
     ]
   },
   {
@@ -78576,7 +78889,7 @@
     "isOfficialVendor": false,
     "skillCount": 75,
     "totalStars": 11682,
-    "totalInstalls": 1328910,
+    "totalInstalls": 1354803,
     "topSkillIds": [
       "prisma/prisma-next:adr-review",
       "prisma/prisma-next:ast-visitor-pattern",
@@ -79057,7 +79370,7 @@
     "authorHandle": "PurpleAILAB",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 5016,
+    "totalStars": 5038,
     "totalInstalls": 0,
     "topSkillIds": [
       "PurpleAILAB/Decepticon:governance-attack"
@@ -79253,7 +79566,7 @@
     "authorHandle": "pytorch",
     "isOfficialVendor": true,
     "skillCount": 18,
-    "totalStars": 1731544,
+    "totalStars": 1731548,
     "totalInstalls": 0,
     "topSkillIds": [
       "pytorch/pytorch:skill-writer",
@@ -80718,7 +81031,7 @@
     "authorHandle": "react",
     "isOfficialVendor": false,
     "skillCount": 7,
-    "totalStars": 1729902,
+    "totalStars": 1729911,
     "totalInstalls": 0,
     "topSkillIds": [
       "react/react:fix",
@@ -80843,7 +81156,7 @@
     "authorHandle": "rebelytics",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 1689,
+    "totalStars": 1706,
     "totalInstalls": 0,
     "topSkillIds": [
       "rebelytics/one-skill-to-rule-them-all"
@@ -81271,7 +81584,7 @@
     "authorHandle": "remotion-dev",
     "isOfficialVendor": false,
     "skillCount": 19,
-    "totalStars": 890973,
+    "totalStars": 890993,
     "totalInstalls": 0,
     "topSkillIds": [
       "remotion-dev/remotion:web-renderer-test",
@@ -81366,7 +81679,7 @@
     "isOfficialVendor": false,
     "skillCount": 10,
     "totalStars": 12930,
-    "totalInstalls": 40439,
+    "totalInstalls": 40552,
     "topSkillIds": [
       "resciencelab/opc-skills:seo-geo",
       "resciencelab/opc-skills:archive",
@@ -81452,10 +81765,11 @@
   {
     "authorHandle": "retlehs",
     "isOfficialVendor": false,
-    "skillCount": 2,
-    "totalStars": 20,
+    "skillCount": 3,
+    "totalStars": 1210,
     "totalInstalls": 0,
     "topSkillIds": [
+      "retlehs/quien",
       "retlehs/gh-actions",
       "retlehs/gh-fetch"
     ]
@@ -82462,7 +82776,7 @@
     "authorHandle": "robustmq",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 1755,
+    "totalStars": 1761,
     "totalInstalls": 0,
     "topSkillIds": [
       "robustmq/robustmq:review-and-fix"
@@ -82534,15 +82848,15 @@
   {
     "authorHandle": "rohitg00",
     "isOfficialVendor": false,
-    "skillCount": 20,
-    "totalStars": 159887,
+    "skillCount": 21,
+    "totalStars": 184770,
     "totalInstalls": 0,
     "topSkillIds": [
       "rohitg00/ai-engineering-from-scratch:check-understanding",
       "rohitg00/ai-engineering-from-scratch:find-your-level",
       "rohitg00/agentmemory:agentmemory-agents",
-      "rohitg00/pro-workflow:skills/auto-setup",
-      "rohitg00/pro-workflow:skills/batch-orchestration"
+      "rohitg00/agentmemory:agentmemory-config",
+      "rohitg00/pro-workflow:skills/auto-setup"
     ]
   },
   {
@@ -82616,10 +82930,11 @@
   {
     "authorHandle": "rolldown",
     "isOfficialVendor": false,
-    "skillCount": 1,
-    "totalStars": 4204,
+    "skillCount": 2,
+    "totalStars": 18002,
     "totalInstalls": 0,
     "topSkillIds": [
+      "rolldown/rolldown:rolldown-repl",
       "rolldown/tsdown:tsdown"
     ]
   },
@@ -82658,7 +82973,7 @@
     "authorHandle": "romainsimon",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 4704,
+    "totalStars": 4786,
     "totalInstalls": 0,
     "topSkillIds": [
       "romainsimon/paperasse:commissaire-aux-comptes",
@@ -83378,7 +83693,7 @@
     "authorHandle": "ruvnet",
     "isOfficialVendor": false,
     "skillCount": 193,
-    "totalStars": 11725887,
+    "totalStars": 11725918,
     "totalInstalls": 0,
     "topSkillIds": [
       "ruvnet/ruflo",
@@ -83500,7 +83815,7 @@
     "authorHandle": "ryanb",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 2393,
+    "totalStars": 2396,
     "totalInstalls": 0,
     "topSkillIds": [
       "ryanb/dotfiles:review-queue"
@@ -83891,7 +84206,7 @@
     "authorHandle": "saadeghi",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 42023,
+    "totalStars": 42043,
     "totalInstalls": 0,
     "topSkillIds": [
       "saadeghi/daisyui:daisyui"
@@ -84457,14 +84772,14 @@
     "authorHandle": "samber",
     "isOfficialVendor": false,
     "skillCount": 58,
-    "totalStars": 87406,
-    "totalInstalls": 1320941,
+    "totalStars": 87488,
+    "totalInstalls": 1322564,
     "topSkillIds": [
+      "samber/cc-skills-golang:golang-cli",
       "samber/cc-skills-golang:golang-code-style",
       "samber/cc-skills-golang:golang-error-handling",
       "samber/cc-skills-golang:golang-design-patterns",
-      "samber/cc-skills-golang:golang-performance",
-      "samber/cc-skills-golang:golang-concurrency"
+      "samber/cc-skills-golang:golang-performance"
     ]
   },
   {
@@ -84717,7 +85032,7 @@
     "authorHandle": "samuraigpt",
     "isOfficialVendor": false,
     "skillCount": 14,
-    "totalStars": 56336,
+    "totalStars": 56343,
     "totalInstalls": 0,
     "topSkillIds": [
       "samuraigpt/generative-media-skills:muapi-ad-creative",
@@ -86557,16 +86872,26 @@
     "isOfficialVendor": false,
     "skillCount": 1,
     "totalStars": 8727,
-    "totalInstalls": 28567,
+    "totalInstalls": 28608,
     "topSkillIds": [
       "shadcn/improve:improve"
+    ]
+  },
+  {
+    "authorHandle": "shadcn-labs",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 579,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "shadcn-labs/termcn:ink"
     ]
   },
   {
     "authorHandle": "shadcn-ui",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 242070,
+    "totalStars": 242098,
     "totalInstalls": 0,
     "topSkillIds": [
       "shadcn-ui/ui:migrate-radix-to-base",
@@ -86819,7 +87144,7 @@
     "authorHandle": "shareAI-lab",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 191072,
+    "totalStars": 191089,
     "totalInstalls": 0,
     "topSkillIds": [
       "shareAI-lab/learn-claude-code:skills/agent-builder",
@@ -87766,7 +88091,7 @@
     "authorHandle": "shuvonsec",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 8120,
+    "totalStars": 8128,
     "totalInstalls": 0,
     "topSkillIds": [
       "shuvonsec/claude-bug-bounty",
@@ -88164,7 +88489,7 @@
     "authorHandle": "simonlin1212",
     "isOfficialVendor": false,
     "skillCount": 4,
-    "totalStars": 12922,
+    "totalStars": 12956,
     "totalInstalls": 0,
     "topSkillIds": [
       "simonlin1212/a-stock-data:a-stock-data",
@@ -88230,6 +88555,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "simplefarmer69/ape-claw:gh-issues"
+    ]
+  },
+  {
+    "authorHandle": "simstudioai",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 28857,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "simstudioai/sim:add-integration"
     ]
   },
   {
@@ -89367,7 +89702,7 @@
     "authorHandle": "software-mansion",
     "isOfficialVendor": false,
     "skillCount": 15,
-    "totalStars": 29340,
+    "totalStars": 29348,
     "totalInstalls": 0,
     "topSkillIds": [
       "software-mansion/argent:argent-android-emulator-setup",
@@ -89437,7 +89772,7 @@
     "isOfficialVendor": false,
     "skillCount": 1,
     "totalStars": 545,
-    "totalInstalls": 57849,
+    "totalInstalls": 58050,
     "topSkillIds": [
       "solana-foundation/solana-dev-skill:solana-dev"
     ]
@@ -89615,7 +89950,7 @@
     "authorHandle": "sonofmagic",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 1841,
+    "totalStars": 1843,
     "totalInstalls": 0,
     "topSkillIds": [
       "sonofmagic/weapp-tailwindcss:.codex/skills/scientific-critical-thinking"
@@ -89991,7 +90326,7 @@
     "isOfficialVendor": false,
     "skillCount": 3,
     "totalStars": 228,
-    "totalInstalls": 32208,
+    "totalInstalls": 32454,
     "topSkillIds": [
       "spillwavesolutions/design-doc-mermaid:design-doc-mermaid",
       "SpillwaveSolutions/code_agent_context_hooks:.skilz/skills/architect-agent",
@@ -90119,7 +90454,7 @@
     "isOfficialVendor": false,
     "skillCount": 2,
     "totalStars": 170,
-    "totalInstalls": 68060,
+    "totalInstalls": 68125,
     "topSkillIds": [
       "squirrelscan/skills:audit-website",
       "squirrelscan/skills:squirrelscan"
@@ -90180,6 +90515,16 @@
     ]
   },
   {
+    "authorHandle": "srid",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 949,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "srid/emanote:do"
+    ]
+  },
+  {
     "authorHandle": "srijanshukla18",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -90221,6 +90566,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "srobinson/nancy:session-history"
+    ]
+  },
+  {
+    "authorHandle": "srombauts",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 2748,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "srombauts/sqlitecpp:sqlitecpp-coding-standards"
     ]
   },
   {
@@ -90467,8 +90822,8 @@
     "authorHandle": "stablyai",
     "isOfficialVendor": false,
     "skillCount": 6,
-    "totalStars": 210442,
-    "totalInstalls": 291196,
+    "totalStars": 210851,
+    "totalInstalls": 294678,
     "topSkillIds": [
       "stablyai/orca:orca-cli",
       "stablyai/orca:orchestration",
@@ -90492,7 +90847,7 @@
     "authorHandle": "stacklok",
     "isOfficialVendor": false,
     "skillCount": 7,
-    "totalStars": 4294,
+    "totalStars": 4302,
     "totalInstalls": 0,
     "topSkillIds": [
       "stacklok/toolhive:.claude/skills/deploying-vmcp-locally",
@@ -90819,15 +91174,15 @@
   {
     "authorHandle": "steipete",
     "isOfficialVendor": false,
-    "skillCount": 26,
-    "totalStars": 477291,
+    "skillCount": 88,
+    "totalStars": 904059,
     "totalInstalls": 0,
     "topSkillIds": [
       "steipete/clawdis:bluebubbles",
-      "steipete/agent-scripts:video-transcript-downloader",
-      "clawdbot/skills:skills/steipete/1password",
-      "clawdbot/skills:skills/steipete/apple-reminders",
-      "clawdbot/skills:skills/steipete/bear-notes"
+      "steipete/CodexBar:.agents/skills/codexbar",
+      "steipete/CodexBar:.agents/skills/qa-test",
+      "steipete/CodexBar:.agents/skills/release-codexbar",
+      "steipete/summarize:.agents/skills/summarize"
     ]
   },
   {
@@ -91090,6 +91445,16 @@
     ]
   },
   {
+    "authorHandle": "stickerdaniel",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 2501,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "stickerdaniel/linkedin-mcp-server:3-verify-pr-fix"
+    ]
+  },
+  {
     "authorHandle": "StirlingMarketingGroup",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -91282,13 +91647,13 @@
     "authorHandle": "stripe",
     "isOfficialVendor": true,
     "skillCount": 8,
-    "totalStars": 11209,
-    "totalInstalls": 183418,
+    "totalStars": 11211,
+    "totalInstalls": 183851,
     "topSkillIds": [
+      "stripe/ai:connect-recommend",
       "stripe/ai:stripe-best-practices",
       "stripe/ai:upgrade-stripe",
       "stripe/ai:stripe-projects",
-      "stripe/ai:connect-recommend",
       "stripe/ai:stripe-directory"
     ]
   },
@@ -91867,7 +92232,7 @@
     "authorHandle": "supabase",
     "isOfficialVendor": true,
     "skillCount": 14,
-    "totalStars": 1289448,
+    "totalStars": 1289485,
     "totalInstalls": 0,
     "topSkillIds": [
       "supabase/supabase:vitest",
@@ -93508,7 +93873,7 @@
     "isOfficialVendor": false,
     "skillCount": 8,
     "totalStars": 3576,
-    "totalInstalls": 28285,
+    "totalInstalls": 28313,
     "topSkillIds": [
       "tavily-ai/skills:tavily-search",
       "tavily-ai/skills:tavily-best-practices",
@@ -94022,7 +94387,7 @@
     "isOfficialVendor": false,
     "skillCount": 1,
     "totalStars": 165,
-    "totalInstalls": 34542,
+    "totalInstalls": 34638,
     "topSkillIds": [
       "tencent/wechatreading:weread-skills"
     ]
@@ -95052,6 +95417,16 @@
     ]
   },
   {
+    "authorHandle": "thedaviddias",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 73500,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "thedaviddias/front-end-checklist:404-page"
+    ]
+  },
+  {
     "authorHandle": "thedivergentai",
     "isOfficialVendor": false,
     "skillCount": 2,
@@ -95076,14 +95451,14 @@
     "authorHandle": "thedotmack",
     "isOfficialVendor": false,
     "skillCount": 10,
-    "totalStars": 804673,
+    "totalStars": 805817,
     "totalInstalls": 0,
     "topSkillIds": [
+      "thedotmack/claude-mem:plugin/skills/do",
       "thedotmack/claude-mem:knowledge-agent",
       "thedotmack/claude-mem:make-plan",
       "thedotmack/claude-mem:mem-search",
-      "thedotmack/claude-mem:pathfinder",
-      "thedotmack/claude-mem:plugin/skills/do"
+      "thedotmack/claude-mem:pathfinder"
     ]
   },
   {
@@ -95269,7 +95644,7 @@
     "authorHandle": "TheOrcDev",
     "isOfficialVendor": false,
     "skillCount": 14,
-    "totalStars": 25982,
+    "totalStars": 25983,
     "totalInstalls": 0,
     "topSkillIds": [
       "TheOrcDev/8bitcn-ui:.claude/skills/8-bit-pixel-art-patterns",
@@ -96437,7 +96812,7 @@
     "authorHandle": "tldraw",
     "isOfficialVendor": false,
     "skillCount": 19,
-    "totalStars": 944572,
+    "totalStars": 944575,
     "totalInstalls": 0,
     "topSkillIds": [
       "tldraw/tldraw:clean-copy",
@@ -97362,6 +97737,16 @@
     ]
   },
   {
+    "authorHandle": "towardsthecloud",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1767,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "towardsthecloud/cloudburn:tdd"
+    ]
+  },
+  {
     "authorHandle": "towns-protocol",
     "isOfficialVendor": false,
     "skillCount": 1,
@@ -97443,7 +97828,7 @@
     "authorHandle": "tradermonty",
     "isOfficialVendor": false,
     "skillCount": 31,
-    "totalStars": 40061,
+    "totalStars": 40085,
     "totalInstalls": 0,
     "topSkillIds": [
       "tradermonty/claude-trading-skills:backtest-expert",
@@ -97476,15 +97861,15 @@
   {
     "authorHandle": "trailofbits",
     "isOfficialVendor": true,
-    "skillCount": 76,
-    "totalStars": 390640,
+    "skillCount": 104,
+    "totalStars": 573532,
     "totalInstalls": 0,
     "topSkillIds": [
-      "trailofbits/skills:aflpp",
-      "trailofbits/skills:agentic-actions-auditor",
-      "trailofbits/skills:algorand-vulnerability-scanner",
-      "trailofbits/skills:ask-questions-if-underspecified",
-      "trailofbits/skills:atheris"
+      "trailofbits/skills:plugins/github-triage/skills/github-triage",
+      "trailofbits/skills:plugins/let-fate-decide/skills/let-fate-decide",
+      "trailofbits/skills:plugins/open-sourcing/skills/open-sourcing",
+      "trailofbits/skills:plugins/rust-review/skills/rust-review",
+      "trailofbits/skills:plugins/second-opinion/skills/second-opinion"
     ]
   },
   {
@@ -97711,6 +98096,16 @@
     "totalInstalls": 0,
     "topSkillIds": [
       "trezero/archon-trinity:archon-extension-sync"
+    ]
+  },
+  {
+    "authorHandle": "trezor",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1017,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "trezor/trezor-suite:skills-and-code-style-contribution"
     ]
   },
   {
@@ -98595,7 +98990,7 @@
     "authorHandle": "uditakhourii",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 3458,
+    "totalStars": 3495,
     "totalInstalls": 0,
     "topSkillIds": [
       "uditakhourii/adhd:adhd"
@@ -98889,7 +99284,7 @@
     "authorHandle": "uni-stack",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 3334,
+    "totalStars": 3336,
     "totalInstalls": 0,
     "topSkillIds": [
       "uni-stack/uniwind:migrate-nativewind-to-uniwind",
@@ -99124,7 +99519,7 @@
     "authorHandle": "upstash",
     "isOfficialVendor": false,
     "skillCount": 19,
-    "totalStars": 185427,
+    "totalStars": 185441,
     "totalInstalls": 0,
     "topSkillIds": [
       "upstash/context7-mcp:context7-cli",
@@ -100022,8 +100417,8 @@
     "authorHandle": "vercel",
     "isOfficialVendor": false,
     "skillCount": 57,
-    "totalStars": 95218,
-    "totalInstalls": 60664,
+    "totalStars": 95242,
+    "totalInstalls": 60761,
     "topSkillIds": [
       "vercel/turborepo:turborepo",
       "vercel/vercel:vercel-cli",
@@ -100036,14 +100431,14 @@
     "authorHandle": "vercel-labs",
     "isOfficialVendor": true,
     "skillCount": 132,
-    "totalStars": 1417193,
+    "totalStars": 1417893,
     "totalInstalls": 0,
     "topSkillIds": [
+      "vercel-labs/agent-browser:skills/agent-browser",
       "vercel-labs/agent-browser:agentcore",
       "vercel-labs/agent-browser:core",
       "vercel-labs/agent-browser:dogfood",
-      "vercel-labs/agent-browser:electron",
-      "vercel-labs/agent-browser:skills/agent-browser"
+      "vercel-labs/agent-browser:electron"
     ]
   },
   {
@@ -100717,7 +101112,7 @@
     "authorHandle": "vinvcn",
     "isOfficialVendor": false,
     "skillCount": 44,
-    "totalStars": 128927,
+    "totalStars": 128950,
     "totalInstalls": 0,
     "topSkillIds": [
       "vinvcn/mattpocock-skills-zh-cn:ask-matt",
@@ -100779,7 +101174,7 @@
     "authorHandle": "virgiliojr94",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 20129,
+    "totalStars": 20452,
     "totalInstalls": 0,
     "topSkillIds": [
       "virgiliojr94/book-to-skill"
@@ -101131,7 +101526,7 @@
     "authorHandle": "vllm-project",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 7722,
+    "totalStars": 7737,
     "totalInstalls": 0,
     "topSkillIds": [
       "vllm-project/semantic-router:router-service-platform-change",
@@ -101456,7 +101851,7 @@
     "authorHandle": "vudovn",
     "isOfficialVendor": false,
     "skillCount": 1,
-    "totalStars": 8119,
+    "totalStars": 8120,
     "totalInstalls": 0,
     "topSkillIds": [
       "vudovn/antigravity-kit:frontend-design"
@@ -101467,7 +101862,7 @@
     "isOfficialVendor": false,
     "skillCount": 4,
     "totalStars": 9416,
-    "totalInstalls": 36282,
+    "totalInstalls": 36311,
     "topSkillIds": [
       "vuejs-ai/skills:vue-best-practices",
       "vuejs-ai/skills:vue-debug-guides",
@@ -102023,7 +102418,7 @@
     "authorHandle": "wanshuiyin",
     "isOfficialVendor": false,
     "skillCount": 66,
-    "totalStars": 543356,
+    "totalStars": 543375,
     "totalInstalls": 0,
     "topSkillIds": [
       "wanshuiyin/Auto-claude-code-research-in-sleep:openalex",
@@ -102069,7 +102464,7 @@
     "authorHandle": "warpdotdev",
     "isOfficialVendor": false,
     "skillCount": 28,
-    "totalStars": 69061,
+    "totalStars": 69068,
     "totalInstalls": 0,
     "topSkillIds": [
       "warpdotdev/warp:add-telemetry",
@@ -103329,7 +103724,7 @@
     "isOfficialVendor": false,
     "skillCount": 3,
     "totalStars": 234,
-    "totalInstalls": 88983,
+    "totalInstalls": 89398,
     "topSkillIds": [
       "wind-information-co-ltd/wind-skills:wind-mcp-skill",
       "wind-information-co-ltd/wind-skills:wind-alice",
@@ -103662,7 +104057,7 @@
     "authorHandle": "wondelai",
     "isOfficialVendor": false,
     "skillCount": 42,
-    "totalStars": 37535,
+    "totalStars": 37566,
     "totalInstalls": 0,
     "topSkillIds": [
       "wondelai/skills:37signals-way",
@@ -103737,7 +104132,7 @@
     "authorHandle": "wordpress",
     "isOfficialVendor": false,
     "skillCount": 17,
-    "totalStars": 33915,
+    "totalStars": 33918,
     "totalInstalls": 0,
     "topSkillIds": [
       "wordpress/agent-skills:blueprint",
@@ -103782,7 +104177,7 @@
     "authorHandle": "worldwonderer",
     "isOfficialVendor": false,
     "skillCount": 8,
-    "totalStars": 11022,
+    "totalStars": 11034,
     "totalInstalls": 0,
     "topSkillIds": [
       "worldwonderer/oh-story-claudecode:skills/browser-cdp",
@@ -103958,15 +104353,15 @@
   {
     "authorHandle": "wshobson",
     "isOfficialVendor": false,
-    "skillCount": 156,
-    "totalStars": 5513865,
-    "totalInstalls": 274803,
+    "skillCount": 252,
+    "totalStars": 9230338,
+    "totalInstalls": 275109,
     "topSkillIds": [
-      "wshobson/agents:airflow-dag-patterns",
-      "wshobson/agents:code-review-excellence",
-      "wshobson/agents:angular-migration",
-      "wshobson/agents:anti-reversing-techniques",
-      "wshobson/agents:api-design-principles"
+      "wshobson/agents:plugins/python-development/skills/python-packaging",
+      "wshobson/agents:plugins/python-development/skills/python-performance-optimization",
+      "wshobson/agents:plugins/python-development/skills/python-resilience",
+      "wshobson/agents:plugins/python-development/skills/python-resource-management",
+      "wshobson/agents:plugins/python-development/skills/python-testing-patterns"
     ]
   },
   {
@@ -105571,6 +105966,16 @@
     ]
   },
   {
+    "authorHandle": "yamada-ui",
+    "isOfficialVendor": false,
+    "skillCount": 1,
+    "totalStars": 1019,
+    "totalInstalls": 0,
+    "topSkillIds": [
+      "yamada-ui/yamada-ui:pr-review-anti-patterns"
+    ]
+  },
+  {
     "authorHandle": "yamadashy",
     "isOfficialVendor": false,
     "skillCount": 4,
@@ -105706,7 +106111,7 @@
     "authorHandle": "yaojingang",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 2972,
+    "totalStars": 2980,
     "totalInstalls": 0,
     "topSkillIds": [
       "yaojingang/yao-meta-skill",
@@ -106583,7 +106988,7 @@
     "authorHandle": "yoshiko-pg",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 6092,
+    "totalStars": 6093,
     "totalInstalls": 0,
     "topSkillIds": [
       "yoshiko-pg/difit:difit",
@@ -106682,7 +107087,7 @@
     "authorHandle": "YouMind-OpenLab",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 2366,
+    "totalStars": 2367,
     "totalInstalls": 0,
     "topSkillIds": [
       "YouMind-OpenLab/nano-banana-pro-prompts-recommend-skill",
@@ -106943,7 +107348,7 @@
     "authorHandle": "yuan1z0825",
     "isOfficialVendor": false,
     "skillCount": 18,
-    "totalStars": 621064,
+    "totalStars": 621096,
     "totalInstalls": 0,
     "topSkillIds": [
       "yuan1z0825/nature-skills:nature-figure",
@@ -107996,7 +108401,7 @@
     "authorHandle": "zed-industries",
     "isOfficialVendor": false,
     "skillCount": 2,
-    "totalStars": 176811,
+    "totalStars": 176832,
     "totalInstalls": 0,
     "topSkillIds": [
       "zed-industries/zed:brand-writer",
@@ -108419,7 +108824,7 @@
     "isOfficialVendor": false,
     "skillCount": 9,
     "totalStars": 602,
-    "totalInstalls": 32929,
+    "totalInstalls": 32936,
     "topSkillIds": [
       "zhaono1/agent-playbook:self-improving-agent",
       "zhaono1/agent-playbook:architecting-solutions",
