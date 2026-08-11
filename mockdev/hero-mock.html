@@ -236,14 +236,14 @@
   .creators { display: none; flex: 1; padding: 14px 24px 0; }
   .stage.creatorsview .creators { display: block; }
   .stage.creatorsview .cats { display: none; }
-  .cre-h { font-size: 11.5px; font-weight: 500; color: rgba(0,0,0,.3); margin: 2px 0 10px 2px; }
+  .cre-h { font-size: 11.5px; font-weight: 500; color: rgba(0,0,0,.3); margin: 0 0 6px 2px; }
   .cre-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
-  .ccell { display: flex; align-items: center; gap: 9px; padding: 6px 4px; border-radius: 8px; opacity: 0; }
+  .ccell { display: flex; align-items: center; gap: 11px; padding: 7.5px 4px; border-radius: 8px; opacity: 0; }
   .stage.creatorsview .ccell { animation: .4s var(--exp) both row-in; }
-  .ccell img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; background: #e8e8ea; flex: none; }
+  .ccell img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; background: #e8e8ea; flex: none; }
   .ccell .cmeta { min-width: 0; }
-  .ccell .cname { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ccell .csub { font-size: 10px; color: var(--desc); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ccell .cname { font-size: 12.5px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ccell .csub { font-size: 10.5px; color: var(--desc); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .ccell .chev { margin-left: auto; font-size: 9px; color: rgba(0,0,0,.2); flex: none; }
   .ccell.selected { background: rgba(10,122,255,.12); }
   .cat.tapped { background: rgba(10,122,255,.1); border-radius: 7px; }
@@ -570,11 +570,13 @@ function renderDevice(freshRow) {
 const CREATORS = [
   ["addyosmani", "Addyosmani", "Web performance engineering"],
   ["agricidaniel", "Agricidaniel", "SEO and advertising"],
+  ["thedotmack", "Alex Newman", "Persistent memory tools"],
   ["antfu", "Antfu", "Vue ecosystem tooling"],
   ["avdlee", "Avdlee", "Swift performance engineering"],
   ["blader", "Blader", "Practical writing tools"],
   ["coreyhaines31", "Coreyhaines31", "SaaS marketing strategy"],
   ["danielmiessler", "Danielmiessler", "Security and AI research"],
+  ["davidondrej", "David Ondrej", "Agent research tools"],
   ["disler", "Disler", "Agentic engineering education"],
   ["emilkowalski", "Emilkowalski", "Interface design engineering"],
   ["garrytan", "Garrytan", "Founder execution systems"],
@@ -584,6 +586,8 @@ const CREATORS = [
   ["leonxlnx", "Leon Lin", "Design-driven interface tools"],
   ["mattpocock", "Matt Pocock", "Practical TypeScript education"],
   ["mengto", "Meng To", "Visual design-to-code systems"],
+  ["onepixelaway", "Michael Wall", "Codex hygiene audits"],
+  ["muratcankoylan", "Muratcankoylan", "Context engineering research"],
   ["mvanhorn", "Mvanhorn", "Agent publishing systems"],
   ["obra", "Obra", "Agentic engineering practice"],
   ["othmanadi", "OthmanAdi", "Persistent planning tools"],
