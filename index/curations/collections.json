@@ -33,7 +33,7 @@
       "subtitle": "Official Claude skills",
       "featuredSkillIds": [
         "anthropics/skills:pdf",
-        "anthropics/skills:skills/docx",
+        "anthropics/skills:docx",
         "anthropics/skills:skills/frontend-design",
         "anthropics/skills:webapp-testing",
         "anthropics/skills:algorithmic-art",
@@ -926,7 +926,7 @@
     },
     "cloudflare": {
       "featuredSkillIds": [
-        "cloudflare/moltworker:skills/cloudflare-browser",
+        "cloudflare/moltworker:cloudflare-browser",
         "cloudflare/vinext:migrate-to-vinext",
         "cloudflare/workerd:add-autogate",
         "cloudflare/workerd:add-compat-flag",
@@ -958,7 +958,7 @@
     },
     "vercel": {
       "featuredSkillIds": [
-        "vercel/turborepo:turborepo",
+        "vercel/turbo:turborepo",
         "vercel-labs/ai:add-provider-package",
         "vercel-labs/ai:adr-skill",
         "vercel/vercel:vercel-cli",
@@ -1257,13 +1257,13 @@
       "imageUrl": "https://omgskills.com/images/collections/starter-pack.webp?v=683ead9c5ff0",
       "featuredSkillIds": [
         "anthropics/skills:pdf",
-        "anthropics/skills:skills/docx",
+        "anthropics/skills:docx",
         "obra/superpowers:systematic-debugging",
         "openai/codex:code-review"
       ],
       "skillIds": [
         "anthropics/skills:pdf",
-        "anthropics/skills:skills/docx",
+        "anthropics/skills:docx",
         "anthropics/skills:xlsx",
         "obra/superpowers:systematic-debugging",
         "obra/superpowers:test-driven-development",
