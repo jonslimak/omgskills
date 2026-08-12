@@ -1252,14 +1252,18 @@
     {
       "id": "starter-pack",
       "type": "topic",
-      "title": "Best Basic Skills",
+      "title": "Starter Skills",
       "subtitle": "Essential skills for a first setup",
-      "imageUrl": "https://omgskills.com/images/collections/starter-pack.webp?v=683ead9c5ff0",
+      "imageUrl": "https://omgskills.com/images/collections/starter-pack.webp?v=9a32757aaf54",
       "featuredSkillIds": [
         "anthropics/skills:pdf",
         "anthropics/skills:docx",
         "obra/superpowers:systematic-debugging",
-        "openai/codex:code-review"
+        "openai/codex:code-review",
+        "obra/superpowers:test-driven-development",
+        "obra/superpowers:requesting-code-review",
+        "anthropics/skills:webapp-testing",
+        "anthropics/skills:xlsx"
       ],
       "skillIds": [
         "anthropics/skills:pdf",
@@ -1278,7 +1282,7 @@
       "type": "topic",
       "title": "Skills for Designers",
       "subtitle": "UI, frontend, and product polish",
-      "imageUrl": null,
+      "imageUrl": "https://omgskills.com/images/collections/design-essentials.webp?v=ec3a01fef2b7",
       "featuredSkillIds": [
         "pbakaus/impeccable:impeccable",
         "anthropics/skills:skills/frontend-design",
@@ -1304,9 +1308,9 @@
     {
       "id": "the-goat-list",
       "type": "topic",
-      "title": "Best Skills",
+      "title": "Most used skills",
       "subtitle": "The skills that re-define how we work with ai",
-      "imageUrl": "https://omgskills.com/images/collections/the-goat-list.webp?v=51657bb109a0",
+      "imageUrl": "https://omgskills.com/images/collections/the-goat-list.webp?v=5668b4514c0b",
       "featuredSkillIds": [
         "garrytan/gstack",
         "mattpocock/skills:grill-me",
@@ -1339,8 +1343,8 @@
       "id": "build-ios-apps",
       "type": "topic",
       "title": "Best iOS Skills",
-      "subtitle": "Pixel perfect, and performant apps ",
-      "imageUrl": "https://omgskills.com/images/collections/build-ios-apps.webp?v=2568d3588edb",
+      "subtitle": "Pixel perfect, and performant apps",
+      "imageUrl": "https://omgskills.com/images/collections/build-ios-apps.webp?v=9a32757aaf54",
       "featuredSkillIds": [
         "twostraws/swiftui-agent-skill:swiftui-pro",
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
@@ -1368,7 +1372,7 @@
       "type": "topic",
       "title": "Best Design Skills",
       "subtitle": "What worldclass designers are using",
-      "imageUrl": "https://omgskills.com/images/collections/elite-ui-design.webp?v=8192d765758c",
+      "imageUrl": "https://omgskills.com/images/collections/elite-ui-design.webp?v=b804a40decc7",
       "featuredSkillIds": [
         "anthropics/skills:canvas-design",
         "pbakaus/impeccable:impeccable",
@@ -1390,6 +1394,209 @@
         "arvindrk/extract-design-system:skills/extract-design-system"
       ],
       "description": "A compact set of skills for stronger results and design quality."
+    },
+    {
+      "id": "video-motion-graphics",
+      "type": "topic",
+      "title": "Best Skills for Video & Motion Graphics",
+      "subtitle": "Make videos, animations, and motion design with your agent",
+      "featuredSkillIds": [
+        "affaan-m/ecc:remotion-video-creation",
+        "heygen-com/hyperframes:hyperframes",
+        "greensock/gsap-skills:gsap-core",
+        "coreyhaines31/marketingskills:video",
+        "inference-sh/skills:ai-video-generation",
+        "danielmiessler/LifeOS:LifeOS/install/skills/Remotion",
+        "heygen-com/hyperframes:animejs",
+        "anthropics/skills:slack-gif-creator",
+        "nexu-io/open-design:emilkowalski-motion",
+        "affaan-m/ecc:video-editing"
+      ],
+      "skillIds": [
+        "affaan-m/ecc:remotion-video-creation",
+        "heygen-com/hyperframes:hyperframes",
+        "greensock/gsap-skills:gsap-core",
+        "coreyhaines31/marketingskills:video",
+        "affaan-m/ecc:video-editing",
+        "nexu-io/open-design:emilkowalski-motion",
+        "anthropics/skills:slack-gif-creator",
+        "heygen-com/hyperframes:animejs",
+        "danielmiessler/LifeOS:LifeOS/install/skills/Remotion",
+        "inference-sh/skills:ai-video-generation"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/video-motion-graphics.webp?v=82238b7ec309"
+    },
+    {
+      "id": "seo",
+      "type": "topic",
+      "title": "Best Skills for SEO & LLMO",
+      "subtitle": "Audits, programmatic pages, and AI-search optimization",
+      "featuredSkillIds": [
+        "coreyhaines31/marketingskills:programmatic-seo",
+        "agricidaniel/claude-seo:seo-page",
+        "affaan-m/ecc:seo",
+        "firecrawl/firecrawl-workflows:firecrawl-seo-audit",
+        "langchain-ai/deepagents:blog-post",
+        "resciencelab/opc-skills:seo-geo",
+        "agricidaniel/claude-seo:seo-hreflang",
+        "agricidaniel/claude-seo:seo-competitor-pages",
+        "coreyhaines31/marketingskills:directory-submissions",
+        "coreyhaines31/marketingskills:site-architecture"
+      ],
+      "skillIds": [
+        "coreyhaines31/marketingskills:programmatic-seo",
+        "agricidaniel/claude-seo:seo-page",
+        "affaan-m/ecc:seo",
+        "firecrawl/firecrawl-workflows:firecrawl-seo-audit",
+        "coreyhaines31/marketingskills:site-architecture",
+        "coreyhaines31/marketingskills:directory-submissions",
+        "agricidaniel/claude-seo:seo-competitor-pages",
+        "agricidaniel/claude-seo:seo-hreflang",
+        "resciencelab/opc-skills:seo-geo",
+        "langchain-ai/deepagents:blog-post"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/seo.webp?v=1729576a95be"
+    },
+    {
+      "id": "trading-investing",
+      "type": "topic",
+      "title": "Skills for Trading & Investing",
+      "subtitle": "Analysis, models, and risk — from earnings to backtests",
+      "featuredSkillIds": [
+        "anthropics/financial-services-plugins:thesis-tracker",
+        "anthropics/financial-services-plugins:earnings-analysis",
+        "wshobson/agents:plugins/quantitative-trading/skills/risk-metrics-calculation",
+        "OpenBB-finance/OpenBB:configure_mcp_server",
+        "marketcalls/vectorbt-backtesting-skills:backtest",
+        "affaan-m/ecc:ito-market-intelligence",
+        "ccxt/ccxt:ccxt-python",
+        "anthropics/financial-services-plugins:bond-futures-basis",
+        "anthropics/financial-services-plugins:comps-analysis",
+        "anthropics/financial-services-plugins:dcf-model"
+      ],
+      "skillIds": [
+        "anthropics/financial-services-plugins:thesis-tracker",
+        "anthropics/financial-services-plugins:earnings-analysis",
+        "wshobson/agents:plugins/quantitative-trading/skills/risk-metrics-calculation",
+        "OpenBB-finance/OpenBB:configure_mcp_server",
+        "anthropics/financial-services-plugins:dcf-model",
+        "anthropics/financial-services-plugins:comps-analysis",
+        "anthropics/financial-services-plugins:bond-futures-basis",
+        "ccxt/ccxt:ccxt-python",
+        "affaan-m/ecc:ito-market-intelligence",
+        "marketcalls/vectorbt-backtesting-skills:backtest"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/trading-investing.webp?v=5870a93b3415"
+    },
+    {
+      "id": "presentations-decks",
+      "type": "topic",
+      "title": "Skills for Presentations & Decks",
+      "subtitle": "From PPTX files to investor decks and web slides",
+      "featuredSkillIds": [
+        "anthropics/skills:pptx",
+        "affaan-m/ecc:frontend-slides",
+        "slidevjs/slidev:slidev",
+        "affaan-m/ecc:investor-materials",
+        "anthropics/financial-services-plugins:funding-digest",
+        "googleworkspace/cli:gws-slides",
+        "hugohe3/ppt-master:ppt-master",
+        "bytedance/deer-flow:ppt-generation",
+        "coreyhaines31/marketingskills:sales-enablement",
+        "anthropics/skills:theme-factory"
+      ],
+      "skillIds": [
+        "anthropics/skills:pptx",
+        "affaan-m/ecc:frontend-slides",
+        "slidevjs/slidev:slidev",
+        "affaan-m/ecc:investor-materials",
+        "anthropics/skills:theme-factory",
+        "coreyhaines31/marketingskills:sales-enablement",
+        "bytedance/deer-flow:ppt-generation",
+        "hugohe3/ppt-master:ppt-master",
+        "googleworkspace/cli:gws-slides",
+        "anthropics/financial-services-plugins:funding-digest"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/presentations-decks.webp?v=62b68d0a11b1"
+    },
+    {
+      "id": "social-media",
+      "type": "topic",
+      "title": "Skills for Social Media",
+      "subtitle": "Create, schedule, and grow across X, LinkedIn, and TikTok",
+      "featuredSkillIds": [
+        "affaan-m/ecc:content-engine",
+        "coreyhaines31/marketingskills:social-content",
+        "mvanhorn/last30days-skill",
+        "wshobson/agents:plugins/social-publishing/skills/social-publishing",
+        "coreyhaines31/marketingskills:image",
+        "typefully/agent-skills:skills/typefully",
+        "inference-sh/skills:twitter-automation",
+        "sickn33/agentic-awesome-skills:linkedin-content-generator",
+        "affaan-m/ecc:crosspost"
+      ],
+      "skillIds": [
+        "affaan-m/ecc:content-engine",
+        "coreyhaines31/marketingskills:social-content",
+        "mvanhorn/last30days-skill",
+        "wshobson/agents:plugins/social-publishing/skills/social-publishing",
+        "affaan-m/ecc:crosspost",
+        "sickn33/agentic-awesome-skills:linkedin-content-generator",
+        "inference-sh/skills:twitter-automation",
+        "typefully/agent-skills:skills/typefully",
+        "coreyhaines31/marketingskills:image"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/social-media.webp?v=54c3840a4041"
+    },
+    {
+      "id": "excel-financial-modeling",
+      "type": "topic",
+      "title": "Best Skills for Excel & Finance",
+      "subtitle": "Spreadsheets, DCF models, and clean data",
+      "featuredSkillIds": [
+        "anthropics/skills:xlsx",
+        "anthropics/financial-services-plugins:dcf-model",
+        "anthropics/financial-services-plugins:comps-analysis",
+        "googleworkspace/cli:gws-sheets",
+        "anthropics/financial-services-plugins:funding-digest",
+        "n8n-io/n8n:data-table-manager",
+        "anthropics/financial-services-plugins:earnings-analysis",
+        "anthropics/financial-services-plugins:clean-data-xls"
+      ],
+      "skillIds": [
+        "anthropics/skills:xlsx",
+        "anthropics/financial-services-plugins:dcf-model",
+        "anthropics/financial-services-plugins:comps-analysis",
+        "googleworkspace/cli:gws-sheets",
+        "anthropics/financial-services-plugins:clean-data-xls",
+        "anthropics/financial-services-plugins:earnings-analysis",
+        "n8n-io/n8n:data-table-manager",
+        "anthropics/financial-services-plugins:funding-digest"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/excel-financial-modeling.webp?v=c5396c482d5d"
+    },
+    {
+      "id": "memory-context",
+      "type": "topic",
+      "title": "Best Skills for Memory & Context",
+      "subtitle": "Stop your agent from forgetting everything between sessions",
+      "featuredSkillIds": [
+        "thedotmack/claude-mem:mem-search",
+        "juliusbrussee/caveman:compress",
+        "paperclipai/paperclip:para-memory-files",
+        "thedotmack/claude-mem:plugin/skills/learn-codebase",
+        "fockus/skill-memory-bank",
+        "thedotmack/claude-mem:timeline-report"
+      ],
+      "skillIds": [
+        "thedotmack/claude-mem:mem-search",
+        "juliusbrussee/caveman:compress",
+        "paperclipai/paperclip:para-memory-files",
+        "thedotmack/claude-mem:plugin/skills/learn-codebase",
+        "thedotmack/claude-mem:timeline-report",
+        "fockus/skill-memory-bank"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/memory-context.webp?v=6b6008a37b54"
     }
   ]
 }
