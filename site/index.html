@@ -120,22 +120,58 @@
       padding: 0 32px 80px;
     }
 
-    .hero {
-      padding: 56px 0 48px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      text-align: center;
+    .hero-layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.82fr) minmax(0, 1.45fr);
+      align-items: start;
+      gap: 32px;
+      padding: 28px 0 0;
+      position: relative;
+      isolation: isolate;
     }
 
-    .logo {
-      width: 80px;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      filter: drop-shadow(0 1px 2px rgba(60, 64, 67, 0.3)) drop-shadow(0 1px 3px rgba(60, 64, 67, 0.15));
+    .hero-layout::before,
+    .hero-layout::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .hero-layout::before {
+      height: 500px;
+      inset: -80px -48px auto;
+      background: radial-gradient(680px 340px at 50% 16%, rgba(13, 13, 13, 0.045), transparent 70%);
+    }
+
+    .hero-layout::after {
+      inset: -48px -48px 28%;
+      background-image: radial-gradient(circle, rgba(13, 13, 13, 0.16) 1px, transparent 1px);
+      background-size: 24px 24px;
+      -webkit-mask-image: radial-gradient(680px 330px at 50% 18%, rgba(0, 0, 0, 0.7), transparent 75%);
+      mask-image: radial-gradient(680px 330px at 50% 18%, rgba(0, 0, 0, 0.7), transparent 75%);
+    }
+
+    .hero {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 20px;
+      text-align: left;
+    }
+
+    .hero-eyes {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      min-height: 28px;
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1;
+      text-decoration: none;
     }
 
     h1 {
@@ -152,7 +188,7 @@
     }
 
     .subheadline {
-      max-width: 640px;
+      max-width: 430px;
       font-size: 13px;
       line-height: 1.45;
       color: var(--muted);
@@ -226,6 +262,10 @@
       overflow: hidden;
     }
 
+    .banner-animation {
+      height: 639px;
+    }
+
     .banner-actions {
       display: flex;
       align-items: center;
@@ -249,6 +289,7 @@
 
     .hero .banner-actions {
       flex-direction: column;
+      align-items: flex-start;
       gap: 7px;
     }
 
@@ -258,10 +299,12 @@
     }
 
     .hero-cta-note {
+      align-self: stretch;
       font-size: 11px;
       line-height: 1.2;
       color: #8b8b8b;
       font-weight: 400;
+      text-align: center;
     }
 
     .banner img,
@@ -279,14 +322,23 @@
       display: none;
     }
 
+    .hero-animation-frame {
+      width: 100%;
+      height: 720px;
+      border: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
     /* ── Features ── */
 
     .features {
-      width: calc(100vw - 20px);
+      width: min(1280px, calc(100vw - 20px));
       margin-top: 0;
-      margin-left: calc(50% - 50vw + 10px);
+      margin-left: 50%;
+      transform: translateX(-50%);
       padding: 104px 56px;
-      background: #f4f4f7;
+      background: #f5f5f7;
       color: #1d1d1f;
       border-radius: 38px;
     }
@@ -907,6 +959,24 @@
     /* ── Mobile ── */
 
     @media (min-width: 501px) and (max-width: 900px) {
+      .hero-layout {
+        display: block;
+        padding: 40px 0 18px;
+      }
+
+      .hero {
+        align-items: center;
+        text-align: center;
+      }
+
+      .hero .banner-actions {
+        align-items: center;
+      }
+
+      .banner {
+        margin-top: 20px;
+      }
+
       .library-preview-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -921,8 +991,18 @@
         padding: 0 20px 60px;
       }
 
-      .hero {
+      .hero-layout {
+        display: block;
         padding: 40px 0 36px;
+      }
+
+      .hero-layout::before,
+      .hero-layout::after {
+        inset-inline: -20px;
+      }
+
+      .hero {
+        padding: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -945,8 +1025,17 @@
         margin-top: 20px;
       }
 
+      .hero .banner-actions {
+        align-items: center;
+      }
+
       .banner {
+        margin-top: 18px;
         border-radius: 0;
+      }
+
+      .banner-animation {
+        height: auto;
       }
 
       .banner .banner-desktop-video {
@@ -1041,24 +1130,23 @@
 </head>
 <body>
   <main>
-    <section class="hero" aria-label="omgskills hero">
-      <img class="logo" src="logo.png" alt="omgskills" width="404" height="195">
-      <h1><span class="headline-strong">Find trending skills</span><br>for Claude &amp; Codex in seconds</h1>
-      <p class="subheadline">Search <a class="subheadline-highlight" href="/skills/">49,000+ skills</a> on Github &amp; X, read docs, install in one click and manage all your skills in one place</p>
-      <div class="banner-actions">
-        <a class="primary-button" href="/downloads/omgskills-mac.dmg" data-humblytics="Hero Download Mac DMG"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>
-        <div class="hero-cta-note">it&rsquo;s free - no signup required</div>
-      </div>
-    </section>
+    <div class="hero-layout">
+      <section class="hero" aria-label="omgskills hero">
+        <a class="hero-eyes" href="/skills/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>
+        <h1><span class="headline-strong">Find trending skills</span><br>for Claude &amp; Codex<br>in seconds</h1>
+        <p class="subheadline">Search <a class="subheadline-highlight" href="/skills/">49,000+ skills</a> on Github &amp; X, read docs, install in one click and manage all your skills in one place</p>
+        <div class="banner-actions">
+          <a class="primary-button" href="/downloads/omgskills-mac.dmg" data-humblytics="Hero Download Mac DMG"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>
+          <div class="hero-cta-note">it&rsquo;s free - no signup required</div>
+        </div>
+      </section>
 
-    <div class="banner">
-      <video class="banner-desktop-video" autoplay muted loop playsinline width="1100" height="700" poster="first.webp" aria-label="omgskills app — search and browse Claude Code skills from your Mac menu bar">
-        <source src="hero-desktop-lite.mp4?v=1" type="video/mp4">
-        <img src="first.webp" alt="omgskills app — search and browse Claude Code skills from your Mac menu bar" width="1100" height="700">
-      </video>
-      <video class="banner-mobile-video" autoplay muted loop playsinline poster="first-m.webp" aria-label="omgskills app mobile preview">
-        <source src="hero-mobile-lite.mp4?v=1" type="video/mp4">
-      </video>
+      <div class="banner banner-animation">
+        <iframe class="banner-desktop-video hero-animation-frame" src="/hero-animation/" title="Animated omgskills app demonstration" width="1200" height="720" scrolling="no"></iframe>
+        <video class="banner-mobile-video" autoplay muted loop playsinline poster="first-m.webp" aria-label="omgskills app mobile preview">
+          <source src="hero-mobile-lite.mp4?v=1" type="video/mp4">
+        </video>
+      </div>
     </div>
 
     <section class="features" aria-label="omgskills features">
