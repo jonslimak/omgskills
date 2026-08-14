@@ -7,8 +7,11 @@ import {
 
 const requiredWebLibraryArtifacts = [
   "library/anthropics/index.html",
+  "library/anthropics/index.md",
   "collections/starter-pack/index.html",
+  "collections/starter-pack/index.md",
   "skills/index.html",
+  "skills/index.md",
   "sitemap.xml",
   "robots.txt",
   "llms.txt",
@@ -66,9 +69,11 @@ export async function verifyWebLibraryDeployArtifacts(rootDir, label = "deploy a
 
   const missingSkillPages = [];
   for (const [catalogSkillId, urlPath] of entries) {
-    const relativePath = path.posix.join(urlPath.replace(/^\/+/, ""), "index.html");
-    if (!(await isFile(path.join(rootDir, relativePath)))) {
-      missingSkillPages.push(`${catalogSkillId} -> ${relativePath}`);
+    for (const filename of ["index.html", "index.md"]) {
+      const relativePath = path.posix.join(urlPath.replace(/^\/+/, ""), filename);
+      if (!(await isFile(path.join(rootDir, relativePath)))) {
+        missingSkillPages.push(`${catalogSkillId} -> ${relativePath}`);
+      }
     }
   }
 

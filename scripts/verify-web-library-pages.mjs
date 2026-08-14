@@ -65,6 +65,7 @@ const pages = [
     profileMetadata: true,
     recommendations: { currentPath: "/library/openai/" },
     skillLayout: true,
+    markdownText: "# OpenAI",
   },
   {
     path: "/library/mattpocock/",
@@ -74,6 +75,7 @@ const pages = [
       github: "https://github.com/mattpocock",
       x: "https://x.com/mattpocockuk",
     },
+    markdownText: "# Matt Pocock",
   },
   {
     path: "/collections/starter-pack/",
@@ -87,6 +89,7 @@ const pages = [
     collectionSkillCount: (starterPack.skillIds || starterPack.featuredSkillIds || []).length,
     recommendations: { currentPath: "/collections/starter-pack/" },
     skillLayout: true,
+    markdownText: `# ${starterPack.title}`,
   },
   {
     path: "/skills/openai/codex/code-review/",
@@ -102,6 +105,7 @@ const pages = [
       path: "/library/openai/",
     },
     allowNoindex: true,
+    markdownText: "# code-review",
   },
   {
     path: "/skills/obra/superpowers/systematic-debugging/",
@@ -112,12 +116,14 @@ const pages = [
       handle: "obra",
       path: "/library/obra/",
     },
+    markdownText: "# systematic-debugging",
   },
   {
     path: "/skills/openai/codex/code-review-change-size/",
     canonical: "https://omgskills.com/skills/openai/codex/code-review-change-size/",
     text: "code-review-change-size",
     allowNoindex: true,
+    markdownText: "# code-review-change-size",
   },
   {
     path: "/skills/",
@@ -125,6 +131,7 @@ const pages = [
     text: "The best &amp; latest skills from the most trusted sources",
     directoryImages: true,
     skillLayout: true,
+    markdownText: "# omgskills web library",
   },
 ];
 
@@ -196,7 +203,7 @@ function internalLinks(html) {
 function sameOriginPaths(text) {
   const references = new Set(internalLinks(text));
   const escapedOrigin = origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  for (const match of text.matchAll(new RegExp(`${escapedOrigin}(/[^\\s"'<>]*)`, "g"))) {
+  for (const match of text.matchAll(new RegExp(`${escapedOrigin}(/[^\\s"'<>\\])}]*)`, "g"))) {
     references.add(match[1]);
   }
   return [...references];
@@ -214,13 +221,13 @@ async function localUrlExists(urlPath) {
   return false;
 }
 
-async function collectHtmlFiles(directory) {
+async function collectFiles(directory, suffix) {
   const files = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const entryPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
-      files.push(...await collectHtmlFiles(entryPath));
-    } else if (entry.isFile() && entry.name.endsWith(".html")) {
+      files.push(...await collectFiles(entryPath, suffix));
+    } else if (entry.isFile() && entry.name.endsWith(suffix)) {
       files.push(entryPath);
     }
   }
@@ -240,8 +247,11 @@ async function collectLocalReferenceFailures(text, label, failures) {
 async function verifyAllLocalReferences() {
   const failures = new Set();
   const htmlRoots = ["skills", "library", "collections"].map((directory) => path.join(siteDir, directory));
-  const htmlFiles = (await Promise.all(htmlRoots.map(collectHtmlFiles))).flat().sort();
-  for (const filePath of htmlFiles) {
+  const generatedFiles = (await Promise.all(htmlRoots.flatMap((directory) => [
+    collectFiles(directory, ".html"),
+    collectFiles(directory, ".md"),
+  ]))).flat().sort();
+  for (const filePath of generatedFiles) {
     await collectLocalReferenceFailures(await readFile(filePath, "utf8"), filePath, failures);
   }
 
@@ -258,6 +268,33 @@ async function verifyAllLocalReferences() {
 
   if (failures.size) {
     throw new Error(`Generated web library has unsafe internal references:\n${[...failures].sort().join("\n")}`);
+  }
+}
+
+async function verifyLocalMarkdownParity() {
+  const failures = [];
+  const roots = ["skills", "library", "collections"].map((directory) => path.join(siteDir, directory));
+  for (const root of roots) {
+    const [htmlFiles, markdownFiles] = await Promise.all([
+      collectFiles(root, ".html"),
+      collectFiles(root, ".md"),
+    ]);
+    for (const htmlPath of htmlFiles.filter((filePath) => path.basename(filePath) === "index.html")) {
+      const markdownPath = path.join(path.dirname(htmlPath), "index.md");
+      if (!(await fileExists(markdownPath))) failures.push(`Missing Markdown mirror for ${htmlPath}`);
+      const html = await readFile(htmlPath, "utf8");
+      const relativeDirectory = path.relative(siteDir, path.dirname(htmlPath)).split(path.sep).join("/");
+      const urlPath = `/${relativeDirectory}/`;
+      const alternate = `<link rel="alternate" type="text/markdown" href="${urlPath}index.md">`;
+      if (!html.includes(alternate)) failures.push(`${htmlPath} is missing ${alternate}`);
+    }
+    for (const markdownPath of markdownFiles.filter((filePath) => path.basename(filePath) === "index.md")) {
+      const htmlPath = path.join(path.dirname(markdownPath), "index.html");
+      if (!(await fileExists(htmlPath))) failures.push(`Missing HTML page for ${markdownPath}`);
+    }
+  }
+  if (failures.length) {
+    throw new Error(`Generated HTML/Markdown parity failed:\n${failures.sort().join("\n")}`);
   }
 }
 
@@ -415,8 +452,17 @@ async function verifyLocalPage(page) {
 
   const html = await readFile(filePath, "utf8");
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, filePath);
+  assertIncludes(html, `<link rel="alternate" type="text/markdown" href="${page.path}index.md">`, filePath);
   assertIncludes(html, page.text, filePath);
   verifyMetadata(html, page, filePath);
+
+  const markdownPath = localPathForUrlPath(path.posix.join(page.path, "index.md"));
+  if (!(await fileExists(markdownPath))) {
+    throw new Error(`Missing Markdown mirror: ${markdownPath}`);
+  }
+  const markdown = await readFile(markdownPath, "utf8");
+  assertIncludes(markdown, page.markdownText, markdownPath);
+  assertIncludes(markdown, page.canonical, markdownPath);
 }
 
 async function verifyLocalSitemap() {
@@ -436,6 +482,7 @@ async function verifyLocalSitemap() {
     });
   }
   assertIncludes(sitemap, "<lastmod>", sitemapPath);
+  assertNotIncludes(sitemap, "index.md", sitemapPath);
 }
 
 async function verifyLocalRootFile(file) {
@@ -443,7 +490,12 @@ async function verifyLocalRootFile(file) {
   if (!(await fileExists(filePath))) {
     throw new Error(`Missing root metadata file: ${filePath}`);
   }
-  assertIncludes(await readFile(filePath, "utf8"), file.text, filePath);
+  const contents = await readFile(filePath, "utf8");
+  assertIncludes(contents, file.text, filePath);
+  if (file.path === "/llms.txt") {
+    assertIncludes(contents, "## Markdown mirrors", filePath);
+    assertIncludes(contents, `${origin}/skills/index.md`, filePath);
+  }
 }
 
 function verifyCatalogSkillUrlCoverage(asset, label) {
@@ -517,9 +569,27 @@ async function verifyLivePage(page) {
   const html = await response.text();
   livePageHtmlByPath.set(page.path, html);
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, url);
+  assertIncludes(html, `<link rel="alternate" type="text/markdown" href="${page.path}index.md">`, url);
   assertIncludes(html, page.text, url);
   verifyMetadata(html, page, url);
   await verifyLiveInternalLinks(html, url);
+
+  const markdownUrl = `${origin}${page.path}index.md`;
+  const markdownResponse = await fetchLive(markdownUrl, { redirect: "manual" });
+  if (markdownResponse.status !== 200) {
+    throw new Error(`${markdownUrl} returned ${markdownResponse.status}, expected 200`);
+  }
+  const contentType = markdownResponse.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().startsWith("text/markdown")) {
+    throw new Error(`${markdownUrl} returned Content-Type ${contentType || "<missing>"}, expected text/markdown`);
+  }
+  const robots = markdownResponse.headers.get("x-robots-tag") || "";
+  if (!robots.toLowerCase().includes("noindex")) {
+    throw new Error(`${markdownUrl} returned X-Robots-Tag ${robots || "<missing>"}, expected noindex`);
+  }
+  const markdown = await markdownResponse.text();
+  assertIncludes(markdown, page.markdownText, markdownUrl);
+  assertIncludes(markdown, page.canonical, markdownUrl);
 }
 
 async function verifyLiveHomepageLibraryPreview() {
@@ -552,6 +622,7 @@ async function verifyLiveSitemap() {
     });
   }
   assertIncludes(sitemap, "<lastmod>", url);
+  assertNotIncludes(sitemap, "index.md", url);
 }
 
 function sitemapChildPaths(xml) {
@@ -586,7 +657,12 @@ async function verifyLiveRootFile(file) {
   if (response.status !== 200) {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
-  assertIncludes(await response.text(), file.text, url);
+  const contents = await response.text();
+  assertIncludes(contents, file.text, url);
+  if (file.path === "/llms.txt") {
+    assertIncludes(contents, "## Markdown mirrors", url);
+    assertIncludes(contents, `${origin}/skills/index.md`, url);
+  }
 }
 
 async function verifyLiveCatalogSkillUrls() {
@@ -656,6 +732,7 @@ async function main() {
   await verifyLocalCatalogSkillUrls();
   await verifyLocalGeneratedRedirects();
   await verifyLocalSitemap();
+  await verifyLocalMarkdownParity();
   await verifyAllLocalReferences();
   console.log("Local web library pages verified");
 }

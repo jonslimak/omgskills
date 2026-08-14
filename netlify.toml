@@ -75,3 +75,31 @@
   for = "/data/manifest.json"
   [headers.values]
     Cache-Control = "public, max-age=60, must-revalidate"
+
+[[headers]]
+  for = "/skills/index.md"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    X-Robots-Tag = "noindex, follow"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+[[headers]]
+  for = "/skills/*/index.md"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    X-Robots-Tag = "noindex, follow"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+[[headers]]
+  for = "/library/*/index.md"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    X-Robots-Tag = "noindex, follow"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+[[headers]]
+  for = "/collections/*/index.md"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    X-Robots-Tag = "noindex, follow"
+    Cache-Control = "public, max-age=300, must-revalidate"

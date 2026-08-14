@@ -98,6 +98,46 @@ function normalizeText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
 }
 
+function markdownMirrorPath(urlPath) {
+  assertTrailingSlash(urlPath);
+  return `${urlPath}index.md`;
+}
+
+function markdownMirrorUrl(urlPath) {
+  return `${origin}${markdownMirrorPath(urlPath)}`;
+}
+
+function escapeMarkdownText(value) {
+  return normalizeText(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/([`*_[\]<>#])/g, "\\$1");
+}
+
+function escapeMarkdownUrl(value) {
+  return encodeURI(String(value || ""))
+    .replace(/\(/g, "%28")
+    .replace(/\)/g, "%29");
+}
+
+function markdownLink(label, url) {
+  return `[${escapeMarkdownText(label)}](${escapeMarkdownUrl(url)})`;
+}
+
+function markdownCodeBlock(value, language = "text") {
+  const content = String(value || "").replace(/\r\n?/g, "\n").trim();
+  const longestFence = Math.max(0, ...[...content.matchAll(/`+/g)].map((match) => match[0].length));
+  const fence = "`".repeat(Math.max(3, longestFence + 1));
+  return `${fence}${language}\n${content}\n${fence}`;
+}
+
+function markdownInlineCode(value) {
+  const content = String(value || "").replace(/\s+/g, " ").trim();
+  const longestFence = Math.max(0, ...[...content.matchAll(/`+/g)].map((match) => match[0].length));
+  const fence = "`".repeat(Math.max(1, longestFence + 1));
+  const padding = content.startsWith("`") || content.endsWith("`") ? " " : "";
+  return `${fence}${padding}${content}${padding}${fence}`;
+}
+
 function shortText(value, maxLength = 120) {
   const text = normalizeText(value);
   if (text.length <= maxLength) return text;
@@ -167,6 +207,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
   <meta name="description" content="${escapeHtml(description)}">
   ${indexTier === "noindex" ? '<meta name="robots" content="noindex,follow">' : ""}
   <link rel="canonical" href="${escapeHtml(canonical)}">
+  <link rel="alternate" type="text/markdown" href="${escapeHtml(markdownMirrorPath(urlPath))}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
@@ -405,10 +446,14 @@ async function readRootManifest() {
   };
 }
 
-async function writePage(urlPath, html) {
-  const filePath = path.join(siteDir, urlPath.replace(/^\/+/, ""), "index.html");
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, html);
+async function writeGeneratedPage(urlPath, { html, markdown }) {
+  const directory = path.join(siteDir, urlPath.replace(/^\/+/, ""));
+  const markdownOutput = markdown.endsWith("\n") ? markdown : `${markdown}\n`;
+  await mkdir(directory, { recursive: true });
+  await Promise.all([
+    writeFile(path.join(directory, "index.html"), html),
+    writeFile(path.join(directory, "index.md"), markdownOutput),
+  ]);
 }
 
 async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlById) {
@@ -887,6 +932,208 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
   });
 }
 
+function markdownAuthorLink(skill, profilePathByCreatorHandle) {
+  const author = skillAuthorReference(skill, profilePathByCreatorHandle);
+  const url = author.profilePath ? markdownMirrorUrl(author.profilePath) : author.githubUrl;
+  return markdownLink(`@${author.handle}`, url);
+}
+
+function renderMarkdownSkillList(
+  skills,
+  skillUrlById,
+  profilePathByCreatorHandle,
+  { ordered = false, includeInstall = false } = {},
+) {
+  if (!skills.length) return "_No skills available._";
+  return skills.map((skill, index) => {
+    const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
+    const prefix = ordered ? `${index + 1}.` : "-";
+    const details = [
+      markdownAuthorLink(skill, profilePathByCreatorHandle),
+      `${compactNumber(skill.stars)} stars`,
+    ];
+    const lines = [
+      `${prefix} ${markdownLink(skill.name, markdownMirrorUrl(urlPath))} — ${escapeMarkdownText(subtitleForSkill(skill))}`,
+      `   - ${details.join(" · ")}`,
+    ];
+    if (includeInstall && skill.install_cmd) {
+      lines.push(`   - Install: ${markdownInlineCode(skill.install_cmd)}`);
+    }
+    return lines.join("\n");
+  }).join("\n");
+}
+
+function renderSkillMarkdown(
+  skill,
+  repoSkills,
+  authorSkills,
+  skillUrlById,
+  profilePathByCreatorHandle,
+) {
+  const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
+  const metadata = [
+    `Claude/Codex skill by ${markdownAuthorLink(skill, profilePathByCreatorHandle)}`,
+    `${compactNumber(skill.stars)} stars`,
+    skill.installs ? `${compactNumber(skill.installs)} installs` : "",
+    skill.last_updated ? `Updated ${String(skill.last_updated).slice(0, 10)}` : "",
+  ].filter(Boolean).join(" · ");
+  const description = visibleDescriptionForSkill(skill);
+  const readmeSnippet = readmeSnippetForSkill(skill);
+  const tags = Array.isArray(skill.tags) ? skill.tags.filter(Boolean) : [];
+  const author = skillAuthorReference(skill, profilePathByCreatorHandle);
+  const authorUrl = author.profilePath ? markdownMirrorUrl(author.profilePath) : author.githubUrl;
+  const links = [
+    `- HTML page: ${origin}${urlPath}`,
+    skill.github_url ? `- GitHub: ${skill.github_url}` : "",
+    `- Author: ${markdownLink(`@${author.handle}`, authorUrl)}`,
+  ].filter(Boolean).join("\n");
+  return `# ${escapeMarkdownText(skill.name)}
+
+> ${metadata}
+
+${escapeMarkdownText(description || descriptionForSkill(skill))}
+${tags.length ? `\nTags: ${tags.map(escapeMarkdownText).join(", ")}\n` : ""}
+${skill.install_cmd ? `## Install\n\n${markdownCodeBlock(skill.install_cmd, "sh")}\n\n` : ""}${readmeSnippet ? `## From README\n\n${escapeMarkdownText(readmeSnippet)}\n\n` : ""}## Links
+
+${links}
+${repoSkills.length ? `\n## More from this repo\n\n${renderMarkdownSkillList(repoSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}${authorSkills.length ? `\n## More skills by this author\n\n${renderMarkdownSkillList(authorSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}`;
+}
+
+function renderProfileMarkdown(
+  collection,
+  skills,
+  skillUrlById,
+  profilePathByCreatorHandle,
+  authorStats,
+  recommendations = [],
+) {
+  const urlPath = profilePath(collection.authorHandle);
+  const githubUrl = collection.githubUrl || githubProfileUrl(collection.authorHandle);
+  const stats = authorStats?.stats;
+  const statLines = stats ? [
+    `- Skills: ${compactNumber(stats.skillCount)}`,
+    `- Stars: ${compactNumber(stats.totalStars)}`,
+    stats.totalInstalls ? `- Installs: ${compactNumber(stats.totalInstalls)}` : "",
+    stats.bestSkill?.name ? `- Best skill: ${escapeMarkdownText(stats.bestSkill.name)}` : "",
+  ].filter(Boolean).join("\n") : "";
+  const links = [
+    `- HTML page: ${origin}${urlPath}`,
+    `- GitHub: ${githubUrl}`,
+    collection.xUrl ? `- X: ${collection.xUrl}` : "",
+  ].filter(Boolean).join("\n");
+  return `# ${escapeMarkdownText(collection.title)}
+
+${collection.subtitle ? `> ${escapeMarkdownText(collection.subtitle)}\n\n` : ""}${escapeMarkdownText(collection.description || `Skills by @${collection.authorHandle}.`)}
+
+${statLines ? `## Profile stats\n\n${statLines}\n\n` : ""}## Links
+
+${links}
+
+## Featured skills
+
+${renderMarkdownSkillList(skills, skillUrlById, profilePathByCreatorHandle)}
+${recommendations.length ? `\n## Others you might like\n\n${recommendations.map((item) => `- ${markdownLink(item.title, markdownMirrorUrl(profilePath(item.authorHandle)))}`).join("\n")}\n` : ""}`;
+}
+
+function renderCollectionMarkdown(
+  collection,
+  featuredSkills,
+  allSkills,
+  skillUrlById,
+  profilePathByCreatorHandle,
+  recommendations = [],
+) {
+  const urlPath = collectionPath(collection.id);
+  const featuredIds = new Set(featuredSkills.map((skill) => skill.id));
+  const remainingSkills = allSkills.filter((skill) => !featuredIds.has(skill.id));
+  return `# ${escapeMarkdownText(collection.title)}
+
+${collection.subtitle ? `> ${escapeMarkdownText(collection.subtitle)}\n\n` : ""}${escapeMarkdownText(collection.description || `${collection.title} skill collection.`)}
+
+## Links
+
+- HTML page: ${origin}${urlPath}
+
+## Featured skills
+
+${renderMarkdownSkillList(featuredSkills, skillUrlById, profilePathByCreatorHandle, { ordered: true, includeInstall: true })}
+${remainingSkills.length ? `\n## Full collection\n\n${renderMarkdownSkillList(remainingSkills, skillUrlById, profilePathByCreatorHandle, { ordered: true, includeInstall: true })}\n` : ""}${recommendations.length ? `\n## Others you might like\n\n${recommendations.map((item) => `- ${markdownLink(item.title, markdownMirrorUrl(collectionPath(item.id)))}`).join("\n")}\n` : ""}`;
+}
+
+function renderSkillsIndexMarkdown(
+  { profileCollections, topicCollections, skills },
+  skillUrlById,
+  profilePathByCreatorHandle,
+) {
+  const profiles = profileCollections.map((collection) => {
+    const detail = collection.description || collection.subtitle || `Skills by ${collection.title}`;
+    return `- ${markdownLink(collection.title, markdownMirrorUrl(profilePath(collection.authorHandle)))} — ${escapeMarkdownText(detail)}`;
+  }).join("\n");
+  const collections = topicCollections.map((collection) => {
+    const detail = collection.description || collection.subtitle || "Editorial skill collection";
+    return `- ${markdownLink(collection.title, markdownMirrorUrl(collectionPath(collection.id)))} — ${escapeMarkdownText(detail)}`;
+  }).join("\n");
+  return `# omgskills web library
+
+> The best and latest skills from the most trusted sources.
+
+## Featured profiles
+
+${profiles || "_No featured profiles available._"}
+
+## Editorial collections
+
+${collections || "_No editorial collections available._"}
+
+## Skills
+
+${renderMarkdownSkillList(skills, skillUrlById, profilePathByCreatorHandle)}
+
+## Links
+
+- HTML page: ${origin}/skills/
+`;
+}
+
+function renderLlmsText(profileCollections, topicCollections, exampleSkill, skillUrlById) {
+  const profileLinks = profileCollections.slice(0, 5)
+    .map((collection) => `- ${markdownLink(collection.title, markdownMirrorUrl(profilePath(collection.authorHandle)))}`)
+    .join("\n");
+  const collectionLinks = topicCollections.slice(0, 5)
+    .map((collection) => `- ${markdownLink(collection.title, markdownMirrorUrl(collectionPath(collection.id)))}`)
+    .join("\n");
+  const exampleSkillPath = exampleSkill
+    ? skillUrlById.get(exampleSkill.id) || skillPathForId(exampleSkill.id)
+    : null;
+  return `# omgskills
+
+> omgskills is a Mac app and public web library for discovering, installing, and organizing AI agent skills.
+
+## Start here
+
+- [Markdown library index](${origin}/skills/index.md)
+- [HTML library index](${origin}/skills/)
+
+## Markdown mirrors
+
+Every generated library page has a Markdown version. Append \`index.md\` to its canonical page URL.
+
+${exampleSkillPath ? `- [Example skill](${markdownMirrorUrl(exampleSkillPath)})\n` : ""}
+## Featured profile mirrors
+
+${profileLinks}
+
+## Editorial collection mirrors
+
+${collectionLinks}
+
+## Data
+
+- [Crawl 4 manifest](${origin}/data/crawl4/manifest.json)
+- [v2 manifest](${origin}/data/v2/manifest.json)
+`;
+}
+
 function sitemapLastmod(value) {
   if (!value) return "";
   const date = String(value).slice(0, 10);
@@ -939,6 +1186,7 @@ async function main() {
     await rm(path.join(siteDir, dir), { recursive: true, force: true });
   }
   await rm(path.join(siteDir, catalogSkillUrlsFilename), { force: true });
+  await rm(path.join(siteDir, "llms.txt"), { force: true });
   await removeSitemapFiles();
 
   const { skills, trending, collections, authorLeaderboards } = libraryData;
@@ -1037,9 +1285,8 @@ async function main() {
     const authorSkills = uniqueSkills(skillsByAuthor.get(String(skill.author_handle || "").toLowerCase()) || [])
       .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id))
       .slice(0, Math.max(0, 3 - repoSkills.length));
-    await writePage(
-      urlPath,
-      renderSkillPage(
+    await writeGeneratedPage(urlPath, {
+      html: renderSkillPage(
         skill,
         repoSkills,
         authorSkills,
@@ -1047,7 +1294,14 @@ async function main() {
         profilePathByCreatorHandle,
         indexDecision,
       ),
-    );
+      markdown: renderSkillMarkdown(
+        skill,
+        repoSkills,
+        authorSkills,
+        skillUrlById,
+        profilePathByCreatorHandle,
+      ),
+    });
     generatedSkillUrlById.set(skill.id, urlPath);
   }
 
@@ -1067,17 +1321,26 @@ async function main() {
       noindexCount += 1;
       addNoindexReason("empty-profile");
     }
-    await writePage(
-      urlPath,
-      renderProfilePage(
+    const recommendations = nextAlphabeticalCollections(collection, profileCollections);
+    const authorStats = authorStatsByHandle.get(collection.authorHandle.toLowerCase());
+    await writeGeneratedPage(urlPath, {
+      html: renderProfilePage(
         collection,
         authorSkills,
         skillUrlById,
-        authorStatsByHandle.get(collection.authorHandle.toLowerCase()),
-        nextAlphabeticalCollections(collection, profileCollections),
+        authorStats,
+        recommendations,
         indexTier,
       ),
-    );
+      markdown: renderProfileMarkdown(
+        collection,
+        authorSkills,
+        skillUrlById,
+        profilePathByCreatorHandle,
+        authorStats,
+        recommendations,
+      ),
+    });
   }
 
   for (const collection of collections.collections) {
@@ -1095,28 +1358,45 @@ async function main() {
       noindexCount += 1;
       addNoindexReason("empty-collection");
     }
-    await writePage(
-      urlPath,
-      renderCollectionPage(
+    const recommendations = nextAlphabeticalCollections(collection, topicCollections);
+    await writeGeneratedPage(urlPath, {
+      html: renderCollectionPage(
         collection,
         featuredSkills,
         allSkills,
         skillUrlById,
-        nextAlphabeticalCollections(collection, topicCollections),
+        recommendations,
         indexTier,
       ),
-    );
+      markdown: renderCollectionMarkdown(
+        collection,
+        featuredSkills,
+        allSkills,
+        skillUrlById,
+        profilePathByCreatorHandle,
+        recommendations,
+      ),
+    });
   }
 
   registerUrl(allUrls, "/skills/", "skills index");
   allUrls.set("/skills/", { source: "skills index", indexTier: "indexable" });
   sitemapUrls.set("/skills/", { source: "skills index" });
   indexableCount += 1;
-  await writePage("/skills/", renderSkillsIndexPage({ profileCollections, topicCollections, skills: includedSkills }, skillUrlById));
+  const skillsIndexData = { profileCollections, topicCollections, skills: includedSkills };
+  await writeGeneratedPage("/skills/", {
+    html: renderSkillsIndexPage(skillsIndexData, skillUrlById),
+    markdown: renderSkillsIndexMarkdown(skillsIndexData, skillUrlById, profilePathByCreatorHandle),
+  });
   await writeWebLibraryRedirects(profileCollections, generatedSkillUrlById);
   await writeFile(
     path.join(siteDir, catalogSkillUrlsFilename),
     `${JSON.stringify(buildCatalogSkillUrlsAsset(generatedSkillUrlById), null, 2)}\n`,
+  );
+  const llmsExampleSkill = skillById.get("openai/codex:code-review") || includedSkills[0];
+  await writeFile(
+    path.join(siteDir, "llms.txt"),
+    renderLlmsText(profileCollections, topicCollections, llmsExampleSkill, skillUrlById),
   );
 
   await writeSitemaps(sitemapUrls);
@@ -1125,7 +1405,7 @@ async function main() {
     .slice(0, 4)
     .map(([reason, count]) => `${reason}:${count}`)
     .join(", ") || "none";
-  console.log(`Built web library test set: ${allUrls.size - 1} pages (${indexableCount} indexable, ${noindexCount} noindex; noindex reasons: ${noindexSummary})`);
+  console.log(`Built web library test set: ${allUrls.size - 1} HTML pages and ${allUrls.size - 1} Markdown mirrors (${indexableCount} indexable, ${noindexCount} noindex; noindex reasons: ${noindexSummary})`);
 }
 
 main().catch((error) => {

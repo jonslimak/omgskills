@@ -96,12 +96,16 @@ test("web library verification requires the generated catalog skill URL asset", 
   const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
   const files = [
     "library/anthropics/index.html",
+    "library/anthropics/index.md",
     "collections/starter-pack/index.html",
+    "collections/starter-pack/index.md",
     "skills/index.html",
+    "skills/index.md",
     "sitemap.xml",
     "robots.txt",
     "llms.txt",
     "skills/example/repo/useful-skill/index.html",
+    "skills/example/repo/useful-skill/index.md",
   ];
   try {
     for (const relativePath of files) {
@@ -118,6 +122,12 @@ test("web library verification requires the generated catalog skill URL asset", 
       }),
     );
     await verifyWebLibraryDeployArtifacts(root);
+    await rm(join(root, "skills/example/repo/useful-skill/index.md"));
+    await assert.rejects(
+      verifyWebLibraryDeployArtifacts(root, "test artifact"),
+      /example\/repo:useful-skill -> skills\/example\/repo\/useful-skill\/index\.md/,
+    );
+    await writeFile(join(root, "skills/example/repo/useful-skill/index.md"), "fixture");
     await rm(join(root, "catalog-skill-urls.json"));
     await assert.rejects(
       verifyWebLibraryDeployArtifacts(root, "test artifact"),
@@ -132,8 +142,11 @@ test("web library verification rejects invalid or empty catalog skill URL assets
   const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
   const files = [
     "library/anthropics/index.html",
+    "library/anthropics/index.md",
     "collections/starter-pack/index.html",
+    "collections/starter-pack/index.md",
     "skills/index.html",
+    "skills/index.md",
     "sitemap.xml",
     "robots.txt",
     "llms.txt",
@@ -167,8 +180,11 @@ test("web library verification rejects catalog URLs whose generated pages are mi
   const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
   const files = [
     "library/anthropics/index.html",
+    "library/anthropics/index.md",
     "collections/starter-pack/index.html",
+    "collections/starter-pack/index.md",
     "skills/index.html",
+    "skills/index.md",
     "sitemap.xml",
     "robots.txt",
     "llms.txt",
