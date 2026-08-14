@@ -1,8 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { resolve } from "node:path";
 
 export type Skill = {
   id: string;
@@ -43,6 +40,9 @@ export type LibraryPaths = {
   goldBasketPath?: string;
   manifestUrl?: string;
   goldBasketUrl?: string;
+  fetcher?: typeof fetch;
+  allowMissingTrending?: boolean;
+  allowMissingGoldBasket?: boolean;
 };
 
 export type SearchOptions = {
@@ -81,13 +81,17 @@ export class OmgskillsLibrary {
 
   static async load(paths = defaultLibraryPaths()): Promise<OmgskillsLibrary> {
     const manifestUrl = paths.manifestUrl ?? defaultManifestUrl;
-    const manifest = paths.skillsPath && paths.trendingPath ? undefined : await readJson<Manifest>(manifestUrl);
+    const fetcher = paths.fetcher ?? fetch;
+    const manifest = paths.skillsPath && paths.trendingPath ? undefined : await readJson<Manifest>(manifestUrl, fetcher);
     const baseUrl = new URL(".", manifestUrl).toString();
+    const skillsSource = paths.skillsPath ?? manifestAssetUrl(manifest?.skills, baseUrl, "skills");
+    const trendingSource = paths.trendingPath ?? optionalManifestAssetUrl(manifest?.trending, baseUrl);
+    const goldBasketSource = paths.goldBasketPath ?? paths.goldBasketUrl ?? defaultGoldBasketUrl;
 
     const [skills, trending, goldBasket] = await Promise.all([
-      readJsonArray<Skill>(paths.skillsPath ?? new URL(manifest?.skills.path ?? "", baseUrl).toString()),
-      readJsonArray<TrendingEntry>(paths.trendingPath ?? new URL(manifest?.trending.path ?? "", baseUrl).toString()),
-      readJsonArray<GoldBasketEntry>(paths.goldBasketPath ?? paths.goldBasketUrl ?? defaultGoldBasketUrl)
+      readJsonArray<Skill>(skillsSource, fetcher),
+      readOptionalJsonArray<TrendingEntry>(trendingSource, fetcher, paths.allowMissingTrending, "trending"),
+      readOptionalJsonArray<GoldBasketEntry>(goldBasketSource, fetcher, paths.allowMissingGoldBasket)
     ]);
 
     return new OmgskillsLibrary({ skills, trending, goldBasket });
@@ -95,6 +99,14 @@ export class OmgskillsLibrary {
 
   static fromData(data: LoadedLibrary): OmgskillsLibrary {
     return new OmgskillsLibrary(data);
+  }
+
+  getStats() {
+    return {
+      skills: this.data.skills.length,
+      trending: this.data.trending.length,
+      goldBasket: this.data.goldBasket.length
+    };
   }
 
   getSkill(id: string): SkillResult | undefined {
@@ -219,17 +231,35 @@ export function defaultLibraryPaths(): LibraryPaths {
   };
 }
 
-async function readJsonArray<T>(pathOrUrl: string): Promise<T[]> {
-  const parsed = await readJson<unknown>(pathOrUrl);
+async function readJsonArray<T>(pathOrUrl: string, fetcher: typeof fetch): Promise<T[]> {
+  const parsed = await readJson<unknown>(pathOrUrl, fetcher);
   if (!Array.isArray(parsed)) {
     throw new Error(`Expected JSON array at ${pathOrUrl}`);
   }
   return parsed as T[];
 }
 
-async function readJson<T>(pathOrUrl: string): Promise<T> {
+async function readOptionalJsonArray<T>(
+  pathOrUrl: string | undefined,
+  fetcher: typeof fetch,
+  optional = false,
+  label = "optional data"
+): Promise<T[]> {
+  if (!pathOrUrl) {
+    if (optional) return [];
+    throw new Error(`Missing ${label} source`);
+  }
+  try {
+    return await readJsonArray<T>(pathOrUrl, fetcher);
+  } catch (error) {
+    if (optional) return [];
+    throw error;
+  }
+}
+
+async function readJson<T>(pathOrUrl: string, fetcher: typeof fetch): Promise<T> {
   if (isUrl(pathOrUrl)) {
-    const response = await fetch(pathOrUrl);
+    const response = await fetcher(pathOrUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch ${pathOrUrl}: ${response.status} ${response.statusText}`);
     }
@@ -240,9 +270,13 @@ async function readJson<T>(pathOrUrl: string): Promise<T> {
   return JSON.parse(raw) as T;
 }
 
+type ManifestAsset = {
+  path?: string;
+};
+
 type Manifest = {
-  skills: { path: string };
-  trending: { path: string };
+  skills?: ManifestAsset;
+  trending?: ManifestAsset;
 };
 
 const defaultManifestUrl = "https://omgskills.com/data/manifest.json";
@@ -250,6 +284,17 @@ const defaultGoldBasketUrl = "https://raw.githubusercontent.com/jonslimak/omgski
 
 function isUrl(value: string): boolean {
   return value.startsWith("http://") || value.startsWith("https://");
+}
+
+function manifestAssetUrl(asset: ManifestAsset | undefined, baseUrl: string, label: string): string {
+  if (!asset?.path) {
+    throw new Error(`Manifest missing ${label}.path`);
+  }
+  return new URL(asset.path, baseUrl).toString();
+}
+
+function optionalManifestAssetUrl(asset: ManifestAsset | undefined, baseUrl: string): string | undefined {
+  return asset?.path ? new URL(asset.path, baseUrl).toString() : undefined;
 }
 
 function normalize(value: unknown): string {

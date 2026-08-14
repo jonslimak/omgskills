@@ -19,6 +19,31 @@ function responseFor(path, options = {}) {
   if (path === "/api/portal/sync-upload" && options.method === "POST") {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (path === "/mcp/health") {
+    return Response.json({ ok: true, skillCount: 46_000 });
+  }
+  if (path === "/mcp" && options.method === "POST") {
+    const request = JSON.parse(options.body);
+    if (request.method === "initialize") {
+      return Response.json({ jsonrpc: "2.0", id: request.id, result: { serverInfo: { name: "omgskills" } } });
+    }
+    if (request.method === "tools/list") {
+      const annotations = { readOnlyHint: true, openWorldHint: false, destructiveHint: false };
+      return Response.json({
+        jsonrpc: "2.0",
+        id: request.id,
+        result: {
+          tools: ["search_skills", "get_skill", "list_trending", "list_gold_basket", "list_by_author"]
+            .map((name) => ({ name, annotations }))
+        }
+      });
+    }
+    return Response.json({
+      jsonrpc: "2.0",
+      id: request.id,
+      result: { structuredContent: { count: 1, skills: [{}] } }
+    });
+  }
   return new Response(null, { status: 200 });
 }
 
@@ -35,6 +60,7 @@ test("verifies the complete production deploy surface", async () => {
 
   assert.deepEqual(requests, [
     { path: "/app/", method: "GET" },
+    { path: "/support/", method: "GET" },
     { path: "/api/portal/sync-upload", method: "POST" },
     { path: "/data/manifest.json", method: "GET" },
     { path: "/data/v2/manifest.json", method: "GET" },
@@ -44,6 +70,10 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/downloads/omgskills-mac.dmg", method: "HEAD" },
     { path: "/downloads/omgskills-mac.dmg.sha256", method: "HEAD" },
     { path: "/updates/omgskills-1.0.0.zip", method: "HEAD" },
+    { path: "/mcp/health", method: "GET" },
+    { path: "/mcp", method: "POST" },
+    { path: "/mcp", method: "POST" },
+    { path: "/mcp", method: "POST" },
   ]);
 });
 

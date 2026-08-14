@@ -2,6 +2,7 @@
 
 import { fileURLToPath } from "node:url";
 import { extractUpdateAssetPaths } from "./deploy-artifact-guard.mjs";
+import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
 
 const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const requiredStaticReleaseAssets = [
@@ -36,6 +37,7 @@ export async function verifyProductionDeploy({
   fetchImpl = fetch,
 } = {}) {
   await expectStatus(fetchImpl, origin, "/app/", 200);
+  await expectStatus(fetchImpl, origin, "/support/", 200);
   await expectStatus(fetchImpl, origin, "/api/portal/sync-upload", 401, {
     method: "POST",
     headers: {
@@ -68,6 +70,8 @@ export async function verifyProductionDeploy({
   for (const relativePath of [...requiredStaticReleaseAssets, ...updateAssets]) {
     await expectStatus(fetchImpl, origin, `/${relativePath}`, 200, { method: "HEAD" });
   }
+
+  await verifyMcpEndpoint({ origin, fetchImpl });
 
   console.log("Production deploy verified");
 }

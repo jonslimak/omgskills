@@ -133,6 +133,16 @@ The endpoint is available at `http://127.0.0.1:3000/mcp`. Set `OMGSKILLS_MCP_POR
 
 The development server refuses non-localhost bindings and is not a production endpoint. For compiled output, run `npm run build` followed by `npm run start:http`.
 
+## Netlify Production Adapter
+
+The repository includes a stateless Netlify adapter at `netlify/functions/omgskills-mcp.mts` for `/mcp`, with public catalog health at `/mcp/health`. It preserves the stdio server and uses the same tool definitions.
+
+Before a production deploy, verify the draft endpoint from the repository root:
+
+```bash
+MCP_ORIGIN=https://<draft-hostname> npm run verify:mcp
+```
+
 ## Agent Client Config
 
 Example local MCP client config:
@@ -179,4 +189,4 @@ Good next steps:
 - SQLite for faster startup and filtering.
 - Full-text search index for better ranking.
 - Embeddings for semantic search.
-- Production hosting, caching, rate limiting, and health checks for the HTTP transport.
+- More advanced production search indexes if catalog size makes the current cached JSON loader too slow.

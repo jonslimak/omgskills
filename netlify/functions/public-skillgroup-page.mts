@@ -64,7 +64,7 @@ export default async (req: Request, context: Context) => {
     return Response.json(
       {
         requestPath,
-        contextPath: context.path || null,
+        contextPath: "path" in context ? String(context.path) : null,
         contextParams: context.params,
         resolvedHandle: route?.handle ?? null,
         resolvedGroupSlug: route?.groupSlug ?? null,

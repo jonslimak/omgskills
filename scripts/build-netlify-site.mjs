@@ -87,6 +87,7 @@ async function verifyRequiredOutput() {
   const required = [
     "index.html",
     "app/index.html",
+    "support/index.html",
     "data/manifest.json",
     "data/health.json",
     "data/v2/manifest.json",
