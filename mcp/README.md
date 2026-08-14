@@ -8,6 +8,8 @@ The server exposes the skill library as safe agent tools. Agents can search, ins
 
 It does not crawl, scrape, edit, install, or write files.
 
+Every tool returns JSON text for existing MCP clients and structured content for clients that support output schemas. Tool metadata marks every operation as read-only, non-destructive, and closed to external side effects.
+
 ## Data Sources
 
 Default remote sources:
@@ -114,8 +116,22 @@ Local development:
 npm install
 npm run typecheck
 npm run build
+npm test
 npm run smoke
 ```
+
+## Local Streamable HTTP Development
+
+The same tool definitions can run through a stateless Streamable HTTP transport for local testing:
+
+```bash
+npm install
+npm run dev:http
+```
+
+The endpoint is available at `http://127.0.0.1:3000/mcp`. Set `OMGSKILLS_MCP_PORT` to use another local port.
+
+The development server refuses non-localhost bindings and is not a production endpoint. For compiled output, run `npm run build` followed by `npm run start:http`.
 
 ## Agent Client Config
 
@@ -163,4 +179,4 @@ Good next steps:
 - SQLite for faster startup and filtering.
 - Full-text search index for better ranking.
 - Embeddings for semantic search.
-- Remote hosted MCP once local behavior is proven.
+- Production hosting, caching, rate limiting, and health checks for the HTTP transport.

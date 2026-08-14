@@ -1,0 +1,15 @@
+[
+  {
+    "id": "anthropics/skills:swift-review",
+    "name": "swift-review",
+    "description": "Review Swift code for correctness and modern concurrency practices.",
+    "github_url": "https://github.com/anthropics/skills",
+    "install_cmd": "npx skills add anthropics/skills --skill swift-review",
+    "author_handle": "Anthropics",
+    "tags": ["swift", "review"],
+    "stars": 1200,
+    "score": 98,
+    "niche": "apple-development",
+    "niche_label": "Apple development"
+  }
+]

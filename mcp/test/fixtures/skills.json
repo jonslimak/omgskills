@@ -1,0 +1,33 @@
+[
+  {
+    "id": "anthropics/skills:swift-review",
+    "name": "swift-review",
+    "description": "Review Swift code for correctness and modern concurrency practices.",
+    "github_url": "https://github.com/anthropics/skills",
+    "install_cmd": "npx skills add anthropics/skills --skill swift-review",
+    "author_handle": "Anthropics",
+    "tags": ["swift", "review"],
+    "stars": 1200,
+    "last_updated": "2026-08-01"
+  },
+  {
+    "id": "openai/codex:mcp-builder",
+    "name": "mcp-builder",
+    "description": "Build and review Model Context Protocol servers and tools.",
+    "github_url": "https://github.com/openai/codex",
+    "install_cmd": "npx skills add openai/codex --skill mcp-builder",
+    "author_handle": "openai",
+    "tags": ["mcp", "typescript"],
+    "stars": 900
+  },
+  {
+    "id": "example/design:interface-design",
+    "name": "interface-design",
+    "description": "Design clear interfaces with deliberate visual hierarchy.",
+    "github_url": "https://github.com/example/design",
+    "install_cmd": "npx skills add example/design --skill interface-design",
+    "author_handle": "example",
+    "tags": ["design"],
+    "stars": 5
+  }
+]

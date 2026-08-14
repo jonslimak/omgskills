@@ -62,7 +62,7 @@ export type SkillResult = Skill & {
   niche_label?: string;
 };
 
-type LoadedLibrary = {
+export type LoadedLibrary = {
   skills: Skill[];
   trending: TrendingEntry[];
   goldBasket: GoldBasketEntry[];
@@ -91,6 +91,10 @@ export class OmgskillsLibrary {
     ]);
 
     return new OmgskillsLibrary({ skills, trending, goldBasket });
+  }
+
+  static fromData(data: LoadedLibrary): OmgskillsLibrary {
+    return new OmgskillsLibrary(data);
   }
 
   getSkill(id: string): SkillResult | undefined {
