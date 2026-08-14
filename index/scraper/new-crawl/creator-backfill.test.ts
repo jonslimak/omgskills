@@ -7,7 +7,11 @@ import {
   selectCreatorBackfillCoverageEntries,
   type CreatorBackfillRepoScan,
 } from "./creator-backfill-plan.js";
-import { parseCreatorBackfillArguments } from "./creator-backfill.js";
+import {
+  executeCreatorCoverageMaintenance,
+  parseCreatorBackfillArguments,
+  summarizeCreatorCoverageRegistry,
+} from "./creator-backfill.js";
 import type { TrustedSeeds } from "./types.js";
 
 function seeds(overrides: Partial<TrustedSeeds> = {}): TrustedSeeds {
@@ -70,7 +74,7 @@ function build(scans: CreatorBackfillRepoScan[], existingSkills: Skill[] = [], t
   });
 }
 
-test("CLI keeps plan and bounded apply modes separate", () => {
+test("CLI keeps plan, bounded apply, and maintenance modes separate", () => {
   assert.deepEqual(parseCreatorBackfillArguments(["--plan", "--creators=B,A"]), {
     mode: "plan",
     creatorFilters: ["a", "b"],
@@ -81,9 +85,65 @@ test("CLI keeps plan and bounded apply modes separate", () => {
     creatorFilters: [],
     limit: 50,
   });
+  assert.deepEqual(parseCreatorBackfillArguments(["--maintain", "--limit=150"]), {
+    mode: "maintain",
+    creatorFilters: [],
+    limit: 150,
+  });
   assert.throws(() => parseCreatorBackfillArguments(["--plan", "--limit=2"]), /only with --apply/);
   assert.throws(() => parseCreatorBackfillArguments(["--apply", "--creators=a"]), /only with --plan/);
+  assert.throws(() => parseCreatorBackfillArguments(["--maintain", "--creators=a"]), /only with --plan/);
   assert.throws(() => parseCreatorBackfillArguments(["--plan", "--apply"]), /Usage/);
+});
+
+test("maintenance skips before planning when quota is low", async () => {
+  let planned = false;
+  let applied = false;
+  const result = await executeCreatorCoverageMaintenance({
+    getQuotaRemaining: async () => 3_499,
+    plan: async () => { planned = true; return build([]); },
+    apply: async () => { applied = true; throw new Error("must not apply"); },
+  });
+  assert.deepEqual(result, { status: "quota-skipped", phase: "plan", remaining: 3_499 });
+  assert.equal(planned, false);
+  assert.equal(applied, false);
+});
+
+test("maintenance treats an empty fresh plan as a clean success", async () => {
+  let applied = false;
+  const emptyPlan = build([]);
+  const result = await executeCreatorCoverageMaintenance({
+    getQuotaRemaining: async () => 4_000,
+    plan: async () => emptyPlan,
+    apply: async () => { applied = true; throw new Error("must not apply"); },
+  });
+  assert.equal(result.status, "complete");
+  assert.equal(result.status === "complete" ? result.progress : undefined, null);
+  assert.equal(applied, false);
+});
+
+test("maintenance skips apply when planning consumes the safe quota", async () => {
+  const quota = [4_000, 3_400];
+  let applied = false;
+  const result = await executeCreatorCoverageMaintenance({
+    getQuotaRemaining: async () => quota.shift() ?? 0,
+    plan: async () => build([scan()]),
+    apply: async () => { applied = true; throw new Error("must not apply"); },
+  });
+  assert.deepEqual(result, { status: "quota-skipped", phase: "apply", remaining: 3_400 });
+  assert.equal(applied, false);
+});
+
+test("creator coverage summary reports reviewed and undecided featured creators", () => {
+  assert.deepEqual(summarizeCreatorCoverageRegistry([
+    { handle: "Covered", watch: true, featured: true, skillCoverage: "all" },
+    { handle: "Selected", watch: true, featured: false, skillCoverage: "selected", skillRepos: ["selected/skills"] },
+    { handle: "Missing", watch: true, featured: true },
+    { handle: "NotFeatured", watch: true, featured: false },
+  ]), {
+    approvedCoverageCount: 2,
+    featuredWithoutCoverage: ["Missing"],
+  });
 });
 
 test("selects all and selected coverage entries and resolves alias filters", () => {

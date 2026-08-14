@@ -89,26 +89,27 @@ function sourceCommit(): string {
 }
 
 export function parseCreatorBackfillArguments(args: string[]): {
-  mode: "plan" | "apply";
+  mode: "plan" | "apply" | "maintain";
   creatorFilters: string[];
   limit: number;
 } {
   const plan = args.includes("--plan");
   const apply = args.includes("--apply");
-  if (plan === apply) {
+  const maintain = args.includes("--maintain");
+  if ([plan, apply, maintain].filter(Boolean).length !== 1) {
     throw new Error(
-      "Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner] or --apply [--limit=125]",
+      "Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner], --apply [--limit=125], or --maintain [--limit=125]",
     );
   }
-  const supported = (arg: string) => arg === "--plan" || arg === "--apply"
+  const supported = (arg: string) => arg === "--plan" || arg === "--apply" || arg === "--maintain"
     || arg.startsWith("--creators=") || arg.startsWith("--limit=");
   const unsupported = args.filter((arg) => !supported(arg));
   if (unsupported.length) throw new Error(`Unsupported creator backfill option: ${unsupported[0]}`);
   if (plan && args.some((arg) => arg.startsWith("--limit="))) {
-    throw new Error("--limit is supported only with --apply.");
+    throw new Error("--limit is supported only with --apply or --maintain.");
   }
-  if (apply && args.some((arg) => arg.startsWith("--creators="))) {
-    throw new Error("--creators is supported only with --plan; apply uses the reviewed plan file.");
+  if (!plan && args.some((arg) => arg.startsWith("--creators="))) {
+    throw new Error("--creators is supported only with --plan; apply and maintain use all reviewed coverage entries.");
   }
   const creatorFilters = args
     .filter((arg) => arg.startsWith("--creators="))
@@ -117,10 +118,48 @@ export function parseCreatorBackfillArguments(args: string[]): {
     .filter(Boolean);
   const limitValue = args.find((arg) => arg.startsWith("--limit="))?.slice("--limit=".length);
   return {
-    mode: plan ? "plan" : "apply",
+    mode: plan ? "plan" : apply ? "apply" : "maintain",
     creatorFilters: [...new Set(creatorFilters)].sort(),
     limit: parseCreatorBackfillApplyLimit(limitValue),
   };
+}
+
+export function summarizeCreatorCoverageRegistry(entries: CreatorRegistryEntry[]): {
+  approvedCoverageCount: number;
+  featuredWithoutCoverage: string[];
+} {
+  return {
+    approvedCoverageCount: entries.filter((entry) => entry.watch && entry.skillCoverage).length,
+    featuredWithoutCoverage: entries
+      .filter((entry) => entry.featured && !entry.skillCoverage)
+      .map((entry) => entry.handle)
+      .sort((left, right) => left.localeCompare(right, undefined, { sensitivity: "base" })),
+  };
+}
+
+export type CreatorCoverageMaintenanceResult =
+  | { status: "quota-skipped"; phase: "plan" | "apply"; remaining: number }
+  | { status: "complete"; plan: CreatorBackfillPlan; progress: CreatorBackfillApplyProgress | null };
+
+export async function executeCreatorCoverageMaintenance(input: {
+  getQuotaRemaining: () => Promise<number>;
+  plan: (initialQuotaRemaining: number) => Promise<CreatorBackfillPlan>;
+  apply: (initialQuotaRemaining: number) => Promise<CreatorBackfillApplyProgress>;
+}): Promise<CreatorCoverageMaintenanceResult> {
+  const planningQuota = await input.getQuotaRemaining();
+  if (planningQuota < CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM) {
+    return { status: "quota-skipped", phase: "plan", remaining: planningQuota };
+  }
+
+  const plan = await input.plan(planningQuota);
+  if (plan.candidates.length === 0) return { status: "complete", plan, progress: null };
+
+  const applyQuota = await input.getQuotaRemaining();
+  if (applyQuota < CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM) {
+    return { status: "quota-skipped", phase: "apply", remaining: applyQuota };
+  }
+
+  return { status: "complete", plan, progress: await input.apply(applyQuota) };
 }
 
 function toRepoMetadata(repo: {
@@ -301,7 +340,10 @@ function skillsById(skills: Skill[]): Map<string, Skill> {
   return new Map(skills.map((skill) => [skill.id, skill]));
 }
 
-async function runPlan(creatorFilters: string[]): Promise<void> {
+async function runPlan(
+  creatorFilters: string[],
+  initialQuotaRemaining?: number,
+): Promise<CreatorBackfillPlan> {
   const registry = loadCreatorRegistry();
   const entries = selectCreatorBackfillCoverageEntries(registry.entries, creatorFilters, registry.aliasToCanonical);
   if (!entries.length) throw new Error("No creator skill coverage entries are configured.");
@@ -312,6 +354,7 @@ async function runPlan(creatorFilters: string[]): Promise<void> {
 
   const plan = await executeCreatorBackfillPlan({
     preflight: async () => {
+      if (initialQuotaRemaining !== undefined) return initialQuotaRemaining;
       const quota = await assertGitHubCoreQuotaAvailable(
         CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM,
         "creator backfill planning",
@@ -337,9 +380,13 @@ async function runPlan(creatorFilters: string[]): Promise<void> {
   console.log(`  discovered SKILL.md files: ${plan.summary.discoveredSkillCount}`);
   console.log(`  candidates: ${plan.summary.candidateCount}`);
   console.log(`  excluded/review: ${plan.summary.excludedCount}`);
+  return plan;
 }
 
-async function runApply(limit: number): Promise<void> {
+async function runApply(
+  limit: number,
+  initialQuotaRemaining?: number,
+): Promise<CreatorBackfillApplyProgress> {
   const plan = loadReviewedPlan();
   const registry = loadCreatorRegistry();
   const seeds = loadTrustedSeeds("manual-command");
@@ -363,6 +410,7 @@ async function runApply(limit: number): Promise<void> {
     limit,
     now: () => new Date().toISOString(),
     initialQuotaPreflight: async () => {
+      if (initialQuotaRemaining !== undefined) return;
       await assertGitHubCoreQuotaAvailable(
         CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM,
         "creator backfill apply",
@@ -467,12 +515,39 @@ async function runApply(limit: number): Promise<void> {
   console.log(`  transient failed: ${progress.summary.transientFailedCount}`);
   console.log(`  pending: ${progress.summary.pendingCount}`);
   console.log("  publish: not run");
+  return progress;
+}
+
+async function runMaintain(limit: number): Promise<void> {
+  const registry = loadCreatorRegistry();
+  const registrySummary = summarizeCreatorCoverageRegistry(registry.entries);
+  console.log("creator coverage maintenance:");
+  console.log(`  approved coverage creators: ${registrySummary.approvedCoverageCount}`);
+  console.log(`  featured creators missing coverage: ${registrySummary.featuredWithoutCoverage.length}`);
+  if (registrySummary.featuredWithoutCoverage.length > 0) {
+    console.log(`  missing coverage handles: ${registrySummary.featuredWithoutCoverage.join(", ")}`);
+  }
+
+  const result = await executeCreatorCoverageMaintenance({
+    getQuotaRemaining: async () => (await getGitHubCoreQuota()).remaining,
+    plan: (remaining) => runPlan([], remaining),
+    apply: (remaining) => runApply(limit, remaining),
+  });
+
+  if (result.status === "quota-skipped") {
+    console.log(
+      `  skipped: GitHub quota below ${CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM} before ${result.phase} (${result.remaining} remaining)`,
+    );
+    return;
+  }
+  if (!result.progress) console.log("  result: no new creator coverage candidates");
 }
 
 async function main(): Promise<void> {
   const args = parseCreatorBackfillArguments(process.argv.slice(2));
   if (args.mode === "plan") await runPlan(args.creatorFilters);
-  else await runApply(args.limit);
+  else if (args.mode === "apply") await runApply(args.limit);
+  else await runMaintain(args.limit);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

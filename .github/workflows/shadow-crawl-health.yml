@@ -11,6 +11,11 @@ on:
         required: true
         default: true
         type: boolean
+      creator_coverage:
+        description: Run bounded creator coverage maintenance before promotion
+        required: true
+        default: false
+        type: boolean
       publication_impact_override:
         description: Allow a reviewed publication impact that exceeds a threshold
         required: true
@@ -138,6 +143,25 @@ jobs:
         working-directory: index
         run: npm run policy:validate -- --profile scheduled-data
 
+      - name: Decide creator coverage maintenance
+        id: creator_coverage
+        env:
+          EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
+          MANUAL_CREATOR_COVERAGE: ${{ inputs.creator_coverage == true && '1' || '0' }}
+        run: |
+          enabled=false
+          reason=disabled
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ] && [ "$EVENT_SCHEDULE" = "0 6 * * *" ] && [ "$(date -u +%u)" = "7" ]; then
+            enabled=true
+            reason=weekly-sunday-0600-utc
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$MANUAL_CREATOR_COVERAGE" = "1" ]; then
+            enabled=true
+            reason=manual
+          fi
+          echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
+          echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          echo "Creator coverage maintenance: $enabled ($reason)"
+
       - name: Capture publication baselines
         working-directory: index
         run: |
@@ -156,7 +180,40 @@ jobs:
           CRAWL4_POLICY_PRECEDENCE: "admission"
           CRAWL4_QUALITY_TIERS: "1"
           GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
-        run: npm run scrape:shadow
+        run: |
+          if [ "${{ steps.creator_coverage.outputs.enabled }}" = "true" ]; then
+            npm run scrape:shadow -- --cadence=fast
+          else
+            npm run scrape:shadow
+          fi
+
+      - name: Run creator coverage maintenance
+        if: ${{ steps.creator_coverage.outputs.enabled == 'true' }}
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          npm run crawl4:creator-backfill -- --maintain --limit=125 | tee "$RUNNER_TEMP/creator-coverage.log"
+          {
+            echo "## Creator coverage maintenance"
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/creator-coverage.log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload creator coverage maintenance report
+        if: ${{ always() && steps.creator_coverage.outputs.enabled == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: creator-coverage-${{ github.run_id }}
+          path: |
+            index/shadow/creator-backfill.plan.json
+            index/shadow/creator-backfill.apply.json
+            ${{ runner.temp }}/creator-coverage.log
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Summarize policy precedence observation
         if: always()

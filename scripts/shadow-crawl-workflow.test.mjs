@@ -71,3 +71,19 @@ test("report-only dispatch cannot enter the production writer job", () => {
     /shadow-crawl-health:\n    if: \$\{\{ github\.event_name != 'workflow_dispatch' \|\| inputs\.report_only != true \}\}/,
   );
 });
+
+test("creator coverage maintenance is bounded, weekly, manual, and stays inside the writer job", () => {
+  const writerJob = workflow.match(
+    /  shadow-crawl-health:\n[\s\S]*?(?=\n  [a-zA-Z0-9_-]+:|\s*$)/,
+  )?.[0];
+
+  assert.ok(writerJob, "shadow-crawl-health job missing");
+  assert.match(workflow, /creator_coverage:\n[\s\S]*?default: false\n[\s\S]*?type: boolean/);
+  assert.match(writerJob, /EVENT_SCHEDULE: \$\{\{ github\.event\.schedule \|\| '' \}\}/);
+  assert.match(writerJob, /\[ "\$EVENT_SCHEDULE" = "0 6 \* \* \*" \].*\[ "\$\(date -u \+%u\)" = "7" \]/);
+  assert.match(writerJob, /MANUAL_CREATOR_COVERAGE: \$\{\{ inputs\.creator_coverage == true && '1' \|\| '0' \}\}/);
+  assert.match(writerJob, /npm run scrape:shadow -- --cadence=fast/);
+  assert.match(writerJob, /npm run crawl4:creator-backfill -- --maintain --limit=125/);
+  assert.match(writerJob, /name: Run creator coverage maintenance[\s\S]*?name: Run shadow guard tests/);
+  assert.match(writerJob, /name: Upload creator coverage maintenance report/);
+});
