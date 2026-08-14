@@ -104,6 +104,7 @@ test("web library verification requires the generated catalog skill URL asset", 
     "sitemap.xml",
     "robots.txt",
     "llms.txt",
+    "llms-gold.txt",
     "skills/example/repo/useful-skill/index.html",
     "skills/example/repo/useful-skill/index.md",
   ];
@@ -150,6 +151,7 @@ test("web library verification rejects invalid or empty catalog skill URL assets
     "sitemap.xml",
     "robots.txt",
     "llms.txt",
+    "llms-gold.txt",
   ];
   try {
     for (const relativePath of files) {
@@ -188,6 +190,7 @@ test("web library verification rejects catalog URLs whose generated pages are mi
     "sitemap.xml",
     "robots.txt",
     "llms.txt",
+    "llms-gold.txt",
   ];
   try {
     for (const relativePath of files) {

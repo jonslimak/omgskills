@@ -144,6 +144,10 @@ const rootFiles = [
     path: "/llms.txt",
     text: "omgskills is a Mac app and public web library",
   },
+  {
+    path: "/llms-gold.txt",
+    text: "# omgskills - curated Gold library export",
+  },
 ];
 
 const redirects = [
@@ -265,6 +269,8 @@ async function verifyAllLocalReferences() {
 
   const llmsPath = localPathForUrlPath("/llms.txt");
   await collectLocalReferenceFailures(await readFile(llmsPath, "utf8"), llmsPath, failures);
+  const llmsGoldPath = localPathForUrlPath("/llms-gold.txt");
+  await collectLocalReferenceFailures(await readFile(llmsGoldPath, "utf8"), llmsGoldPath, failures);
 
   if (failures.size) {
     throw new Error(`Generated web library has unsafe internal references:\n${[...failures].sort().join("\n")}`);
@@ -483,6 +489,7 @@ async function verifyLocalSitemap() {
   }
   assertIncludes(sitemap, "<lastmod>", sitemapPath);
   assertNotIncludes(sitemap, "index.md", sitemapPath);
+  assertNotIncludes(sitemap, "llms-gold.txt", sitemapPath);
 }
 
 async function verifyLocalRootFile(file) {
@@ -495,6 +502,27 @@ async function verifyLocalRootFile(file) {
   if (file.path === "/llms.txt") {
     assertIncludes(contents, "## Markdown mirrors", filePath);
     assertIncludes(contents, `${origin}/skills/index.md`, filePath);
+    assertIncludes(contents, `${origin}/llms-gold.txt`, filePath);
+  }
+  if (file.path === "/llms-gold.txt") {
+    assertIncludes(contents, `Source: ${origin}/skills/`, filePath);
+    assertIncludes(contents, `Source: ${origin}/library/`, filePath);
+    const sourcePaths = [...contents.matchAll(/^Source: (\S+)$/gm)].map((match) => {
+      if (!match[1].startsWith(`${origin}/`)) {
+        throw new Error(`${filePath} contained a non-canonical source URL: ${match[1]}`);
+      }
+      return match[1].slice(origin.length);
+    });
+    if (sourcePaths.length === 0) {
+      throw new Error(`${filePath} contained no canonical source paths`);
+    }
+    const sortedPaths = [...sourcePaths].sort((a, b) => a.localeCompare(b));
+    if (sourcePaths.join("\n") !== sortedPaths.join("\n")) {
+      throw new Error(`${filePath} source paths were not deterministic`);
+    }
+    if (new Set(sourcePaths).size !== sourcePaths.length) {
+      throw new Error(`${filePath} contained duplicate source paths`);
+    }
   }
 }
 
@@ -662,6 +690,18 @@ async function verifyLiveRootFile(file) {
   if (file.path === "/llms.txt") {
     assertIncludes(contents, "## Markdown mirrors", url);
     assertIncludes(contents, `${origin}/skills/index.md`, url);
+    assertIncludes(contents, `${origin}/llms-gold.txt`, url);
+  }
+  if (file.path === "/llms-gold.txt") {
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.toLowerCase().startsWith("text/plain")) {
+      throw new Error(`${url} returned Content-Type ${contentType || "<missing>"}, expected text/plain`);
+    }
+    const robots = response.headers.get("x-robots-tag") || "";
+    if (!robots.toLowerCase().includes("noindex")) {
+      throw new Error(`${url} returned X-Robots-Tag ${robots || "<missing>"}, expected noindex`);
+    }
+    assertIncludes(contents, `Source: ${origin}/skills/`, url);
   }
 }
 

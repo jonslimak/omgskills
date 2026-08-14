@@ -26,8 +26,13 @@ const sitemapChunkSize = Number.parseInt(process.env.WEB_LIBRARY_SITEMAP_CHUNK_S
 const minIndexableDescriptionLength = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_DESCRIPTION_LENGTH || "80", 10);
 const minIndexableSnippetLength = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_SNIPPET_LENGTH || "300", 10);
 const minIndexableStars = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_STARS || "10", 10);
+const llmsGoldMaxBytes = Number.parseInt(process.env.WEB_LIBRARY_LLMS_GOLD_MAX_BYTES || String(5 * 1024 * 1024), 10);
+if (!Number.isSafeInteger(llmsGoldMaxBytes) || llmsGoldMaxBytes <= 0) {
+  throw new Error("WEB_LIBRARY_LLMS_GOLD_MAX_BYTES must be a positive integer");
+}
 
 const generatedDirs = ["skills", "profiles", "creators", "library", "collections"];
+const goldBundlePages = [];
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -446,7 +451,7 @@ async function readRootManifest() {
   };
 }
 
-async function writeGeneratedPage(urlPath, { html, markdown }) {
+async function writeGeneratedPage(urlPath, { html, markdown, includeInGoldBundle = false }) {
   const directory = path.join(siteDir, urlPath.replace(/^\/+/, ""));
   const markdownOutput = markdown.endsWith("\n") ? markdown : `${markdown}\n`;
   await mkdir(directory, { recursive: true });
@@ -454,6 +459,9 @@ async function writeGeneratedPage(urlPath, { html, markdown }) {
     writeFile(path.join(directory, "index.html"), html),
     writeFile(path.join(directory, "index.md"), markdownOutput),
   ]);
+  if (includeInGoldBundle) {
+    goldBundlePages.push({ urlPath, markdown: markdownOutput });
+  }
 }
 
 async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlById) {
@@ -1113,6 +1121,7 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 
 - [Markdown library index](${origin}/skills/index.md)
 - [HTML library index](${origin}/skills/)
+- [Curated Gold library export](${origin}/llms-gold.txt)
 
 ## Markdown mirrors
 
@@ -1132,6 +1141,34 @@ ${collectionLinks}
 - [Crawl 4 manifest](${origin}/data/crawl4/manifest.json)
 - [v2 manifest](${origin}/data/v2/manifest.json)
 `;
+}
+
+function renderLlmsGoldText(pages, { goldSkillCount, generatedGoldSkillCount }) {
+  const sortedPages = [...pages].sort((a, b) => a.urlPath.localeCompare(b.urlPath));
+  const header = `# omgskills - curated Gold library export
+
+> Markdown export of the generated library index, profiles, collections, and published Gold Basket skill mirrors.
+
+- Pages: ${sortedPages.length}
+- Gold skills included: ${generatedGoldSkillCount}
+- Gold skills without a generated page: ${goldSkillCount - generatedGoldSkillCount}
+`;
+  const body = sortedPages.map(({ urlPath, markdown }) => `
+---
+
+Source: ${origin}${urlPath}
+
+${markdown.trim()}
+`).join("\n");
+  const output = `${header}${body}`;
+  const outputBytes = Buffer.byteLength(output, "utf8");
+  if (sortedPages.length === 0) {
+    throw new Error("Refusing to write an empty llms-gold.txt export");
+  }
+  if (outputBytes > llmsGoldMaxBytes) {
+    throw new Error(`Refusing to write llms-gold.txt: ${outputBytes} bytes exceeds ${llmsGoldMaxBytes}`);
+  }
+  return { output, outputBytes, pageCount: sortedPages.length };
 }
 
 function sitemapLastmod(value) {
@@ -1180,13 +1217,23 @@ async function writeSitemaps(urls) {
 async function main() {
   const reservedProfileHandles = loadCreatorHandleReservations();
   const libraryData = await loadLibraryData();
+  const goldBasket = await readJson(path.join(repoRoot, "index", "gold-basket.json"));
+  if (!Array.isArray(goldBasket)) {
+    throw new Error("index/gold-basket.json must contain an array");
+  }
+  const goldSkillIds = new Set(goldBasket.map((skill) => String(skill.id || "").trim()).filter(Boolean));
+  if (goldSkillIds.size === 0) {
+    throw new Error("index/gold-basket.json contained no skill IDs");
+  }
   assertStaticProfileHandlesReserved(libraryData.collections.collections, reservedProfileHandles);
+  goldBundlePages.length = 0;
 
   for (const dir of generatedDirs) {
     await rm(path.join(siteDir, dir), { recursive: true, force: true });
   }
   await rm(path.join(siteDir, catalogSkillUrlsFilename), { force: true });
   await rm(path.join(siteDir, "llms.txt"), { force: true });
+  await rm(path.join(siteDir, "llms-gold.txt"), { force: true });
   await removeSitemapFiles();
 
   const { skills, trending, collections, authorLeaderboards } = libraryData;
@@ -1301,6 +1348,7 @@ async function main() {
         skillUrlById,
         profilePathByCreatorHandle,
       ),
+      includeInGoldBundle: goldSkillIds.has(skill.id),
     });
     generatedSkillUrlById.set(skill.id, urlPath);
   }
@@ -1340,6 +1388,7 @@ async function main() {
         authorStats,
         recommendations,
       ),
+      includeInGoldBundle: true,
     });
   }
 
@@ -1376,6 +1425,7 @@ async function main() {
         profilePathByCreatorHandle,
         recommendations,
       ),
+      includeInGoldBundle: true,
     });
   }
 
@@ -1387,6 +1437,7 @@ async function main() {
   await writeGeneratedPage("/skills/", {
     html: renderSkillsIndexPage(skillsIndexData, skillUrlById),
     markdown: renderSkillsIndexMarkdown(skillsIndexData, skillUrlById, profilePathByCreatorHandle),
+    includeInGoldBundle: true,
   });
   await writeWebLibraryRedirects(profileCollections, generatedSkillUrlById);
   await writeFile(
@@ -1398,6 +1449,12 @@ async function main() {
     path.join(siteDir, "llms.txt"),
     renderLlmsText(profileCollections, topicCollections, llmsExampleSkill, skillUrlById),
   );
+  const generatedGoldSkillCount = includedSkills.filter((skill) => goldSkillIds.has(skill.id)).length;
+  const llmsGold = renderLlmsGoldText(goldBundlePages, {
+    goldSkillCount: goldSkillIds.size,
+    generatedGoldSkillCount,
+  });
+  await writeFile(path.join(siteDir, "llms-gold.txt"), llmsGold.output);
 
   await writeSitemaps(sitemapUrls);
   const noindexSummary = [...noindexReasons.entries()]
@@ -1406,6 +1463,7 @@ async function main() {
     .map(([reason, count]) => `${reason}:${count}`)
     .join(", ") || "none";
   console.log(`Built web library test set: ${allUrls.size - 1} HTML pages and ${allUrls.size - 1} Markdown mirrors (${indexableCount} indexable, ${noindexCount} noindex; noindex reasons: ${noindexSummary})`);
+  console.log(`Built llms-gold.txt: ${llmsGold.pageCount} pages, ${generatedGoldSkillCount}/${goldSkillIds.size} Gold skills, ${llmsGold.outputBytes} bytes`);
 }
 
 main().catch((error) => {

@@ -15,6 +15,7 @@ const requiredWebLibraryArtifacts = [
   "sitemap.xml",
   "robots.txt",
   "llms.txt",
+  "llms-gold.txt",
 ];
 
 const requiredStaticReleaseAssets = [
