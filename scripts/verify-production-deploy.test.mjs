@@ -74,6 +74,7 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/mcp", method: "POST" },
     { path: "/mcp", method: "POST" },
     { path: "/mcp", method: "POST" },
+    { path: "/mcp", method: "POST" },
   ]);
 });
 
