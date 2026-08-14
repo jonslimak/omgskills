@@ -31,7 +31,7 @@ if (!Number.isSafeInteger(llmsGoldMaxBytes) || llmsGoldMaxBytes <= 0) {
   throw new Error("WEB_LIBRARY_LLMS_GOLD_MAX_BYTES must be a positive integer");
 }
 
-const generatedDirs = ["skills", "profiles", "creators", "library", "collections"];
+const generatedDirs = ["skills", "profiles", "creators", "library", "collections", "developers"];
 const goldBundlePages = [];
 
 function escapeHtml(value) {
@@ -317,6 +317,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
     .copy-icon[hidden] { display: none; }
     .install { overflow: auto; flex: 1; min-width: 0; margin: 0; padding: 0; background: transparent; font-size: 13px; scrollbar-width: none; }
     .install::-webkit-scrollbar { display: none; }
+    .developer-config { overflow: auto; max-width: 100%; border-radius: 8px; margin: 12px 0 0; padding: 14px; background: var(--soft); font-size: 12px; line-height: 1.5; }
     .about { max-width: 72ch; }
     .section { margin-top: 36px; }
     .directory-recommendations { margin-top: 66px; }
@@ -940,6 +941,75 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
   });
 }
 
+function renderDevelopersPage() {
+  const body = `    <div class="developer-page">
+    <div class="eyebrow">Developer resources</div>
+    <h1>For agents &amp; developers</h1>
+    <p class="lede">Connect agents to the live omgskills catalog, run the MCP server locally, or read the public library data directly.</p>
+
+    <div class="section">
+      <div class="eyebrow">Hosted MCP</div>
+      <h2>Connect to the live catalog</h2>
+      <p>The hosted server is public, read-only, and requires no authentication. Add this server URL to an MCP client:</p>
+      <div class="install-box"><pre class="install"><code>${origin}/mcp</code></pre></div>
+      <p>Available tools: <code>search_skills</code>, <code>get_skill</code>, <code>list_trending</code>, <code>list_gold_basket</code>, and <code>list_by_author</code>.</p>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">Local MCP</div>
+      <h2>Run from npm</h2>
+      <p>Use the published package with any client that can launch a local MCP process:</p>
+      <div class="install-box"><pre class="install"><code>npx -y omgskills-mcp</code></pre></div>
+      <pre class="developer-config"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;omgskills&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;omgskills-mcp&quot;]
+    }
+  }
+}</code></pre>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">Public data</div>
+      <h2>Read without MCP</h2>
+      <div class="grid">
+        <a class="card" href="/data/manifest.json"><h2>Catalog manifest</h2><p>Current public data assets and hashes.</p></a>
+        <a class="card" href="/skills/index.md"><h2>Markdown library</h2><p>Profiles, collections, and selected skill pages.</p></a>
+        <a class="card" href="/llms-gold.txt"><h2>Curated export</h2><p>One-file export of the generated Gold library.</p></a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">Links</div>
+      <div class="grid">
+        <a class="card" href="${origin}/mcp/health"><h2>MCP health</h2><p>Live catalog status and loaded skill count.</p></a>
+        <a class="card" href="https://www.npmjs.com/package/omgskills-mcp"><h2>npm package</h2><p>Install the local MCP server.</p></a>
+        <a class="card" href="https://github.com/jonslimak/omgskills"><h2>Source</h2><p>Repository, documentation, and issue tracking.</p></a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">Safety</div>
+      <p>The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content.</p>
+    </div>
+    </div>`;
+
+  return pageShell({
+    title: "omgskills developer resources - MCP, npm, and public data",
+    description: "Connect to the read-only omgskills MCP server, run omgskills-mcp from npm, or read the public AI agent skill catalog and Markdown mirrors.",
+    path: "/developers/",
+    body,
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "omgskills developer resources",
+      description: "MCP, npm, public catalog data, and Markdown resources for agents and developers.",
+      url: `${origin}/developers/`,
+    },
+  });
+}
+
 function markdownAuthorLink(skill, profilePathByCreatorHandle) {
   const author = skillAuthorReference(skill, profilePathByCreatorHandle);
   const url = author.profilePath ? markdownMirrorUrl(author.profilePath) : author.githubUrl;
@@ -1103,6 +1173,52 @@ ${renderMarkdownSkillList(skills, skillUrlById, profilePathByCreatorHandle)}
 `;
 }
 
+function renderDevelopersMarkdown() {
+  return `# omgskills for agents & developers
+
+> Connect agents to the live omgskills catalog, run the MCP server locally, or read the public library data directly.
+
+## Hosted MCP
+
+- Server URL: ${origin}/mcp
+- Health: ${origin}/mcp/health
+- Authentication: none
+- Access: read-only
+
+Available tools: \`search_skills\`, \`get_skill\`, \`list_trending\`, \`list_gold_basket\`, and \`list_by_author\`.
+
+## Local MCP
+
+${markdownCodeBlock("npx -y omgskills-mcp", "sh")}
+
+${markdownCodeBlock(`{
+  "mcpServers": {
+    "omgskills": {
+      "command": "npx",
+      "args": ["-y", "omgskills-mcp"]
+    }
+  }
+}`, "json")}
+
+## Public data
+
+- Catalog manifest: ${origin}/data/manifest.json
+- Markdown library: ${origin}/skills/index.md
+- Curated Gold export: ${origin}/llms-gold.txt
+- Markdown convention: append \`index.md\` to a generated library page URL
+
+## Safety
+
+The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content.
+
+## Links
+
+- HTML page: ${origin}/developers/
+- npm: https://www.npmjs.com/package/omgskills-mcp
+- Source: https://github.com/jonslimak/omgskills
+`;
+}
+
 function renderLlmsText(profileCollections, topicCollections, exampleSkill, skillUrlById) {
   const profileLinks = profileCollections.slice(0, 5)
     .map((collection) => `- ${markdownLink(collection.title, markdownMirrorUrl(profilePath(collection.authorHandle)))}`)
@@ -1122,6 +1238,14 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 - [Markdown library index](${origin}/skills/index.md)
 - [HTML library index](${origin}/skills/)
 - [Curated Gold library export](${origin}/llms-gold.txt)
+
+## For agents & developers
+
+- [Developer resources](${origin}/developers/index.md)
+- Hosted MCP endpoint: ${origin}/mcp
+- MCP health: ${origin}/mcp/health
+- npm package: https://www.npmjs.com/package/omgskills-mcp
+- Public catalog manifest: ${origin}/data/manifest.json
 
 ## Markdown mirrors
 
@@ -1438,6 +1562,14 @@ async function main() {
     html: renderSkillsIndexPage(skillsIndexData, skillUrlById),
     markdown: renderSkillsIndexMarkdown(skillsIndexData, skillUrlById, profilePathByCreatorHandle),
     includeInGoldBundle: true,
+  });
+  registerUrl(allUrls, "/developers/", "developer resources");
+  allUrls.set("/developers/", { source: "developer resources", indexTier: "indexable" });
+  sitemapUrls.set("/developers/", { source: "developer resources" });
+  indexableCount += 1;
+  await writeGeneratedPage("/developers/", {
+    html: renderDevelopersPage(),
+    markdown: renderDevelopersMarkdown(),
   });
   await writeWebLibraryRedirects(profileCollections, generatedSkillUrlById);
   await writeFile(

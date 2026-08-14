@@ -19,6 +19,7 @@ const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replac
 const isLive = process.argv.includes("--live");
 const liveFetchAttempts = 3;
 const livePageHtmlByPath = new Map();
+const dynamicLocalPaths = new Set(["/mcp", "/mcp/health"]);
 
 const editorialCollections = JSON.parse(
   await readFile(path.join(repoRoot, "index", "curations", "collections.json"), "utf8"),
@@ -133,6 +134,15 @@ const pages = [
     skillLayout: true,
     markdownText: "# omgskills web library",
   },
+  {
+    path: "/developers/",
+    canonical: "https://omgskills.com/developers/",
+    text: "For agents &amp; developers",
+    titleText: "omgskills developer resources",
+    descriptionText: "read-only omgskills MCP server",
+    markdownText: "# omgskills for agents & developers",
+    developerResources: true,
+  },
 ];
 
 const rootFiles = [
@@ -242,6 +252,8 @@ async function collectLocalReferenceFailures(text, label, failures) {
   for (const urlPath of sameOriginPaths(text)) {
     if (urlPath === "/profiles" || urlPath.startsWith("/profiles/")) {
       failures.add(`${label}: redirect-only URL ${urlPath}`);
+    } else if (dynamicLocalPaths.has(urlPath)) {
+      continue;
     } else if (!(await localUrlExists(urlPath))) {
       failures.add(`${label}: missing local URL ${urlPath}`);
     }
@@ -250,7 +262,7 @@ async function collectLocalReferenceFailures(text, label, failures) {
 
 async function verifyAllLocalReferences() {
   const failures = new Set();
-  const htmlRoots = ["skills", "library", "collections"].map((directory) => path.join(siteDir, directory));
+  const htmlRoots = ["skills", "library", "collections", "developers"].map((directory) => path.join(siteDir, directory));
   const generatedFiles = (await Promise.all(htmlRoots.flatMap((directory) => [
     collectFiles(directory, ".html"),
     collectFiles(directory, ".md"),
@@ -279,7 +291,7 @@ async function verifyAllLocalReferences() {
 
 async function verifyLocalMarkdownParity() {
   const failures = [];
-  const roots = ["skills", "library", "collections"].map((directory) => path.join(siteDir, directory));
+  const roots = ["skills", "library", "collections", "developers"].map((directory) => path.join(siteDir, directory));
   for (const root of roots) {
     const [htmlFiles, markdownFiles] = await Promise.all([
       collectFiles(root, ".html"),
@@ -439,6 +451,15 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, 'collection image" loading="lazy" decoding="async"', label);
   }
 
+  if (page.developerResources) {
+    assertIncludes(html, `${origin}/mcp`, label);
+    assertIncludes(html, "npx -y omgskills-mcp", label);
+    assertIncludes(html, "https://www.npmjs.com/package/omgskills-mcp", label);
+    assertIncludes(html, "/data/manifest.json", label);
+    assertIncludes(html, "/skills/index.md", label);
+    assertIncludes(html, "The MCP tools only read public catalog data.", label);
+  }
+
   if (page.githubAuthor) {
     assertIncludes(
       html,
@@ -501,6 +522,10 @@ async function verifyLocalRootFile(file) {
   assertIncludes(contents, file.text, filePath);
   if (file.path === "/llms.txt") {
     assertIncludes(contents, "## Markdown mirrors", filePath);
+    assertIncludes(contents, "## For agents & developers", filePath);
+    assertIncludes(contents, `${origin}/developers/index.md`, filePath);
+    assertIncludes(contents, `${origin}/mcp`, filePath);
+    assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", filePath);
     assertIncludes(contents, `${origin}/skills/index.md`, filePath);
     assertIncludes(contents, `${origin}/llms-gold.txt`, filePath);
   }
@@ -579,7 +604,9 @@ async function verifyLocalHomepageLibraryPreview() {
   if (!(await fileExists(filePath))) {
     throw new Error(`Missing homepage: ${filePath}`);
   }
-  verifyHomepageLibraryPreview(await readFile(filePath, "utf8"), filePath);
+  const html = await readFile(filePath, "utf8");
+  verifyHomepageLibraryPreview(html, filePath);
+  assertIncludes(html, '<a href="/developers/">Developers</a>', filePath);
   for (const urlPath of homepageLibraryPaths) {
     if (!(await localUrlExists(urlPath))) {
       throw new Error(`${filePath} linked to a missing profile page: ${urlPath}`);
@@ -628,6 +655,7 @@ async function verifyLiveHomepageLibraryPreview() {
   }
   const html = await response.text();
   verifyHomepageLibraryPreview(html, url);
+  assertIncludes(html, '<a href="/developers/">Developers</a>', url);
   await verifyLiveInternalLinks(html, url);
 }
 
@@ -689,6 +717,10 @@ async function verifyLiveRootFile(file) {
   assertIncludes(contents, file.text, url);
   if (file.path === "/llms.txt") {
     assertIncludes(contents, "## Markdown mirrors", url);
+    assertIncludes(contents, "## For agents & developers", url);
+    assertIncludes(contents, `${origin}/developers/index.md`, url);
+    assertIncludes(contents, `${origin}/mcp`, url);
+    assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", url);
     assertIncludes(contents, `${origin}/skills/index.md`, url);
     assertIncludes(contents, `${origin}/llms-gold.txt`, url);
   }
@@ -725,6 +757,7 @@ async function verifyLiveLlmsLinks() {
   const text = await response.text();
   for (const urlPath of llmsUrls(text)) {
     const linkResponse = await fetchLive(`${origin}${urlPath}`, { redirect: "manual" });
+    if (urlPath === "/mcp" && linkResponse.status === 405) continue;
     if (linkResponse.status !== 200) {
       throw new Error(`${origin}/llms.txt linked to ${urlPath}, which returned ${linkResponse.status}`);
     }

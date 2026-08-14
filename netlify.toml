@@ -105,6 +105,13 @@
     Cache-Control = "public, max-age=300, must-revalidate"
 
 [[headers]]
+  for = "/developers/index.md"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    X-Robots-Tag = "noindex, follow"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+[[headers]]
   for = "/llms-gold.txt"
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
