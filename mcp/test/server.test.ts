@@ -47,7 +47,10 @@ const fixtureData: LoadedLibrary = {
       author_handle: "Anthropics",
       tags: ["swift", "review"],
       stars: 1200,
-      score: 98
+      score: 98,
+      installs: null,
+      trending_rank: null,
+      niche: null
     }
   ]
 };
@@ -104,7 +107,12 @@ test("tools expose complete read-only metadata and structured results", async (c
     name: "list_by_author",
     arguments: { author: "ANTHROPICS", limit: 5 }
   });
+  assert.equal(byAuthor.isError, undefined);
   assert.equal(byAuthor.structuredContent?.count, 1);
+  const authorSkill = (byAuthor.structuredContent?.skills as Array<Record<string, unknown>>)[0];
+  assert.equal(authorSkill.installs, undefined);
+  assert.equal(authorSkill.trending_rank, undefined);
+  assert.equal(authorSkill.niche, undefined);
 });
 
 test("local Streamable HTTP transport initializes and calls tools", async (context) => {

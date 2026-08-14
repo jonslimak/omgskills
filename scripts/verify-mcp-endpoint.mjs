@@ -64,6 +64,20 @@ export async function verifyMcpEndpoint({
     throw new Error(`${normalizedOrigin}/mcp search returned invalid structured content`);
   }
 
+  const byAuthor = await rpc(fetchImpl, normalizedOrigin, {
+    jsonrpc: "2.0",
+    id: 4,
+    method: "tools/call",
+    params: { name: "list_by_author", arguments: { author: "anthropics", limit: 100 } }
+  });
+  const authorSkills = byAuthor?.result?.structuredContent?.skills;
+  if (!Number.isInteger(byAuthor?.result?.structuredContent?.count) || !Array.isArray(authorSkills) || authorSkills.length < 1) {
+    throw new Error(`${normalizedOrigin}/mcp author listing returned invalid structured content`);
+  }
+  if (authorSkills.some((skill) => skill.trending_rank !== undefined && typeof skill.trending_rank !== "number")) {
+    throw new Error(`${normalizedOrigin}/mcp author listing returned an invalid trending rank`);
+  }
+
   console.log(`MCP verified: ${normalizedOrigin}/mcp (${healthBody.skillCount} skills)`);
 }
 

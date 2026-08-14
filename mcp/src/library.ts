@@ -18,17 +18,17 @@ export type Skill = {
 
 export type TrendingEntry = {
   id: string;
-  installs?: number;
-  trending_rank?: number;
+  installs?: number | null;
+  trending_rank?: number | null;
   trending_source?: string;
 };
 
 export type GoldBasketEntry = Skill & {
-  niche?: string;
-  niche_label?: string;
-  score?: number;
-  installs?: number;
-  trending_rank?: number;
+  niche?: string | null;
+  niche_label?: string | null;
+  score?: number | null;
+  installs?: number | null;
+  trending_rank?: number | null;
   externally_validated?: boolean;
   external_source_count?: number;
   official_vendor?: boolean;
@@ -172,11 +172,11 @@ export class OmgskillsLibrary {
     return {
       ...skill,
       score,
-      installs: trending?.installs ?? gold?.installs,
-      trending_rank: trending?.trending_rank ?? gold?.trending_rank,
-      gold_score: gold?.score,
-      niche: gold?.niche,
-      niche_label: gold?.niche_label
+      installs: trending?.installs ?? gold?.installs ?? undefined,
+      trending_rank: trending?.trending_rank ?? gold?.trending_rank ?? undefined,
+      gold_score: gold?.score ?? undefined,
+      niche: gold?.niche ?? undefined,
+      niche_label: gold?.niche_label ?? undefined
     };
   }
 
