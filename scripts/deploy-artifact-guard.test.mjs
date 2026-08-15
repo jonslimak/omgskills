@@ -103,6 +103,7 @@ test("web library verification requires the generated catalog skill URL asset", 
     "skills/index.md",
     "sitemap.xml",
     "robots.txt",
+    "agents.md",
     "llms.txt",
     "llms-gold.txt",
     "skills/example/repo/useful-skill/index.html",
@@ -150,6 +151,7 @@ test("web library verification rejects invalid or empty catalog skill URL assets
     "skills/index.md",
     "sitemap.xml",
     "robots.txt",
+    "agents.md",
     "llms.txt",
     "llms-gold.txt",
   ];
@@ -189,6 +191,7 @@ test("web library verification rejects catalog URLs whose generated pages are mi
     "skills/index.md",
     "sitemap.xml",
     "robots.txt",
+    "agents.md",
     "llms.txt",
     "llms-gold.txt",
   ];

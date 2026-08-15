@@ -33,6 +33,10 @@ if (!Number.isSafeInteger(llmsGoldMaxBytes) || llmsGoldMaxBytes <= 0) {
 
 const generatedDirs = ["skills", "profiles", "creators", "library", "collections", "developers"];
 const goldBundlePages = [];
+const agentWhenToUse = [
+  "Use omgskills when you need to find or evaluate trusted skills for Claude Code, Codex, or other coding agents.",
+  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests; use the macOS app to install or manage skills.",
+].join(" ");
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -949,6 +953,11 @@ function renderDevelopersPage() {
     <p class="lede">Connect agents to the live omgskills catalog, run the MCP server locally, or read the public library data directly.</p>
 
     <div class="section">
+      <div class="eyebrow">When to use omgskills</div>
+      <p>${escapeHtml(agentWhenToUse)}</p>
+    </div>
+
+    <div class="section">
       <div class="eyebrow">Hosted MCP</div>
       <h2>Connect to the live catalog</h2>
       <p>The hosted server is public, read-only, and requires no authentication. Add this server URL to an MCP client:</p>
@@ -975,6 +984,7 @@ function renderDevelopersPage() {
       <div class="eyebrow">Public data</div>
       <h2>Read without MCP</h2>
       <div class="grid">
+        <a class="card" href="/agents.md"><h2>Agent guide</h2><p>When to use omgskills and the preferred machine-readable access paths.</p></a>
         <a class="card" href="/data/manifest.json"><h2>Catalog manifest</h2><p>Current public data assets and hashes.</p></a>
         <a class="card" href="/.well-known/ai-catalog.json"><h2>AI catalog</h2><p>ARD discovery manifest for the hosted MCP server.</p></a>
         <a class="card" href="/skills/index.md"><h2>Markdown library</h2><p>Profiles, collections, and selected skill pages.</p></a>
@@ -1180,6 +1190,10 @@ function renderDevelopersMarkdown() {
 
 > Connect agents to the live omgskills catalog, run the MCP server locally, or read the public library data directly.
 
+## When to use omgskills
+
+${agentWhenToUse}
+
 ## Hosted MCP
 
 - Server URL: ${origin}/mcp
@@ -1204,6 +1218,7 @@ ${markdownCodeBlock(`{
 
 ## Public data
 
+- Agent guide: ${origin}/agents.md
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Catalog manifest: ${origin}/data/manifest.json
 - Markdown library: ${origin}/skills/index.md
@@ -1219,6 +1234,37 @@ The MCP tools only read public catalog data. They do not install skills, write f
 - HTML page: ${origin}/developers/
 - npm: https://www.npmjs.com/package/omgskills-mcp
 - Source: https://github.com/jonslimak/omgskills
+`;
+}
+
+function renderAgentsText() {
+  return `# omgskills agent discovery
+
+> omgskills is a public catalog and macOS app for discovering, evaluating, installing, and managing AI agent skills.
+
+## When to use omgskills
+
+${agentWhenToUse}
+
+## Preferred access
+
+- Hosted MCP endpoint: ${origin}/mcp
+- MCP health: ${origin}/mcp/health
+- Authentication: none
+- Access: read-only
+- Developer resources: ${origin}/developers/index.md
+- Markdown library: ${origin}/skills/index.md
+- Curated Gold export: ${origin}/llms-gold.txt
+- Public catalog manifest: ${origin}/data/manifest.json
+- Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
+
+## Markdown mirrors
+
+Append \`index.md\` to any generated library page URL.
+
+## Safety
+
+The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content. Use the macOS app for installation and local skill management.
 `;
 }
 
@@ -1245,11 +1291,16 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 ## For agents & developers
 
 - [Developer resources](${origin}/developers/index.md)
+- Agent discovery guide: ${origin}/agents.md
 - Hosted MCP endpoint: ${origin}/mcp
 - MCP health: ${origin}/mcp/health
 - npm package: https://www.npmjs.com/package/omgskills-mcp
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Public catalog manifest: ${origin}/data/manifest.json
+
+## When to use omgskills
+
+${agentWhenToUse}
 
 ## Markdown mirrors
 
@@ -1360,6 +1411,7 @@ async function main() {
     await rm(path.join(siteDir, dir), { recursive: true, force: true });
   }
   await rm(path.join(siteDir, catalogSkillUrlsFilename), { force: true });
+  await rm(path.join(siteDir, "agents.md"), { force: true });
   await rm(path.join(siteDir, "llms.txt"), { force: true });
   await rm(path.join(siteDir, "llms-gold.txt"), { force: true });
   await removeSitemapFiles();
@@ -1588,6 +1640,7 @@ async function main() {
     path.join(siteDir, "llms.txt"),
     renderLlmsText(profileCollections, topicCollections, llmsExampleSkill, skillUrlById),
   );
+  await writeFile(path.join(siteDir, "agents.md"), renderAgentsText());
   const generatedGoldSkillCount = includedSkills.filter((skill) => goldSkillIds.has(skill.id)).length;
   const llmsGold = renderLlmsGoldText(goldBundlePages, {
     goldSkillCount: goldSkillIds.size,

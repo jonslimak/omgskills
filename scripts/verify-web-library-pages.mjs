@@ -155,6 +155,10 @@ const rootFiles = [
     text: "omgskills is a Mac app and public web library",
   },
   {
+    path: "/agents.md",
+    text: "# omgskills agent discovery",
+  },
+  {
     path: "/llms-gold.txt",
     text: "# omgskills - curated Gold library export",
   },
@@ -275,6 +279,16 @@ function verifyHomepageTrustMetadata(html, label) {
   }
   if (!organization.sameAs?.includes("https://github.com/jonslimak/omgskills")) {
     throw new Error(`${label} Organization JSON-LD is missing the omgskills GitHub sameAs link`);
+  }
+  if (!organization.sameAs?.includes("https://x.com/omgskills")) {
+    throw new Error(`${label} Organization JSON-LD is missing the omgskills X sameAs link`);
+  }
+  if (
+    organization.contactPoint?.email !== "hi@omgskills.com"
+    || organization.contactPoint?.url !== "https://omgskills.com/support/"
+    || organization.contactPoint?.contactType !== "customer support"
+  ) {
+    throw new Error(`${label} Organization JSON-LD is missing the public support contact point`);
   }
   if (website.publisher?.["@id"] !== organization["@id"] || application.publisher?.["@id"] !== organization["@id"]) {
     throw new Error(`${label} JSON-LD entities do not share the Organization publisher`);
@@ -608,6 +622,15 @@ async function verifyLocalRootFile(file) {
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", filePath);
     assertIncludes(contents, `${origin}/skills/index.md`, filePath);
     assertIncludes(contents, `${origin}/llms-gold.txt`, filePath);
+    assertIncludes(contents, "## When to use omgskills", filePath);
+    assertIncludes(contents, `${origin}/agents.md`, filePath);
+  }
+  if (file.path === "/agents.md") {
+    assertIncludes(contents, "## When to use omgskills", filePath);
+    assertIncludes(contents, "read-only MCP endpoint", filePath);
+    assertIncludes(contents, "use the macOS app to install or manage skills", filePath);
+    assertIncludes(contents, `${origin}/developers/index.md`, filePath);
+    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, filePath);
   }
   if (file.path === "/.well-known/ai-catalog.json") {
     verifyAiCatalog(JSON.parse(contents), filePath);
@@ -830,6 +853,19 @@ async function verifyLiveRootFile(file) {
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", url);
     assertIncludes(contents, `${origin}/skills/index.md`, url);
     assertIncludes(contents, `${origin}/llms-gold.txt`, url);
+    assertIncludes(contents, "## When to use omgskills", url);
+    assertIncludes(contents, `${origin}/agents.md`, url);
+  }
+  if (file.path === "/agents.md") {
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.toLowerCase().startsWith("text/markdown")) {
+      throw new Error(`${url} returned Content-Type ${contentType || "<missing>"}, expected text/markdown`);
+    }
+    assertIncludes(contents, "## When to use omgskills", url);
+    assertIncludes(contents, "read-only MCP endpoint", url);
+    assertIncludes(contents, "use the macOS app to install or manage skills", url);
+    assertIncludes(contents, `${origin}/developers/index.md`, url);
+    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, url);
   }
   if (file.path === "/.well-known/ai-catalog.json") {
     const contentType = response.headers.get("content-type") || "";

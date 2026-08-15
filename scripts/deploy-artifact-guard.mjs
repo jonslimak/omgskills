@@ -14,6 +14,7 @@ const requiredWebLibraryArtifacts = [
   "skills/index.md",
   "sitemap.xml",
   "robots.txt",
+  "agents.md",
   "llms.txt",
   "llms-gold.txt",
 ];
