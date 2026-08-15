@@ -37,7 +37,9 @@ export async function verifyProductionDeploy({
   fetchImpl = fetch,
 } = {}) {
   await expectStatus(fetchImpl, origin, "/app/", 200);
+  await expectStatus(fetchImpl, origin, "/about/", 200);
   await expectStatus(fetchImpl, origin, "/support/", 200);
+  await expectStatus(fetchImpl, origin, "/banner.webp", 200, { method: "HEAD" });
   await expectStatus(fetchImpl, origin, "/api/portal/sync-upload", 401, {
     method: "POST",
     headers: {

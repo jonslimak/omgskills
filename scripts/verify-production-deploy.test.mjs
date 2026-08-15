@@ -60,7 +60,9 @@ test("verifies the complete production deploy surface", async () => {
 
   assert.deepEqual(requests, [
     { path: "/app/", method: "GET" },
+    { path: "/about/", method: "GET" },
     { path: "/support/", method: "GET" },
+    { path: "/banner.webp", method: "HEAD" },
     { path: "/api/portal/sync-upload", method: "POST" },
     { path: "/data/manifest.json", method: "GET" },
     { path: "/data/v2/manifest.json", method: "GET" },

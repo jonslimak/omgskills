@@ -208,6 +208,41 @@ function assertOccurrenceCount(haystack, needle, expected, label) {
   }
 }
 
+function verifyHomepageTrustMetadata(html, label) {
+  assertIncludes(html, '<link rel="canonical" href="https://omgskills.com/">', label);
+  assertIncludes(html, '<meta property="og:type" content="website">', label);
+  assertIncludes(html, '<meta property="og:site_name" content="omgskills">', label);
+  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/banner.webp">', label);
+  assertIncludes(html, '<meta name="twitter:card" content="summary_large_image">', label);
+  assertIncludes(html, '<a href="/about/">About</a>', label);
+
+  const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((match) => {
+      try {
+        return JSON.parse(match[1]);
+      } catch (error) {
+        throw new Error(`${label} contained invalid JSON-LD: ${error.message}`);
+      }
+    });
+  const graph = structuredData.flatMap((item) => item?.["@graph"] || [item]);
+  const organization = graph.find((item) => item?.["@type"] === "Organization");
+  const website = graph.find((item) => item?.["@type"] === "WebSite");
+  const application = graph.find((item) => item?.["@type"] === "SoftwareApplication");
+
+  if (!organization || !website || !application) {
+    throw new Error(`${label} must define Organization, WebSite, and SoftwareApplication JSON-LD`);
+  }
+  if (!organization.sameAs?.includes("https://github.com/jonslimak/omgskills")) {
+    throw new Error(`${label} Organization JSON-LD is missing the omgskills GitHub sameAs link`);
+  }
+  if (website.publisher?.["@id"] !== organization["@id"] || application.publisher?.["@id"] !== organization["@id"]) {
+    throw new Error(`${label} JSON-LD entities do not share the Organization publisher`);
+  }
+  if (application.operatingSystem !== "macOS" || application.offers?.price !== "0") {
+    throw new Error(`${label} SoftwareApplication JSON-LD must describe the free macOS app`);
+  }
+}
+
 function internalLinks(html) {
   return [...html.matchAll(/\s+href="([^"#][^"]*)"/g)]
     .map((match) => match[1])
@@ -508,6 +543,7 @@ async function verifyLocalSitemap() {
       label: sitemapPath,
     });
   }
+  assertIncludes(sitemap, "<loc>https://omgskills.com/about/</loc>", sitemapPath);
   assertIncludes(sitemap, "<lastmod>", sitemapPath);
   assertNotIncludes(sitemap, "index.md", sitemapPath);
   assertNotIncludes(sitemap, "llms-gold.txt", sitemapPath);
@@ -606,7 +642,18 @@ async function verifyLocalHomepageLibraryPreview() {
   }
   const html = await readFile(filePath, "utf8");
   verifyHomepageLibraryPreview(html, filePath);
+  verifyHomepageTrustMetadata(html, filePath);
   assertIncludes(html, '<a href="/developers/">Developers</a>', filePath);
+  for (const requiredPath of ["/about/", "/banner.webp"]) {
+    if (!(await localUrlExists(requiredPath))) {
+      throw new Error(`${filePath} requires missing local resource: ${requiredPath}`);
+    }
+  }
+  const aboutPath = localPathForUrlPath("/about/index.html");
+  const aboutHtml = await readFile(aboutPath, "utf8");
+  assertIncludes(aboutHtml, '<link rel="canonical" href="https://omgskills.com/about/">', aboutPath);
+  assertIncludes(aboutHtml, "<h1>About omgskills</h1>", aboutPath);
+  assertIncludes(aboutHtml, '<a href="/developers/">developer resources</a>', aboutPath);
   for (const urlPath of homepageLibraryPaths) {
     if (!(await localUrlExists(urlPath))) {
       throw new Error(`${filePath} linked to a missing profile page: ${urlPath}`);
@@ -655,8 +702,18 @@ async function verifyLiveHomepageLibraryPreview() {
   }
   const html = await response.text();
   verifyHomepageLibraryPreview(html, url);
+  verifyHomepageTrustMetadata(html, url);
   assertIncludes(html, '<a href="/developers/">Developers</a>', url);
   await verifyLiveInternalLinks(html, url);
+
+  const socialImageResponse = await fetchLive(`${origin}/banner.webp`, { redirect: "manual" });
+  if (socialImageResponse.status !== 200) {
+    throw new Error(`${origin}/banner.webp returned ${socialImageResponse.status}, expected 200`);
+  }
+  const contentType = socialImageResponse.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().startsWith("image/webp")) {
+    throw new Error(`${origin}/banner.webp returned Content-Type ${contentType || "<missing>"}, expected image/webp`);
+  }
 }
 
 async function verifyLiveSitemap() {
@@ -677,6 +734,7 @@ async function verifyLiveSitemap() {
       label: url,
     });
   }
+  assertIncludes(sitemap, "<loc>https://omgskills.com/about/</loc>", url);
   assertIncludes(sitemap, "<lastmod>", url);
   assertNotIncludes(sitemap, "index.md", url);
 }

@@ -1423,7 +1423,10 @@ async function main() {
   }
 
   const allUrls = new Map([["/", "home"]]);
-  const sitemapUrls = new Map([["/", { source: "home" }]]);
+  const sitemapUrls = new Map([
+    ["/", { source: "home" }],
+    ["/about/", { source: "about" }],
+  ]);
   const noindexReasons = new Map();
   let indexableCount = 0;
   let noindexCount = 0;
