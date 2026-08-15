@@ -32,6 +32,25 @@ async function verifyManifest(fetchImpl, origin, path) {
   }
 }
 
+async function verifyAiCatalog(fetchImpl, origin) {
+  const path = "/.well-known/ai-catalog.json";
+  const response = await expectStatus(fetchImpl, origin, path, 200);
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().startsWith("application/json")) {
+    throw new Error(`${origin}${path} returned Content-Type ${contentType || "<missing>"}`);
+  }
+  if (response.headers.get("access-control-allow-origin") !== "*") {
+    throw new Error(`${origin}${path} must allow cross-origin discovery`);
+  }
+  const catalog = await response.json();
+  const mcpEntry = catalog?.entries?.find(
+    (entry) => entry.identifier === "urn:air:omgskills.com:mcp:catalog",
+  );
+  if (catalog?.specVersion !== "1.0" || mcpEntry?.data?.endpoint !== `${origin}/mcp`) {
+    throw new Error(`${origin}${path} does not advertise the hosted omgskills MCP server`);
+  }
+}
+
 export async function verifyProductionDeploy({
   origin = defaultOrigin,
   fetchImpl = fetch,
@@ -73,6 +92,7 @@ export async function verifyProductionDeploy({
     await expectStatus(fetchImpl, origin, `/${relativePath}`, 200, { method: "HEAD" });
   }
 
+  await verifyAiCatalog(fetchImpl, origin);
   await verifyMcpEndpoint({ origin, fetchImpl });
 
   console.log("Production deploy verified");

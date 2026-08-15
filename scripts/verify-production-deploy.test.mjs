@@ -22,6 +22,20 @@ function responseFor(path, options = {}) {
   if (path === "/mcp/health") {
     return Response.json({ ok: true, skillCount: 46_000 });
   }
+  if (path === "/.well-known/ai-catalog.json") {
+    return Response.json(
+      {
+        specVersion: "1.0",
+        entries: [
+          {
+            identifier: "urn:air:omgskills.com:mcp:catalog",
+            data: { endpoint: `${origin}/mcp` },
+          },
+        ],
+      },
+      { headers: { "Access-Control-Allow-Origin": "*" } },
+    );
+  }
   if (path === "/mcp" && options.method === "POST") {
     const request = JSON.parse(options.body);
     if (request.method === "initialize") {
@@ -72,6 +86,7 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/downloads/omgskills-mac.dmg", method: "HEAD" },
     { path: "/downloads/omgskills-mac.dmg.sha256", method: "HEAD" },
     { path: "/updates/omgskills-1.0.0.zip", method: "HEAD" },
+    { path: "/.well-known/ai-catalog.json", method: "GET" },
     { path: "/mcp/health", method: "GET" },
     { path: "/mcp", method: "POST" },
     { path: "/mcp", method: "POST" },

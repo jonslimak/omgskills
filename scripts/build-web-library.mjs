@@ -213,6 +213,7 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
   ${indexTier === "noindex" ? '<meta name="robots" content="noindex,follow">' : ""}
   <link rel="canonical" href="${escapeHtml(canonical)}">
   <link rel="alternate" type="text/markdown" href="${escapeHtml(markdownMirrorPath(urlPath))}">
+  <link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
@@ -944,7 +945,7 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
 function renderDevelopersPage() {
   const body = `    <div class="developer-page">
     <div class="eyebrow">Developer resources</div>
-    <h1>For agents &amp; developers</h1>
+    <h1>omgskills developer resources</h1>
     <p class="lede">Connect agents to the live omgskills catalog, run the MCP server locally, or read the public library data directly.</p>
 
     <div class="section">
@@ -975,6 +976,7 @@ function renderDevelopersPage() {
       <h2>Read without MCP</h2>
       <div class="grid">
         <a class="card" href="/data/manifest.json"><h2>Catalog manifest</h2><p>Current public data assets and hashes.</p></a>
+        <a class="card" href="/.well-known/ai-catalog.json"><h2>AI catalog</h2><p>ARD discovery manifest for the hosted MCP server.</p></a>
         <a class="card" href="/skills/index.md"><h2>Markdown library</h2><p>Profiles, collections, and selected skill pages.</p></a>
         <a class="card" href="/llms-gold.txt"><h2>Curated export</h2><p>One-file export of the generated Gold library.</p></a>
       </div>
@@ -1174,7 +1176,7 @@ ${renderMarkdownSkillList(skills, skillUrlById, profilePathByCreatorHandle)}
 }
 
 function renderDevelopersMarkdown() {
-  return `# omgskills for agents & developers
+  return `# omgskills developer resources
 
 > Connect agents to the live omgskills catalog, run the MCP server locally, or read the public library data directly.
 
@@ -1202,6 +1204,7 @@ ${markdownCodeBlock(`{
 
 ## Public data
 
+- Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Catalog manifest: ${origin}/data/manifest.json
 - Markdown library: ${origin}/skills/index.md
 - Curated Gold export: ${origin}/llms-gold.txt
@@ -1245,6 +1248,7 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 - Hosted MCP endpoint: ${origin}/mcp
 - MCP health: ${origin}/mcp/health
 - npm package: https://www.npmjs.com/package/omgskills-mcp
+- Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Public catalog manifest: ${origin}/data/manifest.json
 
 ## Markdown mirrors

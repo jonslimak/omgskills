@@ -1,0 +1,73 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "omgskills",
+    "identifier": "did:web:omgskills.com",
+    "documentationUrl": "https://omgskills.com/developers/"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:omgskills.com:mcp:catalog",
+      "displayName": "omgskills Catalog MCP",
+      "type": "application/mcp-server-card+json",
+      "data": {
+        "name": "omgskills",
+        "description": "Search and inspect the public omgskills agent skill catalog.",
+        "version": "0.1.1",
+        "endpoint": "https://omgskills.com/mcp",
+        "transport": "streamable-http",
+        "authentication": "none",
+        "access": "read-only",
+        "tools": [
+          {
+            "name": "search_skills",
+            "description": "Search skills by keyword with optional author, tag, and minimum-star filters."
+          },
+          {
+            "name": "get_skill",
+            "description": "Get one skill by its exact stable catalog ID."
+          },
+          {
+            "name": "list_trending",
+            "description": "List skills ordered by the current omgskills trending ranking."
+          },
+          {
+            "name": "list_gold_basket",
+            "description": "List curated Gold Basket skills ordered by editorial score."
+          },
+          {
+            "name": "list_by_author",
+            "description": "List skills published by an exact GitHub author handle."
+          }
+        ]
+      },
+      "description": "Read-only MCP server for discovering and inspecting public AI agent skills from the omgskills catalog.",
+      "tags": [
+        "agent-skills",
+        "claude",
+        "codex",
+        "developer-tools",
+        "mcp"
+      ],
+      "capabilities": [
+        "search_skills",
+        "get_skill",
+        "list_trending",
+        "list_gold_basket",
+        "list_by_author"
+      ],
+      "representativeQueries": [
+        "find a SwiftUI skill",
+        "show the current trending agent skills",
+        "list curated skills from trusted sources",
+        "find skills published by Anthropic"
+      ],
+      "version": "0.1.1",
+      "metadata": {
+        "documentationUrl": "https://omgskills.com/developers/",
+        "healthUrl": "https://omgskills.com/mcp/health",
+        "npmPackage": "omgskills-mcp"
+      }
+    }
+  ]
+}

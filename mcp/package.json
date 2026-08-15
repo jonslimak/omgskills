@@ -1,7 +1,17 @@
 {
   "name": "omgskills-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Read-only MCP server for searching the omgskills agent skill library.",
+  "homepage": "https://omgskills.com/developers/",
+  "bugs": "https://github.com/jonslimak/omgskills/issues",
+  "keywords": [
+    "agent-skills",
+    "claude",
+    "codex",
+    "mcp",
+    "model-context-protocol",
+    "omgskills"
+  ],
   "license": "MIT",
   "type": "module",
   "repository": {

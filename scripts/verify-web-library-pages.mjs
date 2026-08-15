@@ -137,10 +137,10 @@ const pages = [
   {
     path: "/developers/",
     canonical: "https://omgskills.com/developers/",
-    text: "For agents &amp; developers",
+    text: "omgskills developer resources",
     titleText: "omgskills developer resources",
     descriptionText: "read-only omgskills MCP server",
-    markdownText: "# omgskills for agents & developers",
+    markdownText: "# omgskills developer resources",
     developerResources: true,
   },
 ];
@@ -157,6 +157,10 @@ const rootFiles = [
   {
     path: "/llms-gold.txt",
     text: "# omgskills - curated Gold library export",
+  },
+  {
+    path: "/.well-known/ai-catalog.json",
+    text: '"identifier": "urn:air:omgskills.com:mcp:catalog"',
   },
 ];
 
@@ -208,8 +212,45 @@ function assertOccurrenceCount(haystack, needle, expected, label) {
   }
 }
 
+function verifyAiCatalog(catalog, label) {
+  if (catalog?.specVersion !== "1.0") {
+    throw new Error(`${label} must use ARD specVersion 1.0`);
+  }
+  if (catalog?.host?.displayName !== "omgskills") {
+    throw new Error(`${label} must identify omgskills as its host`);
+  }
+  if (catalog?.host?.documentationUrl !== `${origin}/developers/`) {
+    throw new Error(`${label} must link to the omgskills developer resources`);
+  }
+  const entry = catalog?.entries?.find(
+    (candidate) => candidate.identifier === "urn:air:omgskills.com:mcp:catalog",
+  );
+  if (!entry || entry.type !== "application/mcp-server-card+json") {
+    throw new Error(`${label} must contain the omgskills MCP server card`);
+  }
+  if (entry.data?.endpoint !== `${origin}/mcp` || entry.data?.access !== "read-only") {
+    throw new Error(`${label} must identify the read-only hosted MCP endpoint`);
+  }
+  const toolNames = new Set((entry.data?.tools || []).map((tool) => tool.name));
+  for (const toolName of [
+    "search_skills",
+    "get_skill",
+    "list_trending",
+    "list_gold_basket",
+    "list_by_author",
+  ]) {
+    if (!toolNames.has(toolName)) {
+      throw new Error(`${label} is missing MCP tool ${toolName}`);
+    }
+  }
+  if (!Array.isArray(entry.representativeQueries) || entry.representativeQueries.length < 2) {
+    throw new Error(`${label} must provide representative queries for discovery`);
+  }
+}
+
 function verifyHomepageTrustMetadata(html, label) {
   assertIncludes(html, '<link rel="canonical" href="https://omgskills.com/">', label);
+  assertIncludes(html, '<link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">', label);
   assertIncludes(html, '<meta property="og:type" content="website">', label);
   assertIncludes(html, '<meta property="og:site_name" content="omgskills">', label);
   assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/banner.webp">', label);
@@ -491,6 +532,7 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, "npx -y omgskills-mcp", label);
     assertIncludes(html, "https://www.npmjs.com/package/omgskills-mcp", label);
     assertIncludes(html, "/data/manifest.json", label);
+    assertIncludes(html, "/.well-known/ai-catalog.json", label);
     assertIncludes(html, "/skills/index.md", label);
     assertIncludes(html, "The MCP tools only read public catalog data.", label);
   }
@@ -515,6 +557,7 @@ async function verifyLocalPage(page) {
   const html = await readFile(filePath, "utf8");
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, filePath);
   assertIncludes(html, `<link rel="alternate" type="text/markdown" href="${page.path}index.md">`, filePath);
+  assertIncludes(html, '<link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">', filePath);
   assertIncludes(html, page.text, filePath);
   verifyMetadata(html, page, filePath);
 
@@ -561,9 +604,13 @@ async function verifyLocalRootFile(file) {
     assertIncludes(contents, "## For agents & developers", filePath);
     assertIncludes(contents, `${origin}/developers/index.md`, filePath);
     assertIncludes(contents, `${origin}/mcp`, filePath);
+    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, filePath);
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", filePath);
     assertIncludes(contents, `${origin}/skills/index.md`, filePath);
     assertIncludes(contents, `${origin}/llms-gold.txt`, filePath);
+  }
+  if (file.path === "/.well-known/ai-catalog.json") {
+    verifyAiCatalog(JSON.parse(contents), filePath);
   }
   if (file.path === "/llms-gold.txt") {
     assertIncludes(contents, `Source: ${origin}/skills/`, filePath);
@@ -672,6 +719,7 @@ async function verifyLivePage(page) {
   livePageHtmlByPath.set(page.path, html);
   assertIncludes(html, `<link rel="canonical" href="${page.canonical}">`, url);
   assertIncludes(html, `<link rel="alternate" type="text/markdown" href="${page.path}index.md">`, url);
+  assertIncludes(html, '<link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">', url);
   assertIncludes(html, page.text, url);
   verifyMetadata(html, page, url);
   await verifyLiveInternalLinks(html, url);
@@ -778,9 +826,21 @@ async function verifyLiveRootFile(file) {
     assertIncludes(contents, "## For agents & developers", url);
     assertIncludes(contents, `${origin}/developers/index.md`, url);
     assertIncludes(contents, `${origin}/mcp`, url);
+    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, url);
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", url);
     assertIncludes(contents, `${origin}/skills/index.md`, url);
     assertIncludes(contents, `${origin}/llms-gold.txt`, url);
+  }
+  if (file.path === "/.well-known/ai-catalog.json") {
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.toLowerCase().startsWith("application/json")) {
+      throw new Error(`${url} returned Content-Type ${contentType || "<missing>"}, expected application/json`);
+    }
+    const cors = response.headers.get("access-control-allow-origin") || "";
+    if (cors !== "*") {
+      throw new Error(`${url} returned Access-Control-Allow-Origin ${cors || "<missing>"}, expected *`);
+    }
+    verifyAiCatalog(JSON.parse(contents), url);
   }
   if (file.path === "/llms-gold.txt") {
     const contentType = response.headers.get("content-type") || "";

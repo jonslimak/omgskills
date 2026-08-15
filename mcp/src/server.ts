@@ -43,7 +43,7 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
   const server = new McpServer(
     {
       name: "omgskills",
-      version: "0.1.0"
+      version: "0.1.1"
     },
     {
       instructions:
