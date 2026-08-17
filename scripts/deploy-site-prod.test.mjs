@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const script = await readFile(new URL("./deploy-site-prod.sh", import.meta.url), "utf8");
+const netlifyConfig = await readFile(new URL("../netlify.toml", import.meta.url), "utf8");
 const workflowPaths = [
   "../.github/workflows/scrape.yml",
   "../.github/workflows/content-reports.yml",
@@ -81,4 +82,18 @@ test("all seven production paths prepare, build, and use the shared deploy helpe
     assert.doesNotMatch(source, /netlify-cli deploy --prod/, workflowPath);
     assert.match(source, /dist\/netlify-deploy-receipt\.json/, workflowPath);
   }
+});
+
+test("manual deploys package health auth and keep health JSON private", () => {
+  assert.match(netlifyConfig, /\[build\][\s\S]*?edge_functions = "netlify\/edge-functions"/);
+  assert.match(netlifyConfig, /path = "\/health\/\*"\s+function = "health-basic-auth"/);
+  assert.match(netlifyConfig, /path = "\/data\/health\.json"\s+function = "health-basic-auth"/);
+
+  const generalDataHeaders = netlifyConfig.indexOf('for = "/data/*"');
+  const healthHeaders = netlifyConfig.indexOf('for = "/data/health.json"');
+  assert.ok(generalDataHeaders !== -1 && healthHeaders > generalDataHeaders);
+  assert.match(
+    netlifyConfig.slice(healthHeaders),
+    /for = "\/data\/health\.json"[\s\S]*?Cache-Control = "private, no-store"/,
+  );
 });

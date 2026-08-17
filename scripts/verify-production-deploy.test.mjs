@@ -13,6 +13,9 @@ function responseFor(path, options = {}) {
     });
   }
   if (path === "/appcast.xml") return new Response(appcast, { status: 200 });
+  if (path === "/health/" || path === "/data/health.json") {
+    return new Response("Authentication required", { status: 401 });
+  }
   if (path.startsWith("/data/")) {
     return Response.json({ skills: { path: "skills.json" } });
   }
@@ -76,6 +79,8 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/app/", method: "GET" },
     { path: "/about/", method: "GET" },
     { path: "/support/", method: "GET" },
+    { path: "/health/", method: "GET" },
+    { path: "/data/health.json", method: "GET" },
     { path: "/banner.webp", method: "HEAD" },
     { path: "/api/portal/sync-upload", method: "POST" },
     { path: "/data/manifest.json", method: "GET" },

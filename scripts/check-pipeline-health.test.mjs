@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildShadowCutoverState, stuckShadowWorkflowIssues } from "./check-pipeline-health.mjs";
+import {
+  buildShadowCutoverState,
+  latestStageSuccess,
+  newestRunsFirst,
+  stuckShadowWorkflowIssues,
+} from "./check-pipeline-health.mjs";
 
 const run = (id, status = "completed") => ({ id, status });
 const stage = (id, completedAt) => ({ run: run(id), completedAt });
@@ -62,4 +67,34 @@ test("stuck shadow crawl still degrades crawler section", () => {
   );
 
   assert.deepEqual(issues, ["workflow stuck: shadow-crawl-health for 120m"]);
+});
+
+test("uses a newer guarded deploy from pipeline health", async () => {
+  const shadowRun = { id: 1, created_at: "2026-08-17T10:00:00.000Z" };
+  const pipelineRun = { id: 2, created_at: "2026-08-17T11:00:00.000Z" };
+  const jobs = new Map([
+    [
+      1,
+      [{ steps: [{ name: "Deploy site to Netlify", conclusion: "failure", completed_at: null }] }],
+    ],
+    [
+      2,
+      [{
+        steps: [{
+          name: "Deploy site to Netlify",
+          conclusion: "success",
+          completed_at: "2026-08-17T11:05:00.000Z",
+        }],
+      }],
+    ],
+  ]);
+
+  const result = await latestStageSuccess(
+    newestRunsFirst([shadowRun, pipelineRun]),
+    "Deploy site to Netlify",
+    async (runId) => jobs.get(runId) ?? [],
+  );
+
+  assert.equal(result.run.id, 2);
+  assert.equal(result.completedAt, "2026-08-17T11:05:00.000Z");
 });

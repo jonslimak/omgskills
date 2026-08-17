@@ -45,6 +45,7 @@ function degraded(issues, details = {}) {
 
 const workflows = {
   shadowCrawler: "shadow-crawl-health.yml",
+  pipelineHealth: "pipeline-health.yml",
 };
 
 const shadowStageSteps = {
@@ -79,9 +80,9 @@ function latestSuccessfulStepAt(jobs, stepName) {
   return latest;
 }
 
-async function latestStageSuccess(runs, stepName) {
+export async function latestStageSuccess(runs, stepName, loadJobs = jobsForRun) {
   for (const run of runs) {
-    const jobs = await jobsForRun(run.id);
+    const jobs = await loadJobs(run.id);
     const completedAt = latestSuccessfulStepAt(jobs, stepName);
     if (completedAt) {
       return {
@@ -91,6 +92,14 @@ async function latestStageSuccess(runs, stepName) {
     }
   }
   return null;
+}
+
+export function newestRunsFirst(runs) {
+  return [...runs].sort((left, right) => {
+    const leftAt = left.created_at ?? left.run_started_at ?? "";
+    const rightAt = right.created_at ?? right.run_started_at ?? "";
+    return rightAt.localeCompare(leftAt);
+  });
 }
 
 export function stuckShadowWorkflowIssues(inProgressRuns, nowMs = Date.now(), maxMinutes = stuckMaxMinutes) {
@@ -140,15 +149,17 @@ async function main() {
   const issues = [];
   const sections = {};
 
-  const [shadowRuns, inProgressRuns] = await Promise.all([
+  const [shadowRuns, pipelineHealthRuns, inProgressRuns] = await Promise.all([
     workflowRuns(workflows.shadowCrawler),
+    workflowRuns(workflows.pipelineHealth),
     github(`/repos/${repo}/actions/runs?status=in_progress&per_page=100`),
   ]);
   const latestShadowRun = shadowRuns[0] ?? null;
+  const verifiedDeployRuns = newestRunsFirst([...shadowRuns, ...pipelineHealthRuns]);
   const [latestShadowCrawl, latestV2Publish, latestVerifiedDeploy] = await Promise.all([
     latestStageSuccess(shadowRuns, shadowStageSteps.crawl),
     latestStageSuccess(shadowRuns, shadowStageSteps.publish),
-    latestStageSuccess(shadowRuns, shadowStageSteps.verifiedDeploy),
+    latestStageSuccess(verifiedDeployRuns, shadowStageSteps.verifiedDeploy),
   ]);
 
   const crawlerIssues = [];
