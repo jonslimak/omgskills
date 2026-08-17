@@ -1,0 +1,140 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "omgskills",
+    "subtitle": "Find trusted agent skills",
+    "description": "Discover skills for Claude Code, Codex, Cursor, and other coding agents from the omgskills public catalog. Search by task, inspect detailed metadata and installation instructions, browse trending and editorially selected skills, and explore skills from specific creators. omgskills is read-only: it helps people find and evaluate skills without installing or changing anything on their device.",
+    "category": "DEVELOPER_TOOLS"
+  },
+  "tools": {
+    "search_skills": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Searches public catalog metadata and returns matching skills without modifying any data.",
+        "open_world_justification": "Does not write to public internet state or any third-party system.",
+        "destructive_justification": "Does not delete, overwrite, install, or perform irreversible actions."
+      }
+    },
+    "get_skill": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Retrieves one public catalog record by its stable ID without modifying any data.",
+        "open_world_justification": "Does not write to public internet state or any third-party system.",
+        "destructive_justification": "Does not delete, overwrite, install, or perform irreversible actions."
+      }
+    },
+    "list_trending": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Reads the published trending ranking and returns public catalog records without modifying any data.",
+        "open_world_justification": "Does not write to public internet state or any third-party system.",
+        "destructive_justification": "Does not delete, overwrite, install, or perform irreversible actions."
+      }
+    },
+    "list_gold_basket": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Reads the published editorial Gold Basket and returns public catalog records without modifying any data.",
+        "open_world_justification": "Does not write to public internet state or any third-party system.",
+        "destructive_justification": "Does not delete, overwrite, install, or perform irreversible actions."
+      }
+    },
+    "list_by_author": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Filters public catalog records by GitHub author handle without modifying any data.",
+        "open_world_justification": "Does not write to public internet state or any third-party system.",
+        "destructive_justification": "Does not delete, overwrite, install, or perform irreversible actions."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Find skills that match a technical development task.",
+      "user_prompt": "Find the best SwiftUI skills for building a modern iOS app.",
+      "file_attachment_urls": null,
+      "tools_triggered": "search_skills",
+      "expected_output": "Returns relevant public skills with stable IDs, names, authors, descriptions, and available quality or popularity metadata.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Retrieve the complete public catalog record for an exact skill ID.",
+      "user_prompt": "Show full details for the omgskills catalog entry anthropics/skills:xlsx.",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_skill",
+      "expected_output": "Returns the exact anthropics/skills:xlsx record with its description, repository, metadata, and install information when available.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Browse the current trending skill ranking.",
+      "user_prompt": "What skills are trending on omgskills right now?",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_trending",
+      "expected_output": "Returns current public trending skills in rank order with their catalog metadata.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Browse the editorially selected Gold Basket.",
+      "user_prompt": "Show the top 20 skills in the omgskills Gold Basket.",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_gold_basket",
+      "expected_output": "Returns the editorial Gold Basket ordered by Gold Score with public skill metadata.",
+      "expected_output_url": null
+    },
+    {
+      "description": "List public catalog skills from a specific creator.",
+      "user_prompt": "List Anthropic's skills in omgskills.",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_by_author",
+      "expected_output": "Returns public catalog records for the exact anthropics GitHub author handle, including records without optional ranking fields.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Catalog mutations are outside the read-only app's capabilities.",
+      "user_prompt": "Remove anthropics/skills:xlsx from the omgskills catalog.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked and the assistant should explain that omgskills cannot modify or delete catalog records.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Private or unpublished account data is not available through the public catalog.",
+      "user_prompt": "Show me my private and unpublished omgskills skills.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked and the assistant should explain that omgskills exposes only the public catalog and has no private account access.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Local device file deletion is outside the catalog app's capabilities.",
+      "user_prompt": "Delete the xlsx skill files from my Mac and confirm they are gone.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked and the assistant must not claim that omgskills deleted local files or changed the user's device.",
+      "expected_output_url": null
+    }
+  ]
+}
