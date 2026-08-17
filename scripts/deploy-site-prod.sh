@@ -59,6 +59,7 @@ fi
 export VITE_SKILLGROUPS_AUTH_ENABLED=0
 
 npm --prefix index ci
+node ./scripts/restore-health-snapshot.mjs
 PRODUCTION_ORIGIN="https://omgskills.com" node ./scripts/prepare-netlify-site-deploy.mjs
 npm ci
 npm run build:netlify

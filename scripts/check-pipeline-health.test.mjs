@@ -6,6 +6,7 @@ import {
   latestStageSuccess,
   newestRunsFirst,
   stuckShadowWorkflowIssues,
+  VERIFIED_DEPLOY_WORKFLOWS,
 } from "./check-pipeline-health.mjs";
 
 const run = (id, status = "completed") => ({ id, status });
@@ -97,4 +98,16 @@ test("uses a newer guarded deploy from pipeline health", async () => {
 
   assert.equal(result.run.id, 2);
   assert.equal(result.completedAt, "2026-08-17T11:05:00.000Z");
+});
+
+test("health recognizes every guarded production deploy path", () => {
+  assert.deepEqual(VERIFIED_DEPLOY_WORKFLOWS, [
+    "content-reports.yml",
+    "deploy-current-main.yml",
+    "pipeline-health.yml",
+    "publish-collections.yml",
+    "scrape.yml",
+    "shadow-crawl-health.yml",
+    "x-refresh.yml",
+  ]);
 });

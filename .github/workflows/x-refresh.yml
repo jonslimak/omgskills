@@ -26,6 +26,7 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: write
   issues: write
 
@@ -153,6 +154,11 @@ jobs:
             git pull --rebase --autostash origin main
             git push
           fi
+
+      - name: Restore latest health snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node ./scripts/restore-health-snapshot.mjs
 
       - name: Prepare release assets for Netlify deploy
         run: node ./scripts/prepare-netlify-site-deploy.mjs
