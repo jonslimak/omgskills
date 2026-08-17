@@ -34,3 +34,19 @@ test("generated health replaces the restored live snapshot before build", () => 
 test("health snapshots remain available for guarded deploy recovery", () => {
   assert.match(workflow, /pipeline-health-snapshot-[\s\S]*?retention-days: 7/);
 });
+
+test("health snapshots survive advisory GitHub issue failures", () => {
+  const upload = workflow.indexOf("name: Upload generated health snapshot");
+  const updateIssue = workflow.indexOf("name: Update health issue on failure");
+  const closeIssue = workflow.indexOf("name: Close health issue on recovery");
+
+  assert.ok(upload !== -1 && upload < updateIssue && updateIssue < closeIssue);
+  assert.match(
+    workflow,
+    /name: Update health issue on failure\n\s+if:[^\n]+\n\s+continue-on-error: true/,
+  );
+  assert.match(
+    workflow,
+    /name: Close health issue on recovery\n\s+if:[^\n]+\n\s+continue-on-error: true/,
+  );
+});
