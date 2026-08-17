@@ -75,8 +75,17 @@ jobs:
           HEALTH_CHECKED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
           node ./scripts/build-health.mjs
 
+      - name: Upload generated health snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-health-snapshot-${{ github.run_id }}
+          path: site/data/health.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Update health issue on failure
         if: steps.finalhealth.outputs.health_status == 'degraded'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -91,6 +100,7 @@ jobs:
 
       - name: Close health issue on recovery
         if: steps.finalhealth.outputs.health_status == 'ok'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -105,14 +115,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node ./scripts/check-active-data-writers.mjs
-
-      - name: Upload generated health snapshot
-        uses: actions/upload-artifact@v4
-        with:
-          name: pipeline-health-snapshot-${{ github.run_id }}
-          path: site/data/health.json
-          if-no-files-found: error
-          retention-days: 7
 
       - name: Fail on degraded health
         if: steps.finalhealth.outputs.health_status == 'degraded'
