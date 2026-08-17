@@ -26,7 +26,11 @@ test("generated health replaces the restored live snapshot before build", () => 
   const build = workflow.indexOf("name: Build combined Netlify artifact");
   const deploy = workflow.indexOf("name: Deploy site to Netlify");
 
-  assert.ok(prepare !== -1 && prepare < download);
-  assert.ok(download < build);
+  assert.ok(download !== -1 && download < prepare);
+  assert.ok(prepare < build);
   assert.ok(build < deploy);
+});
+
+test("health snapshots remain available for guarded deploy recovery", () => {
+  assert.match(workflow, /pipeline-health-snapshot-[\s\S]*?retention-days: 7/);
 });

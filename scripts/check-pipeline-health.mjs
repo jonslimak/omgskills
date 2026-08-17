@@ -48,6 +48,16 @@ const workflows = {
   pipelineHealth: "pipeline-health.yml",
 };
 
+export const VERIFIED_DEPLOY_WORKFLOWS = [
+  "content-reports.yml",
+  "deploy-current-main.yml",
+  "pipeline-health.yml",
+  "publish-collections.yml",
+  "scrape.yml",
+  "shadow-crawl-health.yml",
+  "x-refresh.yml",
+];
+
 const shadowStageSteps = {
   crawl: "Run shadow crawl",
   publish: "Publish hosted v2 app data",
@@ -149,13 +159,21 @@ async function main() {
   const issues = [];
   const sections = {};
 
-  const [shadowRuns, pipelineHealthRuns, inProgressRuns] = await Promise.all([
+  const additionalDeployWorkflows = VERIFIED_DEPLOY_WORKFLOWS.filter(
+    (filename) => filename !== workflows.shadowCrawler && filename !== workflows.pipelineHealth,
+  );
+  const [shadowRuns, pipelineHealthRuns, inProgressRuns, ...additionalDeployRuns] = await Promise.all([
     workflowRuns(workflows.shadowCrawler),
     workflowRuns(workflows.pipelineHealth),
     github(`/repos/${repo}/actions/runs?status=in_progress&per_page=100`),
+    ...additionalDeployWorkflows.map((filename) => workflowRuns(filename)),
   ]);
   const latestShadowRun = shadowRuns[0] ?? null;
-  const verifiedDeployRuns = newestRunsFirst([...shadowRuns, ...pipelineHealthRuns]);
+  const verifiedDeployRuns = newestRunsFirst([
+    ...shadowRuns,
+    ...pipelineHealthRuns,
+    ...additionalDeployRuns.flat(),
+  ]);
   const [latestShadowCrawl, latestV2Publish, latestVerifiedDeploy] = await Promise.all([
     latestStageSuccess(shadowRuns, shadowStageSteps.crawl),
     latestStageSuccess(shadowRuns, shadowStageSteps.publish),

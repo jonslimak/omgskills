@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 export const DATA_WRITER_WORKFLOWS = new Set([
   "content-reports",
+  "deploy-current-main",
   "publish-collections",
   "scrape",
   "shadow-crawl-health",

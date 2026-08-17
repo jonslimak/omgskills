@@ -1,0 +1,99 @@
+name: deploy-current-main
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact reviewed origin/main commit to deploy
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+concurrency:
+  group: app-data-writers
+  cancel-in-progress: false
+
+jobs:
+  deploy-current-main:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main --depth=1
+          git reset --hard origin/main
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "expected_sha must be a full Git commit SHA" >&2
+            exit 1
+          fi
+          if [ "$(git rev-parse HEAD)" != "$EXPECTED_SHA" ]; then
+            echo "main changed after review; sync, review, and dispatch again" >&2
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.5"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            index/package-lock.json
+
+      - name: Install policy validation dependencies
+        working-directory: index
+        run: npm ci
+
+      - name: Restore latest health snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node ./scripts/restore-health-snapshot.mjs
+
+      - name: Capture live appcast baseline
+        run: curl -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.sha256"
+
+      - name: Prepare release assets for Netlify deploy
+        run: node ./scripts/prepare-netlify-site-deploy.mjs
+
+      - name: Install site dependencies
+        run: npm ci
+
+      - name: Build combined Netlify artifact
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          VITE_SKILLGROUPS_AUTH_ENABLED: "0"
+        run: npm run build:netlify
+
+      - name: Deploy site to Netlify
+        id: production_deploy
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npm run deploy:production
+
+      - name: Upload production deploy receipt
+        if: always() && steps.production_deploy.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deploy-${{ github.workflow }}-${{ github.run_id }}
+          path: dist/netlify-deploy-receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Confirm public appcast is unchanged
+        run: |
+          curl -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.after.sha256"
+          diff -u "$RUNNER_TEMP/appcast.sha256" "$RUNNER_TEMP/appcast.after.sha256"

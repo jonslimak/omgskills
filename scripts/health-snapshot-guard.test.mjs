@@ -29,25 +29,15 @@ test("keeps an existing valid health snapshot without fetching", async () => {
   assert.equal(await readFile(target, "utf8"), validSnapshot);
 });
 
-test("restores a missing health snapshot from production", async () => {
-  const siteDir = await mkdtemp(path.join(os.tmpdir(), "health-snapshot-restore-"));
-  let requestedUrl = "";
-
-  const result = await ensureHealthSnapshot({
-    siteDir,
-    productionOrigin: "https://example.test/",
-    fetchImpl: async (url) => {
-      requestedUrl = url;
-      return new Response(validSnapshot, { status: 200 });
-    },
-  });
-
-  assert.equal(result.restored, true);
-  assert.equal(requestedUrl, "https://example.test/data/health.json");
-  assert.equal(await readFile(path.join(siteDir, "data", "health.json"), "utf8"), validSnapshot);
+test("rejects a missing health snapshot instead of fetching the protected production URL", async () => {
+  const siteDir = await mkdtemp(path.join(os.tmpdir(), "health-snapshot-missing-"));
+  await assert.rejects(
+    ensureHealthSnapshot({ siteDir }),
+    /Restore a pipeline-health artifact before preparing the deploy/,
+  );
 });
 
-test("rejects an invalid existing or downloaded health snapshot", async () => {
+test("rejects an invalid existing health snapshot", async () => {
   const invalidSiteDir = await mkdtemp(path.join(os.tmpdir(), "health-snapshot-invalid-"));
   const invalidTarget = path.join(invalidSiteDir, "data", "health.json");
   await mkdir(path.dirname(invalidTarget), { recursive: true });
@@ -56,15 +46,6 @@ test("rejects an invalid existing or downloaded health snapshot", async () => {
   await assert.rejects(
     ensureHealthSnapshot({ siteDir: invalidSiteDir }),
     /missing sections/,
-  );
-
-  const missingSiteDir = await mkdtemp(path.join(os.tmpdir(), "health-snapshot-bad-download-"));
-  await assert.rejects(
-    ensureHealthSnapshot({
-      siteDir: missingSiteDir,
-      fetchImpl: async () => new Response("not json", { status: 200 }),
-    }),
-    /Invalid health snapshot JSON/,
   );
 });
 

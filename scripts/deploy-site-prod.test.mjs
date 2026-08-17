@@ -5,6 +5,7 @@ import test from "node:test";
 const script = await readFile(new URL("./deploy-site-prod.sh", import.meta.url), "utf8");
 const netlifyConfig = await readFile(new URL("../netlify.toml", import.meta.url), "utf8");
 const workflowPaths = [
+  "../.github/workflows/deploy-current-main.yml",
   "../.github/workflows/scrape.yml",
   "../.github/workflows/content-reports.yml",
   "../.github/workflows/x-refresh.yml",
@@ -15,6 +16,7 @@ const workflowPaths = [
 
 test("manual production deploy uses the guarded combined artifact in order", () => {
   const commands = [
+    "node ./scripts/restore-health-snapshot.mjs",
     "node ./scripts/prepare-netlify-site-deploy.mjs",
     "npm ci",
     "npm run build:netlify",
@@ -63,16 +65,21 @@ test("manual production deploy checks generated config and every deploy input", 
   }
 });
 
-test("all seven production paths prepare, build, and use the shared deploy helper in order", async () => {
+test("all production paths prepare, build, and use the shared deploy helper in order", async () => {
   assert.match(script, /npm run deploy:production/);
   assert.doesNotMatch(script, /netlify-cli deploy --prod/);
 
   for (const workflowPath of workflowPaths) {
     const source = await readFile(new URL(workflowPath, import.meta.url), "utf8");
+    const restoreIndex = source.indexOf("Restore latest health snapshot");
     const prepareIndex = source.indexOf("node ./scripts/prepare-netlify-site-deploy.mjs");
     const buildIndex = source.indexOf("npm run build:netlify");
     const deployIndex = source.indexOf("npm run deploy:production");
 
+    if (!workflowPath.endsWith("pipeline-health.yml")) {
+      assert.notEqual(restoreIndex, -1, `${workflowPath}: missing health restore step`);
+      assert.ok(restoreIndex < prepareIndex, `${workflowPath}: health restore must run before prepare`);
+    }
     assert.notEqual(prepareIndex, -1, `${workflowPath}: missing prepare step`);
     assert.notEqual(buildIndex, -1, `${workflowPath}: missing build step`);
     assert.notEqual(deployIndex, -1, `${workflowPath}: missing deploy step`);

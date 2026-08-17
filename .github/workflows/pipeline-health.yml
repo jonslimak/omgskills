@@ -112,7 +112,7 @@ jobs:
           name: pipeline-health-snapshot-${{ github.run_id }}
           path: site/data/health.json
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7
 
       - name: Fail on degraded health
         if: steps.finalhealth.outputs.health_status == 'degraded'
@@ -143,18 +143,18 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Download generated health snapshot
+        uses: actions/download-artifact@v4
+        with:
+          name: pipeline-health-snapshot-${{ github.run_id }}
+          path: site/data
+
       - name: Install policy validation dependencies
         working-directory: index
         run: npm ci
 
       - name: Prepare release assets for Netlify deploy
         run: node ./scripts/prepare-netlify-site-deploy.mjs
-
-      - name: Download generated health snapshot
-        uses: actions/download-artifact@v4
-        with:
-          name: pipeline-health-snapshot-${{ github.run_id }}
-          path: site/data
 
       - name: Install site dependencies
         run: npm ci
