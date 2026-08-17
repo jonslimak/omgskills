@@ -19599,6 +19599,13 @@
       "replacementId": "zxkane/aws-skills:aws-cost-operations",
       "confidence": "high",
       "stagedAt": "2026-07-08T15:42:32.679Z"
+    },
+    {
+      "id": "expo/skills:.claude/skills/expo-skill-eval",
+      "reason": "internal-tooling",
+      "confidence": "high",
+      "stagedAt": "2026-08-14T00:00:00.000Z",
+      "notes": "Internal Expo skill evaluation harness, not a user-facing skill."
     }
   ]
 }

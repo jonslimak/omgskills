@@ -56,6 +56,16 @@
       "notes": "Copied Claude kit/template repo found repeatedly in exact-SHA duplicate clusters."
     },
     {
+      "repo": "browser-use/browser-harness-tui",
+      "reason": "duplicate",
+      "notes": "Mirror of OpenAI Codex content; exclude copied skills from maintained library output."
+    },
+    {
+      "repo": "browser-use/plugins",
+      "reason": "catalog",
+      "notes": "Platform-specific Browser Use plugin catalog duplicates skills maintained in direct source repos."
+    },
+    {
       "repo": "davila7/claude-code-templates",
       "reason": "catalog",
       "notes": "Template marketplace/catalog with bundled third-party sources; do not admit by stars alone."
@@ -64,6 +74,11 @@
       "repo": "deco31416/antigravity-awesome-skills",
       "reason": "catalog",
       "notes": "Copied antigravity skills collection found repeatedly in exact-SHA duplicate clusters."
+    },
+    {
+      "repo": "expo/agent-templates",
+      "reason": "catalog",
+      "notes": "Starter project templates bundle copied skills that are not maintained as direct Expo skill sources."
     },
     {
       "repo": "majiayu000/claude-skill-registry",

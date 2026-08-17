@@ -13,6 +13,7 @@ test("creator formatting preserves coverage fields in stable key order", () => {
       aliases: ["old-handle"],
       skillCoverage: "selected",
       skillRepos: ["DisplayCase/skills"],
+      skillPathExclusions: ["DisplayCase/skills#examples/"],
       notes: "Reviewed coverage",
     }],
   };
@@ -20,7 +21,7 @@ test("creator formatting preserves coverage fields in stable key order", () => {
   const formatted = formatCreatorRegistry(source);
   assert.equal(
     formatted,
-    `{\n  "creators": [\n    { "handle": "DisplayCase", "roles": ["creator"], "watch": true, "featured": false, "aliases": ["old-handle"], "skillCoverage": "selected", "skillRepos": ["DisplayCase/skills"], "notes": "Reviewed coverage" }\n  ]\n}\n`,
+    `{\n  "creators": [\n    { "handle": "DisplayCase", "roles": ["creator"], "watch": true, "featured": false, "aliases": ["old-handle"], "skillCoverage": "selected", "skillRepos": ["DisplayCase/skills"], "skillPathExclusions": ["DisplayCase/skills#examples/"], "notes": "Reviewed coverage" }\n  ]\n}\n`,
   );
   assert.deepEqual(JSON.parse(formatted), source);
   assert.equal(formatCreatorRegistry(JSON.parse(formatted) as CreatorRegistrySource), formatted);

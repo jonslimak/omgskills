@@ -4,6 +4,7 @@ import type { Skill } from "../types.js";
 import {
   buildCreatorBackfillPlan,
   executeCreatorBackfillPlan,
+  isCreatorBackfillPathAllowed,
   selectCreatorBackfillCoverageEntries,
   type CreatorBackfillRepoScan,
 } from "./creator-backfill-plan.js";
@@ -176,6 +177,55 @@ test("plans exact SKILL.md files at arbitrary depth deterministically", () => {
   ]);
 });
 
+test("creator backfill excludes raw source, test data, and fixture path segments", () => {
+  const blockedPaths = [
+    "brain/.raw/sources/skill/SKILL.md",
+    "test/skill/SKILL.md",
+    "tests/skill/SKILL.md",
+    "testdata/golden/expected/skill/SKILL.md",
+    "fixture/skill/SKILL.md",
+    "fixtures/skill/SKILL.md",
+    "plugins/partner-built/vendor/skills/skill/SKILL.md",
+    "plugins/healthcare/skills/contracts/.claude/skills/verify/SKILL.md",
+    "examples/demo/SKILL.md",
+    "samples/demo/SKILL.md",
+  ];
+  const allowedPaths = [
+    ".claude/skills/direct-skill/SKILL.md",
+    "skills/skill-forge-benchmark/SKILL.md",
+    "skills/testing-tools/SKILL.md",
+    "skills/example/SKILL.md",
+  ];
+  const plan = build([scan({ paths: [...blockedPaths, ...allowedPaths] })]);
+
+  assert.deepEqual(plan.candidates.map((entry) => entry.path), [...allowedPaths].sort());
+  assert.deepEqual(
+    plan.exclusions.filter((entry) => entry.reason === "non-publishable-path").map((entry) => entry.path),
+    [...blockedPaths].sort(),
+  );
+  assert.equal(isCreatorBackfillPathAllowed("Tests/fixtures/example/SKILL.md"), false);
+  assert.equal(isCreatorBackfillPathAllowed("testdata/golden/expected/example/SKILL.md"), false);
+  assert.equal(isCreatorBackfillPathAllowed("plugins/partner-built/vendor/skills/example/SKILL.md"), false);
+  assert.equal(isCreatorBackfillPathAllowed("skills/parent/.claude/skills/verify/SKILL.md"), false);
+  assert.equal(isCreatorBackfillPathAllowed(".claude/skills/example/SKILL.md"), true);
+  assert.equal(isCreatorBackfillPathAllowed("skills/skill-forge-benchmark/SKILL.md"), true);
+});
+
+test("creator-specific path exclusions block only the configured repo prefix", () => {
+  const plan = build([
+    scan({
+      paths: ["pstack/copied/SKILL.md", "first-party/direct/SKILL.md"],
+      excludedPathPrefixes: ["pstack/"],
+    }),
+  ]);
+
+  assert.deepEqual(plan.candidates.map((entry) => entry.path), ["first-party/direct/SKILL.md"]);
+  assert.deepEqual(
+    plan.exclusions.filter((entry) => entry.reason === "creator-path-excluded").map((entry) => entry.path),
+    ["pstack/copied/SKILL.md"],
+  );
+});
+
 test("canonical repo aliases prevent already-present paths from returning", () => {
   const plan = build(
     [scan({ repo: "new-owner/skills", repoFullName: "New-Owner/Skills", aliases: ["old-owner/skills"] })],
@@ -183,6 +233,98 @@ test("canonical repo aliases prevent already-present paths from returning", () =
   );
   assert.equal(plan.summary.candidateCount, 0);
   assert.equal(plan.exclusions[0]?.reason, "already-present");
+});
+
+test("canonical repo scans merge path exclusions and prefer the canonical owner", () => {
+  const paths = ["compiler/.claude/skills/internal/SKILL.md", "skills/public/SKILL.md"];
+  const plan = build([
+    scan({
+      creatorHandle: "facebook",
+      repo: "react/react",
+      repoFullName: "React/React",
+      aliases: ["facebook/react"],
+      paths,
+    }),
+    scan({
+      creatorHandle: "react",
+      repo: "react/react",
+      repoFullName: "React/React",
+      excludedPathPrefixes: ["compiler/.claude/skills/"],
+      paths,
+    }),
+  ]);
+
+  assert.equal(plan.summary.repositoryCount, 1);
+  assert.deepEqual(plan.candidates.map((entry) => [entry.creator, entry.path]), [
+    ["react", "skills/public/SKILL.md"],
+  ]);
+  assert.deepEqual(
+    plan.exclusions.filter((entry) => entry.reason === "creator-path-excluded").map((entry) => entry.path),
+    ["compiler/.claude/skills/internal/SKILL.md"],
+  );
+});
+
+test("exact Git blob SHA already in the library is excluded during planning", () => {
+  const plan = build(
+    [scan({
+      paths: ["skills/copied/SKILL.md", "skills/new/SKILL.md"],
+      pathShas: {
+        "skills/copied/SKILL.md": "ABC123",
+        "skills/new/SKILL.md": "DEF456",
+      },
+    })],
+    [skill({ skill_md_sha: "abc123" })],
+  );
+
+  assert.deepEqual(plan.candidates.map((entry) => entry.path), ["skills/new/SKILL.md"]);
+  assert.deepEqual(
+    plan.exclusions.filter((entry) => entry.reason === "exact-sha-present").map((entry) => entry.path),
+    ["skills/copied/SKILL.md"],
+  );
+});
+
+test("candidate without a tree SHA remains eligible", () => {
+  const plan = build(
+    [scan({ paths: ["skills/new/SKILL.md"], pathShas: {} })],
+    [skill({ skill_md_sha: "abc123" })],
+  );
+
+  assert.deepEqual(plan.candidates.map((entry) => entry.path), ["skills/new/SKILL.md"]);
+});
+
+test("exact SHA duplicates within the same repo collapse during planning", () => {
+  const plan = build([scan({
+    paths: [".agents/skills/one/SKILL.md", ".codex/skills/one/SKILL.md"],
+    pathShas: {
+      ".agents/skills/one/SKILL.md": "same-sha",
+      ".codex/skills/one/SKILL.md": "same-sha",
+    },
+  })]);
+
+  assert.deepEqual(plan.candidates.map((entry) => entry.path), [".agents/skills/one/SKILL.md"]);
+  assert.deepEqual(
+    plan.exclusions.filter((entry) => entry.reason === "duplicate-plan-sha").map((entry) => entry.path),
+    [".codex/skills/one/SKILL.md"],
+  );
+});
+
+test("same SHA in different repos remains reviewable", () => {
+  const plan = build([
+    scan({
+      repo: "creator/first",
+      repoFullName: "Creator/First",
+      paths: ["skills/one/SKILL.md"],
+      pathShas: { "skills/one/SKILL.md": "same-sha" },
+    }),
+    scan({
+      repo: "creator/second",
+      repoFullName: "Creator/Second",
+      paths: ["skills/one/SKILL.md"],
+      pathShas: { "skills/one/SKILL.md": "same-sha" },
+    }),
+  ]);
+
+  assert.equal(plan.summary.candidateCount, 2);
 });
 
 test("repo policy, catalog policy, and suppressed skills stay excluded", () => {
@@ -230,13 +372,15 @@ test("explicit selected repo approval allows a large repository", () => {
   assert.equal(plan.summary.reviewRequiredRepositoryCount, 0);
 });
 
-test("duplicate canonical candidates collapse deterministically", () => {
+test("duplicate canonical repo scans collapse deterministically before candidate planning", () => {
   const plan = build([
     scan({ creatorHandle: "a", aliases: ["old/skills"] }),
     scan({ creatorHandle: "b" }),
   ]);
+  assert.equal(plan.summary.repositoryCount, 1);
   assert.equal(plan.summary.candidateCount, 1);
-  assert.equal(plan.exclusions.some((entry) => entry.reason === "duplicate-plan-candidate"), true);
+  assert.equal(plan.candidates[0]?.creator, "a");
+  assert.equal(plan.exclusions.some((entry) => entry.reason === "duplicate-plan-candidate"), false);
 });
 
 test("plan output is stable when input order changes", () => {

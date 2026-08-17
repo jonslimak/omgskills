@@ -10,7 +10,7 @@ import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { deriveSkillIdFromPath, deriveSkillPathFromId } from "./candidate-path.js";
 import type { TrustedSeeds } from "./types.js";
 
-export const CREATOR_BACKFILL_PLAN_VERSION = 1;
+export const CREATOR_BACKFILL_PLAN_VERSION = 4;
 export const CREATOR_BACKFILL_LARGE_REPO_SKILL_LIMIT = 150;
 export const CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM = 3500;
 export const CREATOR_BACKFILL_QUOTA_RESERVE = 2000;
@@ -30,6 +30,8 @@ export type CreatorBackfillRepoScan = {
   treeUnavailableReason?: "empty-repository";
   treeTruncated?: boolean;
   paths?: string[];
+  pathShas?: Record<string, string>;
+  excludedPathPrefixes?: string[];
 };
 
 export type CreatorBackfillPlanCandidate = {
@@ -92,6 +94,7 @@ export type CreatorBackfillPlan = {
 type ExistingSkillKeys = {
   ids: Set<string>;
   repoPaths: Set<string>;
+  shas: Set<string>;
 };
 
 export function selectCreatorBackfillCoverageEntries(
@@ -122,9 +125,43 @@ function repoPathKey(repo: string, path: string): string {
   return `${normalizePolicyRepo(repo)}#${normalizePath(path)}`;
 }
 
+function normalizeSha(value: string | null | undefined): string {
+  return (value ?? "").trim().toLowerCase();
+}
+
 function exactSkillPaths(paths: string[]): string[] {
   return [...new Set(paths.map((path) => path.trim()).filter((path) => path === "SKILL.md" || path.endsWith("/SKILL.md")))]
     .sort((left, right) => left.localeCompare(right));
+}
+
+const nonPublishablePathSegments = new Set([
+  ".raw",
+  "test",
+  "tests",
+  "testdata",
+  "fixture",
+  "fixtures",
+  "examples",
+  "samples",
+  "partner-built",
+]);
+
+export function isCreatorBackfillPathAllowed(path: string): boolean {
+  const segments = normalizePath(path).split("/").filter(Boolean);
+  if (segments.some((segment) => nonPublishablePathSegments.has(segment))) return false;
+
+  const nestedClaudeSkills = segments.findIndex((segment, index) =>
+    segment === ".claude" && segments[index + 1] === "skills"
+  );
+  return nestedClaudeSkills < 0 || !segments.slice(0, nestedClaudeSkills).includes("skills");
+}
+
+function matchesExcludedPathPrefix(path: string, prefixes: string[]): boolean {
+  const normalized = normalizePath(path);
+  return prefixes.some((prefix) => {
+    const normalizedPrefix = normalizePath(prefix);
+    return normalized === normalizedPrefix || normalized.startsWith(`${normalizedPrefix}/`);
+  });
 }
 
 function existingPath(skill: Skill): string | null {
@@ -134,20 +171,71 @@ function existingPath(skill: Skill): string | null {
   return skill.id.includes(":") ? null : "SKILL.md";
 }
 
+function mergeCanonicalRepoScans(scans: CreatorBackfillRepoScan[]): CreatorBackfillRepoScan[] {
+  const byRepo = new Map<string, CreatorBackfillRepoScan[]>();
+  for (const scan of scans) {
+    const repo = normalizePolicyRepo(scan.repo);
+    const group = byRepo.get(repo) ?? [];
+    group.push(scan);
+    byRepo.set(repo, group);
+  }
+
+  return [...byRepo.entries()].map(([repo, group]) => {
+    const owner = repo.split("/")[0] ?? "";
+    const ranked = [...group].sort((left, right) =>
+      Number(normalizeCreatorHandle(right.creatorHandle) === owner)
+        - Number(normalizeCreatorHandle(left.creatorHandle) === owner)
+      || normalizeCreatorHandle(left.creatorHandle).localeCompare(normalizeCreatorHandle(right.creatorHandle))
+    );
+    const preferred = ranked[0];
+    if (!preferred) throw new Error(`Missing creator backfill scan for ${repo}`);
+
+    const pathShas: Record<string, string> = {};
+    for (const scan of ranked) {
+      for (const [path, sha] of Object.entries(scan.pathShas ?? {}).sort(([left], [right]) => left.localeCompare(right))) {
+        if (!(path in pathShas)) pathShas[path] = sha;
+      }
+    }
+
+    const paths = [...new Set(ranked.flatMap((scan) => scan.paths ?? []))].sort();
+    const aliases = [...new Set(ranked.flatMap((scan) => scan.aliases ?? []).map(normalizePolicyRepo))].sort();
+    const excludedPathPrefixes = [...new Set(ranked.flatMap((scan) => scan.excludedPathPrefixes ?? []))].sort();
+    const allTreesUnavailable = ranked.every((scan) => scan.treeUnavailableReason !== undefined);
+
+    return {
+      ...preferred,
+      repo,
+      explicitlyApproved: ranked.some((scan) => scan.explicitlyApproved),
+      aliases,
+      archived: ranked.some((scan) => scan.archived),
+      disabled: ranked.some((scan) => scan.disabled),
+      fork: ranked.some((scan) => scan.fork),
+      treeUnavailableReason: allTreesUnavailable ? preferred.treeUnavailableReason : undefined,
+      treeTruncated: ranked.some((scan) => scan.treeTruncated),
+      paths,
+      pathShas,
+      excludedPathPrefixes,
+    };
+  });
+}
+
 export function buildExistingSkillKeys(
   skills: Skill[],
   repoAliases: ReadonlyMap<string, string> = new Map(),
 ): ExistingSkillKeys {
   const ids = new Set<string>();
   const repoPaths = new Set<string>();
+  const shas = new Set<string>();
   for (const skill of skills) {
     ids.add(normalizePolicySkillId(skill.id));
+    const sha = normalizeSha(skill.skill_md_sha);
+    if (sha) shas.add(sha);
     const repo = repoFromGithubUrl(skill.github_url);
     const path = existingPath(skill);
     if (!repo || !path) continue;
     repoPaths.add(repoPathKey(repoAliases.get(repo) ?? repo, path));
   }
-  return { ids, repoPaths };
+  return { ids, repoPaths, shas };
 }
 
 function exclusion(
@@ -174,7 +262,7 @@ export function buildCreatorBackfillPlan(input: {
   existingSkills: Skill[];
   seeds: TrustedSeeds;
 }): CreatorBackfillPlan {
-  const scans = [...input.scans].sort((left, right) =>
+  const scans = mergeCanonicalRepoScans(input.scans).sort((left, right) =>
     left.creatorHandle.localeCompare(right.creatorHandle)
       || normalizePolicyRepo(left.repo).localeCompare(normalizePolicyRepo(right.repo))
   );
@@ -184,6 +272,7 @@ export function buildCreatorBackfillPlan(input: {
   const existing = buildExistingSkillKeys(input.existingSkills, new Map(aliasPairs));
   const candidates: CreatorBackfillPlanCandidate[] = [];
   const candidateIds = new Set<string>();
+  const candidateRepoShas = new Set<string>();
   const exclusions: CreatorBackfillPlanExclusion[] = [];
   const repositories: CreatorBackfillRepositorySummary[] = [];
 
@@ -218,10 +307,26 @@ export function buildCreatorBackfillPlan(input: {
     } else {
       for (const path of paths) {
         const proposedId = deriveSkillIdFromPath(scan.repoFullName, path);
+        if (matchesExcludedPathPrefix(path, scan.excludedPathPrefixes ?? [])) {
+          reasons.add("creator-path-excluded");
+          exclusions.push(exclusion(scan, "creator-path-excluded", path, proposedId));
+          continue;
+        }
+        if (!isCreatorBackfillPathAllowed(path)) {
+          reasons.add("non-publishable-path");
+          exclusions.push(exclusion(scan, "non-publishable-path", path, proposedId));
+          continue;
+        }
         const normalizedId = normalizePolicySkillId(proposedId);
         if (existing.ids.has(normalizedId) || existing.repoPaths.has(repoPathKey(repo, path))) {
           reasons.add("already-present");
           exclusions.push(exclusion(scan, "already-present", path, proposedId));
+          continue;
+        }
+        const blobSha = normalizeSha(scan.pathShas?.[path]);
+        if (blobSha && existing.shas.has(blobSha)) {
+          reasons.add("exact-sha-present");
+          exclusions.push(exclusion(scan, "exact-sha-present", path, proposedId));
           continue;
         }
         const skillPolicy = evaluateEffectiveSkillPolicy({ id: proposedId, github_url: scan.repoUrl }, input.seeds);
@@ -231,12 +336,19 @@ export function buildCreatorBackfillPlan(input: {
           exclusions.push(exclusion(scan, reason, path, proposedId));
           continue;
         }
+        const repoShaKey = blobSha ? `${repo}#${blobSha}` : "";
+        if (repoShaKey && candidateRepoShas.has(repoShaKey)) {
+          reasons.add("duplicate-plan-sha");
+          exclusions.push(exclusion(scan, "duplicate-plan-sha", path, proposedId));
+          continue;
+        }
         if (candidateIds.has(normalizedId)) {
           reasons.add("duplicate-plan-candidate");
           exclusions.push(exclusion(scan, "duplicate-plan-candidate", path, proposedId));
           continue;
         }
         candidateIds.add(normalizedId);
+        if (repoShaKey) candidateRepoShas.add(repoShaKey);
         candidates.push({
           creator: scan.creatorHandle,
           repo,

@@ -177,6 +177,7 @@ test("creator registry accepts reviewed all and selected skill coverage", () => 
           watch: true,
           skillCoverage: "selected",
           skillRepos: ["SelectedCoverage/skills"],
+          skillPathExclusions: ["SelectedCoverage/skills#vendor-copies/"],
         },
       ],
     },
@@ -257,5 +258,31 @@ test("creator registry rejects skill repos without coverage and normalized dupli
       },
     }),
     /duplicate skill repo owner\/repo/,
+  );
+});
+
+test("creator registry validates creator-specific skill path exclusions", () => {
+  const base = {
+    officialJson: {},
+    manualIncludeJson: {},
+    doNotCrawlJson: {},
+    overridesJson: [],
+    catalogJson: [],
+    provenanceJson: [],
+  };
+  assert.throws(
+    () => buildTrustedSeeds({
+      ...base,
+      creatorRegistryJson: {
+        creators: [{
+          handle: "Selected",
+          watch: true,
+          skillCoverage: "selected",
+          skillRepos: ["selected/skills"],
+          skillPathExclusions: ["other/repo#copies/"],
+        }],
+      },
+    }),
+    /excluded path repo other\/repo is not in skillRepos/,
   );
 });

@@ -12,6 +12,9 @@ export function formatCreatorRegistry(source: CreatorRegistrySource): string {
       parts.push(`"skillCoverage": ${JSON.stringify(entry.skillCoverage)}`);
     }
     if (entry.skillRepos?.length) parts.push(`"skillRepos": ${JSON.stringify(entry.skillRepos)}`);
+    if (entry.skillPathExclusions?.length) {
+      parts.push(`"skillPathExclusions": ${JSON.stringify(entry.skillPathExclusions)}`);
+    }
     if (entry.notes) parts.push(`"notes": ${JSON.stringify(entry.notes)}`);
     return `    { ${parts.join(", ")} }`;
   });

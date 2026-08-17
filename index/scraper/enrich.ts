@@ -203,6 +203,40 @@ export function buildReadmeSnippetFromSkillContent(content: string, _description
   return stripSurrogates(snippet);
 }
 
+export function buildGitHubRawRequestHeaders(token = process.env.GITHUB_TOKEN): Record<string, string> {
+  const normalizedToken = token?.trim();
+  return normalizedToken ? { Authorization: `Bearer ${normalizedToken}` } : {};
+}
+
+function shouldFallbackToGitHubContentsApi(status: number): boolean {
+  return status === 403 || status === 429 || status >= 500;
+}
+
+async function fetchGitHubContentsApiBytes(
+  owner: string,
+  repo: string,
+  path: string,
+  ref: string,
+): Promise<Buffer | null> {
+  const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+  const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`;
+  const response = await fetch(url, {
+    headers: {
+      ...buildGitHubRawRequestHeaders(),
+      Accept: "application/vnd.github.raw+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+    ...(requestTimeoutMs === null ? {} : { signal: AbortSignal.timeout(requestTimeoutMs) }),
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    const error = new Error(`GitHub contents fetch failed (${response.status}) for ${owner}/${repo}/${path}@${ref}`) as Error & { status?: number };
+    error.status = response.status;
+    throw error;
+  }
+  return Buffer.from(await response.arrayBuffer());
+}
+
 async function fetchRawFile(
   owner: string,
   repo: string,
@@ -220,10 +254,15 @@ async function fetchRawFile(
     const fileData = await refreshReplay.rawFile(replayKey, async () => {
       const url = `https://raw.githubusercontent.com/${owner}/${repo}/${candidateRef}/${path}`;
       const res = await fetch(url, {
+        headers: buildGitHubRawRequestHeaders(),
         ...(requestTimeoutMs === null ? {} : { signal: AbortSignal.timeout(requestTimeoutMs) }),
       });
       if (!res.ok) {
         if (res.status === 404) return null;
+        if (shouldFallbackToGitHubContentsApi(res.status)) {
+          const bytes = await fetchGitHubContentsApiBytes(owner, repo, path, candidateRef);
+          return bytes ? { content: bytes.toString("utf8"), sha: gitBlobSha(bytes) } : null;
+        }
         const error = new Error(`raw fetch failed (${res.status}) for ${owner}/${repo}/${path}@${candidateRef}`) as Error & { status?: number };
         error.status = res.status;
         throw error;

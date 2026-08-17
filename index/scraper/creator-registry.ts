@@ -18,6 +18,7 @@ export type CreatorRegistryEntry = {
   aliases?: string[];
   skillCoverage?: CreatorSkillCoverage;
   skillRepos?: string[];
+  skillPathExclusions?: string[];
   notes?: string;
 };
 
@@ -115,6 +116,40 @@ export function buildCreatorRegistry(source: CreatorRegistrySource): CreatorRegi
     }
     if (coverage === "selected" && !entry.skillRepos?.length) {
       throw new Error(`Invalid creators.json entry for ${canonical}: selected coverage requires skillRepos.`);
+    }
+    if (entry.skillPathExclusions !== undefined) {
+      if (!coverage) {
+        throw new Error(`Invalid creators.json entry for ${canonical}: skillPathExclusions requires skillCoverage.`);
+      }
+      if (!Array.isArray(entry.skillPathExclusions) || entry.skillPathExclusions.length === 0) {
+        throw new Error(`Invalid creators.json entry for ${canonical}: skillPathExclusions must be a non-empty array.`);
+      }
+      const coveredRepos = new Set((entry.skillRepos ?? []).map(normalizePolicyRepo));
+      const exclusions = new Set<string>();
+      for (const rawExclusion of entry.skillPathExclusions) {
+        if (typeof rawExclusion !== "string") {
+          throw new Error(`Invalid creators.json entry for ${canonical}: skillPathExclusions must use owner/repo#path-prefix/.`);
+        }
+        const separator = rawExclusion.indexOf("#");
+        const rawRepo = rawExclusion.slice(0, separator);
+        const rawPrefix = rawExclusion.slice(separator + 1);
+        if (separator <= 0 || rawExclusion.indexOf("#", separator + 1) >= 0 || !isValidPolicyRepo(rawRepo)) {
+          throw new Error(`Invalid creators.json entry for ${canonical}: skillPathExclusions must use owner/repo#path-prefix/.`);
+        }
+        const repo = normalizePolicyRepo(rawRepo);
+        const prefix = rawPrefix.trim().replace(/^\.\//, "").replace(/^\/+|\/+$/g, "").toLowerCase();
+        if (!prefix || prefix.split("/").some((segment) => !segment || segment === "." || segment === "..")) {
+          throw new Error(`Invalid creators.json entry for ${canonical}: skillPathExclusions must use owner/repo#path-prefix/.`);
+        }
+        if (coverage === "selected" && !coveredRepos.has(repo)) {
+          throw new Error(`Invalid creators.json entry for ${canonical}: excluded path repo ${repo} is not in skillRepos.`);
+        }
+        const normalized = `${repo}#${prefix}`;
+        if (exclusions.has(normalized)) {
+          throw new Error(`Invalid creators.json entry for ${canonical}: duplicate skill path exclusion ${normalized}.`);
+        }
+        exclusions.add(normalized);
+      }
     }
   }
 

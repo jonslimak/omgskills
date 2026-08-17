@@ -1,14 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { Skill } from "./types.js";
-import { buildReadmeSnippetFromSkillContent, enrichCandidate, seedRepoCache } from "./enrich.js";
+import {
+  buildGitHubRawRequestHeaders,
+  buildReadmeSnippetFromSkillContent,
+  enrichCandidate,
+  seedRepoCache,
+} from "./enrich.js";
 import { gitBlobSha } from "./git-blob-sha.js";
 
-function mockFetchOnce(handler: (url: string) => { ok: boolean; status: number; text: string; bytes?: Uint8Array }) {
+function mockFetchOnce(handler: (
+  url: string,
+  init?: RequestInit,
+) => { ok: boolean; status: number; text: string; bytes?: Uint8Array }) {
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = (async (input: string | URL | Request) => {
+  globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
     const url = String(input);
-    const response = handler(url);
+    const response = handler(url, init);
     const bytes = response.bytes ?? new TextEncoder().encode(response.text);
     return {
       ok: response.ok,
@@ -21,6 +29,59 @@ function mockFetchOnce(handler: (url: string) => { ok: boolean; status: number; 
     globalThis.fetch = originalFetch;
   };
 }
+
+test("raw GitHub requests use the configured token without requiring one", () => {
+  assert.deepEqual(buildGitHubRawRequestHeaders(" test-token "), {
+    Authorization: "Bearer test-token",
+  });
+  assert.deepEqual(buildGitHubRawRequestHeaders(""), {});
+});
+
+test("raw GitHub throttling falls back to the authenticated Contents API", async () => {
+  const originalToken = process.env.GITHUB_TOKEN;
+  process.env.GITHUB_TOKEN = "test-token";
+  const requestedUrls: string[] = [];
+  let apiAuthorization: string | null = null;
+  const restoreFetch = mockFetchOnce((url, init) => {
+    requestedUrls.push(url);
+    if (url.startsWith("https://raw.githubusercontent.com/")) {
+      return { ok: false, status: 429, text: "" };
+    }
+    if (url.startsWith("https://api.github.com/repos/owner/repo/contents/")) {
+      apiAuthorization = new Headers(init?.headers).get("authorization");
+      return {
+        ok: true,
+        status: 200,
+        text: "---\nname: fallback\ndescription: fallback description\n---\n# Fallback\n\nUseful body.",
+      };
+    }
+    throw new Error(`unexpected fetch: ${url}`);
+  });
+
+  try {
+    const result = await enrichCandidate(
+      { id: "owner/repo:fallback", skill_md_path: "skills/fallback/SKILL.md" },
+      new Map(),
+      new Map(),
+      "2026-08-17",
+      {
+        stars: 1,
+        lastUpdated: "2026-08-17T00:00:00Z",
+        tags: [],
+        githubUrl: "https://github.com/owner/repo",
+      },
+    );
+
+    assert.ok(result.skill);
+    assert.equal(apiAuthorization, "Bearer test-token");
+    assert.equal(requestedUrls.length, 2);
+    assert.match(requestedUrls[1] ?? "", /\/contents\/skills\/fallback\/SKILL\.md\?ref=main$/);
+  } finally {
+    restoreFetch();
+    if (originalToken === undefined) delete process.env.GITHUB_TOKEN;
+    else process.env.GITHUB_TOKEN = originalToken;
+  }
+});
 
 test("enrich hashes raw response bytes before UTF-8 decoding", async () => {
   const rawBytes = Buffer.concat([

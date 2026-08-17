@@ -284,6 +284,14 @@ function validateCreators(loaded: LoadedPolicySources, issues: PolicyIssue[]): v
         });
       }
     }
+    if (entry.skillPathExclusions !== undefined && !Array.isArray(entry.skillPathExclusions)) {
+      issues.push(issue(loaded, {
+        code: "invalid-creator-skill-path-exclusions",
+        source: "creators",
+        location: `/creators/${index}/skillPathExclusions`,
+        message: "Creator skillPathExclusions must be an array.",
+      }));
+    }
   });
   try {
     buildCreatorRegistry(value as PolicySources["creators"]);

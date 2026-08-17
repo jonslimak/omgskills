@@ -205,7 +205,11 @@ async function getRepo(repo: string): Promise<RepoMetadata> {
   return toRepoMetadata(response.data, repo);
 }
 
-async function getTree(repo: RepoMetadata): Promise<{ paths: string[]; truncated: boolean }> {
+async function getTree(repo: RepoMetadata): Promise<{
+  paths: string[];
+  pathShas: Record<string, string>;
+  truncated: boolean;
+}> {
   const [owner, repoName] = repo.repo.split("/");
   if (!owner || !repoName) throw new Error(`Invalid canonical creator repository: ${repo.repo}`);
   const response = await octokit.rest.git.getTree({
@@ -214,8 +218,13 @@ async function getTree(repo: RepoMetadata): Promise<{ paths: string[]; truncated
     tree_sha: repo.defaultBranch,
     recursive: "true",
   });
+  const paths = response.data.tree.map((entry) => entry.path ?? "").filter(Boolean);
+  const pathShas = Object.fromEntries(response.data.tree.flatMap((entry) =>
+    entry.path && entry.sha ? [[entry.path, entry.sha]] : []
+  ));
   return {
-    paths: response.data.tree.map((entry) => entry.path ?? "").filter(Boolean),
+    paths,
+    pathShas,
     truncated: Boolean(response.data.truncated),
   };
 }
@@ -247,10 +256,17 @@ async function collectScans(entries: CreatorRegistryEntry[], seeds: TrustedSeeds
 
     for (const repo of [...byRepo.values()].sort((left, right) => left.repo.localeCompare(right.repo))) {
       const explicitlyApproved = approvedRepos.has(repo.repo) || repo.aliases.some((alias) => approvedRepos.has(alias));
+      const repoNames = new Set([repo.repo, ...repo.aliases].map(normalizePolicyRepo));
+      const excludedPathPrefixes = (entry.skillPathExclusions ?? []).flatMap((rule) => {
+        const separator = rule.indexOf("#");
+        const ruleRepo = normalizePolicyRepo(rule.slice(0, separator));
+        return repoNames.has(ruleRepo) ? [rule.slice(separator + 1)] : [];
+      });
       const repoPolicy = evaluateEffectiveRepoPolicy(repo.repo, seeds);
       const skipTree = repo.archived || repo.disabled || repo.fork || repoPolicy.excluded
         || isKnownCatalogRepo(repo.repo, seeds.catalogRepoRules);
       let paths: string[] = [];
+      let pathShas: Record<string, string> = {};
       let treeTruncated = false;
       let treeUnavailableReason: "empty-repository" | undefined;
       if (!skipTree) {
@@ -261,6 +277,7 @@ async function collectScans(entries: CreatorRegistryEntry[], seeds: TrustedSeeds
         try {
           const tree = await getTree(repo);
           paths = tree.paths;
+          pathShas = tree.pathShas;
           treeTruncated = tree.truncated;
         } catch (error) {
           if (errorStatus(error) !== 409) throw error;
@@ -273,6 +290,8 @@ async function collectScans(entries: CreatorRegistryEntry[], seeds: TrustedSeeds
         explicitlyApproved,
         ...repo,
         paths,
+        pathShas,
+        excludedPathPrefixes,
         treeTruncated,
         ...(treeUnavailableReason ? { treeUnavailableReason } : {}),
       });
