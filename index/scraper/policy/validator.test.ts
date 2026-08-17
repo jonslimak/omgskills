@@ -112,6 +112,51 @@ test("stale editorial references block only editorial and strict profiles", () =
   assert.ok(blockingPolicyIssues(issues, "strict").length > 0);
 });
 
+test("allows an intentionally empty featured creator with approved watch coverage", () => {
+  const loaded = fixture({
+    creators: {
+      creators: [{
+        handle: "newcreator",
+        roles: ["creator"],
+        watch: true,
+        featured: true,
+        skillCoverage: "selected",
+        skillRepos: ["newcreator/skills"],
+      }],
+    },
+    collections: { authorOverrides: { newcreator: {} }, collections: [] },
+  });
+  const issues = validatePolicy(loaded, {
+    ...catalogContext,
+    publishedAuthorHandles: new Set(),
+  });
+  assert.ok(!issues.some((entry) => entry.code === "stale-featured-creator"));
+});
+
+test("empty featured creators cannot claim catalog skills", () => {
+  const loaded = fixture({
+    creators: {
+      creators: [{
+        handle: "newcreator",
+        roles: ["creator"],
+        watch: true,
+        featured: true,
+        skillCoverage: "selected",
+        skillRepos: ["newcreator/skills"],
+      }],
+    },
+    collections: {
+      authorOverrides: { newcreator: { featuredSkillIds: ["openai/codex:review"] } },
+      collections: [],
+    },
+  });
+  const issues = validatePolicy(loaded, {
+    ...catalogContext,
+    publishedAuthorHandles: new Set(),
+  });
+  assert.ok(issues.some((entry) => entry.code === "empty-featured-creator-has-skills"));
+});
+
 test("validates new suppressions against the promoted, cutover, and overlay union", () => {
   const loaded = fixture({
     suppressedSkills: { skills: [{ id: "owner/repo:overlay-only", reason: "duplicate" }] },

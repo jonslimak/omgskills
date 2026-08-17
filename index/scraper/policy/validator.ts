@@ -6,7 +6,11 @@ import {
   normalizePolicyRepo,
   normalizePolicySkillId,
 } from "../../../scripts/policy-identifiers.mjs";
-import { buildCreatorRegistry } from "../creator-registry.js";
+import {
+  buildCreatorRegistry,
+  hasApprovedCreatorCoverage,
+  type CreatorRegistryEntry,
+} from "../creator-registry.js";
 import { parseSkillEquivalenceOverrides } from "../new-crawl/skill-equivalence.js";
 import { parseCollectionImageUrl } from "../../scripts/collection-images.js";
 import { typedPolicySources } from "./loader.js";
@@ -816,6 +820,23 @@ export function validatePolicyReferences(
       if (!entry.featured) continue;
       const variants = [entry.handle, ...(entry.aliases ?? [])].map(normalizePolicyHandle);
       if (variants.some((handle) => authors.has(handle))) continue;
+      const override = Object.entries(sources.collections.authorOverrides ?? {}).find(([handle]) =>
+        variants.includes(normalizePolicyHandle(handle))
+      )?.[1];
+      if (hasApprovedCreatorCoverage(entry as CreatorRegistryEntry)) {
+        if ((override?.featuredSkillIds?.length ?? 0) > 0) {
+          issues.push(issue(loaded, {
+            code: "empty-featured-creator-has-skills",
+            severity: "warning",
+            scope: "editorial",
+            source: "collections",
+            location: `/authorOverrides/${entry.handle}/featuredSkillIds`,
+            key: normalizePolicyHandle(entry.handle),
+            message: `Featured creator without catalog rows must not reference skills yet: ${entry.handle}.`,
+          }));
+        }
+        continue;
+      }
       issues.push(issue(loaded, {
         code: "stale-featured-creator",
         severity: "warning",

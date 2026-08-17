@@ -44,6 +44,13 @@ export function normalizeCreatorHandle(value: string): string {
   return normalizePolicyHandle(value);
 }
 
+export function hasApprovedCreatorCoverage(entry: CreatorRegistryEntry): boolean {
+  return entry.watch === true && (
+    entry.skillCoverage === "all"
+    || (entry.skillCoverage === "selected" && Boolean(entry.skillRepos?.length))
+  );
+}
+
 export function buildCreatorRegistry(source: CreatorRegistrySource): CreatorRegistry {
   if (!Array.isArray(source?.creators)) {
     throw new Error("Invalid creators.json: creators must be an array.");

@@ -63,6 +63,49 @@ test("featured creator must be watched", () => {
   );
 });
 
+test("featured creator with approved coverage may publish an empty profile", () => {
+  const source = { version: 1, authorOverrides: {}, collections: [] };
+  const registry: CreatorRegistrySource = {
+    creators: [{
+      handle: "NewCreator",
+      roles: ["creator"],
+      watch: true,
+      featured: true,
+      skillCoverage: "selected",
+      skillRepos: ["newcreator/skills"],
+    }],
+  };
+
+  validateSource(source, registry, skills);
+  const asset = buildCollectionsAsset(source, registry, skills);
+  assert.deepEqual(asset.collections[0].featuredSkillIds, []);
+  assert.equal(asset.collections[0].authorHandle, "NewCreator");
+});
+
+test("empty featured creator cannot reference skills before catalog rows exist", () => {
+  assert.throws(
+    () => validateSource(
+      {
+        version: 1,
+        authorOverrides: { newcreator: { featuredSkillIds: ["oldhandle/repo:one"] } },
+        collections: [],
+      },
+      {
+        creators: [{
+          handle: "newcreator",
+          roles: ["creator"],
+          watch: true,
+          featured: true,
+          skillCoverage: "selected",
+          skillRepos: ["newcreator/skills"],
+        }],
+      },
+      skills,
+    ),
+    /must not reference skills/,
+  );
+});
+
 test("alias-only creator validates and generates a non-empty profile", () => {
   const source = { version: 1, authorOverrides: {}, collections: [] };
   const registry: CreatorRegistrySource = {

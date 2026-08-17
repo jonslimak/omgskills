@@ -235,7 +235,10 @@ function errorStatus(error: unknown): number | null {
   return typeof status === "number" ? status : null;
 }
 
-async function collectScans(entries: CreatorRegistryEntry[], seeds: TrustedSeeds): Promise<CreatorBackfillRepoScan[]> {
+export async function collectCreatorBackfillScans(
+  entries: CreatorRegistryEntry[],
+  seeds: TrustedSeeds,
+): Promise<CreatorBackfillRepoScan[]> {
   const scans: CreatorBackfillRepoScan[] = [];
   let treeRequests = 0;
   for (const entry of entries) {
@@ -300,7 +303,7 @@ async function collectScans(entries: CreatorRegistryEntry[], seeds: TrustedSeeds
   return scans;
 }
 
-function loadExistingSkills(): Skill[] {
+export function loadCreatorBackfillExistingSkills(): Skill[] {
   const baseline = readJson<Skill[]>(join(indexRoot, "skills.json"), []);
   const cutover = readJson<Skill[]>(join(shadowRoot, "skills.cutover.shadow.json"), []);
   const overlay = readJson<ShadowSkillOverlay>(join(shadowRoot, "skills.overlay.json"), {
@@ -369,7 +372,7 @@ async function runPlan(
   const seeds = loadTrustedSeeds("manual-command");
   const loadedPolicy = loadPolicySources();
   const generatedAt = new Date().toISOString();
-  const existingSkills = loadExistingSkills();
+  const existingSkills = loadCreatorBackfillExistingSkills();
 
   const plan = await executeCreatorBackfillPlan({
     preflight: async () => {
@@ -380,7 +383,7 @@ async function runPlan(
       );
       return quota.remaining;
     },
-    collectScans: () => collectScans(entries, seeds),
+    collectScans: () => collectCreatorBackfillScans(entries, seeds),
     build: (initialQuotaRemaining, scans) => buildCreatorBackfillPlan({
       generatedAt,
       sourceCommit: sourceCommit(),
@@ -420,7 +423,7 @@ async function runApply(
       .filter((entry) => entry.watch && entry.skillCoverage)
       .map((entry) => normalizeCreatorHandle(entry.handle)),
   );
-  let currentSkills = loadExistingSkills();
+  let currentSkills = loadCreatorBackfillExistingSkills();
   const priorProgress = readJson<CreatorBackfillApplyProgress | null>(progressPath, null);
 
   const progress = await executeCreatorBackfillApply({
@@ -514,7 +517,7 @@ async function runApply(
         dedupeExactSha: true,
       });
       commitShadowSkillPersistence({ snapshot, prepared });
-      currentSkills = loadExistingSkills();
+      currentSkills = loadCreatorBackfillExistingSkills();
       return prepared.outcomes.map((outcome) => ({
         id: outcome.id,
         status: outcome.status === "added" ? "added" : "existing",

@@ -4,6 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildCreatorRegistry,
+  hasApprovedCreatorCoverage,
   normalizeCreatorHandle,
   type CreatorRegistryEntry,
   type CreatorRegistrySource,
@@ -198,10 +199,15 @@ export function validateSource(source: CollectionsSource, registry: CreatorRegis
   for (const entry of featured) {
     const variants = handleVariants(entry);
     const catalogHandle = findCatalogHandle(skills, variants);
-    if (!catalogHandle) {
-      fail(`${entry.handle}: featured creator not found as a catalog author`);
-    }
     const override = findAuthorOverride(source, variants);
+    if (!catalogHandle) {
+      if (!hasApprovedCreatorCoverage(entry)) {
+        fail(`${entry.handle}: featured creator not found as a catalog author or approved watch coverage`);
+      }
+      if (override.featuredSkillIds?.length) {
+        fail(`${entry.handle}: empty featured creator must not reference skills before catalog rows exist`);
+      }
+    }
     if (override.featuredSkillIds) {
       validateSkillIds(override.featuredSkillIds, skillIds, `authorOverrides.${entry.handle}.featuredSkillIds`);
     }
