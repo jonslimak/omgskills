@@ -958,7 +958,7 @@
     },
     "vercel": {
       "featuredSkillIds": [
-        "vercel/turbo:turborepo",
+        "vercel/turborepo:turborepo",
         "vercel-labs/ai:add-provider-package",
         "vercel-labs/ai:adr-skill",
         "vercel/vercel:vercel-cli",
@@ -1151,7 +1151,7 @@
         "browser-use/video-use:manim-video",
         "browser-use/video-use",
         "browser-use/browser-harness",
-        "browser-use/browser-harness-js",
+        "browser-use/browser-harness-js:cdp",
         "browser-use/browsercode:effect"
       ],
       "subtitle": "Browser agent infrastructure",
@@ -1246,6 +1246,52 @@
       ],
       "description": "Tools for turning manuscripts into polished web and print publications.",
       "xUrl": "https://x.com/tareqismail"
+    },
+    "danyuchn": {
+      "title": "Dustin Yuchen Teng",
+      "subtitle": "Plain language and privacy",
+      "featuredSkillIds": [
+        "danyuchn/asd-ste100-skill",
+        "danyuchn/fire-planner",
+        "danyuchn/iso-24495-skill",
+        "danyuchn/memory-engineering-skill",
+        "danyuchn/pii-guard:.agents/skills/pii-safe-documents"
+      ],
+      "description": "Skills for clearer writing, private document handling, financial planning, and agent memory."
+    },
+    "bholmesdev": {
+      "title": "Ben Holmes",
+      "subtitle": "Developer utility skills",
+      "featuredSkillIds": [
+        "bholmesdev/skills:skills/alt-text",
+        "bholmesdev/skills:skills/done",
+        "bholmesdev/skills:skills/free-disk-space",
+        "bholmesdev/skills:skills/simplify",
+        "bholmesdev/skills:skills/taste-review",
+        "bholmesdev/skills:skills/transcribe"
+      ],
+      "description": "Focused tools for accessibility, review, cleanup, transcription, and shipping code.",
+      "xUrl": "https://x.com/bholmesdev"
+    },
+    "petergyang": {
+      "title": "Peter Yang",
+      "subtitle": "Human review and writing",
+      "featuredSkillIds": [
+        "petergyang/human-review:src",
+        "petergyang/no-ai-slop:no-ai-slop"
+      ],
+      "description": "Skills for reviewing work with people and removing generic AI phrasing.",
+      "xUrl": "https://x.com/petergyang"
+    },
+    "gfodor": {
+      "title": "Greg Fodor",
+      "subtitle": "Patent review tools",
+      "featuredSkillIds": [
+        "gfodor/legal-skills:patent-audit",
+        "gfodor/legal-skills:patent-examine",
+        "gfodor/legal-skills:patent-workaround"
+      ],
+      "description": "Structured skills for auditing, examining, and pressure-testing U.S. patent drafts."
     }
   },
   "collections": [
