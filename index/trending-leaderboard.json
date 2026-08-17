@@ -5,7 +5,7 @@
     "name": "imagegen-frontend-mobile",
     "authorHandle": "leonxlnx",
     "description": "Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. Designed for iOS, Android, and cross-platform mobile products. Prioritizes clean hierarchy, comfortably readable text, strong multi-screen consistency, controlled color palettes, non-generic creative direction, textured surfaces, image-led composition, tasteful custom iconography, and clean phone mockup framing. By default, screens should be shown inside a subtle premium iPhone or similar phone mockup with a visible frame, while the main focus stays on the app content itself. This skill generates images only. It does not write code.",
-    "stars": 77164,
+    "stars": 77210,
     "installs": 210804,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
@@ -38,7 +38,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 169787,
+    "stars": 169834,
     "installs": 202921,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -60,7 +60,7 @@
     "name": "requesting-code-review",
     "authorHandle": "obra",
     "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
-    "stars": 272885,
+    "stars": 272955,
     "installs": 201438,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
@@ -159,7 +159,7 @@
     "name": "lark-note",
     "authorHandle": "larksuite",
     "description": "飞书会议纪要（Note）直查：已知 note_id 时查询纪要详情、展示类型、关联文档 token，并读取 unified 原始逐字记录。当用户已持有 note_id，或从文档显式 vc-node-id 获得 note_id 时使用。不负责会议/日程/妙记定位、文档标题搜索或 Docx 正文读取。",
-    "stars": 16493,
+    "stars": 16505,
     "installs": 183375,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
@@ -357,7 +357,7 @@
     "name": "orca-cli",
     "authorHandle": "stablyai",
     "description": "Use the public `orca` CLI to operate Orca-managed worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, worktree comments, and the browser embedded inside the Orca app. Use when the user says \"$orca-cli\", \"use orca cli\", \"Orca worktree\", \"child worktree\", \"cardStatus\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"terminal send\", \"full handoff\", \"handover\", \"give this to another agent\", \"another worktree\", \"Orca browser\", \"orca artifacts\", \"share HTML/Markdown\", \"public artifact link\", \"share skills\", or \"control the browser inside Orca\". Prefer this over raw `git worktree`, ad hoc PTYs, Playwright, or Computer Use when the task touches Orca-managed state. Use Computer Use for browser windows, webviews, or desktop UI outside Orca's embedded browser.",
-    "stars": 46734,
+    "stars": 46900,
     "installs": 139130,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
@@ -687,7 +687,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 109460,
+    "stars": 109480,
     "installs": 91331,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -951,7 +951,7 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 46349,
+    "stars": 46421,
     "installs": 75039,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1787,7 +1787,7 @@
     "name": "gsap-core",
     "authorHandle": "greensock",
     "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions.",
-    "stars": 13654,
+    "stars": 13691,
     "installs": 46729,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
@@ -2777,7 +2777,7 @@
     "name": "baoyu-post-to-wechat",
     "authorHandle": "jimliu",
     "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
-    "stars": 25064,
+    "stars": 25071,
     "installs": 32753,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
@@ -2821,7 +2821,7 @@
     "name": "karpathy-guidelines",
     "authorHandle": "multica-ai",
     "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-    "stars": 202932,
+    "stars": 203200,
     "installs": 31948,
     "githubUrl": "https://github.com/multica-ai/andrej-karpathy-skills",
     "source": "skills.sh"
