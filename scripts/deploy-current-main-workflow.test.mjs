@@ -28,6 +28,8 @@ test("local dispatcher requires a clean checkout exactly at origin main", () => 
   assert.match(wrapper, /git status --porcelain/);
   assert.match(wrapper, /git fetch origin main/);
   assert.match(wrapper, /expected_sha[\s\S]*?origin_sha/);
+  assert.match(wrapper, /git remote get-url origin/);
+  assert.doesNotMatch(wrapper, /gh repo view/);
   assert.match(wrapper, /gh workflow run deploy-current-main\.yml/);
   assert.match(wrapper, /gh run watch/);
   assert.doesNotMatch(wrapper, /netlify|git push|git tag/);

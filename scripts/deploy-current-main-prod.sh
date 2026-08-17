@@ -28,7 +28,14 @@ if [ "$expected_sha" != "$origin_sha" ]; then
   exit 1
 fi
 
-repository="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
+remote_url="$(git remote get-url origin)"
+repository="${remote_url#https://github.com/}"
+repository="${repository#git@github.com:}"
+repository="${repository%.git}"
+if [[ ! "$repository" =~ ^[^/]+/[^/]+$ ]]; then
+  echo "refusing production deploy: could not derive owner/repo from origin" >&2
+  exit 1
+fi
 gh auth status >/dev/null
 dispatched_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
