@@ -2,7 +2,7 @@
 
 ## Goal
 
-Backfill missing skills from approved creators quickly, without waiting for weekly crawls or changing production data.
+Backfill missing skills from approved creators quickly, then keep approved coverage fresh through bounded weekly maintenance.
 
 The backfill should run in bounded batches of `125` candidates and reuse the normal Crawl 4 enrichment, policy, overlay, and cutover-validation paths.
 
@@ -94,6 +94,15 @@ Apply behavior:
 The generated plan tracks campaign progress, but the Crawl 4 overlays remain authoritative. Rebuilding a plan must safely skip completed skills.
 
 Healthy skip counts are expected. Some selected repositories are already largely indexed, and some skills may already be classified as catalog-like or suppressed.
+
+### Run bounded maintenance
+
+```bash
+cd index
+npm run crawl4:creator-backfill -- --maintain --limit=125
+```
+
+Maintenance builds a fresh plan and applies at most `125` candidates through the same planner, enrichment, policy, and persistence paths. It exits successfully without writes when GitHub core quota is below `3,500`, and it does not change normal daily Crawl 4 behavior.
 
 ## GitHub Quota Safety
 
@@ -256,7 +265,7 @@ Completion gate:
 
 ### B4. Bounded apply runner
 
-Status: complete and validated on 2026-08-10. No live backfill batch has been applied yet.
+Status: complete and live-validated on 2026-08-10. The first bounded batch processed the full reviewed plan without transient failures.
 
 - [x] add `crawl4:creator-backfill -- --apply`
 - [x] process `125` attempts by default with a hard maximum of `150`
@@ -279,14 +288,23 @@ Completion gate:
 
 ### B5. Pilot backfill campaign
 
-- build a plan for `emilkowalski`, `mattpocock`, and `davidondrej`
-- review grouped plan counts before applying
-- apply one `125`-candidate batch
-- inspect added, skipped, and failed samples
-- review additions through Crawl 4 output or the test client
-- run one normal combined Crawl 4 crawl
-- confirm overlay persistence and safety gates
-- publish only after explicit review
+Status: complete and validated on 2026-08-10. The reviewed plan contained `85` candidates across `3` creators. Apply added `78`, skipped `5` existing exact-SHA duplicates, recorded `2` stable invalid-frontmatter failures, and had `0` policy or transient failures. A subsequent normal combined crawl preserved the exact `78` IDs in both cutover and the skill overlay; cutover validation passed and all `467` shadow-guard tests passed.
+
+Addition review:
+
+- all `78` additions have valid descriptions, install commands, paths, authors, and `original` provenance
+- no unresolved catalog/repackaged content or exact-SHA duplicate remains in the additions
+- `74` are clear keeps
+- `4` highly personal/project-specific skills remain optional manual-review items: `davidondrej/autogit:.agents/skills/npm-publish`, `davidondrej/skills:skills/ops-and-setup/read-prod-database`, `davidondrej/skills:skills/research-and-web/fireflies-transcript`, and `mattpocock/course-video-manager:.claude/skills/document-ai-hero-api`
+
+- [x] build a plan for `emilkowalski`, `mattpocock`, and `davidondrej`
+- [x] review grouped plan counts before applying
+- [x] apply one bounded batch
+- [x] inspect added, skipped, and failed samples
+- [x] review additions through Crawl 4 output
+- [x] run one normal combined Crawl 4 crawl
+- [x] confirm overlay persistence and safety gates
+- [x] keep publishing deferred as a separate explicit action
 
 Completion gate:
 
@@ -295,14 +313,29 @@ Completion gate:
 - a normal combined crawl preserves the additions
 - production and v2 remain unchanged until explicit publish/cutover action
 
-### Later: weekly creator coverage
+### B6. Weekly creator coverage maintenance
 
-Only after B1-B5 are validated:
+Status: implemented and live-validated on 2026-08-14.
 
-- reuse the same planner/apply helpers in a bounded weekly run
-- do not create separate weekly enrichment logic
-- choose the weekly cap from measured runtime and quota usage
-- keep manual operator backfill available for deliberate campaigns
+- [x] add `crawl4:creator-backfill -- --maintain --limit=125`
+- [x] rebuild a fresh plan before each maintenance apply
+- [x] reuse the existing planner, bounded apply, enrichment, and policy paths
+- [x] skip cleanly before plan or apply when GitHub core quota is below `3,500`
+- [x] treat an empty plan as a clean success
+- [x] schedule maintenance for Sunday at `06:00 UTC`
+- [x] keep the Sunday `12:00 UTC` and all other runs unchanged
+- [x] add manual `creator_coverage=true` workflow dispatch support
+- [x] upload plan, apply progress, and maintenance logs as workflow artifacts
+- [x] run one manual production-writer validation with `creator_coverage=true`
+- [x] confirm the normal guard, promote, publish, deploy, and live verification path completes
+
+Completion gate:
+
+- a manual maintenance run completes without bypassing quota or policy guards
+- zero candidates or low quota exits cleanly
+- real additions, if any, remain capped at `125`
+- cutover validation and published-data verification pass
+- ordinary Crawl 4 runs remain unchanged
 
 ## Tests
 
@@ -320,6 +353,8 @@ Add focused tests for:
 - adding multiple skills to an existing repository
 - deterministic ordering and batch limits
 - quota preflight protects the scheduled crawler reserve
+- maintenance rechecks quota between planning and applying
+- maintenance treats an empty fresh plan as success
 - idempotent repeated runs
 - stable failures not blocking later candidates
 - transient failures remaining retryable
@@ -339,15 +374,91 @@ npm run test:shadow-guard
 
 ## First Validation Campaign
 
-1. Build a plan for `emilkowalski`, `mattpocock`, and `davidondrej`.
-2. Apply one `125`-candidate batch.
-3. Inspect added, skipped, and failed samples.
-4. Review the additions in Crawl 4 output or the test client.
-5. Continue approved batches until the reviewed queue is empty.
-6. Run one normal combined Crawl 4 crawl to confirm overlay persistence.
-7. Run shadow safety gates.
-8. Publish Crawl 4 only after final review.
+Completed on 2026-08-10:
 
-## Future Weekly Coverage
+1. Built and reviewed the `85`-candidate plan for `emilkowalski`, `mattpocock`, and `davidondrej`.
+2. Applied the complete bounded queue: `78` added, `5` existing, `2` stable failures.
+3. Reviewed the resulting additions and confirmed no catalog or exact-SHA duplicate leakage.
 
-After the manual campaign is validated, the same shared planner/apply helper can power a bounded weekly creator-coverage run. Do not add separate weekly enrichment logic.
+Validation completed on 2026-08-10:
+
+1. A normal combined Crawl 4 crawl preserved all `78` additions in cutover and the skill overlay.
+2. Cutover validation passed and all `467` shadow-guard tests passed.
+3. Production and hosted data were not changed. Publishing remains a separate explicit action.
+
+## Front-Loaded Coverage Campaign
+
+Status: complete. The trusted-creator backlog was cleared through bounded operator batches; weekly coverage now handles later maintenance.
+
+The read-only plan generated on 2026-08-10 found:
+
+- `13` approved creators
+- `571` repositories inspected
+- `981` discovered `SKILL.md` files
+- `657` missing candidates
+- `565` policy/existing-state exclusions
+- `0` repositories requiring additional review
+
+The largest candidate groups are:
+
+- `wshobson`: `118`
+- `mengto`: `114`
+- `googleworkspace`: `74`
+- `steipete`: `62`
+- `intellectronica`: `50`
+- `coreyhaines31`: `49`
+- `trailofbits`: `49`
+
+No candidate path matched the current fixture, test, benchmark, template, asset, or internal-directory warning patterns. This does not replace post-enrichment quality review.
+
+### Execution result
+
+The resumable plan was processed through bounded batches:
+
+- `657` final candidate outcomes
+- `424` added
+- `231` already existing
+- `2` stable failures
+- `0` policy skips
+- `0` transient failures
+- `0` pending candidates
+
+### Finalization
+
+Completed:
+
+1. Ran a normal combined Crawl 4 crawl to verify overlay persistence.
+2. Passed cutover validation, shadow safety gates, and publication-impact review.
+3. Promoted the accepted cutover through the shared `index/skills.json` baseline in commit `e73beb3`.
+4. Published and verified both Crawl 4 and v2 through the normal shared path.
+
+Crawl 4 and v2 currently share the promoted `index/skills.json` baseline. A Crawl 4-only manual publish would be temporary and could be overwritten by the next scheduled workflow, so final campaign publication must use the normal shared path.
+
+The initial backlog is cleared. Weekly creator coverage now reuses the same planner/apply path to discover and admit future skills.
+
+## Current Weekly Coverage
+
+Current registry state:
+
+- `13` watched creators have reviewed coverage: `8` full and `5` selected
+- `59` featured creators still need an explicit `all`, `selected`, or deferred coverage decision
+
+The maintenance job runs Sunday at `06:00 UTC`, is capped at `125`, and keeps manual operator backfill available for deliberate campaigns. It does not create a separate enrichment path.
+
+Live validation completed on 2026-08-14 in `shadow-crawl-health` run `31808260924`:
+
+- `239` fresh candidates planned
+- `125` candidates processed
+- `2` skills added
+- `122` already existing
+- `1` stable `missing-frontmatter` failure
+- `0` policy skips and `0` transient failures
+- `114` candidates deferred for later bounded maintenance
+- quota guard, cutover validation, both data publishes, deploy, and live manifest verification passed
+- both added skills were verified in hosted Crawl 4 and v2 data
+- follow-up `pipeline-health` run `31811251121` passed and restored health to `OK`
+
+Next work:
+
+1. Review the `59` featured creators without a coverage decision in a read-only pass.
+2. Assign `all`, `selected`, or intentionally deferred coverage only after review.

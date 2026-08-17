@@ -1,28 +1,37 @@
 # Crawl System
 
+Validated 2026-08-04 against `origin/main` at `2bae217`.
+
 This doc explains the crawler and library build as they exist today.
 
 Use this as the durable system guide. Historical Crawl 4 planning docs live under [`archive/`](/Users/jonslimak/Projects/omgskills/archive).
 
 ## Current Data Tracks
 
-The app data model has two client-compatible tracks:
+Production has three published manifests:
 
-- Crawl 4 primary: `/data/crawl4/manifest.json`
-- v2 fallback: `/data/v2/manifest.json`
+| Track | Manifest | Writer | Purpose |
+|---|---|---|---|
+| Crawl 4 primary | `/data/crawl4/manifest.json` | Combined Crawl 4 workflow | Preferred current catalog |
+| v2 fallback | `/data/v2/manifest.json` | Validated Crawl 4 promotion | Client fallback while Crawl 4 proves sustained health |
+| legacy root | `/data/manifest.json` | Nightly v2 scraper | Compatibility for older clients and consumers |
 
-Both tracks keep the same required client contract. Crawl 4 may add optional
-fields, such as `quality_tier`; v2 deliberately strips Crawl 4-only fields during
-promotion. Clients must tolerate optional fields being present or absent.
+The primary and fallback tracks keep the same required client contract. Crawl 4
+may add optional fields such as `quality_tier`; promotion strips Crawl 4-only
+fields before publishing v2. Clients must tolerate optional fields being present
+or absent.
 
-The fallback exists to reduce rollout risk while Crawl 4 becomes the main library path. It is not a separate product strategy.
+The v2 fallback and legacy root track are transition infrastructure, not
+separate product strategies. Do not retire either without explicit approval and
+the adoption, health, and rollback checks in `aug.md`.
 
 Local source artifacts:
 
 - `index/shadow/skills.cutover.shadow.json`
   - Crawl 4 candidate library output
 - `index/skills.json`
-  - v2 fallback library source
+  - shared validated catalog staging file; written by the v2 scraper or Crawl 4
+    promotion depending on the serialized workflow
 - `index/trending.json`
   - v2 trending metadata
 - `index/x-trending.json`
@@ -38,7 +47,8 @@ Important:
 
 ### Crawl 4
 
-Crawl 4 owns the new library policy.
+Crawl 4 owns primary catalog discovery, admission, refresh, and quality logic.
+Cross-track exclusions and creator policy come from the shared policy layer.
 
 It should focus on:
 
@@ -54,21 +64,32 @@ It should focus on:
 
 ### v2 fallback
 
-The v2 track stays fresh through its existing scrape/publish path and validated
-Crawl 4 promotion. It remains independently hosted so clients can fall back when
-the Crawl 4 track cannot be loaded.
+The v2 fallback is built from validated Crawl 4 promotion and independently
+hosted so clients can recover when the Crawl 4 track cannot be loaded. The
+nightly v2 scraper still maintains the legacy root track.
 
-Do not stop crawling or publishing v2 until fallback retirement is explicitly approved.
+Do not stop publishing either compatibility track until its retirement is
+explicitly approved.
 
 ### Health and publishing
 
-Health checks should monitor both tracks while fallback exists.
+Health checks should monitor all three published manifests while compatibility
+tracks exist.
 
-Publish flows should keep one track from breaking the other:
+All production data writers use the `app-data-writers` concurrency group, sync
+to current `origin/main`, validate policy, capture last-known-good publication
+state, and run the publication-impact gate before commit or deployment.
+
+Publish flows keep one track from breaking another:
 
 - Crawl 4 failure should not corrupt v2 fallback
-- v2 failure still matters while v2 is the fallback
+- v2 or root failure still matters while those compatibility tracks exist
 - advisory checks should not block fresh data when blocking validation already passed
+- structural live verification failure restores the prior deploy only when the
+  failed candidate is still the live deploy
+
+Use `deploy.md` for deployment, receipt, rollback, and pipeline-health
+operations.
 
 ## Admission and Trust Model — the three doors
 
@@ -81,7 +102,7 @@ the operator endorses.
 A skill enters the searchable library when any value-gate arm passes:
 
 - watched-creator repo (registry `watch: true`, flag-gated)
-- official / trusted-vendor source
+- official, trusted-vendor, or trusted-creator source
 - gold-basket or manual include
 - install arm when enabled: skills.sh all-time rank `<=1000` or installs `>=4000`
 - validated X discovery when the repo has `50+` stars
@@ -97,8 +118,8 @@ suppressed-skills), not through pre-review.
 
 ### Door 2 — Watch (machine proposes, operator ratifies)
 
-Watch is a trust grant: daily new-repo tracking, admission bypass, hotset
-slots. Entry process:
+Watch is a discovery and prioritization grant: daily new-repo tracking,
+flag-gated admission, and hotset slots. Entry process:
 
 - signals write `proposed-creators.json` (gold-basket authorship, skills.sh
   boards, momentum, manual curation)
@@ -108,6 +129,16 @@ slots. Entry process:
 Weekly batched review is not a bottleneck: **nothing waits for it.** A hot
 skill from an unknown creator enters through Door 1 the same day on its own
 merits. Watch only accelerates the creator's *future* repos.
+
+Registry fields have separate meanings:
+
+- `roles: ["vendor"]` or `roles: ["creator"]` grants a trusted value signal
+  when a repository is otherwise discovered
+- `watch: true` enables the creator-watch lane only when
+  `CRAWL4_CREATOR_WATCH=1`
+- `featured: true` controls editorial endorsement and requires `watch: true`;
+  it does not independently admit catalog rows
+- aliases normalize old or alternate handles to one registry owner
 
 ### Door 3 — Featured (fully human)
 
@@ -123,16 +154,57 @@ No signal ever auto-features anyone.
 | skills.sh board movement (momentum) | refresh priority only | proposal evidence | never |
 | X validated mention + `50+` repo stars | admits through the X arm | corroborating evidence at most | never |
 | gold-basket / curation | admits through trusted/manual value arm | strong proposal evidence | operator's call |
-| watched creator | admission bypass | — | operator's call |
+| trusted vendor/creator role | admits a discovered clean repo | operator-managed | operator's call |
+| watched creator | flag-gated discovery and admission | operator-managed | operator's call |
+| featured creator | no independent admission effect | implies watch | operator only |
 | stars | normal admission at `500+`; X arm at `50+`; ranking evidence elsewhere | evidence | never |
 
 ### The X (Twitter) rule
 
-A tweet counts as a signal only when it passes existing X validation:
-minimum engagement (≥50 likes) AND it links to a real repo whose `SKILL.md`
-parses. It then becomes an `x-social` discovery candidate. The repo must also
-have at least `50` stars and pass the normal clean-mapping, catalog, suppression,
-and do-not-crawl checks. X never watches or features a creator.
+A tweet counts as a signal only when it passes existing X validation: English
+text, minimum engagement (at least 50 likes), and a link to a real repo whose
+`SKILL.md` parses. It then becomes an `x-social` discovery candidate. The repo
+must also have at least `50` stars and pass the normal clean-mapping, catalog,
+suppression, and do-not-crawl checks. X never watches or features a creator.
+
+## Shared Policy Inputs And Precedence
+
+`index/scraper/policy/` is the shared loader, validator, reason vocabulary, and
+digest implementation used by both crawler tracks and Editool. Authoritative
+inputs include:
+
+- `seeds/creators.json`
+- `seeds/official-repos.json` and `seeds/manual-include-repos.json`
+- `seeds/do-not-crawl.json` and `seeds/suppressed-skills.json`
+- `seeds/repo-overrides.json`, `seeds/catalog-repos.json`, and
+  `seeds/provenance-overrides.json`
+- `seeds/root-skill-invalid.json`, which affects only a v2 repository-root
+  `SKILL.md`; eligible nested skills remain allowed
+
+Scheduled data workflows run:
+
+```bash
+cd /Users/jonslimak/Projects/omgskills/index
+npm run policy:validate -- --profile scheduled-data
+```
+
+Malformed policy and ownership conflicts block scheduled data work. Stale
+editorial references remain advisory there so editorial drift cannot stop fresh
+catalog data; collection publishing and Editool use stricter profiles.
+
+Effective admission precedence is deny-first:
+
+1. do-not-crawl owner or repository
+2. explicit repository exclusion
+3. known-catalog or explicit non-original provenance
+4. skill-level suppression; bootstrap skips a suppressed candidate and tries
+   the next deterministic candidate
+5. manual, official, trusted, gold-basket, creator-watch, X, stars, or install
+   value signals
+
+Generated reports include stable reason codes, the source commit, and the
+effective-policy digest. Generated reports and crawler output are evidence, not
+authoring surfaces.
 
 ## Crawl 4 Policy Summary
 
@@ -160,7 +232,14 @@ Main behavior:
 
 ### Active and opt-in behavior
 
-The scheduled Crawl 4 workflow enables `CRAWL4_QUALITY_TIERS=1`.
+The scheduled Crawl 4 writer uses:
+
+- `CRAWL4_POLICY_PRECEDENCE=admission`
+- `CRAWL4_QUALITY_TIERS=1`
+
+Admission mode applies the shared deny-first rules to new repository admission.
+Repo-state and quality-tier policy differences are still reported rather than
+enforced. Report-only runs use `observe`; full `enforce` is not active.
 
 These implemented behaviors remain explicit opt-ins:
 
@@ -169,8 +248,10 @@ These implemented behaviors remain explicit opt-ins:
 - `CRAWL4_MOMENTUM_PRIORITY=1`: momentum hotset and promotion attention
 
 Local runs without these flags must not be assumed to exercise those paths.
+Roll out remaining flags one at a time through the replay, report-only, and
+scheduled-canary process in `aug.md`.
 
-## v2 Fallback Build
+## v2 Scraper And Legacy Root Track
 
 Entrypoint:
 
@@ -194,23 +275,34 @@ What it does:
 7. carries forward still-valid older skills
 8. atomically rewrites `skills.json`
 
+The nightly production workflow runs at `03:00 UTC`, enforces shared policy,
+and publishes the legacy root manifest. The combined Crawl 4 workflow may later
+replace `skills.json` through validated promotion before publishing the separate
+v2 fallback manifest. Both writers are serialized.
+
 Important behavior:
 
 - writes are atomic
 - checkpoints are written during large runs
 - SHA reuse avoids reparsing unchanged `SKILL.md` files
 - safety checks prevent catastrophic library shrinkage
-- scheduled runs set `V2_POLICY_MODE=observe`, preserving legacy output while
-  comparing it with the shared exclusion policy
+- scheduled production runs set `V2_POLICY_MODE=enforce`
+- manual report-only observation sets `V2_POLICY_MODE=observe` and uses
+  `--dry-run`, leaving the catalog and caches unchanged
 - each run writes `shadow/v2-policy-diff.shadow.json` and `.md` before publish;
   reports include the source commit, policy digest, migration coverage, reason
   counts, and bounded samples
 - each run also writes `shadow/v2-policy-input.shadow.json`, a content-addressed
   compact input snapshot that can reproduce the policy report without crawling
 - `root-skill-invalid.json` rejects only a repository-root `SKILL.md` under the
-  proposed policy; nested skill paths remain eligible
-- enforcement stays blocked until two consecutive scheduled reports are
-  reviewed and the mode change is approved separately
+  active policy; nested skill paths remain eligible
+- legacy exclusion constants remain only to build comparison and migration
+  evidence; they do not control enforced production output
+- production stops starting new enrichment after a 300-minute soft deadline,
+  carries forward the existing catalog for deferred candidates, and records
+  processed/deferred counts and estimated completion in the job summary
+- GitHub requests use a 30-second timeout so a hung request cannot consume the
+  full six-hour workflow limit
 
 ## Crawl 4 Build
 
@@ -227,15 +319,30 @@ npm run promote:cutover
 npm run test:shadow-guard
 ```
 
+The combined production workflow runs at `06:00 UTC` and `12:00 UTC` with a
+three-hour job limit. Manual report-only mode does not publish or deploy.
+
 High-level flow:
 
 1. build Crawl 4 discovery and repo index
-2. apply repo and skill overlays
-3. run admission and bootstrap
-4. run refresh policy for the current cadence
-5. apply suppression, catalog, provenance, and final quality-tier policy
-6. write shadow outputs
-7. validate cutover output
+2. canonicalize admission candidates through current GitHub repository identity
+3. apply repo and skill overlays
+4. run admission and bootstrap
+5. run refresh policy for the current cadence
+6. apply suppression, catalog, provenance, and final quality-tier policy
+7. record admission outcomes after refresh
+8. write and validate shadow/cutover output
+
+Repository canonicalization runs before admission so renamed aliases do not
+appear as new repositories. It checks at most 25 admission candidates per run,
+rewrites skill IDs and URLs to the canonical owner/repo, merges aliases into an
+existing canonical record when possible, and defers candidates on lookup error
+or cap exhaustion instead of admitting uncertain identity.
+
+If a newly admitted trusted-creator repository has no usable bootstrap path,
+Crawl 4 may inspect its repository tree and try up to 10 deterministic nested
+`SKILL.md` candidates. Every fallback candidate still passes suppression,
+catalog, provenance, and other admission policy.
 
 Important shadow artifacts:
 
@@ -252,6 +359,17 @@ Important shadow artifacts:
 Combined runs persist repo and non-baseline skill overlays. Quality tiers are
 never persisted in overlays; they are recomputed from current policy at final
 cutover.
+
+The precedence report distinguishes:
+
+- **eligible:** proposed policy accepted the repository
+- **applied:** admission created a library repository entry
+- **persisted:** final refresh retained at least one publishable skill
+- **dropped:** refresh left no publishable skill, so cleanup removed the empty
+  repository
+
+An eligible or applied candidate is not proof of a catalog addition; production
+proof requires a persisted result in the final repo index and cutover output.
 
 ### Policy observation and replay
 
@@ -309,6 +427,10 @@ accepts only direct skill paths:
 - `.claude/skills/**/SKILL.md`
 - `.agents/skills/**/SKILL.md`
 - `skills/**/SKILL.md`
+
+The trusted-creator nested bootstrap fallback described above is a narrow
+recovery path for a newly admitted trusted repository, not another broad
+discovery lane.
 
 The operator-only backfill mode can sample up to `250` repos and admit at most
 `50` new repos per run. It reuses normal admission, bootstrap, catalog, and
@@ -370,6 +492,12 @@ not grant trust, block admission, suppress skills, or modify published data.
 
 ## Publishing Data Tracks
 
+Legacy root data:
+
+```bash
+./scripts/publish-data.sh
+```
+
 Crawl 4 hosted data:
 
 ```bash
@@ -384,13 +512,25 @@ OMGSKILLS_DATA_SUBDIR=v2 ./scripts/publish-data.sh
 
 Workflow note:
 
-- `shadow-crawl-health` runs the shadow crawl, validates output, publishes v2,
-  publishes Crawl 4, appends SHA history, deploys the site, and verifies live
-  manifests. Unchanged SHA history reuses its existing hashed asset.
+- every writer validates the `scheduled-data` policy profile and captures a
+  committed last-known-good publication baseline before generation
+- `shadow-crawl-health` runs admission-mode Crawl 4, validates output, promotes
+  cutover, publishes v2 and Crawl 4, appends SHA history, checks publication
+  impact, commits generated data, builds one combined site artifact, deploys,
+  and verifies live manifests
 - `promote:cutover` writes validated Crawl 4 records into `index/skills.json` for
   v2 publication while stripping Crawl 4-only `quality_tier`.
+- unchanged SHA history reuses its existing hashed asset
+- publication impact blocks missing assets, stale manifests, or unexpected
+  shrink unless a reviewed manual dispatch supplies both the override flag and
+  a reason; scheduled jobs never add an override automatically
+- the production deploy helper fetches and checks current `origin/main`, records
+  the previous Netlify deploy, verifies the combined live surface, and restores
+  the prior deploy only if structural verification fails while its candidate is
+  still live
 - blocking crawl, cutover, publish, deploy, and live-manifest checks must pass;
-  rerun-stability remains advisory and has a bounded timeout.
+  rerun stability and stale editorial references remain advisory where fresh
+  catalog publication must continue
 
 This section is intentionally high-level. Use [`deploy.md`](/Users/jonslimak/Projects/omgskills/deploy.md) for Mac release and site deployment details.
 
@@ -443,7 +583,9 @@ Manual curation can bypass normal discovery/value rules, but it cannot bypass:
 
 - valid `SKILL.md` parsing
 - clean GitHub fetch
-- unresolved catalog/repackaged exclusion
+- do-not-crawl or explicit repository exclusion
+- skill-level suppression
+- known-catalog or non-original provenance exclusion
 - cutover validation
 
 Manual curation should not hand-edit production `skills.json`.
@@ -475,12 +617,22 @@ Use these principles for future crawler changes:
 
 ## Transition Strategy
 
-General pattern for crawler changes:
+Current rollout state:
+
+- scheduled v2 enforces shared policy
+- scheduled Crawl 4 enforces admission precedence only
+- repo-state and quality-tier precedence changes remain observation-only
+- creator-watch, momentum, and install-admission flags remain disabled
+- one persisted new-repository admission is still required as the final P1
+  production proof
+
+Track remaining rollout decisions in `aug.md`. For future crawler changes:
 
 1. run the new crawler alongside the current fallback track
 2. point test/client builds at the new track with fallback
 3. monitor quality, freshness, runtime, and workflow health
-4. keep fallback crawling and publishing during the transition
+4. keep compatibility writers and fallback publication healthy during the
+   transition
 5. retire fallback only after sustained confidence and explicit approval
 
 Rollback should be simple:
@@ -494,14 +646,16 @@ Rollback should be simple:
 ```bash
 cd /Users/jonslimak/Projects/omgskills/index
 
-# v2 fallback
+# v2 scraper / legacy root
 npm run scrape
 npm run scrape:trending
 npm run scrape:x
 npm run scrape:with-x
+V2_POLICY_MODE=observe npm run scrape -- --dry-run
 
 # Crawl 4
 npm run scrape:shadow
+CRAWL4_POLICY_PRECEDENCE=admission CRAWL4_QUALITY_TIERS=1 npm run scrape:shadow
 npm run promote:cutover
 npm run test:shadow-guard
 
@@ -522,7 +676,11 @@ npm run crawl4:remove-repo -- owner/repo
 # Read-only audits
 npm run crawl4:removal-audit
 npm run crawl4:audit-canonical-commits
+npm run crawl4:validate-canonical-policy
 npm run crawl4:audit-security -- --limit=100 --offset=0
+
+# Shared policy
+npm run policy:validate -- --profile scheduled-data
 
 # Offline policy evidence
 npm run policy:replay -- --snapshot <snapshot.json> --output-dir shadow/replay
@@ -535,6 +693,7 @@ From the repo root:
 ```bash
 node scripts/publish-crawl4-data.mjs
 OMGSKILLS_DATA_SUBDIR=v2 ./scripts/publish-data.sh
+./scripts/publish-data.sh
 ```
 
 ## Practical Summary
@@ -543,9 +702,14 @@ The current system is:
 
 - Crawl 4 is the primary intended library track
 - v2 remains the fallback track during transition
-- both tracks stay client-compatible but are not byte-for-byte identical
-- v2 stays fresh through its existing pipeline and validated Crawl 4 promotion
-- Crawl 4 crawler owns the new library policy
+- the legacy root track remains for compatibility with older consumers
+- Crawl 4 and v2 stay client-compatible but are not byte-for-byte identical
+- the nightly v2 scraper publishes legacy root data; validated Crawl 4
+  promotion publishes the v2 fallback
+- Crawl 4 owns primary discovery/admission while both crawler paths consume
+  shared exclusion and creator policy
+- scheduled v2 enforces shared exclusions; scheduled Crawl 4 applies shared
+  precedence to admission only
 - manual curation enters through Crawl 4 and reaches v2 through validated promotion
 - quality tiers exist only on the Crawl 4 hosted track
 - creator/install/momentum behavior remains opt-in unless explicitly enabled

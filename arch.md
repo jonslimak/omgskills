@@ -1,7 +1,8 @@
 # omgskills System Architecture
 
-Validated 2026-07-17 against `origin/main`. Public Mac release state remains
-separately gated by `finish.md` and `deploy.md`.
+Validated 2026-08-03 against `origin/main` after P1.1-P1.10 implementation,
+v2 shared-policy enforcement, and the Crawl 4 admission-only rollout. Public
+Mac release state remains separately gated by `aug.md` and `deploy.md`.
 
 This document describes the durable system built across catalog admission,
 identity resolution, editorial discovery, Editool, the macOS client, the web
@@ -10,7 +11,7 @@ systems.
 
 It is not a task tracker or deployment runbook:
 
-- active cross-system work belongs in `finish.md`
+- active cross-system work belongs in `aug.md`
 - crawler internals and operator detail belong in `crawl.md`
 - production and Mac release safety belongs in `deploy.md`
 - security and trust policy belongs in `trust.md`
@@ -77,6 +78,8 @@ These rules are compatibility boundaries:
 - Claude and Codex variants remain separate installable records.
 - Optional manifest assets must not become required for core catalog loading.
 - File-based editorial tools never commit, publish, or deploy automatically.
+- Every production data writer snapshots the last-known-good publication and
+  passes the shared publication-impact gate before commit or deploy.
 - Public editorial creators and portal users occupy different namespaces.
 - User-facing groups preserve dead-reference snapshots instead of breaking.
 - Catalog `quality_tier` and web `indexTier` are separate. Useful content, not
@@ -115,8 +118,8 @@ These rules are compatibility boundaries:
 
 ### Policy inventory
 
-Validated 2026-07-22 against `origin/main` plus the completed P1.2 creator-trust
-consolidation.
+Validated 2026-08-03 against `origin/main` after the completed P1 policy-source
+consolidation and initial enforcement rollout.
 
 Policy-affecting files have four classifications:
 
@@ -124,8 +127,8 @@ Policy-affecting files have four classifications:
   approved path.
 - **Generated evidence:** deterministic or fetched signals produced by jobs.
   It is not edited by hand and has only explicitly bounded authority.
-- **Transitional policy:** active code or data that must still be migrated to a
-  shared authority during P1.
+- **Transitional policy:** temporary compatibility code or data awaiting a
+  shared authority. The completed P1 inventory has no remaining active entry.
 - **Derived state or output:** crawler state, promoted data, assets, and pages
   rebuilt through commands and workflows rather than curated directly.
 
@@ -140,7 +143,7 @@ logical matching.
 | `index/seeds/creators.json` | Editorial/catalog operator through Editool or reviewed file edit | Shared creator-registry loader, Crawl 4 seeds and provenance, content overlays, gold basket, leaderboards, collections publisher, and handle reservations. Roles affect trust; `watch` affects flag-gated discovery; `featured` affects profiles and curated tiers. | discovery, catalog, identity, editorial |
 | `index/curations/collections.json` | Editorial operator through Editool or reviewed file edit | Collections publisher and isolated Editool preview; feeds Mac and web presentation but never admits catalog rows. | editorial |
 | `index/seeds/do-not-crawl.json` | Catalog operator through Editool, reviewed edit, or `crawl4:remove-repo` | Crawl 4 admission, final filtering, removal audit, and removal command. | catalog |
-| `index/seeds/root-skill-invalid.json` | Catalog operator through reviewed file edit; read-only in Editool until P1.6 | v2 root-path discovery only. It never blocks eligible nested skills by itself. | discovery |
+| `index/seeds/root-skill-invalid.json` | Catalog operator through reviewed file edit; visible but read-only in Editool | v2 root-path discovery only. It never blocks eligible nested skills by itself. | discovery |
 | `index/seeds/suppressed-skills.json` | Catalog operator through Editool or reviewed file edit | Crawl 4 and v2 filtering, duplicate audit, and removal audit. Historical entries remain durable after a row leaves the catalog. | catalog |
 | `index/seeds/manual-include-repos.json` | Catalog operator through reviewed file edit | Crawl 4 admission; intended to bypass value thresholds only. | catalog |
 | `index/seeds/official-repos.json` | Catalog operator through reviewed file edit | Crawl 4 admission, priority, and quality tiers. | discovery, catalog |
@@ -182,12 +185,17 @@ Suppression reference checks use the union of promoted, cutover, and overlay
 skills. Existing suppressions remain valid after their catalog rows disappear;
 Editool requires newly proposed suppressions to resolve in that union.
 
-#### Transitional active policy
+#### Retired P1 compatibility policy
 
-| Input | Current behavior | Required P1 disposition |
-|---|---|---|
-| Legacy v2 block constants in `index/scraper/v2-policy.ts` | Remain effective while scheduled v2 runs in `observe`; migration audit confirms every entry is represented in shared policy. | Review two consecutive scheduled reports, then switch mode and remove the compatibility constants. |
-| `index/seeds/root-skill-invalid.json` plus its legacy v2 comparison set | Proposed policy rejects only root `SKILL.md`; legacy comparison still rejects the whole repository. | Keep the JSON source as path-discovery policy and remove only the comparison set after enforcement. |
+Scheduled v2 now applies shared policy unconditionally. The legacy v2 block and
+root-invalid constants remain only as fixed comparison inputs for migration
+coverage and policy-diff reports; they no longer control production output.
+`V2_POLICY_MODE=observe` remains only for the manual, non-publishing report
+path; it is not a second policy authority.
+
+`index/seeds/root-skill-invalid.json` remains the authoritative root-path
+discovery policy. It rejects only a repository-root `SKILL.md`; eligible nested
+skills remain discoverable.
 
 #### Generated evidence
 
@@ -220,27 +228,29 @@ Editool requires newly proposed suppressions to resolve in that union.
 |---|---|
 | Creator roles, aliases, watch, or featured state | Validate through the shared registry; regenerate handle reservations for handle/alias changes; publish collections for featured changes; regenerate web pages. Watch changes do not enable its dormant crawl flag. |
 | Collection copy or membership | Validate catalog references; publish identical collections data to v2 and Crawl 4; regenerate and verify web pages. |
-| Do-not-crawl, suppression, manual include, official/catalog, provenance, or repo policy | Validate and review the Crawl 4 shadow comparison before guarded promotion. v2 shared-policy parity is implemented but remains in scheduled observation. |
+| Do-not-crawl, suppression, manual include, official/catalog, provenance, or repo policy | Validate shared policy, review Crawl 4 observation and admission outcomes, then use guarded promotion. Scheduled v2 enforces shared policy; scheduled Crawl 4 enforces admission precedence while repo-state and quality-tier differences remain observation-only. |
 | Skill-equivalence overrides | Regenerate and review equivalence output, then use its separately guarded publisher. |
 | Generated evidence | Regenerate through its owning job and review impact where it can affect admission. |
 
-Conflict precedence is implemented in Crawl 4 but remains in scheduled
-observation before enforcement:
+Conflict precedence is active with deliberately bounded enforcement:
 
-- do-not-crawl wins in Crawl 4 admission and final filtering; v2 compares the
-  complete shared owner/repo policy while legacy behavior remains effective in
-  `V2_POLICY_MODE=observe`
+- do-not-crawl wins in Crawl 4 admission and final filtering; scheduled v2
+  enforces the complete shared owner/repo policy with no legacy compatibility
+  source
 - skill suppression remains skill-scoped; bootstrap selection skips a
   suppressed candidate and tries the next deterministic candidate
 - proposed Crawl 4 precedence places repository exclusions and catalog or
   explicit non-original provenance ahead of manual, official, trust, gold,
   creator-watch, X, star, and install signals
-- `CRAWL4_POLICY_PRECEDENCE=observe` preserves current output while producing
-  `policy-precedence.shadow.json` and `.md`; `admission` enforces admission only
-  and `enforce` also applies repo-state and quality-tier changes
+- scheduled Crawl 4 uses `CRAWL4_POLICY_PRECEDENCE=admission`; report-only uses
+  `observe`; full `enforce` would additionally apply repo-state and quality-tier
+  changes and is not active
 - v2 writes `v2-policy-diff.shadow.json` and `.md` with migration coverage,
   source commit, policy digest, reason counts, and bounded samples before its
   publish step
+- Crawl 4 reports eligible, applied, persisted, and dropped admission outcomes
+  so policy eligibility is distinguishable from final post-refresh catalog
+  state
 - both tracks write content-addressed policy-input snapshots; replay calls the
   same evaluators without crawling, publishing, deployment, or network access
 - evidence comparison supports policy-diff (same snapshot, changed digest) and
@@ -248,10 +258,14 @@ observation before enforcement:
 - snapshots older than 72 hours remain useful for regression tests but cannot
   satisfy readiness, and one scheduled canary remains required after manual
   evidence passes
+- `.github/workflows/policy-observation.yml` runs either track read-only. It
+  checks for an active production writer once at dispatch, never acquires the
+  writer lock, and cannot commit, publish, or deploy
 - creator/editorial overlaps with exclusion policy are now reported by the
   shared validator using the same policy reason vocabulary
-- Editool writes related removal files as separate atomic operations; pair-level
-  recovery remains P1.6
+- Editool validates the complete proposed policy before writing and applies
+  related files through a locked, revision-checked transaction with a journal,
+  rollback, and startup recovery
 
 Generated reports and production assets are not authoring surfaces. Do not
 hand-edit `skills.json`, shadow state, hashed assets, manifests, generated
@@ -575,6 +589,30 @@ Rules for optional assets:
 - publishers patch and preserve foreign manifest fields
 - current and prior hashed files should be retained where rollback requires it
 
+### Publication impact gate
+
+Every production data writer captures the committed last-known-good manifest
+and referenced assets before generation. After generation and before commit or
+deploy, `index/scripts/publication-impact.ts` compares that baseline with the
+proposed publication and emits JSON and Markdown evidence. Workflows upload the
+evidence even when the gate fails.
+
+The gate blocks:
+
+- missing or older manifest timestamps; an equal timestamp passes only when
+  manifest content is unchanged
+- disappearance of a previously published asset unless the asset's explicit
+  collection or equivalence kill switch authorizes removal
+- skill removals at the tighter threshold of 500 rows or 2 percent
+- any collection-ID removal or removal of at least 20 percent of collection
+  memberships
+- malformed snapshots, invalid overrides, and incomplete asset descriptors
+
+An override is valid only when `PUBLICATION_IMPACT_OVERRIDE=1` and a non-empty
+`PUBLICATION_IMPACT_OVERRIDE_REASON` are both supplied by a reviewed manual
+dispatch. Scheduled jobs never set the override automatically. Large planned
+cleanup batches use this same reviewed path rather than weakening thresholds.
+
 When adding a new optional asset, implement all of:
 
 1. producer and schema validation
@@ -728,8 +766,11 @@ Editool writes only:
 - `index/seeds/do-not-crawl.json`
 - `site/images/collections/*.webp`
 
-Writes are atomic and validated. Editool never writes catalog output, shadow
-output, manifests, generated pages, or database state.
+Before writing, Editool validates the complete proposed policy rather than each
+file in isolation. Related writes use one locked, revision-checked transaction
+with staged files, original-file backups, a journal, rollback on failure, and
+startup recovery after interruption. Editool never writes catalog output,
+shadow output, manifests, generated pages, or database state.
 
 Validation includes:
 
@@ -976,6 +1017,20 @@ cd index
 npm run typecheck
 npm run test:shadow-guard
 ```
+
+Policy observation and publication safety:
+
+```bash
+cd index
+npm run test:policy
+cd ..
+npm run test:deploy-safety
+```
+
+Use `npm run policy:replay` and `npm run policy:evidence` with saved observation
+artifacts for deterministic policy-diff or drift review. For production-shaped
+read-only evidence, dispatch `.github/workflows/policy-observation.yml`; a later
+scheduled canary is still required before expanding enforcement.
 
 Editorial and Editool:
 
