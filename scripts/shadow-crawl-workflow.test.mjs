@@ -79,11 +79,14 @@ test("creator coverage maintenance is bounded, weekly, manual, and stays inside 
 
   assert.ok(writerJob, "shadow-crawl-health job missing");
   assert.match(workflow, /creator_coverage:\n[\s\S]*?default: false\n[\s\S]*?type: boolean/);
+  assert.match(workflow, /creator_handles:\n[\s\S]*?required: false\n[\s\S]*?type: string/);
   assert.match(writerJob, /EVENT_SCHEDULE: \$\{\{ github\.event\.schedule \|\| '' \}\}/);
   assert.match(writerJob, /\[ "\$EVENT_SCHEDULE" = "0 6 \* \* \*" \].*\[ "\$\(date -u \+%u\)" = "7" \]/);
   assert.match(writerJob, /MANUAL_CREATOR_COVERAGE: \$\{\{ inputs\.creator_coverage == true && '1' \|\| '0' \}\}/);
   assert.match(writerJob, /npm run scrape:shadow -- --cadence=fast/);
-  assert.match(writerJob, /npm run crawl4:creator-backfill -- --maintain --limit=125/);
+  assert.match(writerJob, /args=\(--maintain --limit=125\)/);
+  assert.match(writerJob, /args\+=\("--creators=\$CREATOR_HANDLES"\)/);
+  assert.match(writerJob, /npm run crawl4:creator-backfill -- "\$\{args\[@\]\}"/);
   assert.match(writerJob, /name: Run creator coverage maintenance[\s\S]*?name: Run shadow guard tests/);
   assert.match(writerJob, /name: Upload creator coverage maintenance report/);
 });

@@ -90,9 +90,13 @@ test("CLI keeps plan, bounded apply, and maintenance modes separate", () => {
     creatorFilters: [],
     limit: 150,
   });
+  assert.deepEqual(parseCreatorBackfillArguments(["--maintain", "--creators=PeterGYang", "--limit=25"]), {
+    mode: "maintain",
+    creatorFilters: ["petergyang"],
+    limit: 25,
+  });
   assert.throws(() => parseCreatorBackfillArguments(["--plan", "--limit=2"]), /only with --apply/);
-  assert.throws(() => parseCreatorBackfillArguments(["--apply", "--creators=a"]), /only with --plan/);
-  assert.throws(() => parseCreatorBackfillArguments(["--maintain", "--creators=a"]), /only with --plan/);
+  assert.throws(() => parseCreatorBackfillArguments(["--apply", "--creators=a"]), /only with --plan or --maintain/);
   assert.throws(() => parseCreatorBackfillArguments(["--plan", "--apply"]), /Usage/);
 });
 
