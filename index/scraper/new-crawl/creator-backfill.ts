@@ -98,7 +98,7 @@ export function parseCreatorBackfillArguments(args: string[]): {
   const maintain = args.includes("--maintain");
   if ([plan, apply, maintain].filter(Boolean).length !== 1) {
     throw new Error(
-      "Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner], --apply [--limit=125], or --maintain [--limit=125]",
+      "Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner], --apply [--limit=125], or --maintain [--creators=owner,owner] [--limit=125]",
     );
   }
   const supported = (arg: string) => arg === "--plan" || arg === "--apply" || arg === "--maintain"
@@ -108,8 +108,8 @@ export function parseCreatorBackfillArguments(args: string[]): {
   if (plan && args.some((arg) => arg.startsWith("--limit="))) {
     throw new Error("--limit is supported only with --apply or --maintain.");
   }
-  if (!plan && args.some((arg) => arg.startsWith("--creators="))) {
-    throw new Error("--creators is supported only with --plan; apply and maintain use all reviewed coverage entries.");
+  if (apply && args.some((arg) => arg.startsWith("--creators="))) {
+    throw new Error("--creators is supported only with --plan or --maintain; apply uses the existing plan.");
   }
   const creatorFilters = args
     .filter((arg) => arg.startsWith("--creators="))
@@ -518,7 +518,7 @@ async function runApply(
   return progress;
 }
 
-async function runMaintain(limit: number): Promise<void> {
+async function runMaintain(limit: number, creatorFilters: string[] = []): Promise<void> {
   const registry = loadCreatorRegistry();
   const registrySummary = summarizeCreatorCoverageRegistry(registry.entries);
   console.log("creator coverage maintenance:");
@@ -530,7 +530,7 @@ async function runMaintain(limit: number): Promise<void> {
 
   const result = await executeCreatorCoverageMaintenance({
     getQuotaRemaining: async () => (await getGitHubCoreQuota()).remaining,
-    plan: (remaining) => runPlan([], remaining),
+    plan: (remaining) => runPlan(creatorFilters, remaining),
     apply: (remaining) => runApply(limit, remaining),
   });
 
@@ -547,7 +547,7 @@ async function main(): Promise<void> {
   const args = parseCreatorBackfillArguments(process.argv.slice(2));
   if (args.mode === "plan") await runPlan(args.creatorFilters);
   else if (args.mode === "apply") await runApply(args.limit);
-  else await runMaintain(args.limit);
+  else await runMaintain(args.limit, args.creatorFilters);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

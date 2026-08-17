@@ -16,6 +16,10 @@ on:
         required: true
         default: false
         type: boolean
+      creator_handles:
+        description: Optional comma-separated handles for targeted creator coverage
+        required: false
+        type: string
       publication_impact_override:
         description: Allow a reviewed publication impact that exceeds a threshold
         required: true
@@ -192,9 +196,14 @@ jobs:
         working-directory: index
         env:
           GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+          CREATOR_HANDLES: ${{ inputs.creator_handles || '' }}
         run: |
           set -o pipefail
-          npm run crawl4:creator-backfill -- --maintain --limit=125 | tee "$RUNNER_TEMP/creator-coverage.log"
+          args=(--maintain --limit=125)
+          if [ -n "$CREATOR_HANDLES" ]; then
+            args+=("--creators=$CREATOR_HANDLES")
+          fi
+          npm run crawl4:creator-backfill -- "${args[@]}" | tee "$RUNNER_TEMP/creator-coverage.log"
           {
             echo "## Creator coverage maintenance"
             echo
