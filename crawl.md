@@ -206,6 +206,18 @@ Generated reports include stable reason codes, the source commit, and the
 effective-policy digest. Generated reports and crawler output are evidence, not
 authoring surfaces.
 
+The Crawl 4 policy report separates two kinds of admission evidence:
+
+- `admission*` counters describe differences between legacy and shared-policy
+  decisions
+- `newRepo*` counters describe every genuinely new discovered repository,
+  including candidates, eligible repos, applied admissions, repos that persist
+  with publishable skills, dropped repos, and eligible repos deferred by a cap
+
+The bounded new-repository sample includes discovery sources, the effective
+admission reason, final outcome, and publishable skill count. This makes normal
+discovery visible without changing admission behavior or safety thresholds.
+
 ## Crawl 4 Policy Summary
 
 Crawl 4 is intentionally selective.
@@ -623,8 +635,8 @@ Current rollout state:
 - scheduled Crawl 4 enforces admission precedence only
 - repo-state and quality-tier precedence changes remain observation-only
 - creator-watch, momentum, and install-admission flags remain disabled
-- one persisted new-repository admission is still required as the final P1
-  production proof
+- one `persistedNewRepoCount > 0` production run is still required as the final
+  P1 proof; policy-difference additions are not required
 
 Track remaining rollout decisions in `aug.md`. For future crawler changes:
 

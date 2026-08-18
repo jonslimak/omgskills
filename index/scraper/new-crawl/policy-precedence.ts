@@ -15,6 +15,13 @@ export type AdmissionPolicyObservation = {
   skippedSuppressedCandidateIds: string[];
 };
 
+export type NewRepoAdmissionObservation = {
+  repo: string;
+  sources: string[];
+  eligible: boolean;
+  reasonCode: PolicyReasonCode;
+};
+
 export type RepoStatePolicyObservation = {
   repo: string;
   currentState: RepoState;
@@ -40,6 +47,14 @@ export type DroppedAdmissionSample = {
   reason: "no-publishable-skills-after-refresh";
 };
 
+export type NewRepoAdmissionSample = {
+  repo: string;
+  sources: string[];
+  reasonCode: PolicyReasonCode;
+  outcome: "eligible-not-applied" | "persisted" | "dropped";
+  skillCount: number;
+};
+
 export type PolicyPrecedenceReport = {
   generatedAt: string;
   sourceCommit: string;
@@ -55,6 +70,12 @@ export type PolicyPrecedenceReport = {
   appliedAdmissionAdditionCount: number;
   persistedAdmissionAdditionCount: number;
   droppedAdmissionAdditionCount: number;
+  newRepoCandidateCount: number;
+  eligibleNewRepoCount: number;
+  appliedNewRepoCount: number;
+  persistedNewRepoCount: number;
+  droppedNewRepoCount: number;
+  eligibleNotAppliedCount: number;
   skippedSuppressedCandidateCount: number;
   repoStateChangeCount: number;
   qualityTierChangeCount: number;
@@ -62,6 +83,7 @@ export type PolicyPrecedenceReport = {
   admissionSample: AdmissionPolicyObservation[];
   persistedAdmissionSample: PersistedAdmissionSample[];
   droppedAdmissionSample: DroppedAdmissionSample[];
+  newRepoAdmissionSample: NewRepoAdmissionSample[];
   repoStateSample: RepoStatePolicyObservation[];
   qualityTierSample: QualityTierPolicyObservation[];
 };
@@ -117,6 +139,19 @@ export function admissionObservation(
   };
 }
 
+export function newRepoAdmissionObservation(
+  repo: string,
+  sources: Iterable<string>,
+  evaluation: AdmissionEvaluation,
+): NewRepoAdmissionObservation {
+  return {
+    repo,
+    sources: [...new Set(sources)].sort(),
+    eligible: evaluation.effective.eligible,
+    reasonCode: evaluation.effective.reasonCode,
+  };
+}
+
 function increment(counts: Partial<Record<PolicyReasonCode, number>>, reason: PolicyReasonCode): void {
   counts[reason] = (counts[reason] ?? 0) + 1;
 }
@@ -169,12 +204,81 @@ export function buildAdmissionOutcomeSummary(input: {
   };
 }
 
+export function buildNewRepoAdmissionSummary(input: {
+  admissions: NewRepoAdmissionObservation[];
+  appliedAdmissionRepos: ReadonlySet<string>;
+  finalRepoIndex: ShadowRepoIndex;
+}): {
+  candidateCount: number;
+  eligibleCount: number;
+  appliedCount: number;
+  persistedCount: number;
+  droppedCount: number;
+  eligibleNotAppliedCount: number;
+  sample: NewRepoAdmissionSample[];
+} {
+  const admissionByRepo = new Map(
+    input.admissions.map((row) => [normalizePolicyRepo(row.repo), row]),
+  );
+  const eligibleRepos = new Set(
+    input.admissions
+      .filter((row) => row.eligible)
+      .map((row) => normalizePolicyRepo(row.repo)),
+  );
+  const appliedRepos = new Set(
+    [...input.appliedAdmissionRepos]
+      .map(normalizePolicyRepo)
+      .filter((repo) => eligibleRepos.has(repo)),
+  );
+  const finalRepoByName = new Map(
+    input.finalRepoIndex.repos.map((entry) => [normalizePolicyRepo(entry.repo), entry]),
+  );
+  const sample: NewRepoAdmissionSample[] = [];
+  let persistedCount = 0;
+  let droppedCount = 0;
+
+  for (const repo of [...eligibleRepos].sort()) {
+    const observation = admissionByRepo.get(repo);
+    if (!observation) continue;
+    const entry = finalRepoByName.get(repo);
+    const applied = appliedRepos.has(repo);
+    const persisted = applied && Boolean(entry?.skillIds.length);
+    const outcome = !applied
+      ? "eligible-not-applied"
+      : persisted
+        ? "persisted"
+        : "dropped";
+    if (outcome === "persisted") persistedCount += 1;
+    if (outcome === "dropped") droppedCount += 1;
+    if (sample.length < SAMPLE_LIMIT) {
+      sample.push({
+        repo,
+        sources: observation.sources,
+        reasonCode: observation.reasonCode,
+        outcome,
+        skillCount: persisted ? entry?.skillIds.length ?? 0 : 0,
+      });
+    }
+  }
+
+  return {
+    candidateCount: input.admissions.length,
+    eligibleCount: eligibleRepos.size,
+    appliedCount: appliedRepos.size,
+    persistedCount,
+    droppedCount,
+    eligibleNotAppliedCount: eligibleRepos.size - appliedRepos.size,
+    sample,
+  };
+}
+
 export function buildPolicyPrecedenceReport(input: {
   generatedAt: string;
   sourceCommit: string;
   policyDigest: string;
   mode: PolicyPrecedenceMode;
   admissions: AdmissionPolicyObservation[];
+  newRepoAdmissions: NewRepoAdmissionObservation[];
   appliedAdmissionRepos: ReadonlySet<string>;
   finalRepoIndex: ShadowRepoIndex;
   repoStates: RepoStatePolicyObservation[];
@@ -187,6 +291,11 @@ export function buildPolicyPrecedenceReport(input: {
   const repoStates = [...input.repoStates].sort((a, b) => a.repo.localeCompare(b.repo));
   const qualityTiers = [...input.qualityTiers].sort((a, b) => a.skillId.localeCompare(b.skillId));
   const admissionOutcomes = buildAdmissionOutcomeSummary(input);
+  const newRepoOutcomes = buildNewRepoAdmissionSummary({
+    admissions: input.newRepoAdmissions,
+    appliedAdmissionRepos: input.appliedAdmissionRepos,
+    finalRepoIndex: input.finalRepoIndex,
+  });
   const countsByReason: Partial<Record<PolicyReasonCode, number>> = {};
   for (const row of admissions) {
     increment(countsByReason, row.proposedReasonCode);
@@ -211,6 +320,12 @@ export function buildPolicyPrecedenceReport(input: {
     appliedAdmissionAdditionCount: admissionOutcomes.appliedCount,
     persistedAdmissionAdditionCount: admissionOutcomes.persistedCount,
     droppedAdmissionAdditionCount: admissionOutcomes.droppedCount,
+    newRepoCandidateCount: newRepoOutcomes.candidateCount,
+    eligibleNewRepoCount: newRepoOutcomes.eligibleCount,
+    appliedNewRepoCount: newRepoOutcomes.appliedCount,
+    persistedNewRepoCount: newRepoOutcomes.persistedCount,
+    droppedNewRepoCount: newRepoOutcomes.droppedCount,
+    eligibleNotAppliedCount: newRepoOutcomes.eligibleNotAppliedCount,
     skippedSuppressedCandidateCount: admissions.reduce(
       (total, row) => total + row.skippedSuppressedCandidateIds.length,
       0,
@@ -221,6 +336,7 @@ export function buildPolicyPrecedenceReport(input: {
     admissionSample: admissions.slice(0, SAMPLE_LIMIT),
     persistedAdmissionSample: admissionOutcomes.persistedSample,
     droppedAdmissionSample: admissionOutcomes.droppedSample,
+    newRepoAdmissionSample: newRepoOutcomes.sample,
     repoStateSample: repoStates.slice(0, SAMPLE_LIMIT),
     qualityTierSample: qualityTiers.slice(0, SAMPLE_LIMIT),
   };
@@ -244,6 +360,12 @@ export function renderPolicyPrecedenceReport(report: PolicyPrecedenceReport): st
     `- Applied admission additions: ${report.appliedAdmissionAdditionCount}`,
     `- Persisted admission additions: ${report.persistedAdmissionAdditionCount}`,
     `- Dropped admission additions after refresh: ${report.droppedAdmissionAdditionCount}`,
+    `- New repo candidates: ${report.newRepoCandidateCount}`,
+    `- Eligible new repos: ${report.eligibleNewRepoCount}`,
+    `- Applied new repos: ${report.appliedNewRepoCount}`,
+    `- Persisted new repos: ${report.persistedNewRepoCount}`,
+    `- Dropped new repos after refresh: ${report.droppedNewRepoCount}`,
+    `- Eligible new repos not applied: ${report.eligibleNotAppliedCount}`,
     `- Suppressed bootstrap candidates skipped: ${report.skippedSuppressedCandidateCount}`,
     `- Repo-state changes: ${report.repoStateChangeCount}`,
     `- Quality-tier changes: ${report.qualityTierChangeCount}`,
@@ -262,6 +384,14 @@ export function renderPolicyPrecedenceReport(report: PolicyPrecedenceReport): st
     "## Dropped admission sample",
     ...(report.droppedAdmissionSample.length
       ? report.droppedAdmissionSample.map((row) => `- ${row.repo}: ${row.reason}`)
+      : ["- none"]),
+    "",
+    "## New repo admission sample",
+    ...(report.newRepoAdmissionSample.length
+      ? report.newRepoAdmissionSample.map((row) =>
+          `- ${row.repo}: ${row.outcome}, ${row.skillCount} publishable skills ` +
+          `(${row.reasonCode}; sources: ${row.sources.join(", ") || "none"})`
+        )
       : ["- none"]),
     "",
     "## Repo-state sample",

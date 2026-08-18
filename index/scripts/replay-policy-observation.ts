@@ -22,7 +22,9 @@ import {
   admissionObservation,
   applyRepoStatePrecedence,
   buildPolicyPrecedenceReport,
+  newRepoAdmissionObservation,
   renderPolicyPrecedenceReport,
+  type NewRepoAdmissionObservation,
   type QualityTierPolicyObservation,
 } from "../scraper/new-crawl/policy-precedence.js";
 import { classifySkillQualityTier } from "../scraper/new-crawl/quality-tier.js";
@@ -117,6 +119,7 @@ function replayCrawl4(
   policyDigest: string,
 ) {
   const goldBasketRepos = new Set(snapshot.payload.goldBasketRepos);
+  const newRepoAdmissions: NewRepoAdmissionObservation[] = [];
   const admissions = snapshot.payload.admissionCandidates.flatMap((fact) => {
     const discovered = admissionFact(fact);
     const evaluation = evaluateDiscoveredRepoAdmission(
@@ -128,6 +131,7 @@ function replayCrawl4(
         policyPrecedenceMode: "observe",
       },
     );
+    newRepoAdmissions.push(newRepoAdmissionObservation(discovered.repo, discovered.sources, evaluation));
     const observation = admissionObservation(discovered.repo, evaluation);
     return observation ? [observation] : [];
   });
@@ -169,6 +173,7 @@ function replayCrawl4(
     policyDigest,
     mode: "observe",
     admissions,
+    newRepoAdmissions,
     appliedAdmissionRepos: new Set(),
     finalRepoIndex: repoIndex,
     repoStates,

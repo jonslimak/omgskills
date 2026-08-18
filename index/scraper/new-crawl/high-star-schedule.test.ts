@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { admitDiscoveredRepos, HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY, HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, parseForceWebLibrarySnippets, parseHighStarQueryBatch, parseOnlyHighStarBackfill } from "./build-shadow.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery, shouldRunWeeklyWebLibrarySnippetRefresh } from "./high-star-schedule.js";
+import type { NewRepoAdmissionObservation } from "./policy-precedence.js";
 import type { ShadowRepoIndex, TrustedSeeds } from "./types.js";
 
 test("high-star SKILL.md discovery runs on Sunday UTC by default", () => {
@@ -100,6 +101,7 @@ test("admission cap prioritizes highest-star new repos", () => {
     ]),
   );
 
+  const observations: NewRepoAdmissionObservation[] = [];
   const admitted = admitDiscoveredRepos(
     "combined",
     "2026-06-23T00:00:00.000Z",
@@ -107,11 +109,14 @@ test("admission cap prioritizes highest-star new repos", () => {
     discovered,
     new Set(),
     seeds,
-    { maxNewAdmissions: 2 },
+    { maxNewAdmissions: 2, newRepoObservations: observations },
   );
 
   assert.deepEqual([...admitted].sort(), ["owner/a", "owner/b"]);
   assert.deepEqual(repoIndex.repos.map((repo) => repo.repo), ["owner/a", "owner/b"]);
+  assert.equal(observations.length, 3);
+  assert.deepEqual(observations.map((row) => row.repo), ["owner/a", "owner/b", "owner/c"]);
+  assert.ok(observations.every((row) => row.eligible));
 });
 
 test("creator-watch admission remains combined-only", () => {

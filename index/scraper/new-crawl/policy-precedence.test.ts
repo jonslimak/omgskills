@@ -80,6 +80,7 @@ test("report groups changes by shared reason and bounds samples", () => {
       matchedSource: "catalogRepos",
       skippedSuppressedCandidateIds: ["catalog/repo:suppressed"],
     }],
+    newRepoAdmissions: [],
     appliedAdmissionRepos: new Set(),
     finalRepoIndex: { generatedAt: "now", repoCount: 0, repos: [] },
     repoStates: [{ repo: "catalog/repo", currentState: "core", proposedState: "library", reasonCode: "catalog-repo" }],
@@ -115,6 +116,26 @@ test("report distinguishes eligible applied persisted and dropped admissions", (
     policyDigest: "sha256:test",
     mode: "admission",
     admissions,
+    newRepoAdmissions: [
+      {
+        repo: "Owner/Persisted",
+        sources: ["creator-watch"],
+        eligible: true,
+        reasonCode: "trusted-creator",
+      },
+      {
+        repo: "owner/dropped",
+        sources: ["official"],
+        eligible: true,
+        reasonCode: "official",
+      },
+      {
+        repo: "owner/rejected",
+        sources: ["code"],
+        eligible: false,
+        reasonCode: "below-value-threshold",
+      },
+    ],
     appliedAdmissionRepos: new Set(["owner/persisted", "OWNER/DROPPED", "other/repo"]),
     finalRepoIndex: {
       generatedAt: "now",
@@ -129,6 +150,28 @@ test("report distinguishes eligible applied persisted and dropped admissions", (
   assert.equal(report.appliedAdmissionAdditionCount, 2);
   assert.equal(report.persistedAdmissionAdditionCount, 1);
   assert.equal(report.droppedAdmissionAdditionCount, 1);
+  assert.equal(report.newRepoCandidateCount, 3);
+  assert.equal(report.eligibleNewRepoCount, 2);
+  assert.equal(report.appliedNewRepoCount, 2);
+  assert.equal(report.persistedNewRepoCount, 1);
+  assert.equal(report.droppedNewRepoCount, 1);
+  assert.equal(report.eligibleNotAppliedCount, 0);
+  assert.deepEqual(report.newRepoAdmissionSample, [
+    {
+      repo: "owner/dropped",
+      sources: ["official"],
+      reasonCode: "official",
+      outcome: "dropped",
+      skillCount: 0,
+    },
+    {
+      repo: "owner/persisted",
+      sources: ["creator-watch"],
+      reasonCode: "trusted-creator",
+      outcome: "persisted",
+      skillCount: 1,
+    },
+  ]);
   assert.deepEqual(report.persistedAdmissionSample, [{
     repo: "owner/persisted",
     skillCount: 1,
@@ -140,6 +183,8 @@ test("report distinguishes eligible applied persisted and dropped admissions", (
   }]);
   assert.match(renderPolicyPrecedenceReport(report), /Persisted admission additions: 1/);
   assert.match(renderPolicyPrecedenceReport(report), /owner\/dropped: no-publishable-skills-after-refresh/);
+  assert.match(renderPolicyPrecedenceReport(report), /New repo candidates: 3/);
+  assert.match(renderPolicyPrecedenceReport(report), /owner\/persisted: persisted, 1 publishable skills/);
 });
 
 test("observe mode does not classify an unapplied eligible addition as dropped", () => {
@@ -157,6 +202,12 @@ test("observe mode does not classify an unapplied eligible addition as dropped",
       matchedSource: "creators",
       skippedSuppressedCandidateIds: [],
     }],
+    newRepoAdmissions: [{
+      repo: "owner/eligible",
+      sources: ["creator-watch"],
+      eligible: true,
+      reasonCode: "trusted-creator",
+    }],
     appliedAdmissionRepos: new Set(),
     finalRepoIndex: { generatedAt: "now", repoCount: 0, repos: [] },
     repoStates: [],
@@ -167,4 +218,10 @@ test("observe mode does not classify an unapplied eligible addition as dropped",
   assert.equal(report.appliedAdmissionAdditionCount, 0);
   assert.equal(report.persistedAdmissionAdditionCount, 0);
   assert.equal(report.droppedAdmissionAdditionCount, 0);
+  assert.equal(report.newRepoCandidateCount, 1);
+  assert.equal(report.eligibleNewRepoCount, 1);
+  assert.equal(report.appliedNewRepoCount, 0);
+  assert.equal(report.persistedNewRepoCount, 0);
+  assert.equal(report.droppedNewRepoCount, 0);
+  assert.equal(report.eligibleNotAppliedCount, 1);
 });

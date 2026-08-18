@@ -63,8 +63,10 @@ import {
   admissionObservation,
   applyRepoStatePrecedence,
   buildPolicyPrecedenceReport,
+  newRepoAdmissionObservation,
   renderPolicyPrecedenceReport,
   type AdmissionPolicyObservation,
+  type NewRepoAdmissionObservation,
   type QualityTierPolicyObservation,
   type RepoStatePolicyObservation,
 } from "./policy-precedence.js";
@@ -989,6 +991,7 @@ export function admitDiscoveredRepos(
     installAdmissionEnabled?: boolean;
     policyPrecedenceMode?: PolicyPrecedenceMode;
     policyObservations?: AdmissionPolicyObservation[];
+    newRepoObservations?: NewRepoAdmissionObservation[];
   } = {},
 ): Set<string> {
   const admittedRepos = new Set<string>();
@@ -997,20 +1000,28 @@ export function admitDiscoveredRepos(
 
   const existingRepos = new Set(repoIndex.repos.map((repo) => repo.repo));
   const maxNewAdmissions = options.maxNewAdmissions ?? Number.POSITIVE_INFINITY;
-  const candidates = [...discovered.values()].sort((a, b) =>
-    options.maxNewAdmissions
-      ? b.stars - a.stars || a.repo.localeCompare(b.repo)
-      : a.repo.localeCompare(b.repo),
-  );
+  const candidates = [...discovered.values()]
+    .filter((repo) => !existingRepos.has(repo.repo))
+    .sort((a, b) =>
+      options.maxNewAdmissions
+        ? b.stars - a.stars || a.repo.localeCompare(b.repo)
+        : a.repo.localeCompare(b.repo),
+    );
 
-  for (const discoveredRepo of candidates) {
-    if (admittedRepos.size >= maxNewAdmissions) break;
-    if (existingRepos.has(discoveredRepo.repo)) continue;
+  const evaluatedCandidates = candidates.map((discoveredRepo) => {
     const trust = buildTrustSignalsForRepo(discoveredRepo.repo, goldBasketRepos, seeds);
     const evaluation = evaluateDiscoveredRepoAdmission(discoveredRepo, seeds, trust, {
       installAdmissionEnabled: options.installAdmissionEnabled,
       policyPrecedenceMode,
     });
+    options.newRepoObservations?.push(
+      newRepoAdmissionObservation(discoveredRepo.repo, discoveredRepo.sources, evaluation),
+    );
+    return { discoveredRepo, evaluation, trust };
+  });
+
+  for (const { discoveredRepo, evaluation, trust } of evaluatedCandidates) {
+    if (admittedRepos.size >= maxNewAdmissions) break;
     const observation = admissionObservation(discoveredRepo.repo, evaluation);
     if (observation) options.policyObservations?.push(observation);
     if (!evaluation.effective.eligible) continue;
@@ -2270,6 +2281,7 @@ async function main() {
     ...(momentumWarning ? [momentumWarning] : []),
   ];
   const admissionPolicyObservations: AdmissionPolicyObservation[] = [];
+  const newRepoAdmissionObservations: NewRepoAdmissionObservation[] = [];
   const existingReposBeforeAdmission = new Set(repoIndex.repos.map((repo) => repo.repo));
   const policyAdmissionCandidates = [...discovered.values()]
     .filter((repo) => !existingReposBeforeAdmission.has(repo.repo))
@@ -2297,6 +2309,7 @@ async function main() {
       installAdmissionEnabled,
       policyPrecedenceMode,
       policyObservations: admissionPolicyObservations,
+      newRepoObservations: newRepoAdmissionObservations,
     },
   );
   const creatorWatchAdmissionSample = [...newlyAdmittedRepos]
@@ -2430,6 +2443,7 @@ async function main() {
     ...policyMetadata,
     mode: policyPrecedenceMode,
     admissions: admissionPolicyObservations,
+    newRepoAdmissions: newRepoAdmissionObservations,
     appliedAdmissionRepos: newlyAdmittedRepos,
     finalRepoIndex: repoIndex,
     repoStates: repoStatePolicyObservations,
