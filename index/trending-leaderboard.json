@@ -49,7 +49,7 @@
     "name": "requesting-code-review",
     "authorHandle": "obra",
     "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
-    "stars": 273488,
+    "stars": 273602,
     "installs": 202849,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
@@ -335,7 +335,7 @@
     "name": "xlsx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
-    "stars": 170067,
+    "stars": 170256,
     "installs": 154260,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -687,7 +687,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 109599,
+    "stars": 109635,
     "installs": 91506,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -951,7 +951,7 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 46623,
+    "stars": 46671,
     "installs": 76136,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1776,7 +1776,7 @@
     "name": "gsap-core",
     "authorHandle": "greensock",
     "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions.",
-    "stars": 13754,
+    "stars": 13774,
     "installs": 47123,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
@@ -2821,7 +2821,7 @@
     "name": "mastra",
     "authorHandle": "mastra-ai",
     "description": "Comprehensive Mastra framework guide for building agents, workflows, tools, memory, workspaces, and storage with current APIs. Use for documentation lookup, API verification, TypeScript setup, common errors, migrations, and `mastra api` CLI tasks: inspect or call resources on local, Mastra platform, Trace Intelligence, or remote servers.",
-    "stars": 72,
+    "stars": 73,
     "installs": 32389,
     "githubUrl": "https://github.com/mastra-ai/skills",
     "source": "skills.sh"
@@ -2843,7 +2843,7 @@
     "name": "karpathy-guidelines",
     "authorHandle": "multica-ai",
     "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-    "stars": 203527,
+    "stars": 203593,
     "installs": 32148,
     "githubUrl": "https://github.com/multica-ai/andrej-karpathy-skills",
     "source": "skills.sh"
@@ -3173,7 +3173,7 @@
     "name": "baoyu-article-illustrator",
     "authorHandle": "jimliu",
     "description": "Analyzes article structure, identifies positions requiring visual aids, generates illustrations with Type × Style × Palette three-dimension approach. Use when user asks to \"illustrate article\", \"add images\", \"generate images for article\", or \"为文章配图\".",
-    "stars": 25106,
+    "stars": 25130,
     "installs": 30064,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
