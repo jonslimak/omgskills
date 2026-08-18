@@ -450,12 +450,26 @@ Manual apply and verification fail if the source commit, effective policy, or cr
 
 ## Current Weekly Coverage
 
+Status: complete and operational as of 2026-08-18.
+
 Current registry state:
 
-- `13` watched creators have reviewed coverage: `8` full and `5` selected
-- `59` featured creators still need an explicit `all`, `selected`, or deferred coverage decision
+- all `74` featured creators have a reviewed coverage decision
+- `13` use full coverage
+- `60` use selected-repository coverage
+- `nousresearch` is intentionally deferred because `hermes-agent` mixes original skills with attributed third-party ports
+- `0` featured creators remain undecided
 
 The maintenance job runs Sunday at `06:00 UTC`, is capped at `125`, and keeps manual operator backfill available for deliberate campaigns. It does not create a separate enrichment path.
+
+Final coverage review completed on 2026-08-18:
+
+- added selected coverage for `garrytan`, `paperclipai`, `othmanadi`, and `onepixelaway`
+- excluded test, optional, catalog, development, release, and tool-specific mirror paths
+- a read-only plan inspected `337` `SKILL.md` files across `13` repositories
+- `27` clean candidates remain for normal bounded maintenance
+- `310` paths were already present or excluded by reviewed policy
+- `0` repositories require additional review
 
 Live validation completed on 2026-08-14 in `shadow-crawl-health` run `31808260924`:
 
@@ -470,7 +484,7 @@ Live validation completed on 2026-08-14 in `shadow-crawl-health` run `3180826092
 - both added skills were verified in hosted Crawl 4 and v2 data
 - follow-up `pipeline-health` run `31811251121` passed and restored health to `OK`
 
-Next work:
+The backfill project is complete. Future work is routine operation:
 
-1. Review the `59` featured creators without a coverage decision in a read-only pass.
-2. Assign `all`, `selected`, or intentionally deferred coverage only after review.
+1. Let weekly maintenance process the remaining bounded queue, or run the same maintenance command manually when immediate coverage is useful.
+2. Revisit `nousresearch` only after provenance-aware path review can distinguish original Hermes skills from third-party ports.
