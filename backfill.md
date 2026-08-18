@@ -436,6 +436,18 @@ Crawl 4 and v2 currently share the promoted `index/skills.json` baseline. A Craw
 
 The initial backlog is cleared. Weekly creator coverage now reuses the same planner/apply path to discover and admit future skills.
 
+### Manual creator intake and coverage
+
+New creators use one reviewed sequence. Publication remains separate:
+
+1. Plan and apply `creator:intake`, then commit the creator registry change.
+2. Run `crawl4:creator-backfill -- --plan --creators=handle,...` and review the plan.
+3. Run bounded `--apply` batches until only temporary failures remain.
+4. Run `--retry-transient` to retry only temporary failures.
+5. Run `--verify`; it fails unless every discovered `SKILL.md` is added, already present, policy-rejected, or invalid.
+
+Manual apply and verification fail if the source commit, effective policy, or creator registry changed after planning. The final JSON and Markdown reports are written under `index/shadow/`. No command in this sequence publishes collections or deploys the site.
+
 ## Current Weekly Coverage
 
 Current registry state:

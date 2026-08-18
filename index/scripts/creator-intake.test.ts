@@ -17,6 +17,7 @@ const emptyBackfill: CreatorBackfillPlan = {
   generatedAt: "2026-08-17T00:00:00.000Z",
   sourceCommit: "abc",
   policyDigest: "sha256:policy",
+  creatorRegistryRevision: "sha256:creators",
   quota: { initialRemaining: 5000, requiredAtStart: 3500, reservedForScheduledCrawler: 2000 },
   summary: {
     creatorCount: 1,

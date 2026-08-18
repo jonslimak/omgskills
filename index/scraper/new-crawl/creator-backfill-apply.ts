@@ -23,6 +23,7 @@ export type CreatorBackfillApplyOutcome = {
   path: string;
   status: CreatorBackfillApplyStatus;
   attemptedAt: string;
+  attemptCount?: number;
   reason?: string;
   existingId?: string;
 };
@@ -185,6 +186,7 @@ function outcomeFor(
     path: candidate.path,
     status,
     attemptedAt,
+    attemptCount: 1,
     ...details,
   };
 }
@@ -193,9 +195,13 @@ function replaceOutcome(
   progress: CreatorBackfillApplyProgress,
   outcome: CreatorBackfillApplyOutcome,
 ): CreatorBackfillApplyProgress {
+  const existing = progress.outcomes.find((value) => value.key === outcome.key);
   return {
     ...progress,
-    outcomes: [...progress.outcomes.filter((existing) => existing.key !== outcome.key), outcome],
+    outcomes: [
+      ...progress.outcomes.filter((value) => value.key !== outcome.key),
+      { ...outcome, attemptCount: (existing?.attemptCount ?? 0) + (outcome.attemptCount ?? 1) },
+    ],
   };
 }
 
@@ -210,13 +216,21 @@ export async function executeCreatorBackfillApply(input: {
   enrich: (candidate: CreatorBackfillPlanCandidate) => Promise<CreatorBackfillEnrichResult>;
   persist: (additions: ShadowSkillPersistenceAddition[]) => Promise<CreatorBackfillPersistResult[]>;
   writeProgress: (progress: CreatorBackfillApplyProgress) => void;
+  selection?: "pending-and-transient" | "transient-only";
 }): Promise<CreatorBackfillApplyProgress> {
   const limit = parseCreatorBackfillApplyLimit(String(input.limit));
   let progress = initializeCreatorBackfillApplyProgress(input.plan, input.progress, input.now());
   const finalKeys = new Set(
     progress.outcomes.filter((outcome) => finalStatuses.has(outcome.status)).map((outcome) => outcome.key),
   );
-  const candidates = input.plan.candidates.filter((candidate) => !finalKeys.has(creatorBackfillCandidateKey(candidate)));
+  const transientKeys = new Set(
+    progress.outcomes.filter((outcome) => outcome.status === "transient-failed").map((outcome) => outcome.key),
+  );
+  const candidates = input.plan.candidates.filter((candidate) => {
+    const key = creatorBackfillCandidateKey(candidate);
+    if (input.selection === "transient-only") return transientKeys.has(key);
+    return !finalKeys.has(key);
+  });
   const pending: Array<{ candidate: CreatorBackfillPlanCandidate; addition: ShadowSkillPersistenceAddition }> = [];
   let attempted = 0;
   let enrichAttempts = 0;

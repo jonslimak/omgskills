@@ -9,6 +9,7 @@ import {
   type CreatorBackfillRepoScan,
 } from "./creator-backfill-plan.js";
 import {
+  assertCreatorBackfillPlanCurrent,
   executeCreatorCoverageMaintenance,
   parseCreatorBackfillArguments,
   summarizeCreatorCoverageRegistry,
@@ -68,6 +69,7 @@ function build(scans: CreatorBackfillRepoScan[], existingSkills: Skill[] = [], t
     generatedAt: "2026-08-10T12:00:00.000Z",
     sourceCommit: "abc123",
     policyDigest: "sha256:test",
+    creatorRegistryRevision: "sha256:creators",
     initialQuotaRemaining: 4000,
     scans,
     existingSkills,
@@ -96,9 +98,42 @@ test("CLI keeps plan, bounded apply, and maintenance modes separate", () => {
     creatorFilters: ["petergyang"],
     limit: 25,
   });
+  assert.deepEqual(parseCreatorBackfillArguments(["--retry-transient", "--limit=10"]), {
+    mode: "retry-transient",
+    creatorFilters: [],
+    limit: 10,
+  });
+  assert.deepEqual(parseCreatorBackfillArguments(["--verify"]), {
+    mode: "verify",
+    creatorFilters: [],
+    limit: 125,
+  });
   assert.throws(() => parseCreatorBackfillArguments(["--plan", "--limit=2"]), /only with --apply/);
   assert.throws(() => parseCreatorBackfillArguments(["--apply", "--creators=a"]), /only with --plan or --maintain/);
+  assert.throws(() => parseCreatorBackfillArguments(["--verify", "--creators=a"]), /only with --plan or --maintain/);
   assert.throws(() => parseCreatorBackfillArguments(["--plan", "--apply"]), /Usage/);
+});
+
+test("manual apply rejects stale source, policy, and creator registry inputs", () => {
+  const reviewed = build([]);
+  const current = {
+    sourceCommit: reviewed.sourceCommit,
+    policyDigest: reviewed.policyDigest,
+    creatorRegistryRevision: reviewed.creatorRegistryRevision,
+  };
+  assert.doesNotThrow(() => assertCreatorBackfillPlanCurrent(reviewed, current));
+  assert.throws(
+    () => assertCreatorBackfillPlanCurrent(reviewed, { ...current, sourceCommit: "changed" }),
+    /Source commit changed/,
+  );
+  assert.throws(
+    () => assertCreatorBackfillPlanCurrent(reviewed, { ...current, policyDigest: "changed" }),
+    /Policy changed/,
+  );
+  assert.throws(
+    () => assertCreatorBackfillPlanCurrent(reviewed, { ...current, creatorRegistryRevision: "changed" }),
+    /Creator registry changed/,
+  );
 });
 
 test("maintenance skips before planning when quota is low", async () => {

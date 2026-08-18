@@ -53,9 +53,17 @@ import {
   prepareShadowSkillPersistence,
   type ShadowSkillPersistenceAddition,
 } from "./shadow-skill-persistence.js";
+import { editoolFileRevision } from "../../scripts/editool-policy-transaction.js";
+import { withCreatorBackfillGitHubRetry } from "./creator-backfill-retry.js";
+import {
+  buildCreatorBackfillFinalReport,
+  renderCreatorBackfillFinalReport,
+} from "./creator-backfill-report.js";
 
 const planPath = join(shadowRoot, "creator-backfill.plan.json");
 const progressPath = join(shadowRoot, "creator-backfill.apply.json");
+const finalReportJsonPath = join(shadowRoot, "creator-backfill.final.json");
+const finalReportMarkdownPath = join(shadowRoot, "creator-backfill.final.md");
 const quotaRecheckTreeInterval = 25;
 const applyQuotaSafetyBuffer = 100;
 
@@ -83,32 +91,43 @@ function atomicWriteShadowJson(path: string, value: unknown): void {
   renameSync(temporaryPath, path);
 }
 
+function atomicWriteShadowText(path: string, value: string): void {
+  assertShadowPath(path);
+  mkdirSync(dirname(path), { recursive: true });
+  const temporaryPath = `${path}.tmp-${process.pid}`;
+  writeFileSync(temporaryPath, value, "utf8");
+  renameSync(temporaryPath, path);
+}
+
 function sourceCommit(): string {
   if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA;
   return execFileSync("git", ["rev-parse", "HEAD"], { cwd: join(indexRoot, ".."), encoding: "utf8" }).trim();
 }
 
 export function parseCreatorBackfillArguments(args: string[]): {
-  mode: "plan" | "apply" | "maintain";
+  mode: "plan" | "apply" | "retry-transient" | "verify" | "maintain";
   creatorFilters: string[];
   limit: number;
 } {
   const plan = args.includes("--plan");
   const apply = args.includes("--apply");
+  const retryTransient = args.includes("--retry-transient");
+  const verify = args.includes("--verify");
   const maintain = args.includes("--maintain");
-  if ([plan, apply, maintain].filter(Boolean).length !== 1) {
+  if ([plan, apply, retryTransient, verify, maintain].filter(Boolean).length !== 1) {
     throw new Error(
-      "Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner], --apply [--limit=125], or --maintain [--creators=owner,owner] [--limit=125]",
+      "Usage: npm run crawl4:creator-backfill -- --plan [--creators=owner,owner], --apply [--limit=125], --retry-transient [--limit=125], --verify, or --maintain [--creators=owner,owner] [--limit=125]",
     );
   }
-  const supported = (arg: string) => arg === "--plan" || arg === "--apply" || arg === "--maintain"
+  const supported = (arg: string) => arg === "--plan" || arg === "--apply" || arg === "--retry-transient"
+    || arg === "--verify" || arg === "--maintain"
     || arg.startsWith("--creators=") || arg.startsWith("--limit=");
   const unsupported = args.filter((arg) => !supported(arg));
   if (unsupported.length) throw new Error(`Unsupported creator backfill option: ${unsupported[0]}`);
-  if (plan && args.some((arg) => arg.startsWith("--limit="))) {
-    throw new Error("--limit is supported only with --apply or --maintain.");
+  if ((plan || verify) && args.some((arg) => arg.startsWith("--limit="))) {
+    throw new Error("--limit is supported only with --apply, --retry-transient, or --maintain.");
   }
-  if (apply && args.some((arg) => arg.startsWith("--creators="))) {
+  if ((apply || retryTransient || verify) && args.some((arg) => arg.startsWith("--creators="))) {
     throw new Error("--creators is supported only with --plan or --maintain; apply uses the existing plan.");
   }
   const creatorFilters = args
@@ -118,7 +137,7 @@ export function parseCreatorBackfillArguments(args: string[]): {
     .filter(Boolean);
   const limitValue = args.find((arg) => arg.startsWith("--limit="))?.slice("--limit=".length);
   return {
-    mode: plan ? "plan" : apply ? "apply" : "maintain",
+    mode: plan ? "plan" : apply ? "apply" : retryTransient ? "retry-transient" : verify ? "verify" : "maintain",
     creatorFilters: [...new Set(creatorFilters)].sort(),
     limit: parseCreatorBackfillApplyLimit(limitValue),
   };
@@ -188,12 +207,15 @@ function toRepoMetadata(repo: {
 }
 
 async function listOwnedRepos(owner: string): Promise<RepoMetadata[]> {
-  const repos = await octokit.paginate(octokit.rest.repos.listForUser, {
-    username: owner,
-    type: "owner",
-    sort: "full_name",
-    direction: "asc",
-    per_page: 100,
+  const repos = await withCreatorBackfillGitHubRetry({
+    label: `list repositories for ${owner}`,
+    operation: () => octokit.paginate(octokit.rest.repos.listForUser, {
+      username: owner,
+      type: "owner",
+      sort: "full_name",
+      direction: "asc",
+      per_page: 100,
+    }),
   });
   return repos.map((repo) => toRepoMetadata(repo, `${owner}/${repo.name}`));
 }
@@ -201,7 +223,10 @@ async function listOwnedRepos(owner: string): Promise<RepoMetadata[]> {
 async function getRepo(repo: string): Promise<RepoMetadata> {
   const [owner, repoName] = normalizePolicyRepo(repo).split("/");
   if (!owner || !repoName) throw new Error(`Invalid selected creator repository: ${repo}`);
-  const response = await octokit.rest.repos.get({ owner, repo: repoName });
+  const response = await withCreatorBackfillGitHubRetry({
+    label: `load repository ${repo}`,
+    operation: () => octokit.rest.repos.get({ owner, repo: repoName }),
+  });
   return toRepoMetadata(response.data, repo);
 }
 
@@ -212,11 +237,14 @@ async function getTree(repo: RepoMetadata): Promise<{
 }> {
   const [owner, repoName] = repo.repo.split("/");
   if (!owner || !repoName) throw new Error(`Invalid canonical creator repository: ${repo.repo}`);
-  const response = await octokit.rest.git.getTree({
-    owner,
-    repo: repoName,
-    tree_sha: repo.defaultBranch,
-    recursive: "true",
+  const response = await withCreatorBackfillGitHubRetry({
+    label: `load repository tree ${repo.repo}`,
+    operation: () => octokit.rest.git.getTree({
+      owner,
+      repo: repoName,
+      tree_sha: repo.defaultBranch,
+      recursive: "true",
+    }),
   });
   const paths = response.data.tree.map((entry) => entry.path ?? "").filter(Boolean);
   const pathShas = Object.fromEntries(response.data.tree.flatMap((entry) =>
@@ -330,6 +358,21 @@ function loadReviewedPlan(): CreatorBackfillPlan {
   return plan;
 }
 
+export function assertCreatorBackfillPlanCurrent(
+  plan: CreatorBackfillPlan,
+  current: { sourceCommit: string; policyDigest: string; creatorRegistryRevision: string },
+): void {
+  if (current.sourceCommit !== plan.sourceCommit) {
+    throw new Error("Source commit changed after creator backfill planning. Generate and review a new plan.");
+  }
+  if (current.policyDigest !== plan.policyDigest) {
+    throw new Error("Policy changed after creator backfill planning. Generate and review a new plan.");
+  }
+  if (current.creatorRegistryRevision !== plan.creatorRegistryRevision) {
+    throw new Error("Creator registry changed after creator backfill planning. Generate and review a new plan.");
+  }
+}
+
 function normalizePath(value: string | null | undefined): string {
   return (value ?? "").trim().replace(/^\.\//, "").toLowerCase();
 }
@@ -388,6 +431,7 @@ async function runPlan(
       generatedAt,
       sourceCommit: sourceCommit(),
       policyDigest: effectivePolicyDigest(typedPolicySources(loadedPolicy)),
+      creatorRegistryRevision: editoolFileRevision(loadedPolicy.paths.creators),
       initialQuotaRemaining,
       scans,
       existingSkills,
@@ -408,15 +452,18 @@ async function runPlan(
 async function runApply(
   limit: number,
   initialQuotaRemaining?: number,
+  selection: "pending-and-transient" | "transient-only" = "pending-and-transient",
 ): Promise<CreatorBackfillApplyProgress> {
   const plan = loadReviewedPlan();
   const registry = loadCreatorRegistry();
   const seeds = loadTrustedSeeds("manual-command");
   const loadedPolicy = loadPolicySources();
   const currentPolicyDigest = effectivePolicyDigest(typedPolicySources(loadedPolicy));
-  if (currentPolicyDigest !== plan.policyDigest) {
-    console.warn("creator backfill policy changed since planning; candidates will use current policy");
-  }
+  assertCreatorBackfillPlanCurrent(plan, {
+    sourceCommit: sourceCommit(),
+    policyDigest: currentPolicyDigest,
+    creatorRegistryRevision: editoolFileRevision(loadedPolicy.paths.creators),
+  });
 
   const coverageCreators = new Set(
     registry.entries
@@ -526,6 +573,7 @@ async function runApply(
       }));
     },
     writeProgress: (value) => atomicWriteShadowJson(progressPath, value),
+    selection,
   });
 
   console.log(`creator backfill apply: ${progressPath}`);
@@ -538,6 +586,28 @@ async function runApply(
   console.log(`  pending: ${progress.summary.pendingCount}`);
   console.log("  publish: not run");
   return progress;
+}
+
+function runVerify(): void {
+  const plan = loadReviewedPlan();
+  const loadedPolicy = loadPolicySources();
+  assertCreatorBackfillPlanCurrent(plan, {
+    sourceCommit: sourceCommit(),
+    policyDigest: effectivePolicyDigest(typedPolicySources(loadedPolicy)),
+    creatorRegistryRevision: editoolFileRevision(loadedPolicy.paths.creators),
+  });
+  const progress = readJson<CreatorBackfillApplyProgress | null>(progressPath, null);
+  const report = buildCreatorBackfillFinalReport({
+    plan,
+    progress,
+    generatedAt: new Date().toISOString(),
+  });
+  atomicWriteShadowJson(finalReportJsonPath, report);
+  atomicWriteShadowText(finalReportMarkdownPath, renderCreatorBackfillFinalReport(report));
+  console.log(`creator backfill final report: ${finalReportMarkdownPath}`);
+  console.log(`  ready: ${report.ready}`);
+  console.log(`  classified: ${report.summary.dispositionCount}/${report.summary.discoveredSkillCount}`);
+  if (!report.ready) throw new Error(`Creator backfill is incomplete: ${report.issues.join("; ")}`);
 }
 
 async function runMaintain(limit: number, creatorFilters: string[] = []): Promise<void> {
@@ -569,6 +639,8 @@ async function main(): Promise<void> {
   const args = parseCreatorBackfillArguments(process.argv.slice(2));
   if (args.mode === "plan") await runPlan(args.creatorFilters);
   else if (args.mode === "apply") await runApply(args.limit);
+  else if (args.mode === "retry-transient") await runApply(args.limit, undefined, "transient-only");
+  else if (args.mode === "verify") runVerify();
   else await runMaintain(args.limit, args.creatorFilters);
 }
 

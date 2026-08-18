@@ -10,7 +10,7 @@ import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { deriveSkillIdFromPath, deriveSkillPathFromId } from "./candidate-path.js";
 import type { TrustedSeeds } from "./types.js";
 
-export const CREATOR_BACKFILL_PLAN_VERSION = 4;
+export const CREATOR_BACKFILL_PLAN_VERSION = 5;
 export const CREATOR_BACKFILL_LARGE_REPO_SKILL_LIMIT = 150;
 export const CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM = 3500;
 export const CREATOR_BACKFILL_QUOTA_RESERVE = 2000;
@@ -67,6 +67,7 @@ export type CreatorBackfillPlan = {
   generatedAt: string;
   sourceCommit: string;
   policyDigest: string;
+  creatorRegistryRevision: string;
   quota: {
     initialRemaining: number;
     requiredAtStart: number;
@@ -257,6 +258,7 @@ export function buildCreatorBackfillPlan(input: {
   generatedAt: string;
   sourceCommit: string;
   policyDigest: string;
+  creatorRegistryRevision: string;
   initialQuotaRemaining: number;
   scans: CreatorBackfillRepoScan[];
   existingSkills: Skill[];
@@ -399,6 +401,7 @@ export function buildCreatorBackfillPlan(input: {
     generatedAt: input.generatedAt,
     sourceCommit: input.sourceCommit,
     policyDigest: input.policyDigest,
+    creatorRegistryRevision: input.creatorRegistryRevision,
     quota: {
       initialRemaining: input.initialQuotaRemaining,
       requiredAtStart: CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM,

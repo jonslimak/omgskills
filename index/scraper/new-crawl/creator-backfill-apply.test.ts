@@ -39,6 +39,7 @@ function plan(count: number): CreatorBackfillPlan {
     generatedAt: timestamp,
     sourceCommit: "abc123",
     policyDigest: "sha256:policy",
+    creatorRegistryRevision: "sha256:creators",
     quota: {
       initialRemaining: 4000,
       requiredAtStart: 3500,
@@ -107,6 +108,7 @@ function harness(input: {
   enrich?: (candidate: CreatorBackfillPlanCandidate) => Promise<CreatorBackfillEnrichResult>;
   reserveQuotaAvailable?: () => Promise<boolean>;
   persist?: (additions: ShadowSkillPersistenceAddition[]) => Promise<Array<{ id: string; status: "added" | "existing"; existingId?: string; reason?: string }>>;
+  selection?: "pending-and-transient" | "transient-only";
 }) {
   let preflightCount = 0;
   let reserveCheckCount = 0;
@@ -137,6 +139,7 @@ function harness(input: {
         : additions.map((entry) => ({ id: entry.skill.id, status: "added" as const }));
     },
     writeProgress: (progress) => { writes.push(structuredClone(progress)); },
+    selection: input.selection,
   });
   return {
     run,
@@ -194,6 +197,7 @@ test("stable failures finalize while transient failures retry without blocking l
   assert.equal(firstProgress.summary.transientFailedCount, 1);
   assert.equal(firstProgress.summary.addedCount, 1);
   assert.equal(firstProgress.summary.pendingCount, 1);
+  assert.equal(firstProgress.outcomes.find((outcome) => outcome.status === "transient-failed")?.attemptCount, 1);
 
   const second = harness({
     plan: testPlan,
@@ -206,6 +210,25 @@ test("stable failures finalize while transient failures retry without blocking l
   assert.equal(secondProgress.summary.stableFailedCount, 1);
   assert.equal(secondProgress.summary.addedCount, 2);
   assert.equal(secondProgress.summary.transientFailedCount, 0);
+  assert.equal(secondProgress.outcomes.find((outcome) => outcome.id.endsWith("/1"))?.attemptCount, 2);
+});
+
+test("transient-only retry does not process untouched pending candidates", async () => {
+  const testPlan = plan(2);
+  const first = await harness({
+    plan: testPlan,
+    limit: 1,
+    enrich: async () => ({ status: "transient-failed", reason: "timeout" }),
+  }).run;
+  const secondHarness = harness({
+    plan: testPlan,
+    progress: first,
+    selection: "transient-only",
+  });
+  const second = await secondHarness.run;
+  assert.deepEqual(secondHarness.enrichIds, [testPlan.candidates[0]?.proposedId]);
+  assert.equal(second.summary.addedCount, 1);
+  assert.equal(second.summary.pendingCount, 1);
 });
 
 test("periodic quota failure stops cleanly and leaves later candidates pending", async () => {

@@ -283,10 +283,12 @@ async function runPlan(urls: string[]): Promise<void> {
   const scans = await collectCreatorBackfillScans(entries, seeds);
   const sourceCommit = currentSourceCommit();
   const policyDigest = effectivePolicyDigest(sources);
+  const creatorRevision = editoolFileRevision(loaded.paths.creators);
   const backfill = buildCreatorBackfillPlan({
     generatedAt,
     sourceCommit,
     policyDigest,
+    creatorRegistryRevision: creatorRevision,
     initialQuotaRemaining: quota.remaining,
     scans,
     existingSkills: loadCreatorBackfillExistingSkills(),
@@ -298,7 +300,7 @@ async function runPlan(urls: string[]): Promise<void> {
     generatedAt,
     sourceCommit,
     policyDigest,
-    creatorRevision: editoolFileRevision(loaded.paths.creators),
+    creatorRevision,
     inputs: resolved,
     changedHandles: proposed.changedHandles,
     proposedRegistry: proposed.registry,
@@ -370,6 +372,9 @@ function runApply(digest: string): void {
   });
   console.log(`creator intake applied: ${plan.changedHandles.join(", ")}`);
   console.log("No crawl or publication was started.");
+  console.log(
+    `Next: npm run crawl4:creator-backfill -- --plan --creators=${plan.changedHandles.join(",")}`,
+  );
 }
 
 export function parseCreatorIntakeArguments(args: string[]):
