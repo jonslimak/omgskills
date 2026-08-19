@@ -1650,6 +1650,176 @@
       ],
       "imageUrl": "https://omgskills.com/images/collections/memory-context.webp?v=8b75154b39b9",
       "description": "Best memory & context skills to help you build memory systems and so your agents don't forget"
+    },
+    {
+      "id": "reduce-token-usage",
+      "type": "topic",
+      "title": "Skills to Reduce Token Usage",
+      "subtitle": "Cut context bloat and spend fewer tokens per session",
+      "description": "Best Claude Code skills to reduce token usage and context bloat. Compress memory files, cut filler, and budget your context so sessions run longer and cost less.",
+      "featuredSkillIds": [
+        "JuliusBrussee/caveman:plugins/caveman/skills/caveman",
+        "mksglu/context-mode:context-mode",
+        "affaan-m/ecc:context-budget",
+        "affaan-m/ecc:token-budget-advisor",
+        "affaan-m/ecc:cost-tracking",
+        "juliusbrussee/caveman:compress"
+      ],
+      "skillIds": [
+        "JuliusBrussee/caveman:plugins/caveman/skills/caveman",
+        "mksglu/context-mode:context-mode",
+        "affaan-m/ecc:context-budget",
+        "affaan-m/ecc:token-budget-advisor",
+        "juliusbrussee/caveman:compress",
+        "affaan-m/ecc:cost-tracking"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/reduce-token-usage.webp?v=33b613a3f45f"
+    },
+    {
+      "id": "web-development",
+      "type": "topic",
+      "title": "Best Claude Skills for Web Development",
+      "subtitle": "Frontend design, frameworks, and testing for the modern web",
+      "description": "Best Claude skills for web development covering frontend design, React and Next.js, UI quality, and browser testing to ship polished sites faster.",
+      "featuredSkillIds": [
+        "anthropics/skills:skills/frontend-design",
+        "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max",
+        "pbakaus/impeccable:impeccable",
+        "microsoft/playwright:playwright-cli",
+        "MengTo/Skills:landing-page",
+        "anthropics/skills:theme-factory",
+        "saadeghi/daisyui:daisyui",
+        "affaan-m/ecc:api-design",
+        "affaan-m/ecc:nextjs-turbopack",
+        "anthropics/skills:web-artifacts-builder"
+      ],
+      "skillIds": [
+        "anthropics/skills:skills/frontend-design",
+        "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max",
+        "pbakaus/impeccable:impeccable",
+        "microsoft/playwright:playwright-cli",
+        "anthropics/skills:web-artifacts-builder",
+        "affaan-m/ecc:nextjs-turbopack",
+        "affaan-m/ecc:api-design",
+        "saadeghi/daisyui:daisyui",
+        "anthropics/skills:theme-factory",
+        "MengTo/Skills:landing-page"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/web-development.webp?v=1393cc5d2e52"
+    },
+    {
+      "id": "writing",
+      "type": "topic",
+      "title": "Best Claude Skills for Writing",
+      "subtitle": "Articles, editing, and prose that does not sound like AI",
+      "description": "Best Claude skills for writing articles, blog posts, and marketing copy, with editing and humanizer skills so your prose never reads like AI.",
+      "featuredSkillIds": [
+        "mattpocock/skills:edit-article",
+        "zed-industries/zed:humanizer",
+        "affaan-m/ecc:article-writing",
+        "affaan-m/ecc:brand-voice",
+        "anthropics/skills:docx",
+        "langchain-ai/deepagents:blog-post",
+        "supabase/supabase:.claude/skills/copywriting"
+      ],
+      "skillIds": [
+        "mattpocock/skills:edit-article",
+        "zed-industries/zed:humanizer",
+        "affaan-m/ecc:article-writing",
+        "affaan-m/ecc:brand-voice",
+        "supabase/supabase:.claude/skills/copywriting",
+        "langchain-ai/deepagents:blog-post",
+        "anthropics/skills:docx"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/writing.webp?v=f3585cbafe76"
+    },
+    {
+      "id": "students",
+      "type": "topic",
+      "title": "Best Claude Skills for Students",
+      "subtitle": "Research, papers, and study workflows",
+      "description": "Best Claude skills for students covering deep research, academic papers, PDFs, LaTeX, and study workflows for school and university work.",
+      "featuredSkillIds": [
+        "affaan-m/ecc:deep-research",
+        "bytedance/deer-flow:academic-paper-review",
+        "anthropics/skills:docx",
+        "danielmiessler/LifeOS:LifeOS/install/skills/ArXiv",
+        "anthropics/skills:pptx",
+        "TaylorHuston/local-life-manager:.claude/skills/flashcards",
+        "hameefy/claude-latex-skill",
+        "anthropics/skills:pdf"
+      ],
+      "skillIds": [
+        "affaan-m/ecc:deep-research",
+        "bytedance/deer-flow:academic-paper-review",
+        "anthropics/skills:docx",
+        "danielmiessler/LifeOS:LifeOS/install/skills/ArXiv",
+        "anthropics/skills:pdf",
+        "hameefy/claude-latex-skill",
+        "TaylorHuston/local-life-manager:.claude/skills/flashcards",
+        "anthropics/skills:pptx"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/students.webp?v=7322dec913f8"
+    },
+    {
+      "id": "business",
+      "type": "topic",
+      "title": "Best Claude Skills for Business",
+      "subtitle": "Spreadsheets, sales, marketing, and operations",
+      "description": "Best Claude skills for business covering spreadsheets, market research, sales enablement, and the everyday ops that keep a company moving.",
+      "featuredSkillIds": [
+        "anthropics/skills:xlsx",
+        "affaan-m/ecc:market-research",
+        "coreyhaines31/marketingskills:sales-enablement",
+        "affaan-m/ecc:finance-billing-ops",
+        "anthropics/skills:pptx",
+        "googleworkspace/cli:gws-calendar",
+        "googleworkspace/cli:gws-gmail",
+        "coreyhaines31/marketingskills:skills/marketing-plan",
+        "coreyhaines31/marketingskills:lead-magnets"
+      ],
+      "skillIds": [
+        "anthropics/skills:xlsx",
+        "affaan-m/ecc:market-research",
+        "coreyhaines31/marketingskills:sales-enablement",
+        "affaan-m/ecc:finance-billing-ops",
+        "coreyhaines31/marketingskills:lead-magnets",
+        "coreyhaines31/marketingskills:skills/marketing-plan",
+        "googleworkspace/cli:gws-gmail",
+        "googleworkspace/cli:gws-calendar",
+        "anthropics/skills:pptx"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/business.webp?v=f3d01585616b"
+    },
+    {
+      "id": "research",
+      "type": "topic",
+      "title": "Claude Skills for Research",
+      "subtitle": "Deep research, web search, and source gathering",
+      "description": "Best Claude skills for research: deep research agents, web search, scraping, and source gathering to produce well-sourced answers fast.",
+      "featuredSkillIds": [
+        "affaan-m/ecc:deep-research",
+        "affaan-m/ecc:exa-search",
+        "mvanhorn/last30days-skill",
+        "browser-use/browser-use:browser-use",
+        "Lloyd-Jahn/openclaw-paper-search",
+        "bytedance/deer-flow:academic-paper-review",
+        "firecrawl/cli:firecrawl",
+        "tavily-ai/skills:tavily-search",
+        "d4vinci/scrapling:scrapling-official"
+      ],
+      "skillIds": [
+        "affaan-m/ecc:deep-research",
+        "affaan-m/ecc:exa-search",
+        "mvanhorn/last30days-skill",
+        "browser-use/browser-use:browser-use",
+        "d4vinci/scrapling:scrapling-official",
+        "tavily-ai/skills:tavily-search",
+        "firecrawl/cli:firecrawl",
+        "bytedance/deer-flow:academic-paper-review",
+        "Lloyd-Jahn/openclaw-paper-search"
+      ],
+      "imageUrl": "https://omgskills.com/images/collections/research.webp?v=ebd8b6f8de7d"
     }
   ]
 }
