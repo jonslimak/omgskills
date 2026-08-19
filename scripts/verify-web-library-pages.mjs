@@ -170,6 +170,10 @@ const rootFiles = [
 
 const redirects = [
   {
+    path: "/guide",
+    location: "/guide/",
+  },
+  {
     path: "/profiles/openai/",
     location: "/library/openai/",
   },
@@ -381,7 +385,7 @@ async function verifyAllLocalReferences() {
 
 async function verifyLocalMarkdownParity() {
   const failures = [];
-  const roots = ["skills", "library", "collections", "developers"].map((directory) => path.join(siteDir, directory));
+  const roots = ["skills", "library", "collections", "developers", "guide"].map((directory) => path.join(siteDir, directory));
   for (const root of roots) {
     const [htmlFiles, markdownFiles] = await Promise.all([
       collectFiles(root, ".html"),
@@ -624,6 +628,8 @@ async function verifyLocalRootFile(file) {
     assertIncludes(contents, `${origin}/llms-gold.txt`, filePath);
     assertIncludes(contents, "## When to use omgskills", filePath);
     assertIncludes(contents, `${origin}/agents.md`, filePath);
+    assertIncludes(contents, `${origin}/guide/index.md`, filePath);
+    assertIncludes(contents, `${origin}/guide/`, filePath);
   }
   if (file.path === "/agents.md") {
     assertIncludes(contents, "## When to use omgskills", filePath);
@@ -654,6 +660,83 @@ async function verifyLocalRootFile(file) {
     if (new Set(sourcePaths).size !== sourcePaths.length) {
       throw new Error(`${filePath} contained duplicate source paths`);
     }
+  }
+}
+
+function verifyGuideHtml(html, label) {
+  assertIncludes(html, '<link rel="canonical" href="https://omgskills.com/guide/">', label);
+  assertIncludes(html, '<link rel="alternate" type="text/markdown" href="/guide/index.md">', label);
+  assertIncludes(html, '<h1>Skills: The Complete Guide</h1>', label);
+  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/images/guide/share.png">', label);
+  assertIncludes(html, '<meta property="og:image:width" content="1200">', label);
+  assertIncludes(html, '<meta property="og:image:height" content="630">', label);
+  assertIncludes(html, '<meta name="twitter:card" content="summary_large_image">', label);
+  const structuredData = [...html.matchAll(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/g)]
+    .map((match) => JSON.parse(match[1]));
+  const article = structuredData.find((entry) => entry["@type"] === "TechArticle");
+  const faq = structuredData.find((entry) => entry["@type"] === "FAQPage");
+  if (!article) throw new Error(`${label} did not contain TechArticle JSON-LD`);
+  if (!faq) throw new Error(`${label} did not contain FAQPage JSON-LD`);
+  if (article.dateModified !== "2026-08-19") {
+    throw new Error(`${label} had unexpected TechArticle dateModified ${article.dateModified || "<missing>"}`);
+  }
+  const questions = new Map((faq.mainEntity || []).map((entry) => [entry.name, entry.acceptedAnswer?.text]));
+  if (!questions.get("Are skills safe?")?.includes("Skills are instructions, not code")) {
+    throw new Error(`${label} did not contain the visible skills safety answer in FAQPage JSON-LD`);
+  }
+  if (!questions.get("Are skills free?")?.includes("All 49,000+ indexed here are free.")) {
+    throw new Error(`${label} did not contain the visible free-skills answer in FAQPage JSON-LD`);
+  }
+}
+
+function verifyGuideMarkdown(markdown, label) {
+  assertIncludes(markdown, "# Skills: The Complete Guide", label);
+  assertIncludes(markdown, "## Are skills safe?", label);
+  assertIncludes(markdown, "Skills are instructions, not code", label);
+  assertIncludes(markdown, "## Are skills free?", label);
+  assertIncludes(markdown, "All 49,000+ indexed here are free.", label);
+  assertIncludes(markdown, `${origin}/guide/`, label);
+}
+
+async function verifyLocalGuide() {
+  const htmlPath = localPathForUrlPath("/guide/index.html");
+  const markdownPath = localPathForUrlPath("/guide/index.md");
+  const imagePath = localPathForUrlPath("/images/guide/share.png");
+  if (!(await fileExists(markdownPath))) throw new Error(`Missing guide Markdown mirror: ${markdownPath}`);
+  if (!(await fileExists(imagePath))) throw new Error(`Missing guide social image: ${imagePath}`);
+  verifyGuideHtml(await readFile(htmlPath, "utf8"), htmlPath);
+  verifyGuideMarkdown(await readFile(markdownPath, "utf8"), markdownPath);
+  const redirectRules = await readFile(path.join(siteDir, "_redirects"), "utf8");
+  assertIncludes(redirectRules, "/guide /guide/ 301!", path.join(siteDir, "_redirects"));
+  const netlifyConfig = await readFile(path.join(repoRoot, "netlify.toml"), "utf8");
+  assertIncludes(netlifyConfig, 'for = "/guide/index.md"', path.join(repoRoot, "netlify.toml"));
+}
+
+async function verifyLiveGuide() {
+  const htmlUrl = `${origin}/guide/`;
+  const htmlResponse = await fetchLive(htmlUrl, { redirect: "manual" });
+  if (htmlResponse.status !== 200) throw new Error(`${htmlUrl} returned ${htmlResponse.status}, expected 200`);
+  verifyGuideHtml(await htmlResponse.text(), htmlUrl);
+
+  const markdownUrl = `${origin}/guide/index.md`;
+  const markdownResponse = await fetchLive(markdownUrl, { redirect: "manual" });
+  if (markdownResponse.status !== 200) throw new Error(`${markdownUrl} returned ${markdownResponse.status}, expected 200`);
+  const markdownType = markdownResponse.headers.get("content-type") || "";
+  if (!markdownType.toLowerCase().startsWith("text/markdown")) {
+    throw new Error(`${markdownUrl} returned Content-Type ${markdownType || "<missing>"}, expected text/markdown`);
+  }
+  const robots = markdownResponse.headers.get("x-robots-tag") || "";
+  if (!robots.toLowerCase().includes("noindex")) {
+    throw new Error(`${markdownUrl} returned X-Robots-Tag ${robots || "<missing>"}, expected noindex`);
+  }
+  verifyGuideMarkdown(await markdownResponse.text(), markdownUrl);
+
+  const imageUrl = `${origin}/images/guide/share.png`;
+  const imageResponse = await fetchLive(imageUrl, { redirect: "manual" });
+  if (imageResponse.status !== 200) throw new Error(`${imageUrl} returned ${imageResponse.status}, expected 200`);
+  const imageType = imageResponse.headers.get("content-type") || "";
+  if (!imageType.toLowerCase().startsWith("image/png")) {
+    throw new Error(`${imageUrl} returned Content-Type ${imageType || "<missing>"}, expected image/png`);
   }
 }
 
@@ -934,6 +1017,7 @@ async function verifyLiveRedirect(redirect) {
 async function main() {
   if (isLive) {
     await verifyLiveHomepageLibraryPreview();
+    await verifyLiveGuide();
     for (const page of pages) await verifyLivePage(page);
     for (const file of rootFiles) await verifyLiveRootFile(file);
     const generatedUrlById = new Map(await verifyLiveCatalogSkillUrls());
@@ -955,6 +1039,7 @@ async function main() {
 
   for (const page of pages) await verifyLocalPage(page);
   await verifyLocalHomepageLibraryPreview();
+  await verifyLocalGuide();
   for (const file of rootFiles) await verifyLocalRootFile(file);
   await verifyLocalCatalogSkillUrls();
   await verifyLocalGeneratedRedirects();

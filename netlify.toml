@@ -120,6 +120,13 @@
     Cache-Control = "public, max-age=300, must-revalidate"
 
 [[headers]]
+  for = "/guide/index.md"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    X-Robots-Tag = "noindex, follow"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+[[headers]]
   for = "/agents.md"
   [headers.values]
     Content-Type = "text/markdown; charset=utf-8"

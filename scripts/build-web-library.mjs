@@ -1237,6 +1237,84 @@ The MCP tools only read public catalog data. They do not install skills, write f
 `;
 }
 
+function renderGuideMarkdown() {
+  return `# Skills: The Complete Guide
+
+> The simple guide for Claude Code, Codex, Cursor, and other agent skills.
+
+## What are skills?
+
+Skills are reusable instructions that tell an AI how you want something done.
+
+It is like asking an AI for good dinner ideas versus asking while sharing a recipe book by Anthony Bourdain.
+
+## When to use skills
+
+- To specify taste, design style, or writing voice while avoiding generic work.
+- To apply world-class expertise and judgment to a task.
+- To encode workflows you repeat and stop re-explaining them.
+- To reduce the agent's freedom to cut corners.
+- To share and adopt other people's taste, ideas, and workflows.
+
+## Some examples
+
+- Use [swiftui-pro](${origin}/skills/twostraws/swiftui-agent-skill/swiftui-pro/index.md) to create an iOS app signup screen following Apple's best practices.
+- Use [grill-me](${origin}/skills/mattpocock/skills/grill-me/index.md) to ask questions until an idea is fully explained.
+- Use [ad-creative](${origin}/skills/coreyhaines31/marketingskills/skills/ad-creative/index.md) to generate ad alternatives for an Instagram campaign.
+
+## When not to use skills
+
+- One-off tasks: just prompt the agent.
+- Things the model already does well.
+- Live data or system access: those are connections, not instructions.
+
+## How to use a skill
+
+Install skills by sharing a GitHub link with your agent or using the omgskills app.
+
+Use them automatically, or type \`/skill-name\` during a chat session with your prompt.
+
+## How to find good skills
+
+Most people host skills on GitHub and share them on X, Twitter, and Reddit. Use [omgskills](${origin}/skills/), [skills.sh](https://skills.sh/), or similar tools to find, read, install, and share them.
+
+## How to make a skill
+
+Ask your agent to help create one.
+
+## But skills are just Markdown files
+
+Yes. Even so, skill use keeps growing. As models improve, skills get more general, but people will still want to specify the outcomes they want.
+
+## Skills vs. plugins vs. MCP
+
+- **Skill:** Teaches the agent how. Markdown instructions.
+- **MCP server:** Gives the agent access. A live program exposing tools or data.
+- **Plugin:** Packages skills, commands, and configuration for distribution.
+- **Subagent:** Delegates work to a separate context.
+
+They compose: a skill can teach an agent how to use an MCP server well.
+
+## Are skills safe?
+
+Mostly, but not all. Skills are instructions, not code, but agents act on instructions. Like other software, it is best to use skills by trusted creators with large user bases, or ones you create yourself or with your team.
+
+## Why skills?
+
+[Watch the explanation on YouTube](https://www.youtube.com/watch?v=XsiiIa6bs9I).
+
+## Are skills free?
+
+Yes. Skills are open-source Markdown files on GitHub. All 49,000+ indexed here are free.
+
+## Links
+
+- HTML guide: ${origin}/guide/
+- Browse skills: ${origin}/skills/
+- Download omgskills for macOS: ${origin}/downloads/omgskills-mac.dmg
+`;
+}
+
 function renderAgentsText() {
   return `# omgskills agent discovery
 
@@ -1284,6 +1362,8 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 
 ## Start here
 
+- [Skills: The Complete Guide](${origin}/guide/index.md)
+- [HTML skills guide](${origin}/guide/)
 - [Markdown library index](${origin}/skills/index.md)
 - [HTML library index](${origin}/skills/)
 - [Curated Gold library export](${origin}/llms-gold.txt)
@@ -1630,6 +1710,7 @@ async function main() {
     html: renderDevelopersPage(),
     markdown: renderDevelopersMarkdown(),
   });
+  await writeFile(path.join(siteDir, "guide", "index.md"), renderGuideMarkdown());
   await writeWebLibraryRedirects(profileCollections, generatedSkillUrlById);
   await writeFile(
     path.join(siteDir, catalogSkillUrlsFilename),
