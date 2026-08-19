@@ -284,13 +284,13 @@
 
       <div class="guide-grid">
         <article>
-          <section id="what">
+          <section>
             <h2>What are skills?</h2>
             <p>Skills are reusable instructions that tell an AI how you want something done.</p>
             <p>It's like asking an AI for good dinner ideas vs. asking, while sharing a recipe book by Anthony Bourdain.</p>
           </section>
 
-          <section id="when">
+          <section>
             <h2>When to use Skills</h2>
             <ul>
               <li>To specify taste, design style, or writing voice while avoiding generic work.</li>
@@ -301,7 +301,7 @@
             </ul>
           </section>
 
-          <section id="examples">
+          <section>
             <h2>Some examples</h2>
             <ul>
               <li><em>"Use <a class="example-link" href="/skills/twostraws/swiftui-agent-skill/swiftui-pro/">/swiftui-pro</a> to create an iOS app signup screen following Apple's best practices."</em></li>
@@ -310,7 +310,7 @@
             </ul>
           </section>
 
-          <section id="not">
+          <section>
             <h2>When not to use Skills</h2>
             <ul>
               <li>One-off tasks: just prompt it.</li>
@@ -319,19 +319,19 @@
             </ul>
           </section>
 
-          <section id="use">
+          <section>
             <h2>How to use a Skill</h2>
             <p><strong>Install</strong> them by sharing a GitHub link with your agent, or using the omgskills app.</p>
             <p><strong>Use</strong> them automatically, they just work. Or you can type <code>/skill-name</code> during a chat session with your prompt.</p>
           </section>
 
-          <section id="find">
+          <section>
             <h2>How to find good Skills</h2>
             <p>Most people host them on GitHub and share them on X, Twitter, and Reddit.</p>
-            <p>You can use tools like <a href="/">omgskills.com</a>, skills.sh, or others to make finding, reading, installing, and sharing them easier.</p>
+            <p>You can use tools like <a href="/">omgskills.com</a>, <a href="https://skills.sh/" target="_blank" rel="noreferrer">skills.sh</a>, or others to make finding, reading, installing, and sharing them easier.</p>
           </section>
 
-          <section id="make">
+          <section>
             <h2>How to make a Skill</h2>
             <p>Ummmm... just ask your agent. He gotcha.</p>
           </section>
@@ -342,7 +342,7 @@
             <p>As models improve, skills simply get more general. We will always want to specify the outcomes we want from them.</p>
           </section>
 
-          <section id="compare">
+          <section>
             <h2>Skills vs plugins vs MCP</h2>
             <div class="compare">
               <div class="compare-row">
@@ -365,13 +365,13 @@
             <p>They compose: a skill can teach the agent how to use an MCP server well.</p>
           </section>
 
-          <section id="safe">
+          <section>
             <h2>Are skills safe?</h2>
             <p>Mostly, but not all.</p>
             <p>Skills are instructions, not code, but agents act on instructions. Like other software, it is best to use skills by trusted creators with large user bases, or ones you create yourself or with your team.</p>
           </section>
 
-          <section id="why">
+          <section>
             <h2>Why skills?</h2>
             <div class="video-embed">
               <iframe src="https://www.youtube.com/embed/XsiiIa6bs9I" title="Why skills?" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -403,5 +403,10 @@
       <a href="/support/">Support</a>
     </footer>
   </div>
+  <script>
+    if (window.location.hash) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  </script>
 </body>
 </html>
