@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skills: The Complete Guide | omgskills</title>
+  <meta name="description" content="A simple guide to what AI agent skills are, when to use them, how to install them, and how they differ from plugins, MCP servers, and subagents.">
+  <link rel="canonical" href="https://omgskills.com/guide/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Skills: The Complete Guide">
+  <meta property="og:description" content="Learn what AI agent skills are, when to use them, how to install them, and how to find good ones.">
+  <meta property="og:url" content="https://omgskills.com/guide/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="omgskills">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root {
+      color-scheme: light;
+      --text: #1d1d1f;
+      --muted: #6e7380;
+      --soft: #f4f4f7;
+      --line: #e4e4e7;
+      --blue: #1591ff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: #fff;
+      line-height: 1.55;
+    }
+    a { color: inherit; }
+    .shell {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 28px 24px 72px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 72px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      min-height: 28px;
+      text-decoration: none;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .brand:hover {
+      opacity: .72;
+    }
+    .nav-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: #007aff;
+      color: #fff;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0;
+      transition: opacity .15s;
+    }
+    .nav-button:hover {
+      opacity: .82;
+    }
+    .apple-icon {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+    .hero {
+      max-width: 760px;
+      margin: 0 auto 64px;
+      text-align: center;
+    }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(44px, 8vw, 76px);
+      line-height: .95;
+      letter-spacing: -.05em;
+    }
+    .lede {
+      max-width: 640px;
+      margin: 24px auto 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.45;
+    }
+    .guide-grid {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    article {
+      display: grid;
+      gap: 18px;
+    }
+    section {
+      padding: 30px;
+      border: 1px solid transparent;
+      border-radius: 24px;
+      background: var(--soft);
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 15px;
+    }
+    p {
+      margin: 0 0 12px;
+      color: #3f3f46;
+      font-size: 15px;
+    }
+    p:last-child { margin-bottom: 0; }
+    ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      position: relative;
+      padding-left: 20px;
+      color: #3f3f46;
+      font-size: 15px;
+    }
+    li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .65em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text);
+    }
+    .example-link {
+      color: var(--blue);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .example-link:hover {
+      opacity: .82;
+    }
+    .soft {
+      background: var(--soft);
+      border-color: transparent;
+    }
+    .compare {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .compare-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 16px;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(29, 29, 31, .08);
+      font-size: 15px;
+    }
+    .compare-row:last-child { border-bottom: 0; }
+    .compare-row strong { color: var(--text); }
+    .compare-row span { color: #3f3f46; }
+    pre {
+      overflow: auto;
+      margin: 14px 0 0;
+      padding: 18px;
+      border-radius: 16px;
+      background: #111;
+      color: #f5f5f7;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .video-embed {
+      overflow: hidden;
+      margin-top: 18px;
+      border-radius: 18px;
+      aspect-ratio: 16 / 9;
+      background: #111;
+    }
+    .video-embed iframe {
+      display: block;
+      width: 142%;
+      height: 142%;
+      border: 0;
+      transform: translate(-14.8%, -14.8%);
+      transform-origin: center;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .cta-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 28px 30px;
+      border-radius: 24px;
+      background: #007aff;
+      color: #fff;
+    }
+    .cta-card p {
+      color: rgba(255, 255, 255, .7);
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: #fff;
+      color: #111;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 56px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a { text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    @media (max-width: 760px) {
+      .shell { padding: 22px 18px 56px; }
+      header { margin-bottom: 54px; }
+      section { padding: 24px; border-radius: 20px; }
+      h1 { font-size: 46px; }
+      h2 { font-size: 24px; }
+      .lede { font-size: 16px; }
+      .compare-row { grid-template-columns: 1fr; gap: 4px; }
+      .cta-card { display: grid; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="/" aria-label="omgskills home">
+        <span aria-hidden="true">&#128064;</span>
+      </a>
+      <a class="nav-button" href="/downloads/omgskills-mac.dmg"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>
+    </header>
+
+    <main>
+      <div class="hero">
+        <h1>Skills</h1>
+        <p class="lede">The Complete Guide</p>
+      </div>
+
+      <div class="guide-grid">
+        <article>
+          <section id="what">
+            <h2>What are skills?</h2>
+            <p>Skills are reusable instructions that tell an AI how you want something done.</p>
+            <p>It's like asking an AI for good dinner ideas vs. asking, while sharing a recipe book by Anthony Bourdain.</p>
+          </section>
+
+          <section id="when">
+            <h2>When to use Skills</h2>
+            <ul>
+              <li>To specify taste, design style, or writing voice while avoiding generic work.</li>
+              <li>To apply world-class expertise and judgment to a task.</li>
+              <li>To encode workflows you repeat and stop re-explaining them.</li>
+              <li>To reduce the agent's freedom to cut corners.</li>
+              <li>To share and adopt other people's taste, ideas, and workflows.</li>
+            </ul>
+          </section>
+
+          <section id="examples">
+            <h2>Some examples</h2>
+            <ul>
+              <li><em>"Use <a class="example-link" href="/skills/twostraws/swiftui-agent-skill/swiftui-pro/">/swiftui-pro</a> to create an iOS app signup screen following Apple's best practices."</em></li>
+              <li><em>"Use the <a class="example-link" href="/skills/mattpocock/skills/grill-me/">/grill-me</a> skill to ask me questions until I fully explain my idea."</em></li>
+              <li><em>"Use the <a class="example-link" href="/skills/coreyhaines31/marketingskills/skills/ad-creative/">/ad-creative</a> skill to generate 10 ad alternatives for my Instagram campaign."</em></li>
+            </ul>
+          </section>
+
+          <section id="not">
+            <h2>When not to use Skills</h2>
+            <ul>
+              <li>One-off tasks: just prompt it.</li>
+              <li>Things the model already does well.</li>
+              <li>Live data or system access: those are connections, not instructions.</li>
+            </ul>
+          </section>
+
+          <section id="use">
+            <h2>How to use a Skill</h2>
+            <p><strong>Install</strong> them by sharing a GitHub link with your agent, or using the omgskills app.</p>
+            <p><strong>Use</strong> them automatically, they just work. Or you can type <code>/skill-name</code> during a chat session with your prompt.</p>
+          </section>
+
+          <section id="find">
+            <h2>How to find good Skills</h2>
+            <p>Most people host them on GitHub and share them on X, Twitter, and Reddit.</p>
+            <p>You can use tools like <a href="/">omgskills.com</a>, skills.sh, or others to make finding, reading, installing, and sharing them easier.</p>
+          </section>
+
+          <section id="make">
+            <h2>How to make a Skill</h2>
+            <p>Ummmm... just ask your agent. He gotcha.</p>
+          </section>
+
+          <section>
+            <h2>But skills are just markdown files</h2>
+            <p>Yup, we agree. And even so, skill use keeps growing.</p>
+            <p>As models improve, skills simply get more general. We will always want to specify the outcomes we want from them.</p>
+          </section>
+
+          <section id="compare">
+            <h2>Skills vs plugins vs MCP</h2>
+            <div class="compare">
+              <div class="compare-row">
+                <strong>Skill</strong>
+                <span>Teaches the agent how. Markdown instructions.</span>
+              </div>
+              <div class="compare-row">
+                <strong>MCP server</strong>
+                <span>Gives the agent access. A live program exposing tools or data.</span>
+              </div>
+              <div class="compare-row">
+                <strong>Plugin</strong>
+                <span>Packages skills, commands, and config for distribution.</span>
+              </div>
+              <div class="compare-row">
+                <strong>Subagent</strong>
+                <span>Delegates work to a separate context.</span>
+              </div>
+            </div>
+            <p>They compose: a skill can teach the agent how to use an MCP server well.</p>
+          </section>
+
+          <section id="safe">
+            <h2>Are skills safe?</h2>
+            <p>Mostly, but not all.</p>
+            <p>Skills are instructions, not code, but agents act on instructions. Like other software, it is best to use skills by trusted creators with large user bases, or ones you create yourself or with your team.</p>
+          </section>
+
+          <section id="why">
+            <h2>Why skills?</h2>
+            <div class="video-embed">
+              <iframe src="https://www.youtube.com/embed/XsiiIa6bs9I" title="Why skills?" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+          </section>
+
+          <section>
+            <h2>Are skills free?</h2>
+            <p>Yes. Skills are open-source markdown files on GitHub. All 49,000+ indexed here are free.</p>
+          </section>
+
+          <div class="cta-card">
+            <div>
+              <h2>Find skills faster</h2>
+              <p>Browse 49,000+ free skills and install the ones you want from your Mac menu bar.</p>
+            </div>
+            <a class="button" href="/downloads/omgskills-mac.dmg">Download for macOS</a>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <footer>
+      <a href="/">Home</a>
+      <a href="/skills/">Skills</a>
+      <a href="/data/">Data</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/support/">Support</a>
+    </footer>
+  </div>
+</body>
+</html>
