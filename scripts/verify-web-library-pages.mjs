@@ -707,7 +707,8 @@ async function verifyLocalGuide() {
   verifyGuideHtml(await readFile(htmlPath, "utf8"), htmlPath);
   verifyGuideMarkdown(await readFile(markdownPath, "utf8"), markdownPath);
   const redirectRules = await readFile(path.join(siteDir, "_redirects"), "utf8");
-  assertIncludes(redirectRules, "/guide /guide/ 301!", path.join(siteDir, "_redirects"));
+  assertNotIncludes(redirectRules, "/guide /guide/index.html 200", path.join(siteDir, "_redirects"));
+  assertNotIncludes(redirectRules, "/guide /guide/ 301", path.join(siteDir, "_redirects"));
   const netlifyConfig = await readFile(path.join(repoRoot, "netlify.toml"), "utf8");
   assertIncludes(netlifyConfig, 'for = "/guide/index.md"', path.join(repoRoot, "netlify.toml"));
 }
