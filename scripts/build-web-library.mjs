@@ -204,7 +204,20 @@ function titleize(value) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function pageShell({ title, description, path: urlPath, body, structuredData, ogType = "website", ogImage = "", indexTier = "indexable" }) {
+function pageShell({
+  title,
+  description,
+  path: urlPath,
+  body,
+  structuredData,
+  ogType = "website",
+  ogImage = "",
+  ogImageWidth = "",
+  ogImageHeight = "",
+  ogImageAlt = "",
+  twitterCard = "summary",
+  indexTier = "indexable",
+}) {
   const canonical = `${origin}${urlPath}`;
   const structuredDataItems = Array.isArray(structuredData) ? structuredData : [structuredData];
   return `<!doctype html>
@@ -225,10 +238,14 @@ function pageShell({ title, description, path: urlPath, body, structuredData, og
   <meta property="og:type" content="${escapeHtml(ogType)}">
   <meta property="og:site_name" content="omgskills">
   ${ogImage ? `<meta property="og:image" content="${escapeHtml(ogImage)}">` : ""}
-  <meta name="twitter:card" content="summary">
+  ${ogImage && ogImageWidth ? `<meta property="og:image:width" content="${escapeHtml(ogImageWidth)}">` : ""}
+  ${ogImage && ogImageHeight ? `<meta property="og:image:height" content="${escapeHtml(ogImageHeight)}">` : ""}
+  ${ogImage && ogImageAlt ? `<meta property="og:image:alt" content="${escapeHtml(ogImageAlt)}">` : ""}
+  <meta name="twitter:card" content="${escapeHtml(twitterCard)}">
   <meta name="twitter:title" content="${escapeHtml(title)}">
   <meta name="twitter:description" content="${escapeHtml(description)}">
   ${ogImage ? `<meta name="twitter:image" content="${escapeHtml(ogImage)}">` : ""}
+  ${ogImage && ogImageAlt ? `<meta name="twitter:image:alt" content="${escapeHtml(ogImageAlt)}">` : ""}
   <style>
     :root { color-scheme: light; --text: #111111; --muted: #6b7280; --line: #e5e7eb; --soft: #f7f7f8; --blue: #007aff; }
     * { box-sizing: border-box; }
@@ -935,6 +952,11 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
     title: "Skills - omgskills",
     description: "Browse featured profiles, collections, and selected AI agent skills in the omgskills web library.",
     path: "/skills/",
+    ogImage: `${origin}/images/guide/share.png`,
+    ogImageWidth: "1200",
+    ogImageHeight: "630",
+    ogImageAlt: "omgskills skills library social preview",
+    twitterCard: "summary_large_image",
     body,
     structuredData: {
       "@context": "https://schema.org",

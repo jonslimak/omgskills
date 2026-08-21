@@ -132,6 +132,10 @@ const pages = [
     text: "The best &amp; latest skills from the most trusted sources",
     directoryImages: true,
     skillLayout: true,
+    socialImage: {
+      url: "https://omgskills.com/images/guide/share.png",
+      alt: "omgskills skills library social preview",
+    },
     markdownText: "# omgskills web library",
   },
   {
@@ -261,8 +265,13 @@ function verifyHomepageTrustMetadata(html, label) {
   assertIncludes(html, '<link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">', label);
   assertIncludes(html, '<meta property="og:type" content="website">', label);
   assertIncludes(html, '<meta property="og:site_name" content="omgskills">', label);
-  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/banner.webp">', label);
+  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/images/guide/share.png">', label);
+  assertIncludes(html, '<meta property="og:image:width" content="1200">', label);
+  assertIncludes(html, '<meta property="og:image:height" content="630">', label);
+  assertIncludes(html, '<meta property="og:image:alt" content="omgskills skills library social preview">', label);
   assertIncludes(html, '<meta name="twitter:card" content="summary_large_image">', label);
+  assertIncludes(html, '<meta name="twitter:image" content="https://omgskills.com/images/guide/share.png">', label);
+  assertIncludes(html, '<meta name="twitter:image:alt" content="omgskills skills library social preview">', label);
   assertIncludes(html, '<a href="/about/">About</a>', label);
 
   const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
@@ -545,6 +554,16 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, 'collection image" loading="lazy" decoding="async"', label);
   }
 
+  if (page.socialImage) {
+    assertIncludes(html, `<meta property="og:image" content="${page.socialImage.url}">`, label);
+    assertIncludes(html, '<meta property="og:image:width" content="1200">', label);
+    assertIncludes(html, '<meta property="og:image:height" content="630">', label);
+    assertIncludes(html, `<meta property="og:image:alt" content="${page.socialImage.alt}">`, label);
+    assertIncludes(html, '<meta name="twitter:card" content="summary_large_image">', label);
+    assertIncludes(html, `<meta name="twitter:image" content="${page.socialImage.url}">`, label);
+    assertIncludes(html, `<meta name="twitter:image:alt" content="${page.socialImage.alt}">`, label);
+  }
+
   if (page.developerResources) {
     assertIncludes(html, `${origin}/mcp`, label);
     assertIncludes(html, "npx -y omgskills-mcp", label);
@@ -798,7 +817,7 @@ async function verifyLocalHomepageLibraryPreview() {
   verifyHomepageLibraryPreview(html, filePath);
   verifyHomepageTrustMetadata(html, filePath);
   assertIncludes(html, '<a href="/developers/">Developers</a>', filePath);
-  for (const requiredPath of ["/about/", "/banner.webp"]) {
+  for (const requiredPath of ["/about/", "/banner.webp", "/images/guide/share.png"]) {
     if (!(await localUrlExists(requiredPath))) {
       throw new Error(`${filePath} requires missing local resource: ${requiredPath}`);
     }
@@ -861,13 +880,13 @@ async function verifyLiveHomepageLibraryPreview() {
   assertIncludes(html, '<a href="/developers/">Developers</a>', url);
   await verifyLiveInternalLinks(html, url);
 
-  const socialImageResponse = await fetchLive(`${origin}/banner.webp`, { redirect: "manual" });
+  const socialImageResponse = await fetchLive(`${origin}/images/guide/share.png`, { redirect: "manual" });
   if (socialImageResponse.status !== 200) {
-    throw new Error(`${origin}/banner.webp returned ${socialImageResponse.status}, expected 200`);
+    throw new Error(`${origin}/images/guide/share.png returned ${socialImageResponse.status}, expected 200`);
   }
   const contentType = socialImageResponse.headers.get("content-type") || "";
-  if (!contentType.toLowerCase().startsWith("image/webp")) {
-    throw new Error(`${origin}/banner.webp returned Content-Type ${contentType || "<missing>"}, expected image/webp`);
+  if (!contentType.toLowerCase().startsWith("image/png")) {
+    throw new Error(`${origin}/images/guide/share.png returned Content-Type ${contentType || "<missing>"}, expected image/png`);
   }
 }
 
