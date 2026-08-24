@@ -133,7 +133,7 @@ const pages = [
     directoryImages: true,
     skillLayout: true,
     socialImage: {
-      url: "https://omgskills.com/images/guide/share.png",
+      url: "https://omgskills.com/images/guide/share.png?v=20260822",
       alt: "omgskills skills library social preview",
     },
     markdownText: "# omgskills web library",
@@ -265,12 +265,12 @@ function verifyHomepageTrustMetadata(html, label) {
   assertIncludes(html, '<link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">', label);
   assertIncludes(html, '<meta property="og:type" content="website">', label);
   assertIncludes(html, '<meta property="og:site_name" content="omgskills">', label);
-  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/images/guide/share.png">', label);
+  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/images/guide/share.png?v=20260822">', label);
   assertIncludes(html, '<meta property="og:image:width" content="1200">', label);
   assertIncludes(html, '<meta property="og:image:height" content="630">', label);
   assertIncludes(html, '<meta property="og:image:alt" content="omgskills skills library social preview">', label);
   assertIncludes(html, '<meta name="twitter:card" content="summary_large_image">', label);
-  assertIncludes(html, '<meta name="twitter:image" content="https://omgskills.com/images/guide/share.png">', label);
+  assertIncludes(html, '<meta name="twitter:image" content="https://omgskills.com/images/guide/share.png?v=20260822">', label);
   assertIncludes(html, '<meta name="twitter:image:alt" content="omgskills skills library social preview">', label);
   assertIncludes(html, '<a href="/about/">About</a>', label);
 
@@ -686,7 +686,7 @@ function verifyGuideHtml(html, label) {
   assertIncludes(html, '<link rel="canonical" href="https://omgskills.com/guide/">', label);
   assertIncludes(html, '<link rel="alternate" type="text/markdown" href="/guide/index.md">', label);
   assertIncludes(html, '<h1>Skills: The Complete Guide</h1>', label);
-  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/images/guide/share.png">', label);
+  assertIncludes(html, '<meta property="og:image" content="https://omgskills.com/images/guide/share.png?v=20260822">', label);
   assertIncludes(html, '<meta property="og:image:width" content="1200">', label);
   assertIncludes(html, '<meta property="og:image:height" content="630">', label);
   assertIncludes(html, '<meta name="twitter:card" content="summary_large_image">', label);

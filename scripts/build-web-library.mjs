@@ -21,6 +21,7 @@ import {
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
+const sharedSocialImageUrl = `${origin}/images/guide/share.png?v=20260822`;
 const maxAuthorSkills = Number.parseInt(process.env.WEB_LIBRARY_AUTHOR_SKILL_LIMIT || "3", 10);
 const sitemapChunkSize = Number.parseInt(process.env.WEB_LIBRARY_SITEMAP_CHUNK_SIZE || "10000", 10);
 const minIndexableDescriptionLength = Number.parseInt(process.env.WEB_LIBRARY_MIN_INDEXABLE_DESCRIPTION_LENGTH || "80", 10);
@@ -952,7 +953,7 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
     title: "Skills - omgskills",
     description: "Browse featured profiles, collections, and selected AI agent skills in the omgskills web library.",
     path: "/skills/",
-    ogImage: `${origin}/images/guide/share.png`,
+    ogImage: sharedSocialImageUrl,
     ogImageWidth: "1200",
     ogImageHeight: "630",
     ogImageAlt: "omgskills skills library social preview",
