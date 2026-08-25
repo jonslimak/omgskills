@@ -27,7 +27,7 @@
     "name": "imagegen-frontend-mobile",
     "authorHandle": "leonxlnx",
     "description": "Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. Designed for iOS, Android, and cross-platform mobile products. Prioritizes clean hierarchy, comfortably readable text, strong multi-screen consistency, controlled color palettes, non-generic creative direction, textured surfaces, image-led composition, tasteful custom iconography, and clean phone mockup framing. By default, screens should be shown inside a subtle premium iPhone or similar phone mockup with a visible frame, while the main focus stays on the app content itself. This skill generates images only. It does not write code.",
-    "stars": 80170,
+    "stars": 80236,
     "installs": 230067,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
@@ -38,7 +38,7 @@
     "name": "writing-plans",
     "authorHandle": "obra",
     "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
-    "stars": 277183,
+    "stars": 277245,
     "installs": 228936,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
@@ -181,7 +181,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 171406,
+    "stars": 171445,
     "installs": 208005,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -247,7 +247,7 @@
     "name": "seo-audit",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\" \"technical SEO,\" \"why am I not ranking,\" \"SEO issues,\" \"on-page SEO,\" \"meta tags review,\" \"SEO health check,\" \"my traffic dropped,\" \"lost rankings,\" \"not showing up in Google,\" \"site isn't ranking,\" \"Google update hit me,\" \"page speed,\" \"core web vitals,\" \"crawl errors,\" or \"indexing issues.\" Use this even if the user just says something vague like \"my SEO is bad\" or \"help with SEO\" — start with an audit. For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema. For AI search optimization, see ai-seo.",
-    "stars": 45433,
+    "stars": 45532,
     "installs": 193397,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
@@ -269,7 +269,7 @@
     "name": "lark-note",
     "authorHandle": "larksuite",
     "description": "仅当用户或上游配置显式指定 lark-note 时使用，相关请求统一交由 lark-meeting 技能处理。",
-    "stars": 16720,
+    "stars": 16732,
     "installs": 191141,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
@@ -335,7 +335,7 @@
     "name": "orca-cli",
     "authorHandle": "stablyai",
     "description": "Use the public `orca` CLI to operate Orca-managed worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, worktree comments, and the browser embedded inside the Orca app. Use when the user says \"$orca-cli\", \"use orca cli\", \"Orca worktree\", \"child worktree\", \"cardStatus\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"terminal send\", \"full handoff\", \"handover\", \"give this to another agent\", \"another worktree\", \"Orca browser\", \"orca artifacts\", \"share HTML/Markdown\", \"public artifact link\", \"share skills\", or \"control the browser inside Orca\". Prefer this over raw `git worktree`, ad hoc PTYs, Playwright, or Computer Use when the task touches Orca-managed state. Use Computer Use for browser windows, webviews, or desktop UI outside Orca's embedded browser.",
-    "stars": 52984,
+    "stars": 53088,
     "installs": 173549,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
@@ -830,7 +830,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 110403,
+    "stars": 110431,
     "installs": 92280,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -918,7 +918,7 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 47165,
+    "stars": 47217,
     "installs": 79980,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1776,7 +1776,7 @@
     "name": "gws-sheets",
     "authorHandle": "googleworkspace",
     "description": "Google Sheets: Read and write spreadsheets.",
-    "stars": 30408,
+    "stars": 30552,
     "installs": 50533,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
@@ -1831,7 +1831,7 @@
     "name": "gsap-core",
     "authorHandle": "greensock",
     "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions.",
-    "stars": 14256,
+    "stars": 14292,
     "installs": 49503,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
@@ -2909,7 +2909,7 @@
     "name": "karpathy-guidelines",
     "authorHandle": "multica-ai",
     "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-    "stars": 206160,
+    "stars": 206791,
     "installs": 33110,
     "githubUrl": "https://github.com/multica-ai/andrej-karpathy-skills",
     "source": "skills.sh"
@@ -2920,7 +2920,7 @@
     "name": "baoyu-post-to-wechat",
     "authorHandle": "jimliu",
     "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
-    "stars": 25306,
+    "stars": 25313,
     "installs": 32973,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
