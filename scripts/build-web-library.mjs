@@ -1585,6 +1585,7 @@ async function main() {
   const sitemapUrls = new Map([
     ["/", { source: "home" }],
     ["/about/", { source: "about" }],
+    ["/guide/", { source: "guide" }],
   ]);
   const noindexReasons = new Map();
   let indexableCount = 0;
