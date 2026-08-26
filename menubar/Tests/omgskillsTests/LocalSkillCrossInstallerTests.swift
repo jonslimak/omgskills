@@ -76,6 +76,53 @@ struct LocalSkillCrossInstallerTests {
         )
         #expect(provenance.catalogSkillId == "owner/repo:skills/source-skill")
         #expect(provenance.githubUrl == "https://github.com/owner/repo")
+        let skillData = try Data(contentsOf: source.appendingPathComponent("SKILL.md"))
+        #expect(provenance.skillMdSha == SkillIdentityResolver.gitBlobSHA(for: skillData))
+    }
+
+    @Test func localEditChangesCurrentShaWithoutRewritingInstallProvenance() throws {
+        let root = try temporaryDirectory()
+        let source = root.appendingPathComponent("source-skill", isDirectory: true)
+        let targetRoot = root.appendingPathComponent("codex", isDirectory: true)
+        try writeSkill(at: source)
+
+        _ = try LocalSkillCrossInstaller.install(
+            makeInstalledSkill(
+                path: source.path,
+                origin: "Claude",
+                githubUrl: "https://github.com/owner/repo",
+                catalogSkillId: "owner/repo:skills/source-skill",
+                identityStatus: .resolved(method: .git)
+            ),
+            targetRoot: targetRoot
+        )
+
+        let installedProvenance = try #require(SkillInstallProvenanceStore.read(
+            targetRoot: targetRoot,
+            targetName: "source-skill"
+        ))
+        try """
+        ---
+        name: source-skill
+        description: Edited locally.
+        ---
+        """.write(
+            to: source.appendingPathComponent("SKILL.md"),
+            atomically: true,
+            encoding: .utf8
+        )
+
+        let scan = InstalledSkillsScanner.scan(roots: [
+            InstalledSkillsScanner.Root(url: targetRoot, origin: "Codex")
+        ])
+        let currentSha = try #require(scan.installations.first?.skillMdSha)
+        let persistedProvenance = try #require(SkillInstallProvenanceStore.read(
+            targetRoot: targetRoot,
+            targetName: "source-skill"
+        ))
+
+        #expect(currentSha != installedProvenance.skillMdSha)
+        #expect(persistedProvenance.skillMdSha == installedProvenance.skillMdSha)
     }
 
     @Test func ambiguousAndLocalOnlySkillsDoNotWriteProvenance() throws {

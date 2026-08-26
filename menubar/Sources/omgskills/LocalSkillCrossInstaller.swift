@@ -32,9 +32,11 @@ enum LocalSkillCrossInstaller {
         }
 
         let sourceURL = sourceInstallURL.resolvingSymlinksInPath()
-        guard fm.fileExists(atPath: sourceURL.appendingPathComponent("SKILL.md").path) else {
+        let sourceSkill = sourceURL.appendingPathComponent("SKILL.md")
+        guard fm.fileExists(atPath: sourceSkill.path) else {
             throw InstallError.missingSourceSkill
         }
+        let skillMdSha = try SkillInstallProvenanceStore.skillMdSha(at: sourceSkill)
 
         let targetURL = targetRoot.appendingPathComponent(sourceInstallURL.lastPathComponent, isDirectory: true)
         if fm.fileExists(atPath: targetURL.appendingPathComponent("SKILL.md").path) {
@@ -53,6 +55,7 @@ enum LocalSkillCrossInstaller {
                 try SkillInstallProvenanceStore.write(
                     catalogSkillId: catalogSkillId,
                     githubUrl: skill.githubUrl,
+                    skillMdSha: skillMdSha,
                     targetRoot: targetRoot,
                     targetName: sourceInstallURL.lastPathComponent
                 )

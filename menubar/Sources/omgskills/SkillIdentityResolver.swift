@@ -41,6 +41,7 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
     let catalogSkillId: String
     let githubUrl: String
     let installedAt: String
+    let skillMdSha: String?
 }
 
 struct SkillIdentityMeasurement: Equatable, Sendable {

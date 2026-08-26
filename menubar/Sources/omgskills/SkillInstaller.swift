@@ -62,12 +62,15 @@ enum SkillInstaller {
         let targetSkill = targetURL.appendingPathComponent("SKILL.md")
 
         if fm.fileExists(atPath: targetSkill.path) {
-            try? SkillInstallProvenanceStore.write(
-                catalogSkillId: skill.id,
-                githubUrl: skill.githubUrl,
-                targetRoot: targetRoot,
-                targetName: spec.targetName
-            )
+            if let skillMdSha = try? SkillInstallProvenanceStore.skillMdSha(at: targetSkill) {
+                try? SkillInstallProvenanceStore.write(
+                    catalogSkillId: skill.id,
+                    githubUrl: skill.githubUrl,
+                    skillMdSha: skillMdSha,
+                    targetRoot: targetRoot,
+                    targetName: spec.targetName
+                )
+            }
             return .alreadyInstalled
         }
 
@@ -83,9 +86,11 @@ enum SkillInstaller {
             ? repoDir
             : repoDir.appendingPathComponent(spec.skillRelativePath, isDirectory: true)
 
-        guard fm.fileExists(atPath: source.appendingPathComponent("SKILL.md").path) else {
+        let sourceSkill = source.appendingPathComponent("SKILL.md")
+        guard fm.fileExists(atPath: sourceSkill.path) else {
             throw InstallError.missingSkillFile
         }
+        let skillMdSha = try SkillInstallProvenanceStore.skillMdSha(at: sourceSkill)
 
         if fm.fileExists(atPath: targetURL.path) {
             throw InstallError.invalidInstallCommand
@@ -95,6 +100,7 @@ enum SkillInstaller {
         try SkillInstallProvenanceStore.write(
             catalogSkillId: skill.id,
             githubUrl: skill.githubUrl,
+            skillMdSha: skillMdSha,
             targetRoot: targetRoot,
             targetName: spec.targetName
         )

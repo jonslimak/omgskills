@@ -125,18 +125,24 @@ struct InstalledSkillsScannerTests {
         try FileManager.default.createDirectory(at: local, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: metadataDir, withIntermediateDirectories: true)
         try writeSkill(at: local, name: "installed-skill")
-        let metadata = SkillInstallProvenance(
-            catalogSkillId: "owner/repo:installed-skill",
-            githubUrl: "https://github.com/owner/repo",
-            installedAt: "2026-07-06T00:00:00Z"
-        )
-        try JSONEncoder().encode(metadata).write(to: metadataDir.appendingPathComponent("installed-skill.json"))
+        let metadata = """
+        {
+          "catalogSkillId": "owner/repo:installed-skill",
+          "githubUrl": "https://github.com/owner/repo",
+          "installedAt": "2026-07-06T00:00:00Z"
+        }
+        """
+        try Data(metadata.utf8).write(to: metadataDir.appendingPathComponent("installed-skill.json"))
 
         let result = InstalledSkillsScanner.scan(roots: [
             InstalledSkillsScanner.Root(url: codex, origin: "Codex")
         ])
 
         #expect(result.installations.first?.catalogSkillId == "owner/repo:installed-skill")
+        #expect(SkillInstallProvenanceStore.read(
+            targetRoot: codex,
+            targetName: "installed-skill"
+        )?.skillMdSha == nil)
     }
 
     @Test func recentSkillsCapsAtTenNewestFirst() throws {

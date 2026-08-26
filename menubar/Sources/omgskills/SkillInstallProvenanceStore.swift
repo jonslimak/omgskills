@@ -13,9 +13,15 @@ enum SkillInstallProvenanceStore {
         return try? JSONDecoder().decode(SkillInstallProvenance.self, from: data)
     }
 
+    static func skillMdSha(at skillFileURL: URL) throws -> String {
+        let data = try Data(contentsOf: skillFileURL)
+        return SkillIdentityResolver.gitBlobSHA(for: data)
+    }
+
     static func write(
         catalogSkillId: String,
         githubUrl: String,
+        skillMdSha: String,
         targetRoot: URL,
         targetName: String
     ) throws {
@@ -27,7 +33,8 @@ enum SkillInstallProvenanceStore {
         let provenance = SkillInstallProvenance(
             catalogSkillId: catalogSkillId,
             githubUrl: githubUrl,
-            installedAt: formatter.string(from: Date())
+            installedAt: formatter.string(from: Date()),
+            skillMdSha: skillMdSha
         )
         let data = try JSONEncoder().encode(provenance)
         try data.write(

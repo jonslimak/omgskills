@@ -204,6 +204,7 @@ struct InstalledSkillUninstallerTests {
         try SkillInstallProvenanceStore.write(
             catalogSkillId: "owner/repo:example",
             githubUrl: "https://github.com/owner/repo",
+            skillMdSha: String(repeating: "a", count: 40),
             targetRoot: targetRoot,
             targetName: targetName
         )
