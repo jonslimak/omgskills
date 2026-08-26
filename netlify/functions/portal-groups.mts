@@ -1,13 +1,25 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
 import { resolveCreateGroupSlug } from "./_shared/group-slug.js";
+import { findOwnedGroupIds, requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { optionalString, requireString } from "./_shared/validation.js";
 
 async function listGroups(req: Request) {
   const user = await requirePortalUser(req);
-  const result = await getPgPool().query(
+  const pool = getPgPool();
+  const candidateIds = await findOwnedGroupIds(user.id, pool);
+  const accessibleIds = (await Promise.all(
+    candidateIds.map(async (groupId) => {
+      await requireGroupAccess(user, groupId, "manage", pool);
+      return groupId;
+    })
+  ));
+  if (accessibleIds.length === 0) {
+    return jsonResponse(req, { groups: [] });
+  }
+  const result = await pool.query(
     `
       SELECT
         g.id,
@@ -30,11 +42,11 @@ async function listGroups(req: Request) {
       FROM skill_groups g
       LEFT JOIN skill_group_items i ON i.group_id = g.id
       LEFT JOIN skill_group_allowed_emails a ON a.group_id = g.id
-      WHERE g.owner_user_id = $1
+      WHERE g.id = ANY($1::uuid[])
       GROUP BY g.id
       ORDER BY g.created_at DESC
     `,
-    [user.id]
+    [accessibleIds]
   );
 
   return jsonResponse(req, { groups: result.rows });

@@ -1,5 +1,10 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import {
+  findGroupIdByOwnerSlug,
+  findOwnedGroupIds,
+  requireGroupAccess,
+} from "./_shared/group-access.js";
 import { recordAnalytics } from "./_shared/group-items.js";
 import {
   loadCatalogSkillUrls,
@@ -102,6 +107,18 @@ export default async (req: Request, context: Context) => {
   }
 
   if (groupSlug) {
+    const groupId = await findGroupIdByOwnerSlug(user.id, groupSlug.toLowerCase(), pool);
+    if (!groupId) {
+      return notFound();
+    }
+    try {
+      await requireGroupAccess(null, groupId, "public", pool);
+    } catch (error) {
+      if (error instanceof Response && error.status === 404) {
+        return notFound();
+      }
+      throw error;
+    }
     const groupResult = await pool.query(
       `
         SELECT
@@ -124,13 +141,10 @@ export default async (req: Request, context: Context) => {
         FROM skill_groups g
         LEFT JOIN skill_group_items i ON i.group_id = g.id
         LEFT JOIN synced_skills s ON s.id = i.synced_skill_id
-        WHERE g.owner_user_id = $1
-          AND g.slug = $2
-          AND g.visibility = 'public'
-          AND g.disabled_at IS NULL
+        WHERE g.id = $1
         ORDER BY i.position ASC
       `,
-      [user.id, groupSlug.toLowerCase()]
+      [groupId]
     );
     if (groupResult.rowCount === 0) {
       return notFound();
@@ -160,18 +174,32 @@ export default async (req: Request, context: Context) => {
     return html(`<a href="/u/${escapeHtml(user.handle)}">Back to profile</a><h1>${escapeHtml(first.name)}</h1><p class="muted">${escapeHtml(first.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`);
   }
 
-  const groups = await pool.query(
+  const candidateIds = await findOwnedGroupIds(user.id, pool);
+  const publicGroupIds = (await Promise.all(
+    candidateIds.map(async (groupId) => {
+      try {
+        await requireGroupAccess(null, groupId, "public", pool);
+        return groupId;
+      } catch (error) {
+        if (error instanceof Response && error.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    })
+  )).filter((groupId): groupId is string => Boolean(groupId));
+  const groups = publicGroupIds.length === 0
+    ? { rows: [] as any[] }
+    : await pool.query(
     `
       SELECT g.name, g.description, g.slug, count(i.id)::int AS "itemCount"
       FROM skill_groups g
       LEFT JOIN skill_group_items i ON i.group_id = g.id
-      WHERE g.owner_user_id = $1
-        AND g.visibility = 'public'
-        AND g.disabled_at IS NULL
+      WHERE g.id = ANY($1::uuid[])
       GROUP BY g.id
       ORDER BY g.is_favorites DESC, lower(g.name)
     `,
-    [user.id]
+    [publicGroupIds]
   );
   const groupList = groups.rows
     .map((group) => `<div class="item"><h2><a href="/u/${escapeHtml(user.handle)}/sets/${escapeHtml(group.slug)}">${escapeHtml(group.name)}</a></h2><p class="muted">${escapeHtml(group.description || `${group.itemCount} skills`)}</p></div>`)

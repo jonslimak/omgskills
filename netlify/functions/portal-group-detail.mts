@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import { requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 
@@ -25,6 +26,7 @@ export default async (req: Request, _context: Context) => {
 
     if (req.method === "GET") {
       const pool = getPgPool();
+      const access = await requireGroupAccess(user, groupId, "read", pool);
       const groupResult = await pool.query(
         `
           SELECT
@@ -36,9 +38,8 @@ export default async (req: Request, _context: Context) => {
             g.disabled_at AS "disabledAt",
             owner.display_name AS "ownerDisplayName",
             count(DISTINCT i.id)::int AS "itemCount",
-            CASE WHEN g.owner_user_id = $2 THEN 'owner' ELSE 'invited' END AS "accessRole",
             COALESCE(
-              jsonb_agg(DISTINCT jsonb_build_object('id', a.id, 'email', a.email)) FILTER (WHERE a.id IS NOT NULL AND g.owner_user_id = $2),
+              jsonb_agg(DISTINCT jsonb_build_object('id', a.id, 'email', a.email)) FILTER (WHERE a.id IS NOT NULL AND $2 = 'owner'),
               '[]'::jsonb
             ) AS "allowedEmails"
           FROM skill_groups g
@@ -46,14 +47,9 @@ export default async (req: Request, _context: Context) => {
           LEFT JOIN skill_group_items i ON i.group_id = g.id
           LEFT JOIN skill_group_allowed_emails a ON a.group_id = g.id
           WHERE g.id = $1
-            AND (
-              g.owner_user_id = $2
-              OR (g.visibility = 'restricted' AND a.email = $3 AND g.disabled_at IS NULL)
-              OR (g.visibility = 'public' AND g.disabled_at IS NULL)
-            )
           GROUP BY g.id, owner.display_name
         `,
-        [groupId, user.id, user.email]
+        [groupId, access.accessRole]
       );
       const group = groupResult.rows[0];
       if (!group) {
@@ -93,7 +89,7 @@ export default async (req: Request, _context: Context) => {
         position: row.position
       }));
 
-      return jsonResponse(req, { group, items, accessRole: group.accessRole });
+      return jsonResponse(req, { group, items, accessRole: access.accessRole });
     }
 
     const body = await req.json();
@@ -102,22 +98,17 @@ export default async (req: Request, _context: Context) => {
       throw new Response("visibility is invalid", { status: 400 });
     }
 
-    const result = await getPgPool().query<{ id: string; slug: string }>(
+    const pool = getPgPool();
+    const access = await requireGroupAccess(user, groupId, "manage", pool);
+    await pool.query(
       `
         UPDATE skill_groups
-        SET visibility = $3, updated_at = now()
-        WHERE id = $1 AND owner_user_id = $2
-        RETURNING id, slug
+        SET visibility = $2, updated_at = now()
+        WHERE id = $1
       `,
-      [groupId, user.id, visibility]
+      [groupId, visibility]
     );
-
-    const group = result.rows[0];
-    if (!group) {
-      throw new Response("Group not found", { status: 404 });
-    }
-
-    return jsonResponse(req, { groupId: group.id, slug: group.slug, visibility });
+    return jsonResponse(req, { groupId: access.id, slug: access.slug, visibility });
   } catch (error) {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());

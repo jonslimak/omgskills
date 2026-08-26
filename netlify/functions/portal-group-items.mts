@@ -5,7 +5,8 @@ import {
   groupItemForValidatedGithubSkill,
   validateGithubSkill,
 } from "./_shared/github-skill-resolution.js";
-import { addGroupItem, requireOwnedGroup } from "./_shared/group-items.js";
+import { requireGroupAccess } from "./_shared/group-access.js";
+import { addGroupItem } from "./_shared/group-items.js";
 import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
 import { loadPublishedCatalogIdentity } from "./_shared/published-catalog.js";
 import { requirePortalUser } from "./_shared/user.js";
@@ -31,32 +32,9 @@ async function getSyncedSkill(userId: string, syncedSkillId: string) {
   return result.rows[0] ?? null;
 }
 
-async function canViewGroup(userId: string, email: string, groupId: string) {
-  const result = await getPgPool().query<{ id: string }>(
-    `
-      SELECT g.id
-      FROM skill_groups g
-      LEFT JOIN skill_group_allowed_emails a ON a.group_id = g.id
-      WHERE g.id = $1
-        AND g.disabled_at IS NULL
-        AND (
-          g.owner_user_id = $2
-          OR g.visibility = 'public'
-          OR (g.visibility = 'restricted' AND a.email = $3)
-        )
-      LIMIT 1
-    `,
-    [groupId, userId, email]
-  );
-  return Boolean(result.rows[0]);
-}
-
 async function listGroupItems(req: Request, groupId: string) {
   const user = await requirePortalUser(req);
-  const canView = await canViewGroup(user.id, user.email, groupId);
-  if (!canView) {
-    throw new Response("Group not found", { status: 404 });
-  }
+  await requireGroupAccess(user, groupId, "read");
 
   const result = await getPgPool().query(
     `
@@ -112,7 +90,7 @@ export default async (req: Request, _context: Context) => {
     }
 
     const user = await requirePortalUser(req);
-    await requireOwnedGroup(user.id, groupId);
+    await requireGroupAccess(user, groupId, "manage");
 
     const body = await req.json();
     const kind = body?.kind;

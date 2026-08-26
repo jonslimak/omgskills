@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { recordAnalytics } from "./_shared/group-items.js";
+import { requireGroupAccess } from "./_shared/group-access.js";
 import { getPgPool } from "./_shared/db.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
@@ -28,6 +29,7 @@ export default async (req: Request, _context: Context) => {
     }
 
     await client.query("BEGIN");
+    await requireGroupAccess(user, sourceGroupId, "public", client);
     const sourceResult = await client.query<{
       id: string;
       name: string;
@@ -41,8 +43,6 @@ export default async (req: Request, _context: Context) => {
         FROM skill_groups g
         JOIN users owner ON owner.id = g.owner_user_id
         WHERE g.id = $1
-          AND g.visibility = 'public'
-          AND g.disabled_at IS NULL
       `,
       [sourceGroupId]
     );

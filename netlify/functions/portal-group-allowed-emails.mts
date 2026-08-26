@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import { requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { normalizeEmail, requireString } from "./_shared/validation.js";
@@ -26,13 +27,7 @@ export default async (req: Request, _context: Context) => {
     const body = await req.json();
     const email = normalizeEmail(body?.email);
     const pool = getPgPool();
-    const ownerCheck = await pool.query(
-      "SELECT id FROM skill_groups WHERE id = $1 AND owner_user_id = $2",
-      [groupId, user.id]
-    );
-    if (ownerCheck.rowCount === 0) {
-      throw new Response("Group not found", { status: 404 });
-    }
+    await requireGroupAccess(user, groupId, "manage", pool);
 
     if (req.method === "DELETE") {
       const emailId = requireString(body?.emailId, "emailId", 100);

@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
-import { recordAnalytics, requireOwnedGroup } from "./_shared/group-items.js";
+import { requireGroupAccess } from "./_shared/group-access.js";
+import { recordAnalytics } from "./_shared/group-items.js";
 import { getPgPool } from "./_shared/db.js";
 import { errorResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
@@ -23,7 +24,7 @@ export default async (req: Request, _context: Context) => {
     if (!groupId) {
       throw new Response("Missing group id", { status: 400 });
     }
-    const group = await requireOwnedGroup(user.id, groupId);
+    const group = await requireGroupAccess(user, groupId, "manage");
     const items = await getPgPool().query(
       `
         SELECT

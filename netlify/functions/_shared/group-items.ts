@@ -10,18 +10,6 @@ type GroupItemInput = {
   note?: string | null;
 };
 
-export async function requireOwnedGroup(userId: string, groupId: string) {
-  const result = await getPgPool().query<{ id: string; slug: string; name: string }>(
-    "SELECT id, slug, name FROM skill_groups WHERE id = $1 AND owner_user_id = $2",
-    [groupId, userId]
-  );
-  const group = result.rows[0];
-  if (!group) {
-    throw new Response("Group not found", { status: 404 });
-  }
-  return group;
-}
-
 export async function addGroupItem(groupId: string, item: GroupItemInput) {
   const pool = getPgPool();
   let snapshotName = item.name ?? null;

@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import { findInvitedGroupIds, requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 
@@ -13,7 +14,25 @@ export default async (req: Request, _context: Context) => {
 
   try {
     const user = await requirePortalUser(req);
-    const result = await getPgPool().query(
+    const pool = getPgPool();
+    const candidateIds = await findInvitedGroupIds(user.email, pool);
+    const accessibleIds = (await Promise.all(
+      candidateIds.map(async (groupId) => {
+        try {
+          const access = await requireGroupAccess(user, groupId, "read", pool);
+          return access.accessRole === "invited" ? groupId : null;
+        } catch (error) {
+          if (error instanceof Response && error.status === 404) {
+            return null;
+          }
+          throw error;
+        }
+      })
+    )).filter((groupId): groupId is string => Boolean(groupId));
+    if (accessibleIds.length === 0) {
+      return jsonResponse(req, { groups: [] });
+    }
+    const result = await pool.query(
       `
         SELECT
           g.id,
@@ -22,17 +41,14 @@ export default async (req: Request, _context: Context) => {
           g.slug,
           owner.display_name AS "ownerDisplayName",
           count(i.id)::int AS "itemCount"
-        FROM skill_group_allowed_emails a
-        JOIN skill_groups g ON g.id = a.group_id
+        FROM skill_groups g
         JOIN users owner ON owner.id = g.owner_user_id
         LEFT JOIN skill_group_items i ON i.group_id = g.id
-        WHERE a.email = $1
-          AND g.visibility = 'restricted'
-          AND g.disabled_at IS NULL
+        WHERE g.id = ANY($1::uuid[])
         GROUP BY g.id, owner.display_name
         ORDER BY g.created_at DESC
       `,
-      [user.email]
+      [accessibleIds]
     );
 
     return jsonResponse(req, { groups: result.rows });
