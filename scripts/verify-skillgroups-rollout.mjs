@@ -97,6 +97,8 @@ async function verifyTargetCore() {
   await expectJsonAsset("/data/v2/manifest.json", "skills");
   await expectJsonAsset("/data/manifest.json", "skills");
   await expectStatus("/appcast.xml", 200);
+  await expectText("/robots.txt", "Sitemap: https://omgskills.com/sitemap-groups.xml");
+  await expectStatus("/sitemap-groups.xml", 200);
 }
 
 async function verifyProfileDiagnostics() {
@@ -125,8 +127,33 @@ async function verifyPublicGroupRoutes() {
     console.log("skip public group routes: set SKILLGROUP_HANDLE and SKILLGROUP_SLUG to verify real set pages");
     return;
   }
-  await expectStatus(`/u/${encodeURIComponent(handle)}/sets/${encodeURIComponent(groupSlug)}`, 200);
-  await expectStatus(`/u/${encodeURIComponent(handle)}/${encodeURIComponent(groupSlug)}`, 200);
+  const canonicalPath = `/u/${encodeURIComponent(handle)}/sets/${encodeURIComponent(groupSlug)}`;
+  const canonicalUrl = `${productionOrigin}${canonicalPath}`;
+  const page = await expectStatus(canonicalPath, 200);
+  const html = await page.text();
+  if (!html.includes(`<link rel="canonical" href="${canonicalUrl}">`)) {
+    fail(`${targetOrigin}${canonicalPath} did not expose its canonical URL`);
+  }
+  if (/omgskills:\/\/group|Install (all|group)|Open in omgskills/i.test(html)) {
+    fail(`${targetOrigin}${canonicalPath} advertised group installation before L5.2`);
+  }
+
+  for (const legacyPath of [
+    `/u/${encodeURIComponent(handle)}/${encodeURIComponent(groupSlug)}`,
+    `/profiles/${encodeURIComponent(handle)}/sets/${encodeURIComponent(groupSlug)}`,
+    `${canonicalPath}/`,
+  ]) {
+    const redirect = await expectStatus(legacyPath, 301);
+    const location = redirect.headers.get("location");
+    if (!location || new URL(location, targetOrigin).pathname !== canonicalPath) {
+      fail(`${targetOrigin}${legacyPath} did not redirect to ${canonicalPath}`);
+    }
+  }
+
+  const sitemap = await expectStatus("/sitemap-groups.xml", 200);
+  if (!(await sitemap.text()).includes(canonicalUrl)) {
+    fail(`${targetOrigin}/sitemap-groups.xml did not contain ${canonicalUrl}`);
+  }
 }
 
 async function verifyProductionLibraryBaseline() {

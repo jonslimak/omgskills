@@ -20,6 +20,11 @@ export type GroupAccess = GroupAccessFacts & {
   accessRole: GroupAccessRole;
 };
 
+export type PublicGroupRouteFacts = {
+  handle: string;
+  groupSlug: string;
+};
+
 export type GroupAccessActor = Pick<PortalUser, "id" | "email"> | null;
 
 export type GroupAccessClient = {
@@ -129,4 +134,23 @@ export async function findGroupIdByOwnerSlug(
     [ownerUserId, slug]
   );
   return result.rows[0]?.id ?? null;
+}
+
+export async function findIndexablePublicGroups(
+  client: GroupAccessClient = getPgPool()
+): Promise<PublicGroupRouteFacts[]> {
+  const result = await client.query<PublicGroupRouteFacts>(
+    `
+      SELECT u.handle, g.slug AS "groupSlug"
+      FROM skill_groups g
+      JOIN users u ON u.id = g.owner_user_id
+      WHERE
+        u.profile_published = true
+        AND u.handle IS NOT NULL
+        AND g.visibility = 'public'
+        AND g.disabled_at IS NULL
+      ORDER BY lower(u.handle), lower(g.slug)
+    `
+  );
+  return result.rows;
 }

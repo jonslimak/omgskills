@@ -1,0 +1,163 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import type { Context } from "@netlify/functions";
+import type { GroupAccessClient, GroupAccessFacts } from "./group-access.js";
+import {
+  publicSkillgroupPage,
+  type PublicSkillgroupPageDependencies,
+} from "../public-skillgroup-page.mjs";
+
+const context = {
+  deploy: { context: "production" },
+  params: {},
+} as Context;
+
+function result(rows: any[]) {
+  return { rows, rowCount: rows.length } as any;
+}
+
+function sequenceClient(rowsByQuery: any[][]): GroupAccessClient {
+  let index = 0;
+  return {
+    async query() {
+      const rows = rowsByQuery[index++];
+      assert.notEqual(rows, undefined, `unexpected query ${index}`);
+      return result(rows);
+    },
+  };
+}
+
+function accessFacts(overrides: Partial<GroupAccessFacts> = {}): GroupAccessFacts {
+  return {
+    id: "group-id",
+    ownerUserId: "user-id",
+    name: "Design tools",
+    slug: "design-tools",
+    visibility: "public",
+    isFavorites: false,
+    disabledAt: null,
+    invited: false,
+    ...overrides,
+  };
+}
+
+function dependencies(rowsByQuery: any[][]): PublicSkillgroupPageDependencies {
+  return {
+    pool: sequenceClient(rowsByQuery),
+    async loadCatalogSkillUrls() {
+      return new Map([["owner/repo:design", "/skills/owner/repo/design/"]]);
+    },
+    async recordAnalytics() {},
+  };
+}
+
+const publishedUser = {
+  id: "user-id",
+  handle: "jon",
+  displayName: "Jon",
+  profilePublished: true,
+};
+
+test("renders a public group with canonical metadata and no premature install action", async () => {
+  const response = await publicSkillgroupPage(
+    new Request("https://omgskills.com/u/jon/sets/design-tools"),
+    context,
+    dependencies([
+      [publishedUser],
+      [{ id: "group-id" }],
+      [accessFacts()],
+      [{
+        id: "group-id",
+        name: "Design tools",
+        description: "A focused set of design skills.",
+        slug: "design-tools",
+        itemId: "item-id",
+        kind: "catalog",
+        catalogSkillId: "owner/repo:design",
+        itemGithubUrl: null,
+        snapshotName: "Design skill",
+        snapshotDescription: "Design useful interfaces.",
+        note: null,
+        skillName: null,
+        skillDescription: null,
+        syncedCatalogSkillId: null,
+        githubUrl: null,
+        isLocalOnly: false,
+      }],
+    ])
+  );
+  const body = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("cache-control") ?? "", /^public/);
+  assert.match(body, /<title>Design tools by Jon \| omgskills<\/title>/);
+  assert.match(body, /<link rel="canonical" href="https:\/\/omgskills\.com\/u\/jon\/sets\/design-tools">/);
+  assert.match(body, /<meta property="og:title"/);
+  assert.doesNotMatch(body, /noindex/);
+  assert.doesNotMatch(body, /omgskills:\/\/group|Install (all|group)|Open in omgskills/i);
+});
+
+test("redirects compatibility and trailing-slash routes to the canonical group URL", async () => {
+  for (const path of [
+    "/u/jon/design-tools",
+    "/profiles/jon/sets/design-tools",
+    "/u/jon/sets/design-tools/",
+  ]) {
+    const response = await publicSkillgroupPage(
+      new Request(`https://omgskills.com${path}`),
+      context,
+      dependencies([])
+    );
+    assert.equal(response.status, 301);
+    assert.equal(
+      response.headers.get("location"),
+      "https://omgskills.com/u/jon/sets/design-tools"
+    );
+  }
+});
+
+test("hides private, restricted, disabled, and unpublished-profile groups", async (t) => {
+  for (const [label, overrides] of [
+    ["private", { visibility: "private" }],
+    ["restricted", { visibility: "restricted" }],
+    ["disabled", { disabledAt: "2026-08-26T00:00:00.000Z" }],
+  ] as const) {
+    await t.test(label, async () => {
+      const response = await publicSkillgroupPage(
+        new Request("https://omgskills.com/u/jon/sets/design-tools"),
+        context,
+        dependencies([
+          [publishedUser],
+          [{ id: "group-id" }],
+          [accessFacts(overrides)],
+        ])
+      );
+      const body = await response.text();
+      assert.equal(response.status, 404);
+      assert.match(body, /Not found/);
+      assert.doesNotMatch(body, /Design tools/);
+      assert.match(body, /noindex,follow/);
+    });
+  }
+
+  await t.test("unpublished profile", async () => {
+    const response = await publicSkillgroupPage(
+      new Request("https://omgskills.com/u/jon/sets/design-tools"),
+      context,
+      dependencies([[{ ...publishedUser, profilePublished: false }]])
+    );
+    assert.equal(response.status, 404);
+    assert.doesNotMatch(await response.text(), /profile is private/i);
+  });
+});
+
+test("keeps a private profile generic and out of search", async () => {
+  const response = await publicSkillgroupPage(
+    new Request("https://omgskills.com/u/jon"),
+    context,
+    dependencies([[{ ...publishedUser, profilePublished: false }]])
+  );
+  const body = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(body, /This profile is private/);
+  assert.match(body, /noindex,follow/);
+});

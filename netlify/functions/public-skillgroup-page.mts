@@ -4,12 +4,18 @@ import {
   findGroupIdByOwnerSlug,
   findOwnedGroupIds,
   requireGroupAccess,
+  type GroupAccessClient,
 } from "./_shared/group-access.js";
 import { recordAnalytics } from "./_shared/group-items.js";
 import {
   loadCatalogSkillUrls,
   resolvePublicSkillLink,
 } from "./_shared/public-skill-links.js";
+import {
+  parsePublicPageRoute,
+  PUBLIC_SITE_ORIGIN,
+  publicProfilePath,
+} from "./_shared/public-group-routes.js";
 
 function escapeHtml(value: unknown): string {
   return String(value ?? "")
@@ -20,48 +26,63 @@ function escapeHtml(value: unknown): string {
     .replaceAll("'", "&#39;");
 }
 
-function html(body: string, status = 200): Response {
-  return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>omgskills</title><style>body{font-family:ui-sans-serif,system-ui;margin:0;background:#fafafa;color:#171717}.wrap{max-width:760px;margin:0 auto;padding:48px 20px}.muted{color:#666}.item{border-top:1px solid #ddd;padding:18px 0}a{color:#075985;text-decoration:none}</style></head><body><main class="wrap">${body}</main></body></html>`, {
+type HtmlOptions = {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  indexable?: boolean;
+  publiclyCacheable?: boolean;
+};
+
+function html(body: string, status = 200, options: HtmlOptions = {}): Response {
+  const title = options.title ?? "omgskills";
+  const description = options.description ?? "Discover skills from trusted sources.";
+  const canonical = options.canonicalUrl
+    ? `<link rel="canonical" href="${escapeHtml(options.canonicalUrl)}">`
+    : "";
+  const robots = options.indexable === false
+    ? '<meta name="robots" content="noindex,follow">'
+    : "";
+  const social = options.canonicalUrl
+    ? `<meta property="og:type" content="website"><meta property="og:site_name" content="omgskills"><meta property="og:title" content="${escapeHtml(title)}"><meta property="og:description" content="${escapeHtml(description)}"><meta property="og:url" content="${escapeHtml(options.canonicalUrl)}"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="${escapeHtml(title)}"><meta name="twitter:description" content="${escapeHtml(description)}">`
+    : "";
+  return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(description)}">${robots}${canonical}${social}<style>body{font-family:ui-sans-serif,system-ui;margin:0;background:#fafafa;color:#171717}.wrap{max-width:760px;margin:0 auto;padding:48px 20px}.muted{color:#666}.item{border-top:1px solid #ddd;padding:18px 0}a{color:#075985;text-decoration:none}</style></head><body><main class="wrap">${body}</main></body></html>`, {
     status,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "no-store"
+      "Cache-Control": options.publiclyCacheable
+        ? "public, max-age=60, must-revalidate"
+        : "no-store"
     }
   });
 }
 
 function notFound(): Response {
-  return html("<h1>Not found</h1>", 404);
+  return html("<h1>Not found</h1>", 404, { indexable: false });
 }
 
-function isValidHandle(value: string): boolean {
-  return value.length <= 80 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(value);
+export type PublicSkillgroupPageDependencies = {
+  pool: GroupAccessClient;
+  loadCatalogSkillUrls: typeof loadCatalogSkillUrls;
+  recordAnalytics: typeof recordAnalytics;
+};
+
+function defaultDependencies(): PublicSkillgroupPageDependencies {
+  return {
+    pool: getPgPool(),
+    loadCatalogSkillUrls,
+    recordAnalytics,
+  };
 }
 
-function parseRoute(pathname: string): { handle: string; groupSlug: string | null } | null {
-  const parts = pathname.split("/").filter(Boolean);
-  if (parts[0] === "u" && parts[1] && parts.length === 2) {
-    return { handle: parts[1], groupSlug: null };
-  }
-  if (parts[0] === "u" && parts[1] && parts[2] === "sets" && parts[3] && parts.length === 4) {
-    return { handle: parts[1], groupSlug: parts[3] };
-  }
-  if (parts[0] === "u" && parts[1] && parts[2] && parts.length === 3) {
-    return { handle: parts[1], groupSlug: parts[2] };
-  }
-  if (parts[0] === "profiles" && parts[1] && parts.length === 2) {
-    return { handle: parts[1], groupSlug: null };
-  }
-  if (parts[0] === "profiles" && parts[1] && parts[2] === "sets" && parts[3] && parts.length === 4) {
-    return { handle: parts[1], groupSlug: parts[3] };
-  }
-  return null;
-}
-
-export default async (req: Request, context: Context) => {
+export async function publicSkillgroupPage(
+  req: Request,
+  context: Context,
+  dependencies: PublicSkillgroupPageDependencies = defaultDependencies()
+): Promise<Response> {
   const requestPath = new URL(req.url).pathname;
-  const route = parseRoute(requestPath);
-  const resolvedHandleIsValid = route ? isValidHandle(route.handle) : false;
+  const route = parsePublicPageRoute(requestPath);
+  const resolvedHandleIsValid = route !== null;
   if (
     context.deploy.context !== "production" &&
     req.headers.get("x-omgskills-route-diagnostic") === "1"
@@ -72,7 +93,7 @@ export default async (req: Request, context: Context) => {
         contextPath: "path" in context ? String(context.path) : null,
         contextParams: context.params,
         resolvedHandle: route?.handle ?? null,
-        resolvedGroupSlug: route?.groupSlug ?? null,
+        resolvedGroupSlug: route?.kind === "group" ? route.groupSlug : null,
         resolvedHandleIsValid
       },
       { headers: { "Cache-Control": "no-store" } }
@@ -81,9 +102,13 @@ export default async (req: Request, context: Context) => {
   if (!route || !resolvedHandleIsValid) {
     return notFound();
   }
-  const { handle, groupSlug } = route;
+  if (requestPath !== route.canonicalPath) {
+    return Response.redirect(new URL(route.canonicalPath, req.url), 301);
+  }
+  const { handle } = route;
+  const groupSlug = route.kind === "group" ? route.groupSlug : null;
 
-  const pool = getPgPool();
+  const pool = dependencies.pool;
   const userResult = await pool.query<{
     id: string;
     handle: string;
@@ -103,7 +128,13 @@ export default async (req: Request, context: Context) => {
   }
 
   if (!user.profilePublished) {
-    return html("<h1>This profile is private</h1><p class=\"muted\">The owner has not published this profile.</p>");
+    return groupSlug
+      ? notFound()
+      : html(
+        "<h1>This profile is private</h1><p class=\"muted\">The owner has not published this profile.</p>",
+        200,
+        { title: "Private profile | omgskills", indexable: false }
+      );
   }
 
   if (groupSlug) {
@@ -150,8 +181,12 @@ export default async (req: Request, context: Context) => {
       return notFound();
     }
     const first = groupResult.rows[0];
-    await recordAnalytics("public_group_view", { groupId: first.id, profileUserId: user.id });
-    const catalogSkillUrls = await loadCatalogSkillUrls(req.url).catch(() => new Map<string, string>());
+    await dependencies.recordAnalytics("public_group_view", {
+      groupId: first.id,
+      profileUserId: user.id,
+    });
+    const catalogSkillUrls = await dependencies.loadCatalogSkillUrls(req.url)
+      .catch(() => new Map<string, string>());
     const skills = groupResult.rows
       .filter((row) => row.itemId)
       .map((row) => {
@@ -171,7 +206,19 @@ export default async (req: Request, context: Context) => {
         return `<div class="item"><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(description)}</p>${link}</div>`;
       })
       .join("");
-    return html(`<a href="/u/${escapeHtml(user.handle)}">Back to profile</a><h1>${escapeHtml(first.name)}</h1><p class="muted">${escapeHtml(first.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`);
+    const ownerName = user.displayName || user.handle;
+    const description = first.description || `A public skill group by ${ownerName} on omgskills.`;
+    const canonicalUrl = `${PUBLIC_SITE_ORIGIN}${route.canonicalPath}`;
+    return html(
+      `<a href="${escapeHtml(publicProfilePath(user.handle))}">Back to profile</a><h1>${escapeHtml(first.name)}</h1><p class="muted">${escapeHtml(first.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`,
+      200,
+      {
+        title: `${first.name} by ${ownerName} | omgskills`,
+        description,
+        canonicalUrl,
+        publiclyCacheable: true,
+      }
+    );
   }
 
   const candidateIds = await findOwnedGroupIds(user.id, pool);
@@ -205,9 +252,21 @@ export default async (req: Request, context: Context) => {
     .map((group) => `<div class="item"><h2><a href="/u/${escapeHtml(user.handle)}/sets/${escapeHtml(group.slug)}">${escapeHtml(group.name)}</a></h2><p class="muted">${escapeHtml(group.description || `${group.itemCount} skills`)}</p></div>`)
     .join("");
 
-  await recordAnalytics("public_profile_view", { profileUserId: user.id });
-  return html(`<h1>${escapeHtml(user.displayName || user.handle)}</h1><p class="muted">@${escapeHtml(user.handle)}</p>${groupList || "<p>No public Skill Groups yet.</p>"}`);
-};
+  await dependencies.recordAnalytics("public_profile_view", { profileUserId: user.id });
+  const displayName = user.displayName || user.handle;
+  return html(
+    `<h1>${escapeHtml(displayName)}</h1><p class="muted">@${escapeHtml(user.handle)}</p>${groupList || "<p>No public Skill Groups yet.</p>"}`,
+    200,
+    {
+      title: `${displayName}'s skill groups | omgskills`,
+      description: `Public skill groups curated by ${displayName} on omgskills.`,
+      canonicalUrl: `${PUBLIC_SITE_ORIGIN}${route.canonicalPath}`,
+      publiclyCacheable: true,
+    }
+  );
+}
+
+export default async (req: Request, context: Context) => publicSkillgroupPage(req, context);
 
 export const config: Config = {
   path: ["/u/:handle", "/u/:handle/sets/:groupSlug", "/u/:handle/:groupSlug", "/profiles/:handle/sets/:groupSlug"],

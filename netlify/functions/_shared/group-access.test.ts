@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   decideGroupAccess,
+  findIndexablePublicGroups,
   requireGroupAccess,
   type GroupAccessClient,
   type GroupAccessFacts,
@@ -109,4 +110,21 @@ test("protected group endpoints delegate authorization to the shared policy", as
       assert.equal(source.includes(fragment), false, `${file} owns access policy: ${fragment}`);
     }
   }
+});
+
+test("public discovery selects only published, active public groups", async () => {
+  const client: GroupAccessClient = {
+    async query(text) {
+      assert.match(text, /u\.profile_published = true/);
+      assert.match(text, /g\.visibility = 'public'/);
+      assert.match(text, /g\.disabled_at IS NULL/);
+      return {
+        rows: [{ handle: "jon", groupSlug: "design" }],
+        rowCount: 1,
+      } as any;
+    },
+  };
+  assert.deepEqual(await findIndexablePublicGroups(client), [
+    { handle: "jon", groupSlug: "design" },
+  ]);
 });
