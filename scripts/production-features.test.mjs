@@ -18,11 +18,22 @@ async function configUrl(value) {
 
 test("loads the tracked production feature state", async () => {
   const features = await loadProductionFeatures();
-  assert.deepEqual(features, { skillGroupsAuthEnabled: false });
+  assert.equal(typeof features.skillGroupsAuthEnabled, "boolean");
   assert.deepEqual(publicReleaseConfig(features), {
     version: 1,
-    skillGroupsAuthEnabled: false,
+    skillGroupsAuthEnabled: features.skillGroupsAuthEnabled,
   });
+});
+
+test("loads both supported production feature states", async () => {
+  assert.deepEqual(
+    await loadProductionFeatures(await configUrl('{"skillGroupsAuthEnabled":true}')),
+    { skillGroupsAuthEnabled: true },
+  );
+  assert.deepEqual(
+    await loadProductionFeatures(await configUrl('{"skillGroupsAuthEnabled":false}')),
+    { skillGroupsAuthEnabled: false },
+  );
 });
 
 test("maps the production state to the portal build environment", () => {

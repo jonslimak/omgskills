@@ -4,10 +4,11 @@ import { verifyProductionDeploy } from "./verify-production-deploy.mjs";
 
 const origin = "https://example.test";
 const appcast = '<enclosure url="https://omgskills.com/updates/omgskills-1.0.0.zip"/>';
+const disabledFeatures = { skillGroupsAuthEnabled: false };
 
-function responseFor(path, options = {}) {
+function responseFor(path, options = {}, features = disabledFeatures) {
   if (path === "/app/release-config.json") {
-    return Response.json({ version: 1, skillGroupsAuthEnabled: false });
+    return Response.json({ version: 1, ...features });
   }
   if (path === "/download") {
     return new Response(null, {
@@ -71,6 +72,7 @@ test("verifies the complete production deploy surface", async () => {
   const requests = [];
   await verifyProductionDeploy({
     origin,
+    expectedFeatures: disabledFeatures,
     fetchImpl: async (url, options) => {
       const path = new URL(url).pathname;
       requests.push({ path, method: options.method || "GET" });
@@ -108,6 +110,7 @@ test("fails when a required release asset is missing", async () => {
   await assert.rejects(
     verifyProductionDeploy({
       origin,
+      expectedFeatures: disabledFeatures,
       fetchImpl: async (url, options) => {
         const path = new URL(url).pathname;
         if (path === "/downloads/omgskills-mac.dmg") {
@@ -118,6 +121,17 @@ test("fails when a required release asset is missing", async () => {
     }),
     /downloads\/omgskills-mac\.dmg returned 404, expected 200/,
   );
+});
+
+test("accepts an enabled reviewed production feature state", async () => {
+  const enabledFeatures = { skillGroupsAuthEnabled: true };
+  await verifyProductionDeploy({
+    origin,
+    expectedFeatures: enabledFeatures,
+    fetchImpl: async (url, options) => (
+      responseFor(new URL(url).pathname, options, enabledFeatures)
+    ),
+  });
 });
 
 test("fails when the deployed feature receipt does not match the reviewed state", async () => {
