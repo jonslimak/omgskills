@@ -48,19 +48,23 @@ test("manual production deploy never tags a Mac release without explicit opt-in"
   assert.match(script, /Usage: \.\/scripts\/deploy-site-prod\.sh \[--tag-release\]/);
 });
 
-test("manual production deploy keeps Skill Groups auth disabled", () => {
-  const gate = "export VITE_SKILLGROUPS_AUTH_ENABLED=0";
-  const build = "npm run build:netlify";
-
-  assert.notEqual(script.indexOf(gate), -1);
-  assert.ok(script.indexOf(gate) < script.indexOf(build));
+test("production deploy paths use the tracked feature configuration", async () => {
+  const productionFeatures = JSON.parse(
+    await readFile(new URL("../config/production-features.json", import.meta.url), "utf8"),
+  );
+  assert.equal(productionFeatures.skillGroupsAuthEnabled, false);
+  assert.doesNotMatch(script, /VITE_SKILLGROUPS_AUTH_ENABLED/);
+  for (const workflowPath of workflowPaths) {
+    const source = await readFile(new URL(workflowPath, import.meta.url), "utf8");
+    assert.doesNotMatch(source, /VITE_SKILLGROUPS_AUTH_ENABLED/, workflowPath);
+  }
 });
 
 test("manual production deploy checks generated config and every deploy input", () => {
   assert.match(script, /\.netlify\/netlify\.toml/);
   assert.match(script, /PRODUCTION_ORIGIN="https:\/\/omgskills\.com"/);
   assert.doesNotMatch(script, /\$\{PRODUCTION_ORIGIN/);
-  for (const input of [".github/workflows", "netlify", "package-lock.json", "portal", "scripts", "site"]) {
+  for (const input of [".github/workflows", "config", "netlify", "package-lock.json", "portal", "scripts", "site"]) {
     assert.match(script, new RegExp(`\\n  ${input.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}\\n`));
   }
 });
@@ -102,5 +106,9 @@ test("manual deploys package health auth and keep health JSON private", () => {
   assert.match(
     netlifyConfig.slice(healthHeaders),
     /for = "\/data\/health\.json"[\s\S]*?Cache-Control = "private, no-store"/,
+  );
+  assert.match(
+    netlifyConfig,
+    /for = "\/app\/release-config\.json"[\s\S]*?Cache-Control = "no-store"/,
   );
 });

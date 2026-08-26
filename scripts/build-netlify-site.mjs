@@ -5,6 +5,11 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { verifyReleaseDeployArtifacts, verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
 import { refreshHomepageLibraryPreview } from "./homepage-library-preview.mjs";
+import {
+  loadProductionFeatures,
+  portalBuildEnvironment,
+  publicReleaseConfig,
+} from "./production-features.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.join(repoRoot, "site");
@@ -87,6 +92,7 @@ async function verifyRequiredOutput() {
   const required = [
     "index.html",
     "app/index.html",
+    "app/release-config.json",
     "support/index.html",
     "data/manifest.json",
     "data/health.json",
@@ -108,8 +114,11 @@ async function verifyRequiredOutput() {
 
 async function main() {
   verifyPortalBuildEnv();
+  const productionFeatures = await loadProductionFeatures();
   run(process.execPath, ["./scripts/generate-creator-handle-reservations.mjs", "--check"]);
-  run("npm", ["--workspace", "portal", "run", "build"]);
+  run("npm", ["--workspace", "portal", "run", "build"], {
+    env: portalBuildEnvironment(productionFeatures),
+  });
 
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(outputDir, { recursive: true });
@@ -122,6 +131,10 @@ async function main() {
   await verifyReleaseDeployArtifacts(outputDir, "Netlify deploy artifact");
   await rm(outputAppDir, { recursive: true, force: true });
   await cp(portalDist, outputAppDir, { recursive: true });
+  await writeFile(
+    path.join(outputAppDir, "release-config.json"),
+    `${JSON.stringify(publicReleaseConfig(productionFeatures), null, 2)}\n`,
+  );
   await mergeRedirects();
   await verifyRequiredOutput();
 

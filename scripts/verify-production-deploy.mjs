@@ -2,6 +2,7 @@
 
 import { fileURLToPath } from "node:url";
 import { extractUpdateAssetPaths } from "./deploy-artifact-guard.mjs";
+import { loadProductionFeatures } from "./production-features.mjs";
 import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
 
 const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
@@ -51,11 +52,26 @@ async function verifyAiCatalog(fetchImpl, origin) {
   }
 }
 
+async function verifyReleaseConfig(fetchImpl, origin, expected) {
+  const path = "/app/release-config.json";
+  const response = await expectStatus(fetchImpl, origin, path, 200);
+  const config = await response.json();
+  if (
+    config?.version !== 1
+    || config?.skillGroupsAuthEnabled !== expected.skillGroupsAuthEnabled
+  ) {
+    throw new Error(`${origin}${path} does not match the reviewed production feature state`);
+  }
+}
+
 export async function verifyProductionDeploy({
   origin = defaultOrigin,
   fetchImpl = fetch,
+  expectedFeatures,
 } = {}) {
+  const reviewedFeatures = expectedFeatures || await loadProductionFeatures();
   await expectStatus(fetchImpl, origin, "/app/", 200);
+  await verifyReleaseConfig(fetchImpl, origin, reviewedFeatures);
   await expectStatus(fetchImpl, origin, "/about/", 200);
   await expectStatus(fetchImpl, origin, "/support/", 200);
   await expectStatus(fetchImpl, origin, "/health/", 401);

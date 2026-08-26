@@ -4,6 +4,7 @@ import {
   catalogSkillUrlEntries,
   legacyCatalogSkillRedirects,
 } from "./web-library-skill-urls.mjs";
+import { loadProductionFeatures } from "./production-features.mjs";
 
 const targetOrigin = (process.env.TARGET_ORIGIN || "https://codex-skillgroups-mvp--omgskills.netlify.app").replace(/\/$/, "");
 const productionOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
@@ -11,6 +12,7 @@ const handle = process.env.SKILLGROUP_HANDLE || "";
 const groupSlug = process.env.SKILLGROUP_SLUG || "";
 const verifyTargetLibrary = process.env.VERIFY_TARGET_WEB_LIBRARY === "1";
 const verifyProfileRouteDiagnostic = process.env.VERIFY_PROFILE_ROUTE_DIAGNOSTIC === "1";
+const expectedFeatures = await loadProductionFeatures();
 
 function fail(message) {
   console.error(`verify-skillgroups-rollout: ${message}`);
@@ -84,6 +86,14 @@ async function verifyFrontendDesignRedirect(origin) {
 
 async function verifyTargetCore() {
   await expectStatus("/app/", 200);
+  const releaseConfig = await expectStatus("/app/release-config.json", 200);
+  const deployedFeatures = await releaseConfig.json();
+  if (
+    deployedFeatures?.version !== 1
+    || deployedFeatures?.skillGroupsAuthEnabled !== expectedFeatures.skillGroupsAuthEnabled
+  ) {
+    fail("deployed release config does not match the reviewed production feature state");
+  }
   if (verifyProfileRouteDiagnostic) {
     console.log("skip database-backed sync check during profile route diagnostics");
   } else {

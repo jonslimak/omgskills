@@ -18,6 +18,7 @@ fi
 DEPLOY_INPUTS=(
   .gitignore
   .github/workflows
+  config
   menubar/Info.plist
   netlify
   netlify.toml
@@ -54,9 +55,6 @@ if [[ "$VITE_CLERK_PUBLISHABLE_KEY" != pk_* ]]; then
   echo "Refusing production deploy: VITE_CLERK_PUBLISHABLE_KEY is missing or invalid." >&2
   exit 1
 fi
-
-# Device pairing stays dark in production until its dedicated release approval.
-export VITE_SKILLGROUPS_AUTH_ENABLED=0
 
 npm --prefix index ci
 node ./scripts/restore-health-snapshot.mjs

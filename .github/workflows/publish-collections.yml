@@ -154,7 +154,6 @@ jobs:
       - name: Build combined Netlify artifact
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-          VITE_SKILLGROUPS_AUTH_ENABLED: "0"
         run: npm run build:netlify
 
       - name: Deploy site to Netlify

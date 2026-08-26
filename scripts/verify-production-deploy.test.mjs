@@ -6,6 +6,9 @@ const origin = "https://example.test";
 const appcast = '<enclosure url="https://omgskills.com/updates/omgskills-1.0.0.zip"/>';
 
 function responseFor(path, options = {}) {
+  if (path === "/app/release-config.json") {
+    return Response.json({ version: 1, skillGroupsAuthEnabled: false });
+  }
   if (path === "/download") {
     return new Response(null, {
       status: 302,
@@ -77,6 +80,7 @@ test("verifies the complete production deploy surface", async () => {
 
   assert.deepEqual(requests, [
     { path: "/app/", method: "GET" },
+    { path: "/app/release-config.json", method: "GET" },
     { path: "/about/", method: "GET" },
     { path: "/support/", method: "GET" },
     { path: "/health/", method: "GET" },
@@ -113,5 +117,16 @@ test("fails when a required release asset is missing", async () => {
       },
     }),
     /downloads\/omgskills-mac\.dmg returned 404, expected 200/,
+  );
+});
+
+test("fails when the deployed feature receipt does not match the reviewed state", async () => {
+  await assert.rejects(
+    verifyProductionDeploy({
+      origin,
+      expectedFeatures: { skillGroupsAuthEnabled: true },
+      fetchImpl: async (url, options) => responseFor(new URL(url).pathname, options),
+    }),
+    /does not match the reviewed production feature state/,
   );
 });
