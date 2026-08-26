@@ -5,12 +5,13 @@ import {
   groupItemForValidatedGithubSkill,
   validateGithubSkill,
 } from "./_shared/github-skill-resolution.js";
+import { requireGroupItemId, validateCompleteItemOrder } from "./_shared/group-behavior.js";
 import { requireGroupAccess } from "./_shared/group-access.js";
 import { addGroupItem } from "./_shared/group-items.js";
 import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
 import { loadPublishedCatalogIdentity } from "./_shared/published-catalog.js";
 import { requirePortalUser } from "./_shared/user.js";
-import { optionalString, requireString } from "./_shared/validation.js";
+import { optionalString, requireJsonObject, requireString } from "./_shared/validation.js";
 
 function groupIdFromPath(req: Request): string | undefined {
   const parts = new URL(req.url).pathname.split("/").filter(Boolean);
@@ -76,7 +77,7 @@ export default async (req: Request, _context: Context) => {
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
-  if (!["GET", "POST"].includes(req.method)) {
+  if (!["GET", "POST", "PATCH", "DELETE"].includes(req.method)) {
     return errorResponse(req, 405, "Method not allowed");
   }
 
@@ -90,9 +91,82 @@ export default async (req: Request, _context: Context) => {
     }
 
     const user = await requirePortalUser(req);
+
+    if (req.method === "PATCH" || req.method === "DELETE") {
+      const pool = getPgPool();
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        await requireGroupAccess(user, groupId, "manage", client);
+
+        if (req.method === "DELETE") {
+          const body = await requireJsonObject(req);
+          const itemId = requireGroupItemId(body.itemId);
+          const deleted = await client.query<{ id: string }>(
+            "DELETE FROM skill_group_items WHERE group_id = $1 AND id = $2 RETURNING id",
+            [groupId, itemId]
+          );
+          if (!deleted.rowCount) {
+            throw new Response("Group item not found", { status: 404 });
+          }
+          await client.query(
+            `
+              WITH ordered AS (
+                SELECT id, (row_number() OVER (ORDER BY position ASC, created_at ASC, id ASC) - 1)::int AS position
+                FROM skill_group_items
+                WHERE group_id = $1
+              )
+              UPDATE skill_group_items item
+              SET position = ordered.position
+              FROM ordered
+              WHERE item.id = ordered.id
+            `,
+            [groupId]
+          );
+          await client.query("COMMIT");
+          return jsonResponse(req, { itemId, deleted: true });
+        }
+
+        const body = await requireJsonObject(req);
+        const current = await client.query<{ id: string }>(
+          `
+            SELECT id
+            FROM skill_group_items
+            WHERE group_id = $1
+            ORDER BY position ASC, created_at ASC, id ASC
+            FOR UPDATE
+          `,
+          [groupId]
+        );
+        const itemIds = validateCompleteItemOrder(
+          current.rows.map((row) => row.id),
+          body.itemIds
+        );
+        await client.query(
+          `
+            UPDATE skill_group_items item
+            SET position = requested.position
+            FROM (
+              SELECT id, (ordinality - 1)::int AS position
+              FROM unnest($2::uuid[]) WITH ORDINALITY AS ordered(id, ordinality)
+            ) AS requested
+            WHERE item.group_id = $1 AND item.id = requested.id
+          `,
+          [groupId, itemIds]
+        );
+        await client.query("COMMIT");
+        return jsonResponse(req, { itemIds });
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    }
+
     await requireGroupAccess(user, groupId, "manage");
 
-    const body = await req.json();
+    const body = await requireJsonObject(req);
     const kind = body?.kind;
     if (kind === "synced") {
       const syncedSkillId = requireString(body?.syncedSkillId, "syncedSkillId", 80);

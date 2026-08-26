@@ -11,6 +11,7 @@ export type GroupAccessFacts = {
   name: string;
   slug: string;
   visibility: "private" | "restricted" | "public";
+  isFavorites: boolean;
   disabledAt: string | null;
   invited: boolean;
 };
@@ -72,6 +73,7 @@ export async function requireGroupAccess(
         g.name,
         g.slug,
         g.visibility,
+        g.is_favorites AS "isFavorites",
         g.disabled_at AS "disabledAt",
         CASE
           WHEN $2::text IS NULL THEN false

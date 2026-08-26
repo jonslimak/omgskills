@@ -1,8 +1,10 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import { assertGroupCanBeDeleted, parseGroupPatch } from "./_shared/group-behavior.js";
 import { requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
+import { requireJsonObject } from "./_shared/validation.js";
 
 function groupIdFromPath(req: Request): string | undefined {
   const parts = new URL(req.url).pathname.split("/").filter(Boolean);
@@ -13,7 +15,7 @@ export default async (req: Request, _context: Context) => {
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
-  if (!["GET", "PATCH"].includes(req.method)) {
+  if (!["GET", "PATCH", "DELETE"].includes(req.method)) {
     return errorResponse(req, 405, "Method not allowed");
   }
 
@@ -35,6 +37,7 @@ export default async (req: Request, _context: Context) => {
             g.description,
             g.slug,
             g.visibility,
+            g.is_favorites AS "isFavorites",
             g.disabled_at AS "disabledAt",
             owner.display_name AS "ownerDisplayName",
             count(DISTINCT i.id)::int AS "itemCount",
@@ -92,23 +95,46 @@ export default async (req: Request, _context: Context) => {
       return jsonResponse(req, { group, items, accessRole: access.accessRole });
     }
 
-    const body = await req.json();
-    const visibility = typeof body?.visibility === "string" ? body.visibility : "";
-    if (!["private", "restricted", "public"].includes(visibility)) {
-      throw new Response("visibility is invalid", { status: 400 });
-    }
-
     const pool = getPgPool();
     const access = await requireGroupAccess(user, groupId, "manage", pool);
-    await pool.query(
+    if (req.method === "DELETE") {
+      assertGroupCanBeDeleted(access);
+      await pool.query("DELETE FROM skill_groups WHERE id = $1", [groupId]);
+      return jsonResponse(req, { groupId: access.id, deleted: true });
+    }
+
+    const body = await requireJsonObject(req);
+    const patch = parseGroupPatch(body, access);
+    const result = await pool.query<{
+      name: string;
+      description: string | null;
+      visibility: string;
+    }>(
       `
         UPDATE skill_groups
-        SET visibility = $2, updated_at = now()
+        SET
+          name = CASE WHEN $2 THEN $3 ELSE name END,
+          description = CASE WHEN $4 THEN $5 ELSE description END,
+          visibility = CASE WHEN $6 THEN $7 ELSE visibility END,
+          updated_at = now()
         WHERE id = $1
+        RETURNING name, description, visibility
       `,
-      [groupId, visibility]
+      [
+        groupId,
+        patch.hasName,
+        patch.name,
+        patch.hasDescription,
+        patch.description,
+        patch.hasVisibility,
+        patch.visibility,
+      ]
     );
-    return jsonResponse(req, { groupId: access.id, slug: access.slug, visibility });
+    return jsonResponse(req, {
+      groupId: access.id,
+      slug: access.slug,
+      ...result.rows[0],
+    });
   } catch (error) {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());

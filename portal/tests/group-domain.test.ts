@@ -5,10 +5,14 @@ import {
   addGroupAllowedEmail,
   addSyncedSkillToGroup,
   createGroup,
+  deleteGroup,
   listOwnedGroups,
   listSharedGroups,
   loadGroupDetail,
   removeGroupAllowedEmail,
+  removeGroupItem,
+  reorderGroupItems,
+  updateGroup,
   updateGroupModeration,
   updateGroupVisibility,
 } from "../src/groups/api.js";
@@ -38,11 +42,15 @@ test("group mutation adapters preserve request methods and payloads", async () =
   const api = recordingApi({}, calls);
 
   await createGroup(api, "Review team");
+  await updateGroup(api, "group-id", { name: "Review crew", description: "Team defaults" });
   await updateGroupVisibility(api, "group-id", "public");
+  await deleteGroup(api, "delete-group-id");
   await updateGroupModeration(api, "group-id", true);
   await addGroupAllowedEmail(api, "group-id", "member@example.com");
   await removeGroupAllowedEmail(api, "group-id", "email-id");
   await addSyncedSkillToGroup(api, "group-id", "skill-id");
+  await removeGroupItem(api, "group-id", "item-id");
+  await reorderGroupItems(api, "group-id", ["item-b", "item-a"]);
 
   assert.deepEqual(
     calls.map(({ path, init }) => ({
@@ -54,12 +62,22 @@ test("group mutation adapters preserve request methods and payloads", async () =
       {
         path: "/api/portal/groups",
         method: "POST",
-        body: { name: "Review team", visibility: "restricted", syncedSkillIds: [] },
+        body: { name: "Review team", visibility: "private", syncedSkillIds: [] },
+      },
+      {
+        path: "/api/portal/groups/group-id",
+        method: "PATCH",
+        body: { name: "Review crew", description: "Team defaults" },
       },
       {
         path: "/api/portal/groups/group-id",
         method: "PATCH",
         body: { visibility: "public" },
+      },
+      {
+        path: "/api/portal/groups/delete-group-id",
+        method: "DELETE",
+        body: null,
       },
       {
         path: "/api/portal/groups/group-id/moderation",
@@ -80,6 +98,16 @@ test("group mutation adapters preserve request methods and payloads", async () =
         path: "/api/portal/groups/group-id/items",
         method: "POST",
         body: { kind: "synced", syncedSkillId: "skill-id" },
+      },
+      {
+        path: "/api/portal/groups/group-id/items",
+        method: "DELETE",
+        body: { itemId: "item-id" },
+      },
+      {
+        path: "/api/portal/groups/group-id/items",
+        method: "PATCH",
+        body: { itemIds: ["item-b", "item-a"] },
       },
     ]
   );
@@ -114,8 +142,8 @@ test("portal entry delegates detailed group behavior to the group domain", async
   assert.equal(source.includes("function SkillActions"), false);
 });
 
-test("extraction preserves the current visibility labels for L1.1", () => {
-  assert.equal(groupVisibilityLabel("public"), "public");
-  assert.equal(groupVisibilityLabel("restricted"), "private");
-  assert.equal(groupVisibilityLabel("private"), "private");
+test("visibility labels preserve all three product states", () => {
+  assert.equal(groupVisibilityLabel("public"), "Public");
+  assert.equal(groupVisibilityLabel("restricted"), "Invite only");
+  assert.equal(groupVisibilityLabel("private"), "Only me");
 });

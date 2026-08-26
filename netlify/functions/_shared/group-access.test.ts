@@ -19,6 +19,7 @@ function group(overrides: Partial<GroupAccessFacts> = {}): GroupAccessFacts {
     name: "Team skills",
     slug: "team-skills",
     visibility: "private",
+    isFavorites: false,
     disabledAt: null,
     invited: false,
     ...overrides,

@@ -39,6 +39,7 @@ export default async (req: Request, _context: Context) => {
           g.name,
           g.description,
           g.slug,
+          g.visibility,
           owner.display_name AS "ownerDisplayName",
           count(i.id)::int AS "itemCount"
         FROM skill_groups g

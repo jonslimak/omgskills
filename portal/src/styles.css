@@ -373,7 +373,30 @@ pre {
   align-items: center;
   display: grid;
   gap: 8px;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.group-visibility-select {
+  background: #fff;
+  border: 1px solid #dfe4ea;
+  border-radius: 8px;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  height: 32px;
+  padding: 0 28px 0 10px;
+}
+
+.group-visibility-select:focus-visible {
+  border-color: #0b57d0;
+  outline: 2px solid rgb(11 87 208 / 20%);
+  outline-offset: 1px;
+}
+
+.group-visibility-select:disabled {
+  color: #64748b;
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .sets-edit-button {
@@ -718,6 +741,20 @@ pre {
   gap: 6px;
 }
 
+.group-settings-form {
+  display: grid;
+  gap: 8px;
+  max-width: 620px;
+  width: 100%;
+}
+
+.group-settings-actions,
+.group-skill-actions {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
 .group-skill-row {
   align-items: start;
   background: #f8fafc;
@@ -733,6 +770,10 @@ pre {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.group-skill-actions {
+  justify-content: flex-end;
 }
 
 .email-list {
@@ -922,6 +963,14 @@ pre {
   .sets-header.editing,
   .sets-create-inline {
     grid-template-columns: 1fr;
+  }
+
+  .group-skill-row {
+    grid-template-columns: 1fr;
+  }
+
+  .group-skill-actions {
+    justify-content: flex-start;
   }
 
   .sets-edit-button {

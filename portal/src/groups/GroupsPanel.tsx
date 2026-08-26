@@ -1,12 +1,12 @@
 import type React from "react";
 import { useState } from "react";
-import { ArrowUpRight, Earth, Eye, EyeOff, Lock } from "lucide-react";
+import { ArrowUpRight, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createGroup, updateGroupModeration, updateGroupVisibility } from "@/groups/api";
-import { groupVisibilityLabel, publicGroupUrl } from "@/groups/model";
-import type { GroupProfile, SkillGroup } from "@/groups/types";
+import { groupVisibilityLabel, groupVisibilityOptions, publicGroupUrl } from "@/groups/model";
+import type { GroupProfile, GroupVisibility, SkillGroup } from "@/groups/types";
 import { usePortalApi } from "@/portal-api";
 
 const iconClassName = "app-icon";
@@ -27,14 +27,16 @@ export function GroupsPanel({
   const api = usePortalApi();
   const [status, setStatus] = useState("");
   const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupVisibility, setNewGroupVisibility] = useState<GroupVisibility>("private");
   const [isEditingSets, setIsEditingSets] = useState(false);
 
   async function createNewGroup() {
     setStatus("Creating group...");
     try {
-      await createGroup(api, newGroupName);
+      await createGroup(api, newGroupName, newGroupVisibility);
       setStatus("Group created.");
       setNewGroupName("");
+      setNewGroupVisibility("private");
       setIsEditingSets(false);
       onRefresh?.();
     } catch (error) {
@@ -42,7 +44,7 @@ export function GroupsPanel({
     }
   }
 
-  async function setVisibility(group: SkillGroup, visibility: string) {
+  async function setVisibility(group: SkillGroup, visibility: GroupVisibility) {
     setStatus("Updating group...");
     try {
       await updateGroupVisibility(api, group.id, visibility);
@@ -95,6 +97,16 @@ export function GroupsPanel({
               placeholder="Enter set name..."
               value={newGroupName}
             />
+            <select
+              aria-label="New group visibility"
+              className="group-visibility-select"
+              onChange={(event) => setNewGroupVisibility(event.target.value as GroupVisibility)}
+              value={newGroupVisibility}
+            >
+              {groupVisibilityOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
             <Button disabled={!newGroupName.trim()} onClick={createNewGroup}>Create new</Button>
           </div>
         ) : null}
@@ -144,20 +156,20 @@ export function GroupsPanel({
                         </a>
                       </Button>
                     ) : null}
-                    <Button
-                      aria-label={group.visibility === "public" ? "Unpublish group" : "Publish group"}
-                      className={group.visibility === "public" ? "icon-button active" : "icon-button"}
-                      onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}
-                      size="icon"
-                      title={group.visibility === "public" ? "Public. Click to make private." : "Private. Click to publish."}
-                      variant="secondary"
+                    <select
+                      aria-label={`${group.name} visibility`}
+                      className="group-visibility-select"
+                      disabled={group.isFavorites}
+                      onChange={(event) => {
+                        void setVisibility(group, event.target.value as GroupVisibility);
+                      }}
+                      title={group.isFavorites ? "Favorites visibility is protected" : "Group visibility"}
+                      value={group.visibility ?? "private"}
                     >
-                      {group.visibility === "public" ? (
-                        <Earth className={`${iconClassName} public-icon`} />
-                      ) : (
-                        <Lock className={iconClassName} />
-                      )}
-                    </Button>
+                      {groupVisibilityOptions.map((option) => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                      ))}
+                    </select>
                     <Button
                       aria-label={group.disabledAt ? "Restore group" : "Hide group"}
                       className={group.disabledAt ? "icon-button active neutral-active" : "icon-button"}

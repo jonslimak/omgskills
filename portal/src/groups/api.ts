@@ -1,5 +1,10 @@
 import type { PortalApi } from "@/portal-api";
-import type { SkillGroup, SkillGroupDetail, SkillGroupItem } from "@/groups/types";
+import type {
+  GroupVisibility,
+  SkillGroup,
+  SkillGroupDetail,
+  SkillGroupItem,
+} from "@/groups/types";
 
 export async function listOwnedGroups(api: PortalApi): Promise<SkillGroup[]> {
   const result = await api<{ groups: SkillGroup[] }>("/api/portal/groups");
@@ -11,10 +16,14 @@ export async function listSharedGroups(api: PortalApi): Promise<SkillGroup[]> {
   return result.groups;
 }
 
-export async function createGroup(api: PortalApi, name: string) {
+export async function createGroup(
+  api: PortalApi,
+  name: string,
+  visibility: GroupVisibility = "private"
+) {
   return api<{ groupId: string }>("/api/portal/groups", {
     method: "POST",
-    body: JSON.stringify({ name, visibility: "restricted", syncedSkillIds: [] }),
+    body: JSON.stringify({ name, visibility, syncedSkillIds: [] }),
   });
 }
 
@@ -36,12 +45,27 @@ export async function createFavoritesGroup(
 export async function updateGroupVisibility(
   api: PortalApi,
   groupId: string,
-  visibility: string
+  visibility: GroupVisibility
 ) {
   return api(`/api/portal/groups/${groupId}`, {
     method: "PATCH",
     body: JSON.stringify({ visibility }),
   });
+}
+
+export async function updateGroup(
+  api: PortalApi,
+  groupId: string,
+  changes: { name?: string; description?: string; visibility?: GroupVisibility }
+) {
+  return api(`/api/portal/groups/${groupId}`, {
+    method: "PATCH",
+    body: JSON.stringify(changes),
+  });
+}
+
+export async function deleteGroup(api: PortalApi, groupId: string) {
+  return api(`/api/portal/groups/${groupId}`, { method: "DELETE" });
 }
 
 export async function updateGroupModeration(
@@ -89,5 +113,19 @@ export async function addSyncedSkillToGroup(
   return api(`/api/portal/groups/${groupId}/items`, {
     method: "POST",
     body: JSON.stringify({ kind: "synced", syncedSkillId }),
+  });
+}
+
+export async function removeGroupItem(api: PortalApi, groupId: string, itemId: string) {
+  return api(`/api/portal/groups/${groupId}/items`, {
+    method: "DELETE",
+    body: JSON.stringify({ itemId }),
+  });
+}
+
+export async function reorderGroupItems(api: PortalApi, groupId: string, itemIds: string[]) {
+  return api(`/api/portal/groups/${groupId}/items`, {
+    method: "PATCH",
+    body: JSON.stringify({ itemIds }),
   });
 }

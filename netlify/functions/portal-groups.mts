@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import { parseGroupVisibility } from "./_shared/group-behavior.js";
 import { resolveCreateGroupSlug } from "./_shared/group-slug.js";
 import { findOwnedGroupIds, requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
@@ -60,9 +61,9 @@ async function createGroup(req: Request) {
   const isFavorites = body?.isFavorites === true;
   const visibility = isFavorites
     ? "public"
-    : ["private", "restricted", "public"].includes(body?.visibility)
-      ? body.visibility
-      : "private";
+    : body?.visibility === undefined
+      ? "private"
+      : parseGroupVisibility(body.visibility);
   const syncedSkillIds = Array.isArray(body?.syncedSkillIds) ? body.syncedSkillIds : [];
   if (isFavorites && syncedSkillIds.length === 0) {
     throw new Response("Select at least one synced skill", { status: 400 });

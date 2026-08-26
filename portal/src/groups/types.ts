@@ -1,9 +1,11 @@
+export type GroupVisibility = "public" | "restricted" | "private";
+
 export type SkillGroup = {
   id: string;
   name: string;
   description: string | null;
   slug: string;
-  visibility?: string;
+  visibility?: GroupVisibility;
   isFavorites?: boolean;
   disabledAt?: string | null;
   itemCount: number;

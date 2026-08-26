@@ -1,16 +1,28 @@
 import { useEffect, useState } from "react";
 import { UserButton, useUser } from "@clerk/clerk-react";
-import { Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   addGroupAllowedEmail,
+  deleteGroup,
   loadGroupDetail,
   removeGroupAllowedEmail,
+  removeGroupItem,
+  reorderGroupItems,
+  updateGroup,
 } from "@/groups/api";
-import { groupVisibilityLabel } from "@/groups/model";
-import type { SkillGroupDetail, SkillGroupItem } from "@/groups/types";
+import { groupVisibilityLabel, groupVisibilityOptions } from "@/groups/model";
+import type { GroupVisibility, SkillGroupDetail, SkillGroupItem } from "@/groups/types";
 import { usePortalApi } from "@/portal-api";
 
 const iconClassName = "app-icon";
@@ -23,6 +35,12 @@ export function GroupDetailPage({ groupId }: { groupId: string }) {
   const [status, setStatus] = useState("Loading group...");
   const [emailToAdd, setEmailToAdd] = useState("");
   const [showEmailInput, setShowEmailInput] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [draftName, setDraftName] = useState("");
+  const [draftDescription, setDraftDescription] = useState("");
+  const [draftVisibility, setDraftVisibility] = useState<GroupVisibility>("private");
+  const [isMutating, setIsMutating] = useState(false);
 
   async function loadGroup() {
     setStatus("Loading group...");
@@ -30,6 +48,9 @@ export function GroupDetailPage({ groupId }: { groupId: string }) {
       const result = await loadGroupDetail(api, groupId);
       setGroup(result.group);
       setItems(result.items);
+      setDraftName(result.group.name);
+      setDraftDescription(result.group.description ?? "");
+      setDraftVisibility(result.group.visibility ?? "private");
       setStatus("");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to load group");
@@ -67,6 +88,89 @@ export function GroupDetailPage({ groupId }: { groupId: string }) {
     }
   }
 
+  async function saveGroup() {
+    if (!group) {
+      return;
+    }
+    setStatus("Saving group...");
+    setIsMutating(true);
+    try {
+      await updateGroup(
+        api,
+        group.id,
+        group.isFavorites
+          ? { description: draftDescription }
+          : {
+              name: draftName,
+              description: draftDescription,
+              visibility: draftVisibility,
+            }
+      );
+      setIsEditing(false);
+      await loadGroup();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to save group");
+    } finally {
+      setIsMutating(false);
+    }
+  }
+
+  async function confirmDeleteGroup() {
+    if (!group || group.isFavorites) {
+      return;
+    }
+    setStatus("Deleting group...");
+    setIsMutating(true);
+    try {
+      await deleteGroup(api, group.id);
+      window.location.href = "/app/";
+    } catch (error) {
+      setShowDeleteConfirmation(false);
+      setStatus(error instanceof Error ? error.message : "Failed to delete group");
+      setIsMutating(false);
+    }
+  }
+
+  async function removeItem(item: SkillGroupItem) {
+    if (!group) {
+      return;
+    }
+    setStatus(`Removing ${item.name}...`);
+    setIsMutating(true);
+    try {
+      await removeGroupItem(api, group.id, item.id);
+      await loadGroup();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to remove skill");
+    } finally {
+      setIsMutating(false);
+    }
+  }
+
+  async function moveItem(index: number, offset: -1 | 1) {
+    if (!group) {
+      return;
+    }
+    const targetIndex = index + offset;
+    if (targetIndex < 0 || targetIndex >= items.length) {
+      return;
+    }
+    const reordered = [...items];
+    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+    setItems(reordered);
+    setStatus("Saving skill order...");
+    setIsMutating(true);
+    try {
+      await reorderGroupItems(api, group.id, reordered.map((item) => item.id));
+      setStatus("");
+    } catch (error) {
+      setItems(items);
+      setStatus(error instanceof Error ? error.message : "Failed to reorder skills");
+    } finally {
+      setIsMutating(false);
+    }
+  }
+
   useEffect(() => {
     void loadGroup();
   }, [groupId]);
@@ -89,31 +193,122 @@ export function GroupDetailPage({ groupId }: { groupId: string }) {
         <>
           <Card className="panel">
             <div className="panel-header">
-              <div>
-                <h2>{group.name}</h2>
-                <p className="group-meta">
-                  <span>{group.itemCount} skills</span>
-                  <span>{groupVisibilityLabel(group.visibility)}</span>
-                  <span>{group.accessRole}</span>
-                  {group.ownerDisplayName ? <span>{group.ownerDisplayName}</span> : null}
-                </p>
-              </div>
+              {isEditing ? (
+                <div className="group-settings-form">
+                  <Input
+                    aria-label="Group name"
+                    disabled={group.isFavorites}
+                    onChange={(event) => setDraftName(event.target.value)}
+                    value={draftName}
+                  />
+                  <Input
+                    aria-label="Group description"
+                    onChange={(event) => setDraftDescription(event.target.value)}
+                    placeholder="Description"
+                    value={draftDescription}
+                  />
+                  <select
+                    aria-label="Group visibility"
+                    className="group-visibility-select"
+                    disabled={group.isFavorites}
+                    onChange={(event) => setDraftVisibility(event.target.value as GroupVisibility)}
+                    value={draftVisibility}
+                  >
+                    {groupVisibilityOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <div className="group-settings-actions">
+                    <Button disabled={!draftName.trim() || isMutating} onClick={saveGroup} type="button">Save</Button>
+                    <Button onClick={() => setIsEditing(false)} type="button" variant="outline">Cancel</Button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <h2>{group.name}</h2>
+                  <p className="group-meta">
+                    <span>{group.itemCount} skills</span>
+                    <span>{groupVisibilityLabel(group.visibility)}</span>
+                    <span>{group.accessRole}</span>
+                    {group.ownerDisplayName ? <span>{group.ownerDisplayName}</span> : null}
+                  </p>
+                </div>
+              )}
+              {group.accessRole === "owner" && !isEditing ? (
+                <div className="row-actions">
+                  <Button onClick={() => setIsEditing(true)} type="button" variant="outline">
+                    <Pencil className={iconClassName} />
+                    Edit
+                  </Button>
+                  {!group.isFavorites ? (
+                    <Button
+                      aria-label={`Delete ${group.name}`}
+                      disabled={isMutating}
+                      onClick={() => setShowDeleteConfirmation(true)}
+                      type="button"
+                      variant="destructive"
+                    >
+                      <Trash2 className={iconClassName} />
+                      Delete
+                    </Button>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
-            {group.description ? <p>{group.description}</p> : null}
+            {!isEditing && group.description ? <p>{group.description}</p> : null}
           </Card>
 
           <Card className="panel">
             <h2>Skills</h2>
             <div className="group-skills-panel">
-              {items.map((item) => (
+              {items.map((item, index) => (
                 <div className="group-skill-row" key={item.id}>
                   <div>
                     <strong>{item.name}</strong>
                     {item.description ? <p>{item.description}</p> : null}
                   </div>
-                  {item.githubUrl ? (
-                    <a href={item.githubUrl} title="Open GitHub source">GitHub →</a>
-                  ) : null}
+                  <div className="group-skill-actions">
+                    {item.githubUrl ? (
+                      <a href={item.githubUrl} title="Open GitHub source">GitHub →</a>
+                    ) : null}
+                    {group.accessRole === "owner" ? (
+                      <>
+                        <Button
+                          aria-label={`Move ${item.name} up`}
+                          disabled={isMutating || index === 0}
+                          onClick={() => moveItem(index, -1)}
+                          size="icon-sm"
+                          title="Move up"
+                          type="button"
+                          variant="secondary"
+                        >
+                          <ArrowUp className={iconClassName} />
+                        </Button>
+                        <Button
+                          aria-label={`Move ${item.name} down`}
+                          disabled={isMutating || index === items.length - 1}
+                          onClick={() => moveItem(index, 1)}
+                          size="icon-sm"
+                          title="Move down"
+                          type="button"
+                          variant="secondary"
+                        >
+                          <ArrowDown className={iconClassName} />
+                        </Button>
+                        <Button
+                          aria-label={`Remove ${item.name}`}
+                          disabled={isMutating}
+                          onClick={() => removeItem(item)}
+                          size="icon-sm"
+                          title="Remove skill"
+                          type="button"
+                          variant="destructive"
+                        >
+                          <Trash2 className={iconClassName} />
+                        </Button>
+                      </>
+                    ) : null}
+                  </div>
                 </div>
               ))}
               {items.length === 0 ? <p className="muted">No skills in this group yet.</p> : null}
@@ -125,7 +320,7 @@ export function GroupDetailPage({ groupId }: { groupId: string }) {
               <div className="panel-header">
                 <div>
                   <h2>Allowed Emails</h2>
-                  <p>People signed in with these emails can view this private group.</p>
+                  <p>These emails can view the group when visibility is Invite only.</p>
                 </div>
               </div>
               <div className="email-list">
@@ -177,6 +372,17 @@ export function GroupDetailPage({ groupId }: { groupId: string }) {
               )}
             </Card>
           ) : null}
+          <Dialog onOpenChange={setShowDeleteConfirmation} open={showDeleteConfirmation}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete {group.name}?</DialogTitle>
+                <DialogDescription>This removes the group and its memberships.</DialogDescription>
+              </DialogHeader>
+              <DialogFooter showCloseButton>
+                <Button disabled={isMutating} onClick={confirmDeleteGroup} type="button" variant="destructive">Delete group</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       ) : null}
     </main>
