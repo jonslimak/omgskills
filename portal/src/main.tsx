@@ -7,22 +7,13 @@ import {
   SignInButton,
   SignUpButton,
   UserButton,
-  useAuth,
   useUser
 } from "@clerk/clerk-react";
 import {
-  ArrowUpRight,
   Check,
   Copy,
-  Earth,
-  Eye,
-  EyeOff,
-  Grid2X2Plus,
-  Lock,
   Pencil,
   RefreshCcw,
-  Star,
-  Trash2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,12 +25,6 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -55,6 +40,12 @@ import {
   type GroupedSyncedSkill,
   type SyncedSkill
 } from "@/synced-skill-grouping";
+import { GroupDetailPage } from "@/groups/GroupDetailPage";
+import { GroupsPanel } from "@/groups/GroupsPanel";
+import { SkillActions } from "@/groups/SkillActions";
+import { listOwnedGroups, listSharedGroups } from "@/groups/api";
+import type { SkillGroup } from "@/groups/types";
+import { usePortalApi } from "@/portal-api";
 import { isEnabledConnectRoute, isSkillGroupsAuthEnabled } from "@/feature-flags";
 import "./styles.css";
 
@@ -63,52 +54,6 @@ const skillGroupsAuthEnabled = isSkillGroupsAuthEnabled(
   import.meta.env.VITE_SKILLGROUPS_AUTH_ENABLED
 );
 const iconClassName = "app-icon";
-
-function publicSiteOrigin() {
-  if (window.location.hostname === "app.omgskills.com") {
-    return "https://omgskills.com";
-  }
-
-  return window.location.origin;
-}
-
-function publicGroupUrl(handle: string, slug: string) {
-  return `${publicSiteOrigin()}/u/${handle}/sets/${slug}`;
-}
-
-function groupVisibilityLabel(visibility: string | undefined) {
-  return visibility === "public" ? "public" : "private";
-}
-
-type SkillGroup = {
-  id: string;
-  name: string;
-  description: string | null;
-  slug: string;
-  visibility?: string;
-  isFavorites?: boolean;
-  disabledAt?: string | null;
-  itemCount: number;
-  allowedEmailCount?: number;
-  allowedEmails?: { id: string; email: string }[];
-  ownerDisplayName?: string;
-  syncedSkillIds?: string[];
-};
-
-type SkillGroupItem = {
-  id: string;
-  kind: string;
-  name: string;
-  description: string;
-  githubUrl: string | null;
-  source: string;
-  position: number;
-};
-
-type SkillGroupDetail = SkillGroup & {
-  accessRole: "owner" | "invited";
-  allowedEmails?: { id: string; email: string }[];
-};
 
 type Profile = {
   handle: string | null;
@@ -157,28 +102,6 @@ function writeDashboardCache(userId: string, state: ApiState) {
   } catch {
     // Cache is best effort; the live API remains the source of truth.
   }
-}
-
-function usePortalApi() {
-  const { getToken } = useAuth();
-
-  return async function portalApi<T>(path: string, init: RequestInit = {}): Promise<T> {
-    const token = await getToken();
-    const response = await fetch(path, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...init.headers
-      }
-    });
-
-    const body = await response.json().catch(() => null);
-    if (!response.ok) {
-      throw new Error(body?.error ?? `Request failed with ${response.status}`);
-    }
-    return body as T;
-  };
 }
 
 function SyncAppButton({ hasSynced }: { hasSynced: boolean }) {
@@ -476,113 +399,6 @@ function SyncSecret({ label, secret, onCopy }: { label: string; secret: string; 
   );
 }
 
-function SkillActions({
-  skill,
-  groups,
-  onRefresh
-}: {
-  skill: GroupedSyncedSkill;
-  groups: SkillGroup[];
-  onRefresh: () => void;
-}) {
-  const api = usePortalApi();
-  const [status, setStatus] = useState("");
-  const favoritesGroup = groups.find((group) => group.isFavorites);
-  const isFavorite = Boolean(favoritesGroup?.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id)));
-  const selectableGroups = groups.filter((group) => !group.isFavorites);
-
-  async function addToFavorites() {
-    if (isFavorite) {
-      return;
-    }
-    setStatus("Adding to Favorites...");
-    try {
-      if (favoritesGroup) {
-        await api(`/api/portal/groups/${favoritesGroup.id}/items`, {
-          method: "POST",
-          body: JSON.stringify({ kind: "synced", syncedSkillId: skill.id })
-        });
-      } else {
-        await api("/api/portal/groups", {
-          method: "POST",
-          body: JSON.stringify({
-            name: "Favorite Skills",
-            visibility: "public",
-            isFavorites: true,
-            syncedSkillIds: [skill.id]
-          })
-        });
-      }
-      setStatus("");
-      onRefresh();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to add to Favorites");
-    }
-  }
-
-  async function addToGroup(group: SkillGroup) {
-    if (group.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id))) {
-      return;
-    }
-    setStatus(`Adding to ${group.name}...`);
-    try {
-      await api(`/api/portal/groups/${group.id}/items`, {
-        method: "POST",
-        body: JSON.stringify({ kind: "synced", syncedSkillId: skill.id })
-      });
-      setStatus("");
-      onRefresh();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to add to group");
-    }
-  }
-
-  return (
-    <div className="skill-action-stack">
-      <div className="skill-actions">
-        <Button
-          aria-label={isFavorite ? "Already in Favorites" : "Add to Favorites"}
-          className={isFavorite ? "icon-button active" : "icon-button"}
-          disabled={isFavorite}
-          onClick={addToFavorites}
-          size="icon"
-          title={isFavorite ? "Already in Favorites" : "Add to Favorites"}
-          variant="secondary"
-        >
-          <Star className={iconClassName} fill={isFavorite ? "currentColor" : "none"} />
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button aria-label="Add to group" className="icon-button" size="icon" title="Add to group" variant="secondary">
-              <Grid2X2Plus className={iconClassName} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {selectableGroups.length === 0 ? <DropdownMenuItem disabled>No groups yet</DropdownMenuItem> : null}
-            {selectableGroups.map((group) => {
-              const alreadyAdded = group.syncedSkillIds?.some((id) => skill.allSkillIds.includes(id)) ?? false;
-              return (
-                <DropdownMenuItem
-                  disabled={alreadyAdded}
-                  key={group.id}
-                  onSelect={(event) => {
-                    event.preventDefault();
-                    void addToGroup(group);
-                  }}
-                >
-                  <span>{group.name}</span>
-                  {alreadyAdded ? <Check className={iconClassName} /> : null}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      {status ? <p className="inline-status">{status}</p> : null}
-    </div>
-  );
-}
-
 function SyncedSkillRow({
   skill,
   groups,
@@ -835,362 +651,6 @@ function ProfileHeaderControls({
   );
 }
 
-function GroupsPanel({
-  title,
-  groups,
-  onRefresh,
-  canManage = false,
-  profile
-}: {
-  title: string;
-  groups: SkillGroup[];
-  onRefresh?: () => void;
-  canManage?: boolean;
-  profile?: Profile | null;
-}) {
-  const api = usePortalApi();
-  const [status, setStatus] = useState("");
-  const [newGroupName, setNewGroupName] = useState("");
-  const [isEditingSets, setIsEditingSets] = useState(false);
-
-  async function createGroup() {
-    setStatus("Creating group...");
-    try {
-      await api<{ groupId: string }>("/api/portal/groups", {
-        method: "POST",
-        body: JSON.stringify({
-          name: newGroupName,
-          visibility: "restricted",
-          syncedSkillIds: []
-        })
-      });
-
-      setStatus("Group created.");
-      setNewGroupName("");
-      setIsEditingSets(false);
-      onRefresh?.();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to create group");
-    }
-  }
-
-  async function setVisibility(group: SkillGroup, visibility: string) {
-    setStatus("Updating group...");
-    try {
-      await api(`/api/portal/groups/${group.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ visibility })
-      });
-      setStatus("Group updated.");
-      onRefresh?.();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to update group");
-    }
-  }
-
-  async function setDisabled(group: SkillGroup, disabled: boolean) {
-    setStatus("Updating moderation state...");
-    try {
-      await api(`/api/portal/groups/${group.id}/moderation`, {
-        method: "PATCH",
-        body: JSON.stringify({ disabled })
-      });
-      setStatus(disabled ? "Group visibility disabled." : "Group restored.");
-      onRefresh?.();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to update moderation state");
-    }
-  }
-
-  function isInteractiveTarget(target: EventTarget | null) {
-    return target instanceof HTMLElement
-      ? Boolean(target.closest("a, button, input, select, textarea"))
-      : false;
-  }
-
-  function openGroup(groupId: string, event: React.MouseEvent<HTMLDivElement>) {
-    if (isInteractiveTarget(event.target)) {
-      return;
-    }
-
-    window.location.href = `/app/groups/${groupId}`;
-  }
-
-  return (
-    <Card className="panel">
-      <div className={canManage && isEditingSets ? "panel-header sets-header editing" : "panel-header sets-header"}>
-        <div className="sets-title-row">
-          <h2>{title}</h2>
-          {status ? <p className="inline-status">{status}</p> : null}
-        </div>
-        {canManage && isEditingSets ? (
-          <div className="sets-create-inline">
-            <Input
-              aria-label="Set name"
-              onChange={(event) => setNewGroupName(event.target.value)}
-              placeholder="Enter set name..."
-              value={newGroupName}
-            />
-            <Button disabled={!newGroupName.trim()} onClick={createGroup}>Create new</Button>
-          </div>
-        ) : null}
-        {canManage ? (
-          <Button
-            className="sets-edit-button"
-            onClick={() => setIsEditingSets((current) => !current)}
-            variant="outline"
-          >
-            {isEditingSets ? "Done" : "Edit"}
-          </Button>
-        ) : null}
-      </div>
-      <div className="list">
-        {groups.map((group) => (
-            <div
-              className={
-                group.disabledAt
-                  ? "row group-row disabled-row"
-                  : "row group-row expandable-row"
-              }
-              key={group.id}
-              onClick={(event) => openGroup(group.id, event)}
-            >
-              <div className="group-row-summary">
-                <div>
-                  <h3 className="group-title-line">
-                    <span>{group.name}</span>
-                    <span className="group-meta">
-                    <span>{group.description || `${group.itemCount} skills`}</span>
-                      <span>{groupVisibilityLabel(group.visibility)}</span>
-                    </span>
-                  </h3>
-                  {group.ownerDisplayName ? (
-                    <span>
-                      {group.ownerDisplayName ? ` · ${group.ownerDisplayName}` : ""}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="row-actions">
-                  {group.allowedEmailCount !== undefined ? <span>{group.allowedEmailCount} emails</span> : null}
-                  {canManage ? (
-                    <>
-                      {group.visibility === "public" && !group.disabledAt && profile?.handle ? (
-                        <Button aria-label="Open public group URL" asChild className="icon-link" size="icon" title="Open public URL" variant="secondary">
-                          <a href={publicGroupUrl(profile.handle, group.slug)}>
-                            <ArrowUpRight className={iconClassName} />
-                          </a>
-                        </Button>
-                      ) : null}
-                      <Button
-                        aria-label={group.visibility === "public" ? "Unpublish group" : "Publish group"}
-                        className={group.visibility === "public" ? "icon-button active" : "icon-button"}
-                        onClick={() => setVisibility(group, group.visibility === "public" ? "restricted" : "public")}
-                        size="icon"
-                        title={group.visibility === "public" ? "Public. Click to make private." : "Private. Click to publish."}
-                        variant="secondary"
-                      >
-                        {group.visibility === "public" ? (
-                          <Earth className={`${iconClassName} public-icon`} />
-                        ) : (
-                          <Lock className={iconClassName} />
-                        )}
-                      </Button>
-                      <Button
-                        aria-label={group.disabledAt ? "Restore group" : "Hide group"}
-                        className={group.disabledAt ? "icon-button active neutral-active" : "icon-button"}
-                        onClick={() => setDisabled(group, !group.disabledAt)}
-                        size="icon"
-                        title={group.disabledAt ? "Hidden. Click to restore." : "Hide group from public pages."}
-                        variant="secondary"
-                      >
-                        {group.disabledAt ? <EyeOff className={iconClassName} /> : <Eye className={iconClassName} />}
-                      </Button>
-                    </>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-        ))}
-        {groups.length === 0 ? <p className="muted">No groups yet.</p> : null}
-      </div>
-    </Card>
-  );
-}
-
-function GroupDetailPage({ groupId }: { groupId: string }) {
-  const api = usePortalApi();
-  const { user } = useUser();
-  const [group, setGroup] = useState<SkillGroupDetail | null>(null);
-  const [items, setItems] = useState<SkillGroupItem[]>([]);
-  const [status, setStatus] = useState("Loading group...");
-  const [emailToAdd, setEmailToAdd] = useState("");
-  const [showEmailInput, setShowEmailInput] = useState(false);
-
-  async function loadGroup() {
-    setStatus("Loading group...");
-    try {
-      const result = await api<{
-        group: SkillGroupDetail;
-        items: SkillGroupItem[];
-        accessRole: "owner" | "invited";
-      }>(`/api/portal/groups/${groupId}`);
-      setGroup({ ...result.group, accessRole: result.accessRole });
-      setItems(result.items);
-      setStatus("");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to load group");
-    }
-  }
-
-  async function addAllowedEmail() {
-    const email = emailToAdd.trim();
-    if (!email || !group) {
-      return;
-    }
-
-    setStatus("Adding email...");
-    try {
-      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
-        method: "POST",
-        body: JSON.stringify({ email })
-      });
-      setEmailToAdd("");
-      setShowEmailInput(false);
-      await loadGroup();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to add email");
-    }
-  }
-
-  async function removeAllowedEmail(emailId: string) {
-    if (!group) {
-      return;
-    }
-
-    setStatus("Removing email...");
-    try {
-      await api(`/api/portal/groups/${group.id}/allowed-emails`, {
-        method: "DELETE",
-        body: JSON.stringify({ emailId })
-      });
-      await loadGroup();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to remove email");
-    }
-  }
-
-  useEffect(() => {
-    void loadGroup();
-  }, [groupId]);
-
-  return (
-    <main className="shell">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Skill Group</p>
-          <h1>{group?.name ?? "Skill Group"}</h1>
-          <p>{user?.primaryEmailAddress?.emailAddress}</p>
-        </div>
-        <UserButton />
-      </header>
-
-      <a href="/app/" className="back-link">← Back to portal</a>
-      {status ? <p className="status">{status}</p> : null}
-
-      {group ? (
-        <>
-          <Card className="panel">
-            <div className="panel-header">
-              <div>
-                <h2>{group.name}</h2>
-                <p className="group-meta">
-                  <span>{group.itemCount} skills</span>
-                  <span>{groupVisibilityLabel(group.visibility)}</span>
-                  <span>{group.accessRole}</span>
-                  {group.ownerDisplayName ? <span>{group.ownerDisplayName}</span> : null}
-                </p>
-              </div>
-            </div>
-            {group.description ? <p>{group.description}</p> : null}
-          </Card>
-
-          <Card className="panel">
-            <h2>Skills</h2>
-            <div className="group-skills-panel">
-              {items.map((item) => (
-                <div className="group-skill-row" key={item.id}>
-                  <div>
-                    <strong>{item.name}</strong>
-                    {item.description ? <p>{item.description}</p> : null}
-                  </div>
-                  {item.githubUrl ? (
-                    <a href={item.githubUrl} title="Open GitHub source">
-                      GitHub →
-                    </a>
-                  ) : null}
-                </div>
-              ))}
-              {items.length === 0 ? <p className="muted">No skills in this group yet.</p> : null}
-            </div>
-          </Card>
-
-          {group.accessRole === "owner" ? (
-            <Card className="panel">
-              <div className="panel-header">
-                <div>
-                  <h2>Allowed Emails</h2>
-                  <p>People signed in with these emails can view this private group.</p>
-                </div>
-              </div>
-              <div className="email-list">
-                {(group.allowedEmails ?? []).map((allowedEmail) => (
-                  <div className="email-row" key={allowedEmail.id}>
-                    <span>{allowedEmail.email}</span>
-                    <Button
-                      aria-label={`Remove ${allowedEmail.email}`}
-                      className="icon-button warning"
-                      onClick={() => removeAllowedEmail(allowedEmail.id)}
-                      size="icon"
-                      title="Remove email"
-                      type="button"
-                      variant="secondary"
-                    >
-                      <Trash2 className={iconClassName} />
-                    </Button>
-                  </div>
-                ))}
-                {(group.allowedEmails ?? []).length === 0 ? <p className="muted">No emails added.</p> : null}
-              </div>
-              {showEmailInput ? (
-                <div className="inline-email-form">
-                  <Input
-                    autoFocus
-                    onChange={(event) => setEmailToAdd(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        addAllowedEmail();
-                      }
-                    }}
-                    placeholder="teammate@example.com"
-                    value={emailToAdd}
-                  />
-                  <Button disabled={!emailToAdd.trim()} onClick={addAllowedEmail} type="button">
-                    Add
-                  </Button>
-                </div>
-              ) : (
-                <Button className="text-button" onClick={() => setShowEmailInput(true)} size="sm" type="button" variant="link">
-                  Add new email +
-                </Button>
-              )}
-            </Card>
-          ) : null}
-        </>
-      ) : null}
-    </main>
-  );
-}
-
 function Dashboard() {
   const api = usePortalApi();
   const { isLoaded, user } = useUser();
@@ -1202,14 +662,14 @@ function Dashboard() {
     try {
       const [synced, groups, shared, profile] = await Promise.all([
         api<{ skills: SyncedSkill[] }>("/api/portal/synced-skills"),
-        api<{ groups: SkillGroup[] }>("/api/portal/groups"),
-        api<{ groups: SkillGroup[] }>("/api/portal/shared"),
+        listOwnedGroups(api),
+        listSharedGroups(api),
         api<{ profile: Profile }>("/api/portal/profile")
       ]);
       const nextState = {
         syncedSkills: synced.skills,
-        groups: groups.groups,
-        sharedGroups: shared.groups,
+        groups,
+        sharedGroups: shared,
         profile: profile.profile
       };
       setState(nextState);
