@@ -45,6 +45,7 @@ interface SkillsShOptions {
   minRepoStars?: number;
   pageConcurrency?: number;
   repoConcurrency?: number;
+  pageRetryBaseDelayMs?: number;
 }
 
 const ROOT_URL = "https://skills.sh";
@@ -54,6 +55,8 @@ const DEFAULT_PAGE_CONCURRENCY = 3;
 const DEFAULT_REPO_CONCURRENCY = 10;
 const RESOLVE_PATH = "__RESOLVE__";
 const PAGE_RETRY_ATTEMPTS = 4;
+const PAGE_RETRY_BASE_DELAY_MS = 2_000;
+const PAGE_RETRY_MAX_DELAY_MS = 10_000;
 
 const repoMetaCache = new Map<string, RepoMeta | null>();
 
@@ -73,20 +76,51 @@ function apiURL(board: SkillsShOptions["board"], page: number): string {
   return `${ROOT_URL}/api/skills/${board ?? "all-time"}/${page}`;
 }
 
-async function fetchPage(board: NonNullable<SkillsShOptions["board"]>, page: number): Promise<SkillsShResponse> {
+function isRetryablePageStatus(status: number): boolean {
+  return status === 429 || status >= 500;
+}
+
+function pageRetryDelayMs(res: Response | null, attempt: number, baseDelayMs: number): number {
+  const retryAfter = Number(res?.headers.get("retry-after") ?? "0");
+  if (retryAfter > 0) return Math.min(retryAfter * 1_000, PAGE_RETRY_MAX_DELAY_MS);
+  return Math.min(baseDelayMs * (2 ** (attempt - 1)), PAGE_RETRY_MAX_DELAY_MS);
+}
+
+async function fetchPage(
+  board: NonNullable<SkillsShOptions["board"]>,
+  page: number,
+  retryBaseDelayMs: number,
+): Promise<SkillsShResponse> {
   for (let attempt = 1; attempt <= PAGE_RETRY_ATTEMPTS; attempt++) {
-    const res = await fetch(apiURL(board, page));
-    if (res.ok) {
-      return await res.json() as SkillsShResponse;
-    }
-    if (res.status === 429 && attempt < PAGE_RETRY_ATTEMPTS) {
-      const retryAfter = Number(res.headers.get("retry-after") ?? "0");
-      const delayMs = retryAfter > 0 ? retryAfter * 1000 : attempt * 2000;
-      console.warn(`  skills.sh ${board} page ${page}: 429, retrying in ${delayMs}ms`);
+    let res: Response | null = null;
+    try {
+      res = await fetch(apiURL(board, page));
+      if (res.ok) {
+        return await res.json() as SkillsShResponse;
+      }
+      if (!isRetryablePageStatus(res.status)) {
+        throw new Error(`skills.sh page ${page} failed (${res.status})`);
+      }
+    } catch (error) {
+      if (res && !isRetryablePageStatus(res.status)) throw error;
+      if (attempt === PAGE_RETRY_ATTEMPTS) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error(`skills.sh page ${page} failed after ${attempt} attempts: ${detail}`);
+      }
+
+      const delayMs = pageRetryDelayMs(res, attempt, retryBaseDelayMs);
+      const reason = res ? `HTTP ${res.status}` : "network error";
+      console.warn(`  skills.sh ${board} page ${page}: ${reason}, retrying in ${delayMs}ms`);
       await new Promise((resolve) => setTimeout(resolve, delayMs));
       continue;
     }
-    throw new Error(`skills.sh page ${page} failed (${res.status})`);
+
+    if (attempt === PAGE_RETRY_ATTEMPTS) {
+      throw new Error(`skills.sh page ${page} failed after ${attempt} attempts (HTTP ${res.status})`);
+    }
+    const delayMs = pageRetryDelayMs(res, attempt, retryBaseDelayMs);
+    console.warn(`  skills.sh ${board} page ${page}: HTTP ${res.status}, retrying in ${delayMs}ms`);
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
   throw new Error(`skills.sh page ${page} failed after retries`);
 }
@@ -115,8 +149,9 @@ async function fetchBoardEntries(
   topLimit: number | undefined,
   crawlAll: boolean,
   pageConcurrency: number,
+  pageRetryBaseDelayMs: number,
 ): Promise<{ entries: SkillsShEntry[]; total: number }> {
-  const first = await fetchPage(board, 1);
+  const first = await fetchPage(board, 1, pageRetryBaseDelayMs);
   const total = first.total ?? first.skills?.length ?? 0;
   const maxPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const targetPages = crawlAll
@@ -124,7 +159,11 @@ async function fetchBoardEntries(
     : Math.max(1, Math.ceil((topLimit ?? DEFAULT_TOP_LIMIT) / PAGE_SIZE));
 
   const pages = Array.from({ length: Math.min(targetPages, maxPages) - 1 }, (_, i) => i + 2);
-  const rest = await mapWithConcurrency(pages, pageConcurrency, (page) => fetchPage(board, page));
+  const rest = await mapWithConcurrency(
+    pages,
+    pageConcurrency,
+    (page) => fetchPage(board, page, pageRetryBaseDelayMs),
+  );
 
   const merged = [first, ...rest].flatMap((page) => page.skills ?? []);
   return {
@@ -170,8 +209,15 @@ export async function searchSkillsSh(options: SkillsShOptions = {}): Promise<Ski
   const minRepoStars = options.minRepoStars ?? 0;
   const pageConcurrency = options.pageConcurrency ?? DEFAULT_PAGE_CONCURRENCY;
   const repoConcurrency = options.repoConcurrency ?? DEFAULT_REPO_CONCURRENCY;
+  const pageRetryBaseDelayMs = options.pageRetryBaseDelayMs ?? PAGE_RETRY_BASE_DELAY_MS;
 
-  const { entries, total } = await fetchBoardEntries(board, topLimit, crawlAll, pageConcurrency);
+  const { entries, total } = await fetchBoardEntries(
+    board,
+    topLimit,
+    crawlAll,
+    pageConcurrency,
+    pageRetryBaseDelayMs,
+  );
   const deduped = new Map<string, SkillsShEntry>();
   for (const entry of entries) {
     if (!isValidRepo(entry.source) || !entry.skillId) continue;

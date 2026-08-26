@@ -150,3 +150,108 @@ test("skills.sh collapses alias and canonical rows after metadata resolution", a
     octokit.rest.repos.get = originalGet;
   }
 });
+
+test("skills.sh retries temporary server errors", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalGet = octokit.rest.repos.get;
+  let attempts = 0;
+  globalThis.fetch = (async () => {
+    attempts += 1;
+    if (attempts < 3) return new Response("temporary", { status: 500 });
+    return new Response(JSON.stringify({
+      total: 1,
+      page: 1,
+      hasMore: false,
+      skills: [skill("retry/server", "alpha", 30)],
+    }), { status: 200 });
+  }) as typeof fetch;
+  octokit.rest.repos.get = (async () => ({
+    data: {
+      full_name: "retry/server",
+      stargazers_count: 100,
+      pushed_at: "2026-07-01T00:00:00Z",
+      updated_at: "2026-07-01T00:00:00Z",
+      topics: [],
+    },
+  })) as unknown as typeof octokit.rest.repos.get;
+
+  try {
+    const hits = await searchSkillsSh({
+      board: "all-time",
+      topLimit: 1,
+      pageConcurrency: 1,
+      repoConcurrency: 1,
+      pageRetryBaseDelayMs: 0,
+    });
+    assert.equal(attempts, 3);
+    assert.equal(hits[0]?.id, "retry/server:alpha");
+  } finally {
+    globalThis.fetch = originalFetch;
+    octokit.rest.repos.get = originalGet;
+  }
+});
+
+test("skills.sh retries temporary network errors", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalGet = octokit.rest.repos.get;
+  let attempts = 0;
+  globalThis.fetch = (async () => {
+    attempts += 1;
+    if (attempts === 1) throw new TypeError("fetch failed");
+    return new Response(JSON.stringify({
+      total: 1,
+      page: 1,
+      hasMore: false,
+      skills: [skill("retry/network", "alpha", 30)],
+    }), { status: 200 });
+  }) as typeof fetch;
+  octokit.rest.repos.get = (async () => ({
+    data: {
+      full_name: "retry/network",
+      stargazers_count: 100,
+      pushed_at: "2026-07-01T00:00:00Z",
+      updated_at: "2026-07-01T00:00:00Z",
+      topics: [],
+    },
+  })) as unknown as typeof octokit.rest.repos.get;
+
+  try {
+    const hits = await searchSkillsSh({
+      board: "all-time",
+      topLimit: 1,
+      pageConcurrency: 1,
+      repoConcurrency: 1,
+      pageRetryBaseDelayMs: 0,
+    });
+    assert.equal(attempts, 2);
+    assert.equal(hits[0]?.id, "retry/network:alpha");
+  } finally {
+    globalThis.fetch = originalFetch;
+    octokit.rest.repos.get = originalGet;
+  }
+});
+
+test("skills.sh does not retry permanent client errors", async () => {
+  const originalFetch = globalThis.fetch;
+  let attempts = 0;
+  globalThis.fetch = (async () => {
+    attempts += 1;
+    return new Response("missing", { status: 404 });
+  }) as typeof fetch;
+
+  try {
+    await assert.rejects(
+      searchSkillsSh({
+        board: "all-time",
+        topLimit: 1,
+        pageConcurrency: 1,
+        repoConcurrency: 1,
+        pageRetryBaseDelayMs: 0,
+      }),
+      /skills\.sh page 1 failed \(404\)/,
+    );
+    assert.equal(attempts, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
