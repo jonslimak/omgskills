@@ -187,11 +187,18 @@ pre {
 }
 
 .private-source-row {
-  align-items: baseline;
+  align-items: center;
   display: flex;
   gap: 10px;
   justify-content: space-between;
   padding: 8px 0;
+}
+
+.private-source-row > div {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .private-source-row span {

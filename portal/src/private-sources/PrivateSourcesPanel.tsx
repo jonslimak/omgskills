@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { loadPrivateSources, registerPrivateSource } from "@/private-sources/api";
-import type { PrivateSourceView } from "@/private-sources/types";
+import {
+  loadPrivateSources,
+  registerPrivateRelease,
+  registerPrivateSource
+} from "@/private-sources/api";
+import type { PrivateSkillRelease, PrivateSourceView } from "@/private-sources/types";
 import { usePortalApi } from "@/portal-api";
 
 const emptyView: PrivateSourceView = { installations: [], sources: [] };
@@ -16,6 +20,8 @@ export function PrivateSourcesPanel() {
   const [root, setRoot] = useState(".");
   const [status, setStatus] = useState("Loading...");
   const [saving, setSaving] = useState(false);
+  const [releasingSourceId, setReleasingSourceId] = useState("");
+  const [releases, setReleases] = useState<Record<string, PrivateSkillRelease>>({});
 
   const installation = useMemo(
     () => view.installations.find((candidate) => candidate.installationId === installationId)
@@ -63,6 +69,20 @@ export function PrivateSourcesPanel() {
       setStatus(error instanceof Error ? error.message : "Failed to register private source");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function createRelease(sourceId: string) {
+    setReleasingSourceId(sourceId);
+    setStatus("Creating release...");
+    try {
+      const release = await registerPrivateRelease(api, sourceId);
+      setReleases((current) => ({ ...current, [sourceId]: release }));
+      setStatus("Release ready.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Failed to create release");
+    } finally {
+      setReleasingSourceId("");
     }
   }
 
@@ -126,8 +146,20 @@ export function PrivateSourcesPanel() {
         <div className="private-source-list">
           {view.sources.map((source) => (
             <div className="private-source-row" key={source.id}>
-              <strong>{source.repositorySlug}</strong>
-              <span>{source.normalizedRoot}</span>
+              <div>
+                <strong>{source.repositorySlug}</strong>
+                <span>{source.normalizedRoot}</span>
+                {releases[source.id] ? (
+                  <span>Release {releases[source.id].id.slice(0, 8)}</span>
+                ) : null}
+              </div>
+              <Button
+                disabled={Boolean(releasingSourceId)}
+                onClick={() => void createRelease(source.id)}
+                variant="outline"
+              >
+                {releasingSourceId === source.id ? "Creating..." : "Create release"}
+              </Button>
             </div>
           ))}
         </div>

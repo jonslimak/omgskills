@@ -1,10 +1,18 @@
 import { createSign } from "node:crypto";
 import { getEnv } from "./env.js";
+import {
+  BROKER_SKILL_PACKAGE_LIMITS,
+  SkillPackageValidationError,
+  type SkillPackage,
+  type SkillPackageCoordinates,
+  validateSkillPackage
+} from "./skill-package.js";
 
 const API_ORIGIN = "https://api.github.com";
 const API_VERSION = "2026-03-10";
 const REQUEST_TIMEOUT_MS = 20_000;
 const MAX_REPOSITORY_PAGES = 10;
+const MAX_BLOB_CONCURRENCY = 6;
 
 export type GitHubBrokerConfig = {
   appId: number;
@@ -34,6 +42,7 @@ export class GitHubBrokerError extends Error {
       | "installation_scope"
       | "repository_unavailable"
       | "skill_root_missing"
+      | "package_invalid"
       | "rate_limited"
       | "upstream",
     message: string,
@@ -84,13 +93,47 @@ function positiveId(value: unknown, label: string): string {
 function retryAfterSeconds(response: Response, now = Date.now()): number | undefined {
   const retryAfter = response.headers.get("retry-after");
   const direct = retryAfter === null ? Number.NaN : Number(retryAfter);
-  if (Number.isFinite(direct) && direct >= 0) return Math.ceil(direct);
+  if (Number.isFinite(direct) && direct >= 0) return Math.min(3600, Math.max(1, Math.ceil(direct)));
   const resetAt = response.headers.get("x-ratelimit-reset");
   const reset = resetAt === null ? Number.NaN : Number(resetAt);
   if (Number.isFinite(reset) && reset > 0) {
-    return Math.max(1, Math.ceil(reset - now / 1000));
+    return Math.min(3600, Math.max(1, Math.ceil(reset - now / 1000)));
   }
   return undefined;
+}
+
+function repositoryPath(repository: BrokerRepository): string {
+  const [owner, name, ...extra] = repository.fullName.split("/");
+  if (!owner || !name || extra.length > 0) {
+    throw new GitHubBrokerError("upstream", "GitHub returned an invalid repository name");
+  }
+  return `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}`;
+}
+
+function requireSha(value: unknown, label: string): string {
+  const sha = String(value ?? "").toLowerCase();
+  if (!/^[0-9a-f]{40}$/.test(sha)) {
+    throw new GitHubBrokerError("upstream", `GitHub returned an invalid ${label}`);
+  }
+  return sha;
+}
+
+async function mapConcurrent<T, U>(
+  values: T[],
+  limit: number,
+  operation: (value: T) => Promise<U>
+): Promise<U[]> {
+  const output = new Array<U>(values.length);
+  let nextIndex = 0;
+  async function worker(): Promise<void> {
+    while (nextIndex < values.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      output[index] = await operation(values[index]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, values.length) }, () => worker()));
+  return output;
 }
 
 async function githubRequest(
@@ -276,15 +319,11 @@ export class GitHubBrokerClient {
     normalizedRoot: string
   ): Promise<void> {
     const token = await this.createInstallationToken(installationId, [repository.id]);
-    const [owner, name] = repository.fullName.split("/");
-    if (!owner || !name) {
-      throw new GitHubBrokerError("upstream", "GitHub returned an invalid repository name");
-    }
     const skillPath = normalizedRoot === "." ? "SKILL.md" : `${normalizedRoot}/SKILL.md`;
     const encodedPath = skillPath.split("/").map(encodeURIComponent).join("/");
     const response = await githubRequest(
       this.fetchImpl,
-      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}/contents/${encodedPath}`,
+      `${repositoryPath(repository)}/contents/${encodedPath}`,
       token
     );
     if (response.status === 404) {
@@ -298,5 +337,153 @@ export class GitHubBrokerClient {
     if (file.type !== "file" || file.name !== "SKILL.md") {
       throw new GitHubBrokerError("skill_root_missing", "SKILL.md was not found at that root");
     }
+  }
+
+  async fetchCurrentSkillPackage(
+    installationId: string,
+    repository: BrokerRepository,
+    normalizedRoot: string
+  ): Promise<SkillPackage> {
+    return this.fetchSkillPackage(installationId, repository, normalizedRoot);
+  }
+
+  async fetchPinnedSkillPackage(
+    installationId: string,
+    repository: BrokerRepository,
+    normalizedRoot: string,
+    expected: SkillPackageCoordinates
+  ): Promise<SkillPackage> {
+    return this.fetchSkillPackage(installationId, repository, normalizedRoot, expected);
+  }
+
+  private async fetchSkillPackage(
+    installationId: string,
+    repository: BrokerRepository,
+    normalizedRoot: string,
+    expected?: SkillPackageCoordinates
+  ): Promise<SkillPackage> {
+    const token = await this.createInstallationToken(installationId, [repository.id]);
+    const repoPath = repositoryPath(repository);
+    let commitSha: string;
+    if (expected) {
+      commitSha = requireSha(expected.commitSha, "commit SHA");
+    } else {
+      const branch = encodeURIComponent(repository.defaultBranch);
+      const reference = await requireJson<{ object?: { type?: string; sha?: string } }>(
+        await githubRequest(this.fetchImpl, `${repoPath}/git/ref/heads/${branch}`, token),
+        "repository_unavailable",
+        this.now()
+      );
+      if (reference.object?.type !== "commit") {
+        throw new GitHubBrokerError("upstream", "GitHub returned an invalid default-branch reference");
+      }
+      commitSha = requireSha(reference.object.sha, "commit SHA");
+    }
+
+    const commit = await requireJson<{ sha?: string; tree?: { sha?: string } }>(
+      await githubRequest(this.fetchImpl, `${repoPath}/git/commits/${commitSha}`, token),
+      "repository_unavailable",
+      this.now()
+    );
+    if (requireSha(commit.sha, "commit SHA") !== commitSha) {
+      throw new GitHubBrokerError("package_invalid", "GitHub commit did not match the release");
+    }
+    let treeSha = requireSha(commit.tree?.sha, "tree SHA");
+    if (normalizedRoot !== ".") {
+      for (const segment of normalizedRoot.split("/")) {
+        const tree = await requireJson<{
+          sha?: string;
+          tree?: Array<{ path?: string; mode?: string; type?: string; sha?: string }>;
+        }>(
+          await githubRequest(this.fetchImpl, `${repoPath}/git/trees/${treeSha}`, token),
+          "repository_unavailable",
+          this.now()
+        );
+        if (requireSha(tree.sha, "tree SHA") !== treeSha) {
+          throw new GitHubBrokerError("package_invalid", "GitHub tree did not match the release");
+        }
+        const child = tree.tree?.find((entry) => entry.path === segment);
+        if (child?.type !== "tree" || child.mode !== "040000") {
+          throw new GitHubBrokerError("skill_root_missing", "Skill root was not found");
+        }
+        treeSha = requireSha(child.sha, "tree SHA");
+      }
+    }
+
+    const tree = await requireJson<{
+      sha?: string;
+      truncated?: boolean;
+      tree?: Array<{ path?: string; mode?: string; type?: string; sha?: string; size?: number }>;
+    }>(
+      await githubRequest(this.fetchImpl, `${repoPath}/git/trees/${treeSha}?recursive=1`, token),
+      "repository_unavailable",
+      this.now()
+    );
+    if (tree.truncated) {
+      throw new GitHubBrokerError("package_invalid", "GitHub returned a truncated skill tree");
+    }
+    if (requireSha(tree.sha, "tree SHA") !== treeSha) {
+      throw new GitHubBrokerError("package_invalid", "GitHub tree did not match the release");
+    }
+    const rawEntries = tree.tree ?? [];
+    const fileEntries = rawEntries.filter((entry) => entry.type !== "tree");
+    if (fileEntries.length > BROKER_SKILL_PACKAGE_LIMITS.maximumFileCount) {
+      throw new GitHubBrokerError("package_invalid", "Skill package contains too many files");
+    }
+    let declaredBytes = 0;
+    for (const entry of fileEntries) {
+      if (!entry.path || !entry.mode || !entry.type || !entry.sha) {
+        throw new GitHubBrokerError("upstream", "GitHub returned incomplete tree metadata");
+      }
+      if (entry.type !== "blob" || (entry.mode !== "100644" && entry.mode !== "100755")) {
+        throw new GitHubBrokerError("package_invalid", "Skill package contains an unsupported entry");
+      }
+      if (!Number.isSafeInteger(entry.size) || Number(entry.size) < 0) {
+        throw new GitHubBrokerError("upstream", "GitHub returned an invalid blob size");
+      }
+      if (Number(entry.size) > BROKER_SKILL_PACKAGE_LIMITS.maximumFileBytes) {
+        throw new GitHubBrokerError("package_invalid", "Skill package contains an oversized file");
+      }
+      if (entry.path === "SKILL.md" && Number(entry.size) > BROKER_SKILL_PACKAGE_LIMITS.maximumSkillMdBytes) {
+        throw new GitHubBrokerError("package_invalid", "SKILL.md is too large");
+      }
+      declaredBytes += Number(entry.size);
+      if (declaredBytes > BROKER_SKILL_PACKAGE_LIMITS.maximumTotalBytes) {
+        throw new GitHubBrokerError("package_invalid", "Skill package exceeds the Broker delivery limit");
+      }
+    }
+
+    const entries = await mapConcurrent(fileEntries, MAX_BLOB_CONCURRENCY, async (entry) => {
+      const blobSha = requireSha(entry.sha, "blob SHA");
+      const blob = await requireJson<{ sha?: string; encoding?: string; content?: string; size?: number }>(
+        await githubRequest(this.fetchImpl, `${repoPath}/git/blobs/${blobSha}`, token),
+        "repository_unavailable",
+        this.now()
+      );
+      if (requireSha(blob.sha, "blob SHA") !== blobSha || blob.encoding !== "base64" || typeof blob.content !== "string") {
+        throw new GitHubBrokerError("package_invalid", "GitHub blob did not match the package tree");
+      }
+      const data = Buffer.from(blob.content.replace(/\s/g, ""), "base64");
+      if (data.byteLength !== entry.size || data.byteLength !== blob.size) {
+        throw new GitHubBrokerError("package_invalid", "GitHub blob size did not match the package tree");
+      }
+      return { path: entry.path!, mode: entry.mode!, blobSha, data };
+    });
+
+    const skillMdSha = entries.find((entry) => entry.path === "SKILL.md")?.blobSha;
+    if (!skillMdSha) {
+      throw new GitHubBrokerError("skill_root_missing", "SKILL.md was not found at that root");
+    }
+    const coordinates = { commitSha, treeSha, skillMdSha };
+    const skillPackage = { coordinates, entries };
+    try {
+      validateSkillPackage(skillPackage, expected ?? coordinates, BROKER_SKILL_PACKAGE_LIMITS);
+    } catch (error) {
+      if (error instanceof SkillPackageValidationError) {
+        throw new GitHubBrokerError("package_invalid", `Skill package validation failed: ${error.code}`);
+      }
+      throw error;
+    }
+    return skillPackage;
   }
 }

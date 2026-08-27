@@ -26,7 +26,8 @@ let package = Package(
         ),
         .testTarget(
             name: "omgskillsTests",
-            dependencies: ["omgskills"]
+            dependencies: ["omgskills"],
+            resources: [.copy("Fixtures")]
         )
     ]
 )

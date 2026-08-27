@@ -26,6 +26,11 @@ import {
   PrivateSourceError,
   upsertOwnerPrivateSource
 } from "./private-sources.js";
+import {
+  loadOwnerPrivateReleasePackage,
+  PrivateReleaseError,
+  registerOwnerPrivateRelease
+} from "./private-releases.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
 if (!connectionString) {
@@ -288,6 +293,90 @@ test("sources preserve repository identity and releases are append-only", async 
     } finally {
       client.release();
     }
+  });
+});
+
+test("owner release registration is idempotent and opaque release loading stays owner-scoped", async () => {
+  await withMigratedSchema(async (pool) => {
+    const ownerUserId = await createUser(pool, "release-owner");
+    const otherUserId = await createUser(pool, "release-other");
+    await bindGithubBrokerInstallation(pool, {
+      ownerUserId,
+      installationId: "123456789",
+      accountId: "7001",
+      accountLogin: "owner",
+      accountType: "User"
+    });
+    const source = await upsertOwnerPrivateSource(pool, {
+      ownerUserId,
+      installationId: "123456789",
+      repositoryId: "987654321",
+      repositorySlug: "owner/private-skills",
+      normalizedRoot: "skills/example"
+    });
+    const skillPackage = {
+      coordinates: {
+        commitSha: sha.commit,
+        treeSha: sha.tree,
+        skillMdSha: sha.skill
+      },
+      entries: []
+    };
+    let pinnedCoordinates: unknown;
+    const broker = {
+      async listRepositories() {
+        return [{
+          id: "987654321",
+          fullName: "renamed/private-skills",
+          name: "private-skills",
+          isPrivate: true,
+          defaultBranch: "main"
+        }];
+      },
+      async fetchCurrentSkillPackage() { return skillPackage; },
+      async fetchPinnedSkillPackage(
+        _installationId: string,
+        _repository: unknown,
+        _root: string,
+        expected: unknown
+      ) {
+        pinnedCoordinates = expected;
+        return skillPackage;
+      }
+    };
+
+    const first = await registerOwnerPrivateRelease(pool, broker, {
+      ownerUserId,
+      sourceId: source.id
+    });
+    const duplicate = await registerOwnerPrivateRelease(pool, broker, {
+      ownerUserId,
+      sourceId: source.id
+    });
+    assert.equal(duplicate.id, first.id);
+    assert.equal(
+      Number((await pool.query(
+        "SELECT count(*) FROM skill_releases WHERE source_id = $1",
+        [source.id]
+      )).rows[0].count),
+      1
+    );
+
+    const loaded = await loadOwnerPrivateReleasePackage(pool, broker, {
+      ownerUserId,
+      releaseId: first.id
+    });
+    assert.equal(loaded.release.sourceId, source.id);
+    assert.deepEqual(pinnedCoordinates, skillPackage.coordinates);
+
+    await assert.rejects(
+      loadOwnerPrivateReleasePackage(pool, broker, {
+        ownerUserId: otherUserId,
+        releaseId: first.id
+      }),
+      (error: unknown) => error instanceof PrivateReleaseError
+        && error.code === "release_unavailable"
+    );
   });
 });
 

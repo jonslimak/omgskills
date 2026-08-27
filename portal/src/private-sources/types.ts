@@ -23,6 +23,15 @@ export type PrivateSkillSource = {
   createdAt: string;
 };
 
+export type PrivateSkillRelease = {
+  id: string;
+  sourceId: string;
+  commitSha: string;
+  treeSha: string;
+  skillMdSha: string;
+  createdAt: string;
+};
+
 export type PrivateSourceView = {
   installations: PrivateSourceInstallation[];
   sources: PrivateSkillSource[];

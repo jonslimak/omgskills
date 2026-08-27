@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { loadPrivateSources, registerPrivateSource } from "../src/private-sources/api.js";
+import {
+  loadPrivateSources,
+  registerPrivateRelease,
+  registerPrivateSource
+} from "../src/private-sources/api.js";
 import type { PortalApi } from "../src/portal-api.js";
 
 type Call = { path: string; init?: RequestInit };
@@ -18,7 +22,8 @@ test("private-source adapters preserve the owner-only endpoint contract", async 
   const api = recordingApi({
     installations: [],
     sources: [],
-    source: { id: "source-id" }
+    source: { id: "source-id" },
+    release: { id: "release-id" }
   }, calls);
 
   await loadPrivateSources(api);
@@ -27,6 +32,7 @@ test("private-source adapters preserve the owner-only endpoint contract", async 
     repositoryId: "321",
     root: "skills/example"
   });
+  await registerPrivateRelease(api, "11111111-1111-4111-8111-111111111111");
 
   assert.deepEqual(calls.map(({ path, init }) => ({
     path,
@@ -38,6 +44,11 @@ test("private-source adapters preserve the owner-only endpoint contract", async 
       path: "/api/portal/private-sources",
       method: "POST",
       body: { installationId: "456", repositoryId: "321", root: "skills/example" }
+    },
+    {
+      path: "/api/portal/private-sources/11111111-1111-4111-8111-111111111111/releases",
+      method: "POST",
+      body: null
     }
   ]);
 });
@@ -51,5 +62,6 @@ test("private sources remain behind the existing Skill Groups kill switch", asyn
   assert.match(main, /skillGroupsAuthEnabled \? <PrivateSourcesPanel \/>/);
   assert.match(panel, /aria-label="Private repository"/);
   assert.match(panel, /aria-label="Skill root"/);
+  assert.match(panel, /Create release/);
   assert.doesNotMatch(panel, /token|privateKey|authorization/i);
 });

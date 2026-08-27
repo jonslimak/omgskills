@@ -1,5 +1,9 @@
 import type { PortalApi } from "@/portal-api";
-import type { PrivateSkillSource, PrivateSourceView } from "@/private-sources/types";
+import type {
+  PrivateSkillRelease,
+  PrivateSkillSource,
+  PrivateSourceView
+} from "@/private-sources/types";
 
 export function loadPrivateSources(api: PortalApi): Promise<PrivateSourceView> {
   return api<PrivateSourceView>("/api/portal/private-sources");
@@ -14,4 +18,15 @@ export async function registerPrivateSource(
     body: JSON.stringify(input)
   });
   return result.source;
+}
+
+export async function registerPrivateRelease(
+  api: PortalApi,
+  sourceId: string
+): Promise<PrivateSkillRelease> {
+  const result = await api<{ release: PrivateSkillRelease }>(
+    `/api/portal/private-sources/${encodeURIComponent(sourceId)}/releases`,
+    { method: "POST" }
+  );
+  return result.release;
 }

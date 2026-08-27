@@ -3,6 +3,25 @@ import Testing
 @testable import omgskills
 
 struct SkillPackageValidatorTests {
+    private struct SharedFixture: Decodable {
+        struct Entry: Decodable {
+            let path: String
+            let mode: String
+            let blobSha: String
+            let dataBase64: String
+        }
+
+        let version: Int
+        let coordinates: SkillPackageCoordinatesFixture
+        let entries: [Entry]
+    }
+
+    private struct SkillPackageCoordinatesFixture: Decodable {
+        let commitSha: String
+        let treeSha: String
+        let skillMdSha: String
+    }
+
     private let commitSha = String(repeating: "1", count: 40)
     private let treeSha = "315d6f38e5d0c3ab41809ba1c188e25eab45b5a1"
     private let skillMdSha = "6d2190081ae23aae9b09e89d10a3e1f57c3bb398"
@@ -15,6 +34,39 @@ struct SkillPackageValidatorTests {
         #expect(result.coordinates == package.coordinates)
         #expect(result.fileCount == 3)
         #expect(result.totalBytes == package.entries.reduce(0) { $0 + $1.data.count })
+    }
+
+    @Test func validatesSharedServerClientPackageFixture() throws {
+        let fixtureURL = try #require(
+            Bundle.module.url(
+                forResource: "skill-package-validation-v1",
+                withExtension: "json",
+                subdirectory: "Fixtures"
+            )
+        )
+        let fixture = try JSONDecoder().decode(
+            SharedFixture.self,
+            from: Data(contentsOf: fixtureURL)
+        )
+        let coordinates = SkillPackageCoordinates(
+            commitSha: fixture.coordinates.commitSha,
+            treeSha: fixture.coordinates.treeSha,
+            skillMdSha: fixture.coordinates.skillMdSha
+        )
+        let package = SkillPackage(
+            coordinates: coordinates,
+            entries: try fixture.entries.map { entry in
+                SkillPackageEntry(
+                    path: entry.path,
+                    mode: entry.mode,
+                    data: try #require(Data(base64Encoded: entry.dataBase64)),
+                    blobSha: entry.blobSha
+                )
+            }
+        )
+
+        #expect(fixture.version == 1)
+        #expect(try SkillPackageValidator.validate(package, expected: coordinates).fileCount == 1)
     }
 
     @Test func rejectsUnsafeAndReservedPaths() {
