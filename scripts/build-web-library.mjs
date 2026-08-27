@@ -224,7 +224,6 @@ const siteFooterHtml = `  <footer class="site-footer">
         <a href="/openapi.json">API spec (OpenAPI)</a>
         <a href="/agents.md">Agent guide</a>
         <a href="/llms.txt">llms.txt</a>
-        <a href="/health/">Status</a>
       </div>
       <div class="site-footer-col">
         <h2>Company</h2>
@@ -1066,7 +1065,6 @@ function renderDevelopersPage() {
     <div class="section">
       <div class="eyebrow">Status &amp; support</div>
       <div class="grid">
-        <a class="card" href="/health/"><h2>Pipeline status</h2><p>Live crawl and publish pipeline health for the public catalog.</p></a>
         <a class="card" href="${origin}/mcp/health"><h2>MCP health</h2><p>Live catalog status and loaded skill count.</p></a>
         <a class="card" href="mailto:hi@omgskills.com"><h2>Contact</h2><p>Questions, corrections, and support: hi@omgskills.com.</p></a>
       </div>
@@ -1328,7 +1326,6 @@ ${markdownCodeBlock(`{
 
 ## Status and support
 
-- Pipeline status: ${origin}/health/
 - MCP health: ${origin}/mcp/health
 - Contact: hi@omgskills.com
 
@@ -1482,7 +1479,6 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 - OpenAPI specification: ${origin}/openapi.json
 - Hosted MCP endpoint: ${origin}/mcp
 - MCP health: ${origin}/mcp/health
-- Pipeline status: ${origin}/health/
 - npm package: https://www.npmjs.com/package/omgskills-mcp
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Public catalog manifest: ${origin}/data/manifest.json

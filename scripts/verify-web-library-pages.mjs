@@ -816,7 +816,7 @@ async function verifyLocalHomepageLibraryPreview() {
   const html = await readFile(filePath, "utf8");
   verifyHomepageLibraryPreview(html, filePath);
   verifyHomepageTrustMetadata(html, filePath);
-  assertIncludes(html, '<a href="/developers/">Developers</a>', filePath);
+  assertIncludes(html, '<a href="/developers/">Developer resources</a>', filePath);
   for (const requiredPath of ["/about/", "/banner.webp", "/images/guide/share.png"]) {
     if (!(await localUrlExists(requiredPath))) {
       throw new Error(`${filePath} requires missing local resource: ${requiredPath}`);
@@ -877,7 +877,7 @@ async function verifyLiveHomepageLibraryPreview() {
   const html = await response.text();
   verifyHomepageLibraryPreview(html, url);
   verifyHomepageTrustMetadata(html, url);
-  assertIncludes(html, '<a href="/developers/">Developers</a>', url);
+  assertIncludes(html, '<a href="/developers/">Developer resources</a>', url);
   await verifyLiveInternalLinks(html, url);
 
   const socialImageResponse = await fetchLive(`${origin}/images/guide/share.png`, { redirect: "manual" });
