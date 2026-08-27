@@ -1,6 +1,7 @@
 import {
   boolean,
   check,
+  foreignKey,
   index,
   integer,
   pgTable,
@@ -31,6 +32,105 @@ export const users = pgTable(
   ]
 );
 
+export const skillSources = pgTable(
+  "skill_sources",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: text("kind").notNull(),
+    normalizedRoot: text("normalized_root").notNull(),
+    catalogSkillId: text("catalog_skill_id"),
+    repositoryId: text("repository_id"),
+    repositorySlug: text("repository_slug"),
+    ownerUserId: uuid("owner_user_id").references(() => users.id, { onDelete: "restrict" }),
+    brokerInstallationId: text("broker_installation_id"),
+    tombstonedAt: timestamp("tombstoned_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    check(
+      "skill_sources_kind_check",
+      sql`${table.kind} IN ('catalog', 'public_github', 'private_github')`
+    ),
+    check(
+      "skill_sources_root_check",
+      sql`char_length(${table.normalizedRoot}) BETWEEN 1 AND 1000
+        AND ${table.normalizedRoot} = btrim(${table.normalizedRoot})
+        AND ${table.normalizedRoot} NOT LIKE '/%'
+        AND ${table.normalizedRoot} NOT LIKE '%/'
+        AND ${table.normalizedRoot} NOT LIKE '%//%'
+        AND strpos(${table.normalizedRoot}, chr(92)) = 0`
+    ),
+    check(
+      "skill_sources_shape_check",
+      sql`(
+          ${table.kind} = 'catalog'
+          AND ${table.catalogSkillId} IS NOT NULL
+          AND ${table.repositoryId} IS NULL
+          AND ${table.repositorySlug} IS NULL
+          AND ${table.ownerUserId} IS NULL
+          AND ${table.brokerInstallationId} IS NULL
+        ) OR (
+          ${table.kind} = 'public_github'
+          AND ${table.catalogSkillId} IS NULL
+          AND ${table.repositoryId} IS NOT NULL
+          AND ${table.repositorySlug} IS NOT NULL
+          AND ${table.ownerUserId} IS NULL
+          AND ${table.brokerInstallationId} IS NULL
+        ) OR (
+          ${table.kind} = 'private_github'
+          AND ${table.catalogSkillId} IS NULL
+          AND ${table.repositoryId} IS NOT NULL
+          AND ${table.repositorySlug} IS NOT NULL
+          AND ${table.ownerUserId} IS NOT NULL
+          AND ${table.brokerInstallationId} IS NOT NULL
+        )`
+    ),
+    uniqueIndex("skill_sources_catalog_unique")
+      .on(table.catalogSkillId)
+      .where(sql`${table.kind} = 'catalog'`),
+    uniqueIndex("skill_sources_github_unique")
+      .on(table.kind, table.repositoryId, table.normalizedRoot)
+      .where(sql`${table.kind} IN ('public_github', 'private_github')`),
+    index("skill_sources_owner_idx").on(table.ownerUserId),
+    index("skill_sources_repository_idx").on(table.repositoryId)
+  ]
+);
+
+export const skillReleases = pgTable(
+  "skill_releases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sourceId: uuid("source_id").notNull().references(() => skillSources.id, { onDelete: "restrict" }),
+    commitSha: text("commit_sha").notNull(),
+    treeSha: text("tree_sha").notNull(),
+    skillMdSha: text("skill_md_sha").notNull(),
+    createdBy: text("created_by").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    check(
+      "skill_releases_sha_check",
+      sql`${table.commitSha} ~ '^[0-9a-f]{40}$'
+        AND ${table.treeSha} ~ '^[0-9a-f]{40}$'
+        AND ${table.skillMdSha} ~ '^[0-9a-f]{40}$'`
+    ),
+    check(
+      "skill_releases_creator_check",
+      sql`char_length(${table.createdBy}) BETWEEN 1 AND 500
+        AND ${table.createdBy} = btrim(${table.createdBy})`
+    ),
+    uniqueIndex("skill_releases_source_coordinates_unique").on(
+      table.sourceId,
+      table.commitSha,
+      table.treeSha,
+      table.skillMdSha
+    ),
+    uniqueIndex("skill_releases_id_source_unique").on(table.id, table.sourceId),
+    index("skill_releases_source_created_idx").on(table.sourceId, table.createdAt)
+  ]
+);
+
 export const skillGroups = pgTable(
   "skill_groups",
   {
@@ -40,6 +140,7 @@ export const skillGroups = pgTable(
     description: text("description"),
     slug: text("slug").notNull(),
     visibility: text("visibility").notNull().default("private"),
+    revision: integer("revision").notNull().default(1),
     isFavorites: boolean("is_favorites").notNull().default(false),
     showOwnerName: boolean("show_owner_name").notNull().default(false),
     disabledAt: timestamp("disabled_at", { withTimezone: true }),
@@ -49,7 +150,8 @@ export const skillGroups = pgTable(
   (table) => [
     uniqueIndex("skill_groups_owner_slug_unique").on(table.ownerUserId, table.slug),
     index("skill_groups_owner_idx").on(table.ownerUserId),
-    index("skill_groups_visibility_idx").on(table.visibility)
+    index("skill_groups_visibility_idx").on(table.visibility),
+    check("skill_groups_revision_check", sql`${table.revision} > 0`)
   ]
 );
 
@@ -108,11 +210,37 @@ export const skillGroupItems = pgTable(
     name: text("name"),
     description: text("description"),
     note: text("note"),
+    sourceId: uuid("source_id").references(() => skillSources.id, { onDelete: "restrict" }),
+    releaseId: uuid("release_id").references(() => skillReleases.id, { onDelete: "restrict" }),
+    metadataOnlyReason: text("metadata_only_reason"),
     position: integer("position").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
   },
   (table) => [
-    index("skill_group_items_group_position_idx").on(table.groupId, table.position)
+    index("skill_group_items_group_position_idx").on(table.groupId, table.position),
+    index("skill_group_items_source_idx").on(table.sourceId),
+    index("skill_group_items_release_idx").on(table.releaseId),
+    check(
+      "skill_group_items_release_state_check",
+      sql`(
+          ${table.sourceId} IS NULL
+          AND ${table.releaseId} IS NULL
+          AND ${table.metadataOnlyReason} IS NULL
+        ) OR (
+          ${table.sourceId} IS NOT NULL
+          AND ${table.releaseId} IS NOT NULL
+          AND ${table.metadataOnlyReason} IS NULL
+        ) OR (
+          ${table.releaseId} IS NULL
+          AND ${table.metadataOnlyReason} IS NOT NULL
+          AND char_length(btrim(${table.metadataOnlyReason})) BETWEEN 1 AND 200
+        )`
+    ),
+    foreignKey({
+      columns: [table.releaseId, table.sourceId],
+      foreignColumns: [skillReleases.id, skillReleases.sourceId],
+      name: "skill_group_items_release_source_fk"
+    }).onDelete("restrict")
   ]
 );
 

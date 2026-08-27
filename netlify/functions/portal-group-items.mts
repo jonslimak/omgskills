@@ -5,9 +5,13 @@ import {
   groupItemForValidatedGithubSkill,
   validateGithubSkill,
 } from "./_shared/github-skill-resolution.js";
-import { requireGroupItemId, validateCompleteItemOrder } from "./_shared/group-behavior.js";
+import { requireGroupItemId } from "./_shared/group-behavior.js";
 import { requireGroupAccess } from "./_shared/group-access.js";
-import { addGroupItem } from "./_shared/group-items.js";
+import {
+  addGroupItem,
+  deleteGroupItemWithClient,
+  reorderGroupItemsWithClient
+} from "./_shared/group-items.js";
 import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
 import { loadPublishedCatalogIdentity } from "./_shared/published-catalog.js";
 import { requirePortalUser } from "./_shared/user.js";
@@ -102,58 +106,16 @@ export default async (req: Request, _context: Context) => {
         if (req.method === "DELETE") {
           const body = await requireJsonObject(req);
           const itemId = requireGroupItemId(body.itemId);
-          const deleted = await client.query<{ id: string }>(
-            "DELETE FROM skill_group_items WHERE group_id = $1 AND id = $2 RETURNING id",
-            [groupId, itemId]
-          );
-          if (!deleted.rowCount) {
+          const deleted = await deleteGroupItemWithClient(client, groupId, itemId);
+          if (!deleted) {
             throw new Response("Group item not found", { status: 404 });
           }
-          await client.query(
-            `
-              WITH ordered AS (
-                SELECT id, (row_number() OVER (ORDER BY position ASC, created_at ASC, id ASC) - 1)::int AS position
-                FROM skill_group_items
-                WHERE group_id = $1
-              )
-              UPDATE skill_group_items item
-              SET position = ordered.position
-              FROM ordered
-              WHERE item.id = ordered.id
-            `,
-            [groupId]
-          );
           await client.query("COMMIT");
           return jsonResponse(req, { itemId, deleted: true });
         }
 
         const body = await requireJsonObject(req);
-        const current = await client.query<{ id: string }>(
-          `
-            SELECT id
-            FROM skill_group_items
-            WHERE group_id = $1
-            ORDER BY position ASC, created_at ASC, id ASC
-            FOR UPDATE
-          `,
-          [groupId]
-        );
-        const itemIds = validateCompleteItemOrder(
-          current.rows.map((row) => row.id),
-          body.itemIds
-        );
-        await client.query(
-          `
-            UPDATE skill_group_items item
-            SET position = requested.position
-            FROM (
-              SELECT id, (ordinality - 1)::int AS position
-              FROM unnest($2::uuid[]) WITH ORDINALITY AS ordered(id, ordinality)
-            ) AS requested
-            WHERE item.group_id = $1 AND item.id = requested.id
-          `,
-          [groupId, itemIds]
-        );
+        const { itemIds } = await reorderGroupItemsWithClient(client, groupId, body.itemIds);
         await client.query("COMMIT");
         return jsonResponse(req, { itemIds });
       } catch (error) {
