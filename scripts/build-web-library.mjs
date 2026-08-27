@@ -205,6 +205,38 @@ function titleize(value) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+const siteFooterHtml = `  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-brand">
+        <a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
+        <p>The best and latest agent skills from trusted sources. Free macOS app, open web library.</p>
+      </div>
+      <div class="site-footer-col">
+        <h2>Library</h2>
+        <a href="/skills/">Skills</a>
+        <a href="/guide/">Skills guide</a>
+        <a href="/data/">Data</a>
+        <a href="/">macOS app</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Developers</h2>
+        <a href="/developers/">Developer resources</a>
+        <a href="/openapi.json">API spec (OpenAPI)</a>
+        <a href="/agents.md">Agent guide</a>
+        <a href="/llms.txt">llms.txt</a>
+        <a href="/health/">Status</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Company</h2>
+        <a href="/about/">About</a>
+        <a href="/support/">Support</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+        <a href="https://github.com/jonslimak/omgskills" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>`;
+
 function pageShell({
   title,
   description,
@@ -347,6 +379,14 @@ function pageShell({
     .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .tag { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; color: var(--muted); font-size: 13px; }
     .lede { max-width: 68ch; font-size: 17px; }
+    .site-footer { border-top: 1px solid var(--line); margin-top: 64px; }
+    .site-footer-inner { display: grid; grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(140px, 1fr)); gap: 24px; max-width: 880px; margin: 0 auto; padding: 36px 24px 44px; }
+    .site-footer-brand .brand { font-size: 22px; }
+    .site-footer-brand p { margin: 10px 0 0; max-width: 32ch; font-size: 13px; }
+    .site-footer h2 { margin: 0 0 12px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .site-footer-col a { display: block; margin-bottom: 9px; color: var(--muted); font-size: 13px; text-decoration: none; }
+    .site-footer-col a:hover { color: var(--text); }
+    @media (max-width: 720px) { .site-footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); } .site-footer-brand { grid-column: 1 / -1; } }
     @media (max-width: 620px) {
       .entity-hero { grid-template-columns: 72px minmax(0, 1fr); align-items: start; gap: 16px; }
       .entity-avatar { width: 72px; height: 72px; border-radius: 14px; }
@@ -369,6 +409,7 @@ function pageShell({
   <main>
 ${body}
   </main>
+${siteFooterHtml}
   <script>
     document.querySelectorAll("[data-copy]").forEach((button) => {
       button.addEventListener("click", async () => {
@@ -1016,9 +1057,24 @@ function renderDevelopersPage() {
     </div>
 
     <div class="section">
+      <div class="eyebrow">API</div>
+      <h2>OpenAPI specification</h2>
+      <p>Machine-readable description of every public endpoint — catalog manifest, data assets, discovery files, and the hosted MCP server:</p>
+      <div class="install-box"><pre class="install"><code>${origin}/openapi.json</code></pre></div>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">Status &amp; support</div>
+      <div class="grid">
+        <a class="card" href="/health/"><h2>Pipeline status</h2><p>Live crawl and publish pipeline health for the public catalog.</p></a>
+        <a class="card" href="${origin}/mcp/health"><h2>MCP health</h2><p>Live catalog status and loaded skill count.</p></a>
+        <a class="card" href="mailto:hi@omgskills.com"><h2>Contact</h2><p>Questions, corrections, and support: hi@omgskills.com.</p></a>
+      </div>
+    </div>
+
+    <div class="section">
       <div class="eyebrow">Links</div>
       <div class="grid">
-        <a class="card" href="${origin}/mcp/health"><h2>MCP health</h2><p>Live catalog status and loaded skill count.</p></a>
         <a class="card" href="https://www.npmjs.com/package/omgskills-mcp"><h2>npm package</h2><p>Install the local MCP server.</p></a>
         <a class="card" href="https://github.com/jonslimak/omgskills"><h2>Source</h2><p>Repository, documentation, and issue tracking.</p></a>
       </div>
@@ -1035,13 +1091,31 @@ function renderDevelopersPage() {
     description: "Connect to the read-only omgskills MCP server, run omgskills-mcp from npm, or read the public AI agent skill catalog and Markdown mirrors.",
     path: "/developers/",
     body,
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      name: "omgskills developer resources",
-      description: "MCP, npm, public catalog data, and Markdown resources for agents and developers.",
-      url: `${origin}/developers/`,
-    },
+    structuredData: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "omgskills developer resources",
+        description: "MCP, npm, public catalog data, and Markdown resources for agents and developers.",
+        url: `${origin}/developers/`,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "omgskills",
+        url: origin,
+        sameAs: [
+          "https://github.com/jonslimak/omgskills",
+          "https://www.npmjs.com/package/omgskills-mcp",
+        ],
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "technical support",
+          email: "hi@omgskills.com",
+          url: `${origin}/support/`,
+        },
+      },
+    ],
   });
 }
 
@@ -1248,6 +1322,16 @@ ${markdownCodeBlock(`{
 - Curated Gold export: ${origin}/llms-gold.txt
 - Markdown convention: append \`index.md\` to a generated library page URL
 
+## API
+
+- OpenAPI specification: ${origin}/openapi.json
+
+## Status and support
+
+- Pipeline status: ${origin}/health/
+- MCP health: ${origin}/mcp/health
+- Contact: hi@omgskills.com
+
 ## Safety
 
 The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content.
@@ -1395,8 +1479,10 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 
 - [Developer resources](${origin}/developers/index.md)
 - Agent discovery guide: ${origin}/agents.md
+- OpenAPI specification: ${origin}/openapi.json
 - Hosted MCP endpoint: ${origin}/mcp
 - MCP health: ${origin}/mcp/health
+- Pipeline status: ${origin}/health/
 - npm package: https://www.npmjs.com/package/omgskills-mcp
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Public catalog manifest: ${origin}/data/manifest.json

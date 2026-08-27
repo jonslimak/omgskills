@@ -1,0 +1,180 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "omgskills public API",
+    "version": "1.0.0",
+    "summary": "Read-only public API for the omgskills agent skill catalog",
+    "description": "Public, unauthenticated, read-only endpoints for the omgskills library of Claude Code and Codex agent skills. The catalog is published as static JSON assets addressed through a manifest, plus a hosted MCP (Model Context Protocol) server for tool-based access. No API key is required. All endpoints are GET unless noted. For guides and MCP client setup see https://omgskills.com/developers/",
+    "contact": {
+      "name": "omgskills support",
+      "email": "hi@omgskills.com",
+      "url": "https://omgskills.com/support/"
+    }
+  },
+  "externalDocs": {
+    "description": "Developer resources — MCP setup, data feeds, and agent access paths",
+    "url": "https://omgskills.com/developers/"
+  },
+  "servers": [
+    { "url": "https://omgskills.com" }
+  ],
+  "paths": {
+    "/data/manifest.json": {
+      "get": {
+        "operationId": "getCatalogManifest",
+        "summary": "Catalog manifest",
+        "description": "Entry point for the public catalog data. Lists the current content-hashed JSON assets (skills, trending, collections, author leaderboards) with their paths relative to /data/, sha256 hashes, and sizes. Fetch this first, then fetch the assets it names.",
+        "responses": {
+          "200": {
+            "description": "Current catalog manifest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": { "type": "integer" },
+                    "generatedAt": { "type": "string", "format": "date-time" },
+                    "skills": { "$ref": "#/components/schemas/ManifestAsset" },
+                    "trending": { "$ref": "#/components/schemas/ManifestAsset" }
+                  },
+                  "additionalProperties": { "$ref": "#/components/schemas/ManifestAsset" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog-skill-urls.json": {
+      "get": {
+        "operationId": "getCatalogSkillUrls",
+        "summary": "Skill ID to URL map",
+        "description": "Maps catalog skill IDs (owner/repo:skill-name) to their canonical web library page URLs on omgskills.com.",
+        "responses": {
+          "200": {
+            "description": "Skill URL map",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/.well-known/ai-catalog.json": {
+      "get": {
+        "operationId": "getAiCatalog",
+        "summary": "AI catalog discovery manifest",
+        "description": "Agent Resource Discovery manifest describing the hosted MCP server and machine-readable resources on this domain.",
+        "responses": {
+          "200": {
+            "description": "AI catalog manifest",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "operationId": "getLlmsTxt",
+        "summary": "llms.txt index",
+        "description": "Plain-text index of machine-readable resources for LLMs and agents, following the llms.txt convention. Append index.md to any library page URL for its Markdown mirror.",
+        "responses": {
+          "200": {
+            "description": "llms.txt content",
+            "content": { "text/plain": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "/llms-gold.txt": {
+      "get": {
+        "operationId": "getLlmsGoldTxt",
+        "summary": "Curated one-file library export",
+        "description": "Single-file Markdown export of the curated Gold library: collections, creator profiles, and selected skill pages. Large response (~1 MB).",
+        "responses": {
+          "200": {
+            "description": "Concatenated Markdown export",
+            "content": { "text/plain": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "/agents.md": {
+      "get": {
+        "operationId": "getAgentsMd",
+        "summary": "Agent guide",
+        "description": "When to use omgskills and the preferred machine-readable access paths, in Markdown.",
+        "responses": {
+          "200": {
+            "description": "Agent guide in Markdown",
+            "content": { "text/markdown": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "/mcp": {
+      "post": {
+        "operationId": "mcpEndpoint",
+        "summary": "Hosted MCP server (Streamable HTTP)",
+        "description": "Public, read-only Model Context Protocol endpoint speaking JSON-RPC 2.0 over Streamable HTTP. Connect any MCP client to this URL. Available tools: search_skills, get_skill, list_trending, list_gold_basket, list_by_author. The tools only read public catalog data; they do not install skills, write files, or run commands. Also available as the omgskills-mcp package on npm for local use.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "JSON-RPC 2.0 request per the Model Context Protocol specification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JSON-RPC 2.0 response or event stream per the MCP Streamable HTTP transport",
+            "content": {
+              "application/json": { "schema": { "type": "object" } },
+              "text/event-stream": { "schema": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/health": {
+      "get": {
+        "operationId": "getMcpHealth",
+        "summary": "MCP server health",
+        "description": "Live status of the hosted MCP server: loaded skill count, data source track, data age, and refresh state.",
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "sourceTrack": { "type": "string" },
+                    "skillCount": { "type": "integer" },
+                    "loadedAt": { "type": "string", "format": "date-time" },
+                    "ageSeconds": { "type": "number" },
+                    "stale": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ManifestAsset": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "description": "Asset path relative to /data/" },
+          "sha256": { "type": "string" },
+          "bytes": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
