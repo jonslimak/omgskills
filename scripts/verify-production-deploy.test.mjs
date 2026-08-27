@@ -29,6 +29,14 @@ function responseFor(path, options = {}, features = disabledFeatures) {
       { status: features.skillGroupsAuthEnabled ? 401 : 503 },
     );
   }
+  if (path === "/api/public/groups/jonslimak/my-faves/manifest") {
+    return Response.json({
+      type: "omgskills.skill_group",
+      version: 2,
+      group: { id: "group-id", name: "My Faves", slug: "my-faves", revision: 1 },
+      items: [],
+    });
+  }
   if (path === "/mcp/health") {
     return Response.json({ ok: true, skillCount: 46_000 });
   }
@@ -92,6 +100,8 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/data/health.json", method: "GET" },
     { path: "/banner.webp", method: "HEAD" },
     { path: "/api/portal/sync-upload", method: "POST" },
+    { path: "/u/jonslimak/sets/my-faves", method: "GET" },
+    { path: "/api/public/groups/jonslimak/my-faves/manifest", method: "GET" },
     { path: "/data/manifest.json", method: "GET" },
     { path: "/data/v2/manifest.json", method: "GET" },
     { path: "/data/crawl4/manifest.json", method: "GET" },
@@ -151,6 +161,23 @@ test("fails when the private portal does not honor the reviewed kill-switch stat
       },
     }),
     /sync-upload returned 401, expected 503/,
+  );
+});
+
+test("fails when the public group manifest read path is unhealthy", async () => {
+  await assert.rejects(
+    verifyProductionDeploy({
+      origin,
+      expectedFeatures: disabledFeatures,
+      fetchImpl: async (url, options) => {
+        const path = new URL(url).pathname;
+        if (path === "/api/public/groups/jonslimak/my-faves/manifest") {
+          return Response.json({ error: "Manifest failed" }, { status: 500 });
+        }
+        return responseFor(path, options);
+      },
+    }),
+    /public\/groups\/jonslimak\/my-faves\/manifest returned 500, expected 200/,
   );
 });
 

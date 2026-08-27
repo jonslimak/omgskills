@@ -10,6 +10,10 @@ const requiredStaticReleaseAssets = [
   "downloads/omgskills-mac.dmg",
   "downloads/omgskills-mac.dmg.sha256",
 ];
+const publicGroupFixture = {
+  pagePath: "/u/jonslimak/sets/my-faves",
+  manifestPath: "/api/public/groups/jonslimak/my-faves/manifest",
+};
 
 async function expectStatus(fetchImpl, origin, path, expected, options = {}) {
   const url = `${origin}${path}`;
@@ -64,6 +68,23 @@ async function verifyReleaseConfig(fetchImpl, origin, expected) {
   }
 }
 
+async function verifyPublicGroupManifest(fetchImpl, origin) {
+  await expectStatus(fetchImpl, origin, publicGroupFixture.pagePath, 200);
+  const response = await expectStatus(fetchImpl, origin, publicGroupFixture.manifestPath, 200);
+  const manifest = await response.json();
+  if (
+    manifest?.type !== "omgskills.skill_group"
+    || manifest?.version !== 2
+    || manifest?.group?.slug !== "my-faves"
+    || !Array.isArray(manifest?.items)
+  ) {
+    throw new Error(`${origin}${publicGroupFixture.manifestPath} is not a valid public group manifest`);
+  }
+  if (JSON.stringify(manifest).includes("private_github")) {
+    throw new Error(`${origin}${publicGroupFixture.manifestPath} exposed private source coordinates`);
+  }
+}
+
 export async function verifyProductionDeploy({
   origin = defaultOrigin,
   fetchImpl = fetch,
@@ -86,6 +107,7 @@ export async function verifyProductionDeploy({
     },
     body: JSON.stringify({ skills: [] }),
   });
+  await verifyPublicGroupManifest(fetchImpl, origin);
 
   for (const path of [
     "/data/manifest.json",

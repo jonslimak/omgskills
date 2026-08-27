@@ -10,6 +10,7 @@ import {
   portalBuildEnvironment,
   publicReleaseConfig,
 } from "./production-features.mjs";
+import { stageNetlifyDbMigrations } from "./stage-netlify-db-migrations.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.join(repoRoot, "site");
@@ -137,8 +138,10 @@ async function main() {
   );
   await mergeRedirects();
   await verifyRequiredOutput();
+  const stagedMigrations = await stageNetlifyDbMigrations();
 
   console.log(`Netlify deploy output ready: ${path.relative(repoRoot, outputDir)}`);
+  console.log(`Netlify database migrations staged: ${stagedMigrations.length}`);
 }
 
 main().catch((error) => {
