@@ -21,7 +21,7 @@
     "test": "npm run check",
     "test:creator-handle-reservations": "node --test ./scripts/generate-creator-handle-reservations.test.mjs && tsx --test ./netlify/functions/_shared/reserved.test.ts ./netlify/functions/_shared/group-slug.test.ts",
     "test:sync-skill": "tsx --test ./netlify/functions/_shared/sync-skill.test.ts",
-    "test:database-routing": "tsx --test ./netlify/functions/_shared/db.test.ts",
+    "test:database-routing": "tsx --test ./netlify/functions/_shared/db.test.ts ./netlify/functions/_shared/user.test.ts",
     "test:device-auth": "tsx --test ./netlify/functions/_shared/device-auth.test.ts ./netlify/functions/_shared/browser-pairing.test.ts",
     "test:group-access": "tsx --test ./netlify/functions/_shared/group-access.test.ts ./netlify/functions/_shared/group-behavior.test.ts",
     "test:device-auth-integration": "tsx --test ./netlify/functions/_shared/device-pairing.integration.test.ts",
