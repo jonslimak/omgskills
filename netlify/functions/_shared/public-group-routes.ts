@@ -4,6 +4,11 @@ export type PublicPageRoute =
   | { kind: "profile"; handle: string; canonicalPath: string }
   | { kind: "group"; handle: string; groupSlug: string; canonicalPath: string };
 
+export type PublicManifestRoute = {
+  handle: string;
+  groupSlug: string;
+};
+
 function isValidSegment(value: string): boolean {
   return value.length <= 80 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(value);
 }
@@ -64,6 +69,25 @@ export function parsePublicPageRoute(pathname: string): PublicPageRoute | null {
     groupSlug,
     canonicalPath: publicGroupPath(handle, groupSlug),
   };
+}
+
+export function parsePublicManifestRoute(pathname: string): PublicManifestRoute | null {
+  const parts = pathname.split("/").filter(Boolean);
+  if (
+    parts.length !== 6
+    || parts[0] !== "api"
+    || parts[1] !== "public"
+    || parts[2] !== "groups"
+    || parts[5] !== "manifest"
+  ) {
+    return null;
+  }
+  const handle = parts[3].toLowerCase();
+  const groupSlug = parts[4].toLowerCase();
+  if (!isValidSegment(handle) || !isValidSegment(groupSlug)) {
+    return null;
+  }
+  return { handle, groupSlug };
 }
 
 export function publicGroupsSitemapXml(

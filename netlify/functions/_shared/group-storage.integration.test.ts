@@ -11,6 +11,10 @@ import {
   reorderGroupItemsWithClient
 } from "./group-items.js";
 import {
+  readMemberGroupManifest,
+  readPublicGroupManifestByRoute
+} from "./group-manifest-adapters.js";
+import {
   appendSkillRelease,
   createSkillSource,
   GroupStorageError,
@@ -108,7 +112,7 @@ async function createUser(pool: Pool, label: string) {
   return id;
 }
 
-async function createGroup(pool: Pool, userId: string, slug = randomUUID()) {
+async function createGroup(pool: Pool, userId: string, slug: string = randomUUID()) {
   const result = await pool.query<{ id: string }>(
     `
       INSERT INTO skill_groups (owner_user_id, name, slug)
@@ -535,5 +539,74 @@ test("publishable group changes increment revisions exactly once", async () => {
       (await pool.query("SELECT revision FROM skill_groups WHERE id = $1", [groupId])).rows[0].revision,
       7
     );
+  });
+});
+
+test("authorized adapters read pinned releases from one migrated snapshot", async () => {
+  await withMigratedSchema(async (pool) => {
+    const ownerId = await createUser(pool, "manifest-owner");
+    await pool.query(
+      `UPDATE users SET handle = 'manifest-owner', profile_published = true WHERE id = $1`,
+      [ownerId]
+    );
+    const groupId = await createGroup(pool, ownerId, "shared-manifest");
+    await pool.query(
+      `UPDATE skill_groups SET visibility = 'public', revision = 12 WHERE id = $1`,
+      [groupId]
+    );
+
+    const client = await pool.connect();
+    let sourceId: string;
+    let releaseId: string;
+    try {
+      sourceId = await createSkillSource(client, {
+        kind: "private_github",
+        normalizedRoot: "skills/private-review",
+        repositoryId: "987654321",
+        repositorySlug: "secret/private-skills",
+        ownerUserId: ownerId,
+        brokerInstallationId: "installation-123"
+      });
+      releaseId = await appendSkillRelease(client, {
+        sourceId,
+        commitSha: sha.commit,
+        treeSha: sha.tree,
+        skillMdSha: sha.skill,
+        createdBy: "github:secret/private-skills"
+      });
+    } finally {
+      client.release();
+    }
+    await pool.query(
+      `
+        INSERT INTO skill_group_items (
+          group_id, kind, github_url, name, description, position, source_id, release_id
+        ) VALUES (
+          $1, 'github', 'https://github.com/secret/private-skills/tree/main/skills/private-review',
+          'Private review', 'Private review workflow.', 0, $2, $3
+        )
+      `,
+      [groupId, sourceId, releaseId]
+    );
+
+    const member = await readMemberGroupManifest(
+      pool,
+      { id: ownerId, email: "owner@example.com" },
+      groupId
+    );
+    assert.equal(member.manifest.group.revision, 12);
+    assert.equal(member.manifest.items[0].installability.status, "installable");
+    assert.equal(JSON.stringify(member.manifest).includes("secret/private-skills"), false);
+
+    const publicView = await readPublicGroupManifestByRoute(
+      pool,
+      "manifest-owner",
+      "shared-manifest"
+    );
+    assert.deepEqual(publicView.manifest.items[0].installability, {
+      status: "metadata_only",
+      reason: "source_unavailable"
+    });
+    assert.equal(JSON.stringify(publicView).includes("secret/private-skills"), false);
   });
 });

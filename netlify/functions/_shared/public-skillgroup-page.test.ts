@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { Context } from "@netlify/functions";
-import type { GroupAccessClient, GroupAccessFacts } from "./group-access.js";
+import type { GroupAccessClient } from "./group-access.js";
+import type { GroupManifestView } from "./group-manifest-adapters.js";
 import {
   publicSkillgroupPage,
   type PublicSkillgroupPageDependencies,
@@ -27,23 +28,42 @@ function sequenceClient(rowsByQuery: any[][]): GroupAccessClient {
   };
 }
 
-function accessFacts(overrides: Partial<GroupAccessFacts> = {}): GroupAccessFacts {
+function manifestView(): GroupManifestView {
   return {
-    id: "group-id",
-    ownerUserId: "user-id",
-    name: "Design tools",
-    slug: "design-tools",
-    visibility: "public",
-    isFavorites: false,
-    disabledAt: null,
-    invited: false,
-    ...overrides,
+    manifest: {
+      type: "omgskills.skill_group",
+      version: 2,
+      group: {
+        id: "group-id",
+        name: "Design tools",
+        description: "A focused set of design skills.",
+        slug: "design-tools",
+        revision: 4,
+      },
+      items: [{
+        id: "item-id",
+        kind: "catalog",
+        position: 0,
+        name: "Design skill",
+        description: "Design useful interfaces.",
+        note: null,
+        installability: { status: "metadata_only", reason: "release_unavailable" },
+      }],
+    },
+    linkHints: new Map([[
+      "item-id",
+      { catalogSkillId: "owner/repo:design", githubUrl: null, isLocalOnly: false },
+    ]]),
   };
 }
 
-function dependencies(rowsByQuery: any[][]): PublicSkillgroupPageDependencies {
+function dependencies(
+  rowsByQuery: any[][],
+  loadPublicGroupManifest: PublicSkillgroupPageDependencies["loadPublicGroupManifest"] = async () => manifestView()
+): PublicSkillgroupPageDependencies {
   return {
     pool: sequenceClient(rowsByQuery),
+    loadPublicGroupManifest,
     async loadCatalogSkillUrls() {
       return new Map([["owner/repo:design", "/skills/owner/repo/design/"]]);
     },
@@ -62,29 +82,7 @@ test("renders a public group with canonical metadata and no premature install ac
   const response = await publicSkillgroupPage(
     new Request("https://omgskills.com/u/jon/sets/design-tools"),
     context,
-    dependencies([
-      [publishedUser],
-      [{ id: "group-id" }],
-      [accessFacts()],
-      [{
-        id: "group-id",
-        name: "Design tools",
-        description: "A focused set of design skills.",
-        slug: "design-tools",
-        itemId: "item-id",
-        kind: "catalog",
-        catalogSkillId: "owner/repo:design",
-        itemGithubUrl: null,
-        snapshotName: "Design skill",
-        snapshotDescription: "Design useful interfaces.",
-        note: null,
-        skillName: null,
-        skillDescription: null,
-        syncedCatalogSkillId: null,
-        githubUrl: null,
-        isLocalOnly: false,
-      }],
-    ])
+    dependencies([[publishedUser]])
   );
   const body = await response.text();
   assert.equal(response.status, 200);
@@ -116,20 +114,14 @@ test("redirects compatibility and trailing-slash routes to the canonical group U
 });
 
 test("hides private, restricted, disabled, and unpublished-profile groups", async (t) => {
-  for (const [label, overrides] of [
-    ["private", { visibility: "private" }],
-    ["restricted", { visibility: "restricted" }],
-    ["disabled", { disabledAt: "2026-08-26T00:00:00.000Z" }],
-  ] as const) {
+  for (const label of ["private", "restricted", "disabled"] as const) {
     await t.test(label, async () => {
       const response = await publicSkillgroupPage(
         new Request("https://omgskills.com/u/jon/sets/design-tools"),
         context,
-        dependencies([
-          [publishedUser],
-          [{ id: "group-id" }],
-          [accessFacts(overrides)],
-        ])
+        dependencies([[publishedUser]], async () => {
+          throw new Response("Group not found", { status: 404 });
+        })
       );
       const body = await response.text();
       assert.equal(response.status, 404);

@@ -1,11 +1,14 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
 import {
-  findGroupIdByOwnerSlug,
   findOwnedGroupIds,
   requireGroupAccess,
   type GroupAccessClient,
 } from "./_shared/group-access.js";
+import {
+  readPublicGroupManifestByRoute,
+  type GroupManifestView,
+} from "./_shared/group-manifest-adapters.js";
 import { recordAnalytics } from "./_shared/group-items.js";
 import {
   loadCatalogSkillUrls,
@@ -63,6 +66,7 @@ function notFound(): Response {
 
 export type PublicSkillgroupPageDependencies = {
   pool: GroupAccessClient;
+  loadPublicGroupManifest(handle: string, groupSlug: string): Promise<GroupManifestView>;
   loadCatalogSkillUrls: typeof loadCatalogSkillUrls;
   recordAnalytics: typeof recordAnalytics;
 };
@@ -70,6 +74,9 @@ export type PublicSkillgroupPageDependencies = {
 function defaultDependencies(): PublicSkillgroupPageDependencies {
   return {
     pool: getPgPool(),
+    loadPublicGroupManifest(handle, groupSlug) {
+      return readPublicGroupManifestByRoute(getPgPool(), handle, groupSlug);
+    },
     loadCatalogSkillUrls,
     recordAnalytics,
   };
@@ -138,82 +145,47 @@ export async function publicSkillgroupPage(
   }
 
   if (groupSlug) {
-    const groupId = await findGroupIdByOwnerSlug(user.id, groupSlug.toLowerCase(), pool);
-    if (!groupId) {
-      return notFound();
-    }
+    let manifestView: GroupManifestView;
     try {
-      await requireGroupAccess(null, groupId, "public", pool);
+      manifestView = await dependencies.loadPublicGroupManifest(handle, groupSlug);
     } catch (error) {
       if (error instanceof Response && error.status === 404) {
         return notFound();
       }
       throw error;
     }
-    const groupResult = await pool.query(
-      `
-        SELECT
-          g.id,
-          g.name,
-          g.description,
-          g.slug,
-          i.id AS "itemId",
-          i.kind,
-          i.catalog_skill_id AS "catalogSkillId",
-          i.github_url AS "itemGithubUrl",
-          i.name AS "snapshotName",
-          i.description AS "snapshotDescription",
-          i.note,
-          s.name AS "skillName",
-          s.description AS "skillDescription",
-          s.catalog_skill_id AS "syncedCatalogSkillId",
-          s.github_url AS "githubUrl",
-          s.is_local_only AS "isLocalOnly"
-        FROM skill_groups g
-        LEFT JOIN skill_group_items i ON i.group_id = g.id
-        LEFT JOIN synced_skills s ON s.id = i.synced_skill_id
-        WHERE g.id = $1
-        ORDER BY i.position ASC
-      `,
-      [groupId]
-    );
-    if (groupResult.rowCount === 0) {
-      return notFound();
-    }
-    const first = groupResult.rows[0];
+    const manifest = manifestView.manifest;
     await dependencies.recordAnalytics("public_group_view", {
-      groupId: first.id,
+      groupId: manifest.group.id,
       profileUserId: user.id,
     });
     const catalogSkillUrls = await dependencies.loadCatalogSkillUrls(req.url)
       .catch(() => new Map<string, string>());
-    const skills = groupResult.rows
-      .filter((row) => row.itemId)
-      .map((row) => {
-        const name = row.skillName || row.snapshotName || row.catalogSkillId || row.itemGithubUrl || "Skill";
-        const description = row.skillDescription || row.snapshotDescription || row.note || (row.kind === "catalog" ? "Catalog skill" : "No description");
-        const githubUrl = row.githubUrl || row.itemGithubUrl;
+    const skills = manifest.items
+      .map((item) => {
+        const description = item.description || item.note || (item.kind === "catalog" ? "Catalog skill" : "No description");
+        const hint = manifestView.linkHints.get(item.id);
         const resolvedLink = resolvePublicSkillLink({
-          catalogSkillId: row.catalogSkillId || row.syncedCatalogSkillId,
-          githubUrl,
-          isLocalOnly: row.isLocalOnly,
+          catalogSkillId: hint?.catalogSkillId,
+          githubUrl: hint?.githubUrl,
+          isLocalOnly: hint?.isLocalOnly,
         }, catalogSkillUrls);
         const link = resolvedLink.kind === "skillPage"
           ? `<a href="${escapeHtml(resolvedLink.url)}">Skill page</a>`
           : resolvedLink.kind === "github"
-            ? `<a href="/api/public/skill-open?itemId=${encodeURIComponent(row.itemId)}&url=${encodeURIComponent(resolvedLink.url)}">GitHub</a>`
+            ? `<a href="/api/public/skill-open?itemId=${encodeURIComponent(item.id)}&url=${encodeURIComponent(resolvedLink.url)}">GitHub</a>`
             : "<span class=\"muted\">Metadata only</span>";
-        return `<div class="item"><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(description)}</p>${link}</div>`;
+        return `<div class="item"><h2>${escapeHtml(item.name)}</h2><p class="muted">${escapeHtml(description)}</p>${link}</div>`;
       })
       .join("");
     const ownerName = user.displayName || user.handle;
-    const description = first.description || `A public skill group by ${ownerName} on omgskills.`;
+    const description = manifest.group.description || `A public skill group by ${ownerName} on omgskills.`;
     const canonicalUrl = `${PUBLIC_SITE_ORIGIN}${route.canonicalPath}`;
     return html(
-      `<a href="${escapeHtml(publicProfilePath(user.handle))}">Back to profile</a><h1>${escapeHtml(first.name)}</h1><p class="muted">${escapeHtml(first.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`,
+      `<a href="${escapeHtml(publicProfilePath(user.handle))}">Back to profile</a><h1>${escapeHtml(manifest.group.name)}</h1><p class="muted">${escapeHtml(manifest.group.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`,
       200,
       {
-        title: `${first.name} by ${ownerName} | omgskills`,
+        title: `${manifest.group.name} by ${ownerName} | omgskills`,
         description,
         canonicalUrl,
         publiclyCacheable: true,
