@@ -89,6 +89,7 @@ export async function verifyProductionDeploy({
   origin = defaultOrigin,
   fetchImpl = fetch,
   expectedFeatures,
+  verifyCandidateFeatures = process.env.VERIFY_CANDIDATE_FEATURES !== "0",
 } = {}) {
   const reviewedFeatures = expectedFeatures || await loadProductionFeatures();
   await expectStatus(fetchImpl, origin, "/app/", 200);
@@ -107,7 +108,9 @@ export async function verifyProductionDeploy({
     },
     body: JSON.stringify({ skills: [] }),
   });
-  await verifyPublicGroupManifest(fetchImpl, origin);
+  if (verifyCandidateFeatures) {
+    await verifyPublicGroupManifest(fetchImpl, origin);
+  }
 
   for (const path of [
     "/data/manifest.json",

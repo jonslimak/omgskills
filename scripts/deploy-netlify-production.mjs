@@ -184,12 +184,15 @@ async function restoreDeploy({ fetchImpl, siteId, deployId, netlifyToken }) {
   );
 }
 
-function verificationCommands({ exactManifests }) {
+function verificationCommands({ exactManifests, verifyCandidateFeatures }) {
   const commands = [
     {
       command: process.execPath,
       args: ["./scripts/verify-production-deploy.mjs"],
-      env: { PRODUCTION_ORIGIN: "https://omgskills.com" },
+      env: {
+        PRODUCTION_ORIGIN: "https://omgskills.com",
+        VERIFY_CANDIDATE_FEATURES: verifyCandidateFeatures ? "1" : "0",
+      },
     },
     {
       command: process.execPath,
@@ -220,6 +223,7 @@ async function verifyWithRetries({
   run,
   env,
   exactManifests,
+  verifyCandidateFeatures,
   attempts,
   retryDelayMs,
   sleep,
@@ -229,7 +233,7 @@ async function verifyWithRetries({
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     onAttempt(attempt);
     try {
-      for (const command of verificationCommands({ exactManifests })) {
+      for (const command of verificationCommands({ exactManifests, verifyCandidateFeatures })) {
         const result = await run(command.command, command.args, {
           env: { ...env, ...command.env },
         });
@@ -357,7 +361,6 @@ export async function deployProduction({
       "deploy",
       "--prod",
       "--dir=dist/netlify-site",
-      "--no-build",
       "--json",
     ],
     { env },
@@ -380,6 +383,7 @@ export async function deployProduction({
       run,
       env,
       exactManifests: true,
+      verifyCandidateFeatures: true,
       attempts,
       retryDelayMs,
       sleep,
@@ -430,6 +434,7 @@ export async function deployProduction({
       run,
       env,
       exactManifests: false,
+      verifyCandidateFeatures: false,
       attempts,
       retryDelayMs,
       sleep,

@@ -119,6 +119,22 @@ test("verifies the complete production deploy surface", async () => {
   ]);
 });
 
+test("rollback verification skips candidate-only public group checks", async () => {
+  const requests = [];
+  await verifyProductionDeploy({
+    origin,
+    expectedFeatures: disabledFeatures,
+    verifyCandidateFeatures: false,
+    fetchImpl: async (url, options) => {
+      const path = new URL(url).pathname;
+      requests.push(path);
+      return responseFor(path, options);
+    },
+  });
+
+  assert.equal(requests.some((path) => path.includes("/my-faves")), false);
+});
+
 test("fails when a required release asset is missing", async () => {
   await assert.rejects(
     verifyProductionDeploy({

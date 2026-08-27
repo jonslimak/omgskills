@@ -28,9 +28,9 @@ function createHarness({
   const receipts = [];
   let verifyCalls = 0;
   let rollbackStarted = false;
-  const run = async (command, args) => {
+  const run = async (command, args, options = {}) => {
     const key = `${command} ${args.join(" ")}`;
-    calls.push({ type: "command", key });
+    calls.push({ type: "command", key, env: options.env });
     if (key === "git rev-parse HEAD") return { stdout: `${head}\n`, stderr: "" };
     if (key === "git rev-parse origin/main") return { stdout: `${originMain}\n`, stderr: "" };
     if (key.includes("netlify-cli deploy")) {
@@ -101,6 +101,8 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   assert.equal(receipt.sourceCommit, "commit-1");
   assert.equal(receipt.verificationAttempts, 1);
   assert.match(receipt.manualRestoreCommand, /restoreSiteDeploy/);
+  const deployCall = harness.calls.find((call) => call.key?.includes("netlify-cli deploy"));
+  assert.equal(deployCall.key.includes("--no-build"), false);
   assert.equal(
     harness.calls
       .filter((call) => call.key?.includes("verify-live-manifest.mjs"))
@@ -134,6 +136,11 @@ test("restores the previous deploy once and opens the circuit-breaker issue", as
     ),
     true,
   );
+  const productionChecks = harness.calls.filter(
+    (call) => call.key?.includes("verify-production-deploy.mjs"),
+  );
+  assert.equal(productionChecks.at(0).env.VERIFY_CANDIDATE_FEATURES, "1");
+  assert.equal(productionChecks.at(-1).env.VERIFY_CANDIDATE_FEATURES, "0");
   assert.equal(
     harness.calls.some((call) => /database|migration|sql/i.test(call.key || call.path || "")),
     false,
