@@ -32,6 +32,40 @@ export const users = pgTable(
   ]
 );
 
+export const githubBrokerInstallations = pgTable(
+  "github_broker_installations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerUserId: uuid("owner_user_id").notNull().references(() => users.id, { onDelete: "restrict" }),
+    installationId: text("installation_id").notNull(),
+    accountId: text("account_id").notNull(),
+    accountLogin: text("account_login").notNull(),
+    accountType: text("account_type").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    check(
+      "github_broker_installations_values_check",
+      sql`char_length(${table.installationId}) BETWEEN 1 AND 100
+        AND ${table.installationId} = btrim(${table.installationId})
+        AND ${table.installationId} ~ '^[0-9]+$'
+        AND char_length(${table.accountId}) BETWEEN 1 AND 100
+        AND ${table.accountId} = btrim(${table.accountId})
+        AND ${table.accountId} ~ '^[0-9]+$'
+        AND char_length(${table.accountLogin}) BETWEEN 1 AND 255
+        AND ${table.accountLogin} = btrim(${table.accountLogin})
+        AND ${table.accountType} IN ('User', 'Organization')`
+    ),
+    uniqueIndex("github_broker_installations_installation_unique").on(table.installationId),
+    uniqueIndex("github_broker_installations_owner_installation_unique").on(
+      table.ownerUserId,
+      table.installationId
+    ),
+    index("github_broker_installations_owner_idx").on(table.ownerUserId)
+  ]
+);
+
 export const skillSources = pgTable(
   "skill_sources",
   {
@@ -59,7 +93,12 @@ export const skillSources = pgTable(
         AND ${table.normalizedRoot} NOT LIKE '/%'
         AND ${table.normalizedRoot} NOT LIKE '%/'
         AND ${table.normalizedRoot} NOT LIKE '%//%'
-        AND strpos(${table.normalizedRoot}, chr(92)) = 0`
+        AND strpos(${table.normalizedRoot}, chr(92)) = 0
+        AND ${table.normalizedRoot} !~ '[[:cntrl:]]'
+        AND (
+          ${table.normalizedRoot} = '.'
+          OR ${table.normalizedRoot} !~ '(^|/)\\.{1,2}(/|$)'
+        )`
     ),
     check(
       "skill_sources_shape_check",
@@ -93,7 +132,15 @@ export const skillSources = pgTable(
       .on(table.kind, table.repositoryId, table.normalizedRoot)
       .where(sql`${table.kind} IN ('public_github', 'private_github')`),
     index("skill_sources_owner_idx").on(table.ownerUserId),
-    index("skill_sources_repository_idx").on(table.repositoryId)
+    index("skill_sources_repository_idx").on(table.repositoryId),
+    foreignKey({
+      columns: [table.ownerUserId, table.brokerInstallationId],
+      foreignColumns: [
+        githubBrokerInstallations.ownerUserId,
+        githubBrokerInstallations.installationId
+      ],
+      name: "skill_sources_owner_broker_installation_fk"
+    }).onDelete("restrict")
   ]
 );
 

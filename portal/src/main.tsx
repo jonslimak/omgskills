@@ -46,6 +46,7 @@ import { SkillActions } from "@/groups/SkillActions";
 import { listOwnedGroups, listSharedGroups } from "@/groups/api";
 import type { SkillGroup } from "@/groups/types";
 import { usePortalApi } from "@/portal-api";
+import { PrivateSourcesPanel } from "@/private-sources/PrivateSourcesPanel";
 import { isSkillGroupsAuthEnabled, portalSurface } from "@/feature-flags";
 import "./styles.css";
 
@@ -749,6 +750,7 @@ function Dashboard() {
 
       {status ? <p className="status">{status}</p> : null}
       <GroupsPanel title="SETS" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
+      {skillGroupsAuthEnabled ? <PrivateSourcesPanel /> : null}
       <SyncedSkillsPanel groups={state.groups} skills={state.syncedSkills} onRefresh={refresh} />
       <GroupsPanel title="Shared With Me" groups={state.sharedGroups} />
     </main>

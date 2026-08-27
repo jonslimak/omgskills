@@ -164,6 +164,47 @@ pre {
   padding: 32px 20px;
 }
 
+.private-source-form {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  padding: 0 20px 18px;
+}
+
+.private-source-form select {
+  background: var(--background);
+  border: 1px solid var(--input);
+  border-radius: 6px;
+  color: var(--foreground);
+  min-height: 36px;
+  padding: 0 10px;
+}
+
+.private-source-list {
+  border-top: 1px solid var(--border);
+  padding: 8px 20px 14px;
+}
+
+.private-source-row {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.private-source-row span {
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+
+@media (max-width: 680px) {
+  .private-source-form {
+    grid-template-columns: 1fr;
+  }
+}
+
 .auth-shell {
   align-items: center;
   display: flex;

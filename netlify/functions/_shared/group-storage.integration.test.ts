@@ -21,6 +21,11 @@ import {
   selectGroupItemRelease,
   tombstoneSkillSource
 } from "./group-storage.js";
+import {
+  bindGithubBrokerInstallation,
+  PrivateSourceError,
+  upsertOwnerPrivateSource
+} from "./private-sources.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
 if (!connectionString) {
@@ -192,6 +197,13 @@ test("shared storage migration preserves production-shaped legacy groups", async
 test("sources preserve repository identity and releases are append-only", async () => {
   await withMigratedSchema(async (pool) => {
     const userId = await createUser(pool, "owner");
+    await bindGithubBrokerInstallation(pool, {
+      ownerUserId: userId,
+      installationId: "123456789",
+      accountId: "7001",
+      accountLogin: "owner",
+      accountType: "User"
+    });
     const client = await pool.connect();
     try {
       const catalogSourceId = await createSkillSource(client, {
@@ -545,6 +557,13 @@ test("publishable group changes increment revisions exactly once", async () => {
 test("authorized adapters read pinned releases from one migrated snapshot", async () => {
   await withMigratedSchema(async (pool) => {
     const ownerId = await createUser(pool, "manifest-owner");
+    await bindGithubBrokerInstallation(pool, {
+      ownerUserId: ownerId,
+      installationId: "456123",
+      accountId: "7002",
+      accountLogin: "manifest-owner",
+      accountType: "User"
+    });
     await pool.query(
       `UPDATE users SET handle = 'manifest-owner', profile_published = true WHERE id = $1`,
       [ownerId]
@@ -565,7 +584,7 @@ test("authorized adapters read pinned releases from one migrated snapshot", asyn
         repositoryId: "987654321",
         repositorySlug: "secret/private-skills",
         ownerUserId: ownerId,
-        brokerInstallationId: "installation-123"
+        brokerInstallationId: "456123"
       });
       releaseId = await appendSkillRelease(client, {
         sourceId,
@@ -608,5 +627,91 @@ test("authorized adapters read pinned releases from one migrated snapshot", asyn
       reason: "source_unavailable"
     });
     assert.equal(JSON.stringify(publicView).includes("secret/private-skills"), false);
+  });
+});
+
+test("private source bindings enforce owner identity and preserve repository identity", async () => {
+  await withMigratedSchema(async (pool) => {
+    const ownerId = await createUser(pool, "private-owner");
+    const otherOwnerId = await createUser(pool, "other-owner");
+    await bindGithubBrokerInstallation(pool, {
+      ownerUserId: ownerId,
+      installationId: "555001",
+      accountId: "8001",
+      accountLogin: "private-owner",
+      accountType: "User"
+    });
+    await assert.rejects(
+      pool.query(
+        `
+          INSERT INTO skill_sources (
+            kind, normalized_root, repository_id, repository_slug, owner_user_id,
+            broker_installation_id
+          ) VALUES ('private_github', 'skills/../other', '99000', 'private-owner/skills', $1, '555001')
+        `,
+        [ownerId]
+      ),
+      (error: any) => error.code === "23514"
+    );
+    await assert.rejects(
+      bindGithubBrokerInstallation(pool, {
+        ownerUserId: otherOwnerId,
+        installationId: "555001",
+        accountId: "8001",
+        accountLogin: "private-owner",
+        accountType: "User"
+      }),
+      (error: unknown) => error instanceof PrivateSourceError
+        && error.code === "installation_conflict"
+    );
+    await bindGithubBrokerInstallation(pool, {
+      ownerUserId: otherOwnerId,
+      installationId: "555002",
+      accountId: "8002",
+      accountLogin: "other-owner",
+      accountType: "User"
+    });
+    await assert.rejects(
+      pool.query(
+        `
+          INSERT INTO skill_sources (
+            kind, normalized_root, repository_id, repository_slug, owner_user_id,
+            broker_installation_id
+          ) VALUES ('private_github', 'skills/wrong-owner', '99003', 'other-owner/skills', $1, '555002')
+        `,
+        [ownerId]
+      ),
+      (error: any) => error.code === "23503"
+    );
+
+    const source = await upsertOwnerPrivateSource(pool, {
+      ownerUserId: ownerId,
+      installationId: "555001",
+      repositoryId: "99001",
+      repositorySlug: "private-owner/skills",
+      normalizedRoot: "skills/example"
+    });
+    const renamed = await upsertOwnerPrivateSource(pool, {
+      ownerUserId: ownerId,
+      installationId: "555001",
+      repositoryId: "99001",
+      repositorySlug: "private-owner/renamed-skills",
+      normalizedRoot: "skills/example"
+    });
+    assert.equal(renamed.id, source.id);
+    assert.equal(renamed.repositorySlug, "private-owner/renamed-skills");
+
+    await assert.rejects(
+      pool.query(
+        `
+          INSERT INTO skill_sources (
+            kind, normalized_root, repository_id, repository_slug, owner_user_id,
+            broker_installation_id
+          ) VALUES ('private_github', 'skills/missing', '99002', 'other/repo', $1, '999999')
+        `,
+        [ownerId]
+      ),
+      (error: any) => error.code === "23503"
+    );
   });
 });
