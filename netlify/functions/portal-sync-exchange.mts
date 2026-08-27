@@ -2,6 +2,7 @@ import type { Context } from "@netlify/functions";
 import { isCodeVerifier, isPairingCode } from "./_shared/crypto.js";
 import { getPgPool } from "./_shared/db.js";
 import { exchangePairingCode, PairingError } from "./_shared/device-pairing.js";
+import { requireSkillGroupsFeature } from "./_shared/feature-flags.js";
 import { errorResponse, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import { requireJsonObject, requireString } from "./_shared/validation.js";
 
@@ -14,6 +15,7 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
+    requireSkillGroupsFeature();
     const body = await requireJsonObject(req);
     const pairingCode = requireString(body.pairingCode, "pairingCode", 100);
     const deviceName = requireString(body.deviceName, "deviceName", 100);

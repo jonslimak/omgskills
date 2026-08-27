@@ -24,7 +24,10 @@ function responseFor(path, options = {}, features = disabledFeatures) {
     return Response.json({ skills: { path: "skills.json" } });
   }
   if (path === "/api/portal/sync-upload" && options.method === "POST") {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json(
+      { error: features.skillGroupsAuthEnabled ? "Unauthorized" : "Skill Groups are temporarily unavailable" },
+      { status: features.skillGroupsAuthEnabled ? 401 : 503 },
+    );
   }
   if (path === "/mcp/health") {
     return Response.json({ ok: true, skillCount: 46_000 });
@@ -132,6 +135,23 @@ test("accepts an enabled reviewed production feature state", async () => {
       responseFor(new URL(url).pathname, options, enabledFeatures)
     ),
   });
+});
+
+test("fails when the private portal does not honor the reviewed kill-switch state", async () => {
+  await assert.rejects(
+    verifyProductionDeploy({
+      origin,
+      expectedFeatures: disabledFeatures,
+      fetchImpl: async (url, options) => {
+        const path = new URL(url).pathname;
+        if (path === "/api/portal/sync-upload") {
+          return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        return responseFor(path, options);
+      },
+    }),
+    /sync-upload returned 401, expected 503/,
+  );
 });
 
 test("fails when the deployed feature receipt does not match the reviewed state", async () => {

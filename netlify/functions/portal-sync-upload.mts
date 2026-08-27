@@ -1,6 +1,7 @@
 import type { Context } from "@netlify/functions";
 import { DeviceAuthError } from "./_shared/device-auth.js";
 import { getPgPool } from "./_shared/db.js";
+import { requireSkillGroupsFeature } from "./_shared/feature-flags.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { parseSyncSkill } from "./_shared/sync-skill.js";
 import {
@@ -18,6 +19,7 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
+    requireSkillGroupsFeature();
     const body = await requireJsonObject(req);
     const authentication = uploadAuthenticationFromRequest(req, body);
     const skillsValue = body.skills;

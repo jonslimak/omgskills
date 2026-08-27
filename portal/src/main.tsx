@@ -46,7 +46,7 @@ import { SkillActions } from "@/groups/SkillActions";
 import { listOwnedGroups, listSharedGroups } from "@/groups/api";
 import type { SkillGroup } from "@/groups/types";
 import { usePortalApi } from "@/portal-api";
-import { isEnabledConnectRoute, isSkillGroupsAuthEnabled } from "@/feature-flags";
+import { isSkillGroupsAuthEnabled, portalSurface } from "@/feature-flags";
 import "./styles.css";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -840,11 +840,31 @@ function SignedOutPage({ isConnectRoute }: { isConnectRoute: boolean }) {
   );
 }
 
+function SkillGroupsUnavailablePage() {
+  return (
+    <main className="shell auth-shell">
+      <section className="hero">
+        <a aria-label="Home" className="eyes-logo" href="/">👀</a>
+        <h1>Skill Groups are not available yet</h1>
+        <p>Browse the public skill library while we finish preparing this feature.</p>
+        <div className="actions">
+          <Button onClick={() => window.location.assign("/skills/")}>Browse skills</Button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function App() {
-  const isConnectRoute = isEnabledConnectRoute(
+  const surface = portalSurface(
     window.location.pathname,
     skillGroupsAuthEnabled
   );
+  if (surface === "disabled") {
+    return <SkillGroupsUnavailablePage />;
+  }
+
+  const isConnectRoute = surface === "connect";
   const groupDetailMatch = window.location.pathname.match(/^\/app\/groups\/([^/]+)\/?$/);
 
   return (

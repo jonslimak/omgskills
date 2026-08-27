@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { requireAuth } from "./_shared/auth.js";
+import { requireSkillGroupsFeature } from "./_shared/feature-flags.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 
 export default async (req: Request, _context: Context) => {
@@ -8,6 +9,7 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
+    requireSkillGroupsFeature();
     const user = await requireAuth(req);
     return jsonResponse(req, {
       ok: true,

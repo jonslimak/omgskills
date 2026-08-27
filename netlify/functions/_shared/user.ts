@@ -3,6 +3,7 @@ import type { QueryResult, QueryResultRow } from "pg";
 import { requireAuth } from "./auth.js";
 import { getPgPool } from "./db.js";
 import { getEnv } from "./env.js";
+import { requireSkillGroupsFeature } from "./feature-flags.js";
 
 export type PortalUser = {
   id: string;
@@ -58,6 +59,7 @@ export async function reconcilePortalUser(
 }
 
 export async function requirePortalUser(req: Request): Promise<PortalUser> {
+  requireSkillGroupsFeature();
   const auth = await requireAuth(req);
   const secretKey = getEnv("CLERK_SECRET_KEY");
   if (!secretKey) {
