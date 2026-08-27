@@ -9,7 +9,15 @@ enum SkillInstallProvenanceStore {
 
     static func read(targetRoot: URL, targetName: String) -> SkillInstallProvenance? {
         let url = metadataURL(targetRoot: targetRoot, targetName: targetName)
-        guard let data = try? Data(contentsOf: url) else { return nil }
+        if let data = try? Data(contentsOf: url),
+           let provenance = try? JSONDecoder().decode(SkillInstallProvenance.self, from: data) {
+            return provenance
+        }
+
+        let installationURL = targetRoot.appendingPathComponent(targetName, isDirectory: true)
+        guard let managedURL = managedMetadataURL(for: installationURL),
+              let data = try? Data(contentsOf: managedURL)
+        else { return nil }
         return try? JSONDecoder().decode(SkillInstallProvenance.self, from: data)
     }
 
@@ -36,11 +44,12 @@ enum SkillInstallProvenanceStore {
             installedAt: formatter.string(from: Date()),
             skillMdSha: skillMdSha
         )
+        try write(provenance, to: metadataURL(targetRoot: targetRoot, targetName: targetName))
+    }
+
+    static func write(_ provenance: SkillInstallProvenance, to url: URL) throws {
         let data = try JSONEncoder().encode(provenance)
-        try data.write(
-            to: metadataURL(targetRoot: targetRoot, targetName: targetName),
-            options: .atomic
-        )
+        try data.write(to: url, options: .atomic)
     }
 
     @discardableResult
@@ -57,5 +66,22 @@ enum SkillInstallProvenanceStore {
         guard fileManager.fileExists(atPath: url.path) else { return false }
         try fileManager.removeItem(at: url)
         return true
+    }
+
+    private static func managedMetadataURL(for installationURL: URL) -> URL? {
+        guard let destination = try? FileManager.default.destinationOfSymbolicLink(
+            atPath: installationURL.path
+        ) else { return nil }
+
+        let destinationURL: URL
+        if destination.hasPrefix("/") {
+            destinationURL = URL(fileURLWithPath: destination, isDirectory: true)
+        } else {
+            destinationURL = installationURL.deletingLastPathComponent()
+                .appendingPathComponent(destination, isDirectory: true)
+        }
+        guard destinationURL.lastPathComponent == "content" else { return nil }
+        return destinationURL.deletingLastPathComponent()
+            .appendingPathComponent("provenance.json")
     }
 }

@@ -38,10 +38,52 @@ struct ShaHistoryAsset: Codable, Sendable {
 }
 
 struct SkillInstallProvenance: Codable, Equatable, Sendable {
-    let catalogSkillId: String
-    let githubUrl: String
+    let catalogSkillId: String?
+    let githubUrl: String?
     let installedAt: String
     let skillMdSha: String?
+    let sourceKind: String?
+    let sourceId: String?
+    let releaseId: String?
+    let groupRevision: Int?
+    let commitSha: String?
+    let treeSha: String?
+    let targetAgent: String?
+    let targetScope: String?
+    let targetRootIdentifier: String?
+    let installMode: String?
+
+    init(
+        catalogSkillId: String?,
+        githubUrl: String?,
+        installedAt: String,
+        skillMdSha: String?,
+        sourceKind: String? = nil,
+        sourceId: String? = nil,
+        releaseId: String? = nil,
+        groupRevision: Int? = nil,
+        commitSha: String? = nil,
+        treeSha: String? = nil,
+        targetAgent: String? = nil,
+        targetScope: String? = nil,
+        targetRootIdentifier: String? = nil,
+        installMode: String? = nil
+    ) {
+        self.catalogSkillId = catalogSkillId
+        self.githubUrl = githubUrl
+        self.installedAt = installedAt
+        self.skillMdSha = skillMdSha
+        self.sourceKind = sourceKind
+        self.sourceId = sourceId
+        self.releaseId = releaseId
+        self.groupRevision = groupRevision
+        self.commitSha = commitSha
+        self.treeSha = treeSha
+        self.targetAgent = targetAgent
+        self.targetScope = targetScope
+        self.targetRootIdentifier = targetRootIdentifier
+        self.installMode = installMode
+    }
 }
 
 struct SkillIdentityMeasurement: Equatable, Sendable {

@@ -128,7 +128,7 @@ enum InstalledSkillsScanner {
         iso.formatOptions = [.withInternetDateTime]
 
         let gitLocation = resolveGitLocation(dir: dir)
-        let githubUrl = gitLocation?.githubURL ?? ""
+        let githubUrl = provenance?.githubUrl ?? gitLocation?.githubURL ?? ""
         let authorHandle = githubUrl.split(separator: "/").dropLast().last.map(String.init) ?? ""
         let isLocalOnly = !isSymlink && githubUrl.isEmpty
 
