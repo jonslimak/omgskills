@@ -37,11 +37,46 @@
     <h2>Public library data</h2>
     <p>To report incorrect, missing, or outdated skill metadata, include the omgskills page and source GitHub repository.</p>
   </main>
-  <footer>
-    <a href="/privacy/">Privacy</a>
-    <a href="/terms/">Terms</a>
-    <a href="https://github.com/jonslimak/omgskills" target="_blank" rel="noreferrer">Github</a>
-    <a href="/">Home</a>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-brand">
+        <a class="site-footer-brand-logo" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
+        <p>The best and latest agent skills from trusted sources. Free macOS app, open web library.</p>
+      </div>
+      <div class="site-footer-col">
+        <h2>Library</h2>
+        <a href="/skills/">Skills</a>
+        <a href="/guide/">Skills guide</a>
+        <a href="/data/">Data</a>
+        <a href="/">macOS app</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Developers</h2>
+        <a href="/developers/">Developer resources</a>
+        <a href="/openapi.json">API spec (OpenAPI)</a>
+        <a href="/agents.md">Agent guide</a>
+        <a href="/llms.txt">llms.txt</a>
+        <a href="/health/">Status</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Company</h2>
+        <a href="/about/">About</a>
+        <a href="/support/">Support</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+        <a href="https://github.com/jonslimak/omgskills" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
   </footer>
+  <style>
+    footer.site-footer { display: block; max-width: none; margin: 64px 0 0; padding: 0; border-top: 1px solid #e5e7eb; background: #ffffff; }
+    .site-footer-inner { display: grid; grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(140px, 1fr)); gap: 24px; max-width: 880px; margin: 0 auto; padding: 36px 24px 44px; }
+    .site-footer-brand-logo { font-size: 22px; text-decoration: none; }
+    .site-footer-brand p { margin: 10px 0 0; max-width: 32ch; color: #6b7280; font-size: 13px; line-height: 1.5; font-weight: 400; }
+    .site-footer h2 { margin: 0 0 12px; color: #6b7280; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .site-footer-col a { display: block; margin-bottom: 9px; color: #6b7280; font-size: 13px; font-weight: 400; text-decoration: none; }
+    .site-footer-col a:hover { color: #111111; }
+    @media (max-width: 720px) { .site-footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); } .site-footer-brand { grid-column: 1 / -1; } }
+  </style>
 </body>
 </html>
