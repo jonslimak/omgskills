@@ -3,7 +3,14 @@ import { getPgPool } from "./_shared/db.js";
 import { GitHubBrokerClient } from "./_shared/github-broker.js";
 import { corsHeaders, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import {
-  loadOwnerPrivateReleasePackage,
+  PrivateReleaseAccessError,
+  recordContentFetch as writeContentFetchAudit,
+  requirePrivateReleaseAccess,
+  samePrivateRelease,
+  type PrivateReleaseGrant
+} from "./_shared/private-release-access.js";
+import {
+  loadAuthorizedPrivateReleasePackage,
   privateReleaseResponse,
   registerOwnerPrivateRelease,
   type PrivateSkillRelease
@@ -39,10 +46,9 @@ function requireOpaqueId(value: string, label: string): string {
 export type PortalPrivateReleasesDependencies = {
   requirePortalUser(req: Request): Promise<PortalUser>;
   register(ownerUserId: string, sourceId: string): Promise<PrivateSkillRelease>;
-  loadPackage(
-    ownerUserId: string,
-    releaseId: string
-  ): Promise<{ release: PrivateSkillRelease; package: SkillPackage }>;
+  authorize(actor: PortalUser, releaseId: string): Promise<PrivateReleaseGrant>;
+  loadPackage(grant: PrivateReleaseGrant): Promise<SkillPackage>;
+  recordContentFetch(grant: PrivateReleaseGrant): Promise<void>;
 };
 
 function defaultDependencies(): PortalPrivateReleasesDependencies {
@@ -53,8 +59,18 @@ function defaultDependencies(): PortalPrivateReleasesDependencies {
     register(ownerUserId, sourceId) {
       return registerOwnerPrivateRelease(pool, broker, { ownerUserId, sourceId });
     },
-    loadPackage(ownerUserId, releaseId) {
-      return loadOwnerPrivateReleasePackage(pool, broker, { ownerUserId, releaseId });
+    authorize(actor, releaseId) {
+      return requirePrivateReleaseAccess(pool, {
+        userId: actor.id,
+        email: actor.email,
+        deviceId: null
+      }, releaseId);
+    },
+    loadPackage(grant) {
+      return loadAuthorizedPrivateReleasePackage(broker, grant);
+    },
+    recordContentFetch(grant) {
+      return writeContentFetchAudit(pool, grant);
     }
   };
 }
@@ -85,15 +101,19 @@ export async function portalPrivateReleases(
       return secretJsonResponse(req, { release }, { status: 201 });
     }
 
-    const loaded = await resolved.loadPackage(
-      actor.id,
-      requireOpaqueId(route.releaseId, "release id")
-    );
+    const releaseId = requireOpaqueId(route.releaseId, "release id");
+    const initialGrant = await resolved.authorize(actor, releaseId);
+    const skillPackage = await resolved.loadPackage(initialGrant);
+    const finalGrant = await resolved.authorize(actor, releaseId);
+    if (!samePrivateRelease(initialGrant, finalGrant)) {
+      throw new PrivateReleaseAccessError();
+    }
     const stream = skillPackageNdjson({
-      sourceId: loaded.release.sourceId,
-      releaseId: loaded.release.id,
-      package: loaded.package
+      sourceId: finalGrant.sourceId,
+      releaseId: finalGrant.releaseId,
+      package: skillPackage
     });
+    await resolved.recordContentFetch(finalGrant);
     return new Response(stream.body, {
       status: 200,
       headers: {
@@ -128,5 +148,11 @@ export const config: Config = {
   path: [
     "/api/portal/private-sources/:sourceId/releases",
     "/api/portal/private-releases/:releaseId/package"
-  ]
+  ],
+  rateLimit: {
+    action: "rate_limit",
+    aggregateBy: ["domain", "ip"],
+    windowLimit: 10,
+    windowSize: 60
+  }
 };

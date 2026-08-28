@@ -380,9 +380,32 @@ export const analyticsEvents = pgTable(
     groupId: uuid("group_id").references(() => skillGroups.id, { onDelete: "set null" }),
     profileUserId: uuid("profile_user_id").references(() => users.id, { onDelete: "set null" }),
     skillItemId: uuid("skill_item_id").references(() => skillGroupItems.id, { onDelete: "set null" }),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    sourceId: uuid("source_id"),
+    releaseId: uuid("release_id"),
+    deviceId: uuid("device_id").references(() => deviceTokens.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
   },
   (table) => [
-    index("analytics_events_name_created_idx").on(table.eventName, table.createdAt)
+    index("analytics_events_name_created_idx").on(table.eventName, table.createdAt),
+    index("analytics_events_content_fetch_actor_idx")
+      .on(table.actorUserId, table.createdAt)
+      .where(sql`${table.eventName} = 'content_fetch'`),
+    index("analytics_events_content_fetch_source_idx")
+      .on(table.sourceId, table.createdAt)
+      .where(sql`${table.eventName} = 'content_fetch'`),
+    foreignKey({
+      columns: [table.releaseId, table.sourceId],
+      foreignColumns: [skillReleases.id, skillReleases.sourceId],
+      name: "analytics_events_release_source_fk"
+    }).onDelete("set null"),
+    check(
+      "analytics_events_content_fetch_shape_check",
+      sql`${table.eventName} <> 'content_fetch'
+        OR (
+          ${table.sourceId} IS NOT NULL
+          AND ${table.releaseId} IS NOT NULL
+        )`
+    )
   ]
 );

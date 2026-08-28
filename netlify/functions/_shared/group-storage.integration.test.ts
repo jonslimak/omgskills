@@ -31,6 +31,11 @@ import {
   PrivateReleaseError,
   registerOwnerPrivateRelease
 } from "./private-releases.js";
+import {
+  PrivateReleaseAccessError,
+  recordContentFetch,
+  requirePrivateReleaseAccess
+} from "./private-release-access.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
 if (!connectionString) {
@@ -716,6 +721,252 @@ test("authorized adapters read pinned releases from one migrated snapshot", asyn
       reason: "source_unavailable"
     });
     assert.equal(JSON.stringify(publicView).includes("secret/private-skills"), false);
+  });
+});
+
+test("private release access follows live restricted-group ACLs and records metadata-only audit", async () => {
+  await withMigratedSchema(async (pool) => {
+    const ownerId = await createUser(pool, "access-owner");
+    const recipientId = await createUser(pool, "access-recipient");
+    const outsiderId = await createUser(pool, "access-outsider");
+    const recipientEmail = `${recipientId}@example.com`;
+    const outsiderEmail = `${outsiderId}@example.com`;
+    await bindGithubBrokerInstallation(pool, {
+      ownerUserId: ownerId,
+      installationId: "888001",
+      accountId: "9101",
+      accountLogin: "access-owner",
+      accountType: "User"
+    });
+    const groupId = await createGroup(pool, ownerId, "private-access");
+    await pool.query("UPDATE skill_groups SET visibility = 'restricted' WHERE id = $1", [groupId]);
+    await pool.query(
+      "INSERT INTO skill_group_allowed_emails (group_id, email) VALUES ($1, $2)",
+      [groupId, recipientEmail]
+    );
+
+    const client = await pool.connect();
+    let sourceId: string;
+    let releaseId: string;
+    try {
+      sourceId = await createSkillSource(client, {
+        kind: "private_github",
+        normalizedRoot: "skills/private-access",
+        repositoryId: "991001",
+        repositorySlug: "access-owner/private-skills",
+        ownerUserId: ownerId,
+        brokerInstallationId: "888001"
+      });
+      releaseId = await appendSkillRelease(client, {
+        sourceId,
+        commitSha: sha.commit,
+        treeSha: sha.tree,
+        skillMdSha: sha.skill,
+        createdBy: ownerId
+      });
+    } finally {
+      client.release();
+    }
+    const item = await pool.query<{ id: string }>(
+      `
+        INSERT INTO skill_group_items (
+          group_id, kind, github_url, name, description, position, source_id, release_id
+        ) VALUES (
+          $1, 'github', 'https://github.com/access-owner/private-skills/tree/main/skills/private-access',
+          'Private access', 'Private access fixture.', 0, $2, $3
+        )
+        RETURNING id
+      `,
+      [groupId, sourceId, releaseId]
+    );
+    const itemId = item.rows[0].id;
+
+    const ownerGrant = await requirePrivateReleaseAccess(
+      pool,
+      { userId: ownerId, email: `${ownerId}@example.com` },
+      releaseId
+    );
+    assert.equal(ownerGrant.accessRole, "owner");
+
+    const recipientGrant = await requirePrivateReleaseAccess(
+      pool,
+      { userId: recipientId, email: recipientEmail },
+      releaseId
+    );
+    assert.equal(recipientGrant.accessRole, "invited");
+    assert.equal(recipientGrant.groupId, groupId);
+    assert.equal(recipientGrant.skillItemId, itemId);
+
+    await assert.rejects(
+      requirePrivateReleaseAccess(
+        pool,
+        { userId: outsiderId, email: outsiderEmail },
+        releaseId
+      ),
+      (error: unknown) => error instanceof PrivateReleaseAccessError
+    );
+
+    await recordContentFetch(pool, recipientGrant);
+    const audit = await pool.query(
+      `
+        SELECT
+          event_name, group_id, skill_item_id, actor_user_id, source_id, release_id,
+          device_id, created_at
+        FROM analytics_events
+        WHERE event_name = 'content_fetch'
+      `
+    );
+    assert.equal(audit.rowCount, 1);
+    assert.deepEqual(
+      {
+        eventName: audit.rows[0].event_name,
+        groupId: audit.rows[0].group_id,
+        skillItemId: audit.rows[0].skill_item_id,
+        actorUserId: audit.rows[0].actor_user_id,
+        sourceId: audit.rows[0].source_id,
+        releaseId: audit.rows[0].release_id,
+        deviceId: audit.rows[0].device_id,
+        hasTime: audit.rows[0].created_at instanceof Date
+      },
+      {
+        eventName: "content_fetch",
+        groupId,
+        skillItemId: itemId,
+        actorUserId: recipientId,
+        sourceId,
+        releaseId,
+        deviceId: null,
+        hasTime: true
+      }
+    );
+    await assert.rejects(
+      pool.query("INSERT INTO analytics_events (event_name) VALUES ('content_fetch')"),
+      (error: any) => error.code === "23514"
+    );
+
+    await pool.query(
+      "DELETE FROM skill_group_allowed_emails WHERE group_id = $1 AND email = $2",
+      [groupId, recipientEmail]
+    );
+    await assert.rejects(
+      requirePrivateReleaseAccess(pool, { userId: recipientId, email: recipientEmail }, releaseId),
+      (error: unknown) => error instanceof PrivateReleaseAccessError
+    );
+
+    await pool.query(
+      "INSERT INTO skill_group_allowed_emails (group_id, email) VALUES ($1, $2)",
+      [groupId, recipientEmail]
+    );
+    await pool.query("UPDATE skill_groups SET disabled_at = now() WHERE id = $1", [groupId]);
+    await assert.rejects(
+      requirePrivateReleaseAccess(pool, { userId: recipientId, email: recipientEmail }, releaseId),
+      (error: unknown) => error instanceof PrivateReleaseAccessError
+    );
+    await pool.query("UPDATE skill_groups SET disabled_at = NULL, visibility = 'public' WHERE id = $1", [groupId]);
+    await assert.rejects(
+      requirePrivateReleaseAccess(pool, { userId: recipientId, email: recipientEmail }, releaseId),
+      (error: unknown) => error instanceof PrivateReleaseAccessError
+    );
+    await pool.query("UPDATE skill_groups SET visibility = 'restricted' WHERE id = $1", [groupId]);
+    assert.equal(
+      (await requirePrivateReleaseAccess(
+        pool,
+        { userId: recipientId, email: recipientEmail },
+        releaseId
+      )).accessRole,
+      "invited"
+    );
+
+    await pool.query("DELETE FROM users WHERE id = $1", [recipientId]);
+    assert.equal(
+      (await pool.query(
+        "SELECT actor_user_id FROM analytics_events WHERE event_name = 'content_fetch'"
+      )).rows[0].actor_user_id,
+      null
+    );
+  });
+});
+
+test("private release access rejects unlinked releases and cross-owner group substitution", async () => {
+  await withMigratedSchema(async (pool) => {
+    const ownerId = await createUser(pool, "substitution-owner");
+    const otherOwnerId = await createUser(pool, "substitution-other-owner");
+    const recipientId = await createUser(pool, "substitution-recipient");
+    const recipientEmail = `${recipientId}@example.com`;
+    await bindGithubBrokerInstallation(pool, {
+      ownerUserId: ownerId,
+      installationId: "888002",
+      accountId: "9102",
+      accountLogin: "substitution-owner",
+      accountType: "User"
+    });
+    const otherGroupId = await createGroup(pool, otherOwnerId, "cross-owner");
+    await pool.query("UPDATE skill_groups SET visibility = 'restricted' WHERE id = $1", [otherGroupId]);
+    await pool.query(
+      "INSERT INTO skill_group_allowed_emails (group_id, email) VALUES ($1, $2)",
+      [otherGroupId, recipientEmail]
+    );
+
+    const client = await pool.connect();
+    let sourceId: string;
+    let linkedReleaseId: string;
+    let unlinkedReleaseId: string;
+    try {
+      sourceId = await createSkillSource(client, {
+        kind: "private_github",
+        normalizedRoot: "skills/substitution",
+        repositoryId: "991002",
+        repositorySlug: "substitution-owner/private-skills",
+        ownerUserId: ownerId,
+        brokerInstallationId: "888002"
+      });
+      linkedReleaseId = await appendSkillRelease(client, {
+        sourceId,
+        commitSha: sha.commit,
+        treeSha: sha.tree,
+        skillMdSha: sha.skill,
+        createdBy: ownerId
+      });
+      unlinkedReleaseId = await appendSkillRelease(client, {
+        sourceId,
+        commitSha: "4".repeat(40),
+        treeSha: "5".repeat(40),
+        skillMdSha: "6".repeat(40),
+        createdBy: ownerId
+      });
+    } finally {
+      client.release();
+    }
+    await pool.query(
+      `
+        INSERT INTO skill_group_items (
+          group_id, kind, github_url, name, description, position, source_id, release_id
+        ) VALUES (
+          $1, 'github', 'https://github.com/substitution-owner/private-skills/tree/main/skills/substitution',
+          'Substitution', 'Cross-owner fixture.', 0, $2, $3
+        )
+      `,
+      [otherGroupId, sourceId, linkedReleaseId]
+    );
+
+    for (const releaseId of [linkedReleaseId, unlinkedReleaseId]) {
+      await assert.rejects(
+        requirePrivateReleaseAccess(
+          pool,
+          { userId: recipientId, email: recipientEmail },
+          releaseId
+        ),
+        (error: unknown) => error instanceof PrivateReleaseAccessError
+      );
+    }
+    assert.equal(
+      (await requirePrivateReleaseAccess(
+        pool,
+        { userId: ownerId, email: `${ownerId}@example.com` },
+        unlinkedReleaseId
+      )).accessRole,
+      "owner"
+    );
   });
 });
 

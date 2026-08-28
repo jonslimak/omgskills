@@ -10,6 +10,10 @@ import {
   type SkillPackage,
   type SkillPackageCoordinates
 } from "./skill-package.js";
+import {
+  PrivateReleaseAccessError,
+  type PrivateReleaseGrant
+} from "./private-release-access.js";
 
 type PrivateReleaseDatabase = {
   query<T extends QueryResultRow = any>(text: string, values?: any[]): Promise<QueryResult<T>>;
@@ -213,9 +217,26 @@ export async function loadOwnerPrivateReleasePackage(
   };
 }
 
+export async function loadAuthorizedPrivateReleasePackage(
+  broker: PrivateReleaseBroker,
+  grant: PrivateReleaseGrant
+): Promise<SkillPackage> {
+  const repository = await liveRepository(broker, grant);
+  return broker.fetchPinnedSkillPackage(
+    grant.installationId,
+    repository,
+    grant.normalizedRoot,
+    {
+      commitSha: grant.commitSha,
+      treeSha: grant.treeSha,
+      skillMdSha: grant.skillMdSha
+    }
+  );
+}
+
 export function privateReleaseResponse(error: unknown): Response {
-  if (error instanceof PrivateReleaseError) {
-    return new Response(error.message, { status: 404 });
+  if (error instanceof PrivateReleaseError || error instanceof PrivateReleaseAccessError) {
+    return new Response("Private release is unavailable", { status: 404 });
   }
   if (error instanceof GitHubBrokerError) {
     if (error.code === "rate_limited") {
