@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Skills: The Complete Guide | omgskills</title>
+  <title>Skills Guide for Claude Code, Codex, Cursor & AI Agents | omgskills</title>
   <meta name="description" content="A simple guide to what AI agent skills are, when to use them, how to install them, and how they differ from plugins, MCP servers, and subagents.">
   <link rel="canonical" href="https://omgskills.com/guide/">
   <link rel="alternate" type="text/markdown" href="/guide/index.md">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <meta property="og:title" content="Skills: The Complete Guide">
+  <meta property="og:title" content="Skills Guide for Claude Code, Codex, Cursor & AI Agents">
   <meta property="og:description" content="Learn what AI agent skills are, when to use them, how to install them, and how to find good ones.">
   <meta property="og:url" content="https://omgskills.com/guide/">
   <meta property="og:type" content="article">
@@ -18,7 +18,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="omgskills guide social preview">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Skills: The Complete Guide">
+  <meta name="twitter:title" content="Skills Guide for Claude Code, Codex, Cursor & AI Agents">
   <meta name="twitter:description" content="Learn what AI agent skills are, when to use them, how to install them, and how to find good ones.">
   <meta name="twitter:image" content="https://omgskills.com/images/guide/share.png?v=20260822">
   <meta name="twitter:image:alt" content="omgskills guide social preview">
@@ -26,13 +26,13 @@
     {
       "@context": "https://schema.org",
       "@type": "TechArticle",
-      "headline": "Skills: The Complete Guide",
+      "headline": "Skills Guide for Claude Code, Codex, Cursor and AI Agents",
       "description": "A simple guide to what AI agent skills are, when to use them, how to install them, and how they differ from plugins, MCP servers, and subagents.",
       "url": "https://omgskills.com/guide/",
       "mainEntityOfPage": "https://omgskills.com/guide/",
       "image": "https://omgskills.com/images/guide/share.png?v=20260822",
       "datePublished": "2026-08-19",
-      "dateModified": "2026-08-19",
+      "dateModified": "2026-08-27",
       "author": {
         "@type": "Organization",
         "name": "omgskills",
@@ -56,6 +56,94 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Mostly, but not all. Skills are instructions, not code, but agents act on instructions. Like other software, it is best to use skills by trusted creators with large user bases, or ones you create yourself or with your team."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does an agent know when to use a skill?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Each skill has a description that tells the agent when to use it. At session start, the agent scans installed skill descriptions and only loads the full skill when the request matches. This is progressive disclosure."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many skills should I install?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Fewer than you think. Start with a small starter pack, add skills when you feel a gap, and prune what you do not use."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where are skills stored?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Claude Code skills usually live in ~/.claude/skills/. Codex skills usually live in ~/.codex/skills/. A skill is a folder with a SKILL.md file inside."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why isn't my skill activating?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usually the description is too vague for the agent to match. Make the description say when to use the skill concretely. Also check the skill is in the right folder and restart the session."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the difference between a skill and CLAUDE.md or AGENTS.md?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CLAUDE.md and AGENTS.md are standing project instructions. Skills load on demand and travel across projects. Put project rules in CLAUDE.md or AGENTS.md, and reusable know-how in skills."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the best skills?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It depends what you do. Start with curated collections by use case or the most-used skills, then keep the ones that improve your actual workflow."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the easiest way to share skills with a team?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Start with a shared GitHub repo. Keep approved skill folders there so they are versioned, reviewable, discoverable, and easy for teammates to install."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How should shared skills be reviewed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use pull requests. Let someone draft the skill, have another person review it, and add simple checks for frontmatter, broken links, and secrets."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you keep a shared skill library useful?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Give every shared skill an owner, start with a small set of high-value skills, and remove or rewrite skills that do not improve real work."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Should teams install public skills directly?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Treat public skills like open-source packages. Review and scan them first, especially if they include scripts, before sharing them across a team."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How should teams measure shared skills?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Track which skills activate, which ones are reused, and which ones under-trigger. That feedback loop tells you what to improve or prune."
           }
         },
         {
@@ -179,18 +267,18 @@
     }
     h2 {
       margin: 0 0 14px;
-      font-size: 28px;
+      font-size: 24px;
       line-height: 1.05;
       letter-spacing: -.04em;
     }
     h3 {
       margin: 22px 0 8px;
-      font-size: 15px;
+      font-size: 13px;
     }
     p {
       margin: 0 0 12px;
       color: #3f3f46;
-      font-size: 15px;
+      font-size: 13px;
     }
     p:last-child { margin-bottom: 0; }
     ul {
@@ -204,7 +292,7 @@
       position: relative;
       padding-left: 20px;
       color: #3f3f46;
-      font-size: 15px;
+      font-size: 13px;
     }
     li::before {
       content: "";
@@ -239,11 +327,32 @@
       gap: 16px;
       padding: 13px 0;
       border-bottom: 1px solid rgba(29, 29, 31, .08);
-      font-size: 15px;
+      font-size: 13px;
     }
     .compare-row:last-child { border-bottom: 0; }
     .compare-row strong { color: var(--text); }
     .compare-row span { color: #3f3f46; }
+    .faq-list {
+      display: grid;
+      gap: 18px;
+    }
+    .faq-item {
+      padding-top: 18px;
+      border-top: 1px solid rgba(29, 29, 31, .08);
+    }
+    .faq-item:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+    .faq-item h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.25;
+      letter-spacing: -.02em;
+    }
+    .faq-item p {
+      margin-bottom: 0;
+    }
     pre {
       overflow: auto;
       margin: 14px 0 0;
@@ -315,7 +424,7 @@
       header { margin-bottom: 54px; }
       section { padding: 24px; border-radius: 20px; }
       h1 { font-size: 46px; }
-      h2 { font-size: 24px; }
+      h2 { font-size: 20px; }
       .lede { font-size: 16px; }
       .compare-row { grid-template-columns: 1fr; gap: 4px; }
       .cta-card { display: grid; }
@@ -334,8 +443,8 @@
 
     <main>
       <div class="hero">
-        <h1>Skills: The Complete Guide</h1>
-        <p class="lede">The simple guide for Claude Code, Codex, Cursor &amp; other agent skills</p>
+        <h1>Skills</h1>
+        <p class="lede">The complete guide to using agent skills</p>
       </div>
 
       <div class="guide-grid">
@@ -393,6 +502,32 @@
           </section>
 
           <section>
+            <h2>Sharing skills as a team</h2>
+            <div class="faq-list">
+              <div class="faq-item">
+                <h3>What is the easiest way to share skills with a team?</h3>
+                <p>Start with a shared GitHub repo using the <a class="example-link" href="https://agentskills.io/home" target="_blank" rel="noreferrer">Agent Skills format</a>. Keep approved skill folders there so they are versioned, reviewable, discoverable, and easy for teammates to install.</p>
+              </div>
+              <div class="faq-item">
+                <h3>How should shared skills be reviewed?</h3>
+                <p>Use pull requests. Let someone draft the skill, have another person review it, and add simple checks for frontmatter, broken links, and secrets.</p>
+              </div>
+              <div class="faq-item">
+                <h3>How do you keep a shared skill library useful?</h3>
+                <p>Give every shared skill an owner, start with a small set of high-value skills, and remove or rewrite skills that do not improve real work.</p>
+              </div>
+              <div class="faq-item">
+                <h3>Should teams install public skills directly?</h3>
+                <p>Treat public skills like open-source packages. Review and scan them first, especially if they include scripts, before sharing them across a team.</p>
+              </div>
+              <div class="faq-item">
+                <h3>How should teams measure shared skills?</h3>
+                <p>Track which skills activate, which ones are reused, and which ones under-trigger. That feedback loop tells you what to improve or prune.</p>
+              </div>
+            </div>
+          </section>
+
+          <section>
             <h2>But skills are just markdown files</h2>
             <p>Yup, we agree. And even so, skill use keeps growing.</p>
             <p>As models improve, skills simply get more general. We will always want to specify the outcomes we want from them.</p>
@@ -422,9 +557,40 @@
           </section>
 
           <section>
-            <h2>Are skills safe?</h2>
-            <p>Mostly, but not all.</p>
-            <p>Skills are instructions, not code, but agents act on instructions. Like other software, it is best to use skills by trusted creators with large user bases, or ones you create yourself or with your team.</p>
+            <div class="faq-list">
+              <div class="faq-item">
+                <h3>Are skills safe?</h3>
+                <p>Mostly, but not all. Skills are instructions, not code, but agents act on instructions. Like other software, it is best to use skills by trusted creators with large user bases, or ones you create yourself or with your team.</p>
+              </div>
+              <div class="faq-item">
+                <h3>How does an agent know when to use a skill?</h3>
+                <p>Each skill has a description that tells the agent when to use it. The agent scans installed skill descriptions at the start of a session, then loads the full skill only when your request matches. This is called <a class="example-link" href="https://agentskills.io/home" target="_blank" rel="noreferrer">progressive disclosure</a>.</p>
+              </div>
+              <div class="faq-item">
+                <h3>How many skills should I install?</h3>
+                <p>Fewer than you think. Start with a small <a class="example-link" href="/collections/starter-pack/">starter pack</a>, add skills when you feel a gap, and prune what you do not use. If output gets noisy, try skills focused on <a class="example-link" href="/collections/reduce-token-usage/">reducing token usage</a>.</p>
+              </div>
+              <div class="faq-item">
+                <h3>Where are skills stored?</h3>
+                <p><code>~/.claude/skills/</code> for Claude Code and <code>~/.codex/skills/</code> for Codex. A skill is just a folder with a <code>SKILL.md</code> inside.</p>
+              </div>
+              <div class="faq-item">
+                <h3>Why isn't my skill activating?</h3>
+                <p>Usually the description is too vague for the agent to match. Make it say when to use the skill, concretely. Also check that it is in the right folder and restart the session, because skills load at session start.</p>
+              </div>
+              <div class="faq-item">
+                <h3>What's the difference between a skill and CLAUDE.md or AGENTS.md?</h3>
+                <p><code>CLAUDE.md</code> and <code>AGENTS.md</code> are standing project instructions. Skills load on demand and travel across projects. Put project rules in those files; put reusable know-how in skills.</p>
+              </div>
+              <div class="faq-item">
+                <h3>What are the best skills?</h3>
+                <p>It depends what you do. That is why omgskills curates <a class="example-link" href="/skills/">skills by source</a> and <a class="example-link" href="/collections/the-goat-list/">collections by use case</a>. For an all-round set, start with the most-used skills.</p>
+              </div>
+              <div class="faq-item">
+                <h3>Are skills free?</h3>
+                <p>Yes. Skills are open-source markdown files on GitHub. All 49,000+ indexed here are free.</p>
+              </div>
+            </div>
           </section>
 
           <section>
@@ -432,11 +598,6 @@
             <div class="video-embed">
               <iframe src="https://www.youtube.com/embed/XsiiIa6bs9I" title="Why skills?" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
-          </section>
-
-          <section>
-            <h2>Are skills free?</h2>
-            <p>Yes. Skills are open-source markdown files on GitHub. All 49,000+ indexed here are free.</p>
           </section>
 
           <div class="cta-card">
