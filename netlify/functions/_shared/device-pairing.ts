@@ -5,6 +5,11 @@ import {
   hashToken,
   verifyCodeChallenge
 } from "./crypto.js";
+import {
+  BASE_DEVICE_SCOPES,
+  normalizeDeviceScopes,
+  type DeviceScope
+} from "./device-auth.js";
 
 export const PAIRING_CODE_TTL_MS = 10 * 60 * 1000;
 export const DEVICE_CREDENTIAL_TTL_MS = 365 * 24 * 60 * 60 * 1000;
@@ -23,6 +28,7 @@ export class PairingError extends Error {
 
 type PairingCodeOptions = {
   codeChallenge: string | null;
+  grantedScopes?: readonly DeviceScope[];
   now?: Date;
   createCode?: () => string;
 };
@@ -36,6 +42,7 @@ export async function issuePairingCode(
   const now = options.now ?? new Date();
   const expiresAt = new Date(now.getTime() + PAIRING_CODE_TTL_MS);
   const code = (options.createCode ?? createPairingCode)();
+  const grantedScopes = normalizeDeviceScopes(options.grantedScopes ?? BASE_DEVICE_SCOPES);
 
   try {
     await client.query("BEGIN");
@@ -62,15 +69,16 @@ export async function issuePairingCode(
       `
         INSERT INTO sync_tokens (
           user_id, token_hash, purpose, code_challenge, code_challenge_method,
-          expires_at, created_at
+          granted_scopes, expires_at, created_at
         )
-        VALUES ($1, $2, 'device_exchange', $3, $4, $5, $6)
+        VALUES ($1, $2, 'device_exchange', $3, $4, $5, $6, $7)
       `,
       [
         userId,
         hashToken(code),
         options.codeChallenge,
         options.codeChallenge ? "S256" : null,
+        grantedScopes,
         expiresAt,
         now
       ]
@@ -105,11 +113,12 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
       id: string;
       user_id: string;
       code_challenge: string | null;
+      granted_scopes: DeviceScope[];
       display_name: string | null;
       email: string;
     }>(
       `
-        SELECT st.id, st.user_id, st.code_challenge, u.display_name, u.email
+        SELECT st.id, st.user_id, st.code_challenge, st.granted_scopes, u.display_name, u.email
         FROM sync_tokens st
         JOIN users u ON u.id = st.user_id
         WHERE st.token_hash = $1
@@ -124,6 +133,7 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
     if (!pairing) {
       throw new PairingError(401, "Pairing code is invalid or expired");
     }
+    const grantedScopes = normalizeDeviceScopes(pairing.granted_scopes);
 
     if (pairing.code_challenge) {
       if (!options.codeVerifier || !verifyCodeChallenge(options.codeVerifier, pairing.code_challenge)) {
@@ -151,12 +161,12 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
     const device = await client.query<{ id: string }>(
       `
         INSERT INTO device_tokens (
-          user_id, token_hash, device_name, expires_at, created_at
+          user_id, token_hash, device_name, granted_scopes, expires_at, created_at
         )
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id
       `,
-      [pairing.user_id, hashToken(credential), options.deviceName, expiresAt, now]
+      [pairing.user_id, hashToken(credential), options.deviceName, grantedScopes, expiresAt, now]
     );
     await client.query("UPDATE sync_tokens SET used_at = $2 WHERE id = $1", [pairing.id, now]);
     await client.query("COMMIT");
@@ -165,7 +175,8 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
       credential,
       deviceId: device.rows[0].id,
       expiresAt,
-      accountLabel: pairing.display_name || pairing.email
+      accountLabel: pairing.display_name || pairing.email,
+      grantedScopes
     };
   } catch (error) {
     await rollback(client);

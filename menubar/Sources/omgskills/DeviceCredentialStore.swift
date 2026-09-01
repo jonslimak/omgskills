@@ -1,10 +1,47 @@
 import Foundation
 import Security
 
+enum DeviceScope: String, Codable, CaseIterable, Hashable, Sendable {
+    case syncWrite = "sync:write"
+    case selfRevoke = "self:revoke"
+    case contentRead = "content:read"
+
+    static let metadataOnly: Set<DeviceScope> = [.syncWrite, .selfRevoke]
+}
+
 struct DeviceConnectionInfo: Codable, Equatable, Sendable {
     let deviceID: String
     let accountLabel: String
     let expiresAt: Date
+    let grantedScopes: Set<DeviceScope>
+
+    init(
+        deviceID: String,
+        accountLabel: String,
+        expiresAt: Date,
+        grantedScopes: Set<DeviceScope> = DeviceScope.metadataOnly
+    ) {
+        self.deviceID = deviceID
+        self.accountLabel = accountLabel
+        self.expiresAt = expiresAt
+        self.grantedScopes = grantedScopes
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case deviceID
+        case accountLabel
+        case expiresAt
+        case grantedScopes
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        deviceID = try container.decode(String.self, forKey: .deviceID)
+        accountLabel = try container.decode(String.self, forKey: .accountLabel)
+        expiresAt = try container.decode(Date.self, forKey: .expiresAt)
+        grantedScopes = try container.decodeIfPresent(Set<DeviceScope>.self, forKey: .grantedScopes)
+            ?? DeviceScope.metadataOnly
+    }
 }
 
 struct StoredDeviceCredential: Codable, Equatable, Sendable {

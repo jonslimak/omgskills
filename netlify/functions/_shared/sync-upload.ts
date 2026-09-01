@@ -4,7 +4,7 @@ import {
   deviceCredentialFromRequest,
   requireDeviceToken,
   rollback,
-  touchDeviceAfterSuccessfulSync
+  touchDeviceAfterSuccessfulUse
 } from "./device-auth.js";
 import { writeSyncInventory } from "./sync-inventory.js";
 import type { SyncSkill } from "./sync-skill.js";
@@ -73,7 +73,7 @@ export async function performSyncUpload(
 
     const syncRunId = await writeSyncInventory(client, userId, skills);
     if (deviceId) {
-      await touchDeviceAfterSuccessfulSync(client, deviceId, now);
+      await touchDeviceAfterSuccessfulUse(client, deviceId, now);
     } else if (legacyTokenId) {
       await client.query("UPDATE sync_tokens SET used_at = $2 WHERE id = $1", [legacyTokenId, now]);
     }

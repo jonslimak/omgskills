@@ -775,7 +775,8 @@ function ConnectPage() {
           body: JSON.stringify({
             state: request.state,
             codeChallenge: request.codeChallenge,
-            codeChallengeMethod: "S256"
+            codeChallengeMethod: "S256",
+            scopes: request.scopes
           })
         }
       );
@@ -801,6 +802,9 @@ function ConnectPage() {
         <div className="connect-permission">
           <strong>Access</strong>
           <span>Sync installed skills</span>
+          {request?.scopes.includes("content:read") ? (
+            <span>Read private skills shared with you</span>
+          ) : null}
         </div>
         {status ? <p className={request ? "status" : "connect-error"}>{status}</p> : null}
         <div className="actions">

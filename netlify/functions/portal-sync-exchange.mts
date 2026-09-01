@@ -39,7 +39,8 @@ export default async (req: Request, _context: Context) => {
       credential: exchanged.credential,
       deviceId: exchanged.deviceId,
       expiresAt: exchanged.expiresAt.toISOString(),
-      accountLabel: exchanged.accountLabel
+      accountLabel: exchanged.accountLabel,
+      grantedScopes: exchanged.grantedScopes
     });
   } catch (error) {
     if (error instanceof PairingError) {

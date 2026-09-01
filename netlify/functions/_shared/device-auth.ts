@@ -5,7 +5,40 @@ const DEVICE_AUTH_ERROR = "Device credential is invalid or expired";
 const DEVICE_INACTIVITY_INTERVAL = "6 months";
 const LAST_USED_WRITE_INTERVAL = "1 day";
 
-export type DeviceScope = "sync:write" | "self:revoke";
+export const BASE_DEVICE_SCOPES = ["sync:write", "self:revoke"] as const;
+export const ALL_DEVICE_SCOPES = [...BASE_DEVICE_SCOPES, "content:read"] as const;
+export type DeviceScope = typeof ALL_DEVICE_SCOPES[number];
+
+export class DeviceScopeError extends Error {
+  constructor() {
+    super("Device scopes are invalid");
+  }
+}
+
+export function normalizeDeviceScopes(value: unknown): DeviceScope[] {
+  if (!Array.isArray(value) || value.some((scope) => typeof scope !== "string")) {
+    throw new DeviceScopeError();
+  }
+  const scopes = [...new Set(value)];
+  if (
+    scopes.some((scope) => !ALL_DEVICE_SCOPES.includes(scope as DeviceScope))
+    || BASE_DEVICE_SCOPES.some((scope) => !scopes.includes(scope))
+  ) {
+    throw new DeviceScopeError();
+  }
+  return ALL_DEVICE_SCOPES.filter((scope) => scopes.includes(scope));
+}
+
+export function normalizeApprovedDeviceScopes(
+  value: unknown,
+  browserApproval: boolean
+): DeviceScope[] {
+  const scopes = normalizeDeviceScopes(value);
+  if (scopes.includes("content:read") && !browserApproval) {
+    throw new DeviceScopeError();
+  }
+  return scopes;
+}
 
 export class DeviceAuthError extends Error {
   readonly status = 401;
@@ -30,30 +63,56 @@ export async function requireDeviceToken(
   allowedScope: DeviceScope,
   now = new Date()
 ) {
-  if (allowedScope !== "sync:write" && allowedScope !== "self:revoke") {
+  if (!ALL_DEVICE_SCOPES.includes(allowedScope)) {
     throw new DeviceAuthError();
   }
   const credential = deviceCredentialFromRequest(req);
-  const result = await client.query<{ id: string; user_id: string }>(
+  const result = await client.query<{
+    id: string;
+    user_id: string;
+    email: string;
+    granted_scopes: DeviceScope[];
+  }>(
     `
-      SELECT id, user_id
-      FROM device_tokens
-      WHERE token_hash = $1
-        AND revoked_at IS NULL
-        AND expires_at > $2
-        AND COALESCE(last_used_at, created_at) > $2 - $3::interval
+      SELECT device.id, device.user_id, users.email, device.granted_scopes
+      FROM device_tokens device
+      JOIN users ON users.id = device.user_id
+      WHERE device.token_hash = $1
+        AND device.revoked_at IS NULL
+        AND device.expires_at > $2
+        AND device.granted_scopes @> ARRAY[$3]::text[]
+        AND COALESCE(device.last_used_at, device.created_at) > $2 - $4::interval
       FOR UPDATE
     `,
-    [hashToken(credential), now, DEVICE_INACTIVITY_INTERVAL]
+    [hashToken(credential), now, allowedScope, DEVICE_INACTIVITY_INTERVAL]
   );
   const device = result.rows[0];
   if (!device) {
     throw new DeviceAuthError();
   }
-  return { deviceId: device.id, userId: device.user_id };
+  return {
+    deviceId: device.id,
+    userId: device.user_id,
+    email: device.email,
+    grantedScopes: normalizeDeviceScopes(device.granted_scopes)
+  };
 }
 
-export async function touchDeviceAfterSuccessfulSync(
+export async function requireDeviceActor(
+  pool: Pool,
+  req: Request,
+  allowedScope: DeviceScope,
+  now = new Date()
+) {
+  const client = await pool.connect();
+  try {
+    return await requireDeviceToken(req, client, allowedScope, now);
+  } finally {
+    client.release();
+  }
+}
+
+export async function touchDeviceAfterSuccessfulUse(
   client: PoolClient,
   deviceId: string,
   now = new Date()

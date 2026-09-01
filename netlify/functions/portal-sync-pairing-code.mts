@@ -4,6 +4,11 @@ import {
   isBrowserPairingState
 } from "./_shared/browser-pairing.js";
 import { isCodeChallenge } from "./_shared/crypto.js";
+import {
+  BASE_DEVICE_SCOPES,
+  DeviceScopeError,
+  normalizeApprovedDeviceScopes
+} from "./_shared/device-auth.js";
 import { getPgPool } from "./_shared/db.js";
 import { issuePairingCode, PairingError } from "./_shared/device-pairing.js";
 import { errorResponse, optionsResponse, secretJsonResponse } from "./_shared/http.js";
@@ -37,9 +42,16 @@ export default async (req: Request, _context: Context) => {
       codeChallenge = challengeValue;
       browserState = stateValue;
     }
+    const grantedScopes = normalizeApprovedDeviceScopes(
+      body.scopes ?? [...BASE_DEVICE_SCOPES],
+      browserState !== null
+    );
 
     const user = await requirePortalUser(req);
-    const pairing = await issuePairingCode(getPgPool(), user.id, { codeChallenge });
+    const pairing = await issuePairingCode(getPgPool(), user.id, {
+      codeChallenge,
+      grantedScopes
+    });
     return secretJsonResponse(req, browserState
       ? {
           callbackUrl: browserPairingCallbackUrl(pairing.code, browserState),
@@ -50,6 +62,9 @@ export default async (req: Request, _context: Context) => {
           expiresAt: pairing.expiresAt.toISOString()
         });
   } catch (error) {
+    if (error instanceof DeviceScopeError) {
+      return errorResponse(req, 400, error.message);
+    }
     if (error instanceof PairingError) {
       return errorResponse(req, error.status, error.message);
     }

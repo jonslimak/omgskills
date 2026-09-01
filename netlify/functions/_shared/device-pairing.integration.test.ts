@@ -4,6 +4,11 @@ import test from "node:test";
 import pg from "pg";
 import { codeChallengeForVerifier, hashToken } from "./crypto.js";
 import {
+  BASE_DEVICE_SCOPES,
+  DeviceAuthError,
+  requireDeviceToken
+} from "./device-auth.js";
+import {
   exchangePairingCode,
   issuePairingCode,
   PairingError
@@ -38,14 +43,16 @@ test("manual exchange stores only the device hash and rejects replay", async () 
       deviceName: "Jon Mac",
       codeVerifier: null
     });
-    const stored = await pool.query<{ token_hash: string }>(
-      "SELECT token_hash FROM device_tokens WHERE id = $1",
+    const stored = await pool.query<{ token_hash: string; granted_scopes: string[] }>(
+      "SELECT token_hash, granted_scopes FROM device_tokens WHERE id = $1",
       [exchanged.deviceId]
     );
 
     assert.equal(exchanged.accountLabel, "Manual Mac");
     assert.equal(stored.rows[0].token_hash, hashToken(exchanged.credential));
     assert.notEqual(stored.rows[0].token_hash, exchanged.credential);
+    assert.deepEqual(stored.rows[0].granted_scopes, [...BASE_DEVICE_SCOPES]);
+    assert.deepEqual(exchanged.grantedScopes, [...BASE_DEVICE_SCOPES]);
     await assert.rejects(
       exchangePairingCode(pool, {
         pairingCode: pairing.code,
@@ -55,6 +62,77 @@ test("manual exchange stores only the device hash and rejects replay", async () 
       (error) => error instanceof PairingError && error.status === 401
     );
   } finally {
+    await removeUser(userId);
+  }
+});
+
+test("approved content scope is copied from pairing to the device credential", async () => {
+  const userId = await createUser("Private Mac");
+  try {
+    const pairing = await issuePairingCode(pool, userId, {
+      codeChallenge: codeChallengeForVerifier(verifier),
+      grantedScopes: [...BASE_DEVICE_SCOPES, "content:read"]
+    });
+    const exchanged = await exchangePairingCode(pool, {
+      pairingCode: pairing.code,
+      deviceName: "Private Mac",
+      codeVerifier: verifier
+    });
+    const stored = await pool.query<{ granted_scopes: string[] }>(
+      "SELECT granted_scopes FROM device_tokens WHERE id = $1",
+      [exchanged.deviceId]
+    );
+
+    assert.deepEqual(exchanged.grantedScopes, ["sync:write", "self:revoke", "content:read"]);
+    assert.deepEqual(stored.rows[0].granted_scopes, exchanged.grantedScopes);
+  } finally {
+    await removeUser(userId);
+  }
+});
+
+test("private content authorization requires a credential with the approved scope", async () => {
+  const userId = await createUser("Scope Mac");
+  const client = await pool.connect();
+  try {
+    const metadataPairing = await issuePairingCode(pool, userId, { codeChallenge: null });
+    const metadataDevice = await exchangePairingCode(pool, {
+      pairingCode: metadataPairing.code,
+      deviceName: "Metadata Mac",
+      codeVerifier: null
+    });
+    await assert.rejects(
+      requireDeviceToken(
+        new Request("https://example.com", {
+          headers: { Authorization: `Bearer ${metadataDevice.credential}` }
+        }),
+        client,
+        "content:read"
+      ),
+      (error) => error instanceof DeviceAuthError && error.status === 401
+    );
+
+    const contentPairing = await issuePairingCode(pool, userId, {
+      codeChallenge: codeChallengeForVerifier(verifier),
+      grantedScopes: [...BASE_DEVICE_SCOPES, "content:read"]
+    });
+    const contentDevice = await exchangePairingCode(pool, {
+      pairingCode: contentPairing.code,
+      deviceName: "Content Mac",
+      codeVerifier: verifier
+    });
+    const actor = await requireDeviceToken(
+      new Request("https://example.com", {
+        headers: { Authorization: `Bearer ${contentDevice.credential}` }
+      }),
+      client,
+      "content:read"
+    );
+
+    assert.equal(actor.userId, userId);
+    assert.equal(actor.deviceId, contentDevice.deviceId);
+    assert.equal(actor.email, `${userId}@example.com`);
+  } finally {
+    client.release();
     await removeUser(userId);
   }
 });

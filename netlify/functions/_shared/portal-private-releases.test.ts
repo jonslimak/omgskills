@@ -13,6 +13,7 @@ import {
 
 const context = { deploy: { context: "production" }, params: {} } as Context;
 const actor = { id: "owner-id", clerkUserId: "clerk-id", email: "owner@example.com", displayName: "Owner" };
+const deviceActor = { userId: actor.id, email: actor.email, deviceId: "device-id" };
 const sourceId = "11111111-1111-4111-8111-111111111111";
 const releaseId = "22222222-2222-4222-8222-222222222222";
 
@@ -42,7 +43,7 @@ const release = {
 const grant: PrivateReleaseGrant = {
   accessRole: "owner",
   actorUserId: actor.id,
-  deviceId: null,
+  deviceId: deviceActor.deviceId,
   ownerUserId: actor.id,
   installationId: "456",
   repositoryId: "321",
@@ -63,6 +64,7 @@ function dependencies(
 ): PortalPrivateReleasesDependencies {
   return {
     async requirePortalUser() { return actor; },
+    async requireDeviceActor() { return deviceActor; },
     async register() { return release; },
     async authorize() { return grant; },
     async loadPackage() { return fixturePackage(); },
@@ -92,14 +94,19 @@ test("owner registers a release by source ID without supplying Git coordinates",
   assert.deepEqual(received, { ownerUserId: "owner-id", sourceId });
 });
 
-test("owner package route accepts only an opaque release ID and streams validated NDJSON", async () => {
+test("owner device package route accepts only an opaque release ID and streams validated NDJSON", async () => {
   const received: unknown[] = [];
   const response = await portalPrivateReleases(
     new Request(`https://omgskills.com/api/portal/private-releases/${releaseId}/package`),
     context,
     dependencies({
       async authorize(receivedActor, receivedReleaseId) {
-        received.push({ action: "authorize", actorId: receivedActor.id, releaseId: receivedReleaseId });
+        received.push({
+          action: "authorize",
+          actorId: receivedActor.userId,
+          deviceId: receivedActor.deviceId,
+          releaseId: receivedReleaseId
+        });
         return grant;
       },
       async loadPackage(receivedGrant) {
@@ -115,9 +122,9 @@ test("owner package route accepts only an opaque release ID and streams validate
   assert.equal(response.headers.get("cache-control"), "private, no-store");
   assert.equal(response.headers.get("content-type"), "application/x-ndjson; charset=utf-8");
   assert.deepEqual(received, [
-    { action: "authorize", actorId: "owner-id", releaseId },
+    { action: "authorize", actorId: "owner-id", deviceId: "device-id", releaseId },
     { action: "load", releaseId },
-    { action: "authorize", actorId: "owner-id", releaseId },
+    { action: "authorize", actorId: "owner-id", deviceId: "device-id", releaseId },
     { action: "audit", releaseId }
   ]);
   const lines = (await response.text()).trim().split("\n").map((line) => JSON.parse(line));
@@ -128,15 +135,15 @@ test("owner package route accepts only an opaque release ID and streams validate
 
 test("invited recipient receives the same validated package contract", async () => {
   const recipient = {
-    id: "recipient-id",
-    clerkUserId: "recipient-clerk",
+    userId: "recipient-id",
     email: "recipient@example.com",
-    displayName: "Recipient"
+    deviceId: "recipient-device-id"
   };
   const invitedGrant: PrivateReleaseGrant = {
     ...grant,
     accessRole: "invited",
-    actorUserId: recipient.id,
+    actorUserId: recipient.userId,
+    deviceId: recipient.deviceId,
     groupId: "33333333-3333-4333-8333-333333333333",
     skillItemId: "44444444-4444-4444-8444-444444444444"
   };
@@ -145,9 +152,10 @@ test("invited recipient receives the same validated package contract", async () 
     new Request(`https://omgskills.com/api/portal/private-releases/${releaseId}/package`),
     context,
     dependencies({
-      async requirePortalUser() { return recipient; },
+      async requireDeviceActor() { return recipient; },
       async authorize(receivedActor) {
-        assert.equal(receivedActor.id, recipient.id);
+        assert.equal(receivedActor.userId, recipient.userId);
+        assert.equal(receivedActor.deviceId, recipient.deviceId);
         return invitedGrant;
       },
       async recordContentFetch(receivedGrant) {
@@ -177,11 +185,60 @@ test("authentication and malformed IDs fail before release access", async () => 
     new Request(`https://omgskills.com/api/portal/private-releases/${releaseId}/package`),
     context,
     dependencies({
-      async requirePortalUser() { throw new Response("Unauthorized", { status: 401 }); }
+      async requireDeviceActor() { throw new PrivateReleaseAccessError(); }
     })
   );
-  assert.equal(unauthorized.status, 401);
+  assert.equal(unauthorized.status, 404);
   assert.equal(unauthorized.headers.get("cache-control"), "no-store");
+});
+
+test("registration uses portal auth while package reads use device auth", async () => {
+  let portalCalls = 0;
+  let deviceCalls = 0;
+  const resolved = dependencies({
+    async requirePortalUser() { portalCalls += 1; return actor; },
+    async requireDeviceActor() { deviceCalls += 1; return deviceActor; }
+  });
+
+  const registered = await portalPrivateReleases(
+    new Request(`https://omgskills.com/api/portal/private-sources/${sourceId}/releases`, {
+      method: "POST"
+    }),
+    context,
+    resolved
+  );
+  assert.equal(registered.status, 201);
+  assert.deepEqual({ portalCalls, deviceCalls }, { portalCalls: 1, deviceCalls: 0 });
+
+  const fetched = await portalPrivateReleases(
+    new Request(`https://omgskills.com/api/portal/private-releases/${releaseId}/package`),
+    context,
+    resolved
+  );
+  assert.equal(fetched.status, 200);
+  assert.deepEqual({ portalCalls, deviceCalls }, { portalCalls: 1, deviceCalls: 2 });
+});
+
+test("device revocation during package loading prevents content and audit", async () => {
+  let deviceCalls = 0;
+  let auditCalls = 0;
+  const response = await portalPrivateReleases(
+    new Request(`https://omgskills.com/api/portal/private-releases/${releaseId}/package`),
+    context,
+    dependencies({
+      async requireDeviceActor() {
+        deviceCalls += 1;
+        if (deviceCalls === 2) throw new PrivateReleaseAccessError();
+        return deviceActor;
+      },
+      async recordContentFetch() { auditCalls += 1; }
+    })
+  );
+
+  assert.equal(response.status, 404);
+  assert.deepEqual(await response.json(), { error: "Private release is unavailable" });
+  assert.equal(deviceCalls, 2);
+  assert.equal(auditCalls, 0);
 });
 
 test("absent and unauthorized releases are indistinguishable before broker access", async () => {

@@ -67,6 +67,7 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
         let deviceId: String
         let expiresAt: Date
         let accountLabel: String
+        let grantedScopes: Set<DeviceScope>?
     }
 
     private let endpoints: Endpoints
@@ -106,7 +107,8 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
             connection: DeviceConnectionInfo(
                 deviceID: response.deviceId,
                 accountLabel: response.accountLabel,
-                expiresAt: response.expiresAt
+                expiresAt: response.expiresAt,
+                grantedScopes: response.grantedScopes ?? DeviceScope.metadataOnly
             )
         )
     }

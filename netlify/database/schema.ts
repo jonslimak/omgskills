@@ -324,6 +324,8 @@ export const syncTokens = pgTable(
     purpose: text("purpose").notNull().default("legacy_upload"),
     codeChallenge: text("code_challenge"),
     codeChallengeMethod: text("code_challenge_method"),
+    grantedScopes: text("granted_scopes").array().notNull()
+      .default(sql`ARRAY['sync:write', 'self:revoke']::text[]`),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     usedAt: timestamp("used_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
@@ -339,6 +341,11 @@ export const syncTokens = pgTable(
       "sync_tokens_challenge_check",
       sql`(${table.codeChallenge} IS NULL AND ${table.codeChallengeMethod} IS NULL)
         OR (${table.purpose} = 'device_exchange' AND ${table.codeChallenge} IS NOT NULL AND ${table.codeChallengeMethod} = 'S256')`
+    ),
+    check(
+      "sync_tokens_granted_scopes_check",
+      sql`${table.grantedScopes} <@ ARRAY['sync:write', 'self:revoke', 'content:read']::text[]
+        AND ${table.grantedScopes} @> ARRAY['sync:write', 'self:revoke']::text[]`
     )
   ]
 );
@@ -350,6 +357,8 @@ export const deviceTokens = pgTable(
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
     deviceName: text("device_name").notNull(),
+    grantedScopes: text("granted_scopes").array().notNull()
+      .default(sql`ARRAY['sync:write', 'self:revoke']::text[]`),
     lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     revokedAt: timestamp("revoked_at", { withTimezone: true }),
@@ -368,6 +377,11 @@ export const deviceTokens = pgTable(
     check(
       "device_tokens_expiry_check",
       sql`${table.expiresAt} > ${table.createdAt}`
+    ),
+    check(
+      "device_tokens_granted_scopes_check",
+      sql`${table.grantedScopes} <@ ARRAY['sync:write', 'self:revoke', 'content:read']::text[]
+        AND ${table.grantedScopes} @> ARRAY['sync:write', 'self:revoke']::text[]`
     )
   ]
 );

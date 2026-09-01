@@ -6,6 +6,7 @@ struct BrowserPairingRequest: Equatable, Sendable {
     let state: String
     let codeVerifier: String
     let codeChallenge: String
+    let scopes: [DeviceScope]
 }
 
 enum BrowserPairingCallback: Equatable, Sendable {
@@ -45,7 +46,8 @@ struct SystemBrowserPairingRequestGenerator: BrowserPairingRequestGenerating {
         return BrowserPairingRequest(
             state: state,
             codeVerifier: verifier,
-            codeChallenge: Data(digest).base64URLEncodedString()
+            codeChallenge: Data(digest).base64URLEncodedString(),
+            scopes: DeviceScope.allCases
         )
     }
 
@@ -86,10 +88,14 @@ enum BrowserPairing {
             throw BrowserPairingError.invalidConfiguration
         }
         var components = URLComponents(url: connectURL, resolvingAgainstBaseURL: false)
-        components?.fragment = URLComponents(queryItems: [
+        var queryItems = [
             URLQueryItem(name: "state", value: request.state),
             URLQueryItem(name: "code_challenge", value: request.codeChallenge)
-        ]).percentEncodedQuery
+        ]
+        queryItems.append(contentsOf: request.scopes.map {
+            URLQueryItem(name: "scope", value: $0.rawValue)
+        })
+        components?.fragment = URLComponents(queryItems: queryItems).percentEncodedQuery
         guard let url = components?.url else {
             throw BrowserPairingError.invalidConfiguration
         }

@@ -414,7 +414,8 @@ struct DeviceConnectionModelTests {
         BrowserPairingRequest(
             state: String(repeating: "s", count: 43),
             codeVerifier: String(repeating: "v", count: 43),
-            codeChallenge: String(repeating: "c", count: 43)
+            codeChallenge: String(repeating: "c", count: 43),
+            scopes: DeviceScope.allCases
         )
     }
 

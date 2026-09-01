@@ -19,7 +19,8 @@ struct DeviceSyncAPITests {
               "credential": "device-secret",
               "deviceId": "device-1",
               "expiresAt": "2027-07-13T12:00:00.000Z",
-              "accountLabel": "jon@example.com"
+              "accountLabel": "jon@example.com",
+              "grantedScopes": ["sync:write", "self:revoke", "content:read"]
             }
             """)
         ])
@@ -46,6 +47,25 @@ struct DeviceSyncAPITests {
         #expect(json["codeVerifier"] as? String == "pkce-verifier")
         #expect(result.credential == "device-secret")
         #expect(result.connection.deviceID == "device-1")
+        #expect(result.connection.grantedScopes == Set(DeviceScope.allCases))
+    }
+
+    @Test func exchangeWithoutScopesRemainsMetadataOnly() async throws {
+        let session = MockDeviceHTTPSession(responses: [
+            .init(statusCode: 200, body: """
+            {
+              "credential": "device-secret",
+              "deviceId": "device-1",
+              "expiresAt": "2027-07-13T12:00:00.000Z",
+              "accountLabel": "jon@example.com"
+            }
+            """)
+        ])
+        let api = DeviceSyncAPI(session: session)
+
+        let result = try await api.exchange(pairingCode: "code", deviceName: "Mac", codeVerifier: nil)
+
+        #expect(result.connection.grantedScopes == DeviceScope.metadataOnly)
     }
 
     @Test func uploadUsesBearerCredentialAndResolvedPayloadContract() async throws {

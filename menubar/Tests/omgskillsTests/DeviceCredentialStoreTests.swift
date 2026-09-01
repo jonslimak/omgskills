@@ -63,6 +63,25 @@ struct DeviceCredentialStoreTests {
         try await store.delete(deviceID: replacement.connection.deviceID)
     }
 
+    @Test func legacyCredentialWithoutScopesDecodesAsMetadataOnly() throws {
+        let data = try #require("""
+        {
+          "credential": "legacy-secret",
+          "connection": {
+            "deviceID": "legacy-device",
+            "accountLabel": "jon@example.com",
+            "expiresAt": 1800000000
+          }
+        }
+        """.data(using: .utf8))
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+
+        let record = try decoder.decode(StoredDeviceCredential.self, from: data)
+
+        #expect(record.connection.grantedScopes == DeviceScope.metadataOnly)
+    }
+
     private func uniqueService() -> String {
         "com.jonslimak.omgskills.tests.portal-sync.\(UUID().uuidString)"
     }

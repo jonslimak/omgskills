@@ -6,7 +6,8 @@ struct BrowserPairingTests {
     private let request = BrowserPairingRequest(
         state: String(repeating: "s", count: 43),
         codeVerifier: String(repeating: "v", count: 43),
-        codeChallenge: String(repeating: "c", count: 43)
+        codeChallenge: String(repeating: "c", count: 43),
+        scopes: DeviceScope.allCases
     )
 
     @Test func defaultConnectURLUsesPortalAPIOrigin() {
@@ -21,6 +22,7 @@ struct BrowserPairingTests {
         #expect(request.codeChallenge.count == 43)
         #expect(request.state != request.codeVerifier)
         #expect(request.codeChallenge != request.codeVerifier)
+        #expect(request.scopes == DeviceScope.allCases)
     }
 
     @Test func authorizationURLKeepsSecretsOutOfQuery() throws {
@@ -35,6 +37,9 @@ struct BrowserPairingTests {
         #expect(components.query == nil)
         #expect(fragmentItems?.first(where: { $0.name == "state" })?.value == request.state)
         #expect(fragmentItems?.first(where: { $0.name == "code_challenge" })?.value == request.codeChallenge)
+        #expect(fragmentItems?.filter { $0.name == "scope" }.compactMap(\.value) == [
+            "sync:write", "self:revoke", "content:read"
+        ])
         #expect(url.absoluteString.contains(request.codeVerifier) == false)
     }
 

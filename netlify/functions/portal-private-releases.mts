@@ -1,5 +1,9 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
+import {
+  DeviceAuthError,
+  requireDeviceActor as authenticateDevice
+} from "./_shared/device-auth.js";
 import { GitHubBrokerClient } from "./_shared/github-broker.js";
 import { corsHeaders, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import {
@@ -7,6 +11,7 @@ import {
   recordContentFetch as writeContentFetchAudit,
   requirePrivateReleaseAccess,
   samePrivateRelease,
+  type PrivateReleaseActor,
   type PrivateReleaseGrant
 } from "./_shared/private-release-access.js";
 import {
@@ -45,8 +50,9 @@ function requireOpaqueId(value: string, label: string): string {
 
 export type PortalPrivateReleasesDependencies = {
   requirePortalUser(req: Request): Promise<PortalUser>;
+  requireDeviceActor(req: Request): Promise<PrivateReleaseActor>;
   register(ownerUserId: string, sourceId: string): Promise<PrivateSkillRelease>;
-  authorize(actor: PortalUser, releaseId: string): Promise<PrivateReleaseGrant>;
+  authorize(actor: PrivateReleaseActor, releaseId: string): Promise<PrivateReleaseGrant>;
   loadPackage(grant: PrivateReleaseGrant): Promise<SkillPackage>;
   recordContentFetch(grant: PrivateReleaseGrant): Promise<void>;
 };
@@ -56,15 +62,24 @@ function defaultDependencies(): PortalPrivateReleasesDependencies {
   const broker = new GitHubBrokerClient();
   return {
     requirePortalUser,
+    async requireDeviceActor(req) {
+      try {
+        const actor = await authenticateDevice(pool, req, "content:read");
+        return {
+          userId: actor.userId,
+          email: actor.email,
+          deviceId: actor.deviceId
+        };
+      } catch (error) {
+        if (error instanceof DeviceAuthError) throw new PrivateReleaseAccessError();
+        throw error;
+      }
+    },
     register(ownerUserId, sourceId) {
       return registerOwnerPrivateRelease(pool, broker, { ownerUserId, sourceId });
     },
     authorize(actor, releaseId) {
-      return requirePrivateReleaseAccess(pool, {
-        userId: actor.id,
-        email: actor.email,
-        deviceId: null
-      }, releaseId);
+      return requirePrivateReleaseAccess(pool, actor, releaseId);
     },
     loadPackage(grant) {
       return loadAuthorizedPrivateReleasePackage(broker, grant);
@@ -92,8 +107,8 @@ export async function portalPrivateReleases(
 
   try {
     const resolved = dependencies ?? defaultDependencies();
-    const actor = await resolved.requirePortalUser(req);
     if (route.action === "register") {
+      const actor = await resolved.requirePortalUser(req);
       const release = await resolved.register(
         actor.id,
         requireOpaqueId(route.sourceId, "source id")
@@ -102,10 +117,16 @@ export async function portalPrivateReleases(
     }
 
     const releaseId = requireOpaqueId(route.releaseId, "release id");
-    const initialGrant = await resolved.authorize(actor, releaseId);
+    const initialActor = await resolved.requireDeviceActor(req);
+    const initialGrant = await resolved.authorize(initialActor, releaseId);
     const skillPackage = await resolved.loadPackage(initialGrant);
-    const finalGrant = await resolved.authorize(actor, releaseId);
-    if (!samePrivateRelease(initialGrant, finalGrant)) {
+    const finalActor = await resolved.requireDeviceActor(req);
+    const finalGrant = await resolved.authorize(finalActor, releaseId);
+    if (
+      initialActor.userId !== finalActor.userId
+      || initialActor.deviceId !== finalActor.deviceId
+      || !samePrivateRelease(initialGrant, finalGrant)
+    ) {
       throw new PrivateReleaseAccessError();
     }
     const stream = skillPackageNdjson({

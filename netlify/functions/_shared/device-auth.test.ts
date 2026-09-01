@@ -10,7 +10,14 @@ import {
   isPairingCode,
   verifyCodeChallenge
 } from "./crypto.js";
-import { DeviceAuthError, deviceCredentialFromRequest } from "./device-auth.js";
+import {
+  BASE_DEVICE_SCOPES,
+  DeviceAuthError,
+  DeviceScopeError,
+  deviceCredentialFromRequest,
+  normalizeApprovedDeviceScopes,
+  normalizeDeviceScopes
+} from "./device-auth.js";
 import { uploadAuthenticationFromRequest } from "./sync-upload.js";
 import { requireJsonObject } from "./validation.js";
 
@@ -71,6 +78,35 @@ test("extracts only a valid device bearer credential", () => {
       (error) => error instanceof DeviceAuthError && error.status === 401
     );
   }
+});
+
+test("normalizes allow-listed device scopes and requires metadata access", () => {
+  assert.deepEqual(normalizeDeviceScopes([...BASE_DEVICE_SCOPES]), ["sync:write", "self:revoke"]);
+  assert.deepEqual(
+    normalizeDeviceScopes(["content:read", "self:revoke", "sync:write"]),
+    ["sync:write", "self:revoke", "content:read"]
+  );
+  assert.throws(() => normalizeDeviceScopes(["content:read"]), DeviceScopeError);
+  assert.throws(
+    () => normalizeDeviceScopes(["sync:write", "self:revoke", "content:write"]),
+    DeviceScopeError
+  );
+});
+
+test("private content scope requires the browser approval flow", () => {
+  const privateScopes = ["sync:write", "self:revoke", "content:read"];
+  assert.deepEqual(
+    normalizeApprovedDeviceScopes(privateScopes, true),
+    privateScopes
+  );
+  assert.throws(
+    () => normalizeApprovedDeviceScopes(privateScopes, false),
+    DeviceScopeError
+  );
+  assert.deepEqual(
+    normalizeApprovedDeviceScopes(["sync:write", "self:revoke"], false),
+    ["sync:write", "self:revoke"]
+  );
 });
 
 test("never falls back to a legacy body token when authorization is present", () => {
