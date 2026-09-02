@@ -696,7 +696,7 @@ function verifyGuideHtml(html, label) {
   const faq = structuredData.find((entry) => entry["@type"] === "FAQPage");
   if (!article) throw new Error(`${label} did not contain TechArticle JSON-LD`);
   if (!faq) throw new Error(`${label} did not contain FAQPage JSON-LD`);
-  if (article.dateModified !== "2026-08-19") {
+  if (article.dateModified !== "2026-08-27") {
     throw new Error(`${label} had unexpected TechArticle dateModified ${article.dateModified || "<missing>"}`);
   }
   const questions = new Map((faq.mainEntity || []).map((entry) => [entry.name, entry.acceptedAnswer?.text]));
