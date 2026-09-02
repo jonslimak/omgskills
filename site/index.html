@@ -97,6 +97,23 @@
     rdt('track','PageVisit');
   </script>
   <!-- End Reddit Pixel -->
+  <!-- OpenAI Ads Measurement Pixel -->
+  <script>
+    (function(w,d,s,u){
+      var pixelId = '7Qim3U9831EHg9zoGNN1Sb';
+      if (w.oaiq) return;
+      var q = function(){q.q.push(arguments)};
+      q.q = [];
+      w.oaiq = q;
+      var js = d.createElement(s);
+      js.async = true;
+      js.src = u;
+      var f = d.getElementsByTagName(s)[0];
+      f.parentNode.insertBefore(js,f);
+      w.oaiq('init', { pixelId: pixelId });
+    })(window,document,'script','https://bzrcdn.openai.com/sdk/oaiq.min.js');
+  </script>
+  <!-- End OpenAI Ads Measurement Pixel -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1685,6 +1702,9 @@
         }
         if (typeof window.rdt === 'function') {
           window.rdt('track', 'Custom', { customEventName: 'Download' });
+        }
+        if (typeof window.oaiq === 'function') {
+          window.oaiq('measure', 'custom', { type: 'custom' }, { custom_event_name: 'download_clicked' });
         }
 
         window.setTimeout(function() {
