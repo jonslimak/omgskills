@@ -10,7 +10,7 @@ import { isHighStarBackfillPathAllowed, searchBySkillMdFilename, searchHighStarS
 import { searchAggregators } from "../sources/aggregators.js";
 import { searchSocial } from "../sources/social.js";
 import { searchRegistry } from "../sources/registry.js";
-import { searchSkillsSh, type SkillsShHit } from "../sources/skillssh.js";
+import { isSkillsShUnavailableError, searchSkillsSh, type SkillsShHit } from "../sources/skillssh.js";
 import { searchAwesomeAgentSkills } from "../sources/awesome.js";
 import { searchOfficialSkills } from "../sources/official.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
@@ -1626,7 +1626,7 @@ async function timeSource<T>(
   source: DiscoverySourceName,
   lane: DiscoveryLane,
   run: () => Promise<T[]>,
-  options: { allowFailure?: boolean } = {},
+  options: { allowFailure?: boolean | ((error: unknown) => boolean) } = {},
 ): Promise<{ hits: T[]; summary: SourceRunSummary; warning: string | null }> {
   const startedAt = performance.now();
   try {
@@ -1642,7 +1642,10 @@ async function timeSource<T>(
       warning: null,
     };
   } catch (error) {
-    if (!options.allowFailure) throw error;
+    const allowFailure = typeof options.allowFailure === "function"
+      ? options.allowFailure(error)
+      : options.allowFailure;
+    if (!allowFailure) throw error;
     return {
       hits: [],
       summary: {
@@ -1664,20 +1667,29 @@ const PERIODIC_SKILLSSH_BOARDS: Array<{ board: SkillsShBoard; topLimit: number }
   { board: "hot", topLimit: 500 },
 ];
 
-async function runPeriodicSkillsShSources(): Promise<Array<{ hits: SkillsShHit[]; summary: SourceRunSummary; warning: string | null }>> {
+export async function runPeriodicSkillsShSources(
+  search: typeof searchSkillsSh = searchSkillsSh,
+): Promise<Array<{ hits: SkillsShHit[]; summary: SourceRunSummary; warning: string | null }>> {
   const runs: Array<{ hits: SkillsShHit[]; summary: SourceRunSummary; warning: string | null }> = [];
   for (const { board, topLimit } of PERIODIC_SKILLSSH_BOARDS) {
     const run = await timeSource("skillssh", "periodic", () =>
-      searchSkillsSh({
+      search({
         board,
         topLimit,
         minRepoStars: SKILLS_SH_MIN_REPO_STARS,
         pageConcurrency: 1,
         repoConcurrency: 8,
       }),
+      { allowFailure: isSkillsShUnavailableError },
     );
+    if (run.warning) {
+      console.warn(`  skills.sh ${board} unavailable; existing library data preserved`);
+    }
     runs.push({
       ...run,
+      warning: run.warning
+        ? `skillssh:${board} unavailable; existing library data preserved`
+        : null,
       summary: {
         ...run.summary,
         source: `skillssh:${board}`,
@@ -1944,6 +1956,7 @@ async function runDiscovery(
       ]);
       for (const result of [...skillsshRuns, awesomeRun, registryRun] as const) {
         sourceRuns.push(result.summary);
+        if (result.warning) partialDiscoveryWarnings.push(result.warning);
         for (const hit of result.hits) {
           const repoInfo = repoKeyFromGithubUrl(hit.github_url);
           addDiscoveredRepo(
