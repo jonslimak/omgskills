@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { PoolClient } from "pg";
 import {
+  buildDeviceGroupManifestByRoute,
   buildMemberGroupManifest,
   buildPublicGroupManifestByRoute,
   withGroupManifestSnapshot,
@@ -105,6 +106,66 @@ test("member manifest denies unrelated users with the generic not-found response
     ),
     (error) => error instanceof Response && error.status === 404
   );
+});
+
+test("device manifest resolves private routes without requiring a published profile", async () => {
+  const view = await buildDeviceGroupManifestByRoute(
+    { id: "member-id", email: "member@example.com" },
+    "jon",
+    "team-skills",
+    sequenceClient([
+      [{ id: "group-id" }],
+      [accessFacts({ invited: true })],
+      [manifestRow()],
+    ])
+  );
+  assert.equal(view.manifest.items[0].installability.status, "installable");
+});
+
+test("device manifest gives public-role readers the public-safe view", async () => {
+  const view = await buildDeviceGroupManifestByRoute(
+    { id: "reader-id", email: "reader@example.com" },
+    "jon",
+    "team-skills",
+    sequenceClient([
+      [{ id: "group-id" }],
+      [accessFacts({ visibility: "public", invited: false })],
+      [manifestRow()],
+    ])
+  );
+  assert.deepEqual(view.manifest.items[0].installability, {
+    status: "metadata_only",
+    reason: "source_unavailable",
+  });
+  const serialized = JSON.stringify(view.manifest);
+  for (const secret of ["secret/private-skills", "skills/review", "987654321"]) {
+    assert.equal(serialized.includes(secret), false);
+  }
+});
+
+test("device manifest keeps inaccessible and absent routes indistinguishable", async () => {
+  const failures: Array<{ status: number; body: string }> = [];
+  for (const rows of [
+    [[{ id: "group-id" }], [accessFacts({ invited: false })]],
+    [[]],
+  ]) {
+    try {
+      await buildDeviceGroupManifestByRoute(
+        { id: "stranger-id", email: "stranger@example.com" },
+        "jon",
+        "team-skills",
+        sequenceClient(rows as any)
+      );
+      assert.fail("expected route denial");
+    } catch (error) {
+      assert.ok(error instanceof Response);
+      failures.push({ status: error.status, body: await error.text() });
+    }
+  }
+  assert.deepEqual(failures, [
+    { status: 404, body: "Group not found" },
+    { status: 404, body: "Group not found" },
+  ]);
 });
 
 test("public manifest requires a published public group and hides private source coordinates", async () => {

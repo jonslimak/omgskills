@@ -9,6 +9,8 @@ export type PublicManifestRoute = {
   groupSlug: string;
 };
 
+export type DeviceManifestRoute = PublicManifestRoute;
+
 function isValidSegment(value: string): boolean {
   return value.length <= 80 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(value);
 }
@@ -71,12 +73,15 @@ export function parsePublicPageRoute(pathname: string): PublicPageRoute | null {
   };
 }
 
-export function parsePublicManifestRoute(pathname: string): PublicManifestRoute | null {
+function parseManifestRoute(
+  pathname: string,
+  audience: "public" | "device"
+): PublicManifestRoute | null {
   const parts = pathname.split("/").filter(Boolean);
   if (
     parts.length !== 6
     || parts[0] !== "api"
-    || parts[1] !== "public"
+    || parts[1] !== audience
     || parts[2] !== "groups"
     || parts[5] !== "manifest"
   ) {
@@ -88,6 +93,14 @@ export function parsePublicManifestRoute(pathname: string): PublicManifestRoute 
     return null;
   }
   return { handle, groupSlug };
+}
+
+export function parsePublicManifestRoute(pathname: string): PublicManifestRoute | null {
+  return parseManifestRoute(pathname, "public");
+}
+
+export function parseDeviceManifestRoute(pathname: string): DeviceManifestRoute | null {
+  return parseManifestRoute(pathname, "device");
 }
 
 export function publicGroupsSitemapXml(

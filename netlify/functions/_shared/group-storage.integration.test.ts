@@ -11,6 +11,7 @@ import {
   reorderGroupItemsWithClient
 } from "./group-items.js";
 import {
+  readDeviceGroupManifestByRoute,
   readMemberGroupManifest,
   readPublicGroupManifestByRoute
 } from "./group-manifest-adapters.js";
@@ -711,6 +712,26 @@ test("authorized adapters read pinned releases from one migrated snapshot", asyn
     assert.equal(member.manifest.items[0].installability.status, "installable");
     assert.equal(JSON.stringify(member.manifest).includes("secret/private-skills"), false);
 
+    const deviceOwner = await readDeviceGroupManifestByRoute(
+      pool,
+      { id: ownerId, email: `${ownerId}@example.com` },
+      "MANIFEST-OWNER",
+      "shared-manifest"
+    );
+    assert.deepEqual(deviceOwner.manifest, member.manifest);
+
+    const devicePublic = await readDeviceGroupManifestByRoute(
+      pool,
+      { id: randomUUID(), email: "reader@example.com" },
+      "manifest-owner",
+      "shared-manifest"
+    );
+    assert.deepEqual(devicePublic.manifest.items[0].installability, {
+      status: "metadata_only",
+      reason: "source_unavailable"
+    });
+    assert.equal(JSON.stringify(devicePublic).includes("secret/private-skills"), false);
+
     const publicView = await readPublicGroupManifestByRoute(
       pool,
       "manifest-owner",
@@ -731,6 +752,10 @@ test("private release access follows live restricted-group ACLs and records meta
     const outsiderId = await createUser(pool, "access-outsider");
     const recipientEmail = `${recipientId}@example.com`;
     const outsiderEmail = `${outsiderId}@example.com`;
+    await pool.query(
+      "UPDATE users SET handle = 'access-owner' WHERE id = $1",
+      [ownerId]
+    );
     await bindGithubBrokerInstallation(pool, {
       ownerUserId: ownerId,
       installationId: "888001",
@@ -780,6 +805,32 @@ test("private release access follows live restricted-group ACLs and records meta
       [groupId, sourceId, releaseId]
     );
     const itemId = item.rows[0].id;
+
+    const ownerManifest = await readDeviceGroupManifestByRoute(
+      pool,
+      { id: ownerId, email: `${ownerId}@example.com` },
+      "access-owner",
+      "private-access"
+    );
+    assert.equal(ownerManifest.manifest.items[0].installability.status, "installable");
+
+    const recipientManifest = await readDeviceGroupManifestByRoute(
+      pool,
+      { id: recipientId, email: recipientEmail },
+      "access-owner",
+      "private-access"
+    );
+    assert.equal(recipientManifest.manifest.items[0].installability.status, "installable");
+
+    await assert.rejects(
+      readDeviceGroupManifestByRoute(
+        pool,
+        { id: outsiderId, email: outsiderEmail },
+        "access-owner",
+        "private-access"
+      ),
+      (error: unknown) => error instanceof Response && error.status === 404
+    );
 
     const ownerGrant = await requirePrivateReleaseAccess(
       pool,
@@ -852,6 +903,15 @@ test("private release access follows live restricted-group ACLs and records meta
       requirePrivateReleaseAccess(pool, { userId: recipientId, email: recipientEmail }, releaseId),
       (error: unknown) => error instanceof PrivateReleaseAccessError
     );
+    await assert.rejects(
+      readDeviceGroupManifestByRoute(
+        pool,
+        { id: recipientId, email: recipientEmail },
+        "access-owner",
+        "private-access"
+      ),
+      (error: unknown) => error instanceof Response && error.status === 404
+    );
 
     await pool.query(
       "INSERT INTO skill_group_allowed_emails (group_id, email) VALUES ($1, $2)",
@@ -861,6 +921,15 @@ test("private release access follows live restricted-group ACLs and records meta
     await assert.rejects(
       requirePrivateReleaseAccess(pool, { userId: recipientId, email: recipientEmail }, releaseId),
       (error: unknown) => error instanceof PrivateReleaseAccessError
+    );
+    await assert.rejects(
+      readDeviceGroupManifestByRoute(
+        pool,
+        { id: recipientId, email: recipientEmail },
+        "access-owner",
+        "private-access"
+      ),
+      (error: unknown) => error instanceof Response && error.status === 404
     );
     await pool.query("UPDATE skill_groups SET disabled_at = NULL, visibility = 'public' WHERE id = $1", [groupId]);
     await assert.rejects(

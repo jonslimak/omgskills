@@ -289,6 +289,39 @@ export async function buildPublicGroupManifestByRoute(
   return buildAuthorizedManifest(null, groupId, "public", client, true);
 }
 
+export async function buildDeviceGroupManifestByRoute(
+  actor: GroupAccessActor,
+  handle: string,
+  groupSlug: string,
+  client: GroupAccessClient
+): Promise<GroupManifestView> {
+  const route = await client.query<{ id: string }>(
+    `
+      SELECT g.id
+      FROM skill_groups g
+      JOIN users owner ON owner.id = g.owner_user_id
+      WHERE lower(owner.handle) = lower($1)
+        AND g.slug = $2
+      LIMIT 1
+    `,
+    [handle, groupSlug]
+  );
+  const groupId = route.rows[0]?.id;
+  if (!groupId) {
+    throw groupNotFound();
+  }
+
+  const access = await requireGroupAccess(actor, groupId, "read", client);
+  const loaded = await loadGroupManifestInput(groupId, client);
+  const publicView = access.accessRole === "public";
+  return {
+    manifest: buildGroupManifest(publicView ? publicInput(loaded.input) : loaded.input),
+    linkHints: publicView
+      ? publicLinkHints(loaded.input, loaded.linkHints)
+      : loaded.linkHints
+  };
+}
+
 export async function withGroupManifestSnapshot<T>(
   pool: GroupManifestPool,
   operation: (client: PoolClient) => Promise<T>
@@ -327,4 +360,14 @@ export async function readPublicGroupManifestByRoute(
 ): Promise<GroupManifestView> {
   return withGroupManifestSnapshot(pool, (client) =>
     buildPublicGroupManifestByRoute(handle, groupSlug, client));
+}
+
+export async function readDeviceGroupManifestByRoute(
+  pool: GroupManifestPool,
+  actor: GroupAccessActor,
+  handle: string,
+  groupSlug: string
+): Promise<GroupManifestView> {
+  return withGroupManifestSnapshot(pool, (client) =>
+    buildDeviceGroupManifestByRoute(actor, handle, groupSlug, client));
 }

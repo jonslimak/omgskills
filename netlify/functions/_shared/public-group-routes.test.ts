@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  parseDeviceManifestRoute,
   parsePublicManifestRoute,
   parsePublicPageRoute,
   publicGroupAppDeepLink,
@@ -16,6 +17,16 @@ test("recognizes only the exact public manifest route", () => {
   assert.equal(parsePublicManifestRoute("/api/public/groups/jon/design"), null);
   assert.equal(parsePublicManifestRoute("/api/public/groups/jon/not_ok/manifest"), null);
   assert.equal(parsePublicManifestRoute("/api/public/groups/jon/design/manifest/extra"), null);
+});
+
+test("recognizes only the exact device manifest route", () => {
+  assert.deepEqual(parseDeviceManifestRoute("/api/device/groups/Jon/Design/manifest"), {
+    handle: "jon",
+    groupSlug: "design",
+  });
+  assert.equal(parseDeviceManifestRoute("/api/public/groups/jon/design/manifest"), null);
+  assert.equal(parseDeviceManifestRoute("/api/device/groups/jon/not_ok/manifest"), null);
+  assert.equal(parseDeviceManifestRoute("/api/device/groups/jon/design/manifest/extra"), null);
 });
 
 test("keeps one canonical public group route and recognizes compatibility routes", () => {
