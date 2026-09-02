@@ -1,7 +1,10 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { searchSkillsSh } from "./sources/skillssh.js";
+import {
+  canKeepLastGoodSkillsShData,
+  searchSkillsSh,
+} from "./sources/skillssh.js";
 import type { Skill } from "./types.js";
 
 interface TrendingEntry {
@@ -63,7 +66,17 @@ async function main() {
   const library = loadMainLibrary();
   console.log(`Loaded ${library.size} library skills`);
 
-  const hits = await searchSkillsSh();
+  let hits;
+  try {
+    hits = await searchSkillsSh();
+  } catch (error) {
+    if (!canKeepLastGoodSkillsShData(error, existing.entries.size)) throw error;
+    console.warn(
+      `[source-unavailable] ${error instanceof Error ? error.message : String(error)}; ` +
+      `keeping ${existing.entries.size} last-good trending entries`,
+    );
+    return;
+  }
   console.log(`  trending candidates: ${hits.length}`);
 
   const entries: TrendingEntry[] = [];

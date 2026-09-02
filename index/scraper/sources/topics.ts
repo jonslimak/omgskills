@@ -1,4 +1,5 @@
 import { octokit } from "../client.js";
+import { isGitHubRateLimitError } from "../runtime-guard.js";
 
 export interface TopicHit {
   id: string;
@@ -64,12 +65,17 @@ async function paginateRepoSearch(q: string, seen: Map<string, TopicHit>, maxPag
     per_page: 100,
   });
   let pageCount = 0;
-  for await (const { data } of iter) {
-    pageCount++;
-    for (const repo of data) {
-      if (!seen.has(repo.full_name)) seen.set(repo.full_name, toHit(repo));
+  try {
+    for await (const { data } of iter) {
+      pageCount++;
+      for (const repo of data) {
+        if (!seen.has(repo.full_name)) seen.set(repo.full_name, toHit(repo));
+      }
+      if (maxPagesPerQuery && pageCount >= maxPagesPerQuery) break;
     }
-    if (maxPagesPerQuery && pageCount >= maxPagesPerQuery) break;
+  } catch (error) {
+    if (!isGitHubRateLimitError(error)) throw error;
+    console.warn(`  topic search rate limited for ${q}; keeping ${seen.size} collected hits`);
   }
 }
 

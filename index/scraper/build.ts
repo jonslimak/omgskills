@@ -8,7 +8,7 @@ import { searchBySkillMdFilename } from "./sources/code.js";
 import { searchAggregators } from "./sources/aggregators.js";
 import { searchSocial } from "./sources/social.js";
 import { searchRegistry } from "./sources/registry.js";
-import { searchSkillsSh } from "./sources/skillssh.js";
+import { isSkillsShUnavailableError, searchSkillsSh } from "./sources/skillssh.js";
 import { searchAwesomeAgentSkills } from "./sources/awesome.js";
 import { searchOfficialSkills } from "./sources/official.js";
 import {
@@ -35,6 +35,7 @@ import { SKILLS_SH_MIN_REPO_STARS } from "./policy/rollout-criteria.js";
 import {
   calculateRuntimeProgress,
   formatRuntimeDuration,
+  isGitHubRateLimitError,
   parseOptionalPositiveDurationMs,
   runtimeBudgetExpired,
 } from "./runtime-guard.js";
@@ -495,6 +496,16 @@ async function timedSource<T>(name: SourceName, fn: () => Promise<T[]>): Promise
   };
 }
 
+async function keepPartialGitHubSource<T>(name: SourceName, fn: () => Promise<T[]>): Promise<T[]> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (!isGitHubRateLimitError(error)) throw error;
+    console.warn(`[source-deferred] ${name}: GitHub rate limited; continuing with available catalog data`);
+    return [];
+  }
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const paths = buildPaths(options);
@@ -563,27 +574,40 @@ async function main() {
 
   console.log("Fetching discovery sources...");
   const topicPromise = options.sources.has("topics")
-    ? timedSource("topics", () => searchByTopics({
+    ? timedSource("topics", () => keepPartialGitHubSource("topics", () => searchByTopics({
       maxQueries: options.topicQueryLimit ?? undefined,
       maxPagesPerQuery: options.topicPageLimit ?? undefined,
-    }))
+    })))
     : Promise.resolve(null);
-  const codePromise = options.sources.has("code") ? timedSource("code", searchBySkillMdFilename) : Promise.resolve(null);
+  const codePromise = options.sources.has("code")
+    ? timedSource("code", () => keepPartialGitHubSource("code", searchBySkillMdFilename))
+    : Promise.resolve(null);
   const aggregatorsPromise = options.sources.has("aggregators")
-    ? timedSource("aggregators", () => searchAggregators({ maxRepos: options.aggregatorRepoLimit ?? undefined }))
+    ? timedSource("aggregators", () => keepPartialGitHubSource(
+      "aggregators",
+      () => searchAggregators({ maxRepos: options.aggregatorRepoLimit ?? undefined }),
+    ))
     : Promise.resolve(null);
   const socialPromise = options.sources.has("social")
     ? timedSource("social", () => searchSocial({ maxPagesPerQuery: options.socialPageLimit ?? undefined }))
     : Promise.resolve(null);
   const registryPromise = options.sources.has("registry") ? timedSource("registry", searchRegistry) : Promise.resolve(null);
   const skillsshPromise = options.sources.has("skillssh")
-    ? timedSource("skillssh", () => searchSkillsSh({
-      board: "all-time",
-      crawlAll: true,
-      minRepoStars: SKILLS_SH_MIN_REPO_STARS,
-      pageConcurrency: 1,
-      repoConcurrency: 8,
-    }))
+    ? timedSource("skillssh", async () => {
+      try {
+        return await searchSkillsSh({
+          board: "all-time",
+          crawlAll: true,
+          minRepoStars: SKILLS_SH_MIN_REPO_STARS,
+          pageConcurrency: 1,
+          repoConcurrency: 8,
+        });
+      } catch (error) {
+        if (!isSkillsShUnavailableError(error)) throw error;
+        console.warn(`[source-unavailable] ${error.message}; keeping existing skills.sh catalog entries`);
+        return [];
+      }
+    })
     : Promise.resolve(null);
   const awesomePromise = options.sources.has("awesome") ? timedSource("awesome", searchAwesomeAgentSkills) : Promise.resolve(null);
   const officialPromise = options.sources.has("official") ? timedSource("official", searchOfficialSkills) : Promise.resolve(null);
@@ -765,6 +789,7 @@ async function main() {
   let cached = 0;
   let starFiltered = 0;
   let negativeCached = 0;
+  let rateLimitedDeferred = 0;
   let i = 0;
   const total = candidates.size;
   const enrichmentStart = performance.now();
@@ -817,6 +842,13 @@ async function main() {
         if ((options.maxCandidates !== null && options.maxCandidates <= 20) || options.repoFilter || options.authorFilter || options.idPrefix) {
           console.log(`  [pre-skip] ${c.id}: ${failure.reason}`);
         }
+        maybeLogEnrichmentProgress();
+        continue;
+      }
+      if (isGitHubRateLimitError(err)) {
+        skipped++;
+        rateLimitedDeferred++;
+        console.warn(`[deferred] ${c.id}: GitHub rate limited; preserving existing data`);
         maybeLogEnrichmentProgress();
         continue;
       }
@@ -887,6 +919,9 @@ async function main() {
   // search caps out would shrink the index every run.
   const enrichedKept = skills.length;
   const carriedForward = carryForwardExistingSkills(skills, existingSkills);
+  if (rateLimitedDeferred > 0) {
+    console.warn(`[deferred] ${rateLimitedDeferred} candidates deferred by GitHub rate limits`);
+  }
 
   skills.sort((a, b) => b.stars - a.stars);
   const legacySkills = dedupeSkills(skills.filter((skill) => !isSuppressedSkillId(skill.id, trustedSeeds))).skills;

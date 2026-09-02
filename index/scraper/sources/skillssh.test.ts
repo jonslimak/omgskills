@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { searchSkillsSh } from "./skillssh.js";
+import {
+  canKeepLastGoodSkillsShData,
+  isSkillsShUnavailableError,
+  searchSkillsSh,
+  SkillsShUnavailableError,
+} from "./skillssh.js";
 import { octokit } from "../client.js";
 
 function skill(source: string, skillId: string, installs: number) {
@@ -251,6 +256,85 @@ test("skills.sh does not retry permanent client errors", async () => {
       /skills\.sh page 1 failed \(404\)/,
     );
     assert.equal(attempts, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("skills.sh bounds timed-out page requests and marks the source unavailable", async () => {
+  const originalFetch = globalThis.fetch;
+  let attempts = 0;
+  globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
+    attempts += 1;
+    assert.ok(init?.signal, "skills.sh request must include a timeout signal");
+    throw new DOMException("request timed out", "TimeoutError");
+  }) as typeof fetch;
+
+  try {
+    await assert.rejects(
+      searchSkillsSh({
+        board: "all-time",
+        topLimit: 1,
+        pageConcurrency: 1,
+        repoConcurrency: 1,
+        pageRetryBaseDelayMs: 0,
+        requestTimeoutMs: 1,
+      }),
+      (error) => isSkillsShUnavailableError(error),
+    );
+    assert.equal(attempts, 4);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("skills.sh availability failures can reuse only a real last-good dataset", () => {
+  const unavailable = new SkillsShUnavailableError("unavailable");
+  assert.equal(canKeepLastGoodSkillsShData(unavailable, 10), true);
+  assert.equal(canKeepLastGoodSkillsShData(unavailable, 0), false);
+  assert.equal(canKeepLastGoodSkillsShData(new Error("bad response shape"), 10), false);
+});
+
+test("skills.sh marks exhausted server retries as unavailable", async () => {
+  const originalFetch = globalThis.fetch;
+  let attempts = 0;
+  globalThis.fetch = (async () => {
+    attempts += 1;
+    return new Response("temporary", { status: 503 });
+  }) as typeof fetch;
+
+  try {
+    await assert.rejects(
+      searchSkillsSh({
+        board: "all-time",
+        topLimit: 1,
+        pageConcurrency: 1,
+        repoConcurrency: 1,
+        pageRetryBaseDelayMs: 0,
+      }),
+      (error) => isSkillsShUnavailableError(error),
+    );
+    assert.equal(attempts, 4);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("skills.sh keeps malformed successful responses fatal", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async () => new Response("not-json", { status: 200 })) as typeof fetch;
+
+  try {
+    await assert.rejects(
+      searchSkillsSh({
+        board: "all-time",
+        topLimit: 1,
+        pageConcurrency: 1,
+        repoConcurrency: 1,
+        pageRetryBaseDelayMs: 0,
+      }),
+      (error) => !isSkillsShUnavailableError(error),
+    );
   } finally {
     globalThis.fetch = originalFetch;
   }

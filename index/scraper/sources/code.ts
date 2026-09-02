@@ -1,4 +1,5 @@
 import { octokit } from "../client.js";
+import { isGitHubRateLimitError } from "../runtime-guard.js";
 
 export interface CodeHit {
   id: string;
@@ -124,7 +125,12 @@ async function collectCodeHits(
     }
   } catch (err: any) {
     // GitHub caps code search at 1000 results — 404 on page 11+ is expected
-    if (err?.status !== 404) throw err;
+    if (err?.status === 404) return;
+    if (isGitHubRateLimitError(err)) {
+      console.warn(`  code search rate limited for ${q}; keeping ${results.length} collected hits`);
+      return;
+    }
+    throw err;
   }
 }
 

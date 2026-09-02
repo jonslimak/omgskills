@@ -63,3 +63,32 @@ export function isRequestTimeoutError(error: unknown): boolean {
     value.cause?.code === "ETIMEDOUT"
   );
 }
+
+export function isGitHubRateLimitError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const value = error as {
+    status?: unknown;
+    message?: unknown;
+    response?: { headers?: Record<string, unknown> };
+  };
+  const status = typeof value.status === "number" ? value.status : null;
+  if (status === 429) return true;
+  if (status !== 403) return false;
+
+  const remaining = value.response?.headers?.["x-ratelimit-remaining"];
+  if (String(remaining) === "0") return true;
+  return /rate limit|secondary rate|abuse/i.test(
+    typeof value.message === "string" ? value.message : "",
+  );
+}
+
+export function shouldRetryGitHubRateLimit(
+  retryAfterSeconds: number,
+  retryCount: number,
+  maxWaitSeconds: number,
+  retriesDisabled: boolean,
+): boolean {
+  if (retriesDisabled) return false;
+  if (!Number.isFinite(retryAfterSeconds) || retryAfterSeconds > maxWaitSeconds) return false;
+  return retryCount < 2;
+}
