@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   buildGroupManifest,
@@ -56,6 +57,83 @@ function manifestRelease(id: string) {
     skillMdSha: sha.skill
   };
 }
+
+test("matches the shared server-client v2 manifest fixture", async () => {
+  const fixture = JSON.parse(await readFile(
+    new URL(
+      "../../../menubar/Tests/omgskillsTests/Fixtures/group-manifest-v2.json",
+      import.meta.url
+    ),
+    "utf8"
+  ));
+  const metadataReasons = [
+    "release_unavailable",
+    "source_unavailable",
+    "source_mismatch",
+    "incomplete_release",
+    "invalid_release",
+    "release_source_mismatch",
+    "synced_missing",
+    "synced_local_only",
+    "synced_ambiguous",
+    "synced_unresolved"
+  ] as const;
+  const items: GroupManifestInput["items"] = [
+    {
+      id: ids.catalogItem,
+      kind: "catalog",
+      position: 0,
+      name: "Code review",
+      catalogSkillId: "openai/codex:code-review",
+      source: {
+        id: ids.catalogSource,
+        kind: "catalog",
+        normalizedRoot: "skills/code-review",
+        catalogSkillId: "openai/codex:code-review"
+      },
+      release: release(ids.catalogRelease, ids.catalogSource)
+    },
+    {
+      id: ids.publicItem,
+      kind: "github",
+      position: 1,
+      name: "Public skill",
+      description: "A complete public package",
+      source: {
+        id: ids.publicSource,
+        kind: "public_github",
+        normalizedRoot: "skills/public-skill",
+        repositoryId: "900719925474099312345",
+        repositorySlug: "owner/public-skills"
+      },
+      release: release(ids.publicRelease, ids.publicSource)
+    },
+    {
+      id: ids.privateItem,
+      kind: "github",
+      position: 2,
+      name: "Private skill",
+      note: "Owner reviewed",
+      source: {
+        id: ids.privateSource,
+        kind: "private_github",
+        normalizedRoot: "skills/private-skill",
+        repositoryId: "987654321",
+        repositorySlug: "owner/private-skills"
+      },
+      release: release(ids.privateRelease, ids.privateSource)
+    }
+  ];
+  items.push(...metadataReasons.map((reason, index) => ({
+    id: `40000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+    kind: "synced" as const,
+    position: index + 3,
+    name: `${reason[0].toUpperCase()}${reason.slice(1).replaceAll("_", " ")}`,
+    metadataOnlyReason: reason
+  })));
+
+  assert.deepEqual(buildGroupManifest(baseInput(items)), fixture);
+});
 
 test("normalizes complete catalog and public GitHub releases deterministically", () => {
   const catalogItem: GroupManifestInput["items"][number] = {

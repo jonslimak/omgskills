@@ -1,0 +1,171 @@
+{
+  "type": "omgskills.skill_group",
+  "version": 2,
+  "group": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "name": "Team skills",
+    "description": "Reviewed skills",
+    "slug": "team-skills",
+    "revision": 7
+  },
+  "items": [
+    {
+      "id": "10000000-0000-4000-8000-000000000002",
+      "kind": "catalog",
+      "position": 0,
+      "name": "Code review",
+      "description": null,
+      "note": null,
+      "installability": {
+        "status": "installable",
+        "source": {
+          "id": "20000000-0000-4000-8000-000000000001",
+          "kind": "catalog",
+          "catalogSkillId": "openai/codex:code-review",
+          "normalizedRoot": "skills/code-review"
+        },
+        "release": {
+          "id": "30000000-0000-4000-8000-000000000001",
+          "commitSha": "1111111111111111111111111111111111111111",
+          "treeSha": "2222222222222222222222222222222222222222",
+          "skillMdSha": "3333333333333333333333333333333333333333"
+        }
+      }
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000003",
+      "kind": "github",
+      "position": 1,
+      "name": "Public skill",
+      "description": "A complete public package",
+      "note": null,
+      "installability": {
+        "status": "installable",
+        "source": {
+          "id": "20000000-0000-4000-8000-000000000002",
+          "kind": "public_github",
+          "repositoryId": "900719925474099312345",
+          "repositorySlug": "owner/public-skills",
+          "normalizedRoot": "skills/public-skill"
+        },
+        "release": {
+          "id": "30000000-0000-4000-8000-000000000002",
+          "commitSha": "1111111111111111111111111111111111111111",
+          "treeSha": "2222222222222222222222222222222222222222",
+          "skillMdSha": "3333333333333333333333333333333333333333"
+        }
+      }
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000004",
+      "kind": "github",
+      "position": 2,
+      "name": "Private skill",
+      "description": null,
+      "note": "Owner reviewed",
+      "installability": {
+        "status": "installable",
+        "source": {
+          "id": "20000000-0000-4000-8000-000000000003",
+          "kind": "private_github"
+        },
+        "release": {
+          "id": "30000000-0000-4000-8000-000000000003",
+          "commitSha": "1111111111111111111111111111111111111111",
+          "treeSha": "2222222222222222222222222222222222222222",
+          "skillMdSha": "3333333333333333333333333333333333333333"
+        }
+      }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000001",
+      "kind": "synced",
+      "position": 3,
+      "name": "Release unavailable",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "release_unavailable" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000002",
+      "kind": "synced",
+      "position": 4,
+      "name": "Source unavailable",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "source_unavailable" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000003",
+      "kind": "synced",
+      "position": 5,
+      "name": "Source mismatch",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "source_mismatch" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000004",
+      "kind": "synced",
+      "position": 6,
+      "name": "Incomplete release",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "incomplete_release" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000005",
+      "kind": "synced",
+      "position": 7,
+      "name": "Invalid release",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "invalid_release" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000006",
+      "kind": "synced",
+      "position": 8,
+      "name": "Release source mismatch",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "release_source_mismatch" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000007",
+      "kind": "synced",
+      "position": 9,
+      "name": "Synced missing",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "synced_missing" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000008",
+      "kind": "synced",
+      "position": 10,
+      "name": "Synced local only",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "synced_local_only" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000009",
+      "kind": "synced",
+      "position": 11,
+      "name": "Synced ambiguous",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "synced_ambiguous" }
+    },
+    {
+      "id": "40000000-0000-4000-8000-000000000010",
+      "kind": "synced",
+      "position": 12,
+      "name": "Synced unresolved",
+      "description": null,
+      "note": null,
+      "installability": { "status": "metadata_only", "reason": "synced_unresolved" }
+    }
+  ]
+}
