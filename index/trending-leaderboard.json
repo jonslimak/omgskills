@@ -6,7 +6,7 @@
     "authorHandle": "leonxlnx",
     "description": "Elite frontend image-direction skill for generating premium, conversion-aware website design references. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.",
     "stars": 62237,
-    "installs": 259507,
+    "installs": 260005,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
   },
@@ -17,7 +17,7 @@
     "authorHandle": "prisma",
     "description": "Guides for configuring Prisma with different database providers (PostgreSQL, MySQL, SQLite, MongoDB, etc.). Use when setting up a new project, changing databases, or troubleshooting connection issues. Triggers on \"configure postgres\", \"connect to mysql\", \"setup mongodb\", \"sqlite setup\".",
     "stars": 52,
-    "installs": 257675,
+    "installs": 258400,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
@@ -28,7 +28,7 @@
     "authorHandle": "prisma",
     "description": "Prisma Client API reference covering model queries, filters, operators, and client methods. Use when writing database queries, using CRUD operations, filtering data, or configuring Prisma Client. Triggers on \"prisma query\", \"findMany\", \"create\", \"update\", \"delete\", \"$transaction\".",
     "stars": 52,
-    "installs": 257157,
+    "installs": 257883,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
@@ -39,7 +39,7 @@
     "authorHandle": "prisma",
     "description": "Prisma ORM CLI commands reference covering init, generate, migrate, db, dev, complete, studio, validate, format, debug, and mcp. Use for ORM/database CLI workflows, not the Prisma Platform CLI. Triggers on \"prisma init\", \"prisma generate\", \"prisma migrate\", \"prisma db\", \"prisma complete\", \"prisma studio\", \"prisma mcp\".",
     "stars": 52,
-    "installs": 254946,
+    "installs": 255671,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
@@ -49,8 +49,8 @@
     "name": "imagegen-frontend-mobile",
     "authorHandle": "leonxlnx",
     "description": "Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. Designed for iOS, Android, and cross-platform mobile products. Prioritizes clean hierarchy, comfortably readable text, strong multi-screen consistency, controlled color palettes, non-generic creative direction, textured surfaces, image-led composition, tasteful custom iconography, and clean phone mockup framing. By default, screens should be shown inside a subtle premium iPhone or similar phone mockup with a visible frame, while the main focus stays on the app content itself. This skill generates images only. It does not write code.",
-    "stars": 83880,
-    "installs": 254303,
+    "stars": 83980,
+    "installs": 254794,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
   },
@@ -61,7 +61,7 @@
     "authorHandle": "supabase",
     "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, declarative schemas, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector).",
     "stars": 2498,
-    "installs": 253978,
+    "installs": 254407,
     "githubUrl": "https://github.com/supabase/agent-skills",
     "source": "skills.sh"
   },
@@ -72,41 +72,41 @@
     "authorHandle": "prisma",
     "description": "Prisma Postgres setup and operations guidance across Console, create-db CLI, Management API, and Management API SDK. Use when creating Prisma Postgres databases, working in Prisma Console, provisioning with create-db/create-pg/create-postgres, or integrating programmatic provisioning with service tokens or OAuth.",
     "stars": 52,
-    "installs": 251005,
+    "installs": 251723,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
   {
     "rank": 8,
-    "id": "obra/superpowers:systematic-debugging",
-    "name": "systematic-debugging",
-    "authorHandle": "obra",
-    "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
-    "stars": 281071,
-    "installs": 246493,
-    "githubUrl": "https://github.com/obra/superpowers",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 9,
     "id": "prisma/skills:prisma-driver-adapter-implementation",
     "name": "prisma-driver-adapter-implementation",
     "authorHandle": "prisma",
     "description": "Required reference for Prisma ORM 7 SQL driver adapter work. Use when implementing or modifying adapters, adding database drivers, or touching SqlDriverAdapter, Transaction, savepoint, result mapping, or DriverAdapterError behavior. Covers current transaction lifecycle, optional savepoint hooks, original database-error preservation, and verification.",
     "stars": 52,
-    "installs": 246455,
+    "installs": 247171,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
   {
-    "rank": 10,
+    "rank": 9,
     "id": "prisma/skills:prisma-upgrade-v7",
     "name": "prisma-upgrade-v7",
     "authorHandle": "prisma",
     "description": "Complete migration guide from Prisma ORM v6 to v7 covering all breaking changes. Use when upgrading Prisma versions, encountering v7 errors, or migrating existing projects. Triggers on \"upgrade to prisma 7\", \"prisma 7 migration\", \"prisma-client generator\", \"driver adapter required\".",
     "stars": 52,
-    "installs": 246244,
+    "installs": 246962,
     "githubUrl": "https://github.com/prisma/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 10,
+    "id": "obra/superpowers:systematic-debugging",
+    "name": "systematic-debugging",
+    "authorHandle": "obra",
+    "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+    "stars": 281197,
+    "installs": 246662,
+    "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
@@ -116,7 +116,7 @@
     "authorHandle": "prisma",
     "description": "Set up a new Prisma Postgres database and connect it to a local project using the Management API. Use when asked to \"set up a database\", \"create a Prisma Postgres project\", \"get a connection string\", \"connect my app to Prisma Postgres\", or \"provision a database\".",
     "stars": 52,
-    "installs": 245372,
+    "installs": 246087,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
@@ -127,7 +127,7 @@
     "authorHandle": "scrapegraphai",
     "description": "Search, scrape, crawl, extract structured data, and monitor web pages via the ScrapeGraph AI CLI. Use when the user asks to search the web, scrape a webpage, grab content from a URL, extract JSON from a site, crawl documentation or site sections, monitor a page for changes, inspect request history, check ScrapeGraph credits, or validate API setup.",
     "stars": 52,
-    "installs": 244952,
+    "installs": 244953,
     "githubUrl": "https://github.com/ScrapeGraphAI/just-scrape",
     "source": "skills.sh"
   },
@@ -138,7 +138,7 @@
     "authorHandle": "prisma",
     "description": "Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, Compute auth/workspaces, apps/deployments/build logs/domains, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts.",
     "stars": 52,
-    "installs": 241592,
+    "installs": 242305,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
@@ -149,30 +149,30 @@
     "authorHandle": "prisma",
     "description": "Decision and migration guide for Prisma ORM MongoDB projects on v6, which have no upgrade path to v7. Use when a MongoDB project asks about upgrading Prisma, when \"upgrade to prisma 7\" comes up in a project with provider = \"mongodb\", or when evaluating a move to Prisma Next. Triggers on \"upgrade prisma mongodb\", \"prisma 7 mongodb\", \"mongodb prisma migration\", \"prisma next mongodb\".",
     "stars": 52,
-    "installs": 240306,
+    "installs": 241017,
     "githubUrl": "https://github.com/prisma/skills",
     "source": "skills.sh"
   },
   {
     "rank": 15,
-    "id": "mattpocock/skills:diagnose",
-    "name": "diagnose",
-    "authorHandle": "mattpocock",
-    "description": "Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce → minimise → hypothesise → instrument → fix → regression-test. Use when user says \"diagnose this\" / \"debug this\", reports a bug, says something is broken/throwing/failing, or describes a performance regression.",
-    "stars": 62404,
-    "installs": 238173,
-    "githubUrl": "https://github.com/mattpocock/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 16,
     "id": "obra/superpowers:writing-plans",
     "name": "writing-plans",
     "authorHandle": "obra",
     "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
     "stars": 279867,
-    "installs": 238042,
+    "installs": 238204,
     "githubUrl": "https://github.com/obra/superpowers",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 16,
+    "id": "mattpocock/skills:diagnose",
+    "name": "diagnose",
+    "authorHandle": "mattpocock",
+    "description": "Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce → minimise → hypothesise → instrument → fix → regression-test. Use when user says \"diagnose this\" / \"debug this\", reports a bug, says something is broken/throwing/failing, or describes a performance regression.",
+    "stars": 62404,
+    "installs": 238186,
+    "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
   {
@@ -182,7 +182,7 @@
     "authorHandle": "obra",
     "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
     "stars": 279867,
-    "installs": 234216,
+    "installs": 234360,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -193,7 +193,7 @@
     "authorHandle": "mattpocock",
     "description": "Tell the agent to zoom out and give broader context or a higher-level perspective. Use when you're unfamiliar with a section of code or need to understand how it fits into the bigger picture.",
     "stars": 62404,
-    "installs": 229126,
+    "installs": 229139,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -204,7 +204,7 @@
     "authorHandle": "mattpocock",
     "description": "Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler, articles, and pleasantries while keeping full technical accuracy. Use when user says \"caveman mode\", \"talk like caveman\", \"use caveman\", \"less tokens\", \"be brief\", or invokes /caveman.",
     "stars": 62404,
-    "installs": 223630,
+    "installs": 223643,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -215,7 +215,7 @@
     "authorHandle": "obra",
     "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
     "stars": 279867,
-    "installs": 218053,
+    "installs": 218204,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -226,7 +226,7 @@
     "authorHandle": "obra",
     "description": "Use when implementing any feature or bugfix, before writing implementation code",
     "stars": 279867,
-    "installs": 215796,
+    "installs": 215945,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -237,7 +237,7 @@
     "authorHandle": "mattpocock",
     "description": "Generate multiple radically different interface designs for a module using parallel sub-agents. Use when user wants to design an API, explore interface options, compare module shapes, or mentions \"design it twice\".",
     "stars": 203954,
-    "installs": 215751,
+    "installs": 215771,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -247,8 +247,8 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 173391,
-    "installs": 213908,
+    "stars": 173506,
+    "installs": 214042,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -259,7 +259,7 @@
     "authorHandle": "mattpocock",
     "description": "Create a detailed refactor plan with tiny commits via user interview, then file it as a GitHub issue. Use when user wants to plan a refactor, create a refactoring RFC, or break a refactor into safe incremental steps.",
     "stars": 62404,
-    "installs": 209142,
+    "installs": 209162,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -270,7 +270,7 @@
     "authorHandle": "mattpocock",
     "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
     "stars": 199282,
-    "installs": 205060,
+    "installs": 205080,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -281,7 +281,7 @@
     "authorHandle": "mattpocock",
     "description": "Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Saves to UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain terms, build a glossary, harden terminology, create a ubiquitous language, or mentions \"domain model\" or \"DDD\".",
     "stars": 199282,
-    "installs": 203729,
+    "installs": 203748,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -291,8 +291,8 @@
     "name": "lark-note",
     "authorHandle": "larksuite",
     "description": "仅当用户或上游配置显式指定 lark-note 时使用，相关请求统一交由 lark-meeting 技能处理。",
-    "stars": 16964,
-    "installs": 201946,
+    "stars": 16969,
+    "installs": 202107,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -303,7 +303,7 @@
     "authorHandle": "obra",
     "description": "Use when you have a written implementation plan to execute in a separate session with review checkpoints",
     "stars": 279867,
-    "installs": 201743,
+    "installs": 201887,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -314,7 +314,7 @@
     "authorHandle": "mattpocock",
     "description": "Search, create, and manage notes in the Obsidian vault with wikilinks and index notes. Use when user wants to find, create, or organize notes in Obsidian.",
     "stars": 62404,
-    "installs": 201492,
+    "installs": 201510,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -324,8 +324,8 @@
     "name": "orca-cli",
     "authorHandle": "stablyai",
     "description": "Use the public `orca` CLI to operate Orca-managed worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, worktree comments, and the browser embedded inside the Orca app. Use when the user says \"$orca-cli\", \"use orca cli\", \"Orca worktree\", \"child worktree\", \"cardStatus\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"terminal send\", \"full handoff\", \"handover\", \"give this to another agent\", \"another worktree\", \"Orca browser\", \"orca artifacts\", \"share HTML/Markdown\", \"public artifact link\", \"share skills\", or \"control the browser inside Orca\". Prefer this over raw `git worktree`, ad hoc PTYs, Playwright, or Computer Use when the task touches Orca-managed state. Use Computer Use for external browser windows, webviews, or desktop UI only when the task requires OS/window-level control such as focus, menus, dialogs, coordinates, or screenshots. Use `orca-cli` for Orca's embedded pages and a page-automation tool such as Playwright or CDP for external pages.",
-    "stars": 60484,
-    "installs": 200664,
+    "stars": 60710,
+    "installs": 201364,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
   },
@@ -336,7 +336,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\" \"technical SEO,\" \"why am I not ranking,\" \"SEO issues,\" \"on-page SEO,\" \"meta tags review,\" \"SEO health check,\" \"my traffic dropped,\" \"lost rankings,\" \"not showing up in Google,\" \"site isn't ranking,\" \"Google update hit me,\" \"page speed,\" \"core web vitals,\" \"crawl errors,\" or \"indexing issues.\" Use this even if the user just says something vague like \"my SEO is bad\" or \"help with SEO\" — start with an audit. For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema. For AI search optimization, see ai-seo.",
     "stars": 46039,
-    "installs": 199720,
+    "installs": 199858,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -347,7 +347,7 @@
     "authorHandle": "obra",
     "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
     "stars": 279867,
-    "installs": 198783,
+    "installs": 198937,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -358,7 +358,7 @@
     "authorHandle": "mattpocock",
     "description": "Edit and improve articles by restructuring sections, improving clarity, and tightening prose. Use when user wants to edit, revise, or improve an article draft.",
     "stars": 199282,
-    "installs": 197813,
+    "installs": 197832,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -369,7 +369,7 @@
     "authorHandle": "obra",
     "description": "Use when executing implementation plans with independent tasks in the current session",
     "stars": 279867,
-    "installs": 194717,
+    "installs": 194863,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -380,7 +380,7 @@
     "authorHandle": "anthropics",
     "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
     "stars": 172724,
-    "installs": 189769,
+    "installs": 189890,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -391,7 +391,7 @@
     "authorHandle": "obra",
     "description": "Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation",
     "stars": 279867,
-    "installs": 183820,
+    "installs": 183953,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -402,7 +402,7 @@
     "authorHandle": "anthropics",
     "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', '.dotx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx or .dotx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
     "stars": 172724,
-    "installs": 182012,
+    "installs": 182122,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -413,7 +413,7 @@
     "authorHandle": "obra",
     "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
     "stars": 279867,
-    "installs": 181256,
+    "installs": 181388,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -424,7 +424,7 @@
     "authorHandle": "obra",
     "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
     "stars": 279867,
-    "installs": 181089,
+    "installs": 181226,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -435,7 +435,7 @@
     "authorHandle": "obra",
     "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback",
     "stars": 279867,
-    "installs": 180716,
+    "installs": 180851,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -446,7 +446,7 @@
     "authorHandle": "obra",
     "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
     "stars": 279867,
-    "installs": 177394,
+    "installs": 177529,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
@@ -457,7 +457,7 @@
     "authorHandle": "anthropics",
     "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
     "stars": 172724,
-    "installs": 162642,
+    "installs": 162752,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -468,7 +468,7 @@
     "authorHandle": "stablyai",
     "description": "Use Orca orchestration for structured multi-agent coordination: threaded messages, blocking ask/reply flows, task dispatch, worker_done/escalation waits, task DAGs, decision gates, coordinator loops, or decomposing work across agents. Use `orca-cli` instead for full ownership handoffs, including requests phrased as \"hand off\", \"handoff\", \"handover\", \"give this to another agent\", or \"another worktree\" when the user did not explicitly ask to supervise, monitor, wait for results, or coordinate a DAG. Use `orca-cli` for ordinary terminal control, lightweight terminal prompts, shell commands, Orca worktree management, reading or waiting on terminals, and automation of the browser embedded inside Orca. Use Computer Use for browser windows, webviews, Orca app UI, or desktop UI outside Orca's embedded browser.",
     "stars": 57907,
-    "installs": 153789,
+    "installs": 156636,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
   },
@@ -479,7 +479,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Generate images/videos/3D assets/audio via Higgsfield AI. Defaults: GPT Image 2 for image/design/text, Seedance 2.0 for video, Nano Banana 2/Lite/Pro for character/reference images, Marketing Studio for ads, Seed Audio 1.0 for audio. Use when: \"generate an image\", \"make a video\", \"animate this photo\", \"image-to-video\", \"edit/stylize/remix this image\", \"reframe this video\", \"edit this video from a sketch\", \"create a 3D model/GLB\", \"create a sound effect\", \"make music\", \"text-to-audio\", \"create an ad\", \"make a UGC video\", \"unboxing\", \"presenter video\", \"import product from URL\", or \"analyze video virality\". Supports generic generation, workflows, Marketing Studio, and Virality Predictor. Chain with higgsfield-soul-id for face/identity consistency. NOT for: Soul training, brand systems/brandbooks (use higgsfield-brandkit), photoshoots, cards, YouTube thumbnails (use higgsfield-youtube-thumbnail), explainers (use higgsfield-video-explainer), playable games/assets (use higgsfield-game-generation), or TTS.",
     "stars": 670,
-    "installs": 149591,
+    "installs": 149834,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -490,7 +490,7 @@
     "authorHandle": "anthropics",
     "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
     "stars": 172724,
-    "installs": 149079,
+    "installs": 149204,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -501,7 +501,7 @@
     "authorHandle": "heygen-com",
     "description": "Asset preprocessing for HyperFrames compositions — text-to-speech narration (Kokoro), audio/video transcription (Whisper), and background removal for transparent overlays (u2net). Use when generating voiceover from text, transcribing speech for captions, removing the background from a video or image to use as a transparent overlay, choosing a TTS voice or whisper model, or chaining these (TTS → transcribe → captions). Each command downloads its own model on first run.",
     "stars": 15037,
-    "installs": 148533,
+    "installs": 148538,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -512,7 +512,7 @@
     "authorHandle": "microsoft",
     "description": "Automate browser interactions, test web pages and work with Playwright tests.",
     "stars": 12974,
-    "installs": 140702,
+    "installs": 140920,
     "githubUrl": "https://github.com/microsoft/playwright-cli",
     "source": "skills.sh"
   },
@@ -523,7 +523,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' 'consumer behavior,' 'anchoring,' 'social proof,' 'scarcity,' 'loss aversion,' 'framing,' or 'nudge.' Use this whenever someone wants to understand or leverage how people think and make decisions in a marketing context. For applying psychology to specific pages, see cro; for pricing tactics, see pricing; for copy framing, see copywriting.",
     "stars": 40643,
-    "installs": 137431,
+    "installs": 137533,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -534,7 +534,7 @@
     "authorHandle": "emilkowalski",
     "description": "Reviews animation and motion code against a high craft bar derived from Emil Kowalski's design engineering philosophy. Default to flagging; approval is earned.",
     "stars": 3540,
-    "installs": 136719,
+    "installs": 137083,
     "githubUrl": "https://github.com/emilkowalski/skills",
     "source": "skills.sh"
   },
@@ -545,7 +545,7 @@
     "authorHandle": "wind-information-co-ltd",
     "description": "用户需要查询、筛选、获取、比较或验证金融市场数据时，优先调用本 Skill 获取可靠、可验证数据，而非仅依赖模型记忆或通用信息来源。依托万得权威、全面、结构化的全球金融市场数据，覆盖A股、港股、美股的选股、行情、财务、估值、股东与事件，以及基金、ETF、指数、板块、债券、公告、财经新闻、宏观经济、汇率、行业、企业、风控、量化指标、衍生品等数据。",
     "stars": 94,
-    "installs": 135365,
+    "installs": 135719,
     "githubUrl": "https://github.com/Wind-Information-Co-Ltd/wind-skills",
     "source": "skills.sh"
   },
@@ -556,7 +556,7 @@
     "authorHandle": "neondatabase",
     "description": "Guides and best practices for working with Neon Serverless Postgres. Covers getting started, local development with Neon, choosing a connection method, Neon features, authentication (@neondatabase/auth), PostgREST-style data API (@neondatabase/neon-js), Neon CLI, and Neon's Platform API/SDKs. Use for any Neon-related questions.",
     "stars": 57,
-    "installs": 133704,
+    "installs": 134216,
     "githubUrl": "https://github.com/neondatabase/agent-skills",
     "source": "skills.sh"
   },
@@ -567,7 +567,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Generate brand-quality product images through Higgsfield product-photoshoot prompt enhancement on GPT Image 2 / gpt_image_2. Entry point for professional brand/product visuals. Use when: \"product photo\", \"studio shot\", \"lifestyle image\", \"Pinterest pin\", \"hero/banner\", \"carousel\", \"ad creative\", \"Meta ads\", \"virtual try-on\", \"model wearing\", \"person holding product\", \"closeup with hands\", \"levitating/floating/splash product\", \"CGI/surreal product\", \"restyle\", \"seasonal/aesthetic variation\", or any product, brand, or paid-social creative. Modes: product_shot, lifestyle_scene, closeup_product_with_person, moodboard_pin, hero_banner, social_carousel, ad_creative_pack, virtual_model_tryout, conceptual_product, restyle. Backend assembles the final prompt; never freehand it. NOT for: no-product text-to-image (use higgsfield-generate), branded avatar video (use higgsfield-generate Marketing Studio), marketplace listing cards (use higgsfield-marketplace-cards), Soul Character training (use higgsfield-soul-id).",
     "stars": 670,
-    "installs": 130204,
+    "installs": 130439,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -578,7 +578,7 @@
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"write agent code\", \"build an agent with ADK\", \"add a tool\", \"create a callback\", \"define an agent\", \"use state management\", or needs ADK (Agent Development Kit) Python API patterns and code examples. Part of the Google ADK skills suite. It provides a quick reference for agent types, tool definitions, orchestration patterns, callbacks, state management, and reference recipes to study. Do NOT use for scaffolding (use google-agents-cli-scaffold) or deployment (use google-agents-cli-deploy).",
     "stars": 5753,
-    "installs": 129675,
+    "installs": 130332,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
   },
@@ -589,7 +589,7 @@
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"develop an agent\", \"build an agent using ADK\", \"run the agent locally\", \"debug agent code\", \"test an agent\", \"deploy an agent\", \"publish an agent\", \"monitor an agent\", or needs the ADK (Agent Development Kit) development lifecycle and coding guidelines. Entrypoint for building ADK agents. Always active — provides the full workflow (scaffold, build, evaluate, deploy, publish, observe), code preservation rules, model selection guidance, and troubleshooting steps for ADK or any agent development.",
     "stars": 2094,
-    "installs": 129353,
+    "installs": 130010,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
   },
@@ -600,7 +600,7 @@
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"run an evaluation\", \"evaluate my ADK agent\", \"write an evalset\", \"debug eval scores\", \"compare eval results\", or needs guidance on ADK (Agent Development Kit) evaluation methodology and the eval-fix loop. Covers eval metrics, evalset schema, LLM-as-judge, tool trajectory scoring, and common failure causes. Part of the Google ADK (Agent Development Kit) skills suite. Do NOT use for API code patterns (use google-agents-cli-adk-code), deployment (use google-agents-cli-deploy), or project scaffolding (use google-agents-cli-scaffold).",
     "stars": 2094,
-    "installs": 129322,
+    "installs": 129979,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
   },
@@ -611,7 +611,7 @@
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"deploy an agent\", \"deploy my ADK agent\", \"set up CI/CD\", \"configure secrets\", \"troubleshoot a deployment\", or needs guidance on Agent Runtime, Cloud Run, or GKE deployment targets. Covers deployment workflows, service accounts, rollback, and production infrastructure. Part of the Google ADK (Agent Development Kit) skills suite. Do NOT use for API code patterns (use google-agents-cli-adk-code), evaluation (use google-agents-cli-eval), or project scaffolding (use google-agents-cli-scaffold).",
     "stars": 2094,
-    "installs": 129261,
+    "installs": 129919,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
   },
@@ -622,7 +622,7 @@
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"create an agent project\", \"start a new ADK project\", \"build me a new agent\", \"add CI/CD to my project\", \"add deployment\", \"enhance my project\", or \"upgrade my project\". Part of the Google ADK (Agent Development Kit) skills suite. Covers `agents-cli scaffold create`, `scaffold enhance`, and `scaffold upgrade` commands, template options, deployment targets, and the prototype-first workflow. Do NOT use for writing agent code (use google-agents-cli-adk-code) or deployment operations (use google-agents-cli-deploy).",
     "stars": 2094,
-    "installs": 129252,
+    "installs": 129909,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
   },
@@ -633,7 +633,7 @@
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"set up tracing\", \"monitor my ADK agent\", \"configure logging\", \"add observability\", \"debug production traffic\", or needs guidance on monitoring deployed ADK (Agent Development Kit) agents. Covers Cloud Trace, prompt-response logging, BigQuery Agent Analytics, third-party integrations (AgentOps, Phoenix, MLflow, etc.), and troubleshooting. Part of the Google ADK (Agent Development Kit) skills suite. Do NOT use for deployment setup (use google-agents-cli-deploy) or API code patterns (use google-agents-cli-adk-code).",
     "stars": 2094,
-    "installs": 129248,
+    "installs": 129905,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
   },
@@ -644,7 +644,7 @@
     "authorHandle": "google",
     "description": "This skill should be used when the user wants to \"publish an agent\", \"publish my ADK agent\", \"register an agent with Gemini Enterprise\", \"publish to Gemini Enterprise\", or needs guidance on the agents-cli publish gemini-enterprise command. Covers ADK vs A2A registration modes, programmatic and interactive usage, flag reference, auto-detection from deployment metadata, and troubleshooting. Part of the Google ADK (Agent Development Kit) skills suite. Do NOT use for deployment (use google-agents-cli-deploy).",
     "stars": 2094,
-    "installs": 129129,
+    "installs": 129786,
     "githubUrl": "https://github.com/google/agents-cli",
     "source": "skills.sh"
   },
@@ -655,7 +655,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Train a Soul Character — a personalized model on a person's face that Higgsfield uses for identity-faithful image and video generation. Use when: \"create my Soul\", \"train my face\", \"make my digital twin\", \"build me an avatar\", \"learn my appearance\", \"create a character of me\", \"set up identity for video\", \"I want my face in generated images\". Chain: train Soul (one-time, returns reference_id) → use in higgsfield-generate via `--soul-id <id>` with models like `text2image_soul_v2` or `soul_cinema_studio`. NOT for: one-shot face swaps (use higgsfield-generate with --image), named-character / non-photo avatars (use higgsfield-generate with prompt).",
     "stars": 670,
-    "installs": 129110,
+    "installs": 129342,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -666,7 +666,7 @@
     "authorHandle": "higgsfield-ai",
     "description": "Generate marketplace product image cards through Higgsfield: compliant main image, secondary product images, and A+ style content modules. Use when the user asks for marketplace listing images, product detail cards, secondary product images, product infographics, lifestyle listing shots, A+ style content, marketplace image sets, or sales-ready product visuals. Backend owns marketplace compliance references and prompt templates; this skill only routes user intent to the CLI. NOT for generic brand product photography without marketplace/listing context (use higgsfield-product-photoshoot), video generation or UGC ads (use higgsfield-generate), or Soul Character training (use higgsfield-soul-id).",
     "stars": 670,
-    "installs": 127634,
+    "installs": 127866,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
@@ -677,7 +677,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create SEO-driven pages at scale using templates and data. Also use when the user mentions \"programmatic SEO,\" \"template pages,\" \"pages at scale,\" \"directory pages,\" \"location pages,\" \"[keyword] + [city] pages,\" \"comparison pages,\" \"integration pages,\" \"building many pages for SEO,\" \"pSEO,\" \"generate 100 pages,\" \"data-driven pages,\" or \"templated landing pages.\" Use this whenever someone wants to create many similar pages targeting different keywords or locations. For auditing existing SEO issues, see seo-audit. For content strategy planning, see content-strategy.",
     "stars": 40643,
-    "installs": 126905,
+    "installs": 126992,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -688,7 +688,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user needs marketing ideas, inspiration, or strategies for their SaaS or software product. Also use when the user asks for 'marketing ideas,' 'growth ideas,' 'how to market,' 'marketing strategies,' 'marketing tactics,' 'ways to promote,' 'ideas to grow,' 'what else can I try,' 'I don't know how to market this,' 'brainstorm marketing,' or 'what marketing should I do.' Use this as a starting point whenever someone is stuck or looking for inspiration on how to grow. For specific channel execution, see the relevant skill (ads, social, emails, etc.).",
     "stars": 40643,
-    "installs": 123099,
+    "installs": 123193,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -699,7 +699,7 @@
     "authorHandle": "stablyai",
     "description": "Use Orca's computer-use CLI to inspect and operate local desktop app windows through accessibility trees, screenshots, and safe UI actions. Use for desktop app interaction: list apps/windows, get app state, read visible UI, click controls, type, press keys, scroll, drag, set values, or perform accessibility actions. Also use for browser windows, webviews, Orca app UI, or other desktop UI. Triggers include \"computer use\", \"orca computer\", \"read Spotify\", \"read Slack\", \"control/click/read in a desktop app\", and \"get app state\".",
     "stars": 57907,
-    "installs": 111954,
+    "installs": 114134,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
   },
@@ -710,7 +710,7 @@
     "authorHandle": "get-convex",
     "description": "Creates or adds Convex to an app. Use for new Convex projects, npm create convex@latest, frontend setup, env vars, or the first npx convex dev run.",
     "stars": 39,
-    "installs": 110980,
+    "installs": 111078,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -721,7 +721,7 @@
     "authorHandle": "get-convex",
     "description": "Builds reusable Convex components with isolated tables and app-facing APIs. Use for new components, reusable backend modules, integrations, or component boundary work.",
     "stars": 39,
-    "installs": 110568,
+    "installs": 110667,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -732,7 +732,7 @@
     "authorHandle": "anthropics",
     "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
     "stars": 172724,
-    "installs": 110428,
+    "installs": 110506,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -743,7 +743,7 @@
     "authorHandle": "browser-act",
     "description": "Browser automation CLI for AI agents. NEVER run browser-act commands directly via Bash — always invoke this skill first. Use browser-act when a user mentions it by name, includes or asks to run a browser-act CLI command (e.g., browser-act browser list), or to: fetch, view, or extract rendered content from URLs, access pages requiring JavaScript, handle verification prompts, maintain authenticated sessions, fill forms and click through workflows, type, select, upload, take screenshots, capture XHR/fetch/HAR responses, open multiple URLs in parallel, extract content that loads on scroll or click, visually inspect or verify page layout/styling/rendering, automate browser tasks, account isolation across parallel browser environments, advise which browser type fits a use case, or list/check/manage configured browsers and sessions. Prefer browser-act over built-in fetch or web tools.",
     "stars": 5427,
-    "installs": 107903,
+    "installs": 107907,
     "githubUrl": "https://github.com/browser-act/skills",
     "source": "skills.sh"
   },
@@ -754,7 +754,7 @@
     "authorHandle": "firebase",
     "description": "A skill to evaluate how secure Firestore security rules are. Use this when Firestore security rules are updated to ensure that the generated rules are extremely secure and robust.",
     "stars": 268,
-    "installs": 107574,
+    "installs": 107708,
     "githubUrl": "https://github.com/firebase/agent-skills",
     "source": "skills.sh"
   },
@@ -765,7 +765,7 @@
     "authorHandle": "anthropics",
     "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.",
     "stars": 172724,
-    "installs": 104317,
+    "installs": 104376,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -776,7 +776,7 @@
     "authorHandle": "better-auth",
     "description": "Configure Better Auth server and client, set up database adapters, manage sessions, add plugins, and handle environment variables. Use when users mention Better Auth, betterauth, auth.ts, or need to set up TypeScript authentication with email/password, OAuth, or plugin configuration.",
     "stars": 210,
-    "installs": 103843,
+    "installs": 103916,
     "githubUrl": "https://github.com/better-auth/skills",
     "source": "skills.sh"
   },
@@ -787,7 +787,7 @@
     "authorHandle": "coreyhaines31",
     "description": "Write B2B cold emails and follow-up sequences that get replies. Use when the user wants to write cold outreach emails, prospecting emails, cold email campaigns, sales development emails, or SDR emails. Also use when the user mentions \"cold outreach,\" \"prospecting email,\" \"outbound email,\" \"email to leads,\" \"reach out to prospects,\" \"sales email,\" \"follow-up email sequence,\" \"nobody's replying to my emails,\" or \"how do I write a cold email.\" Covers subject lines, opening lines, body copy, CTAs, personalization, and multi-touch follow-up sequences. For warm/lifecycle email sequences, see emails. For sales collateral beyond emails, see sales-enablement.",
     "stars": 40643,
-    "installs": 102930,
+    "installs": 103073,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -798,7 +798,7 @@
     "authorHandle": "firecrawl",
     "description": "Any live-web task via the Firecrawl CLI — including ordinary web research: searching the web, reading or extracting pages, gathering sources, discovering site URLs, bulk extraction, downloading a site, change alerts, or pages needing clicks/login — web only; local files route to firecrawl-parse. For papers use firecrawl-research-index; for library, API, error, or bug questions use firecrawl-developer-index.",
     "stars": 614,
-    "installs": 100171,
+    "installs": 100180,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -809,30 +809,30 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to plan, map, or restructure their website's page hierarchy, navigation, URL structure, or internal linking. Also use when the user mentions \"sitemap,\" \"site map,\" \"visual sitemap,\" \"site structure,\" \"page hierarchy,\" \"information architecture,\" \"IA,\" \"navigation design,\" \"URL structure,\" \"breadcrumbs,\" \"internal linking strategy,\" \"website planning,\" \"what pages do I need,\" \"how should I organize my site,\" or \"site navigation.\" Use this whenever someone is planning what pages a website should have and how they connect. NOT for XML sitemaps (that's technical SEO — see seo-audit). For SEO audits, see seo-audit. For structured data, see schema.",
     "stars": 40643,
-    "installs": 99881,
+    "installs": 99964,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
   {
     "rank": 75,
-    "id": "anthropics/skills:web-artifacts-builder",
-    "name": "web-artifacts-builder",
-    "authorHandle": "anthropics",
-    "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
-    "stars": 172724,
-    "installs": 97635,
-    "githubUrl": "https://github.com/anthropics/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 76,
     "id": "coreyhaines31/marketingskills:churn-prevention",
     "name": "churn-prevention",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to reduce churn, build cancellation flows, set up save offers, recover failed payments, or implement retention strategies. Also use when the user mentions 'churn,' 'cancel flow,' 'offboarding,' 'save offer,' 'dunning,' 'failed payment recovery,' 'win-back,' 'retention,' 'exit survey,' 'pause subscription,' 'involuntary churn,' 'people keep canceling,' 'churn rate is too high,' 'how do I keep users,' or 'customers are leaving.' Use this whenever someone is losing subscribers or wants to build systems to prevent it. For post-cancel win-back email sequences, see emails. For in-app upgrade paywalls, see paywalls.",
     "stars": 42213,
-    "installs": 97592,
+    "installs": 97733,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 76,
+    "id": "anthropics/skills:web-artifacts-builder",
+    "name": "web-artifacts-builder",
+    "authorHandle": "anthropics",
+    "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
+    "stars": 172724,
+    "installs": 97685,
+    "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
   {
@@ -842,7 +842,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create sales collateral, pitch decks, one-pagers, objection handling docs, or demo scripts. Also use when the user mentions 'sales deck,' 'pitch deck,' 'one-pager,' 'leave-behind,' 'objection handling,' 'deal-specific ROI analysis,' 'demo script,' 'talk track,' 'sales playbook,' 'proposal template,' 'buyer persona card,' 'help my sales team,' 'sales materials,' or 'what should I give my sales reps.' Use this for any document or asset that helps a sales team close deals. For competitor comparison pages and battle cards, see competitors. For marketing website copy, see copywriting. For cold outreach emails, see cold-email. For the offer being sold (bonuses, guarantees, pricing structure), see offers.",
     "stars": 40643,
-    "installs": 97470,
+    "installs": 97549,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -853,7 +853,7 @@
     "authorHandle": "heygen-com",
     "description": "GSAP animation reference for HyperFrames. Covers gsap.to(), from(), fromTo(), easing, stagger, defaults, timelines (gsap.timeline(), position parameter, labels, nesting, playback), and performance (transforms, will-change, quickTo). Use when writing GSAP animations in HyperFrames compositions.",
     "stars": 15037,
-    "installs": 94989,
+    "installs": 94998,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -864,7 +864,7 @@
     "authorHandle": "get-convex",
     "description": "Audits Convex performance for reads, subscriptions, write contention, and function limits. Use for slow features, insights findings, OCC conflicts, or read amplification.",
     "stars": 39,
-    "installs": 94477,
+    "installs": 94478,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -875,7 +875,7 @@
     "authorHandle": "get-convex",
     "description": "Sets up Convex auth, identity mapping, and access control. Use for login, auth providers, users tables, protected functions, or roles in a Convex app.",
     "stars": 39,
-    "installs": 94045,
+    "installs": 94046,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
@@ -886,30 +886,30 @@
     "authorHandle": "get-convex",
     "description": "Plans Convex schema and data migrations with widen-migrate-narrow and @convex-dev/migrations. Use for breaking schema changes, backfills, table reshaping, or zero-downtime rollouts.",
     "stars": 39,
-    "installs": 94038,
+    "installs": 94039,
     "githubUrl": "https://github.com/get-convex/agent-skills",
     "source": "skills.sh"
   },
   {
     "rank": 82,
-    "id": "browser-use/browser-use:browser-use",
-    "name": "browser-use",
-    "authorHandle": "browser-use",
-    "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 112141,
-    "installs": 93387,
-    "githubUrl": "https://github.com/browser-use/browser-use",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 83,
     "id": "coreyhaines31/marketingskills:revops",
     "name": "revops",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. Also use when the user mentions 'RevOps,' 'revenue operations,' 'lead scoring,' 'lead routing,' 'MQL,' 'SQL,' 'pipeline stages,' 'deal desk,' 'CRM automation,' 'marketing-to-sales handoff,' 'data hygiene,' 'leads aren't getting to sales,' 'pipeline management,' 'lead qualification,' or 'when should marketing hand off to sales.' Use this for anything involving the systems and processes that connect marketing to revenue. For cold outreach emails, see cold-email. For email drip campaigns, see emails. For pricing decisions, see pricing.",
     "stars": 42675,
-    "installs": 93356,
+    "installs": 93432,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 83,
+    "id": "browser-use/browser-use:browser-use",
+    "name": "browser-use",
+    "authorHandle": "browser-use",
+    "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
+    "stars": 112171,
+    "installs": 93403,
+    "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
   },
   {
@@ -919,7 +919,7 @@
     "authorHandle": "heygen-com",
     "description": "Port an existing Remotion (React) composition's source to HyperFrames HTML. Use ONLY on an explicit ask to port/convert/migrate/translate a Remotion source — one-way, Remotion-only. A passing Remotion mention, reference-only code, or \"make something like my Remotion video\" is a fresh build (/general-video). Unclear → /hyperframes.",
     "stars": 36181,
-    "installs": 92153,
+    "installs": 92162,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -930,7 +930,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create, plan, or optimize a lead magnet for email capture or lead generation. Also use when the user mentions \"lead magnet,\" \"gated content,\" \"content upgrade,\" \"downloadable,\" \"ebook,\" \"cheat sheet,\" \"checklist,\" \"template download,\" \"opt-in,\" \"freebie,\" \"PDF download,\" \"resource library,\" \"content offer,\" \"email capture content,\" \"Notion template,\" \"spreadsheet template,\" or \"what should I give away for emails.\" Use this for planning what to create and how to distribute it. For interactive tools as lead magnets, see free-tools. For writing the actual content, see copywriting. For the email sequence after capture, see emails.",
     "stars": 42675,
-    "installs": 90323,
+    "installs": 90401,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -941,7 +941,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to conduct, analyze, or synthesize customer research. Use when the user mentions \"customer research,\" \"ICP research,\" \"talk to customers,\" \"analyze transcripts,\" \"customer interviews,\" \"survey analysis,\" \"support ticket analysis,\" \"voice of customer,\" \"VOC,\" \"build personas,\" \"customer personas,\" \"jobs to be done,\" \"JTBD,\" \"what do customers say,\" \"what are customers struggling with,\" \"Reddit mining,\" \"G2 reviews,\" \"review mining,\" \"digital watering holes,\" \"community research,\" \"forum research,\" \"competitor reviews,\" \"customer sentiment,\" or \"find out why customers churn/convert/buy.\" Use for both analyzing existing research assets AND gathering new research from online sources. For writing copy informed by research, see copywriting. For acting on research to improve pages, see cro.",
     "stars": 42675,
-    "installs": 88369,
+    "installs": 88518,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -952,7 +952,7 @@
     "authorHandle": "anthropics",
     "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.",
     "stars": 172724,
-    "installs": 86717,
+    "installs": 86782,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -962,8 +962,8 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 47779,
-    "installs": 83262,
+    "stars": 47792,
+    "installs": 83300,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
@@ -974,7 +974,7 @@
     "authorHandle": "anthropics",
     "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.",
     "stars": 172724,
-    "installs": 81917,
+    "installs": 81966,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -985,7 +985,7 @@
     "authorHandle": "firecrawl",
     "description": "Web search with full page content. Use when no URL is known: finding sources, articles, or news. For papers use firecrawl-research-index; for library, API, error, or bug questions use firecrawl-developer-index.",
     "stars": 614,
-    "installs": 81277,
+    "installs": 81288,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -996,7 +996,7 @@
     "authorHandle": "anthropics",
     "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
     "stars": 172724,
-    "installs": 81218,
+    "installs": 81276,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -1007,7 +1007,7 @@
     "authorHandle": "stripe",
     "description": "Guides Stripe integration decisions across API selection (Checkout Sessions vs PaymentIntents), Connect platform setup (Accounts v2, controller properties), billing/subscriptions, tax and registrations (Stripe Tax, automatic_tax, product tax codes), Treasury financial accounts, integration options (Checkout, Payment Element), migrating from deprecated Stripe APIs, and security best practices (API key management, restricted keys, webhooks, OAuth). Use when building, modifying, or reviewing any Stripe integration, including accepting payments, building marketplaces, integrating Stripe, processing payments, setting up subscriptions, collecting sales tax, VAT, or GST, creating connected accounts, or implementing secure key handling.",
     "stars": 1781,
-    "installs": 80967,
+    "installs": 81034,
     "githubUrl": "https://github.com/stripe/ai",
     "source": "skills.sh"
   },
@@ -1018,7 +1018,7 @@
     "authorHandle": "firecrawl",
     "description": "Extract a URL's content as clean markdown, including JS-rendered pages. Use whenever the user provides a URL and wants its content; prefer over WebFetch.",
     "stars": 614,
-    "installs": 80948,
+    "installs": 80958,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -1029,7 +1029,7 @@
     "authorHandle": "firecrawl",
     "description": "Bulk-extract many pages from one site or section. Use for \"crawl\", \"everything under /docs\", or content spanning linked pages.",
     "stars": 614,
-    "installs": 78834,
+    "installs": 78845,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -1040,7 +1040,7 @@
     "authorHandle": "firecrawl",
     "description": "Autonomous multi-page extraction into structured JSON. Use when the user wants website data matching a schema — pricing tiers, product listings — beyond a single-page scrape.",
     "stars": 614,
-    "installs": 78788,
+    "installs": 78798,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -1051,7 +1051,7 @@
     "authorHandle": "currents-dev",
     "description": "Use when writing Playwright tests, fixing flaky tests, debugging failures, implementing Page Object Model, configuring CI/CD, optimizing performance, mocking APIs, handling authentication or OAuth, testing accessibility (axe-core), file uploads/downloads, date/time mocking, WebSockets, geolocation, permissions, multi-tab/popup flows, mobile/responsive layouts, touch gestures, GraphQL, error handling, offline mode, multi-user collaboration, third-party services (payments, email verification), console error monitoring, global setup/teardown, test annotations (skip, fixme, slow), test tags (@smoke, @fast, @critical, filtering with --grep), project dependencies, security testing (XSS, CSRF, auth), performance budgets (Web Vitals, Lighthouse), iframes, component testing, canvas/WebGL, service workers/PWA, test coverage, i18n/localization, Electron apps, or browser extension testing. Covers E2E, component, API, visual, accessibility, security, Electron, and extension testing.",
     "stars": 368,
-    "installs": 78661,
+    "installs": 78729,
     "githubUrl": "https://github.com/currents-dev/playwright-best-practices-skill",
     "source": "skills.sh"
   },
@@ -1062,7 +1062,7 @@
     "authorHandle": "firecrawl",
     "description": "Discover and list a site's URLs, with search filtering. Use for \"map the site\" or \"find the URL for\" requests — when the user knows the site but not the exact page, or wants site structure.",
     "stars": 614,
-    "installs": 78413,
+    "installs": 78423,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -1073,7 +1073,7 @@
     "authorHandle": "anthropics",
     "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.",
     "stars": 172724,
-    "installs": 78215,
+    "installs": 78263,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -1084,7 +1084,7 @@
     "authorHandle": "firecrawl",
     "description": "Save a site or section as local files (markdown, screenshots). Use for \"download the site\", offline docs, or a local copy for reference.",
     "stars": 614,
-    "installs": 78102,
+    "installs": 78112,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -1095,7 +1095,7 @@
     "authorHandle": "nexscope-ai",
     "description": "Comprehensive product research and opportunity analysis for Amazon sellers. Analyzes demand, competition, profit potential, market entry barriers, and validates product ideas. Covers product sourcing, pricing strategy, and go-to-market planning. Use when the user asks about researching a product to sell, validating product ideas, product opportunity analysis, market research for Amazon, competition analysis, profit potential, should I sell this product, product viability, or any general product research questions.",
     "stars": 618,
-    "installs": 77675,
+    "installs": 77677,
     "githubUrl": "https://github.com/nexscope-ai/Amazon-Skills",
     "source": "skills.sh"
   },
@@ -1106,7 +1106,7 @@
     "authorHandle": "cloudflare",
     "description": "Comprehensive Cloudflare platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), feature flags (Flagship), networking (Tunnel, Spectrum), security (WAF, DDoS), and infrastructure-as-code (Terraform, Pulumi). Use for any Cloudflare development task. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 2747,
-    "installs": 76703,
+    "installs": 76900,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -1128,7 +1128,7 @@
     "authorHandle": "cloudflare",
     "description": "Cloudflare Workers CLI for deploying, developing, and managing Workers, KV, R2, D1, Vectorize, Hyperdrive, Workers AI, Containers, Queues, Workflows, Pipelines, and Secrets Store. Load before running wrangler commands to ensure correct syntax and best practices. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 2747,
-    "installs": 74386,
+    "installs": 74553,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -1139,7 +1139,7 @@
     "authorHandle": "heygen-com",
     "description": "CSS animation adapter patterns for HyperFrames. Use when authoring CSS keyframes, animation-delay based timing, animation-fill-mode, animation-play-state, or CSS-only motion that HyperFrames must seek deterministically during preview and rendering.",
     "stars": 15037,
-    "installs": 74132,
+    "installs": 74135,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -1150,7 +1150,7 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Send, read, and manage email.",
     "stars": 30125,
-    "installs": 74008,
+    "installs": 74029,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1161,7 +1161,7 @@
     "authorHandle": "kepano",
     "description": "Interact with Obsidian vaults using the Obsidian CLI to read, create, search, and manage notes, tasks, properties, and more. Also supports plugin and theme development with commands to reload plugins, run JavaScript, capture errors, take screenshots, and inspect the DOM. Use when the user asks to interact with their Obsidian vault, manage notes, search vault content, perform vault operations from the command line, or develop and debug Obsidian plugins and themes.",
     "stars": 43901,
-    "installs": 72856,
+    "installs": 72892,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
@@ -1172,7 +1172,7 @@
     "authorHandle": "heygen-com",
     "description": "Tailwind CSS v4.2 browser-runtime patterns for HyperFrames compositions. Use when scaffolding or editing projects created with `hyperframes init --tailwind`, writing Tailwind utility classes in composition HTML, adding CSS-first Tailwind v4 theme tokens, debugging v3 vs v4 syntax, or deciding when to compile Tailwind to CSS instead of using the browser runtime.",
     "stars": 15037,
-    "installs": 72303,
+    "installs": 72306,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -1183,7 +1183,7 @@
     "authorHandle": "intellectronica",
     "description": "This skill provides comprehensive instructions for interacting with the Notion API via REST calls. This skill should be used whenever the user asks to interact with Notion, including reading, creating, updating, or deleting pages, databases, blocks, comments, or any other Notion content. The skill covers authentication, all available endpoints, pagination, error handling, and best practices.",
     "stars": 257,
-    "installs": 71926,
+    "installs": 71969,
     "githubUrl": "https://github.com/intellectronica/agent-skills",
     "source": "skills.sh"
   },
@@ -1194,7 +1194,7 @@
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.",
     "stars": 43901,
-    "installs": 71834,
+    "installs": 71870,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
@@ -1205,7 +1205,7 @@
     "authorHandle": "heygen-com",
     "description": "Anime.js adapter patterns for HyperFrames. Use when writing Anime.js animations or timelines inside HyperFrames compositions, registering animations on window.__hfAnime, making Anime.js seek-driven and deterministic, or translating Anime.js examples into render-safe HyperFrames HTML.",
     "stars": 15037,
-    "installs": 71757,
+    "installs": 71761,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -1216,7 +1216,7 @@
     "authorHandle": "heygen-com",
     "description": "Three.js and WebGL adapter patterns for HyperFrames. Use when creating deterministic Three.js scenes, WebGL canvas layers, AnimationMixer timelines, camera motion, shader-driven visuals, or canvas renders that respond to HyperFrames hf-seek events.",
     "stars": 15037,
-    "installs": 71038,
+    "installs": 71041,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -1227,7 +1227,7 @@
     "authorHandle": "heygen-com",
     "description": "Lottie and dotLottie adapter patterns for HyperFrames. Use when embedding lottie-web JSON animations, .lottie files, @lottiefiles/dotlottie-web players, registering instances on window.__hfLottie, or making After Effects exports deterministic in HyperFrames.",
     "stars": 15037,
-    "installs": 70774,
+    "installs": 70777,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -1238,7 +1238,7 @@
     "authorHandle": "wshobson",
     "description": "Master TypeScript's advanced type system including generics, conditional types, mapped types, template literals, and utility types for building type-safe applications. Use when implementing complex type logic, creating reusable type utilities, or ensuring compile-time type safety in TypeScript projects.",
     "stars": 34867,
-    "installs": 70473,
+    "installs": 70532,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -1249,7 +1249,7 @@
     "authorHandle": "heygen-com",
     "description": "Web Animations API adapter patterns for HyperFrames. Use when authoring element.animate() motion, Animation currentTime seeking, document.getAnimations(), KeyframeEffect timing, fill modes, or native browser animations that must render deterministically in HyperFrames.",
     "stars": 15037,
-    "installs": 70400,
+    "installs": 70403,
     "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
@@ -1260,7 +1260,7 @@
     "authorHandle": "squirrelscan",
     "description": "Audit a website with the squirrelscan CLI and fix the findings in code. Runs SEO, performance, security, technical, content, accessibility, and 15 other rule categories (260+ rules), returns an LLM-optimized report, then drives an iterative fix loop, mapping issues to source files, applying fixes, and re-auditing until the site scores well. Use to discover and assess website or webapp issues and drive them to fixed.",
     "stars": 87,
-    "installs": 70179,
+    "installs": 70189,
     "githubUrl": "https://github.com/squirrelscan/skills",
     "source": "skills.sh"
   },
@@ -1271,7 +1271,7 @@
     "authorHandle": "anthropics",
     "description": "A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal communications (status reports, leadership updates, 3P updates, company newsletters, FAQs, incident reports, project updates, etc.).",
     "stars": 172724,
-    "installs": 70151,
+    "installs": 70188,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -1282,30 +1282,30 @@
     "authorHandle": "higgsfield-ai",
     "description": "Build, edit, and deploy full-stack websites, apps and games via the Higgsfield CLI (`higgsfield website …`). Each is a React 19 + TanStack Start SSR app in one Cloudflare Worker (D1/R2/KV/DO/Containers). THREE product types, picked via `--type` on create: `website` (standalone, no Higgsfield integration — references/website-flow.md), `app` (Sign in with Higgsfield + fnf SDK, Quanta — references/app-flow.md), `game` (realtime multiplayer rooms — references/game-flow.md). Routes to the right flow; each carries its own rules and deploy/publish gates. Use when: \"build me a website\", \"make a landing page\", \"create a web app\", \"build a SaaS dashboard / portfolio\", \"make me a game\", \"deploy this site\", \"publish\". Also owns GAME ART: \"make a spritesheet\", \"tileable texture\", \"animate a 3D character\", game music/SFX — see the game-* references. NOT for: single image/video/audio generation (higgsfield-generate), product photos (higgsfield-product-photoshoot), marketplace cards (higgsfield-marketplace-cards).",
     "stars": 670,
-    "installs": 69601,
+    "installs": 69837,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
   {
     "rank": 118,
-    "id": "googleworkspace/cli:gws-gmail-send",
-    "name": "gws-gmail-send",
-    "authorHandle": "googleworkspace",
-    "description": "Gmail: Send an email.",
-    "stars": 25810,
-    "installs": 68993,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 119,
     "id": "coreyhaines31/marketingskills:competitor-profiling",
     "name": "competitor-profiling",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to research, profile, or analyze competitors from their URLs. Also use when the user mentions 'competitor profile,' 'competitor research,' 'competitor analysis,' 'profile this competitor,' 'analyze competitor,' 'competitive intelligence,' 'competitor deep dive,' 'who are my competitors,' 'competitor landscape,' 'competitor dossier,' 'competitive audit,' or 'research these competitors.' Input is a list of competitor URLs. Output is structured competitor profile markdown files. For creating comparison/alternative pages from profiles, see competitors. For sales-specific battle cards, see sales-enablement.",
     "stars": 42675,
-    "installs": 68973,
+    "installs": 69120,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 119,
+    "id": "googleworkspace/cli:gws-gmail-send",
+    "name": "gws-gmail-send",
+    "authorHandle": "googleworkspace",
+    "description": "Gmail: Send an email.",
+    "stars": 25810,
+    "installs": 69012,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -1314,8 +1314,8 @@
     "name": "turborepo",
     "authorHandle": "vercel",
     "description": "Turborepo monorepo build system guidance. Triggers on: turbo.json, task pipelines, dependsOn, caching, remote cache, the \"turbo\" CLI, --filter, --affected, CI optimization, environment variables, internal packages, monorepo structure/best practices, and boundaries. Use when user: configures tasks/workflows/pipelines, creates packages, sets up monorepo, shares code between apps, runs changed/affected packages, debugs cache, or has apps/packages directories.",
-    "stars": 31047,
-    "installs": 67981,
+    "stars": 31051,
+    "installs": 68044,
     "githubUrl": "https://github.com/vercel/turborepo",
     "source": "skills.sh"
   },
@@ -1326,7 +1326,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, TikTok, Facebook, or other platforms. Also use when the user mentions 'LinkedIn post,' 'Twitter thread,' 'social media,' 'content calendar,' 'social scheduling,' 'engagement,' 'viral content,' 'what should I post,' 'repurpose this content,' 'tweet ideas,' 'LinkedIn carousel,' 'social media strategy,' 'grow my following,' 'TikTok video,' 'Reels,' 'Shorts,' 'video script,' 'video hook,' 'short-form video,' or 'create a reel.' Use this for social media content creation, repurposing, scheduling, and short-form video scripting. For broader content strategy, see content-strategy. For paid video ads, see ad-creative.",
     "stars": 25364,
-    "installs": 67736,
+    "installs": 67737,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -1337,7 +1337,7 @@
     "authorHandle": "cloudflare",
     "description": "Reviews and authors Cloudflare Workers code against production best practices. Load when writing new Workers, reviewing Worker code, configuring wrangler.jsonc, or checking for common Workers anti-patterns (streaming, floating promises, global state, secrets, bindings, observability). Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 2747,
-    "installs": 67316,
+    "installs": 67494,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -1348,7 +1348,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Drive: Manage files, folders, and shared drives.",
     "stars": 25810,
-    "installs": 67292,
+    "installs": 67312,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1359,7 +1359,7 @@
     "authorHandle": "kepano",
     "description": "Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps, flowcharts, or when the user mentions Canvas files in Obsidian.",
     "stars": 43901,
-    "installs": 67022,
+    "installs": 67056,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
@@ -1370,7 +1370,7 @@
     "authorHandle": "coreyhaines31",
     "description": "Build and leverage online communities to drive product growth and brand loyalty. Use when the user wants to create a community strategy, grow a Discord or Slack community, manage a forum or subreddit, build brand advocates, increase word-of-mouth, drive community-led growth, engage users post-signup, or turn customers into evangelists. Trigger phrases: \"build a community,\" \"community strategy,\" \"Discord community,\" \"Slack community,\" \"community-led growth,\" \"brand advocates,\" \"user community,\" \"forum strategy,\" \"community engagement,\" \"grow our community,\" \"ambassador program,\" \"community flywheel.\"",
     "stars": 42675,
-    "installs": 66515,
+    "installs": 66659,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -1381,7 +1381,7 @@
     "authorHandle": "kepano",
     "description": "Extract clean markdown content from web pages using Defuddle CLI, removing clutter and navigation to save tokens. Use instead of WebFetch when the user provides a URL to read or analyze, for online documentation, articles, blog posts, or any standard web page. Do NOT use for URLs ending in .md — those are already markdown, use WebFetch directly.",
     "stars": 44841,
-    "installs": 66392,
+    "installs": 66422,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
   },
@@ -1392,7 +1392,7 @@
     "authorHandle": "anthropics",
     "description": "Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use when users request animated GIFs for Slack like \"make me a GIF of X doing Y for Slack.\"",
     "stars": 172724,
-    "installs": 66194,
+    "installs": 66230,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -1403,7 +1403,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create, generate, or produce video content using AI tools or programmatic frameworks. Also use when the user mentions 'video production,' 'AI video,' 'Remotion,' 'Hyperframes,' 'HeyGen,' 'Synthesia,' 'Veo,' 'Sora,' 'Runway,' 'Kling,' 'Seedance,' 'Hailuo,' 'MiniMax,' 'Pika,' 'Hunyuan,' 'Wan,' 'video generation,' 'AI avatar,' 'talking head video,' 'programmatic video,' 'video template,' 'explainer video,' 'product demo video,' 'video pipeline,' 'copy this edit,' 'match this video style,' 'reverse-engineer this video,' 'edit like this reference,' or 'make me a video.' Use this for video creation, generation, and production workflows. For video content strategy and what to post, see social. For paid video ad creative, see ad-creative.",
     "stars": 44460,
-    "installs": 64480,
+    "installs": 64560,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -1414,7 +1414,7 @@
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to create, generate, edit, or optimize images for marketing — blog heroes, social graphics, product mockups, profile banners, listing visuals, or brand assets. Also use when the user mentions 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' 'social media graphic,' 'banner image,' 'cover photo,' 'profile banner,' 'listing screenshot,' 'Flux,' 'Flux Kontext,' 'Midjourney,' 'DALL-E,' 'GPT Image,' 'ChatGPT Images,' 'Ideogram,' 'Gemini image,' 'Nano Banana,' 'Recraft,' 'Stable Diffusion,' 'Canva,' 'Figma,' 'image optimization,' 'compress images,' 'WebP,' or 'OG image.' Use this for general-purpose marketing image creation and optimization. For paid ad image creative and platform-specific ad specs, see ad-creative. For video production, see video.",
     "stars": 42675,
-    "installs": 64402,
+    "installs": 64482,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   },
@@ -1425,7 +1425,7 @@
     "authorHandle": "stripe",
     "description": "Guide for upgrading Stripe API versions and SDKs",
     "stars": 1781,
-    "installs": 63892,
+    "installs": 63926,
     "githubUrl": "https://github.com/stripe/ai",
     "source": "skills.sh"
   },
@@ -1436,30 +1436,30 @@
     "authorHandle": "solana-foundation",
     "description": "Use when user asks to \"build a Solana dapp\", \"write an Anchor program\", \"create a token\", \"debug Solana errors\", \"set up wallet connection\", \"test my Solana program\", \"deploy to devnet\", or \"explain Solana concepts\" (rent, accounts, PDAs, CPIs, etc.). Also use for quick on-chain lookups via public RPC + curl — \"what's the balance of <wallet>\", \"look up transaction <sig>\", \"token balance for <account>\", \"check this address on mainnet/devnet\". End-to-end Solana development playbook covering wallet connection, Anchor/Pinocchio programs, Codama client generation, Surfpool/LiteSVM/Mollusk testing, security checklists, and JSON-RPC curl lookups against public clusters. Prefers @solana/kit v7 plugin clients (createClient + .use()), wallet connection via @solana/kit-plugin-wallet + @solana/react, web3.js v3 (Kit internals, RC) as the migration target for legacy codebases, and Surfpool for local networks and integration testing.",
     "stars": 545,
-    "installs": 63464,
+    "installs": 63799,
     "githubUrl": "https://github.com/solana-foundation/solana-dev-skill",
     "source": "skills.sh"
   },
   {
     "rank": 132,
-    "id": "firecrawl/cli:firecrawl-interact",
-    "name": "firecrawl-interact",
-    "authorHandle": "firecrawl",
-    "description": "Drive a live browser on a scraped page: click, fill forms, log in, paginate, infinite-scroll. Use when content requires interaction or a scrape failed or returned incomplete content.",
-    "stars": 614,
-    "installs": 63438,
-    "githubUrl": "https://github.com/firecrawl/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 133,
     "id": "coreyhaines31/marketingskills:directory-submissions",
     "name": "directory-submissions",
     "authorHandle": "coreyhaines31",
     "description": "When the user wants to submit their product to startup, SaaS, AI, agent, MCP, no-code, or review directories for backlinks, domain rating, and discovery. Also use when the user mentions \"directory submissions,\" \"submit to directories,\" \"backlinks from directories,\" \"list my product,\" \"submit to Product Hunt,\" \"BetaList,\" \"TAAFT,\" \"Futurepedia,\" \"G2 listing,\" \"Capterra listing,\" \"AlternativeTo,\" \"SaaSHub,\" \"AI directories,\" \"MCP registry,\" \"agent directory,\" \"dofollow backlinks,\" \"launch directories,\" or \"directory tracker.\" Use this whenever someone is planning the directory layer of a product launch or an ongoing backlink campaign. For the broader launch moment, see launch. For programmatic SEO pages that should live behind these backlinks, see programmatic-seo. For AI citation optimization, see ai-seo.",
     "stars": 42675,
-    "installs": 63429,
+    "installs": 63503,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 133,
+    "id": "firecrawl/cli:firecrawl-interact",
+    "name": "firecrawl-interact",
+    "authorHandle": "firecrawl",
+    "description": "Drive a live browser on a scraped page: click, fill forms, log in, paginate, infinite-scroll. Use when content requires interaction or a scrape failed or returned incomplete content.",
+    "stars": 614,
+    "installs": 63446,
+    "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
   {
@@ -1469,7 +1469,7 @@
     "authorHandle": "anthropics",
     "description": "Replace with description of the skill and when Claude should use it.",
     "stars": 172724,
-    "installs": 63148,
+    "installs": 63181,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
   },
@@ -1486,24 +1486,24 @@
   },
   {
     "rank": 136,
-    "id": "nexscope-ai/ecommerce-skills:cross-border-ecommerce",
-    "name": "cross-border-ecommerce",
-    "authorHandle": "nexscope-ai",
-    "description": "Cross-border e-commerce expansion advisor. Scores target markets on 8 weighted dimensions (market size, ecommerce penetration, competition, regulatory complexity, logistics infrastructure, payment ecosystem, cultural distance, IP protection), compares 5 fulfillment models with cost and transit data, provides country-by-country tax/duty compliance guides (EU VAT/IOSS, UK VAT, US sales tax, CA GST, AU GST, JP consumption tax), maps local payment preferences by market, and builds a phased expansion roadmap. No API key required.",
-    "stars": 826,
-    "installs": 62391,
-    "githubUrl": "https://github.com/nexscope-ai/eCommerce-Skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 137,
     "id": "anthropics/skills:claude-api",
     "name": "claude-api",
     "authorHandle": "anthropics",
     "description": "Reference for the Claude API / Anthropic SDK — model ids, pricing, params, streaming, tool use, MCP, agents, caching, token counting, model migration. TRIGGER — read BEFORE opening the target file; don't skip because it \"looks like a one-liner\" — whenever: the prompt names Claude/Anthropic in any form (Claude, Anthropic, Fable, Opus, Sonnet, Haiku, `anthropic`, `@anthropic-ai`, `claude-*`, `us.anthropic.*`, `[1m]`); the user asks about an LLM (pricing/model choice/limits/caching) — never answer from memory; OR the task is LLM-shaped with provider unstated (agent/MCP/tool-definition/multi-agent/RAG/LLM-judge/computer-use; generate/summarize/extract/classify/rewrite/converse over NL; debugging refusals/cutoffs/streaming/tool-calls/tokens). SKIP only when another provider is being worked on (overrides all triggers): OpenAI/GPT/Gemini/Llama/Mistral/Cohere/Ollama named in the query; OR `grep -rE 'openai|langchain_openai|google.generativeai|genai|mistralai|cohere|ollama'` over the project hits (run this grep FIRST if no provider named — don't Read the file).",
     "stars": 172724,
-    "installs": 62344,
+    "installs": 62402,
     "githubUrl": "https://github.com/anthropics/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 137,
+    "id": "nexscope-ai/ecommerce-skills:cross-border-ecommerce",
+    "name": "cross-border-ecommerce",
+    "authorHandle": "nexscope-ai",
+    "description": "Cross-border e-commerce expansion advisor. Scores target markets on 8 weighted dimensions (market size, ecommerce penetration, competition, regulatory complexity, logistics infrastructure, payment ecosystem, cultural distance, IP protection), compares 5 fulfillment models with cost and transit data, provides country-by-country tax/duty compliance guides (EU VAT/IOSS, UK VAT, US sales tax, CA GST, AU GST, JP consumption tax), maps local payment preferences by market, and builds a phased expansion roadmap. No API key required.",
+    "stars": 826,
+    "installs": 62394,
+    "githubUrl": "https://github.com/nexscope-ai/eCommerce-Skills",
     "source": "skills.sh"
   },
   {
@@ -1513,7 +1513,7 @@
     "authorHandle": "wshobson",
     "description": "Build scalable design systems with Tailwind CSS v4, design tokens, component libraries, and responsive patterns. Use when creating component libraries, implementing design systems, or standardizing UI patterns.",
     "stars": 34867,
-    "installs": 62269,
+    "installs": 62312,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
@@ -1557,7 +1557,7 @@
     "authorHandle": "cloudflare",
     "description": "Analyzes web performance using Chrome DevTools MCP. Measures Core Web Vitals (LCP, INP, CLS) and supplementary metrics (FCP, TBT, Speed Index), identifies render-blocking resources, network dependency chains, layout shifts, caching issues, and accessibility gaps. Use when asked to audit, profile, debug, or optimize page load performance, Lighthouse scores, or site speed. Biases towards retrieval from current documentation over pre-trained knowledge.",
     "stars": 2747,
-    "installs": 61276,
+    "installs": 61435,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -1568,7 +1568,7 @@
     "authorHandle": "stripe",
     "description": "Use when the user wants to provision infrastructure or third-party services using Stripe Projects. Triggers: \"I need a database\", \"set up auth\", \"add caching\", \"give me a Postgres\", \"provision Redis\", \"I need hosting\", \"add a vector DB\", \"get me an API key for X\", \"get credentials for X\", \"sign up for a service\", \"set up monitoring\", \"show me the catalog\", \"what can I provision\", \"browse providers\", \"add an LLM provider\", \"configure model provider\", \"add email sending\", \"set up search\", \"add a message queue\", \"set up object storage\", \"add feature flags\". Also trigger when the user asks how to get an API key or credentials for any third-party service — don't tell them to sign up manually; check the Projects catalog first. Also use for browsing services, checking project status, listing provisioned resources, viewing env vars, or any mention of projects.dev or adding/provisioning/connecting a cloud service.",
     "stars": 1781,
-    "installs": 61237,
+    "installs": 61273,
     "githubUrl": "https://github.com/stripe/ai",
     "source": "skills.sh"
   },
@@ -1579,7 +1579,7 @@
     "authorHandle": "cloudflare",
     "description": "Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing RPC methods, SQLite storage, alarms, WebSockets, or reviewing DO code for best practices. Covers Workers integration, wrangler config, and testing with Vitest. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 2747,
-    "installs": 60935,
+    "installs": 61104,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -1590,7 +1590,7 @@
     "authorHandle": "google-labs-code",
     "description": "Analyze Stitch projects and synthesize a semantic design system into DESIGN.md files",
     "stars": 7870,
-    "installs": 60657,
+    "installs": 60676,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -1601,7 +1601,7 @@
     "authorHandle": "firecrawl",
     "description": "Integrate Firecrawl `/scrape` into product code for single-page extraction. Use when an app already has a URL and needs markdown, HTML, links, screenshots, metadata, or structured page output. Prefer this skill over broader crawl patterns when the feature is page-level.",
     "stars": 97,
-    "installs": 59624,
+    "installs": 59636,
     "githubUrl": "https://github.com/firecrawl/skills",
     "source": "skills.sh"
   },
@@ -1612,7 +1612,7 @@
     "authorHandle": "firecrawl",
     "description": "Integrate Firecrawl `/search` into product code and agent workflows. Use when an app needs discovery before extraction, when the feature starts with a query instead of a URL, or when the system should search the web and optionally hydrate result content.",
     "stars": 97,
-    "installs": 59561,
+    "installs": 59572,
     "githubUrl": "https://github.com/firecrawl/skills",
     "source": "skills.sh"
   },
@@ -1623,7 +1623,7 @@
     "authorHandle": "firecrawl",
     "description": "Integrate Firecrawl `/interact` into product code for dynamic pages and browser actions after scraping. Use when a feature needs clicks, form fills, pagination, authentication-aware flows, or other multi-step interactions that plain `/scrape` cannot complete.",
     "stars": 97,
-    "installs": 59250,
+    "installs": 59261,
     "githubUrl": "https://github.com/firecrawl/skills",
     "source": "skills.sh"
   },
@@ -1634,7 +1634,7 @@
     "authorHandle": "firecrawl",
     "description": "Get Firecrawl credentials and SDK setup into a project. Use when an application needs `FIRECRAWL_API_KEY`, when an agent should add Firecrawl to `.env`, when the user wants to authenticate Firecrawl for app code, or when choosing the first SDK and docs for a new Firecrawl integration. This skill includes its own browser auth flow, so it does not depend on the website onboarding skill.",
     "stars": 97,
-    "installs": 59157,
+    "installs": 59168,
     "githubUrl": "https://github.com/firecrawl/skills",
     "source": "skills.sh"
   },
@@ -1656,7 +1656,7 @@
     "authorHandle": "cloudflare",
     "description": "Build AI agents on Cloudflare Workers using the Agents SDK. Load when creating stateful agents, durable workflows, real-time WebSocket apps, scheduled tasks, MCP servers, chat applications, voice agents, or browser automation. Covers Agent class, state management, callable RPC, Workflows, durable execution, queues, retries, observability, and React hooks. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
     "stars": 2747,
-    "installs": 58754,
+    "installs": 58921,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -1667,12 +1667,23 @@
     "authorHandle": "googleworkspace",
     "description": "gws CLI: Shared patterns for authentication, global flags, and output formatting.",
     "stars": 25810,
-    "installs": 58721,
+    "installs": 58741,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 153,
+    "id": "higgsfield-ai/skills:higgsfield-video-explainer",
+    "name": "higgsfield-video-explainer",
+    "authorHandle": "higgsfield-ai",
+    "description": "Build a complete non-photoreal narrated explainer or story video from ordered 10-second blocks: one narrator, one universal style key, one Seed Audio take and one Gemini Omni clip per block, then server-side assembly with explainer_video. Use when: \"make an explainer video\", \"explain this in a video\", \"turn this topic or document into a narrated video\", \"tell this story as an animated video\", \"make a faceless narrated video\", or \"show me explainer styles\". Supports live CMS presets, custom style references, mascot/faceless modes, two aspects, and optional burned subtitles. NOT for: photoreal films, ads/UGC, talking heads, podcasts, motion typography reels, one-off clips without narration, or editing a finished video.",
+    "stars": 670,
+    "installs": 58144,
+    "githubUrl": "https://github.com/higgsfield-ai/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 154,
     "id": "coreyhaines31/marketingskills:page-cro",
     "name": "page-cro",
     "authorHandle": "coreyhaines31",
@@ -1683,24 +1694,13 @@
     "source": "skills.sh"
   },
   {
-    "rank": 154,
-    "id": "higgsfield-ai/skills:higgsfield-video-explainer",
-    "name": "higgsfield-video-explainer",
-    "authorHandle": "higgsfield-ai",
-    "description": "Build a complete non-photoreal narrated explainer or story video from ordered 10-second blocks: one narrator, one universal style key, one Seed Audio take and one Gemini Omni clip per block, then server-side assembly with explainer_video. Use when: \"make an explainer video\", \"explain this in a video\", \"turn this topic or document into a narrated video\", \"tell this story as an animated video\", \"make a faceless narrated video\", or \"show me explainer styles\". Supports live CMS presets, custom style references, mascot/faceless modes, two aspects, and optional burned subtitles. NOT for: photoreal films, ads/UGC, talking heads, podcasts, motion typography reels, one-off clips without narration, or editing a finished video.",
-    "stars": 670,
-    "installs": 57913,
-    "githubUrl": "https://github.com/higgsfield-ai/skills",
-    "source": "skills.sh"
-  },
-  {
     "rank": 155,
     "id": "anthropics/claude-code:frontend-design",
     "name": "frontend-design",
     "authorHandle": "anthropics",
     "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.",
     "stars": 120905,
-    "installs": 57425,
+    "installs": 57452,
     "githubUrl": "https://github.com/anthropics/claude-code",
     "source": "skills.sh"
   },
@@ -1711,7 +1711,7 @@
     "authorHandle": "genkit-ai",
     "description": "Develop AI-powered applications using Genkit in Node.js/TypeScript. Use when the user asks about Genkit, AI agents, flows, or tools in JavaScript/TypeScript, or when encountering Genkit errors, validation issues, type errors, or API problems.",
     "stars": 12,
-    "installs": 56550,
+    "installs": 56568,
     "githubUrl": "https://github.com/genkit-ai/skills",
     "source": "skills.sh"
   },
@@ -1744,7 +1744,7 @@
     "authorHandle": "msmps",
     "description": "OpenTUI skill for building terminal user interfaces with the Core, React, or Solid APIs. Use for any TUI task including components, layout, keyboard and keymap handling, animations, and testing.",
     "stars": 224,
-    "installs": 55255,
+    "installs": 55256,
     "githubUrl": "https://github.com/msmps/opentui-skill",
     "source": "skills.sh"
   },
@@ -1755,7 +1755,7 @@
     "authorHandle": "expo",
     "description": "Framework (OSS). Build and distribute Expo development clients locally or via TestFlight for internal testing. For production TestFlight releases and store submission, use the eas-app-stores skill.",
     "stars": 2348,
-    "installs": 55141,
+    "installs": 55202,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -1766,30 +1766,30 @@
     "authorHandle": "google-labs-code",
     "description": "Transforms vague UI ideas into polished, Stitch-optimized prompts. Enhances specificity, adds UI/UX keywords, injects design system context, and structures output for better generation results.",
     "stars": 7889,
-    "installs": 54978,
+    "installs": 54994,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
   {
     "rank": 162,
-    "id": "googleworkspace/cli:gws-calendar",
-    "name": "gws-calendar",
-    "authorHandle": "googleworkspace",
-    "description": "Google Calendar: Manage calendars and events.",
-    "stars": 30146,
-    "installs": 54452,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 163,
     "id": "cloudflare/skills:cloudflare-email-service",
     "name": "cloudflare-email-service",
     "authorHandle": "cloudflare",
     "description": "Send and receive transactional emails with Cloudflare Email Service (Email Sending + Email Routing). Use when building email sending (Workers binding or REST API), email routing, Agents SDK email handling, or integrating email into any app — Workers, Node.js, Python, Go, etc. Also use for email deliverability, SPF/DKIM/DMARC, wrangler email setup, MCP email tools, or when a coding agent needs to send emails. Even for simple requests like \"add email to my Worker\" — this skill has critical config details.",
     "stars": 2747,
-    "installs": 54339,
+    "installs": 54515,
     "githubUrl": "https://github.com/cloudflare/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 163,
+    "id": "googleworkspace/cli:gws-calendar",
+    "name": "gws-calendar",
+    "authorHandle": "googleworkspace",
+    "description": "Google Calendar: Manage calendars and events.",
+    "stars": 30146,
+    "installs": 54472,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -1810,7 +1810,7 @@
     "authorHandle": "expo",
     "description": "Set up Tailwind CSS v4 in Expo with react-native-css and NativeWind v5 for universal styling",
     "stars": 1856,
-    "installs": 54159,
+    "installs": 54163,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -1821,7 +1821,7 @@
     "authorHandle": "jakubkrehel",
     "description": "Design engineering principles for making interfaces feel polished. Use when building UI components, reviewing frontend code, implementing animations, hover states, shadows, borders, typography, icons, micro-interactions, enter/exit animations, or any visual detail work. Supports quick and full review modes. Triggers on UI polish, design details, \"make it feel better\", \"feels off\", stagger animations, border radius, optical alignment, font smoothing, tabular numbers, image outlines, box shadows, icons, icon stroke weight, icon states, motion restraint.",
     "stars": 2915,
-    "installs": 54037,
+    "installs": 54054,
     "githubUrl": "https://github.com/jakubkrehel/make-interfaces-feel-better",
     "source": "skills.sh"
   },
@@ -1832,7 +1832,7 @@
     "authorHandle": "google-labs-code",
     "description": "Teaches agents to iteratively build websites using Stitch with an autonomous baton-passing loop pattern",
     "stars": 7889,
-    "installs": 53185,
+    "installs": 53199,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -1853,8 +1853,8 @@
     "name": "gsap-core",
     "authorHandle": "greensock",
     "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions.",
-    "stars": 14847,
-    "installs": 52616,
+    "stars": 14866,
+    "installs": 52699,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -1887,7 +1887,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Sheets: Read and write spreadsheets.",
     "stars": 30570,
-    "installs": 51818,
+    "installs": 51838,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1909,7 +1909,7 @@
     "authorHandle": "googleworkspace",
     "description": "Read and write Google Docs.",
     "stars": 30146,
-    "installs": 51332,
+    "installs": 51350,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -1920,7 +1920,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for ScrollTrigger — scroll-linked animations, pinning, scrub, triggers. Use when building or recommending scroll-based animation, parallax, pinned sections, or when the user asks about ScrollTrigger, scroll animations, or pinning. Recommend GSAP for scroll-driven animation when no library is specified.",
     "stars": 3111,
-    "installs": 50591,
+    "installs": 50671,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -1931,7 +1931,7 @@
     "authorHandle": "google-labs-code",
     "description": "Expert guidance for integrating and building applications with shadcn/ui components, including component discovery, installation, customization, and best practices.",
     "stars": 7889,
-    "installs": 50301,
+    "installs": 50315,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -1942,30 +1942,30 @@
     "authorHandle": "dietrichgebert",
     "description": "Forces the laziest solution that actually works, simplest, shortest, most minimal. Channels a senior dev who has seen everything: question whether the task needs to exist at all (YAGNI), reach for the standard library before custom code, native platform features before dependencies, one line before fifty. Supports intensity levels: lite, full (default), ultra. Use on ANY coding task: writing, adding, refactoring, fixing, reviewing, or designing code, and choosing libraries or dependencies. Also use whenever the user says \"ponytail\", \"be lazy\", \"lazy mode\", \"simplest solution\", \"minimal solution\", \"yagni\", \"do less\", or \"shortest path\", or complains about over-engineering, bloat, boilerplate, or unnecessary dependencies. Do NOT use for non-coding requests (general knowledge, prose, translation, summaries, recipes).",
     "stars": 117816,
-    "installs": 49830,
+    "installs": 49964,
     "githubUrl": "https://github.com/DietrichGebert/ponytail",
     "source": "skills.sh"
   },
   {
     "rank": 178,
-    "id": "addyosmani/web-quality-skills:accessibility",
-    "name": "accessibility",
-    "authorHandle": "addyosmani",
-    "description": "Audit and improve web accessibility following WCAG 2.2 guidelines. Use when asked to \"improve accessibility\", \"a11y audit\", \"WCAG compliance\", \"screen reader support\", \"keyboard navigation\", or \"make accessible\".",
-    "stars": 2723,
-    "installs": 49767,
-    "githubUrl": "https://github.com/addyosmani/web-quality-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 179,
     "id": "nutlope/hallmark:hallmark",
     "name": "hallmark",
     "authorHandle": "nutlope",
     "description": "Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots. Use when the user asks to build a new app or landing page, wants to redesign something, invokes Hallmark by name, or uses audit/redesign/study.",
     "stars": 27594,
-    "installs": 49746,
+    "installs": 49828,
     "githubUrl": "https://github.com/Nutlope/hallmark",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 179,
+    "id": "addyosmani/web-quality-skills:accessibility",
+    "name": "accessibility",
+    "authorHandle": "addyosmani",
+    "description": "Audit and improve web accessibility following WCAG 2.2 guidelines. Use when asked to \"improve accessibility\", \"a11y audit\", \"WCAG compliance\", \"screen reader support\", \"keyboard navigation\", or \"make accessible\".",
+    "stars": 2723,
+    "installs": 49827,
+    "githubUrl": "https://github.com/addyosmani/web-quality-skills",
     "source": "skills.sh"
   },
   {
@@ -1986,7 +1986,7 @@
     "authorHandle": "firecrawl",
     "description": "Convert a local file (PDF, DOCX, XLSX, HTML, …) to markdown, or answer questions about its content. Use whenever the input is a file path, not a URL.",
     "stars": 614,
-    "installs": 49379,
+    "installs": 49387,
     "githubUrl": "https://github.com/firecrawl/cli",
     "source": "skills.sh"
   },
@@ -1997,7 +1997,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for performance — prefer transforms, avoid layout thrashing, will-change, batching. Use when optimizing GSAP animations, reducing jank, or when the user asks about animation performance, FPS, or smooth 60fps.",
     "stars": 3111,
-    "installs": 48730,
+    "installs": 48805,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -2008,7 +2008,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for timelines — gsap.timeline(), position parameter, nesting, playback. Use when sequencing animations, choreographing keyframes, or when the user asks about animation sequencing, timelines, or animation order (in GSAP or when recommending a library that supports timelines).",
     "stars": 3111,
-    "installs": 48519,
+    "installs": 48596,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -2019,7 +2019,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for GSAP plugins — registration, ScrollToPlugin, ScrollSmoother, Flip, Draggable, Inertia, Observer, SplitText, ScrambleText, SVG and physics plugins, CustomEase, EasePack, CustomWiggle, CustomBounce, GSDevTools. Use when the user asks about a GSAP plugin, scroll-to, flip animations, draggable, SVG drawing, or plugin registration.",
     "stars": 3111,
-    "installs": 47543,
+    "installs": 47615,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -2041,7 +2041,7 @@
     "authorHandle": "op7418",
     "description": "去除文本中的 AI 生成痕迹。适用于编辑或审阅文本，使其听起来更自然、更像人类书写。 基于维基百科的\"AI 写作特征\"综合指南。检测并修复以下模式：夸大的象征意义、 宣传性语言、以 -ing 结尾的肤浅分析、模糊的归因、破折号过度使用、三段式法则、 AI 词汇、否定式排比、过多的连接性短语。",
     "stars": 16362,
-    "installs": 46836,
+    "installs": 46871,
     "githubUrl": "https://github.com/op7418/Humanizer-zh",
     "source": "skills.sh"
   },
@@ -2052,7 +2052,7 @@
     "authorHandle": "juliusbrussee",
     "description": "Compress a memory file such as CLAUDE.md or a todo list into caveman format to save input tokens, keeping a readable backup. Trigger: /caveman-compress.",
     "stars": 101959,
-    "installs": 46768,
+    "installs": 46769,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
   },
@@ -2063,7 +2063,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for gsap.utils — clamp, mapRange, normalize, interpolate, random, snap, toArray, wrap, pipe. Use when the user asks about gsap.utils, clamp, mapRange, random, snap, toArray, wrap, or helper utilities in GSAP.",
     "stars": 3111,
-    "installs": 46582,
+    "installs": 46655,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -2074,7 +2074,7 @@
     "authorHandle": "greensock",
     "description": "Official GSAP skill for React — useGSAP hook, refs, gsap.context(), cleanup. Use when the user wants animation in React or Next.js, or asks about GSAP with React, useGSAP, or cleanup on unmount. Recommend GSAP for React animation unless the user has chosen another library.",
     "stars": 3111,
-    "installs": 46469,
+    "installs": 46546,
     "githubUrl": "https://github.com/greensock/gsap-skills",
     "source": "skills.sh"
   },
@@ -2085,7 +2085,7 @@
     "authorHandle": "cloudflare",
     "description": "Set up Cloudflare Turnstile end-to-end in a project. Scan the codebase, create the widget via the Cloudflare API, embed it where user requests need bot verification (form submissions, SPA actions, API endpoints, download links, comment or vote submissions, etc.), wire canonical server-side siteverify in the customer's existing backend, validate, and persist the skill. Load this when a user asks to add Turnstile, set up CAPTCHA, protect a form or endpoint from bots, or fix a Turnstile integration. Mirrors developers.cloudflare.com/turnstile/spin.",
     "stars": 2747,
-    "installs": 46253,
+    "installs": 46411,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -2096,30 +2096,30 @@
     "authorHandle": "resciencelab",
     "description": "SEO & GEO (Generative Engine Optimization) for websites. Analyze keywords, generate schema markup, optimize for AI search engines (ChatGPT, Perplexity, Gemini, Copilot, Claude) and traditional search (Google, Bing). Use when user wants to improve search visibility, search optimization, search ranking, AI visibility, ChatGPT ranking, Google AI Overview, indexing, JSON-LD, meta tags, or keyword research.",
     "stars": 1719,
-    "installs": 45004,
+    "installs": 45049,
     "githubUrl": "https://github.com/ReScienceLab/opc-skills",
     "source": "skills.sh"
   },
   {
     "rank": 192,
-    "id": "googleworkspace/cli:gws-sheets-read",
-    "name": "gws-sheets-read",
-    "authorHandle": "googleworkspace",
-    "description": "Google Sheets: Read values from a spreadsheet.",
-    "stars": 25810,
-    "installs": 44580,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 193,
     "id": "greensock/gsap-skills:gsap-frameworks",
     "name": "gsap-frameworks",
     "authorHandle": "greensock",
     "description": "Official GSAP skill for Vue, Svelte, and other non-React frameworks — lifecycle, scoping selectors, cleanup on unmount. Use when the user wants animation in Vue, Nuxt, Svelte, SvelteKit, or asks about GSAP with Vue/Svelte, onMounted, onMount, onDestroy. Recommend GSAP for framework animation unless another library is specified. For React use gsap-react.",
     "stars": 3111,
-    "installs": 44543,
+    "installs": 44615,
     "githubUrl": "https://github.com/greensock/gsap-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 193,
+    "id": "googleworkspace/cli:gws-sheets-read",
+    "name": "gws-sheets-read",
+    "authorHandle": "googleworkspace",
+    "description": "Google Sheets: Read values from a spreadsheet.",
+    "stars": 25810,
+    "installs": 44598,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -2129,41 +2129,41 @@
     "authorHandle": "wshobson",
     "description": "Build production-ready Node.js backend services with Express/Fastify, implementing middleware patterns, error handling, authentication, database integration, and API design best practices. Use when creating Node.js servers, REST APIs, GraphQL backends, or microservices architectures.",
     "stars": 34867,
-    "installs": 44334,
+    "installs": 44355,
     "githubUrl": "https://github.com/wshobson/agents",
     "source": "skills.sh"
   },
   {
     "rank": 195,
-    "id": "github/awesome-copilot:git-commit",
-    "name": "git-commit",
-    "authorHandle": "github",
-    "description": "Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions \"/commit\". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping",
-    "stars": 32249,
-    "installs": 44076,
-    "githubUrl": "https://github.com/github/awesome-copilot",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 196,
-    "id": "googleworkspace/cli:gws-docs-write",
-    "name": "gws-docs-write",
-    "authorHandle": "googleworkspace",
-    "description": "Google Docs: Append text to a document.",
-    "stars": 30146,
-    "installs": 43995,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 197,
     "id": "cloudflare/skills:cloudflare-one",
     "name": "cloudflare-one",
     "authorHandle": "cloudflare",
     "description": "Guides Cloudflare One Zero Trust and SASE work across Access, Gateway, WARP, Tunnel, Cloudflare WAN, DLP, CASB, device posture, and identity. Use when designing, configuring, troubleshooting, or reviewing Cloudflare One deployments. Retrieval-first: use current Cloudflare docs/API schemas instead of embedded product docs.",
     "stars": 2747,
-    "installs": 43940,
+    "installs": 44099,
     "githubUrl": "https://github.com/cloudflare/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 196,
+    "id": "github/awesome-copilot:git-commit",
+    "name": "git-commit",
+    "authorHandle": "github",
+    "description": "Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions \"/commit\". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping",
+    "stars": 32249,
+    "installs": 44094,
+    "githubUrl": "https://github.com/github/awesome-copilot",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 197,
+    "id": "googleworkspace/cli:gws-docs-write",
+    "name": "gws-docs-write",
+    "authorHandle": "googleworkspace",
+    "description": "Google Docs: Append text to a document.",
+    "stars": 30146,
+    "installs": 44012,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -2173,19 +2173,19 @@
     "authorHandle": "googleworkspace",
     "description": "Google Calendar: Show upcoming events across all calendars.",
     "stars": 30146,
-    "installs": 43686,
+    "installs": 43704,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
     "rank": 199,
-    "id": "googleworkspace/cli:gws-drive-upload",
-    "name": "gws-drive-upload",
-    "authorHandle": "googleworkspace",
-    "description": "Google Drive: Upload a file with automatic metadata.",
-    "stars": 25810,
-    "installs": 43337,
-    "githubUrl": "https://github.com/googleworkspace/cli",
+    "id": "tt-a1i/archify:archify",
+    "name": "archify",
+    "authorHandle": "tt-a1i",
+    "description": "Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.",
+    "stars": 43143,
+    "installs": 43563,
+    "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
   },
   {
@@ -2195,41 +2195,41 @@
     "authorHandle": "cloudflare",
     "description": "Plans migrations from Zscaler ZIA/ZPA, Palo Alto, legacy VPN, SWG, or SASE stacks to Cloudflare One. Use for migration assessments, policy mapping, rollout plans, and parity/gap analysis.",
     "stars": 2747,
-    "installs": 43317,
+    "installs": 43474,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
   {
     "rank": 201,
+    "id": "googleworkspace/cli:gws-drive-upload",
+    "name": "gws-drive-upload",
+    "authorHandle": "googleworkspace",
+    "description": "Google Drive: Upload a file with automatic metadata.",
+    "stars": 25810,
+    "installs": 43354,
+    "githubUrl": "https://github.com/googleworkspace/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 202,
     "id": "addyosmani/web-quality-skills:seo",
     "name": "seo",
     "authorHandle": "addyosmani",
     "description": "Optimize for search engine visibility and ranking. Use when asked to \"improve SEO\", \"optimize for search\", \"fix meta tags\", \"add structured data\", \"sitemap optimization\", or \"search engine optimization\".",
     "stars": 1864,
-    "installs": 43235,
+    "installs": 43277,
     "githubUrl": "https://github.com/addyosmani/web-quality-skills",
     "source": "skills.sh"
   },
   {
-    "rank": 202,
+    "rank": 203,
     "id": "expo/skills:upgrading-expo",
     "name": "upgrading-expo",
     "authorHandle": "expo",
     "description": "Guidelines for upgrading Expo SDK versions and fixing dependency issues",
     "stars": 1856,
-    "installs": 43023,
+    "installs": 43024,
     "githubUrl": "https://github.com/expo/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 203,
-    "id": "tt-a1i/archify:archify",
-    "name": "archify",
-    "authorHandle": "tt-a1i",
-    "description": "Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.",
-    "stars": 43143,
-    "installs": 42914,
-    "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
   },
   {
@@ -2239,30 +2239,30 @@
     "authorHandle": "spillwavesolutions",
     "description": "Create Mermaid diagrams (flowchart, sequence, class, ER, state, C4, architecture) from text or source code. Default for GitHub wiki. Use when asked to create a diagram, generate mermaid, document architecture, or convert code to diagram. PlantUML is only for leftover types. Confluence needs PNG/SVG as well as the fence.",
     "stars": 159,
-    "installs": 42714,
+    "installs": 42898,
     "githubUrl": "https://github.com/SpillwaveSolutions/design-doc-mermaid",
     "source": "skills.sh"
   },
   {
     "rank": 205,
-    "id": "googleworkspace/cli:gws-calendar-insert",
-    "name": "gws-calendar-insert",
-    "authorHandle": "googleworkspace",
-    "description": "Google Calendar: Create a new event.",
-    "stars": 30146,
-    "installs": 42572,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 206,
     "id": "shadcn-ui/ui:shadcn",
     "name": "shadcn",
     "authorHandle": "shadcn-ui",
     "description": "Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI, including chat interfaces. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for \"shadcn init\", \"create an app with --preset\", or \"switch to --preset\".",
     "stars": 122629,
-    "installs": 42435,
+    "installs": 42720,
     "githubUrl": "https://github.com/shadcn-ui/ui",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 206,
+    "id": "googleworkspace/cli:gws-calendar-insert",
+    "name": "gws-calendar-insert",
+    "authorHandle": "googleworkspace",
+    "description": "Google Calendar: Create a new event.",
+    "stars": 30146,
+    "installs": 42589,
+    "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
   {
@@ -2272,7 +2272,7 @@
     "authorHandle": "othmanadi",
     "description": "Persistent file-based planning for multi-step AI-agent work. Keeps task_plan.md, findings.md, and progress.md on disk; lifecycle hooks inject selected project planning context. Automatic recovery reads project planning files only. Explicit session-catchup.py --metadata reads same-project local agent session records and emits aggregate counts only; --replay may emit bounded nonce-framed excerpts. Optional gated mode can request continuation only when the host supports it and never runs commands declared in Markdown. The skill has no network upload path. Use for research or work needing 5+ tool calls.",
     "stars": 26606,
-    "installs": 42286,
+    "installs": 42317,
     "githubUrl": "https://github.com/OthmanAdi/planning-with-files",
     "source": "skills.sh"
   },
@@ -2283,7 +2283,7 @@
     "authorHandle": "mastra-ai",
     "description": "Comprehensive Mastra framework guide for building agents, workflows, tools, memory, workspaces, and storage with current APIs. Use for documentation lookup, API verification, TypeScript setup, common errors, migrations, and `mastra api` CLI tasks: inspect or call resources on local, Mastra platform, Trace Intelligence, or remote servers.",
     "stars": 75,
-    "installs": 41590,
+    "installs": 41800,
     "githubUrl": "https://github.com/mastra-ai/skills",
     "source": "skills.sh"
   },
@@ -2305,7 +2305,7 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Show unread inbox summary (sender, subject, date).",
     "stars": 25810,
-    "installs": 40899,
+    "installs": 40919,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2316,7 +2316,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Sheets: Append a row to a spreadsheet.",
     "stars": 25810,
-    "installs": 40711,
+    "installs": 40728,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2327,7 +2327,7 @@
     "authorHandle": "clerk",
     "description": "Add Clerk authentication to any project by following the official quickstart guides.",
     "stars": 69,
-    "installs": 40404,
+    "installs": 40492,
     "githubUrl": "https://github.com/clerk/skills",
     "source": "skills.sh"
   },
@@ -2338,7 +2338,7 @@
     "authorHandle": "tencent",
     "description": "微信读书助手 — 搜索书籍、管理书架、查看笔记划线、浏览书评、阅读统计、发现推荐好书",
     "stars": 198,
-    "installs": 40113,
+    "installs": 40154,
     "githubUrl": "https://github.com/Tencent/WeChatReading",
     "source": "skills.sh"
   },
@@ -2360,7 +2360,7 @@
     "authorHandle": "samber",
     "description": "Golang code style conventions — line length and breaking, variable declarations, control flow clarity, when comments help vs hurt. Use when writing or reviewing Go code, asking about style or clarity, or establishing project coding standards. Not for naming conventions (→ See `samber/cc-skills-golang@golang-naming` skill), linter configuration (→ See `samber/cc-skills-golang@golang-lint` skill), or doc comments (→ See `samber/cc-skills-golang@golang-documentation` skill).",
     "stars": 2824,
-    "installs": 39772,
+    "installs": 39796,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2371,7 +2371,7 @@
     "authorHandle": "pexoai",
     "description": "AI video generation skill with auto model selection across Seedance 2, Kling 3.0, HappyHorse, and 10+ models. Produces finished multi-shot videos (5–120s) from text, images, URLs, scripts, or audio — including AI music, lip sync, and multi-shot sequencing. Calls Pexo's external API, manages project status and billing confirmations, and transfers only user-approved briefs and assets. Runs setup diagnostics, stores generated downloads locally, and requires shell, outbound HTTPS, and local file access. Authenticated requests are locked to https://pexo.ai. No prompts to write, no models to choose. USE FOR: video production, AI video, make a video, product video, brand video, promotional clip, explainer video, short video, TikTok video, Instagram Reel, YouTube Short, product ad, text-to-video, image-to-video, video generation, AI video agent.",
     "stars": 776,
-    "installs": 39763,
+    "installs": 39766,
     "githubUrl": "https://github.com/pexoai/pexo-skills",
     "source": "skills.sh"
   },
@@ -2382,7 +2382,7 @@
     "authorHandle": "clerk",
     "description": "Advanced Next.js patterns - middleware, Server Actions, caching with Clerk.",
     "stars": 69,
-    "installs": 39576,
+    "installs": 39653,
     "githubUrl": "https://github.com/clerk/skills",
     "source": "skills.sh"
   },
@@ -2393,41 +2393,41 @@
     "authorHandle": "clerk",
     "description": "Custom authentication flows and component appearance - hooks (useSignIn, useSignUp), themes, colors, fonts, CSS. Use for custom sign-in/sign-up flows, appearance styling, visual customization, branding.",
     "stars": 69,
-    "installs": 39210,
+    "installs": 39298,
     "githubUrl": "https://github.com/clerk/skills",
     "source": "skills.sh"
   },
   {
     "rank": 219,
+    "id": "herdrdev/herdr:herdr",
+    "name": "herdr",
+    "authorHandle": "herdrdev",
+    "description": "Control Herdr, a terminal multiplexer for coding agents. Use only when the user explicitly mentions Herdr or asks to use Herdr to inspect or control panes, tabs, workspaces, commands, or another agent. Do not use merely because a task could benefit from a background terminal, delegation, or parallel work. Requires HERDR_ENV=1.",
+    "stars": 35012,
+    "installs": 39216,
+    "githubUrl": "https://github.com/herdrdev/herdr",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 220,
     "id": "samber/cc-skills-golang:golang-error-handling",
     "name": "golang-error-handling",
     "authorHandle": "samber",
     "description": "Idiomatic Golang error handling — creation, wrapping with %w, errors.Is/As, errors.Join, custom error types, sentinel errors, panic/recover, the single handling rule, structured logging with slog, HTTP request logging middleware, and samber/oops for production errors. Built to make logs usable at scale with log aggregation 3rd-party tools. Apply when creating, wrapping, inspecting, or logging errors in Go code. For samber/oops specifics → See `samber/cc-skills-golang@golang-samber-oops` skill; for slog handler ecosystem → See `samber/cc-skills-golang@golang-samber-slog` skill.",
     "stars": 2824,
-    "installs": 39117,
-    "githubUrl": "https://github.com/samber/cc-skills-golang",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 220,
-    "id": "samber/cc-skills-golang:golang-testing",
-    "name": "golang-testing",
-    "authorHandle": "samber",
-    "description": "Provides a comprehensive guide for writing production-ready Golang tests. Covers table-driven tests, test suites with testify, mocks, unit tests, integration tests, benchmarks, code coverage, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, memory leaks, CI with GitHub Actions, and idiomatic naming conventions. Use this whenever writing tests, asking about testing patterns or setting up CI for Go projects. Essential for ANY test-related conversation in Go.",
-    "stars": 1541,
-    "installs": 39068,
+    "installs": 39142,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
   {
     "rank": 221,
-    "id": "herdrdev/herdr:herdr",
-    "name": "herdr",
-    "authorHandle": "herdrdev",
-    "description": "Control Herdr, a terminal multiplexer for coding agents. Use only when the user explicitly mentions Herdr or asks to use Herdr to inspect or control panes, tabs, workspaces, commands, or another agent. Do not use merely because a task could benefit from a background terminal, delegation, or parallel work. Requires HERDR_ENV=1.",
-    "stars": 34961,
-    "installs": 39061,
-    "githubUrl": "https://github.com/herdrdev/herdr",
+    "id": "samber/cc-skills-golang:golang-testing",
+    "name": "golang-testing",
+    "authorHandle": "samber",
+    "description": "Provides a comprehensive guide for writing production-ready Golang tests. Covers table-driven tests, test suites with testify, mocks, unit tests, integration tests, benchmarks, code coverage, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, memory leaks, CI with GitHub Actions, and idiomatic naming conventions. Use this whenever writing tests, asking about testing patterns or setting up CI for Go projects. Essential for ANY test-related conversation in Go.",
+    "stars": 1541,
+    "installs": 39091,
+    "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
   {
@@ -2437,7 +2437,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Tasks: Manage task lists and tasks.",
     "stars": 25810,
-    "installs": 39011,
+    "installs": 39028,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2448,7 +2448,7 @@
     "authorHandle": "google-labs-code",
     "description": "Generate walkthrough videos from Stitch projects using Remotion with smooth transitions, zooming, and text overlays",
     "stars": 7889,
-    "installs": 38579,
+    "installs": 38591,
     "githubUrl": "https://github.com/google-labs-code/stitch-skills",
     "source": "skills.sh"
   },
@@ -2459,7 +2459,7 @@
     "authorHandle": "samber",
     "description": "Idiomatic Golang design patterns — functional options, constructors, error flow and cascading, resource management and lifecycle, graceful shutdown, resilience, architecture, dependency injection, data handling, streaming, and more. Apply when explicitly choosing between architectural patterns, implementing functional options, designing constructor APIs, setting up graceful shutdown, applying resilience patterns, or asking which idiomatic Go pattern fits a specific problem.",
     "stars": 2824,
-    "installs": 38424,
+    "installs": 38445,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2470,7 +2470,7 @@
     "authorHandle": "samber",
     "description": "Golang performance optimization patterns and methodology - if X bottleneck, then apply Y. Covers allocation reduction, CPU efficiency, memory layout, GC tuning, pooling, caching, and hot-path optimization. Use when profiling or benchmarks have identified a bottleneck and you need the right optimization pattern to fix it. Also use when performing performance code review to suggest improvements or benchmarks that could help identify quick performance gains. Not for measurement methodology (→ See `samber/cc-skills-golang@golang-benchmark` skill) or debugging workflow (→ See `samber/cc-skills-golang@golang-troubleshooting` skill).",
     "stars": 2824,
-    "installs": 38365,
+    "installs": 38385,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2481,7 +2481,7 @@
     "authorHandle": "samber",
     "description": "Security best practices and vulnerability prevention for Golang. Covers injection (SQL, command, XSS), cryptography, filesystem safety, network security, cookies, secrets management, memory safety, and logging. Apply when writing, reviewing, or auditing Go code for security, or when working on any risky code involving crypto, I/O, secrets management, user input handling, or authentication. Includes configuration of security tools.",
     "stars": 1541,
-    "installs": 38283,
+    "installs": 38305,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2492,7 +2492,7 @@
     "authorHandle": "clerk",
     "description": "Clerk Backend REST API explorer and executor. Browse tags, inspect endpoint schemas, and execute authenticated requests. Use when listing users, managing organizations, or calling any Clerk API endpoint.",
     "stars": 69,
-    "installs": 37998,
+    "installs": 38087,
     "githubUrl": "https://github.com/clerk/skills",
     "source": "skills.sh"
   },
@@ -2503,7 +2503,7 @@
     "authorHandle": "vuejs-ai",
     "description": "MUST be used for Vue.js tasks. Strongly recommends Composition API with `<script setup>` and TypeScript as the standard approach. Covers Vue 3, SSR, Volar, vue-tsc. Load for any Vue, .vue files, Vue Router, Pinia, or Vite with Vue work. ALWAYS use Composition API unless the project explicitly requires Options API.",
     "stars": 2354,
-    "installs": 37982,
+    "installs": 38002,
     "githubUrl": "https://github.com/vuejs-ai/skills",
     "source": "skills.sh"
   },
@@ -2525,7 +2525,7 @@
     "authorHandle": "samber",
     "description": "Golang concurrency patterns. Use when writing or reviewing concurrent Go code involving goroutines, channels, select, locks, sync primitives, errgroup, singleflight, worker pools, or fan-out/fan-in pipelines. Also triggers when you detect goroutine leaks, race conditions, channel ownership issues, or need to choose between channels and mutexes.",
     "stars": 2824,
-    "installs": 37798,
+    "installs": 37819,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2536,7 +2536,7 @@
     "authorHandle": "mvanhorn",
     "description": "Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. Includes a doctor health check to diagnose broken or missing sources.",
     "stars": 61099,
-    "installs": 37418,
+    "installs": 37479,
     "githubUrl": "https://github.com/mvanhorn/last30days-skill",
     "source": "skills.sh"
   },
@@ -2547,41 +2547,41 @@
     "authorHandle": "anysearch-ai",
     "description": "Real-time search engine supporting web search, vertical domain search, parallel batch search, and URL content extraction.",
     "stars": 5993,
-    "installs": 37385,
+    "installs": 37393,
     "githubUrl": "https://github.com/anysearch-ai/anysearch-skill",
     "source": "skills.sh"
   },
   {
     "rank": 233,
-    "id": "samber/cc-skills-golang:golang-naming",
-    "name": "golang-naming",
-    "authorHandle": "samber",
-    "description": "Go (Golang) naming conventions — covers packages, constructors, structs, interfaces, constants, enums, errors, booleans, receivers, getters/setters, functional options, acronyms, test functions, and subtest names. Use this skill when writing new Go code, reviewing or refactoring, choosing between naming alternatives (New vs NewTypeName, isConnected vs connected, ErrNotFound vs NotFoundError, StatusReady vs StatusUnknown at iota 0), debating Go package names (utils/helpers anti-patterns), or asking about Go naming best practices. Also trigger when the user mentions MixedCaps vs snake_case, ALL_CAPS constants, Get-prefix on getters, or error string casing. Do NOT use for general Go implementation questions that don't involve naming decisions.",
-    "stars": 2824,
-    "installs": 37354,
-    "githubUrl": "https://github.com/samber/cc-skills-golang",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 234,
-    "id": "samber/cc-skills-golang:golang-context",
-    "name": "golang-context",
-    "authorHandle": "samber",
-    "description": "Idiomatic context.Context usage in Golang — propagation through API boundaries, cancellation, timeouts and deadlines, request-scoped values, context.WithoutCancel for background work outliving requests. Apply when designing context propagation across layers, debugging leaked or unexpired contexts, choosing between context.Background/TODO/WithoutCancel, or storing values in context. Not for code that merely accepts ctx as first parameter.",
-    "stars": 2824,
-    "installs": 37336,
-    "githubUrl": "https://github.com/samber/cc-skills-golang",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 235,
     "id": "clerk/skills:clerk-webhooks",
     "name": "clerk-webhooks",
     "authorHandle": "clerk",
     "description": "Clerk webhooks for real-time events and data syncing. Verify with verifyWebhook from the framework-specific package. Handle user, session, organization, billing, and payment events. Build event-driven features like database sync, notifications, and integrations.",
     "stars": 69,
-    "installs": 37296,
+    "installs": 37381,
     "githubUrl": "https://github.com/clerk/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 234,
+    "id": "samber/cc-skills-golang:golang-naming",
+    "name": "golang-naming",
+    "authorHandle": "samber",
+    "description": "Go (Golang) naming conventions — covers packages, constructors, structs, interfaces, constants, enums, errors, booleans, receivers, getters/setters, functional options, acronyms, test functions, and subtest names. Use this skill when writing new Go code, reviewing or refactoring, choosing between naming alternatives (New vs NewTypeName, isConnected vs connected, ErrNotFound vs NotFoundError, StatusReady vs StatusUnknown at iota 0), debating Go package names (utils/helpers anti-patterns), or asking about Go naming best practices. Also trigger when the user mentions MixedCaps vs snake_case, ALL_CAPS constants, Get-prefix on getters, or error string casing. Do NOT use for general Go implementation questions that don't involve naming decisions.",
+    "stars": 2824,
+    "installs": 37375,
+    "githubUrl": "https://github.com/samber/cc-skills-golang",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 235,
+    "id": "samber/cc-skills-golang:golang-context",
+    "name": "golang-context",
+    "authorHandle": "samber",
+    "description": "Idiomatic context.Context usage in Golang — propagation through API boundaries, cancellation, timeouts and deadlines, request-scoped values, context.WithoutCancel for background work outliving requests. Apply when designing context propagation across layers, debugging leaked or unexpired contexts, choosing between context.Background/TODO/WithoutCancel, or storing values in context. Not for code that merely accepts ctx as first parameter.",
+    "stars": 2824,
+    "installs": 37355,
+    "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
   {
@@ -2591,7 +2591,7 @@
     "authorHandle": "samber",
     "description": "Comprehensive guide for Go database access — parameterized queries, struct scanning, NULLable columns, transactions, isolation levels, SELECT FOR UPDATE, connection pool, batch processing, context propagation, and migration tooling. Use when writing, reviewing, or debugging Golang code that interacts with PostgreSQL, MariaDB, MySQL, or SQLite; for database testing; or for questions about database/sql, sqlx, or pgx. Does NOT generate database schemas or migration SQL.",
     "stars": 2824,
-    "installs": 37232,
+    "installs": 37255,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2602,7 +2602,7 @@
     "authorHandle": "googleworkspace",
     "description": "Google Slides: Read and write presentations.",
     "stars": 30408,
-    "installs": 37212,
+    "installs": 37228,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2613,7 +2613,7 @@
     "authorHandle": "samber",
     "description": "Comprehensive documentation guide for Golang projects, covering godoc comments, README, CONTRIBUTING, CHANGELOG, Go Playground, Example tests, API docs, and llms.txt. Use when writing or reviewing doc comments, documentation, adding code examples, setting up doc sites, or discussing documentation best practices. Triggers for both libraries and applications/CLIs.",
     "stars": 2824,
-    "installs": 37202,
+    "installs": 37223,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2624,7 +2624,7 @@
     "authorHandle": "samber",
     "description": "Golang data structures — slices (internals, capacity growth, preallocation, slices package), maps (internals, hash buckets, maps package), arrays, container/list/heap/ring, strings.Builder vs bytes.Buffer, generic collections, pointers (unsafe.Pointer, weak.Pointer), and copy semantics. Use when choosing or optimizing Go data structures, implementing generic containers, using container/ packages, unsafe or weak pointers, or questioning slice/map internals.",
     "stars": 2824,
-    "installs": 37136,
+    "installs": 37156,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2635,7 +2635,7 @@
     "authorHandle": "samber",
     "description": "Defensive Golang coding to prevent panics, silent data corruption, and subtle runtime bugs. Use whenever writing or reviewing Go code that involves nil-prone types (pointers, interfaces, maps, slices, channels), numeric conversions, resource lifecycle (defer in loops), or defensive copying. Also triggers on questions about nil panics, append aliasing, map concurrent access, float comparison, or zero-value design.",
     "stars": 1541,
-    "installs": 37101,
+    "installs": 37122,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2646,7 +2646,7 @@
     "authorHandle": "samber",
     "description": "Modernize Golang code to use recent language features, standard library improvements, and idiomatic patterns. Trigger proactively when writing or reviewing Go code and old-style patterns are detected, or when encountering a deprecation warning. Also use when the user explicitly asks for modernization, a Go version upgrade, or a CI/tooling refresh.",
     "stars": 2824,
-    "installs": 37080,
+    "installs": 37100,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2657,7 +2657,7 @@
     "authorHandle": "samber",
     "description": "Provides a guide for setting up Golang project layouts and workspaces. Use this whenever starting a new Go project, organizing an existing codebase, setting up a monorepo with multiple packages, creating CLI tools with multiple main packages, or deciding on directory structure. Apply this for any Go project initialization or restructuring work.",
     "stars": 1541,
-    "installs": 37023,
+    "installs": 37044,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2668,7 +2668,7 @@
     "authorHandle": "samber",
     "description": "Linting best practices and golangci-lint configuration for Golang projects — running linters, configuring .golangci.yml, suppressing warnings with nolint directives, interpreting lint output, and selecting linters. Use when configuring golangci-lint, asking about lint warnings or nolint suppressions, setting up code quality tooling, or choosing linters. Also use when the user mentions golangci-lint, go vet, staticcheck, or revive.",
     "stars": 2824,
-    "installs": 36925,
+    "installs": 36943,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2679,7 +2679,7 @@
     "authorHandle": "googleworkspace",
     "description": "Gmail: Read a message and extract its body or headers.",
     "stars": 25810,
-    "installs": 36828,
+    "installs": 36843,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2690,7 +2690,7 @@
     "authorHandle": "samber",
     "description": "Troubleshoot Golang programs systematically - find and fix the root cause. Use when encountering bugs, crashes, deadlocks, or unexpected behavior in Go code. Covers debugging methodology, common Go pitfalls, test-driven debugging, pprof setup and capture, Delve debugger, race detection, GODEBUG tracing, and production debugging. Start here for any 'something is wrong' situation. Not for interpreting profiles or benchmarking (see golang-benchmark skill) or applying optimization patterns (see golang-performance skill).",
     "stars": 1541,
-    "installs": 36790,
+    "installs": 36807,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2701,7 +2701,7 @@
     "authorHandle": "samber",
     "description": "Golang everyday observability — the always-on signals in production. Covers structured logging with slog, Prometheus metrics, OpenTelemetry distributed tracing, continuous profiling with pprof/Pyroscope, server-side RUM event tracking, alerting, and Grafana dashboards. Apply when instrumenting Go services for production monitoring, setting up metrics or alerting, adding OpenTelemetry tracing, correlating logs with traces, migrating legacy loggers (zap/logrus/zerolog) to slog, adding observability to new features, or implementing GDPR/CCPA-compliant tracking with Customer Data Platforms (CDP). Not for temporary deep-dive performance investigation (→ See `samber/cc-skills-golang@golang-benchmark` and `samber/cc-skills-golang@golang-performance` skills).",
     "stars": 2824,
-    "installs": 36766,
+    "installs": 36786,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2712,7 +2712,7 @@
     "authorHandle": "samber",
     "description": "Dependency management strategies for Golang projects — go.mod management, installing/upgrading packages, Minimal Version Selection, vulnerability scanning, outdated dependency tracking, binary size analysis, Dependabot/Renovate setup, conflict resolution, and go.work workspaces. Use when adding, removing, or upgrading Go dependencies, auditing vulnerabilities, resolving version conflicts, or setting up automated dependency updates.",
     "stars": 2824,
-    "installs": 36650,
+    "installs": 36667,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2723,7 +2723,7 @@
     "authorHandle": "samber",
     "description": "Golang struct and interface design patterns — composition, embedding, type assertions, type switches, interface segregation, dependency injection via interfaces, struct field tags, and pointer vs value receivers. Use this skill when designing Go types, defining or implementing interfaces, embedding structs or interfaces, writing type assertions or type switches, adding struct field tags for JSON/YAML/DB serialization, or choosing between pointer and value receivers. Also use when the user asks about \"accept interfaces, return structs\", compile-time interface checks, or composing small interfaces into larger ones.",
     "stars": 1541,
-    "installs": 36600,
+    "installs": 36616,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2734,7 +2734,7 @@
     "authorHandle": "samber",
     "description": "Recommends production-ready Golang libraries and frameworks. Apply when the user explicitly asks for library suggestions, wants to compare alternatives, needs to choose a library for a specific task, or when a new dependency is being added to the project.",
     "stars": 1541,
-    "installs": 36585,
+    "installs": 36604,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2745,7 +2745,7 @@
     "authorHandle": "samber",
     "description": "Comprehensive guide for dependency injection (DI) in Golang. Covers why DI matters (testability, loose coupling, separation of concerns, lifecycle management), manual constructor injection, and DI library comparison (google/wire, uber-go/dig, uber-go/fx, samber/do). Use this skill when designing service architecture, setting up dependency injection, refactoring tightly coupled code, managing singletons or service factories, or when the user asks about inversion of control, service containers, or wiring dependencies in Go. For a specific DI library, → See `samber/cc-skills-golang@golang-google-wire`, `samber/cc-skills-golang@golang-uber-dig`, `samber/cc-skills-golang@golang-uber-fx`, or `samber/cc-skills-golang@golang-samber-do` skills.",
     "stars": 2824,
-    "installs": 36509,
+    "installs": 36526,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2756,7 +2756,7 @@
     "authorHandle": "samber",
     "description": "Golang benchmarking, profiling, and performance measurement. Use when writing, running, or comparing Go benchmarks, profiling hot paths with pprof, interpreting CPU/memory/trace profiles, analyzing results with benchstat, setting up CI benchmark regression detection, or investigating production performance with Prometheus runtime metrics. Also use when the developer needs deep analysis on a specific performance indicator - this skill provides the measurement methodology, while `samber/cc-skills-golang@golang-performance` provides the optimization patterns.",
     "stars": 2812,
-    "installs": 36468,
+    "installs": 36486,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2767,7 +2767,7 @@
     "authorHandle": "samber",
     "description": "Golang CLI application development. Use when building, modifying, or reviewing a Go CLI tool — especially for command structure, flag handling, configuration layering, version embedding, exit codes, I/O patterns, signal handling, shell completion, argument validation, and CLI unit testing. Also triggers when code uses cobra, viper, or urfave/cli. For cobra-specific APIs → See `samber/cc-skills-golang@golang-spf13-cobra` skill; for viper configuration layering → See `samber/cc-skills-golang@golang-spf13-viper` skill.",
     "stars": 2963,
-    "installs": 36425,
+    "installs": 36441,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2778,63 +2778,63 @@
     "authorHandle": "samber",
     "description": "Comprehensive guide to stretchr/testify for Golang testing. Covers assert, require, mock, and suite packages in depth. Use whenever writing tests with testify, creating mocks, setting up test suites, or choosing between assert and require. Essential for testify assertions, mock expectations, argument matchers, call verification, suite lifecycle, and advanced patterns like Eventually, JSONEq, and custom matchers. Trigger on any Go test file importing testify.",
     "stars": 1541,
-    "installs": 36414,
+    "installs": 36431,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
   {
     "rank": 254,
-    "id": "samber/cc-skills-golang:golang-continuous-integration",
-    "name": "golang-continuous-integration",
-    "authorHandle": "samber",
-    "description": "CI/CD pipeline configuration using GitHub Actions for Golang projects — testing, linting, SAST, security scanning, code coverage, Dependabot, Renovate, GoReleaser, code review automation, and release pipelines. Use when setting up or improving Go project CI, configuring GitHub Actions workflows, adding linters or security scanners, automating dependency updates, or adding quality gates.",
-    "stars": 2824,
-    "installs": 36323,
-    "githubUrl": "https://github.com/samber/cc-skills-golang",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 255,
-    "id": "samber/cc-skills-golang:golang-grpc",
-    "name": "golang-grpc",
-    "authorHandle": "samber",
-    "description": "Provides gRPC usage guidelines, protobuf organization, and production-ready patterns for Golang microservices. Use when implementing, reviewing, or debugging gRPC servers/clients, writing proto files, setting up interceptors, handling gRPC errors with status codes, configuring TLS/mTLS, testing with bufconn, or working with streaming RPCs.",
-    "stars": 2824,
-    "installs": 36315,
-    "githubUrl": "https://github.com/samber/cc-skills-golang",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 256,
-    "id": "addyosmani/agent-skills:code-review-and-quality",
-    "name": "code-review-and-quality",
-    "authorHandle": "addyosmani",
-    "description": "Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch.",
-    "stars": 81287,
-    "installs": 36168,
-    "githubUrl": "https://github.com/addyosmani/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 257,
     "id": "higgsfield-ai/skills:higgsfield-brandkit",
     "name": "higgsfield-brandkit",
     "authorHandle": "higgsfield-ai",
     "description": "Create and extend complete visual brand systems through the Higgsfield CLI and bundled deterministic local tooling: palettes, SVG logo marks, typography, mockups, social graphics, packaging, signage, merchandise, posters, presentation decks, and editable PPTX/PDF brandbooks. Preserves official supplied assets, persists approvals locally, and regenerates only dependent outputs. Use when: \"create a brand kit\", \"make a visual identity\", \"design a logo and brandbook\", \"apply this logo to branded assets\", \"make packaging or signage\", or \"extend our existing branding\". Chain with higgsfield-generate for general image production and Marketing Studio brand-kits when importing website metadata for ads. NOT for unbranded image generation (use higgsfield-generate), product catalog photography (use higgsfield-product-photoshoot), website implementation (use higgsfield-websites), or native Figma/Canva/PSD/AI delivery.",
     "stars": 670,
-    "installs": 36129,
+    "installs": 36359,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
     "source": "skills.sh"
   },
   {
-    "rank": 258,
+    "rank": 255,
     "id": "higgsfield-ai/skills:higgsfield-youtube-thumbnail",
     "name": "higgsfield-youtube-thumbnail",
     "authorHandle": "higgsfield-ai",
     "description": "Create high-click-through YouTube thumbnails and vertical video covers through the Higgsfield CLI. Builds a truthful information-gap concept, preserves up to three referenced identities, supports logos and controlled variants, renders the main image with Nano Banana Pro, and applies focused Seedream edits. Use when: \"make a YouTube thumbnail\", \"thumbnail for this video\", \"MrBeast-style cover\", \"Shorts cover\", or \"Instagram video cover\". Chain after any video workflow once its truthful topic and visual direction are known. NOT for producing the video itself (use higgsfield-generate), product catalog photos (use higgsfield-product-photoshoot), or marketplace cards (use higgsfield-marketplace-cards).",
     "stars": 670,
-    "installs": 36125,
+    "installs": 36355,
     "githubUrl": "https://github.com/higgsfield-ai/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 256,
+    "id": "samber/cc-skills-golang:golang-continuous-integration",
+    "name": "golang-continuous-integration",
+    "authorHandle": "samber",
+    "description": "CI/CD pipeline configuration using GitHub Actions for Golang projects — testing, linting, SAST, security scanning, code coverage, Dependabot, Renovate, GoReleaser, code review automation, and release pipelines. Use when setting up or improving Go project CI, configuring GitHub Actions workflows, adding linters or security scanners, automating dependency updates, or adding quality gates.",
+    "stars": 2824,
+    "installs": 36342,
+    "githubUrl": "https://github.com/samber/cc-skills-golang",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 257,
+    "id": "samber/cc-skills-golang:golang-grpc",
+    "name": "golang-grpc",
+    "authorHandle": "samber",
+    "description": "Provides gRPC usage guidelines, protobuf organization, and production-ready patterns for Golang microservices. Use when implementing, reviewing, or debugging gRPC servers/clients, writing proto files, setting up interceptors, handling gRPC errors with status codes, configuring TLS/mTLS, testing with bufconn, or working with streaming RPCs.",
+    "stars": 2824,
+    "installs": 36334,
+    "githubUrl": "https://github.com/samber/cc-skills-golang",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 258,
+    "id": "addyosmani/agent-skills:code-review-and-quality",
+    "name": "code-review-and-quality",
+    "authorHandle": "addyosmani",
+    "description": "Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch.",
+    "stars": 81287,
+    "installs": 36277,
+    "githubUrl": "https://github.com/addyosmani/agent-skills",
     "source": "skills.sh"
   },
   {
@@ -2855,7 +2855,7 @@
     "authorHandle": "samber",
     "description": "Provides resources to stay updated with Golang news, communities and people to follow. Use when seeking Go learning resources, discovering new libraries, finding community channels, or keeping up with Go language changes and releases.",
     "stars": 1541,
-    "installs": 35844,
+    "installs": 35860,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2866,7 +2866,7 @@
     "authorHandle": "samber",
     "description": "Functional programming helpers for Golang using samber/lo — 500+ type-safe generic functions for slices, maps, channels, strings, math, tuples, and concurrency (Map, Filter, Reduce, GroupBy, Chunk, Flatten, Find, Uniq, etc.). Core immutable package (lo), concurrent variants (lo/parallel aka lop), in-place mutations (lo/mutable aka lom), lazy iterators (lo/it aka loi for Go 1.23+), and experimental SIMD (lo/exp/simd). Apply when using or adopting samber/lo, when the codebase imports github.com/samber/lo, or when implementing functional-style data transformations in Go. Not for streaming pipelines (→ See golang-samber-ro skill).",
     "stars": 1541,
-    "installs": 35770,
+    "installs": 35787,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2877,7 +2877,7 @@
     "authorHandle": "googleworkspace",
     "description": "Read and write Google Forms.",
     "stars": 25810,
-    "installs": 35702,
+    "installs": 35720,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2888,7 +2888,7 @@
     "authorHandle": "samber",
     "description": "Implements dependency injection in Golang using samber/do. Apply this skill when working with dependency injection, setting up service containers, managing service lifecycles, or when you see code using github.com/samber/do/v2. Also use when refactoring manual dependency injection, implementing health checks, graceful shutdown, or organizing services into scopes/modules.",
     "stars": 1541,
-    "installs": 35677,
+    "installs": 35694,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2899,7 +2899,7 @@
     "authorHandle": "samber",
     "description": "Structured logging extensions for Golang using samber/slog-**** packages — multi-handler pipelines (slog-multi), log sampling (slog-sampling), attribute formatting (slog-formatter), HTTP middleware (slog-fiber, slog-gin, slog-chi, slog-echo), and backend routing (slog-datadog, slog-sentry, slog-loki, slog-syslog, slog-logstash, slog-graylog...). Apply when using or adopting slog, or when the codebase already imports any github.com/samber/slog-* package.",
     "stars": 1541,
-    "installs": 35647,
+    "installs": 35664,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2910,7 +2910,7 @@
     "authorHandle": "samber",
     "description": "Structured error handling in Golang with samber/oops — error builders, stack traces, error codes, error context, error wrapping, error attributes, user-facing vs developer messages, panic recovery, and logger integration. Apply when using or adopting samber/oops, or when the codebase already imports github.com/samber/oops.",
     "stars": 1541,
-    "installs": 35609,
+    "installs": 35626,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2921,7 +2921,7 @@
     "authorHandle": "samber",
     "description": "Monadic types for Golang using samber/mo — Option, Result, Either, Future, IO, Task, and State types for type-safe nullable values, error handling, and functional composition with pipeline sub-packages. Apply when using or adopting samber/mo, when the codebase imports `github.com/samber/mo`, or when considering functional programming patterns as a safety design for Golang.",
     "stars": 1541,
-    "installs": 35592,
+    "installs": 35609,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2932,7 +2932,7 @@
     "authorHandle": "samber",
     "description": "In-memory caching in Golang using samber/hot — eviction algorithms (LRU, LFU, TinyLFU, W-TinyLFU, S3FIFO, ARC, TwoQueue, SIEVE, FIFO), TTL, cache loaders, sharding, stale-while-revalidate, missing key caching, and Prometheus metrics. Apply when using or adopting samber/hot, when the codebase imports github.com/samber/hot, or when the project repeatedly loads the same medium-to-low cardinality resources at high frequency and needs to reduce latency or backend pressure.",
     "stars": 1541,
-    "installs": 35577,
+    "installs": 35594,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2943,7 +2943,7 @@
     "authorHandle": "samber",
     "description": "Reactive streams and event-driven programming in Golang using samber/ro — ReactiveX implementation with 150+ type-safe operators, cold/hot observables, 5 subject types (Publish, Behavior, Replay, Async, Unicast), declarative pipelines via Pipe, 40+ plugins (HTTP, cron, fsnotify, JSON, logging), automatic backpressure, error propagation, and Go context integration. Apply when using or adopting samber/ro, when the codebase imports github.com/samber/ro, or when building asynchronous event-driven pipelines, real-time data processing, streams, or reactive architectures in Go. Not for finite slice transforms (-> See golang-samber-lo skill).",
     "stars": 1541,
-    "installs": 35559,
+    "installs": 35576,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -2965,7 +2965,7 @@
     "authorHandle": "clerk",
     "description": "Clerk Organizations for B2B SaaS - create multi-tenant apps with org switching, role-based access, verified domains, and enterprise SSO. Use for team workspaces, RBAC, org-based routing, member management.",
     "stars": 69,
-    "installs": 35422,
+    "installs": 35507,
     "githubUrl": "https://github.com/clerk/skills",
     "source": "skills.sh"
   },
@@ -2976,7 +2976,7 @@
     "authorHandle": "googleworkspace",
     "description": "Manage Google Meet conferences.",
     "stars": 25810,
-    "installs": 35161,
+    "installs": 35177,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -2986,8 +2986,8 @@
     "name": "karpathy-guidelines",
     "authorHandle": "multica-ai",
     "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-    "stars": 209796,
-    "installs": 34564,
+    "stars": 209848,
+    "installs": 34605,
     "githubUrl": "https://github.com/multica-ai/andrej-karpathy-skills",
     "source": "skills.sh"
   },
@@ -2998,7 +2998,7 @@
     "authorHandle": "antfu",
     "description": "Vite build tool configuration, plugin API, SSR, and Vite 8 Rolldown migration. Use when working with Vite projects, vite.config.ts, Vite plugins, or building libraries/SSR apps with Vite.",
     "stars": 5692,
-    "installs": 34365,
+    "installs": 34389,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -3009,30 +3009,30 @@
     "authorHandle": "antfu",
     "description": "Vitest fast unit testing framework powered by Vite with Jest-compatible API. Use when writing tests, mocking, configuring coverage, or working with test filtering and fixtures.",
     "stars": 5692,
-    "installs": 34338,
+    "installs": 34363,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
   {
     "rank": 275,
-    "id": "samber/cc-skills-golang:golang-graphql",
-    "name": "golang-graphql",
-    "authorHandle": "samber",
-    "description": "Implements GraphQL APIs in Golang using gqlgen or graphql-go. Apply when building GraphQL servers, designing schemas, writing resolvers, handling subscriptions, or integrating GraphQL with existing Go HTTP services. Also apply when the codebase imports `github.com/99designs/gqlgen` or `github.com/graph-gophers/graphql-go`.",
-    "stars": 2824,
-    "installs": 34305,
-    "githubUrl": "https://github.com/samber/cc-skills-golang",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 276,
     "id": "clerk/skills:clerk-testing",
     "name": "clerk-testing",
     "authorHandle": "clerk",
     "description": "E2E testing for Clerk apps. Use with Playwright or Cypress for auth flow tests.",
     "stars": 69,
-    "installs": 34266,
+    "installs": 34339,
     "githubUrl": "https://github.com/clerk/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 276,
+    "id": "samber/cc-skills-golang:golang-graphql",
+    "name": "golang-graphql",
+    "authorHandle": "samber",
+    "description": "Implements GraphQL APIs in Golang using gqlgen or graphql-go. Apply when building GraphQL servers, designing schemas, writing resolvers, handling subscriptions, or integrating GraphQL with existing Go HTTP services. Also apply when the codebase imports `github.com/99designs/gqlgen` or `github.com/graph-gophers/graphql-go`.",
+    "stars": 2824,
+    "installs": 34324,
+    "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
   {
@@ -3042,7 +3042,7 @@
     "authorHandle": "samber",
     "description": "Golang application framework using uber-go/fx — fx.New, fx.Provide, fx.Invoke, fx.Module, fx.Lifecycle hooks, fx.Annotate (name/group/As), fx.Decorate, fx.Supply, fx.Replace, fx.WithLogger, and signal-aware Run(). Apply when using or adopting uber-go/fx, when the codebase imports `go.uber.org/fx`, or when wiring services with fx.New. For raw DI without lifecycle, see `samber/cc-skills-golang@golang-uber-dig` skill.",
     "stars": 1541,
-    "installs": 34051,
+    "installs": 34067,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -3053,7 +3053,7 @@
     "authorHandle": "samber",
     "description": "Implements dependency injection in Golang using uber-go/dig — reflection-based container, Provide/Invoke, dig.In/dig.Out parameter and result objects, named values, value groups, optional dependencies, scopes, and Decorate. Apply when using or adopting uber-go/dig, when the codebase imports `go.uber.org/dig`, or when wiring an application graph at startup. For higher-level lifecycle and modules, see `samber/cc-skills-golang@golang-uber-fx` skill.",
     "stars": 1541,
-    "installs": 33996,
+    "installs": 34013,
     "githubUrl": "https://github.com/samber/cc-skills-golang",
     "source": "skills.sh"
   },
@@ -3064,7 +3064,7 @@
     "authorHandle": "firecrawl",
     "description": "Produce an intensive, cited analytical report: executive summary, multi-angle findings, contrarian views, open questions, and full sources. Use only when the user needs rigorous synthesis of a complex topic (scientific, technical, policy, or market-analytical) that cannot be answered with a short search, and wants a formal written report, not a recommendation list. Do not use for product picks, top-N lists, quick lookups, or routine \"find out about X\" tasks. If the request does not clearly need this kind of report, do not use this skill. Do not use for a literature review over published papers. This skill collects evidence from the open web. A request for the literature on a biomedical, clinical, life-science, or other scientific topic — papers, studies, trials, preprints — belongs to firecrawl-research-papers, which queries Firecrawl's paper index (PubMed, bioRxiv, medRxiv, arXiv) instead of searching websites.",
     "stars": 145,
-    "installs": 33583,
+    "installs": 33587,
     "githubUrl": "https://github.com/firecrawl/firecrawl-workflows",
     "source": "skills.sh"
   },
@@ -3075,52 +3075,52 @@
     "authorHandle": "flutter",
     "description": "Architects a Flutter application using the recommended layered approach (UI, Logic, Data). Use when structuring a new project or refactoring for scalability.",
     "stars": 2893,
-    "installs": 33518,
+    "installs": 33552,
     "githubUrl": "https://github.com/flutter/agent-plugins",
     "source": "skills.sh"
   },
   {
     "rank": 281,
-    "id": "cloudflare/skills:sandbox-sdk",
-    "name": "sandbox-sdk",
-    "authorHandle": "cloudflare",
-    "description": "Build sandboxed applications for secure code execution. Load when building AI code execution, code interpreters, CI/CD systems, interactive dev environments, or executing untrusted code. Covers Sandbox SDK lifecycle, commands, files, code interpreter, and preview URLs. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
-    "stars": 2565,
-    "installs": 33464,
-    "githubUrl": "https://github.com/cloudflare/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 282,
-    "id": "googleworkspace/cli:gws-gmail-watch",
-    "name": "gws-gmail-watch",
-    "authorHandle": "googleworkspace",
-    "description": "Gmail: Watch for new emails and stream them as NDJSON.",
-    "stars": 25810,
-    "installs": 33419,
-    "githubUrl": "https://github.com/googleworkspace/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 283,
-    "id": "zhaono1/agent-playbook:self-improving-agent",
-    "name": "self-improving-agent",
-    "authorHandle": "zhaono1",
-    "description": "Use after a failure, user correction, repeated workflow problem, or validated success reveals a reusable lesson. Captures bounded redacted candidates, runs executable behavior evals, and separates validation from application in durable guidance.",
-    "stars": 75,
-    "installs": 33414,
-    "githubUrl": "https://github.com/zhaono1/agent-playbook",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 284,
     "id": "angular/skills:angular-developer",
     "name": "angular-developer",
     "authorHandle": "angular",
     "description": "Generates Angular code and provides architectural guidance. Trigger when creating projects, components, services, or HTTP communication, or for best practices on reactivity (signals, linkedSignal, resource, httpResource), forms, dependency injection, routing, SSR, accessibility (ARIA), animations, styling (component styles, Tailwind CSS), testing, naming conventions, or CLI tooling.",
     "stars": 627,
-    "installs": 33380,
+    "installs": 33469,
     "githubUrl": "https://github.com/angular/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 282,
+    "id": "cloudflare/skills:sandbox-sdk",
+    "name": "sandbox-sdk",
+    "authorHandle": "cloudflare",
+    "description": "Build sandboxed applications for secure code execution. Load when building AI code execution, code interpreters, CI/CD systems, interactive dev environments, or executing untrusted code. Covers Sandbox SDK lifecycle, commands, files, code interpreter, and preview URLs. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
+    "stars": 2565,
+    "installs": 33466,
+    "githubUrl": "https://github.com/cloudflare/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 283,
+    "id": "googleworkspace/cli:gws-gmail-watch",
+    "name": "gws-gmail-watch",
+    "authorHandle": "googleworkspace",
+    "description": "Gmail: Watch for new emails and stream them as NDJSON.",
+    "stars": 25810,
+    "installs": 33434,
+    "githubUrl": "https://github.com/googleworkspace/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 284,
+    "id": "zhaono1/agent-playbook:self-improving-agent",
+    "name": "self-improving-agent",
+    "authorHandle": "zhaono1",
+    "description": "Use after a failure, user correction, repeated workflow problem, or validated success reveals a reusable lesson. Captures bounded redacted candidates, runs executable behavior evals, and separates validation from application in durable guidance.",
+    "stars": 75,
+    "installs": 33421,
+    "githubUrl": "https://github.com/zhaono1/agent-playbook",
     "source": "skills.sh"
   },
   {
@@ -3129,8 +3129,8 @@
     "name": "baoyu-post-to-wechat",
     "authorHandle": "jimliu",
     "description": "Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions \"发布公众号\", \"post to wechat\", \"微信公众号\", or \"贴图/图文/文章\".",
-    "stars": 25617,
-    "installs": 33218,
+    "stars": 25625,
+    "installs": 33226,
     "githubUrl": "https://github.com/JimLiu/baoyu-skills",
     "source": "skills.sh"
   },
@@ -3141,7 +3141,7 @@
     "authorHandle": "googleworkspace",
     "description": "Manage Google Keep notes.",
     "stars": 25810,
-    "installs": 33180,
+    "installs": 33196,
     "githubUrl": "https://github.com/googleworkspace/cli",
     "source": "skills.sh"
   },
@@ -3152,7 +3152,7 @@
     "authorHandle": "antfu",
     "description": "Vue 3 Composition API, script setup macros, reactivity system, and built-in components. Use when writing Vue SFCs, defineProps/defineEmits/defineModel, watchers, or using Transition/Teleport/Suspense/KeepAlive.",
     "stars": 5692,
-    "installs": 33034,
+    "installs": 33046,
     "githubUrl": "https://github.com/antfu/skills",
     "source": "skills.sh"
   },
@@ -3163,30 +3163,30 @@
     "authorHandle": "addyosmani",
     "description": "Optimize web performance for faster loading and better user experience. Use when asked to \"speed up my site\", \"optimize performance\", \"reduce load time\", \"fix slow loading\", \"improve page speed\", or \"performance audit\".",
     "stars": 1864,
-    "installs": 32772,
+    "installs": 32815,
     "githubUrl": "https://github.com/addyosmani/web-quality-skills",
     "source": "skills.sh"
   },
   {
     "rank": 289,
-    "id": "firecrawl/firecrawl-workflows:firecrawl-research-papers",
-    "name": "firecrawl-research-papers",
-    "authorHandle": "firecrawl",
-    "description": "Find and synthesize research papers, whitepapers, PDFs, technical reports, and academic sources with Firecrawl Research, using semantic paper search, related-paper expansion, and in-body verification over Firecrawl's paper index — largely biomedical and life-science literature from PubMed, bioRxiv, and medRxiv, plus arXiv preprints in CS, physics, and math. Use when the user wants a literature review, systematic review, survey of studies, paper summary, research landscape, or sourced synthesis from scholarly and industry publications, including clinical, drug, gene, disease, epidemiology, and public-health topics. Prefer this over a general web-research workflow whenever the evidence base is published papers rather than web pages.",
-    "stars": 145,
-    "installs": 32646,
-    "githubUrl": "https://github.com/firecrawl/firecrawl-workflows",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 290,
     "id": "wind-information-co-ltd/wind-skills:wind-find-finance-skill",
     "name": "wind-find-finance-skill",
     "authorHandle": "wind-information-co-ltd",
     "description": "万得金融能力发现与安装路由入口。用于金融数据、行情查询、市场分析、今日大盘、市场主线、板块轮动、资金流向、估值、选股、复盘、仓位、交易计划、回测等任务。必须先读取 catalog 判断必需数据 skill / 工作流 skill；缺失时必须展示安装选项，用户确认后由 AI 直接安装，不得只给命令或用通用分析替代。",
     "stars": 94,
-    "installs": 32618,
+    "installs": 32690,
     "githubUrl": "https://github.com/Wind-Information-Co-Ltd/wind-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 290,
+    "id": "firecrawl/firecrawl-workflows:firecrawl-research-papers",
+    "name": "firecrawl-research-papers",
+    "authorHandle": "firecrawl",
+    "description": "Find and synthesize research papers, whitepapers, PDFs, technical reports, and academic sources with Firecrawl Research, using semantic paper search, related-paper expansion, and in-body verification over Firecrawl's paper index — largely biomedical and life-science literature from PubMed, bioRxiv, and medRxiv, plus arXiv preprints in CS, physics, and math. Use when the user wants a literature review, systematic review, survey of studies, paper summary, research landscape, or sourced synthesis from scholarly and industry publications, including clinical, drug, gene, disease, epidemiology, and public-health topics. Prefer this over a general web-research workflow whenever the evidence base is published papers rather than web pages.",
+    "stars": 145,
+    "installs": 32650,
+    "githubUrl": "https://github.com/firecrawl/firecrawl-workflows",
     "source": "skills.sh"
   },
   {
@@ -3196,7 +3196,7 @@
     "authorHandle": "expo",
     "description": "Framework (OSS). Guide for creating and writing Expo native modules and views using the Expo Modules API (Swift, Kotlin, TypeScript). Covers module definition DSL, native views, shared objects, config plugins, lifecycle hooks, autolinking, and type system. Use when building or modifying native modules for Expo. Not for migrating an existing Swift module from the definition DSL to the Expo Modules API 2.0 macros; use expo-migrate-module (from the expo-experiments plugin) for that.",
     "stars": 2348,
-    "installs": 32573,
+    "installs": 32627,
     "githubUrl": "https://github.com/expo/skills",
     "source": "skills.sh"
   },
@@ -3207,30 +3207,30 @@
     "authorHandle": "flutter",
     "description": "Use `LayoutBuilder`, `MediaQuery`, or `Expanded/Flexible` to create a layout that adapts to different screen sizes. Use when you need the UI to look good on both mobile and tablet/desktop form factors.",
     "stars": 2893,
-    "installs": 32528,
+    "installs": 32563,
     "githubUrl": "https://github.com/flutter/agent-plugins",
     "source": "skills.sh"
   },
   {
     "rank": 293,
-    "id": "firecrawl/firecrawl-workflows:firecrawl-website-design-clone",
-    "name": "firecrawl-website-design-clone",
-    "authorHandle": "firecrawl",
-    "description": "Extract any website's design system into an agent-ready DESIGN.md using Firecrawl scrape evidence. Use when the user wants colors, fonts, spacing, components, layout patterns, or brand/UI guidance from a website so AI agents can create new websites, clone a look, or build pages inspired by that design.",
-    "stars": 145,
-    "installs": 32419,
-    "githubUrl": "https://github.com/firecrawl/firecrawl-workflows",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 294,
     "id": "addyosmani/agent-skills:frontend-ui-engineering",
     "name": "frontend-ui-engineering",
     "authorHandle": "addyosmani",
     "description": "Builds production-quality, accessible, responsive user-facing UIs. Use when building or modifying interfaces and pages, creating components, implementing layouts, meeting WCAG accessibility requirements, managing state, or when the output needs to look and feel production-quality rather than AI-generated.",
     "stars": 81287,
-    "installs": 32380,
+    "installs": 32478,
     "githubUrl": "https://github.com/addyosmani/agent-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 294,
+    "id": "firecrawl/firecrawl-workflows:firecrawl-website-design-clone",
+    "name": "firecrawl-website-design-clone",
+    "authorHandle": "firecrawl",
+    "description": "Extract any website's design system into an agent-ready DESIGN.md using Firecrawl scrape evidence. Use when the user wants colors, fonts, spacing, components, layout patterns, or brand/UI guidance from a website so AI agents can create new websites, clone a look, or build pages inspired by that design.",
+    "stars": 145,
+    "installs": 32426,
+    "githubUrl": "https://github.com/firecrawl/firecrawl-workflows",
     "source": "skills.sh"
   }
 ]
