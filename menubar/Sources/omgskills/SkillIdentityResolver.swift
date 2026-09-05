@@ -45,6 +45,8 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
     let sourceKind: String?
     let sourceId: String?
     let releaseId: String?
+    let groupId: String?
+    let groupRoute: String?
     let groupRevision: Int?
     let commitSha: String?
     let treeSha: String?
@@ -61,6 +63,8 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
         sourceKind: String? = nil,
         sourceId: String? = nil,
         releaseId: String? = nil,
+        groupId: String? = nil,
+        groupRoute: String? = nil,
         groupRevision: Int? = nil,
         commitSha: String? = nil,
         treeSha: String? = nil,
@@ -76,6 +80,8 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
         self.sourceKind = sourceKind
         self.sourceId = sourceId
         self.releaseId = releaseId
+        self.groupId = groupId
+        self.groupRoute = groupRoute
         self.groupRevision = groupRevision
         self.commitSha = commitSha
         self.treeSha = treeSha

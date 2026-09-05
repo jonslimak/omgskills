@@ -24,6 +24,8 @@ struct ManagedSkillInstallerTests {
         #expect(provenance.catalogSkillId == "owner/repo:skill")
         #expect(provenance.sourceKind == nil)
         #expect(provenance.releaseId == nil)
+        #expect(provenance.groupId == nil)
+        #expect(provenance.groupRoute == nil)
         #expect(provenance.targetScope == nil)
     }
 
