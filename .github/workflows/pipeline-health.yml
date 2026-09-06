@@ -17,8 +17,6 @@ jobs:
       cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    outputs:
-      writer_busy: ${{ steps.writercheck.outputs.busy }}
 
     steps:
       - name: Checkout
@@ -110,19 +108,13 @@ jobs:
             gh issue close "$ISSUE_NUMBER" --repo "${{ github.repository }}" --comment "Pipeline healthy again on $(date -u +"%Y-%m-%dT%H:%M:%SZ")."
           fi
 
-      - name: Check data writer activity
-        id: writercheck
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: node ./scripts/check-active-data-writers.mjs
-
       - name: Fail on degraded health
         if: steps.finalhealth.outputs.health_status == 'degraded'
         run: exit 1
 
   deploy-health:
     needs: health
-    if: always() && needs.health.outputs.writer_busy == 'false'
+    if: always()
     concurrency:
       group: app-data-writers
       cancel-in-progress: false
