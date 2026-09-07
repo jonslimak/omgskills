@@ -2,7 +2,7 @@
 
 const repo = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
-const shadowMaxAgeHours = Number(process.env.SHADOW_MAX_AGE_HOURS ?? 12);
+const shadowMaxAgeHours = Number(process.env.SHADOW_MAX_AGE_HOURS ?? 18);
 const stuckMaxMinutes = Number(process.env.STUCK_MAX_MINUTES ?? 90);
 const checkedAt = new Date().toISOString();
 

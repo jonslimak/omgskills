@@ -13,11 +13,11 @@ test("health checks cannot enter the shared writer queue", () => {
   assert.match(workflow, /group: pipeline-health-check-[^\n]+\n\s+cancel-in-progress: true/);
 });
 
-test("health deploy joins the writer queue only after an idle check", () => {
+test("health deploy always joins the shared writer queue", () => {
   assert.match(workflow, /deploy-health:\n\s+needs: health/);
-  assert.match(workflow, /needs\.health\.outputs\.writer_busy == 'false'/);
+  assert.match(workflow, /deploy-health:\n\s+needs: health\n\s+if: always\(\)/);
   assert.match(workflow, /deploy-health:[\s\S]*?group: app-data-writers/);
-  assert.match(workflow, /name: Check data writer activity[\s\S]*?check-active-data-writers\.mjs/);
+  assert.doesNotMatch(workflow, /check-active-data-writers\.mjs/);
 });
 
 test("generated health replaces the restored live snapshot before build", () => {
