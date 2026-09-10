@@ -214,12 +214,20 @@ struct DevicePrivateSkillPackageAPI: PrivateSkillPackageFetching, Sendable {
 
     private static func origin(from endpoint: URL) -> URL? {
         guard var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false),
-              components.scheme == "https",
-              components.host != nil,
+              let scheme = components.scheme?.lowercased(),
+              let host = endpoint.host?.lowercased(),
               components.user == nil,
               components.password == nil else {
             return nil
         }
+        let isAllowedScheme: Bool
+        #if OMGSKILLS_DEBUG_GROUP_INSTALL_ROOT_OVERRIDE
+        isAllowedScheme = scheme == "https"
+            || (scheme == "http" && ["localhost", "127.0.0.1", "::1"].contains(host))
+        #else
+        isAllowedScheme = scheme == "https"
+        #endif
+        guard isAllowedScheme else { return nil }
         components.path = ""
         components.query = nil
         components.fragment = nil

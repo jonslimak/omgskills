@@ -33,6 +33,57 @@ struct DevicePrivateSkillPackageAPITests {
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer device-secret")
     }
 
+    @Test func allowsHTTPOnlyForLoopbackEndpoints() async throws {
+        let body = try GroupSkillPackageTestSupport.ndjson()
+        let endpoints = [
+            "http://localhost:8888/api/portal/sync-upload",
+            "http://127.0.0.1:8888/api/portal/sync-upload",
+            "http://[::1]:8888/api/portal/sync-upload"
+        ]
+
+        for endpoint in endpoints {
+            let session = PrivatePackageHTTPSession(responses: [
+                .init(
+                    statusCode: 200,
+                    headers: ["Content-Type": "application/x-ndjson"],
+                    body: body
+                )
+            ])
+            let api = DevicePrivateSkillPackageAPI(
+                uploadEndpoint: URL(string: endpoint)!,
+                session: session,
+                now: { now }
+            )
+
+            _ = try await api.fetchPackage(
+                sourceID: GroupSkillPackageTestSupport.sourceID,
+                release: GroupSkillPackageTestSupport.release(),
+                credential: GroupSkillPackageTestSupport.credential()
+            )
+            let request = try #require(await session.requests().first)
+            #expect(request.url?.scheme == "http")
+            #expect(request.url?.host == URL(string: endpoint)?.host)
+        }
+    }
+
+    @Test func rejectsHTTPForNonLoopbackEndpointBeforeNetwork() async throws {
+        let session = PrivatePackageHTTPSession(responses: [])
+        let api = DevicePrivateSkillPackageAPI(
+            uploadEndpoint: URL(string: "http://example.com/api/portal/sync-upload")!,
+            session: session,
+            now: { now }
+        )
+
+        await #expect(throws: GroupSkillPackageLoaderError.invalidResponse) {
+            try await api.fetchPackage(
+                sourceID: GroupSkillPackageTestSupport.sourceID,
+                release: GroupSkillPackageTestSupport.release(),
+                credential: GroupSkillPackageTestSupport.credential()
+            )
+        }
+        #expect(await session.requests().isEmpty)
+    }
+
     @Test func rejectsExpiredAndInsufficientCredentialBeforeNetwork() async throws {
         let session = PrivatePackageHTTPSession(responses: [])
         let api = makeAPI(session: session)
