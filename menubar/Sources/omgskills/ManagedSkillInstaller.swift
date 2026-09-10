@@ -497,10 +497,7 @@ actor ManagedSkillInstaller {
         switch source {
         case .catalog(let id, let catalogSkillID, _):
             guard item.kind == .catalog || item.kind == .synced,
-                  let separator = catalogSkillID.firstIndex(of: ":"),
-                  let repository = GitHubRepositorySlug.normalized(
-                    String(catalogSkillID[..<separator])
-                  )
+                  let repository = CatalogSkillID.repositorySlug(from: catalogSkillID)
             else {
                 throw InstallError.invalidGroupManifest
             }

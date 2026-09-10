@@ -12,6 +12,7 @@ export type SkillGroup = {
   allowedEmailCount?: number;
   allowedEmails?: { id: string; email: string }[];
   ownerDisplayName?: string;
+  appDeepLink?: string | null;
   syncedSkillIds?: string[];
 };
 

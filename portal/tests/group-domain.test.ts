@@ -130,6 +130,24 @@ test("group detail adapter preserves public access roles", async () => {
   assert.deepEqual(calls.map((call) => call.path), ["/api/portal/groups/group-id"]);
 });
 
+test("group detail adapter preserves the server-authored app deep link", async () => {
+  const calls: Call[] = [];
+  const appDeepLink = "omgskills://group?url=https%3A%2F%2Fomgskills.com%2Fu%2Fjon%2Fsets%2Fdesign";
+  const api = recordingApi(
+    {
+      group: { id: "group-id", name: "Design", appDeepLink },
+      items: [],
+      accessRole: "invited",
+    },
+    calls
+  );
+
+  const result = await loadGroupDetail(api, "group-id");
+
+  assert.equal(result.group.appDeepLink, appDeepLink);
+  assert.equal(result.group.accessRole, "invited");
+});
+
 test("portal entry delegates detailed group behavior to the group domain", async () => {
   const source = await readFile(new URL("../src/main.tsx", import.meta.url), "utf8");
 
@@ -140,6 +158,7 @@ test("portal entry delegates detailed group behavior to the group domain", async
   assert.equal(source.includes("function GroupsPanel"), false);
   assert.equal(source.includes("function GroupDetailPage"), false);
   assert.equal(source.includes("function SkillActions"), false);
+  assert.match(source, /installEnabled=\{skillGroupsAuthEnabled\}/);
 });
 
 test("visibility labels preserve all three product states", () => {

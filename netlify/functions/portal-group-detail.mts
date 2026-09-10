@@ -5,6 +5,7 @@ import { requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { requireJsonObject } from "./_shared/validation.js";
+import { publicGroupAppDeepLink } from "./_shared/public-group-routes.js";
 
 function groupIdFromPath(req: Request): string | undefined {
   const parts = new URL(req.url).pathname.split("/").filter(Boolean);
@@ -40,6 +41,7 @@ export default async (req: Request, _context: Context) => {
             g.is_favorites AS "isFavorites",
             g.disabled_at AS "disabledAt",
             owner.display_name AS "ownerDisplayName",
+            owner.handle AS "ownerHandle",
             count(DISTINCT i.id)::int AS "itemCount",
             COALESCE(
               jsonb_agg(DISTINCT jsonb_build_object('id', a.id, 'email', a.email)) FILTER (WHERE a.id IS NOT NULL AND $2 = 'owner'),
@@ -50,7 +52,7 @@ export default async (req: Request, _context: Context) => {
           LEFT JOIN skill_group_items i ON i.group_id = g.id
           LEFT JOIN skill_group_allowed_emails a ON a.group_id = g.id
           WHERE g.id = $1
-          GROUP BY g.id, owner.display_name
+          GROUP BY g.id, owner.display_name, owner.handle
         `,
         [groupId, access.accessRole]
       );
@@ -58,6 +60,7 @@ export default async (req: Request, _context: Context) => {
       if (!group) {
         throw new Response("Group not found", { status: 404 });
       }
+      const { ownerHandle, ...publicGroup } = group;
 
       const itemsResult = await pool.query(
         `
@@ -92,7 +95,16 @@ export default async (req: Request, _context: Context) => {
         position: row.position
       }));
 
-      return jsonResponse(req, { group, items, accessRole: access.accessRole });
+      return jsonResponse(req, {
+        group: {
+          ...publicGroup,
+          appDeepLink: ownerHandle
+            ? publicGroupAppDeepLink(ownerHandle, group.slug)
+            : null,
+        },
+        items,
+        accessRole: access.accessRole,
+      });
     }
 
     const pool = getPgPool();

@@ -50,9 +50,13 @@ struct DeviceGroupManifestAPI: DeviceGroupManifestServing, Sendable {
     init(
         uploadEndpoint: URL = SkillSyncService.configuredEndpoint(),
         session: any DeviceHTTPSession = URLSession.shared,
-        now: @escaping @Sendable () -> Date = { Date() }
+        now: @escaping @Sendable () -> Date = { Date() },
+        allowLoopbackHTTP: Bool = debugAllowsLoopbackHTTP
     ) {
-        self.origin = Self.origin(from: uploadEndpoint)
+        self.origin = Self.origin(
+            from: uploadEndpoint,
+            allowLoopbackHTTP: allowLoopbackHTTP
+        )
         self.session = session
         self.now = now
     }
@@ -127,10 +131,12 @@ struct DeviceGroupManifestAPI: DeviceGroupManifestServing, Sendable {
         }
     }
 
-    private static func origin(from endpoint: URL) -> URL? {
+    private static func origin(from endpoint: URL, allowLoopbackHTTP: Bool) -> URL? {
         guard var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false),
-              components.scheme == "https",
-              components.host != nil,
+              SkillSyncService.isAllowedEndpoint(
+                  endpoint,
+                  allowLoopbackHTTP: allowLoopbackHTTP
+              ),
               components.user == nil,
               components.password == nil
         else {
@@ -140,5 +146,13 @@ struct DeviceGroupManifestAPI: DeviceGroupManifestServing, Sendable {
         components.query = nil
         components.fragment = nil
         return components.url
+    }
+
+    private static var debugAllowsLoopbackHTTP: Bool {
+        #if OMGSKILLS_DEBUG_GROUP_INSTALL_ROOT_OVERRIDE
+        true
+        #else
+        false
+        #endif
     }
 }

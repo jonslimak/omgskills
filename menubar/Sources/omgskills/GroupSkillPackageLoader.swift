@@ -108,9 +108,7 @@ struct CatalogSkillPackageIndex: Sendable {
     }
 
     private static func catalogRepository(from catalogSkillID: String) -> String? {
-        guard let separator = catalogSkillID.firstIndex(of: ":") else { return nil }
-        let value = String(catalogSkillID[..<separator])
-        return GitHubRepositorySlug.normalized(value)
+        CatalogSkillID.repositorySlug(from: catalogSkillID)
     }
 
     private static func githubRepository(from githubURL: String) -> String? {
@@ -191,6 +189,13 @@ struct GroupSkillPackageLoader: GroupSkillPackageLoading, Sendable {
         try Task.checkCancellation()
         _ = try SkillPackageValidator.validate(package, expected: release.coordinates, limits: limits)
         return package
+    }
+}
+
+enum CatalogSkillID {
+    static func repositorySlug(from value: String) -> String? {
+        let separator = value.firstIndex(of: ":") ?? value.endIndex
+        return GitHubRepositorySlug.normalized(String(value[..<separator]))
     }
 }
 

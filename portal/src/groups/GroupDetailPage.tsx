@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { UserButton, useUser } from "@clerk/clerk-react";
-import { ArrowDown, ArrowUp, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Download, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -27,7 +27,13 @@ import { usePortalApi } from "@/portal-api";
 
 const iconClassName = "app-icon";
 
-export function GroupDetailPage({ groupId }: { groupId: string }) {
+export function GroupDetailPage({
+  groupId,
+  installEnabled,
+}: {
+  groupId: string;
+  installEnabled: boolean;
+}) {
   const api = usePortalApi();
   const { user } = useUser();
   const [group, setGroup] = useState<SkillGroupDetail | null>(null);
@@ -234,23 +240,35 @@ export function GroupDetailPage({ groupId }: { groupId: string }) {
                   </p>
                 </div>
               )}
-              {group.accessRole === "owner" && !isEditing ? (
+              {!isEditing && ((installEnabled && Boolean(group.appDeepLink)) || group.accessRole === "owner") ? (
                 <div className="row-actions">
-                  <Button onClick={() => setIsEditing(true)} type="button" variant="outline">
-                    <Pencil className={iconClassName} />
-                    Edit
-                  </Button>
-                  {!group.isFavorites ? (
-                    <Button
-                      aria-label={`Delete ${group.name}`}
-                      disabled={isMutating}
-                      onClick={() => setShowDeleteConfirmation(true)}
-                      type="button"
-                      variant="destructive"
-                    >
-                      <Trash2 className={iconClassName} />
-                      Delete
+                  {installEnabled && group.appDeepLink ? (
+                    <Button asChild>
+                      <a href={group.appDeepLink}>
+                        <Download className={iconClassName} />
+                        Install
+                      </a>
                     </Button>
+                  ) : null}
+                  {group.accessRole === "owner" ? (
+                    <>
+                      <Button onClick={() => setIsEditing(true)} type="button" variant="outline">
+                        <Pencil className={iconClassName} />
+                        Edit
+                      </Button>
+                      {!group.isFavorites ? (
+                        <Button
+                          aria-label={`Delete ${group.name}`}
+                          disabled={isMutating}
+                          onClick={() => setShowDeleteConfirmation(true)}
+                          type="button"
+                          variant="destructive"
+                        >
+                          <Trash2 className={iconClassName} />
+                          Delete
+                        </Button>
+                      ) : null}
+                    </>
                   ) : null}
                 </div>
               ) : null}

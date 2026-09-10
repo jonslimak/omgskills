@@ -3,6 +3,17 @@ import Testing
 @testable import omgskills
 
 struct GroupSkillPackageLoaderTests {
+    @Test func catalogIndexAcceptsRootLevelSkillIDs() throws {
+        let index = CatalogSkillPackageIndex(skills: [
+            GroupSkillPackageTestSupport.catalogSkill(
+                id: "owner/repo",
+                githubURL: "https://github.com/owner/repo"
+            )
+        ])
+
+        #expect(try index.repositorySlug(for: "owner/repo") == "owner/repo")
+    }
+
     @Test func routesCatalogAndPublicItemsDirectlyToGitHubFetcher() async throws {
         let publicFetcher = RecordingPublicPackageFetcher(
             package: GroupSkillPackageTestSupport.package

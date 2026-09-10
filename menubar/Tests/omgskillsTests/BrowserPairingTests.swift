@@ -43,6 +43,22 @@ struct BrowserPairingTests {
         #expect(url.absoluteString.contains(request.codeVerifier) == false)
     }
 
+    @Test func debugAuthorizationAllowsLoopbackHTTPOnly() throws {
+        let localhost = try BrowserPairing.authorizationURL(
+            connectURL: URL(string: "http://localhost:8888/app/connect")!,
+            request: request
+        )
+        #expect(localhost.scheme == "http")
+        #expect(localhost.host == "localhost")
+
+        #expect(throws: BrowserPairingError.invalidConfiguration) {
+            try BrowserPairing.authorizationURL(
+                connectURL: URL(string: "http://example.com/app/connect")!,
+                request: request
+            )
+        }
+    }
+
     @Test func parsesApprovedAndCancelledCallbacks() throws {
         let pairingCode = "pair_\(String(repeating: "a", count: 43))"
 

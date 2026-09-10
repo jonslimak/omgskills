@@ -7,6 +7,30 @@ private enum GroupTransactionTestFailure: Error {
 }
 
 struct ManagedGroupSnapshotInstallerTests {
+    @Test func installsRootLevelCatalogSkillID() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let manifest = try fixture.manifest(items: [
+            fixture.installable(
+                name: "root-skill",
+                kind: "catalog",
+                source: fixture.catalogSource(
+                    catalogSkillID: "owner/repo",
+                    normalizedRoot: "."
+                )
+            )
+        ])
+
+        let result = try await fixture.installer().installGroupSnapshot(
+            fixture.request(manifest),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+
+        #expect(result.installedCount == 1)
+        #expect(fixture.targetExists("root-skill"))
+    }
+
     @Test func installsMixedSourcesAndReportsMetadataOnlyItems() async throws {
         let fixture = try GroupTransactionFixture()
         defer { fixture.remove() }
@@ -470,12 +494,16 @@ private struct GroupTransactionFixture: Sendable {
         ]
     }
 
-    func catalogSource(id: String = "source-catalog") -> [String: Any] {
+    func catalogSource(
+        id: String = "source-catalog",
+        catalogSkillID: String = "owner/repo:example",
+        normalizedRoot: String = "skills/example"
+    ) -> [String: Any] {
         [
             "id": id,
             "kind": "catalog",
-            "catalogSkillId": "owner/repo:example",
-            "normalizedRoot": "skills/example"
+            "catalogSkillId": catalogSkillID,
+            "normalizedRoot": normalizedRoot
         ]
     }
 

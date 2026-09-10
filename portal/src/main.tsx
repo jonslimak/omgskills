@@ -882,7 +882,10 @@ function App() {
         {isConnectRoute
           ? <ConnectPage />
           : groupDetailMatch
-            ? <GroupDetailPage groupId={decodeURIComponent(groupDetailMatch[1])} />
+            ? <GroupDetailPage
+                groupId={decodeURIComponent(groupDetailMatch[1])}
+                installEnabled={skillGroupsAuthEnabled}
+              />
             : <Dashboard />}
       </SignedIn>
     </>

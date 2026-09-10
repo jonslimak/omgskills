@@ -171,6 +171,9 @@ struct ContentView: View {
     let deviceConnectionModel: DeviceConnectionModel
     let updateInstallCoordinator: UpdateInstallCoordinator
     let skillGroupsAuthEnabled: Bool
+    let groupInstallFlowModel: GroupInstallFlowModel?
+    let groupSnapshotInstaller: any GroupSnapshotInstalling
+    let groupInstallHomeDirectory: URL
 
     @StateObject private var store = SkillsStore()
     @State private var query = ""
@@ -450,6 +453,19 @@ struct ContentView: View {
                 syncPanel
             }
         }
+        .sheet(isPresented: groupInstallSheetPresented) {
+            if skillGroupsAuthEnabled, let groupInstallFlowModel {
+                GroupInstallFlowSheet(
+                    model: groupInstallFlowModel,
+                    installer: groupSnapshotInstaller,
+                    packageLoader: GroupSkillPackageLoader(
+                        catalog: CatalogSkillPackageIndex(skills: store.availableSkills)
+                    ),
+                    updateCoordinator: updateInstallCoordinator,
+                    homeDirectory: groupInstallHomeDirectory
+                )
+            }
+        }
         .onChange(of: showDetail) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
             postDetailVisibility(newValue && !isEmptyStartState)
@@ -489,6 +505,19 @@ struct ContentView: View {
             debouncedQuery = query
             refreshResults(selectFirst: shouldSelectFirstResult)
         }
+    }
+
+    private var groupInstallSheetPresented: Binding<Bool> {
+        Binding(
+            get: {
+                skillGroupsAuthEnabled && (groupInstallFlowModel?.isPresented ?? false)
+            },
+            set: { isPresented in
+                if !isPresented {
+                    groupInstallFlowModel?.dismiss()
+                }
+            }
+        )
     }
 
     private var sessionObservedContent: some View {

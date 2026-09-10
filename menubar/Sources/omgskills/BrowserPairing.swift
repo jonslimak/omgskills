@@ -72,8 +72,7 @@ enum BrowserPairing {
         guard
             let value = bundle.object(forInfoDictionaryKey: connectURLInfoKey) as? String,
             let url = URL(string: value.trimmingCharacters(in: .whitespacesAndNewlines)),
-            url.scheme == "https",
-            url.host != nil
+            isAllowedConnectURL(url)
         else {
             return defaultConnectURL
         }
@@ -84,7 +83,7 @@ enum BrowserPairing {
         connectURL: URL,
         request: BrowserPairingRequest
     ) throws -> URL {
-        guard connectURL.scheme == "https", connectURL.host != nil else {
+        guard isAllowedConnectURL(connectURL) else {
             throw BrowserPairingError.invalidConfiguration
         }
         var components = URLComponents(url: connectURL, resolvingAgainstBaseURL: false)
@@ -100,6 +99,19 @@ enum BrowserPairing {
             throw BrowserPairingError.invalidConfiguration
         }
         return url
+    }
+
+    private static func isAllowedConnectURL(_ url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        if url.scheme?.lowercased() == "https" {
+            return true
+        }
+        #if OMGSKILLS_DEBUG_GROUP_INSTALL_ROOT_OVERRIDE
+        return url.scheme?.lowercased() == "http"
+            && ["localhost", "127.0.0.1", "::1"].contains(host)
+        #else
+        return false
+        #endif
     }
 
     static func parseCallback(

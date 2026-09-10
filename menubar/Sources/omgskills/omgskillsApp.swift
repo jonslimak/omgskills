@@ -30,14 +30,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var libraryRefreshTimer: Timer?
     private var workspaceDidWakeObserver: NSObjectProtocol?
     private var isSharePickerActive = false
+    private var pendingGroupInstallRoute: DeviceGroupManifestRoute?
+    private let groupInstallRuntimePaths = AppRuntimeConfiguration.groupInstallRuntimePaths()
+    private lazy var deviceCredentialStore = DeviceCredentialStore(
+        service: DeviceCredentialStore.configuredService()
+    )
     private lazy var browserPairingSession = WebAuthenticationSession(
         anchorProvider: { [weak self] in self?.panel },
         onReturn: { [weak self] in self?.showPanelAfterAuthentication() }
     )
     private lazy var deviceConnectionModel = DeviceConnectionModel(
-        credentialStore: DeviceCredentialStore(service: DeviceCredentialStore.configuredService()),
+        credentialStore: deviceCredentialStore,
         browserAuthorizer: browserPairingSession,
         updateCoordinator: updateInstallCoordinator
+    )
+    private lazy var groupInstallFlowModel: GroupInstallFlowModel? = {
+        guard skillGroupsAuthEnabled else { return nil }
+        return GroupInstallFlowModel(credentialStore: deviceCredentialStore)
+    }()
+    private lazy var groupSnapshotInstaller = ManagedSkillInstaller(
+        managedRoot: groupInstallRuntimePaths.managedRoot,
+        pathAnchor: groupInstallRuntimePaths.pathAnchor
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -99,8 +112,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
 
     func application(_ application: NSApplication, open urls: [URL]) {
         guard skillGroupsAuthEnabled else { return }
-        guard let callbackURL = urls.first else { return }
-        _ = browserPairingSession.handleCallback(callbackURL)
+        for url in urls {
+            switch GroupInstallDeepLink.classify(url) {
+            case .group(let route):
+                openGroupInstall(route)
+            case .pairing(let callbackURL):
+                _ = browserPairingSession.handleCallback(callbackURL)
+            case .unsupported:
+                continue
+            }
+        }
     }
 
     private func setupUpdater(startingUpdater: Bool) {
@@ -212,7 +233,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             rootView: ContentView(
                 deviceConnectionModel: deviceConnectionModel,
                 updateInstallCoordinator: updateInstallCoordinator,
-                skillGroupsAuthEnabled: skillGroupsAuthEnabled
+                skillGroupsAuthEnabled: skillGroupsAuthEnabled,
+                groupInstallFlowModel: groupInstallFlowModel,
+                groupSnapshotInstaller: groupSnapshotInstaller,
+                groupInstallHomeDirectory: groupInstallRuntimePaths.homeDirectory
             )
         )
         hostingView.wantsLayer = true
@@ -233,6 +257,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         panel.hasShadow = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.becomesKeyOnlyIfNeeded = true
+
+        if let pendingGroupInstallRoute {
+            self.pendingGroupInstallRoute = nil
+            openGroupInstall(pendingGroupInstallRoute)
+        }
+    }
+
+    private func openGroupInstall(_ route: DeviceGroupManifestRoute) {
+        guard skillGroupsAuthEnabled, let groupInstallFlowModel else { return }
+        guard panel != nil else {
+            pendingGroupInstallRoute = route
+            return
+        }
+        showPanelAfterAuthentication()
+        groupInstallFlowModel.open(route)
     }
 
     @objc private func togglePanel() {

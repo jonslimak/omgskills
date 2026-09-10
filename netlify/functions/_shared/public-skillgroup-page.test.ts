@@ -68,6 +68,7 @@ function dependencies(
       return new Map([["owner/repo:design", "/skills/owner/repo/design/"]]);
     },
     async recordAnalytics() {},
+    skillGroupsEnabled: false,
   };
 }
 
@@ -92,6 +93,23 @@ test("renders a public group with canonical metadata and no premature install ac
   assert.match(body, /<meta property="og:title"/);
   assert.doesNotMatch(body, /noindex/);
   assert.doesNotMatch(body, /omgskills:\/\/group|Install (all|group)|Open in omgskills/i);
+});
+
+test("renders the canonical app install link only when Skill Groups are enabled", async () => {
+  const deps = dependencies([[publishedUser]]);
+  deps.skillGroupsEnabled = true;
+  const response = await publicSkillgroupPage(
+    new Request("https://omgskills.com/u/jon/sets/design-tools"),
+    context,
+    deps
+  );
+  const body = await response.text();
+
+  assert.match(
+    body,
+    /href="omgskills:\/\/group\?url=https%3A%2F%2Fomgskills\.com%2Fu%2Fjon%2Fsets%2Fdesign-tools"/
+  );
+  assert.match(body, />Install in omgskills<\/a>/);
 });
 
 test("redirects compatibility and trailing-slash routes to the canonical group URL", async () => {

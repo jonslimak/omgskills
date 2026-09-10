@@ -25,6 +25,33 @@ struct DeviceGroupManifestAPITests {
         #expect(request.httpBody == nil)
     }
 
+    @Test func loopbackHTTPRequiresExplicitDevelopmentAllowance() async throws {
+        let route = try DeviceGroupManifestRoute(handle: "owner", groupSlug: "group")
+        let allowedSession = GroupManifestHTTPSession(responses: [
+            .init(statusCode: 200, body: try fixtureData())
+        ])
+        let allowedAPI = DeviceGroupManifestAPI(
+            uploadEndpoint: URL(string: "http://localhost:8888/api/portal/sync-upload")!,
+            session: allowedSession,
+            now: { now },
+            allowLoopbackHTTP: true
+        )
+
+        _ = try await allowedAPI.fetchManifest(route: route, credential: credential())
+        let request = try #require(await allowedSession.requests().first)
+        #expect(request.url?.absoluteString == "http://localhost:8888/api/device/groups/owner/group/manifest")
+
+        let rejectedAPI = DeviceGroupManifestAPI(
+            uploadEndpoint: URL(string: "http://localhost:8888/api/portal/sync-upload")!,
+            session: GroupManifestHTTPSession(responses: []),
+            now: { now },
+            allowLoopbackHTTP: false
+        )
+        await #expect(throws: DeviceGroupManifestAPIError.invalidConfiguration) {
+            try await rejectedAPI.fetchManifest(route: route, credential: credential())
+        }
+    }
+
     @Test func rejectsExpiredOrInsufficientCredentialBeforeNetwork() async throws {
         let session = GroupManifestHTTPSession(responses: [])
         let api = makeAPI(session: session)

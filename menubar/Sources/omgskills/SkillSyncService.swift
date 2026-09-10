@@ -49,13 +49,30 @@ enum SkillSyncService {
         guard
             let value = bundle.object(forInfoDictionaryKey: endpointInfoKey) as? String,
             let endpoint = URL(string: value.trimmingCharacters(in: .whitespacesAndNewlines)),
-            endpoint.scheme == "https",
-            endpoint.host != nil
+            isAllowedEndpoint(endpoint, allowLoopbackHTTP: debugAllowsLoopbackHTTP)
         else {
             return defaultEndpoint
         }
 
         return endpoint
+    }
+
+    static func isAllowedEndpoint(_ endpoint: URL, allowLoopbackHTTP: Bool) -> Bool {
+        guard let host = endpoint.host?.lowercased() else { return false }
+        if endpoint.scheme?.lowercased() == "https" {
+            return true
+        }
+        return allowLoopbackHTTP
+            && endpoint.scheme?.lowercased() == "http"
+            && ["localhost", "127.0.0.1", "::1"].contains(host)
+    }
+
+    private static var debugAllowsLoopbackHTTP: Bool {
+        #if OMGSKILLS_DEBUG_GROUP_INSTALL_ROOT_OVERRIDE
+        true
+        #else
+        false
+        #endif
     }
 
     static func payload(token: String, installations: [Skill]) -> SkillSyncPayload {

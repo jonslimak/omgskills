@@ -38,6 +38,17 @@ struct SkillSyncServiceTests {
         #expect(endpoint == SkillSyncService.defaultEndpoint)
     }
 
+    @Test func endpointPolicyAllowsLoopbackHTTPOnlyWhenExplicitlyEnabled() {
+        let localhost = URL(string: "http://localhost:8888/api/portal/sync-upload")!
+        let remoteHTTP = URL(string: "http://example.com/api/portal/sync-upload")!
+        let remoteHTTPS = URL(string: "https://example.com/api/portal/sync-upload")!
+
+        #expect(SkillSyncService.isAllowedEndpoint(localhost, allowLoopbackHTTP: true))
+        #expect(!SkillSyncService.isAllowedEndpoint(localhost, allowLoopbackHTTP: false))
+        #expect(!SkillSyncService.isAllowedEndpoint(remoteHTTP, allowLoopbackHTTP: true))
+        #expect(SkillSyncService.isAllowedEndpoint(remoteHTTPS, allowLoopbackHTTP: false))
+    }
+
     @Test func payloadUsesLocationKeyForGithubSkill() {
         let skill = makeSkill(
             name: "review",

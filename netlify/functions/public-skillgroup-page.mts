@@ -17,8 +17,10 @@ import {
 import {
   parsePublicPageRoute,
   PUBLIC_SITE_ORIGIN,
+  publicGroupAppDeepLink,
   publicProfilePath,
 } from "./_shared/public-group-routes.js";
+import { isSkillGroupsFeatureEnabled } from "./_shared/feature-flags.js";
 
 function escapeHtml(value: unknown): string {
   return String(value ?? "")
@@ -69,6 +71,7 @@ export type PublicSkillgroupPageDependencies = {
   loadPublicGroupManifest(handle: string, groupSlug: string): Promise<GroupManifestView>;
   loadCatalogSkillUrls: typeof loadCatalogSkillUrls;
   recordAnalytics: typeof recordAnalytics;
+  skillGroupsEnabled: boolean;
 };
 
 function defaultDependencies(): PublicSkillgroupPageDependencies {
@@ -79,6 +82,7 @@ function defaultDependencies(): PublicSkillgroupPageDependencies {
     },
     loadCatalogSkillUrls,
     recordAnalytics,
+    skillGroupsEnabled: isSkillGroupsFeatureEnabled(),
   };
 }
 
@@ -181,8 +185,11 @@ export async function publicSkillgroupPage(
     const ownerName = user.displayName || user.handle;
     const description = manifest.group.description || `A public skill group by ${ownerName} on omgskills.`;
     const canonicalUrl = `${PUBLIC_SITE_ORIGIN}${route.canonicalPath}`;
+    const installAction = dependencies.skillGroupsEnabled
+      ? `<p><a href="${escapeHtml(publicGroupAppDeepLink(handle, groupSlug))}">Install in omgskills</a></p>`
+      : "";
     return html(
-      `<a href="${escapeHtml(publicProfilePath(user.handle))}">Back to profile</a><h1>${escapeHtml(manifest.group.name)}</h1><p class="muted">${escapeHtml(manifest.group.description || "")}</p>${skills || "<p>No public skills yet.</p>"}`,
+      `<a href="${escapeHtml(publicProfilePath(user.handle))}">Back to profile</a><h1>${escapeHtml(manifest.group.name)}</h1><p class="muted">${escapeHtml(manifest.group.description || "")}</p>${installAction}${skills || "<p>No public skills yet.</p>"}`,
       200,
       {
         title: `${manifest.group.name} by ${ownerName} | omgskills`,
