@@ -8,12 +8,24 @@ import {
 import { requireGroupItemId } from "./_shared/group-behavior.js";
 import { requireGroupAccess } from "./_shared/group-access.js";
 import {
-  addGroupItem,
+  addGroupItemWithClient,
   deleteGroupItemWithClient,
+  type GroupItemInput,
+  type GroupItemPublication,
   reorderGroupItemsWithClient
 } from "./_shared/group-items.js";
 import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
 import { loadPublishedCatalogIdentity } from "./_shared/published-catalog.js";
+import {
+  PublicReleaseResolutionError,
+  resolveCatalogPublicRelease,
+  resolveGithubPublicRelease,
+  type PreparedPublicRelease,
+} from "./_shared/public-releases.js";
+import {
+  prepareSyncedGroupPublication,
+  sameSyncedGroupPublicationIdentity,
+} from "./_shared/synced-group-publication.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { optionalString, requireJsonObject, requireString } from "./_shared/validation.js";
 
@@ -22,19 +34,74 @@ function groupIdFromPath(req: Request): string | undefined {
   return parts[3];
 }
 
-async function getSyncedSkill(userId: string, syncedSkillId: string) {
-  const result = await getPgPool().query<{ id: string }>(
+type SyncedSkill = {
+  id: string;
+  name: string;
+  description: string | null;
+  identityStatus: string;
+  catalogSkillId: string | null;
+  skillMdSha: string;
+};
+
+type QueryClient = Pick<ReturnType<typeof getPgPool>, "query">;
+
+async function getSyncedSkill(
+  client: QueryClient,
+  userId: string,
+  syncedSkillId: string,
+  lock = false,
+): Promise<SyncedSkill | null> {
+  const result = await client.query<SyncedSkill>(
     `
-      SELECT id
+      SELECT
+        id,
+        name,
+        description,
+        identity_status AS "identityStatus",
+        catalog_skill_id AS "catalogSkillId",
+        skill_md_sha AS "skillMdSha"
       FROM synced_skills
       WHERE id = $1
         AND user_id = $2
         AND is_current = true
       LIMIT 1
+      ${lock ? "FOR SHARE" : ""}
     `,
     [syncedSkillId, userId]
   );
   return result.rows[0] ?? null;
+}
+
+function publicReleasePublication(release: PreparedPublicRelease): GroupItemPublication {
+  return { kind: "release", ...release };
+}
+
+async function persistGroupItem(
+  user: Awaited<ReturnType<typeof requirePortalUser>>,
+  groupId: string,
+  item: GroupItemInput,
+  publication: GroupItemPublication,
+  syncedSnapshot?: SyncedSkill,
+) {
+  const client = await getPgPool().connect();
+  try {
+    await client.query("BEGIN");
+    await requireGroupAccess(user, groupId, "manage", client);
+    if (syncedSnapshot) {
+      const current = await getSyncedSkill(client, user.id, syncedSnapshot.id, true);
+      if (!current || !sameSyncedGroupPublicationIdentity(current, syncedSnapshot)) {
+        throw new Response("Synced skill changed; try again", { status: 409 });
+      }
+    }
+    const result = await addGroupItemWithClient(client, groupId, item, publication);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 async function listGroupItems(req: Request, groupId: string) {
@@ -132,12 +199,19 @@ export default async (req: Request, _context: Context) => {
     const kind = body?.kind;
     if (kind === "synced") {
       const syncedSkillId = requireString(body?.syncedSkillId, "syncedSkillId", 80);
-      const available = await getSyncedSkill(user.id, syncedSkillId);
+      const available = await getSyncedSkill(getPgPool(), user.id, syncedSkillId);
       if (!available) {
         throw new Response("Synced skill is unavailable", { status: 400 });
       }
       const note = optionalString(body?.note, 1000);
-      const item = await addGroupItem(groupId, { kind: "synced", syncedSkillId, note });
+      const publication = await prepareSyncedGroupPublication(available);
+      const item = await persistGroupItem(
+        user,
+        groupId,
+        { kind: "synced", syncedSkillId, note },
+        publication,
+        available,
+      );
       return jsonResponse(req, item, { status: 201 });
     }
     if (kind === "catalog") {
@@ -145,7 +219,15 @@ export default async (req: Request, _context: Context) => {
       const name = optionalString(body?.name, 200);
       const description = optionalString(body?.description, 2000);
       const note = optionalString(body?.note, 1000);
-      const item = await addGroupItem(groupId, { kind: "catalog", catalogSkillId, name, description, note });
+      const publication = publicReleasePublication(
+        await resolveCatalogPublicRelease(catalogSkillId),
+      );
+      const item = await persistGroupItem(
+        user,
+        groupId,
+        { kind: "catalog", catalogSkillId, name, description, note },
+        publication,
+      );
       return jsonResponse(req, item, { status: 201 });
     }
     if (kind === "github") {
@@ -156,10 +238,13 @@ export default async (req: Request, _context: Context) => {
       const catalogIdentity = await withTimeout(loadPublishedCatalogIdentity(), 5_000)
         .catch(() => null);
       const resolvedItem = groupItemForValidatedGithubSkill(validated, catalogIdentity);
-      const item = await addGroupItem(groupId, {
+      const release = resolvedItem.kind === "catalog"
+        ? await resolveCatalogPublicRelease(resolvedItem.catalogSkillId)
+        : await resolveGithubPublicRelease(validated);
+      const item = await persistGroupItem(user, groupId, {
         ...resolvedItem,
         note
-      });
+      }, publicReleasePublication(release));
       return jsonResponse(req, item, { status: 201 });
     }
 
@@ -170,6 +255,19 @@ export default async (req: Request, _context: Context) => {
     }
     if (error instanceof GithubSkillValidationError) {
       return errorResponse(req, 400, error.message);
+    }
+    if (error instanceof PublicReleaseResolutionError) {
+      const status = error.code === "rate_limited" || error.code === "upstream_unavailable"
+        ? 503
+        : error.code === "skill_changed" || error.code === "catalog_unavailable"
+          ? 409
+          : 400;
+      return jsonResponse(req, { error: error.message }, {
+        status,
+        headers: error.retryAfterSeconds
+          ? { "Retry-After": String(error.retryAfterSeconds) }
+          : undefined,
+      });
     }
     return errorResponse(req, 500, "Failed to add group item");
   }

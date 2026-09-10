@@ -1,9 +1,16 @@
 import type { PoolClient } from "pg";
 import { getPgPool } from "./db.js";
 import { validateCompleteItemOrder } from "./group-behavior.js";
-import { incrementGroupRevision, lockGroupForMutation } from "./group-storage.js";
+import {
+  appendSkillRelease,
+  incrementGroupRevision,
+  lockGroupForMutation,
+  upsertPublicSkillSource,
+  type PublicSkillSourceInput,
+} from "./group-storage.js";
+import type { SkillPackageCoordinates } from "./skill-package.js";
 
-type GroupItemInput = {
+export type GroupItemInput = {
   kind: "synced" | "catalog" | "github";
   syncedSkillId?: string | null;
   catalogSkillId?: string | null;
@@ -13,10 +20,21 @@ type GroupItemInput = {
   note?: string | null;
 };
 
+export type GroupItemPublication =
+  | {
+      kind: "release";
+      source: PublicSkillSourceInput;
+      coordinates: SkillPackageCoordinates;
+      createdBy: string;
+    }
+  | { kind: "metadata_only"; reason: string };
+
 export async function addGroupItemWithClient(
   client: PoolClient,
   groupId: string,
-  item: GroupItemInput
+  item: GroupItemInput,
+  publication?: GroupItemPublication,
+  options: { incrementRevision?: boolean } = {},
 ) {
   await lockGroupForMutation(client, groupId);
   let snapshotName = item.name ?? null;
@@ -43,10 +61,26 @@ export async function addGroupItemWithClient(
     [groupId]
   );
   const position = positionResult.rows[0]?.next_position ?? 0;
+  let sourceId: string | null = null;
+  let releaseId: string | null = null;
+  let metadataOnlyReason: string | null = null;
+  if (publication?.kind === "release") {
+    sourceId = await upsertPublicSkillSource(client, publication.source);
+    releaseId = await appendSkillRelease(client, {
+      sourceId,
+      ...publication.coordinates,
+      createdBy: publication.createdBy,
+    });
+  } else if (publication?.kind === "metadata_only") {
+    metadataOnlyReason = publication.reason.trim();
+  }
   const result = await client.query<{ id: string }>(
     `
-      INSERT INTO skill_group_items (group_id, kind, synced_skill_id, catalog_skill_id, github_url, name, description, note, position)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      INSERT INTO skill_group_items (
+        group_id, kind, synced_skill_id, catalog_skill_id, github_url, name,
+        description, note, position, source_id, release_id, metadata_only_reason
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING id
     `,
     [
@@ -58,19 +92,28 @@ export async function addGroupItemWithClient(
       snapshotName,
       snapshotDescription,
       item.note ?? null,
-      position
+      position,
+      sourceId,
+      releaseId,
+      metadataOnlyReason,
     ]
   );
-  await incrementGroupRevision(client, groupId);
+  if (options.incrementRevision !== false) {
+    await incrementGroupRevision(client, groupId);
+  }
 
   return { itemId: result.rows[0].id, position };
 }
 
-export async function addGroupItem(groupId: string, item: GroupItemInput) {
+export async function addGroupItem(
+  groupId: string,
+  item: GroupItemInput,
+  publication?: GroupItemPublication,
+) {
   const client = await getPgPool().connect();
   try {
     await client.query("BEGIN");
-    const result = await addGroupItemWithClient(client, groupId, item);
+    const result = await addGroupItemWithClient(client, groupId, item, publication);
     await client.query("COMMIT");
     return result;
   } catch (error) {

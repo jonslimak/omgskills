@@ -29,18 +29,68 @@ export type SkillReleaseInput = {
   createdBy: string;
 };
 
+export type PublicSkillSourceInput = Extract<
+  SkillSourceInput,
+  { kind: "catalog" | "public_github" }
+>;
+
 export type GroupItemReleaseState =
   | { kind: "release"; sourceId: string; releaseId: string }
   | { kind: "metadata_only"; sourceId?: string | null; reason: string };
 
 export class GroupStorageError extends Error {
   constructor(
-    readonly code: "group_not_found" | "item_not_found" | "source_not_found" | "source_in_use",
+    readonly code:
+      | "group_not_found"
+      | "item_not_found"
+      | "source_not_found"
+      | "source_in_use"
+      | "source_mismatch",
     message: string
   ) {
     super(message);
     this.name = "GroupStorageError";
   }
+}
+
+export async function upsertPublicSkillSource(
+  client: PoolClient,
+  input: PublicSkillSourceInput,
+) {
+  const result = input.kind === "catalog"
+    ? await client.query<{ id: string; normalized_root: string; tombstoned_at: Date | null }>(
+      `
+        INSERT INTO skill_sources (kind, normalized_root, catalog_skill_id)
+        VALUES ('catalog', $1, $2)
+        ON CONFLICT (catalog_skill_id) WHERE kind = 'catalog'
+        DO UPDATE SET updated_at = skill_sources.updated_at
+        RETURNING id, normalized_root, tombstoned_at
+      `,
+      [input.normalizedRoot, input.catalogSkillId],
+    )
+    : await client.query<{ id: string; normalized_root: string; tombstoned_at: Date | null }>(
+      `
+        INSERT INTO skill_sources (
+          kind, normalized_root, repository_id, repository_slug
+        )
+        VALUES ('public_github', $1, $2, $3)
+        ON CONFLICT (kind, repository_id, normalized_root)
+          WHERE kind IN ('public_github', 'private_github')
+        DO UPDATE SET
+          repository_slug = EXCLUDED.repository_slug,
+          updated_at = now()
+        RETURNING id, normalized_root, tombstoned_at
+      `,
+      [input.normalizedRoot, input.repositoryId, input.repositorySlug],
+    );
+  const source = result.rows[0];
+  if (!source || source.tombstoned_at) {
+    throw new GroupStorageError("source_not_found", "Active skill source not found");
+  }
+  if (source.normalized_root !== input.normalizedRoot) {
+    throw new GroupStorageError("source_mismatch", "Skill source root does not match");
+  }
+  return source.id;
 }
 
 export async function lockGroupForMutation(client: PoolClient, groupId: string) {

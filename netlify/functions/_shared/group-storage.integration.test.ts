@@ -649,6 +649,125 @@ test("publishable group changes increment revisions exactly once", async () => {
   });
 });
 
+test("adding a materialized public item atomically reuses its source and release", async () => {
+  await withMigratedSchema(async (pool) => {
+    const ownerId = await createUser(pool, "public-publication");
+    const firstGroupId = await createGroup(pool, ownerId);
+    const secondGroupId = await createGroup(pool, ownerId);
+    const initialSnapshotGroupId = await createGroup(pool, ownerId);
+    const mismatchedGroupId = await createGroup(pool, ownerId);
+    const publication = {
+      kind: "release" as const,
+      source: {
+        kind: "catalog" as const,
+        normalizedRoot: "skills/example",
+        catalogSkillId: "owner/repo:skills/example",
+      },
+      coordinates: {
+        commitSha: sha.commit,
+        treeSha: sha.tree,
+        skillMdSha: sha.skill,
+      },
+      createdBy: "catalog:owner/repo:skills/example",
+    };
+
+    const first = await transaction(pool, (client) => addGroupItemWithClient(
+      client,
+      firstGroupId,
+      {
+        kind: "synced",
+        syncedSkillId: null,
+        name: "Example",
+        description: "Resolved synced skill",
+      },
+      publication,
+    ));
+    await transaction(pool, (client) => addGroupItemWithClient(
+      client,
+      secondGroupId,
+      {
+        kind: "catalog",
+        catalogSkillId: "owner/repo:skills/example",
+        name: "Example",
+      },
+      publication,
+    ));
+    await transaction(pool, (client) => addGroupItemWithClient(
+      client,
+      initialSnapshotGroupId,
+      {
+        kind: "catalog",
+        catalogSkillId: "owner/repo:skills/example",
+        name: "Initial example",
+      },
+      publication,
+      { incrementRevision: false },
+    ));
+
+    const item = await pool.query<{
+      source_id: string;
+      release_id: string;
+      metadata_only_reason: string | null;
+    }>(
+      "SELECT source_id, release_id, metadata_only_reason FROM skill_group_items WHERE id = $1",
+      [first.itemId],
+    );
+    assert.ok(item.rows[0].source_id);
+    assert.ok(item.rows[0].release_id);
+    assert.equal(item.rows[0].metadata_only_reason, null);
+    assert.equal(
+      Number((await pool.query("SELECT count(*) FROM skill_sources WHERE catalog_skill_id = $1", [
+        "owner/repo:skills/example",
+      ])).rows[0].count),
+      1,
+    );
+    assert.equal(
+      Number((await pool.query("SELECT count(*) FROM skill_releases")).rows[0].count),
+      1,
+    );
+    assert.equal(
+      (await pool.query("SELECT revision FROM skill_groups WHERE id = $1", [firstGroupId])).rows[0].revision,
+      2,
+    );
+    assert.equal(
+      (await pool.query("SELECT revision FROM skill_groups WHERE id = $1", [secondGroupId])).rows[0].revision,
+      2,
+    );
+    assert.equal(
+      (await pool.query("SELECT revision FROM skill_groups WHERE id = $1", [initialSnapshotGroupId])).rows[0].revision,
+      1,
+    );
+
+    await assert.rejects(
+      transaction(pool, (client) => addGroupItemWithClient(
+        client,
+        mismatchedGroupId,
+        {
+          kind: "catalog",
+          catalogSkillId: "owner/repo:skills/example",
+          name: "Moved example",
+        },
+        {
+          ...publication,
+          source: { ...publication.source, normalizedRoot: "skills/moved" },
+        },
+      )),
+      (error: unknown) => error instanceof GroupStorageError
+        && error.code === "source_mismatch",
+    );
+    assert.equal(
+      Number((await pool.query("SELECT count(*) FROM skill_group_items WHERE group_id = $1", [
+        mismatchedGroupId,
+      ])).rows[0].count),
+      0,
+    );
+    assert.equal(
+      (await pool.query("SELECT revision FROM skill_groups WHERE id = $1", [mismatchedGroupId])).rows[0].revision,
+      1,
+    );
+  });
+});
+
 test("authorized adapters read pinned releases from one migrated snapshot", async () => {
   await withMigratedSchema(async (pool) => {
     const ownerId = await createUser(pool, "manifest-owner");

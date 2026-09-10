@@ -65,8 +65,13 @@ export default async (req: Request, _context: Context) => {
 
     await client.query(
       `
-        INSERT INTO skill_group_items (group_id, kind, synced_skill_id, catalog_skill_id, github_url, name, description, note, position)
-        SELECT $1, kind, synced_skill_id, catalog_skill_id, github_url, name, description, note, position
+        INSERT INTO skill_group_items (
+          group_id, kind, synced_skill_id, catalog_skill_id, github_url, name,
+          description, note, position, source_id, release_id, metadata_only_reason
+        )
+        SELECT
+          $1, kind, synced_skill_id, catalog_skill_id, github_url, name,
+          description, note, position, source_id, release_id, metadata_only_reason
         FROM skill_group_items
         WHERE group_id = $2
         ORDER BY position ASC

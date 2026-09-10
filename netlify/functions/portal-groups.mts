@@ -1,9 +1,19 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
 import { parseGroupVisibility } from "./_shared/group-behavior.js";
+import {
+  addGroupItemWithClient,
+  type GroupItemPublication,
+} from "./_shared/group-items.js";
 import { resolveCreateGroupSlug } from "./_shared/group-slug.js";
 import { findOwnedGroupIds, requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
+import { PublicReleaseResolutionError } from "./_shared/public-releases.js";
+import {
+  prepareSyncedGroupPublication,
+  sameSyncedGroupPublicationIdentity,
+  type SyncedGroupPublicationIdentity,
+} from "./_shared/synced-group-publication.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { optionalString, requireString } from "./_shared/validation.js";
 
@@ -75,6 +85,38 @@ async function createGroup(req: Request) {
   const slug = resolveCreateGroupSlug(name, body?.slug, isFavorites);
 
   const pool = getPgPool();
+  type OwnedSkill = SyncedGroupPublicationIdentity & {
+    name: string;
+    description: string | null;
+  };
+  const ownedSkills = await pool.query<OwnedSkill>(
+    `
+      SELECT
+        id,
+        name,
+        description,
+        identity_status AS "identityStatus",
+        catalog_skill_id AS "catalogSkillId",
+        skill_md_sha AS "skillMdSha"
+      FROM synced_skills
+      WHERE user_id = $1
+        AND is_current = true
+        AND id = ANY($2::uuid[])
+    `,
+    [user.id, syncedSkillIds],
+  );
+  if (ownedSkills.rows.length !== syncedSkillIds.length) {
+    throw new Response("One or more synced skills are unavailable", { status: 400 });
+  }
+  const ownedSkillById = new Map(ownedSkills.rows.map((skill) => [skill.id, skill]));
+  const publicationById = new Map<string, GroupItemPublication>();
+  for (const syncedSkillId of syncedSkillIds) {
+    publicationById.set(
+      syncedSkillId,
+      await prepareSyncedGroupPublication(ownedSkillById.get(syncedSkillId)!),
+    );
+  }
+
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -88,29 +130,50 @@ async function createGroup(req: Request) {
     );
     const groupId = groupResult.rows[0].id;
 
-    const ownedSkills = await client.query<{ id: string; name: string; description: string | null }>(
+    const currentSkills = await client.query<OwnedSkill>(
       `
-        SELECT id, name, description
+        SELECT
+          id,
+          name,
+          description,
+          identity_status AS "identityStatus",
+          catalog_skill_id AS "catalogSkillId",
+          skill_md_sha AS "skillMdSha"
         FROM synced_skills
         WHERE user_id = $1
           AND is_current = true
           AND id = ANY($2::uuid[])
+        FOR SHARE
       `,
       [user.id, syncedSkillIds]
     );
-    if (ownedSkills.rows.length !== syncedSkillIds.length) {
+    if (currentSkills.rows.length !== syncedSkillIds.length) {
       throw new Response("One or more synced skills are unavailable", { status: 400 });
     }
-    const ownedSkillById = new Map(ownedSkills.rows.map((skill) => [skill.id, skill]));
+    const currentSkillById = new Map(currentSkills.rows.map((skill) => [skill.id, skill]));
 
-    for (const [index, syncedSkillId] of syncedSkillIds.entries()) {
+    for (const syncedSkillId of syncedSkillIds) {
       const syncedSkill = ownedSkillById.get(syncedSkillId);
-      await client.query(
-        `
-          INSERT INTO skill_group_items (group_id, kind, synced_skill_id, name, description, position)
-          VALUES ($1, 'synced', $2, $3, $4, $5)
-        `,
-        [groupId, syncedSkillId, syncedSkill?.name ?? null, syncedSkill?.description ?? null, index]
+      const currentSkill = currentSkillById.get(syncedSkillId);
+      if (!syncedSkill || !currentSkill
+        || !sameSyncedGroupPublicationIdentity(syncedSkill, currentSkill)) {
+        throw new Response("One or more synced skills changed; try again", { status: 409 });
+      }
+      const publication = publicationById.get(syncedSkillId);
+      if (!publication) {
+        throw new Response("One or more synced skills are unavailable", { status: 400 });
+      }
+      await addGroupItemWithClient(
+        client,
+        groupId,
+        {
+          kind: "synced",
+          syncedSkillId,
+          name: syncedSkill.name,
+          description: syncedSkill.description,
+        },
+        publication,
+        { incrementRevision: false },
       );
     }
 
@@ -120,6 +183,14 @@ async function createGroup(req: Request) {
     await client.query("ROLLBACK");
     if (error instanceof Response) {
       throw error;
+    }
+    if (error instanceof PublicReleaseResolutionError) {
+      throw new Response(error.message, {
+        status: error.code === "rate_limited" || error.code === "upstream_unavailable" ? 503 : 409,
+        headers: error.retryAfterSeconds
+          ? { "Retry-After": String(error.retryAfterSeconds) }
+          : undefined,
+      });
     }
     if ((error as { code?: string }).code === "23505") {
       throw new Response("Group slug is already used", { status: 409 });
@@ -146,6 +217,14 @@ export default async (req: Request, _context: Context) => {
   } catch (error) {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());
+    }
+    if (error instanceof PublicReleaseResolutionError) {
+      return jsonResponse(req, { error: error.message }, {
+        status: error.code === "rate_limited" || error.code === "upstream_unavailable" ? 503 : 409,
+        headers: error.retryAfterSeconds
+          ? { "Retry-After": String(error.retryAfterSeconds) }
+          : undefined,
+      });
     }
     return errorResponse(req, 500, "Group request failed");
   }

@@ -6,6 +6,8 @@ export type CatalogSkill = {
   description?: string;
   github_url?: string;
   githubUrl?: string;
+  skill_md_path?: string;
+  skill_md_sha?: string;
 };
 
 export type CanonicalShaEntry = {
