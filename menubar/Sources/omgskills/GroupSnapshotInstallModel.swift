@@ -1,12 +1,22 @@
 import Foundation
 import Observation
 
-protocol GroupSnapshotInstalling: Sendable {
+protocol GroupSnapshotInstalling: GroupSubscriptionDetecting, Sendable {
     func installGroupSnapshot(
         _ request: ManagedGroupSnapshotInstallRequest,
         credential: StoredDeviceCredential,
         packageLoader: any GroupSkillPackageLoading
     ) async throws -> ManagedGroupSnapshotInstallResult
+}
+
+extension GroupSnapshotInstalling {
+    func detectGroupSubscription(
+        manifest: GroupManifest,
+        route: DeviceGroupManifestRoute,
+        destination: ManagedGroupSnapshotDestination
+    ) async throws -> GroupSubscriptionDiff? {
+        nil
+    }
 }
 
 extension ManagedSkillInstaller: GroupSnapshotInstalling {}
@@ -105,14 +115,23 @@ final class GroupSnapshotInstallModel {
         case cancelled
     }
 
+    enum SubscriptionPhase: Equatable, Sendable {
+        case none
+        case checking
+        case existing(GroupSubscriptionDiff)
+        case failure(String)
+    }
+
     let groupName: String
     let groupDescription: String?
     let groupRevision: Int
     let items: [GroupSnapshotInstallItem]
 
     var selectedTarget: GroupSnapshotInstallTarget?
+    var installMode: ManagedSkillInstallMode = .snapshot
     var acknowledgesMetadataOnly = false
     private(set) var phase: Phase = .ready
+    private(set) var subscriptionPhase: SubscriptionPhase = .none
 
     @ObservationIgnored private let manifest: GroupManifest
     @ObservationIgnored private let route: DeviceGroupManifestRoute
@@ -180,10 +199,47 @@ final class GroupSnapshotInstallModel {
         guard phase == .ready,
               activeTask == nil,
               selectedTarget != nil,
+              subscriptionPhase == .none,
               installableCount > 0 else {
             return false
         }
         return metadataOnlyCount == 0 || acknowledgesMetadataOnly
+    }
+
+    var existingSubscription: GroupSubscriptionDiff? {
+        guard case .existing(let diff) = subscriptionPhase else { return nil }
+        return diff
+    }
+
+    func selectTarget(_ target: GroupSnapshotInstallTarget?) {
+        guard selectedTarget != target else { return }
+        selectedTarget = target
+        installMode = .snapshot
+        subscriptionPhase = target == nil ? .none : .checking
+    }
+
+    func refreshSubscription() async {
+        guard let selectedTarget else {
+            subscriptionPhase = .none
+            return
+        }
+        let destination = selectedTarget.destination(homeDirectory: homeDirectory)
+        subscriptionPhase = .checking
+        do {
+            let diff = try await installer.detectGroupSubscription(
+                manifest: manifest,
+                route: route,
+                destination: destination
+            )
+            try Task.checkCancellation()
+            guard self.selectedTarget == selectedTarget else { return }
+            subscriptionPhase = diff.map(SubscriptionPhase.existing) ?? .none
+        } catch is CancellationError {
+            return
+        } catch {
+            guard self.selectedTarget == selectedTarget else { return }
+            subscriptionPhase = .failure(error.localizedDescription)
+        }
     }
 
     var canDismiss: Bool {
@@ -197,7 +253,8 @@ final class GroupSnapshotInstallModel {
         let request = ManagedGroupSnapshotInstallRequest(
             manifest: manifest,
             route: route,
-            destination: selectedTarget.destination(homeDirectory: homeDirectory)
+            destination: selectedTarget.destination(homeDirectory: homeDirectory),
+            mode: installMode
         )
         let attemptID = UUID()
         let activity = updateCoordinator.beginActivity(.skillInstall)

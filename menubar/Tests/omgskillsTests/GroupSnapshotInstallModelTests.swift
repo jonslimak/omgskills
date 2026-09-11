@@ -102,6 +102,7 @@ struct GroupSnapshotInstallModelTests {
             coordinator: coordinator
         )
         model.selectedTarget = .codex
+        model.installMode = .subscribed
         model.acknowledgesMetadataOnly = true
 
         let task = try #require(model.startInstall())
@@ -118,6 +119,42 @@ struct GroupSnapshotInstallModelTests {
         #expect(coordinator.isBusy == false)
         let request = try #require(await installer.recordedRequests().first)
         #expect(request.destination.agent == .codex)
+        #expect(request.mode == .subscribed)
+    }
+
+    @Test func existingSubscriptionShowsDiffAndBlocksSilentReplacement() async throws {
+        let diff = GroupSubscriptionDiff(
+            groupId: "10000000-0000-4000-8000-000000000001",
+            installedRevision: 6,
+            currentRevision: 7,
+            changes: [GroupSubscriptionChange(
+                id: "first",
+                name: "Alpha",
+                kind: .updated,
+                wasReordered: false,
+                isMetadataOnly: false,
+                localState: .clean
+            )]
+        )
+        let installer = RecordingGroupSnapshotInstaller(
+            outcomes: [],
+            detectedSubscription: diff
+        )
+        let model = try makeModel(
+            manifest: manifest(items: [
+                installableItem(id: "first", position: 0, name: "Alpha")
+            ]),
+            installer: installer
+        )
+
+        model.selectTarget(.claude)
+        #expect(model.subscriptionPhase == .checking)
+        await model.refreshSubscription()
+
+        #expect(model.existingSubscription == diff)
+        #expect(model.canInstall == false)
+        #expect(model.startInstall() == nil)
+        #expect(await installer.recordedRequests().isEmpty)
     }
 
     @Test func transientFailureCanRetryButReconnectFailureCannot() async throws {
@@ -306,10 +343,23 @@ private enum GroupSnapshotInstallerOutcome: Sendable {
 
 private actor RecordingGroupSnapshotInstaller: GroupSnapshotInstalling {
     private var outcomes: [GroupSnapshotInstallerOutcome]
+    private let detectedSubscription: GroupSubscriptionDiff?
     private var requests: [ManagedGroupSnapshotInstallRequest] = []
 
-    init(outcomes: [GroupSnapshotInstallerOutcome]) {
+    init(
+        outcomes: [GroupSnapshotInstallerOutcome],
+        detectedSubscription: GroupSubscriptionDiff? = nil
+    ) {
         self.outcomes = outcomes
+        self.detectedSubscription = detectedSubscription
+    }
+
+    func detectGroupSubscription(
+        manifest: GroupManifest,
+        route: DeviceGroupManifestRoute,
+        destination: ManagedGroupSnapshotDestination
+    ) async throws -> GroupSubscriptionDiff? {
+        detectedSubscription
     }
 
     func installGroupSnapshot(

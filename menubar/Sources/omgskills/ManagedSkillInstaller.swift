@@ -82,6 +82,19 @@ struct ManagedGroupSnapshotInstallRequest: Equatable, Sendable {
     let manifest: GroupManifest
     let route: DeviceGroupManifestRoute
     let destination: ManagedGroupSnapshotDestination
+    let mode: ManagedSkillInstallMode
+
+    init(
+        manifest: GroupManifest,
+        route: DeviceGroupManifestRoute,
+        destination: ManagedGroupSnapshotDestination,
+        mode: ManagedSkillInstallMode = .snapshot
+    ) {
+        self.manifest = manifest
+        self.route = route
+        self.destination = destination
+        self.mode = mode
+    }
 }
 
 struct ManagedGroupMetadataOnlyItem: Equatable, Sendable {
@@ -137,11 +150,18 @@ private struct ManagedGroupTransactionJournal: Codable, Sendable {
     let targetRootIdentifier: String
     let targetRootRelativePath: String
     let entries: [Entry]
+    let subscription: Subscription?
 
     struct Entry: Codable, Sendable {
         let targetName: String
         let previousActivationRelativePath: String?
         let preparedActivationRelativePath: String
+    }
+
+    struct Subscription: Codable, Sendable {
+        let relativePath: String
+        let previousData: Data?
+        let replacementData: Data
     }
 }
 
@@ -195,12 +215,14 @@ actor ManagedSkillInstaller {
     typealias PackageLoader = @Sendable () async throws -> SkillPackage
     typealias BeforeActivationSwitch = @Sendable () throws -> Void
     typealias BeforeGroupActivationSwitch = @Sendable (Int, String) throws -> Void
+    typealias BeforeSubscriptionWrite = @Sendable () throws -> Void
 
     private let managedRoot: URL
     private let pathAnchor: URL
     private let limits: SkillPackageValidationLimits
     private let beforeActivationSwitch: BeforeActivationSwitch
     private let beforeGroupActivationSwitch: BeforeGroupActivationSwitch
+    private let beforeSubscriptionWrite: BeforeSubscriptionWrite
     private var mutationInProgress = false
 
     init(
@@ -208,13 +230,15 @@ actor ManagedSkillInstaller {
         pathAnchor: URL = FileManager.default.homeDirectoryForCurrentUser,
         limits: SkillPackageValidationLimits = .standard,
         beforeActivationSwitch: @escaping BeforeActivationSwitch = {},
-        beforeGroupActivationSwitch: @escaping BeforeGroupActivationSwitch = { _, _ in }
+        beforeGroupActivationSwitch: @escaping BeforeGroupActivationSwitch = { _, _ in },
+        beforeSubscriptionWrite: @escaping BeforeSubscriptionWrite = {}
     ) {
         self.managedRoot = managedRoot
         self.pathAnchor = pathAnchor.standardizedFileURL
         self.limits = limits
         self.beforeActivationSwitch = beforeActivationSwitch
         self.beforeGroupActivationSwitch = beforeGroupActivationSwitch
+        self.beforeSubscriptionWrite = beforeSubscriptionWrite
     }
 
     static var defaultManagedRoot: URL {
@@ -308,6 +332,15 @@ actor ManagedSkillInstaller {
                     to: item.activation.appendingPathComponent("content", isDirectory: true)
                 )
             }
+            if let subscription = journal.subscription {
+                try beforeSubscriptionWrite()
+                let subscriptionURL = request.destination.rootURL
+                    .appendingPathComponent(subscription.relativePath)
+                try GroupSubscriptionStore.write(
+                    subscription.replacementData,
+                    to: subscriptionURL
+                )
+            }
             try removeJournal()
         } catch {
             do {
@@ -399,6 +432,21 @@ actor ManagedSkillInstaller {
         )
     }
 
+    func managedPackageContentURL(at targetURL: URL) throws -> URL? {
+        guard let activation = try existingManagedActivation(
+            at: targetURL,
+            fileManager: .default
+        ),
+              let packageContent = symlinkDestination(
+                  of: activation.appendingPathComponent("content", isDirectory: true),
+                  fileManager: .default
+              )
+        else {
+            return nil
+        }
+        return packageContent
+    }
+
     private func beginMutation() throws {
         guard !mutationInProgress else {
             throw InstallError.operationInProgress
@@ -452,7 +500,7 @@ actor ManagedSkillInstaller {
                     catalogSkillId: sourceValues.catalogSkillId,
                     githubUrl: sourceValues.githubUrl,
                     expectedCoordinates: release.coordinates,
-                    mode: .snapshot,
+                    mode: request.mode,
                     destination: ManagedSkillDestination(
                         agent: destination.agent,
                         scope: destination.scope,
@@ -544,6 +592,7 @@ actor ManagedSkillInstaller {
                 preparedActivationRelativePath: preparedPath
             )
         }
+        let subscription = try makeSubscriptionMutation(for: request)
         return ManagedGroupTransactionJournal(
             version: ManagedGroupTransactionJournal.supportedVersion,
             transactionId: UUID().uuidString.lowercased(),
@@ -554,7 +603,51 @@ actor ManagedSkillInstaller {
             targetScope: request.destination.scope.rawValue,
             targetRootIdentifier: request.destination.rootIdentifier,
             targetRootRelativePath: targetRootRelativePath,
-            entries: entries
+            entries: entries,
+            subscription: subscription
+        )
+    }
+
+    private func makeSubscriptionMutation(
+        for request: ManagedGroupSnapshotInstallRequest
+    ) throws -> ManagedGroupTransactionJournal.Subscription? {
+        guard request.mode == .subscribed else { return nil }
+        let record = try GroupSubscriptionRecord.make(
+            manifest: request.manifest,
+            route: request.route,
+            destination: request.destination
+        )
+        let replacementData = try GroupSubscriptionStore.encode(record)
+        let url = GroupSubscriptionStore.recordURL(
+            groupId: request.manifest.group.id,
+            targetRoot: request.destination.rootURL
+        )
+        guard let relativePath = relativePath(of: url, under: request.destination.rootURL),
+              relativePath.hasPrefix(".omgskills/groups/")
+        else {
+            throw InstallError.invalidGroupManifest
+        }
+
+        let previousData: Data?
+        if let previous = try GroupSubscriptionStore.read(
+            groupId: request.manifest.group.id,
+            targetRoot: request.destination.rootURL
+        ) {
+            guard previous.groupId == record.groupId,
+                  previous.targetAgent == record.targetAgent,
+                  previous.targetScope == record.targetScope,
+                  previous.targetRootIdentifier == record.targetRootIdentifier
+            else {
+                throw InstallError.invalidGroupManifest
+            }
+            previousData = try Data(contentsOf: url)
+        } else {
+            previousData = nil
+        }
+        return ManagedGroupTransactionJournal.Subscription(
+            relativePath: relativePath,
+            previousData: previousData,
+            replacementData: replacementData
         )
     }
 
@@ -591,7 +684,7 @@ actor ManagedSkillInstaller {
               values.isSymbolicLink != true,
               let attributes = try? fileManager.attributesOfItem(atPath: journalURL.path),
               let size = (attributes[.size] as? NSNumber)?.intValue,
-              size <= 1_048_576,
+              size <= 3_145_728,
               let data = try? Data(contentsOf: journalURL),
               let journal = try? JSONDecoder().decode(
                 ManagedGroupTransactionJournal.self,
@@ -617,6 +710,13 @@ actor ManagedSkillInstaller {
         else {
             throw InstallError.invalidTransactionJournal
         }
+
+        let subscriptionRecovery = try validateSubscriptionRecovery(
+            journal.subscription,
+            journal: journal,
+            targetRoot: targetRoot,
+            fileManager: fileManager
+        )
 
         var targetKeys = Set<String>()
         var recoveryEntries: [JournalRecoveryEntry] = []
@@ -680,7 +780,87 @@ actor ManagedSkillInstaller {
                 try fileManager.removeItem(at: entry.targetURL)
             }
         }
+        if let subscriptionRecovery {
+            if let previousData = subscriptionRecovery.previousData {
+                try GroupSubscriptionStore.write(previousData, to: subscriptionRecovery.url)
+            } else if pathExists(subscriptionRecovery.url, fileManager: fileManager) {
+                try fileManager.removeItem(at: subscriptionRecovery.url)
+            }
+        }
         try removeJournal()
+    }
+
+    private func validateSubscriptionRecovery(
+        _ subscription: ManagedGroupTransactionJournal.Subscription?,
+        journal: ManagedGroupTransactionJournal,
+        targetRoot: URL,
+        fileManager: FileManager
+    ) throws -> (url: URL, previousData: Data?)? {
+        guard let subscription else { return nil }
+        guard let url = resolveRelativePath(subscription.relativePath, under: targetRoot),
+              subscription.relativePath.hasPrefix(".omgskills/groups/"),
+              url == GroupSubscriptionStore.recordURL(
+                  groupId: journal.groupId,
+                  targetRoot: targetRoot
+              )
+        else {
+            throw InstallError.invalidTransactionJournal
+        }
+
+        let replacement = try decodeJournalSubscription(subscription.replacementData)
+        guard replacement.groupId == journal.groupId,
+              replacement.groupRoute == journal.groupRoute,
+              replacement.groupRevision == journal.groupRevision,
+              replacement.targetAgent == journal.targetAgent,
+              replacement.targetScope == journal.targetScope,
+              replacement.targetRootIdentifier == journal.targetRootIdentifier
+        else {
+            throw InstallError.invalidTransactionJournal
+        }
+        if let previousData = subscription.previousData {
+            let previous = try decodeJournalSubscription(previousData)
+            guard previous.groupId == journal.groupId,
+                  previous.targetAgent == journal.targetAgent,
+                  previous.targetScope == journal.targetScope,
+                  previous.targetRootIdentifier == journal.targetRootIdentifier
+            else {
+                throw InstallError.invalidTransactionJournal
+            }
+        }
+
+        let currentData: Data?
+        if pathExists(url, fileManager: fileManager) {
+            guard let values = try? url.resourceValues(
+                      forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey]
+                  ),
+                  values.isRegularFile == true,
+                  values.isSymbolicLink != true,
+                  (values.fileSize ?? Int.max) <= GroupSubscriptionRecord.maximumBytes,
+                  let data = try? Data(contentsOf: url)
+            else {
+                throw InstallError.invalidTransactionJournal
+            }
+            currentData = data
+        } else {
+            currentData = nil
+        }
+        guard currentData == subscription.previousData
+                || currentData == subscription.replacementData
+                || (currentData == nil && subscription.previousData == nil)
+        else {
+            throw InstallError.invalidTransactionJournal
+        }
+        return (url, subscription.previousData)
+    }
+
+    private func decodeJournalSubscription(_ data: Data) throws -> GroupSubscriptionRecord {
+        guard data.count <= GroupSubscriptionRecord.maximumBytes,
+              let record = try? JSONDecoder().decode(GroupSubscriptionRecord.self, from: data),
+              (try? record.validate()) != nil
+        else {
+            throw InstallError.invalidTransactionJournal
+        }
+        return record
     }
 
     private func resolveActivationPath(_ relativePath: String) -> URL? {

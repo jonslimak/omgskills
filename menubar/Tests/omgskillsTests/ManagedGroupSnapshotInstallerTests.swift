@@ -79,6 +79,103 @@ struct ManagedGroupSnapshotInstallerTests {
         )
         #expect(updateResult.installedCount == 0)
         #expect(updateResult.updatedCount == 3)
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ) == nil)
+    }
+
+    @Test func subscribedInstallWritesReceiptAndDetectsCompleteLocalEdits() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let manifest = try fixture.manifest(items: [
+            fixture.installable(name: "example", kind: "catalog", source: fixture.catalogSource()),
+            fixture.metadataOnly(name: "local-note", reason: "synced_local_only")
+        ])
+
+        _ = try await installer.installGroupSnapshot(
+            fixture.request(manifest, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+
+        let savedReceipt = try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        )
+        let receipt = try #require(savedReceipt)
+        #expect(receipt.groupRevision == 7)
+        #expect(receipt.items.map(\.name) == ["example", "local-note"])
+        #expect(SkillInstallProvenanceStore.read(
+            targetRoot: fixture.targetRoot,
+            targetName: "example"
+        )?.installMode == ManagedSkillInstallMode.subscribed.rawValue)
+
+        let clean = try #require(await installer.detectGroupSubscription(
+            manifest: manifest,
+            route: fixture.route,
+            destination: fixture.destination
+        ))
+        #expect(clean.hasUpstreamChanges == false)
+        #expect(clean.hasLocalChanges == false)
+
+        let nestedFile = fixture.targetRoot.appendingPathComponent("example/references/info.txt")
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o644],
+            ofItemAtPath: nestedFile.path
+        )
+        try Data("locally changed\n".utf8).write(to: nestedFile)
+
+        let modified = try #require(await installer.detectGroupSubscription(
+            manifest: manifest,
+            route: fixture.route,
+            destination: fixture.destination
+        ))
+        #expect(modified.hasUpstreamChanges == false)
+        #expect(modified.hasLocalChanges)
+        #expect(modified.changes.first?.localState == .modified)
+    }
+
+    @Test func failedReceiptWriteRollsBackTargetsAndPreviousReceipt() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let firstManifest = try fixture.manifest(revision: 7, items: [
+            fixture.installable(name: "example", kind: "catalog", source: fixture.catalogSource())
+        ])
+        let firstInstaller = fixture.installer()
+        _ = try await firstInstaller.installGroupSnapshot(
+            fixture.request(firstManifest, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let previousTarget = try fixture.targetDestination("example")
+        let savedReceipt = try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        )
+        let previousReceipt = try #require(savedReceipt)
+        let nextManifest = try fixture.manifest(revision: 8, items: [
+            fixture.installable(name: "example", kind: "catalog", source: fixture.catalogSource())
+        ])
+        let failingInstaller = fixture.installer(beforeSubscriptionWrite: {
+            throw GroupTransactionTestFailure.injected
+        })
+
+        await #expect(throws: GroupTransactionTestFailure.self) {
+            try await failingInstaller.installGroupSnapshot(
+                fixture.request(nextManifest, mode: .subscribed),
+                credential: fixture.credential,
+                packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+            )
+        }
+
+        #expect(try fixture.targetDestination("example") == previousTarget)
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ) == previousReceipt)
+        #expect(!FileManager.default.fileExists(atPath: fixture.journalURL.path))
     }
 
     @Test func preflightRejectsPortableNameCollisionsBeforeLoading() async throws {
@@ -395,25 +492,41 @@ private struct GroupTransactionFixture: Sendable {
     }
 
     func installer(
-        beforeGroupSwitch: @escaping ManagedSkillInstaller.BeforeGroupActivationSwitch = { _, _ in }
+        beforeGroupSwitch: @escaping ManagedSkillInstaller.BeforeGroupActivationSwitch = { _, _ in },
+        beforeSubscriptionWrite: @escaping ManagedSkillInstaller.BeforeSubscriptionWrite = {}
     ) -> ManagedSkillInstaller {
         ManagedSkillInstaller(
             managedRoot: managedRoot,
             pathAnchor: root,
-            beforeGroupActivationSwitch: beforeGroupSwitch
+            beforeGroupActivationSwitch: beforeGroupSwitch,
+            beforeSubscriptionWrite: beforeSubscriptionWrite
         )
     }
 
-    func request(_ manifest: GroupManifest) throws -> ManagedGroupSnapshotInstallRequest {
+    var route: DeviceGroupManifestRoute {
+        get throws {
+            try DeviceGroupManifestRoute(handle: "owner", groupSlug: "team-skills")
+        }
+    }
+
+    var destination: ManagedGroupSnapshotDestination {
+        ManagedGroupSnapshotDestination(
+            agent: .claude,
+            scope: .userGlobal,
+            rootIdentifier: "claude-user-global",
+            rootURL: targetRoot
+        )
+    }
+
+    func request(
+        _ manifest: GroupManifest,
+        mode: ManagedSkillInstallMode = .snapshot
+    ) throws -> ManagedGroupSnapshotInstallRequest {
         ManagedGroupSnapshotInstallRequest(
             manifest: manifest,
-            route: try DeviceGroupManifestRoute(handle: "owner", groupSlug: "team-skills"),
-            destination: ManagedGroupSnapshotDestination(
-                agent: .claude,
-                scope: .userGlobal,
-                rootIdentifier: "claude-user-global",
-                rootURL: targetRoot
-            )
+            route: try route,
+            destination: destination,
+            mode: mode
         )
     }
 
@@ -437,7 +550,7 @@ private struct GroupTransactionFixture: Sendable {
         )
     }
 
-    func manifest(items: [[String: Any]]) throws -> GroupManifest {
+    func manifest(revision: Int = 7, items: [[String: Any]]) throws -> GroupManifest {
         let object: [String: Any] = [
             "type": GroupManifest.expectedType,
             "version": GroupManifest.supportedVersion,
@@ -446,7 +559,7 @@ private struct GroupTransactionFixture: Sendable {
                 "name": "Team Skills",
                 "description": "Test group",
                 "slug": "team-skills",
-                "revision": 7
+                "revision": revision
             ],
             "items": items.enumerated().map { position, item in
                 var positioned = item

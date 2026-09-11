@@ -29,7 +29,11 @@ struct GroupSnapshotInstallSheet: View {
 
         VStack(alignment: .leading, spacing: 16) {
             header
-            targetPicker(selection: $model.selectedTarget)
+            targetPicker(selection: Binding(
+                get: { model.selectedTarget },
+                set: { model.selectTarget($0) }
+            ))
+            installModePicker(selection: $model.installMode)
             itemList
             acknowledgement(isOn: $model.acknowledgesMetadataOnly)
             status
@@ -45,8 +49,25 @@ struct GroupSnapshotInstallSheet: View {
             maxHeight: 700
         )
         .interactiveDismissDisabled(model.isOperationActive)
+        .task(id: model.selectedTarget) {
+            await model.refreshSubscription()
+        }
         .onDisappear {
             model.cancelInstall()
+        }
+    }
+
+    @ViewBuilder
+    private func installModePicker(selection: Binding<ManagedSkillInstallMode>) -> some View {
+        if model.selectedTarget != nil,
+           model.subscriptionPhase == .none,
+           model.phase == .ready {
+            Picker("Install mode", selection: selection) {
+                Text("Install this version").tag(ManagedSkillInstallMode.snapshot)
+                Text("Keep updated").tag(ManagedSkillInstallMode.subscribed)
+            }
+            .pickerStyle(.segmented)
+            .accessibilityHint("Choose a fixed version or save it for update checks")
         }
     }
 
@@ -87,8 +108,16 @@ struct GroupSnapshotInstallSheet: View {
     }
 
     private var itemList: some View {
-        List(model.items) { item in
-            GroupSnapshotInstallItemRow(item: item)
+        List {
+            if let subscription = model.existingSubscription {
+                ForEach(subscription.changes) { change in
+                    GroupSubscriptionChangeRow(change: change)
+                }
+            } else {
+                ForEach(model.items) { item in
+                    GroupSnapshotInstallItemRow(item: item)
+                }
+            }
         }
         .listStyle(.plain)
         .frame(minHeight: 180)
@@ -120,12 +149,27 @@ struct GroupSnapshotInstallSheet: View {
     private var status: some View {
         switch model.phase {
         case .ready:
-            if model.installableCount == 0 {
+            switch model.subscriptionPhase {
+            case .checking:
+                ProgressView("Checking installed version...")
+                    .controlSize(.small)
+            case .existing(let diff):
+                subscriptionStatus(diff)
+            case .failure(let message):
+                Label(message, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
+            case .none where model.installableCount == 0:
                 Label("This group has no installable skills.", systemImage: "info.circle")
                     .foregroundStyle(.secondary)
+            case .none:
+                EmptyView()
             }
         case .installing:
-            ProgressView("Installing this version...")
+            ProgressView(
+                model.installMode == .subscribed
+                    ? "Installing and enabling update checks..."
+                    : "Installing this version..."
+            )
                 .controlSize(.small)
         case .cancelling:
             ProgressView("Cancelling and restoring previous skills...")
@@ -139,6 +183,26 @@ struct GroupSnapshotInstallSheet: View {
         case .cancelled:
             Label("Installation cancelled. Previous skills remain available.", systemImage: "xmark.circle")
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func subscriptionStatus(_ diff: GroupSubscriptionDiff) -> some View {
+        if diff.hasLocalChanges {
+            Label(
+                "Local changes were found. Review them before replacing this version.",
+                systemImage: "exclamationmark.triangle.fill"
+            )
+            .foregroundStyle(.orange)
+        } else if diff.hasUpstreamChanges {
+            Label(
+                "Changes are available. Applying them will be added in the next step.",
+                systemImage: "arrow.triangle.2.circlepath"
+            )
+            .foregroundStyle(.secondary)
+        } else {
+            Label("This installed group is up to date.", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(.green)
         }
     }
 
@@ -173,11 +237,24 @@ struct GroupSnapshotInstallSheet: View {
     private var primaryAction: some View {
         switch model.phase {
         case .ready:
-            Button("Install this version") {
-                model.startInstall()
+            if model.existingSubscription != nil || model.subscriptionPhase == .checking {
+                EmptyView()
+            } else if case .failure = model.subscriptionPhase {
+                Button("Try again") {
+                    Task { await model.refreshSubscription() }
+                }
+                .keyboardShortcut(.defaultAction)
+            } else {
+                Button(
+                    model.installMode == .subscribed
+                        ? "Keep updated"
+                        : "Install this version"
+                ) {
+                    model.startInstall()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!model.canInstall)
             }
-            .keyboardShortcut(.defaultAction)
-            .disabled(!model.canInstall)
         case .failure(let failure) where failure.canRetry:
             Button("Try again") {
                 model.retryInstall()
@@ -221,6 +298,82 @@ struct GroupSnapshotInstallSheet: View {
             parts.append("\(summary.skippedCount) skipped")
         }
         return parts.isEmpty ? "This version is installed." : parts.joined(separator: ", ").capitalized + "."
+    }
+}
+
+private struct GroupSubscriptionChangeRow: View {
+    let change: GroupSubscriptionChange
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: symbolName)
+                .foregroundStyle(symbolStyle)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(change.name)
+                    .font(.body.weight(.medium))
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(detailStyle)
+            }
+
+            Spacer(minLength: 8)
+            Text(statusLabel)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var statusLabel: String {
+        switch change.kind {
+        case .added: "Added"
+        case .updated: change.wasReordered ? "Updated and moved" : "Updated"
+        case .removed: "Removed"
+        case .reordered: "Moved"
+        case .unchanged: "Unchanged"
+        }
+    }
+
+    private var detail: String {
+        guard let localState = change.localState, localState != .clean else {
+            return change.isMetadataOnly ? "Metadata only" : "Installed package"
+        }
+        return switch localState {
+        case .clean: "Installed package"
+        case .modified: "Modified on this Mac"
+        case .missing: "Missing from this Mac"
+        case .replaced: "Replaced by another installation"
+        case .unreadable: "Could not verify local files"
+        }
+    }
+
+    private var symbolName: String {
+        switch change.kind {
+        case .added: "plus.circle"
+        case .updated: "arrow.triangle.2.circlepath.circle"
+        case .removed: "minus.circle"
+        case .reordered: "arrow.up.arrow.down.circle"
+        case .unchanged: "checkmark.circle"
+        }
+    }
+
+    private var symbolStyle: AnyShapeStyle {
+        if let localState = change.localState, localState != .clean {
+            return AnyShapeStyle(Color.orange)
+        }
+        return change.kind == .unchanged
+            ? AnyShapeStyle(Color.secondary)
+            : AnyShapeStyle(Color.accentColor)
+    }
+
+    private var detailStyle: AnyShapeStyle {
+        if let localState = change.localState, localState != .clean {
+            return AnyShapeStyle(Color.orange)
+        }
+        return AnyShapeStyle(Color.secondary)
     }
 }
 
