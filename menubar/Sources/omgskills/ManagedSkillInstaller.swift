@@ -107,7 +107,20 @@ struct ManagedGroupMetadataOnlyItem: Equatable, Sendable {
 struct ManagedGroupSnapshotInstallResult: Equatable, Sendable {
     let installedCount: Int
     let updatedCount: Int
+    let removedCount: Int
     let metadataOnlyItems: [ManagedGroupMetadataOnlyItem]
+
+    init(
+        installedCount: Int,
+        updatedCount: Int,
+        removedCount: Int = 0,
+        metadataOnlyItems: [ManagedGroupMetadataOnlyItem]
+    ) {
+        self.installedCount = installedCount
+        self.updatedCount = updatedCount
+        self.removedCount = removedCount
+        self.metadataOnlyItems = metadataOnlyItems
+    }
 }
 
 struct ManagedSkillCleanupReport: Equatable, Sendable {
@@ -137,6 +150,26 @@ private struct PreparedGroupItem: Sendable {
     let activation: URL
 }
 
+private struct PlannedGroupRemoval: Sendable {
+    let targetName: String
+    let targetURL: URL
+    let previousActivation: URL
+}
+
+private enum PreparedGroupMutation: Sendable {
+    case replace(PreparedGroupItem)
+    case remove(PlannedGroupRemoval)
+
+    var targetName: String {
+        switch self {
+        case .replace(let item):
+            item.planned.installRequest.destination.targetName
+        case .remove(let item):
+            item.targetName
+        }
+    }
+}
+
 private struct ManagedGroupTransactionJournal: Codable, Sendable {
     static let supportedVersion = 1
 
@@ -153,9 +186,15 @@ private struct ManagedGroupTransactionJournal: Codable, Sendable {
     let subscription: Subscription?
 
     struct Entry: Codable, Sendable {
+        enum Operation: String, Codable, Sendable {
+            case replace
+            case remove
+        }
+
         let targetName: String
         let previousActivationRelativePath: String?
-        let preparedActivationRelativePath: String
+        let preparedActivationRelativePath: String?
+        let operation: Operation?
     }
 
     struct Subscription: Codable, Sendable {
@@ -168,7 +207,12 @@ private struct ManagedGroupTransactionJournal: Codable, Sendable {
 private struct JournalRecoveryEntry {
     let targetURL: URL
     let previousContent: URL?
-    let preparedContent: URL
+    let operation: Operation
+
+    enum Operation {
+        case replace(preparedContent: URL)
+        case remove
+    }
 }
 
 actor ManagedSkillInstaller {
@@ -185,6 +229,9 @@ actor ManagedSkillInstaller {
         case invalidManagedActivation
         case invalidGroupManifest
         case invalidTransactionJournal
+        case subscriptionNotFound
+        case subscriptionChanged
+        case subscriptionHasLocalConflicts
         case operationInProgress
         case filesystemFailure(String)
 
@@ -204,6 +251,12 @@ actor ManagedSkillInstaller {
                 return "This group cannot be installed safely"
             case .invalidTransactionJournal:
                 return "A previous group installation cannot be recovered safely"
+            case .subscriptionNotFound:
+                return "This Skill Group subscription is no longer installed"
+            case .subscriptionChanged:
+                return "The installed Skill Group changed. Refresh it and try again"
+            case .subscriptionHasLocalConflicts:
+                return "Resolve the local skill changes before applying this group update"
             case .operationInProgress:
                 return "Another managed installation is already in progress"
             case .filesystemFailure(let message):
@@ -277,6 +330,113 @@ actor ManagedSkillInstaller {
         try recoverPendingTransaction()
 
         let plan = try makeGroupPlan(request)
+        return try await performGroupTransaction(
+            request: request,
+            plan: plan,
+            removals: [],
+            credential: credential,
+            packageLoader: packageLoader
+        )
+    }
+
+    func applyGroupSubscriptionUpdate(
+        _ request: ManagedGroupSnapshotInstallRequest,
+        credential: StoredDeviceCredential,
+        packageLoader: any GroupSkillPackageLoading
+    ) async throws -> ManagedGroupSnapshotInstallResult {
+        try beginMutation()
+        defer { endMutation() }
+        try recoverPendingTransaction()
+        guard request.mode == .subscribed,
+              let baseline = try GroupSubscriptionStore.read(
+                  groupId: request.manifest.group.id,
+                  targetRoot: request.destination.rootURL
+              ),
+              let diff = try await detectGroupSubscription(
+                  manifest: request.manifest,
+                  route: request.route,
+                  destination: request.destination
+              )
+        else {
+            throw InstallError.subscriptionNotFound
+        }
+        guard diff.hasUpstreamChanges else {
+            return ManagedGroupSnapshotInstallResult(
+                installedCount: 0,
+                updatedCount: 0,
+                removedCount: 0,
+                metadataOnlyItems: []
+            )
+        }
+        guard !diff.hasBlockingLocalConflicts else {
+            throw InstallError.subscriptionHasLocalConflicts
+        }
+
+        let packageItemIDs = Set(diff.changes.compactMap { change in
+            switch change.packageAction {
+            case .install, .update, .rename:
+                change.id
+            case .remove, .none:
+                nil
+            }
+        })
+        let baselineTargetKeys = Set<String>(baseline.items.compactMap { item in
+            guard !item.isMetadataOnly else { return nil }
+            return portableTargetKey(item.name)
+        })
+        let plan = try makeGroupPlan(
+            request,
+            installing: packageItemIDs,
+            allowedExistingTargetKeys: baselineTargetKeys
+        )
+        let currentTargetKeys = Set<String>(request.manifest.items.compactMap { item in
+            guard case .installable = item.installability else { return nil }
+            return portableTargetKey(item.name)
+        })
+        let baselineByID = Dictionary(uniqueKeysWithValues: baseline.items.map { ($0.id, $0) })
+        var removals: [PlannedGroupRemoval] = []
+        for change in diff.changes where change.packageAction == .remove || change.packageAction == .rename {
+            guard let previous = baselineByID[change.id],
+                  !previous.isMetadataOnly,
+                  !currentTargetKeys.contains(portableTargetKey(previous.name))
+            else {
+                continue
+            }
+            let targetURL = request.destination.rootURL.appendingPathComponent(
+                previous.name,
+                isDirectory: true
+            )
+            guard let activation = try existingManagedActivation(
+                at: targetURL,
+                fileManager: .default
+            ) else {
+                continue
+            }
+            removals.append(PlannedGroupRemoval(
+                targetName: previous.name,
+                targetURL: targetURL,
+                previousActivation: activation
+            ))
+        }
+
+        return try await performGroupTransaction(
+            request: request,
+            plan: plan,
+            removals: removals,
+            credential: credential,
+            packageLoader: packageLoader,
+            expectedInstalledRevision: diff.installedRevision
+        )
+    }
+
+    private func performGroupTransaction(
+        request: ManagedGroupSnapshotInstallRequest,
+        plan: GroupInstallPlan,
+        removals: [PlannedGroupRemoval],
+        credential: StoredDeviceCredential,
+        packageLoader: any GroupSkillPackageLoading,
+        expectedInstalledRevision: Int? = nil
+    ) async throws -> ManagedGroupSnapshotInstallResult {
         var stored: [StoredGroupItem] = []
         stored.reserveCapacity(plan.installable.count)
         for item in plan.installable {
@@ -296,6 +456,18 @@ actor ManagedSkillInstaller {
         }
 
         try Task.checkCancellation()
+        if let expectedInstalledRevision {
+            guard let latestDiff = try await detectGroupSubscription(
+                manifest: request.manifest,
+                route: request.route,
+                destination: request.destination
+            ), latestDiff.installedRevision == expectedInstalledRevision else {
+                throw InstallError.subscriptionChanged
+            }
+            guard !latestDiff.hasBlockingLocalConflicts else {
+                throw InstallError.subscriptionHasLocalConflicts
+            }
+        }
         let prepared = try stored.map { item in
             let current = try existingManagedActivation(
                 at: item.planned.targetURL,
@@ -313,24 +485,39 @@ actor ManagedSkillInstaller {
             )
         }
 
-        guard !prepared.isEmpty else {
+        let mutations = prepared.map(PreparedGroupMutation.replace)
+            + removals.map(PreparedGroupMutation.remove)
+        guard !mutations.isEmpty || request.mode == .subscribed else {
             return ManagedGroupSnapshotInstallResult(
                 installedCount: 0,
                 updatedCount: 0,
+                removedCount: 0,
                 metadataOnlyItems: plan.metadataOnly
             )
         }
 
-        let journal = try makeJournal(for: request, prepared: prepared)
+        let journal = try makeJournal(for: request, mutations: mutations)
         try writeJournal(journal)
         do {
-            for (index, item) in prepared.enumerated() {
+            for (index, mutation) in mutations.enumerated() {
                 try Task.checkCancellation()
-                try beforeGroupActivationSwitch(index, item.planned.installRequest.destination.targetName)
-                try switchTarget(
-                    item.planned.targetURL,
-                    to: item.activation.appendingPathComponent("content", isDirectory: true)
-                )
+                try beforeGroupActivationSwitch(index, mutation.targetName)
+                switch mutation {
+                case .replace(let item):
+                    try switchTarget(
+                        item.planned.targetURL,
+                        to: item.activation.appendingPathComponent("content", isDirectory: true)
+                    )
+                case .remove(let item):
+                    let current = try existingManagedActivation(
+                        at: item.targetURL,
+                        fileManager: .default
+                    )
+                    guard current == item.previousActivation else {
+                        throw InstallError.invalidManagedActivation
+                    }
+                    try FileManager.default.removeItem(at: item.targetURL)
+                }
             }
             if let subscription = journal.subscription {
                 try beforeSubscriptionWrite()
@@ -354,6 +541,7 @@ actor ManagedSkillInstaller {
         return ManagedGroupSnapshotInstallResult(
             installedCount: prepared.filter { $0.planned.previousActivation == nil }.count,
             updatedCount: prepared.filter { $0.planned.previousActivation != nil }.count,
+            removedCount: removals.count,
             metadataOnlyItems: plan.metadataOnly
         )
     }
@@ -459,7 +647,9 @@ actor ManagedSkillInstaller {
     }
 
     private func makeGroupPlan(
-        _ request: ManagedGroupSnapshotInstallRequest
+        _ request: ManagedGroupSnapshotInstallRequest,
+        installing itemIDs: Set<String>? = nil,
+        allowedExistingTargetKeys: Set<String>? = nil
     ) throws -> GroupInstallPlan {
         let manifest = request.manifest
         let destination = request.destination
@@ -490,6 +680,12 @@ actor ManagedSkillInstaller {
                 ))
             case .installable(let source, let release):
                 let sourceValues = try managedSourceValues(for: item, source: source)
+                try validateTargetName(item.name)
+                let collisionKey = portableTargetKey(item.name)
+                guard targetKeys.insert(collisionKey).inserted else {
+                    throw InstallError.invalidGroupManifest
+                }
+                guard itemIDs?.contains(item.id) ?? true else { continue }
                 let installRequest = ManagedSkillInstallRequest(
                     sourceKind: sourceValues.kind,
                     sourceId: sourceValues.id,
@@ -510,22 +706,24 @@ actor ManagedSkillInstaller {
                     )
                 )
                 try validate(installRequest)
-                let collisionKey = portableTargetKey(item.name)
-                guard targetKeys.insert(collisionKey).inserted else {
-                    throw InstallError.invalidGroupManifest
-                }
                 let targetURL = destination.rootURL.appendingPathComponent(
                     item.name,
                     isDirectory: true
                 )
+                let previousActivation = try existingManagedActivation(
+                    at: targetURL,
+                    fileManager: .default
+                )
+                if previousActivation != nil,
+                   let allowedExistingTargetKeys,
+                   !allowedExistingTargetKeys.contains(collisionKey) {
+                    throw InstallError.unmanagedTargetExists
+                }
                 installable.append(PlannedGroupItem(
                     manifestItem: item,
                     installRequest: installRequest,
                     targetURL: targetURL,
-                    previousActivation: try existingManagedActivation(
-                        at: targetURL,
-                        fileManager: .default
-                    )
+                    previousActivation: previousActivation
                 ))
             }
         }
@@ -567,7 +765,7 @@ actor ManagedSkillInstaller {
 
     private func makeJournal(
         for request: ManagedGroupSnapshotInstallRequest,
-        prepared: [PreparedGroupItem]
+        mutations: [PreparedGroupMutation]
     ) throws -> ManagedGroupTransactionJournal {
         guard let targetRootRelativePath = relativePath(
             of: request.destination.rootURL,
@@ -575,22 +773,39 @@ actor ManagedSkillInstaller {
         ) else {
             throw InstallError.invalidGroupManifest
         }
-        let entries = try prepared.map { item in
-            guard let preparedPath = relativePath(of: item.activation, under: managedRoot)
-            else {
-                throw InstallError.invalidManagedActivation
-            }
-            let previousPath = try item.planned.previousActivation.map { activation in
-                guard let path = relativePath(of: activation, under: managedRoot) else {
+        let entries = try mutations.map { mutation in
+            switch mutation {
+            case .replace(let item):
+                guard let preparedPath = relativePath(of: item.activation, under: managedRoot)
+                else {
                     throw InstallError.invalidManagedActivation
                 }
-                return path
+                let previousPath = try item.planned.previousActivation.map { activation in
+                    guard let path = relativePath(of: activation, under: managedRoot) else {
+                        throw InstallError.invalidManagedActivation
+                    }
+                    return path
+                }
+                return ManagedGroupTransactionJournal.Entry(
+                    targetName: item.planned.installRequest.destination.targetName,
+                    previousActivationRelativePath: previousPath,
+                    preparedActivationRelativePath: preparedPath,
+                    operation: .replace
+                )
+            case .remove(let item):
+                guard let previousPath = relativePath(
+                    of: item.previousActivation,
+                    under: managedRoot
+                ) else {
+                    throw InstallError.invalidManagedActivation
+                }
+                return ManagedGroupTransactionJournal.Entry(
+                    targetName: item.targetName,
+                    previousActivationRelativePath: previousPath,
+                    preparedActivationRelativePath: nil,
+                    operation: .remove
+                )
             }
-            return ManagedGroupTransactionJournal.Entry(
-                targetName: item.planned.installRequest.destination.targetName,
-                previousActivationRelativePath: previousPath,
-                preparedActivationRelativePath: preparedPath
-            )
         }
         let subscription = try makeSubscriptionMutation(for: request)
         return ManagedGroupTransactionJournal(
@@ -701,8 +916,8 @@ actor ManagedSkillInstaller {
                 of: "^[a-z0-9][a-z0-9._-]{0,127}$",
                 options: .regularExpression
               ) != nil,
-              !journal.entries.isEmpty,
-              journal.entries.count <= GroupManifest.maximumItemCount,
+              (!journal.entries.isEmpty || journal.subscription != nil),
+              journal.entries.count <= GroupManifest.maximumItemCount * 2,
               let targetRoot = resolveRelativePath(
                 journal.targetRootRelativePath,
                 under: pathAnchor
@@ -724,11 +939,7 @@ actor ManagedSkillInstaller {
         for entry in journal.entries {
             try validateTargetName(entry.targetName)
             let key = portableTargetKey(entry.targetName)
-            guard targetKeys.insert(key).inserted,
-                  let preparedActivation = resolveActivationPath(
-                    entry.preparedActivationRelativePath
-                  )
-            else {
+            guard targetKeys.insert(key).inserted else {
                 throw InstallError.invalidTransactionJournal
             }
             let previousActivation = try entry.previousActivationRelativePath.map { path in
@@ -738,46 +949,82 @@ actor ManagedSkillInstaller {
                 return activation
             }
             let targetURL = targetRoot.appendingPathComponent(entry.targetName, isDirectory: true)
-            let preparedContent = preparedActivation.appendingPathComponent(
-                "content",
-                isDirectory: true
-            )
             let previousContent = previousActivation?.appendingPathComponent(
                 "content",
                 isDirectory: true
             )
             let current = symlinkDestination(of: targetURL, fileManager: fileManager)
-            if previousContent == nil {
-                guard !pathExists(targetURL, fileManager: fileManager) || current == preparedContent
+            let operation = entry.operation ?? .replace
+            switch operation {
+            case .replace:
+                guard let preparedPath = entry.preparedActivationRelativePath,
+                      let preparedActivation = resolveActivationPath(preparedPath)
                 else {
                     throw InstallError.invalidTransactionJournal
                 }
-            } else {
-                guard current == previousContent || current == preparedContent else {
+                let preparedContent = preparedActivation.appendingPathComponent(
+                    "content",
+                    isDirectory: true
+                )
+                if previousContent == nil {
+                    guard !pathExists(targetURL, fileManager: fileManager)
+                            || current == preparedContent
+                    else {
+                        throw InstallError.invalidTransactionJournal
+                    }
+                } else if current != previousContent && current != preparedContent {
                     throw InstallError.invalidTransactionJournal
                 }
+                recoveryEntries.append(JournalRecoveryEntry(
+                    targetURL: targetURL,
+                    previousContent: previousContent,
+                    operation: .replace(preparedContent: preparedContent)
+                ))
+            case .remove:
+                guard entry.preparedActivationRelativePath == nil,
+                      let previousContent
+                else {
+                    throw InstallError.invalidTransactionJournal
+                }
+                if pathExists(targetURL, fileManager: fileManager), current != previousContent {
+                    throw InstallError.invalidTransactionJournal
+                }
+                recoveryEntries.append(JournalRecoveryEntry(
+                    targetURL: targetURL,
+                    previousContent: previousContent,
+                    operation: .remove
+                ))
             }
-            recoveryEntries.append(JournalRecoveryEntry(
-                targetURL: targetURL,
-                previousContent: previousContent,
-                preparedContent: preparedContent
-            ))
         }
 
         for entry in recoveryEntries.reversed() {
             let current = symlinkDestination(of: entry.targetURL, fileManager: fileManager)
-            if let previousContent = entry.previousContent {
-                guard current == previousContent || current == entry.preparedContent else {
+            switch entry.operation {
+            case .replace(let preparedContent):
+                if let previousContent = entry.previousContent {
+                    guard current == previousContent || current == preparedContent else {
+                        throw InstallError.invalidTransactionJournal
+                    }
+                    if current != previousContent {
+                        try switchTarget(entry.targetURL, to: previousContent)
+                    }
+                } else if pathExists(entry.targetURL, fileManager: fileManager) {
+                    guard current == preparedContent else {
+                        throw InstallError.invalidTransactionJournal
+                    }
+                    try fileManager.removeItem(at: entry.targetURL)
+                }
+            case .remove:
+                guard let previousContent = entry.previousContent else {
                     throw InstallError.invalidTransactionJournal
                 }
-                if current != previousContent {
+                if pathExists(entry.targetURL, fileManager: fileManager) {
+                    guard current == previousContent else {
+                        throw InstallError.invalidTransactionJournal
+                    }
+                } else {
                     try switchTarget(entry.targetURL, to: previousContent)
                 }
-            } else if pathExists(entry.targetURL, fileManager: fileManager) {
-                guard current == entry.preparedContent else {
-                    throw InstallError.invalidTransactionJournal
-                }
-                try fileManager.removeItem(at: entry.targetURL)
             }
         }
         if let subscriptionRecovery {

@@ -3,6 +3,7 @@ import SwiftUI
 struct GroupSnapshotInstallSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var model: GroupSnapshotInstallModel
+    @State private var showsUpdateConfirmation = false
 
     init(
         manifest: GroupManifest,
@@ -49,6 +50,18 @@ struct GroupSnapshotInstallSheet: View {
             maxHeight: 700
         )
         .interactiveDismissDisabled(model.isOperationActive)
+        .confirmationDialog(
+            "Apply this Skill Group update?",
+            isPresented: $showsUpdateConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Apply update") {
+                model.startSubscriptionUpdate()
+            }
+            Button("Not now", role: .cancel) {}
+        } message: {
+            Text(updateConfirmationMessage)
+        }
         .task(id: model.selectedTarget) {
             await model.refreshSubscription()
         }
@@ -135,7 +148,7 @@ struct GroupSnapshotInstallSheet: View {
 
     @ViewBuilder
     private func acknowledgement(isOn: Binding<Bool>) -> some View {
-        if model.metadataOnlyCount > 0 {
+        if model.existingSubscription == nil, model.metadataOnlyCount > 0 {
             Toggle(
                 acknowledgementLabel,
                 isOn: isOn
@@ -166,7 +179,9 @@ struct GroupSnapshotInstallSheet: View {
             }
         case .installing:
             ProgressView(
-                model.installMode == .subscribed
+                model.existingSubscription != nil
+                    ? "Validating and applying this update..."
+                    : model.installMode == .subscribed
                     ? "Installing and enabling update checks..."
                     : "Installing this version..."
             )
@@ -181,27 +196,39 @@ struct GroupSnapshotInstallSheet: View {
             Label(failure.message, systemImage: "exclamationmark.triangle.fill")
                 .foregroundStyle(.red)
         case .cancelled:
-            Label("Installation cancelled. Previous skills remain available.", systemImage: "xmark.circle")
+            Label(
+                model.existingSubscription == nil
+                    ? "Installation cancelled. Previous skills remain available."
+                    : "Update cancelled. Previous skills remain available.",
+                systemImage: "xmark.circle"
+            )
                 .foregroundStyle(.secondary)
         }
     }
 
     @ViewBuilder
     private func subscriptionStatus(_ diff: GroupSubscriptionDiff) -> some View {
-        if diff.hasLocalChanges {
+        if diff.hasBlockingLocalConflicts {
             Label(
-                "Local changes were found. Review them before replacing this version.",
+                "Local changes block this update. Restore or reinstall the affected skills first.",
                 systemImage: "exclamationmark.triangle.fill"
             )
             .foregroundStyle(.orange)
         } else if diff.hasUpstreamChanges {
             Label(
-                "Changes are available. Applying them will be added in the next step.",
+                diff.hasLocalChanges
+                    ? "Changes are available. Unaffected local edits will be preserved."
+                    : "Review the changes before applying this update.",
                 systemImage: "arrow.triangle.2.circlepath"
             )
             .foregroundStyle(.secondary)
         } else {
-            Label("This installed group is up to date.", systemImage: "checkmark.circle.fill")
+            Label(
+                diff.hasLocalChanges
+                    ? "This group is up to date. Local edits remain on this Mac."
+                    : "This installed group is up to date.",
+                systemImage: "checkmark.circle.fill"
+            )
                 .foregroundStyle(.green)
         }
     }
@@ -218,7 +245,7 @@ struct GroupSnapshotInstallSheet: View {
     private var leadingAction: some View {
         switch model.phase {
         case .installing:
-            Button("Cancel installation") {
+            Button(model.existingSubscription == nil ? "Cancel installation" : "Cancel update") {
                 model.cancelInstall()
             }
             .keyboardShortcut(.cancelAction)
@@ -237,7 +264,15 @@ struct GroupSnapshotInstallSheet: View {
     private var primaryAction: some View {
         switch model.phase {
         case .ready:
-            if model.existingSubscription != nil || model.subscriptionPhase == .checking {
+            if let subscription = model.existingSubscription {
+                if subscription.hasUpstreamChanges {
+                    Button("Apply update...") {
+                        showsUpdateConfirmation = true
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(!model.canApplySubscriptionUpdate)
+                }
+            } else if model.subscriptionPhase == .checking {
                 EmptyView()
             } else if case .failure = model.subscriptionPhase {
                 Button("Try again") {
@@ -294,10 +329,34 @@ struct GroupSnapshotInstallSheet: View {
         if summary.updatedCount > 0 {
             parts.append("\(summary.updatedCount) updated")
         }
+        if summary.removedCount > 0 {
+            parts.append("\(summary.removedCount) removed")
+        }
         if summary.skippedCount > 0 {
             parts.append("\(summary.skippedCount) skipped")
         }
         return parts.isEmpty ? "This version is installed." : parts.joined(separator: ", ").capitalized + "."
+    }
+
+    private var updateConfirmationMessage: String {
+        guard let diff = model.existingSubscription else {
+            return "No update is available."
+        }
+        let installCount = diff.changes.count { $0.packageAction == .install }
+        let updateCount = diff.changes.count {
+            $0.packageAction == .update || $0.packageAction == .rename
+        }
+        let removeCount = diff.changes.count {
+            $0.packageAction == .remove || $0.packageAction == .rename
+        }
+        var parts: [String] = []
+        if installCount > 0 { parts.append("install \(installCount)") }
+        if updateCount > 0 { parts.append("update \(updateCount)") }
+        if removeCount > 0 { parts.append("remove \(removeCount)") }
+        if parts.isEmpty {
+            return "This updates the saved group version without changing installed files."
+        }
+        return "This will \(parts.joined(separator: ", ")). Existing files stay unchanged if any step fails."
     }
 }
 
@@ -328,7 +387,14 @@ private struct GroupSubscriptionChangeRow: View {
     }
 
     private var statusLabel: String {
-        switch change.kind {
+        switch change.packageAction {
+        case .install: return "Will install"
+        case .update: return "Will update"
+        case .remove: return "Will remove"
+        case .rename: return "Will rename"
+        case .none: break
+        }
+        return switch change.kind {
         case .added: "Added"
         case .updated: change.wasReordered ? "Updated and moved" : "Updated"
         case .removed: "Removed"
@@ -351,7 +417,14 @@ private struct GroupSubscriptionChangeRow: View {
     }
 
     private var symbolName: String {
-        switch change.kind {
+        switch change.packageAction {
+        case .install: return "plus.circle"
+        case .update: return "arrow.triangle.2.circlepath.circle"
+        case .remove: return "minus.circle"
+        case .rename: return "pencil.circle"
+        case .none: break
+        }
+        return switch change.kind {
         case .added: "plus.circle"
         case .updated: "arrow.triangle.2.circlepath.circle"
         case .removed: "minus.circle"
@@ -363,6 +436,9 @@ private struct GroupSubscriptionChangeRow: View {
     private var symbolStyle: AnyShapeStyle {
         if let localState = change.localState, localState != .clean {
             return AnyShapeStyle(Color.orange)
+        }
+        if change.packageAction == .remove || change.packageAction == .rename {
+            return AnyShapeStyle(Color.red)
         }
         return change.kind == .unchanged
             ? AnyShapeStyle(Color.secondary)

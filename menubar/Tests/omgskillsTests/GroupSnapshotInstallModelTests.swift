@@ -157,6 +157,85 @@ struct GroupSnapshotInstallModelTests {
         #expect(await installer.recordedRequests().isEmpty)
     }
 
+    @Test func confirmedSubscriptionUpdateUsesUpdatePathAndReportsRemovals() async throws {
+        let diff = GroupSubscriptionDiff(
+            groupId: "10000000-0000-4000-8000-000000000001",
+            installedRevision: 6,
+            currentRevision: 7,
+            changes: [GroupSubscriptionChange(
+                id: "first",
+                name: "Alpha",
+                kind: .updated,
+                wasReordered: false,
+                isMetadataOnly: false,
+                localState: .clean,
+                packageAction: .update
+            )]
+        )
+        let installer = RecordingGroupSnapshotInstaller(
+            outcomes: [.success(ManagedGroupSnapshotInstallResult(
+                installedCount: 0,
+                updatedCount: 1,
+                removedCount: 1,
+                metadataOnlyItems: []
+            ))],
+            detectedSubscription: diff
+        )
+        let model = try makeModel(
+            manifest: manifest(items: [
+                installableItem(id: "first", position: 0, name: "Alpha")
+            ]),
+            installer: installer
+        )
+        model.selectTarget(.claude)
+        await model.refreshSubscription()
+
+        #expect(model.canApplySubscriptionUpdate)
+        try await #require(model.startSubscriptionUpdate()).value
+
+        #expect(model.phase == .success(GroupSnapshotInstallSummary(
+            installedCount: 0,
+            updatedCount: 1,
+            removedCount: 1,
+            skippedCount: 0
+        )))
+        #expect(await installer.recordedRequests().isEmpty)
+        #expect(await installer.recordedUpdateRequests().count == 1)
+    }
+
+    @Test func locallyModifiedChangedSkillBlocksSubscriptionUpdate() async throws {
+        let diff = GroupSubscriptionDiff(
+            groupId: "10000000-0000-4000-8000-000000000001",
+            installedRevision: 6,
+            currentRevision: 7,
+            changes: [GroupSubscriptionChange(
+                id: "first",
+                name: "Alpha",
+                kind: .updated,
+                wasReordered: false,
+                isMetadataOnly: false,
+                localState: .modified,
+                packageAction: .update
+            )]
+        )
+        let installer = RecordingGroupSnapshotInstaller(
+            outcomes: [],
+            detectedSubscription: diff
+        )
+        let model = try makeModel(
+            manifest: manifest(items: [
+                installableItem(id: "first", position: 0, name: "Alpha")
+            ]),
+            installer: installer
+        )
+        model.selectTarget(.claude)
+        await model.refreshSubscription()
+
+        #expect(model.canApplySubscriptionUpdate == false)
+        #expect(model.startSubscriptionUpdate() == nil)
+        #expect(await installer.recordedUpdateRequests().isEmpty)
+    }
+
     @Test func transientFailureCanRetryButReconnectFailureCannot() async throws {
         let transientInstaller = RecordingGroupSnapshotInstaller(outcomes: [
             .failure(.temporarilyUnavailable(retryAfter: "5")),
@@ -345,6 +424,7 @@ private actor RecordingGroupSnapshotInstaller: GroupSnapshotInstalling {
     private var outcomes: [GroupSnapshotInstallerOutcome]
     private let detectedSubscription: GroupSubscriptionDiff?
     private var requests: [ManagedGroupSnapshotInstallRequest] = []
+    private var updateRequests: [ManagedGroupSnapshotInstallRequest] = []
 
     init(
         outcomes: [GroupSnapshotInstallerOutcome],
@@ -368,6 +448,19 @@ private actor RecordingGroupSnapshotInstaller: GroupSnapshotInstalling {
         packageLoader: any GroupSkillPackageLoading
     ) async throws -> ManagedGroupSnapshotInstallResult {
         requests.append(request)
+        return try nextOutcome()
+    }
+
+    func applyGroupSubscriptionUpdate(
+        _ request: ManagedGroupSnapshotInstallRequest,
+        credential: StoredDeviceCredential,
+        packageLoader: any GroupSkillPackageLoading
+    ) async throws -> ManagedGroupSnapshotInstallResult {
+        updateRequests.append(request)
+        return try nextOutcome()
+    }
+
+    private func nextOutcome() throws -> ManagedGroupSnapshotInstallResult {
         guard !outcomes.isEmpty else {
             throw GroupSkillPackageLoaderError.packageUnavailable
         }
@@ -381,6 +474,10 @@ private actor RecordingGroupSnapshotInstaller: GroupSnapshotInstalling {
 
     func recordedRequests() -> [ManagedGroupSnapshotInstallRequest] {
         requests
+    }
+
+    func recordedUpdateRequests() -> [ManagedGroupSnapshotInstallRequest] {
+        updateRequests
     }
 }
 
@@ -409,6 +506,18 @@ private actor SuspendingGroupSnapshotInstaller: GroupSnapshotInstalling {
         }
         try Task.checkCancellation()
         return result
+    }
+
+    func applyGroupSubscriptionUpdate(
+        _ request: ManagedGroupSnapshotInstallRequest,
+        credential: StoredDeviceCredential,
+        packageLoader: any GroupSkillPackageLoading
+    ) async throws -> ManagedGroupSnapshotInstallResult {
+        try await installGroupSnapshot(
+            request,
+            credential: credential,
+            packageLoader: packageLoader
+        )
     }
 
     func waitUntilStarted() async {

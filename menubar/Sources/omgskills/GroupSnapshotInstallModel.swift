@@ -7,6 +7,12 @@ protocol GroupSnapshotInstalling: GroupSubscriptionDetecting, Sendable {
         credential: StoredDeviceCredential,
         packageLoader: any GroupSkillPackageLoading
     ) async throws -> ManagedGroupSnapshotInstallResult
+
+    func applyGroupSubscriptionUpdate(
+        _ request: ManagedGroupSnapshotInstallRequest,
+        credential: StoredDeviceCredential,
+        packageLoader: any GroupSkillPackageLoading
+    ) async throws -> ManagedGroupSnapshotInstallResult
 }
 
 extension GroupSnapshotInstalling {
@@ -78,7 +84,20 @@ struct GroupSnapshotInstallItem: Identifiable, Equatable, Sendable {
 struct GroupSnapshotInstallSummary: Equatable, Sendable {
     let installedCount: Int
     let updatedCount: Int
+    let removedCount: Int
     let skippedCount: Int
+
+    init(
+        installedCount: Int,
+        updatedCount: Int,
+        removedCount: Int = 0,
+        skippedCount: Int
+    ) {
+        self.installedCount = installedCount
+        self.updatedCount = updatedCount
+        self.removedCount = removedCount
+        self.skippedCount = skippedCount
+    }
 }
 
 struct GroupSnapshotInstallFailure: Equatable, Sendable {
@@ -211,6 +230,17 @@ final class GroupSnapshotInstallModel {
         return diff
     }
 
+    var canApplySubscriptionUpdate: Bool {
+        guard phase == .ready,
+              activeTask == nil,
+              let diff = existingSubscription,
+              diff.hasUpstreamChanges,
+              !diff.hasBlockingLocalConflicts else {
+            return false
+        }
+        return true
+    }
+
     func selectTarget(_ target: GroupSnapshotInstallTarget?) {
         guard selectedTarget != target else { return }
         selectedTarget = target
@@ -250,11 +280,30 @@ final class GroupSnapshotInstallModel {
     func startInstall() -> Task<Void, Never>? {
         guard canInstall, let selectedTarget else { return nil }
 
+        return startOperation(.install, selectedTarget: selectedTarget)
+    }
+
+    @discardableResult
+    func startSubscriptionUpdate() -> Task<Void, Never>? {
+        guard canApplySubscriptionUpdate, let selectedTarget else { return nil }
+
+        return startOperation(.subscriptionUpdate, selectedTarget: selectedTarget)
+    }
+
+    private enum RequestedOperation: Equatable, Sendable {
+        case install
+        case subscriptionUpdate
+    }
+
+    private func startOperation(
+        _ operation: RequestedOperation,
+        selectedTarget: GroupSnapshotInstallTarget
+    ) -> Task<Void, Never> {
         let request = ManagedGroupSnapshotInstallRequest(
             manifest: manifest,
             route: route,
             destination: selectedTarget.destination(homeDirectory: homeDirectory),
-            mode: installMode
+            mode: operation == .subscriptionUpdate ? .subscribed : installMode
         )
         let attemptID = UUID()
         let activity = updateCoordinator.beginActivity(.skillInstall)
@@ -272,15 +321,25 @@ final class GroupSnapshotInstallModel {
             }
 
             do {
-                let result = try await installer.installGroupSnapshot(
-                    request,
-                    credential: credential,
-                    packageLoader: packageLoader
-                )
+                let result = switch operation {
+                case .install:
+                    try await installer.installGroupSnapshot(
+                        request,
+                        credential: credential,
+                        packageLoader: packageLoader
+                    )
+                case .subscriptionUpdate:
+                    try await installer.applyGroupSubscriptionUpdate(
+                        request,
+                        credential: credential,
+                        packageLoader: packageLoader
+                    )
+                }
                 guard self?.activeAttemptID == attemptID else { return }
                 self?.phase = .success(GroupSnapshotInstallSummary(
                     installedCount: result.installedCount,
                     updatedCount: result.updatedCount,
+                    removedCount: result.removedCount,
                     skippedCount: result.metadataOnlyItems.count
                 ))
             } catch is CancellationError {
@@ -312,7 +371,7 @@ final class GroupSnapshotInstallModel {
         default:
             return nil
         }
-        return startInstall()
+        return existingSubscription == nil ? startInstall() : startSubscriptionUpdate()
     }
 
     private func finishAttempt(_ attemptID: UUID) {

@@ -275,6 +275,14 @@ enum GroupSubscriptionChangeKind: String, Equatable, Sendable {
     case unchanged
 }
 
+enum GroupSubscriptionPackageAction: String, Equatable, Sendable {
+    case install
+    case update
+    case remove
+    case rename
+    case none
+}
+
 struct GroupSubscriptionChange: Identifiable, Equatable, Sendable {
     let id: String
     let name: String
@@ -282,6 +290,36 @@ struct GroupSubscriptionChange: Identifiable, Equatable, Sendable {
     let wasReordered: Bool
     let isMetadataOnly: Bool
     let localState: GroupSubscriptionLocalState?
+    let packageAction: GroupSubscriptionPackageAction
+
+    init(
+        id: String,
+        name: String,
+        kind: GroupSubscriptionChangeKind,
+        wasReordered: Bool,
+        isMetadataOnly: Bool,
+        localState: GroupSubscriptionLocalState?,
+        packageAction: GroupSubscriptionPackageAction = .none
+    ) {
+        self.id = id
+        self.name = name
+        self.kind = kind
+        self.wasReordered = wasReordered
+        self.isMetadataOnly = isMetadataOnly
+        self.localState = localState
+        self.packageAction = packageAction
+    }
+
+    var hasBlockingLocalConflict: Bool {
+        guard packageAction == .update || packageAction == .remove || packageAction == .rename
+        else { return false }
+        switch localState {
+        case .modified, .replaced, .unreadable:
+            return true
+        case .clean, .missing, .none:
+            return false
+        }
+    }
 }
 
 struct GroupSubscriptionDiff: Equatable, Sendable {
@@ -299,6 +337,10 @@ struct GroupSubscriptionDiff: Equatable, Sendable {
             guard let state = change.localState else { return false }
             return state != .clean
         }
+    }
+
+    var hasBlockingLocalConflicts: Bool {
+        changes.contains(where: \.hasBlockingLocalConflict)
     }
 }
 
@@ -328,7 +370,8 @@ enum GroupSubscriptionDiffer {
                     kind: .added,
                     wasReordered: false,
                     isMetadataOnly: item.isMetadataOnly,
-                    localState: nil
+                    localState: nil,
+                    packageAction: item.isMetadataOnly ? .none : .install
                 )
             }
             let reordered = previous.position != item.position
@@ -340,7 +383,8 @@ enum GroupSubscriptionDiffer {
                 kind: updated ? .updated : (reordered ? .reordered : .unchanged),
                 wasReordered: reordered,
                 isMetadataOnly: item.isMetadataOnly,
-                localState: localStates[item.id]
+                localState: localStates[item.id],
+                packageAction: packageAction(previous: previous, current: item)
             )
         }
         changes.append(contentsOf: baseline.items.compactMap { item in
@@ -351,7 +395,8 @@ enum GroupSubscriptionDiffer {
                 kind: .removed,
                 wasReordered: false,
                 isMetadataOnly: item.isMetadataOnly,
-                localState: localStates[item.id]
+                localState: localStates[item.id],
+                packageAction: item.isMetadataOnly ? .none : .remove
             )
         })
         return GroupSubscriptionDiff(
@@ -361,9 +406,26 @@ enum GroupSubscriptionDiffer {
             changes: changes
         )
     }
+
+    private static func packageAction(
+        previous: GroupSubscriptionRecord.Item,
+        current: GroupSubscriptionRecord.Item
+    ) -> GroupSubscriptionPackageAction {
+        switch (previous.state, current.state) {
+        case (.metadataOnly, .metadataOnly):
+            return .none
+        case (.metadataOnly, .installable):
+            return .install
+        case (.installable, .metadataOnly):
+            return .remove
+        case (.installable, .installable):
+            if previous.name != current.name { return .rename }
+            return previous.state == current.state ? .none : .update
+        }
+    }
 }
 
-private extension GroupSubscriptionRecord.Item {
+extension GroupSubscriptionRecord.Item {
     var isMetadataOnly: Bool {
         if case .metadataOnly = state { return true }
         return false

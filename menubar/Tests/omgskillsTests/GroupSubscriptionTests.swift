@@ -58,13 +58,48 @@ struct GroupSubscriptionTests {
         #expect(diff.changes[0].kind == .updated)
         #expect(diff.changes[0].wasReordered)
         #expect(diff.changes[0].localState == .modified)
+        #expect(diff.changes[0].packageAction == .update)
+        #expect(diff.changes[0].hasBlockingLocalConflict)
         #expect(diff.changes[1].kind == .updated)
         #expect(diff.changes[1].isMetadataOnly == false)
+        #expect(diff.changes[1].packageAction == .install)
         #expect(diff.changes[2].kind == .reordered)
+        #expect(diff.changes[2].packageAction == .none)
         #expect(diff.changes[3].kind == .added)
         #expect(diff.changes[3].isMetadataOnly)
+        #expect(diff.changes[3].packageAction == .none)
         #expect(diff.changes[4].kind == .removed)
         #expect(diff.changes[4].localState == .missing)
+        #expect(diff.changes[4].packageAction == .remove)
+        #expect(diff.changes[4].hasBlockingLocalConflict == false)
+        #expect(diff.hasBlockingLocalConflicts)
+    }
+
+    @Test func diffClassifiesPackageRemovalRenameAndSafeUnchangedEdits() throws {
+        let baseline = try subscriptionRecord(items: [
+            installableRecordItem(id: "metadata", name: "Metadata", position: 0),
+            installableRecordItem(id: "renamed", name: "Old name", position: 1),
+            installableRecordItem(id: "unchanged", name: "Unchanged", position: 2)
+        ])
+        let current = try subscriptionRecord(revision: 8, items: [
+            metadataRecordItem(id: "metadata", name: "Metadata", position: 0),
+            installableRecordItem(id: "renamed", name: "New name", position: 1),
+            installableRecordItem(id: "unchanged", name: "Unchanged", position: 2)
+        ])
+
+        let diff = try GroupSubscriptionDiffer.compare(
+            baseline: baseline,
+            current: current,
+            localStates: [
+                "metadata": .clean,
+                "renamed": .clean,
+                "unchanged": .modified
+            ]
+        )
+
+        #expect(diff.changes.map(\.packageAction) == [.remove, .rename, .none])
+        #expect(diff.hasLocalChanges)
+        #expect(diff.hasBlockingLocalConflicts == false)
     }
 
     @Test func diffRejectsAReceiptForAnotherDestination() throws {

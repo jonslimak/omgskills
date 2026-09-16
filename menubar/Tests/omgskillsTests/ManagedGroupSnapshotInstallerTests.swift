@@ -155,15 +155,13 @@ struct ManagedGroupSnapshotInstallerTests {
             targetRoot: fixture.targetRoot
         )
         let previousReceipt = try #require(savedReceipt)
-        let nextManifest = try fixture.manifest(revision: 8, items: [
-            fixture.installable(name: "example", kind: "catalog", source: fixture.catalogSource())
-        ])
+        let nextManifest = try fixture.manifest(revision: 8, items: [])
         let failingInstaller = fixture.installer(beforeSubscriptionWrite: {
             throw GroupTransactionTestFailure.injected
         })
 
         await #expect(throws: GroupTransactionTestFailure.self) {
-            try await failingInstaller.installGroupSnapshot(
+            try await failingInstaller.applyGroupSubscriptionUpdate(
                 fixture.request(nextManifest, mode: .subscribed),
                 credential: fixture.credential,
                 packageLoader: RecordingGroupPackageLoader(package: fixture.package)
@@ -176,6 +174,404 @@ struct ManagedGroupSnapshotInstallerTests {
             targetRoot: fixture.targetRoot
         ) == previousReceipt)
         #expect(!FileManager.default.fileExists(atPath: fixture.journalURL.path))
+    }
+
+    @Test func subscribedUpdateAppliesOnlyChangedPackagesAndCleanRemovals() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-old"
+            ),
+            fixture.installable(
+                id: "removed",
+                name: "removed",
+                kind: "github",
+                source: fixture.publicSource()
+            ),
+            fixture.installable(
+                id: "unchanged",
+                name: "unchanged",
+                kind: "github",
+                source: fixture.privateSource()
+            )
+        ])
+        _ = try await installer.installGroupSnapshot(
+            fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let unchangedBefore = try fixture.targetDestination("unchanged")
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-new"
+            ),
+            fixture.installable(
+                id: "unchanged",
+                name: "unchanged",
+                kind: "github",
+                source: fixture.privateSource()
+            ),
+            fixture.installable(
+                id: "added",
+                name: "added",
+                kind: "github",
+                source: fixture.publicSource(id: "source-added")
+            )
+        ])
+        let loader = RecordingGroupPackageLoader(package: fixture.package)
+
+        let result = try await installer.applyGroupSubscriptionUpdate(
+            fixture.request(current, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: loader
+        )
+
+        #expect(result.installedCount == 1)
+        #expect(result.updatedCount == 1)
+        #expect(result.removedCount == 1)
+        #expect(await loader.loadedNames() == ["updated", "added"])
+        #expect(!fixture.targetExists("removed"))
+        #expect(try fixture.targetDestination("unchanged") == unchangedBefore)
+        #expect(SkillInstallProvenanceStore.read(
+            targetRoot: fixture.targetRoot,
+            targetName: "updated"
+        )?.releaseId == "release-new")
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        )?.groupRevision == 8)
+    }
+
+    @Test func subscribedUpdateBlocksChangedLocallyModifiedPackageBeforeLoading() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(
+                id: "example",
+                name: "example",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-old"
+            )
+        ])
+        _ = try await installer.installGroupSnapshot(
+            fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let previousTarget = try fixture.targetDestination("example")
+        let previousReceipt = try #require(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ))
+        let localFile = fixture.targetRoot.appendingPathComponent("example/references/info.txt")
+        try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: localFile.path)
+        try Data("local edit\n".utf8).write(to: localFile)
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(
+                id: "example",
+                name: "example",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-new"
+            )
+        ])
+        let loader = RecordingGroupPackageLoader(package: fixture.package)
+
+        await #expect(throws: ManagedSkillInstaller.InstallError.subscriptionHasLocalConflicts) {
+            try await installer.applyGroupSubscriptionUpdate(
+                fixture.request(current, mode: .subscribed),
+                credential: fixture.credential,
+                packageLoader: loader
+            )
+        }
+
+        #expect(await loader.loadedNames().isEmpty)
+        #expect(try fixture.targetDestination("example") == previousTarget)
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ) == previousReceipt)
+    }
+
+    @Test func subscribedUpdatePreservesLocalEditsOnUnchangedPackage() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-old"
+            ),
+            fixture.installable(
+                id: "local",
+                name: "local",
+                kind: "github",
+                source: fixture.publicSource()
+            )
+        ])
+        _ = try await installer.installGroupSnapshot(
+            fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let localFile = fixture.targetRoot.appendingPathComponent("local/references/info.txt")
+        try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: localFile.path)
+        let localData = Data("keep this edit\n".utf8)
+        try localData.write(to: localFile)
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-new"
+            ),
+            fixture.installable(
+                id: "local",
+                name: "local",
+                kind: "github",
+                source: fixture.publicSource()
+            )
+        ])
+
+        _ = try await installer.applyGroupSubscriptionUpdate(
+            fixture.request(current, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+
+        #expect(try Data(contentsOf: localFile) == localData)
+        let diff = try #require(await installer.detectGroupSubscription(
+            manifest: current,
+            route: fixture.route,
+            destination: fixture.destination
+        ))
+        #expect(diff.hasUpstreamChanges == false)
+        #expect(diff.hasLocalChanges)
+    }
+
+    @Test func subscribedUpdateRenamesPackageAsOneRecoverableTransaction() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(
+                id: "renamed",
+                name: "old-name",
+                kind: "catalog",
+                source: fixture.catalogSource()
+            )
+        ])
+        _ = try await installer.installGroupSnapshot(
+            fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(
+                id: "renamed",
+                name: "new-name",
+                kind: "catalog",
+                source: fixture.catalogSource()
+            )
+        ])
+
+        let result = try await installer.applyGroupSubscriptionUpdate(
+            fixture.request(current, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+
+        #expect(result.installedCount == 1)
+        #expect(result.removedCount == 1)
+        #expect(!fixture.targetExists("old-name"))
+        #expect(fixture.targetExists("new-name"))
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        )?.items.first?.name == "new-name")
+    }
+
+    @Test func subscribedUpdateFailureAfterRemovalRestoresEveryTargetAndReceipt() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let initialInstaller = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-old"
+            ),
+            fixture.installable(
+                id: "removed-a",
+                name: "removed-a",
+                kind: "github",
+                source: fixture.publicSource()
+            ),
+            fixture.installable(
+                id: "removed-b",
+                name: "removed-b",
+                kind: "github",
+                source: fixture.privateSource()
+            )
+        ])
+        _ = try await initialInstaller.installGroupSnapshot(
+            fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let targetNames = ["updated", "removed-a", "removed-b"]
+        let targetsBefore = try Dictionary(uniqueKeysWithValues: targetNames.map {
+            ($0, try fixture.targetDestination($0))
+        })
+        let receiptBefore = try #require(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ))
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-new"
+            )
+        ])
+        let failingInstaller = fixture.installer { index, _ in
+            if index == 2 { throw GroupTransactionTestFailure.injected }
+        }
+
+        await #expect(throws: GroupTransactionTestFailure.self) {
+            try await failingInstaller.applyGroupSubscriptionUpdate(
+                fixture.request(current, mode: .subscribed),
+                credential: fixture.credential,
+                packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+            )
+        }
+
+        for name in targetNames {
+            #expect(try fixture.targetDestination(name) == targetsBefore[name])
+        }
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ) == receiptBefore)
+        #expect(!FileManager.default.fileExists(atPath: fixture.journalURL.path))
+    }
+
+    @Test func subscribedUpdateValidatesEveryPackageBeforeChangingTargets() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-old"
+            )
+        ])
+        _ = try await installer.installGroupSnapshot(
+            fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let targetBefore = try fixture.targetDestination("updated")
+        let receiptBefore = try #require(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ))
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(
+                id: "updated",
+                name: "updated",
+                kind: "catalog",
+                source: fixture.catalogSource(),
+                releaseID: "release-new"
+            ),
+            fixture.installable(
+                id: "added",
+                name: "added",
+                kind: "github",
+                source: fixture.publicSource()
+            )
+        ])
+
+        await #expect(throws: SkillPackageValidationError.self) {
+            try await installer.applyGroupSubscriptionUpdate(
+                fixture.request(current, mode: .subscribed),
+                credential: fixture.credential,
+                packageLoader: RecordingGroupPackageLoader(
+                    package: fixture.package,
+                    invalidCall: 2
+                )
+            )
+        }
+
+        #expect(try fixture.targetDestination("updated") == targetBefore)
+        #expect(!fixture.targetExists("added"))
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        ) == receiptBefore)
+        #expect(!FileManager.default.fileExists(atPath: fixture.journalURL.path))
+    }
+
+    @Test func reorderOnlySubscribedUpdateAdvancesReceiptWithoutLoadingPackages() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(id: "alpha", name: "alpha", kind: "catalog", source: fixture.catalogSource()),
+            fixture.installable(id: "beta", name: "beta", kind: "github", source: fixture.publicSource())
+        ])
+        _ = try await installer.installGroupSnapshot(
+            fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
+        let alphaBefore = try fixture.targetDestination("alpha")
+        let betaBefore = try fixture.targetDestination("beta")
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(id: "beta", name: "beta", kind: "github", source: fixture.publicSource()),
+            fixture.installable(id: "alpha", name: "alpha", kind: "catalog", source: fixture.catalogSource())
+        ])
+        let loader = RecordingGroupPackageLoader(package: fixture.package)
+
+        let result = try await installer.applyGroupSubscriptionUpdate(
+            fixture.request(current, mode: .subscribed),
+            credential: fixture.credential,
+            packageLoader: loader
+        )
+
+        #expect(result.installedCount == 0)
+        #expect(result.updatedCount == 0)
+        #expect(result.removedCount == 0)
+        #expect(await loader.loadedNames().isEmpty)
+        #expect(try fixture.targetDestination("alpha") == alphaBefore)
+        #expect(try fixture.targetDestination("beta") == betaBefore)
+        #expect(try GroupSubscriptionStore.read(
+            groupId: fixture.groupID,
+            targetRoot: fixture.targetRoot
+        )?.groupRevision == 8)
     }
 
     @Test func preflightRejectsPortableNameCollisionsBeforeLoading() async throws {
@@ -563,7 +959,9 @@ private struct GroupTransactionFixture: Sendable {
             ],
             "items": items.enumerated().map { position, item in
                 var positioned = item
-                positioned["id"] = "item-\(position)"
+                if positioned["id"] == nil {
+                    positioned["id"] = "item-\(position)"
+                }
                 positioned["position"] = position
                 return positioned
             }
@@ -575,11 +973,13 @@ private struct GroupTransactionFixture: Sendable {
     }
 
     func installable(
+        id: String? = nil,
         name: String,
         kind: String,
-        source: [String: Any]
+        source: [String: Any],
+        releaseID: String? = nil
     ) -> [String: Any] {
-        [
+        var item: [String: Any] = [
             "kind": kind,
             "name": name,
             "description": NSNull(),
@@ -588,23 +988,27 @@ private struct GroupTransactionFixture: Sendable {
                 "status": "installable",
                 "source": source,
                 "release": [
-                    "id": "release-\(name.lowercased())",
+                    "id": releaseID ?? "release-\(name.lowercased())",
                     "commitSha": package.coordinates.commitSha,
                     "treeSha": package.coordinates.treeSha,
                     "skillMdSha": package.coordinates.skillMdSha
                 ]
             ]
         ]
+        if let id { item["id"] = id }
+        return item
     }
 
-    func metadataOnly(name: String, reason: String) -> [String: Any] {
-        [
+    func metadataOnly(id: String? = nil, name: String, reason: String) -> [String: Any] {
+        var item: [String: Any] = [
             "kind": "synced",
             "name": name,
             "description": NSNull(),
             "note": NSNull(),
             "installability": ["status": "metadata_only", "reason": reason]
         ]
+        if let id { item["id"] = id }
+        return item
     }
 
     func catalogSource(
