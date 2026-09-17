@@ -1,6 +1,7 @@
 import { parse as parseYaml } from "yaml";
 import { octokit } from "./client.js";
 import { gitBlobSha } from "./git-blob-sha.js";
+import { pinnedPackageMetadataFromSkill } from "./new-crawl/package-metadata.js";
 import { createRefreshReplayStoreFromEnv } from "./new-crawl/refresh-replay.js";
 import {
   isRequestTimeoutError,
@@ -499,8 +500,16 @@ function hasCompleteCachedSkill(skill: Skill): boolean {
 function preserveExistingOptionalMetadata(existing: Skill | undefined, next: Skill): Skill {
   if (!existing) return next;
 
+  const existingPackage = pinnedPackageMetadataFromSkill(existing);
+  const canPreservePackage = Boolean(
+    existingPackage &&
+      existingPackage.skill_md_path === next.skill_md_path &&
+      existingPackage.skill_md_sha.toLowerCase() === next.skill_md_sha?.toLowerCase(),
+  );
+
   return {
     ...next,
+    ...(canPreservePackage ? existingPackage : {}),
     ...("source_tag" in existing && existing.source_tag !== undefined ? { source_tag: existing.source_tag } : {}),
     ...("source_url" in existing && existing.source_url !== undefined ? { source_url: existing.source_url } : {}),
     ...("tweet_url" in existing && existing.tweet_url !== undefined ? { tweet_url: existing.tweet_url } : {}),

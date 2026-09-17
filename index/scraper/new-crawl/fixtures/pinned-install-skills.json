@@ -1,0 +1,52 @@
+[
+  {
+    "id": "fixture/root:root-skill",
+    "name": "root-skill",
+    "description": "Root package fixture",
+    "github_url": "https://github.com/fixture/root",
+    "repo_slug": "fixture/root",
+    "skill_md_path": "SKILL.md",
+    "repo_commit_sha": "1111111111111111111111111111111111111111",
+    "skill_tree_sha": "2222222222222222222222222222222222222222",
+    "skill_md_sha": "3333333333333333333333333333333333333333",
+    "install_target_name": "root-skill",
+    "install_cmd": "git clone https://github.com/fixture/root ~/.claude/skills/root-skill",
+    "author_handle": "fixture",
+    "tags": [],
+    "stars": 1,
+    "last_updated": "2026-09-17T00:00:00Z",
+    "first_seen": "2026-09-17"
+  },
+  {
+    "id": "fixture/nested:example",
+    "name": "example",
+    "description": "Nested package fixture",
+    "github_url": "https://github.com/fixture/nested",
+    "repo_slug": "fixture/nested",
+    "skill_md_path": "skills/example/SKILL.md",
+    "repo_commit_sha": "4444444444444444444444444444444444444444",
+    "skill_tree_sha": "5555555555555555555555555555555555555555",
+    "skill_md_sha": "6666666666666666666666666666666666666666",
+    "install_target_name": "example",
+    "install_cmd": "git clone https://github.com/fixture/nested /tmp/nested && ln -s /tmp/nested/skills/example ~/.claude/skills/example",
+    "author_handle": "fixture",
+    "tags": [],
+    "stars": 1,
+    "last_updated": "2026-09-17T00:00:00Z",
+    "first_seen": "2026-09-17"
+  },
+  {
+    "id": "fixture/legacy:legacy",
+    "name": "legacy",
+    "description": "Legacy fallback fixture",
+    "github_url": "https://github.com/fixture/legacy",
+    "skill_md_path": "SKILL.md",
+    "skill_md_sha": "7777777777777777777777777777777777777777",
+    "install_cmd": "git clone https://github.com/fixture/legacy ~/.claude/skills/legacy",
+    "author_handle": "fixture",
+    "tags": [],
+    "stars": 1,
+    "last_updated": "2026-09-17T00:00:00Z",
+    "first_seen": "2026-09-17"
+  }
+]

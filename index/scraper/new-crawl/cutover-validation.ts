@@ -5,6 +5,7 @@ import type {
   ShadowRepoIndex,
 } from "./types.js";
 import { QUALITY_TIERS } from "./quality-tier.js";
+import { validatePinnedPackageMetadata } from "./package-metadata.js";
 
 type CutoverSkillForValidation = Skill & {
   provenance_type?: string;
@@ -40,6 +41,15 @@ export function validateCutoverOutputs(
         kind: "invalidQualityTier",
         id: skill.id,
         details: `Skill ${skill.id} has invalid quality_tier "${String(qualityTier)}"`,
+      });
+    }
+
+    const packageMetadataErrors = validatePinnedPackageMetadata(skill);
+    if (packageMetadataErrors.length > 0) {
+      failures.push({
+        kind: "invalidPinnedPackageMetadata",
+        id: skill.id,
+        details: `Skill ${skill.id} has invalid pinned package metadata: ${packageMetadataErrors.join("; ")}`,
       });
     }
 

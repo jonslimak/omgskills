@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import type { Skill } from "../types.js";
+import { octokit } from "../client.js";
 import type { EnrichResult } from "../enrich.js";
 import { enrichCandidate, getCandidateRepoMeta, listRepoSkillPaths, resolveCandidateSkillPath, resolveCanonicalRepoIdentity } from "../enrich.js";
 import { searchByTopics } from "../sources/topics.js";
@@ -78,6 +79,14 @@ import {
   shouldReadShadowSkillOverlay,
   shouldWriteShadowSkillOverlay,
 } from "./skill-overlay.js";
+import { createPinnedPackageMetadataResolver, preserveLastGoodPinnedSkill } from "./package-metadata.js";
+import {
+  applyPinnedPackageMetadataOverlay,
+  buildPinnedPackageMetadataOverlay,
+  loadPinnedPackageMetadataOverlay,
+  shouldReadPinnedPackageMetadataOverlay,
+  shouldWritePinnedPackageMetadataOverlay,
+} from "./package-metadata-overlay.js";
 import { buildCheapTriggeredRefreshSelection, buildWeeklyCheapCheckRepos, markRepoMissingCheapCheck, mergePriorShadowRepoTimestamps, repoMetaLooksChanged } from "./rolling-refresh.js";
 import {
   applyShadowRepoOverlay,
@@ -786,6 +795,10 @@ function buildSummary(report: ShadowRunReport, repoIndex: ShadowRepoIndex) {
     `- Shadow skill overlay loaded: ${report.shadowSkillOverlayLoaded ? "yes" : "no"}`,
     `- Shadow skill overlay entries: ${report.shadowSkillOverlayEntryCount}`,
     `- Shadow skill overlay written: ${report.shadowSkillOverlayWrittenCount}`,
+    `- Pinned package metadata overlay loaded: ${report.pinnedPackageMetadataOverlayLoaded ? "yes" : "no"}`,
+    `- Pinned package metadata overlay entries: ${report.pinnedPackageMetadataOverlayEntryCount ?? 0}`,
+    `- Pinned package metadata overlay applied: ${report.pinnedPackageMetadataOverlayAppliedCount ?? 0}`,
+    `- Pinned package metadata overlay written: ${report.pinnedPackageMetadataOverlayWrittenCount ?? 0}`,
     `- Skills deep-refreshed: ${report.enrichmentCounts.skillsDeepRefreshed}`,
     `- Monitored deep-refreshed: ${report.enrichmentCounts.monitoredDeepRefreshed}`,
     `- Cheap-triggered refresh candidates: ${report.enrichmentCounts.cheapTriggeredRefreshCandidateCount}`,
@@ -1204,6 +1217,28 @@ async function runShadowRefresh(
       .map((repo) => repo.repo),
   );
   const enrichmentWarnings: string[] = [];
+  const resolvePinnedPackageMetadata = createPinnedPackageMetadataResolver(octokit);
+  const enrichCrawl4Candidate = async (
+    candidate: Parameters<typeof enrichCandidate>[0],
+    firstSeen: Parameters<typeof enrichCandidate>[1],
+    skills: Parameters<typeof enrichCandidate>[2],
+    date: string,
+  ): Promise<EnrichResult> => {
+    const result = await enrichCandidate(candidate, firstSeen, skills, date);
+    if (!result.skill) return result;
+    try {
+      const metadata = await resolvePinnedPackageMetadata(result.skill, candidate.ref);
+      if (!metadata) {
+        enrichmentWarnings.push(`pinned install metadata unresolved for ${result.skill.id}`);
+        return { ...result, skill: preserveLastGoodPinnedSkill(result.skill, skills.get(result.skill.id)) };
+      }
+      return { ...result, skill: { ...result.skill, ...metadata } };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      enrichmentWarnings.push(`pinned install metadata deferred for ${result.skill.id}: ${message}`);
+      return { ...result, skill: preserveLastGoodPinnedSkill(result.skill, skills.get(result.skill.id)) };
+    }
+  };
   const trustedSeeds = loadTrustedSeeds();
   const pilotAssets = loadWebLibraryPilotAssets([
     join(indexRoot, "..", "site", "data", "crawl4", "manifest.json"),
@@ -1264,7 +1299,7 @@ async function runShadowRefresh(
     },
     fallbackCandidateRejectionFn: (repo, candidate) =>
       bootstrapCandidatePolicyRejectionReason(repo, candidate, trustedSeeds),
-    enrichCandidateFn: enrichCandidate,
+    enrichCandidateFn: enrichCrawl4Candidate,
   });
   removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);
   for (const skill of bootstrapResult.bootstrappedSkills) {
@@ -1424,7 +1459,7 @@ async function runShadowRefresh(
         console.log(`  ${label} [${index + 1}/${rows.length}] ${repo.repo} (${pathMode})`);
       }
 
-      const result = await enrichCandidate(
+      const result = await enrichCrawl4Candidate(
         candidate,
         existingFirstSeen,
         existingSkills,
@@ -1516,7 +1551,7 @@ async function runShadowRefresh(
         if (index === 0 || (index + 1) % 5 === 0 || index === pilotSkillIdsToRefresh.length - 1) {
           console.log(`  web-library snippet refresh [${index + 1}/${pilotSkillIdsToRefresh.length}] ${skillId}`);
         }
-        const result = await enrichCandidate(
+        const result = await enrichCrawl4Candidate(
           buildCandidateFromSkill(skill),
           existingFirstSeen,
           existingSkills,
@@ -2173,6 +2208,7 @@ async function main() {
   const skillEquivalenceOutPath = join(shadowRoot, "skill-equivalence.shadow.json");
   const skillEquivalenceReviewOutPath = join(shadowRoot, "skill-equivalence-review.shadow.json");
   const skillOverlayOutPath = join(shadowRoot, "skills.overlay.json");
+  const packageMetadataOverlayOutPath = join(shadowRoot, "package-metadata.overlay.json");
   const repoIndexOutPath = join(shadowRoot, "repo-index.shadow.json");
   const repoOverlayOutPath = join(shadowRoot, "repo-index.overlay.json");
   const skillSignalsOutPath = join(shadowRoot, "skill-signals.shadow.json");
@@ -2225,6 +2261,16 @@ async function main() {
     overlayEntryCount: shadowSkillOverlayEntryCount,
   } = applyShadowSkillOverlay(cadence, shadowSkills, repoIndex, skillOverlay);
   shadowSkills = stripQualityTiers(overlayMergedShadowSkills);
+  const packageMetadataOverlay = shouldReadPinnedPackageMetadataOverlay(cadence)
+    ? loadPinnedPackageMetadataOverlay(packageMetadataOverlayOutPath)
+    : null;
+  const {
+    skills: packageMetadataMergedSkills,
+    overlayLoaded: pinnedPackageMetadataOverlayLoaded,
+    overlayEntryCount: pinnedPackageMetadataOverlayEntryCount,
+    appliedCount: pinnedPackageMetadataOverlayAppliedCount,
+  } = applyPinnedPackageMetadataOverlay(cadence, shadowSkills, packageMetadataOverlay);
+  shadowSkills = packageMetadataMergedSkills;
   shadowSkills = removeDoNotCrawlState(repoIndex, shadowSkills, seeds);
   shadowSkills = removeBelowStarXSocialOnlyState(repoIndex, shadowSkills).skills;
 
@@ -2490,6 +2536,10 @@ async function main() {
     ? buildShadowSkillOverlay(untieredCutoverShadowSkills, baselineSkillIds, repoIndex, checkedAt)
     : null;
   const shadowSkillOverlayWrittenCount = shadowSkillOverlay?.skillCount ?? 0;
+  const pinnedPackageMetadataOverlay = shouldWritePinnedPackageMetadataOverlay(cadence)
+    ? buildPinnedPackageMetadataOverlay(untieredCutoverShadowSkills, checkedAt)
+    : null;
+  const pinnedPackageMetadataOverlayWrittenCount = pinnedPackageMetadataOverlay?.entryCount ?? 0;
 
   const skillSignalsStart = performance.now();
   const skillSignals = buildSkillSignals(checkedAt);
@@ -2639,6 +2689,10 @@ async function main() {
     shadowSkillOverlayLoaded,
     shadowSkillOverlayEntryCount,
     shadowSkillOverlayWrittenCount,
+    pinnedPackageMetadataOverlayLoaded,
+    pinnedPackageMetadataOverlayEntryCount,
+    pinnedPackageMetadataOverlayAppliedCount,
+    pinnedPackageMetadataOverlayWrittenCount,
     shaCanonicalClusterCount: shaCanonicalArtifact.clusterCount,
     shaCanonicalCandidateCount: shaCanonicalArtifact.canonicalCandidateCount,
     shaCanonicalHighConfidenceCount: shaCanonicalArtifact.highConfidenceCount,
@@ -2698,6 +2752,9 @@ async function main() {
   }
   if (shadowSkillOverlay) {
     writeShadowFile(skillOverlayOutPath, JSON.stringify(shadowSkillOverlay, null, 2) + "\n");
+  }
+  if (pinnedPackageMetadataOverlay) {
+    writeShadowFile(packageMetadataOverlayOutPath, JSON.stringify(pinnedPackageMetadataOverlay, null, 2) + "\n");
   }
   writeShadowFile(skillSignalsOutPath, JSON.stringify(skillSignals, null, 2) + "\n");
   writeShadowFile(cutoverSkillSignalsOutPath, JSON.stringify(cutoverSkillSignals, null, 2) + "\n");

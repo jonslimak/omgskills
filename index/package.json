@@ -8,6 +8,7 @@
     "scrape:shadow": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/build-shadow.ts",
     "crawl4:add-skill": "tsx scraper/new-crawl/add-curated-skill.ts",
     "crawl4:creator-backfill": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/creator-backfill.ts",
+    "crawl4:backfill-package-metadata": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scraper/new-crawl/backfill-package-metadata.ts",
     "creator:intake": "OMGSKILLS_DISABLE_OCTOKIT_SECONDARY_RETRY=1 tsx scripts/creator-intake.ts",
     "crawl4:remove-repo": "tsx scraper/new-crawl/remove-repo.ts",
     "crawl4:removal-audit": "tsx scraper/new-crawl/removal-audit.ts",

@@ -4,6 +4,10 @@ export interface Skill {
   description: string;
   github_url: string;
   skill_md_path?: string;
+  repo_slug?: string;
+  repo_commit_sha?: string;
+  skill_tree_sha?: string;
+  install_target_name?: string;
   install_cmd: string;
   author_handle: string;
   tags: string[];

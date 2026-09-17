@@ -142,6 +142,22 @@ export type ShadowSkillOverlay = {
   skills: ShadowSkillRecord[];
 };
 
+export type PinnedPackageMetadataOverlayEntry = {
+  id: string;
+  repo_slug: string;
+  skill_md_path: string;
+  repo_commit_sha: string;
+  skill_tree_sha: string;
+  skill_md_sha: string;
+  install_target_name: string;
+};
+
+export type PinnedPackageMetadataOverlay = {
+  generatedAt: string;
+  entryCount: number;
+  entries: PinnedPackageMetadataOverlayEntry[];
+};
+
 export type ShadowSkillSignals = {
   generatedAt: string;
   signals: Record<string, never>;
@@ -164,7 +180,8 @@ export type CutoverValidationFailureKind =
   | "duplicateCutoverSkillId"
   | "cutoverSignalMissingSkill"
   | "originalAuthorHandleMismatch"
-  | "invalidQualityTier";
+  | "invalidQualityTier"
+  | "invalidPinnedPackageMetadata";
 
 export type CutoverValidationFailure = {
   kind: CutoverValidationFailureKind;
@@ -520,6 +537,10 @@ export type ShadowRunReport = {
   shadowSkillOverlayLoaded: boolean;
   shadowSkillOverlayEntryCount: number;
   shadowSkillOverlayWrittenCount: number;
+  pinnedPackageMetadataOverlayLoaded?: boolean;
+  pinnedPackageMetadataOverlayEntryCount?: number;
+  pinnedPackageMetadataOverlayAppliedCount?: number;
+  pinnedPackageMetadataOverlayWrittenCount?: number;
   shaCanonicalClusterCount?: number;
   shaCanonicalCandidateCount?: number;
   shaCanonicalHighConfidenceCount?: number;

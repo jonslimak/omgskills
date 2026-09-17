@@ -250,6 +250,21 @@ test("unresolved repackaged skill is filtered", () => {
   assert.equal(summary.filteredRepackagedCount, 1);
 });
 
+test("promotion preserves pinned install metadata", () => {
+  const pinned = skill("owner/repo:pinned", {
+    repo_slug: "owner/repo",
+    repo_commit_sha: "a".repeat(40),
+    skill_tree_sha: "b".repeat(40),
+    skill_md_sha: "c".repeat(40),
+    install_target_name: "pinned",
+  });
+  const { promotedSkills } = buildPromotedSkills([pinned], [currentSkill("owner/repo:existing")]);
+  assert.equal(promotedSkills[0]?.repo_slug, "owner/repo");
+  assert.equal(promotedSkills[0]?.repo_commit_sha, "a".repeat(40));
+  assert.equal(promotedSkills[0]?.skill_tree_sha, "b".repeat(40));
+  assert.equal(promotedSkills[0]?.install_target_name, "pinned");
+});
+
 test("skill with real author_handle is retained", () => {
   const { promotedSkills, summary } = buildPromotedSkills(
     [skill("catalog/repo:kept", { author_handle: "creator", provenance_type: "catalog" })],

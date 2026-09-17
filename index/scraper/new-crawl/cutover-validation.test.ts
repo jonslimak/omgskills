@@ -170,6 +170,36 @@ test("invalid quality tier fails validation", () => {
   assert.equal(failures[0]?.kind, "invalidQualityTier");
 });
 
+test("legacy skill without pinned package metadata remains valid", () => {
+  const failures = validateCutoverOutputs([skill("owner/repo:legacy")], [], repoIndex([]));
+  assert.deepEqual(failures, []);
+});
+
+test("partial pinned package metadata fails validation", () => {
+  const failures = validateCutoverOutputs(
+    [skill("owner/repo:partial", "owner/repo", { repo_slug: "owner/repo" })],
+    [],
+    repoIndex([]),
+  );
+  assert.equal(failures.length, 1);
+  assert.equal(failures[0]?.kind, "invalidPinnedPackageMetadata");
+});
+
+test("complete pinned package metadata passes validation", () => {
+  const failures = validateCutoverOutputs(
+    [skill("owner/repo:pinned", "owner/repo", {
+      repo_slug: "owner/repo",
+      repo_commit_sha: "a".repeat(40),
+      skill_tree_sha: "b".repeat(40),
+      skill_md_sha: "c".repeat(40),
+      install_target_name: "pinned",
+    })],
+    [],
+    repoIndex([]),
+  );
+  assert.deepEqual(failures, []);
+});
+
 test("lum1104/understand-anything style mismatch is caught", () => {
   const failures = validateCutoverOutputs(
     [],
