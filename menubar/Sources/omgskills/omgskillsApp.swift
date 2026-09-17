@@ -55,9 +55,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         guard skillGroupsBuildSupported else { return nil }
         return GroupInstallFlowModel(credentialStore: deviceCredentialStore)
     }()
-    private lazy var groupSnapshotInstaller = ManagedSkillInstaller(
+    private lazy var managedSkillInstaller = ManagedSkillInstaller(
         managedRoot: groupInstallRuntimePaths.managedRoot,
         pathAnchor: groupInstallRuntimePaths.pathAnchor
+    )
+    private lazy var groupSnapshotInstaller: any GroupSnapshotInstalling = managedSkillInstaller
+    private lazy var catalogSkillInstaller: any CatalogSkillInstalling = CatalogSkillInstaller(
+        managedInstaller: managedSkillInstaller
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -296,6 +300,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
                 skillGroupsFeatureAvailability: skillGroupsFeatureAvailability,
                 groupInstallFlowModel: groupInstallFlowModel,
                 groupSnapshotInstaller: groupSnapshotInstaller,
+                catalogSkillInstaller: catalogSkillInstaller,
                 groupInstallHomeDirectory: groupInstallRuntimePaths.homeDirectory
             )
         )

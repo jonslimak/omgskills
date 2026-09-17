@@ -1,7 +1,7 @@
 import Foundation
 
 enum SkillInstaller {
-    enum Target: String, Equatable {
+    enum Target: String, Equatable, Sendable {
         case claude = "Claude"
         case codex = "Codex"
 
@@ -14,7 +14,7 @@ enum SkillInstaller {
         }
     }
 
-    enum InstallResult: Equatable {
+    enum InstallResult: Equatable, Sendable {
         case installed
         case alreadyInstalled
     }

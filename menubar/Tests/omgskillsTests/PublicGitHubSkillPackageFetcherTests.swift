@@ -27,6 +27,28 @@ struct PublicGitHubSkillPackageFetcherTests {
         _ = try SkillPackageValidator.validate(package, expected: fixture.coordinates)
     }
 
+    @Test func fetchesRequestedCommitAfterRepositoryHeadAdvances() async throws {
+        let fixture = try LocalGitPackageRepository()
+        defer { fixture.remove() }
+        try fixture.advanceHead()
+        let fetcher = GitPublicSkillPackageFetcher(
+            temporaryRoot: fixture.temporaryRoot,
+            remoteURL: { _ in fixture.repositoryRoot }
+        )
+
+        let package = try await fetcher.fetchPackage(
+            repositorySlug: "owner/repo",
+            normalizedRoot: "skills/example",
+            expected: fixture.coordinates
+        )
+
+        #expect(package.coordinates.commitSha == fixture.coordinates.commitSha)
+        #expect(
+            package.entries.first(where: { $0.path == "SKILL.md" })?.data
+                == fixture.originalSkillData
+        )
+    }
+
     @Test func rejectsMismatchedPinnedTree() async throws {
         let fixture = try LocalGitPackageRepository()
         defer { fixture.remove() }
@@ -171,6 +193,7 @@ private struct LocalGitPackageRepository: Sendable {
     let temporaryRoot: URL
     let repositoryRoot: URL
     let coordinates: SkillPackageCoordinates
+    let originalSkillData: Data
 
     init() throws {
         root = FileManager.default.temporaryDirectory
@@ -186,7 +209,7 @@ private struct LocalGitPackageRepository: Sendable {
         let scripts = skillRoot.appendingPathComponent("scripts", isDirectory: true)
         try FileManager.default.createDirectory(at: references, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: scripts, withIntermediateDirectories: true)
-        let skillData = Data(
+        originalSkillData = Data(
             """
             ---
             name: example
@@ -195,7 +218,7 @@ private struct LocalGitPackageRepository: Sendable {
 
             """.utf8
         )
-        try skillData.write(to: skillRoot.appendingPathComponent("SKILL.md"))
+        try originalSkillData.write(to: skillRoot.appendingPathComponent("SKILL.md"))
         try Data("reference\n".utf8).write(to: references.appendingPathComponent("info.txt"))
         let script = scripts.appendingPathComponent("run.sh")
         try Data("#!/bin/sh\necho hello\n".utf8).write(to: script)
@@ -230,6 +253,18 @@ private struct LocalGitPackageRepository: Sendable {
 
     func remove() {
         try? FileManager.default.removeItem(at: root)
+    }
+
+    func advanceHead() throws {
+        let skill = repositoryRoot.appendingPathComponent("skills/example/SKILL.md")
+        try Data("---\nname: changed\ndescription: New head.\n---\n".utf8).write(to: skill)
+        _ = try Self.git(["-C", repositoryRoot.path, "add", "."])
+        _ = try Self.git([
+            "-C", repositoryRoot.path,
+            "-c", "user.name=omgskills-tests",
+            "-c", "user.email=tests@example.com",
+            "commit", "--quiet", "-m", "new head"
+        ])
     }
 
     private static func gitText(_ arguments: [String]) throws -> String {

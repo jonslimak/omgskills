@@ -173,6 +173,7 @@ struct ContentView: View {
     let skillGroupsFeatureAvailability: SkillGroupsFeatureAvailability
     let groupInstallFlowModel: GroupInstallFlowModel?
     let groupSnapshotInstaller: any GroupSnapshotInstalling
+    let catalogSkillInstaller: any CatalogSkillInstalling
     let groupInstallHomeDirectory: URL
 
     @StateObject private var store = SkillsStore()
@@ -2249,9 +2250,7 @@ struct ContentView: View {
             let activity = updateInstallCoordinator.beginActivity(.skillInstall)
             defer { activity.finish() }
             do {
-                _ = try await Task.detached {
-                    try await SkillInstaller.install(skill, target: target)
-                }.value
+                try await catalogSkillInstaller.install(skill, target: target)
                 guard selectedId == skill.id else { return }
                 Analytics.signal("skill.installed", parameters: analyticsParameters(for: skill, target: target))
                 setInstallState(.installed, for: target)
@@ -2872,10 +2871,10 @@ struct ContentView: View {
 
         guard let skill else { return }
         if source != .installed {
-            if SkillInstaller.isInstalled(skill, target: .claude) {
+            if CatalogSkillInstaller.isInstalled(skill, target: .claude) {
                 claudeInstallState = .installed
             }
-            if SkillInstaller.isInstalled(skill, target: .codex) {
+            if CatalogSkillInstaller.isInstalled(skill, target: .codex) {
                 codexInstallState = .installed
             }
         }
@@ -2942,6 +2941,7 @@ struct ContentView: View {
         ]
         if let target {
             parameters["target"] = target.rawValue
+            parameters["install_mode"] = skill.installModeTelemetryValue
         }
         if let origin = skill.origin {
             parameters["origin"] = origin
