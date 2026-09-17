@@ -18,7 +18,7 @@ struct OmgskillsApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     nonisolated static let debugAppcastURLEnvironmentKey = "OMGSKILLS_DEBUG_APPCAST_URL"
     private static let libraryRefreshTimerInterval: TimeInterval = 60 * 60
-    private let skillGroupsAuthEnabled = AppRuntimeConfiguration.skillGroupsAuthEnabled
+    private let skillGroupsBuildSupported = AppRuntimeConfiguration.skillGroupsAuthSupported
     private var statusItem: NSStatusItem!
     private var panel: NSPanel!
     private var clickMonitor: Any?
@@ -29,7 +29,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var libraryRefreshTask: Task<Void, Never>?
     private var libraryRefreshTimer: Timer?
     private var workspaceDidWakeObserver: NSObjectProtocol?
+    private var skillGroupsFeatureRefreshTask: Task<Void, Never>?
+    private var skillGroupsFeatureRefreshID: UUID?
+    private var hasFinishedLaunching = false
     private var isSharePickerActive = false
+    private var pendingSkillGroupsURLs: [URL] = []
     private var pendingGroupInstallRoute: DeviceGroupManifestRoute?
     private let groupInstallRuntimePaths = AppRuntimeConfiguration.groupInstallRuntimePaths()
     private lazy var deviceCredentialStore = DeviceCredentialStore(
@@ -44,8 +48,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         browserAuthorizer: browserPairingSession,
         updateCoordinator: updateInstallCoordinator
     )
+    private lazy var skillGroupsFeatureAvailability = SkillGroupsFeatureAvailability(
+        buildSupportsSkillGroups: skillGroupsBuildSupported
+    )
     private lazy var groupInstallFlowModel: GroupInstallFlowModel? = {
-        guard skillGroupsAuthEnabled else { return nil }
+        guard skillGroupsBuildSupported else { return nil }
         return GroupInstallFlowModel(credentialStore: deviceCredentialStore)
     }()
     private lazy var groupSnapshotInstaller = ManagedSkillInstaller(
@@ -56,9 +63,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let usesBundledLibraryPreview = AppRuntimeConfiguration.usesBundledLibraryPreview
         Analytics.start()
-        if skillGroupsAuthEnabled {
-            deviceConnectionModel.restore()
-        }
         let shouldStartUpdater = !usesBundledLibraryPreview
         setupUpdater(startingUpdater: shouldStartUpdater)
         if Self.shouldCheckForUpdatesInBackground(updaterStarted: shouldStartUpdater) {
@@ -67,6 +71,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         setupStatusItem()
         setupPanel()
         setupGlobalHotkey()
+        hasFinishedLaunching = true
+        refreshSkillGroupsFeatureAvailability()
         if !usesBundledLibraryPreview {
             setupLibraryRefreshObservers()
             setupLibraryRefreshTimer()
@@ -102,6 +108,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        skillGroupsFeatureRefreshTask?.cancel()
         libraryRefreshTask?.cancel()
         libraryRefreshTimer?.invalidate()
         libraryRefreshTimer = nil
@@ -110,17 +117,70 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
     }
 
+    func applicationDidBecomeActive(_ notification: Notification) {
+        guard hasFinishedLaunching else { return }
+        refreshSkillGroupsFeatureAvailability()
+    }
+
     func application(_ application: NSApplication, open urls: [URL]) {
-        guard skillGroupsAuthEnabled else { return }
         for url in urls {
-            switch GroupInstallDeepLink.classify(url) {
-            case .group(let route):
-                openGroupInstall(route)
-            case .pairing(let callbackURL):
-                _ = browserPairingSession.handleCallback(callbackURL)
-            case .unsupported:
-                continue
+            guard GroupInstallDeepLink.classify(url) != .unsupported else { continue }
+            switch skillGroupsFeatureAvailability.deepLinkDisposition {
+            case .handle:
+                handleSkillGroupsURL(url)
+            case .queueUntilResolved:
+                if !pendingSkillGroupsURLs.contains(url) {
+                    pendingSkillGroupsURLs.append(url)
+                }
+            case .discard:
+                break
             }
+        }
+    }
+
+    private func handleSkillGroupsURL(_ url: URL) {
+        switch GroupInstallDeepLink.classify(url) {
+        case .group(let route):
+            openGroupInstall(route)
+        case .pairing(let callbackURL):
+            _ = browserPairingSession.handleCallback(callbackURL)
+        case .unsupported:
+            break
+        }
+    }
+
+    private func refreshSkillGroupsFeatureAvailability() {
+        guard skillGroupsBuildSupported, skillGroupsFeatureRefreshTask == nil else { return }
+        let refreshID = UUID()
+        let wasEnabled = skillGroupsFeatureAvailability.isEnabled
+        skillGroupsFeatureRefreshID = refreshID
+        skillGroupsFeatureRefreshTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            let isEnabled = await skillGroupsFeatureAvailability.refresh()
+            guard !Task.isCancelled, skillGroupsFeatureRefreshID == refreshID else { return }
+            skillGroupsFeatureRefreshID = nil
+            skillGroupsFeatureRefreshTask = nil
+            applySkillGroupsFeatureAvailability(isEnabled, wasEnabled: wasEnabled)
+        }
+    }
+
+    private func applySkillGroupsFeatureAvailability(_ isEnabled: Bool, wasEnabled: Bool) {
+        if isEnabled {
+            if !wasEnabled {
+                deviceConnectionModel.restore()
+            }
+            let pendingURLs = pendingSkillGroupsURLs
+            pendingSkillGroupsURLs.removeAll()
+            pendingURLs.forEach(handleSkillGroupsURL)
+            return
+        }
+
+        pendingSkillGroupsURLs.removeAll()
+        pendingGroupInstallRoute = nil
+        groupInstallFlowModel?.dismiss()
+        if wasEnabled {
+            browserPairingSession.cancel()
+            deviceConnectionModel.cancelCurrentOperation()
         }
     }
 
@@ -233,7 +293,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             rootView: ContentView(
                 deviceConnectionModel: deviceConnectionModel,
                 updateInstallCoordinator: updateInstallCoordinator,
-                skillGroupsAuthEnabled: skillGroupsAuthEnabled,
+                skillGroupsFeatureAvailability: skillGroupsFeatureAvailability,
                 groupInstallFlowModel: groupInstallFlowModel,
                 groupSnapshotInstaller: groupSnapshotInstaller,
                 groupInstallHomeDirectory: groupInstallRuntimePaths.homeDirectory
@@ -265,7 +325,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     private func openGroupInstall(_ route: DeviceGroupManifestRoute) {
-        guard skillGroupsAuthEnabled, let groupInstallFlowModel else { return }
+        guard skillGroupsFeatureAvailability.isEnabled, let groupInstallFlowModel else { return }
         guard panel != nil else {
             pendingGroupInstallRoute = route
             return
@@ -278,6 +338,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         if panel.isVisible {
             closePopover()
         } else {
+            refreshSkillGroupsFeatureAvailability()
             repositionPanel(width: 400, animate: false)
             panel.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)

@@ -13,29 +13,46 @@ struct AppRuntimeConfigurationTests {
     }
 
     @Test func skillGroupsAuthDefaultsOffAndRequiresExplicitEnablement() {
-        #expect(!AppRuntimeConfiguration.skillGroupsAuthEnabled(
+        #expect(!AppRuntimeConfiguration.skillGroupsAuthSupported(
             infoDictionary: [:],
             environment: [:]
         ))
-        #expect(!AppRuntimeConfiguration.skillGroupsAuthEnabled(
+        #expect(!AppRuntimeConfiguration.skillGroupsAuthSupported(
             infoDictionary: [AppRuntimeConfiguration.skillGroupsAuthEnabledKey: "true"],
             environment: [:]
         ))
-        #expect(AppRuntimeConfiguration.skillGroupsAuthEnabled(
+        #expect(AppRuntimeConfiguration.skillGroupsAuthSupported(
             infoDictionary: [AppRuntimeConfiguration.skillGroupsAuthEnabledKey: true],
             environment: [:]
         ))
     }
 
     @Test func skillGroupsAuthAllowsOnlyTheExplicitPrivatePreviewValue() {
-        #expect(!AppRuntimeConfiguration.skillGroupsAuthEnabled(
+        #expect(!AppRuntimeConfiguration.skillGroupsAuthSupported(
             infoDictionary: [:],
             environment: [AppRuntimeConfiguration.skillGroupsAuthPreviewEnvironmentKey: "true"]
         ))
-        #expect(AppRuntimeConfiguration.skillGroupsAuthEnabled(
+        #expect(AppRuntimeConfiguration.skillGroupsAuthSupported(
             infoDictionary: [:],
             environment: [AppRuntimeConfiguration.skillGroupsAuthPreviewEnvironmentKey: "1"]
         ))
+    }
+
+    @Test func releaseConfigurationUsesSafeDebugOverrideOrProductionURL() {
+        #expect(AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [:])
+            == AppRuntimeConfiguration.productionReleaseConfigurationURL)
+        #expect(AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [
+            AppRuntimeConfiguration.debugReleaseConfigurationURLEnvironmentKey:
+                " http://localhost:8123/app/release-config.json "
+        ]).absoluteString == "http://localhost:8123/app/release-config.json")
+        #expect(AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [
+            AppRuntimeConfiguration.debugReleaseConfigurationURLEnvironmentKey:
+                "http://example.com/app/release-config.json"
+        ]) == AppRuntimeConfiguration.productionReleaseConfigurationURL)
+        #expect(AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [
+            AppRuntimeConfiguration.debugReleaseConfigurationURLEnvironmentKey:
+                "file:///tmp/release-config.json"
+        ]) == AppRuntimeConfiguration.productionReleaseConfigurationURL)
     }
 
     @Test func debugGroupInstallRootIsIsolatedAndRequiresAnAbsolutePath() {

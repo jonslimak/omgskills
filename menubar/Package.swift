@@ -22,6 +22,7 @@ let package = Package(
             resources: [.copy("Resources")],
             swiftSettings: [
                 .define("OMGSKILLS_DEBUG_APPCAST_OVERRIDE", .when(configuration: .debug)),
+                .define("OMGSKILLS_DEBUG_RELEASE_CONFIG_OVERRIDE", .when(configuration: .debug)),
                 .define("OMGSKILLS_DEBUG_GROUP_INSTALL_ROOT_OVERRIDE", .when(configuration: .debug))
             ]
         ),

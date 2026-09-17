@@ -170,7 +170,7 @@ private extension Array where Element == SkillCollection {
 struct ContentView: View {
     let deviceConnectionModel: DeviceConnectionModel
     let updateInstallCoordinator: UpdateInstallCoordinator
-    let skillGroupsAuthEnabled: Bool
+    let skillGroupsFeatureAvailability: SkillGroupsFeatureAvailability
     let groupInstallFlowModel: GroupInstallFlowModel?
     let groupSnapshotInstaller: any GroupSnapshotInstalling
     let groupInstallHomeDirectory: URL
@@ -449,12 +449,12 @@ struct ContentView: View {
         }
         .frame(width: shouldShowDetailPanel ? 750 : 400, height: 855)
         .sheet(isPresented: $isSyncPanelPresented) {
-            if skillGroupsAuthEnabled {
+            if skillGroupsFeatureAvailability.isEnabled {
                 syncPanel
             }
         }
         .sheet(isPresented: groupInstallSheetPresented) {
-            if skillGroupsAuthEnabled, let groupInstallFlowModel {
+            if skillGroupsFeatureAvailability.isEnabled, let groupInstallFlowModel {
                 GroupInstallFlowSheet(
                     model: groupInstallFlowModel,
                     installer: groupSnapshotInstaller,
@@ -465,6 +465,11 @@ struct ContentView: View {
                     homeDirectory: groupInstallHomeDirectory
                 )
             }
+        }
+        .onChange(of: skillGroupsFeatureAvailability.isEnabled) { _, isEnabled in
+            guard !isEnabled else { return }
+            isSyncPanelPresented = false
+            groupInstallFlowModel?.dismiss()
         }
         .onChange(of: showDetail) { _, newValue in
             guard !suppressSessionChangeHandlers else { return }
@@ -510,7 +515,8 @@ struct ContentView: View {
     private var groupInstallSheetPresented: Binding<Bool> {
         Binding(
             get: {
-                skillGroupsAuthEnabled && (groupInstallFlowModel?.isPresented ?? false)
+                skillGroupsFeatureAvailability.isEnabled
+                    && (groupInstallFlowModel?.isPresented ?? false)
             },
             set: { isPresented in
                 if !isPresented {
@@ -1055,7 +1061,7 @@ struct ContentView: View {
             .scrollIndicators(.never)
 
             if localDashboardFilter == nil {
-                if skillGroupsAuthEnabled {
+                if skillGroupsFeatureAvailability.isEnabled {
                     Button {
                         store.refreshInstalled()
                         isSyncPanelPresented = true

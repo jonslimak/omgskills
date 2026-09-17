@@ -4,8 +4,12 @@ enum AppRuntimeConfiguration {
     static let bundledLibraryPreviewKey = "OMGSkillsBundledLibraryPreview"
     static let skillGroupsAuthEnabledKey = "OMGSkillsSkillGroupsAuthEnabled"
     static let skillGroupsAuthPreviewEnvironmentKey = "OMGSKILLS_SKILLGROUPS_AUTH_ENABLED"
+    static let debugReleaseConfigurationURLEnvironmentKey = "OMGSKILLS_DEBUG_RELEASE_CONFIG_URL"
     static let debugGroupInstallRootEnvironmentKey = "OMGSKILLS_DEBUG_GROUP_INSTALL_ROOT"
     static let debugGroupInstallRootInfoKey = "OMGSkillsDebugGroupInstallRoot"
+    static let productionReleaseConfigurationURL = URL(
+        string: "https://omgskills.com/app/release-config.json"
+    )!
 
     static var usesBundledLibraryPreview: Bool {
         usesBundledLibraryPreview(infoDictionary: Bundle.main.infoDictionary ?? [:])
@@ -17,14 +21,14 @@ enum AppRuntimeConfiguration {
         infoDictionary[bundledLibraryPreviewKey] as? Bool == true
     }
 
-    static var skillGroupsAuthEnabled: Bool {
-        skillGroupsAuthEnabled(
+    static var skillGroupsAuthSupported: Bool {
+        skillGroupsAuthSupported(
             infoDictionary: Bundle.main.infoDictionary ?? [:],
             environment: ProcessInfo.processInfo.environment
         )
     }
 
-    static func skillGroupsAuthEnabled(
+    static func skillGroupsAuthSupported(
         infoDictionary: [String: Any],
         environment: [String: String]
     ) -> Bool {
@@ -32,6 +36,27 @@ enum AppRuntimeConfiguration {
             return true
         }
         return infoDictionary[skillGroupsAuthEnabledKey] as? Bool == true
+    }
+
+    static var skillGroupsReleaseConfigurationURL: URL {
+        skillGroupsReleaseConfigurationURL(environment: ProcessInfo.processInfo.environment)
+    }
+
+    static func skillGroupsReleaseConfigurationURL(
+        environment: [String: String]
+    ) -> URL {
+        #if OMGSKILLS_DEBUG_RELEASE_CONFIG_OVERRIDE
+        if let rawValue = environment[debugReleaseConfigurationURLEnvironmentKey]?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+           !rawValue.isEmpty,
+           let url = URL(string: rawValue),
+           let scheme = url.scheme?.lowercased(),
+           scheme == "https" || (scheme == "http" && url.host?.lowercased() == "localhost")
+                || (scheme == "http" && url.host == "127.0.0.1") {
+            return url
+        }
+        #endif
+        return productionReleaseConfigurationURL
     }
 
     static func groupInstallRuntimePaths(
