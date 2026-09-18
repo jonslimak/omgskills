@@ -15,24 +15,20 @@ enum InstalledSkillUninstaller {
     }
 
     static var defaultAllowedRoots: [URL] {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        return [
-            home.appendingPathComponent(".codex/skills", isDirectory: true),
-            home.appendingPathComponent(".claude/skills", isDirectory: true),
-            home.appendingPathComponent(".agents/skills", isDirectory: true)
-        ]
+        SkillFilesystemPaths.production().allSkillsRoots
     }
 
     static func uninstall(
         _ skill: Skill,
-        allowedRoots: [URL] = defaultAllowedRoots,
+        allowedRoots: [URL]? = nil,
+        filesystemPaths: SkillFilesystemPaths = .production(),
         fileManager: FileManager = .default,
         trashItem: ((URL) throws -> Void)? = nil
     ) throws -> Result {
         let installationURL = URL(fileURLWithPath: skill.installCmd, isDirectory: true)
         guard let targetRoot = allowedRoot(
             containing: installationURL,
-            allowedRoots: allowedRoots
+            allowedRoots: allowedRoots ?? filesystemPaths.allSkillsRoots
         ) else {
             throw UninstallError.unexpectedSkillPath
         }

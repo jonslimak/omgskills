@@ -175,8 +175,9 @@ struct ContentView: View {
     let groupSnapshotInstaller: any GroupSnapshotInstalling
     let catalogSkillInstaller: any CatalogSkillInstalling
     let groupInstallHomeDirectory: URL
+    let skillFilesystemPaths: SkillFilesystemPaths
 
-    @StateObject private var store = SkillsStore()
+    @StateObject private var store: SkillsStore
     @State private var query = ""
     @State private var selectedCreatorHandle: String?
     @State private var selectedId: String?
@@ -188,6 +189,26 @@ struct ContentView: View {
     @State private var showDetail = false
     @State private var cachedResults: [Skill] = []
     @State private var cachedInstalledResults: [InstalledSkillDisplayItem] = []
+
+    init(
+        deviceConnectionModel: DeviceConnectionModel,
+        updateInstallCoordinator: UpdateInstallCoordinator,
+        skillGroupsFeatureAvailability: SkillGroupsFeatureAvailability,
+        groupInstallFlowModel: GroupInstallFlowModel?,
+        groupSnapshotInstaller: any GroupSnapshotInstalling,
+        catalogSkillInstaller: any CatalogSkillInstalling,
+        runtimeContext: AppRuntimeConfiguration.RuntimeContext
+    ) {
+        self.deviceConnectionModel = deviceConnectionModel
+        self.updateInstallCoordinator = updateInstallCoordinator
+        self.skillGroupsFeatureAvailability = skillGroupsFeatureAvailability
+        self.groupInstallFlowModel = groupInstallFlowModel
+        self.groupSnapshotInstaller = groupSnapshotInstaller
+        self.catalogSkillInstaller = catalogSkillInstaller
+        self.groupInstallHomeDirectory = runtimeContext.groupInstallRuntimePaths.homeDirectory
+        self.skillFilesystemPaths = runtimeContext.skillFilesystemPaths
+        _store = StateObject(wrappedValue: SkillsStore(runtimeContext: runtimeContext))
+    }
     @State private var selectedSkill: Skill?
     @State private var installedSelectionAnchor: InstalledSkillSelectionResolver.Anchor?
     @State private var displayedReadme: String?
@@ -2076,12 +2097,17 @@ struct ContentView: View {
     private func crossInstallSkill(_ skill: Skill, target: SkillInstaller.Target) {
         guard crossInstallState.isInstalling == false else { return }
         crossInstallState = .installing
+        let filesystemPaths = skillFilesystemPaths
         Task { @MainActor in
             let activity = updateInstallCoordinator.beginActivity(.localCrossInstall)
             defer { activity.finish() }
             do {
                 _ = try await Task.detached {
-                    try LocalSkillCrossInstaller.install(skill, target: target)
+                    try LocalSkillCrossInstaller.install(
+                        skill,
+                        target: target,
+                        filesystemPaths: filesystemPaths
+                    )
                 }.value
                 Analytics.signal(crossInstallSignalName(for: target), parameters: analyticsParameters(for: skill, target: target))
                 crossInstallState = .idle
@@ -2098,7 +2124,10 @@ struct ContentView: View {
     private func deleteInstalledSkill(_ skill: Skill) {
         do {
             try updateInstallCoordinator.withActivity(.localSkillDelete) {
-                let result = try InstalledSkillUninstaller.uninstall(skill)
+                let result = try InstalledSkillUninstaller.uninstall(
+                    skill,
+                    filesystemPaths: skillFilesystemPaths
+                )
                 skillPendingDelete = nil
                 deleteError = result.provenanceCleanupWarning
                 store.refreshInstalled()
@@ -2157,13 +2186,18 @@ struct ContentView: View {
         guard !targets.isEmpty else { return }
 
         githubInstallPromptStatus = .installing
+        let filesystemPaths = skillFilesystemPaths
         Task { @MainActor in
             let activity = updateInstallCoordinator.beginActivity(.gitHubInstallPrompt)
             defer { activity.finish() }
             do {
                 for target in targets {
                     _ = try await Task.detached {
-                        try await SkillInstaller.install(skill, target: target)
+                        try await SkillInstaller.install(
+                            skill,
+                            target: target,
+                            filesystemPaths: filesystemPaths
+                        )
                     }.value
                     Analytics.signal("skill.installed", parameters: analyticsParameters(for: skill, target: target))
                 }
@@ -2871,10 +2905,10 @@ struct ContentView: View {
 
         guard let skill else { return }
         if source != .installed {
-            if CatalogSkillInstaller.isInstalled(skill, target: .claude) {
+            if catalogSkillInstaller.isInstalled(skill, target: .claude) {
                 claudeInstallState = .installed
             }
-            if CatalogSkillInstaller.isInstalled(skill, target: .codex) {
+            if catalogSkillInstaller.isInstalled(skill, target: .codex) {
                 codexInstallState = .installed
             }
         }

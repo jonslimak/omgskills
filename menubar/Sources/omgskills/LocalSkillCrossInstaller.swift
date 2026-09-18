@@ -20,8 +20,12 @@ enum LocalSkillCrossInstaller {
         }
     }
 
-    static func install(_ skill: Skill, target: SkillInstaller.Target) throws -> InstallResult {
-        try install(skill, targetRoot: target.skillsRoot)
+    static func install(
+        _ skill: Skill,
+        target: SkillInstaller.Target,
+        filesystemPaths: SkillFilesystemPaths = .production()
+    ) throws -> InstallResult {
+        try install(skill, targetRoot: filesystemPaths.skillsRoot(for: target))
     }
 
     static func install(_ skill: Skill, targetRoot: URL) throws -> InstallResult {

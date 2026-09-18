@@ -2,6 +2,7 @@ import Foundation
 
 protocol CatalogSkillInstalling: Sendable {
     func install(_ skill: Skill, target: SkillInstaller.Target) async throws
+    func isInstalled(_ skill: Skill, target: SkillInstaller.Target) -> Bool
 }
 
 struct CatalogSkillInstaller: CatalogSkillInstalling {
@@ -23,27 +24,34 @@ struct CatalogSkillInstaller: CatalogSkillInstalling {
     private let managedInstaller: ManagedSkillInstaller
     private let legacyInstall: LegacyInstall
     private let destinationBuilder: DestinationBuilder
+    private let filesystemPaths: SkillFilesystemPaths
 
     init(
         packageFetcher: any PublicSkillPackageFetching = GitPublicSkillPackageFetcher(),
         managedInstaller: ManagedSkillInstaller,
-        legacyInstall: @escaping LegacyInstall = { skill, target in
-            _ = try await SkillInstaller.install(skill, target: target)
-        },
-        destinationBuilder: @escaping DestinationBuilder = { target, targetName in
+        filesystemPaths: SkillFilesystemPaths = .production(),
+        legacyInstall: LegacyInstall? = nil,
+        destinationBuilder: DestinationBuilder? = nil
+    ) {
+        self.packageFetcher = packageFetcher
+        self.managedInstaller = managedInstaller
+        self.filesystemPaths = filesystemPaths
+        self.legacyInstall = legacyInstall ?? { skill, target in
+            _ = try await SkillInstaller.install(
+                skill,
+                target: target,
+                filesystemPaths: filesystemPaths
+            )
+        }
+        self.destinationBuilder = destinationBuilder ?? { target, targetName in
             ManagedSkillDestination(
                 agent: target.managedAgent,
                 scope: .userGlobal,
                 rootIdentifier: target.managedRootIdentifier,
-                rootURL: target.skillsRoot,
+                rootURL: filesystemPaths.skillsRoot(for: target),
                 targetName: targetName
             )
         }
-    ) {
-        self.packageFetcher = packageFetcher
-        self.managedInstaller = managedInstaller
-        self.legacyInstall = legacyInstall
-        self.destinationBuilder = destinationBuilder
     }
 
     func install(_ skill: Skill, target: SkillInstaller.Target) async throws {
@@ -75,16 +83,21 @@ struct CatalogSkillInstaller: CatalogSkillInstalling {
         }
     }
 
-    nonisolated static func isInstalled(_ skill: Skill, target: SkillInstaller.Target) -> Bool {
+    func isInstalled(_ skill: Skill, target: SkillInstaller.Target) -> Bool {
         switch skill.pinnedInstallMetadataState {
         case .legacy:
-            return SkillInstaller.isInstalled(skill, target: target)
+            return SkillInstaller.isInstalled(
+                skill,
+                target: target,
+                filesystemPaths: filesystemPaths
+            )
         case .invalid:
             return false
         case .complete(let metadata):
+            let destination = destinationBuilder(target, metadata.targetName)
             return FileManager.default.fileExists(
-                atPath: target.skillsRoot
-                    .appendingPathComponent(metadata.targetName, isDirectory: true)
+                atPath: destination.rootURL
+                    .appendingPathComponent(destination.targetName, isDirectory: true)
                     .appendingPathComponent("SKILL.md", isDirectory: false)
                     .path
             )

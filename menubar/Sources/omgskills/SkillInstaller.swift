@@ -6,11 +6,7 @@ enum SkillInstaller {
         case codex = "Codex"
 
         var skillsRoot: URL {
-            let home = FileManager.default.homeDirectoryForCurrentUser
-            switch self {
-            case .claude: return home.appendingPathComponent(".claude/skills", isDirectory: true)
-            case .codex: return home.appendingPathComponent(".codex/skills", isDirectory: true)
-            }
+            SkillFilesystemPaths.production().skillsRoot(for: self)
         }
     }
 
@@ -49,15 +45,27 @@ enum SkillInstaller {
         }
     }
 
-    static func isInstalled(_ skill: Skill, target: Target) -> Bool {
+    static func isInstalled(
+        _ skill: Skill,
+        target: Target,
+        filesystemPaths: SkillFilesystemPaths = .production()
+    ) -> Bool {
         guard let spec = try? installationSpec(for: skill) else { return false }
-        return FileManager.default.fileExists(atPath: target.skillsRoot.appendingPathComponent(spec.targetName).appendingPathComponent("SKILL.md").path)
+        return FileManager.default.fileExists(
+            atPath: filesystemPaths.skillsRoot(for: target)
+                .appendingPathComponent(spec.targetName)
+                .appendingPathComponent("SKILL.md").path
+        )
     }
 
-    static func install(_ skill: Skill, target: Target) async throws -> InstallResult {
+    static func install(
+        _ skill: Skill,
+        target: Target,
+        filesystemPaths: SkillFilesystemPaths = .production()
+    ) async throws -> InstallResult {
         let spec = try installationSpec(for: skill)
         let fm = FileManager.default
-        let targetRoot = target.skillsRoot
+        let targetRoot = filesystemPaths.skillsRoot(for: target)
         let targetURL = targetRoot.appendingPathComponent(spec.targetName, isDirectory: true)
         let targetSkill = targetURL.appendingPathComponent("SKILL.md")
 
@@ -75,9 +83,10 @@ enum SkillInstaller {
         }
 
         try fm.createDirectory(at: targetRoot, withIntermediateDirectories: true)
-        try fm.createDirectory(at: repoCacheRoot, withIntermediateDirectories: true)
+        try fm.createDirectory(at: filesystemPaths.legacyRepoCacheRoot, withIntermediateDirectories: true)
 
-        let repoDir = repoCacheRoot.appendingPathComponent(spec.repoCacheName, isDirectory: true)
+        let repoDir = filesystemPaths.legacyRepoCacheRoot
+            .appendingPathComponent(spec.repoCacheName, isDirectory: true)
         if !fm.fileExists(atPath: repoDir.appendingPathComponent(".git").path) {
             try await runGit(["clone", spec.repoURL, repoDir.path])
         }
@@ -122,11 +131,6 @@ enum SkillInstaller {
             skillRelativePath: skillRelativePath(from: skill.installCmd, repoName: repo.name),
             targetName: targetName
         )
-    }
-
-    private static var repoCacheRoot: URL {
-        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("omgskills/repos", isDirectory: true)
     }
 
     private static func repoParts(from githubURL: String) -> (owner: String, name: String)? {

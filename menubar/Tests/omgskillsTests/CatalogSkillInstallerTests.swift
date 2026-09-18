@@ -122,6 +122,60 @@ struct CatalogSkillInstallerTests {
         #expect(fixture.installedSkillExists)
     }
 
+    @Test func isolatedCatalogLifecycleNeverLeavesTheTestRoot() async throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("omgskills-catalog-lifecycle-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let filesystemPaths = SkillFilesystemPaths.isolated(testRoot: root)
+        let managedRoot = root.appendingPathComponent("managed", isDirectory: true)
+        let installer = CatalogSkillInstaller(
+            packageFetcher: RecordingPackageFetcher(package: GroupSkillPackageTestSupport.package),
+            managedInstaller: ManagedSkillInstaller(
+                managedRoot: managedRoot,
+                pathAnchor: filesystemPaths.homeDirectory
+            ),
+            filesystemPaths: filesystemPaths
+        )
+        let skill = makeSkill()
+
+        try await installer.install(skill, target: .claude)
+
+        let installedURL = filesystemPaths.claudeSkillsRoot
+            .appendingPathComponent("example", isDirectory: true)
+        #expect(installer.isInstalled(skill, target: .claude))
+        #expect(installedURL.standardizedFileURL.path.hasPrefix(root.standardizedFileURL.path + "/"))
+        #expect(FileManager.default.fileExists(atPath: installedURL.appendingPathComponent("SKILL.md").path))
+
+        let scan = InstalledSkillsScanner.scanWithSummary(filesystemPaths: filesystemPaths)
+        #expect(scan.installations.count == 1)
+        let installed = try #require(scan.installations.first)
+        #expect(installed.catalogSkillId == skill.id)
+        #expect(
+            URL(fileURLWithPath: installed.installCmd, isDirectory: true).resolvingSymlinksInPath()
+                == installedURL.resolvingSymlinksInPath()
+        )
+
+        let result = try InstalledSkillUninstaller.uninstall(
+            installed,
+            filesystemPaths: filesystemPaths
+        ) { url in
+            try FileManager.default.removeItem(at: url)
+        }
+        #expect(!FileManager.default.fileExists(atPath: installedURL.path))
+        #expect(InstalledSkillsScanner.scan(filesystemPaths: filesystemPaths).isEmpty)
+        #expect(result.provenanceCleanupWarning == nil)
+
+        let enumerator = FileManager.default.enumerator(
+            at: root,
+            includingPropertiesForKeys: nil
+        )
+        let touchedURLs = (enumerator?.allObjects as? [URL]) ?? []
+        #expect(touchedURLs.allSatisfy {
+            $0.standardizedFileURL.path.hasPrefix(root.standardizedFileURL.path + "/")
+        })
+    }
+
     private func assertPinnedInstall(skillMDPath: String, expectedRoot: String) async throws {
         let fixture = try InstallFixture()
         defer { fixture.remove() }
