@@ -71,7 +71,7 @@
     "name": "impeccable",
     "authorHandle": "pbakaus",
     "description": "Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Handles UX review, visual hierarchy, information architecture, cognitive load, accessibility, performance, responsive behavior, theming, anti-patterns, typography, fonts, spacing, layout, alignment, color, motion, micro-interactions, UX copy, error states, edge cases, i18n, and reusable design systems or tokens. Also use for bland designs that need to become bolder or more delightful, loud designs that should become quieter, live browser iteration on UI elements, or ambitious visual effects that should feel technically extraordinary. Not for backend-only or non-UI tasks.",
-    "stars": 68745,
+    "stars": 68881,
     "installs": 282052,
     "githubUrl": "https://github.com/pbakaus/impeccable",
     "source": "skills.sh"
@@ -258,7 +258,7 @@
     "name": "orca-cli",
     "authorHandle": "stablyai",
     "description": "Operate Orca-managed worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, worktree comments, and Orca's embedded browser through the `orca` CLI. Use when the user says \"$orca-cli\", \"Orca worktree\", \"child worktree\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"handoff\" / \"handover\" / \"give this to another agent\", \"Orca browser\", \"orca artifacts\", or \"share skills\". Prefer it over raw git worktree, ad hoc PTYs, or Computer Use when Orca state is involved. Use Computer Use only when a visible window needs GUI control that a CLI, filesystem, or API cannot do.",
-    "stars": 71055,
+    "stars": 71516,
     "installs": 237775,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
@@ -313,7 +313,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 176953,
+    "stars": 176976,
     "installs": 223061,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -346,7 +346,7 @@
     "name": "lark-note",
     "authorHandle": "larksuite",
     "description": "仅当用户或上游配置显式指定 lark-note 时使用，相关请求统一交由 lark-meeting 技能处理。",
-    "stars": 17259,
+    "stars": 17269,
     "installs": 216303,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
@@ -775,7 +775,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 114968,
+    "stars": 115073,
     "installs": 94974,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -819,7 +819,7 @@
     "name": "archify",
     "authorHandle": "tt-a1i",
     "description": "Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.",
-    "stars": 65489,
+    "stars": 66396,
     "installs": 93942,
     "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
@@ -863,7 +863,7 @@
     "name": "obsidian-markdown",
     "authorHandle": "kepano",
     "description": "Create and edit Obsidian Flavored Markdown with wikilinks, embeds, callouts, properties, and other Obsidian-specific syntax. Use when working with .md files in Obsidian, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, or Obsidian notes.",
-    "stars": 48506,
+    "stars": 48544,
     "installs": 86077,
     "githubUrl": "https://github.com/kepano/obsidian-skills",
     "source": "skills.sh"
@@ -1534,7 +1534,7 @@
     "name": "caveman-discover",
     "authorHandle": "juliusbrussee",
     "description": "Find and label every LLM workflow in the repository so Caveman Cloud groups spend by workflow instead of one bucket. Use for \"discover workflows\" or breaking LLM spend down by workflow.",
-    "stars": 106251,
+    "stars": 106455,
     "installs": 56899,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
@@ -1864,7 +1864,7 @@
     "name": "herdr",
     "authorHandle": "herdrdev",
     "description": "Control Herdr, a terminal multiplexer for coding agents. Use only when the user explicitly mentions Herdr or asks to use Herdr to inspect or control panes, tabs, workspaces, commands, or another agent. Do not use merely because a task could benefit from a background terminal, delegation, or parallel work. Requires HERDR_ENV=1.",
-    "stars": 39224,
+    "stars": 39365,
     "installs": 50701,
     "githubUrl": "https://github.com/herdrdev/herdr",
     "source": "skills.sh"
@@ -2799,7 +2799,7 @@
     "name": "karpathy-guidelines",
     "authorHandle": "multica-ai",
     "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
-    "stars": 213672,
+    "stars": 213858,
     "installs": 36787,
     "githubUrl": "https://github.com/multica-ai/andrej-karpathy-skills",
     "source": "skills.sh"
