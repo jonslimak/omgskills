@@ -1,24 +1,6 @@
 [
   {
-    "repo": "coreyhaines31/marketingskills",
-    "sources": [
-      "awesome-agent-skills-voltagent",
-      "awesome-agent-skills-heilcheng",
-      "firecrawl-best-skills"
-    ],
-    "source_count": 3
-  },
-  {
     "repo": "jthack/ffuf_claude_skill",
-    "sources": [
-      "awesome-claude-skills",
-      "awesome-agent-skills-voltagent",
-      "antigravity-sources"
-    ],
-    "source_count": 3
-  },
-  {
-    "repo": "K-Dense-AI/claude-scientific-skills",
     "sources": [
       "awesome-claude-skills",
       "awesome-agent-skills-voltagent",
@@ -131,14 +113,6 @@
     "source_count": 2
   },
   {
-    "repo": "BrianRWagner/ai-marketing-skills",
-    "sources": [
-      "awesome-agent-skills-voltagent",
-      "awesome-agent-skills-heilcheng"
-    ],
-    "source_count": 2
-  },
-  {
     "repo": "CloudAI-X/threejs-skills",
     "sources": [
       "awesome-agent-skills-voltagent",
@@ -163,6 +137,14 @@
     "source_count": 2
   },
   {
+    "repo": "coreyhaines31/marketingskills",
+    "sources": [
+      "awesome-agent-skills-voltagent",
+      "awesome-agent-skills-heilcheng"
+    ],
+    "source_count": 2
+  },
+  {
     "repo": "czlonkowski/n8n-skills",
     "sources": [
       "awesome-agent-skills-voltagent",
@@ -183,14 +165,6 @@
     "sources": [
       "awesome-claude-skills",
       "antigravity-sources"
-    ],
-    "source_count": 2
-  },
-  {
-    "repo": "firecrawl/cli",
-    "sources": [
-      "awesome-agent-skills-heilcheng",
-      "firecrawl-best-skills"
     ],
     "source_count": 2
   },
@@ -227,7 +201,7 @@
     "source_count": 2
   },
   {
-    "repo": "huifer/Claude-Ally-Health",
+    "repo": "ibelick/ui-skills",
     "sources": [
       "awesome-agent-skills-voltagent",
       "antigravity-sources"
@@ -235,9 +209,9 @@
     "source_count": 2
   },
   {
-    "repo": "ibelick/ui-skills",
+    "repo": "K-Dense-AI/claude-scientific-skills",
     "sources": [
-      "awesome-agent-skills-voltagent",
+      "awesome-claude-skills",
       "antigravity-sources"
     ],
     "source_count": 2
@@ -355,14 +329,6 @@
     "source_count": 2
   },
   {
-    "repo": "RoundTable02/tutor-skills",
-    "sources": [
-      "awesome-agent-skills-voltagent",
-      "awesome-agent-skills-heilcheng"
-    ],
-    "source_count": 2
-  },
-  {
     "repo": "sanjay3290/ai-skills",
     "sources": [
       "awesome-agent-skills-voltagent",
@@ -388,14 +354,6 @@
   },
   {
     "repo": "SHADOWPR0/security-bluebook-builder",
-    "sources": [
-      "awesome-agent-skills-voltagent",
-      "antigravity-sources"
-    ],
-    "source_count": 2
-  },
-  {
-    "repo": "Shpigford/skills",
     "sources": [
       "awesome-agent-skills-voltagent",
       "antigravity-sources"
@@ -481,6 +439,20 @@
     "source_count": 1
   },
   {
+    "repo": "aeonfun/aeon",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "agiwhitelist/auteur",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "AIDevGTM/gtm-cofounder",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -495,7 +467,7 @@
     "source_count": 1
   },
   {
-    "repo": "alinaqi/claude-bootstrap",
+    "repo": "alinaqi/maggy",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -512,6 +484,13 @@
     "repo": "alonw0/web-asset-generator",
     "sources": [
       "awesome-claude-skills"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "amirkiarafiei/subagent-cli-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -544,9 +523,9 @@
     "source_count": 1
   },
   {
-    "repo": "anthropics/claude-plugins-official",
+    "repo": "apitube/news-api-skills",
     "sources": [
-      "firecrawl-best-skills"
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -561,6 +540,27 @@
     "repo": "awrshift/claude-memory-kit",
     "sources": [
       "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "axelfreeman/marketing-mindset",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "ayghri/i-have-adhd",
+    "sources": [
+      "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "BagelHole/DevOps-Security-Agent-Skills",
+    "sources": [
+      "antigravity-sources"
     ],
     "source_count": 1
   },
@@ -586,6 +586,13 @@
     "source_count": 1
   },
   {
+    "repo": "bevibing/tutor-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "bitwize-music-studio/claude-ai-music-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -607,9 +614,30 @@
     "source_count": 1
   },
   {
+    "repo": "BrianRWagner/ai-marketing-claude-code-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "BrianRWagner/ai-marketing-skills",
+    "sources": [
+      "awesome-agent-skills-heilcheng"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "browser-act/skills",
     "sources": [
       "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "career-ops-hq/career-ops",
+    "sources": [
+      "antigravity-sources"
     ],
     "source_count": 1
   },
@@ -642,14 +670,49 @@
     "source_count": 1
   },
   {
-    "repo": "cli/cli",
+    "repo": "chrono-meta/forge-harness",
     "sources": [
-      "firecrawl-best-skills"
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "citlyze/citlyze-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Continuum-AI-Corp/OrcaReplay",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
   {
     "repo": "CosmoBlk/email-marketing-bible",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "crawlbase/crawlbase-mcp",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "crawlbase/langchain-crawlbase",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "crawlbase/n8n-nodes-crawlbase",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -663,7 +726,42 @@
     "source_count": 1
   },
   {
+    "repo": "cyperx84/claude-skills-mental-models",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "cypress-io/ai-toolkit",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "d1vai/d1v-cli",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "dagger/container-use",
+    "sources": [
+      "firecrawl-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "dankofly/perfectify",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "dannwaneri/spec-writer",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -712,7 +810,28 @@
     "source_count": 1
   },
   {
+    "repo": "drogers0/gh-image",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "eduardo-sl/go-agent-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "efremidze/swift-patterns-skill",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Egonex-AI/Understand-Anything",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -722,6 +841,13 @@
     "repo": "ehmo/platform-design-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "elementalsouls/Claude-BugHunter",
+    "sources": [
+      "antigravity-sources"
     ],
     "source_count": 1
   },
@@ -768,6 +894,13 @@
     "source_count": 1
   },
   {
+    "repo": "firecrawl/cli",
+    "sources": [
+      "awesome-agent-skills-heilcheng"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "firecrawl/firecrawl",
     "sources": [
       "firecrawl-best-skills"
@@ -789,6 +922,13 @@
     "source_count": 1
   },
   {
+    "repo": "FrancoStino/opencode-skills-collection",
+    "sources": [
+      "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "fvadicamo/dev-agent-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -797,6 +937,13 @@
   },
   {
     "repo": "GanyuanRan/Aegis",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "GarethManning/education-agent-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -845,9 +992,9 @@
     "source_count": 1
   },
   {
-    "repo": "googleworkspace/cli",
+    "repo": "gooseworks-ai/goose-skills",
     "sources": [
-      "firecrawl-best-skills"
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -866,13 +1013,6 @@
     "source_count": 1
   },
   {
-    "repo": "hamelsmu/prompts",
-    "sources": [
-      "awesome-agent-skills-voltagent"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "hanhuark/mechanical-engineering-research-skill",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -883,6 +1023,13 @@
     "repo": "HasData/hasdata-cli",
     "sources": [
       "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "hedralab/eskill",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -929,9 +1076,44 @@
     "source_count": 1
   },
   {
+    "repo": "HUANGCHIHHUNGLeo/claude-real-video",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "huggingface/skills",
     "sources": [
       "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "huifer/Claude-Ally-Health",
+    "sources": [
+      "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "huifer/WellAlly-health",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "ilyautov/humanizer-ru",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "ilyautov/small-business-ru",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -957,14 +1139,7 @@
     "source_count": 1
   },
   {
-    "repo": "jeffersonwarrior/claudisms",
-    "sources": [
-      "awesome-agent-skills-voltagent"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "Joannis/claude-skills",
+    "repo": "JimmySadek/youtube-fetcher-to-markdown",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -992,6 +1167,27 @@
     "source_count": 1
   },
   {
+    "repo": "K-Dense-AI/scientific-agent-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Kayforkind/reimagine-it",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "kensaurus/cursor-kenji",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "Kevin7Qi/codex-collab",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -999,14 +1195,28 @@
     "source_count": 1
   },
   {
-    "repo": "komal-SkyNET/claude-skill-homeassistant",
+    "repo": "kgraph57/mckinsey-style-visualization-skill",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
   {
-    "repo": "kreuzberg-dev/kreuzberg",
+    "repo": "KhazP/vibe-coding-prompt-template",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "khendzel/skills-janitor",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "komal-SkyNET/claude-skill-homeassistant",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1034,7 +1244,14 @@
     "source_count": 1
   },
   {
-    "repo": "lawvable/awesome-legal-skills",
+    "repo": "lawve-ai/awesome-legal-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "lindblomstefan/skills-library",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1048,7 +1265,7 @@
     "source_count": 1
   },
   {
-    "repo": "Lum1104/Understand-Anything",
+    "repo": "mailtrap/mailtrap-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1063,6 +1280,27 @@
   },
   {
     "repo": "makenotion/notion-cookbook",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Maksim-Burtsev/simple-man",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "manavmishra/ZeroSlop",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "MartinDelophy/ai-video-editor",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1104,6 +1342,13 @@
     "source_count": 1
   },
   {
+    "repo": "modem-dev/skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "MohamedAbdallah-14/unslop",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -1112,6 +1357,13 @@
   },
   {
     "repo": "more-io/claude-apple-bridges",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "morluto/rea",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1133,6 +1385,20 @@
   },
   {
     "repo": "mvanhorn/last30days-skill",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Nanako0129/sepia",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Neeeophytee/finding-unknowns-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1167,7 +1433,7 @@
     "source_count": 1
   },
   {
-    "repo": "nowork-studio/NotFair",
+    "repo": "nowork-studio/notfair-plugin",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1244,7 +1510,14 @@
     "source_count": 1
   },
   {
-    "repo": "Orchestra-Research/AI-research-SKILLs",
+    "repo": "Optim-Agent/optim-agent",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Orchestra-Research/AI-Research-SKILLs",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1259,6 +1532,13 @@
   },
   {
     "repo": "Orkas-AI/Orkas-VideoStudio",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "orziz/odai",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1280,6 +1560,20 @@
   },
   {
     "repo": "pattern-ai-labs/agentcall",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "perso-ai/perso-dubbing-plugin",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "plasma-ai/fractal",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1314,7 +1608,14 @@
     "source_count": 1
   },
   {
-    "repo": "raintree-technology/apple-hig-skills",
+    "repo": "rainmanjam/poka-yoke",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "raintree-technology/hig-doctor",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1342,7 +1643,21 @@
     "source_count": 1
   },
   {
+    "repo": "rebelytics/one-skill-to-rule-them-all",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "redis/agent-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "reliefeai/browser-relay",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1363,16 +1678,23 @@
     "source_count": 1
   },
   {
-    "repo": "Rootly-AI-Labs/Rootly-MCP-server",
+    "repo": "rootlyhq/rootly-mcp-server",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
   {
-    "repo": "rudrankriyam/app-store-connect-cli-skills",
+    "repo": "rorkai/app-store-connect-cli-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "RoundTable02/tutor-skills",
+    "sources": [
+      "awesome-agent-skills-heilcheng"
     ],
     "source_count": 1
   },
@@ -1384,7 +1706,28 @@
     "source_count": 1
   },
   {
+    "repo": "Ryan-yang125/motion-lexicon",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "saleh-alhaddad/itqan-engineering",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "sametbrr/llm-wiki-manager",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "sandbaseai/sandbase-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1405,7 +1748,42 @@
     "source_count": 1
   },
   {
+    "repo": "scarletkc/agents",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "ScrapeCreators/social-media-research-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "Sendmux/skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "sergebulaev/linkedin-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "serpapi/serpapi-cli",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "serpapi/serpapi-search-tools-python",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1419,16 +1797,16 @@
     "source_count": 1
   },
   {
-    "repo": "ShunsukeHayashi/agent-skill-bus",
+    "repo": "Shpigford/skills",
     "sources": [
-      "awesome-agent-skills-voltagent"
+      "antigravity-sources"
     ],
     "source_count": 1
   },
   {
-    "repo": "skills-directory/skill-codex",
+    "repo": "Simon-He95/markstream-vue",
     "sources": [
-      "firecrawl-best-skills"
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -1440,9 +1818,44 @@
     "source_count": 1
   },
   {
+    "repo": "squirrelscan/squirrelscan",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "stareezy-1/frontend-architecture-skill",
     "sources": [
       "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "stjbrown/agent-knowledge",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "SupercmoHQ/superCMO-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "superdesigndev/superdesign-skill",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "swaylq/humanize-chinese",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -1468,7 +1881,35 @@
     "source_count": 1
   },
   {
+    "repo": "Tencent/AI-Infra-Guard",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "testdino-hq/playwright-skill",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "thedotmack/claude-mem",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "thousandflowers/skillreaper",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "tjboudreaux/cc-thinking-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1483,6 +1924,13 @@
   },
   {
     "repo": "truongduy2611/app-store-preflight-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "tt-a1i/archify",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1504,6 +1952,13 @@
   },
   {
     "repo": "uucz/moyu",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "vaibhavarora14/job-application-agent",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1538,6 +1993,27 @@
     "source_count": 1
   },
   {
+    "repo": "Vladimir-Human/humanizer-ru",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "vmware-skills/VMware-AIops",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "VoDaiLocz/kilo-kit-mcp",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "VoltAgent/awesome-codex-subagents",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -1566,6 +2042,13 @@
     "source_count": 1
   },
   {
+    "repo": "vshulcz/deja-vu",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "wanshuiyin/Auto-claude-code-research-in-sleep",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -1580,6 +2063,13 @@
     "source_count": 1
   },
   {
+    "repo": "wendylabsinc/claude-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "whatiskadudoing/fp-ts-skills",
     "sources": [
       "antigravity-sources"
@@ -1587,7 +2077,21 @@
     "source_count": 1
   },
   {
+    "repo": "woniu9524/open-web-bridge",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "wshuyi/x-article-publisher-skill",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "xberg-io/xberg",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1608,7 +2112,49 @@
     "source_count": 1
   },
   {
-    "repo": "zechenzhangAGI/AI-research-SKILLs",
+    "repo": "YannisKiefer/dark-psychology-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "yylo-dev/yylo-skills",
+    "sources": [
+      "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "zapier/zapier-mcp",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "ZeroPointRepo/youtube-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "zhaoxuya520/reverse-skill",
+    "sources": [
+      "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "zilliztech/mfs",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "zincio/skills",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1622,9 +2168,9 @@
     "source_count": 1
   },
   {
-    "repo": "zw008/VMware-AIops",
+    "repo": "zubair-trabzada/geo-seo-claude",
     "sources": [
-      "awesome-agent-skills-voltagent"
+      "antigravity-sources"
     ],
     "source_count": 1
   }
