@@ -101,13 +101,29 @@
     h2 { margin: 0 0 14px; font-size: 24px; line-height: 1.05; letter-spacing: -.04em; }
     p { margin: 0 0 12px; color: #3f3f46; font-size: 15px; }
     p:last-child { margin-bottom: 0; }
-    .skill { padding: 18px 0; border-bottom: 1px solid rgba(29,29,31,.08); }
-    .skill p { font-size: 13.5px; }
+    .skill { padding: 6px 0 20px; border-bottom: 1px solid rgba(29,29,31,.06); }
     .skill:last-child { border-bottom: 0; padding-bottom: 0; }
-    .skill h3 { margin: 0 0 6px; font-size: 15px; }
-    .skill h3 a { color: var(--blue); text-decoration: none; font-family: ui-monospace, Menlo, monospace; }
-    .skill h3 a:hover { opacity: .82; }
-    .skill .by { color: var(--muted); font-size: 13px; font-weight: 500; margin-left: 8px; }
+    .srow {
+      display: grid;
+      grid-template-columns: minmax(140px, 200px) minmax(110px, 140px) minmax(0, 1fr) max-content;
+      align-items: center; gap: 12px; padding: 13px 0;
+      text-decoration: none;
+    }
+    .srow h3 { overflow: hidden; margin: 0; font-size: 14px; font-weight: 700; color: var(--text); text-overflow: ellipsis; white-space: nowrap; }
+    .srow:hover h3 { color: #007aff; }
+    .s-author { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 500; }
+    .s-author img { width: 18px; height: 18px; border-radius: 50%; background: var(--soft); }
+    .s-desc { overflow: hidden; color: #9ca3af; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+    .s-stars { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .s-star-icon { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .sdetail p { margin: 2px 0 0; font-size: 13.5px; }
+    @media (max-width: 620px) {
+      .srow { grid-template-columns: minmax(0, 1fr) max-content max-content; gap: 6px 12px; }
+      .srow h3 { grid-column: 1; grid-row: 1; }
+      .s-author { grid-column: 2; grid-row: 1; }
+      .s-stars { grid-column: 3; grid-row: 1; }
+      .s-desc { grid-column: 1 / -1; grid-row: 2; }
+    }
     pre {
       overflow: auto; margin: 10px 0 0; padding: 12px 14px; border-radius: 12px;
       background: var(--soft); color: #3f3f46; font-size: 11.5px; line-height: 1.5;
@@ -159,33 +175,68 @@
           <h2>The five skills</h2>
 
           <div class="skill">
-            <h3><a href="/skills/stripe/ai/stripe-best-practices/">stripe-best-practices</a><span class="by">by @stripe</span></h3>
-            <p>The foundation. Checkout Sessions vs PaymentIntents, Connect setup, which integration fits your case — Stripe's own answers, so you get the recommended pattern instead of a plausible guess.</p>
-            <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/stripe-best-practices ~/.claude/skills/stripe-best-practices</code></pre>
+            <a class="srow" href="/skills/stripe/ai/stripe-best-practices/">
+              <h3>stripe-best-practices</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Guides Stripe integration decisions across API selection, Connect setup, billing, tax, and security</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 1.8k</span>
+            </a>
+            <div class="sdetail">
+              <p>The foundation. Checkout Sessions vs PaymentIntents, Connect setup, which integration fits your case — Stripe's own answers, so you get the recommended pattern instead of a plausible guess.</p>
+              <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/stripe-best-practices ~/.claude/skills/stripe-best-practices</code></pre>
+            </div>
           </div>
 
           <div class="skill">
-            <h3><a href="/skills/stripe/ai/connect-recommend/">connect-recommend</a><span class="by">by @stripe</span></h3>
-            <p>Stripe's most-starred skill, covering the part people find hardest: Stripe Connect. Charge patterns, Dashboard access, and platform setup for marketplaces and e-commerce platforms.</p>
-            <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/connect-recommend ~/.claude/skills/connect-recommend</code></pre>
+            <a class="srow" href="/skills/stripe/ai/connect-recommend/">
+              <h3>connect-recommend</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Used when the user asks about Stripe Connect configuration, charge patterns, or Dashboard access</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 1.8k</span>
+            </a>
+            <div class="sdetail">
+              <p>Stripe's most-starred skill, covering the part people find hardest: Stripe Connect. Charge patterns, Dashboard access, and platform setup for marketplaces and e-commerce platforms.</p>
+              <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/connect-recommend ~/.claude/skills/connect-recommend</code></pre>
+            </div>
           </div>
 
           <div class="skill">
-            <h3><a href="/skills/stripe/ai/upgrade-stripe/">upgrade-stripe</a><span class="by">by @stripe</span></h3>
-            <p>Walks your agent through Stripe's API version changes and SDK updates, so you can finish the upgrade you've been putting off in a single session.</p>
-            <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/upgrade-stripe ~/.claude/skills/upgrade-stripe</code></pre>
+            <a class="srow" href="/skills/stripe/ai/upgrade-stripe/">
+              <h3>upgrade-stripe</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Guide for upgrading Stripe API versions and SDKs</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 1.8k</span>
+            </a>
+            <div class="sdetail">
+              <p>Walks your agent through Stripe's API version changes and SDK updates, so you can finish the upgrade you've been putting off in a single session.</p>
+              <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/upgrade-stripe ~/.claude/skills/upgrade-stripe</code></pre>
+            </div>
           </div>
 
           <div class="skill">
-            <h3><a href="/skills/stripe/link-cli/create-payment-credential/">create-payment-credential</a><span class="by">by @stripe</span></h3>
-            <p>What agents can do themselves: secure, one-time-use payment credentials from a Link wallet, so an agent can complete a real purchase with a card that can only be used once.</p>
-            <pre><code>git clone https://github.com/stripe/link-cli /tmp/link-cli && ln -s /tmp/link-cli/skills/create-payment-credential ~/.claude/skills/create-payment-credential</code></pre>
+            <a class="srow" href="/skills/stripe/link-cli/create-payment-credential/">
+              <h3>create-payment-credential</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Gets secure, one-time-use payment credentials from a Link wallet so agents can complete purchases</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 746</span>
+            </a>
+            <div class="sdetail">
+              <p>What agents can do themselves: secure, one-time-use payment credentials from a Link wallet, so an agent can complete a real purchase with a card that can only be used once.</p>
+              <pre><code>git clone https://github.com/stripe/link-cli /tmp/link-cli && ln -s /tmp/link-cli/skills/create-payment-credential ~/.claude/skills/create-payment-credential</code></pre>
+            </div>
           </div>
 
           <div class="skill">
-            <h3><a href="/skills/stripe/purl/pay-for-http-request/">pay-for-http-request</a><span class="by">by @stripe</span></h3>
-            <p>Lets an agent pay for an API call while making it, using the x402 payment standard through the purl command line. Hit a paid endpoint, pay, continue.</p>
-            <pre><code>git clone https://github.com/stripe/purl /tmp/purl && ln -s /tmp/purl/skills/pay-for-http-request ~/.claude/skills/pay-for-http-request</code></pre>
+            <a class="srow" href="/skills/stripe/purl/pay-for-http-request/">
+              <h3>pay-for-http-request</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Make HTTP requests with automatic x402 payment support using the purl command line interface</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 178</span>
+            </a>
+            <div class="sdetail">
+              <p>Lets an agent pay for an API call while making it, using the x402 payment standard through the purl command line. Hit a paid endpoint, pay, continue.</p>
+              <pre><code>git clone https://github.com/stripe/purl /tmp/purl && ln -s /tmp/purl/skills/pay-for-http-request ~/.claude/skills/pay-for-http-request</code></pre>
+            </div>
           </div>
         </section>
 
