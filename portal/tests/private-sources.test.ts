@@ -53,13 +53,13 @@ test("private-source adapters preserve the owner-only endpoint contract", async 
   ]);
 });
 
-test("private sources remain behind the existing Skill Groups kill switch", async () => {
+test("private sources remain behind the web portal kill switch", async () => {
   const main = await readFile(new URL("../src/main.tsx", import.meta.url), "utf8");
   const panel = await readFile(
     new URL("../src/private-sources/PrivateSourcesPanel.tsx", import.meta.url),
     "utf8"
   );
-  assert.match(main, /skillGroupsAuthEnabled \? <PrivateSourcesPanel \/>/);
+  assert.match(main, /skillGroupsWebEnabled \? <PrivateSourcesPanel \/>/);
   assert.match(panel, /aria-label="Private repository"/);
   assert.match(panel, /aria-label="Skill root"/);
   assert.match(panel, /Create release/);

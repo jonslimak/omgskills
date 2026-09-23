@@ -63,6 +63,7 @@ function dependencies(
   overrides: Partial<PortalPrivateReleasesDependencies> = {}
 ): PortalPrivateReleasesDependencies {
   return {
+    requireMacFeature() {},
     async requirePortalUser() { return actor; },
     async requireDeviceActor() { return deviceActor; },
     async register() { return release; },
@@ -72,6 +73,25 @@ function dependencies(
     ...overrides
   };
 }
+
+test("private package delivery stays off during the web-only beta", async () => {
+  let deviceCalls = 0;
+  const response = await portalPrivateReleases(
+    new Request(`https://omgskills.com/api/portal/private-releases/${releaseId}/package`),
+    context,
+    dependencies({
+      requireMacFeature() {
+        throw new Response("Skill Groups are temporarily unavailable", { status: 503 });
+      },
+      async requireDeviceActor() {
+        deviceCalls += 1;
+        return deviceActor;
+      }
+    })
+  );
+  assert.equal(response.status, 503);
+  assert.equal(deviceCalls, 0);
+});
 
 test("owner registers a release by source ID without supplying Git coordinates", async () => {
   let received: unknown;

@@ -52,12 +52,13 @@ test("production deploy paths use the tracked feature configuration", async () =
   const productionFeatures = JSON.parse(
     await readFile(new URL("../config/production-features.json", import.meta.url), "utf8"),
   );
-  assert.deepEqual(Object.keys(productionFeatures), ["skillGroupsAuthEnabled"]);
+  assert.deepEqual(Object.keys(productionFeatures), ["skillGroupsWebEnabled", "skillGroupsAuthEnabled"]);
+  assert.equal(typeof productionFeatures.skillGroupsWebEnabled, "boolean");
   assert.equal(typeof productionFeatures.skillGroupsAuthEnabled, "boolean");
-  assert.doesNotMatch(script, /VITE_SKILLGROUPS_AUTH_ENABLED/);
+  assert.doesNotMatch(script, /VITE_SKILLGROUPS_(WEB|MAC)_ENABLED/);
   for (const workflowPath of workflowPaths) {
     const source = await readFile(new URL(workflowPath, import.meta.url), "utf8");
-    assert.doesNotMatch(source, /VITE_SKILLGROUPS_AUTH_ENABLED/, workflowPath);
+    assert.doesNotMatch(source, /VITE_SKILLGROUPS_(WEB|MAC)_ENABLED/, workflowPath);
   }
 });
 

@@ -2,15 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   isEnabledConnectRoute,
-  isSkillGroupsAuthEnabled,
+  isFeatureEnabled,
   portalSurface
 } from "../src/feature-flags.js";
 
-test("Skill Groups auth defaults off and requires the explicit enable value", () => {
-  assert.equal(isSkillGroupsAuthEnabled(undefined), false);
-  assert.equal(isSkillGroupsAuthEnabled("0"), false);
-  assert.equal(isSkillGroupsAuthEnabled("true"), false);
-  assert.equal(isSkillGroupsAuthEnabled("1"), true);
+test("feature flags default off and require the explicit enable value", () => {
+  assert.equal(isFeatureEnabled(undefined), false);
+  assert.equal(isFeatureEnabled("0"), false);
+  assert.equal(isFeatureEnabled("true"), false);
+  assert.equal(isFeatureEnabled("1"), true);
 });
 
 test("connect routes are unavailable while Skill Groups auth is disabled", () => {

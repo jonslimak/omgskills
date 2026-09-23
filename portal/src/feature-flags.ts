@@ -1,6 +1,6 @@
 const connectPathPattern = /^\/(?:app\/)?connect\/?$/;
 
-export function isSkillGroupsAuthEnabled(value: unknown): boolean {
+export function isFeatureEnabled(value: unknown): boolean {
   return value === "1";
 }
 

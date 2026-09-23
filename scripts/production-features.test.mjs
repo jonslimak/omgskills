@@ -18,6 +18,7 @@ async function configUrl(value) {
 
 test("loads the tracked production feature state", async () => {
   const features = await loadProductionFeatures();
+  assert.equal(typeof features.skillGroupsWebEnabled, "boolean");
   assert.equal(typeof features.skillGroupsAuthEnabled, "boolean");
   assert.deepEqual(publicReleaseConfig(features), {
     version: 1,
@@ -25,35 +26,50 @@ test("loads the tracked production feature state", async () => {
   });
 });
 
-test("loads both supported production feature states", async () => {
+test("loads disabled, web-only, and full production feature states", async () => {
   assert.deepEqual(
-    await loadProductionFeatures(await configUrl('{"skillGroupsAuthEnabled":true}')),
-    { skillGroupsAuthEnabled: true },
+    await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":true}')),
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true },
   );
   assert.deepEqual(
-    await loadProductionFeatures(await configUrl('{"skillGroupsAuthEnabled":false}')),
-    { skillGroupsAuthEnabled: false },
+    await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":false}')),
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false },
+  );
+  assert.deepEqual(
+    await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":false}')),
+    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false },
   );
 });
 
 test("maps the production state to the portal build environment", () => {
   assert.deepEqual(
-    portalBuildEnvironment({ skillGroupsAuthEnabled: true }, { KEEP: "yes" }),
-    { KEEP: "yes", VITE_SKILLGROUPS_AUTH_ENABLED: "1" },
+    portalBuildEnvironment({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false }, { KEEP: "yes" }),
+    { KEEP: "yes", VITE_SKILLGROUPS_WEB_ENABLED: "1", VITE_SKILLGROUPS_MAC_ENABLED: "0" },
   );
   assert.deepEqual(
-    portalBuildEnvironment({ skillGroupsAuthEnabled: false }, {}),
-    { VITE_SKILLGROUPS_AUTH_ENABLED: "0" },
+    portalBuildEnvironment({ skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false }, {}),
+    { VITE_SKILLGROUPS_WEB_ENABLED: "0", VITE_SKILLGROUPS_MAC_ENABLED: "0" },
+  );
+});
+
+test("web-only activation keeps the public Mac release gate disabled", () => {
+  assert.deepEqual(
+    publicReleaseConfig({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false }),
+    { version: 1, skillGroupsAuthEnabled: false },
   );
 });
 
 test("rejects malformed or ambiguous production feature state", async () => {
   await assert.rejects(
     loadProductionFeatures(await configUrl("{}")),
-    /skillGroupsAuthEnabled as a boolean/,
+    /skillGroupsWebEnabled and skillGroupsAuthEnabled as booleans/,
   );
   await assert.rejects(
-    loadProductionFeatures(await configUrl('{"skillGroupsAuthEnabled":false,"extra":true}')),
+    loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":false,"extra":true}')),
     /unknown keys: extra/,
+  );
+  await assert.rejects(
+    loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":true}')),
+    /skillGroupsAuthEnabled requires skillGroupsWebEnabled/,
   );
 });

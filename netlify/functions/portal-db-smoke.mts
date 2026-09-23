@@ -2,7 +2,7 @@ import type { Config, Context } from "@netlify/functions";
 import type { Pool } from "pg";
 import { requireAuth } from "./_shared/auth.js";
 import { getSqlDatabase } from "./_shared/db.js";
-import { requireSkillGroupsFeature } from "./_shared/feature-flags.js";
+import { requireSkillGroupsWebFeature } from "./_shared/feature-flags.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 
 export default async (req: Request, _context: Context) => {
@@ -11,7 +11,7 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
-    requireSkillGroupsFeature();
+    requireSkillGroupsWebFeature();
     await requireAuth(req);
     const db = getSqlDatabase();
     const pool = db.pool as unknown as Pool;

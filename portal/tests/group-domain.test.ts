@@ -158,7 +158,7 @@ test("portal entry delegates detailed group behavior to the group domain", async
   assert.equal(source.includes("function GroupsPanel"), false);
   assert.equal(source.includes("function GroupDetailPage"), false);
   assert.equal(source.includes("function SkillActions"), false);
-  assert.match(source, /installEnabled=\{skillGroupsAuthEnabled\}/);
+  assert.match(source, /installEnabled=\{skillGroupsMacEnabled\}/);
 });
 
 test("visibility labels preserve all three product states", () => {
