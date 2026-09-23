@@ -14,17 +14,24 @@ export async function loadProductionFeatures(configUrl = defaultConfigUrl) {
     !parsed
     || typeof parsed !== "object"
     || Array.isArray(parsed)
+    || typeof parsed.skillGroupsWebEnabled !== "boolean"
     || typeof parsed.skillGroupsAuthEnabled !== "boolean"
   ) {
-    throw new Error("production-features.json must declare skillGroupsAuthEnabled as a boolean");
+    throw new Error("production-features.json must declare skillGroupsWebEnabled and skillGroupsAuthEnabled as booleans");
   }
 
-  const unknownKeys = Object.keys(parsed).filter((key) => key !== "skillGroupsAuthEnabled");
+  const unknownKeys = Object.keys(parsed).filter(
+    (key) => key !== "skillGroupsWebEnabled" && key !== "skillGroupsAuthEnabled"
+  );
   if (unknownKeys.length > 0) {
     throw new Error(`production-features.json contains unknown keys: ${unknownKeys.join(", ")}`);
   }
+  if (parsed.skillGroupsAuthEnabled && !parsed.skillGroupsWebEnabled) {
+    throw new Error("skillGroupsAuthEnabled requires skillGroupsWebEnabled");
+  }
 
   return Object.freeze({
+    skillGroupsWebEnabled: parsed.skillGroupsWebEnabled,
     skillGroupsAuthEnabled: parsed.skillGroupsAuthEnabled,
   });
 }
@@ -32,7 +39,8 @@ export async function loadProductionFeatures(configUrl = defaultConfigUrl) {
 export function portalBuildEnvironment(features, baseEnvironment = process.env) {
   return {
     ...baseEnvironment,
-    VITE_SKILLGROUPS_AUTH_ENABLED: features.skillGroupsAuthEnabled ? "1" : "0",
+    VITE_SKILLGROUPS_WEB_ENABLED: features.skillGroupsWebEnabled ? "1" : "0",
+    VITE_SKILLGROUPS_MAC_ENABLED: features.skillGroupsAuthEnabled ? "1" : "0",
   };
 }
 

@@ -54,18 +54,17 @@ export function validateArtifactSnapshot(raw, source, {
   return snapshot;
 }
 
-async function defaultListRuns({ repository, run }) {
+export async function defaultListRuns({ repository, run }) {
   const result = await run("gh", [
     "run", "list",
     "--repo", repository,
     "--workflow", "pipeline-health.yml",
-    "--status", "completed",
     "--limit", "20",
-    "--json", "databaseId,createdAt",
+    "--json", "databaseId,createdAt,status",
   ]);
   const runs = JSON.parse(result.stdout);
   if (!Array.isArray(runs)) throw new Error("pipeline-health run list was not an array");
-  return runs;
+  return runs.filter((run) => run.status === "completed");
 }
 
 async function defaultDownloadRunArtifact({ repository, runId, destination, run }) {

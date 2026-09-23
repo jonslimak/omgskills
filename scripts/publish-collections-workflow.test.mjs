@@ -46,7 +46,7 @@ test("collection publisher uses the combined deploy and verifies its narrow cont
   const appcast = position("- name: Confirm public appcast is unchanged");
 
   assert.ok(deploy < liveImages && liveImages < appcast);
-  assert.doesNotMatch(workflow, /VITE_SKILLGROUPS_AUTH_ENABLED/);
+  assert.doesNotMatch(workflow, /VITE_SKILLGROUPS_(WEB|MAC)_ENABLED/);
   assert.match(workflow, /name: Upload production deploy receipt[\s\S]*?dist\/netlify-deploy-receipt\.json/);
   assert.doesNotMatch(workflow, /git tag|--tag-release|netlify-cli deploy/);
 });

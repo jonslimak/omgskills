@@ -2,10 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   isSkillGroupsFeatureEnabled,
+  isSkillGroupsWebEnabled,
+  requireSkillGroupsWebFeature,
   requireSkillGroupsFeature
 } from "./feature-flags.js";
 
-test("Skill Groups server access requires an explicit boolean enable", () => {
+test("web and Mac access are independently gated", () => {
+  assert.equal(isSkillGroupsWebEnabled({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false }), true);
+  assert.equal(isSkillGroupsWebEnabled({ skillGroupsWebEnabled: "true" }), false);
+  assert.equal(isSkillGroupsWebEnabled({}), false);
   assert.equal(isSkillGroupsFeatureEnabled({ skillGroupsAuthEnabled: true }), true);
   assert.equal(isSkillGroupsFeatureEnabled({ skillGroupsAuthEnabled: false }), false);
   assert.equal(isSkillGroupsFeatureEnabled({ skillGroupsAuthEnabled: "true" }), false);
@@ -23,4 +28,9 @@ test("disabled server access fails closed with a retryable response", async () =
     }
   );
   assert.doesNotThrow(() => requireSkillGroupsFeature({ skillGroupsAuthEnabled: true }));
+  assert.throws(
+    () => requireSkillGroupsWebFeature({ skillGroupsWebEnabled: false, skillGroupsAuthEnabled: true }),
+    (error: unknown) => error instanceof Response && error.status === 503
+  );
+  assert.doesNotThrow(() => requireSkillGroupsWebFeature({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false }));
 });

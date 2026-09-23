@@ -144,8 +144,8 @@ async function verifyPublicGroupRoutes() {
   if (!html.includes(`<link rel="canonical" href="${canonicalUrl}">`)) {
     fail(`${targetOrigin}${canonicalPath} did not expose its canonical URL`);
   }
-  if (/omgskills:\/\/group|Install (all|group)|Open in omgskills/i.test(html)) {
-    fail(`${targetOrigin}${canonicalPath} advertised group installation before L5.2`);
+  if (html.includes("Install in omgskills") !== expectedFeatures.skillGroupsAuthEnabled) {
+    fail(`${targetOrigin}${canonicalPath} has the wrong Mac install availability`);
   }
 
   for (const legacyPath of [

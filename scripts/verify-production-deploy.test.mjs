@@ -4,11 +4,11 @@ import { verifyProductionDeploy } from "./verify-production-deploy.mjs";
 
 const origin = "https://example.test";
 const appcast = '<enclosure url="https://omgskills.com/updates/omgskills-1.0.0.zip"/>';
-const disabledFeatures = { skillGroupsAuthEnabled: false };
+const disabledFeatures = { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false };
 
 function responseFor(path, options = {}, features = disabledFeatures) {
   if (path === "/app/release-config.json") {
-    return Response.json({ version: 1, ...features });
+    return Response.json({ version: 1, skillGroupsAuthEnabled: features.skillGroupsAuthEnabled });
   }
   if (path === "/download") {
     return new Response(null, {
@@ -25,9 +25,15 @@ function responseFor(path, options = {}, features = disabledFeatures) {
   }
   if (path === "/api/portal/sync-upload" && options.method === "POST") {
     return Response.json(
-      { error: features.skillGroupsAuthEnabled ? "Unauthorized" : "Skill Groups are temporarily unavailable" },
-      { status: features.skillGroupsAuthEnabled ? 401 : 503 },
+      { error: features.skillGroupsWebEnabled ? "Unauthorized" : "Skill Groups are temporarily unavailable" },
+      { status: features.skillGroupsWebEnabled ? 401 : 503 },
     );
+  }
+  if (path.endsWith("/package") && path.startsWith("/api/portal/private-releases/")) {
+    return new Response("Skill Groups are temporarily unavailable", { status: 503 });
+  }
+  if (path === "/u/jonslimak/sets/my-faves") {
+    return new Response(features.skillGroupsAuthEnabled ? "Install in omgskills" : "My Faves");
   }
   if (path === "/api/public/groups/jonslimak/my-faves/manifest") {
     return Response.json({
@@ -102,6 +108,7 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/api/portal/sync-upload", method: "POST" },
     { path: "/u/jonslimak/sets/my-faves", method: "GET" },
     { path: "/api/public/groups/jonslimak/my-faves/manifest", method: "GET" },
+    { path: "/api/portal/private-releases/00000000-0000-4000-8000-000000000000/package", method: "GET" },
     { path: "/data/manifest.json", method: "GET" },
     { path: "/data/v2/manifest.json", method: "GET" },
     { path: "/data/crawl4/manifest.json", method: "GET" },
@@ -153,13 +160,22 @@ test("fails when a required release asset is missing", async () => {
 });
 
 test("accepts an enabled reviewed production feature state", async () => {
-  const enabledFeatures = { skillGroupsAuthEnabled: true };
+  const enabledFeatures = { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true };
   await verifyProductionDeploy({
     origin,
     expectedFeatures: enabledFeatures,
     fetchImpl: async (url, options) => (
       responseFor(new URL(url).pathname, options, enabledFeatures)
     ),
+  });
+});
+
+test("accepts the web-only beta with Mac delivery disabled", async () => {
+  const webOnlyFeatures = { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false };
+  await verifyProductionDeploy({
+    origin,
+    expectedFeatures: webOnlyFeatures,
+    fetchImpl: async (url, options) => responseFor(new URL(url).pathname, options, webOnlyFeatures),
   });
 });
 
@@ -201,7 +217,7 @@ test("fails when the deployed feature receipt does not match the reviewed state"
   await assert.rejects(
     verifyProductionDeploy({
       origin,
-      expectedFeatures: { skillGroupsAuthEnabled: true },
+      expectedFeatures: { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true },
       fetchImpl: async (url, options) => responseFor(new URL(url).pathname, options),
     }),
     /does not match the reviewed production feature state/,

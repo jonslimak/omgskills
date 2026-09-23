@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   DEFAULT_MAX_AGE_MS,
+  defaultListRuns,
   restoreLatestHealthSnapshot,
   validateArtifactSnapshot,
 } from "./restore-health-snapshot.mjs";
@@ -13,6 +14,25 @@ import {
 function snapshot(checkedAt, status = "ok") {
   return JSON.stringify({ status, checkedAt, sections: { v2AppData: { status: "ok" } } });
 }
+
+test("lists recent runs without GitHub's stale completed-status filter", async () => {
+  let query;
+  const runs = await defaultListRuns({
+    repository: "owner/repo",
+    run: async (_command, args) => {
+      query = args;
+      return {
+        stdout: JSON.stringify([
+          { databaseId: 3, status: "in_progress" },
+          { databaseId: 2, status: "completed" },
+        ]),
+      };
+    },
+  });
+
+  assert.equal(query.includes("--status"), false);
+  assert.deepEqual(runs, [{ databaseId: 2, status: "completed" }]);
+});
 
 test("restores the newest valid pipeline-health artifact", async () => {
   const siteDir = await mkdtemp(path.join(os.tmpdir(), "restore-health-site-"));

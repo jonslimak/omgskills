@@ -5,6 +5,7 @@ import {
   requireDeviceActor as authenticateDevice
 } from "./_shared/device-auth.js";
 import { GitHubBrokerClient } from "./_shared/github-broker.js";
+import { requireSkillGroupsFeature } from "./_shared/feature-flags.js";
 import { corsHeaders, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import {
   PrivateReleaseAccessError,
@@ -49,6 +50,7 @@ function requireOpaqueId(value: string, label: string): string {
 }
 
 export type PortalPrivateReleasesDependencies = {
+  requireMacFeature(): void;
   requirePortalUser(req: Request): Promise<PortalUser>;
   requireDeviceActor(req: Request): Promise<PrivateReleaseActor>;
   register(ownerUserId: string, sourceId: string): Promise<PrivateSkillRelease>;
@@ -61,6 +63,7 @@ function defaultDependencies(): PortalPrivateReleasesDependencies {
   const pool = getPgPool();
   const broker = new GitHubBrokerClient();
   return {
+    requireMacFeature: requireSkillGroupsFeature,
     requirePortalUser,
     async requireDeviceActor(req) {
       try {
@@ -106,6 +109,9 @@ export async function portalPrivateReleases(
   }
 
   try {
+    if (route.action === "package") {
+      (dependencies?.requireMacFeature ?? requireSkillGroupsFeature)();
+    }
     const resolved = dependencies ?? defaultDependencies();
     if (route.action === "register") {
       const actor = await resolved.requirePortalUser(req);

@@ -68,8 +68,13 @@ async function verifyReleaseConfig(fetchImpl, origin, expected) {
   }
 }
 
-async function verifyPublicGroupManifest(fetchImpl, origin) {
-  await expectStatus(fetchImpl, origin, publicGroupFixture.pagePath, 200);
+async function verifyPublicGroupManifest(fetchImpl, origin, expectedFeatures) {
+  const page = await expectStatus(fetchImpl, origin, publicGroupFixture.pagePath, 200);
+  const pageHtml = await page.text();
+  const hasInstallLink = pageHtml.includes("Install in omgskills");
+  if (hasInstallLink !== expectedFeatures.skillGroupsAuthEnabled) {
+    throw new Error(`${origin}${publicGroupFixture.pagePath} has the wrong Mac install availability`);
+  }
   const response = await expectStatus(fetchImpl, origin, publicGroupFixture.manifestPath, 200);
   const manifest = await response.json();
   if (
@@ -99,7 +104,7 @@ export async function verifyProductionDeploy({
   await expectStatus(fetchImpl, origin, "/health/", 401);
   await expectStatus(fetchImpl, origin, "/data/health.json", 401);
   await expectStatus(fetchImpl, origin, "/banner.webp", 200, { method: "HEAD" });
-  const expectedPortalStatus = reviewedFeatures.skillGroupsAuthEnabled ? 401 : 503;
+  const expectedPortalStatus = reviewedFeatures.skillGroupsWebEnabled ? 401 : 503;
   await expectStatus(fetchImpl, origin, "/api/portal/sync-upload", expectedPortalStatus, {
     method: "POST",
     headers: {
@@ -109,7 +114,15 @@ export async function verifyProductionDeploy({
     body: JSON.stringify({ skills: [] }),
   });
   if (verifyCandidateFeatures) {
-    await verifyPublicGroupManifest(fetchImpl, origin);
+    await verifyPublicGroupManifest(fetchImpl, origin, reviewedFeatures);
+    if (!reviewedFeatures.skillGroupsAuthEnabled) {
+      await expectStatus(
+        fetchImpl,
+        origin,
+        "/api/portal/private-releases/00000000-0000-4000-8000-000000000000/package",
+        503,
+      );
+    }
   }
 
   for (const path of [

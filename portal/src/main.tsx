@@ -47,12 +47,15 @@ import { listOwnedGroups, listSharedGroups } from "@/groups/api";
 import type { SkillGroup } from "@/groups/types";
 import { usePortalApi } from "@/portal-api";
 import { PrivateSourcesPanel } from "@/private-sources/PrivateSourcesPanel";
-import { isSkillGroupsAuthEnabled, portalSurface } from "@/feature-flags";
+import { isFeatureEnabled, portalSurface } from "@/feature-flags";
 import "./styles.css";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-const skillGroupsAuthEnabled = isSkillGroupsAuthEnabled(
-  import.meta.env.VITE_SKILLGROUPS_AUTH_ENABLED
+const skillGroupsWebEnabled = isFeatureEnabled(
+  import.meta.env.VITE_SKILLGROUPS_WEB_ENABLED
+);
+const skillGroupsMacEnabled = isFeatureEnabled(
+  import.meta.env.VITE_SKILLGROUPS_MAC_ENABLED
 );
 const iconClassName = "app-icon";
 
@@ -742,7 +745,7 @@ function Dashboard() {
         </div>
         <div className="dashboard-actions">
           <UserButton />
-          {skillGroupsAuthEnabled ? (
+          {skillGroupsWebEnabled ? (
             <SyncAppButton hasSynced={state.syncedSkills.length > 0} />
           ) : null}
         </div>
@@ -750,7 +753,7 @@ function Dashboard() {
 
       {status ? <p className="status">{status}</p> : null}
       <GroupsPanel title="SETS" groups={state.groups} onRefresh={refresh} canManage profile={state.profile} />
-      {skillGroupsAuthEnabled ? <PrivateSourcesPanel /> : null}
+      {skillGroupsWebEnabled ? <PrivateSourcesPanel /> : null}
       <SyncedSkillsPanel groups={state.groups} skills={state.syncedSkills} onRefresh={refresh} />
       <GroupsPanel title="Shared With Me" groups={state.sharedGroups} />
     </main>
@@ -864,7 +867,7 @@ function SkillGroupsUnavailablePage() {
 function App() {
   const surface = portalSurface(
     window.location.pathname,
-    skillGroupsAuthEnabled
+    skillGroupsWebEnabled
   );
   if (surface === "disabled") {
     return <SkillGroupsUnavailablePage />;
@@ -884,7 +887,7 @@ function App() {
           : groupDetailMatch
             ? <GroupDetailPage
                 groupId={decodeURIComponent(groupDetailMatch[1])}
-                installEnabled={skillGroupsAuthEnabled}
+                installEnabled={skillGroupsMacEnabled}
               />
             : <Dashboard />}
       </SignedIn>
