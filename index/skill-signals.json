@@ -6760,14 +6760,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 401
+    "trendingRank": 406
   },
   {
     "id": "addyosmani/agent-skills:code-simplification",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 453
+    "trendingRank": 452
   },
   {
     "id": "addyosmani/agent-skills:context-engineering",
@@ -6781,7 +6781,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 450
+    "trendingRank": 449
   },
   {
     "id": "addyosmani/agent-skills:deprecation-and-migration",
@@ -6794,7 +6794,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 447
+    "trendingRank": 448
   },
   {
     "id": "addyosmani/agent-skills:frontend-ui-engineering",
@@ -6827,14 +6827,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 444
+    "trendingRank": 443
   },
   {
     "id": "addyosmani/agent-skills:planning-and-task-breakdown",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 438
+    "trendingRank": 437
   },
   {
     "id": "addyosmani/agent-skills:security-and-hardening",
@@ -6896,20 +6896,21 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 440
+    "trendingRank": 439
   },
   {
     "id": "addyosmani/agent-skills:test-driven-development",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 461
+    "trendingRank": 462
   },
   {
     "id": "addyosmani/agent-skills:using-agent-skills",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 494
   },
   {
     "id": "addyosmani/clarity:clarity",
@@ -6922,7 +6923,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 357
+    "trendingRank": 355
   },
   {
     "id": "addyosmani/web-quality-skills:best-practices",
@@ -6947,7 +6948,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 413
+    "trendingRank": 412
   },
   {
     "id": "addyosmani/web-quality-skills:skills/accessibility",
@@ -28145,10 +28146,9 @@
   },
   {
     "id": "angular/skills:angular-developer",
-    "isTrending": true,
+    "isTrending": false,
     "isOfficial": false,
-    "hasXSignal": false,
-    "trendingRank": 494
+    "hasXSignal": false
   },
   {
     "id": "angular/skills:angular-new-app",
@@ -30893,7 +30893,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 156
+    "trendingRank": 160
   },
   {
     "id": "anthropics/skills:canvas-design",
@@ -30907,7 +30907,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 256
+    "trendingRank": 262
   },
   {
     "id": "anthropics/skills:discernment-nudge",
@@ -30927,14 +30927,14 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 77
+    "trendingRank": 81
   },
   {
     "id": "anthropics/skills:internal-comms",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 224
+    "trendingRank": 229
   },
   {
     "id": "anthropics/skills:mcp-builder",
@@ -30995,14 +30995,14 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 180
+    "trendingRank": 181
   },
   {
     "id": "anthropics/skills:web-artifacts-builder",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 139
+    "trendingRank": 144
   },
   {
     "id": "anthropics/skills:webapp-testing",
@@ -31029,7 +31029,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 152
+    "trendingRank": 156
   },
   {
     "id": "anticorrelator/lore:implement",
@@ -54175,7 +54175,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 155
+    "trendingRank": 159
   },
   {
     "id": "browser-use/browser-use:cloud",
@@ -55193,6 +55193,12 @@
   },
   {
     "id": "buildatscale-tv/claude-code-plugins:promo-video",
+    "isTrending": false,
+    "isOfficial": false,
+    "hasXSignal": false
+  },
+  {
+    "id": "buildbuddy-io/buildbuddy:remote-run-curl",
     "isTrending": false,
     "isOfficial": false,
     "hasXSignal": false
@@ -65704,7 +65710,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 415
+    "trendingRank": 414
   },
   {
     "id": "clerk/skills:clerk-nuxt-patterns",
@@ -65717,7 +65723,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 433
+    "trendingRank": 434
   },
   {
     "id": "clerk/skills:clerk-react-patterns",
@@ -65736,7 +65742,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 400
+    "trendingRank": 405
   },
   {
     "id": "clerk/skills:clerk-swift",
@@ -65755,7 +65761,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 452
+    "trendingRank": 454
   },
   {
     "id": "clerk/skills:clerk-vue-patterns",
@@ -65768,7 +65774,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 425
+    "trendingRank": 424
   },
   {
     "id": "cleven12/tanzania-tourism-seo",
@@ -66483,28 +66489,28 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 308
+    "trendingRank": 305
   },
   {
     "id": "cloudflare/skills:cloudflare-one-migrations",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 314
+    "trendingRank": 311
   },
   {
     "id": "cloudflare/skills:sandbox-migrate-to-next",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 463
+    "trendingRank": 461
   },
   {
     "id": "cloudflare/skills:sandbox-next",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 462
+    "trendingRank": 458
   },
   {
     "id": "cloudflare/skills:sandbox-sdk",
@@ -66572,7 +66578,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 283
+    "trendingRank": 281
   },
   {
     "id": "cloudflare/vibesdk:worker/agents/think/skills/app-file-structure",
@@ -71913,7 +71919,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 134
+    "trendingRank": 135
   },
   {
     "id": "coreyhaines31/marketingskills:cold-email",
@@ -71927,105 +71933,105 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 218
+    "trendingRank": 223
   },
   {
     "id": "coreyhaines31/marketingskills:competitor-profiling",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 212
+    "trendingRank": 211
   },
   {
     "id": "coreyhaines31/marketingskills:customer-research",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 149
+    "trendingRank": 154
   },
   {
     "id": "coreyhaines31/marketingskills:directory-submissions",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 241
+    "trendingRank": 240
   },
   {
     "id": "coreyhaines31/marketingskills:image",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 233
+    "trendingRank": 234
   },
   {
     "id": "coreyhaines31/marketingskills:lead-magnets",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 148
+    "trendingRank": 152
   },
   {
     "id": "coreyhaines31/marketingskills:onboarding-cro",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 368
+    "trendingRank": 369
   },
   {
     "id": "coreyhaines31/marketingskills:page-cro",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 334
+    "trendingRank": 337
   },
   {
     "id": "coreyhaines31/marketingskills:paid-ads",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 355
+    "trendingRank": 356
   },
   {
     "id": "coreyhaines31/marketingskills:paywall-upgrade-cro",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 384
+    "trendingRank": 385
   },
   {
     "id": "coreyhaines31/marketingskills:popup-cro",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 389
+    "trendingRank": 390
   },
   {
     "id": "coreyhaines31/marketingskills:pricing-strategy",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 306
+    "trendingRank": 308
   },
   {
     "id": "coreyhaines31/marketingskills:product-marketing-context",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 305
+    "trendingRank": 307
   },
   {
     "id": "coreyhaines31/marketingskills:referral-program",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 378
+    "trendingRank": 380
   },
   {
     "id": "coreyhaines31/marketingskills:schema-markup",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 349
+    "trendingRank": 350
   },
   {
     "id": "coreyhaines31/marketingskills:signup-flow-cro",
@@ -72327,14 +72333,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 252
+    "trendingRank": 253
   },
   {
     "id": "coreyhaines31/marketingskills:video",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 235
+    "trendingRank": 236
   },
   {
     "id": "coreyja/dotfiles:.claude/skills/bake-site-compare",
@@ -75245,7 +75251,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 183
+    "trendingRank": 184
   },
   {
     "id": "Cursedpotential/TheBigOne:04_Voice_Analysis/Context_Analysis_Suite/Chat_Parser_App",
@@ -84502,7 +84508,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 221
+    "trendingRank": 227
   },
   {
     "id": "deijing/IKunImage:ikunimage",
@@ -88361,7 +88367,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 284
+    "trendingRank": 285
   },
   {
     "id": "dietrichgebert/ponytail:ponytail-audit",
@@ -105171,31 +105177,30 @@
   },
   {
     "id": "expo/skills:expo-api-routes",
-    "isTrending": true,
+    "isTrending": false,
     "isOfficial": true,
-    "hasXSignal": false,
-    "trendingRank": 495
+    "hasXSignal": false
   },
   {
     "id": "expo/skills:expo-cicd-workflows",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 459
+    "trendingRank": 463
   },
   {
     "id": "expo/skills:expo-deployment",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 446
+    "trendingRank": 447
   },
   {
     "id": "expo/skills:expo-dev-client",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 312
+    "trendingRank": 313
   },
   {
     "id": "expo/skills:expo-module",
@@ -105208,7 +105213,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 365
+    "trendingRank": 368
   },
   {
     "id": "expo/skills:native-data-fetching",
@@ -105360,7 +105365,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 430
+    "trendingRank": 432
   },
   {
     "id": "expo/skills:use-dom",
@@ -108115,21 +108120,21 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 297
+    "trendingRank": 304
   },
   {
     "id": "firebase/agent-skills:developing-genkit-go",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 398
+    "trendingRank": 403
   },
   {
     "id": "firebase/agent-skills:developing-genkit-js",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 289
+    "trendingRank": 300
   },
   {
     "id": "firebase/agent-skills:firebase-firestore-enterprise-native-mode",
@@ -120253,14 +120258,14 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 164
+    "trendingRank": 166
   },
   {
     "id": "get-convex/agent-skills:convex-performance-audit",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 159
+    "trendingRank": 163
   },
   {
     "id": "get-convex/agent-skills:convex-quickstart",
@@ -120274,7 +120279,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 163
+    "trendingRank": 165
   },
   {
     "id": "get-convex/templates:convex-add",
@@ -123089,7 +123094,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 421
+    "trendingRank": 422
   },
   {
     "id": "github/awesome-copilot:git-flow-branch-creator",
@@ -127368,14 +127373,14 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 294
+    "trendingRank": 303
   },
   {
     "id": "google-labs-code/stitch-skills:enhance-prompt",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 346
+    "trendingRank": 347
   },
   {
     "id": "google-labs-code/stitch-skills:plugins/stitch-build/skills/react-native",
@@ -127430,14 +127435,14 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 460
+    "trendingRank": 465
   },
   {
     "id": "google-labs-code/stitch-skills:shadcn-ui",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 388
+    "trendingRank": 389
   },
   {
     "id": "google-labs-code/stitch-skills:site-md",
@@ -127920,7 +127925,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 419
+    "trendingRank": 418
   },
   {
     "id": "googleworkspace/cli:gws-calendar-insert",
@@ -127959,7 +127964,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 414
+    "trendingRank": 415
   },
   {
     "id": "googleworkspace/cli:gws-drive",
@@ -127973,7 +127978,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 422
+    "trendingRank": 421
   },
   {
     "id": "googleworkspace/cli:gws-events",
@@ -128004,7 +128009,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 214
+    "trendingRank": 218
   },
   {
     "id": "googleworkspace/cli:gws-gmail-forward",
@@ -128017,7 +128022,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 484
+    "trendingRank": 485
   },
   {
     "id": "googleworkspace/cli:gws-gmail-reply",
@@ -128117,35 +128122,35 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 366
+    "trendingRank": 365
   },
   {
     "id": "googleworkspace/cli:gws-sheets-append",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 432
+    "trendingRank": 433
   },
   {
     "id": "googleworkspace/cli:gws-sheets-read",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 412
+    "trendingRank": 411
   },
   {
     "id": "googleworkspace/cli:gws-slides",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 477
+    "trendingRank": 479
   },
   {
     "id": "googleworkspace/cli:gws-tasks",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 445
+    "trendingRank": 446
   },
   {
     "id": "googleworkspace/cli:gws-workflow",
@@ -130618,7 +130623,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 397
+    "trendingRank": 402
   },
   {
     "id": "greensock/gsap-skills:gsap-performance",
@@ -130632,21 +130637,21 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 379
+    "trendingRank": 378
   },
   {
     "id": "greensock/gsap-skills:gsap-react",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 385
+    "trendingRank": 384
   },
   {
     "id": "greensock/gsap-skills:gsap-scrolltrigger",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 348
+    "trendingRank": 346
   },
   {
     "id": "greensock/gsap-skills:gsap-timeline",
@@ -135342,21 +135347,21 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 234
+    "trendingRank": 235
   },
   {
     "id": "heygen-com/hyperframes:css-animations",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 223
+    "trendingRank": 228
   },
   {
     "id": "heygen-com/hyperframes:gsap",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 154
+    "trendingRank": 158
   },
   {
     "id": "heygen-com/hyperframes:hyperframes",
@@ -135388,7 +135393,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 240
+    "trendingRank": 241
   },
   {
     "id": "heygen-com/hyperframes:skills/embedded-captions",
@@ -135491,14 +135496,14 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 228
+    "trendingRank": 232
   },
   {
     "id": "heygen-com/hyperframes:three",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 237
+    "trendingRank": 238
   },
   {
     "id": "heygen-com/hyperframes:waapi",
@@ -135512,7 +135517,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 168
+    "trendingRank": 172
   },
   {
     "id": "heygen-com/liveavatar-agent-skills:skills/liveavatar-debug",
@@ -135957,7 +135962,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 287
+    "trendingRank": 286
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-game-generation",
@@ -135984,35 +135989,35 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 94
+    "trendingRank": 93
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-soul-id",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 96
+    "trendingRank": 95
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-video-explainer",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 185
+    "trendingRank": 183
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-websites",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 151
+    "trendingRank": 155
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-youtube-thumbnail",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 288
+    "trendingRank": 287
   },
   {
     "id": "highcharts/highcharts:tooling",
@@ -145860,7 +145865,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 333
+    "trendingRank": 334
   },
   {
     "id": "jakubkrehel/oklch-skill:oklch-skill",
@@ -155713,21 +155718,21 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 271
+    "trendingRank": 269
   },
   {
     "id": "juliusbrussee/caveman:caveman-evidence-review",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 269
+    "trendingRank": 264
   },
   {
     "id": "juliusbrussee/caveman:caveman-explore",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 254
+    "trendingRank": 252
   },
   {
     "id": "juliusbrussee/caveman:caveman-help",
@@ -155740,21 +155745,21 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 259
+    "trendingRank": 256
   },
   {
     "id": "juliusbrussee/caveman:caveman-manage",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 272
+    "trendingRank": 271
   },
   {
     "id": "juliusbrussee/caveman:caveman-optimize",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 258
+    "trendingRank": 255
   },
   {
     "id": "juliusbrussee/caveman:caveman-review",
@@ -155767,7 +155772,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 277
+    "trendingRank": 276
   },
   {
     "id": "juliusbrussee/caveman:caveman-stats",
@@ -155780,28 +155785,28 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 411
+    "trendingRank": 413
   },
   {
     "id": "juliusbrussee/caveman:investigate-first",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 262
+    "trendingRank": 259
   },
   {
     "id": "juliusbrussee/caveman:lean-build",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 270
+    "trendingRank": 268
   },
   {
     "id": "juliusbrussee/caveman:migration",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 275
+    "trendingRank": 272
   },
   {
     "id": "JuliusBrussee/caveman:plugins/caveman/skills/cavecrew",
@@ -155826,21 +155831,21 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 263
+    "trendingRank": 258
   },
   {
     "id": "juliusbrussee/caveman:surgical-patch",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 267
+    "trendingRank": 263
   },
   {
     "id": "juliusbrussee/caveman:verify-and-stop",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 264
+    "trendingRank": 260
   },
   {
     "id": "JuliusBrussee/Loop-Factory:.agents/skills/backpropagate-specs",
@@ -160343,14 +160348,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 219
+    "trendingRank": 224
   },
   {
     "id": "kepano/obsidian-skills:obsidian-cli",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 216
+    "trendingRank": 220
   },
   {
     "id": "kepano/obsidian-skills:obsidian-markdown",
@@ -166664,7 +166669,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 20
+    "trendingRank": 25
   },
   {
     "id": "larksuite/cli:lark-attendance",
@@ -168472,7 +168477,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 10
+    "trendingRank": 11
   },
   {
     "id": "leonxlnx/taste-skill:imagegen-frontend-mobile",
@@ -180062,7 +180067,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 360
+    "trendingRank": 357
   },
   {
     "id": "MastroMimmo/comfyui-claude-skill",
@@ -181013,14 +181018,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 44
+    "trendingRank": 45
   },
   {
     "id": "mattpocock/skills:edit-article",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 71
+    "trendingRank": 72
   },
   {
     "id": "mattpocock/skills:git-guardrails-claude-code",
@@ -198577,7 +198582,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 353
+    "trendingRank": 354
   },
   {
     "id": "mswell/dotfiles:caido-mode",
@@ -203787,7 +203792,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 211
+    "trendingRank": 212
   },
   {
     "id": "nexscope-ai/amazon-skills:amazon-review-analyzer",
@@ -203860,7 +203865,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 290
+    "trendingRank": 301
   },
   {
     "id": "nexscope-ai/eCommerce-Skills:cross-border-ecommerce",
@@ -209553,7 +209558,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 350
+    "trendingRank": 349
   },
   {
     "id": "nutstrut/settlement-witness-skill",
@@ -215042,7 +215047,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 47
+    "trendingRank": 48
   },
   {
     "id": "obra/superpowers:subagent-driven-development",
@@ -215077,7 +215082,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 41
+    "trendingRank": 42
   },
   {
     "id": "obra/superpowers:verification-before-completion",
@@ -227646,7 +227651,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 29
+    "trendingRank": 30
   },
   {
     "id": "pbc-os/smb-starter-kit:data-lake-starter",
@@ -228801,7 +228806,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 457
+    "trendingRank": 460
   },
   {
     "id": "pexoai/pexo-skills:seedance-2.0-prompter",
@@ -236718,7 +236723,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 27
+    "trendingRank": 28
   },
   {
     "id": "prisma/skills:prisma-database-setup",
@@ -236732,14 +236737,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 17
+    "trendingRank": 20
   },
   {
     "id": "prisma/skills:prisma-mongodb-upgrade",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 30
+    "trendingRank": 29
   },
   {
     "id": "prisma/skills:prisma-postgres",
@@ -236753,14 +236758,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 19
+    "trendingRank": 22
   },
   {
     "id": "prisma/skills:prisma-upgrade-v7",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 18
+    "trendingRank": 21
   },
   {
     "id": "pritesh-crypto/content-researcher-skill",
@@ -243967,7 +243972,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 399
+    "trendingRank": 404
   },
   {
     "id": "resciencelab/opc-skills:twitter",
@@ -250984,14 +250989,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 439
+    "trendingRank": 441
   },
   {
     "id": "samber/cc-skills-golang:golang-concurrency",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 458
+    "trendingRank": 459
   },
   {
     "id": "samber/cc-skills-golang:golang-context",
@@ -251012,14 +251017,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 475
+    "trendingRank": 476
   },
   {
     "id": "samber/cc-skills-golang:golang-database",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 469
+    "trendingRank": 472
   },
   {
     "id": "samber/cc-skills-golang:golang-dependency-injection",
@@ -251040,21 +251045,21 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 448
+    "trendingRank": 450
   },
   {
     "id": "samber/cc-skills-golang:golang-documentation",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 470
+    "trendingRank": 473
   },
   {
     "id": "samber/cc-skills-golang:golang-error-handling",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 442
+    "trendingRank": 444
   },
   {
     "id": "samber/cc-skills-golang:golang-graphql",
@@ -251081,14 +251086,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 476
+    "trendingRank": 477
   },
   {
     "id": "samber/cc-skills-golang:golang-naming",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 468
+    "trendingRank": 469
   },
   {
     "id": "samber/cc-skills-golang:golang-observability",
@@ -251102,7 +251107,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 449
+    "trendingRank": 451
   },
   {
     "id": "samber/cc-skills-golang:golang-popular-libraries",
@@ -251123,7 +251128,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 474
+    "trendingRank": 475
   },
   {
     "id": "samber/cc-skills-golang:golang-samber-do",
@@ -251172,7 +251177,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 451
+    "trendingRank": 453
   },
   {
     "id": "samber/cc-skills-golang:golang-stay-updated",
@@ -251192,14 +251197,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 485
+    "trendingRank": 484
   },
   {
     "id": "samber/cc-skills-golang:golang-testing",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 443
+    "trendingRank": 445
   },
   {
     "id": "samber/cc-skills-golang:golang-troubleshooting",
@@ -261781,7 +261786,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 231
+    "trendingRank": 233
   },
   {
     "id": "solanabr/auditor-skill",
@@ -262796,7 +262801,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 369
+    "trendingRank": 362
   },
   {
     "id": "SpillwaveSolutions/document-specialist-skill",
@@ -263067,7 +263072,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 236
+    "trendingRank": 237
   },
   {
     "id": "squirrelscan/skills:squirrelscan",
@@ -263483,7 +263488,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 42
+    "trendingRank": 41
   },
   {
     "id": "stablyai/orca:orca-emulator",
@@ -263514,7 +263519,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 48
+    "trendingRank": 47
   },
   {
     "id": "Stacked-Labs/poker-game:.codex/skills/chakra-design-system",
@@ -269756,7 +269761,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 424
+    "trendingRank": 425
   },
   {
     "id": "Tencent/workrally",
@@ -280059,7 +280064,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 136
+    "trendingRank": 134
   },
   {
     "id": "tt-a1i/simplify-codebase",
@@ -288732,7 +288737,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 466
+    "trendingRank": 468
   },
   {
     "id": "vuejs-ai/skills:vue-debug-guides",
@@ -294825,7 +294830,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 418
+    "trendingRank": 419
   },
   {
     "id": "wshobson/agents:nx-workspace-patterns",
@@ -295762,7 +295767,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 274
+    "trendingRank": 277
   },
   {
     "id": "wshobson/agents:task-coordination-strategies",
