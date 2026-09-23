@@ -223,6 +223,23 @@ export function parseOnlyHighStarBackfill(argv: string[], cadence: ShadowCadence
   return enabled;
 }
 
+export function parseOnlyPackageMetadataOverlay(argv: string[], cadence: ShadowCadence): boolean {
+  const enabled = argv.includes("--only-package-metadata-overlay");
+  if (!enabled) return false;
+  if (cadence !== "combined") {
+    throw new Error("--only-package-metadata-overlay requires --cadence=combined");
+  }
+  const incompatible = [
+    "--only-high-star-backfill",
+    "--force-high-star-skillmd",
+    "--force-web-library-snippets",
+  ].find((flag) => argv.includes(flag));
+  if (incompatible || argv.some((arg) => arg.startsWith("--high-star-query-batch="))) {
+    throw new Error("--only-package-metadata-overlay cannot be combined with discovery or refresh flags");
+  }
+  return true;
+}
+
 export function parseHighStarQueryBatch(argv: string[], onlyHighStarBackfill: boolean): HighStarQueryBatch | null {
   const raw = argv.find((arg) => arg.startsWith("--high-star-query-batch="));
   if (!raw) return null;
@@ -1206,7 +1223,7 @@ async function runShadowRefresh(
   discovered: Map<string, DiscoveredRepoRecord>,
   checkedAt: string,
   newlyAdmittedRepos: Set<string>,
-  options: { forceWebLibrarySnippets?: boolean; skipRefreshWork?: boolean } = {},
+  options: { forceWebLibrarySnippets?: boolean; skipRefreshWork?: boolean; skipAllNetworkWork?: boolean } = {},
 ): Promise<ShadowRefreshResult> {
   const baselineById = new Map(baselineSkills.map((skill) => [skill.id, skill]));
   const shadowById = new Map(shadowSkills.map((skill) => [skill.id, skill]));
@@ -1254,6 +1271,47 @@ async function runShadowRefresh(
       trendingSkillIds: pilotAssets.trendingSkillIds,
     });
   };
+  if (options.skipAllNetworkWork) {
+    const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, []);
+    return {
+      shadowSkills: refreshedShadowSkills,
+      webLibraryPilotSnippetCoverage: buildWebLibraryPilotSnippetCoverage({
+        skillIds: buildPilotSkillIds(refreshedShadowSkills),
+        skills: refreshedShadowSkills,
+        refreshMode: "skipped",
+      }),
+      enrichmentCounts: {
+        cheapReposChecked: 0,
+        dailyPriorityRepoCount: 0,
+        skillsDeepRefreshed: 0,
+        monitoredDeepRefreshed: 0,
+        cheapTriggeredRefreshCandidateCount: 0,
+        cheapTriggeredRefreshDeferredCount: 0,
+        cheapTriggeredDeepRefreshed: 0,
+        carriedForwardCount: baselineSkills.length,
+        correctedCount: 0,
+        staleInvalidCandidateCount: 0,
+      },
+      newlyDiscoveredCount: 0,
+      lowStarValidSkillCount: 0,
+      lowStarValidSkillSample: [],
+      trustedLowStarSkillCount: 0,
+      officialLowStarSkillCount: 0,
+      staleInvalidCandidatesSample: [],
+      skillFileMissingSample: [],
+      staleReasonCounts: emptyStaleReasonCounts(),
+      priorityReasonCounts: emptyPriorityReasonCounts(),
+      dailyPriorityRepoSample: [],
+      dailyPriorityStarsFillSample: [],
+      skippedMonitoredRepoCount: 0,
+      bootstrappedRepoSample: [],
+      catalogAdmissionSample: [],
+      bootstrapFailedRepoSample: [],
+      bootstrapSkippedRepoSample: [],
+      rebootstrapEligibleRepoSample: [],
+      enrichmentWarnings: ["package metadata overlay-only mode skipped all GitHub-backed work"],
+    };
+  }
   const staleInvalidCandidates: ShadowStaleInvalidCandidate[] = [];
   const staleReasonCounts = emptyStaleReasonCounts();
   const missingPersistedSkillRefreshSample: string[] = [];
@@ -2195,9 +2253,12 @@ async function main() {
   const forceHighStarSkillMd = parseForceHighStarSkillMd(argv);
   const forceWebLibrarySnippets = parseForceWebLibrarySnippets(argv);
   const onlyHighStarBackfill = parseOnlyHighStarBackfill(argv, cadence);
+  const onlyPackageMetadataOverlay = parseOnlyPackageMetadataOverlay(argv, cadence);
   const highStarQueryBatch = parseHighStarQueryBatch(argv, onlyHighStarBackfill);
   const policyPrecedenceMode = parsePolicyPrecedenceMode();
-  await assertGitHubQuotaAvailable(cadence);
+  if (!onlyPackageMetadataOverlay) {
+    await assertGitHubQuotaAvailable(cadence);
+  }
 
   const baselinePath = join(indexRoot, "skills.json");
   const goldBasketPath = join(indexRoot, "gold-basket.json");
@@ -2288,15 +2349,31 @@ async function main() {
     creatorWatchNewRepoSample,
     xDiscoveryCandidateCount,
     xDiscoveryCandidateSample,
-  } =
-    await runDiscovery(
-      cadence,
-      repoIndex,
-      checkedAt,
-      forceHighStarSkillMd || onlyHighStarBackfill,
-      onlyHighStarBackfill,
-      highStarQueryBatch,
-    );
+  } = onlyPackageMetadataOverlay
+    ? {
+        sourceRuns: [],
+        discovered: new Map<string, DiscoveredRepoRecord>(),
+        discoveryBudgetApplied: false,
+        discoveryBudgetSummary: null,
+        partialDiscoveryWarnings: [
+          "package metadata overlay-only mode enabled; discovery, admission, promotion, bootstrap, and refresh skipped",
+        ],
+        highStarPathQualitySkippedCount: 0,
+        highStarPathQualitySkippedSample: [],
+        creatorWatchCheckedOwnerCount: 0,
+        creatorWatchDiscoveredRepoCount: 0,
+        creatorWatchNewRepoSample: [],
+        xDiscoveryCandidateCount: 0,
+        xDiscoveryCandidateSample: [],
+      }
+    : await runDiscovery(
+        cadence,
+        repoIndex,
+        checkedAt,
+        forceHighStarSkillMd || onlyHighStarBackfill,
+        onlyHighStarBackfill,
+        highStarQueryBatch,
+      );
   for (const repo of [...discovered.keys()]) {
     if (isDoNotCrawlRepo(repo, seeds)) discovered.delete(repo);
   }
@@ -2385,7 +2462,7 @@ async function main() {
     ),
   );
   const catalogRepoSet = new Set(seeds.catalogRepoRules.map((rule) => rule.repo));
-  const nextPromotionCandidates = onlyHighStarBackfill
+  const nextPromotionCandidates = onlyHighStarBackfill || onlyPackageMetadataOverlay
     ? []
     : buildNextPromotionCandidates(
         repoIndex,
@@ -2394,8 +2471,8 @@ async function main() {
         catalogRepoSet,
         process.env.CRAWL4_MOMENTUM_PRIORITY === "1" ? momentumByRepo : undefined,
       );
-  const nextPromotionShortlist = onlyHighStarBackfill ? [] : buildNextPromotionShortlist(nextPromotionCandidates);
-  const promotedRepoSample = onlyHighStarBackfill
+  const nextPromotionShortlist = onlyHighStarBackfill || onlyPackageMetadataOverlay ? [] : buildNextPromotionShortlist(nextPromotionCandidates);
+  const promotedRepoSample = onlyHighStarBackfill || onlyPackageMetadataOverlay
     ? []
     : await applyShortlistPromotions({
         cadence,
@@ -2412,7 +2489,11 @@ async function main() {
     discovered,
     checkedAt,
     newlyAdmittedRepos,
-    { forceWebLibrarySnippets, skipRefreshWork: onlyHighStarBackfill },
+    {
+      forceWebLibrarySnippets,
+      skipRefreshWork: onlyHighStarBackfill,
+      skipAllNetworkWork: onlyPackageMetadataOverlay,
+    },
   );
   shadowSkills = refreshResult.shadowSkills;
   timings.runRefresh = Math.round(performance.now() - refreshStart);

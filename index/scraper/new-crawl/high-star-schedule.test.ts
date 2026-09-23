@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { admitDiscoveredRepos, HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY, HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, parseForceWebLibrarySnippets, parseHighStarQueryBatch, parseOnlyHighStarBackfill } from "./build-shadow.js";
+import { admitDiscoveredRepos, HIGH_STAR_BACKFILL_ONLY_MAX_NEW_ADMISSIONS, HIGH_STAR_BACKFILL_ONLY_MAX_PAGES_PER_QUERY, HIGH_STAR_BACKFILL_ONLY_MAX_SAMPLED_REPOS, parseForceWebLibrarySnippets, parseHighStarQueryBatch, parseOnlyHighStarBackfill, parseOnlyPackageMetadataOverlay } from "./build-shadow.js";
 import { shouldRunWeeklyHighStarSkillMdDiscovery, shouldRunWeeklyWebLibrarySnippetRefresh } from "./high-star-schedule.js";
 import type { NewRepoAdmissionObservation } from "./policy-precedence.js";
 import type { ShadowRepoIndex, TrustedSeeds } from "./types.js";
@@ -36,6 +36,22 @@ test("high-star backfill-only mode requires combined cadence", () => {
   assert.throws(
     () => parseOnlyHighStarBackfill(["--only-high-star-backfill"], "fast"),
     /requires --cadence=combined/,
+  );
+});
+
+test("package metadata overlay-only mode is combined-only and exclusive", () => {
+  assert.equal(parseOnlyPackageMetadataOverlay(["--only-package-metadata-overlay"], "combined"), true);
+  assert.equal(parseOnlyPackageMetadataOverlay([], "combined"), false);
+  assert.throws(
+    () => parseOnlyPackageMetadataOverlay(["--only-package-metadata-overlay"], "fast"),
+    /requires --cadence=combined/,
+  );
+  assert.throws(
+    () => parseOnlyPackageMetadataOverlay([
+      "--only-package-metadata-overlay",
+      "--force-web-library-snippets",
+    ], "combined"),
+    /cannot be combined/,
   );
 });
 
