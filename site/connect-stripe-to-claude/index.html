@@ -91,7 +91,8 @@
     .eyebrow { margin: 0 0 14px; color: var(--blue); font-size: 13px; font-weight: 700; }
     h1 { margin: 0; font-size: clamp(36px, 6.5vw, 60px); line-height: 1.0; letter-spacing: -.045em; }
     .lede { max-width: 640px; margin: 22px auto 0; color: var(--muted); font-size: 17px; font-weight: 300; line-height: 1.5; }
-    .content { max-width: 760px; margin: 0 auto; display: grid; gap: 18px; }
+    .content { max-width: 760px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .content > * { min-width: 0; }
     .video-frame {
       position: relative; width: 100%; aspect-ratio: 16 / 9;
       border-radius: 24px; overflow: hidden; background: #111;
