@@ -178,7 +178,7 @@ test("read-only transport rejects writes, auth endpoints, redirects, and other d
   for (const path of [
     "https://omgskills.com/api/portal/profile",
     "/api/portal/sync-pairing-code",
-    "/api/portal/devices",
+    "/api/portal/devices/not-a-device",
     "/api/portal/groups/a/items",
     "/api/portal/groups/../profile",
     "/api/portal/profile?x=1",

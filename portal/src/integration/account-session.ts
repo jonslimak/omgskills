@@ -254,6 +254,14 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
     saveProfile,
     saveSet,
     saveMembership,
+    invalidateAccess() {
+      generation++;
+      request?.controller.abort(); request = undefined;
+      mutation?.controller.abort(); mutation = undefined;
+      clearCache();
+      emit({ data: null, accessDenied: true, refreshing: false, profileSaving: false, setSaving: false,
+        error: "Account access is unavailable. Sign in again or retry." });
+    },
     dispose(removeCache = true) {
       active = false;
       generation++;

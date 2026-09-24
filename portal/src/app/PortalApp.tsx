@@ -82,6 +82,7 @@ export function PortalApp({
   detailSet,
   membership,
   onNavigate,
+  devicesPanel,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -99,6 +100,7 @@ export function PortalApp({
   detailSet?: PortalSet | null;
   membership?: import("./model").MembershipControls;
   onNavigate?: () => void;
+  devicesPanel?: ReactNode;
 }) {
   const [locationKey, setLocationKey] = useState(
     location.pathname + location.search,
@@ -487,6 +489,7 @@ export function PortalApp({
                 )}
                 {route.page === "agents" && (
                   <AgentsPage
+                    devicesPanel={devicesPanel}
                     readOnly={readOnly}
                     skills={skills}
                     data={data}

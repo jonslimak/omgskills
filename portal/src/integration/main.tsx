@@ -12,6 +12,7 @@ import { PortalApp } from "../app/PortalApp";
 import { Action, IconAction } from "../app/ui";
 import type { PortalActions, PortalSet } from "../app/model";
 import { SetControls } from "./SetControls";
+import { DevicesPanel } from "./DevicesPanel";
 import type { SetCommand, EmailCommand } from "./set-data";
 import { SetAccessControls } from "./SetAccessControls";
 import { setLink } from "../app/set-link";
@@ -95,7 +96,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
   }, [notice]);
 
   const unavailable = () =>
-    notify("Membership and device changes are not enabled yet.");
+    notify("This action is not connected yet.");
   const actions: PortalActions = {
     updateSet: unavailable,
     createSet: unavailable,
@@ -150,6 +151,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
       readOnly
       detailSet={detailSet}
       membership={membership.controls}
+      devicesPanel={<DevicesPanel api={api} denied={() => sessionRef.current?.invalidateAccess()} />}
       onNavigate={membership.dismiss}
       setControls={(page, id, navigate) => <SetControls key={`${page}:${id ?? ""}`} page={page}
         set={detailSet?.id === id ? detailSet : null}

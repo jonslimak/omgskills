@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2 and C1-C4 are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. Slice D is not started. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2, C1-C4 and D1 are implemented locally. C4 user manual testing passed. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. D2-D4 remain. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -201,13 +201,21 @@ Verification: 89 portal tests, 34 backend access/behavior/endpoint/public-route 
 
 ## 7. Slice D: Devices, Private Sources, And Gates
 
-- [ ] Agents uses actual source labels and counts; links return to Skills with the relevant filter.
-- [ ] Devices uses actual names/statuses and Last active dates. Do not present token activity as live presence.
-- [ ] Move existing connection-code, legacy-token, device listing, and confirmed revocation controls into the new layout without changing protocol behavior.
+### D1: Connected Devices
+
+- [x] Agents uses actual source labels and counts; links return to Skills with the relevant filter.
+- [x] Devices uses actual names, active/revoked/expired/inactive statuses, connection/expiry dates and Last active (Never when absent), not live presence.
+- [x] Lazy, memory-only device reads and confirmed revocation use existing APIs. Device read failures preserve the last loaded list without blocking skills; access denial clears account state/cache. Reads/revocation serialize; unmount/account changes abort and ignore late completion. Confirmed revoke survives refresh failure; uncertain outcomes require refresh, never automatic retry.
+
+D1 verification: 98 portal tests, eight backend device-auth tests, root typecheck and normal/flag-enabled production builds pass. Local entries remain excluded. Desktop/390px browser checks cover all four statuses, empty state, cancel/confirm, a second confirmation and reload persistence. Isolated SQL verifies only the intended fixture was revoked and another owner cannot revoke it. All four disposable device records removed; no installed app or production connection touched. Local device GET/DELETE require authentication; pairing and private-source routes remain blocked. Two-account browser coverage remains open.
+
+### D2-D4: Remaining Steps
+
+- [ ] D2: Move existing connection-code and legacy-token controls into the new layout without changing protocol behavior. Keep credentials memory-only, clear on close/navigation/account change, respect expiry, and prevent duplicate requests. Test locally without launching/reconnecting the installed Mac app.
 - [ ] Preserve code clearing, cancellation, and stale-response guards in authentication-related dialogs.
-- [ ] Retain private-source installation/repository/root selection, source registration, and release creation, including disconnected, empty, error, and pending states.
+- [ ] D3: Retain private-source installation/repository/root selection, source registration, and release creation, including disconnected, empty, error, and pending states. Use a controlled local GitHub substitute first; real Broker/private-repository testing requires separate approval, not just database isolation.
 - [ ] Keep unsupported agent and GitHub setup actions explicit and non-operative.
-- [ ] Verify separate web/Mac gates. Do not expose Mac install actions because web UI is enabled, or assume existing sync APIs all share one gate.
+- [ ] D4: Verify separate web/Mac gates. Do not expose Mac install actions because web UI is enabled, or assume existing sync APIs all share one gate.
 - [ ] Recheck `/app/connect` and existing set links independently of the redesign.
 
 **Exit:** all supported old capabilities remain reachable, placeholders do not claim unimplemented behavior, and no feature flag or protocol was changed unintentionally.
@@ -252,4 +260,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-C1-C4 supply authorized item/email IDs, set editing, membership, email access and link actions. Next plan Slice D devices/private sources/gates; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.
+C1-C4 and D1 supply set actions/access/links and connected-device management. Next implement D2 connection controls after approval, then D3 private sources and D4 gate/regression checks. Finish the remaining two-account/shared-access browser checks before closing full verification. Slices B-D are not a production rollout authorization.

@@ -24,7 +24,7 @@ export function testBackendOrigin(env: Record<string, string | undefined>) {
 export function isIntegrationRead(path: string, method = "GET") {
   return (
     method.toUpperCase() === "GET" &&
-    /^\/api\/portal\/(?:synced-skills|groups|shared|profile|groups\/[a-zA-Z0-9_-]+)$/.test(
+    /^\/api\/portal\/(?:synced-skills|groups|shared|profile|devices|groups\/[a-zA-Z0-9_-]+)$/.test(
       path,
     )
   );
@@ -33,6 +33,7 @@ export function isIntegrationRead(path: string, method = "GET") {
 export function isIntegrationRequest(path: string, method = "GET") {
   const verb = method.toUpperCase();
   return isIntegrationRead(path, method) ||
+    (/^\/api\/portal\/devices\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(path) && verb === "DELETE") ||
     (path === "/api/portal/profile" && verb === "PATCH") ||
     (path === "/api/portal/groups" && verb === "POST") ||
     (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+$/.test(path) && ["PATCH", "DELETE"].includes(verb)) ||
@@ -41,7 +42,7 @@ export function isIntegrationRequest(path: string, method = "GET") {
     (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/allowed-emails$/.test(path) && ["POST", "DELETE"].includes(verb));
 }
 
-// Only existing set/access operations are writable; GitHub/catalog entry and device APIs stay blocked.
+// Only existing set/access operations and device revocation are writable; pairing stays blocked.
 export function isIntegrationBody(path: string, method: string, body: unknown) {
   if (!isIntegrationRequest(path, method)) return false;
   if (method === "GET" || (method === "DELETE" && !path.endsWith("/items") && !path.endsWith("/allowed-emails"))) return body === undefined;

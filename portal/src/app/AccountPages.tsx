@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { GitFork as Github, Laptop, Copy, Pencil, LogOut } from "lucide-react";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
 import type { AccountControls, ProfileControls, PortalActions, PortalData, PortalDevice } from "./model";
@@ -19,6 +20,7 @@ export function AgentsPage({
   revoke,
   unavailable,
   readOnly = false,
+  devicesPanel,
 }: {
   skills: GroupedSyncedSkill[];
   data: PortalData;
@@ -26,6 +28,7 @@ export function AgentsPage({
   revoke: (device: PortalDevice) => void;
   unavailable: (title: string, description: string) => void;
   readOnly?: boolean;
+  devicesPanel?: ReactNode;
 }) {
   const sources = [...new Set(skills.flatMap((skill) => skill.sources))].sort();
   return (
@@ -60,7 +63,7 @@ export function AgentsPage({
           />
         )}
       </div>
-      <div className="rd-section-heading">
+      {devicesPanel ?? <><div className="rd-section-heading">
         <h2>Connected devices</h2>
         <Action
           disabled={readOnly}
@@ -102,7 +105,7 @@ export function AgentsPage({
         {!readOnly && !data.devices.length && (
           <EmptyState title="No connected devices" />
         )}
-      </div>
+      </div></>}
     </>
   );
 }
