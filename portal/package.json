@@ -5,11 +5,14 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "dev": "vite --host 0.0.0.0",
+    "dev:design": "VITE_PORTAL_PREVIEW=1 vite --host 127.0.0.1",
+    "test:design": "node --import tsx --test tests/redesign.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.31.2",
     "@fontsource-variable/geist": "^5.2.9",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "@tailwindcss/vite": "^4.3.1",
     "@vitejs/plugin-react": "^4.5.2",
     "class-variance-authority": "^0.7.1",

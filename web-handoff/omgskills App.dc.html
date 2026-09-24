@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<template id="__bundler_thumbnail" data-bg-color="#2f7df6"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#2f7df6"/><text x="50" y="62" font-size="36" text-anchor="middle">👀</text></svg></template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+
+<style>body{margin:0;background:#fff;color:#09090b;font-family:Geist,system-ui,sans-serif;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}a{color:#09090b;text-decoration:none}a:hover{text-decoration:underline}button{font-family:inherit}input{font-family:inherit}input:focus{outline:none}</style>
+</helmet>
+<div style="display:flex;height:{{ ui.rootH }};min-height:{{ ui.rootMinH }};width:{{ ui.rootW }};margin:{{ ui.rootM }};transform:{{ ui.rootT }};border:{{ ui.rootB }};border-radius:{{ ui.rootR }};overflow:hidden;background:#fff;font-size:12px;line-height:18px">
+
+  <!-- Sidebar -->
+  <aside style="width:{{ ui.asideW }};flex:none;display:flex;flex-direction:column;background:#fff;padding:12px;position:{{ ui.asidePos }};top:0;bottom:0;left:0;z-index:80;transform:{{ ui.asideX }};transition:transform .2s ease;box-shadow:{{ ui.asideShadow }}">
+    <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 8px;margin-bottom:12px">
+      <span style="font-size:18px;line-height:1">👀</span>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:2px">
+      <button onClick="{{ goSkills }}" style="display:flex;align-items:center;gap:8px;height:{{ ui.navH }};padding:0 10px;border:0;border-radius:6px;background:{{ navSkills.bg }};color:{{ navSkills.fg }};font-weight:{{ navSkills.fw }};font-size:11px;cursor:pointer;text-align:left" style-hover="background:#f0f0f1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        <span style="flex:1">Skills</span><span style="font-size:10px;color:#a1a1aa;font-weight:400">{{ skillCount }}</span>
+      </button>
+      <button onClick="{{ goAgents }}" style="display:flex;align-items:center;gap:8px;height:{{ ui.navH }};padding:0 10px;border:0;border-radius:6px;background:{{ navAgents.bg }};color:{{ navAgents.fg }};font-weight:{{ navAgents.fw }};font-size:11px;cursor:pointer;text-align:left" style-hover="background:#f0f0f1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"></rect><path d="M12 8V4H8"></path><path d="M2 14h2M20 14h2M15 13v2M9 13v2"></path></svg>
+        <span style="flex:1">Agents</span><span style="font-size:10px;color:#a1a1aa;font-weight:400">{{ agentCount }}</span>
+      </button>
+      <button onClick="{{ goSets }}" style="display:flex;align-items:center;gap:8px;height:{{ ui.navH }};padding:0 10px;border:0;border-radius:6px;background:{{ navSets.bg }};color:{{ navSets.fg }};font-weight:{{ navSets.fw }};font-size:11px;cursor:pointer;text-align:left" style-hover="background:#f0f0f1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 10 5-10 5L2 7z"></path><path d="m2 17 10 5 10-5"></path><path d="m2 12 10 5 10-5"></path></svg>
+        <span style="flex:1">Sets</span><span style="font-size:10px;color:#a1a1aa;font-weight:400">{{ setCount }}</span>
+      </button>
+    </nav>
+    <div style="flex:1"></div>
+    <button onClick="{{ goProfile }}" style="display:flex;align-items:center;gap:10px;padding:8px;border:0;border-radius:8px;background:{{ navProfile.bg }};cursor:pointer;text-align:left" style-hover="background:#f0f0f1">
+      <div style="width:24px;height:24px;border-radius:999px;background:#e4e4e7;display:grid;place-items:center;font-size:10px;font-weight:600;color:#3f3f46">JS</div>
+      <div style="display:flex;flex-direction:column;min-width:0;flex:1">
+        <span style="font-size:11px;font-weight:500;color:#09090b">Home</span>
+        <span style="font-size:10px;color:#71717a;font-family:'Geist Mono',monospace">/jonslimak</span>
+      </div>
+    </button>
+  </aside>
+  <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;z-index:75;background:rgba(9,9,11,.35)"></div></sc-if>
+
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:auto">
+
+    <!-- SKILLS -->
+    <sc-if value="{{ isSkills }}" hint-placeholder-val="{{ true }}">
+      <header style="display:flex;align-items:center;gap:12px;height:48px;padding:0 {{ ui.px }};flex:none;position:sticky;top:0;background:#fff;z-index:20">
+        <sc-if value="{{ isMobile }}"><button onClick="{{ openDrawer }}" aria-label="Menu" style="width:34px;height:34px;margin-left:-6px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:#09090b;flex:none" style-hover="background:#f4f4f5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button></sc-if>
+        <h1 style="margin:0;font-size:13px;font-weight:600">Skills</h1>
+        <div style="flex:1"></div>
+        <button onClick="{{ toggleEdit }}" style="height:32px;padding:0 12px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">{{ editLabel }}</button>
+      </header>
+      <div style="padding:14px {{ ui.px }} 32px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="position:relative;flex:none">
+            <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:8px;white-space:nowrap;height:30px;padding:0 10px 0 12px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;cursor:pointer" style-hover="background:#f4f4f5">
+              <span style="color:#71717a">Showing</span><span style="font-weight:500">{{ filterLabel }}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:36px;left:0;z-index:40;width:264px;background:#fff;border:1px solid #e4e4e7;border-radius:8px;box-shadow:0 8px 24px -6px rgba(0,0,0,.14),0 2px 6px rgba(0,0,0,.04);padding:4px">
+                <div style="padding:6px 8px 4px;font-size:10px;color:#71717a;font-weight:500">View</div>
+                <sc-for list="{{ viewItems }}" as="m" hint-placeholder-count="2">
+                  <button onClick="{{ m.onClick }}" style="display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 8px;border:0;border-radius:4px;background:transparent;font-size:11px;cursor:pointer;text-align:left;color:#09090b" style-hover="background:#f4f4f5">
+                    <span style="width:16px;display:grid;place-items:center"><sc-if value="{{ m.checked }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>
+                    <span style="flex:1">{{ m.label }}</span>
+                  </button>
+                </sc-for>
+                <div style="height:1px;background:#e4e4e7;margin:4px -4px"></div>
+                <div style="padding:6px 8px 4px;font-size:10px;color:#71717a;font-weight:500">By agent</div>
+                <sc-for list="{{ agentItems }}" as="m" hint-placeholder-count="3">
+                  <button onClick="{{ m.onClick }}" style="display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 8px;border:0;border-radius:4px;background:transparent;font-size:11px;cursor:pointer;text-align:left;color:#09090b" style-hover="background:#f4f4f5">
+                    <span style="width:16px;display:grid;place-items:center"><sc-if value="{{ m.checked }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>
+                    <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.label }} <span style="color:#71717a">· {{ m.host }}</span></span>
+                    <span style="font-size:10px;color:#a1a1aa">{{ m.count }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="position:relative;flex:1;max-width:320px;min-width:180px">
+            <svg style="position:absolute;left:10px;top:8px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input value="{{ q }}" onChange="{{ onQ }}" placeholder="Search skills" style="width:100%;height:30px;padding:0 10px 0 32px;border:1px solid #e4e4e7;border-radius:6px;font-size:11px;background:#fff;color:#09090b" style-focus="border-color:#a1a1aa;box-shadow:0 0 0 3px rgba(161,161,170,.25)">
+          </div>
+          <div style="flex:1"></div>
+          <span style="font-size:11px;color:#71717a">{{ resultLabel }}</span>
+        </div>
+
+        <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:8px;min-height:38px;flex-wrap:wrap;padding:4px 6px 4px 12px;border:1px solid #e4e4e7;border-radius:8px;background:#fafafa">
+            <span style="font-size:11px;font-weight:500">{{ selectedLabel }}</span>
+            <div style="flex:1"></div>
+            <button onClick="{{ clearSelection }}" style="height:30px;padding:0 10px;border:0;border-radius:999px;background:transparent;font-size:11px;cursor:pointer;color:#71717a" style-hover="background:#f0f0f1;color:#09090b">Clear</button>
+            <button onClick="{{ bulkAddToSet }}" style="height:30px;padding:0 10px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">Add to Skills Set demo</button>
+            <button onClick="{{ bulkStar }}" style="height:30px;padding:0 10px;border:0;border-radius:999px;background:#2f7df6;color:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#1f6ae0">Star</button>
+          </div>
+        </sc-if>
+
+        <div style="border:1px solid #e4e4e7;border-radius:8px">
+          <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;height:32px;padding:0 12px;border-bottom:1px solid #e4e4e7;font-size:10px;font-weight:500;color:#71717a;background:#fafafa;border-radius:8px 8px 0 0">
+            <sc-if value="{{ edit }}"><div></div></sc-if>
+            <div style="padding:0 8px">Skill</div>
+            <sc-if value="{{ wide }}"><div style="padding:0 8px">Source</div>
+            <div style="padding:0 8px">Agents</div>
+            <div style="padding:0 8px">Last used</div></sc-if>
+            <div></div>
+          </div>
+          <sc-for list="{{ rows }}" as="s" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;min-height:48px;padding:0 12px;border-bottom:1px solid #f4f4f5;background:{{ s.bg }}" style-hover="background:#fafafa">
+              <sc-if value="{{ edit }}">
+                <button onClick="{{ s.onSelect }}" style="width:16px;height:16px;padding:0;border:1px solid {{ s.boxBorder }};border-radius:4px;background:{{ s.boxBg }};display:grid;place-items:center;cursor:pointer;margin-left:6px">
+                  <sc-if value="{{ s.selected }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fafafa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                </button>
+              </sc-if>
+              <div style="padding:5px 8px;min-width:0;display:flex;flex-direction:column;gap:0">
+                <span style="font-family:'Geist Mono',monospace;font-size:11px;font-weight:500;color:#09090b">{{ s.name }}</span>
+                <sc-if value="{{ showDesc }}"><span style="font-size:10px;color:#a1a1aa;line-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.desc }}</span></sc-if>
+                <sc-if value="{{ isMobile }}"><span style="font-size:10px;color:#71717a;line-height:15px">{{ s.meta }}</span></sc-if>
+              </div>
+              <sc-if value="{{ wide }}"><div style="padding:0 8px;min-width:0">
+                <sc-if value="{{ s.hasRepo }}">
+                  <a href="{{ s.repoUrl }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#09090b;max-width:100%">
+                    <svg style="flex:none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.repo }}</span>
+                  </a>
+                </sc-if>
+                <sc-if value="{{ s.noRepo }}"><span style="font-size:11px;color:#a1a1aa">Local</span></sc-if>
+              </div>
+              <div style="padding:0 8px;display:flex;gap:4px">
+                <sc-for list="{{ s.agents }}" as="a" hint-placeholder-count="2">
+                  <span title="{{ a.title }}" style="width:22px;height:22px;border-radius:5px;border:1px solid #e4e4e7;background:#fff;display:grid;place-items:center;font-size:9px;font-weight:600;color:#3f3f46">{{ a.letter }}</span>
+                </sc-for>
+              </div>
+              <div style="padding:0 8px;font-size:11px;color:#71717a;font-variant-numeric:tabular-nums">{{ s.last }}</div></sc-if>
+              <div style="display:flex;justify-content:flex-end;gap:2px;position:relative">
+                <button onClick="{{ s.onStar }}" title="Star" style="width:28px;height:28px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:{{ s.starColor }}" style-hover="background:#f4f4f5">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="{{ s.starFill }}" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </button>
+                <button onClick="{{ s.onAdd }}" title="Add to set" style="width:28px;height:28px;border:0;border-radius:999px;background:{{ s.addBg }};display:grid;place-items:center;cursor:pointer;color:#3f3f46" style-hover="background:#f4f4f5">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 12H3M16 6H3M16 18H3M18 9v6M21 12h-6"></path></svg>
+                </button>
+                <sc-if value="{{ s.addOpen }}">
+                  <div style="position:absolute;right:0;top:32px;z-index:40;width:232px;background:#fff;border:1px solid #e4e4e7;border-radius:8px;box-shadow:0 8px 24px -6px rgba(0,0,0,.14),0 2px 6px rgba(0,0,0,.04);padding:4px">
+                    <div style="padding:6px 8px 4px;font-size:10px;color:#71717a;font-weight:500">Add to set</div>
+                    <sc-for list="{{ s.setOptions }}" as="o" hint-placeholder-count="3">
+                      <button onClick="{{ o.onToggle }}" style="display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 8px;border:0;border-radius:4px;background:transparent;font-size:11px;cursor:pointer;text-align:left;color:#09090b" style-hover="background:#f4f4f5">
+                        <span style="width:16px;height:16px;border-radius:4px;border:1px solid {{ o.border }};background:{{ o.bg }};display:grid;place-items:center;flex:none"><sc-if value="{{ o.checked }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fafafa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>
+                        <span style="flex:1">{{ o.name }}</span>
+                      </button>
+                    </sc-for>
+                    <div style="height:1px;background:#e4e4e7;margin:4px -4px"></div>
+                    <button onClick="{{ openNewSet }}" style="display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 8px;border:0;border-radius:4px;background:transparent;font-size:11px;cursor:pointer;text-align:left;color:#09090b" style-hover="background:#f4f4f5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"></path></svg>New set…
+                    </button>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ empty }}">
+            <div style="padding:48px 16px;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center">
+              <span style="font-weight:500">No skills found</span>
+              <span style="font-size:11px;color:#71717a">Try a different filter or search term.</span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- AGENTS -->
+    <sc-if value="{{ isAgents }}" hint-placeholder-val="{{ false }}">
+      <header style="display:flex;align-items:center;gap:8px;height:48px;padding:0 {{ ui.px }};flex:none">
+        <sc-if value="{{ isMobile }}"><button onClick="{{ openDrawer }}" aria-label="Menu" style="width:34px;height:34px;margin-left:-6px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:#09090b;flex:none" style-hover="background:#f4f4f5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button></sc-if>
+        <h1 style="margin:0;font-size:13px;font-weight:600">Agents</h1>
+        <div style="flex:1"></div>
+        <button onClick="{{ toggleEdit }}" style="height:32px;padding:0 12px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">{{ editLabel }}</button>
+        <button onClick="{{ openAddAgent }}" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:0;border-radius:999px;background:#2f7df6;color:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#1f6ae0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"></path></svg>Add agent
+        </button>
+      </header>
+      <div style="padding:14px {{ ui.px }} 32px;display:flex;flex-direction:column;gap:12px;max-width:920px">
+        <p style="margin:0;font-size:11px;color:#71717a">Agents pull skills from omgskills. Each connection syncs automatically.</p>
+        <div style="border:1px solid #e4e4e7;border-radius:8px">
+          <sc-for list="{{ agentRows }}" as="a" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:14px;padding:8px 14px;border-bottom:1px solid #f4f4f5" style-hover="background:#fafafa">
+              <div style="width:28px;height:28px;border-radius:6px;border:1px solid #e4e4e7;display:grid;place-items:center;font-weight:600;font-size:10px;color:#3f3f46;flex:none">{{ a.letter }}</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                <span style="font-weight:500">{{ a.name }}</span>
+                <span style="font-size:11px;color:#71717a">{{ a.sub }}</span>
+              </div>
+              <sc-if value="{{ wide }}"><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#71717a;width:150px">
+                <span style="width:7px;height:7px;border-radius:999px;background:{{ a.dot }}"></span>{{ a.status }}
+              </div></sc-if>
+              <button onClick="{{ a.onView }}" style="height:30px;padding:0 10px;border:0;border-radius:999px;background:transparent;font-size:11px;cursor:pointer;color:#09090b;width:{{ ui.skillsBtnW }};text-align:right" style-hover="background:#f4f4f5">{{ a.skills }} skills</button>
+              <sc-if value="{{ edit }}">
+                <button onClick="{{ a.onRemove }}" style="height:30px;padding:0 10px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;color:#dc2626;cursor:pointer" style-hover="background:#fef2f2">Disconnect</button>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- SETS -->
+    <sc-if value="{{ isSets }}" hint-placeholder-val="{{ false }}">
+      <header style="display:flex;align-items:center;gap:8px;height:48px;padding:0 {{ ui.px }};flex:none">
+        <sc-if value="{{ isMobile }}"><button onClick="{{ openDrawer }}" aria-label="Menu" style="width:34px;height:34px;margin-left:-6px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:#09090b;flex:none" style-hover="background:#f4f4f5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button></sc-if>
+        <h1 style="margin:0;font-size:13px;font-weight:600">Sets</h1>
+        <div style="flex:1"></div>
+        <button onClick="{{ toggleEdit }}" style="height:32px;padding:0 12px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">{{ editLabel }}</button>
+        <button onClick="{{ openNewSet }}" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:0;border-radius:999px;background:#2f7df6;color:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#1f6ae0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"></path></svg>New set
+        </button>
+      </header>
+      <div style="padding:14px {{ ui.px }} 32px;display:flex;flex-direction:column;gap:18px;max-width:920px">
+        <sc-for list="{{ setGroups }}" as="g" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <h2 style="margin:0;font-size:11px;font-weight:500;color:#71717a">{{ g.title }}</h2>
+            <div style="border:1px solid #e4e4e7;border-radius:8px">
+              <sc-for list="{{ g.items }}" as="st" hint-placeholder-count="3">
+                <div onClick="{{ st.onOpen }}" style="display:flex;align-items:center;gap:14px;padding:8px 14px;border-bottom:1px solid #f4f4f5;cursor:pointer" style-hover="background:#fafafa">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span style="font-weight:500">{{ st.name }}</span>
+                    <span style="font-size:11px;color:#71717a">{{ st.meta }}</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid #e4e4e7;border-radius:999px;font-size:10px;font-weight:500;color:#3f3f46">{{ st.visibility }}</span>
+                  <sc-if value="{{ wide }}"><div style="display:flex">
+                    <sc-for list="{{ st.avatars }}" as="av" hint-placeholder-count="2">
+                      <span style="width:24px;height:24px;border-radius:999px;background:#f4f4f5;border:2px solid #fff;margin-left:-6px;display:grid;place-items:center;font-size:8px;font-weight:600;color:#3f3f46">{{ av }}</span>
+                    </sc-for>
+                  </div></sc-if>
+                  <sc-if value="{{ st.canDelete }}">
+                    <button onClick="{{ st.onDelete }}" title="Delete" style="width:30px;height:30px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:#dc2626" style-hover="background:#fef2f2">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2"></path></svg>
+                    </button>
+                  </sc-if>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- SET DETAIL -->
+    <sc-if value="{{ isSet }}" hint-placeholder-val="{{ false }}">
+      <header style="display:flex;align-items:center;gap:8px;height:48px;padding:0 {{ ui.px }};flex:none">
+        <sc-if value="{{ isMobile }}"><button onClick="{{ goSets }}" aria-label="Back to sets" style="width:34px;height:34px;margin-left:-6px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:#09090b;flex:none" style-hover="background:#f4f4f5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button></sc-if>
+        <sc-if value="{{ wide }}"><button onClick="{{ goSets }}" style="height:30px;padding:0 8px;border:0;border-radius:999px;background:transparent;font-size:12px;color:#71717a;cursor:pointer" style-hover="background:#f4f4f5;color:#09090b">Sets</button>
+        <span style="color:#d4d4d8">/</span></sc-if>
+        <h1 style="margin:0;font-size:13px;font-weight:600;padding:0 4px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ set.name }}</h1>
+        <div style="flex:1"></div>
+        <sc-if value="{{ set.mine }}">
+          <button onClick="{{ toggleSetPublic }}" style="display:flex;align-items:center;gap:10px;height:32px;padding:0 4px 0 10px;border:0;background:transparent;font-size:11px;cursor:pointer;color:#09090b">
+            {{ set.visibility }}
+            <span style="width:36px;height:20px;border-radius:999px;background:{{ set.trackBg }};position:relative;transition:background .15s"><span style="position:absolute;top:2px;left:{{ set.knobLeft }};width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s"></span></span>
+          </button>
+        </sc-if>
+        <button onClick="{{ copyLink }}" style="display:flex;align-items:center;gap:6px;white-space:nowrap;flex:none;height:32px;padding:0 12px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="14" height="14" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg><sc-if value="{{ wide }}">Copy link</sc-if>
+        </button>
+      </header>
+      <div style="padding:14px {{ ui.px }} 32px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 10px;border:1px solid #e4e4e7;border-radius:8px">
+          <div style="display:flex;align-items:baseline;gap:6px;flex:none;padding-left:2px">
+            <span style="font-size:11px;font-weight:600">Members</span>
+            <span style="font-size:10px;color:#71717a">{{ set.memberCount }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;flex:1 1 auto;max-width:100%">
+            <sc-for list="{{ memberRows }}" as="mb" hint-placeholder-count="2">
+              <div title="{{ mb.role }}" style="display:flex;align-items:center;gap:6px;height:28px;padding:0 4px 0 3px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;max-width:100%;min-width:0">
+                <span style="width:20px;height:20px;border-radius:999px;background:#f4f4f5;display:grid;place-items:center;font-size:7px;font-weight:600;color:#3f3f46;flex:none">{{ mb.initials }}</span>
+                <span style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">{{ mb.email }}</span>
+                <span style="font-size:10px;color:#a1a1aa;padding-right:4px">{{ mb.roleTag }}</span>
+                <sc-if value="{{ mb.canRemove }}">
+                  <button onClick="{{ mb.onRemove }}" title="Remove" style="width:20px;height:20px;margin-left:-4px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:#71717a" style-hover="background:#f4f4f5;color:#09090b">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                  </button>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ set.mine }}">
+            <div style="display:flex;gap:6px;flex:1 1 240px;max-width:320px">
+              <input value="{{ invite }}" onChange="{{ onInvite }}" onKeyDown="{{ onInviteKey }}" placeholder="Invite by email" style="flex:1;min-width:0;height:28px;padding:0 10px;border:1px solid #e4e4e7;border-radius:6px;font-size:11px;color:#09090b" style-focus="border-color:#a1a1aa;box-shadow:0 0 0 3px rgba(161,161,170,.25)">
+              <button onClick="{{ addMember }}" style="height:28px;padding:0 10px;border:0;border-radius:999px;background:#2f7df6;color:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#1f6ae0">Invite</button>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;height:32px">
+            <h2 style="margin:0;font-size:12px;font-weight:600">Skills</h2>
+            <span style="font-size:11px;color:#71717a">{{ set.count }}</span>
+            <div style="flex:1"></div>
+            <sc-if value="{{ set.mine }}">
+              <button onClick="{{ toggleEdit }}" style="height:30px;padding:0 12px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">{{ editLabel }}</button>
+            </sc-if>
+          </div>
+          <div style="border:1px solid #e4e4e7;border-radius:8px">
+            <div style="display:grid;grid-template-columns:{{ setGridCols }};align-items:center;height:32px;padding:0 12px;border-bottom:1px solid #e4e4e7;font-size:10px;font-weight:500;color:#71717a;background:#fafafa;border-radius:8px 8px 0 0">
+              <div style="padding:0 8px">Skill</div><sc-if value="{{ wide }}"><div style="padding:0 8px">Source</div></sc-if><div></div>
+            </div>
+            <sc-for list="{{ setRows }}" as="s" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:{{ setGridCols }};align-items:center;min-height:48px;padding:0 12px;border-bottom:1px solid #f4f4f5" style-hover="background:#fafafa">
+                <div style="padding:5px 8px;min-width:0;display:flex;flex-direction:column;gap:0">
+                  <span style="font-family:'Geist Mono',monospace;font-size:11px;font-weight:500">{{ s.name }}</span>
+                  <sc-if value="{{ showDesc }}"><span style="font-size:10px;color:#a1a1aa;line-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.desc }}</span></sc-if>
+                </div>
+                <sc-if value="{{ wide }}"><div style="padding:0 8px;min-width:0">
+                  <sc-if value="{{ s.hasRepo }}">
+                    <a href="{{ s.repoUrl }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;max-width:100%">
+                      <svg style="flex:none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.350 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                      <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.repo }}</span>
+                    </a>
+                  </sc-if>
+                  <sc-if value="{{ s.noRepo }}"><span style="font-size:11px;color:#a1a1aa">Local</span></sc-if>
+                </div></sc-if>
+                <div style="display:flex;justify-content:flex-end;gap:2px">
+                  <sc-if value="{{ s.canRemove }}">
+                    <button onClick="{{ s.onRemove }}" style="height:30px;padding:0 10px;border:0;border-radius:999px;background:transparent;font-size:11px;color:#dc2626;cursor:pointer" style-hover="background:#fef2f2">Remove</button>
+                  </sc-if>
+                  <sc-if value="{{ s.showStar }}">
+                    <button onClick="{{ s.onStar }}" title="Star" style="width:28px;height:28px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:{{ s.starColor }}" style-hover="background:#f4f4f5">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="{{ s.starFill }}" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- PROFILE -->
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <header style="display:flex;align-items:center;gap:8px;height:48px;padding:0 {{ ui.px }};flex:none">
+        <sc-if value="{{ isMobile }}"><button onClick="{{ openDrawer }}" aria-label="Menu" style="width:34px;height:34px;margin-left:-6px;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:pointer;color:#09090b;flex:none" style-hover="background:#f4f4f5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button></sc-if>
+        <h1 style="margin:0;font-size:13px;font-weight:600">Home</h1>
+      </header>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:16px;max-width:720px">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:56px;height:48px;border-radius:999px;background:#e4e4e7;display:grid;place-items:center;font-size:16px;font-weight:600;color:#3f3f46">JS</div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:18px;font-weight:600;letter-spacing:-0.01em;font-family:'Geist Mono',monospace">/jonslimak</span>
+            <span style="font-size:11px;color:#71717a">jonslimak@gmail.com</span>
+          </div>
+        </div>
+
+        <div style="border:1px solid #e4e4e7;border-radius:8px">
+          <div style="display:flex;align-items:center;gap:16px;padding:16px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+              <span style="font-weight:500">Public profile</span>
+              <span style="font-size:11px;color:#71717a">{{ profileHint }}</span>
+            </div>
+            <button onClick="{{ toggleProfilePublic }}" aria-label="Public profile" style="width:36px;height:20px;border:0;padding:0;border-radius:999px;background:{{ profileTrack }};position:relative;cursor:pointer;transition:background .15s;flex:none"><span style="position:absolute;top:2px;left:{{ profileKnob }};width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s"></span></button>
+          </div>
+          <sc-if value="{{ profilePublic }}">
+            <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid #f4f4f5">
+              <span style="flex:1;font-family:'Geist Mono',monospace;font-size:11px;color:#3f3f46">omgskills.com/jonslimak</span>
+              <button onClick="{{ copyLink }}" style="height:30px;padding:0 10px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">Copy</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <h2 style="margin:0;font-size:12px;font-weight:600">Private source</h2>
+          <div style="border:1px dashed #d4d4d8;border-radius:8px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+            <div style="width:36px;height:36px;border-radius:8px;border:1px solid #e4e4e7;display:grid;place-items:center;margin-bottom:6px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3f3f46" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+            </div>
+            <span style="font-weight:500">No installation connected</span>
+            <span style="font-size:11px;color:#71717a;max-width:360px;text-wrap:pretty">Connect the omgskills GitHub App to sync skills from private repositories.</span>
+            <button onClick="{{ connectGithub }}" style="margin-top:10px;height:32px;padding:0 12px;border:0;border-radius:999px;background:#2f7df6;color:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#1f6ae0">Connect GitHub</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+
+  <!-- click-away layer -->
+  <sc-if value="{{ anyPopover }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePopovers }}" style="position:fixed;inset:0;z-index:30"></div>
+  </sc-if>
+
+  <!-- dialogs -->
+  <sc-if value="{{ dlgNewSet }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:60;background:rgba(9,9,11,.45);display:grid;place-items:center;padding:20px">
+      <div style="width:100%;max-width:420px;background:#fff;border:1px solid #e4e4e7;border-radius:10px;box-shadow:0 20px 50px -12px rgba(0,0,0,.25);padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <h3 style="margin:0;font-size:14px;font-weight:600">New set</h3>
+          <p style="margin:0;font-size:11px;color:#71717a">Group skills to share with people or install on agents together.</p>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:500">Name
+          <input value="{{ newSetName }}" onChange="{{ onNewSetName }}" onKeyDown="{{ onNewSetKey }}" placeholder="e.g. Marketing skills" style="height:36px;padding:0 10px;border:1px solid #e4e4e7;border-radius:6px;font-size:12px;font-weight:400;color:#09090b" style-focus="border-color:#a1a1aa;box-shadow:0 0 0 3px rgba(161,161,170,.25)">
+        </label>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button onClick="{{ closeDialog }}" style="height:34px;padding:0 14px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">Cancel</button>
+          <button onClick="{{ createSet }}" style="height:34px;padding:0 14px;border:0;border-radius:999px;background:#2f7df6;color:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#1f6ae0">Create set</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ dlgAddAgent }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:60;background:rgba(9,9,11,.45);display:grid;place-items:center;padding:20px">
+      <div style="width:100%;max-width:480px;background:#fff;border:1px solid #e4e4e7;border-radius:10px;box-shadow:0 20px 50px -12px rgba(0,0,0,.25);padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <h3 style="margin:0;font-size:14px;font-weight:600">Add agent</h3>
+          <p style="margin:0;font-size:11px;color:#71717a">Run this on the machine where your agent lives. It will appear here once connected.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border:1px solid #e4e4e7;border-radius:6px;background:#fafafa">
+          <code style="flex:1;font-family:'Geist Mono',monospace;font-size:11px;color:#09090b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">npx omgskills connect --token osk_7f2a…</code>
+          <button onClick="{{ copyCmd }}" style="height:28px;padding:0 10px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:10px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">Copy</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:#71717a">
+          <span style="width:7px;height:7px;border-radius:999px;background:#a1a1aa"></span>Waiting for connection…
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button onClick="{{ closeDialog }}" style="height:34px;padding:0 14px;border:1px solid #e4e4e7;border-radius:999px;background:#fff;font-size:11px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f5">Done</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;right:20px;bottom:20px;z-index:70;display:flex;align-items:center;gap:8px;padding:10px 14px;background:#fff;border:1px solid #e4e4e7;border-radius:8px;box-shadow:0 8px 24px -6px rgba(0,0,0,.14);font-size:11px;font-weight:500">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ toast }}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;skills&quot;,&quot;agents&quot;,&quot;sets&quot;,&quot;set&quot;,&quot;profile&quot;],&quot;default&quot;:&quot;skills&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showDescriptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;previewMobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const AGENTS = [
+  { id: 'claude', name: 'Claude', host: 'jonathan’s local mac', letter: 'C', online: true, sync: 'Synced 2m ago' },
+  { id: 'chatgpt', name: 'ChatGPT', host: 'jonathan’s local mac', letter: 'G', online: true, sync: 'Synced 1h ago' },
+  { id: 'hermes', name: 'Hermes agent', host: 'server', letter: 'H', online: false, sync: 'Offline · 3d' },
+];
+const SKILLS = [
+  ['ad-produce', 'Draft ad copy and variants for paid campaigns', null, ['claude'], 45],
+  ['agentation', 'Annotate UI for agents to act on', null, ['claude', 'chatgpt'], 190],
+  ['ai-seo', 'Optimize pages for AI search engines', 'jonslimak/ai-seo', ['claude', 'hermes'], 12],
+  ['app-store-review', 'Pre-check builds against App Store guidelines', null, ['claude'], 2900],
+  ['app-store-screenshots', 'Generate localized App Store screenshots', null, ['chatgpt'], 5200],
+  ['apple-hig-designer', 'Review designs against Apple HIG', null, ['claude', 'chatgpt'], 30],
+  ['appstore-connect', 'Manage builds and metadata in App Store Connect', 'rudrankriyam/appstore-connect', ['claude'], 610],
+  ['autoplan', 'Break a goal into a sequenced plan', null, ['hermes'], 14000],
+  ['benchmark', 'Run and compare performance benchmarks', null, ['hermes'], 20000],
+  ['benchmark-models', 'Compare LLM outputs across providers', null, ['claude', 'hermes'], 8],
+  ['bflow', 'Branch-based git workflow helper', null, ['claude'], 16000],
+  ['brand-voice', 'Keep writing on-brand', 'acme/brand-voice', ['chatgpt'], 3100],
+  ['changelog', 'Write release notes from commits', null, ['claude', 'chatgpt', 'hermes'], 720],
+].map(([name, desc, repo, agents, last]) => ({ name, desc, repo, agents, last }));
+const fmt = m => m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
+const initials = e => e.split('@')[0].slice(0, 2).toUpperCase();
+
+class Component extends DCLogic {
+  state = {
+    view: (this.props && this.props.startScreen) || 'skills',
+    filter: 'recent', menu: false, q: '', edit: false, selected: [], addFor: null,
+    starred: ['ai-seo', 'apple-hig-designer'], agents: AGENTS,
+    sets: [
+      { id: 'demo', name: 'Skills Set demo', mine: true, pub: false, owner: 'jonslimak@gmail.com', members: ['fred@gmail.com'], skills: ['ad-produce', 'agentation', 'ai-seo', 'app-store-review', 'app-store-screenshots', 'apple-hig-designer', 'appstore-connect', 'autoplan'] },
+      { id: 'writing', name: 'Writing skills', mine: true, pub: true, owner: 'jonslimak@gmail.com', members: [], skills: ['ad-produce', 'brand-voice', 'changelog'] },
+      { id: 'ios', name: 'iOS skills', mine: true, pub: false, owner: 'jonslimak@gmail.com', members: ['matt@gmail.com'], skills: ['app-store-review', 'app-store-screenshots', 'apple-hig-designer', 'appstore-connect'] },
+      { id: 'company', name: 'Company skills', mine: false, pub: false, owner: 'ops@acme.co', members: ['jonslimak@gmail.com', 'fred@gmail.com', 'lena@acme.co'], skills: ['brand-voice', 'changelog', 'benchmark'] },
+      { id: 'matt', name: 'Matt’s skills', mine: false, pub: true, owner: 'matt@gmail.com', members: ['jonslimak@gmail.com'], skills: ['bflow', 'autoplan', 'benchmark-models'] },
+    ],
+    activeSet: 'demo', dialog: null, drawer: false, w: typeof window !== 'undefined' ? window.innerWidth : 1200, newSetName: '', invite: '', profilePublic: false, toast: null,
+  };
+  componentDidMount() { this._r = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: null }), 1800); }
+  go(view, extra) { this.setState({ view, drawer: false, edit: false, selected: [], addFor: null, menu: false, ...extra }); }
+  updSet(id, fn) { this.setState(s => ({ sets: s.sets.map(x => x.id === id ? fn(x) : x) })); }
+  toggleStar(n) { this.setState(s => ({ starred: s.starred.includes(n) ? s.starred.filter(x => x !== n) : [...s.starred, n] })); }
+  createSet() {
+    const name = this.state.newSetName.trim(); if (!name) return;
+    const id = 'set' + Date.now();
+    const skills = this.state.addFor ? [this.state.addFor] : [];
+    this.setState(s => ({ sets: [...s.sets.slice(0, s.sets.filter(x => x.mine).length), { id, name, mine: true, pub: false, owner: 'jonslimak@gmail.com', members: [], skills }, ...s.sets.filter(x => !x.mine)], dialog: null, newSetName: '', addFor: null }));
+    this.flash('Created “' + name + '”');
+  }
+  addMember() {
+    const e = this.state.invite.trim(); if (!e.includes('@')) return;
+    this.updSet(this.state.activeSet, x => ({ ...x, members: [...x.members, e] }));
+    this.setState({ invite: '' }); this.flash('Invited ' + e);
+  }
+  starStyle(n) { const on = this.state.starred.includes(n); return { starFill: on ? '#f59e0b' : 'none', starColor: on ? '#f59e0b' : '#3f3f46' }; }
+  skillBase(sk) {
+    return { name: sk.name, desc: sk.desc, repo: sk.repo, hasRepo: !!sk.repo, noRepo: !sk.repo, repoUrl: sk.repo ? 'https://github.com/' + sk.repo : '', ...this.starStyle(sk.name), onStar: () => this.toggleStar(sk.name) };
+  }
+  renderVals() {
+    const s = this.state, v = s.view;
+    const forced = !!this.props.previewMobile, mob = forced || s.w < 720;
+    const nav = k => ({ bg: v === k || (k === 'sets' && v === 'set') ? '#f0f0f1' : 'transparent', fg: v === k || (k === 'sets' && v === 'set') ? '#09090b' : '#3f3f46', fw: v === k || (k === 'sets' && v === 'set') ? 500 : 400 });
+    const agentLabel = id => { const a = s.agents.find(x => x.id === id); return a ? a.name + ' · ' + a.host : ''; };
+    let list = SKILLS.slice();
+    if (s.filter === 'recent') list = list.filter(x => x.last < 10080).sort((a, b) => a.last - b.last);
+    else if (s.filter !== 'all') list = list.filter(x => x.agents.includes(s.filter));
+    if (s.q) list = list.filter(x => x.name.includes(s.q.toLowerCase()) || x.desc.toLowerCase().includes(s.q.toLowerCase()));
+    const mySets = s.sets.filter(x => x.mine);
+    const rows = list.map(sk => {
+      const sel = s.selected.includes(sk.name), open = s.addFor === sk.name && !s.dialog;
+      return {
+        ...this.skillBase(sk), last: fmt(sk.last), selected: sel, meta: [fmt(sk.last), sk.agents.length + (sk.agents.length === 1 ? ' agent' : ' agents'), sk.repo ? 'GitHub' : 'Local'].join(' · '),
+        bg: sel ? '#fafafa' : 'transparent', boxBg: sel ? '#18181b' : '#fff', boxBorder: sel ? '#18181b' : '#d4d4d8',
+        agents: sk.agents.filter(id => s.agents.some(a => a.id === id)).map(id => { const a = s.agents.find(x => x.id === id); return { letter: a.letter, title: agentLabel(id) }; }),
+        onSelect: () => this.setState(st => ({ selected: sel ? st.selected.filter(x => x !== sk.name) : [...st.selected, sk.name] })),
+        addOpen: open, addBg: open ? '#f4f4f5' : 'transparent',
+        onAdd: () => this.setState({ addFor: open ? null : sk.name, menu: false }),
+        setOptions: mySets.map(st => { const c = st.skills.includes(sk.name); return { name: st.name, checked: c, bg: c ? '#18181b' : '#fff', border: c ? '#18181b' : '#d4d4d8', onToggle: () => this.updSet(st.id, x => ({ ...x, skills: c ? x.skills.filter(n => n !== sk.name) : [...x.skills, sk.name] })) }; }),
+      };
+    });
+    const filterLabel = s.filter === 'all' ? 'All skills' : s.filter === 'recent' ? 'Recent activity' : agentLabel(s.filter);
+    const set = s.sets.find(x => x.id === s.activeSet) || s.sets[0];
+    const setObj = {
+      name: set.name, mine: set.mine, visibility: set.pub ? 'Public' : 'Private',
+      trackBg: set.pub ? '#2f7df6' : '#e4e4e7', knobLeft: set.pub ? '18px' : '2px',
+      count: set.skills.length, memberCount: set.members.length + 1,
+    };
+    const setRows = set.skills.map(n => SKILLS.find(x => x.name === n)).filter(Boolean).map(sk => ({
+      ...this.skillBase(sk), canRemove: set.mine && s.edit, showStar: !(set.mine && s.edit),
+      onRemove: () => this.updSet(set.id, x => ({ ...x, skills: x.skills.filter(n => n !== sk.name) })),
+    }));
+    const memberRows = [{ email: set.owner, initials: initials(set.owner), role: 'Owner', roleTag: 'Owner', canRemove: false }, ...set.members.map(e => ({
+      email: e, initials: initials(e), role: 'Member', roleTag: '', canRemove: set.mine,
+      onRemove: () => this.updSet(set.id, x => ({ ...x, members: x.members.filter(m => m !== e) })),
+    }))];
+    const setItem = st => ({
+      name: st.name, visibility: st.pub ? 'Public' : 'Private',
+      meta: st.skills.length + ' skills' + (st.mine ? '' : ' · by ' + st.owner.split('@')[0]),
+      avatars: [st.owner, ...st.members].slice(0, 4).map(initials),
+      canDelete: st.mine && s.edit,
+      onOpen: () => this.go('set', { activeSet: st.id }),
+      onDelete: e => { e.stopPropagation(); this.setState(x => ({ sets: x.sets.filter(y => y.id !== st.id) })); this.flash('Deleted “' + st.name + '”'); },
+    });
+    const count = id => SKILLS.filter(x => x.agents.includes(id)).length;
+    return {
+      isMobile: mob, wide: !mob, drawerOpen: mob && s.drawer,
+      openDrawer: () => this.setState({ drawer: true, menu: false, addFor: null }), closeDrawer: () => this.setState({ drawer: false }),
+      setGridCols: mob ? 'minmax(0,1fr) 72px' : 'minmax(0,2.2fr) minmax(0,1.2fr) 88px',
+      ui: {
+        rootH: forced ? '844px' : '100vh', rootMinH: forced ? '0' : '620px', rootW: forced ? '390px' : '100%', rootM: forced ? '24px auto' : '0',
+        rootT: forced ? 'translateZ(0)' : 'none', rootB: forced ? '1px solid #e4e4e7' : '0', rootR: forced ? '20px' : '0',
+        asideW: mob ? '256px' : '168px', asidePos: mob ? 'fixed' : 'relative', asideX: mob ? (s.drawer ? 'translateX(0)' : 'translateX(-100%)') : 'none',
+        asideShadow: mob && s.drawer ? '0 10px 40px rgba(0,0,0,.18)' : 'none', navH: mob ? '40px' : '28px', px: mob ? '12px' : '20px', skillsBtnW: mob ? 'auto' : '96px',
+      },
+      navSkills: nav('skills'), navAgents: nav('agents'), navSets: nav('sets'), navProfile: nav('profile'),
+      skillCount: SKILLS.length, agentCount: s.agents.length, setCount: s.sets.length,
+      goSkills: () => this.go('skills'), goAgents: () => this.go('agents'), goSets: () => this.go('sets'), goProfile: () => this.go('profile'),
+      isSkills: v === 'skills', isAgents: v === 'agents', isSets: v === 'sets', isSet: v === 'set', isProfile: v === 'profile',
+      edit: s.edit, editLabel: s.edit ? 'Done' : 'Edit', toggleEdit: () => this.setState(x => ({ edit: !x.edit, selected: [] })),
+      showDesc: this.props.showDescriptions ?? true,
+      menuOpen: s.menu, toggleMenu: () => this.setState(x => ({ menu: !x.menu, addFor: null })), filterLabel,
+      viewItems: [['all', 'All skills'], ['recent', 'Recent activity']].map(([k, l]) => ({ label: l, checked: s.filter === k, onClick: () => this.setState({ filter: k, menu: false }) })),
+      agentItems: s.agents.map(a => ({ label: a.name, host: a.host, count: count(a.id), checked: s.filter === a.id, onClick: () => this.setState({ filter: a.id, menu: false }) })),
+      q: s.q, onQ: e => this.setState({ q: e.target.value }),
+      resultLabel: rows.length + (rows.length === 1 ? ' skill' : ' skills'),
+      rows, empty: rows.length === 0,
+      gridCols: mob ? (s.edit ? '28px minmax(0,1fr) 64px' : 'minmax(0,1fr) 64px') : s.edit ? '32px minmax(0,2.4fr) minmax(0,1.3fr) 100px 90px 80px' : 'minmax(0,2.4fr) minmax(0,1.3fr) 100px 90px 80px',
+      hasSelection: s.edit && s.selected.length > 0, selectedLabel: s.selected.length + ' selected',
+      clearSelection: () => this.setState({ selected: [] }),
+      bulkAddToSet: () => { const sel = s.selected; this.updSet('demo', x => ({ ...x, skills: [...new Set([...x.skills, ...sel])] })); this.setState({ selected: [] }); this.flash('Added ' + sel.length + ' to Skills Set demo'); },
+      bulkStar: () => { this.setState(x => ({ starred: [...new Set([...x.starred, ...x.selected])], selected: [] })); this.flash('Starred'); },
+      anyPopover: s.menu || (!!s.addFor && !s.dialog), closePopovers: () => this.setState({ menu: false, addFor: null }),
+      agentRows: s.agents.map(a => ({
+        name: a.name, host: a.host, sub: mob ? a.host + ' · ' + a.sync : a.host, letter: a.letter, status: a.sync, dot: a.online ? '#16a34a' : '#d4d4d8', skills: count(a.id),
+        onView: () => this.go('skills', { filter: a.id }),
+        onRemove: () => { this.setState(x => ({ agents: x.agents.filter(y => y.id !== a.id) })); this.flash('Disconnected ' + a.name); },
+      })),
+      openAddAgent: () => this.setState({ dialog: 'agent' }),
+      setGroups: [{ title: 'My sets', items: s.sets.filter(x => x.mine).map(setItem) }, { title: 'Shared with me', items: s.sets.filter(x => !x.mine).map(setItem) }],
+      set: setObj, setRows, memberRows,
+      toggleSetPublic: () => this.updSet(set.id, x => ({ ...x, pub: !x.pub })),
+      copyLink: () => this.flash('Link copied'),
+      invite: s.invite, onInvite: e => this.setState({ invite: e.target.value }), onInviteKey: e => { if (e.key === 'Enter') this.addMember(); }, addMember: () => this.addMember(),
+      profilePublic: s.profilePublic, toggleProfilePublic: () => this.setState(x => ({ profilePublic: !x.profilePublic })),
+      profileTrack: s.profilePublic ? '#2f7df6' : '#e4e4e7', profileKnob: s.profilePublic ? '18px' : '2px',
+      profileHint: s.profilePublic ? 'Anyone with the link can see your public sets.' : 'Only you and set members can see your skills.',
+      connectGithub: () => this.flash('Opening GitHub…'),
+      dlgNewSet: s.dialog === 'set', dlgAddAgent: s.dialog === 'agent',
+      openNewSet: () => this.setState({ dialog: 'set' }),
+      closeDialog: () => this.setState({ dialog: null, addFor: null, newSetName: '' }),
+      newSetName: s.newSetName, onNewSetName: e => this.setState({ newSetName: e.target.value }),
+      onNewSetKey: e => { if (e.key === 'Enter') this.createSet(); }, createSet: () => this.createSet(),
+      copyCmd: () => this.flash('Command copied'),
+      hasToast: !!s.toast, toast: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
