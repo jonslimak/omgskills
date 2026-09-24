@@ -115,7 +115,7 @@ struct SkillSearchIndexTests {
     }
 
     @Test @MainActor func fallbackSearchDemotesCollectionLikeSkills() {
-        let store = SkillsStore()
+        let store = SkillsStore(autoload: false)
         let results = store.search(query: "browser use", in: [
             skill(name: "browser-use", description: "Browser automation skill.", stars: 500),
             skill(name: "browser-use-catalog", description: "Browser use skill collection.", stars: 220_000, provenanceType: "repackaged"),
