@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1 is implemented locally; signed-in reads and populated account-snapshot checks pass. Remaining isolation/lifecycle checks are tracked in LOCAL-INTEGRATION.md. B2 and Slices C-D are not started. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2 are implemented locally; populated reads, account controls and isolated profile saves pass. Remaining two-account/shared-access checks are tracked in LOCAL-INTEGRATION.md. Slices C-D are not started. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -129,17 +129,19 @@ After design review, attach authenticated controllers to the same views.
 - [x] Require an explicitly verified loopback backend and a development Clerk key before enabling sign-in. Client and local proxy allow only required GET endpoints.
 - [x] Automated checks and blocked-entry browser verification pass. Production excludes both local entries even with their opt-in flags set.
 - [x] Verify development Clerk and the backend's resolved local database; test sign-in, empty/populated reads, owned detail, search/filtering, reload and mobile navigation using an approved account-scoped snapshot. No production backend: even GET requests reconcile user records.
-- [ ] Complete shared detail and two-account lifecycle/isolation checks; account switching/sign-out wiring belongs to B2. Investigate the initial load error if reproducible.
+- [ ] Complete shared detail and two-account lifecycle/isolation browser checks; B2 wires sign-out and account-scoped state. Investigate the initial load error if reproducible.
 
 See `LOCAL-INTEGRATION.md` for setup and remaining checks. B1 is not end-to-end verified yet.
 
 ### B2: Account Lifecycle And Profile Changes
 
-- [ ] Preserve Clerk sign-in, account management, sign-out, and handle onboarding.
-- [ ] Retain account-scoped cache, refresh on focus/visibility, request deduplication, manual refresh, and stale-response protection on account changes.
-- [ ] Keep loading, stale-but-usable, empty, permission-denied, and error states distinct. Failed refresh must not erase usable data.
-- [ ] Wire Home handle/publication changes with server validation and accurate public-profile wording. Use the API's returned profile URL.
-- [ ] Clear selection and account-specific state on sign-out/account change; prune deleted selections after refresh.
+- [x] Preserve Clerk sign-in, account management, session-scoped sign-out, and handle onboarding.
+- [x] Retain account-scoped cache, refresh on focus/visibility, request deduplication, manual refresh, and stale-response protection on account changes.
+- [x] Keep loading, stale-but-usable, empty, permission-denied, and error states distinct. Failed refresh must not erase usable data; 401/403 clear private state.
+- [x] Wire Home handle/publication changes with server validation and accurate public-profile wording. Use the API's returned profile URL; preserve publication during handle edits and serialize saves against refresh.
+- [x] Clear selection and account-specific state on sign-out/account change; prune deleted selections after refresh.
+- [x] Verify local handle onboarding/normalization, reserved-handle errors, publication on/off, reload persistence, account settings, sign-out/sign-in, and mobile editing. Only profile PATCH is enabled; sets/devices remain blocked.
+- [ ] Complete the real second-account/shared-access browser checkpoint before treating Slice B as fully verified. Automated cache-isolation and stale-response checks pass.
 
 **Exit:** real reads and profile changes work without changed identity/grouping behavior, cross-account data leakage, or regressions to existing authentication and refresh behavior. Use an isolated test account/environment for mutation verification.
 
@@ -221,4 +223,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-Review/commit the B1 read-only checkpoint, then plan B2 and finish the remaining account-lifecycle/isolation checks alongside its wiring. Slices B-D are not a production rollout authorization.
+B2 has two local checkpoints: account controls/refresh, then isolated profile editing. Finish the remaining two-account/shared-access checks and plan Slice C's authorized item mapping before enabling set mutations. Slices B-D are not a production rollout authorization.

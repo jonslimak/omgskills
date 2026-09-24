@@ -53,6 +53,13 @@ export type AccountControls = {
   signOut: () => void;
   busy: boolean;
 };
+export type ProfileControls = {
+  edit: () => void;
+  publish: (published: boolean) => void;
+  copy: () => void;
+  busy: boolean;
+  error: string;
+};
 export type PortalActions = {
   updateSet: (
     id: string,

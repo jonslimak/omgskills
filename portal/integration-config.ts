@@ -29,3 +29,8 @@ export function isIntegrationRead(path: string, method = "GET") {
     )
   );
 }
+
+export function isIntegrationRequest(path: string, method = "GET") {
+  return isIntegrationRead(path, method) ||
+    (path === "/api/portal/profile" && method.toUpperCase() === "PATCH");
+}

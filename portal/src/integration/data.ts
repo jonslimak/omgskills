@@ -12,6 +12,30 @@ export type ProfileResponse = {
   publicUrl: string | null;
 };
 
+export function isProfileResponse(value: unknown): value is ProfileResponse {
+  if (!value || typeof value !== "object") return false;
+  const profile = value as ProfileResponse;
+  return (profile.handle === null || typeof profile.handle === "string") &&
+    typeof profile.profilePublished === "boolean" &&
+    (profile.publicUrl === null || typeof profile.publicUrl === "string");
+}
+
+export async function saveProfileData(
+  api: PortalApi,
+  current: PortalData["profile"],
+  changes: { handle?: string; published?: boolean },
+  signal: AbortSignal,
+) {
+  const result = await api<{ profile: ProfileResponse }>("/api/portal/profile", {
+    method: "PATCH", signal, redirect: "error", cache: "no-store",
+    body: JSON.stringify({ handle: changes.handle ?? current.handle,
+      profilePublished: changes.published ?? current.published }),
+  });
+  if (!isProfileResponse(result?.profile)) throw new Error("Invalid profile response.");
+  return { ...current, handle: result.profile.handle ?? "",
+    published: result.profile.profilePublished, publicUrl: result.profile.publicUrl };
+}
+
 export function readOnlyApi(api: PortalApi, signal?: AbortSignal): PortalApi {
   return (path, init = {}) => {
     if (!isIntegrationRead(path, init.method) || init.body != null) {
@@ -65,8 +89,7 @@ export async function loadAccountData(
     !Array.isArray(synced.skills) ||
     !Array.isArray(owned) ||
     !Array.isArray(shared) ||
-    !profile.profile ||
-    typeof profile.profile.profilePublished !== "boolean"
+    !isProfileResponse(profile.profile)
   ) {
     throw new Error("The portal returned an invalid account response.");
   }

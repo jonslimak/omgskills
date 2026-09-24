@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { isIntegrationRead, testBackendOrigin } from "../integration-config";
+import { isIntegrationRead, isIntegrationRequest, testBackendOrigin } from "../integration-config";
 import {
   isLocalIntegration,
   integrationConfigurationError,
@@ -61,6 +61,16 @@ const actions: PortalActions = {
   retry: noOp,
 };
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
+
+test("local mutation allowlist permits only profile PATCH", () => {
+  assert.equal(isIntegrationRequest("/api/portal/profile", "PATCH"), true);
+  assert.equal(isIntegrationRead("/api/portal/profile", "PATCH"), false);
+  for (const path of ["/api/portal/groups", "/api/portal/devices", "/api/portal/profile?x=1", "/api/portal/groups/a/items", "/api/portal/sync-upload"]) {
+    for (const method of ["POST", "PATCH", "DELETE"]) assert.equal(isIntegrationRequest(path, method), false);
+  }
+  assert.equal(isIntegrationRequest("/api/portal/profile", "DELETE"), false);
+  assert.equal(isIntegrationRequest("/api/portal/profile", "POST"), false);
+});
 
 test("integration requires development, loopback, a dedicated path, and explicit opt-in", () => {
   const valid = {

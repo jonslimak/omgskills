@@ -1,6 +1,6 @@
 import { GitFork as Github, Laptop, Copy, Pencil, LogOut } from "lucide-react";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
-import type { AccountControls, PortalActions, PortalData, PortalDevice } from "./model";
+import type { AccountControls, ProfileControls, PortalActions, PortalData, PortalDevice } from "./model";
 import type { LinkRenderer } from "./SetsPage";
 import {
   Action,
@@ -115,6 +115,7 @@ export function HomePage({
   copy,
   readOnly = false,
   accountControls,
+  profileControls,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -123,6 +124,7 @@ export function HomePage({
   copy: () => void;
   readOnly?: boolean;
   accountControls?: AccountControls;
+  profileControls?: ProfileControls;
 }) {
   const profile = data.profile;
   return (
@@ -135,10 +137,10 @@ export function HomePage({
         </div>
         <IconAction
           label="Edit profile"
-          onClick={editProfile}
-          disabled={readOnly}
+          onClick={profileControls?.edit ?? editProfile}
+          disabled={profileControls ? profileControls.busy : readOnly}
           title={
-            readOnly ? "Profile editing is not connected yet" : "Edit profile"
+            readOnly && !profileControls ? "Profile editing is not connected yet" : "Edit profile"
           }
         >
           <Pencil />
@@ -155,10 +157,10 @@ export function HomePage({
             </p>
           </div>
           <Toggle
-            disabled={readOnly}
+            disabled={profileControls ? profileControls.busy : readOnly}
             label="Publish profile"
             checked={profile.published}
-            onChange={(published) => actions.updateProfile({ published })}
+            onChange={(published) => profileControls ? profileControls.publish(published) : actions.updateProfile({ published })}
           />
         </div>
         {profile.published && (!readOnly || profile.publicUrl) && (
@@ -168,13 +170,14 @@ export function HomePage({
                 ? profile.publicUrl
                 : `omgskills.com/u/${profile.handle}`}
             </span>
-            <Action onClick={copy} disabled={readOnly}>
+            <Action onClick={profileControls?.copy ?? copy} disabled={readOnly && !profileControls}>
               <Copy data-icon="inline-start" />
               Copy
             </Action>
           </div>
         )}
       </section>
+      {profileControls?.error && <p role="alert">{profileControls.error}</p>}
       <section className="rd-private-source">
         <h2>Private source</h2>
         {data.privateSourceConnected === null ? (

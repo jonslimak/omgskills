@@ -12,6 +12,7 @@ import { PortalApp } from "../app/PortalApp";
 import { Action, IconAction } from "../app/ui";
 import type { PortalActions } from "../app/model";
 import { ReadOnlySetDetail } from "./ReadOnlySetDetail";
+import { ProfileDialog } from "./ProfileDialog";
 import { usePortalApi } from "../portal-api";
 import { emptyAccount, type AccountIdentity } from "./data";
 import { integrationConfigurationError } from "./gate";
@@ -31,15 +32,16 @@ function localStorageForAccount() {
   try { return window.sessionStorage; } catch { return undefined; }
 }
 
-function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: string }) {
+function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity; cacheKey: string; sessionId: string }) {
   const api = usePortalApi();
   const clerk = useClerk();
   const apiRef = useRef(api);
   apiRef.current = api;
-  const [snapshot, setSnapshot] = useState<AccountSnapshot>({ data: null, refreshing: true, error: "", accessDenied: false, revision: 0 });
+  const [snapshot, setSnapshot] = useState<AccountSnapshot>({ data: null, refreshing: true, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "" });
   const sessionRef = useRef<ReturnType<typeof createAccountSession> | null>(null);
   const [recovery, setRecovery] = useState(0);
   const [signingOut, setSigningOut] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [notice, notify] = useState("");
 
   useEffect(() => {
@@ -65,8 +67,9 @@ function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: 
     if (signingOut) return;
     setSigningOut(true);
     sessionRef.current?.dispose();
-    setSnapshot({ data: null, refreshing: false, error: "", accessDenied: false, revision: 0 });
-    try { await clerk.signOut({ redirectUrl: base }); }
+    setProfileOpen(false);
+    setSnapshot({ data: null, refreshing: false, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "" });
+    try { await clerk.signOut({ sessionId, redirectUrl: base }); }
     catch {
       setSigningOut(false);
       notify("Could not sign out. Please try again.");
@@ -81,7 +84,7 @@ function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: 
   }, [notice]);
 
   const unavailable = () =>
-    notify("Changes are not enabled in this read-only view.");
+    notify("Set and device changes are not enabled yet.");
   const actions: PortalActions = {
     updateSet: unavailable,
     createSet: unavailable,
@@ -92,7 +95,16 @@ function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: 
     retry: () => { void sessionRef.current?.refresh(); },
   };
   const data = snapshot.data ?? emptyAccount(identity);
+  async function saveProfile(changes: { handle?: string; published?: boolean }) {
+    const session = sessionRef.current;
+    if (!session) throw new Error("Account is not ready.");
+    await session.saveProfile(changes);
+    if (sessionRef.current !== session) return;
+    setProfileOpen(false);
+    notify("Profile saved locally.");
+  }
   return (
+    <>
     <PortalApp
       data={data}
       actions={actions}
@@ -100,7 +112,16 @@ function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: 
       base={base}
       readOnly
       accountControls={{ settings: () => clerk.openUserProfile(), signOut: () => { void signOut(); }, busy: signingOut }}
-      refreshControl={<IconAction label="Refresh account" disabled={snapshot.refreshing || signingOut}
+      profileControls={{ edit: () => setProfileOpen(true),
+        publish: (published) => { void saveProfile({ published }).catch(() => {}); },
+        busy: snapshot.profileSaving || snapshot.refreshing || signingOut || Boolean(snapshot.error),
+        error: snapshot.profileError,
+        copy: () => {
+          if (data.profile.publicUrl) void navigator.clipboard.writeText(data.profile.publicUrl)
+            .then(() => notify("Profile link copied."), () => notify("Could not copy the link."));
+        },
+      }}
+      refreshControl={<IconAction label="Refresh account" disabled={snapshot.refreshing || snapshot.profileSaving || signingOut}
         onClick={() => { void sessionRef.current?.refresh(); }}>
         <RefreshCw className={snapshot.refreshing ? "rd-spin" : undefined} />
       </IconAction>}
@@ -108,7 +129,7 @@ function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: 
       notify={notify}
       previewBar={
         <div className="rd-preview-bar" role="status">
-          <span>Local integration · test account · read-only</span>
+          <span>Local integration · profile changes stay local</span>
           {snapshot.error && <span role="alert">{snapshot.error}</span>}
           {snapshot.accessDenied && <Action onClick={() => { void signOut(); }} disabled={signingOut}>Sign out</Action>}
         </div>
@@ -123,6 +144,11 @@ function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: 
         />
       )}
     />
+    {profileOpen && snapshot.data && !snapshot.accessDenied && <ProfileDialog
+      handle={data.profile.handle} saving={snapshot.profileSaving} blocked={Boolean(snapshot.error)}
+      error={snapshot.profileError} close={() => setProfileOpen(false)}
+      save={(handle) => saveProfile({ handle })} />}
+    </>
   );
 }
 
@@ -140,7 +166,7 @@ function Session() {
   }, [cacheKey, isLoaded]);
   if (!isLoaded || (isSignedIn && !user))
     return <Entry title="Loading account..." />;
-  if (!isSignedIn || !user || !userId || !cacheKey)
+  if (!isSignedIn || !user || !userId || !cacheKey || !sessionId)
     return (
       <Entry title="Sign in to the test portal">
         <SignInButton mode="modal" forceRedirectUrl={window.location.href}>
@@ -152,6 +178,7 @@ function Session() {
     <Account
       key={`${userId}:${sessionId}`}
       cacheKey={cacheKey}
+      sessionId={sessionId}
       identity={{
         name:
           user.fullName || user.primaryEmailAddress?.emailAddress || "Account",

@@ -77,6 +77,7 @@ export function PortalApp({
   renderDetail,
   accountControls,
   refreshControl,
+  profileControls,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -89,6 +90,7 @@ export function PortalApp({
   renderDetail?: (groupId: string) => ReactNode;
   accountControls?: import("./model").AccountControls;
   refreshControl?: ReactNode;
+  profileControls?: import("./model").ProfileControls;
 }) {
   const [locationKey, setLocationKey] = useState(
     location.pathname + location.search,
@@ -489,6 +491,7 @@ export function PortalApp({
                 {route.page === "home" && (
                   <HomePage
                     accountControls={accountControls}
+                    profileControls={profileControls}
                     readOnly={readOnly}
                     data={data}
                     actions={actions}

@@ -132,3 +132,105 @@ test("unavailable browser storage does not block live reads", async () => {
   assert.equal(session.getSnapshot().data?.profile.handle, "tester");
   session.dispose();
 });
+
+test("profile edits preserve publication, use returned canonical values and reject concurrent saves", async () => {
+  const bodies: unknown[] = [];
+  let release = () => {};
+  const transport: PortalApi = <T>(path: string, init?: RequestInit) => {
+    if (init?.method === "PATCH") {
+      bodies.push(JSON.parse(init.body as string));
+      return new Promise<T>((resolve) => { release = () => resolve({ profile: {
+        handle: "normalized", profilePublished: true, publicUrl: "http://localhost/u/normalized",
+      } } as T); });
+    }
+    return Promise.resolve((path.endsWith("profile") ? { profile: {
+      handle: "original", profilePublished: true, publicUrl: "http://localhost/u/original",
+    } } : response(path)) as T);
+  };
+  const session = createAccountSession({ api: transport, identity, cacheKey: key, changed: noOp });
+  await session.refresh();
+  const save = session.saveProfile({ handle: "Normalized" });
+  await assert.rejects(session.saveProfile({ published: false }), /already in progress/);
+  assert.deepEqual(bodies, [{ handle: "Normalized", profilePublished: true }]);
+  assert.equal(session.getSnapshot().profileSaving, true);
+  release();
+  await save;
+  assert.equal(session.getSnapshot().data?.profile.handle, "normalized");
+  assert.equal(session.getSnapshot().data?.profile.publicUrl, "http://localhost/u/normalized");
+  assert.equal(session.getSnapshot().profileSaving, false);
+  session.dispose();
+});
+
+test("older refresh results cannot overwrite a profile save; focus does not race writes", async () => {
+  let delay = false;
+  const releases: (() => void)[] = [];
+  const signals: AbortSignal[] = [];
+  const transport: PortalApi = <T>(path: string, init?: RequestInit) => {
+    if (init?.method === "PATCH") return Promise.resolve({ profile: { handle: "new-handle", profilePublished: false, publicUrl: "http://localhost/u/new-handle" } } as T);
+    if (delay) return new Promise<T>((resolve) => {
+      signals.push(init!.signal!);
+      releases.push(() => resolve(response(path) as T));
+    });
+    return Promise.resolve(response(path) as T);
+  };
+  const session = createAccountSession({ api: transport, identity, cacheKey: key, changed: noOp });
+  await session.refresh();
+  delay = true;
+  const old = session.refresh();
+  const save = session.saveProfile({ handle: "new-handle" });
+  const focus = session.refresh(true);
+  assert.equal(releases.length, 4);
+  assert.ok(signals.every((signal) => signal.aborted));
+  await save;
+  await focus;
+  releases.forEach((release) => release());
+  await old;
+  assert.equal(session.getSnapshot().data?.profile.handle, "new-handle");
+  session.dispose();
+});
+
+test("validation failures keep saved values; authorization loss removes account data", async () => {
+  for (const status of [400, 409, 401, 403, 500]) {
+    const storage = memoryStorage();
+    const transport: PortalApi = async <T>(path: string, init?: RequestInit) => {
+      if (init?.method === "PATCH") throw new PortalApiError(status === 409 ? "Handle is already taken" : "Handle is reserved", status);
+      return response(path) as T;
+    };
+    const session = createAccountSession({ api: transport, identity, cacheKey: key, storage, changed: noOp });
+    await session.refresh();
+    await assert.rejects(session.saveProfile({ published: true }));
+    assert.equal(session.getSnapshot().profileSaving, false);
+    if ([401, 403].includes(status)) {
+      assert.equal(session.getSnapshot().data, null);
+      assert.equal(storage.getItem(key), null);
+    } else {
+      assert.equal(session.getSnapshot().data?.profile.published, false);
+      assert.match(session.getSnapshot().profileError, status === 500 ? /Could not confirm/ : /Handle/);
+    }
+    session.dispose();
+  }
+});
+
+test("save completion after account switch never updates state or cache", async () => {
+  let release = () => {};
+  const states: AccountSnapshot[] = [];
+  const storage = memoryStorage();
+  let signal: AbortSignal | null | undefined;
+  const transport: PortalApi = <T>(path: string, init?: RequestInit) => {
+    if (init?.method === "PATCH") return new Promise<T>((resolve) => {
+      signal = init.signal;
+      release = () => resolve({ profile: { handle: "late", profilePublished: true, publicUrl: null } } as T);
+    });
+    return Promise.resolve(response(path) as T);
+  };
+  const session = createAccountSession({ api: transport, identity, cacheKey: key, storage, changed: (state) => states.push(state) });
+  await session.refresh();
+  const save = session.saveProfile({ handle: "late" });
+  session.dispose();
+  const count = states.length;
+  assert.equal(signal?.aborted, true);
+  release();
+  await assert.rejects(save, { name: "AbortError" });
+  assert.equal(states.length, count);
+  assert.equal(storage.getItem(key), null);
+});
