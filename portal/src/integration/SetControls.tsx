@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { DropdownMenu } from "radix-ui";
-import { EyeOff, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Copy, EyeOff, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { copySetLink, type SetLink } from "../app/set-link";
 import { Action, IconAction, Modal, TextInput } from "../app/ui";
 import { visibilityLabels, type PortalSet, type Visibility } from "../app/model";
 import type { SetCommand } from "./set-data";
 
 type Dialog = "create" | "edit" | "delete";
-export function SetControls({ page, set, blocked, saving, save, navigate, notify }: {
+export function SetControls({ page, set, blocked, saving, save, navigate, notify, link }: {
   page: string;
   set: PortalSet | null;
   blocked: boolean;
@@ -14,11 +15,13 @@ export function SetControls({ page, set, blocked, saving, save, navigate, notify
   save: (command: SetCommand) => Promise<{ groupId: string; refreshed: boolean }>;
   navigate: (path: string) => void;
   notify: (message: string) => void;
+  link?: SetLink;
 }) {
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
+  const [copying, setCopying] = useState(false);
   const active = useRef(false);
   const pending = useRef(false);
   useEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
@@ -49,6 +52,15 @@ export function SetControls({ page, set, blocked, saving, save, navigate, notify
   const owner = page === "detail" && set?.role === "owner";
   const disabled = blocked || saving || (page === "detail" && !owner);
   return <>
+    {page === "detail" && set && link && <Action aria-label="Copy set link" title={link.description} disabled={blocked || saving || copying}
+      onClick={() => {
+        const origin = location.pathname;
+        setCopying(true); setError("");
+        void copySetLink(link, (text) => navigator.clipboard.writeText(text))
+          .then((message) => { if (active.current && location.pathname === origin) notify(message); })
+          .catch((error) => { if (active.current && location.pathname === origin) setError(error.message); })
+          .finally(() => { if (active.current) setCopying(false); });
+      }}><Copy data-icon="inline-start" /><span className="rd-desktop">Copy link</span></Action>}
     {page === "sets" && <Action variant="default" disabled={disabled} onClick={() => open("create")}>
       <Plus data-icon="inline-start" />New set
     </Action>}

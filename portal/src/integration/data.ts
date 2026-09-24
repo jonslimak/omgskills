@@ -65,6 +65,7 @@ export function setSummary(
   }
   return {
     id: group.id,
+    slug: typeof group.slug === "string" ? group.slug : undefined,
     name: group.name,
     description: group.description ?? "",
     visibility: group.visibility ?? "private",

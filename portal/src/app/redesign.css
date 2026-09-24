@@ -704,6 +704,9 @@ button.rd-skill-title:hover {
 }
 .rd-email-form p {
   width: 100%;
+  color: var(--muted-foreground);
+}
+.rd-email-form p[role="alert"] {
   color: var(--destructive);
 }
 .rd-detail-table .rd-detail-action-column {

@@ -32,6 +32,7 @@ function validCache(data: PortalData) {
     (s.githubUrl === null || typeof s.githubUrl === "string")) &&
     Array.isArray(data.sets) && data.sets.every((s) => s && typeof s.id === "string" &&
       typeof s.name === "string" && typeof s.ownerName === "string" &&
+      (s.slug === undefined || typeof s.slug === "string") &&
       ["owner", "invited", "public"].includes(s.role) &&
       Array.isArray(s.items) && s.items.length === 0 && Array.isArray(s.emails) &&
       s.emails.every((email) => typeof email === "string") &&

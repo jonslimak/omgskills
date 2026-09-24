@@ -62,7 +62,7 @@ const actions: PortalActions = {
 };
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 
-test("local mutation allowlist permits profile, sets and item operations only", () => {
+test("local mutation allowlist permits profile, sets, items and email access only", () => {
   assert.equal(isIntegrationRequest("/api/portal/profile", "PATCH"), true);
   assert.equal(isIntegrationRead("/api/portal/profile", "PATCH"), false);
   assert.equal(isIntegrationRequest("/api/portal/groups", "POST"), true);
@@ -70,14 +70,16 @@ test("local mutation allowlist permits profile, sets and item operations only", 
   assert.equal(isIntegrationRequest("/api/portal/groups/a", "DELETE"), true);
   assert.equal(isIntegrationRequest("/api/portal/groups/a/moderation", "PATCH"), true);
   for (const method of ["POST", "PATCH", "DELETE"]) assert.equal(isIntegrationRequest("/api/portal/groups/a/items", method), true);
-  for (const path of ["/api/portal/devices", "/api/portal/profile?x=1", "/api/portal/groups/a/allowed-emails", "/api/portal/sync-upload"]) {
+  for (const method of ["POST", "DELETE"]) assert.equal(isIntegrationRequest("/api/portal/groups/a/allowed-emails", method), true);
+  assert.equal(isIntegrationRequest("/api/portal/groups/a/allowed-emails", "PATCH"), false);
+  for (const path of ["/api/portal/devices", "/api/portal/profile?x=1", "/api/portal/sync-upload"]) {
     for (const method of ["POST", "PATCH", "DELETE"]) assert.equal(isIntegrationRequest(path, method), false);
   }
   assert.equal(isIntegrationRequest("/api/portal/profile", "DELETE"), false);
   assert.equal(isIntegrationRequest("/api/portal/profile", "POST"), false);
 });
 
-test("local body guard allows synced membership without arbitrary publication or email access", () => {
+test("local body guard allows synced membership and narrow email bodies without arbitrary publication", () => {
   const path = "/api/portal/groups";
   const body = { name: "Test", visibility: "private", syncedSkillIds: [] };
   assert.equal(isIntegrationBody(path, "POST", body), true);
@@ -97,6 +99,10 @@ test("local body guard allows synced membership without arbitrary publication or
   assert.equal(isIntegrationBody(`${path}/a/items`, "DELETE", { itemId: "id" }), true);
   assert.equal(isIntegrationBody(`${path}/a/items`, "PATCH", { itemIds: ["a", "b"] }), true);
   assert.equal(isIntegrationBody(`${path}/a/items`, "PATCH", { itemIds: ["a", "a"] }), false);
+  assert.equal(isIntegrationBody(`${path}/a/allowed-emails`, "POST", { email: "reader@example.test" }), true);
+  assert.equal(isIntegrationBody(`${path}/a/allowed-emails`, "DELETE", { emailId: "record-id" }), true);
+  assert.equal(isIntegrationBody(`${path}/a/allowed-emails`, "DELETE", { email: "reader@example.test" }), false);
+  assert.equal(isIntegrationBody(`${path}/a/allowed-emails`, "POST", { email: "reader@example.test", role: "owner" }), false);
 });
 
 test("integration requires development, loopback, a dedicated path, and explicit opt-in", () => {

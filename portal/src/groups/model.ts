@@ -8,8 +8,8 @@ export function publicSiteOrigin() {
   return window.location.origin;
 }
 
-export function publicGroupUrl(handle: string, slug: string) {
-  return `${publicSiteOrigin()}/u/${handle}/sets/${slug}`;
+export function publicGroupUrl(handle: string, slug: string, origin = publicSiteOrigin()) {
+  return `${origin}/u/${handle}/sets/${slug}`;
 }
 
 export const groupVisibilityOptions: Array<{ value: GroupVisibility; label: string }> = [

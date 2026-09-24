@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2 and C1-C3 are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. C4 and Slice D are not started. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2 and C1-C4 are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. Slice D is not started. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -174,7 +174,13 @@ Implemented locally using existing APIs: membership toggles, Favorites, sequenti
 
 Verification: 76 portal tests, 26 backend access/behavior/endpoint/publication tests, root typecheck and production build pass. Browser checks on disposable local skills covered a grouped Claude/Codex pair, selected creation, add/remove/reorder, checked membership, star/unstar with public disclosure, duplicate-safe bulk add, reload persistence and a 390px dialog. Original set/skills fingerprint unchanged after cleanup. Partial failures, unknown outcomes and account races have automated coverage; Favorites first creation/race and resolved-skill publication were tested with controlled API/dependency fixtures, not live GitHub publication. Real two-account/shared-access browser checks remain open. No push or deployment.
 
-Next: C4 allowed-email controls and link behavior. Keep device/private-source actions disabled throughout.
+### C4: Email Access And Sharing Links
+
+Implemented locally: owners add normalized emails to active Invite-only sets and remove saved emails by record ID with confirmation. Shared viewers never receive email controls or lists. Public/Only-me/hidden states distinguish saved emails from active access; the UI explicitly says read-only access and no invitation email is sent. Reuses the account-wide save lock, cancellation and refresh/error handling; no automatic mutation retry.
+
+Copy link awaits a successful clipboard write. Local links always use the local authenticated detail route. The reusable link helper selects canonical `/u/{handle}/sets/{slug}` only for eligible owned, visible public sets with a published profile; otherwise it uses an authenticated detail link. No Mac deep links.
+
+Verification: 89 portal tests, 34 backend access/behavior/endpoint/public-route tests, root typecheck and production builds pass. Local entries remain excluded with their flags enabled. Browser checks covered normalization, duplicate draft retention, visibility transitions, removal confirmation/cancellation, reload, actual clipboard contents and a 390px layout. Real isolated SQL verified read-only access, denial while Only me and denial after removal. Disposable set removed; original set/skills fingerprint unchanged. A real second-account browser session and deployed public-page navigation remain unverified. No push or deployment.
 
 ### Interaction Rules
 
@@ -186,10 +192,10 @@ Next: C4 allowed-email controls and link behavior. Keep device/private-source ac
 - [x] New-set creation passes selected IDs through the existing supported API parameter and refreshes returned state.
 - [x] C2: Preserve rename, description, delete confirmation, and Hide/Restore.
 - [x] C3: Wire reorder/item removal while preserving source links and every set item kind.
-- [ ] Owner-only controls remain absent for shared viewers; server checks remain the security boundary.
-- [ ] Keep allowed-email access wording accurate and preserve restricted/private distinctions.
-- [ ] For an owned public set with a known handle/slug, use the canonical web URL. Otherwise use the authenticated detail link with access-appropriate wording. Defer adding a server `shareUrl` unless this proves insufficient.
-- [ ] Show clipboard success only after an actual successful write. Never derive a web link from a disabled Mac deep link.
+- [x] Owner-only controls remain absent for shared viewers; server checks remain the security boundary. Automated/SQL checks pass; real second-account browser verification remains open.
+- [x] Keep allowed-email access wording accurate and preserve restricted/private distinctions.
+- [x] For an owned visible public set with a published profile and known handle/slug, use the canonical web URL. Otherwise use the authenticated detail link with access-appropriate wording. Local integration always uses localhost. No server `shareUrl` needed.
+- [x] Show clipboard success only after an actual successful write. Never derive a web link from a disabled Mac deep link.
 
 **Exit:** toggles persist correctly across refresh; non-representative membership and partial failures are tested; no behavior depends on a name match or fake successful response.
 
@@ -246,4 +252,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-C1-C3 supply authorized item/email IDs, basic set editing and membership actions. Next plan C4 allowed-email controls and link behavior; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.
+C1-C4 supply authorized item/email IDs, set editing, membership, email access and link actions. Next plan Slice D devices/private sources/gates; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.

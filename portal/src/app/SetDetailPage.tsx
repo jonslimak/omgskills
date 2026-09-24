@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, X, Plus, EyeOff, Star } from "lucide-react";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
 import { isMember, membershipStatus, visibilityLabels, type PortalActions, type PortalSet, type MembershipControls } from "./model";
@@ -25,6 +25,7 @@ export function SetDetailPage({
   newSet,
   readOnly = false,
   membership,
+  accessControls,
 }: {
   set: PortalSet;
   actions: PortalActions;
@@ -37,6 +38,7 @@ export function SetDetailPage({
   newSet: (skills: GroupedSyncedSkill[]) => void;
   readOnly?: boolean;
   membership?: MembershipControls;
+  accessControls?: ReactNode;
 }) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -73,7 +75,7 @@ export function SetDetailPage({
         </p>
       )}
       {set.description && <p className="rd-intro">{set.description}</p>}
-      <div className="rd-access-strip">
+      {accessControls ?? <div className="rd-access-strip">
         <strong>Access</strong>
         {readOnly && <StatusBadge>{visibilityLabels[set.visibility]}</StatusBadge>}
         <span className="rd-member">
@@ -136,7 +138,7 @@ export function SetDetailPage({
             {emailError && <p role="alert">{emailError}</p>}
           </form>
         )}
-      </div>
+      </div>}
       <div className="rd-section-heading">
         <h2>
           Skills <span className="rd-muted">{set.items.length}</span>

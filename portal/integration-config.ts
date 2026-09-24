@@ -37,18 +37,22 @@ export function isIntegrationRequest(path: string, method = "GET") {
     (path === "/api/portal/groups" && verb === "POST") ||
     (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+$/.test(path) && ["PATCH", "DELETE"].includes(verb)) ||
     (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/moderation$/.test(path) && verb === "PATCH") ||
-    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/items$/.test(path) && ["POST", "PATCH", "DELETE"].includes(verb));
+    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/items$/.test(path) && ["POST", "PATCH", "DELETE"].includes(verb)) ||
+    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/allowed-emails$/.test(path) && ["POST", "DELETE"].includes(verb));
 }
 
-// Only synced membership is writable here; GitHub/catalog entry and email access stay blocked.
+// Only existing set/access operations are writable; GitHub/catalog entry and device APIs stay blocked.
 export function isIntegrationBody(path: string, method: string, body: unknown) {
   if (!isIntegrationRequest(path, method)) return false;
-  if (method === "GET" || (method === "DELETE" && !path.endsWith("/items"))) return body === undefined;
+  if (method === "GET" || (method === "DELETE" && !path.endsWith("/items") && !path.endsWith("/allowed-emails"))) return body === undefined;
   if (!body || typeof body !== "object" || Array.isArray(body)) return false;
   const value = body as Record<string, unknown>;
   const only = (keys: string[]) => Object.keys(value).every((key) => keys.includes(key));
   if (path === "/api/portal/profile") return only(["handle", "profilePublished"]);
   const ids = (items: unknown) => Array.isArray(items) && items.every((id) => typeof id === "string" && /^[a-zA-Z0-9_-]+$/.test(id)) && new Set(items).size === items.length;
+  if (path.endsWith("/allowed-emails")) return method === "POST"
+    ? only(["email"]) && typeof value.email === "string" && value.email.length <= 320
+    : only(["emailId"]) && ids([value.emailId]);
   if (path === "/api/portal/groups") return only(["name", "visibility", "syncedSkillIds", "isFavorites"])
     && typeof value.name === "string" && ids(value.syncedSkillIds)
     && (value.isFavorites === true ? value.name === "Favorite Skills" && value.visibility === "public" && (value.syncedSkillIds as string[]).length > 0

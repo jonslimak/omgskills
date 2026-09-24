@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { PortalApi } from "../portal-api";
 import type { PortalActions, PortalSet, MembershipControls } from "../app/model";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
@@ -8,7 +8,7 @@ import { startSetRead } from "./read-session";
 
 const noOp = () => {};
 
-export function ReadOnlySetDetail({ groupId, api, actions, hasSummary, loaded, membership, edit = false, skills = [], sets = [] }: {
+export function ReadOnlySetDetail({ groupId, api, actions, hasSummary, loaded, membership, edit = false, skills = [], sets = [], renderAccess }: {
   groupId: string;
   api: PortalApi;
   actions: PortalActions;
@@ -18,6 +18,7 @@ export function ReadOnlySetDetail({ groupId, api, actions, hasSummary, loaded, m
   edit?: boolean;
   skills?: GroupedSyncedSkill[];
   sets?: PortalSet[];
+  renderAccess?: (set: PortalSet) => ReactNode;
 }) {
   const apiRef = useRef(api);
   apiRef.current = api;
@@ -41,6 +42,7 @@ export function ReadOnlySetDetail({ groupId, api, actions, hasSummary, loaded, m
   return <>
     {!hasSummary && <h2>{set.name}</h2>}
     <SetDetailPage set={set} sets={sets} skills={skills} actions={actions} membership={membership}
+      accessControls={renderAccess?.(set)}
       readOnly edit={edit} addSkills={noOp} notify={noOp} star={noOp} newSet={noOp} />
   </>;
 }

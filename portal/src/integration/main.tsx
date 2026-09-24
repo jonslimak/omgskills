@@ -12,7 +12,9 @@ import { PortalApp } from "../app/PortalApp";
 import { Action, IconAction } from "../app/ui";
 import type { PortalActions, PortalSet } from "../app/model";
 import { SetControls } from "./SetControls";
-import type { SetCommand } from "./set-data";
+import type { SetCommand, EmailCommand } from "./set-data";
+import { SetAccessControls } from "./SetAccessControls";
+import { setLink } from "../app/set-link";
 import { useMembershipControls } from "./useMembershipControls";
 import type { MembershipCommand } from "./membership-data";
 import { groupSyncedSkills } from "../synced-skill-grouping";
@@ -126,6 +128,14 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
     if (sessionRef.current !== session) throw new DOMException("Account changed", "AbortError");
     return result;
   }
+  async function saveEmail(command: EmailCommand) {
+    const origin = location.pathname;
+    const result = await saveSet(command);
+    if (location.pathname === origin) notify(result.refreshed
+      ? command.kind === "add-email" ? "Email access added. No email sent." : "Saved email removed."
+      : "Saved. Refresh to confirm the latest access records.");
+    return result;
+  }
   const membership = useMembershipControls({ data,
     busy: snapshot.setSaving || snapshot.profileSaving,
     blocked: snapshot.refreshing || signingOut || Boolean(snapshot.error) || !snapshot.data,
@@ -143,6 +153,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
       onNavigate={membership.dismiss}
       setControls={(page, id, navigate) => <SetControls key={`${page}:${id ?? ""}`} page={page}
         set={detailSet?.id === id ? detailSet : null}
+        link={detailSet && detailSet.id === id ? setLink(detailSet, data.profile, location.origin, base, true) : undefined}
         blocked={snapshot.refreshing || snapshot.profileSaving || signingOut || Boolean(snapshot.error)}
         saving={snapshot.setSaving} save={saveSet} navigate={navigate} notify={notify} />}
       accountControls={{ settings: () => clerk.openUserProfile(), signOut: () => { void signOut(); }, busy: signingOut }}
@@ -181,6 +192,8 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
           edit={edit}
           sets={data.sets}
           skills={groupSyncedSkills(data.skills)}
+          renderAccess={(set) => <SetAccessControls set={set} busy={snapshot.setSaving || snapshot.profileSaving}
+            blocked={snapshot.refreshing || signingOut || Boolean(snapshot.error)} save={saveEmail} />}
         />
       )}
     />
