@@ -1,15 +1,15 @@
-# Local Portal Integration (B1-C1)
+# Local Portal Integration (B1-C2)
 
 Updated 2026-09-24. Local checkpoints on `codex/web-portal-redesign`; not pushed or deployed. Signed-in reads, account controls and profile editing pass against an isolated account snapshot. Production was read only for the approved snapshot; no production writes/migrations, deployment, feature activation, or Mac changes were made.
 
 ## Boundaries
 
-- `/app/integration/` uses development Clerk, real API reads and isolated profile saves. `/app/preview/` remains sample-only.
+- `/app/integration/` uses development Clerk, real API reads and isolated profile/basic-set saves. `/app/preview/` remains sample-only.
 - Skills, owned/shared set summaries, profile, and existing set detail are connected. Set counts come from summaries; items are fetched only on detail navigation.
-- Home supports account settings, sign-out, handle edits and publication on/off. Profile writes stay in the isolated database. Set editing, Favorites/membership changes, device controls and private sources are not enabled. Unknown device/source state is not presented as disconnected.
-- Detail uses the redesigned set layout with lazy API reads, validated metadata, cancellation, loading/error/retry states and disabled mutations. `/app/connect` and existing production routes are unchanged.
+- Home supports account settings, sign-out, handle edits and publication on/off. Sets supports empty private creation, owner details/visibility, Hide/Restore and confirmed deletion. All writes stay in the isolated database. Favorites identity is protected; membership, ordering, allowed emails, device controls and private sources remain disabled.
+- Detail uses the redesigned set layout with lazy API reads, validated metadata, cancellation and loading/error/retry states. Only authorized owners receive basic-set controls; item/access controls remain read-only. `/app/connect` and existing production routes are unchanged.
 - Account identity/session changes remount the controller; cancelled reads/saves cannot deliver stale results. A 15-minute per-tab cache is scoped to Clerk instance/user/session. Focus/visibility and manual refresh deduplicate requests; transient errors preserve usable data, while 401/403 and sign-out clear it.
-- The local proxy/backend allow only GET for synced-skills, groups, shared, profile, individual group detail, plus PATCH for profile. All other mutations and unrelated endpoints are blocked. **GET still reconciles users in the backend**, so this is not safe against production data.
+- The local proxy/backend allow required GETs, profile PATCH, groups POST, group PATCH/DELETE and moderation PATCH. The harness also validates bodies: create must be empty/private, updates cannot modify membership/access. All unrelated endpoints remain blocked. **GET still reconciles users in the backend**, so this is not safe against production data.
 
 ## Environment Gate
 
@@ -34,7 +34,7 @@ The last setting is an operator acknowledgement, **not an automated proof of dat
 - Worktree: `/private/tmp/omgskills-web-portal-redesign`.
 - Disposable PostgreSQL 16 database: `omgskills_portal_b1`, data directory `/private/tmp/omgskills-portal-b1.MhPXC3/data`. All nine repository migrations applied; one development account plus the approved metadata snapshot described below.
 - Database accepts a Unix socket only, in an owner-only directory; TCP is disabled. Existing PostgreSQL services are unchanged.
-- Ignored operator scripts/config are in `.netlify/portal-integration/`. `setup.mjs` refuses to overwrite an existing database. `server.mts` runs the five existing portal GET handlers and profile PATCH at `127.0.0.1:8888`, validates the exact database name/data directory through the application's `getPgPool()`, and rejects other writes, unrelated paths, unexpected hosts/origins, oversized bodies and non-development Clerk keys. This is a local handler harness, not verification of Netlify routing/runtime.
+- Ignored operator scripts/config are in `.netlify/portal-integration/`. `setup.mjs` refuses to overwrite an existing database. `server.mts` runs the existing handlers at `127.0.0.1:8888`, using `isIntegrationRequest` and `isIntegrationBody` for the narrow C2 allowlist. It validates the exact database name/data directory through the application's `getPgPool()` and rejects unrelated paths/bodies, unexpected hosts/origins, oversized bodies and non-development Clerk keys. This is a local handler harness, not verification of Netlify routing/runtime.
 - Backend starts with a clean environment and the explicit local database override. No linked Netlify site or managed-database environment is loaded.
 - Development keys are stored in ignored, owner-only `.netlify/portal-integration/clerk.env`. Clerk accepted the secret; backend and frontend JWKS matched, confirming the same development instance. No Clerk settings or credentials were created/changed. Do not substitute production credentials.
 - Backend runs with the verified development credentials. The ignored `frontend.mjs` launcher passes only the public key and local flags to Vite, with verified origin `http://127.0.0.1:8888`; no backend secret is inherited by Vite.
@@ -61,6 +61,10 @@ The launcher sets `PORTAL_TEST_ENVIRONMENT_VERIFIED=1` for this verified local e
 
 ## Verification
 
+- C2: 61 portal tests and 19 backend access/behavior/endpoint tests pass; root typecheck and production build pass. Covers command payloads, double-submit/profile conflicts, stale reads/account disposal, authorization and validation errors, confirmed-write/failed-refresh handling, protected Favorites and shared controls. Production bundles exclude both local entries even with opt-in flags set.
+- C2 browser: disposable set created private/empty; rename/description, all three visibility states, Hide/Restore without visibility changes, duplicate-slug error with retained draft, confirmed delete and reload pass. Detail/dialog fit at 390px. Disposable set removed; `my faves` and installed skills were not modified. Simulated network/account races have automated coverage, not browser fault-injection coverage.
+- C2 safety probes through API and Vite: unsigned basic-set writes return 401; items, allowed emails, devices and sync-upload remain 405. The local harness uses the committed body guard as well as the route allowlist.
+
 - C1: 52 portal tests and 21 backend access/endpoint tests pass; root typecheck and production build pass. Both item read endpoints expose physical skill IDs only to owners and return no-store responses. Owner email-record IDs survive the adapter/cache; older responses remain supported. The email DELETE handler now accepts its existing ID-only request contract.
 - C1 SQL checks passed against the verified isolated database: owner/invited/public reads, deletion by email ID, and denial after access removal. All temporary fixture writes were rolled back; the imported set was unchanged. Authentication was supplied by test dependencies, so these checks do not replace the pending real second-account browser test. Set writes remain blocked in the local proxy/harness.
 
@@ -85,7 +89,7 @@ npm --workspace portal test
 
 Root-level alternative: `TSX_TSCONFIG_PATH=portal/tsconfig.json node --import tsx --test portal/tests/*.test.ts` (needed for the UI tests' path aliases).
 
-Remaining checks: real two-account isolation/switch, shared detail with a separate isolated fixture, and slow/cancelled browser reads (unit coverage exists). Set mutations belong to Slice C. Do not call Slice B fully end-to-end verified yet.
+Remaining checks: real two-account isolation/switch, shared detail with a separate isolated fixture, and slow/cancelled browser reads (unit coverage exists). Membership/Favorites/bulk actions belong to C3; allowed emails/link behavior to C4. Do not call Slice B/C fully end-to-end verified yet.
 
 ## Approved Account Snapshot
 

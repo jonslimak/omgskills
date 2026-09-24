@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
               res.end(
                 JSON.stringify({
                   error: backend
-                    ? "Only approved portal reads and profile saves are enabled."
+                    ? "Only approved portal reads, profile saves and basic set changes are enabled."
                     : "Isolated backend is not configured.",
                 }),
               );

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { isIntegrationRead, isIntegrationRequest, testBackendOrigin } from "../integration-config";
+import { isIntegrationRead, isIntegrationRequest, isIntegrationBody, testBackendOrigin } from "../integration-config";
 import {
   isLocalIntegration,
   integrationConfigurationError,
@@ -62,14 +62,32 @@ const actions: PortalActions = {
 };
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 
-test("local mutation allowlist permits only profile PATCH", () => {
+test("local mutation allowlist permits profile and basic set changes only", () => {
   assert.equal(isIntegrationRequest("/api/portal/profile", "PATCH"), true);
   assert.equal(isIntegrationRead("/api/portal/profile", "PATCH"), false);
-  for (const path of ["/api/portal/groups", "/api/portal/devices", "/api/portal/profile?x=1", "/api/portal/groups/a/items", "/api/portal/sync-upload"]) {
+  assert.equal(isIntegrationRequest("/api/portal/groups", "POST"), true);
+  assert.equal(isIntegrationRequest("/api/portal/groups/a", "PATCH"), true);
+  assert.equal(isIntegrationRequest("/api/portal/groups/a", "DELETE"), true);
+  assert.equal(isIntegrationRequest("/api/portal/groups/a/moderation", "PATCH"), true);
+  for (const path of ["/api/portal/devices", "/api/portal/profile?x=1", "/api/portal/groups/a/items", "/api/portal/groups/a/allowed-emails", "/api/portal/sync-upload"]) {
     for (const method of ["POST", "PATCH", "DELETE"]) assert.equal(isIntegrationRequest(path, method), false);
   }
   assert.equal(isIntegrationRequest("/api/portal/profile", "DELETE"), false);
   assert.equal(isIntegrationRequest("/api/portal/profile", "POST"), false);
+});
+
+test("local body guard excludes membership and implicit Favorites publication", () => {
+  const path = "/api/portal/groups";
+  const body = { name: "Test", visibility: "private", syncedSkillIds: [] };
+  assert.equal(isIntegrationBody(path, "POST", body), true);
+  for (const changes of [{ visibility: "public" }, { isFavorites: true }, { syncedSkillIds: ["id"] }, { items: [] }]) {
+    assert.equal(isIntegrationBody(path, "POST", { ...body, ...changes }), false);
+  }
+  assert.equal(isIntegrationBody(`${path}/a`, "PATCH", { name: "New", description: "Text", visibility: "restricted" }), true);
+  assert.equal(isIntegrationBody(`${path}/a`, "PATCH", { emails: [] }), false);
+  assert.equal(isIntegrationBody(`${path}/a/moderation`, "PATCH", { disabled: true }), true);
+  assert.equal(isIntegrationBody(`${path}/a/moderation`, "PATCH", { disabled: "true" }), false);
+  assert.equal(isIntegrationBody(`${path}/a`, "DELETE", undefined), true);
 });
 
 test("integration requires development, loopback, a dedicated path, and explicit opt-in", () => {

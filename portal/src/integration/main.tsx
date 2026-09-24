@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useRef, useState } from "react";
+import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ClerkProvider,
@@ -10,7 +10,9 @@ import {
 import { RefreshCw } from "lucide-react";
 import { PortalApp } from "../app/PortalApp";
 import { Action, IconAction } from "../app/ui";
-import type { PortalActions } from "../app/model";
+import type { PortalActions, PortalSet } from "../app/model";
+import { SetControls } from "./SetControls";
+import type { SetCommand } from "./set-data";
 import { ReadOnlySetDetail } from "./ReadOnlySetDetail";
 import { ProfileDialog } from "./ProfileDialog";
 import { usePortalApi } from "../portal-api";
@@ -37,7 +39,10 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
   const clerk = useClerk();
   const apiRef = useRef(api);
   apiRef.current = api;
-  const [snapshot, setSnapshot] = useState<AccountSnapshot>({ data: null, refreshing: true, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "" });
+  const [snapshot, setSnapshot] = useState<AccountSnapshot>({ data: null, refreshing: true, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "", setSaving: false });
+  const [detail, setDetail] = useState<{ set: PortalSet | null; revision: number } | null>(null);
+  const loaded = useCallback((set: PortalSet | null) => setDetail({ set, revision: snapshot.revision }), [snapshot.revision]);
+  const detailSet = detail?.revision === snapshot.revision ? detail.set : null;
   const sessionRef = useRef<ReturnType<typeof createAccountSession> | null>(null);
   const [recovery, setRecovery] = useState(0);
   const [signingOut, setSigningOut] = useState(false);
@@ -68,7 +73,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
     setSigningOut(true);
     sessionRef.current?.dispose();
     setProfileOpen(false);
-    setSnapshot({ data: null, refreshing: false, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "" });
+    setSnapshot({ data: null, refreshing: false, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "", setSaving: false });
     try { await clerk.signOut({ sessionId, redirectUrl: base }); }
     catch {
       setSigningOut(false);
@@ -84,7 +89,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
   }, [notice]);
 
   const unavailable = () =>
-    notify("Set and device changes are not enabled yet.");
+    notify("Membership and device changes are not enabled yet.");
   const actions: PortalActions = {
     updateSet: unavailable,
     createSet: unavailable,
@@ -103,6 +108,13 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
     setProfileOpen(false);
     notify("Profile saved locally.");
   }
+  async function saveSet(command: SetCommand) {
+    const session = sessionRef.current;
+    if (!session) throw new Error("Account is not ready.");
+    const result = await session.saveSet(command);
+    if (sessionRef.current !== session) throw new DOMException("Account changed", "AbortError");
+    return result;
+  }
   return (
     <>
     <PortalApp
@@ -111,17 +123,22 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
       state={signingOut ? "loading" : snapshot.data ? "ready" : snapshot.error ? "error" : "loading"}
       base={base}
       readOnly
+      detailSet={detailSet}
+      setControls={(page, id, navigate) => <SetControls key={`${page}:${id ?? ""}`} page={page}
+        set={detailSet?.id === id ? detailSet : null}
+        blocked={snapshot.refreshing || snapshot.profileSaving || signingOut || Boolean(snapshot.error)}
+        saving={snapshot.setSaving} save={saveSet} navigate={navigate} notify={notify} />}
       accountControls={{ settings: () => clerk.openUserProfile(), signOut: () => { void signOut(); }, busy: signingOut }}
       profileControls={{ edit: () => setProfileOpen(true),
         publish: (published) => { void saveProfile({ published }).catch(() => {}); },
-        busy: snapshot.profileSaving || snapshot.refreshing || signingOut || Boolean(snapshot.error),
+        busy: snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing || signingOut || Boolean(snapshot.error),
         error: snapshot.profileError,
         copy: () => {
           if (data.profile.publicUrl) void navigator.clipboard.writeText(data.profile.publicUrl)
             .then(() => notify("Profile link copied."), () => notify("Could not copy the link."));
         },
       }}
-      refreshControl={<IconAction label="Refresh account" disabled={snapshot.refreshing || snapshot.profileSaving || signingOut}
+      refreshControl={<IconAction label="Refresh account" disabled={snapshot.refreshing || snapshot.profileSaving || snapshot.setSaving || signingOut}
         onClick={() => { void sessionRef.current?.refresh(); }}>
         <RefreshCw className={snapshot.refreshing ? "rd-spin" : undefined} />
       </IconAction>}
@@ -129,7 +146,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
       notify={notify}
       previewBar={
         <div className="rd-preview-bar" role="status">
-          <span>Local integration · profile changes stay local</span>
+          <span>Local integration · changes stay local</span>
           {snapshot.error && <span role="alert">{snapshot.error}</span>}
           {snapshot.accessDenied && <Action onClick={() => { void signOut(); }} disabled={signingOut}>Sign out</Action>}
         </div>
@@ -141,6 +158,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
           api={api}
           actions={actions}
           hasSummary={data.sets.some((set) => set.id === id)}
+          loaded={loaded}
         />
       )}
     />

@@ -78,6 +78,8 @@ export function PortalApp({
   accountControls,
   refreshControl,
   profileControls,
+  setControls,
+  detailSet,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -91,6 +93,8 @@ export function PortalApp({
   accountControls?: import("./model").AccountControls;
   refreshControl?: ReactNode;
   profileControls?: import("./model").ProfileControls;
+  setControls?: (page: string, groupId: string | undefined, navigate: (path: string) => void) => ReactNode;
+  detailSet?: PortalSet | null;
 }) {
   const [locationKey, setLocationKey] = useState(
     location.pathname + location.search,
@@ -101,7 +105,7 @@ export function PortalApp({
   const [favoritesAcknowledged, setFavoritesAcknowledged] = useState(false);
   const route = parseRoute(location.pathname, location.search, base);
   const skills = useMemo(() => groupSyncedSkills(data.skills), [data.skills]);
-  const activeSet = data.sets.find((set) => set.id === route.groupId);
+  const activeSet = detailSet?.id === route.groupId ? detailSet : data.sets.find((set) => set.id === route.groupId);
   const sources = [...new Set(data.skills.map((skill) => skill.source))];
   const [pathname] = locationKey.split("?");
   useEffect(() => {
@@ -316,6 +320,7 @@ export function PortalApp({
             <h1>{title}</h1>
             <div className="rd-header-actions">
               {refreshControl}
+              {state === "ready" && setControls?.(route.page, route.groupId, navigate)}
               {route.page === "detail" && activeSet && !readOnly && (
                 <>
                   {activeSet.role === "owner" && !activeSet.isFavorites && (

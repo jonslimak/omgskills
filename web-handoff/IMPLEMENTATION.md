@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2 and C1's data foundation are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. Set actions (C2-C4) and Slice D are not started. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2, C1's data foundation and C2 basic set editing are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. C3-C4 and Slice D are not started. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -157,7 +157,18 @@ See `LOCAL-INTEGRATION.md` for setup and remaining checks. B1 is not end-to-end 
 
 C1 verification: 52 portal tests and 21 backend access/endpoint tests pass; root typecheck and portal production build pass. Real SQL checked owner/invited/public reads, email-ID deletion and revoked access in the isolated database, with all fixture writes rolled back. Set mutation routes remain blocked in the local proxy/harness. No push or deployment.
 
-Next checkpoints: C2 basic set editing; C3 membership/Favorites/bulk actions; C4 allowed-email controls and link behavior. Keep device/private-source actions disabled throughout.
+### C2: Basic Set Editing
+
+- [x] Create empty Only-me sets; navigate only after confirmed creation.
+- [x] Owner name/description and three-state visibility edits, Hide/Restore independent of visibility, and confirmed deletion with return to Sets.
+- [x] Keep Favorites name/visibility/deletion protected; description remains editable. No item, ordering, email, device or pairing mutations enabled.
+- [x] Separate basic-set capability from read-only membership. Detail permissions come from an authorized detail read, not just cached summaries.
+- [x] Await saves, retain failed drafts, block duplicate/conflicting writes, ignore late account/route completions, and refresh summaries/detail after success. Confirmed save plus failed refresh is distinct from an uncertain save; neither automatically retries a mutation.
+- [x] Extend only the local route/body allowlist. Creation is private and empty; no implicit Favorites or selected-skill publication.
+
+C2 verification: 61 portal tests, 19 backend access/behavior/endpoint tests, root typecheck and production build pass. Browser checks passed for create, rename/description, all visibility states, Hide/Restore, duplicate-slug draft retention, delete, reload, and 390px layout. Disposable set deleted; original set unchanged. Local integration remains excluded from production bundles. No push or deployment.
+
+Next checkpoints: C3 membership/Favorites/bulk actions; C4 allowed-email controls and link behavior. Keep device/private-source actions disabled throughout.
 
 ### Interaction Rules
 
@@ -167,7 +178,8 @@ Next checkpoints: C2 basic set editing; C3 membership/Favorites/bulk actions; C4
 - [ ] Unknown membership is a loading/error state, not an unchecked checkbox. Disable conflicting actions while a row/target mutation is pending.
 - [ ] Bulk actions use a small bounded request queue, report per-item outcomes, and retain failed selections for retry. Reconcile duplicate/already-present responses rather than claiming new additions.
 - [ ] New-set creation passes selected IDs through the existing supported API parameter and refreshes returned state.
-- [ ] Preserve rename, description, reorder, source links, remove, delete confirmation, Hide/Restore, and all set item kinds.
+- [x] C2: Preserve rename, description, delete confirmation, and Hide/Restore.
+- [ ] C3: Wire reorder/item removal while preserving source links and every set item kind.
 - [ ] Owner-only controls remain absent for shared viewers; server checks remain the security boundary.
 - [ ] Keep allowed-email access wording accurate and preserve restricted/private distinctions.
 - [ ] For an owned public set with a known handle/slug, use the canonical web URL. Otherwise use the authenticated detail link with access-appropriate wording. Defer adding a server `shareUrl` unless this proves insufficient.
@@ -228,4 +240,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-C1 supplies authorized item/email IDs and the email-removal fix. Next implement C2 basic set editing against the isolated database; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.
+C1-C2 supply authorized item/email IDs and basic set editing. Next plan C3 membership/Favorites/bulk actions against the isolated database; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.

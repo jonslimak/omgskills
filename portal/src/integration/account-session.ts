@@ -2,6 +2,7 @@ import type { PortalApi } from "../portal-api";
 import type { PortalData } from "../app/model";
 import { isAccessError, PortalApiError } from "../api-error";
 import { loadAccountData, readOnlyApi, saveProfileData, type AccountIdentity } from "./data";
+import { saveSetData, type SetCommand } from "./set-data";
 
 export type AccountSnapshot = {
   data: PortalData | null;
@@ -11,6 +12,7 @@ export type AccountSnapshot = {
   revision: number;
   profileSaving: boolean;
   profileError: string;
+  setSaving: boolean;
 };
 type Storage = Pick<globalThis.Storage, "getItem" | "setItem" | "removeItem">;
 const cacheAge = 15 * 60 * 1000;
@@ -54,8 +56,8 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
   let generation = 0;
   let lastAttempt = -Infinity;
   let request: { controller: AbortController; promise: Promise<void> } | undefined;
-  let mutation: { controller: AbortController; promise: Promise<void> } | undefined;
-  let snapshot: AccountSnapshot = { data: null, refreshing: false, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "" };
+  let mutation: { controller: AbortController; promise: Promise<unknown> } | undefined;
+  let snapshot: AccountSnapshot = { data: null, refreshing: false, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "", setSaving: false };
   const clearCache = () => { try { storage?.removeItem(cacheKey); } catch { /* Best effort. */ } };
   try {
     const cached = JSON.parse(storage?.getItem(cacheKey) || "null");
@@ -73,7 +75,7 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
   }
   function refresh(automatic = false): Promise<void> {
     if (!active) return Promise.resolve();
-    if (mutation) return mutation.promise.catch(() => {});
+    if (mutation) return mutation.promise.then(() => {}, () => {});
     if (request) return request.promise;
     if (automatic && now() - lastAttempt < 5000) return Promise.resolve();
     lastAttempt = now();
@@ -101,7 +103,7 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
   }
   function saveProfile(changes: { handle?: string; published?: boolean }): Promise<void> {
     if (!active || !snapshot.data || snapshot.accessDenied) return Promise.reject(new Error("Load your account before saving."));
-    if (mutation) return Promise.reject(new Error("A profile save is already in progress."));
+    if (mutation) return Promise.reject(new Error("A save is already in progress."));
     const current = snapshot.data;
     const version = ++generation;
     request?.controller.abort();
@@ -130,10 +132,64 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
     mutation = { controller, promise };
     return promise;
   }
+  function saveSet(command: SetCommand): Promise<{ groupId: string; refreshed: boolean }> {
+    if (!active || !snapshot.data || snapshot.accessDenied || snapshot.error) return Promise.reject(new Error("Refresh your account before saving."));
+    if (mutation) return Promise.reject(new Error("A save is already in progress."));
+    const current = snapshot.data;
+    const version = ++generation;
+    request?.controller.abort();
+    request = undefined;
+    const controller = new AbortController();
+    const checkActive = () => {
+      if (!active || version !== generation) throw new DOMException("Account changed", "AbortError");
+    };
+    emit({ refreshing: false, setSaving: true });
+    const promise = (async () => {
+      let result: Awaited<ReturnType<typeof saveSetData>>;
+      try { result = await saveSetData(api, command, controller.signal); }
+      catch (error) {
+        checkActive();
+        const denied = isAccessError(error);
+        const rejected = error instanceof PortalApiError && [400, 404, 409, 422, 429].includes(error.status);
+        if (denied) clearCache();
+        const message = denied ? "Account access is unavailable. Sign in again."
+          : rejected ? error.message : "Could not confirm the save. Refresh before trying again.";
+        emit({ data: denied ? null : current, accessDenied: denied, setSaving: false,
+          error: denied || !rejected ? message : "" });
+        throw new Error(message);
+      }
+      checkActive();
+      // Preserve confirmed changes even if the following summary read fails.
+      const sets = command.kind === "delete" ? current.sets.filter((set) => set.id !== result.groupId)
+        : current.sets.map((set) => set.id === result.groupId ? { ...set, ...result.fields,
+          ...(command.kind === "moderate" ? { hidden: command.hidden } : {}) } : set);
+      const confirmed = { ...current, sets };
+      persist(confirmed);
+      emit({ data: confirmed });
+      try {
+        const data = await loadAccountData(readOnlyApi(api, controller.signal), identity);
+        checkActive();
+        persist(data);
+        emit({ data, error: "", setSaving: false, revision: snapshot.revision + 1 });
+        return { groupId: result.groupId, refreshed: true };
+      } catch (error) {
+        checkActive();
+        const denied = isAccessError(error);
+        if (denied) clearCache();
+        emit({ data: denied ? null : confirmed, accessDenied: denied, setSaving: false, revision: snapshot.revision + 1,
+          error: denied ? "Saved, but account access is unavailable. Sign in again."
+            : "Saved, but could not refresh your account. Refresh to continue." });
+        return { groupId: result.groupId, refreshed: false };
+      }
+    })().finally(() => { if (mutation?.controller === controller) mutation = undefined; });
+    mutation = { controller, promise };
+    return promise;
+  }
   return {
     getSnapshot: () => snapshot,
     refresh,
     saveProfile,
+    saveSet,
     dispose(removeCache = true) {
       active = false;
       generation++;

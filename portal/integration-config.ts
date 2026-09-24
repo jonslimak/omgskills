@@ -31,6 +31,25 @@ export function isIntegrationRead(path: string, method = "GET") {
 }
 
 export function isIntegrationRequest(path: string, method = "GET") {
+  const verb = method.toUpperCase();
   return isIntegrationRead(path, method) ||
-    (path === "/api/portal/profile" && method.toUpperCase() === "PATCH");
+    (path === "/api/portal/profile" && verb === "PATCH") ||
+    (path === "/api/portal/groups" && verb === "POST") ||
+    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+$/.test(path) && ["PATCH", "DELETE"].includes(verb)) ||
+    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/moderation$/.test(path) && verb === "PATCH");
+}
+
+// The isolated harness deliberately excludes membership and implicit Favorites creation.
+export function isIntegrationBody(path: string, method: string, body: unknown) {
+  if (!isIntegrationRequest(path, method)) return false;
+  if (["GET", "DELETE"].includes(method)) return body === undefined;
+  if (!body || typeof body !== "object" || Array.isArray(body)) return false;
+  const value = body as Record<string, unknown>;
+  const only = (keys: string[]) => Object.keys(value).every((key) => keys.includes(key));
+  if (path === "/api/portal/profile") return only(["handle", "profilePublished"]);
+  if (path === "/api/portal/groups") return only(["name", "visibility", "syncedSkillIds"])
+    && typeof value.name === "string" && value.visibility === "private"
+    && Array.isArray(value.syncedSkillIds) && value.syncedSkillIds.length === 0;
+  if (path.endsWith("/moderation")) return only(["disabled"]) && typeof value.disabled === "boolean";
+  return only(["name", "description", "visibility"]) && Object.keys(value).length > 0;
 }

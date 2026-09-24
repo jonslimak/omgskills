@@ -7,11 +7,12 @@ import { startSetRead } from "./read-session";
 
 const noOp = () => {};
 
-export function ReadOnlySetDetail({ groupId, api, actions, hasSummary }: {
+export function ReadOnlySetDetail({ groupId, api, actions, hasSummary, loaded }: {
   groupId: string;
   api: PortalApi;
   actions: PortalActions;
   hasSummary: boolean;
+  loaded?: (set: PortalSet | null) => void;
 }) {
   const apiRef = useRef(api);
   apiRef.current = api;
@@ -21,8 +22,10 @@ export function ReadOnlySetDetail({ groupId, api, actions, hasSummary }: {
   useEffect(() => {
     setSet(null);
     setFailed(false);
-    return startSetRead(apiRef.current, groupId, setSet, () => setFailed(true));
-  }, [groupId, attempt]);
+    loaded?.(null);
+    const cancel = startSetRead(apiRef.current, groupId, (value) => { setSet(value); loaded?.(value); }, () => setFailed(true));
+    return () => { cancel(); loaded?.(null); };
+  }, [groupId, attempt, loaded]);
 
   if (failed) return (
     <EmptyState title="Could not load this set" description="It may be unavailable or you may no longer have access.">
