@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2, C1-C4 and D1-D3 are implemented locally. C4, D2 and D3 user manual testing passed. Remaining browser checks are tracked in LOCAL-INTEGRATION.md. D4 remains. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2, C1-C4 and D1-D4 are implemented locally. C4, D2 and D3 user manual testing passed. D4 automated/local checks pass; remaining real-account checks are tracked in LOCAL-INTEGRATION.md. Not production rollout approval. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -214,7 +214,7 @@ D1 verification: 98 portal tests, eight backend device-auth tests, root typechec
 - [x] Connect app opens connection-code/legacy-token tabs using the existing endpoints. Generation is explicit; only empty POST bodies are allowed locally. No scopes, browser callbacks, exchange or upload enabled.
 - [x] Credentials remain memory-only, masked and cleared on close/navigation/account change/tab change/expiry. Duplicate generation is blocked; late request/clipboard completions are ignored. Copy success follows the clipboard write. Closing does not revoke an already-issued code; the local-only warning excludes use in the installed app.
 
-D2 verification: 108 portal tests, root typecheck and normal/flag-enabled production builds pass; local modules remain excluded. User reported generation in both tabs and close/reopen clearing green. SQL confirmed one unused code and one unused legacy token, hashed with ten-minute expiry; both identified test rows removed, zero devices created. Local API/proxy reject unsigned generation (401), nonempty generation bodies and exchange/upload/private-source requests (405). Expiry, rate limits, cancellation/account races and clipboard failure are automated tests, not live browser fault injection. Browser tooling timed out; automated desktop/mobile visual verification remains for D4. No Mac pairing, push or deployment.
+D2 verification: 108 portal tests, root typecheck and normal/flag-enabled production builds pass; local modules remain excluded. User reported generation in both tabs and close/reopen clearing green. SQL confirmed one unused code and one unused legacy token, hashed with ten-minute expiry; both identified test rows removed, zero devices created. Local API/proxy reject unsigned generation (401), nonempty generation bodies and exchange/upload/private-source requests (405). Expiry, rate limits, cancellation/account races and clipboard failure are automated tests, not live browser fault injection. D4 subsequently completed fixture-based desktop/mobile visual checks. No Mac pairing, push or deployment.
 
 ### D3: Private Sources
 
@@ -224,10 +224,14 @@ D2 verification: 108 portal tests, root typecheck and normal/flag-enabled produc
 
 D3 verification: 119 portal tests, 35 backend private-source/release/Broker tests, root typecheck and normal/flag-enabled production builds pass. Local code remains absent from production bundles. Isolated SQL/handler checks cover ownership, permitted repositories, invalid paths, registration/snapshot deduplication and revoked/rate-limited grants; automated test writes rolled back. Component browser checks cover register/snapshot, empty/disconnected/error states and 1440/390/320px layouts using fixture responses. User then completed the signed-in local flow; read-only SQL confirmed the simulated repository at root `.` and one saved snapshot. Those user-created test records remain. Real GitHub is unverified; no push/deploy/Mac change.
 
-### D4: Remaining Checks
+### D4: Safety And Regression Checks
 
-- [ ] D4: Verify separate web/Mac gates. Do not expose Mac install actions because web UI is enabled, or assume existing sync APIs all share one gate.
-- [ ] Recheck `/app/connect` and existing set links independently of the redesign.
+- [x] Verify all four web/Mac gate combinations and production install-button wiring; local routes cannot capture `/app/connect` or enable themselves in a production build. No flag values changed.
+- [x] Recheck connect fragment parsing, existing set-route boundaries and link eligibility with automated tests; no app callback or deployed route exercised.
+- [x] Repeat five-screen desktop/mobile review, D2 dialogs, navigation/reload, shared/denied detail and cancelled reads using isolated browser fixtures.
+- [x] Repeat owner/invited/outsider/anonymous policy checks in isolated SQL, including hidden/private sets and access removal; roll back all fixture writes.
+
+D4 verification: 125 portal tests, 53 targeted backend tests, root typecheck and normal/flag-enabled production builds pass. Fixture browser checks pass at 1440/1024/390/320px, including dialog containment, masking/clearing, keyboard focus/Escape and no external/API traffic. No application behavior changes were needed. Real second-account Clerk switching, deployed public pages, real GitHub and Mac callbacks remain unverified. Reproduction commands are in LOCAL-INTEGRATION.md.
 
 **Exit:** all supported old capabilities remain reachable, placeholders do not claim unimplemented behavior, and no feature flag or protocol was changed unintentionally.
 
@@ -271,4 +275,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-C1-C4 and D1-D3 supply set actions/access/links, device management, connection-code generation and simulated private-source flows. D3 local user verification passed. Next plan D4 gate/regression checks, including D2 mobile visual verification. Finish remaining two-account/shared-access browser checks before closing full verification. Slices B-D are not a production rollout authorization.
+Before any production adoption, plan the remaining real two-account/shared-access browser checkpoint and production-entry integration. The redesign still runs only in local preview/integration; production keeps its existing UI. Real GitHub and Mac callback tests require separate scope approval. No push or deployment is authorized by these local checks.

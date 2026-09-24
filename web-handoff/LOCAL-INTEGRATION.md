@@ -1,4 +1,4 @@
-# Local Portal Integration (B1-D3)
+# Local Portal Integration (B1-D4)
 
 Updated 2026-09-24. Local checkpoints on `codex/web-portal-redesign`; not pushed or deployed. Signed-in reads, account controls and profile editing pass against an isolated account snapshot. Production was read only for the approved snapshot; no production writes/migrations, deployment, feature activation, or Mac changes were made.
 
@@ -66,11 +66,15 @@ The launcher sets `PORTAL_TEST_ENVIRONMENT_VERIFIED=1` for this verified local e
 
 ## Verification
 
+- D4: 125 portal tests and 53 targeted backend tests pass; root typecheck and normal/flag-enabled production builds pass. Both local entries and test fixtures stay absent from production bundles. Checks cover independent web/Mac gates, production install-button wiring, connect fragment/route boundaries and blocked local exchange/upload/package paths. No feature flags or application behavior changed.
+- D4 browser: five screens at 1440/1024/390/320px, mobile navigation, back/forward/reload, shared/denied detail, late reads and empty/loading/error/long-content states pass using fixture data. D2 dialogs pass containment/clipping, masked values, mode/close clearing, focus trapping, Escape and focus return. The runner uses the integration entry's stylesheet order and blocks external/API requests. This completes D2 visual verification, not real Mac pairing.
+- D4 isolated SQL: owner/invited/outsider/anonymous access, public/private/restricted/hidden states and access removal pass through the real policy helper. Fixture users/set are created inside a transaction, rolled back and verified absent. No existing user-created records changed. These supplied actors do not replace two real Clerk browser accounts.
+
 - D3: 119 portal tests and 35 backend private-source/release/Broker tests pass; root typecheck and normal/flag-enabled production builds pass. Production bundles exclude the integration and simulated Broker. Covers strict response parsing, root/path preservation, allowed IDs, concurrent writes, confirmed-write/read failure, uncertain outcomes, abort/account changes and 401/403 clearing. Component browser checks pass at 1440/390/320px with no overflow or runtime errors, including register/snapshot and empty/disconnected/error states. These browser checks use fixture responses, not signed-in end-to-end auth.
 - D3 SQL/handler checks passed against the verified isolated database: duplicate registration and identical snapshots reuse IDs; foreign owners, ungranted repositories and invalid roots fail; revoked/rate-limited grants return 502/503. Automated test writes rolled back; only the synthetic installation binding was seeded. User then completed registration and snapshot creation in the signed-in local UI. Read-only SQL confirmed `local-github-simulation/skills`, root `.`, and one saved release; these user-created test records remain. Unsigned source reads and bodyless snapshot POST return 401 through Vite; private package GET remains 405. Real GitHub remains unverified and needs separate approval.
 
 - D2: 108 portal tests, root typecheck and normal/flag-enabled production builds pass. Tests cover explicit/duplicate generation, mode changes, disposal, late responses, malformed credentials, server-derived expiry, delayed timers, clipboard failure/completion races, 429 and 401/403. Local connection code remains excluded from production bundles.
-- D2 manual: user reported both code modes and close/reopen clearing green. SQL verified exactly one unused pairing code and one unused legacy token with ten-minute expiry and hashed storage; both explicitly identified test rows removed, zero devices created. API/proxy probes confirm unsigned generation is 401 and scopes/exchange/upload/private-source requests are 405. Browser tool timeouts prevented automated desktop/mobile screenshots; retain D2 visual checks for D4. Expiry/race/clipboard-failure checks are automated, not live fault-injected. No end-to-end Mac pairing tested.
+- D2 manual: user reported both code modes and close/reopen clearing green. SQL verified exactly one unused pairing code and one unused legacy token with ten-minute expiry and hashed storage; both explicitly identified test rows removed, zero devices created. API/proxy probes confirm unsigned generation is 401 and scopes/exchange/upload/private-source requests are 405. D4 completed automated desktop/mobile screenshots with fixture responses. Expiry/race/clipboard-failure checks are automated, not live fault-injected. No end-to-end Mac pairing tested.
 
 - D1: 98 portal tests and eight backend device-auth tests pass; root typecheck and normal/flag-enabled production builds pass. Covers status/response validation, duplicate-request prevention, stale-list recovery, confirmed revocation with failed refresh, unknown outcomes, account disposal and 401/403 clearing. Production excludes the local device panel.
 - D1 browser: four disposable device records covered active/inactive/expired/revoked statuses, Never last-active, cancel/confirm, opening another confirmation, reload persistence, empty state and 390px layout. SQL confirmed only the selected fixture was revoked; an unrelated owner could not revoke it. All four fixture records were removed by exact IDs/owner/name; user-created sets were left alone. No real Mac pairing or production device operations. Both local API/proxy return 401 for unsigned device reads/revocation and 405 for pairing/token/private-source requests. Real second-account browser switching remains unverified.
@@ -110,7 +114,26 @@ npm --workspace portal test
 
 Root-level alternative: `TSX_TSCONFIG_PATH=portal/tsconfig.json node --import tsx --test portal/tests/*.test.ts` (needed for the UI tests' path aliases).
 
-Remaining checks: real two-account isolation/switch, shared detail with a separate isolated fixture, slow/cancelled browser reads, first Favorites creation and resolved-skill publication against live public sources (controlled automated coverage exists). C3 membership/Favorites/bulk and C4 allowed-email/link actions are implemented locally. Do not call Slice B/C fully end-to-end verified yet. Earlier counts/allowlists below each checkpoint describe that checkpoint, not current permissions.
+Remaining checks: real two-account Clerk isolation/switch and shared access; deployed public-page navigation; first Favorites creation and resolved-skill publication against live public sources (controlled automated coverage exists). Shared/denied fixture rendering and slow/cancelled browser reads passed D4. Real GitHub and Mac callbacks are outside the local checkpoint. Do not call Slice B/C fully end-to-end verified yet. Earlier counts/allowlists describe that checkpoint, not current permissions.
+
+### Repeat D4 Checks
+
+From the worktree, with a supported Node and local Playwright installation:
+
+```sh
+node portal/testing/d4-browser.mjs
+```
+
+Set `PLAYWRIGHT_MODULE` to an absolute Playwright entry point if it is not locally resolvable. The runner uses installed Chrome, starts/closes its own loopback server and writes ignored screenshots to `output/playwright/d4/`. No Clerk credentials are needed.
+
+SQL checks require the verified disposable database above. The script refuses other database names, TCP, non-development context or a different actual data directory:
+
+```sh
+env -i HOME="$HOME" USER="$USER" PATH=/opt/homebrew/opt/node/bin:/usr/bin:/bin \
+  PORTAL_TEST_DATABASE_DIRECTORY=/private/tmp/omgskills-portal-b1.MhPXC3/data \
+  node --env-file=.netlify/portal-integration/database.env --import tsx \
+  portal/testing/d4-access.mts
+```
 
 ## Approved Account Snapshot
 

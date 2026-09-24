@@ -17,6 +17,18 @@ test("web and Mac access are independently gated", () => {
   assert.equal(isSkillGroupsFeatureEnabled({}), false);
 });
 
+test("every web/Mac flag combination preserves independent access", () => {
+  for (const web of [false, true]) for (const mac of [false, true]) {
+    const config = { skillGroupsWebEnabled: web, skillGroupsAuthEnabled: mac };
+    assert.equal(isSkillGroupsWebEnabled(config), web);
+    assert.equal(isSkillGroupsFeatureEnabled(config), mac);
+    for (const [enabled, requireAccess] of [[web, requireSkillGroupsWebFeature], [mac, requireSkillGroupsFeature]] as const) {
+      if (enabled) assert.doesNotThrow(() => requireAccess(config));
+      else assert.throws(() => requireAccess(config), (error: unknown) => error instanceof Response && error.status === 503);
+    }
+  }
+});
+
 test("disabled server access fails closed with a retryable response", async () => {
   assert.throws(
     () => requireSkillGroupsFeature({ skillGroupsAuthEnabled: false }),
