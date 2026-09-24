@@ -1,6 +1,6 @@
 import { GitFork as Github, Laptop, Copy, Pencil, LogOut } from "lucide-react";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
-import type { PortalActions, PortalData, PortalDevice } from "./model";
+import type { AccountControls, PortalActions, PortalData, PortalDevice } from "./model";
 import type { LinkRenderer } from "./SetsPage";
 import {
   Action,
@@ -114,6 +114,7 @@ export function HomePage({
   unavailable,
   copy,
   readOnly = false,
+  accountControls,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -121,6 +122,7 @@ export function HomePage({
   unavailable: (title: string, description: string) => void;
   copy: () => void;
   readOnly?: boolean;
+  accountControls?: AccountControls;
 }) {
   const profile = data.profile;
   return (
@@ -247,9 +249,9 @@ export function HomePage({
       </section>
       <div className="rd-account-actions">
         <Action
-          disabled={readOnly}
+          disabled={accountControls ? accountControls.busy : readOnly}
           onClick={() =>
-            unavailable(
+            accountControls ? accountControls.settings() : unavailable(
               "Account settings",
               "Clerk account settings will remain available in the signed-in portal. This preview has no signed-in account.",
             )
@@ -259,9 +261,9 @@ export function HomePage({
         </Action>
         <Action
           variant="ghost"
-          disabled={readOnly}
+          disabled={accountControls ? accountControls.busy : readOnly}
           onClick={() =>
-            unavailable(
+            accountControls ? accountControls.signOut() : unavailable(
               "Sign out",
               "There is no signed-in account in this local preview.",
             )

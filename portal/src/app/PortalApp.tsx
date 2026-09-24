@@ -75,6 +75,8 @@ export function PortalApp({
   notify,
   readOnly = false,
   renderDetail,
+  accountControls,
+  refreshControl,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -85,6 +87,8 @@ export function PortalApp({
   notify: (text: string) => void;
   readOnly?: boolean;
   renderDetail?: (groupId: string) => ReactNode;
+  accountControls?: import("./model").AccountControls;
+  refreshControl?: ReactNode;
 }) {
   const [locationKey, setLocationKey] = useState(
     location.pathname + location.search,
@@ -309,6 +313,7 @@ export function PortalApp({
             )}
             <h1>{title}</h1>
             <div className="rd-header-actions">
+              {refreshControl}
               {route.page === "detail" && activeSet && !readOnly && (
                 <>
                   {activeSet.role === "owner" && !activeSet.isFavorites && (
@@ -483,6 +488,7 @@ export function PortalApp({
                 )}
                 {route.page === "home" && (
                   <HomePage
+                    accountControls={accountControls}
                     readOnly={readOnly}
                     data={data}
                     actions={actions}

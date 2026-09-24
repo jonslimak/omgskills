@@ -5,15 +5,17 @@ import {
   SignInButton,
   useAuth,
   useUser,
+  useClerk,
 } from "@clerk/clerk-react";
+import { RefreshCw } from "lucide-react";
 import { PortalApp } from "../app/PortalApp";
-import { Action } from "../app/ui";
-import type { LoadState, PortalActions } from "../app/model";
+import { Action, IconAction } from "../app/ui";
+import type { PortalActions } from "../app/model";
 import { ReadOnlySetDetail } from "./ReadOnlySetDetail";
 import { usePortalApi } from "../portal-api";
 import { emptyAccount, type AccountIdentity } from "./data";
 import { integrationConfigurationError } from "./gate";
-import { startAccountRead } from "./read-session";
+import { accountCacheKey, createAccountSession, type AccountSnapshot } from "./account-session";
 import "../styles.css";
 import "../app/redesign.css";
 
@@ -25,35 +27,52 @@ const configurationError = integrationConfigurationError({
   webEnabled: import.meta.env.VITE_SKILLGROUPS_WEB_ENABLED,
 });
 
-function Account({ identity }: { identity: AccountIdentity }) {
+function localStorageForAccount() {
+  try { return window.sessionStorage; } catch { return undefined; }
+}
+
+function Account({ identity, cacheKey }: { identity: AccountIdentity; cacheKey: string }) {
   const api = usePortalApi();
+  const clerk = useClerk();
   const apiRef = useRef(api);
   apiRef.current = api;
-  const [data, setData] = useState(() => emptyAccount(identity));
-  const [state, setState] = useState<LoadState>("loading");
-  const [error, setError] = useState("");
-  const [attempt, setAttempt] = useState(0);
+  const [snapshot, setSnapshot] = useState<AccountSnapshot>({ data: null, refreshing: true, error: "", accessDenied: false, revision: 0 });
+  const sessionRef = useRef<ReturnType<typeof createAccountSession> | null>(null);
+  const [recovery, setRecovery] = useState(0);
+  const [signingOut, setSigningOut] = useState(false);
   const [notice, notify] = useState("");
 
   useEffect(() => {
-    setState("loading");
-    setError("");
-    return startAccountRead(
-      apiRef.current,
-      identity,
-      (next) => {
-        setData(next);
-        setState("ready");
-      },
-      () => {
-        setData(emptyAccount(identity));
-        setError(
-          "Could not load the account. Check your test session and backend, then retry.",
-        );
-        setState("error");
-      },
-    );
-  }, [attempt, identity.name, identity.email]);
+    const session = createAccountSession({
+      api: (path, init) => apiRef.current(path, init), identity, cacheKey,
+      storage: localStorageForAccount(), changed: setSnapshot,
+    });
+    sessionRef.current = session;
+    setSnapshot(session.getSnapshot());
+    void session.refresh();
+    const onActive = () => { if (!document.hidden) void session.refresh(true); };
+    window.addEventListener("focus", onActive);
+    document.addEventListener("visibilitychange", onActive);
+    return () => {
+      session.dispose(false);
+      if (sessionRef.current === session) sessionRef.current = null;
+      window.removeEventListener("focus", onActive);
+      document.removeEventListener("visibilitychange", onActive);
+    };
+  }, [cacheKey, recovery, identity.name, identity.email]);
+
+  async function signOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+    sessionRef.current?.dispose();
+    setSnapshot({ data: null, refreshing: false, error: "", accessDenied: false, revision: 0 });
+    try { await clerk.signOut({ redirectUrl: base }); }
+    catch {
+      setSigningOut(false);
+      notify("Could not sign out. Please try again.");
+      setRecovery((value) => value + 1);
+    }
+  }
 
   useEffect(() => {
     if (!notice) return;
@@ -70,26 +89,33 @@ function Account({ identity }: { identity: AccountIdentity }) {
     membership: unavailable,
     revoke: unavailable,
     updateProfile: unavailable,
-    retry: () => setAttempt((value) => value + 1),
+    retry: () => { void sessionRef.current?.refresh(); },
   };
+  const data = snapshot.data ?? emptyAccount(identity);
   return (
     <PortalApp
       data={data}
       actions={actions}
-      state={state}
+      state={signingOut ? "loading" : snapshot.data ? "ready" : snapshot.error ? "error" : "loading"}
       base={base}
       readOnly
+      accountControls={{ settings: () => clerk.openUserProfile(), signOut: () => { void signOut(); }, busy: signingOut }}
+      refreshControl={<IconAction label="Refresh account" disabled={snapshot.refreshing || signingOut}
+        onClick={() => { void sessionRef.current?.refresh(); }}>
+        <RefreshCw className={snapshot.refreshing ? "rd-spin" : undefined} />
+      </IconAction>}
       notice={notice}
       notify={notify}
       previewBar={
         <div className="rd-preview-bar" role="status">
           <span>Local integration · test account · read-only</span>
-          {error && <span>{error}</span>}
+          {snapshot.error && <span role="alert">{snapshot.error}</span>}
+          {snapshot.accessDenied && <Action onClick={() => { void signOut(); }} disabled={signingOut}>Sign out</Action>}
         </div>
       }
       renderDetail={(id) => (
         <ReadOnlySetDetail
-          key={id}
+          key={`${id}:${snapshot.revision}`}
           groupId={id}
           api={api}
           actions={actions}
@@ -103,9 +129,18 @@ function Account({ identity }: { identity: AccountIdentity }) {
 function Session() {
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user } = useUser();
+  const cacheKey = isSignedIn && userId && sessionId ? accountCacheKey(publishableKey!, userId, sessionId) : null;
+  const previousKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (previousKey.current && previousKey.current !== cacheKey) {
+      try { localStorageForAccount()?.removeItem(previousKey.current); } catch { /* Best effort. */ }
+    }
+    previousKey.current = cacheKey;
+  }, [cacheKey, isLoaded]);
   if (!isLoaded || (isSignedIn && !user))
     return <Entry title="Loading account..." />;
-  if (!isSignedIn || !user || !userId)
+  if (!isSignedIn || !user || !userId || !cacheKey)
     return (
       <Entry title="Sign in to the test portal">
         <SignInButton mode="modal" forceRedirectUrl={window.location.href}>
@@ -116,6 +151,7 @@ function Session() {
   return (
     <Account
       key={`${userId}:${sessionId}`}
+      cacheKey={cacheKey}
       identity={{
         name:
           user.fullName || user.primaryEmailAddress?.emailAddress || "Account",

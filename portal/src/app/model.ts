@@ -48,6 +48,11 @@ export type PortalData = {
   privateSourceConnected: boolean | null;
 };
 export type LoadState = "ready" | "loading" | "error";
+export type AccountControls = {
+  settings: () => void;
+  signOut: () => void;
+  busy: boolean;
+};
 export type PortalActions = {
   updateSet: (
     id: string,

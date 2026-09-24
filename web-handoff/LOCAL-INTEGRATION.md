@@ -61,6 +61,8 @@ The launcher sets `PORTAL_TEST_ENVIRONMENT_VERIFIED=1` for this verified local e
 
 ## Verification
 
+- B2 account/refresh checkpoint: Home account settings opens Clerk Development settings; manual refresh retains the populated UI. Refresh uses a 15-minute per-tab cache scoped to Clerk instance/user/session, deduplicates overlapping requests, and coalesces focus events for five seconds. Temporary errors preserve data; 401/403 clear it. Sign-out/account changes cancel reads and remove old cache entries. Automated suite: 44 passing; production build passes. Browser sign-out and second-account switch checks remain pending while profile work continues.
+
 - 33 portal tests pass, including eight new tests for gates, read allowlists, summary adapters, cancellation, invalid responses, and disabled/unavailable UI states.
 - Production build passes with a non-secret test publishable-key placeholder, the web gate on, and both local opt-in flags on. Authenticated production code remains included; local preview/integration entries are excluded. The legacy production detail component is unchanged.
 - Browser: blocked integration entry works and the existing sample preview still renders. Direct GET/PATCH probes return 503 before proxying while unverified.

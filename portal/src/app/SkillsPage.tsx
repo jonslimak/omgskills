@@ -96,6 +96,10 @@ export function SkillsPage({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   useEffect(() => {
+    const liveIds = new Set(skills.map((skill) => skill.id));
+    setSelected((current) => current.filter((id) => liveIds.has(id)));
+  }, [skills]);
+  useEffect(() => {
     if (!edit) setSelected([]);
   }, [edit]);
   const sources = [...new Set(skills.flatMap((skill) => skill.sources))].sort();
