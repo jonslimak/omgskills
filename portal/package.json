@@ -6,7 +6,10 @@
     "build": "tsc -b && vite build",
     "dev": "vite --host 0.0.0.0",
     "dev:design": "VITE_PORTAL_PREVIEW=1 vite --host 127.0.0.1",
+    "dev:integration": "VITE_PORTAL_INTEGRATION=1 vite --host 127.0.0.1",
     "test:design": "node --import tsx --test tests/redesign.test.ts",
+    "test:integration": "node --import tsx --test tests/integration.test.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

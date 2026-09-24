@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { ArrowDown, ArrowUp, X, Plus, EyeOff, Star } from "lucide-react";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
-import { isMember, type PortalActions, type PortalSet } from "./model";
+import { isMember, visibilityLabels, type PortalActions, type PortalSet } from "./model";
 import {
   Action,
   Avatar,
   EmptyState,
   IconAction,
   SourceLink,
+  StatusBadge,
   TextInput,
 } from "./ui";
 import { MembershipPicker } from "./SkillsPage";
@@ -22,6 +23,7 @@ export function SetDetailPage({
   notify,
   star,
   newSet,
+  readOnly = false,
 }: {
   set: PortalSet;
   actions: PortalActions;
@@ -32,10 +34,12 @@ export function SetDetailPage({
   sets: PortalSet[];
   star: (skills: GroupedSyncedSkill[], add: boolean) => void;
   newSet: (skills: GroupedSyncedSkill[]) => void;
+  readOnly?: boolean;
 }) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const owner = set.role === "owner";
+  const canEdit = owner && !readOnly;
   const reorder = (index: number, offset: number) => {
     const items = [...set.items];
     [items[index], items[index + offset]] = [
@@ -55,6 +59,7 @@ export function SetDetailPage({
       {set.description && <p className="rd-intro">{set.description}</p>}
       <div className="rd-access-strip">
         <strong>Access</strong>
+        {readOnly && <StatusBadge>{visibilityLabels[set.visibility]}</StatusBadge>}
         <span className="rd-member">
           <Avatar name={set.ownerName} />
           <span>{set.ownerName}</span>
@@ -67,6 +72,7 @@ export function SetDetailPage({
               <span title={address}>{address}</span>
               <IconAction
                 label={`Remove access for ${address}`}
+                disabled={readOnly}
                 onClick={() =>
                   actions.updateSet(set.id, {
                     emails: set.emails.filter((value) => value !== address),
@@ -84,7 +90,7 @@ export function SetDetailPage({
               : "Public read-only access"}
           </span>
         )}
-        {owner && !set.isFavorites && set.visibility === "restricted" && (
+        {canEdit && !set.isFavorites && set.visibility === "restricted" && (
           <form
             className="rd-email-form"
             onSubmit={(event) => {
@@ -119,7 +125,7 @@ export function SetDetailPage({
         <h2>
           Skills <span className="rd-muted">{set.items.length}</span>
         </h2>
-        {owner && edit && (
+        {canEdit && edit && (
           <Action onClick={addSkills} disabled={!skills.length}>
             <Plus data-icon="inline-start" />
             Add skills
@@ -134,7 +140,7 @@ export function SetDetailPage({
               <th className="rd-desktop rd-source-column">Source</th>
               <th
                 className={
-                  edit ? "rd-detail-action-column" : "rd-action-column"
+                  canEdit && edit ? "rd-detail-action-column" : "rd-action-column"
                 }
               >
                 <span className="rd-sr-only">Actions</span>
@@ -172,7 +178,7 @@ export function SetDetailPage({
                     )}
                   </td>
                   <td>
-                    {owner && edit ? (
+                    {canEdit && edit ? (
                       <div className="rd-actions">
                         <IconAction
                           label={`Move ${item.name} up`}
@@ -205,13 +211,16 @@ export function SetDetailPage({
                     ) : (
                       <div className="rd-actions">
                         <IconAction
-                          disabled={!skill}
+                          disabled={readOnly || !skill}
                           className={starred ? "rd-starred" : undefined}
                           label={
-                            skill
+                            readOnly
+                              ? `Star ${item.name}`
+                              : skill
                               ? `${starred ? "Unstar" : "Star"} ${item.name}`
                               : "Not in your synced library"
                           }
+                          {...(readOnly ? { title: "Favorites changes are not connected yet" } : {})}
                           aria-pressed={starred}
                           onClick={() => {
                             if (skill) star([skill], !starred);
@@ -219,7 +228,7 @@ export function SetDetailPage({
                         >
                           <Star />
                         </IconAction>
-                        {skill && (
+                        {skill && !readOnly && (
                           <MembershipPicker
                             skill={skill}
                             sets={sets}
@@ -239,7 +248,7 @@ export function SetDetailPage({
           <EmptyState
             title="No skills in this set"
             description={
-              owner
+              canEdit
                 ? "Choose Edit to add skills."
                 : "The owner hasn't added any skills yet."
             }

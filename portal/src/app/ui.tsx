@@ -99,15 +99,18 @@ export function Toggle({
   checked,
   onChange,
   label,
+  disabled,
 }: {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <PrimitiveSwitch.Root
       className="rd-switch"
       checked={checked}
+      disabled={disabled}
       onCheckedChange={onChange}
       aria-label={label}
     >

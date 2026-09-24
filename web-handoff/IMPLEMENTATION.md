@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A implemented, reviewed, and design-approved locally. Slices B-D are not started. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1 is implemented locally; signed-in reads and populated account-snapshot checks pass. Remaining isolation/lifecycle checks are tracked in LOCAL-INTEGRATION.md. B2 and Slices C-D are not started. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -119,11 +119,24 @@ Fixtures should reflect the real data model. Future unsupported fields stay unav
 
 After design review, attach authenticated controllers to the same views.
 
+### B1: Read-Only Checkpoint
+
+- [x] Separate development-only `/app/integration/` entry with Clerk sign-in; sample preview and production entry remain separate.
+- [x] Load skills, owned/shared set summaries, and profile through existing APIs. Use returned set counts without fetching every detail or inventing item records.
+- [x] Keep grouping/search/filter contracts; shared summaries never receive owner membership IDs or email lists from the adapter.
+- [x] Connect lazy real detail reads to the redesigned set layout, with loading/error/retry, response validation and stale-read cancellation. Disable mutation/install controls; show unloaded devices/private sources as unavailable, not disconnected. Desktop/mobile and direct reload verified; item identity remains unknown until Slice C adds physical IDs to the response.
+- [x] Cancel pending reads on unmount/account switch and ignore late responses. Account cache and focus-refresh belong to B2.
+- [x] Require an explicitly verified loopback backend and a development Clerk key before enabling sign-in. Client and local proxy allow only required GET endpoints.
+- [x] Automated checks and blocked-entry browser verification pass. Production excludes both local entries even with their opt-in flags set.
+- [x] Verify development Clerk and the backend's resolved local database; test sign-in, empty/populated reads, owned detail, search/filtering, reload and mobile navigation using an approved account-scoped snapshot. No production backend: even GET requests reconcile user records.
+- [ ] Complete shared detail and two-account lifecycle/isolation checks; account switching/sign-out wiring belongs to B2. Investigate the initial load error if reproducible.
+
+See `LOCAL-INTEGRATION.md` for setup and remaining checks. B1 is not end-to-end verified yet.
+
+### B2: Account Lifecycle And Profile Changes
+
 - [ ] Preserve Clerk sign-in, account management, sign-out, and handle onboarding.
-- [ ] Load synced skills, owned/shared sets, and profile using current API helpers and response types.
 - [ ] Retain account-scoped cache, refresh on focus/visibility, request deduplication, manual refresh, and stale-response protection on account changes.
-- [ ] Keep existing grouping and logical/physical count semantics. Search the union of members' names/descriptions, including non-representative variants.
-- [ ] Source filters include a logical row if a member matches, while preserving its complete member IDs for membership actions.
 - [ ] Keep loading, stale-but-usable, empty, permission-denied, and error states distinct. Failed refresh must not erase usable data.
 - [ ] Wire Home handle/publication changes with server validation and accurate public-profile wording. Use the API's returned profile URL.
 - [ ] Clear selection and account-specific state on sign-out/account change; prune deleted selections after refresh.
@@ -208,4 +221,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-Slice A design review is approved. Next, plan the isolated real-account checks for Slice B before starting integration. Slices B-D describe the integration path; they are not a production rollout authorization.
+Review/commit the B1 read-only checkpoint, then plan B2 and finish the remaining account-lifecycle/isolation checks alongside its wiring. Slices B-D are not a production rollout authorization.

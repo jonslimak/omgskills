@@ -73,6 +73,8 @@ export function PortalApp({
   previewBar,
   notice,
   notify,
+  readOnly = false,
+  renderDetail,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -81,6 +83,8 @@ export function PortalApp({
   previewBar: ReactNode;
   notice: string;
   notify: (text: string) => void;
+  readOnly?: boolean;
+  renderDetail?: (groupId: string) => ReactNode;
 }) {
   const [locationKey, setLocationKey] = useState(
     location.pathname + location.search,
@@ -224,7 +228,10 @@ export function PortalApp({
           <>
             <Avatar name={data.profile.name} />
             <span>
-              Home<small>/{data.profile.handle}</small>
+              Home
+              <small>
+                {data.profile.handle ? `/${data.profile.handle}` : "No handle"}
+              </small>
             </span>
           </>,
           "rd-nav-link",
@@ -234,7 +241,7 @@ export function PortalApp({
   );
   const title =
     route.page === "detail"
-      ? activeSet?.name || "Set not found"
+      ? activeSet?.name || (renderDetail ? "Set" : "Set not found")
       : (
           {
             skills: "Skills",
@@ -245,6 +252,7 @@ export function PortalApp({
           } as const
         )[route.page];
   const canEdit =
+    !readOnly &&
     state === "ready" &&
     (route.page === "skills" ||
       route.page === "sets" ||
@@ -301,7 +309,7 @@ export function PortalApp({
             )}
             <h1>{title}</h1>
             <div className="rd-header-actions">
-              {route.page === "detail" && activeSet && (
+              {route.page === "detail" && activeSet && !readOnly && (
                 <>
                   {activeSet.role === "owner" && !activeSet.isFavorites && (
                     <select
@@ -383,6 +391,12 @@ export function PortalApp({
               {route.page === "agents" && (
                 <Action
                   variant="default"
+                  disabled={readOnly}
+                  title={
+                    readOnly
+                      ? "Not connected in this read-only view"
+                      : undefined
+                  }
                   onClick={() =>
                     unavailable(
                       "Add agent",
@@ -394,7 +408,7 @@ export function PortalApp({
                   Add agent
                 </Action>
               )}
-              {route.page === "sets" && state === "ready" && (
+              {route.page === "sets" && state === "ready" && !readOnly && (
                 <Action variant="default" onClick={() => newSet()}>
                   <Plus data-icon="inline-start" />
                   New set
@@ -422,6 +436,7 @@ export function PortalApp({
               <>
                 {route.page === "skills" && (
                   <SkillsPage
+                    readOnly={readOnly}
                     skills={skills}
                     sets={data.sets}
                     actions={actions}
@@ -449,6 +464,7 @@ export function PortalApp({
                 )}
                 {route.page === "agents" && (
                   <AgentsPage
+                    readOnly={readOnly}
                     skills={skills}
                     data={data}
                     link={link}
@@ -467,6 +483,7 @@ export function PortalApp({
                 )}
                 {route.page === "home" && (
                   <HomePage
+                    readOnly={readOnly}
                     data={data}
                     actions={actions}
                     editProfile={() => setDialog({ kind: "profile" })}
@@ -474,8 +491,13 @@ export function PortalApp({
                     copy={() => void copy("home")}
                   />
                 )}
-                {route.page === "detail" && activeSet && (
+                {route.page === "detail" &&
+                  renderDetail &&
+                  route.groupId &&
+                  renderDetail(route.groupId)}
+                {route.page === "detail" && activeSet && !renderDetail && (
                   <SetDetailPage
+                    readOnly={readOnly}
                     set={activeSet}
                     sets={data.sets}
                     actions={actions}
@@ -490,7 +512,7 @@ export function PortalApp({
                   />
                 )}
                 {(route.page === "missing" ||
-                  (route.page === "detail" && !activeSet)) && (
+                  (route.page === "detail" && !activeSet && !renderDetail)) && (
                   <EmptyState title="Page not found">
                     <Action onClick={() => navigate("")}>Go to Skills</Action>
                   </EmptyState>

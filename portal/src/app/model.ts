@@ -12,7 +12,7 @@ export type SetItem = {
   name: string;
   description: string;
   githubUrl: string | null;
-  kind: "synced" | "github" | "private-release";
+  kind: "synced" | "catalog" | "github" | "private-release";
 };
 export type PortalSet = {
   id: string;
@@ -25,6 +25,8 @@ export type PortalSet = {
   ownerName: string;
   emails: string[];
   items: SetItem[];
+  itemCount?: number;
+  membershipSkillIds?: string[];
 };
 export type PortalDevice = {
   id: string;
@@ -36,8 +38,14 @@ export type PortalData = {
   skills: SyncedSkill[];
   sets: PortalSet[];
   devices: PortalDevice[];
-  profile: { handle: string; email: string; name: string; published: boolean };
-  privateSourceConnected: boolean;
+  profile: {
+    handle: string;
+    email: string;
+    name: string;
+    published: boolean;
+    publicUrl?: string | null;
+  };
+  privateSourceConnected: boolean | null;
 };
 export type LoadState = "ready" | "loading" | "error";
 export type PortalActions = {
@@ -63,10 +71,13 @@ export type PortalActions = {
 };
 
 export function isMember(set: PortalSet, skill: GroupedSyncedSkill) {
-  return set.items.some(
-    (item) =>
-      item.syncedSkillId !== null &&
-      skill.allSkillIds.includes(item.syncedSkillId),
+  return (
+    set.membershipSkillIds?.some((id) => skill.allSkillIds.includes(id)) ||
+    set.items.some(
+      (item) =>
+        item.syncedSkillId !== null &&
+        skill.allSkillIds.includes(item.syncedSkillId),
+    )
   );
 }
 export function filterSkills(

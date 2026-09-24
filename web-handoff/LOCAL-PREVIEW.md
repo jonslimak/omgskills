@@ -1,6 +1,8 @@
 # Local UI Preview
 
-Updated 2026-09-24. Slice A only; real account integration is not implemented.
+Updated 2026-09-24. This page remains sample-only.
+
+The separate B1 implementation is tracked in `LOCAL-INTEGRATION.md`; this preview remains sample-only.
 
 - URL: http://127.0.0.1:5173/app/preview/
 - Worktree: `/private/tmp/omgskills-web-portal-redesign`
@@ -43,7 +45,7 @@ env PATH=/opt/homebrew/opt/node/bin:$PATH npm --workspace portal run dev:design 
 Use another free port if needed. The preview binds only to loopback, requires development mode and its explicit flag, and bypasses Clerk only under `/app/preview/`.
 
 ```sh
-node --import tsx --test portal/tests/*.test.ts
+npm --workspace portal test
 env PATH=/opt/homebrew/opt/node/bin:$PATH npm run build:portal
 ```
 

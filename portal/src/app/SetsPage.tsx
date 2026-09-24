@@ -53,7 +53,7 @@ export function SetsPage({
                             {set.name}
                           </div>
                           <p>
-                            {set.items.length} skills
+                            {set.itemCount ?? set.items.length} skills
                             {set.role !== "owner" && ` · by ${set.ownerName}`}
                           </p>
                         </div>

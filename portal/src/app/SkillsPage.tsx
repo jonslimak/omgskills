@@ -80,6 +80,7 @@ export function SkillsPage({
   newSet,
   star,
   inspect,
+  readOnly = false,
 }: {
   skills: GroupedSyncedSkill[];
   sets: PortalSet[];
@@ -90,6 +91,7 @@ export function SkillsPage({
   newSet: (skills: GroupedSyncedSkill[]) => void;
   star: (skills: GroupedSyncedSkill[], add: boolean) => void;
   inspect: (skill: GroupedSyncedSkill) => void;
+  readOnly?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
@@ -314,6 +316,8 @@ export function SkillsPage({
                 <td>
                   <div className="rd-actions">
                     <IconAction
+                      disabled={readOnly}
+                      {...(readOnly ? { title: "Favorites changes are not connected yet" } : {})}
                       className={
                         favorites && isMember(favorites, skill)
                           ? "rd-starred"
@@ -332,12 +336,22 @@ export function SkillsPage({
                     >
                       <Star />
                     </IconAction>
-                    <MembershipPicker
-                      skill={skill}
-                      sets={sets}
-                      actions={actions}
-                      newSet={newSet}
-                    />
+                    {readOnly ? (
+                      <IconAction
+                        label={`Add ${skill.name} to set`}
+                        disabled
+                        title="Set changes are not connected yet"
+                      >
+                        <ListPlus />
+                      </IconAction>
+                    ) : (
+                      <MembershipPicker
+                        skill={skill}
+                        sets={sets}
+                        actions={actions}
+                        newSet={newSet}
+                      />
+                    )}
                   </div>
                 </td>
               </tr>

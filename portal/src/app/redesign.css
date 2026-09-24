@@ -31,6 +31,16 @@
   -webkit-font-smoothing: antialiased;
   color-scheme: light;
 }
+.rd-integration-entry {
+  max-width: 640px;
+  margin: 64px auto;
+  padding: 20px;
+}
+.portal-design.rd-integration-entry h1 {
+  font-size: 24px;
+  line-height: 32px;
+  margin-block: 12px;
+}
 .portal-design *,
 .portal-design *::before,
 .portal-design *::after {
