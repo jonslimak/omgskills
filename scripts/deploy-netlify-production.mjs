@@ -84,13 +84,19 @@ async function currentDeployId({ fetchImpl, siteId, netlifyToken }) {
   return deployId;
 }
 
-function parseDeployId(stdout) {
+function parseDeployResult(stdout) {
   const candidates = [stdout.trim(), ...stdout.trim().split("\n").reverse()].filter(Boolean);
   for (const candidate of candidates) {
     try {
       const parsed = JSON.parse(candidate);
       const deployId = parsed.deploy_id ?? parsed.deployId ?? parsed.id;
-      if (typeof deployId === "string" && deployId) return deployId;
+      const deployUrl = parsed.deploy_url ?? parsed.deployUrl ?? parsed.ssl_url ?? parsed.url ?? null;
+      if (typeof deployId === "string" && deployId) {
+        return {
+          deployId,
+          deployUrl: typeof deployUrl === "string" && deployUrl ? deployUrl.replace(/\/$/, "") : null,
+        };
+      }
     } catch {
       // Netlify may print informational lines before its JSON result.
     }
@@ -184,20 +190,26 @@ async function restoreDeploy({ fetchImpl, siteId, deployId, netlifyToken }) {
   );
 }
 
-function verificationCommands({ exactManifests, verifyCandidateFeatures }) {
+function verificationCommands({
+  origin,
+  publicOrigin,
+  exactManifests,
+  verifyCandidateFeatures,
+}) {
   const commands = [
     {
       command: process.execPath,
       args: ["./scripts/verify-production-deploy.mjs"],
       env: {
-        PRODUCTION_ORIGIN: "https://omgskills.com",
+        PRODUCTION_ORIGIN: origin,
+        PUBLIC_ORIGIN: publicOrigin,
         VERIFY_CANDIDATE_FEATURES: verifyCandidateFeatures ? "1" : "0",
       },
     },
     {
       command: process.execPath,
       args: ["./scripts/verify-web-library-pages.mjs", "--live"],
-      env: { PRODUCTION_ORIGIN: "https://omgskills.com" },
+      env: { PRODUCTION_ORIGIN: origin, PUBLIC_ORIGIN: publicOrigin },
     },
   ];
   if (!exactManifests) return commands;
@@ -211,7 +223,7 @@ function verificationCommands({ exactManifests, verifyCandidateFeatures }) {
       command: process.execPath,
       args: ["./scripts/verify-live-manifest.mjs"],
       env: {
-        LIVE_MANIFEST_URL: `https://omgskills.com${livePath}`,
+        LIVE_MANIFEST_URL: `${origin}${livePath}`,
         LOCAL_MANIFEST_PATH: localPath,
       },
     });
@@ -222,6 +234,8 @@ function verificationCommands({ exactManifests, verifyCandidateFeatures }) {
 async function verifyWithRetries({
   run,
   env,
+  origin,
+  publicOrigin,
   exactManifests,
   verifyCandidateFeatures,
   attempts,
@@ -233,7 +247,12 @@ async function verifyWithRetries({
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     onAttempt(attempt);
     try {
-      for (const command of verificationCommands({ exactManifests, verifyCandidateFeatures })) {
+      for (const command of verificationCommands({
+        origin,
+        publicOrigin,
+        exactManifests,
+        verifyCandidateFeatures,
+      })) {
         const result = await run(command.command, command.args, {
           env: { ...env, ...command.env },
         });
@@ -244,7 +263,7 @@ async function verifyWithRetries({
     } catch (error) {
       lastError = error;
       if (attempt < attempts) {
-        console.error(`Production verification attempt ${attempt} failed: ${error.message}`);
+        console.error(`Deploy verification attempt ${attempt} failed: ${error.message}`);
         await sleep(retryDelayMs);
       }
     }
@@ -288,13 +307,31 @@ export async function deployProduction({
   const siteId = requireEnv(env, "NETLIFY_SITE_ID");
   const netlifyToken = requireEnv(env, "NETLIFY_AUTH_TOKEN");
   const receiptPath = env.NETLIFY_DEPLOY_RECEIPT_PATH || DEFAULT_RECEIPT_PATH;
-  const attempts = Number.parseInt(env.NETLIFY_VERIFY_ATTEMPTS || "3", 10);
-  const retryDelayMs = Number.parseInt(env.NETLIFY_VERIFY_RETRY_DELAY_MS || "10000", 10);
+  const attempts = Number.parseInt(env.NETLIFY_VERIFY_ATTEMPTS || "5", 10);
+  const retryDelayMs = Number.parseInt(env.NETLIFY_VERIFY_RETRY_DELAY_MS || "15000", 10);
+  const previewAttempts = Number.parseInt(env.NETLIFY_PREVIEW_VERIFY_ATTEMPTS || "3", 10);
+  const previewRetryDelayMs = Number.parseInt(
+    env.NETLIFY_PREVIEW_VERIFY_RETRY_DELAY_MS || "10000",
+    10,
+  );
+  const stabilizationDelayMs = Number.parseInt(
+    env.NETLIFY_PRODUCTION_STABILIZATION_DELAY_MS || "30000",
+    10,
+  );
   if (!Number.isInteger(attempts) || attempts < 1) {
     throw new Error("NETLIFY_VERIFY_ATTEMPTS must be a positive integer");
   }
   if (!Number.isInteger(retryDelayMs) || retryDelayMs < 0) {
     throw new Error("NETLIFY_VERIFY_RETRY_DELAY_MS must be a non-negative integer");
+  }
+  if (!Number.isInteger(previewAttempts) || previewAttempts < 1) {
+    throw new Error("NETLIFY_PREVIEW_VERIFY_ATTEMPTS must be a positive integer");
+  }
+  if (!Number.isInteger(previewRetryDelayMs) || previewRetryDelayMs < 0) {
+    throw new Error("NETLIFY_PREVIEW_VERIFY_RETRY_DELAY_MS must be a non-negative integer");
+  }
+  if (!Number.isInteger(stabilizationDelayMs) || stabilizationDelayMs < 0) {
+    throw new Error("NETLIFY_PRODUCTION_STABILIZATION_DELAY_MS must be a non-negative integer");
   }
 
   const receipt = {
@@ -302,12 +339,16 @@ export async function deployProduction({
     siteId,
     sourceCommit: null,
     previousDeployId: null,
+    previewDeployId: null,
+    previewDeployUrl: null,
     candidateDeployId: null,
     startedAt: now(),
     completedAt: null,
     status: "starting",
+    previewVerificationAttempts: 0,
     verificationAttempts: 0,
     rollbackVerificationAttempts: 0,
+    productionStabilizationDelayMs: stabilizationDelayMs,
     githubRepository: env.GITHUB_REPOSITORY || null,
     githubRunId: env.GITHUB_RUN_ID || null,
     githubRunUrl: env.GITHUB_SERVER_URL && env.GITHUB_REPOSITORY && env.GITHUB_RUN_ID
@@ -351,6 +392,50 @@ export async function deployProduction({
     site_id: siteId,
     deploy_id: receipt.previousDeployId,
   })}'`;
+  receipt.status = "deploying-preview";
+  await save();
+
+  const previewResult = await run(
+    "npx",
+    ["netlify-cli", "deploy", "--dir=dist/netlify-site", "--no-build", "--json"],
+    { env },
+  );
+  const previewDeploy = parseDeployResult(previewResult.stdout);
+  if (!previewDeploy.deployUrl) {
+    receipt.status = "preview-verification-failed";
+    receipt.previewVerificationError = "Netlify draft deploy output did not contain a deploy URL";
+    receipt.completedAt = now();
+    await save();
+    throw new Error("Draft verification failed; production was not changed: missing deploy URL");
+  }
+  receipt.previewDeployId = previewDeploy.deployId;
+  receipt.previewDeployUrl = previewDeploy.deployUrl;
+  receipt.status = "verifying-preview";
+  await save();
+
+  try {
+    await verifyWithRetries({
+      run,
+      env,
+      origin: receipt.previewDeployUrl,
+      publicOrigin: "https://omgskills.com",
+      exactManifests: true,
+      verifyCandidateFeatures: false,
+      attempts: previewAttempts,
+      retryDelayMs: previewRetryDelayMs,
+      sleep,
+      onAttempt: (attempt) => {
+        receipt.previewVerificationAttempts = attempt;
+      },
+    });
+  } catch (error) {
+    receipt.status = "preview-verification-failed";
+    receipt.previewVerificationError = error.message;
+    receipt.completedAt = now();
+    await save();
+    throw new Error(`Draft verification failed; production was not changed: ${error.message}`);
+  }
+
   receipt.status = "deploying";
   await save();
 
@@ -366,7 +451,7 @@ export async function deployProduction({
     { env },
   );
   try {
-    receipt.candidateDeployId = parseDeployId(deployResult.stdout);
+    receipt.candidateDeployId = parseDeployResult(deployResult.stdout).deployId;
   } catch {
     const liveDeployId = await currentDeployId({ fetchImpl, siteId, netlifyToken });
     if (liveDeployId === receipt.previousDeployId) {
@@ -378,10 +463,16 @@ export async function deployProduction({
   receipt.status = "verifying";
   await save();
 
+  if (stabilizationDelayMs > 0) {
+    await sleep(stabilizationDelayMs);
+  }
+
   try {
     await verifyWithRetries({
       run,
       env,
+      origin: "https://omgskills.com",
+      publicOrigin: "https://omgskills.com",
       exactManifests: true,
       verifyCandidateFeatures: true,
       attempts,
@@ -433,6 +524,8 @@ export async function deployProduction({
     await verifyWithRetries({
       run,
       env,
+      origin: "https://omgskills.com",
+      publicOrigin: "https://omgskills.com",
       exactManifests: false,
       verifyCandidateFeatures: false,
       attempts,

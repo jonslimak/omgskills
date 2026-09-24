@@ -16,6 +16,7 @@ import { assertIndexStateMatchesSitemap } from "./web-library-index-verification
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
+const publicOrigin = (process.env.PUBLIC_ORIGIN || origin).replace(/\/$/, "");
 const isLive = process.argv.includes("--live");
 const liveFetchAttempts = 3;
 const livePageHtmlByPath = new Map();
@@ -231,7 +232,7 @@ function verifyAiCatalog(catalog, label) {
   if (catalog?.host?.displayName !== "omgskills") {
     throw new Error(`${label} must identify omgskills as its host`);
   }
-  if (catalog?.host?.documentationUrl !== `${origin}/developers/`) {
+  if (catalog?.host?.documentationUrl !== `${publicOrigin}/developers/`) {
     throw new Error(`${label} must link to the omgskills developer resources`);
   }
   const entry = catalog?.entries?.find(
@@ -240,7 +241,7 @@ function verifyAiCatalog(catalog, label) {
   if (!entry || entry.type !== "application/mcp-server-card+json") {
     throw new Error(`${label} must contain the omgskills MCP server card`);
   }
-  if (entry.data?.endpoint !== `${origin}/mcp` || entry.data?.access !== "read-only") {
+  if (entry.data?.endpoint !== `${publicOrigin}/mcp` || entry.data?.access !== "read-only") {
     throw new Error(`${label} must identify the read-only hosted MCP endpoint`);
   }
   const toolNames = new Set((entry.data?.tools || []).map((tool) => tool.name));
@@ -319,7 +320,7 @@ function internalLinks(html) {
 
 function sameOriginPaths(text) {
   const references = new Set(internalLinks(text));
-  const escapedOrigin = origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedOrigin = publicOrigin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   for (const match of text.matchAll(new RegExp(`${escapedOrigin}(/[^\\s"'<>\\])}]*)`, "g"))) {
     references.add(match[1]);
   }
@@ -523,7 +524,7 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, '.skill-detail > .section:not(.skill-section) > p { font-size: 13px; }', label);
     assertNotIncludes(html, 'Author match:', label);
     assertNotIncludes(html, ' stars</span>', label);
-    assertIncludes(html, `${origin}${page.profileAuthor.path}`, label);
+    assertIncludes(html, `${publicOrigin}${page.profileAuthor.path}`, label);
   }
 
   if (page.skillLayout) {
@@ -565,7 +566,7 @@ function verifyMetadata(html, page, label) {
   }
 
   if (page.developerResources) {
-    assertIncludes(html, `${origin}/mcp`, label);
+    assertIncludes(html, `${publicOrigin}/mcp`, label);
     assertIncludes(html, "npx -y omgskills-mcp", label);
     assertIncludes(html, "https://www.npmjs.com/package/omgskills-mcp", label);
     assertIncludes(html, "/data/manifest.json", label);
@@ -639,35 +640,35 @@ async function verifyLocalRootFile(file) {
   if (file.path === "/llms.txt") {
     assertIncludes(contents, "## Markdown mirrors", filePath);
     assertIncludes(contents, "## For agents & developers", filePath);
-    assertIncludes(contents, `${origin}/developers/index.md`, filePath);
-    assertIncludes(contents, `${origin}/mcp`, filePath);
-    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, filePath);
+    assertIncludes(contents, `${publicOrigin}/developers/index.md`, filePath);
+    assertIncludes(contents, `${publicOrigin}/mcp`, filePath);
+    assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, filePath);
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", filePath);
-    assertIncludes(contents, `${origin}/skills/index.md`, filePath);
-    assertIncludes(contents, `${origin}/llms-gold.txt`, filePath);
+    assertIncludes(contents, `${publicOrigin}/skills/index.md`, filePath);
+    assertIncludes(contents, `${publicOrigin}/llms-gold.txt`, filePath);
     assertIncludes(contents, "## When to use omgskills", filePath);
-    assertIncludes(contents, `${origin}/agents.md`, filePath);
-    assertIncludes(contents, `${origin}/guide/index.md`, filePath);
-    assertIncludes(contents, `${origin}/guide/`, filePath);
+    assertIncludes(contents, `${publicOrigin}/agents.md`, filePath);
+    assertIncludes(contents, `${publicOrigin}/guide/index.md`, filePath);
+    assertIncludes(contents, `${publicOrigin}/guide/`, filePath);
   }
   if (file.path === "/agents.md") {
     assertIncludes(contents, "## When to use omgskills", filePath);
     assertIncludes(contents, "read-only MCP endpoint", filePath);
     assertIncludes(contents, "use the macOS app to install or manage skills", filePath);
-    assertIncludes(contents, `${origin}/developers/index.md`, filePath);
-    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, filePath);
+    assertIncludes(contents, `${publicOrigin}/developers/index.md`, filePath);
+    assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, filePath);
   }
   if (file.path === "/.well-known/ai-catalog.json") {
     verifyAiCatalog(JSON.parse(contents), filePath);
   }
   if (file.path === "/llms-gold.txt") {
-    assertIncludes(contents, `Source: ${origin}/skills/`, filePath);
-    assertIncludes(contents, `Source: ${origin}/library/`, filePath);
+    assertIncludes(contents, `Source: ${publicOrigin}/skills/`, filePath);
+    assertIncludes(contents, `Source: ${publicOrigin}/library/`, filePath);
     const sourcePaths = [...contents.matchAll(/^Source: (\S+)$/gm)].map((match) => {
-      if (!match[1].startsWith(`${origin}/`)) {
+      if (!match[1].startsWith(`${publicOrigin}/`)) {
         throw new Error(`${filePath} contained a non-canonical source URL: ${match[1]}`);
       }
-      return match[1].slice(origin.length);
+      return match[1].slice(publicOrigin.length);
     });
     if (sourcePaths.length === 0) {
       throw new Error(`${filePath} contained no canonical source paths`);
@@ -714,7 +715,7 @@ function verifyGuideMarkdown(markdown, label) {
   assertIncludes(markdown, "Skills are instructions, not code", label);
   assertIncludes(markdown, "## Are skills free?", label);
   assertIncludes(markdown, "All 49,000+ indexed here are free.", label);
-  assertIncludes(markdown, `${origin}/guide/`, label);
+  assertIncludes(markdown, `${publicOrigin}/guide/`, label);
 }
 
 async function verifyLocalGuide() {
@@ -950,14 +951,14 @@ async function verifyLiveRootFile(file) {
   if (file.path === "/llms.txt") {
     assertIncludes(contents, "## Markdown mirrors", url);
     assertIncludes(contents, "## For agents & developers", url);
-    assertIncludes(contents, `${origin}/developers/index.md`, url);
-    assertIncludes(contents, `${origin}/mcp`, url);
-    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, url);
+    assertIncludes(contents, `${publicOrigin}/developers/index.md`, url);
+    assertIncludes(contents, `${publicOrigin}/mcp`, url);
+    assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, url);
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", url);
-    assertIncludes(contents, `${origin}/skills/index.md`, url);
-    assertIncludes(contents, `${origin}/llms-gold.txt`, url);
+    assertIncludes(contents, `${publicOrigin}/skills/index.md`, url);
+    assertIncludes(contents, `${publicOrigin}/llms-gold.txt`, url);
     assertIncludes(contents, "## When to use omgskills", url);
-    assertIncludes(contents, `${origin}/agents.md`, url);
+    assertIncludes(contents, `${publicOrigin}/agents.md`, url);
   }
   if (file.path === "/agents.md") {
     const contentType = response.headers.get("content-type") || "";
@@ -967,8 +968,8 @@ async function verifyLiveRootFile(file) {
     assertIncludes(contents, "## When to use omgskills", url);
     assertIncludes(contents, "read-only MCP endpoint", url);
     assertIncludes(contents, "use the macOS app to install or manage skills", url);
-    assertIncludes(contents, `${origin}/developers/index.md`, url);
-    assertIncludes(contents, `${origin}/.well-known/ai-catalog.json`, url);
+    assertIncludes(contents, `${publicOrigin}/developers/index.md`, url);
+    assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, url);
   }
   if (file.path === "/.well-known/ai-catalog.json") {
     const contentType = response.headers.get("content-type") || "";
@@ -990,7 +991,7 @@ async function verifyLiveRootFile(file) {
     if (!robots.toLowerCase().includes("noindex")) {
       throw new Error(`${url} returned X-Robots-Tag ${robots || "<missing>"}, expected noindex`);
     }
-    assertIncludes(contents, `Source: ${origin}/skills/`, url);
+    assertIncludes(contents, `Source: ${publicOrigin}/skills/`, url);
   }
 }
 

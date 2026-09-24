@@ -37,7 +37,7 @@ async function verifyManifest(fetchImpl, origin, path) {
   }
 }
 
-async function verifyAiCatalog(fetchImpl, origin) {
+async function verifyAiCatalog(fetchImpl, origin, publicOrigin) {
   const path = "/.well-known/ai-catalog.json";
   const response = await expectStatus(fetchImpl, origin, path, 200);
   const contentType = response.headers.get("content-type") || "";
@@ -51,7 +51,7 @@ async function verifyAiCatalog(fetchImpl, origin) {
   const mcpEntry = catalog?.entries?.find(
     (entry) => entry.identifier === "urn:air:omgskills.com:mcp:catalog",
   );
-  if (catalog?.specVersion !== "1.0" || mcpEntry?.data?.endpoint !== `${origin}/mcp`) {
+  if (catalog?.specVersion !== "1.0" || mcpEntry?.data?.endpoint !== `${publicOrigin}/mcp`) {
     throw new Error(`${origin}${path} does not advertise the hosted omgskills MCP server`);
   }
 }
@@ -92,10 +92,13 @@ async function verifyPublicGroupManifest(fetchImpl, origin, expectedFeatures) {
 
 export async function verifyProductionDeploy({
   origin = defaultOrigin,
+  publicOrigin = process.env.PUBLIC_ORIGIN || origin,
   fetchImpl = fetch,
   expectedFeatures,
   verifyCandidateFeatures = process.env.VERIFY_CANDIDATE_FEATURES !== "0",
 } = {}) {
+  origin = origin.replace(/\/$/, "");
+  publicOrigin = publicOrigin.replace(/\/$/, "");
   const reviewedFeatures = expectedFeatures || await loadProductionFeatures();
   await expectStatus(fetchImpl, origin, "/app/", 200);
   await verifyReleaseConfig(fetchImpl, origin, reviewedFeatures);
@@ -149,7 +152,7 @@ export async function verifyProductionDeploy({
     await expectStatus(fetchImpl, origin, `/${relativePath}`, 200, { method: "HEAD" });
   }
 
-  await verifyAiCatalog(fetchImpl, origin);
+  await verifyAiCatalog(fetchImpl, origin, publicOrigin);
   await verifyMcpEndpoint({ origin, fetchImpl });
 
   console.log("Production deploy verified");

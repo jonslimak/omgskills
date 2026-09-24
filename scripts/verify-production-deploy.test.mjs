@@ -142,6 +142,24 @@ test("rollback verification skips candidate-only public group checks", async () 
   assert.equal(requests.some((path) => path.includes("/my-faves")), false);
 });
 
+test("verifies a draft origin while preserving canonical public URLs", async () => {
+  const previewOrigin = "https://preview.test";
+  const requestedOrigins = [];
+  await verifyProductionDeploy({
+    origin: previewOrigin,
+    publicOrigin: origin,
+    expectedFeatures: disabledFeatures,
+    verifyCandidateFeatures: false,
+    fetchImpl: async (url, options) => {
+      const parsed = new URL(url);
+      requestedOrigins.push(parsed.origin);
+      return responseFor(parsed.pathname, options);
+    },
+  });
+
+  assert.deepEqual(new Set(requestedOrigins), new Set([previewOrigin]));
+});
+
 test("fails when a required release asset is missing", async () => {
   await assert.rejects(
     verifyProductionDeploy({
