@@ -24,7 +24,7 @@
     "test:sync-skill": "tsx --test ./netlify/functions/_shared/sync-skill.test.ts",
     "test:database-routing": "tsx --test ./netlify/functions/_shared/db.test.ts ./netlify/functions/_shared/user.test.ts",
     "test:device-auth": "tsx --test ./netlify/functions/_shared/device-auth.test.ts ./netlify/functions/_shared/browser-pairing.test.ts",
-    "test:group-access": "tsx --test ./netlify/functions/_shared/feature-flags.test.ts ./netlify/functions/_shared/group-access.test.ts ./netlify/functions/_shared/group-behavior.test.ts",
+    "test:group-access": "tsx --test ./netlify/functions/_shared/feature-flags.test.ts ./netlify/functions/_shared/group-access.test.ts ./netlify/functions/_shared/group-behavior.test.ts ./netlify/functions/_shared/portal-group-endpoints.test.ts",
     "test:group-manifest": "tsx --test ./netlify/functions/_shared/group-manifest.test.ts ./netlify/functions/_shared/group-manifest-adapters.test.ts ./netlify/functions/_shared/group-manifest-endpoints.test.ts",
     "test:github-broker": "node --test ./scripts/verify-github-broker-app.test.mjs && tsx --test ./netlify/functions/_shared/github-broker.test.ts ./netlify/functions/_shared/private-sources.test.ts ./netlify/functions/_shared/private-release-access.test.ts ./netlify/functions/_shared/private-releases.test.ts ./netlify/functions/_shared/portal-private-sources.test.ts ./netlify/functions/_shared/portal-private-releases.test.ts ./netlify/functions/_shared/skill-package.test.ts ./scripts/bind-github-broker-installation.test.ts",
     "test:group-storage-integration": "tsx --test ./netlify/functions/_shared/group-storage.integration.test.ts",

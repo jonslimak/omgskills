@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2 are implemented locally; populated reads, account controls and isolated profile saves pass. Remaining two-account/shared-access checks are tracked in LOCAL-INTEGRATION.md. Slices C-D are not started. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2 and C1's data foundation are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. Set actions (C2-C4) and Slice D are not started. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -124,7 +124,7 @@ After design review, attach authenticated controllers to the same views.
 - [x] Separate development-only `/app/integration/` entry with Clerk sign-in; sample preview and production entry remain separate.
 - [x] Load skills, owned/shared set summaries, and profile through existing APIs. Use returned set counts without fetching every detail or inventing item records.
 - [x] Keep grouping/search/filter contracts; shared summaries never receive owner membership IDs or email lists from the adapter.
-- [x] Connect lazy real detail reads to the redesigned set layout, with loading/error/retry, response validation and stale-read cancellation. Disable mutation/install controls; show unloaded devices/private sources as unavailable, not disconnected. Desktop/mobile and direct reload verified; item identity remains unknown until Slice C adds physical IDs to the response.
+- [x] Connect lazy real detail reads to the redesigned set layout, with loading/error/retry, response validation and stale-read cancellation. Disable mutation/install controls; show unloaded devices/private sources as unavailable, not disconnected. Desktop/mobile and direct reload verified; C1 subsequently added owner-only physical IDs.
 - [x] Cancel pending reads on unmount/account switch and ignore late responses. Account cache and focus-refresh belong to B2.
 - [x] Require an explicitly verified loopback backend and a development Clerk key before enabling sign-in. Client and local proxy allow only required GET endpoints.
 - [x] Automated checks and blocked-entry browser verification pass. Production excludes both local entries even with their opt-in flags set.
@@ -149,10 +149,15 @@ See `LOCAL-INTEGRATION.md` for setup and remaining checks. B1 is not end-to-end 
 
 ### Small Additive API Change
 
-- [ ] Add nullable `syncedSkillId` to owner-authorized item/detail responses and the client type. No schema migration.
-- [ ] Keep shared/public responses from exposing owner-only identity mappings or allowed-email lists.
+- [x] C1: Add nullable `syncedSkillId` to owner-authorized item/detail responses and the client type. Omit it for shared/public readers; older responses still decode. No schema migration.
+- [x] C1: Keep shared/public responses from exposing owner-only identity mappings or allowed-email lists. Both item endpoints use the same response mapper and no-store headers.
+- [x] C1: Retain allowed-email record IDs in owner summaries/details/cache. Fix DELETE to require `emailId`, not an email address; POST still validates/normalizes email.
 - [ ] Load membership item IDs on demand and cache only within the current account. Invalidate after changes.
 - [ ] Do not match item IDs using names, ordering, or guessed URLs.
+
+C1 verification: 52 portal tests and 21 backend access/endpoint tests pass; root typecheck and portal production build pass. Real SQL checked owner/invited/public reads, email-ID deletion and revoked access in the isolated database, with all fixture writes rolled back. Set mutation routes remain blocked in the local proxy/harness. No push or deployment.
+
+Next checkpoints: C2 basic set editing; C3 membership/Favorites/bulk actions; C4 allowed-email controls and link behavior. Keep device/private-source actions disabled throughout.
 
 ### Interaction Rules
 
@@ -223,4 +228,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-B2 has two local checkpoints: account controls/refresh, then isolated profile editing. Finish the remaining two-account/shared-access checks and plan Slice C's authorized item mapping before enabling set mutations. Slices B-D are not a production rollout authorization.
+C1 supplies authorized item/email IDs and the email-removal fix. Next implement C2 basic set editing against the isolated database; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.

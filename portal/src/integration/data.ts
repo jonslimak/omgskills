@@ -57,6 +57,12 @@ export function setSummary(
   owner: boolean,
   name: string,
 ): PortalSet {
+  if (owner && group.allowedEmails !== undefined &&
+    (!Array.isArray(group.allowedEmails) || group.allowedEmails.some((entry) =>
+      !entry || typeof entry.id !== "string" || !entry.id || typeof entry.email !== "string") ||
+      new Set(group.allowedEmails.map((entry) => entry.id)).size !== group.allowedEmails.length)) {
+    throw new Error("The portal returned invalid access records.");
+  }
   return {
     id: group.id,
     name: group.name,
@@ -69,6 +75,7 @@ export function setSummary(
     emails: owner
       ? (group.allowedEmails ?? []).map((entry) => entry.email)
       : [],
+    allowedEmails: owner ? group.allowedEmails?.map((entry) => ({ ...entry })) : undefined,
     itemCount: group.itemCount,
     membershipSkillIds: owner ? (group.syncedSkillIds ?? []) : undefined,
     items: [], // Summaries are not detail responses. Never invent item records.
@@ -118,6 +125,7 @@ export async function loadSetData(api: PortalApi, groupId: string): Promise<Port
     !["public", "restricted", "private"].includes(group.visibility ?? "") ||
     !Array.isArray(items) || items.some((item) =>
       !item || typeof item.id !== "string" || typeof item.name !== "string" ||
+      (item.syncedSkillId != null && (typeof item.syncedSkillId !== "string" || !item.syncedSkillId)) ||
       typeof item.description !== "string" || !Number.isFinite(item.position) ||
       !["synced", "catalog", "github"].includes(item.kind) ||
       (item.githubUrl !== null && typeof item.githubUrl !== "string")) ||
@@ -128,8 +136,8 @@ export async function loadSetData(api: PortalApi, groupId: string): Promise<Port
     role: group.accessRole,
     items: [...items].sort((a, b) => a.position - b.position).map((item) => ({
       id: item.id,
-      // The current detail endpoint has no physical ID; never infer it by name.
-      syncedSkillId: null,
+      // Older responses omit this ID. Shared viewers never get owner mappings.
+      syncedSkillId: group.accessRole === "owner" && item.kind === "synced" ? item.syncedSkillId ?? null : null,
       name: item.name,
       description: item.description,
       githubUrl: item.githubUrl,

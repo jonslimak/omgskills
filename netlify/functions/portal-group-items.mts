@@ -14,7 +14,8 @@ import {
   type GroupItemPublication,
   reorderGroupItemsWithClient
 } from "./_shared/group-items.js";
-import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./_shared/http.js";
+import { errorResponse, jsonResponse, optionsResponse, secretJsonResponse, withTimeout } from "./_shared/http.js";
+import { portalGroupItem, type PortalGroupItemRow } from "./_shared/portal-group-item.js";
 import { loadPublishedCatalogIdentity } from "./_shared/published-catalog.js";
 import {
   PublicReleaseResolutionError,
@@ -104,15 +105,20 @@ async function persistGroupItem(
   }
 }
 
-async function listGroupItems(req: Request, groupId: string) {
-  const user = await requirePortalUser(req);
-  await requireGroupAccess(user, groupId, "read");
+const defaultReadDependencies = { getPgPool, requirePortalUser, requireGroupAccess };
 
-  const result = await getPgPool().query(
+export async function listGroupItems(req: Request, groupId: string, dependencies = defaultReadDependencies) {
+  const { getPgPool, requirePortalUser, requireGroupAccess } = dependencies;
+  const user = await requirePortalUser(req);
+  const pool = getPgPool();
+  const access = await requireGroupAccess(user, groupId, "read", pool);
+
+  const result = await pool.query<PortalGroupItemRow>(
     `
       SELECT
         i.id,
         i.kind,
+        CASE WHEN $2 = 'owner' THEN i.synced_skill_id ELSE NULL END AS "syncedSkillId",
         i.catalog_skill_id AS "catalogSkillId",
         i.github_url AS "itemGithubUrl",
         i.name AS "snapshotName",
@@ -128,20 +134,12 @@ async function listGroupItems(req: Request, groupId: string) {
       WHERE i.group_id = $1
       ORDER BY i.position ASC
     `,
-    [groupId]
+    [groupId, access.accessRole]
   );
 
-  const items = result.rows.map((row: any) => ({
-    id: row.id,
-    kind: row.kind,
-    name: row.skillName || row.snapshotName || row.catalogSkillId || row.itemGithubUrl || "Skill",
-    description: row.skillDescription || row.snapshotDescription || row.note || "",
-    githubUrl: row.githubUrl || row.itemGithubUrl || null,
-    source: row.source || row.kind,
-    position: row.position
-  }));
+  const items = result.rows.map((row) => portalGroupItem(row, access.accessRole));
 
-  return jsonResponse(req, { items });
+  return secretJsonResponse(req, { items });
 }
 
 export default async (req: Request, _context: Context) => {

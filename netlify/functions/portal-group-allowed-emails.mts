@@ -3,14 +3,17 @@ import { getPgPool } from "./_shared/db.js";
 import { requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
-import { normalizeEmail, requireString } from "./_shared/validation.js";
+import { normalizeEmail, requireJsonObject, requireString } from "./_shared/validation.js";
 
 function groupIdFromPath(req: Request): string | undefined {
   const parts = new URL(req.url).pathname.split("/").filter(Boolean);
   return parts[3];
 }
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requirePortalUser, requireGroupAccess };
+
+export async function portalGroupAllowedEmails(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, requirePortalUser, requireGroupAccess } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -24,10 +27,9 @@ export default async (req: Request, _context: Context) => {
     if (!groupId) {
       throw new Response("Missing group id", { status: 400 });
     }
-    const body = await req.json();
-    const email = normalizeEmail(body?.email);
     const pool = getPgPool();
     await requireGroupAccess(user, groupId, "manage", pool);
+    const body = await requireJsonObject(req);
 
     if (req.method === "DELETE") {
       const emailId = requireString(body?.emailId, "emailId", 100);
@@ -38,6 +40,7 @@ export default async (req: Request, _context: Context) => {
       return jsonResponse(req, { emailId });
     }
 
+    const email = normalizeEmail(body.email);
     await pool.query(
       `
         INSERT INTO skill_group_allowed_emails (group_id, email)
@@ -54,7 +57,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Failed to update allowed email");
   }
-};
+}
+
+export default async (req: Request, context: Context) => portalGroupAllowedEmails(req, context);
 
 export const config: Config = {
   path: "/api/portal/groups/:groupId/allowed-emails"

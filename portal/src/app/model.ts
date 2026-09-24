@@ -24,6 +24,7 @@ export type PortalSet = {
   role: "owner" | "invited" | "public";
   ownerName: string;
   emails: string[];
+  allowedEmails?: { id: string; email: string }[];
   items: SetItem[];
   itemCount?: number;
   membershipSkillIds?: string[];

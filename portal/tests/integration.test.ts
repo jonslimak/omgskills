@@ -178,8 +178,10 @@ test("account reads use four existing endpoints and preserve real summary counts
   assert.equal(result.sets[0].hidden, true);
   assert.equal(result.sets[0].role, "owner");
   assert.deepEqual(result.sets[0].membershipSkillIds, ["physical-id"]);
+  assert.deepEqual(result.sets[0].allowedEmails, group.allowedEmails);
   assert.equal(result.sets[1].role, "invited");
   assert.deepEqual(result.sets[1].emails, []);
+  assert.equal(result.sets[1].allowedEmails, undefined);
   assert.equal(result.sets[1].membershipSkillIds, undefined);
   assert.equal(result.profile.handle, "");
   assert.equal(result.profile.publicUrl, null);
@@ -332,6 +334,10 @@ test("invalid or inaccessible set responses fail closed", async () => {
     { ...valid, items: null },
     { ...valid, items: [valid.items[0], valid.items[0]] },
     { ...valid, items: [{ ...valid.items[0], kind: "unknown" }] },
+    { ...valid, items: [{ ...valid.items[1], syncedSkillId: 123 }] },
+    { ...valid, items: [{ ...valid.items[1], syncedSkillId: "" }] },
+    { ...valid, group: { ...valid.group, allowedEmails: [{ email: "missing-id@example.test" }] } },
+    { ...valid, group: { ...valid.group, allowedEmails: [group.allowedEmails![0], group.allowedEmails![0]] } },
   ]) {
     const transport: PortalApi = async <T>() => response as T;
     await assert.rejects(loadSetData(transport, group.id));
@@ -342,6 +348,31 @@ test("invalid or inaccessible set responses fail closed", async () => {
   await tick();
   assert.deepEqual(delivered, ["error"]);
   cancel();
+});
+
+test("owner detail retains physical and email IDs; shared adapters discard owner-only mappings", async () => {
+  for (const role of ["owner", "invited", "public"]) {
+    const response = detailResponse(role);
+    const transport: PortalApi = async <T>() => ({ ...response,
+      items: response.items.map((item) => ({ ...item, syncedSkillId: "physical-id" })),
+    }) as T;
+    const set = await loadSetData(transport, group.id);
+    assert.equal(set.items[0].syncedSkillId, role === "owner" ? "physical-id" : null);
+    assert.equal(set.items[1].syncedSkillId, null, "catalog entries are not installation mappings");
+    assert.deepEqual(set.allowedEmails, role === "owner" ? group.allowedEmails : undefined);
+  }
+});
+
+test("old and null physical IDs remain unknown rather than inferred", async () => {
+  for (const syncedSkillId of [undefined, null]) {
+    const response = detailResponse();
+    const transport: PortalApi = async <T>() => ({ ...response,
+      items: response.items.map((item) => ({ ...item, syncedSkillId })),
+    }) as T;
+    assert.ok((await loadSetData(transport, group.id)).items.every((item) => item.syncedSkillId === null));
+  }
+  const { allowedEmails: _, ...legacy } = group;
+  assert.equal(setSummary(legacy, true, identity.name).allowedEmails, undefined);
 });
 
 test("cancelled set reads never deliver stale detail even if transport ignores abort", async () => {

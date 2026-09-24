@@ -2,7 +2,8 @@ import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
 import { assertGroupCanBeDeleted, parseGroupPatch } from "./_shared/group-behavior.js";
 import { requireGroupAccess } from "./_shared/group-access.js";
-import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
+import { errorResponse, jsonResponse, optionsResponse, secretJsonResponse } from "./_shared/http.js";
+import { portalGroupItem, type PortalGroupItemRow } from "./_shared/portal-group-item.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { requireJsonObject } from "./_shared/validation.js";
 import { publicGroupAppDeepLink } from "./_shared/public-group-routes.js";
@@ -12,7 +13,10 @@ function groupIdFromPath(req: Request): string | undefined {
   return parts[3];
 }
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requirePortalUser, requireGroupAccess };
+
+export async function portalGroupDetail(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, requirePortalUser, requireGroupAccess } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -62,11 +66,12 @@ export default async (req: Request, _context: Context) => {
       }
       const { ownerHandle, ...publicGroup } = group;
 
-      const itemsResult = await pool.query(
+      const itemsResult = await pool.query<PortalGroupItemRow>(
         `
           SELECT
             i.id,
             i.kind,
+            CASE WHEN $2 = 'owner' THEN i.synced_skill_id ELSE NULL END AS "syncedSkillId",
             i.catalog_skill_id AS "catalogSkillId",
             i.github_url AS "itemGithubUrl",
             i.name AS "snapshotName",
@@ -82,22 +87,15 @@ export default async (req: Request, _context: Context) => {
           WHERE i.group_id = $1
           ORDER BY i.position ASC
         `,
-        [groupId]
+        [groupId, access.accessRole]
       );
 
-      const items = itemsResult.rows.map((row: any) => ({
-        id: row.id,
-        kind: row.kind,
-        name: row.skillName || row.snapshotName || row.catalogSkillId || row.itemGithubUrl || "Skill",
-        description: row.skillDescription || row.snapshotDescription || row.note || "",
-        githubUrl: row.githubUrl || row.itemGithubUrl || null,
-        source: row.source || row.kind,
-        position: row.position
-      }));
+      const items = itemsResult.rows.map((row) => portalGroupItem(row, access.accessRole));
 
-      return jsonResponse(req, {
+      return secretJsonResponse(req, {
         group: {
           ...publicGroup,
+          allowedEmails: access.accessRole === "owner" ? publicGroup.allowedEmails : [],
           appDeepLink: ownerHandle
             ? publicGroupAppDeepLink(ownerHandle, group.slug)
             : null,
@@ -153,7 +151,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Group update failed");
   }
-};
+}
+
+export default async (req: Request, context: Context) => portalGroupDetail(req, context);
 
 export const config: Config = {
   path: "/api/portal/groups/:groupId"

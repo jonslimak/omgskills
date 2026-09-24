@@ -30,6 +30,8 @@ function validCache(data: PortalData) {
       ["owner", "invited", "public"].includes(s.role) &&
       Array.isArray(s.items) && s.items.length === 0 && Array.isArray(s.emails) &&
       s.emails.every((email) => typeof email === "string") &&
+      (s.allowedEmails === undefined || (s.role === "owner" && Array.isArray(s.allowedEmails) &&
+        s.allowedEmails.every((entry) => entry && typeof entry.id === "string" && Boolean(entry.id) && typeof entry.email === "string"))) &&
       (s.membershipSkillIds === undefined || (Array.isArray(s.membershipSkillIds) &&
         s.membershipSkillIds.every((id) => typeof id === "string")))) &&
     data.profile && typeof data.profile.handle === "string" &&

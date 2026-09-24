@@ -1,4 +1,4 @@
-# Local Portal Integration (B1-B2)
+# Local Portal Integration (B1-C1)
 
 Updated 2026-09-24. Local checkpoints on `codex/web-portal-redesign`; not pushed or deployed. Signed-in reads, account controls and profile editing pass against an isolated account snapshot. Production was read only for the approved snapshot; no production writes/migrations, deployment, feature activation, or Mac changes were made.
 
@@ -61,6 +61,9 @@ The launcher sets `PORTAL_TEST_ENVIRONMENT_VERIFIED=1` for this verified local e
 
 ## Verification
 
+- C1: 52 portal tests and 21 backend access/endpoint tests pass; root typecheck and production build pass. Both item read endpoints expose physical skill IDs only to owners and return no-store responses. Owner email-record IDs survive the adapter/cache; older responses remain supported. The email DELETE handler now accepts its existing ID-only request contract.
+- C1 SQL checks passed against the verified isolated database: owner/invited/public reads, deletion by email ID, and denial after access removal. All temporary fixture writes were rolled back; the imported set was unchanged. Authentication was supplied by test dependencies, so these checks do not replace the pending real second-account browser test. Set writes remain blocked in the local proxy/harness.
+
 - B2: 49 portal tests pass; typecheck/production build passes. Tests cover cache expiry/isolation, deduplicated refresh, cancelled/stale reads and saves, validation/access/server errors, publication preservation, authoritative returned URLs, and the exact profile-only write allowlist.
 - Browser: account settings opens Clerk Development settings without changing them; manual refresh retains populated data. Session-scoped sign-out removes private UI; Google sign-in restores the same account with 122 skills and one set. Second-account switching remains unverified.
 - Browser profile checks: reserved handle rejected inline without losing the draft; handle onboarding/normalization and later rename succeed; publication survives rename, then turns off and stays off after reload. The local test handle is `local-b2-verified`, unpublished. Profile dialog fits at 390px. Returned URLs use the local backend origin; the public-page renderer is not served by this harness or verified here.
@@ -74,7 +77,7 @@ The launcher sets `PORTAL_TEST_ENVIRONMENT_VERIFIED=1` for this verified local e
 - Local backend: allowed GET without Clerk configuration returned 503; after configuration, unsigned GET returns 401. PATCH and `/api/portal/devices` return 405 through both backend and Vite proxy. Startup verified the exact local database identity and critical auth columns through `getPgPool()`. Portal tests re-run after database setup: 33 passing.
 - Chrome: development sign-in succeeded. Empty account initially loaded after Retry; after import, authenticated reads and reload succeed. The initial generic load error has not been reproduced or attributed to a confirmed cause.
 - Populated browser checks: 122 grouped skills from 166 current installs; search, no-results/clear, Codex filter (82 logical rows), two-install skill details, owned set summary/detail (two items), Agents and missing-handle Home all render. Mutation controls remain disabled/hidden. Desktop and 390px mobile Skills have no document overflow; mobile navigation opens and closes on selection. Portal tests re-run: 33 passing.
-- Redesigned real set detail verified with two items, expandable descriptions, direct reload, one page heading/main landmark, and no document overflow at desktop/390px mobile. All 37 portal tests passed, including detail roles/order, malformed responses, stale-read cancellation and read-only owner controls; production build passed. The current API omits physical item IDs, so the adapter leaves them null rather than matching by name. B2 subsequently added account controls.
+- Redesigned real set detail verified with two items, expandable descriptions, direct reload, one page heading/main landmark, and no document overflow at desktop/390px mobile. All 37 portal tests passed, including detail roles/order, malformed responses, stale-read cancellation and read-only owner controls; production build passed. B1 left physical IDs unknown; C1 subsequently added explicit owner-only mappings, retaining null for older responses. B2 added account controls.
 
 ```sh
 npm --workspace portal test

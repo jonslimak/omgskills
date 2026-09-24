@@ -133,6 +133,30 @@ test("unavailable browser storage does not block live reads", async () => {
   session.dispose();
 });
 
+test("account cache preserves owner access record IDs and rejects malformed or shared records", async () => {
+  const storage = memoryStorage();
+  const transport: PortalApi = async <T>(path: string) => (path.endsWith("/groups") ? { groups: [{
+    id: "set", name: "Set", slug: "set", itemCount: 0, visibility: "restricted",
+    allowedEmails: [{ id: "email-id", email: "member@example.test" }],
+  }] } : response(path)) as T;
+  const first = createAccountSession({ api: transport, identity, cacheKey: key, storage, changed: noOp });
+  await first.refresh();
+  first.dispose(false);
+  const cached = storage.getItem(key)!;
+  const next = createAccountSession({ api: transport, identity, cacheKey: key, storage, changed: noOp });
+  assert.deepEqual(next.getSnapshot().data?.sets[0].allowedEmails, [{ id: "email-id", email: "member@example.test" }]);
+  next.dispose();
+  for (const change of [{ allowedEmails: [{ email: "missing-id@example.test" }] }, { role: "invited" }]) {
+    const value = JSON.parse(cached);
+    Object.assign(value.data.sets[0], change);
+    storage.setItem(key, JSON.stringify(value));
+    const rejected = createAccountSession({ api: transport, identity, cacheKey: key, storage, changed: noOp });
+    assert.equal(rejected.getSnapshot().data, null);
+    assert.equal(storage.getItem(key), null);
+    rejected.dispose();
+  }
+});
+
 test("profile edits preserve publication, use returned canonical values and reject concurrent saves", async () => {
   const bodies: unknown[] = [];
   let release = () => {};
