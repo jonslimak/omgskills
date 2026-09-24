@@ -19,11 +19,12 @@ export async function listSharedGroups(api: PortalApi): Promise<SkillGroup[]> {
 export async function createGroup(
   api: PortalApi,
   name: string,
-  visibility: GroupVisibility = "private"
+  visibility: GroupVisibility = "private",
+  syncedSkillIds: string[] = []
 ) {
   return api<{ groupId: string }>("/api/portal/groups", {
     method: "POST",
-    body: JSON.stringify({ name, visibility, syncedSkillIds: [] }),
+    body: JSON.stringify({ name, visibility, syncedSkillIds }),
   });
 }
 

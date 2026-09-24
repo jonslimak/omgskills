@@ -13,6 +13,9 @@ import { Action, IconAction } from "../app/ui";
 import type { PortalActions, PortalSet } from "../app/model";
 import { SetControls } from "./SetControls";
 import type { SetCommand } from "./set-data";
+import { useMembershipControls } from "./useMembershipControls";
+import type { MembershipCommand } from "./membership-data";
+import { groupSyncedSkills } from "../synced-skill-grouping";
 import { ReadOnlySetDetail } from "./ReadOnlySetDetail";
 import { ProfileDialog } from "./ProfileDialog";
 import { usePortalApi } from "../portal-api";
@@ -73,6 +76,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
     setSigningOut(true);
     sessionRef.current?.dispose();
     setProfileOpen(false);
+    membership.dismiss();
     setSnapshot({ data: null, refreshing: false, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "", setSaving: false });
     try { await clerk.signOut({ sessionId, redirectUrl: base }); }
     catch {
@@ -115,6 +119,17 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
     if (sessionRef.current !== session) throw new DOMException("Account changed", "AbortError");
     return result;
   }
+  async function saveMembership(command: MembershipCommand) {
+    const session = sessionRef.current;
+    if (!session) throw new Error("Account is not ready.");
+    const result = await session.saveMembership(command);
+    if (sessionRef.current !== session) throw new DOMException("Account changed", "AbortError");
+    return result;
+  }
+  const membership = useMembershipControls({ data,
+    busy: snapshot.setSaving || snapshot.profileSaving,
+    blocked: snapshot.refreshing || signingOut || Boolean(snapshot.error) || !snapshot.data,
+    save: saveMembership, refresh: () => { void sessionRef.current?.refresh(); }, notify });
   return (
     <>
     <PortalApp
@@ -124,6 +139,8 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
       base={base}
       readOnly
       detailSet={detailSet}
+      membership={membership.controls}
+      onNavigate={membership.dismiss}
       setControls={(page, id, navigate) => <SetControls key={`${page}:${id ?? ""}`} page={page}
         set={detailSet?.id === id ? detailSet : null}
         blocked={snapshot.refreshing || snapshot.profileSaving || signingOut || Boolean(snapshot.error)}
@@ -148,10 +165,11 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
         <div className="rd-preview-bar" role="status">
           <span>Local integration · changes stay local</span>
           {snapshot.error && <span role="alert">{snapshot.error}</span>}
+          {membership.error && <span role="alert">{membership.error}</span>}
           {snapshot.accessDenied && <Action onClick={() => { void signOut(); }} disabled={signingOut}>Sign out</Action>}
         </div>
       }
-      renderDetail={(id) => (
+      renderDetail={(id, edit) => (
         <ReadOnlySetDetail
           key={`${id}:${snapshot.revision}`}
           groupId={id}
@@ -159,9 +177,14 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
           actions={actions}
           hasSummary={data.sets.some((set) => set.id === id)}
           loaded={loaded}
+          membership={membership.controls}
+          edit={edit}
+          sets={data.sets}
+          skills={groupSyncedSkills(data.skills)}
         />
       )}
     />
+    {snapshot.data && !snapshot.accessDenied && membership.dialog}
     {profileOpen && snapshot.data && !snapshot.accessDenied && <ProfileDialog
       handle={data.profile.handle} saving={snapshot.profileSaving} blocked={Boolean(snapshot.error)}
       error={snapshot.profileError} close={() => setProfileOpen(false)}

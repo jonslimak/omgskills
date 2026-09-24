@@ -36,20 +36,28 @@ export function isIntegrationRequest(path: string, method = "GET") {
     (path === "/api/portal/profile" && verb === "PATCH") ||
     (path === "/api/portal/groups" && verb === "POST") ||
     (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+$/.test(path) && ["PATCH", "DELETE"].includes(verb)) ||
-    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/moderation$/.test(path) && verb === "PATCH");
+    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/moderation$/.test(path) && verb === "PATCH") ||
+    (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/items$/.test(path) && ["POST", "PATCH", "DELETE"].includes(verb));
 }
 
-// The isolated harness deliberately excludes membership and implicit Favorites creation.
+// Only synced membership is writable here; GitHub/catalog entry and email access stay blocked.
 export function isIntegrationBody(path: string, method: string, body: unknown) {
   if (!isIntegrationRequest(path, method)) return false;
-  if (["GET", "DELETE"].includes(method)) return body === undefined;
+  if (method === "GET" || (method === "DELETE" && !path.endsWith("/items"))) return body === undefined;
   if (!body || typeof body !== "object" || Array.isArray(body)) return false;
   const value = body as Record<string, unknown>;
   const only = (keys: string[]) => Object.keys(value).every((key) => keys.includes(key));
   if (path === "/api/portal/profile") return only(["handle", "profilePublished"]);
-  if (path === "/api/portal/groups") return only(["name", "visibility", "syncedSkillIds"])
-    && typeof value.name === "string" && value.visibility === "private"
-    && Array.isArray(value.syncedSkillIds) && value.syncedSkillIds.length === 0;
+  const ids = (items: unknown) => Array.isArray(items) && items.every((id) => typeof id === "string" && /^[a-zA-Z0-9_-]+$/.test(id)) && new Set(items).size === items.length;
+  if (path === "/api/portal/groups") return only(["name", "visibility", "syncedSkillIds", "isFavorites"])
+    && typeof value.name === "string" && ids(value.syncedSkillIds)
+    && (value.isFavorites === true ? value.name === "Favorite Skills" && value.visibility === "public" && (value.syncedSkillIds as string[]).length > 0
+      : value.isFavorites === undefined && value.visibility === "private");
+  if (path.endsWith("/items")) {
+    if (method === "POST") return only(["kind", "syncedSkillId"]) && value.kind === "synced" && ids([value.syncedSkillId]);
+    if (method === "DELETE") return only(["itemId"]) && ids([value.itemId]);
+    return only(["itemIds"]) && ids(value.itemIds);
+  }
   if (path.endsWith("/moderation")) return only(["disabled"]) && typeof value.disabled === "boolean";
   return only(["name", "description", "visibility"]) && Object.keys(value).length > 0;
 }

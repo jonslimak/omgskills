@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DropdownMenu } from "radix-ui";
 import {
   Check,
@@ -15,6 +15,9 @@ import {
   filterSkills,
   type PortalSet,
   type PortalActions,
+  type MembershipControls,
+  type MembershipResult,
+  membershipStatus,
 } from "./model";
 import {
   Action,
@@ -31,17 +34,22 @@ export function MembershipPicker({
   sets,
   actions,
   newSet,
+  membership,
 }: {
   skill: GroupedSyncedSkill;
   sets: PortalSet[];
   actions: PortalActions;
   newSet: (skills: GroupedSyncedSkill[]) => void;
+  membership?: MembershipControls;
 }) {
+  const [error, setError] = useState("");
+  const live = useRef(false);
+  useEffect(() => { live.current = true; return () => { live.current = false; }; }, []);
   return (
     <PanelPopover
       label={`Sets for ${skill.name}`}
       trigger={
-        <IconAction label={`Add ${skill.name} to set`}>
+        <IconAction label={`Add ${skill.name} to set`} disabled={membership && (membership.busy || membership.blocked)}>
           <ListPlus />
         </IconAction>
       }
@@ -54,15 +62,23 @@ export function MembershipPicker({
             <input
               type="checkbox"
               checked={isMember(set, skill)}
-              onChange={(event) =>
-                actions.membership(set.id, [skill], event.target.checked)
-              }
+              disabled={membership && (membership.busy || membership.blocked || membershipStatus(set, skill) === null)}
+              onChange={(event) => {
+                if (!membership) { actions.membership(set.id, [skill], event.target.checked); return; }
+                setError("");
+                void membership.change(set.id, [skill], event.target.checked)
+                  .then((result) => { if (live.current) setError(result.failed.map((item) => item.message).join(" ")); })
+                  .catch((error) => { if (live.current) setError(error instanceof Error ? error.message : "Could not update membership."); });
+              }}
             />
-            <span>{set.name}</span>
+            <span>{set.name}{membership && membershipStatus(set, skill) === null ? " (membership unavailable)" : ""}</span>
           </label>
         ))}
       <div className="rd-menu-divider" />
-      <Action variant="ghost" onClick={() => newSet([skill])}>
+      {error && <p role="alert">{error}</p>}
+      {membership && sets.some((set) => set.role === "owner" && membershipStatus(set, skill) === null) &&
+        <Action disabled={membership.busy} onClick={membership.refresh}>Refresh membership</Action>}
+      <Action variant="ghost" disabled={membership && (membership.busy || membership.blocked)} onClick={() => newSet([skill])}>
         <Plus data-icon="inline-start" />
         New set...
       </Action>
@@ -81,6 +97,7 @@ export function SkillsPage({
   star,
   inspect,
   readOnly = false,
+  membership,
 }: {
   skills: GroupedSyncedSkill[];
   sets: PortalSet[];
@@ -92,9 +109,25 @@ export function SkillsPage({
   star: (skills: GroupedSyncedSkill[], add: boolean) => void;
   inspect: (skill: GroupedSyncedSkill) => void;
   readOnly?: boolean;
+  membership?: MembershipControls;
 }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
+  const [error, setError] = useState("");
+  const live = useRef(false);
+  useEffect(() => { live.current = true; return () => { live.current = false; }; }, []);
+  const unavailable = membership ? membership.busy || membership.blocked : readOnly;
+  async function run(work: () => Promise<MembershipResult>) {
+    setError("");
+    try {
+      const result = await work();
+      if (!live.current) return;
+      setSelected((ids) => ids.filter((id) => !result.completedIds.includes(id)));
+      setError(result.failed.map((item) => `${item.name}: ${item.message}`).join(" "));
+    } catch (error) { if (live.current) setError(error instanceof Error ? error.message : "Could not update membership."); }
+  }
+  const create = (chosen: GroupedSyncedSkill[]) => membership ? void run(() => membership.create(chosen)) : newSet(chosen);
+  const favorite = (chosen: GroupedSyncedSkill[], add: boolean) => membership ? void run(() => membership.star(chosen, add)) : star(chosen, add);
   useEffect(() => {
     const liveIds = new Set(skills.map((skill) => skill.id));
     setSelected((current) => current.filter((id) => liveIds.has(id)));
@@ -105,7 +138,7 @@ export function SkillsPage({
   const sources = [...new Set(skills.flatMap((skill) => skill.sources))].sort();
   const rows = filterSkills(skills, query, source);
   const selectedSkills = skills.filter((skill) => selected.includes(skill.id));
-  const favorites = sets.find((set) => set.isFavorites);
+  const favorites = sets.find((set) => set.role === "owner" && set.isFavorites);
   const choose = (id: string, checked: boolean) =>
     setSelected((current) =>
       checked
@@ -186,13 +219,13 @@ export function SkillsPage({
         <div className="rd-bulk">
           <span>{selectedSkills.length} selected</span>
           <div className="rd-actions">
-            <Action variant="ghost" onClick={() => setSelected([])}>
+            <Action variant="ghost" disabled={unavailable} onClick={() => setSelected([])}>
               Clear
             </Action>
             <PanelPopover
               label="Choose target set"
               trigger={
-                <Action>
+                <Action disabled={unavailable}>
                   <ListPlus data-icon="inline-start" />
                   Add to set
                 </Action>
@@ -206,7 +239,9 @@ export function SkillsPage({
                     className="rd-menu-action"
                     variant="ghost"
                     key={set.id}
+                    disabled={unavailable}
                     onClick={() => {
+                      if (membership) { void run(() => membership.change(set.id, selectedSkills, true)); return; }
                       actions.membership(set.id, selectedSkills, true);
                       setSelected([]);
                     }}
@@ -214,14 +249,16 @@ export function SkillsPage({
                     {set.name}
                   </Action>
                 ))}
-              <Action variant="ghost" onClick={() => newSet(selectedSkills)}>
+              <Action variant="ghost" disabled={unavailable} onClick={() => create(selectedSkills)}>
                 <Plus data-icon="inline-start" />
                 New set...
               </Action>
             </PanelPopover>
             <Action
               variant="default"
+              disabled={unavailable}
               onClick={() => {
+                if (membership) { favorite(selectedSkills, true); return; }
                 star(selectedSkills, true);
                 setSelected([]);
               }}
@@ -232,6 +269,7 @@ export function SkillsPage({
           </div>
         </div>
       )}
+      {error && <p role="alert">{error}</p>}
       <div className="rd-table-wrap">
         <table className="rd-table">
           <thead>
@@ -241,6 +279,7 @@ export function SkillsPage({
                   <input
                     type="checkbox"
                     aria-label="Select all visible skills"
+                    disabled={unavailable}
                     checked={
                       rows.length > 0 &&
                       rows.every((skill) => selected.includes(skill.id))
@@ -284,6 +323,7 @@ export function SkillsPage({
                     <input
                       type="checkbox"
                       aria-label={`Select ${skill.name}`}
+                      disabled={unavailable}
                       checked={selected.includes(skill.id)}
                       onChange={(event) =>
                         choose(skill.id, event.target.checked)
@@ -320,8 +360,8 @@ export function SkillsPage({
                 <td>
                   <div className="rd-actions">
                     <IconAction
-                      disabled={readOnly}
-                      {...(readOnly ? { title: "Favorites changes are not connected yet" } : {})}
+                      disabled={unavailable || Boolean(membership && favorites && membershipStatus(favorites, skill) === null)}
+                      {...(readOnly && !membership ? { title: "Favorites changes are not connected yet" } : {})}
                       className={
                         favorites && isMember(favorites, skill)
                           ? "rd-starred"
@@ -332,7 +372,7 @@ export function SkillsPage({
                         favorites && isMember(favorites, skill),
                       )}
                       onClick={() =>
-                        star(
+                        favorite(
                           [skill],
                           !(favorites && isMember(favorites, skill)),
                         )
@@ -340,7 +380,7 @@ export function SkillsPage({
                     >
                       <Star />
                     </IconAction>
-                    {readOnly ? (
+                    {readOnly && !membership ? (
                       <IconAction
                         label={`Add ${skill.name} to set`}
                         disabled
@@ -353,7 +393,8 @@ export function SkillsPage({
                         skill={skill}
                         sets={sets}
                         actions={actions}
-                        newSet={newSet}
+                        newSet={create}
+                        membership={membership}
                       />
                     )}
                   </div>

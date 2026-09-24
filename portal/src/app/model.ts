@@ -61,6 +61,26 @@ export type ProfileControls = {
   busy: boolean;
   error: string;
 };
+export type MembershipResult = {
+  completedIds: string[];
+  failed: { id: string; name: string; message: string }[];
+  added: number;
+  removed: number;
+  unchanged: number;
+  uncertain: boolean;
+  groupId?: string;
+};
+export type MembershipControls = {
+  busy: boolean;
+  blocked: boolean;
+  change: (setId: string, skills: GroupedSyncedSkill[], add: boolean) => Promise<MembershipResult>;
+  star: (skills: GroupedSyncedSkill[], add: boolean) => Promise<MembershipResult>;
+  create: (skills: GroupedSyncedSkill[]) => Promise<MembershipResult>;
+  addSkills: (setId: string) => void;
+  removeItem: (setId: string, itemId: string) => Promise<void>;
+  reorder: (setId: string, itemIds: string[]) => Promise<void>;
+  refresh: () => void;
+};
 export type PortalActions = {
   updateSet: (
     id: string,
@@ -92,6 +112,10 @@ export function isMember(set: PortalSet, skill: GroupedSyncedSkill) {
         skill.allSkillIds.includes(item.syncedSkillId),
     )
   );
+}
+export function membershipStatus(set: PortalSet, skill: GroupedSyncedSkill): boolean | null {
+  if (isMember(set, skill)) return true;
+  return set.membershipSkillIds === undefined ? null : false;
 }
 export function filterSkills(
   skills: GroupedSyncedSkill[],

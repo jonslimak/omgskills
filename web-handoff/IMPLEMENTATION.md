@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2, C1's data foundation and C2 basic set editing are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. C3-C4 and Slice D are not started. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2 and C1-C3 are implemented locally. Remaining two-account/shared-access browser checks are tracked in LOCAL-INTEGRATION.md. C4 and Slice D are not started. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -152,8 +152,8 @@ See `LOCAL-INTEGRATION.md` for setup and remaining checks. B1 is not end-to-end 
 - [x] C1: Add nullable `syncedSkillId` to owner-authorized item/detail responses and the client type. Omit it for shared/public readers; older responses still decode. No schema migration.
 - [x] C1: Keep shared/public responses from exposing owner-only identity mappings or allowed-email lists. Both item endpoints use the same response mapper and no-store headers.
 - [x] C1: Retain allowed-email record IDs in owner summaries/details/cache. Fix DELETE to require `emailId`, not an email address; POST still validates/normalizes email.
-- [ ] Load membership item IDs on demand and cache only within the current account. Invalidate after changes.
-- [ ] Do not match item IDs using names, ordering, or guessed URLs.
+- [x] C3: Read authorized membership item IDs once per operation; keep mappings operation-local rather than persist another cache. Reconcile summaries/detail after changes.
+- [x] C3: Do not match item IDs using names, ordering, or guessed URLs.
 
 C1 verification: 52 portal tests and 21 backend access/endpoint tests pass; root typecheck and portal production build pass. Real SQL checked owner/invited/public reads, email-ID deletion and revoked access in the isolated database, with all fixture writes rolled back. Set mutation routes remain blocked in the local proxy/harness. No push or deployment.
 
@@ -168,18 +168,24 @@ C1 verification: 52 portal tests and 21 backend access/endpoint tests pass; root
 
 C2 verification: 61 portal tests, 19 backend access/behavior/endpoint tests, root typecheck and production build pass. Browser checks passed for create, rename/description, all visibility states, Hide/Restore, duplicate-slug draft retention, delete, reload, and 390px layout. Disposable set deleted; original set unchanged. Local integration remains excluded from production bundles. No push or deployment.
 
-Next checkpoints: C3 membership/Favorites/bulk actions; C4 allowed-email controls and link behavior. Keep device/private-source actions disabled throughout.
+### C3: Membership And Bulk Actions
+
+Implemented locally using existing APIs: membership toggles, Favorites, sequential bulk adds, transactional selected-skill set creation, exact item removal and complete-list reorder. Account-wide write serialization also covers C2/profile changes. Unknown outcomes stop remaining writes and require refresh; no automatic mutation retry. Account disposal aborts work; route changes close dialogs and suppress late UI completion. A submitted write may finish and is reconciled, not assumed undone.
+
+Verification: 76 portal tests, 26 backend access/behavior/endpoint/publication tests, root typecheck and production build pass. Browser checks on disposable local skills covered a grouped Claude/Codex pair, selected creation, add/remove/reorder, checked membership, star/unstar with public disclosure, duplicate-safe bulk add, reload persistence and a 390px dialog. Original set/skills fingerprint unchanged after cleanup. Partial failures, unknown outcomes and account races have automated coverage; Favorites first creation/race and resolved-skill publication were tested with controlled API/dependency fixtures, not live GitHub publication. Real two-account/shared-access browser checks remain open. No push or deployment.
+
+Next: C4 allowed-email controls and link behavior. Keep device/private-source actions disabled throughout.
 
 ### Interaction Rules
 
-- [ ] Star toggles public Favorites. Disclose visibility before the first add; retain protected-set rules.
-- [ ] A logical skill is a member when any `allSkillIds` match. Removal removes every matching membership, never unrelated set items.
-- [ ] Add one representative synced ID per logical row, unless an existing member already satisfies membership. Server responses remain authoritative.
-- [ ] Unknown membership is a loading/error state, not an unchecked checkbox. Disable conflicting actions while a row/target mutation is pending.
-- [ ] Bulk actions use a small bounded request queue, report per-item outcomes, and retain failed selections for retry. Reconcile duplicate/already-present responses rather than claiming new additions.
-- [ ] New-set creation passes selected IDs through the existing supported API parameter and refreshes returned state.
+- [x] Star toggles public Favorites. Disclose visibility before the first add; retain protected-set rules.
+- [x] A logical skill is a member when any `allSkillIds` match. Removal removes every matching membership, never unrelated set items.
+- [x] Add one representative synced ID per logical row, unless an existing member already satisfies membership. Server responses remain authoritative.
+- [x] Unknown membership is explicitly unavailable, not treated as confirmed absence. Disable conflicting actions while a mutation is pending.
+- [x] Bulk actions run sequentially, report per-item outcomes, and retain failed selections for retry. Reconcile duplicate/already-present responses rather than claiming new additions.
+- [x] New-set creation passes selected IDs through the existing supported API parameter and refreshes returned state.
 - [x] C2: Preserve rename, description, delete confirmation, and Hide/Restore.
-- [ ] C3: Wire reorder/item removal while preserving source links and every set item kind.
+- [x] C3: Wire reorder/item removal while preserving source links and every set item kind.
 - [ ] Owner-only controls remain absent for shared viewers; server checks remain the security boundary.
 - [ ] Keep allowed-email access wording accurate and preserve restricted/private distinctions.
 - [ ] For an owned public set with a known handle/slug, use the canonical web URL. Otherwise use the authenticated detail link with access-appropriate wording. Defer adding a server `shareUrl` unless this proves insufficient.
@@ -240,4 +246,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-C1-C2 supply authorized item/email IDs and basic set editing. Next plan C3 membership/Favorites/bulk actions against the isolated database; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.
+C1-C3 supply authorized item/email IDs, basic set editing and membership actions. Next plan C4 allowed-email controls and link behavior; finish the remaining two-account/shared-access browser checks before closing Slice B/C verification. Slices B-D are not a production rollout authorization.

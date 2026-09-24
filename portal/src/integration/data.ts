@@ -77,7 +77,7 @@ export function setSummary(
       : [],
     allowedEmails: owner ? group.allowedEmails?.map((entry) => ({ ...entry })) : undefined,
     itemCount: group.itemCount,
-    membershipSkillIds: owner ? (group.syncedSkillIds ?? []) : undefined,
+    membershipSkillIds: owner ? group.syncedSkillIds : undefined,
     items: [], // Summaries are not detail responses. Never invent item records.
   };
 }

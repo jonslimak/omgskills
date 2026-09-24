@@ -3,6 +3,9 @@ import type { PortalData } from "../app/model";
 import { isAccessError, PortalApiError } from "../api-error";
 import { loadAccountData, readOnlyApi, saveProfileData, type AccountIdentity } from "./data";
 import { saveSetData, type SetCommand } from "./set-data";
+import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, emptyMembershipResult, type MembershipCommand } from "./membership-data";
+import { groupSyncedSkills } from "../synced-skill-grouping";
+import type { MembershipResult } from "../app/model";
 
 export type AccountSnapshot = {
   data: PortalData | null;
@@ -185,11 +188,71 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
     mutation = { controller, promise };
     return promise;
   }
+  function saveMembership(command: MembershipCommand): Promise<MembershipResult> {
+    if (!active || !snapshot.data || snapshot.accessDenied || snapshot.error) return Promise.reject(new Error("Refresh your account before saving."));
+    if (mutation) return Promise.reject(new Error("A save is already in progress."));
+    const current = snapshot.data;
+    const version = ++generation;
+    request?.controller.abort(); request = undefined;
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const scoped: PortalApi = (path, init) => api(path, { ...init, signal, redirect: "error", cache: "no-store" });
+    const checkActive = () => { if (!active || version !== generation) throw new DOMException("Account changed", "AbortError"); };
+    emit({ refreshing: false, setSaving: true });
+    const promise = (async () => {
+      let result = emptyMembershipResult();
+      let failure: unknown;
+      try {
+        if (command.kind === "remove-item") await removeMembershipItem(scoped, command.id, command.itemId, signal);
+        else if (command.kind === "reorder") await reorderMembership(scoped, command.id, command.itemIds, signal);
+        else {
+          const live = new Map(groupSyncedSkills(current.skills).map((skill) => [skill.id, skill]));
+          const skills = [...new Set(command.skills.map((skill) => skill.id))].map((id) => {
+            const skill = live.get(id);
+            if (!skill) throw new PortalApiError("Your selected skills changed. Refresh and select them again.", 409);
+            return skill;
+          });
+          result = command.kind === "change" ? await changeMembership(scoped, command.id, skills, command.add, signal)
+            : command.kind === "favorites" ? await changeFavorites(scoped, current.sets, skills, command.add, signal)
+            : await createSelectedSet(scoped, command.name, skills, signal);
+        }
+      } catch (error) { failure = error; }
+      checkActive();
+      const denied = isAccessError(failure);
+      const unknown = failure && (!(failure instanceof PortalApiError) || failure.status >= 500);
+      if (denied) {
+        clearCache();
+        emit({ data: null, accessDenied: true, setSaving: false, error: "Account access is unavailable. Sign in again." });
+        throw new Error("Account access is unavailable. Sign in again.");
+      }
+      // Reconcile even a partial batch; never replay writes to recover a failed read.
+      let data = current;
+      let refreshError = "";
+      try { data = await loadAccountData(readOnlyApi(scoped), identity); checkActive(); persist(data); }
+      catch (error) {
+        checkActive();
+        if (isAccessError(error)) {
+          clearCache();
+          emit({ data: null, accessDenied: true, setSaving: false, error: "Changes may have saved, but account access is unavailable. Sign in again." });
+          throw new Error("Account access is unavailable. Sign in again.");
+        }
+        refreshError = "Could not refresh after the operation. Refresh to confirm the latest membership.";
+      }
+      emit({ data, setSaving: false, revision: snapshot.revision + 1,
+        error: unknown || result.uncertain ? "Some changes could not be confirmed. Refresh before continuing." : refreshError });
+      if (failure) throw new Error(unknown ? "Could not confirm all changes. Refresh before trying again."
+        : failure instanceof Error ? failure.message : "Could not update the set.");
+      return result;
+    })().finally(() => { if (mutation?.controller === controller) mutation = undefined; });
+    mutation = { controller, promise };
+    return promise;
+  }
   return {
     getSnapshot: () => snapshot,
     refresh,
     saveProfile,
     saveSet,
+    saveMembership,
     dispose(removeCache = true) {
       active = false;
       generation++;

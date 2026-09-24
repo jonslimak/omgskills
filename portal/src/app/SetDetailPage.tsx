@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, X, Plus, EyeOff, Star } from "lucide-react";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
-import { isMember, visibilityLabels, type PortalActions, type PortalSet } from "./model";
+import { isMember, membershipStatus, visibilityLabels, type PortalActions, type PortalSet, type MembershipControls } from "./model";
 import {
   Action,
   Avatar,
@@ -24,6 +24,7 @@ export function SetDetailPage({
   star,
   newSet,
   readOnly = false,
+  membership,
 }: {
   set: PortalSet;
   actions: PortalActions;
@@ -35,18 +36,33 @@ export function SetDetailPage({
   star: (skills: GroupedSyncedSkill[], add: boolean) => void;
   newSet: (skills: GroupedSyncedSkill[]) => void;
   readOnly?: boolean;
+  membership?: MembershipControls;
 }) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const owner = set.role === "owner";
   const canEdit = owner && !readOnly;
+  const canEditItems = owner && (!readOnly || Boolean(membership));
+  const busy = Boolean(membership && (membership.busy || membership.blocked));
+  const [error, setError] = useState("");
+  const live = useRef(false);
+  useEffect(() => { live.current = true; return () => { live.current = false; }; }, []);
+  const execute = async (work: () => Promise<unknown>) => {
+    setError("");
+    try {
+      const result = await work() as { failed?: { name: string; message: string }[] } | undefined;
+      if (live.current) setError(result?.failed?.map((item) => `${item.name}: ${item.message}`).join(" ") ?? "");
+    } catch (error) { if (live.current) setError(error instanceof Error ? error.message : "Could not update the set."); }
+  };
+  const create = (selected: GroupedSyncedSkill[]) => membership ? void execute(() => membership.create(selected)) : newSet(selected);
   const reorder = (index: number, offset: number) => {
     const items = [...set.items];
     [items[index], items[index + offset]] = [
       items[index + offset],
       items[index],
     ];
-    actions.updateSet(set.id, { items });
+    if (membership) void execute(() => membership.reorder(set.id, items.map((item) => item.id)));
+    else actions.updateSet(set.id, { items });
   };
   return (
     <>
@@ -125,13 +141,14 @@ export function SetDetailPage({
         <h2>
           Skills <span className="rd-muted">{set.items.length}</span>
         </h2>
-        {canEdit && edit && (
-          <Action onClick={addSkills} disabled={!skills.length}>
+        {canEditItems && edit && (
+          <Action onClick={membership ? () => membership.addSkills(set.id) : addSkills} disabled={busy || !skills.length}>
             <Plus data-icon="inline-start" />
             Add skills
           </Action>
         )}
       </div>
+      {error && <p role="alert">{error}</p>}
       <div className="rd-table-wrap">
         <table className="rd-table rd-detail-table">
           <thead>
@@ -140,7 +157,7 @@ export function SetDetailPage({
               <th className="rd-desktop rd-source-column">Source</th>
               <th
                 className={
-                  canEdit && edit ? "rd-detail-action-column" : "rd-action-column"
+                  canEditItems && edit ? "rd-detail-action-column" : "rd-action-column"
                 }
               >
                 <span className="rd-sr-only">Actions</span>
@@ -154,7 +171,7 @@ export function SetDetailPage({
                   item.syncedSkillId &&
                   skill.allSkillIds.includes(item.syncedSkillId),
               );
-              const favorites = sets.find((set) => set.isFavorites);
+              const favorites = sets.find((set) => set.role === "owner" && set.isFavorites);
               const starred = Boolean(
                 skill && favorites && isMember(favorites, skill),
               );
@@ -178,18 +195,18 @@ export function SetDetailPage({
                     )}
                   </td>
                   <td>
-                    {canEdit && edit ? (
+                    {canEditItems && edit ? (
                       <div className="rd-actions">
                         <IconAction
                           label={`Move ${item.name} up`}
-                          disabled={index === 0}
+                          disabled={busy || index === 0}
                           onClick={() => reorder(index, -1)}
                         >
                           <ArrowUp />
                         </IconAction>
                         <IconAction
                           label={`Move ${item.name} down`}
-                          disabled={index === set.items.length - 1}
+                          disabled={busy || index === set.items.length - 1}
                           onClick={() => reorder(index, 1)}
                         >
                           <ArrowDown />
@@ -197,13 +214,15 @@ export function SetDetailPage({
                         <IconAction
                           variant="destructive"
                           label={`Remove ${item.name}`}
-                          onClick={() =>
+                          disabled={busy}
+                          onClick={() => {
+                            if (membership) { void execute(() => membership.removeItem(set.id, item.id)); return; }
                             actions.updateSet(set.id, {
                               items: set.items.filter(
                                 (value) => value.id !== item.id,
                               ),
-                            })
-                          }
+                            });
+                          }}
                         >
                           <X />
                         </IconAction>
@@ -211,29 +230,31 @@ export function SetDetailPage({
                     ) : (
                       <div className="rd-actions">
                         <IconAction
-                          disabled={readOnly || !skill}
+                          disabled={(readOnly && !membership) || busy || !skill || Boolean(membership && favorites && skill && membershipStatus(favorites, skill) === null)}
                           className={starred ? "rd-starred" : undefined}
                           label={
-                            readOnly
+                            readOnly && !membership
                               ? `Star ${item.name}`
                               : skill
                               ? `${starred ? "Unstar" : "Star"} ${item.name}`
                               : "Not in your synced library"
                           }
-                          {...(readOnly ? { title: "Favorites changes are not connected yet" } : {})}
+                          {...(readOnly && !membership ? { title: "Favorites changes are not connected yet" } : {})}
                           aria-pressed={starred}
                           onClick={() => {
-                            if (skill) star([skill], !starred);
+                            if (skill && membership) void execute(() => membership.star([skill], !starred));
+                            else if (skill) star([skill], !starred);
                           }}
                         >
                           <Star />
                         </IconAction>
-                        {skill && !readOnly && (
+                        {skill && (!readOnly || membership) && (
                           <MembershipPicker
                             skill={skill}
                             sets={sets}
                             actions={actions}
-                            newSet={newSet}
+                            newSet={create}
+                            membership={membership}
                           />
                         )}
                       </div>
@@ -248,7 +269,7 @@ export function SetDetailPage({
           <EmptyState
             title="No skills in this set"
             description={
-              canEdit
+              canEditItems
                 ? "Choose Edit to add skills."
                 : "The owner hasn't added any skills yet."
             }

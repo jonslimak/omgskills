@@ -80,6 +80,8 @@ export function PortalApp({
   profileControls,
   setControls,
   detailSet,
+  membership,
+  onNavigate,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -89,12 +91,14 @@ export function PortalApp({
   notice: string;
   notify: (text: string) => void;
   readOnly?: boolean;
-  renderDetail?: (groupId: string) => ReactNode;
+  renderDetail?: (groupId: string, edit: boolean) => ReactNode;
   accountControls?: import("./model").AccountControls;
   refreshControl?: ReactNode;
   profileControls?: import("./model").ProfileControls;
   setControls?: (page: string, groupId: string | undefined, navigate: (path: string) => void) => ReactNode;
   detailSet?: PortalSet | null;
+  membership?: import("./model").MembershipControls;
+  onNavigate?: () => void;
 }) {
   const [locationKey, setLocationKey] = useState(
     location.pathname + location.search,
@@ -119,6 +123,7 @@ export function PortalApp({
     setDialog(null);
   }, [pathname]);
   const navigate = (path: string) => {
+    onNavigate?.();
     history.pushState(null, "", base + path);
     setLocationKey(location.pathname + location.search);
     setDrawer(false);
@@ -262,10 +267,10 @@ export function PortalApp({
           } as const
         )[route.page];
   const canEdit =
-    !readOnly &&
+    (!readOnly || Boolean(membership)) &&
     state === "ready" &&
     (route.page === "skills" ||
-      route.page === "sets" ||
+      (!readOnly && route.page === "sets") ||
       (route.page === "detail" && activeSet?.role === "owner"));
   return (
     <div className="portal-design rd-root">
@@ -396,7 +401,7 @@ export function PortalApp({
                 </>
               )}
               {canEdit && (
-                <Action onClick={() => setEdit((value) => !value)}>
+                <Action disabled={membership && (membership.busy || membership.blocked)} onClick={() => setEdit((value) => !value)}>
                   {edit ? "Done" : "Edit"}
                 </Action>
               )}
@@ -449,6 +454,12 @@ export function PortalApp({
                 {route.page === "skills" && (
                   <SkillsPage
                     readOnly={readOnly}
+                    membership={membership ? { ...membership, create: async (chosen) => {
+                      const origin = location.pathname;
+                      const result = await membership.create(chosen);
+                      if (result.groupId && location.pathname === origin) navigate(`groups/${result.groupId}`);
+                      return result;
+                    } } : undefined}
                     skills={skills}
                     sets={data.sets}
                     actions={actions}
@@ -508,7 +519,7 @@ export function PortalApp({
                 {route.page === "detail" &&
                   renderDetail &&
                   route.groupId &&
-                  renderDetail(route.groupId)}
+                  renderDetail(route.groupId, edit)}
                 {route.page === "detail" && activeSet && !renderDetail && (
                   <SetDetailPage
                     readOnly={readOnly}
