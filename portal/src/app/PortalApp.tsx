@@ -83,6 +83,7 @@ export function PortalApp({
   membership,
   onNavigate,
   devicesPanel,
+  privateSourcesPanel,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -101,6 +102,7 @@ export function PortalApp({
   membership?: import("./model").MembershipControls;
   onNavigate?: () => void;
   devicesPanel?: ReactNode;
+  privateSourcesPanel?: ReactNode;
 }) {
   const [locationKey, setLocationKey] = useState(
     location.pathname + location.search,
@@ -509,6 +511,7 @@ export function PortalApp({
                 )}
                 {route.page === "home" && (
                   <HomePage
+                    privateSourcesPanel={privateSourcesPanel}
                     accountControls={accountControls}
                     profileControls={profileControls}
                     readOnly={readOnly}

@@ -843,6 +843,19 @@ button.rd-skill-title:hover {
 .rd-source-release .rd-action {
   margin-left: auto;
 }
+.rd-private-source-live {
+  display: grid;
+  gap: 12px;
+}
+.rd-private-source-live .rd-section-heading {
+  margin: 0;
+}
+.rd-private-source-live .rd-connected-source > .rd-action {
+  justify-self: start;
+}
+.rd-private-source-live .rd-source-release .rd-grow {
+  overflow-wrap: anywhere;
+}
 .rd-account-actions {
   display: flex;
   gap: 8px;

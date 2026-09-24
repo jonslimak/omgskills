@@ -13,6 +13,7 @@ import { Action, IconAction } from "../app/ui";
 import type { PortalActions, PortalSet } from "../app/model";
 import { SetControls } from "./SetControls";
 import { DevicesPanel } from "./DevicesPanel";
+import { PrivateSourcesPanel } from "./PrivateSourcesPanel";
 import type { SetCommand, EmailCommand } from "./set-data";
 import { SetAccessControls } from "./SetAccessControls";
 import { setLink } from "../app/set-link";
@@ -152,6 +153,7 @@ function Account({ identity, cacheKey, sessionId }: { identity: AccountIdentity;
       detailSet={detailSet}
       membership={membership.controls}
       devicesPanel={<DevicesPanel api={api} denied={() => sessionRef.current?.invalidateAccess()} />}
+      privateSourcesPanel={<PrivateSourcesPanel api={api} denied={() => sessionRef.current?.invalidateAccess()} />}
       onNavigate={membership.dismiss}
       setControls={(page, id, navigate) => <SetControls key={`${page}:${id ?? ""}`} page={page}
         set={detailSet?.id === id ? detailSet : null}

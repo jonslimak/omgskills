@@ -15,7 +15,7 @@ test("generation guard permits only empty POST bodies and blocks exchange, scope
       assert.equal(isIntegrationBody(path, "POST", body), false);
     assert.equal(isIntegrationRequest(path, "GET"), false);
   }
-  for (const path of ["/api/portal/device-exchange", "/api/portal/sync-upload", "/api/portal/private-sources"])
+  for (const path of ["/api/portal/device-exchange", "/api/portal/sync-upload"])
     assert.equal(isIntegrationRequest(path, "POST"), false);
 });
 test("generation is explicit, preserves endpoint contracts and does not regenerate a valid secret", async () => {

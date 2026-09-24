@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2, C1-C4 and D1-D2 are implemented locally. C4 and D2 user manual testing passed. Remaining browser checks are tracked in LOCAL-INTEGRATION.md. D3-D4 remain. Updated 2026-09-24.
+Status: Slice A committed and design-approved. B1-B2, C1-C4 and D1-D3 are implemented locally. C4, D2 and D3 user manual testing passed. Remaining browser checks are tracked in LOCAL-INTEGRATION.md. D4 remains. Updated 2026-09-24.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -216,10 +216,16 @@ D1 verification: 98 portal tests, eight backend device-auth tests, root typechec
 
 D2 verification: 108 portal tests, root typecheck and normal/flag-enabled production builds pass; local modules remain excluded. User reported generation in both tabs and close/reopen clearing green. SQL confirmed one unused code and one unused legacy token, hashed with ten-minute expiry; both identified test rows removed, zero devices created. Local API/proxy reject unsigned generation (401), nonempty generation bodies and exchange/upload/private-source requests (405). Expiry, rate limits, cancellation/account races and clipboard failure are automated tests, not live browser fault injection. Browser tooling timed out; automated desktop/mobile visual verification remains for D4. No Mac pairing, push or deployment.
 
-### D3-D4: Remaining Steps
+### D3: Private Sources
 
-- [ ] D3: Retain private-source installation/repository/root selection, source registration, and release creation, including disconnected, empty, error, and pending states. Use a controlled local GitHub substitute first; real Broker/private-repository testing requires separate approval, not just database isolation.
-- [ ] Keep unsupported agent and GitHub setup actions explicit and non-operative.
+- [x] Home loads private sources independently, with account/repository/root selection, source registration and private snapshot creation through existing APIs. Disconnected, empty, unavailable and pending states stay distinct. Forms retain drafts; writes serialize and uncertain results require refresh. Confirmed registration survives a failed follow-up read. Account/page disposal aborts requests and ignores late results; authorization loss clears account data.
+- [x] Local GitHub substitute uses real isolated SQL, no Broker credentials/network fallback. Only source GET/POST and bodyless source UUID/release POST are enabled; package downloads stay blocked. Returned snapshot confirmation is memory-only, not release history. Repeated identical content reuses its release.
+- [x] Unsupported agent and self-service GitHub setup actions remain non-operative. Real Broker/private-repository testing requires separate approval, not just database isolation.
+
+D3 verification: 119 portal tests, 35 backend private-source/release/Broker tests, root typecheck and normal/flag-enabled production builds pass. Local code remains absent from production bundles. Isolated SQL/handler checks cover ownership, permitted repositories, invalid paths, registration/snapshot deduplication and revoked/rate-limited grants; automated test writes rolled back. Component browser checks cover register/snapshot, empty/disconnected/error states and 1440/390/320px layouts using fixture responses. User then completed the signed-in local flow; read-only SQL confirmed the simulated repository at root `.` and one saved snapshot. Those user-created test records remain. Real GitHub is unverified; no push/deploy/Mac change.
+
+### D4: Remaining Checks
+
 - [ ] D4: Verify separate web/Mac gates. Do not expose Mac install actions because web UI is enabled, or assume existing sync APIs all share one gate.
 - [ ] Recheck `/app/connect` and existing set links independently of the redesign.
 
@@ -265,4 +271,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-C1-C4 and D1-D2 supply set actions/access/links, device management and connection-code generation. Next plan D3 private sources, then D4 gate/regression checks, including D2 mobile visual verification. Finish remaining two-account/shared-access browser checks before closing full verification. Slices B-D are not a production rollout authorization.
+C1-C4 and D1-D3 supply set actions/access/links, device management, connection-code generation and simulated private-source flows. D3 local user verification passed. Next plan D4 gate/regression checks, including D2 mobile visual verification. Finish remaining two-account/shared-access browser checks before closing full verification. Slices B-D are not a production rollout authorization.

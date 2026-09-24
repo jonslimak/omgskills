@@ -119,6 +119,7 @@ export function HomePage({
   readOnly = false,
   accountControls,
   profileControls,
+  privateSourcesPanel,
 }: {
   data: PortalData;
   actions: PortalActions;
@@ -128,6 +129,7 @@ export function HomePage({
   readOnly?: boolean;
   accountControls?: AccountControls;
   profileControls?: ProfileControls;
+  privateSourcesPanel?: ReactNode;
 }) {
   const profile = data.profile;
   return (
@@ -181,7 +183,7 @@ export function HomePage({
         )}
       </section>
       {profileControls?.error && <p role="alert">{profileControls.error}</p>}
-      <section className="rd-private-source">
+      {privateSourcesPanel ?? <section className="rd-private-source">
         <h2>Private source</h2>
         {data.privateSourceConnected === null ? (
           <p className="rd-muted">
@@ -252,7 +254,7 @@ export function HomePage({
             </Action>
           </div>
         )}
-      </section>
+      </section>}
       <div className="rd-account-actions">
         <Action
           disabled={accountControls ? accountControls.busy : readOnly}

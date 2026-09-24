@@ -24,7 +24,7 @@ export function testBackendOrigin(env: Record<string, string | undefined>) {
 export function isIntegrationRead(path: string, method = "GET") {
   return (
     method.toUpperCase() === "GET" &&
-    /^\/api\/portal\/(?:synced-skills|groups|shared|profile|devices|groups\/[a-zA-Z0-9_-]+)$/.test(
+    /^\/api\/portal\/(?:synced-skills|groups|shared|profile|devices|private-sources|groups\/[a-zA-Z0-9_-]+)$/.test(
       path,
     )
   );
@@ -33,6 +33,8 @@ export function isIntegrationRead(path: string, method = "GET") {
 export function isIntegrationRequest(path: string, method = "GET") {
   const verb = method.toUpperCase();
   return isIntegrationRead(path, method) ||
+    (path === "/api/portal/private-sources" && verb === "POST") ||
+    (/^\/api\/portal\/private-sources\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/releases$/i.test(path) && verb === "POST") ||
     (["/api/portal/sync-pairing-code", "/api/portal/sync-token"].includes(path) && verb === "POST") ||
     (/^\/api\/portal\/devices\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(path) && verb === "DELETE") ||
     (path === "/api/portal/profile" && verb === "PATCH") ||
@@ -46,10 +48,14 @@ export function isIntegrationRequest(path: string, method = "GET") {
 // Connection generation accepts no scopes/callback data. Exchange and uploads stay blocked.
 export function isIntegrationBody(path: string, method: string, body: unknown) {
   if (!isIntegrationRequest(path, method)) return false;
+  if (path.startsWith("/api/portal/private-sources/") && path.endsWith("/releases")) return body === undefined;
   if (method === "GET" || (method === "DELETE" && !path.endsWith("/items") && !path.endsWith("/allowed-emails"))) return body === undefined;
   if (!body || typeof body !== "object" || Array.isArray(body)) return false;
   const value = body as Record<string, unknown>;
   const only = (keys: string[]) => Object.keys(value).every((key) => keys.includes(key));
+  if (path === "/api/portal/private-sources") return only(["installationId", "repositoryId", "root"])
+    && [value.installationId, value.repositoryId].every((id) => typeof id === "string" && /^[1-9][0-9]{0,99}$/.test(id))
+    && typeof value.root === "string" && value.root.length > 0 && value.root.length <= 1000;
   if (["/api/portal/sync-pairing-code", "/api/portal/sync-token"].includes(path)) return only([]);
   if (path === "/api/portal/profile") return only(["handle", "profilePublished"]);
   const ids = (items: unknown) => Array.isArray(items) && items.every((id) => typeof id === "string" && /^[a-zA-Z0-9_-]+$/.test(id)) && new Set(items).size === items.length;
