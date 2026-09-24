@@ -16,13 +16,13 @@ test("device parsing preserves all server statuses and rejects malformed lists",
     assert.throws(() => parseDevices(value), /Invalid device response/);
   }
 });
-test("device guard enables only list and bodyless UUID revocation; pairing remains blocked", () => {
+test("device guard enables only list and bodyless UUID revocation; exchange remains blocked", () => {
   const path = `/api/portal/devices/${device.id}`;
   assert.equal(isIntegrationRequest("/api/portal/devices"), true);
   assert.equal(isIntegrationBody(path, "DELETE", undefined), true);
   assert.equal(isIntegrationBody(path, "DELETE", {}), false);
   for (const [target, method] of [[path, "GET"], [path, "POST"], ["/api/portal/devices/bad", "DELETE"],
-    ["/api/portal/sync-pairing-code", "POST"], ["/api/portal/sync-token", "POST"], ["/api/portal/device-revoke", "POST"]]) {
+    ["/api/portal/device-exchange", "POST"], ["/api/portal/sync-upload", "POST"], ["/api/portal/device-revoke", "POST"]]) {
     assert.equal(isIntegrationRequest(target, method), false);
   }
 });

@@ -33,6 +33,7 @@ export function isIntegrationRead(path: string, method = "GET") {
 export function isIntegrationRequest(path: string, method = "GET") {
   const verb = method.toUpperCase();
   return isIntegrationRead(path, method) ||
+    (["/api/portal/sync-pairing-code", "/api/portal/sync-token"].includes(path) && verb === "POST") ||
     (/^\/api\/portal\/devices\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(path) && verb === "DELETE") ||
     (path === "/api/portal/profile" && verb === "PATCH") ||
     (path === "/api/portal/groups" && verb === "POST") ||
@@ -42,13 +43,14 @@ export function isIntegrationRequest(path: string, method = "GET") {
     (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/allowed-emails$/.test(path) && ["POST", "DELETE"].includes(verb));
 }
 
-// Only existing set/access operations and device revocation are writable; pairing stays blocked.
+// Connection generation accepts no scopes/callback data. Exchange and uploads stay blocked.
 export function isIntegrationBody(path: string, method: string, body: unknown) {
   if (!isIntegrationRequest(path, method)) return false;
   if (method === "GET" || (method === "DELETE" && !path.endsWith("/items") && !path.endsWith("/allowed-emails"))) return body === undefined;
   if (!body || typeof body !== "object" || Array.isArray(body)) return false;
   const value = body as Record<string, unknown>;
   const only = (keys: string[]) => Object.keys(value).every((key) => keys.includes(key));
+  if (["/api/portal/sync-pairing-code", "/api/portal/sync-token"].includes(path)) return only([]);
   if (path === "/api/portal/profile") return only(["handle", "profilePublished"]);
   const ids = (items: unknown) => Array.isArray(items) && items.every((id) => typeof id === "string" && /^[a-zA-Z0-9_-]+$/.test(id)) && new Set(items).size === items.length;
   if (path.endsWith("/allowed-emails")) return method === "POST"

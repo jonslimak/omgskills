@@ -3,6 +3,7 @@ import { Laptop, RefreshCw } from "lucide-react";
 import type { PortalApi } from "../portal-api";
 import { Action, EmptyState, IconAction, Modal, StatusBadge } from "../app/ui";
 import { createDeviceSession, type Device, type DeviceSnapshot } from "./device-session";
+import { ConnectionDialog } from "./ConnectionDialog";
 
 const formatDate = (value: string | null) => value === null ? "Never"
   : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
@@ -13,6 +14,7 @@ export function DevicesPanel({ api, denied }: { api: PortalApi; denied: () => vo
   const sessionRef = useRef<ReturnType<typeof createDeviceSession> | null>(null);
   const [state, setState] = useState<DeviceSnapshot>({ devices: null, loading: true, revoking: null, error: "", notice: "" });
   const [confirm, setConfirm] = useState<Device | null>(null);
+  const [connecting, setConnecting] = useState(false);
   useEffect(() => {
     const session = createDeviceSession((path, init) => callbacks.current.api(path, init), setState, () => callbacks.current.denied());
     sessionRef.current = session;
@@ -33,7 +35,7 @@ export function DevicesPanel({ api, denied }: { api: PortalApi; denied: () => vo
   return <section aria-label="Connected devices">
     <div className="rd-section-heading"><h2>Connected devices</h2>
       <IconAction label="Refresh devices" disabled={busy} onClick={() => void sessionRef.current?.refresh()}><RefreshCw /></IconAction>
-      <Action disabled title="Connection controls are not connected yet">Connect app</Action>
+      <Action disabled={busy || Boolean(state.error)} onClick={() => setConnecting(true)}>Connect app</Action>
     </div>
     {state.error && <p role="alert">{state.error}</p>}
     {state.notice && <p role="status">{state.notice}</p>}
@@ -51,6 +53,7 @@ export function DevicesPanel({ api, denied }: { api: PortalApi; denied: () => vo
       </div>)}
     </div>
     {state.devices?.length === 0 && !state.loading && !state.error && <EmptyState title="No connected devices" />}
+    {connecting && <ConnectionDialog api={api} denied={denied} close={() => setConnecting(false)} />}
     {confirm && <Modal title={`Revoke ${confirm.deviceName}?`} close={() => { if (!state.revoking) setConfirm(null); }}>
       <p>This stops this connection from accessing your account. Installed skills and sets are not deleted. Reconnect the app to use it again.</p>
       <div className="rd-dialog-footer"><Action disabled={busy} onClick={() => setConfirm(null)}>Cancel</Action>
