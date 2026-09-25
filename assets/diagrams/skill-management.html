@@ -17,6 +17,9 @@
     --shadow-soft: rgba(0, 0, 0, 0.04);
     --track: #e3e3e8;
     --logo-filter: none;
+    --update: #248a3d;
+    --on-update: #ffffff;
+    --update-tint: rgba(52, 199, 89, 0.22);
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
     --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
   }
@@ -36,6 +39,9 @@
       --shadow-soft: rgba(0, 0, 0, 0.3);
       --track: #1c1c1e;
       --logo-filter: invert(1);
+      --update: #30d158;
+      --on-update: #002b0c;
+      --update-tint: rgba(48, 209, 88, 0.26);
     }
   }
   :root[data-theme="dark"] {
@@ -53,6 +59,9 @@
     --shadow-soft: rgba(0, 0, 0, 0.3);
     --track: #1c1c1e;
     --logo-filter: invert(1);
+    --update: #30d158;
+    --on-update: #002b0c;
+    --update-tint: rgba(48, 209, 88, 0.26);
   }
 
   body {
@@ -133,6 +142,12 @@
   #flow .link { transition: opacity 400ms ease; }
   #flow .link path { transition: stroke-dashoffset 750ms cubic-bezier(0.3, 0.7, 0.3, 1); }
   #flow.instant .anim, #flow.instant .link, #flow.instant .link path { transition: none !important; }
+  #flow .chip .bg { transition: fill 500ms ease; }
+  #flow .chip.flash .bg { fill: var(--update-tint); }
+  #flow .badge rect { fill: var(--update); }
+  #flow .badge text { fill: var(--on-update); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+  #flow .link.sync path { stroke: var(--update); stroke-width: 1.75; }
+  #flow .arrowhead.sync path { fill: var(--update); }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
 </style>
 
@@ -189,6 +204,7 @@
     { who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
+    { who: "you", update: "release-notes" },
   ];
   const WHO = { you: "You", mate: "Your teammate" };
 
@@ -326,6 +342,8 @@
     el("stop", { offset: 1, "stop-color": "#858a94" }, grad);
     const m = el("marker", { id: "arrow", class: "arrowhead", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, m);
+    const ms = el("marker", { id: "arrow-sync", class: "arrowhead sync", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
+    el("path", { d: "M0,1 L9,5 L0,9 z" }, ms);
     layers = { link: el("g", {}, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
 
     // You: the hero card
@@ -363,7 +381,7 @@
     });
 
     const finalH = Math.max(...AGENTS.map((a) => {
-      const n = EVENTS.filter((e) => e.send.includes(a.id)).length;
+      const n = EVENTS.filter((e) => (e.send || []).includes(a.id)).length;
       return AG_HEAD + n * (CH + CG) + (a.shared ? 2 * 22 + 6 : 0) + 20;
     }));
     svg.setAttribute("viewBox", `0 0 ${W} ${AG_Y + finalH + 24}`);
@@ -489,6 +507,86 @@
     for (const f of flights) f.lg.remove();
   }
 
+  // A small green pill, e.g. "Updated", pinned to the top-right of a skill
+  function badge(x, y, label, center) {
+    measurer.textContent = label;
+    const w = Math.ceil(measurer.getComputedTextLength()) + 14;
+    if (center) x += w / 2;
+    const g = el("g", { class: "badge anim" }, layers.chip);
+    el("rect", { width: w, height: 18, rx: 9 }, g);
+    txt(g, w / 2, 12.5, label, "", "middle");
+    place(g, x - w, y + 4, 0);
+    return { g, show: () => place(g, x - w, y, 1) };
+  }
+  function syncArrow(sx, sy, ex, ey) {
+    const lg = el("g", { class: "link sync", style: "opacity:0" }, layers.link);
+    const p = el("path", { d: curve(sx, sy, ex, ey), pathLength: 1, "stroke-dasharray": "1 1", "marker-end": "url(#arrow-sync)" }, lg);
+    p.style.strokeDashoffset = 1;
+    return { lg, show: () => { lg.style.opacity = 1; p.style.strokeDashoffset = 0; } };
+  }
+
+  async function update(o, name) {
+    const row = o.rows.find((r) => r.name === name);
+    const rp = rowPos(o, o.rows.indexOf(row));
+    const rowW = o.w - 32;
+    const extras = [];
+
+    // 1. The skill changes in your library
+    row.el.classList.add("flash");
+    const b0 = badge(rp.x + rowW + 6, rp.y - 10, "Updated");
+    extras.push(b0.g);
+    await frame();
+    b0.show();
+    say(`You updated <b>${name}</b>`);
+    await sleep(1500);
+
+    // 2. It syncs to every agent that has it
+    const hits = Object.values(agents).filter((a) => a.items.some((it) => it.name === name));
+    const arrows = hits.map((a) => {
+      const sx = o.x + o.w * (a.i + 1) / (AGENTS.length + 1);
+      const ex = a.x + AG_W / 2 + (a.shared ? -24 : 0);
+      const ar = syncArrow(sx, omgBottom(o), ex, AG_Y - 4);
+      extras.push(ar.lg);
+      return ar;
+    });
+    await frame();
+    arrows.forEach((ar) => ar.show());
+    const list = hits.map((a) => a.label);
+    say(`The new version syncs to ${list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list.at(-1) : list[0]}`);
+    await sleep(750);
+    for (const a of hits) {
+      const it = a.items.find((x) => x.name === name);
+      it.el.classList.add("flash");
+      const b = badge(it.pos.x + chipW(name) + 6, it.pos.y - 10, "Updated");
+      extras.push(b.g);
+      await frame();
+      b.show();
+    }
+    await sleep(1600);
+
+    // 3. Teammates on a shared agent get it too
+    const shared = hits.find((a) => a.shared);
+    if (shared && mate.shown) {
+      const ar = syncArrow(shared.x + AG_W / 2 + 24, AG_Y - 4, mate.x + mate.w / 2, omgBottom(mate) + 13);
+      extras.push(ar.lg);
+      await frame();
+      ar.show();
+      say(`Your teammate gets it too, through the shared ${shared.label}`);
+      await sleep(750);
+      const t = badge(mate.x + mate.w / 2, omgBottom(mate) - 9, `${name} updated`, true);
+      extras.push(t.g);
+      await frame();
+      t.show();
+      await sleep(2000);
+    }
+
+    // Settle
+    for (const n of extras) n.style.opacity = 0;
+    svg.querySelectorAll(".chip.flash").forEach((c) => c.classList.remove("flash"));
+    await sleep(500);
+    extras.forEach((n) => n.remove());
+  }
+
   async function showMate() {
     if (mate.shown) return;
     mate.shown = true;
@@ -520,6 +618,7 @@
     for (const e of EVENTS) {
       const o = e.who === "you" ? you : mate;
       if (o === mate) await showMate();
+      if (e.update) { await update(o, e.update); continue; }
       if (e.collect) await spawnAndCollect(o, e.collect);
       else say(`<b>${e.reuse}</b> is already in your library, so there is nothing to add`);
       if (e.reuse) await sleep(1400);
