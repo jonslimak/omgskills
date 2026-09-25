@@ -120,8 +120,9 @@
   #flow .omg-title { font-family: var(--display); font-size: 21px; font-weight: 600; letter-spacing: -0.02em; }
   #flow .omg-sub { fill: var(--muted); font-size: 13px; }
   #flow .mate-title { font-family: var(--display); font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
-  #flow .agent-title { font-family: var(--display); font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
+  #flow .agent-title { font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: -0.015em; }
   #flow .agent-sub, #flow .group-cap { fill: var(--muted); font-size: 12.5px; }
+  #flow .agent-sub { font-size: 10px; }
   #flow .group-cap { font-size: 11.5px; font-weight: 500; }
   #flow .hair { stroke: var(--hair); stroke-width: 1; }
   #flow .handle { fill: var(--muted); font-size: 12px; }
@@ -180,7 +181,7 @@
     twostraws: { handle: "@twostraws", img: "data:image/jpeg;base64,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" },
     anthropics: { handle: "@anthropics", img: "data:image/png;base64,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" },
     you: { handle: "your team" },
-    sam: { handle: "@teammate" },
+    sam: { handle: "teammate" },
   };
   // omg = whose OMG holds it
   const SKILLS = {
@@ -211,7 +212,7 @@
     { label: "Send", title: "Give each agent just what it needs.",
       body: "ChatGPT gets three skills. Claude stays lean with only <b>humanizer</b>. Team agents get the private <b>release-notes</b>." },
     { label: "Share", title: "Team agents combine everyone's picks.",
-      body: "@teammate sends skills from their own OMG to the same team ChatGPT, so it has skills from both of you." },
+      body: "Your teammate sends skills from their own OMG to the same team ChatGPT, so it has skills from both of you." },
   ];
 
   // ---- Geometry
@@ -346,7 +347,7 @@
     const omgCard = el("g", { class: "lift-hero" }, omg);
     el("rect", { class: "card", x: 0, y: 0, width: OMG_W, height: omgH, rx: 24 }, omgCard);
     placeholder(omg, OMG_W / 2, 56, 34);
-    txt(omg, OMG_W / 2, 118, "@you", "omg-title", "middle");
+    txt(omg, OMG_W / 2, 118, "you", "omg-title", "middle");
     const reach = AGENTS.filter((a) => a.from.you).length;
     const omgSub = txt(omg, OMG_W / 2, 137, "", "omg-sub", "middle");
     steppers.push((st) => {
@@ -379,7 +380,7 @@
     const mateCard = el("g", { class: "lift" }, mate);
     el("rect", { class: "card", x: 0, y: 0, width: MATE_W, height: mH, rx: 20 }, mateCard);
     placeholder(mate, MATE_W / 2, 42, 24);
-    txt(mate, MATE_W / 2, 89, "@teammate", "mate-title", "middle");
+    txt(mate, MATE_W / 2, 89, "teammate", "mate-title", "middle");
     txt(mate, MATE_W / 2, 106, `${theirs.length} skills · ${mReach} agent${mReach === 1 ? "" : "s"}`, "omg-sub", "middle");
     steppers.push((st) => place(mate, mX, st >= 3 ? MATE_Y : MATE_Y - 12, st >= 3 ? 1 : 0));
     theirs.forEach((name, i) => {
@@ -397,7 +398,7 @@
       const ax = agentX(ai);
       const groups = Object.entries(a.from);
       const CAP = a.shared ? 22 : 0;
-      let cy = 64;
+      let cy = 56;
       const pos = [];
       const caps = [];
       groups.forEach(([o, list], gi) => {
@@ -411,10 +412,10 @@
       const card = el("g", { class: "anim" }, cardLayer);
       const face = el("g", { class: "lift" }, card);
       el("rect", { class: "card", x: 0, y: 0, width: AG_W, height: h, rx: 18 }, face);
-      logo(card, a.logo, 31, 32, 15);
-      txt(card, 54, 29, a.name, "agent-title");
-      const sub = txt(card, 54, 46, a.kind, "agent-sub");
-      const capEls = caps.map((c) => txt(card, 16, c.y, c.o === "you" ? "From @you" : "From @teammate", "group-cap anim"));
+      logo(card, a.logo, 28, 30, 12);
+      txt(card, 47, 28, a.name, "agent-title");
+      const sub = txt(card, 47, 41, a.kind, "agent-sub");
+      const capEls = caps.map((c) => txt(card, 16, c.y, c.o === "you" ? "From you" : "From teammate", "group-cap anim"));
       steppers.push((st) => {
         place(card, ax, st >= 2 ? AG_Y : AG_Y + 16, st >= 2 ? 1 : 0, st >= 2 ? ai * 90 : 0);
         if (a.shared) {
@@ -443,7 +444,7 @@
         const lg = el("g", { class: "link draw" }, linkLayer);
         const p = el("path", { d: cv.d, pathLength: 1, "stroke-dasharray": "1 1", "marker-end": "url(#arrow)" }, lg);
         const [lx, ly] = cv.at(0.52);
-        txt(lg, lx, ly + 4, a.shared ? `${n} from @${o === "you" ? "you" : "teammate"}` : `${n} skill${n === 1 ? "" : "s"}`, "", "middle");
+        txt(lg, lx, ly + 4, a.shared ? `${n} from ${o === "you" ? "you" : "teammate"}` : `${n} skill${n === 1 ? "" : "s"}`, "", "middle");
         const from = o === "mate" ? 3 : 2;
         steppers.push((st) => {
           const on = st >= from;
