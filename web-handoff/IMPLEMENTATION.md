@@ -314,4 +314,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-Review the live read-only `/app/review/` UI, then separately approve a scoped production write test before considering the public redesign switch. Hosted read-only verification and local two-account access checks passed; production mutation/two-account checks remain open. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.
+Approved: test one disposable private set on `/app/review/`, then enable the public redesign only if that lifecycle passes. The temporary test transport allows only its own create response ID, retained in account/session-scoped browser storage across refresh; existing sets, publication, sharing, profile and device changes remain blocked. Local checks: 138 portal tests, portal build and deployment safety checks pass. Production write verification is pending deployment. Restore review to read-only after the test. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.
