@@ -124,11 +124,16 @@
       .s-stars { grid-column: 3; grid-row: 1; }
       .s-desc { grid-column: 1 / -1; grid-row: 2; }
     }
-    pre {
-      overflow: auto; margin: 10px 0 0; padding: 12px 14px; border-radius: 12px;
-      background: var(--soft); color: #3f3f46; font-size: 11.5px; line-height: 1.5;
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 10px; padding: 8px 14px;
+      border: 1px solid var(--line); border-radius: 999px; background: #fff;
+      color: #3f3f46; font-size: 12.5px; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: background .15s;
     }
-    pre code { font-family: ui-monospace, Menlo, monospace; }
+    .copy-btn:hover { background: var(--soft); }
+    .copy-btn.copied { color: #136c2e; border-color: #b7e2c3; background: #e8f7ec; }
+    .gh-icon { width: 15px; height: 15px; flex: none; }
     .transcript p { font-size: 13.5px; }
     .links p { font-size: 13.5px; }
     .links a { color: var(--blue); font-weight: 600; text-decoration: none; }
@@ -183,7 +188,7 @@
             </a>
             <div class="sdetail">
               <p>The foundation. Checkout Sessions vs PaymentIntents, Connect setup, which integration fits your case — Stripe's own answers, so you get the recommended pattern instead of a plausible guess.</p>
-              <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/stripe-best-practices ~/.claude/skills/stripe-best-practices</code></pre>
+              <button class="copy-btn" type="button" data-cmd="git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/stripe-best-practices ~/.claude/skills/stripe-best-practices"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
             </div>
           </div>
 
@@ -196,7 +201,7 @@
             </a>
             <div class="sdetail">
               <p>Stripe's most-starred skill, covering the part people find hardest: Stripe Connect. Charge patterns, Dashboard access, and platform setup for marketplaces and e-commerce platforms.</p>
-              <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/connect-recommend ~/.claude/skills/connect-recommend</code></pre>
+              <button class="copy-btn" type="button" data-cmd="git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/connect-recommend ~/.claude/skills/connect-recommend"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
             </div>
           </div>
 
@@ -209,7 +214,7 @@
             </a>
             <div class="sdetail">
               <p>Walks your agent through Stripe's API version changes and SDK updates, so you can finish the upgrade you've been putting off in a single session.</p>
-              <pre><code>git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/upgrade-stripe ~/.claude/skills/upgrade-stripe</code></pre>
+              <button class="copy-btn" type="button" data-cmd="git clone https://github.com/stripe/ai /tmp/ai && ln -s /tmp/ai/skills/upgrade-stripe ~/.claude/skills/upgrade-stripe"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
             </div>
           </div>
 
@@ -222,7 +227,7 @@
             </a>
             <div class="sdetail">
               <p>What agents can do themselves: secure, one-time-use payment credentials from a Link wallet, so an agent can complete a real purchase with a card that can only be used once.</p>
-              <pre><code>git clone https://github.com/stripe/link-cli /tmp/link-cli && ln -s /tmp/link-cli/skills/create-payment-credential ~/.claude/skills/create-payment-credential</code></pre>
+              <button class="copy-btn" type="button" data-cmd="git clone https://github.com/stripe/link-cli /tmp/link-cli && ln -s /tmp/link-cli/skills/create-payment-credential ~/.claude/skills/create-payment-credential"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
             </div>
           </div>
 
@@ -235,7 +240,7 @@
             </a>
             <div class="sdetail">
               <p>Lets an agent pay for an API call while making it, using the x402 payment standard through the purl command line. Hit a paid endpoint, pay, continue.</p>
-              <pre><code>git clone https://github.com/stripe/purl /tmp/purl && ln -s /tmp/purl/skills/pay-for-http-request ~/.claude/skills/pay-for-http-request</code></pre>
+              <button class="copy-btn" type="button" data-cmd="git clone https://github.com/stripe/purl /tmp/purl && ln -s /tmp/purl/skills/pay-for-http-request ~/.claude/skills/pay-for-http-request"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
             </div>
           </div>
         </section>
@@ -291,5 +296,17 @@
       </div>
     </div>
   </footer>
+  <script>
+    document.querySelectorAll(".copy-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(btn.dataset.cmd); } catch (e) { return; }
+        const label = btn.querySelector(".copy-label");
+        const prev = label.textContent;
+        btn.classList.add("copied");
+        label.textContent = "Copied";
+        setTimeout(() => { btn.classList.remove("copied"); label.textContent = prev; }, 1600);
+      });
+    });
+  </script>
 </body>
 </html>
