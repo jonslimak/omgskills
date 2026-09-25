@@ -131,7 +131,9 @@
   #flow .chip.float .bg { fill: var(--float); }
   #flow .chip.float { filter: drop-shadow(0 1px 1px var(--shadow-soft)) drop-shadow(0 4px 10px var(--shadow)); }
   #flow .chip .name { font-size: 13px; font-weight: 500; }
-  #flow .chip .count { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  #flow .chip .count text { fill: var(--muted); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  #flow .chip .bot { fill: none; stroke: var(--muted); stroke-width: 1.3; stroke-linecap: round; }
+  #flow .chip .bot-eye { fill: var(--muted); }
   #flow .chip .lock { fill: none; stroke: var(--muted); stroke-width: 1.3; }
   #flow .avatar-ring { fill: none; stroke: var(--hair); stroke-width: 0.75; }
   #flow .glyph { fill: #ffffff; }
@@ -287,7 +289,18 @@
       el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1.2 }, g);
       el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, g);
     }
-    if (opts.right) txt(g, w - 14, CH / 2 + 4.5, opts.right, "count", "end");
+    if (opts.right != null) {
+      // Number followed by a small agent (bot) glyph
+      const cg = el("g", { class: "count" }, g);
+      const bx = w - 26, by = CH / 2 - 5;
+      el("rect", { class: "bot", x: bx, y: by, width: 12, height: 10, rx: 3 }, cg);
+      el("path", { class: "bot", d: `M${bx + 6} ${by}v-2.5` }, cg);
+      el("circle", { class: "bot-eye", cx: bx + 6, cy: by - 3.2, r: 1.1 }, cg);
+      el("circle", { class: "bot-eye", cx: bx + 3.8, cy: by + 4.6, r: 1.1 }, cg);
+      el("circle", { class: "bot-eye", cx: bx + 8.2, cy: by + 4.6, r: 1.1 }, cg);
+      const t = txt(cg, bx - 5, CH / 2 + 4.5, String(opts.right), "", "end");
+      el("title", {}, cg).textContent = `${opts.right} agent${opts.right === 1 ? "" : "s"}`;
+    }
     return g;
   }
 
@@ -358,7 +371,7 @@
     SOURCE_ORDER.forEach((name, i) => {
       slot[name] = { x: OMG_X + 16, y: OMG_Y + ROW_Y + i * (CH + CG) };
       const n = AGENTS.filter((a) => (a.from.you || []).includes(name)).length;
-      const c = chip(chipLayer, name, { w: rowW, right: `${n} agent${n === 1 ? "" : "s"}` });
+      const c = chip(chipLayer, name, { w: rowW, right: n });
       const count = c.querySelector(".count");
       count.classList.add("anim");
       steppers.push((st) => {
@@ -386,7 +399,7 @@
     theirs.forEach((name, i) => {
       slot[name] = { x: mX + 12, y: MATE_Y + M_ROW + i * (CH + CG) };
       const n = AGENTS.filter((a) => (a.from.mate || []).includes(name)).length;
-      const c = chip(chipLayer, name, { w: MATE_W - 24, right: `${n} agent${n === 1 ? "" : "s"}` });
+      const c = chip(chipLayer, name, { w: MATE_W - 24, right: n });
       steppers.push((st) => place(c, slot[name].x, st >= 3 ? slot[name].y : slot[name].y - 12, st >= 3 ? 1 : 0, st >= 3 ? 150 + i * 90 : 0));
     });
 
