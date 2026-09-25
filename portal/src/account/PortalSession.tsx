@@ -33,8 +33,9 @@ function localStorageForAccount() {
   try { return window.sessionStorage; } catch { return undefined; }
 }
 
-export function PortalAccount({ identity, cacheKey, base, local, installEnabled, api, onSignOut, onSettings }: PortalOptions & {
+export function PortalAccount({ identity, cacheKey, base, local, installEnabled, api, onSignOut, onSettings, readOnlyReview = false }: PortalOptions & {
   identity: AccountIdentity; cacheKey: string; api: PortalApi; onSignOut: () => Promise<void>; onSettings: () => void;
+  readOnlyReview?: boolean;
 }) {
   const apiRef = useRef(api);
   apiRef.current = api;
@@ -51,7 +52,7 @@ export function PortalAccount({ identity, cacheKey, base, local, installEnabled,
   useEffect(() => {
     const session = createAccountSession({
       api: (path, init) => apiRef.current(path, init), identity, cacheKey,
-      storage: localStorageForAccount(), changed: setSnapshot,
+      storage: readOnlyReview ? undefined : localStorageForAccount(), changed: setSnapshot,
     });
     sessionRef.current = session;
     setSnapshot(session.getSnapshot());
@@ -65,7 +66,7 @@ export function PortalAccount({ identity, cacheKey, base, local, installEnabled,
       window.removeEventListener("focus", onActive);
       document.removeEventListener("visibilitychange", onActive);
     };
-  }, [cacheKey, recovery, identity.name, identity.email]);
+  }, [cacheKey, recovery, identity.name, identity.email, readOnlyReview]);
 
   async function signOut() {
     if (signingOut) return;
@@ -143,19 +144,19 @@ export function PortalAccount({ identity, cacheKey, base, local, installEnabled,
       base={base}
       readOnly
       detailSet={detailSet}
-      membership={membership.controls}
-      devicesPanel={<DevicesPanel api={api} local={local} denied={() => sessionRef.current?.invalidateAccess()} />}
-      privateSourcesPanel={<PrivateSourcesPanel api={api} local={local} denied={() => sessionRef.current?.invalidateAccess()} />}
+      membership={readOnlyReview ? undefined : membership.controls}
+      devicesPanel={<DevicesPanel api={api} local={local} readOnly={readOnlyReview} denied={() => sessionRef.current?.invalidateAccess()} />}
+      privateSourcesPanel={readOnlyReview ? undefined : <PrivateSourcesPanel api={api} local={local} denied={() => sessionRef.current?.invalidateAccess()} />}
       onNavigate={membership.dismiss}
-      setControls={(page, id, navigate) => <SetControls key={`${page}:${id ?? ""}`} page={page} local={local} installEnabled={installEnabled}
+      setControls={readOnlyReview ? undefined : (page, id, navigate) => <SetControls key={`${page}:${id ?? ""}`} page={page} local={local} installEnabled={installEnabled}
         set={detailSet?.id === id ? detailSet : null}
         link={detailSet && detailSet.id === id ? setLink(detailSet, data.profile, location.origin, base, local) : undefined}
         blocked={snapshot.refreshing || snapshot.profileSaving || signingOut || Boolean(snapshot.error)}
         saving={snapshot.setSaving} save={saveSet} navigate={navigate} notify={notify} />}
-      accountControls={{ settings: onSettings, signOut: () => { void signOut(); }, busy: signingOut }}
+      accountControls={{ settings: onSettings, settingsDisabled: readOnlyReview, signOut: () => { void signOut(); }, busy: signingOut }}
       profileControls={{ edit: () => setProfileOpen(true),
         publish: (published) => { void saveProfile({ published }).catch(() => {}); },
-        busy: snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing || signingOut || Boolean(snapshot.error),
+        busy: readOnlyReview || snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing || signingOut || Boolean(snapshot.error),
         error: snapshot.profileError,
         copy: () => {
           if (data.profile.publicUrl) void navigator.clipboard.writeText(data.profile.publicUrl)
@@ -169,7 +170,8 @@ export function PortalAccount({ identity, cacheKey, base, local, installEnabled,
       notice={notice}
       notify={notify}
       previewBar={
-        (local || snapshot.error || membership.error || snapshot.accessDenied) && <div className="portal-design rd-preview-bar" role="status">
+        (readOnlyReview || local || snapshot.error || membership.error || snapshot.accessDenied) && <div className="portal-design rd-preview-bar" role="status">
+          {readOnlyReview && <span>Production review · read-only</span>}
           {local && <span>Local integration · changes stay local</span>}
           {snapshot.error && <span role="alert">{snapshot.error}</span>}
           {membership.error && <span role="alert">{membership.error}</span>}
@@ -184,17 +186,17 @@ export function PortalAccount({ identity, cacheKey, base, local, installEnabled,
           actions={actions}
           hasSummary={data.sets.some((set) => set.id === id)}
           loaded={loaded}
-          membership={membership.controls}
-          edit={edit}
+          membership={readOnlyReview ? undefined : membership.controls}
+          edit={!readOnlyReview && edit}
           sets={data.sets}
           skills={groupSyncedSkills(data.skills)}
-          renderAccess={(set) => <SetAccessControls set={set} busy={snapshot.setSaving || snapshot.profileSaving}
+          renderAccess={readOnlyReview ? undefined : (set) => <SetAccessControls set={set} busy={snapshot.setSaving || snapshot.profileSaving}
             blocked={snapshot.refreshing || signingOut || Boolean(snapshot.error)} save={saveEmail} />}
         />
       )}
     />
-    {snapshot.data && !snapshot.accessDenied && membership.dialog}
-    {profileOpen && snapshot.data && !snapshot.accessDenied && <ProfileDialog
+    {!readOnlyReview && snapshot.data && !snapshot.accessDenied && membership.dialog}
+    {!readOnlyReview && profileOpen && snapshot.data && !snapshot.accessDenied && <ProfileDialog
       handle={data.profile.handle} saving={snapshot.profileSaving} blocked={Boolean(snapshot.error)}
       error={snapshot.profileError} close={() => setProfileOpen(false)}
       save={(handle) => saveProfile({ handle })} />}

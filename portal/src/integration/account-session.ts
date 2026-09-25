@@ -20,7 +20,7 @@ export type AccountSnapshot = {
 type Storage = Pick<globalThis.Storage, "getItem" | "setItem" | "removeItem">;
 const cacheAge = 15 * 60 * 1000;
 
-export function accountCacheKey(instance: string, userId: string, sessionId: string, environment: "integration" | "local-app" | "app" = "integration") {
+export function accountCacheKey(instance: string, userId: string, sessionId: string, environment: "integration" | "local-app" | "app" | "review" = "integration") {
   return `omgskills.portal.${environment}.v1.${instance}.${userId}.${sessionId}`;
 }
 

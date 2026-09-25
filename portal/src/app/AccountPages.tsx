@@ -257,7 +257,7 @@ export function HomePage({
       </section>}
       <div className="rd-account-actions">
         <Action
-          disabled={accountControls ? accountControls.busy : readOnly}
+          disabled={accountControls ? accountControls.busy || accountControls.settingsDisabled : readOnly}
           onClick={() =>
             accountControls ? accountControls.settings() : unavailable(
               "Account settings",

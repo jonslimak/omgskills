@@ -53,6 +53,7 @@ export type PortalData = {
 export type LoadState = "ready" | "loading" | "error";
 export type AccountControls = {
   settings: () => void;
+  settingsDisabled?: boolean;
   signOut: () => void;
   busy: boolean;
 };
