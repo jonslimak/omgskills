@@ -358,7 +358,8 @@
 
     // Teammate: smaller card, joins later
     const mg = el("g", { class: "anim" }, layers.card);
-    place(mg, MATE_X, MATE_Y - 12, 0);
+    mg.style.transform = `translate(${MATE_X + MATE_W * 0.04}px, ${MATE_Y + 12}px) scale(0.92)`;
+    mg.style.opacity = 0;
     const mFace = el("g", { class: "lift" }, mg);
     const mRect = el("rect", { class: "card", x: 0, y: 0, width: MATE_W, height: cardH(M_ROW, 0), rx: 20 }, mFace);
     placeholder(mg, MATE_W / 2, 42, 24);
@@ -566,7 +567,8 @@
 
     // 3. Teammates on a shared agent get it too
     const shared = hits.find((a) => a.shared);
-    if (shared && mate.shown) {
+    if (shared && mate.joined) {
+      await showMate();
       const ar = syncArrow(shared.x + AG_W / 2 + 24, AG_Y - 4, mate.x + mate.w / 2, omgBottom(mate) + 13);
       extras.push(ar.lg);
       await frame();
@@ -585,24 +587,39 @@
     svg.querySelectorAll(".chip.flash").forEach((c) => c.classList.remove("flash"));
     await sleep(500);
     extras.forEach((n) => n.remove());
+    await hideMate();
   }
 
+  // The teammate card pops in for their moves and pops out afterwards
+  function mateVisible(v) {
+    const s = v ? 1 : 0.92, h = +(mate.rect.dataset.h || mate.rect.getAttribute("height"));
+    mate.g.style.transform = `translate(${MATE_X + (MATE_W * (1 - s)) / 2}px, ${MATE_Y + (h * (1 - s)) / 2}px) scale(${s})`;
+    mate.g.style.opacity = v ? 1 : 0;
+    for (const r of mate.rows) r.el.style.opacity = v ? 1 : 0;
+  }
   async function showMate() {
     if (mate.shown) return;
     mate.shown = true;
-    say("Your teammate joins with their own library");
-    place(mate.g, MATE_X, MATE_Y, 1);
-    await sleep(1000);
+    if (!mate.joined) say("Your teammate joins with their own library");
+    mate.joined = true;
+    mateVisible(true);
+    await sleep(mate.rows.length ? 700 : 1000);
+  }
+  async function hideMate() {
+    if (!mate.shown) return;
+    mate.shown = false;
+    mateVisible(false);
+    await sleep(500);
   }
 
   async function reset() {
     say("&nbsp;");
     for (const n of layers.chip.querySelectorAll(":scope > *")) n.style.opacity = 0;
-    place(mate.g, MATE_X, MATE_Y - 12, 0);
+    mateVisible(false);
     await sleep(700);
     layers.chip.textContent = "";
     layers.link.textContent = "";
-    you.rows = []; mate.rows = []; mate.shown = false;
+    you.rows = []; mate.rows = []; mate.shown = false; mate.joined = false;
     tweenH(you.rect, cardH(ROW_Y, 0));
     tweenH(mate.rect, cardH(M_ROW, 0));
     for (const a of Object.values(agents)) {
@@ -624,6 +641,7 @@
       if (e.reuse) await sleep(1400);
       await sleep(300);
       await send(o, e.collect || e.reuse, e.send);
+      if (o === mate) { await sleep(500); await hideMate(); }
       await sleep(600);
     }
   }
