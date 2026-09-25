@@ -67,37 +67,8 @@
   }
   .stage { max-width: 820px; margin: 0 auto; display: grid; gap: 22px; }
 
-  /* Narration */
-  .story { display: grid; gap: 16px; justify-items: center; text-align: center; }
-  .controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; }
-  .steps {
-    display: flex; gap: 2px; margin: 0; padding: 2px; list-style: none;
-    background: var(--track); border-radius: 10px;
-  }
-  .steps button {
-    font: 500 13px/1 var(--sans);
-    color: var(--ink);
-    background: transparent;
-    border: 0;
-    border-radius: 8px;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: background 200ms ease, box-shadow 200ms ease;
-  }
-  .steps button[aria-current="step"] {
-    background: var(--card);
-    box-shadow: 0 1px 3px var(--shadow), 0 1px 1px var(--shadow-soft);
-    font-weight: 600;
-  }
-  .replay {
-    font: 500 13px/1 var(--sans);
-    color: var(--muted);
-    background: none; border: 0; padding: 8px 4px; cursor: pointer;
-  }
-  .replay:hover { color: var(--ink); }
-  .steps button:focus-visible, .replay:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .caption { min-height: 4.6em; display: grid; gap: 4px; justify-items: center; }
-  .caption h2 {
+  .story { display: grid; gap: 8px; justify-items: center; text-align: center; }
+  .story h2 {
     margin: 0;
     font-family: var(--display);
     font-size: clamp(22px, 3.4vw, 30px);
@@ -106,8 +77,17 @@
     font-weight: 600;
     text-wrap: balance;
   }
-  .caption p { margin: 0; color: var(--muted); max-width: 54ch; font-size: 16px; text-wrap: pretty; }
-  .caption b { color: var(--ink); font-weight: 500; }
+  .ticker { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 1.6em; }
+  .ticker p { margin: 0; color: var(--muted); font-size: 15px; }
+  .ticker b { color: var(--ink); font-weight: 500; }
+  .pause {
+    font: 500 12px/1 var(--sans);
+    color: var(--muted);
+    background: var(--track); border: 0; border-radius: 999px;
+    padding: 6px 11px; cursor: pointer;
+  }
+  .pause:hover { color: var(--ink); }
+  .pause:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
   .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   #flow { display: block; width: 100%; min-width: 660px; height: auto; overflow: visible; }
@@ -147,36 +127,32 @@
     stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; paint-order: stroke;
   }
 
+
   /* Motion */
   #flow .anim { transition: transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 450ms ease; }
-  #flow .draw path { transition: stroke-dashoffset 800ms ease; }
-  #flow.instant .anim, #flow.instant .draw path, #flow.instant .link { transition: none !important; }
+  #flow .link { transition: opacity 400ms ease; }
+  #flow .link path { transition: stroke-dashoffset 750ms cubic-bezier(0.3, 0.7, 0.3, 1); }
+  #flow.instant .anim, #flow.instant .link, #flow.instant .link path { transition: none !important; }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
-  @media (prefers-reduced-motion: reduce) {
-    #flow .anim, #flow .draw path, #flow .link { transition: none !important; }
-  }
 </style>
 
 <div class="stage">
-  <div class="story">
-    <div class="controls">
-      <ol class="steps" id="steps"></ol>
-      <button class="replay" id="replay" type="button">Replay</button>
+  <header class="story">
+    <h2>Add a skill once. Send it to any agent.</h2>
+    <div class="ticker">
+      <p id="ticker" aria-live="polite">&nbsp;</p>
+      <button class="pause" id="pause" type="button" aria-pressed="false">Pause</button>
     </div>
-    <div class="caption" aria-live="polite">
-      <h2 id="cap-title"></h2>
-      <p id="cap-body"></p>
-    </div>
-  </div>
+  </header>
   <div class="scroll">
     <svg id="flow" viewBox="0 0 800 880" role="img"
-      aria-label="Skills written by different people, such as grill-me by mattpocock and humanizer by blader, are collected into your OMG. Your OMG sends a chosen set of skills to each agent: your ChatGPT, your Claude, a team Hermes and a team ChatGPT. Your teammate Your teammate's OMG also sends skills to the same team ChatGPT."></svg>
+      aria-label="A looping animation. New skills, such as grill-me by mattpocock and humanizer by blader, appear and are collected into your library, then sent to agents: ChatGPT, Claude, Hermes and a shared team ChatGPT. A teammate joins and sends their own skills to the same team ChatGPT."></svg>
   </div>
 </div>
 
 <script>
 (() => {
-  // ---- Example data. Avatars are embedded so the page works offline.
+  // ---- Example data. Avatars and logos are embedded so the page works offline.
   const PEOPLE = {
     mattpocock: { handle: "@mattpocock", img: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAXiUlEQVR4nJx6WY9l13XeXmsPZ7pzjd1VXWR3k+IkUhIlRhIl0bAlxMmDnSCPMYI85DW/IX8gL3nIawIkMOIAUZAEcCyLNgwTMWXGEUVzHprssbq7qrqGO55pDyvY59yphm7J3nVw695zz7lnDd9a61t7b/Fv/92/Z7MBADB7t3ySPWYAg+m/c9cQ0ezd6fP+oNntsyuri4nIOpemKSIqpSZpppTq9drAWFmWROT8hTD9DVbfxEQYhudlPS3QeaWWzgN7rH4XyF89vHoy0LKyMwWsq98HQWAsKSWDIPD2QSRXX4fE3FTh6mYRBMFFCuB5UU4Jik8W+0n6nFOgPkNuNioFwtJYpVQQhMAIEGoFmFfAO2PuZCGVmsn3JNgsn4GLpD9zywJCj9PE0ZkrnXO2OhgxKaVSgZRCBQoqg7pK7NpZtIAQCSnlBSIynJ1ckg+msDurHrCz/nmC3HRWgbkKjix6DTyMpFRSGimFlAqn6jGvALPkr1zc+kQFYFmBs6B6QnAvQx9On1gosBTl9Z8jRPQKWOe8/FoJyaWSWN3sXOUBDyFGDOZhI6SQC/nOWhYY0EzOv4cCVP8I+VdyZMGDD+rHzBWoXVEhG8G7QIEx0g/DBUohEYCIzcIDqfqFKif5u4QQgi2wsiTVueQIS1iZv8BZuacJAsh5xJkcyII2zDpDDEJlQHIhAfkCBQ7nmgCgNR7tnAvuB3LBkSHntvKOm/kQGON1OAjkYi44wAL1s/+nsADLsb6sHtH8tHNWWAP5gJd5SCZiBhkC50xw5+yEslHBjAxU2DIoq3zmBXGMETgGjFeXcY5CcPQKCGTArRcXkNd60lL8C85xhpb5v2VfuCX5a0Dh8pm5AgSEjEE+0YOTKB8mVEjwyQQU9/DkiIojyCZRD6BgNNajCY9Jhhw4AbNeGP9MzrnjHBA5TgcH5Jx7/9DcyTTDKAms1DqfHM/gB+uPBAsgwRKUiUgXg3s3k2y/xUw7bHGBgMxHoBCcK+DcoQ8EB6CAJGMNSQM9uHP0IFnZ4UHg/K8RVIEM9UBAAAECkHn8MJqVjqoaz54rEPEM6E+nI6hvgJkCbJqOaEkBGPcfPfjkb55G1wSdJJGSFqQEoUApLgWiBP8YcK7SolKfuFiRQRJFH375CYsb7a1nCDkAcPSxzn0QCKrTC1Z3+wJcg2Bm/mpg9XV1eJ2BVxaYH2cHVvUApqypdsPR4f7/e/OPL7OiyU0SB0GSYCB5KGUohZIgJAoBQnGhhJKcc+l94kUSQiRR8uo3Xi5O9u5++iuoLVV5oBYa0QN26eH+iTh79EJIXBqzm0+d5Evf89lHjj5JELk//58/faabdJFJKXgYiiAQYehjUAoh/StKgUqAklzKSnTwP8Gc/xUZqjD+/vd++OWnn9y9dQOAvJTemlNccMbnCjCYJeGZFb1/ptSu+kCL/F0nhio3gA9dmtEYR9aR9YkYidB9/PH7NN7vCCMEV0HgC6cQNQKQC+QSUECVD7lXnlee9mICR0ZWMMsJoqjxox+8/hd/+t+ZmQRSJElSWXUab1PpvYjTSFxGiLDGVl/Tgl3CKXKwnE9hdtZZW1fC937x9vVeU6HjAhhnds5SCBlglfKrm2b80XnU+orlC6vT6DSxEBh79vr11Vby7jtvf+eHP0bwmXRm9MVYyn3zVM5QVI4Wnnb4N9JXNl9rxOzg00PUB1aHrMjKaDTMBketKIAqPdXOpSrQESWiYsBrxznPNX3WQ6xqmtMIxIFZY5zRWpecw0vPP/vRB++RMUEQcCGgSqXLqXph5VPpsbLYHFOVtU7X2Cl6cJkC14X9xuefrXfiJJBWk/GlnUsfrBIhECoCGTIEZ0qrS9+qECNTkpfekNXOmIoOOCpHthwxna12mq1WdO/eTUQSgWq2Wq1mq058M0cwXEoutQdEvz9gS2T6lKdmGFxOqfV/HwzO3bt560qv05DEFXegUERcRShCoUIMIpDKMbJGk3MqCKwBspqjqEuWp82Ijpw1hllhGXXiuNdIbt++tX75qvEtjC+6UsrV1S67aNSiijzPT7lmUabgnMPmBYSqJMWGg37jUqJQM+Y4s5w5YA4FEAPHmECsggFQKiYUCOY0WVvU9R45OEBPkYGAY1lqQzQcjWLV1HluwHcwjijLMiExWmobz3R5Yn19/ZSMdT2mZb4GbF5yZ+c5RyJbGj3SdHM8mQzuF4O+keHOzs7Lz39t6/IVTiWWAYAQZHynojPgnCpSjIyQc0foWM3xPDCyIu8PR8PxuHtZrvR61jMkqLHM0SP2ceR3yoXO+GVOl+oCUlM0WKrWH334wR/+0R8e7u4ebXRf2V7ZXmmHUfT5Xv9v/s+773144/d++M1nXnxBRhGquGQWjd7f3b97bzfP83anGSdRd2V9/alrVgiPpur5utSTSTpK0/FkMoW75zi1Ac82d8vhKabIhvlMATG2zOpczTRx0dr4C7a2Nh/u3v3ec1d3FPYM27t1L3fl19Y3n1v92qAs3rm5y4heee0bhjvMxkd3d3dv3N4/eJTpyajf7m6soQB9121eu+4rDHhXHB4eHuzvmxLCoAk88E8hB6c7/1oeWMolAF6BsxMHS1TNN281eZl5cHptb2XlH7zwzE5D5UcHnx2N9o27lxXf4ivPr8Y9m+0a9p//6m/fmGQ/fuONwcPDv/zzv8qyAuMg03Zlo7mxsd3qrgdxdHx03Oz2KuFsacqHjx4xLjq9lRlTcRdiBqAmo1PBxYUXPcZl00qNjB28+8uvSQ1lEQWq2et9/elrv7x75yf/6Cc9Zz968087nc7P7x+sieCtn/0lSPXP//GPQ2ePjx7tDtO9QR4+HH75yd3b/aPV69d++3d+0oikNS4dp9axQutmu0uLqaMnD29ZcVo5XCBnegZO3+CHLcs3/9N/NDF9//mrG60kS/PN7dXfeuVZ5Mw4/qPf/p2fvvln/+Zf/cHrr37rP/zRfymLot0Oi0eH44n9+Zf3XK/ze9ee5/mDV3fW/sevPvyTD+787ne/9eMffM9a1uut48Pjbm/dwRQqp4SZM4LFfIfvln8jD9DUD5XXCMwkp1KnnWTl6Wc3I+9RGUWWiyhqIKAu5EYrevXZa4LT5fWeFOLKcy+6jWEjufdPNzceMfv1q1c+3/1qcPjwpae2b3946/7tm2+h1laj4N1ma6Xb8VajC6F9wRA0A8ZM1ifcVtUBRjabbK71Ll1Zv/3w/rUXnk6SFlMBceU7Qmfv3Lqx3o5ihaSLS73O4WDMw8hENmi13ti+wuOYjGl+8+sfv/uLyf6Df/37P9neWrt/0v+zt/86iJPV3kocxZb59oZ+DZJo5gWYt7PzMKVlkWGJw1WetM6krXZDpmmYju9+8XlelFxGFf/Hj//2vXf/+p0XX/i6lMoZvbXeu33zDkjRWF1Zf+7ZcL0DgRMRW9nobL3wclHkT7UwkNBuNjc7vefXN3//9e+2JOFCjPrA5aOiEp4C1YeYibUs5DQCcFaSZ4rxOm5ACEOYG+MmZUb49ptvjU4GnTiZmFIo+cpLL67vXPHtFRfdRiMqs+L4OFldhzhUJEqtyjJHcqljL734Qtxs8Wa7FbHvfufbL610vnz7rXufvL/2z/5l5vt9zk4H5MUQehxWztU9nGpKODwZHeXZ1atbr1673NvcDBrtQEasLLLR+M7nn3HBom6XoYPSljm9/vILf/HT//pP/uBfJN1VBhFIq6Lmg4OHx8cnP/jed0USGuBc4lozOdp7eP3rL5q9+4XNc5RL+PlNFVggh18wQT0lecTQMpZao3VZFKkpc5HJwXDsnLnx/kd3v7oloyBYuxQrHgrVjpO0Gb/6ysu/+tnPGt1V3e6ZKC6LAmz5o9dek0nEEDKtgbjpH125epmVjkmZT/uXU9PofzcPPGkAMwILRsM8G03G3cm4LKyxBBy++uyz92/v9TVBXo4NZUX+D3/4WsHo8rPP7zz3sin0yf6eTgcUy87aJRXJkhmbkwxCGTeLB073D1srW0MIS4x+c3EEYxckrHoKcuk8IbPTdwTEMScc5YUjndu0sDoOG3qSXX/muhHy5sP9+wf7l3d2lMRf/d/3Xv2t11WgxuNxc21zY+uSb8YZFc6YojDGmCqoEPkz3/hOfrjnQI7bnaKat5tNX/yabCrOzh+e6tyW0+u8YaBLW9uq3WGYh3GIHHVp+4N+NhgnnfZr3/7mq0S61GHSCsKw12xFrRiFzNM06J8ESdNyTJm1yIwutLUkFQBIU2oOjsuCRCqbVFUoYHRapJkkRMuM83EQOu+TxQjjxkvf+vbBR29zGSBKD6VRKhgPiLimTqPRvbJBYeg411qP8lzYImk1hyfHTWColEHf8FrfVSOgIEc0GVutc2OHYWK5rAoZ0UVinLe1YEsrVgvKudB+QbbddCbc93hEYLUrLSiVcEjv3bq7t3t0ubnSa7YeOdto3CTE9mqvd21HNFWmM2As7HSPho96a+vOMeucZRykYiiZMSCYFSpr97Kw7fwjncOlzOHcGbmXV0/+bkFcT5/Ws2SCi+FozK9f20ySZrt759ObDVJXr11jSkYqnEzG93d3f/nWL0TEn37haRaIYC2Km4kjV5TGs00pGaIxJj8edNY6w6wYdzcdcKjknc6+1Uz/8Vi4UAFg5xYSl76bAhKlEkIN+4P+yUm72RJKrm6uslSPywkXsSWkUGw+fWXj8sYwHeRFEYTKIiaN9iTNrDHCQ59bx1LtWO/yV+O8sbZiuIClTpB+bfzWCsxFxNmMHavT/bSRXOiASzborq0dOUZG9w+PuHVhlHSubFCpy0leFiPDddztxnHMOW/La9bk1tkSKC11ludKSlctZpAjJkLceDpgaIDmhsPTj7MAZ2rBbxLEM1kvcqLvyJ7aeZ8sCDEajRpxIkFKGUgRxYl0qgy6Ld5oOC4sY2S1JiIO5Xg4znKlQgLuLCNjx7qQm5dNJSrNUHPGWOfHYnJtFsTTjOmq1At13a6o4IWLrfWI4k576/qjo1uIRTNOTWG73TUZJ0IBMxpA6dQw4Tx15Y4JmExG+SSVUSxVYEpD2uQ2w6hFUZvBjDrPUnfdjC0Xfzaf/5yvKi+pCvUU8Nzo0/n0czz0tBnwuW9//8ZJ+qA/muSFsYbHITYb0G5hr2vD0ElROgdC8CBwiChks9NVKijzosiy8WisjYk7q9ZH7UUGhgUrfoIYfy8qMdXbCaWO0tKmwyQOr0mRFxOcCC4VlwFxz1gRpEV0HkMOQJEz+XiUp9ngZGC53L60g0FCjMPjQvU8Q7iIFQmYmfzc3U8axFj/6LDQ9ojg3S/u5ZNSa7PW66hAiTCSYYRKSSURoHClTzscdZ6NhoOTwTgtzPa17aDZKVA8tnWfpSC3vKR80dSQgIt6tycvodbIe7S3XxaGh+ogz4Y37t3YPeg1VacZ9bqdTrvdiMJAySiKUPkHGG3GWT7JCxTBztWn1i5dRhmkgBekCFggZ14JzqahZQUuVn7p+guVAWJ7d2+D1rqa2Bkjn2R6f5zzh30lHkYc15phrxW1Ww0EpwQC8ubKevvSpVZ7ZaW7iiKopxTpwt0iMF0KXo7dx0ko2MV4ObW6el4fYO5kf5eTLYschfBsmhFxJGAl872CGVKhTZqXnXbM4rDX665ub0eNVqvVAc6ni43A8Zx5aInGTB88X2G4MAaW7zkf7NXaIJ1eUPWvB48eBqQbCge5M9YSMUSSkscCFZdgrQQIlGw24o219UYjSZpNjjyOY1HNqiIDC/jrkXpmXAQlsbDz48fpm6goip//yR/3olBEodP5hAAFTxRbb8br7SgOZOSJhoijoNduxUkkfHIKZBhyQGQ+RTGqtz4sJsDpomcBLEQ+M2l7SoEnSD9bUq1XYPz9pTEff/opt2a7FZ+UmdU2tMSVXO2EVy+tXdneaDQbUoowiKWS9VxZtXharVdX8jhyYJkVjAA9o57nIZyxl1MCgF2eJUGsd3jNnScuWLW5aDjnDvb3j09OHu7vjcdjKPNuW/XCjTgY9LMcg7DZClc73fXNndbKOnIUwrc+1hqyjgMybcARkO+1PGdAVlpiznLEM5saYPFxGsV42uju9GyReMKWsXlTZLX+/IsvJuNxlhe6dFKGeZaq1W6r04rCyGd267wvjTZFiUJwJX19MpoZU23u8a/kCCu2Zr07sZ9lskkHew/a7VYcJ+z0Hq6ljqReZDslFWMLX51qKeeboup9Ida5g8PDfr9/cnzsnHNaa+Mmo5Qha6ogiZMoaoRSAIJ2NCnyssgP9x42O9242zbOFWnqykJUqQkYcOQE4KquuiiKg+PJ5uqOQ/blV19tbW11u10Os1XUaaKDKe2p01H11rHFJqazbNQ5d3xyMily5xwwNhwOs8lEWztJJ576Vp3u0fGJ1h5/250OY4wLIWWQ60BWyyxFWY5Pjh7durGmtwwxa43vDj2tUIwLnz0rBDtjvvjixihor2ndajR0Xuzt7RljGkkiOffeWNrqMJd9ptXCHXU8CESPsbws7ty+baxzDIxz42GfOaZ15n1htAqjsW9E9OHRfhDHgWqKSDowhmrAKFuWgVKE3Bblyf4jW5TJykqYxB43ngV5MUCC1gV3ZIrysw8/ufLG72ptEWk8Hmht8jyN4/Deg4edTrfX7Qkhp6sqwKBao6WZE7wbZ3uGAEAQo93d3d0HD3whEsJ32JMJIlC1El1qrZR0ztemQKnhcBj7NOpYK/aZ0M3aVSLBUSEHJaMgCKKQcw6OsDYgI45QbSWzpM3JwcHJoH9FSMZcqcvxeKJ1CQBhGEgpj4+Oy1IrpcqybDab7VZLCF9YPIbJAdGZtCneeeedNE11tcsrjMIsS511pfNtkD8TBtb6PCaQKyW7va4M1MH+wO60jZ4Ya5j24utSM491jJvNqJGoOPYp3xFUW/VqUzlnmPWBMTzpN7q9zsqa4Hw8Kfb3DzY316kyHCNW6jLPc0QIguDuvXvM0erq6uVLl1SgdKnB28Dhckc2nowYoPRtnimK3FmPtyRplGVRliVWuRlR5IVpd0S32zOEKiisiEo7KnXhrEUEbQ1aZhhkwEUQsqK0DgQwX4+BlXlmpXGOubIYHx/1+/1k/RKqUJcmG2dETMkQEYeDkVJqMh45Z4s87ayst7q94WCw/+jw8PhoZ3u72+5UG8/mse2jXERxQA7SrGBEjYbChBvjm7XxuJBSpdX+XyFkvUkjDKPMEFfqJMs3PRaNB2GVt7R1BNxYM+gPgjgEgEgq8BHmw9cSGW2z8Sgbpw5Ud+tp7xOfITKPdY7WuDTLnlpZz/N8PB53Ou3jwwPfCPmaAtboB/d3rTbtdhsFP5WFKsAFURgNR2OtdRBw52g0GljryHlW1mg0nPO5qNStMG5I5EKGzZZw/ZHWhoOp9iaJski55MhACS44F4IzZ8k6EmhKA8iLUjNTMhXD9mZ7a9v3gZJnphBCOceMtScng/W1SRSF1uhQBdrYvMh1qfMiS71K3eOj40uXL21sbIZRRLPmE43RPr9bY7SpUhNaa7XWYRiPRlmr2QpD5WMamXaOoRe23Wp0W20lBYDX1jorlXJVxOd5pvPclIXRpQ/8IvdnyqLMsyKbkNV7k/xnH3yyf3JSmtKCcwjGWGtNtWQtPv/iM0bUbDSdtVL6FC8Et9YEUSikJyKHjw729/eHw5GHbkU0fE9cbzbV/pecta4sfTdb5NoYQs7K0hjjojhK01RxEXDRiCJuykYSqGo3BENUQdBsNhmjNEvHo8FkNJ4MR8UktXnhilKneTEcQ5oOeOuWVe9/de+//a//HahIokjCKM8KZ73hWu0oS/VwOK62LAprbRX6zhgThqEj0tb0BwNtiqKcpNnIkI9XYa1TKkDmrLYepiw1xoZRmOdloxULLrR3kRkNx1EUCa4QTbfTaKFrBj2XGusKU+ZJGIZSBWHcHw4subLUotrO4aS0zjDDhy75ZNj/xfsf7B0OBv3B8aPD27fvrK+vBVyRI621ZJyISSWPj4+TJKz2VIG1epJOYl95glKXxJitbDwYnCi1MRyNEfn/DwAA//9rvWsSbDKFjgAAAABJRU5ErkJggg==" },
     blader: { handle: "@blader", img: "data:image/jpeg;base64,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" },
@@ -185,45 +161,50 @@
     you: { handle: "your team" },
     sam: { handle: "teammate" },
   };
-  // omg = whose OMG holds it
   const SKILLS = {
-    "grill-me": { author: "mattpocock", omg: "you" },
-    "humanizer": { author: "blader", omg: "you" },
-    "swiftui-pro": { author: "twostraws", omg: "you" },
-    "release-notes": { author: "you", omg: "you", private: true },
-    "frontend-design": { author: "anthropics", omg: "mate" },
-    "brand-voice": { author: "sam", omg: "mate", private: true },
+    "grill-me": { author: "mattpocock" },
+    "humanizer": { author: "blader" },
+    "swiftui-pro": { author: "twostraws" },
+    "release-notes": { author: "you", private: true },
+    "frontend-design": { author: "anthropics" },
+    "brand-voice": { author: "sam", private: true },
   };
-  const SOURCE_ORDER = ["grill-me", "humanizer", "swiftui-pro", "release-notes"];
   const LOGOS = {
     chatgpt: { path: "M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" },
     claude: { path: "m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z" },
     hermes: { img: "data:image/png;base64,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" },
   };
   const AGENTS = [
-    { id: "chatgpt", logo: "chatgpt", kind: "Personal", name: "ChatGPT", from: { you: ["swiftui-pro", "grill-me", "humanizer"] } },
-    { id: "claude", logo: "claude", kind: "Personal", name: "Claude", from: { you: ["humanizer"] } },
-    { id: "hermes", logo: "hermes", kind: "Team", name: "Hermes", from: { you: ["grill-me", "release-notes"] } },
-    { id: "team-chatgpt", logo: "chatgpt", kind: "Team", name: "ChatGPT", shared: true, from: { you: ["humanizer", "release-notes"], mate: ["frontend-design", "brand-voice"] } },
+    { id: "chatgpt", logo: "chatgpt", kind: "Personal", name: "ChatGPT", label: "ChatGPT" },
+    { id: "claude", logo: "claude", kind: "Personal", name: "Claude", label: "Claude" },
+    { id: "hermes", logo: "hermes", kind: "Team", name: "Hermes", label: "Hermes" },
+    { id: "team-chatgpt", logo: "chatgpt", kind: "Team", name: "ChatGPT", label: "team ChatGPT", shared: true },
   ];
-  const STEPS = [
-    { label: "Find", title: "Great skills are written by lots of people.",
-      body: "<b>grill-me</b> comes from @mattpocock, <b>humanizer</b> from @blader, <b>swiftui-pro</b> from @twostraws. Your team writes private skills too." },
-    { label: "Collect", title: "Collect them into your OMG.",
-      body: "Your OMG is your personal skill library. Add each skill once, whoever wrote it." },
-    { label: "Send", title: "Give each agent just what it needs.",
-      body: "ChatGPT gets three skills. Claude stays lean with only <b>humanizer</b>. Team agents get the private <b>release-notes</b>." },
-    { label: "Share", title: "Team agents combine everyone's picks.",
-      body: "Your teammate sends skills from their own OMG to the same team ChatGPT, so it has skills from both of you." },
+  // The story, played in order and then looped.
+  const EVENTS = [
+    { who: "you", collect: "grill-me", send: ["hermes"] },
+    { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
+    { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
+    { who: "mate", collect: "frontend-design", send: ["team-chatgpt"] },
+    { who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
+    { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
+    { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
   ];
+  const WHO = { you: "You", mate: "Your teammate" };
 
   // ---- Geometry
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("flow");
+  const ticker = document.getElementById("ticker");
+  const pauseBtn = document.getElementById("pause");
   const W = 800, CH = 32, CG = 8, M = 20;
-  const OMG_W = 260, OMG_X = (W - OMG_W) / 2, OMG_Y = 168;
-  const MATE_W = 212, MATE_Y = 300;
-  const AG_GAP = 14, AG_W = (W - 2 * M - 3 * AG_GAP) / 4;
+  const OMG_W = 260, OMG_X = (W - OMG_W) / 2, OMG_Y = 132, ROW_Y = 150;
+  const MATE_W = 212, MATE_X = W - M - MATE_W, MATE_Y = 262, M_ROW = 120;
+  const AG_GAP = 14, AG_W = (W - 2 * M - 3 * AG_GAP) / 4, AG_HEAD = 56;
+  const youCollects = EVENTS.filter((e) => e.who === "you" && e.collect).length;
+  const cardH = (head, n) => (n ? head + n * (CH + CG) - CG + 20 : head - 2);
+  const AG_Y = OMG_Y + cardH(ROW_Y, youCollects) + 80;
+  const agentX = (i) => M + i * (AG_W + AG_GAP);
 
   const el = (tag, attrs, parent) => {
     const n = document.createElementNS(NS, tag);
@@ -237,22 +218,21 @@
     t.textContent = s;
     return t;
   };
-  const place = (node, x, y, opacity, delay) => {
+  const place = (node, x, y, opacity) => {
     node.style.transform = `translate(${x}px, ${y}px)`;
-    node.style.opacity = opacity;
-    node.style.transitionDelay = (delay || 0) + "ms";
+    if (opacity != null) node.style.opacity = opacity;
   };
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
   let measurer;
   const textW = (s) => { measurer.textContent = s; return Math.ceil(measurer.getComputedTextLength()); };
   const chipW = (name) => textW(name) + 48 + (SKILLS[name].private ? 16 : 0);
 
-  // Contacts-style placeholder: grey gradient with a person glyph
   function placeholder(g, cx, cy, r) {
     el("circle", { cx, cy, r, fill: "url(#ph)" }, g);
     el("circle", { class: "glyph", cx, cy: cy - r * 0.2, r: r * 0.34 }, g);
     const w = r * 0.62;
-    el("path", { class: "glyph", d: `M${cx - w} ${cy + r * 0.72}a${w} ${w * 0.86} 0 0 1 ${2 * w} 0z`, "clip-path": "url(#round)" }, g);
+    el("path", { class: "glyph", d: `M${cx - w} ${cy + r * 0.72}a${w} ${w * 0.86} 0 0 1 ${2 * w} 0z` }, g);
   }
   function avatar(g, who, cx, cy, r) {
     const p = PEOPLE[who];
@@ -263,10 +243,8 @@
       placeholder(g, cx, cy, r);
     }
   }
-
   function logo(g, key, cx, cy, r) {
     const L = LOGOS[key];
-    // Monochrome marks, inverted in dark mode
     if (L.img) {
       el("image", { class: "logo-img", href: L.img, x: cx - r, y: cy - r, width: 2 * r, height: 2 * r, preserveAspectRatio: "xMidYMid meet" }, g);
     } else {
@@ -275,7 +253,7 @@
     }
   }
 
-  // A pill drawn at the origin and moved with CSS transforms.
+  // A skill pill, drawn at the origin and moved with CSS transforms.
   function chip(parent, name, opts = {}) {
     const s = SKILLS[name];
     const tw = textW(name);
@@ -289,39 +267,56 @@
       el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1.2 }, g);
       el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, g);
     }
-    if (opts.right != null) {
-      // Number followed by a small agent (bot) glyph
-      const cg = el("g", { class: "count" }, g);
-      // Bot drawn at 12 x 13 units, shown at half size
+    if (opts.count) {
+      const cg = el("g", { class: "count anim", style: "opacity:0" }, g);
       const bx = w - 20, bot = el("g", { transform: `translate(${bx} ${CH / 2 - 2}) scale(0.5)` }, cg);
       el("rect", { class: "bot", x: 0, y: 0, width: 12, height: 10, rx: 3 }, bot);
       el("path", { class: "bot", d: "M6 0v-2.5" }, bot);
       el("circle", { class: "bot-eye", cx: 6, cy: -3.4, r: 1.5 }, bot);
       el("circle", { class: "bot-eye", cx: 3.8, cy: 4.8, r: 1.5 }, bot);
       el("circle", { class: "bot-eye", cx: 8.2, cy: 4.8, r: 1.5 }, bot);
-      txt(cg, bx - 3, CH / 2 + 4.5, String(opts.right), "", "end");
-      el("title", {}, cg).textContent = `${opts.right} agent${opts.right === 1 ? "" : "s"}`;
+      g.countG = cg;
+      g.countT = txt(cg, bx - 3, CH / 2 + 4.5, "0", "", "end");
     }
     return g;
   }
 
   function curve(sx, sy, ex, ey) {
     const c = (ey - sy) * 0.55;
-    const at = (t) => {
-      const u = 1 - t;
-      return [
-        u * u * u * sx + 3 * u * u * t * sx + 3 * u * t * t * ex + t * t * t * ex,
-        u * u * u * sy + 3 * u * u * t * (sy + c) + 3 * u * t * t * (ey - c) + t * t * t * ey,
-      ];
-    };
-    return { d: `M${sx} ${sy}C${sx} ${sy + c} ${ex} ${ey - c} ${ex} ${ey}`, at };
+    return `M${sx} ${sy}C${sx} ${sy + c} ${ex} ${ey - c} ${ex} ${ey}`;
   }
 
-  let steppers = [];
+  // ---- Timing helpers (pausable)
+  let paused = false, instant = false;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  async function sleep(ms) {
+    if (instant) return;
+    let t = 0;
+    while (t < ms) {
+      await new Promise((r) => setTimeout(r, 50));
+      if (!paused && !document.hidden) t += 50;
+    }
+  }
+  function tweenH(rect, to, dur = 520) {
+    rect.dataset.h = to;
+    const from = +rect.getAttribute("height");
+    if (instant) { rect.setAttribute("height", to); return; }
+    const t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      rect.setAttribute("height", from + (to - from) * e);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  const say = (html) => { ticker.innerHTML = html; };
+
+  // ---- Scene
+  let layers, you, mate, agents, measurerReady = false;
 
   function build() {
     svg.textContent = "";
-    steppers = [];
     measurer = el("text", { x: -999, y: -999, style: "font: 500 12px var(--sans)" }, svg);
     const defs = el("defs", {}, svg);
     const clip = el("clipPath", { id: "round", clipPathUnits: "objectBoundingBox" }, defs);
@@ -331,197 +326,231 @@
     el("stop", { offset: 1, "stop-color": "#858a94" }, grad);
     const m = el("marker", { id: "arrow", class: "arrowhead", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, m);
+    layers = { link: el("g", {}, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
 
-    const linkLayer = el("g", {}, svg);
-    const cardLayer = el("g", {}, svg);
-    const chipLayer = el("g", {}, svg);
+    // You: the hero card
+    const yg = el("g", { class: "anim" }, layers.card);
+    place(yg, OMG_X, OMG_Y, 1);
+    const yFace = el("g", { class: "lift-hero" }, yg);
+    const yRect = el("rect", { class: "card", x: 0, y: 0, width: OMG_W, height: cardH(ROW_Y, 0), rx: 24 }, yFace);
+    placeholder(yg, OMG_W / 2, 56, 34);
+    txt(yg, OMG_W / 2, 118, "you", "omg-title", "middle");
+    const ySub = txt(yg, OMG_W / 2, 137, "", "omg-sub", "middle");
+    you = { key: "you", g: yg, rect: yRect, sub: ySub, rows: [], x: OMG_X, y: OMG_Y, w: OMG_W, head: ROW_Y };
 
-    // 1. Loose source skills
-    const widths = SOURCE_ORDER.map(chipW);
-    const free = W - 2 * M - widths.reduce((a, b) => a + b, 0);
-    const jitter = [10, 36, 0, 28];
-    const tilt = [-2.5, 1.5, -1, 2.5];
-    const srcPos = {};
-    let x = M + free / (SOURCE_ORDER.length * 2);
-    SOURCE_ORDER.forEach((name, i) => {
-      srcPos[name] = { x, y: 20 + jitter[i] };
-      const holder = el("g", { class: "anim" }, chipLayer);
-      const c = chip(holder, name, { float: true });
-      c.classList.remove("anim");
-      c.setAttribute("transform", `rotate(${tilt[i]} ${widths[i] / 2} ${CH / 2})`);
-      txt(holder, widths[i] / 2, CH + 20, PEOPLE[SKILLS[name].author].handle, "handle", "middle");
-      steppers.push((st) => place(holder, srcPos[name].x, srcPos[name].y, st === 0 ? 1 : 0.3, st === 0 ? i * 90 : 0));
-      x += widths[i] + free / SOURCE_ORDER.length;
+    // Teammate: smaller card, joins later
+    const mg = el("g", { class: "anim" }, layers.card);
+    place(mg, MATE_X, MATE_Y - 12, 0);
+    const mFace = el("g", { class: "lift" }, mg);
+    const mRect = el("rect", { class: "card", x: 0, y: 0, width: MATE_W, height: cardH(M_ROW, 0), rx: 20 }, mFace);
+    placeholder(mg, MATE_W / 2, 42, 24);
+    txt(mg, MATE_W / 2, 89, "teammate", "mate-title", "middle");
+    const mSub = txt(mg, MATE_W / 2, 106, "", "omg-sub", "middle");
+    mate = { key: "mate", g: mg, rect: mRect, sub: mSub, rows: [], x: MATE_X, y: MATE_Y, w: MATE_W, head: M_ROW, shown: false };
+
+    // Agents
+    agents = {};
+    AGENTS.forEach((a, i) => {
+      const g = el("g", { class: "anim" }, layers.card);
+      const x = agentX(i);
+      place(g, x, AG_Y, 1);
+      const face = el("g", { class: "lift" }, g);
+      const rect = el("rect", { class: "card", x: 0, y: 0, width: AG_W, height: AG_HEAD + 2, rx: 18 }, face);
+      logo(g, a.logo, 28, 30, 12);
+      txt(g, 47, 28, a.name, "agent-title");
+      const sub = txt(g, 47, 41, a.kind, "agent-sub");
+      agents[a.id] = { ...a, i, g, rect, sub, x, items: [], caps: {} };
     });
 
-    // 2. Your OMG: the hero, a tall card
-    const ROW_Y = 150, rowW = OMG_W - 32;
-    const omgH = ROW_Y + SOURCE_ORDER.length * CH + (SOURCE_ORDER.length - 1) * CG + 22;
-    const omg = el("g", { class: "anim" }, cardLayer);
-    const omgCard = el("g", { class: "lift-hero" }, omg);
-    el("rect", { class: "card", x: 0, y: 0, width: OMG_W, height: omgH, rx: 24 }, omgCard);
-    placeholder(omg, OMG_W / 2, 56, 34);
-    txt(omg, OMG_W / 2, 118, "you", "omg-title", "middle");
-    const reach = AGENTS.filter((a) => a.from.you).length;
-    const omgSub = txt(omg, OMG_W / 2, 137, "", "omg-sub", "middle");
-    steppers.push((st) => {
-      place(omg, OMG_X, st >= 1 ? OMG_Y : OMG_Y + 16, st >= 1 ? 1 : 0);
-      omgSub.textContent = `${SOURCE_ORDER.length} skills` + (st >= 2 ? ` · ${reach} agents` : "");
-    });
-    const slot = {};
-    SOURCE_ORDER.forEach((name, i) => {
-      slot[name] = { x: OMG_X + 16, y: OMG_Y + ROW_Y + i * (CH + CG) };
-      const n = AGENTS.filter((a) => (a.from.you || []).includes(name)).length;
-      const c = chip(chipLayer, name, { w: rowW, right: n });
-      const count = c.querySelector(".count");
-      count.classList.add("anim");
-      steppers.push((st) => {
-        if (st >= 1) place(c, slot[name].x, slot[name].y, 1, 250 + i * 140);
-        else place(c, srcPos[name].x, srcPos[name].y, 0);
-        count.style.opacity = st >= 2 ? 1 : 0;
-        count.style.transitionDelay = st >= 2 ? "200ms" : "0ms";
-      });
-    });
-    const omgBottom = OMG_Y + omgH;
+    const finalH = Math.max(...AGENTS.map((a) => {
+      const n = EVENTS.filter((e) => e.send.includes(a.id)).length;
+      return AG_HEAD + n * (CH + CG) + (a.shared ? 2 * 22 + 6 : 0) + 20;
+    }));
+    svg.setAttribute("viewBox", `0 0 ${W} ${AG_Y + finalH + 24}`);
+    refreshSubs();
+  }
 
-    // Sam's OMG: small side card
-    const theirs = Object.keys(SKILLS).filter((n) => SKILLS[n].omg === "mate");
-    const M_ROW = 120;
-    const mH = M_ROW + theirs.length * CH + (theirs.length - 1) * CG + 16;
-    const mX = W - M - MATE_W;
-    const mReach = AGENTS.filter((a) => a.from.mate).length;
-    const mate = el("g", { class: "anim" }, cardLayer);
-    const mateCard = el("g", { class: "lift" }, mate);
-    el("rect", { class: "card", x: 0, y: 0, width: MATE_W, height: mH, rx: 20 }, mateCard);
-    placeholder(mate, MATE_W / 2, 42, 24);
-    txt(mate, MATE_W / 2, 89, "teammate", "mate-title", "middle");
-    txt(mate, MATE_W / 2, 106, `${theirs.length} skills · ${mReach} agent${mReach === 1 ? "" : "s"}`, "omg-sub", "middle");
-    steppers.push((st) => place(mate, mX, st >= 3 ? MATE_Y : MATE_Y - 12, st >= 3 ? 1 : 0));
-    theirs.forEach((name, i) => {
-      slot[name] = { x: mX + 12, y: MATE_Y + M_ROW + i * (CH + CG) };
-      const n = AGENTS.filter((a) => (a.from.mate || []).includes(name)).length;
-      const c = chip(chipLayer, name, { w: MATE_W - 24, right: n });
-      steppers.push((st) => place(c, slot[name].x, st >= 3 ? slot[name].y : slot[name].y - 12, st >= 3 ? 1 : 0, st >= 3 ? 150 + i * 90 : 0));
-    });
+  function refreshSubs() {
+    for (const o of [you, mate]) {
+      const reach = new Set(Object.values(agents).filter((a) => a.items.some((it) => it.who === o.key)).map((a) => a.id)).size;
+      o.sub.textContent = plural(o.rows.length, "skill") + (reach ? ` · ${plural(reach, "agent")}` : "");
+    }
+  }
 
-    // 3 + 4. Agents
-    const AG_Y = Math.max(omgBottom, MATE_Y + mH) + 78;
-    const agentX = (i) => M + i * (AG_W + AG_GAP);
-    let bottom = 0;
-    AGENTS.forEach((a, ai) => {
-      const ax = agentX(ai);
-      const groups = Object.entries(a.from);
-      const CAP = a.shared ? 22 : 0;
-      let cy = 56;
-      const pos = [];
-      const caps = [];
-      groups.forEach(([o, list], gi) => {
-        if (a.shared) { caps.push({ y: cy + 12, o }); cy += CAP; }
-        list.forEach((name) => { pos.push({ name, o, y: cy }); cy += CH + CG; });
-        if (gi < groups.length - 1) cy += 6;
-      });
-      const h = cy - CG + 16;
-      bottom = Math.max(bottom, AG_Y + h);
+  // Row slot inside an OMG card
+  const rowPos = (o, i) => ({ x: o.x + 16, y: o.y + o.head + i * (CH + CG) });
+  const omgBottom = (o) => o.y + +(o.rect.dataset.h || o.rect.getAttribute("height"));
 
-      const card = el("g", { class: "anim" }, cardLayer);
-      const face = el("g", { class: "lift" }, card);
-      el("rect", { class: "card", x: 0, y: 0, width: AG_W, height: h, rx: 18 }, face);
-      logo(card, a.logo, 28, 30, 12);
-      txt(card, 47, 28, a.name, "agent-title");
-      const sub = txt(card, 47, 41, a.kind, "agent-sub");
-      const capEls = caps.map((c) => txt(card, 16, c.y, c.o === "you" ? "From you" : "From teammate", "group-cap anim"));
-      steppers.push((st) => {
-        place(card, ax, st >= 2 ? AG_Y : AG_Y + 16, st >= 2 ? 1 : 0, st >= 2 ? ai * 90 : 0);
-        if (a.shared) {
-          sub.textContent = st >= 3 ? "Team · shared" : "Team";
-          capEls.forEach((c) => { c.style.opacity = st >= 3 ? 1 : 0; });
+  // Lay out an agent's skills, grouping by sender on the shared agent
+  function layoutAgent(a) {
+    let y = AG_HEAD;
+    const groups = [];
+    for (const it of a.items) {
+      let g = groups.find((x) => x.who === it.who);
+      if (!g) { g = { who: it.who, items: [] }; groups.push(g); }
+      g.items.push(it);
+    }
+    const ordered = a.shared ? groups : [{ who: null, items: a.items }];
+    ordered.forEach((g, gi) => {
+      if (a.shared) {
+        let cap = a.caps[g.who];
+        if (!cap) {
+          cap = a.caps[g.who] = txt(layers.chip, 0, 0, g.who === "you" ? "From you" : "From teammate", "group-cap anim");
+          place(cap, a.x + 16, AG_Y + y + 12, 0);
         }
-      });
-
-      pos.forEach((p, k) => {
-        const at = p.o === "mate" ? 3 : 2;
-        const c = chip(chipLayer, p.name);
-        const tx = ax + 12, ty = AG_Y + p.y;
-        steppers.push((st) => st >= at
-          ? place(c, tx, ty, 1, 350 + (p.o === "mate" ? 0 : ai * 160) + k * 90)
-          : place(c, slot[p.name].x, slot[p.name].y, 0));
-      });
-
-      // Links
-      for (const [o, list] of groups) {
-        const n = list.length;
-        const sx = o === "you" ? OMG_X + OMG_W * (ai + 1) / (AGENTS.length + 1) : mX + MATE_W / 2;
-        const sy = o === "you" ? omgBottom : MATE_Y + mH;
-        const ex = ax + AG_W / 2 + (a.shared ? (o === "you" ? -28 : 28) : 0);
-        const ey = AG_Y - 4;
-        const cv = curve(sx, sy, ex, ey);
-        const lg = el("g", { class: "link draw" }, linkLayer);
-        const p = el("path", { d: cv.d, pathLength: 1, "stroke-dasharray": "1 1", "marker-end": "url(#arrow)" }, lg);
-        const [lx, ly] = cv.at(0.52);
-        txt(lg, lx, ly + 4, a.shared ? `${n} from ${o === "you" ? "you" : "teammate"}` : `${n} skill${n === 1 ? "" : "s"}`, "", "middle");
-        const from = o === "mate" ? 3 : 2;
-        steppers.push((st) => {
-          const on = st >= from;
-          const d = on ? 150 + ai * 120 + "ms" : "0ms";
-          p.style.strokeDashoffset = on ? 0 : 1;
-          p.style.transitionDelay = d;
-          lg.style.opacity = on ? 1 : 0;
-          lg.style.transition = "opacity 300ms ease";
-          lg.style.transitionDelay = d;
-        });
+        cap.pos = { x: a.x + 16, y: AG_Y + y + 12 };
+        y += 22;
       }
+      for (const it of g.items) { it.pos = { x: a.x + 12, y: AG_Y + y }; y += CH + CG; }
+      if (a.shared && gi < ordered.length - 1) y += 6;
     });
-
-    svg.setAttribute("viewBox", `0 0 ${W} ${bottom + 30}`);
-    measurer.remove();
+    const h = a.items.length ? y - CG + 16 : AG_HEAD + 2;
+    return h;
   }
 
-  // ---- Playback
-  const stepsEl = document.getElementById("steps");
-  const capTitle = document.getElementById("cap-title");
-  const capBody = document.getElementById("cap-body");
-  const replay = document.getElementById("replay");
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const HOLD = 4200;
-  let current = 0, timer = null;
+  // ---- Actions
+  async function spawnAndCollect(o, name) {
+    const w = chipW(name);
+    const band = o.key === "you"
+      ? { x0: 60, x1: W - 60 - w, y0: 18, y1: 60 }
+      : { x0: MATE_X - 10, x1: W - M - w, y0: MATE_Y - 104, y1: MATE_Y - 84 };
+    const sx = band.x0 + Math.random() * Math.max(0, band.x1 - band.x0);
+    const sy = band.y0 + Math.random() * (band.y1 - band.y0);
+    const tilt = (Math.random() * 5 - 2.5).toFixed(1);
 
-  STEPS.forEach((s, i) => {
-    const li = document.createElement("li");
-    const b = document.createElement("button");
-    b.type = "button";
-    b.textContent = s.label;
-    b.addEventListener("click", () => { stop(); show(i); });
-    li.appendChild(b);
-    stepsEl.appendChild(li);
+    const holder = el("g", { class: "anim" }, layers.chip);
+    const c = chip(holder, name, { float: true });
+    c.classList.remove("anim");
+    c.setAttribute("transform", `rotate(${tilt} ${w / 2} ${CH / 2})`);
+    const h = txt(holder, w / 2, CH + 18, PEOPLE[SKILLS[name].author].handle, "handle", "middle");
+    place(holder, sx, sy + 10, 0);
+    await frame();
+    place(holder, sx, sy, 1);
+    const au = SKILLS[name].author;
+    const src = au === "you" ? "in your team's private repo" : au === "sam" ? "in the team's private repo" : `by ${PEOPLE[au].handle}`;
+    say(`${WHO[o.key]} found <b>${name}</b> ${src}`);
+    await sleep(1100);
+
+    // Fly into the card: the floating pill hands off to a row pill
+    const i = o.rows.length;
+    const slot = rowPos(o, i);
+    const row = chip(layers.chip, name, { w: o.w - 32, count: true });
+    place(row, sx, sy, 0);
+    o.rows.push({ name, el: row, n: 0 });
+    tweenH(o.rect, cardH(o.head, o.rows.length));
+    await frame();
+    h.style.opacity = 0;
+    place(holder, slot.x, slot.y, 0);
+    place(row, slot.x, slot.y, 1);
+    say(`${WHO[o.key]} added <b>${name}</b> to ${o.key === "you" ? "your" : "their"} library`);
+    refreshSubs();
+    await sleep(900);
+    holder.remove();
+  }
+
+  async function send(o, name, targets) {
+    const row = o.rows.find((r) => r.name === name);
+    const from = rowPos(o, o.rows.indexOf(row));
+    const flights = [];
+    for (const id of targets) {
+      const a = agents[id];
+      const c = chip(layers.chip, name);
+      place(c, from.x, from.y, 0);
+      a.items.push({ name, who: o.key, el: c });
+      const h = layoutAgent(a);
+      if (a.shared && o.key === "mate") a.sub.textContent = "Team · shared";
+      // Transient arrow
+      const sx = o.key === "you" ? o.x + o.w * (a.i + 1) / (AGENTS.length + 1) : o.x + o.w / 2;
+      const ex = a.x + AG_W / 2 + (a.shared ? (o.key === "you" ? -24 : 24) : 0);
+      const lg = el("g", { class: "link", style: "opacity:0" }, layers.link);
+      const p = el("path", { d: curve(sx, omgBottom(o), ex, AG_Y - 4), pathLength: 1, "stroke-dasharray": "1 1", "marker-end": "url(#arrow)" }, lg);
+      p.style.strokeDashoffset = 1;
+      flights.push({ a, c, h, lg, p });
+    }
+    await frame();
+    for (const f of flights) {
+      f.lg.style.opacity = 1;
+      f.p.style.strokeDashoffset = 0;
+      tweenH(f.a.rect, f.h);
+      for (const it of f.a.items) place(it.el, it.pos.x, it.pos.y, 1);
+      for (const cap of Object.values(f.a.caps)) place(cap, cap.pos.x, cap.pos.y, 1);
+    }
+    const names = targets.map((id) => agents[id].label);
+    const list = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names.at(-1) : names[0];
+    say(`${WHO[o.key]} sent <b>${name}</b> to ${list}`);
+    await sleep(700);
+    row.n += targets.length;
+    row.el.countT.textContent = row.n;
+    row.el.countG.style.opacity = 1;
+    refreshSubs();
+    await sleep(700);
+    for (const f of flights) f.lg.style.opacity = 0;
+    await sleep(450);
+    for (const f of flights) f.lg.remove();
+  }
+
+  async function showMate() {
+    if (mate.shown) return;
+    mate.shown = true;
+    say("Your teammate joins with their own library");
+    place(mate.g, MATE_X, MATE_Y, 1);
+    await sleep(1000);
+  }
+
+  async function reset() {
+    say("&nbsp;");
+    for (const n of layers.chip.querySelectorAll(":scope > *")) n.style.opacity = 0;
+    place(mate.g, MATE_X, MATE_Y - 12, 0);
+    await sleep(700);
+    layers.chip.textContent = "";
+    layers.link.textContent = "";
+    you.rows = []; mate.rows = []; mate.shown = false;
+    tweenH(you.rect, cardH(ROW_Y, 0));
+    tweenH(mate.rect, cardH(M_ROW, 0));
+    for (const a of Object.values(agents)) {
+      a.items = []; a.caps = {};
+      a.sub.textContent = a.kind;
+      tweenH(a.rect, AG_HEAD + 2);
+    }
+    refreshSubs();
+    await sleep(900);
+  }
+
+  async function playOnce() {
+    for (const e of EVENTS) {
+      const o = e.who === "you" ? you : mate;
+      if (o === mate) await showMate();
+      if (e.collect) await spawnAndCollect(o, e.collect);
+      else say(`<b>${e.reuse}</b> is already in your library, so there is nothing to add`);
+      if (e.reuse) await sleep(1400);
+      await sleep(300);
+      await send(o, e.collect || e.reuse, e.send);
+      await sleep(600);
+    }
+  }
+
+  async function run() {
+    if (reduced) {
+      instant = true;
+      svg.classList.add("instant");
+      await playOnce();
+      say("Your library feeds every agent, and a teammate's library feeds the team agent too.");
+      pauseBtn.hidden = true;
+      return;
+    }
+    for (;;) {
+      await playOnce();
+      say("Every agent has exactly the skills it was sent");
+      await sleep(3200);
+      await reset();
+    }
+  }
+
+  pauseBtn.addEventListener("click", () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Play" : "Pause";
+    pauseBtn.setAttribute("aria-pressed", String(paused));
   });
-  const buttons = [...stepsEl.querySelectorAll("button")];
-
-  function show(i) {
-    current = i;
-    steppers.forEach((f) => f(i));
-    buttons.forEach((b, k) => {
-      if (k === i) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
-    });
-    capTitle.textContent = STEPS[i].title;
-    capBody.innerHTML = STEPS[i].body;
-  }
-  function stop() { clearTimeout(timer); timer = null; }
-  function tick() {
-    if (current >= STEPS.length - 1) { stop(); return; }
-    show(current + 1);
-    timer = setTimeout(tick, HOLD);
-  }
-  function play() {
-    stop();
-    svg.classList.add("instant");
-    show(0);
-    svg.getBoundingClientRect();
-    requestAnimationFrame(() => {
-      svg.classList.remove("instant");
-      timer = setTimeout(tick, HOLD);
-    });
-  }
-  replay.addEventListener("click", play);
 
   // Hover a skill to see every copy of it
   svg.addEventListener("pointerover", (e) => {
@@ -532,17 +561,8 @@
   });
   svg.addEventListener("pointerleave", () => svg.classList.remove("tracing"));
 
-  build();
-  if (reduced) show(STEPS.length - 1); else play();
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => {
-      const keep = current;
-      build();
-      svg.classList.add("instant");
-      show(keep);
-      svg.getBoundingClientRect();
-      requestAnimationFrame(() => svg.classList.remove("instant"));
-    });
-  }
+  // Wait briefly for fonts so pill widths are measured with the real face
+  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  Promise.race([fontsReady, new Promise((r) => setTimeout(r, 1200))]).then(() => { build(); run(); });
 })();
 </script>
