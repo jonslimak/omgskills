@@ -130,7 +130,7 @@
   #flow .chip .bg { fill: var(--chip); }
   #flow .chip.float .bg { fill: var(--float); }
   #flow .chip.float { filter: drop-shadow(0 1px 1px var(--shadow-soft)) drop-shadow(0 4px 10px var(--shadow)); }
-  #flow .chip .name { font-size: 13px; font-weight: 500; }
+  #flow .chip .name { font-size: 12px; font-weight: 500; }
   #flow .chip .count text { fill: var(--muted); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
   #flow .chip .bot { fill: none; stroke: var(--faint); stroke-width: 2; stroke-linecap: round; }
   #flow .chip .bot-eye { fill: var(--faint); }
@@ -221,7 +221,7 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("flow");
   const W = 800, CH = 32, CG = 8, M = 20;
-  const OMG_W = 288, OMG_X = (W - OMG_W) / 2, OMG_Y = 168;
+  const OMG_W = 260, OMG_X = (W - OMG_W) / 2, OMG_Y = 168;
   const MATE_W = 212, MATE_Y = 300;
   const AG_GAP = 14, AG_W = (W - 2 * M - 3 * AG_GAP) / 4;
 
@@ -322,7 +322,7 @@
   function build() {
     svg.textContent = "";
     steppers = [];
-    measurer = el("text", { x: -999, y: -999, style: "font: 500 13px var(--sans)" }, svg);
+    measurer = el("text", { x: -999, y: -999, style: "font: 500 12px var(--sans)" }, svg);
     const defs = el("defs", {}, svg);
     const clip = el("clipPath", { id: "round", clipPathUnits: "objectBoundingBox" }, defs);
     el("circle", { cx: 0.5, cy: 0.5, r: 0.5 }, clip);
