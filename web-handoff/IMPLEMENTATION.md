@@ -248,6 +248,13 @@ Verification: 131 portal tests, root typecheck and four production build combina
 
 The current local launcher enables the switch only on port 5174 and uses the existing verified database. Public activation requires an explicit build/deploy decision. Flag off retains the old portal; do not remove it before rollout acceptance.
 
+### Rollout Preparation
+
+- Integrated `origin/main` at `1fda6915` into the portal branch without conflicts (`f11186b`). The separate primary checkout and its unfinished work were not changed.
+- Combined builds read `portalRedesignEnabled` from `config/production-features.json`, overriding ambient `VITE_PORTAL_REDESIGN_ENABLED`. Missing means off; invalid types fail the build. Direct portal/local builds still use the Vite switch.
+- Keep the tracked setting false until a redesign-enabled combined draft passes and activation is approved. Set it true for rollout; false plus rebuild/redeploy restores the legacy UI. Scheduled builds use the same tracked setting. Mac flags and `release-config.json` are unchanged.
+- Verification: full `npm run check` (including deploy safety and root typecheck), 131 portal tests and four production entry builds pass after integration. The build matrix uses the same feature-to-environment helper as combined builds. No Swift build, release packaging or live deploy was run.
+
 ## 9. Verification And Final Local Review
 
 Verification accompanies every slice, not only the final one.
@@ -288,4 +295,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-Plan safe integration onto latest main, then a separately approved draft/deployment review. The local two-account access checkpoint is complete; no more environment expansion unless blocked. Production keeps its existing UI until explicit redesign activation/deployment approval. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.
+Review/commit the rollout configuration, then prepare a separately approved redesign-enabled combined draft. Latest main is integrated locally; no push or deployment yet. The local two-account access checkpoint is complete. Production keeps its existing UI until explicit redesign activation/deployment approval. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.

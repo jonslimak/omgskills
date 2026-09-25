@@ -20,8 +20,12 @@ export async function loadProductionFeatures(configUrl = defaultConfigUrl) {
     throw new Error("production-features.json must declare skillGroupsWebEnabled and skillGroupsAuthEnabled as booleans");
   }
 
+  if (parsed.portalRedesignEnabled !== undefined && typeof parsed.portalRedesignEnabled !== "boolean") {
+    throw new Error("portalRedesignEnabled must be a boolean when present");
+  }
+
   const unknownKeys = Object.keys(parsed).filter(
-    (key) => key !== "skillGroupsWebEnabled" && key !== "skillGroupsAuthEnabled"
+    (key) => key !== "skillGroupsWebEnabled" && key !== "skillGroupsAuthEnabled" && key !== "portalRedesignEnabled"
   );
   if (unknownKeys.length > 0) {
     throw new Error(`production-features.json contains unknown keys: ${unknownKeys.join(", ")}`);
@@ -33,6 +37,7 @@ export async function loadProductionFeatures(configUrl = defaultConfigUrl) {
   return Object.freeze({
     skillGroupsWebEnabled: parsed.skillGroupsWebEnabled,
     skillGroupsAuthEnabled: parsed.skillGroupsAuthEnabled,
+    portalRedesignEnabled: parsed.portalRedesignEnabled === true,
   });
 }
 
@@ -41,6 +46,7 @@ export function portalBuildEnvironment(features, baseEnvironment = process.env) 
     ...baseEnvironment,
     VITE_SKILLGROUPS_WEB_ENABLED: features.skillGroupsWebEnabled ? "1" : "0",
     VITE_SKILLGROUPS_MAC_ENABLED: features.skillGroupsAuthEnabled ? "1" : "0",
+    VITE_PORTAL_REDESIGN_ENABLED: features.portalRedesignEnabled === true ? "1" : "0",
   };
 }
 

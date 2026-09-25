@@ -3,17 +3,19 @@ import { readdir, readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { portalBuildEnvironment } from "../../scripts/production-features.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 // Finish with the default-off artifact; none of these placeholder-key builds is deployable.
 for (const [redesign, web, mac] of [["1", "1", "1"], ["1", "1", "0"], ["1", "0", "0"], ["0", "1", "0"]]) {
   const build = spawnSync("npm", ["--workspace", "portal", "run", "build"], {
     cwd: root, encoding: "utf8", timeout: 120000,
-    env: { ...process.env,
+    env: portalBuildEnvironment({
+      portalRedesignEnabled: redesign === "1", skillGroupsWebEnabled: web === "1", skillGroupsAuthEnabled: mac === "1",
+    }, { ...process.env,
       // Non-secret placeholder keeps the authenticated branch in the build.
       VITE_CLERK_PUBLISHABLE_KEY: "pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk",
-      VITE_PORTAL_REDESIGN_ENABLED: redesign, VITE_SKILLGROUPS_WEB_ENABLED: web, VITE_SKILLGROUPS_MAC_ENABLED: mac,
-      VITE_PORTAL_INTEGRATION: "1", VITE_PORTAL_PREVIEW: "1" },
+      VITE_PORTAL_INTEGRATION: "1", VITE_PORTAL_PREVIEW: "1" }),
   });
   assert.equal(build.status, 0, build.stderr || build.stdout || String(build.error));
   const assets = path.join(root, "portal/dist/assets");

@@ -28,7 +28,7 @@ Configuration (local ignored environment only, never commit secrets):
 | `VITE_PORTAL_INTEGRATION` | `1`, supplied by `dev:integration` |
 | `VITE_CLERK_PUBLISHABLE_KEY` | Verified development `pk_test_` key |
 | `VITE_SKILLGROUPS_WEB_ENABLED` | `1` locally; no production flag change |
-| `VITE_PORTAL_REDESIGN_ENABLED` | `1` in the ignored local launcher for normal routes; defaults off elsewhere |
+| `VITE_PORTAL_REDESIGN_ENABLED` | `1` in the ignored local launcher; combined builds derive it from tracked `portalRedesignEnabled` (currently false), overriding ambient values |
 | `PORTAL_TEST_API_ORIGIN` | Explicit local function server origin, e.g. `http://127.0.0.1:8888`; not the frontend port |
 | `PORTAL_TEST_ENVIRONMENT_VERIFIED` | `1` only after inspecting the backend credentials/database routing |
 
