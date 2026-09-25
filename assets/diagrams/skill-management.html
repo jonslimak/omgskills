@@ -132,8 +132,8 @@
   #flow .chip.float { filter: drop-shadow(0 1px 1px var(--shadow-soft)) drop-shadow(0 4px 10px var(--shadow)); }
   #flow .chip .name { font-size: 13px; font-weight: 500; }
   #flow .chip .count text { fill: var(--muted); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
-  #flow .chip .bot { fill: none; stroke: var(--muted); stroke-width: 1.3; stroke-linecap: round; }
-  #flow .chip .bot-eye { fill: var(--muted); }
+  #flow .chip .bot { fill: none; stroke: var(--faint); stroke-width: 2; stroke-linecap: round; }
+  #flow .chip .bot-eye { fill: var(--faint); }
   #flow .chip .lock { fill: none; stroke: var(--muted); stroke-width: 1.3; }
   #flow .avatar-ring { fill: none; stroke: var(--hair); stroke-width: 0.75; }
   #flow .glyph { fill: #ffffff; }
@@ -292,13 +292,14 @@
     if (opts.right != null) {
       // Number followed by a small agent (bot) glyph
       const cg = el("g", { class: "count" }, g);
-      const bx = w - 26, by = CH / 2 - 5;
-      el("rect", { class: "bot", x: bx, y: by, width: 12, height: 10, rx: 3 }, cg);
-      el("path", { class: "bot", d: `M${bx + 6} ${by}v-2.5` }, cg);
-      el("circle", { class: "bot-eye", cx: bx + 6, cy: by - 3.2, r: 1.1 }, cg);
-      el("circle", { class: "bot-eye", cx: bx + 3.8, cy: by + 4.6, r: 1.1 }, cg);
-      el("circle", { class: "bot-eye", cx: bx + 8.2, cy: by + 4.6, r: 1.1 }, cg);
-      const t = txt(cg, bx - 5, CH / 2 + 4.5, String(opts.right), "", "end");
+      // Bot drawn at 12 x 13 units, shown at half size
+      const bx = w - 20, bot = el("g", { transform: `translate(${bx} ${CH / 2 - 2}) scale(0.5)` }, cg);
+      el("rect", { class: "bot", x: 0, y: 0, width: 12, height: 10, rx: 3 }, bot);
+      el("path", { class: "bot", d: "M6 0v-2.5" }, bot);
+      el("circle", { class: "bot-eye", cx: 6, cy: -3.4, r: 1.5 }, bot);
+      el("circle", { class: "bot-eye", cx: 3.8, cy: 4.8, r: 1.5 }, bot);
+      el("circle", { class: "bot-eye", cx: 8.2, cy: 4.8, r: 1.5 }, bot);
+      txt(cg, bx - 3, CH / 2 + 4.5, String(opts.right), "", "end");
       el("title", {}, cg).textContent = `${opts.right} agent${opts.right === 1 ? "" : "s"}`;
     }
     return g;
