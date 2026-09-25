@@ -1,11 +1,13 @@
 import type { PoolClient } from "pg";
 import type { SyncSkill } from "./sync-skill.js";
+import { reconcileSyncedGroupReferences } from "./sync-group-reconciliation.js";
 
 export async function writeSyncInventory(
   client: PoolClient,
   userId: string,
   skills: SyncSkill[]
 ) {
+  await client.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [userId]);
   const runResult = await client.query<{ id: string }>(
     "INSERT INTO sync_runs (user_id, status) VALUES ($1, 'started') RETURNING id",
     [userId]
@@ -63,6 +65,8 @@ export async function writeSyncInventory(
   } else {
     await client.query("UPDATE synced_skills SET is_current = false WHERE user_id = $1", [userId]);
   }
+
+  await reconcileSyncedGroupReferences(client, userId);
 
   await client.query(
     "UPDATE sync_runs SET status = 'completed', completed_at = now() WHERE id = $1",

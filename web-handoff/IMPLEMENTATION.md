@@ -324,3 +324,11 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 ## Next Action
 
 Public web rollout is complete. Continue design iteration separately. Production two-account switching, first Favorites creation and live resolved-skill publication remain optional follow-up checks; corresponding local/automated coverage is recorded in LOCAL-INTEGRATION.md. Real GitHub and Mac callback testing remains separate scope.
+
+### Historical Set Reference Repair (2026-09-25)
+
+- Confirmed cause: legacy absolute-path stable keys created different synced IDs from `location:v1` keys; "my faves" still references two non-current rows.
+- Sync reconciliation now accepts only same-owner, same-agent, exact standard-root folder and content-SHA matches. Missing/ambiguous matches and duplicate memberships are skipped. Item IDs, order, notes, snapshots, pins and permissions are unchanged; each repaired group revision increments once.
+- `scripts/repair-synced-group-references.ts` defaults to a read-only preview scoped to an exact Clerk user and group. Applying requires `REPAIR_DATABASE_URL`, `--apply`, and exact `--repair itemId:oldId:newId` tuples from that preview; changed plans abort.
+- Repository checks and 18 local database integration tests pass, including rollback, repeat sync, ownership, dry run and pinned-release preservation. Production read-only preview finds exactly the two expected matches.
+- Backend deployment approved; the production receipt is pending. No production repair applied: Netlify API credentials and the dashboard SQL console are read-only, and no access settings were changed. After deployment, normal sync can reconcile these references. Direct operator repair instead requires an explicitly supplied write connection. `/app/review/` remains read-only; test normal `/app/`.

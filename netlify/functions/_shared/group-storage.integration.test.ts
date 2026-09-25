@@ -5,6 +5,9 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import pg, { type Pool, type PoolClient } from "pg";
+import { writeSyncInventory } from "./sync-inventory.js";
+import { reconcileSyncedGroupReferences } from "./sync-group-reconciliation.js";
+import type { SyncSkill } from "./sync-skill.js";
 import {
   addGroupItemWithClient,
   deleteGroupItemWithClient,
@@ -145,6 +148,65 @@ const sha = {
   tree: "2222222222222222222222222222222222222222",
   skill: "3333333333333333333333333333333333333333"
 };
+
+test("legacy synced references repair transactionally without changing snapshots, pins, or access", async () => {
+  await withMigratedSchema(async (pool) => {
+    const owner = await createUser(pool, "migration-owner");
+    const other = await createUser(pool, "migration-other");
+    const group = await createGroup(pool, owner);
+    const otherGroup = await createGroup(pool, other);
+    const legacy: SyncSkill = {
+      stableKey: "Codex:/Users/test/.codex/skills/example", skillMdSha: sha.skill,
+      identityStatus: "ambiguous", name: "Original title", description: "Original description",
+      catalogSkillId: null, githubUrl: null, isLocalOnly: false, source: "Codex",
+    };
+    await transaction(pool, (client) => writeSyncInventory(client, owner, [legacy]));
+    const oldId = (await pool.query("SELECT id FROM synced_skills WHERE user_id = $1", [owner])).rows[0].id;
+    await transaction(pool, async (client) => {
+      await addGroupItemWithClient(client, group, { kind: "synced", syncedSkillId: oldId, note: "Keep this note" }, {
+        kind: "release", source: { kind: "catalog", normalizedRoot: "skills/original", catalogSkillId: "owner/repo:original" },
+        coordinates: { commitSha: sha.commit, treeSha: sha.tree, skillMdSha: sha.skill }, createdBy: "test",
+      });
+      // Even an anomalous cross-owner reference must never be repaired by this owner's sync.
+      await addGroupItemWithClient(client, otherGroup, { kind: "synced", syncedSkillId: oldId });
+    });
+    const before = (await pool.query("SELECT * FROM skill_group_items WHERE group_id = $1", [group])).rows[0];
+    const groupBefore = (await pool.query("SELECT * FROM skill_groups WHERE id = $1", [group])).rows[0];
+    const replacement: SyncSkill = { ...legacy, stableKey: "location:v1:codex:example", name: "New title",
+      description: "New description", identityStatus: "resolved", catalogSkillId: "new/repo:example", isLocalOnly: false };
+    // A failed upload rolls back both its inventory and its reference repairs.
+    await assert.rejects(transaction(pool, async (client) => {
+      await writeSyncInventory(client, owner, [replacement]);
+      assert.notEqual((await client.query("SELECT synced_skill_id FROM skill_group_items WHERE id = $1", [before.id])).rows[0].synced_skill_id, oldId);
+      throw new Error("rollback fixture");
+    }), /rollback fixture/);
+    assert.deepEqual((await pool.query("SELECT * FROM skill_group_items WHERE id = $1", [before.id])).rows[0], before);
+    await transaction(pool, (client) => writeSyncInventory(client, owner, [replacement, {
+      ...replacement, source: "Claude", stableKey: "location:v1:claude:example",
+    }]));
+    const currentId = (await pool.query("SELECT id FROM synced_skills WHERE user_id = $1 AND stable_key = $2", [owner, replacement.stableKey])).rows[0].id;
+    const after = (await pool.query("SELECT * FROM skill_group_items WHERE id = $1", [before.id])).rows[0];
+    assert.deepEqual(after, { ...before, synced_skill_id: currentId });
+    const groupAfter = (await pool.query("SELECT * FROM skill_groups WHERE id = $1", [group])).rows[0];
+    assert.deepEqual(groupAfter, { ...groupBefore, revision: groupBefore.revision + 1, updated_at: groupAfter.updated_at });
+    assert.equal((await pool.query("SELECT synced_skill_id FROM skill_group_items WHERE group_id = $1", [otherGroup])).rows[0].synced_skill_id, oldId);
+    await transaction(pool, (client) => writeSyncInventory(client, owner, [replacement]));
+    assert.equal((await pool.query("SELECT revision FROM skill_groups WHERE id = $1", [group])).rows[0].revision, groupAfter.revision);
+
+    // Reproduce an already-stale reference to verify a genuinely read-only dry run.
+    await pool.query("UPDATE skill_group_items SET synced_skill_id = $1 WHERE id = $2", [oldId, before.id]);
+    const reader = await pool.connect();
+    try {
+      await reader.query("BEGIN READ ONLY");
+      const repairs = await reconcileSyncedGroupReferences(reader, owner, { dryRun: true, groupId: group });
+      assert.deepEqual(repairs, [{ id: before.id, groupId: group, syncedSkillId: oldId, replacementId: currentId }]);
+      await reader.query("ROLLBACK");
+    } finally { reader.release(); }
+    assert.equal((await pool.query("SELECT synced_skill_id FROM skill_group_items WHERE id = $1", [before.id])).rows[0].synced_skill_id, oldId);
+    await transaction(pool, (client) => addGroupItemWithClient(client, group, { kind: "synced", syncedSkillId: currentId }));
+    assert.deepEqual(await transaction(pool, (client) => reconcileSyncedGroupReferences(client, owner)), []);
+  });
+});
 
 test("shared storage migration preserves production-shaped legacy groups", async () => {
   const schema = schemaName();
