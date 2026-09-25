@@ -34,13 +34,20 @@ final class SkillsStore: ObservableObject {
     private var trendingIndexTask: Task<Void, Never>?
     private var twitterIndexTask: Task<Void, Never>?
     private let identityMeasurementReporter: IdentityMeasurementReporter
+    nonisolated private let testCatalogURL: URL?
+    nonisolated private let usesBundledLibraryPreview: Bool
+    private let skillFilesystemPaths: SkillFilesystemPaths
 
     init(
         autoload: Bool = true,
+        runtimeContext: AppRuntimeConfiguration.RuntimeContext = AppRuntimeConfiguration.runtimeContext,
         identityMeasurementReporter: @escaping IdentityMeasurementReporter = { measurement, track in
             Analytics.signalIdentityResolution(measurement, track: track)
         }
     ) {
+        self.testCatalogURL = runtimeContext.testCatalogURL
+        self.usesBundledLibraryPreview = runtimeContext.usesBundledLibraryPreview
+        self.skillFilesystemPaths = runtimeContext.skillFilesystemPaths
         self.identityMeasurementReporter = identityMeasurementReporter
         if autoload {
             load()
@@ -249,7 +256,21 @@ final class SkillsStore: ObservableObject {
     }
 
     private nonisolated func decodeAvailableCatalog() async -> LoadResult<LoadedCatalog> {
-        if AppRuntimeConfiguration.usesBundledLibraryPreview {
+        if let testCatalogURL {
+            do {
+                let data = try Data(contentsOf: testCatalogURL)
+                switch await decode(data, as: [Skill].self, label: "debug-catalog.json") {
+                case .success(let skills):
+                    return .success(LoadedCatalog(skills: skills, track: .crawl4))
+                case .failure(let error):
+                    return .failure(error)
+                }
+            } catch {
+                return .failure("Failed to load test catalog: \(error)")
+            }
+        }
+
+        if usesBundledLibraryPreview {
             switch await decodeBundledProductionAvailableSkills() {
             case .success(let skills):
                 return .success(LoadedCatalog(skills: skills, track: .productionV2))
@@ -457,7 +478,11 @@ final class SkillsStore: ObservableObject {
     private nonisolated func decodeSkillEquivalence(
         using plan: SkillEquivalenceLoadPlan
     ) async -> LoadResult<SkillEquivalenceAsset?> {
-        if AppRuntimeConfiguration.usesBundledLibraryPreview {
+        if testCatalogURL != nil {
+            return .success(nil)
+        }
+
+        if usesBundledLibraryPreview {
             guard let bundled = bundledSkillEquivalenceData() else {
                 return .failure("Bundled skill equivalence asset not found")
             }
@@ -568,7 +593,9 @@ final class SkillsStore: ObservableObject {
     }
 
     private func loadInstalled() {
-        applyInstalledScanResult(InstalledSkillsScanner.scanWithSummary())
+        applyInstalledScanResult(
+            InstalledSkillsScanner.scanWithSummary(filesystemPaths: skillFilesystemPaths)
+        )
     }
 
     func applyInstalledScanResult(_ result: InstalledSkillsScanner.ScanResult) {

@@ -37,17 +37,19 @@ enum InstalledSkillsScanner {
         let origin: String
     }
 
-    static func scan() -> [Skill] {
-        scanWithSummary().skills
+    static func scan(
+        filesystemPaths: SkillFilesystemPaths = .production()
+    ) -> [Skill] {
+        scanWithSummary(filesystemPaths: filesystemPaths).skills
     }
 
-    static func scanWithSummary() -> ScanResult {
-        let fm = FileManager.default
-        let home = fm.homeDirectoryForCurrentUser
+    static func scanWithSummary(
+        filesystemPaths: SkillFilesystemPaths = .production()
+    ) -> ScanResult {
         let roots: [Root] = [
-            Root(url: home.appendingPathComponent(".claude/skills"), origin: "Claude"),
-            Root(url: home.appendingPathComponent(".codex/skills"), origin: "Codex"),
-            Root(url: home.appendingPathComponent(".agents/skills"), origin: "Agents"),
+            Root(url: filesystemPaths.claudeSkillsRoot, origin: "Claude"),
+            Root(url: filesystemPaths.codexSkillsRoot, origin: "Codex"),
+            Root(url: filesystemPaths.agentsSkillsRoot, origin: "Agents"),
         ]
         return scan(roots: roots)
     }

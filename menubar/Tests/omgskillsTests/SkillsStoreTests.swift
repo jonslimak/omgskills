@@ -25,6 +25,39 @@ struct SkillsStoreTests {
         #expect(store.loadError == "available failed")
     }
 
+    @Test func localTestCatalogOverridesTheBundledCatalog() async {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("omgskills-store-test-\(UUID().uuidString)", isDirectory: true)
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let context = AppRuntimeConfiguration.RuntimeContext(
+            catalogTestMode: .enabled(root: root, catalog: sharedPinnedCatalogFixtureURL),
+            usesBundledLibraryPreview: true,
+            testCatalogURL: sharedPinnedCatalogFixtureURL,
+            skillFilesystemPaths: paths,
+            groupInstallRuntimePaths: GroupInstallRuntimePaths(
+                homeDirectory: paths.homeDirectory,
+                managedRoot: root.appendingPathComponent("managed", isDirectory: true),
+                pathAnchor: paths.homeDirectory
+            )
+        )
+        let store = SkillsStore(
+            autoload: false,
+            runtimeContext: context,
+            identityMeasurementReporter: { _, _ in }
+        )
+
+        await store.reloadLibraryData()
+
+        #expect(store.availableSkills.count == 3)
+        guard case .complete = store.availableSkills[0].pinnedInstallMetadataState,
+              case .complete = store.availableSkills[1].pinnedInstallMetadataState
+        else {
+            Issue.record("Expected the local pinned catalog to load")
+            return
+        }
+        #expect(store.availableSkills[2].pinnedInstallMetadataState == .legacy)
+    }
+
     @Test func failedTrendingReloadKeepsVisibleTrendingSkills() {
         let store = makeStore()
         let existing = skill(name: "existing", stars: 10)
@@ -479,6 +512,16 @@ struct SkillsStoreTests {
             autoload: false,
             identityMeasurementReporter: { _, _ in }
         )
+    }
+
+    private var sharedPinnedCatalogFixtureURL: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("index/scraper/new-crawl/fixtures/pinned-install-skills.json")
+            .standardizedFileURL
     }
 
     private func skill(

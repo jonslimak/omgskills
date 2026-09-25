@@ -35,7 +35,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var isSharePickerActive = false
     private var pendingSkillGroupsURLs: [URL] = []
     private var pendingGroupInstallRoute: DeviceGroupManifestRoute?
-    private let groupInstallRuntimePaths = AppRuntimeConfiguration.groupInstallRuntimePaths()
+    private let runtimeContext = AppRuntimeConfiguration.runtimeContext
+    private var groupInstallRuntimePaths: GroupInstallRuntimePaths {
+        runtimeContext.groupInstallRuntimePaths
+    }
     private lazy var deviceCredentialStore = DeviceCredentialStore(
         service: DeviceCredentialStore.configuredService()
     )
@@ -55,13 +58,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         guard skillGroupsBuildSupported else { return nil }
         return GroupInstallFlowModel(credentialStore: deviceCredentialStore)
     }()
-    private lazy var groupSnapshotInstaller = ManagedSkillInstaller(
+    private lazy var managedSkillInstaller = ManagedSkillInstaller(
         managedRoot: groupInstallRuntimePaths.managedRoot,
         pathAnchor: groupInstallRuntimePaths.pathAnchor
     )
+    private lazy var groupSnapshotInstaller: any GroupSnapshotInstalling = managedSkillInstaller
+    private lazy var catalogSkillInstaller: any CatalogSkillInstalling = CatalogSkillInstaller(
+        managedInstaller: managedSkillInstaller,
+        filesystemPaths: runtimeContext.skillFilesystemPaths
+    )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let usesBundledLibraryPreview = AppRuntimeConfiguration.usesBundledLibraryPreview
+        if case .invalid(let reason) = runtimeContext.catalogTestMode {
+            let alert = NSAlert()
+            alert.alertStyle = .critical
+            alert.messageText = "Invalid catalog test mode"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        }
+
+        let usesBundledLibraryPreview = runtimeContext.usesBundledLibraryPreview
         Analytics.start()
         let shouldStartUpdater = !usesBundledLibraryPreview
         setupUpdater(startingUpdater: shouldStartUpdater)
@@ -296,7 +314,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
                 skillGroupsFeatureAvailability: skillGroupsFeatureAvailability,
                 groupInstallFlowModel: groupInstallFlowModel,
                 groupSnapshotInstaller: groupSnapshotInstaller,
-                groupInstallHomeDirectory: groupInstallRuntimePaths.homeDirectory
+                catalogSkillInstaller: catalogSkillInstaller,
+                runtimeContext: runtimeContext
             )
         )
         hostingView.wantsLayer = true

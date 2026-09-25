@@ -20,6 +20,11 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
     let lastUpdated: String
     let firstSeen: String
     let skillMdSha: String?
+    let repoSlug: String?
+    let skillMdPath: String?
+    let repoCommitSha: String?
+    let skillTreeSha: String?
+    let installTargetName: String?
     let installs: Int?
     let trendingRank: Int?
     let trendingSource: String?
@@ -58,6 +63,11 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         lastUpdated: String,
         firstSeen: String,
         skillMdSha: String?,
+        repoSlug: String? = nil,
+        skillMdPath: String? = nil,
+        repoCommitSha: String? = nil,
+        skillTreeSha: String? = nil,
+        installTargetName: String? = nil,
         installs: Int?,
         trendingRank: Int?,
         trendingSource: String?,
@@ -95,6 +105,11 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         self.lastUpdated = lastUpdated
         self.firstSeen = firstSeen
         self.skillMdSha = skillMdSha
+        self.repoSlug = repoSlug
+        self.skillMdPath = skillMdPath
+        self.repoCommitSha = repoCommitSha
+        self.skillTreeSha = skillTreeSha
+        self.installTargetName = installTargetName
         self.installs = installs
         self.trendingRank = trendingRank
         self.trendingSource = trendingSource
@@ -137,6 +152,11 @@ extension Skill {
             lastUpdated: lastUpdated,
             firstSeen: firstSeen,
             skillMdSha: skillMdSha,
+            repoSlug: repoSlug,
+            skillMdPath: skillMdPath,
+            repoCommitSha: repoCommitSha,
+            skillTreeSha: skillTreeSha,
+            installTargetName: installTargetName,
             installs: entry.installs,
             trendingRank: entry.trendingRank,
             trendingSource: entry.trendingSource,
