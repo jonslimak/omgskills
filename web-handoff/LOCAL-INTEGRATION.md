@@ -1,6 +1,6 @@
 # Local Portal Integration (B1-E)
 
-Updated 2026-09-25. Local checkpoints on `codex/web-portal-redesign`; not pushed or deployed. Signed-in reads, account controls and profile editing pass against an isolated account snapshot. Production was read only for the approved snapshot; no production writes/migrations, deployment, feature activation, or Mac changes were made.
+Updated 2026-09-25. This document preserves local integration checkpoints against the isolated account snapshot. The redesign has since landed on main and shipped at `/app/`, with a separately approved disposable production set test and no Mac release changes. See IMPLEMENTATION.md, Public Rollout, for live verification and deployment receipts. Earlier no-deploy/no-production-write notes describe their individual checkpoints.
 
 ## Boundaries
 

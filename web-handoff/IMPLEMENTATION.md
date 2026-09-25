@@ -1,6 +1,6 @@
 # Web App Redesign Implementation Plan
 
-Status: A-E complete locally; E reviewed for this commit. User-reported two-account shared-access check passed. Redesign remains off by default; no push or production activation. Remaining release checks are tracked in LOCAL-INTEGRATION.md. Updated 2026-09-25.
+Status: A-E complete and the redesigned `/app/` is live. Local two-account access and scoped production set-write checks passed. Mac release/auth gates remain unchanged. Production verification is recorded below; remaining optional checks are in LOCAL-INTEGRATION.md. Updated 2026-09-25.
 
 Local preview: http://127.0.0.1:5173/app/preview/
 
@@ -312,6 +312,15 @@ Only after fixture review and with an approved isolated backend/account: validat
 
 Keep the existing authenticated UI during Slice A. Adopt each subsequent slice only after its checks pass. Commit boundaries should allow an individual UI slice to be reverted without changing data or release state.
 
+## Public Rollout (Verified 2026-09-25)
+
+- Production create, rename, full refresh, add/remove synced skill, and delete passed on disposable private set `18b8f7c1-8c1e-48d9-85ef-b4f57b242661`. It was deleted; the baseline is again 122 skills from 166 installs and one public "my faves" set with its original two items. Existing sets, profile, sharing and devices were not mutated.
+- Temporary review testing used commits `60cb80c` and `415391e`. The scoped harness needed an Edit-button correction and manual navigation after deletion cleared its ID permission. All temporary test code was removed before public activation; `/app/review/` is read-only again.
+- Activation commit `f3b9874` changes only the redesign flag relative to the pre-test application code. `portalRedesignEnabled=true`; `skillGroupsAuthEnabled=false`. Final 135 portal tests, production build and deploy safety checks passed; full repository checks also passed during this rollout.
+- Guarded workflow [36181447671](https://github.com/jonslimak/omgskills/actions/runs/36181447671) verified draft `6ab6cf60cdaaa04414c5f627`, then production `6ab6d07e4348cc8766e751f3`, on the first attempt without rollback. Previous deployment: `6ab6cdb00b89b51ea2562796`.
+- Signed-in normal `/app/` passed Skills/search, Sets/detail, Agents/devices and Home/private-source empty state with no console errors. Review access remains protected (anonymous 401/no-store); `/app/connect` remains separate. The old set's historical items remain unmapped to current installs, as in the original account snapshot.
+- Hosted guards passed library pages, redirects, data, downloads and MCP. All 13 release assets are byte-identical to the pre-rollout baseline; appcast and all three manifests match tracked source. The live Mac/auth gate is false. No Mac release, Git tag or updater change.
+
 ## Next Action
 
-Approved public activation is ready for guarded deployment. Production create, rename, full refresh, add/remove synced skill, and delete passed on disposable private set `18b8f7c1-8c1e-48d9-85ef-b4f57b242661`; it was deleted and the original one-set/122-skill baseline restored. "my faves" remains public with its original two items. The temporary test harness required a scoped Edit-button correction and, after deletion, manual navigation back to Sets because its ID permission was cleared. Both restrictions were test-only; the harness is now removed and review is read-only again. No profile, sharing, device or existing-set mutations were tested in production; two-account access passed locally. Real GitHub and Mac callback tests remain separate. The public redesign flag is enabled in code; the Mac/auth flag stays false. Record the final deployment receipt and production route checks before marking the rollout complete.
+Public web rollout is complete. Continue design iteration separately. Production two-account switching, first Favorites creation and live resolved-skill publication remain optional follow-up checks; corresponding local/automated coverage is recorded in LOCAL-INTEGRATION.md. Real GitHub and Mac callback testing remains separate scope.
