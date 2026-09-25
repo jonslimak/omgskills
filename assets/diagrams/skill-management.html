@@ -1,0 +1,418 @@
+<title>One Library, Every Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #101217;
+    --muted: #5f6571;
+    --line: #e3e5ea;
+    --surface: #f5f6f8;
+    --raised: #ffffff;
+    --you: #2456d8;
+    --you-tint: rgba(36, 86, 216, 0.09);
+    --mate: #c2521b;
+    --mate-tint: rgba(194, 82, 27, 0.09);
+    --sans: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0f1115;
+      --ink: #eceef2;
+      --muted: #9aa1ad;
+      --line: #2a2e37;
+      --surface: #171a20;
+      --raised: #1d2027;
+      --you: #86a8ff;
+      --you-tint: rgba(134, 168, 255, 0.13);
+      --mate: #ff9d66;
+      --mate-tint: rgba(255, 157, 102, 0.13);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1115;
+    --ink: #eceef2;
+    --muted: #9aa1ad;
+    --line: #2a2e37;
+    --surface: #171a20;
+    --raised: #1d2027;
+    --you: #86a8ff;
+    --you-tint: rgba(134, 168, 255, 0.13);
+    --mate: #ff9d66;
+    --mate-tint: rgba(255, 157, 102, 0.13);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    padding-inline: 20px;
+    padding-block: 48px 64px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 40px; }
+
+  header { display: grid; gap: 14px; max-width: 680px; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(30px, 4.6vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    font-weight: 650;
+    text-wrap: balance;
+  }
+  h1 .you { color: var(--you); }
+  .lede { margin: 0; color: var(--muted); font-size: 17px; max-width: 62ch; }
+
+  figure { margin: 0; display: grid; gap: 14px; }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #flow { display: block; width: 100%; min-width: 780px; height: auto; }
+
+  .figfoot {
+    display: flex; flex-wrap: wrap; gap: 10px 28px;
+    align-items: baseline; justify-content: space-between;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .swatch { width: 22px; height: 12px; border-radius: 3px; border: 1.5px solid; }
+  .swatch.you { border-color: var(--you); background: var(--you-tint); }
+  .swatch.mate { border-color: var(--mate); background: var(--mate-tint); }
+  .swatch.private { border-color: var(--muted); border-style: dashed; }
+  #status { font-size: 14px; color: var(--ink); min-height: 1.55em; margin: 0; }
+  #status b { font-family: var(--mono); font-weight: 500; }
+
+  .points {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 28px 36px;
+    border-top: 1px solid var(--line);
+    padding-top: 28px;
+  }
+  .points h2 { margin: 0 0 6px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .points p { margin: 0; color: var(--muted); font-size: 15px; }
+  code { font-family: var(--mono); font-size: 0.92em; }
+
+  /* SVG */
+  #flow text { fill: var(--ink); font-family: var(--sans); }
+  #flow .col-head { fill: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: 0.09em; }
+  #flow .card { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+  #flow .omg .card { fill: var(--raised); stroke-width: 1.5; }
+  #flow .omg.you .card { stroke: var(--you); }
+  #flow .omg.mate .card { stroke: var(--mate); }
+  #flow .agent.shared .card { fill: var(--raised); stroke: var(--ink); stroke-width: 1.5; }
+  #flow .kicker { fill: var(--muted); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.07em; }
+  #flow .card-title { font-size: 16px; font-weight: 600; }
+  #flow .omg .card-title { font-size: 18px; }
+  #flow .dot.you { fill: var(--you); }
+  #flow .dot.mate { fill: var(--mate); }
+
+  #flow .chip rect { stroke-width: 1.3; }
+  #flow .chip.you rect { fill: var(--you-tint); stroke: var(--you); }
+  #flow .chip.mate rect { fill: var(--mate-tint); stroke: var(--mate); }
+  #flow .chip.private rect { stroke-dasharray: 3.5 2.5; }
+  #flow .chip text { font-family: var(--mono); font-size: 12px; }
+  #flow .chip .lock { fill: none; stroke-width: 1.3; }
+  #flow .chip.you .lock { stroke: var(--you); }
+  #flow .chip.mate .lock { stroke: var(--mate); }
+  #flow .chip, #flow .agent { cursor: pointer; outline: none; }
+  #flow .chip:focus-visible rect, #flow .agent:focus-visible .card { stroke-width: 2.5; stroke: var(--ink); }
+  #flow .count { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  #flow .link path { fill: none; stroke-width: 1.6; }
+  #flow .link.you path { stroke: var(--you); }
+  #flow .link.mate path { stroke: var(--mate); }
+  #flow .arrow.you path { fill: var(--you); }
+  #flow .arrow.mate path { fill: var(--mate); }
+  #flow .link text {
+    font-size: 11.5px; font-weight: 500;
+    stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; paint-order: stroke;
+  }
+  #flow .link.you text { fill: var(--you); }
+  #flow .link.mate text { fill: var(--mate); }
+
+  #flow .chip, #flow .link, #flow .card-body, #flow .count { transition: opacity 160ms ease; }
+  #flow.focusing .chip:not(.on),
+  #flow.focusing .link:not(.on),
+  #flow.focusing .agent:not(.on) .card-body,
+  #flow.focusing .count:not(.on) { opacity: 0.18; }
+  @media (prefers-reduced-motion: reduce) {
+    #flow .chip, #flow .link, #flow .card-body, #flow .count { transition: none; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">omgskills · Skill management</div>
+    <h1>Add a skill <span class="you">once</span>. Send it to every agent that needs it.</h1>
+    <p class="lede">Your OMG is your personal skill library. Pick skills from the public library or add your team's private ones, then choose which agents get each skill. When teammates connect the same team agent, it gets the skills every one of them sends.</p>
+  </header>
+
+  <figure>
+    <div class="scroll">
+      <svg id="flow" viewBox="0 0 1040 640" role="img"
+        aria-label="Two skill libraries feed five agents. Your OMG sends different subsets of its four skills to your personal ChatGPT, your personal Claude, a team Hermes and a shared team ChatGPT. A teammate's OMG sends its two skills to the same shared team ChatGPT and to the teammate's personal ChatGPT, so the shared agent ends up with all six."></svg>
+    </div>
+    <figcaption class="figfoot">
+      <p id="status" aria-live="polite">Point at a skill or an agent to trace where it goes.</p>
+      <div class="legend">
+        <span><i class="swatch you"></i>From your OMG</span>
+        <span><i class="swatch mate"></i>From a teammate's OMG</span>
+        <span><i class="swatch private"></i>Private team skill</span>
+      </div>
+    </figcaption>
+  </figure>
+
+  <section class="points">
+    <div>
+      <h2>One library per person</h2>
+      <p>Your OMG holds every skill you use, whether it came from the public library or from your team's private repos. Add a skill there once instead of installing it in each agent by hand.</p>
+    </div>
+    <div>
+      <h2>Each agent gets its own set</h2>
+      <p>Choose which skills go to ChatGPT, Claude, Hermes or any other agent. Your personal Claude can stay lean with just <code>humanizer</code> while ChatGPT gets three skills.</p>
+    </div>
+    <div>
+      <h2>Team agents combine everyone's picks</h2>
+      <p>When several people connect the same team agent, it receives the skills each person sends. Private skills only reach the agents their owner sends them to.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  // Edit this block to change the example. Layout is computed from it.
+  const OWNERS = {
+    you: { omg: "Your OMG", ref: "your OMG", who: "You" },
+    mate: { omg: "Teammate's OMG", ref: "your teammate's OMG", who: "Teammate" },
+  };
+  const SKILLS = {
+    "humanizer": { owner: "you" },
+    "grill-me": { owner: "you" },
+    "ios-expert": { owner: "you" },
+    "team-skill-1": { owner: "you", private: true },
+    "web-expert": { owner: "mate" },
+    "team-skill-2": { owner: "mate", private: true },
+  };
+  const AGENTS = [
+    { id: "you-chatgpt", name: "ChatGPT", kind: "Personal · you", owners: ["you"], skills: ["ios-expert", "grill-me", "humanizer"] },
+    { id: "you-claude", name: "Claude", kind: "Personal · you", owners: ["you"], skills: ["humanizer"] },
+    { id: "team-hermes", name: "Hermes", kind: "Team", owners: ["you"], skills: ["grill-me", "humanizer"] },
+    { id: "team-chatgpt", name: "ChatGPT", kind: "Team · shared", owners: ["you", "mate"], skills: ["humanizer", "team-skill-1", "ios-expert", "grill-me", "web-expert", "team-skill-2"] },
+    { id: "mate-chatgpt", name: "ChatGPT", kind: "Personal · teammate", owners: ["mate"], skills: ["web-expert"] },
+  ];
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("flow");
+  const status = document.getElementById("status");
+  const W = 1040, TOP = 44, PAD = 16, CH = 26, CG = 8, RG = 8, GAP = 18;
+  const OMG_X = 24, OMG_W = 270, AG_X = 628, AG_W = 388, HEAD = 56;
+
+  const el = (tag, attrs, parent) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+  const txt = (parent, x, y, s, cls, anchor) => {
+    const t = el("text", { x, y, class: cls || "" }, parent);
+    if (anchor) t.setAttribute("text-anchor", anchor);
+    t.textContent = s;
+    return t;
+  };
+  const agentsWith = (name) => AGENTS.filter((a) => a.skills.includes(name));
+  const agentLabel = (a) => (a.owners.length > 1 ? "team " : a.kind.startsWith("Team") ? "team " : a.owners[0] === "you" ? "your " : "teammate's ") + a.name;
+
+  let measurer;
+  const chipWidth = (name) => {
+    measurer.textContent = name;
+    const tw = Math.ceil(measurer.getComputedTextLength());
+    return SKILLS[name].private ? tw + 36 : tw + 22;
+  };
+
+  function chip(parent, name, x, y) {
+    const s = SKILLS[name];
+    const w = chipWidth(name);
+    const g = el("g", {
+      class: `chip ${s.owner}${s.private ? " private" : ""}`,
+      "data-skill": name, tabindex: 0, role: "button",
+      "aria-label": `${name}, ${s.private ? "private team skill" : "library skill"} in ${OWNERS[s.owner].omg}`,
+      transform: `translate(${x} ${y})`,
+    }, parent);
+    el("rect", { width: w, height: CH, rx: 6 }, g);
+    txt(g, 11, 17.5, name);
+    if (s.private) {
+      const cx = w - 14, cy = CH / 2 + 1;
+      el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1 }, g);
+      el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, g);
+    }
+    return w;
+  }
+
+  function wrapChips(names, maxW) {
+    const rows = [[]];
+    let x = 0;
+    for (const name of names) {
+      const w = chipWidth(name);
+      if (x > 0 && x + w > maxW) { rows.push([]); x = 0; }
+      rows[rows.length - 1].push({ name, w });
+      x += w + CG;
+    }
+    return rows;
+  }
+
+  function bez(sx, sy, ex, ey, t) {
+    const c1 = sx + 150, c2 = ex - 150, u = 1 - t;
+    return [
+      u * u * u * sx + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t * t * t * ex,
+      u * u * u * sy + 3 * u * u * t * sy + 3 * u * t * t * ey + t * t * t * ey,
+    ];
+  }
+
+  function render() {
+    svg.textContent = "";
+    measurer = el("text", { x: -999, y: -999, style: "font-family: var(--mono); font-size: 12px" }, svg);
+    const defs = el("defs", {}, svg);
+    for (const o of Object.keys(OWNERS)) {
+      const m = el("marker", { id: "arrow-" + o, class: "arrow " + o, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto" }, defs);
+      el("path", { d: "M0,1 L10,5 L0,9 z" }, m);
+    }
+    const linkLayer = el("g", {}, svg);
+    const nodeLayer = el("g", {}, svg);
+    txt(nodeLayer, OMG_X, 24, "SKILL LIBRARIES", "col-head");
+    txt(nodeLayer, AG_X, 24, "AGENTS", "col-head");
+
+    // Agent column
+    let y = TOP;
+    const boxes = {};
+    for (const a of AGENTS) {
+      const rows = wrapChips(a.skills, AG_W - 2 * PAD);
+      const h = HEAD + rows.length * CH + (rows.length - 1) * RG + PAD;
+      boxes[a.id] = { y, h, rows };
+      y += h + GAP;
+    }
+    const agentsBottom = y - GAP;
+
+    // OMG column, centered on the agents each one feeds
+    const omgBoxes = {};
+    let minTop = TOP;
+    for (const o of Object.keys(OWNERS)) {
+      const names = Object.keys(SKILLS).filter((n) => SKILLS[n].owner === o);
+      const h = HEAD + names.length * CH + (names.length - 1) * RG + PAD;
+      const fed = AGENTS.filter((a) => a.owners.includes(o)).map((a) => boxes[a.id]);
+      const mid = (fed[0].y + fed[fed.length - 1].y + fed[fed.length - 1].h) / 2;
+      const top = Math.max(minTop, mid - h / 2);
+      omgBoxes[o] = { y: top, h, names };
+      minTop = top + h + 28;
+    }
+    const H = Math.max(agentsBottom, minTop - 28) + 20;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+    for (const [o, b] of Object.entries(omgBoxes)) {
+      const g = el("g", { class: "omg " + o }, nodeLayer);
+      el("rect", { class: "card", x: OMG_X, y: b.y, width: OMG_W, height: b.h, rx: 12 }, g);
+      el("circle", { class: "dot " + o, cx: OMG_X + PAD + 4, cy: b.y + 20, r: 4 }, g);
+      txt(g, OMG_X + PAD + 14, b.y + 24, OWNERS[o].who.toUpperCase(), "kicker");
+      txt(g, OMG_X + PAD, b.y + 45, OWNERS[o].omg, "card-title");
+      b.names.forEach((name, i) => {
+        const ry = b.y + HEAD + i * (CH + RG);
+        chip(g, name, OMG_X + PAD, ry);
+        const n = agentsWith(name).length;
+        const c = txt(g, OMG_X + OMG_W - PAD, ry + 17.5, `→ ${n} agent${n === 1 ? "" : "s"}`, "count", "end");
+        c.setAttribute("data-skill", name);
+      });
+    }
+
+    for (const a of AGENTS) {
+      const b = boxes[a.id];
+      const shared = a.owners.length > 1;
+      const g = el("g", {
+        class: "agent" + (shared ? " shared" : ""), "data-agent": a.id, tabindex: 0, role: "button",
+        "aria-label": `${a.kind} ${a.name} with ${a.skills.length} skill${a.skills.length === 1 ? "" : "s"}: ${a.skills.join(", ")}`,
+      }, nodeLayer);
+      const body = el("g", { class: "card-body" }, g);
+      el("rect", { class: "card", x: AG_X, y: b.y, width: AG_W, height: b.h, rx: 12 }, body);
+      let dx = AG_X + PAD;
+      for (const o of a.owners) { el("circle", { class: "dot " + o, cx: dx + 4, cy: b.y + 20, r: 4 }, body); dx += 11; }
+      txt(body, dx + 3, b.y + 24, a.kind.toUpperCase(), "kicker");
+      txt(body, AG_X + PAD, b.y + 45, a.name, "card-title");
+      b.rows.forEach((row, ri) => {
+        let cx = AG_X + PAD;
+        for (const c of row) { chip(g, c.name, cx, b.y + HEAD + ri * (CH + RG)); cx += c.w + CG; }
+      });
+
+      // Connectors, one per owner that feeds this agent
+      a.owners.forEach((o, i) => {
+        const ob = omgBoxes[o];
+        const out = AGENTS.filter((x) => x.owners.includes(o));
+        const k = out.indexOf(a);
+        const sx = OMG_X + OMG_W, sy = ob.y + 34 + ((k + 0.5) * (ob.h - 68)) / out.length;
+        const ex = AG_X - 2, ey = b.y + b.h / 2 + (shared ? (i - (a.owners.length - 1) / 2) * 26 : 0);
+        const mine = a.skills.filter((n) => SKILLS[n].owner === o);
+        const lg = el("g", { class: "link " + o, "data-agent": a.id, "data-skills": mine.join(" ") }, linkLayer);
+        el("path", { d: `M${sx} ${sy}C${sx + 150} ${sy} ${ex - 150} ${ey} ${ex} ${ey}`, "marker-end": `url(#arrow-${o})` }, lg);
+        const [lx, ly] = bez(sx, sy, ex, ey, 0.66);
+        const label = shared
+          ? `${mine.length} from ${o === "you" ? "you" : "teammate"}`
+          : `${mine.length} skill${mine.length === 1 ? "" : "s"}`;
+        txt(lg, lx, ly + 4, label, "", "middle");
+      });
+    }
+  }
+
+  // Tracing
+  const all = (sel) => svg.querySelectorAll(sel);
+  function clear() {
+    svg.classList.remove("focusing");
+    all(".on").forEach((n) => n.classList.remove("on"));
+  }
+  function focusSkill(name) {
+    clear();
+    svg.classList.add("focusing");
+    all(`.chip[data-skill="${name}"], .count[data-skill="${name}"]`).forEach((n) => n.classList.add("on"));
+    const hits = agentsWith(name);
+    hits.forEach((a) => svg.querySelector(`.agent[data-agent="${a.id}"]`).classList.add("on"));
+    all(".link").forEach((l) => { if (l.dataset.skills.split(" ").includes(name)) l.classList.add("on"); });
+    const s = SKILLS[name];
+    status.innerHTML = `<b>${name}</b> is added once in ${OWNERS[s.owner].ref} and reaches ${hits.length} agent${hits.length === 1 ? "" : "s"}: ${hits.map(agentLabel).join(", ")}.`;
+  }
+  function focusAgent(id) {
+    clear();
+    svg.classList.add("focusing");
+    const a = AGENTS.find((x) => x.id === id);
+    const card = svg.querySelector(`.agent[data-agent="${id}"]`);
+    card.classList.add("on");
+    card.querySelectorAll(".chip").forEach((n) => n.classList.add("on"));
+    a.skills.forEach((n) => all(`.omg .chip[data-skill="${n}"], .count[data-skill="${n}"]`).forEach((c) => c.classList.add("on")));
+    all(`.link[data-agent="${id}"]`).forEach((l) => l.classList.add("on"));
+    const from = a.owners.map((o) => OWNERS[o].ref).join(" and ");
+    status.innerHTML = `${agentLabel(a).replace(/^./, (c) => c.toUpperCase())} gets ${a.skills.length} skill${a.skills.length === 1 ? "" : "s"} from ${from}.`;
+  }
+  const rest = () => { clear(); status.textContent = "Point at a skill or an agent to trace where it goes."; };
+  function handle(target) {
+    const c = target.closest && target.closest(".chip");
+    if (c) return focusSkill(c.dataset.skill);
+    const a = target.closest && target.closest(".agent");
+    if (a) return focusAgent(a.dataset.agent);
+    rest();
+  }
+  svg.addEventListener("pointerover", (e) => handle(e.target));
+  svg.addEventListener("pointerleave", rest);
+  svg.addEventListener("focusin", (e) => handle(e.target));
+  svg.addEventListener("focusout", (e) => { if (!svg.contains(e.relatedTarget)) rest(); });
+
+  render();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+})();
+</script>
