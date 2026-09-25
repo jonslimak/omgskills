@@ -255,6 +255,13 @@ The current local launcher enables the switch only on port 5174 and uses the exi
 - Keep the tracked setting false until a redesign-enabled combined draft passes and activation is approved. Set it true for rollout; false plus rebuild/redeploy restores the legacy UI. Scheduled builds use the same tracked setting. Mac flags and `release-config.json` are unchanged.
 - Verification: full `npm run check` (including deploy safety and root typecheck), 131 portal tests and four production entry builds pass after integration. The build matrix uses the same feature-to-environment helper as combined builds. No Swift build, release packaging or live deploy was run.
 
+### Draft Checkpoint (2026-09-25)
+
+- Rollout configuration committed as `293d137`. Draft: `https://6ab6b1983d884564c607ac12--omgskills.netlify.app/app/`.
+- Combined artifact built with the redesign temporarily enabled and the configured draft Clerk public key. Tracked setting restored to false before upload; no production activation or push. No fixture modules in the deployed app.
+- Passed: hosted signed-out Skills/Sets/detail/connect routes and Clerk dialog; all three manifests match the artifact; protected health pages, unauthorized sync, downloads, every appcast update asset, and MCP. Full live library verification passed against the draft with production canonical URLs, including profile/skill/collection pages, Markdown mirrors, internal links, sitemap and redirects. Appcast bytes match production and the Mac release gate remains false.
+- Authenticated hosted flows and the preview database contents were not tested; the real two-account result above is local-only. Production remains on `6ab6afcfa041425306120b86`.
+
 ## 9. Verification And Final Local Review
 
 Verification accompanies every slice, not only the final one.
@@ -295,4 +302,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-Review/commit the rollout configuration, then prepare a separately approved redesign-enabled combined draft. Latest main is integrated locally; no push or deployment yet. The local two-account access checkpoint is complete. Production keeps its existing UI until explicit redesign activation/deployment approval. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.
+Complete draft review, then obtain approval to land/push and activate the redesign through the guarded production deploy. Recheck latest main and live release assets first. The local two-account access checkpoint is complete; hosted authenticated flows are not yet verified. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.
