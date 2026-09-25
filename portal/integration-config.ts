@@ -1,3 +1,6 @@
+import { isPortalRead as isIntegrationRead } from "./src/portal-read-policy";
+export { isIntegrationRead };
+
 // This is an explicit operator attestation, not proof that a database is isolated.
 // Verify the backend's Clerk instance and resolved DB before setting it to 1.
 export function testBackendOrigin(env: Record<string, string | undefined>) {
@@ -19,15 +22,6 @@ export function testBackendOrigin(env: Record<string, string | undefined>) {
   } catch {
     return null;
   }
-}
-
-export function isIntegrationRead(path: string, method = "GET") {
-  return (
-    method.toUpperCase() === "GET" &&
-    /^\/api\/portal\/(?:synced-skills|groups|shared|profile|devices|private-sources|groups\/[a-zA-Z0-9_-]+)$/.test(
-      path,
-    )
-  );
 }
 
 export function isIntegrationRequest(path: string, method = "GET") {

@@ -1,8 +1,10 @@
 # Web App Redesign Implementation Plan
 
-Status: Slice A committed and design-approved. B1-B2, C1-C4 and D1-D4 are implemented locally. C4, D2 and D3 user manual testing passed. D4 automated/local checks pass; remaining real-account checks are tracked in LOCAL-INTEGRATION.md. Not production rollout approval. Updated 2026-09-24.
+Status: A-E complete locally; E reviewed for this commit. User-reported two-account shared-access check passed. Redesign remains off by default; no push or production activation. Remaining release checks are tracked in LOCAL-INTEGRATION.md. Updated 2026-09-25.
 
 Local preview: http://127.0.0.1:5173/app/preview/
+
+Normal-route local review: http://127.0.0.1:5174/app/ (same isolated backend as `/app/integration/`).
 
 Worktree: `/private/tmp/omgskills-web-portal-redesign`, branch `codex/web-portal-redesign`, based on `827f31ce`. See `LOCAL-PREVIEW.md` for verification and restart instructions. Local commit only; no push or deployment.
 
@@ -129,7 +131,7 @@ After design review, attach authenticated controllers to the same views.
 - [x] Require an explicitly verified loopback backend and a development Clerk key before enabling sign-in. Client and local proxy allow only required GET endpoints.
 - [x] Automated checks and blocked-entry browser verification pass. Production excludes both local entries even with their opt-in flags set.
 - [x] Verify development Clerk and the backend's resolved local database; test sign-in, empty/populated reads, owned detail, search/filtering, reload and mobile navigation using an approved account-scoped snapshot. No production backend: even GET requests reconcile user records.
-- [ ] Complete shared detail and two-account lifecycle/isolation browser checks; B2 wires sign-out and account-scoped state. Investigate the initial load error if reproducible.
+- [x] Shared detail and real two-account access checks passed at E (user-reported). B2 covers sign-out; account-switch races/cache isolation have automated coverage. Investigate the initial load error only if reproducible.
 
 See `LOCAL-INTEGRATION.md` for setup and remaining checks. B1 is not end-to-end verified yet.
 
@@ -235,7 +237,18 @@ D4 verification: 125 portal tests, 53 targeted backend tests, root typecheck and
 
 **Exit:** all supported old capabilities remain reachable, placeholders do not claim unimplemented behavior, and no feature flag or protocol was changed unintentionally.
 
-## 8. Verification And Final Local Review
+## 8. Slice E: Normal App Integration
+
+- [x] E1: Extract `account/PortalSession.tsx`; local and normal entries share account loading, edits, refresh, cancellation and session-scoped sign-out. Keep local configuration checks in the local entry. Isolate integration, local normal-route and production caches.
+- [x] E2: Add `VITE_PORTAL_REDESIGN_ENABLED=1`, default off. Enabled normal `/app/` routes and root-relative app-host routes use the redesign; `/app/connect` and `/connect` retain the existing pairing entry. Web-off remains unavailable. Preserve direct detail links, sign-in/signup return URLs and navigation.
+- [x] E3: Context-aware save messages, connection/private-source warnings and sharing links. Error/access-denied recovery remains visible without the local banner. Existing private-source APIs are reused; no simulated Broker is imported into the production application.
+- [x] E4: Retain server-provided `appDeepLink` on authorized detail reads and validate the existing group protocol before rendering Install. Require the independent Mac gate; all local modes prohibit Install. No auth protocol, backend permission or production flag changes.
+
+Verification: 131 portal tests, root typecheck and four production build combinations pass. Builds use a non-secret placeholder publishable key so authenticated code is actually compiled; fixture/local entry modules remain excluded. The shared account controller passes all five screens at 1440/1024/390/320px with fixture responses, including normal-route navigation, dialogs, shared/denied views and Mac-gated link rendering (never launched). Actual local signed-out `/app/`, Sets, direct detail and `/app/connect` entry checks pass. On 2026-09-25 the user reported the local two-account test green: Invite-only access granted, recipient can view but not edit, and access denied after removal and refresh. Existing signed-in mutation checks belong to B-D; this does not claim a fresh repeat of every B-D flow.
+
+The current local launcher enables the switch only on port 5174 and uses the existing verified database. Public activation requires an explicit build/deploy decision. Flag off retains the old portal; do not remove it before rollout acceptance.
+
+## 9. Verification And Final Local Review
 
 Verification accompanies every slice, not only the final one.
 
@@ -259,7 +272,7 @@ Verification accompanies every slice, not only the final one.
 
 Only after fixture review and with an approved isolated backend/account: validate login, refresh, profile edits, create/edit/add/remove/reorder a test set, public/restricted/private access, device revocation, and permitted private-source actions. If that environment is unavailable, report these checks as unverified; fixture success is not integration proof.
 
-## 9. Risks And Stop Conditions
+## 10. Risks And Stop Conditions
 
 | Risk | Control |
 | --- | --- |
@@ -275,4 +288,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-Before any production adoption, plan the remaining real two-account/shared-access browser checkpoint and production-entry integration. The redesign still runs only in local preview/integration; production keeps its existing UI. Real GitHub and Mac callback tests require separate scope approval. No push or deployment is authorized by these local checks.
+Plan safe integration onto latest main, then a separately approved draft/deployment review. The local two-account access checkpoint is complete; no more environment expansion unless blocked. Production keeps its existing UI until explicit redesign activation/deployment approval. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.

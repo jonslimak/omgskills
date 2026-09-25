@@ -9,9 +9,10 @@ import tailwindcss from "@tailwindcss/vite";
 // Set PLAYWRIGHT_MODULE to a locally installed Playwright entry point when not a project dependency.
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || "playwright");
 const root = fileURLToPath(new URL("../", import.meta.url));
-const output = path.resolve(root, "../output/playwright/d4");
-const prefix = "/app/testing/d4/";
-const html = '<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div><script type="module" src="/testing/d4-review.tsx"></script></body></html>';
+const normalRoutes = process.env.PORTAL_BROWSER_REVIEW === "app";
+const output = path.resolve(root, `../output/playwright/${normalRoutes ? "e" : "d4"}`);
+const prefix = normalRoutes ? "/app/" : "/app/testing/d4/";
+const html = `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div><script type="module" src="/testing/${normalRoutes ? "e" : "d4"}-review.tsx"></script></body></html>`;
 const server = await createServer({ configFile: false, envFile: false, root, base: "/app/",
   cacheDir: path.join(root, "node_modules/.vite-d4"),
   resolve: { alias: { "@": path.join(root, "src") } },
@@ -19,6 +20,7 @@ const server = await createServer({ configFile: false, envFile: false, root, bas
   plugins: [react(), tailwindcss(), { name: "d4-fixture-page", configureServer(vite) {
     vite.middlewares.use(async (req, res, next) => {
       if (!req.url?.startsWith(prefix)) return next();
+      if (normalRoutes && !/^\/app\/(?:agents|sets|home|groups\/[^/?]+)?(?:\?.*)?$/.test(req.url)) return next();
       try { res.setHeader("Content-Type", "text/html"); res.end(await vite.transformIndexHtml(req.url, html)); }
       catch (error) { next(error); }
     });
@@ -51,7 +53,7 @@ try {
     for (const [route, title] of [["", "Skills"], ["sets", "Sets"], ["agents", "Agents"], ["home", "Home"], ["groups/marketing", "Marketing essentials"]]) {
       await go(route);
       await page.getByRole("heading", { name: title, exact: true }).waitFor();
-      if (route.startsWith("groups/")) await page.getByText("Invite only", { exact: true }).first().waitFor();
+      if (route.startsWith("groups/")) await page.locator(".rd-detail-table").waitFor();
       await fits();
       await page.screenshot({ path: path.join(output, `${width}-${route.replaceAll("/", "-") || "skills"}.png`), fullPage: true });
     }
@@ -120,6 +122,19 @@ try {
     await fits();
     await page.screenshot({ path: path.join(output, `320-${scenario}.png`), fullPage: true });
   }
+  if (normalRoutes) {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await go("groups/marketing");
+    await page.locator(".rd-detail-table").waitFor();
+    assert.equal(await page.getByRole("link", { name: "Install", exact: true }).count(), 0);
+    await go("groups/marketing?install=1");
+    const install = page.getByRole("link", { name: "Install", exact: true });
+    await install.waitFor();
+    assert.match(await install.getAttribute("href"), /^omgskills:\/\/group\?url=/);
+    await go("home");
+    await page.getByRole("heading", { name: "Home", exact: true }).waitFor();
+    assert.equal(await page.getByText(/Local GitHub simulation|changes stay local/).count(), 0);
+  }
   assert.deepEqual(errors, []); assert.deepEqual(forbidden, []);
-  console.log("D4 browser passed: 5 screens x 4 widths; connection modes/masking/clearing/focus/Escape; navigation/reload; shared/denied detail; late reads; empty/loading/error/long content. No real API or external requests.");
+  console.log(`${normalRoutes ? "E normal-route controller" : "D4"} browser passed: 5 screens x 4 widths; connection modes/masking/clearing/focus/Escape; navigation/reload; shared/denied detail; late reads; empty/loading/error/long content. No real API or external requests.`);
 } finally { await browser?.close(); await server.close(); }

@@ -3,7 +3,7 @@ import { listOwnedGroups, listSharedGroups, loadGroupDetail } from "../groups/ap
 import type { SkillGroup } from "../groups/types";
 import type { SyncedSkill } from "../synced-skill-grouping";
 import type { PortalData, PortalSet } from "../app/model";
-import { isIntegrationRead } from "../../integration-config";
+import { isPortalRead } from "../portal-read-policy";
 
 export type AccountIdentity = { name: string; email: string };
 export type ProfileResponse = {
@@ -38,9 +38,9 @@ export async function saveProfileData(
 
 export function readOnlyApi(api: PortalApi, signal?: AbortSignal): PortalApi {
   return (path, init = {}) => {
-    if (!isIntegrationRead(path, init.method) || init.body != null) {
+    if (!isPortalRead(path, init.method) || init.body != null) {
       return Promise.reject(
-        new Error("This integration view only allows portal reads."),
+        new Error("This transport only allows portal reads."),
       );
     }
     return api(path, {
@@ -135,6 +135,7 @@ export async function loadSetData(api: PortalApi, groupId: string): Promise<Port
   return {
     ...setSummary(group, group.accessRole === "owner", group.ownerDisplayName || "Owner"),
     role: group.accessRole,
+    appDeepLink: typeof group.appDeepLink === "string" ? group.appDeepLink : null,
     items: [...items].sort((a, b) => a.position - b.position).map((item) => ({
       id: item.id,
       // Older responses omit this ID. Shared viewers never get owner mappings.

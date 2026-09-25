@@ -1,6 +1,6 @@
-# Local Portal Integration (B1-D4)
+# Local Portal Integration (B1-E)
 
-Updated 2026-09-24. Local checkpoints on `codex/web-portal-redesign`; not pushed or deployed. Signed-in reads, account controls and profile editing pass against an isolated account snapshot. Production was read only for the approved snapshot; no production writes/migrations, deployment, feature activation, or Mac changes were made.
+Updated 2026-09-25. Local checkpoints on `codex/web-portal-redesign`; not pushed or deployed. Signed-in reads, account controls and profile editing pass against an isolated account snapshot. Production was read only for the approved snapshot; no production writes/migrations, deployment, feature activation, or Mac changes were made.
 
 ## Boundaries
 
@@ -17,7 +17,7 @@ Updated 2026-09-24. Local checkpoints on `codex/web-portal-redesign`; not pushed
 
 ## Environment Gate
 
-The guarded page is available at http://127.0.0.1:5174/app/integration/. Development Clerk sign-in and authenticated reads are verified in Chrome against the isolated local database.
+The guarded page is available at http://127.0.0.1:5174/app/integration/. E also enables normal-route review at http://127.0.0.1:5174/app/ on the same server/backend. Development Clerk sign-in and authenticated reads were verified in Chrome through the integration route; fresh signed-in normal-route verification remains for the final pass.
 
 Before enabling access, verify the local function server's actual resolved database is disposable/non-production, its schema is current, and its Clerk secret belongs to the same development instance as the browser key. Do not inherit a linked production site's environment or permit the backend to fall back to Netlify's production database. Use synthetic data by default; account-scoped snapshots require explicit approval and the safeguards below.
 
@@ -28,6 +28,7 @@ Configuration (local ignored environment only, never commit secrets):
 | `VITE_PORTAL_INTEGRATION` | `1`, supplied by `dev:integration` |
 | `VITE_CLERK_PUBLISHABLE_KEY` | Verified development `pk_test_` key |
 | `VITE_SKILLGROUPS_WEB_ENABLED` | `1` locally; no production flag change |
+| `VITE_PORTAL_REDESIGN_ENABLED` | `1` in the ignored local launcher for normal routes; defaults off elsewhere |
 | `PORTAL_TEST_API_ORIGIN` | Explicit local function server origin, e.g. `http://127.0.0.1:8888`; not the frontend port |
 | `PORTAL_TEST_ENVIRONMENT_VERIFIED` | `1` only after inspecting the backend credentials/database routing |
 
@@ -65,6 +66,10 @@ env -i HOME="$HOME" PATH=/opt/homebrew/opt/node/bin:/usr/bin:/bin \
 The launcher sets `PORTAL_TEST_ENVIRONMENT_VERIFIED=1` for this verified local environment only. Recheck isolation before reusing it for another environment. Use Node supported by Vite (20.19+ or 22.12+).
 
 ## Verification
+
+- E manual, 2026-09-25: user reported the two-account test at `/app/` passed: Invite-only access granted, recipient can view but not edit, and access denied after removal and refresh. This closes the real shared-access checkpoint left open in B-D; it does not verify deployed pages, real GitHub or Mac callbacks, or same-browser account switching.
+- E: 131 portal tests, root typecheck and four production build combinations pass. The redesign is opt-in, separate from web/Mac gates. Shared controller checks use fixture responses at 1440/1024/390/320px; actual signed-out normal routes and the existing connect sign-in page pass on port 5174. No real callback was launched. Test builds use a placeholder Clerk public key and are not deploy artifacts.
+- E shares the authenticated controller without sharing test transport: local guards/proxy/simulated Broker remain local. Integration, local normal-route and production caches are separate. Local warnings remain in local mode; normal mode retains error/recovery messages and uses canonical sharing where eligible. Install requires a validated server link plus the Mac gate and is always suppressed locally. Production builds may now contain reusable controllers formerly exclusive to `integration/`; fixture data, the local bootstraps and simulated services remain excluded.
 
 - D4: 125 portal tests and 53 targeted backend tests pass; root typecheck and normal/flag-enabled production builds pass. Both local entries and test fixtures stay absent from production bundles. Checks cover independent web/Mac gates, production install-button wiring, connect fragment/route boundaries and blocked local exchange/upload/package paths. No feature flags or application behavior changed.
 - D4 browser: five screens at 1440/1024/390/320px, mobile navigation, back/forward/reload, shared/denied detail, late reads and empty/loading/error/long-content states pass using fixture data. D2 dialogs pass containment/clipping, masked values, mode/close clearing, focus trapping, Escape and focus return. The runner uses the integration entry's stylesheet order and blocks external/API requests. This completes D2 visual verification, not real Mac pairing.
@@ -114,7 +119,7 @@ npm --workspace portal test
 
 Root-level alternative: `TSX_TSCONFIG_PATH=portal/tsconfig.json node --import tsx --test portal/tests/*.test.ts` (needed for the UI tests' path aliases).
 
-Remaining checks: real two-account Clerk isolation/switch and shared access; deployed public-page navigation; first Favorites creation and resolved-skill publication against live public sources (controlled automated coverage exists). Shared/denied fixture rendering and slow/cancelled browser reads passed D4. Real GitHub and Mac callbacks are outside the local checkpoint. Do not call Slice B/C fully end-to-end verified yet. Earlier counts/allowlists describe that checkpoint, not current permissions.
+Remaining checks: same-browser account switching (automated isolation/race coverage exists); deployed public-page navigation; first Favorites creation and resolved-skill publication against live public sources (controlled automated coverage exists). Real two-account shared access passed at E (user-reported). Shared/denied fixture rendering and slow/cancelled browser reads passed D4. Real GitHub and Mac callbacks are outside the local checkpoint. Earlier counts, allowlists and open-check notes describe their checkpoint, not current permissions or verification status.
 
 ### Repeat D4 Checks
 
@@ -125,6 +130,8 @@ node portal/testing/d4-browser.mjs
 ```
 
 Set `PLAYWRIGHT_MODULE` to an absolute Playwright entry point if it is not locally resolvable. The runner uses installed Chrome, starts/closes its own loopback server and writes ignored screenshots to `output/playwright/d4/`. No Clerk credentials are needed.
+
+E reuses this runner with `PORTAL_BROWSER_REVIEW=app`, testing the shared account controller on normal routes with injected fixture responses; screenshots go to `output/playwright/e/`. Run `node portal/testing/verify-entry-builds.mjs` for the redesign/web/Mac build combinations and fixture exclusion. It finishes with the redesign off and a placeholder public key; rebuild through the guarded deployment process before any deployment.
 
 SQL checks require the verified disposable database above. The script refuses other database names, TCP, non-development context or a different actual data directory:
 

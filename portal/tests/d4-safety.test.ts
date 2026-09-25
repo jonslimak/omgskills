@@ -76,7 +76,7 @@ test("D4 production composition keeps the Mac install switch separate from the w
   const detail = await readFile(new URL("../src/groups/GroupDetailPage.tsx", import.meta.url), "utf8");
   assert.match(main, /installEnabled=\{skillGroupsMacEnabled\}/);
   assert.match(detail, /installEnabled && group\.appDeepLink/);
-  const integration = await readFile(new URL("../src/integration/main.tsx", import.meta.url), "utf8");
-  assert.match(integration, /key=\{`\$\{userId\}:\$\{sessionId\}`\}/);
+  const integration = await readFile(new URL("../src/account/PortalSession.tsx", import.meta.url), "utf8");
+  assert.match(integration, /key=\{`\$\{local\}:\$\{base\}:\$\{userId\}:\$\{sessionId\}`\}/);
   assert.match(integration, /forceRedirectUrl=\{window\.location\.href\}/);
 });

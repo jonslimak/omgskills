@@ -4,7 +4,7 @@ import type { PortalApi } from "../portal-api";
 import { Action, EmptyState, IconAction, TextInput } from "../app/ui";
 import { createPrivateSourceSession, emptyPrivateSourceSnapshot, validSkillRoot } from "./private-source-session";
 
-export function PrivateSourcesPanel({ api, denied }: { api: PortalApi; denied: () => void }) {
+export function PrivateSourcesPanel({ api, denied, local = true }: { api: PortalApi; denied: () => void; local?: boolean }) {
   const callbacks = useRef({ api, denied });
   callbacks.current = { api, denied };
   const session = useRef<ReturnType<typeof createPrivateSourceSession> | null>(null);
@@ -34,7 +34,7 @@ export function PrivateSourcesPanel({ api, denied }: { api: PortalApi; denied: (
     <div className="rd-section-heading"><h2>Private sources</h2>
       <IconAction label="Refresh private sources" disabled={busy} onClick={() => void session.current?.refresh()}><RefreshCw /></IconAction>
     </div>
-    <p className="rd-muted">Local GitHub simulation. No real repository is connected.</p>
+    {local && <p className="rd-muted">Local GitHub simulation. No real repository is connected.</p>}
     {state.error && <p role="alert">{state.error}</p>}
     {state.notice && <p role="status">{state.notice}</p>}
     {state.loading && !state.view && <p role="status">Loading private sources...</p>}

@@ -1,6 +1,11 @@
 export type Page = "skills" | "agents" | "sets" | "detail" | "home" | "missing";
 export type Route = { page: Page; groupId?: string; source: string };
 
+// app.omgskills.com also serves the portal at the host root.
+export function normalPortalBase(pathname: string): string {
+  return /^\/app(?:\/|$)/.test(pathname) ? "/app/" : "/";
+}
+
 export function parseRoute(path: string, search: string, base: string): Route {
   const source = new URLSearchParams(search).get("source") || "all";
   const relative =

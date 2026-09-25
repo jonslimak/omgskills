@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { DropdownMenu } from "radix-ui";
-import { Copy, EyeOff, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Copy, Download, EyeOff, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { setInstallLink } from "../app/set-install";
 import { copySetLink, type SetLink } from "../app/set-link";
 import { Action, IconAction, Modal, TextInput } from "../app/ui";
 import { visibilityLabels, type PortalSet, type Visibility } from "../app/model";
 import type { SetCommand } from "./set-data";
 
 type Dialog = "create" | "edit" | "delete";
-export function SetControls({ page, set, blocked, saving, save, navigate, notify, link }: {
+export function SetControls({ page, set, blocked, saving, save, navigate, notify, link, local = true, installEnabled = false }: {
   page: string;
   set: PortalSet | null;
   blocked: boolean;
@@ -16,6 +17,8 @@ export function SetControls({ page, set, blocked, saving, save, navigate, notify
   navigate: (path: string) => void;
   notify: (message: string) => void;
   link?: SetLink;
+  local?: boolean;
+  installEnabled?: boolean;
 }) {
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [name, setName] = useState("");
@@ -42,7 +45,7 @@ export function SetControls({ page, set, blocked, saving, save, navigate, notify
       const result = await save(command);
       if (!active.current || location.pathname !== origin) return;
       setDialog(null);
-      notify(result.refreshed ? "Set saved locally." : "Saved. Refresh your account to see the latest data.");
+      notify(result.refreshed ? local ? "Set saved locally." : "Set saved." : "Saved. Refresh your account to see the latest data.");
       if (command.kind === "create") navigate(`groups/${result.groupId}`);
       if (command.kind === "delete") navigate("sets");
     } catch (error) {
@@ -51,7 +54,9 @@ export function SetControls({ page, set, blocked, saving, save, navigate, notify
   }
   const owner = page === "detail" && set?.role === "owner";
   const disabled = blocked || saving || (page === "detail" && !owner);
+  const installLink = page === "detail" ? setInstallLink(set?.appDeepLink, installEnabled, local) : null;
   return <>
+    {installLink && !blocked && !saving && <Action asChild><a href={installLink}><Download data-icon="inline-start" />Install</a></Action>}
     {page === "detail" && set && link && <Action aria-label="Copy set link" title={link.description} disabled={blocked || saving || copying}
       onClick={() => {
         const origin = location.pathname;

@@ -16,6 +16,7 @@ export type SetItem = {
 };
 export type PortalSet = {
   id: string;
+  appDeepLink?: string | null;
   slug?: string;
   name: string;
   description: string;
