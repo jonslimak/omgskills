@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useMemo, useRef, useState } from "react";
+import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ClerkProvider, SignInButton, useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { PortalAccount, PortalEntry } from "../account/PortalSession";
@@ -7,7 +7,6 @@ import { usePortalApi } from "../portal-api";
 import { Action } from "../app/ui";
 import { isFeatureEnabled } from "../feature-flags";
 import { reviewReadApi } from "./policy";
-import { createReviewSetTest } from "./set-test";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const base = "/app/review/";
@@ -16,10 +15,6 @@ function ReviewAccess({ identityKey }: { identityKey: string }) {
   const api = usePortalApi();
   const apiRef = useRef(api);
   apiRef.current = api;
-  const setTest = useMemo(() => {
-    try { return createReviewSetTest((path, init) => apiRef.current(path, init), window.sessionStorage, identityKey); }
-    catch { return null; }
-  }, [identityKey]);
   const { user } = useUser();
   const clerk = useClerk();
   const { sessionId } = useAuth();
@@ -42,8 +37,7 @@ function ReviewAccess({ identityKey }: { identityKey: string }) {
       <Action onClick={() => { void signOut(); }}>Sign out</Action></>}
   </PortalEntry>;
   return <PortalAccount base={base} local={false} installEnabled={false} readOnlyReview
-    reviewSetEditing={setTest?.ownsSet}
-    cacheKey={identityKey} api={setTest?.api ?? reviewReadApi(api)} onSignOut={signOut} onSettings={() => {}}
+    cacheKey={identityKey} api={reviewReadApi(api)} onSignOut={signOut} onSettings={() => {}}
     identity={{ name: user.fullName || user.primaryEmailAddress?.emailAddress || "Account",
       email: user.primaryEmailAddress?.emailAddress || "" }} />;
 }
