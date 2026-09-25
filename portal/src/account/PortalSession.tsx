@@ -145,7 +145,7 @@ export function PortalAccount({ identity, cacheKey, base, local, installEnabled,
       base={base}
       readOnly
       detailSet={detailSet}
-      membership={readOnlyReview ? undefined : membership.controls}
+      membership={readOnlyReview && !(detailSet && reviewSetEditing?.(detailSet.id)) ? undefined : membership.controls}
       devicesPanel={<DevicesPanel api={api} local={local} readOnly={readOnlyReview} denied={() => sessionRef.current?.invalidateAccess()} />}
       privateSourcesPanel={readOnlyReview ? undefined : <PrivateSourcesPanel api={api} local={local} denied={() => sessionRef.current?.invalidateAccess()} />}
       onNavigate={membership.dismiss}
