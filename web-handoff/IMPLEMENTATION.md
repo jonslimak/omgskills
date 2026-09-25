@@ -260,17 +260,19 @@ The current local launcher enables the switch only on port 5174 and uses the exi
 - Rollout configuration committed as `293d137`. Draft: `https://6ab6b1983d884564c607ac12--omgskills.netlify.app/app/`.
 - Combined artifact built with the redesign temporarily enabled and the configured draft Clerk public key. Tracked setting restored to false before upload; no production activation or push. No fixture modules in the deployed app.
 - Passed: hosted signed-out Skills/Sets/detail/connect routes and Clerk dialog; all three manifests match the artifact; protected health pages, unauthorized sync, downloads, every appcast update asset, and MCP. Full live library verification passed against the draft with production canonical URLs, including profile/skill/collection pages, Markdown mirrors, internal links, sitemap and redirects. Appcast bytes match production and the Mac release gate remains false.
-- Authenticated hosted flows and the preview database contents were not tested; the real two-account result above is local-only. Production remains on `6ab6afcfa041425306120b86`.
+- At this checkpoint, authenticated hosted flows and preview database contents were not tested; the real two-account result above was local-only. Production was on `6ab6afcfa041425306120b86`.
 
-### Restricted Production Review (Prepared, Not Deployed)
+### Restricted Production Review (Verified 2026-09-25)
 
 - Draft diagnostics confirmed PostgreSQL `42501` during user reconciliation through the preview database override. The earlier invalid-URL diagnosis was incorrect: Netlify's API had returned a masked secret.
 - `/app/review/` uses the production Clerk public key and existing same-origin production APIs. Normal `/app/`, pairing routes, and the public redesign/Mac switches remain unchanged.
-- `GET /api/portal/review-access` verifies the Clerk identity against `PORTAL_REVIEW_CLERK_USER_IDS` (comma-separated exact IDs, Functions scope). Missing or malformed configuration denies access. Configure only the approved production account ID before deployment; never substitute development IDs or email matching. No allowlist has been configured yet.
+- `GET /api/portal/review-access` verifies the Clerk identity against `PORTAL_REVIEW_CLERK_USER_IDS` (comma-separated exact IDs, Functions scope). Missing or malformed configuration denies access. One approved production account is configured in the production context only; never substitute development IDs or email matching.
 - The first review is read-only: account/skill/set/device reads, no profile edits, set mutations, pairing, revocation, private-source changes, installs or Clerk settings edits. Each review read rechecks access; no account snapshot is persisted. Existing production read endpoints still perform their usual account reconciliation.
-- This is not a production rollout. Temporary-set write testing is a later explicit step. Do not enable the global redesign flag to test this route.
-- Local verification: 135 portal tests, 27 focused backend tests, deploy-safety tests, TypeScript checks and production-key portal build passed with the global redesign switch off. Temporary draft diagnostics were removed before commit. Hosted review remains untested.
-- Before deployment: review/commit the route, verify latest main and release assets, build the guarded combined artifact with the production public key, and obtain production-deploy approval. Verify that the normal portal and non-review accounts remain unaffected.
+- This is not a public redesign rollout. Temporary-set write testing is a later explicit step. Do not enable the global redesign flag to test this route.
+- Local verification: 135 portal tests, 27 focused backend tests, full root checks and production-key portal build passed. Temporary draft diagnostics were removed before commit `7d17c26`, landed and pushed to main.
+- Guarded workflow [36176406229](https://github.com/jonslimak/omgskills/actions/runs/36176406229) verified draft `6ab6c3d8e5118b56276c6902`, then production `6ab6c4ed78dff638970433ab`, on the first attempt without rollback. Previous deployment: `6ab6afcfa041425306120b86`.
+- Signed-in production review passed Skills (122), Agents/devices, Sets, the two-item "my faves" detail, and Home. Mutation controls are disabled; normal `/app/` still renders the original UI and 122 skills from 166 installs. No console errors observed. Anonymous review access returns 401/no-store; other-account denial is covered by automated tests, not a second production account.
+- Hosted safety checks passed for library pages, redirects, manifests, protected health, public group routes, downloads and MCP. All 13 release assets match the pre-deploy bytes; no Mac release or appcast change.
 
 ## 9. Verification And Final Local Review
 
@@ -312,4 +314,4 @@ Keep the existing authenticated UI during Slice A. Adopt each subsequent slice o
 
 ## Next Action
 
-Review the prepared read-only `/app/review/` slice, then configure the approved production account and deploy it through the guarded combined-artifact process after approval. Keep the global redesign switch off until hosted review passes. The local two-account access checkpoint is complete; hosted authenticated flows are not yet verified. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.
+Review the live read-only `/app/review/` UI, then separately approve a scoped production write test before considering the public redesign switch. Hosted read-only verification and local two-account access checks passed; production mutation/two-account checks remain open. Real GitHub and Mac callback tests require separate scope approval; no Mac release is included.
