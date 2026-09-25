@@ -7,14 +7,15 @@
     --bg: #ffffff;
     --ink: #101217;
     --muted: #5f6571;
+    --faint: #9aa0aa;
     --line: #e3e5ea;
     --surface: #f5f6f8;
     --raised: #ffffff;
-    --neutral-chip: #ffffff;
+    --chip: #ffffff;
     --you: #2456d8;
     --you-tint: rgba(36, 86, 216, 0.09);
-    --mate: #c2521b;
-    --mate-tint: rgba(194, 82, 27, 0.09);
+    --mate: #b87a55;
+    --mate-tint: rgba(184, 122, 85, 0.08);
     --sans: "Geist", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
@@ -24,14 +25,15 @@
       --bg: #0f1115;
       --ink: #eceef2;
       --muted: #9aa1ad;
+      --faint: #6b717c;
       --line: #2a2e37;
       --surface: #171a20;
       --raised: #1d2027;
-      --neutral-chip: #23262e;
+      --chip: #23262e;
       --you: #86a8ff;
       --you-tint: rgba(134, 168, 255, 0.13);
-      --mate: #ff9d66;
-      --mate-tint: rgba(255, 157, 102, 0.13);
+      --mate: #d6a07e;
+      --mate-tint: rgba(214, 160, 126, 0.10);
     }
   }
   :root[data-theme="dark"] {
@@ -39,14 +41,15 @@
     --bg: #0f1115;
     --ink: #eceef2;
     --muted: #9aa1ad;
+    --faint: #6b717c;
     --line: #2a2e37;
     --surface: #171a20;
     --raised: #1d2027;
-    --neutral-chip: #23262e;
+    --chip: #23262e;
     --you: #86a8ff;
     --you-tint: rgba(134, 168, 255, 0.13);
-    --mate: #ff9d66;
-    --mate-tint: rgba(255, 157, 102, 0.13);
+    --mate: #d6a07e;
+    --mate-tint: rgba(214, 160, 126, 0.10);
   }
 
   body {
@@ -56,64 +59,83 @@
     font-size: 16px;
     line-height: 1.5;
     padding-inline: 20px;
-    padding-block: 32px 40px;
+    padding-block: 28px 40px;
   }
-  figure { margin: 0 auto; max-width: 1320px; display: grid; gap: 14px; }
-  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  #flow { display: block; width: 100%; min-width: 980px; height: auto; }
+  .stage { max-width: 820px; margin: 0 auto; display: grid; gap: 18px; }
 
-  .figfoot {
-    display: flex; flex-wrap: wrap; gap: 10px 28px;
-    align-items: baseline; justify-content: space-between;
+  /* Narration */
+  .story { display: grid; gap: 12px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .steps button, .replay {
+    font: 500 13px/1 var(--sans);
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 12px 7px 8px;
+    display: inline-flex; align-items: center; gap: 7px;
+    cursor: pointer;
   }
-  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted); }
-  .legend span { display: inline-flex; align-items: center; gap: 8px; }
-  .swatch { width: 22px; height: 12px; border-radius: 3px; border: 1.5px solid; }
-  .swatch.you { border-color: var(--you); background: var(--you-tint); }
-  .swatch.mate { border-color: var(--mate); background: var(--mate-tint); }
-  .swatch.private { border-color: var(--muted); border-style: dashed; }
-  .face { width: 14px; height: 14px; border-radius: 50%; background: #0f8b8d; }
-  #status { font-size: 14px; margin: 0; min-height: 1.5em; }
-  #status b { font-family: var(--mono); font-weight: 500; }
+  .steps button .n {
+    font: 500 11px/1 var(--mono);
+    width: 18px; height: 18px; border-radius: 50%;
+    display: inline-grid; place-items: center;
+    background: var(--surface); color: var(--muted);
+  }
+  .steps button[aria-current="step"] { color: var(--ink); border-color: var(--ink); }
+  .steps button[aria-current="step"] .n { background: var(--ink); color: var(--bg); }
+  .steps button.done .n { background: var(--you-tint); color: var(--you); }
+  .replay { margin-left: auto; padding: 7px 12px; }
+  .steps button:focus-visible, .replay:focus-visible { outline: 2px solid var(--you); outline-offset: 2px; }
+  .caption { min-height: 4.2em; }
+  .caption h2 {
+    margin: 0 0 2px;
+    font-size: clamp(20px, 3vw, 26px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 650;
+    text-wrap: balance;
+  }
+  .caption p { margin: 0; color: var(--muted); max-width: 60ch; }
+  .caption code { font-family: var(--mono); font-size: 0.9em; color: var(--ink); }
+
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #flow { display: block; width: 100%; min-width: 640px; height: auto; }
 
   /* SVG */
   #flow text { fill: var(--ink); font-family: var(--sans); }
-  #flow .col-head { fill: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: 0.09em; }
-  #flow .col-head .step { fill: var(--ink); font-weight: 500; }
+  #flow .row-label { fill: var(--faint); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; }
   #flow .card { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
-  #flow .omg .card { fill: var(--raised); stroke-width: 1.5; }
-  #flow .omg.you .card { stroke: var(--you); }
-  #flow .omg.mate .card { stroke: var(--mate); }
-  #flow .agent.shared .card { fill: var(--raised); stroke: var(--ink); stroke-width: 1.5; }
+  #flow .omg-you .card { fill: var(--raised); stroke: var(--you); stroke-width: 2; }
+  #flow .omg-mate .card { fill: var(--surface); stroke: var(--mate); stroke-width: 1; stroke-dasharray: 4 3; }
+  #flow .agent .card { transition: stroke 400ms ease, stroke-width 400ms ease; }
+  #flow .agent.lit .card { stroke: var(--ink); stroke-width: 1.5; fill: var(--raised); }
   #flow .kicker { fill: var(--muted); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.07em; }
-  #flow .card-title { font-size: 16px; font-weight: 600; }
-  #flow .omg .card-title { font-size: 18px; }
+  #flow .title { font-size: 16px; font-weight: 600; }
+  #flow .omg-you .title { font-size: 19px; font-weight: 650; }
+  #flow .omg-mate .title { font-size: 14px; font-weight: 500; fill: var(--muted); }
   #flow .dot.you { fill: var(--you); }
   #flow .dot.mate { fill: var(--mate); }
-  #flow .author { fill: var(--muted); font-size: 12px; }
+  #flow .handle { fill: var(--muted); font-size: 11.5px; }
 
-  #flow .chip rect { stroke-width: 1.3; }
-  #flow .chip.src rect { fill: var(--neutral-chip); stroke: var(--line); stroke-width: 1.3; }
-  #flow .chip.you rect { fill: var(--you-tint); stroke: var(--you); }
-  #flow .chip.mate rect { fill: var(--mate-tint); stroke: var(--mate); }
-  #flow .chip.private rect { stroke-dasharray: 3.5 2.5; }
-  #flow .chip.src.private rect { stroke: var(--muted); }
-  #flow .chip text { font-family: var(--mono); font-size: 12px; }
+  #flow .chip rect.bg { fill: var(--chip); stroke: var(--line); stroke-width: 1.2; }
+  #flow .chip.you rect.bg { fill: var(--you-tint); stroke: var(--you); }
+  #flow .chip.mate rect.bg { fill: var(--mate-tint); stroke: var(--mate); }
+  #flow .chip.private rect.bg { stroke-dasharray: 3.5 2.5; }
+  #flow .chip.src { filter: drop-shadow(0 1px 1.5px rgba(16, 18, 23, 0.10)); }
+  #flow .chip text.name { font-family: var(--mono); font-size: 12.5px; }
   #flow .chip .lock { fill: none; stroke-width: 1.3; stroke: var(--muted); }
   #flow .chip.you .lock { stroke: var(--you); }
   #flow .chip.mate .lock { stroke: var(--mate); }
-  #flow .chip .avatar-ring { fill: none; stroke: var(--bg); stroke-width: 1.5; }
-  #flow .chip text.initial {
-    font-family: var(--sans); font-size: 8.5px; font-weight: 700; fill: #ffffff; letter-spacing: 0;
-  }
-  #flow .chip, #flow .agent { cursor: pointer; outline: none; }
-  #flow .chip:focus-visible rect, #flow .agent:focus-visible .card { stroke-width: 2.5; stroke: var(--ink); }
-  #flow .count { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  #flow .avatar-ring { fill: none; stroke: var(--line); stroke-width: 1; }
+  #flow .person-bg.you { fill: var(--you); }
+  #flow .person-bg.mate { fill: var(--mate); }
+  #flow .person { fill: var(--bg); }
 
   #flow .link path { fill: none; stroke-width: 1.6; }
-  #flow .link.collect path { stroke-width: 1.3; stroke-dasharray: 4 3; }
   #flow .link.you path { stroke: var(--you); }
-  #flow .link.mate path { stroke: var(--mate); }
+  #flow .link.mate path { stroke: var(--mate); stroke-dasharray: 4 3; }
   #flow .arrow.you path { fill: var(--you); }
   #flow .arrow.mate path { fill: var(--mate); }
   #flow .link text {
@@ -123,75 +145,84 @@
   #flow .link.you text { fill: var(--you); }
   #flow .link.mate text { fill: var(--mate); }
 
-  #flow .chip, #flow .link, #flow .card-body, #flow .count, #flow .author { transition: opacity 160ms ease; }
-  #flow.focusing .chip:not(.on),
-  #flow.focusing .link:not(.on),
-  #flow.focusing .agent:not(.on) .card-body,
-  #flow.focusing .count:not(.on),
-  #flow.focusing .author:not(.on) { opacity: 0.16; }
+  /* Motion */
+  #flow .anim {
+    transition:
+      transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1),
+      opacity 450ms ease;
+  }
+  #flow .draw path {
+    transition: stroke-dashoffset 800ms ease;
+  }
+  #flow.instant .anim, #flow.instant .draw path, #flow.instant .card { transition: none !important; }
+  #flow .chip { cursor: default; }
+  #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
   @media (prefers-reduced-motion: reduce) {
-    #flow .chip, #flow .link, #flow .card-body, #flow .count, #flow .author { transition: none; }
+    #flow .anim, #flow .draw path, #flow .agent .card { transition: none !important; }
   }
 </style>
 
-<figure>
-  <div class="scroll">
-    <svg id="flow" viewBox="0 0 1320 660" role="img"
-      aria-label="Skills written by different people are collected into two OMG libraries, yours and your teammate Sam's. Each OMG sends a chosen subset of its skills to agents. Your OMG feeds your personal ChatGPT, your personal Claude, a team Hermes and a shared team ChatGPT. Sam's OMG feeds the same shared team ChatGPT and Sam's personal ChatGPT, so the shared agent gets skills from both libraries."></svg>
-  </div>
-  <figcaption class="figfoot">
-    <p id="status" aria-live="polite">Point at a skill or an agent to trace it from author to agent.</p>
-    <div class="legend">
-      <span><i class="face"></i>Skill author</span>
-      <span><i class="swatch you"></i>In your OMG</span>
-      <span><i class="swatch mate"></i>In Sam's OMG</span>
-      <span><i class="swatch private"></i>Private team skill</span>
+<div class="stage">
+  <div class="story">
+    <div class="controls">
+      <ol class="steps" id="steps"></ol>
+      <button class="replay" id="replay" type="button">Replay</button>
     </div>
-  </figcaption>
-</figure>
+    <div class="caption" aria-live="polite">
+      <h2 id="cap-title"></h2>
+      <p id="cap-body"></p>
+    </div>
+  </div>
+  <div class="scroll">
+    <svg id="flow" viewBox="0 0 800 620" role="img"
+      aria-label="Skills written by different people, such as grill-me by mattpocock and humanizer by blader, are collected into your OMG. Your OMG sends a chosen set of skills to each agent: your ChatGPT, your Claude, a team Hermes and a team ChatGPT. Your teammate Sam's OMG also sends skills to the same team ChatGPT."></svg>
+  </div>
+</div>
 
 <script>
 (() => {
-  // Edit this block to change the example. Layout is computed from it.
+  // ---- Example data. Avatars are embedded so the page works offline.
   const PEOPLE = {
-    lena: { name: "Lena Ortiz", initials: "LO", color: "#0f8b8d" },
-    kai: { name: "Kai Tanaka", initials: "KT", color: "#7b4bb7" },
-    arjun: { name: "Arjun Mehta", initials: "AM", color: "#5d7f1f" },
-    sofia: { name: "Sofia Rossi", initials: "SR", color: "#b8336a" },
-    you: { name: "You", initials: "Y", color: "#2456d8" },
-    sam: { name: "Sam", initials: "S", color: "#c2521b" },
+    mattpocock: { handle: "@mattpocock", img: "data:image/png;base64,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" },
+    blader: { handle: "@blader", img: "data:image/jpeg;base64,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" },
+    twostraws: { handle: "@twostraws", img: "data:image/jpeg;base64,/9j/2wCEAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDIBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIAEAAQAMBIgACEQEDEQH/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+gEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoLEQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APf6KKKAIrm4itLWa5mbbFChkdvRQMmvIdZ8ceJdbv0/sSCaLTxypt/vsf8AaJ/kP1r1fV7L+0dGvrIHBuIHiB9CVIrynwfq+n2lhDbXE6xTBQu1hjmsqsmtjehCMm7kS+LPE+neXLPNcZLYZZl4H1yK9T0DWE1zSku1TY4YpInow6/hyD+NcPqXijSLiCa13l8qQzhNyrWp8Mrjfo13C6uJFuGb5lIyuAoPPup681NOTvZlVqaSujuKKKK3OYKKKKAAgEEHoa8Z1zR7G0128gksYI7a3kiyQucphe2O4616Hc+PfCtpPJBPrloskZKsAxOCPccV554r8b+FdY8QW1tpt808lwhSaREZEG05Xk4OevTjFZVX7uh1UKclL3k7GvDZW32d0iGy2Yt5alMNt9PoOg46V13hK2EVjNMAuJHwCOpwT1riftdlbWgETCS5bgHqQPrWbpPiJfDHi2Ke61Cc2E8flzwbiUQk5EgX19cc4rGnJKV2dc6EqkXGmj2miora5gvLdLi2mSaGQZV0bII+tS11nlNW0YV5H8YPGk9nt8OafIUaRA13Ip5Cnontkcn2I9TXql9eR6fYXF5KGMcMZchRknA6Aepr5Y1q6vdR1e7v9QikjnuZDIwdSMZ6AZ7AYH4VlVlZWPUyrDqrV55bL8zFlj3rx9arW8PlahE5JUBxhx/Bx1rSgUMjf7xpyoA8gHcD+tcydj6CpQVRamnN4nuWHlWYMkmMeay7VX3A71RhjuGPnXt1JOwJILnOM0+JFj9z3offNjawCj86VyqOGjS13Zv6B4q1bw/Pv065aOMnLROdyP8AVf6jn3r3DwZ4wg8WWEjFFhvICBNEDkYPRh7H9K+clKRjlhn1Jr0T4LyGXxZqG1sotkc4PGS64/ka0pSalY5M1w1KVF1GrSXU9G8X3xzb6ah/1n7yT6A/KPzyfwrH1CGwGjyLqEMMkAQswlAIAA6+1VtUvDeeKb2VvuxP5Uf0Xg/rn86zPFGkXPiTRxaCRliMqtKiPtLoDyAfp+FE5XmeJTXJBW3PGhdQtMTAhSF2JjHoCcigTYZj6tXsMVlpCWq2C2MH2dQFVGQHgf1qsPBOgsDKlgHOclTI+PyzUO3Q9anmPu2mtTivCGkDxBrCwvk28fzzY7jsPx/xr1qfwR4eubcJJp0cZAwHiJQj8uv41JoOl6dpsBFjax24Y5YKuCT71evLtYkOW2gdSaEc1bFzqT5oux5H4z8JP4eQ3VrO09kTg7/vRn39R712HwH01hYarrDrgTSLbx/RRlj/AOPD8q4Dxx4tOrztp9nJ/oaN+8cf8tGHb6Cvefh7pg0nwFo9vjDPAJ3+r/Pz/wB9Y/CtaSXMTjq9V4dKpuz/2Q==" },
+    anthropics: { handle: "@anthropics", img: "data:image/png;base64,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" },
+    you: { handle: "your team", self: "you" },
+    sam: { handle: "Sam", self: "mate" },
   };
-  const SOURCES = [
-    { id: "library", kicker: "Public", title: "omgskills library", skills: ["humanizer", "grill-me", "ios-expert", "web-expert"] },
-    { id: "team", kicker: "Private", title: "Your team's GitHub", skills: ["team-skill-1", "team-skill-2"] },
-  ];
-  const OWNERS = {
-    you: { omg: "Your OMG", ref: "your OMG", who: "You", short: "you" },
-    mate: { omg: "Sam's OMG", ref: "Sam's OMG", who: "Teammate", short: "Sam" },
-  };
-  // owner = whose OMG collects the skill; author = who wrote it
+  // omg = whose OMG holds it
   const SKILLS = {
-    "humanizer": { owner: "you", author: "lena" },
-    "grill-me": { owner: "you", author: "kai" },
-    "ios-expert": { owner: "you", author: "arjun" },
-    "team-skill-1": { owner: "you", author: "you", private: true },
-    "web-expert": { owner: "mate", author: "sofia" },
-    "team-skill-2": { owner: "mate", author: "sam", private: true },
+    "grill-me": { author: "mattpocock", omg: "you" },
+    "humanizer": { author: "blader", omg: "you" },
+    "swiftui-pro": { author: "twostraws", omg: "you" },
+    "release-notes": { author: "you", omg: "you", private: true },
+    "frontend-design": { author: "anthropics", omg: "mate" },
+    "brand-voice": { author: "sam", omg: "mate", private: true },
   };
+  const SOURCE_ORDER = ["grill-me", "humanizer", "swiftui-pro", "release-notes"];
   const AGENTS = [
-    { id: "you-chatgpt", name: "ChatGPT", kind: "Personal · you", owners: ["you"], skills: ["ios-expert", "grill-me", "humanizer"] },
-    { id: "you-claude", name: "Claude", kind: "Personal · you", owners: ["you"], skills: ["humanizer"] },
-    { id: "team-hermes", name: "Hermes", kind: "Team", owners: ["you"], skills: ["grill-me", "humanizer"] },
-    { id: "team-chatgpt", name: "ChatGPT", kind: "Team · shared", owners: ["you", "mate"], skills: ["humanizer", "team-skill-1", "ios-expert", "grill-me", "web-expert", "team-skill-2"] },
-    { id: "mate-chatgpt", name: "ChatGPT", kind: "Personal · Sam", owners: ["mate"], skills: ["web-expert"] },
+    { id: "chatgpt", kind: "Personal", name: "ChatGPT", from: { you: ["swiftui-pro", "grill-me", "humanizer"] } },
+    { id: "claude", kind: "Personal", name: "Claude", from: { you: ["humanizer"] } },
+    { id: "hermes", kind: "Team", name: "Hermes", from: { you: ["grill-me", "release-notes"] } },
+    { id: "team-chatgpt", kind: "Team", name: "ChatGPT", shared: true, from: { you: ["humanizer", "release-notes"], mate: ["frontend-design", "brand-voice"] } },
+  ];
+  const STEPS = [
+    { label: "Find", title: "Skills are written by people all over GitHub",
+      body: "<code>grill-me</code> comes from @mattpocock, <code>humanizer</code> from @blader, <code>swiftui-pro</code> from @twostraws. Your team also writes private skills of its own." },
+    { label: "Collect", title: "Collect the ones you want into your OMG",
+      body: "Your OMG is your personal skill library. Each skill is added once, whoever wrote it." },
+    { label: "Send", title: "Send each agent only the skills it needs",
+      body: "Your ChatGPT gets three skills. Claude stays lean with just <code>humanizer</code>. The team agents get the team's private <code>release-notes</code>." },
+    { label: "Share", title: "Team agents combine everyone's picks",
+      body: "Sam sends skills from their own OMG to the same team ChatGPT, so it ends up with skills from both of you." },
   ];
 
+  // ---- Geometry
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("flow");
-  const status = document.getElementById("status");
-  const REST = "Point at a skill or an agent to trace it from author to agent.";
-  const W = 1320, TOP = 44, PAD = 16, CH = 26, CG = 8, RG = 8, GAP = 18, HEAD = 56;
-  const SRC_X = 24, SRC_W = 262, OMG_X = 400, OMG_W = 280, AG_X = 884, AG_W = 416;
+  const W = 800, CH = 30, CG = 8, M = 20;
+  const AG_Y = 392, AG_GAP = 14, AG_W = (W - 2 * M - 3 * AG_GAP) / 4;
+  const OMG_Y = 176, MATE_Y = 204;
 
   const el = (tag, attrs, parent) => {
     const n = document.createElementNS(NS, tag);
@@ -205,238 +236,290 @@
     t.textContent = s;
     return t;
   };
-  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
-  const agentsWith = (name) => AGENTS.filter((a) => a.skills.includes(name));
-  const agentLabel = (a) =>
-    (a.kind.startsWith("Team") ? "team " : a.owners[0] === "you" ? "your " : "Sam's ") + a.name;
-
-  let measurer;
-  const chipWidth = (name) => {
-    measurer.textContent = name;
-    const tw = Math.ceil(measurer.getComputedTextLength());
-    return tw + 40 + (SKILLS[name].private ? 14 : 0);
+  const place = (node, x, y, opacity, delay) => {
+    node.style.transform = `translate(${x}px, ${y}px)`;
+    node.style.opacity = opacity;
+    node.style.transitionDelay = (delay || 0) + "ms";
   };
 
-  function chip(parent, name, x, y, neutral) {
+  let measurer;
+  const chipW = (name) => {
+    measurer.textContent = name;
+    return Math.ceil(measurer.getComputedTextLength()) + 44 + (SKILLS[name].private ? 14 : 0);
+  };
+
+  function avatar(g, who, cx, cy, r) {
+    const p = PEOPLE[who];
+    if (p.img) {
+      el("image", { href: p.img, x: cx - r, y: cy - r, width: 2 * r, height: 2 * r, "clip-path": "url(#round)", preserveAspectRatio: "xMidYMid slice" }, g);
+      el("circle", { class: "avatar-ring", cx, cy, r }, g);
+    } else {
+      el("circle", { class: "person-bg " + p.self, cx, cy, r }, g);
+      el("circle", { class: "person", cx, cy: cy - r * 0.22, r: r * 0.32 }, g);
+      el("path", { class: "person", d: `M${cx - r * 0.58} ${cy + r * 0.62}a${r * 0.58} ${r * 0.5} 0 0 1 ${r * 1.16} 0z` }, g);
+    }
+  }
+
+  // A chip is drawn at the origin and moved with CSS transforms.
+  function chip(parent, name, variant, extra) {
     const s = SKILLS[name];
-    const p = PEOPLE[s.author];
-    const w = chipWidth(name);
-    const g = el("g", {
-      class: `chip ${neutral ? "src" : s.owner}${s.private ? " private" : ""}`,
-      "data-skill": name, tabindex: 0, role: "button",
-      "aria-label": `${name} by ${p.name}${s.private ? ", private team skill" : ""}`,
-      transform: `translate(${x} ${y})`,
-    }, parent);
-    el("rect", { width: w, height: CH, rx: 6 }, g);
-    el("circle", { cx: 13, cy: CH / 2, r: 8.5, fill: p.color }, g);
-    el("circle", { class: "avatar-ring", cx: 13, cy: CH / 2, r: 9.25 }, g);
-    txt(g, 13, CH / 2 + 3, p.initials, "initial", "middle");
-    txt(g, 28, 17.5, name);
+    const w = chipW(name);
+    const g = el("g", { class: `chip anim ${variant}${s.private ? " private" : ""} ${extra || ""}`, "data-skill": name }, parent);
+    el("rect", { class: "bg", width: w, height: CH, rx: 7 }, g);
+    avatar(g, s.author, 15, CH / 2, 10);
+    txt(g, 31, 19.5, name, "name");
     if (s.private) {
-      const cx = w - 14, cy = CH / 2 + 1;
+      const cx = w - 15, cy = CH / 2 + 1;
       el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1 }, g);
       el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, g);
     }
-    return w;
-  }
-
-  function wrapChips(names, maxW) {
-    const rows = [[]];
-    let x = 0;
-    for (const name of names) {
-      const w = chipWidth(name);
-      if (x > 0 && x + w > maxW) { rows.push([]); x = 0; }
-      rows[rows.length - 1].push({ name, w });
-      x += w + CG;
-    }
-    return rows;
+    return g;
   }
 
   function curve(sx, sy, ex, ey) {
-    const c = (ex - sx) * 0.45;
-    return {
-      d: `M${sx} ${sy}C${sx + c} ${sy} ${ex - c} ${ey} ${ex} ${ey}`,
-      at(t) {
-        const u = 1 - t, c1 = sx + c, c2 = ex - c;
-        return [
-          u * u * u * sx + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t * t * t * ex,
-          u * u * u * sy + 3 * u * u * t * sy + 3 * u * t * t * ey + t * t * t * ey,
-        ];
-      },
+    const c = (ey - sy) * 0.5;
+    const at = (t) => {
+      const u = 1 - t;
+      return [
+        u * u * u * sx + 3 * u * u * t * sx + 3 * u * t * t * ex + t * t * t * ex,
+        u * u * u * sy + 3 * u * u * t * (sy + c) + 3 * u * t * t * (ey - c) + t * t * t * ey,
+      ];
     };
+    return { d: `M${sx} ${sy}C${sx} ${sy + c} ${ex} ${ey - c} ${ex} ${ey}`, at };
   }
 
-  const listHeight = (n) => HEAD + n * CH + (n - 1) * RG + PAD;
+  // Everything that changes per step registers here: fn(step) -> void
+  let steppers = [];
 
-  function render() {
+  function build() {
     svg.textContent = "";
-    measurer = el("text", { x: -999, y: -999, style: "font-family: var(--mono); font-size: 12px" }, svg);
+    steppers = [];
+    measurer = el("text", { x: -999, y: -999, style: "font-family: var(--mono); font-size: 12.5px" }, svg);
     const defs = el("defs", {}, svg);
-    for (const o of Object.keys(OWNERS)) {
+    const clip = el("clipPath", { id: "round", clipPathUnits: "objectBoundingBox" }, defs);
+    el("circle", { cx: 0.5, cy: 0.5, r: 0.5 }, clip);
+    for (const o of ["you", "mate"]) {
       const m = el("marker", { id: "arrow-" + o, class: "arrow " + o, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto" }, defs);
       el("path", { d: "M0,1 L10,5 L0,9 z" }, m);
     }
     const linkLayer = el("g", {}, svg);
-    const nodeLayer = el("g", {}, svg);
-    const head = (x, n, label) => {
-      const t = el("text", { x, y: 24, class: "col-head" }, nodeLayer);
-      const s = el("tspan", { class: "step" }, t);
-      s.textContent = n + "  ";
-      t.appendChild(document.createTextNode(label));
+    const cardLayer = el("g", {}, svg);
+    const chipLayer = el("g", {}, svg);
+
+    // Row labels
+    const label = (y, s, from) => {
+      const t = txt(cardLayer, M, y, s, "row-label anim");
+      steppers.push((st) => place(t, 0, 0, st >= from ? 1 : 0));
     };
-    head(SRC_X, "1", "COLLECT SKILLS");
-    head(OMG_X, "2", "ORGANIZE IN AN OMG");
-    head(AG_X, "3", "SEND TO AGENTS");
+    label(24, "SKILLS", 0);
+    label(OMG_Y - 12, "YOUR LIBRARY", 1);
+    label(AG_Y - 14, "AGENTS", 2);
 
-    // Agents
-    let y = TOP;
-    const boxes = {};
-    for (const a of AGENTS) {
-      const rows = wrapChips(a.skills, AG_W - 2 * PAD);
-      const h = HEAD + rows.length * CH + (rows.length - 1) * RG + PAD;
-      boxes[a.id] = { y, h, rows };
-      y += h + GAP;
-    }
-    const agentsBottom = y - GAP;
-
-    // OMGs, centered on the agents each one feeds
-    const omgBoxes = {};
-    let minTop = TOP;
-    for (const o of Object.keys(OWNERS)) {
-      const names = Object.keys(SKILLS).filter((n) => SKILLS[n].owner === o);
-      const h = listHeight(names.length);
-      const fed = AGENTS.filter((a) => a.owners.includes(o)).map((a) => boxes[a.id]);
-      const mid = (fed[0].y + fed[fed.length - 1].y + fed[fed.length - 1].h) / 2;
-      const top = Math.max(minTop, mid - h / 2);
-      omgBoxes[o] = { y: top, h, names };
-      minTop = top + h + 28;
-    }
-    const contentBottom = Math.max(agentsBottom, minTop - 28);
-
-    // Sources, centered vertically against everything else
-    const srcHeights = SOURCES.map((s) => listHeight(s.skills.length));
-    const srcTotal = srcHeights.reduce((a, b) => a + b, 0) + 28 * (SOURCES.length - 1);
-    let sy = Math.max(TOP, TOP + (contentBottom - TOP - srcTotal) / 2);
-    const rowPos = {};
-    SOURCES.forEach((src, i) => {
-      const h = srcHeights[i];
-      const g = el("g", { class: "source" }, nodeLayer);
-      el("rect", { class: "card", x: SRC_X, y: sy, width: SRC_W, height: h, rx: 12 }, g);
-      txt(g, SRC_X + PAD, sy + 24, src.kicker.toUpperCase(), "kicker");
-      txt(g, SRC_X + PAD, sy + 45, src.title, "card-title");
-      src.skills.forEach((name, k) => {
-        const ry = sy + HEAD + k * (CH + RG);
-        chip(g, name, SRC_X + PAD, ry, true);
-        const a = txt(g, SRC_X + SRC_W - PAD, ry + 17.5, PEOPLE[SKILLS[name].author].name, "author", "end");
-        a.setAttribute("data-skill", name);
-        rowPos[name] = { src: ry + CH / 2 };
-      });
-      sy += h + 28;
+    // 1. Loose source chips, scattered
+    const widths = SOURCE_ORDER.map(chipW);
+    const free = W - 2 * M - widths.reduce((a, b) => a + b, 0);
+    const jitter = [8, 30, 0, 24];
+    const tilt = [-2, 1.5, -1, 2];
+    const srcPos = {};
+    let x = M + free / (SOURCE_ORDER.length * 2);
+    SOURCE_ORDER.forEach((name, i) => {
+      const y = 44 + jitter[i];
+      srcPos[name] = { x, y };
+      const holder = el("g", { class: "anim" }, chipLayer);
+      const c = chip(holder, name, "src");
+      c.classList.remove("anim");
+      c.setAttribute("transform", `rotate(${tilt[i]} ${widths[i] / 2} ${CH / 2})`);
+      const h = txt(holder, widths[i] / 2, CH + 17, PEOPLE[SKILLS[name].author].handle, "handle", "middle");
+      steppers.push((st) => place(holder, srcPos[name].x, srcPos[name].y + (st === 0 ? 0 : 0), st === 0 ? 1 : 0.38, st === 0 ? i * 90 : 0));
+      x += widths[i] + free / SOURCE_ORDER.length;
     });
-    const H = Math.max(contentBottom, sy - 28) + 20;
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
-    for (const [o, b] of Object.entries(omgBoxes)) {
-      const g = el("g", { class: "omg " + o }, nodeLayer);
-      el("rect", { class: "card", x: OMG_X, y: b.y, width: OMG_W, height: b.h, rx: 12 }, g);
-      el("circle", { class: "dot " + o, cx: OMG_X + PAD + 4, cy: b.y + 20, r: 4 }, g);
-      txt(g, OMG_X + PAD + 14, b.y + 24, OWNERS[o].who.toUpperCase(), "kicker");
-      txt(g, OMG_X + PAD, b.y + 45, OWNERS[o].omg, "card-title");
-      b.names.forEach((name, i) => {
-        const ry = b.y + HEAD + i * (CH + RG);
-        chip(g, name, OMG_X + PAD, ry);
-        const n = agentsWith(name).length;
-        const c = txt(g, OMG_X + OMG_W - PAD, ry + 17.5, `→ ${plural(n, "agent")}`, "count", "end");
-        c.setAttribute("data-skill", name);
-        // Collect link: source row -> this OMG row
-        const cv = curve(SRC_X + SRC_W, rowPos[name].src, OMG_X - 2, ry + CH / 2);
-        const lg = el("g", { class: "link collect " + o, "data-skills": name }, linkLayer);
-        el("path", { d: cv.d, "marker-end": `url(#arrow-${o})` }, lg);
-      });
-    }
-
-    for (const a of AGENTS) {
-      const b = boxes[a.id];
-      const shared = a.owners.length > 1;
-      const g = el("g", {
-        class: "agent" + (shared ? " shared" : ""), "data-agent": a.id, tabindex: 0, role: "button",
-        "aria-label": `${a.kind} ${a.name} with ${plural(a.skills.length, "skill")}: ${a.skills.join(", ")}`,
-      }, nodeLayer);
-      const body = el("g", { class: "card-body" }, g);
-      el("rect", { class: "card", x: AG_X, y: b.y, width: AG_W, height: b.h, rx: 12 }, body);
-      let dx = AG_X + PAD;
-      for (const o of a.owners) { el("circle", { class: "dot " + o, cx: dx + 4, cy: b.y + 20, r: 4 }, body); dx += 11; }
-      txt(body, dx + 3, b.y + 24, a.kind.toUpperCase(), "kicker");
-      txt(body, AG_X + PAD, b.y + 45, a.name, "card-title");
-      b.rows.forEach((row, ri) => {
-        let cx = AG_X + PAD;
-        for (const c of row) { chip(g, c.name, cx, b.y + HEAD + ri * (CH + RG)); cx += c.w + CG; }
-      });
-
-      a.owners.forEach((o, i) => {
-        const ob = omgBoxes[o];
-        const out = AGENTS.filter((x) => x.owners.includes(o));
-        const k = out.indexOf(a);
-        const sx = OMG_X + OMG_W, sy0 = ob.y + 34 + ((k + 0.5) * (ob.h - 68)) / out.length;
-        const ex = AG_X - 2, ey = b.y + b.h / 2 + (shared ? (i - (a.owners.length - 1) / 2) * 26 : 0);
-        const mine = a.skills.filter((n) => SKILLS[n].owner === o);
-        const cv = curve(sx, sy0, ex, ey);
-        const lg = el("g", { class: "link send " + o, "data-agent": a.id, "data-skills": mine.join(" ") }, linkLayer);
-        el("path", { d: cv.d, "marker-end": `url(#arrow-${o})` }, lg);
-        const [lx, ly] = cv.at(0.66);
-        txt(lg, lx, ly + 4, shared ? `${mine.length} from ${OWNERS[o].short}` : plural(mine.length, "skill"), "", "middle");
-      });
-    }
-  }
-
-  // Tracing
-  const all = (sel) => svg.querySelectorAll(sel);
-  const mark = (sel) => all(sel).forEach((n) => n.classList.add("on"));
-  function clear() {
-    svg.classList.remove("focusing");
-    all(".on").forEach((n) => n.classList.remove("on"));
-  }
-  function focusSkill(name) {
-    clear();
-    svg.classList.add("focusing");
-    mark(`[data-skill="${name}"]`);
-    const hits = agentsWith(name);
-    hits.forEach((a) => mark(`.agent[data-agent="${a.id}"]`));
-    all(".link").forEach((l) => { if (l.dataset.skills.split(" ").includes(name)) l.classList.add("on"); });
-    const s = SKILLS[name];
-    const by = s.author === "you" ? "written by you" : `by ${PEOPLE[s.author].name}`;
-    status.innerHTML = `<b>${name}</b> ${by} is collected once into ${OWNERS[s.owner].ref} and reaches ${plural(hits.length, "agent")}: ${hits.map(agentLabel).join(", ")}.`;
-  }
-  function focusAgent(id) {
-    clear();
-    svg.classList.add("focusing");
-    const a = AGENTS.find((x) => x.id === id);
-    const card = svg.querySelector(`.agent[data-agent="${id}"]`);
-    card.classList.add("on");
-    card.querySelectorAll(".chip").forEach((n) => n.classList.add("on"));
-    a.skills.forEach((n) => {
-      mark(`.source [data-skill="${n}"], .omg [data-skill="${n}"], .link.collect[data-skills="${n}"]`);
+    // 2. Your OMG: 2 x 2 grid
+    const mine = SOURCE_ORDER;
+    const colW = Math.max(...mine.map(chipW));
+    const omgW = 2 * colW + CG + 32, omgH = 58 + 2 * CH + CG + 16;
+    const agentX = (i) => M + i * (AG_W + AG_GAP);
+    const omgX = (agentX(0) + agentX(2) + AG_W) / 2 - omgW / 2;
+    const omg = el("g", { class: "omg-you anim" }, cardLayer);
+    el("rect", { class: "card", x: 0, y: 0, width: omgW, height: omgH, rx: 14 }, omg);
+    el("circle", { class: "dot you", cx: 20, cy: 20, r: 4 }, omg);
+    txt(omg, 30, 24, "YOU", "kicker");
+    txt(omg, 16, 46, "Your OMG", "title");
+    steppers.push((st) => place(omg, omgX, st >= 1 ? OMG_Y : OMG_Y + 12, st >= 1 ? 1 : 0));
+    const slot = {};
+    mine.forEach((name, i) => {
+      slot[name] = { x: omgX + 16 + (i % 2) * (colW + CG), y: OMG_Y + 58 + Math.floor(i / 2) * (CH + CG) };
+      const c = chip(chipLayer, name, "you");
+      steppers.push((st) => st >= 1
+        ? place(c, slot[name].x, slot[name].y, 1, 250 + i * 140)
+        : place(c, srcPos[name].x, srcPos[name].y, 0));
     });
-    mark(`.link[data-agent="${id}"]`);
-    const authors = [...new Set(a.skills.map((n) => SKILLS[n].author))].length;
-    const from = a.owners.map((o) => OWNERS[o].ref).join(" and ");
-    const label = agentLabel(a).replace(/^./, (c) => c.toUpperCase());
-    status.textContent = `${label} gets ${plural(a.skills.length, "skill")} by ${plural(authors, "author")}, sent from ${from}.`;
-  }
-  const rest = () => { clear(); status.textContent = REST; };
-  function handle(target) {
-    const c = target.closest && target.closest(".chip");
-    if (c) return focusSkill(c.dataset.skill);
-    const a = target.closest && target.closest(".agent");
-    if (a) return focusAgent(a.dataset.agent);
-    rest();
-  }
-  svg.addEventListener("pointerover", (e) => handle(e.target));
-  svg.addEventListener("pointerleave", rest);
-  svg.addEventListener("focusin", (e) => handle(e.target));
-  svg.addEventListener("focusout", (e) => { if (!svg.contains(e.relatedTarget)) rest(); });
 
-  render();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+    // Sam's OMG: smaller, quieter, sits above the team agent it feeds
+    const theirs = Object.keys(SKILLS).filter((n) => SKILLS[n].omg === "mate");
+    const mColW = Math.max(...theirs.map(chipW));
+    const mW = mColW + 24, mH = 50 + theirs.length * CH + (theirs.length - 1) * CG + 12;
+    const mX = Math.min(W - M - mW, agentX(3) + AG_W / 2 - mW / 2);
+    const mate = el("g", { class: "omg-mate anim" }, cardLayer);
+    el("rect", { class: "card", x: 0, y: 0, width: mW, height: mH, rx: 12 }, mate);
+    el("circle", { class: "dot mate", cx: 16, cy: 18, r: 3.5 }, mate);
+    txt(mate, 25, 22, "TEAMMATE", "kicker");
+    txt(mate, 12, 40, "Sam's OMG", "title");
+    steppers.push((st) => place(mate, mX, st >= 3 ? MATE_Y : MATE_Y - 10, st >= 3 ? 1 : 0));
+    theirs.forEach((name, i) => {
+      slot[name] = { x: mX + 12, y: MATE_Y + 50 + i * (CH + CG) };
+      const c = chip(chipLayer, name, "mate");
+      steppers.push((st) => place(c, slot[name].x, st >= 3 ? slot[name].y : slot[name].y - 10, st >= 3 ? 1 : 0, st >= 3 ? 120 + i * 80 : 0));
+    });
+
+    // 3 + 4. Agents
+    const omgBottom = OMG_Y + omgH;
+    AGENTS.forEach((a, ai) => {
+      const ax = agentX(ai);
+      const list = [...(a.from.you || []), ...(a.from.mate || [])];
+      const h = 50 + list.length * CH + (list.length - 1) * CG + 14;
+      const card = el("g", { class: "agent anim" + (a.shared ? " shared" : "") }, cardLayer);
+      el("rect", { class: "card", x: 0, y: 0, width: AG_W, height: h, rx: 12 }, card);
+      el("circle", { class: "dot you", cx: 16, cy: 18, r: 3.5 }, card);
+      const k1 = txt(card, 25, 22, a.kind.toUpperCase(), "kicker");
+      txt(card, 12, 42, a.name, "title");
+      let mateBits = [];
+      if (a.shared) {
+        const d2 = el("circle", { class: "dot mate anim", cx: 26, cy: 18, r: 3.5 }, card);
+        const k2 = txt(card, 35, 22, "TEAM · SHARED", "kicker anim");
+        k1.classList.add("anim");
+        mateBits = [d2, k2, k1];
+      }
+      steppers.push((st) => {
+        place(card, ax, st >= 2 ? AG_Y : AG_Y + 14, st >= 2 ? 1 : 0, st >= 2 ? ai * 90 : 0);
+        card.classList.toggle("lit", !!a.shared && st >= 3);
+        if (mateBits.length) {
+          mateBits[0].style.opacity = st >= 3 ? 1 : 0;
+          mateBits[1].style.opacity = st >= 3 ? 1 : 0;
+          mateBits[2].style.opacity = st >= 3 ? 0 : 1;
+        }
+      });
+
+      list.forEach((name, k) => {
+        const owner = SKILLS[name].omg;
+        const at = owner === "mate" ? 3 : 2;
+        const c = chip(chipLayer, name, owner);
+        const tx = ax + 12, ty = AG_Y + 50 + k * (CH + CG);
+        steppers.push((st) => st >= at
+          ? place(c, tx, ty, 1, 350 + (owner === "mate" ? 0 : ai * 160) + k * 90)
+          : place(c, slot[name].x, slot[name].y, 0));
+      });
+
+      // Links
+      for (const o of Object.keys(a.from)) {
+        const n = a.from[o].length;
+        const sx = o === "you" ? omgX + omgW * (ai + 1) / (AGENTS.length + 1) : mX + mW / 2;
+        const sy = o === "you" ? omgBottom : MATE_Y + mH;
+        const ex = ax + AG_W / 2 + (a.shared ? (o === "you" ? -26 : 26) : 0);
+        const ey = AG_Y - 3;
+        const cv = curve(sx, sy, ex, ey);
+        const lg = el("g", { class: "link draw " + o }, linkLayer);
+        const p = el("path", { d: cv.d, pathLength: 1, "marker-end": `url(#arrow-${o})` }, lg);
+        if (o === "you") p.setAttribute("stroke-dasharray", "1 1");
+        const [lx, ly] = cv.at(0.5);
+        const t = txt(lg, lx, ly + 4, a.shared ? `${n} from ${o === "you" ? "you" : "Sam"}` : `${n} skill${n === 1 ? "" : "s"}`, "anim", "middle");
+        const from = o === "mate" ? 3 : 2;
+        steppers.push((st) => {
+          const on = st >= from;
+          if (o === "you") {
+            p.style.strokeDashoffset = on ? 0 : 1;
+            p.style.transitionDelay = on ? 150 + ai * 120 + "ms" : "0ms";
+          }
+          lg.style.opacity = on ? 1 : 0;
+          lg.style.transition = "opacity 300ms ease";
+          lg.style.transitionDelay = on ? 150 + ai * 120 + "ms" : "0ms";
+          t.style.opacity = on ? 1 : 0;
+        });
+      }
+    });
+
+    const agentsBottom = AG_Y + Math.max(...AGENTS.map((a) => {
+      const n = Object.values(a.from).flat().length;
+      return 50 + n * CH + (n - 1) * CG + 14;
+    }));
+    svg.setAttribute("viewBox", `0 0 ${W} ${agentsBottom + 16}`);
+    measurer.remove();
+  }
+
+  // ---- Playback
+  const stepsEl = document.getElementById("steps");
+  const capTitle = document.getElementById("cap-title");
+  const capBody = document.getElementById("cap-body");
+  const replay = document.getElementById("replay");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const HOLD = 4200;
+  let current = 0, timer = null;
+
+  STEPS.forEach((s, i) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = `<span class="n">${i + 1}</span>${s.label}`;
+    b.addEventListener("click", () => { stop(); show(i); });
+    li.appendChild(b);
+    stepsEl.appendChild(li);
+  });
+  const buttons = [...stepsEl.querySelectorAll("button")];
+
+  function show(i) {
+    current = i;
+    steppers.forEach((f) => f(i));
+    buttons.forEach((b, k) => {
+      if (k === i) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+      b.classList.toggle("done", k < i);
+    });
+    capTitle.textContent = STEPS[i].title;
+    capBody.innerHTML = STEPS[i].body;
+  }
+  function stop() { clearTimeout(timer); timer = null; }
+  function tick() {
+    if (current >= STEPS.length - 1) { stop(); return; }
+    show(current + 1);
+    timer = setTimeout(tick, HOLD);
+  }
+  function play() {
+    stop();
+    svg.classList.add("instant");
+    show(0);
+    svg.getBoundingClientRect();
+    requestAnimationFrame(() => {
+      svg.classList.remove("instant");
+      timer = setTimeout(tick, HOLD);
+    });
+  }
+  replay.addEventListener("click", play);
+
+  // Hover a chip to see every copy of that skill
+  svg.addEventListener("pointerover", (e) => {
+    const c = e.target.closest && e.target.closest(".chip");
+    svg.classList.toggle("tracing", !!c);
+    svg.querySelectorAll(".chip.hit").forEach((n) => n.classList.remove("hit"));
+    if (c) svg.querySelectorAll(`.chip[data-skill="${c.dataset.skill}"]`).forEach((n) => n.classList.add("hit"));
+  });
+  svg.addEventListener("pointerleave", () => svg.classList.remove("tracing"));
+
+  function start() {
+    build();
+    svg.classList.add("instant");
+    if (reduced) { show(STEPS.length - 1); svg.classList.remove("instant"); return; }
+    play();
+  }
+  start();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      const keep = current, playing = !!timer;
+      build();
+      svg.classList.add("instant");
+      show(keep);
+      svg.getBoundingClientRect();
+      requestAnimationFrame(() => svg.classList.remove("instant"));
+      if (!playing && !reduced && keep === 0) timer = setTimeout(tick, HOLD);
+    });
+  }
 })();
 </script>
