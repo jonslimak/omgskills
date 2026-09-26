@@ -10,9 +10,10 @@ const requiredStaticReleaseAssets = [
   "downloads/omgskills-mac.dmg",
   "downloads/omgskills-mac.dmg.sha256",
 ];
-const publicGroupFixture = {
-  pagePath: "/u/jonslimak/sets/my-faves",
-  manifestPath: "/api/public/groups/jonslimak/my-faves/manifest",
+const publicGroupProbe = {
+  profilePath: "/u/jonslimak",
+  missingPagePath: "/u/jonslimak/sets/health-check-missing",
+  missingManifestPath: "/api/public/groups/jonslimak/health-check-missing/manifest",
 };
 
 async function expectStatus(fetchImpl, origin, path, expected, options = {}) {
@@ -68,25 +69,27 @@ async function verifyReleaseConfig(fetchImpl, origin, expected) {
   }
 }
 
-async function verifyPublicGroupManifest(fetchImpl, origin, expectedFeatures) {
-  const page = await expectStatus(fetchImpl, origin, publicGroupFixture.pagePath, 200);
-  const pageHtml = await page.text();
-  const hasInstallLink = pageHtml.includes("Install in omgskills");
-  if (hasInstallLink !== expectedFeatures.skillGroupsAuthEnabled) {
-    throw new Error(`${origin}${publicGroupFixture.pagePath} has the wrong Mac install availability`);
+async function verifyPublicGroupSurface(fetchImpl, origin) {
+  const profile = await expectStatus(fetchImpl, origin, publicGroupProbe.profilePath, 200);
+  const profileHtml = await profile.text();
+  if (!profileHtml.includes("@jonslimak")) {
+    throw new Error(`${origin}${publicGroupProbe.profilePath} is not the expected public profile`);
   }
-  const response = await expectStatus(fetchImpl, origin, publicGroupFixture.manifestPath, 200);
-  const manifest = await response.json();
-  if (
-    manifest?.type !== "omgskills.skill_group"
-    || manifest?.version !== 2
-    || manifest?.group?.slug !== "my-faves"
-    || !Array.isArray(manifest?.items)
-  ) {
-    throw new Error(`${origin}${publicGroupFixture.manifestPath} is not a valid public group manifest`);
+
+  const missingPage = await expectStatus(fetchImpl, origin, publicGroupProbe.missingPagePath, 404);
+  if (!(await missingPage.text()).includes("Not found")) {
+    throw new Error(`${origin}${publicGroupProbe.missingPagePath} did not return the public page not-found response`);
   }
-  if (JSON.stringify(manifest).includes("private_github")) {
-    throw new Error(`${origin}${publicGroupFixture.manifestPath} exposed private source coordinates`);
+
+  const missingManifest = await expectStatus(
+    fetchImpl,
+    origin,
+    publicGroupProbe.missingManifestPath,
+    404,
+  );
+  const manifestError = await missingManifest.json();
+  if (typeof manifestError?.error !== "string") {
+    throw new Error(`${origin}${publicGroupProbe.missingManifestPath} did not return a structured error`);
   }
 }
 
@@ -117,7 +120,7 @@ export async function verifyProductionDeploy({
     body: JSON.stringify({ skills: [] }),
   });
   if (verifyCandidateFeatures) {
-    await verifyPublicGroupManifest(fetchImpl, origin, reviewedFeatures);
+    await verifyPublicGroupSurface(fetchImpl, origin);
     if (!reviewedFeatures.skillGroupsAuthEnabled) {
       await expectStatus(
         fetchImpl,

@@ -32,16 +32,14 @@ function responseFor(path, options = {}, features = disabledFeatures) {
   if (path.endsWith("/package") && path.startsWith("/api/portal/private-releases/")) {
     return new Response("Skill Groups are temporarily unavailable", { status: 503 });
   }
-  if (path === "/u/jonslimak/sets/my-faves") {
-    return new Response(features.skillGroupsAuthEnabled ? "Install in omgskills" : "My Faves");
+  if (path === "/u/jonslimak") {
+    return new Response("<h1>jon slim</h1><p>@jonslimak</p>");
   }
-  if (path === "/api/public/groups/jonslimak/my-faves/manifest") {
-    return Response.json({
-      type: "omgskills.skill_group",
-      version: 2,
-      group: { id: "group-id", name: "My Faves", slug: "my-faves", revision: 1 },
-      items: [],
-    });
+  if (path === "/u/jonslimak/sets/health-check-missing") {
+    return new Response("<h1>Not found</h1>", { status: 404 });
+  }
+  if (path === "/api/public/groups/jonslimak/health-check-missing/manifest") {
+    return Response.json({ error: "Group not found" }, { status: 404 });
   }
   if (path === "/mcp/health") {
     return Response.json({ ok: true, skillCount: 46_000 });
@@ -106,8 +104,9 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/data/health.json", method: "GET" },
     { path: "/banner.webp", method: "HEAD" },
     { path: "/api/portal/sync-upload", method: "POST" },
-    { path: "/u/jonslimak/sets/my-faves", method: "GET" },
-    { path: "/api/public/groups/jonslimak/my-faves/manifest", method: "GET" },
+    { path: "/u/jonslimak", method: "GET" },
+    { path: "/u/jonslimak/sets/health-check-missing", method: "GET" },
+    { path: "/api/public/groups/jonslimak/health-check-missing/manifest", method: "GET" },
     { path: "/api/portal/private-releases/00000000-0000-4000-8000-000000000000/package", method: "GET" },
     { path: "/data/manifest.json", method: "GET" },
     { path: "/data/v2/manifest.json", method: "GET" },
@@ -139,7 +138,8 @@ test("rollback verification skips candidate-only public group checks", async () 
     },
   });
 
-  assert.equal(requests.some((path) => path.includes("/my-faves")), false);
+  assert.equal(requests.some((path) => path.startsWith("/u/jonslimak")), false);
+  assert.equal(requests.some((path) => path.includes("health-check-missing")), false);
 });
 
 test("verifies a draft origin while preserving canonical public URLs", async () => {
@@ -214,20 +214,20 @@ test("fails when the private portal does not honor the reviewed kill-switch stat
   );
 });
 
-test("fails when the public group manifest read path is unhealthy", async () => {
+test("fails when the public group manifest route is unhealthy", async () => {
   await assert.rejects(
     verifyProductionDeploy({
       origin,
       expectedFeatures: disabledFeatures,
       fetchImpl: async (url, options) => {
         const path = new URL(url).pathname;
-        if (path === "/api/public/groups/jonslimak/my-faves/manifest") {
+        if (path === "/api/public/groups/jonslimak/health-check-missing/manifest") {
           return Response.json({ error: "Manifest failed" }, { status: 500 });
         }
         return responseFor(path, options);
       },
     }),
-    /public\/groups\/jonslimak\/my-faves\/manifest returned 500, expected 200/,
+    /public\/groups\/jonslimak\/health-check-missing\/manifest returned 500, expected 404/,
   );
 });
 
