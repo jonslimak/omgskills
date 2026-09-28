@@ -171,7 +171,7 @@
   #flow .badge.create text { fill: #ffffff; }
   #flow .link.sync path { stroke: var(--update); }
   #flow .link.relay path { stroke: var(--create); }
-  #flow .pulse { fill: none; stroke: var(--update); stroke-width: 2; transform-box: fill-box; transform-origin: center; pointer-events: none; }
+  #flow .pulse { fill: none; stroke: var(--update); stroke-width: 0; stroke-linejoin: round; pointer-events: none; }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow .badge.author rect { fill: var(--ink); }
   #flow .badge.author text { fill: var(--bg); font-weight: 500; }
@@ -770,10 +770,14 @@
   // Single hop of the logo/avatar and name when a skill arrives
   function activate(a) {
     if (instant || reduced) return;
-    const k = (y, sc, offset) => ({ transform: `translateY(${y}px) scale(${sc})`, offset, easing: "cubic-bezier(0.33, 0, 0.3, 1)" });
     (a.pop || a.head).animate(
-      [k(0, 1, 0), k(-7, 1.06, 0.45), k(0, 1, 1)], // one clean hop, no rebounds
-      { duration: 520 }
+      // Quick lift, soft landing: fast out, gentle ease back, no rebound
+      [
+        { transform: "translateY(0) scale(1)", offset: 0, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
+        { transform: "translateY(-5px) scale(1.045)", offset: 0.32, easing: "cubic-bezier(0.35, 0, 0.25, 1)" },
+        { transform: "translateY(0) scale(1)", offset: 1 },
+      ],
+      { duration: 420 }
     );
   }
 
@@ -794,19 +798,18 @@
     return { lg, show: () => { lg.style.opacity = 1; } };
   }
 
-  // A soft green ring that ripples out from the pill and fades, marking the update
+  // A soft green glow that swells out from behind the pill and fades, marking the update.
+  // It grows by stroke width, so it keeps the pill's rounded shape exactly.
   function pulse(node) {
     if (instant || reduced) return;
     const bg = node.querySelector("rect.bg");
-    const w = +bg.getAttribute("width");
-    for (const delay of [0, 220]) {
-      const ring = el("rect", { class: "pulse", width: w, height: CH, rx: CH / 2 }, node);
-      const a = ring.animate(
-        [{ transform: "scale(1)", opacity: 0.7 }, { transform: "scale(1.16, 1.5)", opacity: 0 }],
-        { duration: 800, delay, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)", fill: "both" }
-      );
-      a.onfinish = () => ring.remove();
-    }
+    const glow = el("rect", { class: "pulse", width: bg.getAttribute("width"), height: CH, rx: CH / 2 });
+    node.insertBefore(glow, bg); // behind the pill, so only the outer halo shows
+    const a = glow.animate(
+      [{ strokeWidth: "0px", opacity: 0.55 }, { strokeWidth: "18px", opacity: 0 }],
+      { duration: 750, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" }
+    );
+    a.onfinish = () => glow.remove();
   }
 
   async function update(o, name) {
