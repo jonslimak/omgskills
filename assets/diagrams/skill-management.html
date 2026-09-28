@@ -502,6 +502,16 @@
     await sleep(900);
     holder.remove();
     if (created) created.g.remove();
+    // Teammate rows live inside their card from here on, so they swing in and out with it
+    if (o === mate) {
+      const r = mate.rows[i];
+      row.classList.remove("anim");
+      row.style.transition = "none";
+      row.style.transitionDelay = "0ms";
+      mate.g.appendChild(row);
+      place(row, 16, mate.head + i * (CH + CG), 1);
+      r.inCard = true;
+    }
   }
 
 
@@ -640,7 +650,7 @@
     mate.g.style.transition = "transform 520ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 200ms ease";
     mate.g.style.transform = `translate(${MATE_X}px, ${mate.y}px) scale(1)`;
     mate.rows.forEach((r, i) => {
-      if (skipLast && i === mate.rows.length - 1) return;
+      if (r.inCard || (skipLast && i === mate.rows.length - 1)) return;
       const p = rowPos(mate, i);
       r.el.style.transitionDelay = "0ms";
       place(r.el, p.x, p.y);
@@ -659,11 +669,7 @@
       : "transform 800ms cubic-bezier(0.5, 0, 0.3, 1), opacity 250ms ease 600ms";
     mate.g.style.transform = `translate(${cx - (MATE_W * s) / 2}px, ${cy - (h * s) / 2}px) scale(${s})`;
     mate.g.style.opacity = v ? 1 : 0;
-    mate.rows.forEach((r, i) => {
-      r.el.style.transitionDelay = v ? "550ms" : "0ms";
-      if (v) { const p = rowPos(mate, i); place(r.el, p.x, p.y); }
-      r.el.style.opacity = v ? 1 : 0;
-    });
+    // Rows are inside the card group, so they move, scale and fade with it
   }
 
   async function showMate() {
@@ -688,6 +694,7 @@
     await sleep(700);
     layers.chip.textContent = "";
     layers.link.textContent = "";
+    mate.rows.forEach((r) => r.el.remove());
     you.rows = []; mate.rows = []; mate.shown = false; mate.joined = false;
     tweenH(you.rect, cardH(ROW_Y, 0));
     tweenH(mate.rect, cardH(M_ROW, 0));
