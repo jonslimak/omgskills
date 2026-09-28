@@ -234,9 +234,11 @@
   // The story, played in order and then looped.
   // `phase` sets the headline when that event starts; it holds until the next phase.
   // Library skills floating above your card: [name, centre x, top y]
+  // Scattered around your card: two above, three down each side (the teammate card may cover some)
   const CLOUD = [
-    ["code-review", 150, 10], ["grill-me", 345, 18], ["napkin", 530, 8], ["humanizer", 715, 16],
-    ["swiftui-pro", 95, 60], ["gstack", 275, 66], ["mcp-builder", 580, 62], ["swiftdata-pro", 760, 58],
+    ["code-review", 320, 72], ["napkin", 540, 84],
+    ["grill-me", 150, 190], ["swiftui-pro", 105, 285], ["gstack", 175, 380],
+    ["humanizer", 700, 200], ["mcp-builder", 755, 295], ["swiftdata-pro", 690, 390],
   ];
   const EVENTS = [
     { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
@@ -401,7 +403,8 @@
     el("path", { d: "M0,1 L9,5 L0,9 z" }, m);
     const ms = el("marker", { id: "arrow-sync", class: "arrowhead sync", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, ms);
-    layers = { link: el("g", {}, svg), under: el("g", {}, svg), card: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), chip: el("g", {}, svg) };
+    // The cloud sits behind the cards, so the teammate card can cover part of it
+    layers = { link: el("g", {}, svg), under: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
 
     // You: the hero card
     const yg = el("g", { class: "anim" }, layers.card);
@@ -564,12 +567,13 @@
       holder.classList.add("anim");
       void holder.getBoundingClientRect();
     } else {
-      // Picked out of the floating cloud: it lifts, shows its author, the rest dim
+      // Picked out of the floating cloud: it is drawn toward your card and shows its author
       holder.remove();
       const e = cloud[name];
       delete cloud[name];
       holder = e.holder;
-      sx = e.x; sy = e.y - 6;
+      const pull = (OMG_X + OMG_W / 2 - (e.x + e.w / 2)) * 0.25;
+      sx = e.x + pull; sy = e.y - 4;
       layers.cloud.classList.add("picking");
       holder.classList.add("picked");
       holder.style.transition = ""; // back to the normal move + fade transition
