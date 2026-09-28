@@ -305,7 +305,10 @@
   // ---- Timing helpers (pausable)
   let paused = false, instant = false;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const frame = () => {
+    void svg.getBoundingClientRect(); // commit start positions before animating
+    return new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  };
   async function sleep(ms) {
     if (instant) return;
     let t = 0;
@@ -430,8 +433,6 @@
   // ---- Actions
   // Is this skill written by the card's own person? Then it hatches from the card.
   const madeBy = (o, name) => SKILLS[name].author === (o.key === "you" ? "you" : "sam");
-  const scaled = (node, x, y, s, w) =>
-    (node.style.transform = `translate(${x + (w / 2) * (1 - s)}px, ${y + (CH / 2) * (1 - s)}px) scale(${s})`);
 
   async function spawnAndCollect(o, name) {
     const w = chipW(name);
@@ -442,19 +443,24 @@
     let sx, sy, h = null;
 
     if (hatch) {
-      // Pops out of the card's avatar, springs above the card
+      // Pops out of the card's avatar and springs above the card (explicit keyframes)
+      holder.classList.remove("anim");
       const cx = o.x + o.w / 2, cy = o.y + (o.key === "you" ? 56 : 42);
       sx = cx - w / 2;
       sy = o.y - CH - 26;
-      scaled(holder, cx - w / 2, cy - CH / 2, 0.2, w);
-      holder.style.opacity = 0;
-      await frame();
-      holder.style.transition = "transform 720ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 220ms ease";
-      scaled(holder, sx, sy, 1, w);
+      const s0 = 0.2;
+      const startT = `translate(${cx - (w / 2) * s0}px, ${cy - (CH / 2) * s0}px) scale(${s0})`;
+      const endT = `translate(${sx}px, ${sy}px) scale(1)`;
+      holder.style.transform = endT;
       holder.style.opacity = 1;
+      holder.animate(
+        [{ transform: startT, opacity: 0 }, { transform: startT, opacity: 1, offset: 0.12 }, { transform: endT, opacity: 1 }],
+        { duration: instant ? 0 : 900, easing: "cubic-bezier(0.34, 1.4, 0.64, 1)" }
+      );
       say(`${WHO[o.key]} made <b>${name}</b>`);
-      await sleep(1300);
-      holder.style.transition = "";
+      await sleep(1500);
+      holder.classList.add("anim");
+      void holder.getBoundingClientRect();
     } else {
       const band = o.key === "you"
         ? { x0: 60, x1: W - 60 - w, y0: 18, y1: 60 }
@@ -480,7 +486,6 @@
     tweenH(o.rect, cardH(o.head, o.rows.length));
     await frame();
     if (h) h.style.opacity = 0;
-    if (hatch) scaled(holder, slot.x, slot.y, 1, w);
     place(holder, slot.x, slot.y, 0);
     place(row, slot.x, slot.y, 1);
     say(`${WHO[o.key]} added <b>${name}</b> to ${o.key === "you" ? "your" : "their"} library`);
