@@ -628,17 +628,24 @@
     tag.show();
     await sleep(1000);
 
-    // Settles down into its slot in the agent, turning into a normal skill as it moves
-    layers.chip.appendChild(c); // in front of the agent from here on
-    c.style.transition = "transform 600ms cubic-bezier(0.3, 0.7, 0.3, 1)";
-    tag.g.style.opacity = 0;
+    // Settles down into its slot in the agent, turning into a normal skill as it moves.
+    // Explicit keyframes keep the glide smooth; the badge fades and is removed.
+    tag.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, fill: "forwards" }).onfinish = () => tag.g.remove();
     c.classList.remove("create", "float");
+    c.style.transition = "none";
     tweenH(a.rect, h);
-    c.style.transform = `translate(${it.pos.x}px, ${it.pos.y}px)`;
-    await sleep(550);
-    c.style.transition = "";
+    const landed = `translate(${it.pos.x}px, ${it.pos.y}px)`;
+    c.style.transform = landed;
+    const glide = c.animate(
+      [{ transform: `translate(${sx}px, ${sy}px)` }, { transform: landed }],
+      { duration: instant ? 0 : 650, easing: "cubic-bezier(0.45, 0, 0.2, 1)" }
+    );
+    await glide.finished;
+    layers.chip.appendChild(c); // in front of the agent from here on
     c.style.transformBox = "";
     c.style.transformOrigin = "";
+    c.classList.add("anim");
+    c.style.transition = "";
 
     // Up into your card
     const i = o.rows.length;
