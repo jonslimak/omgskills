@@ -462,11 +462,11 @@
         { duration: instant ? 0 : 850, easing: "cubic-bezier(0.25, 0.9, 0.3, 1)" }
       );
       say(`${WHO[o.key]} made <b>${name}</b>`);
-      await sleep(650);
+      await sleep(450);
       created = badge(sx + w + 6, sy - 10, "Created", false, "create");
       await frame();
       created.show();
-      await sleep(1400);
+      await sleep(1000);
       holder.classList.add("anim");
       void holder.getBoundingClientRect();
     } else {
@@ -482,7 +482,7 @@
       await frame();
       place(holder, sx, sy, 1);
       say(`${WHO[o.key]} found <b>${name}</b> by ${PEOPLE[SKILLS[name].author].handle}`);
-      await sleep(1100);
+      await sleep(750);
     }
 
     // Absorb into the card: the floating pill hands off to a row pill
@@ -500,7 +500,7 @@
     place(row, slot.x, slot.y, 1);
     say(`${WHO[o.key]} added <b>${name}</b> to ${o.key === "you" ? "your" : "their"} library`);
     refreshSubs();
-    await sleep(900);
+    await sleep(650);
     holder.remove();
     if (created) created.g.remove();
     // Teammate rows live inside their card from here on, so they swing in and out with it
@@ -546,15 +546,19 @@
     const names = targets.map((id) => agents[id].label);
     const list = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names.at(-1) : names[0];
     say(`${WHO[o.key]} sent <b>${name}</b> to ${list}`);
-    await sleep(700);
+    await sleep(650);
     row.n += targets.length;
     row.el.countT.textContent = row.n;
     row.el.countG.style.opacity = 1;
     refreshSubs();
-    await sleep(700);
-    for (const f of flights) f.lg.style.opacity = 0;
-    await sleep(450);
-    for (const f of flights) f.lg.remove();
+    // Arrows fade out in the background while the next action starts
+    (async () => {
+      await sleep(450);
+      for (const f of flights) f.lg.style.opacity = 0;
+      await sleep(450);
+      for (const f of flights) f.lg.remove();
+    })();
+    await sleep(250);
   }
 
   // A small green pill, e.g. "Updated", pinned to the top-right of a skill
@@ -588,7 +592,7 @@
     await frame();
     b0.show();
     say(`You updated <b>${name}</b>`);
-    await sleep(1500);
+    await sleep(1100);
 
     // 2. It syncs to every agent that has it
     const hits = Object.values(agents).filter((a) => a.items.some((it) => it.name === name));
@@ -603,7 +607,7 @@
     arrows.forEach((ar) => ar.show());
     const list = hits.map((a) => a.label);
     say(`The new version syncs to ${list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list.at(-1) : list[0]}`);
-    await sleep(750);
+    await sleep(600);
     for (const a of hits) {
       const it = a.items.find((x) => x.name === name);
       it.el.classList.add("flash");
@@ -612,7 +616,7 @@
       await frame();
       b.show();
     }
-    await sleep(1600);
+    await sleep(1200);
 
     // 3. Teammates on a shared agent get it too
     const shared = hits.find((a) => a.shared);
@@ -623,12 +627,12 @@
       await frame();
       ar.show();
       say(`Your teammate gets it too, through the shared ${shared.label}`);
-      await sleep(750);
+      await sleep(600);
       const t = badge(mate.x + mate.w / 2, omgBottom(mate) - 9, "App synced", true);
       extras.push(t.g);
       await frame();
       t.show();
-      await sleep(2000);
+      await sleep(1600);
     }
 
     // Settle
@@ -679,13 +683,13 @@
     if (!mate.joined) say("Your teammate joins with their own library");
     mate.joined = true;
     mateVisible(true);
-    await sleep(mate.rows.length ? 700 : 1000);
+    await sleep(mate.rows.length ? 550 : 800);
   }
   async function hideMate() {
     if (!mate.shown) return;
     mate.shown = false;
     mateVisible(false);
-    await sleep(850);
+    await sleep(300);
   }
 
   async function reset() {
@@ -715,12 +719,11 @@
       if (e.update) { await update(o, e.update); continue; }
       if (e.collect) await spawnAndCollect(o, e.collect);
       else say(`<b>${e.reuse}</b> is already in your library, so there is nothing to add`);
-      if (e.reuse) await sleep(1400);
-      await sleep(300);
+      if (e.reuse) await sleep(900);
       await send(o, e.collect || e.reuse, e.send);
       // Keep the teammate on screen between back-to-back teammate moves
-      if (o === mate && EVENTS[k + 1]?.who !== "mate") { await sleep(500); await hideMate(); }
-      await sleep(600);
+      if (o === mate && EVENTS[k + 1]?.who !== "mate") await hideMate();
+      await sleep(150);
     }
   }
 
