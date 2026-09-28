@@ -839,6 +839,8 @@
   async function hideMate() {
     if (!mate.shown) return;
     mate.shown = false;
+    // Any dots still flowing from the teammate card leave with it
+    layers.link.querySelectorAll(".link").forEach((l) => { l.style.opacity = 0; });
     mateVisible(false);
     await sleep(300);
   }
