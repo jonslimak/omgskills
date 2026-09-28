@@ -74,14 +74,14 @@
     padding-inline: 20px;
     padding-block: 32px 44px;
   }
-  .stage { max-width: 842px; margin: 0 auto; display: grid; gap: 22px; }
+  .stage { max-width: 842px; margin: 0 auto; display: grid; gap: 6px; }
 
   .story { display: grid; gap: 8px; justify-items: center; text-align: center; }
   .ticker { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 1.6em; }
   .ticker p {
     margin: 0;
     font-family: var(--display);
-    font-size: clamp(22px, 3.4vw, 30px);
+    font-size: clamp(15px, 2.4vw, 21px);
     line-height: 1.15;
     letter-spacing: -0.022em;
     font-weight: 600;
@@ -207,7 +207,7 @@
   const AG_GAP = 14, AG_W = 190, AG_HEAD = 56;
   const CH = 32, CG = 8, M = 20;
   const W = 2 * M + 4 * AG_W + 3 * AG_GAP; // 842: four 190px agent cards fit exactly
-  const OMG_W = 248, OMG_X = (W - OMG_W) / 2, OMG_Y = 132, ROW_Y = 136;
+  const OMG_W = 248, OMG_X = (W - OMG_W) / 2, OMG_Y = 100, ROW_Y = 136;
   const MATE_W = 222, MATE_X = W - M - MATE_W, MATE_Y = 262, M_ROW = 108;
   const youCollects = EVENTS.filter((e) => e.who === "you" && e.collect).length;
   const cardH = (head, n) => (n ? head + n * (CH + CG) - CG + 20 : head - 2);
@@ -326,7 +326,6 @@
   function phase(text) {
     if (text === phaseNow) return;
     phaseNow = text;
-    text = "👀 " + text;
     if (instant) { ticker.textContent = text; return; }
     ticker.classList.add("out");
     setTimeout(() => { ticker.textContent = text; ticker.classList.remove("out"); }, 200);
@@ -468,7 +467,7 @@
       void holder.getBoundingClientRect();
     } else {
       const band = o.key === "you"
-        ? { x0: 60, x1: W - 60 - w, y0: 18, y1: 60 }
+        ? { x0: 60, x1: W - 60 - w, y0: 8, y1: 30 }
         : { x0: MATE_X - 10, x1: W - M - w, y0: mate.y - 104, y1: mate.y - 84 };
       sx = band.x0 + Math.random() * Math.max(0, band.x1 - band.x0);
       sy = band.y0 + Math.random() * (band.y1 - band.y0);
