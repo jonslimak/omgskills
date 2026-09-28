@@ -431,7 +431,7 @@
       const bob = el("g", { class: "bob", style: `animation-delay:${-(i * 0.7) % 4}s; animation-duration:${3.6 + (i % 3) * 0.5}s` }, holder);
       const c = chip(bob, name, { float: true });
       c.classList.remove("anim");
-      place(holder, x, y + 8, 0);
+      place(holder, x, y, 0); // already in place; it only fades in
       cloud[name] = { holder, bob, c, x, y, w };
     });
     void svg.getBoundingClientRect();
