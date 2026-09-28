@@ -20,9 +20,6 @@
     --update: #248a3d;
     --on-update: #ffffff;
     --update-tint: rgba(52, 199, 89, 0.22);
-    --create: #0071e3;
-    --on-create: #ffffff;
-    --create-fill: #dcebfd;
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
     --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
   }
@@ -45,9 +42,6 @@
       --update: #30d158;
       --on-update: #002b0c;
       --update-tint: rgba(48, 209, 88, 0.26);
-      --create: #0a84ff;
-      --on-create: #ffffff;
-      --create-fill: #0f2b4d;
     }
   }
   :root[data-theme="dark"] {
@@ -68,9 +62,6 @@
     --update: #30d158;
     --on-update: #002b0c;
     --update-tint: rgba(48, 209, 88, 0.26);
-    --create: #0a84ff;
-    --on-create: #ffffff;
-    --create-fill: #0f2b4d;
   }
 
   body {
@@ -155,9 +146,7 @@
   #flow .chip.flash .bg { fill: var(--update-tint); }
   #flow .badge rect { fill: var(--update); }
   #flow .badge text { fill: var(--on-update); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
-  #flow .badge.create rect { fill: var(--create); }
-  #flow .badge.create text { fill: var(--on-create); }
-  #flow .chip.float.create .bg { fill: var(--create-fill); }
+  #flow .chip.float.create .bg { fill: var(--update-tint); }
   #flow .link.sync path { stroke: var(--update); stroke-width: 1.75; }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
@@ -472,7 +461,7 @@
       );
       say(`${WHO[o.key]} made <b>${name}</b>`);
       await sleep(650);
-      created = badge(sx + w + 6, sy - 10, "Skill created", false, "create");
+      created = badge(sx + w + 6, sy - 10, "Created", false, "create");
       await frame();
       created.show();
       await sleep(1400);
