@@ -112,6 +112,7 @@
   #flow .card { fill: var(--card); }
   #flow .card.agent-card { fill: transparent; }
   #flow .agent-head { transform-box: fill-box; transform-origin: 20% 60%; }
+  #flow .you-head { transform-box: fill-box; transform-origin: 50% 70%; }
   /* On a pure white page the cards are defined only by their shadow */
   #flow .lift { filter: drop-shadow(0 1px 2px var(--shadow-soft)) drop-shadow(0 8px 24px var(--shadow)); }
   #flow .lift-hero { filter: drop-shadow(0 2px 4px var(--shadow-soft)) drop-shadow(0 20px 48px var(--shadow)); }
@@ -406,10 +407,11 @@
     place(yg, OMG_X, OMG_Y, 1);
     const yFace = el("g", { class: "lift-hero" }, yg);
     const yRect = el("rect", { class: "card", x: 0, y: 0, width: OMG_W, height: cardH(ROW_Y, 0), rx: 24 }, yFace);
-    avatar(yg, "you", OMG_W / 2, 56, 34);
-    txt(yg, OMG_W / 2, 110, "you", "omg-title", "middle");
+    const yPop = el("g", { class: "you-head" }, yg); // avatar + name, bounced when a skill comes in
+    avatar(yPop, "you", OMG_W / 2, 56, 34);
+    txt(yPop, OMG_W / 2, 110, "you", "omg-title", "middle");
     const ySub = txt(yg, OMG_W / 2, 123, "", "omg-sub", "middle");
-    you = { key: "you", g: yg, rect: yRect, sub: ySub, rows: [], x: OMG_X, y: OMG_Y, w: OMG_W, head: ROW_Y };
+    you = { key: "you", g: yg, rect: yRect, sub: ySub, rows: [], x: OMG_X, y: OMG_Y, w: OMG_W, head: ROW_Y, pop: yPop };
 
     // Teammate: smaller card, joins later
     const mg = el("g", { class: "anim" }, layers.card);
@@ -675,6 +677,7 @@
     await frame();
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
+    if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
     await sleep(650);
     row.countT.textContent = "1";
     row.countG.style.opacity = 1;
@@ -709,6 +712,7 @@
     await frame();
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
+    if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
     alignMate(); // your card grew, so keep the teammate centred on it
     const mr = mate.rows[mi];
     mr.n += targets.length;
@@ -766,7 +770,7 @@
   function activate(a) {
     if (instant || reduced) return;
     const k = (y, sc, offset) => ({ transform: `translateY(${y}px) scale(${sc})`, offset, easing: "cubic-bezier(0.33, 0, 0.3, 1)" });
-    a.head.animate(
+    (a.pop || a.head).animate(
       [k(0, 1, 0), k(1.5, 0.98, 0.14), k(-7, 1.06, 0.42), k(1.5, 0.99, 0.64), k(-2, 1.015, 0.82), k(0, 1, 1)],
       { duration: 520 }
     );
