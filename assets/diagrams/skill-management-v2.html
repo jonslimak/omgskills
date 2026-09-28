@@ -600,26 +600,45 @@
   async function createOnAgent(o, name, agentId) {
     const a = agents[agentId];
     const w = chipW(name);
-    const c = chip(layers.chip, name, { float: true });
+    // Starts behind the agent's logo and name (drawn under them), same look as a teammate creation
+    const c = chip(layers.under, name, { float: true });
+    c.classList.remove("anim");
     c.classList.add("create");
     a.items.push({ name, who: o.key, el: c });
     const h = layoutAgent(a);
     const it = a.items[a.items.length - 1];
-    const at = (sc) => `translate(${it.pos.x + (w / 2) * (1 - sc)}px, ${it.pos.y + (CH / 2) * (1 - sc)}px) scale(${sc})`;
-    c.style.transition = "none";
-    c.style.transform = at(1);
+    const sx = it.pos.x, sy = AG_Y - CH - 16; // just above the agent's name
+    c.style.transformBox = "fill-box";
+    c.style.transformOrigin = "center";
+    c.style.transform = `translate(${sx}px, ${sy}px)`;
     c.style.opacity = 1;
-    tweenH(a.rect, h);
     c.animate(
-      [{ transform: at(0.5), opacity: 0 }, { transform: at(1.08), opacity: 1, offset: 0.6 }, { transform: at(1), opacity: 1 }],
-      { duration: instant ? 0 : 520, easing: "cubic-bezier(0.3, 0.8, 0.4, 1)" }
+      [
+        { transform: `translate(${sx}px, ${AG_Y + 14}px) scale(0.55)`, opacity: 0 },
+        { transform: `translate(${sx}px, ${AG_Y + 4}px) scale(0.7)`, opacity: 1, offset: 0.2 },
+        { transform: `translate(${sx}px, ${sy - 8}px) scale(1.03)`, offset: 0.72 },
+        { transform: `translate(${sx}px, ${sy}px) scale(1)` },
+      ],
+      { duration: instant ? 0 : 850, easing: "cubic-bezier(0.25, 0.9, 0.3, 1)" }
     );
     activate(a);
-    await sleep(350);
-    const tag = badge(it.pos.x + w + 6, it.pos.y - 10, "Created", false, "create");
+    await sleep(450);
+    const tag = badge(sx + w + 6, sy - 10, "Created", false, "create");
     await frame();
     tag.show();
-    await sleep(1100);
+    await sleep(1000);
+
+    // Settles down into its slot in the agent, turning into a normal skill as it moves
+    layers.chip.appendChild(c); // in front of the agent from here on
+    c.style.transition = "transform 600ms cubic-bezier(0.3, 0.7, 0.3, 1)";
+    tag.g.style.opacity = 0;
+    c.classList.remove("create", "float");
+    tweenH(a.rect, h);
+    c.style.transform = `translate(${it.pos.x}px, ${it.pos.y}px)`;
+    await sleep(550);
+    c.style.transition = "";
+    c.style.transformBox = "";
+    c.style.transformOrigin = "";
 
     // Up into your card
     const i = o.rows.length;
@@ -632,9 +651,6 @@
     el("path", { d: curve(a.x + AG_W / 2, AG_Y - 6, o.x + o.w * (a.i + 1) / (AGENTS.length + 1), omgBottom(o) + 4) }, lg);
     await frame();
     lg.style.opacity = 1;
-    tag.g.style.opacity = 0;
-    c.style.transition = "";
-    c.classList.remove("create", "float");
     place(row, slot.x, slot.y, 1);
     await sleep(650);
     row.countT.textContent = "1";
