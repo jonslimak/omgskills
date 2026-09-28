@@ -149,9 +149,12 @@
   #flow .badge.author text { fill: var(--bg); font-weight: 500; }
   @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   #flow .bob { animation: bob 4s ease-in-out infinite; }
-  #flow .cloud .bob > .chip { transition: opacity 300ms ease; }
-  /* Unpicked skills stay faded so the cloud reads as background until one is chosen */
-  #flow .cloud .cloud-chip:not(.picked) .bob > .chip { opacity: 0.35; }
+  #flow .cloud .bob > .chip {
+    transform-box: fill-box; transform-origin: center;
+    transition: opacity 300ms ease, transform 500ms cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  }
+  /* Unpicked skills stay faded and 40% smaller, so the cloud reads as background until one is chosen */
+  #flow .cloud .cloud-chip:not(.picked) .bob > .chip { opacity: 0.35; transform: scale(0.6); }
   @media (prefers-reduced-motion: reduce) { #flow .bob { animation: none; } }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
 </style>
@@ -407,7 +410,7 @@
 
     const finalH = Math.max(...AGENTS.map((a) => {
       const n = EVENTS.filter((e) => (e.send || []).includes(a.id)).length;
-      return AG_HEAD + n * (CH + CG) + (a.shared ? 2 * 22 + 6 : 0) + 20;
+      return AG_HEAD + n * (CH + CG) + (a.shared ? 22 + 6 : 0) + 20;
     }));
     svg.setAttribute("viewBox", `0 0 ${W} ${AG_Y + finalH + 24}`);
     refreshSubs();
@@ -457,10 +460,11 @@
     }
     const ordered = a.shared ? groups : [{ who: null, items: a.items }];
     ordered.forEach((g, gi) => {
-      if (a.shared) {
+      // Only the teammate's group gets a caption; your skills need no label
+      if (a.shared && g.who === "mate") {
         let cap = a.caps[g.who];
         if (!cap) {
-          cap = a.caps[g.who] = txt(layers.chip, 0, 0, g.who === "you" ? "From you" : "From teammate", "group-cap anim");
+          cap = a.caps[g.who] = txt(layers.chip, 0, 0, "From teammate", "group-cap anim");
           place(cap, a.x + 16, AG_Y + y + 12, 0);
         }
         cap.pos = { x: a.x + 16, y: AG_Y + y + 12 };
