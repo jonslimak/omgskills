@@ -3,6 +3,31 @@ import Testing
 @testable import omgskills
 
 struct SkillGroupsFeatureAvailabilityTests {
+    #if !DEBUG
+    @MainActor
+    @Test func shippingReleaseCannotBeEnabledByPreviewEnvironmentOrRemoteConfig() async throws {
+        let packageRoot = URL(filePath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let data = try Data(contentsOf: packageRoot.appending(path: "Info.plist"))
+        let info = try #require(
+            PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
+        )
+        #expect(info[AppRuntimeConfiguration.skillGroupsAuthEnabledKey] as? Bool == false)
+        let supportsGroups = AppRuntimeConfiguration.skillGroupsAuthSupported(
+            infoDictionary: info,
+            environment: [AppRuntimeConfiguration.skillGroupsAuthPreviewEnvironmentKey: "1"]
+        )
+        let loader = SequencedFeatureConfigurationLoader(responses: [.enabled])
+        let availability = SkillGroupsFeatureAvailability(
+            buildSupportsSkillGroups: supportsGroups, loader: loader
+        )
+        #expect(!supportsGroups)
+        #expect(await availability.refresh() == false)
+        #expect(availability.deepLinkDisposition == .discard)
+        #expect(await loader.requestCount() == 0)
+    }
+    #endif
+
     @Test func releaseConfigurationAPIReadsVersionedBooleanWithoutCache() async throws {
         let session = ReleaseConfigurationHTTPSession(responses: [
             .init(statusCode: 200, body: Data(#"{"version":1,"skillGroupsAuthEnabled":true}"#.utf8))

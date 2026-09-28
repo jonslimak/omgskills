@@ -44,12 +44,21 @@ struct BrowserPairingTests {
     }
 
     @Test func debugAuthorizationAllowsLoopbackHTTPOnly() throws {
+        #if DEBUG
         let localhost = try BrowserPairing.authorizationURL(
             connectURL: URL(string: "http://localhost:8888/app/connect")!,
             request: request
         )
         #expect(localhost.scheme == "http")
         #expect(localhost.host == "localhost")
+        #else
+        #expect(throws: BrowserPairingError.invalidConfiguration) {
+            try BrowserPairing.authorizationURL(
+                connectURL: URL(string: "http://localhost:8888/app/connect")!,
+                request: request
+            )
+        }
+        #endif
 
         #expect(throws: BrowserPairingError.invalidConfiguration) {
             try BrowserPairing.authorizationURL(

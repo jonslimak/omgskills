@@ -33,19 +33,29 @@ struct AppRuntimeConfigurationTests {
             infoDictionary: [:],
             environment: [AppRuntimeConfiguration.skillGroupsAuthPreviewEnvironmentKey: "true"]
         ))
-        #expect(AppRuntimeConfiguration.skillGroupsAuthSupported(
+        let previewEnabled = AppRuntimeConfiguration.skillGroupsAuthSupported(
             infoDictionary: [:],
             environment: [AppRuntimeConfiguration.skillGroupsAuthPreviewEnvironmentKey: "1"]
-        ))
+        )
+        #if DEBUG
+        #expect(previewEnabled)
+        #else
+        #expect(!previewEnabled)
+        #endif
     }
 
     @Test func releaseConfigurationUsesSafeDebugOverrideOrProductionURL() {
         #expect(AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [:])
             == AppRuntimeConfiguration.productionReleaseConfigurationURL)
-        #expect(AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [
+        let overrideURL = AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [
             AppRuntimeConfiguration.debugReleaseConfigurationURLEnvironmentKey:
                 " http://localhost:8123/app/release-config.json "
-        ]).absoluteString == "http://localhost:8123/app/release-config.json")
+        ])
+        #if DEBUG
+        #expect(overrideURL.absoluteString == "http://localhost:8123/app/release-config.json")
+        #else
+        #expect(overrideURL == AppRuntimeConfiguration.productionReleaseConfigurationURL)
+        #endif
         #expect(AppRuntimeConfiguration.skillGroupsReleaseConfigurationURL(environment: [
             AppRuntimeConfiguration.debugReleaseConfigurationURLEnvironmentKey:
                 "http://example.com/app/release-config.json"
@@ -94,6 +104,22 @@ struct AppRuntimeConfigurationTests {
             return
         }
     }
+
+    #if !DEBUG
+    @Test func compiledReleaseIgnoresCatalogOverridesWithoutTestInjection() {
+        let context = AppRuntimeConfiguration.runtimeContext(
+            infoDictionary: [:],
+            environment: [
+                AppRuntimeConfiguration.debugGroupInstallRootEnvironmentKey: "/tmp/omgskills-catalog-test",
+                AppRuntimeConfiguration.debugCatalogPathEnvironmentKey: sharedCatalogFixtureURL.path
+            ]
+        )
+        #expect(context.catalogTestMode == .disabled)
+        #expect(context.testCatalogURL == nil)
+        #expect(!context.usesBundledLibraryPreview)
+        #expect(context.skillFilesystemPaths == .production())
+    }
+    #endif
 
     @Test func validCatalogTestModeUsesOneIsolatedRuntimeContext() {
         let root = URL(fileURLWithPath: "/tmp/omgskills-catalog-test", isDirectory: true)

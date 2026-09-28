@@ -30,7 +30,11 @@ struct AppDelegateTests {
             AppDelegate.debugAppcastURLEnvironmentKey: "http://127.0.0.1:8123/appcast.xml"
         ])
 
+        #if DEBUG
         #expect(url == "http://127.0.0.1:8123/appcast.xml")
+        #else
+        #expect(url == nil)
+        #endif
     }
 
     @Test func debugAppcastOverrideTrimsWhitespace() {
@@ -38,7 +42,11 @@ struct AppDelegateTests {
             AppDelegate.debugAppcastURLEnvironmentKey: "  https://example.test/appcast.xml  "
         ])
 
+        #if DEBUG
         #expect(url == "https://example.test/appcast.xml")
+        #else
+        #expect(url == nil)
+        #endif
     }
 
     @Test func debugAppcastOverrideIgnoresMissingBlankAndNonHTTPValues() {

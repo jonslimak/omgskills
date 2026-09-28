@@ -4,6 +4,13 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.20] - Release Candidate (not published)
+
+### App
+- Install catalog skills with complete pinned metadata from their exact indexed repository commit and directory, verifying tree and SKILL.md hashes before installation.
+- Preserve the legacy installer for catalog entries without pinned metadata; the new installation path currently covers only a small subset of the catalog.
+- Keep Skill Groups unavailable and ignore its developer preview override in release builds.
+
 ## [0.0.19] - 2026-08-03
 
 ### App

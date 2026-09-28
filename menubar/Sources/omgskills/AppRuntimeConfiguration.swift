@@ -61,9 +61,11 @@ enum AppRuntimeConfiguration {
         infoDictionary: [String: Any],
         environment: [String: String]
     ) -> Bool {
+        #if DEBUG
         if environment[skillGroupsAuthPreviewEnvironmentKey] == "1" {
             return true
         }
+        #endif
         return infoDictionary[skillGroupsAuthEnabledKey] as? Bool == true
     }
 

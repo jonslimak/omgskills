@@ -19,6 +19,7 @@ DMG_BACKGROUND_PNG="$MENUBAR_DIR/Assets/dmg-background.png"
 IDENTITY="${DEVELOPER_ID_APPLICATION:-}"
 VERSION="${1:-$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$INFO_PLIST")}"
 RC_MODE="${OMGSKILLS_RELEASE_RC:-0}"
+STAGE_EXISTING="${2:-}"
 
 fail() {
     echo "✗ $*" >&2
@@ -217,7 +218,52 @@ preflight() {
     verify_identity
 }
 
-preflight
+verify_existing_candidate() {
+    [ "$RC_MODE" = "0" ] || fail "Cannot combine RC build mode with candidate staging."
+    require_env OMGSKILLS_EXPECTED_ZIP_SHA256
+    require_env OMGSKILLS_EXPECTED_DMG_SHA256
+    require_file "$ZIP"
+    require_file "$DMG"
+    require_file "$APP/Contents/Info.plist"
+    require_file "$SPARKLE_TOOLS/generate_appcast"
+    [ "$(shasum -a 256 "$ZIP" | awk '{print $1}')" = "$OMGSKILLS_EXPECTED_ZIP_SHA256" ] \
+        || fail "Candidate ZIP does not match the approved checksum."
+    [ "$(shasum -a 256 "$DMG" | awk '{print $1}')" = "$OMGSKILLS_EXPECTED_DMG_SHA256" ] \
+        || fail "Candidate DMG does not match the approved checksum."
+    for key in CFBundleShortVersionString CFBundleVersion CFBundleIdentifier SUPublicEDKey OMGSkillsSkillGroupsAuthEnabled; do
+        [ "$(/usr/libexec/PlistBuddy -c "Print :$key" "$APP/Contents/Info.plist")" = \
+          "$(/usr/libexec/PlistBuddy -c "Print :$key" "$INFO_PLIST")" ] \
+            || fail "Candidate $key differs from the release source."
+    done
+    [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")" = "$VERSION" ] \
+        || fail "Candidate version differs from the requested release."
+    cmp -s <(unzip -p "$ZIP" "$APP_NAME.app/Contents/Info.plist") "$APP/Contents/Info.plist" \
+        || fail "Candidate ZIP metadata differs from the verified app."
+    verify_skillgroups_auth_release_gate
+    require_clean_zip "$ZIP"
+    codesign --verify --deep --strict "$APP"
+    codesign --verify "$DMG"
+    xcrun stapler validate "$APP"
+    xcrun stapler validate "$DMG"
+    spctl --assess --type execute "$APP"
+    spctl --assess --type open --context context:primary-signature "$DMG"
+    # Reuse the verified packages unchanged; only refresh their checksum sidecars.
+    (cd "$MENUBAR_DIR/dist" && shasum -a 256 "$(basename "$ZIP")" > "$(basename "$ZIP_CHECKSUM")")
+    (cd "$MENUBAR_DIR/dist" && shasum -a 256 "$(basename "$DMG")" > "$(basename "$DMG_CHECKSUM")")
+}
+
+case "$STAGE_EXISTING" in
+    --stage-existing)
+        echo "Staging an existing verified candidate; no build, upload, or public release."
+        verify_existing_candidate
+        ;;
+    "")
+        preflight
+        ;;
+    *) fail "Unknown release option: $STAGE_EXISTING" ;;
+esac
+
+if [ "$STAGE_EXISTING" != "--stage-existing" ]; then
 
 cd "$MENUBAR_DIR"
 ./build.sh
@@ -280,8 +326,9 @@ xcrun stapler validate "$DMG"
 spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG"
 shasum -a 256 "$(basename "$DMG")" | tee "$(basename "$DMG_CHECKSUM")"
 require_file "$DMG_CHECKSUM" "DMG checksum file was not created."
+fi
 
-RELEASE_HASH="$(awk '{print substr($1, 1, 8)}' "$(basename "$DMG_CHECKSUM")")"
+RELEASE_HASH="$(awk '{print substr($1, 1, 8)}' "$DMG_CHECKSUM")"
 DOWNLOAD_ZIP="omgskills-mac-$RELEASE_HASH.zip"
 DOWNLOAD_ZIP_CHECKSUM="$DOWNLOAD_ZIP.sha256"
 DOWNLOAD_DMG="omgskills-mac-$RELEASE_HASH.dmg"

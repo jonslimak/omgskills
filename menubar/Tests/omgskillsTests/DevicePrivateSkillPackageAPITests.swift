@@ -33,7 +33,7 @@ struct DevicePrivateSkillPackageAPITests {
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer device-secret")
     }
 
-    @Test func allowsHTTPOnlyForLoopbackEndpoints() async throws {
+    @Test func loopbackHTTPAccessMatchesBuildConfiguration() async throws {
         let body = try GroupSkillPackageTestSupport.ndjson()
         let endpoints = [
             "http://localhost:8888/api/portal/sync-upload",
@@ -55,6 +55,7 @@ struct DevicePrivateSkillPackageAPITests {
                 now: { now }
             )
 
+            #if DEBUG
             _ = try await api.fetchPackage(
                 sourceID: GroupSkillPackageTestSupport.sourceID,
                 release: GroupSkillPackageTestSupport.release(),
@@ -63,6 +64,16 @@ struct DevicePrivateSkillPackageAPITests {
             let request = try #require(await session.requests().first)
             #expect(request.url?.scheme == "http")
             #expect(request.url?.host == URL(string: endpoint)?.host)
+            #else
+            await #expect(throws: GroupSkillPackageLoaderError.invalidResponse) {
+                try await api.fetchPackage(
+                    sourceID: GroupSkillPackageTestSupport.sourceID,
+                    release: GroupSkillPackageTestSupport.release(),
+                    credential: GroupSkillPackageTestSupport.credential()
+                )
+            }
+            #expect(await session.requests().isEmpty)
+            #endif
         }
     }
 
