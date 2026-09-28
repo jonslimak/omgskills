@@ -431,7 +431,8 @@
       const bob = el("g", { class: "bob", style: `animation-delay:${-(i * 0.7) % 4}s; animation-duration:${3.6 + (i % 3) * 0.5}s` }, holder);
       const c = chip(bob, name, { float: true });
       c.classList.remove("anim");
-      place(holder, x, y, 0); // already in place; it only fades in
+      holder.style.transition = "opacity 500ms ease"; // no movement on entry, only a fade
+      place(holder, x, y, 0);
       cloud[name] = { holder, bob, c, x, y, w };
     });
     void svg.getBoundingClientRect();
@@ -524,6 +525,7 @@
       sx = e.x; sy = e.y - 6;
       layers.cloud.classList.add("picking");
       holder.classList.add("picked");
+      holder.style.transition = ""; // back to the normal move + fade transition
       holder.style.transitionDelay = "0ms";
       place(holder, sx, sy, 1);
       // Author shown as a small dark tag on the chip's corner
