@@ -145,6 +145,13 @@
   #flow .chip.float.create .bg { fill: var(--float); stroke: var(--update); }
   #flow .link.sync path { stroke: var(--update); stroke-width: 1.75; }
   #flow .arrowhead.sync path { fill: var(--update); }
+  #flow .badge.author rect { fill: var(--ink); }
+  #flow .badge.author text { fill: var(--bg); font-weight: 500; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  #flow .bob { animation: bob 4s ease-in-out infinite; }
+  #flow .cloud .bob > .chip { transition: opacity 300ms ease; }
+  #flow .cloud.picking .cloud-chip:not(.picked) .bob > .chip { opacity: 0.35; }
+  @media (prefers-reduced-motion: reduce) { #flow .bob { animation: none; } }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
 </style>
 
@@ -178,6 +185,11 @@
     "release-notes": { author: "you", private: true },
     "frontend-design": { author: "anthropics" },
     "brand-voice": { author: "sam", private: true },
+    // Library skills that only float in the cloud
+    "code-review": { author: "mattpocock" },
+    "napkin": { author: "blader" },
+    "swiftdata-pro": { author: "twostraws" },
+    "mcp-builder": { author: "anthropics" },
   };
   const LOGOS = {
     chatgpt: { path: "M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" },
@@ -192,6 +204,11 @@
   ];
   // The story, played in order and then looped.
   // `phase` sets the headline when that event starts; it holds until the next phase.
+  // Library skills floating above your card: [name, centre x, top y]
+  const CLOUD = [
+    ["code-review", 150, 10], ["grill-me", 345, 18], ["napkin", 530, 8], ["humanizer", 715, 16],
+    ["swiftui-pro", 95, 60], ["frontend-design", 275, 66], ["mcp-builder", 580, 62], ["swiftdata-pro", 760, 58],
+  ];
   const EVENTS = [
     { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
@@ -210,7 +227,7 @@
   const AG_GAP = 14, AG_W = 190, AG_HEAD = 56;
   const CH = 32, CG = 8, M = 20;
   const W = 2 * M + 4 * AG_W + 3 * AG_GAP; // 842: four 190px agent cards fit exactly
-  const OMG_W = 248, OMG_X = (W - OMG_W) / 2, OMG_Y = 100, ROW_Y = 136;
+  const OMG_W = 248, OMG_X = (W - OMG_W) / 2, OMG_Y = 150, ROW_Y = 136;
   const MATE_W = 222, MATE_X = W - M - MATE_W, MATE_Y = 262, M_ROW = 108;
   const youCollects = EVENTS.filter((e) => e.who === "you" && e.collect).length;
   const cardH = (head, n) => (n ? head + n * (CH + CG) - CG + 20 : head - 2);
@@ -350,7 +367,7 @@
     el("path", { d: "M0,1 L9,5 L0,9 z" }, m);
     const ms = el("marker", { id: "arrow-sync", class: "arrowhead sync", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, ms);
-    layers = { link: el("g", {}, svg), under: el("g", {}, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
+    layers = { link: el("g", {}, svg), under: el("g", {}, svg), card: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), chip: el("g", {}, svg) };
 
     // You: the hero card
     const yg = el("g", { class: "anim" }, layers.card);
@@ -393,6 +410,28 @@
     }));
     svg.setAttribute("viewBox", `0 0 ${W} ${AG_Y + finalH + 24}`);
     refreshSubs();
+    makeCloud();
+  }
+
+  // ---- The cloud of discoverable skills
+  let cloud = {};
+  function makeCloud() {
+    layers.cloud.textContent = "";
+    cloud = {};
+    CLOUD.forEach(([name, cx, y], i) => {
+      const w = chipW(name), x = cx - w / 2;
+      const holder = el("g", { class: "anim cloud-chip" }, layers.cloud);
+      const bob = el("g", { class: "bob", style: `animation-delay:${-(i * 0.7) % 4}s; animation-duration:${3.6 + (i % 3) * 0.5}s` }, holder);
+      const c = chip(bob, name, { float: true });
+      c.classList.remove("anim");
+      place(holder, x, y + 8, 0);
+      cloud[name] = { holder, bob, c, x, y, w };
+    });
+    void svg.getBoundingClientRect();
+    Object.values(cloud).forEach((e, i) => {
+      e.holder.style.transitionDelay = instant ? "0ms" : `${i * 60}ms`;
+      place(e.holder, e.x, e.y, 1);
+    });
   }
 
   function refreshSubs() {
@@ -440,7 +479,7 @@
   async function spawnAndCollect(o, name) {
     const w = chipW(name);
     const hatch = madeBy(o, name);
-    const holder = el("g", { class: "anim" }, layers.chip);
+    let holder = el("g", { class: "anim" }, layers.chip);
     const c = chip(holder, name, { float: true });
     c.classList.remove("anim");
     let sx, sy, h = null, created = null;
@@ -469,18 +508,23 @@
       holder.classList.add("anim");
       void holder.getBoundingClientRect();
     } else {
-      const band = o.key === "you"
-        ? { x0: 60, x1: W - 60 - w, y0: 8, y1: 30 }
-        : { x0: MATE_X - 10, x1: W - M - w, y0: mate.y - 104, y1: mate.y - 84 };
-      sx = band.x0 + Math.random() * Math.max(0, band.x1 - band.x0);
-      sy = band.y0 + Math.random() * (band.y1 - band.y0);
-      const tilt = (Math.random() * 5 - 2.5).toFixed(1);
-      c.setAttribute("transform", `rotate(${tilt} ${w / 2} ${CH / 2})`);
-      h = txt(holder, w / 2, CH + 18, PEOPLE[SKILLS[name].author].handle, "handle", "middle");
-      place(holder, sx, sy + 10, 0);
-      await frame();
+      // Picked out of the floating cloud: it lifts, shows its author, the rest dim
+      holder.remove();
+      const e = cloud[name];
+      delete cloud[name];
+      holder = e.holder;
+      sx = e.x; sy = e.y - 6;
+      layers.cloud.classList.add("picking");
+      holder.classList.add("picked");
+      holder.style.transitionDelay = "0ms";
       place(holder, sx, sy, 1);
-      await sleep(750);
+      // Author shown as a small dark tag on the chip's corner
+      const tag = badge(sx + e.w + 6, sy - 10, PEOPLE[SKILLS[name].author].handle, false, "author");
+      h = tag.g;
+      await frame();
+      tag.show();
+      await sleep(900);
+      layers.cloud.classList.remove("picking");
     }
 
     // Absorb into the card: the floating pill hands off to a row pill
@@ -500,6 +544,7 @@
     await sleep(650);
     holder.remove();
     if (created) created.g.remove();
+    if (h && h.classList.contains("badge")) h.remove();
     // Teammate rows live inside their card from here on, so they swing in and out with it
     if (o === mate) {
       const r = mate.rows[i];
@@ -683,6 +728,7 @@
 
   async function reset() {
     for (const n of layers.chip.querySelectorAll(":scope > *")) n.style.opacity = 0;
+    for (const n of layers.cloud.querySelectorAll(":scope > *")) n.style.opacity = 0;
     mateVisible(false);
     await sleep(700);
     layers.chip.textContent = "";
@@ -697,6 +743,7 @@
       tweenH(a.rect, AG_HEAD + 2);
     }
     refreshSubs();
+    makeCloud();
     await sleep(900);
   }
 
@@ -724,6 +771,7 @@
       return;
     }
     for (;;) {
+      await sleep(1200); // let the cloud float for a moment before the first pick
       await playOnce();
       await sleep(3200);
       await reset();
