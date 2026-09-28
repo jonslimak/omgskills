@@ -219,8 +219,8 @@
   const AGENTS = [
     { id: "chatgpt", logo: "chatgpt", kind: "Personal", name: "ChatGPT", label: "ChatGPT" },
     { id: "claude", logo: "claude", kind: "Personal", name: "Claude", label: "Claude" },
-    { id: "hermes", logo: "hermes", kind: "Team", name: "Hermes", label: "Hermes" },
-    { id: "team-chatgpt", logo: "chatgpt", kind: "Team", name: "ChatGPT", label: "team ChatGPT", shared: true },
+    { id: "hermes", logo: "hermes", kind: "Work", name: "Hermes", label: "Hermes" },
+    { id: "team-chatgpt", logo: "chatgpt", kind: "Work", name: "ChatGPT", label: "team ChatGPT", shared: true },
   ];
   // The story, played in order and then looped.
   // `phase` sets the headline when that event starts; it holds until the next phase.
@@ -687,7 +687,7 @@
       place(c, from.x, from.y, 0);
       a.items.push({ name, who: o.key, el: c });
       const h = layoutAgent(a);
-      if (a.shared && o.key === "mate") a.sub.textContent = "Team · shared";
+      if (a.shared && o.key === "mate") a.sub.textContent = "Work · shared";
       // Transient arrow
       const sx = o.key === "you" ? o.x + o.w * (a.i + 1) / (AGENTS.length + 1) : o.x + o.w / 2;
       const ex = a.x + AG_W / 2 + (a.shared ? (o.key === "you" ? -24 : 24) : 0);
