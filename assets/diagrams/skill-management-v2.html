@@ -251,7 +251,8 @@
   const W = 842; // drawing width stays fixed; the agent row is centred in it
   const OMG_W = 248, OMG_X = (W - OMG_W) / 2, OMG_Y = 150, ROW_Y = 136;
   const MATE_W = 222, MATE_X = W - M - MATE_W, MATE_Y = 262, M_ROW = 108;
-  const youCollects = EVENTS.filter((e) => e.who === "you" && e.collect).length;
+  // Rows your card ends up with: your own collects plus every teammate skill relayed through it
+  const youCollects = EVENTS.filter((e) => (e.who === "you" && e.collect) || (e.who === "mate" && (e.collect || e.reuse))).length;
   const cardH = (head, n) => (n ? head + n * (CH + CG) - CG + 20 : head - 2);
   const AG_Y = OMG_Y + cardH(ROW_Y, youCollects) + 80;
   const AG_X0 = (W - (4 * AG_W + 3 * AG_GAP)) / 2;
@@ -677,7 +678,38 @@
     setTimeout(() => lg.remove(), 450);
   }
 
-  async function send(o, name, targets) {
+  // Side-to-side curve, for links between the teammate card and your card
+  function curveH(sx, sy, ex, ey) {
+    const c = (sx - ex) * 0.45;
+    return `M${sx} ${sy}C${sx - c} ${sy} ${ex + c} ${ey} ${ex} ${ey}`;
+  }
+
+  // Teammates never drop skills straight into your agents: they go into your library first
+  async function relayToYou(name, targets) {
+    const mi = mate.rows.findIndex((r) => r.name === name);
+    const from = rowPos(mate, mi);
+    const i = you.rows.length;
+    const row = chip(layers.chip, name, { w: you.w - 32, count: true });
+    place(row, from.x, from.y, 0);
+    you.rows.push({ name, el: row, n: 0 });
+    tweenH(you.rect, cardH(you.head, you.rows.length));
+    const slot = rowPos(you, i);
+    const lg = el("g", { class: "link", style: "opacity:0" }, layers.link);
+    el("path", { d: curveH(MATE_X - 6, from.y + CH / 2, you.x + you.w + 6, slot.y + CH / 2) }, lg);
+    await frame();
+    lg.style.opacity = 1;
+    place(row, slot.x, slot.y, 1);
+    alignMate(); // your card grew, so keep the teammate centred on it
+    const mr = mate.rows[mi];
+    mr.n += targets.length;
+    mr.el.countT.textContent = mr.n;
+    mr.el.countG.style.opacity = 1;
+    refreshSubs();
+    await sleep(800);
+    (async () => { await sleep(250); lg.style.opacity = 0; await sleep(450); lg.remove(); })();
+  }
+
+  async function send(o, name, targets, owner) {
     const row = o.rows.find((r) => r.name === name);
     const from = rowPos(o, o.rows.indexOf(row));
     const flights = [];
@@ -685,9 +717,9 @@
       const a = agents[id];
       const c = chip(layers.chip, name);
       place(c, from.x, from.y, 0);
-      a.items.push({ name, who: o.key, el: c });
+      a.items.push({ name, who: owner || o.key, el: c });
       const h = layoutAgent(a);
-      if (a.shared && o.key === "mate") a.sub.textContent = "Work · shared";
+      if (a.shared && owner === "mate") a.sub.textContent = "Work · shared";
       // Transient arrow
       const sx = o.key === "you" ? o.x + o.w * (a.i + 1) / (AGENTS.length + 1) : o.x + o.w / 2;
       const ex = a.x + AG_W / 2 + (a.shared ? (o.key === "you" ? -24 : 24) : 0);
@@ -785,9 +817,12 @@
 
     // 3. Teammates on a shared agent get it too
     const shared = hits.find((a) => a.shared);
-    if (shared && mate.joined) {
+    if (mate.joined) {
       await showMate();
-      const ar = syncArrow(shared.x + AG_W / 2 + 24, AG_Y - 4, mate.x + mate.w / 2, omgBottom(mate) + 13);
+      // The update reaches the teammate through your library, not through the agent
+      const ri = o.rows.indexOf(row);
+      const ar = syncArrow(0, 0, 0, 0);
+      ar.lg.querySelector("path").setAttribute("d", curveH(you.x + you.w + 6, rowPos(you, ri).y + CH / 2, MATE_X - 6, mate.y + mateH() / 2));
       extras.push(ar.lg);
       await frame();
       ar.show();
@@ -887,7 +922,12 @@
       if (e.createOn) await createOnAgent(o, e.collect, e.createOn);
       else if (e.collect) await spawnAndCollect(o, e.collect);
       if (e.reuse) await sleep(900);
-      await send(o, e.collect || e.reuse, e.send);
+      if (o === mate) {
+        await relayToYou(e.collect || e.reuse, e.send);
+        await send(you, e.collect || e.reuse, e.send, "mate");
+      } else {
+        await send(o, e.collect || e.reuse, e.send);
+      }
       // Keep the teammate on screen between back-to-back teammate moves
       if (o === mate && EVENTS[k + 1]?.who !== "mate") await hideMate();
       await sleep(150);
