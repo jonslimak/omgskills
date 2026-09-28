@@ -225,7 +225,8 @@
   const EVENTS = [
     { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
-    { phase: "Keep track of personal ones", who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
+    // Made inside your personal ChatGPT, saved up to your library, then shared to other agents
+    { phase: "Keep track of personal ones", who: "you", createOn: "chatgpt", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
     // The teammate already has frontend-design in their library; they just send it
     { phase: "Share them with your team", who: "mate", reuse: "frontend-design", send: ["team-chatgpt"] },
@@ -422,7 +423,7 @@
     });
 
     const finalH = Math.max(...AGENTS.map((a) => {
-      const n = EVENTS.filter((e) => (e.send || []).includes(a.id)).length;
+      const n = EVENTS.filter((e) => (e.send || []).includes(a.id) || e.createOn === a.id).length;
       return AG_HEAD + n * (CH + CG) + (a.shared ? 22 + 6 : 0) + 20;
     }));
     svg.setAttribute("viewBox", `0 0 ${W} ${AG_Y + finalH + 24}`);
@@ -593,6 +594,57 @@
     }
   }
 
+
+  // A skill written inside an agent: it pops up in that agent with a "Created" badge,
+  // then travels up along flowing dots into your library
+  async function createOnAgent(o, name, agentId) {
+    const a = agents[agentId];
+    const w = chipW(name);
+    const c = chip(layers.chip, name, { float: true });
+    c.classList.add("create");
+    a.items.push({ name, who: o.key, el: c });
+    const h = layoutAgent(a);
+    const it = a.items[a.items.length - 1];
+    const at = (sc) => `translate(${it.pos.x + (w / 2) * (1 - sc)}px, ${it.pos.y + (CH / 2) * (1 - sc)}px) scale(${sc})`;
+    c.style.transition = "none";
+    c.style.transform = at(1);
+    c.style.opacity = 1;
+    tweenH(a.rect, h);
+    c.animate(
+      [{ transform: at(0.5), opacity: 0 }, { transform: at(1.08), opacity: 1, offset: 0.6 }, { transform: at(1), opacity: 1 }],
+      { duration: instant ? 0 : 520, easing: "cubic-bezier(0.3, 0.8, 0.4, 1)" }
+    );
+    activate(a);
+    await sleep(350);
+    const tag = badge(it.pos.x + w + 6, it.pos.y - 10, "Created", false, "create");
+    await frame();
+    tag.show();
+    await sleep(1100);
+
+    // Up into your card
+    const i = o.rows.length;
+    const row = chip(layers.chip, name, { w: o.w - 32, count: true });
+    place(row, it.pos.x, it.pos.y, 0);
+    o.rows.push({ name, el: row, n: 1 });
+    tweenH(o.rect, cardH(o.head, o.rows.length));
+    const slot = rowPos(o, i);
+    const lg = el("g", { class: "link", style: "opacity:0" }, layers.link);
+    el("path", { d: curve(a.x + AG_W / 2, AG_Y - 6, o.x + o.w * (a.i + 1) / (AGENTS.length + 1), omgBottom(o) + 4) }, lg);
+    await frame();
+    lg.style.opacity = 1;
+    tag.g.style.opacity = 0;
+    c.style.transition = "";
+    c.classList.remove("create", "float");
+    place(row, slot.x, slot.y, 1);
+    await sleep(650);
+    row.countT.textContent = "1";
+    row.countG.style.opacity = 1;
+    refreshSubs();
+    await sleep(500);
+    lg.style.opacity = 0;
+    tag.g.remove();
+    setTimeout(() => lg.remove(), 450);
+  }
 
   async function send(o, name, targets) {
     const row = o.rows.find((r) => r.name === name);
@@ -799,7 +851,8 @@
       if (e.phase) phase(e.phase);
       if (o === mate) await showMate();
       if (e.update) { await update(o, e.update); continue; }
-      if (e.collect) await spawnAndCollect(o, e.collect);
+      if (e.createOn) await createOnAgent(o, e.collect, e.createOn);
+      else if (e.collect) await spawnAndCollect(o, e.collect);
       if (e.reuse) await sleep(900);
       await send(o, e.collect || e.reuse, e.send);
       // Keep the teammate on screen between back-to-back teammate moves
