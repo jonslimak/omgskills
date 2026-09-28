@@ -190,14 +190,14 @@
   // The story, played in order and then looped.
   // `phase` sets the headline when that event starts; it holds until the next phase.
   const EVENTS = [
-    { phase: "Find skills", who: "you", collect: "grill-me", send: ["hermes"] },
+    { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
-    { phase: "Manage them", who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
+    { phase: "And keep track of personal ones", who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
-    { phase: "Share them", who: "mate", collect: "frontend-design", send: ["team-chatgpt"] },
+    { phase: "Share them with your team", who: "mate", collect: "frontend-design", send: ["team-chatgpt"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
-    { phase: "Update them", who: "you", update: "release-notes" },
+    { phase: "Keep everything updated", who: "you", update: "release-notes" },
   ];
 
   // ---- Geometry
@@ -321,7 +321,7 @@
     };
     requestAnimationFrame(step);
   }
-  // High-level phase shown above the diagram: Find skills > Manage them > Share them > Update them
+  // High-level phase shown above the diagram, set per event in EVENTS
   let phaseNow = "";
   function phase(text) {
     if (text === phaseNow) return;
@@ -717,7 +717,7 @@
       instant = true;
       svg.classList.add("instant");
       await playOnce();
-      phase("Find skills. Manage them. Share them. Update them.");
+      phase("Find the best, trusted skills, keep track of personal ones, share them with your team and keep everything updated.");
       return;
     }
     for (;;) {
