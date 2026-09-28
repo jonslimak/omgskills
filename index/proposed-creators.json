@@ -1,7 +1,30 @@
 {
-  "generatedAt": "2026-09-21T11:12:24.087Z",
+  "generatedAt": "2026-09-28T11:22:56.951Z",
   "candidateCount": 50,
   "candidates": [
+    {
+      "handle": "remotion-dev",
+      "suggestedAction": "review-for-watch",
+      "score": 224,
+      "reasons": [
+        "4 gold-basket skills",
+        "100k+ installs",
+        "10k+ best repo stars",
+        "1k+ median repo stars",
+        "3+ distinct repos"
+      ],
+      "skillCount": 30,
+      "goldBasketCount": 4,
+      "totalStars": 1010268,
+      "totalInstalls": 997748,
+      "sampleSkillIds": [
+        "remotion-dev/skills:remotion-render",
+        "remotion-dev/skills:remotion-create",
+        "remotion-dev/skills:remotion-captions",
+        "remotion-dev/skills:remotion-markup",
+        "remotion-dev/remotion:web-renderer-test"
+      ]
+    },
     {
       "handle": "stablyai",
       "suggestedAction": "review-for-watch",
@@ -14,8 +37,8 @@
       ],
       "skillCount": 9,
       "goldBasketCount": 3,
-      "totalStars": 479358,
-      "totalInstalls": 636819,
+      "totalStars": 629994,
+      "totalInstalls": 692009,
       "sampleSkillIds": [
         "stablyai/orca:orca-cli",
         "stablyai/orca:orchestration",
@@ -34,7 +57,7 @@
       ],
       "skillCount": 2,
       "goldBasketCount": 1,
-      "totalStars": 246692,
+      "totalStars": 249222,
       "totalInstalls": 271676,
       "sampleSkillIds": [
         "shadcn-ui/ui:shadcn",
@@ -44,6 +67,44 @@
     {
       "handle": "tt-a1i",
       "suggestedAction": "review-for-watch",
+      "score": 182,
+      "reasons": [
+        "1 gold-basket skill",
+        "100k+ installs",
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 2,
+      "goldBasketCount": 1,
+      "totalStars": 73233,
+      "totalInstalls": 117201,
+      "sampleSkillIds": [
+        "tt-a1i/archify:archify"
+      ]
+    },
+    {
+      "handle": "better-auth",
+      "suggestedAction": "review-for-watch",
+      "score": 168,
+      "reasons": [
+        "1 gold-basket skill",
+        "100k+ installs",
+        "1k+ best repo stars",
+        "100+ median repo stars",
+        "3+ distinct repos"
+      ],
+      "skillCount": 8,
+      "goldBasketCount": 1,
+      "totalStars": 2521,
+      "totalInstalls": 115041,
+      "sampleSkillIds": [
+        "better-auth/skills:better-auth-best-practices",
+        "better-auth/better-icons:better-icons"
+      ]
+    },
+    {
+      "handle": "dietrichgebert",
+      "suggestedAction": "review-for-watch",
       "score": 167,
       "reasons": [
         "1 gold-basket skill",
@@ -51,30 +112,48 @@
         "10k+ best repo stars",
         "1k+ median repo stars"
       ],
-      "skillCount": 2,
+      "skillCount": 6,
       "goldBasketCount": 1,
-      "totalStars": 68680,
-      "totalInstalls": 99708,
+      "totalStars": 877050,
+      "totalInstalls": 66451,
       "sampleSkillIds": [
-        "tt-a1i/archify:archify"
+        "dietrichgebert/ponytail:ponytail"
       ]
     },
     {
       "handle": "antibrow",
       "suggestedAction": "review-for-watch",
-      "score": 140,
+      "score": 155,
       "reasons": [
         "1 gold-basket skill",
-        "10k+ installs",
+        "100k+ installs",
         "500+ best repo stars",
         "100+ median repo stars"
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
       "totalStars": 513,
-      "totalInstalls": 93713,
+      "totalInstalls": 102687,
       "sampleSkillIds": [
         "antibrow/anti-detect-browser-skills:anti-detect-browser"
+      ]
+    },
+    {
+      "handle": "wind-alice",
+      "suggestedAction": "review-for-watch",
+      "score": 147,
+      "reasons": [
+        "1 gold-basket skill",
+        "100k+ installs",
+        "100+ median repo stars"
+      ],
+      "skillCount": 3,
+      "goldBasketCount": 1,
+      "totalStars": 351,
+      "totalInstalls": 220640,
+      "sampleSkillIds": [
+        "wind-alice/alicemarket:wind-mcp-skill",
+        "wind-alice/alicemarket:wind-alice"
       ]
     },
     {
@@ -88,11 +167,29 @@
       ],
       "skillCount": 30,
       "goldBasketCount": 1,
-      "totalStars": 1592280,
+      "totalStars": 1602585,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "bmad-code-org/bmad-method:bmad-sprint-planning",
-        "bmad-code-org/bmad-method:bmad"
+        "bmad-code-org/bmad-method:bmad-code-review"
+      ]
+    },
+    {
+      "handle": "nextlevelbuilder",
+      "suggestedAction": "review-for-watch",
+      "score": 137,
+      "reasons": [
+        "1 gold-basket skill",
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 7,
+      "goldBasketCount": 1,
+      "totalStars": 915342,
+      "totalInstalls": 0,
+      "sampleSkillIds": [
+        "nextlevelbuilder/ui-ux-pro-max-skill:slides",
+        "nextlevelbuilder/ui-ux-pro-max-skill:ckm:design-system"
       ]
     },
     {
@@ -106,7 +203,7 @@
       ],
       "skillCount": 19,
       "goldBasketCount": 1,
-      "totalStars": 728763,
+      "totalStars": 847698,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "yuan1z0825/nature-skills:nature-downloader",
@@ -124,28 +221,10 @@
       ],
       "skillCount": 3,
       "goldBasketCount": 1,
-      "totalStars": 501834,
+      "totalStars": 504287,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "f/prompts.chat:prompt-lookup"
-      ]
-    },
-    {
-      "handle": "abhigyanpatwari",
-      "suggestedAction": "review-for-watch",
-      "score": 137,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 4,
-      "goldBasketCount": 1,
-      "totalStars": 189839,
-      "totalInstalls": 0,
-      "sampleSkillIds": [
-        "abhigyanpatwari/gitnexus:gitnexus-impact-analysis",
-        "abhigyanpatwari/gitnexus:gitnexus-exploring"
       ]
     },
     {
@@ -159,61 +238,28 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 1,
-      "totalStars": 68880,
+      "totalStars": 69447,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "cline/cline:create-pull-request"
       ]
     },
     {
-      "handle": "mem0ai",
+      "handle": "op7418",
       "suggestedAction": "review-for-watch",
-      "score": 137,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 1,
-      "goldBasketCount": 1,
-      "totalStars": 65629,
-      "totalInstalls": 0,
-      "sampleSkillIds": [
-        "mem0ai/mem0:mem0"
-      ]
-    },
-    {
-      "handle": "cli",
-      "suggestedAction": "review-for-watch",
-      "score": 137,
-      "reasons": [
-        "1 gold-basket skill",
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 1,
-      "goldBasketCount": 1,
-      "totalStars": 46353,
-      "totalInstalls": 0,
-      "sampleSkillIds": [
-        "cli/cli:gh"
-      ]
-    },
-    {
-      "handle": "dietrichgebert",
-      "suggestedAction": "review-for-watch",
-      "score": 75,
+      "score": 87,
       "reasons": [
         "10k+ installs",
         "10k+ best repo stars",
-        "1k+ median repo stars"
+        "1k+ median repo stars",
+        "10+ distinct repos"
       ],
-      "skillCount": 6,
+      "skillCount": 11,
       "goldBasketCount": 0,
-      "totalStars": 727416,
-      "totalInstalls": 62043,
+      "totalStars": 62616,
+      "totalInstalls": 50712,
       "sampleSkillIds": [
-        "dietrichgebert/ponytail:ponytail"
+        "op7418/guizang-ppt-skill:guizang-ppt-skill"
       ]
     },
     {
@@ -227,8 +273,8 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 0,
-      "totalStars": 39850,
-      "totalInstalls": 52448,
+      "totalStars": 41008,
+      "totalInstalls": 56786,
       "sampleSkillIds": [
         "herdrdev/herdr:herdr"
       ]
@@ -244,8 +290,8 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 0,
-      "totalStars": 27594,
-      "totalInstalls": 55477,
+      "totalStars": 29166,
+      "totalInstalls": 57657,
       "sampleSkillIds": [
         "nutlope/hallmark:hallmark"
       ]
@@ -261,14 +307,14 @@
       ],
       "skillCount": 4,
       "goldBasketCount": 0,
-      "totalStars": 9416,
-      "totalInstalls": 39265,
+      "totalStars": 11480,
+      "totalInstalls": 39824,
       "sampleSkillIds": [
         "vuejs-ai/skills:vue-best-practices"
       ]
     },
     {
-      "handle": "anysearch-ai",
+      "handle": "typesafe-ai",
       "suggestedAction": "review-for-watch",
       "score": 65,
       "reasons": [
@@ -278,10 +324,10 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 0,
-      "totalStars": 6214,
-      "totalInstalls": 37890,
+      "totalStars": 2163,
+      "totalInstalls": 74858,
       "sampleSkillIds": [
-        "anysearch-ai/anysearch-skill:anysearch"
+        "typesafe-ai/skills:typesafe-ai"
       ]
     },
     {
@@ -295,10 +341,10 @@
       ],
       "skillCount": 63,
       "goldBasketCount": 0,
-      "totalStars": 19809,
-      "totalInstalls": 140400,
+      "totalStars": 20212,
+      "totalInstalls": 140524,
       "sampleSkillIds": [
-        "nexscope-ai/ecommerce-skills:dropshipping-product-research"
+        "nexscope-ai/ecommerce-skills:cross-border-ecommerce"
       ]
     },
     {
@@ -310,33 +356,32 @@
         "10k+ best repo stars",
         "3+ distinct repos"
       ],
-      "skillCount": 13,
+      "skillCount": 14,
       "goldBasketCount": 0,
-      "totalStars": 308503,
-      "totalInstalls": 52821,
+      "totalStars": 311952,
+      "totalInstalls": 58870,
       "sampleSkillIds": [
-        "mastra-ai/mastra:mastra-docs"
+        "mastra-ai/mastra:react-best-practices"
       ]
     },
     {
-      "handle": "op7418",
+      "handle": "autonnel",
       "suggestedAction": "review-for-watch",
-      "score": 57,
+      "score": 55,
       "reasons": [
-        "10k+ best repo stars",
-        "1k+ median repo stars",
-        "10+ distinct repos"
+        "100k+ installs",
+        "100+ median repo stars"
       ],
-      "skillCount": 11,
+      "skillCount": 6,
       "goldBasketCount": 0,
-      "totalStars": 59683,
-      "totalInstalls": 0,
+      "totalStars": 1140,
+      "totalInstalls": 413107,
       "sampleSkillIds": [
-        "op7418/guizang-ppt-skill"
+        "autonnel/autonnel-skills:funnel-platform-picker"
       ]
     },
     {
-      "handle": "remotion-dev",
+      "handle": "minimax-ai",
       "suggestedAction": "review-for-watch",
       "score": 51,
       "reasons": [
@@ -344,12 +389,12 @@
         "1k+ median repo stars",
         "3+ distinct repos"
       ],
-      "skillCount": 20,
+      "skillCount": 29,
       "goldBasketCount": 0,
-      "totalStars": 943126,
+      "totalStars": 330971,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "remotion-dev/remotion:pr-name"
+        "minimax-ai/skills:android-native-dev"
       ]
     },
     {
@@ -363,7 +408,7 @@
       ],
       "skillCount": 11,
       "goldBasketCount": 0,
-      "totalStars": 209310,
+      "totalStars": 213628,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "jackwener/opencli:opencli-adapter-author"
@@ -397,7 +442,7 @@
       ],
       "skillCount": 9,
       "goldBasketCount": 0,
-      "totalStars": 29154,
+      "totalStars": 29456,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "pydantic/pydantic-ai:building-pydantic-ai-agents"
@@ -414,7 +459,7 @@
       ],
       "skillCount": 23,
       "goldBasketCount": 0,
-      "totalStars": 18741,
+      "totalStars": 18769,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "composio-community/awesome-codex-skills:spreadsheet-formula-helper"
@@ -431,7 +476,7 @@
       ],
       "skillCount": 4,
       "goldBasketCount": 0,
-      "totalStars": 14381,
+      "totalStars": 14429,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "cocoindex-io/cocoindex:cocoindex"
@@ -447,10 +492,10 @@
       ],
       "skillCount": 75,
       "goldBasketCount": 0,
-      "totalStars": 11728,
-      "totalInstalls": 2027114,
+      "totalStars": 11782,
+      "totalInstalls": 2788111,
       "sampleSkillIds": [
-        "prisma/prisma-next:prisma-next"
+        "prisma/prisma-next:adr-review"
       ]
     },
     {
@@ -463,10 +508,10 @@
       ],
       "skillCount": 16,
       "goldBasketCount": 0,
-      "totalStars": 1090959,
+      "totalStars": 1126608,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "fission-ai/openspec:verify-openspec-docs"
+        "fission-ai/openspec:draft-openspec-docs"
       ]
     },
     {
@@ -495,7 +540,7 @@
       ],
       "skillCount": 19,
       "goldBasketCount": 0,
-      "totalStars": 959348,
+      "totalStars": 961046,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "tldraw/tldraw:write-unit-tests"
@@ -511,26 +556,10 @@
       ],
       "skillCount": 5,
       "goldBasketCount": 0,
-      "totalStars": 606806,
+      "totalStars": 612308,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "langgenius/dify:backend-code-review"
-      ]
-    },
-    {
-      "handle": "wanshuiyin",
-      "suggestedAction": "review-for-watch",
-      "score": 45,
-      "reasons": [
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 66,
-      "goldBasketCount": 0,
-      "totalStars": 545226,
-      "totalInstalls": 0,
-      "sampleSkillIds": [
-        "wanshuiyin/Auto-claude-code-research-in-sleep:openalex"
+        "langgenius/dify:frontend-code-review"
       ]
     },
     {
@@ -543,10 +572,26 @@
       ],
       "skillCount": 9,
       "goldBasketCount": 0,
-      "totalStars": 540724,
+      "totalStars": 584064,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "usestrix/strix:penetration-testing-with-strix"
+        "usestrix/strix:api-security-testing"
+      ]
+    },
+    {
+      "handle": "wanshuiyin",
+      "suggestedAction": "review-for-watch",
+      "score": 45,
+      "reasons": [
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 66,
+      "goldBasketCount": 0,
+      "totalStars": 545523,
+      "totalInstalls": 0,
+      "sampleSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:openalex"
       ]
     },
     {
@@ -559,7 +604,7 @@
       ],
       "skillCount": 17,
       "goldBasketCount": 0,
-      "totalStars": 523803,
+      "totalStars": 526568,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "langfuse/langfuse:backend-dev-guidelines"
@@ -575,10 +620,10 @@
       ],
       "skillCount": 10,
       "goldBasketCount": 0,
-      "totalStars": 488724,
+      "totalStars": 489846,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "metabase/metabase:add-malli-schemas"
+        "metabase/metabase:typescript-review"
       ]
     },
     {
@@ -607,7 +652,7 @@
       ],
       "skillCount": 7,
       "goldBasketCount": 0,
-      "totalStars": 398896,
+      "totalStars": 398907,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "leonardomso/33-js-concepts:seo-review"
@@ -621,12 +666,28 @@
         "10k+ best repo stars",
         "1k+ median repo stars"
       ],
-      "skillCount": 35,
+      "skillCount": 37,
       "goldBasketCount": 0,
-      "totalStars": 334726,
+      "totalStars": 368395,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "dontbesilent2025/dbskill:dbs-theory-grounding"
+        "dontbesilent2025/dbskill:dbs"
+      ]
+    },
+    {
+      "handle": "every-app",
+      "suggestedAction": "review-for-watch",
+      "score": 45,
+      "reasons": [
+        "10k+ best repo stars",
+        "1k+ median repo stars"
+      ],
+      "skillCount": 16,
+      "goldBasketCount": 0,
+      "totalStars": 338336,
+      "totalInstalls": 0,
+      "sampleSkillIds": [
+        "every-app/open-seo:competitive-landscape"
       ]
     },
     {
@@ -639,7 +700,7 @@
       ],
       "skillCount": 40,
       "goldBasketCount": 0,
-      "totalStars": 320168,
+      "totalStars": 320307,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "Orchestra-Research/AI-Research-SKILLs:hqq"
@@ -655,7 +716,7 @@
       ],
       "skillCount": 7,
       "goldBasketCount": 0,
-      "totalStars": 307640,
+      "totalStars": 319787,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "chromedevtools/chrome-devtools-mcp:chrome-devtools"
@@ -671,26 +732,10 @@
       ],
       "skillCount": 18,
       "goldBasketCount": 0,
-      "totalStars": 256601,
+      "totalStars": 256600,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "abpframework/abp:.claude/skills/abp-angular"
-      ]
-    },
-    {
-      "handle": "nextlevelbuilder",
-      "suggestedAction": "review-for-watch",
-      "score": 45,
-      "reasons": [
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 2,
-      "goldBasketCount": 0,
-      "totalStars": 255997,
-      "totalInstalls": 0,
-      "sampleSkillIds": [
-        "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max-skill"
       ]
     },
     {
@@ -703,10 +748,10 @@
       ],
       "skillCount": 3,
       "goldBasketCount": 0,
-      "totalStars": 243654,
+      "totalStars": 244237,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "rtk-ai/rtk:rtk-tdd"
+        "rtk-ai/rtk:code-simplifier"
       ]
     },
     {
@@ -719,10 +764,10 @@
       ],
       "skillCount": 10,
       "goldBasketCount": 0,
-      "totalStars": 243380,
+      "totalStars": 243948,
       "totalInstalls": 0,
       "sampleSkillIds": [
-        "tursodatabase/turso:code-quality"
+        "tursodatabase/turso:async-io-model"
       ]
     },
     {
@@ -735,26 +780,10 @@
       ],
       "skillCount": 1,
       "goldBasketCount": 0,
-      "totalStars": 227854,
+      "totalStars": 237628,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "deepseek-ai/deepseek-harness:dsh-prose-standard"
-      ]
-    },
-    {
-      "handle": "every-app",
-      "suggestedAction": "review-for-watch",
-      "score": 45,
-      "reasons": [
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 14,
-      "goldBasketCount": 0,
-      "totalStars": 219676,
-      "totalInstalls": 0,
-      "sampleSkillIds": [
-        "every-app/open-seo:papercuts"
       ]
     },
     {
@@ -767,7 +796,7 @@
       ],
       "skillCount": 12,
       "goldBasketCount": 0,
-      "totalStars": 216849,
+      "totalStars": 217048,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "Donchitos/Claude-Code-Game-Studios:.claude/skills/architecture-decision"
@@ -783,7 +812,7 @@
       ],
       "skillCount": 5,
       "goldBasketCount": 0,
-      "totalStars": 213994,
+      "totalStars": 214095,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "ccxt/ccxt:ccxt-python"
@@ -806,22 +835,6 @@
       ]
     },
     {
-      "handle": "asgeirtj",
-      "suggestedAction": "review-for-watch",
-      "score": 45,
-      "reasons": [
-        "10k+ best repo stars",
-        "1k+ median repo stars"
-      ],
-      "skillCount": 3,
-      "goldBasketCount": 0,
-      "totalStars": 195647,
-      "totalInstalls": 0,
-      "sampleSkillIds": [
-        "asgeirtj/system_prompts_leaks:doctor"
-      ]
-    },
-    {
       "handle": "imbad0202",
       "suggestedAction": "review-for-watch",
       "score": 45,
@@ -831,7 +844,7 @@
       ],
       "skillCount": 5,
       "goldBasketCount": 0,
-      "totalStars": 193322,
+      "totalStars": 209829,
       "totalInstalls": 0,
       "sampleSkillIds": [
         "imbad0202/academic-research-skills:academic-paper"
