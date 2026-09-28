@@ -98,6 +98,7 @@
   /* SVG */
   #flow text { fill: var(--ink); font-family: var(--sans); }
   #flow .card { fill: var(--card); }
+  #flow .card.agent-card { fill: transparent; }
   /* On a pure white page the cards are defined only by their shadow */
   #flow .lift { filter: drop-shadow(0 1px 2px var(--shadow-soft)) drop-shadow(0 8px 24px var(--shadow)); }
   #flow .lift-hero { filter: drop-shadow(0 2px 4px var(--shadow-soft)) drop-shadow(0 20px 48px var(--shadow)); }
@@ -400,8 +401,9 @@
       const g = el("g", { class: "anim" }, layers.card);
       const x = agentX(i);
       place(g, x, AG_Y, 1);
-      const face = el("g", { class: "lift" }, g);
-      const rect = el("rect", { class: "card", x: 0, y: 0, width: AG_W, height: AG_HEAD + 2, rx: 18 }, face);
+      // Agent cards have no fill or shadow; the rect only tracks the card's size
+      const face = el("g", {}, g);
+      const rect = el("rect", { class: "card agent-card", x: 0, y: 0, width: AG_W, height: AG_HEAD + 2, rx: 18 }, face);
       logo(g, a.logo, 28, 30, 12);
       txt(g, 47, 28, a.name, "agent-title");
       const sub = txt(g, 47, 41, a.kind, "agent-sub");
