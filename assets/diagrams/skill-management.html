@@ -106,9 +106,9 @@
   #flow .card { fill: var(--card); }
   #flow .lift { filter: drop-shadow(0 1px 1px var(--shadow-soft)) drop-shadow(0 6px 16px var(--shadow)); }
   #flow .lift-hero { filter: drop-shadow(0 1px 2px var(--shadow-soft)) drop-shadow(0 18px 40px var(--shadow)); }
-  #flow .omg-title { font-family: var(--display); font-size: 21px; font-weight: 600; letter-spacing: -0.02em; }
-  #flow .omg-sub { fill: var(--muted); font-size: 13px; }
-  #flow .mate-title { font-family: var(--display); font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
+  /* Card names and counts match the agent cards' name and "Personal" label */
+  #flow .omg-title, #flow .mate-title { font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: -0.015em; }
+  #flow .omg-sub { fill: var(--muted); font-size: 10px; }
   #flow .agent-title { font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: -0.015em; }
   #flow .agent-sub, #flow .group-cap { fill: var(--muted); font-size: 12.5px; }
   #flow .agent-sub { font-size: 10px; }
@@ -218,8 +218,8 @@
   const AG_GAP = 14, AG_W = 190, AG_HEAD = 56;
   const CH = 32, CG = 8, M = 20;
   const W = 2 * M + 4 * AG_W + 3 * AG_GAP; // 842: four 190px agent cards fit exactly
-  const OMG_W = 248, OMG_X = (W - OMG_W) / 2, OMG_Y = 132, ROW_Y = 150;
-  const MATE_W = 222, MATE_X = W - M - MATE_W, MATE_Y = 262, M_ROW = 120;
+  const OMG_W = 248, OMG_X = (W - OMG_W) / 2, OMG_Y = 132, ROW_Y = 136;
+  const MATE_W = 222, MATE_X = W - M - MATE_W, MATE_Y = 262, M_ROW = 108;
   const youCollects = EVENTS.filter((e) => e.who === "you" && e.collect).length;
   const cardH = (head, n) => (n ? head + n * (CH + CG) - CG + 20 : head - 2);
   const AG_Y = OMG_Y + cardH(ROW_Y, youCollects) + 80;
@@ -358,8 +358,8 @@
     const yFace = el("g", { class: "lift-hero" }, yg);
     const yRect = el("rect", { class: "card", x: 0, y: 0, width: OMG_W, height: cardH(ROW_Y, 0), rx: 24 }, yFace);
     avatar(yg, "you", OMG_W / 2, 56, 34);
-    txt(yg, OMG_W / 2, 118, "you", "omg-title", "middle");
-    const ySub = txt(yg, OMG_W / 2, 137, "", "omg-sub", "middle");
+    txt(yg, OMG_W / 2, 110, "you", "omg-title", "middle");
+    const ySub = txt(yg, OMG_W / 2, 123, "", "omg-sub", "middle");
     you = { key: "you", g: yg, rect: yRect, sub: ySub, rows: [], x: OMG_X, y: OMG_Y, w: OMG_W, head: ROW_Y };
 
     // Teammate: smaller card, joins later
@@ -368,8 +368,8 @@
     const mFace = el("g", { class: "lift" }, mg);
     const mRect = el("rect", { class: "card", x: 0, y: 0, width: MATE_W, height: cardH(M_ROW, 0), rx: 20 }, mFace);
     avatar(mg, "sam", MATE_W / 2, 42, 24);
-    txt(mg, MATE_W / 2, 89, "teammate", "mate-title", "middle");
-    const mSub = txt(mg, MATE_W / 2, 106, "", "omg-sub", "middle");
+    txt(mg, MATE_W / 2, 84, "teammate", "mate-title", "middle");
+    const mSub = txt(mg, MATE_W / 2, 97, "", "omg-sub", "middle");
     mate = { key: "mate", g: mg, rect: mRect, sub: mSub, rows: [], x: MATE_X, y: MATE_Y, w: MATE_W, head: M_ROW, shown: false };
     mateVisible(false);
 
