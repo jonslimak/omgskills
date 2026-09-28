@@ -20,6 +20,9 @@
     --update: #248a3d;
     --on-update: #ffffff;
     --update-tint: rgba(52, 199, 89, 0.22);
+    --create: #0071e3;
+    --on-create: #ffffff;
+    --create-fill: #dcebfd;
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
     --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
   }
@@ -42,6 +45,9 @@
       --update: #30d158;
       --on-update: #002b0c;
       --update-tint: rgba(48, 209, 88, 0.26);
+      --create: #0a84ff;
+      --on-create: #ffffff;
+      --create-fill: #0f2b4d;
     }
   }
   :root[data-theme="dark"] {
@@ -62,6 +68,9 @@
     --update: #30d158;
     --on-update: #002b0c;
     --update-tint: rgba(48, 209, 88, 0.26);
+    --create: #0a84ff;
+    --on-create: #ffffff;
+    --create-fill: #0f2b4d;
   }
 
   body {
@@ -146,6 +155,9 @@
   #flow .chip.flash .bg { fill: var(--update-tint); }
   #flow .badge rect { fill: var(--update); }
   #flow .badge text { fill: var(--on-update); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+  #flow .badge.create rect { fill: var(--create); }
+  #flow .badge.create text { fill: var(--on-create); }
+  #flow .chip.float.create .bg { fill: var(--create-fill); }
   #flow .link.sync path { stroke: var(--update); stroke-width: 1.75; }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
@@ -347,7 +359,7 @@
     el("path", { d: "M0,1 L9,5 L0,9 z" }, m);
     const ms = el("marker", { id: "arrow-sync", class: "arrowhead sync", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, ms);
-    layers = { link: el("g", {}, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
+    layers = { link: el("g", {}, svg), under: el("g", {}, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
 
     // You: the hero card
     const yg = el("g", { class: "anim" }, layers.card);
@@ -440,25 +452,30 @@
     const holder = el("g", { class: "anim" }, layers.chip);
     const c = chip(holder, name, { float: true });
     c.classList.remove("anim");
-    let sx, sy, h = null;
+    let sx, sy, h = null, created = null;
 
     if (hatch) {
-      // Pops out of the card's avatar and springs above the card (explicit keyframes)
+      // Rises from behind the card's top edge, light blue, with a "Skill created" badge
       holder.classList.remove("anim");
-      const cx = o.x + o.w / 2, cy = o.y + (o.key === "you" ? 56 : 42);
-      sx = cx - w / 2;
+      holder.remove();
+      layers.under.appendChild(holder);
+      c.classList.add("create");
+      sx = o.x + o.w / 2 - w / 2;
       sy = o.y - CH - 26;
-      const s0 = 0.2;
-      const startT = `translate(${cx - (w / 2) * s0}px, ${cy - (CH / 2) * s0}px) scale(${s0})`;
-      const endT = `translate(${sx}px, ${sy}px) scale(1)`;
+      const startT = `translate(${sx}px, ${o.y + 12}px)`;
+      const endT = `translate(${sx}px, ${sy}px)`;
       holder.style.transform = endT;
       holder.style.opacity = 1;
       holder.animate(
-        [{ transform: startT, opacity: 0 }, { transform: startT, opacity: 1, offset: 0.12 }, { transform: endT, opacity: 1 }],
-        { duration: instant ? 0 : 900, easing: "cubic-bezier(0.34, 1.4, 0.64, 1)" }
+        [{ transform: startT }, { transform: `translate(${sx}px, ${sy - 8}px)`, offset: 0.72 }, { transform: endT }],
+        { duration: instant ? 0 : 850, easing: "cubic-bezier(0.25, 0.9, 0.3, 1)" }
       );
       say(`${WHO[o.key]} made <b>${name}</b>`);
-      await sleep(1500);
+      await sleep(650);
+      created = badge(sx + w + 6, sy - 10, "Skill created", false, "create");
+      await frame();
+      created.show();
+      await sleep(1400);
       holder.classList.add("anim");
       void holder.getBoundingClientRect();
     } else {
@@ -486,12 +503,14 @@
     tweenH(o.rect, cardH(o.head, o.rows.length));
     await frame();
     if (h) h.style.opacity = 0;
+    if (created) { created.g.style.opacity = 0; c.classList.remove("create"); }
     place(holder, slot.x, slot.y, 0);
     place(row, slot.x, slot.y, 1);
     say(`${WHO[o.key]} added <b>${name}</b> to ${o.key === "you" ? "your" : "their"} library`);
     refreshSubs();
     await sleep(900);
     holder.remove();
+    if (created) created.g.remove();
   }
 
 
@@ -537,11 +556,11 @@
   }
 
   // A small green pill, e.g. "Updated", pinned to the top-right of a skill
-  function badge(x, y, label, center) {
+  function badge(x, y, label, center, kind) {
     measurer.textContent = label;
     const w = Math.ceil(measurer.getComputedTextLength()) + 14;
     if (center) x += w / 2;
-    const g = el("g", { class: "badge anim" }, layers.chip);
+    const g = el("g", { class: `badge anim${kind ? " " + kind : ""}` }, layers.chip);
     el("rect", { width: w, height: 18, rx: 9 }, g);
     txt(g, w / 2, 12.5, label, "", "middle");
     place(g, x - w, y + 4, 0);
