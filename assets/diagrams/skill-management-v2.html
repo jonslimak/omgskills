@@ -163,6 +163,7 @@
   #flow .badge.create rect { fill: var(--created-tag); }
   #flow .badge.create text { fill: #ffffff; }
   #flow .link.sync path { stroke: var(--update); }
+  #flow .link.relay path { stroke: var(--create); }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow .badge.author rect { fill: var(--ink); }
   #flow .badge.author text { fill: var(--bg); font-weight: 500; }
@@ -694,8 +695,11 @@
     you.rows.push({ name, el: row, n: 0 });
     tweenH(you.rect, cardH(you.head, you.rows.length));
     const slot = rowPos(you, i);
-    const lg = el("g", { class: "link", style: "opacity:0" }, layers.link);
-    el("path", { d: curveH(MATE_X - 6, from.y + CH / 2, you.x + you.w + 6, slot.y + CH / 2) }, lg);
+    // Straight, level line in blue: a teammate handing a skill to your library
+    // Level with the landing row, but kept within the teammate card so it leaves from its edge
+    const ly = Math.min(Math.max(slot.y + CH / 2, mate.y + 24), mate.y + mateH() - 24);
+    const lg = el("g", { class: "link relay", style: "opacity:0" }, layers.link);
+    el("path", { d: `M${MATE_X - 6} ${ly}H${you.x + you.w + 6}` }, lg);
     await frame();
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
@@ -822,7 +826,8 @@
       // The update reaches the teammate through your library, not through the agent
       const ri = o.rows.indexOf(row);
       const ar = syncArrow(0, 0, 0, 0);
-      ar.lg.querySelector("path").setAttribute("d", curveH(you.x + you.w + 6, rowPos(you, ri).y + CH / 2, MATE_X - 6, mate.y + mateH() / 2));
+      const sy = Math.min(Math.max(rowPos(you, ri).y + CH / 2, mate.y + 24), mate.y + mateH() - 24);
+      ar.lg.querySelector("path").setAttribute("d", `M${you.x + you.w + 6} ${sy}H${MATE_X - 6}`);
       extras.push(ar.lg);
       await frame();
       ar.show();
