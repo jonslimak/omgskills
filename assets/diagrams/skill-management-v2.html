@@ -776,15 +776,16 @@
   }
 
   // Single hop of the logo/avatar and name when a skill arrives
-  // Very faint grey rings that spread out from your card when it takes in a skill
+  // Very faint grey circular rings that spread out from the centre of your card when it takes in a skill
   function rippleYou() {
     if (instant || reduced) return;
     const h = +(you.rect.dataset.h || you.rect.getAttribute("height"));
+    const cx = you.x + you.w / 2, cy = you.y + h / 2, r = Math.max(you.w, h) * 0.45;
     [0, 260, 520].forEach((delay) => {
-      const ring = el("rect", { class: "ripple", x: you.x, y: you.y, width: you.w, height: h, rx: 24 }, layers.ripple);
+      const ring = el("circle", { class: "ripple", cx, cy, r }, layers.ripple);
       ring.animate(
-        [{ transform: "scale(1)", opacity: 0.5 }, { transform: "scale(1.28, 1.14)", opacity: 0 }],
-        { duration: 1600, delay, easing: "cubic-bezier(0.2, 0.6, 0.35, 1)", fill: "both" }
+        [{ transform: "scale(1)", opacity: 0.5 }, { transform: "scale(1.9)", opacity: 0 }],
+        { duration: 1700, delay, easing: "cubic-bezier(0.2, 0.6, 0.35, 1)", fill: "both" }
       ).onfinish = () => ring.remove();
     });
   }
