@@ -20,6 +20,8 @@
     --update: #248a3d;
     --on-update: #ffffff;
     --update-tint: rgba(52, 199, 89, 0.22);
+    --create: #0071e3;
+    --created-tag: #ff3b30;
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
     --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
   }
@@ -42,6 +44,8 @@
       --update: #30d158;
       --on-update: #002b0c;
       --update-tint: rgba(48, 209, 88, 0.26);
+      --create: #0a84ff;
+      --created-tag: #ff453a;
     }
   }
   :root[data-theme="dark"] {
@@ -62,6 +66,8 @@
     --update: #30d158;
     --on-update: #002b0c;
     --update-tint: rgba(48, 209, 88, 0.26);
+    --create: #0a84ff;
+    --created-tag: #ff453a;
   }
 
   body {
@@ -149,7 +155,13 @@
   #flow .badge rect { fill: var(--update); }
   #flow .badge text { fill: var(--on-update); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
   #flow .chip.float .bg { stroke: transparent; stroke-width: 1.5; }
-  #flow .chip.float.create .bg { fill: var(--float); stroke: var(--update); }
+  /* Skill creation moment: Apple blue pill, white text, red "Created" tag */
+  #flow .chip.float.create .bg { fill: var(--create); }
+  #flow .chip .name { transition: fill 400ms ease; }
+  #flow .chip.create .name { fill: #ffffff; }
+  #flow .chip.create .lock { stroke: #ffffff; }
+  #flow .badge.create rect { fill: var(--created-tag); }
+  #flow .badge.create text { fill: #ffffff; }
   #flow .link.sync path { stroke: var(--update); }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow .badge.author rect { fill: var(--ink); }
