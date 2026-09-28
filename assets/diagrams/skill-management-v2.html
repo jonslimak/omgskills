@@ -806,8 +806,12 @@
     const glow = el("rect", { class: "pulse", width: bg.getAttribute("width"), height: CH, rx: CH / 2 });
     node.insertBefore(glow, bg); // behind the pill, so only the outer halo shows
     const a = glow.animate(
-      [{ strokeWidth: "0px", opacity: 0.55 }, { strokeWidth: "18px", opacity: 0 }],
-      { duration: 750, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" }
+      [
+        { strokeWidth: "0px", opacity: 0.9 },
+        { strokeWidth: "16px", opacity: 0.55, offset: 0.35 },
+        { strokeWidth: "30px", opacity: 0 },
+      ],
+      { duration: 950, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)", fill: "both" }
     );
     a.onfinish = () => glow.remove();
   }
@@ -868,7 +872,7 @@
       extras.push(t.g);
       await frame();
       t.show();
-      await sleep(1600);
+      await sleep(1100);
     }
 
     // Settle
@@ -933,7 +937,7 @@
     for (const n of layers.chip.querySelectorAll(":scope > *")) n.style.opacity = 0;
     for (const n of layers.cloud.querySelectorAll(":scope > *")) n.style.opacity = 0;
     mateVisible(false);
-    await sleep(700);
+    await sleep(500);
     layers.chip.textContent = "";
     layers.link.textContent = "";
     mate.rows.forEach((r) => r.el.remove());
@@ -947,7 +951,7 @@
     }
     refreshSubs();
     makeCloud();
-    await sleep(900);
+    await sleep(600);
   }
 
   async function playOnce() {
@@ -980,9 +984,9 @@
       return;
     }
     for (;;) {
-      await sleep(1200); // let the cloud float for a moment before the first pick
+      await sleep(600); // let the cloud float for a moment before the first pick
       await playOnce();
-      await sleep(3200);
+      await sleep(1200);
       await reset();
     }
   }
