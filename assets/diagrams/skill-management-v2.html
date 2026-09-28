@@ -610,7 +610,7 @@
     }
     await frame();
     // The agent starts to react while the skill is still on its way down
-    if (!instant) setTimeout(() => flights.forEach((f) => activate(f.a)), 380);
+    if (!instant) setTimeout(() => flights.forEach((f) => activate(f.a)), 520);
     for (const f of flights) {
       f.lg.style.opacity = 1;
       f.p.style.strokeDashoffset = 0;
@@ -640,7 +640,7 @@
     const k = (y, sc, offset) => ({ transform: `translateY(${y}px) scale(${sc})`, offset, easing: "cubic-bezier(0.33, 0, 0.3, 1)" });
     a.head.animate(
       [k(0, 1, 0), k(1.5, 0.98, 0.14), k(-7, 1.06, 0.42), k(1.5, 0.99, 0.64), k(-2, 1.015, 0.82), k(0, 1, 1)],
-      { duration: 900 }
+      { duration: 520 }
     );
   }
 
