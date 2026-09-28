@@ -363,14 +363,14 @@
 
     // Teammate: smaller card, joins later
     const mg = el("g", { class: "anim" }, layers.card);
-    mg.style.transform = `translate(${MATE_X + MATE_W * 0.04}px, ${MATE_Y + 12}px) scale(0.92)`;
-    mg.style.opacity = 0;
+    layers.card.insertBefore(mg, yg); // drawn behind your card so it can swing out from under it
     const mFace = el("g", { class: "lift" }, mg);
     const mRect = el("rect", { class: "card", x: 0, y: 0, width: MATE_W, height: cardH(M_ROW, 0), rx: 20 }, mFace);
     avatar(mg, "sam", MATE_W / 2, 42, 24);
     txt(mg, MATE_W / 2, 89, "teammate", "mate-title", "middle");
     const mSub = txt(mg, MATE_W / 2, 106, "", "omg-sub", "middle");
     mate = { key: "mate", g: mg, rect: mRect, sub: mSub, rows: [], x: MATE_X, y: MATE_Y, w: MATE_W, head: M_ROW, shown: false };
+    mateVisible(false);
 
     // Agents
     agents = {};
@@ -628,11 +628,21 @@
   }
 
   // The teammate card pops in for their moves and pops out afterwards
+  // Shown: at its spot, full size. Hidden: tucked behind the centre of your card, smaller.
   function mateVisible(v) {
-    const s = v ? 1 : 0.92, h = +(mate.rect.dataset.h || mate.rect.getAttribute("height"));
-    mate.g.style.transform = `translate(${MATE_X + (MATE_W * (1 - s)) / 2}px, ${MATE_Y + (h * (1 - s)) / 2}px) scale(${s})`;
+    const h = +(mate.rect.dataset.h || mate.rect.getAttribute("height"));
+    const s = v ? 1 : 0.6;
+    const cx = v ? MATE_X + MATE_W / 2 : OMG_X + OMG_W / 2;
+    const cy = MATE_Y + h / 2;
+    mate.g.style.transition = v
+      ? "transform 900ms cubic-bezier(0.2, 0.9, 0.3, 1.08), opacity 200ms ease"
+      : "transform 800ms cubic-bezier(0.5, 0, 0.3, 1), opacity 250ms ease 600ms";
+    mate.g.style.transform = `translate(${cx - (MATE_W * s) / 2}px, ${cy - (h * s) / 2}px) scale(${s})`;
     mate.g.style.opacity = v ? 1 : 0;
-    for (const r of mate.rows) r.el.style.opacity = v ? 1 : 0;
+    for (const r of mate.rows) {
+      r.el.style.transitionDelay = v ? "550ms" : "0ms";
+      r.el.style.opacity = v ? 1 : 0;
+    }
   }
   async function showMate() {
     if (mate.shown) return;
@@ -646,7 +656,7 @@
     if (!mate.shown) return;
     mate.shown = false;
     mateVisible(false);
-    await sleep(500);
+    await sleep(850);
   }
 
   async function reset() {
