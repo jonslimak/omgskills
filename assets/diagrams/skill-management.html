@@ -201,9 +201,9 @@
   const EVENTS = [
     { who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
+    { who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
     { who: "mate", collect: "frontend-design", send: ["team-chatgpt"] },
-    { who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
     { who: "you", update: "release-notes" },
@@ -669,7 +669,7 @@
   }
 
   async function playOnce() {
-    for (const e of EVENTS) {
+    for (const [k, e] of EVENTS.entries()) {
       const o = e.who === "you" ? you : mate;
       if (o === mate) await showMate();
       if (e.update) { await update(o, e.update); continue; }
@@ -678,7 +678,8 @@
       if (e.reuse) await sleep(1400);
       await sleep(300);
       await send(o, e.collect || e.reuse, e.send);
-      if (o === mate) { await sleep(500); await hideMate(); }
+      // Keep the teammate on screen between back-to-back teammate moves
+      if (o === mate && EVENTS[k + 1]?.who !== "mate") { await sleep(500); await hideMate(); }
       await sleep(600);
     }
   }
