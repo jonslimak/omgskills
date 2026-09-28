@@ -150,7 +150,8 @@
   @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   #flow .bob { animation: bob 4s ease-in-out infinite; }
   #flow .cloud .bob > .chip { transition: opacity 300ms ease; }
-  #flow .cloud.picking .cloud-chip:not(.picked) .bob > .chip { opacity: 0.35; }
+  /* Unpicked skills stay faded so the cloud reads as background until one is chosen */
+  #flow .cloud .cloud-chip:not(.picked) .bob > .chip { opacity: 0.35; }
   @media (prefers-reduced-motion: reduce) { #flow .bob { animation: none; } }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
 </style>
