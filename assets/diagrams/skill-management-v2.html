@@ -674,7 +674,7 @@
     o.rows.push({ name, el: row, n: 1 });
     tweenH(o.rect, cardH(o.head, o.rows.length));
     const slot = rowPos(o, i);
-    const lg = el("g", { class: "link", style: "opacity:0" }, layers.link);
+    const lg = el("g", { class: "link relay", style: "opacity:0" }, layers.link); // blue: a new skill saved to your library
     el("path", { d: curve(a.x + AG_W / 2, AG_Y - 6, o.x + o.w * (a.i + 1) / (AGENTS.length + 1), omgBottom(o) + 4) }, lg);
     await frame();
     lg.style.opacity = 1;
