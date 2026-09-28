@@ -77,18 +77,18 @@
   .stage { max-width: 842px; margin: 0 auto; display: grid; gap: 22px; }
 
   .story { display: grid; gap: 8px; justify-items: center; text-align: center; }
-  .story h2 {
+  .ticker { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 1.6em; }
+  .ticker p {
     margin: 0;
     font-family: var(--display);
     font-size: clamp(22px, 3.4vw, 30px);
     line-height: 1.15;
     letter-spacing: -0.022em;
     font-weight: 600;
-    text-wrap: balance;
+    color: var(--ink);
+    transition: opacity 200ms ease, transform 200ms ease;
   }
-  .ticker { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 1.6em; }
-  .ticker p { margin: 0; color: var(--muted); font-size: 15px; }
-  .ticker b { color: var(--ink); font-weight: 500; }
+  .ticker p.out { opacity: 0; transform: translateY(6px); }
   .pause {
     font: 500 12px/1 var(--sans);
     color: var(--muted);
@@ -155,7 +155,6 @@
 
 <div class="stage">
   <header class="story">
-    <h2>Add a skill once. Send it to any agent.</h2>
     <div class="ticker">
       <p id="ticker" aria-live="polite">&nbsp;</p>
       <button class="pause" id="pause" type="button" aria-pressed="false">Pause</button>
@@ -208,7 +207,6 @@
     { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
     { who: "you", update: "release-notes" },
   ];
-  const WHO = { you: "You", mate: "Your teammate" };
 
   // ---- Geometry
   const NS = "http://www.w3.org/2000/svg";
@@ -332,7 +330,15 @@
     };
     requestAnimationFrame(step);
   }
-  const say = (html) => { ticker.innerHTML = html; };
+  // High-level phase shown above the diagram: Find skills > Manage them > Share them > Update them
+  let phaseNow = "";
+  function phase(text) {
+    if (text === phaseNow) return;
+    phaseNow = text;
+    if (instant) { ticker.textContent = text; return; }
+    ticker.classList.add("out");
+    setTimeout(() => { ticker.textContent = text; ticker.classList.remove("out"); }, 200);
+  }
 
   // ---- Scene
   let layers, you, mate, agents, measurerReady = false;
@@ -461,7 +467,7 @@
         [{ transform: startT }, { transform: `translate(${sx}px, ${sy - 8}px)`, offset: 0.72 }, { transform: endT }],
         { duration: instant ? 0 : 850, easing: "cubic-bezier(0.25, 0.9, 0.3, 1)" }
       );
-      say(`${WHO[o.key]} made <b>${name}</b>`);
+      phase(o === mate ? "Share them" : "Find skills");
       await sleep(450);
       created = badge(sx + w + 6, sy - 10, "Created", false, "create");
       await frame();
@@ -481,7 +487,7 @@
       place(holder, sx, sy + 10, 0);
       await frame();
       place(holder, sx, sy, 1);
-      say(`${WHO[o.key]} found <b>${name}</b> by ${PEOPLE[SKILLS[name].author].handle}`);
+      phase(o === mate ? "Share them" : "Find skills");
       await sleep(750);
     }
 
@@ -498,7 +504,6 @@
     if (created) { created.g.style.opacity = 0; c.classList.remove("create"); }
     place(holder, slot.x, slot.y, 0);
     place(row, slot.x, slot.y, 1);
-    say(`${WHO[o.key]} added <b>${name}</b> to ${o.key === "you" ? "your" : "their"} library`);
     refreshSubs();
     await sleep(650);
     holder.remove();
@@ -516,7 +521,7 @@
   }
 
 
-  async function send(o, name, targets) {
+  async function send(o, name, targets, ph) {
     const row = o.rows.find((r) => r.name === name);
     const from = rowPos(o, o.rows.indexOf(row));
     const flights = [];
@@ -543,9 +548,7 @@
       for (const it of f.a.items) place(it.el, it.pos.x, it.pos.y, 1);
       for (const cap of Object.values(f.a.caps)) place(cap, cap.pos.x, cap.pos.y, 1);
     }
-    const names = targets.map((id) => agents[id].label);
-    const list = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names.at(-1) : names[0];
-    say(`${WHO[o.key]} sent <b>${name}</b> to ${list}`);
+    phase(ph || (o === mate ? "Share them" : "Manage them"));
     await sleep(650);
     row.n += targets.length;
     row.el.countT.textContent = row.n;
@@ -591,7 +594,7 @@
     extras.push(b0.g);
     await frame();
     b0.show();
-    say(`You updated <b>${name}</b>`);
+    phase("Update them");
     await sleep(1100);
 
     // 2. It syncs to every agent that has it
@@ -605,8 +608,6 @@
     });
     await frame();
     arrows.forEach((ar) => ar.show());
-    const list = hits.map((a) => a.label);
-    say(`The new version syncs to ${list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list.at(-1) : list[0]}`);
     await sleep(600);
     for (const a of hits) {
       const it = a.items.find((x) => x.name === name);
@@ -626,7 +627,6 @@
       extras.push(ar.lg);
       await frame();
       ar.show();
-      say(`Your teammate gets it too, through the shared ${shared.label}`);
       await sleep(600);
       const t = badge(mate.x + mate.w / 2, omgBottom(mate) - 9, "App synced", true);
       extras.push(t.g);
@@ -680,7 +680,7 @@
   async function showMate() {
     if (mate.shown) return;
     mate.shown = true;
-    if (!mate.joined) say("Your teammate joins with their own library");
+    phase("Share them");
     mate.joined = true;
     mateVisible(true);
     await sleep(mate.rows.length ? 550 : 800);
@@ -693,7 +693,6 @@
   }
 
   async function reset() {
-    say("&nbsp;");
     for (const n of layers.chip.querySelectorAll(":scope > *")) n.style.opacity = 0;
     mateVisible(false);
     await sleep(700);
@@ -718,9 +717,9 @@
       if (o === mate) await showMate();
       if (e.update) { await update(o, e.update); continue; }
       if (e.collect) await spawnAndCollect(o, e.collect);
-      else say(`<b>${e.reuse}</b> is already in your library, so there is nothing to add`);
+      else phase("Share them");
       if (e.reuse) await sleep(900);
-      await send(o, e.collect || e.reuse, e.send);
+      await send(o, e.collect || e.reuse, e.send, e.reuse ? "Share them" : null);
       // Keep the teammate on screen between back-to-back teammate moves
       if (o === mate && EVENTS[k + 1]?.who !== "mate") await hideMate();
       await sleep(150);
@@ -732,13 +731,12 @@
       instant = true;
       svg.classList.add("instant");
       await playOnce();
-      say("Your library feeds every agent, and a teammate's library feeds the team agent too.");
+      phase("Find skills. Manage them. Share them. Update them.");
       pauseBtn.hidden = true;
       return;
     }
     for (;;) {
       await playOnce();
-      say("Every agent has exactly the skills it was sent");
       await sleep(3200);
       await reset();
     }
