@@ -428,29 +428,50 @@
   }
 
   // ---- Actions
+  // Is this skill written by the card's own person? Then it hatches from the card.
+  const madeBy = (o, name) => SKILLS[name].author === (o.key === "you" ? "you" : "sam");
+  const scaled = (node, x, y, s, w) =>
+    (node.style.transform = `translate(${x + (w / 2) * (1 - s)}px, ${y + (CH / 2) * (1 - s)}px) scale(${s})`);
+
   async function spawnAndCollect(o, name) {
     const w = chipW(name);
-    const band = o.key === "you"
-      ? { x0: 60, x1: W - 60 - w, y0: 18, y1: 60 }
-      : { x0: MATE_X - 10, x1: W - M - w, y0: MATE_Y - 104, y1: MATE_Y - 84 };
-    const sx = band.x0 + Math.random() * Math.max(0, band.x1 - band.x0);
-    const sy = band.y0 + Math.random() * (band.y1 - band.y0);
-    const tilt = (Math.random() * 5 - 2.5).toFixed(1);
-
+    const hatch = madeBy(o, name);
     const holder = el("g", { class: "anim" }, layers.chip);
     const c = chip(holder, name, { float: true });
     c.classList.remove("anim");
-    c.setAttribute("transform", `rotate(${tilt} ${w / 2} ${CH / 2})`);
-    const h = txt(holder, w / 2, CH + 18, PEOPLE[SKILLS[name].author].handle, "handle", "middle");
-    place(holder, sx, sy + 10, 0);
-    await frame();
-    place(holder, sx, sy, 1);
-    const au = SKILLS[name].author;
-    const src = au === "you" ? "in your team's private repo" : au === "sam" ? "in the team's private repo" : `by ${PEOPLE[au].handle}`;
-    say(`${WHO[o.key]} found <b>${name}</b> ${src}`);
-    await sleep(1100);
+    let sx, sy, h = null;
 
-    // Fly into the card: the floating pill hands off to a row pill
+    if (hatch) {
+      // Pops out of the card's avatar, springs above the card
+      const cx = o.x + o.w / 2, cy = o.y + (o.key === "you" ? 56 : 42);
+      sx = cx - w / 2;
+      sy = o.y - CH - 26;
+      scaled(holder, cx - w / 2, cy - CH / 2, 0.2, w);
+      holder.style.opacity = 0;
+      await frame();
+      holder.style.transition = "transform 720ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 220ms ease";
+      scaled(holder, sx, sy, 1, w);
+      holder.style.opacity = 1;
+      say(`${WHO[o.key]} made <b>${name}</b>`);
+      await sleep(1300);
+      holder.style.transition = "";
+    } else {
+      const band = o.key === "you"
+        ? { x0: 60, x1: W - 60 - w, y0: 18, y1: 60 }
+        : { x0: MATE_X - 10, x1: W - M - w, y0: MATE_Y - 104, y1: MATE_Y - 84 };
+      sx = band.x0 + Math.random() * Math.max(0, band.x1 - band.x0);
+      sy = band.y0 + Math.random() * (band.y1 - band.y0);
+      const tilt = (Math.random() * 5 - 2.5).toFixed(1);
+      c.setAttribute("transform", `rotate(${tilt} ${w / 2} ${CH / 2})`);
+      h = txt(holder, w / 2, CH + 18, PEOPLE[SKILLS[name].author].handle, "handle", "middle");
+      place(holder, sx, sy + 10, 0);
+      await frame();
+      place(holder, sx, sy, 1);
+      say(`${WHO[o.key]} found <b>${name}</b> by ${PEOPLE[SKILLS[name].author].handle}`);
+      await sleep(1100);
+    }
+
+    // Absorb into the card: the floating pill hands off to a row pill
     const i = o.rows.length;
     const slot = rowPos(o, i);
     const row = chip(layers.chip, name, { w: o.w - 32, count: true });
@@ -458,7 +479,8 @@
     o.rows.push({ name, el: row, n: 0 });
     tweenH(o.rect, cardH(o.head, o.rows.length));
     await frame();
-    h.style.opacity = 0;
+    if (h) h.style.opacity = 0;
+    if (hatch) scaled(holder, slot.x, slot.y, 1, w);
     place(holder, slot.x, slot.y, 0);
     place(row, slot.x, slot.y, 1);
     say(`${WHO[o.key]} added <b>${name}</b> to ${o.key === "you" ? "your" : "their"} library`);
@@ -466,6 +488,7 @@
     await sleep(900);
     holder.remove();
   }
+
 
   async function send(o, name, targets) {
     const row = o.rows.find((r) => r.name === name);
