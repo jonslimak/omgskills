@@ -99,6 +99,7 @@
   #flow text { fill: var(--ink); font-family: var(--sans); }
   #flow .card { fill: var(--card); }
   #flow .card.agent-card { fill: transparent; }
+  #flow .agent-head { transform-box: fill-box; transform-origin: 20% 60%; }
   /* On a pure white page the cards are defined only by their shadow */
   #flow .lift { filter: drop-shadow(0 1px 2px var(--shadow-soft)) drop-shadow(0 8px 24px var(--shadow)); }
   #flow .lift-hero { filter: drop-shadow(0 2px 4px var(--shadow-soft)) drop-shadow(0 20px 48px var(--shadow)); }
@@ -408,10 +409,11 @@
       // Agent cards have no fill or shadow; the rect only tracks the card's size
       const face = el("g", {}, g);
       const rect = el("rect", { class: "card agent-card", x: 0, y: 0, width: AG_W, height: AG_HEAD + 2, rx: 18 }, face);
-      logo(g, a.logo, 28, 30, 12);
-      txt(g, 47, 28, a.name, "agent-title");
-      const sub = txt(g, 47, 41, a.kind, "agent-sub");
-      agents[a.id] = { ...a, i, g, rect, sub, x, items: [], caps: {} };
+      const head = el("g", { class: "agent-head" }, g); // logo + name, bounced when a skill arrives
+      logo(head, a.logo, 28, 30, 12);
+      txt(head, 47, 28, a.name, "agent-title");
+      const sub = txt(head, 47, 41, a.kind, "agent-sub");
+      agents[a.id] = { ...a, i, g, head, rect, sub, x, items: [], caps: {} };
     });
 
     const finalH = Math.max(...AGENTS.map((a) => {
@@ -615,6 +617,7 @@
       for (const cap of Object.values(f.a.caps)) place(cap, cap.pos.x, cap.pos.y, 1);
     }
     await sleep(650);
+    for (const f of flights) activate(f.a);
     row.n += targets.length;
     row.el.countT.textContent = row.n;
     row.el.countG.style.opacity = 1;
@@ -627,6 +630,20 @@
       for (const f of flights) f.lg.remove();
     })();
     await sleep(250);
+  }
+
+  // Quick hop of the agent's logo and name, as if it just switched on
+  function activate(a) {
+    if (instant || reduced) return;
+    a.head.animate(
+      [
+        { transform: "translateY(0) scale(1)" },
+        { transform: "translateY(-6px) scale(1.06)", offset: 0.35 },
+        { transform: "translateY(1px) scale(0.99)", offset: 0.7 },
+        { transform: "translateY(0) scale(1)" },
+      ],
+      { duration: 480, easing: "ease-out" }
+    );
   }
 
   // A small green pill, e.g. "Updated", pinned to the top-right of a skill
