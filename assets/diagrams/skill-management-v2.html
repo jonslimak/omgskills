@@ -418,10 +418,11 @@
     layers.card.insertBefore(mg, yg); // drawn behind your card so it can swing out from under it
     const mFace = el("g", { class: "lift" }, mg);
     const mRect = el("rect", { class: "card", x: 0, y: 0, width: MATE_W, height: cardH(M_ROW, 0), rx: 20 }, mFace);
-    avatar(mg, "sam", MATE_W / 2, 42, 24);
-    txt(mg, MATE_W / 2, 84, "teammate", "mate-title", "middle");
+    const mPop = el("g", { class: "you-head" }, mg); // avatar + name, bounced when an update syncs in
+    avatar(mPop, "sam", MATE_W / 2, 42, 24);
+    txt(mPop, MATE_W / 2, 84, "teammate", "mate-title", "middle");
     const mSub = txt(mg, MATE_W / 2, 97, "", "omg-sub", "middle");
-    mate = { key: "mate", g: mg, rect: mRect, sub: mSub, rows: [], x: MATE_X, y: MATE_Y, w: MATE_W, head: M_ROW, shown: false };
+    mate = { key: "mate", g: mg, rect: mRect, sub: mSub, rows: [], x: MATE_X, y: MATE_Y, w: MATE_W, head: M_ROW, shown: false, pop: mPop };
     mateVisible(false);
 
     // Agents
@@ -842,6 +843,7 @@
       await frame();
       ar.show();
       await sleep(600);
+      activate(mate); // the teammate reacts as the update reaches them
       const t = badge(mate.x + mate.w / 2, omgBottom(mate) - 9, "App synced", true);
       extras.push(t.g);
       await frame();
