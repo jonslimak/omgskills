@@ -794,6 +794,15 @@
     return { lg, show: () => { lg.style.opacity = 1; } };
   }
 
+  // Quick side-to-side shake, added on top of wherever the skill already sits
+  function shake(node) {
+    if (instant || reduced) return;
+    const k = (x, r) => ({ transform: `translateX(${x}px) rotate(${r}deg)` });
+    node.animate([k(0, 0), k(-4, -1.5), k(4, 1.5), k(-3, -1), k(3, 1), k(-1, 0), k(0, 0)], {
+      duration: 460, easing: "ease-in-out", composite: "add",
+    });
+  }
+
   async function update(o, name) {
     const row = o.rows.find((r) => r.name === name);
     const rp = rowPos(o, o.rows.indexOf(row));
@@ -802,6 +811,7 @@
 
     // 1. The skill changes in your library
     row.el.classList.add("flash");
+    shake(row.el);
     const b0 = badge(rp.x + rowW + 6, rp.y - 10, "Updated");
     extras.push(b0.g);
     await frame();
@@ -823,6 +833,7 @@
     for (const a of hits) {
       const it = a.items.find((x) => x.name === name);
       it.el.classList.add("flash");
+      shake(it.el);
       const b = badge(it.pos.x + chipW(name) + 6, it.pos.y - 10, "Updated");
       extras.push(b.g);
       await frame();
