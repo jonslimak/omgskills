@@ -163,7 +163,10 @@
   #flow .badge text { fill: var(--on-update); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
   #flow .chip.float .bg { stroke: transparent; stroke-width: 1.5; }
   /* Skill creation moment: Apple blue pill, white text, red "Created" tag */
-  #flow .chip.float.create .bg { fill: var(--create); }
+  #flow .chip.create .bg { fill: var(--create); }
+  #flow .chip.create .count text { fill: #ffffff; }
+  #flow .chip.create .bot { stroke: #ffffff; }
+  #flow .chip.create .bot-eye { fill: #ffffff; }
   #flow .chip .name { transition: fill 400ms ease; }
   #flow .chip.create .name { fill: #ffffff; }
   #flow .chip.create .lock { stroke: #ffffff; }
@@ -592,6 +595,7 @@
     // Absorb into the card: the floating pill hands off to a row pill
     const i = o.rows.length;
     const row = chip(layers.chip, name, { w: o.w - 32, count: true });
+    if (hatch) row.classList.add("create"); // stays blue while it travels
     place(row, sx, sy, 0);
     o.rows.push({ name, el: row, n: 0 });
     tweenH(o.rect, cardH(o.head, o.rows.length));
@@ -605,6 +609,7 @@
     if (o === you && !instant) setTimeout(rippleYou, 380); // faint rings as the skill lands
     refreshSubs();
     await sleep(650);
+    row.classList.remove("create"); // grey once it has arrived
     holder.remove();
     if (created) created.g.remove();
     if (h && h.classList.contains("badge")) h.remove();
@@ -657,7 +662,7 @@
     // Settles down into its slot in the agent, turning into a normal skill as it moves.
     // Explicit keyframes keep the glide smooth; the badge fades and is removed.
     tag.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, fill: "forwards" }).onfinish = () => tag.g.remove();
-    c.classList.remove("create", "float");
+    c.classList.remove("float");
     c.style.transition = "none";
     tweenH(a.rect, h);
     const landed = `translate(${it.pos.x}px, ${it.pos.y}px)`;
@@ -667,6 +672,7 @@
       { duration: instant ? 0 : 650, easing: "cubic-bezier(0.45, 0, 0.2, 1)" }
     );
     await glide.finished;
+    c.classList.remove("create"); // arrived in the agent: now a normal skill
     layers.chip.appendChild(c); // in front of the agent from here on
     c.style.transformBox = "";
     c.style.transformOrigin = "";
@@ -676,6 +682,7 @@
     // Up into your card
     const i = o.rows.length;
     const row = chip(layers.chip, name, { w: o.w - 32, count: true });
+    row.classList.add("create");
     place(row, it.pos.x, it.pos.y, 0);
     o.rows.push({ name, el: row, n: 1 });
     tweenH(o.rect, cardH(o.head, o.rows.length));
@@ -688,6 +695,7 @@
     if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
     if (!instant) setTimeout(rippleYou, 380);
     await sleep(650);
+    row.classList.remove("create");
     row.countT.textContent = "1";
     row.countG.style.opacity = 1;
     refreshSubs();
@@ -709,6 +717,7 @@
     const from = rowPos(mate, mi);
     const i = you.rows.length;
     const row = chip(layers.chip, name, { w: you.w - 32, count: true });
+    if (SKILLS[name].private) row.classList.add("create");
     place(row, from.x, from.y, 0);
     you.rows.push({ name, el: row, n: 0 });
     tweenH(you.rect, cardH(you.head, you.rows.length));
@@ -729,7 +738,9 @@
     mr.el.countT.textContent = mr.n;
     mr.el.countG.style.opacity = 1;
     refreshSubs();
-    await sleep(800);
+    await sleep(650);
+    row.classList.remove("create");
+    await sleep(150);
     (async () => { await sleep(250); lg.style.opacity = 0; await sleep(450); lg.remove(); })();
   }
 
@@ -740,6 +751,7 @@
     for (const id of targets) {
       const a = agents[id];
       const c = chip(layers.chip, name);
+      if (SKILLS[name].private) c.classList.add("create"); // created skills stay blue in transit
       place(c, from.x, from.y, 0);
       a.items.push({ name, who: owner || o.key, el: c });
       const h = layoutAgent(a);
@@ -761,6 +773,7 @@
       for (const cap of Object.values(f.a.caps)) place(cap, cap.pos.x, cap.pos.y, 1);
     }
     await sleep(650);
+    flights.forEach((f) => f.c.classList.remove("create"));
     row.n += targets.length;
     row.el.countT.textContent = row.n;
     row.el.countG.style.opacity = 1;
