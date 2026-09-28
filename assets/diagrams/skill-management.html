@@ -192,7 +192,7 @@
   const EVENTS = [
     { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
-    { phase: "And keep track of personal ones", who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
+    { phase: "Keep track of personal ones", who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
     { phase: "Share them with your team", who: "mate", collect: "frontend-design", send: ["team-chatgpt"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
@@ -326,6 +326,7 @@
   function phase(text) {
     if (text === phaseNow) return;
     phaseNow = text;
+    text = "👀 " + text;
     if (instant) { ticker.textContent = text; return; }
     ticker.classList.add("out");
     setTimeout(() => { ticker.textContent = text; ticker.classList.remove("out"); }, 200);
