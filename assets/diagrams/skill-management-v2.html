@@ -167,11 +167,6 @@
 </style>
 
 <div class="stage">
-  <header class="story">
-    <div class="ticker">
-      <p id="ticker" aria-live="polite">&nbsp;</p>
-    </div>
-  </header>
   <div class="scroll">
     <svg id="flow" viewBox="0 0 800 880" role="img"
       aria-label="A looping animation. New skills, such as grill-me by mattpocock and humanizer by blader, appear and are collected into your library, then sent to agents: ChatGPT, Claude, Hermes and a shared team ChatGPT. A teammate joins and sends their own skills to the same team ChatGPT."></svg>
@@ -360,6 +355,7 @@
   // High-level phase shown above the diagram, set per event in EVENTS
   let phaseNow = "";
   function phase(text) {
+    if (!ticker) return; // the headline is not shown in v2
     if (text === phaseNow) return;
     phaseNow = text;
     if (instant) { ticker.textContent = text; return; }
