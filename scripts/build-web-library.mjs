@@ -1668,6 +1668,7 @@ async function main() {
     ["/", { source: "home" }],
     ["/about/", { source: "about" }],
     ["/guide/", { source: "guide" }],
+    ["/connect-stripe-to-claude/", { source: "stripe video page" }],
   ]);
   const noindexReasons = new Map();
   let indexableCount = 0;

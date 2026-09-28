@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Connect Stripe to Claude — 5 Official Stripe Skills | omgskills</title>
+  <meta name="description" content="How to connect Stripe to Claude and Claude Code: the five official Stripe skills, with a 2-minute video, install commands, and links. Works with Claude, Codex, and Cursor.">
+  <link rel="canonical" href="https://omgskills.com/connect-stripe-to-claude/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="How to Connect Stripe to Claude — 5 Official Stripe Skills">
+  <meta property="og:description" content="The five official Stripe skills for Claude Code, with a 2-minute video and install commands.">
+  <meta property="og:url" content="https://omgskills.com/connect-stripe-to-claude/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="omgskills">
+  <meta property="og:image" content="https://i.ytimg.com/vi/x92YhjmZA_Q/maxresdefault.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How to Connect Stripe to Claude — 5 Official Stripe Skills">
+  <meta name="twitter:description" content="The five official Stripe skills for Claude Code, with a 2-minute video and install commands.">
+  <meta name="twitter:image" content="https://i.ytimg.com/vi/x92YhjmZA_Q/maxresdefault.jpg">
+  <script async src="https://app.humblytics.com/hmbl.min.js?id=a156a68"></script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": "How to Connect Stripe to Claude Code — 5 Official Stripe Skills",
+      "description": "How to connect Stripe to Claude and Claude Code: the five official Stripe skills, with install commands.",
+      "thumbnailUrl": "https://i.ytimg.com/vi/x92YhjmZA_Q/maxresdefault.jpg",
+      "uploadDate": "2026-09-23",
+      "duration": "PT1M41S",
+      "contentUrl": "https://www.youtube.com/watch?v=x92YhjmZA_Q",
+      "embedUrl": "https://www.youtube-nocookie.com/embed/x92YhjmZA_Q",
+      "publisher": {
+        "@type": "Organization",
+        "name": "omgskills",
+        "url": "https://omgskills.com/"
+      }
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "How to Connect Stripe to Claude — 5 Official Stripe Skills",
+      "description": "How to connect Stripe to Claude and Claude Code using the five official Stripe skills.",
+      "url": "https://omgskills.com/connect-stripe-to-claude/",
+      "mainEntityOfPage": "https://omgskills.com/connect-stripe-to-claude/",
+      "image": "https://i.ytimg.com/vi/x92YhjmZA_Q/maxresdefault.jpg",
+      "datePublished": "2026-09-23",
+      "dateModified": "2026-09-23",
+      "author": { "@type": "Organization", "name": "omgskills", "url": "https://omgskills.com/" },
+      "publisher": { "@type": "Organization", "name": "omgskills", "url": "https://omgskills.com/" }
+    }
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --text: #1d1d1f;
+      --muted: #6e7380;
+      --soft: #f4f4f7;
+      --line: #e4e4e7;
+      --blue: #1591ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: #fff;
+      line-height: 1.55;
+    }
+    a { color: inherit; }
+    .shell { width: min(100%, 960px); margin: 0 auto; padding: 28px 24px 72px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; margin-bottom: 56px;
+    }
+    .brand {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 28px; min-height: 28px; text-decoration: none;
+      font-size: 18px; line-height: 1;
+    }
+    .brand:hover { opacity: .72; }
+    .nav-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      height: 38px; padding: 0 16px; border-radius: 999px;
+      background: #007aff; color: #fff; text-decoration: none;
+      font-size: 10px; font-weight: 400; transition: opacity .15s;
+    }
+    .nav-button:hover { opacity: .82; }
+    .apple-icon { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; line-height: 1; transform: translateY(-1px); }
+    .hero { max-width: 760px; margin: 0 auto 28px; text-align: left; }
+    h1 { margin: 0; font-size: clamp(36px, 6.5vw, 60px); line-height: 1.0; letter-spacing: -.045em; }
+    .content { max-width: 760px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .content > * { min-width: 0; }
+    .video-frame {
+      position: relative; width: 100%; aspect-ratio: 16 / 9;
+      border-radius: 24px; overflow: hidden; background: #111;
+    }
+    .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    section { padding: 30px 0; }
+    h2 { margin: 0 0 14px; font-size: 24px; line-height: 1.05; letter-spacing: -.04em; }
+    p { margin: 0 0 12px; color: #3f3f46; font-size: 15px; }
+    p:last-child { margin-bottom: 0; }
+    .skill { padding: 6px 0 20px; border-bottom: 1px solid rgba(29,29,31,.06); }
+    .skill:last-child { border-bottom: 0; padding-bottom: 0; }
+    .srow {
+      display: grid;
+      grid-template-columns: minmax(140px, 200px) minmax(110px, 140px) minmax(0, 1fr) max-content;
+      align-items: center; gap: 12px; padding: 13px 0;
+      text-decoration: none;
+    }
+    .srow h3 { overflow: hidden; margin: 0; font-size: 14px; font-weight: 700; color: var(--text); text-overflow: ellipsis; white-space: nowrap; }
+    .srow:hover h3 { color: #007aff; }
+    .s-author { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 500; }
+    .s-author img { width: 18px; height: 18px; border-radius: 50%; background: var(--soft); }
+    .s-desc { overflow: hidden; color: #9ca3af; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+    .s-stars { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .s-star-icon { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .sdetail { display: flex; align-items: flex-start; gap: 20px; }
+    .sdetail p { flex: 1; min-width: 0; margin: 2px 0 0; font-size: 13.5px; }
+    @media (max-width: 620px) {
+      .srow { grid-template-columns: minmax(0, 1fr) max-content max-content; gap: 6px 12px; }
+      .srow h3 { grid-column: 1; grid-row: 1; }
+      .s-author { grid-column: 2; grid-row: 1; }
+      .s-stars { grid-column: 3; grid-row: 1; }
+      .s-desc { grid-column: 1 / -1; grid-row: 2; }
+    }
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 7px; flex: none;
+      margin-top: 2px; padding: 7px 12px;
+      border: 1px solid var(--line); border-radius: 999px; background: #fff;
+      color: var(--muted); font-size: 11.5px; font-weight: 400;
+      font-family: inherit; cursor: pointer; transition: background .15s;
+    }
+    @media (max-width: 620px) { .sdetail { flex-direction: column; gap: 10px; } }
+    .copy-btn:hover { background: var(--soft); }
+    .copy-btn.copied { color: #136c2e; border-color: #b7e2c3; background: #e8f7ec; }
+    .gh-icon { width: 15px; height: 15px; flex: none; }
+    .transcript p { font-size: 13.5px; }
+    .links p { font-size: 13.5px; }
+    .links a { color: var(--blue); font-weight: 600; text-decoration: none; }
+    .links a:hover { opacity: .8; }
+    footer.site-footer { display: block; max-width: none; margin: 64px 0 0; padding: 0; border-top: 1px solid #e5e7eb; background: #ffffff; }
+    .site-footer-inner { display: grid; grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(140px, 1fr)); gap: 24px; max-width: 880px; margin: 0 auto; padding: 36px 24px 44px; }
+    .site-footer-brand-logo { font-size: 22px; text-decoration: none; }
+    .site-footer-brand p { margin: 10px 0 0; max-width: 32ch; color: #6b7280; font-size: 13px; line-height: 1.5; font-weight: 400; }
+    .site-footer h2 { margin: 0 0 12px; color: #6b7280; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .site-footer-col a { display: block; margin-bottom: 9px; color: #6b7280; font-size: 13px; font-weight: 400; text-decoration: none; }
+    .site-footer-col a:hover { color: #111111; }
+    @media (max-width: 720px) { .site-footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); } .site-footer-brand { grid-column: 1 / -1; } }
+    @media (max-width: 560px) {
+      header { margin-bottom: 40px; }
+      section { padding: 22px 0; }
+      .video-frame { border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
+      <a class="nav-button" href="/downloads/omgskills-mac.dmg" data-humblytics="Stripe Guide Download Mac DMG"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>
+    </header>
+
+    <main>
+      <div class="hero">
+        <h1>How to Connect Stripe to Claude</h1>
+      </div>
+
+      <div class="content">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/x92YhjmZA_Q"
+            title="How to Connect Stripe to Claude Code — 5 Official Stripe Skills"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
+        </div>
+
+        <section>
+          <h2>The five skills</h2>
+
+          <div class="skill">
+            <a class="srow" href="/skills/stripe/agent-toolkit/stripe-best-practices/">
+              <h3>stripe-best-practices</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Guides Stripe integration decisions across API selection, Connect setup, billing, tax, and security</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 1.8k</span>
+            </a>
+            <div class="sdetail">
+              <p>The foundation. Checkout Sessions vs PaymentIntents, Connect setup, which integration fits your case — Stripe's own answers, so you get the recommended pattern instead of a plausible guess.</p>
+              <button class="copy-btn" type="button" data-humblytics="Stripe Guide Copy stripe-best-practices" data-cmd="npx skills add stripe/ai --skill stripe-best-practices --agent claude-code --global"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
+            </div>
+          </div>
+
+          <div class="skill">
+            <a class="srow" href="/skills/stripe/ai/connect-recommend/">
+              <h3>connect-recommend</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Used when the user asks about Stripe Connect configuration, charge patterns, or Dashboard access</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 1.8k</span>
+            </a>
+            <div class="sdetail">
+              <p>Stripe's most-starred skill, covering the part people find hardest: Stripe Connect. Charge patterns, Dashboard access, and platform setup for marketplaces and e-commerce platforms.</p>
+              <button class="copy-btn" type="button" data-humblytics="Stripe Guide Copy connect-recommend" data-cmd="npx skills add stripe/ai --skill connect-recommend --agent claude-code --global"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
+            </div>
+          </div>
+
+          <div class="skill">
+            <a class="srow" href="/skills/stripe/agent-toolkit/upgrade-stripe/">
+              <h3>upgrade-stripe</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Guide for upgrading Stripe API versions and SDKs</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 1.8k</span>
+            </a>
+            <div class="sdetail">
+              <p>Walks your agent through Stripe's API version changes and SDK updates, so you can finish the upgrade you've been putting off in a single session.</p>
+              <button class="copy-btn" type="button" data-humblytics="Stripe Guide Copy upgrade-stripe" data-cmd="npx skills add stripe/ai --skill upgrade-stripe --agent claude-code --global"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
+            </div>
+          </div>
+
+          <div class="skill">
+            <a class="srow" href="/skills/stripe/link-cli/create-payment-credential/">
+              <h3>create-payment-credential</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Gets secure, one-time-use payment credentials from a Link wallet so agents can complete purchases</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 746</span>
+            </a>
+            <div class="sdetail">
+              <p>What agents can do themselves: secure, one-time-use payment credentials from a Link wallet, so an agent can complete a real purchase with a card that can only be used once.</p>
+              <button class="copy-btn" type="button" data-humblytics="Stripe Guide Copy create-payment-credential" data-cmd="npx skills add stripe/link-cli --skill create-payment-credential --agent claude-code --global"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
+            </div>
+          </div>
+
+          <div class="skill">
+            <a class="srow" href="/skills/stripe/purl/pay-for-http-request/">
+              <h3>pay-for-http-request</h3>
+              <span class="s-author"><img src="https://github.com/stripe.png?size=40" alt="" loading="lazy">@stripe</span>
+              <span class="s-desc">Make HTTP requests with automatic x402 payment support using the purl command line interface</span>
+              <span class="s-stars"><svg class="s-star-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.26L7 14.14 2 9.27l6.91-1.01z"/></svg> 178</span>
+            </a>
+            <div class="sdetail">
+              <p>Lets an agent pay for an API call while making it, using the x402 payment standard through the purl command line. Hit a paid endpoint, pay, continue.</p>
+              <button class="copy-btn" type="button" data-humblytics="Stripe Guide Copy pay-for-http-request" data-cmd="npx skills add stripe/purl --skill pay-for-http-request --agent claude-code --global"><svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="copy-label">Copy install command</span></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="links">
+          <h2>More</h2>
+          <p>All Stripe skills, including seven more: <a href="/library/stripe/">the Stripe library on omgskills</a>.</p>
+          <p>New to skills? <a href="/guide/">Skills: the complete guide</a>.</p>
+        </section>
+
+        <section class="transcript">
+          <h2>Video transcript</h2>
+          <p>How do you connect Stripe to Claude? Stripe already did the work. They publish official skills for Claude Code — instruction files your agent loads when relevant, that teach it how Stripe wants to be integrated. They work on Claude, Codex, Cursor, or any agent you're working with — they're free, and they install in seconds. These are the five worth having.</p>
+          <p>First, stripe-best-practices. This is the foundation. Adding payments means real decisions — Checkout Sessions or PaymentIntents, how to set up Connect, which integration fits your case. This skill gives Claude or Codex Stripe's own answers to those questions, so you get the recommended pattern instead of a plausible guess.</p>
+          <p>Second, connect-recommend. This is Stripe's most-starred skill, and it covers the part people find hardest: Stripe Connect. It guides charge patterns, Dashboard access, and platform setup, so if you're building anything with sellers, vendors, or an e-commerce platform, this is the skill that gets the configuration right.</p>
+          <p>Third, upgrade-stripe. Everyone has an API upgrade they've been putting off. This skill walks your agent through Stripe's version changes and SDK updates, so you can finish an upgrade in a single session.</p>
+          <p>Fourth — and here the video turns. create-payment-credential. The first three skills help your agent build your integration. This one is about what agents can do themselves: it gets secure, one-time-use payment credentials from a Link wallet, so an agent can complete a real purchase with a card that can only be used once.</p>
+          <p>Fifth, pay-for-http-request. This skill lets an agent pay for an API call while making it, using the x402 payment standard through a command-line tool called purl. When an agent hits a paid endpoint, it can pay and continue on its own.</p>
+          <p>All five are official Stripe skills — free, open source, and published by Stripe, not third parties. You can install any of them in one click at omgskills.com, where the library has seven more Stripe skills. They work on Claude, Codex, Cursor — or any agent you're working with. And that's how you connect Stripe to Claude Code.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-brand">
+        <a class="site-footer-brand-logo" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
+        <p>The best and latest agent skills from trusted sources. Free macOS app, open web library.</p>
+      </div>
+      <div class="site-footer-col">
+        <h2>Library</h2>
+        <a href="/skills/">Skills</a>
+        <a href="/guide/">Skills guide</a>
+        <a href="/data/">Data</a>
+        <a href="/">macOS app</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Developers</h2>
+        <a href="/developers/">Developer resources</a>
+        <a href="/openapi.json">API spec (OpenAPI)</a>
+        <a href="/agents.md">Agent guide</a>
+        <a href="/llms.txt">llms.txt</a>
+        <a href="/health/">Status</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Company</h2>
+        <a href="/about/">About</a>
+        <a href="/support/">Support</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+        <a href="https://github.com/jonslimak/omgskills" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    document.querySelectorAll(".copy-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(btn.dataset.cmd); } catch (e) { return; }
+        const label = btn.querySelector(".copy-label");
+        const prev = label.textContent;
+        btn.classList.add("copied");
+        label.textContent = "Copied";
+        setTimeout(() => { btn.classList.remove("copied"); label.textContent = prev; }, 1600);
+      });
+    });
+  </script>
+</body>
+</html>
