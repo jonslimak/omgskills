@@ -766,13 +766,12 @@
     await sleep(250);
   }
 
-  // Springy hop of the agent's logo and name: a small dip, a lift that catches the
-  // arriving skill, then a couple of softer rebounds
+  // Single hop of the logo/avatar and name when a skill arrives
   function activate(a) {
     if (instant || reduced) return;
     const k = (y, sc, offset) => ({ transform: `translateY(${y}px) scale(${sc})`, offset, easing: "cubic-bezier(0.33, 0, 0.3, 1)" });
     (a.pop || a.head).animate(
-      [k(0, 1, 0), k(1.5, 0.98, 0.14), k(-7, 1.06, 0.42), k(1.5, 0.99, 0.64), k(-2, 1.015, 0.82), k(0, 1, 1)],
+      [k(0, 1, 0), k(-7, 1.06, 0.45), k(0, 1, 1)], // one clean hop, no rebounds
       { duration: 520 }
     );
   }
@@ -798,8 +797,8 @@
   function shake(node) {
     if (instant || reduced) return;
     const k = (x, r) => ({ transform: `translateX(${x}px) rotate(${r}deg)` });
-    node.animate([k(0, 0), k(-4, -1.5), k(4, 1.5), k(-3, -1), k(3, 1), k(-1, 0), k(0, 0)], {
-      duration: 460, easing: "ease-in-out", composite: "add",
+    node.animate([k(0, 0), k(-2, -0.6), k(2, 0.6), k(-1.5, -0.4), k(1, 0.3), k(0, 0)], {
+      duration: 520, easing: "ease-in-out", composite: "add",
     });
   }
 
