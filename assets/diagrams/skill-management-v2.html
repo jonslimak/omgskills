@@ -171,6 +171,7 @@
   #flow .badge.create text { fill: #ffffff; }
   #flow .link.sync path { stroke: var(--update); }
   #flow .link.relay path { stroke: var(--create); }
+  #flow .ripple { fill: none; stroke: #b9bcc4; stroke-width: 1; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; pointer-events: none; }
   #flow .pulse { fill: none; stroke: var(--update); stroke-width: 0; stroke-linejoin: round; pointer-events: none; }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow .badge.author rect { fill: var(--ink); }
@@ -404,7 +405,7 @@
     const ms = el("marker", { id: "arrow-sync", class: "arrowhead sync", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, ms);
     // The cloud sits behind the cards, so the teammate card can cover part of it
-    layers = { link: el("g", {}, svg), under: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
+    layers = { link: el("g", {}, svg), ripple: el("g", {}, svg), under: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
 
     // You: the hero card
     const yg = el("g", { class: "anim" }, layers.card);
@@ -601,6 +602,7 @@
     if (created) { created.g.style.opacity = 0; c.classList.remove("create"); }
     place(holder, slot.x, slot.y, 0);
     place(row, slot.x, slot.y, 1);
+    if (o === you && !instant) setTimeout(rippleYou, 380); // faint rings as the skill lands
     refreshSubs();
     await sleep(650);
     holder.remove();
@@ -684,6 +686,7 @@
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
     if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
+    if (!instant) setTimeout(rippleYou, 380);
     await sleep(650);
     row.countT.textContent = "1";
     row.countG.style.opacity = 1;
@@ -719,6 +722,7 @@
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
     if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
+    if (!instant) setTimeout(rippleYou, 380);
     alignMate(); // your card grew, so keep the teammate centred on it
     const mr = mate.rows[mi];
     mr.n += targets.length;
@@ -772,6 +776,19 @@
   }
 
   // Single hop of the logo/avatar and name when a skill arrives
+  // Very faint grey rings that spread out from your card when it takes in a skill
+  function rippleYou() {
+    if (instant || reduced) return;
+    const h = +(you.rect.dataset.h || you.rect.getAttribute("height"));
+    [0, 260, 520].forEach((delay) => {
+      const ring = el("rect", { class: "ripple", x: you.x, y: you.y, width: you.w, height: h, rx: 24 }, layers.ripple);
+      ring.animate(
+        [{ transform: "scale(1)", opacity: 0.5 }, { transform: "scale(1.28, 1.14)", opacity: 0 }],
+        { duration: 1600, delay, easing: "cubic-bezier(0.2, 0.6, 0.35, 1)", fill: "both" }
+      ).onfinish = () => ring.remove();
+    });
+  }
+
   function activate(a) {
     if (instant || reduced) return;
     (a.pop || a.head).animate(
