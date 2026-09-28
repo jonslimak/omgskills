@@ -89,14 +89,6 @@
     transition: opacity 200ms ease, transform 200ms ease;
   }
   .ticker p.out { opacity: 0; transform: translateY(6px); }
-  .pause {
-    font: 500 12px/1 var(--sans);
-    color: var(--muted);
-    background: var(--track); border: 0; border-radius: 999px;
-    padding: 6px 11px; cursor: pointer;
-  }
-  .pause:hover { color: var(--ink); }
-  .pause:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
   .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   #flow { display: block; width: 100%; min-width: 680px; height: auto; overflow: visible; }
@@ -157,7 +149,6 @@
   <header class="story">
     <div class="ticker">
       <p id="ticker" aria-live="polite">&nbsp;</p>
-      <button class="pause" id="pause" type="button" aria-pressed="false">Pause</button>
     </div>
   </header>
   <div class="scroll">
@@ -197,22 +188,22 @@
     { id: "team-chatgpt", logo: "chatgpt", kind: "Team", name: "ChatGPT", label: "team ChatGPT", shared: true },
   ];
   // The story, played in order and then looped.
+  // `phase` sets the headline when that event starts; it holds until the next phase.
   const EVENTS = [
-    { who: "you", collect: "grill-me", send: ["hermes"] },
+    { phase: "Find skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
-    { who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
+    { phase: "Manage them", who: "you", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
-    { who: "mate", collect: "frontend-design", send: ["team-chatgpt"] },
+    { phase: "Share them", who: "mate", collect: "frontend-design", send: ["team-chatgpt"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
-    { who: "you", update: "release-notes" },
+    { phase: "Update them", who: "you", update: "release-notes" },
   ];
 
   // ---- Geometry
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("flow");
   const ticker = document.getElementById("ticker");
-  const pauseBtn = document.getElementById("pause");
   const AG_GAP = 14, AG_W = 190, AG_HEAD = 56;
   const CH = 32, CG = 8, M = 20;
   const W = 2 * M + 4 * AG_W + 3 * AG_GAP; // 842: four 190px agent cards fit exactly
@@ -304,7 +295,7 @@
   }
 
   // ---- Timing helpers (pausable)
-  let paused = false, instant = false;
+  let instant = false;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const frame = () => {
     void svg.getBoundingClientRect(); // commit start positions before animating
@@ -315,7 +306,7 @@
     let t = 0;
     while (t < ms) {
       await new Promise((r) => setTimeout(r, 50));
-      if (!paused && !document.hidden) t += 50;
+      if (!document.hidden) t += 50;
     }
   }
   function tweenH(rect, to, dur = 520) {
@@ -467,7 +458,6 @@
         [{ transform: startT }, { transform: `translate(${sx}px, ${sy - 8}px)`, offset: 0.72 }, { transform: endT }],
         { duration: instant ? 0 : 850, easing: "cubic-bezier(0.25, 0.9, 0.3, 1)" }
       );
-      phase(o === mate ? "Share them" : "Find skills");
       await sleep(450);
       created = badge(sx + w + 6, sy - 10, "Created", false, "create");
       await frame();
@@ -487,7 +477,6 @@
       place(holder, sx, sy + 10, 0);
       await frame();
       place(holder, sx, sy, 1);
-      phase(o === mate ? "Share them" : "Find skills");
       await sleep(750);
     }
 
@@ -521,7 +510,7 @@
   }
 
 
-  async function send(o, name, targets, ph) {
+  async function send(o, name, targets) {
     const row = o.rows.find((r) => r.name === name);
     const from = rowPos(o, o.rows.indexOf(row));
     const flights = [];
@@ -548,7 +537,6 @@
       for (const it of f.a.items) place(it.el, it.pos.x, it.pos.y, 1);
       for (const cap of Object.values(f.a.caps)) place(cap, cap.pos.x, cap.pos.y, 1);
     }
-    phase(ph || (o === mate ? "Share them" : "Manage them"));
     await sleep(650);
     row.n += targets.length;
     row.el.countT.textContent = row.n;
@@ -594,7 +582,6 @@
     extras.push(b0.g);
     await frame();
     b0.show();
-    phase("Update them");
     await sleep(1100);
 
     // 2. It syncs to every agent that has it
@@ -680,7 +667,6 @@
   async function showMate() {
     if (mate.shown) return;
     mate.shown = true;
-    phase("Share them");
     mate.joined = true;
     mateVisible(true);
     await sleep(mate.rows.length ? 550 : 800);
@@ -714,12 +700,12 @@
   async function playOnce() {
     for (const [k, e] of EVENTS.entries()) {
       const o = e.who === "you" ? you : mate;
+      if (e.phase) phase(e.phase);
       if (o === mate) await showMate();
       if (e.update) { await update(o, e.update); continue; }
       if (e.collect) await spawnAndCollect(o, e.collect);
-      else phase("Share them");
       if (e.reuse) await sleep(900);
-      await send(o, e.collect || e.reuse, e.send, e.reuse ? "Share them" : null);
+      await send(o, e.collect || e.reuse, e.send);
       // Keep the teammate on screen between back-to-back teammate moves
       if (o === mate && EVENTS[k + 1]?.who !== "mate") await hideMate();
       await sleep(150);
@@ -732,7 +718,6 @@
       svg.classList.add("instant");
       await playOnce();
       phase("Find skills. Manage them. Share them. Update them.");
-      pauseBtn.hidden = true;
       return;
     }
     for (;;) {
@@ -742,11 +727,6 @@
     }
   }
 
-  pauseBtn.addEventListener("click", () => {
-    paused = !paused;
-    pauseBtn.textContent = paused ? "Play" : "Pause";
-    pauseBtn.setAttribute("aria-pressed", String(paused));
-  });
 
   // Hover a skill to see every copy of it
   svg.addEventListener("pointerover", (e) => {
