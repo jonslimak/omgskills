@@ -471,7 +471,7 @@
     } else {
       const band = o.key === "you"
         ? { x0: 60, x1: W - 60 - w, y0: 18, y1: 60 }
-        : { x0: MATE_X - 10, x1: W - M - w, y0: MATE_Y - 104, y1: MATE_Y - 84 };
+        : { x0: MATE_X - 10, x1: W - M - w, y0: mate.y - 104, y1: mate.y - 84 };
       sx = band.x0 + Math.random() * Math.max(0, band.x1 - band.x0);
       sy = band.y0 + Math.random() * (band.y1 - band.y0);
       const tilt = (Math.random() * 5 - 2.5).toFixed(1);
@@ -486,11 +486,12 @@
 
     // Absorb into the card: the floating pill hands off to a row pill
     const i = o.rows.length;
-    const slot = rowPos(o, i);
     const row = chip(layers.chip, name, { w: o.w - 32, count: true });
     place(row, sx, sy, 0);
     o.rows.push({ name, el: row, n: 0 });
     tweenH(o.rect, cardH(o.head, o.rows.length));
+    if (o === mate) alignMate(true); // the card grows around its centre
+    const slot = rowPos(o, i);
     await frame();
     if (h) h.style.opacity = 0;
     if (created) { created.g.style.opacity = 0; c.classList.remove("create"); }
@@ -628,22 +629,43 @@
   }
 
   // The teammate card pops in for their moves and pops out afterwards
+  // The teammate card is always vertically centred on your card, whatever their heights
+  const youCenterY = () => OMG_Y + +(you.rect.dataset.h || you.rect.getAttribute("height")) / 2;
+  const mateH = () => +(mate.rect.dataset.h || mate.rect.getAttribute("height"));
+
+  // Keep it centred as it grows; move its existing rows with it
+  function alignMate(skipLast) {
+    const h = mateH();
+    mate.y = youCenterY() - h / 2;
+    mate.g.style.transition = "transform 520ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 200ms ease";
+    mate.g.style.transform = `translate(${MATE_X}px, ${mate.y}px) scale(1)`;
+    mate.rows.forEach((r, i) => {
+      if (skipLast && i === mate.rows.length - 1) return;
+      const p = rowPos(mate, i);
+      r.el.style.transitionDelay = "0ms";
+      place(r.el, p.x, p.y);
+    });
+  }
+
   // Shown: at its spot, full size. Hidden: tucked behind the centre of your card, smaller.
   function mateVisible(v) {
-    const h = +(mate.rect.dataset.h || mate.rect.getAttribute("height"));
+    const h = mateH();
     const s = v ? 1 : 0.6;
     const cx = v ? MATE_X + MATE_W / 2 : OMG_X + OMG_W / 2;
-    const cy = MATE_Y + h / 2;
+    const cy = youCenterY();
+    mate.y = cy - h / 2;
     mate.g.style.transition = v
       ? "transform 900ms cubic-bezier(0.2, 0.9, 0.3, 1.08), opacity 200ms ease"
       : "transform 800ms cubic-bezier(0.5, 0, 0.3, 1), opacity 250ms ease 600ms";
     mate.g.style.transform = `translate(${cx - (MATE_W * s) / 2}px, ${cy - (h * s) / 2}px) scale(${s})`;
     mate.g.style.opacity = v ? 1 : 0;
-    for (const r of mate.rows) {
+    mate.rows.forEach((r, i) => {
       r.el.style.transitionDelay = v ? "550ms" : "0ms";
+      if (v) { const p = rowPos(mate, i); place(r.el, p.x, p.y); }
       r.el.style.opacity = v ? 1 : 0;
-    }
+    });
   }
+
   async function showMate() {
     if (mate.shown) return;
     mate.shown = true;
