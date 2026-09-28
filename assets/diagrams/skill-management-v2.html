@@ -609,6 +609,8 @@
       flights.push({ a, c, h, lg, p });
     }
     await frame();
+    // The agent starts to react while the skill is still on its way down
+    if (!instant) setTimeout(() => flights.forEach((f) => activate(f.a)), 380);
     for (const f of flights) {
       f.lg.style.opacity = 1;
       f.p.style.strokeDashoffset = 0;
@@ -617,7 +619,6 @@
       for (const cap of Object.values(f.a.caps)) place(cap, cap.pos.x, cap.pos.y, 1);
     }
     await sleep(650);
-    for (const f of flights) activate(f.a);
     row.n += targets.length;
     row.el.countT.textContent = row.n;
     row.el.countG.style.opacity = 1;
@@ -632,17 +633,14 @@
     await sleep(250);
   }
 
-  // Quick hop of the agent's logo and name, as if it just switched on
+  // Springy hop of the agent's logo and name: a small dip, a lift that catches the
+  // arriving skill, then a couple of softer rebounds
   function activate(a) {
     if (instant || reduced) return;
+    const k = (y, sc, offset) => ({ transform: `translateY(${y}px) scale(${sc})`, offset, easing: "cubic-bezier(0.33, 0, 0.3, 1)" });
     a.head.animate(
-      [
-        { transform: "translateY(0) scale(1)" },
-        { transform: "translateY(-6px) scale(1.06)", offset: 0.35 },
-        { transform: "translateY(1px) scale(0.99)", offset: 0.7 },
-        { transform: "translateY(0) scale(1)" },
-      ],
-      { duration: 480, easing: "ease-out" }
+      [k(0, 1, 0), k(1.5, 0.98, 0.14), k(-7, 1.06, 0.42), k(1.5, 0.99, 0.64), k(-2, 1.015, 0.82), k(0, 1, 1)],
+      { duration: 900 }
     );
   }
 
