@@ -1,7 +1,7 @@
 <title>One Library, Every Agent v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #ffffff;
@@ -176,7 +176,7 @@
   #flow .link.relay path { stroke: var(--create); }
   #flow .bg-dot { fill: var(--ink); fill-opacity: 0.16; }
   #flow .headline {
-    font-family: var(--display); font-size: 30px; font-weight: 300; letter-spacing: -0.01em;
+    font-family: var(--display); font-size: 28px; font-weight: 200; letter-spacing: -0.01em;
     fill: #c7c7cc; transition: opacity 280ms ease;
   }
   :root[data-theme="dark"] #flow .headline { fill: #636366; }
@@ -401,13 +401,18 @@
   // High-level phase shown above the diagram, set per event in EVENTS
   let phaseNow = "";
   // Large, light headline drawn in the diagram just above your card; it cross-fades per phase
-  let headline = null;
+  // Each line shows for 2.5s, then fades away until the next phase
+  let headline = null, headlineTimer = 0;
   function phase(text) {
     if (!headline || text === phaseNow) return;
     phaseNow = text;
-    if (instant) { headline.textContent = text; return; }
+    clearTimeout(headlineTimer);
+    if (instant) { headline.textContent = text; headline.style.opacity = 1; return; }
     headline.style.opacity = 0;
-    setTimeout(() => { headline.textContent = text; headline.style.opacity = 1; }, 280);
+    headlineTimer = setTimeout(() => {
+      headline.textContent = text; headline.style.opacity = 1;
+      headlineTimer = setTimeout(() => { headline.style.opacity = 0; }, 2500);
+    }, 280);
   }
 
   // ---- Scene
