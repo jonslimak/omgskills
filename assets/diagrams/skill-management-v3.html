@@ -184,10 +184,11 @@
   #flow .bob { animation: bob 4s ease-in-out infinite; }
   #flow .cloud .bob > .chip {
     transform-box: fill-box; transform-origin: center;
-    transition: opacity 300ms ease, transform 500ms cubic-bezier(0.2, 0.9, 0.3, 1.1);
+    transition: opacity 350ms ease, transform 550ms cubic-bezier(0.2, 0.9, 0.3, 1.15);
   }
   /* Unpicked skills stay faded and 40% smaller, so the cloud reads as background until one is chosen */
-  #flow .cloud .cloud-chip:not(.picked) .bob > .chip { opacity: 0.35; transform: scale(0.6); }
+  /* v3: the cloud is hidden; a skill only appears, growing in place, when it is discovered */
+  #flow .cloud .cloud-chip:not(.picked) .bob > .chip { opacity: 0; transform: scale(0.6); }
   @media (prefers-reduced-motion: reduce) { #flow .bob { animation: none; } }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
 </style>
