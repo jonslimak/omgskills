@@ -141,10 +141,10 @@
 
   /* Links are rows of dots that flow toward where the skill is going */
   #flow .link path {
-    fill: none; stroke: var(--link); stroke-width: 3; stroke-linecap: round;
-    stroke-dasharray: 0 8; animation: flow 0.55s linear infinite;
+    fill: none; stroke: var(--link); stroke-width: 2; stroke-linecap: round;
+    stroke-dasharray: 0 6; animation: flow 0.45s linear infinite;
   }
-  @keyframes flow { to { stroke-dashoffset: -8; } }
+  @keyframes flow { to { stroke-dashoffset: -6; } }
   #flow .arrowhead path { fill: var(--link); }
   #flow .link text {
     fill: var(--muted); font-size: 11.5px; font-weight: 500;
@@ -819,13 +819,12 @@
     if (instant || reduced) return;
     const h = +(you.rect.dataset.h || you.rect.getAttribute("height"));
     const cx = you.x + you.w / 2, cy = you.y + h / 2, r = Math.max(you.w, h) * 0.45;
-    [0, 260, 520].forEach((delay) => {
-      const ring = el("circle", { class: "ripple", cx, cy, r }, layers.ripple);
-      ring.animate(
-        [{ transform: "scale(1)", opacity: 0.5 }, { transform: "scale(1.9)", opacity: 0 }],
-        { duration: 1700, delay, easing: "cubic-bezier(0.2, 0.6, 0.35, 1)", fill: "both" }
-      ).onfinish = () => ring.remove();
-    });
+    // One ring, one ping
+    const ring = el("circle", { class: "ripple", cx, cy, r }, layers.ripple);
+    ring.animate(
+      [{ transform: "scale(1)", opacity: 0.55 }, { transform: "scale(1.4)", opacity: 0 }],
+      { duration: 1300, easing: "cubic-bezier(0.2, 0.6, 0.35, 1)", fill: "both" }
+    ).onfinish = () => ring.remove();
   }
 
   function activate(a) {
