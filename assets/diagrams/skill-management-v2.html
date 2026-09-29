@@ -246,10 +246,11 @@
   // `phase` sets the headline when that event starts; it holds until the next phase.
   // Library skills floating above your card: [name, centre x, top y]
   // Scattered around your card: two above, three down each side (the teammate card may cover some)
+  // Side spots avoid the teammate card's edges: each one is either fully hidden behind it or fully clear
   const CLOUD = [
     ["code-review", 320, 72], ["napkin", 540, 84],
-    ["grill-me", 150, 190], ["swiftui-pro", 105, 285], ["gstack", 175, 380],
-    ["humanizer", 700, 200], ["mcp-builder", 755, 295], ["swiftdata-pro", 690, 390],
+    ["grill-me", 150, 104], ["swiftui-pro", 105, 290], ["gstack", 170, 450],
+    ["humanizer", 705, 104], ["mcp-builder", 755, 290], ["swiftdata-pro", 695, 450],
   ];
   const EVENTS = [
     { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
