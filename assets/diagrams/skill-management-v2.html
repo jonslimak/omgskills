@@ -174,6 +174,9 @@
   #flow .badge.create text { fill: #ffffff; }
   #flow .link.sync path { stroke: var(--update); }
   #flow .link.relay path { stroke: var(--create); }
+  #flow .bg-dot { fill: var(--ink); fill-opacity: 0.16; }
+  #flow .glow-stop { stop-color: var(--ink); stop-opacity: 0.045; }
+  #flow .glow-stop.end { stop-opacity: 0; }
   #flow .ripple { fill: none; stroke: #b9bcc4; stroke-width: 1; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; pointer-events: none; }
   #flow .pulse { fill: none; stroke: var(--update); stroke-width: 0; stroke-linejoin: round; pointer-events: none; }
   #flow .arrowhead.sync path { fill: var(--update); }
@@ -418,6 +421,24 @@
     const ms = el("marker", { id: "arrow-sync", class: "arrowhead sync", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, ms);
     // The cloud sits behind the cards, so the teammate card can cover part of it
+    // Dotted backdrop, same recipe as the omgskills.com hero: a 24px grid of 1px dots and a
+    // faint glow, both fading out radially, here centred on your card
+    {
+      const cx = OMG_X + OMG_W / 2, cy = OMG_Y + 170;
+      const pat = el("pattern", { id: "dots", width: 24, height: 24, patternUnits: "userSpaceOnUse", x: cx % 24, y: cy % 24 }, defs);
+      el("circle", { class: "bg-dot", cx: 12, cy: 12, r: 1 }, pat);
+      const fade = el("radialGradient", { id: "dot-fade", cx, cy, r: 400, gradientUnits: "userSpaceOnUse", gradientTransform: `translate(${cx} ${cy}) scale(1 0.72) translate(${-cx} ${-cy})` }, defs);
+      el("stop", { offset: 0, "stop-color": "#fff", "stop-opacity": 0.7 }, fade);
+      el("stop", { offset: 0.75, "stop-color": "#fff", "stop-opacity": 0 }, fade);
+      const mask = el("mask", { id: "dot-mask", maskUnits: "userSpaceOnUse", x: 0, y: 0, width: W, height: 2000 }, defs);
+      el("rect", { x: 0, y: 0, width: W, height: 2000, fill: "url(#dot-fade)" }, mask);
+      const glow = el("radialGradient", { id: "dot-glow", cx, cy, r: 360, gradientUnits: "userSpaceOnUse", gradientTransform: `translate(${cx} ${cy}) scale(1 0.55) translate(${-cx} ${-cy})` }, defs);
+      el("stop", { class: "glow-stop", offset: 0 }, glow);
+      el("stop", { class: "glow-stop end", offset: 0.7 }, glow);
+      const back = el("g", { class: "backdrop" }, svg);
+      el("rect", { x: -200, y: -200, width: W + 400, height: 2400, fill: "url(#dot-glow)" }, back);
+      el("rect", { x: -200, y: -200, width: W + 400, height: 2400, fill: "url(#dots)", mask: "url(#dot-mask)" }, back);
+    }
     // Order: ripples, the floating cloud, skills being created (above the cloud, below cards), cards, moving skills
     layers = { link: el("g", {}, svg), ripple: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), under: el("g", {}, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
 
