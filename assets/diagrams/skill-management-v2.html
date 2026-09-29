@@ -609,6 +609,7 @@
       sx = e.x + pull; sy = e.y - 4;
       layers.cloud.classList.add("picking");
       holder.classList.add("picked");
+      rippleAt(e.x + e.w / 2, e.y + CH / 2, e.w * 0.36); // ping where it was discovered
       holder.style.transition = ""; // back to the normal move + fade transition
       holder.style.transitionDelay = "0ms";
       place(holder, sx, sy, 1);
@@ -635,7 +636,6 @@
     if (created) { created.g.style.opacity = 0; c.classList.remove("create"); }
     place(holder, slot.x, slot.y, 0);
     place(row, slot.x, slot.y, 1);
-    if (o === you && !instant) setTimeout(rippleYou, 380); // faint rings as the skill lands
     refreshSubs();
     await sleep(650);
     row.classList.remove("create"); // grey once it has arrived
@@ -722,7 +722,6 @@
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
     if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
-    if (!instant) setTimeout(rippleYou, 380);
     await sleep(650);
     row.classList.remove("create");
     row.countT.textContent = "1";
@@ -760,7 +759,6 @@
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
     if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
-    if (!instant) setTimeout(rippleYou, 380);
     alignMate(); // your card grew, so keep the teammate centred on it
     const mr = mate.rows[mi];
     mr.n += targets.length;
@@ -818,16 +816,13 @@
   }
 
   // Single hop of the logo/avatar and name when a skill arrives
-  // Very faint grey circular rings that spread out from the centre of your card when it takes in a skill
-  function rippleYou() {
+  // A single faint grey ring that pings out from a point, e.g. a skill as it is discovered
+  function rippleAt(cx, cy, r) {
     if (instant || reduced) return;
-    const h = +(you.rect.dataset.h || you.rect.getAttribute("height"));
-    const cx = you.x + you.w / 2, cy = you.y + h / 2, r = Math.max(you.w, h) * 0.45;
-    // One ring, one ping
     const ring = el("circle", { class: "ripple", cx, cy, r }, layers.ripple);
     ring.animate(
-      [{ transform: "scale(1)", opacity: 0.55 }, { transform: "scale(1.4)", opacity: 0 }],
-      { duration: 1300, easing: "cubic-bezier(0.2, 0.6, 0.35, 1)", fill: "both" }
+      [{ transform: "scale(1)", opacity: 0.6 }, { transform: "scale(1.5)", opacity: 0 }],
+      { duration: 1100, easing: "cubic-bezier(0.2, 0.6, 0.35, 1)", fill: "both" }
     ).onfinish = () => ring.remove();
   }
 
