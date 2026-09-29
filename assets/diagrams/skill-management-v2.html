@@ -786,7 +786,6 @@
       place(c, from.x, from.y, 0);
       a.items.push({ name, who: owner || o.key, el: c });
       const h = layoutAgent(a);
-      if (a.shared && owner === "mate") a.sub.textContent = "Work · shared";
       // Transient arrow
       const sx = o.key === "you" ? o.x + o.w * (a.i + 1) / (AGENTS.length + 1) : o.x + o.w / 2;
       const ex = a.x + AG_W / 2 + (a.shared ? (o.key === "you" ? -24 : 24) : 0);
