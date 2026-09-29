@@ -175,6 +175,12 @@
   #flow .link.sync path { stroke: var(--update); }
   #flow .link.relay path { stroke: var(--create); }
   #flow .bg-dot { fill: var(--ink); fill-opacity: 0.16; }
+  #flow .headline {
+    font-family: var(--display); font-size: 30px; font-weight: 300; letter-spacing: -0.01em;
+    fill: #c7c7cc; transition: opacity 280ms ease;
+  }
+  :root[data-theme="dark"] #flow .headline { fill: #636366; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #flow .headline { fill: #636366; } }
   #flow .ripple { fill: none; stroke: #b9bcc4; stroke-width: 1; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; pointer-events: none; }
   #flow .pulse { fill: none; stroke: var(--update); stroke-width: 0; stroke-linejoin: round; pointer-events: none; }
   #flow .arrowhead.sync path { fill: var(--update); }
@@ -257,16 +263,16 @@
     ["swiftui-pro", 102, 304], ["grill-me", 142, 149],    // left
   ];
   const EVENTS = [
-    { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
+    { phase: "Find the trusted public skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
     // Made inside your personal ChatGPT, saved up to your library, then shared to other agents
-    { phase: "Keep track of personal ones", who: "you", createOn: "chatgpt", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
+    { phase: "Manage the skills you make", who: "you", createOn: "chatgpt", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
     // The teammate already has frontend-design in their library; they just send it
-    { phase: "Share them with your team", who: "mate", reuse: "frontend-design", send: ["team-chatgpt"] },
+    { phase: "Share skills with your team", who: "mate", reuse: "frontend-design", send: ["team-chatgpt"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
-    { phase: "Keep everything updated", who: "you", update: "release-notes" },
+    { phase: "Update & stay in sync", who: "you", update: "release-notes" },
   ];
 
   // ---- Geometry
@@ -394,13 +400,14 @@
   }
   // High-level phase shown above the diagram, set per event in EVENTS
   let phaseNow = "";
+  // Large, light headline drawn in the diagram just above your card; it cross-fades per phase
+  let headline = null;
   function phase(text) {
-    if (!ticker) return; // the headline is not shown in v2
-    if (text === phaseNow) return;
+    if (!headline || text === phaseNow) return;
     phaseNow = text;
-    if (instant) { ticker.textContent = text; return; }
-    ticker.classList.add("out");
-    setTimeout(() => { ticker.textContent = text; ticker.classList.remove("out"); }, 200);
+    if (instant) { headline.textContent = text; return; }
+    headline.style.opacity = 0;
+    setTimeout(() => { headline.textContent = text; headline.style.opacity = 1; }, 280);
   }
 
   // ---- Scene
@@ -484,6 +491,7 @@
     seedMate();
     refreshSubs();
     makeCloud();
+    headline = txt(svg, OMG_X + OMG_W / 2, OMG_Y - 52, phaseNow, "headline", "middle");
   }
 
   // Skills the teammate already has before the story starts
@@ -1080,7 +1088,7 @@
       instant = true;
       svg.classList.add("instant");
       await playOnce();
-      phase("Find the best, trusted skills, keep track of personal ones, share them with your team and keep everything updated.");
+      phase("Update & stay in sync");
       return;
     }
     for (;;) {
