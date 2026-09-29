@@ -252,6 +252,21 @@ verify_existing_candidate() {
     (cd "$MENUBAR_DIR/dist" && shasum -a 256 "$(basename "$DMG")" > "$(basename "$DMG_CHECKSUM")")
 }
 
+archive_target_deltas() {
+    local target_build="$1"
+    local archive_dir=""
+    local delta
+    # Sparkle reuses patches by build-number filename, even when the target ZIP changed.
+    for delta in "$SITE_UPDATES/$APP_NAME$target_build-"*.delta; do
+        [ -f "$delta" ] || continue
+        if [ -z "$archive_dir" ]; then
+            archive_dir="$(mktemp -d "$MENUBAR_DIR/dist/stale-update-deltas-$target_build.XXXXXX")"
+            echo "Archiving previous target-build patches in $archive_dir"
+        fi
+        mv "$delta" "$archive_dir/"
+    done
+}
+
 case "$STAGE_EXISTING" in
     --stage-existing)
         echo "Staging an existing verified candidate; no build, upload, or public release."
@@ -358,6 +373,7 @@ if [ "$RC_MODE" != "1" ]; then
         printf '/download/ /downloads/omgskills-mac.dmg 302\n' >> "$REDIRECTS_FILE"
     fi
 
+    archive_target_deltas "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Contents/Info.plist")"
     "$SPARKLE_TOOLS/generate_appcast" \
         --download-url-prefix "https://omgskills.com/updates/" \
         --link "https://omgskills.com" \

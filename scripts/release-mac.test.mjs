@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { chmod, mkdir, mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -77,6 +77,45 @@ test("public releases finalize appcast assets after Sparkle generation", () => {
   const appcastCall = script.lastIndexOf('"$SPARKLE_TOOLS/generate_appcast"');
   const finalizeCall = script.indexOf("finalize-release-assets.mjs");
   assert.ok(appcastCall >= 0 && finalizeCall > appcastCall);
+});
+
+test("release staging archives target-build patches before Sparkle can reuse them", () => {
+  const archiveCall = script.indexOf('archive_target_deltas "$(/usr/libexec/PlistBuddy');
+  const appcastCall = script.lastIndexOf('"$SPARKLE_TOOLS/generate_appcast"');
+  assert.ok(archiveCall >= 0 && archiveCall < appcastCall);
+});
+
+test("target patch archival preserves older releases and handles repeated staging", async (t) => {
+  const helper = script.match(/^archive_target_deltas\(\) \{[\s\S]*?^\}/m)?.[0];
+  assert.ok(helper, "missing target patch archival helper");
+  const root = await mkdtemp(join(tmpdir(), "omgskills-delta-archive-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const updates = join(root, "updates");
+  const menubar = join(root, "menubar");
+  const dist = join(menubar, "dist");
+  await mkdir(updates);
+  await mkdir(dist, { recursive: true });
+  const stale = ["omgskills20-19.delta", "omgskills20-18.delta"];
+  const preserved = ["omgskills19-18.delta", "omgskills200-19.delta", "omgskills-0.0.20.zip"];
+  for (const name of [...stale, ...preserved]) await writeFile(join(updates, name), name);
+  const run = () => spawnSync("bash", ["-eu", "-c", `${helper}\narchive_target_deltas 20`], {
+    env: { ...process.env, SITE_UPDATES: updates, MENUBAR_DIR: menubar, APP_NAME: "omgskills" },
+    encoding: "utf8",
+  });
+  let result = run();
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual((await readdir(updates)).sort(), preserved.sort());
+  const archives = await readdir(dist);
+  assert.equal(archives.length, 1);
+  for (const name of stale) assert.equal(await readFile(join(dist, archives[0], name), "utf8"), name);
+  result = run();
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(await readdir(dist), archives, "no patches means no new archive");
+  await writeFile(join(updates, stale[0]), "regenerated patch");
+  result = run();
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal((await readdir(dist)).length, 2);
+  assert.equal(await readFile(join(dist, archives[0], stale[0]), "utf8"), stale[0]);
 });
 
 test("existing candidate staging fails closed without approved checksums", () => {
