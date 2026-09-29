@@ -905,18 +905,38 @@
     const rowW = o.w - 32;
     const extras = [];
 
-    // 1. The skill changes in your library
-    row.el.classList.add("flash");
-    pulse(row.el);
-    const b0 = badge(rp.x + rowW + 6, rp.y - 10, "Updated");
-    extras.push(b0.g);
-    await frame();
-    b0.show();
+    const markUpdated = async (chipEl, x, y, w) => {
+      chipEl.classList.add("flash");
+      pulse(chipEl);
+      const b = badge(x + w + 6, y - 10, "Updated");
+      extras.push(b.g);
+      await frame();
+      b.show();
+    };
+    const hits = Object.values(agents).filter((a) => a.items.some((it) => it.name === name));
+    const source = agents["team-chatgpt"] && hits.includes(agents["team-chatgpt"]) ? agents["team-chatgpt"] : hits[0];
+    const srcIt = source.items.find((x) => x.name === name);
+
+    // 1. The skill is updated inside the work ChatGPT
+    activate(source);
+    await markUpdated(srcIt.el, srcIt.pos.x, srcIt.pos.y, chipW(name));
     await sleep(1100);
 
-    // 2. It syncs to every agent that has it
-    const hits = Object.values(agents).filter((a) => a.items.some((it) => it.name === name));
-    const arrows = hits.map((a) => {
+    // 2. The new version flows up into your library
+    const up = syncArrow(0, 0, 0, 0);
+    up.lg.querySelector("path").setAttribute("d",
+      curve(source.x + AG_W / 2 - 24, AG_Y - 6, o.x + o.w * (source.i + 1) / (AGENTS.length + 1), omgBottom(o) + 4));
+    extras.push(up.lg);
+    await frame();
+    up.show();
+    await sleep(650);
+    activate(you);
+    await markUpdated(row.el, rp.x, rp.y, rowW);
+    await sleep(1000);
+
+    // 3. From your library it syncs to the other agents that have it
+    const rest = hits.filter((a) => a !== source);
+    const arrows = rest.map((a) => {
       const sx = o.x + o.w * (a.i + 1) / (AGENTS.length + 1);
       const ex = a.x + AG_W / 2 + (a.shared ? -24 : 0);
       const ar = syncArrow(sx, omgBottom(o), ex, AG_Y - 4);
@@ -926,14 +946,10 @@
     await frame();
     arrows.forEach((ar) => ar.show());
     await sleep(600);
-    for (const a of hits) {
+    for (const a of rest) {
       const it = a.items.find((x) => x.name === name);
-      it.el.classList.add("flash");
-      pulse(it.el);
-      const b = badge(it.pos.x + chipW(name) + 6, it.pos.y - 10, "Updated");
-      extras.push(b.g);
-      await frame();
-      b.show();
+      activate(a);
+      await markUpdated(it.el, it.pos.x, it.pos.y, chipW(name));
     }
     await sleep(1200);
 
