@@ -642,7 +642,7 @@
     place(row, slot.x, slot.y, 1);
     refreshSubs();
     await sleep(650);
-    row.classList.remove("create"); // grey once it has arrived
+    holdBlue(row); // stays blue until this skill's whole journey is done
     holder.remove();
     if (created) created.g.remove();
     if (h && h.classList.contains("badge")) h.remove();
@@ -705,7 +705,7 @@
       { duration: instant ? 0 : 650, easing: "cubic-bezier(0.45, 0, 0.2, 1)" }
     );
     await glide.finished;
-    c.classList.remove("create"); // arrived in the agent: now a normal skill
+    holdBlue(c);
     layers.chip.appendChild(c); // in front of the agent from here on
     c.style.transformBox = "";
     c.style.transformOrigin = "";
@@ -727,7 +727,7 @@
     place(row, slot.x, slot.y, 1);
     if (!instant) setTimeout(() => activate(you), 380); // your card reacts as the skill arrives
     await sleep(650);
-    row.classList.remove("create");
+    holdBlue(row);
     row.countT.textContent = "1";
     row.countG.style.opacity = 1;
     refreshSubs();
@@ -770,10 +770,16 @@
     mr.el.countG.style.opacity = 1;
     refreshSubs();
     await sleep(650);
-    row.classList.remove("create");
+    holdBlue(row);
     await sleep(150);
     (async () => { await sleep(250); lg.style.opacity = 0; await sleep(450); lg.remove(); })();
   }
+
+  // A newly created skill and every copy of it stay blue until the last copy lands,
+  // so you can follow the whole trip. Then they all turn grey together.
+  let blueFlow = [];
+  function holdBlue(node) { if (node.classList.contains("create")) blueFlow.push(node); }
+  function releaseBlue() { blueFlow.forEach((n) => n.classList.remove("create")); blueFlow = []; }
 
   async function send(o, name, targets, owner) {
     const row = o.rows.find((r) => r.name === name);
@@ -803,7 +809,7 @@
       for (const cap of Object.values(f.a.caps)) place(cap, cap.pos.x, cap.pos.y, 1);
     }
     await sleep(650);
-    flights.forEach((f) => f.c.classList.remove("create"));
+    flights.forEach((f) => holdBlue(f.c));
     row.n += targets.length;
     row.el.countT.textContent = row.n;
     row.el.countG.style.opacity = 1;
@@ -1031,6 +1037,7 @@
         await send(o, e.collect || e.reuse, e.send);
       }
       // Keep the teammate on screen between back-to-back teammate moves
+      releaseBlue(); // the trip is over: every blue copy turns grey together
       if (o === mate && EVENTS[k + 1]?.who !== "mate") await hideMate();
       await sleep(150);
     }
