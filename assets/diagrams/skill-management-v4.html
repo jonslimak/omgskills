@@ -194,7 +194,7 @@
   }
   /* Unpicked skills stay faded and 40% smaller, so the cloud reads as background until one is chosen */
   /* v3: the cloud is hidden; a skill only appears, growing in place, when it is discovered */
-  #flow .cloud .cloud-chip:not(.picked) .bob > .chip { opacity: 0; transform: scale(0.6); }
+  #flow .cloud .cloud-chip:not(.picked) .bob > .chip { opacity: 0 !important; transform: scale(0.6); pointer-events: none; }
   @media (prefers-reduced-motion: reduce) { #flow .bob { animation: none; } }
   #flow.tracing .chip:not(.hit) { opacity: 0.2 !important; }
 </style>
