@@ -263,7 +263,7 @@
     ["swiftui-pro", 102, 304], ["grill-me", 142, 149],    // left
   ];
   const EVENTS = [
-    { phase: "Find the trusted public skills", who: "you", collect: "grill-me", send: ["hermes"] },
+    { phase: "Discover trusted public skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
     // Made inside your personal ChatGPT, saved up to your library, then shared to other agents
     { phase: "Manage the skills you make", who: "you", createOn: "chatgpt", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
@@ -272,7 +272,7 @@
     { phase: "Share skills with your team", who: "mate", reuse: "frontend-design", send: ["team-chatgpt"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { who: "you", reuse: "humanizer", send: ["team-chatgpt"] },
-    { phase: "Update & stay in sync", who: "you", update: "release-notes" },
+    { phase: "Update once & stay in sync.", who: "you", update: "release-notes" },
   ];
 
   // ---- Geometry
@@ -401,7 +401,7 @@
   // High-level phase shown above the diagram, set per event in EVENTS
   let phaseNow = "";
   // Large, light headline drawn in the diagram just above your card; it cross-fades per phase
-  // Each line shows for 2.5s, then fades away until the next phase
+  // Each line shows for 3s, then fades away until the next phase
   let headline = null, headlineTimer = 0;
   function phase(text) {
     if (!headline || text === phaseNow) return;
@@ -411,7 +411,7 @@
     headline.style.opacity = 0;
     headlineTimer = setTimeout(() => {
       headline.textContent = text; headline.style.opacity = 1;
-      headlineTimer = setTimeout(() => { headline.style.opacity = 0; }, 2500);
+      headlineTimer = setTimeout(() => { headline.style.opacity = 0; }, 3000);
     }, 280);
   }
 
@@ -1093,7 +1093,7 @@
       instant = true;
       svg.classList.add("instant");
       await playOnce();
-      phase("Update & stay in sync");
+      phase("Update once & stay in sync.");
       return;
     }
     for (;;) {
