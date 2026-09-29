@@ -422,10 +422,10 @@
     // Dotted backdrop, same dots as the omgskills.com hero (24px grid of 1px dots) fading out
     // radially, here centred on your card. No glow behind it.
     {
-      const cx = OMG_X + OMG_W / 2, cy = OMG_Y + 170;
+      const cx = OMG_X + OMG_W / 2, cy = OMG_Y + 230; // a little below the card's middle, so the larger field fits
       const pat = el("pattern", { id: "dots", width: 24, height: 24, patternUnits: "userSpaceOnUse", x: cx % 24, y: cy % 24 }, defs);
       el("circle", { class: "bg-dot", cx: 12, cy: 12, r: 1 }, pat);
-      const fade = el("radialGradient", { id: "dot-fade", cx, cy, r: 400, gradientUnits: "userSpaceOnUse", gradientTransform: `translate(${cx} ${cy}) scale(1 0.72) translate(${-cx} ${-cy})` }, defs);
+      const fade = el("radialGradient", { id: "dot-fade", cx, cy, r: 560, gradientUnits: "userSpaceOnUse", gradientTransform: `translate(${cx} ${cy}) scale(1 0.8) translate(${-cx} ${-cy})` }, defs);
       el("stop", { offset: 0, "stop-color": "#fff", "stop-opacity": 0.7 }, fade);
       el("stop", { offset: 0.75, "stop-color": "#fff", "stop-opacity": 0 }, fade);
       const mask = el("mask", { id: "dot-mask", maskUnits: "userSpaceOnUse", x: 0, y: 0, width: W, height: 2000 }, defs);
