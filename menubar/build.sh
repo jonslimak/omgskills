@@ -105,6 +105,10 @@ fi
 # Copy any SPM-generated resource bundles (e.g. KeyboardShortcuts localizations)
 find "$BIN_DIR" -maxdepth 1 -name "*.bundle" -exec cp -R {} "$APP_BUNDLE/Contents/Resources/" \; 2>/dev/null || true
 
+# SwiftPM resources can be read-only; Sparkle needs owner-write access to clear download quarantine.
+# Only change copied regular files, never symlink targets or dependency sources.
+find "$APP_BUNDLE/Contents/Resources" -type f -exec chmod u+w {} +
+
 test -f "$APP_BUNDLE/Contents/Resources/marked.min.js"
 test -f "$APP_BUNDLE/Contents/Resources/x-twitter-logo-block.png"
 

@@ -1,11 +1,60 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const script = await readFile(new URL("./release-mac.sh", import.meta.url), "utf8");
 const infoPlist = await readFile(new URL("../menubar/Info.plist", import.meta.url), "utf8");
+const buildScript = await readFile(new URL("../menubar/build.sh", import.meta.url), "utf8");
+const resourcePermissionsCommand = 'find "$APP_BUNDLE/Contents/Resources" -type f -exec chmod u+w {} +';
+
+test("copied app resources become owner-writable before signing", () => {
+  const copy = buildScript.indexOf('# Copy any SPM-generated resource bundles');
+  const permissions = buildScript.indexOf(resourcePermissionsCommand);
+  const signing = buildScript.indexOf('codesign --force --deep --sign');
+  assert.ok(copy >= 0 && permissions > copy && signing > permissions);
+});
+
+test("resource permissions preserve contents, executable bits and external symlink targets", async (t) => {
+  assert.ok(buildScript.includes(resourcePermissionsCommand));
+  const root = await mkdtemp(join(tmpdir(), "omgskills-resource-permissions-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const app = join(root, "omgskills.app");
+  const resources = join(app, "Contents", "Resources");
+  const bundle = join(resources, "Example.bundle", "en.lproj");
+  await mkdir(bundle, { recursive: true });
+  const translation = join(bundle, "Localizable.strings");
+  const privacy = join(resources, "PrivacyInfo.xcprivacy");
+  const executable = join(resources, "helper");
+  const external = join(root, "dependency-source");
+  const externalDirectory = join(root, "dependency-directory");
+  await mkdir(externalDirectory);
+  const externalChild = join(externalDirectory, "source.strings");
+  for (const file of [translation, privacy, external, externalChild]) {
+    await writeFile(file, "unchanged resource");
+    await chmod(file, 0o444);
+  }
+  await writeFile(executable, "unchanged executable");
+  await chmod(executable, 0o555);
+  await symlink(external, join(resources, "linked-file"));
+  await symlink(externalDirectory, join(resources, "linked-directory"));
+  const result = spawnSync("bash", ["-eu", "-c", resourcePermissionsCommand], {
+    env: { ...process.env, APP_BUNDLE: app }, encoding: "utf8",
+  });
+  assert.equal(result.status, 0, result.stderr);
+  for (const file of [translation, privacy]) {
+    assert.equal((await stat(file)).mode & 0o777, 0o644);
+    assert.equal(await readFile(file, "utf8"), "unchanged resource");
+  }
+  assert.equal((await stat(executable)).mode & 0o777, 0o755);
+  assert.equal(await readFile(executable, "utf8"), "unchanged executable");
+  for (const file of [external, externalChild]) {
+    assert.equal((await stat(file)).mode & 0o777, 0o444);
+  }
+});
 
 test("Mac releases require explicit approval when Skill Groups auth is enabled", () => {
   assert.match(script, /Print :OMGSkillsSkillGroupsAuthEnabled/);
