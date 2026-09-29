@@ -97,15 +97,15 @@
   .ticker p.out { opacity: 0; transform: translateY(6px); }
 
   /* Extra room so the soft card shadows are not clipped by the scroll box */
-  /* The drawing scales down to 680px wide; below that it stays centred and is cropped
-     evenly on both sides instead of scrolling. Extra padding keeps card shadows unclipped. */
+  /* The drawing scales all the way down to phone width (320px); only below that is it
+     cropped evenly on both sides. Extra padding keeps card shadows unclipped. */
   .scroll {
     display: flex; justify-content: center; overflow: hidden;
     padding-block: 48px; margin-block: -48px;
   }
   @media (min-width: 950px) { .scroll { padding-inline: 48px; margin-inline: -48px; } }
   @media (max-width: 949px) { .scroll { margin-inline: -20px; } } /* crop at the screen edge, not the page gutter */
-  #flow { display: block; flex: 0 0 auto; width: max(100%, 680px); height: auto; overflow: visible; }
+  #flow { display: block; flex: 0 0 auto; width: max(100%, 320px); height: auto; overflow: visible; }
 
   /* SVG */
   #flow text { fill: var(--ink); font-family: var(--sans); }
