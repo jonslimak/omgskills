@@ -246,11 +246,13 @@
   // `phase` sets the headline when that event starts; it holds until the next phase.
   // Library skills floating above your card: [name, centre x, top y]
   // Scattered around your card: two above, three down each side (the teammate card may cover some)
-  // Side spots avoid the teammate card's edges: each one is either fully hidden behind it or fully clear
+  // A rough ring around your card. Right-hand spots sit either fully behind the
+  // teammate card or fully clear of its edges.
   const CLOUD = [
-    ["code-review", 320, 72], ["napkin", 540, 84],
-    ["grill-me", 150, 104], ["swiftui-pro", 105, 290], ["gstack", 170, 450],
-    ["humanizer", 705, 104], ["mcp-builder", 755, 290], ["swiftdata-pro", 695, 450],
+    ["code-review", 306, 79], ["napkin", 536, 79],        // top
+    ["humanizer", 700, 149], ["mcp-builder", 740, 304],   // right
+    ["swiftdata-pro", 590, 489], ["gstack", 252, 489],    // bottom
+    ["swiftui-pro", 102, 304], ["grill-me", 142, 149],    // left
   ];
   const EVENTS = [
     { phase: "Find the best, trusted skills", who: "you", collect: "grill-me", send: ["hermes"] },
@@ -416,7 +418,8 @@
     const ms = el("marker", { id: "arrow-sync", class: "arrowhead sync", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" }, defs);
     el("path", { d: "M0,1 L9,5 L0,9 z" }, ms);
     // The cloud sits behind the cards, so the teammate card can cover part of it
-    layers = { link: el("g", {}, svg), ripple: el("g", {}, svg), under: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
+    // Order: ripples, the floating cloud, skills being created (above the cloud, below cards), cards, moving skills
+    layers = { link: el("g", {}, svg), ripple: el("g", {}, svg), cloud: el("g", { class: "cloud" }, svg), under: el("g", {}, svg), card: el("g", {}, svg), chip: el("g", {}, svg) };
 
     // You: the hero card
     const yg = el("g", { class: "anim" }, layers.card);
