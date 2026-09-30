@@ -708,8 +708,8 @@
       delete cloud[name];
       if (!instant) setTimeout(() => refillCloud(e), 2200); // keep the cloud symmetrical
       holder = e.holder;
-      // discovered just under your card, wherever it has grown to
-      e.y = omgBottom(you) + 36;
+      // discovered just above your card, wherever it has grown to (same gap as it used to have below)
+      e.y = you.y - 36 - CH;
       holder.style.transition = "none";
       place(holder, e.x, e.y);
       void holder.getBoundingClientRect();
