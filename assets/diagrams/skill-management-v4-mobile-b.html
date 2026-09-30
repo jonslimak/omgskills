@@ -1,4 +1,4 @@
-<title>One Library, Every Agent v4 Mobile</title>
+<title>One Library, Every Agent v4 Mobile B</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600;700&display=swap" rel="stylesheet">
@@ -154,8 +154,6 @@
 
   /* Motion */
   #flow .anim { transition: transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 450ms ease, filter 300ms ease; }
-  /* Agents your teammate's card slides over fade out underneath it */
-  #flow .under-mate { opacity: 0 !important; }
   #flow .link { transition: opacity 400ms ease; }
   @media (prefers-reduced-motion: reduce) { #flow .link path { animation: none; } }
   #flow.instant .anim, #flow.instant .link, #flow.instant .link path { transition: none !important; }
@@ -413,7 +411,7 @@
   }
   function tweenH(rect, to, dur = 520) {
     rect.dataset.h = to;
-    if (rect.classList.contains("agent-card")) restack();
+    if (rect.classList.contains("agent-card") || (mate && rect === mate.rect)) restack();
     const from = +rect.getAttribute("height");
     if (instant) { rect.setAttribute("height", to); return; }
     const t0 = performance.now();
@@ -427,13 +425,17 @@
   // The agent stack reflows as cards grow or shrink: each card sits a small gap below the one above
   function restack() {
     if (!agents) return;
-    let y = OMG_Y;
+    let y = OMG_Y + (mate && mate.shown ? mateH() + AG_GAP : 0); // room for your teammate's card while it's in view
     for (const a of Object.values(agents)) {
       if (a.y !== y) {
         a.y = y;
         place(a.g, a.x, y);
         layoutAgent(a);
-        for (const it of a.items) place(it.el, it.pos.x, it.pos.y);
+        for (const it of a.items) {
+          place(it.el, it.pos.x, it.pos.y);
+          const bg = it.el._badge;
+          if (bg && bg.isConnected) { const m = /translate\(([-\d.]+)px/.exec(bg.style.transform); if (m) place(bg, +m[1], it.pos.y - 10); }
+        }
         for (const cap of Object.values(a.caps)) place(cap, cap.pos.x, cap.pos.y);
       }
       y += +(a.rect.dataset.h || a.rect.getAttribute("height")) + AG_GAP;
@@ -545,8 +547,8 @@
       agents[a.id] = { ...a, i, g, head, rect, sub, x, y, items: [], caps: {} };
     });
 
-    svg.setAttribute("viewBox", `0 0 ${W} ${AG_END + 24}`);
-    layers.card.appendChild(mate.g); // your teammate's card slides in above the agents
+    svg.setAttribute("viewBox", `0 0 ${W} ${AG_END + 24 + cardH(M_ROW, 2) + AG_GAP}`); // room for the stack plus your teammate's card
+    layers.card.appendChild(mate.g); // drawn above the agents as it drops in
     seedMate();
     refreshSubs();
     makeCloud();
@@ -976,6 +978,7 @@
       chipEl.classList.add("flash");
       pulse(chipEl);
       const b = badge(x + w + 6, y - 10, "Updated");
+      chipEl._badge = b.g; // travels with the skill if the agent stack moves
       extras.push(b.g);
       await frame();
       b.show();
@@ -1069,30 +1072,18 @@
   }
 
   // Shown: at its spot, full size. Hidden: tucked behind the centre of your card, smaller.
+  // Your teammate's card joins the top of the agent column: it drops in from above and pushes the
+  // agents down, then retracts upward and the agents close the gap
   function mateVisible(v) {
     const h = mateH();
-    // Level with the top of your card; it always slides in from the right and leaves to the right
     mate.y = OMG_Y;
-    const x = v ? MATE_X : W + 20;
+    const y = v ? OMG_Y : OMG_Y - h - 20;
     mate.g.style.transition = v
-      ? "transform 700ms cubic-bezier(0.2, 0.9, 0.3, 1), opacity 350ms ease"
-      : "transform 600ms cubic-bezier(0.5, 0, 0.75, 0.3), opacity 400ms ease 150ms";
-    mate.g.style.transform = `translate(${x}px, ${mate.y}px) scale(1)`;
+      ? "transform 700ms cubic-bezier(0.2, 0.9, 0.3, 1), opacity 300ms ease"
+      : "transform 650ms cubic-bezier(0.5, 0, 0.3, 1), opacity 350ms ease 200ms";
+    mate.g.style.transform = `translate(${MATE_X}px, ${y}px) scale(1)`;
     mate.g.style.opacity = v ? 1 : 0;
-    // agents the card covers fade out underneath it, and come back when it leaves
-    const covered = [];
-    if (agents) for (const a of Object.values(agents)) {
-      const ah = +(a.rect.dataset.h || a.rect.getAttribute("height"));
-      const hid = v && a.y < mate.y + h + 12 && a.y + ah > mate.y - 12;
-      if (hid) covered.push([a.y - 30, a.y + ah]);
-      [a.g, ...a.items.map((it) => it.el), ...Object.values(a.caps)].forEach((n) => n.classList.toggle("under-mate", hid));
-    }
-    // badges pinned to those agents' skills hide with them
-    if (layers) layers.chip.querySelectorAll(".badge").forEach((b) => {
-      const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(b.style.transform || "");
-      if (m) b.classList.toggle("under-mate", +m[1] > MATE_X - 60 && covered.some(([t, btm]) => +m[2] > t && +m[2] < btm));
-    });
-    // Rows are inside the card group, so they move, scale and fade with it
+    restack();
   }
 
   async function showMate() {
