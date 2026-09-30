@@ -460,7 +460,7 @@
         logo(n.logo, x0 + 6, below - 4, 13, "ink");
         text(n.label, x0 + 18, below, { size: 10.5, weight: 500, spacing: "0.1em" });
       } else text(n.label, n.x, below, { size: 10.5, weight: 500, align: "center", spacing: "0.1em" });
-      text(n.note || `${n.kind} · ${plural(held(n), "skill")}`, n.x, below + 14, { size: 10, color: n.note ? ink : muted, align: "center" });
+      text(n.note || n.kind, n.x, below + 14, { size: 10, color: n.note ? ink : muted, align: "center" });
     }
     for (const m of orbs) if (m.tag) tagFor(m);
   }
