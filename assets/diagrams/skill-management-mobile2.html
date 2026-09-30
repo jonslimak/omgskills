@@ -681,7 +681,8 @@
       // Rises from behind the card's top edge, white with a green outline and a "Created" badge
       holder.classList.remove("anim");
       holder.remove();
-      layers.under.appendChild(holder);
+      // your teammate's new skill rises just behind their card but above the faded agents it covers
+      if (o === mate) layers.chip.insertBefore(holder, mate.g); else layers.under.appendChild(holder);
       c.classList.add("create");
       sx = o.x + o.w / 2 - w / 2;
       sy = o.y - CH - 26;
@@ -1079,7 +1080,7 @@
   // Keep it centred as it grows; move its existing rows with it
   function alignMate(skipLast) {
     const h = mateH();
-    mate.y = you.y; // level with the top of your card
+    mate.y = CY - mateH() / 2; // centred on the same line as your card
     mate.g.style.transition = "transform 520ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 200ms ease";
     mate.g.style.transform = `translate(${MATE_X}px, ${mate.y}px) scale(1)`;
     mate.rows.forEach((r, i) => {
@@ -1093,8 +1094,8 @@
   // Shown: at its spot, full size. Hidden: tucked behind the centre of your card, smaller.
   function mateVisible(v) {
     const h = mateH();
-    // Level with the top of your card; it always slides in from the right and leaves to the right
-    mate.y = you.y;
+    // Centred on the same line as your card; it always slides in from the right and leaves to the right
+    mate.y = CY - h / 2;
     const x = v ? MATE_X : W + 20;
     mate.g.style.transition = v
       ? "transform 700ms cubic-bezier(0.2, 0.9, 0.3, 1), opacity 350ms ease"
@@ -1105,7 +1106,8 @@
     const covered = [];
     if (agents) for (const a of Object.values(agents)) {
       const ah = +(a.rect.dataset.h || a.rect.getAttribute("height"));
-      const hid = v && a.y < mate.y + h + 12 && a.y + ah > mate.y - 12;
+      const overlap = Math.min(a.y + ah, mate.y + h) - Math.max(a.y, mate.y);
+      const hid = v && overlap > 20; // only agents the card really covers, not ones it just touches
       if (hid) covered.push([a.y - 30, a.y + ah]);
       [a.g, ...a.items.map((it) => it.el), ...Object.values(a.caps)].forEach((n) => n.classList.toggle("under-mate", hid));
     }
