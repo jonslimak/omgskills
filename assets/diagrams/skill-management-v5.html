@@ -159,23 +159,30 @@
   for (const n of ALL) { n.slots = new Array(n.cells.length).fill(null); n.flash = 0; n.note = ""; n.noteT = 0; }
   const cellPos = (n, i) => [n.x + n.cells[i][0], n.y + n.cells[i][1]];
 
-  // Paths from your orb to each of the others, as sampled curves
-  function bez(p0, p1, p2, p3, steps = 40) {
-    const pts = [];
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps, u = 1 - t;
-      pts.push([u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0], u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1]]);
+  // Glass tubes: square runs with rounded bends down to the agents, and a straight split tube to your teammate
+  function bends(corners, r = 16) {
+    const out = [corners[0]];
+    for (let i = 1; i < corners.length - 1; i++) {
+      const a = corners[i - 1], p = corners[i], b = corners[i + 1];
+      const da = Math.hypot(p[0] - a[0], p[1] - a[1]), db = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      const k1 = Math.min(r, da / 2) / da, k2 = Math.min(r, db / 2) / db;
+      const s0 = [p[0] + (a[0] - p[0]) * k1, p[1] + (a[1] - p[1]) * k1], s1 = [p[0] + (b[0] - p[0]) * k2, p[1] + (b[1] - p[1]) * k2];
+      for (let j = 0; j <= 8; j++) { const t = j / 8, u = 1 - t; out.push([u * u * s0[0] + 2 * u * t * p[0] + t * t * s1[0], u * u * s0[1] + 2 * u * t * p[1] + t * t * s1[1]]); }
     }
-    return pts;
+    out.push(corners[corners.length - 1]);
+    return out;
   }
-  const edge = (n, toward, pad = 0) => { const dx = toward.x - n.x, dy = toward.y - n.y, l = Math.hypot(dx, dy); return [n.x + (dx / l) * (n.r + pad), n.y + (dy / l) * (n.r + pad)]; };
-  for (const n of Object.values(NODES)) {
-    const a = edge(YOU, n), b = edge(n, YOU);
-    const down = n.y > YOU.y + 40;
-    const c1 = down ? [a[0] + (a[0] - YOU.x) * 0.5, a[1] + 70] : [a[0] + 90, a[1] - 26];
-    const c2 = down ? [b[0], b[1] - 110] : [b[0] - 90, b[1] - 26];
-    n.route = bez(a, c1, c2, b);
+  // each tube drops from under your orb, turns once towards its agent, and drops again; outer tubes turn higher so none cross
+  const TUBES = { pc: [540, 378], pk: [572, 410], wh: [628, 410], wc: [660, 378] };
+  for (const [id, [sx, turn]] of Object.entries(TUBES)) {
+    const n = NODES[id];
+    n.sx = sx;
+    n.route = bends([[sx, YOU.y + 50], [sx, turn], [n.x, turn], [n.x, n.y - 28]]);
   }
+  NODES.team.route = [[YOU.x + YOU.r - 6, YOU.y], [NODES.team.x - NODES.team.r + 6, YOU.y]];
+  const TW = 26, GAP = 18;               // tube bore, and the space in the middle of the teammate tube
+  const link = { v: 0, hold: -1 };       // the teammate tube only shows while something crosses it
+  const openLink = (t) => { link.hold = Math.max(link.hold, clock + t); };
 
   function mkPath(pts) {
     const L = [0];
@@ -221,6 +228,9 @@
 
   // Move a copy of a skill from one orb to another along their shared path
   function sendCopy(src, from, to, extra) {
+    const viaTeam = from === NODES.team || to === NODES.team;
+    if (viaTeam && link.v < 0.95) { openLink(4); later(0.8, () => sendCopy(src, from, to, extra)); return; }
+    if (viaTeam) openLink(3.4);
     const m = mk(src.name, src.kind, src.x, src.y);
     const toYou = to === YOU, n = toYou ? from : to;
     const route = toYou ? [...n.route].reverse() : n.route;
@@ -262,7 +272,9 @@
       for (const [id, o] of Object.entries(NODES)) {
         if (id === "wc") continue;
         const has = o.slots.find((q) => q && q.name === name);
-        if (has) pulse(o.route, () => { note(o, "synced", 2.4); ripple(has.x, has.y, 22, 0.8); ripple(o.x, o.y, o.r + 18, 1, o.r); });
+        if (!has) continue;
+        const go = () => pulse(o.route, () => { note(o, "synced", 2.4); ripple(has.x, has.y, 22, 0.8); ripple(o.x, o.y, o.r + 18, 1, o.r); });
+        if (o === NODES.team) { openLink(3); later(0.8, go); } else go();
       }
     });
   }
@@ -322,6 +334,7 @@
     }
     orbs = orbs.filter((m) => m.state !== "gone");
 
+    link.v = Math.max(0, Math.min(1, link.v + (clock < link.hold ? 1 : -1) * dt * 2.2));
     for (const n of ALL) { n.flash = Math.max(0, n.flash - dt * 1.4); if (n.noteT > 0) { n.noteT -= dt; if (n.noteT <= 0) n.note = ""; } }
     ripples.forEach((r) => (r.t += dt)); ripples = ripples.filter((r) => r.t < r.dur);
     for (const p of pulses) { p.d += dt * 420; if (p.d >= p.path.len && p.onEnd) { const f = p.onEnd; p.onEnd = null; f(); } }
@@ -365,10 +378,37 @@
     else if (n.logo) logo(n.logo, n.x, n.y, 17, "ink");
     else text("@", n.x, n.y + 5, { size: 15, weight: 500, align: "center" });
   }
-  function drawPath(pts) {
-    ctx.save(); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
-    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-    ctx.stroke(); ctx.restore();
+  // A glass tube: ink walls, a paper bore, and a faint inner wall for the thickness of the glass
+  function glassTube(pts, alpha = 1) {
+    const trace = () => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); };
+    ctx.save(); ctx.lineCap = "butt"; ctx.lineJoin = "round"; ctx.globalAlpha = alpha;
+    trace(); ctx.lineWidth = TW + 2 * LW; ctx.strokeStyle = ink; ctx.stroke();
+    trace(); ctx.lineWidth = TW; ctx.strokeStyle = paper; ctx.stroke();
+    trace(); ctx.lineWidth = TW - 6; ctx.strokeStyle = muted; ctx.globalAlpha = alpha * 0.45; ctx.stroke();
+    trace(); ctx.lineWidth = TW - 7.6; ctx.strokeStyle = paper; ctx.globalAlpha = alpha; ctx.stroke();
+    ctx.restore();
+  }
+  // A collar clamped round a tube
+  function collar(x, y, across, alpha = 1) {
+    ctx.save(); ctx.globalAlpha = alpha;
+    const w = across ? TW + 10 : 7, h = across ? 7 : TW + 10;
+    ctx.beginPath(); ctx.rect(x - w / 2, y - h / 2, w, h); fillAs("paper"); ctx.stroke();
+    ctx.restore();
+  }
+  function drawTubes() {
+    for (const n of Object.values(NODES)) {
+      if (n === NODES.team) continue;
+      glassTube(n.route);
+      collar(n.sx, YOU.y + Math.sqrt(YOU.r ** 2 - (n.sx - YOU.x) ** 2) + 9, true);
+      collar(n.x, n.y - n.r - 11, true);
+    }
+    // the teammate tube: each half grows out of its own orb and they meet across a small gap
+    if (link.v > 0.01) {
+      const [a, b] = NODES.team.route, mid = (a[0] + b[0]) / 2, e = ease(link.v);
+      const l = a[0] + (mid - GAP / 2 - a[0]) * e, r = b[0] - (b[0] - mid - GAP / 2) * e;
+      glassTube([a, [l, a[1]]], e); glassTube([[r, b[1]], b], e);
+      collar(l - 3.5, a[1], false, e); collar(r + 3.5, b[1], false, e);
+    }
   }
   function tagFor(m) {
     const y1 = m.y - MR - 14;
@@ -393,7 +433,7 @@
     // a short drop from the stream into your orb
     ctx.save(); ctx.lineWidth = 0.9; ctx.setLineDash([1.5, 5]); line([PICK_X, STREAM_Y + MR + 8], [PICK_X, YOU.y - YOU.r - 4]); ctx.restore();
 
-    for (const n of Object.values(NODES)) drawPath(n.route);
+    drawTubes();
     for (const n of ALL) drawNode(n);
 
     // skills: in cells, moving, and in the stream
