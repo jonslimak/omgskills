@@ -153,7 +153,9 @@
 
 
   /* Motion */
-  #flow .anim { transition: transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 450ms ease; }
+  #flow .anim { transition: transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 450ms ease, filter 300ms ease; }
+  /* Agents your teammate's card slides over fade out underneath it */
+  #flow .under-mate { filter: opacity(0); transition: filter 300ms ease; }
   #flow .link { transition: opacity 400ms ease; }
   @media (prefers-reduced-motion: reduce) { #flow .link path { animation: none; } }
   #flow.instant .anim, #flow.instant .link, #flow.instant .link path { transition: none !important; }
@@ -256,10 +258,10 @@
   // Scattered around your card: two above, three down each side (the teammate card may cover some)
   // A rough ring around your card. Right-hand spots sit either fully behind the
   // teammate card or fully clear of its edges.
-  // Mobile: found skills appear in the column to the right of your card, where your teammate's card also appears
+  // Mobile: found skills appear in the space below your card, then rise into it
   const CLOUD = [
-    ["grill-me", 313, 104], ["swiftui-pro", 313, 160], ["humanizer", 313, 216], ["napkin", 313, 272],
-    ["code-review", 313, 328], ["mcp-builder", 313, 384], ["swiftdata-pro", 313, 440], ["gstack", 313, 496],
+    ["grill-me", 105, 560], ["swiftui-pro", 105, 616], ["humanizer", 105, 672], ["napkin", 105, 728],
+    ["code-review", 105, 784], ["mcp-builder", 105, 840], ["swiftdata-pro", 105, 896], ["gstack", 105, 952],
   ];
   const EVENTS = [
     { phase: "Discover trusted public skills", who: "you", collect: "grill-me", send: ["hermes"] },
@@ -278,33 +280,29 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("flow");
   const ticker = document.getElementById("ticker");
-  // Mobile layout: your card on the left, a column on the right for found skills and your teammate,
-  // and the four agents in a 2 x 2 grid underneath
-  const AG_GAP = 16, AG_W = 190, AG_HEAD = 56;
+  // Mobile layout: your card on the left, the agents stacked in a column on its right,
+  // and your teammate's card sliding in over that column when they take part
+  const AG_GAP = 18, AG_W = 186, AG_HEAD = 56;
   const CH = 32, CG = 8, M = 12;
   const W = 420;
-  const OMG_W = 190, OMG_X = M, OMG_Y = 96, ROW_Y = 136;
-  const MATE_W = 190, MATE_X = W - M - MATE_W, MATE_Y = 262, M_ROW = 108;
+  const OMG_W = 186, OMG_X = M, OMG_Y = 96, ROW_Y = 136;
+  const MATE_W = AG_W, MATE_X = W - M - AG_W, MATE_Y = 262, M_ROW = 108;
   // Rows your card ends up with: your own collects plus every teammate skill relayed through it
   const youCollects = EVENTS.filter((e) => (e.who === "you" && e.collect) || (e.who === "mate" && (e.collect || e.reuse))).length;
   const cardH = (head, n) => (n ? head + n * (CH + CG) - CG + 20 : head - 2);
-  const AG_Y = OMG_Y + cardH(ROW_Y, youCollects) + 70;
-  const agentX = (i) => M + (i % 2) * (AG_W + AG_GAP);
-  // How tall each agent card gets by the end of the story, so the back row clears the front row
+  // Each agent gets room for everything it will hold by the end, so the column never reflows
   const finalAgentH = (a) => {
     const n = EVENTS.filter((e) => (e.send || []).includes(a.id) || e.createOn === a.id).length;
     return AG_HEAD + n * (CH + CG) + (a.shared ? 22 + 6 : 0) + 20;
   };
-  const AG_Y2 = AG_Y + Math.max(finalAgentH(AGENTS[0]), finalAgentH(AGENTS[1])) + 44;
-  const agentY = (i) => (i < 2 ? AG_Y : AG_Y2);
+  const AG_X = W - M - AG_W;
+  const AG_TOPS = AGENTS.reduce((tops, a, i) => { tops.push(i ? tops[i - 1] + finalAgentH(AGENTS[i - 1]) + AG_GAP : OMG_Y); return tops; }, []);
+  const AG_END = AG_TOPS[AGENTS.length - 1] + finalAgentH(AGENTS[AGENTS.length - 1]);
 
-  // Links to the front row curve straight down; links to the back row run down the gap between the columns
-  const CORRIDOR = W / 2;
-  function agentLink(a, ox, oy, ax, up) {
-    if (a.row === 0) return up ? curve(ax, a.y - 6, ox, oy) : curve(ox, oy, ax, a.y - 6);
-    const y1 = AG_Y - 18, y2 = a.y - 30, ex = a.col === 0 ? a.x + AG_W - 34 : a.x + 34, k = (y1 - oy) * 0.55;
-    if (up) return `M${ex} ${a.y - 6}C${ex} ${a.y - 20} ${CORRIDOR} ${y2 + 14} ${CORRIDOR} ${y2}L${CORRIDOR} ${y1}C${CORRIDOR} ${y1 - k} ${ox} ${oy + k} ${ox} ${oy}`;
-    return `M${ox} ${oy}C${ox} ${oy + k} ${CORRIDOR} ${y1 - k} ${CORRIDOR} ${y1}L${CORRIDOR} ${y2}C${CORRIDOR} ${y2 + 14} ${ex} ${a.y - 20} ${ex} ${a.y - 6}`;
+  // Skills leave your card from its right side, level with their row, and curve into the agent's head
+  function sideLink(a, sy, up) {
+    const sx = OMG_X + OMG_W + 6, ex = a.x - 6, ey = a.y + 28;
+    return up ? `M${ex} ${ey}C${ex - 20} ${ey} ${sx + 20} ${sy} ${sx} ${sy}` : `M${sx} ${sy}C${sx + 20} ${sy} ${ex - 20} ${ey} ${ex} ${ey}`;
   }
 
   const el = (tag, attrs, parent) => {
@@ -451,7 +449,7 @@
     // Dotted backdrop, same dots as the omgskills.com hero (24px grid of 1px dots) fading out
     // radially, here centred on your card. No glow behind it.
     {
-      const cx = W / 2, cy = OMG_Y + 300; // a little below the card's middle, so the larger field fits
+      const cx = W / 2, cy = OMG_Y + 330; // a little below the card's middle, so the larger field fits
       const pat = el("pattern", { id: "dots", width: 24, height: 24, patternUnits: "userSpaceOnUse", x: cx % 24, y: cy % 24 }, defs);
       el("circle", { class: "bg-dot", cx: 12, cy: 12, r: 1 }, pat);
       const fade = el("radialGradient", { id: "dot-fade", cx, cy, r: 560, gradientUnits: "userSpaceOnUse", gradientTransform: `translate(${cx} ${cy}) scale(1 0.8) translate(${-cx} ${-cy})` }, defs);
@@ -492,7 +490,7 @@
     agents = {};
     AGENTS.forEach((a, i) => {
       const g = el("g", { class: "anim" }, layers.card);
-      const x = agentX(i), y = agentY(i);
+      const x = AG_X, y = AG_TOPS[i];
       place(g, x, y, 1);
       // Agent cards have no fill or shadow; the rect only tracks the card's size
       const face = el("g", {}, g);
@@ -501,11 +499,11 @@
       logo(head, a.logo, 28, 30, 12);
       txt(head, 47, 28, a.name, "agent-title");
       const sub = txt(head, 47, 41, a.kind, "agent-sub");
-      agents[a.id] = { ...a, i, g, head, rect, sub, x, y, row: i < 2 ? 0 : 1, col: i % 2, items: [], caps: {} };
+      agents[a.id] = { ...a, i, g, head, rect, sub, x, y, items: [], caps: {} };
     });
 
-    const finalH = Math.max(finalAgentH(AGENTS[2]), finalAgentH(AGENTS[3]));
-    svg.setAttribute("viewBox", `0 0 ${W} ${AG_Y2 + finalH + 24}`);
+    svg.setAttribute("viewBox", `0 0 ${W} ${AG_END + 24}`);
+    layers.card.appendChild(mate.g); // your teammate's card slides in above the agents
     seedMate();
     refreshSubs();
     makeCloud();
@@ -713,15 +711,15 @@
     a.items.push({ name, who: o.key, el: c });
     const h = layoutAgent(a);
     const it = a.items[a.items.length - 1];
-    const sx = it.pos.x, sy = a.y - CH - 16; // just above the agent's name
+    const sx = it.pos.x, sy = it.pos.y; // grows in its own slot in the agent
     c.style.transformBox = "fill-box";
     c.style.transformOrigin = "center";
     c.style.transform = `translate(${sx}px, ${sy}px)`;
     c.style.opacity = 1;
     c.animate(
       [
-        { transform: `translate(${sx}px, ${a.y + 14}px) scale(0.55)`, opacity: 0 },
-        { transform: `translate(${sx}px, ${a.y + 4}px) scale(0.7)`, opacity: 1, offset: 0.2 },
+        { transform: `translate(${sx}px, ${sy + 14}px) scale(0.55)`, opacity: 0 },
+        { transform: `translate(${sx}px, ${sy + 4}px) scale(0.7)`, opacity: 1, offset: 0.2 },
         { transform: `translate(${sx}px, ${sy - 8}px) scale(1.03)`, offset: 0.72 },
         { transform: `translate(${sx}px, ${sy}px) scale(1)` },
       ],
@@ -763,7 +761,7 @@
     tweenH(o.rect, cardH(o.head, o.rows.length));
     const slot = rowPos(o, i);
     const lg = el("g", { class: "link relay", style: "opacity:0" }, layers.link); // blue: a new skill saved to your library
-    el("path", { d: agentLink(a, o.x + o.w * (a.i + 1) / (AGENTS.length + 1), omgBottom(o) + 4, a.x + AG_W / 2, true) }, lg);
+    el("path", { d: sideLink(a, slot.y + CH / 2, true) }, lg);
     await frame();
     lg.style.opacity = 1;
     place(row, slot.x, slot.y, 1);
@@ -838,7 +836,7 @@
       const sx = o.key === "you" ? o.x + o.w * (a.i + 1) / (AGENTS.length + 1) : o.x + o.w / 2;
       const ex = a.x + AG_W / 2 + (a.shared ? (o.key === "you" ? -24 : 24) : 0);
       const lg = el("g", { class: "link", style: "opacity:0" }, layers.link);
-      const p = el("path", { d: agentLink(a, sx, omgBottom(o), ex, false) }, lg);
+      const p = el("path", { d: sideLink(a, from.y + CH / 2, false) }, lg);
       flights.push({ a, c, h, lg, p });
     }
     await frame();
@@ -951,7 +949,7 @@
     // 2. The new version flows up into your library
     const up = syncArrow(0, 0, 0, 0);
     up.lg.querySelector("path").setAttribute("d",
-      agentLink(source, o.x + o.w * (source.i + 1) / (AGENTS.length + 1), omgBottom(o) + 4, source.x + AG_W / 2 - 24, true));
+      sideLink(source, rp.y + CH / 2, true));
     extras.push(up.lg);
     await frame();
     up.show();
@@ -966,7 +964,7 @@
       const sx = o.x + o.w * (a.i + 1) / (AGENTS.length + 1);
       const ex = a.x + AG_W / 2 + (a.shared ? -24 : 0);
       const ar = syncArrow(0, 0, 0, 0);
-      ar.lg.querySelector("path").setAttribute("d", agentLink(a, sx, omgBottom(o), ex, false));
+      ar.lg.querySelector("path").setAttribute("d", sideLink(a, rp.y + CH / 2, false));
       extras.push(ar.lg);
       return ar;
     });
@@ -1031,8 +1029,8 @@
   // Shown: at its spot, full size. Hidden: tucked behind the centre of your card, smaller.
   function mateVisible(v) {
     const h = mateH();
-    const s = v ? 1 : 0.6;
-    const cx = v ? MATE_X + MATE_W / 2 : OMG_X + OMG_W / 2;
+    const s = v ? 1 : 0.92;
+    const cx = MATE_X + MATE_W / 2;
     const cy = youCenterY();
     mate.y = cy - h / 2;
     mate.g.style.transition = v
@@ -1040,6 +1038,11 @@
       : "transform 800ms cubic-bezier(0.5, 0, 0.3, 1), opacity 250ms ease 600ms";
     mate.g.style.transform = `translate(${cx - (MATE_W * s) / 2}px, ${cy - (h * s) / 2}px) scale(${s})`;
     mate.g.style.opacity = v ? 1 : 0;
+    // agents the card covers fade out underneath it, and come back when it leaves
+    if (agents) for (const a of Object.values(agents)) {
+      const hid = v && a.y < mate.y + h + 12 && a.y + +(a.rect.dataset.h || a.rect.getAttribute("height")) > mate.y - 12;
+      [a.g, ...a.items.map((it) => it.el), ...Object.values(a.caps)].forEach((n) => n.classList.toggle("under-mate", hid));
+    }
     // Rows are inside the card group, so they move, scale and fade with it
   }
 
