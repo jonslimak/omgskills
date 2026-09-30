@@ -200,6 +200,12 @@
   #flow .chip.remove .bg { fill: var(--remove-tint); }
   #flow .badge.remove rect { fill: var(--remove); }
   #flow .badge.remove text { fill: #ffffff; }
+  /* A skill from your teammate is checked before it spreads: grey "Verifying…" that breathes, then green "Safe" */
+  #flow .badge.verify rect { fill: var(--muted); }
+  #flow .badge.verify text { fill: #ffffff; }
+  #flow .badge.verify { animation: verify-breathe 1s ease-in-out infinite; }
+  @keyframes verify-breathe { 50% { opacity: 0.55; } }
+  #flow .badge.safe text { fill: #ffffff; }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow .badge.author rect { fill: var(--ink); }
   #flow .badge.author text { fill: var(--bg); font-weight: 500; }
@@ -1226,6 +1232,23 @@
     await sleep(1200);
   }
 
+  // A skill that arrives from your teammate is verified before it goes any further
+  async function verify(name) {
+    const i = you.rows.findIndex((r) => r.name === name);
+    if (i < 0) return null;
+    const p = rowPos(you, i), x = p.x + you.w - 32 + 6, y = p.y - 10;
+    const checking = badge(x, y, "Verifying…", false, "verify");
+    await frame();
+    checking.show();
+    await sleep(1600);
+    const ok = badge(x, y, "Safe", false, "safe");
+    await frame();
+    checking.g.remove();
+    ok.show();
+    await sleep(700);
+    return ok.g;
+  }
+
   async function playOnce() {
     for (const [k, e] of EVENTS.entries()) {
       const o = e.who === "you" ? you : mate;
@@ -1238,7 +1261,9 @@
       if (e.reuse) await sleep(900);
       if (o === mate) {
         await relayToYou(e.collect || e.reuse, e.send);
+        const safe = await verify(e.collect || e.reuse); // only a verified skill is passed on
         await send(you, e.collect || e.reuse, e.send, "mate");
+        if (safe) { safe.style.opacity = 0; setTimeout(() => safe.remove(), 500); }
       } else {
         await send(o, e.collect || e.reuse, e.send);
       }
