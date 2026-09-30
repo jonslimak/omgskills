@@ -40,7 +40,7 @@
       --shadow: rgba(0, 0, 0, 0.5);
       --shadow-soft: rgba(0, 0, 0, 0.3);
       --track: #1c1c1e;
-      --logo-filter: invert(1);
+      --logo-filter: url(#invert);
       --update: #30d158;
       --on-update: #002b0c;
       --update-tint: rgba(48, 209, 88, 0.26);
@@ -62,7 +62,7 @@
     --shadow: rgba(0, 0, 0, 0.5);
     --shadow-soft: rgba(0, 0, 0, 0.3);
     --track: #1c1c1e;
-    --logo-filter: invert(1);
+    --logo-filter: url(#invert);
     --update: #30d158;
     --on-update: #002b0c;
     --update-tint: rgba(48, 209, 88, 0.26);
@@ -113,8 +113,9 @@
   #flow .agent-head { transform-box: fill-box; transform-origin: 20% 60%; }
   #flow .you-head { transform-box: fill-box; transform-origin: 50% 70%; }
   /* On a pure white page the cards are defined only by their shadow */
-  #flow .lift { filter: drop-shadow(0 1px 2px var(--shadow-soft)) drop-shadow(0 8px 24px var(--shadow)); }
-  #flow .lift-hero { filter: drop-shadow(0 1px 2px var(--shadow-soft)) drop-shadow(0 10px 24px var(--shadow)); }
+  /* Shadows are SVG filters (defined in the drawing's defs): iPhone browsers ignore CSS drop-shadow on SVG groups */
+  #flow .lift { filter: url(#lift); }
+  #flow .lift-hero { filter: url(#lift-hero); }
   /* Card names and counts match the agent cards' name and "Personal" label */
   #flow .omg-title, #flow .mate-title { font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: -0.015em; }
   #flow .omg-sub { fill: var(--muted); font-size: 10px; }
@@ -127,7 +128,7 @@
 
   #flow .chip .bg { fill: var(--chip); }
   #flow .chip.float .bg { fill: var(--float); }
-  #flow .chip.float { filter: drop-shadow(0 1px 1px var(--shadow-soft)) drop-shadow(0 4px 10px var(--shadow)); }
+  #flow .chip.float { filter: url(#lift-chip); }
   #flow .chip .name { font-size: 12px; font-weight: 500; }
   #flow .chip .count text { fill: var(--muted); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
   #flow .chip .bot { fill: none; stroke: var(--faint); stroke-width: 2; stroke-linecap: round; }
@@ -154,7 +155,7 @@
   /* Motion */
   #flow .anim { transition: transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 450ms ease, filter 300ms ease; }
   /* Agents your teammate's card slides over fade out underneath it */
-  #flow .under-mate { filter: opacity(0); transition: filter 300ms ease; }
+  #flow .under-mate { opacity: 0 !important; }
   #flow .link { transition: opacity 400ms ease; }
   @media (prefers-reduced-motion: reduce) { #flow .link path { animation: none; } }
   #flow.instant .anim, #flow.instant .link, #flow.instant .link path { transition: none !important; }
@@ -453,6 +454,21 @@
     svg.textContent = "";
     measurer = el("text", { x: -999, y: -999, style: "font: 500 12px var(--sans)" }, svg);
     const defs = el("defs", {}, svg);
+    // Soft two-layer shadows and the dark-mode logo inversion, as SVG filters so WebKit renders them
+    const shadow = (id, region, layers) => {
+      const f = el("filter", { id, x: region[0], y: region[1], width: region[2], height: region[3] }, defs);
+      let input = "SourceGraphic";
+      layers.forEach(([dy, blur, token], i) => {
+        const d = el("feDropShadow", { in: input, dx: 0, dy, stdDeviation: blur / 2, result: `s${i}` }, f);
+        d.style.floodColor = `var(${token})`;
+        input = `s${i}`;
+      });
+    };
+    shadow("lift", ["-40%", "-60%", "180%", "260%"], [[1, 2, "--shadow-soft"], [8, 24, "--shadow"]]);
+    shadow("lift-hero", ["-40%", "-40%", "180%", "200%"], [[1, 2, "--shadow-soft"], [10, 24, "--shadow"]]);
+    shadow("lift-chip", ["-30%", "-100%", "160%", "320%"], [[1, 1, "--shadow-soft"], [4, 10, "--shadow"]]);
+    const inv = el("filter", { id: "invert" }, defs);
+    el("feColorMatrix", { type: "matrix", values: "-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0" }, inv);
     const clip = el("clipPath", { id: "round", clipPathUnits: "objectBoundingBox" }, defs);
     el("circle", { cx: 0.5, cy: 0.5, r: 0.5 }, clip);
     const grad = el("linearGradient", { id: "ph", x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
