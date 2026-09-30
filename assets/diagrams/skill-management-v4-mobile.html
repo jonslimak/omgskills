@@ -383,14 +383,9 @@
     }
     if (opts.count) {
       const cg = el("g", { class: "count anim", style: "opacity:0" }, g);
-      const bx = w - 20, bot = el("g", { transform: `translate(${bx} ${CH / 2 - 2}) scale(0.5)` }, cg);
-      el("rect", { class: "bot", x: 0, y: 0, width: 12, height: 10, rx: 3 }, bot);
-      el("path", { class: "bot", d: "M6 0v-2.5" }, bot);
-      el("circle", { class: "bot-eye", cx: 6, cy: -3.4, r: 1.5 }, bot);
-      el("circle", { class: "bot-eye", cx: 3.8, cy: 4.8, r: 1.5 }, bot);
-      el("circle", { class: "bot-eye", cx: 8.2, cy: 4.8, r: 1.5 }, bot);
+      // just the number of agents using it, no agent icon
       g.countG = cg;
-      g.countT = txt(cg, bx - 3, CH / 2 + 4.5, "0", "", "end");
+      g.countT = txt(cg, w - 14, CH / 2 + 4.5, "0", "", "end");
     }
     return g;
   }
