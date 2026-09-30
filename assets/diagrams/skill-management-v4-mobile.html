@@ -155,7 +155,9 @@
   /* Motion */
   #flow .anim { transition: transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 450ms ease, filter 300ms ease; }
   /* Agents your teammate's card slides over fade out underneath it */
-  #flow .under-mate { opacity: 0 !important; }
+  /* Agents under your teammate's card stay visible, faded */
+  #flow .under-mate { opacity: 0.3 !important; }
+  #flow .under-mate-hide { opacity: 0 !important; }
   #flow .link { transition: opacity 400ms ease; }
   @media (prefers-reduced-motion: reduce) { #flow .link path { animation: none; } }
   #flow.instant .anim, #flow.instant .link, #flow.instant .link path { transition: none !important; }
@@ -546,7 +548,7 @@
     });
 
     svg.setAttribute("viewBox", `0 0 ${W} ${AG_END + 24}`);
-    layers.card.appendChild(mate.g); // your teammate's card slides in above the agents
+    layers.chip.appendChild(mate.g); // your teammate's card slides in above the agents and their skills
     seedMate();
     refreshSubs();
     makeCloud();
@@ -1087,10 +1089,13 @@
       if (hid) covered.push([a.y - 30, a.y + ah]);
       [a.g, ...a.items.map((it) => it.el), ...Object.values(a.caps)].forEach((n) => n.classList.toggle("under-mate", hid));
     }
-    // badges pinned to those agents' skills hide with them
+    // badges on those agents fade with them, and hide where they would sit on top of the card
     if (layers) layers.chip.querySelectorAll(".badge").forEach((b) => {
       const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(b.style.transform || "");
-      if (m) b.classList.toggle("under-mate", +m[1] > MATE_X - 60 && covered.some(([t, btm]) => +m[2] > t && +m[2] < btm));
+      if (!m || b.closest(".card") || +m[1] <= MATE_X - 60) return;
+      const y = +m[2], onCard = v && y > mate.y - 18 && y < mate.y + h;
+      b.classList.toggle("under-mate-hide", onCard);
+      b.classList.toggle("under-mate", !onCard && covered.some(([t, btm]) => y > t && y < btm));
     });
     // Rows are inside the card group, so they move, scale and fade with it
   }
@@ -1099,6 +1104,8 @@
     if (mate.shown) return;
     mate.shown = true;
     mate.joined = true;
+    layers.chip.appendChild(mate.g); // on top of every agent skill drawn since it was last shown
+    void svg.getBoundingClientRect(); // keep its off-screen start, so it still slides in
     mateVisible(true);
     await sleep(mate.rows.length ? 550 : 800);
   }
