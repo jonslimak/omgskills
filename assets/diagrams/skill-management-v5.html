@@ -208,9 +208,9 @@
   // Take a free cell (centre cells hold the name or logo); make room by letting the oldest go
   function claim(n, m) {
     let free = [];
-    n.slots.forEach((q, i) => { if (i > 0 && !q) free.push(i); });
+    n.slots.forEach((q, i) => { if ((i > 0 || n !== YOU) && !q) free.push(i); });
     if (!free.length) {
-      const old = n.slots.filter((q, i) => i > 0 && q && q.state === "home").sort((a, b) => a.born - b.born)[0];
+      const old = n.slots.filter((q, i) => (i > 0 || n !== YOU) && q && q.state === "home").sort((a, b) => a.born - b.born)[0];
       if (!old) return -1;
       n.slots[old.slot] = null; old.state = "fade"; free = [old.slot];
     }
@@ -371,12 +371,10 @@
     if (lit > 0.05) { ctx.save(); ctx.globalAlpha = lit * 0.8; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.arc(n.x, n.y, n.r + 4, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
     // cells
     ctx.save(); ctx.lineWidth = 0.8; ctx.strokeStyle = muted; ctx.setLineDash([2, 2.4]);
-    n.cells.forEach(([dx, dy], i) => { if (i > 0 && !n.slots[i]) { ctx.beginPath(); ctx.arc(n.x + dx, n.y + dy, MR, 0, Math.PI * 2); ctx.stroke(); } });
+    n.cells.forEach(([dx, dy], i) => { if ((i > 0 || n !== YOU) && !n.slots[i]) { ctx.beginPath(); ctx.arc(n.x + dx, n.y + dy, MR, 0, Math.PI * 2); ctx.stroke(); } });
     ctx.restore();
     // centre: your name, an agent's logo, or your teammate's @
     if (n === YOU) text("YOU", n.x, n.y + 4, { size: 11, weight: 500, align: "center", spacing: "0.14em" });
-    else if (n.logo) logo(n.logo, n.x, n.y, 17, "ink");
-    else text("@", n.x, n.y + 5, { size: 15, weight: 500, align: "center" });
   }
   // A glass tube: ink walls, a paper bore, and a faint inner wall for the thickness of the glass
   function glassTube(pts, alpha = 1) {
@@ -446,7 +444,13 @@
     if (YOU.note) text(YOU.note, YOU.x - YOU.r - 12, YOU.y - YOU.r + 30, { size: 10, color: ink, align: "right" });
     for (const n of Object.values(NODES)) {
       const below = n.y + n.r + 18;
-      text(n.label, n.x, below, { size: 10.5, weight: 500, align: "center", spacing: "0.1em" });
+      if (n.logo) {
+        // the agent's logo sits just left of its name
+        ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = "0.1em"; ctx.font = `500 10.5px ${MONO}`; const w = ctx.measureText(n.label).width; ctx.restore();
+        const x0 = n.x - (w + 18) / 2;
+        logo(n.logo, x0 + 6, below - 4, 13, "ink");
+        text(n.label, x0 + 18, below, { size: 10.5, weight: 500, spacing: "0.1em" });
+      } else text(n.label, n.x, below, { size: 10.5, weight: 500, align: "center", spacing: "0.1em" });
       text(n.note || `${n.kind} · ${plural(held(n), "skill")}`, n.x, below + 14, { size: 10, color: n.note ? ink : muted, align: "center" });
     }
     for (const m of orbs) if (m.tag) tagFor(m);
