@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@200&display=swap" rel="stylesheet">
 <style>
-  /* Banner: a marble machine in side view, ink on paper, no colour */
+  /* Banner: a magical marble machine of glass orbs joined by paths, ink on paper, no colour */
   :root {
     --paper: #ffffff;
     --ink: #151515;
@@ -22,7 +22,7 @@
   .plate { position: relative; }
   #line { display: block; width: 100%; }
   .caption {
-    position: absolute; right: 1%; top: 4%; text-align: right; align-items: flex-end;
+    position: absolute; left: 1%; top: 34%;
     display: flex; flex-direction: column; gap: 6px;
     opacity: 0; transition: opacity 300ms ease;
     pointer-events: none;
@@ -38,7 +38,7 @@
 
 <div class="banner">
   <div class="plate">
-    <canvas id="line" role="img" aria-label="A marble machine. Public skills roll past on a track and a gate drops the one you pick onto your wheel. Your wheel sends copies down to ChatGPT, Claude, Hermes and your teammate. A skill made on an agent rolls back along the floor and rides a lift up to your wheel, which passes it on, and an update in one place spreads to every agent."></canvas>
+    <canvas id="line" role="img" aria-label="Glass orbs joined by paths. Public skills drift past in a stream and the one you pick drops into your orb. Copies travel along the paths into the orbs for ChatGPT, Claude, Hermes and your teammate. A skill made on an agent travels back along its path to you and on to the others, and an update in one place spreads to every orb."></canvas>
     <div class="caption" aria-live="polite"><span class="idx">01 / 04</span><span class="txt">Discover trusted public skills</span></div>
   </div>
 </div>
@@ -58,7 +58,7 @@
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ---- Side view of a marble machine, drawn in a fixed 1200 x 610 space and scaled to the banner width
-  const VW = 1200, VH = 610;
+  const VW = 1200, VH = 600;
   let s = 1, DPR = 1, W = 0, H = 0;
   const LW = 1.25, R = 8, DX = 9, DY = -7; // line weight, marble radius, oblique depth
 
@@ -132,120 +132,143 @@
     ctx.restore();
   }
 
-  // ---- The machine. Every track is a list of points for the marble's centre.
+  // ---- The machine: orbs joined by paths. Every skill sits in a cell of a hexagonal grid inside an orb.
   const lerp = (a, b, t) => a + (b - a) * t;
-  const onLine = (seg, x) => lerp(seg[0][1], seg[1][1], (x - seg[0][0]) / (seg[1][0] - seg[0][0]));
-  const STREAM = [[150, 104], [1010, 176]];        // public skills roll left to right
-  const GATE = 600;                                 // where you pick from the stream
-  const BIN = { x: 1000, y: 196, w: 84, h: 40 };    // everything not picked
-  const WHEEL = { x: 600, y: 300, r: 92, n: 8 };    // you
-  const FUNNEL = [600, 424];
-  const LEFT = [[588, 440], [140, 470]], RIGHT = [[612, 440], [1168, 470]];
-  const RETURN = [[1170, 574], [58, 594]];          // back along the floor
-  const LIFT = { x: 40, bottom: 594, top: 208 };
-  const FEED = [[40, 208], [496, 294]];             // from the top of the lift into your wheel
-  const BOWL_Y = 492, PED = { top: 502, h: 50, w: 88 };
-  const AGENTS = {
-    pc: { x: 215, name: "CHATGPT", kind: "personal", logo: "chatgpt", track: LEFT, skills: new Set(["swiftui-pro", "code-review"]) },
-    pk: { x: 395, name: "CLAUDE", kind: "personal", logo: "claude", track: LEFT, skills: new Set(["humanizer", "swiftui-pro"]) },
-    wh: { x: 805, name: "HERMES", kind: "work", logo: "hermes", track: RIGHT, skills: new Set(["grill-me"]) },
-    wc: { x: 985, name: "CHATGPT", kind: "work", logo: "chatgpt", track: RIGHT, skills: new Set(["frontend-design"]) },
-    team: { x: 1120, name: "@TEAMMATE", kind: "team", logo: null, track: RIGHT, skills: new Set(["frontend-design", "canvas-design"]) },
+  const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+  const hexCells = (pitch, rings) => {
+    const out = [[0, 0]];
+    if (rings >= 1) for (let k = 0; k < 6; k++) out.push([pitch * Math.cos((k * Math.PI) / 3 - Math.PI / 2), pitch * Math.sin((k * Math.PI) / 3 - Math.PI / 2)]);
+    if (rings >= 2) for (let k = 0; k < 6; k++) {
+      const a = (k * Math.PI) / 3 - Math.PI / 2, b = a + Math.PI / 6;
+      out.push([2 * pitch * Math.cos(a), 2 * pitch * Math.sin(a)]);
+      out.push([Math.sqrt(3) * pitch * Math.cos(b), Math.sqrt(3) * pitch * Math.sin(b)]);
+    }
+    return out;
   };
-  for (const a of Object.values(AGENTS)) { a.flash = 0; a.note = ""; a.noteT = 0; a.door = 0; a.pile = []; }
-  const you = { note: "", noteT: 0, flash: 0 };
-  const gate = { open: 0 };
+  const STREAM_Y = 78, PICK_X = 600, DRIFT = 40, EVERY = 1.8, FADE = 110;
+  const YOU = { id: "you", x: 600, y: 248, r: 92, cells: hexCells(30, 2), label: "YOU", kind: "" };
+  const NODES = {
+    pc: { x: 150, y: 492, logo: "chatgpt", label: "CHATGPT", kind: "personal", seed: [["swiftui-pro", "pub"], ["code-review", "pub"]] },
+    pk: { x: 365, y: 492, logo: "claude", label: "CLAUDE", kind: "personal", seed: [["humanizer", "pub"], ["swiftui-pro", "pub"]] },
+    wh: { x: 835, y: 492, logo: "hermes", label: "HERMES", kind: "work", seed: [["grill-me", "pub"]] },
+    wc: { x: 1050, y: 492, logo: "chatgpt", label: "CHATGPT", kind: "work", seed: [["frontend-design", "team"]] },
+    team: { x: 1085, y: 248, logo: null, label: "@TEAMMATE", kind: "teammate", seed: [["frontend-design", "team"], ["canvas-design", "team"]] },
+  };
+  for (const n of Object.values(NODES)) { n.r = 50; n.cells = hexCells(27, 1); }
+  const ALL = [YOU, ...Object.values(NODES)];
+  for (const n of ALL) { n.slots = new Array(n.cells.length).fill(null); n.flash = 0; n.note = ""; n.noteT = 0; }
+  const cellPos = (n, i) => [n.x + n.cells[i][0], n.y + n.cells[i][1]];
 
-  // ---- Paths: rolling segments keep a steady speed, drops accelerate, lifts climb slowly
+  // Paths from your orb to each of the others, as sampled curves
+  function bez(p0, p1, p2, p3, steps = 40) {
+    const pts = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps, u = 1 - t;
+      pts.push([u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0], u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1]]);
+    }
+    return pts;
+  }
+  const edge = (n, toward, pad = 0) => { const dx = toward.x - n.x, dy = toward.y - n.y, l = Math.hypot(dx, dy); return [n.x + (dx / l) * (n.r + pad), n.y + (dy / l) * (n.r + pad)]; };
+  for (const n of Object.values(NODES)) {
+    const a = edge(YOU, n), b = edge(n, YOU);
+    const down = n.y > YOU.y + 40;
+    const c1 = down ? [a[0] + (a[0] - YOU.x) * 0.5, a[1] + 70] : [a[0] + 90, a[1] - 26];
+    const c2 = down ? [b[0], b[1] - 110] : [b[0] - 90, b[1] - 26];
+    n.route = bez(a, c1, c2, b);
+  }
+
   function mkPath(pts) {
     const L = [0];
     for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
     return { pts, L, len: L[L.length - 1] };
   }
-  function segAt(path, d) { let i = 1; while (i < path.L.length - 1 && path.L[i] < d) i++; return i; }
   function at(path, d) {
-    const i = segAt(path, d), a = path.pts[i - 1], b = path.pts[i], span = path.L[i] - path.L[i - 1];
+    let i = 1; while (i < path.L.length - 1 && path.L[i] < d) i++;
+    const a = path.pts[i - 1], b = path.pts[i], span = path.L[i] - path.L[i - 1];
     const k = span ? Math.max(0, Math.min(1, (d - path.L[i - 1]) / span)) : 1;
-    return [lerp(a[0], b[0], k), lerp(a[1], b[1], k), b[0] - a[0], b[1] - a[1]];
+    return [lerp(a[0], b[0], k), lerp(a[1], b[1], k)];
   }
-  const ROLL = 150, CLIMB = 120, DRIFT = 42, EVERY = 1.7; // the public stream drifts slowly past
 
   // ---- State
-  let rot = 0, marbles = [], ripples = [], pulses = [], born = 0, streamT = 0;
-  const gondolas = new Array(WHEEL.n).fill(null);
-  function mk(name, kind, x, y, state) {
-    const m = { name, kind, x, y, state, v: 0, scale: 1, alpha: 1, routes: [], tag: false, born: born++, lastCopy: -9 };
-    marbles.push(m); return m;
+  let orbs = [], ripples = [], pulses = [], born = 0, streamT = 0, clock = 0;
+  function mk(name, kind, x, y) {
+    const m = { name, kind, x, y, state: "idle", scale: 1, alpha: 1, tag: false, born: born++ };
+    orbs.push(m); return m;
   }
-  const gAng = (i) => rot + (i * 2 * Math.PI) / WHEEL.n;
-  const pivot = (i) => [WHEEL.x + WHEEL.r * Math.cos(gAng(i)), WHEEL.y + WHEEL.r * Math.sin(gAng(i))];
-  const cupPos = (i) => { const [x, y] = pivot(i); return [x, y + 13]; };
-  const wrapA = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
-  function ripple(x, y, r1 = 26, dur = 0.9) { ripples.push({ x, y, r1, t: 0, dur }); }
-  function note(o, str, t = 2.2) { o.note = str; o.noteT = t; o.flash = 1; }
+  function ripple(x, y, r1 = 26, dur = 0.9, r0 = 6) { ripples.push({ x, y, r0, r1, t: 0, dur }); }
+  function note(n, str, t = 2.2) { n.note = str; n.noteT = t; n.flash = 1; }
 
-  function follow(m, pts, onEnd) { m.state = "path"; m.path = mkPath(pts); m.d = 0; m.onEnd = onEnd; }
-  // Settle into the free gondola nearest a point on the wheel
-  function board(m, near, routes) {
-    let best = -1, bd = 1e9;
-    gondolas.forEach((g, i) => { if (!g) { const [x, y] = cupPos(i), d = Math.hypot(x - near[0], y - near[1]); if (d < bd) { bd = d; best = i; } } });
-    if (best < 0) { // wheel full: let the oldest idle skill go
-      const old = gondolas.filter((g) => g && !g.routes.length).sort((a, b) => a.born - b.born)[0];
-      if (old) { gondolas[old.slot] = null; old.state = "fade"; best = old.slot; }
+  // Take a free cell (centre cells hold the name or logo); make room by letting the oldest go
+  function claim(n, m) {
+    let free = [];
+    n.slots.forEach((q, i) => { if (i > 0 && !q) free.push(i); });
+    if (!free.length) {
+      const old = n.slots.filter((q, i) => i > 0 && q && q.state === "home").sort((a, b) => a.born - b.born)[0];
+      if (!old) return -1;
+      n.slots[old.slot] = null; old.state = "fade"; free = [old.slot];
     }
-    gondolas[best] = m; m.slot = best; m.routes = routes || [];
-    m.state = "boarding"; m.bt = 0; m.bx = m.x; m.by = m.y;
-    for (const g of gondolas) if (g && g !== m && g.name === m.name) { gondolas[g.slot] = null; g.state = "fade"; }
+    const i = free.sort((a, b) => Math.hypot(...n.cells[a]) - Math.hypot(...n.cells[b]) || a - b)[0];
+    n.slots[i] = m; return i;
+  }
+  function place(m, n, i) {
+    m.node = n; m.slot = i; m.state = "home";
+    [m.x, m.y] = cellPos(n, i);
+    for (const q of n.slots) if (q && q !== m && q.name === m.name && q.state === "home") { n.slots[q.slot] = null; q.state = "fade"; }
+  }
+  // Glide along a path with an ease, then run onEnd
+  function glide(m, pts, dur, onEnd) { m.state = "move"; m.path = mkPath(pts); m.t = 0; m.dur = dur; m.onEnd = onEnd; }
+  const travel = (path) => 0.5 + mkPath(path).len / 260;
+
+  // Move a copy of a skill from one orb to another along their shared path
+  function sendCopy(src, from, to, extra) {
+    const m = mk(src.name, src.kind, src.x, src.y);
+    const toYou = to === YOU, n = toYou ? from : to;
+    const route = toYou ? [...n.route].reverse() : n.route;
+    const i = claim(to, m);
+    if (i < 0) { m.state = "gone"; return; }
+    const target = cellPos(to, i);
+    const pts = [[src.x, src.y], ...route, target];
+    ripple(src.x, src.y, 16, 0.5);
+    glide(m, pts, travel(pts), () => { place(m, to, i); ripple(m.x, m.y, 18, 0.6); to.flash = 1; if (extra) extra(m); });
   }
 
-  // Seed what you already keep
-  [["swiftui-pro", "pub", 0], ["release-notes", "mine", 2], ["code-review", "pub", 4], ["frontend-design", "team", 5], ["humanizer", "pub", 7]].forEach(([n, k, i]) => {
-    const m = mk(n, k, 0, 0, "ride"); gondolas[i] = m; m.slot = i;
-  });
-  for (const a of Object.values(AGENTS)) a.pile = [...a.skills].slice(0, 5).map((n) => (n === "release-notes" ? "mine" : a.kind === "team" || n === "frontend-design" || n === "canvas-design" ? "team" : "pub"));
-
-  // A copy leaves the bottom gondola, drops through the funnel and rolls to its agent's trapdoor
-  function deliver(m, id) {
-    const a = AGENTS[id], tr = a.track, start = tr === LEFT ? LEFT[0] : RIGHT[0];
-    const c = mk(m.name, m.kind, m.x, m.y, "path");
-    follow(c, [[m.x, m.y], [FUNNEL[0], FUNNEL[1] - 6], [start[0], start[1]], [a.x, onLine(tr, a.x)], [a.x, BOWL_Y]], () => land(c, a));
-    c.dropX = a.x; c.agent = a;
-  }
-  function land(m, a) {
-    m.state = "gone"; a.skills.add(m.name); a.pile = [m.kind, ...a.pile].slice(0, 5);
-    note(a, a.kind === "team" ? "received" : "installed", 1.8); ripple(a.x, BOWL_Y - 4, 34);
-  }
-  // Back to you: drop through the stand, roll home along the floor, ride the lift, feed into the wheel
-  function goHome(m, a, routes) {
-    follow(m, [[a.x, BOWL_Y - 6], [a.x, onLine(RETURN, a.x)], [LIFT.x + 12, onLine(RETURN, LIFT.x + 12)], [LIFT.x, LIFT.bottom - 6], [LIFT.x, LIFT.top], FEED[1]],
-      () => { board(m, [WHEEL.x - WHEEL.r, WHEEL.y], routes); note(you, "collected", 1.8); });
-  }
+  // Seed the orbs
+  for (const n of Object.values(NODES)) n.seed.forEach(([name, kind]) => { const m = mk(name, kind, 0, 0); place(m, n, claim(n, m)); });
+  [["swiftui-pro", "pub"], ["release-notes", "mine"], ["code-review", "pub"], ["frontend-design", "team"], ["humanizer", "pub"]].forEach(([name, kind]) => { const m = mk(name, kind, 0, 0); place(m, YOU, claim(YOU, m)); });
 
   // ---- The four moves
-  const PUBLIC = ["grill-me", "napkin", "gstack", "mcp-builder", "swiftdata-pro", "humanizer"];
+  const PUBLIC = ["grill-me", "napkin", "gstack", "mcp-builder", "swiftdata-pro", "brand-voice"];
   let pi = 0;
   function discover(routes) {
-    const m = marbles.filter((q) => q.state === "stream" && !q.target && q.x < GATE - 50).sort((a, b) => b.x - a.x)[0];
+    const m = orbs.filter((q) => q.state === "stream" && !q.target && q.x < PICK_X - 40).sort((a, b) => b.x - a.x)[0];
     if (!m) return;
     m.target = true; m.tag = true; m.name = PUBLIC[pi++ % PUBLIC.length]; m.routes = routes;
   }
+  function spread(m, from, routes) {
+    routes.forEach((id, k) => later(0.45 * k, () => sendCopy(m, from, NODES[id])));
+  }
   function create(id, name, routes) {
-    const a = AGENTS[id], m = mk(name, id === "team" ? "team" : "mine", a.x, BOWL_Y - 14, "made");
-    m.scale = 0.1; m.tag = true; m.mt = 0; m.agent = a; m.next = routes;
-    note(a, id === "team" ? "shared" : "new skill", 2.4); ripple(a.x, BOWL_Y - 14, 30); a.skills.add(name);
+    const n = NODES[id], m = mk(name, id === "team" ? "team" : "mine", n.x, n.y), i = claim(n, m);
+    place(m, n, i); m.scale = 0.1; m.tag = true; m.grow = true;
+    note(n, id === "team" ? "shared" : "new skill", 2.4); ripple(m.x, m.y, 30);
+    later(1.4, () => { m.tag = false; sendCopy(m, n, YOU, (c) => { c.tag = false; note(YOU, "collected", 1.8); later(0.4, () => spread(c, YOU, routes)); }); });
   }
   function update(name) {
-    const a = AGENTS.wc; note(a, "updated", 2.6); ripple(a.x, BOWL_Y - 4, 40);
-    pulse([[a.x, BOWL_Y], [a.x, onLine(RETURN, a.x)], [LIFT.x, LIFT.bottom], [LIFT.x, LIFT.top], FEED[1], [WHEEL.x, WHEEL.y]], () => {
-      note(you, "updated", 2.6); ripple(WHEEL.x, WHEEL.y, WHEEL.r + 30, 1.3);
-      for (const [id, b] of Object.entries(AGENTS)) {
-        if (id === "wc" || !b.skills.has(name)) continue;
-        const start = b.track === LEFT ? LEFT[0] : RIGHT[0];
-        pulse([[WHEEL.x, WHEEL.y + WHEEL.r], FUNNEL, start, [b.x, onLine(b.track, b.x)], [b.x, BOWL_Y]], () => { note(b, "synced", 2.4); ripple(b.x, BOWL_Y - 4, 34); });
+    const n = NODES.wc, cell = n.slots.find((q) => q && q.name === name);
+    note(n, "updated", 2.6); if (cell) ripple(cell.x, cell.y, 22, 0.8);
+    pulse([...n.route].reverse(), () => {
+      note(YOU, "updated", 2.6); ripple(YOU.x, YOU.y, YOU.r + 26, 1.3, YOU.r);
+      const mine = YOU.slots.find((q) => q && q.name === name); if (mine) ripple(mine.x, mine.y, 22, 0.8);
+      for (const [id, o] of Object.entries(NODES)) {
+        if (id === "wc") continue;
+        const has = o.slots.find((q) => q && q.name === name);
+        if (has) pulse(o.route, () => { note(o, "synced", 2.4); ripple(has.x, has.y, 22, 0.8); ripple(o.x, o.y, o.r + 18, 1, o.r); });
       }
     });
   }
   function pulse(pts, onEnd) { pulses.push({ path: mkPath(pts), d: 0, onEnd }); }
+  let timers = [];
+  function later(t, fn) { timers.push({ t: clock + t, fn }); }
 
   const PHRASES = ["Discover trusted public skills", "Manage the skills you make", "Share skills with your team", "Update once & stay in sync."];
   let capTimer = 0, capSwap = 0;
@@ -257,216 +280,105 @@
     capSwap = setTimeout(() => { set(); capTimer = setTimeout(() => capEl.classList.remove("on"), 3000); }, 300);
   }
 
-  const CYCLE = 32;
+  const CYCLE = 30;
   const EVENTS = [
     [0.3, () => { caption(0); discover(["pc", "wh"]); }],
-    [3.5, () => discover(["pk", "wc"])],
-    [9.0, () => { caption(1); create("pc", "release-notes", ["wh", "wc"]); }],
-    [17.0, () => { caption(2); create("team", "canvas-design", ["wc"]); const r = gondolas.find((g) => g && g.name === "release-notes"); if (r) r.routes.push("team"); }],
-    [24.5, () => { caption(3); update("release-notes"); }],
+    [4.5, () => discover(["pk", "wc"])],
+    [10.0, () => { caption(1); create("pc", "release-notes", ["wh", "wc"]); }],
+    [17.0, () => { caption(2); create("team", "canvas-design", ["wc"]); later(2.6, () => { const r = YOU.slots.find((q) => q && q.name === "release-notes"); if (r) sendCopy(r, YOU, NODES.team); }); }],
+    [23.5, () => { caption(3); update("release-notes"); }],
   ];
-  let tc = 0, ei = 0, clock = 0;
+  let tc = 0, ei = 0;
 
   // ---- Simulation step
   function step(dt) {
     clock += dt; tc += dt;
     while (ei < EVENTS.length && tc >= EVENTS[ei][0]) EVENTS[ei++][1]();
     if (tc >= CYCLE) { tc -= CYCLE; ei = 0; }
-    rot += dt * (2 * Math.PI) / 16;
+    const due = timers.filter((t) => t.t <= clock); timers = timers.filter((t) => t.t > clock); due.forEach((t) => t.fn());
 
-    // the hopper lets a marble go every few seconds, whether anyone wants it or not
+    // public skills drift across, fading in on the left and out on the right
     streamT += dt;
-    if (streamT >= EVERY) {
-      streamT -= EVERY;
-      const m = mk("", "pub", STREAM[0][0], STREAM[0][1], "stream"); m.scale = 0.2;
-      m.path = mkPath([...STREAM, [BIN.x + 30, BIN.y + 10]]); m.d = 0;
-    }
+    if (streamT >= EVERY) { streamT -= EVERY; const m = mk("", "pub", 20, STREAM_Y); m.state = "stream"; }
 
-    for (const m of marbles) {
-      if (m.scale < 1 && m.state !== "made") m.scale = Math.min(1, m.scale + dt * 3);
+    for (const m of orbs) {
+      if (m.grow) { m.scale = Math.min(1, m.scale + dt * 2.2); if (m.scale >= 1) m.grow = false; }
       if (m.state === "stream") {
-        m.d += DRIFT * dt;
-        const [x, y] = at(m.path, m.d); m.x = x; m.y = y;
-        if (m.target && m.x >= GATE) {
-          // the gate flips and the chosen marble drops down the chute to your wheel
-          gate.open = 1; m.tag = true;
-          follow(m, [[GATE, m.y], [GATE, WHEEL.y - WHEEL.r - 2]], () => board(m, [WHEEL.x, WHEEL.y - WHEEL.r], m.routes));
-          m.v = 40;
-        } else if (m.d >= m.path.len) m.state = "binned";
+        m.x += DRIFT * dt;
+        m.alpha = Math.min(1, (m.x - 20) / FADE, (VW - 20 - m.x) / FADE);
+        if (m.target && m.x >= PICK_X) {
+          // picked: it leaves the stream and drops into your orb
+          const i = claim(YOU, m), target = cellPos(YOU, i), pts = [[m.x, m.y], [PICK_X, YOU.y - YOU.r - 14], target];
+          m.alpha = 1;
+          glide(m, pts, 1.6, () => { place(m, YOU, i); ripple(m.x, m.y, 20, 0.6); note(YOU, "picked", 1.6); const r = m.routes; m.tag = false; later(0.5, () => spread(m, YOU, r)); });
+        } else if (m.x > VW - 20) m.state = "gone";
       }
-      if (m.state === "binned") { m.alpha -= dt * 1.5; if (m.alpha <= 0) m.state = "gone"; }
-      if (m.state === "path") {
-        const i = segAt(m.path, m.d), a = m.path.pts[i - 1], b = m.path.pts[i], dx = b[0] - a[0], dy = b[1] - a[1];
-        if (dy < 0 && -dy > Math.abs(dx)) m.v = CLIMB;
-        else if (dy > 0 && dy > 1.5 * Math.abs(dx)) m.v = Math.min(520, Math.max(m.v, 60) + 1300 * dt);
-        else m.v = ROLL;
-        m.d = Math.min(m.path.len, m.d + m.v * dt);
-        const [x, y] = at(m.path, m.d); m.x = x; m.y = y;
-        if (m.agent && m.dropX !== undefined && Math.abs(m.x - m.dropX) < 2 && m.y < BOWL_Y - 6) m.agent.door = 1;
-        if (m.d >= m.path.len && m.onEnd) { const f = m.onEnd; m.onEnd = null; f(); }
+      if (m.state === "move") {
+        m.t += dt; const k = Math.min(1, m.t / m.dur);
+        [m.x, m.y] = at(m.path, ease(k) * m.path.len);
+        if (k >= 1) { const f = m.onEnd; m.onEnd = null; f && f(); }
       }
-      if (m.state === "boarding") {
-        m.bt = Math.min(1, m.bt + dt / 0.3);
-        const [x, y] = cupPos(m.slot); m.x = lerp(m.bx, x, m.bt); m.y = lerp(m.by, y, m.bt);
-        if (m.bt >= 1) { m.state = "ride"; m.tag = false; ripple(x, y, 20, 0.6); }
-      }
-      if (m.state === "ride" || m.state === "fade") {
-        if (m.state === "ride" || gondolas[m.slot] === m) { const [x, y] = cupPos(m.slot); m.x = x; m.y = y; }
-        if (m.state === "ride" && m.routes.length && Math.abs(wrapA(gAng(m.slot) - Math.PI / 2)) < 0.45 && clock - m.lastCopy > 0.4) {
-          m.lastCopy = clock; deliver(m, m.routes.shift()); ripple(m.x, m.y, 18, 0.5);
-        }
-      }
-      if (m.state === "fade") { m.alpha -= dt * 1.5; m.y -= dt * 10; if (m.alpha <= 0) m.state = "gone"; }
-      if (m.state === "made") {
-        m.mt += dt; m.scale = Math.min(1, 0.1 + m.mt * 2.5);
-        if (m.mt > 1.6) { const a = m.agent; m.agent = null; goHome(m, a, m.next); }
-      }
+      if (m.state === "fade") { m.alpha -= dt * 1.6; m.scale = Math.max(0.2, m.scale - dt); if (m.alpha <= 0) m.state = "gone"; }
     }
-    marbles = marbles.filter((m) => m.state !== "gone");
+    orbs = orbs.filter((m) => m.state !== "gone");
 
-    gate.open = Math.max(0, gate.open - dt * 2.2);
-    for (const o of [...Object.values(AGENTS), you]) {
-      o.flash = Math.max(0, o.flash - dt * 1.4);
-      if (o.door !== undefined) o.door = Math.max(0, o.door - dt * 3);
-      if (o.noteT > 0) { o.noteT -= dt; if (o.noteT <= 0) o.note = ""; }
-    }
+    for (const n of ALL) { n.flash = Math.max(0, n.flash - dt * 1.4); if (n.noteT > 0) { n.noteT -= dt; if (n.noteT <= 0) n.note = ""; } }
     ripples.forEach((r) => (r.t += dt)); ripples = ripples.filter((r) => r.t < r.dur);
-    for (const p of pulses) { p.d += dt * 520; if (p.d >= p.path.len && p.onEnd) { const f = p.onEnd; p.onEnd = null; f(); } }
-    pulses = pulses.filter((p) => p.d < p.path.len + 60);
+    for (const p of pulses) { p.d += dt * 420; if (p.d >= p.path.len && p.onEnd) { const f = p.onEnd; p.onEnd = null; f(); } }
+    pulses = pulses.filter((p) => p.d < p.path.len + 80);
   }
 
   // ---- Drawing
-  // A rail under a stretch of marble path: two lines a marble's radius below the centre line
-  function rail(a, b, gaps = []) {
-    const off = R + 1.5;
-    const dx = b[0] - a[0], dy = b[1] - a[1];
-    if (Math.abs(dx) < 1) { // vertical chute or lift: walls either side
-      for (const sx of [-R - 3, R + 3]) line([a[0] + sx, a[1]], [b[0] + sx, b[1]]);
-      return;
-    }
-    const segs = [[a[0], b[0]]];
-    for (const g of gaps) { const last = segs.pop(); segs.push([last[0], g - 12], [g + 12, last[1]]); }
-    for (const [x0, x1] of segs) {
-      const y0 = a[1] + (dy * (x0 - a[0])) / dx, y1 = a[1] + (dy * (x1 - a[0])) / dx;
-      line([x0, y0 + off], [x1, y1 + off]); line([x0, y0 + off + 3.5], [x1, y1 + off + 3.5]);
-    }
-  }
-  function drawMarble(m) {
-    const r = R * m.scale; if (r < 0.6) return;
-    ctx.save(); ctx.globalAlpha = Math.max(0, m.alpha);
-    ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, Math.PI * 2);
+  const MR = 10; // skill radius
+  function drawSkill(m, x = m.x, y = m.y) {
+    const r = MR * m.scale; if (r < 0.6) return;
+    ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1, m.alpha));
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
     if (m.kind === "mine") {
       fillAs("ink"); ctx.stroke();
-      ctx.beginPath(); ctx.arc(m.x - r * 0.38, m.y - r * 0.38, r * 0.22, 0, Math.PI * 2); fillAs("paper");
+      ctx.beginPath(); ctx.arc(x - r * 0.38, y - r * 0.38, r * 0.2, 0, Math.PI * 2); fillAs("paper");
     } else {
       ctx.save(); ctx.clip();
-      ctx.fillStyle = m.kind === "team" ? cross : hatch; ctx.fillRect(m.x - r, m.y - r, 2 * r, 2 * r);
-      ctx.beginPath(); ctx.arc(m.x - r * 0.3, m.y - r * 0.32, r * (m.kind === "team" ? 0.6 : 0.9), 0, Math.PI * 2); fillAs("paper");
+      ctx.fillStyle = m.kind === "team" ? cross : hatch; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+      ctx.beginPath(); ctx.arc(x - r * 0.3, y - r * 0.32, r * (m.kind === "team" ? 0.6 : 0.9), 0, Math.PI * 2); fillAs("paper");
       ctx.restore();
-      ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
     }
     ctx.restore();
   }
-  function drawHopper() {
-    const t = [[92, 22], [208, 22]], b = [[140, 92], [160, 92]];
-    poly([[t[1][0], t[1][1]], [t[1][0] + DX, t[1][1] + DY], [b[1][0] + DX, b[1][1] + DY], [b[1][0], b[1][1]]], "hatch");
-    poly([[t[0][0], t[0][1]], [t[0][0] + DX, t[0][1] + DY], [t[1][0] + DX, t[1][1] + DY], [t[1][0], t[1][1]]], "paper");
-    ctx.save(); ctx.beginPath(); ctx.moveTo(...t[0]); ctx.lineTo(...t[1]); ctx.lineTo(...b[1]); ctx.lineTo(...b[0]); ctx.closePath(); fillAs("paper"); ctx.clip();
-    for (let row = 0; row < 5; row++) for (let c = 0; c < 7; c++) {
-      const x = 104 + c * 16 + (row % 2) * 8, y = 34 + row * 14;
-      drawMarble({ x, y, kind: (row * 7 + c) % 5 === 3 ? "team" : "pub", scale: 1, alpha: 1 });
-    }
+  // A glass orb: outline, inner rim, a highlight, and the empty cells of its grid
+  function drawNode(n) {
+    const lit = n.flash;
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); fillAs("paper"); ctx.stroke();
+    ctx.save(); ctx.lineWidth = 0.8; ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r - 5, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r - 10, Math.PI * 1.08, Math.PI * 1.32); ctx.stroke();
     ctx.restore();
-    poly([t[0], t[1], b[1], b[0]], null);
-    line([140, 92], [140, 100]); line([160, 92], [160, 100]);
-  }
-  function drawBin() {
-    block(BIN.x, BIN.y, BIN.w, BIN.h, null, "paper", "hatch");
-    ctx.save(); ctx.beginPath(); ctx.rect(BIN.x, BIN.y - 20, BIN.w, BIN.h + 20); ctx.clip();
-    for (let c = 0; c < 5; c++) for (let row = 0; row < 2; row++) drawMarble({ x: BIN.x + 12 + c * 15 + row * 7, y: BIN.y + BIN.h - 8 - row * 13, kind: "pub", scale: 1, alpha: 1 });
+    if (lit > 0.05) { ctx.save(); ctx.globalAlpha = lit * 0.8; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.arc(n.x, n.y, n.r + 4, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+    // cells
+    ctx.save(); ctx.lineWidth = 0.8; ctx.strokeStyle = muted; ctx.setLineDash([2, 2.4]);
+    n.cells.forEach(([dx, dy], i) => { if (i > 0 && !n.slots[i]) { ctx.beginPath(); ctx.arc(n.x + dx, n.y + dy, MR, 0, Math.PI * 2); ctx.stroke(); } });
     ctx.restore();
+    // centre: your name, an agent's logo, or your teammate's @
+    if (n === YOU) text("YOU", n.x, n.y + 4, { size: 11, weight: 500, align: "center", spacing: "0.14em" });
+    else if (n.logo) logo(n.logo, n.x, n.y, 17, "ink");
+    else text("@", n.x, n.y + 5, { size: 15, weight: 500, align: "center" });
   }
-  function drawBinFront() { poly([[BIN.x, BIN.y + 14], [BIN.x + BIN.w, BIN.y + 14], [BIN.x + BIN.w, BIN.y + BIN.h], [BIN.x, BIN.y + BIN.h]], "paper"); }
-  function drawWheelBack() {
-    const { x, y, r } = WHEEL;
-    // A-frame stand
-    line([x, y], [x - 70, y + 118]); line([x, y], [x + 70, y + 118]);
-    line([x - 70 + DX, y + 118 + DY], [x + DX, y + DY]); line([x + 70 + DX, y + 118 + DY], [x + DX, y + DY]);
-    ctx.beginPath(); ctx.arc(x + DX, y + DY, r, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(x, y, r - 5, 0, Math.PI * 2); ctx.stroke();
-    for (let i = 0; i < WHEEL.n; i++) { const [px, py] = pivot(i); line([x + (px - x) * 0.28, y + (py - y) * 0.28], [px, py]); }
-    circle(x, y, 24, you.flash > 0.4 ? "ink" : "paper");
-    text("YOU", x, y + 4, { size: 11, weight: 500, align: "center", color: you.flash > 0.4 ? paper : ink, spacing: "0.12em" });
-  }
-  function drawGondolas() {
-    for (let i = 0; i < WHEEL.n; i++) {
-      const [px, py] = pivot(i);
-      circle(px, py, 2.6, "paper");
-      line([px, py], [px, py + 3]);
-      ctx.beginPath(); ctx.arc(px, py + 13, R + 3, 0.1, Math.PI - 0.1); ctx.stroke();
-      line([px - R - 3, py + 12], [px + R + 3, py + 12]);
-    }
-  }
-  function drawFunnel() {
-    poly([[FUNNEL[0] - 22, FUNNEL[1] - 18], [FUNNEL[0] + 22, FUNNEL[1] - 18], [FUNNEL[0] + 11, FUNNEL[1] + 4], [FUNNEL[0] - 11, FUNNEL[1] + 4]], "paper");
-    line([FUNNEL[0] - 11, FUNNEL[1] + 4], [FUNNEL[0] - 11, FUNNEL[1] + 10]); line([FUNNEL[0] + 11, FUNNEL[1] + 4], [FUNNEL[0] + 11, FUNNEL[1] + 10]);
-  }
-  function drawLift() {
-    const x = LIFT.x;
-    line([x - 13, LIFT.top - 10], [x - 13, LIFT.bottom + 6]); line([x + 13, LIFT.top - 10], [x + 13, LIFT.bottom + 6]);
-    circle(x, LIFT.top - 10, 9, "paper"); circle(x, LIFT.bottom + 6, 9, "paper");
-    // buckets on the chain
-    const gap = 34, off = (clock * CLIMB) % gap;
-    for (let yy = LIFT.bottom - off; yy > LIFT.top; yy -= gap) line([x - 9, yy + R + 2], [x + 9, yy + R + 2]);
-  }
-  function drawAgent(a, id) {
-    const lit = a.flash > 0.45, x = a.x - PED.w / 2;
-    // trapdoor in the track above
-    const ty = onLine(a.track, a.x) + R + 1.5;
-    ctx.save(); ctx.lineWidth = 1.6; line([a.x - 12, ty], [a.x - 12 + 12 * Math.cos(a.door * 1.2), ty + 12 * Math.sin(a.door * 1.2)]); ctx.restore();
-    // bowl front and pile
-    block(x, PED.top, PED.w, PED.h, lit ? "ink" : "paper", "paper", "hatch");
-    const cx = a.x, cy = PED.top - 2;
-    if (a.logo) logo(a.logo, cx, PED.top + 17, 16, lit ? "paper" : "ink");
-    else text("@", cx, PED.top + 22, { size: 16, weight: 500, align: "center", color: lit ? paper : ink });
-    text(a.name, cx, PED.top + 38, { size: 8.5, weight: 500, align: "center", color: lit ? paper : ink });
-    ctx.save(); ctx.lineWidth = LW;
-    ctx.beginPath(); ctx.ellipse(cx, cy - 8, 30, 8, 0, 0, Math.PI); ctx.lineTo(cx - 30, cy - 8); ctx.stroke();
-    ctx.restore();
-  }
-  function drawPile(a) {
-    const spots = [[-14, 0], [0, 0], [14, 0], [-7, -12], [7, -12]];
-    a.pile.forEach((k, i) => drawMarble({ x: a.x + spots[i][0], y: PED.top - 12 + spots[i][1], kind: k, scale: 1, alpha: 1 }));
-  }
-  function drawBowlBack(a) {
-    const cx = a.x, cy = PED.top - 2;
-    ctx.beginPath(); ctx.ellipse(cx, cy - 8, 30, 8, 0, Math.PI, 2 * Math.PI); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx - 30, cy - 8); ctx.quadraticCurveTo(cx - 30, cy + 6, cx - 18, cy + 6); ctx.lineTo(cx + 18, cy + 6); ctx.quadraticCurveTo(cx + 30, cy + 6, cx + 30, cy - 8); fillAs("paper"); ctx.stroke();
-  }
-  function callout(ax, ay, dx, dy, l1, l2) {
-    const ex = ax + dx, ey = ay + dy;
-    ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = "0.08em";
-    ctx.font = `500 10.5px ${MONO}`; const w1 = ctx.measureText(l1).width;
-    ctx.font = `400 10px ${MONO}`; const w2 = l2 ? ctx.measureText(l2).width : 0;
-    ctx.restore();
-    const w = Math.max(w1, w2) + 6, right = dx >= 0;
-    ctx.save(); ctx.lineWidth = 0.9;
-    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.lineTo(right ? ex + w : ex - w, ey); ctx.stroke();
-    ctx.beginPath(); ctx.arc(ax, ay, 2, 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill();
-    ctx.restore();
-    const tx = right ? ex + 3 : ex - 3, al = right ? "left" : "right";
-    text(l1, tx, ey - 5, { size: 10.5, weight: 500, align: al });
-    if (l2) text(l2, tx, ey + 13, { size: 10, color: muted, align: al });
+  function drawPath(pts) {
+    ctx.save(); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.stroke(); ctx.restore();
   }
   function tagFor(m) {
-    const y1 = m.y - R - 16;
-    ctx.save(); ctx.lineWidth = 0.9; line([m.x, m.y - R - 2], [m.x, y1]); ctx.restore();
-    ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = "0.02em"; ctx.font = `400 10px ${MONO}`; ctx.textAlign = "center";
+    const y1 = m.y - MR - 14;
+    ctx.save(); ctx.globalAlpha = Math.min(1, m.alpha); ctx.lineWidth = 0.9; line([m.x, m.y - MR - 2], [m.x, y1]);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0.02em"; ctx.font = `400 10px ${MONO}`; ctx.textAlign = "center";
     ctx.lineWidth = 4; ctx.strokeStyle = paper; ctx.strokeText(m.name, m.x, y1 - 4); ctx.fillStyle = ink; ctx.fillText(m.name, m.x, y1 - 4);
     ctx.restore();
   }
   const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const held = (n) => n.slots.filter((q) => q && q.state === "home").length;
 
   function draw() {
     readTheme();
@@ -474,51 +386,40 @@
     ctx.fillStyle = paper; ctx.fillRect(0, 0, VW, VH);
     ctx.lineWidth = LW; ctx.lineJoin = "round"; ctx.lineCap = "round"; ctx.strokeStyle = ink;
 
-    // structure behind the marbles
-    rail(...STREAM);
-    rail([BIN.x - 6, onLine(STREAM, BIN.x - 6)], [BIN.x + 30, BIN.y + 4]);
-    // gate: a flap in the stream track above your wheel, and the chute down to it
-    const gy = onLine(STREAM, GATE) + R + 1.5;
-    ctx.save(); ctx.lineWidth = 1.8; line([GATE - 12, gy], [GATE - 12 + 24 * Math.cos(gate.open * 1.1), gy + 24 * Math.sin(gate.open * 1.1)]); ctx.restore();
-    rail([GATE, gy + 6], [GATE, WHEEL.y - WHEEL.r - 12]);
-    drawWheelBack();
-    drawFunnel();
-    rail(...LEFT, Object.values(AGENTS).filter((a) => a.track === LEFT).map((a) => a.x));
-    rail(...RIGHT, Object.values(AGENTS).filter((a) => a.track === RIGHT).map((a) => a.x));
-    rail(...RETURN); rail(...FEED);
-    drawLift();
-    drawBin();
-    for (const a of Object.values(AGENTS)) drawBowlBack(a);
+    // the stream's guide line, faint at both ends
+    const grad = ctx.createLinearGradient(20, 0, VW - 20, 0);
+    grad.addColorStop(0, "rgba(0,0,0,0)"); grad.addColorStop(0.12, muted); grad.addColorStop(0.88, muted); grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.save(); ctx.strokeStyle = grad; ctx.lineWidth = 0.9; ctx.setLineDash([1.5, 5]); line([20, STREAM_Y + MR + 4], [VW - 20, STREAM_Y + MR + 4]); ctx.restore();
+    // a short drop from the stream into your orb
+    ctx.save(); ctx.lineWidth = 0.9; ctx.setLineDash([1.5, 5]); line([PICK_X, STREAM_Y + MR + 8], [PICK_X, YOU.y - YOU.r - 4]); ctx.restore();
 
-    for (const a of Object.values(AGENTS)) drawPile(a);
-    for (const m of marbles) drawMarble(m);
+    for (const n of Object.values(NODES)) drawPath(n.route);
+    for (const n of ALL) drawNode(n);
 
-    // structure in front
-    drawGondolas();
-    drawHopper();
-    drawBinFront();
-    for (const [id, a] of Object.entries(AGENTS)) drawAgent(a, id);
-    line([10, 604], [VW - 10, 604]);
+    // skills: in cells, moving, and in the stream
+    for (const m of orbs) drawSkill(m);
 
     // ripples and update pulses
     ctx.save();
-    for (const r of ripples) { const k = r.t / r.dur; ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.arc(r.x, r.y, 6 + (r.r1 - 6) * (1 - Math.pow(1 - k, 3)), 0, Math.PI * 2); ctx.stroke(); }
+    for (const r of ripples) { const k = r.t / r.dur; ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.arc(r.x, r.y, r.r0 + (r.r1 - r.r0) * (1 - Math.pow(1 - k, 3)), 0, Math.PI * 2); ctx.stroke(); }
     ctx.restore();
-    for (const p of pulses) for (let j = 0; j < 8; j++) {
-      const d = p.d - j * 9; if (d < 0 || d > p.path.len) continue;
+    for (const p of pulses) for (let j = 0; j < 9; j++) {
+      const d = p.d - j * 8; if (d < 0 || d > p.path.len) continue;
       const [x, y] = at(p.path, d);
-      ctx.beginPath(); ctx.arc(x, y, Math.max(1, 4.2 - j * 0.45), 0, Math.PI * 2); ctx.fillStyle = ink; ctx.globalAlpha = 1 - j / 9; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(x, y, Math.max(1, 4.4 - j * 0.42), 0, Math.PI * 2); ctx.fillStyle = ink; ctx.globalAlpha = 1 - j / 10; ctx.fill(); ctx.globalAlpha = 1;
     }
 
     // labels
-    callout(208, 26, 30, -8, "PUBLIC SKILLS", "a stream of trusted skills");
-    callout(GATE + 12, onLine(STREAM, GATE + 12) + 12, 40, 30, "YOUR PICK", "the gate drops it to you");
-    callout(BIN.x + BIN.w + DX, BIN.y + 8, 22, -26, "THE REST", "roll on by");
-    const held = gondolas.filter((g) => g && g.state === "ride").length;
-    callout(WHEEL.x - WHEEL.r * 0.7, WHEEL.y - WHEEL.r * 0.7, -70, -40, "YOUR SKILLS", you.note || `${plural(held, "skill")} · 4 agents`);
-    callout(LIFT.x + 13, LIFT.top + 40, 34, 14, "LIFT", "back to you");
-    for (const a of Object.values(AGENTS)) if (a.note) text(a.note, a.x, PED.top + PED.h + 14, { size: 10, color: muted, align: "center" });
-    for (const m of marbles) if (m.tag && m.state !== "ride") tagFor(m);
+    text("PUBLIC SKILLS", 24, STREAM_Y - 44, { size: 10.5, weight: 500 });
+    text("a stream of trusted skills", 24, STREAM_Y - 30, { size: 10, color: muted });
+    text(`${plural(held(YOU), "skill")} · 4 agents`, YOU.x + YOU.r + 14, YOU.y + YOU.r - 6, { size: 10, color: muted });
+    if (YOU.note) text(YOU.note, YOU.x + YOU.r + 14, YOU.y + YOU.r + 8, { size: 10, color: ink });
+    for (const n of Object.values(NODES)) {
+      const below = n.y + n.r + 18;
+      text(n.label, n.x, below, { size: 10.5, weight: 500, align: "center", spacing: "0.1em" });
+      text(n.note || `${n.kind} · ${plural(held(n), "skill")}`, n.x, below + 14, { size: 10, color: n.note ? ink : muted, align: "center" });
+    }
+    for (const m of orbs) if (m.tag) tagFor(m);
   }
 
   // ---- Fit to the banner width
@@ -531,11 +432,8 @@
   new ResizeObserver(() => { layout(); if (reduce) draw(); }).observe(plate);
   layout();
 
-  // fill the stream track before the first frame
-  for (let d = 0; d < mkPath(STREAM).len; d += DRIFT * EVERY) {
-    const m = mk("", "pub", 0, 0, "stream"); m.path = mkPath([...STREAM, [BIN.x + 30, BIN.y + 10]]); m.d = d; [m.x, m.y] = at(m.path, d);
-  }
-  for (const m of marbles) if (m.state === "ride") [m.x, m.y] = cupPos(m.slot);
+  // the stream is already flowing on the first frame
+  for (let x = 20; x < VW - 20; x += DRIFT * EVERY) { const m = mk("", "pub", x, STREAM_Y); m.state = "stream"; m.alpha = Math.min(1, (x - 20) / FADE, (VW - 20 - x) / FADE); }
 
   if (reduce) {
     for (let i = 0; i < 60 * 27; i++) step(1 / 60);
