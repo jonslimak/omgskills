@@ -18,11 +18,11 @@
   :root[data-theme="dark"] { --paper: #0f0f10; --ink: #e8e8e5; --muted: #85858a; --caption: #5c5c61; color-scheme: dark; }
 
   body { background: var(--paper); color: var(--ink); margin: 0; }
-  .banner { max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 24px; box-sizing: border-box; }
+  .banner { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 24px; box-sizing: border-box; }
   .plate { position: relative; }
   #line { display: block; width: 100%; }
   .caption {
-    position: absolute; left: 1%; top: 34%;
+    position: static; margin-top: 4px; align-items: center; text-align: center; min-height: 3.2em;
     display: flex; flex-direction: column; gap: 6px;
     opacity: 0; transition: opacity 300ms ease;
     pointer-events: none;
@@ -31,7 +31,7 @@
   .caption .idx { font: 500 11px/1 var(--mono); letter-spacing: 0.12em; color: var(--muted); }
   .caption .txt { font: 200 clamp(18px, 2.4vw, 28px)/1.15 var(--display); letter-spacing: -0.01em; color: var(--caption); }
   @media (max-width: 620px) {
-    .caption { position: static; margin-top: 12px; }
+    .caption { margin-top: 8px; }
   }
   @media (prefers-reduced-motion: reduce) { .caption { transition: none; } }
 </style>
@@ -58,7 +58,7 @@
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ---- Side view of a marble machine, drawn in a fixed 1200 x 610 space and scaled to the banner width
-  const VW = 1200, VH = 600;
+  const VW = 800, VH = 660;
   let s = 1, DPR = 1, W = 0, H = 0;
   const LW = 1.25, R = 8, DX = 9, DY = -7; // line weight, marble radius, oblique depth
 
@@ -145,14 +145,14 @@
     }
     return out;
   };
-  const STREAM_Y = 78, PICK_X = 600, DRIFT = 40, EVERY = 1.8, FADE = 110;
-  const YOU = { id: "you", x: 600, y: 248, r: 92, cells: hexCells(30, 2), label: "YOU", kind: "" };
+  const STREAM_Y = 78, PICK_X = 400, DRIFT = 40, EVERY = 1.8, FADE = 110;
+  const YOU = { id: "you", x: 400, y: 262, r: 92, cells: hexCells(30, 2), label: "YOU", kind: "" };
   const NODES = {
-    pc: { x: 150, y: 492, logo: "chatgpt", label: "CHATGPT", kind: "personal", seed: [["swiftui-pro", "pub"], ["code-review", "pub"]] },
-    pk: { x: 365, y: 492, logo: "claude", label: "CLAUDE", kind: "personal", seed: [["humanizer", "pub"], ["swiftui-pro", "pub"]] },
-    wh: { x: 835, y: 492, logo: "hermes", label: "HERMES", kind: "work", seed: [["grill-me", "pub"]] },
-    wc: { x: 1050, y: 492, logo: "chatgpt", label: "CHATGPT", kind: "work", seed: [["frontend-design", "team"]] },
-    team: { x: 1085, y: 248, logo: null, label: "@TEAMMATE", kind: "teammate", seed: [["frontend-design", "team"], ["canvas-design", "team"]] },
+    pc: { x: 120, y: 566, logo: "chatgpt", label: "CHATGPT", kind: "personal", seed: [["swiftui-pro", "pub"], ["code-review", "pub"]] },
+    pk: { x: 305, y: 566, logo: "claude", label: "CLAUDE", kind: "personal", seed: [["humanizer", "pub"], ["swiftui-pro", "pub"]] },
+    wh: { x: 495, y: 566, logo: "hermes", label: "HERMES", kind: "work", seed: [["grill-me", "pub"]] },
+    wc: { x: 680, y: 566, logo: "chatgpt", label: "CHATGPT", kind: "work", seed: [["frontend-design", "team"]] },
+    team: { x: 690, y: 262, logo: null, label: "@TEAMMATE", kind: "teammate", seed: [["frontend-design", "team"], ["canvas-design", "team"]] },
   };
   for (const n of Object.values(NODES)) { n.r = 50; n.cells = hexCells(27, 1); }
   const ALL = [YOU, ...Object.values(NODES)];
@@ -173,14 +173,14 @@
     return out;
   }
   // each tube drops from under your orb, turns once towards its agent, and drops again; outer tubes turn higher so none cross
-  const TUBES = { pc: [540, 378], pk: [572, 410], wh: [628, 410], wc: [660, 378] };
+  const TUBES = { pc: [334, 412], pk: [368, 452], wh: [432, 452], wc: [466, 412] };
   for (const [id, [sx, turn]] of Object.entries(TUBES)) {
     const n = NODES[id];
     n.sx = sx;
     n.route = bends([[sx, YOU.y + 50], [sx, turn], [n.x, turn], [n.x, n.y - 28]]);
   }
   NODES.team.route = [[YOU.x + YOU.r - 6, YOU.y], [NODES.team.x - NODES.team.r + 6, YOU.y]];
-  const TW = 26, GAP = 18;               // tube bore, and the space in the middle of the teammate tube
+  const TW = 24, GAP = 14;               // tube bore, and the space in the middle of the teammate tube
   const link = { v: 0, hold: -1 };       // the teammate tube only shows while something crosses it
   const openLink = (t) => { link.hold = Math.max(link.hold, clock + t); };
 
@@ -388,26 +388,16 @@
     trace(); ctx.lineWidth = TW - 7.6; ctx.strokeStyle = paper; ctx.globalAlpha = alpha; ctx.stroke();
     ctx.restore();
   }
-  // A collar clamped round a tube
-  function collar(x, y, across, alpha = 1) {
-    ctx.save(); ctx.globalAlpha = alpha;
-    const w = across ? TW + 10 : 7, h = across ? 7 : TW + 10;
-    ctx.beginPath(); ctx.rect(x - w / 2, y - h / 2, w, h); fillAs("paper"); ctx.stroke();
-    ctx.restore();
-  }
   function drawTubes() {
     for (const n of Object.values(NODES)) {
       if (n === NODES.team) continue;
       glassTube(n.route);
-      collar(n.sx, YOU.y + Math.sqrt(YOU.r ** 2 - (n.sx - YOU.x) ** 2) + 9, true);
-      collar(n.x, n.y - n.r - 11, true);
     }
     // the teammate tube: each half grows out of its own orb and they meet across a small gap
     if (link.v > 0.01) {
       const [a, b] = NODES.team.route, mid = (a[0] + b[0]) / 2, e = ease(link.v);
       const l = a[0] + (mid - GAP / 2 - a[0]) * e, r = b[0] - (b[0] - mid - GAP / 2) * e;
       glassTube([a, [l, a[1]]], e); glassTube([[r, b[1]], b], e);
-      collar(l - 3.5, a[1], false, e); collar(r + 3.5, b[1], false, e);
     }
   }
   function tagFor(m) {
@@ -452,8 +442,8 @@
     // labels
     text("PUBLIC SKILLS", 24, STREAM_Y - 44, { size: 10.5, weight: 500 });
     text("a stream of trusted skills", 24, STREAM_Y - 30, { size: 10, color: muted });
-    text(`${plural(held(YOU), "skill")} · 4 agents`, YOU.x + YOU.r + 14, YOU.y + YOU.r - 6, { size: 10, color: muted });
-    if (YOU.note) text(YOU.note, YOU.x + YOU.r + 14, YOU.y + YOU.r + 8, { size: 10, color: ink });
+    text(`${plural(held(YOU), "skill")} · 4 agents`, YOU.x - YOU.r - 12, YOU.y - YOU.r + 16, { size: 10, color: muted, align: "right" });
+    if (YOU.note) text(YOU.note, YOU.x - YOU.r - 12, YOU.y - YOU.r + 30, { size: 10, color: ink, align: "right" });
     for (const n of Object.values(NODES)) {
       const below = n.y + n.r + 18;
       text(n.label, n.x, below, { size: 10.5, weight: 500, align: "center", spacing: "0.1em" });
