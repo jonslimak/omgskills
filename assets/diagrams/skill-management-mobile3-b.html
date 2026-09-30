@@ -402,8 +402,8 @@
     txt(inner, 35, CH / 2 + 4.5, name, "name");
     if (s.private) {
       const cx = 35 + tw + 11, cy = CH / 2 + 1;
-      // on your card and your teammate's card (the rows with counts) the lock is 30% smaller
-      const lk = opts.count ? el("g", { transform: `translate(${cx - 3} ${cy}) scale(0.7) translate(${-cx} ${-cy})` }, inner) : inner;
+      // the lock is 30% smaller on every card: your card, your teammate's, and the agents'
+      const lk = opts.count || opts.small ? el("g", { transform: `translate(${cx - 3} ${cy}) scale(0.7) translate(${-cx} ${-cy})` }, inner) : inner;
       el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1.2 }, lk);
       el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, lk);
     }
