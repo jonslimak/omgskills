@@ -285,9 +285,9 @@
     { phase: "Manage the skills you make", who: "you", createOn: "chatgpt", collect: "release-notes", send: ["team-chatgpt", "hermes"] },
     { who: "you", collect: "humanizer", send: ["chatgpt", "claude"] },
     // The teammate already has frontend-design in their library; they just send it
-    // Your teammate already has Emil Kowalski's web-animations; it comes to you, then on to ChatGPT and Claude
-    { phase: "Share skills with your team", who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
-    { who: "mate", reuse: "web-animations", send: ["chatgpt", "claude"] },
+    // Your teammate already has Emil Kowalski's web-animations; it comes to you, then on to work ChatGPT and Claude
+    { phase: "Share skills with your team", who: "mate", reuse: "web-animations", send: ["team-chatgpt", "claude"] },
+    { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { phase: "Update once & stay in sync.", who: "you", update: "release-notes" },
     { phase: "Delete once, gone everywhere.", who: "you", remove: "humanizer" },
   ];
@@ -918,6 +918,8 @@
       const p = el("path", { d: sideLink(a, from.y + CH / 2, false) }, lg);
       flights.push({ a, c, h, lg, p });
     }
+    // while your teammate's card is in view it stays on top, so skills going to agents it covers slide in under it
+    if (mate.shown) layers.chip.appendChild(mate.g);
     await frame();
     // The agent starts to react while the skill is still on its way down
     if (!instant) setTimeout(() => flights.forEach((f) => activate(f.a)), 520);
@@ -1236,8 +1238,6 @@
       if (e.reuse) await sleep(900);
       if (o === mate) {
         await relayToYou(e.collect || e.reuse, e.send);
-        // after their last hand-off your teammate's card leaves, so the agents receiving it are in view
-        if (EVENTS[k + 1]?.who !== "mate") await hideMate();
         await send(you, e.collect || e.reuse, e.send, "mate");
       } else {
         await send(o, e.collect || e.reuse, e.send);
