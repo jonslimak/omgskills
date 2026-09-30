@@ -271,7 +271,7 @@
     m.target = true; m.tag = true; m.name = PUBLIC[pi++ % PUBLIC.length]; m.routes = routes;
   }
   function spread(m, from, routes) {
-    routes.forEach((id, k) => later(0.45 * k, () => sendCopy(m, from, NODES[id])));
+    routes.forEach((id) => sendCopy(m, from, NODES[id])); // all copies leave together
   }
   function create(id, name, routes) {
     const n = NODES[id], m = mk(name, id === "team" ? "team" : "mine", n.x, n.y), i = claim(n, m);
