@@ -90,6 +90,7 @@ function makeTracks(root: string): SkillEquivalenceTrack[] {
   return ["crawl4", "v2"].map((name) => {
     const dir = join(root, "site", "data", name);
     mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "future.json"), "{}\n");
     writeFileSync(
       join(dir, "manifest.json"),
       `${JSON.stringify({ version: 1, generatedAt: "before", futureAsset: { path: "future.json" } }, null, 2)}\n`,
@@ -309,6 +310,7 @@ test("full v2 and Crawl 4 publishers preserve equivalence manifests and assets",
     mkdirSync(join(root, "scripts"), { recursive: true });
     mkdirSync(join(root, "index", "shadow"), { recursive: true });
     cpSync(join(repoRoot, "scripts", "publish-data.sh"), join(root, "scripts", "publish-data.sh"));
+    cpSync(join(repoRoot, "scripts", "publish-catalog-manifest.mjs"), join(root, "scripts", "publish-catalog-manifest.mjs"));
     cpSync(
       join(repoRoot, "scripts", "publish-crawl4-data.mjs"),
       join(root, "scripts", "publish-crawl4-data.mjs"),

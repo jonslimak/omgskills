@@ -87,6 +87,8 @@ fi
 mkdir -p "$DATA_DIR"
 manifest_generated_at="${MANIFEST_GENERATED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
 existing_manifest_tmp="$(mktemp)"
+next_manifest_tmp="$(mktemp)"
+trap 'rm -f "$existing_manifest_tmp" "$next_manifest_tmp"' EXIT
 if [ -f "$DATA_DIR/manifest.json" ]; then
     cp "$DATA_DIR/manifest.json" "$existing_manifest_tmp"
 fi
@@ -153,7 +155,7 @@ if [ -n "$author_leaderboards_file" ]; then
     cp "$AUTHOR_LEADERBOARDS" "$DATA_DIR/$author_leaderboards_file"
 fi
 
-cat > "$DATA_DIR/manifest.json" <<JSON
+cat > "$next_manifest_tmp" <<JSON
 {
   "version": 1,
   "generatedAt": "$manifest_generated_at",
@@ -220,7 +222,7 @@ fi)
 JSON
 
 if [ -s "$existing_manifest_tmp" ]; then
-    MANIFEST_PATH="$DATA_DIR/manifest.json" \
+    MANIFEST_PATH="$next_manifest_tmp" \
     EXISTING_MANIFEST_PATH="$existing_manifest_tmp" \
     python3 - <<'PY'
 import json
@@ -249,19 +251,16 @@ for key, value in existing.items():
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
 PY
 fi
-rm -f "$existing_manifest_tmp"
+node "$REPO_ROOT/scripts/publish-catalog-manifest.mjs" \
+    "$DATA_DIR" "$next_manifest_tmp" "$existing_manifest_tmp" \
+    skills trending trending-leaderboard leaderboard-view-data x-trending \
+    skill-signals author-signals author-leaderboards
 
 if [ -z "$DATA_TRACK_SUBDIR" ]; then
     HEALTH_PUBLISHED_AT="${HEALTH_PUBLISHED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \
     HEALTH_CHECKED_AT="${HEALTH_CHECKED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \
     node "$REPO_ROOT/scripts/build-health.mjs"
 fi
-
-for prefix in skills trending trending-leaderboard leaderboard-view-data x-trending skill-signals author-signals author-leaderboards; do
-    if ls "$DATA_DIR"/"$prefix"-*.json >/dev/null 2>&1; then
-        ls -t "$DATA_DIR"/"$prefix"-*.json | awk 'NR>2' | xargs -r rm -f
-    fi
-done
 
 echo "✓ Published library data"
 echo "  $DATA_DIR/manifest.json"

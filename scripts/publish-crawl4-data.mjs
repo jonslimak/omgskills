@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { publishCatalogManifest } from "./publish-catalog-manifest.mjs";
 
 const repoRoot = process.cwd();
 const shadowDir = join(repoRoot, "index", "shadow");
@@ -49,23 +50,6 @@ function preserveForeignManifestAssets(manifest, existingManifest) {
   return manifest;
 }
 
-function pruneOldAssets(manifest) {
-  const manifestAssets = new Set(
-    [manifest.skills, manifest.trending, manifest.xTrending]
-      .map((asset) => asset?.path)
-      .filter(Boolean),
-  );
-  for (const prefix of ["skills", "trending", "x-trending"]) {
-    const files = readdirSync(dataDir)
-      .filter((file) => file.startsWith(`${prefix}-`) && file.endsWith(".json"))
-      .filter((file) => !manifestAssets.has(file))
-      .sort((a, b) => statSync(join(dataDir, b)).mtimeMs - statSync(join(dataDir, a)).mtimeMs);
-    for (const file of files.slice(1)) {
-      rmSync(join(dataDir, file), { force: true });
-    }
-  }
-}
-
 if (!existsSync(reportPath)) fail("missing index/shadow/shadow-report.json; run npm run scrape:shadow first");
 if (!existsSync(cutoverSkillsPath)) fail("missing index/shadow/skills.cutover.shadow.json; run npm run scrape:shadow first");
 if (!existsSync(trendingPath)) fail("missing index/trending.json; run npm run scrape:trending first");
@@ -106,8 +90,10 @@ if (existsSync(xTrendingPath)) {
 }
 
 preserveForeignManifestAssets(manifest, existingManifest);
-writeFileSync(join(dataDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
-pruneOldAssets(manifest);
+publishCatalogManifest({
+  dataDir, manifest, previousManifest: existingManifest,
+  prefixes: ["skills", "trending", "x-trending"],
+});
 
 console.log("✓ Published Crawl 4 data");
 console.log(`  ${join(dataDir, "manifest.json")}`);
