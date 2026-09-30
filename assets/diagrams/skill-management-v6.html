@@ -1,0 +1,498 @@
+<title>One Library, Every Agent v6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@200&display=swap" rel="stylesheet">
+<style>
+  /* Banner: a magical marble machine of glass orbs joined by paths, ink on paper, no colour */
+  :root {
+    --paper: #ffffff;
+    --ink: #151515;
+    --muted: #8c8c90;
+    --caption: #b8b8bd;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #0f0f10; --ink: #e8e8e5; --muted: #85858a; --caption: #5c5c61; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --paper: #0f0f10; --ink: #e8e8e5; --muted: #85858a; --caption: #5c5c61; color-scheme: dark; }
+
+  body { background: var(--paper); color: var(--ink); margin: 0; }
+  .banner { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 24px; box-sizing: border-box; }
+  .plate { position: relative; }
+  #line { display: block; width: 100%; }
+  .caption {
+    position: static; margin-top: 4px; align-items: center; text-align: center; min-height: 3.2em;
+    display: flex; flex-direction: column; gap: 6px;
+    opacity: 0; transition: opacity 300ms ease;
+    pointer-events: none;
+  }
+  .caption.on { opacity: 1; }
+  .caption .idx { font: 500 11px/1 var(--mono); letter-spacing: 0.12em; color: var(--muted); }
+  .caption .txt { font: 200 clamp(18px, 2.4vw, 28px)/1.15 var(--display); letter-spacing: -0.01em; color: var(--caption); }
+  @media (max-width: 620px) {
+    .caption { margin-top: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .caption { transition: none; } }
+</style>
+
+<div class="banner">
+  <div class="plate">
+    <canvas id="line" role="img" aria-label="Glass orbs joined by paths. Public skills drift past in a stream and the one you pick drops into your orb. Copies travel along the paths into the orbs for ChatGPT, Claude, Hermes and your teammate. A skill made on an agent travels back along its path to you and on to the others, and an update in one place spreads to every orb."></canvas>
+    <div class="caption" aria-live="polite"><span class="idx">01 / 04</span><span class="txt">Discover trusted public skills</span></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const LOGOS = {
+    chatgpt: { path: "M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" },
+    claude: { path: "m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z" },
+    hermes: { img: "data:image/png;base64,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" },
+  };
+
+  const cvs = document.getElementById("line");
+  const ctx = cvs.getContext("2d");
+  const plate = cvs.parentNode;
+  const capEl = document.querySelector(".caption");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---- Side view of a marble machine, drawn in a fixed 1200 x 610 space and scaled to the banner width
+  const VW = 800, VH = 690;
+  let s = 1, DPR = 1, W = 0, H = 0;
+  const LW = 1.25, R = 8, DX = 9, DY = -7; // line weight, marble radius, oblique depth
+
+  // ---- Theme: ink, paper and two hatch patterns, re-read when the theme flips
+  let ink = "#151515", paper = "#fff", muted = "#8c8c90", hatch = null, cross = null, themeKey = "";
+  const logoTint = {};
+  function readTheme() {
+    const cs = getComputedStyle(document.documentElement);
+    const i = cs.getPropertyValue("--ink").trim(), p = cs.getPropertyValue("--paper").trim();
+    const key = i + p + DPR + s;
+    if (key === themeKey) return;
+    themeKey = key; ink = i; paper = p; muted = cs.getPropertyValue("--muted").trim();
+    makePatterns(); tintLogos();
+  }
+  function patternTile(draw) {
+    const t = Math.max(1, Math.round(DPR)), n = 5 * t;
+    const c = document.createElement("canvas"); c.width = c.height = n;
+    const g = c.getContext("2d"); g.strokeStyle = ink; g.lineWidth = 0.8 * t; draw(g, n);
+    const pat = ctx.createPattern(c, "repeat"); pat.setTransform(new DOMMatrix().scale(1 / (DPR * s)));
+    return pat;
+  }
+  function makePatterns() {
+    const diag = (g, n) => { g.beginPath(); for (let k = -n; k <= n; k += n) { g.moveTo(k, n); g.lineTo(k + n, 0); } g.stroke(); };
+    hatch = patternTile(diag);
+    cross = patternTile((g, n) => { diag(g, n); g.beginPath(); for (let k = -n; k <= n; k += n) { g.moveTo(k, 0); g.lineTo(k + n, n); } g.stroke(); });
+  }
+  const hermesImg = new Image();
+  hermesImg.onload = tintLogos;
+  hermesImg.src = LOGOS.hermes.img;
+  function tintLogos() {
+    if (!hermesImg.complete || !hermesImg.naturalWidth) return;
+    for (const [k, col] of [["ink", ink], ["paper", paper]]) {
+      const c = document.createElement("canvas"); c.width = c.height = 96;
+      const g = c.getContext("2d"); g.drawImage(hermesImg, 0, 0, 96, 96);
+      g.globalCompositeOperation = "source-in"; g.fillStyle = col; g.fillRect(0, 0, 96, 96);
+      logoTint[k] = c;
+    }
+  }
+  const logoPaths = { chatgpt: new Path2D(LOGOS.chatgpt.path), claude: new Path2D(LOGOS.claude.path) };
+
+  // ---- Drawing primitives
+  function fillAs(f) {
+    if (!f) return;
+    if (f === "hatch" || f === "cross") { ctx.fillStyle = paper; ctx.fill(); ctx.fillStyle = f === "hatch" ? hatch : cross; ctx.fill(); }
+    else { ctx.fillStyle = f === "ink" ? ink : f === "paper" ? paper : f; ctx.fill(); }
+  }
+  function poly(pts, f, stroke = true) {
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.closePath(); fillAs(f); if (stroke) ctx.stroke();
+  }
+  function line(a, b) { ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+  function circle(x, y, r, f) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); fillAs(f); ctx.stroke(); }
+  // Block in oblique projection: front face, then the top and right faces going back
+  function block(x, y, w, h, front = "paper", top = "paper", side = "hatch") {
+    poly([[x, y], [x + DX, y + DY], [x + w + DX, y + DY], [x + w, y]], top);
+    poly([[x + w, y], [x + w + DX, y + DY], [x + w + DX, y + h + DY], [x + w, y + h]], side);
+    poly([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], front);
+  }
+  function logo(key, cx, cy, size, col) {
+    const k = size / 24;
+    ctx.save(); ctx.translate(cx - size / 2, cy - size / 2); ctx.scale(k, k);
+    if (logoPaths[key]) { ctx.fillStyle = col === "ink" ? ink : paper; ctx.fill(logoPaths[key]); }
+    else if (logoTint[col]) ctx.drawImage(logoTint[col], 0, 0, 24, 24);
+    ctx.restore();
+  }
+  const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
+  function text(str, x, y, { size = 10, weight = 400, color = ink, align = "left", spacing = "0.06em" } = {}) {
+    ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = spacing;
+    ctx.font = `${weight} ${size}px ${MONO}`; ctx.textAlign = align; ctx.fillStyle = color; ctx.fillText(str, x, y);
+    ctx.restore();
+  }
+
+  // ---- The machine: orbs joined by paths. Every skill sits in a cell of a hexagonal grid inside an orb.
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+  const hexCells = (pitch, rings) => {
+    const out = [[0, 0]];
+    if (rings >= 1) for (let k = 0; k < 6; k++) out.push([pitch * Math.cos((k * Math.PI) / 3 - Math.PI / 2), pitch * Math.sin((k * Math.PI) / 3 - Math.PI / 2)]);
+    if (rings >= 2) for (let k = 0; k < 6; k++) {
+      const a = (k * Math.PI) / 3 - Math.PI / 2, b = a + Math.PI / 6;
+      out.push([2 * pitch * Math.cos(a), 2 * pitch * Math.sin(a)]);
+      out.push([Math.sqrt(3) * pitch * Math.cos(b), Math.sqrt(3) * pitch * Math.sin(b)]);
+    }
+    return out;
+  };
+  const STREAM_Y = 78, PICK_X = 400, DRIFT = 40, EVERY = 1.8, FADE = 110;
+  const YOU = { id: "you", x: 400, y: 262, r: 72, cells: hexCells(21, 2), label: "YOU", kind: "" };
+  const NODES = {
+    pc: { x: 150, y: 580, logo: "chatgpt", label: "CHATGPT", kind: "personal", seed: [["swiftui-pro", "pub"], ["code-review", "pub"]] },
+    pk: { x: 330, y: 580, logo: "claude", label: "CLAUDE", kind: "personal", seed: [["humanizer", "pub"], ["swiftui-pro", "pub"]] },
+    wh: { x: 470, y: 580, logo: "hermes", label: "HERMES", kind: "work", seed: [["grill-me", "pub"]] },
+    wc: { x: 650, y: 580, logo: "chatgpt", label: "CHATGPT", kind: "work", seed: [["frontend-design", "team"]] },
+    team: { x: 690, y: 262, logo: null, label: "@TEAMMATE", kind: "teammate", seed: [["frontend-design", "team"], ["canvas-design", "team"]] },
+  };
+  for (const n of Object.values(NODES)) { n.r = 44; n.cells = hexCells(21, 1); }
+  const ALL = [YOU, ...Object.values(NODES)];
+  for (const n of ALL) { n.slots = new Array(n.cells.length).fill(null); n.flash = 0; n.note = ""; n.noteT = 0; }
+  const cellPos = (n, i) => [n.x + n.cells[i][0], n.y + n.cells[i][1]];
+
+  // Glass tubes: square runs with rounded bends down to the agents, and a straight split tube to your teammate
+  function bends(input, r = 40) {
+    const corners = input.filter((p, i) => i === 0 || Math.hypot(p[0] - input[i - 1][0], p[1] - input[i - 1][1]) > 0.5);
+    const out = [corners[0]];
+    for (let i = 1; i < corners.length - 1; i++) {
+      const a = corners[i - 1], p = corners[i], b = corners[i + 1];
+      const da = Math.hypot(p[0] - a[0], p[1] - a[1]), db = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      const k1 = Math.min(r, da / 2) / da, k2 = Math.min(r, db / 2) / db;
+      const s0 = [p[0] + (a[0] - p[0]) * k1, p[1] + (a[1] - p[1]) * k1], s1 = [p[0] + (b[0] - p[0]) * k2, p[1] + (b[1] - p[1]) * k2];
+      for (let j = 0; j <= 16; j++) { const t = j / 16, u = 1 - t; out.push([u * u * s0[0] + 2 * u * t * p[0] + t * t * s1[0], u * u * s0[1] + 2 * u * t * p[1] + t * t * s1[1]]); }
+    }
+    out.push(corners[corners.length - 1]);
+    return out;
+  }
+  // two trunks leave your orb at 45 degrees, drop to a fork, and branch at 45 degrees to a pair of agents each
+  const FORK_Y = 470;
+  for (const [id, side] of [["pc", -1], ["pk", -1], ["wh", 1], ["wc", 1]]) {
+    const n = NODES[id], d = YOU.r * Math.SQRT1_2 - 4;
+    const s0 = [YOU.x + side * (d - 20), YOU.y + d - 20], jx = YOU.x + side * 160;
+    const j0 = [jx, s0[1] + Math.abs(jx - s0[0])];
+    const dx = Math.abs(n.x - jx);
+    n.route = bends([s0, j0, [jx, FORK_Y], [n.x, FORK_Y + dx], [n.x, n.y]], 24);
+  }
+  NODES.team.route = [[YOU.x + YOU.r - 6, YOU.y], [NODES.team.x - NODES.team.r + 6, YOU.y]];
+  const GAP = 14;                        // the space in the middle of the path to your teammate
+  const link = { v: 0, hold: -1 };       // the teammate tube only shows while something crosses it
+  const openLink = (t) => { link.hold = Math.max(link.hold, clock + t); };
+
+  function mkPath(pts) {
+    const L = [0];
+    for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    return { pts, L, len: L[L.length - 1] };
+  }
+  function at(path, d) {
+    let i = 1; while (i < path.L.length - 1 && path.L[i] < d) i++;
+    const a = path.pts[i - 1], b = path.pts[i], span = path.L[i] - path.L[i - 1];
+    const k = span ? Math.max(0, Math.min(1, (d - path.L[i - 1]) / span)) : 1;
+    return [lerp(a[0], b[0], k), lerp(a[1], b[1], k)];
+  }
+
+  // ---- State
+  let orbs = [], ripples = [], pulses = [], born = 0, streamT = 0, clock = 0;
+  function mk(name, kind, x, y) {
+    const m = { name, kind, x, y, state: "idle", scale: 1, alpha: 1, tag: false, born: born++ };
+    orbs.push(m); return m;
+  }
+  function ripple(x, y, r1 = 26, dur = 0.9, r0 = 6) { ripples.push({ x, y, r0, r1, t: 0, dur }); }
+  function note(n, str, t = 2.2) { n.note = str; n.noteT = t; n.flash = 1; }
+
+  // Take a free cell (centre cells hold the name or logo); make room by letting the oldest go
+  function claim(n, m) {
+    let free = [];
+    n.slots.forEach((q, i) => { if (!q) free.push(i); });
+    if (!free.length) {
+      const old = n.slots.filter((q) => q && q.state === "home").sort((a, b) => a.born - b.born)[0];
+      if (!old) return -1;
+      n.slots[old.slot] = null; old.state = "fade"; free = [old.slot];
+    }
+    const i = free.sort((a, b) => Math.hypot(...n.cells[a]) - Math.hypot(...n.cells[b]) || a - b)[0];
+    n.slots[i] = m; return i;
+  }
+  function place(m, n, i) {
+    m.node = n; m.slot = i; m.state = "home";
+    [m.x, m.y] = cellPos(n, i);
+    for (const q of n.slots) if (q && q !== m && q.name === m.name && q.state === "home") { n.slots[q.slot] = null; q.state = "fade"; }
+    compact(n);
+  }
+  // Keep each cluster packed: if a gap opens nearer the middle, the outermost skill slides into it
+  function compact(n) {
+    const dist = (i) => Math.hypot(...n.cells[i]);
+    for (let guard = 0; guard < 20; guard++) {
+      const holes = n.slots.map((q, i) => (q ? -1 : i)).filter((i) => i >= 0).sort((a, b) => dist(a) - dist(b));
+      const outer = n.slots.map((q, i) => (q && q.state === "home" ? i : -1)).filter((i) => i >= 0).sort((a, b) => dist(b) - dist(a));
+      if (!holes.length || !outer.length || dist(holes[0]) >= dist(outer[0]) - 1) return;
+      const h = holes[0], m = n.slots[outer[0]];
+      n.slots[outer[0]] = null; n.slots[h] = m; m.slot = h;
+      glide(m, [[m.x, m.y], cellPos(n, h)], 0.5, () => { m.state = "home"; });
+    }
+  }
+  // Glide along a path with an ease, then run onEnd
+  function glide(m, pts, dur, onEnd) { m.state = "move"; m.path = mkPath(pts); m.t = 0; m.dur = dur; m.onEnd = onEnd; }
+  const travel = (path) => 0.5 + mkPath(path).len / 260;
+
+  // Move a copy of a skill from one orb to another along their shared path
+  function sendCopy(src, from, to, extra) {
+    const viaTeam = from === NODES.team || to === NODES.team;
+    if (viaTeam && link.v < 0.95) { openLink(4); later(0.8, () => sendCopy(src, from, to, extra)); return; }
+    if (viaTeam) openLink(3.4);
+    const m = mk(src.name, src.kind, src.x, src.y);
+    const toYou = to === YOU, n = toYou ? from : to;
+    const route = toYou ? [...n.route].reverse() : n.route;
+    const i = claim(to, m);
+    if (i < 0) { m.state = "gone"; return; }
+    const target = cellPos(to, i);
+    const pts = [[src.x, src.y], ...route, target];
+    ripple(src.x, src.y, 16, 0.5);
+    glide(m, pts, travel(pts), () => { place(m, to, i); ripple(m.x, m.y, 18, 0.6); to.flash = 1; if (extra) extra(m); });
+  }
+
+  // Seed the orbs
+  for (const n of Object.values(NODES)) n.seed.forEach(([name, kind]) => { const m = mk(name, kind, 0, 0); place(m, n, claim(n, m)); });
+  [["swiftui-pro", "pub"], ["release-notes", "mine"], ["code-review", "pub"], ["frontend-design", "team"], ["humanizer", "pub"]].forEach(([name, kind]) => { const m = mk(name, kind, 0, 0); place(m, YOU, claim(YOU, m)); });
+
+  // ---- The four moves
+  const PUBLIC = ["grill-me", "napkin", "gstack", "mcp-builder", "swiftdata-pro", "brand-voice"];
+  let pi = 0;
+  function discover(routes) {
+    const m = orbs.filter((q) => q.state === "stream" && !q.target && q.x < PICK_X - 40).sort((a, b) => b.x - a.x)[0];
+    if (!m) return;
+    m.target = true; m.tag = true; m.name = PUBLIC[pi++ % PUBLIC.length]; m.routes = routes;
+  }
+  function spread(m, from, routes) {
+    routes.forEach((id, k) => later(0.45 * k, () => sendCopy(m, from, NODES[id])));
+  }
+  function create(id, name, routes) {
+    const n = NODES[id], m = mk(name, id === "team" ? "team" : "mine", n.x, n.y), i = claim(n, m);
+    place(m, n, i); m.scale = 0.1; m.tag = true; m.grow = true;
+    note(n, id === "team" ? "shared" : "new skill", 2.4); ripple(m.x, m.y, 30);
+    later(1.4, () => { m.tag = false; sendCopy(m, n, YOU, (c) => { c.tag = false; note(YOU, "collected", 1.8); later(0.4, () => spread(c, YOU, routes)); }); });
+  }
+  function update(name) {
+    const n = NODES.wc, cell = n.slots.find((q) => q && q.name === name);
+    note(n, "updated", 2.6); if (cell) ripple(cell.x, cell.y, 22, 0.8);
+    pulse([...n.route].reverse(), () => {
+      note(YOU, "updated", 2.6); ripple(YOU.x, YOU.y, YOU.r + 26, 1.3, YOU.r);
+      const mine = YOU.slots.find((q) => q && q.name === name); if (mine) ripple(mine.x, mine.y, 22, 0.8);
+      for (const [id, o] of Object.entries(NODES)) {
+        if (id === "wc") continue;
+        const has = o.slots.find((q) => q && q.name === name);
+        if (!has) continue;
+        const go = () => pulse(o.route, () => { note(o, "synced", 2.4); ripple(has.x, has.y, 22, 0.8); ripple(o.x, o.y, o.r + 18, 1, o.r); });
+        if (o === NODES.team) { openLink(3); later(0.8, go); } else go();
+      }
+    });
+  }
+  function pulse(pts, onEnd) { pulses.push({ path: mkPath(pts), d: 0, onEnd }); }
+  let timers = [];
+  function later(t, fn) { timers.push({ t: clock + t, fn }); }
+
+  const PHRASES = ["Discover trusted public skills", "Manage the skills you make", "Share skills with your team", "Update once & stay in sync."];
+  let capTimer = 0, capSwap = 0;
+  function caption(i) {
+    clearTimeout(capTimer); clearTimeout(capSwap);
+    const set = () => { capEl.querySelector(".idx").textContent = `0${i + 1} / 04`; capEl.querySelector(".txt").textContent = PHRASES[i]; capEl.classList.add("on"); };
+    if (reduce) { set(); return; }
+    capEl.classList.remove("on");
+    capSwap = setTimeout(() => { set(); capTimer = setTimeout(() => capEl.classList.remove("on"), 3000); }, 300);
+  }
+
+  const CYCLE = 30;
+  const EVENTS = [
+    [0.3, () => { caption(0); discover(["pc", "wh"]); }],
+    [4.5, () => discover(["pk", "wc"])],
+    [10.0, () => { caption(1); create("pc", "release-notes", ["wh", "wc"]); }],
+    // one direction per loop: you share with your teammate, then next time your teammate shares with you
+    [17.0, () => {
+      caption(2);
+      if (loops % 2 === 0) { const r = YOU.slots.find((q) => q && q.name === "release-notes"); if (r) { note(YOU, "sharing", 1.8); sendCopy(r, YOU, NODES.team, () => note(NODES.team, "received", 2)); } }
+      else create("team", "canvas-design", ["wc"]);
+    }],
+    [23.5, () => { caption(3); update("release-notes"); }],
+  ];
+  let tc = 0, ei = 0, loops = 0;
+
+  // ---- Simulation step
+  function step(dt) {
+    clock += dt; tc += dt;
+    while (ei < EVENTS.length && tc >= EVENTS[ei][0]) EVENTS[ei++][1]();
+    if (tc >= CYCLE) { tc -= CYCLE; ei = 0; loops++; }
+    const due = timers.filter((t) => t.t <= clock); timers = timers.filter((t) => t.t > clock); due.forEach((t) => t.fn());
+
+    // public skills drift across, fading in on the left and out on the right
+    streamT += dt;
+    if (streamT >= EVERY) { streamT -= EVERY; const m = mk("", "pub", 20, STREAM_Y); m.state = "stream"; }
+
+    for (const m of orbs) {
+      if (m.grow) { m.scale = Math.min(1, m.scale + dt * 2.2); if (m.scale >= 1) m.grow = false; }
+      if (m.state === "stream") {
+        m.x += DRIFT * dt;
+        m.alpha = Math.min(1, (m.x - 20) / FADE, (VW - 20 - m.x) / FADE);
+        if (m.target && m.x >= PICK_X) {
+          // picked: it leaves the stream and drops into your orb
+          const i = claim(YOU, m), target = cellPos(YOU, i), pts = [[m.x, m.y], [PICK_X, YOU.y - YOU.r - 14], target];
+          m.alpha = 1;
+          glide(m, pts, 1.6, () => { place(m, YOU, i); ripple(m.x, m.y, 20, 0.6); note(YOU, "picked", 1.6); const r = m.routes; m.tag = false; later(0.5, () => spread(m, YOU, r)); });
+        } else if (m.x > VW - 20) m.state = "gone";
+      }
+      if (m.state === "move") {
+        m.t += dt; const k = Math.min(1, m.t / m.dur);
+        [m.x, m.y] = at(m.path, ease(k) * m.path.len);
+        if (k >= 1) { const f = m.onEnd; m.onEnd = null; f && f(); }
+      }
+      if (m.state === "fade") { m.alpha -= dt * 1.6; m.scale = Math.max(0.2, m.scale - dt); if (m.alpha <= 0) m.state = "gone"; }
+    }
+    orbs = orbs.filter((m) => m.state !== "gone");
+
+    link.v = Math.max(0, Math.min(1, link.v + (clock < link.hold ? 1 : -1) * dt * 2.2));
+    for (const n of ALL) { n.flash = Math.max(0, n.flash - dt * 1.4); if (n.noteT > 0) { n.noteT -= dt; if (n.noteT <= 0) n.note = ""; } }
+    ripples.forEach((r) => (r.t += dt)); ripples = ripples.filter((r) => r.t < r.dur);
+    for (const p of pulses) { p.d += dt * 420; if (p.d >= p.path.len && p.onEnd) { const f = p.onEnd; p.onEnd = null; f(); } }
+    pulses = pulses.filter((p) => p.d < p.path.len + 80);
+  }
+
+  // ---- Drawing
+  const MR = 10; // skill radius
+  function drawSkill(m, x = m.x, y = m.y) {
+    const r = MR * m.scale; if (r < 0.6) return;
+    ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1, m.alpha));
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+    if (m.kind === "mine") {
+      fillAs("ink"); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x - r * 0.38, y - r * 0.38, r * 0.2, 0, Math.PI * 2); fillAs("paper");
+    } else {
+      ctx.save(); ctx.clip();
+      ctx.fillStyle = m.kind === "team" ? cross : hatch; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+      ctx.beginPath(); ctx.arc(x - r * 0.3, y - r * 0.32, r * (m.kind === "team" ? 0.6 : 0.9), 0, Math.PI * 2); fillAs("paper");
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // A glass orb: outline, inner rim, a highlight, and the empty cells of its grid
+  function drawNode(n) {
+    const lit = n.flash;
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); fillAs("paper"); ctx.stroke();
+    ctx.save(); ctx.lineWidth = 0.8; ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r - 5, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(n.x, n.y, n.r - 10, Math.PI * 1.08, Math.PI * 1.32); ctx.stroke();
+    ctx.restore();
+    if (lit > 0.05) { ctx.save(); ctx.globalAlpha = lit * 0.8; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.arc(n.x, n.y, n.r + 4, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+  }
+  // A dotted path; shared stretches start at the same point, so their dots line up and read as one path
+  function dotted(pts, alpha = 1) {
+    const list = typeof pts[0][0] === "number" ? [pts] : pts;
+    ctx.save(); ctx.globalAlpha = alpha; ctx.lineWidth = 1.6; ctx.lineCap = "round"; ctx.setLineDash([0.1, 6]);
+    for (const q of list) { ctx.beginPath(); ctx.moveTo(q[0][0], q[0][1]); for (let i = 1; i < q.length; i++) ctx.lineTo(q[i][0], q[i][1]); ctx.stroke(); }
+    ctx.restore();
+  }
+  function drawTubes() {
+    dotted(["pc", "pk", "wh", "wc"].map((id) => NODES[id].route));
+    // the path to your teammate: each half grows out of its own orb and they meet across a small gap
+    if (link.v > 0.01) {
+      const [a, b] = NODES.team.route, mid = (a[0] + b[0]) / 2, e = ease(link.v);
+      const l = a[0] + (mid - GAP / 2 - a[0]) * e, r = b[0] - (b[0] - mid - GAP / 2) * e;
+      dotted([a, [l, a[1]]], e); dotted([[r, b[1]], b], e);
+    }
+  }
+  function tagFor(m) {
+    const y1 = m.y - MR - 14;
+    ctx.save(); ctx.globalAlpha = Math.min(1, m.alpha); ctx.lineWidth = 0.9; line([m.x, m.y - MR - 2], [m.x, y1]);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0.02em"; ctx.font = `400 10px ${MONO}`; ctx.textAlign = "center";
+    ctx.lineWidth = 4; ctx.strokeStyle = paper; ctx.strokeText(m.name, m.x, y1 - 4); ctx.fillStyle = ink; ctx.fillText(m.name, m.x, y1 - 4);
+    ctx.restore();
+  }
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const held = (n) => n.slots.filter((q) => q && q.state === "home").length;
+
+  function draw() {
+    readTheme();
+    ctx.setTransform(DPR * s, 0, 0, DPR * s, 0, 0);
+    ctx.fillStyle = paper; ctx.fillRect(0, 0, VW, VH);
+    ctx.lineWidth = LW; ctx.lineJoin = "round"; ctx.lineCap = "round"; ctx.strokeStyle = ink;
+
+    // the stream's guide line, faint at both ends
+    const grad = ctx.createLinearGradient(20, 0, VW - 20, 0);
+    grad.addColorStop(0, "rgba(0,0,0,0)"); grad.addColorStop(0.12, muted); grad.addColorStop(0.88, muted); grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.save(); ctx.strokeStyle = grad; ctx.lineWidth = 0.9; ctx.setLineDash([1.5, 5]); line([20, STREAM_Y + MR + 4], [VW - 20, STREAM_Y + MR + 4]); ctx.restore();
+    // a short drop from the stream into your orb
+    ctx.save(); ctx.lineWidth = 0.9; ctx.setLineDash([1.5, 5]); line([PICK_X, STREAM_Y + MR + 8], [PICK_X, YOU.y - YOU.r - 4]); ctx.restore();
+
+    drawTubes();
+    for (const n of ALL) drawNode(n);
+
+    // skills: in cells, moving, and in the stream
+    for (const m of orbs) drawSkill(m);
+
+    // ripples and update pulses
+    ctx.save();
+    for (const r of ripples) { const k = r.t / r.dur; ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.arc(r.x, r.y, r.r0 + (r.r1 - r.r0) * (1 - Math.pow(1 - k, 3)), 0, Math.PI * 2); ctx.stroke(); }
+    ctx.restore();
+    for (const p of pulses) for (let j = 0; j < 9; j++) {
+      const d = p.d - j * 8; if (d < 0 || d > p.path.len) continue;
+      const [x, y] = at(p.path, d);
+      ctx.beginPath(); ctx.arc(x, y, Math.max(1, 4.4 - j * 0.42), 0, Math.PI * 2); ctx.fillStyle = ink; ctx.globalAlpha = 1 - j / 10; ctx.fill(); ctx.globalAlpha = 1;
+    }
+
+    // labels
+    text("PUBLIC SKILLS", 24, STREAM_Y - 44, { size: 10.5, weight: 500 });
+    text("a stream of trusted skills", 24, STREAM_Y - 30, { size: 10, color: muted });
+    text("YOU", YOU.x, YOU.y + YOU.r + 18, { size: 10.5, weight: 500, align: "center", spacing: "0.1em" });
+    text(YOU.note || `${plural(held(YOU), "skill")} · 4 agents`, YOU.x, YOU.y + YOU.r + 32, { size: 10, color: YOU.note ? ink : muted, align: "center" });
+    for (const n of Object.values(NODES)) {
+      const below = n.y + n.r + 18;
+      if (n.logo) {
+        // the agent's logo sits just left of its name
+        ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = "0.1em"; ctx.font = `500 10.5px ${MONO}`; const w = ctx.measureText(n.label).width; ctx.restore();
+        const x0 = n.x - (w + 18) / 2;
+        logo(n.logo, x0 + 6, below - 4, 13, "ink");
+        text(n.label, x0 + 18, below, { size: 10.5, weight: 500, spacing: "0.1em" });
+      } else text(n.label, n.x, below, { size: 10.5, weight: 500, align: "center", spacing: "0.1em" });
+      text(n.note || n.kind, n.x, below + 14, { size: 10, color: n.note ? ink : muted, align: "center" });
+    }
+    for (const m of orbs) if (m.tag) tagFor(m);
+  }
+
+  // ---- Fit to the banner width
+  function layout() {
+    W = Math.round(plate.clientWidth); s = W / VW; H = Math.round(VH * s);
+    DPR = window.devicePixelRatio || 1;
+    cvs.width = Math.round(W * DPR); cvs.height = Math.round(H * DPR); cvs.style.height = H + "px";
+    themeKey = ""; readTheme();
+  }
+  new ResizeObserver(() => { layout(); if (reduce) draw(); }).observe(plate);
+  layout();
+
+  // the stream is already flowing on the first frame
+  for (let x = 20; x < VW - 20; x += DRIFT * EVERY) { const m = mk("", "pub", x, STREAM_Y); m.state = "stream"; m.alpha = Math.min(1, (x - 20) / FADE, (VW - 20 - x) / FADE); }
+
+  if (reduce) {
+    for (let i = 0; i < 60 * 27; i++) step(1 / 60);
+    caption(3); draw();
+    const redraw = () => { themeKey = ""; draw(); };
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw);
+    new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  } else {
+    let last = performance.now();
+    const frame = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      step(dt); draw();
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+  if (document.fonts) document.fonts.ready.then(() => { if (reduce) draw(); });
+})();
+</script>
