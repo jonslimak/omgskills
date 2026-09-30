@@ -122,7 +122,7 @@
   #flow .agent-title { font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: -0.015em; }
   #flow .agent-sub, #flow .group-cap { fill: var(--muted); font-size: 12.5px; }
   #flow .agent-sub { font-size: 10px; }
-  #flow .group-cap { font-size: 11.5px; font-weight: 500; }
+  #flow .group-cap { font-size: 9.5px; font-weight: 500; }
   #flow .hair { stroke: var(--hair); stroke-width: 1; }
   #flow .handle { fill: var(--muted); font-size: 12px; }
 
@@ -282,7 +282,9 @@
   const ticker = document.getElementById("ticker");
   // Mobile layout: your card on the left, the agents stacked in a column on its right,
   // and your teammate's card sliding in over that column when they take part
-  const AG_GAP = 18, AG_W = 186, AG_HEAD = 56;
+  const AS = 0.8;                                  // agent content is drawn at 80%
+  const AG_GAP = 12, AG_W = 186, AG_HEAD = 45;
+  const ACH = 32 * AS, ACG = 6, ACAP = 18;         // agent skill height, gap, and caption height
   const CH = 32, CG = 8, M = 12;
   const W = 420;
   const OMG_W = 186, OMG_X = M, OMG_Y = 96, ROW_Y = 136;
@@ -293,7 +295,7 @@
   // Each agent gets room for everything it will hold by the end, so the column never reflows
   const finalAgentH = (a) => {
     const n = EVENTS.filter((e) => (e.send || []).includes(a.id) || e.createOn === a.id).length;
-    return AG_HEAD + n * (CH + CG) + (a.shared ? 22 + 6 : 0) + 20;
+    return AG_HEAD + n * (ACH + ACG) + (a.shared ? ACAP + 5 : 0) + 14;
   };
   const AG_X = W - M - AG_W;
   const AG_TOPS = AGENTS.reduce((tops, a, i) => { tops.push(i ? tops[i - 1] + finalAgentH(AGENTS[i - 1]) + AG_GAP : OMG_Y); return tops; }, []);
@@ -301,7 +303,7 @@
 
   // Skills leave your card from its right side, level with their row, and curve into the agent's head
   function sideLink(a, sy, up) {
-    const sx = OMG_X + OMG_W + 6, ex = a.x - 6, ey = a.y + 28;
+    const sx = OMG_X + OMG_W + 6, ex = a.x - 6, ey = a.y + 24;
     return up ? `M${ex} ${ey}C${ex - 20} ${ey} ${sx + 20} ${sy} ${sx} ${sy}` : `M${sx} ${sy}C${sx + 20} ${sy} ${ex - 20} ${ey} ${ex} ${ey}`;
   }
 
@@ -358,13 +360,15 @@
     const tw = textW(name);
     const w = opts.w || chipW(name);
     const g = el("g", { class: `chip anim${opts.float ? " float" : ""}`, "data-skill": name }, parent);
-    el("rect", { class: "bg", width: w, height: CH, rx: CH / 2 }, g);
-    avatar(g, s.author, 17, CH / 2, 11);
-    txt(g, 35, CH / 2 + 4.5, name, "name");
+    // skills inside agents are drawn at 80%, so more of the agent column fits on a phone
+    const inner = opts.small ? el("g", { transform: `scale(${AS})` }, g) : g;
+    el("rect", { class: "bg", width: w, height: CH, rx: CH / 2 }, inner);
+    avatar(inner, s.author, 17, CH / 2, 11);
+    txt(inner, 35, CH / 2 + 4.5, name, "name");
     if (s.private) {
       const cx = 35 + tw + 11, cy = CH / 2 + 1;
-      el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1.2 }, g);
-      el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, g);
+      el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1.2 }, inner);
+      el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, inner);
     }
     if (opts.count) {
       const cg = el("g", { class: "count anim", style: "opacity:0" }, g);
@@ -496,9 +500,10 @@
       const face = el("g", {}, g);
       const rect = el("rect", { class: "card agent-card", x: 0, y: 0, width: AG_W, height: AG_HEAD + 2, rx: 18 }, face);
       const head = el("g", { class: "agent-head" }, g); // logo + name, bounced when a skill arrives
-      logo(head, a.logo, 28, 30, 12);
-      txt(head, 47, 28, a.name, "agent-title");
-      const sub = txt(head, 47, 41, a.kind, "agent-sub");
+      const hs = el("g", { transform: `scale(${AS})` }, head);
+      logo(hs, a.logo, 28, 30, 12);
+      txt(hs, 47, 28, a.name, "agent-title");
+      const sub = txt(hs, 47, 41, a.kind, "agent-sub");
       agents[a.id] = { ...a, i, g, head, rect, sub, x, y, items: [], caps: {} };
     });
 
@@ -591,15 +596,15 @@
         let cap = a.caps[g.who];
         if (!cap) {
           cap = a.caps[g.who] = txt(layers.chip, 0, 0, "From teammate", "group-cap anim");
-          place(cap, a.x + 16, a.y + y + 12, 0);
+          place(cap, a.x + 12, a.y + y + 10, 0);
         }
-        cap.pos = { x: a.x + 16, y: a.y + y + 12 };
-        y += 22;
+        cap.pos = { x: a.x + 12, y: a.y + y + 10 };
+        y += ACAP;
       }
-      for (const it of g.items) { it.pos = { x: a.x + 12, y: a.y + y }; y += CH + CG; }
-      if (a.shared && gi < ordered.length - 1) y += 6;
+      for (const it of g.items) { it.pos = { x: a.x + 10, y: a.y + y }; y += ACH + ACG; }
+      if (a.shared && gi < ordered.length - 1) y += 5;
     });
-    const h = a.items.length ? y - CG + 16 : AG_HEAD + 2;
+    const h = a.items.length ? y - ACG + 12 : AG_HEAD + 2;
     return h;
   }
 
@@ -703,9 +708,9 @@
   // then travels up along flowing dots into your library
   async function createOnAgent(o, name, agentId) {
     const a = agents[agentId];
-    const w = chipW(name);
+    const w = chipW(name) * AS;
     // Starts behind the agent's logo and name (drawn under them), same look as a teammate creation
-    const c = chip(layers.under, name, { float: true });
+    const c = chip(layers.under, name, { float: true, small: true });
     c.classList.remove("anim");
     c.classList.add("create");
     a.items.push({ name, who: o.key, el: c });
@@ -827,7 +832,7 @@
     const flights = [];
     for (const id of targets) {
       const a = agents[id];
-      const c = chip(layers.chip, name);
+      const c = chip(layers.chip, name, { small: true });
       if (SKILLS[name].private) c.classList.add("create"); // created skills stay blue in transit
       place(c, from.x, from.y, 0);
       a.items.push({ name, who: owner || o.key, el: c });
@@ -911,7 +916,7 @@
     if (instant || reduced) return;
     const bg = node.querySelector("rect.bg");
     const glow = el("rect", { class: "pulse", width: bg.getAttribute("width"), height: CH, rx: CH / 2 });
-    node.insertBefore(glow, bg); // behind the pill, so only the outer halo shows
+    bg.parentNode.insertBefore(glow, bg); // behind the pill, so only the outer halo shows
     const a = glow.animate(
       [
         { strokeWidth: "0px", opacity: 0.9 },
@@ -943,7 +948,7 @@
 
     // 1. The skill is updated inside the work ChatGPT
     activate(source);
-    await markUpdated(srcIt.el, srcIt.pos.x, srcIt.pos.y, chipW(name));
+    await markUpdated(srcIt.el, srcIt.pos.x, srcIt.pos.y, chipW(name) * AS);
     await sleep(1100);
 
     // 2. The new version flows up into your library
@@ -974,7 +979,7 @@
     for (const a of rest) {
       const it = a.items.find((x) => x.name === name);
       activate(a);
-      await markUpdated(it.el, it.pos.x, it.pos.y, chipW(name));
+      await markUpdated(it.el, it.pos.x, it.pos.y, chipW(name) * AS);
     }
     await sleep(1200);
 
