@@ -156,6 +156,8 @@
   #flow .anim { transition: transform 900ms cubic-bezier(0.22, 0.8, 0.24, 1), opacity 450ms ease, filter 300ms ease; }
   /* Agents your teammate's card slides over fade out underneath it */
   /* Agents under your teammate's card stay visible, faded */
+  /* No connecting lines on mobile: the skills moving between cards carry the story */
+  #flow .link { display: none; }
   #flow .under-mate { opacity: 0.3 !important; }
   #flow .under-mate-hide { opacity: 0 !important; }
   #flow .link { transition: opacity 400ms ease; }
