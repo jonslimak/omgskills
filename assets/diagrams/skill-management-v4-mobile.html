@@ -257,11 +257,9 @@
   // Scattered around your card: two above, three down each side (the teammate card may cover some)
   // A rough ring around your card. Right-hand spots sit either fully behind the
   // teammate card or fully clear of its edges.
-  // Mobile: found skills appear in the space below your card, then rise into it
-  const CLOUD = [
-    ["grill-me", 105, 560], ["swiftui-pro", 105, 616], ["humanizer", 105, 672], ["napkin", 105, 728],
-    ["code-review", 105, 784], ["mcp-builder", 105, 840], ["swiftdata-pro", 105, 896], ["gstack", 105, 952],
-  ];
+  // Mobile: every found skill appears at one spot below your card, then rises into it
+  const FOUND = [105, 452];
+  const CLOUD = ["grill-me", "swiftui-pro", "humanizer", "napkin", "code-review", "mcp-builder", "swiftdata-pro", "gstack"].map((n) => [n, ...FOUND]);
   const EVENTS = [
     { phase: "Discover trusted public skills", who: "you", collect: "grill-me", send: ["hermes"] },
     { who: "you", collect: "swiftui-pro", send: ["chatgpt"] },
@@ -405,6 +403,7 @@
   }
   function tweenH(rect, to, dur = 520) {
     rect.dataset.h = to;
+    if (rect.classList.contains("agent-card")) restack();
     const from = +rect.getAttribute("height");
     if (instant) { rect.setAttribute("height", to); return; }
     const t0 = performance.now();
@@ -414,6 +413,21 @@
       if (k < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
+  }
+  // The agent stack reflows as cards grow or shrink: each card sits a small gap below the one above
+  function restack() {
+    if (!agents) return;
+    let y = OMG_Y;
+    for (const a of Object.values(agents)) {
+      if (a.y !== y) {
+        a.y = y;
+        place(a.g, a.x, y);
+        layoutAgent(a);
+        for (const it of a.items) place(it.el, it.pos.x, it.pos.y);
+        for (const cap of Object.values(a.caps)) place(cap, cap.pos.x, cap.pos.y);
+      }
+      y += +(a.rect.dataset.h || a.rect.getAttribute("height")) + AG_GAP;
+    }
   }
   // High-level phase shown above the diagram, set per event in EVENTS
   let phaseNow = "";
@@ -493,7 +507,7 @@
     agents = {};
     AGENTS.forEach((a, i) => {
       const g = el("g", { class: "anim" }, layers.card);
-      const x = AG_X, y = AG_TOPS[i];
+      const x = AG_X, y = OMG_Y + i * (AG_HEAD + 2 + AG_GAP); // starts as a compact stack
       place(g, x, y, 1);
       // White agent cards with the same soft shadow as the teammate card
       const face = el("g", { class: "lift" }, g);
@@ -1043,10 +1057,18 @@
     mate.g.style.transform = `translate(${cx - (MATE_W * s) / 2}px, ${cy - (h * s) / 2}px) scale(${s})`;
     mate.g.style.opacity = v ? 1 : 0;
     // agents the card covers fade out underneath it, and come back when it leaves
+    const covered = [];
     if (agents) for (const a of Object.values(agents)) {
-      const hid = v && a.y < mate.y + h + 12 && a.y + +(a.rect.dataset.h || a.rect.getAttribute("height")) > mate.y - 12;
+      const ah = +(a.rect.dataset.h || a.rect.getAttribute("height"));
+      const hid = v && a.y < mate.y + h + 12 && a.y + ah > mate.y - 12;
+      if (hid) covered.push([a.y - 30, a.y + ah]);
       [a.g, ...a.items.map((it) => it.el), ...Object.values(a.caps)].forEach((n) => n.classList.toggle("under-mate", hid));
     }
+    // badges pinned to those agents' skills hide with them
+    if (layers) layers.chip.querySelectorAll(".badge").forEach((b) => {
+      const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(b.style.transform || "");
+      if (m) b.classList.toggle("under-mate", +m[1] > MATE_X - 60 && covered.some(([t, btm]) => +m[2] > t && +m[2] < btm));
+    });
     // Rows are inside the card group, so they move, scale and fade with it
   }
 
