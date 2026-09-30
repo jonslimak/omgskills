@@ -166,7 +166,7 @@
   #flow .chip .bg { transition: fill 500ms ease, stroke 400ms ease; }
   #flow .chip.flash .bg { fill: var(--update-tint); }
   #flow .badge rect { fill: var(--update); }
-  #flow .badge text { fill: var(--on-update); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+  #flow .badge text { fill: var(--on-update); font-size: 9.6px; font-weight: 600; letter-spacing: 0.01em; } /* same size as the smallest skill names */
   #flow .chip.float .bg { stroke: transparent; stroke-width: 1.5; }
   /* Skill creation moment: Apple blue pill, white text, red "Created" tag */
   #flow .chip.create .bg { fill: var(--create); }
@@ -932,11 +932,12 @@
   // A small green pill, e.g. "Updated", pinned to the top-right of a skill
   function badge(x, y, label, center, kind) {
     measurer.textContent = label;
-    const w = Math.ceil(measurer.getComputedTextLength()) + 14;
+    // tags use the agent skill-name size (80% of 12px), so the pill scales down to match
+    const w = Math.ceil(measurer.getComputedTextLength() * 0.84) + 12;
     if (center) x += w / 2;
     const g = el("g", { class: `badge anim${kind ? " " + kind : ""}` }, layers.chip);
-    el("rect", { width: w, height: 18, rx: 9 }, g);
-    txt(g, w / 2, 12.5, label, "", "middle");
+    el("rect", { width: w, height: 15, rx: 7.5 }, g);
+    txt(g, w / 2, 10.8, label, "", "middle");
     place(g, x - w, y + 4, 0);
     return { g, show: () => place(g, x - w, y, 1) };
   }
