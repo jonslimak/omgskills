@@ -1196,12 +1196,13 @@
     await mark(row.el, rp.x, rp.y, o.w - 32);
     await sleep(1100);
     const hits = Object.values(agents).filter((a) => a.items.some((it) => it.name === name));
-    for (const a of hits) {
+    // every agent that has it is marked at the same moment
+    await Promise.all(hits.map((a) => {
       const it = a.items.find((x) => x.name === name);
       activate(a);
-      await mark(it.el, it.pos.x, it.pos.y, chipW(name) * AS);
-      await sleep(450);
-    }
+      return mark(it.el, it.pos.x, it.pos.y, chipW(name) * AS);
+    }));
+    await sleep(450);
     await sleep(1000);
     // Gone: every copy and its tag fade out, then the cards close the gaps
     const gone = [row.el, ...hits.map((a) => a.items.find((x) => x.name === name).el), ...tags];
