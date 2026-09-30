@@ -110,7 +110,6 @@
   /* SVG */
   #flow text { fill: var(--ink); font-family: var(--sans); }
   #flow .card { fill: var(--card); }
-  #flow .card.agent-card { fill: transparent; }
   #flow .agent-head { transform-box: fill-box; transform-origin: 20% 60%; }
   #flow .you-head { transform-box: fill-box; transform-origin: 50% 70%; }
   /* On a pure white page the cards are defined only by their shadow */
@@ -496,9 +495,9 @@
       const g = el("g", { class: "anim" }, layers.card);
       const x = AG_X, y = AG_TOPS[i];
       place(g, x, y, 1);
-      // Agent cards have no fill or shadow; the rect only tracks the card's size
-      const face = el("g", {}, g);
-      const rect = el("rect", { class: "card agent-card", x: 0, y: 0, width: AG_W, height: AG_HEAD + 2, rx: 18 }, face);
+      // White agent cards with the same soft shadow as the teammate card
+      const face = el("g", { class: "lift" }, g);
+      const rect = el("rect", { class: "card agent-card", x: 0, y: 0, width: AG_W, height: AG_HEAD + 2, rx: 16 }, face);
       const head = el("g", { class: "agent-head" }, g); // logo + name, bounced when a skill arrives
       const hs = el("g", { transform: `scale(${AS})` }, head);
       logo(hs, a.logo, 28, 30, 12);
@@ -710,7 +709,7 @@
     const a = agents[agentId];
     const w = chipW(name) * AS;
     // Starts behind the agent's logo and name (drawn under them), same look as a teammate creation
-    const c = chip(layers.under, name, { float: true, small: true });
+    const c = chip(layers.chip, name, { float: true, small: true });
     c.classList.remove("anim");
     c.classList.add("create");
     a.items.push({ name, who: o.key, el: c });
