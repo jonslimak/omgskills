@@ -160,7 +160,8 @@
   const cellPos = (n, i) => [n.x + n.cells[i][0], n.y + n.cells[i][1]];
 
   // Glass tubes: square runs with rounded bends down to the agents, and a straight split tube to your teammate
-  function bends(corners, r = 40) {
+  function bends(input, r = 40) {
+    const corners = input.filter((p, i) => i === 0 || Math.hypot(p[0] - input[i - 1][0], p[1] - input[i - 1][1]) > 0.5);
     const out = [corners[0]];
     for (let i = 1; i < corners.length - 1; i++) {
       const a = corners[i - 1], p = corners[i], b = corners[i + 1];
@@ -179,7 +180,7 @@
     const s0 = [YOU.x + side * (d - 20), YOU.y + d - 20], jx = YOU.x + side * 160;
     const j0 = [jx, s0[1] + Math.abs(jx - s0[0])];
     const dx = Math.abs(n.x - jx);
-    n.route = bends([s0, j0, [jx, FORK_Y], [n.x, FORK_Y + dx], [n.x, n.y - 20]], 24);
+    n.route = bends([s0, j0, [jx, FORK_Y], [n.x, FORK_Y + dx], [n.x, n.y]], 24);
   }
   NODES.team.route = [[YOU.x + YOU.r - 6, YOU.y], [NODES.team.x - NODES.team.r + 6, YOU.y]];
   const GAP = 14;                        // the space in the middle of the path to your teammate
@@ -312,16 +313,21 @@
     [0.3, () => { caption(0); discover(["pc", "wh"]); }],
     [4.5, () => discover(["pk", "wc"])],
     [10.0, () => { caption(1); create("pc", "release-notes", ["wh", "wc"]); }],
-    [17.0, () => { caption(2); create("team", "canvas-design", ["wc"]); later(2.6, () => { const r = YOU.slots.find((q) => q && q.name === "release-notes"); if (r) sendCopy(r, YOU, NODES.team); }); }],
+    // one direction per loop: you share with your teammate, then next time your teammate shares with you
+    [17.0, () => {
+      caption(2);
+      if (loops % 2 === 0) { const r = YOU.slots.find((q) => q && q.name === "release-notes"); if (r) { note(YOU, "sharing", 1.8); sendCopy(r, YOU, NODES.team, () => note(NODES.team, "received", 2)); } }
+      else create("team", "canvas-design", ["wc"]);
+    }],
     [23.5, () => { caption(3); update("release-notes"); }],
   ];
-  let tc = 0, ei = 0;
+  let tc = 0, ei = 0, loops = 0;
 
   // ---- Simulation step
   function step(dt) {
     clock += dt; tc += dt;
     while (ei < EVENTS.length && tc >= EVENTS[ei][0]) EVENTS[ei++][1]();
-    if (tc >= CYCLE) { tc -= CYCLE; ei = 0; }
+    if (tc >= CYCLE) { tc -= CYCLE; ei = 0; loops++; }
     const due = timers.filter((t) => t.t <= clock); timers = timers.filter((t) => t.t > clock); due.forEach((t) => t.fn());
 
     // public skills drift across, fading in on the left and out on the right
