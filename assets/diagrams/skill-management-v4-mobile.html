@@ -378,8 +378,10 @@
     txt(inner, 35, CH / 2 + 4.5, name, "name");
     if (s.private) {
       const cx = 35 + tw + 11, cy = CH / 2 + 1;
-      el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1.2 }, inner);
-      el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, inner);
+      // on your card and your teammate's card (the rows with counts) the lock is 30% smaller
+      const lk = opts.count ? el("g", { transform: `translate(${cx - 3} ${cy}) scale(0.7) translate(${-cx} ${-cy})` }, inner) : inner;
+      el("rect", { class: "lock", x: cx - 4, y: cy - 1, width: 8, height: 6, rx: 1.2 }, lk);
+      el("path", { class: "lock", d: `M${cx - 2.5} ${cy - 1}V${cy - 3.5}A2.5 2.5 0 0 1 ${cx + 2.5} ${cy - 3.5}V${cy - 1}` }, lk);
     }
     if (opts.count) {
       const cg = el("g", { class: "count anim", style: "opacity:0" }, g);
@@ -691,11 +693,8 @@
       sx = e.x + pull; sy = e.y - 4;
       layers.cloud.classList.add("picking");
       holder.classList.add("picked");
-      // Ping out from behind your card the moment a skill is discovered
-      {
-        const yh = +(you.rect.dataset.h || you.rect.getAttribute("height"));
-        rippleAt(you.x + you.w / 2, you.y + yh / 2, Math.max(you.w, yh) * 0.45);
-      }
+      // Ping out from the spot under your card where the skill was discovered
+      rippleAt(e.x + e.w / 2, e.y + CH / 2, e.w * 0.55);
       holder.style.transition = ""; // back to the normal move + fade transition
       holder.style.transitionDelay = "0ms";
       place(holder, sx, sy, 1);
