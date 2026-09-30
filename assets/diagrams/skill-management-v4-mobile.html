@@ -1046,9 +1046,9 @@
   // Shown: at its spot, full size. Hidden: tucked behind the centre of your card, smaller.
   function mateVisible(v) {
     const h = mateH();
-    // Level with the top of your card; it always slides in from the left and leaves to the left
+    // Level with the top of your card; it always slides in from the right and leaves to the right
     mate.y = OMG_Y;
-    const x = v ? MATE_X : MATE_X - 90;
+    const x = v ? MATE_X : W + 20;
     mate.g.style.transition = v
       ? "transform 700ms cubic-bezier(0.2, 0.9, 0.3, 1), opacity 350ms ease"
       : "transform 600ms cubic-bezier(0.5, 0, 0.75, 0.3), opacity 400ms ease 150ms";
