@@ -58,7 +58,7 @@
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ---- Side view of a marble machine, drawn in a fixed 1200 x 610 space and scaled to the banner width
-  const VW = 800, VH = 660;
+  const VW = 800, VH = 690;
   let s = 1, DPR = 1, W = 0, H = 0;
   const LW = 1.25, R = 8, DX = 9, DY = -7; // line weight, marble radius, oblique depth
 
@@ -148,10 +148,10 @@
   const STREAM_Y = 78, PICK_X = 400, DRIFT = 40, EVERY = 1.8, FADE = 110;
   const YOU = { id: "you", x: 400, y: 262, r: 92, cells: hexCells(30, 2), label: "YOU", kind: "" };
   const NODES = {
-    pc: { x: 120, y: 566, logo: "chatgpt", label: "CHATGPT", kind: "personal", seed: [["swiftui-pro", "pub"], ["code-review", "pub"]] },
-    pk: { x: 305, y: 566, logo: "claude", label: "CLAUDE", kind: "personal", seed: [["humanizer", "pub"], ["swiftui-pro", "pub"]] },
-    wh: { x: 495, y: 566, logo: "hermes", label: "HERMES", kind: "work", seed: [["grill-me", "pub"]] },
-    wc: { x: 680, y: 566, logo: "chatgpt", label: "CHATGPT", kind: "work", seed: [["frontend-design", "team"]] },
+    pc: { x: 150, y: 580, logo: "chatgpt", label: "CHATGPT", kind: "personal", seed: [["swiftui-pro", "pub"], ["code-review", "pub"]] },
+    pk: { x: 330, y: 580, logo: "claude", label: "CLAUDE", kind: "personal", seed: [["humanizer", "pub"], ["swiftui-pro", "pub"]] },
+    wh: { x: 470, y: 580, logo: "hermes", label: "HERMES", kind: "work", seed: [["grill-me", "pub"]] },
+    wc: { x: 650, y: 580, logo: "chatgpt", label: "CHATGPT", kind: "work", seed: [["frontend-design", "team"]] },
     team: { x: 690, y: 262, logo: null, label: "@TEAMMATE", kind: "teammate", seed: [["frontend-design", "team"], ["canvas-design", "team"]] },
   };
   for (const n of Object.values(NODES)) { n.r = 50; n.cells = hexCells(27, 1); }
@@ -160,27 +160,29 @@
   const cellPos = (n, i) => [n.x + n.cells[i][0], n.y + n.cells[i][1]];
 
   // Glass tubes: square runs with rounded bends down to the agents, and a straight split tube to your teammate
-  function bends(corners, r = 16) {
+  function bends(corners, r = 40) {
     const out = [corners[0]];
     for (let i = 1; i < corners.length - 1; i++) {
       const a = corners[i - 1], p = corners[i], b = corners[i + 1];
       const da = Math.hypot(p[0] - a[0], p[1] - a[1]), db = Math.hypot(b[0] - p[0], b[1] - p[1]);
       const k1 = Math.min(r, da / 2) / da, k2 = Math.min(r, db / 2) / db;
       const s0 = [p[0] + (a[0] - p[0]) * k1, p[1] + (a[1] - p[1]) * k1], s1 = [p[0] + (b[0] - p[0]) * k2, p[1] + (b[1] - p[1]) * k2];
-      for (let j = 0; j <= 8; j++) { const t = j / 8, u = 1 - t; out.push([u * u * s0[0] + 2 * u * t * p[0] + t * t * s1[0], u * u * s0[1] + 2 * u * t * p[1] + t * t * s1[1]]); }
+      for (let j = 0; j <= 16; j++) { const t = j / 16, u = 1 - t; out.push([u * u * s0[0] + 2 * u * t * p[0] + t * t * s1[0], u * u * s0[1] + 2 * u * t * p[1] + t * t * s1[1]]); }
     }
     out.push(corners[corners.length - 1]);
     return out;
   }
-  // each tube drops from under your orb, turns once towards its agent, and drops again; outer tubes turn higher so none cross
-  const TUBES = { pc: [334, 412], pk: [368, 452], wh: [432, 452], wc: [466, 412] };
-  for (const [id, [sx, turn]] of Object.entries(TUBES)) {
-    const n = NODES[id];
-    n.sx = sx;
-    n.route = bends([[sx, YOU.y + 50], [sx, turn], [n.x, turn], [n.x, n.y - 28]]);
+  // two trunks leave your orb at 45 degrees, drop to a fork, and branch at 45 degrees to a pair of agents each
+  const FORK_Y = 470;
+  for (const [id, side] of [["pc", -1], ["pk", -1], ["wh", 1], ["wc", 1]]) {
+    const n = NODES[id], d = YOU.r * Math.SQRT1_2 - 4;
+    const s0 = [YOU.x + side * (d - 20), YOU.y + d - 20], jx = YOU.x + side * 160;
+    const j0 = [jx, s0[1] + Math.abs(jx - s0[0])];
+    const dx = Math.abs(n.x - jx);
+    n.route = bends([s0, j0, [jx, FORK_Y], [n.x, FORK_Y + dx], [n.x, n.y - 20]], 24);
   }
   NODES.team.route = [[YOU.x + YOU.r - 6, YOU.y], [NODES.team.x - NODES.team.r + 6, YOU.y]];
-  const TW = 24, GAP = 14;               // tube bore, and the space in the middle of the teammate tube
+  const GAP = 14;                        // the space in the middle of the path to your teammate
   const link = { v: 0, hold: -1 };       // the teammate tube only shows while something crosses it
   const openLink = (t) => { link.hold = Math.max(link.hold, clock + t); };
 
@@ -376,26 +378,20 @@
     // centre: your name, an agent's logo, or your teammate's @
     if (n === YOU) text("YOU", n.x, n.y + 4, { size: 11, weight: 500, align: "center", spacing: "0.14em" });
   }
-  // A glass tube: ink walls, a paper bore, and a faint inner wall for the thickness of the glass
-  function glassTube(pts, alpha = 1) {
-    const trace = () => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); };
-    ctx.save(); ctx.lineCap = "butt"; ctx.lineJoin = "round"; ctx.globalAlpha = alpha;
-    trace(); ctx.lineWidth = TW + 2 * LW; ctx.strokeStyle = ink; ctx.stroke();
-    trace(); ctx.lineWidth = TW; ctx.strokeStyle = paper; ctx.stroke();
-    trace(); ctx.lineWidth = TW - 6; ctx.strokeStyle = muted; ctx.globalAlpha = alpha * 0.45; ctx.stroke();
-    trace(); ctx.lineWidth = TW - 7.6; ctx.strokeStyle = paper; ctx.globalAlpha = alpha; ctx.stroke();
+  // A dotted path; shared stretches start at the same point, so their dots line up and read as one path
+  function dotted(pts, alpha = 1) {
+    const list = typeof pts[0][0] === "number" ? [pts] : pts;
+    ctx.save(); ctx.globalAlpha = alpha; ctx.lineWidth = 1.6; ctx.lineCap = "round"; ctx.setLineDash([0.1, 6]);
+    for (const q of list) { ctx.beginPath(); ctx.moveTo(q[0][0], q[0][1]); for (let i = 1; i < q.length; i++) ctx.lineTo(q[i][0], q[i][1]); ctx.stroke(); }
     ctx.restore();
   }
   function drawTubes() {
-    for (const n of Object.values(NODES)) {
-      if (n === NODES.team) continue;
-      glassTube(n.route);
-    }
-    // the teammate tube: each half grows out of its own orb and they meet across a small gap
+    dotted(["pc", "pk", "wh", "wc"].map((id) => NODES[id].route));
+    // the path to your teammate: each half grows out of its own orb and they meet across a small gap
     if (link.v > 0.01) {
       const [a, b] = NODES.team.route, mid = (a[0] + b[0]) / 2, e = ease(link.v);
       const l = a[0] + (mid - GAP / 2 - a[0]) * e, r = b[0] - (b[0] - mid - GAP / 2) * e;
-      glassTube([a, [l, a[1]]], e); glassTube([[r, b[1]], b], e);
+      dotted([a, [l, a[1]]], e); dotted([[r, b[1]], b], e);
     }
   }
   function tagFor(m) {
