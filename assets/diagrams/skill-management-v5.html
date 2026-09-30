@@ -22,7 +22,7 @@
   .plate { position: relative; }
   #line { display: block; width: 100%; }
   .caption {
-    position: absolute; left: 1%; bottom: 9%;
+    position: absolute; right: 1%; top: 4%; text-align: right; align-items: flex-end;
     display: flex; flex-direction: column; gap: 6px;
     opacity: 0; transition: opacity 300ms ease;
     pointer-events: none;
@@ -38,7 +38,7 @@
 
 <div class="banner">
   <div class="plate">
-    <canvas id="line" role="img" aria-label="An isometric production line. Skills leave a public library and your workbench on conveyor belts, two robot arms on your turntable collect them and send copies to ChatGPT, Claude, Hermes and a teammate, and an update made in one place spreads to every agent."></canvas>
+    <canvas id="line" role="img" aria-label="An isometric production line. Public skills stream past on a conveyor and a robot arm on your turntable picks the ones you want. Tubes join your turntable to ChatGPT, Claude, Hermes and your teammate: skills made on an agent travel back to you and are handed on to the others, and an update made in one place spreads to every agent."></canvas>
     <div class="caption" aria-live="polite"><span class="idx">01 / 04</span><span class="txt">Discover trusted public skills</span></div>
   </div>
 </div>
@@ -156,90 +156,92 @@
   function joint(p, r) { ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, Math.PI * 2); fillAs("paper"); ctx.stroke(); }
 
   // ---- The plant
-  const PK = 0.9, BELT_Z = 0.42, GRIP = 0.28, V = 2.6;
-  const HUB = { x: 0, y: 0, top: 0.6, r: 3.1, ringR: 2.3, slots: 8 };
-  const TEAM = { x: 15.2, y: 0, top: 0.5, r: 1.6, ringR: 1.0, slots: 4 };
-  const BELTS = [
-    { x0: -13.9, y0: 0, x1: -3.6, y1: 0 },   // public library -> you
-    { x0: 0, y0: -11.7, x1: 0, y1: -3.6 },   // workbench -> you
-    { x0: 3.6, y0: 0, x1: 9.9, y1: 0 },      // you -> work junction
-    { x0: 0, y0: 3.6, x1: 0, y1: 9.9 },      // you -> personal junction
-    { x0: 11, y0: -1.1, x1: 11, y1: -5.2 },  // -> ChatGPT (work)
-    { x0: 11, y0: 1.1, x1: 11, y1: 5.2 },    // -> Hermes (work)
-    { x0: -1.1, y0: 11, x1: -5.2, y1: 11 },  // -> ChatGPT (personal)
-    { x0: 1.1, y0: 11, x1: 5.2, y1: 11 },    // -> Claude (personal)
-  ];
+  const ORB = 0.42, GRIP = 0.22, V = 2.2, TUBE_V = 5.5, TUBE_Z = 0.95, TUBE_R = 0.5;
+  const HUB = { x: 0, y: 0, top: 0.6, r: 3.0, ringR: 2.1, slots: 8, mouthR: 3.75 };
+  const TEAM = { x: 17, y: -3, top: 0.45, r: 1.5, ringR: 0.8, slots: 4 };
+  const STREAM = { y: -4.4, x0: -14, x1: 9.2, top: 0.4, pickX: -0.5 };
+  const deg = (d) => (d * Math.PI) / 180;
   const ST = {
-    pc: { x: -6.5, y: 11, h: 1.9, logo: "chatgpt", name: "CHATGPT", kind: "personal", skills: new Set(["swiftui-pro", "release-notes", "code-review"]) },
-    pk: { x: 6.5, y: 11, h: 1.9, logo: "claude", name: "CLAUDE", kind: "personal", skills: new Set(["humanizer", "swiftui-pro"]) },
-    wc: { x: 11, y: -6.5, h: 1.9, logo: "chatgpt", name: "CHATGPT", kind: "work", skills: new Set(["release-notes", "frontend-design"]) },
-    wh: { x: 11, y: 6.5, h: 1.9, logo: "hermes", name: "HERMES", kind: "work", skills: new Set(["grill-me", "release-notes"]) },
+    pc: { x: 1, y: 13, logo: "chatgpt", name: "CHATGPT", kind: "personal", mouth: deg(89), skills: new Set(["swiftui-pro", "code-review"]) },
+    pk: { x: 5, y: 9, logo: "claude", name: "CLAUDE", kind: "personal", mouth: deg(63), skills: new Set(["humanizer", "swiftui-pro"]) },
+    wh: { x: 9, y: 5, logo: "hermes", name: "HERMES", kind: "work", mouth: deg(37), skills: new Set(["grill-me"]) },
+    wc: { x: 13, y: 1, logo: "chatgpt", name: "CHATGPT", kind: "work", mouth: deg(11), skills: new Set(["frontend-design"]) },
   };
+  const SW = 2.4, SH = 1.8; // agent block footprint and height
   for (const s of Object.values(ST)) { s.flash = 0; s.note = ""; s.noteT = 0; }
-  const ROUTES = {
-    pc: [[0, 4.4], [0, 11], [-4.6, 11]], pk: [[0, 4.4], [0, 11], [4.6, 11]],
-    wc: [[4.4, 0], [11, 0], [11, -4.6]], wh: [[4.4, 0], [11, 0], [11, 4.6]],
-    team: [[4.4, 0], [11, 0]],
-  };
-  const STYLE = {
-    pub: ["paper", "paper", "hatch"],   // public skill: plain crate
-    mine: ["ink", "paper", "hatch"],    // made by you: solid lid
-    team: ["cross", "paper", "hatch"],  // from your teammate: cross-hatched lid
-  };
+  const team = { flash: 0, note: "", noteT: 0, mouth: deg(-15) };
+  const hub = { note: "", noteT: 0 };
+
+  // Tubes join every agent (and your teammate) to a cup on the rim of your turntable
+  const mouthPt = (a) => [HUB.mouthR * Math.cos(a), HUB.mouthR * Math.sin(a), TUBE_Z];
+  const TUBES = {};
+  for (const [id, s] of Object.entries(ST)) TUBES[id] = { a: mouthPt(s.mouth), b: [s.x, s.y, TUBE_Z], st: s };
+  {
+    const m = mouthPt(team.mouth), dx = m[0] - TEAM.x, dy = m[1] - TEAM.y, l = Math.hypot(dx, dy);
+    TUBES.team = { a: m, b: [TEAM.x + (dx / l) * (TEAM.r + 0.1), TEAM.y + (dy / l) * (TEAM.r + 0.1), TUBE_Z], st: null };
+  }
 
   // ---- Paths
   function mkPath(pts) {
     const L = [0];
-    for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1], (pts[i][2] || 0) - (pts[i - 1][2] || 0)));
+    for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1], pts[i][2] - pts[i - 1][2]));
     return { pts, L, len: L[L.length - 1] };
   }
   function along(path, s) {
     const { pts, L } = path; let i = 1;
     while (i < L.length - 1 && L[i] < s) i++;
     const a = pts[i - 1], b = pts[i], k = L[i] === L[i - 1] ? 1 : Math.max(0, Math.min(1, (s - L[i - 1]) / (L[i] - L[i - 1])));
-    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * k, b[0] - a[0], b[1] - a[1]];
+    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
   }
-  const flat = (pts, z) => pts.map(([x, y]) => [x, y, z]);
 
-  // ---- State
-  let rot = 0.4, trot = 0, packets = [], ripples = [], signals = [];
+  // ---- State. An orb's (x, y, z) is its centre.
+  let rot = 0.3, trot = 0, orbs = [], ripples = [], signals = [], born = 0, streamT = 0;
   const ring = new Array(HUB.slots).fill(null), tring = new Array(TEAM.slots).fill(null);
-  const press = { t: -1, headZ: 3.4, job: null };
-  const lib = { flash: 0 };
-  const hub = { note: "", noteT: 0 }, team = { note: "", noteT: 0 };
-  let born = 0;
-
   function mk(name, kind, x, y, z, state) {
-    const p = { name, kind, x, y, z, state, ang: 0, scale: 1, alpha: 1, routes: [], tag: false, born: born++ };
-    packets.push(p); return p;
+    const o = { name, kind, x, y, z, state, scale: 1, alpha: 1, routes: [], tag: false, born: born++ };
+    orbs.push(o); return o;
   }
   const slotAng = (i) => rot + (i * 2 * Math.PI) / HUB.slots;
-  const slotPos = (i) => { const a = slotAng(i); return [HUB.x + HUB.ringR * Math.cos(a), HUB.y + HUB.ringR * Math.sin(a), HUB.top]; };
+  const slotPos = (i) => { const a = slotAng(i); return [HUB.ringR * Math.cos(a), HUB.ringR * Math.sin(a), HUB.top + ORB]; };
   const tslotAng = (i) => trot + (i * 2 * Math.PI) / TEAM.slots;
-  const tslotPos = (i) => { const a = tslotAng(i); return [TEAM.x + TEAM.ringR * Math.cos(a), TEAM.y + TEAM.ringR * Math.sin(a), TEAM.top]; };
-  const grip = (p) => () => [p.x, p.y, p.z + PK * p.scale + GRIP];
-  const gripAt = (fn) => () => { const q = fn(); return [q[0], q[1], q[2] + PK + GRIP]; };
+  const tslotPos = (i) => { const a = tslotAng(i); return [TEAM.x + TEAM.ringR * Math.cos(a), TEAM.y + TEAM.ringR * Math.sin(a), TEAM.top + ORB]; };
   const wrapA = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
-  function ripple(x, y, z, r1 = 1.6, dur = 1.1) { ripples.push({ x, y, z, r0: 0.4, r1, t: 0, dur }); }
+  const grip = (o) => () => [o.x, o.y, o.z + ORB * o.scale + GRIP];
+  const gripAt = (fn) => () => { const q = fn(); return [q[0], q[1], q[2] + ORB + GRIP]; };
+  function ripple(x, y, z, r1 = 1.6, dur = 1.1) { ripples.push({ x, y, z, r0: 0.3, r1, t: 0, dur }); }
+  function freeSlot(arr, angFn, want) {
+    let best = -1, bd = 1e9;
+    arr.forEach((q, i) => { if (!q) { const d = Math.abs(wrapA(angFn(i) - want)); if (d < bd) { bd = d; best = i; } } });
+    return best;
+  }
+  function claim(arr, angFn, want, o) {
+    const i = freeSlot(arr, angFn, want);
+    if (i >= 0) arr[i] = o;
+    return i;
+  }
+  function makeRoom(arr) {
+    const c = arr.filter((q) => q && q.state === "ring" && !q.routes.length && !q.busy).sort((a, b) => a.born - b.born)[0];
+    if (c) { c.state = "fade"; return true; }
+    return false;
+  }
+  function settle(arr, o, i) {
+    arr[i] = o; o.slot = i; o.state = "ring"; o.home = arr;
+    for (const q of arr) if (q && q !== o && q.name === o.name && q.state === "ring") q.state = "fade";
+  }
 
-  // Seed: what you, your teammate and the agents already hold
-  [["swiftui-pro", "pub", 1], ["release-notes", "mine", 3], ["code-review", "pub", 5], ["frontend-design", "team", 6]].forEach(([n, k, i]) => {
-    const p = mk(n, k, 0, 0, HUB.top, "ring"); p.slot = i; ring[i] = p;
-  });
-  [["frontend-design", "team", 0], ["release-notes", "mine", 2]].forEach(([n, k, i]) => {
-    const p = mk(n, k, 0, 0, TEAM.top, "tring"); p.slot = i; tring[i] = p;
-  });
+  // Seed: what you and your teammate already keep
+  [["swiftui-pro", "pub", 0], ["release-notes", "mine", 2], ["code-review", "pub", 4], ["frontend-design", "team", 5], ["humanizer", "pub", 7]]
+    .forEach(([n, k, i]) => settle(ring, mk(n, k, 0, 0, 0, "ring"), i));
+  [["frontend-design", "team", 0], ["canvas-design", "team", 2]].forEach(([n, k, i]) => settle(tring, mk(n, k, 0, 0, 0, "ring"), i));
 
-  // ---- Arms: a wrist target moves in cylindrical coordinates around the base, so arms swing rather than cut across
+  // ---- Arms: the wrist moves in cylindrical coordinates around the base, so arms swing instead of cutting across
   function Arm(base, L, homeAng, homeR, homeZ) {
     const home = [base[0] + homeR * Math.cos(homeAng), base[1] + homeR * Math.sin(homeAng), homeZ];
     return { base, L, home, pos: home.slice(), job: null, free: true, carry: null, yaw: homeAng };
   }
-  const arm1 = Arm([0, 0, 3.5], 2.6, (200 * Math.PI) / 180, 2.4, 3.1);  // intake, works the back of the turntable
-  const arm2 = Arm([0, 0, 2.7], 2.6, (75 * Math.PI) / 180, 2.4, 2.3);        // dispatch, works the front
-  const armT = Arm([TEAM.x, TEAM.y, 2.6], 2.35, (160 * Math.PI) / 180, 2.0, 2.0); // your teammate's arm
-  const ARMS = [arm1, arm2, armT];
-
+  const arm1 = Arm([0, 0, 3.5], 2.6, deg(-75), 2.4, 3.0); // picks from the public stream, at the back
+  const arm2 = Arm([0, 0, 2.7], 2.6, deg(15), 2.5, 2.3);   // hands copies to the tubes, at the front
+  const ARMS = [arm1, arm2];
   const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
   function cylLerp(b, f, t, e, lift) {
     const af = Math.atan2(f[1] - b[1], f[0] - b[0]), rf = Math.hypot(f[0] - b[0], f[1] - b[1]);
@@ -247,23 +249,7 @@
     const a = af + wrapA(at - af) * e, r = rf + (rt - rf) * e;
     return [b[0] + r * Math.cos(a), b[1] + r * Math.sin(a), f[2] + (t[2] - f[2]) * e + lift * Math.sin(Math.PI * e)];
   }
-  function pickPlace(a, src, dst, onGrab, onRelease) {
-    let sp = null;
-    const from = () => sp || src();
-    const up = (f, h) => () => { const q = f(); return [q[0], q[1], q[2] + h]; };
-    a.free = false;
-    a.job = { i: 0, steps: [
-      { to: up(from, 1.0), dur: 0.55, lift: 0.3 },
-      { to: up(from, 0), dur: 0.25 },
-      { to: up(from, 0), dur: 0.1, call: () => { sp = src(); onGrab(); } },
-      { to: up(from, 1.0), dur: 0.25 },
-      { to: up(dst, 1.0), dur: 0.7, lift: 0.4 },
-      { to: up(dst, 0), dur: 0.25 },
-      { to: up(dst, 0), dur: 0.1, call: onRelease },
-      { to: up(dst, 1.0), dur: 0.25, idle: true },
-      { to: () => a.home, dur: 0.8, idle: true },
-    ] };
-  }
+  const up = (f, h) => () => { const q = f(); return [q[0], q[1], q[2] + h]; };
   function runArm(a, dt) {
     const j = a.job;
     if (j) {
@@ -272,7 +258,7 @@
       st.t += dt;
       const k = Math.min(1, st.t / st.dur);
       a.pos = cylLerp(a.base, st.from, st.to(), ease(k), st.lift || 0);
-      if (k >= 1) {
+      if (k >= 1 && (!st.until || st.until())) {
         if (st.call) st.call();
         j.i++;
         if (j.i >= j.steps.length) { a.job = null; a.free = true; }
@@ -281,107 +267,108 @@
     }
     const dx = a.pos[0] - a.base[0], dy = a.pos[1] - a.base[1];
     if (Math.hypot(dx, dy) > 0.2) a.yaw = Math.atan2(dy, dx);
-    if (a.carry) { const p = a.carry; p.x = a.pos[0]; p.y = a.pos[1]; p.z = a.pos[2] - GRIP - PK; p.ang = a.yaw; }
+    if (a.carry) { const o = a.carry; o.x = a.pos[0]; o.y = a.pos[1]; o.z = a.pos[2] - GRIP - ORB; }
   }
+  const tail = (a) => [
+    { to: () => a.home, dur: 0.8, idle: true },
+  ];
 
-  // Keep one copy of each skill on a turntable
-  function dedupe(arr, p) { for (const q of arr) if (q && q !== p && q.name === p.name && q.state !== "fade") q.state = q.state === "tring" ? "tfade" : "fade"; }
-  function freeSlot(arr, angFn, want) {
-    let best = -1, bd = 1e9;
-    arr.forEach((q, i) => { if (!q) { const d = Math.abs(wrapA(angFn(i) - want)); if (d < bd) { bd = d; best = i; } } });
-    return best;
+  // Discover: wait over the stream, then pluck the chosen skill as it passes
+  const PICK = [STREAM.pickX, STREAM.y, STREAM.top + ORB];
+  function pluck(o) {
+    let i = -1, sp = null;
+    arm1.free = false;
+    arm1.job = { i: 0, steps: [
+      { to: up(gripAt(() => PICK), 1.1), dur: 0.7, lift: 0.2 },
+      { to: up(gripAt(() => PICK), 1.1), dur: 0.05, until: () => o.x >= PICK[0] - V * 0.3 },
+      { to: grip(o), dur: 0.3 },
+      { to: grip(o), dur: 0.01, call: () => { sp = [o.x, o.y, o.z]; o.state = "arm"; arm1.carry = o; } },
+      { to: up(gripAt(() => sp), 1.2), dur: 0.35 },
+      { to: () => { if (i < 0) i = claim(ring, slotAng, deg(-140), o); const q = i < 0 ? PICK : slotPos(i); return [q[0], q[1], q[2] + ORB + GRIP + 1.0]; }, dur: 0.7, lift: 0.3 },
+      { to: gripAt(() => slotPos(i)), dur: 0.3, until: () => i >= 0 || (i = claim(ring, slotAng, deg(-140), o)) >= 0 || (makeRoom(ring), false) },
+      { to: gripAt(() => slotPos(i)), dur: 0.08, call: () => { arm1.carry = null; o.tag = false; settle(ring, o, i); ripple(o.x, o.y, HUB.top, 0.9, 0.7); } },
+      { to: up(gripAt(() => slotPos(i)), 1.0), dur: 0.3, idle: true },
+      ...tail(arm1),
+    ] };
   }
-  function evictOldest(arr, fadeState) {
-    const c = arr.filter((q) => q && (q.state === "ring" || q.state === "tring") && !q.routes.length && !q.busy && !q.send).sort((a, b) => a.born - b.born)[0];
-    if (c) c.state = fadeState;
-  }
-
-  // Intake: take whatever waits at the end of the two input belts and set it on your turntable
-  function intake() {
-    if (!arm1.free) return;
-    const p = packets.find((q) => q.state === "wait" && (q.at === "A" || q.at === "B"));
-    if (!p) return;
-    const i = freeSlot(ring, slotAng, 3.2);
-    if (i < 0) { evictOldest(ring, "fade"); return; }
-    ring[i] = p; p.state = "queued";
-    pickPlace(arm1, grip(p), gripAt(() => slotPos(i)),
-      () => { p.state = "arm"; p.tag = false; arm1.carry = p; },
-      () => { arm1.carry = null; p.state = "ring"; p.slot = i; dedupe(ring, p); ripple(...slotPos(i), 0.9, 0.7); });
-  }
-  // Dispatch: copy a skill off the turntable onto the belt that leads to its agent
+  // Distribute: lift a copy off your turntable and drop it into the cup of the agent's tube
   function dispatch() {
     if (!arm2.free) return;
-    const p = ring.find((q) => q && q.state === "ring" && q.routes.length && !q.busy && (() => { const a = wrapA(slotAng(q.slot)); return a > -1.4 && a < 2.0; })());
-    if (!p) return;
-    const route = p.routes.shift();
-    const start = ROUTES[route][0];
-    let copy = null; p.busy = true;
-    pickPlace(arm2, grip(p), gripAt(() => [start[0], start[1], BELT_Z]),
-      () => { p.busy = false; copy = mk(p.name, p.kind, p.x, p.y, p.z, "arm"); copy.ang = p.ang; arm2.carry = copy; },
-      () => { arm2.carry = null; toBelt(copy, route); });
+    const o = ring.find((q) => q && q.state === "ring" && q.routes.length && !q.busy && (() => { const a = wrapA(slotAng(q.slot)); return a > deg(-60) && a < deg(115); })());
+    if (!o) return;
+    const route = o.routes.shift(), cup = TUBES[route].a;
+    let copy = null; o.busy = true; arm2.free = false;
+    arm2.job = { i: 0, steps: [
+      { to: up(grip(o), 0.9), dur: 0.55, lift: 0.2 },
+      { to: grip(o), dur: 0.25 },
+      { to: grip(o), dur: 0.08, call: () => { o.busy = false; copy = mk(o.name, o.kind, o.x, o.y, o.z, "arm"); arm2.carry = copy; ripple(o.x, o.y, HUB.top, 0.7, 0.5); } },
+      { to: up(grip(o), 1.0), dur: 0.3 },
+      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 0.9], dur: 0.6, lift: 0.3 },
+      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 0.35], dur: 0.2 },
+      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 0.35], dur: 0.06, call: () => { arm2.carry = null; drop(copy, route); } },
+      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 1.1], dur: 0.3, idle: true },
+      ...tail(arm2),
+    ] };
   }
-  function toBelt(p, route) {
-    p.state = "belt"; p.ang = 0; p.s = 0; p.path = mkPath(flat(ROUTES[route], BELT_Z));
-    p.onEnd = route === "team" ? (q) => { q.state = "wait"; q.at = "J"; } : (q) => hopInto(q, ST[route]);
+  function drop(o, route) {
+    o.state = "fall"; o.fall = { z1: TUBE_Z, onEnd: () => send(o, TUBES[route], true, () => arriveAt(o, route)) };
   }
-  // Your teammate's arm: takes shared skills off the junction, and puts its own skills on it
-  function teamWork() {
-    if (!armT.free) return;
-    const inbound = packets.find((q) => q.state === "wait" && q.at === "J");
-    if (inbound) {
-      const i = freeSlot(tring, tslotAng, Math.PI);
-      if (i < 0) { evictOldest(tring, "tfade"); return; }
-      tring[i] = inbound; inbound.state = "queued";
-      pickPlace(armT, grip(inbound), gripAt(() => tslotPos(i)),
-        () => { inbound.state = "arm"; armT.carry = inbound; },
-        () => { armT.carry = null; inbound.state = "tring"; inbound.slot = i; dedupe(tring, inbound); ripple(...tslotPos(i), 0.8, 0.7); team.note = "received"; team.noteT = 2; });
-      return;
-    }
-    const out = tring.find((q) => q && q.send && q.scale >= 1);
-    if (out) {
-      let copy = null; out.send = false;
-      pickPlace(armT, grip(out), gripAt(() => [11, 0, BELT_Z]),
-        () => { copy = mk(out.name, out.kind, out.x, out.y, out.z, "arm"); copy.ang = out.ang; copy.tag = true; armT.carry = copy; },
-        () => { armT.carry = null; copy.state = "belt"; copy.ang = 0; copy.s = 0; copy.path = mkPath(flat([[11, 0], [11, -4.6]], BELT_Z)); copy.onEnd = (q) => hopInto(q, ST.wc); });
-    }
+  // Travel along a tube; out = away from you
+  function send(o, tube, out, onEnd) {
+    o.state = "tube"; o.s = 0; o.tube = tube; o.path = mkPath(out ? [tube.a, tube.b] : [tube.b, tube.a]); o.onEnd = onEnd;
   }
-  function hopInto(p, st) { p.state = "hop"; p.tag = false; p.hop = { x0: p.x, y0: p.y, z0: p.z, t: 0, dur: 0.55, st }; }
+  function arriveAt(o, route) {
+    if (route === "team") { hop(o, () => claim(tring, tslotAng, Math.atan2(-TEAM.y, -TEAM.x), o), tring, tslotPos, () => { team.flash = 1; team.note = "received"; team.noteT = 2.2; }); return; }
+    const s = ST[route]; o.state = "gone"; s.skills.add(o.name); s.flash = 1; s.note = "installed"; s.noteT = 1.8; ripple(s.x, s.y, SH, 1.6);
+  }
+  // Pop out of a tube end onto a free spot on a turntable
+  function hop(o, pickSlot, arr, posFn, done) {
+    let i = pickSlot();
+    if (i < 0) { makeRoom(arr); i = -1; }
+    o.state = "hop"; o.hop = { x0: o.x, y0: o.y, z0: o.z, t: 0, dur: 0.6, to: () => { if (i < 0) i = pickSlot(); return i < 0 ? [o.x, o.y, o.z] : posFn(i); },
+      end: () => { if (i < 0) { i = pickSlot(); if (i < 0) { o.hop.t = 0; return; } } settle(arr, o, i); done && done(); } };
+  }
+  // Something arrives at your turntable from an agent or your teammate
+  function arriveHome(o, routes) {
+    hop(o, () => claim(ring, slotAng, Math.atan2(o.y, o.x), o), ring, slotPos, () => { o.routes = routes; ripple(o.x, o.y, HUB.top, 1.0, 0.7); hub.note = "collected"; hub.noteT = 1.8; });
+  }
 
   // ---- The four moves
-  const PUBLIC = ["grill-me", "humanizer", "napkin", "gstack", "mcp-builder", "swiftdata-pro"];
-  const MINE = ["brand-voice", "release-notes"];
-  const TEAMS = ["canvas-design", "frontend-design"];
-  let pi = 0, mi = 0, ti = 0;
-  function emit(routes) {
-    const p = mk(PUBLIC[pi++ % PUBLIC.length], "pub", -13.3, 0, BELT_Z, "belt");
-    p.scale = 0.15; p.tag = true; p.routes = routes; p.s = 0;
-    p.path = mkPath(flat([[-13.3, 0], [-4.4, 0]], BELT_Z));
-    p.onEnd = (q) => { q.state = "wait"; q.at = "A"; };
-    lib.flash = 1;
+  const PUBLIC = ["grill-me", "napkin", "gstack", "mcp-builder", "swiftdata-pro", "humanizer"];
+  let pi = 0;
+  function discover(routes) {
+    // choose the next unclaimed skill far enough upstream for the arm to get there first
+    const lead = PICK[0] - V * 1.4;
+    const o = orbs.filter((q) => q.state === "stream" && !q.target && q.x < lead).sort((a, b) => b.x - a.x)[0];
+    if (!o || !arm1.free) return;
+    o.target = true; o.tag = true; o.name = PUBLIC[pi++ % PUBLIC.length]; o.routes = routes;
+    pluck(o);
   }
-  function stamp(routes) { press.t = 0; press.job = { name: MINE[mi++ % MINE.length], routes }; }
-  function teamSend() {
-    let i = freeSlot(tring, tslotAng, 0);
-    if (i < 0) { const old = tring.filter(Boolean).sort((a, b) => a.born - b.born)[0]; tring[old.slot] = null; old.state = "gone"; i = old.slot; }
-    const p = mk(TEAMS[ti++ % TEAMS.length], "team", 0, 0, TEAM.top, "tring");
-    p.slot = i; tring[i] = p; p.scale = 0.15; p.send = true; dedupe(tring, p);
-    ripple(TEAM.x, TEAM.y, TEAM.top, 2.4);
+  function create(id, name, routes) {
+    const s = ST[id], o = mk(name, "mine", s.x, s.y, SH + ORB + 0.05, "emerge");
+    o.scale = 0.1; o.tag = true; o.emerge = { t: 0, st: s, onEnd: () => send(o, TUBES[id], false, () => arriveHome(o, routes)) };
+    s.flash = 1; s.note = "new skill"; s.noteT = 2.2; ripple(s.x, s.y, SH, 1.8); s.skills.add(name);
   }
-  let lastMine = "release-notes";
-  function startUpdate() {
-    const st = ST.wc, z = 1.1;
-    st.flash = 1; st.note = "updated"; st.noteT = 2.4; ripple(st.x, st.y, st.h, 2);
-    signal([[st.x, st.y, st.h + 0.2], [11, -5.2, z], [11, 0, z], [3.3, 0, z]], () => {
-      ripple(HUB.x, HUB.y, HUB.top, 4.2, 1.4); hub.note = "updated"; hub.noteT = 2.4;
-      ring.forEach((q) => { if (q && q.name === lastMine) ripple(q.x, q.y, q.z + PK, 1, 0.8); });
-      const reach = (id, pts) => signal(pts, () => { const s = ST[id]; s.flash = 1; s.note = "synced"; s.noteT = 2.4; ripple(s.x, s.y, s.h, 1.8); });
-      reach("pc", [[0, 3.3, z], [0, 11, z], [-5.2, 11, z], [-6.5, 11, 2.1]]);
-      reach("pk", [[0, 3.3, z], [0, 11, z], [5.2, 11, z], [6.5, 11, 2.1]]);
-      reach("wh", [[3.3, 0, z], [11, 0, z], [11, 5.2, z], [11, 6.5, 2.1]]);
-      signal([[3.3, 0, z], [11, 0, z], [13.6, 0, z]], () => { ripple(TEAM.x, TEAM.y, TEAM.top, 2.4); team.note = "synced"; team.noteT = 2.4; });
+  function teamShare(name, routes) {
+    const b = TUBES.team.b, o = mk(name, "team", b[0], b[1], TUBE_Z, "emerge");
+    o.scale = 0.1; o.tag = true; o.emerge = { t: 0, st: null, onEnd: () => send(o, TUBES.team, false, () => arriveHome(o, routes)) };
+    team.flash = 1; team.note = "shared"; team.noteT = 2.2; ripple(TEAM.x, TEAM.y, TEAM.top, 2.2);
+  }
+  function shareOut(name) {
+    const o = ring.find((q) => q && q.name === name && q.state === "ring");
+    if (o) o.routes.push("team");
+  }
+  function update(name) {
+    const s = ST.wc;
+    s.flash = 1; s.note = "updated"; s.noteT = 2.4; ripple(s.x, s.y, SH, 2);
+    signal(TUBES.wc, false, () => {
+      ripple(0, 0, HUB.top, 4.0, 1.4); hub.note = "updated"; hub.noteT = 2.4;
+      ring.forEach((q) => { if (q && q.name === name) ripple(q.x, q.y, q.z + ORB, 1.1, 0.8); });
+      for (const id of ["pc", "pk", "wh"]) if (ST[id].skills.has(name)) signal(TUBES[id], true, () => { const t = ST[id]; t.flash = 1; t.note = "synced"; t.noteT = 2.4; ripple(t.x, t.y, SH, 1.8); });
+      if (tring.some((q) => q && q.name === name)) signal(TUBES.team, true, () => { team.flash = 1; team.note = "synced"; team.noteT = 2.4; ripple(TEAM.x, TEAM.y, TEAM.top, 2.2); });
     });
   }
-  function signal(pts, onEnd) { signals.push({ path: mkPath(pts), s: 0, onEnd }); }
+  function signal(tube, out, onEnd) { signals.push({ path: mkPath(out ? [tube.a, tube.b] : [tube.b, tube.a]), s: 0, onEnd }); }
 
   const PHRASES = ["Discover trusted public skills", "Manage the skills you make", "Share skills with your team", "Update once & stay in sync."];
   let capTimer = 0, capSwap = 0;
@@ -393,114 +380,111 @@
     capSwap = setTimeout(() => { set(); capTimer = setTimeout(() => capEl.classList.remove("on"), 3000); }, 300);
   }
 
-  const CYCLE = 28;
+  const CYCLE = 30;
   const EVENTS = [
-    [0.4, () => { caption(0); emit(["pc", "wh"]); }],
-    [3.8, () => emit(["pk", "wc"])],
-    [8.0, () => { caption(1); stamp(["pc", "wc", "team"]); }],
-    [15.5, () => { caption(2); teamSend(); }],
-    [21.5, () => { caption(3); startUpdate(); }],
+    [0.3, () => { caption(0); discover(["pc", "wh"]); }],
+    [4.2, () => discover(["pk", "wc"])],
+    [9.0, () => { caption(1); create("pc", "release-notes", ["wc", "wh"]); }],
+    [16.0, () => { caption(2); teamShare("canvas-design", ["wc"]); shareOut("release-notes"); }],
+    [23.0, () => { caption(3); update("release-notes"); }],
   ];
   let tc = 0, ei = 0;
 
   // ---- Simulation step
-  function blocked(p) {
-    const [, , , tx, ty] = along(p.path, p.s), tl = Math.hypot(tx, ty) || 1;
-    for (const q of packets) {
-      if (q === p || (q.state !== "belt" && q.state !== "wait" && q.state !== "queued")) continue;
-      const dx = q.x - p.x, dy = q.y - p.y;
-      if (Math.hypot(dx, dy) < 1.15 && (dx * tx + dy * ty) / tl > 0.3) return true;
-    }
-    return false;
-  }
-  function update(dt) {
+  function step(dt) {
     tc += dt;
     while (ei < EVENTS.length && tc >= EVENTS[ei][0]) EVENTS[ei++][1]();
     if (tc >= CYCLE) { tc -= CYCLE; ei = 0; }
+    rot += dt * (2 * Math.PI) / 12;
+    trot -= dt * (2 * Math.PI) / 14;
 
-    rot += dt * (2 * Math.PI) / 11;
-    trot -= dt * (2 * Math.PI) / 16;
+    // the public stream never stops
+    streamT += dt;
+    if (streamT >= 0.8) { streamT -= 0.8; const o = mk("", "pub", STREAM.x0 + 0.1, STREAM.y, STREAM.top + ORB, "stream"); o.scale = 0.15; }
 
-    // press: down, stamp a new skill, back up, then let it go
-    if (press.t >= 0) {
-      const t0 = press.t; press.t += dt; const t = press.t;
-      press.headZ = t < 0.35 ? 3.4 - 2.05 * ease(t / 0.35) : t < 0.55 ? 1.35 : t < 1.1 ? 1.35 + 2.05 * ease((t - 0.55) / 0.55) : 3.4;
-      if (t0 < 0.35 && t >= 0.35) {
-        const p = mk(press.job.name, "mine", 0, -13.5, BELT_Z, "hold");
-        p.routes = press.job.routes; p.tag = true; press.p = p; lastMine = p.name;
-        ripple(0, -13.5, BELT_Z, 1.8);
+    for (const o of orbs) {
+      if (o.scale < 1 && o.state !== "emerge") o.scale = Math.min(1, o.scale + dt * 2.5);
+      if (o.state === "ring" || o.state === "fade") {
+        const [x, y, z] = (o.home === tring ? tslotPos : slotPos)(o.slot); o.x = x; o.y = y; o.z = z;
       }
-      if (t0 < 0.9 && t >= 0.9 && press.p) {
-        const p = press.p; p.state = "belt"; p.s = 0; p.path = mkPath(flat([[0, -13.5], [0, -4.4]], BELT_Z));
-        p.onEnd = (q) => { q.state = "wait"; q.at = "B"; }; press.p = null;
+      if (o.state === "fade") { o.alpha -= dt * 1.6; if (o.alpha <= 0) { o.home[o.slot] = null; o.state = "gone"; } }
+      if (o.state === "stream") {
+        o.x += V * dt;
+        if (o.x >= STREAM.x1 + 0.4) { o.state = "drain"; }
       }
-      if (t >= 1.1) press.t = -1;
-    }
-
-    for (const p of packets) {
-      if (p.scale < 1) p.scale = Math.min(1, p.scale + dt * 2.2);
-      if (p.state === "ring" || p.state === "fade") {
-        const [x, y, z] = slotPos(p.slot); p.x = x; p.y = y; p.z = z; p.ang = slotAng(p.slot);
+      if (o.state === "drain") { o.z -= dt * 2.5; if (o.z < STREAM.top - 0.2) o.state = "gone"; }
+      if (o.state === "fall") { o.z -= dt * 4; if (o.z <= o.fall.z1) { o.z = o.fall.z1; o.fall.onEnd(); } }
+      if (o.state === "tube") {
+        o.s = Math.min(o.path.len, o.s + TUBE_V * dt);
+        [o.x, o.y, o.z] = along(o.path, o.s);
+        if (o.s >= o.path.len) { const f = o.onEnd; o.onEnd = null; f && f(); }
       }
-      if (p.state === "tring" || p.state === "tfade") {
-        const [x, y, z] = tslotPos(p.slot); p.x = x; p.y = y; p.z = z; p.ang = tslotAng(p.slot);
+      if (o.state === "hop") {
+        const h = o.hop; h.t += dt; const k = Math.min(1, h.t / h.dur), to = h.to(), e = ease(k);
+        o.x = h.x0 + (to[0] - h.x0) * e; o.y = h.y0 + (to[1] - h.y0) * e; o.z = h.z0 + (to[2] - h.z0) * e + 1.2 * Math.sin(Math.PI * k);
+        if (k >= 1) h.end();
       }
-      if (p.state === "fade" || p.state === "tfade") {
-        p.alpha -= dt * 1.6;
-        if (p.alpha <= 0) { (p.state === "fade" ? ring : tring)[p.slot] = null; p.state = "gone"; }
-      }
-      if (p.state === "belt" && !blocked(p)) {
-        p.s = Math.min(p.path.len, p.s + V * dt);
-        const [x, y, z] = along(p.path, p.s); p.x = x; p.y = y; p.z = z;
-        if (p.s >= p.path.len && p.onEnd) { const f = p.onEnd; p.onEnd = null; f(p); }
-      }
-      if (p.state === "hop") {
-        const h = p.hop; h.t += dt; const k = Math.min(1, h.t / h.dur);
-        p.x = h.x0 + (h.st.x - h.x0) * k; p.y = h.y0 + (h.st.y - h.y0) * k;
-        p.z = h.z0 + (h.st.h + 0.02 - h.z0) * k + 1.4 * Math.sin(Math.PI * k);
-        if (k >= 1) { p.state = "sink"; p.floor = h.st.h; }
-      }
-      if (p.state === "sink") {
-        p.z -= dt * 2.4;
-        if (p.z + PK <= p.floor) {
-          p.state = "gone"; const st = p.hop.st; st.skills.add(p.name); st.flash = 1; ripple(st.x, st.y, st.h, 1.5);
-        }
+      if (o.state === "emerge") {
+        const m = o.emerge; m.t += dt;
+        o.scale = Math.min(1, 0.1 + m.t * 2.2);
+        if (m.st) {
+          // rises out of the agent, is shown for a moment, then sinks back in to travel home
+          const top = SH + ORB + 0.05;
+          o.z = m.t < 1.6 ? top + 0.5 * ease(Math.min(1, m.t / 0.5)) : top + 0.5 - (m.t - 1.6) * 3;
+          if (m.t > 1.6 && o.z < SH - ORB) { o.state = "hidden"; m.onEnd(); }
+        } else if (m.t > 1.4) { m.onEnd(); }
       }
     }
-    packets = packets.filter((p) => p.state !== "gone");
+    orbs = orbs.filter((o) => o.state !== "gone");
 
-    intake(); dispatch(); teamWork();
+    dispatch();
     ARMS.forEach((a) => runArm(a, dt));
 
-    for (const s of [...Object.values(ST), hub, team, lib]) {
+    for (const s of [...Object.values(ST), hub, team]) {
       if (s.flash > 0) s.flash = Math.max(0, s.flash - dt * 1.4);
       if (s.noteT > 0) { s.noteT -= dt; if (s.noteT <= 0) s.note = ""; }
     }
     ripples.forEach((r) => (r.t += dt)); ripples = ripples.filter((r) => r.t < r.dur);
-    for (const g of signals) { g.s += dt * 7; if (g.s >= g.path.len && g.onEnd) { const f = g.onEnd; g.onEnd = null; f(); } }
-    signals = signals.filter((g) => g.s < g.path.len + 1.6);
+    for (const g of signals) { g.s += dt * 8; if (g.s >= g.path.len && g.onEnd) { const f = g.onEnd; g.onEnd = null; f(); } }
+    signals = signals.filter((g) => g.s < g.path.len + 2);
   }
 
   // ---- Scene pieces
-  function drawBelt(b, t) {
-    const horiz = b.y0 === b.y1, hw = 0.8;
-    let x = Math.min(b.x0, b.x1), y = Math.min(b.y0, b.y1), w = Math.abs(b.x1 - b.x0), d = Math.abs(b.y1 - b.y0);
-    if (horiz) { y -= hw; d = 2 * hw; } else { x -= hw; w = 2 * hw; }
-    box(x, y, 0, w, d, BELT_Z);
-    const len = horiz ? w : d, dir = horiz ? Math.sign(b.x1 - b.x0) : Math.sign(b.y1 - b.y0), gap = 0.7;
-    const off = (((t * V * dir) % gap) + gap) % gap;
+  function drawStream(t) {
+    const x = STREAM.x0, y = STREAM.y - 0.6, w = STREAM.x1 - STREAM.x0, d = 1.2;
+    box(x, y, 0, w, d, STREAM.top);
+    const gap = 0.7, off = (t * V) % gap;
     ctx.save(); ctx.globalAlpha = 0.45; ctx.beginPath();
-    for (let u = off; u < len; u += gap) {
-      const a = horiz ? P(x + u, y + 0.15, BELT_Z) : P(x + 0.15, y + u, BELT_Z);
-      const c = horiz ? P(x + u, y + d - 0.15, BELT_Z) : P(x + w - 0.15, y + u, BELT_Z);
-      ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]);
-    }
+    for (let u = off; u < w; u += gap) { const a = P(x + u, y + 0.12, STREAM.top), c = P(x + u, y + d - 0.12, STREAM.top); ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]); }
     ctx.stroke(); ctx.restore();
+    // the drain at the far end, where everything nobody picked goes back
+    box(STREAM.x1, STREAM.y - 0.9, 0, 1.6, 1.8, STREAM.top + 0.15);
+    poly([P(STREAM.x1 + 0.2, STREAM.y - 0.6, STREAM.top + 0.15), P(STREAM.x1 + 1.3, STREAM.y - 0.6, STREAM.top + 0.15), P(STREAM.x1 + 1.3, STREAM.y + 0.6, STREAM.top + 0.15), P(STREAM.x1 + 0.2, STREAM.y + 0.6, STREAM.top + 0.15)], "ink");
   }
-  function drawPlate(cx, cy) {
-    box(cx - 1.1, cy - 1.1, 0, 2.2, 2.2, BELT_Z + 0.02);
-    ringEllipse(cx, cy, BELT_Z + 0.02, 0.75);
+  function drawLibrary() {
+    const x0 = -17.6, y0 = STREAM.y - 1.8, fx = STREAM.x0;
+    box(x0, y0, 0, fx - x0, 3.6, 4.2, "paper", "hatch", "paper");
+    for (const z of [1.05, 2.1, 3.15]) line(P(fx, y0, z), P(fx, y0 + 3.6, z));
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) {
+      if (r === 0 && c === 1) continue;
+      const u = y0 + 0.15 + c * 1.15, z = r * 1.05 + 0.12, [cx, cy] = P(fx, u + 0.48, z + 0.4);
+      ctx.beginPath(); ctx.ellipse(cx, cy, 0.34 * S, 0.34 * S, 0, 0, Math.PI * 2); fillAs((r * 3 + c) % 4 === 1 ? "hatch" : "paper"); ctx.stroke();
+    }
+    poly([P(fx, STREAM.y - 0.6, 0), P(fx, STREAM.y + 0.6, 0), P(fx, STREAM.y + 0.6, 1.0), P(fx, STREAM.y - 0.6, 1.0)], "ink");
   }
+  function drawTube(tb) {
+    const a = P(...tb.a), b = P(...tb.b), k = S;
+    // posts down to the floor
+    for (const f of [0.3, 0.65]) {
+      const x = tb.a[0] + (tb.b[0] - tb.a[0]) * f, y = tb.a[1] + (tb.b[1] - tb.a[1]) * f;
+      line(P(x, y, 0), P(x, y, TUBE_Z - TUBE_R)); ctx.beginPath(); const [fx, fy] = P(x, y, 0), [rx, ry] = ell(0.22); ctx.ellipse(fx, fy, rx, ry, 0, 0, Math.PI * 2); fillAs("paper"); ctx.stroke();
+    }
+    ctx.save(); ctx.lineCap = "butt";
+    ctx.lineWidth = 2 * TUBE_R * k; ctx.strokeStyle = ink; line(a, b);
+    ctx.lineWidth = 2 * TUBE_R * k - 2 * LW; ctx.strokeStyle = paper; line(a, b);
+    ctx.restore();
+  }
+  function drawCup(tb) { cyl(tb.a[0], tb.a[1], TUBE_Z - 0.45, 0.55, 0.75, "paper", "paper"); const [x, y] = P(tb.a[0], tb.a[1], TUBE_Z + 0.3), [rx, ry] = ell(0.36); ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); fillAs("ink"); }
   function drawDisc(c, r, top, turn, ticks) {
     cyl(c.x, c.y, 0, r, top);
     ctx.save(); ctx.globalAlpha = 0.55; ctx.beginPath();
@@ -511,41 +495,29 @@
     }
     ctx.stroke(); ctx.restore();
   }
-  function drawLibrary() {
-    box(-17.5, -1.8, 0, 3.6, 3.6, 4.4, "paper", "hatch", "paper");
-    const fx = -13.9;
-    for (const z of [1.1, 2.2, 3.3]) line(P(fx, -1.8, z), P(fx, 1.8, z));
-    for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) {
-      if (r === 0 && c === 1) continue;
-      const u = -1.65 + c * 1.15, z = r * 1.1 + 0.1;
-      poly([P(fx, u, z), P(fx, u + 0.95, z), P(fx, u + 0.95, z + 0.8), P(fx, u, z + 0.8)], (r * 3 + c) % 4 === 1 ? "hatch" : (r * 3 + c) % 5 === 2 ? "ink" : "paper");
-    }
-    poly([P(fx, -0.6, 0), P(fx, 0.6, 0), P(fx, 0.6, 1.0), P(fx, -0.6, 1.0)], "ink");
-  }
-  function drawPressBack() {
-    box(-1.8, -15.3, BELT_Z, 0.45, 0.45, 4.4);
-    box(-1.8, -12.15, BELT_Z, 0.45, 0.45, 4.4);
-  }
-  function drawPressHead() {
-    const z = press.headZ;
-    cyl(0, -13.5, z + 0.45, 0.22, 4.82 - (z + 0.45));
-    box(-0.75, -14.25, z, 1.5, 1.5, 0.45, "paper", "paper", "hatch");
-  }
-  function drawBeam() { box(-1.8, -15.3, 4.82, 2.6, 3.6, 0.5); }
   function drawStation(st) {
-    const x = st.x - 1.3, y = st.y - 1.3, fy = st.y + 1.3, lit = st.flash > 0.45;
-    box(x, y, 0, 2.6, 2.6, st.h);
-    poly([P(st.x - 0.6, st.y - 0.6, st.h), P(st.x + 0.6, st.y - 0.6, st.h), P(st.x + 0.6, st.y + 0.6, st.h), P(st.x - 0.6, st.y + 0.6, st.h)], "ink");
-    poly([P(x + 0.35, fy, 0.35), P(x + 2.25, fy, 0.35), P(x + 2.25, fy, 1.6), P(x + 0.35, fy, 1.6)], lit ? "ink" : "paper");
-    faceLogo(st.logo, st.x, fy, 0.975, 0.85, lit ? "paper" : "ink");
+    const x = st.x - SW / 2, y = st.y - SW / 2, fy = st.y + SW / 2, lit = st.flash > 0.45;
+    box(x, y, 0, SW, SW, SH);
+    const [hx, hy] = P(st.x, st.y, SH), [rx, ry] = ell(0.55); ctx.beginPath(); ctx.ellipse(hx, hy, rx, ry, 0, 0, Math.PI * 2); fillAs("ink");
+    poly([P(x + 0.3, fy, 0.3), P(x + SW - 0.3, fy, 0.3), P(x + SW - 0.3, fy, SH - 0.3), P(x + 0.3, fy, SH - 0.3)], lit ? "ink" : "paper");
+    faceLogo(st.logo, st.x, fy, SH / 2, 0.8, lit ? "paper" : "ink");
   }
-  function drawPacket(p) {
-    const s = PK * p.scale; let z = p.z, h = s;
-    if (p.state === "sink") { z = Math.max(p.z, p.floor); h = p.z + PK - z; if (h <= 0.02) return; }
-    ctx.globalAlpha = Math.max(0, p.alpha);
-    const [t, l, r] = STYLE[p.kind];
-    rbox(p.x, p.y, z, s, h, p.ang, t, l, r);
-    ctx.globalAlpha = 1;
+  function drawOrb(o) {
+    const [cx, cy] = P(o.x, o.y, o.z), R = ORB * S * o.scale;
+    if (R < 0.5) return;
+    ctx.save(); ctx.globalAlpha = Math.max(0, o.alpha);
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    if (o.kind === "mine") {
+      fillAs("ink"); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx - R * 0.38, cy - R * 0.38, R * 0.2, 0, Math.PI * 2); fillAs("paper");
+    } else {
+      ctx.save(); ctx.clip();
+      ctx.fillStyle = o.kind === "team" ? cross : hatch; ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+      ctx.beginPath(); ctx.arc(cx - R * 0.3, cy - R * 0.32, R * (o.kind === "team" ? 0.62 : 0.9), 0, Math.PI * 2); fillAs("paper");
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
   }
   function ik(a) {
     const b = a.base, T = a.pos, dx = T[0] - b[0], dy = T[1] - b[1], dz = T[2] - b[2];
@@ -554,22 +526,24 @@
     return [b[0] + Math.cos(a.yaw) * Math.cos(ang) * L, b[1] + Math.sin(a.yaw) * Math.cos(ang) * L, b[2] + Math.sin(ang) * L];
   }
   function drawArm(a) {
-    const k = S / 24, E = ik(a), W3 = a.pos, H3 = [W3[0], W3[1], W3[2] - 0.12];
+    const k = S / 24, E = ik(a), W3 = a.pos;
     const B = P(...a.base), Ep = P(...E), Wp = P(...W3);
     tube(B, Ep, 8 * k); tube(Ep, Wp, 7 * k);
     joint(B, 4.6 * k); joint(Ep, 3.8 * k);
-    if (a.carry) drawPacket(a.carry);
-    // gripper: a bar across the wrist with two fingers that close around the lid
-    const px = -Math.sin(a.yaw) * 0.55, py = Math.cos(a.yaw) * 0.55, fz = H3[2] - GRIP - 0.32;
-    const l = [H3[0] - px, H3[1] - py], r = [H3[0] + px, H3[1] + py];
+    if (a.carry) drawOrb(a.carry);
+    // gripper: a bar across the wrist and two fingers that close round the orb
+    const open = a.carry ? 0.48 : 0.62, px = -Math.sin(a.yaw) * open, py = Math.cos(a.yaw) * open;
+    const hz = W3[2], fz = hz - GRIP - ORB;
+    const l = [W3[0] - px, W3[1] - py], r = [W3[0] + px, W3[1] + py];
     ctx.save(); ctx.lineWidth = 2.2 * LW;
-    line(P(l[0], l[1], H3[2]), P(r[0], r[1], H3[2]));
-    line(P(l[0], l[1], H3[2]), P(l[0], l[1], fz)); line(P(r[0], r[1], H3[2]), P(r[0], r[1], fz));
+    line(P(l[0], l[1], hz), P(r[0], r[1], hz));
+    line(P(l[0], l[1], hz), P(l[0], l[1], fz)); line(P(r[0], r[1], hz), P(r[0], r[1], fz));
     ctx.restore();
     joint(Wp, 3.2 * k);
   }
 
   // Leader-line label in the manner of a technical drawing
+  const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
   function callout(anchor, dx, dy, l1, l2) {
     const k = S / 24, f1 = Math.max(8, Math.min(12, 10.5 * k)), f2 = f1 - 0.5;
     const ex = anchor[0] + dx * k, ey = anchor[1] + dy * k;
@@ -587,19 +561,19 @@
     ctx.fillStyle = muted; ctx.font = `400 ${f2}px ${MONO}`; ctx.fillText(l2, tx, ey + f2 + 2);
     ctx.restore();
   }
-  function tagFor(p) {
-    const k = S / 24, top = P(p.x, p.y, p.z + PK * p.scale + 0.1), y1 = top[1] - 16 * k;
+  function tagFor(o) {
+    const k = S / 24, top = P(o.x, o.y, o.z + ORB * o.scale + 0.1), y1 = top[1] - 16 * k;
     ctx.save(); ctx.lineWidth = Math.max(0.7, LW * 0.8);
     line(top, [top[0], y1]);
     if ("letterSpacing" in ctx) ctx.letterSpacing = "0.02em";
     ctx.font = `400 ${Math.max(8, Math.min(11, 10 * k))}px ${MONO}`; ctx.textAlign = "center";
-    ctx.lineWidth = 4; ctx.strokeStyle = paper; ctx.strokeText(p.name, top[0], y1 - 4);
-    ctx.fillStyle = ink; ctx.fillText(p.name, top[0], y1 - 4);
+    ctx.lineWidth = 4; ctx.strokeStyle = paper; ctx.strokeText(o.name, top[0], y1 - 4);
+    ctx.fillStyle = ink; ctx.fillText(o.name, top[0], y1 - 4);
     ctx.restore();
   }
-  const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
-  const ringCount = (arr) => arr.filter((q) => q && q.state !== "fade" && q.state !== "tfade").length;
+  const held = (arr) => arr.filter((q) => q && q.state === "ring").length;
   const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const inside = (o, s) => Math.abs(o.x - s.x) < SW / 2 + 0.2 && Math.abs(o.y - s.y) < SW / 2 + 0.2;
 
   let clock = 0;
   function draw() {
@@ -608,36 +582,32 @@
     ctx.fillStyle = paper; ctx.fillRect(0, 0, W, H);
     ctx.lineWidth = LW; ctx.lineJoin = "round"; ctx.lineCap = "round"; ctx.strokeStyle = ink;
 
-    // ground level
-    BELTS.forEach((b) => drawBelt(b, clock));
-    drawPlate(11, 0); drawPlate(0, 11);
-    box(-1.8, -15.3, 0, 3.6, 3.6, BELT_Z);
+    // floor level: the stream, both turntables, the tubes and their cups
+    drawStream(clock);
     drawDisc(HUB, HUB.r, HUB.top, rot, 16);
-    ringEllipse(HUB.x, HUB.y, HUB.top, 1.25);
+    ringEllipse(0, 0, HUB.top, 1.2);
     drawDisc(TEAM, TEAM.r, TEAM.top, trot, 10);
+    Object.values(TUBES).forEach(drawTube);
+    Object.values(TUBES).forEach(drawCup);
+    { const b = TUBES.team.b; cyl(b[0], b[1], TUBE_Z - 0.45, 0.55, 0.75); }
 
     // everything that stands up, back to front
     const items = [
-      { k: -15.7, d: drawLibrary },
-      { k: -14.2, d: drawPressBack },
-      { k: -13.2, d: drawPressHead },
-      { k: -13.1, d: drawBeam },
-      { k: 0, d: () => cyl(0, 0, HUB.top, 0.55, 3.0) },
-      { k: TEAM.x, d: () => cyl(TEAM.x, TEAM.y, TEAM.top, 0.35, 2.1) },
+      { k: -17.6 + STREAM.y + 1.8, d: drawLibrary },
+      { k: 0, d: () => cyl(0, 0, HUB.top, 0.5, 3.0) },
+      { k: TEAM.x + TEAM.y, d: () => cyl(TEAM.x, TEAM.y, TEAM.top, 0.3, 1.1) },
     ];
     for (const st of Object.values(ST)) items.push({ k: st.x + st.y, d: () => drawStation(st) });
-    for (const p of packets) {
-      if (p.state === "arm") continue;
-      let k = p.x + p.y + p.z * 0.02;
-      if (p.state === "hop" || p.state === "sink") k = p.hop.st.x + p.hop.st.y + 0.05;
-      items.push({ k, d: () => drawPacket(p) });
+    for (const o of orbs) {
+      if (o.state === "arm" || o.state === "hidden") continue;
+      let k = o.x + o.y + o.z * 0.02;
+      for (const st of Object.values(ST)) if (inside(o, st)) k = o.state === "emerge" && o.z > SH ? st.x + st.y + 0.05 : st.x + st.y - 0.05;
+      items.push({ k, d: () => drawOrb(o) });
     }
     items.sort((a, b) => a.k - b.k).forEach((it) => it.d());
 
-    // arms over the turntables
-    drawArm(arm1); drawArm(arm2); drawArm(armT);
+    drawArm(arm1); drawArm(arm2);
 
-    // ripples and update signals
     ctx.save();
     for (const r of ripples) {
       const k = r.t / r.dur; ctx.globalAlpha = 1 - k; ctx.lineWidth = LW;
@@ -647,37 +617,31 @@
     for (const g of signals) {
       for (let j = 0; j < 7; j++) {
         const s = g.s - j * 0.32; if (s < 0 || s > g.path.len) continue;
-        const [x, y, z] = along(g.path, s), q = P(x, y, z);
+        const q = P(...along(g.path, s));
         ctx.beginPath(); ctx.arc(q[0], q[1], Math.max(1, (4.2 - j * 0.45) * (S / 24)), 0, Math.PI * 2);
         ctx.fillStyle = ink; ctx.globalAlpha = 1 - j / 8; ctx.fill(); ctx.globalAlpha = 1;
       }
     }
 
     // labels
-    const n = ringCount(ring);
-    callout(P(-13.9, -1.8, 4.4), 30, -26, "PUBLIC LIBRARY", "trusted skills");
-    callout(P(1.8, -11.7, BELT_Z), 34, 14, "YOUR WORKBENCH", "skills you make");
-    callout(P(2.19, -2.19, HUB.top), 46, -8, "YOU", hub.note || `${plural(n, "skill")} · 4 agents`);
-    callout(P(TEAM.x + 1.13, TEAM.y + 1.13, TEAM.top), 26, 22, "@TEAMMATE", team.note || plural(ringCount(tring), "skill"));
-    const at = { pc: [26, -30], pk: [28, 26], wh: [28, 26], wc: [26, -30] };
-    for (const [id, st] of Object.entries(ST)) {
-      const [dx, dy] = at[id];
-      const anchor = dy < 0 ? P(st.x + 1.3, st.y - 1.3, st.h) : P(st.x + 1.3, st.y + 1.3, 0.9);
-      callout(anchor, dx, dy, st.name, st.note || `${st.kind} · ${plural(st.skills.size, "skill")}`);
-    }
-    for (const p of packets) if (p.tag && (p.state === "belt" || p.state === "hold" || p.state === "wait")) tagFor(p);
+    callout(P(STREAM.x0, STREAM.y - 1.8, 4.2), 30, -24, "PUBLIC SKILLS", "a stream of trusted skills");
+    callout(P(-2.12, 2.12, HUB.top), -40, -16, "YOU", hub.note || `${plural(held(ring), "skill")} · 4 agents`);
+    callout(P(TEAM.x + 1.06, TEAM.y + 1.06, TEAM.top), 22, 24, "@TEAMMATE", team.note || plural(held(tring), "skill"));
+    for (const st of Object.values(ST)) callout(P(st.x + SW / 2, st.y + SW / 2, 0.9), 22, 24, st.name, st.note || `${st.kind} · ${plural(st.skills.size, "skill")}`);
+    for (const o of orbs) if (o.tag && (o.state === "stream" || o.state === "emerge" || o.state === "tube")) tagFor(o);
   }
 
   // ---- Fit the drawing to the banner width
   const BOUNDS = (() => {
     const pts = [];
     const add = (x, y, z) => pts.push([(x - y) * C30, (x + y) * 0.5 - z]);
-    [[-17.5, -1.8, 0], [-13.9, 1.8, 0], [-17.5, -1.8, 4.4], [-13.9, 1.8, 4.4], [-13.9, -1.8, 4.4]].forEach((p) => add(...p));
-    [[-1.8, -15.3, 5.32], [0.8, -11.7, 5.32], [1.8, -15.3, 0.4], [1.8, -11.7, 0]].forEach((p) => add(...p));
-    for (const s of Object.values(ST)) for (const dx of [-1.3, 1.3]) for (const dy of [-1.3, 1.3]) { add(s.x + dx, s.y + dy, 0); add(s.x + dx, s.y + dy, s.h); }
-    add(TEAM.x + 1.6, TEAM.y + 1.6, 0); add(0, 0, 6.2);
+    for (const z of [0, 4.2]) for (const y of [STREAM.y - 1.8, STREAM.y + 1.8]) add(-17.6, y, z), add(STREAM.x0, y, z);
+    add(STREAM.x1 + 1.6, STREAM.y - 0.9, 0); add(STREAM.x1 + 1.6, STREAM.y + 0.9, 0);
+    for (const s of Object.values(ST)) for (const dx of [-1.2, 1.2]) for (const dy of [-1.2, 1.2]) { add(s.x + dx, s.y + dy, 0); add(s.x + dx, s.y + dy, SH); }
+    for (const a of [0, 1, 2, 3]) add(TEAM.x + Math.cos(a * Math.PI / 2) * TEAM.r, TEAM.y + Math.sin(a * Math.PI / 2) * TEAM.r, 0);
+    add(0, 0, 6.4);
     const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-    return { minX: Math.min(...xs) - 3, maxX: Math.max(...xs) + 7.4, minY: Math.min(...ys) - 2.6, maxY: Math.max(...ys) + 2.6 };
+    return { minX: Math.min(...xs) - 1.5, maxX: Math.max(...xs) + 5.5, minY: Math.min(...ys) - 2.4, maxY: Math.max(...ys) + 2.6 };
   })();
   function layout() {
     W = Math.round(plate.clientWidth);
@@ -692,9 +656,11 @@
   new ResizeObserver(() => { layout(); if (reduce) draw(); }).observe(plate);
   layout();
 
+  // Fill the stream before the first frame
+  for (let x = STREAM.x0 + 0.1; x < STREAM.x1; x += V * 0.8) mk("", "pub", x, STREAM.y, STREAM.top + ORB, "stream");
+
   if (reduce) {
-    // A still frame of the running line
-    for (let i = 0; i < 60 * 20; i++) { update(1 / 60); clock += 1 / 60; }
+    for (let i = 0; i < 60 * 26; i++) { step(1 / 60); clock += 1 / 60; }
     caption(3);
     draw();
     const redraw = () => { themeKey = ""; draw(); };
@@ -704,7 +670,7 @@
     let last = performance.now();
     const frame = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      update(dt); clock += dt; draw();
+      step(dt); clock += dt; draw();
       requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
