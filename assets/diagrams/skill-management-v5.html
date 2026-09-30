@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@200&display=swap" rel="stylesheet">
 <style>
-  /* Banner: an isometric line drawing of a skill production line, ink on paper, no colour */
+  /* Banner: a marble machine in side view, ink on paper, no colour */
   :root {
     --paper: #ffffff;
     --ink: #151515;
@@ -38,7 +38,7 @@
 
 <div class="banner">
   <div class="plate">
-    <canvas id="line" role="img" aria-label="An isometric production line. Public skills stream past on a conveyor and a robot arm on your turntable picks the ones you want. Tubes join your turntable to ChatGPT, Claude, Hermes and your teammate: skills made on an agent travel back to you and are handed on to the others, and an update made in one place spreads to every agent."></canvas>
+    <canvas id="line" role="img" aria-label="A marble machine. Public skills roll past on a track and a gate drops the one you pick onto your wheel. Your wheel sends copies down to ChatGPT, Claude, Hermes and your teammate. A skill made on an agent rolls back along the floor and rides a lift up to your wheel, which passes it on, and an update in one place spreads to every agent."></canvas>
     <div class="caption" aria-live="polite"><span class="idx">01 / 04</span><span class="txt">Discover trusted public skills</span></div>
   </div>
 </div>
@@ -57,10 +57,10 @@
   const capEl = document.querySelector(".caption");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // ---- Isometric projection: world x runs down-right, y down-left, z up
-  const C30 = Math.cos(Math.PI / 6);
-  let S = 20, OX = 0, OY = 0, DPR = 1, W = 0, H = 0, LW = 1;
-  const P = (x, y, z = 0) => [OX + (x - y) * C30 * S, OY + ((x + y) * 0.5 - z) * S];
+  // ---- Side view of a marble machine, drawn in a fixed 1200 x 610 space and scaled to the banner width
+  const VW = 1200, VH = 610;
+  let s = 1, DPR = 1, W = 0, H = 0;
+  const LW = 1.25, R = 8, DX = 9, DY = -7; // line weight, marble radius, oblique depth
 
   // ---- Theme: ink, paper and two hatch patterns, re-read when the theme flips
   let ink = "#151515", paper = "#fff", muted = "#8c8c90", hatch = null, cross = null, themeKey = "";
@@ -68,7 +68,7 @@
   function readTheme() {
     const cs = getComputedStyle(document.documentElement);
     const i = cs.getPropertyValue("--ink").trim(), p = cs.getPropertyValue("--paper").trim();
-    const key = i + p + DPR;
+    const key = i + p + DPR + s;
     if (key === themeKey) return;
     themeKey = key; ink = i; paper = p; muted = cs.getPropertyValue("--muted").trim();
     makePatterns(); tintLogos();
@@ -77,7 +77,7 @@
     const t = Math.max(1, Math.round(DPR)), n = 5 * t;
     const c = document.createElement("canvas"); c.width = c.height = n;
     const g = c.getContext("2d"); g.strokeStyle = ink; g.lineWidth = 0.8 * t; draw(g, n);
-    const pat = ctx.createPattern(c, "repeat"); pat.setTransform(new DOMMatrix().scale(1 / t));
+    const pat = ctx.createPattern(c, "repeat"); pat.setTransform(new DOMMatrix().scale(1 / (DPR * s)));
     return pat;
   }
   function makePatterns() {
@@ -85,7 +85,6 @@
     hatch = patternTile(diag);
     cross = patternTile((g, n) => { diag(g, n); g.beginPath(); for (let k = -n; k <= n; k += n) { g.moveTo(k, 0); g.lineTo(k + n, n); } g.stroke(); });
   }
-  // The Hermes mark is a bitmap: keep two tinted copies (ink and paper)
   const hermesImg = new Image();
   hermesImg.onload = tintLogos;
   hermesImg.src = LOGOS.hermes.img;
@@ -106,269 +105,147 @@
     if (f === "hatch" || f === "cross") { ctx.fillStyle = paper; ctx.fill(); ctx.fillStyle = f === "hatch" ? hatch : cross; ctx.fill(); }
     else { ctx.fillStyle = f === "ink" ? ink : f === "paper" ? paper : f; ctx.fill(); }
   }
-  function poly(pts, f) {
+  function poly(pts, f, stroke = true) {
     ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
     for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-    ctx.closePath(); fillAs(f); ctx.stroke();
+    ctx.closePath(); fillAs(f); if (stroke) ctx.stroke();
   }
   function line(a, b) { ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
-  // Axis-aligned block: the viewer sees the top, the +y face (left) and the +x face (right)
-  function box(x, y, z, w, d, h, top = "paper", left = "paper", right = "hatch") {
-    poly([P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], left);
-    poly([P(x + w, y + d, z), P(x + w, y, z), P(x + w, y, z + h), P(x + w, y + d, z + h)], right);
-    poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], top);
+  function circle(x, y, r, f) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); fillAs(f); ctx.stroke(); }
+  // Block in oblique projection: front face, then the top and right faces going back
+  function block(x, y, w, h, front = "paper", top = "paper", side = "hatch") {
+    poly([[x, y], [x + DX, y + DY], [x + w + DX, y + DY], [x + w, y]], top);
+    poly([[x + w, y], [x + w + DX, y + DY], [x + w + DX, y + h + DY], [x + w, y + h]], side);
+    poly([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], front);
   }
-  // Square block turned by `ang` around its centre (packets on the turntable and in the grippers)
-  function rbox(cx, cy, z, s, h, ang, top, left, right) {
-    const c = Math.cos(ang), sn = Math.sin(ang), hs = s / 2;
-    const q = [[-hs, -hs], [hs, -hs], [hs, hs], [-hs, hs]].map(([u, v]) => [cx + u * c - v * sn, cy + u * sn + v * c]);
-    for (let i = 0; i < 4; i++) {
-      const a = q[i], b = q[(i + 1) % 4], nx = b[1] - a[1], ny = a[0] - b[0];
-      if (nx + ny <= 1e-6) continue;
-      poly([P(a[0], a[1], z), P(b[0], b[1], z), P(b[0], b[1], z + h), P(a[0], a[1], z + h)], nx > ny ? right : left);
-    }
-    poly(q.map(([x, y]) => P(x, y, z + h)), top);
-  }
-  // Upright cylinder; a circle on the ground projects to an axis-aligned ellipse
-  const ell = (r) => [r * 1.2247 * S, r * 0.7071 * S];
-  function cyl(cx, cy, z, r, h, top = "paper", side = "paper") {
-    const [bx, by] = P(cx, cy, z), [tx, ty] = P(cx, cy, z + h), [rx, ry] = ell(r);
-    ctx.beginPath(); ctx.ellipse(bx, by, rx, ry, 0, 0, Math.PI); ctx.lineTo(tx - rx, ty);
-    ctx.ellipse(tx, ty, rx, ry, 0, Math.PI, 0, true); ctx.closePath(); fillAs(side); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(tx, ty, rx, ry, 0, 0, Math.PI * 2); fillAs(top); ctx.stroke();
-  }
-  function ringEllipse(cx, cy, z, r) { const [x, y] = P(cx, cy, z), [rx, ry] = ell(r); ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke(); }
-  // A logo painted flat onto a +y face, so it follows the isometric plane
-  function faceLogo(key, cx, fy, cz, size, col) {
-    const [ox, oy] = P(cx - size / 2, fy, cz + size / 2), k = size / 24;
-    ctx.save(); ctx.transform(C30 * S * k, 0.5 * S * k, 0, S * k, ox, oy);
+  function logo(key, cx, cy, size, col) {
+    const k = size / 24;
+    ctx.save(); ctx.translate(cx - size / 2, cy - size / 2); ctx.scale(k, k);
     if (logoPaths[key]) { ctx.fillStyle = col === "ink" ? ink : paper; ctx.fill(logoPaths[key]); }
     else if (logoTint[col]) ctx.drawImage(logoTint[col], 0, 0, 24, 24);
     ctx.restore();
   }
-  // Hollow tube, drawn as a thick ink stroke with a paper core
-  function tube(a, b, w) {
-    ctx.save(); ctx.lineCap = "round";
-    ctx.lineWidth = w; ctx.strokeStyle = ink; line(a, b);
-    ctx.lineWidth = Math.max(1, w - 2.4 * LW); ctx.strokeStyle = paper; line(a, b);
+  const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
+  function text(str, x, y, { size = 10, weight = 400, color = ink, align = "left", spacing = "0.06em" } = {}) {
+    ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = spacing;
+    ctx.font = `${weight} ${size}px ${MONO}`; ctx.textAlign = align; ctx.fillStyle = color; ctx.fillText(str, x, y);
     ctx.restore();
   }
-  function joint(p, r) { ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, Math.PI * 2); fillAs("paper"); ctx.stroke(); }
 
-  // ---- The plant
-  const ORB = 0.42, GRIP = 0.22, V = 2.2, TUBE_V = 5.5, TUBE_Z = 0.95, TUBE_R = 0.5;
-  const HUB = { x: 0, y: 0, top: 0.6, r: 3.0, ringR: 2.1, slots: 8, mouthR: 3.75 };
-  const TEAM = { x: 17, y: -3, top: 0.45, r: 1.5, ringR: 0.8, slots: 4 };
-  const STREAM = { y: -4.4, x0: -14, x1: 9.2, top: 0.4, pickX: -0.5 };
-  const deg = (d) => (d * Math.PI) / 180;
-  const ST = {
-    pc: { x: 1, y: 13, logo: "chatgpt", name: "CHATGPT", kind: "personal", mouth: deg(89), skills: new Set(["swiftui-pro", "code-review"]) },
-    pk: { x: 5, y: 9, logo: "claude", name: "CLAUDE", kind: "personal", mouth: deg(63), skills: new Set(["humanizer", "swiftui-pro"]) },
-    wh: { x: 9, y: 5, logo: "hermes", name: "HERMES", kind: "work", mouth: deg(37), skills: new Set(["grill-me"]) },
-    wc: { x: 13, y: 1, logo: "chatgpt", name: "CHATGPT", kind: "work", mouth: deg(11), skills: new Set(["frontend-design"]) },
+  // ---- The machine. Every track is a list of points for the marble's centre.
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const onLine = (seg, x) => lerp(seg[0][1], seg[1][1], (x - seg[0][0]) / (seg[1][0] - seg[0][0]));
+  const STREAM = [[150, 104], [1010, 176]];        // public skills roll left to right
+  const GATE = 600;                                 // where you pick from the stream
+  const BIN = { x: 1000, y: 196, w: 84, h: 40 };    // everything not picked
+  const WHEEL = { x: 600, y: 300, r: 92, n: 8 };    // you
+  const FUNNEL = [600, 424];
+  const LEFT = [[588, 440], [140, 470]], RIGHT = [[612, 440], [1168, 470]];
+  const RETURN = [[1170, 574], [58, 594]];          // back along the floor
+  const LIFT = { x: 40, bottom: 594, top: 208 };
+  const FEED = [[40, 208], [496, 294]];             // from the top of the lift into your wheel
+  const BOWL_Y = 492, PED = { top: 502, h: 50, w: 88 };
+  const AGENTS = {
+    pc: { x: 215, name: "CHATGPT", kind: "personal", logo: "chatgpt", track: LEFT, skills: new Set(["swiftui-pro", "code-review"]) },
+    pk: { x: 395, name: "CLAUDE", kind: "personal", logo: "claude", track: LEFT, skills: new Set(["humanizer", "swiftui-pro"]) },
+    wh: { x: 805, name: "HERMES", kind: "work", logo: "hermes", track: RIGHT, skills: new Set(["grill-me"]) },
+    wc: { x: 985, name: "CHATGPT", kind: "work", logo: "chatgpt", track: RIGHT, skills: new Set(["frontend-design"]) },
+    team: { x: 1120, name: "@TEAMMATE", kind: "team", logo: null, track: RIGHT, skills: new Set(["frontend-design", "canvas-design"]) },
   };
-  const SW = 2.4, SH = 1.8; // agent block footprint and height
-  for (const s of Object.values(ST)) { s.flash = 0; s.note = ""; s.noteT = 0; }
-  const team = { flash: 0, note: "", noteT: 0, mouth: deg(-15) };
-  const hub = { note: "", noteT: 0 };
+  for (const a of Object.values(AGENTS)) { a.flash = 0; a.note = ""; a.noteT = 0; a.door = 0; a.pile = []; }
+  const you = { note: "", noteT: 0, flash: 0 };
+  const gate = { open: 0 };
 
-  // Tubes join every agent (and your teammate) to a cup on the rim of your turntable
-  const mouthPt = (a) => [HUB.mouthR * Math.cos(a), HUB.mouthR * Math.sin(a), TUBE_Z];
-  const TUBES = {};
-  for (const [id, s] of Object.entries(ST)) TUBES[id] = { a: mouthPt(s.mouth), b: [s.x, s.y, TUBE_Z], st: s };
-  {
-    const m = mouthPt(team.mouth), dx = m[0] - TEAM.x, dy = m[1] - TEAM.y, l = Math.hypot(dx, dy);
-    TUBES.team = { a: m, b: [TEAM.x + (dx / l) * (TEAM.r + 0.1), TEAM.y + (dy / l) * (TEAM.r + 0.1), TUBE_Z], st: null };
-  }
-
-  // ---- Paths
+  // ---- Paths: rolling segments keep a steady speed, drops accelerate, lifts climb slowly
   function mkPath(pts) {
     const L = [0];
-    for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1], pts[i][2] - pts[i - 1][2]));
+    for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
     return { pts, L, len: L[L.length - 1] };
   }
-  function along(path, s) {
-    const { pts, L } = path; let i = 1;
-    while (i < L.length - 1 && L[i] < s) i++;
-    const a = pts[i - 1], b = pts[i], k = L[i] === L[i - 1] ? 1 : Math.max(0, Math.min(1, (s - L[i - 1]) / (L[i] - L[i - 1])));
-    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+  function segAt(path, d) { let i = 1; while (i < path.L.length - 1 && path.L[i] < d) i++; return i; }
+  function at(path, d) {
+    const i = segAt(path, d), a = path.pts[i - 1], b = path.pts[i], span = path.L[i] - path.L[i - 1];
+    const k = span ? Math.max(0, Math.min(1, (d - path.L[i - 1]) / span)) : 1;
+    return [lerp(a[0], b[0], k), lerp(a[1], b[1], k), b[0] - a[0], b[1] - a[1]];
   }
+  const ROLL = 150, CLIMB = 120, DRIFT = 42, EVERY = 1.7; // the public stream drifts slowly past
 
-  // ---- State. An orb's (x, y, z) is its centre.
-  let rot = 0.3, trot = 0, orbs = [], ripples = [], signals = [], born = 0, streamT = 0;
-  const ring = new Array(HUB.slots).fill(null), tring = new Array(TEAM.slots).fill(null);
-  function mk(name, kind, x, y, z, state) {
-    const o = { name, kind, x, y, z, state, scale: 1, alpha: 1, routes: [], tag: false, born: born++ };
-    orbs.push(o); return o;
+  // ---- State
+  let rot = 0, marbles = [], ripples = [], pulses = [], born = 0, streamT = 0;
+  const gondolas = new Array(WHEEL.n).fill(null);
+  function mk(name, kind, x, y, state) {
+    const m = { name, kind, x, y, state, v: 0, scale: 1, alpha: 1, routes: [], tag: false, born: born++, lastCopy: -9 };
+    marbles.push(m); return m;
   }
-  const slotAng = (i) => rot + (i * 2 * Math.PI) / HUB.slots;
-  const slotPos = (i) => { const a = slotAng(i); return [HUB.ringR * Math.cos(a), HUB.ringR * Math.sin(a), HUB.top + ORB]; };
-  const tslotAng = (i) => trot + (i * 2 * Math.PI) / TEAM.slots;
-  const tslotPos = (i) => { const a = tslotAng(i); return [TEAM.x + TEAM.ringR * Math.cos(a), TEAM.y + TEAM.ringR * Math.sin(a), TEAM.top + ORB]; };
+  const gAng = (i) => rot + (i * 2 * Math.PI) / WHEEL.n;
+  const pivot = (i) => [WHEEL.x + WHEEL.r * Math.cos(gAng(i)), WHEEL.y + WHEEL.r * Math.sin(gAng(i))];
+  const cupPos = (i) => { const [x, y] = pivot(i); return [x, y + 13]; };
   const wrapA = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
-  const grip = (o) => () => [o.x, o.y, o.z + ORB * o.scale + GRIP];
-  const gripAt = (fn) => () => { const q = fn(); return [q[0], q[1], q[2] + ORB + GRIP]; };
-  function ripple(x, y, z, r1 = 1.6, dur = 1.1) { ripples.push({ x, y, z, r0: 0.3, r1, t: 0, dur }); }
-  function freeSlot(arr, angFn, want) {
+  function ripple(x, y, r1 = 26, dur = 0.9) { ripples.push({ x, y, r1, t: 0, dur }); }
+  function note(o, str, t = 2.2) { o.note = str; o.noteT = t; o.flash = 1; }
+
+  function follow(m, pts, onEnd) { m.state = "path"; m.path = mkPath(pts); m.d = 0; m.onEnd = onEnd; }
+  // Settle into the free gondola nearest a point on the wheel
+  function board(m, near, routes) {
     let best = -1, bd = 1e9;
-    arr.forEach((q, i) => { if (!q) { const d = Math.abs(wrapA(angFn(i) - want)); if (d < bd) { bd = d; best = i; } } });
-    return best;
-  }
-  function claim(arr, angFn, want, o) {
-    const i = freeSlot(arr, angFn, want);
-    if (i >= 0) arr[i] = o;
-    return i;
-  }
-  function makeRoom(arr) {
-    const c = arr.filter((q) => q && q.state === "ring" && !q.routes.length && !q.busy).sort((a, b) => a.born - b.born)[0];
-    if (c) { c.state = "fade"; return true; }
-    return false;
-  }
-  function settle(arr, o, i) {
-    arr[i] = o; o.slot = i; o.state = "ring"; o.home = arr;
-    for (const q of arr) if (q && q !== o && q.name === o.name && q.state === "ring") q.state = "fade";
-  }
-
-  // Seed: what you and your teammate already keep
-  [["swiftui-pro", "pub", 0], ["release-notes", "mine", 2], ["code-review", "pub", 4], ["frontend-design", "team", 5], ["humanizer", "pub", 7]]
-    .forEach(([n, k, i]) => settle(ring, mk(n, k, 0, 0, 0, "ring"), i));
-  [["frontend-design", "team", 0], ["canvas-design", "team", 2]].forEach(([n, k, i]) => settle(tring, mk(n, k, 0, 0, 0, "ring"), i));
-
-  // ---- Arms: the wrist moves in cylindrical coordinates around the base, so arms swing instead of cutting across
-  function Arm(base, L, homeAng, homeR, homeZ) {
-    const home = [base[0] + homeR * Math.cos(homeAng), base[1] + homeR * Math.sin(homeAng), homeZ];
-    return { base, L, home, pos: home.slice(), job: null, free: true, carry: null, yaw: homeAng };
-  }
-  const arm1 = Arm([0, 0, 3.5], 2.6, deg(-75), 2.4, 3.0); // picks from the public stream, at the back
-  const arm2 = Arm([0, 0, 2.7], 2.6, deg(15), 2.5, 2.3);   // hands copies to the tubes, at the front
-  const ARMS = [arm1, arm2];
-  const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
-  function cylLerp(b, f, t, e, lift) {
-    const af = Math.atan2(f[1] - b[1], f[0] - b[0]), rf = Math.hypot(f[0] - b[0], f[1] - b[1]);
-    const at = Math.atan2(t[1] - b[1], t[0] - b[0]), rt = Math.hypot(t[0] - b[0], t[1] - b[1]);
-    const a = af + wrapA(at - af) * e, r = rf + (rt - rf) * e;
-    return [b[0] + r * Math.cos(a), b[1] + r * Math.sin(a), f[2] + (t[2] - f[2]) * e + lift * Math.sin(Math.PI * e)];
-  }
-  const up = (f, h) => () => { const q = f(); return [q[0], q[1], q[2] + h]; };
-  function runArm(a, dt) {
-    const j = a.job;
-    if (j) {
-      const st = j.steps[j.i];
-      if (!st.started) { st.started = true; st.t = 0; st.from = a.pos.slice(); }
-      st.t += dt;
-      const k = Math.min(1, st.t / st.dur);
-      a.pos = cylLerp(a.base, st.from, st.to(), ease(k), st.lift || 0);
-      if (k >= 1 && (!st.until || st.until())) {
-        if (st.call) st.call();
-        j.i++;
-        if (j.i >= j.steps.length) { a.job = null; a.free = true; }
-        else if (j.steps[j.i].idle) a.free = true;
-      }
+    gondolas.forEach((g, i) => { if (!g) { const [x, y] = cupPos(i), d = Math.hypot(x - near[0], y - near[1]); if (d < bd) { bd = d; best = i; } } });
+    if (best < 0) { // wheel full: let the oldest idle skill go
+      const old = gondolas.filter((g) => g && !g.routes.length).sort((a, b) => a.born - b.born)[0];
+      if (old) { gondolas[old.slot] = null; old.state = "fade"; best = old.slot; }
     }
-    const dx = a.pos[0] - a.base[0], dy = a.pos[1] - a.base[1];
-    if (Math.hypot(dx, dy) > 0.2) a.yaw = Math.atan2(dy, dx);
-    if (a.carry) { const o = a.carry; o.x = a.pos[0]; o.y = a.pos[1]; o.z = a.pos[2] - GRIP - ORB; }
+    gondolas[best] = m; m.slot = best; m.routes = routes || [];
+    m.state = "boarding"; m.bt = 0; m.bx = m.x; m.by = m.y;
+    for (const g of gondolas) if (g && g !== m && g.name === m.name) { gondolas[g.slot] = null; g.state = "fade"; }
   }
-  const tail = (a) => [
-    { to: () => a.home, dur: 0.8, idle: true },
-  ];
 
-  // Discover: wait over the stream, then pluck the chosen skill as it passes
-  const PICK = [STREAM.pickX, STREAM.y, STREAM.top + ORB];
-  function pluck(o) {
-    let i = -1, sp = null;
-    arm1.free = false;
-    arm1.job = { i: 0, steps: [
-      { to: up(gripAt(() => PICK), 1.1), dur: 0.7, lift: 0.2 },
-      { to: up(gripAt(() => PICK), 1.1), dur: 0.05, until: () => o.x >= PICK[0] - V * 0.3 },
-      { to: grip(o), dur: 0.3 },
-      { to: grip(o), dur: 0.01, call: () => { sp = [o.x, o.y, o.z]; o.state = "arm"; arm1.carry = o; } },
-      { to: up(gripAt(() => sp), 1.2), dur: 0.35 },
-      { to: () => { if (i < 0) i = claim(ring, slotAng, deg(-140), o); const q = i < 0 ? PICK : slotPos(i); return [q[0], q[1], q[2] + ORB + GRIP + 1.0]; }, dur: 0.7, lift: 0.3 },
-      { to: gripAt(() => slotPos(i)), dur: 0.3, until: () => i >= 0 || (i = claim(ring, slotAng, deg(-140), o)) >= 0 || (makeRoom(ring), false) },
-      { to: gripAt(() => slotPos(i)), dur: 0.08, call: () => { arm1.carry = null; o.tag = false; settle(ring, o, i); ripple(o.x, o.y, HUB.top, 0.9, 0.7); } },
-      { to: up(gripAt(() => slotPos(i)), 1.0), dur: 0.3, idle: true },
-      ...tail(arm1),
-    ] };
+  // Seed what you already keep
+  [["swiftui-pro", "pub", 0], ["release-notes", "mine", 2], ["code-review", "pub", 4], ["frontend-design", "team", 5], ["humanizer", "pub", 7]].forEach(([n, k, i]) => {
+    const m = mk(n, k, 0, 0, "ride"); gondolas[i] = m; m.slot = i;
+  });
+  for (const a of Object.values(AGENTS)) a.pile = [...a.skills].slice(0, 5).map((n) => (n === "release-notes" ? "mine" : a.kind === "team" || n === "frontend-design" || n === "canvas-design" ? "team" : "pub"));
+
+  // A copy leaves the bottom gondola, drops through the funnel and rolls to its agent's trapdoor
+  function deliver(m, id) {
+    const a = AGENTS[id], tr = a.track, start = tr === LEFT ? LEFT[0] : RIGHT[0];
+    const c = mk(m.name, m.kind, m.x, m.y, "path");
+    follow(c, [[m.x, m.y], [FUNNEL[0], FUNNEL[1] - 6], [start[0], start[1]], [a.x, onLine(tr, a.x)], [a.x, BOWL_Y]], () => land(c, a));
+    c.dropX = a.x; c.agent = a;
   }
-  // Distribute: lift a copy off your turntable and drop it into the cup of the agent's tube
-  function dispatch() {
-    if (!arm2.free) return;
-    const o = ring.find((q) => q && q.state === "ring" && q.routes.length && !q.busy && (() => { const a = wrapA(slotAng(q.slot)); return a > deg(-60) && a < deg(115); })());
-    if (!o) return;
-    const route = o.routes.shift(), cup = TUBES[route].a;
-    let copy = null; o.busy = true; arm2.free = false;
-    arm2.job = { i: 0, steps: [
-      { to: up(grip(o), 0.9), dur: 0.55, lift: 0.2 },
-      { to: grip(o), dur: 0.25 },
-      { to: grip(o), dur: 0.08, call: () => { o.busy = false; copy = mk(o.name, o.kind, o.x, o.y, o.z, "arm"); arm2.carry = copy; ripple(o.x, o.y, HUB.top, 0.7, 0.5); } },
-      { to: up(grip(o), 1.0), dur: 0.3 },
-      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 0.9], dur: 0.6, lift: 0.3 },
-      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 0.35], dur: 0.2 },
-      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 0.35], dur: 0.06, call: () => { arm2.carry = null; drop(copy, route); } },
-      { to: () => [cup[0], cup[1], cup[2] + ORB + GRIP + 1.1], dur: 0.3, idle: true },
-      ...tail(arm2),
-    ] };
+  function land(m, a) {
+    m.state = "gone"; a.skills.add(m.name); a.pile = [m.kind, ...a.pile].slice(0, 5);
+    note(a, a.kind === "team" ? "received" : "installed", 1.8); ripple(a.x, BOWL_Y - 4, 34);
   }
-  function drop(o, route) {
-    o.state = "fall"; o.fall = { z1: TUBE_Z, onEnd: () => send(o, TUBES[route], true, () => arriveAt(o, route)) };
-  }
-  // Travel along a tube; out = away from you
-  function send(o, tube, out, onEnd) {
-    o.state = "tube"; o.s = 0; o.tube = tube; o.path = mkPath(out ? [tube.a, tube.b] : [tube.b, tube.a]); o.onEnd = onEnd;
-  }
-  function arriveAt(o, route) {
-    if (route === "team") { hop(o, () => claim(tring, tslotAng, Math.atan2(-TEAM.y, -TEAM.x), o), tring, tslotPos, () => { team.flash = 1; team.note = "received"; team.noteT = 2.2; }); return; }
-    const s = ST[route]; o.state = "gone"; s.skills.add(o.name); s.flash = 1; s.note = "installed"; s.noteT = 1.8; ripple(s.x, s.y, SH, 1.6);
-  }
-  // Pop out of a tube end onto a free spot on a turntable
-  function hop(o, pickSlot, arr, posFn, done) {
-    let i = pickSlot();
-    if (i < 0) { makeRoom(arr); i = -1; }
-    o.state = "hop"; o.hop = { x0: o.x, y0: o.y, z0: o.z, t: 0, dur: 0.6, to: () => { if (i < 0) i = pickSlot(); return i < 0 ? [o.x, o.y, o.z] : posFn(i); },
-      end: () => { if (i < 0) { i = pickSlot(); if (i < 0) { o.hop.t = 0; return; } } settle(arr, o, i); done && done(); } };
-  }
-  // Something arrives at your turntable from an agent or your teammate
-  function arriveHome(o, routes) {
-    hop(o, () => claim(ring, slotAng, Math.atan2(o.y, o.x), o), ring, slotPos, () => { o.routes = routes; ripple(o.x, o.y, HUB.top, 1.0, 0.7); hub.note = "collected"; hub.noteT = 1.8; });
+  // Back to you: drop through the stand, roll home along the floor, ride the lift, feed into the wheel
+  function goHome(m, a, routes) {
+    follow(m, [[a.x, BOWL_Y - 6], [a.x, onLine(RETURN, a.x)], [LIFT.x + 12, onLine(RETURN, LIFT.x + 12)], [LIFT.x, LIFT.bottom - 6], [LIFT.x, LIFT.top], FEED[1]],
+      () => { board(m, [WHEEL.x - WHEEL.r, WHEEL.y], routes); note(you, "collected", 1.8); });
   }
 
   // ---- The four moves
   const PUBLIC = ["grill-me", "napkin", "gstack", "mcp-builder", "swiftdata-pro", "humanizer"];
   let pi = 0;
   function discover(routes) {
-    // choose the next unclaimed skill far enough upstream for the arm to get there first
-    const lead = PICK[0] - V * 1.4;
-    const o = orbs.filter((q) => q.state === "stream" && !q.target && q.x < lead).sort((a, b) => b.x - a.x)[0];
-    if (!o || !arm1.free) return;
-    o.target = true; o.tag = true; o.name = PUBLIC[pi++ % PUBLIC.length]; o.routes = routes;
-    pluck(o);
+    const m = marbles.filter((q) => q.state === "stream" && !q.target && q.x < GATE - 50).sort((a, b) => b.x - a.x)[0];
+    if (!m) return;
+    m.target = true; m.tag = true; m.name = PUBLIC[pi++ % PUBLIC.length]; m.routes = routes;
   }
   function create(id, name, routes) {
-    const s = ST[id], o = mk(name, "mine", s.x, s.y, SH + ORB + 0.05, "emerge");
-    o.scale = 0.1; o.tag = true; o.emerge = { t: 0, st: s, onEnd: () => send(o, TUBES[id], false, () => arriveHome(o, routes)) };
-    s.flash = 1; s.note = "new skill"; s.noteT = 2.2; ripple(s.x, s.y, SH, 1.8); s.skills.add(name);
-  }
-  function teamShare(name, routes) {
-    const b = TUBES.team.b, o = mk(name, "team", b[0], b[1], TUBE_Z, "emerge");
-    o.scale = 0.1; o.tag = true; o.emerge = { t: 0, st: null, onEnd: () => send(o, TUBES.team, false, () => arriveHome(o, routes)) };
-    team.flash = 1; team.note = "shared"; team.noteT = 2.2; ripple(TEAM.x, TEAM.y, TEAM.top, 2.2);
-  }
-  function shareOut(name) {
-    const o = ring.find((q) => q && q.name === name && q.state === "ring");
-    if (o) o.routes.push("team");
+    const a = AGENTS[id], m = mk(name, id === "team" ? "team" : "mine", a.x, BOWL_Y - 14, "made");
+    m.scale = 0.1; m.tag = true; m.mt = 0; m.agent = a; m.next = routes;
+    note(a, id === "team" ? "shared" : "new skill", 2.4); ripple(a.x, BOWL_Y - 14, 30); a.skills.add(name);
   }
   function update(name) {
-    const s = ST.wc;
-    s.flash = 1; s.note = "updated"; s.noteT = 2.4; ripple(s.x, s.y, SH, 2);
-    signal(TUBES.wc, false, () => {
-      ripple(0, 0, HUB.top, 4.0, 1.4); hub.note = "updated"; hub.noteT = 2.4;
-      ring.forEach((q) => { if (q && q.name === name) ripple(q.x, q.y, q.z + ORB, 1.1, 0.8); });
-      for (const id of ["pc", "pk", "wh"]) if (ST[id].skills.has(name)) signal(TUBES[id], true, () => { const t = ST[id]; t.flash = 1; t.note = "synced"; t.noteT = 2.4; ripple(t.x, t.y, SH, 1.8); });
-      if (tring.some((q) => q && q.name === name)) signal(TUBES.team, true, () => { team.flash = 1; team.note = "synced"; team.noteT = 2.4; ripple(TEAM.x, TEAM.y, TEAM.top, 2.2); });
+    const a = AGENTS.wc; note(a, "updated", 2.6); ripple(a.x, BOWL_Y - 4, 40);
+    pulse([[a.x, BOWL_Y], [a.x, onLine(RETURN, a.x)], [LIFT.x, LIFT.bottom], [LIFT.x, LIFT.top], FEED[1], [WHEEL.x, WHEEL.y]], () => {
+      note(you, "updated", 2.6); ripple(WHEEL.x, WHEEL.y, WHEEL.r + 30, 1.3);
+      for (const [id, b] of Object.entries(AGENTS)) {
+        if (id === "wc" || !b.skills.has(name)) continue;
+        const start = b.track === LEFT ? LEFT[0] : RIGHT[0];
+        pulse([[WHEEL.x, WHEEL.y + WHEEL.r], FUNNEL, start, [b.x, onLine(b.track, b.x)], [b.x, BOWL_Y]], () => { note(b, "synced", 2.4); ripple(b.x, BOWL_Y - 4, 34); });
+      }
     });
   }
-  function signal(tube, out, onEnd) { signals.push({ path: mkPath(out ? [tube.a, tube.b] : [tube.b, tube.a]), s: 0, onEnd }); }
+  function pulse(pts, onEnd) { pulses.push({ path: mkPath(pts), d: 0, onEnd }); }
 
   const PHRASES = ["Discover trusted public skills", "Manage the skills you make", "Share skills with your team", "Update once & stay in sync."];
   let capTimer = 0, capSwap = 0;
@@ -380,289 +257,289 @@
     capSwap = setTimeout(() => { set(); capTimer = setTimeout(() => capEl.classList.remove("on"), 3000); }, 300);
   }
 
-  const CYCLE = 30;
+  const CYCLE = 32;
   const EVENTS = [
     [0.3, () => { caption(0); discover(["pc", "wh"]); }],
-    [4.2, () => discover(["pk", "wc"])],
-    [9.0, () => { caption(1); create("pc", "release-notes", ["wc", "wh"]); }],
-    [16.0, () => { caption(2); teamShare("canvas-design", ["wc"]); shareOut("release-notes"); }],
-    [23.0, () => { caption(3); update("release-notes"); }],
+    [3.5, () => discover(["pk", "wc"])],
+    [9.0, () => { caption(1); create("pc", "release-notes", ["wh", "wc"]); }],
+    [17.0, () => { caption(2); create("team", "canvas-design", ["wc"]); const r = gondolas.find((g) => g && g.name === "release-notes"); if (r) r.routes.push("team"); }],
+    [24.5, () => { caption(3); update("release-notes"); }],
   ];
-  let tc = 0, ei = 0;
+  let tc = 0, ei = 0, clock = 0;
 
   // ---- Simulation step
   function step(dt) {
-    tc += dt;
+    clock += dt; tc += dt;
     while (ei < EVENTS.length && tc >= EVENTS[ei][0]) EVENTS[ei++][1]();
     if (tc >= CYCLE) { tc -= CYCLE; ei = 0; }
-    rot += dt * (2 * Math.PI) / 12;
-    trot -= dt * (2 * Math.PI) / 14;
+    rot += dt * (2 * Math.PI) / 16;
 
-    // the public stream never stops
+    // the hopper lets a marble go every few seconds, whether anyone wants it or not
     streamT += dt;
-    if (streamT >= 0.8) { streamT -= 0.8; const o = mk("", "pub", STREAM.x0 + 0.1, STREAM.y, STREAM.top + ORB, "stream"); o.scale = 0.15; }
+    if (streamT >= EVERY) {
+      streamT -= EVERY;
+      const m = mk("", "pub", STREAM[0][0], STREAM[0][1], "stream"); m.scale = 0.2;
+      m.path = mkPath([...STREAM, [BIN.x + 30, BIN.y + 10]]); m.d = 0;
+    }
 
-    for (const o of orbs) {
-      if (o.scale < 1 && o.state !== "emerge") o.scale = Math.min(1, o.scale + dt * 2.5);
-      if (o.state === "ring" || o.state === "fade") {
-        const [x, y, z] = (o.home === tring ? tslotPos : slotPos)(o.slot); o.x = x; o.y = y; o.z = z;
+    for (const m of marbles) {
+      if (m.scale < 1 && m.state !== "made") m.scale = Math.min(1, m.scale + dt * 3);
+      if (m.state === "stream") {
+        m.d += DRIFT * dt;
+        const [x, y] = at(m.path, m.d); m.x = x; m.y = y;
+        if (m.target && m.x >= GATE) {
+          // the gate flips and the chosen marble drops down the chute to your wheel
+          gate.open = 1; m.tag = true;
+          follow(m, [[GATE, m.y], [GATE, WHEEL.y - WHEEL.r - 2]], () => board(m, [WHEEL.x, WHEEL.y - WHEEL.r], m.routes));
+          m.v = 40;
+        } else if (m.d >= m.path.len) m.state = "binned";
       }
-      if (o.state === "fade") { o.alpha -= dt * 1.6; if (o.alpha <= 0) { o.home[o.slot] = null; o.state = "gone"; } }
-      if (o.state === "stream") {
-        o.x += V * dt;
-        if (o.x >= STREAM.x1 + 0.4) { o.state = "drain"; }
+      if (m.state === "binned") { m.alpha -= dt * 1.5; if (m.alpha <= 0) m.state = "gone"; }
+      if (m.state === "path") {
+        const i = segAt(m.path, m.d), a = m.path.pts[i - 1], b = m.path.pts[i], dx = b[0] - a[0], dy = b[1] - a[1];
+        if (dy < 0 && -dy > Math.abs(dx)) m.v = CLIMB;
+        else if (dy > 0 && dy > 1.5 * Math.abs(dx)) m.v = Math.min(520, Math.max(m.v, 60) + 1300 * dt);
+        else m.v = ROLL;
+        m.d = Math.min(m.path.len, m.d + m.v * dt);
+        const [x, y] = at(m.path, m.d); m.x = x; m.y = y;
+        if (m.agent && m.dropX !== undefined && Math.abs(m.x - m.dropX) < 2 && m.y < BOWL_Y - 6) m.agent.door = 1;
+        if (m.d >= m.path.len && m.onEnd) { const f = m.onEnd; m.onEnd = null; f(); }
       }
-      if (o.state === "drain") { o.z -= dt * 2.5; if (o.z < STREAM.top - 0.2) o.state = "gone"; }
-      if (o.state === "fall") { o.z -= dt * 4; if (o.z <= o.fall.z1) { o.z = o.fall.z1; o.fall.onEnd(); } }
-      if (o.state === "tube") {
-        o.s = Math.min(o.path.len, o.s + TUBE_V * dt);
-        [o.x, o.y, o.z] = along(o.path, o.s);
-        if (o.s >= o.path.len) { const f = o.onEnd; o.onEnd = null; f && f(); }
+      if (m.state === "boarding") {
+        m.bt = Math.min(1, m.bt + dt / 0.3);
+        const [x, y] = cupPos(m.slot); m.x = lerp(m.bx, x, m.bt); m.y = lerp(m.by, y, m.bt);
+        if (m.bt >= 1) { m.state = "ride"; m.tag = false; ripple(x, y, 20, 0.6); }
       }
-      if (o.state === "hop") {
-        const h = o.hop; h.t += dt; const k = Math.min(1, h.t / h.dur), to = h.to(), e = ease(k);
-        o.x = h.x0 + (to[0] - h.x0) * e; o.y = h.y0 + (to[1] - h.y0) * e; o.z = h.z0 + (to[2] - h.z0) * e + 1.2 * Math.sin(Math.PI * k);
-        if (k >= 1) h.end();
+      if (m.state === "ride" || m.state === "fade") {
+        if (m.state === "ride" || gondolas[m.slot] === m) { const [x, y] = cupPos(m.slot); m.x = x; m.y = y; }
+        if (m.state === "ride" && m.routes.length && Math.abs(wrapA(gAng(m.slot) - Math.PI / 2)) < 0.45 && clock - m.lastCopy > 0.4) {
+          m.lastCopy = clock; deliver(m, m.routes.shift()); ripple(m.x, m.y, 18, 0.5);
+        }
       }
-      if (o.state === "emerge") {
-        const m = o.emerge; m.t += dt;
-        o.scale = Math.min(1, 0.1 + m.t * 2.2);
-        if (m.st) {
-          // rises out of the agent, is shown for a moment, then sinks back in to travel home
-          const top = SH + ORB + 0.05;
-          o.z = m.t < 1.6 ? top + 0.5 * ease(Math.min(1, m.t / 0.5)) : top + 0.5 - (m.t - 1.6) * 3;
-          if (m.t > 1.6 && o.z < SH - ORB) { o.state = "hidden"; m.onEnd(); }
-        } else if (m.t > 1.4) { m.onEnd(); }
+      if (m.state === "fade") { m.alpha -= dt * 1.5; m.y -= dt * 10; if (m.alpha <= 0) m.state = "gone"; }
+      if (m.state === "made") {
+        m.mt += dt; m.scale = Math.min(1, 0.1 + m.mt * 2.5);
+        if (m.mt > 1.6) { const a = m.agent; m.agent = null; goHome(m, a, m.next); }
       }
     }
-    orbs = orbs.filter((o) => o.state !== "gone");
+    marbles = marbles.filter((m) => m.state !== "gone");
 
-    dispatch();
-    ARMS.forEach((a) => runArm(a, dt));
-
-    for (const s of [...Object.values(ST), hub, team]) {
-      if (s.flash > 0) s.flash = Math.max(0, s.flash - dt * 1.4);
-      if (s.noteT > 0) { s.noteT -= dt; if (s.noteT <= 0) s.note = ""; }
+    gate.open = Math.max(0, gate.open - dt * 2.2);
+    for (const o of [...Object.values(AGENTS), you]) {
+      o.flash = Math.max(0, o.flash - dt * 1.4);
+      if (o.door !== undefined) o.door = Math.max(0, o.door - dt * 3);
+      if (o.noteT > 0) { o.noteT -= dt; if (o.noteT <= 0) o.note = ""; }
     }
     ripples.forEach((r) => (r.t += dt)); ripples = ripples.filter((r) => r.t < r.dur);
-    for (const g of signals) { g.s += dt * 8; if (g.s >= g.path.len && g.onEnd) { const f = g.onEnd; g.onEnd = null; f(); } }
-    signals = signals.filter((g) => g.s < g.path.len + 2);
+    for (const p of pulses) { p.d += dt * 520; if (p.d >= p.path.len && p.onEnd) { const f = p.onEnd; p.onEnd = null; f(); } }
+    pulses = pulses.filter((p) => p.d < p.path.len + 60);
   }
 
-  // ---- Scene pieces
-  function drawStream(t) {
-    const x = STREAM.x0, y = STREAM.y - 0.6, w = STREAM.x1 - STREAM.x0, d = 1.2;
-    box(x, y, 0, w, d, STREAM.top);
-    const gap = 0.7, off = (t * V) % gap;
-    ctx.save(); ctx.globalAlpha = 0.45; ctx.beginPath();
-    for (let u = off; u < w; u += gap) { const a = P(x + u, y + 0.12, STREAM.top), c = P(x + u, y + d - 0.12, STREAM.top); ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]); }
-    ctx.stroke(); ctx.restore();
-    // the drain at the far end, where everything nobody picked goes back
-    box(STREAM.x1, STREAM.y - 0.9, 0, 1.6, 1.8, STREAM.top + 0.15);
-    poly([P(STREAM.x1 + 0.2, STREAM.y - 0.6, STREAM.top + 0.15), P(STREAM.x1 + 1.3, STREAM.y - 0.6, STREAM.top + 0.15), P(STREAM.x1 + 1.3, STREAM.y + 0.6, STREAM.top + 0.15), P(STREAM.x1 + 0.2, STREAM.y + 0.6, STREAM.top + 0.15)], "ink");
-  }
-  function drawLibrary() {
-    const x0 = -17.6, y0 = STREAM.y - 1.8, fx = STREAM.x0;
-    box(x0, y0, 0, fx - x0, 3.6, 4.2, "paper", "hatch", "paper");
-    for (const z of [1.05, 2.1, 3.15]) line(P(fx, y0, z), P(fx, y0 + 3.6, z));
-    for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) {
-      if (r === 0 && c === 1) continue;
-      const u = y0 + 0.15 + c * 1.15, z = r * 1.05 + 0.12, [cx, cy] = P(fx, u + 0.48, z + 0.4);
-      ctx.beginPath(); ctx.ellipse(cx, cy, 0.34 * S, 0.34 * S, 0, 0, Math.PI * 2); fillAs((r * 3 + c) % 4 === 1 ? "hatch" : "paper"); ctx.stroke();
+  // ---- Drawing
+  // A rail under a stretch of marble path: two lines a marble's radius below the centre line
+  function rail(a, b, gaps = []) {
+    const off = R + 1.5;
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    if (Math.abs(dx) < 1) { // vertical chute or lift: walls either side
+      for (const sx of [-R - 3, R + 3]) line([a[0] + sx, a[1]], [b[0] + sx, b[1]]);
+      return;
     }
-    poly([P(fx, STREAM.y - 0.6, 0), P(fx, STREAM.y + 0.6, 0), P(fx, STREAM.y + 0.6, 1.0), P(fx, STREAM.y - 0.6, 1.0)], "ink");
-  }
-  function drawTube(tb) {
-    const a = P(...tb.a), b = P(...tb.b), k = S;
-    // posts down to the floor
-    for (const f of [0.3, 0.65]) {
-      const x = tb.a[0] + (tb.b[0] - tb.a[0]) * f, y = tb.a[1] + (tb.b[1] - tb.a[1]) * f;
-      line(P(x, y, 0), P(x, y, TUBE_Z - TUBE_R)); ctx.beginPath(); const [fx, fy] = P(x, y, 0), [rx, ry] = ell(0.22); ctx.ellipse(fx, fy, rx, ry, 0, 0, Math.PI * 2); fillAs("paper"); ctx.stroke();
+    const segs = [[a[0], b[0]]];
+    for (const g of gaps) { const last = segs.pop(); segs.push([last[0], g - 12], [g + 12, last[1]]); }
+    for (const [x0, x1] of segs) {
+      const y0 = a[1] + (dy * (x0 - a[0])) / dx, y1 = a[1] + (dy * (x1 - a[0])) / dx;
+      line([x0, y0 + off], [x1, y1 + off]); line([x0, y0 + off + 3.5], [x1, y1 + off + 3.5]);
     }
-    ctx.save(); ctx.lineCap = "butt";
-    ctx.lineWidth = 2 * TUBE_R * k; ctx.strokeStyle = ink; line(a, b);
-    ctx.lineWidth = 2 * TUBE_R * k - 2 * LW; ctx.strokeStyle = paper; line(a, b);
-    ctx.restore();
   }
-  function drawCup(tb) { cyl(tb.a[0], tb.a[1], TUBE_Z - 0.45, 0.55, 0.75, "paper", "paper"); const [x, y] = P(tb.a[0], tb.a[1], TUBE_Z + 0.3), [rx, ry] = ell(0.36); ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); fillAs("ink"); }
-  function drawDisc(c, r, top, turn, ticks) {
-    cyl(c.x, c.y, 0, r, top);
-    ctx.save(); ctx.globalAlpha = 0.55; ctx.beginPath();
-    for (let k = 0; k < ticks; k++) {
-      const a = turn + (k * 2 * Math.PI) / ticks;
-      const p1 = P(c.x + (r - 0.35) * Math.cos(a), c.y + (r - 0.35) * Math.sin(a), top), p2 = P(c.x + (r - 0.1) * Math.cos(a), c.y + (r - 0.1) * Math.sin(a), top);
-      ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]);
-    }
-    ctx.stroke(); ctx.restore();
-  }
-  function drawStation(st) {
-    const x = st.x - SW / 2, y = st.y - SW / 2, fy = st.y + SW / 2, lit = st.flash > 0.45;
-    box(x, y, 0, SW, SW, SH);
-    const [hx, hy] = P(st.x, st.y, SH), [rx, ry] = ell(0.55); ctx.beginPath(); ctx.ellipse(hx, hy, rx, ry, 0, 0, Math.PI * 2); fillAs("ink");
-    poly([P(x + 0.3, fy, 0.3), P(x + SW - 0.3, fy, 0.3), P(x + SW - 0.3, fy, SH - 0.3), P(x + 0.3, fy, SH - 0.3)], lit ? "ink" : "paper");
-    faceLogo(st.logo, st.x, fy, SH / 2, 0.8, lit ? "paper" : "ink");
-  }
-  function drawOrb(o) {
-    const [cx, cy] = P(o.x, o.y, o.z), R = ORB * S * o.scale;
-    if (R < 0.5) return;
-    ctx.save(); ctx.globalAlpha = Math.max(0, o.alpha);
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
-    if (o.kind === "mine") {
+  function drawMarble(m) {
+    const r = R * m.scale; if (r < 0.6) return;
+    ctx.save(); ctx.globalAlpha = Math.max(0, m.alpha);
+    ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, Math.PI * 2);
+    if (m.kind === "mine") {
       fillAs("ink"); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx - R * 0.38, cy - R * 0.38, R * 0.2, 0, Math.PI * 2); fillAs("paper");
+      ctx.beginPath(); ctx.arc(m.x - r * 0.38, m.y - r * 0.38, r * 0.22, 0, Math.PI * 2); fillAs("paper");
     } else {
       ctx.save(); ctx.clip();
-      ctx.fillStyle = o.kind === "team" ? cross : hatch; ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
-      ctx.beginPath(); ctx.arc(cx - R * 0.3, cy - R * 0.32, R * (o.kind === "team" ? 0.62 : 0.9), 0, Math.PI * 2); fillAs("paper");
+      ctx.fillStyle = m.kind === "team" ? cross : hatch; ctx.fillRect(m.x - r, m.y - r, 2 * r, 2 * r);
+      ctx.beginPath(); ctx.arc(m.x - r * 0.3, m.y - r * 0.32, r * (m.kind === "team" ? 0.6 : 0.9), 0, Math.PI * 2); fillAs("paper");
       ctx.restore();
-      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(m.x, m.y, r, 0, Math.PI * 2); ctx.stroke();
     }
     ctx.restore();
   }
-  function ik(a) {
-    const b = a.base, T = a.pos, dx = T[0] - b[0], dy = T[1] - b[1], dz = T[2] - b[2];
-    const d = Math.hypot(dx, dy), L = a.L, D = Math.min(Math.hypot(d, dz), 2 * L - 1e-3);
-    const ang = Math.atan2(dz, d) + Math.acos(D / (2 * L));
-    return [b[0] + Math.cos(a.yaw) * Math.cos(ang) * L, b[1] + Math.sin(a.yaw) * Math.cos(ang) * L, b[2] + Math.sin(ang) * L];
-  }
-  function drawArm(a) {
-    const k = S / 24, E = ik(a), W3 = a.pos;
-    const B = P(...a.base), Ep = P(...E), Wp = P(...W3);
-    tube(B, Ep, 8 * k); tube(Ep, Wp, 7 * k);
-    joint(B, 4.6 * k); joint(Ep, 3.8 * k);
-    if (a.carry) drawOrb(a.carry);
-    // gripper: a bar across the wrist and two fingers that close round the orb
-    const open = a.carry ? 0.48 : 0.62, px = -Math.sin(a.yaw) * open, py = Math.cos(a.yaw) * open;
-    const hz = W3[2], fz = hz - GRIP - ORB;
-    const l = [W3[0] - px, W3[1] - py], r = [W3[0] + px, W3[1] + py];
-    ctx.save(); ctx.lineWidth = 2.2 * LW;
-    line(P(l[0], l[1], hz), P(r[0], r[1], hz));
-    line(P(l[0], l[1], hz), P(l[0], l[1], fz)); line(P(r[0], r[1], hz), P(r[0], r[1], fz));
+  function drawHopper() {
+    const t = [[92, 22], [208, 22]], b = [[140, 92], [160, 92]];
+    poly([[t[1][0], t[1][1]], [t[1][0] + DX, t[1][1] + DY], [b[1][0] + DX, b[1][1] + DY], [b[1][0], b[1][1]]], "hatch");
+    poly([[t[0][0], t[0][1]], [t[0][0] + DX, t[0][1] + DY], [t[1][0] + DX, t[1][1] + DY], [t[1][0], t[1][1]]], "paper");
+    ctx.save(); ctx.beginPath(); ctx.moveTo(...t[0]); ctx.lineTo(...t[1]); ctx.lineTo(...b[1]); ctx.lineTo(...b[0]); ctx.closePath(); fillAs("paper"); ctx.clip();
+    for (let row = 0; row < 5; row++) for (let c = 0; c < 7; c++) {
+      const x = 104 + c * 16 + (row % 2) * 8, y = 34 + row * 14;
+      drawMarble({ x, y, kind: (row * 7 + c) % 5 === 3 ? "team" : "pub", scale: 1, alpha: 1 });
+    }
     ctx.restore();
-    joint(Wp, 3.2 * k);
+    poly([t[0], t[1], b[1], b[0]], null);
+    line([140, 92], [140, 100]); line([160, 92], [160, 100]);
   }
-
-  // Leader-line label in the manner of a technical drawing
-  const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
-  function callout(anchor, dx, dy, l1, l2) {
-    const k = S / 24, f1 = Math.max(8, Math.min(12, 10.5 * k)), f2 = f1 - 0.5;
-    const ex = anchor[0] + dx * k, ey = anchor[1] + dy * k;
-    ctx.save();
-    if ("letterSpacing" in ctx) ctx.letterSpacing = "0.08em";
-    ctx.font = `500 ${f1}px ${MONO}`; const w1 = ctx.measureText(l1).width;
-    ctx.font = `400 ${f2}px ${MONO}`; const w2 = ctx.measureText(l2).width;
-    const w = Math.max(w1, w2) + 6, right = dx >= 0, sx = right ? ex + w : ex - w;
-    ctx.lineWidth = Math.max(0.7, LW * 0.8);
-    ctx.beginPath(); ctx.moveTo(anchor[0], anchor[1]); ctx.lineTo(ex, ey); ctx.lineTo(sx, ey); ctx.stroke();
-    ctx.beginPath(); ctx.arc(anchor[0], anchor[1], 1.9 * Math.max(1, k), 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill();
-    ctx.textAlign = right ? "left" : "right";
-    const tx = right ? ex + 3 : ex - 3;
-    ctx.fillStyle = ink; ctx.font = `500 ${f1}px ${MONO}`; ctx.fillText(l1, tx, ey - 4 * Math.max(0.8, k));
-    ctx.fillStyle = muted; ctx.font = `400 ${f2}px ${MONO}`; ctx.fillText(l2, tx, ey + f2 + 2);
+  function drawBin() {
+    block(BIN.x, BIN.y, BIN.w, BIN.h, null, "paper", "hatch");
+    ctx.save(); ctx.beginPath(); ctx.rect(BIN.x, BIN.y - 20, BIN.w, BIN.h + 20); ctx.clip();
+    for (let c = 0; c < 5; c++) for (let row = 0; row < 2; row++) drawMarble({ x: BIN.x + 12 + c * 15 + row * 7, y: BIN.y + BIN.h - 8 - row * 13, kind: "pub", scale: 1, alpha: 1 });
     ctx.restore();
   }
-  function tagFor(o) {
-    const k = S / 24, top = P(o.x, o.y, o.z + ORB * o.scale + 0.1), y1 = top[1] - 16 * k;
-    ctx.save(); ctx.lineWidth = Math.max(0.7, LW * 0.8);
-    line(top, [top[0], y1]);
-    if ("letterSpacing" in ctx) ctx.letterSpacing = "0.02em";
-    ctx.font = `400 ${Math.max(8, Math.min(11, 10 * k))}px ${MONO}`; ctx.textAlign = "center";
-    ctx.lineWidth = 4; ctx.strokeStyle = paper; ctx.strokeText(o.name, top[0], y1 - 4);
-    ctx.fillStyle = ink; ctx.fillText(o.name, top[0], y1 - 4);
+  function drawBinFront() { poly([[BIN.x, BIN.y + 14], [BIN.x + BIN.w, BIN.y + 14], [BIN.x + BIN.w, BIN.y + BIN.h], [BIN.x, BIN.y + BIN.h]], "paper"); }
+  function drawWheelBack() {
+    const { x, y, r } = WHEEL;
+    // A-frame stand
+    line([x, y], [x - 70, y + 118]); line([x, y], [x + 70, y + 118]);
+    line([x - 70 + DX, y + 118 + DY], [x + DX, y + DY]); line([x + 70 + DX, y + 118 + DY], [x + DX, y + DY]);
+    ctx.beginPath(); ctx.arc(x + DX, y + DY, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, y, r - 5, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < WHEEL.n; i++) { const [px, py] = pivot(i); line([x + (px - x) * 0.28, y + (py - y) * 0.28], [px, py]); }
+    circle(x, y, 24, you.flash > 0.4 ? "ink" : "paper");
+    text("YOU", x, y + 4, { size: 11, weight: 500, align: "center", color: you.flash > 0.4 ? paper : ink, spacing: "0.12em" });
+  }
+  function drawGondolas() {
+    for (let i = 0; i < WHEEL.n; i++) {
+      const [px, py] = pivot(i);
+      circle(px, py, 2.6, "paper");
+      line([px, py], [px, py + 3]);
+      ctx.beginPath(); ctx.arc(px, py + 13, R + 3, 0.1, Math.PI - 0.1); ctx.stroke();
+      line([px - R - 3, py + 12], [px + R + 3, py + 12]);
+    }
+  }
+  function drawFunnel() {
+    poly([[FUNNEL[0] - 22, FUNNEL[1] - 18], [FUNNEL[0] + 22, FUNNEL[1] - 18], [FUNNEL[0] + 11, FUNNEL[1] + 4], [FUNNEL[0] - 11, FUNNEL[1] + 4]], "paper");
+    line([FUNNEL[0] - 11, FUNNEL[1] + 4], [FUNNEL[0] - 11, FUNNEL[1] + 10]); line([FUNNEL[0] + 11, FUNNEL[1] + 4], [FUNNEL[0] + 11, FUNNEL[1] + 10]);
+  }
+  function drawLift() {
+    const x = LIFT.x;
+    line([x - 13, LIFT.top - 10], [x - 13, LIFT.bottom + 6]); line([x + 13, LIFT.top - 10], [x + 13, LIFT.bottom + 6]);
+    circle(x, LIFT.top - 10, 9, "paper"); circle(x, LIFT.bottom + 6, 9, "paper");
+    // buckets on the chain
+    const gap = 34, off = (clock * CLIMB) % gap;
+    for (let yy = LIFT.bottom - off; yy > LIFT.top; yy -= gap) line([x - 9, yy + R + 2], [x + 9, yy + R + 2]);
+  }
+  function drawAgent(a, id) {
+    const lit = a.flash > 0.45, x = a.x - PED.w / 2;
+    // trapdoor in the track above
+    const ty = onLine(a.track, a.x) + R + 1.5;
+    ctx.save(); ctx.lineWidth = 1.6; line([a.x - 12, ty], [a.x - 12 + 12 * Math.cos(a.door * 1.2), ty + 12 * Math.sin(a.door * 1.2)]); ctx.restore();
+    // bowl front and pile
+    block(x, PED.top, PED.w, PED.h, lit ? "ink" : "paper", "paper", "hatch");
+    const cx = a.x, cy = PED.top - 2;
+    if (a.logo) logo(a.logo, cx, PED.top + 17, 16, lit ? "paper" : "ink");
+    else text("@", cx, PED.top + 22, { size: 16, weight: 500, align: "center", color: lit ? paper : ink });
+    text(a.name, cx, PED.top + 38, { size: 8.5, weight: 500, align: "center", color: lit ? paper : ink });
+    ctx.save(); ctx.lineWidth = LW;
+    ctx.beginPath(); ctx.ellipse(cx, cy - 8, 30, 8, 0, 0, Math.PI); ctx.lineTo(cx - 30, cy - 8); ctx.stroke();
     ctx.restore();
   }
-  const held = (arr) => arr.filter((q) => q && q.state === "ring").length;
+  function drawPile(a) {
+    const spots = [[-14, 0], [0, 0], [14, 0], [-7, -12], [7, -12]];
+    a.pile.forEach((k, i) => drawMarble({ x: a.x + spots[i][0], y: PED.top - 12 + spots[i][1], kind: k, scale: 1, alpha: 1 }));
+  }
+  function drawBowlBack(a) {
+    const cx = a.x, cy = PED.top - 2;
+    ctx.beginPath(); ctx.ellipse(cx, cy - 8, 30, 8, 0, Math.PI, 2 * Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - 30, cy - 8); ctx.quadraticCurveTo(cx - 30, cy + 6, cx - 18, cy + 6); ctx.lineTo(cx + 18, cy + 6); ctx.quadraticCurveTo(cx + 30, cy + 6, cx + 30, cy - 8); fillAs("paper"); ctx.stroke();
+  }
+  function callout(ax, ay, dx, dy, l1, l2) {
+    const ex = ax + dx, ey = ay + dy;
+    ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = "0.08em";
+    ctx.font = `500 10.5px ${MONO}`; const w1 = ctx.measureText(l1).width;
+    ctx.font = `400 10px ${MONO}`; const w2 = l2 ? ctx.measureText(l2).width : 0;
+    ctx.restore();
+    const w = Math.max(w1, w2) + 6, right = dx >= 0;
+    ctx.save(); ctx.lineWidth = 0.9;
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.lineTo(right ? ex + w : ex - w, ey); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ax, ay, 2, 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill();
+    ctx.restore();
+    const tx = right ? ex + 3 : ex - 3, al = right ? "left" : "right";
+    text(l1, tx, ey - 5, { size: 10.5, weight: 500, align: al });
+    if (l2) text(l2, tx, ey + 13, { size: 10, color: muted, align: al });
+  }
+  function tagFor(m) {
+    const y1 = m.y - R - 16;
+    ctx.save(); ctx.lineWidth = 0.9; line([m.x, m.y - R - 2], [m.x, y1]); ctx.restore();
+    ctx.save(); if ("letterSpacing" in ctx) ctx.letterSpacing = "0.02em"; ctx.font = `400 10px ${MONO}`; ctx.textAlign = "center";
+    ctx.lineWidth = 4; ctx.strokeStyle = paper; ctx.strokeText(m.name, m.x, y1 - 4); ctx.fillStyle = ink; ctx.fillText(m.name, m.x, y1 - 4);
+    ctx.restore();
+  }
   const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
-  const inside = (o, s) => Math.abs(o.x - s.x) < SW / 2 + 0.2 && Math.abs(o.y - s.y) < SW / 2 + 0.2;
 
-  let clock = 0;
   function draw() {
     readTheme();
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.fillStyle = paper; ctx.fillRect(0, 0, W, H);
+    ctx.setTransform(DPR * s, 0, 0, DPR * s, 0, 0);
+    ctx.fillStyle = paper; ctx.fillRect(0, 0, VW, VH);
     ctx.lineWidth = LW; ctx.lineJoin = "round"; ctx.lineCap = "round"; ctx.strokeStyle = ink;
 
-    // floor level: the stream, both turntables, the tubes and their cups
-    drawStream(clock);
-    drawDisc(HUB, HUB.r, HUB.top, rot, 16);
-    ringEllipse(0, 0, HUB.top, 1.2);
-    drawDisc(TEAM, TEAM.r, TEAM.top, trot, 10);
-    Object.values(TUBES).forEach(drawTube);
-    Object.values(TUBES).forEach(drawCup);
-    { const b = TUBES.team.b; cyl(b[0], b[1], TUBE_Z - 0.45, 0.55, 0.75); }
+    // structure behind the marbles
+    rail(...STREAM);
+    rail([BIN.x - 6, onLine(STREAM, BIN.x - 6)], [BIN.x + 30, BIN.y + 4]);
+    // gate: a flap in the stream track above your wheel, and the chute down to it
+    const gy = onLine(STREAM, GATE) + R + 1.5;
+    ctx.save(); ctx.lineWidth = 1.8; line([GATE - 12, gy], [GATE - 12 + 24 * Math.cos(gate.open * 1.1), gy + 24 * Math.sin(gate.open * 1.1)]); ctx.restore();
+    rail([GATE, gy + 6], [GATE, WHEEL.y - WHEEL.r - 12]);
+    drawWheelBack();
+    drawFunnel();
+    rail(...LEFT, Object.values(AGENTS).filter((a) => a.track === LEFT).map((a) => a.x));
+    rail(...RIGHT, Object.values(AGENTS).filter((a) => a.track === RIGHT).map((a) => a.x));
+    rail(...RETURN); rail(...FEED);
+    drawLift();
+    drawBin();
+    for (const a of Object.values(AGENTS)) drawBowlBack(a);
 
-    // everything that stands up, back to front
-    const items = [
-      { k: -17.6 + STREAM.y + 1.8, d: drawLibrary },
-      { k: 0, d: () => cyl(0, 0, HUB.top, 0.5, 3.0) },
-      { k: TEAM.x + TEAM.y, d: () => cyl(TEAM.x, TEAM.y, TEAM.top, 0.3, 1.1) },
-    ];
-    for (const st of Object.values(ST)) items.push({ k: st.x + st.y, d: () => drawStation(st) });
-    for (const o of orbs) {
-      if (o.state === "arm" || o.state === "hidden") continue;
-      let k = o.x + o.y + o.z * 0.02;
-      for (const st of Object.values(ST)) if (inside(o, st)) k = o.state === "emerge" && o.z > SH ? st.x + st.y + 0.05 : st.x + st.y - 0.05;
-      items.push({ k, d: () => drawOrb(o) });
-    }
-    items.sort((a, b) => a.k - b.k).forEach((it) => it.d());
+    for (const a of Object.values(AGENTS)) drawPile(a);
+    for (const m of marbles) drawMarble(m);
 
-    drawArm(arm1); drawArm(arm2);
+    // structure in front
+    drawGondolas();
+    drawHopper();
+    drawBinFront();
+    for (const [id, a] of Object.entries(AGENTS)) drawAgent(a, id);
+    line([10, 604], [VW - 10, 604]);
 
+    // ripples and update pulses
     ctx.save();
-    for (const r of ripples) {
-      const k = r.t / r.dur; ctx.globalAlpha = 1 - k; ctx.lineWidth = LW;
-      ringEllipse(r.x, r.y, r.z, r.r0 + (r.r1 - r.r0) * (1 - Math.pow(1 - k, 3)));
-    }
+    for (const r of ripples) { const k = r.t / r.dur; ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.arc(r.x, r.y, 6 + (r.r1 - 6) * (1 - Math.pow(1 - k, 3)), 0, Math.PI * 2); ctx.stroke(); }
     ctx.restore();
-    for (const g of signals) {
-      for (let j = 0; j < 7; j++) {
-        const s = g.s - j * 0.32; if (s < 0 || s > g.path.len) continue;
-        const q = P(...along(g.path, s));
-        ctx.beginPath(); ctx.arc(q[0], q[1], Math.max(1, (4.2 - j * 0.45) * (S / 24)), 0, Math.PI * 2);
-        ctx.fillStyle = ink; ctx.globalAlpha = 1 - j / 8; ctx.fill(); ctx.globalAlpha = 1;
-      }
+    for (const p of pulses) for (let j = 0; j < 8; j++) {
+      const d = p.d - j * 9; if (d < 0 || d > p.path.len) continue;
+      const [x, y] = at(p.path, d);
+      ctx.beginPath(); ctx.arc(x, y, Math.max(1, 4.2 - j * 0.45), 0, Math.PI * 2); ctx.fillStyle = ink; ctx.globalAlpha = 1 - j / 9; ctx.fill(); ctx.globalAlpha = 1;
     }
 
     // labels
-    callout(P(STREAM.x0, STREAM.y - 1.8, 4.2), 30, -24, "PUBLIC SKILLS", "a stream of trusted skills");
-    callout(P(-2.12, 2.12, HUB.top), -40, -16, "YOU", hub.note || `${plural(held(ring), "skill")} · 4 agents`);
-    callout(P(TEAM.x + 1.06, TEAM.y + 1.06, TEAM.top), 22, 24, "@TEAMMATE", team.note || plural(held(tring), "skill"));
-    for (const st of Object.values(ST)) callout(P(st.x + SW / 2, st.y + SW / 2, 0.9), 22, 24, st.name, st.note || `${st.kind} · ${plural(st.skills.size, "skill")}`);
-    for (const o of orbs) if (o.tag && (o.state === "stream" || o.state === "emerge" || o.state === "tube")) tagFor(o);
+    callout(208, 26, 30, -8, "PUBLIC SKILLS", "a stream of trusted skills");
+    callout(GATE + 12, onLine(STREAM, GATE + 12) + 12, 40, 30, "YOUR PICK", "the gate drops it to you");
+    callout(BIN.x + BIN.w + DX, BIN.y + 8, 22, -26, "THE REST", "roll on by");
+    const held = gondolas.filter((g) => g && g.state === "ride").length;
+    callout(WHEEL.x - WHEEL.r * 0.7, WHEEL.y - WHEEL.r * 0.7, -70, -40, "YOUR SKILLS", you.note || `${plural(held, "skill")} · 4 agents`);
+    callout(LIFT.x + 13, LIFT.top + 40, 34, 14, "LIFT", "back to you");
+    for (const a of Object.values(AGENTS)) if (a.note) text(a.note, a.x, PED.top + PED.h + 14, { size: 10, color: muted, align: "center" });
+    for (const m of marbles) if (m.tag && m.state !== "ride") tagFor(m);
   }
 
-  // ---- Fit the drawing to the banner width
-  const BOUNDS = (() => {
-    const pts = [];
-    const add = (x, y, z) => pts.push([(x - y) * C30, (x + y) * 0.5 - z]);
-    for (const z of [0, 4.2]) for (const y of [STREAM.y - 1.8, STREAM.y + 1.8]) add(-17.6, y, z), add(STREAM.x0, y, z);
-    add(STREAM.x1 + 1.6, STREAM.y - 0.9, 0); add(STREAM.x1 + 1.6, STREAM.y + 0.9, 0);
-    for (const s of Object.values(ST)) for (const dx of [-1.2, 1.2]) for (const dy of [-1.2, 1.2]) { add(s.x + dx, s.y + dy, 0); add(s.x + dx, s.y + dy, SH); }
-    for (const a of [0, 1, 2, 3]) add(TEAM.x + Math.cos(a * Math.PI / 2) * TEAM.r, TEAM.y + Math.sin(a * Math.PI / 2) * TEAM.r, 0);
-    add(0, 0, 6.4);
-    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-    return { minX: Math.min(...xs) - 1.5, maxX: Math.max(...xs) + 5.5, minY: Math.min(...ys) - 2.4, maxY: Math.max(...ys) + 2.6 };
-  })();
+  // ---- Fit to the banner width
   function layout() {
-    W = Math.round(plate.clientWidth);
-    S = W / (BOUNDS.maxX - BOUNDS.minX);
-    H = Math.round((BOUNDS.maxY - BOUNDS.minY) * S);
-    OX = -BOUNDS.minX * S; OY = -BOUNDS.minY * S;
+    W = Math.round(plate.clientWidth); s = W / VW; H = Math.round(VH * s);
     DPR = window.devicePixelRatio || 1;
     cvs.width = Math.round(W * DPR); cvs.height = Math.round(H * DPR); cvs.style.height = H + "px";
-    LW = Math.max(0.75, S * 0.05);
     themeKey = ""; readTheme();
   }
   new ResizeObserver(() => { layout(); if (reduce) draw(); }).observe(plate);
   layout();
 
-  // Fill the stream before the first frame
-  for (let x = STREAM.x0 + 0.1; x < STREAM.x1; x += V * 0.8) mk("", "pub", x, STREAM.y, STREAM.top + ORB, "stream");
+  // fill the stream track before the first frame
+  for (let d = 0; d < mkPath(STREAM).len; d += DRIFT * EVERY) {
+    const m = mk("", "pub", 0, 0, "stream"); m.path = mkPath([...STREAM, [BIN.x + 30, BIN.y + 10]]); m.d = d; [m.x, m.y] = at(m.path, d);
+  }
+  for (const m of marbles) if (m.state === "ride") [m.x, m.y] = cupPos(m.slot);
 
   if (reduce) {
-    for (let i = 0; i < 60 * 26; i++) { step(1 / 60); clock += 1 / 60; }
-    caption(3);
-    draw();
+    for (let i = 0; i < 60 * 27; i++) step(1 / 60);
+    caption(3); draw();
     const redraw = () => { themeKey = ""; draw(); };
     matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw);
     new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -670,7 +547,7 @@
     let last = performance.now();
     const frame = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      step(dt); clock += dt; draw();
+      step(dt); draw();
       requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
