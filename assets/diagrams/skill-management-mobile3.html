@@ -20,6 +20,8 @@
     --update: #248a3d;
     --on-update: #ffffff;
     --update-tint: rgba(52, 199, 89, 0.22);
+    --remove: #d70015;
+    --remove-tint: rgba(255, 59, 48, 0.16);
     --create: #0a84ff;
     --created-tag: #ff3b30;
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
@@ -44,6 +46,8 @@
       --update: #30d158;
       --on-update: #002b0c;
       --update-tint: rgba(48, 209, 88, 0.26);
+      --remove: #ff453a;
+      --remove-tint: rgba(255, 69, 58, 0.24);
       --create: #409cff;
       --created-tag: #ff453a;
     }
@@ -66,6 +70,8 @@
     --update: #30d158;
     --on-update: #002b0c;
     --update-tint: rgba(48, 209, 88, 0.26);
+    --remove: #ff453a;
+    --remove-tint: rgba(255, 69, 58, 0.24);
     --create: #409cff;
     --created-tag: #ff453a;
   }
@@ -189,6 +195,11 @@
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #flow .headline { fill: #636366; } }
   #flow .ripple { fill: none; stroke: #b9bcc4; stroke-width: 1; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; pointer-events: none; }
   #flow .pulse { fill: none; stroke: var(--update); stroke-width: 0; stroke-linejoin: round; pointer-events: none; }
+  /* Deleting a skill: the same flash and glow as an update, in red */
+  #flow .pulse.remove { stroke: var(--remove); }
+  #flow .chip.remove .bg { fill: var(--remove-tint); }
+  #flow .badge.remove rect { fill: var(--remove); }
+  #flow .badge.remove text { fill: #ffffff; }
   #flow .arrowhead.sync path { fill: var(--update); }
   #flow .badge.author rect { fill: var(--ink); }
   #flow .badge.author text { fill: var(--bg); font-weight: 500; }
@@ -275,6 +286,7 @@
     { phase: "Share skills with your team", who: "mate", reuse: "frontend-design", send: ["team-chatgpt"] },
     { who: "mate", collect: "brand-voice", send: ["team-chatgpt"] },
     { phase: "Update once & stay in sync.", who: "you", update: "release-notes" },
+    { phase: "Delete once, gone everywhere.", who: "you", remove: "humanizer" },
   ];
 
   // ---- Geometry
@@ -972,10 +984,10 @@
 
   // A soft green glow that swells out from behind the pill and fades, marking the update.
   // It grows by stroke width, so it keeps the pill's rounded shape exactly.
-  function pulse(node) {
+  function pulse(node, kind) {
     if (instant || reduced) return;
     const bg = node.querySelector("rect.bg");
-    const glow = el("rect", { class: "pulse", width: bg.getAttribute("width"), height: CH, rx: CH / 2 });
+    const glow = el("rect", { class: `pulse${kind ? " " + kind : ""}`, width: bg.getAttribute("width"), height: CH, rx: CH / 2 });
     bg.parentNode.insertBefore(glow, bg); // behind the pill, so only the outer halo shows
     const a = glow.animate(
       [
@@ -1160,12 +1172,59 @@
     await sleep(600);
   }
 
+  // Deleting a skill: it turns red in your library first, then in every agent that has it,
+  // then every copy fades away and the cards close up around the gap
+  async function removeSkill(o, name) {
+    const ri = o.rows.findIndex((r) => r.name === name);
+    if (ri < 0) return;
+    const row = o.rows[ri], rp = rowPos(o, ri);
+    const tags = [];
+    const mark = async (chipEl, x, y, w) => {
+      chipEl.classList.add("remove");
+      pulse(chipEl, "remove");
+      const b = badge(x + w + 6, y - 10, "Deleted", false, "remove");
+      chipEl._badge = b.g;
+      tags.push(b.g);
+      await frame();
+      b.show();
+    };
+    activate(o);
+    await mark(row.el, rp.x, rp.y, o.w - 32);
+    await sleep(1100);
+    const hits = Object.values(agents).filter((a) => a.items.some((it) => it.name === name));
+    for (const a of hits) {
+      const it = a.items.find((x) => x.name === name);
+      activate(a);
+      await mark(it.el, it.pos.x, it.pos.y, chipW(name) * AS);
+      await sleep(450);
+    }
+    await sleep(1000);
+    // Gone: every copy and its tag fade out, then the cards close the gaps
+    const gone = [row.el, ...hits.map((a) => a.items.find((x) => x.name === name).el), ...tags];
+    gone.forEach((n) => { n.style.transition = "opacity 380ms ease"; n.style.opacity = 0; });
+    await sleep(420);
+    gone.forEach((n) => n.remove());
+    o.rows.splice(ri, 1);
+    tweenH(o.rect, cardH(o.head, o.rows.length));
+    o.rows.forEach((r, i) => { const p = rowPos(o, i); place(r.el, p.x, p.y); });
+    for (const a of hits) {
+      a.items = a.items.filter((x) => x.name !== name);
+      const h = layoutAgent(a);
+      tweenH(a.rect, h);
+      for (const it of a.items) place(it.el, it.pos.x, it.pos.y);
+      for (const cap of Object.values(a.caps)) place(cap, cap.pos.x, cap.pos.y);
+    }
+    refreshSubs();
+    await sleep(1200);
+  }
+
   async function playOnce() {
     for (const [k, e] of EVENTS.entries()) {
       const o = e.who === "you" ? you : mate;
       if (e.phase) phase(e.phase);
       if (o === mate) await showMate();
       if (e.update) { await update(o, e.update); continue; }
+      if (e.remove) { await removeSkill(o, e.remove); continue; }
       if (e.createOn) await createOnAgent(o, e.collect, e.createOn);
       else if (e.collect) await spawnAndCollect(o, e.collect);
       if (e.reuse) await sleep(900);
