@@ -14,6 +14,8 @@ export type Skill = {
   first_seen?: string;
   skill_md_sha?: string;
   skill_md_path?: string;
+  repo_commit_sha?: string;
+  skill_tree_sha?: string;
 };
 
 export type TrendingEntry = {

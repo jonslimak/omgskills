@@ -69,6 +69,7 @@ test("tools expose complete read-only metadata and structured results", async (c
   });
 
   assert.match(client.getInstructions() ?? "", /All tools are read-only/);
+  assert.match(client.getInstructions() ?? "", /If install_status is discovery_only, do not install/);
 
   const { tools } = await client.listTools();
   assert.deepEqual(tools.map((tool) => tool.name), [
@@ -96,6 +97,8 @@ test("tools expose complete read-only metadata and structured results", async (c
   assert.equal(search.isError, undefined);
   assert.equal(search.structuredContent?.count, 1);
   assert.equal((search.structuredContent?.skills as Array<{ id: string }>)[0]?.id, "anthropics/skills:swift-review");
+  assert.equal((search.structuredContent?.skills as Array<{ install_status: string }>)[0]?.install_status, "discovery_only");
+  assert.equal("pinned_install" in (search.structuredContent?.skills as object[])[0], false);
 
   const missing = await client.callTool({
     name: "get_skill",
@@ -113,6 +116,85 @@ test("tools expose complete read-only metadata and structured results", async (c
   assert.equal(authorSkill.installs, undefined);
   assert.equal(authorSkill.trending_rank, undefined);
   assert.equal(authorSkill.niche, undefined);
+});
+
+test("strict clients accept real catalog records without undeclared fields", async (context) => {
+  const skill = {
+    ...fixtureData.skills[0],
+    publisher_handle: "anthropics",
+    repo_commit_sha: "a".repeat(40),
+    skill_tree_sha: "b".repeat(40),
+    skill_md_path: "skills/swift-review/SKILL.md",
+    skill_md_sha: "c".repeat(40),
+    readme_snippet: "Internal catalog metadata"
+  };
+  const library = OmgskillsLibrary.fromData({
+    skills: [skill],
+    trending: [{ id: skill.id, installs: 10, trending_rank: 1 }],
+    goldBasket: [{ ...skill, score: 98 }]
+  });
+  const server = createOmgskillsServer(library);
+  const client = new Client({ name: "omgskills-strict-test", version: "1.0.0" });
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  await server.connect(serverTransport);
+  await client.connect(clientTransport);
+  context.after(async () => {
+    await client.close();
+    await server.close();
+  });
+
+  const calls = [
+    { name: "search_skills", arguments: { query: "swift" } },
+    { name: "get_skill", arguments: { id: skill.id } },
+    { name: "list_trending", arguments: {} },
+    { name: "list_gold_basket", arguments: {} },
+    { name: "list_by_author", arguments: { author: "anthropics" } }
+  ];
+  for (const call of calls) {
+    const response = await client.callTool(call);
+    assert.equal(response.isError, undefined, call.name);
+    const publicSkill = call.name === "get_skill"
+      ? response.structuredContent?.skill
+      : (response.structuredContent?.skills as unknown[])[0];
+    assert.ok(publicSkill && typeof publicSkill === "object", call.name);
+    assert.equal((publicSkill as { id: string }).id, skill.id);
+    assert.equal("publisher_handle" in publicSkill, false);
+    assert.equal("repo_commit_sha" in publicSkill, false);
+    assert.equal("skill_tree_sha" in publicSkill, false);
+    assert.equal((publicSkill as { install_status: string }).install_status, "pinned");
+    assert.deepEqual((publicSkill as { pinned_install: unknown }).pinned_install, {
+      repo: "anthropics/skills",
+      path: "skills/swift-review",
+      commit_sha: "a".repeat(40),
+      skill_md_sha: "c".repeat(40),
+      skill_tree_sha: "b".repeat(40)
+    });
+    assert.doesNotMatch(JSON.stringify(response.content), /readme_snippet|Internal catalog metadata/);
+  }
+});
+
+test("invalid or incomplete pin metadata never yields an install plan", async (context) => {
+  const invalid = {
+    ...fixtureData.skills[0],
+    repo_commit_sha: "a".repeat(40),
+    skill_md_sha: "c".repeat(40),
+    skill_md_path: "../swift-review/SKILL.md"
+  };
+  const library = OmgskillsLibrary.fromData({ skills: [invalid], trending: [], goldBasket: [] });
+  const server = createOmgskillsServer(library);
+  const client = new Client({ name: "omgskills-invalid-pin-test", version: "1.0.0" });
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  await server.connect(serverTransport);
+  await client.connect(clientTransport);
+  context.after(async () => {
+    await client.close();
+    await server.close();
+  });
+
+  const response = await client.callTool({ name: "get_skill", arguments: { id: invalid.id } });
+  const skill = response.structuredContent?.skill as Record<string, unknown>;
+  assert.equal(skill.install_status, "discovery_only");
+  assert.equal("pinned_install" in skill, false);
 });
 
 test("local Streamable HTTP transport initializes and calls tools", async (context) => {

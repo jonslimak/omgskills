@@ -364,7 +364,11 @@ function pageShell({
     .entity-copy p { max-width: 68ch; margin: 0; font-size: 13px; }
     .entity-copy .entity-subtitle { margin-bottom: 5px; color: var(--text); font-weight: 600; }
     .install-box { display: flex; align-items: center; gap: 12px; overflow: hidden; border: 0; border-radius: 8px; padding: 6px 8px 6px 14px; background: var(--soft); }
+    .install-method { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+    .agent-install { flex-wrap: wrap; margin-bottom: 16px; }
+    .agent-instructions { flex: 1 1 240px; min-width: 0; margin: 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
     .copy { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 30px; height: 30px; border: 0; padding: 0; background: transparent; color: var(--blue); cursor: pointer; }
+    .copy.agent-copy { width: auto; gap: 6px; padding: 0 4px; white-space: nowrap; font-size: 13px; font-weight: 600; }
     .copy:hover { color: var(--text); }
     .copy:focus-visible { outline: 3px solid rgba(0, 122, 255, .3); outline-offset: 2px; }
     .copy-icon { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -424,8 +428,9 @@ ${siteFooterHtml}
         window.setTimeout(() => {
           if (copyIcon) copyIcon.hidden = false;
           if (copiedIcon) copiedIcon.hidden = true;
-          button.setAttribute("aria-label", "Copy install command");
-          button.setAttribute("title", "Copy install command");
+          const label = button.dataset.copyLabel || "Copy install command";
+          button.setAttribute("aria-label", label);
+          button.setAttribute("title", label);
         }, 1200);
       });
     });
@@ -873,6 +878,8 @@ function renderSkillPage(
   const visibleDescription = visibleDescriptionForSkill(skill);
   const readmeSnippet = readmeSnippetForSkill(skill);
   const installId = `install-${createHash("sha256").update(skill.id).digest("hex").slice(0, 10)}`;
+  const pinnedInstall = hasPinnedInstall(skill);
+  const agentPrompt = `Install OMGSkills skill ${JSON.stringify(skill.id)} into this agent's normal skills directory: use the OMGSkills MCP get_skill tool, install only the pinned_install commit and path, verify SKILL.md against pinned_install.skill_md_sha, and stop if MCP or the pin is unavailable. Do not overwrite or change existing skills without asking me.`;
   const author = skill.author_handle
     ? skillAuthorReference(skill, profilePathByCreatorHandle)
     : null;
@@ -891,6 +898,12 @@ function renderSkillPage(
     ${tagsForSkill(skill)}
     <div class="section">
       ${pageHeading("Install")}
+      ${pinnedInstall ? `<p class="install-method">With your agent</p>
+      <div class="install-box agent-install">
+        <p class="agent-instructions" id="${escapeHtml(installId)}-agent">${escapeHtml(agentPrompt)}</p>
+        <button class="copy agent-copy" type="button" data-copy="${escapeHtml(installId)}-agent" data-copy-label="Copy for agent" aria-label="Copy for agent" title="Copy for agent"><svg class="copy-icon" data-copy-icon viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="copy-icon" data-copied-icon viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m20 6-11 11-5-5"/></svg><span>Copy for agent</span></button>
+      </div>
+      <p class="install-method">Manual command</p>` : ""}
       <div class="install-box">
       <pre class="install"><code id="${escapeHtml(installId)}">${escapeHtml(skill.install_cmd || "")}</code></pre>
       <button class="copy" type="button" data-copy="${escapeHtml(installId)}" aria-label="Copy install command" title="Copy install command"><svg class="copy-icon" data-copy-icon viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="copy-icon" data-copied-icon viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m20 6-11 11-5-5"/></svg></button>
@@ -912,6 +925,23 @@ function renderSkillPage(
     ogType: "article",
     indexTier: indexDecision.tier,
   });
+}
+
+function hasPinnedInstall(skill) {
+  const sha = /^[a-f0-9]{40}$/i;
+  if (!sha.test(skill.repo_commit_sha || "") || !sha.test(skill.skill_md_sha || "")) return false;
+  let url;
+  try {
+    url = new URL(skill.github_url);
+  } catch {
+    return false;
+  }
+  const repoParts = url.pathname.split("/").filter(Boolean);
+  if (url.protocol !== "https:" || url.hostname !== "github.com" || url.username || url.password || url.port || repoParts.length !== 2 || url.search || url.hash) return false;
+  if (!repoParts.every((part) => /^[a-z0-9_.-]+$/i.test(part))) return false;
+  const pathParts = String(skill.skill_md_path || "").split("/");
+  return pathParts.length >= 2 && pathParts.at(-1) === "SKILL.md"
+    && pathParts.every((part) => /^[a-z0-9_.-]+$/i.test(part) && part !== "." && part !== "..");
 }
 
 function renderProfilePage(collection, skills, skillUrlById, authorStats, recommendations = [], indexTier = "indexable") {
