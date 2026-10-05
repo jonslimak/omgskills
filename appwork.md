@@ -1,0 +1,271 @@
+# Unified Web App Plan
+
+Status: local-preview checkpoint approved for commit. Slice 1 UI and testing complete; Slice 0 all-host data access remains blocked. Live-data integration is not approved or implemented.
+Reviewed: 2026-10-05. Source baseline: `origin/main` at `61f9f13f`.
+
+## Goal
+
+Bring discovery from `/skills/` into `/app/`, using `web-handoff/app/` for the UI and interactions. Keep existing data models, APIs, permissions, and publishing pipelines unchanged.
+
+### Confirmed Decisions
+
+- Keep `/skills/`, public skill pages, creator pages, and collection pages available for search engines and existing links.
+- Make `/app/` the unified discovery and management experience.
+- Use the handoff's **My skills / Discover** switch, not the stacked navigation alternative.
+- Rebuild the design in the existing React portal. Do not ship the prototype runtime or its sample data.
+- Work locally first. Commit, production deployment, and any broader capability work need separate approval.
+
+## What Was Reviewed
+
+| Source | Findings |
+| --- | --- |
+| Live `https://omgskills.com/app/` | Currently presents authentication to signed-out visitors. Authenticated behavior was assessed from current-main source, not a signed-in live session. |
+| Live `https://omgskills.com/skills/` | Public discovery already has featured creators, collections, skill listings, and canonical detail links. Preserve this independent public surface. |
+| `web-handoff/app/README.md`, `Web App v2.dc.html`, `support.js` | High-fidelity discovery/management prototype with sidebar switch, shared rows, detail panel, account menu, and mobile navigation. Data and many actions are simulated. Reviewed source; interactive prototype rendering was not verified in this audit. |
+| Current-main portal and backend | The earlier portal redesign is already integrated. Reuse its session, membership, set, account, pairing, and access controls instead of implementing them again. |
+| Public catalog API | A live read-only `search_skills` request to `/mcp` returned structured catalog data successfully. This proves the endpoint responds, not browser/subdomain compatibility or performance under load. |
+
+### Checkout Safety
+
+The working checkout is `codex/pinned-install-test-mode` at `227716f7`, with unrelated local changes. It is not the implementation baseline. `origin/main` was refreshed for this review without switching branches.
+
+Start implementation from a clean worktree based on freshly fetched main. Carry over only this plan and the approved `web-handoff/app/` reference files, which are currently untracked. Leave this checkout and its unrelated changes untouched.
+
+## Target Experience
+
+### Navigation
+
+- Signed in: open My skills by default. Switch to Discover without leaving the app.
+- Signed out: open Discover without requiring authentication. Offer real Clerk sign-in for account actions, preserving the selected skill and destination.
+- My skills: All skills, Favorites, and Sets. Preserve current search, source filtering, selection, and bulk membership operations.
+- Discover: featured collections, trending skills, creators, collections, and categories supported by published data.
+- Search: separate results into My skills and Library. Local private results remain local; never send their descriptions or contents to public search.
+- Account menu: preserve access to profile, agents/sources, devices, private GitHub sources, MCP information, and sign-out. Moving these out of primary navigation must not remove existing functions.
+- Mobile: My skills / Discover / Sets bottom navigation; signed-out public browsing without private tabs.
+
+### Visual Structure
+
+- Expanded desktop sidebar 212px; collapsed rail 60px.
+- Below 760px: mobile header and navigation, no desktop sidebar.
+- From 1180px: 380px right detail panel; narrower desktop uses a floating panel; mobile uses a bottom sheet.
+- Content wrapper up to 1120px. Follow handoff spacing, neutral colors, blue actions, rows, avatars, and Lucide icons within the existing component system.
+- Shared skill rows and detail content across My skills, discovery lists, and set detail. Preserve readable long names and descriptions.
+- Keep agent/source indicators in stable columns, but derive the agents from actual data. Do not hardcode the prototype's five-agent population.
+- Use existing accessible dialog/menu primitives, visible focus, keyboard navigation, tooltips, and mobile safe-area padding. Keep typography locally bundled or system-based.
+- Support the supplied light/dark treatments with scoped tokens; appearance preference is browser UI state, not a new account field.
+- Resolve layout rules against available content width when the detail panel is open. Do not force three discovery columns into insufficient space.
+
+## Keep Existing Architecture
+
+Current production flow is `bootstrap.ts` -> `redesign-main.tsx` -> `account/PortalSession.tsx` -> `app/PortalApp.tsx` when the existing redesign flag is enabled.
+
+| Area | Planned work |
+| --- | --- |
+| `portal/src/app/PortalApp.tsx`, `routes.ts`, `redesign.css` | New navigation/layout and public discovery routes; retain established History API approach. |
+| `portal/src/app/SkillsPage.tsx`, `SetsPage.tsx`, `SetDetailPage.tsx`, `AccountPages.tsx`, `ui.tsx` | Adapt existing views to shared rows, detail panel, and relocated account controls. |
+| `portal/src/account/PortalSession.tsx` | Separate public browsing from authenticated account loading without weakening private-route checks. Keep existing session lifecycle. |
+| `portal/src/integration/` | Reuse real read/write controllers. Add a small public-catalog client and display adapters only where needed. |
+| Existing groups, devices, private-source and pairing modules | Reuse their contracts and controls. No schema, permission, or Mac changes. |
+| `portal/src/preview/` and tests | Extend existing development-only fixtures to review the new UI and states safely. |
+
+Suggested new components: app navigation, shared skill row, skill detail panel, Discover page, and reusable catalog list. Create them within existing ownership boundaries; avoid a second framework or generic provider system.
+
+New client display types may combine existing fields. They must not redefine stored skills, groups, installs, or sources.
+
+## Data Plan
+
+### Private Management
+
+Keep existing authenticated `/api/portal/` endpoints and controllers for synced skills, groups, membership, profile, devices, and private sources.
+
+- Keep `groupSyncedSkills` and physical source skill IDs. One displayed skill can represent multiple synced records.
+- Match a catalog skill to an installed skill through explicit `catalogSkillId`. Never merge by display name or repository URL alone.
+- Keep ambiguous/local-only states explicit. Do not send private identifiers to public catalog lookups.
+- Preserve aborts, session/account-specific caches, refresh-on-focus, sign-out cleanup, and protection from late responses.
+- Preserve real mutation outcomes, partial bulk failures, permission checks, and ownership-specific controls.
+
+### Public Discovery
+
+Use existing published sources, not HTML scraping or a new copied catalog:
+
+| UI | Existing source |
+| --- | --- |
+| Search | Public `/mcp` `search_skills` |
+| Trending | `/mcp` `list_trending`; preserve current ranking meaning, do not invent weekly growth metrics |
+| Skill summary/details | `/mcp` `get_skill` |
+| Creator skills | `/mcp` `list_by_author` |
+| Collections and featured creator metadata | Manifest-discovered collections asset using the existing library's track/fallback rules |
+| Canonical public links | Existing `/catalog-skill-urls.json` and library URL conventions; measure mapping payload before deciding when to fetch it |
+
+The current-main raw skills asset is approximately 79MB uncompressed. The collections asset is approximately 93KB. Never load the raw skills asset in the browser or import the server's filesystem-based catalog loader.
+
+Use a small typed client around existing MCP JSON responses, with validation, aborts, timeouts, and honest errors. Prefer `structuredContent`; handle protocol errors and tool errors separately from empty results. Do not add a heavyweight SDK to the browser solely for these few read calls unless it is demonstrably simpler and small enough.
+
+- Debounce remote search; abort outdated requests and deduplicate detail lookups.
+- Fetch only the visible discovery section and selected details initially.
+- Bound collection detail lookups and concurrency; reuse results across views.
+- Lazy-load avatar images and retain dimensions/fallbacks to avoid layout jumps.
+- Public caches must be separate from account data and bounded in memory.
+- The current tools cap results at 100 and expose no cursor/offset. Do not invent pagination, total counts, or promise a complete creator listing. Offer refinement/public links where needed.
+- The authenticated `catalog-search` endpoint returns only up to 12 basic results and requires sign-in. It is not the replacement for public Discover.
+- Use real collections/categories and available labels. Do not fill the prototype's six-item groups with invented categories or quality claims.
+
+### Transport Gate
+
+Prove browser requests before building all discovery screens:
+
+1. Verify `/app/` on the primary domain can call `/mcp` and published assets.
+2. Verify the local development proxy routes those requests correctly.
+3. Verify `app.omgskills.com` separately. The current subdomain rewrite can intercept generic paths; a same-origin `/mcp` assumption is not safe there. Cross-origin CORS support has not been verified.
+4. If existing routes cannot support this without server/deploy changes, stop that slice and request a narrowly scoped plan adjustment. Do not silently add new endpoints, CORS policy, or a second data feed.
+
+## Capability Rules
+
+The handoff is the design authority, not proof that a backend capability exists.
+
+| Handoff feature | First-release treatment |
+| --- | --- |
+| My skills / source filters / detail | Real synced data, existing grouping, explicit unknown fields. |
+| Favorites for installed skills | Reuse real membership controller. Favorites remains a public, protected group; do not imply privacy. |
+| Sets and bulk add/remove | Retain existing synced/catalog/GitHub/private-release behavior and permissions; do not flatten mixed items into only catalog rows. |
+| Favorite/add-to-set from Discover | Enable only where identity and repeat actions can be verified. POST supports catalog items, but current group-item responses omit `catalogSkillId`; do not guess membership from names/URLs or create duplicates. Resolve this contract gap before promising a fully reversible catalog toggle. Keep existing installed-skill controls working. |
+| Get / install | Use the existing supported copy-for-agent/source-link flow, checking pinned versus discovery-only metadata. No simulated successful install or new helper rollout. A copied instruction is not an installed skill. |
+| Agent picker / remove from all agents | Observed sources may be displayed; remote install/uninstall controls stay omitted until a supported contract exists. |
+| Updates / Update all / version diff / Keep updated | Omit unsupported controls and badges. No fabricated version numbers, update counts, or "all up to date" state. Pinned public metadata alone is not update detection. |
+| Agent/device status | Display actual observed sources and devices. Last synced does not mean last used, currently online, or remotely controllable. |
+| Set visibility/access | Preserve Public / Invite only / Only me. Allowed emails grant access; they do not prove an email was sent. Preserve owner versus reader permissions. |
+| README / About | Show existing description/available public metadata and source links. The public API does not provide full README content; do not fetch the entire catalog or fabricate it. |
+| Top-rated badge / members / creator totals | Display only values with real supporting fields and correct semantics; otherwise omit. |
+| GitHub connection, profile, devices, MCP | Retain current account capabilities and gates; account-menu placement is a UI change only. |
+| Signed-out Get | Do not promise sign-in enables unsupported remote installs. Keep public copy/source actions available and require auth for genuine account actions. |
+
+These limits are recommended scope boundaries, not backend tasks approved by this plan. If full prototype functionality is required, revise scope explicitly before implementation.
+
+## Routes And State
+
+Extend existing route helpers; no routing-library migration is needed.
+
+- Preserve `/app/`, `/app/sets`, `/app/groups/:id`, `/app/agents`, and `/app/home`. Old account routes may render within the new shell and remain valid links.
+- Add explicit Discover, trending, creator, collection, category, and search destinations under `/app/`.
+- Encode selected skill ID and search/filter state safely; support direct refresh, back/forward, and opening links in a new tab.
+- Closing detail restores the underlying list and focus. Leaving a view resets incompatible edit selections and menus.
+- Preserve `/app/connect`, its fragment-based pairing state, review routes, and the `/` portal base on `app.omgskills.com`.
+- Safe internal destinations only after authentication. Signing out clears private data immediately but can retain public browsing state.
+- Show real not-found/unavailable states for missing skills and deleted/inaccessible sets.
+- Public `/skills/` URLs keep their current content/canonical behavior. No mass redirect into an authenticated or JavaScript-only app.
+
+## Implementation Slices
+
+Slices 0-1 are approved. Slices 2-5 still require approval. Each ends with a local review/checkpoint.
+
+### 0. Fresh Baseline And Capability Proof
+
+- [x] Create a clean latest-main worktree; carry only approved reference files.
+- [x] Run existing portal tests/build and record baseline failures separately.
+- [ ] Verify public transport, bounded search/detail, published collection fields, and canonical links on primary/local/subdomain routes.
+- [x] Confirm exact current install handoff and catalog-membership limitations. Escalate only genuinely necessary scope changes.
+
+### 1. Shell And Shared Visual Components
+
+- [x] Build the switch-based shell, rail, mobile navigation, account menu, rows, and responsive detail using existing preview isolation.
+- [x] Use deterministic fixtures for signed-out, signed-in, long names, empty states, errors, and mixed skill sources.
+- [ ] Review visual fidelity before wiring new catalog requests. No real account writes in preview.
+
+### 2. Discover With Real Public Data
+
+- [ ] Add the bounded public-data adapter and public browsing routes.
+- [ ] Connect collections, creators, trending, category/search lists, and skill summaries to existing sources.
+- [ ] Add public links and honest copy/source actions, with visible failures and clipboard confirmation.
+- [ ] Verify no raw skills download, full-catalog fan-out, or private-data leakage.
+
+### 3. Management In The New Shell
+
+- [ ] Connect existing account sessions, My skills, Favorites, Sets, filters, and bulk operations.
+- [ ] Preserve all existing set edits, ordering, access, Hide/Restore, and mixed-item behaviors.
+- [ ] Move profile/devices/private-source controls into reachable account destinations.
+- [ ] Cross-link discovered and installed skills only with explicit identity. Implement only proven catalog membership actions.
+
+### 4. End-To-End Hardening
+
+- [ ] Test auth transitions, stale responses, account switching, deep links, mobile sheets, keyboard access, and loading/error states.
+- [ ] Verify existing pairing, review, public pages, and protected routes remain unchanged.
+- [ ] Compare request counts, transfer sizes, built bundle size, and cold/warm navigation to the baseline. Investigate regressions before rollout.
+- [ ] Present a working local URL and explicit list of any remaining unsupported prototype controls.
+
+### 5. Approved Release
+
+- [ ] Obtain approval after local review; commit only scoped client changes from the correct main baseline.
+- [ ] Follow current deployment documentation and guarded current-main workflow; build the combined `dist/netlify-site` artifact, never deploy only `site` or `portal/dist`.
+- [ ] Verify draft before production, preserving public pages, downloads, appcast, manifests, release assets, and feature gates.
+- [ ] After separate production approval, verify both app hosts, public library, auth/account workflows, and catalog requests. Retain prior deployment for rollback.
+
+## Verification
+
+Commands confirmed in current-main package scripts; run from the implementation worktree, not this stale checkout:
+
+```sh
+npm --workspace portal test
+npm run build:portal
+npm run test:portal-grouping
+npm run test:public-skill-links
+npm run test:mcp-production
+npm run test:deploy-safety
+```
+
+Before approved release, run the full `npm run check` and combined build under the deployment guide's environment requirements. Local preview verification is recorded below; full release checks are not yet run.
+
+New focused coverage:
+
+- Route parsing/base paths, selection and back/forward, safe auth returns.
+- Catalog response validation, tool errors, rate limits, timeouts, cancellation, and bounded requests.
+- Identity matching with duplicate names, multiple skills per repo, ambiguous/local-only records, and multiple agent sources.
+- Membership pending/success/failure and partial bulk outcomes; preserve selection for failed work.
+- Sign-out/account switch while requests are in flight; no private data in another account or public cache.
+- Read-only/public/invited/owner views; protected Favorites behavior and missing catalog identity.
+- Production cannot activate preview fixtures or test-only writes.
+
+Browser checks at 390, 759, 760, 1179, 1180, and 1440px, plus narrow 320px overflow testing. Cover sidebar/rail, panel/sheet transition, open menus, long content, and keyboard focus. Confirm primary lists do not reload or jump unexpectedly when detail opens.
+
+Real write tests use an approved isolated account/backend and disposable private sets. Preview success is not proof of integration. Production mutation checks need specific approval; do not test destructive actions on the user's real skills.
+
+## Main Risks And Decisions Still Needed
+
+1. **Prototype capabilities exceed current APIs.** Keep the UI truthful; adding remote installs/updates is separate work.
+2. **Catalog membership identity is incomplete in read responses.** Keep current installed Favorites working; confirm whether Discover mutations can be safe without changing contracts before exposing them.
+3. **Public transport on the app subdomain is unproven.** Resolve at Slice 0 before choosing a browser adapter for all hosts.
+4. **Bounded APIs are not a complete catalog export.** Use existing curated discovery and honest search limits, not fake pagination or counts.
+5. **Public versus private visibility can be confused in the new layout.** Preserve permissions and clear visibility indicators, especially public Favorites.
+
+Recommended next step: resolve the subdomain transport decision before approving live-data integration. The user approved committing the local-preview checkpoint, not pushing or deploying it.
+
+## Local Preview Receipt - 2026-10-05
+
+- Working directory: `/private/tmp/omgskills-unified-app-preview`
+- Branch: `codex/unified-app-preview`, based on `61f9f13f`.
+- URL: http://127.0.0.1:5190/app/preview/unified/
+- Discover directly: http://127.0.0.1:5190/app/preview/unified/?view=discover
+- Persistent sample-data marker; top controls select signed-in/out and populated, empty, loading, error, long-content, or connected-source scenarios.
+- Local-only bootstrap uses the existing development + explicit opt-in + loopback + preview-path gate. Existing preview and production entry points are retained.
+- New shell supports the mode switch, collapsed rail, discovery lists, search, account destinations, mobile tabs, desktop/floating/mobile detail, light/dark appearance, and browser history.
+- Sample favorites, create set, bulk membership and visibility changes are memory-only. Account settings are sample summaries, not newly integrated production editors. Unsupported install/update actions are not simulated.
+- The prototype runtime is not imported; only supplied avatar assets are used in preview fixtures.
+- This local-preview checkpoint is approved for a scoped commit on `codex/unified-app-preview`. No push, deployment, schema/API changes, account writes, feature activation, or Mac release changes.
+
+### Checks Passed
+
+- Baseline: 135 portal tests and production build.
+- After changes: 142 portal tests, TypeScript and production build using Node 20.20.0.
+- Production build also tested with the preview environment flag set: new preview sample strings, component markers, and fixture assets are excluded. A dummy publishable test key was used for build coverage, not authentication.
+- Browser screenshots and overflow checks at 320, 390, 759, 760, 1179, 1180 and 1440px; additional long-content and dark-mode checks.
+- Sample favorites, create set, bulk membership, shared-set read-only visibility, mixed-source set items, search, rail collapse, back navigation, deep-link refresh, Escape and focus return, error recovery and signed-out browsing.
+- Browser request log showed no account/catalog API calls from the local fixture preview.
+- Screenshots: `output/playwright/` in the worktree. The local server lacks a favicon (404); it does not affect app rendering. A development hot-reload duplicate-root warning was traced to entry-module re-evaluation and corrected by retaining the React root in Vite's hot data.
+
+### Data Access Result And Remaining Gate
+
+- From a signed-out browser at `https://omgskills.com/app/`: bounded public search returned 200 and one result; manifest and manifest-discovered collections returned 200; 92 collections were present.
+- Canonical URL mapping returned 200 and measured 89,552 bytes. No raw skills asset was requested.
+- `POST https://app.omgskills.com/mcp` returned 404. Cross-origin preflight to the primary-domain MCP endpoint returned 405 without an allow-origin header.
+- Therefore the primary-domain path is viable, but the app subdomain needs a separately approved routing/CORS solution. No routing changes were made.
+- Local real-data proxy and production integration remain deferred. Slice 0's all-host transport check is intentionally incomplete, not treated as passed.
+- Authenticated production behavior and real account mutations have not been re-tested for this preview; those belong to later integration slices.

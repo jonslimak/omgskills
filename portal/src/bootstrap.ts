@@ -13,7 +13,11 @@ if (
     pathname: location.pathname,
   })
 ) {
-  void import("./preview/main");
+  if (/^\/app\/preview\/unified(?:\/|$)/.test(location.pathname)) {
+    void import("./preview/unified/main");
+  } else {
+    void import("./preview/main");
+  }
 } else if (
   import.meta.env.DEV &&
   isLocalIntegration({

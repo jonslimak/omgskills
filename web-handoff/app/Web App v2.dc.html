@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+:root{--cta:#0071e3;--bg:#fff;--ink:#000;--body:#3a3a3c;--muted:#6e6e73;--faint:#aeaeb2;--chip:#f2f2f7;--side:#f5f5f7;--hair:#e5e5ea;--card:#fff;--sel:#e8e8ed;--update:#34c759;--star:#f59e0b;--shadow:0 1px 2px rgba(0,0,0,.06),0 12px 40px rgba(0,0,0,.14);--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;--display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter Tight","Inter",system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+:root[data-theme="dark"]{color-scheme:dark;--cta:#0a84ff;--bg:#000;--ink:#f5f5f7;--body:#d1d1d6;--muted:#98989d;--faint:#636366;--chip:#232326;--side:#161618;--hair:#2c2c2e;--card:#3a3a3d;--sel:#2c2c2e;--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 40px rgba(0,0,0,.6)}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--cta);text-decoration:none}a:hover{opacity:.72}
+button{font-family:inherit;color:inherit}
+input{font-family:inherit}
+</style>
+</helmet>
+<div style="height:100vh; display:flex; background:var(--bg); color:var(--ink); font-family:var(--sans); overflow:hidden; position:relative;">
+
+  <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+    <aside style="width:212px; flex:none; display:flex; flex-direction:column; background:var(--side); border-right:1px solid var(--hair); box-sizing:border-box;">
+      <div style="display:flex; align-items:center; gap:8px; padding:14px 16px 10px;">
+        <span style="font-size:19px; line-height:1;">👀</span>
+        <sc-if value="{{ showWordmark }}" hint-placeholder-val="{{ true }}"><span style="flex:1; font-size:14px; font-weight:700; letter-spacing:-0.02em;">omgskills</span></sc-if>
+        <sc-if value="{{ showModeText }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1; display:flex; align-items:baseline; gap:12px; margin-left:4px;">
+            <sc-for list="{{ modes }}" as="m" hint-placeholder-count="0">
+              <button onClick="{{ m.onClick }}" style="position:relative; padding:0; border:0; background:none; color:{{ m.textColor }}; font-size:14px; font-weight:700; letter-spacing:-0.02em; cursor:pointer; white-space:nowrap;" style-hover="color:var(--ink);">{{ m.label }}<sc-if value="{{ m.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:-1px; right:-8px; width:6px; height:6px; border-radius:50%; background:var(--update);"></span></sc-if></button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ showModeTabs }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:1fr 1fr; margin:0 16px 10px; border-bottom:1px solid var(--hair);">
+          <sc-for list="{{ modes }}" as="m" hint-placeholder-count="0">
+            <button onClick="{{ m.onClick }}" style="position:relative; height:30px; padding:0; margin-bottom:-1px; border:0; border-bottom:2px solid {{ m.lineColor }}; background:none; color:{{ m.textColor }}; font-size:12px; font-weight:600; cursor:pointer;">{{ m.label }}<sc-if value="{{ m.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block; width:6px; height:6px; margin-left:5px; border-radius:50%; background:var(--update); vertical-align:2px;"></span></sc-if></button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showModeSeg }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:2px 10px 8px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; padding:2px; border-radius:9px; background:var(--sel);">
+            <sc-for list="{{ modes }}" as="m" hint-placeholder-count="0">
+              <button onClick="{{ m.onClick }}" style="position:relative; height:26px; padding:0 8px; border:0; border-radius:7px; background:{{ m.bg }}; box-shadow:{{ m.shadow }}; color:{{ m.color }}; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;">{{ m.label }}<sc-if value="{{ m.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:6px; margin-left:5px; width:7px; height:7px; border-radius:50%; background:var(--update);"></span></sc-if></button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <div style="padding:2px 10px 8px;">
+        <label style="display:flex; align-items:center; gap:6px; height:30px; padding:0 10px; border-radius:8px; background:var(--bg); color:var(--muted); box-shadow:0 0 0 1px var(--hair);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="{{ searchPh }}" style="flex:1; min-width:0; border:0; outline:0; background:none; font-size:12px; color:var(--ink);">
+        </label>
+      </div>
+      <div style="flex:1; overflow:auto; padding:4px 8px 12px; display:flex; flex-direction:column; gap:14px;">
+        <sc-for list="{{ navSections }}" as="sec" hint-placeholder-count="0">
+          <div style="display:flex; flex-direction:column; gap:1px;">
+            <sc-if value="{{ sec.label }}" hint-placeholder-val="{{ true }}"><div style="padding:0 10px 4px; font-size:10px; font-weight:600; color:var(--faint);">{{ sec.label }}</div></sc-if>
+            <sc-for list="{{ sec.items }}" as="it" hint-placeholder-count="0">
+              <button onClick="{{ it.onClick }}" style="display:flex; align-items:center; gap:8px; height:30px; padding:0 10px; border:0; border-radius:7px; background:{{ it.bg }}; cursor:pointer; text-align:left; font-size:12px; font-weight:{{ it.weight }};">
+                <sc-if value="{{ it.hasImg }}" hint-placeholder-val="{{ false }}"><span  style="display:block; flex:none; width:18px; height:18px; border-radius:50%; object-fit:cover; display:block; background:var(--chip) center/cover no-repeat; background-image:url({{ it.img }});"></span></sc-if>
+                <sc-if value="{{ it.hasIcon }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ it.iconColor }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin:0 1px;"><path d="{{ it.icon }}"></path></svg></sc-if>
+                <span style="flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ it.label }}</span>
+                <sc-if value="{{ it.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:999px; background:var(--update); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;">{{ it.badge }}</span></sc-if>
+                <sc-if value="{{ it.hasCount }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums;">{{ it.count }}</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding:4px 8px 6px;">
+        <button onClick="{{ toggleRail }}" title="Collapse sidebar" aria-label="Collapse sidebar" style="width:32px; height:30px; padding:0; border:0; border-radius:7px; background:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:var(--sel);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM9 4v16"></path></svg></button>
+      </div>
+      <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ true }}"><div style="padding:8px; border-top:1px solid var(--hair);">
+        <button onClick="{{ toggleAcct }}" style="width:100%; display:flex; align-items:center; gap:8px; height:42px; padding:0 8px; border:0; border-radius:12px; background:none; cursor:pointer; text-align:left;" style-hover="background:var(--sel);">
+          <img src="assets/you.jpg" alt="" style="width:26px; height:26px; border-radius:50%; object-fit:cover;">
+          <span style="flex:1; display:flex; flex-direction:column; gap:1px; min-width:0;">
+            <span style="font-size:12px; font-weight:600;">you</span>
+            <span style="font-size:10px; color:var(--muted);">{{ agentSummary }}</span>
+          </span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"></path></svg>
+        </button>
+      </div></sc-if>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ showRail }}" hint-placeholder-val="{{ false }}">
+    <aside style="width:60px; flex:none; display:flex; flex-direction:column; align-items:center; background:var(--side); border-right:1px solid var(--hair); box-sizing:border-box;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 0 8px;">
+        <span style="font-size:19px; line-height:1; height:28px; display:flex; align-items:center;">👀</span>
+      </div>
+      <sc-if value="{{ showModeSeg }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-direction:column; gap:2px; padding:2px; margin-bottom:8px; border-radius:10px; background:var(--sel);">
+          <sc-for list="{{ modes }}" as="m" hint-placeholder-count="0">
+            <button onClick="{{ m.onClick }}" title="{{ m.label }}" style="position:relative; width:36px; height:30px; padding:0; border:0; border-radius:8px; background:{{ m.bg }}; box-shadow:{{ m.shadow }}; color:{{ m.color }}; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ m.icon }}"></path></svg><sc-if value="{{ m.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:4px; right:5px; width:7px; height:7px; border-radius:50%; background:var(--update);"></span></sc-if></button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <button onClick="{{ toggleRail }}" title="Search" aria-label="Search" style="width:40px; height:34px; padding:0; border:0; border-radius:9px; background:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:var(--sel);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></button>
+      <div style="flex:1; width:100%; overflow:auto; display:flex; flex-direction:column; align-items:center; padding:6px 0 12px;">
+        <sc-for list="{{ navSections }}" as="sec" hint-placeholder-count="0">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 0; border-top:1px solid var(--hair); width:36px;">
+            <sc-for list="{{ sec.items }}" as="it" hint-placeholder-count="0">
+              <button onClick="{{ it.onClick }}" title="{{ it.label }}" aria-label="{{ it.label }}" style="position:relative; width:40px; height:34px; padding:0; border:0; border-radius:9px; background:{{ it.bg }}; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <sc-if value="{{ it.hasImg }}" hint-placeholder-val="{{ false }}"><span style="display:block; width:20px; height:20px; border-radius:50%; background:var(--chip) center/cover no-repeat; background-image:url({{ it.img }});"></span></sc-if>
+                <sc-if value="{{ it.hasIcon }}" hint-placeholder-val="{{ false }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="{{ it.iconColor }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ it.icon }}"></path></svg></sc-if>
+                <sc-if value="{{ it.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:3px; right:4px; min-width:15px; height:15px; padding:0 4px; box-sizing:border-box; border-radius:999px; background:var(--update); color:#fff; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center;">{{ it.badge }}</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding:4px 0 6px; display:flex; justify-content:center;">
+        <button onClick="{{ toggleRail }}" title="Expand sidebar" aria-label="Expand sidebar" style="width:40px; height:30px; padding:0; border:0; border-radius:8px; background:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:var(--sel);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM9 4v16"></path></svg></button>
+      </div>
+      <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ true }}"><div style="padding:8px 0 12px; border-top:1px solid var(--hair); width:100%; display:flex; justify-content:center;">
+        <button onClick="{{ toggleAcct }}" title="Account" style="width:40px; height:40px; padding:0; border:0; border-radius:50%; background:none; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:var(--sel);"><img src="assets/you.jpg" alt="" style="width:28px; height:28px; border-radius:50%; object-fit:cover;"></button>
+      </div></sc-if>
+    </aside>
+  </sc-if>
+
+  <main style="position:relative; flex:1; min-width:0; display:flex; flex-direction:column;">
+    <sc-if value="{{ desktopSignin }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; top:18px; right:24px; z-index:5; display:flex; align-items:center; gap:14px;">
+        <a href="https://omgskills.com/" style="font-size:13px; font-weight:500; color:var(--muted);">Get the Mac app</a>
+        <button onClick="{{ openSignin }}" style="height:32px; padding:0 16px; border:0; border-radius:999px; background:var(--cta); color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Sign in</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:12px; padding:14px 16px 12px; flex:none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <span style="font-size:25px; line-height:1;">👀</span>
+          <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ true }}"><button onClick="{{ toggleAcct }}" style="width:44px; height:44px; padding:4px; border:0; border-radius:50%; background:none; cursor:pointer; margin-right:-4px;"><img src="assets/you.jpg" alt="" style="width:36px; height:36px; border-radius:50%; object-fit:cover; display:block;"></button></sc-if><sc-if value="{{ signedOut }}" hint-placeholder-val="{{ false }}"><button onClick="{{ openSignin }}" style="height:34px; padding:0 16px; border:0; border-radius:999px; background:var(--cta); color:#fff; font-size:14px; font-weight:600; cursor:pointer;">Sign in</button></sc-if>
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; height:44px; padding:0 14px; border-radius:999px; background:var(--chip); color:var(--muted);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Search skills or creators" style="flex:1; min-width:0; border:0; outline:0; background:none; font-size:15px; color:var(--ink);">
+        </label>
+      </div>
+    </sc-if>
+
+    <div style="flex:1; overflow:auto;">
+      <div style="max-width:1120px; margin:0 auto; padding:{{ contentPad }}; box-sizing:border-box; display:flex; flex-direction:column; gap:{{ pageGap }};">
+        <sc-if value="{{ hasBack }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onBack }}" style="align-self:flex-start; display:flex; align-items:center; gap:4px; height:28px; padding:0 10px 0 4px; margin:-6px 0 -12px -6px; border:0; border-radius:999px; background:none; color:var(--cta); font-size:12px; font-weight:500; cursor:pointer;" style-hover="background:var(--chip);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>{{ backLabel }}</button>
+        </sc-if>
+
+        <sc-if value="{{ isDiscover }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-family:var(--display); font-weight:700; font-size:{{ titleSize }}; line-height:1; letter-spacing:-0.045em;">Discover</span>
+            <span style="font-size:12px; color:var(--muted);">Curated daily from creators you can trust.</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:{{ featCols }}; gap:10px;">
+            <sc-for list="{{ featured }}" as="c" hint-placeholder-count="0">
+              <button onClick="{{ c.onClick }}" style="display:flex; flex-direction:column; justify-content:space-between; gap:24px; min-height:150px; padding:16px 18px; border:0; border-radius:20px; background:var(--chip); cursor:pointer; text-align:left;" style-hover="background:var(--sel);">
+                <span style="display:flex;"><sc-for list="{{ c.imgs }}" as="im" hint-placeholder-count="0"><span  style="display:block; width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--chip); margin-left:{{ im.ml }}; background:var(--chip) center/cover no-repeat; background-image:url({{ im.src }});"></span></sc-for></span>
+                <span style="display:flex; flex-direction:column; gap:4px;">
+                  <span style="font-size:10px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.02em;">{{ c.kicker }}</span>
+                  <span style="font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:-0.025em; line-height:1.1;">{{ c.name }}</span>
+                  <span style="font-size:12px; line-height:1.35; color:var(--muted);">{{ c.tagline }}</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+              <span style="font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:-0.025em;">Top this week</span>
+              <button onClick="{{ goTop }}" style="padding:0; border:0; background:none; color:var(--cta); font-size:12px; font-weight:500; cursor:pointer;">See all</button>
+            </div>
+            <div style="display:grid; grid-template-columns:{{ topCols }}; grid-auto-flow:{{ topFlow }}; grid-template-rows:{{ topRowsTpl }}; column-gap:28px;">
+              <sc-for list="{{ topRows }}" as="r" hint-placeholder-count="0">
+                <div onClick="{{ r.onClick }}" style="display:flex; align-items:center; gap:12px; padding:0 8px; margin:0 -8px; border-radius:14px; background:{{ r.bg }}; cursor:pointer; min-width:0;" style-hover="background:var(--chip);">
+                  <span style="flex:none; width:16px; text-align:center; font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">{{ r.rank }}</span>
+                  <span  style="display:block; flex:none; width:27px; height:27px; border-radius:50%; object-fit:cover; background:var(--chip) center/cover no-repeat; background-image:url({{ r.img }});"></span>
+                  <div style="flex:1; min-width:0; align-self:stretch; display:flex; align-items:center; gap:10px; min-height:52px;">
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;">
+                      <span style="font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ r.name }}</span>
+                      <span style="font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">@{{ r.by }} · ★ {{ r.stars }}</span>
+                    </div>
+                    <button onClick="{{ r.onAction }}" style="flex:none; height:26px; min-width:56px; padding:0 12px; border:0; border-radius:999px; background:{{ r.actionBg }}; color:{{ r.actionFg }}; font-size:11px; font-weight:700; cursor:pointer;">{{ r.actionLabel }}</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+              <span style="font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:-0.025em;">Creators</span>
+              <button onClick="{{ goCreators }}" style="padding:0; border:0; background:none; color:var(--cta); font-size:12px; font-weight:500; cursor:pointer;">See all</button>
+            </div>
+            <div style="display:grid; grid-template-columns:{{ creatorCols }}; gap:0 28px;">
+              <sc-for list="{{ creatorCards }}" as="c" hint-placeholder-count="0">
+                <button onClick="{{ c.onClick }}" style="display:flex; align-items:center; gap:12px; height:52px; padding:0; border:0; background:none; cursor:pointer; text-align:left; min-width:0;" style-hover="opacity:.72;">
+                  <span style="display:block; flex:none; width:34px; height:34px; border-radius:50%; background:var(--chip) center/cover no-repeat; background-image:url({{ c.img }});"></span>
+                  <span style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;">
+                    <span style="font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.name }}</span>
+                    <span style="font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.tagline }}</span>
+                  </span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="m9 18 6-6-6-6"></path></svg>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:22px;">
+            <span style="font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:-0.025em; margin-bottom:-8px;">Categories</span>
+            <sc-for list="{{ categories }}" as="g" hint-placeholder-count="0">
+              <div style="display:flex; flex-direction:column; gap:2px;">
+                <span style="font-size:11px; font-weight:600; color:var(--muted);">{{ g.label }}</span>
+                <div style="display:grid; grid-template-columns:{{ catCols }}; column-gap:24px;">
+                  <sc-for list="{{ g.items }}" as="t" hint-placeholder-count="0">
+                    <button onClick="{{ t.onClick }}" style="display:flex; align-items:center; gap:10px; height:38px; padding:0; border:0; background:none; cursor:pointer; text-align:left; min-width:0;" style-hover="opacity:.72;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="{{ t.icon }}"></path></svg>
+                      <span style="flex:1; min-width:0; font-size:12px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ t.label }}</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="m9 18 6-6-6-6"></path></svg>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <sc-if value="{{ hasHero }}" hint-placeholder-val="{{ false }}">
+              <span style="flex:none; display:flex;"><sc-for list="{{ heroImgs }}" as="im" hint-placeholder-count="0"><span  style="display:block; width:{{ heroSize }}; height:{{ heroSize }}; border-radius:50%; object-fit:cover; border:3px solid var(--bg); margin-left:{{ im.ml }}; background:var(--chip) center/cover no-repeat; background-image:url({{ im.src }});"></span></sc-for></span>
+            </sc-if>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;">
+              <span style="font-family:var(--display); font-weight:700; font-size:{{ titleSize }}; line-height:1; letter-spacing:-0.045em;">{{ title }}</span>
+              <span style="font-size:12px; color:var(--muted);">{{ meta }}</span>
+            </div>
+            <sc-if value="{{ isSet }}" hint-placeholder-val="{{ false }}">
+              <div style="position:relative; align-self:flex-start; flex:none;">
+                <button onClick="{{ toggleVisMenu }}" style="display:flex; align-items:center; gap:6px; height:30px; padding:0 10px 0 12px; border:0; border-radius:999px; background:var(--chip); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{ visIcon }}"></path></svg>{{ setVis }}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+                <sc-if value="{{ visMenu }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:38px; right:0; z-index:30; width:260px; padding:6px; border-radius:16px; background:var(--bg); box-shadow:var(--shadow); box-sizing:border-box; display:flex; flex-direction:column;">
+                    <sc-for list="{{ visOptions }}" as="o" hint-placeholder-count="0">
+                      <button onClick="{{ o.onClick }}" style="display:flex; align-items:flex-start; gap:10px; padding:8px 10px; border:0; border-radius:10px; background:none; cursor:pointer; text-align:left;" style-hover="background:var(--chip);">
+                        <span style="flex:none; width:14px; padding-top:1px; color:var(--cta); font-size:12px;">{{ o.check }}</span>
+                        <span style="flex:1; display:flex; flex-direction:column; gap:1px;"><span style="font-size:13px; font-weight:600;">{{ o.label }}</span><span style="font-size:11px; color:var(--muted); line-height:1.35;">{{ o.sub }}</span></span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ isSet }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:14px 14px 14px 18px; border-radius:22px; background:var(--chip);">
+              <span style="display:flex;"><sc-for list="{{ setMembers }}" as="m" hint-placeholder-count="0"><span  style="display:block; width:28px; height:28px; border-radius:50%; object-fit:cover; border:2px solid var(--chip); margin-left:{{ m.ml }}; background:var(--chip) center/cover no-repeat; background-image:url({{ m.src }});"></span></sc-for></span>
+              <span style="margin-left:auto; display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted);">Keep updated
+                <button onClick="{{ toggleSetKeep }}" style="position:relative; width:44px; height:26px; padding:0; border:0; border-radius:999px; background:{{ setKeepBg }}; cursor:pointer; flex:none;"><span style="position:absolute; top:2px; left:{{ setKeepKnob }}; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25);"></span></button>
+              </span>
+              <button style="height:36px; padding:0 16px; border:0; border-radius:999px; background:var(--update); color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Invite</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showAgentFilter }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:-8px;">
+              <div style="position:relative;">
+                <button onClick="{{ toggleAgentMenu }}" style="display:flex; align-items:center; gap:6px; height:30px; padding:0 10px 0 12px; border:0; border-radius:999px; background:var(--chip); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">
+                  <span style="color:var(--muted); font-weight:500;">Agent</span>{{ agentLabel }}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+                <sc-if value="{{ agentMenu }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:44px; left:0; z-index:30; width:270px; padding:6px; border-radius:18px; background:var(--bg); box-shadow:var(--shadow); box-sizing:border-box; display:flex; flex-direction:column;">
+                    <sc-for list="{{ agentOptions }}" as="o" hint-placeholder-count="0">
+                      <button onClick="{{ o.onClick }}" style="display:flex; align-items:center; gap:10px; min-height:40px; padding:0 10px; border:0; border-radius:10px; background:none; cursor:pointer; text-align:left; font-size:13px;" style-hover="background:var(--chip);">
+                        <span style="flex:none; width:16px; color:var(--cta);">{{ o.check }}</span>
+                        <span style="flex:1;">{{ o.label }}</span>
+                        <span style="font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums;">{{ o.count }}</span>
+                      </button>
+                    </sc-for>
+                    <div style="height:1px; background:var(--hair); margin:4px 10px;"></div>
+                    <button style="display:flex; align-items:center; min-height:40px; padding:0 10px 0 36px; border:0; border-radius:10px; background:none; cursor:pointer; text-align:left; font-size:13px; color:var(--cta);" style-hover="background:var(--chip);">Connect an agent…</button>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <sc-if value="{{ hasUpdateAll }}" hint-placeholder-val="{{ false }}"><button onClick="{{ updateAll }}" style="height:30px; padding:0 14px; border:0; border-radius:999px; background:var(--update); color:#fff; font-size:12px; font-weight:600; cursor:pointer;">Update all</button></sc-if>
+                <button onClick="{{ toggleEdit }}" style="height:30px; padding:0 14px; border:0; border-radius:999px; background:var(--chip); color:var(--ink); font-size:12px; font-weight:600; cursor:pointer;">{{ editLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showBulk }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:44px; padding:6px 6px 6px 14px; margin-bottom:-12px; border-radius:14px; background:var(--chip); box-sizing:border-box;">
+              <button onClick="{{ selectAll }}" style="padding:0; border:0; background:none; color:var(--cta); font-size:12px; font-weight:600; cursor:pointer;">{{ selectAllLabel }}</button>
+              <span style="flex:1; font-size:12px; color:var(--muted);">{{ selCount }}</span>
+              <sc-for list="{{ bulkActions }}" as="b" hint-placeholder-count="0"><button onClick="{{ b.onClick }}" style="height:30px; padding:0 12px; border:0; border-radius:999px; background:{{ b.bg }}; color:{{ b.fg }}; font-size:12px; font-weight:600; cursor:{{ b.cursor }}; opacity:{{ b.op }};">{{ b.label }}</button></sc-for>
+            </div>
+          </sc-if>
+
+          <div style="display:flex; flex-direction:column;">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="0">
+              <sc-if value="{{ r.isHeader }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:{{ r.pad }}; font-size:11px; font-weight:600; color:var(--muted);">{{ r.label }}</div>
+              </sc-if>
+              <sc-if value="{{ r.isSkill }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ r.onClick }}" style="position:relative; display:flex; align-items:center; gap:12px; padding:0 8px; margin:0 -8px; border-radius:12px; background:{{ r.bg }}; cursor:pointer;" style-hover="background:var(--chip);">
+                  <sc-if value="{{ r.hasCheck }}" hint-placeholder-val="{{ false }}"><span style="flex:none; width:20px; height:20px; box-sizing:border-box; border-radius:50%; border:{{ r.ckBorder }}; background:{{ r.ckBg }}; color:#fff; display:flex; align-items:center; justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{ r.ckTick }}"></path></svg></span></sc-if>
+                  <sc-if value="{{ r.hasRank }}" hint-placeholder-val="{{ false }}"><span style="flex:none; width:18px; text-align:center; font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">{{ r.rank }}</span></sc-if>
+                  <span title="@{{ r.by }}" style="display:block; flex:none; width:27px; height:27px; border-radius:50%; object-fit:cover; background:var(--chip); background:var(--chip) center/cover no-repeat; background-image:url({{ r.img }});"></span>
+                  <div style="flex:1; min-width:0; align-self:stretch; display:flex; align-items:center; gap:12px; min-height:{{ rowH }}; border-bottom:1px solid var(--hair);">
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; padding:8px 0;">
+                      <span style="display:flex; align-items:baseline; gap:8px; min-width:0;">
+                        <span style="font-size:13px; font-weight:600; letter-spacing:-0.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:none; max-width:70%;">{{ r.name }}</span>
+                        <sc-if value="{{ r.showBy }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; color:var(--faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">@{{ r.by }}</span></sc-if>
+                        <sc-if value="{{ r.isPrivate }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.8" stroke-linecap="round" style="flex:none;"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></sc-if>
+                        <sc-if value="{{ r.inlineUpd }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.onAction }}" style="flex:none; align-self:center; height:20px; padding:0 8px; border:0; border-radius:999px; background:var(--update); color:#fff; font-size:10px; font-weight:700; cursor:pointer;">Update</button></sc-if>
+                      </span>
+                      <span style="font-size:10px; color:{{ r.subColor }}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ r.sub }}</span>
+                    </div>
+                    <div style="flex:none; display:flex; align-items:center; gap:12px;">
+                      <sc-if value="{{ r.hasStars }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap;">★ {{ r.stars }}</span></sc-if>
+                      <sc-if value="{{ r.hasTiles }}" hint-placeholder-val="{{ false }}">
+                        <span style="display:flex; align-items:center; gap:4px;"><sc-for list="{{ r.tiles }}" as="tl" hint-placeholder-count="0"><span title="{{ tl.name }}" style="width:19px; height:19px; border-radius:6px; background:{{ tl.bg }}; color:var(--muted); font-size:8px; font-weight:700; display:flex; align-items:center; justify-content:center;"><sc-if value="{{ tl.hasIcon }}" hint-placeholder-val="{{ false }}"><span style="display:block; width:12px; height:12px; background:var(--muted); -webkit-mask:{{ tl.mask }}; mask:{{ tl.mask }};"></span></sc-if><sc-if value="{{ tl.noIcon }}" hint-placeholder-val="{{ false }}">{{ tl.l }}</sc-if></span></sc-for></span>
+                      </sc-if>
+                      <sc-if value="{{ r.hasDots }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ r.onDots }}" aria-label="More actions" style="flex:none; width:28px; height:28px; margin-right:-4px; padding:0; border:0; border-radius:50%; background:{{ r.dotsBg }}; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:var(--sel);"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>
+                      </sc-if>
+                      <sc-if value="{{ r.menuOpen }}" hint-placeholder-val="{{ false }}">
+                        <div onClick="{{ stop }}" style="position:absolute; top:calc(100% - 6px); right:0; z-index:30; width:230px; padding:6px; border-radius:16px; background:var(--bg); box-shadow:var(--shadow); box-sizing:border-box; display:flex; flex-direction:column; cursor:default;">
+                          <sc-for list="{{ rowMenuItems }}" as="mi" hint-placeholder-count="0">
+                            <sc-if value="{{ mi.isSep }}" hint-placeholder-val="{{ false }}"><div style="height:1px; background:var(--hair); margin:4px 10px;"></div></sc-if>
+                            <sc-if value="{{ mi.isItem }}" hint-placeholder-val="{{ false }}">
+                              <button onClick="{{ mi.onClick }}" style="display:flex; align-items:center; gap:10px; min-height:34px; padding:0 10px; border:0; border-radius:9px; background:none; color:{{ mi.color }}; cursor:pointer; text-align:left; font-size:12px;" style-hover="background:var(--chip);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex:none; opacity:.8;"><path d="{{ mi.icon }}"></path></svg>
+                                <span style="flex:1;">{{ mi.label }}</span>
+                              </button>
+                            </sc-if>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ r.actionSlot }}" hint-placeholder-val="{{ false }}"><span style="width:72px; display:flex; justify-content:flex-end;"><sc-if value="{{ r.hasAction }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.onAction }}" style="height:26px; min-width:56px; padding:0 12px; border:0; border-radius:999px; background:{{ r.actionBg }}; color:{{ r.actionFg }}; font-size:11px; font-weight:700; cursor:pointer;">{{ r.actionLabel }}</button></sc-if></span></sc-if><sc-if value="{{ r.noSlot }}" hint-placeholder-val="{{ false }}"><sc-if value="{{ r.hasAction }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.onAction }}" style="height:26px; min-width:56px; padding:0 12px; border:0; border-radius:999px; background:{{ r.actionBg }}; color:{{ r.actionFg }}; font-size:11px; font-weight:700; cursor:pointer;">{{ r.actionLabel }}</button></sc-if></sc-if>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+            </sc-for>
+            <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:48px 0; text-align:center; font-size:14px; color:var(--muted);">{{ emptyText }}</div></sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ false }}">
+      <nav style="flex:none; display:flex; justify-content:space-around; padding:6px 8px 20px; border-top:1px solid var(--hair); background:var(--bg);">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="0">
+          <button onClick="{{ t.onClick }}" style="position:relative; flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; height:50px; padding:6px 0 0; border:0; background:none; color:{{ t.color }}; font-size:10px; font-weight:600; cursor:pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg>
+            {{ t.label }}
+            <sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:2px; left:calc(50% + 6px); min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:999px; background:var(--update); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;">{{ t.badge }}</span></sc-if>
+          </button>
+        </sc-for>
+      </nav>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ showScrim }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeAll }}" style="position:absolute; inset:0; background:{{ scrimBg }}; z-index:10;"></div>
+  </sc-if>
+
+  <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+    <aside style="position:{{ ip.pos }}; top:{{ ip.top }}; right:{{ ip.right }}; bottom:{{ ip.bottom }}; left:{{ ip.left }}; width:{{ ip.width }}; max-height:{{ ip.maxh }}; border-radius:{{ ip.radius }}; box-shadow:{{ ip.shadow }}; border-left:{{ ip.bl }}; flex:none; z-index:20; background:var(--bg); overflow:auto; box-sizing:border-box;">
+      <div style="display:flex; flex-direction:column; gap:16px; padding:14px 20px 28px;">
+        <div style="display:flex; align-items:center; min-height:28px; margin-bottom:-8px;">
+          <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}"><span style="width:36px; height:5px; border-radius:3px; background:var(--hair); margin:0 auto;"></span></sc-if>
+          <button onClick="{{ closeSel }}" aria-label="close" style="margin-left:auto; width:26px; height:26px; padding:0; border:0; border-radius:50%; background:var(--chip); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button onClick="{{ sel.onCreator }}" style="flex:none; padding:0; border:0; background:none; cursor:pointer;"><span  style="display:block; width:48px; height:48px; border-radius:50%; object-fit:cover; display:block; background:var(--chip) center/cover no-repeat; background-image:url({{ sel.img }});"></span></button>
+          <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
+            <span style="font-family:var(--display); font-size:23px; font-weight:700; letter-spacing:-0.035em; line-height:1; overflow-wrap:anywhere;">{{ sel.name }}</span>
+            <span style="display:flex; flex-wrap:wrap; align-items:center; gap:3px 8px; font-size:11px; color:var(--muted);">
+              <button onClick="{{ sel.onCreator }}" style="padding:0; border:0; background:none; color:var(--cta); font-size:11px; font-weight:500; cursor:pointer;">@{{ sel.by }}</button>
+              <sc-if value="{{ sel.hasStars }}" hint-placeholder-val="{{ false }}"><span>★ {{ sel.stars }}</span></sc-if>
+              <sc-if value="{{ sel.tier }}" hint-placeholder-val="{{ false }}"><span style="display:flex; align-items:center; gap:4px; height:20px; padding:0 7px; border-radius:999px; background:var(--chip); font-size:10px; font-weight:600; color:var(--ink);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M5 15l-1-8 5 4 3-6 3 6 5-4-1 8H5Z"></path></svg>Top rated</span></sc-if>
+              <span style="color:var(--faint); white-space:nowrap;">Updated {{ sel.updated }}</span>
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <button onClick="{{ sel.onPrimary }}" style="display:flex; align-items:center; gap:6px; height:32px; padding:0 14px; border:0; border-radius:999px; background:{{ sel.primaryBg }}; color:{{ sel.primaryFg }}; font-size:12px; font-weight:600; cursor:pointer;">{{ sel.primaryLabel }}<sc-if value="{{ sel.primaryChevron }}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></sc-if></button>
+          <sc-for list="{{ sel.iconBtns }}" as="b" hint-placeholder-count="0">
+            <button onClick="{{ b.onClick }}" title="{{ b.label }}" style="display:flex; align-items:center; justify-content:center; gap:6px; width:32px; height:32px; padding:0; border:0; border-radius:999px; background:var(--chip); color:{{ b.color }}; font-size:13px; font-weight:600; cursor:pointer;" style-hover="background:var(--sel);"><svg width="14" height="14" viewBox="0 0 24 24" fill="{{ b.fill }}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ b.icon }}"></path></svg>{{ b.text }}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ pickOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:2px; padding:8px; border-radius:16px; background:var(--chip);">
+            <div style="padding:4px 8px 4px; font-size:11px; font-weight:600; color:var(--muted);">{{ pickTitle }}</div>
+            <sc-for list="{{ pickRows }}" as="p" hint-placeholder-count="0">
+              <button onClick="{{ p.onClick }}" style="display:flex; align-items:center; gap:10px; min-height:40px; padding:0 8px; border:0; border-radius:10px; background:none; cursor:pointer; text-align:left;" style-hover="background:var(--sel);">
+                <span style="flex:none; width:18px; height:18px; box-sizing:border-box; border-radius:7px; border:{{ p.border }}; background:{{ p.bg }}; color:#fff; display:flex; align-items:center; justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.tick }}"></path></svg></span>
+                <span style="flex:1; display:flex; flex-direction:column; gap:1px;"><span style="font-size:12px; font-weight:500;">{{ p.label }}</span><span style="font-size:10px; color:var(--muted);">{{ p.sub }}</span></span>
+              </button>
+            </sc-for>
+            <div style="display:flex; gap:8px; padding:8px 4px 4px;">
+              <button onClick="{{ pickCancel }}" style="flex:1; height:32px; border:0; border-radius:999px; background:var(--card); font-size:12px; font-weight:600; cursor:pointer;">Cancel</button>
+              <button onClick="{{ pickApply }}" style="flex:2; height:32px; border:0; border-radius:999px; background:var(--cta); color:#fff; font-size:12px; font-weight:600; cursor:pointer;">{{ pickApplyLabel }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sel.hasUpdate }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:8px; padding:12px 14px; border-radius:14px; background:var(--chip);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;"><span style="font-size:12px; font-weight:600;">What’s new in version {{ sel.next }}</span><span style="display:flex; gap:8px; font-size:12px; font-weight:600;"><span style="color:var(--update);">+12</span><span style="color:#ff3b30;">−3</span></span></div>
+            <div style="display:flex; flex-direction:column; gap:6px; font-family:var(--mono); font-size:11px; color:var(--muted);"><span>M  SKILL.md</span><span>A  references/voice.md</span><span>M  scripts/collect.sh</span></div>
+          </div>
+        </sc-if>
+
+        <div style="padding:12px 14px; border-radius:14px; background:var(--chip); font-size:13px; line-height:1.45; color:var(--body); text-wrap:pretty;">{{ sel.desc }}</div>
+
+        <sc-if value="{{ sel.installed }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column;">
+            <span style="font-size:11px; font-weight:600; color:var(--muted); padding-bottom:2px;">On this account</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; border-bottom:1px solid var(--hair);">
+              <span style="display:flex; flex-direction:column; gap:1px;"><span style="font-size:12px; font-weight:500;">Installed on</span><span style="font-size:10px; color:var(--muted);">{{ sel.agentNames }}</span></span>
+              <button onClick="{{ sel.onPick }}" style="padding:0; border:0; background:none; color:var(--cta); font-size:12px; font-weight:500; cursor:pointer;">Edit</button>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; border-bottom:1px solid var(--hair);">
+              <span style="display:flex; flex-direction:column; gap:1px;"><span style="font-size:12px; font-weight:500;">Keep updated</span><span style="font-size:10px; color:var(--muted);">Review each change before it lands</span></span>
+              <button onClick="{{ sel.onKeep }}" style="position:relative; width:38px; height:22px; padding:0; border:0; border-radius:999px; background:{{ sel.keepBg }}; cursor:pointer; flex:none;"><span style="position:absolute; top:2px; left:{{ sel.keepKnob }}; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25);"></span></button>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:44px; padding-top:8px;">
+              <sc-for list="{{ sel.sets }}" as="s" hint-placeholder-count="0"><span style="height:28px; padding:0 12px; border-radius:999px; background:var(--chip); font-size:11px; font-weight:600; display:flex; align-items:center;">{{ s.name }}</span></sc-for>
+              <span style="height:28px; padding:0 12px; border-radius:999px; border:1px dashed var(--faint); color:var(--muted); font-size:11px; font-weight:600; display:flex; align-items:center; box-sizing:border-box;">+ Add to set</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex; flex-direction:column; gap:10px; padding-top:6px;">
+          <span style="font-family:var(--display); font-size:15px; font-weight:700; letter-spacing:-0.015em;">About</span>
+          <p style="margin:0; font-size:12px; line-height:1.55; color:var(--body); text-wrap:pretty;">{{ sel.about }}</p>
+          <div style="display:flex; flex-direction:column; gap:6px; padding:10px 12px; border-radius:12px; border:1px solid var(--hair);">
+            <span style="font-size:11px; font-weight:600; color:var(--muted);">Use it</span>
+            <span style="font-family:var(--mono); font-size:11px;">/{{ sel.name }}</span>
+          </div>
+        </div>
+
+        <sc-if value="{{ sel.hasMore }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:4px; padding-top:6px;">
+            <span style="font-size:11px; font-weight:600; color:var(--muted); padding-bottom:2px;">More from @{{ sel.by }}</span>
+            <sc-for list="{{ sel.more }}" as="m" hint-placeholder-count="0">
+              <button onClick="{{ m.onClick }}" style="display:flex; align-items:center; gap:10px; min-height:44px; padding:0 8px; margin:0 -8px; border:0; border-radius:10px; background:none; cursor:pointer; text-align:left;" style-hover="background:var(--chip);">
+                <span style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;"><span style="font-size:12px; font-weight:600;">{{ m.name }}</span><span style="font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ m.desc }}</span></span>
+                <span style="flex:none; font-size:11px; color:var(--muted);">★ {{ m.stars }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ acctOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; top:{{ ap.top }}; left:{{ ap.left }}; right:{{ ap.right }}; bottom:{{ ap.bottom }}; width:300px; border-radius:22px; z-index:20; background:var(--bg); box-shadow:var(--shadow); padding:8px; box-sizing:border-box; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; gap:12px; padding:12px;">
+        <img src="assets/you.jpg" alt="" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+        <span style="display:flex; flex-direction:column; gap:1px;"><span style="font-size:14px; font-weight:600;">you</span><span style="font-size:12px; color:var(--muted);">you@acme.co</span></span>
+      </div>
+      <div style="height:1px; background:var(--hair); margin:4px 12px;"></div>
+      <sc-for list="{{ acctItems }}" as="m" hint-placeholder-count="0">
+        <button onClick="{{ m.onClick }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; padding:0 12px; border:0; border-radius:10px; background:none; cursor:pointer; text-align:left; font-size:14px;" style-hover="background:var(--chip);">
+          <span>{{ m.label }}</span><span style="font-size:12px; color:var(--muted);">{{ m.value }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{ signinOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:40; width:min(360px, calc(100% - 32px)); padding:28px 24px 20px; border-radius:24px; background:var(--bg); box-shadow:var(--shadow); box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;">
+      <span style="font-size:34px; line-height:1;">👀</span>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <span style="font-family:var(--display); font-size:21px; font-weight:700; letter-spacing:-0.025em;">Sign in to install</span>
+        <span style="font-size:13px; line-height:1.45; color:var(--muted); text-wrap:pretty;">Install skills into every agent you use, keep them updated and share sets with your team.</span>
+      </div>
+      <div style="align-self:stretch; display:flex; flex-direction:column; gap:8px; padding-top:6px;">
+        <button onClick="{{ signIn }}" style="height:40px; border:0; border-radius:999px; background:var(--ink); color:var(--bg); font-size:14px; font-weight:600; cursor:pointer;">Continue with GitHub</button>
+        <button onClick="{{ signIn }}" style="height:40px; border:0; border-radius:999px; background:var(--chip); color:var(--ink); font-size:14px; font-weight:600; cursor:pointer;">Continue with email</button>
+        <button onClick="{{ closeSignin }}" style="height:32px; border:0; background:none; color:var(--muted); font-size:13px; font-weight:500; cursor:pointer;">Not now</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;toggleStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pill&quot;,&quot;tabs&quot;,&quot;text&quot;],&quot;default&quot;:&quot;pill&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;auth&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;in&quot;,&quot;out&quot;],&quot;default&quot;:&quot;in&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;navMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;toggle&quot;,&quot;stacked&quot;],&quot;default&quot;:&quot;toggle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;view&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;discover&quot;,&quot;all&quot;,&quot;top&quot;,&quot;updates&quot;],&quot;default&quot;:&quot;all&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const AG = [
+  { id:'claude', name:'Claude Code', l:'C', path:'~/.claude/skills', icon:'assets/agent-claude.png' },
+  { id:'codex', name:'Codex', l:'Cx', path:'~/.codex/skills', icon:'assets/agent-codex.png' },
+  { id:'cursor', name:'Cursor', l:'Cu', path:'~/.cursor/skills' },
+  { id:'gemini', name:'Gemini CLI', l:'G', path:'~/.gemini/skills' },
+  { id:'opencode', name:'OpenCode', l:'O', path:'~/.config/opencode/skills' },
+];
+const AGB = Object.fromEntries(AG.map(a => [a.id, a]));
+const CR = {
+  anthropics:{ name:'Anthropic', img:'anthropics.png', tagline:'Official Claude skills' },
+  mattpocock:{ name:'Matt Pocock', img:'mattpocock.png', tagline:'Practical TypeScript education' },
+  emilkowalski:{ name:'Emil Kowalski', img:'emilkowalski.jpg', tagline:'Interface design engineering' },
+  garrytan:{ name:'Garry Tan', img:'garrytan.jpg', tagline:'Founder execution systems' },
+  twostraws:{ name:'Paul Hudson', img:'twostraws.jpg', tagline:'Swift and SwiftUI' },
+  blader:{ name:'Blader', img:'blader.jpg', tagline:'Practical writing tools' },
+  hermes:{ name:'Hermes', img:'hermes.png', tagline:'Background agents' },
+  samrivera:{ name:'Sam Rivera', img:'sam.jpg', tagline:'Data and analytics workflows' },
+  jordanlee:{ name:'Jordan Lee', img:'you.jpg', tagline:'Product and UX research' },
+  you:{ name:'you', img:'you.jpg', tagline:'' }, sam:{ name:'Sam', img:'sam.jpg', tagline:'' },
+};
+const SK = [
+  ['frontend-design','anthropics','design','178.4k',1,'3d ago','Create distinctive, production-grade frontend interfaces that avoid generic AI aesthetics.'],
+  ['skill-creator','anthropics','practical','92.1k',1,'5d ago','Create new skills, improve existing ones and measure how well they trigger.'],
+  ['pdf','anthropics','practical','64.0k',0,'12d ago','Read, fill, merge and create PDF files.'],
+  ['grill-me','mattpocock','coding','41.2k',1,'2d ago','Get interviewed about a plan until every branch of the decision tree is resolved.'],
+  ['tdd','mattpocock','coding','18.7k',0,'9d ago','Test-driven development with a red, green, refactor loop.'],
+  ['write-a-prd','mattpocock','founder','12.3k',0,'20d ago','Turn a fuzzy idea into a crisp product requirements doc through a short interview.'],
+  ['emil-design-eng','emilkowalski','design','33.4k',1,'6d ago','Design engineering taste: the small details that make interfaces feel right.'],
+  ['web-animations','emilkowalski','design','21.8k',0,'14d ago','Motion that feels native on the web, with easing and timing that holds up.'],
+  ['gstack','garrytan','founder','56.1k',1,'1d ago','An opinionated stack of founder workflows to plan, ship and review.'],
+  ['office-hours','garrytan','founder','14.9k',0,'1mo ago','YC-style feedback on your startup, product and pitch.'],
+  ['swiftui-pro','twostraws','ios','27.5k',1,'4d ago','Write modern, idiomatic SwiftUI that performs.'],
+  ['swift-concurrency','twostraws','ios','15.2k',0,'11d ago','Async/await, actors and Sendable, done right.'],
+  ['humanizer','blader','writing','38.9k',1,'8d ago','Remove the tells of AI-written text so it reads like a person wrote it.'],
+  ['hermes-agent','hermes','practical','9.4k',0,'2mo ago','Run long tasks in the background and report back when they are done.'],
+  ['release-notes','you','team','',0,'1d ago','Turn merged PRs into release notes in our voice.',1],
+  ['brand-voice','sam','team','',0,'3d ago','How acme writes, with real examples.',1],
+].map(([id,by,cat,stars,tier,updated,desc,priv]) => ({ id, by, cat, stars, tier:!!tier, updated, desc, priv:!!priv, img:'assets/'+CR[by].img }));
+const BY = Object.fromEntries(SK.map(s => [s.id, s]));
+const TOP = ['frontend-design','skill-creator','gstack','grill-me','humanizer','emil-design-eng','swiftui-pro','web-animations','tdd','swift-concurrency'];
+const COLLS = [
+  { id:'goat', name:'The GOAT list', tagline:'The skills everyone is using, across every category.', items:['frontend-design','gstack','grill-me','humanizer','skill-creator','tdd'] },
+  { id:'ui', name:'Elite UI design', tagline:'What world-class designers are using.', items:['emil-design-eng','frontend-design','web-animations'] },
+  { id:'ios', name:'Build iOS apps', tagline:'Ship pixel-perfect, performant native apps.', items:['swiftui-pro','swift-concurrency'] },
+  { id:'founder', name:'Founder toolkit', tagline:'Plan, decide and ship faster.', items:['gstack','office-hours','write-a-prd','grill-me'] },
+];
+const CATS = [
+  { label:'Design + Apps', items:[
+    ['Design system','design','M12 22a10 10 0 1 1 10-10c0 2.8-2.2 4-4 4h-2a2 2 0 0 0-1.5 3.3c.4.5.5 1 .5 1.2 0 .8-1.5 1.5-3 1.5ZM7.5 10.5h.01M10.5 7.5h.01M15.5 7.5h.01'],
+    ['SwiftUI','ios','M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2ZM12 18h.01'],
+    ['React','design','M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5ZM15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z'],
+    ['App Store','ios','M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM10 4v4M2 8h20M6 4v4'],
+    ['Landing page','design','M4 3h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM4 14h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1ZM15 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1Z'],
+    ['Animation','design','M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM10 8l6 4-6 4V8Z'] ] },
+  { label:'Marketing', items:[
+    ['SEO','writing','M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM21 21l-4.3-4.3M8 11l2 2 4-4'],
+    ['Blog','writing','M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5M10 6h8v4h-8V6Z'],
+    ['Social media','writing','M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75'],
+    ['Brand','writing','M12 3l2.2 4.6 5 .7-3.6 3.5.9 5L12 14.4l-4.5 2.4.9-5L4.8 8.3l5-.7L12 3ZM5 21h14'],
+    ['Copywriting','writing','M4 7V4h16v3M9 20h6M12 4v16'],
+    ['Market research','founder','M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z'] ] },
+  { label:'Coding', items:[
+    ['Code review','coding','M18 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM13 6h3a2 2 0 0 1 2 2v7M6 9v12'],
+    ['Testing','coding','M10 2v7.5L4.3 19.2A1.9 1.9 0 0 0 6 22h12a1.9 1.9 0 0 0 1.7-2.8L14 9.5V2M8.5 2h7M7 16h10'],
+    ['Debugging','coding','M8 2l1.9 1.9M14.1 3.9 16 2M9 7.1v-1a3 3 0 1 1 6 0v1M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6ZM12 20v-9M6 13H2M22 13h-4'],
+    ['Refactoring','coding','M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5'],
+    ['API design','coding','M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1'],
+    ['Security audit','coding','M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1zM9 12l2 2 4-4'] ] },
+  { label:'Practical', items:[
+    ['MCP server','practical','M4 2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2ZM4 14h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2ZM6 6h.01M6 18h.01'],
+    ['Deep research','practical','M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4M14 2v4a2 2 0 0 0 2 2h4M14 2l6 6v4M16.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM18.3 19.3 21 22'],
+    ['PDF','practical','M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7ZM14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8'],
+    ['Deck','practical','M2 3h20M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3M7 21l5-5 5 5'],
+    ['Excel','practical','M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM3 9h18M3 15h18M9 9v12M15 9v12'],
+    ['Writing','writing','M12 20h9M16.38 3.62a1 1 0 0 1 3 3L7.37 18.64a2 2 0 0 1-.86.5l-2.87.84a.5.5 0 0 1-.62-.62l.84-2.87a2 2 0 0 1 .5-.86z'] ] },
+];
+const SETS = [
+  { id:'design', name:'design team', vis:'Invite only', members:['you.jpg','sam.jpg','emilkowalski.jpg','blader.jpg'], items:['release-notes','brand-voice','emil-design-eng','frontend-design','web-animations'] },
+  { id:'ios', name:'ios', vis:'Only me', members:['you.jpg'], items:['swiftui-pro','swift-concurrency'] },
+  { id:'founder', name:'founder kit', vis:'Public', members:['you.jpg','garrytan.jpg'], items:['gstack','grill-me','write-a-prd','office-hours'] },
+];
+const I = {
+  discover:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM15.5 8.5l-2 5-5 2 2-5 5-2Z',
+  top:'M5 20V11M12 20V4M19 20v-6',
+  creators:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
+  coll:'M12 3 3 8l9 5 9-5-9-5ZM3 12.5l9 5 9-5M3 17l9 5 9-5',
+  all:'M4 13h4l2 3h4l2-3h4M4 13l2.5-8h11L20 13v6H4v-6Z',
+  upd:'M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14',
+  fav:'M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20Z',
+  plus:'M12 5v14M5 12h14',
+  share:'M12 3v12M8 7l4-4 4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6',
+  gh:'M7 17 17 7M8 7h9v9',
+  listplus:'M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6',
+  sets:'M4 5h16v5H4zM4 14h16v5H4z',
+  check:'m5 12 5 5 9-10',
+};
+const INIT_INST = { 'release-notes':['claude','codex'], 'brand-voice':['claude','codex','cursor'], 'grill-me':['claude','codex','cursor','gemini'], 'swiftui-pro':['codex'], 'frontend-design':['claude','cursor'], 'humanizer':['claude','codex'], 'gstack':['claude'], 'emil-design-eng':['claude','codex','cursor'], 'tdd':['codex','opencode'], 'hermes-agent':['claude'], 'skill-creator':['claude'] };
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const q = k => { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } };
+    this.state = {
+      out: (q('auth') || this.props.auth) === 'out', w: window.innerWidth, scope: q('view') || this.props.view || ((q('auth') || this.props.auth) === 'out' ? 'discover' : 'all'), back: null, query:'', sel: q('sel'),
+      signin:false, agent:'all', agentMenu:false, rowMenu:null, visMenu:false, vis:{}, rail: q('rail') === '1', edit:false, picked:[], acct:false, pick:null, theme:null,
+      inst: { ...INIT_INST }, upd: {},
+      fav: ['grill-me','emil-design-eng','frontend-design'], keep: {}, setKeep: { design:true, ios:false, founder:true },
+    };
+    if (this.state.out) { this.state.inst = {}; this.state.fav = []; const v = this.state.scope; if (['all','updates','favorites','sets'].includes(v) || v.startsWith('set:')) this.state.scope = 'discover'; }
+    if (q('pick') && this.state.sel) this.state.pick = [...(INIT_INST[this.state.sel] || ['claude','codex'])];
+  }
+  componentDidMount() { this.onR = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this.onR); this.applyTheme(); }
+  componentDidUpdate() { this.applyTheme(); }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  q(k) { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } }
+  applyTheme() { document.documentElement.dataset.theme = this.state.theme ?? this.q('theme') ?? this.props.theme ?? 'light'; }
+  go(scope, back = null) { this.setState({ scope, back, visMenu:false, edit:false, picked:[], sel:null, pick:null, query:'', agentMenu:false, acct:false }); }
+  open(id) { this.setState({ sel:id, pick:null, acct:false, agentMenu:false }); }
+  install(id, agents) { this.setState(st => ({ inst: { ...st.inst, [id]: agents }, pick:null })); }
+  update(id) { this.setState(st => { const u = { ...st.upd }; delete u[id]; return { upd:u }; }); }
+  remove(id) { this.setState(st => { const n = { ...st.inst }; delete n[id]; const u = { ...st.upd }; delete u[id]; return { inst:n, upd:u, pick:null }; }); }
+
+  renderVals() {
+    const S = this.state, w = S.w;
+    const isMobile = w < 760, wide = w >= 1180;
+    const nUpd = Object.keys(S.upd).length, nInst = Object.keys(S.inst).length;
+    const qq = S.query.trim().toLowerCase();
+    const scope = qq ? 'search' : S.scope;
+    const libScopes = ['discover','top','creators','collections'];
+    const isLib = libScopes.includes(scope) || /^(col|creator|cat):/.test(scope);
+
+    const item = (key, label, extra = {}) => {
+      const active = S.scope === key && !qq;
+      return { label, onClick: () => this.go(key), bg: active ? 'var(--sel)' : 'transparent', weight: active ? 600 : 500,
+        hasIcon: !extra.img, icon: extra.icon || '', iconColor: active ? 'var(--cta)' : 'var(--muted)',
+        hasImg: !!extra.img, img: extra.img || '',
+        hasBadge: !!extra.badge, badge: extra.badge || '', hasCount: extra.count != null && !extra.badge, count: extra.count ?? '' };
+    };
+    const navMode = this.q('nav') ?? this.props.navMode ?? 'toggle';
+    const toggleStyle = this.q('toggle') ?? this.props.toggleStyle ?? 'pill';
+    const mineScope = ['all','updates','favorites','sets'].includes(S.scope) || S.scope.startsWith('set:');
+    const half = mineScope && !S.out ? 'mine' : 'lib';
+    const libSec = { label:'Library', items:[ item('discover','Discover',{icon:I.discover}), item('top','Top this week',{icon:I.top}), item('creators','Creators',{icon:I.creators}), item('collections','Collections',{icon:I.coll}) ] };
+    const catSec = { label:'Categories', items: CATS.map(g => { const [label,cat,icon] = g.items[0]; const key = 'cat:'+g.label+'|'+cat; return { ...item(key, g.label, { icon }), onClick: () => this.go(key) }; }) };
+    const mineSec = { label: navMode === 'toggle' ? '' : 'My skills', items:[ item('all','All skills',{icon:I.all, count:nInst}), item('updates','Updates',{icon:I.upd, badge:nUpd || null}), item('favorites','Favorites',{icon:I.fav, count:S.fav.length}) ] };
+    const setSec = { label:'Sets', items:[ ...SETS.map(s => item('set:'+s.id, s.name, { img: BY[s.items[0]].img })), { ...item('newset','New set',{icon:I.plus}), onClick: () => {}, iconColor:'var(--faint)' } ] };
+    if (navMode === 'toggle') libSec.label = '';
+    const navSections = S.out ? [{ ...libSec, label:'' }, catSec] : navMode === 'toggle' ? (half === 'lib' ? [libSec, catSec] : [mineSec, setSec]) : [libSec, mineSec, setSec];
+
+    const actionFor = s => {
+      const inst = S.inst[s.id], upd = S.upd[s.id];
+      if (upd) return { label:'Update', bg:'var(--update)', fg:'#fff', fn: () => this.update(s.id) };
+      if (!inst) return { label:'Get', bg:'var(--chip)', fg:'var(--cta)', fn: () => S.out ? this.setState({ signin:true }) : this.setState({ sel:s.id, pick:['claude','codex'] }) };
+      return { label:'Open', bg:'var(--chip)', fg:'var(--cta)', fn: () => this.open(s.id) };
+    };
+    const tilesFor = ids => AG.map(a => { const on = ids.includes(a.id); return { l:a.l, name: on ? a.name : '', hasIcon: on && !!a.icon, noIcon: on && !a.icon, mask: a.icon ? `url(${a.icon}) center/contain no-repeat` : 'none', bg: on ? 'var(--chip)' : 'transparent' }; });
+    const skillRow = (s, o = {}) => {
+      const inst = S.inst[s.id], upd = S.upd[s.id], a = actionFor(s);
+      const mine = !!o.mine;
+      return { isSkill:true, isHeader:false, name:s.id, by:s.by, img:s.img, isPrivate:s.priv, showBy: !mine && !isMobile,
+        sub: mine ? (upd ? `Version ${upd} available` : s.desc) : s.desc,
+        subColor: mine && upd ? 'var(--update)' : 'var(--muted)',
+        hasRank: !!o.rank, rank: o.rank || '', hasStars: !mine && !!s.stars && !isMobile, stars: s.stars,
+        hasTiles: mine && !!inst, hasDots: mine && !!inst, menuOpen: S.rowMenu === s.id, dotsBg: S.rowMenu === s.id ? 'var(--sel)' : 'transparent', onDots: e => { e.stopPropagation(); this.setState(st => ({ rowMenu: st.rowMenu === s.id ? null : s.id, agentMenu:false, acct:false })); }, actionSlot: false, noSlot: !(mine && !!inst), inlineUpd: mine && !!upd, tiles: inst ? tilesFor(inst) : [],
+        hasAction: mine ? false : true, actionLabel:a.label, actionBg:a.bg, actionFg:a.fg,
+        onAction: e => { e.stopPropagation(); a.fn(); },
+        bg: S.sel === s.id ? 'var(--sel)' : 'transparent', onClick: () => this.open(s.id) };
+    };
+    const editing = S.edit && ['all','updates'].includes(scope);
+    const withEdit = r => { if (!editing || !r.isSkill) return { ...r, hasCheck:false };
+      const on = S.picked.includes(r.name);
+      return { ...r, hasCheck:true, ckBorder: on ? '0' : '1.5px solid var(--faint)', ckBg: on ? 'var(--cta)' : 'transparent', ckTick: on ? I.check : '', inlineUpd:false, hasDots:false, menuOpen:false,
+        bg: on ? 'var(--chip)' : 'transparent', onClick: () => this.setState(st => ({ picked: on ? st.picked.filter(x => x !== r.name) : [...st.picked, r.name] })) }; };
+    const header = (label, pad) => ({ isHeader:true, isSkill:false, label, pad });
+    const navRow = (img, name, sub, note, fn) => ({ isSkill:true, isHeader:false, name, by:'', img, isPrivate:false, showBy:false, sub, subColor:'var(--muted)',
+      hasRank:false, hasStars:false, hasTiles:false, hasAction:true, actionLabel:note, actionBg:'transparent', actionFg:'var(--faint)', onAction: e => { e.stopPropagation(); fn(); }, bg:'transparent', onClick: fn });
+
+    const agentOk = id => S.agent === 'all' || (S.inst[id] || []).includes(S.agent);
+    const mine = ids => ids.map(id => BY[id]).filter(s => agentOk(s.id));
+    let title = '', meta = '', rows = [], hero = null, emptyText = '', back = S.back;
+    const set = scope.startsWith('set:') ? SETS.find(x => 'set:'+x.id === scope) : null;
+    if (scope === 'search') {
+      const hit = s => s.id.includes(qq) || s.by.includes(qq) || s.desc.toLowerCase().includes(qq);
+      const a = SK.filter(s => S.inst[s.id] && hit(s)), b = SK.filter(s => !S.inst[s.id] && !s.priv && hit(s));
+      title = 'results'; meta = `${a.length + b.length} skills match “${S.query.trim()}”`; emptyText = 'Nothing matches. Try a creator or a task.';
+      if (a.length) rows.push(header('In my skills','4px 0 6px'), ...a.map(s => skillRow(s, { mine:true })));
+      if (b.length) rows.push(header('Library', a.length ? '28px 0 6px' : '4px 0 6px'), ...b.map(s => skillRow(s)));
+    } else if (scope === 'top') {
+      title = 'top this week'; meta = 'Ranked by installs over the last 7 days';
+      rows = TOP.map((id,i) => skillRow(BY[id], { rank:i+1 }));
+    } else if (scope === 'creators') {
+      title = 'creators'; meta = `${Object.keys(CR).length - 2} creators`;
+      rows = Object.entries(CR).filter(([k]) => k !== 'you' && k !== 'sam').map(([k,c]) => navRow('assets/'+c.img, c.name, c.tagline, SK.filter(s => s.by === k).length + ' skills', () => this.go('creator:'+k, 'creators')));
+    } else if (scope === 'collections') {
+      title = 'collections'; meta = `${COLLS.length} collections`;
+      rows = COLLS.map(c => navRow(BY[c.items[0]].img, c.name, c.tagline, c.items.length + ' skills', () => this.go('col:'+c.id, 'collections')));
+    } else if (scope.startsWith('col:')) {
+      const c = COLLS.find(x => 'col:'+x.id === scope); title = c.name; meta = c.tagline;
+      hero = [...new Set(c.items.map(id => BY[id].img))].slice(0,3);
+      rows = c.items.map(id => skillRow(BY[id]));
+    } else if (scope.startsWith('creator:')) {
+      const k = scope.slice(8), c = CR[k]; title = c.name; meta = `@${k} · ${c.tagline}`; hero = ['assets/'+c.img];
+      rows = SK.filter(s => s.by === k).map(s => ({ ...skillRow(s), showBy:false }));
+    } else if (scope.startsWith('cat:')) {
+      const [label, cat] = scope.slice(4).split('|'); title = label.toLowerCase(); meta = 'Most installed first';
+      rows = SK.filter(s => s.cat === cat && !s.priv).map(s => skillRow(s));
+    } else if (scope === 'all') {
+      title = 'my skills'; meta = `${nInst} skills across ${AG.length} agents`; emptyText = 'No skills on this agent yet.';
+      rows = mine(Object.keys(S.inst).sort()).map(s => skillRow(s, { mine:true }));
+    } else if (scope === 'updates') {
+      title = 'updates'; meta = nUpd ? `${nUpd} updates. Review each one before it lands.` : 'Everything is up to date'; emptyText = 'You’re all caught up.';
+      rows = mine(Object.keys(S.upd)).map(s => skillRow(s, { mine:true }));
+    } else if (scope === 'favorites') {
+      title = 'favorites'; meta = `${S.fav.length} skills`;
+      rows = S.fav.map(id => skillRow(BY[id], { mine: !!S.inst[id] }));
+    } else if (scope === 'sets') {
+      title = 'sets'; meta = `${SETS.length} sets`;
+      rows = SETS.map(x => navRow(BY[x.items[0]].img, x.name, `${x.items.length} skills · ${x.vis}`, '', () => this.go('set:'+x.id, 'sets')));
+    } else if (set) {
+      title = set.name; meta = `${set.items.length} skills · ${set.members.length} ${set.members.length === 1 ? 'member' : 'members'}`;
+      rows = set.items.map(id => skillRow(BY[id], { mine: !!S.inst[id] }));
+    }
+    if (!back && /^(col|creator|cat):/.test(scope)) back = 'discover';
+    const backLabels = { discover:'Discover', creators:'Creators', collections:'Collections', sets:'Sets' };
+
+    const s = S.sel && BY[S.sel];
+    let sel = {}, pickRows = [];
+    if (s) {
+      const inst = S.inst[s.id], upd = S.upd[s.id], isFav = S.fav.includes(s.id), keepOn = S.keep[s.id] ?? true;
+      const startPick = () => this.setState({ pick: [...(inst || ['claude','codex'])] });
+      sel = { ...s, name:s.id, hasStars: !!s.stars, installed: !!inst, hasUpdate: !!upd, next: upd,
+        primaryLabel: upd ? `Update to version ${upd}` : inst ? `Installed on ${inst.length}` : 'Get',
+        primaryChevron: !upd && !S.out, primaryBg: upd ? 'var(--update)' : inst ? 'var(--chip)' : 'var(--cta)', primaryFg: upd || !inst ? '#fff' : 'var(--ink)',
+        onPrimary: () => S.out ? this.setState({ signin:true, sel:null }) : upd ? this.update(s.id) : (S.pick ? this.setState({ pick:null }) : startPick()),
+        onPick: startPick, onCreator: () => this.go('creator:'+s.by),
+        agentNames: (inst || []).map(a => AGB[a].name).join(', '),
+        keepBg: keepOn ? 'var(--update)' : 'var(--hair)', keepKnob: keepOn ? '20px' : '2px',
+        onKeep: () => this.setState(st => ({ keep: { ...st.keep, [s.id]: !(st.keep[s.id] ?? true) } })),
+        sets: SETS.filter(x => x.items.includes(s.id)),
+        about: `${s.desc} Install it once and every agent you choose picks it up. omgskills pins the exact version you installed and shows you every change before an update lands.`,
+        more: SK.filter(x => x.by === s.by && x.id !== s.id).slice(0,3).map(x => ({ name:x.id, desc:x.desc, stars:x.stars || '—', onClick: () => this.open(x.id) })),
+        iconBtns: [
+          ...(S.out ? [] : [{ label: isFav ? 'Remove from favorites' : 'Favorite', icon:I.fav, fill: isFav ? '#ff375f' : 'none', color: isFav ? '#ff375f' : 'var(--ink)', text:'', onClick: () => this.setState(st => ({ fav: isFav ? st.fav.filter(x => x !== s.id) : [...st.fav, s.id] })) },
+          { label:'Add to set', icon:I.listplus, fill:'none', color:'var(--ink)', text:'', onClick: () => {} }]),
+          { label:'GitHub', icon:I.gh, fill:'none', color:'var(--ink)', text:'', onClick: () => {} },
+          { label:'Share', icon:I.share, fill:'none', color:'var(--ink)', text: '', onClick: () => {} },
+        ] };
+      sel.hasMore = sel.more.length > 0;
+      if (S.pick) pickRows = AG.map(a => { const on = S.pick.includes(a.id); return { label:a.name, sub:a.path,
+        bg: on ? 'var(--cta)' : 'transparent', border: on ? '0' : '2px solid var(--faint)', tick: on ? I.check : '',
+        onClick: () => this.setState(st => ({ pick: on ? st.pick.filter(x => x !== a.id) : [...st.pick, a.id] })) }; });
+    }
+    const pickN = S.pick ? S.pick.length : 0, wasInst = s && !!S.inst[s.id];
+
+    const ip = isMobile ? { pos:'absolute', top:'auto', right:'0', bottom:'0', left:'0', width:'auto', maxh:'92%', radius:'28px 28px 0 0', shadow:'var(--shadow)', bl:'0' }
+      : wide ? { pos:'relative', top:'auto', right:'auto', bottom:'auto', left:'auto', width:'380px', maxh:'none', radius:'0', shadow:'none', bl:'1px solid var(--hair)' }
+      : { pos:'absolute', top:'12px', right:'12px', bottom:'12px', left:'auto', width:'380px', maxh:'none', radius:'22px', shadow:'var(--shadow)', bl:'0' };
+    const ap = isMobile ? { top:'64px', left:'auto', right:'12px', bottom:'auto' } : { top:'auto', left:'12px', right:'auto', bottom:'70px' };
+    const theme = document.documentElement.dataset.theme || 'light';
+    const agentCount = id => Object.values(S.inst).filter(v => v.includes(id)).length;
+    const mobTab = scope === 'sets' || scope.startsWith('set:') ? 'sets' : (isLib || scope === 'search' ? 'discover' : 'mine');
+    const narrowTop = isMobile || (w < 1000 && !!s && !wide);
+
+    return {
+      showSidebar: !isMobile && !S.rail, showRail: !isMobile && S.rail, toggleRail: () => this.setState(st => ({ rail: !st.rail })), isMobile, navSections, showModeSeg: navMode === 'toggle' && !S.out && toggleStyle === 'pill',
+      showModeText: navMode === 'toggle' && !S.out && toggleStyle === 'text', showModeTabs: navMode === 'toggle' && !S.out && toggleStyle === 'tabs',
+      showWordmark: !(navMode === 'toggle' && !S.out && toggleStyle === 'text'), signedOut: S.out, signedIn: !S.out, openSignin: () => this.setState({ signin:true, sel:null, pick:null }), signIn: () => this.setState({ out:false, signin:false, inst:{ ...INIT_INST }, fav:['grill-me','emil-design-eng','frontend-design'], scope:'all', back:null, query:'' }), closeSignin: () => this.setState({ signin:false }), signinOpen: S.signin,
+      searchPh: navMode === 'toggle' && half === 'mine' ? 'Search my skills' : 'Search skills',
+      modes: [['mine','My skills','all',I.all],['lib','Discover','discover',I.discover]].map(([k,label,to,icon]) => ({ label, icon, onClick: () => this.go(to),
+        bg: half === k ? 'var(--bg)' : 'transparent', shadow: half === k ? '0 1px 2px rgba(0,0,0,.12), 0 0 0 .5px rgba(0,0,0,.04)' : 'none',
+        color: half === k ? 'var(--ink)' : 'var(--muted)', textColor: half === k ? 'var(--ink)' : 'var(--faint)', pillBg: half === k ? 'var(--sel)' : 'transparent', lineColor: half === k ? 'var(--ink)' : 'transparent', hasBadge: k === 'mine' && nUpd > 0 && half !== 'mine' })), query: S.query, onQuery: e => this.setState({ query: e.target.value }),
+      agentSummary: `${AG.length} agents · 2 Macs`,
+      contentPad: isMobile ? '6px 16px 28px' : '26px 32px 56px', pageGap: isMobile ? '24px' : '30px',
+      titleSize: isMobile ? '30px' : '30px',
+      hasBack: !!back && !qq, backLabel: backLabels[back] || 'Back', onBack: () => this.go(back),
+      isDiscover: scope === 'discover', isList: scope !== 'discover',
+      featCols: isMobile ? 'minmax(0,1fr)' : 'repeat(3, minmax(0,1fr))',
+      featured: COLLS.slice(0,3).map((c,i) => ({ name:c.name, tagline:c.tagline, kicker:['Collection','Editor’s pick','Collection'][i],
+        imgs: [...new Set(c.items.map(id => BY[id].img))].slice(0,3).map((src,j) => ({ src, ml: j ? '-10px' : '0' })), onClick: () => this.go('col:'+c.id) })),
+      catCols: isMobile ? 'repeat(2, minmax(0,1fr))' : (w - (s && wide ? 380 : 0) >= 1180 ? 'repeat(3, minmax(0,1fr))' : 'repeat(2, minmax(0,1fr))'),
+      creatorCols: isMobile ? 'minmax(0,1fr)' : 'repeat(3, minmax(0,1fr))',
+      topCols: narrowTop ? 'minmax(0,1fr)' : (w - (s && wide ? 380 : 0) >= 1180 ? 'repeat(3, minmax(0,1fr))' : 'repeat(2, minmax(0,1fr))'), topFlow: 'row', topRowsTpl: 'none',
+      topRows: TOP.slice(0, isMobile ? 5 : 9).map((id,i) => { const sk = BY[id], a = actionFor(sk); return { rank:i+1, name:id, by:sk.by, img:sk.img, stars:sk.stars,
+        actionLabel:a.label, actionBg:a.bg, actionFg:a.fg, onAction: e => { e.stopPropagation(); a.fn(); }, bg: S.sel === id ? 'var(--sel)' : 'transparent', onClick: () => this.open(id) }; }),
+      goTop: () => this.go('top'), goCreators: () => this.go('creators'),
+      creatorCards: Object.entries(CR).filter(([k]) => k !== 'you' && k !== 'sam').slice(0,9).map(([k,c]) => ({ name:c.name, tagline:c.tagline, img:'assets/'+c.img, onClick: () => this.go('creator:'+k) })),
+      categories: CATS.map(g => ({ label:g.label, items: g.items.map(([label,cat,icon]) => ({ label, icon, onClick: () => this.go('cat:'+label+'|'+cat) })) })),
+      title, meta, rows: rows.map(withEdit), emptyText, stop: e => e.stopPropagation(),
+      rowMenuItems: (() => { const id = S.rowMenu; if (!id) return []; const isFav = S.fav.includes(id), upd = S.upd[id], close = fn => () => { this.setState({ rowMenu:null }); fn(); };
+        const it = (label, icon, fn, color = 'var(--ink)') => ({ isItem:true, isSep:false, label, icon, color, onClick: close(fn) }), sep = { isSep:true, isItem:false };
+        return [
+          it('View details', 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16v-4M12 8h.01', () => this.open(id)),
+          ...(upd ? [it(`Update to version ${upd}`, I.upd, () => this.update(id))] : []),
+          it('Choose agents…', 'M12 8V4H8M4 12h16M6 8h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2ZM9 14h.01M15 14h.01', () => this.setState({ sel:id, pick:[...(S.inst[id] || [])] })),
+          it('Add to set…', I.listplus, () => {}),
+          it(isFav ? 'Remove from favorites' : 'Add to favorites', I.fav, () => this.setState(st => ({ fav: isFav ? st.fav.filter(x => x !== id) : [...st.fav, id] }))),
+          sep,
+          it('Copy command', 'M8 8h12v12H8zM4 16V4h12', () => {}),
+          it('View on GitHub', I.gh, () => {}),
+          it('Share', I.share, () => {}),
+          sep,
+          it('Remove from all agents', 'M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14', () => this.remove(id), '#ff3b30'),
+        ]; })(),
+      toggleEdit: () => this.setState(st => ({ edit: !st.edit, picked:[], sel:null, pick:null })), editLabel: editing ? 'Done' : 'Edit',
+      showBulk: editing, selCount: S.picked.length ? `${S.picked.length} selected` : 'Select skills',
+      selectAllLabel: S.picked.length && S.picked.length === rows.filter(r => r.isSkill).length ? 'Deselect all' : 'Select all',
+      selectAll: () => { const ids = rows.filter(r => r.isSkill).map(r => r.name); this.setState(st => ({ picked: st.picked.length === ids.length ? [] : ids })); },
+      bulkActions: (() => { const n = S.picked.length, u = S.picked.filter(id => S.upd[id]).length, off = { cursor:'default', op:'.4' }, on = { cursor:'pointer', op:'1' };
+        return [
+          { label: u ? `Update ${u}` : 'Update', bg:'var(--update)', fg:'#fff', ...(u ? on : off), onClick: () => this.setState(st => { const x = { ...st.upd }; st.picked.forEach(id => delete x[id]); return { upd:x }; }) },
+          { label:'Add to set', bg:'var(--card)', fg:'var(--ink)', ...(n ? on : off), onClick: () => {} },
+          { label:'Agents', bg:'var(--card)', fg:'var(--ink)', ...(n ? on : off), onClick: () => {} },
+          { label:'Remove', bg:'var(--card)', fg:'#ff3b30', ...(n ? on : off), onClick: () => this.setState(st => { const i2 = { ...st.inst }, u2 = { ...st.upd }; st.picked.forEach(id => { delete i2[id]; delete u2[id]; }); return { inst:i2, upd:u2, picked:[] }; }) },
+        ]; })(), isEmpty: rows.filter(r => r.isSkill).length === 0,
+      hasHero: !!hero, heroImgs: (hero || []).map((src,i) => ({ src, ml: i ? '-14px' : '0' })), heroSize: isMobile ? '52px' : '60px',
+      rowH: isMobile ? '58px' : '52px',
+      isSet: !!set, setVis: set ? (S.vis[set.id] || set.vis) : '',
+      visIcon: ({ 'Public':'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18', 'Invite only':'M5 11h14v10H5zM8 11V8a4 4 0 0 1 8 0v3', 'Only me':'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0' })[set ? (S.vis[set.id] || set.vis) : 'Public'],
+      visMenu: S.visMenu, toggleVisMenu: () => this.setState(st => ({ visMenu: !st.visMenu, agentMenu:false, acct:false })),
+      visOptions: [['Public','Anyone can find and install this set.'],['Invite only','Only people you invite by email.'],['Only me','Just you, on all your agents.']].map(([label,sub]) => ({ label, sub,
+        check: set && (S.vis[set.id] || set.vis) === label ? '✓' : '', onClick: () => this.setState(st => ({ vis: { ...st.vis, [set.id]: label }, visMenu:false })) })), setMembers: (set?.members || []).map((m,i) => ({ src:'assets/'+m, ml: i ? '-8px' : '0' })),
+      setKeepBg: set && S.setKeep[set.id] ? 'var(--update)' : 'var(--hair)', setKeepKnob: set && S.setKeep[set.id] ? '20px' : '2px',
+      toggleSetKeep: () => set && this.setState(st => ({ setKeep: { ...st.setKeep, [set.id]: !st.setKeep[set.id] } })),
+      showAgentFilter: ['all','updates'].includes(scope),
+      agentLabel: S.agent === 'all' ? 'All' : AGB[S.agent].name, agentMenu: S.agentMenu,
+      toggleAgentMenu: () => this.setState(st => ({ agentMenu: !st.agentMenu, acct:false })),
+      agentOptions: [{ id:'all', name:'All agents', n:nInst }, ...AG.map(a => ({ id:a.id, name:a.name, n:agentCount(a.id) }))].map(o => ({ label:o.name, count:o.n, check: S.agent === o.id ? '✓' : '', onClick: () => this.setState({ agent:o.id, agentMenu:false }) })),
+      hasUpdateAll: scope === 'all' && nUpd > 1, updateAll: () => this.setState({ upd:{} }),
+      showTabs: isMobile && !S.out, tabs: [['mine','My skills','M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z','all'],['discover','Discover','M16 7h6v6M22 7l-8.5 8.5-5-5L2 17','discover'],['sets','Sets','M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1ZM4 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1ZM17.5 21a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z','sets']].map(([k,label,icon,to]) => ({ label, icon,
+        color: mobTab === k ? 'var(--cta)' : 'var(--faint)', hasBadge: k === 'mine' && nUpd > 0, badge:nUpd, onClick: () => this.go(to) })),
+      hasSel: !!s, sel, ip, closeSel: () => this.setState({ sel:null, pick:null }),
+      pickOpen: !!S.pick && !!s, pickRows, pickTitle: wasInst ? 'Installed on' : 'Install on',
+      pickApplyLabel: pickN === 0 ? (wasInst ? 'Remove from all agents' : 'Choose an agent') : `${wasInst ? 'Save' : 'Install'} · ${pickN} ${pickN === 1 ? 'agent' : 'agents'}`,
+      pickCancel: () => this.setState({ pick:null }),
+      pickApply: () => { if (!s) return; if (pickN === 0) { if (wasInst) this.remove(s.id); return; } this.install(s.id, S.pick); },
+      acctOpen: S.acct, ap,
+      desktopSignin: S.out && !isMobile, showScrim: S.signin || S.acct || S.agentMenu || !!S.rowMenu || S.visMenu || (!!s && !wide),
+      scrimBg: S.signin ? 'rgba(0,0,0,.35)' : !!s && !wide ? (isMobile ? 'rgba(0,0,0,.3)' : 'rgba(0,0,0,.12)') : 'transparent',
+      closeAll: () => this.setState({ signin:false, acct:false, agentMenu:false, rowMenu:null, visMenu:false, sel: wide ? S.sel : null, pick: wide ? S.pick : null }),
+      toggleAcct: () => this.setState(st => ({ acct: !st.acct, agentMenu:false })),
+      acctItems: [
+        { label:'Agents', value:`${AG.length} connected` },
+        { label:'Devices', value:'2 Macs' },
+        { label:'GitHub', value:'Connected' },
+        { label:'MCP server', value:'omgskills.com/mcp' },
+        { label:'Appearance', value: theme === 'dark' ? 'Dark' : 'Light', onClick: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }) },
+        { label:'Sign out', value:'', onClick: () => this.setState({ out:true, acct:false, inst:{}, fav:[], upd:{}, sel:null, pick:null, edit:false, picked:[], scope:'discover', back:null, query:'' }) },
+      ].map(m => ({ ...m, onClick: m.onClick || (() => {}) })),
+    };
+  }
+}
+</script>
+</body>
+</html>
