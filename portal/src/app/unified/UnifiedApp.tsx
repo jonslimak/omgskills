@@ -101,6 +101,8 @@ type Props = {
   retry: () => void;
   previewBar: ReactNode;
   publicStatus?: PublicStatus;
+  readOnlyAccount?: boolean;
+  onSignIn?: () => void;
 };
 
 function IconButton({
@@ -321,6 +323,8 @@ export function UnifiedApp({
   retry,
   previewBar,
   publicStatus,
+  readOnlyAccount = false,
+  onSignIn,
 }: Props) {
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
@@ -369,13 +373,14 @@ export function UnifiedApp({
     ? data.sets.filter((set) => !set.hidden && !set.isFavorites)
     : [];
   const editableView =
-    signedIn &&
+    signedIn && !readOnlyAccount &&
     ["all", "favorites", "set"].includes(nav.view) &&
     (!activeSet || activeSet.role === "owner");
-  const matchingMine = mine.filter((skill) => matchesSearch(skill, nav.query));
+  const matchingMine = mine.filter((skill) => matchesSearch(skill, nav.query) && (nav.source === "all" || skill.installed?.sources.includes(nav.source)));
   const remoteRows = catalog.resultIds?.flatMap((id) => library.find((skill) => skill.catalogId === id) || []) || [];
   const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
-  const publicList = !!publicStatus && (isDiscovery(nav.view) || !!nav.query.trim());
+  const privateSearch = readOnlyAccount && !discovery;
+  const publicList = !!publicStatus && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
   const listState = publicList ? publicStatus.list : state;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
 
@@ -412,16 +417,22 @@ export function UnifiedApp({
     navigate({ ...nav, selected: "" });
   }
   function addToSet(skills: SkillDisplay[]) {
+    if (readOnlyAccount) return;
     setActionSkills(skills);
     setDialog("membership");
   }
   function newSet(skills: SkillDisplay[] = []) {
+    if (readOnlyAccount) return;
     setActionSkills(skills);
     setSetName("");
     setDialog("new-set");
   }
   function changeQuery(query: string) {
     navigate({ ...nav, query, selected: "" }, true);
+  }
+  function signIn() {
+    if (onSignIn) onSignIn();
+    else setDialog("signin");
   }
   async function copySource(skill: SkillDisplay) {
     if (!skill.githubUrl) return;
@@ -483,7 +494,7 @@ export function UnifiedApp({
           <span>
             <strong>{data.profile.name.split(" ")[0]}</strong>
             <small>
-              {sources.length} sources · {data.devices.length} devices
+              {sources.length} sources{!readOnlyAccount && ` · ${data.devices.length} devices`}
             </small>
           </span>
           <ChevronsUpDown />
@@ -500,7 +511,7 @@ export function UnifiedApp({
       <MenuItem icon={Bot} onSelect={() => go("agents")}>
         Agents <small>{sources.length} observed</small>
       </MenuItem>
-      <MenuItem icon={Monitor} onSelect={() => go("devices")}>
+      {!readOnlyAccount && <><MenuItem icon={Monitor} onSelect={() => go("devices")}>
         Devices <small>{data.devices.length}</small>
       </MenuItem>
       <MenuItem icon={Code} onSelect={() => go("github")}>
@@ -509,6 +520,7 @@ export function UnifiedApp({
       <MenuItem icon={Server} onSelect={() => go("mcp")}>
         MCP server
       </MenuItem>
+      </>}
       <DropdownMenu.Separator className="ua-separator" />
       <MenuItem
         icon={theme === "light" ? Moon : Sun}
@@ -611,7 +623,7 @@ export function UnifiedApp({
               <MenuItem icon={BookOpen} onSelect={() => open(skill)}>
                 View details
               </MenuItem>
-              <MenuItem icon={ListPlus} onSelect={() => addToSet([skill])}>
+              {!readOnlyAccount && <><MenuItem icon={ListPlus} onSelect={() => addToSet([skill])}>
                 Add to set
               </MenuItem>
               <MenuItem icon={Heart} onSelect={() => onFavorite(skill)}>
@@ -619,6 +631,7 @@ export function UnifiedApp({
                   ? "Remove from favorites"
                   : "Add to favorites"}
               </MenuItem>
+              </>}
               <MenuItem
                 icon={Copy}
                 onSelect={() => void copySource(skill)}
@@ -875,7 +888,7 @@ export function UnifiedApp({
             ) : (
               <>
                 {navItem("all", "All skills", Inbox, mine.length)}
-                {navItem("favorites", "Favorites", Heart, favorites.length)}
+                {!readOnlyAccount && <>{navItem("favorites", "Favorites", Heart, favorites.length)}
                 <div className="ua-nav-group">
                   <small>Sets</small>
                   {sets.map((set) =>
@@ -891,6 +904,7 @@ export function UnifiedApp({
                     <span>New set</span>
                   </button>
                 </div>
+                </>}
               </>
             )}
           </nav>
@@ -909,7 +923,7 @@ export function UnifiedApp({
               <button
                 type="button"
                 className="ua-pill ua-primary"
-                onClick={() => setDialog("signin")}
+                onClick={signIn}
               >
                 <User />
                 <span>Sign in</span>
@@ -927,7 +941,7 @@ export function UnifiedApp({
                 <button
                   type="button"
                   className="ua-pill ua-primary"
-                  onClick={() => setDialog("signin")}
+                  onClick={signIn}
                 >
                   Sign in
                 </button>
@@ -949,7 +963,7 @@ export function UnifiedApp({
                   <button
                     type="button"
                     className="ua-pill ua-primary"
-                    onClick={() => setDialog("signin")}
+                    onClick={signIn}
                   >
                     Sign in
                   </button>
@@ -971,7 +985,7 @@ export function UnifiedApp({
                   <h1>{title}</h1>
                   {meta && <p>{meta}</p>}
                 </div>
-                {nav.view === "sets" && (
+                {!readOnlyAccount && nav.view === "sets" && (
                   <button
                     type="button"
                     className="ua-pill"
@@ -981,7 +995,7 @@ export function UnifiedApp({
                     New set
                   </button>
                 )}
-                {nav.view === "set" && activeSet && (
+                {!readOnlyAccount && nav.view === "set" && activeSet && (
                   <Menu
                     theme={theme}
                     label="Set visibility"
@@ -1045,10 +1059,10 @@ export function UnifiedApp({
                       <p className="ua-muted">Sign in to see your skills.</p>
                     )}
                   </section>
-                  <section>
+                  {!privateSearch && <section>
                     <SectionHeading title="Library" />
                     {rows(matchingLibrary)}
-                  </section>
+                  </section>}
                 </>
               ) : nav.view === "discover" ? (
                 <>
@@ -1153,7 +1167,7 @@ export function UnifiedApp({
                     <>
                       <Avatar name={data.profile.name} size="large" />
                       <h2>{data.profile.name}</h2>
-                      <p>@{data.profile.handle}</p>
+                      {data.profile.handle && <p>@{data.profile.handle}</p>}
                       <p>{data.profile.email}</p>
                       <p className="ua-muted">
                         {data.profile.published
@@ -1195,7 +1209,7 @@ export function UnifiedApp({
                 </div>
               ) : (
                 <>
-                  {editableView && (
+                  {(editableView || (readOnlyAccount && signedIn && nav.view === "all")) && (
                     <div className="ua-toolbar">
                       <label className="ua-filter">
                         Agent
@@ -1212,7 +1226,7 @@ export function UnifiedApp({
                           ))}
                         </select>
                       </label>
-                      <button
+                      {editableView && <button
                         type="button"
                         className="ua-pill"
                         onClick={() => {
@@ -1222,7 +1236,7 @@ export function UnifiedApp({
                         }}
                       >
                         {editing ? "Done" : "Edit"}
-                      </button>
+                      </button>}
                     </div>
                   )}
                   {editing && (
@@ -1289,14 +1303,14 @@ export function UnifiedApp({
             </div>
           </main>
           {signedIn && (
-            <nav className="ua-mobile-tabs" aria-label="Mobile navigation">
+            <nav className="ua-mobile-tabs" aria-label="Mobile navigation" style={readOnlyAccount ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" } : undefined}>
               {(
                 [
                   ["all", "My skills", User],
                   ["discover", "Discover", TrendingUp],
                   ["sets", "Sets", Shapes],
                 ] as const
-              ).map(([view, label, Icon]) => (
+              ).filter(([view]) => !readOnlyAccount || view !== "sets").map(([view, label, Icon]) => (
                 <button
                   type="button"
                   key={view}
@@ -1399,7 +1413,7 @@ export function UnifiedApp({
                       Local skill
                     </span>
                   )}
-                  {signedIn && selected.installed && (
+                  {!readOnlyAccount && signedIn && selected.installed && (
                     <>
                       <IconButton
                         label={
@@ -1439,7 +1453,7 @@ export function UnifiedApp({
                       <span>Observed on</span>
                       <strong>{selected.installed.sources.join(", ")}</strong>
                     </div>
-                    <div className="ua-set-chips">
+                    {!readOnlyAccount && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, selected.installed!))
                         .map((set) => (
@@ -1455,7 +1469,7 @@ export function UnifiedApp({
                             {set.name}
                           </button>
                         ))}
-                    </div>
+                    </div>}
                   </section>
                 )}
                 <section className="ua-about">
@@ -1503,7 +1517,7 @@ export function UnifiedApp({
           </Dialog.Root>
         )}
       </div>
-      {dialog === "new-set" && (
+      {!readOnlyAccount && dialog === "new-set" && (
         <Modal title="New set" theme={theme} close={() => setDialog(null)}>
           <form
             onSubmit={(event) => {
@@ -1538,7 +1552,7 @@ export function UnifiedApp({
           </form>
         </Modal>
       )}
-      {dialog === "membership" && (
+      {!readOnlyAccount && dialog === "membership" && (
         <Modal title="Add to set" theme={theme} close={() => setDialog(null)}>
           <div className="ua-membership">
             {sets
@@ -1585,7 +1599,7 @@ export function UnifiedApp({
           </button>
         </Modal>
       )}
-      {dialog === "signin" && (
+      {!onSignIn && dialog === "signin" && (
         <Modal
           title="Sign in to omgskills"
           theme={theme}

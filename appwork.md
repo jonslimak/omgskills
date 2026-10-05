@@ -180,6 +180,40 @@ Slices 0-1 and local read-only Discover integration in Slice 2 are approved. Sli
 
 ### 3. Management In The New Shell
 
+- Local environment recovery (2026-10-05): the former September temporary DB and
+  Clerk configuration no longer exist. Added reproducible, GET-only test setup
+  under `portal/testing/`; see `portal/testing/LOCAL-ENVIRONMENT.md`. The new
+  database is empty, uses the existing nine migrations, and has no production
+  connection. The previous development Clerk keys have now been recovered and
+  verified against matching browser/server JWKS. Real development browser login
+  and manual account refresh now pass against the isolated database (one user,
+  zero skills). The first unified read-only account slice is implemented below;
+  broader account management and browser account switching remain outstanding.
+
+- [x] First local read-only account slice: reuse Clerk, `usePortalApi`, the account
+  session controller, and existing skill grouping at `/app/integration/unified/`.
+  Real My Skills, private search, agent filters, details, profile/observed agents,
+  refresh, and sign-out are connected. Public Discover remains available signed out.
+  This is the isolated test account, not a live production account connection.
+- [x] Prevent sample actions/fake account destinations in this slice: hide
+  Favorites/Sets, device/source management and mutations until their full flows
+  are connected. Block writes in both the client transport and local backend;
+  do not infer catalog membership or install status from names.
+- [x] Keep private search/IDs out of public catalog requests; no persistent private
+  cache in the new entry. Key the account subtree by user/session, dispose pending
+  reads on logout/unmount, clear private navigation on logout/anonymous deep links.
+- [x] Verification: 174 portal tests and production TypeScript/build pass. Local
+  unified entry/fixtures are absent from production JS/CSS even with local flags
+  set during the build. Authenticated reads/refresh and desktop (1440px)/mobile
+  (390px) grouping, search, filter and detail checks passed with three temporary
+  local installs; those records were removed and zero skills verified. Actual
+  sign-out, signed-out live Discover, and private-link sanitization passed.
+- [x] User confirmed the local unified experience works (2026-10-05). This
+  checkpoint covers the read-only test account slice, not production activation
+  or the remaining management actions.
+- [ ] Real second-account browser switching, denied/slow-network browser checks,
+  and populated real-account data beyond synthetic test installs remain unverified.
+
 - [ ] Connect existing account sessions, My skills, Favorites, Sets, filters, and bulk operations.
 - [ ] Preserve all existing set edits, ordering, access, Hide/Restore, and mixed-item behaviors.
 - [ ] Move profile/devices/private-source controls into reachable account destinations.

@@ -27,7 +27,11 @@ if (
     pathname: location.pathname,
   })
 ) {
-  void import("./integration/main");
+  if (/^\/app\/integration\/unified(?:\/|$)/.test(location.pathname)) {
+    void import("./integration/unified/main");
+  } else {
+    void import("./integration/main");
+  }
 } else if (isReviewRoute(location.pathname)) {
   void import("./review/main");
 } else if (
