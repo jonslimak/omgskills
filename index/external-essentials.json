@@ -1,5 +1,24 @@
 [
   {
+    "repo": "obra/superpowers",
+    "sources": [
+      "awesome-claude-skills",
+      "awesome-agent-skills-voltagent",
+      "developers-digest-best-skills",
+      "firecrawl-best-skills"
+    ],
+    "source_count": 4
+  },
+  {
+    "repo": "anthropics/skills",
+    "sources": [
+      "awesome-claude-skills",
+      "developers-digest-best-skills",
+      "firecrawl-best-skills"
+    ],
+    "source_count": 3
+  },
+  {
     "repo": "jthack/ffuf_claude_skill",
     "sources": [
       "awesome-claude-skills",
@@ -23,15 +42,6 @@
       "awesome-agent-skills-voltagent",
       "awesome-agent-skills-heilcheng",
       "antigravity-sources"
-    ],
-    "source_count": 3
-  },
-  {
-    "repo": "obra/superpowers",
-    "sources": [
-      "awesome-claude-skills",
-      "awesome-agent-skills-voltagent",
-      "firecrawl-best-skills"
     ],
     "source_count": 3
   },
@@ -85,14 +95,6 @@
     "sources": [
       "awesome-agent-skills-voltagent",
       "awesome-agent-skills-heilcheng"
-    ],
-    "source_count": 2
-  },
-  {
-    "repo": "anthropics/skills",
-    "sources": [
-      "awesome-claude-skills",
-      "firecrawl-best-skills"
     ],
     "source_count": 2
   },
@@ -393,6 +395,14 @@
     "source_count": 2
   },
   {
+    "repo": "vercel-labs/skills",
+    "sources": [
+      "awesome-agent-skills-heilcheng",
+      "developers-digest-best-skills"
+    ],
+    "source_count": 2
+  },
+  {
     "repo": "VoltAgent/awesome-agent-skills",
     "sources": [
       "awesome-agent-skills-voltagent",
@@ -509,13 +519,6 @@
     "source_count": 1
   },
   {
-    "repo": "anthropics/claude-code",
-    "sources": [
-      "developers-digest-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "anthropics/claude-cookbooks",
     "sources": [
       "awesome-claude-skills"
@@ -523,9 +526,37 @@
     "source_count": 1
   },
   {
+    "repo": "anthropics/claude-plugins-community",
+    "sources": [
+      "developers-digest-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "anthropics/claude-plugins-official",
+    "sources": [
+      "developers-digest-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "anthropics/knowledge-work-plugins",
+    "sources": [
+      "developers-digest-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "apitube/news-api-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "ArcadeAI/arcade-mcp",
+    "sources": [
+      "firecrawl-best-skills"
     ],
     "source_count": 1
   },
@@ -691,6 +722,13 @@
     "source_count": 1
   },
   {
+    "repo": "ComposioHQ/composio",
+    "sources": [
+      "firecrawl-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "Continuum-AI-Corp/OrcaReplay",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -831,6 +869,13 @@
     "source_count": 1
   },
   {
+    "repo": "eatmoreduck/boss-zhipin-scraper",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "eduardo-sl/go-agent-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -901,6 +946,13 @@
     "source_count": 1
   },
   {
+    "repo": "explorium-ai/vibeprospecting-plugin",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "fal-ai-community/skills",
     "sources": [
       "antigravity-sources"
@@ -936,6 +988,20 @@
     "source_count": 1
   },
   {
+    "repo": "fishzjp/qa-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "forjd/better-writing",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "foryourhealth111-pixel/Vibe-Skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -946,6 +1012,13 @@
     "repo": "FrancoStino/opencode-skills-collection",
     "sources": [
       "antigravity-sources"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "fujibee/agmsg",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -974,6 +1047,13 @@
     "repo": "garrytan/gstack",
     "sources": [
       "awesome-agent-skills-heilcheng"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "GiaSip/giasip-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -1063,6 +1143,13 @@
   },
   {
     "repo": "helius-labs/core-ai",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "hermes-labs-ai/lintlang",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1433,6 +1520,13 @@
     "source_count": 1
   },
   {
+    "repo": "NangoHQ/nango",
+    "sources": [
+      "firecrawl-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "Neeeophytee/finding-unknowns-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -1517,6 +1611,13 @@
     "source_count": 1
   },
   {
+    "repo": "OneWave-AI/claude-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "op7418/NanoBanana-PPT-Skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -1541,6 +1642,13 @@
     "repo": "openai/codex",
     "sources": [
       "firecrawl-best-skills"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "openai/skills",
+    "sources": [
+      "developers-digest-best-skills"
     ],
     "source_count": 1
   },
@@ -1639,6 +1747,13 @@
     "repo": "punkpeye/awesome-mcp-servers",
     "sources": [
       "awesome-agent-skills-heilcheng"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "Qiuner/birdview",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -1860,7 +1975,14 @@
     "source_count": 1
   },
   {
-    "repo": "squirrelscan/squirrelscan",
+    "repo": "socai-io/jev-social",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "squirrelscan/skills",
     "sources": [
       "awesome-agent-skills-voltagent"
     ],
@@ -1965,6 +2087,13 @@
     "source_count": 1
   },
   {
+    "repo": "tronghieu/agent-skills",
+    "sources": [
+      "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
     "repo": "truongduy2611/app-store-preflight-skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -2021,20 +2150,6 @@
     "source_count": 1
   },
   {
-    "repo": "vercel-labs/agent-browser",
-    "sources": [
-      "firecrawl-best-skills"
-    ],
-    "source_count": 1
-  },
-  {
-    "repo": "vercel-labs/skills",
-    "sources": [
-      "awesome-agent-skills-heilcheng"
-    ],
-    "source_count": 1
-  },
-  {
     "repo": "video-db/skills",
     "sources": [
       "awesome-agent-skills-voltagent"
@@ -2080,6 +2195,13 @@
     "repo": "VoltAgent/awesome-openclaw-skills",
     "sources": [
       "awesome-agent-skills-heilcheng"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "VoltAgent/official-mcp-servers",
+    "sources": [
+      "awesome-agent-skills-voltagent"
     ],
     "source_count": 1
   },
@@ -2136,6 +2258,13 @@
     "repo": "woniu9524/open-web-bridge",
     "sources": [
       "awesome-agent-skills-voltagent"
+    ],
+    "source_count": 1
+  },
+  {
+    "repo": "workos/mcp.shop",
+    "sources": [
+      "firecrawl-best-skills"
     ],
     "source_count": 1
   },

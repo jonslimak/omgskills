@@ -1,103 +1,103 @@
 {
-  "generated_at": "2026-09-28T11:22:50.190Z",
-  "total_skills": 51129,
-  "total_trending": 338,
+  "generated_at": "2026-10-05T12:05:51.852Z",
+  "total_skills": 51132,
+  "total_trending": 326,
   "total_basket": 420,
   "sections": [
     {
       "id": "install_power_law",
-      "hook": "Just 190 skills drive 80% of all 37.9M installs across the index",
+      "hook": "Just 184 skills drive 80% of all 38.6M installs across the index",
       "angle": "The Claude skill ecosystem is winner-take-all. Most skills are never installed — a tiny handful capture nearly everything. This is your content angle: the crowd doesn't know what the crowd is installing.",
       "tweet_hooks": [
-        "190 skills out of 338 tracked drive 80% of all Claude skill installs 🤯 #ClaudeCode",
-        "Top 5 authors control 39.9% of all Claude skill installs. The ecosystem has a serious power law. omgskills.app",
-        "37.9M Claude skills installs — and 190 skills account for 80% of them. Who's dominating? omgskills.app"
+        "184 skills out of 326 tracked drive 80% of all Claude skill installs 🤯 #ClaudeCode",
+        "Top 5 authors control 36.9% of all Claude skill installs. The ecosystem has a serious power law. omgskills.app",
+        "38.6M Claude skills installs — and 184 skills account for 80% of them. Who's dominating? omgskills.app"
       ],
       "data": {
-        "total_installs": 37891512,
-        "skills_for_80_pct": 190,
+        "total_installs": 38629621,
+        "skills_for_80_pct": 184,
         "top10": [
           {
-            "id": "juliusbrussee/caveman:cavecrew",
-            "installs": 324831,
+            "id": "mattpocock/skills:claude-handoff",
+            "installs": 347020,
             "trending_rank": 1,
             "trending_source": "skills.sh"
           },
           {
             "id": "leonxlnx/taste-skill:brandkit",
-            "installs": 324596,
+            "installs": 345819,
             "trending_rank": 2,
             "trending_source": "skills.sh"
           },
           {
-            "id": "juliusbrussee/caveman:caveman-stats",
-            "installs": 324319,
+            "id": "leonxlnx/taste-skill:image-to-code",
+            "installs": 341744,
+            "trending_rank": 3,
+            "trending_source": "skills.sh"
+          },
+          {
+            "id": "larksuite/cli:lark-vc-agent",
+            "installs": 340829,
             "trending_rank": 4,
             "trending_source": "skills.sh"
           },
           {
-            "id": "mattpocock/skills:claude-handoff",
-            "installs": 322316,
+            "id": "microsoft/azure-skills:entra-agent-id",
+            "installs": 340211,
             "trending_rank": 5,
             "trending_source": "skills.sh"
           },
           {
-            "id": "leonxlnx/taste-skill:image-to-code",
-            "installs": 320132,
+            "id": "leonxlnx/taste-skill:imagegen-frontend-web",
+            "installs": 337756,
             "trending_rank": 6,
             "trending_source": "skills.sh"
           },
           {
             "id": "prisma/skills:prisma-database-setup",
-            "installs": 319169,
+            "installs": 336131,
             "trending_rank": 7,
             "trending_source": "skills.sh"
           },
           {
-            "id": "heygen-com/hyperframes:product-launch-video",
-            "installs": 319069,
+            "id": "prisma/skills:prisma-client-api",
+            "installs": 336070,
             "trending_rank": 8,
             "trending_source": "skills.sh"
           },
           {
-            "id": "prisma/skills:prisma-client-api",
-            "installs": 318826,
+            "id": "juliusbrussee/caveman:cavecrew",
+            "installs": 335664,
             "trending_rank": 9,
             "trending_source": "skills.sh"
           },
           {
-            "id": "leonxlnx/taste-skill:imagegen-frontend-web",
-            "installs": 317110,
+            "id": "juliusbrussee/caveman:caveman-stats",
+            "installs": 334928,
             "trending_rank": 10,
-            "trending_source": "skills.sh"
-          },
-          {
-            "id": "prisma/skills:prisma-cli",
-            "installs": 316399,
-            "trending_rank": 11,
             "trending_source": "skills.sh"
           }
         ],
         "top_authors": [
           {
-            "author": "heygen-com",
-            "installs": 3931266
-          },
-          {
             "author": "mattpocock",
-            "installs": 3297416
+            "installs": 3165652
           },
           {
             "author": "obra",
-            "installs": 2934885
+            "installs": 3009974
+          },
+          {
+            "author": "heygen-com",
+            "installs": 2973634
           },
           {
             "author": "prisma",
-            "installs": 2788111
+            "installs": 2939589
           },
           {
             "author": "lllllllama",
-            "installs": 2175860
+            "installs": 2176186
           }
         ]
       }
@@ -134,25 +134,25 @@
             "id": "mattpocock/skills:writing-for-agents",
             "name": "writing-for-agents",
             "author": "mattpocock",
-            "stars": 270660
-          },
-          {
-            "id": "mattpocock/skills:pr",
-            "name": "pr",
-            "author": "mattpocock",
-            "stars": 269921
+            "stars": 276108
           },
           {
             "id": "affaan-m/ecc:security-review",
             "name": "security-review",
             "author": "affaan-m",
-            "stars": 268354
+            "stars": 272893
           },
           {
             "id": "affaan-m/everything-claude-code:docs/zh-TW/skills/continuous-learning",
             "name": "continuous-learning",
             "author": "affaan-m",
-            "stars": 268354
+            "stars": 272893
+          },
+          {
+            "id": "mattpocock/skills:wait-what",
+            "name": "wait-what",
+            "author": "mattpocock",
+            "stars": 269921
           },
           {
             "id": "affaan-m/ecc:accessibility",
@@ -175,54 +175,54 @@
         ],
         "efficiency_outliers": [
           {
+            "id": "microsoft/azure-skills:entra-agent-id",
+            "installs": 340211,
+            "stars": 1536
+          },
+          {
             "id": "prisma/skills:prisma-database-setup",
-            "installs": 319169,
+            "installs": 336131,
             "stars": 60
           },
           {
             "id": "prisma/skills:prisma-client-api",
-            "installs": 318826,
+            "installs": 336070,
             "stars": 60
           },
           {
             "id": "prisma/skills:prisma-cli",
-            "installs": 316399,
+            "installs": 333587,
             "stars": 60
           },
           {
             "id": "prisma/skills:prisma-postgres",
-            "installs": 311836,
+            "installs": 328618,
             "stars": 60
           },
           {
-            "id": "lllllllama/rigorpilot-skills:ai-research-explore",
-            "installs": 311338,
-            "stars": 495
+            "id": "prisma/skills:prisma-driver-adapter-implementation",
+            "installs": 323507,
+            "stars": 60
           },
           {
-            "id": "lllllllama/rigorpilot-skills:analyze-project",
-            "installs": 311104,
-            "stars": 495
+            "id": "prisma/skills:prisma-upgrade-v7",
+            "installs": 323229,
+            "stars": 60
           },
           {
-            "id": "lllllllama/rigorpilot-skills:ai-research-reproduction",
-            "installs": 311008,
-            "stars": 495
+            "id": "prisma/skills:prisma-postgres-setup",
+            "installs": 322919,
+            "stars": 60
           },
           {
-            "id": "lllllllama/rigorpilot-skills:explore-code",
-            "installs": 310699,
-            "stars": 495
+            "id": "larksuite/cli:lark-vc-agent",
+            "installs": 340829,
+            "stars": 17535
           },
           {
-            "id": "lllllllama/rigorpilot-skills:safe-debug",
-            "installs": 310689,
-            "stars": 495
-          },
-          {
-            "id": "lllllllama/rigorpilot-skills:run-train",
-            "installs": 310519,
-            "stars": 495
+            "id": "prisma/skills:prisma-compute",
+            "installs": 318469,
+            "stars": 60
           }
         ]
       }
@@ -233,26 +233,26 @@
       "angle": "In the Claude ecosystem, brand trust is a multiplier. Developers reach for official vendor skills first — even when community alternatives are just as good or better. The discovery gap is real.",
       "tweet_hooks": [
         "Official vendor Claude skills get 0.6x more installs than community-built ones. Brand trust dominates quality. omgskills.app",
-        "179 vendor skills control 31.7% of all gold-basket installs despite being 42.6% of the list. omgskills.app"
+        "176 vendor skills control 29.1% of all gold-basket installs despite being 41.9% of the list. omgskills.app"
       ],
       "data": {
         "vendor": {
-          "count": 179,
-          "avg_stars": 111521,
-          "avg_installs": 44936,
-          "avg_forks": 22858,
-          "avg_watchers": 1325,
-          "total_installs": 8043597
+          "count": 176,
+          "avg_stars": 112126,
+          "avg_installs": 43088,
+          "avg_forks": 23094,
+          "avg_watchers": 1344,
+          "total_installs": 7583548
         },
         "community": {
-          "count": 241,
-          "avg_stars": 133311,
-          "avg_installs": 71798,
-          "avg_forks": 16857,
-          "avg_watchers": 715,
-          "total_installs": 17303261
+          "count": 244,
+          "avg_stars": 131758,
+          "avg_installs": 75555,
+          "avg_forks": 16855,
+          "avg_watchers": 708,
+          "total_installs": 18435522
         },
-        "vendor_install_share_pct": 31.7
+        "vendor_install_share_pct": 29.1
       }
     },
     {
@@ -261,11 +261,11 @@
       "angle": "The index is a massive iceberg. The vast majority of skills are invisible by stars — yet some get installed heavily anyway. Stars alone aren't the signal people think they are.",
       "tweet_hooks": [
         "15.2% of Claude skills on GitHub have zero stars. The index has 51.1k skills — most are invisible. omgskills.app finds the ones worth using.",
-        "80% of all GitHub stars in the Claude ecosystem belong to just 2591 skills out of 51.1k. omgskills.app"
+        "80% of all GitHub stars in the Claude ecosystem belong to just 2592 skills out of 51.1k. omgskills.app"
       ],
       "data": {
-        "total_stars": 326211987,
-        "skills_for_80_pct": 2591,
+        "total_stars": 326410419,
+        "skills_for_80_pct": 2592,
         "buckets": [
           {
             "label": "0 stars",
@@ -283,7 +283,7 @@
             "label": "10–99 stars",
             "min": 10,
             "max": 99,
-            "count": 12058
+            "count": 12059
           },
           {
             "label": "100–499 stars",
@@ -301,17 +301,17 @@
             "label": "1000+ stars",
             "min": 1000,
             "max": null,
-            "count": 10343
+            "count": 10345
           }
         ]
       }
     },
     {
       "id": "niche_breakdown",
-      "hook": "Media & Creative dominates with 22.0% of installs — MCP Servers is last",
+      "hook": "Media & Creative dominates with 20.9% of installs — MCP Servers is last",
       "angle": "Developer attention isn't evenly distributed. Some niches punch far above their weight in installs — others have passionate but small communities. Knowing this shapes which content formats will resonate.",
       "tweet_hooks": [
-        "Media & Creative skills get 22.0% of all Claude skill installs. MCP Servers is last. The niche breakdown is wilder than you'd expect. omgskills.app",
+        "Media & Creative skills get 20.9% of all Claude skill installs. MCP Servers is last. The niche breakdown is wilder than you'd expect. omgskills.app",
         "The most community-engaged Claude skill niche (by forks/stars)? Web Scraping & Automation. The most loyal? Security. omgskills.app"
       ],
       "data": {
@@ -319,156 +319,156 @@
           {
             "label": "Media & Creative",
             "count": 30,
-            "totalInstalls": 5582117,
-            "avgStars": 46226,
-            "avgForks": 4651,
-            "avgWatchers": 195,
-            "avgScore": 47.5,
-            "forksPerStar": 0.10061437286375632,
-            "watchersPerInstall": 0.0010479894993243601
+            "totalInstalls": 5441008,
+            "avgStars": 39301,
+            "avgForks": 3828,
+            "avgWatchers": 170,
+            "avgScore": 43.7,
+            "forksPerStar": 0.09740210172769141,
+            "watchersPerInstall": 0.0009373263189467834
           },
           {
             "label": "DevOps & CI/CD",
             "count": 30,
-            "totalInstalls": 4545452,
-            "avgStars": 98980,
-            "avgForks": 9475,
-            "avgWatchers": 484,
-            "avgScore": 46.8,
-            "forksPerStar": 0.09572640937563144,
-            "watchersPerInstall": 0.0031944017888650015
-          },
-          {
-            "label": "Agent Memory & Workflow",
-            "count": 30,
-            "totalInstalls": 2824506,
-            "avgStars": 187537,
-            "avgForks": 26315,
-            "avgWatchers": 1273,
-            "avgScore": 39.6,
-            "forksPerStar": 0.14031897705519444,
-            "watchersPerInstall": 0.013520948441957639
+            "totalInstalls": 5037972,
+            "avgStars": 96075,
+            "avgForks": 9217,
+            "avgWatchers": 468,
+            "avgScore": 47.8,
+            "forksPerStar": 0.09593546708300807,
+            "watchersPerInstall": 0.0027868356552993943
           },
           {
             "label": "Design & UI",
             "count": 30,
-            "totalInstalls": 2819100,
-            "avgStars": 188525,
-            "avgForks": 26403,
-            "avgWatchers": 1883,
-            "avgScore": 42,
-            "forksPerStar": 0.14005039119480175,
-            "watchersPerInstall": 0.020038310098967754
+            "totalInstalls": 3111190,
+            "avgStars": 178460,
+            "avgForks": 23994,
+            "avgWatchers": 1816,
+            "avgScore": 41.6,
+            "forksPerStar": 0.13445029698531885,
+            "watchersPerInstall": 0.01751098454289195
+          },
+          {
+            "label": "Agent Memory & Workflow",
+            "count": 30,
+            "totalInstalls": 2867657,
+            "avgStars": 187910,
+            "avgForks": 26976,
+            "avgWatchers": 1295,
+            "avgScore": 38.9,
+            "forksPerStar": 0.14355808631791817,
+            "watchersPerInstall": 0.013547645342521787
           },
           {
             "label": "Coding Productivity",
             "count": 30,
-            "totalInstalls": 2509531,
-            "avgStars": 187224,
-            "avgForks": 31740,
-            "avgWatchers": 1519,
-            "avgScore": 36.6,
-            "forksPerStar": 0.16952954749391103,
-            "watchersPerInstall": 0.01815877149953517
+            "totalInstalls": 2578825,
+            "avgStars": 188104,
+            "avgForks": 31976,
+            "avgWatchers": 1527,
+            "avgScore": 36.2,
+            "forksPerStar": 0.1699910687704674,
+            "watchersPerInstall": 0.01776390410361308
           },
           {
             "label": "Writing & Documentation",
             "count": 30,
-            "totalInstalls": 1665974,
-            "avgStars": 136855,
-            "avgForks": 20560,
-            "avgWatchers": 1003,
-            "avgScore": 27.5,
-            "forksPerStar": 0.15023199736947865,
-            "watchersPerInstall": 0.018061506362044066
-          },
-          {
-            "label": "General & Utilities",
-            "count": 30,
-            "totalInstalls": 1234499,
-            "avgStars": 199533,
-            "avgForks": 32837,
-            "avgWatchers": 1999,
-            "avgScore": 28.4,
-            "forksPerStar": 0.164569269243684,
-            "watchersPerInstall": 0.048578411161126905
+            "totalInstalls": 1702243,
+            "avgStars": 140451,
+            "avgForks": 21234,
+            "avgWatchers": 1026,
+            "avgScore": 27.1,
+            "forksPerStar": 0.151184398829485,
+            "watchersPerInstall": 0.01808202471680013
           },
           {
             "label": "AI Orchestration",
             "count": 30,
-            "totalInstalls": 1081387,
-            "avgStars": 114986,
-            "avgForks": 18625,
-            "avgWatchers": 1193,
-            "avgScore": 18.6,
-            "forksPerStar": 0.16197624058581045,
-            "watchersPerInstall": 0.0330963845505818
+            "totalInstalls": 1482490,
+            "avgStars": 112860,
+            "avgForks": 18564,
+            "avgWatchers": 1191,
+            "avgScore": 20.7,
+            "forksPerStar": 0.1644869750132908,
+            "watchersPerInstall": 0.024101343010745433
           },
           {
-            "label": "Web Scraping & Automation",
+            "label": "General & Utilities",
             "count": 30,
-            "totalInstalls": 790405,
-            "avgStars": 102531,
-            "avgForks": 25358,
-            "avgWatchers": 733,
-            "avgScore": 12.6,
-            "forksPerStar": 0.24732032263413017,
-            "watchersPerInstall": 0.027821180280995186
+            "totalInstalls": 968234,
+            "avgStars": 199692,
+            "avgForks": 33221,
+            "avgWatchers": 2007,
+            "avgScore": 25.6,
+            "forksPerStar": 0.16636119624221302,
+            "watchersPerInstall": 0.06218538080670582
           },
           {
             "label": "Research & Summarization",
             "count": 30,
-            "totalInstalls": 740380,
-            "avgStars": 81807,
-            "avgForks": 12750,
-            "avgWatchers": 667,
-            "avgScore": 12.8,
-            "forksPerStar": 0.15585463346657377,
-            "watchersPerInstall": 0.0270266619843864
+            "totalInstalls": 699483,
+            "avgStars": 82188,
+            "avgForks": 12749,
+            "avgWatchers": 655,
+            "avgScore": 12.4,
+            "forksPerStar": 0.15511996885190052,
+            "watchersPerInstall": 0.02809217665046899
+          },
+          {
+            "label": "Web Scraping & Automation",
+            "count": 30,
+            "totalInstalls": 673350,
+            "avgStars": 102723,
+            "avgForks": 25560,
+            "avgWatchers": 745,
+            "avgScore": 12.1,
+            "forksPerStar": 0.24882450863000496,
+            "watchersPerInstall": 0.03319224771664068
           },
           {
             "label": "Content & Marketing",
             "count": 30,
-            "totalInstalls": 559015,
-            "avgStars": 35043,
-            "avgForks": 5706,
-            "avgWatchers": 310,
-            "avgScore": 6.4,
-            "forksPerStar": 0.16282852495505523,
-            "watchersPerInstall": 0.016636405105408623
+            "totalInstalls": 566532,
+            "avgStars": 35089,
+            "avgForks": 5788,
+            "avgWatchers": 297,
+            "avgScore": 6,
+            "forksPerStar": 0.16495197925275729,
+            "watchersPerInstall": 0.015727266950498822
           },
           {
             "label": "Security",
             "count": 30,
-            "totalInstalls": 430956,
-            "avgStars": 199720,
-            "avgForks": 29296,
-            "avgWatchers": 1128,
+            "totalInstalls": 360516,
+            "avgStars": 208630,
+            "avgForks": 31128,
+            "avgWatchers": 1189,
             "avgScore": 19.4,
-            "forksPerStar": 0.14668535950330464,
-            "watchersPerInstall": 0.07852309748559018
+            "forksPerStar": 0.14920193644250587,
+            "watchersPerInstall": 0.09894151715873914
           },
           {
             "label": "Data & Analytics",
             "count": 30,
-            "totalInstalls": 383038,
-            "avgStars": 87321,
-            "avgForks": 16938,
-            "avgWatchers": 909,
-            "avgScore": 10.2,
-            "forksPerStar": 0.19397395815439586,
-            "watchersPerInstall": 0.07119398075386776
+            "totalInstalls": 340932,
+            "avgStars": 88037,
+            "avgForks": 17255,
+            "avgWatchers": 912,
+            "avgScore": 10,
+            "forksPerStar": 0.19599713756715925,
+            "watchersPerInstall": 0.0802506071591989
           },
           {
             "label": "MCP Servers",
             "count": 30,
-            "totalInstalls": 180498,
-            "avgStars": 70054,
-            "avgForks": 11147,
-            "avgWatchers": 351,
-            "avgScore": 7.5,
-            "forksPerStar": 0.15912010734576185,
-            "watchersPerInstall": 0.058338596549546255
+            "totalInstalls": 188638,
+            "avgStars": 69920,
+            "avgForks": 11080,
+            "avgWatchers": 346,
+            "avgScore": 7.6,
+            "forksPerStar": 0.15846681922196795,
+            "watchersPerInstall": 0.0550260286898716
           }
         ]
       }
@@ -485,7 +485,7 @@
         "top_tags": [
           {
             "tag": "claude-code",
-            "count": 11370
+            "count": 11371
           },
           {
             "tag": "agent-skills",
@@ -493,19 +493,19 @@
           },
           {
             "tag": "ai-agents",
-            "count": 6279
+            "count": 6280
           },
           {
             "tag": "claude",
-            "count": 5782
+            "count": 5783
           },
           {
             "tag": "skills",
-            "count": 4771
+            "count": 4772
           },
           {
             "tag": "claude-skills",
-            "count": 4641
+            "count": 4642
           },
           {
             "tag": "ai",
@@ -529,7 +529,7 @@
           },
           {
             "tag": "llm",
-            "count": 2925
+            "count": 2927
           },
           {
             "tag": "claude-code-skills",
@@ -567,27 +567,27 @@
         "top_pairs": [
           {
             "pair": "ai-agents + claude-code",
-            "count": 4510
+            "count": 4511
           },
           {
             "pair": "claude + claude-code",
-            "count": 3763
+            "count": 3764
           },
           {
             "pair": "claude-code + claude-skills",
-            "count": 3370
+            "count": 3371
           },
           {
             "pair": "agent-skills + claude-code",
-            "count": 3369
+            "count": 3370
           },
           {
             "pair": "claude-code + developer-tools",
-            "count": 3188
+            "count": 3189
           },
           {
             "pair": "ai-agents + developer-tools",
-            "count": 2745
+            "count": 2746
           },
           {
             "pair": "claude-code + skills",
@@ -595,7 +595,7 @@
           },
           {
             "pair": "claude-code + codex",
-            "count": 2515
+            "count": 2516
           },
           {
             "pair": "claude-code + claude-code-skills",
@@ -609,43 +609,43 @@
         "high_quality_tags": [
           {
             "tag": "obra",
-            "avg": 291828
+            "avg": 292035
           },
           {
             "tag": "subagent-driven-development",
-            "avg": 291828
+            "avg": 292035
           },
           {
             "tag": "declarative",
-            "avg": 233592
+            "avg": 233606
           },
           {
             "tag": "apis",
-            "avg": 203239
+            "avg": 203254
           },
           {
             "tag": "integration-framework",
-            "avg": 203239
+            "avg": 203254
           },
           {
             "tag": "ipaas",
-            "avg": 203239
+            "avg": 203254
           },
           {
             "tag": "low-code-platform",
-            "avg": 203239
+            "avg": 203254
           },
           {
             "tag": "data-flow",
-            "avg": 192826
+            "avg": 192839
           },
           {
             "tag": "visual-studio-code",
-            "avg": 191499
+            "avg": 191504
           },
           {
             "tag": "brainstorming",
-            "avg": 182758
+            "avg": 182887
           }
         ]
       }
@@ -656,39 +656,39 @@
       "angle": "Prolific doesn't always mean quality — and one-hit wonders often have the highest-starred skills. Author spotlights work best when you contrast quantity vs quality builders.",
       "tweet_hooks": [
         "@nvidia has built 782 Claude skills. The most prolific creator in the index. omgskills.app",
-        "Multi-skill Claude authors avg 1.8k ⭐ per skill vs 698 ⭐ for one-timers. Quantity drives quality. omgskills.app"
+        "Multi-skill Claude authors avg 1.8k ⭐ per skill vs 705 ⭐ for one-timers. Quantity drives quality. omgskills.app"
       ],
       "data": {
         "top_prolific": [
           {
             "author": "nvidia",
             "count": 782,
-            "avg_stars": 3935
+            "avg_stars": 3945
           },
           {
             "author": "microsoft",
             "count": 714,
-            "avg_stars": 21130
+            "avg_stars": 21134
           },
           {
             "author": "github",
             "count": 477,
-            "avg_stars": 25770
+            "avg_stars": 25773
           },
           {
             "author": "openai",
             "count": 449,
-            "avg_stars": 13995
+            "avg_stars": 13998
           },
           {
             "author": "affaan-m",
             "count": 426,
-            "avg_stars": 238218
+            "avg_stars": 238239
           },
           {
             "author": "anthropics",
-            "count": 394,
-            "avg_stars": 37884
+            "count": 395,
+            "avg_stars": 37816
           },
           {
             "author": "aj-geddes",
@@ -698,7 +698,7 @@
           {
             "author": "wshobson",
             "count": 252,
-            "avg_stars": 36633
+            "avg_stars": 36634
           },
           {
             "author": "plurigrid",
@@ -720,7 +720,7 @@
           {
             "author": "affaan-m",
             "count": 426,
-            "avgStars": 238218
+            "avgStars": 238239
           },
           {
             "author": "react",
@@ -730,65 +730,69 @@
           {
             "author": "f",
             "count": 3,
-            "avgStars": 168096
+            "avgStars": 168296
           },
           {
             "author": "n8n-io",
             "count": 51,
-            "avgStars": 147587
+            "avgStars": 147597
           },
           {
             "author": "dietrichgebert",
             "count": 6,
-            "avgStars": 146175
+            "avgStars": 147205
           },
           {
             "author": "mattpocock",
             "count": 68,
-            "avgStars": 141237
+            "avgStars": 141331
           },
           {
             "author": "garrytan",
             "count": 54,
-            "avgStars": 132461
+            "avgStars": 132476
           },
           {
             "author": "nextlevelbuilder",
             "count": 7,
-            "avgStars": 130763
+            "avgStars": 131050
           },
           {
             "author": "langgenius",
             "count": 5,
-            "avgStars": 122462
+            "avgStars": 122563
           }
         ],
         "single_skill": {
           "count": 6763,
-          "avg_stars": 698
+          "avg_stars": 705
         },
         "multi_skill": {
           "count": 4105,
-          "avg_stars": 1843
+          "avg_stars": 1847
         }
       }
     },
     {
       "id": "github_health",
-      "hook": "The freshest niche (AI Orchestration) averaged 1d since last push — Content & Marketing averaged 0mo",
+      "hook": "The freshest niche (General & Utilities) averaged 0d since last push — Coding Productivity averaged 0mo",
       "angle": "Repo freshness reveals which niches are actively evolving vs coasting on past work. Every niche in the gold basket pushed within the last week — the 100-star floor filtered out stale skills automatically.",
       "tweet_hooks": [
-        "Which Claude skill niches are most actively maintained? AI Orchestration wins — avg 1 days since last push. omgskills.app",
+        "Which Claude skill niches are most actively maintained? General & Utilities wins — avg 0 days since last push. omgskills.app",
         "Every niche in the omgskills gold basket pushed to GitHub in the last week. Stale skills filtered out automatically. omgskills.app"
       ],
       "data": {
         "niche_age": [
           {
-            "label": "AI Orchestration",
-            "avg_days": 1
+            "label": "General & Utilities",
+            "avg_days": 0
           },
           {
-            "label": "General & Utilities",
+            "label": "Security",
+            "avg_days": 0
+          },
+          {
+            "label": "AI Orchestration",
             "avg_days": 1
           },
           {
@@ -796,23 +800,23 @@
             "avg_days": 1
           },
           {
-            "label": "MCP Servers",
-            "avg_days": 1
-          },
-          {
             "label": "Media & Creative",
             "avg_days": 2
           },
           {
-            "label": "Research & Summarization",
+            "label": "MCP Servers",
             "avg_days": 2
           },
           {
-            "label": "Security",
+            "label": "Data & Analytics",
+            "avg_days": 2
+          },
+          {
+            "label": "DevOps & CI/CD",
             "avg_days": 3
           },
           {
-            "label": "Web Scraping & Automation",
+            "label": "Content & Marketing",
             "avg_days": 3
           },
           {
@@ -820,73 +824,69 @@
             "avg_days": 4
           },
           {
-            "label": "DevOps & CI/CD",
+            "label": "Research & Summarization",
             "avg_days": 4
           },
           {
-            "label": "Data & Analytics",
-            "avg_days": 4
-          },
-          {
-            "label": "Coding Productivity",
-            "avg_days": 8
+            "label": "Web Scraping & Automation",
+            "avg_days": 5
           },
           {
             "label": "Writing & Documentation",
-            "avg_days": 9
+            "avg_days": 8
           },
           {
-            "label": "Content & Marketing",
-            "avg_days": 13
+            "label": "Coding Productivity",
+            "avg_days": 9
           }
         ],
         "high_issue_repos": [
           {
             "repo": "NousResearch/hermes-agent",
             "author": "nousresearch",
-            "open_issues": 44795
+            "open_issues": 48070
           },
           {
             "repo": "microsoft/vscode",
             "author": "microsoft",
-            "open_issues": 21189
+            "open_issues": 21423
           },
           {
             "repo": "pytorch/pytorch",
             "author": "pytorch",
-            "open_issues": 17607
+            "open_issues": 17595
           },
           {
             "repo": "anthropics/claude-code",
             "author": "anthropics",
-            "open_issues": 13440
+            "open_issues": 14224
           },
           {
             "repo": "openclaw/openclaw",
             "author": "clawdbot",
-            "open_issues": 8911
+            "open_issues": 9360
           }
         ],
         "correlations": {
-          "stars_installs": -0.16,
-          "stars_forks": 0.82,
-          "installs_watchers": -0.25
+          "stars_installs": -0.17,
+          "stars_forks": 0.83,
+          "installs_watchers": -0.26
         }
       }
     },
     {
       "id": "signal_correlations",
-      "hook": "Stars and installs are negatively correlated (r=-0.16) — more stars does NOT mean more installs",
+      "hook": "Stars and installs are negatively correlated (r=-0.17) — more stars does NOT mean more installs",
       "angle": "This is the most counterintuitive finding in the data. Stars and installs measure completely different things — and they slightly oppose each other. A skill with few stars but high installs is solving a real problem. A skill with many stars but few installs is respected but not used day-to-day.",
       "tweet_hooks": [
-        "Stars and installs in the Claude skill ecosystem have a -0.16 correlation. More stars = slightly fewer installs. They measure completely different things 🤯 omgskills.app",
-        "GitHub stars predict forks with r=0.82 but predict installs with r=-0.16. Stars ≠ usefulness. omgskills.app tracks both. omgskills.app",
-        "Hot take backed by data: the most-starred Claude skills are NOT the most-installed. r=-0.16 correlation. omgskills.app finds the ones that get used."
+        "Stars and installs in the Claude skill ecosystem have a -0.17 correlation. More stars = slightly fewer installs. They measure completely different things 🤯 omgskills.app",
+        "GitHub stars predict forks with r=0.83 but predict installs with r=-0.17. Stars ≠ usefulness. omgskills.app tracks both. omgskills.app",
+        "Hot take backed by data: the most-starred Claude skills are NOT the most-installed. r=-0.17 correlation. omgskills.app finds the ones that get used."
       ],
       "data": {
-        "r_stars_installs": -0.16,
-        "r_stars_forks": 0.82,
-        "r_installs_watchers": -0.25
+        "r_stars_installs": -0.17,
+        "r_stars_forks": 0.83,
+        "r_installs_watchers": -0.26
       }
     }
   ]
