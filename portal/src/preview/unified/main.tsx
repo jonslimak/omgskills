@@ -15,8 +15,11 @@ import { makeCatalog, makeFixtures, type Scenario } from "./fixtures";
 import { changeMembership } from "../state";
 import type { PortalSet } from "../../app/model";
 import type { GroupedSyncedSkill } from "../../synced-skill-grouping";
+import { PublicCatalogClient } from "../../app/unified/public-catalog";
+import { usePublicCatalog } from "../../app/unified/use-public-catalog";
 
 const catalog = makeCatalog();
+const publicClient = new PublicCatalogClient();
 const base = "/app/preview/unified/";
 function installed(skills: SkillDisplay[]): GroupedSyncedSkill[] {
   return skills.flatMap((skill) => (skill.installed ? [skill.installed] : []));
@@ -29,6 +32,8 @@ function Preview() {
   const [nav, setNav] = useState(() => parseNavigation(location.search));
   const [revision, setRevision] = useState(0);
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
+  const [liveCatalog, setLiveCatalog] = useState(true);
+  const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
   const navigate = (next: Navigation, replace = false) => {
     const safe =
       !signedIn && !isDiscovery(next.view)
@@ -86,7 +91,7 @@ function Preview() {
       key={revision}
       data={data}
       catalog={
-        scenario === "empty"
+        liveCatalog ? publicData.catalog : scenario === "empty"
           ? {
               ...catalog,
               skills: [],
@@ -96,6 +101,7 @@ function Preview() {
             }
           : catalog
       }
+      publicStatus={liveCatalog ? publicData.status : undefined}
       nav={nav}
       navigate={navigate}
       signedIn={signedIn}
@@ -163,8 +169,19 @@ function Preview() {
       }}
       previewBar={
         <div className="ua-preview">
-          <span>Local preview · sample data</span>
+          <span>{liveCatalog ? "Local preview · live Discover · sample account" : "Local preview · sample data"}</span>
           <div>
+            <select
+              aria-label="Catalog data"
+              value={liveCatalog ? "live" : "sample"}
+              onChange={(event) => {
+                setLiveCatalog(event.target.value === "live");
+                navigate({ ...initialNavigation, view: "discover" }, true);
+              }}
+            >
+              <option value="live">Live catalog</option>
+              <option value="sample">Sample catalog</option>
+            </select>
             <label>
               <span className="ua-sr">Preview account</span>
               <select

@@ -11,6 +11,7 @@ import {
   publicReleaseConfig,
 } from "./production-features.mjs";
 import { stageNetlifyDbMigrations } from "./stage-netlify-db-migrations.mjs";
+import { appDomainRedirects } from "./portal-redirects.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.join(repoRoot, "site");
@@ -18,15 +19,6 @@ const portalDir = path.join(repoRoot, "portal");
 const portalDist = path.join(portalDir, "dist");
 const outputDir = path.join(repoRoot, "dist", "netlify-site");
 const outputAppDir = path.join(outputDir, "app");
-
-const appDomainRedirects = [
-  "https://app.omgskills.com/app/assets/*  /app/assets/:splat  200!",
-  "http://app.omgskills.com/app/assets/*   /app/assets/:splat  200!",
-  "https://app.omgskills.com/assets/*      /app/assets/:splat  200!",
-  "http://app.omgskills.com/assets/*       /app/assets/:splat  200!",
-  "https://app.omgskills.com/*             /app/index.html     200!",
-  "http://app.omgskills.com/*              /app/index.html     200!"
-];
 
 const previewPortalRedirects = [
   "/app/*  /app/index.html  200"

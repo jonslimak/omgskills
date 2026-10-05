@@ -1,4 +1,5 @@
 import type { CatalogDisplay } from "../../app/unified/model";
+import { discoveryCategories } from "../../app/unified/discovery-categories";
 import { makeFixtures as makeBaseFixtures, type Scenario } from "../fixtures";
 import anthropics from "../../../../web-handoff/app/assets/anthropics.png";
 import matt from "../../../../web-handoff/app/assets/mattpocock.png";
@@ -196,52 +197,7 @@ export function makeCatalog(): CatalogDisplay {
           .map((s) => s.id),
       },
     ],
-    categories: [
-      {
-        label: "Design + Apps",
-        items: [
-          "Design system",
-          "SwiftUI",
-          "React",
-          "App Store",
-          "Landing page",
-          "Animation",
-        ],
-      },
-      {
-        label: "Marketing",
-        items: [
-          "Brand",
-          "Copywriting",
-          "SEO",
-          "Blog",
-          "Social media",
-          "Market research",
-        ],
-      },
-      {
-        label: "Coding",
-        items: [
-          "Code review",
-          "Testing",
-          "Debugging",
-          "Refactoring",
-          "API design",
-          "Security audit",
-        ],
-      },
-      {
-        label: "Practical",
-        items: [
-          "MCP server",
-          "Deep research",
-          "PDF",
-          "Deck",
-          "Excel",
-          "Writing",
-        ],
-      },
-    ],
+    categories: discoveryCategories,
     trendingIds: [...skills.slice(8, 13), ...skills.slice(0, 8)].map(
       (s) => s.id,
     ),

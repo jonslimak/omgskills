@@ -14,6 +14,7 @@ import {
   BookOpen,
   Bot,
   Braces,
+  Bug,
   Check,
   ChevronDown,
   ChevronRight,
@@ -23,33 +24,42 @@ import {
   Compass,
   Copy,
   FileText,
-  FlaskConical,
+  FileSearch,
   Folder,
+  GitBranch,
   Globe,
   Heart,
   Inbox,
   Laptop,
   ListPlus,
+  ListChecks,
   Lock,
   LogOut,
   Monitor,
   Moon,
   MoreHorizontal,
+  Newspaper,
   Palette,
   PanelLeft,
   Plus,
+  Presentation,
+  RefreshCw,
   Search,
+  SearchCheck,
   SearchX,
   Server,
   Shapes,
   ShieldCheck,
   Smartphone,
   Sparkles,
+  PanelsTopLeft,
   Star,
   Sun,
   Target,
+  Table,
   TrendingUp,
   User,
+  UserCheck,
   Users,
   X,
   type LucideIcon,
@@ -74,6 +84,7 @@ import {
   type View,
 } from "./model";
 import "./unified.css";
+import type { PublicStatus } from "./use-public-catalog";
 
 type Props = {
   data: PortalData;
@@ -89,6 +100,7 @@ type Props = {
   state: LoadState;
   retry: () => void;
   previewBar: ReactNode;
+  publicStatus?: PublicStatus;
 };
 
 function IconButton({
@@ -272,14 +284,26 @@ const categoryIcons: Record<string, LucideIcon> = {
   SwiftUI: Smartphone,
   React: Atom,
   "App Store": Laptop,
-  Animation: CirclePlay,
-  "Code review": Code,
-  Testing: FlaskConical,
+  Remotion: CirclePlay,
+  "Landing page": PanelsTopLeft,
+  Brand: Star,
+  Blog: Newspaper,
+  SEO: SearchCheck,
+  Scraping: Globe,
+  "Social media": Users,
+  "Market research": Target,
+  "Code review": GitBranch,
+  Playwright: ListChecks,
+  Debugging: Bug,
+  "API design": Braces,
+  Refactoring: RefreshCw,
   "Security audit": ShieldCheck,
-  "Deep research": Search,
+  "Deep research": FileSearch,
   "MCP server": Server,
   PDF: FileText,
-  Writing: BookOpen,
+  Deck: Presentation,
+  Humanizer: UserCheck,
+  Excel: Table,
 };
 
 export function UnifiedApp({
@@ -296,6 +320,7 @@ export function UnifiedApp({
   state,
   retry,
   previewBar,
+  publicStatus,
 }: Props) {
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
@@ -318,15 +343,26 @@ export function UnifiedApp({
     [data.skills],
   );
   const mine = signedIn ? models.mine : [];
-  const library = signedIn
+  const library = signedIn && !publicStatus
     ? models.library
     : models.library.map((skill) => ({ ...skill, installed: undefined }));
-  const selected = [...mine, ...library].find((s) => s.key === nav.selected);
+  const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
+    ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
+    : undefined;
+  const selected = [...mine, ...library].find((s) => s.key === nav.selected) || pendingSelection;
+  const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
+  const detailPending = remoteDetail && publicStatus.detail !== "ready";
+  const relatedSkills = selected?.author
+    ? library
+        .filter((skill) => skill.author === selected.author && skill.catalogId !== selected.catalogId)
+        .slice(0, 3)
+    : [];
   const activeSet = signedIn
     ? data.sets.find((set) => set.id === nav.id)
     : undefined;
   const collection = catalog.collections.find((item) => item.id === nav.id);
   const creator = catalog.creators.find((item) => item.handle === nav.id);
+  const categoryGroup = catalog.categories.find((group) => group.label === nav.id);
   const discovery = !signedIn || isDiscovery(nav.view);
   const favorites = mine.filter((skill) => isFavorite(data, skill));
   const sets = signedIn
@@ -337,9 +373,10 @@ export function UnifiedApp({
     ["all", "favorites", "set"].includes(nav.view) &&
     (!activeSet || activeSet.role === "owner");
   const matchingMine = mine.filter((skill) => matchesSearch(skill, nav.query));
-  const matchingLibrary = library.filter((skill) =>
-    matchesSearch(skill, nav.query),
-  );
+  const remoteRows = catalog.resultIds?.flatMap((id) => library.find((skill) => skill.catalogId === id) || []) || [];
+  const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
+  const publicList = !!publicStatus && (isDiscovery(nav.view) || !!nav.query.trim());
+  const listState = publicList ? publicStatus.list : state;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
 
   useEffect(() => {
@@ -525,11 +562,12 @@ export function UnifiedApp({
         >
           <Avatar src={skill.avatar} name={skill.author || skill.name} />
           <span className="ua-row-text">
-            <span className="ua-row-name">
-              {skill.name}
-              {skill.installed?.isLocalOnly && (
-                <Lock aria-label="Local skill" />
+            <span className="ua-row-heading">
+              <span className="ua-row-name">{skill.name}</span>
+              {!compact && (discovery || nav.query) && skill.author && (
+                <span className="ua-row-author">@{skill.author}</span>
               )}
+              {skill.installed?.isLocalOnly && <Lock aria-label="Local skill" />}
             </span>
             <span className="ua-row-description">
               {compact
@@ -624,10 +662,10 @@ export function UnifiedApp({
       </div>
     );
   }
-  function CollectionCards() {
+  function CollectionCards({ limit }: { limit?: number }) {
     return (
       <div className="ua-collections">
-        {catalog.collections.map((item) => (
+        {catalog.collections.slice(0, limit).map((item) => (
           <button
             type="button"
             className="ua-collection"
@@ -635,7 +673,9 @@ export function UnifiedApp({
             onClick={() => go("collection", item.id)}
           >
             <span className="ua-avatar-stack">
-              {[
+              {item.authors ? item.authors.map((author) => (
+                <Avatar key={author.handle} src={author.avatar} name={author.handle} size="medium" />
+              )) : [
                 ...new Map(
                   library
                     .filter((skill) => item.skillIds.includes(skill.catalogId!))
@@ -652,18 +692,20 @@ export function UnifiedApp({
                   />
                 ))}
             </span>
-            <small>Collection</small>
-            <strong>{item.name}</strong>
-            <span>{item.description}</span>
+            <span className="ua-collection-copy">
+              <small>Collection</small>
+              <strong>{item.name}</strong>
+              <span>{item.description}</span>
+            </span>
           </button>
         ))}
       </div>
     );
   }
-  function CreatorList() {
+  function CreatorList({ limit }: { limit?: number }) {
     return (
       <div className="ua-creators">
-        {catalog.creators.map((item) => (
+        {catalog.creators.slice(0, limit).map((item) => (
           <button
             type="button"
             className="ua-creator"
@@ -677,6 +719,33 @@ export function UnifiedApp({
             </span>
             <ChevronRight />
           </button>
+        ))}
+      </div>
+    );
+  }
+  function CategoryList({ groups = catalog.categories }: { groups?: CatalogDisplay["categories"] }) {
+    return (
+      <div className="ua-categories">
+        {groups.map((group) => (
+          <div key={group.label}>
+            {groups.length > 1 && <h3>{group.label}</h3>}
+            <div>
+              {group.items.map((item) => {
+                const Icon = categoryIcons[item] || Search;
+                return (
+                  <button
+                    type="button"
+                    key={item}
+                    onClick={() => navigate({ view: "discover", id: "", query: item, selected: "", source: "all" })}
+                  >
+                    <Icon />
+                    <span>{item}</span>
+                    <ChevronRight />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         ))}
       </div>
     );
@@ -697,12 +766,9 @@ export function UnifiedApp({
       collection?.skillIds.includes(skill.catalogId!),
     );
   if (nav.view === "category") {
-    const tags = catalog.categories.find((group) => group.label === nav.id)
-      ?.items || [nav.id];
-    visible = library.filter((skill) =>
-      skill.tags.some((tag) => tags.includes(tag)),
-    );
+    visible = library.filter((skill) => matchesSearch(skill, nav.id));
   }
+  if (publicStatus && ["top", "creator", "collection", "category"].includes(nav.view)) visible = remoteRows;
   if (nav.source !== "all")
     visible = visible.filter((skill) =>
       skill.installed?.sources.includes(nav.source),
@@ -712,12 +778,12 @@ export function UnifiedApp({
     favorites: "favorites",
     sets: "sets",
     discover: "Discover",
-    top: "Top this week",
+    top: publicStatus ? "Trending skills" : "Top this week",
     creators: "Creators",
     collections: "Collections",
     set: activeSet?.name || "Set not found",
     creator: creator?.name || nav.id,
-    collection: collection?.name || "Collection not found",
+    collection: collection?.name || (listState === "loading" ? "Collection" : "Collection not found"),
     category: nav.id,
     agents: "agents",
     devices: "devices",
@@ -790,7 +856,7 @@ export function UnifiedApp({
             {discovery ? (
               <>
                 {navItem("discover", "Discover", Compass)}
-                {navItem("top", "Top this week", TrendingUp)}
+                {navItem("top", publicStatus ? "Trending skills" : "Top this week", TrendingUp)}
                 {navItem("creators", "Creators", Users)}
                 {navItem("collections", "Collections", Shapes)}
                 <div className="ua-nav-group">
@@ -951,7 +1017,8 @@ export function UnifiedApp({
                   </Menu>
                 )}
               </div>
-              {state === "loading" ? (
+              {publicList && publicStatus.note && listState === "ready" && <p className="ua-muted" role="status">{publicStatus.note}</p>}
+              {listState === "loading" ? (
                 <div
                   className="ua-skeletons"
                   role="status"
@@ -961,9 +1028,10 @@ export function UnifiedApp({
                     <div key={i} />
                   ))}
                 </div>
-              ) : state === "error" ? (
+              ) : listState === "error" ? (
                 <Empty title="Skills couldn't be loaded">
-                  <button type="button" className="ua-pill" onClick={retry}>
+                  {publicList && publicStatus.error && <span>{publicStatus.error}<br /></span>}
+                  <button type="button" className="ua-pill" onClick={publicList ? publicStatus.retry : retry}>
                     Try again
                   </button>
                 </Empty>
@@ -984,10 +1052,10 @@ export function UnifiedApp({
                 </>
               ) : nav.view === "discover" ? (
                 <>
-                  <CollectionCards />
+                  <CollectionCards limit={publicStatus ? 3 : undefined} />
                   <section>
                     <SectionHeading
-                      title="Top this week"
+                      title={publicStatus ? "Trending skills" : "Top this week"}
                       action={() => go("top")}
                     />
                     <div className="ua-trending">
@@ -1001,35 +1069,15 @@ export function UnifiedApp({
                       title="Creators"
                       action={() => go("creators")}
                     />
-                    <CreatorList />
+                    <CreatorList limit={publicStatus ? 9 : undefined} />
                   </section>
                   <section>
                     <SectionHeading title="Categories" />
-                    <div className="ua-categories">
-                      {catalog.categories.map((group) => (
-                        <div key={group.label}>
-                          <h3>{group.label}</h3>
-                          <div>
-                            {group.items.map((item) => {
-                              const Icon = categoryIcons[item] || Braces;
-                              return (
-                                <button
-                                  type="button"
-                                  key={item}
-                                  onClick={() => go("category", item)}
-                                >
-                                  <Icon />
-                                  <span>{item}</span>
-                                  <ChevronRight />
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <CategoryList />
                   </section>
                 </>
+              ) : nav.view === "category" && categoryGroup ? (
+                <CategoryList groups={[categoryGroup]} />
               ) : nav.view === "collections" ? (
                 <CollectionCards />
               ) : nav.view === "creators" ? (
@@ -1301,28 +1349,39 @@ export function UnifiedApp({
                     </IconButton>
                   </Dialog.Close>
                 </div>
-                <Avatar
-                  src={selected.avatar}
-                  name={selected.author || selected.name}
-                  size="large"
-                />
-                <Dialog.Title>{selected.name}</Dialog.Title>
-                <div className="ua-detail-meta">
-                  {selected.author && (
-                    <button
-                      type="button"
-                      className="ua-link"
-                      onClick={() => go("creator", selected.author)}
-                    >
-                      @{selected.author}
-                    </button>
-                  )}
-                  {selected.stars !== undefined && (
-                    <span>
-                      <Star />
-                      {starCount(selected.stars)}
-                    </span>
-                  )}
+                {detailPending ? (
+                  <>
+                    <Dialog.Title>Skill details</Dialog.Title>
+                    <p role="status">{publicStatus.detail === "loading" ? "Loading skill..." : publicStatus.detailError}</p>
+                    {publicStatus.detail === "error" && <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>}
+                  </>
+                ) : <>
+                <div className="ua-detail-heading">
+                  <Avatar
+                    src={selected.avatar}
+                    name={selected.author || selected.name}
+                    size="large"
+                  />
+                  <div className="ua-detail-heading-copy">
+                    <Dialog.Title>{selected.name}</Dialog.Title>
+                    <div className="ua-detail-meta">
+                      {selected.author && (
+                        <button
+                          type="button"
+                          className="ua-link"
+                          onClick={() => go("creator", selected.author)}
+                        >
+                          @{selected.author}
+                        </button>
+                      )}
+                      {selected.stars !== undefined && (
+                        <span>
+                          <Star />
+                          {starCount(selected.stars)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="ua-detail-actions">
                   {selected.githubUrl ? (
@@ -1416,18 +1475,16 @@ export function UnifiedApp({
                       Open on GitHub <ArrowUpRight />
                     </a>
                   )}
+                  {selected.publicUrl && (
+                    <a className="ua-link" href={selected.publicUrl} target="_blank" rel="noreferrer">
+                      View public skill page <ArrowUpRight />
+                    </a>
+                  )}
                 </section>
-                {selected.author && (
+                {relatedSkills.length > 0 && (
                   <section className="ua-more">
                     <h3>More from @{selected.author}</h3>
-                    {library
-                      .filter(
-                        (skill) =>
-                          skill.author === selected.author &&
-                          skill.catalogId !== selected.catalogId,
-                      )
-                      .slice(0, 3)
-                      .map((skill) => (
+                    {relatedSkills.map((skill) => (
                         <button
                           type="button"
                           key={skill.key}
@@ -1440,6 +1497,7 @@ export function UnifiedApp({
                       ))}
                   </section>
                 )}
+                </>}
               </Dialog.Content>
             </Dialog.Portal>
           </Dialog.Root>

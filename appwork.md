@@ -1,6 +1,6 @@
 # Unified Web App Plan
 
-Status: local-preview checkpoint approved for commit. Slice 1 UI and testing complete; Slice 0 all-host data access remains blocked. Live-data integration is not approved or implemented.
+Status: local-only checkpoint on `codex/unified-app-preview`, following `2d28cf0d`. Public routing support, live Discover, handoff UI refinements, and Mac-style category searches are implemented and tested locally. User approved committing this checkpoint; no push or deployment. My Skills remains sample-only. Slice 0 still needs deployed subdomain verification.
 Reviewed: 2026-10-05. Source baseline: `origin/main` at `61f9f13f`.
 
 ## Goal
@@ -38,7 +38,7 @@ Start implementation from a clean worktree based on freshly fetched main. Carry 
 - Signed in: open My skills by default. Switch to Discover without leaving the app.
 - Signed out: open Discover without requiring authentication. Offer real Clerk sign-in for account actions, preserving the selected skill and destination.
 - My skills: All skills, Favorites, and Sets. Preserve current search, source filtering, selection, and bulk membership operations.
-- Discover: featured collections, trending skills, creators, collections, and categories supported by published data.
+- Discover: published collections, trending skills, creators, and the Mac app's grouped starter-search categories.
 - Search: separate results into My skills and Library. Local private results remain local; never send their descriptions or contents to public search.
 - Account menu: preserve access to profile, agents/sources, devices, private GitHub sources, MCP information, and sign-out. Moving these out of primary navigation must not remove existing functions.
 - Mobile: My skills / Discover / Sets bottom navigation; signed-out public browsing without private tabs.
@@ -108,7 +108,7 @@ Use a small typed client around existing MCP JSON responses, with validation, ab
 - Public caches must be separate from account data and bounded in memory.
 - The current tools cap results at 100 and expose no cursor/offset. Do not invent pagination, total counts, or promise a complete creator listing. Offer refinement/public links where needed.
 - The authenticated `catalog-search` endpoint returns only up to 12 basic results and requires sign-in. It is not the replacement for public Discover.
-- Use real collections/categories and available labels. Do not fill the prototype's six-item groups with invented categories or quality claims.
+- Use published collections and creator labels. Categories are the Mac app's 24 starter-search terms, not collection metadata; selecting a term runs an exact-text public search. Do not invent quality claims.
 
 ### Transport Gate
 
@@ -156,7 +156,7 @@ Extend existing route helpers; no routing-library migration is needed.
 
 ## Implementation Slices
 
-Slices 0-1 are approved. Slices 2-5 still require approval. Each ends with a local review/checkpoint.
+Slices 0-1 and local read-only Discover integration in Slice 2 are approved. Slices 3-5 still require approval. Each ends with a local review/checkpoint.
 
 ### 0. Fresh Baseline And Capability Proof
 
@@ -169,14 +169,14 @@ Slices 0-1 are approved. Slices 2-5 still require approval. Each ends with a loc
 
 - [x] Build the switch-based shell, rail, mobile navigation, account menu, rows, and responsive detail using existing preview isolation.
 - [x] Use deterministic fixtures for signed-out, signed-in, long names, empty states, errors, and mixed skill sources.
-- [ ] Review visual fidelity before wiring new catalog requests. No real account writes in preview.
+- [x] Compare the handoff with the rendered preview and refine list spacing, typography, and detail-panel layout. Completed after live Discover integration; no real account writes in preview.
 
 ### 2. Discover With Real Public Data
 
-- [ ] Add the bounded public-data adapter and public browsing routes.
-- [ ] Connect collections, creators, trending, category/search lists, and skill summaries to existing sources.
-- [ ] Add public links and honest copy/source actions, with visible failures and clipboard confirmation.
-- [ ] Verify no raw skills download, full-catalog fan-out, or private-data leakage.
+- [x] Add the bounded public-data adapter and local preview browsing routes. Production entry remains unchanged.
+- [x] Connect collections, creators, trending, category/search lists, and skill summaries to existing sources.
+- [x] Add canonical public links and retain honest copy/source actions and clipboard feedback, with visible loading/error/missing states.
+- [x] Verify no raw skills download, full-catalog fan-out, or private API requests.
 
 ### 3. Management In The New Shell
 
@@ -236,7 +236,7 @@ Real write tests use an approved isolated account/backend and disposable private
 4. **Bounded APIs are not a complete catalog export.** Use existing curated discovery and honest search limits, not fake pagination or counts.
 5. **Public versus private visibility can be confused in the new layout.** Preserve permissions and clear visibility indicators, especially public Favorites.
 
-Recommended next step: resolve the subdomain transport decision before approving live-data integration. The user approved committing the local-preview checkpoint, not pushing or deploying it.
+Recommended next step after this approved checkpoint: plan real-account integration (Slice 3) for separate approval. Verify subdomain routing on an approved deployment before marking Slice 0 complete. No push or deployment is approved.
 
 ## Local Preview Receipt - 2026-10-05
 
@@ -269,3 +269,45 @@ Recommended next step: resolve the subdomain transport decision before approving
 - Therefore the primary-domain path is viable, but the app subdomain needs a separately approved routing/CORS solution. No routing changes were made.
 - Local real-data proxy and production integration remain deferred. Slice 0's all-host transport check is intentionally incomplete, not treated as passed.
 - Authenticated production behavior and real account mutations have not been re-tested for this preview; those belong to later integration slices.
+
+## Public Routing Checkpoint - 2026-10-05
+
+- User approved the routing fix only. No account, database, MCP contract, or CORS changes.
+- Added public exceptions for `/mcp`, `/mcp/health`, `/data/crawl4/*`, and `/catalog-skill-urls.json` before the app-subdomain fallback. They forward to the existing canonical primary-domain endpoints. Existing assets, deep links, and other route behavior stay unchanged.
+- Added opt-in local Vite proxy: `PORTAL_PUBLIC_CATALOG_PROXY=1`. Public files/health permit GET/HEAD; MCP permits POST to existing read-only tools. Local forwarding strips cookies and authorization and uses timeouts without following redirects.
+- No generic API proxy, private account endpoint, or protected health route was added. The crawl4 route exposes already-public files, but no raw skills download was requested or added to the client.
+- Tests: 4 redirect tests and 4 proxy tests pass; all 146 portal tests pass; portal TypeScript/production build and the deployment-safety suite pass. Routing tests are included in `npm run check`.
+- Browser verification at `http://127.0.0.1:5190/app/preview/unified/`: manifest, manifest-discovered collections, canonical skill links, one-result public search, and MCP health all returned HTTP 200 JSON. POST to the manifest was rejected with 405.
+- Local preview remains sample-driven. Enabling transport does not integrate Discover, authenticate an account, or perform any account writes.
+- Netlify's actual deployed proxy behavior remains unverified until a separately approved deploy. The tests validate generated routing order, not a live production fix.
+
+## Live Discover Checkpoint - 2026-10-05
+
+- User approved connecting Discover to existing public data in the local preview. No schema changes, private API integration, real account writes, commit, push, or deploy.
+- Preview: http://127.0.0.1:5190/app/preview/unified/?view=discover
+- Live catalog is the default; a selector retains deterministic sample catalog scenarios. The banner explicitly distinguishes live Discover from the sample account. Public rows never inherit installation/favorite state from sample skills.
+- The client resolves the collections filename through the crawl4 manifest, with the public library's existing v2 fallback. The local proxy and proposed subdomain exceptions now include `/data/v2/*` for that fallback. No raw skills or author-leaderboard asset is used.
+- Published topic collections supply collection views; published author entries supply creator metadata. The overview shows the first three published topic collections, nine trending skills, and nine creators, with full collection/creator lists reachable from navigation. Categories were initially derived from collections; the correction below replaces that behavior.
+- Trending uses the existing ranking and is labeled "Trending skills", not an invented weekly-growth measure. Search and creator/trending lists are capped at 30, with visible limit notices. Collection lookup preserves published order and fetches at most 30 entries, four at a time; missing entries are reported.
+- Search debounces 250ms. Public responses are validated, cancellable, deduplicated, and bounded to 2 MB per response, 60 cached responses, and two-minute cache freshness. Timeouts, rate limits, malformed responses, missing skills, and unavailable collections have visible error states.
+- Skill details use exact IDs. Canonical public skill links load on demand from the existing URL mapping. Source/open/copy actions remain separate from installation. No remote install, update, favorite, or account mutation is implied.
+- Verification: all 162 portal tests pass, including 16 new catalog tests; 4 redirect tests and 4 proxy tests pass. TypeScript and production build pass with preview enabled; new preview/catalog markers remain absent from production bundles.
+- Browser checks passed: real overview, all eight Starter Skills, 30-row creator/search results, category navigation, deep-link refresh, back navigation, Escape/focus return, signed-out browsing, rate-limit retry, empty results, missing skills, and stale-search cancellation.
+- Responsive checks at 320, 390, 759, 760, 1179, 1180, and 1440px found no page/detail horizontal overflow. Fresh mobile detail load confirmed one app root, one preview bar, and one dialog. Desktop/mobile screenshots are in `output/playwright/`.
+- Initial overview JSON: 1,080-byte manifest + 92,902-byte collections + 23,408-byte trending response = 117,390 bytes, across three reads (decoded body sizes, excluding JS/images; local cached timings are not a production speed benchmark).
+- Browser request inspection found no raw catalog fetch or private API calls. The browser-only fetch binding issue found during testing was corrected and regression-tested.
+- Remaining gates: user visual review, actual Netlify subdomain routing verification after an approved deploy, and separately approved real-account integration.
+
+## Category Correction - 2026-10-05
+
+- Shared `discovery-categories.ts` uses the Mac Discover terms in four groups of six. Both live and sample catalogs use it; icons follow the handoff's Lucide references. The latest approved layout uses three columns by two rows on desktop, retaining two columns in narrow/mobile layouts.
+- Each term opens Search results with that exact query. Sidebar group links show the group's six shortcuts. Collections retain their separate entry-list behavior; no server data model changed.
+- Verified: 165 portal tests and production build pass; all 24 browser clicks produce the correct search request and query URL; a live PDF search returns HTTP 200 and 30 rows. Desktop/mobile layouts checked locally. Not committed or deployed.
+
+## UI Refinement And Commit Checkpoint - 2026-10-05
+
+- Restored the handoff's font stacks and compact typography. Lowered the font reset's specificity so button styles apply correctly. Compact discovery rows are 52px; list actions are 26px tall with 11px bold labels. Full lists include inline creator names and correctly aligned dividers.
+- Restored grouped collection copy, tighter creator spacing, and the side-by-side avatar/title detail header with consistent 16px section spacing. About links are separated and empty related-skill headings are hidden. No unsupported install/update controls were added.
+- Browser checks covered desktop/mobile details, long names, signed-out browsing, live catalog results, and Escape. No horizontal overflow at 320, 390, 759, 760, 1179, 1180, or 1440px. Category grid verified at three columns/two rows on desktop and two columns on mobile.
+- This checkpoint includes the previously approved public routing/proxy and bounded catalog client, their regression tests, UI refinements, categories, and documentation. It does not enable the new UI in production, connect real accounts, change server data models, push to GitHub, or deploy.
+- Pre-commit verification rerun: 165 portal tests (including proxy and catalog tests), four redirect tests, deployment-safety/workflow-lock tests, TypeScript, and production build passed. No unified-preview markers in the eight production JS/CSS bundles with the preview flag enabled. `git diff --check` passed. Screenshots and local build output remain untracked/ignored artifacts, not release files.

@@ -14,6 +14,7 @@ export type CatalogSummary = {
   githubUrl: string;
   stars?: number;
   tags: string[];
+  publicUrl?: string;
 };
 export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   key: string;
@@ -26,6 +27,7 @@ export type CollectionDisplay = {
   name: string;
   description: string;
   skillIds: string[];
+  authors?: { handle: string; avatar: string }[];
 };
 export type CreatorDisplay = {
   handle: string;
@@ -39,6 +41,7 @@ export type CatalogDisplay = {
   creators: CreatorDisplay[];
   categories: { label: string; items: string[] }[];
   trendingIds: string[];
+  resultIds?: string[];
 };
 export type View =
   | "all"
