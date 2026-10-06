@@ -90,7 +90,9 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         }
         if (message === "Saved.") message = "Set created.";
       } else if (request.kind === "favorite") {
-        result = request.skill.installed
+        result = !request.add
+          ? await saveMembership({ kind: "remove-favorite", catalogId: request.skill.catalogId, skillId: request.skill.installed?.id })
+          : request.skill.installed
           ? await saveMembership({ kind: "favorites", skills: [request.skill.installed], add: request.add })
           : await saveMembership({ kind: "catalog", catalogId: request.skill.catalogId!, favorite: true });
         message = request.add ? "Added to Favorites." : "Removed from Favorites.";

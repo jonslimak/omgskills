@@ -86,6 +86,7 @@ export function setSummary(
 export async function loadAccountData(
   api: PortalApi,
   identity: AccountIdentity,
+  includeFavoriteItems = false,
 ): Promise<PortalData> {
   const [synced, owned, shared, profile] = await Promise.all([
     api<{ skills: SyncedSkill[] }>("/api/portal/synced-skills"),
@@ -101,12 +102,23 @@ export async function loadAccountData(
   ) {
     throw new Error("The portal returned an invalid account response.");
   }
+  const sets = [
+    ...owned.map((group) => setSummary(group, true, identity.name)),
+    ...shared.map((group) => setSummary(group, false, identity.name)),
+  ];
+  // Only the unified shell needs catalog membership; leave legacy reads unchanged.
+  const favorites = sets.find(set => set.role === "owner" && set.isFavorites);
+  if (includeFavoriteItems && favorites) {
+    const detail = await loadSetData(api, favorites.id);
+    if (detail.role !== "owner" || !detail.isFavorites) throw new Error("Favorites changed. Refresh your account.");
+    favorites.items = detail.items;
+    favorites.itemCount = detail.items.length;
+    favorites.membershipSkillIds = detail.items.some(item => item.kind === "synced" && !item.syncedSkillId)
+      ? undefined : detail.items.flatMap(item => item.syncedSkillId ? [item.syncedSkillId] : []);
+  }
   return {
     skills: synced.skills,
-    sets: [
-      ...owned.map((group) => setSummary(group, true, identity.name)),
-      ...shared.map((group) => setSummary(group, false, identity.name)),
-    ],
+    sets,
     devices: [],
     profile: {
       ...identity,

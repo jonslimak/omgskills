@@ -10,6 +10,7 @@ export type MembershipCommand =
   | { kind: "catalog"; catalogId: string; favorite: boolean; id?: string }
   | { kind: "change"; id: string; skills: GroupedSyncedSkill[]; add: boolean }
   | { kind: "favorites"; skills: GroupedSyncedSkill[]; add: boolean }
+  | { kind: "remove-favorite"; catalogId?: string; skillId?: string }
   | { kind: "create-selected"; name: string; skills: GroupedSyncedSkill[] }
   | { kind: "remove-item"; id: string; itemId: string }
   | { kind: "reorder"; id: string; itemIds: string[] };
@@ -183,4 +184,24 @@ export async function changeFavorites(api: PortalApi, sets: PortalSet[], skills:
     }
   }
   return changeMembership(api, id, skills, add, signal);
+}
+
+// Remove exact saved representations only, never the installed skill or its files.
+export async function removeFavoriteMembership(api: PortalApi, sets: PortalSet[], catalogId: string | undefined, skill: GroupedSyncedSkill | undefined, signal: AbortSignal): Promise<MembershipResult> {
+  checkSignal(signal);
+  if ((!catalogId && !skill) || (catalogId && catalogId.length > 500)) throw new PortalApiError("Choose a skill to remove from Favorites.", 400);
+  const id = sets.find(set => set.role === "owner" && set.isFavorites)?.id;
+  const result = { ...emptyMembershipResult(), groupId: id, completedIds: [catalogId || skill!.id] };
+  if (!id) return { ...result, unchanged: 1 };
+  const set = await ownedSet(api, id, signal);
+  if (!set.isFavorites || set.hidden) throw new PortalApiError("Favorites is not available for this action.", 409);
+  if (set.items.some(item => (catalogId && item.kind === "catalog" && !item.catalogSkillId) ||
+    (skill && item.kind === "synced" && !item.syncedSkillId))) {
+    throw new PortalApiError("Membership information is incomplete. Refresh Favorites.", 409);
+  }
+  const matches = set.items.filter(item =>
+    (catalogId && item.kind === "catalog" && item.catalogSkillId === catalogId) ||
+    (skill && item.kind === "synced" && item.syncedSkillId && skill.allSkillIds.includes(item.syncedSkillId)));
+  for (const item of matches) await removeMembershipItem(api, id, item.id, signal);
+  return { ...result, removed: matches.length ? 1 : 0, unchanged: matches.length ? 0 : 1 };
 }

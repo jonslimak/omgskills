@@ -174,7 +174,8 @@ export function matchesSearch(skill: SkillDisplay, query: string) {
 export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[]): SkillDisplay[] {
   return set.items.map(item => {
     const installed = item.syncedSkillId
-      ? mine.find(skill => skill.installed?.allSkillIds.includes(item.syncedSkillId!)) : undefined;
+      ? mine.find(skill => skill.installed?.allSkillIds.includes(item.syncedSkillId!))
+      : item.catalogSkillId ? mine.find(skill => skill.catalogId === item.catalogSkillId) : undefined;
     return { key: `set-item:${item.id}`, setItemId: item.id, name: item.name,
       catalogId: item.catalogSkillId ?? undefined,
       description: item.description, githubUrl: item.githubUrl, author: "", tags: [],
@@ -182,10 +183,10 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[]): SkillDis
   });
 }
 export function isFavorite(data: PortalData, skill: SkillDisplay) {
-  return (
-    !!skill.installed &&
-    data.sets.some((set) => set.isFavorites && isMember(set, skill.installed!))
-  );
+  return data.sets.some(set => set.isFavorites && set.role === "owner" && (
+    (skill.installed && isMember(set, skill.installed)) ||
+    (skill.catalogId && set.items.some(item => item.kind === "catalog" && item.catalogSkillId === skill.catalogId))
+  ));
 }
 export function starCount(value: number | undefined) {
   if (value === undefined) return "";

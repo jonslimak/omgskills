@@ -1,6 +1,6 @@
 # Unified Web App Plan
 
-Status: UI checkpoint committed as `1140d68b` on `codex/unified-app-preview`. The catalog/Favorites API follow-up is implemented and reviewed as a separately approved local commit checkpoint; see below. Production acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working. The new production entry remains disabled by default; neither change is deployed.
+Status: UI checkpoint committed as `1140d68b` and catalog/Favorites API follow-up committed as `61ac8a92` on `codex/unified-app-preview`. The later Favorites heart/removal correction is implemented and reviewed for its approved local commit checkpoint; see below. Production acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working. The new production entry remains disabled by default; none of these changes is deployed.
 Updated: 2026-10-06. Original source baseline: `origin/main` at `61f9f13f`; recheck current main before release.
 
 ## Current Working Agreement - 2026-10-06
@@ -173,6 +173,37 @@ Next: reconcile current main and finish the remaining UI checklist; follow
 `deploy.md` for a separately approved rollout. Verify first catalog Favorite,
 repeat/concurrent saves and existing Mac/installed Favorites in production, along
 with the already deferred invite/connectivity checks.
+
+### Favorites Heart And Removal Correction - 2026-10-06
+
+- [x] Fixed catalog-only Favorites detection in the unified presentation model.
+  Previously the heart required an installed skill, even after a catalog save.
+- [x] Unified account reads now hydrate only the owner's Favorites through the
+  existing detail endpoint. This adds one read when Favorites exists; normal set
+  summaries and legacy account loads remain unchanged. No private browser cache
+  was added. Refresh/save reconciliation includes the membership read.
+- [x] The heart's removal action reads current item IDs and removes exact catalog
+  and matching synced representations using the existing item-delete endpoint.
+  It does not uninstall skills, delete files, or change ordinary sets. Ownership,
+  hidden-state and incomplete-identity checks run before deletion. Uncertain
+  outcomes stop the operation and require refresh; writes are not replayed.
+- [x] Added regression coverage for catalog add/remove/reload, installed-only and
+  mixed representations, fresh IDs, similar-name isolation, ownership, missing
+  mappings, failed/partial writes, failed reads and disposed accounts.
+- [ ] Real browser save/reload/removal acceptance remains a production check.
+  No local account/set was mutated, no test server was added, and the broad UI
+  completion checklist above is not considered finished by these tests.
+
+This is a client-only correction: no schema, backend API, permissions, deployment
+flags or styling changes. Verification: 210 portal tests, root/portal TypeScript,
+default and unified opt-in builds passed. The opt-in build used a dummy public
+Clerk key for compilation, not real authentication. The user approved this scoped
+local commit; all 210 portal tests and portal TypeScript passed again before
+committing. No merge, push or deployment is included in this checkpoint.
+
+The preceding read-only release review fetched `origin/main` at `d22e476d`:
+two generated-data updates, with no files overlapping this branch's changes.
+That was a comparison, not a merge; fetch again before an approved release.
 
 ## Goal
 

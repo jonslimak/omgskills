@@ -6,7 +6,7 @@ import { saveSetData, type SetCommand } from "./set-data";
 import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, emptyMembershipResult, type MembershipCommand } from "./membership-data";
 import { groupSyncedSkills } from "../synced-skill-grouping";
 import type { MembershipResult } from "../app/model";
-import { addCatalogMembership } from "./membership-data";
+import { addCatalogMembership, removeFavoriteMembership } from "./membership-data";
 
 export type AccountSnapshot = {
   data: PortalData | null;
@@ -49,13 +49,14 @@ function validCache(data: PortalData) {
 }
 
 // A session owns its cache and requests. Disposing it cannot affect a newer account.
-export function createAccountSession({ api, identity, cacheKey, storage, changed, now = Date.now }: {
+export function createAccountSession({ api, identity, cacheKey, storage, changed, now = Date.now, includeFavoriteItems = false }: {
   api: PortalApi;
   identity: AccountIdentity;
   cacheKey: string;
   storage?: Storage;
   changed: (snapshot: AccountSnapshot) => void;
   now?: () => number;
+  includeFavoriteItems?: boolean;
 }) {
   let active = true;
   let generation = 0;
@@ -87,7 +88,7 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
     const version = ++generation;
     const controller = new AbortController();
     emit({ refreshing: true, error: "" });
-    const promise = loadAccountData(readOnlyApi(api, controller.signal), identity).then(
+    const promise = loadAccountData(readOnlyApi(api, controller.signal), identity, includeFavoriteItems).then(
       (data) => {
         if (!active || version !== generation) return;
         persist(data);
@@ -172,7 +173,7 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
       persist(confirmed);
       emit({ data: confirmed });
       try {
-        const data = await loadAccountData(readOnlyApi(api, controller.signal), identity);
+        const data = await loadAccountData(readOnlyApi(api, controller.signal), identity, includeFavoriteItems);
         checkActive();
         persist(data);
         emit({ data, error: "", setSaving: false, revision: snapshot.revision + 1 });
@@ -208,6 +209,11 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
         if (command.kind === "remove-item") await removeMembershipItem(scoped, command.id, command.itemId, signal);
         else if (command.kind === "reorder") await reorderMembership(scoped, command.id, command.itemIds, signal);
         else if (command.kind === "catalog") result = await addCatalogMembership(scoped, current.sets, command, signal);
+        else if (command.kind === "remove-favorite") {
+          const skill = command.skillId ? groupSyncedSkills(current.skills).find(skill => skill.id === command.skillId) : undefined;
+          if (command.skillId && !skill) throw new PortalApiError("Your selected skill changed. Refresh and select it again.", 409);
+          result = await removeFavoriteMembership(scoped, current.sets, command.catalogId, skill, signal);
+        }
         else {
           const live = new Map(groupSyncedSkills(current.skills).map((skill) => [skill.id, skill]));
           const skills = [...new Set(command.skills.map((skill) => skill.id))].map((id) => {
@@ -231,7 +237,7 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
       // Reconcile even a partial batch; never replay writes to recover a failed read.
       let data = current;
       let refreshError = "";
-      try { data = await loadAccountData(readOnlyApi(scoped), identity); checkActive(); persist(data); }
+      try { data = await loadAccountData(readOnlyApi(scoped), identity, includeFavoriteItems); checkActive(); persist(data); }
       catch (error) {
         checkActive();
         if (isAccessError(error)) {

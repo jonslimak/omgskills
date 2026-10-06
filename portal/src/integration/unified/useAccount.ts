@@ -19,6 +19,7 @@ export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: b
     const account = createAccountSession({
       api: managementApi((path, init) => apiRef.current(path, init)), identity,
       cacheKey: key, changed: setSnapshot,
+      includeFavoriteItems: true,
       // No persistent private cache in the first authenticated unified slice.
     });
     session.current = account;
