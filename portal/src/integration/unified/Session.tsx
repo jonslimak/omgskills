@@ -78,7 +78,7 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
       error={snapshot.profileError} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
       : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel api={api} local={local} denied={account.invalidate} /></div>
       : view === "github" ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div> : undefined : undefined}
-    previewBar={(local || available || sessionError) && <div className="ua-preview">
+    previewBar={(local || sessionError || (available && snapshot.error)) && <div className="ua-preview">
       {local && <span>Local test · Unified app</span>}
       <div>
         {(sessionError || (available && snapshot.error)) && <span role="alert">{sessionError || snapshot.error}</span>}

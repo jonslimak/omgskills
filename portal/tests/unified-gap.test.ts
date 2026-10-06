@@ -31,6 +31,14 @@ test("production unified shell stays explicitly opt-in and preserves connect and
   assert.match(entry, /ClerkProvider/);
 });
 
+test("production account bar appears only for errors, not merely for signed-in sessions", () => {
+  const source = readFileSync(new URL("../src/integration/unified/Session.tsx", import.meta.url), "utf8");
+  assert.match(source, /previewBar=\{\(local \|\| sessionError \|\| \(available && snapshot\.error\)\) &&/);
+  assert.match(source, /role="alert"/);
+  assert.match(source, /aria-label="Refresh account"[^>]*onClick=\{account\.refresh\}/);
+  assert.match(source, /retry=\{account\.refresh\}/);
+});
+
 function catalogFixture(options: { present?: boolean; missingIdentity?: boolean; role?: string; hidden?: boolean; favorites?: boolean; badResponse?: boolean; conflict?: boolean; createConflict?: boolean; noFavorites?: boolean; createFailure?: number; afterCreate?: () => void } = {}) {
   const calls: { path: string; method: string; body: any }[] = [];
   let present = options.present ?? false;
