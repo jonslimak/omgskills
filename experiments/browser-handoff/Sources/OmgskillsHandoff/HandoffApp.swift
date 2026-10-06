@@ -4,9 +4,52 @@ import SwiftUI
 @main
 struct HandoffApp: App {
     @State private var model = PreviewModel()
+    @State private var installModel: InstallModel?
+    private let configurationError: String?
+    private let fixtureMode: Bool
+
+    init() {
+        let environment = ProcessInfo.processInfo.environment
+        fixtureMode = environment["OMGSKILLS_H12_FIXTURES"] == "1"
+        if let root = environment["OMGSKILLS_H1_INSTALL_ROOT"] {
+            do {
+                _installModel = State(initialValue: InstallModel(service: try PublicInstallService(testRoot: root, fixtures: fixtureMode)))
+                configurationError = nil
+            } catch {
+                _installModel = State(initialValue: nil)
+                configurationError = error.localizedDescription
+            }
+        } else {
+            _installModel = State(initialValue: nil)
+            configurationError = nil
+        }
+    }
 
     var body: some Scene {
         Window("OMGSkills Handoff Test", id: "handoff") {
+            Group {
+                if let installModel {
+                    InstallContent(model: installModel, fixtureMode: fixtureMode)
+                } else if let configurationError {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Test folder unavailable").font(.title2)
+                        Text(configurationError)
+                    }.padding(24).frame(width: 600, height: 240)
+                } else {
+                    previewContent
+                }
+            }
+            .onOpenURL { url in
+                if let installModel { installModel.open(url.absoluteString) }
+                else if configurationError == nil { model.open(url.absoluteString) }
+                NSApplication.shared.activate()
+            }
+            .onDisappear { model.cancel(); installModel?.cancel() }
+        }
+        .windowResizability(.contentSize)
+    }
+
+    private var previewContent: some View {
             VStack(alignment: .leading, spacing: 16) {
                 Text("OMGSkills")
                     .font(.headline)
@@ -48,12 +91,5 @@ struct HandoffApp: App {
             }
             .padding(24)
             .frame(width: 660, height: 480)
-            .onOpenURL { url in
-                model.open(url.absoluteString)
-                NSApplication.shared.activate()
-            }
-            .onDisappear { model.cancel() }
-        }
-        .windowResizability(.contentSize)
     }
 }
