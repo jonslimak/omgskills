@@ -36,9 +36,14 @@ enum InstallFixtures {
     }
 
     static func selected(in sandbox: InstallSandbox) throws -> InstallCandidate {
+        try candidate(selectedVersion(in: sandbox))
+    }
+
+    static func selectedVersion(in sandbox: InstallSandbox) throws -> String {
         let (data, mode) = try sandbox.open().read("fixture-version", limit: 1)
         guard mode == 0o600, let value = String(data: data, encoding: .utf8) else { throw InstallFailure.invalidRecord }
-        return try candidate(value)
+        guard ["A", "B"].contains(value) else { throw InstallFailure.invalidRecord }
+        return value
     }
 }
 
@@ -46,8 +51,20 @@ package enum InstallHarness {
     package static func run(_ arguments: [String]) async throws -> String {
         guard let command = arguments.first else { throw InstallFailure.invalidRecord }
         if command == "create", arguments.count == 1 { return try InstallSandbox.create().url.path }
+        if ["discovery-inspect", "discovery-remove"].contains(command) {
+            guard arguments.count == 4, let agent = InstallAgent(rawValue: arguments[2]),
+                  arguments[3] == "--real-home" else { throw InstallFailure.invalidRecord }
+            let control = try InstallSandbox(path: arguments[1])
+            _ = try DiscoveryFixture.selected(in: control)
+            let store = SandboxInstaller(location: .user(try .currentUser(), agent, discovery: true))
+            if command == "discovery-remove" { return try await store.removeDiscoveryActivation() }
+            return try await store.installedCommit() ?? "not_installed"
+        }
         guard arguments.count == 2 || arguments.count == 3 else { throw InstallFailure.invalidRecord }
         let sandbox = try InstallSandbox(path: arguments[1])
+        if command.hasPrefix("home-") {
+            return try await runHome(command, sandbox: sandbox, arguments: arguments)
+        }
         if command == "select", arguments.count == 3 {
             _ = try InstallFixtures.candidate(arguments[2])
             let root = try sandbox.open()
@@ -74,6 +91,26 @@ package enum InstallHarness {
             review = try await store.prepare(InstallFixtures.selected(in: sandbox))
         }
         if command == "review" { return "\(review.action.rawValue): \(review.toCommit), \(review.changes.count) changes" }
+        return try await store.apply(review.id)
+    }
+
+    private static func runHome(_ command: String, sandbox: InstallSandbox, arguments: [String]) async throws -> String {
+        guard arguments.count == 3, let agent = InstallAgent(rawValue: arguments[2]),
+              ["home-apply", "home-review", "home-inspect", "home-restore", "home-kill-before", "home-kill-after"].contains(command) else {
+            throw InstallFailure.invalidRecord
+        }
+        // The harness can only reach a marked temporary home, never the OS account home.
+        let home = try UserInstallHome.simulated(in: sandbox)
+        let store = SandboxInstaller(location: .user(home, agent), beforeSwitch: {
+            if command == "home-kill-before" { raise(SIGKILL) }
+        }, afterSwitch: {
+            if command == "home-kill-after" { raise(SIGKILL) }
+        })
+        if command == "home-inspect" { return try await store.installedCommit() ?? "not_installed" }
+        let review = command == "home-restore"
+            ? try await store.prepareRestore()
+            : try await store.prepare(InstallFixtures.selected(in: sandbox))
+        if command == "home-review" { return "\(review.action.rawValue): \(review.destination)" }
         return try await store.apply(review.id)
     }
 }

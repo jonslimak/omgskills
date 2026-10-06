@@ -8,7 +8,7 @@ public struct HandoffRequest: Equatable, Sendable {
     public static let testSkillID = "anthropics/skills:skills/frontend-design"
     public static let pinnedTestSkillID = "anthropics/claude-plugins-public:frontend-design"
 
-    public static func parse(_ rawURL: String) -> HandoffRequest? {
+    public static func parse(_ rawURL: String, discoveryOnly: Bool = false) -> HandoffRequest? {
         guard rawURL.utf8.count <= 512,
               rawURL.unicodeScalars.allSatisfy({ !CharacterSet.controlCharacters.contains($0) }),
               validPercentEncoding(rawURL),
@@ -24,11 +24,11 @@ public struct HandoffRequest: Equatable, Sendable {
               let item = url.queryItems?.first,
               item.name == "id",
               let skillID = item.value,
-              [testSkillID, pinnedTestSkillID].contains(skillID) else {
+              (discoveryOnly ? [DiscoveryFixture.id] : [testSkillID, pinnedTestSkillID]).contains(skillID) else {
             return nil
         }
 
-        return HandoffRequest(skillID: skillID, skillName: "Frontend Design")
+        return HandoffRequest(skillID: skillID, skillName: discoveryOnly ? "OMGSkills discovery check" : "Frontend Design")
     }
 
     private static func validPercentEncoding(_ value: String) -> Bool {

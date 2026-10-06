@@ -4,22 +4,31 @@ import SwiftUI
 struct InstallContent: View {
     let model: InstallModel
     let fixtureMode: Bool
+    let testDestination: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 Text("OMGSkills").font(.headline)
                 Spacer()
-                Text(fixtureMode ? "Local fixtures" : "Public package").foregroundStyle(.secondary)
+                Text(model.discoveryOnly ? "Local discovery test" : fixtureMode ? "Local fixtures" : "Public package")
+                    .foregroundStyle(.secondary)
+            }
+            if model.canSelectAgent {
+                Picker("Install in", selection: Binding(get: { model.selectedAgent }, set: { model.selectAgent($0) })) {
+                    ForEach(InstallAgent.allCases) { agent in Text(agent.title).tag(agent) }
+                }
+                .pickerStyle(.segmented)
+                .disabled(model.isApplying)
             }
             if let review = model.review {
                 Text(title(review.action)).font(.title2)
                 Text(review.skillID).textSelection(.enabled)
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Test destination").font(.caption).foregroundStyle(.secondary)
+                    Text(testDestination ? "Test destination" : "Destination").font(.caption).foregroundStyle(.secondary)
                     Text(review.destination).font(.caption).textSelection(.enabled)
-                    if let from = review.fromCommit { Text("From: \(from)").font(.system(.caption, design: .monospaced)) }
-                    Text("To: \(review.toCommit)").font(.system(.caption, design: .monospaced))
+                    if let from = review.fromCommit { Text("From: \(versionLabel(from))").font(.system(.caption, design: .monospaced)) }
+                    Text("To: \(versionLabel(review.toCommit))").font(.system(.caption, design: .monospaced))
                 }
                 Divider()
                 ScrollView {
@@ -81,10 +90,15 @@ struct InstallContent: View {
 
     private func title(_ action: InstallReview.Action) -> String {
         switch action {
-        case .install: "Install in test folder"
+        case .install: testDestination ? "Install in test folder" : "Install in \(model.selectedAgent.title)"
         case .update: "Apply update"
         case .restore: "Restore this version"
         case .unchanged: "Already installed"
         }
+    }
+
+    private func versionLabel(_ commit: String) -> String {
+        guard model.discoveryOnly else { return commit }
+        return commit == String(repeating: "a", count: 40) ? "Fixture A (local)" : "Fixture B (local)"
     }
 }

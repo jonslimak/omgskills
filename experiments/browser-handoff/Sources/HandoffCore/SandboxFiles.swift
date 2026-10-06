@@ -6,7 +6,7 @@ public enum InstallFailure: LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .unsafeRoot: "An owned H1.2 temporary test folder is required."
+        case .unsafeRoot: "The helper storage or destination folder is not safely configured. Nothing was replaced."
         case .unsafePath: "An unexpected file, link, or permission was found. Nothing was replaced."
         case .busy: "Another helper operation is running. Try again."
         case .unmanaged: "This destination belongs to another installation. Nothing was replaced."
@@ -42,6 +42,32 @@ final class SandboxDirectory {
         guard fstat(fd, &info) == 0, info.st_uid == getuid(), info.st_mode & 0o077 == 0 else {
             throw InstallFailure.unsafeRoot
         }
+    }
+
+    // Agent folders commonly use 0755. Do not weaken the private store's 0700 rule.
+    func userDirectory() throws {
+        var info = stat()
+        guard fstat(fd, &info) == 0, info.st_uid == getuid(), info.st_mode & 0o022 == 0 else {
+            throw InstallFailure.unsafeRoot
+        }
+    }
+
+    func sameDirectory(as other: SandboxDirectory) throws -> Bool {
+        var a = stat(), b = stat()
+        guard fstat(fd, &a) == 0, fstat(other.fd, &b) == 0 else { throw InstallFailure.io }
+        return a.st_dev == b.st_dev && a.st_ino == b.st_ino
+    }
+
+    func identity() throws -> String {
+        var info = stat()
+        guard fstat(fd, &info) == 0 else { throw InstallFailure.io }
+        return "\(info.st_dev):\(info.st_ino)"
+    }
+
+    func userChild(_ name: String, create: Bool = false) throws -> SandboxDirectory {
+        let result = try child(name, create: create, owned: false)
+        try result.userDirectory()
+        return result
     }
 
     func child(_ name: String, create: Bool = false, owned: Bool = true) throws -> SandboxDirectory {
@@ -135,7 +161,8 @@ final class SandboxDirectory {
 
     func link(_ name: String) throws -> String {
         try Self.name(name)
-        guard let info = try info(name), info.st_mode & S_IFMT == S_IFLNK else {
+        guard let info = try info(name), info.st_mode & S_IFMT == S_IFLNK,
+              info.st_uid == getuid(), info.st_nlink == 1 else {
             throw InstallFailure.unmanaged
         }
         var bytes = [CChar](repeating: 0, count: 4096)

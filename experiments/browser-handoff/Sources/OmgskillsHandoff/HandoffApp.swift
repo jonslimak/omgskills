@@ -7,21 +7,22 @@ struct HandoffApp: App {
     @State private var installModel: InstallModel?
     private let configurationError: String?
     private let fixtureMode: Bool
+    private let testDestination: Bool
 
     init() {
         let environment = ProcessInfo.processInfo.environment
-        fixtureMode = environment["OMGSKILLS_H12_FIXTURES"] == "1"
-        if let root = environment["OMGSKILLS_H1_INSTALL_ROOT"] {
-            do {
-                _installModel = State(initialValue: InstallModel(service: try PublicInstallService(testRoot: root, fixtures: fixtureMode)))
-                configurationError = nil
-            } catch {
-                _installModel = State(initialValue: nil)
-                configurationError = error.localizedDescription
-            }
-        } else {
-            _installModel = State(initialValue: nil)
+        do {
+            let mode = try InstallLaunchMode.parse(environment)
+            let prepared = try mode.makeModel()
+            fixtureMode = mode.fixtures
+            testDestination = mode.isTest
+            _installModel = State(initialValue: prepared)
             configurationError = nil
+        } catch {
+            fixtureMode = false
+            testDestination = true
+            _installModel = State(initialValue: nil)
+            configurationError = error.localizedDescription
         }
     }
 
@@ -29,10 +30,10 @@ struct HandoffApp: App {
         Window("OMGSkills Handoff Test", id: "handoff") {
             Group {
                 if let installModel {
-                    InstallContent(model: installModel, fixtureMode: fixtureMode)
+                    InstallContent(model: installModel, fixtureMode: fixtureMode, testDestination: testDestination)
                 } else if let configurationError {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Test folder unavailable").font(.title2)
+                        Text("Install destination unavailable").font(.title2)
                         Text(configurationError)
                     }.padding(24).frame(width: 600, height: 240)
                 } else {

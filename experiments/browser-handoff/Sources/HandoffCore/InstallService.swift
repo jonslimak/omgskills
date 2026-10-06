@@ -11,20 +11,24 @@ public protocol InstallServing: Sendable {
 public struct PublicInstallService: InstallServing {
     private let loader: PublicPackageLoader
     private let store: SandboxInstaller
-    private let sandbox: InstallSandbox
-    private let fixtures: Bool
+    private let fixtureSandbox: InstallSandbox?
 
     public init(testRoot: String, fixtures: Bool = false) throws {
         let sandbox = try InstallSandbox(path: testRoot)
-        self.sandbox = sandbox
-        self.fixtures = fixtures
+        fixtureSandbox = fixtures ? sandbox : nil
         store = SandboxInstaller(sandbox: sandbox)
+        loader = PublicPackageLoader(http: BoundedPublicHTTP())
+    }
+
+    init(home: UserInstallHome, agent: InstallAgent, fixtureSandbox: InstallSandbox? = nil) {
+        self.fixtureSandbox = fixtureSandbox
+        store = SandboxInstaller(location: .user(home, agent))
         loader = PublicPackageLoader(http: BoundedPublicHTTP())
     }
 
     public func prepare(_ request: HandoffRequest) async throws -> InstallReview {
         let candidate: InstallCandidate
-        if fixtures {
+        if let sandbox = fixtureSandbox {
             guard request.skillID == HandoffRequest.pinnedTestSkillID else { throw PreviewFailure.unpinned }
             candidate = try InstallFixtures.selected(in: sandbox)
         } else {
@@ -59,16 +63,35 @@ public final class InstallModel {
     public private(set) var message: String?
     public private(set) var errorMessage: String?
     public private(set) var canRestore = false
-    @ObservationIgnored private let service: any InstallServing
+    public private(set) var selectedAgent: InstallAgent = .codex
+    public let discoveryOnly: Bool
+    public var canSelectAgent: Bool { !services.isEmpty }
+    @ObservationIgnored private var service: any InstallServing
+    @ObservationIgnored private let services: [InstallAgent: any InstallServing]
     @ObservationIgnored private var request: HandoffRequest?
     @ObservationIgnored private(set) var task: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
 
-    public init(service: any InstallServing) { self.service = service }
+    public init(service: any InstallServing) { self.service = service; services = [:]; discoveryOnly = false }
+
+    public init(codex: any InstallServing, claude: any InstallServing, discoveryOnly: Bool = false) {
+        service = codex
+        services = [.codex: codex, .claude: claude]
+        self.discoveryOnly = discoveryOnly
+    }
+
+    public func selectAgent(_ agent: InstallAgent) {
+        guard !isApplying, agent != selectedAgent, let next = services[agent] else { return }
+        begin()
+        selectedAgent = agent
+        service = next
+        isLoading = false
+        if let request { load { try await next.prepare(request) } }
+    }
 
     public func open(_ raw: String) {
         guard !isApplying else { return }
-        guard let incoming = HandoffRequest.parse(raw) else {
+        guard let incoming = HandoffRequest.parse(raw, discoveryOnly: discoveryOnly) else {
             cancel(); errorMessage = "Invalid install link. Nothing was installed."; return
         }
         if incoming == request, isLoading { return }

@@ -28,6 +28,37 @@ private func runHarness(_ arguments: [String]) throws -> (Int32, Process.Termina
 }
 
 struct InstallProcessTests {
+    @Test(arguments: ["home-kill-before", "home-kill-after"], InstallAgent.allCases)
+    func persistentHomeProcessTerminationAndRecovery(_ phase: String, _ agent: InstallAgent) throws {
+        let sandbox = try InstallSandbox.create()
+        defer { try? FileManager.default.removeItem(at: sandbox.url) }
+        #expect(try runHarness(["select", sandbox.url.path, "A"]).0 == 0)
+        #expect(try runHarness(["home-apply", sandbox.url.path, agent.rawValue]).0 == 0)
+        #expect(try runHarness(["select", sandbox.url.path, "B"]).0 == 0)
+        let killed = try runHarness([phase, sandbox.url.path, agent.rawValue])
+        #expect(killed.0 == 9 && killed.1 == .uncaughtSignal)
+        let expected = phase == "home-kill-before" ? "a" : "b"
+        #expect(try runHarness(["home-inspect", sandbox.url.path, agent.rawValue]).2 == String(repeating: expected, count: 40))
+        #expect(try runHarness(["home-apply", sandbox.url.path, agent.rawValue]).0 == 0)
+        #expect(try runHarness(["home-inspect", sandbox.url.path, agent.rawValue]).2 == String(repeating: "b", count: 40))
+        #expect(try runHarness(["home-restore", sandbox.url.path, agent.rawValue]).0 == 0)
+        #expect(try runHarness(["home-inspect", sandbox.url.path, agent.rawValue]).2 == String(repeating: "a", count: 40))
+        let skill = sandbox.url.appendingPathComponent("home/\(agent.directory)/skills/frontend-design/SKILL.md")
+        #expect(try String(contentsOf: skill, encoding: .utf8).contains("Version A"))
+    }
+
+    @Test func persistentHomeLockExcludesAnotherProcess() throws {
+        let sandbox = try InstallSandbox.create()
+        defer { try? FileManager.default.removeItem(at: sandbox.url) }
+        let home = try UserInstallHome.simulated(in: sandbox)
+        _ = try runHarness(["select", sandbox.url.path, "A"])
+        let root = try home.open(), lock = try root.lock()
+        defer { lock.release() }
+        #expect(try runHarness(["home-apply", sandbox.url.path, "codex"]).0 != 0)
+        #expect(try runHarness(["home-apply", sandbox.url.path, "claude"]).0 != 0)
+        #expect(!FileManager.default.fileExists(atPath: home.url.appendingPathComponent(".agents").path))
+    }
+
     @Test(arguments: ["kill-before", "kill-after"])
     func realProcessTerminationLeavesCompleteVersionAndRetryWorks(_ phase: String) async throws {
         let sandbox = try InstallSandbox.create()

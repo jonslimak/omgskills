@@ -1,13 +1,15 @@
-# Standalone package preview and isolated install (H1.1/H1.2)
+# Standalone helper experiment (H1.1-H1.3)
 
-Local experiment only. No real skill-root writes, private auth, or public-app dependency.
+Local experiment only. No private auth or public-app dependency.
 The same isolated H0 bundle and `omgskills-helper-test` scheme now support a real
-pinned package preview. Links accept only the two fixture IDs; the helper resolves
+pinned package preview. Normal links accept only the two public fixture IDs; the helper resolves
 their pins through the public OMGSkills MCP endpoint and downloads from GitHub
 over HTTPS. It verifies tree/blob hashes and validates paths and package limits
-before staging. It never writes to a real agent's skill directory or executes content.
-Without an explicit test-root launch setting it remains preview-only. H1.2 enables
-install/update/rollback only inside a generated temporary sandbox.
+before staging. It never executes skill content. Without an explicit launch
+setting it remains preview-only. H1.2 installs inside a temporary sandbox;
+H1.3 adds permanent destination handling. Simulated-home checks passed for both
+agents; the separate local Codex discovery fixture passed install/update/rollback.
+Do not enable real-home mode without separate approval.
 
 ```sh
 swift test --package-path experiments/browser-handoff --build-path /private/tmp/omgskills-h1-build
@@ -103,3 +105,82 @@ those children before/after activation. It checks fresh-process recovery, retry,
 rollback and lock exclusion. The harness locates itself beside the SwiftPM test
 bundle and is not copied into the test app. Temporary test roots are removed by
 tests; manual roots and crash remnants must be accounted for after a session.
+
+## H1.3 destinations
+
+The same installer supports an independent private store at
+`~/Library/Application Support/OMGSkills Helper`, with a stable owner marker
+and separate `codex/versions` and `claude/versions` directories. The selected
+agent's skill entry is an atomic symlink to verified version content. Records
+bind the store ID and exact destination, pins, hashes, modes and previous version.
+No existing-app store or `.omgskills` metadata is adopted or modified.
+
+- Codex uses `~/.agents/skills/frontend-design`. This is a shared user skills
+  location, not exclusive to Codex. A same-name legacy `.codex/skills` entry blocks
+  installation; the helper never writes both locations.
+- Claude Code uses `~/.claude/skills/frontend-design`.
+- This slice keeps the two public ID allowlist and one target name. Existing
+  directories, foreign/broken links, local edits and copied foreign records
+  fail closed. No existing installation is migrated or overwritten.
+- Normal user-owned 0755 home/agent/support parents are accepted unchanged;
+  group/other-writable or symlinked parents are refused. Private store directories
+  remain 0700. No privilege escalation, chmod repair or arbitrary-root chooser.
+- Changing agent discards consent and reloads that destination. Apply freezes
+  selection. Parent inode identity and legacy conflicts are checked again at
+  activation; the same store lock excludes other helper processes across agents.
+- Removed activation links are not automatically restored. Old versions and
+  interrupted staging remain retained; there is no garbage collection yet.
+- These defaults do not cover custom agent roots, cloud/Cowork, plugin installs
+  or project-level precedence. Local Codex discovery/supporting-file reads passed
+  in fresh chats; actual Claude Code discovery and same-chat refresh remain untested.
+
+Launch modes are mutually exclusive:
+
+| Setting | Behavior |
+| --- | --- |
+| None | Preview only; no permanent store. |
+| `OMGSKILLS_H1_INSTALL_ROOT=<marked sandbox>` | Existing H1.2 isolated destination. |
+| `OMGSKILLS_H13_TEST_HOME_ROOT=<marked sandbox>` | H1.3 layout below `<sandbox>/home`; local agent selector enabled. |
+| `OMGSKILLS_H13_REAL_INSTALLS=1` | OS account home, public downloads only. Separate approval required before use. |
+
+`OMGSKILLS_H12_FIXTURES=1` is accepted only with either temporary mode, never
+real-home mode. Browser URLs cannot set any launch option. A real-mode launch
+initializes the private store, but writes no skill activation until approval.
+
+For a separately requested manual simulated-home session, use the H1.2 setup
+commands above with `OMGSKILLS_H13_TEST_HOME_ROOT` replacing
+`OMGSKILLS_H1_INSTALL_ROOT`. Rebuild the test bundle first; never launch a second
+copy. The harness supports `home-review`, `home-apply`, `home-inspect` and
+`home-restore`, each followed by the marked sandbox path and `codex` or `claude`.
+Its `home-kill-before`/`home-kill-after` commands exist only for process tests.
+Every `home-*` harness command requires a temporary sandbox; none accepts a real home.
+
+### Controlled agent-discovery check
+
+The separate `OMGSKILLS_H13_DISCOVERY_ROOT=<marked sandbox>` setting requires
+`OMGSKILLS_H13_REAL_INSTALLS=1`. This narrow exception uses embedded, non-executable
+A/B fixture bytes, not synthetic public downloads. It accepts only
+`omgskills/local-h13:omgskills-h13-check-20261006` and installs only the unique
+`omgskills-h13-check-20261006` name in the locally selected agent folder. Normal
+public links are rejected in this mode; the ordinary public mode rejects this ID
+before networking. The browser cannot select the mode, version or destination.
+
+`SKILL.md` asks the agent to read the adjacent `CHECK.txt`, which reports A or B.
+There are no scripts or network requests. The same installer validates exact
+built-in bytes, records, reviews, conflicts and activation. `select ROOT A|B`
+chooses the candidate for the next review, not an already approved review.
+Use `discovery-test.html`; the old public test page is intentionally incompatible.
+
+Only after separate real-home approval, the harness supports
+`discovery-inspect ROOT codex|claude --real-home` and
+`discovery-remove ROOT codex|claude --real-home`. Removal refuses edited or foreign
+state and unlinks only the verified test activation. It retains version files.
+These commands initialize the private store; do not use them during preparation.
+There is no real-home apply command: installation still requires helper consent.
+
+Completed Codex session, file-read evidence and cleanup: `../../webwork-h13-manual-test.md`.
+The test activation is removed, helper/server stopped and handler unregistered;
+inactive versions and builds are retained. This does not prove signed setup.
+
+H1.3 implementation/evidence: `../../webwork-h13-spec.md`. Signing, notarized
+first launch, helper updates and distribution are separate later gates.

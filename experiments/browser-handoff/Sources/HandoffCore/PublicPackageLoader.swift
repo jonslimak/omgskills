@@ -54,6 +54,9 @@ struct PublicPackageLoader: Sendable {
     )
 
     func resolve(_ request: HandoffRequest) async throws -> PublicPin {
+        guard [HandoffRequest.pinnedTestSkillID, HandoffRequest.testSkillID].contains(request.skillID) else {
+            throw PreviewFailure.invalidMetadata
+        }
         var query = URLRequest(url: URL(string: "https://omgskills.com/mcp")!)
         query.httpMethod = "POST"
         query.setValue("application/json", forHTTPHeaderField: "Content-Type")

@@ -109,4 +109,45 @@ struct InstallModelTests {
         let next = try await service.prepare(HandoffRequest.parse(link)!)
         #expect(next.action == .update && next.toCommit == String(repeating: "b", count: 40))
     }
+
+    @Test func changingAgentDiscardsOldConsentAndLateResults() async throws {
+        let codex = ControlledInstallService(), claude = ControlledInstallService()
+        let model = InstallModel(codex: codex, claude: claude)
+        model.open(link); await codex.wait(1)
+        let old = try #require(model.task)
+        model.selectAgent(.claude)
+        #expect(model.review == nil && model.selectedAgent == .claude)
+        model.apply()
+        #expect(await codex.approvals.isEmpty)
+        await claude.wait(1)
+        let new = try #require(model.task)
+        let correct = await claude.finish(1); await new.value
+        let stale = await codex.finish(1); await old.value
+        #expect(model.review?.id == correct)
+        #expect(await codex.discarded.contains(stale))
+        model.apply(); await claude.wait(100)
+        let applying = try #require(model.task)
+        model.selectAgent(.codex)
+        #expect(model.selectedAgent == .claude)
+        #expect(await claude.approvals == [correct])
+        #expect(await codex.approvals.isEmpty)
+        await claude.applied(); await applying.value
+    }
+
+    @Test func simulatedLaunchUsesPersistentDestinationsAndClearsReadyReview() async throws {
+        let sandbox = try InstallSandbox.create(); defer { try? FileManager.default.removeItem(at: sandbox.url) }
+        _ = try await InstallHarness.run(["select", sandbox.url.path, "A"])
+        let model = try #require(try InstallLaunchMode.simulatedHome(sandbox.url.path, fixtures: true).makeModel())
+        model.open(link)
+        await model.task?.value
+        #expect(model.review?.destination.contains("/home/.agents/skills/") == true)
+        model.selectAgent(.claude)
+        #expect(model.review == nil)
+        await model.task?.value
+        #expect(model.review?.destination.contains("/home/.claude/skills/") == true)
+        model.apply(); await model.task?.value
+        #expect(model.errorMessage == nil && model.message != nil)
+        #expect(!FileManager.default.fileExists(atPath: sandbox.url.appendingPathComponent("home/.agents/skills/frontend-design").path))
+        #expect(FileManager.default.fileExists(atPath: sandbox.url.appendingPathComponent("home/.claude/skills/frontend-design/SKILL.md").path))
+    }
 }
