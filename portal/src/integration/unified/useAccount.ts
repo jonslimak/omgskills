@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { PortalApi } from "../../portal-api";
 import { createAccountSession, type AccountSnapshot } from "../account-session";
-import { readOnlyApi, type AccountIdentity } from "../data";
+import { type AccountIdentity } from "../data";
+import { managementApi } from "./management-api";
+import type { SetCommand } from "../set-data";
+import type { MembershipCommand } from "../membership-data";
 
 const initial: AccountSnapshot = { data: null, refreshing: true, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "", setSaving: false };
 
@@ -14,7 +17,7 @@ export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: b
   useEffect(() => {
     if (!enabled) { setSnapshot({ ...initial, refreshing: false }); return; }
     const account = createAccountSession({
-      api: readOnlyApi((path, init) => apiRef.current(path, init)), identity,
+      api: managementApi((path, init) => apiRef.current(path, init)), identity,
       cacheKey: key, changed: setSnapshot,
       // No persistent private cache in the first authenticated unified slice.
     });
@@ -33,6 +36,10 @@ export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: b
   }, [enabled, key, identity.name, identity.email, recovery]);
   return {
     snapshot,
+    saveSet: (command: SetCommand) => session.current
+      ? session.current.saveSet(command) : Promise.reject(new Error("Sign in before saving.")),
+    saveMembership: (command: MembershipCommand) => session.current
+      ? session.current.saveMembership(command) : Promise.reject(new Error("Sign in before saving.")),
     refresh: () => { void session.current?.refresh(); },
     clear: () => { session.current?.dispose(); setSnapshot(initial); },
     recover: () => setRecovery(value => value + 1),

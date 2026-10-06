@@ -78,10 +78,39 @@ export async function verifyClerk(keys) {
 const readPaths = new Set([
   "/api/portal/synced-skills", "/api/portal/groups", "/api/portal/shared", "/api/portal/profile",
 ]);
-export function allowedRequest(url, method, headers) {
+export function managementRoute(url, method) {
+  if (url === "/api/portal/groups" && method === "POST") return "groups";
+  if (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+$/.test(url) && ["GET", "PATCH"].includes(method)) return "detail";
+  if (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/items$/.test(url) && ["POST", "DELETE"].includes(method)) return "items";
+  return null;
+}
+
+export function allowedManagementBody(url, method, body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return false;
+  const only = keys => Object.keys(body).every(key => keys.includes(key));
+  const id = value => typeof value === "string" && /^[a-zA-Z0-9_-]{1,80}$/.test(value);
+  const name = typeof body.name === "string" && body.name.trim().length > 0 && body.name.length <= 120;
+  const route = managementRoute(url, method);
+  if (route === "groups") {
+    if (!only(["name", "visibility", "syncedSkillIds", "isFavorites"]) || !name) return false;
+    const ids = body.syncedSkillIds ?? [];
+    if (!Array.isArray(ids) || ids.length > 1 || !ids.every(id)) return false;
+    return body.isFavorites === true ? body.visibility === "public" && ids.length === 1
+      : body.isFavorites == null && (body.visibility ?? "private") === "private";
+  }
+  if (route === "detail" && method === "PATCH") return only(["name"]) && name;
+  if (route === "items" && method === "POST") return only(["kind", "syncedSkillId"]) && body.kind === "synced" && id(body.syncedSkillId);
+  if (route === "items" && method === "DELETE") return only(["itemId"]) && id(body.itemId);
+  return false;
+}
+
+export function allowedRequest(url, method, headers, writes = false) {
   if (headers.host !== new URL(backendOrigin).host) return false;
   if (headers.origin && ![backendOrigin, frontendOrigin].includes(headers.origin)) return false;
   if (headers["sec-fetch-site"] === "cross-site") return false;
-  if (headers["transfer-encoding"] || (headers["content-length"] && headers["content-length"] !== "0")) return false;
-  return method === "GET" && readPaths.has(url);
+  if (headers["transfer-encoding"]) return false;
+  const length = Number(headers["content-length"] ?? 0);
+  if (!Number.isInteger(length) || length < 0 || length > 8192 || (method === "GET" && length !== 0)) return false;
+  if (method === "GET") return readPaths.has(url) || managementRoute(url, method) === "detail";
+  return writes && !!managementRoute(url, method) && headers["content-type"]?.split(";")[0] === "application/json";
 }

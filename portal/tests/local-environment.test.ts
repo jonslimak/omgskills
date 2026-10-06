@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { allowedRequest, backendOrigin, frontendOrigin, clerkFrontend, connectionString, socket, database, cleanEnvironment, verifyClerk } from "../testing/local-environment.mjs";
+import { allowedRequest, allowedManagementBody, backendOrigin, frontendOrigin, clerkFrontend, connectionString, socket, database, cleanEnvironment, verifyClerk } from "../testing/local-environment.mjs";
 
 const host = new URL(backendOrigin).host;
 test("local environment uses only its named Unix-socket database", () => {
@@ -21,6 +21,27 @@ test("Clerk must be a development instance, not production or an arbitrary URL",
   const encode = (host: string) => `pk_test_${Buffer.from(host).toString("base64")}`;
   assert.equal(clerkFrontend(encode("example.clerk.accounts.dev$")), "https://example.clerk.accounts.dev");
   for (const key of ["pk_live_anything", "", encode("evil.test$"), encode("foo.clerk.accounts.dev.evil.test$"), encode("foo.clerk.accounts.dev/path$")]) assert.throws(() => clerkFrontend(key));
+});
+
+test("local management must opt in; sharing, bulk and other writes stay blocked", () => {
+  const headers = { host, origin: frontendOrigin, "content-type": "application/json", "content-length": "32" };
+  const groups = "/api/portal/groups";
+  assert.equal(allowedRequest(groups, "POST", headers), false);
+  assert.equal(allowedRequest(groups, "POST", headers, true), true);
+  for (const [path, method] of [["/api/portal/profile", "PATCH"], [`${groups}/one`, "DELETE"], [`${groups}/one/items`, "PATCH"], [`${groups}/one/allowed-emails`, "POST"]]) {
+    assert.equal(allowedRequest(path, method, headers, true), false);
+  }
+  assert.equal(allowedRequest(groups, "POST", { ...headers, origin: "https://omgskills.com" }, true), false);
+  assert.equal(allowedRequest(groups, "POST", { ...headers, "content-length": "99999" }, true), false);
+  assert.equal(allowedManagementBody(groups, "POST", { name: "Test", visibility: "private", syncedSkillIds: [] }), true);
+  assert.equal(allowedManagementBody(groups, "POST", { name: "Test", visibility: "public" }), false);
+  assert.equal(allowedManagementBody(groups, "POST", { name: "Favorites", visibility: "public", isFavorites: true, syncedSkillIds: ["one"] }), true);
+  assert.equal(allowedManagementBody(groups, "POST", { name: "Test", syncedSkillIds: ["one", "two"] }), false);
+  assert.equal(allowedManagementBody(`${groups}/one`, "PATCH", { name: "Renamed" }), true);
+  assert.equal(allowedManagementBody(`${groups}/one`, "PATCH", { name: "Renamed", visibility: "public" }), false);
+  assert.equal(allowedManagementBody(`${groups}/one/items`, "POST", { kind: "synced", syncedSkillId: "one" }), true);
+  assert.equal(allowedManagementBody(`${groups}/one/items`, "POST", { kind: "catalog", catalogSkillId: "one" }), false);
+  assert.equal(allowedManagementBody(`${groups}/one/items`, "DELETE", { itemId: "one" }), true);
 });
 test("Clerk verification rejects keys from different instances and upstream failures", async () => {
   const original = globalThis.fetch;

@@ -1236,7 +1236,8 @@
   flex-direction: column;
   gap: 6px;
 }
-.ua-modal form input {
+.ua-modal form input,
+.ua-modal form select {
   border: 1px solid var(--ua-line);
   border-radius: 8px;
   padding: 10px;

@@ -41,6 +41,7 @@ import {
   Newspaper,
   Palette,
   PanelLeft,
+  Pencil,
   Plus,
   Presentation,
   RefreshCw,
@@ -77,6 +78,7 @@ import {
   isFavorite,
   matchesSearch,
   skillDisplays,
+  setSkillDisplays,
   starCount,
   type CatalogDisplay,
   type Navigation,
@@ -85,6 +87,7 @@ import {
 } from "./model";
 import "./unified.css";
 import type { PublicStatus } from "./use-public-catalog";
+import type { UnifiedManagement } from "./management";
 
 type Props = {
   data: PortalData;
@@ -103,6 +106,7 @@ type Props = {
   publicStatus?: PublicStatus;
   readOnlyAccount?: boolean;
   onSignIn?: () => void;
+  management?: UnifiedManagement;
 };
 
 function IconButton({
@@ -196,7 +200,7 @@ function MenuItem({
     </DropdownMenu.Item>
   );
 }
-function Modal({
+export function Modal({
   title,
   close,
   theme,
@@ -325,6 +329,7 @@ export function UnifiedApp({
   publicStatus,
   readOnlyAccount = false,
   onSignIn,
+  management,
 }: Props) {
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
@@ -347,13 +352,14 @@ export function UnifiedApp({
     [data.skills],
   );
   const mine = signedIn ? models.mine : [];
+  const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, mine) : [];
   const library = signedIn && !publicStatus
     ? models.library
     : models.library.map((skill) => ({ ...skill, installed: undefined }));
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
-  const selected = [...mine, ...library].find((s) => s.key === nav.selected) || pendingSelection;
+  const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected) || pendingSelection;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
   const detailPending = remoteDetail && publicStatus.detail !== "ready";
   const relatedSkills = selected?.author
@@ -362,7 +368,7 @@ export function UnifiedApp({
         .slice(0, 3)
     : [];
   const activeSet = signedIn
-    ? data.sets.find((set) => set.id === nav.id)
+    ? management?.detail.set ?? data.sets.find((set) => set.id === nav.id)
     : undefined;
   const collection = catalog.collections.find((item) => item.id === nav.id);
   const creator = catalog.creators.find((item) => item.handle === nav.id);
@@ -381,7 +387,10 @@ export function UnifiedApp({
   const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
   const privateSearch = readOnlyAccount && !discovery;
   const publicList = !!publicStatus && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
-  const listState = publicList ? publicStatus.list : state;
+  const setPage = !!management && ["set", "favorites"].includes(nav.view);
+  const listState = publicList ? publicStatus.list : setPage && state === "ready" ? management.detail.state : state;
+  const canManage = !!management && !management.blocked && !management.busy;
+  const editableSet = activeSet?.role === "owner" && !activeSet.hidden && activeSet.visibility === "private" && !activeSet.isFavorites;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
 
   useEffect(() => {
@@ -417,11 +426,13 @@ export function UnifiedApp({
     navigate({ ...nav, selected: "" });
   }
   function addToSet(skills: SkillDisplay[]) {
+    if (management) { management.add(skills); return; }
     if (readOnlyAccount) return;
     setActionSkills(skills);
     setDialog("membership");
   }
   function newSet(skills: SkillDisplay[] = []) {
+    if (management) { management.create(skills); return; }
     if (readOnlyAccount) return;
     setActionSkills(skills);
     setSetName("");
@@ -623,15 +634,18 @@ export function UnifiedApp({
               <MenuItem icon={BookOpen} onSelect={() => open(skill)}>
                 View details
               </MenuItem>
-              {!readOnlyAccount && <><MenuItem icon={ListPlus} onSelect={() => addToSet([skill])}>
+              {(!readOnlyAccount || management) && skill.installed && <><MenuItem icon={ListPlus} disabled={!!management && !canManage} onSelect={() => addToSet([skill])}>
                 Add to set
               </MenuItem>
-              <MenuItem icon={Heart} onSelect={() => onFavorite(skill)}>
+              <MenuItem icon={Heart} disabled={!!management && !canManage} onSelect={() => management ? management.favorite(skill) : onFavorite(skill)}>
                 {isFavorite(data, skill)
                   ? "Remove from favorites"
                   : "Add to favorites"}
               </MenuItem>
               </>}
+              {management && skill.setItemId && activeSet && (editableSet || (activeSet.isFavorites && activeSet.role === "owner")) && <MenuItem icon={X} disabled={!canManage} onSelect={() => management.remove(activeSet, skill)}>
+                Remove from set
+              </MenuItem>}
               <MenuItem
                 icon={Copy}
                 onSelect={() => void copySource(skill)}
@@ -771,6 +785,7 @@ export function UnifiedApp({
     visible = activeSet
       ? mine.filter((skill) => isMember(activeSet, skill.installed!))
       : [];
+  if (setPage) visible = setRows;
   if (nav.view === "top") visible = top;
   if (nav.view === "creator")
     visible = library.filter((skill) => skill.author === nav.id);
@@ -888,7 +903,8 @@ export function UnifiedApp({
             ) : (
               <>
                 {navItem("all", "All skills", Inbox, mine.length)}
-                {!readOnlyAccount && <>{navItem("favorites", "Favorites", Heart, favorites.length)}
+                {(!readOnlyAccount || management) && <>{navItem("favorites", "Favorites", Heart, management ? data.sets.find(set => set.isFavorites)?.itemCount ?? 0 : favorites.length)}
+                {management && navItem("sets", "All sets", Shapes, sets.length)}
                 <div className="ua-nav-group">
                   <small>Sets</small>
                   {sets.map((set) =>
@@ -985,16 +1001,24 @@ export function UnifiedApp({
                   <h1>{title}</h1>
                   {meta && <p>{meta}</p>}
                 </div>
-                {!readOnlyAccount && nav.view === "sets" && (
+                {(!readOnlyAccount || management) && nav.view === "sets" && (
                   <button
                     type="button"
                     className="ua-pill"
+                    disabled={!!management && !canManage}
                     onClick={() => newSet()}
                   >
                     <Plus />
                     New set
                   </button>
                 )}
+                {management && nav.view === "set" && activeSet && management.detail.state === "ready" && <div className="ua-toolbar">
+                  <span className="ua-muted">{visibilityLabels[activeSet.visibility]}</span>
+                  {editableSet && <>
+                    <IconButton label="Rename set" disabled={!canManage} onClick={() => management.rename(activeSet)}><Pencil /></IconButton>
+                    <button className="ua-pill" type="button" disabled={!canManage} onClick={() => management.add([], activeSet)}><Plus />Add skill</button>
+                  </>}
+                </div>}
                 {!readOnlyAccount && nav.view === "set" && activeSet && (
                   <Menu
                     theme={theme}
@@ -1031,6 +1055,7 @@ export function UnifiedApp({
                   </Menu>
                 )}
               </div>
+              {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
               {publicList && publicStatus.note && listState === "ready" && <p className="ua-muted" role="status">{publicStatus.note}</p>}
               {listState === "loading" ? (
                 <div
@@ -1045,11 +1070,12 @@ export function UnifiedApp({
               ) : listState === "error" ? (
                 <Empty title="Skills couldn't be loaded">
                   {publicList && publicStatus.error && <span>{publicStatus.error}<br /></span>}
-                  <button type="button" className="ua-pill" onClick={publicList ? publicStatus.retry : retry}>
+                  {setPage && <span>{management.detail.error}<br /></span>}
+                  <button type="button" className="ua-pill" onClick={publicList ? publicStatus.retry : setPage ? management.detail.retry : retry}>
                     Try again
                   </button>
                 </Empty>
-              ) : nav.query ? (
+              ) : nav.query && setPage ? rows(visible.filter(skill => matchesSearch(skill, nav.query))) : nav.query ? (
                 <>
                   <section>
                     <SectionHeading title="In my skills" />
@@ -1110,7 +1136,7 @@ export function UnifiedApp({
                       <span>
                         <strong>{set.name}</strong>
                         <small>
-                          {set.items.length} skills ·{" "}
+                          {set.itemCount ?? set.items.length} skills ·{" "}
                           {visibilityLabels[set.visibility]}
                           {set.role !== "owner"
                             ? ` · Shared by ${set.ownerName}`
@@ -1277,7 +1303,7 @@ export function UnifiedApp({
                   !activeSet?.items.length
                     ? rows(visible, nav.view === "top")
                     : null}
-                  {nav.view === "set" &&
+                  {!management && nav.view === "set" &&
                     activeSet &&
                     activeSet.items
                       .filter(
@@ -1303,14 +1329,14 @@ export function UnifiedApp({
             </div>
           </main>
           {signedIn && (
-            <nav className="ua-mobile-tabs" aria-label="Mobile navigation" style={readOnlyAccount ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" } : undefined}>
+            <nav className="ua-mobile-tabs" aria-label="Mobile navigation" style={readOnlyAccount && !management ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" } : undefined}>
               {(
                 [
                   ["all", "My skills", User],
                   ["discover", "Discover", TrendingUp],
                   ["sets", "Sets", Shapes],
                 ] as const
-              ).filter(([view]) => !readOnlyAccount || view !== "sets").map(([view, label, Icon]) => (
+              ).filter(([view]) => !readOnlyAccount || management || view !== "sets").map(([view, label, Icon]) => (
                 <button
                   type="button"
                   key={view}
@@ -1413,7 +1439,7 @@ export function UnifiedApp({
                       Local skill
                     </span>
                   )}
-                  {!readOnlyAccount && signedIn && selected.installed && (
+                  {(!readOnlyAccount || management) && signedIn && selected.installed && (
                     <>
                       <IconButton
                         label={
@@ -1422,12 +1448,14 @@ export function UnifiedApp({
                             : "Add to favorites"
                         }
                         data-favorite={isFavorite(data, selected)}
-                        onClick={() => onFavorite(selected)}
+                        disabled={!!management && !canManage}
+                        onClick={() => management ? management.favorite(selected) : onFavorite(selected)}
                       >
                         <Heart />
                       </IconButton>
                       <IconButton
                         label="Add to set"
+                        disabled={!!management && !canManage}
                         onClick={() => addToSet([selected])}
                       >
                         <ListPlus />
@@ -1453,7 +1481,7 @@ export function UnifiedApp({
                       <span>Observed on</span>
                       <strong>{selected.installed.sources.join(", ")}</strong>
                     </div>
-                    {!readOnlyAccount && <div className="ua-set-chips">
+                    {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, selected.installed!))
                         .map((set) => (
@@ -1517,6 +1545,7 @@ export function UnifiedApp({
           </Dialog.Root>
         )}
       </div>
+      {management?.dialog(theme)}
       {!readOnlyAccount && dialog === "new-set" && (
         <Modal title="New set" theme={theme} close={() => setDialog(null)}>
           <form

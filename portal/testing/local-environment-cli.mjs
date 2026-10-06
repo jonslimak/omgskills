@@ -96,13 +96,14 @@ async function main() {
     catch { console.log("Development keys missing or invalid; sign-in remains disabled."); }
     return;
   }
-  if (command === "backend") {
+  if (command === "backend" || command === "backend-write") {
     const c = await client(); await c.end();
     const keys = await developmentKeys();
     await verifyClerk(keys);
     runNode(["--import", "tsx", "portal/testing/local-read-server.mts"], {
       CONTEXT: "dev", SKILLGROUPS_DATABASE_URL: connectionString(),
       VITE_CLERK_PUBLISHABLE_KEY: keys.publicKey, CLERK_SECRET_KEY: keys.secretKey,
+      LOCAL_SET_WRITES: command === "backend-write" ? "1" : "0",
     });
     return;
   }
@@ -112,7 +113,9 @@ async function main() {
     const health = await fetch(`${backendOrigin}/health`, { signal: AbortSignal.timeout(3000), redirect: "error" });
     assert.equal(health.status, 200);
     const ready = await health.json();
-    assert.equal(ready.database, database); assert.equal(ready.readOnly, true); assert.equal(ready.clerkFrontend, keys.frontend);
+    assert.equal(ready.database, database);
+    assert.ok(ready.readOnly === true || (ready.readOnly === false && ready.mode === "set-management"));
+    assert.equal(ready.clerkFrontend, keys.frontend);
     runNode(["node_modules/vite/bin/vite.js", "portal", "--host", "127.0.0.1", "--port", "5191", "--strictPort"], {
       VITE_PORTAL_INTEGRATION: "1", VITE_SKILLGROUPS_WEB_ENABLED: "1",
       VITE_CLERK_PUBLISHABLE_KEY: keys.publicKey, PORTAL_TEST_API_ORIGIN: backendOrigin,
@@ -120,6 +123,6 @@ async function main() {
     });
     return;
   }
-  throw new Error("Use setup, migrate, start-db, stop-db, status, backend, or frontend.");
+  throw new Error("Use setup, migrate, start-db, stop-db, status, backend, backend-write, or frontend.");
 }
 main().catch(error => { console.error(error.message); process.exitCode = 1; });

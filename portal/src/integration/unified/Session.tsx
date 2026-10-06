@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
-import { navigationSearch, parseNavigation, type Navigation } from "../../app/unified/model";
+import { navigationSearch, parseNavigation, skillDisplays, type Navigation } from "../../app/unified/model";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog } from "../../app/unified/use-public-catalog";
 import { usePortalApi } from "../../portal-api";
 import { emptyAccount, type AccountIdentity } from "../data";
 import { useAccount } from "./useAccount";
 import { accountNavigation, publicNavigation, unifiedBase } from "./policy";
+import { useSetDetail } from "./useSetDetail";
+import { useManagement } from "./useManagement";
 
 const publicClient = new PublicCatalogClient();
 const rejectEdit = () => { throw new Error("Account editing is disabled in this read-only integration."); };
@@ -50,18 +52,24 @@ function AccountView({ identity, signedIn, accountKey }: { identity: AccountIden
   }
   const { snapshot } = account;
   const data = available && snapshot.data ? snapshot.data : emptyAccount(available ? identity : { name: "Visitor", email: "" });
+  const setId = nav.view === "set" ? nav.id : nav.view === "favorites" ? data.sets.find(set => set.isFavorites && set.role === "owner")?.id ?? "" : "";
+  const detail = useSetDetail(api, setId, snapshot.revision, available && !!snapshot.data && !snapshot.accessDenied);
+  const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine,
+    busy: snapshot.setSaving, blocked: !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
+    scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership, detail });
   return <UnifiedApp
     key={available ? accountKey : "public"}
     data={data} catalog={publicData.catalog} publicStatus={publicData.status}
     nav={nav} navigate={navigate} signedIn={available}
     readOnlyAccount
+    management={available ? management : undefined}
     onSignIn={() => { void clerk.openSignIn({ forceRedirectUrl: `${location.origin}${unifiedBase}${navigationSearch(nav)}` }); }}
     onSession={next => { if (!next) void signOut(); }}
     onFavorite={rejectEdit} onCreateSet={rejectEdit} onMembership={rejectEdit} onVisibility={rejectEdit}
     state={!available || snapshot.data ? "ready" : snapshot.error ? "error" : "loading"}
     retry={account.refresh}
     previewBar={<div className="ua-preview">
-      <span>Local test · read-only account</span>
+      <span>Local test · Favorites and private Sets</span>
       <div>
         {(sessionError || (available && snapshot.error)) && <span role="alert">{sessionError || snapshot.error}</span>}
         {available && <button type="button" className="ua-icon" title="Refresh account" aria-label="Refresh account" disabled={snapshot.refreshing || leaving} onClick={account.refresh}><RefreshCw /></button>}

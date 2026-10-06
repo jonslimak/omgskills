@@ -3,6 +3,10 @@ import { randomUUID } from "node:crypto";
 import { readFile, writeFile, unlink } from "node:fs/promises";
 import pg from "pg";
 import { connectionString, state, verifyDatabase } from "./local-environment.mjs";
+import { resolveCatalogPublicRelease } from "../../netlify/functions/_shared/public-releases.js";
+
+const catalogSkillId = "anthropics/skills:skills/frontend-design";
+const githubUrl = "https://github.com/anthropics/skills";
 
 const file = `${state}/unified-fixture.json`;
 const db = new pg.Client({ connectionString: connectionString() });
@@ -13,6 +17,7 @@ try {
     const users = await db.query("SELECT id FROM users");
     assert.equal(users.rowCount, 1, "Fixture requires exactly one signed-in test account");
     assert.equal((await db.query("SELECT id FROM synced_skills")).rowCount, 0, "Do not mix fixtures with existing skills");
+    const release = await resolveCatalogPublicRelease(catalogSkillId);
     const run = randomUUID();
     const ids = [randomUUID(), randomUUID(), randomUUID()];
     await writeFile(file, JSON.stringify({ run, ids }), { flag: "wx", mode: 0o600 });
@@ -20,14 +25,32 @@ try {
     try {
       await db.query("INSERT INTO sync_runs(id,user_id,status) VALUES ($1,$2,'completed')", [run, users.rows[0].id]);
       for (let i = 0; i < ids.length; i++) {
-        await db.query(`INSERT INTO synced_skills (id,user_id,sync_run_id,stable_key,name,description,catalog_skill_id,github_url,is_local_only,source,identity_status)
-          VALUES ($1,$2,$3,$4,$5,$6,$7,NULL,$8,$9,$10)`,
+        await db.query(`INSERT INTO synced_skills (id,user_id,sync_run_id,stable_key,name,description,catalog_skill_id,github_url,is_local_only,source,identity_status,skill_md_sha)
+          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
         [ids[i], users.rows[0].id, run, `unified-browser-fixture:${ids[i]}`, i < 2 ? "Test design skill" : "Test private workflow",
-          "Temporary local browser-test fixture", i < 2 ? "unified-test/design" : null, i === 2, i === 1 ? "codex" : "claude", i < 2 ? "resolved" : "localOnly"]);
+          "Temporary local browser-test fixture", i < 2 ? catalogSkillId : null, i < 2 ? githubUrl : null,
+          i === 2, i === 1 ? "codex" : "claude", i < 2 ? "resolved" : "localOnly", i < 2 ? release.coordinates.skillMdSha : ""]);
       }
       await db.query("COMMIT");
     } catch (error) { await db.query("ROLLBACK"); await unlink(file); throw error; }
     console.log("Added three clearly labeled local test installs (two grouped skills). No external account/data changed.");
+  } else if (process.argv[2] === "repair") {
+    const { run, ids } = JSON.parse(await readFile(file, "utf8"));
+    assert.ok(Array.isArray(ids) && ids.length === 3);
+    const release = await resolveCatalogPublicRelease(catalogSkillId);
+    await db.query("BEGIN");
+    try {
+      const result = await db.query(`UPDATE synced_skills
+        SET catalog_skill_id=$3, github_url=$4, skill_md_sha=$5
+        WHERE id=ANY($1::uuid[]) AND sync_run_id=$2
+          AND stable_key='unified-browser-fixture:' || id::text
+          AND name='Test design skill' AND identity_status='resolved'
+          AND catalog_skill_id IN ('unified-test/design', $3)`,
+      [ids.slice(0, 2), run, catalogSkillId, githubUrl, release.coordinates.skillMdSha]);
+      assert.equal(result.rowCount, 2, "Repair must match exactly the two recorded catalog test installs");
+      await db.query("COMMIT");
+    } catch (error) { await db.query("ROLLBACK"); throw error; }
+    console.log("Repaired two local test installs with verified frontend-design catalog identity. Private skill and sets unchanged.");
   } else if (process.argv[2] === "cleanup") {
     const { run, ids } = JSON.parse(await readFile(file, "utf8"));
     assert.ok(Array.isArray(ids) && ids.length === 3);
@@ -37,5 +60,5 @@ try {
     await db.query("COMMIT");
     await unlink(file);
     console.log("Removed only the temporary browser-test records.");
-  } else throw new Error("Use seed or cleanup");
+  } else throw new Error("Use seed, repair, or cleanup");
 } finally { await db.end(); }

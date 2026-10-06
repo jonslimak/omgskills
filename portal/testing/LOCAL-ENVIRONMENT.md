@@ -10,9 +10,12 @@ The implementation worktree remains `/private/tmp/omgskills-unified-app-preview`
   authentication, owner-only directories. No TCP listener or managed DB fallback.
 - All repository migrations apply transactionally; a checksum ledger prevents
   silently reapplying changed migrations. Setup refuses an existing data directory.
-- Existing account handlers are reused behind an exact GET-only allowlist for
-  synced skills, owned groups, shared groups, and profile. All other routes and
-  mutations are blocked. Private GitHub, device pairing, and uploads stay disabled.
+- Existing account handlers are reused behind an exact allowlist. Default
+  `backend` mode allows reads of synced skills, owned/shared groups, group detail,
+  and profile. Explicit `backend-write` mode additionally allows private set
+  creation/rename and single installed-skill membership changes, including public
+  Favorites. Profile, sharing/access changes, set deletion, reordering, bulk
+  additions, private GitHub, device pairing, and uploads remain blocked.
 - GET handlers reconcile the signed-in user in the **local** database; read-only
   means no skill/set/profile edit endpoints, not zero internal database writes.
 - Backend starts with a clean environment and verifies its actual database path,
@@ -29,6 +32,8 @@ Run from the implementation worktree using Node 20.19+ and installed dependencie
 node portal/testing/local-environment-cli.mjs setup
 node portal/testing/local-environment-cli.mjs status
 node portal/testing/local-environment-cli.mjs backend
+# Or, for the approved local Favorites/private Sets checks (not both at once):
+node portal/testing/local-environment-cli.mjs backend-write
 # In a second process, after the backend is verified:
 node portal/testing/local-environment-cli.mjs frontend
 ```
@@ -47,8 +52,30 @@ Backend: `http://127.0.0.1:8890`. Reserved frontend: `http://127.0.0.1:5191`.
 The existing unified sample preview on port 5190 is unchanged. The authenticated
 unified UI is at `http://127.0.0.1:5191/app/integration/unified/` and uses the same
 development login. The older `/app/integration/` route remains available; its
-edit controls cannot write through this backend and should not be used to test
-editing. The unified route hides these unconnected controls entirely.
+edit controls may exceed this backend's allowlist and should not be used to test
+this slice. Use the unified route; it hides unconnected controls. In read-only
+backend mode, attempted set edits are rejected, never redirected to production.
+
+### Favorites / Private Sets Checkpoint
+
+- 179 tests and the production build pass. Unauthenticated mutations are rejected;
+  sharing, profile and other out-of-scope writes remain blocked in write mode.
+- Owner/outsider/anonymous SQL access checks passed and rolled back.
+- 2026-10-06: repaired the two catalog fixture installs to the verified
+  `anthropics/skills:skills/frontend-design` identity. `seed` now resolves that
+  release before inserting; `repair` updates only the two recorded catalog
+  fixture IDs and leaves private skills/sets unchanged. Real catalog/GitHub
+  resolution and `addGroupItemWithClient` passed with a pinned release; duplicate
+  rejection and private metadata-only behavior passed. Verification writes were
+  rolled back. This is backend coverage, not signed-in browser verification.
+- User confirmed adding Test design skill succeeds in the signed-in local app
+  on 2026-10-06. Remaining browser checks include create/rename/remove, Favorites,
+  reload persistence, mobile, error handling and logout/account switching.
+  Temporary local skill fixtures are seeded; use
+  `node --import tsx portal/testing/unified-account-fixture.mts cleanup`
+  after checking and removing only the explicitly created test sets/items.
+- Public Favorites confirmation describes production semantics; this test's writes
+  are only in the private local PostgreSQL cluster, not the live website.
 
 ## Verification
 

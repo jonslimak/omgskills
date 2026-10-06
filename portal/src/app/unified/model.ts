@@ -2,7 +2,7 @@ import {
   groupSyncedSkills,
   type GroupedSyncedSkill,
 } from "../../synced-skill-grouping";
-import { isMember, type PortalData } from "../model";
+import { isMember, type PortalData, type PortalSet } from "../model";
 
 // Presentation fields only; the stored skill and group models stay unchanged.
 export type CatalogSummary = {
@@ -21,6 +21,7 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   catalogId?: string;
   githubUrl: string | null;
   installed?: GroupedSyncedSkill;
+  setItemId?: string;
 };
 export type CollectionDisplay = {
   id: string;
@@ -156,6 +157,17 @@ export function matchesSearch(skill: SkillDisplay, query: string) {
   return `${skill.name} ${skill.description} ${skill.author} ${skill.tags.join(" ")} ${skill.installed?.sourceSkills.map((s) => `${s.name} ${s.description || ""}`).join(" ") || ""}`
     .toLowerCase()
     .includes(q);
+}
+
+// Set contents come from the detail response, not the account's installed list.
+export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[]): SkillDisplay[] {
+  return set.items.map(item => {
+    const installed = item.syncedSkillId
+      ? mine.find(skill => skill.installed?.allSkillIds.includes(item.syncedSkillId!)) : undefined;
+    return { key: `set-item:${item.id}`, setItemId: item.id, name: item.name,
+      description: item.description, githubUrl: item.githubUrl, author: "", tags: [],
+      installed: installed?.installed };
+  });
 }
 export function isFavorite(data: PortalData, skill: SkillDisplay) {
   return (

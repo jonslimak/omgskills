@@ -214,6 +214,33 @@ Slices 0-1 and local read-only Discover integration in Slice 2 are approved. Sli
 - [ ] Real second-account browser switching, denied/slow-network browser checks,
   and populated real-account data beyond synthetic test installs remain unverified.
 
+#### Local Checkpoint: Favorites And Private Sets (2026-10-06)
+
+- Approved scope: reuse existing handlers and account controller for Favorites,
+  private set creation/rename, and single installed-skill membership changes.
+  No production entry, data model, profile, sharing, bulk, or device changes.
+- Implemented locally: narrow opt-in `backend-write` mode; actual set detail
+  reads, ordered mixed-item rows, account-scoped cancellation, save/error states,
+  and public-Favorites confirmation. The sample preview remains separate.
+- Verification so far: 179 portal tests and TypeScript/production build pass;
+  local entry remains absent from production bundles. Actual unauthenticated
+  requests return 401, unrelated writes return 405, and out-of-scope publication
+  bodies return 400. Isolated SQL owner/outsider/anonymous checks pass with rollback.
+- 2026-10-06 fixture repair: replaced the nonexistent `unified-test/design`
+  reference on the two recorded test installs with verified frontend-design
+  catalog metadata. Future seeds verify the release first. Real catalog/GitHub
+  resolution and transactional set-add/release persistence checks pass, including
+  duplicate rejection and unchanged private-skill handling. Test writes rolled
+  back; 179 portal tests pass again.
+- [x] User confirmed the repaired Test design skill adds successfully in the
+  signed-in local app on 2026-10-06. This is user-reported browser verification;
+  the agent's separate browser session remained signed out.
+- [ ] Remaining browser coverage: create/rename/remove, Favorites, reload
+  persistence, mobile, failure handling, and logout/account-switch checks. Three
+  clearly labeled disposable local skill installs are seeded for this check;
+  clean them up after verification. This checkpoint is local only; no production
+  activation or deployment, and the broader authenticated migration is unfinished.
+
 - [ ] Connect existing account sessions, My skills, Favorites, Sets, filters, and bulk operations.
 - [ ] Preserve all existing set edits, ordering, access, Hide/Restore, and mixed-item behaviors.
 - [ ] Move profile/devices/private-source controls into reachable account destinations.
