@@ -1,7 +1,140 @@
 # Unified Web App Plan
 
-Status: local-only checkpoint on `codex/unified-app-preview`, following `2d28cf0d`. Public routing support, live Discover, handoff UI refinements, and Mac-style category searches are implemented and tested locally. User approved committing this checkpoint; no push or deployment. My Skills remains sample-only. Slice 0 still needs deployed subdomain verification.
-Reviewed: 2026-10-05. Source baseline: `origin/main` at `61f9f13f`.
+Status: Local UI checkpoint on `codex/unified-app-preview`, approved for commit. Discover caching, set/invite presentation, management/account controls, mobile Favorites and the handoff's Claude/OpenAI icons are implemented. Production acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working. The new production entry remains disabled by default; this checkpoint is not deployed.
+Updated: 2026-10-06. Original source baseline: `origin/main` at `61f9f13f`; recheck current main before release.
+
+## Current Working Agreement - 2026-10-06
+
+This section supersedes earlier local-integration testing requirements and stale
+approval/status statements in historical checkpoints below.
+
+- **Finish the UI/UX first.** Compare every intended screen and interaction with
+  `web-handoff/app/` and preserve existing production app capabilities. Do not
+  confuse a polished screen with a complete or verified workflow.
+- **Use localhost for presentation review**, responsive layout, keyboard behavior,
+  and deterministic loading/empty/error/permission states. Reuse the existing
+  preview and fixtures when useful. Do not create, rebuild, or expand disposable
+  servers/databases/accounts to chase connectivity problems.
+- **Keep code checks local.** Run build, unit/contract tests and static checks.
+  Identify missing handlers, placeholder actions, unsupported contracts, and
+  client bugs before shipping; deferring connectivity tests does not excuse
+  known implementation gaps or mean every error is caused by localhost.
+- **Confirm real connectivity in production after an approved deploy:** auth,
+  both app hosts, catalog requests, account persistence, invitations/email access,
+  account switching, and external-service flows. These are pending acceptance
+  checks, not blockers to continuing visual work and not marked as passed.
+- **No schema/API/permission redesign.** Reuse existing supported contracts.
+  If the mock needs a capability the backend does not provide, record the gap and
+  get a scope decision instead of simulating success or silently dropping it.
+- **Release remains a separate gate.** Follow `deploy.md`, review the UI first,
+  and retain rollback. Having no users reduces rollout impact but does not remove
+  permission/data exposure risks. Production access changes and destructive tests
+  need an agreed test account/set/recipient scope; do not use personal skills.
+- The later user approval covers committing the current implementation and docs
+  on this branch. It does not approve push, deploy, new email delivery, changes to
+  production access, or additional local connectivity experiments.
+
+### Known Invite Issue And Deferred Checks
+
+- User reports `Could not confirm the save. Refresh before trying again.` when
+  adding email access in the local app. Root cause is not established. An isolated
+  client-to-handler test passed, but that does not clear the browser failure.
+- `Read-only access. No invitation email is sent.` is explanatory copy, not the
+  error. Email delivery is not implemented or part of the current UI migration.
+- Earlier passing receipts are historical evidence, not acceptance of this
+  failing flow. Track email-access grant, revoke, persistence and recipient access
+  as **production verification pending**; investigate the failure there if it recurs.
+- Local diagnostic set `Invite diagnostic (temporary)` remains empty and private
+  (ID `23547cdb-2b16-4878-aa4d-d6a324de0499`). Permission testing stopped. Do not
+  resume that experiment or remove existing local data without approval.
+
+### UI/UX Completion Checklist
+
+Every unchecked row needs a source/behavior comparison, a local visual review,
+and either a fix or an explicit agreed omission. A local connection failure alone
+does not establish a missing UI feature. This checklist is a review to perform,
+not a claim that every listed feature is broken.
+
+- [ ] Shell/navigation: signed-in/out entry, My Skills/Discover, rail, mobile tabs,
+  account menu, back/forward, direct links and restoration of selected detail.
+- [ ] Discover: featured collections, trending, creators, categories/search,
+  selection, result limits, and loading/empty/error/retry states.
+- [ ] Skill rows/detail: spacing/type/icons, source indicators, long content,
+  panel/sheet sizing, copy/source actions, Favorites and Add to set entry points.
+- [ ] My Skills: search, source filters, grouped installs, multi-selection and
+  bulk actions, partial failures and preserving selection after failed work.
+- [ ] Sets: listing, create/rename, add/remove, ordering, mixed item types,
+  Hide/Restore, protected Favorites, empty/deleted/unavailable states.
+- [ ] Set detail/inviting: mock fidelity, separate visibility/invite controls,
+  owner/reader/public states, member information, pending/error/confirmation
+  feedback and a usable path for recipients to open the set. Live access pending.
+- [ ] Account destinations: profile, agents/sources, devices, private GitHub and
+  MCP; reachable existing controls with no dead buttons or sample-only settings.
+- [ ] Responsive/accessibility: desktop/mobile, light/dark, long names/emails,
+  focus/keyboard/Escape, touch targets, scroll/overflow and modal recovery.
+- [ ] Production entry/routes: connect the completed shell to the real session
+  and supported mutations; preserve old app links, pairing/review and public pages.
+- [ ] Final gap register: label each item **implemented + UI reviewed**,
+  **implementation missing**, **intentionally omitted**, or **production check
+  pending**. User approves omissions and reviews the finished UX before release.
+
+### UI Gap Implementation Checkpoint - 2026-10-06
+
+User approved implementing the focused review findings, not deployment or live
+permission changes. Existing work in this checkout was preserved. No database,
+backend endpoint, deployment configuration or disposable server was changed.
+
+| Gap | Implementation / current acceptance |
+| --- | --- |
+| Discover actions | Exact catalog-ID install association retained; Add to set and Favorite actions use existing APIs, not synthetic installs. Catalog additions check current ownership/membership and reconcile conflicts only when identity is returned. Missing catalog identity blocks additional saves to prevent duplicates. Live writes pending. |
+| Set sharing | Copy link in the set toolbar and Invite dialog, with explicit no-email/access guidance. Local links use the unified route; production keeps canonical public or authenticated set links. Dialog visually reviewed; recipient access pending. |
+| Bulk management | Edit/select, add selected skills, create a set from selected installed skills. Partial add failures retain failed items in the dialog; uncertain results require refresh. Bulk dialog reviewed without saving. |
+| Ordering / Hide / Restore | Item menus use existing reorder API with current item IDs; set menu confirms Hide/Restore. Hidden sets have a listing filter. Menu boundaries reviewed; real mutations pending. |
+| Account destinations | Profile editing/publication confirmation/settings wired to the existing session. Devices and GitHub reuse existing guarded panels; MCP instructions are reachable. Profile dialog reviewed. Local devices showed a load error: do not expand the harness to chase it; confirm in production. |
+| Mobile / icons | Favorites gets a direct mobile tab; small text controls have a minimum hit area; source badges normalize casing for display without changing stored data. Checked library and Favorites at 390px: no horizontal overflow, distinct Claude/Codex icons. |
+| Production entry | `VITE_PORTAL_UNIFIED_ENABLED=1` selects the unified shell only in production with the web flag enabled. Default remains off. `/app/groups/:id`, sets, agents and home links map to unified views; sign-in preserves the intended set. Pairing/review routing remains separate. |
+
+**Icon correction:** feed source badges now use the exact `agent-claude.png` and
+`agent-codex.png` assets from the handoff, replacing generic sparkle/robot icons.
+The mock's 12px monochrome masks and 19px tiles are preserved. Verified rendered
+in the local feed; screenshot: `/private/tmp/unified-feed-brand-icons.jpg`.
+
+**Commit scope:** includes the earlier uncommitted Discover caching and set-access
+UI work, its existing local harness/tests, this UI gap pass, the icon correction,
+and documentation. Retaining earlier harness code does not authorize further
+local access tests. Generated builds, screenshots, credentials and environment
+files are excluded. Reconcile newer main commits before release; do not treat
+this branch checkpoint as a main merge or deployment.
+
+**Backend limit discovered:** creating Favorites requires at least one synced
+skill (`portal-groups.mts`). No workaround or fake synced ID was added. Catalog
+skills can be added to an existing Favorites set; without one, the UI explains
+the requirement and blocks the unsupported save. Expanding this API needs a
+separate scope decision.
+
+**Catalog identity limit confirmed:** `portalGroupItem()` currently omits catalog
+IDs. The client accepts optional IDs but does not assume they exist. A set with
+unidentified catalog items blocks further catalog additions rather than guessing
+membership or risking duplicate rows. Completing repeat-safe catalog saves needs
+a separately approved read-contract update; no backend code was changed here.
+
+**Still intentionally unavailable:** remote installation, automatic updates,
+invented member counts, invitation email delivery, and README content unavailable
+from the existing contract. Public pages and the data model remain unchanged.
+
+**Verification:** TypeScript and 195 portal tests passed, including new catalog
+membership guards, exact-ID matching, source casing, and legacy route checks.
+Default and opt-in production builds were checked; the opt-in build used a dummy
+public Clerk key only for compilation, not a live sign-in. No live credentials,
+permission changes, email grants, or production writes were tested. Discover's
+Add to set dialog was checked without submitting. Desktop invite and mobile
+library screenshots are saved under `/private/tmp/unified-gap-fixed-*.jpg`.
+
+Before release: complete user visual review, recheck current main, follow
+`deploy.md`, explicitly choose/enable the unified flag, retain rollback, then
+verify auth, devices/GitHub, set persistence, profile changes and recipient access
+on the approved production test scope. The broad checklist above is not marked
+fully accepted merely because the focused fixes compile.
 
 ## Goal
 
@@ -13,7 +146,7 @@ Bring discovery from `/skills/` into `/app/`, using `web-handoff/app/` for the U
 - Make `/app/` the unified discovery and management experience.
 - Use the handoff's **My skills / Discover** switch, not the stacked navigation alternative.
 - Rebuild the design in the existing React portal. Do not ship the prototype runtime or its sample data.
-- Work locally first. Commit, production deployment, and any broader capability work need separate approval.
+- Finish and review UI/UX locally; confirm real connectivity in production after approved deployment. Do not build more disposable test infrastructure. Commit, deploy, and broader capability work need separate approval.
 
 ## What Was Reviewed
 
@@ -156,13 +289,16 @@ Extend existing route helpers; no routing-library migration is needed.
 
 ## Implementation Slices
 
-Slices 0-1 and local read-only Discover integration in Slice 2 are approved. Slices 3-5 still require approval. Each ends with a local review/checkpoint.
+Slices 0-2 and parts of Slice 3 have been implemented through approved checkpoints.
+Use the current UI/UX checklist above to plan the remaining work. Historical
+receipts below retain their original scope; live integration acceptance is now
+deferred to production, not additional disposable local environments.
 
 ### 0. Fresh Baseline And Capability Proof
 
 - [x] Create a clean latest-main worktree; carry only approved reference files.
 - [x] Run existing portal tests/build and record baseline failures separately.
-- [ ] Verify public transport, bounded search/detail, published collection fields, and canonical links on primary/local/subdomain routes.
+- [ ] Production check pending: verify primary/app-subdomain transport, search/detail, manifest assets and canonical links. Local/public-client checks are already recorded; no new local transport harness is required.
 - [x] Confirm exact current install handoff and catalog-membership limitations. Escalate only genuinely necessary scope changes.
 
 ### 1. Shell And Shared Visual Components
@@ -211,8 +347,9 @@ Slices 0-1 and local read-only Discover integration in Slice 2 are approved. Sli
 - [x] User confirmed the local unified experience works (2026-10-05). This
   checkpoint covers the read-only test account slice, not production activation
   or the remaining management actions.
-- [ ] Real second-account browser switching, denied/slow-network browser checks,
-  and populated real-account data beyond synthetic test installs remain unverified.
+- [ ] Production check pending: real second-account switching and populated
+  account behavior. Review denied/slow/error UI locally with existing fixtures;
+  do not provision another local account/backend for this gate.
 
 #### Local Checkpoint: Favorites And Private Sets (2026-10-06)
 
@@ -235,23 +372,69 @@ Slices 0-1 and local read-only Discover integration in Slice 2 are approved. Sli
 - [x] User confirmed the repaired Test design skill adds successfully in the
   signed-in local app on 2026-10-06. This is user-reported browser verification;
   the agent's separate browser session remained signed out.
-- [ ] Remaining browser coverage: create/rename/remove, Favorites, reload
-  persistence, mobile, failure handling, and logout/account-switch checks. Three
-  clearly labeled disposable local skill installs are seeded for this check;
-  clean them up after verification. This checkpoint is local only; no production
-  activation or deployment, and the broader authenticated migration is unfinished.
+- [ ] Remaining acceptance: real mutation persistence, Favorites and account
+  switching move to the approved production test pass. Mobile and failure-state
+  presentation remain local UI review items. Existing local fixtures need no
+  further expansion; cleanup is separate from this UI buildout.
 
-- [ ] Connect existing account sessions, My skills, Favorites, Sets, filters, and bulk operations.
-- [ ] Preserve all existing set edits, ordering, access, Hide/Restore, and mixed-item behaviors.
-- [ ] Move profile/devices/private-source controls into reachable account destinations.
-- [ ] Cross-link discovered and installed skills only with explicit identity. Implement only proven catalog membership actions.
+- [ ] Complete management parity: existing basic sessions/My Skills/Favorites/Sets
+  and filters are connected locally; review missing bulk operations and production wiring.
+- [ ] Review and complete remaining set edits, ordering, Hide/Restore and mixed-item
+  behavior. Access UI exists; its save error remains open for production verification.
+- [ ] Restore all supported profile/device/private-source controls in reachable account destinations.
+- [ ] Resolve Discover membership UX using explicit identity and existing contracts;
+  document unsupported actions instead of inferring membership or making duplicates.
 
-### 4. End-To-End Hardening
+#### Set Detail And Invite Fidelity (2026-10-06, Local Only)
 
-- [ ] Test auth transitions, stale responses, account switching, deep links, mobile sheets, keyboard access, and loading/error states.
-- [ ] Verify existing pairing, review, public pages, and protected routes remain unchanged.
-- [ ] Compare request counts, transfer sizes, built bundle size, and cold/warm navigation to the baseline. Investigate regressions before rollout.
-- [ ] Present a working local URL and explicit list of any remaining unsupported prototype controls.
+- [x] Restored the handoff's skill-avatar header, count, anchored three-option
+  visibility menu, and grey access bar with a separate green Invite button.
+- [x] Moved email entry/removal into a dedicated compact invite dialog. Visibility
+  saves reuse the existing controller; making a set public requires confirmation.
+- [x] Only-me/public sets require an explicit switch to Invite only before adding
+  email access. Saved inactive emails are not shown as active members.
+- [x] Real names/email initials replace unavailable member photos. Counts say
+  "emails with access", not confirmed members. No invitation email is sent.
+- [x] 185 portal tests, TypeScript, production build, diff check, and isolated
+  handler/SQL permission checks pass. SQL fixture changes were rolled back.
+- [x] Browser checks: desktop 1280px and mobile 390px, anchored menu, cancel public
+  confirmation, separate invite dialog, invalid-email validation, and cancel removal.
+  No horizontal overflow. Existing set permissions were not changed during this pass.
+- Keep updated remains omitted: no working set-subscription control exists in this
+  client. Second-account browser sign-in and a fresh UI grant/revoke cycle remain
+  untested in this pass (handler/SQL grant/revoke checks passed).
+- Local only. No commit, push, deployment, data-model or backend-handler changes.
+
+#### Discover And Set Access Pass (2026-10-06, Local Only)
+
+- [x] Concurrent metadata/feed requests, bounded ten-minute public view snapshots,
+  cached navigation while refreshing, and retry without discarding good results.
+  Cache remains in memory and resets on full reload. Sample local first-load
+  timing improved from 1,478ms to 591ms; immediate cached repeat was 0ms.
+- [x] Owner-only visibility and email-access UI using existing handlers/controller.
+  Public access has explicit confirmation; email grants are read-only and send no
+  invitation email. Favorites stays public. Shared sets remain editable by their
+  owner; hidden/non-owned sets, profile, devices, bulk and deletion stay blocked.
+- [x] 183 portal tests, TypeScript/production build, production bundle exclusion,
+  unsigned HTTP rejection, and real-handler/isolated SQL checks for granted,
+  revoked, private/public and non-owner access.
+- [x] Signed-in browser: new disposable set, all three visibility modes,
+  add/remove synthetic email, reload persistence, desktop/390px dialog, and
+  Discover return navigation. Disposable set removed; existing user sets kept.
+- [ ] Deferred to production: second-account sign-in and broader account-switch/error journeys.
+  Non-owner authorization was checked with real handlers/SQL, not a second login.
+  No data model, production entry or backend handler changes. Not committed or deployed.
+
+### 4. UI Review And Code Readiness
+
+- [ ] Complete the screen-by-screen UI/UX checklist and fix agreed implementation gaps.
+- [ ] Check mobile sheets, keyboard/focus, deep links and loading/error states locally.
+  Retain automated tests for auth transitions, stale responses and account isolation.
+- [ ] Check pairing/review routes, public pages and permission guards in source/tests.
+- [ ] Check bundle size and request strategy locally. Confirm real transfer sizes,
+  cold/warm timings and host behavior in production rather than chasing local connectivity.
+- [ ] Present local UI for approval, plus explicit missing/omitted capabilities and
+  production checks. No placeholder control may masquerade as a working action.
 
 ### 5. Approved Release
 
@@ -259,6 +442,11 @@ Slices 0-1 and local read-only Discover integration in Slice 2 are approved. Sli
 - [ ] Follow current deployment documentation and guarded current-main workflow; build the combined `dist/netlify-site` artifact, never deploy only `site` or `portal/dist`.
 - [ ] Verify draft before production, preserving public pages, downloads, appcast, manifests, release assets, and feature gates.
 - [ ] After separate production approval, verify both app hosts, public library, auth/account workflows, and catalog requests. Retain prior deployment for rollback.
+- [ ] On an agreed production test set/account, verify visibility, email grant and
+  revoke, reload persistence and recipient access. Diagnose the reported save error
+  if it persists; do not declare invites complete from unit tests or visuals alone.
+- [ ] Verify production Favorites/set edits, bulk actions, account destinations,
+  external connections and legacy app routes within their approved test scope.
 
 ## Verification
 
@@ -287,17 +475,24 @@ New focused coverage:
 
 Browser checks at 390, 759, 760, 1179, 1180, and 1440px, plus narrow 320px overflow testing. Cover sidebar/rail, panel/sheet transition, open menus, long content, and keyboard focus. Confirm primary lists do not reload or jump unexpectedly when detail opens.
 
-Real write tests use an approved isolated account/backend and disposable private sets. Preview success is not proof of integration. Production mutation checks need specific approval; do not test destructive actions on the user's real skills.
+Use the existing local preview for UI states and normal code tests for logic.
+Do not create or expand disposable local servers/databases to prove connectivity.
+Real connection and write acceptance now runs after approved production deployment,
+with a named test account/set and agreed recipients/actions. Preview success is not
+proof of integration. Never test destructive actions on the user's real skills.
 
 ## Main Risks And Decisions Still Needed
 
 1. **Prototype capabilities exceed current APIs.** Keep the UI truthful; adding remote installs/updates is separate work.
-2. **Catalog membership identity is incomplete in read responses.** Keep current installed Favorites working; confirm whether Discover mutations can be safe without changing contracts before exposing them.
-3. **Public transport on the app subdomain is unproven.** Resolve at Slice 0 before choosing a browser adapter for all hosts.
+2. **Catalog membership identity is incomplete in read responses.** Installed Favorites remain supported. Catalog saves are guarded when existing catalog IDs are missing; complete repeat-safe membership requires an approved read-contract update. First-time catalog-only Favorites also needs a separate API decision.
+3. **Public transport on the app subdomain is unproven live.** The client/proxy exists; confirm host routing in the production acceptance pass without blocking UI work on new local infrastructure.
 4. **Bounded APIs are not a complete catalog export.** Use existing curated discovery and honest search limits, not fake pagination or counts.
 5. **Public versus private visibility can be confused in the new layout.** Preserve permissions and clear visibility indicators, especially public Favorites.
 
-Recommended next step after this approved checkpoint: plan real-account integration (Slice 3) for separate approval. Verify subdomain routing on an approved deployment before marking Slice 0 complete. No push or deployment is approved.
+Next step: user visual review of this focused implementation, then decide whether
+to close the two documented catalog/Favorites backend limits before release.
+Production deployment and real connectivity checks require separate approval.
+No push or deployment is approved by this doc update.
 
 ## Local Preview Receipt - 2026-10-05
 

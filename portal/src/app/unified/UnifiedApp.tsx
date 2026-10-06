@@ -9,6 +9,9 @@ import {
 import { Dialog, DropdownMenu } from "radix-ui";
 import {
   ArrowLeft,
+  ArrowUp,
+  ArrowDown,
+  EyeOff,
   ArrowUpRight,
   Atom,
   BookOpen,
@@ -52,7 +55,6 @@ import {
   Shapes,
   ShieldCheck,
   Smartphone,
-  Sparkles,
   PanelsTopLeft,
   Star,
   Sun,
@@ -79,7 +81,9 @@ import {
   matchesSearch,
   skillDisplays,
   setSkillDisplays,
+  setAccessSummary,
   starCount,
+  agentKind,
   type CatalogDisplay,
   type Navigation,
   type SkillDisplay,
@@ -107,6 +111,7 @@ type Props = {
   readOnlyAccount?: boolean;
   onSignIn?: () => void;
   management?: UnifiedManagement;
+  accountPages?: (view: View, theme: string) => ReactNode;
 };
 
 function IconButton({
@@ -200,6 +205,63 @@ function MenuItem({
     </DropdownMenu.Item>
   );
 }
+
+function ManagedSetHeader({ set, skills, management, theme }: {
+  set: PortalSet; skills: SkillDisplay[]; management: UnifiedManagement; theme: string;
+}) {
+  const editable = set.role === "owner" && !set.hidden && !set.isFavorites;
+  const disabled = management.busy || management.blocked;
+  const access = setAccessSummary(set);
+  const VisibilityIcon = set.visibility === "public" ? Globe : set.visibility === "restricted" ? Lock : User;
+  const count = set.itemCount ?? set.items.length;
+  const descriptions = {
+    public: "Anyone with the link can view this set.",
+    restricted: "Only you and people granted email access.",
+    private: "Just you, on your account.",
+  };
+  return <>
+    <div className="ua-page-heading ua-set-heading">
+      <div className="ua-set-identity">
+        <div className="ua-set-hero" aria-hidden="true">
+          {skills.length ? skills.slice(0, 3).map(skill => <Avatar key={skill.key} name={skill.name} src={skill.avatar} size="large" />)
+            : <span className="ua-avatar ua-avatar-large"><Folder /></span>}
+        </div>
+        <div><h1>{set.name}</h1><p>{count} {count === 1 ? "skill" : "skills"} &middot; {access.label}</p></div>
+      </div>
+      {editable ? <Menu theme={theme} label="Set visibility" trigger={
+        <button type="button" className="ua-pill" disabled={disabled} aria-label={`Set visibility: ${visibilityLabels[set.visibility]}`}>
+          <VisibilityIcon />{visibilityLabels[set.visibility]}<ChevronDown />
+        </button>
+      }>
+        {(["public", "restricted", "private"] as const).map(value => <MenuItem key={value} disabled={disabled}
+          onSelect={() => management.visibility(set, value)}>
+          <span className="ua-visibility-check">{set.visibility === value && <Check />}</span>
+          <span className="ua-visibility-option"><strong>{visibilityLabels[value]}</strong><span>{descriptions[value]}</span></span>
+        </MenuItem>)}
+      </Menu> : <span className="ua-muted">{visibilityLabels[set.visibility]}</span>}
+    </div>
+    {!set.isFavorites && <div className="ua-set-access-bar">
+      <div className="ua-set-people" aria-label={`Set access: ${access.label}`}>
+        {access.people.slice(0, 5).map((person, index) => <span key={`${index}:${person}`} className="ua-member-initial" title={index === 0 ? `${person} (owner)` : person}>
+          {person.slice(0, 2).toUpperCase()}
+        </span>)}
+        {access.people.length > 5 && <span className="ua-member-initial">+{access.people.length - 5}</span>}
+      </div>
+      {editable && <button type="button" className="ua-pill ua-invite" disabled={disabled} onClick={() => management.access(set)}>Invite</button>}
+    </div>}
+    <div className="ua-set-actions">
+      <button className="ua-pill" type="button" onClick={() => management.copyLink(set)}><Copy />Copy link</button>
+      {set.hidden && <span className="ua-muted">Hidden from other people</span>}
+      {editable && <>
+        <IconButton label="Rename set" disabled={disabled} onClick={() => management.rename(set)}><Pencil /></IconButton>
+        <button className="ua-pill" type="button" disabled={disabled} onClick={() => management.add([], set)}><Plus />Add skill</button>
+      </>}
+      {set.role === "owner" && !set.isFavorites && <Menu theme={theme} label="Set options" trigger={<IconButton label="Set options" disabled={disabled}><MoreHorizontal /></IconButton>}>
+        <MenuItem icon={EyeOff} disabled={disabled} onSelect={() => management.moderate(set)}>{set.hidden ? "Restore set" : "Hide set"}</MenuItem>
+      </Menu>}
+    </div>
+  </>;
+}
 export function Modal({
   title,
   close,
@@ -272,10 +334,8 @@ function AgentTiles({
           title={skill.installed?.sources.includes(source) ? source : undefined}
         >
           {skill.installed?.sources.includes(source) ? (
-            source === "Claude" ? (
-              <Sparkles />
-            ) : source === "Codex" ? (
-              <Bot />
+            agentKind(source) !== "other" ? (
+              <span className="ua-agent-logo" data-agent={agentKind(source)} aria-hidden="true" />
             ) : (
               source.slice(0, 1)
             )
@@ -330,6 +390,7 @@ export function UnifiedApp({
   readOnlyAccount = false,
   onSignIn,
   management,
+  accountPages,
 }: Props) {
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
@@ -341,6 +402,7 @@ export function UnifiedApp({
   const [actionSkills, setActionSkills] = useState<SkillDisplay[]>([]);
   const [setName, setSetName] = useState("");
   const [notice, setNotice] = useState("");
+  const [showHidden, setShowHidden] = useState(false);
   const [wide, setWide] = useState(
     () => window.matchMedia("(min-width: 1180px)").matches,
   );
@@ -353,7 +415,7 @@ export function UnifiedApp({
   );
   const mine = signedIn ? models.mine : [];
   const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, mine) : [];
-  const library = signedIn && !publicStatus
+  const library = signedIn
     ? models.library
     : models.library.map((skill) => ({ ...skill, installed: undefined }));
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
@@ -376,12 +438,12 @@ export function UnifiedApp({
   const discovery = !signedIn || isDiscovery(nav.view);
   const favorites = mine.filter((skill) => isFavorite(data, skill));
   const sets = signedIn
-    ? data.sets.filter((set) => !set.hidden && !set.isFavorites)
+    ? data.sets.filter((set) => (!set.hidden || (showHidden && nav.view === "sets")) && !set.isFavorites)
     : [];
   const editableView =
-    signedIn && !readOnlyAccount &&
+    signedIn && (!readOnlyAccount || !!management) &&
     ["all", "favorites", "set"].includes(nav.view) &&
-    (!activeSet || activeSet.role === "owner");
+    (!activeSet || (activeSet.role === "owner" && !activeSet.hidden));
   const matchingMine = mine.filter((skill) => matchesSearch(skill, nav.query) && (nav.source === "all" || skill.installed?.sources.includes(nav.source)));
   const remoteRows = catalog.resultIds?.flatMap((id) => library.find((skill) => skill.catalogId === id) || []) || [];
   const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
@@ -390,7 +452,7 @@ export function UnifiedApp({
   const setPage = !!management && ["set", "favorites"].includes(nav.view);
   const listState = publicList ? publicStatus.list : setPage && state === "ready" ? management.detail.state : state;
   const canManage = !!management && !management.blocked && !management.busy;
-  const editableSet = activeSet?.role === "owner" && !activeSet.hidden && activeSet.visibility === "private" && !activeSet.isFavorites;
+  const editableSet = activeSet?.role === "owner" && !activeSet.hidden && !activeSet.isFavorites;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
 
   useEffect(() => {
@@ -522,8 +584,8 @@ export function UnifiedApp({
       <MenuItem icon={Bot} onSelect={() => go("agents")}>
         Agents <small>{sources.length} observed</small>
       </MenuItem>
-      {!readOnlyAccount && <><MenuItem icon={Monitor} onSelect={() => go("devices")}>
-        Devices <small>{data.devices.length}</small>
+      {(!readOnlyAccount || accountPages) && <><MenuItem icon={Monitor} onSelect={() => go("devices")}>
+        Devices {!readOnlyAccount && <small>{data.devices.length}</small>}
       </MenuItem>
       <MenuItem icon={Code} onSelect={() => go("github")}>
         GitHub sources
@@ -646,6 +708,10 @@ export function UnifiedApp({
               {management && skill.setItemId && activeSet && (editableSet || (activeSet.isFavorites && activeSet.role === "owner")) && <MenuItem icon={X} disabled={!canManage} onSelect={() => management.remove(activeSet, skill)}>
                 Remove from set
               </MenuItem>}
+              {management && skill.setItemId && activeSet && editableSet && <>
+                <MenuItem icon={ArrowUp} disabled={!canManage || activeSet.items[0]?.id === skill.setItemId} onSelect={() => management.reorder(activeSet, skill.setItemId!, -1)}>Move up</MenuItem>
+                <MenuItem icon={ArrowDown} disabled={!canManage || activeSet.items.at(-1)?.id === skill.setItemId} onSelect={() => management.reorder(activeSet, skill.setItemId!, 1)}>Move down</MenuItem>
+              </>}
               <MenuItem
                 icon={Copy}
                 onSelect={() => void copySource(skill)}
@@ -996,7 +1062,8 @@ export function UnifiedApp({
                     Discover
                   </button>
                 )}
-              <div className="ua-page-heading">
+              {management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
+                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} /> : <div className="ua-page-heading">
                 <div>
                   <h1>{title}</h1>
                   {meta && <p>{meta}</p>}
@@ -1012,13 +1079,6 @@ export function UnifiedApp({
                     New set
                   </button>
                 )}
-                {management && nav.view === "set" && activeSet && management.detail.state === "ready" && <div className="ua-toolbar">
-                  <span className="ua-muted">{visibilityLabels[activeSet.visibility]}</span>
-                  {editableSet && <>
-                    <IconButton label="Rename set" disabled={!canManage} onClick={() => management.rename(activeSet)}><Pencil /></IconButton>
-                    <button className="ua-pill" type="button" disabled={!canManage} onClick={() => management.add([], activeSet)}><Plus />Add skill</button>
-                  </>}
-                </div>}
                 {!readOnlyAccount && nav.view === "set" && activeSet && (
                   <Menu
                     theme={theme}
@@ -1054,9 +1114,13 @@ export function UnifiedApp({
                     )}
                   </Menu>
                 )}
-              </div>
+              </div>}
               {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
               {publicList && publicStatus.note && listState === "ready" && <p className="ua-muted" role="status">{publicStatus.note}</p>}
+              {publicList && publicStatus.error && listState === "ready" && <div className="ua-toolbar" role="status">
+                <span className="ua-muted">Could not refresh. Showing saved results.</span>
+                <button type="button" className="ua-pill" onClick={publicStatus.retry}>Retry</button>
+              </div>}
               {listState === "loading" ? (
                 <div
                   className="ua-skeletons"
@@ -1124,6 +1188,7 @@ export function UnifiedApp({
                 <CreatorList />
               ) : nav.view === "sets" ? (
                 <div className="ua-set-list">
+                  <label className="ua-hidden-filter"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)} />Show hidden sets</label>
                   {sets.map((set) => (
                     <button
                       type="button"
@@ -1138,6 +1203,7 @@ export function UnifiedApp({
                         <small>
                           {set.itemCount ?? set.items.length} skills ·{" "}
                           {visibilityLabels[set.visibility]}
+                          {set.hidden ? " · Hidden" : ""}
                           {set.role !== "owner"
                             ? ` · Shared by ${set.ownerName}`
                             : ""}
@@ -1155,7 +1221,7 @@ export function UnifiedApp({
               ) : ["agents", "devices", "profile", "github", "mcp"].includes(
                   nav.view,
                 ) ? (
-                <div className="ua-account-page">
+                accountPages?.(nav.view, theme) ?? <div className="ua-account-page">
                   {nav.view === "agents" && (
                     <>
                       {sources.map((source) => (
@@ -1272,21 +1338,23 @@ export function UnifiedApp({
                         className="ua-link"
                         onClick={() =>
                           setPicked(
-                            picked.length === visible.length
+                            visible.filter(s => s.installed).every(s => picked.includes(s.key))
                               ? []
-                              : visible.map((s) => s.key),
+                              : visible.filter(s => s.installed).map((s) => s.key),
                           )
                         }
                       >
-                        {picked.length === visible.length && picked.length
+                        {visible.filter(s => s.installed).every(s => picked.includes(s.key)) && picked.length
                           ? "Deselect all"
                           : "Select all"}
                       </button>
                       <span>{picked.length} selected</span>
+                      <button type="button" className="ua-pill" disabled={!picked.length || (!!management && !canManage)}
+                        onClick={() => newSet(visible.filter(skill => picked.includes(skill.key)))}><Plus />New set</button>
                       <button
                         type="button"
                         className="ua-pill"
-                        disabled={!picked.length}
+                        disabled={!picked.length || (!!management && !canManage)}
                         onClick={() =>
                           addToSet(
                             visible.filter((s) => picked.includes(s.key)),
@@ -1333,6 +1401,7 @@ export function UnifiedApp({
               {(
                 [
                   ["all", "My skills", User],
+                  ["favorites", "Favorites", Heart],
                   ["discover", "Discover", TrendingUp],
                   ["sets", "Sets", Shapes],
                 ] as const
@@ -1343,10 +1412,10 @@ export function UnifiedApp({
                   aria-current={
                     (
                       view === "all"
-                        ? !discovery && !["sets", "set"].includes(nav.view)
+                        ? !discovery && !["sets", "set", "favorites"].includes(nav.view)
                         : view === "sets"
                           ? ["sets", "set"].includes(nav.view)
-                          : discovery
+                          : view === "favorites" ? nav.view === "favorites" : discovery
                     )
                       ? "page"
                       : undefined
@@ -1439,7 +1508,7 @@ export function UnifiedApp({
                       Local skill
                     </span>
                   )}
-                  {(!readOnlyAccount || management) && signedIn && selected.installed && (
+                  {(!readOnlyAccount || management) && signedIn && (selected.installed || (management && selected.catalogId)) && (
                     <>
                       <IconButton
                         label={

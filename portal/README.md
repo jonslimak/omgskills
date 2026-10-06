@@ -59,6 +59,29 @@ side-by-side detail header are scoped to the unified preview.
 The combined Netlify build adds matching public-route exceptions before the app
 subdomain fallback. Routing changes require a separately approved deployment.
 
+### Unified app checkpoint
+
+The active local integration preview is `http://127.0.0.1:5191/app/integration/unified/`.
+See `../appwork.md` for the current acceptance checklist and backend limits.
+Reuse the existing preview for UI checks. Do not provision or expand disposable
+local infrastructure; real auth, invite persistence and external connections are
+reserved for separately approved production testing.
+
+Discover starts independent reads concurrently and retains up to 20 public view
+snapshots in memory for ten minutes, showing cached results while refreshing.
+It does not persist private account data or fetch the full skills catalog.
+
+Production routing is implemented but **off by default**. A separately approved
+release can select it with `VITE_PORTAL_UNIFIED_ENABLED=1` and
+`VITE_SKILLGROUPS_WEB_ENABLED=1`, plus the existing Clerk configuration. Existing
+set deep links, pairing/review routes and public library pages are preserved.
+No environment flag is enabled by this checkpoint.
+
+Catalog-only first-time Favorites and repeat saves with missing catalog identity
+remain guarded backend limitations. No invitation email is sent; the UI provides
+a copyable link after access is granted. Local UI success is not proof of recipient
+access or production connectivity.
+
 ## Verification
 
 Build the portal and combined Netlify output:

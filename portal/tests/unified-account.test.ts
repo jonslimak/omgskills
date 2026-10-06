@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { initialNavigation, navigationSearch, setSkillDisplays, skillDisplays } from "../src/app/unified/model";
+import { initialNavigation, navigationSearch, setAccessSummary, setSkillDisplays, skillDisplays } from "../src/app/unified/model";
 import { accountNavigation, publicNavigation } from "../src/integration/unified/policy";
 import { readOnlyApi } from "../src/integration/data";
 import { createAccountSession } from "../src/integration/account-session";
@@ -17,9 +17,10 @@ test("private navigation is cleared on logout, public selection survives", () =>
   assert.deepEqual(accountNavigation(publicNav, false), publicNav);
   assert.equal(accountNavigation({ ...publicNav, selected: "synced:private" }, false).selected, "");
 });
-test("unsupported account destinations never render fake device or source controls", () => {
+test("connected account destinations retain their route but clear unrelated private IDs", () => {
   for (const view of ["devices", "github", "mcp"] as const) {
-    assert.deepEqual(accountNavigation({ ...initialNavigation, view, id: "private-id" }, true), initialNavigation);
+    assert.deepEqual(accountNavigation({ ...initialNavigation, view, id: "private-id" }, true), { ...initialNavigation, view });
+    assert.equal(accountNavigation({ ...initialNavigation, view }, false).view, "discover");
   }
 });
 test("set and Favorites routes survive sign-in, but clear private IDs on logout", () => {
@@ -64,15 +65,20 @@ test("unified authenticated entry remains inside the local integration guard and
 test("management transport rejects unrelated writes without reaching the API", async () => {
   const calls: string[] = [];
   const api = managementApi(async <T>(path: string) => { calls.push(path); return {} as T; });
-  for (const path of ["/api/portal/profile", "/api/portal/sync-token", "/api/portal/groups/test/allowed-emails", "/api/portal/groups/test/moderation"]) {
+  for (const path of ["/api/portal/profile", "/api/portal/sync-token", "/api/portal/groups/test/moderation"]) {
     await assert.rejects(api(path, { method: "POST" }));
   }
   await assert.rejects(api("/api/portal/groups/test", { method: "DELETE" }));
-  await assert.rejects(api("/api/portal/groups/test/items", { method: "PATCH" }));
+  await assert.rejects(api("/api/portal/devices/test", { method: "DELETE" }));
   assert.deepEqual(calls, []);
   await api("/api/portal/groups/test", { method: "GET" });
   await api("/api/portal/groups", { method: "POST", body: JSON.stringify({ name: "Test" }) });
   assert.equal(calls.length, 2);
+  await api("/api/portal/groups/test/allowed-emails", { method: "POST", body: JSON.stringify({ email: "test@example.test" }) });
+  await api("/api/portal/groups/test/allowed-emails", { method: "DELETE", body: JSON.stringify({ emailId: "one" }) });
+  assert.equal(calls.length, 4);
+  for (const path of ["/api/portal/groups/test/items", "/api/portal/groups/test/moderation", "/api/portal/profile"]) await api(path, { method: "PATCH" });
+  assert.equal(calls.length, 7);
 });
 
 test("set presentation preserves mixed items and order, without name-based install matching", () => {
@@ -106,4 +112,20 @@ test("cancelled set reads cannot restore old-account detail", async () => {
   finish({ group: { id: "test", name: "Old", visibility: "private" }, items: [], accessRole: "owner" });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(updated, false);
+});
+
+test("set header distinguishes email access from confirmed members", () => {
+  const set = { ...makeFixtures().sets[0], ownerName: "Owner", role: "owner" as const,
+    visibility: "restricted" as const, allowedEmails: [{ id: "one", email: "person@example.test" }] };
+  assert.deepEqual(setAccessSummary(set), { people: ["Owner", "person@example.test"], label: "1 email with access" });
+  assert.deepEqual(setAccessSummary({ ...set, allowedEmails: [] }), { people: ["Owner"], label: "0 emails with access" });
+  assert.equal(setAccessSummary({ ...set, allowedEmails: undefined }).label, "Invite only");
+});
+
+test("set header never shows inactive saved emails or owner-only access records to readers", () => {
+  const set = { ...makeFixtures().sets[0], ownerName: "Owner", role: "owner" as const,
+    allowedEmails: [{ id: "one", email: "person@example.test" }] };
+  assert.deepEqual(setAccessSummary({ ...set, visibility: "private" }), { people: ["Owner"], label: "Only you" });
+  assert.deepEqual(setAccessSummary({ ...set, visibility: "public" }), { people: ["Owner"], label: "Public access" });
+  assert.deepEqual(setAccessSummary({ ...set, visibility: "restricted", role: "invited" }), { people: ["Owner"], label: "Invite only" });
 });

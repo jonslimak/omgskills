@@ -6,6 +6,7 @@ import { saveSetData, type SetCommand } from "./set-data";
 import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, emptyMembershipResult, type MembershipCommand } from "./membership-data";
 import { groupSyncedSkills } from "../synced-skill-grouping";
 import type { MembershipResult } from "../app/model";
+import { addCatalogMembership } from "./membership-data";
 
 export type AccountSnapshot = {
   data: PortalData | null;
@@ -206,6 +207,7 @@ export function createAccountSession({ api, identity, cacheKey, storage, changed
       try {
         if (command.kind === "remove-item") await removeMembershipItem(scoped, command.id, command.itemId, signal);
         else if (command.kind === "reorder") await reorderMembership(scoped, command.id, command.itemIds, signal);
+        else if (command.kind === "catalog") result = await addCatalogMembership(scoped, current.sets, command, signal);
         else {
           const live = new Map(groupSyncedSkills(current.skills).map((skill) => [skill.id, skill]));
           const skills = [...new Set(command.skills.map((skill) => skill.id))].map((id) => {

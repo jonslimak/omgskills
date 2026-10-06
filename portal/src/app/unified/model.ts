@@ -5,6 +5,17 @@ import {
 import { isMember, type PortalData, type PortalSet } from "../model";
 
 // Presentation fields only; the stored skill and group models stay unchanged.
+export function setAccessSummary(set: PortalSet) {
+  const emails = set.visibility === "restricted" && set.role === "owner"
+    ? set.allowedEmails?.map(entry => entry.email) : undefined;
+  return {
+    people: [set.ownerName || "Owner", ...(emails ?? [])],
+    label: set.visibility === "public" ? "Public access"
+      : set.visibility === "private" ? "Only you"
+      : emails ? `${emails.length} ${emails.length === 1 ? "email" : "emails"} with access` : "Invite only",
+  };
+}
+
 export type CatalogSummary = {
   id: string;
   name: string;
@@ -165,6 +176,7 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[]): SkillDis
     const installed = item.syncedSkillId
       ? mine.find(skill => skill.installed?.allSkillIds.includes(item.syncedSkillId!)) : undefined;
     return { key: `set-item:${item.id}`, setItemId: item.id, name: item.name,
+      catalogId: item.catalogSkillId ?? undefined,
       description: item.description, githubUrl: item.githubUrl, author: "", tags: [],
       installed: installed?.installed };
   });
@@ -181,4 +193,9 @@ export function starCount(value: number | undefined) {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);
+}
+
+export function agentKind(source: string): "claude" | "codex" | "other" {
+  const name = source.trim().toLowerCase();
+  return name === "claude" || name === "claude code" ? "claude" : name === "codex" ? "codex" : "other";
 }

@@ -19,6 +19,7 @@ export type SkillGroup = {
 export type SkillGroupItem = {
   id: string;
   syncedSkillId?: string | null;
+  catalogSkillId?: string | null;
   kind: string;
   name: string;
   description: string;

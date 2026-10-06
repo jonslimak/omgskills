@@ -35,6 +35,12 @@ if (
 } else if (isReviewRoute(location.pathname)) {
   void import("./review/main");
 } else if (
+  !import.meta.env.DEV &&
+  import.meta.env.VITE_PORTAL_UNIFIED_ENABLED === "1" &&
+  portalSurface(location.pathname, isFeatureEnabled(import.meta.env.VITE_SKILLGROUPS_WEB_ENABLED)) === "dashboard"
+) {
+  void import("./unified-main");
+} else if (
   import.meta.env.VITE_PORTAL_REDESIGN_ENABLED === "1" &&
   portalSurface(location.pathname, isFeatureEnabled(import.meta.env.VITE_SKILLGROUPS_WEB_ENABLED)) === "dashboard"
 ) {

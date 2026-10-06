@@ -1,8 +1,23 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { allowedRequest, allowedManagementBody, backendOrigin, frontendOrigin, clerkFrontend, connectionString, socket, database, cleanEnvironment, verifyClerk } from "../testing/local-environment.mjs";
+import { allowedRequest, allowedManagementBody, allowedSetMutation, backendOrigin, frontendOrigin, clerkFrontend, connectionString, socket, database, cleanEnvironment, verifyClerk } from "../testing/local-environment.mjs";
 
 const host = new URL(backendOrigin).host;
+test("local access writes require ownership, active sets and appropriate visibility", () => {
+  const set = { visibility: "restricted", isFavorites: false, disabledAt: null };
+  for (const role of ["invited", "public"]) {
+    for (const route of ["detail", "items", "emails"]) assert.equal(allowedSetMutation(set, role, route, "POST"), false);
+  }
+  assert.equal(allowedSetMutation(set, "owner", "emails", "POST"), true);
+  for (const visibility of ["private", "public"]) {
+    assert.equal(allowedSetMutation({ ...set, visibility }, "owner", "emails", "POST"), false);
+    assert.equal(allowedSetMutation({ ...set, visibility }, "owner", "emails", "DELETE"), true);
+    assert.equal(allowedSetMutation({ ...set, visibility }, "owner", "detail", "PATCH"), true);
+  }
+  assert.equal(allowedSetMutation({ ...set, disabledAt: "today" }, "owner", "detail", "PATCH"), false);
+  assert.equal(allowedSetMutation({ ...set, isFavorites: true }, "owner", "emails", "POST"), false);
+  assert.equal(allowedSetMutation({ ...set, isFavorites: true }, "owner", "detail", "PATCH"), false);
+});
 test("local environment uses only its named Unix-socket database", () => {
   const url = new URL(connectionString());
   assert.equal(url.hostname, "");
@@ -23,12 +38,12 @@ test("Clerk must be a development instance, not production or an arbitrary URL",
   for (const key of ["pk_live_anything", "", encode("evil.test$"), encode("foo.clerk.accounts.dev.evil.test$"), encode("foo.clerk.accounts.dev/path$")]) assert.throws(() => clerkFrontend(key));
 });
 
-test("local management must opt in; sharing, bulk and other writes stay blocked", () => {
+test("local management must opt in; access is narrow and bulk and unrelated writes stay blocked", () => {
   const headers = { host, origin: frontendOrigin, "content-type": "application/json", "content-length": "32" };
   const groups = "/api/portal/groups";
   assert.equal(allowedRequest(groups, "POST", headers), false);
   assert.equal(allowedRequest(groups, "POST", headers, true), true);
-  for (const [path, method] of [["/api/portal/profile", "PATCH"], [`${groups}/one`, "DELETE"], [`${groups}/one/items`, "PATCH"], [`${groups}/one/allowed-emails`, "POST"]]) {
+  for (const [path, method] of [["/api/portal/profile", "PATCH"], [`${groups}/one`, "DELETE"], [`${groups}/one/items`, "PATCH"]]) {
     assert.equal(allowedRequest(path, method, headers, true), false);
   }
   assert.equal(allowedRequest(groups, "POST", { ...headers, origin: "https://omgskills.com" }, true), false);
@@ -38,7 +53,18 @@ test("local management must opt in; sharing, bulk and other writes stay blocked"
   assert.equal(allowedManagementBody(groups, "POST", { name: "Favorites", visibility: "public", isFavorites: true, syncedSkillIds: ["one"] }), true);
   assert.equal(allowedManagementBody(groups, "POST", { name: "Test", syncedSkillIds: ["one", "two"] }), false);
   assert.equal(allowedManagementBody(`${groups}/one`, "PATCH", { name: "Renamed" }), true);
-  assert.equal(allowedManagementBody(`${groups}/one`, "PATCH", { name: "Renamed", visibility: "public" }), false);
+  assert.equal(allowedManagementBody(`${groups}/one`, "PATCH", { name: "Renamed", visibility: "public" }), true);
+  assert.equal(allowedManagementBody(`${groups}/one`, "PATCH", { visibility: "restricted" }), true);
+  for (const body of [{}, { visibility: "unknown" }, { visibility: "public", owner: "other" }]) {
+    assert.equal(allowedManagementBody(`${groups}/one`, "PATCH", body), false);
+  }
+  const access = `${groups}/one/allowed-emails`;
+  assert.equal(allowedRequest(access, "POST", headers), false);
+  assert.equal(allowedRequest(access, "POST", headers, true), true);
+  assert.equal(allowedManagementBody(access, "POST", { email: "test@example.test" }), true);
+  assert.equal(allowedManagementBody(access, "POST", { email: "invalid" }), false);
+  assert.equal(allowedManagementBody(access, "POST", { email: "test@example.test", role: "owner" }), false);
+  assert.equal(allowedManagementBody(access, "DELETE", { emailId: "one" }), true);
   assert.equal(allowedManagementBody(`${groups}/one/items`, "POST", { kind: "synced", syncedSkillId: "one" }), true);
   assert.equal(allowedManagementBody(`${groups}/one/items`, "POST", { kind: "catalog", catalogSkillId: "one" }), false);
   assert.equal(allowedManagementBody(`${groups}/one/items`, "DELETE", { itemId: "one" }), true);

@@ -7,7 +7,7 @@ export function accountNavigation(nav: Navigation, signedIn: boolean): Navigatio
     return { ...nav, source: "all", selected: nav.selected.startsWith("catalog:") ? nav.selected : "" };
   }
   if (!signedIn) return { ...initialNavigation, view: "discover" };
-  if (!["all", "favorites", "sets", "set", "agents", "profile"].includes(nav.view)) return { ...initialNavigation };
+  if (!["all", "favorites", "sets", "set", "agents", "profile", "devices", "github", "mcp"].includes(nav.view)) return { ...initialNavigation };
   if (nav.view === "set" && !/^[a-zA-Z0-9_-]+$/.test(nav.id)) return { ...initialNavigation, view: "sets" };
   const list = ["all", "favorites", "set"].includes(nav.view);
   return { ...nav, id: nav.view === "set" ? nav.id : "",

@@ -23,12 +23,13 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
   useEffect(() => {
     if (!active) return;
     const controller = new AbortController();
-    setView((previous) => ({ ...previous, scope, state: "loading", error: "", note: "" }));
+    const cached = client.cachedView(request);
+    setView({ scope, catalog: cached?.catalog ?? emptyCatalog(), state: cached ? "ready" : "loading", error: "", note: cached?.note ?? "" });
     const timer = setTimeout(() => {
       loadPublicView(client, request, controller.signal).then(({ catalog, note }) => {
         if (!controller.signal.aborted) setView({ scope, catalog, note, state: "ready", error: "" });
       }).catch((error) => {
-        if (!controller.signal.aborted) setView((previous) => ({ ...previous, scope, state: "error", error: message(error) }));
+        if (!controller.signal.aborted) setView(previous => ({ ...previous, scope, state: cached ? "ready" : "error", error: message(error) }));
       });
     }, request.query.trim() ? 250 : 0);
     return () => { clearTimeout(timer); controller.abort(); };
@@ -51,10 +52,12 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
   }, [client, selectedId, detailRevision]);
 
   const currentDetail = detail.key === selectedId ? detail : null;
-  const catalog = { ...view.catalog, skills: [...view.catalog.skills.filter((skill) => skill.id !== currentDetail?.skill?.id), ...(currentDetail?.skill ? [currentDetail.skill] : [])] };
+  const cached = active ? client.cachedView(request) : undefined;
+  const current = view.scope === scope ? view : cached ? { ...cached, state: "ready" as const, error: "" } : { catalog: emptyCatalog(), state: "loading" as const, error: "", note: "" };
+  const catalog = { ...current.catalog, skills: [...current.catalog.skills.filter((skill) => skill.id !== currentDetail?.skill?.id), ...(currentDetail?.skill ? [currentDetail.skill] : [])] };
   const status: PublicStatus = {
-    list: active ? (view.scope === scope ? view.state : "loading") : "ready",
-    error: view.scope === scope ? view.error : "", note: view.scope === scope ? view.note : "",
+    list: active ? current.state : "ready",
+    error: current.error, note: current.note,
     detail: currentDetail?.state ?? "loading", detailError: currentDetail?.error,
     retry: () => setRevision((value) => value + 1),
     retryDetail: () => setDetailRevision((value) => value + 1),

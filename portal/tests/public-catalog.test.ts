@@ -10,6 +10,31 @@ const collections = { collections: [
   { id: "author-author", type: "author", authorHandle: "author", title: "The Author", subtitle: "Published skills", featuredSkillIds: ["author/repo:pdf"] },
   { id: "documents", type: "topic", title: "Document tools", subtitle: "Read and write", skillIds: ["author/repo:pdf", "author/repo:missing"] },
 ] };
+
+test("Discover starts trending before metadata finishes and retains bounded view snapshots", async () => {
+  let finish!: () => void;
+  let started = false;
+  let now = 0;
+  const client = new PublicCatalogClient(async (path, init) => {
+    if (path.endsWith("manifest.json")) {
+      await new Promise<void>(resolve => { finish = resolve; });
+      return json({ collections: { path: "collections-123abc.json" } });
+    }
+    if (path.includes("collections-")) return json(collections);
+    started = true;
+    return reply(init, { skills: [skill()] });
+  }, 15_000, () => now);
+  const nav = { ...initialNavigation, view: "discover" as const };
+  const pending = loadPublicView(client, nav, signal());
+  assert.equal(started, true);
+  assert.equal(client.cachedView(nav), undefined);
+  finish();
+  const result = await pending;
+  assert.deepEqual(client.cachedView(nav), result);
+  assert.equal(client.cachedView({ ...nav, query: "other" }), undefined);
+  now = 600_001;
+  assert.equal(client.cachedView(nav), undefined);
+});
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { "content-type": "application/json" } });
 type Request = { id: number; params: { name: string; arguments: Record<string, unknown> } };
 function reply(init: RequestInit | undefined, result: unknown) {
@@ -257,4 +282,35 @@ test("Discover reads metadata and nine trending skills, without collection detai
   assert.deepEqual(result.catalog.trendingIds, ["author/repo:pdf"]);
   assert.equal(paths.length, 3);
   assert.ok(paths.every((path) => !path.includes("skills-large")));
+});
+
+test("refresh failure preserves the last good public view without mixing search scopes", async () => {
+  let now = 0, fail = false;
+  const client = new PublicCatalogClient(async (path, init) => {
+    if (fail) return json({}, 503);
+    if (path.endsWith("manifest.json")) return json({ collections: { path: "collections-123abc.json" } });
+    if (path.includes("collections-")) return json(collections);
+    return reply(init, { skills: [skill()] });
+  }, 15_000, () => now);
+  const nav = { ...initialNavigation, view: "discover" as const };
+  const first = await loadPublicView(client, nav, signal());
+  now = 120_001; fail = true;
+  await assert.rejects(loadPublicView(client, nav, signal()));
+  assert.deepEqual(client.cachedView(nav), first);
+  assert.equal(client.cachedView({ ...nav, query: "different" }), undefined);
+});
+
+test("view snapshots are bounded and cancelled loads cannot replace them", async () => {
+  const client = new PublicCatalogClient(async (path, init) => {
+    if (path.endsWith("manifest.json")) return json({ collections: { path: "collections-123abc.json" } });
+    if (path.includes("collections-")) return json(collections);
+    return reply(init, { skills: [skill()] });
+  });
+  const nav = { ...initialNavigation, view: "discover" as const };
+  for (let i = 0; i < 21; i++) await loadPublicView(client, { ...nav, query: String(i) }, signal());
+  assert.equal(client.cachedView({ ...nav, query: "0" }), undefined);
+  assert.ok(client.cachedView({ ...nav, query: "20" }));
+  const controller = new AbortController(); controller.abort();
+  await assert.rejects(loadPublicView(client, nav, controller.signal));
+  assert.equal(client.cachedView(nav), undefined);
 });

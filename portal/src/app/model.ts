@@ -9,6 +9,7 @@ export const visibilityLabels: Record<Visibility, string> = {
 export type SetItem = {
   id: string;
   syncedSkillId: string | null;
+  catalogSkillId?: string | null;
   name: string;
   description: string;
   githubUrl: string | null;

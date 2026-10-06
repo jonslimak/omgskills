@@ -82,6 +82,7 @@ export function managementRoute(url, method) {
   if (url === "/api/portal/groups" && method === "POST") return "groups";
   if (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+$/.test(url) && ["GET", "PATCH"].includes(method)) return "detail";
   if (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/items$/.test(url) && ["POST", "DELETE"].includes(method)) return "items";
+  if (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/allowed-emails$/.test(url) && ["POST", "DELETE"].includes(method)) return "emails";
   return null;
 }
 
@@ -98,10 +99,22 @@ export function allowedManagementBody(url, method, body) {
     return body.isFavorites === true ? body.visibility === "public" && ids.length === 1
       : body.isFavorites == null && (body.visibility ?? "private") === "private";
   }
-  if (route === "detail" && method === "PATCH") return only(["name"]) && name;
+  if (route === "detail" && method === "PATCH") return only(["name", "visibility"]) && Object.keys(body).length > 0
+    && (body.name === undefined || name)
+    && (body.visibility === undefined || ["private", "restricted", "public"].includes(body.visibility));
+  if (route === "emails" && method === "POST") return only(["email"]) && typeof body.email === "string"
+    && body.email.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email.trim());
+  if (route === "emails" && method === "DELETE") return only(["emailId"]) && id(body.emailId);
   if (route === "items" && method === "POST") return only(["kind", "syncedSkillId"]) && body.kind === "synced" && id(body.syncedSkillId);
   if (route === "items" && method === "DELETE") return only(["itemId"]) && id(body.itemId);
   return false;
+}
+
+export function allowedSetMutation(set, role, route, method) {
+  if (role !== "owner" || set.disabledAt) return false;
+  if (set.isFavorites) return route === "items";
+  if (route === "emails" && method === "POST") return set.visibility === "restricted";
+  return ["detail", "items", "emails"].includes(route);
 }
 
 export function allowedRequest(url, method, headers, writes = false) {

@@ -127,6 +127,7 @@ export async function loadSetData(api: PortalApi, groupId: string): Promise<Port
     !Array.isArray(items) || items.some((item) =>
       !item || typeof item.id !== "string" || typeof item.name !== "string" ||
       (item.syncedSkillId != null && (typeof item.syncedSkillId !== "string" || !item.syncedSkillId)) ||
+      (item.catalogSkillId != null && (typeof item.catalogSkillId !== "string" || !item.catalogSkillId)) ||
       typeof item.description !== "string" || !Number.isFinite(item.position) ||
       !["synced", "catalog", "github"].includes(item.kind) ||
       (item.githubUrl !== null && typeof item.githubUrl !== "string")) ||
@@ -140,6 +141,7 @@ export async function loadSetData(api: PortalApi, groupId: string): Promise<Port
       id: item.id,
       // Older responses omit this ID. Shared viewers never get owner mappings.
       syncedSkillId: group.accessRole === "owner" && item.kind === "synced" ? item.syncedSkillId ?? null : null,
+      catalogSkillId: item.catalogSkillId ?? null,
       name: item.name,
       description: item.description,
       githubUrl: item.githubUrl,

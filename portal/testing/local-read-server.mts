@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import {
   allowedRequest, backendOrigin, database, connectionString, clerkFrontend, verifyDatabase, verifyClerk,
-  managementRoute, allowedManagementBody,
+  managementRoute, allowedManagementBody, allowedSetMutation,
 } from "./local-environment.mjs";
 
 assert.equal(process.env.CONTEXT, "dev");
@@ -19,6 +19,7 @@ await verifyDatabase(pool);
 const writes = process.env.LOCAL_SET_WRITES === "1";
 const detailHandler = (await import("../../netlify/functions/portal-group-detail.mjs")).default;
 const itemHandler = (await import("../../netlify/functions/portal-group-items.mjs")).default;
+const emailHandler = (await import("../../netlify/functions/portal-group-allowed-emails.mjs")).default;
 const handlers = new Map([
   ["/api/portal/synced-skills", (await import("../../netlify/functions/portal-synced-skills.mjs")).default],
   ["/api/portal/groups", (await import("../../netlify/functions/portal-groups.mjs")).default],
@@ -52,22 +53,22 @@ const server = createServer(async (req, res) => {
       let value;
       try { value = JSON.parse(body); } catch { value = null; }
       if (!allowedManagementBody(req.url, req.method, value)) {
-        res.writeHead(400); res.end(JSON.stringify({ error: "Only private set creation, renaming and single-skill membership changes are enabled." })); return;
+        res.writeHead(400); res.end(JSON.stringify({ error: "Only set creation, naming, visibility, email access and single-skill membership changes are enabled." })); return;
       }
       await verifyDatabase(pool);
       if (route !== "groups") {
-        const path = req.url!.replace(/\/items$/, "");
+        const path = req.url!.replace(/\/(items|allowed-emails)$/, "");
         const access = await detailHandler(new Request(`${backendOrigin}${path}`, { headers }), {} as never);
         if (!access.ok) { res.writeHead(access.status); res.end(await access.text()); return; }
         const { group: set, accessRole } = await access.json();
         if (accessRole !== "owner") { res.writeHead(403); res.end(JSON.stringify({ error: "Only the owner can edit this set." })); return; }
-        if (set.disabledAt || (set.visibility !== "private" && !(set.isFavorites && route === "items"))) {
-          res.writeHead(409); res.end(JSON.stringify({ error: "Shared set editing is not enabled in this test." })); return;
+        if (!allowedSetMutation(set, accessRole, route, req.method)) {
+          res.writeHead(409); res.end(JSON.stringify({ error: "This set cannot be changed here. Email access requires an active Invite-only set; Favorites stays public." })); return;
         }
       }
       headers.set("content-type", "application/json");
     }
-    const handler = route === "detail" ? detailHandler : route === "items" ? itemHandler : handlers.get(req.url!);
+    const handler = route === "detail" ? detailHandler : route === "items" ? itemHandler : route === "emails" ? emailHandler : handlers.get(req.url!);
     const response = await handler!(new Request(`${backendOrigin}${req.url}`, { headers, method: req.method, body }), {} as never);
     res.writeHead(response.status);
     res.end(await response.text());

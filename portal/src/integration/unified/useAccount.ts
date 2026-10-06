@@ -36,6 +36,9 @@ export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: b
   }, [enabled, key, identity.name, identity.email, recovery]);
   return {
     snapshot,
+    saveProfile: (changes: { handle?: string; published?: boolean }) => session.current
+      ? session.current.saveProfile(changes) : Promise.reject(new Error("Sign in before saving.")),
+    invalidate: () => session.current?.invalidateAccess(),
     saveSet: (command: SetCommand) => session.current
       ? session.current.saveSet(command) : Promise.reject(new Error("Sign in before saving.")),
     saveMembership: (command: MembershipCommand) => session.current

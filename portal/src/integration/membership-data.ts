@@ -7,6 +7,7 @@ import { loadSetData } from "./data";
 
 export const emptyMembershipResult = (): MembershipResult => ({ completedIds: [], failed: [], added: 0, removed: 0, unchanged: 0, uncertain: false });
 export type MembershipCommand =
+  | { kind: "catalog"; catalogId: string; favorite: boolean; id?: string }
   | { kind: "change"; id: string; skills: GroupedSyncedSkill[]; add: boolean }
   | { kind: "favorites"; skills: GroupedSyncedSkill[]; add: boolean }
   | { kind: "create-selected"; name: string; skills: GroupedSyncedSkill[] }
@@ -25,6 +26,38 @@ async function ownedSet(api: PortalApi, id: string, signal: AbortSignal) {
   checkSignal(signal);
   if (set.role !== "owner") throw new PortalApiError("Only the owner can edit this set.", 403);
   return set;
+}
+
+// Catalog additions use the existing release-resolving endpoint, never synthetic installs.
+export async function addCatalogMembership(api: PortalApi, sets: PortalSet[], command: Extract<MembershipCommand, { kind: "catalog" }>, signal: AbortSignal): Promise<MembershipResult> {
+  if (!command.catalogId || command.catalogId.length > 500) throw new PortalApiError("Choose a catalog skill.", 400);
+  checkSignal(signal);
+  const id = command.favorite ? sets.find(set => set.isFavorites && set.role === "owner")?.id : command.id;
+  if (!id && command.favorite) throw new PortalApiError("Favorite an installed skill first to create Favorites. You can save this catalog skill to a regular set now.", 409);
+  checkSignal(signal);
+  if (!id) throw new PortalApiError("Choose a set you own.", 400);
+  let set = await ownedSet(api, id, signal);
+  if (set.hidden || (command.favorite ? !set.isFavorites : set.isFavorites)) throw new PortalApiError("This set is not available for this action.", 409);
+  const result = { ...emptyMembershipResult(), groupId: id, completedIds: [command.catalogId] };
+  if (set.items.some(item => item.catalogSkillId === command.catalogId)) return { ...result, unchanged: 1 };
+  // Older read responses omit catalog identity, so a repeated save cannot be verified.
+  if (set.items.some(item => item.kind === "catalog" && !item.catalogSkillId)) {
+    throw new PortalApiError("This set contains catalog skills whose identity is unavailable. Adding is paused to avoid duplicates.", 409);
+  }
+  try {
+    const value = await api<{ itemId: string }>(`/api/portal/groups/${id}/items`, {
+      method: "POST", body: JSON.stringify({ kind: "catalog", catalogSkillId: command.catalogId }),
+    });
+    checkSignal(signal);
+    if (typeof value?.itemId !== "string" || !value.itemId) throw new Error("Unexpected add response. Refresh before trying again.");
+    return { ...result, added: 1 };
+  } catch (error) {
+    checkSignal(signal);
+    if (!(error instanceof PortalApiError) || error.status !== 409) throw error;
+    set = await ownedSet(api, id, signal);
+    if (!set.items.some(item => item.catalogSkillId === command.catalogId)) throw error;
+    return { ...result, unchanged: 1 };
+  }
 }
 
 // Read actual item IDs once per operation. Never persist mappings across accounts or refreshes.
