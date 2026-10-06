@@ -1,7 +1,7 @@
 # Unified Web App Plan
 
-Status: UI checkpoint committed as `1140d68b` and catalog/Favorites API follow-up committed as `61ac8a92` on `codex/unified-app-preview`. The later Favorites heart/removal correction is implemented and reviewed for its approved local commit checkpoint; see below. Production acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working. The new production entry remains disabled by default; none of these changes is deployed.
-Updated: 2026-10-06. Original source baseline: `origin/main` at `61f9f13f`; recheck current main before release.
+Status: Production rollout approved, including a persistent unified-app build flag and fix-forward-only deployment failure handling. Safeguard regression tests and the full root code check pass. Production is not yet changed. Draft structural checks pass; draft app startup is blocked by Clerk's production-domain restriction. Authenticated UI/account acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working.
+Updated: 2026-10-06. Original source baseline: `61f9f13f`; merged main baseline: `d22e476d`. Recheck main before release.
 
 ## Current Working Agreement - 2026-10-06
 
@@ -27,12 +27,29 @@ approval/status statements in historical checkpoints below.
   If the mock needs a capability the backend does not provide, record the gap and
   get a scope decision instead of simulating success or silently dropping it.
 - **Release remains a separate gate.** Follow `deploy.md`, review the UI first,
-  and retain rollback. Having no users reduces rollout impact but does not remove
+  and fix forward on failure. Having no users reduces rollout impact but does not remove
   permission/data exposure risks. Production access changes and destructive tests
   need an agreed test account/set/recipient scope; do not use personal skills.
-- The later user approval covers committing the current implementation and docs
-  on this branch. It does not approve push, deploy, new email delivery, changes to
-  production access, or additional local connectivity experiments.
+- The latest user approval covers the scoped commit, main integration, and
+  production deployment with the two safeguards below. It does not approve new
+  email delivery, account access changes, or local connectivity experiments.
+
+### Production Safeguards - 2026-10-06
+
+- `config/production-features.json` now explicitly enables `portalUnifiedEnabled`.
+  The shared build reads this setting and overrides ambient build flags, so
+  scheduled builds retain the approved app. Mac auth/release gates are unchanged.
+- The shared deploy helper uploads the same prebuilt artifact for draft and
+  production. Failed verification records an incident and blocks later deploys;
+  it never restores an older whole-site snapshot. The existing incident issue
+  title remains compatible with previously opened circuit-breaker issues.
+- Verified: 23 focused feature/deploy tests and `npm run check` pass, including
+  failed-verification/no-restore coverage. No schema/migration changes.
+- Release boundary: only `/app/`, its catalog proxy routes, and the approved
+  catalog/Favorites handler fixes may change. Compare every non-app public file
+  with the live file inventory before release; preserve release binaries exactly.
+- Live acceptance still needs an agreed account/set/recipient scope before
+  testing writes or granting access. Structural checks do not confirm invitations.
 
 ### Known Invite Issue And Deferred Checks
 
@@ -203,7 +220,121 @@ committing. No merge, push or deployment is included in this checkpoint.
 
 The preceding read-only release review fetched `origin/main` at `d22e476d`:
 two generated-data updates, with no files overlapping this branch's changes.
-That was a comparison, not a merge; fetch again before an approved release.
+That comparison was followed by the approved merge recorded below; fetch again
+before an approved release.
+
+### Main Merge And Release-Readiness Receipt - 2026-10-06
+
+- [x] Fetched main and merged `d22e476d` into this branch as `7f73f8c6` without
+  conflicts. `git diff origin/main -- index site/data` is empty: newer generated
+  data is preserved exactly. The primary checkout's unrelated work was untouched.
+- [x] Full root `npm run check` passed under Node 20, including root TypeScript,
+  API/permission, routing, deployment-safety and published-data checks. The first
+  sandbox attempt could not create a tsx IPC pipe; the approved retry passed.
+- [x] All 210 portal tests and portal TypeScript passed after the merge.
+- [x] Unified opt-in Vite build passed with a dummy public Clerk key, proving
+  compilation only. Unified JS chunk: 74.88 kB / 23.09 kB gzip; shared portal API
+  chunk: 407.00 kB / 124.63 kB gzip. These are build sizes, not live load timings.
+- [x] Existing integration browser: Discover, skill detail, long description,
+  source/public links, account navigation and Escape/focus return checked after
+  the merge. No account writes or access changes were performed.
+- [x] Source/tests preserve pairing and review routing before unified dashboard
+  entry; preview/integration imports require development gates. Activation still
+  requires an explicit unified build flag and the existing web gate.
+- [ ] Complete final visual acceptance. The separate deterministic preview at
+  port 5190 is offline. No replacement server was started. Earlier responsive,
+  signed-out and error-state receipts remain historical, not a fresh full pass.
+- [x] Produce the combined release artifact (completed in the receipt below).
+  At the initial readiness check, this worktree lacked ignored
+  `site/downloads/`, `site/updates/` and `site/data/health.json`; the current shell
+  also lacks `VITE_CLERK_PUBLISHABLE_KEY`, `NETLIFY_SITE_ID` and
+  `HEALTH_BASIC_AUTH_PASSWORD`. Restore verified release inputs and use the
+  approved deployment environment before preparation/build. Do not use dummy
+  credentials, fake CI mode, or deploy portal-only output to bypass these gates.
+- [ ] Production auth, invite/access persistence, Favorites writes and both-host
+  routing remain pending under the existing production test agreement.
+
+No push, deployment, schema change or production activation was performed.
+The subsequent approval covered restoring verified release inputs and preparing
+the combined candidate below; production deployment is still separate. The broad
+UI checklist is not marked complete from passing tests.
+
+### Combined Candidate Prepared - 2026-10-06
+
+User approved restoring release inputs and preparing the local combined package.
+No commit, push, upload, deployment or live setting change was included.
+
+- Restored the validated health snapshot from GitHub Actions pipeline-health run
+  `37493572349`, using the existing age/schema checks. The older primary-checkout
+  snapshot and Mac binaries were not copied.
+- Downloaded the 11 required release assets directly from production. Confirmed
+  the tracked appcast equals the live appcast; validated the DMG SHA-256 and every
+  update ZIP/delta's appcast length and Sparkle Ed25519 signature. Rechecked live
+  appcast/checksum after restoration to detect a release changing mid-download.
+- Ran the documented order: prepare, locked `npm ci`, combined build. Preparation
+  passed with 38 nonblocking policy findings about existing stale editorial skill
+  references. No policy gate or link verification was weakened.
+- Read only the production Clerk publishable key from Netlify's builds scope;
+  passed it in memory to the build, without logging it or creating an env file.
+  No private credential or health password was added to the client output.
+- Built with `VITE_PORTAL_UNIFIED_ENABLED=1` for this local candidate only. Existing
+  checked-in web/auth feature configuration is unchanged. A future default build
+  does not automatically enable unified; release activation still needs approval.
+- Output: `/private/tmp/omgskills-unified-app-preview/dist/netlify-site/`.
+  Combined required-output guards, library verification and published-data
+  verification passed. Appcast and all release binaries were preserved
+  byte-for-byte in the combined artifact. Nine existing migration files were
+  staged locally by the normal builder; no database migration was executed.
+- A broad bundle-string probe matched dormant local-preview labels in shared UI
+  components. Source tracing confirmed production passes `local={false}` and a
+  real Clerk sign-in callback; those labels are gated. Tested fixture records
+  are absent from the bundles. This is not a signed-in production acceptance test.
+- No `.netlify/netlify.toml` cache is present. Only `appwork.md` is modified in
+  tracked source; restored assets, generated pages, builds and receipts are ignored.
+- Local receipts: `dist/release-input-receipt.json` and
+  `dist/unified-candidate-receipt.json`. Do not commit these generated files.
+
+Next: approve the remaining UX/omissions and a draft deployment of the combined
+candidate, then verify host routing and deployment packaging. Keep production
+invite/access/persistence checks under the previously agreed production test
+scope. Recheck main and release inputs before any upload; this package is a
+point-in-time candidate, not a guarantee of current-main deployment readiness.
+
+### Draft Deployment Receipt - 2026-10-06
+
+- User approved a draft upload only. Fetched main again: still `d22e476d`, fully
+  included by the reviewed branch. Deploy inputs had no uncommitted changes;
+  `appwork.md` remains the only modified tracked file.
+- Draft: https://6ac554e5bde0e9a5bbaf36c8--omgskills.netlify.app/app/
+- Netlify deploy ID: `6ac554e5bde0e9a5bbaf36c8`; source: `7f73f8c6`.
+  Uploaded `dist/netlify-site` with functions/edge configuration using
+  `netlify deploy --no-build --json`, without `--prod` or `--prod-if-unlocked`.
+- Production deploy ID before and after upload:
+  `6ac51f39b0136aa966b26694`. No production publish, Git push, feature setting,
+  authentication setting or access grant was performed.
+- Draft structural verifier passed: app shell/release config, About/Support,
+  protected health routes (401), invalid-token API rejection (401), all three
+  manifests, legacy download redirect, all release asset endpoints, AI catalog,
+  MCP health/tool discovery/read-only catalog results. The verifier's generic
+  final text says "Production deploy verified"; its target was this draft only.
+- Deployed manifests, appcast and DMG checksum match the local candidate exactly.
+  Homepage, guide, library, creator and starter collection pages returned HTML
+  200. Did not run the production-only web-library live verifier against the draft.
+- **Browser blocker:** `/app/` stays at "Loading account...". Console reports
+  Clerk production keys are only allowed on `omgskills.com`; this temporary
+  `netlify.app` origin is rejected. No security/domain settings were weakened and
+  no test-key substitution was made. This is not a successful UI or login test.
+- No account writes, invitation tests or new disposable servers were used.
+  Authentication, set/Favorites persistence, invitation access and both-host
+  runtime acceptance remain assigned to the separately approved production pass.
+- Machine receipt: `dist/unified-draft-receipt.json` (ignored). Full acceptance
+  remains false; structural verification is recorded separately.
+
+Next requires explicit approval: commit the documentation, integrate/push the
+reviewed branch through the current-main release process, preserve the unified
+build flag for the intended release, then perform the controlled production
+rollout and agreed account tests. Do not promote this draft merely because its
+static and endpoint checks passed.
 
 ## Goal
 
@@ -530,7 +661,7 @@ npm run test:mcp-production
 npm run test:deploy-safety
 ```
 
-Before approved release, run the full `npm run check` and combined build under the deployment guide's environment requirements. Local preview verification is recorded below; full release checks are not yet run.
+Before approved release, rerun the full `npm run check` and combined build under the deployment guide's environment requirements. The full code check passed after the main merge; the combined candidate build has now passed using restored verified inputs and the production public build key. Draft/live checks remain pending.
 
 New focused coverage:
 

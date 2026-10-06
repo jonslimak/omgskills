@@ -23,9 +23,12 @@ export async function loadProductionFeatures(configUrl = defaultConfigUrl) {
   if (parsed.portalRedesignEnabled !== undefined && typeof parsed.portalRedesignEnabled !== "boolean") {
     throw new Error("portalRedesignEnabled must be a boolean when present");
   }
+  if (parsed.portalUnifiedEnabled !== undefined && typeof parsed.portalUnifiedEnabled !== "boolean") {
+    throw new Error("portalUnifiedEnabled must be a boolean when present");
+  }
 
   const unknownKeys = Object.keys(parsed).filter(
-    (key) => key !== "skillGroupsWebEnabled" && key !== "skillGroupsAuthEnabled" && key !== "portalRedesignEnabled"
+    (key) => key !== "skillGroupsWebEnabled" && key !== "skillGroupsAuthEnabled" && key !== "portalRedesignEnabled" && key !== "portalUnifiedEnabled"
   );
   if (unknownKeys.length > 0) {
     throw new Error(`production-features.json contains unknown keys: ${unknownKeys.join(", ")}`);
@@ -38,6 +41,7 @@ export async function loadProductionFeatures(configUrl = defaultConfigUrl) {
     skillGroupsWebEnabled: parsed.skillGroupsWebEnabled,
     skillGroupsAuthEnabled: parsed.skillGroupsAuthEnabled,
     portalRedesignEnabled: parsed.portalRedesignEnabled === true,
+    portalUnifiedEnabled: parsed.portalUnifiedEnabled === true,
   });
 }
 
@@ -47,6 +51,7 @@ export function portalBuildEnvironment(features, baseEnvironment = process.env) 
     VITE_SKILLGROUPS_WEB_ENABLED: features.skillGroupsWebEnabled ? "1" : "0",
     VITE_SKILLGROUPS_MAC_ENABLED: features.skillGroupsAuthEnabled ? "1" : "0",
     VITE_PORTAL_REDESIGN_ENABLED: features.portalRedesignEnabled === true ? "1" : "0",
+    VITE_PORTAL_UNIFIED_ENABLED: features.portalUnifiedEnabled === true ? "1" : "0",
   };
 }
 

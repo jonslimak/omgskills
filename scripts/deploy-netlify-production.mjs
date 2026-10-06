@@ -5,6 +5,7 @@ import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Preserve the existing circuit-breaker issue title so older open incidents still block deploys.
 export const ROLLBACK_ISSUE_TITLE = "Production deploy rollback";
 const NETLIFY_API_ORIGIN = "https://api.netlify.com/api/v1";
 const GITHUB_API_ORIGIN = "https://api.github.com";
@@ -178,18 +179,6 @@ async function openOrUpdateRollbackIssue({
   );
 }
 
-async function restoreDeploy({ fetchImpl, siteId, deployId, netlifyToken }) {
-  await apiJson(
-    fetchImpl,
-    `${NETLIFY_API_ORIGIN}/sites/${encodeURIComponent(siteId)}/deploys/${encodeURIComponent(deployId)}/restore`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${netlifyToken}` },
-    },
-    "Netlify deploy restore",
-  );
-}
-
 function verificationCommands({
   origin,
   publicOrigin,
@@ -286,9 +275,7 @@ function rollbackIssueBody(receipt) {
     `- Previous deploy: \`${receipt.previousDeployId || "unknown"}\``,
     `- Verification error: ${receipt.verificationError || "unknown"}`,
     runUrl ? `- Workflow run: ${runUrl}` : null,
-    receipt.manualRestoreCommand
-      ? `- Manual restore: \`${receipt.manualRestoreCommand}\``
-      : null,
+    "No previous deployment was restored. Fix forward; do not restore an older whole-site deployment.",
     "",
     "Confirm production is healthy, fix the source problem, then close this issue to resume deploys.",
   ]
@@ -347,7 +334,6 @@ export async function deployProduction({
     status: "starting",
     previewVerificationAttempts: 0,
     verificationAttempts: 0,
-    rollbackVerificationAttempts: 0,
     productionStabilizationDelayMs: stabilizationDelayMs,
     githubRepository: env.GITHUB_REPOSITORY || null,
     githubRunId: env.GITHUB_RUN_ID || null,
@@ -388,10 +374,6 @@ export async function deployProduction({
   }
 
   receipt.previousDeployId = await currentDeployId({ fetchImpl, siteId, netlifyToken });
-  receipt.manualRestoreCommand = `npx netlify-cli api restoreSiteDeploy --data '${JSON.stringify({
-    site_id: siteId,
-    deploy_id: receipt.previousDeployId,
-  })}'`;
   receipt.status = "deploying-preview";
   await save();
 
@@ -446,6 +428,7 @@ export async function deployProduction({
       "deploy",
       "--prod",
       "--dir=dist/netlify-site",
+      "--no-build",
       "--json",
     ],
     { env },
@@ -512,35 +495,7 @@ export async function deployProduction({
     );
   }
 
-  try {
-    await restoreDeploy({
-      fetchImpl,
-      siteId,
-      deployId: receipt.previousDeployId,
-      netlifyToken,
-    });
-    receipt.status = "verifying-rollback";
-    await save();
-    await verifyWithRetries({
-      run,
-      env,
-      origin: "https://omgskills.com",
-      publicOrigin: "https://omgskills.com",
-      exactManifests: false,
-      verifyCandidateFeatures: false,
-      attempts,
-      retryDelayMs,
-      sleep,
-      onAttempt: (attempt) => {
-        receipt.rollbackVerificationAttempts = attempt;
-      },
-    });
-    receipt.status = "rolled-back";
-  } catch (error) {
-    receipt.status = "rollback-failed";
-    receipt.rollbackError = error.message;
-  }
-
+  receipt.status = "verification-failed";
   receipt.completedAt = now();
   await save();
   try {
@@ -555,9 +510,7 @@ export async function deployProduction({
     await save();
   }
   throw new Error(
-    receipt.status === "rolled-back"
-      ? `Production verification failed; restored deploy ${receipt.previousDeployId}`
-      : `Production verification failed and rollback did not verify: ${receipt.rollbackError}`,
+    "Production verification failed; no rollback attempted. Fix forward before redeploying.",
   );
 }
 

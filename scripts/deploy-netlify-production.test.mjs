@@ -24,7 +24,6 @@ function createHarness({
   originMain = "commit-1",
   previewVerificationFailures = 0,
   verificationFailures = 0,
-  rollbackVerificationFailures = 0,
   liveAfterFailure = "candidate-2",
   openIssue = null,
 } = {}) {
@@ -32,7 +31,6 @@ function createHarness({
   const receipts = [];
   let previewVerifyCalls = 0;
   let productionVerifyCalls = 0;
-  let rollbackStarted = false;
   const run = async (command, args, options = {}) => {
     const key = `${command} ${args.join(" ")}`;
     calls.push({ type: "command", key, env: options.env });
@@ -59,8 +57,7 @@ function createHarness({
         return { stdout: "", stderr: "" };
       }
       productionVerifyCalls += 1;
-      const limit = rollbackStarted ? rollbackVerificationFailures : verificationFailures;
-      if (productionVerifyCalls <= limit) {
+      if (productionVerifyCalls <= verificationFailures) {
         throw new Error(`verification failure ${productionVerifyCalls}`);
       }
     }
@@ -75,14 +72,14 @@ function createHarness({
       if (options.method === "POST" || options.method === "PATCH") {
         const body = JSON.parse(options.body);
         assert.equal(body.title, ROLLBACK_ISSUE_TITLE);
+        assert.match(body.body, /No previous deployment was restored. Fix forward/);
+        assert.doesNotMatch(body.body, /restoreSiteDeploy|Manual restore/);
         return Response.json({ number: 99, ...body });
       }
       return Response.json(openIssue ? [openIssue] : []);
     }
     if (parsed.pathname.endsWith("/restore")) {
-      rollbackStarted = true;
-      productionVerifyCalls = 0;
-      return Response.json({});
+      assert.fail("Deployment verification must never restore an older whole-site deploy");
     }
     siteLookups += 1;
     const id = siteLookups === 1 ? "previous-1" : liveAfterFailure;
@@ -129,13 +126,13 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   assert.equal(receipt.sourceCommit, "commit-1");
   assert.equal(receipt.previewVerificationAttempts, 1);
   assert.equal(receipt.verificationAttempts, 1);
-  assert.match(receipt.manualRestoreCommand, /restoreSiteDeploy/);
+  assert.equal(receipt.manualRestoreCommand, undefined);
   const deployCalls = harness.calls.filter((call) => call.key?.includes("netlify-cli deploy"));
   assert.equal(deployCalls.length, 2);
   assert.equal(deployCalls[0].key.includes("--prod"), false);
   assert.equal(deployCalls[0].key.includes("--no-build"), true);
   assert.equal(deployCalls[1].key.includes("--prod"), true);
-  assert.equal(deployCalls[1].key.includes("--no-build"), false);
+  assert.equal(deployCalls[1].key.includes("--no-build"), true);
   const previewCheck = harness.calls.find(
     (call) => call.key?.includes("verify-production-deploy.mjs")
       && call.env.PRODUCTION_ORIGIN === "https://preview-1--example.netlify.app",
@@ -194,17 +191,18 @@ test("retries transient verification failures", async () => {
   assert.equal(receipt.verificationAttempts, 3);
 });
 
-test("restores the previous deploy once and opens the circuit-breaker issue", async () => {
+test("stops without restoring the previous deploy and opens the circuit-breaker issue", async () => {
   const harness = createHarness({ verificationFailures: 3 });
   await assert.rejects(
     deployProduction({ env, ...harness }),
-    /restored deploy previous-1/,
+    /no rollback attempted. Fix forward/,
   );
   const receipt = harness.receipts.at(-1);
-  assert.equal(receipt.status, "rolled-back");
+  assert.equal(receipt.status, "verification-failed");
+  assert.equal(receipt.manualRestoreCommand, undefined);
   assert.equal(
     harness.calls.filter((call) => call.path?.endsWith("/restore")).length,
-    1,
+    0,
   );
   assert.equal(
     harness.calls.some(
@@ -217,7 +215,8 @@ test("restores the previous deploy once and opens the circuit-breaker issue", as
       && call.env.PRODUCTION_ORIGIN === "https://omgskills.com",
   );
   assert.equal(productionChecks.at(0).env.VERIFY_CANDIDATE_FEATURES, "1");
-  assert.equal(productionChecks.at(-1).env.VERIFY_CANDIDATE_FEATURES, "0");
+  assert.equal(productionChecks.length, 3);
+  assert.equal(productionChecks.at(-1).env.VERIFY_CANDIDATE_FEATURES, "1");
   assert.equal(
     harness.calls.some((call) => /database|migration|sql/i.test(call.key || call.path || "")),
     false,
