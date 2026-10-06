@@ -21,6 +21,7 @@ export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) 
     id: row.id,
     kind: row.kind,
     ...(role === "owner" ? { syncedSkillId: row.kind === "synced" ? row.syncedSkillId ?? null : null } : {}),
+    ...(role === "owner" ? { catalogSkillId: row.kind === "catalog" ? row.catalogSkillId ?? null : null } : {}),
     name: row.skillName || row.snapshotName || row.catalogSkillId || row.itemGithubUrl || "Skill",
     description: row.skillDescription || row.snapshotDescription || row.note || "",
     githubUrl: row.githubUrl || row.itemGithubUrl || null,

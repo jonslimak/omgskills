@@ -1,6 +1,6 @@
 # Unified Web App Plan
 
-Status: Local UI checkpoint on `codex/unified-app-preview`, approved for commit. Discover caching, set/invite presentation, management/account controls, mobile Favorites and the handoff's Claude/OpenAI icons are implemented. Production acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working. The new production entry remains disabled by default; this checkpoint is not deployed.
+Status: UI checkpoint committed as `1140d68b` on `codex/unified-app-preview`. The catalog/Favorites API follow-up is implemented and reviewed as a separately approved local commit checkpoint; see below. Production acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working. The new production entry remains disabled by default; neither change is deployed.
 Updated: 2026-10-06. Original source baseline: `origin/main` at `61f9f13f`; recheck current main before release.
 
 ## Current Working Agreement - 2026-10-06
@@ -106,13 +106,13 @@ local access tests. Generated builds, screenshots, credentials and environment
 files are excluded. Reconcile newer main commits before release; do not treat
 this branch checkpoint as a main merge or deployment.
 
-**Backend limit discovered:** creating Favorites requires at least one synced
+**Backend limit at the UI checkpoint (addressed by the follow-up below):** creating Favorites requires at least one synced
 skill (`portal-groups.mts`). No workaround or fake synced ID was added. Catalog
 skills can be added to an existing Favorites set; without one, the UI explains
 the requirement and blocks the unsupported save. Expanding this API needs a
 separate scope decision.
 
-**Catalog identity limit confirmed:** `portalGroupItem()` currently omits catalog
+**Catalog identity limit at the UI checkpoint (addressed by the follow-up below):** `portalGroupItem()` omits catalog
 IDs. The client accepts optional IDs but does not assume they exist. A set with
 unidentified catalog items blocks further catalog additions rather than guessing
 membership or risking duplicate rows. Completing repeat-safe catalog saves needs
@@ -135,6 +135,44 @@ Before release: complete user visual review, recheck current main, follow
 verify auth, devices/GitHub, set persistence, profile changes and recipient access
 on the approved production test scope. The broad checklist above is not marked
 fully accepted merely because the focused fixes compile.
+
+### Catalog/Favorites API Follow-up - 2026-10-06
+
+User explicitly approved the smallest backend changes after read-only inspection.
+No database tables, columns, migrations, permissions, production flags, local
+harness or servers were changed. The user subsequently approved review and commit
+on this branch only. No merge, push, deployment or live mutation is authorized.
+
+- Existing `POST /api/portal/groups` now accepts one `catalogSkillId` when creating
+  Favorites without synced skills. It reuses catalog release validation and saves
+  the public Favorites set and its first item in one transaction. Empty Favorites,
+  mixed catalog/synced creation, invalid IDs and catalog creation for ordinary sets
+  are rejected. Existing synced creation remains supported.
+- Both item-read endpoints include `catalogSkillId` for catalog items for owners
+  only, through the shared response mapper. Invited/public viewers retain existing
+  redaction. No private install IDs or new access rights are exposed.
+- Catalog insertions check exact set/catalog identity under the existing row lock
+  and return 409 for duplicates before writing item/release records. No unique
+  index/migration or cleanup of existing records was added.
+- The client can create first-time Favorites directly from Discover after the
+  existing public-visibility confirmation. A concurrent creation conflict triggers
+  a fresh owned-set/membership read; unknown outcomes are not retried. The installed
+  skill prerequisite is removed. The missing-ID guard remains for older deployed
+  responses during rollout, rather than guessing or allowing duplicates.
+- Verification: 198 portal tests, 49 focused backend tests, root/portal TypeScript,
+  default/opt-in builds and whitespace checks passed. Coverage includes validation,
+  transaction rollback control, simulated concurrent saves, identity redaction,
+  existing synced flows, stale client data, aborts and uncertain responses. SQL,
+  network and lock behavior are simulated in these tests, not a live DB acceptance
+  claim. Real creation/persistence/recipient access remain production checks.
+
+Focused pre-commit review found no blocking issue within this scope. Local test
+results do not establish production persistence or real database concurrency.
+
+Next: reconcile current main and finish the remaining UI checklist; follow
+`deploy.md` for a separately approved rollout. Verify first catalog Favorite,
+repeat/concurrent saves and existing Mac/installed Favorites in production, along
+with the already deferred invite/connectivity checks.
 
 ## Goal
 
@@ -484,13 +522,12 @@ proof of integration. Never test destructive actions on the user's real skills.
 ## Main Risks And Decisions Still Needed
 
 1. **Prototype capabilities exceed current APIs.** Keep the UI truthful; adding remote installs/updates is separate work.
-2. **Catalog membership identity is incomplete in read responses.** Installed Favorites remain supported. Catalog saves are guarded when existing catalog IDs are missing; complete repeat-safe membership requires an approved read-contract update. First-time catalog-only Favorites also needs a separate API decision.
+2. **Catalog/Favorites changes need production acceptance.** Owner-only catalog identity, locked duplicate prevention and atomic first-time catalog Favorites are implemented locally. Older responses still trigger the safe missing-ID guard until the matching backend is deployed.
 3. **Public transport on the app subdomain is unproven live.** The client/proxy exists; confirm host routing in the production acceptance pass without blocking UI work on new local infrastructure.
 4. **Bounded APIs are not a complete catalog export.** Use existing curated discovery and honest search limits, not fake pagination or counts.
 5. **Public versus private visibility can be confused in the new layout.** Preserve permissions and clear visibility indicators, especially public Favorites.
 
-Next step: user visual review of this focused implementation, then decide whether
-to close the two documented catalog/Favorites backend limits before release.
+Next step: user review of the UI and the approved catalog/Favorites follow-up.
 Production deployment and real connectivity checks require separate approval.
 No push or deployment is approved by this doc update.
 

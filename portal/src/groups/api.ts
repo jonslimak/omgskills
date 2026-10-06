@@ -43,6 +43,13 @@ export async function createFavoritesGroup(
   });
 }
 
+export async function createCatalogFavoritesGroup(api: PortalApi, catalogSkillId: string) {
+  return api<{ groupId: string }>("/api/portal/groups", {
+    method: "POST",
+    body: JSON.stringify({ name: "Favorite Skills", visibility: "public", isFavorites: true, catalogSkillId }),
+  });
+}
+
 export async function updateGroupVisibility(
   api: PortalApi,
   groupId: string,

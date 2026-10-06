@@ -31,19 +31,25 @@ test("production unified shell stays explicitly opt-in and preserves connect and
   assert.match(entry, /ClerkProvider/);
 });
 
-function catalogFixture(options: { present?: boolean; missingIdentity?: boolean; role?: string; hidden?: boolean; favorites?: boolean; badResponse?: boolean; conflict?: boolean } = {}) {
+function catalogFixture(options: { present?: boolean; missingIdentity?: boolean; role?: string; hidden?: boolean; favorites?: boolean; badResponse?: boolean; conflict?: boolean; createConflict?: boolean; noFavorites?: boolean; createFailure?: number; afterCreate?: () => void } = {}) {
   const calls: { path: string; method: string; body: any }[] = [];
   let present = options.present ?? false;
   const api: PortalApi = async <T>(path: string, init?: RequestInit) => {
     const method = init?.method ?? "GET";
     const body = init?.body ? JSON.parse(String(init.body)) : undefined;
     calls.push({ path, method, body });
+    if (path === "/api/portal/groups" && method === "GET") return { groups: options.noFavorites ? [] : [{ id: "set", isFavorites: true }] } as T;
+    if (path === "/api/portal/groups" && method === "POST") {
+      if (options.createConflict) throw new PortalApiError("Group slug is already used", 409);
+      if (options.createFailure) throw new PortalApiError("Create failed", options.createFailure);
+      present = true; options.afterCreate?.();
+      return (options.badResponse ? {} : { groupId: "set" }) as T;
+    }
     if (method === "GET") return {
       group: { id: "set", name: "Set", visibility: options.favorites ? "public" : "private", isFavorites: options.favorites, disabledAt: options.hidden ? "2026-10-06" : null },
       accessRole: options.role ?? "owner",
       items: present ? [{ id: "item", ...(options.missingIdentity ? {} : { catalogSkillId: "owner/repo:skill" }), kind: "catalog", name: "Skill", description: "", position: 0, githubUrl: null }] : [],
     } as T;
-    if (path === "/api/portal/groups") return { groupId: "set" } as T;
     present = true;
     if (options.conflict) throw new PortalApiError("Already saved", 409);
     return (options.badResponse ? {} : { itemId: "item" }) as T;
@@ -72,13 +78,46 @@ test("current responses without catalog identity block repeat saves instead of d
   await assert.rejects(addCatalogMembership(f.api, [], command, signal()), /identity is unavailable/);
   assert.equal(f.calls.filter(call => call.method === "POST").length, 1);
 });
-test("catalog Favorites require the existing synced-skill-created container; no unsupported create request", async () => {
+test("catalog Favorites create the first item atomically without an installed skill", async () => {
   const f = catalogFixture({ favorites: true });
-  await assert.rejects(addCatalogMembership(f.api, [], { ...command, favorite: true }, signal()), /Favorite an installed skill first/);
-  assert.equal(f.calls.length, 0);
+  const result = await addCatalogMembership(f.api, [], { ...command, favorite: true }, signal());
+  assert.equal(result.added, 1); assert.equal(result.groupId, "set");
+  assert.equal(f.calls.length, 1);
+  assert.deepEqual(f.calls[0], { path: "/api/portal/groups", method: "POST", body: {
+    name: "Favorite Skills", visibility: "public", isFavorites: true, catalogSkillId: command.catalogId,
+  } });
+});
+test("catalog Favorites reuse an existing container without creating another", async () => {
+  const f = catalogFixture({ favorites: true });
   const set = { ...makeFixtures().sets[0], id: "set", isFavorites: true, role: "owner" as const };
   assert.equal((await addCatalogMembership(f.api, [set], { ...command, favorite: true }, signal())).added, 1);
   assert.ok(f.calls.every(call => call.path !== "/api/portal/groups"));
+});
+test("concurrent Favorites creation re-reads ownership and exact membership before adding", async () => {
+  for (const present of [true, false]) {
+    const f = catalogFixture({ favorites: true, createConflict: true, present });
+    const result = await addCatalogMembership(f.api, [], { ...command, favorite: true }, signal());
+    assert.equal(result.unchanged, present ? 1 : 0);
+    assert.equal(result.added, present ? 0 : 1);
+    assert.equal(f.calls.filter(call => call.method === "POST" && call.path === "/api/portal/groups").length, 1);
+    assert.equal(f.calls.filter(call => call.method === "POST" && call.path.endsWith("/items")).length, present ? 0 : 1);
+  }
+  for (const options of [{ role: "invited" }, { hidden: true }, { noFavorites: true }]) {
+    const f = catalogFixture({ favorites: true, createConflict: true, ...options });
+    await assert.rejects(addCatalogMembership(f.api, [], { ...command, favorite: true }, signal()));
+    assert.ok(!f.calls.some(call => call.path.endsWith("/items")));
+  }
+});
+test("uncertain, unauthorized or malformed creation results never trigger an automatic retry", async () => {
+  for (const options of [{ createFailure: 500 }, { createFailure: 403 }, { createFailure: 400 }, { badResponse: true }]) {
+    const f = catalogFixture({ favorites: true, ...options });
+    await assert.rejects(addCatalogMembership(f.api, [], { ...command, favorite: true }, signal()));
+    assert.equal(f.calls.length, 1);
+  }
+  const controller = new AbortController();
+  const f = catalogFixture({ favorites: true, afterCreate: () => controller.abort() });
+  await assert.rejects(addCatalogMembership(f.api, [], { ...command, favorite: true }, controller.signal), { name: "AbortError" });
+  assert.equal(f.calls.length, 1);
 });
 test("catalog duplicate conflicts require a fresh matching item, malformed responses are not success", async () => {
   const f = catalogFixture({ conflict: true });

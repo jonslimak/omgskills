@@ -50,7 +50,6 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
   const targetSet = request?.kind === "add" ? request.set ?? data.sets.find(set => set.id === setId) : undefined;
   const targetSkills = request?.kind === "add" ? request.skills.length ? request.skills : mine.filter(skill => skill.key === skillKey) : [];
   const disabled = busy || blocked;
-  const needsFavorites = request?.kind === "favorite" && !request.skill.installed && !data.sets.some(set => set.isFavorites && set.role === "owner");
   const close = () => { if (!busy && !pending.current) setRequest(null); };
   async function changeVisibility(set: PortalSet, visibility: Visibility) {
     if (disabled || pending.current || set.role !== "owner" || set.hidden || set.isFavorites || set.visibility === visibility) return;
@@ -65,7 +64,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     } finally { pending.current = false; }
   }
   async function submit() {
-    if (!request || disabled || pending.current || needsFavorites) return;
+    if (!request || disabled || pending.current) return;
     pending.current = true;
     const version = generation.current;
     setError("");
@@ -171,7 +170,6 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         {request.kind === "favorite" && <p>{request.add
           ? "Favorites is public. Anyone with its link can view the skills you add."
           : "This removes the favorite, not the installed skill."}</p>}
-        {needsFavorites && <p>Favorite an installed skill first to create Favorites. You can save this catalog skill to a regular set now.</p>}
         {request.kind === "remove" && <p>Remove {request.skill.name} from {request.set.name}? This does not uninstall the skill.</p>}
         {(request.kind === "create" || request.kind === "rename") && <label>Set name
           <input autoFocus required maxLength={120} value={name} disabled={disabled} onChange={event => setName(event.target.value)} />
@@ -197,7 +195,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         {error && <p role="alert">{error}</p>}
         <div className="ua-toolbar">
           <button type="button" className="ua-pill" disabled={busy} onClick={close}>Cancel</button>
-          <button type="submit" className="ua-pill ua-primary" disabled={disabled || needsFavorites ||
+          <button type="submit" className="ua-pill ua-primary" disabled={disabled ||
             ((request.kind === "create" || request.kind === "rename") && !name.trim()) ||
             (request.kind === "add" && (!targetSet || !targetSkills.length))}>
             {busy ? "Saving..." : request.kind === "moderate" ? request.set.hidden ? "Restore" : "Hide" : request.kind === "publish" ? "Make public" : request.kind === "create" ? "Create set" : request.kind === "rename" ? "Save name"

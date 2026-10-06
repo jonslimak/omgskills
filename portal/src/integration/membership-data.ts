@@ -1,6 +1,6 @@
 import type { PortalApi } from "../portal-api";
 import { PortalApiError, isAccessError } from "../api-error";
-import { addSyncedSkillToGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems } from "../groups/api";
+import { addSyncedSkillToGroup, createCatalogFavoritesGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems } from "../groups/api";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
 import { isMember, type MembershipResult, type PortalSet } from "../app/model";
 import { loadSetData } from "./data";
@@ -32,8 +32,21 @@ async function ownedSet(api: PortalApi, id: string, signal: AbortSignal) {
 export async function addCatalogMembership(api: PortalApi, sets: PortalSet[], command: Extract<MembershipCommand, { kind: "catalog" }>, signal: AbortSignal): Promise<MembershipResult> {
   if (!command.catalogId || command.catalogId.length > 500) throw new PortalApiError("Choose a catalog skill.", 400);
   checkSignal(signal);
-  const id = command.favorite ? sets.find(set => set.isFavorites && set.role === "owner")?.id : command.id;
-  if (!id && command.favorite) throw new PortalApiError("Favorite an installed skill first to create Favorites. You can save this catalog skill to a regular set now.", 409);
+  let id = command.favorite ? sets.find(set => set.isFavorites && set.role === "owner")?.id : command.id;
+  if (!id && command.favorite) {
+    try {
+      id = groupId(await createCatalogFavoritesGroup(api, command.catalogId));
+      checkSignal(signal);
+      return { ...emptyMembershipResult(), groupId: id, added: 1, completedIds: [command.catalogId] };
+    } catch (error) {
+      checkSignal(signal);
+      if (!(error instanceof PortalApiError) || error.status !== 409) throw error;
+      const groups = await listOwnedGroups(api);
+      checkSignal(signal);
+      id = groups.find(group => group.isFavorites)?.id;
+      if (!id) throw error;
+    }
+  }
   checkSignal(signal);
   if (!id) throw new PortalApiError("Choose a set you own.", 400);
   let set = await ownedSet(api, id, signal);

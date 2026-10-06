@@ -8,14 +8,14 @@ import {
 import { resolveCreateGroupSlug } from "./_shared/group-slug.js";
 import { findOwnedGroupIds, requireGroupAccess } from "./_shared/group-access.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
-import { PublicReleaseResolutionError } from "./_shared/public-releases.js";
+import { PublicReleaseResolutionError, resolveCatalogPublicRelease } from "./_shared/public-releases.js";
 import {
   prepareSyncedGroupPublication,
   sameSyncedGroupPublicationIdentity,
   type SyncedGroupPublicationIdentity,
 } from "./_shared/synced-group-publication.js";
 import { requirePortalUser } from "./_shared/user.js";
-import { optionalString, requireString } from "./_shared/validation.js";
+import { optionalString, requireJsonObject, requireString } from "./_shared/validation.js";
 
 async function listGroups(req: Request) {
   const user = await requirePortalUser(req);
@@ -63,9 +63,16 @@ async function listGroups(req: Request) {
   return jsonResponse(req, { groups: result.rows });
 }
 
-async function createGroup(req: Request) {
+const createDependencies = {
+  getPgPool, requirePortalUser, prepareSyncedGroupPublication,
+  resolveCatalogPublicRelease, addGroupItemWithClient,
+};
+
+export async function createGroup(req: Request, dependencies = createDependencies) {
+  const { getPgPool, requirePortalUser, prepareSyncedGroupPublication,
+    resolveCatalogPublicRelease, addGroupItemWithClient } = dependencies;
   const user = await requirePortalUser(req);
-  const body = await req.json();
+  const body = await requireJsonObject(req);
   const name = requireString(body?.name, "name", 120);
   const description = optionalString(body?.description, 1000);
   const isFavorites = body?.isFavorites === true;
@@ -75,8 +82,13 @@ async function createGroup(req: Request) {
       ? "private"
       : parseGroupVisibility(body.visibility);
   const syncedSkillIds = Array.isArray(body?.syncedSkillIds) ? body.syncedSkillIds : [];
-  if (isFavorites && syncedSkillIds.length === 0) {
-    throw new Response("Select at least one synced skill", { status: 400 });
+  const catalogSkillId = body.catalogSkillId === undefined
+    ? undefined : requireString(body.catalogSkillId, "catalogSkillId", 500);
+  if (catalogSkillId && (!isFavorites || syncedSkillIds.length > 0)) {
+    throw new Response("catalogSkillId requires Favorites without synced skills", { status: 400 });
+  }
+  if (isFavorites && syncedSkillIds.length === 0 && !catalogSkillId) {
+    throw new Response("Select at least one synced skill or one catalog skill", { status: 400 });
   }
   if (syncedSkillIds.some((id: unknown) => typeof id !== "string")) {
     throw new Response("syncedSkillIds must be strings", { status: 400 });
@@ -116,6 +128,9 @@ async function createGroup(req: Request) {
       await prepareSyncedGroupPublication(ownedSkillById.get(syncedSkillId)!),
     );
   }
+  const catalogPublication: GroupItemPublication | undefined = catalogSkillId
+    ? { kind: "release", ...await resolveCatalogPublicRelease(catalogSkillId) }
+    : undefined;
 
   const client = await pool.connect();
   try {
@@ -175,6 +190,12 @@ async function createGroup(req: Request) {
         publication,
         { incrementRevision: false },
       );
+    }
+
+    if (catalogSkillId && catalogPublication) {
+      await addGroupItemWithClient(client, groupId,
+        { kind: "catalog", catalogSkillId }, catalogPublication,
+        { incrementRevision: false });
     }
 
     await client.query("COMMIT");

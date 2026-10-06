@@ -40,6 +40,17 @@ export async function addGroupItemWithClient(
   let snapshotName = item.name ?? null;
   let snapshotDescription = item.description ?? null;
 
+  // Serialize the identity check with the insert, including saves from other tabs.
+  if (item.kind === "catalog" && item.catalogSkillId) {
+    const existing = await client.query<{ id: string }>(
+      "SELECT id FROM skill_group_items WHERE group_id = $1 AND kind = 'catalog' AND catalog_skill_id = $2 LIMIT 1",
+      [groupId, item.catalogSkillId]
+    );
+    if (existing.rowCount) {
+      throw new Response("Skill is already in this group", { status: 409 });
+    }
+  }
+
   if (item.syncedSkillId) {
     const existing = await client.query<{ id: string }>(
       "SELECT id FROM skill_group_items WHERE group_id = $1 AND synced_skill_id = $2 LIMIT 1",

@@ -37,7 +37,7 @@ function dependencies(role: GroupAccessRole, deny = false) {
         assert.match(sql, /CASE WHEN \$2 = 'owner' THEN i\.synced_skill_id ELSE NULL END/);
         // Deliberately return private values even for non-owners to test response redaction too.
         return { rows: [row, { ...row, id: "orphan", syncedSkillId: null, skillName: null, skillDescription: null },
-          { ...row, id: "catalog", kind: "catalog", skillName: null },
+          { ...row, id: "catalog", kind: "catalog", catalogSkillId: "author/repo:skill", skillName: null },
           { ...row, id: "github", kind: "github", skillName: null }] };
       }
       return { rows: [], rowCount: 1 };
@@ -74,9 +74,11 @@ for (const role of ["owner", "invited", "public"] as const) {
     assert.deepEqual(detailBody.items.map((item: { id: string }) => item.id), ["item", "orphan", "catalog", "github"]);
     if (role === "owner") {
       assert.deepEqual(detailBody.items.map((item: { syncedSkillId: string | null }) => item.syncedSkillId), [physicalId, null, null, null]);
+      assert.deepEqual(detailBody.items.map((item: { catalogSkillId: string | null }) => item.catalogSkillId), [null, null, "author/repo:skill", null]);
       assert.deepEqual(detailBody.group.allowedEmails, [{ id: emailId, email: "member@example.test" }]);
     } else {
       assert.ok(detailBody.items.every((item: object) => !Object.hasOwn(item, "syncedSkillId")));
+      assert.ok(detailBody.items.every((item: object) => !Object.hasOwn(item, "catalogSkillId")));
       assert.deepEqual(detailBody.group.allowedEmails, []);
       assert.equal(JSON.stringify(detailBody).includes(physicalId), false);
       assert.equal(JSON.stringify(detailBody).includes(emailId), false);

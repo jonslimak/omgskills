@@ -77,10 +77,15 @@ release can select it with `VITE_PORTAL_UNIFIED_ENABLED=1` and
 set deep links, pairing/review routes and public library pages are preserved.
 No environment flag is enabled by this checkpoint.
 
-Catalog-only first-time Favorites and repeat saves with missing catalog identity
-remain guarded backend limitations. No invitation email is sent; the UI provides
-a copyable link after access is granted. Local UI success is not proof of recipient
-access or production connectivity.
+The catalog/Favorites follow-up extends the existing creation API with a single
+`catalogSkillId` for Favorites, saving the set and first item together. Owner item
+reads include existing catalog IDs; catalog insertion checks duplicates under the
+existing set lock. No schema migration is needed. The client retains a missing-ID
+guard for older responses, so deploy the matching backend with this client.
+
+No invitation email is sent; the UI provides a copyable link after access is
+granted. First-time catalog Favorites, persisted saves and recipient access still
+need production acceptance. Local tests do not establish live connectivity.
 
 ## Verification
 
