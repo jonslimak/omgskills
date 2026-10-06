@@ -1,6 +1,6 @@
 # Unified Web App Plan
 
-Status: Production rollout approved, including a persistent unified-app build flag and fix-forward-only deployment failure handling. Safeguard regression tests and the full root code check pass. Production is not yet changed. Draft structural checks pass; draft app startup is blocked by Clerk's production-domain restriction. Authenticated UI/account acceptance remains pending. Invite saving has a user-reported failure and is not confirmed working.
+Status: Unified app released from `9d99a7ca` to production deploy `6ac55adfbe78b2bd038287a4`. Guarded draft/production verification passed. Both app hosts render the unified Discover UI; category search and skill details work signed out. All 2,210 public non-app files match the prior production deploy byte-for-byte. Authenticated account, save and invitation acceptance remains pending; the earlier invite-save failure is not cleared by this release.
 Updated: 2026-10-06. Original source baseline: `61f9f13f`; merged main baseline: `d22e476d`. Recheck main before release.
 
 ## Current Working Agreement - 2026-10-06
@@ -50,6 +50,33 @@ approval/status statements in historical checkpoints below.
   with the live file inventory before release; preserve release binaries exactly.
 - Live acceptance still needs an agreed account/set/recipient scope before
   testing writes or granting access. Structural checks do not confirm invitations.
+
+### Production Release Receipt - 2026-10-06
+
+- Source `9d99a7ca754a230d60b178f58dd22736ec2e818c` was fast-forwarded to main.
+  GitHub workflow-writer-safety run `37526528854` passed.
+- Followed prepare, locked dependency install, combined build, guarded draft,
+  then production deployment. The tracked unified flag selected the UI without
+  an ambient flag override. All 210 portal tests and full `npm run check` passed.
+- Draft: `6ac5599ebb13daa4e043c297`; production:
+  `6ac55adfbe78b2bd038287a4`; previous production:
+  `6ac51f39b0136aa966b26694`. No restore operation was used.
+- Both verification stages passed on their first attempt: app/release gates,
+  protected health, unauthenticated API rejection, manifests, AI catalog/MCP,
+  download redirect, DMG/checksum, every referenced update asset, public library
+  pages/canonicals/redirects, and exact manifest comparisons.
+- Before/after Netlify file inventories confirm zero changes across 2,210
+  public non-app files. Existing release assets and appcast remained identical.
+  Database migrations, public pages/data, root Netlify configuration and health
+  edge-function source were unchanged; no Mac release or schema change occurred.
+- Browser: `https://omgskills.com/app/` and `https://app.omgskills.com/` loaded
+  Discover with live collections/trending/creators. API design category search
+  returned 30 results and the selected skill detail opened. No console errors
+  were captured. Screenshot: `/private/tmp/omgskills-unified-live.jpg`.
+- No signed-in account mutation, access grant/revoke, invitation email, or
+  external connection was tested. Those remain explicit production acceptance
+  items, not implied by successful deployment. Local receipt:
+  `dist/netlify-deploy-receipt.json` (ignored, not a public artifact).
 
 ### Known Invite Issue And Deferred Checks
 
@@ -638,10 +665,11 @@ deferred to production, not additional disposable local environments.
 
 ### 5. Approved Release
 
-- [ ] Obtain approval after local review; commit only scoped client changes from the correct main baseline.
-- [ ] Follow current deployment documentation and guarded current-main workflow; build the combined `dist/netlify-site` artifact, never deploy only `site` or `portal/dist`.
-- [ ] Verify draft before production, preserving public pages, downloads, appcast, manifests, release assets, and feature gates.
-- [ ] After separate production approval, verify both app hosts, public library, auth/account workflows, and catalog requests. Retain prior deployment for rollback.
+- [x] Obtain approval after local review; commit scoped client/API fixes and approved safeguards from the current main baseline.
+- [x] Follow current deployment documentation and guarded current-main workflow; build the combined `dist/netlify-site` artifact, never deploy only `site` or `portal/dist`.
+- [x] Verify draft before production, preserving public pages, downloads, appcast, manifests, release assets, and feature gates.
+- [x] After production approval, verify both app hosts, public library and signed-out catalog requests. Fix forward on failure; never restore an older whole-site snapshot.
+- [ ] Verify authenticated account workflows under an agreed test scope.
 - [ ] On an agreed production test set/account, verify visibility, email grant and
   revoke, reload persistence and recipient access. Diagnose the reported save error
   if it persists; do not declare invites complete from unit tests or visuals alone.
@@ -661,7 +689,7 @@ npm run test:mcp-production
 npm run test:deploy-safety
 ```
 
-Before approved release, rerun the full `npm run check` and combined build under the deployment guide's environment requirements. The full code check passed after the main merge; the combined candidate build has now passed using restored verified inputs and the production public build key. Draft/live checks remain pending.
+The full `npm run check`, 210 portal tests and combined build passed for the approved release. Guarded draft/live structural checks also passed; see the production receipt above. Authenticated workflow acceptance remains pending.
 
 New focused coverage:
 
@@ -685,7 +713,7 @@ proof of integration. Never test destructive actions on the user's real skills.
 
 1. **Prototype capabilities exceed current APIs.** Keep the UI truthful; adding remote installs/updates is separate work.
 2. **Catalog/Favorites changes need production acceptance.** Owner-only catalog identity, locked duplicate prevention and atomic first-time catalog Favorites are implemented locally. Older responses still trigger the safe missing-ID guard until the matching backend is deployed.
-3. **Public transport on the app subdomain is unproven live.** The client/proxy exists; confirm host routing in the production acceptance pass without blocking UI work on new local infrastructure.
+3. **Public app-subdomain transport is verified signed out.** Both hosts loaded live Discover after deployment; authenticated host/account transitions still need acceptance.
 4. **Bounded APIs are not a complete catalog export.** Use existing curated discovery and honest search limits, not fake pagination or counts.
 5. **Public versus private visibility can be confused in the new layout.** Preserve permissions and clear visibility indicators, especially public Favorites.
 
