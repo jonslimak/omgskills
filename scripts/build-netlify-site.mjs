@@ -12,6 +12,7 @@ import {
 } from "./production-features.mjs";
 import { stageNetlifyDbMigrations } from "./stage-netlify-db-migrations.mjs";
 import { appDomainRedirects } from "./portal-redirects.mjs";
+import { verifyPortalBuildEnv } from "./portal-build-env.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.join(repoRoot, "site");
@@ -42,12 +43,6 @@ function run(command, args, options = {}) {
 
   if (result.status !== 0) {
     throw new Error(`${command} ${args.join(" ")} failed`);
-  }
-}
-
-function verifyPortalBuildEnv() {
-  if (!process.env.VITE_CLERK_PUBLISHABLE_KEY) {
-    throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY. Build the Netlify site with the production portal environment.");
   }
 }
 

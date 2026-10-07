@@ -14,6 +14,30 @@ const workflowPaths = [
   "../.github/workflows/publish-collections.yml",
 ];
 
+test("combined builds reject test, malformed, and unrelated Clerk keys", async () => {
+  const { verifyPortalBuildEnv } = await import("./portal-build-env.mjs");
+  const key = (mode, host) => `pk_${mode}_${Buffer.from(`${host}$`).toString("base64")}`;
+  assert.doesNotThrow(() => verifyPortalBuildEnv({
+    VITE_CLERK_PUBLISHABLE_KEY: key("live", "clerk.omgskills.com"),
+  }));
+  for (const value of [undefined, "", key("test", "example.clerk.accounts.dev"),
+    key("live", "clerk.other.example"), "pk_live_invalid", "sk_live_do-not-log-this"]) {
+    assert.throws(() => verifyPortalBuildEnv({ VITE_CLERK_PUBLISHABLE_KEY: value }), error => {
+      assert.match(error.message, /production Clerk publishable key/);
+      if (value) assert.ok(!error.message.includes(value));
+      return true;
+    });
+  }
+});
+
+test("combined build validates Clerk configuration before building or replacing artifacts", async () => {
+  const source = await readFile(new URL("./build-netlify-site.mjs", import.meta.url), "utf8");
+  assert.match(source, /import \{ verifyPortalBuildEnv \} from "\.\/portal-build-env\.mjs"/);
+  const validation = source.indexOf("verifyPortalBuildEnv();");
+  assert.ok(validation >= 0 && validation < source.indexOf('run("npm"'));
+  assert.ok(validation < source.indexOf("await rm(outputDir"));
+});
+
 test("manual production deploy uses the guarded combined artifact in order", () => {
   const commands = [
     "node ./scripts/restore-health-snapshot.mjs",
