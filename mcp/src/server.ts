@@ -104,6 +104,23 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
   );
 
   server.registerTool(
+    "get_skills",
+    {
+      title: "Get skills",
+      description: "Get up to 30 skills by exact catalog IDs in one read. Preserves requested order, removes duplicate IDs, and omits missing skills.",
+      inputSchema: {
+        ids: z.array(z.string().min(1).max(500)).min(1).max(30).describe("Stable catalog IDs in display order.")
+      },
+      outputSchema: skillListOutputSchema,
+      annotations: toolAnnotations
+    },
+    async ({ ids }) => skillListResult([...new Set(ids)].flatMap(id => {
+      const skill = library.getSkill(id);
+      return skill ? [skill] : [];
+    }))
+  );
+
+  server.registerTool(
     "list_trending",
     {
       title: "List trending skills",

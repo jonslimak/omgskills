@@ -59,6 +59,18 @@ Fetch one skill by stable ID.
 }
 ```
 
+### `get_skills`
+
+Fetch up to 30 skills by stable ID in one read. Results keep the requested order;
+duplicate IDs are removed and missing skills are omitted. Uses the same public
+fields and pinned-install validation as `get_skill`.
+
+```json
+{
+  "ids": ["anthropics/skills:algorithmic-art", "anthropics/skills:pdf"]
+}
+```
+
 ### `list_trending`
 
 List trending skills.

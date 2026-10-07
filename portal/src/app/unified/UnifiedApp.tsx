@@ -77,6 +77,7 @@ import {
 } from "../model";
 import {
   isDiscovery,
+  openSkillNavigation,
   isFavorite,
   matchesSearch,
   skillDisplays,
@@ -422,6 +423,8 @@ export function UnifiedApp({
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
   const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected) || pendingSelection;
+  const detailOpen = useRef(false);
+  detailOpen.current = !!selected;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
   const detailPending = remoteDetail && publicStatus.detail !== "ready";
   const relatedSkills = selected?.author
@@ -450,7 +453,11 @@ export function UnifiedApp({
   const privateSearch = readOnlyAccount && !discovery;
   const publicList = !!publicStatus && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
   const setPage = !!management && ["set", "favorites"].includes(nav.view);
-  const listState = publicList ? publicStatus.list : setPage && state === "ready" ? management.detail.state : state;
+  const progressiveDiscover = publicList && nav.view === "discover" && !nav.query.trim();
+  const metadataOnly = !nav.query.trim() && (["creators", "collections"].includes(nav.view) || !!categoryGroup);
+  const publicListState = metadataOnly ? publicStatus?.metadata ?? publicStatus?.list : publicStatus?.list;
+  const publicListError = metadataOnly ? publicStatus?.metadataError : publicStatus?.error;
+  const listState = progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state : state;
   const canManage = !!management && !management.blocked && !management.busy;
   const editableSet = activeSet?.role === "owner" && !activeSet.hidden && !activeSet.isFavorites;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
@@ -472,17 +479,13 @@ export function UnifiedApp({
     const timer = setTimeout(() => setNotice(""), 3000);
     return () => clearTimeout(timer);
   }, [notice]);
-  useEffect(() => {
-    if (selected) return;
-    if (detailTrigger.current?.isConnected) detailTrigger.current.focus();
-  }, [selected?.key]);
-
   function go(view: View, id = "") {
     navigate({ view, id, query: "", selected: "", source: "all" });
   }
   function open(skill: SkillDisplay) {
-    detailTrigger.current = document.activeElement as HTMLElement;
-    navigate({ ...nav, selected: skill.key });
+    const trigger = document.activeElement as HTMLElement | null;
+    if (!trigger?.closest(".ua-detail")) detailTrigger.current = trigger;
+    navigate(openSkillNavigation(nav, skill));
   }
   function closeDetail() {
     navigate({ ...nav, selected: "" });
@@ -795,6 +798,21 @@ export function UnifiedApp({
       </div>
     );
   }
+
+  function publicSection(section: "metadata" | "list", label: string, children: ReactNode) {
+    const status = section === "metadata" ? publicStatus?.metadata ?? publicStatus?.list : publicStatus?.list;
+    const error = section === "metadata" ? publicStatus?.metadataError : publicStatus?.error;
+    if (status === "loading") return <div className="ua-skeletons" role="status" aria-label={`Loading ${label}`}>
+      {Array.from({ length: 3 }, (_, i) => <div key={i} />)}
+    </div>;
+    return <>
+      {error && <div className="ua-toolbar" role="status">
+        <span className="ua-muted">{status === "ready" ? "Could not refresh. Showing saved results." : error}</span>
+        <button type="button" className="ua-pill" onClick={publicStatus?.retry}>Retry {label}</button>
+      </div>}
+      {status !== "error" && children}
+    </>;
+  }
   function CreatorList({ limit }: { limit?: number }) {
     return (
       <div className="ua-creators">
@@ -1031,7 +1049,7 @@ export function UnifiedApp({
             </div>
             {search(true)}
           </header>
-          <main className="ua-main" ref={main} id="unified-main">
+          <main className="ua-main" ref={main} id="unified-main" tabIndex={-1}>
             <div className="ua-content">
               {!signedIn && (
                 <div className="ua-public-actions">
@@ -1051,8 +1069,8 @@ export function UnifiedApp({
                   </button>
                 </div>
               )}
-              {["creator", "collection", "category"].includes(nav.view) &&
-                !nav.query && (
+              {((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
+                (!signedIn && (nav.view !== "discover" || !!nav.query))) && (
                   <button
                     type="button"
                     className="ua-link ua-back"
@@ -1117,7 +1135,7 @@ export function UnifiedApp({
               </div>}
               {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
               {publicList && publicStatus.note && listState === "ready" && <p className="ua-muted" role="status">{publicStatus.note}</p>}
-              {publicList && publicStatus.error && listState === "ready" && <div className="ua-toolbar" role="status">
+              {publicList && !progressiveDiscover && publicListError && listState === "ready" && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">Could not refresh. Showing saved results.</span>
                 <button type="button" className="ua-pill" onClick={publicStatus.retry}>Retry</button>
               </div>}
@@ -1133,7 +1151,7 @@ export function UnifiedApp({
                 </div>
               ) : listState === "error" ? (
                 <Empty title="Skills couldn't be loaded">
-                  {publicList && publicStatus.error && <span>{publicStatus.error}<br /></span>}
+                  {publicList && publicListError && <span>{publicListError}<br /></span>}
                   {setPage && <span>{management.detail.error}<br /></span>}
                   <button type="button" className="ua-pill" onClick={publicList ? publicStatus.retry : setPage ? management.detail.retry : retry}>
                     Try again
@@ -1156,24 +1174,24 @@ export function UnifiedApp({
                 </>
               ) : nav.view === "discover" ? (
                 <>
-                  <CollectionCards limit={publicStatus ? 3 : undefined} />
+                  {publicSection("metadata", "collections", <CollectionCards limit={publicStatus ? 3 : undefined} />)}
                   <section>
                     <SectionHeading
                       title={publicStatus ? "Trending skills" : "Top this week"}
                       action={() => go("top")}
                     />
-                    <div className="ua-trending">
+                    {publicSection("list", "trending skills", <div className="ua-trending">
                       {top
                         .slice(0, 9)
                         .map((skill, i) => renderRow(skill, i + 1, true))}
-                    </div>
+                    </div>)}
                   </section>
                   <section>
                     <SectionHeading
                       title="Creators"
                       action={() => go("creators")}
                     />
-                    <CreatorList limit={publicStatus ? 9 : undefined} />
+                    {publicSection("metadata", "creators", <CreatorList limit={publicStatus ? 9 : undefined} />)}
                   </section>
                   <section>
                     <SectionHeading title="Categories" />
@@ -1443,8 +1461,12 @@ export function UnifiedApp({
                 aria-describedby={undefined}
                 onCloseAutoFocus={(event) => {
                   event.preventDefault();
-                  detailTrigger.current?.isConnected &&
-                    detailTrigger.current.focus();
+                  // Radix remounts content when changing between a pane and a modal.
+                  if (detailOpen.current) return;
+                  const trigger = detailTrigger.current;
+                  const target = trigger?.isConnected && trigger.getClientRects().length ? trigger : main.current;
+                  target?.focus({ preventScroll: true });
+                  detailTrigger.current = null;
                 }}
                 onInteractOutside={(event) => {
                   if (wide) event.preventDefault();

@@ -100,8 +100,8 @@ test("opening a collection still reads its entries instead of searching its titl
     if (path.endsWith("manifest.json")) return json({ collections: { path: "collections-123abc.json" } });
     if (path.includes("collections-")) return json(collections);
     const body = JSON.parse(init!.body as string) as Request;
-    assert.equal(body.params.name, "get_skill");
-    return reply(init, { found: true, skill: skill(body.params.arguments.id as string) });
+    assert.equal(body.params.name, "get_skills");
+    return reply(init, { skills: (body.params.arguments.ids as string[]).map(id => skill(id)) });
   });
   const result = await loadPublicView(client, { ...initialNavigation, view: "collection", id: "documents" }, signal());
   assert.deepEqual(result.catalog.resultIds, ["author/repo:pdf", "author/repo:missing"]);
@@ -211,21 +211,23 @@ test("abandoning all consumers aborts upstream and cannot poison a later request
   assert.equal(calls, 2);
 });
 
-test("collection reads preserve order, cap total requests and use at most four concurrent requests", async () => {
-  let active = 0, maxActive = 0, total = 0;
+test("collection reads use one bounded batch, preserve order, and reuse detail cache", async () => {
+  let total = 0;
   const client = new PublicCatalogClient(async (_path, init) => {
-    total++; maxActive = Math.max(maxActive, ++active);
-    await new Promise((resolve) => setTimeout(resolve, 1));
-    active--;
-    const id = JSON.parse(init!.body as string).params.arguments.id as string;
-    return reply(init, id.endsWith(":1") ? { found: false, skill: null } : { found: true, skill: skill(id) });
+    total++;
+    const request = JSON.parse(init!.body as string) as Request;
+    assert.equal(request.params.name, "get_skills");
+    const ids = request.params.arguments.ids as string[];
+    assert.equal(ids.length, LIST_LIMIT);
+    return reply(init, { skills: ids.filter(id => !id.endsWith(":1")).reverse().map(id => skill(id)) });
   });
   const result = await client.collection(Array.from({ length: 100 }, (_, i) => `author/repo:${i}`), signal());
-  assert.equal(total, LIST_LIMIT);
-  assert.equal(maxActive, 4);
+  assert.equal(total, 1);
   assert.equal(result.missing, 1);
   assert.equal(result.limited, true);
   assert.equal(result.skills[1].id, "author/repo:2");
+  assert.equal((await client.skill("author/repo:2", signal()))?.id, "author/repo:2");
+  assert.equal(total, 1);
 });
 
 test("public links are lazy and restricted to known public skill routes", async () => {
@@ -247,19 +249,74 @@ test("public cache stays bounded instead of retaining every browsed skill", asyn
   assert.equal(calls, 62);
 });
 
-test("failed collection read cancels its workers without fetching remaining entries", async () => {
-  let calls = 0, cancelled = 0;
+test("failed collection batch does not fan out into per-skill requests", async () => {
+  let calls = 0;
   const client = new PublicCatalogClient(async (_path, init) => {
     calls++;
-    if (calls === 1) return json({}, 503);
-    return new Promise<Response>((_resolve, reject) => init!.signal!.addEventListener("abort", () => {
-      cancelled++;
-      reject(init!.signal!.reason);
-    }));
+    return json({}, 503);
   });
   await assert.rejects(client.collection(Array.from({ length: 30 }, (_, i) => `author/repo:${i}`), signal()));
-  assert.equal(calls, 4);
-  assert.equal(cancelled, 3);
+  assert.equal(calls, 1);
+});
+
+test("collection batch rejects unexpected or duplicate identities and skips empty reads", async () => {
+  for (const skills of [[skill("other/repo:pdf")], [skill(), skill()]]) {
+    const client = new PublicCatalogClient(async (_path, init) => reply(init, { skills }));
+    await assert.rejects(client.collection(["author/repo:pdf"], signal()));
+  }
+  const client = new PublicCatalogClient(async () => { throw new Error("Should not fetch"); });
+  assert.deepEqual(await client.collection([], signal()), { skills: [], missing: 0, limited: false });
+});
+
+test("metadata becomes visible while trending is pending, and survives its failure", async () => {
+  let fail!: () => void;
+  let metadataReady!: () => void;
+  const ready = new Promise<void>(resolve => { metadataReady = resolve; });
+  const client = new PublicCatalogClient(async (path) => {
+    if (path.endsWith("manifest.json")) return json({ collections: { path: "collections-123abc.json" } });
+    if (path.includes("collections-")) return json(collections);
+    await new Promise<void>(resolve => { fail = resolve; });
+    return json({}, 503);
+  });
+  const progress: string[] = [];
+  const pending = loadPublicView(client, { ...initialNavigation, view: "discover" }, signal(), update => {
+    progress.push(`${update.section}:${update.state}`);
+    if (update.section === "metadata" && update.state === "ready") {
+      assert.equal(update.catalog.creators.length, 1);
+      metadataReady();
+    }
+  });
+  await ready;
+  assert.deepEqual(progress, ["metadata:ready"]);
+  fail();
+  await assert.rejects(pending);
+  assert.deepEqual(progress, ["metadata:ready", "list:error"]);
+});
+
+test("trending becomes visible before slow metadata and aborted loads emit no progress", async () => {
+  let finish!: () => void;
+  let listReady!: () => void;
+  const ready = new Promise<void>(resolve => { listReady = resolve; });
+  const controller = new AbortController();
+  const client = new PublicCatalogClient(async (path, init) => {
+    if (path.endsWith("manifest.json")) {
+      await new Promise<void>(resolve => { finish = resolve; });
+      return json({ collections: { path: "collections-123abc.json" } });
+    }
+    if (path.includes("collections-")) return json(collections);
+    return reply(init, { skills: [skill()] });
+  });
+  const progress: string[] = [];
+  const pending = loadPublicView(client, { ...initialNavigation, view: "discover" }, controller.signal, update => {
+    progress.push(`${update.section}:${update.state}`);
+    if (update.section === "list" && update.state === "ready") listReady();
+  });
+  await ready;
+  assert.deepEqual(progress, ["list:ready"]);
+  controller.abort();
+  finish();
+  await assert.rejects(pending);
+  assert.deepEqual(progress, ["list:ready"]);
 });
 
 test("list scope excludes detail selection and account source filters", () => {

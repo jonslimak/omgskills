@@ -1,7 +1,149 @@
 # Unified Web App Plan
 
-Status: Unified app released from `9d99a7ca` to production deploy `6ac55adfbe78b2bd038287a4`. Guarded draft/production verification passed. Both app hosts render the unified Discover UI; category search and skill details work signed out. All 2,210 public non-app files match the prior production deploy byte-for-byte. Authenticated account, save and invitation acceptance remains pending; the earlier invite-save failure is not cleared by this release.
-Updated: 2026-10-06. Original source baseline: `61f9f13f`; merged main baseline: `d22e476d`. Recheck main before release.
+Status: Unified app is live. Latest recorded fix: `cb0d8164`, production deploy `6ac6367cfd2afecd22a5c69b`. Guarded draft/production checks passed; all 2,210 public non-app files were unchanged. On 2026-10-07 the user confirmed My Skills, invitation access/revocation, and Favorites/skill/set persistence after refresh pass in production. Remaining acceptance is listed below; historical pending statements are not the current checklist.
+Updated: 2026-10-07. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
+
+## Current Acceptance And Remaining Work - 2026-10-07
+
+This section supersedes acceptance/status statements in the dated checkpoints
+below. User-reported production tests are recorded separately from automated or
+agent-observed checks. This documentation update makes no new product changes
+and does not authorize account mutations, a commit, or a deployment.
+
+### Confirmed In Production
+
+- [x] My Skills loads after the production sign-in configuration fix.
+- [x] Create a test set, add skills, select Invite only, and save recipient email
+  access; access persists after refresh.
+- [x] A second account can open the shared link and read the set without editing it.
+- [x] Removing the recipient's access denies access after their page is refreshed.
+- [x] Favorites and skill/set changes persist after refresh.
+
+Evidence: the user reported "all tests pass for me" for the proposed invitation
+checklist, then confirmed "they do" for Favorites and skill/set persistence.
+These are user-reported results on `https://omgskills.com/app/`, not a fresh agent
+browser test or proof of every item type, host, device, or concurrency edge case.
+The earlier local invite-save failure is no longer an open production blocker;
+its local root cause was not established and the local experiment stays stopped.
+
+### Remaining Acceptance (Not Confirmed Implementation Gaps)
+
+- [ ] Account isolation: switch/sign out between populated accounts in the same
+  browser, including an in-flight read; no previous account's skills remain.
+  Also verify authenticated navigation on `app.omgskills.com`.
+  Local controller tests cover populated-account late reads, disposal, pending
+  save completion and access invalidation; real Clerk account switching is still
+  a production acceptance check, not established by those tests.
+- [ ] Less-common management paths: bulk add/remove and partial failures,
+  ordering, Hide/Restore, mixed item types, and protected Favorites behavior.
+- [ ] Catalog-specific edge cases: first-ever Favorites creation from Discover,
+  repeated/concurrent saves, and installed/catalog duplicate representations.
+  Ordinary Favorites persistence is already accepted above.
+- [ ] Account destinations: profile editing/publication, devices, private GitHub,
+  and MCP connection instructions; test external connections only within an
+  explicitly agreed scope. Include legacy set links and pairing/review routes.
+- [ ] Final UI/accessibility sweep: mobile sheets, keyboard/focus, light/dark,
+  long content, back/forward and direct links, loading/error recovery. The local
+  sample-data pass below is complete; repeat a focused smoke check with real
+  production data after an approved deploy.
+- [ ] Production performance: cold/warm Discover timings and request sizes.
+  Earlier local cache measurements are not production performance evidence.
+
+No new feature implementation is required by the passed invitation/persistence
+tests. The approved local isolation/mobile pass is complete below. Next release
+gate: review and separately approve a commit/deploy, then confirm real account
+switching and mobile/deep-link behavior in production. Less-common management
+and account-destination checks remain afterward.
+
+### Local Discovery Loading Pass - 2026-10-07
+
+- [x] Public entry reads start while Clerk initializes, using the existing bounded
+  public cache/in-flight deduplication. Private navigation/search is stripped
+  before preloading; account requests, permissions and session isolation are unchanged.
+- [x] Discover renders collections/creators and trending independently. Each can
+  load, fail, retry or retain its last good result without hiding the other.
+  Final layout/copy is unchanged. Other list views use their relevant loading state.
+- [x] Added read-only MCP `get_skills` for up to 30 exact IDs. Collection reads use
+  one batch instead of up to 30 individual calls, preserve display order, report
+  missing entries and reuse results for detail reads. Existing tools and data
+  models are unchanged. Deployment verification now checks the additive tool.
+- [x] Verified 217 portal tests, full `npm run check`, portal TypeScript/build,
+  MCP build/5 transport tests, and desktop/tablet/mobile acceptance at four widths.
+  Controlled browser checks confirmed preload before account readiness, one shared
+  trending request, independent error/retry paths, six collection skills in one
+  batch, cached details/revisits and no private data sent to public endpoints.
+- [x] The test fixture remains localhost/DEV-only and is excluded from the build.
+  No account writes or new persistent backend/test database were used. The portal
+  build used a placeholder test key and is verification-only, not deployable.
+- [ ] Commit/deploy separately with the updated MCP function and client together.
+  The live MCP endpoint does not have `get_skills` yet; an old live proxy cannot
+  validate the new collection call. Browser checks used controlled responses,
+  and function tests used the real handler with fixtures. Measure real signed-in
+  and cold/warm production behavior after an approved deploy.
+- [ ] The server's full-catalog cold-start load remains unchanged in this pass.
+  Earlier live inspection found a roughly 79 MB decoded skills asset; that is
+  server-side startup work, not a browser download.
+
+No commit, push, production deployment, schema migration, or account change was
+made by this pass. The earlier 32px desktop detail offset fix is also local only.
+
+### Local Isolation And Navigation Pass - 2026-10-07
+
+- [x] Reviewed the keyed user/session boundary, request cancellation, private
+  navigation filtering, and account state disposal. No backend, schema, auth
+  configuration or permission changes were needed.
+- [x] Added populated-account late-response and access-invalidation regression
+  tests. Existing save/disposal tests continue to pass. These are synthetic
+  controller tests, not live sign-in or authorization tests.
+- [x] Fixed related-skill navigation from My Skills: installed matches retain
+  their local detail identity; public-only skills open in Discover without
+  carrying private set IDs, searches or source filters.
+- [x] Fixed keyboard focus after related-skill navigation, direct-link closes,
+  and resizing an open desktop panel into a mobile sheet. Return to the original
+  visible trigger, or to main content when that trigger no longer exists.
+- [x] Added the existing Discover return control to signed-out secondary lists
+  and search results, so mobile users are not stranded without the desktop nav.
+- [x] Browser matrix: 1440, 1024, 390 and 320px; detail sheets, nested Add to set
+  dialogs, Tab containment, Escape/focus restoration, Back/Forward, related skills,
+  Invite layout, long content, dark appearance, signed-out return paths,
+  direct-link reloads, empty/loading/error states and error retry.
+- [x] Verification: 214 portal tests, full `npm run check`, TypeScript/Vite unified
+  build and browser matrix passed. Screenshots reviewed under
+  `output/playwright/unified-acceptance/`. No API/external requests were allowed
+  in the browser matrix; it reused the existing Vite frontend on port 5191.
+- [x] Added a repeatable localhost-only sample review page and browser runner in
+  `portal/testing/unified-acceptance*`; neither is a production entry point.
+
+The full authenticated build was checked with the repository's non-secret
+placeholder Clerk key, in `/private/tmp/omgskills-unified-acceptance-build` only.
+It is a compile check, NOT a deployable artifact or live-auth test. Production
+builds still require the guarded combined builder and real approved live key.
+No production accounts were changed. This pass is not committed or deployed.
+
+### Intentionally Outside This UI Migration
+
+Invitation email delivery, remote install/uninstall, automatic updates/set
+subscriptions, and full README content absent from the existing API remain out
+of scope. Sharing currently grants read-only email access and provides a link
+to share manually. These are separate product decisions, not failed tests.
+
+### Authentication Fix Receipt
+
+- An overnight automated build embedded a Clerk test publishable key while the
+  previously verified manual build used the live instance. Account loads failed
+  with an access error.
+- Corrected the GitHub Actions `VITE_CLERK_PUBLISHABLE_KEY` setting to match
+  Netlify's existing production build value. No server secret or account data
+  was changed.
+- `scripts/portal-build-env.mjs` now rejects missing, test, malformed, and
+  unrelated-instance keys before the combined builder invokes Vite or replaces
+  deployment artifacts. All seven production workflows use this shared builder.
+- Commit `cb0d8164006ba8190c1662e125eb93dcb44cb86c`; guarded draft
+  `6ac635659fa6deb90e6ccd45`; production `6ac6367cfd2afecd22a5c69b`.
+- Deployment-safety tests, 211 portal tests, combined build, draft/live library
+  and manifest checks passed. The live bundle was checked for the correct
+  production instance. Non-app file comparison: 2,210 unchanged files.
+- No schema, API, permissions, Mac release, or public content changes.
 
 ## Current Working Agreement - 2026-10-06
 
@@ -21,8 +163,8 @@ approval/status statements in historical checkpoints below.
   known implementation gaps or mean every error is caused by localhost.
 - **Confirm real connectivity in production after an approved deploy:** auth,
   both app hosts, catalog requests, account persistence, invitations/email access,
-  account switching, and external-service flows. These are pending acceptance
-  checks, not blockers to continuing visual work and not marked as passed.
+  account switching, and external-service flows. Mark only the specifically
+  confirmed checks as passed in the current acceptance section above.
 - **No schema/API/permission redesign.** Reuse existing supported contracts.
   If the mock needs a capability the backend does not provide, record the gap and
   get a scope decision instead of simulating success or silently dropping it.
@@ -78,16 +220,16 @@ approval/status statements in historical checkpoints below.
   items, not implied by successful deployment. Local receipt:
   `dist/netlify-deploy-receipt.json` (ignored, not a public artifact).
 
-### Known Invite Issue And Deferred Checks
+### Earlier Local Invite Issue (Production Flow Accepted 2026-10-07)
 
 - User reports `Could not confirm the save. Refresh before trying again.` when
   adding email access in the local app. Root cause is not established. An isolated
   client-to-handler test passed, but that does not clear the browser failure.
 - `Read-only access. No invitation email is sent.` is explanatory copy, not the
   error. Email delivery is not implemented or part of the current UI migration.
-- Earlier passing receipts are historical evidence, not acceptance of this
-  failing flow. Track email-access grant, revoke, persistence and recipient access
-  as **production verification pending**; investigate the failure there if it recurs.
+- The user has now confirmed production email-access grant, revoke, persistence
+  and read-only recipient access. The local report remains historical; reopen
+  the issue only if it recurs rather than expanding the stopped local experiment.
 - Local diagnostic set `Invite diagnostic (temporary)` remains empty and private
   (ID `23547cdb-2b16-4878-aa4d-d6a324de0499`). Permission testing stopped. Do not
   resume that experiment or remove existing local data without approval.
@@ -111,13 +253,15 @@ not a claim that every listed feature is broken.
   Hide/Restore, protected Favorites, empty/deleted/unavailable states.
 - [ ] Set detail/inviting: mock fidelity, separate visibility/invite controls,
   owner/reader/public states, member information, pending/error/confirmation
-  feedback and a usable path for recipients to open the set. Live access pending.
+  feedback and a usable path for recipients to open the set. Core live access
+  is user-accepted; the broad visual/state review remains separate.
 - [ ] Account destinations: profile, agents/sources, devices, private GitHub and
   MCP; reachable existing controls with no dead buttons or sample-only settings.
 - [ ] Responsive/accessibility: desktop/mobile, light/dark, long names/emails,
   focus/keyboard/Escape, touch targets, scroll/overflow and modal recovery.
-- [ ] Production entry/routes: connect the completed shell to the real session
-  and supported mutations; preserve old app links, pairing/review and public pages.
+- [x] Production entry: unified shell connected to the real session and supported
+  mutations. Legacy/pairing/review routes are preserved in source/tests; remaining
+  authenticated route checks are tracked in the current acceptance section.
 - [ ] Final gap register: label each item **implemented + UI reviewed**,
   **implementation missing**, **intentionally omitted**, or **production check
   pending**. User approves omissions and reviews the finished UX before release.
@@ -234,9 +378,10 @@ with the already deferred invite/connectivity checks.
 - [x] Added regression coverage for catalog add/remove/reload, installed-only and
   mixed representations, fresh IDs, similar-name isolation, ownership, missing
   mappings, failed/partial writes, failed reads and disposed accounts.
-- [ ] Real browser save/reload/removal acceptance remains a production check.
-  No local account/set was mutated, no test server was added, and the broad UI
-  completion checklist above is not considered finished by these tests.
+- [x] Ordinary Favorites changes and refresh persistence accepted by the user in
+  production on 2026-10-07. First-ever catalog creation, concurrency and mixed
+  representations remain explicit checks above. No new local account/set tests
+  were performed; this does not complete the broad UI checklist.
 
 This is a client-only correction: no schema, backend API, permissions, deployment
 flags or styling changes. Verification: 210 portal tests, root/portal TypeScript,
@@ -669,12 +814,13 @@ deferred to production, not additional disposable local environments.
 - [x] Follow current deployment documentation and guarded current-main workflow; build the combined `dist/netlify-site` artifact, never deploy only `site` or `portal/dist`.
 - [x] Verify draft before production, preserving public pages, downloads, appcast, manifests, release assets, and feature gates.
 - [x] After production approval, verify both app hosts, public library and signed-out catalog requests. Fix forward on failure; never restore an older whole-site snapshot.
-- [ ] Verify authenticated account workflows under an agreed test scope.
-- [ ] On an agreed production test set/account, verify visibility, email grant and
-  revoke, reload persistence and recipient access. Diagnose the reported save error
-  if it persists; do not declare invites complete from unit tests or visuals alone.
-- [ ] Verify production Favorites/set edits, bulk actions, account destinations,
-  external connections and legacy app routes within their approved test scope.
+- [x] User confirmed primary-host sign-in/My Skills loading in production.
+- [x] User confirmed test-set creation, Invite-only visibility, email grant/revoke,
+  reload persistence and read-only recipient access on 2026-10-07.
+- [x] User confirmed ordinary Favorites and skill/set changes persist after refresh.
+- [ ] Verify remaining bulk/edge-case actions, account isolation/destinations,
+  external connections and authenticated legacy/alternate-host routes within
+  their approved test scope; see the current acceptance list above.
 
 ## Verification
 
@@ -689,7 +835,7 @@ npm run test:mcp-production
 npm run test:deploy-safety
 ```
 
-The full `npm run check`, 210 portal tests and combined build passed for the approved release. Guarded draft/live structural checks also passed; see the production receipt above. Authenticated workflow acceptance remains pending.
+The full `npm run check`, 210 portal tests and combined build passed for the initial approved release. The authentication fix subsequently passed deployment-safety checks, all 211 portal tests, the combined build and guarded draft/live checks. Core authenticated invitation and persistence workflows are now user-accepted; only the explicitly listed remaining checks are pending.
 
 New focused coverage:
 
@@ -712,14 +858,14 @@ proof of integration. Never test destructive actions on the user's real skills.
 ## Main Risks And Decisions Still Needed
 
 1. **Prototype capabilities exceed current APIs.** Keep the UI truthful; adding remote installs/updates is separate work.
-2. **Catalog/Favorites changes need production acceptance.** Owner-only catalog identity, locked duplicate prevention and atomic first-time catalog Favorites are implemented locally. Older responses still trigger the safe missing-ID guard until the matching backend is deployed.
+2. **Catalog/Favorites edge cases need focused acceptance.** The matching backend is deployed and ordinary Favorites persistence is user-accepted. First-ever catalog Favorites, concurrent saves and mixed installed/catalog representations are not specifically confirmed.
 3. **Public app-subdomain transport is verified signed out.** Both hosts loaded live Discover after deployment; authenticated host/account transitions still need acceptance.
 4. **Bounded APIs are not a complete catalog export.** Use existing curated discovery and honest search limits, not fake pagination or counts.
 5. **Public versus private visibility can be confused in the new layout.** Preserve permissions and clear visibility indicators, especially public Favorites.
 
-Next step: user review of the UI and the approved catalog/Favorites follow-up.
-Production deployment and real connectivity checks require separate approval.
-No push or deployment is approved by this doc update.
+Next step: finish the focused remaining acceptance checks listed at the top,
+starting with account isolation and mobile/deep-link behavior. No push, deployment,
+new backend feature, or account mutation is approved by this doc update.
 
 ## Local Preview Receipt - 2026-10-05
 

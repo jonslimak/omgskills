@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
 
-const tools = ["search_skills", "get_skill", "list_trending", "list_gold_basket", "list_by_author"]
+const tools = ["search_skills", "get_skill", "get_skills", "list_trending", "list_gold_basket", "list_by_author"]
   .map((name) => ({
     name,
     annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false }
   }));
 
-function mockFetch({ badTools = false, nullAuthorRank = false } = {}) {
+function mockFetch({ badTools = false, nullAuthorRank = false, badBatch = false } = {}) {
   return async (url, options = {}) => {
     const path = new URL(url).pathname;
     if (path === "/mcp/health") return Response.json({ ok: true, skillCount: 46_000 });
@@ -18,12 +18,16 @@ function mockFetch({ badTools = false, nullAuthorRank = false } = {}) {
     if (request.params?.name === "list_by_author" && nullAuthorRank) {
       return Response.json({ jsonrpc: "2.0", id: request.id, result: { structuredContent: { count: 1, skills: [{ trending_rank: null }] } } });
     }
-    return Response.json({ jsonrpc: "2.0", id: request.id, result: { structuredContent: { count: 1, skills: [{}] } } });
+    return Response.json({ jsonrpc: "2.0", id: request.id, result: { structuredContent: { count: 1, skills: [{ id: badBatch && request.params?.name === "get_skills" ? "wrong" : "author/repo:skill" }] } } });
   };
 }
 
-test("verifies health, tool metadata, search, and author listing", async () => {
+test("verifies health, tool metadata, search, author listing, and batch lookup", async () => {
   await verifyMcpEndpoint({ origin: "https://example.test/", fetchImpl: mockFetch() });
+});
+
+test("fails when batch lookup returns a different skill", async () => {
+  await assert.rejects(verifyMcpEndpoint({ origin: "https://example.test", fetchImpl: mockFetch({ badBatch: true }) }), /invalid skills/);
 });
 
 test("fails when the public tool set changes", async () => {

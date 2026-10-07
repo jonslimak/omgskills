@@ -9,6 +9,10 @@ type RecordValue = Record<string, unknown>;
 type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 type Pending = { controller: AbortController; promise: Promise<unknown>; users: number };
 type PublicView = { catalog: CatalogDisplay; note: string };
+export type PublicViewProgress =
+  | { section: "metadata"; state: "ready"; catalog: CatalogDisplay }
+  | { section: "list"; state: "ready"; skills: CatalogSummary[] }
+  | { section: "metadata" | "list"; state: "error"; error: unknown };
 
 function record(value: unknown): RecordValue {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("The catalog returned an invalid response.");
@@ -90,6 +94,12 @@ export class PublicCatalogClient {
     return value;
   }
 
+  private remember(key: string, value: unknown) {
+    this.cache.delete(key);
+    this.cache.set(key, { at: this.now(), value });
+    while (this.cache.size > 60) this.cache.delete(this.cache.keys().next().value!);
+  }
+
   // Share in-flight public reads, but cancel upstream when the last consumer leaves.
   private cached<T>(key: string, load: (signal: AbortSignal) => Promise<T>, signal: AbortSignal): Promise<T> {
     signal.throwIfAborted();
@@ -101,9 +111,7 @@ export class PublicCatalogClient {
       const fresh: Pending = { controller, users: 0, promise: Promise.resolve() };
       fresh.promise = load(controller.signal).then((value) => {
         if (!controller.signal.aborted && value !== null) {
-          this.cache.delete(key);
-          this.cache.set(key, { at: this.now(), value });
-          while (this.cache.size > 60) this.cache.delete(this.cache.keys().next().value!);
+          this.remember(key, value);
         }
         if (this.pending.get(key) === fresh) this.pending.delete(key);
         return value;
@@ -228,26 +236,19 @@ export class PublicCatalogClient {
   }
   async collection(ids: string[], signal: AbortSignal) {
     signal.throwIfAborted();
-    const controller = new AbortController();
-    const abort = () => controller.abort(signal.reason);
-    signal.addEventListener("abort", abort, { once: true });
-    const requested = ids.slice(0, LIST_LIMIT);
-    const results: (CatalogSummary | null)[] = new Array(requested.length);
-    let cursor = 0;
-    const worker = async () => {
-      while (cursor < requested.length) {
-        controller.signal.throwIfAborted();
-        const index = cursor++;
-        results[index] = await this.skill(requested[index], controller.signal);
-      }
-    };
-    try {
-      await Promise.all(Array.from({ length: Math.min(4, requested.length) }, worker));
-      return { skills: results.filter((skill): skill is CatalogSummary => !!skill), missing: results.filter((skill) => !skill).length, limited: ids.length > LIST_LIMIT };
-    } finally {
-      controller.abort();
-      signal.removeEventListener("abort", abort);
-    }
+    const requested = [...new Set(ids)].slice(0, LIST_LIMIT);
+    if (!requested.length) return { skills: [], missing: 0, limited: false };
+    const skills = await this.cached(`batch:${JSON.stringify(requested)}`, async signal => {
+      const payload = record(await this.tool("get_skills", { ids: requested }, signal));
+      if (!Array.isArray(payload.skills) || payload.skills.length > requested.length) throw new Error("The catalog returned an invalid collection.");
+      const parsed = payload.skills.map(parseSkill);
+      const byId = new Map(parsed.map(skill => [skill.id, skill]));
+      if (byId.size !== parsed.length || parsed.some(skill => !requested.includes(skill.id))) throw new Error("The catalog returned different collection skills.");
+      signal.throwIfAborted();
+      for (const skill of parsed) this.remember(`skill:${skill.id}`, skill);
+      return requested.flatMap(id => byId.get(id) ?? []);
+    }, signal);
+    return { skills, missing: requested.length - skills.length, limited: ids.length > LIST_LIMIT };
   }
 }
 
@@ -256,12 +257,19 @@ export function publicScope(nav: Navigation) {
   return `${nav.view}:${nav.id}`;
 }
 
-export async function loadPublicView(client: PublicCatalogClient, nav: Navigation, signal: AbortSignal) {
+export async function loadPublicView(client: PublicCatalogClient, nav: Navigation, signal: AbortSignal, onProgress?: (update: PublicViewProgress) => void) {
   let note = "";
+  const emit = (update: PublicViewProgress) => { if (!signal.aborted) onProgress?.(update); };
   const categoryTerm = nav.view === "category" && discoveryCategories.some((group) => group.items.includes(nav.id)) ? nav.id : "";
   const query = nav.query.trim() || categoryTerm;
   if (!query && nav.view === "creator" && !handle(nav.id)) throw new Error("This creator could not be found.");
-  const metadata = client.metadata(signal);
+  const metadata = client.metadata(signal).then(catalog => {
+    emit({ section: "metadata", state: "ready", catalog });
+    return catalog;
+  }, error => {
+    emit({ section: "metadata", state: "error", error });
+    throw error;
+  });
   // Only collection entries depend on metadata. Start all other lists immediately.
   const list = query ? client.list("search_skills", { query }, signal)
     : nav.view === "top" || nav.view === "discover" ? client.list("list_trending", { limit: nav.view === "discover" ? 9 : LIST_LIMIT }, signal)
@@ -273,8 +281,19 @@ export async function loadPublicView(client: PublicCatalogClient, nav: Navigatio
     note = [result.limited ? `Showing the first ${LIST_LIMIT} collection entries.` : "", result.missing ? `${result.missing} collection entries are no longer available in the catalog.` : ""].filter(Boolean).join(" ");
     return result.skills;
   }) : Promise.resolve([] as CatalogSummary[]);
-  const [catalog, skills] = await Promise.all([metadata, list]);
+  const readyList = list.then(skills => {
+    emit({ section: "list", state: "ready", skills });
+    return skills;
+  }, error => {
+    emit({ section: "list", state: "error", error });
+    throw error;
+  });
+  // Settle both so a failure in one section cannot swallow a later success in another.
+  const [metadataResult, listResult] = await Promise.allSettled([metadata, readyList]);
   signal.throwIfAborted();
+  if (metadataResult.status === "rejected") throw metadataResult.reason;
+  if (listResult.status === "rejected") throw listResult.reason;
+  const catalog = metadataResult.value, skills = listResult.value;
   if ((query || nav.view === "creator" || nav.view === "top") && skills.length === LIST_LIMIT) note = `Showing up to ${LIST_LIMIT} results${query ? ". Refine your search for more specific matches." : "."}`;
   return client.rememberView(nav, { catalog: { ...catalog, skills, resultIds: skills.map((skill) => skill.id), trendingIds: !query && ["top", "discover"].includes(nav.view) ? skills.map((skill) => skill.id) : [] }, note });
 }

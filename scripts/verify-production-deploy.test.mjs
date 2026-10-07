@@ -69,7 +69,7 @@ function responseFor(path, options = {}, features = disabledFeatures) {
         jsonrpc: "2.0",
         id: request.id,
         result: {
-          tools: ["search_skills", "get_skill", "list_trending", "list_gold_basket", "list_by_author"]
+          tools: ["search_skills", "get_skill", "get_skills", "list_trending", "list_gold_basket", "list_by_author"]
             .map((name) => ({ name, annotations }))
         }
       });
@@ -77,7 +77,7 @@ function responseFor(path, options = {}, features = disabledFeatures) {
     return Response.json({
       jsonrpc: "2.0",
       id: request.id,
-      result: { structuredContent: { count: 1, skills: [{}] } }
+      result: { structuredContent: { count: 1, skills: [{ id: "author/repo:skill" }] } }
     });
   }
   return new Response(null, { status: 200 });
@@ -118,6 +118,7 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/updates/omgskills-1.0.0.zip", method: "HEAD" },
     { path: "/.well-known/ai-catalog.json", method: "GET" },
     { path: "/mcp/health", method: "GET" },
+    { path: "/mcp", method: "POST" },
     { path: "/mcp", method: "POST" },
     { path: "/mcp", method: "POST" },
     { path: "/mcp", method: "POST" },

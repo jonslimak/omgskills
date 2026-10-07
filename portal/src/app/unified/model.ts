@@ -104,6 +104,14 @@ export const initialNavigation: Navigation = {
   selected: "",
   source: "all",
 };
+export function openSkillNavigation(nav: Navigation, skill: SkillDisplay): Navigation {
+  if (!isDiscovery(nav.view) && skill.key.startsWith("catalog:")) {
+    if (skill.installed) return { ...nav, selected: `synced:${skill.installed.id}` };
+    // Public detail requests must not inherit a private set, search, or source.
+    return { ...initialNavigation, view: "discover", selected: skill.key };
+  }
+  return { ...nav, selected: skill.key };
+}
 export function parseNavigation(search: string): Navigation {
   const params = new URLSearchParams(search);
   const view = params.get("view") as View;

@@ -80,6 +80,7 @@ test("serves MCP initialization, tools, and structured results", async () => {
   assert.deepEqual(tools.map((tool: { name: string }) => tool.name), [
     "search_skills",
     "get_skill",
+    "get_skills",
     "list_trending",
     "list_gold_basket",
     "list_by_author"
@@ -97,6 +98,30 @@ test("serves MCP initialization, tools, and structured results", async () => {
   assert.equal(result.structuredContent.count, 1);
   assert.equal(result.structuredContent.skills[0].id, "example/skills:swift-review");
   await callContext.finish();
+});
+
+test("batch lookup is a single bounded read with the same public projection", async () => {
+  let loads = 0;
+  const base = loader();
+  const handler = createMcpHandler(loader({ get: async () => { loads++; return base.get(); } }));
+  const callContext = context();
+  const response = await handler(rpcRequest({
+    jsonrpc: "2.0", id: 1, method: "tools/call",
+    params: { name: "get_skills", arguments: { ids: ["missing/repo:skill", "example/skills:swift-review", "example/skills:swift-review"] } }
+  }), callContext.value);
+  const result = (await response.json()).result;
+  assert.equal(loads, 1);
+  assert.equal(result.structuredContent.count, 1);
+  assert.equal(result.structuredContent.skills[0].id, "example/skills:swift-review");
+  assert.equal(result.structuredContent.skills[0].install_status, "discovery_only");
+  await callContext.finish();
+  for (const ids of [[], Array(31).fill("example/skills:swift-review"), [""], ["x".repeat(501)]]) {
+    const invalidContext = context();
+    const invalid = await handler(rpcRequest({ jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "get_skills", arguments: { ids } } }), invalidContext.value);
+    const payload = await invalid.json();
+    assert.ok(payload.error || payload.result?.isError);
+    await invalidContext.finish();
+  }
 });
 
 test("exposes health and rejects unsafe request shapes", async () => {

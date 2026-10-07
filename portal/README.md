@@ -2,6 +2,28 @@
 
 React/Vite portal for Skill Groups.
 
+## Public discovery loading checks
+
+The unified app preloads its public entry during sign-in initialization. Discover
+sections render independently; collection entries use MCP `get_skills` (up to 30
+IDs) and share the existing bounded public cache. Deploy the updated MCP function
+and client together; a proxy to an older live function cannot serve that new tool.
+No account data is included in the public preload.
+
+With the existing Vite frontend running, run:
+
+```bash
+PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs \
+  node portal/testing/public-catalog-performance-browser.mjs
+```
+
+Defaults to `http://127.0.0.1:5191`; override `PORTAL_REVIEW_ORIGIN` for another
+loopback frontend. Uses installed Chrome and browser-intercepted public responses
+to test real hooks/UI, delays, failures, retries, batch reads and cached revisits.
+No new backend or test database is started. The DEV-only acceptance fixture's
+`catalog=1` option enables real public hooks; `authDelay` simulates account readiness
+without Clerk. These controlled checks are not production latency measurements.
+
 ## Local setup
 
 Use Node 20:
@@ -64,18 +86,25 @@ subdomain fallback. Routing changes require a separately approved deployment.
 The active local integration preview is `http://127.0.0.1:5191/app/integration/unified/`.
 See `../appwork.md` for the current acceptance checklist and backend limits.
 Reuse the existing preview for UI checks. Do not provision or expand disposable
-local infrastructure; real auth, invite persistence and external connections are
-reserved for separately approved production testing.
+local infrastructure. Core production auth, invitation access/revocation and
+Favorites/skill/set persistence were confirmed by the user on 2026-10-07.
+Remaining account-isolation, edge-case and external-connection checks are listed
+at the top of `../appwork.md`; they are not covered by that confirmation.
 
 Discover starts independent reads concurrently and retains up to 20 public view
 snapshots in memory for ten minutes, showing cached results while refreshing.
 It does not persist private account data or fetch the full skills catalog.
 
-Production routing is implemented but **off by default**. A separately approved
-release can select it with `VITE_PORTAL_UNIFIED_ENABLED=1` and
-`VITE_SKILLGROUPS_WEB_ENABLED=1`, plus the existing Clerk configuration. Existing
-set deep links, pairing/review routes and public library pages are preserved.
-No environment flag is enabled by this checkpoint.
+The unified app is live. `config/production-features.json` enables the unified
+and web flags; the combined builder uses this tracked configuration instead of
+ambient flag overrides. Existing set deep links, pairing/review routes and public
+library pages are preserved. Mac authentication/release gates remain separate.
+
+Combined builds require the live Clerk publishable key for `clerk.omgskills.com`.
+Keep `VITE_CLERK_PUBLISHABLE_KEY` identical in GitHub Actions and Netlify's
+production build scope. `scripts/portal-build-env.mjs` rejects test keys and other
+instances before building; an overnight test-key mismatch was corrected in
+`cb0d8164`. Never substitute a test key to make a production deploy preview login.
 
 The catalog/Favorites follow-up extends the existing creation API with a single
 `catalogSkillId` for Favorites, saving the set and first item together. Owner item
@@ -84,23 +113,55 @@ existing set lock. No schema migration is needed. The client retains a missing-I
 guard for older responses, so deploy the matching backend with this client.
 
 No invitation email is sent; the UI provides a copyable link after access is
-granted. First-time catalog Favorites, persisted saves and recipient access still
-need production acceptance. Local tests do not establish live connectivity.
+granted. The user confirmed persisted saves, read-only recipient access and
+revocation in production. First-ever catalog Favorites, concurrency, mixed
+representations and the other checks in `appwork.md` remain separate acceptance
+items. Local tests alone do not establish live connectivity.
+
+### Local isolation and mobile review
+
+The 2026-10-07 pass covers local account-controller cancellation/isolation and
+UI navigation. Related skills retain installed identity, or enter Discover with
+private context cleared. Detail focus survives related navigation and responsive
+panel changes; signed-out mobile lists/search have a Discover return control.
+Actual Clerk account switching still requires a production acceptance check.
+
+Reuse the existing Vite frontend for the sample-only page:
+`http://127.0.0.1:5191/app/testing/unified-acceptance/`.
+It uses the real unified UI and management dialogs with synthetic data, no auth
+or backend, and rejects writes. Do not use it to confirm invitation persistence.
+It is not included in the production entry build.
+
+```bash
+# From the repo root; point PLAYWRIGHT_MODULE at an existing Playwright module if needed.
+PORTAL_REVIEW_ORIGIN=http://127.0.0.1:5191 node portal/testing/unified-acceptance-browser.mjs
+```
+
+The runner starts only its browser, never a server or database, and blocks API
+and external requests. It checks four widths, keyboard/nested-dialog focus,
+related skills, Back/Forward, reload, signed-out navigation, Invite layout,
+light/dark and content/error states. Screenshots go to
+`output/playwright/unified-acceptance/` (ignored).
 
 ## Verification
 
-Build the portal and combined Netlify output:
+Follow `deploy.md` for release approval and inputs. Check and build the complete
+Netlify artifact, preserving current data and release assets:
 
 ```bash
+node ./scripts/restore-health-snapshot.mjs
+node ./scripts/prepare-netlify-site-deploy.mjs
+npm ci
 npm run check
+npm --workspace portal test
 npm run build:netlify
-SITE_DIR=dist/netlify-site node ./scripts/prepare-netlify-site-deploy.mjs
 ```
 
-Create a draft deploy:
+After explicit production approval, use the guarded helper. It verifies a draft
+before publishing the same prebuilt artifact and verifies production afterward:
 
 ```bash
-npx netlify-cli deploy --dir=dist/netlify-site --site "$NETLIFY_SITE_ID"
+npm run deploy:production
 ```
 
 Milestone 0 smoke endpoints:

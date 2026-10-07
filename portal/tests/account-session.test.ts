@@ -4,6 +4,7 @@ import { PortalApiError } from "../src/api-error";
 import type { PortalApi } from "../src/portal-api";
 import { accountCacheKey, createAccountSession, type AccountSnapshot } from "../src/integration/account-session";
 import { emptyAccount } from "../src/integration/data";
+import { makeFixtures } from "../src/preview/fixtures";
 
 const identity = { name: "Local tester", email: "tester@example.test" };
 const key = accountCacheKey("test-instance", "user-a", "session-a");
@@ -257,4 +258,59 @@ test("save completion after account switch never updates state or cache", async 
   await assert.rejects(save, { name: "AbortError" });
   assert.equal(states.length, count);
   assert.equal(storage.getItem(key), null);
+});
+
+test("late reads from a populated account cannot replace another account's skills, sets or cache", async () => {
+  const storage = memoryStorage();
+  const releases: (() => void)[] = [];
+  const signals: AbortSignal[] = [];
+  const states: AccountSnapshot[] = [];
+  const populated = (owner: string, path: string) => path.endsWith("synced-skills")
+    ? { skills: makeFixtures().skills.slice(0, 1).map(skill => ({ ...skill, id: owner, name: `${owner}-private-skill` })) }
+    : path.endsWith("/groups") ? { groups: [{ id: owner, name: `${owner}-private-set`, visibility: "private" }] }
+    : path.endsWith("profile") ? { profile: { handle: owner, profilePublished: false, publicUrl: null } } : { groups: [] };
+  let delay = false;
+  const firstApi: PortalApi = <T>(path: string, init?: RequestInit) => delay
+    ? new Promise<T>(resolve => { signals.push(init!.signal!); releases.push(() => resolve(populated("alice", path) as T)); })
+    : Promise.resolve(populated("alice", path) as T);
+  const first = createAccountSession({ api: firstApi, identity, cacheKey: "alice", storage, changed: state => states.push(state) });
+  await first.refresh();
+  assert.equal(first.getSnapshot().data?.skills[0].name, "alice-private-skill");
+  delay = true;
+  const late = first.refresh();
+  first.dispose();
+  const count = states.length;
+  const second = createAccountSession({ api: async <T>(path: string) => populated("bob", path) as T,
+    identity: { name: "Bob", email: "bob@example.test" }, cacheKey: "bob", storage, changed: () => {} });
+  assert.equal(second.getSnapshot().data, null);
+  await second.refresh();
+  const cache = storage.getItem("bob");
+  releases.forEach(release => release());
+  await late;
+  assert.ok(signals.every(signal => signal.aborted));
+  assert.equal(states.length, count);
+  assert.equal(storage.getItem("alice"), null);
+  assert.equal(storage.getItem("bob"), cache);
+  assert.equal(second.getSnapshot().data?.skills[0].name, "bob-private-skill");
+  assert.equal(second.getSnapshot().data?.sets[0].name, "bob-private-set");
+  second.dispose();
+});
+
+test("access invalidation aborts pending work and late reads cannot restore private data", async () => {
+  const releases: (() => void)[] = [];
+  let delay = false;
+  const transport: PortalApi = <T>(path: string) => delay
+    ? new Promise<T>(resolve => releases.push(() => resolve(response(path) as T)))
+    : Promise.resolve(response(path) as T);
+  const session = createAccountSession({ api: transport, identity, cacheKey: key, changed: noOp });
+  await session.refresh();
+  delay = true;
+  const late = session.refresh();
+  session.invalidateAccess();
+  releases.forEach(release => release());
+  await late;
+  assert.equal(session.getSnapshot().data, null);
+  assert.equal(session.getSnapshot().accessDenied, true);
+  await assert.rejects(session.saveSet({ kind: "create", name: "Not allowed" }), /Refresh/);
+  session.dispose();
 });

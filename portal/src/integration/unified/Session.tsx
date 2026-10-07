@@ -4,7 +4,7 @@ import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
 import { navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
-import { usePublicCatalog } from "../../app/unified/use-public-catalog";
+import { usePublicCatalog, usePublicCatalogPreload } from "../../app/unified/use-public-catalog";
 import { usePortalApi } from "../../portal-api";
 import { emptyAccount, type AccountIdentity } from "../data";
 import { useAccount } from "./useAccount";
@@ -89,6 +89,8 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
 }
 
 export function UnifiedSession({ base = unifiedBase, local = true }: { base?: string; local?: boolean }) {
+  const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
+  usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   if (!isLoaded || (isSignedIn && !userLoaded)) return <p role="status">Loading account...</p>;

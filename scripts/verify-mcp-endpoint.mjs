@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const expectedTools = [
   "search_skills",
   "get_skill",
+  "get_skills",
   "list_trending",
   "list_gold_basket",
   "list_by_author"
@@ -76,6 +77,17 @@ export async function verifyMcpEndpoint({
   }
   if (authorSkills.some((skill) => skill.trending_rank !== undefined && typeof skill.trending_rank !== "number")) {
     throw new Error(`${normalizedOrigin}/mcp author listing returned an invalid trending rank`);
+  }
+
+  const id = authorSkills[0]?.id;
+  if (typeof id !== "string" || !id) throw new Error(`${normalizedOrigin}/mcp author listing returned no skill ID`);
+  const batch = await rpc(fetchImpl, normalizedOrigin, {
+    jsonrpc: "2.0", id: 5, method: "tools/call",
+    params: { name: "get_skills", arguments: { ids: [id] } }
+  });
+  const batchData = batch?.result?.structuredContent;
+  if (batchData?.count !== 1 || batchData?.skills?.length !== 1 || batchData.skills[0]?.id !== id) {
+    throw new Error(`${normalizedOrigin}/mcp batch lookup returned invalid skills`);
   }
 
   console.log(`MCP verified: ${normalizedOrigin}/mcp (${healthBody.skillCount} skills)`);

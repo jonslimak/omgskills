@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { initialNavigation, navigationSearch, setAccessSummary, setSkillDisplays, skillDisplays } from "../src/app/unified/model";
+import { initialNavigation, navigationSearch, openSkillNavigation, setAccessSummary, setSkillDisplays, skillDisplays } from "../src/app/unified/model";
 import { accountNavigation, publicNavigation } from "../src/integration/unified/policy";
 import { readOnlyApi } from "../src/integration/data";
 import { createAccountSession } from "../src/integration/account-session";
@@ -38,6 +38,22 @@ test("private search and identifiers cannot reach the public catalog hook", () =
   assert.equal(navigationSearch(publicNavigation(privateNav)), "");
   const discovery = { ...initialNavigation, view: "discover" as const, query: "React" };
   assert.deepEqual(publicNavigation(discovery), discovery);
+});
+test("related skills keep installed detail local and clear private context before public navigation", () => {
+  const data = makeFixtures();
+  const mine = skillDisplays(data, { skills: [], collections: [], creators: [], categories: [], trendingIds: [] }).mine;
+  const skill = mine[0];
+  const nav = { ...initialNavigation, view: "set" as const, id: "private-set", query: "confidential", source: "Claude" };
+  const installed = openSkillNavigation(nav, { ...skill, key: "catalog:public" });
+  assert.equal(installed.selected, skill.key);
+  assert.deepEqual(accountNavigation(installed, true), installed);
+  assert.deepEqual(publicNavigation(installed), initialNavigation);
+  const publicSkill = { ...skill, key: "catalog:public", installed: undefined };
+  const opened = openSkillNavigation(nav, publicSkill);
+  assert.deepEqual(opened, { ...initialNavigation, view: "discover", selected: publicSkill.key });
+  assert.deepEqual(accountNavigation(opened, true), opened);
+  const discover = { ...initialNavigation, view: "creator" as const, id: "author", query: "React" };
+  assert.deepEqual(openSkillNavigation(discover, publicSkill), { ...discover, selected: publicSkill.key });
 });
 test("authenticated controller receives a read-only transport even for accidental edits", async () => {
   const requests: string[] = [];

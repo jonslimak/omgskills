@@ -75,6 +75,7 @@ test("tools expose complete read-only metadata and structured results", async (c
   assert.deepEqual(tools.map((tool) => tool.name), [
     "search_skills",
     "get_skill",
+    "get_skills",
     "list_trending",
     "list_gold_basket",
     "list_by_author"
@@ -105,6 +106,13 @@ test("tools expose complete read-only metadata and structured results", async (c
     arguments: { id: "missing/repo:missing" }
   });
   assert.deepEqual(missing.structuredContent, { found: false, skill: null });
+
+  const batch = await client.callTool({ name: "get_skills", arguments: {
+    ids: ["openai/codex:mcp-builder", "missing/repo:missing", "anthropics/skills:swift-review", "openai/codex:mcp-builder"]
+  } });
+  assert.equal(batch.isError, undefined);
+  assert.deepEqual((batch.structuredContent?.skills as Array<{ id: string }>).map(skill => skill.id),
+    ["openai/codex:mcp-builder", "anthropics/skills:swift-review"]);
 
   const byAuthor = await client.callTool({
     name: "list_by_author",
@@ -146,6 +154,7 @@ test("strict clients accept real catalog records without undeclared fields", asy
   const calls = [
     { name: "search_skills", arguments: { query: "swift" } },
     { name: "get_skill", arguments: { id: skill.id } },
+    { name: "get_skills", arguments: { ids: [skill.id] } },
     { name: "list_trending", arguments: {} },
     { name: "list_gold_basket", arguments: {} },
     { name: "list_by_author", arguments: { author: "anthropics" } }
@@ -211,7 +220,7 @@ test("local Streamable HTTP transport initializes and calls tools", async (conte
   context.after(() => client.close());
 
   const { tools } = await client.listTools();
-  assert.equal(tools.length, 5);
+  assert.equal(tools.length, 6);
 
   const result = await client.callTool({
     name: "list_trending",
@@ -241,7 +250,7 @@ test("published stdio entry point still exposes the shared tools", async (contex
   context.after(() => client.close());
 
   const { tools } = await client.listTools();
-  assert.equal(tools.length, 5);
+  assert.equal(tools.length, 6);
 
   const result = await client.callTool({
     name: "get_skill",
