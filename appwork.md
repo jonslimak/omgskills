@@ -1,6 +1,6 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest recorded fix: `cb0d8164`, production deploy `6ac6367cfd2afecd22a5c69b`. Guarded draft/production checks passed; all 2,210 public non-app files were unchanged. On 2026-10-07 the user confirmed My Skills, invitation access/revocation, and Favorites/skill/set persistence after refresh pass in production. Remaining acceptance is listed below; historical pending statements are not the current checklist.
+Status: Unified app is live. Latest app release: `0e51f512`, production deploy `6ac6906f6d4c8564369c82ba`. Guarded draft/production checks passed; all 2,210 public non-app files were unchanged. On 2026-10-07 the user confirmed My Skills, invitation access/revocation, and Favorites/skill/set persistence after refresh on the earlier release. Remaining acceptance is listed below; historical pending statements are not the current checklist.
 Updated: 2026-10-07. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
 ## Current Acceptance And Remaining Work - 2026-10-07
@@ -50,10 +50,36 @@ its local root cause was not established and the local experiment stays stopped.
   Earlier local cache measurements are not production performance evidence.
 
 No new feature implementation is required by the passed invitation/persistence
-tests. The approved local isolation/mobile pass is complete below. Next release
-gate: review and separately approve a commit/deploy, then confirm real account
-switching and mobile/deep-link behavior in production. Less-common management
-and account-destination checks remain afterward.
+tests. The approved isolation/mobile and discovery-loading passes are now live.
+Next: confirm real account switching and signed-in mobile/deep-link behavior in
+production. Less-common management and account-destination checks remain afterward.
+
+### Verified Release - 2026-10-07
+
+- App source commit `0e51f512` was integrated with current main's catalog update
+  `bac117d5` and pushed to main. No schema, permissions, authentication settings,
+  or Mac release changes were included.
+- Regenerated ignored public library pages from current inputs before packaging;
+  stale local generated pages initially failed the non-app comparison. No failed
+  candidate was published and no comparison guard was relaxed.
+- Draft `6ac68f4582e0246021971165` and production
+  `6ac6906f6d4c8564369c82ba` passed the guarded complete-site checks, including
+  public library pages, exact manifests, downloads, protected routes and MCP
+  `get_skills`. Receipt: `dist/netlify-deploy-receipt.json` (ignored).
+- The production file inventory confirmed all 2,210 public non-app files were
+  unchanged. All 11 Mac download/update assets and appcast were preserved.
+- Re-ran 217 portal tests, full `npm run check`, the complete production build,
+  four-width UI checks and controlled discovery-loading browser checks.
+- A fresh signed-out Chrome session on `https://omgskills.com/app/` confirmed
+  live discovery, one collection batch request, no per-skill collection calls,
+  desktop detail top at 0px, bottom-aligned mobile detail at 390px, no horizontal
+  overflow and no page errors. Screenshots were inspected. One warm-service
+  sample measured first discovery rows at 1,088ms and collection rows at 240ms;
+  these are spot checks, not a cold-start benchmark or signed-in acceptance.
+- Draft browser authentication remained restricted to the production domain
+  (`origin_invalid`); no auth protection was changed. Browser smoke checks used
+  the real production domain after deployment. Existing signed-in acceptance
+  and outstanding account-isolation checks remain distinct from these results.
 
 ### Local Discovery Loading Pass - 2026-10-07
 
@@ -75,17 +101,16 @@ and account-destination checks remain afterward.
 - [x] The test fixture remains localhost/DEV-only and is excluded from the build.
   No account writes or new persistent backend/test database were used. The portal
   build used a placeholder test key and is verification-only, not deployable.
-- [ ] Commit/deploy separately with the updated MCP function and client together.
-  The live MCP endpoint does not have `get_skills` yet; an old live proxy cannot
-  validate the new collection call. Browser checks used controlled responses,
-  and function tests used the real handler with fixtures. Measure real signed-in
-  and cold/warm production behavior after an approved deploy.
+- [x] Committed and deployed the updated MCP function and client together in
+  `0e51f512`. Production verification and a real signed-out collection request
+  confirmed `get_skills`. Signed-in and repeated cold/warm timing checks remain.
 - [ ] The server's full-catalog cold-start load remains unchanged in this pass.
   Earlier live inspection found a roughly 79 MB decoded skills asset; that is
   server-side startup work, not a browser download.
 
-No commit, push, production deployment, schema migration, or account change was
-made by this pass. The earlier 32px desktop detail offset fix is also local only.
+This pass was initially local-only; the verified release above subsequently
+published it together with the 32px desktop detail offset fix. No schema migration
+or account change was made.
 
 ### Local Isolation And Navigation Pass - 2026-10-07
 
