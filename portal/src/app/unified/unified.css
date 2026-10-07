@@ -402,6 +402,44 @@
   color: var(--ua-muted);
   margin-top: 8px;
 }
+.ua-page-heading.ua-heading-filter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+.ua-heading-filter > :first-child {
+  min-width: 0;
+}
+.ua-heading-actions {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ua-heading-actions > .ua-filter {
+  max-width: 150px;
+}
+.ua-heading-actions > .ua-pill {
+  width: 52px;
+  padding-inline: 8px;
+}
+.ua-heading-actions > .ua-pill,
+.ua-heading-actions > .ua-filter {
+  height: 28px;
+  min-height: 28px;
+}
+.ua-heading-actions .ua-filter select {
+  min-width: 0;
+}
+.ua-set-heading-controls {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .ua-set-heading { align-items: flex-start; }
 .ua-set-identity { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; }
 .ua-set-identity > div:last-child { min-width: 0; }
@@ -437,6 +475,7 @@
 .ua-set-people .ua-member-initial + .ua-member-initial { margin-left: -8px; }
 .ua-pill.ua-invite { --ua-pill-bg: #34c759; --ua-pill-hover: #2aab4a; height: 36px; padding: 0 16px; color: #fff; font-size: 13px; }
 .ua-set-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: -20px; }
+.ua-set-actions > .ua-heading-actions { margin-left: auto; flex-shrink: 0; }
 .ua-visibility-check { width: 14px; flex-shrink: 0; color: var(--ua-blue); }
 .ua-visibility-option { display: flex; flex-direction: column; gap: 1px; width: 202px; }
 .ua-visibility-option strong { font-size: 13px; font-weight: 600; }
@@ -547,24 +586,6 @@
   position: relative;
   padding: 0 8px;
   margin: 0 -8px;
-}
-.ua-row::after {
-  content: "";
-  position: absolute;
-  left: 47px;
-  right: 8px;
-  bottom: 0;
-  height: 1px;
-  background: var(--ua-line);
-}
-.ua-row:last-child::after {
-  display: none;
-}
-.ua-row:has(> .ua-rank)::after {
-  left: 77px;
-}
-.ua-row:has(> input)::after {
-  left: 79px;
 }
 .ua-row > input {
   flex: none;
@@ -807,9 +828,6 @@
   gap: 12px;
   border-radius: 14px;
 }
-.ua-row-compact::after {
-  display: none;
-}
 .ua-row-compact .ua-row-main {
   gap: 12px;
 }
@@ -928,7 +946,6 @@
   align-items: center;
   gap: 14px;
   min-height: 76px;
-  border-bottom: 1px solid var(--ua-line);
   padding: 12px 0;
 }
 .ua-set-list > button > span:not(.ua-set-icon) {
@@ -1428,16 +1445,13 @@
     gap: 24px;
   }
   .ua-mobile-header {
-    display: block;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
     padding: 14px 16px 12px;
   }
-  .ua-mobile-header > div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .ua-mobile-header > div > span {
+  .ua-mobile-logo {
     font-size: 25px;
   }
   .ua-account-mobile {
@@ -1458,6 +1472,7 @@
     border: 0;
     border-radius: 999px;
     background: var(--ua-chip);
+    color: var(--ua-faint);
     margin: 0;
     padding: 0 14px;
     gap: 10px;
@@ -1465,9 +1480,14 @@
   .ua-search-mobile svg {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
   }
   .ua-search-mobile input {
     font-size: 16px;
+  }
+  .ua-search-mobile input::placeholder {
+    color: var(--ua-faint);
+    opacity: 1;
   }
   .ua-mobile-tabs {
     display: grid;
@@ -1501,8 +1521,15 @@
   .ua-page-heading h1 {
     font-size: 30px;
   }
-  .ua-set-hero .ua-avatar { width: 52px; height: 52px; }
   .ua-set-heading .ua-set-identity { flex-basis: 100%; }
+  .ua-set-heading.ua-heading-filter .ua-set-identity { display: contents; }
+  .ua-set-heading.ua-heading-filter .ua-set-identity > div:last-child {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .ua-set-heading .ua-set-hero { display: none; }
+  .ua-set-action > span { display: none; }
+  .ua-pill.ua-set-action { width: 28px; padding: 0; flex-shrink: 0; }
   .ua-row {
     min-height: 58px;
   }
@@ -1562,5 +1589,16 @@
   }
   .ua-toast {
     bottom: 90px;
+  }
+}
+@media (max-width: 359px) {
+  .ua-page-heading.ua-heading-filter {
+    gap: 8px;
+  }
+  .ua-heading-actions .ua-filter-label {
+    display: none;
+  }
+  .ua-set-visibility-label {
+    display: none;
   }
 }

@@ -33,6 +33,26 @@ try {
   const focused = async label => {
     await page.waitForFunction(label => document.activeElement?.getAttribute("aria-label") === label, label);
   };
+  for (const width of [320, 390, 759, 760]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const signedOut of [false, true]) {
+      await go(`?view=discover${signedOut ? "&signedOut=1" : ""}`);
+      const header = page.locator(".ua-mobile-header");
+      assert.equal(await header.isVisible(), width < 760);
+      if (width >= 760) continue;
+      const logo = await header.locator(".ua-mobile-logo").boundingBox();
+      const search = await header.locator(".ua-search-mobile").boundingBox();
+      const account = await header.getByRole("button", { name: signedOut ? "Sign in" : "Account menu", exact: true }).boundingBox();
+      assert.ok(logo && search && account);
+      assert.ok(logo.x + logo.width <= search.x && search.x + search.width <= account.x);
+      const centers = [logo, search, account].map(box => box.y + box.height / 2);
+      assert.ok(Math.max(...centers) - Math.min(...centers) < 1, "Mobile header controls must share one row");
+      await fits();
+      await page.screenshot({ path: path.join(output, `${width}-header-${signedOut ? "public" : "account"}.png`) });
+      await header.getByRole("searchbox").fill("frontend");
+      await page.waitForURL(url => url.searchParams.get("q") === "frontend");
+    }
+  }
   for (const width of [1440, 1024, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await go();

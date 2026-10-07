@@ -65,8 +65,8 @@ the sample-data preview, or download the raw catalog automatically.
 The unified local preview defaults to live Discover with a sample account. The
 catalog selector retains the deterministic sample catalog. Live mode reads
 manifest-discovered collections (crawl4, then v2 fallback) and bounded MCP lists;
-it never reads the raw skills asset. Collection details use at most four concurrent
-requests and 30 entries. Search is debounced; public reads are cancellable and
+it never reads the raw skills asset. Collection details use one MCP `get_skills`
+batch for up to 30 entries. Search is debounced; public reads are cancellable and
 cached in memory for two minutes (up to 60 responses). Real catalog rows do not
 inherit installation or favorite state from the sample account. Public skill
 links load on demand, and no install or account write is enabled.
@@ -90,6 +90,9 @@ local infrastructure. Core production auth, invitation access/revocation and
 Favorites/skill/set persistence were confirmed by the user on 2026-10-07.
 Remaining account-isolation, edge-case and external-connection checks are listed
 at the top of `../appwork.md`; they are not covered by that confirmation.
+The loading/panel fixes shipped in `0e51f512`; guarded deployment and signed-out
+live desktop/mobile smoke checks passed. The next proposed pass is signed-in
+production navigation and account switching, using an agreed account scope.
 
 Discover starts independent reads concurrently and retains up to 20 public view
 snapshots in memory for ten minutes, showing cached results while refreshing.

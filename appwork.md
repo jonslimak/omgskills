@@ -18,24 +18,36 @@ and does not authorize account mutations, a commit, or a deployment.
 - [x] A second account can open the shared link and read the set without editing it.
 - [x] Removing the recipient's access denies access after their page is refreshed.
 - [x] Favorites and skill/set changes persist after refresh.
+- [x] User confirmed sign-in and the flows they tested work on the latest release.
+- [x] User confirmed switching between two accounts removes the previous
+  account's skills.
+- [x] User confirmed bulk add/remove, ordering, and Hide/Restore work.
+- [x] Latest loading/panel release passed guarded draft and production checks.
+  Agent-observed signed-out discovery, batched collection loading, and desktop/
+  mobile detail placement passed; all 2,210 public non-app files stayed unchanged.
 
-Evidence: the user reported "all tests pass for me" for the proposed invitation
+Evidence for account behavior: the user reported "all tests pass for me" for the proposed invitation
 checklist, then confirmed "they do" for Favorites and skill/set persistence.
 These are user-reported results on `https://omgskills.com/app/`, not a fresh agent
 browser test or proof of every item type, host, device, or concurrency edge case.
 The earlier local invite-save failure is no longer an open production blocker;
 its local root cause was not established and the local experiment stays stopped.
+Evidence for the latest release is in the verified release receipt below.
+Subsequently, the user reported "I tested the signin and most of the things and
+all work", answered "yes" to the two-account switching/previous-skills check,
+and reported "tested all work" for bulk add/remove, ordering, and Hide/Restore.
+These are user-verified production results, not new agent-run tests. They do not
+establish coverage of deliberate failure/race conditions or every host/device.
 
 ### Remaining Acceptance (Not Confirmed Implementation Gaps)
 
-- [ ] Account isolation: switch/sign out between populated accounts in the same
-  browser, including an in-flight read; no previous account's skills remain.
-  Also verify authenticated navigation on `app.omgskills.com`.
+- [ ] Account-isolation edge cases: switching during a deliberately delayed
+  in-flight read, and authenticated navigation on `app.omgskills.com`.
   Local controller tests cover populated-account late reads, disposal, pending
-  save completion and access invalidation; real Clerk account switching is still
-  a production acceptance check, not established by those tests.
-- [ ] Less-common management paths: bulk add/remove and partial failures,
-  ordering, Hide/Restore, mixed item types, and protected Favorites behavior.
+  save completion and access invalidation. Ordinary two-account switching is
+  user-accepted above; the additional race/host cases were not explicitly tested.
+- [ ] Management edge cases: partial failures, mixed item types, and protected
+  Favorites behavior. Bulk add/remove, ordering and Hide/Restore are user-accepted.
 - [ ] Catalog-specific edge cases: first-ever Favorites creation from Discover,
   repeated/concurrent saves, and installed/catalog duplicate representations.
   Ordinary Favorites persistence is already accepted above.
@@ -44,15 +56,27 @@ its local root cause was not established and the local experiment stays stopped.
   explicitly agreed scope. Include legacy set links and pairing/review routes.
 - [ ] Final UI/accessibility sweep: mobile sheets, keyboard/focus, light/dark,
   long content, back/forward and direct links, loading/error recovery. The local
-  sample-data pass below is complete; repeat a focused smoke check with real
-  production data after an approved deploy.
+  four-width sample-data pass and real signed-out desktop/mobile panel smoke
+  check are complete. Signed-in production navigation and detail checks remain.
 - [ ] Production performance: cold/warm Discover timings and request sizes.
-  Earlier local cache measurements are not production performance evidence.
+  One live signed-out timing sample is recorded below; repeated measurements
+  and signed-in behavior remain unverified. Local fixture timings do not count.
 
-No new feature implementation is required by the passed invitation/persistence
-tests. The approved isolation/mobile and discovery-loading passes are now live.
-Next: confirm real account switching and signed-in mobile/deep-link behavior in
-production. Less-common management and account-destination checks remain afterward.
+No new implementation gap was reported by these production tests. The approved
+isolation/mobile and discovery-loading passes are live, and the user has accepted
+ordinary sign-in, account switching, and the named management actions.
+
+### Next Work
+
+Await the user's requested quick UI tweaks. Do not start another acceptance pass,
+change account data, commit, or deploy as part of this documentation update.
+
+The earlier proposed sign-in/account-switch and bulk-management checks are
+superseded by the user confirmations above. Profile/device/connection screens
+and the remaining edge cases stay open; they are unverified, not known defects.
+Any later production test involving session changes, mutations, or external
+connections needs an agreed scope. Further performance changes should follow
+repeated measurements, not the single timing sample below.
 
 ### Verified Release - 2026-10-07
 
@@ -143,7 +167,8 @@ The full authenticated build was checked with the repository's non-secret
 placeholder Clerk key, in `/private/tmp/omgskills-unified-acceptance-build` only.
 It is a compile check, NOT a deployable artifact or live-auth test. Production
 builds still require the guarded combined builder and real approved live key.
-No production accounts were changed. This pass is not committed or deployed.
+No production accounts were changed. This was initially a local-only pass; its
+fixes and regression tests shipped in the verified `0e51f512` release above.
 
 ### Intentionally Outside This UI Migration
 
@@ -259,12 +284,12 @@ approval/status statements in historical checkpoints below.
   (ID `23547cdb-2b16-4878-aa4d-d6a324de0499`). Permission testing stopped. Do not
   resume that experiment or remove existing local data without approval.
 
-### UI/UX Completion Checklist
+### Broad UI/UX Review Inventory
 
-Every unchecked row needs a source/behavior comparison, a local visual review,
-and either a fix or an explicit agreed omission. A local connection failure alone
-does not establish a missing UI feature. This checklist is a review to perform,
-not a claim that every listed feature is broken.
+These broad rows mix several behaviors and are not a second current task queue.
+Keep a row open until all of its behaviors have evidence; completed narrower
+checks and the actionable remaining queue are recorded at the top of this file.
+A local connection failure alone does not establish a missing UI feature.
 
 - [ ] Shell/navigation: signed-in/out entry, My Skills/Discover, rail, mobile tabs,
   account menu, back/forward, direct links and restoration of selected detail.
@@ -825,8 +850,10 @@ deferred to production, not additional disposable local environments.
 ### 4. UI Review And Code Readiness
 
 - [ ] Complete the screen-by-screen UI/UX checklist and fix agreed implementation gaps.
-- [ ] Check mobile sheets, keyboard/focus, deep links and loading/error states locally.
+- [x] Check mobile sheets, keyboard/focus, deep links and loading/error states locally.
   Retain automated tests for auth transitions, stale responses and account isolation.
+  Evidence: four-width local acceptance matrix and controller tests recorded above;
+  this does not mark signed-in production acceptance complete.
 - [ ] Check pairing/review routes, public pages and permission guards in source/tests.
 - [ ] Check bundle size and request strategy locally. Confirm real transfer sizes,
   cold/warm timings and host behavior in production rather than chasing local connectivity.

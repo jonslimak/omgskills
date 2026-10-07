@@ -207,8 +207,8 @@ function MenuItem({
   );
 }
 
-function ManagedSetHeader({ set, skills, management, theme }: {
-  set: PortalSet; skills: SkillDisplay[]; management: UnifiedManagement; theme: string;
+function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
+  set: PortalSet; skills: SkillDisplay[]; management: UnifiedManagement; theme: string; headingActions: ReactNode;
 }) {
   const editable = set.role === "owner" && !set.hidden && !set.isFavorites;
   const disabled = management.busy || management.blocked;
@@ -221,7 +221,7 @@ function ManagedSetHeader({ set, skills, management, theme }: {
     private: "Just you, on your account.",
   };
   return <>
-    <div className="ua-page-heading ua-set-heading">
+    <div className="ua-page-heading ua-set-heading ua-heading-filter">
       <div className="ua-set-identity">
         <div className="ua-set-hero" aria-hidden="true">
           {skills.length ? skills.slice(0, 3).map(skill => <Avatar key={skill.key} name={skill.name} src={skill.avatar} size="large" />)
@@ -229,9 +229,11 @@ function ManagedSetHeader({ set, skills, management, theme }: {
         </div>
         <div><h1>{set.name}</h1><p>{count} {count === 1 ? "skill" : "skills"} &middot; {access.label}</p></div>
       </div>
+      <div className="ua-set-heading-controls">
+      {editable && <IconButton label="Rename set" disabled={disabled} onClick={() => management.rename(set)}><Pencil /></IconButton>}
       {editable ? <Menu theme={theme} label="Set visibility" trigger={
         <button type="button" className="ua-pill" disabled={disabled} aria-label={`Set visibility: ${visibilityLabels[set.visibility]}`}>
-          <VisibilityIcon />{visibilityLabels[set.visibility]}<ChevronDown />
+          <VisibilityIcon /><span className="ua-set-visibility-label">{visibilityLabels[set.visibility]}</span><ChevronDown />
         </button>
       }>
         {(["public", "restricted", "private"] as const).map(value => <MenuItem key={value} disabled={disabled}
@@ -240,6 +242,7 @@ function ManagedSetHeader({ set, skills, management, theme }: {
           <span className="ua-visibility-option"><strong>{visibilityLabels[value]}</strong><span>{descriptions[value]}</span></span>
         </MenuItem>)}
       </Menu> : <span className="ua-muted">{visibilityLabels[set.visibility]}</span>}
+      </div>
     </div>
     {!set.isFavorites && <div className="ua-set-access-bar">
       <div className="ua-set-people" aria-label={`Set access: ${access.label}`}>
@@ -251,15 +254,15 @@ function ManagedSetHeader({ set, skills, management, theme }: {
       {editable && <button type="button" className="ua-pill ua-invite" disabled={disabled} onClick={() => management.access(set)}>Invite</button>}
     </div>}
     <div className="ua-set-actions">
-      <button className="ua-pill" type="button" onClick={() => management.copyLink(set)}><Copy />Copy link</button>
-      {set.hidden && <span className="ua-muted">Hidden from other people</span>}
       {editable && <>
-        <IconButton label="Rename set" disabled={disabled} onClick={() => management.rename(set)}><Pencil /></IconButton>
-        <button className="ua-pill" type="button" disabled={disabled} onClick={() => management.add([], set)}><Plus />Add skill</button>
+        <button className="ua-pill ua-set-action" type="button" aria-label="Add skill" title="Add skill" disabled={disabled} onClick={() => management.add([], set)}><Plus /><span>Add skill</span></button>
       </>}
+      <IconButton label="Copy link" onClick={() => management.copyLink(set)}><Copy /></IconButton>
+      {set.hidden && <span className="ua-muted">Hidden from other people</span>}
       {set.role === "owner" && !set.isFavorites && <Menu theme={theme} label="Set options" trigger={<IconButton label="Set options" disabled={disabled}><MoreHorizontal /></IconButton>}>
         <MenuItem icon={EyeOff} disabled={disabled} onSelect={() => management.moderate(set)}>{set.hidden ? "Restore set" : "Hide set"}</MenuItem>
       </Menu>}
+      {headingActions}
     </div>
   </>;
 }
@@ -525,7 +528,7 @@ export function UnifiedApp({
       <span className="ua-sr">Search skills or creators</span>
       <input
         type="search"
-        placeholder={mobile ? "Search skills or creators" : "Search skills"}
+        placeholder="Search skills"
         value={nav.query}
         onChange={(event) => changeQuery(event.target.value)}
       />
@@ -921,6 +924,33 @@ export function UnifiedApp({
                 : nav.view === "top"
                   ? "A little inspiration for what to try next."
                   : "";
+  const headingActions = listState === "ready" && !nav.query &&
+    (editableView || (readOnlyAccount && signedIn && nav.view === "all")) ? (
+    <div className="ua-heading-actions">
+      {editableView && <button
+        type="button"
+        className="ua-pill"
+        onClick={() => {
+          setEditing(!editing);
+          setPicked([]);
+          closeDetail();
+        }}
+      >
+        {editing ? "Done" : "Edit"}
+      </button>}
+      <label className="ua-filter">
+        <span className="ua-filter-label">Agent</span>
+        <select
+          aria-label="Filter by agent"
+          value={nav.source}
+          onChange={(event) => navigate({ ...nav, source: event.target.value })}
+        >
+          <option value="all">All</option>
+          {sources.map((source) => <option key={source}>{source}</option>)}
+        </select>
+      </label>
+    </div>
+    ) : null;
 
   return (
     <div className="ua-theme ua-root" data-theme={theme}>
@@ -1033,21 +1063,19 @@ export function UnifiedApp({
         </aside>
         <div className="ua-content-column">
           <header className="ua-mobile-header">
-            <div>
-              <span aria-label="omgskills">👀</span>
-              {signedIn ? (
-                accountMenu(true)
-              ) : (
-                <button
-                  type="button"
-                  className="ua-pill ua-primary"
-                  onClick={signIn}
-                >
-                  Sign in
-                </button>
-              )}
-            </div>
+            <span className="ua-mobile-logo" aria-label="omgskills">👀</span>
             {search(true)}
+            {signedIn ? (
+              accountMenu(true)
+            ) : (
+              <button
+                type="button"
+                className="ua-pill ua-primary"
+                onClick={signIn}
+              >
+                Sign in
+              </button>
+            )}
           </header>
           <main className="ua-main" ref={main} id="unified-main" tabIndex={-1}>
             <div className="ua-content">
@@ -1081,11 +1109,12 @@ export function UnifiedApp({
                   </button>
                 )}
               {management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
-                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} /> : <div className="ua-page-heading">
+                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}`}>
                 <div>
                   <h1>{title}</h1>
                   {meta && <p>{meta}</p>}
                 </div>
+                {headingActions}
                 {(!readOnlyAccount || management) && nav.view === "sets" && (
                   <button
                     type="button"
@@ -1319,36 +1348,6 @@ export function UnifiedApp({
                 </div>
               ) : (
                 <>
-                  {(editableView || (readOnlyAccount && signedIn && nav.view === "all")) && (
-                    <div className="ua-toolbar">
-                      <label className="ua-filter">
-                        Agent
-                        <select
-                          aria-label="Filter by agent"
-                          value={nav.source}
-                          onChange={(event) =>
-                            navigate({ ...nav, source: event.target.value })
-                          }
-                        >
-                          <option value="all">All</option>
-                          {sources.map((source) => (
-                            <option key={source}>{source}</option>
-                          ))}
-                        </select>
-                      </label>
-                      {editableView && <button
-                        type="button"
-                        className="ua-pill"
-                        onClick={() => {
-                          setEditing(!editing);
-                          setPicked([]);
-                          closeDetail();
-                        }}
-                      >
-                        {editing ? "Done" : "Edit"}
-                      </button>}
-                    </div>
-                  )}
                   {editing && (
                     <div className="ua-bulk">
                       <button
