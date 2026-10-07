@@ -21,8 +21,8 @@ public enum InstallFailure: LocalizedError, Equatable {
 }
 
 // All operations below stay relative to open directory descriptors, not paths supplied by a link.
-final class SandboxDirectory {
-    let fd: Int32
+package final class SandboxDirectory {
+    package let fd: Int32
     init(fd: Int32) throws {
         guard fd >= 0 else { throw InstallFailure.unsafePath }
         self.fd = fd
@@ -94,7 +94,7 @@ final class SandboxDirectory {
         throw InstallFailure.io
     }
 
-    func read(_ path: String, limit: Int) throws -> (Data, mode_t) {
+    package func read(_ path: String, limit: Int) throws -> (Data, mode_t) {
         let (directory, name) = try parent(of: path)
         let file = openat(directory.fd, name, O_RDONLY | O_NOFOLLOW | O_NONBLOCK)
         guard file >= 0 else { throw InstallFailure.unsafePath }
@@ -117,7 +117,7 @@ final class SandboxDirectory {
         return (bytes, info.st_mode & 0o7777)
     }
 
-    func write(_ path: String, data: Data, mode: mode_t = 0o600) throws {
+    package func write(_ path: String, data: Data, mode: mode_t = 0o600) throws {
         let (directory, name) = try parent(of: path, create: true)
         let file = openat(directory.fd, name, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW, 0o600)
         guard file >= 0 else { throw InstallFailure.unsafePath }
@@ -171,7 +171,7 @@ final class SandboxDirectory {
         return bytes.withUnsafeBufferPointer { String(cString: $0.baseAddress!) }
     }
 
-    func lock() throws -> SandboxLock {
+    package func lock() throws -> SandboxLock {
         let lock = openat(fd, "install.lock", O_RDWR | O_CREAT | O_NOFOLLOW | O_NONBLOCK, 0o600)
         guard lock >= 0 else { throw InstallFailure.unsafePath }
         var info = stat()
@@ -191,10 +191,10 @@ final class SandboxDirectory {
     }
 }
 
-final class SandboxLock {
+package final class SandboxLock {
     private var fd: Int32
     init(fd: Int32) { self.fd = fd }
-    func release() {
+    package func release() {
         if fd >= 0 { flock(fd, LOCK_UN); Darwin.close(fd); fd = -1 }
     }
     deinit { release() }
@@ -230,7 +230,7 @@ package struct InstallSandbox: Sendable {
         _ = try open()
     }
 
-    func open() throws -> SandboxDirectory {
+    package func open() throws -> SandboxDirectory {
         let root = try SandboxDirectory.absolute(url)
         try root.owned()
         let (bytes, mode) = try root.read("sandbox.json", limit: 1024)

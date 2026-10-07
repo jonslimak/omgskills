@@ -1,4 +1,5 @@
 import Foundation
+import HandoffCore
 
 public enum InstallLaunchMode: Equatable, Sendable {
     case preview
@@ -44,7 +45,10 @@ public enum InstallLaunchMode: Equatable, Sendable {
         switch self {
         case .preview: return nil
         case .sandbox(let path, let fixtures):
-            return InstallModel(service: try PublicInstallService(testRoot: path, fixtures: fixtures))
+            let service: any InstallServing = fixtures
+                ? try FixtureInstallService(testRoot: path)
+                : try PublicInstallService(testRoot: path)
+            return InstallModel(service: service, requestPolicy: .test)
         case .simulatedHome(let path, let fixtures):
             let sandbox = try InstallSandbox(path: path)
             return try model(home: .simulated(in: sandbox), fixtureSandbox: fixtures ? sandbox : nil)
@@ -54,12 +58,16 @@ public enum InstallLaunchMode: Equatable, Sendable {
             _ = try DiscoveryFixture.selected(in: control)
             let home = try UserInstallHome.currentUser()
             return InstallModel(codex: DiscoveryInstallService(home: home, agent: .codex, control: control),
-                                claude: DiscoveryInstallService(home: home, agent: .claude, control: control), discoveryOnly: true)
+                                claude: DiscoveryInstallService(home: home, agent: .claude, control: control), requestPolicy: .discovery)
         }
     }
 
     @MainActor private func model(home: UserInstallHome, fixtureSandbox: InstallSandbox?) -> InstallModel {
-        InstallModel(codex: PublicInstallService(home: home, agent: .codex, fixtureSandbox: fixtureSandbox),
-                     claude: PublicInstallService(home: home, agent: .claude, fixtureSandbox: fixtureSandbox))
+        if let fixtureSandbox {
+            return InstallModel(codex: FixtureInstallService(home: home, agent: .codex, control: fixtureSandbox),
+                                claude: FixtureInstallService(home: home, agent: .claude, control: fixtureSandbox), requestPolicy: .test)
+        }
+        return InstallModel(codex: PublicInstallService(home: home, agent: .codex),
+                            claude: PublicInstallService(home: home, agent: .claude), requestPolicy: .test)
     }
 }

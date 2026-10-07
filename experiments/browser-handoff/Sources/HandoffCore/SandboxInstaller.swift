@@ -2,14 +2,27 @@ import CryptoKit
 import Darwin
 import Foundation
 
-struct InstallCandidate: Sendable {
+package struct InstallCandidate: Sendable, Equatable {
     let pin: PublicPin
     let package: SkillPackage
 
-    func validate(discovery: Bool = false) throws {
-        let allowed = try discovery ? DiscoveryFixture.accepts(self)
-            : [HandoffRequest.pinnedTestSkillID, HandoffRequest.testSkillID].contains(pin.id)
-        guard allowed else { throw InstallFailure.invalidRecord }
+    init(pin: PublicPin, package: SkillPackage) { self.pin = pin; self.package = package }
+
+    // Package-scoped construction lets test support reuse validation without exposing validator types.
+    package init(id: String, repo: String, path: String, commit: String, tree: String, skill: String,
+                 entries: [(path: String, mode: String, data: Data, blobSha: String)]) throws {
+        pin = try PublicPin(id: id, repo: repo, path: path, commit: commit, skillSHA: skill, treeSHA: tree)
+        package = SkillPackage(coordinates: .init(commitSha: commit, treeSha: tree, skillMdSha: skill),
+                               entries: entries.map { .init(path: $0.path, mode: $0.mode, data: $0.data, blobSha: $0.blobSha) })
+    }
+
+    package static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.pin == rhs.pin && lhs.package.coordinates == rhs.package.coordinates
+            && lhs.package.entries.sorted { $0.path < $1.path } == rhs.package.entries.sorted { $0.path < $1.path }
+    }
+
+    func validate(policy: InstallPolicy = .publicSkills) throws {
+        guard try policy.accepts(self) else { throw InstallFailure.invalidRecord }
         _ = try SkillPackageValidator.validate(package, expected: .init(
             commitSha: pin.commit, treeSha: pin.treeSHA ?? package.coordinates.treeSha, skillMdSha: pin.skillSHA
         ), limits: PublicPackageLoader.limits)
@@ -50,7 +63,7 @@ private struct ApprovedPlan: Sendable {
     let directories: String
 }
 
-actor SandboxInstaller {
+package actor SandboxInstaller {
     static let targetName = "frontend-design"
     static let target = "codex/skills/frontend-design"
     let location: InstallLocation
@@ -59,24 +72,24 @@ actor SandboxInstaller {
     private let beforeSwitch: @Sendable () throws -> Void
     private let afterSwitch: @Sendable () -> Void
 
-    init(sandbox: InstallSandbox, beforeSwitch: @escaping @Sendable () throws -> Void = {},
+    package init(sandbox: InstallSandbox, beforeSwitch: @escaping @Sendable () throws -> Void = {},
          afterSwitch: @escaping @Sendable () -> Void = {}) {
         self.location = .sandbox(sandbox)
         self.beforeSwitch = beforeSwitch
         self.afterSwitch = afterSwitch
     }
 
-    init(location: InstallLocation, beforeSwitch: @escaping @Sendable () throws -> Void = {},
+    package init(location: InstallLocation, beforeSwitch: @escaping @Sendable () throws -> Void = {},
          afterSwitch: @escaping @Sendable () -> Void = {}) {
         self.location = location
         self.beforeSwitch = beforeSwitch
         self.afterSwitch = afterSwitch
     }
 
-    func prepare(_ candidate: InstallCandidate) throws -> InstallReview {
+    package func prepare(_ candidate: InstallCandidate) throws -> InstallReview {
         plan = nil
         try Task.checkCancellation()
-        try candidate.validate(discovery: location.discovery)
+        try candidate.validate(policy: location.policy)
         let root = try location.open()
         let lock = try root.lock()
         defer { lock.release() }
@@ -88,7 +101,7 @@ actor SandboxInstaller {
         }
     }
 
-    func prepareRestore() throws -> InstallReview {
+    package func prepareRestore() throws -> InstallReview {
         plan = nil
         try Task.checkCancellation()
         let root = try location.open()
@@ -105,9 +118,9 @@ actor SandboxInstaller {
         }
     }
 
-    func discard(_ id: UUID) { if plan?.review.id == id { plan = nil } }
+    package func discard(_ id: UUID) { if plan?.review.id == id { plan = nil } }
 
-    func apply(_ id: UUID) throws -> String {
+    package func apply(_ id: UUID) throws -> String {
         guard let approved = plan, approved.review.id == id else { throw InstallFailure.staleReview }
         plan = nil
         try Task.checkCancellation()
@@ -124,7 +137,7 @@ actor SandboxInstaller {
                       try readVersion(previous, versions).fingerprint == backup else { throw InstallFailure.staleReview }
             }
             if approved.review.action == .unchanged { return "Already installed. No changes made." }
-            try approved.candidate.validate(discovery: location.discovery)
+            try approved.candidate.validate(policy: location.policy)
             let versionID = UUID().uuidString
             guard mkdirat(versions.fd, versionID, 0o700) == 0 else { throw InstallFailure.io }
             let version = try versions.child(versionID)
@@ -171,7 +184,7 @@ actor SandboxInstaller {
         }
     }
 
-    func installedCommit() throws -> String? {
+    package func installedCommit() throws -> String? {
         let root = try location.open()
         let lock = try root.lock()
         defer { lock.release() }
@@ -181,9 +194,9 @@ actor SandboxInstaller {
         }
     }
 
-    // Test cleanup removes only a fully verified discovery activation; versions remain retained.
-    func removeDiscoveryActivation() throws -> String {
-        guard location.discovery else { throw InstallFailure.unmanaged }
+    // Only a trusted package policy may enable cleanup; public installs never enable it.
+    package func removeOwnedActivation() throws -> String {
+        guard location.policy.permitsRemoval else { throw InstallFailure.unmanaged }
         plan = nil
         let root = try location.open()
         let lock = try root.lock()
@@ -271,7 +284,7 @@ actor SandboxInstaller {
         }
         let candidate = InstallCandidate(pin: pin, package: .init(coordinates: .init(
             commitSha: pin.commit, treeSha: record.tree, skillMdSha: pin.skillSHA), entries: entries))
-        try candidate.validate(discovery: location.discovery)
+        try candidate.validate(policy: location.policy)
         return StoredInstall(record: record, candidate: candidate,
                              digest: SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined())
     }

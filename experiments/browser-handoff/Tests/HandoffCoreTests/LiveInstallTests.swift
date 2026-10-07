@@ -2,6 +2,7 @@ import CryptoKit
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 struct LiveInstallTests {
     @Test(.enabled(if: ProcessInfo.processInfo.environment["OMGSKILLS_H12_LIVE_TEST"] == "1"))
@@ -9,7 +10,7 @@ struct LiveInstallTests {
         let sandbox = try InstallSandbox.create()
         defer { try? FileManager.default.removeItem(at: sandbox.url) }
         let service = try PublicInstallService(testRoot: sandbox.url.path)
-        let request = try #require(HandoffRequest.parse("omgskills-helper-test://install?id=anthropics%2Fclaude-plugins-public%3Afrontend-design"))
+        let request = try #require(HandoffRequest.parseTest("omgskills-helper-test://install?id=anthropics%2Fclaude-plugins-public%3Afrontend-design"))
         let review = try await service.prepare(request)
         #expect(review.action == .install)
         #expect(review.fileCount > 0)

@@ -105,15 +105,17 @@ public final class PreviewModel {
     public private(set) var isLoading = false
     public private(set) var errorMessage: String?
     @ObservationIgnored private let service: any PackagePreviewLoading
+    @ObservationIgnored private let requestPolicy: HandoffRequestPolicy
     @ObservationIgnored private(set) var task: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
 
-    public init(service: any PackagePreviewLoading = PublicPackagePreviewService()) {
+    public init(service: any PackagePreviewLoading = PublicPackagePreviewService(), requestPolicy: HandoffRequestPolicy = .helper) {
         self.service = service
+        self.requestPolicy = requestPolicy
     }
 
     public func open(_ rawURL: String) {
-        guard let incoming = HandoffRequest.parse(rawURL) else {
+        guard let incoming = HandoffRequest.parse(rawURL, policy: requestPolicy) else {
             cancel()
             errorMessage = "Invalid preview link. Nothing was installed."
             return

@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 private let discoveryLink = "omgskills-helper-test://install?id=omgskills%2Flocal-h13%3Aomgskills-h13-check-20261006"
 private let publicLink = "omgskills-helper-test://install?id=anthropics%2Fclaude-plugins-public%3Afrontend-design"
@@ -13,7 +14,7 @@ private struct DiscoveryHome {
         home = try .simulated(in: sandbox)
     }
     func erase() { try? FileManager.default.removeItem(at: sandbox.url) }
-    func location(_ agent: InstallAgent) -> InstallLocation { .user(home, agent, discovery: true) }
+    func location(_ agent: InstallAgent) -> InstallLocation { .user(home, agent, policy: DiscoveryFixture.policy) }
     func target(_ agent: InstallAgent) -> URL { URL(fileURLWithPath: location(agent).destination) }
     func select(_ version: String) async throws {
         _ = try await InstallHarness.run(["select", sandbox.url.path, version])
@@ -32,11 +33,11 @@ private struct NoDiscoveryHTTP: PublicHTTPClient {
 
 struct DiscoveryFixtureTests {
     @Test func fixtureRequiresSeparateURLAndLaunchMode() throws {
-        #expect(HandoffRequest.parse(discoveryLink) == nil)
-        #expect(HandoffRequest.parse(publicLink, discoveryOnly: true) == nil)
-        #expect(HandoffRequest.parse(discoveryLink, discoveryOnly: true)?.skillID == DiscoveryFixture.id)
+        #expect(HandoffRequest.parseTest(discoveryLink) == nil)
+        #expect(HandoffRequest.parseTest(publicLink, discoveryOnly: true) == nil)
+        #expect(HandoffRequest.parseTest(discoveryLink, discoveryOnly: true)?.skillID == DiscoveryFixture.id)
         for suffix in ["&version=B", "&path=/tmp", "#B", "&id=other"] {
-            #expect(HandoffRequest.parse(discoveryLink + suffix, discoveryOnly: true) == nil)
+            #expect(HandoffRequest.parseTest(discoveryLink + suffix, discoveryOnly: true) == nil)
         }
         let env = ["OMGSKILLS_H13_REAL_INSTALLS": "1", "OMGSKILLS_H13_DISCOVERY_ROOT": "/control"]
         #expect(try InstallLaunchMode.parse(env) == .realDiscovery("/control"))
@@ -52,17 +53,17 @@ struct DiscoveryFixtureTests {
 
     @Test func strictFixtureBytesAndPublicNetworkBoundary() async throws {
         let a = try DiscoveryFixture.candidate("A")
-        try a.validate(discovery: true)
+        try a.validate(policy: DiscoveryFixture.policy)
         #expect(a.package.entries.map(\.path) == ["SKILL.md", "CHECK.txt"])
         #expect(a.package.entries.allSatisfy { $0.mode == "100644" })
         #expect(throws: InstallFailure.invalidRecord) { try a.validate() }
-        #expect(throws: InstallFailure.invalidRecord) { try InstallFixtures.candidate("A").validate(discovery: true) }
+        #expect(throws: InstallFailure.invalidRecord) { try InstallFixtures.candidate("A").validate(policy: DiscoveryFixture.policy) }
         let changed = InstallCandidate(pin: a.pin, package: .init(coordinates: a.package.coordinates,
             entries: a.package.entries.map { entry in
                 .init(path: entry.path, mode: entry.mode, data: Data("different bytes".utf8), blobSha: entry.blobSha)
             }))
-        #expect(throws: InstallFailure.invalidRecord) { try changed.validate(discovery: true) }
-        let request = try #require(HandoffRequest.parse(discoveryLink, discoveryOnly: true))
+        #expect(throws: InstallFailure.invalidRecord) { try changed.validate(policy: DiscoveryFixture.policy) }
+        let request = try #require(HandoffRequest.parseTest(discoveryLink, discoveryOnly: true))
         await #expect(throws: PreviewFailure.invalidMetadata) {
             try await PublicPackageLoader(http: NoDiscoveryHTTP()).resolve(request)
         }
@@ -72,8 +73,8 @@ struct DiscoveryFixtureTests {
     func discoveryInstallFrozenReviewUpdateAndRestore(_ agent: InstallAgent) async throws {
         let test = try DiscoveryHome(); defer { test.erase() }
         let service = DiscoveryInstallService(home: test.home, agent: agent, control: test.sandbox)
-        let request = try #require(HandoffRequest.parse(discoveryLink, discoveryOnly: true))
-        let publicRequest = try #require(HandoffRequest.parse(publicLink))
+        let request = try #require(HandoffRequest.parseTest(discoveryLink, discoveryOnly: true))
+        let publicRequest = try #require(HandoffRequest.parseTest(publicLink))
         await #expect(throws: InstallFailure.invalidRecord) { try await service.prepare(publicRequest) }
         try await test.select("A")
         let a = try await service.prepare(request)
@@ -113,14 +114,14 @@ struct DiscoveryFixtureTests {
         let a = try await store.prepare(DiscoveryFixture.candidate("A"))
         _ = try await store.apply(a.id)
         let content = try fm.destinationOfSymbolicLink(atPath: test.target(agent).path)
-        _ = try await store.removeDiscoveryActivation()
+        _ = try await store.removeOwnedActivation()
         #expect(try fm.contentsOfDirectory(atPath: test.target(agent).deletingLastPathComponent().path) == ["frontend-design"])
         #expect(fm.fileExists(atPath: content + "/CHECK.txt"))
         #expect(try String(contentsOf: existing.appendingPathComponent("mine"), encoding: .utf8) == "untouched")
         #expect(fm.fileExists(atPath: legacy.path))
-        #expect(try await store.removeDiscoveryActivation() == "Test skill is not installed.")
+        #expect(try await store.removeOwnedActivation() == "Test skill is not installed.")
         await #expect(throws: InstallFailure.unmanaged) {
-            try await SandboxInstaller(location: .user(test.home, agent)).removeDiscoveryActivation()
+            try await SandboxInstaller(location: .user(test.home, agent)).removeOwnedActivation()
         }
     }
 
@@ -142,7 +143,7 @@ struct DiscoveryFixtureTests {
                                    withIntermediateDirectories: true)
         }
         let error: InstallFailure = kind == "local-edit" ? .changed : .unmanaged
-        await #expect(throws: error) { try await store.removeDiscoveryActivation() }
+        await #expect(throws: error) { try await store.removeOwnedActivation() }
         await #expect(throws: error) { try await store.prepare(DiscoveryFixture.candidate("B")) }
         #expect(fm.fileExists(atPath: target.path))
         if kind == "local-edit" { #expect(try test.text(.codex) == "my edit") }
@@ -153,7 +154,7 @@ struct DiscoveryFixtureTests {
         try await test.select("A")
         let model = InstallModel(
             codex: DiscoveryInstallService(home: test.home, agent: .codex, control: test.sandbox),
-            claude: DiscoveryInstallService(home: test.home, agent: .claude, control: test.sandbox), discoveryOnly: true)
+            claude: DiscoveryInstallService(home: test.home, agent: .claude, control: test.sandbox), requestPolicy: .discovery)
         model.open(publicLink)
         #expect(model.review == nil && model.errorMessage != nil)
         model.open(discoveryLink)

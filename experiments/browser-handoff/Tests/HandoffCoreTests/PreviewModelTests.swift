@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 private actor ControlledPreviewService: PackagePreviewLoading {
     private(set) var count = 0
@@ -39,7 +40,7 @@ struct PreviewModelTests {
 
     @Test func repeatedClickReusesLoadingAndCompletedPreview() async throws {
         let service = ControlledPreviewService()
-        let model = PreviewModel(service: service)
+        let model = PreviewModel(service: service, requestPolicy: .test)
         model.open(link)
         model.open(link)
         await service.waitForCall(1)
@@ -57,7 +58,7 @@ struct PreviewModelTests {
 
     @Test func cancelDiscardsLateSuccess() async throws {
         let service = ControlledPreviewService()
-        let model = PreviewModel(service: service)
+        let model = PreviewModel(service: service, requestPolicy: .test)
         model.open(link)
         await service.waitForCall(1)
         let task = try #require(model.task)
@@ -73,7 +74,7 @@ struct PreviewModelTests {
 
     @Test func replacementIgnoresPreviousCompletion() async throws {
         let service = ControlledPreviewService()
-        let model = PreviewModel(service: service)
+        let model = PreviewModel(service: service, requestPolicy: .test)
         model.open(link)
         await service.waitForCall(1)
         let first = try #require(model.task)
@@ -90,7 +91,7 @@ struct PreviewModelTests {
 
     @Test func invalidLinkCancelsPreviousDownloadWithoutStartingAnother() async throws {
         let service = ControlledPreviewService()
-        let model = PreviewModel(service: service)
+        let model = PreviewModel(service: service, requestPolicy: .test)
         model.open(link)
         await service.waitForCall(1)
         let task = try #require(model.task)
@@ -104,7 +105,7 @@ struct PreviewModelTests {
 
     @Test func timeoutShowsFailureAndAllowsRetry() async throws {
         let service = ControlledPreviewService()
-        let model = PreviewModel(service: service)
+        let model = PreviewModel(service: service, requestPolicy: .test)
         model.open(link)
         await service.waitForCall(1)
         let first = try #require(model.task)

@@ -2,6 +2,7 @@ import Darwin
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 private var fm: FileManager { FileManager() }
 

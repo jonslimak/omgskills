@@ -11,40 +11,29 @@ public protocol InstallServing: Sendable {
 public struct PublicInstallService: InstallServing {
     private let loader: PublicPackageLoader
     private let store: SandboxInstaller
-    private let fixtureSandbox: InstallSandbox?
-
-    public init(testRoot: String, fixtures: Bool = false) throws {
-        let sandbox = try InstallSandbox(path: testRoot)
-        fixtureSandbox = fixtures ? sandbox : nil
-        store = SandboxInstaller(sandbox: sandbox)
+    package init(testRoot: String) throws {
+        store = SandboxInstaller(sandbox: try InstallSandbox(path: testRoot))
         loader = PublicPackageLoader(http: BoundedPublicHTTP())
     }
 
-    init(home: UserInstallHome, agent: InstallAgent, fixtureSandbox: InstallSandbox? = nil) {
-        self.fixtureSandbox = fixtureSandbox
+    package init(home: UserInstallHome, agent: InstallAgent) {
         store = SandboxInstaller(location: .user(home, agent))
         loader = PublicPackageLoader(http: BoundedPublicHTTP())
     }
 
     public func prepare(_ request: HandoffRequest) async throws -> InstallReview {
-        let candidate: InstallCandidate
-        if let sandbox = fixtureSandbox {
-            guard request.skillID == HandoffRequest.pinnedTestSkillID else { throw PreviewFailure.unpinned }
-            candidate = try InstallFixtures.selected(in: sandbox)
-        } else {
-            candidate = try await withThrowingTaskGroup(of: InstallCandidate.self) { group in
-                group.addTask {
-                    let pin = try await loader.resolve(request)
-                    return try await InstallCandidate(pin: pin, package: loader.fetch(pin))
-                }
-                group.addTask {
-                    try await Task.sleep(for: .seconds(180))
-                    throw URLError(.timedOut)
-                }
-                defer { group.cancelAll() }
-                guard let result = try await group.next() else { throw CancellationError() }
-                return result
+        let candidate = try await withThrowingTaskGroup(of: InstallCandidate.self) { group in
+            group.addTask {
+                let pin = try await loader.resolve(request)
+                return try await InstallCandidate(pin: pin, package: loader.fetch(pin))
             }
+            group.addTask {
+                try await Task.sleep(for: .seconds(180))
+                throw URLError(.timedOut)
+            }
+            defer { group.cancelAll() }
+            guard let result = try await group.next() else { throw CancellationError() }
+            return result
         }
         try Task.checkCancellation()
         return try await store.prepare(candidate)
@@ -61,10 +50,12 @@ public final class InstallModel {
     public private(set) var isLoading = false
     public private(set) var isApplying = false
     public private(set) var message: String?
+    public private(set) var noticeMessage: String?
     public private(set) var errorMessage: String?
     public private(set) var canRestore = false
     public private(set) var selectedAgent: InstallAgent = .codex
-    public let discoveryOnly: Bool
+    @ObservationIgnored private let requestPolicy: HandoffRequestPolicy
+    @ObservationIgnored private let admissionCheck: @MainActor () throws -> Void
     public var canSelectAgent: Bool { !services.isEmpty }
     @ObservationIgnored private var service: any InstallServing
     @ObservationIgnored private let services: [InstallAgent: any InstallServing]
@@ -72,16 +63,23 @@ public final class InstallModel {
     @ObservationIgnored private(set) var task: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
 
-    public init(service: any InstallServing) { self.service = service; services = [:]; discoveryOnly = false }
+    public init(service: any InstallServing, requestPolicy: HandoffRequestPolicy = .helper,
+                admissionCheck: @escaping @MainActor () throws -> Void = {}) {
+        self.service = service; services = [:]; self.requestPolicy = requestPolicy
+        self.admissionCheck = admissionCheck
+    }
 
-    public init(codex: any InstallServing, claude: any InstallServing, discoveryOnly: Bool = false) {
+    public init(codex: any InstallServing, claude: any InstallServing, requestPolicy: HandoffRequestPolicy = .helper,
+                admissionCheck: @escaping @MainActor () throws -> Void = {}) {
         service = codex
         services = [.codex: codex, .claude: claude]
-        self.discoveryOnly = discoveryOnly
+        self.requestPolicy = requestPolicy
+        self.admissionCheck = admissionCheck
     }
 
     public func selectAgent(_ agent: InstallAgent) {
         guard !isApplying, agent != selectedAgent, let next = services[agent] else { return }
+        guard admitted() else { return }
         begin()
         selectedAgent = agent
         service = next
@@ -90,8 +88,12 @@ public final class InstallModel {
     }
 
     public func open(_ raw: String) {
-        guard !isApplying else { return }
-        guard let incoming = HandoffRequest.parse(raw, discoveryOnly: discoveryOnly) else {
+        guard !isApplying else {
+            noticeMessage = "An installation is finishing. Reopen the link when it completes."
+            return
+        }
+        guard admitted() else { return }
+        guard let incoming = HandoffRequest.parse(raw, policy: requestPolicy) else {
             cancel(); errorMessage = "Invalid install link. Nothing was installed."; return
         }
         if incoming == request, isLoading { return }
@@ -102,13 +104,16 @@ public final class InstallModel {
 
     public func restore() {
         guard !isApplying, !isLoading, canRestore else { return }
+        guard admitted() else { return }
         begin()
         load { [service] in try await service.prepareRestore() }
     }
 
     public func apply() {
         guard let review, !isApplying, !isLoading, review.action != .unchanged else { return }
+        guard admitted() else { return }
         isApplying = true
+        noticeMessage = nil
         errorMessage = nil
         let current = generation
         task = Task { [weak self, service] in
@@ -144,8 +149,18 @@ public final class InstallModel {
         if let review { Task { [service] in await service.discard(review.id) } }
         review = nil
         message = nil
+        noticeMessage = nil
         errorMessage = nil
         canRestore = false
+    }
+
+    private func admitted() -> Bool {
+        do { try admissionCheck(); return true }
+        catch {
+            cancel()
+            errorMessage = (error as? HelperLaunchFailure)?.localizedDescription ?? Self.message(for: error)
+            return false
+        }
     }
 
     private func load(_ operation: @escaping @Sendable () async throws -> InstallReview) {

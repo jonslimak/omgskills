@@ -1,17 +1,26 @@
 import HandoffCore
 import SwiftUI
 
-struct InstallContent: View {
+public struct InstallContent: View {
     let model: InstallModel
-    let fixtureMode: Bool
+    let sourceLabel: String
+    let versionLabel: @Sendable (String) -> String
     let testDestination: Bool
 
-    var body: some View {
+    public init(model: InstallModel, sourceLabel: String = "Public package", testDestination: Bool = false,
+                versionLabel: @escaping @Sendable (String) -> String = { $0 }) {
+        self.model = model
+        self.sourceLabel = sourceLabel
+        self.testDestination = testDestination
+        self.versionLabel = versionLabel
+    }
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 Text("OMGSkills").font(.headline)
                 Spacer()
-                Text(model.discoveryOnly ? "Local discovery test" : fixtureMode ? "Local fixtures" : "Public package")
+                Text(sourceLabel)
                     .foregroundStyle(.secondary)
             }
             if model.canSelectAgent {
@@ -67,6 +76,9 @@ struct InstallContent: View {
             if let error = model.errorMessage {
                 Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.red)
             }
+            if let notice = model.noticeMessage {
+                Label(notice, systemImage: "info.circle").foregroundStyle(.secondary)
+            }
             Spacer(minLength: 0)
             HStack {
                 Button("Close review", role: .cancel) { model.cancel() }
@@ -97,8 +109,4 @@ struct InstallContent: View {
         }
     }
 
-    private func versionLabel(_ commit: String) -> String {
-        guard model.discoveryOnly else { return commit }
-        return commit == String(repeating: "a", count: 40) ? "Fixture A (local)" : "Fixture B (local)"
-    }
 }

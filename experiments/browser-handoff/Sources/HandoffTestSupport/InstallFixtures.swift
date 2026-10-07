@@ -1,9 +1,10 @@
 import Darwin
 import Foundation
+import HandoffCore
 
 // Synthetic pins are available only via an explicit local fixture launch setting and an owned sandbox.
-enum InstallFixtures {
-    static func candidate(_ version: String) throws -> InstallCandidate {
+package enum InstallFixtures {
+    package static func candidate(_ version: String) throws -> InstallCandidate {
         guard ["A", "B"].contains(version) else { throw InstallFailure.invalidRecord }
         let texts: [(String, String, String)] = version == "A" ? [
             ("SKILL.md", "---\nname: frontend-design\ndescription: H1.2 isolated fixture.\n---\nVersion A\n", "100644"),
@@ -14,18 +15,16 @@ enum InstallFixtures {
         ]
         let entries = texts.map { path, text, mode in
             let data = Data(text.utf8)
-            return SkillPackageEntry(path: path, mode: mode, data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data))
+            return (path: path, mode: mode, data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data))
         }
         let tree = flatTree(entries)
         let skill = entries.first { $0.path == "SKILL.md" }!.blobSha
         let commit = String(repeating: version == "A" ? "a" : "b", count: 40)
-        let pin = try PublicPin(id: HandoffRequest.pinnedTestSkillID, repo: "omgskills/h12-fixture", path: "frontend-design",
-                                commit: commit, skillSHA: skill, treeSHA: tree)
-        return InstallCandidate(pin: pin, package: .init(coordinates: .init(
-            commitSha: commit, treeSha: tree, skillMdSha: skill), entries: entries))
+        return try InstallCandidate(id: HandoffRequest.pinnedTestSkillID, repo: "omgskills/h12-fixture",
+                                    path: "frontend-design", commit: commit, tree: tree, skill: skill, entries: entries)
     }
 
-    static func flatTree(_ entries: [SkillPackageEntry]) -> String {
+    package static func flatTree(_ entries: [(path: String, mode: String, data: Data, blobSha: String)]) -> String {
         var bytes = Data()
         for entry in entries.sorted(by: { Array($0.path.utf8).lexicographicallyPrecedes(Array($1.path.utf8)) }) {
             bytes.append(Data("\(entry.mode) \(entry.path)\0".utf8))
@@ -35,11 +34,11 @@ enum InstallFixtures {
         return GitObjectHash.sha(type: "tree", data: bytes)
     }
 
-    static func selected(in sandbox: InstallSandbox) throws -> InstallCandidate {
+    package static func selected(in sandbox: InstallSandbox) throws -> InstallCandidate {
         try candidate(selectedVersion(in: sandbox))
     }
 
-    static func selectedVersion(in sandbox: InstallSandbox) throws -> String {
+    package static func selectedVersion(in sandbox: InstallSandbox) throws -> String {
         let (data, mode) = try sandbox.open().read("fixture-version", limit: 1)
         guard mode == 0o600, let value = String(data: data, encoding: .utf8) else { throw InstallFailure.invalidRecord }
         guard ["A", "B"].contains(value) else { throw InstallFailure.invalidRecord }
@@ -56,8 +55,8 @@ package enum InstallHarness {
                   arguments[3] == "--real-home" else { throw InstallFailure.invalidRecord }
             let control = try InstallSandbox(path: arguments[1])
             _ = try DiscoveryFixture.selected(in: control)
-            let store = SandboxInstaller(location: .user(try .currentUser(), agent, discovery: true))
-            if command == "discovery-remove" { return try await store.removeDiscoveryActivation() }
+            let store = SandboxInstaller(location: .user(try .currentUser(), agent, policy: DiscoveryFixture.policy))
+            if command == "discovery-remove" { return try await store.removeOwnedActivation() }
             return try await store.installedCommit() ?? "not_installed"
         }
         guard arguments.count == 2 || arguments.count == 3 else { throw InstallFailure.invalidRecord }

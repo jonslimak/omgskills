@@ -1,6 +1,11 @@
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
+
+@MainActor private final class AdmissionProbe {
+    var otherCopy = false
+}
 
 private actor ControlledInstallService: InstallServing {
     private var pending: [Int: CheckedContinuation<InstallReview, any Error>] = [:]
@@ -48,9 +53,11 @@ private actor ControlledInstallService: InstallServing {
 struct InstallModelTests {
     let link = "omgskills-helper-test://install?id=anthropics%2Fclaude-plugins-public%3Afrontend-design"
 
-    @Test func duplicateLoadingAndCancelledReviewCannotApply() async throws {
+    @Test(arguments: [HandoffRequestPolicy.helper, .test])
+    func duplicateLoadingAndCancelledReviewCannotApply(_ policy: HandoffRequestPolicy) async throws {
         let service = ControlledInstallService()
-        let subject = InstallModel(service: service)
+        let link = link.replacingOccurrences(of: "omgskills-helper-test", with: policy.scheme)
+        let subject = InstallModel(service: service, requestPolicy: policy)
         subject.open(link); subject.open(link)
         await service.wait(1)
         #expect(await service.calls == 1)
@@ -64,9 +71,11 @@ struct InstallModelTests {
         #expect(subject.review == nil && !subject.isLoading)
     }
 
-    @Test func replacementDiscardsLateReview() async throws {
+    @Test(arguments: [HandoffRequestPolicy.helper, .test])
+    func replacementDiscardsLateReview(_ policy: HandoffRequestPolicy) async throws {
         let service = ControlledInstallService()
-        let model = InstallModel(service: service)
+        let link = link.replacingOccurrences(of: "omgskills-helper-test", with: policy.scheme)
+        let model = InstallModel(service: service, requestPolicy: policy)
         model.open(link); await service.wait(1)
         let old = try #require(model.task)
         model.cancel(); model.open(link); await service.wait(2)
@@ -79,10 +88,11 @@ struct InstallModelTests {
         #expect(await service.discarded.contains(oldID))
     }
 
-    @Test(arguments: [false, true])
-    func applyUsesReviewedIDOnceAndBlocksReplacement(_ failure: Bool) async throws {
+    @Test(arguments: [false, true], [HandoffRequestPolicy.helper, .test])
+    func applyUsesReviewedIDOnceAndBlocksReplacement(_ failure: Bool, _ policy: HandoffRequestPolicy) async throws {
         let service = ControlledInstallService()
-        let model = InstallModel(service: service)
+        let link = link.replacingOccurrences(of: "omgskills-helper-test", with: policy.scheme)
+        let model = InstallModel(service: service, requestPolicy: policy)
         model.open(link); await service.wait(1)
         let load = try #require(model.task)
         let id = await service.finish(1, action: .update); await load.value
@@ -90,29 +100,55 @@ struct InstallModelTests {
         let applying = try #require(model.task)
         model.apply(); model.cancel(); model.open("bad://url")
         #expect(model.isApplying)
+        #expect(model.noticeMessage?.contains("Reopen the link") == true)
         #expect(await service.approvals == [id])
         #expect(await service.calls == 1)
         await service.applied(failure: failure); await applying.value
         #expect(!model.isApplying && model.review == nil)
         #expect(failure ? model.errorMessage != nil : model.message == "Verified version installed.")
         #expect(model.canRestore == !failure)
+        #expect(await service.calls == 1)
+    }
+
+    @Test func competingCopyInvalidatesConsentBeforeApply() async throws {
+        let admission = AdmissionProbe()
+        let service = ControlledInstallService()
+        let model = InstallModel(service: service) {
+            if admission.otherCopy { throw HelperLaunchFailure.otherCopy }
+        }
+        model.open(link.replacingOccurrences(of: "omgskills-helper-test", with: HelperIdentity.scheme))
+        await service.wait(1)
+        let task = try #require(model.task)
+        _ = await service.finish(1)
+        await task.value
+        #expect(model.review != nil)
+        admission.otherCopy = true
+        model.apply()
+        #expect(model.review == nil && !model.isApplying)
+        #expect(model.errorMessage == HelperLaunchFailure.otherCopy.localizedDescription)
+        #expect(await service.approvals.isEmpty)
+        admission.otherCopy = false
+        model.apply()
+        #expect(await service.approvals.isEmpty)
     }
 
     @Test func fixtureServiceAppliesReviewedAWhileSelectionChangesToB() async throws {
         let sandbox = try InstallSandbox.create(); defer { try? FileManager.default.removeItem(at: sandbox.url) }
         _ = try await InstallHarness.run(["select", sandbox.url.path, "A"])
-        let service = try PublicInstallService(testRoot: sandbox.url.path, fixtures: true)
-        let review = try await service.prepare(HandoffRequest.parse(link)!)
+        let service = try FixtureInstallService(testRoot: sandbox.url.path)
+        let review = try await service.prepare(HandoffRequest.parseTest(link)!)
         _ = try await InstallHarness.run(["select", sandbox.url.path, "B"])
         _ = try await service.apply(review.id)
         #expect(try await InstallHarness.run(["inspect", sandbox.url.path]) == String(repeating: "a", count: 40))
-        let next = try await service.prepare(HandoffRequest.parse(link)!)
+        let next = try await service.prepare(HandoffRequest.parseTest(link)!)
         #expect(next.action == .update && next.toCommit == String(repeating: "b", count: 40))
     }
 
-    @Test func changingAgentDiscardsOldConsentAndLateResults() async throws {
+    @Test(arguments: [HandoffRequestPolicy.helper, .test])
+    func changingAgentDiscardsOldConsentAndLateResults(_ policy: HandoffRequestPolicy) async throws {
         let codex = ControlledInstallService(), claude = ControlledInstallService()
-        let model = InstallModel(codex: codex, claude: claude)
+        let link = link.replacingOccurrences(of: "omgskills-helper-test", with: policy.scheme)
+        let model = InstallModel(codex: codex, claude: claude, requestPolicy: policy)
         model.open(link); await codex.wait(1)
         let old = try #require(model.task)
         model.selectAgent(.claude)

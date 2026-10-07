@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 struct PackageReviewTests {
     private func package(_ text: String, mode: String = "100644") -> SkillPackage {

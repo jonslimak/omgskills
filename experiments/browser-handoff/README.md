@@ -1,15 +1,58 @@
-# Standalone helper experiment (H1.1-H1.3)
+# Standalone helper experiment (H1.1-H1.4A)
 
 Local experiment only. No private auth or public-app dependency.
 The same isolated H0 bundle and `omgskills-helper-test` scheme now support a real
 pinned package preview. Normal links accept only the two public fixture IDs; the helper resolves
 their pins through the public OMGSkills MCP endpoint and downloads from GitHub
 over HTTPS. It verifies tree/blob hashes and validates paths and package limits
-before staging. It never executes skill content. Without an explicit launch
-setting it remains preview-only. H1.2 installs inside a temporary sandbox;
+before staging. It never executes skill content. The test app remains preview-only
+without an explicit launch setting. H1.2 installs inside a temporary sandbox;
 H1.3 adds permanent destination handling. Simulated-home checks passed for both
 agents; the separate local Codex discovery fixture passed install/update/rollback.
 Do not enable real-home mode without separate approval.
+
+## H1.4A normal helper candidate
+
+The separate `OMGSkillsHelper` product uses `OMGSkills Helper.app`, bundle ID
+`com.omgskills.helper` and only the `omgskills-helper` scheme. It does not use
+the existing menu-bar app or its `omgskills` scheme. This is a local candidate,
+not a signed distribution or a public release.
+
+- Normal launch needs no developer settings. Idle launch and agent selection
+  create no store or network request; a valid public link starts lazy service
+  creation. The OS account home and fixed service origins remain authoritative.
+- `HandoffTestSupport` owns fixture bytes, discovery policy, launch-env parsing
+  and harness commands. Only the test app/harness depend on it. Both apps share
+  `HandoffCore` and `HandoffUI`; records and transactions are unchanged.
+- The normal app rejects test schemes/fixture IDs and developer URL options.
+  It retains the two-public-ID allowlist and `frontend-design` destination.
+  The URL identifies a skill, not an exact page version; that binding is H2.
+- Duplicate-copy checks guard launch, requests and approval. Busy links show a
+  retry notice rather than replacing or queueing a transaction. The limited local
+  launch/Safari/repeated-link/refusal/Close check passed on 2026-10-07 with installed
+  skills unchanged. Cold URL launch and a ready-review/cancel check remain unverified;
+  existing Frontend Design installs were protected, not replaced for the test.
+
+Build and inspect only (requires the repo's Swift and Node tools):
+
+```sh
+node --test experiments/browser-handoff/verify-candidate.test.mjs
+sh experiments/browser-handoff/build-candidate.sh
+```
+
+The command refuses a running normal helper, uses fresh build/output directories,
+and prints the exact ignored `.candidate-app/candidate.*/OMGSkills Helper.app`
+path. It verifies the product graph, link inputs, plist, ad-hoc signature, bundle
+inventory, system-only dependencies and native architecture. Symbol/string scans
+supplement those structural checks. No launch, registration, installation,
+Developer ID signing, notarization, upload or release occurs. The old `.test-app`
+bundle is not replaced. Failed/older outputs remain local; no automatic deletion.
+
+Do not open the candidate as part of build verification. See
+`../../webwork-h14-spec.md` for results and the separately approved manual check.
+Sparkle belongs to H1.4B; signed artifacts and distribution remain H1.4C/D.
+
+## Existing test app
 
 ```sh
 swift test --package-path experiments/browser-handoff --build-path /private/tmp/omgskills-h1-build
@@ -134,7 +177,7 @@ No existing-app store or `.omgskills` metadata is adopted or modified.
   or project-level precedence. Local Codex discovery/supporting-file reads passed
   in fresh chats; actual Claude Code discovery and same-chat refresh remain untested.
 
-Launch modes are mutually exclusive:
+Test-app launch modes are mutually exclusive (not available in the normal helper):
 
 | Setting | Behavior |
 | --- | --- |

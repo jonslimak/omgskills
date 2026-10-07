@@ -3,6 +3,7 @@ import Darwin
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 private func target(_ sandbox: InstallSandbox) -> URL { sandbox.url.appendingPathComponent(SandboxInstaller.target) }
 private func version(_ sandbox: InstallSandbox) throws -> URL {

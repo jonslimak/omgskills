@@ -1,11 +1,12 @@
 import HandoffCore
+import HandoffTestSupport
 import XCTest
 
 final class HandoffRequestTests: XCTestCase {
     private let valid = "omgskills-helper-test://install?id=anthropics%2Fskills%3Askills%2Ffrontend-design"
 
     func testValidPublicFixture() {
-        XCTAssertEqual(HandoffRequest.parse(valid)?.skillID, HandoffRequest.testSkillID)
+        XCTAssertEqual(HandoffRequest.parseTest(valid)?.skillID, HandoffRequest.testSkillID)
     }
 
     func testRejectsUntrustedInputs() {
@@ -23,7 +24,8 @@ final class HandoffRequestTests: XCTestCase {
             valid + String(repeating: "a", count: 513),
         ]
         for input in invalid {
-            XCTAssertNil(HandoffRequest.parse(input), input)
+            XCTAssertNil(HandoffRequest.parseTest(input), input)
+            XCTAssertNil(HandoffRequest.parse(input.replacingOccurrences(of: "omgskills-helper-test:", with: "omgskills-helper:")), input)
         }
     }
 }

@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 private final class InstallTestBundle {}
 

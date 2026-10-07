@@ -1,12 +1,15 @@
 import HandoffCore
+import HandoffTestSupport
+import HandoffUI
 import SwiftUI
 
 @main
 struct HandoffApp: App {
-    @State private var model = PreviewModel()
+    @State private var model = PreviewModel(requestPolicy: .test)
     @State private var installModel: InstallModel?
     private let configurationError: String?
-    private let fixtureMode: Bool
+    private let sourceLabel: String
+    private let versionLabel: @Sendable (String) -> String
     private let testDestination: Bool
 
     init() {
@@ -14,12 +17,19 @@ struct HandoffApp: App {
         do {
             let mode = try InstallLaunchMode.parse(environment)
             let prepared = try mode.makeModel()
-            fixtureMode = mode.fixtures
+            if case .realDiscovery = mode {
+                sourceLabel = "Local discovery test"
+                versionLabel = { $0 == String(repeating: "a", count: 40) ? "Fixture A (local)" : "Fixture B (local)" }
+            } else {
+                sourceLabel = mode.fixtures ? "Local fixtures" : "Public package"
+                versionLabel = { $0 }
+            }
             testDestination = mode.isTest
             _installModel = State(initialValue: prepared)
             configurationError = nil
         } catch {
-            fixtureMode = false
+            sourceLabel = "Public package"
+            versionLabel = { $0 }
             testDestination = true
             _installModel = State(initialValue: nil)
             configurationError = error.localizedDescription
@@ -30,7 +40,7 @@ struct HandoffApp: App {
         Window("OMGSkills Handoff Test", id: "handoff") {
             Group {
                 if let installModel {
-                    InstallContent(model: installModel, fixtureMode: fixtureMode, testDestination: testDestination)
+                    InstallContent(model: installModel, sourceLabel: sourceLabel, testDestination: testDestination, versionLabel: versionLabel)
                 } else if let configurationError {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Install destination unavailable").font(.title2)

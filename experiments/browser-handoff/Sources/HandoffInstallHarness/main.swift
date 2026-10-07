@@ -1,5 +1,5 @@
 import Foundation
-import HandoffCore
+import HandoffTestSupport
 
 @main
 struct Harness {

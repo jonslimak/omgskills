@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 @testable import HandoffCore
+import HandoffTestSupport
 
 private struct Fixture {
     let commit = String(repeating: "1", count: 40)
@@ -23,7 +24,7 @@ private struct Fixture {
         }
     }
     var request: HandoffRequest {
-        HandoffRequest.parse("omgskills-helper-test://install?id=\(HandoffRequest.pinnedTestSkillID)")!
+        HandoffRequest.parseTest("omgskills-helper-test://install?id=\(HandoffRequest.pinnedTestSkillID)")!
     }
 
     func entry(_ path: String, _ text: String, mode: String = "100644") -> SkillPackageEntry {

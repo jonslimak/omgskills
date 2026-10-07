@@ -8,18 +8,18 @@ public enum InstallAgent: String, CaseIterable, Sendable, Identifiable {
     var directory: String { self == .codex ? ".agents" : ".claude" }
 }
 
-struct UserInstallHome: Sendable {
+package struct UserInstallHome: Sendable {
     let url: URL
     let storeID: String
     static let storePath = "Library/Application Support/OMGSkills Helper"
     var storeURL: URL { url.appendingPathComponent(Self.storePath) }
 
-    static func simulated(in sandbox: InstallSandbox) throws -> Self {
+    package static func simulated(in sandbox: InstallSandbox) throws -> Self {
         _ = try sandbox.open().userChild("home", create: true)
         return try Self(home: sandbox.url.appendingPathComponent("home"))
     }
 
-    static func currentUser() throws -> Self {
+    package static func currentUser() throws -> Self {
         // Only the OS account home is trusted for canonicalization; never a URL or environment path.
         guard let entry = getpwuid(getuid()), let path = entry.pointee.pw_dir,
               let canonical = realpath(path, nil) else { throw InstallFailure.unsafeRoot }
@@ -74,15 +74,15 @@ struct UserInstallHome: Sendable {
     }
 }
 
-enum InstallLocation: Sendable {
+package enum InstallLocation: Sendable {
     case sandbox(InstallSandbox)
-    case user(UserInstallHome, InstallAgent, discovery: Bool = false)
+    case user(UserInstallHome, InstallAgent, policy: InstallPolicy = .publicSkills)
 
     var id: String { switch self { case .sandbox(let root): root.id; case .user(let home, _, _): home.storeID } }
     var owner: String { switch self { case .sandbox: "omgskills-handoff-test"; case .user: UserInstallHome.owner } }
     var schema: Int { switch self { case .sandbox: 1; case .user: 2 } }
-    var discovery: Bool { switch self { case .user(_, _, let flag): flag; case .sandbox: false } }
-    var targetName: String { discovery ? DiscoveryFixture.name : SandboxInstaller.targetName }
+    var policy: InstallPolicy { switch self { case .user(_, _, let policy): policy; case .sandbox: .publicSkills } }
+    var targetName: String { policy.targetName }
     var target: String {
         switch self {
         case .sandbox: SandboxInstaller.target
