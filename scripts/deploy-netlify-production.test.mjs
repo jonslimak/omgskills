@@ -26,6 +26,7 @@ function createHarness({
   verificationFailures = 0,
   liveAfterFailure = "candidate-2",
   openIssue = null,
+  helperAssetError = null,
 } = {}) {
   const calls = [];
   const receipts = [];
@@ -91,6 +92,10 @@ function createHarness({
     receipts,
     run,
     fetchImpl,
+    verifyHelperAssets: async () => {
+      calls.push({ type: "helper-assets" });
+      if (helperAssetError) throw helperAssetError;
+    },
     writeReceipt: async (_path, receipt) => {
       const serialized = JSON.stringify(receipt);
       assert.doesNotMatch(serialized, /netlify-secret|github-secret/);
@@ -129,6 +134,9 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   assert.equal(receipt.manualRestoreCommand, undefined);
   const deployCalls = harness.calls.filter((call) => call.key?.includes("netlify-cli deploy"));
   assert.equal(deployCalls.length, 2);
+  const helperCheckIndex = harness.calls.findIndex((call) => call.type === "helper-assets");
+  assert.ok(helperCheckIndex >= 0);
+  assert.ok(helperCheckIndex < harness.calls.indexOf(deployCalls[0]));
   assert.equal(deployCalls[0].key.includes("--prod"), false);
   assert.equal(deployCalls[0].key.includes("--no-build"), true);
   assert.equal(deployCalls[1].key.includes("--prod"), true);
@@ -182,6 +190,15 @@ test("waits for production alias stabilization before verification", async () =>
   );
   assert.ok(productionDeployIndex < stabilizationIndex);
   assert.ok(stabilizationIndex < productionVerifyIndex);
+});
+
+test("blocks invalid helper assets before publishing or touching Netlify", async () => {
+  const harness = createHarness({ helperAssetError: new Error("Helper release checksum mismatch") });
+  await assert.rejects(deployProduction({ env, ...harness }), /checksum mismatch/);
+  assert.equal(harness.receipts.at(-1).status, "blocked-by-helper-assets");
+  assert.equal(harness.receipts.at(-1).verificationError, "Helper release checksum mismatch");
+  assert.equal(harness.calls.some((call) => call.key?.includes("netlify-cli deploy")), false);
+  assert.equal(harness.calls.some((call) => call.path?.startsWith("/api/v1/")), false);
 });
 
 test("retries transient verification failures", async () => {

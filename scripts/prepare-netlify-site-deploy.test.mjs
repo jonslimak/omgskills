@@ -30,3 +30,15 @@ test("restores release assets before building and verifying web pages", async ()
     "verify-release-artifacts",
   ]);
 });
+
+test("an asset restoration failure stops preparation before the build", async () => {
+  let built = false;
+  await assert.rejects(runPreparationSequence({
+    verifyPolicy: async () => {},
+    verifyCollectionImages: async () => {},
+    verifyCreatorHandleReservations: async () => {},
+    restoreRequiredAssets: async () => { throw new Error("Missing helper release assets"); },
+    runWebLibraryBuild: async () => { built = true; },
+  }), /Missing helper release assets/);
+  assert.equal(built, false);
+});

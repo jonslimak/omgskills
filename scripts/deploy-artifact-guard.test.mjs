@@ -65,6 +65,27 @@ test("release artifact verification reports every missing asset", async () => {
   }
 });
 
+test("combined release guard rejects helper assets while distribution is disabled", async (t) => {
+  const { root } = await fixture();
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await mkdir(join(root, "helper/updates"), { recursive: true });
+  await writeFile(join(root, "helper/updates/appcast.xml"), "not approved for hosting");
+  await assert.rejects(verifyReleaseDeployArtifacts(root), /Unexpected helper release file/);
+});
+
+test("combined release guard requires the enabled helper inventory", async (t) => {
+  const { root } = await fixture();
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const helperManifest = {
+    version: 1,
+    enabled: true,
+    assets: ["appcast.xml", "OMGSkills-Helper-0.1.0-1-arm64.dmg"].map((name) => ({
+      path: `helper/updates/${name}`, size: 1, sha256: "a".repeat(64),
+    })),
+  };
+  await assert.rejects(verifyReleaseDeployArtifacts(root, "test artifact", { helperManifest }), /Missing helper release assets/);
+});
+
 test("release artifact verification rejects appcasts without update assets", async () => {
   const root = await mkdtemp(join(tmpdir(), "omgskills-deploy-guard-"));
   try {

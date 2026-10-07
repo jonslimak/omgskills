@@ -144,3 +144,14 @@ test("manual deploys package health auth and keep health JSON private", () => {
     /for = "\/app\/release-config\.json"[\s\S]*?Cache-Control = "no-store"/,
   );
 });
+
+test("shared production preparation and bundle guards include helper retention", async () => {
+  const preparation = await readFile(new URL("./prepare-netlify-site-deploy.mjs", import.meta.url), "utf8");
+  const builder = await readFile(new URL("./build-netlify-site.mjs", import.meta.url), "utf8");
+  const guard = await readFile(new URL("./deploy-artifact-guard.mjs", import.meta.url), "utf8");
+  const publisher = await readFile(new URL("./deploy-netlify-production.mjs", import.meta.url), "utf8");
+  assert.match(preparation, /verifyHelperReleaseAssets\(siteDir, \{ allowRestore: isCi \}\)/);
+  assert.match(builder, /verifyReleaseDeployArtifacts\(outputDir/);
+  assert.match(guard, /await verifyHelperReleaseAssets\(rootDir/);
+  assert.match(publisher, /verifyHelperAssets = \(\) => verifyHelperReleaseAssets\(path.resolve\("dist\/netlify-site"\)\)/);
+});

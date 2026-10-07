@@ -4,6 +4,7 @@ import { spawn } from "node:child_process";
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyHelperReleaseAssets } from "./helper-release-assets.mjs";
 
 // Preserve the existing circuit-breaker issue title so older open incidents still block deploys.
 export const ROLLBACK_ISSUE_TITLE = "Production deploy rollback";
@@ -290,6 +291,7 @@ export async function deployProduction({
   sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
   now = () => new Date().toISOString(),
   writeReceipt = writeReceiptFile,
+  verifyHelperAssets = () => verifyHelperReleaseAssets(path.resolve("dist/netlify-site")),
 } = {}) {
   const siteId = requireEnv(env, "NETLIFY_SITE_ID");
   const netlifyToken = requireEnv(env, "NETLIFY_AUTH_TOKEN");
@@ -371,6 +373,16 @@ export async function deployProduction({
     receipt.originMainCommit = originMain || null;
     await save();
     throw new Error(`Production deploy requires HEAD == origin/main (${head} != ${originMain})`);
+  }
+
+  try {
+    await verifyHelperAssets();
+  } catch (error) {
+    receipt.status = "blocked-by-helper-assets";
+    receipt.completedAt = now();
+    receipt.verificationError = error.message;
+    await save();
+    throw error;
   }
 
   receipt.previousDeployId = await currentDeployId({ fetchImpl, siteId, netlifyToken });

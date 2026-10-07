@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { extractUpdateAssetPaths } from "./deploy-artifact-guard.mjs";
 import { loadProductionFeatures } from "./production-features.mjs";
 import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
+import { verifyLiveHelperReleaseAssets } from "./helper-release-assets.mjs";
 
 const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const requiredStaticReleaseAssets = [
@@ -98,6 +99,7 @@ export async function verifyProductionDeploy({
   publicOrigin = process.env.PUBLIC_ORIGIN || origin,
   fetchImpl = fetch,
   expectedFeatures,
+  expectedHelperRelease,
   verifyCandidateFeatures = process.env.VERIFY_CANDIDATE_FEATURES !== "0",
 } = {}) {
   origin = origin.replace(/\/$/, "");
@@ -153,6 +155,10 @@ export async function verifyProductionDeploy({
 
   for (const relativePath of [...requiredStaticReleaseAssets, ...updateAssets]) {
     await expectStatus(fetchImpl, origin, `/${relativePath}`, 200, { method: "HEAD" });
+  }
+
+  if (verifyCandidateFeatures) {
+    await verifyLiveHelperReleaseAssets({ origin, fetchImpl, manifest: expectedHelperRelease });
   }
 
   await verifyAiCatalog(fetchImpl, origin, publicOrigin);

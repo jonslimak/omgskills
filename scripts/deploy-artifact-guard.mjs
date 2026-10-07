@@ -1,5 +1,6 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { verifyHelperReleaseAssets } from "./helper-release-assets.mjs";
 import {
   catalogSkillUrlEntries,
   catalogSkillUrlsFilename,
@@ -120,7 +121,7 @@ export async function requiredReleaseAssetPaths(rootDir) {
   return [...requiredStaticReleaseAssets, ...updateAssets];
 }
 
-export async function verifyReleaseDeployArtifacts(rootDir, label = "deploy artifact") {
+export async function verifyReleaseDeployArtifacts(rootDir, label = "deploy artifact", { helperManifest } = {}) {
   const requiredAssets = await requiredReleaseAssetPaths(rootDir);
   const missing = [];
 
@@ -133,4 +134,5 @@ export async function verifyReleaseDeployArtifacts(rootDir, label = "deploy arti
   if (missing.length > 0) {
     throw new Error(`${label} is unsafe: missing release assets: ${missing.join(", ")}`);
   }
+  await verifyHelperReleaseAssets(rootDir, { manifest: helperManifest });
 }

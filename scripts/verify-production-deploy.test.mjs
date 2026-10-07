@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { verifyProductionDeploy } from "./verify-production-deploy.mjs";
 
@@ -241,4 +242,39 @@ test("fails when the deployed feature receipt does not match the reviewed state"
     }),
     /does not match the reviewed production feature state/,
   );
+});
+
+test("candidate verification checks the full helper feed and download bytes", async () => {
+  const content = Buffer.from("synthetic helper asset");
+  const expectedHelperRelease = {
+    version: 1,
+    enabled: true,
+    assets: ["appcast.xml", "OMGSkills-Helper-0.1.0-1-arm64.dmg"].map((name) => ({
+      path: `helper/updates/${name}`,
+      size: content.length,
+      sha256: createHash("sha256").update(content).digest("hex"),
+    })),
+  };
+  const requests = [];
+  let corrupt = false;
+  const options = {
+    origin,
+    expectedFeatures: disabledFeatures,
+    expectedHelperRelease,
+    fetchImpl: async (url, request) => {
+      const path = new URL(url).pathname;
+      if (path.startsWith("/helper/updates/")) {
+        requests.push({ path, method: request.method || "GET" });
+        return new Response(corrupt ? Buffer.alloc(content.length, 120) : content);
+      }
+      return responseFor(path, request);
+    },
+  };
+  await verifyProductionDeploy(options);
+  assert.deepEqual(requests, expectedHelperRelease.assets.map((asset) => ({ path: `/${asset.path}`, method: "GET" })));
+  corrupt = true;
+  await assert.rejects(verifyProductionDeploy(options), /checksum mismatch/);
+  requests.length = 0;
+  await verifyProductionDeploy({ ...options, verifyCandidateFeatures: false });
+  assert.deepEqual(requests, []);
 });

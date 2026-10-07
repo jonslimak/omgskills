@@ -10,6 +10,7 @@ import {
   verifyWebLibraryDeployArtifacts,
 } from "./deploy-artifact-guard.mjs";
 import { ensureHealthSnapshot } from "./health-snapshot-guard.mjs";
+import { verifyHelperReleaseAssets } from "./helper-release-assets.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -177,7 +178,8 @@ async function restoreRequiredAssets() {
     await ensureAsset(`/${relativePath}`);
   }
 
-  return requiredAssets;
+  const helperAssets = await verifyHelperReleaseAssets(siteDir, { allowRestore: isCi });
+  return [...requiredAssets, ...helperAssets];
 }
 
 async function main() {
