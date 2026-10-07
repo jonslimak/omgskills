@@ -97,7 +97,7 @@ export function verifyInventory(files, frameworkFiles) {
     ].sort(), 'Unexpected app bundle contents');
 }
 
-function inventory(root, relative = '', framework = false) {
+export function inventory(root, relative = '', framework = false) {
     return readdirSync(join(root, relative)).flatMap(name => {
         const path = join(relative, name);
         const stat = lstatSync(join(root, path));

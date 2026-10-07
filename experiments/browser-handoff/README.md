@@ -1,4 +1,4 @@
-# Standalone helper experiment (H1.1-H1.4B)
+# Standalone helper experiment (H1.1-H1.4C1)
 
 Local experiment only. No private auth or public-app dependency.
 The same isolated H0 bundle and `omgskills-helper-test` scheme now support a real
@@ -77,6 +77,83 @@ interrupt an apply; otherwise it cancels and waits for tracked cleanup.
 Offline model/fake-driver tests and the real adapter/build pass. These do not
 prove signed v1-to-v2 replacement, bad-signature refusal, interrupted download or
 replacement-failure recovery; those need C/D artifacts and user-run checks.
+
+### H1.4C1 packaging (no distribution)
+
+`package-helper.mjs` defaults to **prepare**, never signing/uploading implicitly.
+It reads a full Git commit into a fresh source snapshot, including the shared
+validator outside this package. It does not copy the working tree. The normal
+product is built once and copied into a controlled pair differing only in release
+metadata. All output stays in fresh ignored `.release-artifacts/<run-id>/` folders.
+Do not launch, register, install or distribute these preparation bundles.
+
+Offline checks and an explicitly synthetic local rehearsal:
+
+```sh
+node --test experiments/browser-handoff/package-helper.test.mjs experiments/browser-handoff/verify-candidate.test.mjs
+node experiments/browser-handoff/package-helper.mjs prepare --rehearsal --source FULL_REVIEWED_COMMIT --run UNIQUE_RUN_ID
+```
+
+The rehearsal uses only ad-hoc signing and a fake public key. No signing identity,
+Keychain account access, timestamp request, notary request, mounting, hosting or
+helper launch occurs. The source plist and old candidates stay unchanged.
+`prepared.json` explicitly says `prepared-not-for-distribution`; its command log,
+source manifest, tool hashes and per-version bundle manifests are retained. A
+rehearsal cannot be finalized. Failed output is retained with no ready receipt.
+
+After scoped review/commit and **separate C2 approval**, prepare a release-profile
+configuration. `--config` accepts exactly this JSON shape (public values and named
+credential references only; never private keys/passwords):
+
+```json
+{
+  "schema": 1,
+  "profile": "release",
+  "sourceCommit": "FULL_REVIEWED_40_CHARACTER_COMMIT",
+  "previousRelease": null,
+  "versions": [{"version": "0.1.0", "build": "1"}, {"version": "0.1.1", "build": "2"}],
+  "architecture": "arm64",
+  "feedURL": "https://omgskills.com/helper/updates/appcast.xml",
+  "publicKey": "DEDICATED_HELPER_PUBLIC_ED25519_KEY",
+  "teamID": "EXPECTED_TEAM_ID",
+  "signingIdentity": "DEVELOPER_ID_CERTIFICATE_SHA1_FINGERPRINT",
+  "sparkleAccount": "com.omgskills.helper",
+  "notaryProfile": "approved-helper-notary-profile"
+}
+```
+
+Recheck previously distributed versions and local release receipts before
+allocating the pair. Set `previousRelease` to the last distributed version/build,
+or `null` only for the first release. Both version and build must increase.
+Release preparation requires these packaging files to match the frozen commit.
+The helper key must differ from the existing Mac app key; keys are never created
+or exported by the packaging script. Key ownership/recovery and hosting origin
+must be agreed before C2. Preparing a config is not approval to finalize it.
+
+Finalization requires the explicit `finalize --run RUN_ID
+--approve-signing-and-apple` invocation. It checks the dedicated public key,
+Developer ID identity/Team and named notary credentials, signs inside-out,
+notarizes/staples app then DMG, inspects a read-only mounted copy without launch,
+and generates/verifies the signed appcast with pinned Sparkle tools and no deltas.
+It never writes a hosting directory or calls the public Mac release scripts.
+This adapter has offline injected-command coverage, **not real C2 acceptance**.
+
+Only all-success finalization writes `ready.json` (still local, not hosted).
+Notary timeout resumes the recorded submission ID; an unknown upload outcome,
+rejection or incomplete non-notary stage stops for inspection. Never delete the
+journal or change inputs to force retry. A crash may leave `finalize.lock` or an
+owned mount: verify the recorded process/mount is inactive before approved scoped
+recovery. No automatic stale-lock deletion, resubmission or broad cleanup.
+
+Payload comparison uses identically ad-hoc-signed disposable copies because
+signature removal alone leaves variable Mach-O signature-size metadata. Resources,
+permissions, links and canonical executable bytes must stay exact; separate
+checks enforce real signatures, entitlements, identities and timestamps. Only
+known seal paths and the validated outer stapling ticket may differ. Comparison
+copies are deleted; original signatures are never stripped.
+
+Actual Developer ID/notary/DMG/feed compatibility remains C2. Browser download,
+quarantine, clean-account setup, helper replacement and retained skills remain D.
 
 ## Existing test app
 
