@@ -11,9 +11,13 @@ private actor ControlledInstallService: InstallServing {
     private var pending: [Int: CheckedContinuation<InstallReview, any Error>] = [:]
     private var waiters: [Int: CheckedContinuation<Void, Never>] = [:]
     private var applyContinuation: CheckedContinuation<String, any Error>?
+    private var discardContinuation: CheckedContinuation<Void, Never>?
+    private let pauseDiscard: Bool
     private(set) var calls = 0
     private(set) var approvals: [UUID] = []
     private(set) var discarded: [UUID] = []
+
+    init(pauseDiscard: Bool = false) { self.pauseDiscard = pauseDiscard }
 
     func prepare(_ request: HandoffRequest) async throws -> InstallReview {
         calls += 1
@@ -30,11 +34,17 @@ private actor ControlledInstallService: InstallServing {
         approvals.append(id)
         return try await withCheckedThrowingContinuation { applyContinuation = $0; waiters.removeValue(forKey: 100)?.resume() }
     }
-    func discard(_ id: UUID) { discarded.append(id) }
+    func discard(_ id: UUID) async {
+        discarded.append(id)
+        if pauseDiscard {
+            await withCheckedContinuation { discardContinuation = $0; waiters.removeValue(forKey: 200)?.resume() }
+        }
+    }
     func wait(_ index: Int) async {
-        if index == 100 ? applyContinuation != nil : calls >= index { return }
+        if index == 200 ? discardContinuation != nil : (index == 100 ? applyContinuation != nil : calls >= index) { return }
         await withCheckedContinuation { waiters[index] = $0 }
     }
+    func finishDiscard() { discardContinuation?.resume(); discardContinuation = nil }
     func finish(_ index: Int, action: InstallReview.Action = .install) -> UUID {
         let id = UUID()
         pending.removeValue(forKey: index)?.resume(returning: InstallReview(
@@ -185,5 +195,65 @@ struct InstallModelTests {
         #expect(model.errorMessage == nil && model.message != nil)
         #expect(!FileManager.default.fileExists(atPath: sandbox.url.appendingPathComponent("home/.agents/skills/frontend-design").path))
         #expect(FileManager.default.fileExists(atPath: sandbox.url.appendingPathComponent("home/.claude/skills/frontend-design/SKILL.md").path))
+    }
+
+    @Test func cancelledLoadRemainsBusyUntilLateCleanupFinishes() async throws {
+        let service = ControlledInstallService(pauseDiscard: true)
+        let model = InstallModel(service: service, requestPolicy: .test)
+        model.open(link); await service.wait(1)
+        model.cancel()
+        #expect(!model.isLoading && model.hasPendingWork)
+        #expect(model.beginHelperUpdate() == nil)
+        let id = await service.finish(1)
+        await service.wait(200)
+        #expect(model.beginHelperUpdate() == nil)
+        #expect(model.beginTermination())
+        model.open(link)
+        #expect(await service.calls == 1)
+        await service.finishDiscard()
+        await model.waitForPendingWork()
+        #expect(!model.hasPendingWork && model.review == nil)
+        #expect(await service.discarded == [id])
+        #expect(model.beginHelperUpdate() == nil)
+    }
+
+    @Test func readyReviewMustCloseAndDiscardBeforeHelperUpdate() async throws {
+        let service = ControlledInstallService(pauseDiscard: true)
+        let model = InstallModel(codex: service, claude: service, requestPolicy: .test)
+        model.open(link); await service.wait(1)
+        _ = await service.finish(1, action: .update)
+        await model.task?.value
+        #expect(model.beginHelperUpdate() == nil)
+        model.cancel(); await service.wait(200)
+        #expect(model.beginHelperUpdate() == nil)
+        await service.finishDiscard(); await model.waitForPendingWork()
+        let hold = try #require(model.beginHelperUpdate())
+        #expect(model.beginHelperUpdate() == nil)
+        model.open(link); model.selectAgent(.claude); model.apply(); model.restore()
+        #expect(model.helperUpdateActive && !model.acceptsSkillRequests)
+        #expect(model.selectedAgent == .codex && model.review == nil)
+        #expect(await service.calls == 1)
+        #expect(await service.approvals.isEmpty)
+        model.endHelperUpdate(UUID())
+        #expect(model.helperUpdateActive)
+        model.endHelperUpdate(hold)
+        #expect(model.canBeginHelperUpdate)
+        model.apply(); model.selectAgent(.claude)
+        #expect(await service.calls == 1)
+        #expect(await service.approvals.isEmpty)
+    }
+
+    @Test func applyCannotBeInterruptedByHelperUpdateOrQuit() async throws {
+        let service = ControlledInstallService()
+        let model = InstallModel(service: service, requestPolicy: .test)
+        model.open(link); await service.wait(1)
+        _ = await service.finish(1); await model.task?.value
+        model.apply(); await service.wait(100)
+        #expect(model.beginHelperUpdate() == nil)
+        #expect(!model.beginTermination() && !model.isTerminating)
+        await service.applied(); await model.waitForPendingWork()
+        #expect(model.beginTermination())
+        await model.waitForPendingWork()
+        #expect(!model.acceptsSkillRequests && !model.hasPendingWork)
     }
 }

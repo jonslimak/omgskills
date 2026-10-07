@@ -1,4 +1,4 @@
-# Standalone helper experiment (H1.1-H1.4A)
+# Standalone helper experiment (H1.1-H1.4B)
 
 Local experiment only. No private auth or public-app dependency.
 The same isolated H0 bundle and `omgskills-helper-test` scheme now support a real
@@ -11,7 +11,7 @@ H1.3 adds permanent destination handling. Simulated-home checks passed for both
 agents; the separate local Codex discovery fixture passed install/update/rollback.
 Do not enable real-home mode without separate approval.
 
-## H1.4A normal helper candidate
+## H1.4 normal helper candidate
 
 The separate `OMGSkillsHelper` product uses `OMGSkills Helper.app`, bundle ID
 `com.omgskills.helper` and only the `omgskills-helper` scheme. It does not use
@@ -23,7 +23,8 @@ not a signed distribution or a public release.
   creation. The OS account home and fixed service origins remain authoritative.
 - `HandoffTestSupport` owns fixture bytes, discovery policy, launch-env parsing
   and harness commands. Only the test app/harness depend on it. Both apps share
-  `HandoffCore` and `HandoffUI`; records and transactions are unchanged.
+  `HandoffCore` and `HandoffUI`; records and transactions are unchanged. Only the
+  normal helper also depends on `HelperUpdates` and Sparkle.
 - The normal app rejects test schemes/fixture IDs and developer URL options.
   It retains the two-public-ID allowlist and `frontend-design` destination.
   The URL identifies a skill, not an exact page version; that binding is H2.
@@ -43,14 +44,39 @@ sh experiments/browser-handoff/build-candidate.sh
 The command refuses a running normal helper, uses fresh build/output directories,
 and prints the exact ignored `.candidate-app/candidate.*/OMGSkills Helper.app`
 path. It verifies the product graph, link inputs, plist, ad-hoc signature, bundle
-inventory, system-only dependencies and native architecture. Symbol/string scans
+inventory, system/Sparkle dependencies and native architecture. Sparkle's exact
+version, source revision and archive checksum are pinned. Its embedded framework,
+nested code and contained relative links must match the resolved artifact.
+Symbol/string scans
 supplement those structural checks. No launch, registration, installation,
 Developer ID signing, notarization, upload or release occurs. The old `.test-app`
 bundle is not replaced. Failed/older outputs remain local; no automatic deletion.
 
 Do not open the candidate as part of build verification. See
 `../../webwork-h14-spec.md` for results and the separately approved manual check.
-Sparkle belongs to H1.4B; signed artifacts and distribution remain H1.4C/D.
+Signed artifacts and distribution remain H1.4C/D.
+
+### H1.4B helper updates
+
+The normal helper integrates Sparkle 2.10.0 and its standard update UI through
+one Check for Updates command. This candidate deliberately has updates disabled
+and no feed or public key: the updater is neither constructed nor started.
+Later release configuration must use the reserved helper-only feed and a separate
+EdDSA key. The existing Mac app and its update channel are not dependencies.
+
+Checks are user initiated; automatic installation and profiling are disabled.
+Configuration fails closed and the adapter pins the feed instead of accepting
+an old user-default override. Required signed feeds/archives, Developer ID signing,
+notarization and hosting remain separately approved work.
+
+Helper updates require a closed skill review and completed cleanup, including
+cancelled downloads. During an update, skill requests are refused without queuing.
+A pending replacement keeps that block until restart. Normal quit refuses to
+interrupt an apply; otherwise it cancels and waits for tracked cleanup.
+
+Offline model/fake-driver tests and the real adapter/build pass. These do not
+prove signed v1-to-v2 replacement, bad-signature refusal, interrupted download or
+replacement-failure recovery; those need C/D artifacts and user-run checks.
 
 ## Existing test app
 

@@ -54,9 +54,18 @@ public final class InstallModel {
     public private(set) var errorMessage: String?
     public private(set) var canRestore = false
     public private(set) var selectedAgent: InstallAgent = .codex
+    public private(set) var hasPendingWork = false
+    public private(set) var helperUpdateActive = false
+    public private(set) var isTerminating = false
+    @ObservationIgnored private var updateHold: UUID?
+    @ObservationIgnored private var operations: [UUID: Task<Void, Never>] = [:]
     @ObservationIgnored private let requestPolicy: HandoffRequestPolicy
     @ObservationIgnored private let admissionCheck: @MainActor () throws -> Void
     public var canSelectAgent: Bool { !services.isEmpty }
+    public var acceptsSkillRequests: Bool { !helperUpdateActive && !isTerminating }
+    public var canBeginHelperUpdate: Bool {
+        acceptsSkillRequests && !isApplying && !isLoading && !hasPendingWork && review == nil
+    }
     @ObservationIgnored private var service: any InstallServing
     @ObservationIgnored private let services: [InstallAgent: any InstallServing]
     @ObservationIgnored private var request: HandoffRequest?
@@ -78,6 +87,7 @@ public final class InstallModel {
     }
 
     public func selectAgent(_ agent: InstallAgent) {
+        guard acceptsSkillRequest() else { return }
         guard !isApplying, agent != selectedAgent, let next = services[agent] else { return }
         guard admitted() else { return }
         begin()
@@ -88,6 +98,7 @@ public final class InstallModel {
     }
 
     public func open(_ raw: String) {
+        guard acceptsSkillRequest() else { return }
         guard !isApplying else {
             noticeMessage = "An installation is finishing. Reopen the link when it completes."
             return
@@ -103,6 +114,7 @@ public final class InstallModel {
     }
 
     public func restore() {
+        guard acceptsSkillRequest() else { return }
         guard !isApplying, !isLoading, canRestore else { return }
         guard admitted() else { return }
         begin()
@@ -110,13 +122,14 @@ public final class InstallModel {
     }
 
     public func apply() {
+        guard acceptsSkillRequest() else { return }
         guard let review, !isApplying, !isLoading, review.action != .unchanged else { return }
         guard admitted() else { return }
         isApplying = true
         noticeMessage = nil
         errorMessage = nil
         let current = generation
-        task = Task { [weak self, service] in
+        task = track { [weak self, service] in
             do {
                 let result = try await service.apply(review.id)
                 guard let self, generation == current else { return }
@@ -142,11 +155,61 @@ public final class InstallModel {
         isLoading = false
     }
 
+    public func beginHelperUpdate() -> UUID? {
+        guard canBeginHelperUpdate, admitted() else { return nil }
+        cancel()
+        let id = UUID()
+        updateHold = id
+        helperUpdateActive = true
+        return id
+    }
+
+    public func endHelperUpdate(_ id: UUID) {
+        guard updateHold == id else { return }
+        updateHold = nil
+        helperUpdateActive = false
+    }
+
+    public func beginTermination() -> Bool {
+        guard !isApplying else { return false }
+        isTerminating = true
+        cancel()
+        return true
+    }
+
+    public func waitForPendingWork() async {
+        while let operation = operations.values.first { await operation.value }
+    }
+
+    private func acceptsSkillRequest() -> Bool {
+        guard acceptsSkillRequests else {
+            noticeMessage = isTerminating ? "The helper is closing. Reopen the link after restarting."
+                : "A helper update is in progress. Reopen the skill link when it finishes."
+            return false
+        }
+        return true
+    }
+
+    // A cancelled load may still be cleaning up. Keep it tracked until it returns.
+    private func track(_ operation: @escaping @MainActor () async -> Void) -> Task<Void, Never> {
+        let id = UUID()
+        let tracked = Task { [weak self] in
+            defer {
+                self?.operations.removeValue(forKey: id)
+                self?.hasPendingWork = !(self?.operations.isEmpty ?? true)
+            }
+            await operation()
+        }
+        operations[id] = tracked
+        hasPendingWork = true
+        return tracked
+    }
+
     private func begin() {
         generation = UUID()
         task?.cancel()
         task = nil
-        if let review { Task { [service] in await service.discard(review.id) } }
+        if let review { _ = track { [service] in await service.discard(review.id) } }
         review = nil
         message = nil
         noticeMessage = nil
@@ -166,7 +229,7 @@ public final class InstallModel {
     private func load(_ operation: @escaping @Sendable () async throws -> InstallReview) {
         isLoading = true
         let current = generation
-        task = Task { [weak self, service] in
+        task = track { [weak self, service] in
             do {
                 let result = try await operation()
                 guard let self, generation == current, !Task.isCancelled else {
@@ -192,5 +255,5 @@ public final class InstallModel {
         return "The operation could not be verified. Reopen the link to check the installed version."
     }
 
-    deinit { task?.cancel() }
+    deinit { for operation in operations.values { operation.cancel() } }
 }

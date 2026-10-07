@@ -32,13 +32,16 @@ printf 'Build evidence: %s\nCandidate directory: %s\n' "$BUILD" "$ARTIFACT"
 swift package --package-path "$HERE" describe --type json > "$BUILD/package.json"
 node "$HERE/verify-candidate.mjs" graph "$BUILD/package.json"
 CLANG_MODULE_CACHE_PATH="$BUILD/module-cache" swift build --package-path "$HERE" \
-    --build-path "$BUILD/swift-build" -c release --product OMGSkillsHelper
+    --build-path "$BUILD/swift-build" --force-resolved-versions -c release --product OMGSkillsHelper -Xswiftc -warnings-as-errors
+swift package --package-path "$BUILD/swift-build/checkouts/Sparkle" dump-package > "$BUILD/sparkle-package.json"
+node "$HERE/verify-candidate.mjs" dependency "$HERE/Package.resolved" "$BUILD/sparkle-package.json"
 BIN=$(swift build --package-path "$HERE" --build-path "$BUILD/swift-build" -c release --show-bin-path)
 require_stopped
-mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Frameworks"
 cp "$HERE/Helper-Info.plist" "$APP/Contents/Info.plist"
 cp "$BIN/OMGSkillsHelper" "$APP/Contents/MacOS/OMGSkillsHelper"
 /usr/bin/cmp "$BIN/OMGSkillsHelper" "$APP/Contents/MacOS/OMGSkillsHelper"
+/usr/bin/ditto "$BIN/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
 # Local inspection only. Never uses a Developer ID or touches a release feed.
 /usr/bin/codesign --force --sign - "$APP"
 node "$HERE/verify-candidate.mjs" bundle "$APP" "$BIN"

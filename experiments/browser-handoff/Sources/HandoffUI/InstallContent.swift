@@ -28,7 +28,7 @@ public struct InstallContent: View {
                     ForEach(InstallAgent.allCases) { agent in Text(agent.title).tag(agent) }
                 }
                 .pickerStyle(.segmented)
-                .disabled(model.isApplying)
+                .disabled(model.isApplying || !model.acceptsSkillRequests)
             }
             if let review = model.review {
                 Text(title(review.action)).font(.title2)
@@ -85,14 +85,14 @@ public struct InstallContent: View {
                     .keyboardShortcut(.cancelAction).disabled(model.isApplying)
                 if model.canRestore {
                     Button("Review previous version", systemImage: "arrow.uturn.backward") { model.restore() }
-                        .disabled(model.isApplying || model.isLoading)
+                        .disabled(model.isApplying || model.isLoading || !model.acceptsSkillRequests)
                 }
                 Spacer()
                 if model.isApplying { ProgressView().controlSize(.small) }
                 if let review = model.review, review.action != .unchanged {
                     Button(title(review.action)) { model.apply() }
                         .buttonStyle(.borderedProminent)
-                        .disabled(model.isApplying || model.isLoading)
+                        .disabled(model.isApplying || model.isLoading || !model.acceptsSkillRequests)
                 }
             }
         }
