@@ -74,9 +74,10 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
     state={!available || snapshot.data ? "ready" : snapshot.error ? "error" : "loading"}
     retry={account.refresh}
     accountPages={available ? (view, theme) => view === "profile" ? <ProfilePanel profile={data.profile} theme={theme}
-      busy={snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing || !!snapshot.error || !snapshot.data}
-      error={snapshot.profileError} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
-      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel api={api} local={local} denied={account.invalidate} /></div>
+      busy={snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing}
+      blocked={!!snapshot.error || !snapshot.data || snapshot.accessDenied}
+      error={snapshot.profileError || snapshot.error} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
+      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel api={api} local={local} denied={account.invalidate} theme={theme} /></div>
       : view === "github" ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div> : undefined : undefined}
     previewBar={(local || sessionError || (available && snapshot.error)) && <div className="ua-preview">
       {local && <span>Local test · Unified app</span>}

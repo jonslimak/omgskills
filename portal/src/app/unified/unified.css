@@ -941,6 +941,11 @@
   font-family: inherit;
   color: var(--ua-ink);
 }
+.ua-connected-panel.ua-theme {
+  font-family: var(--ua-sans);
+  --accent: var(--ua-chip);
+  --accent-foreground: var(--ua-ink);
+}
 .ua-set-list > button {
   display: flex;
   align-items: center;

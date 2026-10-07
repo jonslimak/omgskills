@@ -5,7 +5,7 @@ import { Action, IconAction, Modal, TextInput } from "../app/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { createConnectionSession, type ConnectionSnapshot } from "./connection-session";
 
-export function ConnectionDialog({ api, denied, close, local = true }: { api: PortalApi; denied: () => void; close: () => void; local?: boolean }) {
+export function ConnectionDialog({ api, denied, close, local = true, theme }: { api: PortalApi; denied: () => void; close: () => void; local?: boolean; theme?: string }) {
   const callbacks = useRef({ api, denied }); callbacks.current = { api, denied };
   const session = useRef<ReturnType<typeof createConnectionSession> | null>(null);
   const [state, setState] = useState<ConnectionSnapshot>({ mode: "pairing", secret: "", expiresAt: "",
@@ -23,7 +23,7 @@ export function ConnectionDialog({ api, denied, close, local = true }: { api: Po
     };
   }, []);
   const label = state.mode === "pairing" ? "Connection code" : "Legacy token";
-  return <Modal title="Connect app" close={() => { session.current?.dispose(); close(); }}>
+  return <Modal title="Connect app" theme={theme} close={() => { session.current?.dispose(); close(); }}>
     {local ? <p>Local test only. Do not paste these codes into your installed app.</p>
       : <p>Paste the code into the app to connect this account.</p>}
     <Tabs value={state.mode} onValueChange={(value) => { if (value === "pairing" || value === "legacy") session.current?.select(value); }}>

@@ -8,7 +8,7 @@ import { ConnectionDialog } from "./ConnectionDialog";
 const formatDate = (value: string | null) => value === null ? "Never"
   : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
 
-export function DevicesPanel({ api, denied, local = true, readOnly = false }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean }) {
+export function DevicesPanel({ api, denied, local = true, readOnly = false, theme }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; theme?: string }) {
   const callbacks = useRef({ api, denied });
   callbacks.current = { api, denied };
   const sessionRef = useRef<ReturnType<typeof createDeviceSession> | null>(null);
@@ -53,8 +53,8 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false }: { 
       </div>)}
     </div>
     {state.devices?.length === 0 && !state.loading && !state.error && <EmptyState title="No connected devices" />}
-    {!readOnly && connecting && <ConnectionDialog api={api} denied={denied} local={local} close={() => setConnecting(false)} />}
-    {!readOnly && confirm && <Modal title={`Revoke ${confirm.deviceName}?`} close={() => { if (!state.revoking) setConfirm(null); }}>
+    {!readOnly && connecting && <ConnectionDialog api={api} denied={denied} local={local} theme={theme} close={() => setConnecting(false)} />}
+    {!readOnly && confirm && <Modal title={`Revoke ${confirm.deviceName}?`} theme={theme} close={() => { if (!state.revoking) setConfirm(null); }}>
       <p>This stops this connection from accessing your account. Installed skills and sets are not deleted. Reconnect the app to use it again.</p>
       <div className="rd-dialog-footer"><Action disabled={busy} onClick={() => setConfirm(null)}>Cancel</Action>
         <Action variant="destructive" disabled={busy || Boolean(state.error)} onClick={() => {

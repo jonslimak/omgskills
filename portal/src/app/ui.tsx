@@ -121,11 +121,13 @@ export function Toggle({
 export function Modal({
   title,
   description,
+  theme,
   close,
   children,
 }: {
   title: string;
   description?: string;
+  theme?: string;
   close: () => void;
   children: ReactNode;
 }) {
@@ -144,7 +146,8 @@ export function Modal({
       <PrimitiveDialog.Portal>
         <PrimitiveDialog.Overlay className="rd-overlay" />
         <PrimitiveDialog.Content
-          className="portal-design rd-dialog"
+          className={`portal-design rd-dialog${theme ? " ua-theme ua-connected-panel" : ""}`}
+          data-theme={theme}
           {...(!description ? { "aria-describedby": undefined } : {})}
           onCloseAutoFocus={(event) => {
             event.preventDefault();

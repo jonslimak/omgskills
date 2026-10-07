@@ -1,6 +1,6 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest app release: `0e51f512`, production deploy `6ac6906f6d4c8564369c82ba`. Guarded draft/production checks passed; all 2,210 public non-app files were unchanged. On 2026-10-07 the user confirmed My Skills, invitation access/revocation, and Favorites/skill/set persistence after refresh on the earlier release. Remaining acceptance is listed below; historical pending statements are not the current checklist.
+Status: Unified app is live. Latest app release: `b6941765`, production deploy `6ac6a028c8329ce482ee2c3e`. Guarded draft/production checks passed; all 2,210 public non-app files were unchanged. On 2026-10-07 the user accepted the deployed UI tweaks. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-07. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
 ## Current Acceptance And Remaining Work - 2026-10-07
@@ -25,6 +25,10 @@ and does not authorize account mutations, a commit, or a deployment.
 - [x] Latest loading/panel release passed guarded draft and production checks.
   Agent-observed signed-out discovery, batched collection loading, and desktop/
   mobile detail placement passed; all 2,210 public non-app files stayed unchanged.
+- [x] Mobile header, feed dividers, Edit/agent placement, and set-header/action
+  tweaks shipped in `b6941765`. The user reported "I verified the ui changes"
+  after deployment. This closes acceptance of the requested visual changes,
+  not every account destination, accessibility state, or connection flow.
 
 Evidence for account behavior: the user reported "all tests pass for me" for the proposed invitation
 checklist, then confirmed "they do" for Favorites and skill/set persistence.
@@ -57,7 +61,8 @@ establish coverage of deliberate failure/race conditions or every host/device.
 - [ ] Final UI/accessibility sweep: mobile sheets, keyboard/focus, light/dark,
   long content, back/forward and direct links, loading/error recovery. The local
   four-width sample-data pass and real signed-out desktop/mobile panel smoke
-  check are complete. Signed-in production navigation and detail checks remain.
+  check are complete. The user accepted the deployed visual tweaks; a systematic
+  signed-in navigation, keyboard and recovery sweep remains separately unverified.
 - [ ] Production performance: cold/warm Discover timings and request sizes.
   One live signed-out timing sample is recorded below; repeated measurements
   and signed-in behavior remain unverified. Local fixture timings do not count.
@@ -68,17 +73,124 @@ ordinary sign-in, account switching, and the named management actions.
 
 ### Next Work
 
-Await the user's requested quick UI tweaks. Do not start another acceptance pass,
-change account data, commit, or deploy as part of this documentation update.
+The user's quick UI tweaks are complete, committed, deployed and user-accepted.
+The read-only source/test review below is complete. Two confirmed UI issues
+have been fixed locally; commit and draft preparation are approved. Production
+publication and signed-in live verification of these fixes remain pending.
 
 The earlier proposed sign-in/account-switch and bulk-management checks are
 superseded by the user confirmations above. Profile/device/connection screens
-and the remaining edge cases stay open; they are unverified, not known defects.
+and the remaining edge cases stay open. Apart from the two corrected issues
+below, they are unverified, not known defects.
 Any later production test involving session changes, mutations, or external
 connections needs an agreed scope. Further performance changes should follow
 repeated measurements, not the single timing sample below.
 
-### Verified Release - 2026-10-07
+### Account Dialog Fixes - 2026-10-07
+
+- Profile dialogs no longer treat an unconfirmed save as an active request.
+  Cancel/Close remain usable after failure; resubmission stays blocked until
+  account refresh. Existing validation failures remain correctable.
+- Device connection and revoke dialogs receive the unified light/dark theme.
+  Unthemed legacy dialogs retain their existing styling.
+- Verified: 219 portal tests, TypeScript/build, focused browser failure/recovery
+  checks at 390/1440px, light/dark connection and revoke dialogs, and the existing
+  four-width UI regression suite. Browser checks used sample data with external
+  and API requests blocked. No real connection, publication, or account mutation
+  was performed. The temporary frontend test server was stopped afterward.
+- No backend, authentication, permissions, schema, or public-site changes.
+- Self-service GitHub installation setup remains a separate future feature;
+  this pass does not add it.
+- Release status: approved for commit and draft preparation only. Not live.
+
+### Account And Connection Review Plan
+
+Goal: confirm the remaining destinations work with the unified shell, without
+redesigning them or changing APIs, authentication, permissions, or the data model.
+Use the real production site for connectivity checks; do not create disposable
+servers or databases. Use local fixtures/unit tests only for deterministic UI,
+validation and failure-state checks.
+
+1. **Read-only source and test review.** Trace account-menu destinations through
+   `portal/src/integration/unified/Session.tsx`. Review the existing profile,
+   device, private-source, pairing and review tests. Record each behavior as
+   verified, a confirmed gap, or requiring a scoped production test. Do not count
+   a local fixture or source inspection as proof of a working external connection.
+2. **Read-only production navigation.** With an agreed signed-in session, open
+   Profile, Devices, GitHub sources and MCP from the menu. Check desktop/mobile
+   layout, direct URLs, refresh, Back/Forward, current account context and error
+   presentation. Open only destinations known not to write on load. Do not click
+   connection or confirmation actions until their side effects are understood.
+3. **Report before mutation.** Share confirmed defects with file references and
+   the smallest fix proposal. List any checks that need account changes and the
+   exact test account/device/repository required. Wait for scope approval before
+   saves, publication, pairing, revocation or external installation changes.
+4. **Scoped end-to-end checks, only after approval.** Verify persistence and
+   downstream effects in production for approved actions, then restore only the
+   agreed test state. Reuse existing accounts and connections where read-only;
+   never revoke an existing working connection as an exploratory test.
+
+Review checklist and completion evidence:
+
+- [ ] **Profile:** `ProfilePanel.tsx` and the account controller. Check saved
+  handle/public URL, edit/cancel, validation, disabled/busy/error states and Clerk
+  settings entry. Saving or Publish/Unpublish requires approval and a recorded
+  baseline. A full pass includes refresh persistence and the expected public URL
+  visibility, without exposing private email or private skills.
+- [ ] **Devices:** `DevicesPanel.tsx`, `ConnectionDialog.tsx` and
+  `device-session.ts`. Confirm the list reflects the current account and displays
+  loading/empty/error states. Inspect token/pairing creation before opening the
+  connection dialog. Real pairing or revocation requires a named test device;
+  completion means the intended device connects or loses access, with unrelated
+  devices and installed skills unchanged. Do not log pairing secrets.
+- [ ] **Private GitHub:** `PrivateSourcesPanel.tsx` and
+  `private-source-session.ts`. Check available installations/repositories,
+  feature-disabled/empty/error states, path validation and ownership boundaries.
+  Linking, refreshing private content, unbinding or changing GitHub App access
+  requires approval for a selected pilot repository. No new broad repository
+  permissions; keep private content and credentials out of screenshots/logs.
+- [ ] **MCP:** the unified `mcp` view and `/developers/` instructions. Verify the
+  displayed endpoint, instruction link, public read-only tool contract and an
+  existing harmless discovery request. Deployment health checks already passed;
+  they do not prove agent setup. Installing/configuring MCP in an agent requires
+  separate approval and is unnecessary for the initial read-only review.
+- [ ] **Older links and helper routes:** `entry-navigation.ts`, `routes.ts`,
+  pairing and review routing. Check `/app/groups/:id`, `/app/sets`, `/app/agents`,
+  `/app/home`, `/app/review/` and the supported pairing entry on both supported
+  hosts. Preserve the destination through sign-in; missing or unauthorized IDs
+  must not reveal another account's data. Test review/approval submissions only
+  within an agreed pairing scope, not by creating unsolicited install requests.
+
+Risks: production saves can publish a profile, disrupt a working device, expose
+private-repository content or alter access. Avoid these during the first review;
+use explicit scope and read-back evidence for later writes. A disabled rollout
+feature is not automatically a missing implementation and must not be enabled
+just to make a check pass.
+
+Deliverable: a short findings list and per-flow evidence/status. No product edits,
+commit or deployment are included in preparing this plan. Remaining race,
+partial-failure and repeated performance checks stay in the separate backlog.
+
+### Verified UI Tweaks Release - 2026-10-07
+
+- Commit `b69417656d1a69be1f3d83fae2e04252e784b5fb` was pushed to main.
+  Draft `6ac69f09c300afeadb822f9a` and production
+  `6ac6a028c8329ce482ee2c3e` passed the guarded complete-site deployment.
+  Receipt completed at `2026-10-07T19:44:41.576Z` with status `verified`.
+- Scope: mobile search/header spacing and contrast; removal of skill/set row
+  dividers; aligned Edit/agent controls; set rename/visibility/action placement;
+  icon-only Copy link; mobile-only hiding of the set's skill-avatar group.
+- Verified 217 portal tests, full `npm run check`, combined production build,
+  four-width local UI acceptance, and focused set-control/breakpoint checks.
+- Live signed-out desktop/mobile browser checks confirmed discovery loading,
+  single-row mobile header, removed row dividers and no page errors/overflow.
+  Signed-in set interactions were checked locally, then the user accepted the
+  deployed UI. Do not describe this as an agent-run signed-in production test.
+- All 2,210 public non-app files were unchanged. All 11 Mac release assets and
+  appcast matched production byte-for-byte. No backend/data-model, auth setting,
+  permission or Mac release change was included.
+
+### Previous Loading Release - 2026-10-07
 
 - App source commit `0e51f512` was integrated with current main's catalog update
   `bac117d5` and pushed to main. No schema, permissions, authentication settings,

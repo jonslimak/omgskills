@@ -9,6 +9,7 @@ import { useManagement } from "../src/integration/unified/useManagement";
 import { emptyAccount } from "../src/integration/data";
 import { PublicCatalogClient } from "../src/app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../src/app/unified/use-public-catalog";
+import { AccountDialogReview } from "./account-dialog-review";
 
 // Browser-only presentation fixture. No Clerk, backend, or account writes.
 const base = "/app/testing/unified-acceptance/";
@@ -52,6 +53,7 @@ function Review() {
   return <UnifiedApp key={String(signedIn)} data={data} catalog={shownCatalog} publicStatus={publicReview ? remote.status : undefined} nav={nav} navigate={navigate}
     signedIn={signedIn} onSession={next => { setSignedIn(next); setRequested({ ...initialNavigation, view: "discover" }); }}
     onSignIn={() => setSignedIn(true)} readOnlyAccount management={signedIn ? management : undefined}
+    accountPages={params.get("accountDialogs") === "1" ? (_view, theme) => <AccountDialogReview theme={theme} /> : undefined}
     onFavorite={rejectWrite} onCreateSet={rejectWrite} onMembership={rejectWrite} onVisibility={rejectWrite}
     state={!recovered && (scenario === "loading" || scenario === "error") ? scenario : "ready"}
     retry={() => setRecovered(true)} previewBar={null} />;
