@@ -1,9 +1,9 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest app release: `475a9f96`, production deploy `6ac7bfa6ac9d5965126c160a`. Guarded draft/production checks passed; all 2,213 public non-app files and 30 backend function digests stayed unchanged. Mobile drawer, counts, Favorites, detail close control, and all 18 collections passed signed-in live checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
+Status: Unified app is live. Latest app release: `562877c9`, production deploy `6ac7f21b11544c078bc5185c`. Guarded draft/production checks passed; all 2,213 public non-app files and 30 backend function digests stayed unchanged. Latest mobile header/drawer changes passed signed-in live checks; dark contrast was checked locally and its deployed CSS verified. Earlier counts, Favorites, detail close control, and all 18 collections passed signed-in live checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
-### Mobile Header And Dark Panels - Release Candidate, 2026-10-08
+### Mobile Header And Dark Panels - Released, 2026-10-08
 
 - User approved committing and safely deploying the latest local tweaks.
 - Mobile header keeps the eyes logo at left and moves the signed-in menu trigger
@@ -18,7 +18,18 @@ Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-ap
   were updated but not executed; affected interactions were checked in-browser.
 - Release uses the combined artifact and guarded current-main workflow. No Mac
   release, backend/schema changes, account writes or connection resets are included.
-- Commit and production receipt pending; this entry is not proof of deployment.
+- Committed/pushed as `562877c955ceebbfd2620bbdc23da52ea9be0a38`.
+  [Guarded workflow 37833148102](https://github.com/jonslimak/omgskills/actions/runs/37833148102)
+  succeeded: draft `6ac7f104ef42caae499626e4` and production
+  `6ac7f21b11544c078bc5185c` both verified on the first attempt. Appcast unchanged.
+  All 2,213 public non-app file hashes and all 30 backend function digests match
+  the previous deploy `6ac7bfa6ac9d5965126c160a`.
+- Live signed-in check at 390px confirmed eyes left, search middle, menu right,
+  no overflow, drawer navigation starting at 20px, no drawer logo, and the account
+  avatar at the bottom. Its menu opens above the drawer; Escape returns focus to
+  the avatar without closing navigation. Deployed CSS contains the dark surface
+  rule. Dark appearance was visually checked locally, not by changing the user's
+  production theme. Browser size was restored; no account data was changed.
 
 ### Mobile Navigation And Presentation - Released, 2026-10-08
 
