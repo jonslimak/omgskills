@@ -5,6 +5,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { verifyReleaseDeployArtifacts, verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
 import { refreshHomepageLibraryPreview } from "./homepage-library-preview.mjs";
+import { refreshHomePreview } from "./home-preview-content.mjs";
 import {
   loadProductionFeatures,
   portalBuildEnvironment,
@@ -115,6 +116,7 @@ async function main() {
     homepagePath: path.join(outputDir, "index.html"),
     siteDir: outputDir,
   });
+  await refreshHomePreview({ siteDir: outputDir });
   await verifyWebLibraryDeployArtifacts(outputDir, "Netlify deploy artifact");
   await verifyReleaseDeployArtifacts(outputDir, "Netlify deploy artifact");
   await rm(outputAppDir, { recursive: true, force: true });
