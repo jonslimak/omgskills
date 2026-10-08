@@ -464,7 +464,15 @@ export function UnifiedApp({
   const canManage = !!management && !management.blocked && !management.busy;
   const editableSet = activeSet?.role === "owner" && !activeSet.hidden && !activeSet.isFavorites;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
+  const pageKey = `${nav.view}:${nav.id}`;
+  const previousPage = useRef(pageKey);
 
+  useEffect(() => {
+    const changed = previousPage.current !== pageKey;
+    previousPage.current = pageKey;
+    // Page changes need a focus destination; search and detail dialogs own theirs.
+    if (changed && !nav.selected) main.current?.focus({ preventScroll: true });
+  }, [pageKey, nav.selected]);
   useEffect(() => {
     setEditing(false);
     setPicked([]);
@@ -684,6 +692,7 @@ export function UnifiedApp({
               <button
                 type="button"
                 className="ua-pill ua-link"
+                aria-label={`Open ${skill.name} details`}
                 onClick={() => open(skill)}
               >
                 Open

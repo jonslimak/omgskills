@@ -1,7 +1,7 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest app release: `b6941765`, production deploy `6ac6a028c8329ce482ee2c3e`. Guarded draft/production checks passed; all 2,210 public non-app files were unchanged. On 2026-10-07 the user accepted the deployed UI tweaks. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
-Updated: 2026-10-07. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
+Status: Unified app is live. Latest app release: `1aaa9266`, production deploy `6ac6b083bf8140fdd1657f88`. Guarded draft/production checks passed; the only non-app change was the scheduled `/data/health.json` update. The user reports the latest version seems to work; disconnect/reconnect testing is deferred at their request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
+Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
 ## Current Acceptance And Remaining Work - 2026-10-07
 
@@ -29,6 +29,10 @@ and does not authorize account mutations, a commit, or a deployment.
   tweaks shipped in `b6941765`. The user reported "I verified the ui changes"
   after deployment. This closes acceptance of the requested visual changes,
   not every account destination, accessibility state, or connection flow.
+- [x] Account-dialog fixes shipped in `1aaa9266` and passed guarded deployment
+  checks. The user reported "it seems to be working" afterward. This is a limited
+  user observation, not confirmation of deliberate save failures or connection
+  lifecycle tests.
 
 Evidence for account behavior: the user reported "all tests pass for me" for the proposed invitation
 checklist, then confirmed "they do" for Favorites and skill/set persistence.
@@ -58,6 +62,9 @@ establish coverage of deliberate failure/race conditions or every host/device.
 - [ ] Account destinations: profile editing/publication, devices, private GitHub,
   and MCP connection instructions; test external connections only within an
   explicitly agreed scope. Include legacy set links and pairing/review routes.
+- [ ] Deferred at the user's request: real disconnect/reconnect, device revocation
+  and pairing checks. Leave existing connections untouched; these are untested,
+  not failed, and do not block the next read-only review.
 - [ ] Final UI/accessibility sweep: mobile sheets, keyboard/focus, light/dark,
   long content, back/forward and direct links, loading/error recovery. The local
   four-width sample-data pass and real signed-out desktop/mobile panel smoke
@@ -74,9 +81,21 @@ ordinary sign-in, account switching, and the named management actions.
 ### Next Work
 
 The user's quick UI tweaks are complete, committed, deployed and user-accepted.
-The read-only source/test review below is complete. Two confirmed UI issues
-have been fixed locally; commit and draft preparation are approved. Production
-publication and signed-in live verification of these fixes remain pending.
+The read-only source/test review below is complete. Both account-dialog issues
+are fixed, committed and live. The user reports the release seems to work;
+full signed-in failure/recovery and connection lifecycle checks remain unverified.
+
+Approved next task: a read-only signed-in UI/navigation sweep
+on desktop and mobile, covering keyboard/focus, light/dark layout, Back/Forward,
+direct links and account destinations known not to write on load. Report any
+confirmed gaps before proposing fixes. Do not save settings, switch accounts,
+disconnect/reconnect, pair devices or alter existing connections.
+
+The first live pass reached signed-out public discovery only; account screens
+and live dark mode remain unverified until a signed-in session is available.
+Mobile layout, skill-sheet keyboard containment/dismissal/focus return, direct
+skill reload, Back/Forward, search and empty results passed. Two small accessibility
+issues were confirmed and the user approved fixing them, as recorded below.
 
 The earlier proposed sign-in/account-switch and bulk-management checks are
 superseded by the user confirmations above. Profile/device/connection screens
@@ -85,6 +104,21 @@ below, they are unverified, not known defects.
 Any later production test involving session changes, mutations, or external
 connections needs an agreed scope. Further performance changes should follow
 repeated measurements, not the single timing sample below.
+
+### Navigation Accessibility Fixes - 2026-10-07
+
+- Included in this checkpoint; production deployment approved on 2026-10-08,
+  pending the guarded release receipt: page changes move focus to the existing
+  main-content target; Open actions include the skill name in their accessible
+  label while retaining the visible "Open" text.
+- Initial load, search typing and source filtering do not trigger page focus;
+  selected skill dialogs retain their existing focus handling.
+- New isolated browser regression reproduced both issues before the fix and
+  passed afterward at 390/1440px, including search focus, detail dismissal and
+  Back/Forward. All 219 portal tests, the portal build and the existing four-width
+  browser acceptance suite passed. Browser tests used sample data, blocking API
+  and external requests; no account or connection changes were made.
+- Regression entry: `portal/testing/navigation-accessibility-browser.mjs`.
 
 ### Account Dialog Fixes - 2026-10-07
 
@@ -101,7 +135,18 @@ repeated measurements, not the single timing sample below.
 - No backend, authentication, permissions, schema, or public-site changes.
 - Self-service GitHub installation setup remains a separate future feature;
   this pass does not add it.
-- Release status: approved for commit and draft preparation only. Not live.
+- Release status: live. Commit `1aaa9266abe9d94cc0d6ba10b8804e0d0e018950`
+  was pushed to main and published by scheduled workflow `37684161642`.
+  Draft `6ac6af7a5610ec4f4605df94` and production
+  `6ac6b083bf8140fdd1657f88` passed guarded checks; the release receipt completed
+  at `2026-10-07T20:54:15.190Z` with status `verified`.
+- Production inventory comparison checked 2,210 non-app files. Only the scheduled
+  `/data/health.json` changed; marketing pages, public data assets and downloads
+  were otherwise unchanged. All 11 Mac release assets and appcast matched.
+- User observation: "it seems to be working". Disconnect/reconnect is explicitly
+  deferred; do not count the observation as a full connection or profile-save
+  recovery test. Receipt and comparison are retained under ignored
+  `dist/scheduled-release-37684161642/` in the implementation worktree.
 
 ### Account And Connection Review Plan
 
