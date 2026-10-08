@@ -20,8 +20,8 @@ PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs \
 Defaults to `http://127.0.0.1:5191`; override `PORTAL_REVIEW_ORIGIN` for another
 loopback frontend. Uses installed Chrome and browser-intercepted public responses
 to test real hooks/UI, delays, failures, retries, batch reads and cached revisits.
-No new backend or test database is started. The DEV-only acceptance fixture's
-`catalog=1` option enables real public hooks; `authDelay` simulates account readiness
+No new backend or test database is started. The DEV-only acceptance fixture uses
+real public hooks by default; `catalog=0` opts into sample data. `authDelay` simulates account readiness
 without Clerk. These controlled checks are not production latency measurements.
 
 ## Local setup
@@ -129,10 +129,12 @@ private context cleared. Detail focus survives related navigation and responsive
 panel changes; signed-out mobile lists/search have a Discover return control.
 Actual Clerk account switching still requires a production acceptance check.
 
-Reuse the existing Vite frontend for the sample-only page:
+Reuse the existing Vite frontend for the local review page:
 `http://127.0.0.1:5191/app/testing/unified-acceptance/`.
-It uses the real unified UI and management dialogs with synthetic data, no auth
-or backend, and rejects writes. Do not use it to confirm invitation persistence.
+It uses the full public catalog by default (start Vite with `PORTAL_PUBLIC_CATALOG_PROXY=1`).
+Account data and management dialogs remain synthetic, with no auth or account backend, and reject writes.
+Use `?catalog=0` for the sample-only, offline mode used by UI tests; navigation preserves that opt-out.
+Do not use it to confirm invitation persistence.
 It is not included in the production entry build.
 
 ```bash

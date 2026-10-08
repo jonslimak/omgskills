@@ -3,6 +3,30 @@
 Status: Unified app is live. Latest app release: `a8ab048e`, production deploy `6ac7a90cedba638c90e33545`. Guarded draft/production checks passed; all 2,210 public non-app files stayed unchanged from the preceding data deployment. Signed-in Favorites details and account-menu navigation focus passed live desktop/mobile checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
+### Mobile Navigation And Presentation - Release Candidate, 2026-10-08
+
+- User approved the local UI and a scoped commit/deploy of this pass.
+- Signed-in mobile navigation uses an accessible side drawer instead of bottom
+  tabs. Signed-out mobile retains the eyes logo. Drawer branding is eyes-only;
+  My Skills and Collections use the requested User and Playing Cards Fan icons.
+- Mobile skill rows show numeric installed-agent counts, 14px names, and a larger
+  detail close target. Favorites no longer render empty agent placeholders.
+- Initial HTML and account loading show a spinner. Account actions, device
+  separators, and destructive controls now respect the dark theme.
+- The local acceptance page defaults to the full public catalog (18 collections
+  verified); `catalog=0` retains deterministic sample data. Account data remains
+  synthetic and writes are rejected. Production catalog/data contracts are unchanged.
+- Verification: 225 portal tests, the full root check (including deployment
+  safety/workflow locks), production-configured combined build, and whitespace
+  checks passed. Local browser checks covered 320/390/1440px, drawer
+  navigation/focus/Escape, signed-out branding, counts, loading, dark mode, and all
+  18 collections. Updated standalone browser scripts were not executed; the
+  affected interactions were checked through the browser instead.
+- Main's helper-hosting inventory was already live before this release: all three
+  pinned files matched their sizes and SHA-256 hashes. Preserve these and all
+  other non-app surfaces; no backend/schema, account writes, or Mac release.
+- Commit and production receipt pending; local approval is not live verification.
+
 ### Favorites Details And Account Focus - Released, 2026-10-08
 
 - Read-only signed-in production review confirmed catalog-only Favorites showed

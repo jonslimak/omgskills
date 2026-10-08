@@ -10,6 +10,7 @@
   --ua-selection: #e8e8ed;
   --ua-line: #e5e5ea;
   --ua-blue: #0071e3;
+  --ua-danger: #dc2626;
   --ua-shadow: 0 1px 2px #0000000f, 0 12px 40px #00000024;
   --ua-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter",
     system-ui, sans-serif;
@@ -34,7 +35,9 @@
   --ua-chip: #242428;
   --ua-selection: #303035;
   --ua-line: #333338;
+  --rd-row-divider: var(--ua-line);
   --ua-blue: #409cff;
+  --ua-danger: #ff6b6b;
   --ua-shadow: 0 1px 2px #0006, 0 12px 40px #0009;
   color-scheme: dark;
 }
@@ -724,6 +727,9 @@
   display: flex;
   gap: 4px;
 }
+.ua-agent-count {
+  display: none;
+}
 .ua-agent-tile {
   display: inline-flex;
   width: 19px;
@@ -938,6 +944,7 @@
   --popover-foreground: var(--ua-ink);
   --secondary: var(--ua-chip);
   --secondary-foreground: var(--ua-ink);
+  --destructive: var(--ua-danger);
   font-family: inherit;
   color: var(--ua-ink);
 }
@@ -1389,10 +1396,53 @@
   box-shadow: var(--ua-shadow);
   z-index: 100;
 }
-.ua-mobile-header,
-.ua-mobile-tabs {
+.ua-mobile-header {
   display: none;
 }
+.ua-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0006;
+  z-index: 50;
+}
+.ua-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(320px, calc(100vw - 48px));
+  padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: var(--ua-shadow);
+  z-index: 51;
+}
+.ua-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.ua-drawer-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 10px;
+  font-size: 18px;
+}
+.ua-drawer-logo {
+  display: inline-flex;
+  justify-content: center;
+  flex: 0 0 16px;
+  width: 16px;
+  font-size: 25px;
+}
+.ua-drawer-header .ua-icon { width: 44px; height: 44px; }
+.ua-drawer nav { display: grid; gap: 4px; }
+.ua-drawer .ua-nav-item { min-height: 48px; font-size: 15px; }
+.ua-drawer .ua-drawer-section { font-weight: 700; }
+.ua-drawer .ua-drawer-section:not(:first-child) { margin-top: 24px; }
+.ua-drawer .ua-drawer-profile { margin-top: auto; flex-shrink: 0; }
 @container (min-width: 1000px) {
   .ua-trending {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1456,9 +1506,9 @@
     gap: 20px;
     padding: 14px 16px 12px;
   }
-  .ua-mobile-logo {
-    font-size: 25px;
-  }
+  .ua-mobile-menu { width: 44px; height: 44px; }
+  .ua-mobile-menu svg { width: 24px; height: 24px; color: var(--ua-faint); }
+  .ua-mobile-logo { font-size: 25px; }
   .ua-account-mobile {
     width: 44px;
     height: 44px;
@@ -1494,31 +1544,6 @@
     color: var(--ua-faint);
     opacity: 1;
   }
-  .ua-mobile-tabs {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding: 6px 8px max(12px, env(safe-area-inset-bottom));
-    border-top: 1px solid var(--ua-line);
-    background: var(--ua-bg);
-  }
-  .ua-mobile-tabs button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    min-height: 50px;
-    gap: 3px;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--ua-faint);
-  }
-  .ua-mobile-tabs button svg {
-    width: 24px;
-    height: 24px;
-  }
-  .ua-mobile-tabs button[aria-current] {
-    color: var(--ua-blue);
-  }
   .ua-page-heading {
     align-items: flex-start;
     flex-wrap: wrap;
@@ -1537,6 +1562,20 @@
   .ua-pill.ua-set-action { width: 28px; padding: 0; flex-shrink: 0; }
   .ua-row {
     min-height: 58px;
+  }
+  .ua-row-name { font-size: 14px; }
+  .ua-agent-tiles { display: none; }
+  .ua-agent-count {
+    display: inline-flex;
+    justify-content: center;
+    min-width: 20px;
+    flex-shrink: 0;
+    color: var(--ua-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .ua-main[data-view="all"] .ua-agent-count {
+    color: var(--ua-faint);
   }
   .ua-row-compact {
     min-height: 52px;
@@ -1582,6 +1621,8 @@
   .ua-detail-top {
     position: relative;
   }
+  .ua-detail-top .ua-icon { width: 44px; height: 44px; }
+  .ua-detail-top .ua-icon svg { width: 24px; height: 24px; }
   .ua-grabber {
     display: block;
     position: absolute;
@@ -1593,7 +1634,7 @@
     background: var(--ua-line);
   }
   .ua-toast {
-    bottom: 90px;
+    bottom: max(20px, env(safe-area-inset-bottom));
   }
 }
 @media (max-width: 359px) {

@@ -17,6 +17,7 @@ import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation } from "./entry-navigation";
 import "../../app/redesign.css";
+import { LoadingScreen } from "../../app/LoadingScreen";
 
 const publicClient = new PublicCatalogClient();
 const rejectEdit = () => { throw new Error("Account editing is disabled in this read-only integration."); };
@@ -98,7 +99,7 @@ export function UnifiedSession({ base = unifiedBase, local = true }: { base?: st
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
-  if (!isLoaded || (isSignedIn && !userLoaded)) return <p role="status">Loading account...</p>;
+  if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
   const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
   return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;

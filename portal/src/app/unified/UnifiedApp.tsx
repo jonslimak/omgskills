@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Dialog, DropdownMenu } from "radix-ui";
 import {
+  createLucideIcon,
   ArrowLeft,
   ArrowUp,
   ArrowDown,
@@ -32,13 +33,13 @@ import {
   GitBranch,
   Globe,
   Heart,
-  Inbox,
   Laptop,
   ListPlus,
   ListChecks,
   Lock,
   LogOut,
   Monitor,
+  Menu as MenuIcon,
   Moon,
   MoreHorizontal,
   Newspaper,
@@ -93,6 +94,14 @@ import {
 import "./unified.css";
 import type { PublicStatus } from "./use-public-catalog";
 import type { UnifiedManagement } from "./management";
+
+// Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
+// This icon is not yet included in our installed Lucide version.
+const PlayingCardsFan = createLucideIcon("PlayingCardsFan", [
+  ["path", { d: "M12.65 7.65a2 2 0 012.629-1.046l5.51 2.374a2 2 0 011.046 2.628l-3.957 9.184a2 2 0 01-2.628 1.046l-5.51-2.374a2 2 0 01-1.046-2.628z", key: "front" }],
+  ["path", { d: "M18 7.777V4a2 2 0 00-2-2h-6a2 2 0 00-2 2v10a2 2 0 001.137 1.805", key: "middle" }],
+  ["path", { d: "m8 4.389-4.364.809a2 2 0 00-1.602 2.33l1.822 9.833a2 2 0 002.331 1.602l2.542-.47", key: "back" }],
+]);
 
 type Props = {
   data: PortalData;
@@ -324,16 +333,20 @@ function Empty({
 function AgentTiles({
   skill,
   sources,
+  onlyInstalled = false,
 }: {
   skill: SkillDisplay;
   sources: string[];
+  onlyInstalled?: boolean;
 }) {
+  if (!skill.installed?.sources.length) return null;
+  const visibleSources = onlyInstalled ? sources.filter(source => skill.installed!.sources.includes(source)) : sources;
   return (
     <div
       className="ua-agent-tiles"
       aria-label={skill.installed?.sources.join(", ")}
     >
-      {sources.map((source) => (
+      {visibleSources.map((source) => (
         <span
           className="ua-agent-tile"
           data-present={skill.installed?.sources.includes(source)}
@@ -401,6 +414,8 @@ export function UnifiedApp({
 }: Props) {
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerNavigating = useRef(false);
   const [editing, setEditing] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
   const [dialog, setDialog] = useState<
@@ -484,6 +499,14 @@ export function UnifiedApp({
     main.current?.scrollTo(0, 0);
   }, [scopeKey]);
   useEffect(() => {
+    const mq = window.matchMedia("(min-width: 760px)");
+    const change = () => {
+      if (mq.matches) { drawerNavigating.current = true; setDrawerOpen(false); }
+    };
+    mq.addEventListener("change", change);
+    return () => mq.removeEventListener("change", change);
+  }, []);
+  useEffect(() => {
     const mq = window.matchMedia("(min-width: 1180px)");
     const change = () => setWide(mq.matches);
     mq.addEventListener("change", change);
@@ -495,6 +518,7 @@ export function UnifiedApp({
     return () => clearTimeout(timer);
   }, [notice]);
   function go(view: View, id = "") {
+    if (drawerOpen) { drawerNavigating.current = true; setDrawerOpen(false); }
     navigate({ view, id, query: "", selected: "", source: "all" });
   }
   function open(skill: SkillDisplay) {
@@ -691,8 +715,13 @@ export function UnifiedApp({
           </span>
         </button>
         {!compact && !discovery && !nav.query && (
-          <AgentTiles skill={skill} sources={sources} />
+          <AgentTiles skill={skill} sources={sources} onlyInstalled={nav.view === "favorites"} />
         )}
+        {!!skill.installed?.sources.length && <span className="ua-agent-count"
+          aria-label={`Installed in ${skill.installed.sources.length} ${skill.installed.sources.length === 1 ? "agent" : "agents"}`}
+          title={skill.installed.sources.join(", ")}>
+          {skill.installed.sources.length}
+        </span>}
         {!canSelect &&
           (discovery || nav.query || compact ? (
             <>
@@ -997,7 +1026,7 @@ export function UnifiedApp({
                 title="My skills"
                 onClick={() => go("all")}
               >
-                <Inbox />
+                <User />
                 <span>My skills</span>
               </button>
               <button
@@ -1024,7 +1053,7 @@ export function UnifiedApp({
                 {navItem("discover", "Discover", Compass)}
                 {navItem("top", publicStatus ? "Trending skills" : "Top this week", TrendingUp)}
                 {navItem("creators", "Creators", Users)}
-                {navItem("collections", "Collections", Shapes)}
+                {navItem("collections", "Collections", PlayingCardsFan)}
                 <div className="ua-nav-group">
                   <small>Categories</small>
                   {catalog.categories.map((group, i) =>
@@ -1040,7 +1069,7 @@ export function UnifiedApp({
               </>
             ) : (
               <>
-                {navItem("all", "All skills", Inbox, mine.length)}
+                {navItem("all", "All skills", User, mine.length)}
                 {(!readOnlyAccount || management) && <>{navItem("favorites", "Favorites", Heart, management ? data.sets.find(set => set.isFavorites)?.itemCount ?? 0 : favorites.length)}
                 {management && navItem("sets", "All sets", Shapes, sets.length)}
                 <div className="ua-nav-group">
@@ -1087,7 +1116,47 @@ export function UnifiedApp({
         </aside>
         <div className="ua-content-column">
           <header className="ua-mobile-header">
-            <span className="ua-mobile-logo" aria-label="omgskills">👀</span>
+            {signedIn ? <Dialog.Root open={drawerOpen} onOpenChange={open => {
+              if (open) drawerNavigating.current = false;
+              setDrawerOpen(open);
+            }}>
+              <Dialog.Trigger asChild>
+                <IconButton label="Open navigation" className="ua-icon ua-mobile-menu"><MenuIcon /></IconButton>
+              </Dialog.Trigger>
+              <Dialog.Portal>
+                <Dialog.Overlay className="ua-drawer-overlay" />
+                <Dialog.Content className="ua-drawer ua-theme" data-theme={theme} aria-describedby={undefined}
+                  onCloseAutoFocus={event => {
+                    if (drawerNavigating.current) {
+                      event.preventDefault();
+                      main.current?.focus({ preventScroll: true });
+                      drawerNavigating.current = false;
+                    }
+                  }}>
+                  <div className="ua-drawer-header">
+                    <Dialog.Title aria-label="omgskills"><span className="ua-drawer-logo" aria-hidden="true">👀</span></Dialog.Title>
+                    <Dialog.Close asChild><IconButton label="Close navigation"><X /></IconButton></Dialog.Close>
+                  </div>
+                  <nav aria-label="Mobile navigation">
+                    {([
+                      ["all", "My Skills", User, true],
+                      ["favorites", "Favorites", Heart, false],
+                      ["sets", "Sets", Shapes, false],
+                      ["discover", "Discover", Compass, true],
+                      ["top", "Trending", TrendingUp, false],
+                      ["creators", "Creators", Users, false],
+                      ["collections", "Collections", PlayingCardsFan, false],
+                    ] as const).map(([view, label, Icon, heading]) => <button type="button" key={view}
+                      className={`ua-nav-item${heading ? " ua-drawer-section" : ""}`}
+                      aria-current={(nav.view === view || (view === "sets" && nav.view === "set") || (view === "creators" && nav.view === "creator") || (view === "collections" && nav.view === "collection")) && !nav.query ? "page" : undefined}
+                      onClick={() => go(view)}><Icon /><span>{label}</span></button>)}
+                  </nav>
+                  <button type="button" className="ua-nav-item ua-drawer-profile" onClick={() => go("profile")} aria-current={nav.view === "profile" ? "page" : undefined}>
+                    <User /><span>{data.profile.name.split(/\s+/)[0] || "Profile"}</span>
+                  </button>
+                </Dialog.Content>
+              </Dialog.Portal>
+            </Dialog.Root> : <span className="ua-mobile-logo" role="img" aria-label="omgskills">👀</span>}
             {search(true)}
             {signedIn ? (
               accountMenu(true)
@@ -1101,7 +1170,7 @@ export function UnifiedApp({
               </button>
             )}
           </header>
-          <main className="ua-main" ref={main} id="unified-main" tabIndex={-1}>
+          <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1}>
             <div className="ua-content">
               {!signedIn && (
                 <div className="ua-public-actions">
@@ -1442,38 +1511,6 @@ export function UnifiedApp({
               )}
             </div>
           </main>
-          {signedIn && (
-            <nav className="ua-mobile-tabs" aria-label="Mobile navigation" style={readOnlyAccount && !management ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" } : undefined}>
-              {(
-                [
-                  ["all", "My skills", User],
-                  ["favorites", "Favorites", Heart],
-                  ["discover", "Discover", TrendingUp],
-                  ["sets", "Sets", Shapes],
-                ] as const
-              ).filter(([view]) => !readOnlyAccount || management || view !== "sets").map(([view, label, Icon]) => (
-                <button
-                  type="button"
-                  key={view}
-                  aria-current={
-                    (
-                      view === "all"
-                        ? !discovery && !["sets", "set", "favorites"].includes(nav.view)
-                        : view === "sets"
-                          ? ["sets", "set"].includes(nav.view)
-                          : view === "favorites" ? nav.view === "favorites" : discovery
-                    )
-                      ? "page"
-                      : undefined
-                  }
-                  onClick={() => go(view)}
-                >
-                  <Icon />
-                  {label}
-                </button>
-              ))}
-            </nav>
-          )}
         </div>
         {selected && (
           <Dialog.Root

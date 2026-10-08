@@ -24,7 +24,12 @@ try {
   page.on("pageerror", error => errors.push(error.message));
   page.setDefaultTimeout(6000);
   await mkdir(output, { recursive: true });
-  const go = async (query = "") => { await page.goto(origin + base + query); await page.locator("h1").waitFor(); };
+  const go = async (query = "") => {
+    const params = new URLSearchParams(query);
+    params.set("catalog", "0");
+    await page.goto(origin + base + `?${params}`);
+    await page.locator("h1").waitFor();
+  };
   const fits = async () => {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `Overflow: ${page.url()}`);
     assert.deepEqual(await page.locator(".ua-main, .ua-content, .ua-detail, .ua-modal").evaluateAll(nodes => nodes
@@ -33,6 +38,16 @@ try {
   const focused = async label => {
     await page.waitForFunction(label => document.activeElement?.getAttribute("aria-label") === label, label);
   };
+  await page.goto(origin + base + "?authDelay=5000&catalog=0");
+  await page.getByRole("status", { name: "Loading omgskills" }).waitFor();
+  await page.locator("h1").waitFor();
+  assert.equal(await page.locator(".portal-loading").count(), 0);
+  for (const query of ["?view=favorites", "?view=favorites&setCatalog=1"]) {
+    await go(query);
+    await page.locator(".ua-row-name").first().waitFor();
+    assert.equal(await page.locator('.ua-agent-tile[data-present="false"]').count(), 0,
+      "Favorites must not render empty agent squares");
+  }
   for (const width of [320, 390, 759, 760]) {
     await page.setViewportSize({ width, height: 844 });
     for (const signedOut of [false, true]) {
@@ -40,7 +55,7 @@ try {
       const header = page.locator(".ua-mobile-header");
       assert.equal(await header.isVisible(), width < 760);
       if (width >= 760) continue;
-      const logo = await header.locator(".ua-mobile-logo").boundingBox();
+      const logo = await header.locator(signedOut ? ".ua-mobile-logo" : ".ua-mobile-menu").boundingBox();
       const search = await header.locator(".ua-search-mobile").boundingBox();
       const account = await header.getByRole("button", { name: signedOut ? "Sign in" : "Account menu", exact: true }).boundingBox();
       assert.ok(logo && search && account);
@@ -48,6 +63,18 @@ try {
       const centers = [logo, search, account].map(box => box.y + box.height / 2);
       assert.ok(Math.max(...centers) - Math.min(...centers) < 1, "Mobile header controls must share one row");
       await fits();
+      assert.equal(await page.locator(".ua-mobile-tabs").count(), 0);
+      if (signedOut) {
+        assert.equal(await header.getByRole("button", { name: "Open navigation", exact: true }).count(), 0);
+      } else {
+        await header.getByRole("button", { name: "Open navigation", exact: true }).click();
+        const drawer = page.getByRole("dialog", { name: "omgskills", exact: true });
+        assert.deepEqual(await drawer.getByRole("navigation").getByRole("button").allTextContents(),
+          ["My Skills", "Favorites", "Sets", "Discover", "Trending", "Creators", "Collections"]);
+        await page.keyboard.press("Escape");
+        await drawer.waitFor({ state: "hidden" });
+        await focused("Open navigation");
+      }
       await page.screenshot({ path: path.join(output, `${width}-header-${signedOut ? "public" : "account"}.png`) });
       await header.getByRole("searchbox").fill("frontend");
       await page.waitForURL(url => url.searchParams.get("q") === "frontend");
@@ -56,9 +83,17 @@ try {
   for (const width of [1440, 1024, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await go();
+    if (width < 760) {
+      assert.equal(await page.locator(".ua-row-name").first().evaluate(node => getComputedStyle(node).fontSize), "14px");
+      assert.equal(await page.locator(".ua-agent-count").first().innerText(), "2");
+    }
     await page.getByRole("button", { name: "Open frontend-design", exact: true }).click();
     const detail = page.getByRole("dialog");
     await detail.getByRole("heading", { name: "frontend-design", exact: true }).waitFor();
+    if (width < 760) {
+      const close = await detail.locator(".ua-detail-top .ua-icon").boundingBox();
+      assert.ok(close && close.width === 44 && close.height === 44);
+    }
     await fits();
     await page.screenshot({ path: path.join(output, `${width}-detail.png`) });
     const box = await detail.boundingBox();

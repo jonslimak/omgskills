@@ -11,6 +11,7 @@ import { PublicCatalogClient } from "../src/app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../src/app/unified/use-public-catalog";
 import { AccountDialogReview } from "./account-dialog-review";
 import { useSetCatalog } from "../src/app/unified/use-set-catalog";
+import { LoadingScreen } from "../src/app/LoadingScreen";
 
 // Browser-only presentation fixture. No Clerk, backend, or account writes.
 const base = "/app/testing/unified-acceptance/";
@@ -21,7 +22,7 @@ const params = new URLSearchParams(location.search);
 const scenario = (params.get("scenario") || "populated") as Scenario;
 const catalog = makeCatalog();
 const publicClient = new PublicCatalogClient();
-const publicReview = params.get("catalog") === "1";
+const publicReview = params.get("catalog") !== "0";
 const sample = makeFixtures(scenario);
 const setCatalogReview = params.get("setCatalog");
 let failCatalog = setCatalogReview === "error";
@@ -55,7 +56,9 @@ function Review() {
   const data = signedIn ? sample : emptyAccount({ name: "Visitor", email: "" });
   const navigate = (next: Navigation, replace = false) => {
     const safe = accountNavigation(next, signedIn);
-    history[replace ? "replaceState" : "pushState"]({}, "", base + navigationSearch(safe));
+    const search = new URLSearchParams(navigationSearch(safe));
+    if (!publicReview) search.set("catalog", "0");
+    history[replace ? "replaceState" : "pushState"]({}, "", base + (search.size ? `?${search}` : ""));
     setRequested(safe);
   };
   useEffect(() => {
@@ -83,13 +86,13 @@ function Review() {
 function ReviewRoot() {
   const [entry] = useState(() => publicReview ? accountNavigation(entryNavigation(location.pathname, location.search, base), false) : initialNavigation);
   usePublicCatalogPreload(publicClient, entry);
-  const delay = publicReview ? Math.min(5000, Math.max(0, Number(params.get("authDelay")) || 0)) : 0;
+  const delay = Math.min(5000, Math.max(0, Number(params.get("authDelay")) || 0));
   const [ready, setReady] = useState(!delay);
   useEffect(() => {
     const timer = setTimeout(() => setReady(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
-  return ready ? <Review /> : <p role="status">Loading account...</p>;
+  return ready ? <Review /> : <LoadingScreen />;
 }
 
 createRoot(document.getElementById("root")!).render(<StrictMode><ReviewRoot /></StrictMode>);

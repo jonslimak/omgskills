@@ -23,7 +23,10 @@ export function AccountDialogReview({ theme }: { theme: string }) {
     if (path.endsWith("synced-skills")) return { skills: [] } as T;
     if (path.endsWith("devices")) return { devices: [{ id: "d1000000-0000-4000-8000-000000000001",
       deviceName: "Sample Mac", status: "active", createdAt: "2026-01-01T00:00:00Z", lastUsedAt: null,
-      revokedAt: null, expiresAt: "2027-01-01T00:00:00Z" }] } as T;
+      revokedAt: null, expiresAt: "2027-01-01T00:00:00Z" }, {
+      id: "d1000000-0000-4000-8000-000000000002", deviceName: "Previous Sample Mac", status: "revoked",
+      createdAt: "2026-01-01T00:00:00Z", lastUsedAt: null, revokedAt: "2026-02-01T00:00:00Z",
+      expiresAt: "2027-01-01T00:00:00Z" }] } as T;
     return { groups: [] } as T;
   };
   const account = useAccount(api, { name: "Sample Reviewer", email: "reviewer@example.test" }, true, "dialog-review");

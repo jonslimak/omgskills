@@ -21,7 +21,7 @@ try {
   const mainFocused = async () => page.locator("main").evaluate(node => node === document.activeElement);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 844 });
-    await page.goto(origin + "/app/testing/unified-acceptance/?view=discover");
+    await page.goto(origin + "/app/testing/unified-acceptance/?view=discover&catalog=0");
     await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
     assert.equal(await mainFocused(), false, "Initial load must not move focus");
     await page.getByRole("button", { name: /^Collection Build your next thing/ }).press("Enter");

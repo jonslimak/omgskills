@@ -246,7 +246,7 @@
   justify-content: center;
   box-shadow: none;
   color: var(--foreground);
-  background: #fff;
+  background: var(--background);
   border: 1px solid var(--border);
   white-space: nowrap;
 }
@@ -616,7 +616,7 @@ button.rd-skill-title:hover {
   display: flex;
   gap: 14px;
   align-items: center;
-  border-bottom: 1px solid #f4f4f5;
+  border-bottom: 1px solid var(--rd-row-divider, #f4f4f5);
 }
 .rd-agent-row:last-child {
   border-bottom: 0;

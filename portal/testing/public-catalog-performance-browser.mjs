@@ -5,7 +5,7 @@ const origin = process.env.PORTAL_REVIEW_ORIGIN || "http://127.0.0.1:5191";
 assert.ok(["127.0.0.1", "localhost"].includes(new URL(origin).hostname));
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || "playwright");
 const browser = await chromium.launch({ channel: "chrome", headless: true });
-const base = "/app/testing/unified-acceptance/?catalog=1&view=discover";
+const base = "/app/testing/unified-acceptance/?view=discover";
 const skill = id => ({ id, name: id.split(":")[1], description: "Sample public skill", author_handle: "example",
   github_url: "https://github.com/example/skills", stars: 20, tags: [] });
 const ids = Array.from({ length: 6 }, (_, i) => `example/skills:sample-${i}`);
@@ -66,7 +66,7 @@ try {
   const { page, calls } = review;
   await page.goto(origin + base + "&authDelay=1500");
   await review.requested.promise;
-  assert.equal(await page.getByText("Loading account...", { exact: true }).isVisible(), true, "Preload must start before account readiness");
+  assert.equal(await page.getByRole("status", { name: "Loading omgskills" }).isVisible(), true, "Preload must start before account readiness");
   await page.getByRole("button", { name: /Collection Sample collection/ }).waitFor();
   await page.getByRole("button", { name: /Sample Creator/ }).waitFor();
   assert.equal(await page.getByRole("status", { name: "Loading trending skills" }).isVisible(), true);

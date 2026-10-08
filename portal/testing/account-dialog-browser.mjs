@@ -23,7 +23,7 @@ try {
   await mkdir(output, { recursive: true });
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto(origin + "/app/testing/unified-acceptance/?view=profile&accountDialogs=1");
+    await page.goto(origin + "/app/testing/unified-acceptance/?view=profile&accountDialogs=1&catalog=0");
     await page.getByRole("button", { name: "Edit profile", exact: true }).click().catch(async error => {
       console.error(await page.locator("body").innerText(), forbidden); throw error;
     });
