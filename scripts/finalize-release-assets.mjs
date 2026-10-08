@@ -17,7 +17,7 @@ async function isFile(filePath) {
   }
 }
 
-export async function finalizeReleaseAssets(rootDir) {
+export async function finalizeReleaseAssets(rootDir, { helperManifest } = {}) {
   const archivedUpdatesDir = path.join(rootDir, "updates", "old_updates");
   const requiredAssets = await requiredReleaseAssetPaths(rootDir);
   const restored = [];
@@ -36,7 +36,7 @@ export async function finalizeReleaseAssets(rootDir) {
     restored.push(relativePath);
   }
 
-  await verifyReleaseDeployArtifacts(rootDir, "release source");
+  await verifyReleaseDeployArtifacts(rootDir, "release source", { helperManifest });
   await rm(archivedUpdatesDir, { recursive: true, force: true });
   return restored;
 }

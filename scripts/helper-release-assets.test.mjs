@@ -51,9 +51,19 @@ function fixtureFetch(calls = []) {
   };
 }
 
-test("reviewed helper distribution starts disabled", async () => {
-  assert.deepEqual(await loadHelperReleaseManifest(), disabled);
+test("loads and validates the tracked helper inventory by default", async () => {
+  const tracked = JSON.parse(await readFile(new URL("../config/helper-release.json", import.meta.url), "utf8"));
+  assert.deepEqual(await loadHelperReleaseManifest(), validateHelperReleaseManifest(tracked));
 });
+
+for (const reviewed of [disabled, manifest]) {
+  test(`loads an explicit ${reviewed.enabled ? "enabled" : "disabled"} inventory`, async (t) => {
+    const root = await fixture(t);
+    const file = path.join(root, "manifest.json");
+    await writeFile(file, JSON.stringify(reviewed));
+    assert.deepEqual(await loadHelperReleaseManifest(file), reviewed);
+  });
+}
 
 test("missing and malformed inventory fail instead of disabling protection", async (t) => {
   const root = await fixture(t);

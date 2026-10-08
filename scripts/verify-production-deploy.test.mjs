@@ -6,6 +6,7 @@ import { verifyProductionDeploy } from "./verify-production-deploy.mjs";
 const origin = "https://example.test";
 const appcast = '<enclosure url="https://omgskills.com/updates/omgskills-1.0.0.zip"/>';
 const disabledFeatures = { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false };
+const disabledHelper = { version: 1, enabled: false, assets: [] };
 
 function responseFor(path, options = {}, features = disabledFeatures) {
   if (path === "/app/release-config.json") {
@@ -89,6 +90,7 @@ test("verifies the complete production deploy surface", async () => {
   await verifyProductionDeploy({
     origin,
     expectedFeatures: disabledFeatures,
+    expectedHelperRelease: disabledHelper,
     fetchImpl: async (url, options) => {
       const path = new URL(url).pathname;
       requests.push({ path, method: options.method || "GET" });
@@ -132,6 +134,7 @@ test("rollback verification skips candidate-only public group checks", async () 
   await verifyProductionDeploy({
     origin,
     expectedFeatures: disabledFeatures,
+    expectedHelperRelease: disabledHelper,
     verifyCandidateFeatures: false,
     fetchImpl: async (url, options) => {
       const path = new URL(url).pathname;
@@ -151,6 +154,7 @@ test("verifies a draft origin while preserving canonical public URLs", async () 
     origin: previewOrigin,
     publicOrigin: origin,
     expectedFeatures: disabledFeatures,
+    expectedHelperRelease: disabledHelper,
     verifyCandidateFeatures: false,
     fetchImpl: async (url, options) => {
       const parsed = new URL(url);
@@ -167,6 +171,7 @@ test("fails when a required release asset is missing", async () => {
     verifyProductionDeploy({
       origin,
       expectedFeatures: disabledFeatures,
+      expectedHelperRelease: disabledHelper,
       fetchImpl: async (url, options) => {
         const path = new URL(url).pathname;
         if (path === "/downloads/omgskills-mac.dmg") {
@@ -184,6 +189,7 @@ test("accepts an enabled reviewed production feature state", async () => {
   await verifyProductionDeploy({
     origin,
     expectedFeatures: enabledFeatures,
+    expectedHelperRelease: disabledHelper,
     fetchImpl: async (url, options) => (
       responseFor(new URL(url).pathname, options, enabledFeatures)
     ),
@@ -195,6 +201,7 @@ test("accepts the web-only beta with Mac delivery disabled", async () => {
   await verifyProductionDeploy({
     origin,
     expectedFeatures: webOnlyFeatures,
+    expectedHelperRelease: disabledHelper,
     fetchImpl: async (url, options) => responseFor(new URL(url).pathname, options, webOnlyFeatures),
   });
 });
@@ -204,6 +211,7 @@ test("fails when the private portal does not honor the reviewed kill-switch stat
     verifyProductionDeploy({
       origin,
       expectedFeatures: disabledFeatures,
+      expectedHelperRelease: disabledHelper,
       fetchImpl: async (url, options) => {
         const path = new URL(url).pathname;
         if (path === "/api/portal/sync-upload") {
@@ -221,6 +229,7 @@ test("fails when the public group manifest route is unhealthy", async () => {
     verifyProductionDeploy({
       origin,
       expectedFeatures: disabledFeatures,
+      expectedHelperRelease: disabledHelper,
       fetchImpl: async (url, options) => {
         const path = new URL(url).pathname;
         if (path === "/api/public/groups/jonslimak/health-check-missing/manifest") {
@@ -238,6 +247,7 @@ test("fails when the deployed feature receipt does not match the reviewed state"
     verifyProductionDeploy({
       origin,
       expectedFeatures: { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true },
+      expectedHelperRelease: disabledHelper,
       fetchImpl: async (url, options) => responseFor(new URL(url).pathname, options),
     }),
     /does not match the reviewed production feature state/,

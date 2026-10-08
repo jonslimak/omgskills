@@ -1,5 +1,21 @@
 {
   "version": 1,
-  "enabled": false,
-  "assets": []
+  "enabled": true,
+  "assets": [
+    {
+      "path": "helper/updates/appcast.xml",
+      "size": 1945,
+      "sha256": "333f12ad7dfe4431985ca666efd4efa4f71c32cce3f04387828c1c18b1f3042a"
+    },
+    {
+      "path": "helper/updates/OMGSkills-Helper-0.1.0-1-arm64.dmg",
+      "size": 1785394,
+      "sha256": "ce7ec45f127df688c8ae9738d2cb4b18cfe9749c6c5d6b8b6f68d35576557b3d"
+    },
+    {
+      "path": "helper/updates/OMGSkills-Helper-0.1.1-2-arm64.dmg",
+      "size": 1785351,
+      "sha256": "59666ad9c433eb4a842840134e7ddf3bd5cb82afcad2b0cb6389c8a53f5794a1"
+    }
+  ]
 }

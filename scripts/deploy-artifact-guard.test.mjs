@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { access, mkdtemp, mkdir, rename, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { access, mkdtemp, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -10,6 +11,18 @@ import {
   verifyWebLibraryDeployArtifacts,
 } from "./deploy-artifact-guard.mjs";
 import { finalizeReleaseAssets } from "./finalize-release-assets.mjs";
+
+const disabledHelper = { version: 1, enabled: false, assets: [] };
+const helperContent = Buffer.from("synthetic helper asset");
+const enabledHelper = {
+  version: 1,
+  enabled: true,
+  assets: ["appcast.xml", "OMGSkills-Helper-0.1.0-1-arm64.dmg"].map((name) => ({
+    path: `helper/updates/${name}`,
+    size: helperContent.length,
+    sha256: createHash("sha256").update(helperContent).digest("hex"),
+  })),
+};
 
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "omgskills-deploy-guard-"));
@@ -45,7 +58,7 @@ test("release artifact verification passes with DMG, checksum, and appcast updat
   const { root, files } = await fixture();
   try {
     assert.deepEqual(await requiredReleaseAssetPaths(root), files);
-    await verifyReleaseDeployArtifacts(root);
+    await verifyReleaseDeployArtifacts(root, "test artifact", { helperManifest: disabledHelper });
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -57,7 +70,7 @@ test("release artifact verification reports every missing asset", async () => {
     await rm(join(root, "downloads", "omgskills-mac.dmg"));
     await rm(join(root, "updates", "omgskills-1.0.0.zip"));
     await assert.rejects(
-      verifyReleaseDeployArtifacts(root, "test artifact"),
+      verifyReleaseDeployArtifacts(root, "test artifact", { helperManifest: disabledHelper }),
       /test artifact is unsafe: missing release assets: downloads\/omgskills-mac\.dmg, updates\/omgskills-1\.0\.0\.zip/,
     );
   } finally {
@@ -70,20 +83,19 @@ test("combined release guard rejects helper assets while distribution is disable
   t.after(() => rm(root, { recursive: true, force: true }));
   await mkdir(join(root, "helper/updates"), { recursive: true });
   await writeFile(join(root, "helper/updates/appcast.xml"), "not approved for hosting");
-  await assert.rejects(verifyReleaseDeployArtifacts(root), /Unexpected helper release file/);
+  await assert.rejects(
+    verifyReleaseDeployArtifacts(root, "test artifact", { helperManifest: disabledHelper }),
+    /Unexpected helper release file/,
+  );
 });
 
 test("combined release guard requires the enabled helper inventory", async (t) => {
   const { root } = await fixture();
   t.after(() => rm(root, { recursive: true, force: true }));
-  const helperManifest = {
-    version: 1,
-    enabled: true,
-    assets: ["appcast.xml", "OMGSkills-Helper-0.1.0-1-arm64.dmg"].map((name) => ({
-      path: `helper/updates/${name}`, size: 1, sha256: "a".repeat(64),
-    })),
-  };
-  await assert.rejects(verifyReleaseDeployArtifacts(root, "test artifact", { helperManifest }), /Missing helper release assets/);
+  await assert.rejects(
+    verifyReleaseDeployArtifacts(root, "test artifact", { helperManifest: enabledHelper }),
+    /Missing helper release assets/,
+  );
 });
 
 test("release artifact verification rejects appcasts without update assets", async () => {
@@ -105,13 +117,42 @@ test("release finalization restores referenced Sparkle assets and removes its ar
     await rename(join(root, "updates", delta), join(archivedDir, delta));
     await writeFile(join(archivedDir, "obsolete.delta"), "fixture");
 
-    assert.deepEqual(await finalizeReleaseAssets(root), [`updates/${delta}`]);
-    await verifyReleaseDeployArtifacts(root);
+    assert.deepEqual(await finalizeReleaseAssets(root, { helperManifest: disabledHelper }), [`updates/${delta}`]);
+    await verifyReleaseDeployArtifacts(root, "test artifact", { helperManifest: disabledHelper });
     await assert.rejects(access(archivedDir));
   } finally {
     await rm(root, { recursive: true, force: true });
   }
 });
+
+for (const state of ["valid", "missing", "corrupt"]) {
+  test(`release finalization enforces ${state} enabled helper assets before deleting its archive`, async (t) => {
+    const { root } = await fixture();
+    t.after(() => rm(root, { recursive: true, force: true }));
+    const archivedDir = join(root, "updates/old_updates");
+    await mkdir(archivedDir);
+    await writeFile(join(archivedDir, "obsolete.delta"), "keep until verified");
+    await mkdir(join(root, "helper/updates"), { recursive: true });
+    for (const asset of enabledHelper.assets) {
+      if (state === "missing" && asset.path.endsWith(".dmg")) continue;
+      const content = state === "corrupt" && asset.path.endsWith(".dmg")
+        ? Buffer.alloc(helperContent.length, 120) : helperContent;
+      await writeFile(join(root, asset.path), content);
+    }
+
+    const result = finalizeReleaseAssets(root, { helperManifest: enabledHelper });
+    if (state === "valid") {
+      assert.deepEqual(await result, []);
+      await assert.rejects(access(archivedDir), { code: "ENOENT" });
+      for (const asset of enabledHelper.assets) {
+        assert.deepEqual(await readFile(join(root, asset.path)), helperContent);
+      }
+    } else {
+      await assert.rejects(result, state === "missing" ? /Missing helper release assets/ : /checksum mismatch/);
+      assert.equal(await readFile(join(archivedDir, "obsolete.delta"), "utf8"), "keep until verified");
+    }
+  });
+}
 
 test("web library verification requires the generated catalog skill URL asset", async () => {
   const root = await mkdtemp(join(tmpdir(), "omgskills-web-library-guard-"));
