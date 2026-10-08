@@ -1,6 +1,6 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest app release: `1aaa9266`, production deploy `6ac6b083bf8140fdd1657f88`. Guarded draft/production checks passed; the only non-app change was the scheduled `/data/health.json` update. The user reports the latest version seems to work; disconnect/reconnect testing is deferred at their request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
+Status: Unified app is live. Latest app release: `5eeb87ec`, production deploy `6ac794c2459c7607e4d454dc`. Guarded draft/production checks passed; all 2,213 non-app files stayed unchanged. Signed-out keyboard navigation and named Open actions passed live desktop/mobile checks. The user reported the preceding account-dialog release seemed to work; disconnect/reconnect testing remains deferred at their request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
 ## Current Acceptance And Remaining Work - 2026-10-07
@@ -33,6 +33,9 @@ and does not authorize account mutations, a commit, or a deployment.
   checks. The user reported "it seems to be working" afterward. This is a limited
   user observation, not confirmation of deliberate save failures or connection
   lifecycle tests.
+- [x] Navigation accessibility fixes shipped in `5eeb87ec`. Guarded release
+  checks and agent-observed signed-out desktop/mobile focus and Open-label
+  checks passed. This does not close the broader signed-in accessibility sweep.
 
 Evidence for account behavior: the user reported "all tests pass for me" for the proposed invitation
 checklist, then confirmed "they do" for Favorites and skill/set persistence.
@@ -107,8 +110,7 @@ repeated measurements, not the single timing sample below.
 
 ### Navigation Accessibility Fixes - 2026-10-07
 
-- Included in this checkpoint; production deployment approved on 2026-10-08,
-  pending the guarded release receipt: page changes move focus to the existing
+- Deployed on 2026-10-08: page changes move focus to the existing
   main-content target; Open actions include the skill name in their accessible
   label while retaining the visible "Open" text.
 - Initial load, search typing and source filtering do not trigger page focus;
@@ -119,6 +121,21 @@ repeated measurements, not the single timing sample below.
   browser acceptance suite passed. Browser tests used sample data, blocking API
   and external requests; no account or connection changes were made.
 - Regression entry: `portal/testing/navigation-accessibility-browser.mjs`.
+- Release: commit `5eeb87ecf5cca419cb64c60f22bc44786e540f94`, workflow
+  `37780658720`, draft `6ac793b5459c76fab2d4557b`, production
+  `6ac794c2459c7607e4d454dc`. Receipt status `verified` at
+  `2026-10-08T13:08:05.146Z`; draft and production checks passed on their first
+  attempt. Root `npm run check`, all 219 portal tests and the focused browser
+  regression were rerun after fast-forwarding to current main before release.
+- Live verification at 390/1440px: Discover/collection navigation focuses main;
+  Open actions identify the skill; opening details focuses Close and Escape
+  returns focus to the original Open action. Signed-out only; no account or
+  connection mutations. Temporary browser viewport override was reset.
+- Compared all 2,213 non-app files against production
+  `6ac7839c60a9f1034a569603`: none changed, including public pages/data,
+  downloads and update assets. Workflow also confirmed appcast unchanged.
+  Receipt, file inventories/comparison and live screenshots are retained under
+  ignored `dist/accessibility-release/` in the implementation worktree.
 
 ### Account Dialog Fixes - 2026-10-07
 
