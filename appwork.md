@@ -1,14 +1,15 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest app release: `5eeb87ec`, production deploy `6ac794c2459c7607e4d454dc`. Guarded draft/production checks passed; all 2,213 non-app files stayed unchanged. Signed-out keyboard navigation and named Open actions passed live desktop/mobile checks. The user reported the preceding account-dialog release seemed to work; disconnect/reconnect testing remains deferred at their request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
+Status: Unified app is live. Latest app release: `a8ab048e`, production deploy `6ac7a90cedba638c90e33545`. Guarded draft/production checks passed; all 2,210 public non-app files stayed unchanged from the preceding data deployment. Signed-in Favorites details and account-menu navigation focus passed live desktop/mobile checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
-### Favorites Details And Account Focus - Local Fixes, 2026-10-08
+### Favorites Details And Account Focus - Released, 2026-10-08
 
 - Read-only signed-in production review confirmed catalog-only Favorites showed
   raw IDs without descriptions/source links and were incorrectly labeled local.
   Account-menu navigation also restored focus to its trigger instead of the page.
-- User approved these two fixes. Implemented locally; **not committed or deployed**.
+- User approved these two fixes and their guarded release. Committed and pushed
+  as `a8ab048ed2e43c10b8a593827bf5262ed582fbdc`, then deployed to production.
 - Favorites/set presentation now resolves explicit public catalog IDs using the
   existing cached, abortable public lookup in batches of 30. Saved item identities,
   order and membership remain unchanged. Private names, links and synced IDs are
@@ -24,8 +25,19 @@ Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-ap
   cancellation, cache and private-data boundaries have unit coverage. The expanded
   standalone browser regression was not run; its new focus cases were checked
   through the local browser instead.
-- Real account data, connections, backend and data model were untouched. Next:
-  review/commit these fixes, then deploy only with approval and verify live.
+- Release receipt: [workflow 37788897276](https://github.com/jonslimak/omgskills/actions/runs/37788897276)
+  succeeded. Draft `6ac7a7e180a53b428ebad6f5` and production
+  `6ac7a90cedba638c90e33545` both verified on the first attempt. Public appcast
+  comparison passed. All 2,210 public non-app files matched the preceding
+  scheduled data deployment `6ac7a1626ef19279968847f5`.
+- Live read-only checks: all five signed-in Favorites rows showed catalog names
+  and descriptions; xlsx showed its author and GitHub source on desktop/mobile.
+  Keyboard account-menu navigation focused `main#unified-main` (Profile at
+  1440px, Agents at 390px); Escape returned focus to the account-menu button at
+  both widths. The viewport was restored and the browser returned to Discover.
+- Real account data, connections, backend and data model were untouched. These
+  checks do not close the broader recovery, connection or account-isolation
+  edge cases below.
 
 ## Current Acceptance And Remaining Work - 2026-10-07
 
@@ -60,6 +72,9 @@ and does not authorize account mutations, a commit, or a deployment.
 - [x] Navigation accessibility fixes shipped in `5eeb87ec`. Guarded release
   checks and agent-observed signed-out desktop/mobile focus and Open-label
   checks passed. This does not close the broader signed-in accessibility sweep.
+- [x] Favorites catalog details and account-menu navigation focus shipped in
+  `a8ab048e`. Guarded release and read-only signed-in desktop/mobile checks
+  passed; saved membership and existing connections were not changed.
 
 Evidence for account behavior: the user reported "all tests pass for me" for the proposed invitation
 checklist, then confirmed "they do" for Favorites and skill/set persistence.
