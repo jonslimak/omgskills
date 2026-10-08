@@ -168,6 +168,7 @@ function Menu({
   theme,
   label,
   side = "bottom",
+  className = "",
   onCloseAutoFocus,
 }: {
   trigger: ReactNode;
@@ -175,6 +176,7 @@ function Menu({
   theme: string;
   label: string;
   side?: "top" | "bottom";
+  className?: string;
   onCloseAutoFocus?: (event: Event) => void;
 }) {
   return (
@@ -182,7 +184,7 @@ function Menu({
       <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="ua-menu ua-theme"
+          className={`ua-menu ua-theme ${className}`}
           data-theme={theme}
           aria-label={label}
           side={side}
@@ -598,7 +600,8 @@ export function UnifiedApp({
     <Menu
       theme={theme}
       label="Account"
-      side={mobile ? "bottom" : "top"}
+      side="top"
+      className={mobile ? "ua-drawer-account-menu" : ""}
       onCloseAutoFocus={event => {
         if (!accountNavigating.current) return;
         accountNavigating.current = false;
@@ -1116,6 +1119,8 @@ export function UnifiedApp({
         </aside>
         <div className="ua-content-column">
           <header className="ua-mobile-header">
+            <span className="ua-mobile-logo" role="img" aria-label="omgskills">👀</span>
+            {search(true)}
             {signedIn ? <Dialog.Root open={drawerOpen} onOpenChange={open => {
               if (open) drawerNavigating.current = false;
               setDrawerOpen(open);
@@ -1134,7 +1139,7 @@ export function UnifiedApp({
                     }
                   }}>
                   <div className="ua-drawer-header">
-                    <Dialog.Title aria-label="omgskills"><span className="ua-drawer-logo" aria-hidden="true">👀</span></Dialog.Title>
+                    <Dialog.Title className="ua-drawer-title">Navigation</Dialog.Title>
                     <Dialog.Close asChild><IconButton label="Close navigation"><X /></IconButton></Dialog.Close>
                   </div>
                   <nav aria-label="Mobile navigation">
@@ -1151,16 +1156,10 @@ export function UnifiedApp({
                       aria-current={(nav.view === view || (view === "sets" && nav.view === "set") || (view === "creators" && nav.view === "creator") || (view === "collections" && nav.view === "collection")) && !nav.query ? "page" : undefined}
                       onClick={() => go(view)}><Icon /><span>{label}</span></button>)}
                   </nav>
-                  <button type="button" className="ua-nav-item ua-drawer-profile" onClick={() => go("profile")} aria-current={nav.view === "profile" ? "page" : undefined}>
-                    <User /><span>{data.profile.name.split(/\s+/)[0] || "Profile"}</span>
-                  </button>
+                  <div className="ua-drawer-profile">{accountMenu(true)}</div>
                 </Dialog.Content>
               </Dialog.Portal>
-            </Dialog.Root> : <span className="ua-mobile-logo" role="img" aria-label="omgskills">👀</span>}
-            {search(true)}
-            {signedIn ? (
-              accountMenu(true)
-            ) : (
+            </Dialog.Root> : (
               <button
                 type="button"
                 className="ua-pill ua-primary"

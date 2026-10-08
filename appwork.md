@@ -3,6 +3,23 @@
 Status: Unified app is live. Latest app release: `475a9f96`, production deploy `6ac7bfa6ac9d5965126c160a`. Guarded draft/production checks passed; all 2,213 public non-app files and 30 backend function digests stayed unchanged. Mobile drawer, counts, Favorites, detail close control, and all 18 collections passed signed-in live checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
+### Mobile Header And Dark Panels - Release Candidate, 2026-10-08
+
+- User approved committing and safely deploying the latest local tweaks.
+- Mobile header keeps the eyes logo at left and moves the signed-in menu trigger
+  to the right. The drawer starts with navigation at the top; its account avatar
+  opens the existing account menu from the bottom. Signed-out behavior is retained.
+- Dark drawer and skill-detail surfaces use lighter charcoal with a subtle edge.
+  Light mode, desktop navigation, account behavior and data contracts are unchanged.
+- Verification: 225 portal tests, full root checks, TypeScript and production build
+  passed. Local browser checks covered narrow signed-in/out headers, drawer and
+  nested-menu Escape/focus, Profile navigation, desktop, and mobile/desktop dark
+  panels. Light drawer/detail backgrounds remain white. Standalone browser scripts
+  were updated but not executed; affected interactions were checked in-browser.
+- Release uses the combined artifact and guarded current-main workflow. No Mac
+  release, backend/schema changes, account writes or connection resets are included.
+- Commit and production receipt pending; this entry is not proof of deployment.
+
 ### Mobile Navigation And Presentation - Released, 2026-10-08
 
 - User approved the local UI and a scoped commit/deploy of this pass.

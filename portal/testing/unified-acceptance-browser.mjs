@@ -55,9 +55,9 @@ try {
       const header = page.locator(".ua-mobile-header");
       assert.equal(await header.isVisible(), width < 760);
       if (width >= 760) continue;
-      const logo = await header.locator(signedOut ? ".ua-mobile-logo" : ".ua-mobile-menu").boundingBox();
+      const logo = await header.locator(".ua-mobile-logo").boundingBox();
       const search = await header.locator(".ua-search-mobile").boundingBox();
-      const account = await header.getByRole("button", { name: signedOut ? "Sign in" : "Account menu", exact: true }).boundingBox();
+      const account = await header.getByRole("button", { name: signedOut ? "Sign in" : "Open navigation", exact: true }).boundingBox();
       assert.ok(logo && search && account);
       assert.ok(logo.x + logo.width <= search.x && search.x + search.width <= account.x);
       const centers = [logo, search, account].map(box => box.y + box.height / 2);
@@ -68,7 +68,13 @@ try {
         assert.equal(await header.getByRole("button", { name: "Open navigation", exact: true }).count(), 0);
       } else {
         await header.getByRole("button", { name: "Open navigation", exact: true }).click();
-        const drawer = page.getByRole("dialog", { name: "omgskills", exact: true });
+        const drawer = page.getByRole("dialog", { name: "Navigation", exact: true });
+        assert.equal(await drawer.locator(".ua-drawer-logo").count(), 0);
+        assert.equal(await header.getByRole("button", { name: "Account menu", exact: true }).count(), 0);
+        await drawer.getByRole("button", { name: "Account menu", exact: true }).click();
+        await page.getByRole("menuitem", { name: "Profile", exact: true }).waitFor();
+        await page.keyboard.press("Escape");
+        await focused("Account menu");
         assert.deepEqual(await drawer.getByRole("navigation").getByRole("button").allTextContents(),
           ["My Skills", "Favorites", "Sets", "Discover", "Trending", "Creators", "Collections"]);
         await page.keyboard.press("Escape");

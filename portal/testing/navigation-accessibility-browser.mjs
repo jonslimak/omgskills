@@ -57,6 +57,7 @@ try {
       await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Open frontend-design details");
       assert.equal(await openAction.evaluate(node => node === document.activeElement), true);
     }
+    if (width < 760) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
     await page.getByRole("button", { name: "Discover", exact: true }).filter({ visible: true }).last().press("Enter");
     await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
     if (!await mainFocused()) failures.push(`${width}: return navigation lost focus`);
@@ -68,12 +69,14 @@ try {
     if (!await mainFocused()) failures.push(`${width}: browser Forward lost focus`);
     const accountMenu = page.getByRole("button", { name: "Account menu", exact: true }).filter({ visible: true });
     for (const destination of ["Profile", "Agents 2 observed"]) {
+      if (width < 760) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
       await accountMenu.press("Enter");
       await page.getByRole("menuitem", { name: destination, exact: true }).press("Enter");
       await page.getByRole("menu").waitFor({ state: "hidden" });
       await page.waitForFunction(() => !document.querySelector('[data-radix-popper-content-wrapper]'));
       if (!await mainFocused()) failures.push(`${width}: ${destination} returned focus to account menu`);
     }
+    if (width < 760) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
     await accountMenu.press("Enter");
     await page.keyboard.press("Escape");
     await page.getByRole("menu").waitFor({ state: "hidden" });

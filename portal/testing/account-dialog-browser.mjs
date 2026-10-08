@@ -46,8 +46,10 @@ try {
 
     for (const theme of ["light", "dark"]) {
       if (theme === "dark") {
+        if (width < 760) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
         await page.getByRole("button", { name: "Account menu", exact: true }).filter({ visible: true }).click();
         await page.getByRole("menuitem", { name: "Dark appearance", exact: true }).click();
+        if (width < 760) await page.getByRole("button", { name: "Close navigation", exact: true }).click();
       }
       for (const title of ["Connect app", "Revoke Sample Mac?"]) {
         await page.getByRole("button", { name: title === "Connect app" ? "Connect app" : "Revoke Sample Mac", exact: true }).click();

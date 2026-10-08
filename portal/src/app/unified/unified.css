@@ -41,6 +41,10 @@
   --ua-shadow: 0 1px 2px #0006, 0 12px 40px #0009;
   color-scheme: dark;
 }
+.ua-theme[data-theme="dark"]:is(.ua-drawer, .ua-detail) {
+  background: #202024;
+  box-shadow: inset 0 0 0 1px var(--ua-line), var(--ua-shadow);
+}
 .ua-theme *,
 .ua-theme *::before,
 .ua-theme *::after {
@@ -1418,31 +1422,31 @@
   z-index: 51;
 }
 .ua-drawer-header {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  right: 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  justify-content: flex-end;
 }
-.ua-drawer-header h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 10px;
-  font-size: 18px;
-}
-.ua-drawer-logo {
-  display: inline-flex;
-  justify-content: center;
-  flex: 0 0 16px;
-  width: 16px;
-  font-size: 25px;
+.ua-drawer-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .ua-drawer-header .ua-icon { width: 44px; height: 44px; }
 .ua-drawer nav { display: grid; gap: 4px; }
+.ua-drawer nav > .ua-nav-item:first-child { width: calc(100% - 48px); }
 .ua-drawer .ua-nav-item { min-height: 48px; font-size: 15px; }
 .ua-drawer .ua-drawer-section { font-weight: 700; }
 .ua-drawer .ua-drawer-section:not(:first-child) { margin-top: 24px; }
 .ua-drawer .ua-drawer-profile { margin-top: auto; flex-shrink: 0; }
+.ua-drawer-account-menu { z-index: 52; }
 @container (min-width: 1000px) {
   .ua-trending {
     grid-template-columns: repeat(3, minmax(0, 1fr));
