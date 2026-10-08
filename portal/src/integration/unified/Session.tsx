@@ -10,6 +10,7 @@ import { emptyAccount, type AccountIdentity } from "../data";
 import { useAccount } from "./useAccount";
 import { accountNavigation, publicNavigation, unifiedBase } from "./policy";
 import { useSetDetail } from "./useSetDetail";
+import { useSetCatalog } from "../../app/unified/use-set-catalog";
 import { useManagement } from "./useManagement";
 import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
@@ -59,12 +60,15 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
   const data = available && snapshot.data ? snapshot.data : emptyAccount(available ? identity : { name: "Visitor", email: "" });
   const setId = nav.view === "set" ? nav.id : nav.view === "favorites" ? data.sets.find(set => set.isFavorites && set.role === "owner")?.id ?? "" : "";
   const detail = useSetDetail(api, setId, snapshot.revision, available && !!snapshot.data && !snapshot.accessDenied);
+  const setCatalog = useSetCatalog(publicClient, detail.set);
+  const catalog = { ...publicData.catalog, skills: [...publicData.catalog.skills, ...setCatalog.skills] };
   const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine,
     busy: snapshot.setSaving || snapshot.profileSaving, blocked: !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
-    scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership, detail, base, local });
+    scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
+    detail: { ...detail, catalog: setCatalog }, base, local });
   return <UnifiedApp
     key={available ? accountKey : "public"}
-    data={data} catalog={publicData.catalog} publicStatus={publicData.status}
+    data={data} catalog={catalog} publicStatus={publicData.status}
     nav={nav} navigate={navigate} signedIn={available}
     readOnlyAccount
     management={available ? management : undefined}

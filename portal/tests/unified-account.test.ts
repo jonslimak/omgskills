@@ -114,6 +114,40 @@ test("set presentation preserves mixed items and order, without name-based insta
   assert.equal(rows[0].key, "set-item:github");
 });
 
+test("catalog set rows recover display details without changing saved identities", () => {
+  const data = makeFixtures();
+  const item = { id: "saved-item", kind: "catalog" as const, catalogSkillId: "author/repo:pdf",
+    name: "author/repo:pdf", description: "", githubUrl: null };
+  const set = { ...data.sets[0], items: [item] };
+  const catalog = [{ id: item.catalogSkillId, name: "pdf", description: "Work with PDFs", author: "author",
+    githubUrl: "https://github.com/author/repo", avatar: "https://github.com/author.png", stars: 42, tags: ["documents"] }];
+  const [row] = setSkillDisplays(set, [], catalog);
+  assert.equal(row.name, "pdf");
+  assert.equal(row.description, "Work with PDFs");
+  assert.equal(row.githubUrl, catalog[0].githubUrl);
+  assert.equal(row.author, "author");
+  assert.equal(row.key, "set-item:saved-item");
+  assert.equal(row.setItemId, item.id);
+  assert.equal(row.catalogId, item.catalogSkillId);
+  assert.equal(row.installed, undefined);
+  assert.equal(set.items[0].name, item.catalogSkillId);
+  const [missing] = setSkillDisplays(set, [], []);
+  assert.equal(missing.key, row.key);
+  assert.equal(missing.catalogId, item.catalogSkillId);
+});
+
+test("synced set rows retain known source links without borrowing catalog identities", () => {
+  const data = makeFixtures();
+  const mine = skillDisplays(data, { skills: [], collections: [], creators: [], categories: [], trendingIds: [] }).mine;
+  const installed = { ...mine[0], githubUrl: "https://github.com/example/skills" };
+  const set = { ...data.sets[0], items: [{ id: "saved", kind: "synced" as const,
+    syncedSkillId: installed.installed!.allSkillIds[0], name: installed.name, description: "Saved", githubUrl: null }] };
+  const [row] = setSkillDisplays(set, [installed]);
+  assert.equal(row.githubUrl, installed.githubUrl);
+  assert.equal(row.catalogId, undefined);
+  assert.equal(row.installed?.id, installed.installed?.id);
+});
+
 test("cancelled set reads cannot restore old-account detail", async () => {
   let finish!: (value: unknown) => void;
   let updated = false;

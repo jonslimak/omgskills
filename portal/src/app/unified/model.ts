@@ -33,6 +33,7 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   githubUrl: string | null;
   installed?: GroupedSyncedSkill;
   setItemId?: string;
+  setItemKind?: PortalSet["items"][number]["kind"];
 };
 export type CollectionDisplay = {
   id: string;
@@ -179,14 +180,19 @@ export function matchesSearch(skill: SkillDisplay, query: string) {
 }
 
 // Set contents come from the detail response, not the account's installed list.
-export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[]): SkillDisplay[] {
+export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: CatalogSummary[] = []): SkillDisplay[] {
+  const byId = new Map(catalog.map(skill => [skill.id, skill]));
   return set.items.map(item => {
     const installed = item.syncedSkillId
       ? mine.find(skill => skill.installed?.allSkillIds.includes(item.syncedSkillId!))
       : item.catalogSkillId ? mine.find(skill => skill.catalogId === item.catalogSkillId) : undefined;
-    return { key: `set-item:${item.id}`, setItemId: item.id, name: item.name,
+    const publicSkill = item.kind === "catalog" && item.catalogSkillId ? byId.get(item.catalogSkillId) : undefined;
+    return { key: `set-item:${item.id}`, setItemId: item.id, setItemKind: item.kind, name: publicSkill?.name || item.name,
       catalogId: item.catalogSkillId ?? undefined,
-      description: item.description, githubUrl: item.githubUrl, author: "", tags: [],
+      description: publicSkill?.description || item.description || installed?.description || "",
+      githubUrl: publicSkill?.githubUrl || item.githubUrl || installed?.githubUrl || null,
+      author: publicSkill?.author || installed?.author || "", tags: publicSkill?.tags || [],
+      avatar: publicSkill?.avatar || installed?.avatar, stars: publicSkill?.stars,
       installed: installed?.installed };
   });
 }

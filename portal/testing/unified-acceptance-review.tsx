@@ -10,6 +10,7 @@ import { emptyAccount } from "../src/integration/data";
 import { PublicCatalogClient } from "../src/app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../src/app/unified/use-public-catalog";
 import { AccountDialogReview } from "./account-dialog-review";
+import { useSetCatalog } from "../src/app/unified/use-set-catalog";
 
 // Browser-only presentation fixture. No Clerk, backend, or account writes.
 const base = "/app/testing/unified-acceptance/";
@@ -22,6 +23,24 @@ const catalog = makeCatalog();
 const publicClient = new PublicCatalogClient();
 const publicReview = params.get("catalog") === "1";
 const sample = makeFixtures(scenario);
+const setCatalogReview = params.get("setCatalog");
+let failCatalog = setCatalogReview === "error";
+const setClient = new PublicCatalogClient(async (path, init) => {
+  await Promise.resolve();
+  init?.signal?.throwIfAborted();
+  const request = JSON.parse(String(init?.body));
+  if (path !== "/mcp" || request.params.name !== "get_skills") throw new Error("Unexpected fixture request");
+  if (failCatalog) { failCatalog = false; return new Response("", { status: 503 }); }
+  return new Response(JSON.stringify({ jsonrpc: "2.0", id: request.id, result: { structuredContent: {
+    skills: setCatalogReview === "missing" ? [] : request.params.arguments.ids.map((id: string) => ({
+      id, name: "pdf", description: "Read and create PDF documents.", author_handle: "example",
+      github_url: "https://github.com/example/skills", tags: [],
+    })),
+  } } }), { headers: { "content-type": "application/json" } });
+});
+if (setCatalogReview) sample.sets = sample.sets.map(set => set.isFavorites ? { ...set, items: [
+  { id: "saved-pdf", kind: "catalog", catalogSkillId: "example/skills:pdf", name: "example/skills:pdf", description: "", githubUrl: null },
+] } : set);
 sample.profile = { name: "Sample Reviewer", email: "reviewer@example.test", handle: "reviewer", published: false };
 sample.sets = sample.sets.map(set => ({ ...set, ownerName: "Sample Owner",
   allowedEmails: set.role === "owner" ? set.emails.map((_, index) => ({ id: `email-${index}`, email: `sample-${index}@example.test` })) : undefined }));
@@ -33,7 +52,6 @@ function Review() {
   const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
   const nav = accountNavigation(requested, signedIn);
   const remote = usePublicCatalog(publicClient, publicNavigation(nav), publicReview);
-  const shownCatalog = publicReview ? remote.catalog : catalog;
   const data = signedIn ? sample : emptyAccount({ name: "Visitor", email: "" });
   const navigate = (next: Navigation, replace = false) => {
     const safe = accountNavigation(next, signedIn);
@@ -47,9 +65,12 @@ function Review() {
   }, []);
   const detail = { set: data.sets.find(set => nav.view === "favorites" ? set.isFavorites : set.id === nav.id) ?? null,
     state: "ready" as const, error: "", retry: () => {} };
+  const setCatalog = useSetCatalog(setClient, setCatalogReview ? detail.set : null);
+  const baseCatalog = publicReview ? remote.catalog : catalog;
+  const shownCatalog = { ...baseCatalog, skills: [...baseCatalog.skills, ...setCatalog.skills.map(skill => ({ ...skill, avatar: undefined }))] };
   const management = useManagement({ data, mine: skillDisplays(data, shownCatalog).mine, busy: false, blocked: false,
     scope: `${nav.view}:${nav.id}:${nav.query}:${signedIn}`, saveSet: rejectWrite, saveMembership: rejectWrite,
-    detail, base, local: true });
+    detail: { ...detail, catalog: setCatalogReview ? setCatalog : undefined }, base, local: true });
   return <UnifiedApp key={String(signedIn)} data={data} catalog={shownCatalog} publicStatus={publicReview ? remote.status : undefined} nav={nav} navigate={navigate}
     signedIn={signedIn} onSession={next => { setSignedIn(next); setRequested({ ...initialNavigation, view: "discover" }); }}
     onSignIn={() => setSignedIn(true)} readOnlyAccount management={signedIn ? management : undefined}

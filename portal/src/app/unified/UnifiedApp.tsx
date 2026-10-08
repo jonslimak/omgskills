@@ -159,12 +159,14 @@ function Menu({
   theme,
   label,
   side = "bottom",
+  onCloseAutoFocus,
 }: {
   trigger: ReactNode;
   children: ReactNode;
   theme: string;
   label: string;
   side?: "top" | "bottom";
+  onCloseAutoFocus?: (event: Event) => void;
 }) {
   return (
     <DropdownMenu.Root>
@@ -177,6 +179,7 @@ function Menu({
           side={side}
           sideOffset={8}
           collisionPadding={12}
+          onCloseAutoFocus={onCloseAutoFocus}
         >
           {children}
         </DropdownMenu.Content>
@@ -418,7 +421,7 @@ export function UnifiedApp({
     [data.skills],
   );
   const mine = signedIn ? models.mine : [];
-  const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, mine) : [];
+  const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, mine, catalog.skills) : [];
   const library = signedIn
     ? models.library
     : models.library.map((skill) => ({ ...skill, installed: undefined }));
@@ -466,6 +469,7 @@ export function UnifiedApp({
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
   const pageKey = `${nav.view}:${nav.id}`;
   const previousPage = useRef(pageKey);
+  const accountNavigating = useRef(false);
 
   useEffect(() => {
     const changed = previousPage.current !== pageKey;
@@ -571,6 +575,12 @@ export function UnifiedApp({
       theme={theme}
       label="Account"
       side={mobile ? "bottom" : "top"}
+      onCloseAutoFocus={event => {
+        if (!accountNavigating.current) return;
+        accountNavigating.current = false;
+        event.preventDefault();
+        main.current?.focus({ preventScroll: true });
+      }}
       trigger={
         <button
           type="button"
@@ -592,19 +602,19 @@ export function UnifiedApp({
         <strong>{data.profile.name}</strong>
         <small>{data.profile.email}</small>
       </div>
-      <MenuItem icon={User} onSelect={() => go("profile")}>
+      <MenuItem icon={User} onSelect={() => goFromAccount("profile")}>
         Profile
       </MenuItem>
-      <MenuItem icon={Bot} onSelect={() => go("agents")}>
+      <MenuItem icon={Bot} onSelect={() => goFromAccount("agents")}>
         Agents <small>{sources.length} observed</small>
       </MenuItem>
-      {(!readOnlyAccount || accountPages) && <><MenuItem icon={Monitor} onSelect={() => go("devices")}>
+      {(!readOnlyAccount || accountPages) && <><MenuItem icon={Monitor} onSelect={() => goFromAccount("devices")}>
         Devices {!readOnlyAccount && <small>{data.devices.length}</small>}
       </MenuItem>
-      <MenuItem icon={Code} onSelect={() => go("github")}>
+      <MenuItem icon={Code} onSelect={() => goFromAccount("github")}>
         GitHub sources
       </MenuItem>
-      <MenuItem icon={Server} onSelect={() => go("mcp")}>
+      <MenuItem icon={Server} onSelect={() => goFromAccount("mcp")}>
         MCP server
       </MenuItem>
       </>}
@@ -620,6 +630,11 @@ export function UnifiedApp({
       </MenuItem>
     </Menu>
   );
+
+  function goFromAccount(view: View) {
+    accountNavigating.current = nav.view !== view || !!nav.id || !!nav.query || !!nav.selected;
+    go(view);
+  }
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
@@ -1172,6 +1187,11 @@ export function UnifiedApp({
                 )}
               </div>}
               {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
+              {setPage && management.detail.catalog?.state === "loading" && <p className="ua-muted" role="status">Loading catalog details...</p>}
+              {setPage && management.detail.catalog?.note && <div className="ua-toolbar" role="status">
+                <span className="ua-muted">{management.detail.catalog.note}</span>
+                {management.detail.catalog.state === "error" && <button type="button" className="ua-pill" onClick={management.detail.catalog.retry}>Retry catalog details</button>}
+              </div>}
               {publicList && publicStatus.note && listState === "ready" && <p className="ua-muted" role="status">{publicStatus.note}</p>}
               {publicList && !progressiveDiscover && publicListError && listState === "ready" && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">Could not refresh. Showing saved results.</span>
@@ -1534,8 +1554,8 @@ export function UnifiedApp({
                     </a>
                   ) : (
                     <span className="ua-pill">
-                      <Lock />
-                      Local skill
+                      {selected.installed?.isLocalOnly && <Lock />}
+                      {selected.catalogId || selected.setItemKind === "catalog" ? "Catalog skill" : selected.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
                     </span>
                   )}
                   {(!readOnlyAccount || management) && signedIn && (selected.installed || (management && selected.catalogId)) && (
@@ -1604,7 +1624,9 @@ export function UnifiedApp({
                   <p>
                     {selected.githubUrl
                       ? "Read the skill's instructions and installation guidance at its source."
-                      : "This skill belongs to your local library."}
+                      : selected.catalogId || selected.setItemKind === "catalog"
+                        ? "Catalog details are unavailable. Your saved skill is still in this set."
+                        : selected.installed?.isLocalOnly ? "This skill belongs to your local library." : "No source link is available for this skill."}
                   </p>
                   {selected.githubUrl && (
                     <a

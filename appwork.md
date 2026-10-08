@@ -3,6 +3,30 @@
 Status: Unified app is live. Latest app release: `5eeb87ec`, production deploy `6ac794c2459c7607e4d454dc`. Guarded draft/production checks passed; all 2,213 non-app files stayed unchanged. Signed-out keyboard navigation and named Open actions passed live desktop/mobile checks. The user reported the preceding account-dialog release seemed to work; disconnect/reconnect testing remains deferred at their request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
+### Favorites Details And Account Focus - Local Fixes, 2026-10-08
+
+- Read-only signed-in production review confirmed catalog-only Favorites showed
+  raw IDs without descriptions/source links and were incorrectly labeled local.
+  Account-menu navigation also restored focus to its trigger instead of the page.
+- User approved these two fixes. Implemented locally; **not committed or deployed**.
+- Favorites/set presentation now resolves explicit public catalog IDs using the
+  existing cached, abortable public lookup in batches of 30. Saved item identities,
+  order and membership remain unchanged. Private names, links and synced IDs are
+  not sent to discovery. Synced items retain known installed source links.
+- Missing/deleted catalog entries remain visible with saved details. Failed reads
+  offer retry without changing membership; missing links no longer imply local.
+- Account-menu navigation focuses the destination main area. Ordinary Escape
+  still returns focus to the menu trigger.
+- Verification: both model regressions failed before the fix and passed afterward;
+  all 224 portal tests and the production build pass. Local browser checks at
+  390/1440px confirmed restored details/source links, Profile/Agents focus and
+  Escape. Synthetic failure/retry and missing-entry cases also passed. Batch,
+  cancellation, cache and private-data boundaries have unit coverage. The expanded
+  standalone browser regression was not run; its new focus cases were checked
+  through the local browser instead.
+- Real account data, connections, backend and data model were untouched. Next:
+  review/commit these fixes, then deploy only with approval and verify live.
+
 ## Current Acceptance And Remaining Work - 2026-10-07
 
 This section supersedes acceptance/status statements in the dated checkpoints

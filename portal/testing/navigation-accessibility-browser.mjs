@@ -66,6 +66,18 @@ try {
     await page.goForward();
     await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
     if (!await mainFocused()) failures.push(`${width}: browser Forward lost focus`);
+    const accountMenu = page.getByRole("button", { name: "Account menu", exact: true }).filter({ visible: true });
+    for (const destination of ["Profile", "Agents 2 observed"]) {
+      await accountMenu.press("Enter");
+      await page.getByRole("menuitem", { name: destination, exact: true }).press("Enter");
+      await page.getByRole("menu").waitFor({ state: "hidden" });
+      await page.waitForFunction(() => !document.querySelector('[data-radix-popper-content-wrapper]'));
+      if (!await mainFocused()) failures.push(`${width}: ${destination} returned focus to account menu`);
+    }
+    await accountMenu.press("Enter");
+    await page.keyboard.press("Escape");
+    await page.getByRole("menu").waitFor({ state: "hidden" });
+    assert.equal(await accountMenu.evaluate(node => node === document.activeElement), true, "Dismissing the menu must still return to its trigger");
   }
   assert.deepEqual(forbidden, []);
   assert.deepEqual(errors, []);

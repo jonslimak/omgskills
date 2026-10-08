@@ -17,5 +17,6 @@ export type UnifiedManagement = {
   moderate: (set: PortalSet) => void;
   copyLink: (set: PortalSet) => void;
   dialog: (theme: string) => ReactNode;
-  detail: { set: PortalSet | null; state: LoadState; error: string; retry: () => void };
+  detail: { set: PortalSet | null; state: LoadState; error: string; retry: () => void;
+    catalog?: { state: LoadState; note: string; retry: () => void } };
 };
