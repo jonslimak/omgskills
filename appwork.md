@@ -1,9 +1,9 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest app release: `a8ab048e`, production deploy `6ac7a90cedba638c90e33545`. Guarded draft/production checks passed; all 2,210 public non-app files stayed unchanged from the preceding data deployment. Signed-in Favorites details and account-menu navigation focus passed live desktop/mobile checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
+Status: Unified app is live. Latest app release: `475a9f96`, production deploy `6ac7bfa6ac9d5965126c160a`. Guarded draft/production checks passed; all 2,213 public non-app files and 30 backend function digests stayed unchanged. Mobile drawer, counts, Favorites, detail close control, and all 18 collections passed signed-in live checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
 Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
 
-### Mobile Navigation And Presentation - Release Candidate, 2026-10-08
+### Mobile Navigation And Presentation - Released, 2026-10-08
 
 - User approved the local UI and a scoped commit/deploy of this pass.
 - Signed-in mobile navigation uses an accessible side drawer instead of bottom
@@ -25,7 +25,21 @@ Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-ap
 - Main's helper-hosting inventory was already live before this release: all three
   pinned files matched their sizes and SHA-256 hashes. Preserve these and all
   other non-app surfaces; no backend/schema, account writes, or Mac release.
-- Commit and production receipt pending; local approval is not live verification.
+- Committed/pushed as `475a9f96d9076f8c7fef18c3e5e4a2d8ca601a17`.
+  [Guarded workflow 37805480984](https://github.com/jonslimak/omgskills/actions/runs/37805480984)
+  succeeded: draft `6ac7beaf48b917c760376db4` and production
+  `6ac7bfa6ac9d5965126c160a` both verified on the first attempt. Public appcast
+  comparison passed. All 2,213 public non-app files matched the pre-release
+  deployment `6ac7b77656a2fb744206994c`; all 30 function digests were unchanged.
+- Live read-only checks: startup spinner transitioned to signed-in Discover;
+  desktop Collections listed 18 entries. At 390px, drawer navigation focused main,
+  My Skills loaded 81 skills with bare numeric counts in the requested lighter
+  grey and 14px names, Favorites had no empty agent squares, and the detail close
+  target measured 44px with a 24px icon. Browser size was reset and Discover restored.
+- Signed-out branding, dark mode, and Escape/focus checks were verified locally,
+  not by signing out the user's production session. The draft host rejects the
+  production Clerk key by domain policy, so signed-in browser checks used the
+  live domain. No connection reset or production account write was performed.
 
 ### Favorites Details And Account Focus - Released, 2026-10-08
 
