@@ -71,6 +71,24 @@ test('page remains isolated, unindexed, and free of prototype dependencies', asy
   assert.match(html, /name="q"/);
 });
 
+test('library links open the app and follow the theme control in the header', async () => {
+  const html = await readFile(new URL('../site/home/index.html', import.meta.url), 'utf8');
+  const links = [...html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>(?:Skill library|Explore the library)<\/a>/g)];
+  assert.equal(links.length, 5);
+  for (const link of links) assert.equal(link[1], '/app/');
+  const themeIndex = html.indexOf('id="theme-toggle"');
+  const libraryIndex = html.indexOf('class="library-link"');
+  assert.ok(themeIndex >= 0 && libraryIndex > themeIndex);
+});
+
+test('landing artwork matches the demo green in light and dark themes', async () => {
+  const css = await readFile(new URL('../site/home/home.css', import.meta.url), 'utf8');
+  assert.equal((css.match(/--green:#34c759;--on-green:#fff;/g) || []).length, 3);
+  assert.doesNotMatch(css, /--green:#(?:248a3d|30d158)/);
+  assert.match(css, /--tint:rgba\(52,199,89,\.22\)/);
+  assert.equal((css.match(/--tint:rgba\(48,209,88,\.26\)/g) || []).length, 2);
+});
+
 test('data refresh preserves the handoff layout and static feature artwork', async () => {
   const html = await readFile(new URL('../site/home/index.html', import.meta.url), 'utf8');
   const refreshed = replaceHomeContent(html, renderHomeContent(collections, data));
@@ -79,7 +97,11 @@ test('data refresh preserves the handoff layout and static feature artwork', asy
     '$1$3',
   );
   assert.equal(withoutGeneratedContent(refreshed), withoutGeneratedContent(html));
-  assert.match(refreshed, /your skills, every agent/);
+  assert.match(refreshed, /Your skills, every agent/);
+  const sectionTitles = [...refreshed.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/g)];
+  assert.equal(sectionTitles.length, 8);
+  for (const [, title] of sectionTitles) assert.match(title, /^[A-Z]/);
+  assert.match(refreshed, /<h1 id="hero-title">find &amp; manage<br>trusted skills<\/h1>/);
   assert.match(refreshed, /Example design team set/);
-  assert.match(refreshed, /Shared with your team/);
+  assert.match(refreshed, /<div class="demo-footer">keep updated<span class="switch" aria-hidden="true"><\/span><\/div>/);
 });
