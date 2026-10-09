@@ -22,14 +22,22 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- **Next: plan F3b signed first-time setup.**
+- **Next: review the isolated HTTPS downloader, then prepare the F3b candidate.**
+  The [local candidate plan](newmac.md#f3b-local-candidate-plan-and-prerequisite-hold)
+  remains gated. The approved native HTTPS downloader is implemented locally,
+  with passing isolated/regression tests and a live Writing Guidelines comparison
+  against Git. It resolves on demand and preserves full package validation;
+  [evidence and limits](newmac.md#f3b-https-downloader-checkpoint) are recorded.
+  It is not wired into the app: all current defaults still use system Git.
+  Candidate integration and clean-Mac setup remain unproven. No signing, upload,
+  hosting or signed setup test is approved or performed.
   [F3a local acceptance](archive/newmac-f3a-2026-10-09/README.md) passed:
   refresh retained the request, cancellation wrote nothing, retry installed the
   exact version, Codex discovered it and repeat changed nothing. Also passed:
   249 portal tests, TypeScript, 34 native regressions and both production builds.
   Results are saved; approved cleanup and scoped review passed. Source, tests
-  and evidence belong to this local F3a checkpoint. Separately plan/approve
-  F3b's signed setup test in a clean environment. A preinstalled Debug build
+  and evidence are committed locally as `462ac68a`. F3b's eventual signed
+  setup test in a clean environment needs separate approval. A preinstalled Debug build
   cannot prove first-time setup. Broader coverage, migration and release gates
   stay open. No push, deployment or release is authorized by this checkpoint.
 - [~] **F3: First-time setup and retry (C10/C5/C17).** F3a automated and user-run
@@ -559,10 +567,12 @@ component to finish. C5 is a distribution gate, not a cyclic build prerequisite.
    discovery, plus automated collision refusal. Local commit `f7a964b0` is
    complete; integration, push, deployment and release remain separate.
    Do not repeat the full F1 manual matrix. C13 stays partial.
-3. **Preserve F3a, then plan signed setup.** Local acceptance, approved cleanup
-   and scoped review passed. Separately scope the F3b signed
-   candidate and clean-user setup. Do not enable a download for the older public
-   app or count local simulation as signed acceptance.
+3. **Preserve F3a, then integrate the F3b HTTPS downloader.** F3a local acceptance,
+   cleanup and scoped review are committed as `462ac68a`. F3b's first local slice
+   selected native HTTPS; isolated tests and live parity passed. Review and
+   checkpoint that slice, then prepare the candidate and separately approve signing, hosting and
+   clean-environment setup. Do not substitute the older public download or
+   count local simulation as signed acceptance.
 4. **Harden for a controlled pilot.** Use F2/F3 findings to expand C13 coverage,
    complete C17 lifecycle, then remaining C5/G1/G2 signed setup/upgrades and C16
    measurement. Retain security and failure checks here; do not erase them.
@@ -717,6 +727,22 @@ unchanged. Portal tests (249), TypeScript and both production exclusion builds
 passed again; six source hashes match acceptance. No blocking findings. See
 [cleanup and review evidence](archive/newmac-f3a-2026-10-09/README.md).
 This local checkpoint does not authorize integration, push, deployment or release.
+
+2026-10-09: F3a committed locally as `462ac68a`. User approved documenting
+F3b and preparing local candidate changes, with a stop if extra developer tools
+are required. Source audit confirmed the current public installer calls
+`/usr/bin/git`; Apple's documentation establishes the fresh-macOS developer-tool
+prompt. Recorded the candidate contract, implementation order and later manual
+acceptance in New Mac. Stopped before candidate code/builds to choose the
+dependency solution; no fresh-Mac test, signing, upload, hosting, app install,
+push, deployment or release took place. Earlier F1/F2/F3a evidence remains valid
+within its developer-equipped test environment.
+
+2026-10-09: the native HTTPS downloader slice was approved, implemented and
+reviewed locally. Focused regressions and a separate live GitHub parity check
+passed, as did the release compile. No blocking source findings; corrected stale
+dependency-choice notes during review. The slice retains the existing app's Git
+defaults. Candidate wiring is the next separate change; no push or release.
 
 ## Open questions
 

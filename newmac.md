@@ -2,21 +2,23 @@
 
 Design and F1 implementation plan, 2026-10-08; local acceptance passed 2026-10-09.
 F3a local setup/retry automated and user-run acceptance passed 2026-10-09.
-F3b signed setup is not implemented or approved.
+F3b's native HTTPS downloader was approved, implemented and checked in isolation
+on 2026-10-09; candidate integration is next. Signing, hosting and signed setup
+acceptance are not approved or performed.
 F2 local acceptance, scoped review and approved cleanup passed 2026-10-09.
 Code and acceptance evidence are recorded in [Connect](connect.md), the single
 progress tracker. No release approval.
 This document expands C17 and its Mac-side dependencies, without duplicating
 status checklists. [Webwork](webwork.md) retains earlier test evidence.
 
-**Current target: plan F3b signed first-time setup.** F1
+**Current target: integrate the verified HTTPS downloader into the F3b test candidate.** F1
 proved one public install/update locally. F2 passed three repositories, an
 independent update, repeat no-op, Codex discovery and automated name-collision
 refusal. F2 is committed locally as `f7a964b0`; the
 [F3 plan](#f3-first-time-setup-and-retry-plan) separates local UX proof from
 real signed first-time setup. [F3a results](archive/newmac-f3a-2026-10-09/README.md)
-record local acceptance, approved cleanup and scoped review for this checkpoint.
-F3b has not run. The rest describes the
+record local acceptance, approved cleanup and scoped review, committed as
+`462ac68a`. F3b signed acceptance has not run. The rest describes the
 intended product, not completed C17/C13/C10 work.
 Full security, compatibility and signed-release testing follows at G1-G4.
 
@@ -766,6 +768,164 @@ prompts, app copies/processes, exact installed content and discovery. The app
 must not write a skill merely because it launched. Never reuse F3a's simulated
 fallback as evidence of first-time setup.
 
+### F3b local candidate plan and prerequisite hold
+
+**2026-10-09: native HTTPS dependency slice approved and tested in isolation;
+candidate integration remains pending.** Approval covers the recorded local
+preparation plan and the isolated downloader/tests, not a runtime/default switch.
+It does not authorize signing, Apple submission, uploading,
+hosting, an installed-app replacement, a public feed change or release.
+Source baseline is the clean F3a checkpoint `462ac68a` on
+`codex/newmac-f1-core`; refresh main/release state before external preparation.
+
+#### Confirmed prerequisite
+
+The current path is not dependency-free:
+
+- `PublicSkillReviewService` directly uses `GitPublicSkillPackageFetcher`.
+- `GitCommandRunner` defaults to `/usr/bin/git`. Package resolution uses Git
+  to fetch a commit, inspect its tree and read every package blob.
+- The runner's executable-file check does not establish that developer tools
+  are installed. [Apple's command-line tools documentation](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools/)
+  says invoking Git on a fresh macOS installation prompts for Command Line Tools.
+- Existing fetcher tests also build their repositories with system Git; their
+  success is not a no-developer-tools proof. A fresh user on this developer Mac
+  still shares the machine's tools.
+
+This is source inspection plus vendor documentation, not a fresh-Mac run.
+The later approved dependency slice implements native HTTPS, without bundling
+Git or changing the active installer. No candidate app/package is prepared yet.
+Do not remove developer tools from the working Mac or silently add them as a
+user requirement.
+
+The approved choice is an isolated native HTTPS implementation with no
+pre-pinned-catalog requirement. See the checkpoint below before integration.
+
+#### F3b HTTPS downloader checkpoint
+
+Implemented and reviewed locally on `codex/newmac-f1-core`, based on `462ac68a`:
+
+- New `HTTPPublicSkillPackageFetcher.swift` and `PublicGitHubHTTPClient.swift`
+  in `menubar/Sources/omgskills/`; two matching test files. No existing runtime,
+  installer, validator, release script, URL handler or dependency was changed.
+- Resolve a public repository's default-branch head once (or an explicit commit),
+  walk verified ancestor trees and fetch the complete selected tree. Download
+  raw files at that immutable commit, not one REST blob call per file. No
+  catalog pin, MCP response, account, helper subprocess or Git process is needed
+  by the HTTPS implementation.
+- Reuse the existing blob/full-tree validator and standard package limits.
+  Preserve binary bytes, executable modes and literal Unicode/reserved URL path
+  characters. Metadata is limited to 2 MiB/response; selected paths to 1,024 UTF-8
+  bytes and 32 components. Truncated metadata, redirects, links, submodules,
+  missing/corrupt data and exceeded bounds fail closed. Downloads are bounded,
+  credential-free and cancellable; no automatic retries or Git fallback.
+- The HTTPS response binds commit to root tree; ancestor/package hashes are
+  checked locally. This is not independent commit-signature verification.
+- Focused native regression run: **76 tests reported passed across 11 suites**;
+  the opt-in live test was disabled in that run. Install, repeat no-op, reviewed
+  update, cancel, local-edit protections and failure preservation use temporary
+  roots. Binary fetch coverage does not broaden native review: its existing
+  binary/large-diff refusal remains. Release configuration also compiled.
+- Separately enabled live comparison: Writing Guidelines resolved to commit
+  `063bee94c3f4df8453406c830b0a7df0f2860278`, package tree
+  `17d954cadfb8dec50bf0c707c9e7634be9ae9fe8`. HTTPS and the existing Git fetcher
+  returned identical coordinates, modes and bytes: **1 file, 1,233 bytes,
+  4 REST requests and 1 raw download**. Passed in 1.946 seconds on this Mac.
+  Git was used only as the comparison oracle, never by the new downloader.
+
+The ordinary new fixtures need neither Git nor network, except the explicitly
+named Git parity test. Live reproduction from `menubar/` is opt-in:
+`OMGSKILLS_HTTP_PACKAGE_LIVE_TEST=1 swift test --filter HTTPPublicSkillPackageFetcherTests/livePublicSourceMatchesGitAtResolvedCommit`.
+The two new test suites are `HTTPPublicSkillPackageFetcherTests` and
+`PublicGitHubHTTPClientTests`; related existing installer/model/validator tests
+also ran. All current app construction sites still choose the Git fetcher.
+
+Limits: one public-source live comparison is not full-catalog or rate-capacity
+proof. An install uses root depth + 2 REST requests plus one raw download per
+file. GitHub's unauthenticated REST limit is
+[60 requests/hour per IP](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api);
+raw delivery can also fail or throttle. Renamed repositories that redirect are
+currently refused, not silently followed. API version `2022-11-28` remains
+[supported](https://docs.github.com/en/rest/about-the-rest-api/api-versions).
+Fresh-Mac setup, production integration, broad source coverage and signed
+distribution remain open. Next: scoped review, then explicit candidate-only
+integration/packaging; no production default switch.
+
+#### Candidate contract after the dependency decision
+
+One Mac architecture (arm64), macOS 14 or later, Codex, Safari and the recorded
+Writing Guidelines source from F3a. No new source sample or A/B test here.
+
+- Proposed app: `OMGSkills Setup Test.app`; bundle ID
+  `com.jonslimak.omgskills.setuptest`; URL scheme `omgskills-setup-test`.
+  Verify these are unused before freezing the contract. Never claim `omgskills`.
+- Proposed version/build: `0.1.0` / `1`; distribution filename
+  `OMGSkills-Setup-Test-0.1.0-arm64.dmg`. These are planned names, not available
+  artifacts or download links.
+- Reuse the existing-app review/model/writer, not the old standalone helper.
+  Add an explicit candidate build configuration instead of relaxing F1's
+  Debug-only temporary-root guard. Ordinary production builds remain unchanged.
+- On first launch create the candidate's own per-user state under
+  `~/Library/Application Support/OMGSkills Setup Test/`. No assembler-created
+  root, machine-specific path in the bundle, environment-variable setup or
+  browser-provided filesystem destination.
+- In the separately approved disposable macOS environment, use that user's
+  `~/.codex/skills` destination and candidate-owned managed store. Display the
+  destination for consent. Do not touch the working user's real skills or adopt
+  existing installs; stop on a destination collision. Automated tests inject
+  temporary paths.
+- The candidate has only status/version, Open website and Quit, plus native
+  review/results. No discovery, account pairing, login startup, telemetry or
+  updater activation in this test. Opening the app alone installs nothing.
+- The browser retains F3a intent/revalidation behavior. Add a separate test-only
+  identity/URL mapping; do not globally replace the F1 scheme. Download remains
+  disabled until the exact signed artifact, digest and approved HTTPS URL exist.
+
+#### Implementation order and verification
+
+1. **Review the dependency slice.** Native HTTPS is approved and its isolated
+   checks passed above. Review it before candidate integration; do not mistake
+   parity on this developer Mac for signed setup without developer tools.
+2. **Prepare local runtime and handoff.** Scope changes to runtime configuration,
+   app launch/URL dispatch, reusable review composition, preview identity mapping
+   and their tests. Test first launch without pre-created storage, invalid or
+   redirected storage refusal, cold URL delivery, correct handler/identity,
+   cancel/no writes and unchanged ordinary production behavior.
+3. **Prepare packaging only.** Add a narrow candidate assembler with source and
+   output manifests, fixed identity, dependencies, minimum OS and architecture.
+   Reuse existing signing/verification primitives later; do not invoke the public
+   release script as-is or repoint the standalone helper's updater/hosting.
+   Packaging tests must reject production identity, feeds and machine paths.
+   Local preparation neither launches/registers the candidate on the working
+   account nor enables a download.
+4. **Review before external work.** Run relevant native and portal tests,
+   production builds/exclusion checks and package inspection. Record exact
+   source/artifact hashes. Stop for additional runtime tools, unsafe writes,
+   a second unintended app identity or unexpected signing requirements.
+   Review/commit, signing/Apple submission, and controlled hosting remain
+   distinct approval steps.
+
+#### Later signed acceptance, separately approved
+
+Use a clean macOS environment without developer tools; a new user alone is not
+enough to establish that prerequisite. Confirm the test app/handler and target
+skill are absent. Use a supported Codex installation for the discovery check,
+without copying the working user's credentials or invoking a model.
+
+Give the user one skill-page link and exact artifact/app names. In Safari:
+download the verified DMG, copy the app once to `~/Applications`, eject the DMG,
+open that final copy through normal macOS approval, return to the original
+page, retry, review and approve. Never run the app from the mounted image or
+pre-register it with a setup script. Record actual prompts, clicks, app paths
+and process count rather than assuming how macOS behaves.
+
+Verify exact commit/tree/files, one installation and Codex discovery. Quit the
+app, retry from the same page, and verify cold launch reports Already installed
+without another download or write. No Terminal/Gatekeeper bypass is allowed.
+Archive the result; cleanup requires an exact inventory and separate approval.
+This proves candidate first-time setup only, not production identity migration,
+Sparkle upgrades, all architectures, other browsers or G1-G4 completion.
+
 ### Evidence, cleanup and stop rules
 
 Archive stage-labelled build/source hashes, exact URLs/artifact names, intent
@@ -842,9 +1002,12 @@ F1 step 1 implements the approved narrow answers to 1, 3 and the request part of
 6. Login onboarding/defaults and existing-user transition messaging; preserve
    explicit opt-outs and distinguish Quit from disabling future login startup.
 
-Next: separately plan F3b candidate packaging/distribution and real first-time
-setup. F3a local acceptance, approved cleanup and scoped review passed;
-[results](archive/newmac-f3a-2026-10-09/README.md) are saved for this checkpoint.
+Next: review the isolated HTTPS downloader checkpoint in the
+[F3b local candidate plan](#f3b-local-candidate-plan-and-prerequisite-hold)
+before integrating it into the distributable test candidate. Current app
+defaults still use Git. F3a local acceptance, approved
+cleanup and scoped review passed; [results](archive/newmac-f3a-2026-10-09/README.md)
+are committed with the source in `462ac68a`. No signing or hosting approval.
 F2 is committed
 as `f7a964b0`. Its automated and user-run acceptance passed locally; evidence is
 saved, scoped review passed and approved cleanup is complete. F1 is committed
