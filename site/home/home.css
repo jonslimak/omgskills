@@ -226,3 +226,17 @@ h2{letter-spacing:-.05em}
 .collection h3,.rank-info strong,.faq summary{letter-spacing:-.015em}
 .hero-copy{letter-spacing:-.012em}
 .library-link,.hero-actions .button{letter-spacing:-.01em}
+
+/* Hero matched to the Landing Hybrid design (web-handoff/land): left-aligned at every width,
+   fluid headline, and the animation's built-in 24px gutters cancelled by a bleed at every width. */
+.hero h1{font-size:clamp(54px,min(14vw,8.2vw + 20px),108px);text-wrap:initial}
+@media(max-width:999px){
+.hero{align-items:stretch;text-align:left;padding-top:12px;gap:8px}
+.hero-text{align-items:flex-start}
+.hero-actions{justify-content:flex-start}
+.hero-copy{font-size:19px;max-width:28em;text-wrap:pretty}
+.hero-visual{max-width:470px;align-self:center;margin-top:0}
+.hero iframe{width:calc(100% + 48px);margin-inline:-24px}
+}
+@media(min-width:1000px){.hero{padding-inline:20px}}
+@media(max-width:374px){.hero h1{font-size:44px}}
