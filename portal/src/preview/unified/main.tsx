@@ -17,6 +17,9 @@ import type { PortalSet } from "../../app/model";
 import type { GroupedSyncedSkill } from "../../synced-skill-grouping";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog } from "../../app/unified/use-public-catalog";
+import { f1InstallLink, isF1Preview } from "../../app/unified/public-install";
+
+const f1Enabled = import.meta.env.DEV && isF1Preview(import.meta.env.DEV, import.meta.env.VITE_NEWMAC_F1, location.hostname);
 
 const catalog = makeCatalog();
 const publicClient = new PublicCatalogClient();
@@ -28,7 +31,8 @@ function installed(skills: SkillDisplay[]): GroupedSyncedSkill[] {
 function Preview() {
   const [scenario, setScenario] = useState<Scenario>("populated");
   const [data, setData] = useState(() => makeFixtures());
-  const [signedIn, setSignedIn] = useState(true);
+  const [signedIn, setSignedIn] = useState(!f1Enabled);
+  const [f1Revision, setF1Revision] = useState("A");
   const [nav, setNav] = useState(() => parseNavigation(location.search));
   const [revision, setRevision] = useState(0);
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
@@ -105,6 +109,8 @@ function Preview() {
       nav={nav}
       navigate={navigate}
       signedIn={signedIn}
+      publicInstallLink={f1Enabled ? (skill) => f1InstallLink(skill,
+        f1Revision === "HEAD" ? undefined : (f1Revision === "A" ? import.meta.env.VITE_NEWMAC_F1_A : import.meta.env.VITE_NEWMAC_F1_B) || "") : undefined}
       onSession={session}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
@@ -171,6 +177,11 @@ function Preview() {
         <div className="ua-preview">
           <span>{liveCatalog ? "Local preview · live Discover · sample account" : "Local preview · sample data"}</span>
           <div>
+            {f1Enabled && <select aria-label="F1 revision" value={f1Revision} onChange={event => setF1Revision(event.target.value)}>
+              <option value="A">F1: Version A</option>
+              <option value="B">F1: Version B</option>
+              <option value="HEAD">F1: Latest</option>
+            </select>}
             <select
               aria-label="Catalog data"
               value={liveCatalog ? "live" : "sample"}

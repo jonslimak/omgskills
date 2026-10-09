@@ -16,6 +16,11 @@ struct OmgskillsApp: App {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
+    private let f1Mode = AppRuntimeConfiguration.f1Mode()
+    #if DEBUG
+    private var f1Controller: PublicSkillInstallWindowController?
+    private var pendingF1URL: URL?
+    #endif
     nonisolated static let debugAppcastURLEnvironmentKey = "OMGSKILLS_DEBUG_APPCAST_URL"
     private static let libraryRefreshTimerInterval: TimeInterval = 60 * 60
     private let skillGroupsBuildSupported = AppRuntimeConfiguration.skillGroupsAuthSupported
@@ -69,6 +74,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        switch f1Mode {
+        case .invalid(let reason):
+            let alert = NSAlert()
+            alert.messageText = "Cannot start OMGSkills F1 Test"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        case .enabled(let root, let website):
+            #if DEBUG
+            f1Controller = PublicSkillInstallWindowController(root: root, website: website)
+            if let pendingF1URL { f1Controller?.receive(pendingF1URL); self.pendingF1URL = nil }
+            else { f1Controller?.showReview() }
+            #endif
+            return
+        case .disabled: break
+        }
         if case .invalid(let reason) = runtimeContext.catalogTestMode {
             let alert = NSAlert()
             alert.alertStyle = .critical
@@ -135,12 +157,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
     }
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        #if DEBUG
+        if let f1Controller {
+            guard !f1Controller.model.isApplying, f1Controller.model.phase != .cancelling else { return .terminateCancel }
+            Task {
+                await f1Controller.model.cancel()
+                sender.reply(toApplicationShouldTerminate: true)
+            }
+            return .terminateLater
+        }
+        #endif
+        return .terminateNow
+    }
+
     func applicationDidBecomeActive(_ notification: Notification) {
         guard hasFinishedLaunching else { return }
         refreshSkillGroupsFeatureAvailability()
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        if f1Mode != .disabled {
+            #if DEBUG
+            if case .enabled = f1Mode, let url = urls.first {
+                if let f1Controller { f1Controller.receive(url) }
+                else if pendingF1URL == nil { pendingF1URL = url }
+            }
+            #endif
+            return
+        }
         for url in urls {
             guard GroupInstallDeepLink.classify(url) != .unsupported else { continue }
             switch skillGroupsFeatureAvailability.deepLinkDisposition {

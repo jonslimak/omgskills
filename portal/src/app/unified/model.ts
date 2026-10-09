@@ -17,6 +17,8 @@ export function setAccessSummary(set: PortalSet) {
 }
 
 export type CatalogSummary = {
+  skillMDPath?: string;
+  hasPinnedInstall?: boolean;
   id: string;
   name: string;
   description: string;

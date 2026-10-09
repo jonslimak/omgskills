@@ -1,6 +1,54 @@
 import Foundation
 
 enum AppRuntimeConfiguration {
+    static let f1BundleID = "com.jonslimak.omgskills.f1"
+    static let f1RootKey = "OMGSkillsF1Root"
+    static let f1WebsiteKey = "OMGSkillsF1Website"
+
+    enum F1Mode: Equatable, Sendable {
+        case disabled
+        case enabled(root: URL, website: URL)
+        case invalid(String)
+    }
+
+    static var buildAllowsF1: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
+    }
+
+    static func f1Mode(
+        info: [String: Any] = Bundle.main.infoDictionary ?? [:],
+        debugAllowed: Bool = buildAllowsF1
+    ) -> F1Mode {
+        let requested = info["CFBundleIdentifier"] as? String == f1BundleID
+            || info[f1RootKey] != nil || info[f1WebsiteKey] != nil
+        guard requested else { return .disabled }
+        guard debugAllowed, info["CFBundleIdentifier"] as? String == f1BundleID,
+              let types = info["CFBundleURLTypes"] as? [[String: Any]], types.count == 1,
+              types[0]["CFBundleURLSchemes"] as? [String] == ["omgskills-f1"],
+              let path = info[f1RootKey] as? String,
+              path.range(of: "^/private/tmp/omgskills-f1-[A-Za-z0-9-]+$", options: .regularExpression) != nil,
+              let rawWebsite = info[f1WebsiteKey] as? String,
+              let website = URL(string: rawWebsite), website.scheme == "http",
+              ["localhost", "127.0.0.1"].contains(website.host ?? ""),
+              website.user == nil, website.password == nil, website.port != nil else {
+            return .invalid("Invalid F1 test identity, storage or local website configuration.")
+        }
+        let root = URL(fileURLWithPath: path, isDirectory: true)
+        // Foundation canonicalizes the system /private/tmp alias to /tmp.
+        let canonical = URL(fileURLWithPath: "/private/tmp", isDirectory: true)
+            .resolvingSymlinksInPath().appendingPathComponent(root.lastPathComponent, isDirectory: true)
+        guard root.resolvingSymlinksInPath().path == canonical.path,
+              (try? root.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true else {
+            return .invalid("The F1 test folder is missing or redirected.")
+        }
+        // Derive existing and not-yet-created child paths from the same system alias.
+        return .enabled(root: canonical, website: website)
+    }
+
     static let bundledLibraryPreviewKey = "OMGSkillsBundledLibraryPreview"
     static let skillGroupsAuthEnabledKey = "OMGSkillsSkillGroupsAuthEnabled"
     static let skillGroupsAuthPreviewEnvironmentKey = "OMGSKILLS_SKILLGROUPS_AUTH_ENABLED"

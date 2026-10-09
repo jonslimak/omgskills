@@ -539,6 +539,17 @@
   background: var(--ua-blue) !important;
   color: #fff !important;
 }
+.ua-f1-install {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  max-width: 100%;
+  min-height: 40px;
+  white-space: normal;
+}
+.ua-f1-install svg { width: 18px; height: 18px; flex-shrink: 0; }
 .ua-primary:hover:not(:disabled) {
   background: var(--ua-blue) !important;
   opacity: 0.88;

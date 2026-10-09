@@ -122,6 +122,7 @@ type Props = {
   onSignIn?: () => void;
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
+  publicInstallLink?: (skill: SkillDisplay) => string | null;
 };
 
 function IconButton({
@@ -413,6 +414,7 @@ export function UnifiedApp({
   onSignIn,
   management,
   accountPages,
+  publicInstallLink,
 }: Props) {
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
@@ -1653,6 +1655,20 @@ export function UnifiedApp({
                           </button>
                         ))}
                     </div>}
+                  </section>
+                )}
+                {publicInstallLink && (
+                  <section className="ua-about">
+                    <button type="button" className="ua-f1-install ua-primary"
+                      disabled={!publicInstallLink(selected)}
+                      onClick={() => {
+                        const link = publicInstallLink(selected);
+                        if (!link) return;
+                        setNotice("Opening requested. Check OMGSkills F1 Test for the result.");
+                        window.location.assign(link);
+                      }}>
+                      <ArrowUpRight /> Open in OMGSkills F1 Test
+                    </button>
                   </section>
                 )}
                 <section className="ua-about">

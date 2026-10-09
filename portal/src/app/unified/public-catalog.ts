@@ -41,6 +41,8 @@ function parseSkill(value: unknown): CatalogSummary {
   if (skill.stars !== undefined && (typeof skill.stars !== "number" || !Number.isFinite(skill.stars) || skill.stars < 0)) throw new Error("The catalog returned invalid skill statistics.");
   return {
     id, name, author, description: text(skill.description), githubUrl: safeGithub(skill.github_url),
+    skillMDPath: optionalText(skill.skill_md_path) || undefined,
+    hasPinnedInstall: skill.pinned_install != null || skill.repo_commit_sha != null || skill.skill_tree_sha != null,
     stars: skill.stars as number | undefined, tags: strings(skill.tags ?? []), avatar: avatar(author),
   };
 }

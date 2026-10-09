@@ -3,6 +3,50 @@ import Testing
 @testable import omgskills
 
 struct PublicGitHubSkillPackageFetcherTests {
+    @Test func resolvesHeadAndExplicitOldCommitWithoutCatalogPins() async throws {
+        let fixture = try LocalGitPackageRepository()
+        defer { fixture.remove() }
+        let fetcher = GitPublicSkillPackageFetcher(
+            temporaryRoot: fixture.temporaryRoot, remoteURL: { _ in fixture.repositoryRoot }
+        )
+        let source = try PublicSkillInstallRequest(
+            catalogID: "owner/repo:example", repositorySlug: "Owner/Repo",
+            skillMDPath: "skills/example/SKILL.md"
+        )
+        let a = try await fetcher.resolvePackage(source)
+        #expect(a.coordinates == fixture.coordinates)
+        try fixture.advanceHead()
+        let b = try await fetcher.resolvePackage(source)
+        #expect(b.coordinates.commitSha != a.coordinates.commitSha)
+        #expect(b.coordinates.treeSha != a.coordinates.treeSha)
+        #expect(b.coordinates.skillMdSha != a.coordinates.skillMdSha)
+        #expect(a.entries.first { $0.path == "SKILL.md" }?.data == fixture.originalSkillData)
+        let pinnedA = try PublicSkillInstallRequest(
+            catalogID: source.catalogID, repositorySlug: source.repositorySlug,
+            skillMDPath: source.skillMDPath, commitSha: a.coordinates.commitSha
+        )
+        #expect(try await fetcher.resolvePackage(pinnedA) == a)
+        _ = try SkillPackageValidator.validate(b, expected: b.coordinates)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: fixture.temporaryRoot.path).isEmpty)
+    }
+
+    @Test func resolutionRejectsMissingSkillAndPreservesCancellation() async throws {
+        let fixture = try LocalGitPackageRepository()
+        defer { fixture.remove() }
+        let source = try PublicSkillInstallRequest(
+            catalogID: "owner/repo:root", repositorySlug: "owner/repo", skillMDPath: "SKILL.md"
+        )
+        let fetcher = GitPublicSkillPackageFetcher(
+            temporaryRoot: fixture.temporaryRoot, remoteURL: { _ in fixture.repositoryRoot }
+        )
+        await #expect(throws: SkillPackageValidationError(code: .missingSkillMd, path: nil)) {
+            try await fetcher.resolvePackage(source)
+        }
+        await #expect(throws: CancellationError.self) {
+            try await GitPublicSkillPackageFetcher(runner: CancellingGitRunner()).resolvePackage(source)
+        }
+    }
+
     @Test func fetchesPinnedNestedTreeFromLocalGitRepository() async throws {
         let fixture = try LocalGitPackageRepository()
         defer { fixture.remove() }
@@ -188,16 +232,16 @@ private actor OversizedBlobGitRunner: GitCommandRunning {
     }
 }
 
-private struct LocalGitPackageRepository: Sendable {
+struct LocalGitPackageRepository: Sendable {
     let root: URL
     let temporaryRoot: URL
     let repositoryRoot: URL
     let coordinates: SkillPackageCoordinates
     let originalSkillData: Data
 
-    init() throws {
-        root = FileManager.default.temporaryDirectory
-            .appendingPathComponent("omgskills-git-fixture-\(UUID().uuidString)", isDirectory: true)
+    init(root: URL = FileManager.default.temporaryDirectory
+        .appendingPathComponent("omgskills-git-fixture-\(UUID().uuidString)", isDirectory: true)) throws {
+        self.root = root
         temporaryRoot = root.appendingPathComponent("temporary", isDirectory: true)
         repositoryRoot = root.appendingPathComponent("repository", isDirectory: true)
         try FileManager.default.createDirectory(at: temporaryRoot, withIntermediateDirectories: true)
@@ -252,6 +296,13 @@ private struct LocalGitPackageRepository: Sendable {
     }
 
     func remove() {
+        if let entries = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) {
+            for case let url as URL in entries {
+                if (try? FileManager.default.attributesOfItem(atPath: url.path)[.type] as? FileAttributeType) == .typeDirectory {
+                    try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: url.path)
+                }
+            }
+        }
         try? FileManager.default.removeItem(at: root)
     }
 
