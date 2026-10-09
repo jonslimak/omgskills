@@ -70,3 +70,16 @@ test('page remains isolated, unindexed, and free of prototype dependencies', asy
   assert.match(html, /name="view" value="discover"/);
   assert.match(html, /name="q"/);
 });
+
+test('data refresh preserves the handoff layout and static feature artwork', async () => {
+  const html = await readFile(new URL('../site/home/index.html', import.meta.url), 'utf8');
+  const refreshed = replaceHomeContent(html, renderHomeContent(collections, data));
+  const withoutGeneratedContent = value => value.replace(
+    /(<!-- home:(suggestions|collections|rankings):start -->)[\s\S]*?(<!-- home:\2:end -->)/g,
+    '$1$3',
+  );
+  assert.equal(withoutGeneratedContent(refreshed), withoutGeneratedContent(html));
+  assert.match(refreshed, /your skills, every agent/);
+  assert.match(refreshed, /Example design team set/);
+  assert.match(refreshed, /Shared with your team/);
+});
