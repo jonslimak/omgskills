@@ -231,7 +231,7 @@ h2{letter-spacing:-.05em}
    fluid headline, and the animation's built-in 24px gutters cancelled by a bleed at every width. */
 .hero h1{font-size:clamp(54px,min(14vw,8.2vw + 20px),108px);text-wrap:initial}
 @media(max-width:999px){
-.hero{align-items:stretch;text-align:left;padding-top:12px;gap:8px}
+.hero{align-items:stretch;text-align:left;padding-top:12px;gap:0}
 .hero-text{align-items:flex-start}
 .hero-actions{justify-content:flex-start}
 .hero-copy{font-size:19px;max-width:28em;text-wrap:pretty}
@@ -246,3 +246,7 @@ h2{letter-spacing:-.05em}
 .gh-mark svg{width:26px;height:26px;fill:currentColor;stroke:none}
 .switch{margin-left:auto;flex:none;position:relative;width:44px;height:26px;border-radius:999px;background:var(--green)}
 .switch::after{content:'';position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px #0000004d}
+
+/* Keep the animation tight to the subtitle above and the search card below. */
+.hero{padding-bottom:0}
+.search-section{margin-top:8px}

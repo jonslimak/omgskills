@@ -82,7 +82,7 @@
     line-height: 1.47;
     -webkit-font-smoothing: antialiased;
     margin: 0;
-    padding: 10px 24px 16px;
+    padding: 0 24px; /* no vertical padding: the drawing keeps its own room for shadows */
     overflow: hidden;
   }
   .stage { max-width: 460px; /* a phone-shaped drawing, 420 units wide */ margin: 0 auto; display: grid; gap: 6px; }
@@ -107,6 +107,8 @@
   .scroll {
     display: flex; justify-content: center; overflow: hidden;
     padding-block: 48px; margin-block: -48px;
+    /* Same room sideways (into the body's 24px gutter) so card shadows fade out instead of being cut. */
+    padding-inline: 24px; margin-inline: -24px;
   }
   #flow { display: block; flex: 0 0 auto; width: 100%; height: auto; overflow: visible; }
 
@@ -446,7 +448,7 @@ html { overflow: hidden; }
     while ((paused || document.hidden) && !instant) await new Promise(resolve => resumeWaiters.push(resolve));
   }
   const stage = document.querySelector(".stage");
-  const reportSize = () => parent.postMessage({type: "home-animation-size", height: stage.offsetHeight + 26}, location.origin);
+  const reportSize = () => parent.postMessage({type: "home-animation-size", height: stage.offsetHeight}, location.origin);
   new ResizeObserver(reportSize).observe(stage);
   parent.postMessage({type: "home-animation-ready"}, location.origin);
   reportSize();
@@ -613,7 +615,9 @@ html { overflow: hidden; }
       agents[a.id] = { ...a, i, g, head, rect, sub, x, y, items: [], caps: {} };
     });
 
-    svg.setAttribute("viewBox", `0 0 ${W} ${CY + SPAN / 2 + PAD}`);
+    // Nothing is ever drawn in the top TRIM units except shadow room (content starts at ~34), so crop it
+    const TRIM = 16;
+    svg.setAttribute("viewBox", `0 ${TRIM} ${W} ${CY + SPAN / 2 + PAD - TRIM}`);
     layers.chip.appendChild(mate.g); // your teammate's card slides in above the agents and their skills
     seedMate();
     refreshSubs();
