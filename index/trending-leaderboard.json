@@ -115,7 +115,7 @@
     "name": "lark-vc-agent",
     "authorHandle": "larksuite",
     "description": "仅当用户或上游配置显式指定 lark-vc-agent 时使用，相关请求统一交由 lark-meeting 技能处理。",
-    "stars": 17570,
+    "stars": 17583,
     "installs": 342797,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
@@ -148,7 +148,7 @@
     "name": "cavecrew",
     "authorHandle": "juliusbrussee",
     "description": "When to delegate to `cavecrew-investigator` (locate code), `cavecrew-builder` (1-2 file edit) or `cavecrew-reviewer` (diff review) instead of working inline or using `Explore`. Their output is compressed, so main context lasts longer.",
-    "stars": 110511,
+    "stars": 110693,
     "installs": 340959,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
@@ -192,7 +192,7 @@
     "name": "emil-design-eng",
     "authorHandle": "emilkowalski",
     "description": "This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.",
-    "stars": 44415,
+    "stars": 44598,
     "installs": 336097,
     "githubUrl": "https://github.com/emilkowalski/skills",
     "source": "skills.sh"
@@ -544,7 +544,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 180078,
+    "stars": 180110,
     "installs": 232695,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -973,7 +973,7 @@
     "name": "archify",
     "authorHandle": "tt-a1i",
     "description": "Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid. Also use for everyday subjects with steps, parts, relationships, or states: a leave or travel plan, an application or approval process, a back-and-forth such as renting, where money or documents go, or where an application or order stands. Not for numeric charts or dashboards.",
-    "stars": 79969,
+    "stars": 80909,
     "installs": 143560,
     "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
@@ -1743,7 +1743,7 @@
     "name": "audit",
     "authorHandle": "pbakaus",
     "description": "a user-authored audit skill",
-    "stars": 78644,
+    "stars": 78867,
     "installs": 81858,
     "githubUrl": "https://github.com/pbakaus/impeccable",
     "source": "skills.sh"
