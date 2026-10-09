@@ -264,3 +264,20 @@ async function closeHttpServer(server: Server): Promise<void> {
     server.close((error) => error ? reject(error) : resolveClose());
   });
 }
+
+test("library keeps only returnable fields and ranks with precomputed search data", () => {
+  const library = OmgskillsLibrary.fromData({
+    skills: [
+      { id: "a/x:first", name: "pdf-tools", description: "Work with PDF files.", github_url: "https://github.com/a/x", install_cmd: "x", author_handle: "Acme", stars: 10, readme_snippet: "internal" } as never,
+      { id: "a/x:second", name: "pdf-tools", description: "Work with PDF files.", github_url: "https://github.com/a/x", install_cmd: "x", author_handle: "acme", stars: 10 },
+      { id: "b/y:other", name: "spreadsheet", description: "Edit sheets.", github_url: "https://github.com/b/y", install_cmd: "y", author_handle: "beta", stars: 500 }
+    ],
+    trending: [],
+    goldBasket: []
+  });
+
+  assert.equal("readme_snippet" in (library.getSkill("a/x:first") ?? {}), false);
+  assert.deepEqual(library.searchSkills({ query: "PDF" }).map((skill) => skill.id), ["a/x:first", "a/x:second"]);
+  assert.deepEqual(library.listByAuthor("ACME").map((skill) => skill.id), ["a/x:first", "a/x:second"]);
+  assert.deepEqual(library.searchSkills({ query: "", minStars: 100 }).map((skill) => skill.id), ["b/y:other"]);
+});

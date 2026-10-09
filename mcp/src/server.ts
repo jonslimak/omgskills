@@ -216,7 +216,8 @@ function result(structuredContent: Record<string, unknown>, textData: unknown) {
     content: [
       {
         type: "text" as const,
-        text: JSON.stringify(textData, null, 2)
+        // Compact: clients read structuredContent; this copy is a fallback.
+        text: JSON.stringify(textData)
       }
     ]
   };

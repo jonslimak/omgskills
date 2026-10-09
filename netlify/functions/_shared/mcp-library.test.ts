@@ -141,3 +141,76 @@ test("fails closed when no catalog has ever loaded", async () => {
   await assert.rejects(loader.get(), /unavailable/);
   assert.equal(loader.status().hasSnapshot, false);
 });
+
+function versionedLibrary(id: string, version: string) {
+  const base = library(id);
+  return OmgskillsLibrary.fromData({ skills: [base.getSkill(id)!], trending: [], goldBasket: [] }, version);
+}
+
+test("refresh keeps the snapshot when the catalog version is unchanged", async () => {
+  let clock = 0;
+  let loads = 0;
+  let versionReads = 0;
+  const loader = createMcpLibraryLoader({
+    tracks: [{ name: "crawl4", manifestUrl: "https://example.test/crawl4.json" }],
+    maxAgeMs: 1000,
+    now: () => clock,
+    loadTrack: async () => {
+      loads += 1;
+      return versionedLibrary("example/skills:same", "skills-a.json|trending-a.json");
+    },
+    readTrackVersion: async () => {
+      versionReads += 1;
+      return "skills-a.json|trending-a.json";
+    }
+  });
+
+  const first = await loader.get();
+  clock = 5000;
+  const refreshed = await loader.refresh();
+  assert.equal(loads, 1);
+  assert.equal(versionReads, 1);
+  assert.equal(refreshed.library, first.library);
+  assert.equal(refreshed.loadedAt, 5000);
+});
+
+test("refresh reloads when the catalog version changes or cannot be read", async () => {
+  let loads = 0;
+  let version = "skills-a.json|";
+  let failVersionRead = false;
+  const loader = createMcpLibraryLoader({
+    tracks: [{ name: "crawl4", manifestUrl: "https://example.test/crawl4.json" }],
+    loadTrack: async () => {
+      loads += 1;
+      return versionedLibrary(`example/skills:v${loads}`, version);
+    },
+    readTrackVersion: async () => {
+      if (failVersionRead) throw new Error("manifest unavailable");
+      return version;
+    }
+  });
+
+  await loader.get();
+  version = "skills-b.json|";
+  const changed = await loader.refresh();
+  assert.equal(loads, 2);
+  assert.equal(changed.library.version, "skills-b.json|");
+
+  failVersionRead = true;
+  await loader.refresh();
+  assert.equal(loads, 3);
+});
+
+test("library version comes from content-hashed manifest paths", async () => {
+  const fetcher: typeof fetch = async (input) => {
+    const url = String(input);
+    if (url === "https://example.test/data/manifest.json") {
+      return Response.json({ skills: { path: "skills-abc.json" }, trending: { path: "trending-def.json" } });
+    }
+    return Response.json([]);
+  };
+  assert.equal(
+    await OmgskillsLibrary.readVersion("https://example.test/data/manifest.json", fetcher),
+    "skills-abc.json|trending-def.json"
+  );
+});

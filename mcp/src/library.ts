@@ -70,15 +70,52 @@ export type LoadedLibrary = {
   goldBasket: GoldBasketEntry[];
 };
 
+// Fields the MCP tools can return. Published catalog records carry more (README
+// snippets, attribution, tweets); dropping them at load keeps memory and GC low.
+const skillFields = [
+  "id", "name", "description", "github_url", "install_cmd", "author_handle", "tags", "stars",
+  "last_updated", "first_seen", "skill_md_sha", "skill_md_path", "repo_commit_sha", "skill_tree_sha"
+] as const satisfies readonly (keyof Skill)[];
+
+// Precomputed per-skill search data so a query never re-normalizes or copies records.
+type SearchEntry = {
+  skill: Skill;
+  fields: string[];
+  author: string;
+  tags: string[];
+  stars: number;
+  signal: number;
+};
+
+const searchFieldWeights = [12, 10, 8, 6, 4, 2];
+
 export class OmgskillsLibrary {
+  private readonly data: LoadedLibrary;
   private readonly skillsById = new Map<string, Skill>();
   private readonly trendingById = new Map<string, TrendingEntry>();
   private readonly goldById = new Map<string, GoldBasketEntry>();
+  private readonly entries: SearchEntry[];
+  private readonly entriesByAuthor = new Map<string, SearchEntry[]>();
 
-  private constructor(private readonly data: LoadedLibrary) {
-    for (const skill of data.skills) this.skillsById.set(skill.id, skill);
+  private constructor(data: LoadedLibrary, readonly version?: string) {
+    this.data = { ...data, skills: data.skills.map(slimSkill) };
+    for (const skill of this.data.skills) this.skillsById.set(skill.id, skill);
     for (const entry of data.trending) this.trendingById.set(entry.id, entry);
     for (const entry of data.goldBasket) this.goldById.set(entry.id, entry);
+
+    this.entries = this.data.skills.map((skill) => ({
+      skill,
+      fields: [skill.name, skill.id, skill.author_handle, (skill.tags ?? []).join(" "), skill.description, skill.github_url].map(normalize),
+      author: normalize(skill.author_handle),
+      tags: (skill.tags ?? []).map(normalize),
+      stars: skill.stars ?? 0,
+      signal: this.signalScore(skill)
+    }));
+    for (const entry of this.entries) {
+      const list = this.entriesByAuthor.get(entry.author);
+      if (list) list.push(entry);
+      else this.entriesByAuthor.set(entry.author, [entry]);
+    }
   }
 
   static async load(paths = defaultLibraryPaths()): Promise<OmgskillsLibrary> {
@@ -96,11 +133,16 @@ export class OmgskillsLibrary {
       readOptionalJsonArray<GoldBasketEntry>(goldBasketSource, fetcher, paths.allowMissingGoldBasket)
     ]);
 
-    return new OmgskillsLibrary({ skills, trending, goldBasket });
+    return new OmgskillsLibrary({ skills, trending, goldBasket }, manifestVersion(manifest));
   }
 
-  static fromData(data: LoadedLibrary): OmgskillsLibrary {
-    return new OmgskillsLibrary(data);
+  /** Content-hashed asset paths from a manifest; equal versions mean unchanged catalog data. */
+  static async readVersion(manifestUrl: string, fetcher: typeof fetch = fetch): Promise<string | undefined> {
+    return manifestVersion(await readJson<Manifest>(manifestUrl, fetcher));
+  }
+
+  static fromData(data: LoadedLibrary, version?: string): OmgskillsLibrary {
+    return new OmgskillsLibrary(data, version);
   }
 
   getStats() {
@@ -128,23 +170,21 @@ export class OmgskillsLibrary {
       return [];
     }
 
-    return this.data.skills
-      .filter((skill) => {
-        if (author && normalize(skill.author_handle) !== author) return false;
-        if (tag && !(skill.tags ?? []).some((value) => normalize(value) === tag)) return false;
-        if ((skill.stars ?? 0) < minStars) return false;
-        return true;
-      })
-      .map((skill) => {
-        const score = terms.length === 0 ? this.signalScore(skill) : this.textScore(skill, terms);
-        return this.enrich(skill, score);
-      })
-      .filter((skill) => terms.length === 0 || skill.score > 0)
-      .sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return (b.stars ?? 0) - (a.stars ?? 0);
-      })
-      .slice(0, limit);
+    const candidates = author ? this.entriesByAuthor.get(author) ?? [] : this.entries;
+    const matches: { entry: SearchEntry; score: number }[] = [];
+    for (const entry of candidates) {
+      if (tag && !entry.tags.includes(tag)) continue;
+      if (entry.stars < minStars) continue;
+      const score = terms.length === 0 ? entry.signal : textScore(entry, terms);
+      if (terms.length > 0 && score <= 0) continue;
+      matches.push({ entry, score });
+    }
+
+    // Array.prototype.sort is stable, so ties keep catalog order as before.
+    return matches
+      .sort((a, b) => (b.score !== a.score ? b.score - a.score : b.entry.stars - a.entry.stars))
+      .slice(0, limit)
+      .map(({ entry, score }) => this.enrich(entry.skill, score));
   }
 
   listTrending(limit?: number): SkillResult[] {
@@ -180,34 +220,6 @@ export class OmgskillsLibrary {
       niche: gold?.niche ?? undefined,
       niche_label: gold?.niche_label ?? undefined
     };
-  }
-
-  private textScore(skill: Skill, terms: string[]): number {
-    const fields = [
-      { text: skill.name, weight: 12 },
-      { text: skill.id, weight: 10 },
-      { text: skill.author_handle, weight: 8 },
-      { text: (skill.tags ?? []).join(" "), weight: 6 },
-      { text: skill.description, weight: 4 },
-      { text: skill.github_url, weight: 2 }
-    ];
-
-    let score = this.signalScore(skill);
-    for (const term of terms) {
-      let matched = false;
-      for (const field of fields) {
-        const text = normalize(field.text);
-        if (text === term) {
-          score += field.weight * 3;
-          matched = true;
-        } else if (text.includes(term)) {
-          score += field.weight;
-          matched = true;
-        }
-      }
-      if (!matched) return 0;
-    }
-    return score;
   }
 
   private signalScore(skill: Skill): number {
@@ -297,6 +309,39 @@ function manifestAssetUrl(asset: ManifestAsset | undefined, baseUrl: string, lab
 
 function optionalManifestAssetUrl(asset: ManifestAsset | undefined, baseUrl: string): string | undefined {
   return asset?.path ? new URL(asset.path, baseUrl).toString() : undefined;
+}
+
+function textScore(entry: SearchEntry, terms: string[]): number {
+  let score = entry.signal;
+  for (const term of terms) {
+    let matched = false;
+    for (let index = 0; index < entry.fields.length; index++) {
+      const text = entry.fields[index];
+      const weight = searchFieldWeights[index];
+      if (text === term) {
+        score += weight * 3;
+        matched = true;
+      } else if (text.includes(term)) {
+        score += weight;
+        matched = true;
+      }
+    }
+    if (!matched) return 0;
+  }
+  return score;
+}
+
+function slimSkill(skill: Skill): Skill {
+  const slim: Record<string, unknown> = {};
+  for (const field of skillFields) {
+    if (skill[field] !== undefined) slim[field] = skill[field];
+  }
+  return slim as Skill;
+}
+
+function manifestVersion(manifest: Manifest | undefined): string | undefined {
+  if (!manifest?.skills?.path) return undefined;
+  return [manifest.skills.path, manifest.trending?.path ?? ""].join("|");
 }
 
 function normalize(value: unknown): string {

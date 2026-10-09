@@ -25,9 +25,14 @@ export function createMcpHandler(loader: McpLibraryLoader) {
       return jsonRpcError(415, -32000, "Content-Type must be application/json");
     }
 
+    const startedAt = performance.now();
+    const cold = !loader.status().hasSnapshot;
     let snapshot;
+    let catalogMs = 0;
     try {
       snapshot = await loader.get();
+      catalogMs = performance.now() - startedAt;
+      if (cold) console.info(`MCP catalog cold load: ${Math.round(catalogMs)}ms (${snapshot.skillCount} skills)`);
       keepRefreshAlive(loader, context);
     } catch (error) {
       console.error("MCP catalog load failed:", error);
@@ -44,7 +49,7 @@ export function createMcpHandler(loader: McpLibraryLoader) {
       await server.connect(transport);
       const response = await transport.handleRequest(request);
       context.waitUntil(server.close());
-      return hardened(response);
+      return hardened(response, serverTiming(cold, catalogMs, performance.now() - startedAt));
     } catch (error) {
       console.error("MCP request failed:", error);
       context.waitUntil(server.close());
@@ -112,14 +117,23 @@ function jsonRpcError(status: number, code: number, message: string): Response {
   });
 }
 
-function hardened(response: Response): Response {
+function hardened(response: Response, timing?: string): Response {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(responseHeaders())) headers.set(name, value);
+  if (timing) headers.set("Server-Timing", timing);
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
     headers
   });
+}
+
+// Visible in browser dev tools and curl; lets production show load versus request time.
+function serverTiming(cold: boolean, catalogMs: number, totalMs: number): string {
+  return [
+    `catalog;dur=${catalogMs.toFixed(1)};desc="${cold ? "cold load" : "warm"}"`,
+    `total;dur=${totalMs.toFixed(1)}`
+  ].join(", ");
 }
 
 function responseHeaders(): Record<string, string> {

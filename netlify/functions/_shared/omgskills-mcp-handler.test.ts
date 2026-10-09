@@ -71,6 +71,8 @@ test("serves MCP initialization, tools, and structured results", async () => {
     }
   }), initContext.value);
   assert.equal(initialize.status, 200);
+  assert.match(initialize.headers.get("server-timing") ?? "", /^catalog;dur=[\d.]+;desc="(cold load|warm)", total;dur=[\d.]+$/);
+  assert.equal(initialize.headers.get("cache-control"), "no-store");
   assert.equal((await initialize.json()).result.serverInfo.name, "omgskills");
   await initContext.finish();
 

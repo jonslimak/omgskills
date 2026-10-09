@@ -19,6 +19,8 @@ type McpLibraryLoaderOptions = {
   maxAgeMs?: number;
   now?: () => number;
   loadTrack?: (track: McpCatalogTrack) => Promise<OmgskillsLibrary>;
+  /** Reads a track's current data version cheaply; unchanged data skips the full reload. */
+  readTrackVersion?: (track: McpCatalogTrack) => Promise<string | undefined>;
 };
 
 export type McpLibraryLoader = {
@@ -44,11 +46,29 @@ export function createMcpLibraryLoader(options: McpLibraryLoaderOptions = {}): M
   const maxAgeMs = options.maxAgeMs ?? 10 * 60_000;
   const now = options.now ?? Date.now;
   const loadTrack = options.loadTrack ?? loadProductionTrack;
+  const readTrackVersion = options.readTrackVersion ?? (options.loadTrack ? undefined : readProductionTrackVersion);
   let snapshot: McpLibrarySnapshot | null = null;
   let refreshPromise: Promise<McpLibrarySnapshot> | null = null;
   let lastRefreshFailed = false;
 
+  // A stale snapshot whose source data has not changed only needs a new timestamp.
+  // This avoids re-downloading and re-parsing the full catalog every refresh window.
+  async function unchangedSnapshot(): Promise<McpLibrarySnapshot | null> {
+    if (!snapshot?.library.version || !readTrackVersion) return null;
+    const track = tracks.find((candidate) => candidate.name === snapshot?.sourceTrack);
+    if (!track) return null;
+    try {
+      const version = await readTrackVersion(track);
+      if (version && version === snapshot.library.version) return { ...snapshot, loadedAt: now() };
+    } catch {
+      // Fall through to a full reload, which has its own fallback handling.
+    }
+    return null;
+  }
+
   async function loadFreshSnapshot(): Promise<McpLibrarySnapshot> {
+    const unchanged = await unchangedSnapshot();
+    if (unchanged) return unchanged;
     let lastError: unknown;
     for (const track of tracks) {
       try {
@@ -114,6 +134,10 @@ async function loadProductionTrack(track: McpCatalogTrack): Promise<OmgskillsLib
     allowMissingTrending: true,
     allowMissingGoldBasket: true
   });
+}
+
+function readProductionTrackVersion(track: McpCatalogTrack): Promise<string | undefined> {
+  return OmgskillsLibrary.readVersion(track.manifestUrl, fetchWithTimeout);
 }
 
 const fetchWithTimeout: typeof fetch = (input, init = {}) =>
