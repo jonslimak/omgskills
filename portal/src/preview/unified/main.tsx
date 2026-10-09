@@ -18,7 +18,8 @@ import type { GroupedSyncedSkill } from "../../synced-skill-grouping";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog } from "../../app/unified/use-public-catalog";
 import { isF1Preview } from "../../app/unified/public-install";
-import { f2Cases, f2CaseNavigation, f2InstallAction, f2NavigationSearch, readF2CaseKey } from "./f2-install";
+import { f2Cases, f2CaseNavigation, f2NavigationSearch, readF2CaseKey } from "./f2-install";
+import { createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
 
 const f1Enabled = import.meta.env.DEV && isF1Preview(import.meta.env.DEV, import.meta.env.VITE_NEWMAC_F1, location.hostname);
 
@@ -30,6 +31,7 @@ function installed(skills: SkillDisplay[]): GroupedSyncedSkill[] {
 }
 
 function Preview() {
+  const [installStore] = useState(() => f1Enabled ? createPreviewInstallStore() : null);
   const [scenario, setScenario] = useState<Scenario>("populated");
   const [data, setData] = useState(() => makeFixtures());
   const [signedIn, setSignedIn] = useState(!f1Enabled);
@@ -42,6 +44,7 @@ function Preview() {
   const previewSearch = (next: Navigation, caseKey = f2CaseKey) =>
     f1Enabled ? f2NavigationSearch(next, caseKey) : navigationSearch(next);
   const navigate = (next: Navigation, replace = false) => {
+    if (next.selected && next.selected !== nav.selected) installStore?.clear();
     const safe =
       !signedIn && !isDiscovery(next.view)
         ? { ...initialNavigation, view: "discover" as const }
@@ -57,6 +60,8 @@ function Preview() {
     const pop = () => {
       const next = parseNavigation(location.search);
       const caseKey = readF2CaseKey(location.search);
+      const pending = installStore?.read().intent;
+      if (pending && next.selected && next.selected !== `catalog:${pending.catalogId}`) installStore?.clear();
       setF2CaseKey(caseKey);
       if (!signedIn && !isDiscovery(next.view)) {
         const safe = { ...initialNavigation, view: "discover" as const };
@@ -66,16 +71,18 @@ function Preview() {
     };
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
-  }, [signedIn]);
+  }, [signedIn, installStore]);
   function selectF2Case(caseKey: string) {
     const next = f2CaseNavigation(caseKey);
     if (!next) return;
+    installStore?.clear();
     history.pushState({}, "", `${base}${previewSearch(next, caseKey)}`);
     setF2CaseKey(caseKey);
     setLiveCatalog(true);
     setNav(next);
   }
   function reset(next: Scenario) {
+    installStore?.clear();
     setScenario(next);
     setData(makeFixtures(next));
     setRevision((value) => value + 1);
@@ -122,7 +129,9 @@ function Preview() {
       nav={nav}
       navigate={navigate}
       signedIn={signedIn}
-      publicInstallAction={f1Enabled ? (skill) => f2InstallAction(skill, f2CaseKey) : undefined}
+      publicInstallAction={f1Enabled ? (skill, detailReady) => <PublicInstallSetup
+        key={`${skill.catalogId}:${f2CaseKey}`} skill={skill} detailReady={detailReady && liveCatalog}
+        caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} /> : undefined}
       onSession={session}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"

@@ -1,0 +1,30 @@
+{
+  "baseCommit": "f7a964b0",
+  "implementationStatus": "uncommitted",
+  "files": [
+    {
+      "path": "portal/src/app/unified/UnifiedApp.tsx",
+      "sha256": "8bf70999b5f3d4124c2d781342eb59aa090fe5306e7b84ec23efd34ada5033fa"
+    },
+    {
+      "path": "portal/src/app/unified/install-intent.ts",
+      "sha256": "54e7c74b6e70a49275acb70657994c6829616e9287db37d1d606fea527edc539"
+    },
+    {
+      "path": "portal/src/preview/unified/main.tsx",
+      "sha256": "c26ee6c30e0b6dfe6321b2f4fed80d5458df3bfa1ce1784af79eace8840d2198"
+    },
+    {
+      "path": "portal/src/preview/unified/PublicInstallSetup.tsx",
+      "sha256": "ebb3efb9405b331f59499e59fe7a338902cf278906004e1f455b18a1e97a7b3e"
+    },
+    {
+      "path": "portal/src/preview/unified/install-setup.css",
+      "sha256": "c1e4fe7a9d536f8ec11776db63d77d2a94f742dce80edf31778470a1aa038358"
+    },
+    {
+      "path": "portal/tests/install-intent.test.ts",
+      "sha256": "f90edab8e0034deb8552c02ed5f30be9d1ec6818c74f72bd28ed14884ad10d2a"
+    }
+  ]
+}

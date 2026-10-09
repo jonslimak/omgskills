@@ -122,7 +122,7 @@ type Props = {
   onSignIn?: () => void;
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
-  publicInstallAction?: (skill: SkillDisplay) => { href: string | null; reason: string };
+  publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
 };
 
 function IconButton({
@@ -452,9 +452,6 @@ export function UnifiedApp({
   detailOpen.current = !!selected;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
   const detailPending = remoteDetail && publicStatus.detail !== "ready";
-  const installAction = selected && publicInstallAction
-    ? detailPending ? { href: null, reason: "Waiting for current catalog details." } : publicInstallAction(selected)
-    : undefined;
   const relatedSkills = selected?.author
     ? library
         .filter((skill) => skill.author === selected.author && skill.catalogId !== selected.catalogId)
@@ -1178,13 +1175,13 @@ export function UnifiedApp({
             <div className="ua-content">
               {!signedIn && (
                 <div className="ua-public-actions">
-                  <a
+                  {!publicInstallAction && <a
                     href="https://omgskills.com/download"
                     target="_blank"
                     rel="noreferrer"
                   >
                     Get the Mac app <ArrowUpRight />
-                  </a>
+                  </a>}
                   <button
                     type="button"
                     className="ua-pill ua-primary"
@@ -1660,21 +1657,7 @@ export function UnifiedApp({
                     </div>}
                   </section>
                 )}
-                {installAction && (
-                  <section className="ua-about">
-                    <button type="button" className="ua-f1-install ua-primary"
-                      disabled={!installAction.href}
-                      onClick={() => {
-                        const link = installAction.href;
-                        if (!link) return;
-                        setNotice("Opening requested. Check OMGSkills F1 Test for the result.");
-                        window.location.assign(link);
-                      }}>
-                      <ArrowUpRight /> Open in OMGSkills F1 Test
-                    </button>
-                    {!installAction.href && <p role="status">{installAction.reason}</p>}
-                  </section>
-                )}
+                {publicInstallAction?.(selected, !detailPending)}
                 <section className="ua-about">
                   <h3>About</h3>
                   <p>

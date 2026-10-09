@@ -1,18 +1,23 @@
 # New Mac
 
 Design and F1 implementation plan, 2026-10-08; local acceptance passed 2026-10-09.
+F3a local setup/retry automated and user-run acceptance passed 2026-10-09.
+F3b signed setup is not implemented or approved.
 F2 local acceptance, scoped review and approved cleanup passed 2026-10-09.
 Code and acceptance evidence are recorded in [Connect](connect.md), the single
 progress tracker. No release approval.
 This document expands C17 and its Mac-side dependencies, without duplicating
 status checklists. [Webwork](webwork.md) retains earlier test evidence.
 
-**Current target: plan first-time setup and retry after the F2 checkpoint.** F1
+**Current target: plan F3b signed first-time setup.** F1
 proved one public install/update locally. F2 passed three repositories, an
 independent update, repeat no-op, Codex discovery and automated name-collision
-refusal. Scoped local review/commit is approved; the next implementation plan
-still needs approval. The rest of this document describes the intended product, not
-completed C17/C13/C10 work.
+refusal. F2 is committed locally as `f7a964b0`; the
+[F3 plan](#f3-first-time-setup-and-retry-plan) separates local UX proof from
+real signed first-time setup. [F3a results](archive/newmac-f3a-2026-10-09/README.md)
+record local acceptance, approved cleanup and scoped review for this checkpoint.
+F3b has not run. The rest describes the
+intended product, not completed C17/C13/C10 work.
 Full security, compatibility and signed-release testing follows at G1-G4.
 
 ## Product decision
@@ -581,9 +586,196 @@ The public app's process, URL handler and executable hash were unchanged.
 Full manifests, per-operation snapshots and cleanup checks are in the
 [F2 archive](archive/newmac-f2-2026-10-09/README.md).
 
-Next after this local checkpoint: plan first-time download/open/return/retry
-and signed pilot setup. Broader source coverage, rename/delete/rewrite behavior,
+Next after this local checkpoint: F3 setup/retry below, followed by
+signed pilot setup. Broader source coverage, rename/delete/rewrite behavior,
 rate limits, interruption/rollback, migration and G1-G4 remain open.
+
+## F3 first-time setup and retry plan
+
+**F3a implemented and accepted locally, 2026-10-09.** Connect owns
+progress; automated and user-run checks passed. Results are archived below.
+F3b signing/distribution and manual setup require a separate plan/approval.
+Source baseline: clean `codex/newmac-f1-core` at `f7a964b0`. Preserve F1/F2's
+writer, request validation, destination, consent and native result contracts.
+
+F3a verification: 249 portal tests (17 new intent/component tests), TypeScript,
+34 native regression tests in seven suites, and normal/unified production
+builds passed. Built output excludes F3 setup and F1/F2 fixtures even with the
+preview flags set. The component was rendered in a Node test; that render does
+not establish browser or native behavior. The user performed the manual checks
+below; no browser automation or screenshot acceptance was used.
+
+Historical run (now cleaned up): `/private/tmp/omgskills-f1-u0pGXL/`; server PID 66492 was at
+`http://127.0.0.1:5198`. The existing assembler made exactly one
+`OMGSkills F1 Test.app`, registered for `omgskills-f1` only, not launched by setup.
+Its bundle is in `menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-u0pGXL/`
+in the F1/F2 implementation worktree. Public app hash and `omgskills` handler are
+unchanged; the test home was empty at preflight. `receipt.json`, `f3-server.json`
+and `f3-preflight.json` were archived before removing that run folder; they
+record preparation, not acceptance.
+Historical test link (server stopped): [Writing Guidelines, recorded version](http://127.0.0.1:5198/app/preview/unified/?view=discover&skill=catalog%3Avercel-labs%2Fagent-skills%3Askills%2Fwriting-guidelines&f2case=writing-guidelines-recorded):
+catalog identity/path remain unchanged and unpinned; GitHub confirmed commit
+`063bee94c3f4df8453406c830b0a7df0f2860278` is reachable. Preflight itself installed
+no skill; the later acceptance run below did.
+The download stayed disabled; this was the preinstalled local F3a flow, not F3b.
+
+**Manual acceptance passed, 2026-10-09.** The user confirmed retained skill/setup
+after refresh, cancelled the native request, then retried and approved the
+install. After cancellation, independent read-back found an empty test home
+and no managed store. After installation, files/tree/provenance matched the
+exact commit above (one file, 1,233 bytes), and a fresh isolated Codex
+`skills/list` discovered the enabled skill without errors or model calls.
+The user confirmed Already installed on repeat; independent comparison found
+unchanged files, modes, links, provenance/hash/timestamp, one activation and
+empty staging. Exact prompt/click counts were not collected. The public app
+binary remained unchanged.
+
+[F3a evidence](archive/newmac-f3a-2026-10-09/README.md) preserves final acceptance,
+source hashes, original preflight receipts and the subsequent cleanup/review.
+Approved cleanup removed only this test app/bundle, server, temporary root and
+test handler. The public app and unrelated processes were preserved. Scoped
+review found no blocking issue; 249 portal tests, TypeScript and both production
+exclusion builds passed again. This is the local F3a checkpoint, not a release.
+
+### Goal and narrow scope
+
+Prove a signed-out user can start from one skill page, obtain and open the
+companion when needed, return to that same skill and retry successfully.
+Existing users can open their app without downloading another copy. No agent,
+account pairing, per-skill Terminal commands or automatic skill installation.
+
+Use one previously verified F2 source and Codex only. Prefer Writing Guidelines
+at its recorded revision, after checking that the catalog identity and source
+are still available. This measures setup, not another catalog sample or A/B run.
+No inventory, remote requests, server callback, presence-detection service,
+updater change, migration or public rollout in this slice.
+
+### Why there are two stages
+
+At the F2 baseline, `UnifiedApp.tsx` had a direct Open button and a validated
+`developmentInstallLink`, but no setup state. F3a adds that state without changing
+the test assembler: `prepare-newmac-f1.mjs` creates a
+temporary root, embeds it in an ad-hoc signed Debug bundle and registers the
+bundle before the test starts. `AppRuntimeConfiguration.f1Mode` requires that
+root to exist and allows only the F1 identity/scheme and loopback website.
+The generic web download link points to the current public app, not this build.
+
+Therefore the current assembler cannot demonstrate a clean user's download and
+first launch. Do not label a preinstalled Debug test as setup acceptance, link
+the old standalone helper as a substitute, or send testers to the public app.
+
+| Stage | Deliverable | What it does not prove |
+| --- | --- | --- |
+| F3a: local setup/retry UX | Real detail-page retry flow, retained intent, deterministic fallback tests and one user-run retry with the isolated app | Download, quarantine/Gatekeeper, clean-machine launch or signed distribution |
+| F3b: signed first-time setup | Approved merged-code candidate; real download/open/return/retry in a clean macOS user/environment | Existing-user upgrade, full G1/G2, broad coverage or rollout |
+
+### F3a flow and retained intent
+
+1. The eligible detail page offers **Open in OMGSkills** (use the exact test-app
+   name in preview) and a separate **Set up OMGSkills** action. Setup is always
+   available; do not wait for a guessed app-detection timeout.
+2. Opening stores the pending intent before requesting the existing URL scheme.
+   Keep the page and show **Opening requested**, **Try opening again** and setup
+   help. Browser focus, visibility, elapsed time and user confirmation prove
+   neither presence nor installation. Never auto-retry a scheme or download.
+3. Setup stays within the detail flow: **Download for Mac**, open the downloaded
+   app using normal macOS steps, then return to this page and **Try opening
+   again**. Preserve the selected skill and Codex throughout. For F3a, the
+   download control is explicitly unavailable until an approved candidate
+   exists; test its navigation through a test adapter, not a misleading ZIP.
+4. Retry reloads current detail and revalidates the source and intent, then
+   requires a fresh explicit Open click if async work has finished outside the
+   original browser gesture. It must never silently switch skill/repository/path.
+   Invalid or unavailable metadata disables opening with a reason. A changed
+   identity requires a fresh selection. An advertised commit stays exact;
+   Latest may resolve again but the app freezes and reviews its result before Apply.
+5. The same native review requests consent. Cancel leaves skills untouched;
+   Apply uses the existing writer. After returning to the web, the result remains
+   **Check the app for the result** without a verified completion channel.
+   A repeated opening must not apply twice or create a second app instance.
+
+Use the existing detail URL for shareable skill selection. Store only one
+versioned pending intent per browser tab in `sessionStorage`: catalog ID,
+validated repository/path, agent, optional advertised commit, return route and
+creation time. Do not persist a trusted executable link, destination, credential,
+approval or installed status. Keep this logic in one small module and rebuild
+requests through the existing validator after detail refresh. Restrict return
+routes to the current same-origin app; artifact URLs come from trusted build
+configuration, never query parameters or skill metadata.
+
+Expire pending intent after 24 hours; keep the detail page but require a new
+explicit selection/action. Clear on web-side Cancel/reset or deliberate skill
+change; native cancellation is not observable by this web flow.
+Refresh/back retains matching unexpired intent. Other tabs remain independent.
+If storage is blocked, retain in-memory intent and the detail URL; do not block
+manual retry or pretend reload restoration worked. No cross-tab/browser resume
+or native "return to browser" protocol is needed in F3a.
+
+### F3a implementation and checks
+
+Keep production unchanged: inject the new setup/retry action through the existing
+development + flag + loopback boundary. Extend `UnifiedApp.tsx` narrowly; keep
+state/validation in a small adjacent module, preview wiring in
+`portal/src/preview/unified/main.tsx`, and focused tests in `portal/tests/`.
+Reuse `public-install.ts` and F2's fixture identity, not another native parser,
+allowlist or writer. No new native service or packaging change in this stage.
+In this gated preview, prevent the existing Get the Mac app CTA from sending
+testers to the old public binary; leave the production CTA unchanged.
+
+Automated checks cover fresh/opening/setup/retry/expired states, denied or absent
+handler with unknown outcome, restored/invalid intent, metadata mismatch,
+fixed-commit preservation, Latest review, storage failure, tab independence and
+no automatic launch/write/download. Verify setup URLs cannot be injected and
+production builds contain no test scheme, fixtures or enabled setup action.
+Run portal tests, typecheck/build and relevant native request/no-op regressions.
+
+One short user-run session uses one fresh isolated test root/bundle and browser.
+Check the server and exact handler before giving one clickable skill-detail URL.
+Open setup help; refresh and return to the same detail; explicitly retry; cancel
+the native review once, then reopen and approve. Read back exact bytes, records,
+links and Codex discovery; reopening afterward must be a no-op. Record clicks,
+browser prompts and any extra user work. Simulated missing-app states are labelled
+as such; F3a does not require deleting or disabling the user's normal app.
+
+### F3b prerequisites, then real acceptance
+
+After F3a, inspect current main/release state and propose the narrow signed-candidate
+plan before changing packaging or hosting. A distributable build must create its
+own user-owned storage, launch without an assembler-created root, and preserve
+the existing app's production identity/update path for the eventual release.
+Do not weaken F1's Debug guard or register a competing production handler on the
+working Mac. Choose an isolated signed-test identity for limited evidence or the
+intended identity in a clean user/environment; state which was actually tested.
+
+Reuse signing/notarization and controlled hosting infrastructure, but sign/verify
+the integrated candidate, not the earlier standalone binary. Require an exact
+artifact filename, version, digest, minimum OS/architecture and verified download
+URL before enabling Download. Make setup instructions match the chosen ZIP/DMG
+and final app location. Respect quarantine and normal browser/macOS approval;
+no Terminal bypass, local-skill reset or public Sparkle/feed replacement.
+Audit runtime prerequisites, including the current Git-based fetcher: a developer
+Mac having Git does not prove a clean Mac works without developer-tool installation.
+If setup needs additional tools, signing access or storage changes beyond this
+approved candidate scope, stop and re-plan rather than hide the extra friction.
+
+In that clean environment, prove absence first, then download, open, return to
+the unchanged page, retry, review and install; repeat with the app quit to check
+cold opening without another download. One Safari run is enough for the initial
+proof; Chrome and the full failure/upgrade matrix remain at G1/G2. Record all
+prompts, app copies/processes, exact installed content and discovery. The app
+must not write a skill merely because it launched. Never reuse F3a's simulated
+fallback as evidence of first-time setup.
+
+### Evidence, cleanup and stop rules
+
+Archive stage-labelled build/source hashes, exact URLs/artifact names, intent
+transitions, before/after file checks and user outcomes. Connect records F3a and
+F3b separately; neither automatically closes C5/C10/C17 or G1-G3. Preserve the
+public app/handler and real skill roots. After approval, remove only inventoried
+test artifacts and stop that test server; the old F2 server/root are already gone.
+Stop for wrong-app launches, changed source identity, unexpected writes, lost
+intent, false success, extra app copies or required security bypasses. Fix and
+retest only the failed step. Commit, integration, hosting and release stay separate.
 
 ## Proposed sequence
 
@@ -594,6 +786,7 @@ Progress and approvals stay in Connect. These are design steps, not a second tas
 | Settle F1's narrow contract | C17, C13, C10 | Current baseline, one write/store path and Codex destination, request shape, public A/B source and isolated test setup; code scope approved |
 | Prove the bare-bones flow | F1, parts of C17/C13/C10 | Existing-app dev build; web install A and update B for one unpinned skill; apply Connect's short F1 checks; no full migration or inventory project |
 | Prove a small multi-source sample | F2, parts of C13/C10 | Three isolated installs, one independent update, name-collision refusal and fresh Codex discovery; no broad coverage claim |
+| Prove setup and retry incrementally | F3, C10 then C5/C17 | F3a local retry/intent proof, then separately approved F3b signed download/open/return/retry; no preinstalled-build shortcut |
 | Harden and verify setup for a controlled pilot | C17, C13, C10, C5, C16, G1-G3 | Wider source coverage, lifecycle, setup/retry, signing, upgrades, security/failure checks and measured user flow |
 | Roll out to existing users separately | C5, C1-C3, relevant G1-G3 | Preserved existing-user data and behavior, agreed web discovery replacements and explicit release approval |
 | Add connected management | C9, C8, C6-C7, C14, C18, C11, C15 | Device/account isolation, truthful inventory, queued requests, Sets and explicit management; private rollout separately meets G4 |
@@ -649,8 +842,11 @@ F1 step 1 implements the approved narrow answers to 1, 3 and the request part of
 6. Login onboarding/defaults and existing-user transition messaging; preserve
    explicit opt-outs and distinguish Quit from disabling future login startup.
 
-Next: a separately approved first-time setup/retry plan after the local F2
-checkpoint. F2's automated and user-run acceptance passed locally; evidence is
+Next: separately plan F3b candidate packaging/distribution and real first-time
+setup. F3a local acceptance, approved cleanup and scoped review passed;
+[results](archive/newmac-f3a-2026-10-09/README.md) are saved for this checkpoint.
+F2 is committed
+as `f7a964b0`. Its automated and user-run acceptance passed locally; evidence is
 saved, scoped review passed and approved cleanup is complete. F1 is committed
 as `33b659e6`; its earlier scoped review and cleanup are complete.
 [F1 evidence](archive/newmac-f1-2026-10-09/README.md) retains cancellation,

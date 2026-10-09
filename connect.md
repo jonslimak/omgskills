@@ -22,11 +22,20 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- **Next: plan first-time setup and retry.** The F2 checkpoint review passed;
-  its scoped local commit is approved. A new implementation plan needs separate
-  approval. Preserve the proof below; next product work is
-  the download/open/return/retry flow and signed pilot setup, not another replay
-  of these installs. Broader coverage, migration and release gates stay open.
+- **Next: plan F3b signed first-time setup.**
+  [F3a local acceptance](archive/newmac-f3a-2026-10-09/README.md) passed:
+  refresh retained the request, cancellation wrote nothing, retry installed the
+  exact version, Codex discovered it and repeat changed nothing. Also passed:
+  249 portal tests, TypeScript, 34 native regressions and both production builds.
+  Results are saved; approved cleanup and scoped review passed. Source, tests
+  and evidence belong to this local F3a checkpoint. Separately plan/approve
+  F3b's signed setup test in a clean environment. A preinstalled Debug build
+  cannot prove first-time setup. Broader coverage, migration and release gates
+  stay open. No push, deployment or release is authorized by this checkpoint.
+- [~] **F3: First-time setup and retry (C10/C5/C17).** F3a automated and user-run
+  checks passed locally on 2026-10-09. F3b signed setup has not run.
+  Keep the native result authoritative, timeout state unknown, and public
+  installs account-free.
 - [x] **F2: Three-source local install/update proof.** Local acceptance passed
   2026-10-09 for Humanizer, Writing Guidelines and SEO Audit: three installs,
   repeat no-op, independent Humanizer update and fresh Codex discovery before
@@ -34,8 +43,8 @@ This consolidation changes documentation only, not implementation or release sta
   automated tests. Evidence is saved and approved cleanup is complete; see
   [results](archive/newmac-f2-2026-10-09/README.md) and the
   [implementation plan](newmac.md#f2-implementation-plan). Source, tests and
-  evidence belong to this local F2 checkpoint. No full-catalog, distribution
-  or production-activation claim.
+  evidence are committed locally as `f7a964b0` on `codex/newmac-f1-core`.
+  No full-catalog, distribution or production-activation claim.
 - **F1 checkpoint complete locally.**
   The [implementation plan](newmac.md#f1-implementation-plan) and short local
   acceptance passed on 2026-10-09: Cancel A/B, install A, repeat no-op, local-edit
@@ -57,6 +66,7 @@ This consolidation changes documentation only, not implementation or release sta
 | --- | --- | --- |
 | F1: Local functional proof | One public skill installed and updated from the web through the existing-app codebase | Isolated development build; no release or broad safety/coverage claim |
 | F2: Small multi-source proof (passed locally) | Three independent public installs, repeat no-op, one reviewed update, Codex discovery and automated collision refusal | Same isolated local flow; no full-catalog, fresh-setup or release claim |
+| F3: Setup/retry (F3a passed locally) | F3a refresh, cancel, retry/install, Codex discovery and repeat no-op passed. F3b signed download/open remains planned | Separate approval for signed packaging/distribution; no false presence/success or full G1/G2 claim |
 | Controlled public-skill pilot | Setup/retry, signed build, wider source coverage and release safeguards work for approved testers | C5/C13/C16 and applicable G1-G3; separate test/distribution approval |
 | Existing-user rollout | The replacement can update existing users without losing data or required capabilities | Full relevant G1-G3, migration evidence, agreed C1-C3 web parity and separate release approval; G4 before private activation |
 
@@ -451,10 +461,13 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
   F1 starts in a local preview of its skill-detail view; static-page expansion
   is a later decision, not another first-slice entry point.
   Public content needs no account pairing or uploaded inventory.
-- [ ] **First-time setup and retry (C5/C10, after F1).** Download the signed
-  app, install/open it, accept normal prompts, return to the original page and
-  retry. Keep the intended skill/agent but revalidate the request. A timeout is
-  unknown state, not proof the app is absent. F1 uses a preinstalled dev build.
+- [~] **First-time setup and retry (C5/C10/C17, F3).** Follow the
+  [stage-separated plan](newmac.md#f3-first-time-setup-and-retry-plan): local
+  intent/retry UX first, then the actual signed download/open/return/retry path.
+  Keep the intended skill/agent but revalidate the request. A timeout is unknown
+  state, not proof the app is absent. F3a automated and user-run acceptance
+  passed locally; F3b remains pending. F1/F2/F3a used a preinstalled dev build,
+  not clean-user setup.
 - [~] **Generalize helper targets, not just the allowlist.** F1/F2's existing-app
   path derives per-source destinations and ownership; three coexisting sources,
   independent update and automated same-name refusal passed locally. The older
@@ -519,7 +532,7 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
 | C7 | Inventory scan + upload | C6, C8, C9; identity-data decision | Reuse scanner/resolver/uploader without assuming full-catalog loading disappears; device-scoped uploads; activation separately approved; outside F1 |
 | C8 | Per-device inventory model and migration | C9 | Device-scoped replacement/reconciliation; existing rows and legacy-client compatibility |
 | C9 | Shared reporting contract | C13 identity contract | Define before C8/C7; extend local identity with device, ownership and freshness |
-| C10 | Public web install/update (H2) | C17/C13 contracts for F1; C5 before distribution | F1 uses `/app/` detail and an app-local result; later setup/retry and verified web result. Signed-out links need no C6-C9; signed-in queued delivery uses C18 |
+| C10 | Public web install/update (H2) | C17/C13 contracts for F1; C5 before distribution | F1/F2 local detail/native result passed; F3a local setup/retry acceptance passed. Signed setup and verified web result remain later work. Signed-out links need no C6-C9; signed-in queued delivery uses C18 |
 | C11 | Helper Set install and subscription updates | C10; C6 for private access | Public first; mixed items, reviewed removals and local protection; C14 for web inventory status |
 | C12 | Retire Mac dependencies safely | replacement flows and migration evidence | C7/C14 reporting, C10/C11/C15 management; preserve supported clients and memberships |
 | C13 | General catalog/target identity | C17 write/store and destination contract | F2 passed three unpinned sources, independent update and automated collision refusal locally. Broader source/restore coverage remains open; not the same as matching existing local inventory |
@@ -543,22 +556,26 @@ component to finish. C5 is a distribution gate, not a cyclic build prerequisite.
    Mac writer, store, destination and review contract.
 2. **Preserve the F2 checkpoint.** Local acceptance, scoped review and cleanup passed;
    results cover three real installs, no-op, independent update and Codex
-   discovery, plus automated collision refusal. The scoped local commit is
-   approved; integration, push, deployment and release remain separate.
+   discovery, plus automated collision refusal. Local commit `f7a964b0` is
+   complete; integration, push, deployment and release remain separate.
    Do not repeat the full F1 manual matrix. C13 stays partial.
-3. **Harden for a controlled pilot.** Use F2's findings to expand C13 coverage,
-   complete C10's setup fallback and C17 lifecycle, then C5/G1/G2 signed setup/upgrades and C16
+3. **Preserve F3a, then plan signed setup.** Local acceptance, approved cleanup
+   and scoped review passed. Separately scope the F3b signed
+   candidate and clean-user setup. Do not enable a download for the older public
+   app or count local simulation as signed acceptance.
+4. **Harden for a controlled pilot.** Use F2/F3 findings to expand C13 coverage,
+   complete C17 lifecycle, then remaining C5/G1/G2 signed setup/upgrades and C16
    measurement. Retain security and failure checks here; do not erase them.
-4. **Pilot, then separately approve existing-user rollout.** G3 verifies the
+5. **Pilot, then separately approve existing-user rollout.** G3 verifies the
    real public flow. Broad rollout also needs migration evidence and agreed
    C1-C3 discovery replacements; local proof is not permission to ship. Broader
    inventory/private work need not block the public install pilot.
-5. **Add device-aware reporting and queued delivery.** C9, then C8/C6, then
+6. **Add device-aware reporting and queued delivery.** C9, then C8/C6, then
    C7/C14; C18 follows device auth and C17. Prove account/device isolation,
    revocation, duplicate-request refusal, stale inventory and failure reporting.
-6. **Broader management and Sets.** C15/C11 add explicit uninstall, another-agent
+7. **Broader management and Sets.** C15/C11 add explicit uninstall, another-agent
    installs, snapshots and subscriptions. Private access and rollout require G4.
-7. **Retire old surfaces last (C12).** Preserve supported users and memberships;
+8. **Retire old surfaces last (C12).** Preserve supported users and memberships;
    remove obsolete UI separately from APIs, credentials, stores or hosted assets.
    Optional C4 and the deferred backlog are not public-MVP blockers.
 
@@ -671,6 +688,35 @@ store already support source-specific identity; the preview link and revision
 picker are fixture-specific. Plan only: fixture selection and live availability
 remain preflight work. Keep current review/package limits and record exclusions;
 three passing sources cannot establish broad catalog coverage or rate capacity.
+
+2026-10-09: Recorded the F2 local commit `f7a964b0` and drafted F3 in `newmac.md`
+from that source baseline. Separate local setup/retry UX from signed clean-user
+setup: the current assembler pre-registers an ad-hoc Debug app and pre-creates
+its temporary root, so it cannot prove download/first launch. F3 implementation,
+signing, hosting and test execution still need approval. Docs only; no runtime,
+app, credential, public download, feed, deployment or release changed.
+
+2026-10-09: User approved F3a implementation. Added the preview-only intent/retry
+flow and disabled download, with the old public-download CTA suppressed only
+inside this test. Automated web/native checks and production exclusion passed;
+one isolated app/server is prepared on port 5198. No browser/manual acceptance,
+skill install, signing submission, commit, public deployment or release claimed.
+F3b remains separately scoped. See New Mac for the exact test link and receipts.
+
+2026-10-09: F3a user-run acceptance subsequently passed: refresh persistence,
+cancel with no writes, exact Writing Guidelines install, fresh isolated Codex
+discovery and repeat no-op independently verified. See
+[F3a results](archive/newmac-f3a-2026-10-09/README.md). Evidence is saved; cleanup
+and scoped review/commit are pending separate approval. F3b has not run; no
+signed setup, production deployment or release claim.
+
+2026-10-09: Approved F3a cleanup and scoped review completed. Removed only the
+named test root/bundle, stopped its app/server and unregistered its test handler.
+The public app binary/handler, other app processes and unrelated preview were
+unchanged. Portal tests (249), TypeScript and both production exclusion builds
+passed again; six source hashes match acceptance. No blocking findings. See
+[cleanup and review evidence](archive/newmac-f3a-2026-10-09/README.md).
+This local checkpoint does not authorize integration, push, deployment or release.
 
 ## Open questions
 
