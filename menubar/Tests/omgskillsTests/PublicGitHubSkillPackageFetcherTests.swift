@@ -238,17 +238,20 @@ struct LocalGitPackageRepository: Sendable {
     let repositoryRoot: URL
     let coordinates: SkillPackageCoordinates
     let originalSkillData: Data
+    let packagePath: String
 
     init(root: URL = FileManager.default.temporaryDirectory
-        .appendingPathComponent("omgskills-git-fixture-\(UUID().uuidString)", isDirectory: true)) throws {
+        .appendingPathComponent("omgskills-git-fixture-\(UUID().uuidString)", isDirectory: true),
+         packagePath: String = "skills/example", skillName: String = "example") throws {
         self.root = root
+        self.packagePath = packagePath
         temporaryRoot = root.appendingPathComponent("temporary", isDirectory: true)
         repositoryRoot = root.appendingPathComponent("repository", isDirectory: true)
         try FileManager.default.createDirectory(at: temporaryRoot, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: repositoryRoot, withIntermediateDirectories: true)
 
         _ = try Self.git(["init", "--quiet", repositoryRoot.path])
-        let skillRoot = repositoryRoot.appendingPathComponent("skills/example", isDirectory: true)
+        let skillRoot = packagePath == "." ? repositoryRoot : repositoryRoot.appendingPathComponent(packagePath, isDirectory: true)
         let references = skillRoot.appendingPathComponent("references", isDirectory: true)
         let scripts = skillRoot.appendingPathComponent("scripts", isDirectory: true)
         try FileManager.default.createDirectory(at: references, withIntermediateDirectories: true)
@@ -256,7 +259,7 @@ struct LocalGitPackageRepository: Sendable {
         originalSkillData = Data(
             """
             ---
-            name: example
+            name: \(skillName)
             description: Example package.
             ---
 
@@ -282,11 +285,11 @@ struct LocalGitPackageRepository: Sendable {
         let commitSha = try Self.gitText(["-C", repositoryRoot.path, "rev-parse", "HEAD"])
         let treeSha = try Self.gitText([
             "-C", repositoryRoot.path,
-            "rev-parse", "HEAD:skills/example"
+            "rev-parse", packagePath == "." ? "HEAD^{tree}" : "HEAD:\(packagePath)"
         ])
         let skillMdSha = try Self.gitText([
             "-C", repositoryRoot.path,
-            "hash-object", "skills/example/SKILL.md"
+            "hash-object", packagePath == "." ? "SKILL.md" : "\(packagePath)/SKILL.md"
         ])
         coordinates = SkillPackageCoordinates(
             commitSha: commitSha,
@@ -307,7 +310,7 @@ struct LocalGitPackageRepository: Sendable {
     }
 
     func advanceHead() throws {
-        let skill = repositoryRoot.appendingPathComponent("skills/example/SKILL.md")
+        let skill = repositoryRoot.appendingPathComponent(packagePath).appendingPathComponent("SKILL.md")
         try Data("---\nname: changed\ndescription: New head.\n---\n".utf8).write(to: skill)
         _ = try Self.git(["-C", repositoryRoot.path, "add", "."])
         _ = try Self.git([
@@ -316,6 +319,14 @@ struct LocalGitPackageRepository: Sendable {
             "-c", "user.email=tests@example.com",
             "commit", "--quiet", "-m", "new head"
         ])
+    }
+
+    func advanceReference() throws {
+        let reference = repositoryRoot.appendingPathComponent(packagePath).appendingPathComponent("references/info.txt")
+        try Data("updated companion file\n".utf8).write(to: reference)
+        _ = try Self.git(["-C", repositoryRoot.path, "add", "."])
+        _ = try Self.git(["-C", repositoryRoot.path, "-c", "user.name=omgskills-tests",
+            "-c", "user.email=tests@example.com", "commit", "--quiet", "-m", "companion update"])
     }
 
     private static func gitText(_ arguments: [String]) throws -> String {

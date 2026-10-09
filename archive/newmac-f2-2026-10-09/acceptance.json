@@ -1,0 +1,1145 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-09",
+  "scope": "F2 selected three-source isolated public install/update acceptance; not catalog-wide or release acceptance",
+  "status": "passed; approved cleanup complete",
+  "cleanup": { "status": "complete", "receipt": "cleanup.json" },
+  "baseCommit": "33b659e6",
+  "branch": "codex/newmac-f1-core",
+  "f2Changes": "uncommitted",
+  "testRoot": "/private/tmp/omgskills-f1-hl5alh",
+  "app": "/Users/jonslimak/.codex/worktrees/newmac-f1-core/omgskills/menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-hl5alh/OMGSkills F1 Test.app",
+  "binarySHA256": "f938b985d26d865cd00c5db5060b5797ae2998f87c474a978472da476a12984a",
+  "publicExecutableSHA256": "34f3aa9b7a96766463f7e827e521e20a4282c3ff2f71bdbe2bec9b1bc44065b1",
+  "publicURLHandler": "/Applications/omgskills.app",
+  "operations": [
+    {
+      "operation": "install-humanizer-a",
+      "userReportedDone": true,
+      "verification": {
+        "passed": true,
+        "observedAt": "2026-10-09T15:23:48.448Z",
+        "skill": "humanizer",
+        "version": "A",
+        "fileCount": 14,
+        "totalBytes": 66106,
+        "commit": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+        "tree": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+        "link": "/tmp/omgskills-f1-hl5alh/managed/activations/f9421121ca205fa6883c1c7fad8122ce46a5ecca61f980173a7c0c3651852847/BDB87927-3C3B-48F3-89AA-0FE023557D88/content",
+        "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+        "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+        "provenance": {
+          "releaseId": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+          "targetRootIdentifier": "codex-user-global",
+          "installMode": "snapshot",
+          "catalogSkillId": "blader/humanizer",
+          "commitSha": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+          "targetAgent": "codex",
+          "installedAt": "2026-10-09T15:22:18Z",
+          "githubUrl": "https://github.com/blader/humanizer",
+          "targetScope": "user_global",
+          "skillMdSha": "19fc634208e8cc6ae55d4ff287152583216fd244",
+          "treeSha": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+          "sourceId": "github:blader/humanizer:.",
+          "sourceKind": "public_github"
+        },
+        "provenanceSha256": "90fe186da1ab5e51b8a522c99b5a85bd4f1e48db6423edc67ab4de3c57ab1e4e",
+        "provenanceModifiedAt": "2026-10-09T15:22:18.401Z",
+        "activationCount": 1,
+        "files": [
+          {
+            "path": ".claude-plugin/marketplace.json",
+            "blob": "259312e97cc3b6d84fab8556945d51a002c24858",
+            "bytes": 521,
+            "mode": "100644"
+          },
+          {
+            "path": ".claude-plugin/plugin.json",
+            "blob": "7c2c657ffb3edba76e1202a39d802753131dd695",
+            "bytes": 526,
+            "mode": "100644"
+          },
+          {
+            "path": ".cursor-plugin/plugin.json",
+            "blob": "a825c73bec4192a211326dd9b10ee5cffb386999",
+            "bytes": 388,
+            "mode": "100644"
+          },
+          {
+            "path": ".github/ISSUE_TEMPLATE/config.yml",
+            "blob": "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+            "bytes": 393,
+            "mode": "100644"
+          },
+          {
+            "path": ".github/ISSUE_TEMPLATE/new-pattern.yml",
+            "blob": "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+            "bytes": 681,
+            "mode": "100644"
+          },
+          {
+            "path": ".github/ISSUE_TEMPLATE/rewrite-problem.yml",
+            "blob": "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+            "bytes": 1286,
+            "mode": "100644"
+          },
+          {
+            "path": ".github/workflows/validate.yml",
+            "blob": "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+            "bytes": 815,
+            "mode": "100644"
+          },
+          {
+            "path": "AGENTS.md",
+            "blob": "5b170fd02364e3c088897a2b417c4226a533244e",
+            "bytes": 3439,
+            "mode": "100644"
+          },
+          {
+            "path": "agents/openai.yaml",
+            "blob": "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+            "bytes": 201,
+            "mode": "100644"
+          },
+          {
+            "path": "CHANGELOG.md",
+            "blob": "77738df202dcedbf4cf599d624398fcd9198269b",
+            "bytes": 5830,
+            "mode": "100644"
+          },
+          {
+            "path": "LICENSE",
+            "blob": "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+            "bytes": 1066,
+            "mode": "100644"
+          },
+          {
+            "path": "README.md",
+            "blob": "bf650665e14220a4c7841f049cd00c275155466a",
+            "bytes": 13194,
+            "mode": "100644"
+          },
+          {
+            "path": "scripts/validate-package.py",
+            "blob": "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+            "bytes": 5418,
+            "mode": "100755"
+          },
+          {
+            "path": "SKILL.md",
+            "blob": "19fc634208e8cc6ae55d4ff287152583216fd244",
+            "bytes": 32348,
+            "mode": "100644"
+          }
+        ]
+      }
+    },
+    {
+      "operation": "install-writing-guidelines",
+      "userReportedDone": true,
+      "verification": {
+        "passed": true,
+        "observedAt": "2026-10-09T15:26:03.344Z",
+        "unchanged": [
+          "humanizer"
+        ],
+        "snapshots": [
+          {
+            "skill": "humanizer",
+            "fileCount": 14,
+            "totalBytes": 66106,
+            "commit": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+            "tree": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/f9421121ca205fa6883c1c7fad8122ce46a5ecca61f980173a7c0c3651852847/BDB87927-3C3B-48F3-89AA-0FE023557D88/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+            "provenance": {
+              "releaseId": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+              "targetRootIdentifier": "codex-user-global",
+              "installMode": "snapshot",
+              "catalogSkillId": "blader/humanizer",
+              "commitSha": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+              "targetAgent": "codex",
+              "installedAt": "2026-10-09T15:22:18Z",
+              "githubUrl": "https://github.com/blader/humanizer",
+              "targetScope": "user_global",
+              "skillMdSha": "19fc634208e8cc6ae55d4ff287152583216fd244",
+              "treeSha": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+              "sourceId": "github:blader/humanizer:.",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "90fe186da1ab5e51b8a522c99b5a85bd4f1e48db6423edc67ab4de3c57ab1e4e",
+            "provenanceModifiedAt": "2026-10-09T15:22:18.401Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": ".claude-plugin/marketplace.json",
+                "blob": "259312e97cc3b6d84fab8556945d51a002c24858",
+                "bytes": 521,
+                "mode": "100644"
+              },
+              {
+                "path": ".claude-plugin/plugin.json",
+                "blob": "7c2c657ffb3edba76e1202a39d802753131dd695",
+                "bytes": 526,
+                "mode": "100644"
+              },
+              {
+                "path": ".cursor-plugin/plugin.json",
+                "blob": "a825c73bec4192a211326dd9b10ee5cffb386999",
+                "bytes": 388,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/config.yml",
+                "blob": "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+                "bytes": 393,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/new-pattern.yml",
+                "blob": "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+                "bytes": 681,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/rewrite-problem.yml",
+                "blob": "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+                "bytes": 1286,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/workflows/validate.yml",
+                "blob": "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+                "bytes": 815,
+                "mode": "100644"
+              },
+              {
+                "path": "AGENTS.md",
+                "blob": "5b170fd02364e3c088897a2b417c4226a533244e",
+                "bytes": 3439,
+                "mode": "100644"
+              },
+              {
+                "path": "agents/openai.yaml",
+                "blob": "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+                "bytes": 201,
+                "mode": "100644"
+              },
+              {
+                "path": "CHANGELOG.md",
+                "blob": "77738df202dcedbf4cf599d624398fcd9198269b",
+                "bytes": 5830,
+                "mode": "100644"
+              },
+              {
+                "path": "LICENSE",
+                "blob": "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+                "bytes": 1066,
+                "mode": "100644"
+              },
+              {
+                "path": "README.md",
+                "blob": "bf650665e14220a4c7841f049cd00c275155466a",
+                "bytes": 13194,
+                "mode": "100644"
+              },
+              {
+                "path": "scripts/validate-package.py",
+                "blob": "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+                "bytes": 5418,
+                "mode": "100755"
+              },
+              {
+                "path": "SKILL.md",
+                "blob": "19fc634208e8cc6ae55d4ff287152583216fd244",
+                "bytes": 32348,
+                "mode": "100644"
+              }
+            ]
+          },
+          {
+            "skill": "writing-guidelines",
+            "fileCount": 1,
+            "totalBytes": 1233,
+            "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+            "tree": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/82D0EA87-04FF-4B44-8783-2757CF55BE3B/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "provenance": {
+              "treeSha": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+              "skillMdSha": "63facf310252a990d154bed12b3dcdd295ba771a",
+              "commitSha": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "installMode": "snapshot",
+              "targetRootIdentifier": "codex-user-global",
+              "githubUrl": "https://github.com/vercel-labs/agent-skills",
+              "sourceId": "github:vercel-labs/agent-skills:skills/writing-guidelines",
+              "targetScope": "user_global",
+              "installedAt": "2026-10-09T15:25:19Z",
+              "targetAgent": "codex",
+              "releaseId": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "catalogSkillId": "vercel-labs/agent-skills:skills/writing-guidelines",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "c79a84a2e9494bacf4f09d187fd1b086ec71becd1b2ea87860347cbca85acba7",
+            "provenanceModifiedAt": "2026-10-09T15:25:19.642Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": "SKILL.md",
+                "blob": "63facf310252a990d154bed12b3dcdd295ba771a",
+                "bytes": 1233,
+                "mode": "100644"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "operation": "install-seo-audit",
+      "userReportedDone": true,
+      "verification": {
+        "passed": true,
+        "observedAt": "2026-10-09T15:28:05.806Z",
+        "unchanged": [
+          "humanizer",
+          "writing-guidelines"
+        ],
+        "snapshots": [
+          {
+            "skill": "humanizer",
+            "fileCount": 14,
+            "totalBytes": 66106,
+            "commit": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+            "tree": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/f9421121ca205fa6883c1c7fad8122ce46a5ecca61f980173a7c0c3651852847/BDB87927-3C3B-48F3-89AA-0FE023557D88/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+            "provenance": {
+              "releaseId": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+              "targetRootIdentifier": "codex-user-global",
+              "installMode": "snapshot",
+              "catalogSkillId": "blader/humanizer",
+              "commitSha": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+              "targetAgent": "codex",
+              "installedAt": "2026-10-09T15:22:18Z",
+              "githubUrl": "https://github.com/blader/humanizer",
+              "targetScope": "user_global",
+              "skillMdSha": "19fc634208e8cc6ae55d4ff287152583216fd244",
+              "treeSha": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+              "sourceId": "github:blader/humanizer:.",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "90fe186da1ab5e51b8a522c99b5a85bd4f1e48db6423edc67ab4de3c57ab1e4e",
+            "provenanceModifiedAt": "2026-10-09T15:22:18.401Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": ".claude-plugin/marketplace.json",
+                "blob": "259312e97cc3b6d84fab8556945d51a002c24858",
+                "bytes": 521,
+                "mode": "100644"
+              },
+              {
+                "path": ".claude-plugin/plugin.json",
+                "blob": "7c2c657ffb3edba76e1202a39d802753131dd695",
+                "bytes": 526,
+                "mode": "100644"
+              },
+              {
+                "path": ".cursor-plugin/plugin.json",
+                "blob": "a825c73bec4192a211326dd9b10ee5cffb386999",
+                "bytes": 388,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/config.yml",
+                "blob": "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+                "bytes": 393,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/new-pattern.yml",
+                "blob": "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+                "bytes": 681,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/rewrite-problem.yml",
+                "blob": "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+                "bytes": 1286,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/workflows/validate.yml",
+                "blob": "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+                "bytes": 815,
+                "mode": "100644"
+              },
+              {
+                "path": "AGENTS.md",
+                "blob": "5b170fd02364e3c088897a2b417c4226a533244e",
+                "bytes": 3439,
+                "mode": "100644"
+              },
+              {
+                "path": "agents/openai.yaml",
+                "blob": "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+                "bytes": 201,
+                "mode": "100644"
+              },
+              {
+                "path": "CHANGELOG.md",
+                "blob": "77738df202dcedbf4cf599d624398fcd9198269b",
+                "bytes": 5830,
+                "mode": "100644"
+              },
+              {
+                "path": "LICENSE",
+                "blob": "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+                "bytes": 1066,
+                "mode": "100644"
+              },
+              {
+                "path": "README.md",
+                "blob": "bf650665e14220a4c7841f049cd00c275155466a",
+                "bytes": 13194,
+                "mode": "100644"
+              },
+              {
+                "path": "scripts/validate-package.py",
+                "blob": "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+                "bytes": 5418,
+                "mode": "100755"
+              },
+              {
+                "path": "SKILL.md",
+                "blob": "19fc634208e8cc6ae55d4ff287152583216fd244",
+                "bytes": 32348,
+                "mode": "100644"
+              }
+            ]
+          },
+          {
+            "skill": "writing-guidelines",
+            "fileCount": 1,
+            "totalBytes": 1233,
+            "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+            "tree": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/82D0EA87-04FF-4B44-8783-2757CF55BE3B/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "provenance": {
+              "treeSha": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+              "skillMdSha": "63facf310252a990d154bed12b3dcdd295ba771a",
+              "commitSha": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "installMode": "snapshot",
+              "targetRootIdentifier": "codex-user-global",
+              "githubUrl": "https://github.com/vercel-labs/agent-skills",
+              "sourceId": "github:vercel-labs/agent-skills:skills/writing-guidelines",
+              "targetScope": "user_global",
+              "installedAt": "2026-10-09T15:25:19Z",
+              "targetAgent": "codex",
+              "releaseId": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "catalogSkillId": "vercel-labs/agent-skills:skills/writing-guidelines",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "c79a84a2e9494bacf4f09d187fd1b086ec71becd1b2ea87860347cbca85acba7",
+            "provenanceModifiedAt": "2026-10-09T15:25:19.642Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": "SKILL.md",
+                "blob": "63facf310252a990d154bed12b3dcdd295ba771a",
+                "bytes": 1233,
+                "mode": "100644"
+              }
+            ]
+          },
+          {
+            "skill": "seo-audit",
+            "fileCount": 9,
+            "totalBytes": 79787,
+            "commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+            "tree": "7aa1a3602b909a511c92516da3d7d4d2b9c89159",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/5b8968871e12248369b0ef2b2c9c7e7f196c212f4a21cd823da9fb978ec4c22e/53B198E5-E3E7-48E7-8D3C-4B934A2ECA8E/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content",
+            "provenance": {
+              "treeSha": "7aa1a3602b909a511c92516da3d7d4d2b9c89159",
+              "skillMdSha": "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+              "commitSha": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+              "installMode": "snapshot",
+              "targetRootIdentifier": "codex-user-global",
+              "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+              "sourceId": "github:coreyhaines31/marketingskills:skills/seo-audit",
+              "targetScope": "user_global",
+              "installedAt": "2026-10-09T15:27:44Z",
+              "targetAgent": "codex",
+              "releaseId": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+              "catalogSkillId": "coreyhaines31/marketingskills:skills/seo-audit",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "ec397289b4fde1b6dc0cd21fa3c441e5b063c2f42f3fdf929d72e9c7741f3ee6",
+            "provenanceModifiedAt": "2026-10-09T15:27:44.667Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": "evals/evals.json",
+                "blob": "d569ae70cf4746f7a27e7808abbaea4878c27fd7",
+                "bytes": 15717,
+                "mode": "100644"
+              },
+              {
+                "path": "references/ai-writing-detection.md",
+                "blob": "cb67ece4135f4153575bbbdfbf722364babff61d",
+                "bytes": 6528,
+                "mode": "100644"
+              },
+              {
+                "path": "references/international-seo.md",
+                "blob": "6ba5f1f6804477f3f86aecabecc128fbe9083911",
+                "bytes": 14622,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo-pages-and-measurement.md",
+                "blob": "d49f0443e091c70e4778a4e33030a33d18a361a4",
+                "bytes": 4036,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo-profile-and-citations.md",
+                "blob": "d34b7e043cb7c4d2da114f04e986bd476a22d0c6",
+                "bytes": 3971,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo.md",
+                "blob": "c2636ada98809d6ed8db588040817adc332add5e",
+                "bytes": 7249,
+                "mode": "100644"
+              },
+              {
+                "path": "references/rankings-push.md",
+                "blob": "7883357f7425dd90a9ce8ba7c94a9105b4f7fda7",
+                "bytes": 4466,
+                "mode": "100644"
+              },
+              {
+                "path": "references/title-tags.md",
+                "blob": "5d5eac8002179ac5288f3b4bbd2aa35b3a409a42",
+                "bytes": 5533,
+                "mode": "100644"
+              },
+              {
+                "path": "SKILL.md",
+                "blob": "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+                "bytes": 17665,
+                "mode": "100644"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "operation": "repeat-writing-guidelines",
+      "userReportedDone": true,
+      "verification": {
+        "passed": true,
+        "observedAt": "2026-10-09T15:30:31.636Z",
+        "unchanged": [
+          "humanizer",
+          "writing-guidelines",
+          "seo-audit"
+        ],
+        "snapshots": [
+          {
+            "skill": "humanizer",
+            "fileCount": 14,
+            "totalBytes": 66106,
+            "commit": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+            "tree": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/f9421121ca205fa6883c1c7fad8122ce46a5ecca61f980173a7c0c3651852847/BDB87927-3C3B-48F3-89AA-0FE023557D88/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content",
+            "provenance": {
+              "releaseId": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+              "targetRootIdentifier": "codex-user-global",
+              "installMode": "snapshot",
+              "catalogSkillId": "blader/humanizer",
+              "commitSha": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+              "targetAgent": "codex",
+              "installedAt": "2026-10-09T15:22:18Z",
+              "githubUrl": "https://github.com/blader/humanizer",
+              "targetScope": "user_global",
+              "skillMdSha": "19fc634208e8cc6ae55d4ff287152583216fd244",
+              "treeSha": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+              "sourceId": "github:blader/humanizer:.",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "90fe186da1ab5e51b8a522c99b5a85bd4f1e48db6423edc67ab4de3c57ab1e4e",
+            "provenanceModifiedAt": "2026-10-09T15:22:18.401Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": ".claude-plugin/marketplace.json",
+                "blob": "259312e97cc3b6d84fab8556945d51a002c24858",
+                "bytes": 521,
+                "mode": "100644"
+              },
+              {
+                "path": ".claude-plugin/plugin.json",
+                "blob": "7c2c657ffb3edba76e1202a39d802753131dd695",
+                "bytes": 526,
+                "mode": "100644"
+              },
+              {
+                "path": ".cursor-plugin/plugin.json",
+                "blob": "a825c73bec4192a211326dd9b10ee5cffb386999",
+                "bytes": 388,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/config.yml",
+                "blob": "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+                "bytes": 393,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/new-pattern.yml",
+                "blob": "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+                "bytes": 681,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/rewrite-problem.yml",
+                "blob": "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+                "bytes": 1286,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/workflows/validate.yml",
+                "blob": "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+                "bytes": 815,
+                "mode": "100644"
+              },
+              {
+                "path": "AGENTS.md",
+                "blob": "5b170fd02364e3c088897a2b417c4226a533244e",
+                "bytes": 3439,
+                "mode": "100644"
+              },
+              {
+                "path": "agents/openai.yaml",
+                "blob": "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+                "bytes": 201,
+                "mode": "100644"
+              },
+              {
+                "path": "CHANGELOG.md",
+                "blob": "77738df202dcedbf4cf599d624398fcd9198269b",
+                "bytes": 5830,
+                "mode": "100644"
+              },
+              {
+                "path": "LICENSE",
+                "blob": "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+                "bytes": 1066,
+                "mode": "100644"
+              },
+              {
+                "path": "README.md",
+                "blob": "bf650665e14220a4c7841f049cd00c275155466a",
+                "bytes": 13194,
+                "mode": "100644"
+              },
+              {
+                "path": "scripts/validate-package.py",
+                "blob": "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+                "bytes": 5418,
+                "mode": "100755"
+              },
+              {
+                "path": "SKILL.md",
+                "blob": "19fc634208e8cc6ae55d4ff287152583216fd244",
+                "bytes": 32348,
+                "mode": "100644"
+              }
+            ]
+          },
+          {
+            "skill": "writing-guidelines",
+            "fileCount": 1,
+            "totalBytes": 1233,
+            "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+            "tree": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/82D0EA87-04FF-4B44-8783-2757CF55BE3B/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "provenance": {
+              "treeSha": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+              "skillMdSha": "63facf310252a990d154bed12b3dcdd295ba771a",
+              "commitSha": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "installMode": "snapshot",
+              "targetRootIdentifier": "codex-user-global",
+              "githubUrl": "https://github.com/vercel-labs/agent-skills",
+              "sourceId": "github:vercel-labs/agent-skills:skills/writing-guidelines",
+              "targetScope": "user_global",
+              "installedAt": "2026-10-09T15:25:19Z",
+              "targetAgent": "codex",
+              "releaseId": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "catalogSkillId": "vercel-labs/agent-skills:skills/writing-guidelines",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "c79a84a2e9494bacf4f09d187fd1b086ec71becd1b2ea87860347cbca85acba7",
+            "provenanceModifiedAt": "2026-10-09T15:25:19.642Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": "SKILL.md",
+                "blob": "63facf310252a990d154bed12b3dcdd295ba771a",
+                "bytes": 1233,
+                "mode": "100644"
+              }
+            ]
+          },
+          {
+            "skill": "seo-audit",
+            "fileCount": 9,
+            "totalBytes": 79787,
+            "commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+            "tree": "7aa1a3602b909a511c92516da3d7d4d2b9c89159",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/5b8968871e12248369b0ef2b2c9c7e7f196c212f4a21cd823da9fb978ec4c22e/53B198E5-E3E7-48E7-8D3C-4B934A2ECA8E/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content",
+            "provenance": {
+              "treeSha": "7aa1a3602b909a511c92516da3d7d4d2b9c89159",
+              "skillMdSha": "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+              "commitSha": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+              "installMode": "snapshot",
+              "targetRootIdentifier": "codex-user-global",
+              "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+              "sourceId": "github:coreyhaines31/marketingskills:skills/seo-audit",
+              "targetScope": "user_global",
+              "installedAt": "2026-10-09T15:27:44Z",
+              "targetAgent": "codex",
+              "releaseId": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+              "catalogSkillId": "coreyhaines31/marketingskills:skills/seo-audit",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "ec397289b4fde1b6dc0cd21fa3c441e5b063c2f42f3fdf929d72e9c7741f3ee6",
+            "provenanceModifiedAt": "2026-10-09T15:27:44.667Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": "evals/evals.json",
+                "blob": "d569ae70cf4746f7a27e7808abbaea4878c27fd7",
+                "bytes": 15717,
+                "mode": "100644"
+              },
+              {
+                "path": "references/ai-writing-detection.md",
+                "blob": "cb67ece4135f4153575bbbdfbf722364babff61d",
+                "bytes": 6528,
+                "mode": "100644"
+              },
+              {
+                "path": "references/international-seo.md",
+                "blob": "6ba5f1f6804477f3f86aecabecc128fbe9083911",
+                "bytes": 14622,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo-pages-and-measurement.md",
+                "blob": "d49f0443e091c70e4778a4e33030a33d18a361a4",
+                "bytes": 4036,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo-profile-and-citations.md",
+                "blob": "d34b7e043cb7c4d2da114f04e986bd476a22d0c6",
+                "bytes": 3971,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo.md",
+                "blob": "c2636ada98809d6ed8db588040817adc332add5e",
+                "bytes": 7249,
+                "mode": "100644"
+              },
+              {
+                "path": "references/rankings-push.md",
+                "blob": "7883357f7425dd90a9ce8ba7c94a9105b4f7fda7",
+                "bytes": 4466,
+                "mode": "100644"
+              },
+              {
+                "path": "references/title-tags.md",
+                "blob": "5d5eac8002179ac5288f3b4bbd2aa35b3a409a42",
+                "bytes": 5533,
+                "mode": "100644"
+              },
+              {
+                "path": "SKILL.md",
+                "blob": "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+                "bytes": 17665,
+                "mode": "100644"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "operation": "update-humanizer-b",
+      "userReportedDone": true,
+      "verification": {
+        "passed": true,
+        "observedAt": "2026-10-09T15:31:17.661Z",
+        "unchanged": [
+          "writing-guidelines",
+          "seo-audit"
+        ],
+        "changed": [
+          "CHANGELOG.md",
+          "README.md"
+        ],
+        "snapshots": [
+          {
+            "skill": "humanizer",
+            "fileCount": 14,
+            "totalBytes": 65888,
+            "commit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+            "tree": "8ed37b6d1d98a0bbdb599d0399a4a2185eb8fa03",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/f9421121ca205fa6883c1c7fad8122ce46a5ecca61f980173a7c0c3651852847/828AE160-34B1-4E8C-B3B1-22A8726C6443/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/c3410e19eabb895dde33ff4ae3f55044c93ac2e2e44fb74db61f65aed31a265f/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/c3410e19eabb895dde33ff4ae3f55044c93ac2e2e44fb74db61f65aed31a265f/content",
+            "provenance": {
+              "targetScope": "user_global",
+              "githubUrl": "https://github.com/blader/humanizer",
+              "treeSha": "8ed37b6d1d98a0bbdb599d0399a4a2185eb8fa03",
+              "installedAt": "2026-10-09T15:30:55Z",
+              "commitSha": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+              "targetRootIdentifier": "codex-user-global",
+              "sourceId": "github:blader/humanizer:.",
+              "releaseId": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+              "targetAgent": "codex",
+              "skillMdSha": "19fc634208e8cc6ae55d4ff287152583216fd244",
+              "catalogSkillId": "blader/humanizer",
+              "sourceKind": "public_github",
+              "installMode": "snapshot"
+            },
+            "provenanceSha256": "10aa7181ec465b1ff32b1bae95ae935b4421f47d2ebd1040a601a3ef2644a9a1",
+            "provenanceModifiedAt": "2026-10-09T15:30:55.873Z",
+            "activationCount": 2,
+            "files": [
+              {
+                "path": ".claude-plugin/marketplace.json",
+                "blob": "259312e97cc3b6d84fab8556945d51a002c24858",
+                "bytes": 521,
+                "mode": "100644"
+              },
+              {
+                "path": ".claude-plugin/plugin.json",
+                "blob": "7c2c657ffb3edba76e1202a39d802753131dd695",
+                "bytes": 526,
+                "mode": "100644"
+              },
+              {
+                "path": ".cursor-plugin/plugin.json",
+                "blob": "a825c73bec4192a211326dd9b10ee5cffb386999",
+                "bytes": 388,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/config.yml",
+                "blob": "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+                "bytes": 393,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/new-pattern.yml",
+                "blob": "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+                "bytes": 681,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/ISSUE_TEMPLATE/rewrite-problem.yml",
+                "blob": "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+                "bytes": 1286,
+                "mode": "100644"
+              },
+              {
+                "path": ".github/workflows/validate.yml",
+                "blob": "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+                "bytes": 815,
+                "mode": "100644"
+              },
+              {
+                "path": "AGENTS.md",
+                "blob": "5b170fd02364e3c088897a2b417c4226a533244e",
+                "bytes": 3439,
+                "mode": "100644"
+              },
+              {
+                "path": "agents/openai.yaml",
+                "blob": "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+                "bytes": 201,
+                "mode": "100644"
+              },
+              {
+                "path": "CHANGELOG.md",
+                "blob": "f84b9f4ad2c9bfcf2a3d38b258269033163f807c",
+                "bytes": 5922,
+                "mode": "100644"
+              },
+              {
+                "path": "LICENSE",
+                "blob": "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+                "bytes": 1066,
+                "mode": "100644"
+              },
+              {
+                "path": "README.md",
+                "blob": "22594fa2688ebb53dde0a54719a943721d31e9a7",
+                "bytes": 12884,
+                "mode": "100644"
+              },
+              {
+                "path": "scripts/validate-package.py",
+                "blob": "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+                "bytes": 5418,
+                "mode": "100755"
+              },
+              {
+                "path": "SKILL.md",
+                "blob": "19fc634208e8cc6ae55d4ff287152583216fd244",
+                "bytes": 32348,
+                "mode": "100644"
+              }
+            ]
+          },
+          {
+            "skill": "writing-guidelines",
+            "fileCount": 1,
+            "totalBytes": 1233,
+            "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+            "tree": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/82D0EA87-04FF-4B44-8783-2757CF55BE3B/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+            "provenance": {
+              "treeSha": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+              "skillMdSha": "63facf310252a990d154bed12b3dcdd295ba771a",
+              "commitSha": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "installMode": "snapshot",
+              "targetRootIdentifier": "codex-user-global",
+              "githubUrl": "https://github.com/vercel-labs/agent-skills",
+              "sourceId": "github:vercel-labs/agent-skills:skills/writing-guidelines",
+              "targetScope": "user_global",
+              "installedAt": "2026-10-09T15:25:19Z",
+              "targetAgent": "codex",
+              "releaseId": "063bee94c3f4df8453406c830b0a7df0f2860278",
+              "catalogSkillId": "vercel-labs/agent-skills:skills/writing-guidelines",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "c79a84a2e9494bacf4f09d187fd1b086ec71becd1b2ea87860347cbca85acba7",
+            "provenanceModifiedAt": "2026-10-09T15:25:19.642Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": "SKILL.md",
+                "blob": "63facf310252a990d154bed12b3dcdd295ba771a",
+                "bytes": 1233,
+                "mode": "100644"
+              }
+            ]
+          },
+          {
+            "skill": "seo-audit",
+            "fileCount": 9,
+            "totalBytes": 79787,
+            "commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+            "tree": "7aa1a3602b909a511c92516da3d7d4d2b9c89159",
+            "link": "/tmp/omgskills-f1-hl5alh/managed/activations/5b8968871e12248369b0ef2b2c9c7e7f196c212f4a21cd823da9fb978ec4c22e/53B198E5-E3E7-48E7-8D3C-4B934A2ECA8E/content",
+            "packageLink": "/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content",
+            "resolvedContent": "/private/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content",
+            "provenance": {
+              "treeSha": "7aa1a3602b909a511c92516da3d7d4d2b9c89159",
+              "skillMdSha": "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+              "commitSha": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+              "installMode": "snapshot",
+              "targetRootIdentifier": "codex-user-global",
+              "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+              "sourceId": "github:coreyhaines31/marketingskills:skills/seo-audit",
+              "targetScope": "user_global",
+              "installedAt": "2026-10-09T15:27:44Z",
+              "targetAgent": "codex",
+              "releaseId": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+              "catalogSkillId": "coreyhaines31/marketingskills:skills/seo-audit",
+              "sourceKind": "public_github"
+            },
+            "provenanceSha256": "ec397289b4fde1b6dc0cd21fa3c441e5b063c2f42f3fdf929d72e9c7741f3ee6",
+            "provenanceModifiedAt": "2026-10-09T15:27:44.667Z",
+            "activationCount": 1,
+            "files": [
+              {
+                "path": "evals/evals.json",
+                "blob": "d569ae70cf4746f7a27e7808abbaea4878c27fd7",
+                "bytes": 15717,
+                "mode": "100644"
+              },
+              {
+                "path": "references/ai-writing-detection.md",
+                "blob": "cb67ece4135f4153575bbbdfbf722364babff61d",
+                "bytes": 6528,
+                "mode": "100644"
+              },
+              {
+                "path": "references/international-seo.md",
+                "blob": "6ba5f1f6804477f3f86aecabecc128fbe9083911",
+                "bytes": 14622,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo-pages-and-measurement.md",
+                "blob": "d49f0443e091c70e4778a4e33030a33d18a361a4",
+                "bytes": 4036,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo-profile-and-citations.md",
+                "blob": "d34b7e043cb7c4d2da114f04e986bd476a22d0c6",
+                "bytes": 3971,
+                "mode": "100644"
+              },
+              {
+                "path": "references/local-seo.md",
+                "blob": "c2636ada98809d6ed8db588040817adc332add5e",
+                "bytes": 7249,
+                "mode": "100644"
+              },
+              {
+                "path": "references/rankings-push.md",
+                "blob": "7883357f7425dd90a9ce8ba7c94a9105b4f7fda7",
+                "bytes": 4466,
+                "mode": "100644"
+              },
+              {
+                "path": "references/title-tags.md",
+                "blob": "5d5eac8002179ac5288f3b4bbd2aa35b3a409a42",
+                "bytes": 5533,
+                "mode": "100644"
+              },
+              {
+                "path": "SKILL.md",
+                "blob": "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+                "bytes": 17665,
+                "mode": "100644"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "discovery": [
+    {
+      "passed": true,
+      "observedAt": "2026-10-09T15:29:32.515Z",
+      "errors": [],
+      "skills": [
+        {
+          "installedSkill": "humanizer",
+          "codexName": "humanizer:humanizer",
+          "enabled": true,
+          "scope": "user",
+          "path": "/private/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/070962e01453edc05ea1f74a9c009ee575c0a3acd4350237ae900ed255570ac1/content/SKILL.md",
+          "commit": "29deb74c89fc12d01c6eab433252c869ce08ad7b"
+        },
+        {
+          "installedSkill": "writing-guidelines",
+          "codexName": "writing-guidelines",
+          "enabled": true,
+          "scope": "user",
+          "path": "/private/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content/SKILL.md",
+          "commit": "063bee94c3f4df8453406c830b0a7df0f2860278"
+        },
+        {
+          "installedSkill": "seo-audit",
+          "codexName": "seo-audit",
+          "enabled": true,
+          "scope": "user",
+          "path": "/private/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content/SKILL.md",
+          "commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff"
+        }
+      ],
+      "modelCalls": 0,
+      "note": "Humanizer is namespaced by its own plugin metadata. Codex also generated bundled system skills only inside the isolated HOME."
+    },
+    {
+      "passed": true,
+      "observedAt": "2026-10-09T15:31:38.615Z",
+      "method": "skills/list",
+      "freshProcess": true,
+      "home": "/private/tmp/omgskills-f1-hl5alh/home",
+      "errors": [],
+      "skills": [
+        {
+          "installedSkill": "humanizer",
+          "codexName": "humanizer:humanizer",
+          "enabled": true,
+          "scope": "user",
+          "path": "/private/tmp/omgskills-f1-hl5alh/managed/packages/6e1e370d59b467b3fa37037a25d5f6fbf6dd2d65acfb49f64ab01f50f2455b58/c3410e19eabb895dde33ff4ae3f55044c93ac2e2e44fb74db61f65aed31a265f/content/SKILL.md",
+          "commit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8"
+        },
+        {
+          "installedSkill": "writing-guidelines",
+          "codexName": "writing-guidelines",
+          "enabled": true,
+          "scope": "user",
+          "path": "/private/tmp/omgskills-f1-hl5alh/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content/SKILL.md",
+          "commit": "063bee94c3f4df8453406c830b0a7df0f2860278"
+        },
+        {
+          "installedSkill": "seo-audit",
+          "codexName": "seo-audit",
+          "enabled": true,
+          "scope": "user",
+          "path": "/private/tmp/omgskills-f1-hl5alh/managed/packages/93d8501541004a2574290514657b9a09de6fe65c2043cbdf800a692d8d399aac/7c030c104cd24dea1839d0bcff0312448c4c139e517221f4494abea1692f90ea/content/SKILL.md",
+          "commit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff"
+        }
+      ],
+      "modelCalls": 0
+    }
+  ],
+  "automatedEvidence": {
+    "swiftTests": 116,
+    "swiftSuites": 16,
+    "portalTests": 232,
+    "assemblerTests": 2,
+    "realSourcePreflight": "passed; four Git fetches; see preflight.json",
+    "sameNameDifferentSource": "automated local Git fixture refusal with unchanged state",
+    "productionBuild": "passed with test flag deliberately set; fixture links and commits absent"
+  },
+  "verificationNotes": [
+    "Browser and native approvals were performed by the user; filesystem, provenance and fresh Codex discovery were checked locally.",
+    "The first read-only file check assumed activation content was a directory. The actual two-link target -> activation/content -> immutable package design was confirmed before verification; no installer changes were made.",
+    "The first discovery assertion expected the unqualified name humanizer. Fresh skills/list output showed humanizer:humanizer from the package's own plugin metadata, at the exact installed path, enabled with user scope and no errors. The check was corrected to validate path and namespacing, not to bypass missing discovery.",
+    "Codex generated bundled .system skills inside only the isolated HOME; no real credentials/config were copied and no model call or skill instruction execution occurred.",
+    "Latest was used for Writing Guidelines, SEO Audit and Humanizer B; Humanizer A and the repeat request used explicit recorded commits. Source commits matched the bounded preflight.",
+    "Complete manifests, file modes, package tree hashes, target links, provenance timestamps and activation counts were compared. Only Humanizer README.md and CHANGELOG.md changed during the update."
+  ],
+  "remainingGates": [
+    "broader source/rename/delete/rewrite coverage",
+    "rate limits and freshness",
+    "first-time setup and retry",
+    "signed merged-app setup and upgrades",
+    "migration and production gates G1-G4"
+  ],
+  "commitPushDeployRelease": "none authorized or performed in this acceptance/cleanup step"
+}

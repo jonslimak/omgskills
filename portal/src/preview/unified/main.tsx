@@ -17,7 +17,8 @@ import type { PortalSet } from "../../app/model";
 import type { GroupedSyncedSkill } from "../../synced-skill-grouping";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog } from "../../app/unified/use-public-catalog";
-import { f1InstallLink, isF1Preview } from "../../app/unified/public-install";
+import { isF1Preview } from "../../app/unified/public-install";
+import { f2Cases, f2CaseNavigation, f2InstallAction, f2NavigationSearch, readF2CaseKey } from "./f2-install";
 
 const f1Enabled = import.meta.env.DEV && isF1Preview(import.meta.env.DEV, import.meta.env.VITE_NEWMAC_F1, location.hostname);
 
@@ -32,12 +33,14 @@ function Preview() {
   const [scenario, setScenario] = useState<Scenario>("populated");
   const [data, setData] = useState(() => makeFixtures());
   const [signedIn, setSignedIn] = useState(!f1Enabled);
-  const [f1Revision, setF1Revision] = useState("A");
+  const [f2CaseKey, setF2CaseKey] = useState(() => readF2CaseKey(location.search));
   const [nav, setNav] = useState(() => parseNavigation(location.search));
   const [revision, setRevision] = useState(0);
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
+  const previewSearch = (next: Navigation, caseKey = f2CaseKey) =>
+    f1Enabled ? f2NavigationSearch(next, caseKey) : navigationSearch(next);
   const navigate = (next: Navigation, replace = false) => {
     const safe =
       !signedIn && !isDiscovery(next.view)
@@ -46,22 +49,32 @@ function Preview() {
     window.history[replace ? "replaceState" : "pushState"](
       {},
       "",
-      `${base}${navigationSearch(safe)}`,
+      `${base}${previewSearch(safe)}`,
     );
     setNav(safe);
   };
   useEffect(() => {
     const pop = () => {
       const next = parseNavigation(location.search);
+      const caseKey = readF2CaseKey(location.search);
+      setF2CaseKey(caseKey);
       if (!signedIn && !isDiscovery(next.view)) {
         const safe = { ...initialNavigation, view: "discover" as const };
-        history.replaceState({}, "", `${base}${navigationSearch(safe)}`);
+        history.replaceState({}, "", `${base}${f1Enabled ? f2NavigationSearch(safe, caseKey) : navigationSearch(safe)}`);
         setNav(safe);
       } else setNav(next);
     };
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
   }, [signedIn]);
+  function selectF2Case(caseKey: string) {
+    const next = f2CaseNavigation(caseKey);
+    if (!next) return;
+    history.pushState({}, "", `${base}${previewSearch(next, caseKey)}`);
+    setF2CaseKey(caseKey);
+    setLiveCatalog(true);
+    setNav(next);
+  }
   function reset(next: Scenario) {
     setScenario(next);
     setData(makeFixtures(next));
@@ -80,13 +93,13 @@ function Preview() {
             selected: nav.selected.startsWith("catalog:") ? nav.selected : "",
           }
         : { ...initialNavigation, view: "discover" as const };
-      history.replaceState({}, "", `${base}${navigationSearch(publicNav)}`);
+      history.replaceState({}, "", `${base}${previewSearch(publicNav)}`);
       setNav(publicNav);
     } else {
       const nextNav = isDiscovery(nav.view)
         ? nav
         : signedOutNav || initialNavigation;
-      history.replaceState({}, "", `${base}${navigationSearch(nextNav)}`);
+      history.replaceState({}, "", `${base}${previewSearch(nextNav)}`);
       setNav(nextNav);
     }
   }
@@ -109,8 +122,7 @@ function Preview() {
       nav={nav}
       navigate={navigate}
       signedIn={signedIn}
-      publicInstallLink={f1Enabled ? (skill) => f1InstallLink(skill,
-        f1Revision === "HEAD" ? undefined : (f1Revision === "A" ? import.meta.env.VITE_NEWMAC_F1_A : import.meta.env.VITE_NEWMAC_F1_B) || "") : undefined}
+      publicInstallAction={f1Enabled ? (skill) => f2InstallAction(skill, f2CaseKey) : undefined}
       onSession={session}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
@@ -177,10 +189,9 @@ function Preview() {
         <div className="ua-preview">
           <span>{liveCatalog ? "Local preview · live Discover · sample account" : "Local preview · sample data"}</span>
           <div>
-            {f1Enabled && <select aria-label="F1 revision" value={f1Revision} onChange={event => setF1Revision(event.target.value)}>
-              <option value="A">F1: Version A</option>
-              <option value="B">F1: Version B</option>
-              <option value="HEAD">F1: Latest</option>
+            {f1Enabled && <select aria-label="F2 test case" value={f2CaseKey} onChange={event => selectF2Case(event.target.value)}>
+              <option value="" disabled>F2: Choose a test case</option>
+              {f2Cases.map(item => <option key={item.key} value={item.key}>{item.label}</option>)}
             </select>}
             <select
               aria-label="Catalog data"

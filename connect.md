@@ -22,14 +22,28 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- [ ] **Decide the next integration/pilot slice after the F1 checkpoint.**
+- **Next: plan first-time setup and retry.** The F2 checkpoint review passed;
+  its scoped local commit is approved. A new implementation plan needs separate
+  approval. Preserve the proof below; next product work is
+  the download/open/return/retry flow and signed pilot setup, not another replay
+  of these installs. Broader coverage, migration and release gates stay open.
+- [x] **F2: Three-source local install/update proof.** Local acceptance passed
+  2026-10-09 for Humanizer, Writing Guidelines and SEO Audit: three installs,
+  repeat no-op, independent Humanizer update and fresh Codex discovery before
+  and after the update. Different-source/same-name refusal is covered by
+  automated tests. Evidence is saved and approved cleanup is complete; see
+  [results](archive/newmac-f2-2026-10-09/README.md) and the
+  [implementation plan](newmac.md#f2-implementation-plan). Source, tests and
+  evidence belong to this local F2 checkpoint. No full-catalog, distribution
+  or production-activation claim.
+- **F1 checkpoint complete locally.**
   The [implementation plan](newmac.md#f1-implementation-plan) and short local
   acceptance passed on 2026-10-09: Cancel A/B, install A, repeat no-op, local-edit
   refusal/restoration, reviewed B update and isolated Codex discovery of A and B.
-  Implementation is on `codex/newmac-f1-core`, based on `eb92e828`. The scoped
-  review passed and approved cleanup is complete; see the preserved
-  [F1 evidence](archive/newmac-f1-2026-10-09/README.md). Only F1 is complete,
-  not C17/C13/C10 or release readiness. Integration, push, deployment and release
+  Implementation is committed as `33b659e6` on `codex/newmac-f1-core`, based on
+  `eb92e828`. The scoped review passed and approved cleanup is complete; see the preserved
+  [F1 evidence](archive/newmac-f1-2026-10-09/README.md). Neither checkpoint
+  completes C17/C13/C10 or release readiness. Integration, push, deployment and release
   remain separate decisions; this checkpoint does not authorize them.
 - The prepared standalone `webwork-h14-d3-test.md` is **superseded as the next
   execution step**, not passed. Carry its valid acceptance checks to G1/G2 on
@@ -42,6 +56,7 @@ This consolidation changes documentation only, not implementation or release sta
 | Milestone | What it proves | Boundary |
 | --- | --- | --- |
 | F1: Local functional proof | One public skill installed and updated from the web through the existing-app codebase | Isolated development build; no release or broad safety/coverage claim |
+| F2: Small multi-source proof (passed locally) | Three independent public installs, repeat no-op, one reviewed update, Codex discovery and automated collision refusal | Same isolated local flow; no full-catalog, fresh-setup or release claim |
 | Controlled public-skill pilot | Setup/retry, signed build, wider source coverage and release safeguards work for approved testers | C5/C13/C16 and applicable G1-G3; separate test/distribution approval |
 | Existing-user rollout | The replacement can update existing users without losing data or required capabilities | Full relevant G1-G3, migration evidence, agreed C1-C3 web parity and separate release approval; G4 before private activation |
 
@@ -171,6 +186,44 @@ unregistering its test scheme and stopping port 5197. The regular app kept runni
 its URL handler and executable hash unchanged. This checkpoint includes no push,
 deployment or Sparkle release; see the archived evidence for exact paths/results.
 
+### F2 implementation and local acceptance, 2026-10-09
+
+This local checkpoint builds on `33b659e6`. The fixture-specific web link
+became validated source-to-request construction plus a development-only fixture
+policy. Exact case links survive refresh/back and show a disabled reason for
+missing, pinned or changed source metadata. No native installer or release
+configuration change was needed. Existing validation/consent checks remain.
+
+All three real packages and Humanizer's historical A passed the existing Swift
+fetcher/review limits. Humanizer's update changes README/changelog, not SKILL.md.
+116 Swift regression tests, 232 portal tests and 2 assembler tests passed;
+the opt-in real-source preflight passed separately. Production output excludes
+test links/revisions. Preserve [preflight, setup and acceptance evidence](archive/newmac-f2-2026-10-09/README.md).
+
+The user completed all five browser/native checks. Humanizer A's 14 files,
+Writing Guidelines' one file and SEO Audit's nine files matched full Git
+manifests, modes and provenance. The repeat request changed no files, links,
+records, timestamps or activation counts. Humanizer B changed only
+`CHANGELOG.md` and `README.md`; its activation count advanced from one to two,
+while both other installs remained identical. Fresh isolated Codex discovery
+before and after B found all three enabled user skills at the exact installed
+paths, without errors, login or model calls. Humanizer's own plugin metadata
+namespaces it as `humanizer:humanizer`; this was a verifier expectation correction,
+not an installer change.
+
+Acceptance snapshots were preserved and hash-verified in both checkouts before
+approved cleanup. Only `/private/tmp/omgskills-f1-hl5alh/` and its matching
+Debug test-bundle folder were removed; the exact test app was stopped and
+unregistered, and port 5197 stopped listening. The public app's process, URL
+handler and executable hash stayed unchanged; the other preview on port 5191
+was left running. See `cleanup.json` in the evidence folder.
+C13's broader coverage, setup and release gates remain open. Scoped review
+found no blocking issues; 117 Swift tests in 17 suites, 232 portal tests and
+two assembler tests passed on rerun. TypeScript and both standard and unified
+production builds passed, with test links/revisions absent even when preview
+flags were deliberately set. See the [review note](archive/newmac-f2-2026-10-09/REVIEW.md).
+This is a local checkpoint only; no push, deployment or release.
+
 ## Working rules
 
 - Plan and approve each slice: baseline, exact scope, contracts, risks, recovery,
@@ -240,7 +293,7 @@ Reported inventory is not proof that a device is online or remotely controllable
 | --- | --- | --- |
 | Unified `/app/` and public catalog | Recorded live in `appwork.md` | Source reviewed here; no fresh live check or production timing result |
 | Standalone helper | Signed/notarized and hosted (unlinked) per `webwork.md`; now an input to C17 | Existing safety and scoped Codex evidence retained; clean-account setup, signed upgrade and remaining acceptance gates still open |
-| Management-app-backed web install/update | Not implemented | C10/C13 and G3 must establish the complete flow |
+| Management-app-backed web install/update | Isolated F1/F2 flow passed; production flow incomplete | C10/C13 and G3 still require setup/retry, broader coverage and pilot acceptance |
 | Device-aware helper inventory and web management | Not implemented | Requires migration, isolation and end-to-end evidence |
 
 Helper-key backup/recovery is already complete per `webwork.md`. Hosting,
@@ -402,30 +455,33 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
   app, install/open it, accept normal prompts, return to the original page and
   retry. Keep the intended skill/agent but revalidate the request. A timeout is
   unknown state, not proof the app is absent. F1 uses a preinstalled dev build.
-- [ ] **Generalize helper targets, not just the allowlist.** The production
-  policy hardcodes `frontend-design`. Define safe per-skill destinations,
-  catalog/source identity, name-collision handling and independent update/restore
-  histories. Preserve ownership and local-edit protections. This is the local
-  installation contract; the later reporting contract extends it for the web.
+- [~] **Generalize helper targets, not just the allowlist.** F1/F2's existing-app
+  path derives per-source destinations and ownership; three coexisting sources,
+  independent update and automated same-name refusal passed locally. The older
+  standalone policy remains restricted. Broader target/restore coverage and
+  production policy are still open; preserve ownership and local-edit protections.
+  The later reporting contract extends this local contract for the web.
 - [~] **Codex destination policy (C17/C13).** F1 step 1 retains the app's
   `.codex/skills` default under the injected test home and refuses same-name
-  entries in `.agents/skills`. Broader migration/adoption and real Codex discovery
-  remain unproven; preserve recorded existing locations without moving files.
-- [ ] **Installation coverage and on-demand pinning (C13).** The October 8
+  entries in `.agents/skills`. F1/F2 verified actual Codex discovery in isolated
+  homes. Broader migration/adoption and existing-user compatibility remain
+  unproven; preserve recorded existing locations without moving files.
+- [~] **Installation coverage and on-demand pinning (C13).** The October 8
   deployment catalog has 515/51,133 entries with commit/tree/blob metadata;
   the standalone prototype has the further two-ID restriction. The existing
   Mac installer also has a legacy path without those precomputed pins.
   Triggering that same engine from the web does not inherently reduce coverage,
   but legacy installs do not automatically gain exact-diff/rollback guarantees.
-  Plan resolution of an exact version at request time, freeze it before approval,
-  and never silently substitute a later branch head. Prove representative
-  previously unpinned packages, path/name collisions, rate limits, renamed,
-  deleted and rewritten repositories, request counts and latency. Full-catalog
-  backfill is not a prerequisite of that design; broad coverage remains unproven.
-- [ ] **Exact-version handoff and honest results.** Bind the request to the
-  exact version resolved for the install review; any version advertised on the
-  page must match or require a new review. Today's prototype carries only an ID.
-  Retain local diff/approval checks. Cover missing-helper
+  F1/F2 resolve an exact version at request time and freeze it before approval;
+  three previously unpinned root/nested/companion packages passed the F2 sample,
+  with automated collision refusal. Never substitute a later branch head.
+  Wider packages, rate limits, renamed/deleted/rewritten repositories and
+  catalog-scale request/latency behavior remain unproven. Full-catalog backfill
+  is not a prerequisite of this design.
+- [~] **Exact-version handoff and honest results.** F1/F2 bind validated source
+  requests to a frozen native review and show the actual local result; the
+  browser only requests opening. Any version advertised on the page must match
+  or require a new review. Retain local diff/approval checks. Cover missing-helper
   setup and retry, unavailable pins, conflicts, cancellation and failures.
   A browser click or timeout proves neither helper presence nor installation.
   Show web success only with verified completion evidence; otherwise keep the
@@ -466,7 +522,7 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
 | C10 | Public web install/update (H2) | C17/C13 contracts for F1; C5 before distribution | F1 uses `/app/` detail and an app-local result; later setup/retry and verified web result. Signed-out links need no C6-C9; signed-in queued delivery uses C18 |
 | C11 | Helper Set install and subscription updates | C10; C6 for private access | Public first; mixed items, reviewed removals and local protection; C14 for web inventory status |
 | C12 | Retire Mac dependencies safely | replacement flows and migration evidence | C7/C14 reporting, C10/C11/C15 management; preserve supported clients and memberships |
-| C13 | General catalog/target identity | C17 write/store and destination contract | F1 resolves one unpinned source; later sample broader coverage, collisions and update/restore histories. Not the same as matching existing local inventory |
+| C13 | General catalog/target identity | C17 write/store and destination contract | F2 passed three unpinned sources, independent update and automated collision refusal locally. Broader source/restore coverage remains open; not the same as matching existing local inventory |
 | C14 | Web inventory and update status | C7 | Machine/agent views; observed versus managed; verified versions and stale/unknown states |
 | C15 | Uninstall and another-agent management | C10, C14 | Explicit local approval, ownership checks and inventory reconciliation |
 | C16 | Web and helper measurement | none; needed before G3, not F1 | Reuse app TelemetryDeck; preserve install events currently in discovery UI. Web measurement stays separate; no private paths/content; F1 uses a short test receipt |
@@ -483,22 +539,26 @@ component to finish. C5 is a distribution gate, not a cyclic build prerequisite.
 
 ## Suggested delivery order
 
-1. **Plan and implement F1 only after code-scope approval.** Reuse the existing
-   Mac base, settle the narrow write/destination/request contract, then connect
-   web install and update. Use the short F1 acceptance above, not the full gates.
-2. **Harden for a controlled pilot.** Expand C13 coverage, complete C10's setup
-   fallback and C17 lifecycle, then C5/G1/G2 signed setup/upgrades and C16
+1. **F1 local proof is complete.** Preserve its evidence and reuse its existing
+   Mac writer, store, destination and review contract.
+2. **Preserve the F2 checkpoint.** Local acceptance, scoped review and cleanup passed;
+   results cover three real installs, no-op, independent update and Codex
+   discovery, plus automated collision refusal. The scoped local commit is
+   approved; integration, push, deployment and release remain separate.
+   Do not repeat the full F1 manual matrix. C13 stays partial.
+3. **Harden for a controlled pilot.** Use F2's findings to expand C13 coverage,
+   complete C10's setup fallback and C17 lifecycle, then C5/G1/G2 signed setup/upgrades and C16
    measurement. Retain security and failure checks here; do not erase them.
-3. **Pilot, then separately approve existing-user rollout.** G3 verifies the
+4. **Pilot, then separately approve existing-user rollout.** G3 verifies the
    real public flow. Broad rollout also needs migration evidence and agreed
    C1-C3 discovery replacements; local proof is not permission to ship. Broader
    inventory/private work need not block the public install pilot.
-4. **Add device-aware reporting and queued delivery.** C9, then C8/C6, then
+5. **Add device-aware reporting and queued delivery.** C9, then C8/C6, then
    C7/C14; C18 follows device auth and C17. Prove account/device isolation,
    revocation, duplicate-request refusal, stale inventory and failure reporting.
-5. **Broader management and Sets.** C15/C11 add explicit uninstall, another-agent
+6. **Broader management and Sets.** C15/C11 add explicit uninstall, another-agent
    installs, snapshots and subscriptions. Private access and rollout require G4.
-6. **Retire old surfaces last (C12).** Preserve supported users and memberships;
+7. **Retire old surfaces last (C12).** Preserve supported users and memberships;
    remove obsolete UI separately from APIs, credentials, stores or hosted assets.
    Optional C4 and the deferred backlog are not public-MVP blockers.
 
@@ -604,6 +664,13 @@ source inspection at `562877c9`. Proposed the existing app's managed store,
 isolated Codex root, on-demand package resolution and local-only web handoff.
 Code/test execution awaits approval; A/B source availability and exact commit
 selection remain preflight checks. No implementation or test result is claimed.
+
+2026-10-09: F1 committed locally as `33b659e6`; no push, deployment or release.
+Drafted F2 in `newmac.md` after reading that implementation. The Mac request and
+store already support source-specific identity; the preview link and revision
+picker are fixture-specific. Plan only: fixture selection and live availability
+remain preflight work. Keep current review/package limits and record exclusions;
+three passing sources cannot establish broad catalog coverage or rate capacity.
 
 ## Open questions
 

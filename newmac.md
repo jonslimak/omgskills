@@ -1,15 +1,18 @@
 # New Mac
 
 Design and F1 implementation plan, 2026-10-08; local acceptance passed 2026-10-09.
+F2 local acceptance, scoped review and approved cleanup passed 2026-10-09.
 Code and acceptance evidence are recorded in [Connect](connect.md), the single
 progress tracker. No release approval.
 This document expands C17 and its Mac-side dependencies, without duplicating
 status checklists. [Webwork](webwork.md) retains earlier test evidence.
 
-**First implementation target: Connect F1, the bare-bones local flow.** One
-public skill, one Mac/browser and Codex: web request, local review, install A,
-then reviewed update B. Build only the required C17/C13/C10 parts. The rest of
-this document describes the intended product, not prerequisites for that proof.
+**Current target: plan first-time setup and retry after the F2 checkpoint.** F1
+proved one public install/update locally. F2 passed three repositories, an
+independent update, repeat no-op, Codex discovery and automated name-collision
+refusal. Scoped local review/commit is approved; the next implementation plan
+still needs approval. The rest of this document describes the intended product, not
+completed C17/C13/C10 work.
 Full security, compatibility and signed-release testing follows at G1-G4.
 
 ## Product decision
@@ -405,6 +408,183 @@ interruption, rollback, migration and release matrices remain in later gates.
 Only the short checks complete F1. They do not complete C17/C13/C10, authorize a
 commit/deploy/release or qualify the new interface for existing users.
 
+## F2 implementation plan
+
+**Implemented after approval; local acceptance and approved cleanup passed.**
+Connect owns status and links the [results](archive/newmac-f2-2026-10-09/README.md).
+The following retains the approved scope; only this bounded sample passed,
+not broad catalog coverage or release acceptance. Source, tests and evidence
+are included in the local F2 checkpoint; see the archived review note.
+Baseline: F1 commit `33b659e6` on `codex/newmac-f1-core`. Recheck the
+branch and working tree before starting; integration into main is separate.
+
+### Goal and boundary
+
+Prove three previously unpinned public catalog skills from three repositories
+can coexist in one isolated Codex home, and updating one cannot change the
+others. A different source requesting an occupied name must be refused.
+
+Keep the existing `ManagedSkillInstaller`, provenance format, `.codex/skills`
+destination, cross-root conflict checks and explicit local approval. No new
+writer, automatic renaming/adoption, legacy fallback or migration. The browser
+only requests opening; the native result remains authoritative.
+
+Reuse one fresh `OMGSkills F1 Test.app` with its existing Debug-only identity,
+`omgskills-f1` scheme and `VITE_NEWMAC_F1` loopback gate. F2 names the milestone,
+not another app. No production scheme registration, real-home writes, login,
+sync, Claude support, signed distribution, telemetry project or public release.
+
+### Baseline at the F1 commit
+
+- `PublicSkillInstallRequest.swift` accepts validated repository/path inputs;
+  source identity is repository plus package root, not catalog ID or name.
+  Nested targets use their directory name; root targets use the repository name.
+- `GitPublicSkillPackageFetcher.swift` resolves exact Git objects before review.
+  The fetch is a shallow repository fetch, not a GitHub REST pinning pipeline.
+- `ManagedSkillInstaller.swift` keeps packages per source/revision and activations
+  per target. Reviewed apply rechecks ownership, installed bytes and expected base.
+- At F1, `portal/src/app/unified/public-install.ts` permitted only Frontend
+  Design, and preview `main.tsx` applied its A/B commits globally. F2 replaced
+  that coupling with validated requests and preview-only per-source cases,
+  without replacing or changing the native engine.
+
+### 1. Select and preflight a bounded sample
+
+Use current public catalog detail records, without changing catalog/database
+data or manufacturing missing paths. Select three distinct target names and
+repositories; prefer new examples rather than replaying the F1 fixture.
+
+| Slot | Required shape | Purpose |
+| --- | --- | --- |
+| S1 | Repository-root `SKILL.md` | Root package and repository-derived target |
+| S2 | Nested `SKILL.md` | Package extraction excludes sibling skills |
+| S3 | Nested package with companion text files/subdirectories | Complete package, not only `SKILL.md` |
+
+Selected after live preflight: `blader/humanizer` (`SKILL.md`),
+`vercel-labs/agent-skills:skills/writing-guidelines`
+(`skills/writing-guidelines/SKILL.md`), and
+`coreyhaines31/marketingskills:skills/seo-audit` (`skills/seo-audit/SKILL.md`).
+`portal/src/preview/unified/f2-sources.json` binds their exact identities and
+revisions; [the evidence](archive/newmac-f2-2026-10-09/README.md) records catalog
+pin absence, observation times, targets, sizes and full Git manifests.
+Humanizer supplies two reachable immutable
+revisions A/B with a real package change; prefer a companion-file change. Never
+wait for a publisher to update or rewrite a source to make the test work.
+
+Install two sources with no commit in the browser request. For the update
+source, install historical A explicitly, then request current B without a
+commit. Thus each of S1-S3 exercises on-demand resolution at least once, while
+the A/B transition stays reproducible. Record pinned replays separately from
+no-commit requests. Freeze B at review, never refetch HEAD during apply.
+
+Keep preflight bounded to these three slots and one update pair. Record every
+rejected candidate and its reason before substitution. Root skills include the
+whole repository tree under the current package rule. Current review limits
+reject non-text/control-character content, changed files over 64 KiB or 2,000
+lines, and aggregate before/after changed bytes over 128 KiB. Existing package
+limits also apply. Do not drop companion files, trim packages, weaken limits or
+silently select only successes. If a slot cannot be filled within these rules,
+stop with the concrete gap and seek a revised scope. No broad crawl here.
+
+### 2. Generalize only the development handoff
+
+- Refactor the link builder into validated source-to-request construction plus
+  a separate preview fixture policy. Do not embed three special cases in the
+  native installer. Derive repository/path from catalog detail, not display text
+  or a guessed split of the catalog ID; source aliases can differ from the ID.
+- Keep a small preview-only registry for S1-S3: exact catalog ID, repository,
+  path and optional A/B replay revisions. Require the detail to match it and
+  still be unpinned. Missing/changed metadata disables the action with a reason.
+  All other sources and pinned records retain their existing behavior.
+- Keep the same request format, no destinations/commands/approval in links,
+  and the existing development + flag + loopback checks. Validate the source
+  and completed URL against the native contract, including its 4 KiB limit.
+- Replace the global F1 A/B selection with per-fixture cases: Latest for each
+  source and A/B only where defined. Use a validated preview case key in the URL
+  so exact links survive refresh; arbitrary query text must not supply a commit
+  or source. Remove the previous close/select/Back testing workaround.
+- Reuse the existing detail action and native review/result. No search redesign,
+  account UI or fake installed status. Keep all fixture controls out of production.
+
+Expected code scope: `public-install.ts`, preview `main.tsx`, their tests, and a
+small preview-only fixture module if needed. Extend the existing Swift request,
+fetcher and reviewed-installer tests. Change native production logic only for a
+reproduced in-scope failure; re-plan first if storage or ownership rules must change.
+
+### 3. Focused automated verification
+
+- Web: exact source/path binding, root/nested sources, per-fixture revisions,
+  refresh/back behavior, invalid/oversized inputs, pinned/unlisted refusal and
+  absence of the action outside the existing gates.
+- Fetcher/parser: root, nested and companion-file packages through on-demand
+  resolution, retaining exact coordinates and existing pinned-API behavior.
+- Installer: install three sources into one temporary home; update one and
+  compare the other two's bytes, links, provenance and activation counts. Reopen
+  the store to verify persisted ownership and histories remain separate.
+- Collision: different repositories with the same target leaf must refuse;
+  also retain the unmanaged and alternate-root tests. Use deterministic local
+  fixtures for this case, not another public download or a forged catalog ID.
+- Reuse F1's no-op, cancel, local-edit and stale-review regressions. Run the
+  affected shared installer/group suites, portal tests and production build;
+  inspect generated output for the test scheme, cases and fixture revisions.
+
+### 4. One short user-run session
+
+Prepare a fresh isolated root and exactly one test bundle using the existing
+assembler. Check the public app hash/URL handler, test identity/root, Git
+availability and loopback server before asking the user to click anything.
+Do not reuse the deleted F1 run or assume port 5197 is available.
+
+Provide numbered steps with full localhost links and exact button/app names.
+The user performs native approvals; the assistant checks resulting files. In
+one session: install S1-S3, repeat one request pinned to its recorded installed
+commit, then review/apply B for the chosen source. Compare all three states
+after every operation. If HEAD
+moved since preflight, stop to capture/review the new version, never substitute
+it silently. Do not repeat the full F1 manual safety matrix on all three skills.
+
+Use a fresh isolated Codex discovery process after the installs and after B;
+require each expected skill at its exact path with no discovery errors. Do not
+execute skill instructions, copy user credentials or start paid agent runs.
+The collision check remains automated with before/after evidence; it does not
+need another manual browser session.
+
+Acceptance result, 2026-10-09: the user completed all three installs, the
+recorded Writing Guidelines repeat and the Humanizer A-to-B update. Complete
+bytes/modes/trees, links and provenance matched; only Humanizer's `README.md`
+and `CHANGELOG.md` changed, and the other two skills stayed identical. Fresh
+Codex discovery before and after B found all three enabled user skills with no
+errors. Match the exact resolved file and declared plugin namespace:
+Humanizer appears as `humanizer:humanizer`, not the bare folder name.
+No skill instructions or model runs were used for verification.
+
+### Exit evidence and stop rules
+
+One receipt records the tested commit/build, catalog observations, source and
+package coordinates, complete file hashes, target/provenance snapshots,
+per-operation result, time and available fetch counts. Git fetch measurements
+do not establish GitHub API rate capacity or catalog-scale coverage. Record
+excluded packages and any limits; do not report a success percentage from this
+selected sample. Three installs, one no-op, one independent update, collision
+refusal and exact Codex discovery are the bounded pass criteria.
+
+Stop on wrong-app launch, writes outside the isolated root, unexpected changes
+to another skill, ambiguous ownership or a required validation bypass. Record
+the failure and re-plan; do not expand into release work or repeat long runs.
+After acceptance and cleanup approval, preserve evidence, remove only the named
+test app/root and stop its server. Update Connect without marking C13 complete.
+Review/commit, main integration, push, deployment and release are separate approvals.
+
+Evidence was preserved and hash-verified before removing the named temporary
+root and test bundle, stopping port 5197 and unregistering only the test app.
+The public app's process, URL handler and executable hash were unchanged.
+Full manifests, per-operation snapshots and cleanup checks are in the
+[F2 archive](archive/newmac-f2-2026-10-09/README.md).
+
+Next after this local checkpoint: plan first-time download/open/return/retry
+and signed pilot setup. Broader source coverage, rename/delete/rewrite behavior,
+rate limits, interruption/rollback, migration and G1-G4 remain open.
+
 ## Proposed sequence
 
 Progress and approvals stay in Connect. These are design steps, not a second task list.
@@ -413,6 +593,7 @@ Progress and approvals stay in Connect. These are design steps, not a second tas
 | --- | --- | --- |
 | Settle F1's narrow contract | C17, C13, C10 | Current baseline, one write/store path and Codex destination, request shape, public A/B source and isolated test setup; code scope approved |
 | Prove the bare-bones flow | F1, parts of C17/C13/C10 | Existing-app dev build; web install A and update B for one unpinned skill; apply Connect's short F1 checks; no full migration or inventory project |
+| Prove a small multi-source sample | F2, parts of C13/C10 | Three isolated installs, one independent update, name-collision refusal and fresh Codex discovery; no broad coverage claim |
 | Harden and verify setup for a controlled pilot | C17, C13, C10, C5, C16, G1-G3 | Wider source coverage, lifecycle, setup/retry, signing, upgrades, security/failure checks and measured user flow |
 | Roll out to existing users separately | C5, C1-C3, relevant G1-G3 | Preserved existing-user data and behavior, agreed web discovery replacements and explicit release approval |
 | Add connected management | C9, C8, C6-C7, C14, C18, C11, C15 | Device/account isolation, truthful inventory, queued requests, Sets and explicit management; private rollout separately meets G4 |
@@ -468,12 +649,14 @@ F1 step 1 implements the approved narrow answers to 1, 3 and the request part of
 6. Login onboarding/defaults and existing-user transition messaging; preserve
    explicit opt-outs and distinguish Quit from disabling future login startup.
 
-Next: separately decide integration/pilot scope after the F1 checkpoint. The
-scoped review and approved cleanup are complete; evidence is preserved in
-[the F1 archive](archive/newmac-f1-2026-10-09/README.md).
-Browser delivery, manual A/B acceptance, cancellation,
-repeat no-op, local-edit refusal and fresh isolated Codex discovery passed on
-2026-10-09. This proves one local public-skill flow, not broad coverage or release
-readiness. The separate test bundle does not replace the installed app. No real
-skill folder, credential, production flag, update feed or deployment was changed.
-Connect and the run receipt hold progress/evidence.
+Next: a separately approved first-time setup/retry plan after the local F2
+checkpoint. F2's automated and user-run acceptance passed locally; evidence is
+saved, scoped review passed and approved cleanup is complete. F1 is committed
+as `33b659e6`; its earlier scoped review and cleanup are complete.
+[F1 evidence](archive/newmac-f1-2026-10-09/README.md) retains cancellation,
+local-edit and A/B checks; [F2 evidence](archive/newmac-f2-2026-10-09/README.md)
+adds three-source coexistence and an independent companion-file update.
+Neither proves broad coverage, existing-user migration or release readiness.
+The test bundle did not replace the installed app. No real skill folder,
+credential, production flag, update feed or deployment was changed.
+Connect and the archived receipts hold progress/evidence.
