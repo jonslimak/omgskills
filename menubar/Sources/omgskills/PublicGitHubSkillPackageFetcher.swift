@@ -165,7 +165,7 @@ private final class ProcessExecutionState: @unchecked Sendable {
     }
 }
 
-struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
+struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, PublicSkillPackageResolving, Sendable {
     typealias RemoteURLBuilder = @Sendable (String) -> URL?
 
     private static let maximumCommandOutputBytes = 1 * 1024 * 1024

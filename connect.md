@@ -22,14 +22,18 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- **Next: review the isolated HTTPS downloader, then prepare the F3b candidate.**
+- **Next: prepare local F3b packaging.**
   The [local candidate plan](newmac.md#f3b-local-candidate-plan-and-prerequisite-hold)
-  remains gated. The approved native HTTPS downloader is implemented locally,
+  remains gated. The native HTTPS downloader is reviewed and committed locally
+  as `f8a40cf0`,
   with passing isolated/regression tests and a live Writing Guidelines comparison
   against Git. It resolves on demand and preserves full package validation;
   [evidence and limits](newmac.md#f3b-https-downloader-checkpoint) are recorded.
-  It is not wired into the app: all current defaults still use system Git.
-  Candidate integration and clean-Mac setup remain unproven. No signing, upload,
+  Candidate-only native/browser wiring is implemented, tested and reviewed in
+  this local checkpoint; ordinary app and F1 defaults still use Git. See the
+  [wiring checkpoint](newmac.md#f3b-candidate-wiring-checkpoint).
+  No app bundle/DMG is assembled, registered, installed or launched.
+  Clean-Mac setup remains unproven. No signing, upload,
   hosting or signed setup test is approved or performed.
   [F3a local acceptance](archive/newmac-f3a-2026-10-09/README.md) passed:
   refresh retained the request, cancellation wrote nothing, retry installed the
@@ -567,10 +571,11 @@ component to finish. C5 is a distribution gate, not a cyclic build prerequisite.
    discovery, plus automated collision refusal. Local commit `f7a964b0` is
    complete; integration, push, deployment and release remain separate.
    Do not repeat the full F1 manual matrix. C13 stays partial.
-3. **Preserve F3a, then integrate the F3b HTTPS downloader.** F3a local acceptance,
+3. **Preserve F3a, then prepare F3b packaging.** F3a local acceptance,
    cleanup and scoped review are committed as `462ac68a`. F3b's first local slice
-   selected native HTTPS; isolated tests and live parity passed. Review and
-   checkpoint that slice, then prepare the candidate and separately approve signing, hosting and
+   selected native HTTPS; isolated tests and live parity passed, committed as
+   `f8a40cf0`. Candidate-only wiring passes local tests and scoped review in
+   this checkpoint. Prepare the package next, then separately approve signing, hosting and
    clean-environment setup. Do not substitute the older public download or
    count local simulation as signed acceptance.
 4. **Harden for a controlled pilot.** Use F2/F3 findings to expand C13 coverage,
@@ -743,6 +748,19 @@ reviewed locally. Focused regressions and a separate live GitHub parity check
 passed, as did the release compile. No blocking source findings; corrected stale
 dependency-choice notes during review. The slice retains the existing app's Git
 defaults. Candidate wiring is the next separate change; no push or release.
+
+2026-10-09: downloader review committed as `f8a40cf0`. Approved follow-on
+candidate wiring is implemented and reviewed in this local checkpoint: explicit setup-test build
+flag, separate identity/handler/state, HTTPS review service and loopback-only
+browser mapping with independent saved requests. Passed 96 native regressions,
+7 candidate-release tests, 251 portal tests and both portal production builds;
+production web output excludes test handlers even with preview flags set.
+Ordinary Mac Release compilation passed; test installer UI symbols are absent
+there and present in the candidate Release build.
+Scoped review found no blocking issues; the 96 native, 7 candidate-release and
+251 portal checks passed again before committing. No source fixes were needed.
+No new manual browser/native acceptance, signed package, registration, install,
+hosting, push or release. See New Mac's wiring checkpoint for scope and next step.
 
 ## Open questions
 

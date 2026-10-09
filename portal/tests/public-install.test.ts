@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { developmentInstallLink, isF1Preview } from "../src/app/unified/public-install";
+import { developmentInstallLink, isF1Preview, previewInstallClient } from "../src/app/unified/public-install";
 import { PublicCatalogClient } from "../src/app/unified/public-catalog";
 import type { SkillDisplay } from "../src/app/unified/model";
 import { parseNavigation } from "../src/app/unified/model";
@@ -12,6 +12,22 @@ function display(source = f2Sources[0]): SkillDisplay {
     description: "", tags: [], githubUrl: `https://github.com/${source.repository}`, skillMDPath: source.path };
 }
 const skill = display();
+
+test("setup-test selection is exclusive, explicit and confined to local development", () => {
+  assert.equal(previewInstallClient(true, undefined, "1", "127.0.0.1"), "setup-test");
+  assert.equal(previewInstallClient(true, "1", undefined, "localhost"), "f1");
+  for (const args of [[false, undefined, "1", "localhost"], [true, "1", "1", "localhost"],
+    [true, undefined, "1", "omgskills.com"], [true, undefined, undefined, "localhost"]] as const) {
+    assert.equal(previewInstallClient(...args), null);
+  }
+  for (const item of f2Cases) {
+    const original = new URL(f2InstallAction(display(item.source), item.key).href!);
+    const candidate = new URL(f2InstallAction(display(item.source), item.key, "setup-test").href!);
+    assert.equal(candidate.protocol, "omgskills-setup-test:");
+    assert.equal(candidate.search, original.search);
+    assert.equal(candidate.host, original.host);
+  }
+});
 
 test("F1 requires development, explicit flag, and loopback host", () => {
   assert.equal(isF1Preview(true, "1", "127.0.0.1"), true);
@@ -107,9 +123,9 @@ test("public detail preserves path and distinguishes pinned records", async () =
 
 test("production entry never supplies the test action", () => {
   const source = readFileSync(new URL("../src/unified-main.tsx", import.meta.url), "utf8");
-  assert.doesNotMatch(source, /publicInstallAction|developmentInstallLink|VITE_NEWMAC_F1|f2-install/);
+  assert.doesNotMatch(source, /publicInstallAction|developmentInstallLink|VITE_NEWMAC_F1|VITE_NEWMAC_SETUP_TEST|f2-install/);
   const preview = readFileSync(new URL("../src/preview/unified/main.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(preview, /VITE_NEWMAC_F1_[AB]|f1Revision/);
   assert.match(preview, /setF2CaseKey\(caseKey\)/);
-  assert.match(preview, /publicInstallAction=\{f1Enabled \?/);
+  assert.match(preview, /publicInstallAction=\{installClient \?/);
 });

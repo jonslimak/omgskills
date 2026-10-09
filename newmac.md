@@ -2,8 +2,9 @@
 
 Design and F1 implementation plan, 2026-10-08; local acceptance passed 2026-10-09.
 F3a local setup/retry automated and user-run acceptance passed 2026-10-09.
-F3b's native HTTPS downloader was approved, implemented and checked in isolation
-on 2026-10-09; candidate integration is next. Signing, hosting and signed setup
+F3b's native HTTPS downloader is reviewed and committed as `f8a40cf0`.
+Candidate-only wiring is implemented, tested and reviewed in this local
+checkpoint on 2026-10-09; local packaging is next. Signing, hosting and signed setup
 acceptance are not approved or performed.
 F2 local acceptance, scoped review and approved cleanup passed 2026-10-09.
 Code and acceptance evidence are recorded in [Connect](connect.md), the single
@@ -11,7 +12,7 @@ progress tracker. No release approval.
 This document expands C17 and its Mac-side dependencies, without duplicating
 status checklists. [Webwork](webwork.md) retains earlier test evidence.
 
-**Current target: integrate the verified HTTPS downloader into the F3b test candidate.** F1
+**Current target: prepare local F3b packaging.** F1
 proved one public install/update locally. F2 passed three repositories, an
 independent update, repeat no-op, Codex discovery and automated name-collision
 refusal. F2 is committed locally as `f7a964b0`; the
@@ -770,9 +771,9 @@ fallback as evidence of first-time setup.
 
 ### F3b local candidate plan and prerequisite hold
 
-**2026-10-09: native HTTPS dependency slice approved and tested in isolation;
-candidate integration remains pending.** Approval covers the recorded local
-preparation plan and the isolated downloader/tests, not a runtime/default switch.
+**2026-10-09: native HTTPS dependency slice committed; candidate wiring tested
+locally.** Approval covers the recorded local preparation plan, downloader/tests
+and candidate-only wiring, not an ordinary app runtime/default switch.
 It does not authorize signing, Apple submission, uploading,
 hosting, an installed-app replacement, a public feed change or release.
 Source baseline is the clean F3a checkpoint `462ac68a` on
@@ -780,9 +781,9 @@ Source baseline is the clean F3a checkpoint `462ac68a` on
 
 #### Confirmed prerequisite
 
-The current path is not dependency-free:
+The audited F3a path was not dependency-free:
 
-- `PublicSkillReviewService` directly uses `GitPublicSkillPackageFetcher`.
+- F3a's `PublicSkillReviewService` directly used `GitPublicSkillPackageFetcher`.
 - `GitCommandRunner` defaults to `/usr/bin/git`. Package resolution uses Git
   to fetch a commit, inspect its tree and read every package blob.
 - The runner's executable-file check does not establish that developer tools
@@ -793,8 +794,9 @@ The current path is not dependency-free:
   still shares the machine's tools.
 
 This is source inspection plus vendor documentation, not a fresh-Mac run.
-The later approved dependency slice implements native HTTPS, without bundling
-Git or changing the active installer. No candidate app/package is prepared yet.
+The approved dependency slice implements native HTTPS without bundling Git.
+The candidate-only service now selects it; ordinary app/F1 defaults stay Git.
+No candidate app bundle/package is prepared yet.
 Do not remove developer tools from the working Mac or silently add them as a
 user requirement.
 
@@ -803,7 +805,8 @@ pre-pinned-catalog requirement. See the checkpoint below before integration.
 
 #### F3b HTTPS downloader checkpoint
 
-Implemented and reviewed locally on `codex/newmac-f1-core`, based on `462ac68a`:
+Implemented and reviewed on `codex/newmac-f1-core`, committed as `f8a40cf0`
+above `462ac68a`:
 
 - New `HTTPPublicSkillPackageFetcher.swift` and `PublicGitHubHTTPClient.swift`
   in `menubar/Sources/omgskills/`; two matching test files. No existing runtime,
@@ -838,7 +841,8 @@ named Git parity test. Live reproduction from `menubar/` is opt-in:
 `OMGSKILLS_HTTP_PACKAGE_LIVE_TEST=1 swift test --filter HTTPPublicSkillPackageFetcherTests/livePublicSourceMatchesGitAtResolvedCommit`.
 The two new test suites are `HTTPPublicSkillPackageFetcherTests` and
 `PublicGitHubHTTPClientTests`; related existing installer/model/validator tests
-also ran. All current app construction sites still choose the Git fetcher.
+also ran. At that commit all app construction sites still chose Git; the
+follow-on candidate-only wiring below changes only the setup-test service.
 
 Limits: one public-source live comparison is not full-catalog or rate-capacity
 proof. An install uses root depth + 2 REST requests plus one raw download per
@@ -848,8 +852,46 @@ raw delivery can also fail or throttle. Renamed repositories that redirect are
 currently refused, not silently followed. API version `2022-11-28` remains
 [supported](https://docs.github.com/en/rest/about-the-rest-api/api-versions).
 Fresh-Mac setup, production integration, broad source coverage and signed
-distribution remain open. Next: scoped review, then explicit candidate-only
-integration/packaging; no production default switch.
+distribution remain open. No production default switch.
+
+#### F3b candidate wiring checkpoint
+
+Implemented and reviewed locally above `f8a40cf0`, recorded with this checkpoint:
+
+- `OMGSKILLS_SETUP_TEST` is a separate compile flag, including Release builds.
+  Startup requires exact bundle ID `com.jonslimak.omgskills.setuptest`, sole
+  scheme `omgskills-setup-test` and an approved website origin. Missing/mixed
+  configuration fails closed; ordinary builds cannot enable it through a plist.
+  F1 retains its Debug-only temporary-root guard and Git implementation.
+- `SetupTestRuntime.swift` derives storage from the current user's home.
+  Launch creates only candidate state; the reviewed writer owns skill creation.
+  Files/redirected directory chains are refused. Native review/model/writer
+  are reused through `PublicSkillPackageResolving`; setup-test selects HTTPS.
+  The startup/URL branches precede production services, with no candidate
+  activation of discovery, account, analytics, login startup or updater.
+- Local browser preview selects `VITE_NEWMAC_SETUP_TEST=1`, mutually exclusive
+  with `VITE_NEWMAC_F1=1`; DEV and loopback gates remain mandatory. Test links,
+  labels and saved intent use the selected fixed client. Source/commit checks,
+  explicit retry/open and native consent remain; Download is still disabled.
+- Verification: 96 native regressions passed (15 suites); 7 focused tests also
+  passed in the setup-test Release configuration. All native writes used
+  temporary homes. 251 portal tests passed, including rendered setup states
+  for both clients. Standard and unified production portal builds passed with
+  the candidate preview flag present; neither output contained test handlers.
+  The ordinary Mac Release build passed; symbol inspection confirms the test
+  installer UI is absent there and present only in the candidate Release build.
+  A temporary-home fixture normalization issue was corrected without weakening
+  the runtime destination guard.
+- No app bundle/DMG, Developer ID signing, notarization, registration, app launch,
+  real-skill writes, hosting, push or release. The installed public app binary
+  retains SHA-256 `34f3aa9b7a96766463f7e827e521e20a4282c3ff2f71bdbe2bec9b1bc44065b1`.
+  New browser handoff/cold launch and fresh-Mac acceptance have not run.
+
+Scoped review found no blocking issues or required source fixes. The 96 native,
+7 candidate-release and 251 portal checks passed again before committing.
+
+Next: the narrow local candidate assembler below. Signing/submission, hosting and clean-environment acceptance stay
+separately approved; compiled tests are not distribution proof.
 
 #### Candidate contract after the dependency decision
 
@@ -883,14 +925,16 @@ Writing Guidelines source from F3a. No new source sample or A/B test here.
 
 #### Implementation order and verification
 
-1. **Review the dependency slice.** Native HTTPS is approved and its isolated
-   checks passed above. Review it before candidate integration; do not mistake
+1. **Review the dependency slice (done locally).** Native HTTPS is approved,
+   reviewed and committed as `f8a40cf0`. Do not mistake
    parity on this developer Mac for signed setup without developer tools.
-2. **Prepare local runtime and handoff.** Scope changes to runtime configuration,
+2. **Prepare local runtime and handoff (implemented and reviewed locally).** Scope changes to runtime configuration,
    app launch/URL dispatch, reusable review composition, preview identity mapping
    and their tests. Test first launch without pre-created storage, invalid or
-   redirected storage refusal, cold URL delivery, correct handler/identity,
+   redirected storage refusal, correct handler/identity,
    cancel/no writes and unchanged ordinary production behavior.
+   Automated checks passed above; actual browser/cold URL delivery remains
+   part of later candidate acceptance, not a claim from source inspection.
 3. **Prepare packaging only.** Add a narrow candidate assembler with source and
    output manifests, fixed identity, dependencies, minimum OS and architecture.
    Reuse existing signing/verification primitives later; do not invoke the public

@@ -1,5 +1,5 @@
 import type { SkillDisplay } from "./model";
-import { developmentInstallLink } from "./public-install";
+import { developmentInstallLink, installClients, type InstallClient } from "./public-install";
 
 export const INSTALL_INTENT_KEY = "omgskills.preview.install-intent.v1";
 export const INSTALL_INTENT_TTL = 24 * 60 * 60 * 1000;
@@ -39,13 +39,13 @@ function parseIntent(raw: string): InstallIntent | null {
   } catch { return null; }
 }
 
-export function intentFromAction(skill: SkillDisplay, action: Action, returnRoute: string, now: number): InstallIntent | null {
+export function intentFromAction(skill: SkillDisplay, action: Action, returnRoute: string, now: number, client: InstallClient = "f1"): InstallIntent | null {
   if (!action.href) return null;
   try {
     const link = new URL(action.href);
     const commit = link.searchParams.get("commit") ?? undefined;
     // The existing builder remains the authority for source and URL validation.
-    if (developmentInstallLink(skill, commit) !== action.href) return null;
+    if (developmentInstallLink(skill, commit, client) !== action.href) return null;
     return parseIntent(JSON.stringify({ version: 1, catalogId: skill.catalogId,
       repository: link.searchParams.get("repo"), path: skill.skillMDPath, agent: "codex",
       ...(commit ? { commit } : {}), returnRoute, createdAt: now }));
@@ -55,8 +55,10 @@ export function intentFromAction(skill: SkillDisplay, action: Action, returnRout
 export class InstallIntentStore {
   private memory: string | null = null;
   private storage: Storage | null;
-  constructor(getStorage: () => Storage | null) {
-    try { this.storage = getStorage(); this.memory = this.storage?.getItem(INSTALL_INTENT_KEY) ?? null; }
+  private readonly key: string;
+  constructor(getStorage: () => Storage | null, client: InstallClient = "f1") {
+    this.key = client === "f1" ? INSTALL_INTENT_KEY : `${INSTALL_INTENT_KEY}.setup-test`;
+    try { this.storage = getStorage(); this.memory = this.storage?.getItem(this.key) ?? null; }
     catch { this.storage = null; }
   }
   get persistent() { return this.storage !== null; }
@@ -66,20 +68,21 @@ export class InstallIntentStore {
   }
   save(intent: InstallIntent) {
     this.memory = JSON.stringify(intent);
-    try { this.storage?.setItem(INSTALL_INTENT_KEY, this.memory); }
+    try { this.storage?.setItem(this.key, this.memory); }
     catch {
       // A failed save must not leave an older request resumable after reload.
-      try { this.storage?.removeItem(INSTALL_INTENT_KEY); } catch { /* Storage may be fully unavailable. */ }
+      try { this.storage?.removeItem(this.key); } catch { /* Storage may be fully unavailable. */ }
       this.storage = null;
     }
   }
   clear() {
     this.memory = null;
-    try { this.storage?.removeItem(INSTALL_INTENT_KEY); } catch { this.storage = null; }
+    try { this.storage?.removeItem(this.key); } catch { this.storage = null; }
   }
 }
 
 type Options = {
+  client?: InstallClient;
   catalogId: string; commit?: string; returnRoute: string; store: InstallIntentStore;
   action: (skill: SkillDisplay) => Action;
   refresh: (id: string, signal: AbortSignal) => Promise<SkillDisplay | null>;
@@ -118,7 +121,7 @@ export class InstallSetupSession {
   private begin(skill: SkillDisplay) {
     if (this.state.restartRequired) return null;
     const action = this.options.action(skill);
-    const intent = intentFromAction(skill, action, this.options.returnRoute, this.now());
+    const intent = intentFromAction(skill, action, this.options.returnRoute, this.now(), this.options.client);
     if (!intent || intent.catalogId !== this.options.catalogId || intent.commit !== this.options.commit) {
       this.fail(action.reason || "The skill request is unavailable. Select the skill again.", true);
       return null;
@@ -141,7 +144,7 @@ export class InstallSetupSession {
     if (!this.fresh(intent)) { this.fail("This request expired. Cancel setup and start again.", true); return; }
     const candidate = this.prepared?.skill ?? skill;
     const action = this.options.action(candidate);
-    const checked = intentFromAction(candidate, action, intent.returnRoute, intent.createdAt);
+    const checked = intentFromAction(candidate, action, intent.returnRoute, intent.createdAt, this.options.client);
     if (!checked || !this.matches(intent, checked) || (this.prepared && this.prepared.href !== action.href)) {
       this.fail("The source or version changed. Cancel setup and select the skill again.", true);
       return;
@@ -149,7 +152,7 @@ export class InstallSetupSession {
     this.prepared = null;
     // Save before handing control to the browser. No inferred launch/install result.
     this.options.store.save(intent);
-    this.update({ phase: "opening", message: "Opening requested. Check OMGSkills F1 Test for the result." });
+    this.update({ phase: "opening", message: `Opening requested. Check ${installClients[this.options.client ?? "f1"].name} for the result.` });
     try { this.options.open(action.href!); }
     catch { this.update({ message: "Opening could not be confirmed. Try opening again or set up the app." }); }
   }
@@ -168,13 +171,13 @@ export class InstallSetupSession {
       if (!this.fresh(intent)) { this.fail("This request expired. Cancel setup and start again.", true); return; }
       if (!skill) { this.fail("This skill is no longer available. Cancel setup and select another skill.", true); return; }
       const action = this.options.action(skill);
-      const candidate = intentFromAction(skill, action, intent.returnRoute, intent.createdAt);
+      const candidate = intentFromAction(skill, action, intent.returnRoute, intent.createdAt, this.options.client);
       if (!candidate || !this.matches(intent, candidate)) {
         this.fail(action.reason || "The source or version changed. Cancel setup and select the skill again.", true);
         return;
       }
       this.prepared = { href: action.href!, skill };
-      this.update({ phase: "ready", message: "Details checked. Open OMGSkills F1 Test to review this request." });
+      this.update({ phase: "ready", message: `Details checked. Open ${installClients[this.options.client ?? "f1"].name} to review this request.` });
     } catch (error) {
       if (!request.signal.aborted && this.request === request) {
         this.fail(error instanceof Error ? error.message : "Could not check skill details. Try again.");

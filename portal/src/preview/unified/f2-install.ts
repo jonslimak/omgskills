@@ -1,4 +1,4 @@
-import { developmentInstallLink } from "../../app/unified/public-install";
+import { developmentInstallLink, type InstallClient } from "../../app/unified/public-install";
 import { initialNavigation, navigationSearch, type Navigation, type SkillDisplay } from "../../app/unified/model";
 import fixtureData from "./f2-sources.json";
 
@@ -26,12 +26,12 @@ export function f2CaseNavigation(caseKey: string): Navigation | null {
   return item ? { ...initialNavigation, view: "discover", selected: `catalog:${item.source.id}` } : null;
 }
 
-export function f2InstallAction(skill: SkillDisplay, caseKey: string): { href: string | null; reason: string } {
+export function f2InstallAction(skill: SkillDisplay, caseKey: string, client: InstallClient = "f1"): { href: string | null; reason: string } {
   const item = f2Cases.find(item => item.key === caseKey);
   if (!item) return { href: null, reason: "Choose an F2 test case." };
   if (skill.catalogId !== item.source.id) return { href: null, reason: "This skill does not match the selected test case." };
   if (skill.hasPinnedInstall) return { href: null, reason: "This catalog skill is now pinned. Stop and recheck the test fixture." };
-  const href = developmentInstallLink(skill, item.commit);
+  const href = developmentInstallLink(skill, item.commit, client);
   if (!href) return { href: null, reason: "Complete, valid catalog source details are required." };
   const request = new URL(href);
   if (request.searchParams.get("repo") !== item.source.repository || skill.skillMDPath !== item.source.path) {

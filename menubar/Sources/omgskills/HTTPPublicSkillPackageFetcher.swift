@@ -2,7 +2,7 @@ import CryptoKit
 import Foundation
 
 // An opt-in transport, not the app's default. Resolution never needs catalog pins or system Git.
-struct HTTPPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
+struct HTTPPublicSkillPackageFetcher: PublicSkillPackageFetching, PublicSkillPackageResolving, Sendable {
     let http: any PublicGitHubHTTPClient
     let limits: SkillPackageValidationLimits
 

@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || OMGSKILLS_SETUP_TEST
 import Foundation
 import Observation
 
@@ -9,9 +9,16 @@ protocol PublicSkillReviewServing: Sendable {
 }
 
 struct PublicSkillReviewService: PublicSkillReviewServing {
-    let fetcher: GitPublicSkillPackageFetcher
+    let fetcher: any PublicSkillPackageResolving
     let installer: ManagedSkillInstaller
     let paths: SkillFilesystemPaths
+
+    static func setupTest(_ configuration: SetupTestRuntime.Configuration) throws -> Self {
+        try configuration.validateStorage()
+        return Self(fetcher: HTTPPublicSkillPackageFetcher(),
+            installer: ManagedSkillInstaller(managedRoot: configuration.managedRoot, pathAnchor: configuration.home),
+            paths: configuration.paths)
+    }
 
     func prepare(_ source: PublicSkillInstallRequest) async throws -> PublicSkillInstallReview {
         let package = try await fetcher.resolvePackage(source)
@@ -40,15 +47,19 @@ final class PublicSkillInstallModel {
     private(set) var notice = ""
     private var request: PublicSkillInstallRequest?
     @ObservationIgnored private let service: any PublicSkillReviewServing
+    let client: PublicSkillInstallClient
     @ObservationIgnored private(set) var operation: Task<Void, Never>?
 
-    init(service: any PublicSkillReviewServing) { self.service = service }
+    init(service: any PublicSkillReviewServing, client: PublicSkillInstallClient = .f1) {
+        self.service = service
+        self.client = client
+    }
     var isApplying: Bool { phase == .applying }
     var ownsRequest: Bool { [.loading, .review, .applying, .cancelling].contains(phase) }
 
     func receive(_ rawURL: String) {
         let source: PublicSkillInstallRequest
-        do { source = try PublicSkillInstallRequest(url: rawURL) }
+        do { source = try PublicSkillInstallRequest(url: rawURL, client: client) }
         catch {
             if !ownsRequest { phase = .failure; review = nil; message = "This install link is invalid." }
             return
@@ -90,8 +101,8 @@ final class PublicSkillInstallModel {
                 let result = try await service.apply(review.id)
                 phase = .success
                 message = switch result {
-                case .install: "Installed in test folder"
-                case .update: "Updated in test folder"
+                case .install: "Installed in " + client.destinationLabel
+                case .update: "Updated in " + client.destinationLabel
                 case .unchanged: "Already installed. No changes made."
                 }
             } catch {
@@ -117,6 +128,7 @@ final class PublicSkillInstallModel {
 
     private static func failureMessage(_ error: any Error) -> String {
         if let error = error as? PublicSkillReviewError { return error.localizedDescription }
+        if let error = error as? PublicGitHubHTTPError { return error.localizedDescription }
         if error is CancellationError { return "Cancelled. No installation was activated." }
         return "The package could not be loaded or applied safely. Close this request and try again."
     }

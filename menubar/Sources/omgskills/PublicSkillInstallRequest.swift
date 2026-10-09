@@ -1,5 +1,17 @@
 import Foundation
 
+enum PublicSkillInstallClient: String, Sendable {
+    case f1 = "omgskills-f1"
+    case setupTest = "omgskills-setup-test"
+
+    var appName: String { self == .f1 ? "OMGSkills F1 Test" : "OMGSkills Setup Test" }
+    var destinationLabel: String { self == .f1 ? "test folder" : "Codex" }
+}
+
+protocol PublicSkillPackageResolving: Sendable {
+    func resolvePackage(_ request: PublicSkillInstallRequest) async throws -> SkillPackage
+}
+
 struct PublicSkillInstallRequest: Equatable, Sendable {
     enum RequestError: Error { case invalidRequest }
 
@@ -37,12 +49,12 @@ struct PublicSkillInstallRequest: Equatable, Sendable {
         self.commitSha = commitSha?.lowercased()
     }
 
-    init(url: String) throws {
+    init(url: String, client: PublicSkillInstallClient = .f1) throws {
         guard url.utf8.count <= 4096,
               !url.unicodeScalars.contains(where: CharacterSet.controlCharacters.contains),
               url.range(of: "%(?![0-9A-Fa-f]{2})", options: .regularExpression) == nil,
               let components = URLComponents(string: url),
-              components.scheme == "omgskills-f1", components.host == "review",
+              components.scheme == client.rawValue, components.host == "review",
               components.user == nil, components.password == nil, components.port == nil,
               components.path.isEmpty, components.fragment == nil,
               let items = components.queryItems,

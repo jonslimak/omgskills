@@ -17,7 +17,8 @@ struct OmgskillsApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private let f1Mode = AppRuntimeConfiguration.f1Mode()
-    #if DEBUG
+    private let setupTestMode = SetupTestRuntime.mode()
+    #if DEBUG || OMGSKILLS_SETUP_TEST
     private var f1Controller: PublicSkillInstallWindowController?
     private var pendingF1URL: URL?
     #endif
@@ -74,6 +75,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        switch setupTestMode {
+        case .invalid(let reason):
+            refuseSetupTestLaunch(reason)
+            return
+        case .enabled(let configuration):
+            #if OMGSKILLS_SETUP_TEST
+            do {
+                try configuration.prepareStorage()
+                f1Controller = PublicSkillInstallWindowController(service: try .setupTest(configuration),
+                    website: configuration.website, client: .setupTest)
+                if let pendingF1URL { f1Controller?.receive(pendingF1URL); self.pendingF1URL = nil }
+                else { f1Controller?.showReview() }
+            } catch { refuseSetupTestLaunch(error.localizedDescription) }
+            #endif
+            return
+        case .disabled: break
+        }
         switch f1Mode {
         case .invalid(let reason):
             let alert = NSAlert()
@@ -147,6 +165,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
     }
 
+    private func refuseSetupTestLaunch(_ reason: String) {
+        let alert = NSAlert()
+        alert.messageText = "Cannot start OMGSkills Setup Test"
+        alert.informativeText = reason
+        alert.runModal()
+        NSApp.terminate(nil)
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         skillGroupsFeatureRefreshTask?.cancel()
         libraryRefreshTask?.cancel()
@@ -158,7 +184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        #if DEBUG
+        #if DEBUG || OMGSKILLS_SETUP_TEST
         if let f1Controller {
             guard !f1Controller.model.isApplying, f1Controller.model.phase != .cancelling else { return .terminateCancel }
             Task {
@@ -177,6 +203,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        if setupTestMode != .disabled {
+            #if OMGSKILLS_SETUP_TEST
+            if case .enabled = setupTestMode, let url = urls.first {
+                if let f1Controller { f1Controller.receive(url) }
+                else if pendingF1URL == nil { pendingF1URL = url }
+            }
+            #endif
+            return
+        }
         if f1Mode != .disabled {
             #if DEBUG
             if case .enabled = f1Mode, let url = urls.first {

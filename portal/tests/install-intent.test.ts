@@ -7,7 +7,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { build } from "esbuild";
 import { INSTALL_INTENT_KEY, INSTALL_INTENT_TTL, InstallIntentStore, InstallSetupSession, intentFromAction } from "../src/app/unified/install-intent";
-import { developmentInstallLink } from "../src/app/unified/public-install";
+import { developmentInstallLink, installClients, type InstallClient } from "../src/app/unified/public-install";
 import type { SkillDisplay } from "../src/app/unified/model";
 import { f2Cases, f2InstallAction } from "../src/preview/unified/f2-install";
 
@@ -236,11 +236,41 @@ test("separate tabs have independent pending requests; a new selection clears on
   assert.deepEqual(second.store.read().intent, intent);
 });
 
+test("setup-test state is separate from F1 and retry preserves the handler without auto-opening", async () => {
+  const disk = storage();
+  const f1 = new InstallIntentStore(() => disk);
+  f1.save(intent);
+  const setup = new InstallIntentStore(() => disk, "setup-test");
+  assert.equal(setup.read().intent, null);
+  const candidateAction = (value: SkillDisplay) => ({ href: developmentInstallLink(value, commit, "setup-test"), reason: "" });
+  assert.equal(intentFromAction(skill, candidateAction(skill), route, now), null);
+  assert.equal(intentFromAction(skill, action(skill), route, now, "setup-test"), null);
+  const opens: string[] = [];
+  const options = { client: "setup-test" as const, catalogId: skill.catalogId!, commit, returnRoute: route,
+    now: () => now, action: candidateAction, refresh: async () => skill, open: (href: string) => { opens.push(href); } };
+  const first = new InstallSetupSession({ ...options, store: setup });
+  first.showSetup(skill);
+  const restored = new InstallSetupSession({ ...options, store: new InstallIntentStore(() => disk, "setup-test") });
+  assert.equal(restored.getSnapshot().phase, "setup");
+  assert.deepEqual(restored.getSnapshot().intent, intent);
+  await restored.retry();
+  assert.equal(restored.getSnapshot().phase, "ready");
+  assert.deepEqual(opens, []);
+  restored.open(skill);
+  restored.open(skill);
+  assert.deepEqual(opens, [candidateAction(skill).href]);
+  assert.match(restored.getSnapshot().message, /Check OMGSkills Setup Test/);
+  restored.reset();
+  assert.equal(new InstallIntentStore(() => disk, "setup-test").read().intent, null);
+  assert.deepEqual(new InstallIntentStore(() => disk).read().intent, intent);
+});
+
 test("preview wiring gates setup, disables download and suppresses only the test's old public CTA", () => {
   const read = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8");
   const preview = read("../src/preview/unified/main.tsx");
-  assert.match(preview, /publicInstallAction=\{f1Enabled \?/);
-  assert.match(preview, /f1Enabled \? createPreviewInstallStore\(\) : null/);
+  assert.match(preview, /publicInstallAction=\{installClient \?/);
+  assert.match(preview, /installClient \? createPreviewInstallStore\(installClient\) : null/);
+  assert.match(preview, /const installClient = import.meta.env.DEV \? previewInstallClient/);
   assert.match(preview, /detailReady=\{detailReady && liveCatalog\}/);
   assert.match(preview, /next.selected && next.selected !== nav.selected\) installStore\?\.clear\(\)/);
   const component = read("../src/preview/unified/PublicInstallSetup.tsx");
@@ -263,16 +293,18 @@ test("actual setup component renders restored intent and a disabled download wit
   const sample = { ...skill, key: `catalog:${item.source.id}`, catalogId: item.source.id,
     githubUrl: `https://github.com/${item.source.repository}`, skillMDPath: item.source.path };
   const returnRoute = `/app/preview/unified/?skill=${encodeURIComponent(sample.key)}&f2case=${item.key}`;
-  const disk = storage(), store = new InstallIntentStore(() => disk);
-  const props = { skill: sample, detailReady: true, caseKey: item.key, returnRoute, store };
-  const initial = renderToStaticMarkup(createElement(module.exports.PublicInstallSetup, props));
-  assert.match(initial, /Open in OMGSkills F1 Test/);
-  assert.equal(disk.data.size, 0);
-  store.save(intentFromAction(sample, f2InstallAction(sample, item.key), returnRoute, Date.now())!);
-  const restored = renderToStaticMarkup(createElement(module.exports.PublicInstallSetup, props));
-  assert.match(restored, /Try opening again/);
-  assert.match(restored, /disabled="" aria-describedby="ua-download-status"/);
-  assert.match(restored, /The signed test download is not available yet/);
-  assert.match(restored, /Exact version 063bee94/);
-  assert.doesNotMatch(restored, /href="https:\/\/omgskills.com\/download"|Installed successfully/);
+  for (const client of ["f1", "setup-test"] satisfies InstallClient[]) {
+    const disk = storage(), store = new InstallIntentStore(() => disk, client);
+    const props = { skill: sample, detailReady: true, caseKey: item.key, returnRoute, store, client };
+    const initial = renderToStaticMarkup(createElement(module.exports.PublicInstallSetup, props));
+    assert.ok(initial.includes(`Open in ${installClients[client].name}`));
+    assert.equal(disk.data.size, 0);
+    store.save(intentFromAction(sample, f2InstallAction(sample, item.key, client), returnRoute, Date.now(), client)!);
+    const restored = renderToStaticMarkup(createElement(module.exports.PublicInstallSetup, props));
+    assert.match(restored, /Try opening again/);
+    assert.match(restored, /disabled="" aria-describedby="ua-download-status"/);
+    assert.match(restored, /The signed test download is not available yet/);
+    assert.match(restored, /Exact version 063bee94/);
+    assert.doesNotMatch(restored, /href="https:\/\/omgskills.com\/download"|Installed successfully/);
+  }
 });

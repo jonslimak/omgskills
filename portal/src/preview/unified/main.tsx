@@ -17,11 +17,13 @@ import type { PortalSet } from "../../app/model";
 import type { GroupedSyncedSkill } from "../../synced-skill-grouping";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog } from "../../app/unified/use-public-catalog";
-import { isF1Preview } from "../../app/unified/public-install";
+import { previewInstallClient } from "../../app/unified/public-install";
 import { f2Cases, f2CaseNavigation, f2NavigationSearch, readF2CaseKey } from "./f2-install";
 import { createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
 
-const f1Enabled = import.meta.env.DEV && isF1Preview(import.meta.env.DEV, import.meta.env.VITE_NEWMAC_F1, location.hostname);
+const installClient = import.meta.env.DEV ? previewInstallClient(import.meta.env.DEV,
+  import.meta.env.VITE_NEWMAC_F1, import.meta.env.VITE_NEWMAC_SETUP_TEST, location.hostname) : null;
+const installPreviewEnabled = installClient !== null;
 
 const catalog = makeCatalog();
 const publicClient = new PublicCatalogClient();
@@ -31,10 +33,10 @@ function installed(skills: SkillDisplay[]): GroupedSyncedSkill[] {
 }
 
 function Preview() {
-  const [installStore] = useState(() => f1Enabled ? createPreviewInstallStore() : null);
+  const [installStore] = useState(() => installClient ? createPreviewInstallStore(installClient) : null);
   const [scenario, setScenario] = useState<Scenario>("populated");
   const [data, setData] = useState(() => makeFixtures());
-  const [signedIn, setSignedIn] = useState(!f1Enabled);
+  const [signedIn, setSignedIn] = useState(!installPreviewEnabled);
   const [f2CaseKey, setF2CaseKey] = useState(() => readF2CaseKey(location.search));
   const [nav, setNav] = useState(() => parseNavigation(location.search));
   const [revision, setRevision] = useState(0);
@@ -42,7 +44,7 @@ function Preview() {
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
   const previewSearch = (next: Navigation, caseKey = f2CaseKey) =>
-    f1Enabled ? f2NavigationSearch(next, caseKey) : navigationSearch(next);
+    installPreviewEnabled ? f2NavigationSearch(next, caseKey) : navigationSearch(next);
   const navigate = (next: Navigation, replace = false) => {
     if (next.selected && next.selected !== nav.selected) installStore?.clear();
     const safe =
@@ -65,7 +67,7 @@ function Preview() {
       setF2CaseKey(caseKey);
       if (!signedIn && !isDiscovery(next.view)) {
         const safe = { ...initialNavigation, view: "discover" as const };
-        history.replaceState({}, "", `${base}${f1Enabled ? f2NavigationSearch(safe, caseKey) : navigationSearch(safe)}`);
+        history.replaceState({}, "", `${base}${installPreviewEnabled ? f2NavigationSearch(safe, caseKey) : navigationSearch(safe)}`);
         setNav(safe);
       } else setNav(next);
     };
@@ -129,9 +131,9 @@ function Preview() {
       nav={nav}
       navigate={navigate}
       signedIn={signedIn}
-      publicInstallAction={f1Enabled ? (skill, detailReady) => <PublicInstallSetup
+      publicInstallAction={installClient ? (skill, detailReady) => <PublicInstallSetup
         key={`${skill.catalogId}:${f2CaseKey}`} skill={skill} detailReady={detailReady && liveCatalog}
-        caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} /> : undefined}
+        caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} client={installClient} /> : undefined}
       onSession={session}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
@@ -198,7 +200,7 @@ function Preview() {
         <div className="ua-preview">
           <span>{liveCatalog ? "Local preview · live Discover · sample account" : "Local preview · sample data"}</span>
           <div>
-            {f1Enabled && <select aria-label="F2 test case" value={f2CaseKey} onChange={event => selectF2Case(event.target.value)}>
+            {installPreviewEnabled && <select aria-label="F2 test case" value={f2CaseKey} onChange={event => selectF2Case(event.target.value)}>
               <option value="" disabled>F2: Choose a test case</option>
               {f2Cases.map(item => <option key={item.key} value={item.key}>{item.label}</option>)}
             </select>}

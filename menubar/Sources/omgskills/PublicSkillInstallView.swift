@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || OMGSKILLS_SETUP_TEST
 import SwiftUI
 import AppKit
 
@@ -8,7 +8,7 @@ struct PublicSkillInstallView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(model.review?.source.targetName ?? "OMGSkills F1 Test").font(.title2.bold())
+            Text(model.review?.source.targetName ?? model.client.appName).font(.title2.bold())
             if let review = model.review {
                 Text(review.source.repositorySlug + "/" + review.source.packageRoot)
                     .foregroundStyle(.secondary).textSelection(.enabled)
@@ -46,7 +46,8 @@ struct PublicSkillInstallView: View {
                     .disabled(model.isApplying || model.phase == .cancelling)
                 Spacer()
                 if model.phase == .review, let review = model.review {
-                    Button(review.action == .install ? "Install in test folder" : review.action == .update ? "Apply update in test folder" : "Done") {
+                    Button(review.action == .install ? "Install in " + model.client.destinationLabel
+                           : review.action == .update ? "Apply update in " + model.client.destinationLabel : "Done") {
                         model.apply()
                     }.buttonStyle(.borderedProminent)
                 }
@@ -62,32 +63,36 @@ final class PublicSkillInstallWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
 
-    init(root: URL, website: URL) {
+    convenience init(root: URL, website: URL) {
         let paths = SkillFilesystemPaths.isolated(testRoot: root)
-        self.website = website
-        model = PublicSkillInstallModel(service: PublicSkillReviewService(
+        self.init(service: PublicSkillReviewService(
             fetcher: GitPublicSkillPackageFetcher(temporaryRoot: root),
             installer: ManagedSkillInstaller(managedRoot: root.appendingPathComponent("managed"), pathAnchor: paths.homeDirectory),
             paths: paths
-        ))
+        ), website: website, client: .f1)
+    }
+
+    init(service: PublicSkillReviewService, website: URL, client: PublicSkillInstallClient) {
+        self.website = website
+        model = PublicSkillInstallModel(service: service, client: client)
         super.init()
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 720, height: 680),
                           styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
-        window.title = "OMGSkills F1 Test"
+        window.title = client.appName
         window.isReleasedWhenClosed = false
         window.delegate = self
         window.contentView = NSHostingView(rootView: PublicSkillInstallView(model: model, close: { [weak self] in self?.closeReview() }))
         window.center()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.title = "F1"
-        statusItem.button?.toolTip = "OMGSkills F1 Test"
+        statusItem.button?.title = client == .f1 ? "F1" : "Setup Test"
+        statusItem.button?.toolTip = client.appName
         let menu = NSMenu()
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
-        menu.addItem(withTitle: "OMGSkills F1 Test " + version, action: nil, keyEquivalent: "")
+        menu.addItem(withTitle: client.appName + " " + version, action: nil, keyEquivalent: "")
         addItem("Status", action: #selector(showReview), to: menu)
         addItem("Open website", action: #selector(openWebsite), to: menu)
         menu.addItem(.separator())
-        addItem("Quit OMGSkills F1 Test", action: #selector(quit), to: menu)
+        addItem("Quit " + client.appName, action: #selector(quit), to: menu)
         statusItem.menu = menu
     }
 
