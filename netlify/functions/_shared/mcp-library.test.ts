@@ -201,7 +201,7 @@ test("refresh reloads when the catalog version changes or cannot be read", async
   assert.equal(loads, 3);
 });
 
-test("library version comes from content-hashed manifest paths", async () => {
+test("library version covers manifest paths and curated data and matches the loaded snapshot", async () => {
   const fetcher: typeof fetch = async (input) => {
     const url = String(input);
     if (url === "https://example.test/data/manifest.json") {
@@ -209,8 +209,106 @@ test("library version comes from content-hashed manifest paths", async () => {
     }
     return Response.json([]);
   };
-  assert.equal(
-    await OmgskillsLibrary.readVersion("https://example.test/data/manifest.json", fetcher),
-    "skills-abc.json|trending-def.json"
-  );
+  const manifestUrl = "https://example.test/data/manifest.json";
+  const version = await OmgskillsLibrary.readVersion(manifestUrl, fetcher);
+  assert.match(version ?? "", /^skills-abc\.json\|trending-def\.json\|[a-f0-9]{64}$/);
+  assert.equal((await OmgskillsLibrary.load({ manifestUrl, fetcher })).version, version);
+});
+
+test("refresh retries the preferred track before reusing an unchanged fallback", async () => {
+  let primaryAvailable = false;
+  const attempts: string[] = [];
+  const loader = createMcpLibraryLoader({
+    tracks: [
+      { name: "crawl4", manifestUrl: "https://example.test/crawl4.json" },
+      { name: "v2", manifestUrl: "https://example.test/v2.json" }
+    ],
+    loadTrack: async (track) => {
+      attempts.push(track.name);
+      if (track.name === "crawl4" && !primaryAvailable) throw new Error("temporary failure");
+      return versionedLibrary(`example/skills:${track.name}`, track.name);
+    },
+    readTrackVersion: async (track) => track.name
+  });
+
+  const fallback = await loader.get();
+  assert.equal(fallback.sourceTrack, "v2");
+  assert.equal((await loader.refresh()).library, fallback.library);
+  assert.deepEqual(attempts, ["crawl4", "v2", "crawl4"]);
+  primaryAvailable = true;
+  assert.equal((await loader.refresh()).sourceTrack, "crawl4");
+  assert.deepEqual(attempts, ["crawl4", "v2", "crawl4", "crawl4"]);
+});
+
+function remoteCatalog() {
+  const manifestUrl = "https://example.test/data/manifest.json";
+  const skill = library("example/skills:remote").getSkill("example/skills:remote")!;
+  const state = { failTrending: false, failGold: false, goldScore: 10, empty: false, skillReads: 0 };
+  const fetcher: typeof fetch = async (input) => {
+    const url = String(input);
+    if (url === manifestUrl) return Response.json({
+      skills: { path: "skills-abc.json" }, trending: { path: "trending-def.json" }
+    });
+    if (url.endsWith("/skills-abc.json")) {
+      state.skillReads += 1;
+      return Response.json([skill]);
+    }
+    if (url.endsWith("/trending-def.json")) return state.failTrending
+      ? new Response("unavailable", { status: 503 })
+      : Response.json(state.empty ? [] : [{ id: skill.id, trending_rank: 1, installs: 5 }]);
+    if (url.endsWith("/gold-basket.json")) return state.failGold
+      ? new Response("unavailable", { status: 503 })
+      : Response.json(state.empty ? [] : [{ ...skill, score: state.goldScore }]);
+    throw new Error(`Unexpected request: ${url}`);
+  };
+  const loader = createMcpLibraryLoader({
+    tracks: [{ name: "crawl4", manifestUrl }],
+    loadTrack: () => OmgskillsLibrary.load({
+      manifestUrl, fetcher, allowMissingTrending: true, allowMissingGoldBasket: true
+    }),
+    readTrackVersion: () => OmgskillsLibrary.readVersion(manifestUrl, fetcher)
+  });
+  return { state, loader, skill };
+}
+
+for (const source of ["Trending", "Gold"] as const) {
+  test(`refresh recovers a failed optional ${source} download without a manifest change`, async () => {
+    const { state, loader } = remoteCatalog();
+    state[`fail${source}`] = true;
+    const first = await loader.get();
+    assert.equal(source === "Trending" ? first.trendingCount : first.goldBasketCount, 0);
+    assert.equal(first.library.version, undefined);
+    state[`fail${source}`] = false;
+    const recovered = await loader.refresh();
+    assert.equal(source === "Trending" ? recovered.trendingCount : recovered.goldBasketCount, 1);
+    assert.equal(state.skillReads, 2);
+  });
+}
+
+test("refresh picks up independent curated score changes and updates search scoring", async () => {
+  const { state, loader, skill } = remoteCatalog();
+  const first = await loader.get();
+  const oldScore = first.library.searchSkills({ query: "remote" })[0].score;
+  state.goldScore = 99;
+  const refreshed = await loader.refresh();
+  assert.equal(refreshed.library.getSkill(skill.id)?.gold_score, 99);
+  assert.ok(refreshed.library.searchSkills({ query: "remote" })[0].score > oldScore);
+  assert.equal(state.skillReads, 2);
+});
+
+test("unchanged healthy remote data skips the large catalog download", async () => {
+  const { state, loader } = remoteCatalog();
+  const first = await loader.get();
+  assert.equal(first.trendingCount, 1);
+  assert.equal(first.goldBasketCount, 1);
+  assert.equal((await loader.refresh()).library, first.library);
+  assert.equal(state.skillReads, 1);
+});
+
+test("successful empty optional data remains cacheable", async () => {
+  const { state, loader } = remoteCatalog();
+  state.empty = true;
+  const first = await loader.get();
+  assert.equal((await loader.refresh()).library, first.library);
+  assert.equal(state.skillReads, 1);
 });

@@ -53,10 +53,9 @@ export function createMcpLibraryLoader(options: McpLibraryLoaderOptions = {}): M
 
   // A stale snapshot whose source data has not changed only needs a new timestamp.
   // This avoids re-downloading and re-parsing the full catalog every refresh window.
-  async function unchangedSnapshot(): Promise<McpLibrarySnapshot | null> {
+  async function unchangedSnapshot(track: McpCatalogTrack): Promise<McpLibrarySnapshot | null> {
     if (!snapshot?.library.version || !readTrackVersion) return null;
-    const track = tracks.find((candidate) => candidate.name === snapshot?.sourceTrack);
-    if (!track) return null;
+    if (track.name !== snapshot.sourceTrack) return null;
     try {
       const version = await readTrackVersion(track);
       if (version && version === snapshot.library.version) return { ...snapshot, loadedAt: now() };
@@ -67,11 +66,12 @@ export function createMcpLibraryLoader(options: McpLibraryLoaderOptions = {}): M
   }
 
   async function loadFreshSnapshot(): Promise<McpLibrarySnapshot> {
-    const unchanged = await unchangedSnapshot();
-    if (unchanged) return unchanged;
     let lastError: unknown;
     for (const track of tracks) {
       try {
+        // Retry higher-priority sources before reusing a cached fallback.
+        const unchanged = await unchangedSnapshot(track);
+        if (unchanged) return unchanged;
         const library = await loadTrack(track);
         const stats = library.getStats();
         return {

@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 
 export type Skill = {
@@ -133,12 +134,25 @@ export class OmgskillsLibrary {
       readOptionalJsonArray<GoldBasketEntry>(goldBasketSource, fetcher, paths.allowMissingGoldBasket)
     ]);
 
-    return new OmgskillsLibrary({ skills, trending, goldBasket }, manifestVersion(manifest));
+    // Failed optional reads are usable for discovery, but must be retried rather
+    // than cached as a complete snapshot. Local overrides are not manifest-versioned.
+    const version = trending.complete && goldBasket.complete &&
+      !paths.skillsPath && !paths.trendingPath && !paths.goldBasketPath
+      ? manifestVersion(manifest, goldBasket.data) : undefined;
+    return new OmgskillsLibrary({ skills, trending: trending.data, goldBasket: goldBasket.data }, version);
   }
 
-  /** Content-hashed asset paths from a manifest; equal versions mean unchanged catalog data. */
-  static async readVersion(manifestUrl: string, fetcher: typeof fetch = fetch): Promise<string | undefined> {
-    return manifestVersion(await readJson<Manifest>(manifestUrl, fetcher));
+  /** Check hashed catalog paths and the independently published curated data. */
+  static async readVersion(
+    manifestUrl: string,
+    fetcher: typeof fetch = fetch,
+    goldBasketUrl = defaultGoldBasketUrl
+  ): Promise<string | undefined> {
+    const [manifest, goldBasket] = await Promise.all([
+      readJson<Manifest>(manifestUrl, fetcher),
+      readJsonArray<GoldBasketEntry>(goldBasketUrl, fetcher)
+    ]);
+    return manifestVersion(manifest, goldBasket);
   }
 
   static fromData(data: LoadedLibrary, version?: string): OmgskillsLibrary {
@@ -258,15 +272,15 @@ async function readOptionalJsonArray<T>(
   fetcher: typeof fetch,
   optional = false,
   label = "optional data"
-): Promise<T[]> {
+): Promise<{ data: T[]; complete: boolean }> {
   if (!pathOrUrl) {
-    if (optional) return [];
+    if (optional) return { data: [], complete: true };
     throw new Error(`Missing ${label} source`);
   }
   try {
-    return await readJsonArray<T>(pathOrUrl, fetcher);
+    return { data: await readJsonArray<T>(pathOrUrl, fetcher), complete: true };
   } catch (error) {
-    if (optional) return [];
+    if (optional) return { data: [], complete: false };
     throw error;
   }
 }
@@ -339,9 +353,10 @@ function slimSkill(skill: Skill): Skill {
   return slim as Skill;
 }
 
-function manifestVersion(manifest: Manifest | undefined): string | undefined {
+function manifestVersion(manifest: Manifest | undefined, goldBasket: GoldBasketEntry[]): string | undefined {
   if (!manifest?.skills?.path) return undefined;
-  return [manifest.skills.path, manifest.trending?.path ?? ""].join("|");
+  const goldHash = createHash("sha256").update(JSON.stringify(goldBasket)).digest("hex");
+  return [manifest.skills.path, manifest.trending?.path ?? "", goldHash].join("|");
 }
 
 function normalize(value: unknown): string {
