@@ -148,7 +148,7 @@
     "name": "cavecrew",
     "authorHandle": "juliusbrussee",
     "description": "When to delegate to `cavecrew-investigator` (locate code), `cavecrew-builder` (1-2 file edit) or `cavecrew-reviewer` (diff review) instead of working inline or using `Explore`. Their output is compressed, so main context lasts longer.",
-    "stars": 110693,
+    "stars": 110865,
     "installs": 341700,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
@@ -192,7 +192,7 @@
     "name": "emil-design-eng",
     "authorHandle": "emilkowalski",
     "description": "This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.",
-    "stars": 44750,
+    "stars": 44933,
     "installs": 338638,
     "githubUrl": "https://github.com/emilkowalski/skills",
     "source": "skills.sh"
@@ -544,7 +544,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 180233,
+    "stars": 180263,
     "installs": 233200,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -973,7 +973,7 @@
     "name": "archify",
     "authorHandle": "tt-a1i",
     "description": "Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid. Also use for everyday subjects with steps, parts, relationships, or states: a leave or travel plan, an application or approval process, a back-and-forth such as renting, where money or documents go, or where an application or order stands. Not for numeric charts or dashboards.",
-    "stars": 81161,
+    "stars": 81510,
     "installs": 145228,
     "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
@@ -1842,7 +1842,7 @@
     "name": "ponytail",
     "authorHandle": "dietrichgebert",
     "description": "Lazy senior dev mode: the smallest change that fully solves the task, and a reply a busy human understands in one read. Use on any coding task (writing, fixing, refactoring, reviewing, choosing dependencies) and when the user says \"ponytail\", \"be lazy\", \"simplest solution\", \"yagni\", or complains about over-engineering or bloat. Levels: lite, full (default), ultra.",
-    "stars": 158490,
+    "stars": 160107,
     "installs": 78041,
     "githubUrl": "https://github.com/DietrichGebert/ponytail",
     "source": "skills.sh"
@@ -3019,7 +3019,7 @@
     "name": "planning-with-files",
     "authorHandle": "othmanadi",
     "description": "Persistent file-based planning for multi-step AI-agent work. Keeps task_plan.md, findings.md, and progress.md on disk; lifecycle hooks inject selected project planning context. Automatic recovery reads project planning files only. Explicit session-catchup.py --metadata reads same-project local agent session records and emits aggregate counts only; --replay may emit bounded nonce-framed excerpts. Optional gated mode can request continuation only when the host supports it and never runs commands declared in Markdown. The skill has no network upload path. Use for research or work needing 5+ tool calls.",
-    "stars": 27308,
+    "stars": 27373,
     "installs": 45294,
     "githubUrl": "https://github.com/OthmanAdi/planning-with-files",
     "source": "skills.sh"
