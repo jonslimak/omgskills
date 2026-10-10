@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-09T23:01:38.175Z",
+  "generatedAt": "2026-10-10T22:05:01.963Z",
   "shaToSkillIds": {
     "00000f2a9d8359900f2075b536b435ca9473a5b9": [
       "obot-platform/obot:draft-release-blog"
@@ -4640,6 +4640,9 @@
     "01d9931039f709915cbe8b52567e37681f5130e4": [
       "vinvcn/mattpocock-skills-zh-cn:wayfinder"
     ],
+    "01d9b6681b7db13b4183b0169bfde368195dca87": [
+      "liyupi/ai-promo-video-maker"
+    ],
     "01d9f0ba8b718befe08df7f17e73dffe0806bff0": [
       "guia-matthieu/clawfu-skills:skills/meta/agent-evaluation"
     ],
@@ -8584,6 +8587,9 @@
     "063d4a6438922e42170dd1208af5adf360b7670d": [
       "jetbrains/go-modern-guidelines:use-modern-go"
     ],
+    "063eb49c4cfa75b80368ad991d4deab087c077d3": [
+      "microsoft/aspire:pr-testing"
+    ],
     "063ed26c4620829fd05331b55b3862a255ae5196": [
       "dontbesilent2025/dbskill:dbs-spread"
     ],
@@ -11736,6 +11742,9 @@
     ],
     "09e2e4ea081c556f0690f1b7d045c9e863feb374": [
       "Dicklesworthstone/pi_agent_rust:tests/ext_conformance/artifacts/templates-davila7/cli-tool/components/skills/sentry/commit"
+    ],
+    "09e39c8b55c5da98ec52228392e161b033db68e6": [
+      "lIkesimba9/audiogear"
     ],
     "09e3f7dd159fb1d0b9e4aace076c43540adf8bb7": [
       "yu-iskw/skill-inspector:.claude/skills/build-and-fix"
@@ -16714,6 +16723,9 @@
     "0f902ea88894bf54ef68a046bc145ee2e019df15": [
       "kostja94/marketing-skills:public-relations"
     ],
+    "0f92317abe6080ec6a251955b2d3731bc02b9598": [
+      "brandonvant/claude-skill-whiteboard-explainer"
+    ],
     "0f92da1b1f06ac32603ed3faac8cf99de44f5ac4": [
       "modbender/skill-library-mcp:openjobs"
     ],
@@ -17685,6 +17697,9 @@
     "10a3aa9f0f1c17e39d47da1e534ae0b0b7affed0": [
       "forcedotcom/sf-skills:preparing-datacloud"
     ],
+    "10a494109d1adbf0d3c15c17fedc79931149cbdb": [
+      "DaizeDong/self-evolve"
+    ],
     "10a59b2a46a17cdbf59eea25f2aaef1f82d75818": [
       "resend/resend-skills:skills/agent-email-inbox"
     ],
@@ -18420,6 +18435,9 @@
     ],
     "11657b94f824ebea48e50ee4107cbd81014c0eff": [
       "kagenti/kagenti:.claude/skills/kind"
+    ],
+    "1165d422ad5c533b6eab621f9b4c4201264f9bd4": [
+      "cathrynlavery/diagram-design:diagram-design"
     ],
     "116764a29f952a2c06fd17b16e0c1b531a114873": [
       "Ulanxx/mzstack:plan-design-review"
@@ -19716,6 +19734,7 @@
       "virgiliojr94/book-to-skill"
     ],
     "12e37998f01edcde102f3665c2f729c2c43d49c8": [
+      "achimala/dream-loop",
       "achimala/dream-loop:dream-loop"
     ],
     "12e39cd3022b7c80b0026a71b712a42aadca1c29": [
@@ -21661,6 +21680,9 @@
     "1503de942d8591719dee40cb34b03d804ec84cc8": [
       "treasure-data/td-skills:workflow-skills/dbt"
     ],
+    "1505572555cee55d32069377d342a22dde3de139": [
+      "snewhouse/aa-ma-forge:sole-dev-merge"
+    ],
     "1506aa7bae0d41323b05381712c10960f4353ca6": [
       "agents-inc/skills:src/skills/api-cms-strapi"
     ],
@@ -21939,6 +21961,7 @@
       "pynbj1001/alpha-sense:AnnualReports"
     ],
     "155aad4f240f3a38aa3a2559af3a3ec8d704603b": [
+      "nvidia/skills:deploy",
       "nvidia/skills:vss-deploy-profile"
     ],
     "155b0cb53e493884d50665c68ceaf035463ba5ab": [
@@ -27404,6 +27427,7 @@
       "google/skills:google-cloud-waf-cost-optimization"
     ],
     "1bd13e8fe34c555cd48c2aa1f7f21bccc397f70b": [
+      "nvidia/skills:ad-model-onboard",
       "nvidia/skills:nemo-automodel-model-onboarding"
     ],
     "1bd1cee6ad3d293e64bd7ac6ae7ff6df292ceea7": [
@@ -28496,6 +28520,9 @@
     ],
     "1d1d0e77ed79c8269c9163addb88aee3398ad2ab": [
       "mindrally/skills:angular"
+    ],
+    "1d1ec2aeaad90bfb3213adc6b32e5e8c1fcb8a12": [
+      "xlite-dev/LeetCUDA:leetcuda-tex-to-readthedocs"
     ],
     "1d21db00bfc1dc2845bb3ee10987eed166a99505": [
       "github/awesome-copilot:openapi-to-application-code"
@@ -29860,6 +29887,9 @@
     ],
     "1eb0ab5f76102e5e190dd4045314780449b22077": [
       "benzwick/SlicerMouseMaster:.claude/skills/audit-code-quality"
+    ],
+    "1eb129b34761f7762941e52c933612735cf265df": [
+      "ferr079/humanizer-fr"
     ],
     "1eb1999721e726deee1e123b2e0700d5f288d5b7": [
       "lijigang/ljg-skills:ljg-book"
@@ -33371,6 +33401,9 @@
     ],
     "22b6ef1632955bc515633f59fbd2f1d7102ac6e0": [
       "firebase/skills:firebase-basics"
+    ],
+    "22b98fc5bac68d46bc8f066df90155aa3815262d": [
+      "obra/superpowers:brainstorming"
     ],
     "22bbdd5f5fd79ad64633f1e39b4ef79be065fabb": [
       "oimiragieo/agent-studio:.claude/skills/scientific-skills/skills/biopython"
@@ -37486,6 +37519,9 @@
     "27ab920c30ea37f44635a750f921b955459296ea": [
       "proffesor-for-testing/agentic-qe:.claude/skills/consultancy-practices"
     ],
+    "27abb953fcfe27ec259685237d265c3511392b84": [
+      "Nmor/the-council:configure-ecc"
+    ],
     "27ad9962c3a5f291853c7ca55813afb70ccbcd5e": [
       "Ramblurr/nix-devenv:prompts/skills/clojure-babashka-json"
     ],
@@ -38582,6 +38618,9 @@
     "28f8abeda3c84f596b7f4a0d0fd52bd882667371": [
       "ruchernchong/dotfiles:.claude/skills/sync-checker"
     ],
+    "28f91c47ae9b056e67823296ba3441e5a6e55eee": [
+      "worldwonderer/oh-story-claudecode:story-short-write"
+    ],
     "28f977d4448e868d67bf949025baaddbc39307a3": [
       "dianshu/config:continuous-learning"
     ],
@@ -38770,6 +38809,7 @@
       "nomadamas/k-skill:fsc-corporate-info"
     ],
     "2931f6e4b3a0c48cf2a1d0c0b132d4a3fd1b4a6a": [
+      "ZDStudios/AIOS:VoiceServer",
       "danielmiessler/Personal_AI_Infrastructure:VoiceServer",
       "majiayu000/claude-skill-registry-data:VoiceServer",
       "majiayu000/claude-skill-registry-data:voiceserver-danielmiessler-personal-ai-infrastr",
@@ -38842,6 +38882,7 @@
       "SuperPyonchiX/VSCodeEnv:copilot-customization"
     ],
     "2945a7c7f7a64a6397abd4f2c86d67d418d6721a": [
+      "ZDStudios/AIOS:Council",
       "danielmiessler/LifeOS:Council",
       "danielmiessler/Personal_AI_Infrastructure:Council",
       "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Council",
@@ -39890,6 +39931,9 @@
     ],
     "2a972a422c43aca7d37b31d17b95335e40c0962f": [
       "vercel/vercel-plugin:knowledge-update"
+    ],
+    "2a97447b8e36379d8d1c30e931bd0d00c0178470": [
+      "rolecraft-sh/rolecraft"
     ],
     "2a9781367d04500543fb5bd8096fa0ee53e78075": [
       "dylantarre/animation-principles:skills/11-by-principle-focus/anticipation-mastery"
@@ -51678,6 +51722,9 @@
     "394b1c7071181cdbba337987953828e46948f900": [
       "him55710-sudo/uni-foli:gstack-retro"
     ],
+    "394cfdf9871a8e5d6c54a6094d95dcbb51be4c11": [
+      "ommakes/Skills:vois-patterns"
+    ],
     "394d906d3ead0c0cfa48ff943d3e663e3d91d2ac": [
       "microsoft/vscode:update-pr"
     ],
@@ -52878,6 +52925,9 @@
     ],
     "3ad0cf0894fcdbabd471755c6b32eb4f7d1593df": [
       "pr-pm/prpm:.claude/skills/karen-repo-reviewer"
+    ],
+    "3ad14d7b2e54960a4e244e0875a71a24da0c5209": [
+      "masharratt/claude-flow-novice:auto"
     ],
     "3ad2f2971db64a89e5946b15e59fa138dfd56386": [
       "firecrawl/cli:firecrawl-monitor"
@@ -55219,6 +55269,9 @@
     "3dd85c612dd1548697dd0dd85d08988596ad2cd8": [
       "Samin12/skills:universal-skills-manager"
     ],
+    "3dd8fdc2c98aa914619d680ed2af42cad022e4bf": [
+      "gabrielmoreira/agent-skills-mirror:json-schema-maker"
+    ],
     "3dd96949d9b6ed60104ab3bdfe27cc93b2abebd0": [
       "tdimino/claude-code-minoan:codex-orchestrator"
     ],
@@ -55896,6 +55949,9 @@
     ],
     "3ebad3904d24574395a783606078621e6f4fc0b5": [
       "yigitkonur/skills-by-yigitkonur:enhance-skill-by-derailment"
+    ],
+    "3ebb6eaad7a413f8b6616c1b7b4a47aa17a11c8d": [
+      "useburner/burner"
     ],
     "3ebb79366a3d3c0559935a69858338ed92f31bc2": [
       "alanalvestech/hitank:vercel"
@@ -57771,6 +57827,9 @@
     ],
     "411ce46690c11363f82f787b5d2cb3fdbed0e95a": [
       "Niceck/hhxg-top-hhxg-python"
+    ],
+    "411f93ee053bddc4a50823a84793629c5664ac4a": [
+      "shenquan520/reading-analysis"
     ],
     "4120259793ef8ef96a3364362a4fdc56ed33baa1": [
       "xu-xiang/everything-claude-code-zh:continuous-learning"
@@ -61099,6 +61158,9 @@
     "45875d2825522cd1cb3dcf3c43303070cb0b1708": [
       "charleswiltgen/axiom:axiom-shipping"
     ],
+    "458834e652c3c28d2b5e88ee0f5f4d48782f9172": [
+      "skywain/trip-planner-skill"
+    ],
     "4589071ebbd3a4bfb4ef794e8d9cd05551041f26": [
       "mindrally/skills:nlp-natural-language-processing"
     ],
@@ -61123,6 +61185,9 @@
     "458d1aef48c6a458da41a00aa5d48ae8f11aee72": [
       "aj-geddes/useful-ai-prompts:frontend-state-management",
       "aj-geddes/useful-ai-prompts:skills/frontend-state-management"
+    ],
+    "458d1cae7251dba51970787eb42cebf07f4d8ab3": [
+      "skillmds/skillmd:five-element-spec-scope-before-coding"
     ],
     "458e2f6b8f10c4d9c6726025fc2556c188001161": [
       "Treasure-hub-agent/interactive-fiction-skill"
@@ -63923,6 +63988,9 @@
     "493a73579875d7cb9f00c5a22c32eeb1fe494c2f": [
       "steipete/agent-scripts:skills/github-cache-hygiene"
     ],
+    "493d2112cff2cfcf1760469637b5c3dd1373841a": [
+      "alibaba/open-code-review:open-code-review-delegate"
+    ],
     "493dea2db50a9efab7ab48dab6389208c0b991c8": [
       "Dmccarty30/Journeyman-Jobs:.claude/skills/dispatching-parallel-agents"
     ],
@@ -66054,6 +66122,9 @@
     "4c47e95e14ad2639de6fb6c244d5fafd9f9a8b2a": [
       "JosiahSiegel/claude-plugin-marketplace:plugins/bash-master/skills/bash-master"
     ],
+    "4c4862a5ab9b9e1fe44b226912f427ab0ca17ead": [
+      "lukedj78/dev-flow:dev-flow"
+    ],
     "4c4b4249b227ddb97b3886320b6c6e3711704bd8": [
       "neolabhq/context-engineering-kit:context-engineering"
     ],
@@ -68139,6 +68210,9 @@
     "4f0c0559c95382c4f2fb2ad7dde6c6a2a647a625": [
       "posthog/posthog:check-posthog-loading"
     ],
+    "4f0c27b5d107a627ae585f95d5b1b6b36043beea": [
+      "vercel/sandbox:sandbox"
+    ],
     "4f0cdd48c8a3679418fb56b2866913678d30f2be": [
       "Niraven/pokee-deep-research-skill:skills/google-workspace-mcp"
     ],
@@ -69286,6 +69360,9 @@
     "50a259010681a7c5b99b0ec7ed8ea1f2e2301ed9": [
       "athina-ai/goose-skills:skills/composites/get-qualified-leads-from-luma",
       "gooseworks-ai/goose-skills:skills/composites/get-qualified-leads-from-luma"
+    ],
+    "50a2fb3e3e54f5603f407e8cd9984fa787097bd6": [
+      "djnsty23/claude-auto-dev:heal"
     ],
     "50a33248efa2f8da037c521d82be3a99c6f2a591": [
       "wintermeyer/vutuv:deploy"
@@ -70442,7 +70519,8 @@
       "AxelMrak/ai:skills/ai-product"
     ],
     "523a6feecffab0472f64820e799299789a3bd561": [
-      "nvidia/nemo-fabric:nemo-fabric-build-adapter"
+      "nvidia/nemo-fabric:nemo-fabric-build-adapter",
+      "nvidia/skills:nemo-fabric-build-adapter"
     ],
     "523a93f56e18a3376e4101d1bd438948ca9a8a29": [
       "reedom/claude-code-commands:quick-refactor/skills/collect-commits-and-files"
@@ -70781,6 +70859,9 @@
     ],
     "52b885135c13c69b08fbf4da23229f47a20460e9": [
       "diodeinc/pcb:spice-sim"
+    ],
+    "52b936300251212cdcb35fde3ec2459df4403301": [
+      "dbhosbu-dotcom/renwei"
     ],
     "52b94c0f9e5be6abb0b0663f7c637f2f54e1487c": [
       "liangdabiao/claude-data-analysis-ultra-main:.claude/skills/ab-testing-analyzer"
@@ -72004,6 +72085,9 @@
     ],
     "547a3cd2f8fc9b77d95d7514cf75bfa802ab9f85": [
       "pluginagentmarketplace/custom-plugin-server-side-game-dev:skills/multithreading"
+    ],
+    "547a56528b68fd1559fc14198e06c98499379db4": [
+      "ilyautov/consilium-principis"
     ],
     "547a7e20ee9f119d5ef305f6c3b2e1a1da7dcf85": [
       "foryourhealth111-pixel/Vibe-Skills:bundled/skills/commit-with-reflection",
@@ -73374,6 +73458,9 @@
       "lllllllama/ai-paper-reproduction-skill:repo-intake-and-plan",
       "lllllllama/rigorpilot-skills:repo-intake-and-plan"
     ],
+    "5647810531a83b79910411c72e55ef2905ac56f6": [
+      "ZDStudios/AIOS:Delegation"
+    ],
     "564833c90fc6007823f2284e50c0e36803d56cc2": [
       "GPTomics/bioSkills:clip-seq/binding-site-annotation"
     ],
@@ -73853,6 +73940,9 @@
     "56e0c0b7cf60577ee08d546f936743538aa94cba": [
       "OpenAEC-Foundation/Frappe_Claude_Skill_Package:skills/source/impl/frappe-impl-customapp"
     ],
+    "56e192c7651dd27bd4855c0395f393472a4f9fed": [
+      "HybridAIOne/hybridclaw:skill-creator"
+    ],
     "56e1b25427571ea8dd1c91f893844aa86b9e6340": [
       "rbergman/dark-matter-marketplace:plugins/language-pro/skills/go-pro"
     ],
@@ -74199,6 +74289,9 @@
     ],
     "5756d5ff73f146acef6568687eea9521a5f4d40d": [
       "davekilleen/Dex:.claude/skills/anthropic-mcp-builder"
+    ],
+    "57572832dfcbe287db7cd0b2c45c43d4c66eeda4": [
+      "nicobailon/visual-explainer:visual-explainer"
     ],
     "5757c5e7e61f04d23f4638d9f64a029eff37da5e": [
       "p-wegner/coding-aider:.claude/skills/coding-aider-plan-generator"
@@ -78643,6 +78736,9 @@
     "5da6b6285bf430fc90173f9ad42c7d413e688f1e": [
       "memi-design/memi:memoire-design-tooling"
     ],
+    "5da7a244dd14b0cfbbcfbebf5468ffb18b0dc6e6": [
+      "zkk-orz/mcd-order-memory"
+    ],
     "5da7d0b67b5ae7aff370d648d4c0c517c61bc87d": [
       "everyinc/compound-engineering-plugin:ce-plan"
     ],
@@ -78921,6 +79017,9 @@
     ],
     "5dfca09a4094090b0c5c8d2d21b69f5945c61c34": [
       "adamaiken89/learn-anything"
+    ],
+    "5dfcda72f6914874f00104b10c9087c3010013c2": [
+      "Andiii208/seu-handbook-skill"
     ],
     "5dfceb11d2cea5e5629c25f40e8b6d8386d62fc3": [
       "FallseF/claude-code-skills:nanobanana"
@@ -81241,6 +81340,9 @@
     ],
     "613bfcfd7b6a6832d5e339e8a7c925651f8a2ecb": [
       "alex-tgk/claude-init:.claude/skills/claudeisms"
+    ],
+    "613d84e24fd20a5804ad10a0d809e51f1345bad8": [
+      "anivar/contributor-codebase-analyzer"
     ],
     "613e2afc47f523945c01e448f208632e39b8b0e3": [
       "NeverSight/skills_feed:data/skills-md/upsurgeio/akhrot/akhrot"
@@ -86775,6 +86877,7 @@
       "levnikolaevich/claude-code-skills:ln-741-linter-configurator"
     ],
     "684f3b471ed2565f2c26f5330c97012cb8d546bd": [
+      "makenotion/notion-cookbook:notion-research-documentation",
       "makenotion/notion-cookbook:skills/claude/research-documentation"
     ],
     "684fddc0c62085efb66df46dd14cb572fa9b9aac": [
@@ -88176,6 +88279,9 @@
     "6a68d8f3eca10182ab16c8003f045f72cc6270f1": [
       "jezweb/claude-skills:project-docs"
     ],
+    "6a692bd60882499a45fb6b8412bceeee0bc418ac": [
+      "Nagarjuna2997/ios-agent-skill"
+    ],
     "6a6b04ccab36325a82f5106227bb81c3cf7e4401": [
       "dailydotdev/daily-api:.claude/skills/api-create-worker"
     ],
@@ -88730,6 +88836,7 @@
     ],
     "6b1bf889ed1f2d2cf1d57806e059fe65b0990b78": [
       "Peace-png/Keystone:Art",
+      "ZDStudios/AIOS:Art",
       "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/Art",
       "diegosouzapw/awesome-omni-skill:art"
     ],
@@ -88790,6 +88897,9 @@
     ],
     "6b2dc48c3d68b0e7f65025302980bc90807d3412": [
       "davidondrej/skills:goal-loop"
+    ],
+    "6b2f26a38e40cdb504aea64307b5a0d0ffb70f0e": [
+      "othmanadi/planning-with-files:planning-with-files"
     ],
     "6b3006bb7b1b467afc373839ab0f80858c265f42": [
       "domocarroll/subfracture-plugins:bwd-brand-world-design/skills/brand-world-design"
@@ -93694,6 +93804,9 @@
     "721adb47bc9c9d686fec47ca2fa7f25cea07048b": [
       "ngxtm/devkit:linear-claude-skill"
     ],
+    "721c25a90190a61015289b5e0cff9c00ffb31a8b": [
+      "Finderchangchang/brewreel"
+    ],
     "721c496c60655bcb66889f25423a48dfa89111ad": [
       "mae616/ai-template:.claude/skills/biz-researcher"
     ],
@@ -93860,6 +93973,9 @@
     ],
     "725e66d6861946d967571cb320e33a9b8bfea55c": [
       "raoulbia-ai/claude-recall:.claude/skills/memory-management"
+    ],
+    "725faeb2c6de912c48fc5aa51ac7ef97fd1422ea": [
+      "powerofjinbo/phdtaketaketake"
     ],
     "725fee8cee646c2983ce504c10772a6a20f83026": [
       "itsHabib/cc-sbx:where-are-we"
@@ -94654,6 +94770,9 @@
     "7377993cc5e8eb52ed01edd84b0d26a5ae2ce34e": [
       "nvidia/nvidia-resiliency-ext:log-analysis"
     ],
+    "7377a5196af335d4def416941c4727c2fafa7229": [
+      "rebelytics/one-skill-to-rule-them-all"
+    ],
     "7379e61d83d63011bd4312b8373c8ffd723b8177": [
       "oyi77/1ai-skills:book-to-skill"
     ],
@@ -95437,7 +95556,8 @@
       "huggingface/skills:huggingface-llm-trainer"
     ],
     "74ad346c54a9c73ceaf954592f27c592811659c9": [
-      "microsoft/playwright:playwright-dev"
+      "microsoft/playwright:playwright-dev",
+      "microsoft/playwright:playwright-mcp-dev"
     ],
     "74ad620c62207828482585e419b8a1b485fb77ea": [
       "kucherenko/jscpd:jscpd"
@@ -95489,6 +95609,9 @@
     ],
     "74be853b079fcb2441307825da76c759e9c47f17": [
       "DataDog/lading:.claude/skills/lading-optimize-hunt"
+    ],
+    "74c042c7d81cd9b3403596b5d2845bf79dab92f1": [
+      "dotoricode/korean-humanizer"
     ],
     "74c38d9fdde41285be28cb8d464c2e869b2ec60f": [
       "oxc-project/oxc:migrate-oxlint"
@@ -97172,6 +97295,9 @@
     "771c2d1100e74dfb7e241b200204c9890550b418": [
       "Brmbobo/Web2podcast:.claude/agents/enterprise-frontend-design/agents/saas-packs/clerk-pack/skills/clerk-webhooks-events"
     ],
+    "771cc8fb135d2cb91bc448124adaec7cb94f5a54": [
+      "Sogni-AI/sogni-creative-agent-skill"
+    ],
     "771d98605ce974f32f7fd1e651586572fe336e86": [
       "nvidia/simready-foundation:simready-foundation-conform-fet-024-newton"
     ],
@@ -97322,6 +97448,9 @@
     ],
     "774c52f07e17a1f944ff2834a700d9f588f8ad3d": [
       "tw93/waza:write"
+    ],
+    "774c7bfec4b601c5abc46a13e826121ae9b337eb": [
+      "noamseg/interview-coach-skill"
     ],
     "774d31ca7cf2bc96165e00c2106eea583bb8c648": [
       "nhadaututtheky/neural-memory:memory-audit"
@@ -99088,6 +99217,9 @@
     ],
     "79df4bdd98793189912b10568208b843bf33ddf8": [
       "melodic-software/claude-code-plugins:plugins/spec-driven-development/skills/ears-authoring"
+    ],
+    "79e17d61d18c03af6275e32ccdfdfcd5dd577c5a": [
+      "qualixar/superlocalmemory"
     ],
     "79e3ea54fe5c1c8e887224f643e11bfba5652345": [
       "daffy0208/ai-dev-standards:skills/archon-manager"
@@ -101774,6 +101906,9 @@
     "7db14b61a96b4b01f3940119f2f3160e3c14fef6": [
       "existential-birds/beagle:plugins/beagle-ios/skills/combine-code-review"
     ],
+    "7db1c783e6271ada8f2449912737a902f8e19f9d": [
+      "sahuan14/worldcup-betting-analyst-skill"
+    ],
     "7db28f0f4cec8c6353d3b468e352e86abdbe61ab": [
       "FrizzleFur/flowkit:flow-deep"
     ],
@@ -102427,6 +102562,9 @@
     ],
     "7ea140e5bf5a1ced6688657207aed846caba3f95": [
       "enuno/claude-command-and-control:skills-templates/arweave-standards"
+    ],
+    "7ea241977827539128012b6dc05be24d706a62d5": [
+      "moguzbulbul/blueprint-animation"
     ],
     "7ea3c9694aeda4bd15e3900e8efdeb33d581a0c8": [
       "mattpocock/course-video-manager:.claude/skills/install-effect-package"
@@ -103844,6 +103982,9 @@
       "flutter/agent-plugins:.agents/agents/reidbaker-agent/skills/code-review",
       "flutter/skills:code-review"
     ],
+    "80b8c0c22d36d0acbfd115f0de8d1353d4536c88": [
+      "JasonWarrenUK/goblin-mode:clod-config-skill_conventions"
+    ],
     "80b9e2822097d027bf671bdc348b5661c0584249": [
       "imbad0202/academic-research-skills-codex:academic-research-suite"
     ],
@@ -104883,6 +105024,9 @@
     ],
     "82478e063f7412789b0467913d02006cabb4a169": [
       "cobibean/soul-grader-skill"
+    ],
+    "824887a3ee25c18e0b2a6fce760225d4170e02f0": [
+      "hebulin/mcp-read-file-server"
     ],
     "824c6604196246f48cd325372491c51d2f52b506": [
       "dpearson2699/swift-ios-skills:ios-networking",
@@ -106972,6 +107116,9 @@
     "8551dc277e474351d1d2dc2b5cc444761b3801c1": [
       "hyperlane-xyz/hyperlane-monorepo:.claude/skills/investigate-merkle-root-mismatch"
     ],
+    "8552d8d7c0a8b2986d1f411b8737ba13ec04e87a": [
+      "xberg-io/xberg:plugin/skills/xberg"
+    ],
     "8552e3f488db3705a96834c61e3e545a14e45414": [
       "handsomestwei/patent-disclosure-skill"
     ],
@@ -108587,6 +108734,9 @@
     ],
     "87b5bc5e9a5e5daa45fb275e952a7b77d75730f8": [
       "firebase/skills:firebase-firestore"
+    ],
+    "87b7368c3ae18fb70231303e9996eed539fb1132": [
+      "microsoft/ai-agents-for-beginners:microsoft-docs"
     ],
     "87b8ef00ae34f951ff01866cc59156f635263f84": [
       "flowexec/flow:new-command"
@@ -110525,6 +110675,9 @@
     "8a7fc92b9e6597c793156a0303ea489945542104": [
       "netlify/context-and-tools:skills/netlify-forms"
     ],
+    "8a800bfca1d2ccfe03515a6042ae368387a703c4": [
+      "Qiuner/birdview"
+    ],
     "8a86ce4fbf8ad2ab02bc1abf7b91e571a0a81e26": [
       "ALT-F4-LLC/dotfiles.vorpal:design-qa"
     ],
@@ -110815,6 +110968,9 @@
       "TechNickAI/ai-coding-config:kungfu",
       "TechNickAI/ai-coding-config:plugins/core/skills/kungfu"
     ],
+    "8afb535dd172923b7cdbbbc8d347dd0880ac909b": [
+      "microsoft/hve-core:tts-voiceover"
+    ],
     "8afb94004a6e88a98d716ae02ed1ab67661f0e85": [
       "YPares/agent-skills:github-pr-workflow"
     ],
@@ -110833,6 +110989,9 @@
     "8b045e9a52d3b723769dda447b33b7e88075e42b": [
       "aresbit/MateBot:skills/clawdhub",
       "aresbit/OpenMateCode:skills/clawdhub"
+    ],
+    "8b0499e4a50e473c3e1261773f3e7977be092cc2": [
+      "realchendahuang/dsh-skill"
     ],
     "8b05e27c90da20d591409e609b8a6cfd266c86e1": [
       "CANTAGESTUDIO/CosmicAtlasPacker:.claude/skills/frontend-design",
@@ -111740,6 +111899,9 @@
     ],
     "8c40a72880d26d8f61d00d5889815f1d4570f934": [
       "bahayonghang/academic-writing-skills:bib-search-citation"
+    ],
+    "8c40ba52d5d32079b3da08ad4cf2aaf57935f868": [
+      "rrrrrredy/research-toolkit"
     ],
     "8c41f9813430a9d219dd508057345c4dc73c3d0d": [
       "gutomec/nirvana-os-engine:harness"
@@ -113891,6 +114053,9 @@
     "8f6699af3cceec7d64c3b2322411cb365b8cd4f9": [
       "dandye/ai-runbooks:skills/close-case-artifact"
     ],
+    "8f680ac5d5e21ededd6d9eb11321be0b02861a89": [
+      "posthog/posthog:improving-drf-endpoints"
+    ],
     "8f68543b0f46b59cedade24eb12f61c1c2e72383": [
       "boisenoise/skills-collections:skills/composio-plain-automation"
     ],
@@ -114214,6 +114379,7 @@
       "Nikolay-Shirokov/cc-1c-skills:.claude/skills/db-load-xml"
     ],
     "8fe0e3b5ed9d5cacf0b47c068069e592863d0bd8": [
+      "makenotion/notion-cookbook:notion-meeting-intelligence",
       "makenotion/notion-cookbook:skills/claude/meeting-intelligence"
     ],
     "8fe42d42c8c26446b3235c8b2810a90dbd9d89dd": [
@@ -115095,6 +115261,9 @@
     "91089cf0e469c8c3ffeb6ced423dabce5cb05cd1": [
       "maxvaega/awesome-skills:dream"
     ],
+    "9108fd65fa9905d722d490b3f844992b654fdb28": [
+      "timurgaleev/vibestack:plan-ceo-review"
+    ],
     "91098adf1cf6300a72314c1c2f6fb298f9371e7b": [
       "vercel-labs/vercel-plugin:marketplace",
       "vercel/vercel-plugin:marketplace"
@@ -115107,6 +115276,9 @@
     ],
     "910f8fddfaa6a6699c820bf7dcc69821905f75a6": [
       "G1Joshi/Agent-Skills:skills/tools/github"
+    ],
+    "911037072249ecdd3588cc33549b934a64a9b9a4": [
+      "Hanyuyuan6/remote-gpu-trainer"
     ],
     "9110ae35751c9bd2c05f4fe3b33e474acca1a0e7": [
       "foryourhealth111-pixel/Vibe-Skills:bundled/skills/get-available-resources"
@@ -117645,6 +117817,9 @@
     "94ab2ce65e47e092b7e5f899f67199d8beb011e1": [
       "beel-collab/presets:azure/azure-static-web-apps"
     ],
+    "94ab90181b0856da21f77f2a9d7d9c6806b47257": [
+      "simstudioai/sim:add-integration"
+    ],
     "94b23f84797b21163390da99fed5956b81cd6598": [
       "forcedotcom/sf-skills:design-systems-slds2-migrate"
     ],
@@ -118872,6 +119047,9 @@
     ],
     "967d797e1d742c242c4c14954936e0bbb6c96065": [
       "affaan-m/everything-claude-code:healthcare-eval-harness"
+    ],
+    "967dc9f782cfce0fe4951bf3e4dda4104ac48f48": [
+      "nvidia/aicr:aicr-analyzing-snapshots"
     ],
     "967fdc9e4c120965dbd08b347775da4dd2524bbb": [
       "launchdarkly/agent-skills:configs-variations"
@@ -120401,6 +120579,9 @@
     ],
     "98a45db739e8f1024615ba9f8bfe46ae4a2cfda1": [
       "anthropics/knowledge-work-plugins:onboarding"
+    ],
+    "98a66ba2bf94876794a56978eb165c5ab692e90d": [
+      "Devin-AXIS/iPolloWork:ipollowork-video-studio"
     ],
     "98a687f35e471a8bcdf62296477c45a2ecfabd7d": [
       "Moffran/calibrated_explanations:.claude/skills/ce-deadcode-hunter"
@@ -122834,6 +123015,9 @@
     "9bc5055c3d3382cb7a7547bdb16bd9d5bb3c03e9": [
       "pexoai/pexo-skills:pexo-agent"
     ],
+    "9bc5ead92ffc02d6abe0396c6baa1affca242b95": [
+      "ythx-101/live-panel-skill"
+    ],
     "9bc66d55e9a59dc59c08447b12af7a0da85647c0": [
       "lexicalninja/my-little-scrum-team:skills/config-setup"
     ],
@@ -123421,6 +123605,7 @@
     ],
     "9c9dd88f575063d31c11f426fa30abceee95b2d3": [
       "Pouryaak/lokul:remotion",
+      "ZDStudios/AIOS:Remotion",
       "danielmiessler/Personal_AI_Infrastructure:Remotion",
       "saidrassai/AI_as_Infra:Remotion",
       "virtualian/pai:Remotion"
@@ -125061,6 +125246,7 @@
       "ratacat/claude-skills:skills/data-systems-architecture"
     ],
     "9edc08a5f92295a442d6759dc901615f49c1dd0d": [
+      "makenotion/notion-cookbook:notion-knowledge-capture",
       "makenotion/notion-cookbook:skills/claude/knowledge-capture"
     ],
     "9edf0f9995e8e491316d44b8def82f6800c9c184": [
@@ -126134,6 +126320,7 @@
       "modular/skills:mojo-gpu-fundamentals"
     ],
     "a065d94c23c6752bdd99d035cdd3a3f5d6a5ce41": [
+      "ZDStudios/AIOS:PrivateInvestigator",
       "danielmiessler/LifeOS:PrivateInvestigator"
     ],
     "a06601005685b7acfa22dd6a6258002c78bfe800": [
@@ -130112,6 +130299,9 @@
     "a5b36dece41ed13995abf55b7e76144349eecfe1": [
       "Dokhacgiakhoa/antigravity-ide:.agent/skills/intelligent-routing"
     ],
+    "a5b37d11be10ec3b882ae90ebc4a484a9a79103f": [
+      "Ai-Eastern/reuse-before-build"
+    ],
     "a5b4e3f63ca8963718afc78f3111aca9f0cb605b": [
       "sequenzia/agent-alchemy:ported/20260305-085418/git-tools/skills/git-commit"
     ],
@@ -131363,6 +131553,9 @@
     "a75993a7c6e5744a3b57283af262c42794d4f44e": [
       "Zidong-IA/BIBLIOTECA:skills/skills/ai-ml/ai-engineer"
     ],
+    "a75b479a312c8b3f5e522efafa7ef00c0a0e53a3": [
+      "Odyphus/MathModel-Copilot"
+    ],
     "a75c58f6b93c44d9780ae6fbcf26a09989d5128f": [
       "nvidia/model-optimizer:common"
     ],
@@ -132147,6 +132340,9 @@
     ],
     "a883ea456eb5f944b8179be34592a44a9eb60ce5": [
       "affaan-m/ecc:motion-patterns"
+    ],
+    "a884650986c6e73d21dc73e7d485e36d4ed6da3d": [
+      "kajisho5/ffmpeg-skill"
     ],
     "a8855696106824de30c0f8f1d2cd7acf5c35b46c": [
       "danielmiessler/LifeOS:LifeOS/install/skills/Ideate"
@@ -136122,6 +136318,9 @@
     "ae5abfa13b547f3b75834e869ee371d4cf828dc5": [
       "unfinishablemap/unfinishablemap:.claude/skills/check-links"
     ],
+    "ae5d02e10f951111eaeea8752a468ed7fefa35f3": [
+      "skillmds/skillmd:design"
+    ],
     "ae5f1273ba1384a19e3c18d14ebf84801f70143b": [
       "frankxai/arcanea:.claude/skills/agentdb-optimization"
     ],
@@ -136973,6 +137172,9 @@
     "af80160fe5a8350c7987a3841e003688a6c0e9a9": [
       "contentful/skills:contentful-personalization"
     ],
+    "af80c8e2dbd3dcbaaff30ea5885a6361750a2464": [
+      "phuryn/pm-skills:pm-ai-shipping/skills/intended-vs-implemented"
+    ],
     "af816a936a68f748d6197f51fb6e4a6b5e266a3e": [
       "vibery-studio/templates:skills/skill-creator"
     ],
@@ -137549,6 +137751,9 @@
     ],
     "b050d07214c0733f130cfe629f48001d5b245bbd": [
       "vercel-labs/json-render:redux"
+    ],
+    "b05277c424fe88c9ce53c8df0e62f0f230f3fe45": [
+      "Sudiddii/build-DNA"
     ],
     "b05395622a2b0c6d259563ec2447768dd21a762d": [
       "alphaonedev/openclaw-graph:skills/community/food-order"
@@ -138357,6 +138562,9 @@
     ],
     "b164b429774741ef38c544012b5fc7fd70ff330c": [
       "X-McKay/kubani:kubani/skills/k8s/diagnostic/investigate-pod-failure"
+    ],
+    "b16547a645f8aa25f62833464f2649869441678d": [
+      "snewhouse/aa-ma-forge:plan-verification"
     ],
     "b165a01a941f3e3fad870d120df559c45a8b2fdb": [
       "jpoutrin/product-forge:plugins/rag-cag/skills/chunking-strategies"
@@ -139597,6 +139805,9 @@
     ],
     "b32dcce7d4718c336b038a395782771b660b8141": [
       "NateBJones-Projects/developer-documentation-skill"
+    ],
+    "b330153b2298bbc7ace9496dd71eed89009bc635": [
+      "parthjadhav/app-store-screenshots:app-store-screenshots"
     ],
     "b331133b7bd2d64c81dd1e4ce611cfa431c474af": [
       "lobehub/lobehub:i18n"
@@ -148536,6 +148747,9 @@
     "bfe44ba2eca93b9b74ffa470050cd8bd00541a0c": [
       "diegosouzapw/awesome-omni-skill:skills/devops/azure-communication-sms-java"
     ],
+    "bfe63f7aff4d035935cd0924dab51a8cc1eb5504": [
+      "anomalyco/opentui:opentui"
+    ],
     "bfe9ecfb92d111392e3aab4ba8e4ce26528542a6": [
       "charleswiltgen/axiom:axiom-testing"
     ],
@@ -148562,6 +148776,9 @@
     ],
     "bff36d26bbdb4e4351a9da232b35ee9923105ae4": [
       "open-mercato/skills:om-auto-implement-spec"
+    ],
+    "bff3c9474c21c706d82b3d7b953c3ad64920b0c6": [
+      "imbad0202/academic-research-skills:academic-paper"
     ],
     "bff6cc52b2d48dcf084868bac3b7cc60e225a8c8": [
       "giuseppe-trisciuoglio/developer-kit:rag"
@@ -150716,6 +150933,9 @@
     "c2ff1459a638df286094790859ef60d5cae20e14": [
       "pollinations/pollinations:.claude/skills/app-review"
     ],
+    "c2ffae8217b9a03df217fabc6d2b3a06b1da1887": [
+      "wppoland/hidden-text-detector"
+    ],
     "c2ffbaefcfc1f31807e84552708ef963ded1c8f1": [
       "Tibsfox/gsd-skill-creator:examples/skills/patterns/api-design"
     ],
@@ -151198,6 +151418,9 @@
     ],
     "c3b44995500554929e6577496143bcb1877c2d4a": [
       "jasonkneen/kiro:skills/quality-assurance"
+    ],
+    "c3b6993bfd01abeb22dc0e55acf99c9a8bab8e80": [
+      "paperclipai/paperclip:paperclip"
     ],
     "c3b6d0e1765de1f03415d13999c1de850f185ceb": [
       "microsoft/agent-skills:azure-ai-ml-py"
@@ -152303,6 +152526,9 @@
     "c5287d620e6f64e1e994e7497d4512c864506acc": [
       "MengTo/Skills:agent-skills/web-design/css-border-gradient"
     ],
+    "c5288bf63d74436ef8f14ab27266db3f808c3280": [
+      "jiangge0804-crypto/collage-broll-minimax"
+    ],
     "c528fbcf3027e61194fb55d7cc985dc34f6f50de": [
       "troykelly/codex-skills:skills/clean-commits"
     ],
@@ -152489,6 +152715,9 @@
     ],
     "c565941127f5eaa3a9033be03a3503caddd9f0eb": [
       "deanpeters/product-manager-skills:tam-sam-som-calculator"
+    ],
+    "c568f7e231d35abe3f2d4cb8faace6fa84431872": [
+      "oil-oil/oil-ui"
     ],
     "c5693fae070ed2c7f621e07ed25d1761c2134d1c": [
       "neolabhq/context-engineering-kit:subagent-driven-development"
@@ -153129,6 +153358,9 @@
     ],
     "c64769e0b29ac4749283209fe5116bb80a6ac9de": [
       "pbakaus/impeccable:impeccable"
+    ],
+    "c648e8ccdea44c45705ee2e412ed2ab2fd20f793": [
+      "kane50613/native-writing"
     ],
     "c649219b310f545a27f86c044f9571dcfee8b4c0": [
       "owl-listener/designer-skills:typography-scale"
@@ -154040,6 +154272,7 @@
       "liuzhengdongfortest/codestable:cs-refactor"
     ],
     "c7d5c2b847ca2c3a562a50c45fc61ad74b4e7401": [
+      "meodai/skill.color-expert",
       "meodai/skill.color-expert:color-expert"
     ],
     "c7d5cf2b90a145fa6d8cc20c7c358d7709b44cce": [
@@ -155742,6 +155975,9 @@
     ],
     "ca66e6d152f96542209e2ea1b91cf591e2553f60": [
       "robdtaylor/personal-ai-infrastructure:skills/Controlplan"
+    ],
+    "ca6b6f8d49af1a6736f3762d134e10483feb0076": [
+      "mvanhorn/last30days-skill:last30days-skill"
     ],
     "ca6cdfa9a1df11b50762082d2d93afb28f23686d": [
       "gtmagents/gtm-agents:plugins/design-creative/skills/creative-qa-checklist"
@@ -157845,6 +158081,7 @@
       "mshaheerz/hive-mind:tool-x-article-publisher"
     ],
     "cd8875c06a6d7780e32c5689a2b7acf4ee86a130": [
+      "makenotion/notion-cookbook:notion-spec-to-implementation",
       "makenotion/notion-cookbook:skills/claude/spec-to-implementation"
     ],
     "cd89f45f45d8fc3f2f8ff10a0c8d5e52bae1b15b": [
@@ -157995,6 +158232,9 @@
     "cdc3207072bc40a369383523c31d9f7162f94800": [
       "brunolimaff-jpg/NOVO-APP-playground:.agent/skills/claude-scientific-skills",
       "brunolimaff-jpg/NOVO-APP:.agent/skills/claude-scientific-skills"
+    ],
+    "cdc487d0d6f3856bc452616046edada4aea3a0a4": [
+      "wix/skills:wix-manage"
     ],
     "cdc56fe1dd8504f68074a5b31b7ec6084e086993": [
       "google-gemini/gemini-managed-agents-templates:ai-radio/skills/script-writing"
@@ -161184,6 +161424,9 @@
     "d253cd23d30f06da4eade5be51e68703f70b74af": [
       "th3vib3coder/vibe-science-codex"
     ],
+    "d253e024e02ee6184c77faedc5de4bd1ef2436e9": [
+      "oil-oil/oil-motion"
+    ],
     "d254d9d2271c1bee2eb140038cb0b980c06db980": [
       "legotec73/gstack:design-shotgun"
     ],
@@ -163009,6 +163252,9 @@
       "O0000-code/paper-search-pro"
     ],
     "d4e64dec0c8b27669c645137ee267b2b848202c3": [
+      "temporalio/agent-skills:temporal-developer",
+      "temporalio/cursor-temporal-plugin:temporal-developer",
+      "temporalio/skill-temporal-developer:temporal development",
       "temporalio/skill-temporal-developer:temporal-developer"
     ],
     "d4e7287a15972fab94dcdc31be72d08a5001baee": [
@@ -164030,6 +164276,9 @@
     "d65bca4cbbfb7b503607c4501bdf9ec3e8ed1609": [
       "adaptationio/Skrillz:skills/gemini-3-image-generation"
     ],
+    "d65c9cb3ec734af54befb78e1cd83faa82455060": [
+      "beriki770-ship-it/code-animations"
+    ],
     "d65cbfc9febb74416aaa18c89771984936235988": [
       "prompt-security/clawsec:openclaw-audit-watchdog"
     ],
@@ -164196,7 +164445,8 @@
       "westn/gstack-pi-port:canary"
     ],
     "d697359ec3d0edd890ff557606be8b789f9b8f7d": [
-      "nvidia/nemo-fabric:nemo-fabric-integrate"
+      "nvidia/nemo-fabric:nemo-fabric-integrate",
+      "nvidia/skills:nemo-fabric-integrate"
     ],
     "d6973b7aee9316032dd40fd5a75c5e519af4233d": [
       "garrytan/gstack:design-review"
@@ -164724,6 +164974,7 @@
       "alexanderop/second-brain-nuxt:.claude/skills/enhancing-authors"
     ],
     "d751069c66e10619c078671d6c7d4ea930dfcb61": [
+      "upstash/context7-mcp:find-docs",
       "upstash/context7:docs"
     ],
     "d75375126ed7cfd964f9a1b9bab7207b757a0149": [
@@ -168381,6 +168632,7 @@
       "prisma/cursor-plugin:prisma-cli-db-execute"
     ],
     "dc4a394d4c968a2d1c69235d0a3979ba150e5dc9": [
+      "taisly/agent",
       "taisly/agent:agent"
     ],
     "dc4b5ca72f5a750b605179277cd750bb95871dc7": [
@@ -168657,6 +168909,9 @@
     ],
     "dcaaafbd56253fc8be450ec733cea48013a38e6c": [
       "oriolrius/pki-manager-web:.claude/skills/fastify"
+    ],
+    "dcab8a00fc86ec76729c9211f4deac192d499960": [
+      "riffkit/skill"
     ],
     "dcabb1974f374fabca8f4236fcb67cd17d7e7afa": [
       "factory-ai/factory-plugins:verify"
@@ -170281,6 +170536,9 @@
     "def061f3cb4d18f41594b0d65c0a38a7b066707b": [
       "abpframework/abp:.claude/skills/abp-module"
     ],
+    "def12c134785073bd9114ab0e1dcb0f88bbb0b96": [
+      "google/agents-cli:google-agents-cli-deploy"
+    ],
     "def14a2be37a3b496b7e2b962f437b0cb634e54f": [
       "jesseotremblay/claude-skills:analyzing-business-models"
     ],
@@ -170837,6 +171095,9 @@
     "dfc0fee665fec30a477512f2c615e98301e4b4bc": [
       "christophacham/agent-skills-library:skills/automation/alchemy-automation"
     ],
+    "dfc1568a6b6e67f8baf91afea2e80d21838c9a65": [
+      "isaachang/motion-video-workflow"
+    ],
     "dfc4b250eda95981879cd11b7b49188f3c2d633a": [
       "boisenoise/skills-collections:skills/composio-toggl-automation"
     ],
@@ -171289,6 +171550,7 @@
       "levnikolaevich/claude-code-skills:ln-732-cicd-generator"
     ],
     "e076327f6a9a5dad7e3e1d3fa8f73eaec13f58b0": [
+      "cookys/autopilot:distill",
       "cookys/autopilot:distill-sg-red-v6"
     ],
     "e07659945688017683d13f8f85c2f4e38ee8612e": [
@@ -171711,6 +171973,7 @@
       "ECNU-ICALK/AutoSkill:SkillBank/ConvSkill/english_gpt3.5_8/little_gpt_simulation"
     ],
     "e112c1e718cb3181f36df2374acba73a24d45fa8": [
+      "deusyu/translate-book",
       "deusyu/translate-book:translate-book"
     ],
     "e1193c73e7c5c265bae0f0b3105a00e4b4ed1af9": [
@@ -172144,6 +172407,9 @@
     ],
     "e19f1c53f27c5bd638abefd7d8f671a38d7a7765": [
       "VTRiot/ccpit-win:skill-proposal-emitter"
+    ],
+    "e19f36b9fa30df4b2c0a426c238208e9469cb046": [
+      "nvidia/openshell:debug-openshell-cluster"
     ],
     "e19fa1f04cb86f35dc0db27195c45f794622ee5d": [
       "plurigrid/asi:skills/discopy-operads"
@@ -176285,6 +176551,9 @@
     "e7db3ab6ff7261736fdef1fc80d569046e0cfc0b": [
       "franklinxkk/ai-delivery-spec"
     ],
+    "e7dc1e006b116033e95b027f390d5f25b1bb808b": [
+      "discobox-ai/discobox:verify-recipes"
+    ],
     "e7dc357673e21c2ad0e771dcc4be5ce09a395d18": [
       "carterdea/dots:new-skill"
     ],
@@ -180373,6 +180642,9 @@
     "eddd75ebc0c6ad7eeb82ddbafcd3838a73373907": [
       "ar9av/obsidian-wiki:claude-history-ingest"
     ],
+    "edde0b1b324c3bec428f77b72cd62ea8fbe4f3e9": [
+      "gabrielmoreira/agent-skills-mirror:linkedin-profile-optimizer"
+    ],
     "edde27d7bf706cf452167f77ddef45063bcaea1e": [
       "posthog/ai-plugin:suggesting-data-imports",
       "posthog/posthog:suggesting-data-imports"
@@ -180501,6 +180773,9 @@
     ],
     "ee0185009f614ba3bd746a665ebbb7e001bcf7b7": [
       "runwayml/skills:rw-check-compatibility"
+    ],
+    "ee02f9aed8567a85fb61e32d12cbb83638f0de32": [
+      "devonjones/devon-claude-skills:pr-review-loop"
     ],
     "ee03d25ed428c3a3c618c8987c787710c31d7912": [
       "bahayonghang/drawio-skills:drawio"
@@ -182665,6 +182940,7 @@
       "andregusman-raiz/a-gusman-claude:ag-gerar-documentos"
     ],
     "f100b709038129b83d85b3d9f5f9707965956894": [
+      "danyuchn/asd-ste100-skill",
       "danyuchn/asd-ste100-skill:asd-ste100"
     ],
     "f1024678d6bb68393fcf32578739386c78d5edec": [
@@ -185366,6 +185642,7 @@
       "batFormat/sancrm-docs:.claude/skills/aif-architecture"
     ],
     "f4dfe682bf61b046b560a49eafe31f8ea8bb62f8": [
+      "ZDStudios/AIOS:IterativeDepth",
       "danielmiessler/LifeOS:IterativeDepth",
       "saidrassai/AI_as_Infra:IterativeDepth",
       "virtualian/pai:IterativeDepth"
@@ -187868,6 +188145,9 @@
     "f894439d6edceba05d6fc97fe889fef6f49467c1": [
       "Dev10x-Guru/Dev10x-Claude:skill-index"
     ],
+    "f894637b6dbf418ce9f0b754fa51efe295c8c617": [
+      "vtmocanu/uzi:skill"
+    ],
     "f8947dfb7fcc493f239e79d2c16b2fe7feb14c6c": [
       "gutierrezp22/administracion-departamentos:.claude/skills/angular-architecture"
     ],
@@ -188379,6 +188659,9 @@
     ],
     "f97a32b5f843dfa0cc0b6bf7f93134a4181fc848": [
       "forcedotcom/sf-skills:experience-ui-bundle-agentforce-client-generate"
+    ],
+    "f97b8fd6d7452eb696d42edbf56261143f997ec6": [
+      "Sequester-AG/bug-bounty-triage"
     ],
     "f97ecd0b7e6799738e86fd033d73c166bb83294a": [
       "boisenoise/skills-collections:skills/antigravity-slack-bot-builder"
@@ -189239,6 +189522,7 @@
       "OpenSourceSam/v2_heras_garden:.codex/skills/clarify"
     ],
     "faad459bf7c4cd5567ec925f37dfc14662533179": [
+      "nvidia/skills:run-on-slurm",
       "nvidia/skills:tao-run-on-slurm"
     ],
     "faaf2e8533ee426de0fefe732ffb005d008a9eb7": [
@@ -190827,6 +191111,9 @@
     "fce469cfb98c36d4a3f75e6018ce890b2b5687af": [
       "github/gh-aw:.github/skills/resolve-merge-conflicts"
     ],
+    "fce542d30b67785ca62a918325863765baa7f40c": [
+      "luwill/research-skills:lit-search"
+    ],
     "fce79492de0039a2af1318f5f4dcead4888a9b53": [
       "yellinzero/aico:.claude/skills/aico-frontend-implement"
     ],
@@ -191993,6 +192280,9 @@
     "fe7d327562a4a42a22b428f4cd6a43c8b6823216": [
       "mims-harvard/tooluniverse:tooluniverse-sequence-retrieval"
     ],
+    "fe7e28a55c713933ff98e017112e53c61d8f5537": [
+      "anthropics/skills:claude-api"
+    ],
     "fe7e848c95c0942531710165e3e6027bd110abd5": [
       "everyinc/compound-engineering-plugin:ce-optimize"
     ],
@@ -192057,6 +192347,9 @@
     ],
     "fe97c057fbce4f9e0a990755276323e6efe9f95b": [
       "mcp-use/mcp-use:chatgpt-app-builder"
+    ],
+    "fe9a071744018c74a212fbc5d9cb5c02d62e9885": [
+      "plinian/erupt-skill"
     ],
     "fe9a34ca8cd3015a0af4beb5a26b381286bd39b0": [
       "Sawyer-Middeleer/dot-claude:plugins/dot-claude/skills/analyzing-source"
@@ -192661,6 +192954,9 @@
     "ff65306bed106dd8629a029a3f0712b7db5daa8f": [
       "vassiliylakhonin/global-think-tank-analyst"
     ],
+    "ff69aaa23119cf7ec3bcded89fedfa87f8734ac4": [
+      "microsoft/hve-core:vscode-playwright"
+    ],
     "ff6b030ca11f8020280c372e2dd5b8f44eb8e238": [
       "JonOlsenCa/gstack-main:design-consultation",
       "Yaugourt/LiquidTerminal_Back:design-consultation",
@@ -192929,6 +193225,9 @@
     ],
     "ffb9a45a9935b7b1a5073387b8a9128f8e984981": [
       "steipete/agent-scripts:skills/xcode-sync"
+    ],
+    "ffbb3323a5d6f580abfb43c4eec0b913aeeb5636": [
+      "EdbertChan/catstack:show-me-your-work"
     ],
     "ffbb8ea59dbe43eccbd48c71d82dc6dedae29990": [
       "robbyt/claude-skills:plugins/gh-cli/skills/issues"
@@ -193352,6 +193651,11 @@
     },
     "dc3b1b74fcfab93a05cf97358ff6302740ea7168": {
       "skillId": "neolabhq/context-engineering-kit:prompt-engineering",
+      "confidence": "high",
+      "reason": "same-repo"
+    },
+    "e076327f6a9a5dad7e3e1d3fa8f73eaec13f58b0": {
+      "skillId": "cookys/autopilot:distill",
       "confidence": "high",
       "reason": "same-repo"
     },
