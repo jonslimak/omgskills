@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-10T12:59:09.447Z",
+  "generatedAt": "2026-10-11T13:22:24.476Z",
   "shaToSkillIds": {
     "00000f2a9d8359900f2075b536b435ca9473a5b9": [
       "obot-platform/obot:draft-release-blog"
@@ -6335,6 +6335,9 @@
     ],
     "03b36b0826235132e9cef213a801255bd6e28d15": [
       "rebyteai-template/rebyte-skills:deep-research"
+    ],
+    "03b3d5ce0b7a7d9c5e5706a1bf5ab16b9671253f": [
+      "xlite-dev/LeetCUDA:leetcuda-tex-to-readthedocs"
     ],
     "03b57e7f24156996f002166cd5f9fe832dd65b06": [
       "scrapegraphai/just-scrape:just-scrape"
@@ -35373,6 +35376,9 @@
     "2504edb026a43515adc5c508a1fd4b402c38cfbf": [
       "AgriciDaniel/claude-seo:extensions/dataforseo/skills/seo-dataforseo"
     ],
+    "2508bc9a9c924a3ea007608a58ade77687bd8fd7": [
+      "garrytan/gstack"
+    ],
     "2509706041f1177003b81c3648ef7f1d91dca74f": [
       "dontbesilent2025/dbskill:dbs-hook"
     ],
@@ -49116,6 +49122,9 @@
     ],
     "35e868cc71bed085b8ab15a22c0e5774277635f6": [
       "omer-metin/skills-for-antigravity:skills/frontend"
+    ],
+    "35ea0c9346717317ea5fdd5294a669b28487efcf": [
+      "alchaincyf/huashu-art-motion:huashu-art-motion"
     ],
     "35eb0d52cc930e58387ecda3ab4714f497c148f6": [
       "jeremylongshore/claude-code-plugins-plus-skills:planned-skills/generated/08-ml-deployment/canary-deployment-setup"
@@ -66320,6 +66329,9 @@
     "4c8e0b96ae53c25aeb31452c6027c9faa1e5b47d": [
       "microsoft/azure-skills:.github/plugins/azure-skills/skills/azure-app-onboard"
     ],
+    "4c8faf7261468a139297cd9dd747e7535bc614dd": [
+      "xberg-io/xberg:plugin/skills/xberg"
+    ],
     "4c903126fa2d9a0e2ba3feb129c8c8f5a6a50fbb": [
       "googleworkspace/cli:gws-docs-write"
     ],
@@ -74289,6 +74301,9 @@
     ],
     "5756d5ff73f146acef6568687eea9521a5f4d40d": [
       "davekilleen/Dex:.claude/skills/anthropic-mcp-builder"
+    ],
+    "57572832dfcbe287db7cd0b2c45c43d4c66eeda4": [
+      "nicobailon/visual-explainer:visual-explainer"
     ],
     "5757c5e7e61f04d23f4638d9f64a029eff37da5e": [
       "p-wegner/coding-aider:.claude/skills/coding-aider-plan-generator"
@@ -87251,6 +87266,9 @@
       "badideal-2046/SpecVibe",
       "bhana1999/SpecVibe"
     ],
+    "68e32f9606e58848e61c70c9b84ed2711b404546": [
+      "kunchenguid/no-mistakes:no-mistakes"
+    ],
     "68e5aaee5d974dc922c484a9ec44650a447ae2f1": [
       "neondatabase/ai-rules:neon-js"
     ],
@@ -94188,6 +94206,9 @@
     ],
     "72a132eaf4d129786369f8f037b2ccf3dc8168df": [
       "axiomhq/skills:controlling-costs"
+    ],
+    "72a1c90240e74ec4b0690d61bba1d0b73ccbff22": [
+      "yuan1z0825/nature-skills:nature-figure"
     ],
     "72a31549d33bb8ca765bcb0b111df96897ceaa47": [
       "OpenAEC-Foundation/Frappe_Claude_Skill_Package:skills/source/core/frappe-core-utils"
@@ -109495,6 +109516,9 @@
     "88e1914111a79f48284a1c5dd804958d81b4629b": [
       "langchain-ai/langchain-skills:config/skills/eval-engineering"
     ],
+    "88e23ca105b89e67f4085d0e676c40d4b170a623": [
+      "cursor/plugins:architect"
+    ],
     "88e4b2509364e10593992703ebfc8be96385a2e0": [
       "majiayu000/claude-skill-registry-data:cc-polymath-discover-networking-emraher-eerskills",
       "majiayu000/claude-skill-registry:cc-polymath-discover-networking",
@@ -113296,6 +113320,9 @@
     ],
     "8e328801f433f68475e0df72ffc027e9fd30e500": [
       "shoootyou/get-shit-done-multi:templates/skills/gsd-audit-milestone"
+    ],
+    "8e334569f7cfd334b56f3b3bd067469d175ba892": [
+      "simonlin1212/a-stock-data:a-stock-data"
     ],
     "8e335b52fdc8193c4bec668f465af02d8f9b64ad": [
       "agentlyhq/aixyz:aixyz-on-openclaw"
@@ -117814,6 +117841,9 @@
     "94ab2ce65e47e092b7e5f899f67199d8beb011e1": [
       "beel-collab/presets:azure/azure-static-web-apps"
     ],
+    "94ab90181b0856da21f77f2a9d7d9c6806b47257": [
+      "simstudioai/sim:add-integration"
+    ],
     "94b23f84797b21163390da99fed5956b81cd6598": [
       "forcedotcom/sf-skills:design-systems-slds2-migrate"
     ],
@@ -120573,6 +120603,9 @@
     ],
     "98a45db739e8f1024615ba9f8bfe46ae4a2cfda1": [
       "anthropics/knowledge-work-plugins:onboarding"
+    ],
+    "98a66ba2bf94876794a56978eb165c5ab692e90d": [
+      "Devin-AXIS/iPolloWork:ipollowork-video-studio"
     ],
     "98a687f35e471a8bcdf62296477c45a2ecfabd7d": [
       "Moffran/calibrated_explanations:.claude/skills/ce-deadcode-hunter"
@@ -125245,6 +125278,9 @@
     ],
     "9edf656e010f486ded10a41e2f3e77a83ea64ea7": [
       "webflow/webflow-skills:link-checker"
+    ],
+    "9ee104302ec37e9a41d5f858a5109646b86bfe10": [
+      "agents365-ai/drawio-skill:drawio-skill"
     ],
     "9ee3236c057ac461ce2c130f64688a2829c7f111": [
       "plurigrid/asi:skills/gay-mcp"
@@ -139796,6 +139832,9 @@
     ],
     "b32dcce7d4718c336b038a395782771b660b8141": [
       "NateBJones-Projects/developer-documentation-skill"
+    ],
+    "b330153b2298bbc7ace9496dd71eed89009bc635": [
+      "parthjadhav/app-store-screenshots:app-store-screenshots"
     ],
     "b331133b7bd2d64c81dd1e4ce611cfa431c474af": [
       "lobehub/lobehub:i18n"
@@ -170523,6 +170562,9 @@
     ],
     "def061f3cb4d18f41594b0d65c0a38a7b066707b": [
       "abpframework/abp:.claude/skills/abp-module"
+    ],
+    "def12c134785073bd9114ab0e1dcb0f88bbb0b96": [
+      "google/agents-cli:google-agents-cli-deploy"
     ],
     "def14a2be37a3b496b7e2b962f437b0cb634e54f": [
       "jesseotremblay/claude-skills:analyzing-business-models"
