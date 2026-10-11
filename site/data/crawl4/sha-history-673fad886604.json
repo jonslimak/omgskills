@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-10T22:05:01.963Z",
+  "generatedAt": "2026-10-11T22:21:50.194Z",
   "shaToSkillIds": {
     "00000f2a9d8359900f2075b536b435ca9473a5b9": [
       "obot-platform/obot:draft-release-blog"
@@ -6335,6 +6335,9 @@
     ],
     "03b36b0826235132e9cef213a801255bd6e28d15": [
       "rebyteai-template/rebyte-skills:deep-research"
+    ],
+    "03b3d5ce0b7a7d9c5e5706a1bf5ab16b9671253f": [
+      "xlite-dev/LeetCUDA:leetcuda-tex-to-readthedocs"
     ],
     "03b57e7f24156996f002166cd5f9fe832dd65b06": [
       "scrapegraphai/just-scrape:just-scrape"
@@ -27916,6 +27919,9 @@
     "1c600aa4601b9807fa7a90dbc00da9b0a57bc449": [
       "ejoongseok/claude-settings:memory-garden"
     ],
+    "1c60341000786e9e6933ce14a2c10c89724d2cc9": [
+      "kunchenguid/no-mistakes:no-mistakes"
+    ],
     "1c6371cd5cb90216328ab85763f2debfbf87e9e3": [
       "AxelMrak/ai:skills/avalonia-viewmodels-zafiro",
       "claudiodearaujo/IzaCenter:.cursor/skills/avalonia-viewmodels-zafiro",
@@ -35372,6 +35378,9 @@
     ],
     "2504edb026a43515adc5c508a1fd4b402c38cfbf": [
       "AgriciDaniel/claude-seo:extensions/dataforseo/skills/seo-dataforseo"
+    ],
+    "2508bc9a9c924a3ea007608a58ade77687bd8fd7": [
+      "garrytan/gstack"
     ],
     "2509706041f1177003b81c3648ef7f1d91dca74f": [
       "dontbesilent2025/dbskill:dbs-hook"
@@ -49117,6 +49126,9 @@
     "35e868cc71bed085b8ab15a22c0e5774277635f6": [
       "omer-metin/skills-for-antigravity:skills/frontend"
     ],
+    "35ea0c9346717317ea5fdd5294a669b28487efcf": [
+      "alchaincyf/huashu-art-motion:huashu-art-motion"
+    ],
     "35eb0d52cc930e58387ecda3ab4714f497c148f6": [
       "jeremylongshore/claude-code-plugins-plus-skills:planned-skills/generated/08-ml-deployment/canary-deployment-setup"
     ],
@@ -53885,6 +53897,9 @@
     ],
     "3bff894e1175354e3a8dd502b3c1f594bde1c12f": [
       "giuseppe-trisciuoglio/developer-kit:plugins/developer-kit-aws/skills/aws-cloudformation/aws-cloudformation-rds"
+    ],
+    "3c02cbfaa11f748177fb9b6df80f130f74a87544": [
+      "microsoft/azure-skills:azure-cost"
     ],
     "3c03b3fe49d395d6a7d4e952d2042fb32b3fee4b": [
       "paulrberg/agent-skills:code-polish"
@@ -66320,6 +66335,9 @@
     "4c8e0b96ae53c25aeb31452c6027c9faa1e5b47d": [
       "microsoft/azure-skills:.github/plugins/azure-skills/skills/azure-app-onboard"
     ],
+    "4c8faf7261468a139297cd9dd747e7535bc614dd": [
+      "xberg-io/xberg:plugin/skills/xberg"
+    ],
     "4c903126fa2d9a0e2ba3feb129c8c8f5a6a50fbb": [
       "googleworkspace/cli:gws-docs-write"
     ],
@@ -69399,6 +69417,9 @@
     ],
     "50af46e963eeff491cd4d053157ed39238cbd166": [
       "microsoft/winappcli:winapp-identity"
+    ],
+    "50aff0b2dfc013c8c1e9e810029af3dff6e10183": [
+      "Leonxlnx/taste-skill:taste-skill"
     ],
     "50b008939821eceb0ad19ea4378354a4ae3b8771": [
       "flutter/website:.agents/skills/update_whats_new"
@@ -80004,6 +80025,9 @@
     "5f74fc1c3882b81bc49cdaf8812667dad8fccd4d": [
       "himself65/finance-skills:funda-data"
     ],
+    "5f74ff2378d34d40d2a26801e4c42869ae18b263": [
+      "harbor-framework/harbor:rewardkit"
+    ],
     "5f76d465e705ec827399003311ba8ef0029a6795": [
       "nandemo-agent/crypto-nday-analyze"
     ],
@@ -87254,6 +87278,9 @@
       "badideal-2046/SpecVibe",
       "bhana1999/SpecVibe"
     ],
+    "68e32f9606e58848e61c70c9b84ed2711b404546": [
+      "kunchenguid/no-mistakes:no-mistakes"
+    ],
     "68e5aaee5d974dc922c484a9ec44650a447ae2f1": [
       "neondatabase/ai-rules:neon-js"
     ],
@@ -87572,6 +87599,9 @@
     ],
     "695f91abf434d9a1d1faf452f5bbedc1f8a93ef4": [
       "paperclipai/paperclip:paperclip"
+    ],
+    "695faad1d7441597a89dea4bd1b44b835005af7c": [
+      "Vincentwei1021/video-shotcraft"
     ],
     "6960ab88627e3d2a427159df26de4d1424e670c0": [
       "dojoengine/book:skills/dojo-model"
@@ -94191,6 +94221,9 @@
     ],
     "72a132eaf4d129786369f8f037b2ccf3dc8168df": [
       "axiomhq/skills:controlling-costs"
+    ],
+    "72a1c90240e74ec4b0690d61bba1d0b73ccbff22": [
+      "yuan1z0825/nature-skills:nature-figure"
     ],
     "72a31549d33bb8ca765bcb0b111df96897ceaa47": [
       "OpenAEC-Foundation/Frappe_Claude_Skill_Package:skills/source/core/frappe-core-utils"
@@ -109498,6 +109531,9 @@
     "88e1914111a79f48284a1c5dd804958d81b4629b": [
       "langchain-ai/langchain-skills:config/skills/eval-engineering"
     ],
+    "88e23ca105b89e67f4085d0e676c40d4b170a623": [
+      "cursor/plugins:architect"
+    ],
     "88e4b2509364e10593992703ebfc8be96385a2e0": [
       "majiayu000/claude-skill-registry-data:cc-polymath-discover-networking-emraher-eerskills",
       "majiayu000/claude-skill-registry:cc-polymath-discover-networking",
@@ -113299,6 +113335,9 @@
     ],
     "8e328801f433f68475e0df72ffc027e9fd30e500": [
       "shoootyou/get-shit-done-multi:templates/skills/gsd-audit-milestone"
+    ],
+    "8e334569f7cfd334b56f3b3bd067469d175ba892": [
+      "simonlin1212/a-stock-data:a-stock-data"
     ],
     "8e335b52fdc8193c4bec668f465af02d8f9b64ad": [
       "agentlyhq/aixyz:aixyz-on-openclaw"
@@ -125255,6 +125294,9 @@
     "9edf656e010f486ded10a41e2f3e77a83ea64ea7": [
       "webflow/webflow-skills:link-checker"
     ],
+    "9ee104302ec37e9a41d5f858a5109646b86bfe10": [
+      "agents365-ai/drawio-skill:drawio-skill"
+    ],
     "9ee3236c057ac461ce2c130f64688a2829c7f111": [
       "plurigrid/asi:skills/gay-mcp"
     ],
@@ -132515,6 +132557,9 @@
     ],
     "a8bded606bee9b167a0a326470cc05d1c241b1f1": [
       "enuno/claude-command-and-control:skills-templates/agentskb"
+    ],
+    "a8beba0221d8b2f85f2b2dd8d042b01d4d53596e": [
+      "eze-is/web-access:web-access"
     ],
     "a8c0a8f35c703208ac5285c0ee806c429262ef32": [
       "jaganpro/sf-skills:sf-industry-commoncore-omnistudio-analyze"
@@ -145020,6 +145065,9 @@
     "ba44be331d54a1fb5ff8ddc99b0a709bb11792a4": [
       "owl-listener/designer-skills:journey-map"
     ],
+    "ba4c5ebdd9005dc16a698e588d0ad5be5401204a": [
+      "mvanhorn/last30days-skill:last30days-skill"
+    ],
     "ba4eae8ac2f5b59a1d1d71a102525474474bf468": [
       "majiayu000/claude-skill-registry-data:super-review",
       "majiayu000/claude-skill-registry-data:super-review-zuozuo-super-review",
@@ -151824,6 +151872,9 @@
     ],
     "c43ba64613df924e679cba0defa173a960c25461": [
       "tobihagemann/turbo:skills/draft-spec"
+    ],
+    "c43d95012fe4252fde6a5c52980a12211f770875": [
+      "manaflow-ai/cmux:cmux-cua"
     ],
     "c43fe84b80bda730bb5cd8339ba34df917264c33": [
       "dralgorhythm/claude-agentic-framework:.claude/skills/design/accessibility"
