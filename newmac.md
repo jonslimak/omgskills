@@ -8,6 +8,8 @@ notarization, dedicated test hosting and bounded clean-VM setup passed on
 2026-10-12; [evidence](archive/newmac-f3b-2026-10-12/README.md).
 F3c signed-candidate skill-update acceptance passed on 2026-10-12 with a Codex
 restart caveat; [results](archive/newmac-f3c-2026-10-12/README.md).
+F3d signed app A-to-B upgrade, skill preservation and post-upgrade browser
+handoff passed on 2026-10-12; [acceptance](#f3d-signed-upgrade-acceptance-2026-10-12).
 F2 local acceptance, scoped review and approved cleanup passed 2026-10-09.
 Code and acceptance evidence are recorded in [Connect](connect.md), the single
 progress tracker. No release approval.
@@ -15,13 +17,13 @@ This document expands C17 and its Mac-side dependencies, without duplicating
 status checklists. The historical local `webwork.md` document retains earlier
 test evidence but is not included in this checkout.
 
-**Current target: separately approve F3d.2 signed test packaging.**
-Test-only updater preparation passed local automated checks and scoped review
-on 2026-10-12; this checkpoint records the reviewed source.
-See the [F3d plan](#f3d-isolated-app-upgrade-plan)
-and [verification results](#f3d1-preparation-results-2026-10-12).
+**Current target: plan a bounded G2 updater-failure check; execution needs separate approval.**
+F3d source preparation is committed as `453366b7`. Separately approved signing,
+notarization, dedicated test hosting and the VM's successful A-to-B upgrade
+are complete. See [acceptance and retained evidence](#f3d-signed-upgrade-acceptance-2026-10-12).
+Do not repeat those stages or the passed F3c matrix. Preserve the good test feed,
+VM and unlaunched backup; production migration and G1-G4 remain open.
 F3c scoped review and source/evidence are committed as `6507a699`.
-Signed packaging, update hosting and guest execution remain separate approvals.
 The bounded VM flow passed; refresh alone did not discover Humanizer, but a
 normal Codex restart did. See
 [F3c acceptance](#f3c-signed-candidate-skill-update-acceptance-2026-10-12).
@@ -1188,6 +1190,10 @@ C5/C10/C13/C17 and G1-G4 remain open beyond this bounded result.
 Do not edit its signed bundle or describe a manual replacement as an automatic
 upgrade. Preserve the F3b/F3c originals and VM evidence.
 
+This is the original staged plan. Subsequent approvals and the completed
+successful-upgrade case are recorded in [acceptance](#f3d-signed-upgrade-acceptance-2026-10-12);
+the failure stage remains open.
+
 Contract for this preparation:
 
 - Keep `OMGSkills Setup Test.app`, `com.jonslimak.omgskills.setuptest`, the
@@ -1198,13 +1204,13 @@ Contract for this preparation:
 - Updater remains absent by default. `OMGSKILLS_SETUP_TEST` plus an explicitly
   validated update configuration is required. The assembler's optional
   `--update-release a|b` and `--update-public-key` select only 0.1.1/build 2 or
-  0.1.2/build 3. A dedicated real test public key must be supplied later;
+  0.1.2/build 3. Signed packaging must supply a dedicated real test public key;
   synthetic unit-test keys are never distribution credentials.
 - Fixed test feed: `https://omgskills-setup-test-f3b.netlify.app/updates/f3d/appcast.xml`.
   Only matching `OMGSkills-Setup-Test-0.1.1-arm64.zip` or
   `OMGSkills-Setup-Test-0.1.2-arm64.zip` application archives in that directory
   are accepted; no deltas, package installers, production feed or defaults-domain
-  override. This path is reserved in code, not published by this work.
+  override. F3d.1 reserved the path; its later test publication is recorded below.
 - User chooses **Check for app updates...** from the test app menu. No startup
   checks, automatic checks/downloads, profiling or test telemetry. Require signed
   feed and archive verification before extraction; no unsigned fallback.
@@ -1221,7 +1227,7 @@ existing installer and production updater regression tests. Compile/test both
 ordinary and setup-test configurations with locked dependencies. No signing,
 key creation, package assembly, app launch, VM writes or network updater run here.
 
-Later stages, not approved by F3d.1:
+Later stages, requiring approval beyond F3d.1 (stages 1-4 subsequently passed):
 
 1. Review the source, then approve packaging/signing/notarization of A and B
    and creation/storage of a dedicated test update key. Verify both identities,
@@ -1261,24 +1267,75 @@ Implemented and reviewed for this source checkpoint; not packaged:
   `3cf340de60ae43f44d675a60bc485de8476e812c9c3e25fd366b83b5dd58effc`.
   Production metadata, update feed/key and release scripts are unchanged.
 
-No signed A/B bundles, test update key, feed publication, native updater UI run,
-VM changes or end-to-end app replacement occurred. Signature enforcement and
-installed-skill preservation across actual Sparkle replacement remain unproven.
-G1/G2 remain open; the next step is separately approved signed test packaging,
-not another F3c run.
+At the F3d.1 checkpoint, no signed A/B bundles, test update key, feed publication,
+native updater UI run, VM changes or end-to-end app replacement had occurred.
+Signature enforcement and skill preservation across actual Sparkle replacement
+were then unproven. G1/G2 remained open; the next step then was separately
+approved signed test packaging, not another F3c run.
 
 Scoped review found no blocking issues in the 13 changed files. Review checked
 Sparkle's startup/callback contracts, manual-only gating, skill-operation
 exclusion, configuration validation and production defaults. The 22 package/page
 tests and 31 setup-test Release checks passed again; `git diff --check` passed.
 This checkpoint does not include key creation, signing, hosting, VM changes,
-push or release. Actual Sparkle UI/replacement behavior remains a VM test gate.
+push or release. Actual Sparkle UI/replacement behavior was then an open VM test gate.
+
+#### F3d signed upgrade acceptance (2026-10-12)
+
+**Passed: the successful signed-upgrade case, not the G2 failure matrix or
+production migration.** Source: `453366b709b81b1da1b88a1278d4a9886305ba16`.
+
+- A (`0.1.1` / build `2`) and B (`0.1.2` / build `3`) were signed, Apple-notarized,
+  stapled and verified with the same test identity and a dedicated test Sparkle
+  key. Both final archives passed signature and extraction checks.
+- Only the dedicated test site received the two archives and signed feed.
+  Draft/live served bytes and the feed signature matched; old test assets,
+  including the 0.1.0 DMG, were preserved. Test deploy: `6acd33ef8c1e4ad587f700ed`.
+  Production stayed on `6acd058c16b0604a1db7a0bd` across the hosting check.
+- A stopped APFS VM backup was verified before replacement (seven files,
+  hashes/lengths/modes). It has not been launched or restored. A stalled VM
+  startup cleared after an approved normal VirtualBuddy restart, without repair.
+- Manual bootstrap `0.1.0` to A was separate from updater proof. A Terminal
+  move failed with `Operation not permitted`; the original app was immediately
+  restored and verified unchanged. The approved Finder replacement then worked
+  with normal macOS opening approval, no elevated access or security bypass.
+- In `OMGSkills-F3b-Test-01`, A's **Check for app updates...** found B.
+  **Install Update**, then **Install and Relaunch**, performed actual Sparkle
+  replacement. Menu/Terminal confirmed `0.1.2` / `3` at
+  `~/Applications/OMGSkills Setup Test.app`, identity
+  `com.jonslimak.omgskills.setuptest`, valid strict/deep signature and Gatekeeper
+  `accepted`, `source=Notarized Developer ID`. Exactly one app process remained.
+- The pre-bootstrap baseline matched after replacement: all managed `packages`
+  and `activations` file hashes, permissions/inodes/mtime/size, plus Humanizer
+  and Writing Guidelines activation-link targets and metadata. This comparison
+  did not inventory staging or transactions.
+- Safari's Humanizer B request reached B after the user completed the normal
+  browser **Allow** prompt. The app showed the exact existing commit
+  `225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8` and
+  **Already installed. No changes made.** A further independent baseline check
+  returned `POST_HANDOFF_ALL_SKILL_STATE_UNCHANGED`; the sole app PID stayed 1293.
+
+Retained local evidence (ignored build output, not a committed archive):
+[test record](menubar/.build/setup-test-upgrades/f3d-r4NPBX/README.md),
+[packaging receipt](menubar/.build/setup-test-upgrades/f3d-r4NPBX/ready.json),
+[hosting verification](menubar/.build/setup-test-upgrades/f3d-r4NPBX/hosting-verification.json)
+and [VM backup verification](menubar/.build/setup-test-upgrades/f3d-r4NPBX/vm-backup-verification.json).
+The packaging receipt's `hosted`/`installed` false values describe its earlier
+local-only checkpoint; later receipts and the test record establish execution.
+The VM backup is private: never commit or upload it. Retain artifacts until
+separately approved cleanup; do not automatically restore/downgrade the app.
+
+No production app/feed/key, host skills or production deployment changed in
+this test. No push or public release. G1-G4 remain open: real-user migration,
+pairing preservation, other environments, updater failures/recovery and the
+broader pilot still need their own evidence. Plan the next bounded G2 failure
+case separately; never replace a good public feed with a negative fixture.
 
 ### Evidence, cleanup and stop rules
 
 Archive stage-labelled build/source hashes, exact URLs/artifact names, intent
 transitions, before/after file checks and user outcomes. Connect records F3a,
-F3b and F3c separately; none automatically closes C5/C10/C17 or G1-G3. Preserve the
+F3b, F3c and F3d separately; none automatically closes C5/C10/C17 or G1-G3. Preserve the
 public app/handler and real skill roots. After approval, remove only inventoried
 test artifacts and stop that test server; the old F2 server/root are already gone.
 Stop for wrong-app launches, changed source identity, unexpected writes, lost
@@ -1294,7 +1351,7 @@ Progress and approvals stay in Connect. These are design steps, not a second tas
 | Settle F1's narrow contract | C17, C13, C10 | Current baseline, one write/store path and Codex destination, request shape, public A/B source and isolated test setup; code scope approved |
 | Prove the bare-bones flow | F1, parts of C17/C13/C10 | Existing-app dev build; web install A and update B for one unpinned skill; apply Connect's short F1 checks; no full migration or inventory project |
 | Prove a small multi-source sample | F2, parts of C13/C10 | Three isolated installs, one independent update, name-collision refusal and fresh Codex discovery; no broad coverage claim |
-| Prove setup and retry incrementally | F3, C10 then C5/C17 | F3a local retry/intent proof, F3b signed first-time setup and F3c signed-candidate skill update; preserve the Codex restart caveat; no preinstalled-build shortcut |
+| Prove setup and retry incrementally | F3, C10 then C5/C17 | F3a retry, F3b signed setup, F3c skill update and F3d successful signed app upgrade/preservation/handoff; preserve the Codex restart caveat; no production-migration or updater-failure claim |
 | Harden and verify setup for a controlled pilot | C17, C13, C10, C5, C16, G1-G3 | Wider source coverage, lifecycle, setup/retry, signing, upgrades, security/failure checks and measured user flow |
 | Roll out to existing users separately | C5, C1-C3, relevant G1-G3 | Preserved existing-user data and behavior, agreed web discovery replacements and explicit release approval |
 | Add connected management | C9, C8, C6-C7, C14, C18, C11, C15 | Device/account isolation, truthful inventory, queued requests, Sets and explicit management; private rollout separately meets G4 |
@@ -1350,10 +1407,9 @@ F1 step 1 implements the approved narrow answers to 1, 3 and the request part of
 6. Login onboarding/defaults and existing-user transition messaging; preserve
    explicit opt-outs and distinguish Quit from disabling future login startup.
 
-Next: follow [Connect's active queue](connect.md#current-next-task): seek separate
-approval for F3d.2
-signed artifacts, update hosting and VM execution. Do not repeat the passed
-F3c skill-update matrix.
+Next: follow [Connect's active queue](connect.md#current-next-task): plan and
+separately approve the remaining bounded G2 updater-failure check. Preserve
+F3d's passed packaging/hosting/upgrade evidence and do not repeat the F3c matrix.
 Current production app defaults still use Git; candidate HTTPS setup evidence
 does not change them. F3a local acceptance, approved
 cleanup and scoped review passed; [results](archive/newmac-f3a-2026-10-09/README.md)

@@ -22,18 +22,19 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- **Next: approve F3d.2 signed test packaging separately.**
-  Test-only updater preparation, automated checks and scoped review passed on
-  2026-10-12; this checkpoint records the reviewed source. See the
-  [implementation and staged test plan](newmac.md#f3d-isolated-app-upgrade-plan)
-  and [verification results](newmac.md#f3d1-preparation-results-2026-10-12).
-  Keep one test identity and the app's existing Sparkle engine. New update
-  checks are manual and mutually exclusive with skill operations. The current
-  signed 0.1.0 candidate remains unchanged and updater-free; it cannot upgrade
-  itself. Later testing needs a separately approved manual bootstrap to A,
-  then real signed A-to-B replacement with skill-preservation checks.
-  No signing/key creation, package assembly, hosting, VM replacement or release
-  in this preparation. G1/G2 and production integration remain open.
+- **Next: plan a bounded G2 updater-failure check; approve execution separately.**
+  F3d's successful signed app upgrade passed on 2026-10-12: reviewed source
+  `453366b7`, signed/notarized A/B packages, dedicated test hosting, verified
+  stopped-VM backup, manual bootstrap to A, then actual Sparkle A-to-B.
+  B (`0.1.2` / build `3`) relaunched with a valid signature and one app process.
+  Managed packages, activations and both skill links matched the baseline.
+  Safari handoff to B and the already-installed no-op also passed, followed
+  by another unchanged-state check. See [F3d acceptance](newmac.md#f3d-signed-upgrade-acceptance-2026-10-12).
+  Manual `0.1.0`-to-A replacement is setup, not updater proof. Preserve the VM,
+  its unlaunched backup, signed artifacts and good test feed. Do not repeat
+  packaging, notarization or the passed happy path without a reason.
+  Failure/recovery tests, production integration/migration and G1-G4 remain
+  open. No production deployment, public Mac release or push occurred in F3d.
 - **Preserve the F3c checkpoint `6507a699`.**
   F3c scoped review found no blocking issues; this checkpoint records its source
   and eight evidence files. Verification passed 20 package/page tests, 51 related
@@ -81,9 +82,9 @@ This consolidation changes documentation only, not implementation or release sta
   The F3b checkpoint did not change the production website, public app, host
   skills or Sparkle release.
 - [~] **F3: First-time setup and retry (C10/C5/C17).** F3a automated and user-run
-  checks passed locally on 2026-10-09. F3b candidate setup and F3c skill update
-  passed on 2026-10-12, with the F3c Codex restart caveat. Production
-  setup/migration and G1-G4 remain open.
+  checks passed locally on 2026-10-09. F3b candidate setup, F3c skill update and
+  F3d successful app upgrade passed on 2026-10-12, with the F3c Codex restart
+  caveat. Production setup/migration and G1-G4 remain open.
   Keep the native result authoritative, timeout state unknown, and public
   installs account-free.
 - [x] **F2: Three-source local install/update proof.** Local acceptance passed
@@ -116,7 +117,7 @@ This consolidation changes documentation only, not implementation or release sta
 | --- | --- | --- |
 | F1: Local functional proof | One public skill installed and updated from the web through the existing-app codebase | Isolated development build; no release or broad safety/coverage claim |
 | F2: Small multi-source proof (passed locally) | Three independent public installs, repeat no-op, one reviewed update, Codex discovery and automated collision refusal | Same isolated local flow; no full-catalog, fresh-setup or release claim |
-| F3: Setup/retry (F3a, bounded F3b/F3c passed) | Local intent/retry, signed candidate setup/cold launch, Humanizer A/B cancel/apply/repeat and Codex discovery | One arm64 VM, Safari and Codex; Humanizer discovery required restart; not broad coverage, production migration, zero-network retry or G1/G2 completion |
+| F3: Setup/retry (F3a, bounded F3b/F3c/F3d passed) | Local retry, signed setup/cold launch, skill A/B cancel/apply/repeat, Codex discovery and Sparkle app A/B upgrade with preserved skills and handoff | One arm64 VM, Safari and Codex; Humanizer discovery required restart; not updater-failure, broad-coverage, production-migration, zero-network or G1/G2 completion |
 | Controlled public-skill pilot | Setup/retry, signed build, wider source coverage and release safeguards work for approved testers | C5/C13/C16 and applicable G1-G3; separate test/distribution approval |
 | Existing-user rollout | The replacement can update existing users without losing data or required capabilities | Full relevant G1-G3, migration evidence, agreed C1-C3 web parity and separate release approval; G4 before private activation |
 
@@ -353,7 +354,7 @@ Reported inventory is not proof that a device is online or remotely controllable
 | --- | --- | --- |
 | Unified `/app/` and public catalog | Recorded live in `appwork.md` | Source reviewed here; no fresh live check or production timing result |
 | Standalone helper | Signed/notarized and hosted (unlinked) per `webwork.md`; now an input to C17 | Existing safety and scoped Codex evidence retained; clean-account setup, signed upgrade and remaining acceptance gates still open |
-| Management-app-backed web install/update | F1/F2 local flow, F3b signed setup and F3c signed-candidate skill update passed; candidate test site only | F3c Codex discovery required restart; broader coverage, app upgrades, production integration and pilot acceptance remain open |
+| Management-app-backed web install/update | F1/F2 local flow, F3b signed setup, F3c skill update and F3d successful signed app upgrade passed; candidate test site only | F3c Codex discovery required restart; updater failures, broader coverage, production migration/integration and pilot acceptance remain open |
 | Device-aware helper inventory and web management | Not implemented | Requires migration, isolation and end-to-end evidence |
 
 Helper-key backup/recovery is already complete per `webwork.md`. Hosting,
@@ -521,6 +522,8 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
   F3c then passed skill install/update/cancel/repeat with the same signed app;
   Humanizer discovery required a Codex restart, not just refresh. See
   [results](archive/newmac-f3c-2026-10-12/README.md).
+  F3d then passed real signed app A-to-B replacement/relaunch, unchanged skills
+  and post-upgrade handoff/no-op; [acceptance](newmac.md#f3d-signed-upgrade-acceptance-2026-10-12).
   F1/F2/F3a used a preinstalled dev build; do not conflate those earlier results
   with signed setup or count the candidate as production migration proof.
 - [~] **Generalize helper targets, not just the allowlist.** F1/F2's existing-app
@@ -582,7 +585,7 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
 | C2 | Existing skill detail extension | pipeline | Extend `get_skill` and content delivery; bounded README; reuse `list_by_author` |
 | C3 | `/app/` search and detail upgrade | C1, C2 | Paging, sort UI, README, install info |
 | C4 | Avatar proxy/cache | none | Optional |
-| C5 | Mac management app release and setup verification | Integrated C17/C13/C10 candidate; not needed to build F1 | Preserve app identity/signing/Sparkle; test download/open/return/retry and G1/G2 on the merged binary; standalone hosting is not merged acceptance |
+| C5 | Mac management app release and setup verification | Integrated C17/C13/C10 candidate; not needed to build F1 | F3b setup and F3d successful signed upgrade passed on the isolated candidate; intended production identity/channel, migration and G1/G2 still need verification |
 | C6 | Pairing + device token | C17, C9 | Reuse the existing app's `omgskills://pair` flow and device auth; account replacement/revocation safety |
 | C7 | Inventory scan + upload | C6, C8, C9; identity-data decision | Reuse scanner/resolver/uploader without assuming full-catalog loading disappears; device-scoped uploads; activation separately approved; outside F1 |
 | C8 | Per-device inventory model and migration | C9 | Device-scoped replacement/reconciliation; existing rows and legacy-client compatibility |
@@ -624,6 +627,9 @@ component to finish. C5 is a distribution gate, not a cyclic build prerequisite.
    found Humanizer after restart; refresh alone failed. Scoped F3c review passed;
    this checkpoint records the source/evidence with that caveat. Do not repeat
    the passed matrix or confuse a skill update with a Sparkle app upgrade.
+   F3d separately proved Sparkle A-to-B with preserved skills and a working
+   post-upgrade browser request. Next plan the bounded G2 failure cases, not
+   another successful-upgrade run; preserve the good feed and VM backup.
 4. **Harden for a controlled pilot.** Use F2/F3 findings to expand C13 coverage,
    complete C17 lifecycle, then remaining C5/G1/G2 signed setup/upgrades and C16
    measurement. Retain security and failure checks here; do not erase them.
@@ -676,6 +682,8 @@ local flow. Deferring their execution does not mark them passed or waive them.
   links, records, ownership and supported pairing state through independent
   before/after checks. The old standalone pair cannot prove this. Prior v20
   updates also do not prove the merged app or its gated Set capabilities.
+  F3b/F3d provide bounded signed setup/upgrade evidence on the test identity;
+  they do not close this intended-product/channel and migration gate.
 - [ ] **G2: Isolated updater failures (C5).** Carry invalid signature/feed,
   unavailable or interrupted download, replacement failure/recovery and skill
   transaction/update/quit coordination. Reject stale approvals after restart;
@@ -862,6 +870,20 @@ both 14-file manifests matched the saved receipts and guest verification.
 This checkpoint explicitly includes eight small evidence files, not binaries.
 No repeat VM run, build, signing, push, deployment, release or cleanup.
 Next is planning isolated signed-app upgrade verification, not executing it.
+
+2026-10-12, F3d acceptance: separately approved signed packaging, notarization,
+dedicated test hosting and VM execution passed on source `453366b7`. A manual
+bootstrap from updater-free 0.1.0 to A was verified separately from the actual
+Sparkle `0.1.1` / `2` to `0.1.2` / `3` replacement/relaunch. B's signature and
+Gatekeeper assessment passed, one app process remained, and all inventoried
+managed packages, activations and both skill links were unchanged. Safari
+handoff and repeat Humanizer B returned `Already installed. No changes made.`;
+the independent baseline comparison passed again. The stopped VM backup and
+local receipts are retained; [details and limits](newmac.md#f3d-signed-upgrade-acceptance-2026-10-12).
+Only the dedicated test site and guest test app changed during execution.
+This follow-up is documentation-only: no commit, push, cleanup, production
+deployment or public release. G1-G4 and C5/C10/C13/C17 remain open beyond this
+bounded success; next plan the remaining G2 updater-failure slice.
 
 ## Open questions
 
