@@ -3,9 +3,45 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, symlinkSync, realpathSync, renameSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createOutput, inventory, metadata, readLoadCommands, validateDependencyPlatform, validateExecutable, validateMetadata, validateResourceLayout, validateWebsite } from './prepare-newmac-setup-test.mjs';
+import { createOutput, inventory, metadata, readLoadCommands, updateFeed, validateDependencyPlatform, validateExecutable, validateMetadata, validateResourceLayout, validateWebsite } from './prepare-newmac-setup-test.mjs';
 
 const website = 'http://127.0.0.1:5198/app/preview/unified/';
+const publicKey = Buffer.alloc(32, 1).toString('base64'); // Synthetic, never used for distribution.
+
+test('updater is opt-in with fixed test versions, feed, identity and manual-only signed policy', () => {
+  const original = metadata(website);
+  assert.equal(original.SUFeedURL, undefined);
+  assert.equal(original.OMGSkillsSetupTestUpdatesEnabled, undefined);
+  for (const [release, version, build] of [['a', '0.1.1', '2'], ['b', '0.1.2', '3']]) {
+    const value = metadata(website, { release, publicKey });
+    validateMetadata(value);
+    assert.equal(value.CFBundleIdentifier, original.CFBundleIdentifier);
+    assert.deepEqual(value.CFBundleURLTypes, original.CFBundleURLTypes);
+    assert.equal(value.CFBundleShortVersionString, version);
+    assert.equal(value.CFBundleVersion, build);
+    assert.equal(value.SUFeedURL, updateFeed);
+    for (const key of ['SUEnableAutomaticChecks', 'SUAutomaticallyUpdate', 'SUAllowsAutomaticUpdates', 'SUEnableSystemProfiling']) assert.equal(value[key], false);
+    assert.equal(value.SUVerifyUpdateBeforeExtraction, true);
+    assert.equal(value.SURequireSignedFeed, true);
+    assert.equal(value.SUSignedFeedFailureExpirationInterval, 0);
+  }
+});
+
+test('update options and metadata reject mixed channels, incomplete keys and unsafe policy', () => {
+  for (const update of [{}, { release: 'a' }, { publicKey }, { release: 'latest', publicKey },
+    { release: 'a', publicKey, feed: 'https://omgskills.com/appcast.xml' },
+    ...['', 'key', publicKey + '\n', Buffer.alloc(32).toString('base64'), Buffer.alloc(31, 1).toString('base64')]
+      .map(publicKey => ({ release: 'a', publicKey }))]) assert.throws(() => metadata(website, update));
+  const good = metadata(website, { release: 'a', publicKey });
+  for (const changes of [{ SUFeedURL: 'https://omgskills.com/appcast.xml' }, { SUDefaultsDomain: 'com.jonslimak.omgskills' },
+    { CFBundleIdentifier: 'com.jonslimak.omgskills' }, { CFBundleVersion: '3' },
+    { OMGSkillsSetupTestUpdatesEnabled: false }, { SUEnableAutomaticChecks: true }, { SUEnableAutomaticChecks: 0 },
+    { SUAutomaticallyUpdate: true }, { SUAllowsAutomaticUpdates: true }, { SUEnableSystemProfiling: true },
+    { SURequireSignedFeed: false }, { SUVerifyUpdateBeforeExtraction: false },
+    { SUSignedFeedFailureExpirationInterval: 30 }, { SUSignedFeedFailureExpirationInterval: false }]) {
+    assert.throws(() => validateMetadata({ ...good, ...changes }));
+  }
+});
 
 function resourceFixture() {
   const app = realpathSync(mkdtempSync(join(tmpdir(), 'setup-package-resources-')));

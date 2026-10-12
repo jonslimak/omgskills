@@ -65,7 +65,7 @@ struct SetupTestServiceTests {
         let home = FileManager.default.temporaryDirectory.appendingPathComponent("omgskills-setup-service-\(UUID())", isDirectory: true)
             .resolvingSymlinksInPath().standardizedFileURL
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
-        return .init(home: home.standardizedFileURL, website: URL(string: "https://omgskills.com/app/")!)
+        return .init(home: home.standardizedFileURL, website: URL(string: "https://omgskills.com/app/")!, updatesEnabled: false)
     }
 }
 

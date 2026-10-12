@@ -22,7 +22,19 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- **Next: plan an isolated signed-app upgrade test that preserves installed skills.**
+- **Next: approve F3d.2 signed test packaging separately.**
+  Test-only updater preparation, automated checks and scoped review passed on
+  2026-10-12; this checkpoint records the reviewed source. See the
+  [implementation and staged test plan](newmac.md#f3d-isolated-app-upgrade-plan)
+  and [verification results](newmac.md#f3d1-preparation-results-2026-10-12).
+  Keep one test identity and the app's existing Sparkle engine. New update
+  checks are manual and mutually exclusive with skill operations. The current
+  signed 0.1.0 candidate remains unchanged and updater-free; it cannot upgrade
+  itself. Later testing needs a separately approved manual bootstrap to A,
+  then real signed A-to-B replacement with skill-preservation checks.
+  No signing/key creation, package assembly, hosting, VM replacement or release
+  in this preparation. G1/G2 and production integration remain open.
+- **Preserve the F3c checkpoint `6507a699`.**
   F3c scoped review found no blocking issues; this checkpoint records its source
   and eight evidence files. Verification passed 20 package/page tests, 51 related
   portal tests, strict test-page TypeScript and saved source/artifact checks.

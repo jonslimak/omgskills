@@ -20,6 +20,7 @@ enum SetupTestRuntime {
     struct Configuration: Equatable, Sendable {
         let home: URL
         let website: URL
+        let updatesEnabled: Bool
         var stateRoot: URL { home.appendingPathComponent("Library/Application Support/OMGSkills Setup Test", isDirectory: true) }
         var managedRoot: URL { stateRoot.appendingPathComponent("managed", isDirectory: true) }
         var paths: SkillFilesystemPaths {
@@ -56,12 +57,12 @@ enum SetupTestRuntime {
                      home: URL = FileManager.default.homeDirectoryForCurrentUser,
                      allowed: Bool = buildAllowed) -> Mode {
         let requested = allowed || info["CFBundleIdentifier"] as? String == bundleID || info[websiteKey] != nil
+            || info[SetupTestUpdateConfiguration.enabledKey] != nil
         guard requested else { return .disabled }
         guard allowed, info["CFBundleIdentifier"] as? String == bundleID,
               let types = info["CFBundleURLTypes"] as? [[String: Any]], types.count == 1,
               types[0]["CFBundleURLSchemes"] as? [String] == [PublicSkillInstallClient.setupTest.rawValue],
               info[AppRuntimeConfiguration.f1RootKey] == nil, info[AppRuntimeConfiguration.f1WebsiteKey] == nil,
-              info["SUFeedURL"] == nil, info["SUPublicEDKey"] == nil,
               let rawWebsite = info[websiteKey] as? String,
               let website = URL(string: rawWebsite), website.user == nil, website.password == nil,
               website.fragment == nil,
@@ -71,7 +72,10 @@ enum SetupTestRuntime {
                 || (website.scheme == "http" && ["127.0.0.1", "localhost"].contains(website.host ?? "") && website.port != nil) else {
             return .invalid("Invalid setup-test build, identity or website configuration.")
         }
-        let configuration = Configuration(home: home.standardizedFileURL, website: website)
+        let updatesEnabled: Bool
+        do { updatesEnabled = try SetupTestUpdateConfiguration.validate(info) }
+        catch { return .invalid("Invalid setup-test update configuration.") }
+        let configuration = Configuration(home: home.standardizedFileURL, website: website, updatesEnabled: updatesEnabled)
         do { try configuration.validateStorage() }
         catch { return .invalid("The setup-test storage is unavailable or redirected.") }
         return .enabled(configuration)

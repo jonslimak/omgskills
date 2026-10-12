@@ -45,6 +45,7 @@ final class PublicSkillInstallModel {
     private(set) var review: PublicSkillInstallReview?
     private(set) var message = "Ready"
     private(set) var notice = ""
+    private(set) var appUpdateActive = false
     private var request: PublicSkillInstallRequest?
     @ObservationIgnored private let service: any PublicSkillReviewServing
     let client: PublicSkillInstallClient
@@ -57,7 +58,28 @@ final class PublicSkillInstallModel {
     var isApplying: Bool { phase == .applying }
     var ownsRequest: Bool { [.loading, .review, .applying, .cancelling].contains(phase) }
 
+    func beginAppUpdate() -> Bool {
+        guard !ownsRequest, !appUpdateActive else { return false }
+        appUpdateActive = true
+        review = nil
+        request = nil
+        phase = .idle
+        notice = ""
+        message = "Checking for app updates..."
+        return true
+    }
+
+    func finishAppUpdate(message: String, requiresRestart: Bool = false) {
+        appUpdateActive = requiresRestart
+        self.message = message
+        notice = ""
+    }
+
     func receive(_ rawURL: String) {
+        guard !appUpdateActive else {
+            notice = "Finish the app update before opening a skill request. Then retry from the website."
+            return
+        }
         let source: PublicSkillInstallRequest
         do { source = try PublicSkillInstallRequest(url: rawURL, client: client) }
         catch {
@@ -92,7 +114,7 @@ final class PublicSkillInstallModel {
     }
 
     func apply() {
-        guard phase == .review, let review else { return }
+        guard !appUpdateActive, phase == .review, let review else { return }
         phase = .applying
         message = "Applying reviewed package..."
         operation = Task { [weak self] in
@@ -113,7 +135,7 @@ final class PublicSkillInstallModel {
     }
 
     func cancel() async {
-        guard !isApplying, phase != .cancelling else { return }
+        guard !appUpdateActive, !isApplying, phase != .cancelling else { return }
         phase = .cancelling
         operation?.cancel()
         await operation?.value

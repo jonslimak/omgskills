@@ -57,11 +57,12 @@ struct PublicSkillInstallView: View {
 }
 
 @MainActor
-final class PublicSkillInstallWindowController: NSObject, NSWindowDelegate {
+final class PublicSkillInstallWindowController: NSObject, NSWindowDelegate, NSMenuItemValidation {
     let model: PublicSkillInstallModel
     private let website: URL
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
+    private var appUpdater: SetupTestUpdater?
 
     convenience init(root: URL, website: URL) {
         let paths = SkillFilesystemPaths.isolated(testRoot: root)
@@ -100,6 +101,20 @@ final class PublicSkillInstallWindowController: NSObject, NSWindowDelegate {
         let item = menu.addItem(withTitle: title, action: action, keyEquivalent: "")
         item.target = self
     }
+
+    func configureUpdates(_ updater: SetupTestUpdater) {
+        guard appUpdater == nil, model.client == .setupTest, let menu = statusItem.menu else { return }
+        appUpdater = updater
+        let item = NSMenuItem(title: "Check for app updates...", action: #selector(checkForAppUpdates), keyEquivalent: "")
+        item.target = self
+        menu.insertItem(item, at: menu.numberOfItems - 2)
+    }
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        menuItem.action != #selector(checkForAppUpdates) || appUpdater?.canCheck == true
+    }
+
+    @objc private func checkForAppUpdates() { appUpdater?.check(); showReview() }
 
     func receive(_ url: URL) { model.receive(url.absoluteString); showReview() }
     @objc func showReview() { NSApp.activate(ignoringOtherApps: true); window.makeKeyAndOrderFront(nil) }

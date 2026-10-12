@@ -15,9 +15,13 @@ This document expands C17 and its Mac-side dependencies, without duplicating
 status checklists. The historical local `webwork.md` document retains earlier
 test evidence but is not included in this checkout.
 
-**Current target: plan an isolated signed-app upgrade test that preserves installed skills.**
-F3c scoped review passed; this checkpoint records its source and evidence.
-New builds, update hosting and guest execution need a separate approved plan.
+**Current target: separately approve F3d.2 signed test packaging.**
+Test-only updater preparation passed local automated checks and scoped review
+on 2026-10-12; this checkpoint records the reviewed source.
+See the [F3d plan](#f3d-isolated-app-upgrade-plan)
+and [verification results](#f3d1-preparation-results-2026-10-12).
+F3c scoped review and source/evidence are committed as `6507a699`.
+Signed packaging, update hosting and guest execution remain separate approvals.
 The bounded VM flow passed; refresh alone did not discover Humanizer, but a
 normal Codex restart did. See
 [F3c acceptance](#f3c-signed-candidate-skill-update-acceptance-2026-10-12).
@@ -1177,6 +1181,99 @@ The VM and artifacts are retained; cleanup, push and release require separate
 approval. No repeat VM run, build, signing or deployment during review.
 C5/C10/C13/C17 and G1-G4 remain open beyond this bounded result.
 
+### F3d: Isolated app upgrade plan
+
+**F3d.1 approved: local source and automated checks only.** The retained signed
+0.1.0/build 1 candidate has no updater and cannot bootstrap itself by Sparkle.
+Do not edit its signed bundle or describe a manual replacement as an automatic
+upgrade. Preserve the F3b/F3c originals and VM evidence.
+
+Contract for this preparation:
+
+- Keep `OMGSkills Setup Test.app`, `com.jonslimak.omgskills.setuptest`, the
+  `omgskills-setup-test` URL handler and existing candidate storage unchanged.
+- Reuse AppDelegate's single `SPUStandardUpdaterController`. A small test-only
+  lifecycle guard coordinates it with `PublicSkillInstallModel`; do not import
+  the old standalone helper's updater, store or identity.
+- Updater remains absent by default. `OMGSKILLS_SETUP_TEST` plus an explicitly
+  validated update configuration is required. The assembler's optional
+  `--update-release a|b` and `--update-public-key` select only 0.1.1/build 2 or
+  0.1.2/build 3. A dedicated real test public key must be supplied later;
+  synthetic unit-test keys are never distribution credentials.
+- Fixed test feed: `https://omgskills-setup-test-f3b.netlify.app/updates/f3d/appcast.xml`.
+  Only matching `OMGSkills-Setup-Test-0.1.1-arm64.zip` or
+  `OMGSkills-Setup-Test-0.1.2-arm64.zip` application archives in that directory
+  are accepted; no deltas, package installers, production feed or defaults-domain
+  override. This path is reserved in code, not published by this work.
+- User chooses **Check for app updates...** from the test app menu. No startup
+  checks, automatic checks/downloads, profiling or test telemetry. Require signed
+  feed and archive verification before extraction; no unsigned fallback.
+- Loading, review, apply and cancellation prevent app-update checks. Once a
+  check begins, new skill requests are refused without queueing or replay.
+  A dismissed/failed check before replacement unlocks skills; once replacement
+  starts, retain the lock until relaunch, even if an installing prompt is closed.
+  Quit cannot interrupt a skill apply/cancel; old consent is never restored.
+
+Verification: fixed metadata and ordinary-build refusal; partial/unsafe updater
+configuration; exact archive paths/versions; manual-only startup; mutual exclusion,
+duplicate clicks, cancellation, failed checks and pending-replacement lock;
+existing installer and production updater regression tests. Compile/test both
+ordinary and setup-test configurations with locked dependencies. No signing,
+key creation, package assembly, app launch, VM writes or network updater run here.
+
+Later stages, not approved by F3d.1:
+
+1. Review the source, then approve packaging/signing/notarization of A and B
+   and creation/storage of a dedicated test update key. Verify both identities,
+   signatures, resources, versions, disabled background checks and storage paths.
+2. Approve hosting the two immutable archives and signed feed on the dedicated
+   test site. Preserve its existing pages/DMG and all production/helper feeds.
+3. Preserve the stopped VM first. In a disposable copy or approved snapshot,
+   record skill bytes/modes/links/records, then manually replace only the old
+   test app with updater-enabled A. Verify that bootstrap separately.
+4. Trigger A-to-B through Sparkle, approve normal replacement/relaunch and prove
+   the new version, one app process, unchanged skills/provenance and working
+   web handoff. A repeat skill request must remain a no-op. No reset/reinstall
+   of skills to force a pass; no security bypass or public release commands.
+5. Exercise separately scoped updater failures against test-only artifacts;
+   retain failures as open G2 items, not implied by successful A-to-B replacement.
+
+This supports G1/G2 but is not existing-user migration or production acceptance.
+The public app's automatic-update policy, keys and feed remain unchanged.
+
+#### F3d.1 preparation results (2026-10-12)
+
+Implemented and reviewed for this source checkpoint; not packaged:
+
+- Optional fixed A/B metadata, compile-gated manual update entry point and
+  the existing Sparkle controller, coordinated with skill review/apply/cancel.
+- Model tests cover no startup check, duplicate clicks, mutual exclusion,
+  explicit retry after refused links, failed-check recovery and a sticky
+  replacement lock until relaunch. Configuration tests reject other feeds,
+  identities, defaults domains, unsigned policy and mismatched archives.
+- Package/page checks: **22 passed**. Debug native regression run: **69 passed,
+  1 opt-in live-network test skipped** (70 selected, 14 suites). Setup-test
+  Release configuration: **31 passed**; ordinary Release: **25 passed**.
+  These runs overlap; they are not unique-test totals. Dependencies were locked.
+- Both Release configurations compiled successfully. The ordinary Release
+  rejects test activation; existing production updater regression checks pass.
+- Original `OMGSkills-Setup-Test-0.1.0-arm64.dmg` still hashes to
+  `3cf340de60ae43f44d675a60bc485de8476e812c9c3e25fd366b83b5dd58effc`.
+  Production metadata, update feed/key and release scripts are unchanged.
+
+No signed A/B bundles, test update key, feed publication, native updater UI run,
+VM changes or end-to-end app replacement occurred. Signature enforcement and
+installed-skill preservation across actual Sparkle replacement remain unproven.
+G1/G2 remain open; the next step is separately approved signed test packaging,
+not another F3c run.
+
+Scoped review found no blocking issues in the 13 changed files. Review checked
+Sparkle's startup/callback contracts, manual-only gating, skill-operation
+exclusion, configuration validation and production defaults. The 22 package/page
+tests and 31 setup-test Release checks passed again; `git diff --check` passed.
+This checkpoint does not include key creation, signing, hosting, VM changes,
+push or release. Actual Sparkle UI/replacement behavior remains a VM test gate.
+
 ### Evidence, cleanup and stop rules
 
 Archive stage-labelled build/source hashes, exact URLs/artifact names, intent
@@ -1253,10 +1350,10 @@ F1 step 1 implements the approved narrow answers to 1, 3 and the request part of
 6. Login onboarding/defaults and existing-user transition messaging; preserve
    explicit opt-outs and distinguish Quit from disabling future login startup.
 
-Next: follow [Connect's active queue](connect.md#current-next-task): plan isolated
-signed-app upgrade verification that preserves installed skills. Execution,
-new artifacts and update hosting need separate approval; do not repeat the
-passed F3c VM matrix.
+Next: follow [Connect's active queue](connect.md#current-next-task): seek separate
+approval for F3d.2
+signed artifacts, update hosting and VM execution. Do not repeat the passed
+F3c skill-update matrix.
 Current production app defaults still use Git; candidate HTTPS setup evidence
 does not change them. F3a local acceptance, approved
 cleanup and scoped review passed; [results](archive/newmac-f3a-2026-10-09/README.md)

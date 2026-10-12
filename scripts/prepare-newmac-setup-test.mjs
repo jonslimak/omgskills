@@ -15,6 +15,8 @@ const buildArgs = ['build', '--jobs', '2', '--scratch-path', '.build/setup-test'
 const bundles = ['KeyboardShortcuts_KeyboardShortcuts.bundle', 'TelemetryDeck_TelemetryDeck.bundle', 'omgskills_omgskills.bundle'];
 const packagedRpath = '@executable_path/../Frameworks';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+export const updateFeed = 'https://omgskills-setup-test-f3b.netlify.app/updates/f3d/appcast.xml';
+const updateVersions = { a: ['0.1.1', '2'], b: ['0.1.2', '3'] };
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const run = (command, args, cwd = repository) => execFileSync(command, args, { cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
 
@@ -29,7 +31,24 @@ export function validateWebsite(website) {
   return url.href;
 }
 
-export function metadata(website) {
+export function metadata(website, update) {
+  let updateMetadata = {};
+  if (update !== undefined) {
+    assert.deepEqual(Object.keys(update).sort(), ['publicKey', 'release'], 'Use only a test release and public key');
+    assert.ok(Object.hasOwn(updateVersions, update.release), 'Use test update release a or b');
+    assert.equal(typeof update.publicKey, 'string', 'A test update public key is required');
+    const bytes = Buffer.from(update.publicKey, 'base64');
+    assert.ok(bytes.length === 32 && bytes.some(x => x !== 0) && bytes.toString('base64') === update.publicKey,
+      'Use a canonical 32-byte test Ed25519 public key');
+    const [version, build] = updateVersions[update.release];
+    updateMetadata = {
+      CFBundleShortVersionString: version, CFBundleVersion: build,
+      OMGSkillsSetupTestUpdatesEnabled: true, SUFeedURL: updateFeed, SUPublicEDKey: update.publicKey,
+      SUEnableAutomaticChecks: false, SUAutomaticallyUpdate: false, SUAllowsAutomaticUpdates: false,
+      SUEnableSystemProfiling: false, SUVerifyUpdateBeforeExtraction: true, SURequireSignedFeed: true,
+      SUSignedFeedFailureExpirationInterval: 0,
+    };
+  }
   return {
     CFBundleIdentifier: 'com.jonslimak.omgskills.setuptest',
     CFBundleName: 'OMGSkills Setup Test', CFBundleDisplayName: 'OMGSkills Setup Test',
@@ -38,12 +57,16 @@ export function metadata(website) {
     LSMinimumSystemVersion: '14.0', LSUIElement: true, LSMultipleInstancesProhibited: true,
     CFBundleURLTypes: [{ CFBundleURLName: 'OMGSkills Setup Test', CFBundleURLSchemes: ['omgskills-setup-test'] }],
     OMGSkillsSetupTestWebsite: validateWebsite(website),
+    ...updateMetadata,
   };
 }
 
 export function validateMetadata(value) {
-  // A fixed schema rejects production feeds, alternate handlers and local destinations.
-  assert.deepEqual(value, metadata(value.OMGSkillsSetupTestWebsite), 'Unexpected setup-test metadata');
+  // The original candidate stays updater-free; upgrade candidates use one fixed test channel.
+  const release = Object.keys(updateVersions).find(key => updateVersions[key][0] === value.CFBundleShortVersionString
+    && updateVersions[key][1] === value.CFBundleVersion);
+  const update = value.OMGSkillsSetupTestUpdatesEnabled === true ? { release, publicKey: value.SUPublicEDKey } : undefined;
+  assert.deepEqual(value, metadata(value.OMGSkillsSetupTestWebsite, update), 'Unexpected setup-test metadata');
 }
 
 function inside(root, path) {
@@ -141,11 +164,11 @@ export function validateResourceLayout(app) {
   assert.ok(lstatSync(markdown).isFile() && lstatSync(markdown).size > 0, 'Missing markdown resource');
 }
 
-export function verifyPackage(app, expectedWebsite) {
+export function verifyPackage(app, expectedWebsite, update) {
   const contents = join(app, 'Contents');
   const plist = JSON.parse(run('/usr/bin/plutil', ['-convert', 'json', '-o', '-', join(contents, 'Info.plist')]));
   validateMetadata(plist);
-  assert.equal(plist.OMGSkillsSetupTestWebsite, validateWebsite(expectedWebsite));
+  assert.deepEqual(plist, metadata(expectedWebsite, update), 'Packaged settings differ from requested candidate');
   const binary = join(contents, 'MacOS', executable);
   const load = readLoadCommands(run('/usr/bin/otool', ['-l', binary]));
   const architecture = run('/usr/bin/lipo', ['-archs', binary]).trim();
@@ -174,9 +197,9 @@ export function verifyPackage(app, expectedWebsite) {
   return { metadata: plist, architecture, loadCommands: load, binaries, entries };
 }
 
-export function prepare(website) {
+export function prepare(website, update) {
   if (process.platform !== 'darwin') throw new Error('Assembly requires macOS');
-  const plist = metadata(website);
+  const plist = metadata(website, update);
   const before = sourceSnapshot();
   const menubar = join(repository, 'menubar');
   execFileSync('/usr/bin/swift', buildArgs, { cwd: menubar, stdio: ['ignore', 'inherit', 'inherit'] });
@@ -208,7 +231,7 @@ export function prepare(website) {
   const removedRpaths = load.rpaths.filter(path => path.startsWith('/Applications/Xcode') && path.includes('/Toolchains/'));
   for (const path of removedRpaths) run('/usr/bin/install_name_tool', ['-delete_rpath', path, binary]);
   if (!load.rpaths.includes(packagedRpath)) run('/usr/bin/install_name_tool', ['-add_rpath', packagedRpath, binary]);
-  const inspection = verifyPackage(app, website);
+  const inspection = verifyPackage(app, website, update);
   const artifact = { format: 1, stage: 'local-pre-signing-inspection-only', app: appName,
     ...inspection, buildBinarySHA256, packagedBinarySHA256: hash(readFileSync(binary)), removedRpaths,
     dependencyInputs, sourceManifestSHA256: hash(readFileSync(join(output, 'source-manifest.json'))),
@@ -226,7 +249,10 @@ export function prepare(website) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { values } = parseArgs({ options: { website: { type: 'string' } } });
+  const { values } = parseArgs({ options: { website: { type: 'string' },
+    'update-release': { type: 'string' }, 'update-public-key': { type: 'string' } } });
   if (!values.website) throw new Error('Use --website with the approved local preview or website URL.');
-  console.log(json(prepare(values.website)));
+  const wantsUpdates = values['update-release'] !== undefined || values['update-public-key'] !== undefined;
+  console.log(json(prepare(values.website, wantsUpdates
+    ? { release: values['update-release'], publicKey: values['update-public-key'] } : undefined)));
 }

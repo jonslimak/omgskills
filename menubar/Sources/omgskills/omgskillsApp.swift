@@ -22,6 +22,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var f1Controller: PublicSkillInstallWindowController?
     private var pendingF1URL: URL?
     #endif
+    #if OMGSKILLS_SETUP_TEST
+    private var setupTestUpdater: SetupTestUpdater?
+    private var setupTestUpdaterStarted = false
+    #endif
     nonisolated static let debugAppcastURLEnvironmentKey = "OMGSKILLS_DEBUG_APPCAST_URL"
     private static let libraryRefreshTimerInterval: TimeInterval = 60 * 60
     private let skillGroupsBuildSupported = AppRuntimeConfiguration.skillGroupsAuthSupported
@@ -85,6 +89,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
                 try configuration.prepareStorage()
                 f1Controller = PublicSkillInstallWindowController(service: try .setupTest(configuration),
                     website: configuration.website, client: .setupTest)
+                if configuration.updatesEnabled, let f1Controller {
+                    let updater = SetupTestUpdater(model: f1Controller.model) { [weak self] in
+                        guard let self else { throw Self.setupUpdateUnavailable() }
+                        try self.checkSetupTestUpdates()
+                    }
+                    setupTestUpdater = updater
+                    f1Controller.configureUpdates(updater)
+                }
                 if let pendingF1URL { f1Controller?.receive(pendingF1URL); self.pendingF1URL = nil }
                 else { f1Controller?.showReview() }
             } catch { refuseSetupTestLaunch(error.localizedDescription) }
@@ -297,6 +309,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private func checkForUpdatesInBackground() {
         updaterController.updater.checkForUpdatesInBackground()
     }
+
+    #if OMGSKILLS_SETUP_TEST
+    private static func setupUpdateUnavailable() -> NSError {
+        NSError(domain: "com.jonslimak.omgskills.setuptest.updates", code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Close the skill review and finish pending work before checking for app updates."])
+    }
+
+    private func checkSetupTestUpdates() throws {
+        guard setupTestUpdater?.phase == .checking, setupTestUpdater?.permitsUpdate == true else {
+            throw Self.setupUpdateUnavailable()
+        }
+        if updaterController == nil { setupUpdater(startingUpdater: false) }
+        if !setupTestUpdaterStarted {
+            // Ignore persisted automatic-check preferences only in this isolated test identity.
+            updaterController.updater.automaticallyChecksForUpdates = false
+            updaterController.updater.automaticallyDownloadsUpdates = false
+            updaterController.updater.sendsSystemProfile = false
+            try updaterController.updater.start()
+            setupTestUpdaterStarted = true
+        }
+        guard updaterController.updater.canCheckForUpdates else { throw Self.setupUpdateUnavailable() }
+        updaterController.checkForUpdates(nil)
+    }
+    #endif
 
     private func setupLibraryRefreshObservers() {
         workspaceDidWakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -519,6 +555,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled { return }
+        #endif
         Analytics.signal(
             "app.update_found",
             parameters: Analytics.updateParameters(
@@ -529,7 +568,61 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func feedURLString(for updater: SPUUpdater) -> String? {
-        Self.debugAppcastFeedURLString()
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled { return SetupTestUpdateConfiguration.feedURL }
+        #endif
+        return Self.debugAppcastFeedURLString()
+    }
+
+    func allowedSystemProfileKeys(for updater: SPUUpdater) -> [String]? {
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled { return [] }
+        #endif
+        return nil
+    }
+
+    func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled {
+            guard updateCheck == .updates, setupTestUpdater?.phase == .checking,
+                  setupTestUpdater?.permitsUpdate == true else { throw Self.setupUpdateUnavailable() }
+        }
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, shouldProceedWithUpdate item: SUAppcastItem,
+                 updateCheck: SPUUpdateCheck) throws {
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled {
+            try self.updater(updater, mayPerform: updateCheck)
+            guard SetupTestUpdateConfiguration.acceptsArchive(url: item.fileURL, build: item.versionString,
+                version: item.displayVersionString, installationType: item.installationType, isDelta: item.isDeltaUpdate) else {
+                throw Self.setupUpdateUnavailable()
+            }
+        }
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, willInstallUpdate item: SUAppcastItem) {
+        #if OMGSKILLS_SETUP_TEST
+        setupTestUpdater?.installationStarted()
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, userDidMake choice: SPUUserUpdateChoice,
+                 forUpdate item: SUAppcastItem, state: SPUUserUpdateState) {
+        #if OMGSKILLS_SETUP_TEST
+        if state.stage == .installing { setupTestUpdater?.installationStarted() }
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        #if OMGSKILLS_SETUP_TEST
+        guard updateCheck == .updates else { return }
+        let error = error as NSError?
+        let failed = error != nil && !(error?.domain == SUSparkleErrorDomain && error?.code == Int(SUError.noUpdateError.rawValue))
+        setupTestUpdater?.finish(failed: failed)
+        #endif
     }
 
     func updater(
@@ -537,7 +630,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         willInstallUpdateOnQuit item: SUAppcastItem,
         immediateInstallationBlock immediateInstallHandler: @escaping () -> Void
     ) -> Bool {
-        updateInstallHandler.handleInstallOnQuit(
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled {
+            // Retain the skill lock once replacement is pending, even if Sparkle's UI is dismissed.
+            guard setupTestUpdater?.permitsUpdate == true else { return true }
+            setupTestUpdater?.installationStarted()
+            immediateInstallHandler()
+            return true
+        }
+        #endif
+        return updateInstallHandler.handleInstallOnQuit(
             targetVersion: item.displayVersionString,
             targetBuild: item.versionString
         ) {
