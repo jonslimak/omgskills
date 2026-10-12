@@ -103,3 +103,15 @@
     }
   }, true);
 })();
+
+// Same download conversion events as the main landing page (X, Reddit, OpenAI ads).
+document.querySelectorAll('a[href="/downloads/omgskills-mac.dmg"]').forEach(link => {
+  link.addEventListener('click', event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    if (typeof window.twq === 'function') window.twq('event', 'tw-qwhi7-rceh8', { value: null });
+    if (typeof window.rdt === 'function') window.rdt('track', 'Custom', { customEventName: 'Download' });
+    if (typeof window.oaiq === 'function') window.oaiq('measure', 'custom', { type: 'custom' }, { custom_event_name: 'download_clicked' });
+    setTimeout(() => { location.href = link.href; }, 150);
+  });
+});
