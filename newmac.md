@@ -3,23 +3,27 @@
 Design and F1 implementation plan, 2026-10-08; local acceptance passed 2026-10-09.
 F3a local setup/retry automated and user-run acceptance passed 2026-10-09.
 F3b's native HTTPS downloader is reviewed and committed as `f8a40cf0`.
-Candidate-only wiring is implemented, tested and reviewed in this local
-checkpoint on 2026-10-09; local packaging is next. Signing, hosting and signed setup
-acceptance are not approved or performed.
+Candidate-only wiring is committed as `003f94d1`. Separately approved F3b signing,
+notarization, dedicated test hosting and bounded clean-VM setup passed on
+2026-10-12; [evidence](archive/newmac-f3b-2026-10-12/README.md).
 F2 local acceptance, scoped review and approved cleanup passed 2026-10-09.
 Code and acceptance evidence are recorded in [Connect](connect.md), the single
 progress tracker. No release approval.
 This document expands C17 and its Mac-side dependencies, without duplicating
-status checklists. [Webwork](webwork.md) retains earlier test evidence.
+status checklists. The historical local `webwork.md` document retains earlier
+test evidence but is not included in this checkout.
 
-**Current target: prepare local F3b packaging.** F1
+**Current target: plan a signed-candidate skill update in the retained VM.**
+Scoped F3b review passed; this checkpoint records source and evidence, not a
+new build or release. F1
 proved one public install/update locally. F2 passed three repositories, an
 independent update, repeat no-op, Codex discovery and automated name-collision
 refusal. F2 is committed locally as `f7a964b0`; the
 [F3 plan](#f3-first-time-setup-and-retry-plan) separates local UX proof from
 real signed first-time setup. [F3a results](archive/newmac-f3a-2026-10-09/README.md)
 record local acceptance, approved cleanup and scoped review, committed as
-`462ac68a`. F3b signed acceptance has not run. The rest describes the
+`462ac68a`. F3b proved candidate first-time setup, not a public release or
+existing-user upgrade. The rest describes the
 intended product, not completed C17/C13/C10 work.
 Full security, compatibility and signed-release testing follows at G1-G4.
 
@@ -895,6 +899,11 @@ below follows it; compiled tests are not distribution proof.
 
 #### F3b local packaging checkpoint
 
+Historical pre-signing checkpoint; superseded by the
+[signed candidate result](#f3b-signed-candidate-acceptance-2026-10-12).
+The root resource links described here were later rejected by signing and
+removed; the accepted candidate uses standard Contents/Resources layout.
+
 2026-10-12: approved local packaging is implemented, inspected and reviewed,
 recorded with this checkpoint.
 `scripts/prepare-newmac-setup-test.mjs` builds the arm64 Release executable with
@@ -926,7 +935,7 @@ checks; the 7 setup-test Release tests passed again using temporary homes.
   manifest explicitly records base `003f94d1` plus uncommitted assembler files;
   this is not a reproducible committed release claim.
 
-Current local output, relative to this worktree:
+Historical local output, relative to this worktree:
 `menubar/.build/setup-test-packages/candidate-bA7JPv/OMGSkills Setup Test.app`.
 Manifests and receipt are in the same `candidate-bA7JPv` directory.
 Packaged executable SHA-256:
@@ -952,7 +961,7 @@ bytes and manifests were reverified without launching or rebuilding the bundle.
 The artifact retains its original pre-commit provenance; this source checkpoint
 does not turn it into a signed or freshly rebuilt release.
 
-Next: plan signed acceptance separately. Agree
+Next at that checkpoint: plan signed acceptance separately. Agree
 the browser test URL and approve Developer ID signing/notarization, controlled
 hosting and fresh-Mac acceptance. Do not distribute this local inspection bundle
 or count inspection as install/setup proof.
@@ -1016,6 +1025,9 @@ Writing Guidelines source from F3a. No new source sample or A/B test here.
 
 #### Later signed acceptance, separately approved
 
+The following plan was subsequently approved and exercised on 2026-10-12;
+results and limits are recorded in the next section.
+
 Use a clean macOS environment without developer tools; a new user alone is not
 enough to establish that prerequisite. Confirm the test app/handler and target
 skill are absent. Use a supported Codex installation for the discovery check,
@@ -1030,10 +1042,62 @@ and process count rather than assuming how macOS behaves.
 
 Verify exact commit/tree/files, one installation and Codex discovery. Quit the
 app, retry from the same page, and verify cold launch reports Already installed
-without another download or write. No Terminal/Gatekeeper bypass is allowed.
+without repeating app setup or replacing the installed skill. Retry currently
+re-fetches package metadata/content before determining the no-op; zero network
+activity is not proven or promised. No Terminal-based installation or Gatekeeper
+bypass is allowed. Post-install read-only diagnostics are separate evidence,
+not user setup requirements.
 Archive the result; cleanup requires an exact inventory and separate approval.
 This proves candidate first-time setup only, not production identity migration,
 Sparkle upgrades, all architectures, other browsers or G1-G4 completion.
+
+#### F3b signed candidate acceptance, 2026-10-12
+
+**Bounded candidate setup passed.** Full observations and machine-readable
+verification are preserved in [the archive](archive/newmac-f3b-2026-10-12/README.md).
+
+- Candidate `38Efxz`: `OMGSkills Setup Test.app`, version/build `0.1.0` / `1`,
+  arm64, separate `com.jonslimak.omgskills.setuptest` identity and scheme.
+  Apple accepted both app and DMG; signatures, stapling, Gatekeeper and signed
+  payload equivalence were checked. The prior root-link packaging failure was
+  fixed, with regression tests; no bypass was used.
+- Dedicated unlinked/noindex test site:
+  `https://omgskills-setup-test-f3b.netlify.app/app/preview/unified/`.
+  The candidate is not the public app and this site is not production `/app/`.
+  Hosting, package hashes and Apple submission IDs are recorded in the archive.
+- In `OMGSkills-F3b-Test-01`, without developer tools: absent-handler retry,
+  Safari download/resume, copy to `/Users/omgtest/Applications`, eject and normal
+  macOS Open approval worked. The app initially showed Ready without installing.
+  Original Writing Guidelines request survived setup and required revalidation,
+  explicit Open, Safari Allow and native Install in Codex approval.
+- Installed commit `063bee94c3f4df8453406c830b0a7df0f2860278`; one 1,233-byte
+  `SKILL.md` matches the pinned public source. Commit/tree/blob provenance,
+  Codex destination and the managed link were independently read back.
+  Codex listed Writing Guidelines after refresh; no model was invoked.
+- Quit/reopen through Safari reported Already installed. A subsequent measured
+  warm retry preserved skill/provenance hashes, inodes, modification/change
+  times and the activation link. One candidate process ran from the final copy.
+  This proves no skill replacement in the sampled retry, not absence of all
+  temporary writes or network requests. The downloader revalidates package data.
+- Post-install diagnostics used only built-in read-only commands. A request for
+  Terminal access to Downloads was declined; guest DMG hashing was not completed.
+  Host/hosted DMG hash and normal guest Gatekeeper evidence remain available.
+
+The candidate, VM and hosted artifacts are retained, not cleaned up. The signed
+build used then-uncommitted packaging/web inputs on base `dd1e7828`; signed
+manifests retain those actual inputs. The reviewed source checkpoint does not
+retroactively turn it into a clean reproducible release build. No host skill,
+production website, public app identity or Sparkle feed/release was changed.
+
+Scoped review found no blocking issues. The 16 package/page tests, 29 native
+tests and test-page TypeScript check passed; one optional live-network test was
+skipped. Retained artifact digests, native source inputs and local links matched.
+The native test build was rerun; no new app package, signing or deployment.
+
+Next proposed slice: a browser-triggered skill A/B
+update using the signed candidate, with Cancel preservation and independent
+Apply verification. It is not yet prepared or run. Existing-user migration,
+Sparkle app upgrades/failures, other browsers/architectures and G1-G4 remain open.
 
 ### Evidence, cleanup and stop rules
 
@@ -1111,12 +1175,12 @@ F1 step 1 implements the approved narrow answers to 1, 3 and the request part of
 6. Login onboarding/defaults and existing-user transition messaging; preserve
    explicit opt-outs and distinguish Quit from disabling future login startup.
 
-Next: review the isolated HTTPS downloader checkpoint in the
-[F3b local candidate plan](#f3b-local-candidate-plan-and-prerequisite-hold)
-before integrating it into the distributable test candidate. Current app
-defaults still use Git. F3a local acceptance, approved
+Next: follow [Connect's active queue](connect.md#current-next-task): plan the
+signed-candidate skill-update check after this reviewed F3b checkpoint.
+Current production app defaults still use Git; candidate HTTPS setup evidence
+does not change them. F3a local acceptance, approved
 cleanup and scoped review passed; [results](archive/newmac-f3a-2026-10-09/README.md)
-are committed with the source in `462ac68a`. No signing or hosting approval.
+are committed with the source in `462ac68a`.
 F2 is committed
 as `f7a964b0`. Its automated and user-run acceptance passed locally; evidence is
 saved, scoped review passed and approved cleanup is complete. F1 is committed
@@ -1125,6 +1189,7 @@ as `33b659e6`; its earlier scoped review and cleanup are complete.
 local-edit and A/B checks; [F2 evidence](archive/newmac-f2-2026-10-09/README.md)
 adds three-source coexistence and an independent companion-file update.
 Neither proves broad coverage, existing-user migration or release readiness.
-The test bundle did not replace the installed app. No real skill folder,
-credential, production flag, update feed or deployment was changed.
+The candidate did not replace the host's public app. Only the guest test skill
+and dedicated test deployment were created; production flags, update feeds and
+host skill folders were not changed.
 Connect and the archived receipts hold progress/evidence.

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { cpSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, realpathSync, symlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -10,7 +10,7 @@ import { parseArgs } from 'node:util';
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const appName = 'OMGSkills Setup Test.app';
 const executable = 'omgskills-setup-test';
-const buildArgs = ['build', '--scratch-path', '.build/setup-test', '-c', 'release', '--arch', 'arm64',
+const buildArgs = ['build', '--jobs', '2', '--scratch-path', '.build/setup-test', '-c', 'release', '--arch', 'arm64',
   '--disable-automatic-resolution', '-Xswiftc', '-DOMGSKILLS_SETUP_TEST'];
 const bundles = ['KeyboardShortcuts_KeyboardShortcuts.bundle', 'TelemetryDeck_TelemetryDeck.bundle', 'omgskills_omgskills.bundle'];
 const packagedRpath = '@executable_path/../Frameworks';
@@ -22,6 +22,7 @@ export function validateWebsite(website) {
   const url = new URL(website);
   if (url.username || url.password || url.hash || url.search || /[\s\\]/.test(website)
       || !((url.protocol === 'https:' && url.origin === 'https://omgskills.com')
+        || website === 'https://omgskills-setup-test-f3b.netlify.app/app/preview/unified/'
         || (url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname) && url.port))) {
     throw new Error('Use the OMGSkills HTTPS website or loopback HTTP with an explicit port, without credentials, query or fragment.');
   }
@@ -128,6 +129,18 @@ function sourceSnapshot() {
   };
 }
 
+export function validateResourceLayout(app) {
+  assert.deepEqual(readdirSync(app), ['Contents'], 'Unexpected item at app bundle root');
+  for (const path of ['Contents', 'Contents/Resources', ...bundles.map(name => `Contents/Resources/${name}`)]) {
+    const directory = join(app, path);
+    assert.ok(lstatSync(directory).isDirectory(), `Expected a real resource directory: ${path}`);
+    assert.equal(realpathSync(directory), directory, `Redirected resource directory: ${path}`);
+  }
+  // AppResource reads this standard location without SwiftPM's build-machine fallback.
+  const markdown = join(app, 'Contents/Resources/omgskills_omgskills.bundle/Resources/marked.min.js');
+  assert.ok(lstatSync(markdown).isFile() && lstatSync(markdown).size > 0, 'Missing markdown resource');
+}
+
 export function verifyPackage(app, expectedWebsite) {
   const contents = join(app, 'Contents');
   const plist = JSON.parse(run('/usr/bin/plutil', ['-convert', 'json', '-o', '-', join(contents, 'Info.plist')]));
@@ -139,10 +152,7 @@ export function verifyPackage(app, expectedWebsite) {
   validateExecutable({ ...load, architectures: architecture });
   assert.ok(lstatSync(binary).mode & 0o111, 'Executable permissions missing');
   assert.ok(run('/usr/bin/nm', [binary]).includes('PublicSkillInstallWindowController'), 'Candidate installer UI is missing');
-  for (const name of bundles) {
-    assert.equal(readlinkSync(join(app, name)), `Contents/Resources/${name}`);
-    assert.equal(realpathSync(join(app, name)), join(contents, 'Resources', name));
-  }
+  validateResourceLayout(app);
   const entries = inventory(app);
   assert.ok(!entries.some(x => /(?:^|\/)(?:skills\.json|sha-history\.json|.*Tests.*|.*\.xctest)(?:\/|$)/.test(x.path)), 'Catalog/test payload unexpectedly bundled');
   const binaries = [];
@@ -188,8 +198,6 @@ export function prepare(website) {
   const dependencyInputs = {};
   for (const name of bundles) {
     dependencyInputs[name] = copyChecked(join(bin, name), join(contents, 'Resources', name));
-    // SwiftPM accessors look at the app root first; keep their portable path valid.
-    symlinkSync(`Contents/Resources/${name}`, join(app, name));
   }
   dependencyInputs['Sparkle.framework'] = copyChecked(join(bin, 'Sparkle.framework'), join(contents, 'Frameworks/Sparkle.framework'));
   cpSync(join(menubar, 'Assets/omgskills.icns'), join(contents, 'Resources/omgskills.icns'), { errorOnExist: true, force: false });

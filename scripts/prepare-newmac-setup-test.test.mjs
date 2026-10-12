@@ -1,11 +1,40 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, symlinkSync, realpathSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, symlinkSync, realpathSync, renameSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createOutput, inventory, metadata, readLoadCommands, validateDependencyPlatform, validateExecutable, validateMetadata, validateWebsite } from './prepare-newmac-setup-test.mjs';
+import { createOutput, inventory, metadata, readLoadCommands, validateDependencyPlatform, validateExecutable, validateMetadata, validateResourceLayout, validateWebsite } from './prepare-newmac-setup-test.mjs';
 
 const website = 'http://127.0.0.1:5198/app/preview/unified/';
+
+function resourceFixture() {
+  const app = realpathSync(mkdtempSync(join(tmpdir(), 'setup-package-resources-')));
+  for (const name of ['KeyboardShortcuts_KeyboardShortcuts', 'TelemetryDeck_TelemetryDeck', 'omgskills_omgskills']) {
+    mkdirSync(join(app, `Contents/Resources/${name}.bundle/Resources`), { recursive: true });
+  }
+  writeFileSync(join(app, 'Contents/Resources/omgskills_omgskills.bundle/Resources/marked.min.js'), 'fixture');
+  return app;
+}
+
+test('resource bundles use the standard location with no extra app-root contents', () => {
+  const app = resourceFixture();
+  validateResourceLayout(app);
+  symlinkSync('Contents/Resources/omgskills_omgskills.bundle', join(app, 'omgskills_omgskills.bundle'));
+  assert.throws(() => validateResourceLayout(app), /Unexpected item at app bundle root/);
+});
+
+test('rejects redirected resource bundles and missing or empty markdown resources', () => {
+  const app = resourceFixture();
+  const bundle = join(app, 'Contents/Resources/omgskills_omgskills.bundle');
+  const markdown = join(bundle, 'Resources/marked.min.js');
+  writeFileSync(markdown, '');
+  assert.throws(() => validateResourceLayout(app), /Missing markdown resource/);
+  renameSync(markdown, `${markdown}.old`);
+  assert.throws(() => validateResourceLayout(app), /ENOENT/);
+  renameSync(bundle, `${bundle}.old`);
+  symlinkSync('omgskills_omgskills.bundle.old', bundle);
+  assert.throws(() => validateResourceLayout(app), /Expected a real resource directory/);
+});
 
 test('fixed candidate metadata and portable website', () => {
   const value = metadata(website);
@@ -15,6 +44,8 @@ test('fixed candidate metadata and portable website', () => {
   assert.equal(value.LSMinimumSystemVersion, '14.0');
   assert.equal(value.CFBundleShortVersionString, '0.1.0');
   assert.equal(validateWebsite('https://omgskills.com/app/'), 'https://omgskills.com/app/');
+  const testWebsite = 'https://omgskills-setup-test-f3b.netlify.app/app/preview/unified/';
+  assert.equal(validateWebsite(testWebsite), testWebsite);
 });
 
 test('rejects production identity, feeds, other handlers and machine-specific configuration', () => {
@@ -32,7 +63,10 @@ test('rejects unapproved websites and embedded auth/state', () => {
   for (const url of ['file:///Users/example', 'https://example.com/', 'http://omgskills.com/',
     'http://localhost/', 'http://user@localhost:5198/', 'http://localhost:5198/#token',
     'http://localhost:5198/?secret=test', 'https://omgskills.com.evil.test/', 'https://omgskills.com:999/app/',
-    ' http://localhost:5198/', 'http://localhost:5198\\app']) {
+    ' http://localhost:5198/', 'http://localhost:5198\\app',
+    'https://omgskills-setup-test-f3b.netlify.app/other',
+    'https://omgskills-setup-test-f3b.netlify.app.evil.test/app/preview/unified/',
+    'http://omgskills-setup-test-f3b.netlify.app/app/preview/unified/']) {
     assert.throws(() => validateWebsite(url), url);
   }
 });

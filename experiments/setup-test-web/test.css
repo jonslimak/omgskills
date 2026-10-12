@@ -1,0 +1,19 @@
+:root { font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #202124; background: #fff; font-size: 16px; letter-spacing: 0; }
+body { margin: 0; }
+main { max-width: 660px; margin: 48px auto; padding: 0 24px; }
+header { display: flex; align-items: center; gap: 16px; margin: 28px 0; }
+h1 { font-size: 28px; margin: 0; }
+h2 { font-size: 20px; }
+p, li { line-height: 1.5; }
+header p { margin: 6px 0 0; }
+#actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+button, .button { display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; padding: 10px 16px; border-radius: 6px; border: 1px solid #0b64da; background: #0b64da; color: white; text-decoration: none; font: inherit; cursor: pointer; }
+button:disabled { background: #eee; border-color: #ccc; color: #666; cursor: default; }
+button.secondary { background: white; color: #0b64da; }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid #169674; outline-offset: 3px; }
+section { border-top: 1px solid #ddd; padding-top: 12px; margin-top: 24px; }
+li { margin: 12px 0; }
+footer { margin-top: 40px; border-top: 1px solid #ddd; padding-top: 16px; font-size: 14px; color: #555; }
+details { margin-top: 12px; }
+code { overflow-wrap: anywhere; }
+@media (max-width: 480px) { main { margin-top: 24px; padding: 0 18px; } h1 { font-size: 24px; } }

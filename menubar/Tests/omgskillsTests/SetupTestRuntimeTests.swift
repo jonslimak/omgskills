@@ -45,7 +45,8 @@ struct SetupTestRuntimeTests {
     @Test func validatesWebsiteAndCreatesOnlyCandidateState() throws {
         let home = try temporaryHome()
         defer { try? FileManager.default.removeItem(at: home) }
-        for website in ["http://localhost:5199/app/preview/unified/", "https://omgskills.com/app/"] {
+        for website in ["http://localhost:5199/app/preview/unified/", "https://omgskills.com/app/",
+                        "https://omgskills-setup-test-f3b.netlify.app/app/preview/unified/"] {
             var candidate = info
             candidate[SetupTestRuntime.websiteKey] = website
             guard case .enabled(let configuration) = SetupTestRuntime.mode(info: candidate, home: home, allowed: true) else {
@@ -61,7 +62,11 @@ struct SetupTestRuntimeTests {
             #expect(SetupTestRuntime.mode(info: candidate, home: home, allowed: true) == .enabled(configuration))
         }
         for website in ["http://omgskills.com/app", "https://evil.test", "http://localhost/app", "file:///tmp",
-                        "https://user@omgskills.com/app", "https://omgskills.com/app#token", "https://omgskills.com:443/app"] {
+                        "https://user@omgskills.com/app", "https://omgskills.com/app#token", "https://omgskills.com:443/app",
+                        "https://omgskills-setup-test-f3b.netlify.app/other",
+                        "https://omgskills-setup-test-f3b.netlify.app/app/preview/unified/?token=test",
+                        "https://omgskills-setup-test-f3b.netlify.app.evil.test/app/preview/unified/",
+                        "http://omgskills-setup-test-f3b.netlify.app/app/preview/unified/"] {
             var candidate = info
             candidate[SetupTestRuntime.websiteKey] = website
             guard case .invalid = SetupTestRuntime.mode(info: candidate, home: home, allowed: true) else {

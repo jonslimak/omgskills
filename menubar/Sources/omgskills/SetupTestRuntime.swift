@@ -65,7 +65,9 @@ enum SetupTestRuntime {
               let rawWebsite = info[websiteKey] as? String,
               let website = URL(string: rawWebsite), website.user == nil, website.password == nil,
               website.fragment == nil,
-              (website.scheme == "https" && website.host == "omgskills.com" && website.port == nil)
+              (website.scheme == "https" && website.port == nil
+                && (website.host == "omgskills.com"
+                    || rawWebsite == "https://omgskills-setup-test-f3b.netlify.app/app/preview/unified/"))
                 || (website.scheme == "http" && ["127.0.0.1", "localhost"].contains(website.host ?? "") && website.port != nil) else {
             return .invalid("Invalid setup-test build, identity or website configuration.")
         }

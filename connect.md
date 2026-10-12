@@ -22,35 +22,31 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- **Next: plan separately approved F3b signing and clean-Mac acceptance.**
-  The [local candidate plan](newmac.md#f3b-local-candidate-plan-and-prerequisite-hold)
-  remains gated. The native HTTPS downloader is reviewed and committed locally
-  as `f8a40cf0`,
-  with passing isolated/regression tests and a live Writing Guidelines comparison
-  against Git. It resolves on demand and preserves full package validation;
-  [evidence and limits](newmac.md#f3b-https-downloader-checkpoint) are recorded.
-  Candidate-only native/browser wiring is committed as `003f94d1`;
-  ordinary app and F1 defaults still use Git. See the
-  [wiring checkpoint](newmac.md#f3b-candidate-wiring-checkpoint).
-  The approved local assembler now produces an inspected, pre-signing
-  `OMGSkills Setup Test.app`; 10 packaging and 7 candidate-release tests passed.
-  [Package evidence and hashes](newmac.md#f3b-local-packaging-checkpoint) are saved.
-  Scoped review found no blocking issues; source, tests and documentation are
-  recorded with this local checkpoint. The inspected bundle predates the commit.
-  No DMG, registration, installation or app launch. Clean-Mac setup remains
-  unproven. No Developer ID signing, upload,
-  hosting or signed setup test is approved or performed.
-  [F3a local acceptance](archive/newmac-f3a-2026-10-09/README.md) passed:
-  refresh retained the request, cancellation wrote nothing, retry installed the
-  exact version, Codex discovered it and repeat changed nothing. Also passed:
-  249 portal tests, TypeScript, 34 native regressions and both production builds.
-  Results are saved; approved cleanup and scoped review passed. Source, tests
-  and evidence are committed locally as `462ac68a`. F3b's eventual signed
-  setup test in a clean environment needs separate approval. A preinstalled Debug build
-  cannot prove first-time setup. Broader coverage, migration and release gates
-  stay open. No push, deployment or release is authorized by this checkpoint.
+- **Next: plan a signed-candidate skill update in the retained VM.** The update
+  test is not yet prepared or approved. Scoped F3b review passed with no blocking
+  findings; this source checkpoint records the candidate changes and evidence.
+  F3b's signed first-time setup passed its bounded
+  Safari/arm64/Codex flow on 2026-10-12; see
+  [acceptance evidence](archive/newmac-f3b-2026-10-12/README.md).
+  The app and DMG were signed, notarized and hosted on a dedicated test site,
+  then downloaded, copied, opened normally and retried from the original page
+  in a disposable macOS VM without developer tools. Writing Guidelines installed
+  at the exact recorded version and appeared in Codex after refresh.
+  Cold launch passed; a further measured warm retry preserved the skill and
+  provenance hashes, file identities/timestamps and activation link, with one
+  running candidate process. Retry still fetches package data; this is a
+  no-reinstall result, not zero-network proof.
+  The signed artifact was built on base `dd1e7828` with then-uncommitted inputs;
+  this source checkpoint does not rebuild or replace that artifact. Review
+  verification passed 16 package/page tests, 29 native tests and TypeScript;
+  one optional live-network test was skipped. Saved digests and source inputs
+  matched; both evidence files are included explicitly despite the archive rule.
+  Preserve the VM and candidate artifacts
+  for the proposed update test; cleanup needs separate approval.
+  Production website, public app, host skills and Sparkle release were not changed.
 - [~] **F3: First-time setup and retry (C10/C5/C17).** F3a automated and user-run
-  checks passed locally on 2026-10-09. F3b signed setup has not run.
+  checks passed locally on 2026-10-09. F3b candidate setup passed on 2026-10-12
+  within the recorded limits; production setup/migration and G1-G4 remain open.
   Keep the native result authoritative, timeout state unknown, and public
   installs account-free.
 - [x] **F2: Three-source local install/update proof.** Local acceptance passed
@@ -83,7 +79,7 @@ This consolidation changes documentation only, not implementation or release sta
 | --- | --- | --- |
 | F1: Local functional proof | One public skill installed and updated from the web through the existing-app codebase | Isolated development build; no release or broad safety/coverage claim |
 | F2: Small multi-source proof (passed locally) | Three independent public installs, repeat no-op, one reviewed update, Codex discovery and automated collision refusal | Same isolated local flow; no full-catalog, fresh-setup or release claim |
-| F3: Setup/retry (F3a passed locally) | F3a refresh, cancel, retry/install, Codex discovery and repeat no-op passed. F3b signed download/open remains planned | Separate approval for signed packaging/distribution; no false presence/success or full G1/G2 claim |
+| F3: Setup/retry (F3a and bounded F3b passed) | Local intent/retry and signed candidate download/open/return/retry, exact install, cold launch and Codex discovery passed | One arm64 VM, Safari, Codex and one fixture; not production migration, zero-network retry or G1/G2 completion |
 | Controlled public-skill pilot | Setup/retry, signed build, wider source coverage and release safeguards work for approved testers | C5/C13/C16 and applicable G1-G3; separate test/distribution approval |
 | Existing-user rollout | The replacement can update existing users without losing data or required capabilities | Full relevant G1-G3, migration evidence, agreed C1-C3 web parity and separate release approval; G4 before private activation |
 
@@ -320,7 +316,7 @@ Reported inventory is not proof that a device is online or remotely controllable
 | --- | --- | --- |
 | Unified `/app/` and public catalog | Recorded live in `appwork.md` | Source reviewed here; no fresh live check or production timing result |
 | Standalone helper | Signed/notarized and hosted (unlinked) per `webwork.md`; now an input to C17 | Existing safety and scoped Codex evidence retained; clean-account setup, signed upgrade and remaining acceptance gates still open |
-| Management-app-backed web install/update | Isolated F1/F2 flow passed; production flow incomplete | C10/C13 and G3 still require setup/retry, broader coverage and pilot acceptance |
+| Management-app-backed web install/update | F1/F2 local flow and F3b signed setup candidate passed; candidate test site only | Signed-candidate skill update, broader coverage, production integration and pilot acceptance remain open |
 | Device-aware helper inventory and web management | Not implemented | Requires migration, isolation and end-to-end evidence |
 
 Helper-key backup/recovery is already complete per `webwork.md`. Hosting,
@@ -483,8 +479,10 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
   intent/retry UX first, then the actual signed download/open/return/retry path.
   Keep the intended skill/agent but revalidate the request. A timeout is unknown
   state, not proof the app is absent. F3a automated and user-run acceptance
-  passed locally; F3b remains pending. F1/F2/F3a used a preinstalled dev build,
-  not clean-user setup.
+  passed locally. F3b subsequently passed the bounded signed first-time path in
+  a clean arm64 VM; see [evidence](archive/newmac-f3b-2026-10-12/README.md).
+  F1/F2/F3a used a preinstalled dev build; do not conflate those earlier results
+  with signed setup or count the candidate as production migration proof.
 - [~] **Generalize helper targets, not just the allowlist.** F1/F2's existing-app
   path derives per-source destinations and ownership; three coexisting sources,
   independent update and automated same-name refusal passed locally. The older
@@ -549,7 +547,7 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
 | C7 | Inventory scan + upload | C6, C8, C9; identity-data decision | Reuse scanner/resolver/uploader without assuming full-catalog loading disappears; device-scoped uploads; activation separately approved; outside F1 |
 | C8 | Per-device inventory model and migration | C9 | Device-scoped replacement/reconciliation; existing rows and legacy-client compatibility |
 | C9 | Shared reporting contract | C13 identity contract | Define before C8/C7; extend local identity with device, ownership and freshness |
-| C10 | Public web install/update (H2) | C17/C13 contracts for F1; C5 before distribution | F1/F2 local detail/native result passed; F3a local setup/retry acceptance passed. Signed setup and verified web result remain later work. Signed-out links need no C6-C9; signed-in queued delivery uses C18 |
+| C10 | Public web install/update (H2) | C17/C13 contracts for F1; C5 before distribution | F1/F2 local flow, F3a retry and bounded F3b signed setup passed. Signed-candidate update, production integration and verified web result remain open. Signed-out links need no C6-C9; signed-in queued delivery uses C18 |
 | C11 | Helper Set install and subscription updates | C10; C6 for private access | Public first; mixed items, reviewed removals and local protection; C14 for web inventory status |
 | C12 | Retire Mac dependencies safely | replacement flows and migration evidence | C7/C14 reporting, C10/C11/C15 management; preserve supported clients and memberships |
 | C13 | General catalog/target identity | C17 write/store and destination contract | F2 passed three unpinned sources, independent update and automated collision refusal locally. Broader source/restore coverage remains open; not the same as matching existing local inventory |
@@ -576,15 +574,15 @@ component to finish. C5 is a distribution gate, not a cyclic build prerequisite.
    discovery, plus automated collision refusal. Local commit `f7a964b0` is
    complete; integration, push, deployment and release remain separate.
    Do not repeat the full F1 manual matrix. C13 stays partial.
-3. **Preserve F3a and local F3b packaging; plan signed acceptance.** F3a local acceptance,
-   cleanup and scoped review are committed as `462ac68a`. F3b's first local slice
-   selected native HTTPS; isolated tests and live parity passed, committed as
-   `f8a40cf0`. Candidate-only wiring is committed as `003f94d1`. The local
-   assembler and pre-signing bundle passed packaging inspection and focused
-   tests on 2026-10-12; scoped review and evidence are recorded in this checkpoint.
-   Separately agree the browser test URL and approve signing, hosting and
-   clean-environment setup. Do not substitute the older public download or
-   count local simulation as signed acceptance.
+3. **Preserve the reviewed F3b signed setup checkpoint.** F3a is committed as
+   `462ac68a`; native HTTPS as `f8a40cf0`; candidate wiring as `003f94d1`.
+   The signed/notarized candidate and dedicated test page passed the bounded VM
+   flow on 2026-10-12. The independent file/record and repeat evidence is archived;
+   scoped review passed and this checkpoint records the packaging/web changes.
+   Next proposed functional slice: web-triggered skill update with this signed
+   candidate in the retained VM, checking Cancel and Apply against independent
+   before/after files. F1/F2 already proved local updates; do not repeat their
+   entire matrix. Do not confuse a skill update with a Sparkle app upgrade.
 4. **Harden for a controlled pilot.** Use F2/F3 findings to expand C13 coverage,
    complete C17 lifecycle, then remaining C5/G1/G2 signed setup/upgrades and C16
    measurement. Retain security and failure checks here; do not erase them.
@@ -780,9 +778,29 @@ hosting or production change. The installed public binary's hash is unchanged.
 Scoped review found no blocking issues or required source fixes. The 10 packaging
 and 7 candidate-release checks passed again; saved source inputs, package bytes
 and manifests were reverified without launching or rebuilding the bundle.
-See [package evidence](newmac.md#f3b-local-packaging-checkpoint). Next is planning
-signed acceptance; test URL, Developer ID signing, notarization and fresh-Mac setup
-remain separate approvals. Download stays disabled.
+See [package evidence](newmac.md#f3b-local-packaging-checkpoint). At that earlier
+checkpoint signing/hosting/setup still needed approval and Download was disabled;
+the subsequently approved signed run below supersedes that status.
+
+2026-10-12, signed follow-up: app/DMG notarization and dedicated test hosting
+passed. The initial resource-root links were rejected during signing; the
+assembler was corrected to standard Contents/Resources layout and 16 focused
+package/page tests passed. The clean VM then completed normal first launch,
+retained browser retry, exact Writing Guidelines install, cold launch and Codex
+discovery. Independent read-only checks verified the installed file against
+the pinned public source, matching provenance and one candidate process; a
+measured warm retry preserved hashes, inodes, timestamps and the activation
+link. [Archived results](archive/newmac-f3b-2026-10-12/README.md) distinguish
+observed UI, independent file checks and limitations. Read-only Terminal checks
+were post-install diagnostics, not a setup requirement or bypass. Retry is not
+network-free. No production change, commit, push or cleanup in this follow-up;
+C5/C10/C17 and G1-G4 remain open beyond this bounded candidate result.
+
+2026-10-12, scoped review: no blocking findings or further code changes required.
+The 16 package/page tests, 29 native tests and test-page TypeScript check passed;
+one optional live-network test was skipped. Saved candidate source inputs and
+artifact digests matched. This source/evidence checkpoint does not rebuild,
+re-sign, redeploy or replace the tested artifact. No push, release or cleanup.
 
 ## Open questions
 

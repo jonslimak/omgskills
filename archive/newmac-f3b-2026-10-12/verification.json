@@ -1,0 +1,185 @@
+{
+  "stage": "F3b",
+  "date": "2026-10-12",
+  "status": "bounded_candidate_setup_passed_with_limits",
+  "method": "UI observations plus independently executed built-in guest read-only diagnostics; values transcribed from rendered output, not a guest-exported report.",
+  "candidate": {
+    "baseCommit": "dd1e7828",
+    "uncommittedInputs": true,
+    "folder": "menubar/.build/setup-test-packages/candidate-38Efxz",
+    "bundleId": "com.jonslimak.omgskills.setuptest",
+    "scheme": "omgskills-setup-test",
+    "version": "0.1.0",
+    "build": "1",
+    "architecture": "arm64",
+    "sourceManifestSHA256": "349cdc0d4a500a5bbf305f7205d7795138dd53f01fa7071d4cb4d4d97bd4d5d5",
+    "artifactManifestSHA256": "3515cf0777e594fdf5e9dc7d45086e2829d4d6a2bebd1bbab936bf1b48f8756f",
+    "preSigningBinarySHA256": "6e8f2feb7fc84fa6d98fdb783574ab66d683c552c9158209cdf7276c1b6e7a0b",
+    "dmg": "OMGSkills-Setup-Test-0.1.0-arm64.dmg",
+    "dmgBytes": 6080713,
+    "hostedDMGSHA256": "3cf340de60ae43f44d675a60bc485de8476e812c9c3e25fd366b83b5dd58effc",
+    "appNotaryId": "5393e445-2d40-4f79-89bb-148314debae3",
+    "dmgNotaryId": "a372e722-695b-4e03-bf79-381617213e1e",
+    "notaryStatus": "Accepted",
+    "signaturesStaplingAndHostGatekeeper": "passed",
+    "signedPayloadMatchesPreSigning": "passed"
+  },
+  "hosting": {
+    "siteId": "16f435c1-e5d0-4b40-b174-382d839e877b",
+    "deployId": "6accf8455624febf36c2f33c",
+    "url": "https://omgskills-setup-test-f3b.netlify.app/app/preview/unified/",
+    "noindex": true,
+    "publiclyReachable": true,
+    "gitConnected": false,
+    "productionDeploymentChanged": false
+  },
+  "guest": {
+    "vm": "OMGSkills-F3b-Test-01",
+    "user": "omgtest",
+    "macOS": "26.3",
+    "developerToolsInstalled": false,
+    "appPath": "/Users/omgtest/Applications/OMGSkills Setup Test.app",
+    "skillPath": "/Users/omgtest/.codex/skills/writing-guidelines",
+    "modelInvocations": 0
+  },
+  "fixture": {
+    "repository": "vercel-labs/agent-skills",
+    "root": "skills/writing-guidelines",
+    "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+    "tree": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+    "blob": "63facf310252a990d154bed12b3dcdd295ba771a",
+    "fileCount": 1,
+    "totalBytes": 1233,
+    "installedAt": "2026-10-12T15:24:12Z",
+    "sourceComparison": "Fresh host HTTPS fetch at the exact commit matched guest SHA-256. Blob and single-file canonical 100644 source tree were recomputed on host; the managed file is read-only/non-executable (0444)."
+  },
+  "setup": {
+    "absentHandler": "Safari invalid-address message; retained intent/retry, no false install success",
+    "download": "One connection loss at 5.2 MB; resume completed same DMG at displayed 6.1 MB",
+    "copyAndLaunch": "Copied once to guest home Applications, ejected image, Finder Open, normal Internet-download Open confirmation; Ready without installation",
+    "browserRetry": "Revalidation then explicit Open and Safari Allow once, not Always Allow",
+    "install": "Native exact-version diff approved; Installed in Codex",
+    "securityBypass": false,
+    "administratorPassword": false,
+    "terminalRequiredForSetup": false
+  },
+  "coldLaunch": {
+    "method": "Quit from status menu, observed removal, retry from original Safari page",
+    "uiResult": "Already installed. No changes made.",
+    "independentBeforeAfterCapture": false
+  },
+  "measuredWarmRetry": {
+    "window": "Guest display approximately 11:43-11:47 on 2026-10-12",
+    "uiResult": "Already installed. No changes made.",
+    "before": {
+      "skill": {
+        "relativePath": "SKILL.md",
+        "bytes": 1233,
+        "sha256": "89a5f581193289b80af58b980090aeed535047c8df2b55ccbaae0de40283a99d",
+        "mode": "0444",
+        "inode": 152047,
+        "modifiedDisplay": "Mon Oct 12 11:24:12 2026",
+        "changedDisplay": "Mon Oct 12 11:24:12 2026"
+      },
+      "provenance": {
+        "bytes": 611,
+        "sha256": "f5e9fc685b4299cbadf3297168a47c74ae0de5d8287d747ccdf998bfd404bc7e",
+        "mode": "0644",
+        "inode": 152054,
+        "modifiedDisplay": "Mon Oct 12 11:24:12 2026",
+        "changedDisplay": "Mon Oct 12 11:24:12 2026"
+      },
+      "targetLink": "/Users/omgtest/Library/Application Support/OMGSkills Setup Test/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/C4F2C6B7-A182-4CB9-8847-52EF55A57F1B/content",
+      "managedRegularFileCount": 2,
+      "candidateProcesses": [
+        {
+          "pid": 3197,
+          "path": "/Users/omgtest/Applications/OMGSkills Setup Test.app/Contents/MacOS/omgskills-setup-test"
+        }
+      ]
+    },
+    "after": {
+      "skill": {
+        "relativePath": "SKILL.md",
+        "bytes": 1233,
+        "sha256": "89a5f581193289b80af58b980090aeed535047c8df2b55ccbaae0de40283a99d",
+        "mode": "0444",
+        "inode": 152047,
+        "modifiedDisplay": "Mon Oct 12 11:24:12 2026",
+        "changedDisplay": "Mon Oct 12 11:24:12 2026"
+      },
+      "provenance": {
+        "bytes": 611,
+        "sha256": "f5e9fc685b4299cbadf3297168a47c74ae0de5d8287d747ccdf998bfd404bc7e",
+        "mode": "0644",
+        "inode": 152054,
+        "modifiedDisplay": "Mon Oct 12 11:24:12 2026",
+        "changedDisplay": "Mon Oct 12 11:24:12 2026"
+      },
+      "targetLink": "/Users/omgtest/Library/Application Support/OMGSkills Setup Test/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/C4F2C6B7-A182-4CB9-8847-52EF55A57F1B/content",
+      "managedRegularFileCount": 2,
+      "candidateProcesses": [
+        {
+          "pid": 3197,
+          "path": "/Users/omgtest/Applications/OMGSkills Setup Test.app/Contents/MacOS/omgskills-setup-test"
+        }
+      ]
+    },
+    "hashesEqual": true,
+    "fileIdentitiesAndTimesEqual": true,
+    "activationLinkEqual": true,
+    "oneCandidateProcess": true,
+    "newManagedRegularFiles": 0,
+    "scope": "Independent before/after state equality; not filesystem tracing or proof of no temporary writes."
+  },
+  "discovery": {
+    "method": "Guest Codex Customize > Skills, installed list refreshed",
+    "writingGuidelinesListed": true,
+    "enabledCheckmarkVisible": true,
+    "modelInvocation": false
+  },
+  "network": {
+    "zeroNetworkClaim": false,
+    "packageRefetch": "PublicSkillReviewService.prepare resolves the package before the no-op decision; HTTPPublicSkillPackageFetcher.load requests commit/tree metadata and file bytes.",
+    "anotherAppSetupRequested": false,
+    "trafficCapture": false
+  },
+  "diagnostics": {
+    "guestCommands": [
+      "readlink",
+      "shasum -a 256",
+      "stat -x",
+      "find -type f",
+      "cat provenance.json",
+      "pgrep -ifl omgskills"
+    ],
+    "writesToInstalledSkill": false,
+    "downloadsPermission": "Declined Terminal Downloads permission; guest DMG digest not obtained.",
+    "initialListing": "ls -la with trailing slash on the managed symlink returned Invalid argument; direct file reads, readlink and managed-root enumeration succeeded. No repair or permission change."
+  },
+  "limits": [
+    "One macOS 26.3 arm64 VM, Safari, Codex and one pinned fixture only.",
+    "No independently captured cold-retry file baseline; subsequent warm retry was independently measured.",
+    "No network capture; zero-download retry is not a passed criterion.",
+    "No guest DMG digest; host artifact/hosted digest and normal guest Gatekeeper observed.",
+    "No production identity migration, Sparkle signed upgrade/failure tests, Intel, other browser or G1-G4 completion.",
+    "No guest-exported output or exact click/timing benchmark; UI input lag required repeated focus clicks."
+  ],
+  "boundaries": {
+    "productionChanged": false,
+    "hostSkillChanged": false,
+    "publicAppChanged": false,
+    "sparkleFeedChanged": false,
+    "committed": false,
+    "pushed": false,
+    "cleanedUp": false
+  },
+  "retainedForNextTest": true,
+  "documentationCloseout": {
+    "focusedPackageAndPageTestsPassed": 16,
+    "retainedArtifactDigestsMatch": true,
+    "localMarkdownLinksResolve": true,
+    "gitDiffCheck": "passed",
+    "newNativeBuildOrSigning": false
+  }
+}
