@@ -1,0 +1,244 @@
+{
+  "observedAt": "2026-10-12T16:06:10.157Z",
+  "stage": "signed-candidate-update-preparation",
+  "status": "public-source-preflight-passed-not-installed",
+  "repository": "blader/humanizer",
+  "root": ".",
+  "versions": [
+    {
+      "label": "A",
+      "commit": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+      "tree": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+      "files": [
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "mode": "100644",
+          "bytes": 521,
+          "blob": "259312e97cc3b6d84fab8556945d51a002c24858",
+          "sha256": "e539740285b660d2288a38b6d9b237396c6769828c671c46b9f91e760db6cc29"
+        },
+        {
+          "path": ".claude-plugin/plugin.json",
+          "mode": "100644",
+          "bytes": 526,
+          "blob": "7c2c657ffb3edba76e1202a39d802753131dd695",
+          "sha256": "054c0afeeb03c12f01a7f156da949edfdec3a2b756588f5ff4ee7357b0c07f6a"
+        },
+        {
+          "path": ".cursor-plugin/plugin.json",
+          "mode": "100644",
+          "bytes": 388,
+          "blob": "a825c73bec4192a211326dd9b10ee5cffb386999",
+          "sha256": "d1e0b50594cf4bbe57fd164b771b401713a91b76b5a213ebe8f4558bb2036546"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/config.yml",
+          "mode": "100644",
+          "bytes": 393,
+          "blob": "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+          "sha256": "cb7e95de7606d07654024c8d47916796b307033e23ddb2b0a821a9bf89e999ef"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/new-pattern.yml",
+          "mode": "100644",
+          "bytes": 681,
+          "blob": "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+          "sha256": "7436d578fa0056a09da5da6da950a03cb49f3ce27cf268ae295eb3d7ca19f604"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/rewrite-problem.yml",
+          "mode": "100644",
+          "bytes": 1286,
+          "blob": "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+          "sha256": "ecfe5e82c5b6d44683e0cb63cfad117dfdd16e30cc6f03510ef335414eea4947"
+        },
+        {
+          "path": ".github/workflows/validate.yml",
+          "mode": "100644",
+          "bytes": 815,
+          "blob": "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+          "sha256": "f2d6a8780fb0b3cf6fa7d2ffccd72d0fc8bee29b4e63ea0fd65924712c9055fd"
+        },
+        {
+          "path": "AGENTS.md",
+          "mode": "100644",
+          "bytes": 3439,
+          "blob": "5b170fd02364e3c088897a2b417c4226a533244e",
+          "sha256": "de84a449da400454df1225ddb1ced728c35bf0be7811b239e3370c7dbe1f4e69"
+        },
+        {
+          "path": "agents/openai.yaml",
+          "mode": "100644",
+          "bytes": 201,
+          "blob": "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+          "sha256": "9d87ff83149a04f86a372948b8ee35fa249de20923867bbc2a49304290aad736"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "mode": "100644",
+          "bytes": 5830,
+          "blob": "77738df202dcedbf4cf599d624398fcd9198269b",
+          "sha256": "af4130a340be4d09195586b945419f2a344f186898a6179b663d06974cf07fd1"
+        },
+        {
+          "path": "LICENSE",
+          "mode": "100644",
+          "bytes": 1066,
+          "blob": "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+          "sha256": "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96"
+        },
+        {
+          "path": "README.md",
+          "mode": "100644",
+          "bytes": 13194,
+          "blob": "bf650665e14220a4c7841f049cd00c275155466a",
+          "sha256": "d9561e75a050e90bbfafb34d28d0da4040144b3d8d20a2aac46a2cfcd5fb999e"
+        },
+        {
+          "path": "scripts/validate-package.py",
+          "mode": "100755",
+          "bytes": 5418,
+          "blob": "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+          "sha256": "941bd99e52b2ba21449719bb7969607ac8117e3dc173d0c9dfe64fd274c65938"
+        },
+        {
+          "path": "SKILL.md",
+          "mode": "100644",
+          "bytes": 32348,
+          "blob": "19fc634208e8cc6ae55d4ff287152583216fd244",
+          "sha256": "0612f1dfb1672b0ea9b97e139bf1f06cabe98d8b27424fe8ff01e1fb4cc99cad"
+        }
+      ],
+      "totalBytes": 66106
+    },
+    {
+      "label": "B",
+      "commit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+      "tree": "8ed37b6d1d98a0bbdb599d0399a4a2185eb8fa03",
+      "files": [
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "mode": "100644",
+          "bytes": 521,
+          "blob": "259312e97cc3b6d84fab8556945d51a002c24858",
+          "sha256": "e539740285b660d2288a38b6d9b237396c6769828c671c46b9f91e760db6cc29"
+        },
+        {
+          "path": ".claude-plugin/plugin.json",
+          "mode": "100644",
+          "bytes": 526,
+          "blob": "7c2c657ffb3edba76e1202a39d802753131dd695",
+          "sha256": "054c0afeeb03c12f01a7f156da949edfdec3a2b756588f5ff4ee7357b0c07f6a"
+        },
+        {
+          "path": ".cursor-plugin/plugin.json",
+          "mode": "100644",
+          "bytes": 388,
+          "blob": "a825c73bec4192a211326dd9b10ee5cffb386999",
+          "sha256": "d1e0b50594cf4bbe57fd164b771b401713a91b76b5a213ebe8f4558bb2036546"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/config.yml",
+          "mode": "100644",
+          "bytes": 393,
+          "blob": "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+          "sha256": "cb7e95de7606d07654024c8d47916796b307033e23ddb2b0a821a9bf89e999ef"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/new-pattern.yml",
+          "mode": "100644",
+          "bytes": 681,
+          "blob": "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+          "sha256": "7436d578fa0056a09da5da6da950a03cb49f3ce27cf268ae295eb3d7ca19f604"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/rewrite-problem.yml",
+          "mode": "100644",
+          "bytes": 1286,
+          "blob": "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+          "sha256": "ecfe5e82c5b6d44683e0cb63cfad117dfdd16e30cc6f03510ef335414eea4947"
+        },
+        {
+          "path": ".github/workflows/validate.yml",
+          "mode": "100644",
+          "bytes": 815,
+          "blob": "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+          "sha256": "f2d6a8780fb0b3cf6fa7d2ffccd72d0fc8bee29b4e63ea0fd65924712c9055fd"
+        },
+        {
+          "path": "AGENTS.md",
+          "mode": "100644",
+          "bytes": 3439,
+          "blob": "5b170fd02364e3c088897a2b417c4226a533244e",
+          "sha256": "de84a449da400454df1225ddb1ced728c35bf0be7811b239e3370c7dbe1f4e69"
+        },
+        {
+          "path": "agents/openai.yaml",
+          "mode": "100644",
+          "bytes": 201,
+          "blob": "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+          "sha256": "9d87ff83149a04f86a372948b8ee35fa249de20923867bbc2a49304290aad736"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "mode": "100644",
+          "bytes": 5922,
+          "blob": "f84b9f4ad2c9bfcf2a3d38b258269033163f807c",
+          "sha256": "b3591fe203429f1a6bd2f713c79272e9a8e58a487843d0908d2bbe0700722afa"
+        },
+        {
+          "path": "LICENSE",
+          "mode": "100644",
+          "bytes": 1066,
+          "blob": "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+          "sha256": "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96"
+        },
+        {
+          "path": "README.md",
+          "mode": "100644",
+          "bytes": 12884,
+          "blob": "22594fa2688ebb53dde0a54719a943721d31e9a7",
+          "sha256": "a07a054f230dca1e3d25e32ba6c808905b743cc6fa56bf8b6868cee0b12a0432"
+        },
+        {
+          "path": "scripts/validate-package.py",
+          "mode": "100755",
+          "bytes": 5418,
+          "blob": "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+          "sha256": "941bd99e52b2ba21449719bb7969607ac8117e3dc173d0c9dfe64fd274c65938"
+        },
+        {
+          "path": "SKILL.md",
+          "mode": "100644",
+          "bytes": 32348,
+          "blob": "19fc634208e8cc6ae55d4ff287152583216fd244",
+          "sha256": "0612f1dfb1672b0ea9b97e139bf1f06cabe98d8b27424fe8ff01e1fb4cc99cad"
+        }
+      ],
+      "totalBytes": 65888
+    }
+  ],
+  "changedPaths": [
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "skillMDUnchanged": true,
+  "catalogs": [
+    {
+      "id": "blader/humanizer",
+      "githubURL": "https://github.com/blader/humanizer",
+      "skillMDPath": "SKILL.md",
+      "pinned": false
+    },
+    {
+      "id": "vercel-labs/agent-skills:skills/writing-guidelines",
+      "githubURL": "https://github.com/vercel-labs/agent-skills",
+      "skillMDPath": "skills/writing-guidelines/SKILL.md",
+      "pinned": false
+    }
+  ],
+  "githubRequests": 20,
+  "blobCacheReuse": true,
+  "packagesExecuted": false,
+  "guestChanged": false
+}

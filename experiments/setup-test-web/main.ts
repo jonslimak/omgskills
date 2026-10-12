@@ -5,27 +5,56 @@ import type { SkillDisplay } from "../../portal/src/app/unified/model";
 
 declare const DOWNLOAD_SHA256: string;
 const origin = "https://omgskills-setup-test-f3b.netlify.app";
-const testCase = f2Cases.find(item => item.key === "writing-guidelines-recorded")!;
-const route = `/app/preview/unified/?view=discover&skill=${encodeURIComponent(`catalog:${testCase.source.id}`)}&f2case=${testCase.key}`;
+const cases = [
+  { key: "writing-guidelines-recorded", title: "Writing Guidelines" },
+  { key: "humanizer-a", title: "Humanizer A" },
+  { key: "humanizer-recorded", title: "Humanizer B" },
+].map(item => {
+  const fixture = f2Cases.find(fixture => fixture.key === item.key)!;
+  return { ...fixture, title: item.title,
+    route: `/app/preview/unified/?view=discover&skill=${encodeURIComponent(`catalog:${fixture.source.id}`)}&f2case=${fixture.key}` };
+});
 const status = document.querySelector<HTMLElement>("#status")!;
 const actions = document.querySelector<HTMLElement>("#actions")!;
 const setup = document.querySelector<HTMLElement>("#setup")!;
-
-async function refresh(id: string, signal: AbortSignal): Promise<SkillDisplay | null> {
-  if (id !== testCase.source.id) throw new Error("This page supports only the recorded Writing Guidelines test.");
-  const result = await new PublicCatalogClient().skill(id, signal);
-  return result ? { ...result, key: `catalog:${result.id}`, catalogId: result.id } : null;
-}
 
 async function start() {
   if (location.origin !== origin || location.pathname !== "/app/preview/unified/" || location.hash) {
     throw new Error("Use the exact approved test page.");
   }
-  if (location.search && location.search !== new URL(route, origin).search) {
+  const testCase = location.search
+    ? cases.find(item => location.search === new URL(item.route, origin).search) : cases[0];
+  if (!testCase) {
     throw new Error("This URL does not match the recorded test request.");
   }
+  const { route } = testCase;
   history.replaceState(null, "", route);
-  const store = new InstallIntentStore(() => sessionStorage, "setup-test");
+  document.title = `${testCase.title} | OMGSkills Setup Test`;
+  document.querySelector<HTMLElement>("#title")!.textContent = testCase.title;
+  document.querySelector<HTMLElement>("#repository")!.textContent = testCase.source.repository;
+  document.querySelector<HTMLElement>("#version")!.textContent = testCase.commit!;
+  const avatar = document.querySelector<HTMLImageElement>("#avatar")!;
+  avatar.src = `https://github.com/${testCase.source.repository.split("/")[0]}.png?size=80`;
+  avatar.hidden = false;
+  for (const item of cases) {
+    const link = document.createElement("a");
+    link.textContent = item.title;
+    link.href = item.route;
+    if (item.key === testCase.key) link.setAttribute("aria-current", "page");
+    document.querySelector<HTMLElement>("#cases")!.append(link);
+  }
+  async function refresh(id: string, signal: AbortSignal): Promise<SkillDisplay | null> {
+    if (id !== testCase!.source.id) throw new Error("This page supports only the selected test request.");
+    const result = await new PublicCatalogClient().skill(id, signal);
+    return result ? { ...result, key: `catalog:${result.id}`, catalogId: result.id } : null;
+  }
+  // Keep the original setup intent, and scope the two update fixtures independently.
+  const store = new InstallIntentStore(() => {
+    const storage = sessionStorage;
+    const scoped = (key: string) => testCase.key === "writing-guidelines-recorded" ? key : `${key}.${testCase.key}`;
+    return { getItem: key => storage.getItem(scoped(key)), setItem: (key, value) => storage.setItem(scoped(key), value),
+      removeItem: key => storage.removeItem(scoped(key)) };
+  }, "setup-test");
   const session = new InstallSetupSession({ client: "setup-test", catalogId: testCase.source.id,
     commit: testCase.commit, returnRoute: route, store, refresh,
     action: skill => f2InstallAction(skill, testCase.key, "setup-test"),

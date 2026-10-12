@@ -6,6 +6,8 @@ F3b's native HTTPS downloader is reviewed and committed as `f8a40cf0`.
 Candidate-only wiring is committed as `003f94d1`. Separately approved F3b signing,
 notarization, dedicated test hosting and bounded clean-VM setup passed on
 2026-10-12; [evidence](archive/newmac-f3b-2026-10-12/README.md).
+F3c signed-candidate skill-update acceptance passed on 2026-10-12 with a Codex
+restart caveat; [results](archive/newmac-f3c-2026-10-12/README.md).
 F2 local acceptance, scoped review and approved cleanup passed 2026-10-09.
 Code and acceptance evidence are recorded in [Connect](connect.md), the single
 progress tracker. No release approval.
@@ -13,9 +15,14 @@ This document expands C17 and its Mac-side dependencies, without duplicating
 status checklists. The historical local `webwork.md` document retains earlier
 test evidence but is not included in this checkout.
 
-**Current target: plan a signed-candidate skill update in the retained VM.**
-Scoped F3b review passed; this checkpoint records source and evidence, not a
-new build or release. F1
+**Current target: plan an isolated signed-app upgrade test that preserves installed skills.**
+F3c scoped review passed; this checkpoint records its source and evidence.
+New builds, update hosting and guest execution need a separate approved plan.
+The bounded VM flow passed; refresh alone did not discover Humanizer, but a
+normal Codex restart did. See
+[F3c acceptance](#f3c-signed-candidate-skill-update-acceptance-2026-10-12).
+Scoped F3b review passed and is committed as `fd5a4e4d`; F3c reuses its signed
+app unchanged, not a new build or release. F1
 proved one public install/update locally. F2 passed three repositories, an
 independent update, repeat no-op, Codex discovery and automated name-collision
 refusal. F2 is committed locally as `f7a964b0`; the
@@ -1094,16 +1101,87 @@ tests and test-page TypeScript check passed; one optional live-network test was
 skipped. Retained artifact digests, native source inputs and local links matched.
 The native test build was rerun; no new app package, signing or deployment.
 
-Next proposed slice: a browser-triggered skill A/B
-update using the signed candidate, with Cancel preservation and independent
-Apply verification. It is not yet prepared or run. Existing-user migration,
+The subsequent F3c browser-triggered skill A/B update below passed with Cancel
+preservation and independent Apply verification. Existing-user migration,
 Sparkle app upgrades/failures, other browsers/architectures and G1-G4 remain open.
+
+#### F3c signed-candidate skill update preparation, 2026-10-12
+
+**Preparation completed; subsequent acceptance is recorded below.** Reused
+`OMGSkills Setup Test.app` from F3b in `OMGSkills-F3b-Test-01`, without rebuilding,
+signing, installing another app or changing its updater configuration. This is
+a skill update, not a Sparkle app upgrade.
+
+- Dedicated test page accepts exactly Writing Guidelines, Humanizer A and
+  Humanizer B. Each Humanizer revision has its own saved request; Writing
+  Guidelines retains its existing storage key and request. No arbitrary/latest
+  version selection or additional native capability was enabled.
+- Humanizer A: `29deb74c89fc12d01c6eab433252c869ce08ad7b`, 14 files, 66,106 bytes.
+  B: `225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8`, 14 files, 65,888 bytes.
+  Exact public commit/tree/file modes/blob hashes and all package bytes were
+  rechecked. Only `README.md` and `CHANGELOG.md` change; `SKILL.md` is unchanged.
+  Package instructions and scripts were not executed during preparation.
+- 20 package/page tests and TypeScript passed. Draft and published asset bytes,
+  noindex headers and the unchanged signed DMG hash matched. All three published
+  pages passed desktop/mobile checks; no native Open action was clicked during
+  preparation (guest acceptance followed separately).
+- Only the dedicated test site was deployed by this task. A separate production
+  deploy occurred during verification; its timestamps and IDs are recorded,
+  not represented as unchanged production. No production intervention followed.
+
+Approved acceptance sequence (now executed), after a fresh VM baseline: confirm the candidate identity,
+Humanizer absence and Writing Guidelines bytes/record/link; install A and read
+back the whole package; review B and cancel, proving A unchanged; reopen B and
+apply, proving exact B; repeat B, proving no reinstall; confirm Codex discovery
+without a model run. Writing Guidelines must remain unchanged throughout.
+Use Safari inside the retained VM, not a host install. Stop for unexpected
+existing Humanizer, source drift, local edits, wrong identity/destination,
+ambiguous result or required permission/security bypass; do not replace files
+to force the test through. Keep the VM and artifacts until cleanup is approved.
+
+Exact links, manifests, deployment boundaries and checks are in the
+[F3c archive](archive/newmac-f3c-2026-10-12/README.md).
+This preparation does not complete C5/C10/C13/C17 or G1-G4.
+
+#### F3c signed-candidate skill update acceptance, 2026-10-12
+
+**Bounded acceptance passed with a Codex restart caveat.** The existing signed
+`OMGSkills Setup Test.app` handled the Safari flow in `OMGSkills-F3b-Test-01`;
+no new app build, signing, app replacement or updater change was needed.
+
+- Install A: all 14 source hashes, sizes and modes matched; exact A commit/tree
+  provenance and the intended Codex destination were independently verified.
+- Review B/cancel: only `README.md` and `CHANGELOG.md` changed; cancel preserved
+  A's bytes, file identities, provenance and active link.
+- Apply B: all 14 files and provenance matched B. Repeat B reported Already
+  installed and preserved B files, record and active link without replacement.
+- Writing Guidelines remained unchanged throughout. No host skill changes,
+  package-script execution, permission bypass or model run occurred.
+- Codex initially showed No skills found for Humanizer after refresh. After
+  separately approved normal guest Codex quit/reopen, Humanizer appeared under
+  Installed and its details rendered expected content. Writing Guidelines
+  remained visible. No skill reinstall/edit was used to make discovery pass.
+
+The restart result is consistent with stale discovery state, not a confirmed
+root cause. Retain the refresh-only failure as a follow-up; do not claim reliable
+restart-free discovery. This is skill-update evidence for the candidate, not
+Sparkle app-upgrade, broad-catalog or production acceptance.
+
+See [full results](archive/newmac-f3c-2026-10-12/README.md) and
+[guest verification](archive/newmac-f3c-2026-10-12/guest-verification.json).
+F3c scoped review found no blocking issues. All 20 package/page tests, 51 related
+portal tests and strict test-page TypeScript passed; saved source and retained
+artifact hashes matched. This checkpoint includes the source and eight small
+evidence files explicitly despite the archive ignore rule, not binaries.
+The VM and artifacts are retained; cleanup, push and release require separate
+approval. No repeat VM run, build, signing or deployment during review.
+C5/C10/C13/C17 and G1-G4 remain open beyond this bounded result.
 
 ### Evidence, cleanup and stop rules
 
 Archive stage-labelled build/source hashes, exact URLs/artifact names, intent
-transitions, before/after file checks and user outcomes. Connect records F3a and
-F3b separately; neither automatically closes C5/C10/C17 or G1-G3. Preserve the
+transitions, before/after file checks and user outcomes. Connect records F3a,
+F3b and F3c separately; none automatically closes C5/C10/C17 or G1-G3. Preserve the
 public app/handler and real skill roots. After approval, remove only inventoried
 test artifacts and stop that test server; the old F2 server/root are already gone.
 Stop for wrong-app launches, changed source identity, unexpected writes, lost
@@ -1119,7 +1197,7 @@ Progress and approvals stay in Connect. These are design steps, not a second tas
 | Settle F1's narrow contract | C17, C13, C10 | Current baseline, one write/store path and Codex destination, request shape, public A/B source and isolated test setup; code scope approved |
 | Prove the bare-bones flow | F1, parts of C17/C13/C10 | Existing-app dev build; web install A and update B for one unpinned skill; apply Connect's short F1 checks; no full migration or inventory project |
 | Prove a small multi-source sample | F2, parts of C13/C10 | Three isolated installs, one independent update, name-collision refusal and fresh Codex discovery; no broad coverage claim |
-| Prove setup and retry incrementally | F3, C10 then C5/C17 | F3a local retry/intent proof, then separately approved F3b signed download/open/return/retry; no preinstalled-build shortcut |
+| Prove setup and retry incrementally | F3, C10 then C5/C17 | F3a local retry/intent proof, F3b signed first-time setup and F3c signed-candidate skill update; preserve the Codex restart caveat; no preinstalled-build shortcut |
 | Harden and verify setup for a controlled pilot | C17, C13, C10, C5, C16, G1-G3 | Wider source coverage, lifecycle, setup/retry, signing, upgrades, security/failure checks and measured user flow |
 | Roll out to existing users separately | C5, C1-C3, relevant G1-G3 | Preserved existing-user data and behavior, agreed web discovery replacements and explicit release approval |
 | Add connected management | C9, C8, C6-C7, C14, C18, C11, C15 | Device/account isolation, truthful inventory, queued requests, Sets and explicit management; private rollout separately meets G4 |
@@ -1175,8 +1253,10 @@ F1 step 1 implements the approved narrow answers to 1, 3 and the request part of
 6. Login onboarding/defaults and existing-user transition messaging; preserve
    explicit opt-outs and distinguish Quit from disabling future login startup.
 
-Next: follow [Connect's active queue](connect.md#current-next-task): plan the
-signed-candidate skill-update check after this reviewed F3b checkpoint.
+Next: follow [Connect's active queue](connect.md#current-next-task): plan isolated
+signed-app upgrade verification that preserves installed skills. Execution,
+new artifacts and update hosting need separate approval; do not repeat the
+passed F3c VM matrix.
 Current production app defaults still use Git; candidate HTTPS setup evidence
 does not change them. F3a local acceptance, approved
 cleanup and scoped review passed; [results](archive/newmac-f3a-2026-10-09/README.md)

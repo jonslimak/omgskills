@@ -6,6 +6,9 @@ h1 { font-size: 28px; margin: 0; }
 h2 { font-size: 20px; }
 p, li { line-height: 1.5; }
 header p { margin: 6px 0 0; }
+nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+nav a { color: #0b64da; padding: 8px 0; }
+nav a[aria-current="page"] { color: #202124; font-weight: 600; }
 #actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 button, .button { display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; padding: 10px 16px; border-radius: 6px; border: 1px solid #0b64da; background: #0b64da; color: white; text-decoration: none; font: inherit; cursor: pointer; }
 button:disabled { background: #eee; border-color: #ccc; color: #666; cursor: default; }
