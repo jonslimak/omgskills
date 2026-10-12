@@ -890,20 +890,85 @@ Implemented and reviewed locally above `f8a40cf0`, recorded with this checkpoint
 Scoped review found no blocking issues or required source fixes. The 96 native,
 7 candidate-release and 251 portal checks passed again before committing.
 
-Next: the narrow local candidate assembler below. Signing/submission, hosting and clean-environment acceptance stay
-separately approved; compiled tests are not distribution proof.
+That wiring checkpoint is committed as `003f94d1`. The local assembler checkpoint
+below follows it; compiled tests are not distribution proof.
+
+#### F3b local packaging checkpoint
+
+2026-10-12: approved local packaging is implemented, inspected and reviewed,
+recorded with this checkpoint.
+`scripts/prepare-newmac-setup-test.mjs` builds the arm64 Release executable with
+`OMGSKILLS_SETUP_TEST` and locked dependency resolution, then creates a fresh
+output directory. It never replaces earlier candidates, signs, registers,
+launches, installs or publishes an app. Its companion `.test.mjs` has 10 passing
+checks; the 7 setup-test Release tests passed again using temporary homes.
+
+- Fixed `OMGSkills Setup Test.app`, `com.jonslimak.omgskills.setuptest`,
+  `omgskills-setup-test`, version/build `0.1.0` / `1`, macOS 14+, arm64.
+  Read-only handler lookup found no existing registration for this identity.
+  Metadata validation rejects alternate identities/schemes, update feeds and
+  machine-specific home/destination settings.
+- The copied executable uses bundled Sparkle and system libraries. Only the copy
+  has its developer-toolchain search path removed and bundled-framework path
+  added. All bundled executables contain arm64 and support macOS 14.
+  Sparkle remains a linked dependency, but candidate startup does not activate
+  its updater; no feed/key is configured. No runtime activation test was run.
+- All three SwiftPM resource bundles are copied byte-for-byte. Internal relative
+  links preserve the generated accessors' app-root lookup, avoiding dependence
+  on their developer-machine fallback. No catalog, test bundle or Git tool is
+  copied. Framework symlinks stay internal; copied bytes/modes are checked.
+  Compiler debug/fallback strings can still name the build machine; they are not
+  configured runtime destinations or loader dependencies. Fresh-Mac behavior is
+  still unproven.
+- `source-manifest.json`, `artifact-manifest.json` and `receipt.json` record the
+  native sources, dependency lock, assembler/test hashes, build flags, metadata,
+  per-file hashes/modes/links and pre/post-packaging executable hashes. The source
+  manifest explicitly records base `003f94d1` plus uncommitted assembler files;
+  this is not a reproducible committed release claim.
+
+Current local output, relative to this worktree:
+`menubar/.build/setup-test-packages/candidate-bA7JPv/OMGSkills Setup Test.app`.
+Manifests and receipt are in the same `candidate-bA7JPv` directory.
+Packaged executable SHA-256:
+`67fdb1b61c832935f699ea753514160bbe3c391caf7657a5a05e71dcfe3a3f99`.
+Source manifest SHA-256:
+`5b4a6385d83fb4815e7efaadad5a2b399bfe7a84fb0cab4c99aff00d550ccae2`.
+Artifact manifest SHA-256:
+`6fbaaa968f5bb39c2289821550bc127b384c2e36d5045e4b63c50946d5a858d7`.
+The earlier inspection output `candidate-mIh4Ck` is retained, not registered or
+launched; it is superseded by `candidate-bA7JPv`. No prior output was deleted.
+
+The configured website is the local preview
+`http://127.0.0.1:5198/app/preview/unified/`; no server was started. The app has
+not been opened. Compiler ad-hoc and upstream framework signatures may remain;
+the assembler does not perform signing and the bundle is not Developer ID
+signed, notarized or ready for distribution. No DMG or Download link exists.
+No public app, real skill folder, hosting, production configuration or release
+was changed. The public app binary still has the SHA-256 recorded above.
+
+Scoped review found no blocking issues or required source fixes. The 10 packaging
+tests and 7 candidate-release tests passed again; saved source inputs, package
+bytes and manifests were reverified without launching or rebuilding the bundle.
+The artifact retains its original pre-commit provenance; this source checkpoint
+does not turn it into a signed or freshly rebuilt release.
+
+Next: plan signed acceptance separately. Agree
+the browser test URL and approve Developer ID signing/notarization, controlled
+hosting and fresh-Mac acceptance. Do not distribute this local inspection bundle
+or count inspection as install/setup proof.
 
 #### Candidate contract after the dependency decision
 
 One Mac architecture (arm64), macOS 14 or later, Codex, Safari and the recorded
 Writing Guidelines source from F3a. No new source sample or A/B test here.
 
-- Proposed app: `OMGSkills Setup Test.app`; bundle ID
+- Local candidate app: `OMGSkills Setup Test.app`; bundle ID
   `com.jonslimak.omgskills.setuptest`; URL scheme `omgskills-setup-test`.
-  Verify these are unused before freezing the contract. Never claim `omgskills`.
-- Proposed version/build: `0.1.0` / `1`; distribution filename
-  `OMGSkills-Setup-Test-0.1.0-arm64.dmg`. These are planned names, not available
-  artifacts or download links.
+  No existing handler was found during local packaging. Recheck the clean test
+  environment before installation. Never claim `omgskills`.
+- Local version/build: `0.1.0` / `1`; proposed distribution filename
+  `OMGSkills-Setup-Test-0.1.0-arm64.dmg`. Only the pre-signing inspection bundle
+  exists; the DMG and download link remain planned.
 - Reuse the existing-app review/model/writer, not the old standalone helper.
   Add an explicit candidate build configuration instead of relaxing F1's
   Debug-only temporary-root guard. Ordinary production builds remain unchanged.
@@ -935,7 +1000,7 @@ Writing Guidelines source from F3a. No new source sample or A/B test here.
    cancel/no writes and unchanged ordinary production behavior.
    Automated checks passed above; actual browser/cold URL delivery remains
    part of later candidate acceptance, not a claim from source inspection.
-3. **Prepare packaging only.** Add a narrow candidate assembler with source and
+3. **Prepare packaging only (implemented and inspected locally).** The narrow candidate assembler has source and
    output manifests, fixed identity, dependencies, minimum OS and architecture.
    Reuse existing signing/verification primitives later; do not invoke the public
    release script as-is or repoint the standalone helper's updater/hosting.

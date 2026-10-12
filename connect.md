@@ -22,18 +22,23 @@ This consolidation changes documentation only, not implementation or release sta
 
 ## Current next task
 
-- **Next: prepare local F3b packaging.**
+- **Next: plan separately approved F3b signing and clean-Mac acceptance.**
   The [local candidate plan](newmac.md#f3b-local-candidate-plan-and-prerequisite-hold)
   remains gated. The native HTTPS downloader is reviewed and committed locally
   as `f8a40cf0`,
   with passing isolated/regression tests and a live Writing Guidelines comparison
   against Git. It resolves on demand and preserves full package validation;
   [evidence and limits](newmac.md#f3b-https-downloader-checkpoint) are recorded.
-  Candidate-only native/browser wiring is implemented, tested and reviewed in
-  this local checkpoint; ordinary app and F1 defaults still use Git. See the
+  Candidate-only native/browser wiring is committed as `003f94d1`;
+  ordinary app and F1 defaults still use Git. See the
   [wiring checkpoint](newmac.md#f3b-candidate-wiring-checkpoint).
-  No app bundle/DMG is assembled, registered, installed or launched.
-  Clean-Mac setup remains unproven. No signing, upload,
+  The approved local assembler now produces an inspected, pre-signing
+  `OMGSkills Setup Test.app`; 10 packaging and 7 candidate-release tests passed.
+  [Package evidence and hashes](newmac.md#f3b-local-packaging-checkpoint) are saved.
+  Scoped review found no blocking issues; source, tests and documentation are
+  recorded with this local checkpoint. The inspected bundle predates the commit.
+  No DMG, registration, installation or app launch. Clean-Mac setup remains
+  unproven. No Developer ID signing, upload,
   hosting or signed setup test is approved or performed.
   [F3a local acceptance](archive/newmac-f3a-2026-10-09/README.md) passed:
   refresh retained the request, cancellation wrote nothing, retry installed the
@@ -571,11 +576,13 @@ component to finish. C5 is a distribution gate, not a cyclic build prerequisite.
    discovery, plus automated collision refusal. Local commit `f7a964b0` is
    complete; integration, push, deployment and release remain separate.
    Do not repeat the full F1 manual matrix. C13 stays partial.
-3. **Preserve F3a, then prepare F3b packaging.** F3a local acceptance,
+3. **Preserve F3a and local F3b packaging; plan signed acceptance.** F3a local acceptance,
    cleanup and scoped review are committed as `462ac68a`. F3b's first local slice
    selected native HTTPS; isolated tests and live parity passed, committed as
-   `f8a40cf0`. Candidate-only wiring passes local tests and scoped review in
-   this checkpoint. Prepare the package next, then separately approve signing, hosting and
+   `f8a40cf0`. Candidate-only wiring is committed as `003f94d1`. The local
+   assembler and pre-signing bundle passed packaging inspection and focused
+   tests on 2026-10-12; scoped review and evidence are recorded in this checkpoint.
+   Separately agree the browser test URL and approve signing, hosting and
    clean-environment setup. Do not substitute the older public download or
    count local simulation as signed acceptance.
 4. **Harden for a controlled pilot.** Use F2/F3 findings to expand C13 coverage,
@@ -761,6 +768,21 @@ Scoped review found no blocking issues; the 96 native, 7 candidate-release and
 251 portal checks passed again before committing. No source fixes were needed.
 No new manual browser/native acceptance, signed package, registration, install,
 hosting, push or release. See New Mac's wiring checkpoint for scope and next step.
+
+2026-10-12: approved F3b local packaging is implemented, inspected and reviewed,
+recorded with this checkpoint.
+The candidate assembler builds only the separate arm64 setup-test configuration,
+checks fixed metadata, portable loader/resource paths, internal symlinks and
+copied hashes, and saves source/artifact manifests. Ten packaging tests and seven
+candidate-release tests passed. The local pre-signing bundle is assembled and
+inspected only; no launch, registration, signing operation, DMG, installation,
+hosting or production change. The installed public binary's hash is unchanged.
+Scoped review found no blocking issues or required source fixes. The 10 packaging
+and 7 candidate-release checks passed again; saved source inputs, package bytes
+and manifests were reverified without launching or rebuilding the bundle.
+See [package evidence](newmac.md#f3b-local-packaging-checkpoint). Next is planning
+signed acceptance; test URL, Developer ID signing, notarization and fresh-Mac setup
+remain separate approvals. Download stays disabled.
 
 ## Open questions
 
