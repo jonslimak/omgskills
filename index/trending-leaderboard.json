@@ -5,7 +5,7 @@
     "name": "brandkit",
     "authorHandle": "leonxlnx",
     "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
-    "stars": 95363,
+    "stars": 95446,
     "installs": 368953,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
@@ -137,7 +137,7 @@
     "name": "emil-design-eng",
     "authorHandle": "emilkowalski",
     "description": "This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.",
-    "stars": 45728,
+    "stars": 45895,
     "installs": 348504,
     "githubUrl": "https://github.com/emilkowalski/skills",
     "source": "skills.sh"
@@ -148,7 +148,7 @@
     "name": "lark-vc-agent",
     "authorHandle": "larksuite",
     "description": "仅当用户或上游配置显式指定 lark-vc-agent 时使用，相关请求统一交由 lark-meeting 技能处理。",
-    "stars": 17656,
+    "stars": 17658,
     "installs": 346108,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
@@ -423,7 +423,7 @@
     "name": "orca-cli",
     "authorHandle": "stablyai",
     "description": "Operate Orca-managed worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, worktree comments, and Orca's embedded browser through the `orca` CLI. Use when the user says \"$orca-cli\", \"Orca worktree\", \"child worktree\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"handoff\" / \"handover\" / \"give this to another agent\", \"Orca browser\", \"orca artifacts\", or \"share skills\". Prefer it over raw git worktree, ad hoc PTYs, or Computer Use when Orca state is involved. Use Computer Use only when a visible window needs GUI control that a CLI, filesystem, or API cannot do.",
-    "stars": 91153,
+    "stars": 91345,
     "installs": 295140,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
@@ -434,7 +434,7 @@
     "name": "systematic-debugging",
     "authorHandle": "obra",
     "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
-    "stars": 298444,
+    "stars": 298514,
     "installs": 290692,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
@@ -555,7 +555,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 180821,
+    "stars": 180868,
     "installs": 235007,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -995,7 +995,7 @@
     "name": "archify",
     "authorHandle": "tt-a1i",
     "description": "Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid. Also use for everyday subjects with steps, parts, relationships, or states: a leave or travel plan, an application or approval process, a back-and-forth such as renting, where money or documents go, or where an application or order stands. Not for numeric charts or dashboards.",
-    "stars": 82448,
+    "stars": 82923,
     "installs": 150878,
     "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
@@ -1380,7 +1380,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 117828,
+    "stars": 117856,
     "installs": 96918,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -1897,7 +1897,7 @@
     "name": "turborepo",
     "authorHandle": "vercel",
     "description": "Configure and troubleshoot Turborepo repositories. Use when working with turbo.json, task pipelines, caching, Remote Cache, the turbo CLI, filtering, environment variables, package boundaries, monorepo structure, or CI workflows.",
-    "stars": 31194,
+    "stars": 31195,
     "installs": 81052,
     "githubUrl": "https://github.com/vercel/turborepo",
     "source": "skills.sh"
@@ -2260,7 +2260,7 @@
     "name": "herdr",
     "authorHandle": "herdrdev",
     "description": "Control Herdr, a terminal multiplexer for coding agents. Use only when the user explicitly mentions Herdr or asks to use Herdr to inspect or control panes, tabs, workspaces, commands, or another agent. Do not use merely because a task could benefit from a background terminal, delegation, or parallel work. Requires HERDR_ENV=1.",
-    "stars": 43668,
+    "stars": 43761,
     "installs": 65871,
     "githubUrl": "https://github.com/herdrdev/herdr",
     "source": "skills.sh"
