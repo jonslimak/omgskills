@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-13T15:45:53.308Z",
+  "generatedAt": "2026-10-14T12:29:04.387Z",
   "shaToSkillIds": {
     "00000f2a9d8359900f2075b536b435ca9473a5b9": [
       "obot-platform/obot:draft-release-blog"
@@ -6498,6 +6498,9 @@
     ],
     "03d58b29f59b119c241ea5fd919b3ac2d970e7f7": [
       "jovd83/skill-dispatcher"
+    ],
+    "03d5f4021967e5edcf5119cbd10f32d64f40660d": [
+      "nvidia/openshell:openshell-cli"
     ],
     "03d64584a3e9dec46898cd9436fda99a3258abab": [
       "affaan-m/ecc:social-publisher"
@@ -35912,6 +35915,9 @@
     "2548dfd9dca4ff2abf52f2b19b4576b70bef4b1e": [
       "diiviikk5/rezops:retro"
     ],
+    "2549315f9c0afb5acce59adadf526737858c55ef": [
+      "coreyhaines31/marketingskills:skills/ab-testing"
+    ],
     "254a72e2f8759b65e5b15a7fcca88ef5fbea5aab": [
       "tencentcloudbase/skills:auth-tool-cloudbase"
     ],
@@ -37784,6 +37790,9 @@
     ],
     "278c9882c0243cd45c266b10c69681f134752f80": [
       "anam-org/metaxy:.claude/skills/hypothesis"
+    ],
+    "278cbcda543b48440a6e2ea817fc97a01fd722d0": [
+      "tt-a1i/archify:archify"
     ],
     "278cd230c6de52a9d133edbc1702bb8fab5fa8a4": [
       "everyinc/compound-engineering-plugin:ce-debug"
@@ -49363,6 +49372,9 @@
     "359a2d27167551472b7d7eea65e3e5d48a6dd631": [
       "joshprice/claude-skills-from-usage-rules:.claude/skills/usage-rules"
     ],
+    "359a32025f0e43192b2be1fdfb1a62601d4f3564": [
+      "cathrynlavery/diagram-design:diagram-design"
+    ],
     "359a642d78f4b3d9d34f6bcec897d294d8de3744": [
       "davekilleen/Dex:.claude/plugins/compound-engineering/skills/dspy-ruby"
     ],
@@ -51350,6 +51362,9 @@
     ],
     "381dc0b29ac3377edc7a24ac4cc603cf1c011709": [
       "nobu007/speech-to-visuals:.claude/skills/commit-prep-helper"
+    ],
+    "381e1e98f26c3df83c1eaea7289f5b693c130ba4": [
+      "pydantic/pydantic-ai:building-pydantic-ai-agents"
     ],
     "3820cbb882ff711bcf8eeb7ff4e06ce253880151": [
       "slac-lcls/ami:ami-graph-builder"
@@ -71186,6 +71201,9 @@
     ],
     "520cfb8a02bf3f5bbabcc646b7faffe166ff440c": [
       "Dexploarer/hyper-forge:.claude/skills/verify-claude-setup"
+    ],
+    "520d2f25e5d0b3d1890102e10965b792d9329313": [
+      "imbad0202/academic-research-skills:academic-paper"
     ],
     "520d39381db27d9614aa89173f5006f3727abf2e": [
       "Open-Medica/open-medical-skills:epidemiology-surveillance"
@@ -97427,6 +97445,9 @@
     ],
     "75d19ab23838e29f57553260dc2beb915b073f81": [
       "microsoft/dataverse-skills:dv-connect"
+    ],
+    "75d2de50570e1467fc988418e2495702a2385080": [
+      "nvidia/openshell:openshell-cli"
     ],
     "75d40e8678decec53961bbd2a45be8c4540371e5": [
       "google/skills:google-cloud-slo-alert-configuration"
@@ -133745,6 +133766,9 @@
     "a85042c55a31d2dfe15ccdf11888f7a47f920132": [
       "Arch1eSUN/Arcgentic:pre-round-scan"
     ],
+    "a8509ead599d0cf322dcbb80c8b0b41e5ca98165": [
+      "mempalace/mempalace:mempalace"
+    ],
     "a851ddfc4dc0fc76cdb9fb45f0604c16d4d59f82": [
       "microsoft/agent-skills:azure-identity-dotnet"
     ],
@@ -136795,6 +136819,9 @@
       "majiayu000/claude-skill-registry-data:bayes-reasoner",
       "majiayu000/claude-skill-registry-data:bayes-reasoner-nilock-bayes-reasoner-7b85c61e",
       "majiayu000/claude-skill-registry:bayes-reasoner"
+    ],
+    "acb402985cb6a790bc87c79a5c0f85326c1287a8": [
+      "microsoft/playwright-python:playwright-roll"
     ],
     "acb42bc5d70189f4cc5ca9ebe4ee44071d36e852": [
       "Yeachan-Heo/oh-my-claudecode:omc-doctor"
@@ -161329,6 +161356,9 @@
     "cf7e203af4c33c20f7bb89ec86032fd1a8e593d9": [
       "affaan-m/ecc:laravel-security"
     ],
+    "cf805df98ddc24feb0ae57c9ef543a9c5ae62050": [
+      "oxc-project/oxc:migrate-oxfmt"
+    ],
     "cf83b38d0b9c3c793754d11577409f45401e462a": [
       "shopify/flash-list:review-and-test"
     ],
@@ -166267,6 +166297,9 @@
     ],
     "d6687e2a3030f07b639bce39d697098fd21810c0": [
       "edvardgrishin27/nativeprompt"
+    ],
+    "d6696a50f8216c16c256d72f34e1f6b1adb4bd17": [
+      "angular/angular:angular-developer"
     ],
     "d669aafde9c36c23cb33d547852bfeae13e00ab4": [
       "luwill/research-skills:research-proposal"
@@ -185117,6 +185150,9 @@
     "f0fbd3d3ac9349db868cb441f029c773a1350f44": [
       "AEON-7/aeon-music-maker"
     ],
+    "f0fce745d97b0bef77be91fd5bb92844839edaee": [
+      "hugohe3/ppt-master:ppt-master"
+    ],
     "f0fdda8502d17e5100c194b6cff9b377bef64ff5": [
       "NVIDIA/Megatron-LM:cicd"
     ],
@@ -191864,6 +191900,9 @@
     ],
     "fac4ab569353ced3b74b00a546e1c661d1798315": [
       "kunchenguid/lavish-axi:lavish"
+    ],
+    "fac6698b1254f94892ade822a0722d079e59d280": [
+      "ifixai-ai/ifixai:ifixai"
     ],
     "fac8d6fe439076721a17a9f8880d5d440fa9f081": [
       "WenJunDuan/Rlues:athena-setup"
