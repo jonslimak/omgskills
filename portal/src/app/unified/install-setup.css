@@ -12,3 +12,9 @@
 .ua-install-setup .ua-f1-install { font-size: 13px; text-align: left; line-height: 1.4; background: var(--ua-chip); }
 .ua-install-help { border-top: 1px solid var(--ua-line); margin-top: 16px; padding-top: 16px; }
 .ua-install-setup .ua-install-version { color: var(--ua-muted); }
+.ua-install-setup ol { list-style: decimal; padding-left: 20px; font-size: 13px; line-height: 1.5; color: var(--ua-body); }
+.ua-install-setup li + li { margin-top: 8px; }
+.ua-install-setup .ua-f1-install { max-width: 100%; min-width: 0; white-space: normal; }
+.ua-install-setup .ua-f1-install svg { flex-shrink: 0; }
+.ua-install-target { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 14px; }
+.ua-install-target select { border: 1px solid var(--ua-line); border-radius: 6px; padding: 6px 10px; color: var(--ua-body); background: var(--ua-chip); max-width: 100%; }

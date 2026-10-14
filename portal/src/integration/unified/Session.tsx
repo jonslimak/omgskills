@@ -18,8 +18,18 @@ import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation } from "./entry-navigation";
 import "../../app/redesign.css";
 import { LoadingScreen } from "../../app/LoadingScreen";
+import { normalInstallAction, normalInstallClient, catalogInstallTestEnabled } from "../../app/unified/public-install";
+import { InstallIntentStore } from "../../app/unified/install-intent";
+import { PublicInstallSetup } from "../../app/unified/PublicInstallSetup";
+import { setupTestDistribution } from "../../app/unified/setup-test-distribution";
+import { CatalogInstallIntentStore } from "../../app/unified/catalog-install-intent";
+import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
 
 const publicClient = new PublicCatalogClient();
+const installClient = import.meta.env.DEV ? normalInstallClient(import.meta.env.DEV,
+  import.meta.env.VITE_NEWMAC_WEB_INSTALL_TEST, location.hostname, import.meta.env.VITE_NEWMAC_CATALOG_INSTALL_TEST) : null;
+const catalogInstallEnabled = import.meta.env.DEV ? catalogInstallTestEnabled(import.meta.env.DEV,
+  import.meta.env.VITE_NEWMAC_CATALOG_INSTALL_TEST, location.hostname, import.meta.env.VITE_NEWMAC_WEB_INSTALL_TEST) : false;
 const rejectEdit = () => { throw new Error("Account editing is disabled in this read-only integration."); };
 
 function AccountView({ identity, signedIn, accountKey, base, local }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean }) {
@@ -29,11 +39,22 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
   const [leaving, setLeaving] = useState(false);
   const [sessionError, setSessionError] = useState("");
   const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
+  const [installStore] = useState(() => installClient && base === "/app/"
+    ? new InstallIntentStore(() => window.sessionStorage, installClient, "normal") : null);
+  const [catalogStore] = useState(() => catalogInstallEnabled && base === "/app/"
+    ? new CatalogInstallIntentStore(() => window.sessionStorage) : null);
+  const clearOtherIntent = (next: Navigation) => {
+    const pending = installStore?.read().intent;
+    if (pending && next.selected && next.selected !== `catalog:${pending.catalogId}`) installStore?.clear();
+    const catalogPending = catalogStore?.read().intent;
+    if (catalogPending && next.selected && next.selected !== `catalog:${catalogPending.catalogId}`) catalogStore?.clear();
+  };
   const available = signedIn && !leaving;
   const nav = accountNavigation(requested, available);
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
   const navigate = (next: Navigation, replace = false) => {
     const safe = accountNavigation(next, available);
+    clearOtherIntent(safe);
     history[replace ? "replaceState" : "pushState"]({}, "", `${base}${navigationSearch(safe)}`);
     setRequested(safe);
   };
@@ -42,10 +63,14 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
     if (available || requested.view === "discover") history.replaceState({}, "", `${base}${search}`);
   }, [search, available, base, requested.view]);
   useEffect(() => {
-    const pop = () => setRequested(entryNavigation(location.pathname, location.search, base));
+    const pop = () => {
+      const next = entryNavigation(location.pathname, location.search, base);
+      clearOtherIntent(next);
+      setRequested(next);
+    };
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
-  }, [base]);
+  }, [base, installStore, catalogStore]);
   async function signOut() {
     if (leaving) return;
     setLeaving(true);
@@ -71,6 +96,13 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
     key={available ? accountKey : "public"}
     data={data} catalog={catalog} publicStatus={publicData.status}
     nav={nav} navigate={navigate} signedIn={available}
+    publicInstallAction={installClient && installStore ? (skill, detailReady) => <PublicInstallSetup
+      key={skill.key} skill={skill} detailReady={detailReady} client={installClient} store={installStore}
+      returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`}
+      action={normalInstallAction} distribution={setupTestDistribution} />
+      : catalogInstallEnabled && catalogStore ? (skill, detailReady) => <CatalogInstallSetup key={skill.key}
+        skill={skill} detailReady={detailReady} store={catalogStore}
+        returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined}
     readOnlyAccount
     management={available ? management : undefined}
     onSignIn={() => { void clerk.openSignIn({ forceRedirectUrl: `${location.origin}${base}${navigationSearch(requested)}` }); }}

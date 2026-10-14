@@ -274,8 +274,11 @@ test("preview wiring gates setup, disables download and suppresses only the test
   assert.match(preview, /detailReady=\{detailReady && liveCatalog\}/);
   assert.match(preview, /next.selected && next.selected !== nav.selected\) installStore\?\.clear\(\)/);
   const component = read("../src/preview/unified/PublicInstallSetup.tsx");
-  assert.match(component, /new PublicCatalogClient\(\)\.skill/);
-  assert.match(component, /disabled aria-describedby="ua-download-status"/);
+  assert.match(component, /SharedInstallSetup/);
+  assert.doesNotMatch(component, /distribution=/);
+  const shared = read("../src/app/unified/PublicInstallSetup.tsx");
+  assert.match(shared, /new PublicCatalogClient\(\)\.skill/);
+  assert.match(shared, /disabled aria-describedby="ua-download-status"/);
   assert.doesNotMatch(component, /https:\/\/omgskills.com\/download|setTimeout|visibilitychange|window.open/);
   const ui = read("../src/app/unified/UnifiedApp.tsx");
   assert.match(ui, /!publicInstallAction && <a\s+href="https:\/\/omgskills.com\/download"/);

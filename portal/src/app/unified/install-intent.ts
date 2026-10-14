@@ -1,14 +1,15 @@
 import type { SkillDisplay } from "./model";
-import { developmentInstallLink, installClients, type InstallClient } from "./public-install";
+import { developmentInstallLink, installClients, type InstallClient, type InstallAction } from "./public-install";
 
 export const INSTALL_INTENT_KEY = "omgskills.preview.install-intent.v1";
+export const NORMAL_INSTALL_INTENT_KEY = "omgskills.app.install-intent.v1";
+export type InstallContext = "preview" | "normal";
 export const INSTALL_INTENT_TTL = 24 * 60 * 60 * 1000;
 export type InstallIntent = {
   version: 1; catalogId: string; repository: string; path: string; agent: "codex";
   commit?: string; returnRoute: string; createdAt: number;
 };
 type Storage = Pick<globalThis.Storage, "getItem" | "setItem" | "removeItem">;
-type Action = { href: string | null; reason: string };
 type Phase = "idle" | "setup" | "checking" | "ready" | "opening" | "blocked";
 type State = { phase: Phase; message: string; intent: InstallIntent | null; restartRequired: boolean };
 
@@ -17,15 +18,19 @@ function intentSkill(intent: InstallIntent): SkillDisplay {
     description: "", tags: [], githubUrl: `https://github.com/${intent.repository}`, skillMDPath: intent.path };
 }
 
-function validRoute(route: string, id: string) {
-  if (route.length > 4096 || !route.startsWith("/app/preview/unified/?") || /[\\\p{Cc}\p{Cf}]/u.test(route)) return false;
+export function validInstallReturnRoute(route: string, id: string, context: InstallContext) {
+  const base = context === "normal" ? "/app/" : "/app/preview/unified/";
+  if (route.length > 4096 || !route.startsWith(`${base}?`) || /[\\\p{Cc}\p{Cf}]/u.test(route)) return false;
   const url = new URL(route, "https://local.invalid");
-  return url.origin === "https://local.invalid" && url.pathname === "/app/preview/unified/" && !url.hash
+  const keys = [...url.searchParams.keys()];
+  return url.origin === "https://local.invalid" && url.pathname === base && !url.hash
     && url.searchParams.getAll("skill").length === 1 && url.searchParams.get("skill") === `catalog:${id}`
-    && [...url.searchParams.keys()].every(key => ["view", "id", "q", "source", "skill", "f2case"].includes(key));
+    && new Set(keys).size === keys.length
+    && keys.every(key => ["view", "id", "q", "source", "skill", ...(context === "preview" ? ["f2case"] : [])].includes(key))
+    && [...url.searchParams.values()].every(value => !/[\\\p{Cc}\p{Cf}]/u.test(value));
 }
 
-function parseIntent(raw: string): InstallIntent | null {
+function parseIntent(raw: string, context: InstallContext): InstallIntent | null {
   try {
     if (raw.length > 8192) return null;
     const value = JSON.parse(raw) as InstallIntent;
@@ -34,12 +39,13 @@ function parseIntent(raw: string): InstallIntent | null {
       || !Number.isSafeInteger(value.createdAt) || value.createdAt < 0
       || (value.commit !== undefined && typeof value.commit !== "string")
       || Object.keys(value).some(key => !["version", "catalogId", "repository", "path", "agent", "commit", "returnRoute", "createdAt"].includes(key))
-      || !validRoute(value.returnRoute, value.catalogId)) return null;
+      || !validInstallReturnRoute(value.returnRoute, value.catalogId, context)) return null;
     return developmentInstallLink(intentSkill(value), value.commit) ? value : null;
   } catch { return null; }
 }
 
-export function intentFromAction(skill: SkillDisplay, action: Action, returnRoute: string, now: number, client: InstallClient = "f1"): InstallIntent | null {
+export function intentFromAction(skill: SkillDisplay, action: InstallAction, returnRoute: string, now: number,
+  client: InstallClient = "f1", context: InstallContext = "preview"): InstallIntent | null {
   if (!action.href) return null;
   try {
     const link = new URL(action.href);
@@ -48,7 +54,7 @@ export function intentFromAction(skill: SkillDisplay, action: Action, returnRout
     if (developmentInstallLink(skill, commit, client) !== action.href) return null;
     return parseIntent(JSON.stringify({ version: 1, catalogId: skill.catalogId,
       repository: link.searchParams.get("repo"), path: skill.skillMDPath, agent: "codex",
-      ...(commit ? { commit } : {}), returnRoute, createdAt: now }));
+      ...(commit ? { commit } : {}), returnRoute, createdAt: now }), context);
   } catch { return null; }
 }
 
@@ -56,14 +62,15 @@ export class InstallIntentStore {
   private memory: string | null = null;
   private storage: Storage | null;
   private readonly key: string;
-  constructor(getStorage: () => Storage | null, client: InstallClient = "f1") {
-    this.key = client === "f1" ? INSTALL_INTENT_KEY : `${INSTALL_INTENT_KEY}.setup-test`;
+  constructor(getStorage: () => Storage | null, readonly client: InstallClient = "f1", readonly context: InstallContext = "preview") {
+    const base = context === "normal" ? NORMAL_INSTALL_INTENT_KEY : INSTALL_INTENT_KEY;
+    this.key = client === "f1" ? base : `${base}.setup-test`;
     try { this.storage = getStorage(); this.memory = this.storage?.getItem(this.key) ?? null; }
     catch { this.storage = null; }
   }
   get persistent() { return this.storage !== null; }
   read() {
-    const intent = this.memory ? parseIntent(this.memory) : null;
+    const intent = this.memory ? parseIntent(this.memory, this.context) : null;
     return { intent, invalid: this.memory !== null && !intent };
   }
   save(intent: InstallIntent) {
@@ -84,7 +91,7 @@ export class InstallIntentStore {
 type Options = {
   client?: InstallClient;
   catalogId: string; commit?: string; returnRoute: string; store: InstallIntentStore;
-  action: (skill: SkillDisplay) => Action;
+  action: (skill: SkillDisplay) => InstallAction;
   refresh: (id: string, signal: AbortSignal) => Promise<SkillDisplay | null>;
   open: (href: string) => void;
   now?: () => number;
@@ -101,7 +108,7 @@ export class InstallSetupSession {
     const saved = options.store.read();
     const mismatch = saved.intent && (saved.intent.catalogId !== options.catalogId || saved.intent.commit !== options.commit);
     const expired = saved.intent && !this.fresh(saved.intent);
-    const invalid = saved.invalid || mismatch || expired;
+    const invalid = saved.invalid || mismatch || expired || options.store.client !== (options.client ?? "f1");
     this.state = { phase: invalid ? "blocked" : saved.intent ? "setup" : "idle",
       intent: saved.intent, restartRequired: !!invalid,
       message: invalid ? "This saved request is expired or no longer matches. Cancel setup and start again."
@@ -121,7 +128,7 @@ export class InstallSetupSession {
   private begin(skill: SkillDisplay) {
     if (this.state.restartRequired) return null;
     const action = this.options.action(skill);
-    const intent = intentFromAction(skill, action, this.options.returnRoute, this.now(), this.options.client);
+    const intent = intentFromAction(skill, action, this.options.returnRoute, this.now(), this.options.client, this.options.store.context);
     if (!intent || intent.catalogId !== this.options.catalogId || intent.commit !== this.options.commit) {
       this.fail(action.reason || "The skill request is unavailable. Select the skill again.", true);
       return null;
@@ -144,8 +151,11 @@ export class InstallSetupSession {
     if (!this.fresh(intent)) { this.fail("This request expired. Cancel setup and start again.", true); return; }
     const candidate = this.prepared?.skill ?? skill;
     const action = this.options.action(candidate);
-    const checked = intentFromAction(candidate, action, intent.returnRoute, intent.createdAt, this.options.client);
-    if (!checked || !this.matches(intent, checked) || (this.prepared && this.prepared.href !== action.href)) {
+    const checked = intentFromAction(candidate, action, intent.returnRoute, intent.createdAt, this.options.client, this.options.store.context);
+    const displayed = intentFromAction(skill, this.options.action(skill), intent.returnRoute, intent.createdAt,
+      this.options.client, this.options.store.context);
+    if (!checked || !displayed || !this.matches(intent, displayed) || !this.matches(intent, checked)
+      || (this.prepared && this.prepared.href !== action.href)) {
       this.fail("The source or version changed. Cancel setup and select the skill again.", true);
       return;
     }
@@ -171,7 +181,7 @@ export class InstallSetupSession {
       if (!this.fresh(intent)) { this.fail("This request expired. Cancel setup and start again.", true); return; }
       if (!skill) { this.fail("This skill is no longer available. Cancel setup and select another skill.", true); return; }
       const action = this.options.action(skill);
-      const candidate = intentFromAction(skill, action, intent.returnRoute, intent.createdAt, this.options.client);
+      const candidate = intentFromAction(skill, action, intent.returnRoute, intent.createdAt, this.options.client, this.options.store.context);
       if (!candidate || !this.matches(intent, candidate)) {
         this.fail(action.reason || "The source or version changed. Cancel setup and select the skill again.", true);
         return;
@@ -184,7 +194,10 @@ export class InstallSetupSession {
       }
     } finally { if (this.request === request) this.request = null; }
   }
-  abort() { this.request?.abort(); this.request = null; this.prepared = null; }
+  abort() {
+    this.request?.abort(); this.request = null; this.prepared = null;
+    if (this.state.phase === "checking") this.update({ phase: "blocked", message: "Checking was interrupted. Try opening again." });
+  }
   reset() {
     this.abort();
     this.options.store.clear();
