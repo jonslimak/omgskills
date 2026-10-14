@@ -39,6 +39,7 @@ final class UpdateInstallCoordinator {
 
     private var activeActivities: [UUID: Activity] = [:]
     private var pendingInstall: PendingInstall?
+    private(set) var isAppReplacementActive = false
 
     var isBusy: Bool {
         !activeActivities.isEmpty
@@ -97,6 +98,7 @@ final class UpdateInstallCoordinator {
     private func invokePendingInstallIfIdle() {
         guard !isBusy, let install = pendingInstall else { return }
         pendingInstall = nil
+        isAppReplacementActive = true
         install.handler()
     }
 }

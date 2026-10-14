@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { validateInputs } from './prepare-newmac-f1.mjs';
+import { validateInputs, bundleMetadata } from './prepare-newmac-f1.mjs';
 
 test('assembler refuses release builds and non-local websites', () => {
   const root = mkdtempSync(join(tmpdir(), 'f1-assembly-test-'));
@@ -27,4 +27,15 @@ test('test bundle has its own identity and contains no update feed', () => {
   assert.match(source, /join\(config\.bin, 'f1-apps', basename\(root\), 'OMGSkills F1 Test\.app'\)/);
   assert.match(source, /lsregister', \['-f', app\]/);
   assert.doesNotMatch(source, /SUFeedURL|SUPublicEDKey|\/Applications\/|release-mac\.sh/);
+});
+
+test('catalog flow is explicitly selected and does not change the test handler', () => {
+  const config = { website: 'http://127.0.0.1:5197/app/', catalogInstall: false };
+  const legacy = bundleMetadata(config, '/private/tmp/omgskills-f1-fixture');
+  const catalog = bundleMetadata({ ...config, catalogInstall: true }, '/private/tmp/omgskills-f1-fixture');
+  assert.equal(legacy.OMGSkillsCatalogInstallEnabled, false);
+  assert.equal(catalog.OMGSkillsCatalogInstallEnabled, true);
+  assert.deepEqual(catalog.CFBundleURLTypes, legacy.CFBundleURLTypes);
+  assert.equal(catalog.CFBundleIdentifier, legacy.CFBundleIdentifier);
+  assert.equal(catalog.OMGSkillsF1Root, '/private/tmp/omgskills-f1-fixture');
 });

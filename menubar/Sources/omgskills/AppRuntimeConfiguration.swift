@@ -4,6 +4,20 @@ enum AppRuntimeConfiguration {
     static let f1BundleID = "com.jonslimak.omgskills.f1"
     static let f1RootKey = "OMGSkillsF1Root"
     static let f1WebsiteKey = "OMGSkillsF1Website"
+    static let catalogInstallEnabledKey = "OMGSkillsCatalogInstallEnabled"
+
+    static func catalogInstallMode(
+        info: [String: Any] = Bundle.main.infoDictionary ?? [:],
+        debugAllowed: Bool = buildAllowsF1
+    ) -> F1Mode {
+        guard let setting = info[catalogInstallEnabledKey] else { return .disabled }
+        guard let enabled = setting as? Bool else { return .invalid("Invalid catalog install test setting.") }
+        guard enabled else { return .disabled }
+        switch f1Mode(info: info, debugAllowed: debugAllowed) {
+        case .enabled(let root, let website): return .enabled(root: root, website: website)
+        default: return .invalid("Catalog installation requires a valid isolated F1 Debug app.")
+        }
+    }
 
     enum F1Mode: Equatable, Sendable {
         case disabled

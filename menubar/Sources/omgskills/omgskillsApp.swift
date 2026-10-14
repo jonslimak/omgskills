@@ -18,6 +18,11 @@ struct OmgskillsApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private let f1Mode = AppRuntimeConfiguration.f1Mode()
     private let setupTestMode = SetupTestRuntime.mode()
+    private let catalogInstallMode = AppRuntimeConfiguration.catalogInstallMode()
+    #if DEBUG
+    private var catalogInstallController: CatalogInstallWindowController?
+    private var pendingCatalogInstallURL: URL?
+    #endif
     #if DEBUG || OMGSKILLS_SETUP_TEST
     private var f1Controller: PublicSkillInstallWindowController?
     private var pendingF1URL: URL?
@@ -79,6 +84,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        switch catalogInstallMode {
+        case .invalid(let reason):
+            let alert = NSAlert()
+            alert.messageText = "Cannot start catalog install test"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        case .enabled(let root, let website):
+            #if DEBUG
+            do {
+                catalogInstallController = try CatalogInstallWindowController(root: root, website: website,
+                    coordinator: updateInstallCoordinator)
+                if let pendingCatalogInstallURL {
+                    catalogInstallController?.receive(pendingCatalogInstallURL)
+                    self.pendingCatalogInstallURL = nil
+                }
+            } catch {
+                let alert = NSAlert()
+                alert.messageText = "Cannot start catalog install test"
+                alert.informativeText = error.localizedDescription
+                alert.runModal()
+                NSApp.terminate(nil)
+            }
+            #endif
+            return
+        case .disabled: break
+        }
         switch setupTestMode {
         case .invalid(let reason):
             refuseSetupTestLaunch(reason)
@@ -196,6 +229,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        #if DEBUG
+        if let catalogInstallController {
+            guard catalogInstallController.model.canClose else { return .terminateCancel }
+            Task {
+                let closed = await catalogInstallController.model.close()
+                sender.reply(toApplicationShouldTerminate: closed)
+            }
+            return .terminateLater
+        }
+        #endif
         #if DEBUG || OMGSKILLS_SETUP_TEST
         if let f1Controller {
             guard !f1Controller.model.isApplying, f1Controller.model.phase != .cancelling else { return .terminateCancel }
@@ -215,6 +258,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        if catalogInstallMode != .disabled {
+            #if DEBUG
+            if case .enabled = catalogInstallMode, let url = urls.first {
+                if let catalogInstallController { catalogInstallController.receive(url) }
+                else if pendingCatalogInstallURL == nil { pendingCatalogInstallURL = url }
+            }
+            #endif
+            return
+        }
         if setupTestMode != .disabled {
             #if OMGSKILLS_SETUP_TEST
             if case .enabled = setupTestMode, let url = urls.first {
