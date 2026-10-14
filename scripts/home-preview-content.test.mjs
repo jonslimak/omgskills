@@ -3,12 +3,58 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { runInNewContext } from 'node:vm';
 import { renderHomeContent, replaceHomeContent, refreshHomePreview, skillLink } from './home-preview-content.mjs';
 
 const ids = ['the-goat-list', 'elite-ui-design', 'build-ios-apps', 'starter-pack', 'design-essentials', 'video-motion-graphics'];
 const collections = ids.map(id => ({id, type: 'topic', title: id, subtitle: 'Useful skills', featuredSkillIds: ['author/repo:skill']}));
 const data = {generatedAt: '2026-10-08T13:00:00Z', topSkills: Array.from({length: 12}, (_, i) => ({id: `author/repo:skill-${i}`, name: `Skill ${i}`, authorHandle: 'author', installs: i * 1000}))};
 const template = ['suggestions', 'collections', 'rankings'].map(name => `<!-- home:${name}:start -->old<!-- home:${name}:end -->`).join('\n');
+
+test('download continues when conversion pixels are unavailable or throw', async () => {
+  const js = await readFile(new URL('../site/home/home.js', import.meta.url), 'utf8');
+  const start = js.indexOf('// Same download conversion events');
+  assert.ok(start >= 0);
+  for (const scenario of ['normal', 'unavailable', 'twq', 'rdt', 'oaiq', 'modified', 'prevented']) {
+    let click;
+    const calls = [];
+    const timers = [];
+    const location = { href: '' };
+    const link = {
+      href: 'https://omgskills.com/downloads/omgskills-mac.dmg',
+      addEventListener: (_, listener) => { click = listener; },
+    };
+    const window = {};
+    for (const name of ['twq', 'rdt', 'oaiq']) {
+      if (scenario === 'unavailable') continue;
+      window[name] = () => {
+        calls.push(name);
+        if (scenario === name) throw new Error('Synthetic pixel failure');
+      };
+    }
+    runInNewContext(js.slice(start), {
+      document: { querySelectorAll: () => [link] }, window, location,
+      setTimeout: (callback, delay) => { timers.push({ callback, delay }); },
+    });
+    const event = {
+      button: 0, metaKey: scenario === 'modified',
+      defaultPrevented: scenario === 'prevented',
+      preventDefault() { this.defaultPrevented = true; },
+    };
+    assert.doesNotThrow(() => click(event), scenario);
+    if (scenario === 'modified' || scenario === 'prevented') {
+      assert.equal(timers.length, 0, scenario);
+      assert.deepEqual(calls, [], scenario);
+      continue;
+    }
+    assert.equal(event.defaultPrevented, true, scenario);
+    assert.equal(timers.length, 1, scenario);
+    assert.equal(timers[0].delay, 150, scenario);
+    assert.deepEqual(calls, scenario === 'unavailable' ? [] : ['twq', 'rdt', 'oaiq'], scenario);
+    timers[0].callback();
+    assert.equal(location.href, link.href, scenario);
+  }
+});
 
 test('renders six real collection destinations and at most ten ranked skills', () => {
   const sections = renderHomeContent(collections, data);
