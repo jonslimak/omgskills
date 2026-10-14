@@ -1,10 +1,19 @@
 import Foundation
 
-enum GitCommandError: Error, Equatable, Sendable {
+enum GitCommandError: LocalizedError, Equatable, Sendable {
     case unavailable
     case failed(status: Int32)
     case outputTooLarge
     case invalidOutput
+
+    var errorDescription: String? {
+        switch self {
+        case .unavailable: return "Git is not available"
+        case .failed(let status): return "Git failed (exit status \(status))"
+        case .outputTooLarge: return "Git output exceeded the supported limit"
+        case .invalidOutput: return "Git returned invalid output"
+        }
+    }
 }
 
 protocol GitCommandRunning: Sendable {
@@ -186,6 +195,10 @@ struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, PublicSkillPack
         self.temporaryRoot = temporaryRoot
         self.limits = limits
         self.remoteURL = remoteURL
+    }
+
+    func usingRunner(_ runner: any GitCommandRunning) -> Self {
+        Self(runner: runner, temporaryRoot: temporaryRoot, limits: limits, remoteURL: remoteURL)
     }
 
     func fetchPackage(

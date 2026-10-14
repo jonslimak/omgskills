@@ -25,6 +25,7 @@ struct CatalogSkillInstaller: CatalogSkillInstalling {
     private let legacyInstall: LegacyInstall
     private let destinationBuilder: DestinationBuilder
     private let filesystemPaths: SkillFilesystemPaths
+    var installationPaths: SkillFilesystemPaths { filesystemPaths }
 
     init(
         packageFetcher: any PublicSkillPackageFetching = GitPublicSkillPackageFetcher(),
@@ -61,17 +62,7 @@ struct CatalogSkillInstaller: CatalogSkillInstalling {
         case .invalid:
             throw InstallError.invalidPinnedMetadata
         case .complete(let metadata):
-            let request = ManagedSkillInstallRequest(
-                sourceKind: .catalog,
-                sourceId: skill.id,
-                releaseId: metadata.coordinates.commitSha,
-                groupRevision: nil,
-                catalogSkillId: skill.id,
-                githubUrl: skill.githubUrl,
-                expectedCoordinates: metadata.coordinates,
-                mode: .snapshot,
-                destination: destinationBuilder(target, metadata.targetName)
-            )
+            let request = pinnedRequest(skill, target: target, metadata: metadata)
             let packageFetcher = packageFetcher
             _ = try await managedInstaller.install(request) {
                 try await packageFetcher.fetchPackage(
@@ -102,6 +93,42 @@ struct CatalogSkillInstaller: CatalogSkillInstalling {
                     .path
             )
         }
+    }
+
+    func installNew(_ skill: Skill, target: SkillInstaller.Target, gitRunner: any GitCommandRunning,
+                    writeNewRecord: @escaping @Sendable (Skill, URL, String, String) throws -> Void = { skill, root, name, sha in
+                        try SkillInstallProvenanceStore.writeNew(catalogSkillId: skill.id, githubUrl: skill.githubUrl,
+                            skillMdSha: sha, targetRoot: root, targetName: name)
+                    }) async throws {
+        switch skill.pinnedInstallMetadataState {
+        case .invalid: throw InstallError.invalidPinnedMetadata
+        case .legacy:
+            _ = try await SkillInstaller.install(skill, target: target, filesystemPaths: filesystemPaths,
+                policy: .newOnly, gitRunner: gitRunner, writeNewRecord: writeNewRecord)
+        case .complete(let metadata):
+            let request = pinnedRequest(skill, target: target, metadata: metadata)
+            guard request.destination.rootURL == filesystemPaths.skillsRoot(for: target),
+                  request.destination.agent == target.managedAgent else { throw InstallError.invalidPinnedMetadata }
+            let fetcher: any PublicSkillPackageFetching = (packageFetcher as? GitPublicSkillPackageFetcher)?
+                .usingRunner(gitRunner) ?? packageFetcher
+            _ = try await managedInstaller.install(request, policy: .newOnly) {
+                try await fetcher.fetchPackage(repositorySlug: metadata.repositorySlug,
+                    normalizedRoot: metadata.packageRoot, expected: metadata.coordinates)
+            }
+        }
+    }
+
+    func recognizesManagedInstall(_ skill: Skill, target: SkillInstaller.Target) async throws -> Bool {
+        guard case .complete(let metadata) = skill.pinnedInstallMetadataState else { return false }
+        return try await managedInstaller.recognizesCatalogInstall(pinnedRequest(skill, target: target, metadata: metadata))
+    }
+
+    private func pinnedRequest(_ skill: Skill, target: SkillInstaller.Target,
+                               metadata: PinnedSkillInstallMetadata) -> ManagedSkillInstallRequest {
+        ManagedSkillInstallRequest(sourceKind: .catalog, sourceId: skill.id,
+            releaseId: metadata.coordinates.commitSha, groupRevision: nil, catalogSkillId: skill.id,
+            githubUrl: skill.githubUrl, expectedCoordinates: metadata.coordinates, mode: .snapshot,
+            destination: destinationBuilder(target, metadata.targetName))
     }
 }
 

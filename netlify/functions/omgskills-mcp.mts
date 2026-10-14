@@ -2,12 +2,16 @@ import type { Config, Context } from "@netlify/functions";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { createOmgskillsServer } from "../../mcp/src/server.js";
 import { loadProductionMcpLibrary, type McpLibraryLoader } from "./_shared/mcp-library.js";
+import { catalogInstallRecord, catalogInstallRecordPath } from "./_shared/catalog-install-record.js";
 
 const maximumRequestBytes = 64 * 1024;
 
 export function createMcpHandler(loader: McpLibraryLoader) {
   return async (request: Request, context: Pick<Context, "waitUntil">): Promise<Response> => {
     const pathname = new URL(request.url).pathname;
+    if (pathname === catalogInstallRecordPath) {
+      return catalogInstallRecord(request, loader, work => context.waitUntil(work));
+    }
     if (pathname === "/mcp/health") {
       return healthResponse(loader, context);
     }
@@ -57,7 +61,7 @@ const handler = createMcpHandler(loadProductionMcpLibrary);
 export default handler;
 
 export const config: Config = {
-  path: ["/mcp", "/mcp/health"],
+  path: ["/mcp", "/mcp/health", catalogInstallRecordPath],
   rateLimit: {
     windowLimit: 600,
     windowSize: 60,

@@ -317,12 +317,15 @@ actor ManagedSkillInstaller {
 
     func install(
         _ request: ManagedSkillInstallRequest,
+        policy: SkillInstallPolicy = .existingBehavior,
         loadPackage: PackageLoader
     ) async throws -> InstallResult {
         try beginMutation()
         defer { endMutation() }
-        try recoverPendingTransaction()
+        if policy == .existingBehavior { try recoverPendingTransaction() }
+        else if pathExists(journalURL, fileManager: .default) { throw InstallError.operationInProgress }
         try validate(request)
+        if policy == .newOnly { try requireNewCatalogDestination(request) }
 
         let package = try await loadPackage()
         try Task.checkCancellation()
@@ -333,7 +336,30 @@ actor ManagedSkillInstaller {
         )
 
         let packageContent = try storePackage(package, for: request)
-        return try activate(packageContent: packageContent, request: request)
+        return try activate(packageContent: packageContent, request: request, policy: policy)
+    }
+
+    func recognizesCatalogInstall(_ request: ManagedSkillInstallRequest) throws -> Bool {
+        let target = request.destination.rootURL.appendingPathComponent(request.destination.targetName)
+        try requireDirectoryChain(request.destination.rootURL, under: pathAnchor)
+        guard let activation = try existingManagedActivation(at: target, fileManager: .default),
+              let data = try? Data(contentsOf: activation.appendingPathComponent("provenance.json")),
+              let provenance = try? JSONDecoder().decode(SkillInstallProvenance.self, from: data) else { return false }
+        let expectedParent = activationsRoot.appendingPathComponent(
+            stableKey("\(request.destination.rootIdentifier):\(request.destination.targetName)"))
+        return activation.deletingLastPathComponent() == expectedParent
+            && provenance.catalogSkillId == request.catalogSkillId && provenance.githubUrl == request.githubUrl
+            && provenance.sourceKind == ManagedSkillSourceKind.catalog.rawValue
+            && provenance.sourceId == request.sourceId && provenance.groupId == nil
+            && provenance.targetAgent == request.destination.agent.rawValue
+            && provenance.targetScope == request.destination.scope.rawValue
+            && provenance.targetRootIdentifier == request.destination.rootIdentifier
+    }
+
+    private func requireNewCatalogDestination(_ request: ManagedSkillInstallRequest) throws {
+        try requireDirectoryChain(request.destination.rootURL, under: pathAnchor)
+        try requireDirectoryChain(request.destination.rootURL.appendingPathComponent(".omgskills"), under: pathAnchor)
+        try CatalogInstallFilesystem.requireVacant(root: request.destination.rootURL, name: request.destination.targetName)
     }
 
     func preparePublicInstall(
@@ -1513,7 +1539,8 @@ actor ManagedSkillInstaller {
 
     private func activate(
         packageContent: URL,
-        request: ManagedSkillInstallRequest
+        request: ManagedSkillInstallRequest,
+        policy: SkillInstallPolicy = .existingBehavior
     ) throws -> InstallResult {
         let fileManager = FileManager.default
         let destination = request.destination
@@ -1521,17 +1548,31 @@ actor ManagedSkillInstaller {
             destination.targetName,
             isDirectory: true
         )
+        if policy == .newOnly { try requireNewCatalogDestination(request) }
         let existingManaged = try existingManagedActivation(
             at: targetURL,
             fileManager: fileManager
         )
+        if policy == .newOnly {
+            try fileManager.createDirectory(at: destination.rootURL, withIntermediateDirectories: true)
+        }
         let activation = try prepareActivation(packageContent: packageContent, request: request)
         do {
             try beforeActivationSwitch()
-            try switchTarget(
-                targetURL,
-                to: activation.appendingPathComponent("content", isDirectory: true)
-            )
+            if policy == .newOnly {
+                try Task.checkCancellation()
+                try requireNewCatalogDestination(request)
+                // symlink() is exclusive; unlike rename(), it cannot replace a racing destination.
+                do {
+                    try fileManager.createSymbolicLink(at: targetURL,
+                        withDestinationURL: activation.appendingPathComponent("content", isDirectory: true))
+                } catch {
+                    if pathExists(targetURL, fileManager: fileManager) { throw SkillInstaller.InstallError.destinationConflict }
+                    throw error
+                }
+            } else {
+                try switchTarget(targetURL, to: activation.appendingPathComponent("content", isDirectory: true))
+            }
             return existingManaged == nil ? .installed : .updated
         } catch {
             try? fileManager.removeItem(at: activation)

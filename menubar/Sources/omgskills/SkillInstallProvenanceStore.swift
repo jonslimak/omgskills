@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 enum SkillInstallProvenanceStore {
     static func metadataURL(targetRoot: URL, targetName: String) -> URL {
@@ -50,6 +51,24 @@ enum SkillInstallProvenanceStore {
     static func write(_ provenance: SkillInstallProvenance, to url: URL) throws {
         let data = try JSONEncoder().encode(provenance)
         try data.write(to: url, options: .atomic)
+    }
+
+    static func writeNew(catalogSkillId: String, githubUrl: String, skillMdSha: String,
+                         targetRoot: URL, targetName: String) throws {
+        let url = metadataURL(targetRoot: targetRoot, targetName: targetName)
+        let directory = url.deletingLastPathComponent()
+        try CatalogInstallFilesystem.requireDirectoryChain(directory, under: targetRoot)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let record = SkillInstallProvenance(catalogSkillId: catalogSkillId, githubUrl: githubUrl,
+            installedAt: ISO8601DateFormatter().string(from: Date()), skillMdSha: skillMdSha)
+        let temporary = directory.appendingPathComponent(".new-\(UUID().uuidString)")
+        try JSONEncoder().encode(record).write(to: temporary, options: .withoutOverwriting)
+        defer { try? FileManager.default.removeItem(at: temporary) }
+        // A hard link publishes the complete record without ever replacing another record.
+        guard Darwin.link(temporary.path, url.path) == 0 else {
+            if errno == EEXIST { throw SkillInstaller.InstallError.destinationConflict }
+            throw SkillInstaller.InstallError.processFailed(String(cString: strerror(errno)))
+        }
     }
 
     @discardableResult
