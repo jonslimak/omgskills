@@ -141,9 +141,9 @@ export function validateDependencyPlatform({ minimumOS, platform }) {
   'Dependency requires a newer or unknown macOS version');
 }
 
-function sourceSnapshot() {
+function sourceSnapshot(extraFiles = []) {
   const files = ['menubar/Package.swift', 'menubar/Package.resolved', 'menubar/Assets/omgskills.icns',
-    'scripts/prepare-newmac-setup-test.mjs', 'scripts/prepare-newmac-setup-test.test.mjs'];
+    'scripts/prepare-newmac-setup-test.mjs', 'scripts/prepare-newmac-setup-test.test.mjs', ...extraFiles];
   return {
     head: run('/usr/bin/git', ['rev-parse', 'HEAD']).trim(),
     worktreeStatus: run('/usr/bin/git', ['status', '--porcelain=v1']),
@@ -165,16 +165,26 @@ export function validateResourceLayout(app) {
 }
 
 export function verifyPackage(app, expectedWebsite, update) {
+  return inspectPackage(app, { executable, requiredSymbols: ['PublicSkillInstallWindowController'],
+    validateMetadata(plist) {
+      validateMetadata(plist);
+      assert.deepEqual(plist, metadata(expectedWebsite, update), 'Packaged settings differ from requested candidate');
+    } });
+}
+
+export function inspectPackage(app, { executable: binaryName, validateMetadata: validate,
+  requiredSymbols = [], forbiddenSymbols = [] }) {
   const contents = join(app, 'Contents');
   const plist = JSON.parse(run('/usr/bin/plutil', ['-convert', 'json', '-o', '-', join(contents, 'Info.plist')]));
-  validateMetadata(plist);
-  assert.deepEqual(plist, metadata(expectedWebsite, update), 'Packaged settings differ from requested candidate');
-  const binary = join(contents, 'MacOS', executable);
+  validate(plist);
+  const binary = join(contents, 'MacOS', binaryName);
   const load = readLoadCommands(run('/usr/bin/otool', ['-l', binary]));
   const architecture = run('/usr/bin/lipo', ['-archs', binary]).trim();
   validateExecutable({ ...load, architectures: architecture });
   assert.ok(lstatSync(binary).mode & 0o111, 'Executable permissions missing');
-  assert.ok(run('/usr/bin/nm', [binary]).includes('PublicSkillInstallWindowController'), 'Candidate installer UI is missing');
+  const symbols = run('/usr/bin/nm', [binary]);
+  for (const symbol of requiredSymbols) assert.ok(symbols.includes(symbol), `Candidate symbol missing: ${symbol}`);
+  for (const symbol of forbiddenSymbols) assert.ok(!symbols.includes(symbol), `Unexpected candidate symbol: ${symbol}`);
   validateResourceLayout(app);
   const entries = inventory(app);
   assert.ok(!entries.some(x => /(?:^|\/)(?:skills\.json|sha-history\.json|.*Tests.*|.*\.xctest)(?:\/|$)/.test(x.path)), 'Catalog/test payload unexpectedly bundled');
@@ -198,24 +208,36 @@ export function verifyPackage(app, expectedWebsite, update) {
 }
 
 export function prepare(website, update) {
+  return assemblePackage({ plist: metadata(website, update), buildArgs,
+    buildDirectory: '.build/setup-test/arm64-apple-macosx/release', outputDirectory: 'setup-test-packages',
+    appName, executable, requiredSymbols: ['PublicSkillInstallWindowController'],
+    validateMetadata(plist) {
+      validateMetadata(plist);
+      assert.deepEqual(plist, metadata(website, update), 'Packaged settings differ from requested candidate');
+    } });
+}
+
+export function assemblePackage({ plist, buildArgs: args, buildDirectory, outputDirectory,
+  appName: bundleName, executable: binaryName, validateMetadata: validate,
+  requiredSymbols = [], forbiddenSymbols = [], sourceFiles = [], additionalLimitations = [] }) {
   if (process.platform !== 'darwin') throw new Error('Assembly requires macOS');
-  const plist = metadata(website, update);
-  const before = sourceSnapshot();
+  validate(plist);
+  const before = sourceSnapshot(sourceFiles);
   const menubar = join(repository, 'menubar');
-  execFileSync('/usr/bin/swift', buildArgs, { cwd: menubar, stdio: ['ignore', 'inherit', 'inherit'] });
-  assert.deepEqual(sourceSnapshot(), before, 'Sources changed during build; stop and rerun');
-  const bin = run('/usr/bin/swift', [...buildArgs, '--show-bin-path'], menubar).trim();
-  const expectedBin = join(menubar, '.build/setup-test/arm64-apple-macosx/release');
+  execFileSync('/usr/bin/swift', args, { cwd: menubar, stdio: ['ignore', 'inherit', 'inherit'] });
+  assert.deepEqual(sourceSnapshot(sourceFiles), before, 'Sources changed during build; stop and rerun');
+  const bin = run('/usr/bin/swift', [...args, '--show-bin-path'], menubar).trim();
+  const expectedBin = join(menubar, buildDirectory);
   assert.equal(realpathSync(bin), expectedBin, 'Unexpected build directory');
-  const outputParent = join(repository, 'menubar/.build/setup-test-packages');
+  const outputParent = join(repository, 'menubar/.build', outputDirectory);
   mkdirSync(outputParent, { recursive: true });
   const output = createOutput(outputParent);
-  const source = { ...before, buildCommand: ['/usr/bin/swift', ...buildArgs], swiftVersion: run('/usr/bin/swift', ['--version']).trim() };
+  const source = { ...before, buildCommand: ['/usr/bin/swift', ...args], swiftVersion: run('/usr/bin/swift', ['--version']).trim() };
   writeFileSync(join(output, 'source-manifest.json'), json(source), { flag: 'wx' });
-  const app = join(output, appName);
+  const app = join(output, bundleName);
   const contents = join(app, 'Contents');
   for (const directory of ['MacOS', 'Resources', 'Frameworks']) mkdirSync(join(contents, directory), { recursive: true });
-  const binary = join(contents, 'MacOS', executable);
+  const binary = join(contents, 'MacOS', binaryName);
   cpSync(join(bin, 'omgskills'), binary, { errorOnExist: true, force: false });
   const buildBinarySHA256 = hash(readFileSync(binary));
   const dependencyInputs = {};
@@ -231,16 +253,18 @@ export function prepare(website, update) {
   const removedRpaths = load.rpaths.filter(path => path.startsWith('/Applications/Xcode') && path.includes('/Toolchains/'));
   for (const path of removedRpaths) run('/usr/bin/install_name_tool', ['-delete_rpath', path, binary]);
   if (!load.rpaths.includes(packagedRpath)) run('/usr/bin/install_name_tool', ['-add_rpath', packagedRpath, binary]);
-  const inspection = verifyPackage(app, website, update);
-  const artifact = { format: 1, stage: 'local-pre-signing-inspection-only', app: appName,
+  const inspection = inspectPackage(app, { executable: binaryName, validateMetadata: validate, requiredSymbols, forbiddenSymbols });
+  const artifact = { format: 1, stage: 'local-pre-signing-inspection-only', app: bundleName, distributable: false,
     ...inspection, buildBinarySHA256, packagedBinarySHA256: hash(readFileSync(binary)), removedRpaths,
     dependencyInputs, sourceManifestSHA256: hash(readFileSync(join(output, 'source-manifest.json'))),
     limitations: ['Not signed by this assembler; compiler/dependency signatures may remain and require signing after packaging.',
       'No notarization, DMG, registration, launch, installation, hosting or fresh-Mac acceptance.',
-      'No runtime proof from package inspection; compiler debug/resource fallback paths are not configured destinations.'] };
+      'No runtime proof from package inspection; compiler debug/resource fallback paths are not configured destinations.',
+      ...additionalLimitations] };
   writeFileSync(join(output, 'artifact-manifest.json'), json(artifact), { flag: 'wx' });
   assert.deepEqual(inventory(app), inspection.entries, 'Package changed during inspection');
   const receipt = { output, app, createdAt: new Date().toISOString(), stage: artifact.stage,
+    distributable: false,
     sourceManifestSHA256: artifact.sourceManifestSHA256,
     artifactManifestSHA256: hash(readFileSync(join(output, 'artifact-manifest.json'))),
     packagedBinarySHA256: artifact.packagedBinarySHA256 };
