@@ -1,0 +1,46 @@
+{
+  "reviewDate": "2026-10-15",
+  "sourceBaseline": "9c201c2d",
+  "testChangesCommitted": false,
+  "receipt": "results.json",
+  "receiptSHA256": "c34c142919d1aef86d254f70126701e352dbdda0a2885e786d3f4dee686765eb",
+  "sourceFiles": [
+    {
+      "path": "menubar/Tests/omgskillsTests/CatalogCompatibilitySupport.swift",
+      "sha256": "9437f26f3e37debf21eaecdb8d46a0de82a7b04d32a47224c8076e7d6e7ecd5e"
+    },
+    {
+      "path": "menubar/Tests/omgskillsTests/CatalogCompatibilityTests.swift",
+      "sha256": "915a4aa1c43313ea59b91cd085edc6aa9740b400f7ba462a48548d08acbde9b8"
+    },
+    {
+      "path": "menubar/Tests/omgskillsTests/Fixtures/catalog-compatibility-sample.json",
+      "sha256": "125c963474a0a4bc6ff3cbf972d6a8a35d2da5fae7e3d5b36fd9f0f11a38cb4d"
+    }
+  ],
+  "liveResult": {
+    "status": "completed-with-unavailable-sources",
+    "newInstallsVerified": 17,
+    "retainedInstallsVerifiedReadOnly": 2,
+    "sourceUnavailable": 1,
+    "untested": 0,
+    "claudeVerified": 10,
+    "codexVerified": 9,
+    "elapsedSeconds": 36.168
+  },
+  "postRunReadOnlyVerification": {
+    "fileSHA256Matches": 426,
+    "provenanceSHA256AndIdentityMatches": 19,
+    "archivedReceiptByteIdentical": true
+  },
+  "review": {
+    "blockingFindings": 0,
+    "productionSourceAndPackageConfigurationChanged": false,
+    "nativeSuitePassed": true,
+    "reportedTests": 463,
+    "reportedSuites": 59,
+    "liveBatchSkippedDuringRegression": true,
+    "whitespaceCheckPassed": true,
+    "scope": "Two test-only Swift files, fixed sample JSON, result evidence; no full-catalog, discovery, setup, shipping-candidate or production qualification."
+  }
+}

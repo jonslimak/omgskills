@@ -1,0 +1,3269 @@
+{
+  "baseline" : "9c201c2d",
+  "boundary" : "Same real installer; isolated homes. No UI, agent discovery, production or release claim.",
+  "cases" : [
+    {
+      "agent" : "codex",
+      "id" : "anthropics\/skills:skills\/frontend-design",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 10174,
+            "mode" : "100644",
+            "path" : "LICENSE.txt",
+            "sha256" : "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+          },
+          {
+            "binary" : false,
+            "bytes" : 9390,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-f1-6Z3PaH\/legacy-repos\/anthropics--skills\/skills\/frontend-design",
+        "provenanceSHA256" : "3407a3e34b0ecb232c65c9acee7db280c60ec3445276d19e33daa561e9092e5a"
+      },
+      "sourceCommit" : "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "status" : "manual-passed-full-files-verified-read-only",
+      "treeSHA" : "d79e2a5bb4df4a386c2adcdd9ab8709bba28c3f6"
+    },
+    {
+      "agent" : "claude",
+      "id" : "blader\/humanizer",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 521,
+            "mode" : "100644",
+            "path" : ".claude-plugin\/marketplace.json",
+            "sha256" : "e539740285b660d2288a38b6d9b237396c6769828c671c46b9f91e760db6cc29"
+          },
+          {
+            "binary" : false,
+            "bytes" : 526,
+            "mode" : "100644",
+            "path" : ".claude-plugin\/plugin.json",
+            "sha256" : "054c0afeeb03c12f01a7f156da949edfdec3a2b756588f5ff4ee7357b0c07f6a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 388,
+            "mode" : "100644",
+            "path" : ".cursor-plugin\/plugin.json",
+            "sha256" : "d1e0b50594cf4bbe57fd164b771b401713a91b76b5a213ebe8f4558bb2036546"
+          },
+          {
+            "binary" : false,
+            "bytes" : 393,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/config.yml",
+            "sha256" : "cb7e95de7606d07654024c8d47916796b307033e23ddb2b0a821a9bf89e999ef"
+          },
+          {
+            "binary" : false,
+            "bytes" : 681,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/new-pattern.yml",
+            "sha256" : "7436d578fa0056a09da5da6da950a03cb49f3ce27cf268ae295eb3d7ca19f604"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1286,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/rewrite-problem.yml",
+            "sha256" : "ecfe5e82c5b6d44683e0cb63cfad117dfdd16e30cc6f03510ef335414eea4947"
+          },
+          {
+            "binary" : false,
+            "bytes" : 815,
+            "mode" : "100644",
+            "path" : ".github\/workflows\/validate.yml",
+            "sha256" : "f2d6a8780fb0b3cf6fa7d2ffccd72d0fc8bee29b4e63ea0fd65924712c9055fd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3439,
+            "mode" : "100644",
+            "path" : "AGENTS.md",
+            "sha256" : "de84a449da400454df1225ddb1ced728c35bf0be7811b239e3370c7dbe1f4e69"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5922,
+            "mode" : "100644",
+            "path" : "CHANGELOG.md",
+            "sha256" : "b3591fe203429f1a6bd2f713c79272e9a8e58a487843d0908d2bbe0700722afa"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1066,
+            "mode" : "100644",
+            "path" : "LICENSE",
+            "sha256" : "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96"
+          },
+          {
+            "binary" : false,
+            "bytes" : 12884,
+            "mode" : "100644",
+            "path" : "README.md",
+            "sha256" : "a07a054f230dca1e3d25e32ba6c808905b743cc6fa56bf8b6868cee0b12a0432"
+          },
+          {
+            "binary" : false,
+            "bytes" : 32348,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "0612f1dfb1672b0ea9b97e139bf1f06cabe98d8b27424fe8ff01e1fb4cc99cad"
+          },
+          {
+            "binary" : false,
+            "bytes" : 201,
+            "mode" : "100644",
+            "path" : "agents\/openai.yaml",
+            "sha256" : "9d87ff83149a04f86a372948b8ee35fa249de20923867bbc2a49304290aad736"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5418,
+            "mode" : "100755",
+            "path" : "scripts\/validate-package.py",
+            "sha256" : "941bd99e52b2ba21449719bb7969607ac8117e3dc173d0c9dfe64fd274c65938"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-f1-6Z3PaH\/managed\/activations\/5f5f967e313a3cd45caf38f11220005ee66c2f9a24c14c2bc3e4ac57b89d1130\/031EA0A0-54BB-4AE9-B04E-F2907712BC30\/content",
+        "provenanceSHA256" : "58bd70d78e526e2e36ec97fd01f2b0ad17705e80305848f275545ab314c13ea9"
+      },
+      "sourceCommit" : "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+      "status" : "manual-passed-full-files-verified-read-only",
+      "treeSHA" : "8ed37b6d1d98a0bbdb599d0399a4a2185eb8fa03"
+    },
+    {
+      "agent" : "claude",
+      "id" : "anthropics\/claude-code:frontend-design",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 9390,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/anthropics--claude-code\/plugins\/frontend-design\/skills\/frontend-design",
+        "provenanceSHA256" : "85583695d53f64ef115f9d8f250b81766178a61b3f507f12baf3cb1b0c7004da"
+      },
+      "sourceCommit" : "94506ff0d3bd9185f1752da36e968775021fb48f",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "28af03c1c2b14d1ebe9ae5e4358a18498cc83b8c"
+    },
+    {
+      "agent" : "codex",
+      "id" : "anthropics\/claude-code:skill-development",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 22827,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "d40080c45d652dd3cc481d1e381cd7e6258091a87351fa1de67c6c8ecec3446e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 11547,
+            "mode" : "100644",
+            "path" : "references\/skill-creator-original.md",
+            "sha256" : "8c0ce23bb87be91f5b0853c2e9815617c3858b63acdddfe5da47d2c2d3a60816"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/anthropics--claude-code\/plugins\/plugin-dev\/skills\/skill-development",
+        "provenanceSHA256" : "eece924715df01c049f5d5901d720ceb209285773386ab7ca21c559d2ba20fb3"
+      },
+      "sourceCommit" : "94506ff0d3bd9185f1752da36e968775021fb48f",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "3dd57083301fd1ba1a4e04967c6fc055c6d740eb"
+    },
+    {
+      "agent" : "claude",
+      "id" : "anthropics\/claude-code:hook-development",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 16246,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "d14528f389cae485ac50583a22be326485c83fc9c8ef7ce700213e1583cf8fbe"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1690,
+            "mode" : "100755",
+            "path" : "examples\/load-context.sh",
+            "sha256" : "0d614599e711c087b381a4ac7ee3c40758af1022669fc998649d199b9dfe15ed"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1304,
+            "mode" : "100755",
+            "path" : "examples\/validate-bash.sh",
+            "sha256" : "348c58f4cf38a2e7080ea5272935a7658c7122d83dd6c52d0a1f2ef599c176ab"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1222,
+            "mode" : "100755",
+            "path" : "examples\/validate-write.sh",
+            "sha256" : "89a8ef9bb7508e4819080e65834d6783afa5a5a614d458a3821b80a329eb32e5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 10148,
+            "mode" : "100644",
+            "path" : "references\/advanced.md",
+            "sha256" : "5b139ceeb6a3ef16555a6eef421e2642e6ca286b5527ee2b4e02c11ae5b75dd5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8299,
+            "mode" : "100644",
+            "path" : "references\/migration.md",
+            "sha256" : "7f8e7a795829837f46a0c058c26c8f5c4aa8be5c9fb5316b828229d1802ded77"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7144,
+            "mode" : "100644",
+            "path" : "references\/patterns.md",
+            "sha256" : "cb607fca192bfa892fd198141b86dac9d0ca2c573a280b054b7beaa56fc9a8bf"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3677,
+            "mode" : "100644",
+            "path" : "scripts\/README.md",
+            "sha256" : "08a28b12ffa9fcb16f257ea685c70a920f4f835978b9ffbbac055137c6f6aca0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4200,
+            "mode" : "100755",
+            "path" : "scripts\/hook-linter.sh",
+            "sha256" : "85a7d55488f8f38f9b98350b5cb597fb306432d5e61eaa3444e7226ca9309e0b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5336,
+            "mode" : "100755",
+            "path" : "scripts\/test-hook.sh",
+            "sha256" : "ded642e811b4731f6a2c90c73b02e00c937511d9ee65236bb8cf9964f0069393"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5081,
+            "mode" : "100755",
+            "path" : "scripts\/validate-hook-schema.sh",
+            "sha256" : "e7785d6c61d368f5ea5270c979753aea02f776f5b6aa220137ec4585abd720c2"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/anthropics--claude-code\/plugins\/plugin-dev\/skills\/hook-development",
+        "provenanceSHA256" : "3c033938100c64f2399f3c7a81a8bdbed069799a0e47c6a545b2efd5f4f435a2"
+      },
+      "sourceCommit" : "94506ff0d3bd9185f1752da36e968775021fb48f",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "9d89f677df7c43ead68cc64e8b9aa2b5bfb2cd0a"
+    },
+    {
+      "agent" : "codex",
+      "id" : "coreyhaines31\/marketingskills:aso-audit",
+      "sourceCommit" : "55ff469422c3592dac45bcad08dfb40221981c02",
+      "sourceUnavailableReason" : "Package path 'skills\/aso-audit' is absent at fetched commit 55ff469422c3592dac45bcad08dfb40221981c02.",
+      "status" : "source-unavailable"
+    },
+    {
+      "agent" : "claude",
+      "id" : "coreyhaines31\/marketingskills:skills\/seo-audit",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 18111,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "bd5f6fca1334fc960d54403f7142e6d9da066eac7eb2b1ae194b7304bcf76d67"
+          },
+          {
+            "binary" : false,
+            "bytes" : 15717,
+            "mode" : "100644",
+            "path" : "evals\/evals.json",
+            "sha256" : "1524e98916ab53abb894fb80827a8d0e1815041adca2ee2023b89916d68f22b2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6528,
+            "mode" : "100644",
+            "path" : "references\/ai-writing-detection.md",
+            "sha256" : "f1e273f56ce7e2215ff218bf903680ddcec0fd026ab90c3ebfb3439ed0edfaa4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 14898,
+            "mode" : "100644",
+            "path" : "references\/international-seo.md",
+            "sha256" : "0603022cca968acf7889fc224221aa0e70955ba64355bc18b06f7e86b32f45e5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4036,
+            "mode" : "100644",
+            "path" : "references\/local-seo-pages-and-measurement.md",
+            "sha256" : "20607ef91c4b8b37346f42130a6f51ed4ce64dc2731b6e1328b5b14f16917fe3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3971,
+            "mode" : "100644",
+            "path" : "references\/local-seo-profile-and-citations.md",
+            "sha256" : "83b1b63eb6083e7aab1f56c4928335ea2a235e837861a9e9e8043b6af162a1f3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7249,
+            "mode" : "100644",
+            "path" : "references\/local-seo.md",
+            "sha256" : "d2666d9c225bc36f9737ce612894abbe7e263b5974e2db7c1efc50f6010bb376"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4466,
+            "mode" : "100644",
+            "path" : "references\/rankings-push.md",
+            "sha256" : "2a51fa3569e00c10353526bfa98ca1faccccf9c37be78f5f229c72116f5d2154"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5533,
+            "mode" : "100644",
+            "path" : "references\/title-tags.md",
+            "sha256" : "c40b3c6af3600ca15670db8eb81000c7ca6fa25265a6550ccc630f53db3fcf51"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/coreyhaines31--marketingskills\/skills\/seo-audit",
+        "provenanceSHA256" : "bee5009b5145ad2635478ff63a92b25c1465334b7a53c5e5e43e9b3ac04c4f0d"
+      },
+      "sourceCommit" : "55ff469422c3592dac45bcad08dfb40221981c02",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "882cc96732fa55143b6edc4751aff297f976c145"
+    },
+    {
+      "agent" : "codex",
+      "id" : "vercel-labs\/agent-skills:skills\/web-design-guidelines",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 1231,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/vercel-labs--agent-skills\/skills\/web-design-guidelines",
+        "provenanceSHA256" : "a3b421051efdbda04846e7fc1f7bcd212c2de1f9a5fa99e4d7a85e7bbbc992ab"
+      },
+      "sourceCommit" : "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "3116f3e62dbd02b44a598b1aa690d2a8938e8f89"
+    },
+    {
+      "agent" : "claude",
+      "id" : "vercel-labs\/ai:ai-sdk",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 5839,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "6bc642319c4ecbf9fbd59cef783b02174d4bd663c010703a6a6b80bda855b32d"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/managed\/activations\/eb4ca5ce99fcd185660afbdc8d8ff334e7a982681aa9a3360d5f8b685efd660e\/D7C06EE0-4444-4912-ADFF-C7D7722BACD1\/content",
+        "provenanceSHA256" : "ae0c7f6f68b81cb3c0208ffe3fcd7a248be816b3f56f0c350e8ad206b0104398"
+      },
+      "sourceCommit" : "5028fa46b4b4e695bf0d80e968db43268e9ec5ef",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "f0a63823ca82c30c6af320e94cbed1d769503196"
+    },
+    {
+      "agent" : "codex",
+      "id" : "vercel-labs\/claude-skills:vercel-composition-patterns",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 22627,
+            "mode" : "100644",
+            "path" : "AGENTS.md",
+            "sha256" : "89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2140,
+            "mode" : "100644",
+            "path" : "README.md",
+            "sha256" : "85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2886,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 530,
+            "mode" : "100644",
+            "path" : "metadata.json",
+            "sha256" : "49262ed5cb4186f31ee980cf8d990be0170c51efed4908d0464a1cff9905bd05"
+          },
+          {
+            "binary" : false,
+            "bytes" : 829,
+            "mode" : "100644",
+            "path" : "rules\/_sections.md",
+            "sha256" : "a174213b87e6911e2b766995a2cbaf8d1534057076e82fb79fe3f0ecb38047df"
+          },
+          {
+            "binary" : false,
+            "bytes" : 329,
+            "mode" : "100644",
+            "path" : "rules\/_template.md",
+            "sha256" : "587f7d16b0660eb61fee4a4d3d7df2b3077d6835de170602c7d6e60bee559131"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2267,
+            "mode" : "100644",
+            "path" : "rules\/architecture-avoid-boolean-props.md",
+            "sha256" : "007555ebb020f4d552582a2c4db194db71a1fd33094012e5187bcfa4f8c392d5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2600,
+            "mode" : "100644",
+            "path" : "rules\/architecture-compound-components.md",
+            "sha256" : "f246af13dc269b521cf20eb8ad99a0cb645beac381c8c9b117262c34612c8457"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1886,
+            "mode" : "100644",
+            "path" : "rules\/patterns-children-over-render-props.md",
+            "sha256" : "7c45a0d21b3c4126a32cba916ee31adeae195386ad1dbbe6634aedb7457aa0ad"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2395,
+            "mode" : "100644",
+            "path" : "rules\/patterns-explicit-variants.md",
+            "sha256" : "8c19e596e61807549d01ce8c6954c6358199f97a8511c0c02c625ec0efda8c0e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 953,
+            "mode" : "100644",
+            "path" : "rules\/react19-no-forwardref.md",
+            "sha256" : "881830adb7534c4b2d70db426556646ad9837f5478f744f35641f635ada22227"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4974,
+            "mode" : "100644",
+            "path" : "rules\/state-context-interface.md",
+            "sha256" : "09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2699,
+            "mode" : "100644",
+            "path" : "rules\/state-decouple-implementation.md",
+            "sha256" : "76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3224,
+            "mode" : "100644",
+            "path" : "rules\/state-lift-state.md",
+            "sha256" : "74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/managed\/activations\/cd3b1f6dc234a1ad1428f9eb97be60f7e18ee40c2320d9e183bca584460bb3f9\/BA9569EF-FFD0-429B-AFCE-7148EE57C85D\/content",
+        "provenanceSHA256" : "679b58c8a4d7c23ecab9796dfcfe62bb075d5ef41de6072d7a90868ef26676de"
+      },
+      "sourceCommit" : "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "bf90d0a4b83ea054653350f9c67f6de235d3a368"
+    },
+    {
+      "agent" : "claude",
+      "id" : "vercel-labs\/deepsec:deepsec",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 161,
+            "mode" : "100644",
+            "path" : ".gitignore",
+            "sha256" : "be02a7350933019a025d9caafb431d1b7c2ce225d0162916737e1ff1123fbe9d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3872,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "92687167489aaf9514f559818956461c96819d18c615b18afeb523789e8db9ef"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4363,
+            "mode" : "100644",
+            "path" : "build.mjs",
+            "sha256" : "8791ee3ddb1e42677fabf0b6ca7a5a1de337339050f6ae9a67276f366a7c3edc"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1827,
+            "mode" : "100644",
+            "path" : "package.json",
+            "sha256" : "168d6478e3b9591a24a6011b4028af9b4f1dddb6e4d0530803066ff18b967c94"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2850,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/agent-config.test.ts",
+            "sha256" : "f32016ab469e60605e0584c052f3f3c6894cd347f37f0ed4dbf0dd15a13d2cd1"
+          },
+          {
+            "binary" : false,
+            "bytes" : 871,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/agent-defaults.test.ts",
+            "sha256" : "68323b8b2a4d68e2422809fa34c9d0bfef048ccee821b92b9b4310210e54c262"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7444,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/credential-brokering.test.ts",
+            "sha256" : "a810b8c26ee604909e58c0fb6e90a3c1707d1c7fd0cc972ac16f96c303dd8039"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4236,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/ensure-connected-workspace.test.ts",
+            "sha256" : "3faa12b91ddd08d1bb90b852eb57fd4e7d5202971cd721f75d6b22e4324b053f"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1209,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/env-file.test.ts",
+            "sha256" : "057c103a08349c2e221e81e7c4741c76de15de17e9773232ed8e5495150030d7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6037,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/file-sources.test.ts",
+            "sha256" : "114d5949f80aea7d9526d3d0d50b59447f5ca816fdee2258dcf8754271fa4479"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1689,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/formatters.test.ts",
+            "sha256" : "c329300d945113e9c909ce7f7fa2f266d1dc80bef968a39e82cdae52e9da4411"
+          },
+          {
+            "binary" : false,
+            "bytes" : 14363,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/merge-records.test.ts",
+            "sha256" : "d8ce05ce4cf68828524c89fc3f6bd255556cb2517a3cded9ba15a942d3dfdebd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2188,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/metrics.test.ts",
+            "sha256" : "0107495cad99683c283c511474a964c2376634a23820429bc7c63172893a1d12"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4403,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/model-picker.test.ts",
+            "sha256" : "23f40c9e67233c68754136d1d045b8f4a4da5235b93db6151715cd0d667ca69b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4463,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/model-route.test.ts",
+            "sha256" : "46b2e7c41f75a69d521b29849609997f2dc720dbffbf98ea175c975fff4e5a31"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8722,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/network-policy.test.ts",
+            "sha256" : "3fef92e9181a632e481006ebff10f970e24600a95d52a9dc0563ee89ebf008a7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2588,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/output-cap.test.ts",
+            "sha256" : "99ba0a6138ebbb3b3339fc5aa3bc1a2a44a95758be403c9532ebded246cc460b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4568,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/pr-comment.test.ts",
+            "sha256" : "47c802a22e0094b3608c26d26fae065bc32f7294dc5cc9dc284f5f967b992787"
+          },
+          {
+            "binary" : false,
+            "bytes" : 18143,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/preflight.test.ts",
+            "sha256" : "474847e35ae85022309d631d62a845cd061c06ce7dd4f1d28fbebecbf1792ad7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1336,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/resolve-agent-type.test.ts",
+            "sha256" : "c380b560781c2f29f5cb781cbf16c989f0352517e6a9031ffc35a20b8725ef6e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1593,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/resolve-project-id.test.ts",
+            "sha256" : "f2346218d5dd46fbbd90fc8e7d9289fa617f87e3d6dd6d98000f52d01f7ef43c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 421,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/sandbox-tools.test.ts",
+            "sha256" : "2046e6882793f4e93031d33e98b3bc655cc23748c9ceafc934b50b28cd633cec"
+          },
+          {
+            "binary" : false,
+            "bytes" : 17025,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-coordinator.test.ts",
+            "sha256" : "03c7e2c00608d6fc02d0fd5fc73475cd0f426c21a99ae375cef1d9bebea913e9"
+          },
+          {
+            "binary" : false,
+            "bytes" : 10675,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-coverage.test.ts",
+            "sha256" : "e40a162c432bfbec4e4eb2da2e48cdee6b823675c651e13c75abce8492051ca0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1813,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-fingerprint.test.ts",
+            "sha256" : "bae3cecb8c0d64597ef61ea30f58956f08f1feb9285a8fffd012e9c99ec8f5a0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1222,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-generated-matchers.test.ts",
+            "sha256" : "de0d6f9f39f4a568f6e3e32a9f3a7eb524005ad8fbc847b5e281af88c530c33d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 945,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-install.test.ts",
+            "sha256" : "7e018f96806e0e1d1c0d68432a7466e983e848a8ddba5dfc666c7110591a2d10"
+          },
+          {
+            "binary" : false,
+            "bytes" : 790,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-interaction.test.ts",
+            "sha256" : "09910fa48949ff87b2852f9f7dd88023e5dcf8c86e29e2da7bceb0ca03ebe545"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1013,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-lock.test.ts",
+            "sha256" : "66bf9b42272469ebba5e2372209e03d65eb060627d060af89ab02dd407b59acf"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2010,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-options.test.ts",
+            "sha256" : "1d06d713e0db6c21f9cae269fdcbd0f1f71e895acbc746d9e0008958f37f4b4c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1354,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-output.test.ts",
+            "sha256" : "e305185e8359cbc4e5af529ef51455ae90fa8358e42b411d1833820347a7e6b6"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3859,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-persisted-route.test.ts",
+            "sha256" : "36c937176dfdf00def6c6ba68a0d4012317c5acf24767568277797118c7e5d5d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1698,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-plan.test.ts",
+            "sha256" : "322548a82ab67203e3be7def176594b7b73bdabcab9be8e763f372e97614ffc5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 624,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-project-name.test.ts",
+            "sha256" : "e35491b7634b6a136a8c97f15da0098c3125fc0edef446811af64f7859723b26"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1810,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-protocol.test.ts",
+            "sha256" : "5c694f45034c93ba623c208341cf4c72d1e668fd6f5c00b2b6ef8fd074519ced"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5460,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-reporter.test.ts",
+            "sha256" : "21ef36d22b1efd28ee3b60debdd9d904eb21b8bdd62163bcc62f48f2917541f0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2421,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-repository-analysis.test.ts",
+            "sha256" : "7966d96a2f4a2c0ff1ecf5699c6ae24886b66dec4cc2204f90819cabfe424766"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1474,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-state.test.ts",
+            "sha256" : "4e200097cf5cc2f04465ea5cc2591db1618db6bcd02240e44ea54b831d9fdffa"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2847,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-tui.test.ts",
+            "sha256" : "a2493aeb9f492efb8d46a081f8d1c11fb00b7895e3a0a72564faa19c8204da9e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1458,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/setup-workspace-config.test.ts",
+            "sha256" : "f80fce6f80b000642793df7ff5551f6ab7a8bd07bddede7a9035d09db13f5b7e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 12417,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/tarball.test.ts",
+            "sha256" : "291a5e9bde148d7e96c1fcb83e76d65f77fc24f5f98d85eebdaf7175d874f047"
+          },
+          {
+            "binary" : false,
+            "bytes" : 10213,
+            "mode" : "100644",
+            "path" : "src\/__tests__\/vercel-link.test.ts",
+            "sha256" : "8da2b22246aafbdabdad0d706923735cec8c0871dff71f2c93700bd664354671"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3357,
+            "mode" : "100644",
+            "path" : "src\/agent-config.ts",
+            "sha256" : "417980443e1342130c6d07d792cca42af7ee240923189cdeeb3226fcf78be439"
+          },
+          {
+            "binary" : false,
+            "bytes" : 648,
+            "mode" : "100644",
+            "path" : "src\/agent-defaults.ts",
+            "sha256" : "e7b3fc11f7e7021f062afbf6955d98aae0a3d017bb148ca96b09b1bfdb97f62a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1060,
+            "mode" : "100644",
+            "path" : "src\/atomic-file.ts",
+            "sha256" : "c34adffc71c8f30d39d67259d0adf312840dcc2d17bd92e7e2a2cc9f3838843e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6602,
+            "mode" : "100644",
+            "path" : "src\/auth\/ensure-connected-workspace.ts",
+            "sha256" : "c5aa759bd5b1f28d430c3e7f6c3c4ce254361531168a5933234f1d1ece8f4776"
+          },
+          {
+            "binary" : false,
+            "bytes" : 10832,
+            "mode" : "100644",
+            "path" : "src\/auth\/model-picker.ts",
+            "sha256" : "f7ceda87e719fad46047534d54c70d1e112c05cf4d81fb73c71309b6a4a09bde"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1718,
+            "mode" : "100644",
+            "path" : "src\/auth\/model-route-prompt.ts",
+            "sha256" : "d94ea2de0b18f0c7b79bdcfd232b294a1ba5bbfd76e8943784d4bbdc48517887"
+          },
+          {
+            "binary" : false,
+            "bytes" : 9763,
+            "mode" : "100644",
+            "path" : "src\/auth\/model-route.ts",
+            "sha256" : "7edebc3c050a8da3ae58dd8a86109c9a4d36a02bcdb221705fbd45e8001c8b2b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 17936,
+            "mode" : "100644",
+            "path" : "src\/auth\/vercel-link.ts",
+            "sha256" : "eafec4fb2f74302086313a967a837619b2230b6d630528a5fd1e932f3e89dc10"
+          },
+          {
+            "binary" : false,
+            "bytes" : 26144,
+            "mode" : "100755",
+            "path" : "src\/cli.ts",
+            "sha256" : "1ff951432a976112e4d6917ab01c5957932b7144bceada4767e3a50bbed27885"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1502,
+            "mode" : "100644",
+            "path" : "src\/commands\/enrich.ts",
+            "sha256" : "e2b09ed3442d1f0e29e6d7714bebed64f8b1882f953f49c36a9beaa79257f524"
+          },
+          {
+            "binary" : false,
+            "bytes" : 19713,
+            "mode" : "100644",
+            "path" : "src\/commands\/export.ts",
+            "sha256" : "f22f3fdeffc950e2767bbb2d4b961f1ae0373dc6ad6a2fd572db4158232725da"
+          },
+          {
+            "binary" : false,
+            "bytes" : 11311,
+            "mode" : "100644",
+            "path" : "src\/commands\/init-project.ts",
+            "sha256" : "d3fe3f34a242952f62f366fef24d24cf2aecb4281b7d038b66ea72e01d8ff2a3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 24363,
+            "mode" : "100644",
+            "path" : "src\/commands\/init.ts",
+            "sha256" : "58839e76f023abfc8a130bd0c56c4cb8f86c1fb0a5226d8a135bf1dc2b1af346"
+          },
+          {
+            "binary" : false,
+            "bytes" : 17060,
+            "mode" : "100644",
+            "path" : "src\/commands\/metrics.ts",
+            "sha256" : "d051a6ba6bee5a3a7264ca0bf342038a62c819e06aa1e2d842af7337d6a80371"
+          },
+          {
+            "binary" : false,
+            "bytes" : 13779,
+            "mode" : "100644",
+            "path" : "src\/commands\/process.ts",
+            "sha256" : "5d9f5c49249c0087d619ce86f15e49bfff7314c1643c10eb6c43cccb75caa564"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7578,
+            "mode" : "100644",
+            "path" : "src\/commands\/report.ts",
+            "sha256" : "19c003b079242a8be5a7637ed9a9c32ca6dec03b8beef8dec44f576c531f3af5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5953,
+            "mode" : "100644",
+            "path" : "src\/commands\/revalidate.ts",
+            "sha256" : "98fe2b48ce295c74901fb216d622b05c070cef5772f3bcbde2e40ef6d1f43bdf"
+          },
+          {
+            "binary" : false,
+            "bytes" : 10077,
+            "mode" : "100644",
+            "path" : "src\/commands\/sandbox-all.ts",
+            "sha256" : "0ed099287d8136b983a40cf89a239f6613029fd018e09ed7f58fcfb70de48b3b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7904,
+            "mode" : "100644",
+            "path" : "src\/commands\/sandbox-process.ts",
+            "sha256" : "ded92634e2fde5e7738efca27ae7e33c2d6207a8bd481158d1433c8fec8c9fb0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 13056,
+            "mode" : "100644",
+            "path" : "src\/commands\/scan.ts",
+            "sha256" : "3b20c1a7d6d5e90d96a595ba50b9df552faad9fe99e27fc638df2985fa732c4b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5820,
+            "mode" : "100644",
+            "path" : "src\/commands\/setup.ts",
+            "sha256" : "420db5ad623c02c95fd69c4cf5909930351cd03b423c0c3f05d75af6ce8fe967"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4895,
+            "mode" : "100644",
+            "path" : "src\/commands\/status.ts",
+            "sha256" : "a73fab171b0c7c26f953073a649fe00bd3aed1383c976bdbbb627b9a305e26cc"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1987,
+            "mode" : "100644",
+            "path" : "src\/commands\/triage.ts",
+            "sha256" : "2b7bb107295f3ea845509893e8415878d2b11a5655017546755ffe1a60a97601"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1297,
+            "mode" : "100644",
+            "path" : "src\/config.ts",
+            "sha256" : "16199b51e47cd9b1d67f60f80f3aaf4653edebe9b11e91f37f197c3ecff38c70"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5953,
+            "mode" : "100644",
+            "path" : "src\/data-commit.ts",
+            "sha256" : "2dd518f677f29fb0c53597b57f9945872c4153a6d60944b1ee09de07e94f52ce"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2373,
+            "mode" : "100644",
+            "path" : "src\/env-file.ts",
+            "sha256" : "4c6e69bbee3059c5cc8a36b66734b2133f6d121fe371db5cc4f1920a85ecc5a0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5094,
+            "mode" : "100644",
+            "path" : "src\/file-sources.ts",
+            "sha256" : "a911f130f3071285cff4cac9ee2dd9927efec846484bc97f2b0df6125503e6d8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1086,
+            "mode" : "100644",
+            "path" : "src\/formatters.ts",
+            "sha256" : "1c3c30b327e75c93a8bc14e886216bbbd9919c93d3b2d9b8119228aadf72a939"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2737,
+            "mode" : "100644",
+            "path" : "src\/load-config.ts",
+            "sha256" : "ae3a40dba55a3dc35657c8990e293992fea60d999b73f4e0c7bf78b0c658e5ae"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2673,
+            "mode" : "100644",
+            "path" : "src\/output-cap.ts",
+            "sha256" : "9f62052cd439fb5e6ef4dbe54f9e1801402a77f6d3f7df9999e90c727b7af728"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4650,
+            "mode" : "100644",
+            "path" : "src\/pr-comment.ts",
+            "sha256" : "79216c4c1394dbb421fba0ce6f3f03f27a19a87480b0959350d1f07329bffabd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 15608,
+            "mode" : "100644",
+            "path" : "src\/preflight.ts",
+            "sha256" : "c8d4e7f432f8a3eecdcbdf34aa81b21316a1fa1c703d589cfdd1ce5f1810b7dd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5784,
+            "mode" : "100644",
+            "path" : "src\/quota-message.ts",
+            "sha256" : "ead6841449eb2aff0b08a066bb82eb14b9c4a6431a0b8c95af585cae7ffa379a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 836,
+            "mode" : "100644",
+            "path" : "src\/require-dir.ts",
+            "sha256" : "a026adda5faab7905880d32588ab17fff286d6e8bd0699a4e1b181ad34754d1e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 467,
+            "mode" : "100644",
+            "path" : "src\/resolve-agent-type.ts",
+            "sha256" : "906103589217e6473abd62d08bd40ce6a1f2a89304f4844da58a352f6795a229"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4696,
+            "mode" : "100644",
+            "path" : "src\/resolve-project-id.ts",
+            "sha256" : "c39ed405a56598c446141f3661c831d41d063f9852771c85c902718adf4f4440"
+          },
+          {
+            "binary" : false,
+            "bytes" : 13774,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/download.ts",
+            "sha256" : "9f7f8e56aca9dc9b7393aa1ddcb879b17c957a342d43dbf2b73941d2715ca1aa"
+          },
+          {
+            "binary" : false,
+            "bytes" : 11494,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/merge-records.ts",
+            "sha256" : "9bfe0e388bcc24c3d97598622522111dc343307632b044eb376737ebeb5332e6"
+          },
+          {
+            "binary" : false,
+            "bytes" : 29999,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/orchestrator.ts",
+            "sha256" : "1217188e9bfe6919a1ab48ccf52980234b167def064e383d60f1294bd517ee55"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5958,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/partitioner.ts",
+            "sha256" : "e08b396ef38708998f939b65d756b233cdea8ad523f28be72cf41e210a7ea88a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3851,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/request-proxy.mjs",
+            "sha256" : "8048d458199020214b8e220106b248d25b7ff3cddbf725f0621f488e84f782cd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 38134,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/setup.ts",
+            "sha256" : "89fb75e749a512c5d132d72f0dcd41fbf257cc4dcc94db0a6a2ae11eb2282ad2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1645,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/shutdown.ts",
+            "sha256" : "b565a5ec2aedcd17dd47d94ecf4e8914b47cc7efc770164e5300564856a00904"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2175,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/state.ts",
+            "sha256" : "e5971c11edbe9e1ae4b59dbada1c21aa1861c077a8f9fa2714c85d6aa7aafc46"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3083,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/types.ts",
+            "sha256" : "50b677c55698a3b1d6b2389dd83a5c5d452adac09bce97380174b90939e52c33"
+          },
+          {
+            "binary" : false,
+            "bytes" : 12006,
+            "mode" : "100644",
+            "path" : "src\/sandbox\/upload.ts",
+            "sha256" : "84b8333e18d8d9e9f3d1f30f54fbe99029b42c687be4397ad195785491df36cb"
+          },
+          {
+            "binary" : false,
+            "bytes" : 33715,
+            "mode" : "100644",
+            "path" : "src\/setup\/coordinator.ts",
+            "sha256" : "b3a54fb4c303e31a8f1bda9159f6ad3bcf2a8fccae5543e88c7ff8e99902e3d3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 20052,
+            "mode" : "100644",
+            "path" : "src\/setup\/coverage.ts",
+            "sha256" : "4e75aa2143a22a388c460d061d89e886c96de3bd7e3d18f2a589695e6e28d16f"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2183,
+            "mode" : "100644",
+            "path" : "src\/setup\/fingerprint.ts",
+            "sha256" : "94656358d5e5b4bbdfb49924c5c5f99fcefde2455aed0ebe35c5c1fea20a62f4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4510,
+            "mode" : "100644",
+            "path" : "src\/setup\/generated-matchers.ts",
+            "sha256" : "101cfae0cc2fa43fc9dea55cc009ce9ee1a90afe1a76a4543b9bec58ff606af8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5791,
+            "mode" : "100644",
+            "path" : "src\/setup\/install.ts",
+            "sha256" : "2c0b6ef2c510bc01c7a193346c933ddd468e03f23ec07ed3db404df8128f9b60"
+          },
+          {
+            "binary" : false,
+            "bytes" : 415,
+            "mode" : "100644",
+            "path" : "src\/setup\/interaction.ts",
+            "sha256" : "4d214939d398cf743f59deced5c95fadf1adc67cd3d1d341c0265b7d9ce0ddf2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1887,
+            "mode" : "100644",
+            "path" : "src\/setup\/lock.ts",
+            "sha256" : "6d7a7dd1e89fa1f6eb82ba784e68307049e6b769db6d5299f346f1479fb348e8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1810,
+            "mode" : "100644",
+            "path" : "src\/setup\/options.ts",
+            "sha256" : "950f59bff6b4d4c989b4faea36d99db2d34153ebb78b84141056eaed93f59f97"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1917,
+            "mode" : "100644",
+            "path" : "src\/setup\/output.ts",
+            "sha256" : "41b787f72de735227fbda125d8ccebad91b41db09224dc2bf7ccc87db096c0bd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1765,
+            "mode" : "100644",
+            "path" : "src\/setup\/persisted-route.ts",
+            "sha256" : "c650b03e7204b15612b2ad23be144e717914a759bb069103976553a5a0f1dbbd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6053,
+            "mode" : "100644",
+            "path" : "src\/setup\/plan.ts",
+            "sha256" : "29f540f436b376daa54dfa7a234aa5a6c708c38d3bb04558db421df49f512093"
+          },
+          {
+            "binary" : false,
+            "bytes" : 534,
+            "mode" : "100644",
+            "path" : "src\/setup\/project-name.ts",
+            "sha256" : "43000e412d834daa377b6a17e9454dafecc4824642f623ad383b2aef61157bb2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5382,
+            "mode" : "100644",
+            "path" : "src\/setup\/protocol.ts",
+            "sha256" : "cf2bdedf394119e99170f2b1ee4e28abf05f33f4d7763f216b2f0e4bf66ee47b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 14948,
+            "mode" : "100644",
+            "path" : "src\/setup\/reporter.ts",
+            "sha256" : "e5865f604234f3e863e8529dcc248202cba29952b52becf47b84a23311004ba3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8380,
+            "mode" : "100644",
+            "path" : "src\/setup\/repository-analysis.ts",
+            "sha256" : "7daf387398fa0bfe7d651a05c817060bab31a1a9acf772ec0c9522ed27a9bd53"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4888,
+            "mode" : "100644",
+            "path" : "src\/setup\/state.ts",
+            "sha256" : "794ffbfbb42d5bd3d028c8c21eaf066a241b7e395b1c2eb64c735a2d4b2fdd47"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2718,
+            "mode" : "100644",
+            "path" : "src\/setup\/status.ts",
+            "sha256" : "ba77fb053b4c646cf53a60ee1b5cbc8da7dfaef83d78be2b1eee15003c1b4e0e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 10652,
+            "mode" : "100644",
+            "path" : "src\/setup\/tui.tsx",
+            "sha256" : "b7b583fb119042e398c8a8c2cca473859120ba9d877d5d745db8abce40a74674"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4173,
+            "mode" : "100644",
+            "path" : "src\/setup\/workspace-config.ts",
+            "sha256" : "bccbe7c686aba76b13383651894561112178b7154bd15ff0145142ff4335fc0b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2639,
+            "mode" : "100644",
+            "path" : "src\/version.ts",
+            "sha256" : "3f3174737577369b3a949c90d81c1de63ba678ab3604e4038279acd43b9e6b04"
+          },
+          {
+            "binary" : false,
+            "bytes" : 532,
+            "mode" : "100644",
+            "path" : "tsconfig.dts.json",
+            "sha256" : "de1bbeac08cd08846cdbe4d7cf7f8912aa662b70239cc7f530dda1691f8adfb2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 159,
+            "mode" : "100644",
+            "path" : "tsconfig.json",
+            "sha256" : "53c0d7ef21c30ff6005eb4957266511ad318a9909725a67060bf01233da2e49c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 158,
+            "mode" : "100644",
+            "path" : "vitest.config.ts",
+            "sha256" : "0f3a6619567b5b72234f39e0dd95ed70819679ad6727bcb03ff69f90f1ecdb97"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/managed\/activations\/ba67db71d75a99c547b90b4469ae01e4c68dc4817176c0d81363cad040c73e69\/12AFD680-117D-4A27-961B-DE0EC6760E29\/content",
+        "provenanceSHA256" : "9638572a64152c89e98c52aa666389a85c9b45f4524fe452e8272449e8056bdc"
+      },
+      "sourceCommit" : "4fa67220aff67ac93dfc840206d3d32bfa4411ec",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "1b695ae3784045a0ebc03ad1973e7ca3db700d3a"
+    },
+    {
+      "agent" : "codex",
+      "id" : "anthropics\/skills:docx",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 1467,
+            "mode" : "100644",
+            "path" : "LICENSE.txt",
+            "sha256" : "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6911,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "8017469ea95fb7d28225c62daf8e2f3492a7b516fc64c18c28977cbf8980b7fe"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1,
+            "mode" : "100755",
+            "path" : "scripts\/__init__.py",
+            "sha256" : "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4051,
+            "mode" : "100755",
+            "path" : "scripts\/accept_changes.py",
+            "sha256" : "0c991d2bc7304a1248e9f3bf9b1498f0b6e76641fc457e7cbd73c99b4eef3a74"
+          },
+          {
+            "binary" : false,
+            "bytes" : 14054,
+            "mode" : "100755",
+            "path" : "scripts\/comment.py",
+            "sha256" : "37d116e5f56bb142b208c6c6a4bbcf960495abf470ddb7c6675ccfac864ba3d7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 9398,
+            "mode" : "100755",
+            "path" : "scripts\/merge_runs.py",
+            "sha256" : "3ab367fd7fba4647943d0aa5e65203b15458551410f5ffc821d902616a4b9f40"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3358,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/__init__.py",
+            "sha256" : "678e42456d9e10923c8b9a93691cdd993de3433448a184fa72a0c31f4ae086d5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5862,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/pptx_chart.py",
+            "sha256" : "47ac266f7d39d11ede6bb0d1f3a19d801394fd2964636f1b48beb701f1832964"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1675,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/pptx_slide.py",
+            "sha256" : "7b9f69b4a5bd6a2d9eabf9e0e3e796d7a421373145f6a8cd11f60b7ba2d6a5d0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3510,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/pptx_theme.py",
+            "sha256" : "ebb54c56e9c13807f5f98f0cae22d47cdd0162da8525eaa664e3f2c8c8d6bb03"
+          },
+          {
+            "binary" : false,
+            "bytes" : 74984,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-chart.xsd",
+            "sha256" : "41b93bd8857cc68b1e43be2806a872d736a9bdd6566900062d8fdb57d7bbb354"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6956,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-chartDrawing.xsd",
+            "sha256" : "3fd0586f2637b98bb9886f0e0b67d89e1cc987c2d158cc7deb5f5b9890ced412"
+          },
+          {
+            "binary" : false,
+            "bytes" : 51302,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-diagram.xsd",
+            "sha256" : "29b254ee0d10414a8504b5a08149c7baec35a60d5ff607d6b3f492aa36815f40"
+          },
+          {
+            "binary" : false,
+            "bytes" : 624,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-lockedCanvas.xsd",
+            "sha256" : "5cb76dabd8b97d1e9308a1700b90c20139be4d50792d21a7f09789f5cccd6026"
+          },
+          {
+            "binary" : false,
+            "bytes" : 152039,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-main.xsd",
+            "sha256" : "5375417f0f5394b8dd1a7035b9679151f19a6b65df309dec10cfb4a420cb00e9"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1231,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-picture.xsd",
+            "sha256" : "5d389d42befbebd91945d620242347caecd3367f9a3a7cf8d97949507ae1f53c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8862,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-spreadsheetDrawing.xsd",
+            "sha256" : "b4532b6d258832953fbb3ee4c711f4fe25d3faf46a10644b2505f17010d01e88"
+          },
+          {
+            "binary" : false,
+            "bytes" : 14795,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-wordprocessingDrawing.xsd",
+            "sha256" : "bdad416b096b61d37b71603b2c949484f9070c830bdaeba93bf35e15c8900614"
+          },
+          {
+            "binary" : false,
+            "bytes" : 83612,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/pml.xsd",
+            "sha256" : "d173c3e5d61e42e2e3a97226c632fd2ab7cc481fc4e492365b87024ab546daff"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1269,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-additionalCharacteristics.xsd",
+            "sha256" : "3c6709101c6aaa82888df5d8795c33f9e857196790eb320d9194e64be2b6bdd8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7328,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-bibliography.xsd",
+            "sha256" : "0b364451dc36a48dd6dae0f3b6ada05fd9b71e5208211f8ee5537d7e51a587e2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6382,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-commonSimpleTypes.xsd",
+            "sha256" : "e2abacbb9a55ce1365f8961bc1b1395bbc811e512b111000d8c333f98458dece"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1248,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-customXmlDataProperties.xsd",
+            "sha256" : "0ef4bb354ff44b923564c4ddbdda5987919d220225129ec94614a618ceafc281"
+          },
+          {
+            "binary" : false,
+            "bytes" : 880,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-customXmlSchemaProperties.xsd",
+            "sha256" : "0d103b99a4a8652f8871552a69d42d2a3760ac6a5e3ef02d979c4273257ff6a4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2608,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-documentPropertiesCustom.xsd",
+            "sha256" : "9c085407751b9061c1f996f6c39ce58451be22a8d334f09175f0e89e42736285"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3507,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-documentPropertiesExtended.xsd",
+            "sha256" : "bc92e36ccd233722d4c5869bec71ddc7b12e2df56059942cce5a39065cc9c368"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7507,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-documentPropertiesVariantTypes.xsd",
+            "sha256" : "7b5b7413e2c895b1e148e82e292a117d53c7ec65b0696c992edca57b61b4a74b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 23313,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-math.xsd",
+            "sha256" : "3213ef1631606250f5010b42cad7ef716f7c59426367798e33c374c0ec391d3a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1367,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-relationshipReference.xsd",
+            "sha256" : "12264f3c03d738311cd9237d212f1c07479e70f0cbe1ae725d29b36539aef637"
+          },
+          {
+            "binary" : false,
+            "bytes" : 242277,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/sml.xsd",
+            "sha256" : "beffeed56945c22a77440122c8bdc426f3fcbe7f3b12ea0976c770d1f8d54578"
+          },
+          {
+            "binary" : false,
+            "bytes" : 26148,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-main.xsd",
+            "sha256" : "f5ee623b08b6a66935e5aced2f5d8ad0fc71bf9e8e833cd490150c0fa94b8763"
+          },
+          {
+            "binary" : false,
+            "bytes" : 25279,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-officeDrawing.xsd",
+            "sha256" : "585bedc1313b40888dcc544cb74cd939a105ee674f3b1d3aa1cc6d34f70ff155"
+          },
+          {
+            "binary" : false,
+            "bytes" : 535,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-presentationDrawing.xsd",
+            "sha256" : "133c9f64a5c5d573b78d0a474122b22506d8eadb5e063f67cdbbb8fa2f161d0e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5712,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-spreadsheetDrawing.xsd",
+            "sha256" : "6bdeb169c3717eb01108853bd9fc5a3750fb1fa5b82abbdd854d49855a40f519"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4010,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-wordprocessingDrawing.xsd",
+            "sha256" : "475dcae1e7d1ea46232db6f8481040c15e53a52a3c256831d3df204212b0e831"
+          },
+          {
+            "binary" : false,
+            "bytes" : 171367,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/wml.xsd",
+            "sha256" : "c2dd9f61f892deae6acd8d20771ea79b12018af25f3bf8d06639c8542d218cfd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4646,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/xml.xsd",
+            "sha256" : "a539aa2fb154fa50e0f5cc97e6ad7cbc66f8ec3e3746f61ec6a8b0d5d15ecdf2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1963,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-contentTypes.xsd",
+            "sha256" : "9e0b7209fc69ab11987900404540969976000c5ebe4d4f58c43dc3842886bf3a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2515,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-coreProperties.xsd",
+            "sha256" : "451958454e8588dfc7cd945981ada142ca06ff3307937f5700df059c2b307fa8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2856,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-digSig.xsd",
+            "sha256" : "6de111e11403f7cd49027400755bae0ea1cabef2815f09bd40a24f0017613b24"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1344,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-relationships.xsd",
+            "sha256" : "f565adfef5a502044abc3a9153e157edc25af78304d335994afb958874b15e26"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3127,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/mce\/mc.xsd",
+            "sha256" : "3a37e461ecf5a8670fdec34029703401f8728ab9c96ec1739a6ae58d55212413"
+          },
+          {
+            "binary" : false,
+            "bytes" : 26549,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-2010.xsd",
+            "sha256" : "568b26ee156cb9549aa439ca2158965f77b7c1602b7e0316f40ac6cf586e35f2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3745,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-2012.xsd",
+            "sha256" : "0fa75578a000439a7988ba0c59fdc69f774bbd416cbacc14d07125b3f686cb74"
+          },
+          {
+            "binary" : false,
+            "bytes" : 901,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-2018.xsd",
+            "sha256" : "be0ff793a22dd31384650c3a4da14c2fa8062751c2e97b0e5ee852bda13c60ad"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1778,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-cex-2018.xsd",
+            "sha256" : "fddc2b880cabb9005aebbc7e783e53c19fec1c03df7d0e2f2076a33a0fdfd081"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1002,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-cid-2016.xsd",
+            "sha256" : "127ca209fa73d7cb708449cb355c871867948a96e4a74f7bf5811ef62d17991d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 600,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-sdtdatahash-2020.xsd",
+            "sha256" : "842e7163409c8d74f4d7088a8bc99500d80bc75332681a0980055b08f374a604"
+          },
+          {
+            "binary" : false,
+            "bytes" : 745,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-symex-2015.xsd",
+            "sha256" : "16f6f8072249f431370723c2cd8974672e0d9c897e00e97dd918079df934871b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5927,
+            "mode" : "100644",
+            "path" : "scripts\/office\/soffice.py",
+            "sha256" : "df2c8d7249c132a4512d744482e4b5ed0ecbe885f0bcfb1295e7e6a7ced0432c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6142,
+            "mode" : "100755",
+            "path" : "scripts\/office\/validate.py",
+            "sha256" : "346a4c89d92fff55e610f11efda48c30228815b29bdb10b987e48f7af70acf1e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 336,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/__init__.py",
+            "sha256" : "83e0f035c5abea238d3f2c3968afbd511ed022b527b7c9cb60a9434cc34ff987"
+          },
+          {
+            "binary" : false,
+            "bytes" : 33756,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/base.py",
+            "sha256" : "f818ea28c793ba42960fa4498265e2632a62c86f7b5d6aff6fa89dacc02d59ea"
+          },
+          {
+            "binary" : false,
+            "bytes" : 17482,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/docx.py",
+            "sha256" : "93d3444c0ef3f043d21a2285c46d2cda478426b930dc33dcf3b11265935517b5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 15966,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/pptx.py",
+            "sha256" : "17eadad2b7a8374ccbe4cda45693bcd6a36f9d61a7d60f9c9ceef9464dec8299"
+          },
+          {
+            "binary" : false,
+            "bytes" : 11231,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/redlining.py",
+            "sha256" : "ed50d0885eee4b9c387f546b059bcaed64086815880a5167336244f93e305123"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2603,
+            "mode" : "100644",
+            "path" : "scripts\/templates\/comments.xml",
+            "sha256" : "a08ba83ee8790ac9e3dc61921f4988f19edd7e06ac09d6f1897a877c1581818d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2611,
+            "mode" : "100644",
+            "path" : "scripts\/templates\/commentsExtended.xml",
+            "sha256" : "544eeecfeceed4b468fff163cd9c366d33641c8b8ab691ce002576197846afe8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2707,
+            "mode" : "100644",
+            "path" : "scripts\/templates\/commentsExtensible.xml",
+            "sha256" : "bad10b3283e6ad6e7ef6d1ca5169683721ed690ee331282c65df04017e080631"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2619,
+            "mode" : "100644",
+            "path" : "scripts\/templates\/commentsIds.xml",
+            "sha256" : "db20f9616e004ec42ef736e80c2384e45db0f8d1194d31dc8b37c7d6ecdd6420"
+          },
+          {
+            "binary" : false,
+            "bytes" : 115,
+            "mode" : "100644",
+            "path" : "scripts\/templates\/people.xml",
+            "sha256" : "056f63aa1197fd8c9dda980c9f1b9ff016fd5fa4a462df8aec5f384f39d23e37"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/anthropics--skills\/skills\/docx",
+        "provenanceSHA256" : "f62f605d07fb3398e150185e85276778b6815c759eeaaedd14ecec37eb1da55a"
+      },
+      "sourceCommit" : "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "6e6f5b95c1de6e803cc07b214f5059b074d64e0c"
+    },
+    {
+      "agent" : "claude",
+      "id" : "anthropics\/skills:canvas-design",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 11345,
+            "mode" : "100644",
+            "path" : "LICENSE.txt",
+            "sha256" : "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+          },
+          {
+            "binary" : false,
+            "bytes" : 11939,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "a1f288079624402f30682753c1d43920b6664785698d21d3e7aa197450a6448b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4373,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/ArsenalSC-OFL.txt",
+            "sha256" : "8ddd61b18ba2c0d0dbe4a691cf5f1a0673f473d02fa0546e67ee88c006aeff6e"
+          },
+          {
+            "binary" : true,
+            "bytes" : 165848,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/ArsenalSC-Regular.ttf",
+            "sha256" : "65e6f89df58f68fd905b3add34a79dd6106aa3b3044df0dad9676fff53d504b9"
+          },
+          {
+            "binary" : true,
+            "bytes" : 94528,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/BigShoulders-Bold.ttf",
+            "sha256" : "b43bcd198b9fdf717dd42aa61a34dba32e01aceaeae659d689afd0ca52c37ea2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4397,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/BigShoulders-OFL.txt",
+            "sha256" : "fbc746aabf0eb1847dfd92e2efc4596d79fa897d60b8e64062a22f585508fb3f"
+          },
+          {
+            "binary" : true,
+            "bytes" : 94396,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/BigShoulders-Regular.ttf",
+            "sha256" : "18a879fc71978a4447150705caf880a9da3860083c259fd29e6dc03057b6842a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4390,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Boldonse-OFL.txt",
+            "sha256" : "45cc82ab4032273c0924025ffcf8f0665a68e1a5955e3f7247e5daf1deeb1326"
+          },
+          {
+            "binary" : true,
+            "bytes" : 77168,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Boldonse-Regular.ttf",
+            "sha256" : "cc2e540604565c0f90a7d8d46194a2f42fc9c45512cd2e39bf03b50eb68c35a4"
+          },
+          {
+            "binary" : true,
+            "bytes" : 90952,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/BricolageGrotesque-Bold.ttf",
+            "sha256" : "a737b146fe0d77ffe8a86e3cd16700dd431d3b1e420d4fd80e142cd68a1cb50d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4403,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/BricolageGrotesque-OFL.txt",
+            "sha256" : "0e4f4eb8534bc66a76aca13dd19c1f9731b2008866b29ccff182b764649df9b4"
+          },
+          {
+            "binary" : true,
+            "bytes" : 90920,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/BricolageGrotesque-Regular.ttf",
+            "sha256" : "972a6d098c9867ae131d0ea99e221e63976b11a19d4b931c2c7ace525674e4f6"
+          },
+          {
+            "binary" : true,
+            "bytes" : 107352,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/CrimsonPro-Bold.ttf",
+            "sha256" : "48f191e38355c8db100eb3ce157c20f9302a3b9a37b44a660f77ecfce3986609"
+          },
+          {
+            "binary" : true,
+            "bytes" : 108828,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/CrimsonPro-Italic.ttf",
+            "sha256" : "52318db3526b644e6efa60be0b3ca5a50e40fbe8bd026c261e0aa206f0772267"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4394,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/CrimsonPro-OFL.txt",
+            "sha256" : "35680d14547b6748b6f362a052a46d22764ce5eccf96e18b74f567bb2ee58114"
+          },
+          {
+            "binary" : true,
+            "bytes" : 106696,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/CrimsonPro-Regular.ttf",
+            "sha256" : "48fad08cb1917a7b2f2c6fe5135d6c07743a6663cf7631ec4481108aaf081422"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4392,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/DMMono-OFL.txt",
+            "sha256" : "bfe7842fcb88323e2981e24710c25202677385a8c75fb6a87217b275a0247ae3"
+          },
+          {
+            "binary" : true,
+            "bytes" : 48852,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/DMMono-Regular.ttf",
+            "sha256" : "f98ada968dc3b6b2c08d3f5caaf266977df0bfe0929372b93df5a06cf2ace450"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4410,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/EricaOne-OFL.txt",
+            "sha256" : "e0de629968b52255548d5fafcf30b24ff9edae0eda362380755a75816404d0fa"
+          },
+          {
+            "binary" : true,
+            "bytes" : 24872,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/EricaOne-Regular.ttf",
+            "sha256" : "db1d89e80e33a8a01beaaac7a85df582857d24a43f1e181461aa7ff5d701476a"
+          },
+          {
+            "binary" : true,
+            "bytes" : 78304,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/GeistMono-Bold.ttf",
+            "sha256" : "75c0828d5c1ee44b9ef9f4df577bf41595ec362e2ea3f1e558590c9e92c7949d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4388,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/GeistMono-OFL.txt",
+            "sha256" : "6a873c900f584109b13ae0aaf81d6e3cf0a68751a216b03f7b6c68d547057bb4"
+          },
+          {
+            "binary" : true,
+            "bytes" : 78232,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/GeistMono-Regular.ttf",
+            "sha256" : "a55c1b51cda4afeab9e471e7947b85a20f7c8831d7e6b1470c1b7fbdc0f0f15e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4381,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Gloock-OFL.txt",
+            "sha256" : "c0a3f3125ac491ef3d1f09f401be4834c646562f647e44f2bcbc49f0466c656d"
+          },
+          {
+            "binary" : true,
+            "bytes" : 95156,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Gloock-Regular.ttf",
+            "sha256" : "e86b4ce66dbd3f1f83eee8db99ec96e0da1128c3f53df0e9b3b7472025dfe960"
+          },
+          {
+            "binary" : true,
+            "bytes" : 136008,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/IBMPlexMono-Bold.ttf",
+            "sha256" : "dbd2a2fb024579438d6400a84e57579bfd2dbe67c306c8fd9fde92a61e4f2eea"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4363,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/IBMPlexMono-OFL.txt",
+            "sha256" : "5294ce778857e1eb02e830b6ab06435537d38f43055327e73d03a2d4d57d5123"
+          },
+          {
+            "binary" : true,
+            "bytes" : 133796,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/IBMPlexMono-Regular.ttf",
+            "sha256" : "ab08018ccd276b79fb2c636bb95b9c543598f9d50505fe92506fcb4dae7810cd"
+          },
+          {
+            "binary" : true,
+            "bytes" : 161000,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/IBMPlexSerif-Bold.ttf",
+            "sha256" : "b8d294e9b5c5a0940f167c3ced0f7ef2e3f57082ca3ff096ef30e86e26c1c159"
+          },
+          {
+            "binary" : true,
+            "bytes" : 169840,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/IBMPlexSerif-BoldItalic.ttf",
+            "sha256" : "da64b75f4284f53e7b5c71fa190a35b8bf3494fe19f1804c81c3a53340bca570"
+          },
+          {
+            "binary" : true,
+            "bytes" : 170004,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/IBMPlexSerif-Italic.ttf",
+            "sha256" : "b11f1048745e715a55c9d837b3f10226ca3d78867b7db7251ddad8f98dcf0f38"
+          },
+          {
+            "binary" : true,
+            "bytes" : 160380,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/IBMPlexSerif-Regular.ttf",
+            "sha256" : "77cd233a2af8dc6b1022faea3bb3b01f3c75af68bcf530cb6aeb15982ff3dbb7"
+          },
+          {
+            "binary" : true,
+            "bytes" : 68084,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/InstrumentSans-Bold.ttf",
+            "sha256" : "444f85bf1c4b0e1ce1ca624f6be54bcd832207714ccaf4ea99ee531341683bdf"
+          },
+          {
+            "binary" : true,
+            "bytes" : 70004,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/InstrumentSans-BoldItalic.ttf",
+            "sha256" : "3762f6cef95d6039489ad5ba5787d4c30f17a1ad01e9ac3c816ed69692722a68"
+          },
+          {
+            "binary" : true,
+            "bytes" : 69900,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/InstrumentSans-Italic.ttf",
+            "sha256" : "78e85858e371b2cb4e18f617c10f0f937c0e12a0887ffee98555b24ed305b3a7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4403,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/InstrumentSans-OFL.txt",
+            "sha256" : "bf4dc6d13a8cccd4807133c77a1ee9619a16b92cb23322258725ab6731c2f6e5"
+          },
+          {
+            "binary" : true,
+            "bytes" : 68028,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/InstrumentSans-Regular.ttf",
+            "sha256" : "a22cb26e48fd79bcb01bf2fc92d36785474dce36d9c544ab0a8868c2657c4a87"
+          },
+          {
+            "binary" : true,
+            "bytes" : 70868,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/InstrumentSerif-Italic.ttf",
+            "sha256" : "9c86e4d5a47b50224a2463a9eca8535835257c8e85c470c2c6b454b1af6f046e"
+          },
+          {
+            "binary" : true,
+            "bytes" : 69312,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/InstrumentSerif-Regular.ttf",
+            "sha256" : "56ac3be03ac3ba283196b3e77850ab2ffcf56cfb6fd3212c5620109a972f8c99"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4394,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Italiana-OFL.txt",
+            "sha256" : "8373b11312ace78c4cec2e8f9f6aa9f2330601107dac7bcf899c6f2dbd40c5a5"
+          },
+          {
+            "binary" : true,
+            "bytes" : 27184,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Italiana-Regular.ttf",
+            "sha256" : "15c4dd6ab8cf4a29ba8826f65edcbe2f6c266c557d34d081f25072dfd5605fd2"
+          },
+          {
+            "binary" : true,
+            "bytes" : 114828,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/JetBrainsMono-Bold.ttf",
+            "sha256" : "a2349098b9e45419e7bf0e2958d6c4937a049dded37387b08be725be4c7615f3"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4399,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/JetBrainsMono-OFL.txt",
+            "sha256" : "a76abf002c49097d146e86740a3105a5d00450b1592e820a1109a8c5680cd697"
+          },
+          {
+            "binary" : true,
+            "bytes" : 114904,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/JetBrainsMono-Regular.ttf",
+            "sha256" : "b6b1ff4ddefe36d7f2a6174e1d001cab374e594519ee9049af028d577b64c5f5"
+          },
+          {
+            "binary" : true,
+            "bytes" : 154308,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Jura-Light.ttf",
+            "sha256" : "c891a381df056b2c4dfe85841e911bf45da0890fa21a7b2692cbe5ea1f505e1e"
+          },
+          {
+            "binary" : true,
+            "bytes" : 154488,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Jura-Medium.ttf",
+            "sha256" : "c72965cb732a92872643819fd1734128238583cc36b116313859137a51d3368a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4380,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Jura-OFL.txt",
+            "sha256" : "eaf9bdb675f6d87e5feb88199ab3ea581d3bd2082f426e384fa9c394576d7260"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4449,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/LibreBaskerville-OFL.txt",
+            "sha256" : "55959eef5b0c3b2e3c1c7631b8ff0f9447d75de20f29cfa7db5bcfb026763343"
+          },
+          {
+            "binary" : true,
+            "bytes" : 147584,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/LibreBaskerville-Regular.ttf",
+            "sha256" : "2101302538d9e88adb679031c04623e4578b5745e89566284fd2c508d79acae0"
+          },
+          {
+            "binary" : true,
+            "bytes" : 133828,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Lora-Bold.ttf",
+            "sha256" : "7d74015e950c2fb66519c7295b8155621d22200ae2ca2a4c6b43ce3c490cac87"
+          },
+          {
+            "binary" : true,
+            "bytes" : 140332,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Lora-BoldItalic.ttf",
+            "sha256" : "152f87e71f5ddb60d5c57ecd9132807c947e65c42977193c9164e7c5a6690081"
+          },
+          {
+            "binary" : true,
+            "bytes" : 139328,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Lora-Italic.ttf",
+            "sha256" : "be627e595184e8afe521f08da0607eee613f1997d423bc8dadc5798995581377"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4423,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Lora-OFL.txt",
+            "sha256" : "62e37a82d3f1ef2a70712885fa8b3144b65fd144d8e748d6196b690a354d792c"
+          },
+          {
+            "binary" : true,
+            "bytes" : 133888,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Lora-Regular.ttf",
+            "sha256" : "7ed00e7c9cdf16ab7e2fd2361fe45d4f0b61263cd60aae398b27b7ee08108827"
+          },
+          {
+            "binary" : true,
+            "bytes" : 79208,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/NationalPark-Bold.ttf",
+            "sha256" : "69ac4c301c4a7233c6e602d12a92c54d7967b575f4449951c45ce773f7acff53"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4399,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/NationalPark-OFL.txt",
+            "sha256" : "81c6c71d83b5b45d7344f96df12bb4a2477a5b092a9144757ee1d0f50f855175"
+          },
+          {
+            "binary" : true,
+            "bytes" : 76424,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/NationalPark-Regular.ttf",
+            "sha256" : "a477338b7e18308d476650dfe31235ef86a883572665e56ffb5fb80f82009b58"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4363,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/NothingYouCouldDo-OFL.txt",
+            "sha256" : "7c2a6970584ddad04919816163746f83b378078015899b18468b40f05e9ce128"
+          },
+          {
+            "binary" : true,
+            "bytes" : 32020,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/NothingYouCouldDo-Regular.ttf",
+            "sha256" : "d866f985896d3280f4fce72db7e17302c24a0c1fdb0699b6b5ed3af14f944d57"
+          },
+          {
+            "binary" : true,
+            "bytes" : 55392,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Outfit-Bold.ttf",
+            "sha256" : "6654b93d21301ec61887d3cedd6c11d9df1b1dfb63f9cf45ac7995f6e2235ab1"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4389,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Outfit-OFL.txt",
+            "sha256" : "1945b62cd76da9a3051a1660dde72afaa64ffc2666d30e7a78356d651653ba2f"
+          },
+          {
+            "binary" : true,
+            "bytes" : 54912,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Outfit-Regular.ttf",
+            "sha256" : "f24945365147c9e783e91d8649959b59be6b00c9ee4ecd2f6b33afbb2dd871fe"
+          },
+          {
+            "binary" : true,
+            "bytes" : 51072,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/PixelifySans-Medium.ttf",
+            "sha256" : "38397504f71c122b03d234ea6f55118e3d5bdbddffd82bedddbd7755d3b3be82"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4395,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/PixelifySans-OFL.txt",
+            "sha256" : "7f54d1d9f1ae1ba9f2722f978145f90324fea34ca3c2304b3a29cfa96ac6037e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4366,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/PoiretOne-OFL.txt",
+            "sha256" : "2eaf541f7eb8b512e4c757a5212060abf5b6edfef230e9d7640bf736b315c33a"
+          },
+          {
+            "binary" : true,
+            "bytes" : 45244,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/PoiretOne-Regular.ttf",
+            "sha256" : "9cf265b139648b36b6c0afdfeb0bf27f7e66db9a16094bc40f644d8da05bc318"
+          },
+          {
+            "binary" : true,
+            "bytes" : 34420,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/RedHatMono-Bold.ttf",
+            "sha256" : "7ef48353f4be5ddb90f000f6fad48f2b62b3e8c27d9818d8d45ff46c201065e0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4394,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/RedHatMono-OFL.txt",
+            "sha256" : "435fbfb7e66988b2a06686a4cb966faec733f35d8fe100a1601573c27f3e0bb8"
+          },
+          {
+            "binary" : true,
+            "bytes" : 34488,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/RedHatMono-Regular.ttf",
+            "sha256" : "452fe826871b37539f5212b20c87cf30f82f58dd2741f1c96edd1dcbdc0db6b4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4394,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Silkscreen-OFL.txt",
+            "sha256" : "6b849745119bbe85ec01fd080c9cd50234da9f52ac6e48b55d1a424a0c4d7ca9"
+          },
+          {
+            "binary" : true,
+            "bytes" : 31960,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Silkscreen-Regular.ttf",
+            "sha256" : "49567408600809e25147e9225ac4f37f410e2df45a750696c45027531fb65f1b"
+          },
+          {
+            "binary" : true,
+            "bytes" : 59704,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/SmoochSans-Medium.ttf",
+            "sha256" : "dd76e6e77cce82f827a8654cd906e9ce58f3aaf78adda63c4a7f655b8ecb41f0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4396,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/SmoochSans-OFL.txt",
+            "sha256" : "74c9c4eb88e891483e1b7bc54780b452cbf4f4df66d4e71881d7569aa2130749"
+          },
+          {
+            "binary" : true,
+            "bytes" : 76248,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Tektur-Medium.ttf",
+            "sha256" : "52bbe8c9b057b3d2da4eeace31a524b1ea26a1375ae34319cf6900ccc57a4c82"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4385,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Tektur-OFL.txt",
+            "sha256" : "3f1466cb5438f31782eeb6e895f3a655bc4d090e24263e331f555357d1cb734e"
+          },
+          {
+            "binary" : true,
+            "bytes" : 75604,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/Tektur-Regular.ttf",
+            "sha256" : "162e1b36c4718c5b051b36c971ad7e50d341944f35618f480422ebbe72988f98"
+          },
+          {
+            "binary" : true,
+            "bytes" : 191304,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/WorkSans-Bold.ttf",
+            "sha256" : "240d125fc9f8561363dc1ea3f513501253bd70942f41468f48f0b0cafb0c82e2"
+          },
+          {
+            "binary" : true,
+            "bytes" : 175772,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/WorkSans-BoldItalic.ttf",
+            "sha256" : "a5b2cad813df0aaa7d16621f2e93b5117c25e9bc788bc9a3ad218e9d6348ce34"
+          },
+          {
+            "binary" : true,
+            "bytes" : 174280,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/WorkSans-Italic.ttf",
+            "sha256" : "6b7f7002e0b0c8b261fe878658ef5551e3e59d9f6b609b04efb90dde1e2c1ada"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4397,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/WorkSans-OFL.txt",
+            "sha256" : "ace8c22a3326318b54e67c3691857929634205533f454a70ef5a3473ddb2e2ba"
+          },
+          {
+            "binary" : true,
+            "bytes" : 188916,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/WorkSans-Regular.ttf",
+            "sha256" : "e67985a843df0d3cdee51a3d0f329eb1774a344ad9ff0c9ab923751f1577e2a4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4398,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/YoungSerif-OFL.txt",
+            "sha256" : "cdcb8039606b40a027a6d24586ec62d5fe29c701343d82a048c829cb28a3dd28"
+          },
+          {
+            "binary" : true,
+            "bytes" : 105136,
+            "mode" : "100644",
+            "path" : "canvas-fonts\/YoungSerif-Regular.ttf",
+            "sha256" : "f8dc08f77abad753a00670af70756a8ace938e5c3f0b770f4f4c2071c4bd8fc6"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/anthropics--skills\/skills\/canvas-design",
+        "provenanceSHA256" : "ab92046ebf609e8200d42af377173e8a422bbad83b8f91719b797e6fa6e79f71"
+      },
+      "sourceCommit" : "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "95095faaee2ea943e85a5d1d562fde06841e835e"
+    },
+    {
+      "agent" : "codex",
+      "id" : "anthropics\/skills:pptx",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 1467,
+            "mode" : "100644",
+            "path" : "LICENSE.txt",
+            "sha256" : "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa"
+          },
+          {
+            "binary" : false,
+            "bytes" : 20796,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "a7ff03e2c85b636f55232a6b1555f5dd90216b7a1a359ab289d8364e6acbc6a0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 0,
+            "mode" : "100644",
+            "path" : "scripts\/__init__.py",
+            "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "binary" : false,
+            "bytes" : 14537,
+            "mode" : "100755",
+            "path" : "scripts\/add_slide.py",
+            "sha256" : "3922f819ee1f6b8bdc6aa146d1a86de70640f5f919321fe3f01a764482ff69c9"
+          },
+          {
+            "binary" : false,
+            "bytes" : 10415,
+            "mode" : "100755",
+            "path" : "scripts\/clean.py",
+            "sha256" : "5c808cd4dff7e02661ef3c68b5917f4e25097cc6610c92a3a7df4a6366a5c3c1"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3358,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/__init__.py",
+            "sha256" : "678e42456d9e10923c8b9a93691cdd993de3433448a184fa72a0c31f4ae086d5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5862,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/pptx_chart.py",
+            "sha256" : "47ac266f7d39d11ede6bb0d1f3a19d801394fd2964636f1b48beb701f1832964"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1675,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/pptx_slide.py",
+            "sha256" : "7b9f69b4a5bd6a2d9eabf9e0e3e796d7a421373145f6a8cd11f60b7ba2d6a5d0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3510,
+            "mode" : "100644",
+            "path" : "scripts\/office\/helpers\/pptx_theme.py",
+            "sha256" : "ebb54c56e9c13807f5f98f0cae22d47cdd0162da8525eaa664e3f2c8c8d6bb03"
+          },
+          {
+            "binary" : false,
+            "bytes" : 74984,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-chart.xsd",
+            "sha256" : "41b93bd8857cc68b1e43be2806a872d736a9bdd6566900062d8fdb57d7bbb354"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6956,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-chartDrawing.xsd",
+            "sha256" : "3fd0586f2637b98bb9886f0e0b67d89e1cc987c2d158cc7deb5f5b9890ced412"
+          },
+          {
+            "binary" : false,
+            "bytes" : 51302,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-diagram.xsd",
+            "sha256" : "29b254ee0d10414a8504b5a08149c7baec35a60d5ff607d6b3f492aa36815f40"
+          },
+          {
+            "binary" : false,
+            "bytes" : 624,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-lockedCanvas.xsd",
+            "sha256" : "5cb76dabd8b97d1e9308a1700b90c20139be4d50792d21a7f09789f5cccd6026"
+          },
+          {
+            "binary" : false,
+            "bytes" : 152039,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-main.xsd",
+            "sha256" : "5375417f0f5394b8dd1a7035b9679151f19a6b65df309dec10cfb4a420cb00e9"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1231,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-picture.xsd",
+            "sha256" : "5d389d42befbebd91945d620242347caecd3367f9a3a7cf8d97949507ae1f53c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8862,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-spreadsheetDrawing.xsd",
+            "sha256" : "b4532b6d258832953fbb3ee4c711f4fe25d3faf46a10644b2505f17010d01e88"
+          },
+          {
+            "binary" : false,
+            "bytes" : 14795,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/dml-wordprocessingDrawing.xsd",
+            "sha256" : "bdad416b096b61d37b71603b2c949484f9070c830bdaeba93bf35e15c8900614"
+          },
+          {
+            "binary" : false,
+            "bytes" : 83612,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/pml.xsd",
+            "sha256" : "d173c3e5d61e42e2e3a97226c632fd2ab7cc481fc4e492365b87024ab546daff"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1269,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-additionalCharacteristics.xsd",
+            "sha256" : "3c6709101c6aaa82888df5d8795c33f9e857196790eb320d9194e64be2b6bdd8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7328,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-bibliography.xsd",
+            "sha256" : "0b364451dc36a48dd6dae0f3b6ada05fd9b71e5208211f8ee5537d7e51a587e2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6382,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-commonSimpleTypes.xsd",
+            "sha256" : "e2abacbb9a55ce1365f8961bc1b1395bbc811e512b111000d8c333f98458dece"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1248,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-customXmlDataProperties.xsd",
+            "sha256" : "0ef4bb354ff44b923564c4ddbdda5987919d220225129ec94614a618ceafc281"
+          },
+          {
+            "binary" : false,
+            "bytes" : 880,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-customXmlSchemaProperties.xsd",
+            "sha256" : "0d103b99a4a8652f8871552a69d42d2a3760ac6a5e3ef02d979c4273257ff6a4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2608,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-documentPropertiesCustom.xsd",
+            "sha256" : "9c085407751b9061c1f996f6c39ce58451be22a8d334f09175f0e89e42736285"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3507,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-documentPropertiesExtended.xsd",
+            "sha256" : "bc92e36ccd233722d4c5869bec71ddc7b12e2df56059942cce5a39065cc9c368"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7507,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-documentPropertiesVariantTypes.xsd",
+            "sha256" : "7b5b7413e2c895b1e148e82e292a117d53c7ec65b0696c992edca57b61b4a74b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 23313,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-math.xsd",
+            "sha256" : "3213ef1631606250f5010b42cad7ef716f7c59426367798e33c374c0ec391d3a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1367,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/shared-relationshipReference.xsd",
+            "sha256" : "12264f3c03d738311cd9237d212f1c07479e70f0cbe1ae725d29b36539aef637"
+          },
+          {
+            "binary" : false,
+            "bytes" : 242277,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/sml.xsd",
+            "sha256" : "beffeed56945c22a77440122c8bdc426f3fcbe7f3b12ea0976c770d1f8d54578"
+          },
+          {
+            "binary" : false,
+            "bytes" : 26148,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-main.xsd",
+            "sha256" : "f5ee623b08b6a66935e5aced2f5d8ad0fc71bf9e8e833cd490150c0fa94b8763"
+          },
+          {
+            "binary" : false,
+            "bytes" : 25279,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-officeDrawing.xsd",
+            "sha256" : "585bedc1313b40888dcc544cb74cd939a105ee674f3b1d3aa1cc6d34f70ff155"
+          },
+          {
+            "binary" : false,
+            "bytes" : 535,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-presentationDrawing.xsd",
+            "sha256" : "133c9f64a5c5d573b78d0a474122b22506d8eadb5e063f67cdbbb8fa2f161d0e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5712,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-spreadsheetDrawing.xsd",
+            "sha256" : "6bdeb169c3717eb01108853bd9fc5a3750fb1fa5b82abbdd854d49855a40f519"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4010,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/vml-wordprocessingDrawing.xsd",
+            "sha256" : "475dcae1e7d1ea46232db6f8481040c15e53a52a3c256831d3df204212b0e831"
+          },
+          {
+            "binary" : false,
+            "bytes" : 171367,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/wml.xsd",
+            "sha256" : "c2dd9f61f892deae6acd8d20771ea79b12018af25f3bf8d06639c8542d218cfd"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4646,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ISO-IEC29500-4_2016\/xml.xsd",
+            "sha256" : "a539aa2fb154fa50e0f5cc97e6ad7cbc66f8ec3e3746f61ec6a8b0d5d15ecdf2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1963,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-contentTypes.xsd",
+            "sha256" : "9e0b7209fc69ab11987900404540969976000c5ebe4d4f58c43dc3842886bf3a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2515,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-coreProperties.xsd",
+            "sha256" : "451958454e8588dfc7cd945981ada142ca06ff3307937f5700df059c2b307fa8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2856,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-digSig.xsd",
+            "sha256" : "6de111e11403f7cd49027400755bae0ea1cabef2815f09bd40a24f0017613b24"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1344,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/ecma\/fouth-edition\/opc-relationships.xsd",
+            "sha256" : "f565adfef5a502044abc3a9153e157edc25af78304d335994afb958874b15e26"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3127,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/mce\/mc.xsd",
+            "sha256" : "3a37e461ecf5a8670fdec34029703401f8728ab9c96ec1739a6ae58d55212413"
+          },
+          {
+            "binary" : false,
+            "bytes" : 26549,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-2010.xsd",
+            "sha256" : "568b26ee156cb9549aa439ca2158965f77b7c1602b7e0316f40ac6cf586e35f2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3745,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-2012.xsd",
+            "sha256" : "0fa75578a000439a7988ba0c59fdc69f774bbd416cbacc14d07125b3f686cb74"
+          },
+          {
+            "binary" : false,
+            "bytes" : 901,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-2018.xsd",
+            "sha256" : "be0ff793a22dd31384650c3a4da14c2fa8062751c2e97b0e5ee852bda13c60ad"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1778,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-cex-2018.xsd",
+            "sha256" : "fddc2b880cabb9005aebbc7e783e53c19fec1c03df7d0e2f2076a33a0fdfd081"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1002,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-cid-2016.xsd",
+            "sha256" : "127ca209fa73d7cb708449cb355c871867948a96e4a74f7bf5811ef62d17991d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 600,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-sdtdatahash-2020.xsd",
+            "sha256" : "842e7163409c8d74f4d7088a8bc99500d80bc75332681a0980055b08f374a604"
+          },
+          {
+            "binary" : false,
+            "bytes" : 745,
+            "mode" : "100644",
+            "path" : "scripts\/office\/schemas\/microsoft\/wml-symex-2015.xsd",
+            "sha256" : "16f6f8072249f431370723c2cd8974672e0d9c897e00e97dd918079df934871b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5927,
+            "mode" : "100644",
+            "path" : "scripts\/office\/soffice.py",
+            "sha256" : "df2c8d7249c132a4512d744482e4b5ed0ecbe885f0bcfb1295e7e6a7ced0432c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6142,
+            "mode" : "100755",
+            "path" : "scripts\/office\/validate.py",
+            "sha256" : "346a4c89d92fff55e610f11efda48c30228815b29bdb10b987e48f7af70acf1e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 336,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/__init__.py",
+            "sha256" : "83e0f035c5abea238d3f2c3968afbd511ed022b527b7c9cb60a9434cc34ff987"
+          },
+          {
+            "binary" : false,
+            "bytes" : 33756,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/base.py",
+            "sha256" : "f818ea28c793ba42960fa4498265e2632a62c86f7b5d6aff6fa89dacc02d59ea"
+          },
+          {
+            "binary" : false,
+            "bytes" : 17482,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/docx.py",
+            "sha256" : "93d3444c0ef3f043d21a2285c46d2cda478426b930dc33dcf3b11265935517b5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 15966,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/pptx.py",
+            "sha256" : "17eadad2b7a8374ccbe4cda45693bcd6a36f9d61a7d60f9c9ceef9464dec8299"
+          },
+          {
+            "binary" : false,
+            "bytes" : 11231,
+            "mode" : "100644",
+            "path" : "scripts\/office\/validators\/redlining.py",
+            "sha256" : "ed50d0885eee4b9c387f546b059bcaed64086815880a5167336244f93e305123"
+          },
+          {
+            "binary" : false,
+            "bytes" : 9802,
+            "mode" : "100755",
+            "path" : "scripts\/thumbnail.py",
+            "sha256" : "94ef83a84346aa2d63913de0d42bb2fe902ccdc17bfac6130096ca758381793c"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/managed\/activations\/ecac07d79590a1413c977d1e2e94664bef781b9c5a08d344620cc527fde28198\/12E39B36-42DD-4B65-998C-CD24CAAD748E\/content",
+        "provenanceSHA256" : "53840d22a278fd051f938680b3c0e789eed94460bfb98f5808767628ae05f56b"
+      },
+      "sourceCommit" : "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "64529c8b3f35fe632b7256bd2f6d46e4b40160ce"
+    },
+    {
+      "agent" : "claude",
+      "id" : "openai\/skills:pdf",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 10776,
+            "mode" : "100644",
+            "path" : "LICENSE.txt",
+            "sha256" : "4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2517,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "d108cf2b36355ab37eb5962933f4d09785ec002f3105c506129320209306b9d2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 219,
+            "mode" : "100644",
+            "path" : "agents\/openai.yaml",
+            "sha256" : "f8b223e25343559f57e1839ccd849fd1494a9729da33da04bb5074b7f80f4887"
+          },
+          {
+            "binary" : true,
+            "bytes" : 1312,
+            "mode" : "100644",
+            "path" : "assets\/pdf.png",
+            "sha256" : "17da356d195d4e3fa24f9becbee6b8d9e60e13005762b5ab0809c520c76da6ee"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/managed\/activations\/e88a2b38f7f22d8478dcedc107334893b2b3cc8fc01dfb6d803b98a5abe747d6\/66799400-1D6A-4CB7-B65C-5E14748AD8C5\/content",
+        "provenanceSHA256" : "b281dfaf7f3d81b95aff515eb31d25d8b4fe8f90d4b1a7333091f32008273d7f"
+      },
+      "sourceCommit" : "49f948faa9258a0c61caceaf225e179651397431",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "4cffaac4541278a5b142f9773e8a83ccbabc9231"
+    },
+    {
+      "agent" : "codex",
+      "id" : "microsoft\/skills:.github\/plugins\/azure-sdk-dotnet\/skills\/azure-ai-openai-dotnet",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 13485,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "bc1147d6376fa147d04dc218a2b65062d03880502fccda146d26c5d7e951b16b"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/microsoft--skills\/.github\/plugins\/azure-sdk-dotnet\/skills\/azure-ai-openai-dotnet",
+        "provenanceSHA256" : "cfc0d47d11a6094027d9b602c8a6f67042fdd53aa6133c9411351bcb3c5862c2"
+      },
+      "sourceCommit" : "d2f769fd9d7ee81b4d768301bcd2eae14ddcfd0a",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "38bd23798e46c5c010737ecabfcf2bc8d8033d9a"
+    },
+    {
+      "agent" : "claude",
+      "id" : "anthropics\/claude-agent-sdk-python:verify",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 3690,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "f499a4e88c29144d6faf08eda62ff46035f99a8d29766ee504c0a6e1fe1edf09"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/managed\/activations\/a3c42acab4fab48c7bfd3950b4f0e5d7f11144f85c4965741092bab129a78408\/321D4E7A-722D-4489-8E81-20C9B8BC2118\/content",
+        "provenanceSHA256" : "1dd564b5bcf88b6c43e6706be92a71948f5d847219518b37b46a8d0dc7b0489c"
+      },
+      "sourceCommit" : "9c69ce7aced5cdf2aa1ac86fe62e877b4962de8b",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "dd651e01df3b14f7e15ac05d110c20bcbffc7789"
+    },
+    {
+      "agent" : "codex",
+      "id" : "obra\/superpowers:systematic-debugging",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 4257,
+            "mode" : "100644",
+            "path" : "CREATION-LOG.md",
+            "sha256" : "c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789"
+          },
+          {
+            "binary" : false,
+            "bytes" : 9465,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "808fc5717aa88ad65efff312b11c186294d3e6ee301afb584e2f86599b137787"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5054,
+            "mode" : "100644",
+            "path" : "condition-based-waiting-example.ts",
+            "sha256" : "40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3516,
+            "mode" : "100644",
+            "path" : "condition-based-waiting.md",
+            "sha256" : "e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3650,
+            "mode" : "100644",
+            "path" : "defense-in-depth.md",
+            "sha256" : "1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1986,
+            "mode" : "100755",
+            "path" : "find-polluter.sh",
+            "sha256" : "dd7b8f13c4cc2a24b33ff87b18da9248f3e1c80a085c3316224f69ff0fa5c43c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5321,
+            "mode" : "100644",
+            "path" : "root-cause-tracing.md",
+            "sha256" : "75b933b6a8c40bdb2031b10f21654395b56ec6ab6bc7b018c18d3fe57aeb7fb8"
+          },
+          {
+            "binary" : false,
+            "bytes" : 653,
+            "mode" : "100644",
+            "path" : "test-academic.md",
+            "sha256" : "fe2ba480d78ac0d686dc025f41c2a32a43d642bf533f91b0c6053a04d35d6486"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1900,
+            "mode" : "100644",
+            "path" : "test-pressure-1.md",
+            "sha256" : "0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2283,
+            "mode" : "100644",
+            "path" : "test-pressure-2.md",
+            "sha256" : "b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2692,
+            "mode" : "100644",
+            "path" : "test-pressure-3.md",
+            "sha256" : "96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/managed\/activations\/23fd680dcc1d0777e19ebdee761caacc29cfac6571372e07b582138667471995\/5E081D0B-025C-4FB5-9750-EC0558DB00FD\/content",
+        "provenanceSHA256" : "fd7399b4417ff847dd677bb8005111452d723a3d88960ea441e49b901c282c42"
+      },
+      "sourceCommit" : "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "9a48dfda84bf339cba4b03fd803ba0dca2e158e3"
+    },
+    {
+      "agent" : "claude",
+      "id" : "hardikpandya\/stop-slop:stop-slop",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 895,
+            "mode" : "100644",
+            "path" : "CHANGELOG.md",
+            "sha256" : "fe2f1484ef02abf22efc09def89bac186a2235831fd0da13d4895edb19cc6dd0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1070,
+            "mode" : "100644",
+            "path" : "LICENSE",
+            "sha256" : "2e2b2beaf41cc0ce28485455a62aed81777cdcdf68702e142427aef1cd720f2c"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1894,
+            "mode" : "100644",
+            "path" : "README.md",
+            "sha256" : "d5c699e712e62d286aa4314e6b4ba02cde7a9da36ce56102660f98d1a8ceebba"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2629,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "7432a1d9ebdd42b27666da8458af252edf549f723fb14bcd4791425103930310"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1686,
+            "mode" : "100644",
+            "path" : "references\/examples.md",
+            "sha256" : "49c592899eb4457f95d0767e15e3143569e2cef50f2927c3174e62432984cd3d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2915,
+            "mode" : "100644",
+            "path" : "references\/phrases.md",
+            "sha256" : "4ca1b7e97123b5c67eff3dc97e5e977332e0b24021265c1553888a93ec33fa93"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5255,
+            "mode" : "100644",
+            "path" : "references\/structures.md",
+            "sha256" : "ffbf1316c7fb5aaf552de005609a64a9639b546ecd76bfb0e482864d5bbe6f58"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/hardikpandya--stop-slop",
+        "provenanceSHA256" : "7330b5cf97a171a14ecb03e4b037af186bea8979db555ca214c549ed581b2c53"
+      },
+      "sourceCommit" : "8da1f030185bdfe8471220585162991eaeb970e9",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "ad0fbeffcd18b385764221d4de1ba3f1a3abaf2b"
+    },
+    {
+      "agent" : "codex",
+      "id" : "browser-use\/video-use",
+      "snapshot" : {
+        "files" : [
+          {
+            "binary" : false,
+            "bytes" : 20,
+            "mode" : "100644",
+            "path" : ".env.example",
+            "sha256" : "269c7c4459e673f2d063d361995fa4b814075fed239ff909098cc188a67e95dc"
+          },
+          {
+            "binary" : false,
+            "bytes" : 790,
+            "mode" : "100644",
+            "path" : ".gitignore",
+            "sha256" : "8210cce3716bb9bf0912105c2295e91154f43381719ce1084f5ad3e5c852ca6e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 1068,
+            "mode" : "100644",
+            "path" : "LICENSE",
+            "sha256" : "5afa3d97bf1e6f998d587fa101e3fe0d0c416840b7fe77bcd6ae97690a334631"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5632,
+            "mode" : "100644",
+            "path" : "README.md",
+            "sha256" : "9b309e879f776f7e5c7520f097253aef3a9214a299fea5bba69e0513d52011e9"
+          },
+          {
+            "binary" : false,
+            "bytes" : 26098,
+            "mode" : "100644",
+            "path" : "SKILL.md",
+            "sha256" : "d3bbeb19bc0e81e197d74806fba15e0a5f5694a0cdf33f0a2348bffe8472a27b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 13244,
+            "mode" : "100644",
+            "path" : "helpers\/grade.py",
+            "sha256" : "f5df58e81f31c95a621ffba5973fd866f6662fc481a36ebd37a2e68eb81220c2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7207,
+            "mode" : "100644",
+            "path" : "helpers\/pack_transcripts.py",
+            "sha256" : "f9e419def5f0a014d5e1fd16fdad801013ae068854c1d474c3492297e2304f4b"
+          },
+          {
+            "binary" : false,
+            "bytes" : 29462,
+            "mode" : "100644",
+            "path" : "helpers\/render.py",
+            "sha256" : "6bbde45ad5929c7c94fa068996f81e0c44b55a9c9dedcf716fc24c071a5c8dd7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 13748,
+            "mode" : "100644",
+            "path" : "helpers\/timeline_view.py",
+            "sha256" : "69aee88e4204f86127740cca9de6a6eaa75a558df1bb07745dd62f69a3c2e9cf"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8027,
+            "mode" : "100644",
+            "path" : "helpers\/transcribe.py",
+            "sha256" : "5b61a5f92db9baf6e7f7f3ee88d0afaed8485e5f7b537a38e90f87ce8c76e58a"
+          },
+          {
+            "binary" : false,
+            "bytes" : 3970,
+            "mode" : "100644",
+            "path" : "helpers\/transcribe_batch.py",
+            "sha256" : "fcb240f1f2fc422df01d09c2a53335e0b61fa110aac924f9c479c685a52882a1"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7739,
+            "mode" : "100644",
+            "path" : "install.md",
+            "sha256" : "9a78c92932864a728cfe80700d1a6bd5a4c4b4cf2d3f4694f3fd53b49fc93394"
+          },
+          {
+            "binary" : false,
+            "bytes" : 19975,
+            "mode" : "100644",
+            "path" : "poster.html",
+            "sha256" : "9fdded774997b1a502084be4a31ed62d56ad5f0249c939bf6a030da30ac56656"
+          },
+          {
+            "binary" : false,
+            "bytes" : 450,
+            "mode" : "100644",
+            "path" : "pyproject.toml",
+            "sha256" : "4b27fdf0275016a5427416ee9a939ed5c8a756af02427394478d416b0909632d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 886,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/README.md",
+            "sha256" : "a30f3ec6105d5b23bc5ec28e8e2809e9ceed49f1fd816570d5b5656d0aa65819"
+          },
+          {
+            "binary" : false,
+            "bytes" : 11983,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/SKILL.md",
+            "sha256" : "478ff04a7e3ecf9157b14fc2c24b4ae3fef7460debf27c4ecbe361bf26b0ac29"
+          },
+          {
+            "binary" : false,
+            "bytes" : 7205,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/animation-design-thinking.md",
+            "sha256" : "87812340f4756f5e2cc653e6e13ec922562a58483bcd66a5317c19ace5e08220"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8836,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/animations.md",
+            "sha256" : "e00bf77a8e17bf457b7669175ac5dc9ffa68e93d35b3f092036a6077892ba51d"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4132,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/camera-and-3d.md",
+            "sha256" : "36a17d79a0d7b9b11b8e645417f10ebcd2e051228c06867611a3271db7f28ad4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5006,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/decorations.md",
+            "sha256" : "dfd7bd79a57a0b1860aae5a5d6d282b1b517445457db4d4493519d77c0f568de"
+          },
+          {
+            "binary" : false,
+            "bytes" : 6086,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/equations.md",
+            "sha256" : "7408d2688b497f423770e33408d883d54e293a1ba3abb892ebb799a698b50e38"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4628,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/graphs-and-data.md",
+            "sha256" : "347847bc60f1e5f00ab8ad0f81deede00e8c702b3e1d13a22358e358f370be12"
+          },
+          {
+            "binary" : false,
+            "bytes" : 9739,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/mobjects.md",
+            "sha256" : "771421e463b526dcc4e2593ae327358ef26919f698c48ee4e32cc7749d32dcda"
+          },
+          {
+            "binary" : false,
+            "bytes" : 9333,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/paper-explainer.md",
+            "sha256" : "ab67495a01e60f2c45afded7c3c80a4e4501c841a562d1a6d305cc74787a4fc4"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5904,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/production-quality.md",
+            "sha256" : "d9f41d3c58396a94750e6d7c56c9fe5aaa0d067679df059adbe472ceab87d9c0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5375,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/rendering.md",
+            "sha256" : "8a326d4081d658018fccb8ee4df34be6a945b40466f08f4675924f98649c6ac2"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2751,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/scene-planning.md",
+            "sha256" : "c54a8cf6cf864ff5a60d4569e4e285f0fca88e40f3cbff1350b70b099af319e0"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4319,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/troubleshooting.md",
+            "sha256" : "7ee9880cf32ab2b4e1eeaa289464f211e96e9510004635ade59ee6660a4909df"
+          },
+          {
+            "binary" : false,
+            "bytes" : 8500,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/updaters-and-trackers.md",
+            "sha256" : "96c024dce576750a917277e0f4e09135fa7be25ea7e9248b702d36533b22dae5"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4762,
+            "mode" : "100644",
+            "path" : "skills\/manim-video\/references\/visual-design.md",
+            "sha256" : "6703a312d9e35820a84140343b5c484050874ff19daf5c72789fa00cc1644c99"
+          },
+          {
+            "binary" : false,
+            "bytes" : 921,
+            "mode" : "100755",
+            "path" : "skills\/manim-video\/scripts\/setup.sh",
+            "sha256" : "e7563c458764c1b369c26f874cf94acbe43db8f9a3b1e0d9d735230f5d895bae"
+          },
+          {
+            "binary" : false,
+            "bytes" : 12329,
+            "mode" : "100644",
+            "path" : "static\/timeline-view.svg",
+            "sha256" : "edfbf16f698028ef60ecb29225365e73bb1d55c2c9a49fe17aead275e69722d8"
+          },
+          {
+            "binary" : true,
+            "bytes" : 511869,
+            "mode" : "100644",
+            "path" : "static\/video-use-banner.png",
+            "sha256" : "a22497efc42640c79b921030e430d61f8f4a6005d83475cadeeb877320a76eb7"
+          },
+          {
+            "binary" : false,
+            "bytes" : 4339,
+            "mode" : "100644",
+            "path" : "tests\/test_render_captions.py",
+            "sha256" : "a527dbd468e84727d2f0b419b9a56a0b18d391a0f6b5182aad2d1f77b767214e"
+          },
+          {
+            "binary" : false,
+            "bytes" : 5347,
+            "mode" : "100644",
+            "path" : "tests\/test_render_fps.py",
+            "sha256" : "16704cebba3a34371fdcac2bed079a0012c609e0373694beb81444ecb30a12dc"
+          },
+          {
+            "binary" : false,
+            "bytes" : 2313,
+            "mode" : "100644",
+            "path" : "tests\/test_render_orientation.py",
+            "sha256" : "9bdd7c473b28bd79d009057fd3cb6767b441b2e4cc47f3d63932c975a93c7912"
+          }
+        ],
+        "link" : "\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD\/legacy-repos\/browser-use--video-use",
+        "provenanceSHA256" : "ef036835a1b94885fc82b40924be201b158268e00bba7a10f8168e0c23daa879"
+      },
+      "sourceCommit" : "43cfc566833548093455c9d4a46bd69913b7e552",
+      "status" : "installed-full-files-verified",
+      "treeSHA" : "72c956a5b74269d548e4a922768ba72e5e5853d4"
+    }
+  ],
+  "createdAt" : "2026-10-15T14:56:35Z",
+  "phase" : "complete",
+  "root" : "\/private\/tmp\/omgskills-catalog-compatibility-EED3B9F5-B500-4106-B6FD-34BD98D683AD",
+  "status" : "completed-with-unavailable-sources",
+  "summary" : {
+    "all" : {
+      "sourceAvailable" : 19,
+      "sourceUnavailable" : 1,
+      "total" : 20,
+      "untested" : 0,
+      "verified" : 19
+    },
+    "claude" : {
+      "sourceAvailable" : 10,
+      "sourceUnavailable" : 0,
+      "total" : 10,
+      "untested" : 0,
+      "verified" : 10
+    },
+    "codex" : {
+      "sourceAvailable" : 9,
+      "sourceUnavailable" : 1,
+      "total" : 10,
+      "untested" : 0,
+      "verified" : 9
+    }
+  }
+}
