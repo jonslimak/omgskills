@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
 import SwiftUI
 import AppKit
 
@@ -8,7 +8,7 @@ struct CatalogInstallView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text(model.record?.name ?? "OMGSkills F1 Test").font(.title2.bold())
+            Text(model.record?.name ?? model.appName).font(.title2.bold())
                 .textSelection(.enabled)
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
@@ -61,7 +61,9 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
     private let website: URL
     private let window: NSWindow
     private let statusItem: NSStatusItem
+    private var appUpdater: CatalogCandidateUpdater?
 
+    #if DEBUG
     convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator) throws {
         let paths = SkillFilesystemPaths.isolated(testRoot: root)
         var origin = URLComponents(url: website, resolvingAgainstBaseURL: false)!
@@ -75,6 +77,16 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
         let service = CatalogInstallFlowService(records: records, installer: CatalogInstallService(installer: installer))
         self.init(model: CatalogInstallModel(service: service, coordinator: coordinator), website: website)
     }
+    #endif
+
+    convenience init(candidate: CatalogCandidateRuntime.Configuration, coordinator: UpdateInstallCoordinator) {
+        let installer = CatalogSkillInstaller(managedInstaller: ManagedSkillInstaller(
+            managedRoot: candidate.managedRoot, pathAnchor: candidate.home), filesystemPaths: candidate.paths)
+        let service = CatalogInstallFlowService(records: CatalogInstallRecordClient(catalogCandidate: candidate),
+            installer: CatalogInstallService(installer: installer))
+        self.init(model: CatalogInstallModel(service: service, coordinator: coordinator, client: .product),
+            website: CatalogCandidateRuntime.website)
+    }
 
     init(model: CatalogInstallModel, website: URL) {
         self.model = model
@@ -83,21 +95,21 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
             styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
-        window.title = "OMGSkills F1 Test"
+        window.title = model.appName
         window.contentMinSize = NSSize(width: 480, height: 320)
         window.isReleasedWhenClosed = false
         window.delegate = self
         window.contentView = NSHostingView(rootView: CatalogInstallView(model: model, close: { [weak self] in self?.closeRequest() }))
         window.center()
-        statusItem.button?.title = "F1"
-        statusItem.button?.toolTip = "OMGSkills F1 Test - catalog installation"
+        statusItem.button?.title = model.client == .product ? "OMG" : "F1"
+        statusItem.button?.toolTip = model.appName + " - catalog installation"
         let menu = NSMenu()
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
-        menu.addItem(withTitle: "OMGSkills F1 Test " + version, action: nil, keyEquivalent: "")
+        menu.addItem(withTitle: model.appName + " " + version, action: nil, keyEquivalent: "")
         addItem("Status", action: #selector(showStatus), to: menu)
         addItem("Open website", action: #selector(openWebsite), to: menu)
         menu.addItem(.separator())
-        addItem("Quit OMGSkills F1 Test", action: #selector(quit), to: menu)
+        addItem("Quit " + model.appName, action: #selector(quit), to: menu)
         statusItem.menu = menu
     }
 
@@ -110,7 +122,19 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
     @objc func showStatus() { NSApp.activate(ignoringOtherApps: true); window.makeKeyAndOrderFront(nil) }
     @objc private func openWebsite() { NSWorkspace.shared.open(website) }
     @objc private func quit() { NSApp.terminate(nil) }
-    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool { menuItem.action != #selector(quit) || model.canClose }
+    func configureUpdates(_ updater: CatalogCandidateUpdater) {
+        guard appUpdater == nil, model.client == .product, let menu = statusItem.menu else { return }
+        appUpdater = updater
+        let item = NSMenuItem(title: "Check for app updates...", action: #selector(checkForAppUpdates), keyEquivalent: "")
+        item.target = self
+        menu.insertItem(item, at: menu.numberOfItems - 2)
+    }
+
+    @objc private func checkForAppUpdates() { appUpdater?.check(); showStatus() }
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(checkForAppUpdates) { return appUpdater?.canCheck == true }
+        return menuItem.action != #selector(quit) || model.canClose
+    }
     func windowShouldClose(_ sender: NSWindow) -> Bool { closeRequest(); return false }
     private func closeRequest() {
         guard model.canClose else { return }

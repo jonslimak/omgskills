@@ -49,6 +49,13 @@ struct CatalogInstallRecordClient: Sendable {
         self.session = session
     }
 
+    #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
+    init(catalogCandidate: CatalogCandidateRuntime.Configuration, session: URLSession = .shared) {
+        origin = CatalogCandidateRuntime.origin
+        self.session = session
+    }
+    #endif
+
     #if DEBUG
     init(localOrigin: URL, session: URLSession = .shared) throws {
         guard let components = URLComponents(url: localOrigin, resolvingAgainstBaseURL: false),

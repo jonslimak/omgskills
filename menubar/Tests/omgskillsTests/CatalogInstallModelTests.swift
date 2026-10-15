@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
 import Foundation
 import Testing
 @testable import omgskills
@@ -253,6 +253,103 @@ struct CatalogInstallModelTests {
         }
         #expect(await service.fetchCount == 0)
         #expect(await service.installCount == 0)
+    }
+
+    @Test func productClientRequiresFreshApprovalAndRefusesTestHandlers() async {
+        let service = FlowStub()
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), client: .product)
+        model.receive(link())
+        #expect(model.hasFailure)
+        #expect(await service.fetchCount == 0)
+        model.receive(productLink())
+        await model.operation?.value
+        #expect(model.phase == .confirm)
+        #expect(await service.installCount == 0)
+        #expect(await model.close())
+        model.install()
+        #expect(await service.installCount == 0)
+    }
+
+    @Test func candidateUpdaterBlocksRequestsAndCannotInterruptAnySkillPhase() async {
+        let service = FlowStub()
+        await service.holdNextFetch()
+        await service.holdInstall()
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), client: .product)
+        var checks = 0
+        let updater = CatalogCandidateUpdater(model: model) { checks += 1 }
+        #expect(checks == 0)
+        model.receive(productLink())
+        await service.waitForFetch()
+        updater.check()
+        #expect(checks == 0)
+        await service.resumeFetch()
+        await model.operation?.value
+        updater.check()
+        #expect(checks == 0)
+        model.install()
+        await service.waitForInstall()
+        updater.check()
+        #expect(checks == 0)
+        #expect(!(await model.close()))
+        await service.resumeInstall()
+        await model.operation?.value
+        updater.check()
+        updater.check()
+        #expect(checks == 1)
+        #expect(updater.permitsUpdate)
+        #expect(model.request == nil)
+        model.receive(productLink())
+        model.install()
+        #expect(await service.fetchCount == 2)
+        #expect(await service.installCount == 1)
+        updater.finish(failed: false)
+        #expect(updater.canCheck)
+        #expect(model.request == nil)
+        model.receive(productLink())
+        await model.operation?.value
+        #expect(model.phase == .confirm)
+        #expect(await service.installCount == 1)
+        _ = await model.close()
+    }
+
+    @Test func candidateUpdateFailureUnlocksButReplacementStaysLocked() async {
+        let service = FlowStub()
+        let coordinator = UpdateInstallCoordinator()
+        let model = CatalogInstallModel(service: service, coordinator: coordinator, client: .product)
+        let token = coordinator.beginActivity(.portalConnection)
+        var checks = 0
+        let updater = CatalogCandidateUpdater(model: model) { checks += 1 }
+        updater.check()
+        #expect(checks == 0)
+        token.finish()
+        let failure = CatalogCandidateUpdater(model: model) { throw URLError(.notConnectedToInternet) }
+        failure.check()
+        #expect(failure.canCheck)
+        #expect(!model.appUpdateActive)
+        updater.installationStarted()
+        #expect(updater.phase == .idle)
+        updater.check()
+        updater.installationStarted()
+        updater.finish(failed: true)
+        updater.finish(failed: false)
+        _ = await model.close()
+        updater.check()
+        model.receive(productLink())
+        model.install()
+        #expect(updater.phase == .restartRequired)
+        #expect(model.appUpdateActive)
+        #expect(checks == 1)
+        #expect(await service.fetchCount == 0)
+        #expect(await service.installCount == 0)
+        let restarted = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), client: .product)
+        #expect(restarted.request == nil)
+        #expect(!restarted.appUpdateActive)
+        restarted.install()
+        #expect(await service.installCount == 0)
+    }
+
+    private func productLink() -> URL {
+        URL(string: "omgskills://catalog-install?v=1&id=owner%2Frepo%3Aalias&agent=codex")!
     }
 
     private func link(agent: String = "codex", id: String = "owner/repo:alias") -> URL {

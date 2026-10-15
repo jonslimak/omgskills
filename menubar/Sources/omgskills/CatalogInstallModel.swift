@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
 import Foundation
 import Observation
 
@@ -31,15 +31,41 @@ final class CatalogInstallModel {
     private(set) var result: CatalogInstallService.Result?
     private(set) var message = "Ready"
     private(set) var notice = ""
+    private(set) var appUpdateActive = false
+    let client: CatalogInstallRequest.Client
     @ObservationIgnored private let service: any CatalogInstallFlowServing
     @ObservationIgnored private let coordinator: UpdateInstallCoordinator
     @ObservationIgnored private var activity: UpdateInstallCoordinator.ActivityToken?
     @ObservationIgnored private var operationID: UUID?
     @ObservationIgnored private(set) var operation: Task<Void, Never>?
 
-    init(service: any CatalogInstallFlowServing, coordinator: UpdateInstallCoordinator) {
+    init(service: any CatalogInstallFlowServing, coordinator: UpdateInstallCoordinator, client: CatalogInstallRequest.Client = .f1) {
         self.service = service
         self.coordinator = coordinator
+        self.client = client
+    }
+
+    var appName: String { client == .product ? "OMGSkills Candidate" : "OMGSkills F1 Test" }
+    var canCheckForAppUpdates: Bool { !ownsRequest && !appUpdateActive && !coordinator.isBusy && !appReplacementBlocksRequest }
+
+    func beginAppUpdate() -> Bool {
+        guard canCheckForAppUpdates else { return false }
+        record = nil
+        destination = nil
+        request = nil
+        result = nil
+        notice = ""
+        phase = .idle
+        message = "Checking for app updates..."
+        appUpdateActive = true
+        return true
+    }
+
+    func finishAppUpdate(failed: Bool, requiresRestart: Bool = false) {
+        appUpdateActive = requiresRestart
+        message = requiresRestart ? "Finish the app update or restart before installing skills."
+            : failed ? "The app update did not complete. You can check again."
+            : "Update check finished. No skill changes made."
     }
 
     var ownsRequest: Bool { [.loading, .confirm, .rechecking, .installing, .cancelling].contains(phase) }
@@ -52,7 +78,7 @@ final class CatalogInstallModel {
         default: return true
         }
     }
-    private var appReplacementBlocksRequest: Bool { coordinator.hasPendingInstall || coordinator.isAppReplacementActive }
+    private var appReplacementBlocksRequest: Bool { appUpdateActive || coordinator.hasPendingInstall || coordinator.isAppReplacementActive }
 
     func receive(_ url: URL) {
         guard !appReplacementBlocksRequest else {
@@ -60,7 +86,7 @@ final class CatalogInstallModel {
             return
         }
         let incoming: CatalogInstallRequest
-        do { incoming = try CatalogInstallRequest(url: url, client: .f1) }
+        do { incoming = try CatalogInstallRequest(url: url, client: client) }
         catch {
             if ownsRequest { notice = "This install link is invalid." }
             else {
