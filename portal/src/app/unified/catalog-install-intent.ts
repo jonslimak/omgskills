@@ -1,8 +1,9 @@
 import type { SkillDisplay } from "./model";
-import { catalogInstallAction, type CatalogInstallAgent } from "./public-install";
+import { catalogInstallAction, catalogInstallClients, type CatalogInstallAgent, type CatalogInstallClient } from "./public-install";
 import { INSTALL_INTENT_TTL, validInstallReturnRoute } from "./install-intent";
 
 export const CATALOG_INSTALL_INTENT_KEY = "omgskills.app.catalog-install-intent.v1.f1";
+export const CANDIDATE_CATALOG_INSTALL_INTENT_KEY = "omgskills.app.catalog-install-intent.v1.candidate";
 export type CatalogInstallIntent = {
   version: 1; catalogId: string; agent: CatalogInstallAgent; returnRoute: string; createdAt: number;
 };
@@ -24,8 +25,10 @@ function parse(raw: string): CatalogInstallIntent | null {
 export class CatalogInstallIntentStore {
   private memory: string | null = null;
   private storage: Storage | null;
-  constructor(getStorage: () => Storage | null) {
-    try { this.storage = getStorage(); this.memory = this.storage?.getItem(CATALOG_INSTALL_INTENT_KEY) ?? null; }
+  private readonly key: string;
+  constructor(getStorage: () => Storage | null, readonly client: CatalogInstallClient = "f1") {
+    this.key = client === "candidate" ? CANDIDATE_CATALOG_INSTALL_INTENT_KEY : CATALOG_INSTALL_INTENT_KEY;
+    try { this.storage = getStorage(); this.memory = this.storage?.getItem(this.key) ?? null; }
     catch { this.storage = null; }
   }
   get persistent() { return this.storage !== null; }
@@ -35,15 +38,15 @@ export class CatalogInstallIntentStore {
   }
   save(intent: CatalogInstallIntent) {
     this.memory = JSON.stringify(intent);
-    try { this.storage?.setItem(CATALOG_INSTALL_INTENT_KEY, this.memory); }
+    try { this.storage?.setItem(this.key, this.memory); }
     catch {
-      try { this.storage?.removeItem(CATALOG_INSTALL_INTENT_KEY); } catch { /* Storage can be unavailable. */ }
+      try { this.storage?.removeItem(this.key); } catch { /* Storage can be unavailable. */ }
       this.storage = null;
     }
   }
   clear() {
     this.memory = null;
-    try { this.storage?.removeItem(CATALOG_INSTALL_INTENT_KEY); } catch { this.storage = null; }
+    try { this.storage?.removeItem(this.key); } catch { this.storage = null; }
   }
 }
 
@@ -76,7 +79,7 @@ export class CatalogInstallSetupSession {
   private fresh(intent: CatalogInstallIntent) { const age = this.now() - intent.createdAt; return age >= 0 && age < INSTALL_INTENT_TTL; }
   private fail(message: string, restartRequired = false) { this.update({ phase: "blocked", message, restartRequired }); }
   private begin(skill: SkillDisplay) {
-    if (this.state.restartRequired || !catalogInstallAction(skill, this.options.agent).href || skill.catalogId !== this.options.catalogId) return null;
+    if (this.state.restartRequired || !catalogInstallAction(skill, this.options.agent, this.options.store.client).href || skill.catalogId !== this.options.catalogId) return null;
     const intent = parse(JSON.stringify({ version: 1, catalogId: skill.catalogId, agent: this.options.agent,
       returnRoute: this.options.returnRoute, createdAt: this.now() }));
     if (!intent) { this.fail("Select this skill again to start a new request.", true); return null; }
@@ -94,12 +97,12 @@ export class CatalogInstallSetupSession {
     const intent = this.state.intent ?? this.begin(skill);
     if (!intent) return;
     if (!this.fresh(intent)) { this.fail("This request expired. Cancel setup and start again.", true); return; }
-    const action = catalogInstallAction(skill, this.options.agent);
+    const action = catalogInstallAction(skill, this.options.agent, this.options.store.client);
     if (!action.href || skill.catalogId !== intent.catalogId || intent.agent !== this.options.agent) {
       this.fail("The selected skill or target changed. Start again.", true); return;
     }
     this.options.store.save(intent);
-    this.update({ phase: "opening", message: "Opening requested. Check OMGSkills F1 Test for approval and the result." });
+    this.update({ phase: "opening", message: `Opening requested. Check ${catalogInstallClients[this.options.store.client].name} for approval and the result.` });
     try { this.options.open(action.href); }
     catch { this.update({ message: "Opening could not be confirmed. Try opening again." }); }
   }

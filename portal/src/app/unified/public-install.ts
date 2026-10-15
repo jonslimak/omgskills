@@ -17,17 +17,22 @@ export function normalInstallClient(development: boolean, enabled: unknown, host
 }
 
 export type CatalogInstallAgent = "claude" | "codex";
+export const catalogInstallClients = {
+  f1: { scheme: "omgskills-f1", name: "OMGSkills F1 Test" },
+  candidate: { scheme: "omgskills", name: "OMGSkills Candidate" },
+} as const;
+export type CatalogInstallClient = keyof typeof catalogInstallClients;
 export function catalogInstallTestEnabled(development: boolean, enabled: unknown, hostname: string, oldFlag?: unknown) {
   return isF1Preview(development, enabled, hostname) && oldFlag !== "1";
 }
 
-export function catalogInstallAction(skill: SkillDisplay, agent: CatalogInstallAgent): InstallAction {
+export function catalogInstallAction(skill: SkillDisplay, agent: CatalogInstallAgent, client: CatalogInstallClient = "f1"): InstallAction {
   const id = skill.catalogId;
   if (!id?.trim() || skill.key !== `catalog:${id}` || skill.setItemKind || skill.installed?.isLocalOnly
     || bytes(id) > 500 || controls.test(id) || !["claude", "codex"].includes(agent)) {
     return { href: null, reason: "Select a public catalog skill and an install target." };
   }
-  const link = new URL("omgskills-f1://catalog-install");
+  const link = new URL(`${catalogInstallClients[client].scheme}://catalog-install`);
   link.search = new URLSearchParams({ v: "1", id, agent }).toString();
   return { href: bytes(link.href) <= 4096 ? link.href : null, reason: "" };
 }
