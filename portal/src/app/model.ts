@@ -38,6 +38,7 @@ export type PortalDevice = {
   lastActive: string;
   status: "active" | "revoked" | "expired" | "inactive";
   lastReportedAt?: string | null;
+  lastCheckedAt?: string | null;
   scanCoverage?: ScanCoverage[] | null;
 };
 export type PortalData = {

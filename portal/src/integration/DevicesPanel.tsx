@@ -9,6 +9,8 @@ import { inventoryCoverageSummary } from "../app/unified/model";
 
 const formatDate = (value: string | null) => value === null ? "Never"
   : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
+const formatInventoryDate = (value: string | null) => value === null ? "Never"
+  : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
 export function DevicesPanel({ api, denied, local = true, readOnly = false, theme, inventoryDevices }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; theme?: string; inventoryDevices?: PortalDevice[] }) {
   const callbacks = useRef({ api, denied });
@@ -48,8 +50,12 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, them
         <div className="rd-grow"><div className="rd-row-title">{device.deviceName}</div>
           <p>Last active {formatDate(device.lastUsedAt)}</p>
           <p>Connected {formatDate(device.createdAt)} · Expires {formatDate(device.expiresAt)}</p>
-          {inventoryDevices && <p>Last reported {formatDate(inventoryDevices.find(item => item.id === device.id)?.lastReportedAt ?? null)}
+          {inventoryDevices && <p>Last reported {formatInventoryDate(inventoryDevices.find(item => item.id === device.id)?.lastReportedAt ?? null)}
             {device.status !== "active" && " - Last known inventory retained"}</p>}
+          {inventoryDevices?.find(item => item.id === device.id)?.lastCheckedAt !== undefined && <p>
+            Last checked {inventoryDevices.find(item => item.id === device.id)?.lastCheckedAt == null ? "Unknown"
+              : formatInventoryDate(inventoryDevices.find(item => item.id === device.id)?.lastCheckedAt ?? null)}
+          </p>}
           {inventoryDevices?.find(item => item.id === device.id)?.scanCoverage !== undefined && <p>
             {inventoryCoverageSummary(inventoryDevices.find(item => item.id === device.id)?.scanCoverage)}
           </p>}

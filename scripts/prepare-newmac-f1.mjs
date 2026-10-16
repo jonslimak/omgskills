@@ -18,7 +18,10 @@ export function loopbackURL(value, label) {
 
 function connectedSettings(website, { catalogInstall = false, connectedInventoryTest = false,
   portalConnectURL, syncEndpoint, backendOrigin, testEnvironmentVerified = false,
-  inventoryReconciliationTest = false } = {}) {
+  inventoryReconciliationTest = false, inventoryAutomationTest = false } = {}) {
+  if (typeof inventoryAutomationTest !== 'boolean' || (inventoryAutomationTest && !inventoryReconciliationTest)) {
+    throw new Error('inventoryAutomationTest must be a boolean and requires reconciliation.');
+  }
   if (typeof inventoryReconciliationTest !== 'boolean') {
     throw new Error('inventoryReconciliationTest must be a boolean.');
   }
@@ -46,7 +49,8 @@ function connectedSettings(website, { catalogInstall = false, connectedInventory
   }
   return { connectedInventoryTest: true, portalConnectURL: connect.href, syncEndpoint: sync.href,
     backendOrigin: backend.origin, testEnvironmentVerified: true,
-    ...(inventoryReconciliationTest ? { inventoryReconciliationTest: true } : {}) };
+    ...(inventoryReconciliationTest ? { inventoryReconciliationTest: true } : {}),
+    ...(inventoryAutomationTest ? { inventoryAutomationTest: true } : {}) };
 }
 
 export function validateInputs(binDirectory, website, options = {}) {
@@ -76,6 +80,7 @@ export function bundleMetadata(config, root) {
     inventoryMetadata = {
       OMGSkillsConnectedInventoryTest: true,
       ...(connected.inventoryReconciliationTest ? { OMGSkillsInventoryReconciliationTest: true } : {}),
+      ...(connected.inventoryAutomationTest ? { OMGSkillsInventoryAutomationTest: true } : {}),
       OMGSkillsPortalConnectURL: connected.portalConnectURL,
       OMGSkillsSyncEndpoint: connected.syncEndpoint,
       OMGSkillsPortalSyncKeychainService: `com.jonslimak.omgskills.inventory-test.${basename(root).slice('omgskills-f1-'.length)}`,
@@ -106,6 +111,7 @@ export function preparationReceipt(config, root, app, binarySHA256, createdAt = 
       installerHome: join(root, 'home'), scannerHome: join(root, 'home'),
     } : {}),
     ...(metadata.OMGSkillsInventoryReconciliationTest ? { inventoryReconciliationTest: true } : {}),
+    ...(metadata.OMGSkillsInventoryAutomationTest ? { inventoryAutomationTest: true } : {}),
     state: 'prepared and registered; not launched; no manual acceptance yet' };
 }
 
@@ -143,12 +149,14 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const { values } = parseArgs({ options: { 'bin-dir': { type: 'string' }, website: { type: 'string' },
     'catalog-install': { type: 'boolean', default: false }, 'connected-inventory-test': { type: 'boolean', default: false },
     'inventory-reconciliation-test': { type: 'boolean', default: false },
+    'inventory-automation-test': { type: 'boolean', default: false },
     'portal-connect-url': { type: 'string' }, 'sync-endpoint': { type: 'string' }, 'backend-origin': { type: 'string' },
     'test-environment-verified': { type: 'boolean', default: false } } });
   if (!values['bin-dir'] || !values.website) throw new Error('Use --bin-dir and --website.');
   console.log(JSON.stringify(prepare(values['bin-dir'], values.website, { catalogInstall: values['catalog-install'],
     connectedInventoryTest: values['connected-inventory-test'], portalConnectURL: values['portal-connect-url'],
     inventoryReconciliationTest: values['inventory-reconciliation-test'],
+    inventoryAutomationTest: values['inventory-automation-test'],
     syncEndpoint: values['sync-endpoint'], backendOrigin: values['backend-origin'],
     testEnvironmentVerified: values['test-environment-verified'] }), null, 2));
 }

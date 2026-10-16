@@ -49,6 +49,25 @@ function response(path: string, result: unknown = inventory()) {
 const api: PortalApi = async <T>(path: string) => response(path) as T;
 const load = (result = inventory()) => loadAccountData(readOnlyApi(async <T>(path: string) => response(path, result) as T, undefined, true, true), identity, false, true, true);
 
+test("check freshness stays device-scoped and separate from reported and seen dates", async () => {
+  const before = inventory();
+  const checked = "2026-10-16T16:00:00.123Z";
+  const result = { ...before, devices: before.devices.map((device, i) => ({ ...device, lastCheckedAt: i === 0 ? checked : null })) };
+  const parsed = parseConnectedInventory(result, 3);
+  assert.equal(parsed.devices[0].lastCheckedAt, checked);
+  assert.equal(parsed.devices[1].lastCheckedAt, null);
+  assert.equal(parsed.devices[0].lastReportedAt, reported);
+  assert.equal(parsed.skills[0].lastSeenAt, observed);
+  assert.deepEqual(parsed.skills, parseConnectedInventory(before, 3).skills);
+  assert.equal(parseConnectedInventory(before, 3).devices[0].lastCheckedAt, null);
+  for (const lastCheckedAt of ["invalid", 123, {}, false]) {
+    assert.throws(() => parseConnectedInventory({ ...result, devices: [{ ...result.devices[0], lastCheckedAt }] }, 3));
+  }
+  const data = await loadAccountData(readOnlyApi(async <T>(path: string) => response(path, result) as T, undefined, true, true), identity, false, true, true);
+  assert.equal(data.devices[0].lastCheckedAt, checked);
+  assert.deepEqual(data.sets, (await load()).sets);
+});
+
 test("reconciliation flag is separate, fail-closed and requires every connected prerequisite", () => {
   assert.equal(inventoryReconciliationTestEnabled(configuration), false);
   assert.equal(inventoryReconciliationTestEnabled({ ...configuration, reconciliation: "0" }), false);

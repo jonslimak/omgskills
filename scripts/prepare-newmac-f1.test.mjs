@@ -10,6 +10,20 @@ const connectedOptions = { catalogInstall: true, connectedInventoryTest: true, t
   portalConnectURL: 'http://127.0.0.1:5201/app/connect', syncEndpoint: 'http://127.0.0.1:8888/api/portal/sync-upload',
   backendOrigin: 'http://127.0.0.1:8888' };
 
+test('automation is default-off and requires validated connected reconciliation metadata', t => {
+  const { root, bin } = fixture(t);
+  const baseline = validateInputs(bin, website, connectedOptions);
+  assert.equal(bundleMetadata(baseline, root).OMGSkillsInventoryAutomationTest, undefined);
+  assert.equal(preparationReceipt(baseline, root, '/fixture/app', 'hash').inventoryAutomationTest, undefined);
+  const config = validateInputs(bin, website, { ...connectedOptions, inventoryReconciliationTest: true, inventoryAutomationTest: true });
+  assert.equal(bundleMetadata(config, root).OMGSkillsInventoryAutomationTest, true);
+  assert.equal(preparationReceipt(config, root, '/fixture/app', 'hash').inventoryAutomationTest, true);
+  for (const change of [{ inventoryReconciliationTest: false }, { connectedInventoryTest: false },
+    { inventoryAutomationTest: 'true' }, { testEnvironmentVerified: false }]) {
+    assert.throws(() => validateInputs(bin, website, { ...config, ...change }));
+  }
+});
+
 function fixture(t) {
   const root = mkdtempSync('/private/tmp/omgskills-f1-');
   t.after(() => rmSync(root, { recursive: true, force: true }));

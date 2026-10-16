@@ -44,6 +44,14 @@ final class InventoryReportScheduler {
         phase = .idle
     }
 
+    @discardableResult
+    func adoptInitialOutcome(_ outcome: InventoryReportOutcome) -> Bool {
+        guard phase == .idle, lastOutcome == nil, reporting == nil else { return false }
+        lastOutcome = outcome
+        finish(outcome)
+        return true
+    }
+
     func stop() {
         generation = UUID()
         timerID = UUID()
@@ -63,7 +71,9 @@ final class InventoryReportScheduler {
     func stopAndWait() async {
         let pending = reporting
         stop()
+        let session = generation
         await pending?.value
+        if generation == session { reporting = nil }
     }
 
     func changed() {

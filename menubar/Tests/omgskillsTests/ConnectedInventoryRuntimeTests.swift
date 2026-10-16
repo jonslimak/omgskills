@@ -5,6 +5,209 @@ import Testing
 
 @MainActor
 struct ConnectedInventoryRuntimeTests {
+    @Test func resyncDuringAnActiveCheckQueuesOneFullReportWithoutParallelWork() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        let gate = InventoryShutdownGate()
+        await api.setCheckGate(gate)
+        runtime.installed()
+        await events.clock.advance(0)
+        await gate.waitUntilBlocked()
+        for _ in 0..<10 { runtime.resync() }
+        #expect(await api.uploads == 1)
+        #expect(await api.checks == 1)
+        await gate.open()
+        await events.clock.advance(0)
+        #expect(await api.uploads == 2)
+        #expect(await api.checks == 1)
+        events.wakes[0]()
+        await events.clock.advance(0)
+        #expect(await api.checks == 2)
+        await runtime.stop()
+    }
+
+    @Test func automatedStartupIsSingleAndAllTriggersUseTheSameScheduler() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        await runtime.start().value
+        #expect(await api.uploads == 1)
+        #expect(events.changes.count == 1 && events.wakes.count == 1)
+        events.changes[0]()
+        events.changes[0]()
+        await events.clock.advance(2)
+        #expect(await api.checks == 0)
+        await events.clock.advance(1)
+        #expect(await api.checks == 1)
+        runtime.installed()
+        events.wakes[0]()
+        await events.clock.advance(0)
+        #expect(await api.checks == 2)
+        runtime.resync()
+        await events.clock.advance(0)
+        #expect(await api.uploads == 2)
+        await events.clock.advance(3_600)
+        #expect(await api.checks == 3)
+        await events.clock.advance(36_000)
+        #expect(await api.checks == 4)
+        await runtime.disconnect().value
+        #expect(events.watchStops == 1 && events.wakeStops == 1)
+        #expect(await api.revocations == 1)
+        events.changes[0]()
+        events.wakes[0]()
+        await events.clock.advance(36_000)
+        #expect(await api.checks == 4)
+        #expect(events.clock.pendingSleeps == 0)
+        await runtime.stop()
+    }
+
+    @Test func initialFailureAdoptsBackoffWithoutDuplicateReportOrTriggerBypass() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        await api.setFailure(true)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        #expect(await api.uploads == 1)
+        events.changes[0]()
+        events.wakes[0]()
+        runtime.installed()
+        runtime.resync()
+        await events.clock.advance(4)
+        #expect(await api.uploads == 1)
+        await api.setFailure(false)
+        await events.clock.advance(1)
+        #expect(await api.uploads == 2)
+        #expect(await api.checks == 0)
+        await runtime.stop()
+    }
+
+    @Test func initialReportBuffersFilesystemChangesUntilItsOutcomeIsAdopted() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let gate = InventoryShutdownGate()
+        await api.setReportGate(gate)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        let startup = runtime.start()
+        await gate.waitUntilBlocked()
+        for _ in 0..<20 { events.changes[0]() }
+        await events.clock.advance(60)
+        #expect(await api.uploads == 1)
+        #expect(await api.checks == 0)
+        await gate.open()
+        await startup.value
+        await events.clock.advance(3)
+        #expect(await api.uploads == 1)
+        #expect(await api.checks == 1)
+        await runtime.stop()
+    }
+
+    @Test func failedWatcherRemainsVisibleAndHourlyFallbackStillWorks() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        events.failWatch = true
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        #expect(runtime.watchWarning != nil)
+        await events.clock.advance(3_600)
+        #expect(await api.checks == 1)
+        #expect(runtime.watchWarning != nil)
+        runtime.resync()
+        await events.clock.advance(0)
+        #expect(await api.uploads == 2)
+        #expect(runtime.watchWarning != nil)
+        await runtime.stop()
+        #expect(events.watchStops == 0 && events.wakeStops == 1)
+    }
+
+    @Test func stopDrainsAnUncooperativeCheckAndRestartRejectsOldCallbacks() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        let gate = InventoryShutdownGate()
+        await api.setCheckGate(gate)
+        runtime.installed()
+        await events.clock.advance(0)
+        await gate.waitUntilBlocked()
+        let stopping = runtime.cancel()
+        #expect(events.watchStops == 1 && events.wakeStops == 1)
+        await gate.open()
+        await stopping.value
+        #expect(connection.lastInventoryCheckedAt == nil)
+        await runtime.start().value
+        #expect(await api.uploads == 2)
+        events.changes[0]()
+        events.wakes[0]()
+        await events.clock.advance(3)
+        #expect(await api.checks == 1)
+        events.changes[1]()
+        await events.clock.advance(3)
+        #expect(await api.checks == 2)
+        await runtime.stop()
+        #expect(events.watchStops == 2 && events.wakeStops == 2)
+    }
+
+    @Test func replacementDrainsTheOldSessionBeforeStartingNewObservers() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        let gate = InventoryShutdownGate()
+        await api.setCheckGate(gate)
+        runtime.installed()
+        await events.clock.advance(0)
+        await gate.waitUntilBlocked()
+        let replacement = runtime.connect(deviceName: "Replacement")
+        #expect(events.watchStops == 1 && events.wakeStops == 1)
+        #expect(events.changes.count == 1)
+        await gate.open()
+        await replacement.value
+        #expect(events.changes.count == 2)
+        #expect(await api.uploads == 2)
+        events.wakes[0]()
+        await events.clock.advance(0)
+        #expect(await api.checks == 1)
+        events.wakes[1]()
+        await events.clock.advance(0)
+        #expect(await api.checks == 2)
+        await runtime.stop()
+    }
+
+    @Test func reconnectRequiredRemovesWatchWakeAndHourlyWork() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        await api.setCheckError(.reconnectRequired)
+        events.wakes[0]()
+        await events.clock.advance(0)
+        #expect(connection.state == .failed(.reconnectRequired))
+        #expect(events.watchStops == 1 && events.wakeStops == 1)
+        await events.clock.advance(36_000)
+        #expect(await api.checks == 1)
+        #expect(events.clock.pendingSleeps == 0)
+        await runtime.stop()
+    }
+
     @Test func startupRestoresOnceAndUsesTheInjectedFreshInventory() async {
         let store = InventoryCredentialFixture()
         let api = InventoryAPIFixture()
@@ -140,6 +343,8 @@ struct ConnectedInventoryRuntimeTests {
         #expect(view.contains("connectedRuntime?.receivePairingCallback(url)"))
         #expect(view.contains("filesystemPaths: connected.filesystemPaths, pathAnchor: connected.root"))
         #expect(view.contains("await connectedRuntime?.stop()"))
+        #expect(view.contains("inventoryAutomationEnabled: connected.inventoryAutomation"))
+        #expect(view.contains("connected.inventoryAutomation ? .live(paths: connected.filesystemPaths) : nil"))
         #expect(view.components(separatedBy: "NSStatusBar.system.statusItem").count == 2)
         let termination = try #require(app.range(of: "func applicationShouldTerminate"))
         let stop = try #require(app.range(of: "await catalogInstallController.stopReporting()", range: termination.lowerBound..<app.endIndex))
@@ -152,12 +357,13 @@ struct ConnectedInventoryRuntimeTests {
     }
 
     private func makeConnection(store: InventoryCredentialFixture, api: InventoryAPIFixture,
-                                authorizer: InventoryAuthorizerFixture) -> DeviceConnectionModel {
+                                authorizer: InventoryAuthorizerFixture, automation: Bool = false) -> DeviceConnectionModel {
         DeviceConnectionModel(credentialStore: store, api: api, browserAuthorizer: authorizer,
             portalConnectURL: URL(string: "http://127.0.0.1:5201/app/connect")!,
             callbackScheme: BrowserPairing.connectedTestCallbackScheme,
             inventoryScanner: { .init(skills: [], installations: [], summary: .init(),
-                roots: ["claude", "codex", "agents"].map { .init(source: $0, state: .complete, reason: nil) }) })
+                roots: ["claude", "codex", "agents"].map { .init(source: $0, state: .complete, reason: nil) }) },
+            inventoryAutomationEnabled: automation)
     }
 }
 
@@ -185,6 +391,14 @@ private actor InventoryAPIFixture: DeviceSyncServing {
     init(reportMode: DeviceReportMode = .presence) { self.reportMode = reportMode }
     var uploads = 0
     var revocations = 0
+    var checks = 0
+    private var revision: String?
+    private var reportGate: InventoryShutdownGate?
+    private var checkGate: InventoryShutdownGate?
+    private var checkError: DeviceSyncAPIError?
+    func setReportGate(_ gate: InventoryShutdownGate) { reportGate = gate }
+    func setCheckGate(_ gate: InventoryShutdownGate) { checkGate = gate }
+    func setCheckError(_ error: DeviceSyncAPIError) { checkError = error }
     private var failure = false
     func setFailure(_ value: Bool) { failure = value }
     func exchange(pairingCode: String, deviceName: String, codeVerifier: String?) async throws -> StoredDeviceCredential { inventoryCredential }
@@ -198,15 +412,67 @@ private actor InventoryAPIFixture: DeviceSyncServing {
         return SkillSyncResult(syncRunId: "test-run", syncedSkillCount: installations.count, reportVersion: 2,
             mode: "presence", deviceId: inventoryCredential.connection.deviceID, completedAt: "2026-10-16T12:00:00Z")
     }
-    func inventoryRevision(credential: String) async throws -> String? { nil }
+    func inventoryRevision(credential: String) async throws -> String? { revision }
     func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
         uploads += 1
+        if let gate = reportGate { reportGate = nil; await gate.block() }
         if failure { throw DeviceSyncAPIError.server(statusCode: 503) }
         let run = UUID().uuidString
+        revision = run.lowercased()
         return SkillSyncResult(syncRunId: run, syncedSkillCount: payload.skills.count, reportVersion: 3,
             mode: "reconciled", deviceId: inventoryCredential.connection.deviceID,
             completedAt: "2026-10-16T12:00:00Z", revision: run, missingSkillCount: 0,
             roots: payload.roots, complete: true)
+    }
+    func checkInventory(credential: String, payload: InventoryCheckPayload) async throws -> InventoryCheckResult {
+        checks += 1
+        if let gate = checkGate { checkGate = nil; await gate.block() }
+        if let checkError { throw checkError }
+        return .init(reportVersion: 3, mode: "checked", deviceId: inventoryCredential.connection.deviceID,
+            revision: payload.baseRevision, checkedAt: "2026-10-16T13:00:00Z")
+    }
+}
+
+@MainActor
+private final class InventoryAutomationFixture {
+    let clock = InventoryRuntimeClock()
+    var changes: [ConnectedInventoryRuntime.Automation.Event] = []
+    var wakes: [ConnectedInventoryRuntime.Automation.Event] = []
+    var watchStops = 0
+    var wakeStops = 0
+    var failWatch = false
+    var configuration: ConnectedInventoryRuntime.Automation {
+        .init(watch: { callback in
+            if self.failWatch { throw InventoryFolderWatcher.Failure.cannotStart }
+            self.changes.append(callback)
+            return { self.watchStops += 1 }
+        }, wake: { callback in
+            self.wakes.append(callback)
+            return { self.wakeStops += 1 }
+        }, now: { self.clock.now }, sleep: clock.sleep, jitter: { 0 })
+    }
+}
+
+@MainActor
+private final class InventoryRuntimeClock {
+    var now: TimeInterval = 0
+    var pendingSleeps: Int { sleepers.count }
+    private var sleepers: [UUID: (TimeInterval, CheckedContinuation<Void, any Error>)] = [:]
+    func sleep(_ delay: TimeInterval) async throws {
+        try Task.checkCancellation()
+        if delay <= 0 { return }
+        let id = UUID()
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { sleepers[id] = (now + delay, $0) }
+        } onCancel: {
+            Task { @MainActor [weak self] in self?.sleepers.removeValue(forKey: id)?.1.resume(throwing: CancellationError()) }
+        }
+    }
+    func advance(_ seconds: TimeInterval) async {
+        for _ in 0..<100 { await Task.yield() }
+        now += seconds
+        for (id, entry) in sleepers where entry.0 <= now { sleepers.removeValue(forKey: id)?.1.resume() }
+        for _ in 0..<100 { await Task.yield() }
     }
 }
 

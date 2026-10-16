@@ -136,7 +136,7 @@ export async function loadAccountData(
   };
 }
 
-type InventoryDevice = { id: string; deviceName: string; status: NonNullable<SyncedSkill["deviceStatus"]>; lastReportedAt: string | null; scanCoverage?: ScanCoverage[] | null };
+type InventoryDevice = { id: string; deviceName: string; status: NonNullable<SyncedSkill["deviceStatus"]>; lastReportedAt: string | null; lastCheckedAt?: string | null; scanCoverage?: ScanCoverage[] | null };
 
 function validCoverage(value: unknown): value is ScanCoverage[] | null {
   if (value === null) return true;
@@ -161,7 +161,8 @@ export function parseConnectedInventory(value: unknown, version: 2 | 3 = 2) {
       || typeof device.deviceName !== "string" || !device.deviceName.trim()
       || !["active", "revoked", "expired", "inactive"].includes(device.status)
       || !(device.lastReportedAt === null || date(device.lastReportedAt))
-      || (version === 3 && (!validCoverage(device.scanCoverage) || (device.scanCoverage !== null && device.lastReportedAt === null))))
+      || (version === 3 && ((!validCoverage(device.scanCoverage) || (device.scanCoverage !== null && device.lastReportedAt === null))
+        || !(device.lastCheckedAt == null || date(device.lastCheckedAt)))))
     || new Set(data.devices.map(device => device.id)).size !== data.devices.length
     || data.skills.some(skill => !skill || typeof skill.id !== "string" || !skill.id
       || typeof skill.name !== "string" || !nullableString(skill.description)
@@ -186,7 +187,7 @@ export function parseConnectedInventory(value: unknown, version: 2 | 3 = 2) {
     }),
     devices: data.devices.map(device => ({ id: device.id, name: device.deviceName,
       status: device.status, lastActive: device.lastReportedAt ?? "", lastReportedAt: device.lastReportedAt,
-      ...(version === 3 ? { scanCoverage: device.scanCoverage ?? null } : {}) })),
+      ...(version === 3 ? { scanCoverage: device.scanCoverage ?? null, lastCheckedAt: device.lastCheckedAt ?? null } : {}) })),
   };
 }
 

@@ -7,6 +7,7 @@ enum AppRuntimeConfiguration {
     static let catalogInstallEnabledKey = "OMGSkillsCatalogInstallEnabled"
     static let connectedInventoryKey = "OMGSkillsConnectedInventoryTest"
     static let inventoryReconciliationKey = "OMGSkillsInventoryReconciliationTest"
+    static let inventoryAutomationKey = "OMGSkillsInventoryAutomationTest"
 
     struct ConnectedInventoryConfiguration: Equatable, Sendable {
         let root: URL
@@ -15,6 +16,7 @@ enum AppRuntimeConfiguration {
         let uploadURL: URL
         let keychainService: String
         let inventoryReconciliation: Bool
+        let inventoryAutomation: Bool
         var filesystemPaths: SkillFilesystemPaths { .isolated(testRoot: root) }
     }
 
@@ -28,11 +30,17 @@ enum AppRuntimeConfiguration {
         info: [String: Any] = Bundle.main.infoDictionary ?? [:],
         debugAllowed: Bool = buildAllowsF1
     ) -> ConnectedInventoryMode {
+        let automation: Bool
+        if let setting = info[inventoryAutomationKey] {
+            guard let enabled = setting as? Bool else { return .invalid("Invalid inventory automation test setting.") }
+            automation = enabled
+        } else { automation = false }
         let reconciliation: Bool
         if let setting = info[inventoryReconciliationKey] {
             guard let enabled = setting as? Bool else { return .invalid("Invalid inventory reconciliation test setting.") }
             reconciliation = enabled
         } else { reconciliation = false }
+        guard !automation || reconciliation else { return .invalid("Inventory automation requires reconciliation.") }
         guard let setting = info[connectedInventoryKey] else {
             return reconciliation ? .invalid("Inventory reconciliation requires the connected inventory test.") : .disabled
         }
@@ -55,7 +63,7 @@ enum AppRuntimeConfiguration {
             return .invalid("Connected inventory requires isolated F1 storage, local endpoints and a test-only credential service.")
         }
         return .enabled(.init(root: root, website: website, connectURL: connect, uploadURL: upload,
-            keychainService: service, inventoryReconciliation: reconciliation))
+            keychainService: service, inventoryReconciliation: reconciliation, inventoryAutomation: automation))
     }
 
     private static func isolatedInventoryRoots(_ root: URL) -> Bool {

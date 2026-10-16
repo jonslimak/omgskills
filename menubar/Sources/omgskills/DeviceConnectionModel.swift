@@ -39,6 +39,7 @@ final class DeviceConnectionModel {
     private(set) var reportStatus: ReportStatus = .idle
     private(set) var lastReportOutcome: InventoryReportOutcome?
     private(set) var lastInventoryCheckedAt: Date?
+    @ObservationIgnored var onInventoryConnectionReady: (@MainActor () -> Void)?
 
     @ObservationIgnored private let credentialStore: any DeviceCredentialStoring
     @ObservationIgnored private let api: any DeviceSyncServing
@@ -103,6 +104,7 @@ final class DeviceConnectionModel {
                     model.state = .connected(stored.connection)
                     if model.api.reportMode != .legacy {
                         model.connectedCredential = stored
+                        model.onInventoryConnectionReady?()
                         await model.performInventoryReports(record: stored, attemptID: attemptID)
                     }
                 } else if stored != nil {
@@ -194,6 +196,11 @@ final class DeviceConnectionModel {
     @discardableResult
     func requestInventoryReport() -> Task<Void, Never> {
         requestInventoryReport(forceFull: true)
+    }
+
+    func requireFullInventoryReport() {
+        guard connectedCredential != nil else { return }
+        forceFullReportRequested = true
     }
 
     private func requestInventoryReport(forceFull: Bool) -> Task<Void, Never> {
@@ -366,6 +373,7 @@ final class DeviceConnectionModel {
                 connectedInfo = record.connection
                 connectedCredential = record
                 state = .connected(record.connection)
+                onInventoryConnectionReady?()
                 await performInventoryReports(record: record, attemptID: attemptID)
                 finish(attemptID)
                 return

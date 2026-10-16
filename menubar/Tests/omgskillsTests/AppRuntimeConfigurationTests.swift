@@ -3,6 +3,38 @@ import Testing
 @testable import omgskills
 
 struct AppRuntimeConfigurationTests {
+    @Test func automationRequiresReconciliationAndTheSameIsolatedDebugGuards() throws {
+        let root = URL(fileURLWithPath: "/private/tmp/omgskills-f1-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root.appendingPathComponent("home"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let baseline = connectedInfo(root: root)
+        guard case .enabled(let disabled) = AppRuntimeConfiguration.connectedInventoryMode(info: baseline, debugAllowed: true) else {
+            Issue.record("Expected baseline"); return
+        }
+        #expect(!disabled.inventoryAutomation)
+        var info = baseline
+        info[AppRuntimeConfiguration.inventoryReconciliationKey] = true
+        info[AppRuntimeConfiguration.inventoryAutomationKey] = true
+        guard case .enabled(let config) = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: true) else {
+            Issue.record("Expected opted-in automation"); return
+        }
+        #expect(config.inventoryAutomation)
+        for change: [String: Any] in [
+            [AppRuntimeConfiguration.inventoryReconciliationKey: false],
+            [AppRuntimeConfiguration.inventoryAutomationKey: "true"],
+            [AppRuntimeConfiguration.connectedInventoryKey: false],
+            ["CFBundleIdentifier": "com.jonslimak.omgskills"],
+            ["CFBundleIdentifier": "com.jonslimak.omgskills.catalogcandidate"],
+            ["OMGSkillsSyncEndpoint": "https://omgskills.com/api/portal/sync-upload"]] {
+            guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: info.merging(change) { _, new in new }, debugAllowed: true) else {
+                Issue.record("Expected automation to fail closed"); continue
+            }
+        }
+        guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: false) else {
+            Issue.record("Release must refuse automation"); return
+        }
+    }
+
     @Test func reconciliationRequiresAnExplicitValidatedConnectedDebugApp() throws {
         let root = URL(fileURLWithPath: "/private/tmp/omgskills-f1-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: root.appendingPathComponent("home"), withIntermediateDirectories: true)

@@ -4,6 +4,33 @@ import Testing
 
 @MainActor
 struct InventoryReportSchedulerTests {
+    @Test func initialOutcomeIsAdoptedOnceWithoutASecondReportOrLostBackoff() async {
+        let clock = ReportTestClock()
+        var calls = 0
+        let scheduler = InventoryReportScheduler(now: { clock.now }, sleep: clock.sleep, jitter: { 0 }) {
+            calls += 1
+            return .checked
+        }
+        #expect(!scheduler.adoptInitialOutcome(.reported(partial: false)))
+        scheduler.start()
+        #expect(scheduler.adoptInitialOutcome(.retryable(retryAfter: 90)))
+        #expect(!scheduler.adoptInitialOutcome(.reported(partial: false)))
+        scheduler.request()
+        #expect(scheduler.deadline == 90)
+        await clock.advance(89)
+        #expect(calls == 0)
+        await clock.advance(1)
+        #expect(calls == 1)
+        #expect(scheduler.lastOutcome == .checked)
+        #expect(!scheduler.adoptInitialOutcome(.reported(partial: false)))
+        await scheduler.stopAndWait()
+        scheduler.start()
+        #expect(scheduler.adoptInitialOutcome(.reported(partial: false)))
+        await clock.advance(1_000)
+        #expect(calls == 1)
+        await scheduler.stopAndWait()
+    }
+
     @Test func debounceUsesLatestEventAndCapsContinuousBursts() async {
         let clock = ReportTestClock()
         var calls = 0

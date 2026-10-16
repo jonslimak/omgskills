@@ -6,6 +6,9 @@ struct CatalogInstallView: View {
     let model: CatalogInstallModel
     let close: () -> Void
     var connection: DeviceConnectionModel? = nil
+    #if DEBUG
+    var inventoryRuntime: ConnectedInventoryRuntime? = nil
+    #endif
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -13,7 +16,7 @@ struct CatalogInstallView: View {
                 .textSelection(.enabled)
             #if DEBUG
             if let connection {
-                ConnectedInventoryView(model: connection, deviceName: Host.current().localizedName ?? "Test Mac")
+                ConnectedInventoryView(model: connection, deviceName: Host.current().localizedName ?? "Test Mac", runtime: inventoryRuntime)
                 Divider()
             }
             #endif
@@ -105,12 +108,13 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
                     }
                     return try await InstalledSkillsScanner.scanForPresence(
                         filesystemPaths: connected.filesystemPaths, pathAnchor: connected.root)
-                })
-            let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer)
+                }, inventoryAutomationEnabled: connected.inventoryAutomation)
+            let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer,
+                automation: connected.inventoryAutomation ? .live(paths: connected.filesystemPaths) : nil)
             connectedRuntime = runtime
             model.onInstalled = { [weak runtime] in runtime?.installed() }
             window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
-                close: { [weak self] in self?.closeRequest() }, connection: connection))
+                close: { [weak self] in self?.closeRequest() }, connection: connection, inventoryRuntime: runtime))
             runtime.start()
         }
     }

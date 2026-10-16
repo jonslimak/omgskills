@@ -14,6 +14,23 @@ function fixture(t) {
     testEnvironmentVerified: true };
 }
 
+test('automation plans carry both gates and require reconciliation without preparing an app', t => {
+  const input = fixture(t);
+  const plan = inventoryTestPlan({ ...input, inventoryReconciliationTest: true, inventoryAutomationTest: true });
+  assert.equal(plan.options.inventoryAutomationTest, true);
+  assert.equal(plan.options.inventoryReconciliationTest, true);
+  assert.equal(plan.backendEnvironment.OMGSKILLS_INVENTORY_RECONCILIATION_TEST, '1');
+  assert.equal(plan.browserEnvironment.VITE_NEWMAC_INVENTORY_RECONCILIATION_TEST, '1');
+  const args = ['--bin-dir', input.binDirectory, '--website', input.website, '--backend-origin', input.backendOrigin,
+    '--test-environment-verified', '--inventory-reconciliation-test', '--inventory-automation-test'];
+  assert.equal(inventoryTestCommand(args).plan.options.inventoryAutomationTest, true);
+  assert.equal(inventoryTestCommand(args).prepareRequested, false);
+  assert.throws(() => inventoryTestPlan({ ...input, inventoryAutomationTest: true }));
+  assert.throws(() => inventoryTestPlan({ ...input, inventoryReconciliationTest: true, inventoryAutomationTest: 'true' }));
+  assert.throws(() => inventoryTestPlan({ ...input, inventoryReconciliationTest: true,
+    backendEnvironment: { OMGSKILLS_INVENTORY_RECONCILIATION_TEST: '0' } }));
+});
+
 test('plan derives coherent native/browser/backend configuration without preparing anything', t => {
   const input = fixture(t);
   const before = readdirSync(input.binDirectory, { recursive: true });

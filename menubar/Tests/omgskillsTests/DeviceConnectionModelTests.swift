@@ -4,6 +4,29 @@ import Testing
 
 @MainActor
 struct DeviceConnectionModelTests {
+    @Test func readyHookRunsBeforeInitialScanAndManualIntentDoesNotStartWork() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { await api.noteScan(); return scan }, inventoryAutomationEnabled: true)
+        var ready = 0
+        model.onInventoryConnectionReady = {
+            ready += 1
+            #expect(model.state == .connected(record.connection))
+            #expect(model.lastReportOutcome == nil)
+        }
+        await model.restore().value
+        #expect(ready == 1)
+        #expect(await model.requestScheduledInventoryReport() == .checked)
+        #expect(ready == 1)
+        model.requireFullInventoryReport()
+        #expect(await api.uploadedNames().count == 1)
+        #expect(await model.requestScheduledInventoryReport() == .reported(partial: false))
+        #expect(await api.uploadedNames().count == 2)
+        model.onInventoryConnectionReady = nil
+    }
+
     @Test func browserConnectExchangesWithVerifierAndPerformsFirstSync() async {
         let record = makeCredential()
         let store = MockDeviceCredentialStore()
