@@ -122,6 +122,46 @@ struct DeviceSyncAPITests {
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer device-secret")
         #expect(request.httpBody == Data("{}".utf8))
     }
+
+    @Test func presenceUploadUsesVersionTwoAndDecodesAcknowledgment() async throws {
+        let session = MockDeviceHTTPSession(responses: [.init(statusCode: 200, body: """
+            {"syncRunId":"run-2","syncedSkillCount":0,"reportVersion":2,"mode":"presence",
+             "deviceId":"device-2","completedAt":"2026-10-16T12:00:00.123Z"}
+            """)])
+        let api = DeviceSyncAPI(uploadEndpoint: URL(string: "http://127.0.0.1:8888/api/portal/sync-upload")!,
+            session: session, reportMode: .presence)
+        let result = try await api.upload(credential: "secret", installations: [])
+        let request = try #require(await session.requests().first)
+        let data = try #require(request.httpBody)
+        let body = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect(Set(body.keys) == ["reportVersion", "skills"])
+        #expect(body["reportVersion"] as? Int == 2)
+        #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer secret")
+        #expect(result.deviceId == "device-2")
+        #expect(result.completedAt == "2026-10-16T12:00:00.123Z")
+        #expect(result.reportedAt != nil)
+        #expect(api.reportMode == .presence)
+    }
+
+    @Test func presenceRejectsLegacyOrMalformedAcknowledgmentAndNeverRetriesLegacy() async throws {
+        for body in ["{\"syncRunId\":\"run\",\"syncedSkillCount\":0}",
+                     "{\"syncRunId\":\"run\",\"syncedSkillCount\":0,\"reportVersion\":2,\"mode\":\"presence\",\"deviceId\":\"d\",\"completedAt\":\"bad\"}",
+                     "{\"syncRunId\":\"run\",\"syncedSkillCount\":1,\"reportVersion\":2,\"mode\":\"presence\",\"deviceId\":\"d\",\"completedAt\":\"2026-10-16T12:00:00Z\"}"] {
+            let session = MockDeviceHTTPSession(responses: [.init(statusCode: 200, body: body)])
+            let api = DeviceSyncAPI(session: session, reportMode: .presence)
+            await #expect(throws: DeviceSyncAPIError.invalidResponse) { try await api.upload(credential: "secret", installations: []) }
+            #expect(await session.requests().count == 1)
+        }
+    }
+
+    @Test func presenceKeepsUnauthorizedAndServerFailuresAndDoesNotRetry() async {
+        for (status, error) in [(401, DeviceSyncAPIError.reconnectRequired), (503, .server(statusCode: 503))] {
+            let session = MockDeviceHTTPSession(responses: [.init(statusCode: status, body: "{}")])
+            let api = DeviceSyncAPI(session: session, reportMode: .presence)
+            await #expect(throws: error) { try await api.upload(credential: "secret", installations: []) }
+            #expect(await session.requests().count == 1)
+        }
+    }
 }
 
 private actor MockDeviceHTTPSession: DeviceHTTPSession {

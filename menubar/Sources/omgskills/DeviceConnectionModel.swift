@@ -23,8 +23,19 @@ final class DeviceConnectionModel {
         case failed(DeviceConnectionFailure)
     }
 
+    enum ReportStatus: Equatable, Sendable {
+        case idle
+        case pending
+        case reporting
+        case reported(SkillSyncResult, scanIssueCount: Int)
+        case failed(String)
+    }
+
+    typealias InventoryScanner = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
+
     private(set) var state: State = .disconnected
     private(set) var disconnectWarning: String?
+    private(set) var reportStatus: ReportStatus = .idle
 
     @ObservationIgnored private let credentialStore: any DeviceCredentialStoring
     @ObservationIgnored private let api: any DeviceSyncServing
@@ -35,6 +46,9 @@ final class DeviceConnectionModel {
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeAttemptID: UUID?
     @ObservationIgnored private var connectedInfo: DeviceConnectionInfo?
+    @ObservationIgnored private var connectedCredential: StoredDeviceCredential?
+    @ObservationIgnored private let inventoryScanner: InventoryScanner?
+    @ObservationIgnored private var reportRequested = false
 
     init(
         credentialStore: any DeviceCredentialStoring = DeviceCredentialStore(),
@@ -42,7 +56,8 @@ final class DeviceConnectionModel {
         browserAuthorizer: (any BrowserPairingAuthorizing)? = nil,
         pairingRequestGenerator: any BrowserPairingRequestGenerating = SystemBrowserPairingRequestGenerator(),
         portalConnectURL: URL = BrowserPairing.configuredConnectURL(),
-        updateCoordinator: UpdateInstallCoordinator? = nil
+        updateCoordinator: UpdateInstallCoordinator? = nil,
+        inventoryScanner: InventoryScanner? = nil
     ) {
         self.credentialStore = credentialStore
         self.api = api
@@ -50,17 +65,26 @@ final class DeviceConnectionModel {
         self.pairingRequestGenerator = pairingRequestGenerator
         self.portalConnectURL = portalConnectURL
         self.updateCoordinator = updateCoordinator
+        self.inventoryScanner = inventoryScanner
     }
 
     @discardableResult
     func restore() -> Task<Void, Never> {
-        startAttempt(initialState: .disconnected) { model, attemptID in
+        if api.reportMode == .presence {
+            connectedCredential = nil
+            connectedInfo = nil
+        }
+        return startAttempt(initialState: .disconnected) { model, attemptID in
             do {
                 let stored = try await model.credentialStore.load()
                 guard model.isCurrent(attemptID) else { return }
                 if let stored, stored.connection.expiresAt > Date() {
                     model.connectedInfo = stored.connection
                     model.state = .connected(stored.connection)
+                    if model.api.reportMode == .presence {
+                        model.connectedCredential = stored
+                        await model.performPresenceReports(record: stored, attemptID: attemptID)
+                    }
                 } else if stored != nil {
                     model.state = .failed(.reconnectRequired)
                 } else {
@@ -112,7 +136,8 @@ final class DeviceConnectionModel {
 
     @discardableResult
     func retrySync(installations: [Skill]) -> Task<Void, Never> {
-        startAttempt(initialState: .syncing, trackedActivity: .portalConnection) { model, attemptID in
+        if api.reportMode == .presence { return requestInventoryReport() }
+        return startAttempt(initialState: .syncing, trackedActivity: .portalConnection) { model, attemptID in
             do {
                 guard let stored = try await model.credentialStore.load() else {
                     guard model.isCurrent(attemptID) else { return }
@@ -145,7 +170,26 @@ final class DeviceConnectionModel {
     }
 
     @discardableResult
+    func requestInventoryReport() -> Task<Void, Never> {
+        guard api.reportMode == .presence else { return Task {} }
+        if let activeTask, !activeTask.isCancelled {
+            if connectedCredential != nil || state == .authorizing || state == .exchanging || state == .storingCredential {
+                reportRequested = true
+                if reportStatus != .reporting { reportStatus = .pending }
+            }
+            return activeTask
+        }
+        guard let record = connectedCredential, case .connected = state else { return Task {} }
+        return startAttempt(initialState: .connected(record.connection), trackedActivity: .portalConnection) { model, attemptID in
+            await model.performPresenceReports(record: record, attemptID: attemptID)
+        }
+    }
+
+    @discardableResult
     func disconnect() -> Task<Void, Never> {
+        connectedCredential = nil
+        reportRequested = false
+        reportStatus = .idle
         let previousTask = activeTask
         activeAttemptID = nil
         browserAuthorizer?.cancel()
@@ -182,6 +226,7 @@ final class DeviceConnectionModel {
                 : nil
             connectedInfo = nil
             state = .disconnected
+            reportStatus = .idle
             finish(attemptID)
         }
         activeTask = task
@@ -189,6 +234,8 @@ final class DeviceConnectionModel {
     }
 
     func cancelCurrentOperation() {
+        reportRequested = false
+        reportStatus = .idle
         activeAttemptID = nil
         browserAuthorizer?.cancel()
         activeTask?.cancel()
@@ -248,6 +295,15 @@ final class DeviceConnectionModel {
             credentialStored = true
             guard isCurrent(attemptID) else {
                 await cleanup(record, credentialStored: true)
+                return
+            }
+
+            if api.reportMode == .presence {
+                connectedInfo = record.connection
+                connectedCredential = record
+                state = .connected(record.connection)
+                await performPresenceReports(record: record, attemptID: attemptID)
+                finish(attemptID)
                 return
             }
 
@@ -357,6 +413,8 @@ final class DeviceConnectionModel {
         previousTask?.cancel()
         let attemptID = UUID()
         activeAttemptID = attemptID
+        reportRequested = false
+        reportStatus = .idle
         state = initialState
         disconnectWarning = nil
         let activity = trackedActivity.flatMap { updateCoordinator?.beginActivity($0) }
@@ -372,6 +430,43 @@ final class DeviceConnectionModel {
         }
         activeTask = task
         return task
+    }
+
+    private func performPresenceReports(record: StoredDeviceCredential, attemptID: UUID) async {
+        repeat {
+            reportRequested = false
+            reportStatus = .reporting
+            do {
+                guard let inventoryScanner else { throw PresenceSyncError.missingScanner }
+                let scan = try await inventoryScanner()
+                guard isCurrent(attemptID), connectedCredential == record else { return }
+                let result = try await api.upload(credential: record.credential, installations: scan.installations)
+                guard isCurrent(attemptID), connectedCredential == record else { return }
+                guard result.reportVersion == 2, result.mode == "presence",
+                      result.deviceId == record.connection.deviceID, result.reportedAt != nil else {
+                    throw DeviceSyncAPIError.invalidResponse
+                }
+                reportStatus = .reported(result, scanIssueCount: scan.issues.count)
+            } catch is CancellationError {
+                if isCurrent(attemptID) { reportStatus = .pending; reportRequested = false }
+                return
+            } catch DeviceSyncAPIError.reconnectRequired {
+                guard isCurrent(attemptID), connectedCredential == record else { return }
+                try? await credentialStore.delete(deviceID: record.connection.deviceID)
+                guard isCurrent(attemptID), connectedCredential == record else { return }
+                connectedCredential = nil
+                connectedInfo = nil
+                state = .failed(.reconnectRequired)
+                reportStatus = .idle
+                reportRequested = false
+                return
+            } catch {
+                guard isCurrent(attemptID), connectedCredential == record else { return }
+                reportStatus = .failed(error.localizedDescription)
+                reportRequested = false
+                return
+            }
+        } while reportRequested && isCurrent(attemptID)
     }
 
     private func cleanup(
@@ -397,6 +492,13 @@ final class DeviceConnectionModel {
 
     private func finish(_ attemptID: UUID) {
         guard activeAttemptID == attemptID else { return }
+        reportRequested = false
+        if reportStatus == .pending {
+            switch state {
+            case .connected: break
+            default: reportStatus = .idle
+            }
+        }
         activeAttemptID = nil
         activeTask = nil
     }

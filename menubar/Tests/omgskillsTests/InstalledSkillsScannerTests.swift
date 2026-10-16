@@ -168,6 +168,82 @@ struct InstalledSkillsScannerTests {
         #expect(result.summary.recentSkills.last?.name == "skill-1")
     }
 
+    @Test func presenceScanKeepsAllThreeLocationsWithoutCatalogMatching() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let shared = root.appendingPathComponent("shared")
+        try FileManager.default.createDirectory(at: shared, withIntermediateDirectories: true)
+        try writeSkill(at: shared, name: "shared")
+        for agentRoot in paths.allSkillsRoots {
+            try FileManager.default.createDirectory(at: agentRoot, withIntermediateDirectories: true)
+            try FileManager.default.createSymbolicLink(at: agentRoot.appendingPathComponent("shared"), withDestinationURL: shared)
+        }
+        let result = try await InstalledSkillsScanner.scanForPresence(filesystemPaths: paths)
+        #expect(result.skills.count == 1)
+        #expect(result.installations.count == 3)
+        #expect(Set(result.installations.compactMap(\.origin)) == ["Claude", "Codex", "Agents"])
+        #expect(result.issues.isEmpty)
+        #expect(try SkillSyncService.presencePayload(installations: result.installations).skills.count == 3)
+    }
+
+    @Test func presenceScanReportsSkippedEntriesAndUnavailableRootsAlongsideUsableSkills() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let good = paths.codexSkillsRoot.appendingPathComponent("good")
+        let bad = paths.codexSkillsRoot.appendingPathComponent("bad")
+        try FileManager.default.createDirectory(at: good, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: bad, withIntermediateDirectories: true)
+        try writeSkill(at: good, name: "good")
+        try "not valid frontmatter".write(to: bad.appendingPathComponent("SKILL.md"), atomically: true, encoding: .utf8)
+        try FileManager.default.createDirectory(at: paths.agentsSkillsRoot.deletingLastPathComponent(), withIntermediateDirectories: true)
+        // A file where a root should be is a deterministic read error, even as root.
+        try Data("not a directory".utf8).write(to: paths.agentsSkillsRoot)
+        let result = try await InstalledSkillsScanner.scanForPresence(filesystemPaths: paths)
+        #expect(result.installations.map(\.name) == ["good"])
+        #expect(result.issues.contains(.unreadableRoot(source: "Agents")))
+        #expect(result.issues.contains(.skippedSkill(source: "Codex", folder: "bad")))
+        #expect(!result.issues.contains(.unreadableRoot(source: "Claude")))
+    }
+
+    @Test func presenceScanCancellationDoesNotReturnAnEmptySuccessfulReport() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let task = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return try await InstalledSkillsScanner.scanForPresence(filesystemPaths: paths)
+        }
+        await #expect(throws: CancellationError.self) { try await task.value }
+    }
+
+    @Test func presenceScanSkipsOversizeMetadataButRetainsOtherSkills() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        for (folder, name) in [("good", "good"), ("oversize", String(repeating: "x", count: 201))] {
+            let directory = paths.codexSkillsRoot.appendingPathComponent(folder)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try writeSkill(at: directory, name: name)
+        }
+        let result = try await InstalledSkillsScanner.scanForPresence(filesystemPaths: paths)
+        #expect(result.installations.map(\.name) == ["good"])
+        #expect(result.issues.contains(.skippedSkill(source: "Codex", folder: "oversize")))
+        #expect(try SkillSyncService.presencePayload(installations: result.installations).skills.count == 1)
+    }
+
+    @Test func presenceScanDoesNotTreatBrokenRootSymlinkAsAnEmptyRoot() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        try FileManager.default.createDirectory(at: paths.codexSkillsRoot.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: paths.codexSkillsRoot, withDestinationURL: root.appendingPathComponent("missing"))
+        let result = try await InstalledSkillsScanner.scanForPresence(filesystemPaths: paths)
+        #expect(result.installations.isEmpty)
+        #expect(result.issues.contains(.unreadableRoot(source: "Codex")))
+    }
+
     private func temporaryDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)

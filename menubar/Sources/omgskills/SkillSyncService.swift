@@ -9,6 +9,43 @@ struct DeviceSkillSyncPayload: Codable, Equatable, Sendable {
     let skills: [SkillSyncPayloadSkill]
 }
 
+enum DeviceReportMode: Sendable {
+    case legacy
+    case presence
+}
+
+struct PresenceSyncPayload: Encodable, Equatable, Sendable {
+    let reportVersion = 2
+    let skills: [PresenceSyncSkill]
+}
+
+struct PresenceSyncSkill: Encodable, Equatable, Sendable {
+    let source: String
+    let installationPath: String
+    let name: String
+    let description: String
+    let skillMdSha: String?
+    let githubUrl: String?
+    let gitRelativePath: String?
+    let catalogSkillIdHint: String?
+}
+
+enum PresenceSyncError: LocalizedError, Equatable {
+    case tooManyInstallations
+    case invalidInstallation
+    case duplicateLocation
+    case missingScanner
+
+    var errorDescription: String? {
+        switch self {
+        case .tooManyInstallations: "Inventory reporting supports at most 1,000 installations. Nothing was uploaded."
+        case .invalidInstallation: "An installation has unsupported metadata. Nothing was uploaded."
+        case .duplicateLocation: "The scan contains a duplicate installation location. Nothing was uploaded."
+        case .missingScanner: "Inventory scanning is not configured."
+        }
+    }
+}
+
 struct SkillSyncPayloadSkill: Codable, Equatable, Sendable {
     let stableKey: String
     let installationPath: String
@@ -25,6 +62,27 @@ struct SkillSyncPayloadSkill: Codable, Equatable, Sendable {
 struct SkillSyncResult: Decodable, Equatable, Sendable {
     let syncRunId: String
     let syncedSkillCount: Int
+    let reportVersion: Int?
+    let mode: String?
+    let deviceId: String?
+    let completedAt: String?
+
+    init(syncRunId: String, syncedSkillCount: Int, reportVersion: Int? = nil,
+         mode: String? = nil, deviceId: String? = nil, completedAt: String? = nil) {
+        self.syncRunId = syncRunId
+        self.syncedSkillCount = syncedSkillCount
+        self.reportVersion = reportVersion
+        self.mode = mode
+        self.deviceId = deviceId
+        self.completedAt = completedAt
+    }
+
+    var reportedAt: Date? {
+        guard let completedAt else { return nil }
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.date(from: completedAt) ?? ISO8601DateFormatter().date(from: completedAt)
+    }
 }
 
 enum SkillSyncError: LocalizedError, Equatable {
@@ -105,6 +163,72 @@ enum SkillSyncService {
             isLocalOnly: identityStatus == "localOnly",
             source: source
         )
+    }
+
+    static func presencePayload(installations: [Skill]) throws -> PresenceSyncPayload {
+        guard installations.count <= 1000 else { throw PresenceSyncError.tooManyInstallations }
+        var locations = Set<String>()
+        let skills = try installations.map { skill in
+            let row = try presencePayloadSkill(skill)
+            guard locations.insert("\(row.source):\(row.installationPath)").inserted else {
+                throw PresenceSyncError.duplicateLocation
+            }
+            return row
+        }
+        return PresenceSyncPayload(skills: skills)
+    }
+
+    static func presencePayloadSkill(_ skill: Skill) throws -> PresenceSyncSkill {
+        let source = (skill.origin ?? "").lowercased()
+        let folder = URL(fileURLWithPath: skill.installCmd).lastPathComponent
+        guard ["claude", "codex", "agents"].contains(source),
+              validFolder(folder), !skill.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              skill.name.utf16.count <= 200, skill.description.utf16.count <= 2000 else {
+            throw PresenceSyncError.invalidInstallation
+        }
+        let hash = skill.skillMdSha?.lowercased()
+        let hint = skill.catalogSkillId.flatMap { value -> String? in
+            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            return !trimmed.isEmpty && trimmed.utf16.count <= 500 ? trimmed : nil
+        }
+        return PresenceSyncSkill(source: source, installationPath: folder,
+            name: skill.name, description: skill.description,
+            skillMdSha: hash?.range(of: "^(?:[a-f0-9]{40}|[a-f0-9]{64})$", options: .regularExpression) != nil ? hash : nil,
+            githubUrl: safeRepositoryURL(skill.githubUrl),
+            gitRelativePath: safeRelativePath(skill.gitRelativePath), catalogSkillIdHint: hint)
+    }
+
+    private static func validFolder(_ value: String) -> Bool {
+        !value.isEmpty && value.utf16.count <= 500 && value != "." && value != ".."
+            && value == value.trimmingCharacters(in: .whitespacesAndNewlines)
+            && value.range(of: "[\\\\/\\x00-\\x1f\\x7f]", options: .regularExpression) == nil
+    }
+
+    private static func safeRepositoryURL(_ value: String) -> String? {
+        var raw = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if raw.hasPrefix("git@github.com:") { raw = "https://github.com/" + raw.dropFirst(15) }
+        guard raw.utf16.count <= 500, let url = URLComponents(string: raw),
+              url.scheme?.lowercased() == "https", url.host?.lowercased() == "github.com",
+              url.user == nil, url.password == nil, url.query == nil, url.fragment == nil,
+              url.port == nil || url.port == 443 else { return nil }
+        var parts = url.percentEncodedPath.split(separator: "/", omittingEmptySubsequences: false)
+        if parts.last == "" { parts.removeLast() }
+        guard parts.count == 3, parts[0].isEmpty else { return nil }
+        let owner = String(parts[1]), repoWithSuffix = String(parts[2])
+        let repo = repoWithSuffix.hasSuffix(".git") ? String(repoWithSuffix.dropLast(4)) : repoWithSuffix
+        guard owner.range(of: "^[A-Za-z0-9-]+$", options: .regularExpression) != nil,
+              repo.range(of: "^[A-Za-z0-9_.-]+$", options: .regularExpression) != nil,
+              repo != ".", repo != ".." else { return nil }
+        return "https://github.com/\(owner.lowercased())/\(repo.lowercased())"
+    }
+
+    private static func safeRelativePath(_ value: String?) -> String? {
+        guard let value, value.utf16.count <= 500 else { return nil }
+        if value == "." || value.isEmpty { return "" }
+        guard value == value.trimmingCharacters(in: .whitespacesAndNewlines),
+              value.range(of: "[\\\\\\x00-\\x1f\\x7f]|^[A-Za-z]:", options: .regularExpression) == nil,
+              value.split(separator: "/", omittingEmptySubsequences: false).allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." }) else { return nil }
+        return value
     }
 
     static func upload(

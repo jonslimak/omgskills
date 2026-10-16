@@ -30,6 +30,12 @@ enum InstalledSkillsScanner {
         let skills: [Skill]
         let installations: [Skill]
         let summary: InstalledSkillSummary
+        var issues: [ScanIssue] = []
+    }
+
+    enum ScanIssue: Equatable, Sendable {
+        case unreadableRoot(source: String)
+        case skippedSkill(source: String, folder: String)
     }
 
     struct Root {
@@ -54,6 +60,30 @@ enum InstalledSkillsScanner {
         return scan(roots: roots)
     }
 
+    static func scanForPresence(filesystemPaths: SkillFilesystemPaths) async throws -> ScanResult {
+        // A child task keeps synchronous filesystem work off the UI actor.
+        try await withThrowingTaskGroup(of: ScanResult.self) { group in
+            group.addTask {
+                try Task.checkCancellation()
+                let scan = scanWithSummary(filesystemPaths: filesystemPaths)
+                var issues = scan.issues
+                let installations = scan.installations.filter { skill in
+                    do {
+                        _ = try SkillSyncService.presencePayloadSkill(skill)
+                        return true
+                    } catch {
+                        issues.append(.skippedSkill(source: skill.origin ?? "Unknown",
+                            folder: URL(fileURLWithPath: skill.installCmd).lastPathComponent))
+                        return false
+                    }
+                }
+                try Task.checkCancellation()
+                return ScanResult(skills: scan.skills, installations: installations, summary: scan.summary, issues: issues)
+            }
+            return try await group.next()!
+        }
+    }
+
     static func scan(roots: [Root]) -> ScanResult {
         let fm = FileManager.default
         var seen = Set<String>()
@@ -61,23 +91,41 @@ enum InstalledSkillsScanner {
         var installations: [Skill] = []
         var summary = InstalledSkillSummary()
         var recent: [InstalledSkillSummary.RecentSkill] = []
+        var issues: [ScanIssue] = []
 
         for root in roots {
-            guard let entries = try? fm.contentsOfDirectory(
-                at: root.url,
-                includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey, .contentModificationDateKey],
-                options: [.skipsHiddenFiles]
-            ) else { continue }
+            let entries: [URL]
+            do {
+                entries = try fm.contentsOfDirectory(at: root.url,
+                    includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey, .contentModificationDateKey],
+                    options: [.skipsHiddenFiles])
+            } catch {
+                let failure = error as NSError
+                let isLink = (try? fm.attributesOfItem(atPath: root.url.path)[.type] as? FileAttributeType) == .typeSymbolicLink
+                if fm.fileExists(atPath: root.url.path) || isLink || failure.domain != NSCocoaErrorDomain
+                    || ![NSFileNoSuchFileError, NSFileReadNoSuchFileError].contains(failure.code) {
+                    issues.append(.unreadableRoot(source: root.origin))
+                }
+                continue
+            }
 
             for entry in entries {
                 let skillMd = entry.appendingPathComponent("SKILL.md")
-                guard fm.fileExists(atPath: skillMd.path) else { continue }
                 let isSymlink = (try? entry.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false
+                guard fm.fileExists(atPath: skillMd.path) else {
+                    if isSymlink || (try? entry.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
+                        issues.append(.skippedSkill(source: root.origin, folder: entry.lastPathComponent))
+                    }
+                    continue
+                }
                 let provenance = SkillInstallProvenanceStore.read(
                     targetRoot: root.url,
                     targetName: entry.lastPathComponent
                 )
-                guard let skill = parse(skillMd: skillMd, dir: entry, origin: root.origin, isSymlink: isSymlink, provenance: provenance) else { continue }
+                guard let skill = parse(skillMd: skillMd, dir: entry, origin: root.origin, isSymlink: isSymlink, provenance: provenance) else {
+                    issues.append(.skippedSkill(source: root.origin, folder: entry.lastPathComponent))
+                    continue
+                }
 
                 installations.append(skill)
                 summary.totalInstallations += 1
@@ -105,7 +153,7 @@ enum InstalledSkillsScanner {
         }
 
         summary.recentSkills = Array(recent.sorted { $0.installedAt > $1.installedAt }.prefix(recentSkillLimit))
-        return ScanResult(skills: skills, installations: installations, summary: summary)
+        return ScanResult(skills: skills, installations: installations, summary: summary, issues: issues)
     }
 
     private static func parse(skillMd: URL, dir: URL, origin: String, isSymlink: Bool, provenance: SkillInstallProvenance?) -> Skill? {

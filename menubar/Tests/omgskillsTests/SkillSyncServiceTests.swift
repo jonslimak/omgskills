@@ -183,6 +183,72 @@ struct SkillSyncServiceTests {
         try SkillSyncService.validateStatusCode(200)
     }
 
+    @Test func presenceJSONContainsOnlyA1FactsForEveryAgent() throws {
+        let installations = ["Claude", "Codex", "Agents"].map { source in
+            makeSkill(name: "Review", githubUrl: "git@github.com:Owner/Repo.git",
+                installCmd: "/private/test/\(source)/review", origin: source, isLocalOnly: false,
+                skillMdSha: String(repeating: "A", count: 40), catalogSkillId: "owner/repo:skills/review",
+                identityStatus: .resolved(method: .provenance), gitRelativePath: "skills/review")
+        }
+        let payload = try SkillSyncService.presencePayload(installations: installations)
+        let data = try JSONEncoder().encode(payload)
+        let json = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let skills = try #require(json["skills"] as? [[String: Any]])
+        #expect(Set(json.keys) == ["reportVersion", "skills"])
+        #expect(json["reportVersion"] as? Int == 2)
+        #expect(payload.skills.map(\.source) == ["claude", "codex", "agents"])
+        #expect(skills.allSatisfy { Set($0.keys) == ["source", "installationPath", "name", "description", "skillMdSha", "githubUrl", "gitRelativePath", "catalogSkillIdHint"] })
+        #expect(payload.skills.allSatisfy { $0.installationPath == "review" && $0.githubUrl == "https://github.com/owner/repo" })
+        #expect(payload.skills.allSatisfy { $0.skillMdSha == String(repeating: "a", count: 40) })
+        #expect(!String(decoding: data, as: UTF8.self).contains("/private/test"))
+    }
+
+    @Test func presenceOmitsUnsafeOptionalHintsWithoutDroppingInstallation() throws {
+        for remote in ["https://user:secret@github.com/o/r", "https://github.com/o/r?token=secret",
+                       "https://github.com/o/r#secret", "https://notgithub.com/o/r", "http://github.com/o/r"] {
+            let skill = makeSkill(name: "Local", githubUrl: remote, installCmd: "/tmp/local", origin: "Codex",
+                isLocalOnly: false, skillMdSha: "bad-hash", gitRelativePath: "../private")
+            let payload = try SkillSyncService.presencePayload(installations: [skill])
+            #expect(payload.skills.count == 1)
+            #expect(payload.skills[0].githubUrl == nil)
+            #expect(payload.skills[0].gitRelativePath == nil)
+            #expect(payload.skills[0].skillMdSha == nil)
+            #expect(!String(decoding: try JSONEncoder().encode(payload), as: UTF8.self).contains("secret"))
+        }
+    }
+
+    @Test func presenceNormalizesRepositoryRootAndAcceptsSafeHTTPS() throws {
+        let skill = makeSkill(name: "Local", githubUrl: "https://GitHub.com/Owner/Repo.git/",
+            installCmd: "/tmp/local", origin: "Agents", isLocalOnly: false, gitRelativePath: ".")
+        let row = try #require(SkillSyncService.presencePayload(installations: [skill]).skills.first)
+        #expect(row.githubUrl == "https://github.com/owner/repo")
+        #expect(row.gitRelativePath == "")
+    }
+
+    @Test func presenceRefusesLimitsAndDuplicateLocationsWithoutTruncating() throws {
+        let skill = makeSkill(name: "Local", githubUrl: "", installCmd: "/tmp/local", origin: "Codex", isLocalOnly: true)
+        #expect(throws: PresenceSyncError.tooManyInstallations) {
+            try SkillSyncService.presencePayload(installations: Array(repeating: skill, count: 1001))
+        }
+        #expect(throws: PresenceSyncError.duplicateLocation) {
+            try SkillSyncService.presencePayload(installations: [skill, skill])
+        }
+        #expect(try SkillSyncService.presencePayload(installations: []).skills.isEmpty)
+        let invalid = makeSkill(name: "Local", githubUrl: "", installCmd: "/tmp/local", origin: "Unknown", isLocalOnly: true)
+        #expect(throws: PresenceSyncError.invalidInstallation) { try SkillSyncService.presencePayload(installations: [invalid]) }
+    }
+
+    @Test func presenceDoesNotChangeLegacyOneTimePayloadJSON() throws {
+        let skill = makeSkill(name: "Local", githubUrl: "", installCmd: "/tmp/local", origin: "Codex", isLocalOnly: true)
+        let data = try JSONEncoder().encode(SkillSyncService.payload(token: " old-token ", installations: [skill]))
+        let body = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let rows = try #require(body["skills"] as? [[String: Any]])
+        #expect(Set(body.keys) == ["token", "skills"])
+        #expect(body["token"] as? String == "old-token")
+        #expect(rows[0]["stableKey"] as? String == "location:v1:codex:local")
+        #expect(rows[0]["identityStatus"] as? String == "localOnly")
+    }
+
     private func makeSkill(
         name: String,
         githubUrl: String,
@@ -191,7 +257,8 @@ struct SkillSyncServiceTests {
         isLocalOnly: Bool,
         skillMdSha: String? = nil,
         catalogSkillId: String? = nil,
-        identityStatus: SkillIdentityStatus? = nil
+        identityStatus: SkillIdentityStatus? = nil,
+        gitRelativePath: String? = nil
     ) -> Skill {
         Skill(
             id: "installed:\(installCmd)",
@@ -212,6 +279,7 @@ struct SkillSyncServiceTests {
             origin: origin,
             isSymlink: false,
             isLocalOnly: isLocalOnly,
+            gitRelativePath: gitRelativePath,
             catalogSkillId: catalogSkillId,
             identityStatus: identityStatus
         )

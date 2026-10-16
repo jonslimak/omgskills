@@ -27,6 +27,7 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
 }
 
 protocol DeviceSyncServing: Sendable {
+    var reportMode: DeviceReportMode { get }
     func exchange(
         pairingCode: String,
         deviceName: String,
@@ -36,6 +37,10 @@ protocol DeviceSyncServing: Sendable {
     func revoke(credential: String) async throws
 }
 
+extension DeviceSyncServing {
+    var reportMode: DeviceReportMode { .legacy }
+}
+
 protocol DeviceHTTPSession: Sendable {
     func data(for request: URLRequest) async throws -> (Data, URLResponse)
 }
@@ -43,6 +48,7 @@ protocol DeviceHTTPSession: Sendable {
 extension URLSession: DeviceHTTPSession {}
 
 struct DeviceSyncAPI: DeviceSyncServing, Sendable {
+    let reportMode: DeviceReportMode
     struct Endpoints: Equatable, Sendable {
         let exchange: URL
         let upload: URL
@@ -77,10 +83,12 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
 
     init(
         uploadEndpoint: URL = SkillSyncService.configuredEndpoint(),
-        session: any DeviceHTTPSession = URLSession.shared
+        session: any DeviceHTTPSession = URLSession.shared,
+        reportMode: DeviceReportMode = .legacy
     ) {
         self.endpoints = Endpoints(upload: uploadEndpoint)
         self.session = session
+        self.reportMode = reportMode
         self.encoder = JSONEncoder()
         self.decoder = JSONDecoder()
         self.decoder.dateDecodingStrategy = .iso8601
@@ -114,13 +122,26 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
     }
 
     func upload(credential: String, installations: [Skill]) async throws -> SkillSyncResult {
-        let payload = DeviceSkillSyncPayload(skills: SkillSyncService.payloadSkills(installations))
-        return try await send(
+        let body: Data
+        switch reportMode {
+        case .legacy:
+            body = try encoder.encode(DeviceSkillSyncPayload(skills: SkillSyncService.payloadSkills(installations)))
+        case .presence:
+            body = try encoder.encode(SkillSyncService.presencePayload(installations: installations))
+        }
+        let result: SkillSyncResult = try await send(
             to: endpoints.upload,
-            body: encoder.encode(payload),
+            body: body,
             credential: credential,
             unauthorizedError: .reconnectRequired
         )
+        if reportMode == .presence {
+            guard result.reportVersion == 2, result.mode == "presence",
+                  let deviceId = result.deviceId, !deviceId.isEmpty,
+                  !result.syncRunId.isEmpty, result.syncedSkillCount == installations.count,
+                  result.reportedAt != nil else { throw DeviceSyncAPIError.invalidResponse }
+        }
+        return result
     }
 
     func revoke(credential: String) async throws {
