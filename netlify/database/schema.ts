@@ -207,11 +207,15 @@ export const syncRuns = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    deviceId: uuid("device_id").references(() => deviceTokens.id, { onDelete: "no action" }),
     status: text("status").notNull(),
     startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
     completedAt: timestamp("completed_at", { withTimezone: true })
   },
-  (table) => [index("sync_runs_user_idx").on(table.userId)]
+  (table) => [
+    index("sync_runs_user_idx").on(table.userId),
+    index("sync_runs_user_device_completed_idx").on(table.userId, table.deviceId, table.completedAt)
+  ]
 );
 
 export const syncedSkills = pgTable(
@@ -219,6 +223,7 @@ export const syncedSkills = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    deviceId: uuid("device_id").references(() => deviceTokens.id, { onDelete: "no action" }),
     syncRunId: uuid("sync_run_id").notNull().references(() => syncRuns.id, { onDelete: "cascade" }),
     stableKey: text("stable_key").notNull(),
     skillMdSha: text("skill_md_sha"),
@@ -227,6 +232,8 @@ export const syncedSkills = pgTable(
     description: text("description"),
     catalogSkillId: text("catalog_skill_id"),
     githubUrl: text("github_url"),
+    gitRelativePath: text("git_relative_path"),
+    catalogSkillIdHint: text("catalog_skill_id_hint"),
     isLocalOnly: boolean("is_local_only").notNull().default(false),
     source: text("source").notNull(),
     isCurrent: boolean("is_current").notNull().default(true),
@@ -234,7 +241,10 @@ export const syncedSkills = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
   },
   (table) => [
-    uniqueIndex("synced_skills_user_stable_key_unique").on(table.userId, table.stableKey),
+    uniqueIndex("synced_skills_legacy_location_unique").on(table.userId, table.stableKey)
+      .where(sql`${table.deviceId} IS NULL`),
+    uniqueIndex("synced_skills_device_location_unique").on(table.userId, table.deviceId, table.stableKey)
+      .where(sql`${table.deviceId} IS NOT NULL`),
     index("synced_skills_user_current_idx").on(table.userId, table.isCurrent),
     check(
       "synced_skills_identity_consistency_check",

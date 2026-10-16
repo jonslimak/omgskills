@@ -2,15 +2,18 @@ import type { Context } from "@netlify/functions";
 import { DeviceAuthError } from "./_shared/device-auth.js";
 import { getPgPool } from "./_shared/db.js";
 import { requireSkillGroupsWebFeature } from "./_shared/feature-flags.js";
-import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
-import { parseSyncSkill } from "./_shared/sync-skill.js";
+import { errorResponse, secretJsonResponse, optionsResponse } from "./_shared/http.js";
+import { parseSyncReport } from "./_shared/sync-skill.js";
 import {
   performSyncUpload,
   uploadAuthenticationFromRequest
 } from "./_shared/sync-upload.js";
 import { requireJsonObject } from "./_shared/validation.js";
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requireSkillGroupsWebFeature, performSyncUpload };
+
+export async function portalSyncUpload(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, requireSkillGroupsWebFeature, performSyncUpload } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -21,18 +24,10 @@ export default async (req: Request, _context: Context) => {
   try {
     requireSkillGroupsWebFeature();
     const body = await requireJsonObject(req);
+    const { reportVersion, skills } = parseSyncReport(body);
     const authentication = uploadAuthenticationFromRequest(req, body);
-    const skillsValue = body.skills;
-    if (!Array.isArray(skillsValue)) {
-      throw new Response("skills must be an array", { status: 400 });
-    }
-    if (skillsValue.length > 1000) {
-      throw new Response("skills array is too large", { status: 400 });
-    }
-
-    const skills = skillsValue.map(parseSyncSkill);
-    if (new Set(skills.map((skill) => skill.stableKey)).size !== skills.length) {
-      throw new Response("skills contain duplicate installation locations", { status: 400 });
+    if (reportVersion === 2 && authentication.kind !== "device") {
+      throw new Response("Presence reports require device authorization", { status: 400 });
     }
 
     let pool;
@@ -41,8 +36,8 @@ export default async (req: Request, _context: Context) => {
     } catch {
       return errorResponse(req, 503, "Database is not available");
     }
-    const result = await performSyncUpload(pool, authentication, skills);
-    return jsonResponse(req, result);
+    const result = await performSyncUpload(pool, authentication, skills, new Date(), reportVersion);
+    return secretJsonResponse(req, result);
   } catch (error) {
     if (error instanceof DeviceAuthError) {
       return errorResponse(req, error.status, error.message);
@@ -52,7 +47,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Sync upload failed");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalSyncUpload(req, context);
 
 export const config = {
   path: "/api/portal/sync-upload",

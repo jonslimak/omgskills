@@ -32,8 +32,12 @@ export async function performSyncUpload(
   pool: Pool,
   authentication: UploadAuthentication,
   skills: SyncSkill[],
-  now = new Date()
+  now = new Date(),
+  reportVersion: 1 | 2 = 1
 ) {
+  if (reportVersion === 2 && authentication.kind !== "device") {
+    throw new Response("Presence reports require device authorization", { status: 400 });
+  }
   let client: PoolClient;
   try {
     client = await pool.connect();
@@ -71,14 +75,20 @@ export async function performSyncUpload(
       legacyTokenId = token.id;
     }
 
-    const syncRunId = await writeSyncInventory(client, userId, skills);
+    const syncRunId = await writeSyncInventory(client, userId, skills, {
+      deviceId: reportVersion === 2 ? deviceId! : undefined,
+      now
+    });
     if (deviceId) {
       await touchDeviceAfterSuccessfulUse(client, deviceId, now);
     } else if (legacyTokenId) {
       await client.query("UPDATE sync_tokens SET used_at = $2 WHERE id = $1", [legacyTokenId, now]);
     }
     await client.query("COMMIT");
-    return { syncRunId, syncedSkillCount: skills.length };
+    return reportVersion === 2
+      ? { syncRunId, syncedSkillCount: skills.length, reportVersion: 2 as const,
+          mode: "presence" as const, deviceId, completedAt: now.toISOString() }
+      : { syncRunId, syncedSkillCount: skills.length };
   } catch (error) {
     await rollback(client);
     throw error;
