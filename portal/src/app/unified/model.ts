@@ -3,6 +3,7 @@ import {
   type GroupedSyncedSkill,
 } from "../../synced-skill-grouping";
 import { isMember, type PortalData, type PortalSet } from "../model";
+import { validPublicSort, publicPageRequest, type PublicSort } from "./public-paging";
 
 // Presentation fields only; the stored skill and group models stay unchanged.
 export function setAccessSummary(set: PortalSet) {
@@ -92,6 +93,7 @@ const views: View[] = [
   "mcp",
 ];
 export type Navigation = {
+  sort?: PublicSort;
   view: View;
   id: string;
   query: string;
@@ -116,13 +118,16 @@ export function openSkillNavigation(nav: Navigation, skill: SkillDisplay): Navig
 export function parseNavigation(search: string): Navigation {
   const params = new URLSearchParams(search);
   const view = params.get("view") as View;
-  return {
+  const nav: Navigation = {
     view: views.includes(view) ? view : "all",
     id: params.get("id") || "",
     query: params.get("q") || "",
     selected: params.get("skill") || "",
     source: params.get("source") || "all",
   };
+  const sort = params.get("sort");
+  if (validPublicSort(sort) && sort !== "relevance" && publicPageRequest(nav)?.name !== "list_trending" && publicPageRequest(nav)) nav.sort = sort;
+  return nav;
 }
 export function navigationSearch(nav: Navigation) {
   const params = new URLSearchParams();
@@ -131,6 +136,7 @@ export function navigationSearch(nav: Navigation) {
   if (nav.query) params.set("q", nav.query);
   if (nav.selected) params.set("skill", nav.selected);
   if (nav.source !== "all") params.set("source", nav.source);
+  if (nav.sort && nav.sort !== "relevance" && publicPageRequest(nav)?.name !== "list_trending" && publicPageRequest(nav)) params.set("sort", nav.sort);
   return params.size ? `?${params}` : "";
 }
 export function isDiscovery(view: View) {

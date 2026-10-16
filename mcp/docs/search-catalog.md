@@ -1,7 +1,8 @@
 # Compact Search Catalog (Candidate)
 
-This reader is implemented but not selected by the production MCP export. It
-does not add a public endpoint, change default ranking, or migrate the native installer.
+This reader is implemented behind a reviewed, disabled production feature. It
+does not add a public endpoint or migrate the native installer. Current production
+configuration still selects the legacy reader and app behavior.
 
 ## Data
 
@@ -42,8 +43,9 @@ an LRU capped at 32 MiB of decoded JSON bytes. This is not a JavaScript heap cap
 Failed fetches are retried; a failed refresh preserves the last usable snapshot.
 Individual cancellation does not abort another consumer's shared fetch.
 
-`createCompactMcpLibraryLoader` and `createCompactMcpHandler` are candidate-only
-factories. The default handler still uses `loadProductionMcpLibrary`.
+`createCompactMcpLibraryLoader` and `createCompactMcpHandler` support explicit
+candidate configuration. The default handler still uses `loadProductionMcpLibrary`
+while `catalogSearchEnabled` is false.
 `createMcpHandler` retains its synchronous-reader contract for the separate
 install-record work. When merging that work, keep its dispatch in this legacy
 wrapper, not in the common async read handler. Preserve `repo_slug` and
@@ -128,9 +130,9 @@ warm reads. Its receipt records source hashes, timings, selected IDs and limits.
 The public APIs remain bounded; private selector access is confined to this
 offline verification script.
 
-Portal Load more/sort controls, collection batching, README/detail
-content and hosted measurements remain separate work. The current live UI's
-30-row limit is not removed merely by adding this candidate API capability.
+Portal Load more/sort controls are implemented behind the disabled integration
+feature below. Collection batching, README/detail content and hosted measurements
+remain separate work. Adding the candidate API alone does not change live UI.
 
 ## Ranked Search (Slice 3 Candidate)
 
@@ -141,8 +143,8 @@ const loader = createCompactMcpLibraryLoader({ ranking: true });
 const handler = createCompactMcpHandler(loader, { paging: true, ranking: true });
 ```
 
-The ordinary production export and package entries still select neither
-capability. Only a candidate configured for both advertises `ranking: "web-v1"`
+With current configuration, the production export and package entries still
+select neither capability. Only a handler configured for both advertises `ranking: "web-v1"`
 on `search_skills`. Omitted ranking preserves slice-2 behavior, including scores,
 matching, filters and all nonranked list tools. Check advertised support before
 using it; older candidates do not support the new argument.
@@ -201,3 +203,98 @@ compares all six legacy tools and public page examples, and records fresh-proces
 costs. The nine real-ID expectations and original cost budgets are fixed; a
 failure is a stop point, not a reason to weaken the check. Top-result review and
 hosted measurements remain separate from agreement with a reference scorer.
+
+## App Integration (Disabled)
+
+`config/production-features.json` contains `catalogSearchEnabled: false`. One
+shared strict validator controls the deployed handler and the portal build's
+`VITE_CATALOG_SEARCH_ENABLED` value. Ambient environment variables cannot turn
+either side on independently. The Mac release-config response is unchanged.
+
+When explicitly enabled, `createConfiguredMcpHandler` selects compact reads with
+paging and `web-v1` ranking. It retains production's bounded fetch timeout and
+does not eagerly load the full reader too. A later-track full-reader fallback
+reports `catalog.mode: "full"` and `catalog.degraded: true` in health; it is not
+evidence of compact cold-start performance.
+
+The app checks and caches advertised schemas before sending optional arguments.
+Keyword/category and creator feeds gain Sort and Load more; Trending gains paging
+while retaining published rank order. Default Discover still reads nine rows
+without capability discovery. Confirmed older servers retain the capped legacy
+view with an explanatory note, not invented totals. Network and tool failures
+remain errors.
+
+Page chains validate IDs, totals, sort, snapshot and cursors. A failed append
+preserves rows for Retry; changed snapshots require explicit first-page refresh.
+Query/sort changes cancel abandoned work. Cursors stay out of URLs and storage;
+valid public sort survives navigation. Inactive view snapshots are bounded by
+20 entries and 600 rows, and only the active feed grows through Load more.
+Valid source records without author handles remain visible without invented
+attribution. Private account queries never become public search parameters.
+
+Collections still use their existing capped path. README, install fields,
+genuine author-related detail data and new filter UI are not part of this pass.
+
+### Local Acceptance (2026-10-16)
+
+The user confirmed the localhost manual checklist passed: paging from 30 to 60
+to 65 results, sort reset, detail open/close, empty search, mobile/dark appearance,
+append Retry and catalog-snapshot refresh. This used the 65-result synthetic
+fixture, not real account actions or a hosted search-relevance test.
+
+The full-catalog offline client/API path separately passed all nine fixed
+relevance cases. Its ranked first search read fewer decoded asset bytes than
+legacy, but was slower and retained more heap locally. Hosted timing remains an
+activation gate; local acceptance is not evidence of a production speedup.
+`catalogSearchEnabled` remains false. Merge, publication and deployment require
+separate approval.
+
+## Data-First Rollout (Separate Approval)
+
+Code integration does not publish assets or activate behavior. The preferred
+Crawl4 manifest must first receive a complete ranked closure from its exact
+current source. The explicit bootstrap command is:
+
+```sh
+node scripts/search-catalog-cli.mjs --bootstrap-ranking <crawl4-data-dir>
+```
+
+This command writes data. Use it only in an approved publication checkout after
+syncing latest main and draining old writers under the existing shared writer
+lock. It preserves the raw source and every unrelated manifest reference. No
+crawl, signal refresh or frozen benchmark substitution is needed. Existing
+publishers maintain the descriptor and ranking extension once present.
+
+Follow `deploy.md` for two separately reviewed combined artifacts:
+
+1. Publish the reviewed additive Crawl4 closure and extension-aware code with
+   behavior off. Verify the draft's static closure, publish, then verify canonical
+   data. Draft functions use canonical production track URLs, not draft-local data.
+2. Only after canonical data is ready, review activation on fresh main. Verify
+   the active draft's compact mode, old tools, ranking, sorts, pages and browser
+   behavior before approving production activation.
+
+Read-only static verification checks the exact reviewed manifest and streamed
+hash/size of all referenced assets, with at most four concurrent downloads:
+
+```sh
+node scripts/verify-hosted-search-catalog.mjs <https-origin> <crawl4-data-dir>
+MCP_ORIGIN=<https-origin> npm run verify:mcp
+```
+
+The MCP verifier derives required capabilities from reviewed feature config.
+When enabled it requires compact, ranking-ready Crawl4 health and verifies two
+pages under all six search sorts. Static closure verification is separate from
+API activation and hosted timing. Observe an actual cold load before making a
+cold-start claim; capability discovery can itself warm the function.
+
+Rollback keeps additive assets and extension-aware writers, and restores the
+reviewed feature-off app/API through the normal combined deployment. Never
+delete immutable assets or revert unrelated concurrent work. No migration,
+native release or account write is required.
+
+Local checks include `npm run check`, `npm --workspace portal test`, root and
+portal TypeScript, and the combined artifact build. The dev-loopback-only
+`/app/testing/unified-acceptance/?paging=1&view=discover&q=design` fixture supplies
+65 synthetic public results for browser paging/error checks; it cannot activate
+production search or exercise real account data.

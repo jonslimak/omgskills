@@ -162,7 +162,7 @@ export async function verifyProductionDeploy({
   }
 
   await verifyAiCatalog(fetchImpl, origin, publicOrigin);
-  await verifyMcpEndpoint({ origin, fetchImpl });
+  await verifyMcpEndpoint({ origin, fetchImpl, requireCatalogSearch: verifyCandidateFeatures && reviewedFeatures.catalogSearchEnabled === true });
 
   console.log("Production deploy verified");
 }

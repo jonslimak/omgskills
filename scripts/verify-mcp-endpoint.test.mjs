@@ -43,3 +43,30 @@ test("fails when an author listing exposes a null rank", async () => {
     /invalid trending rank/
   );
 });
+
+function activeFetch({ full = false, missingCapability = false, duplicate = false, mixed = false, toolError = false } = {}) {
+  const old = mockFetch();
+  return async (url, options = {}) => {
+    if (url.endsWith("/health")) return Response.json({ ok: true, skillCount: 46000, sourceTrack: "crawl4", catalog: { mode: full ? "full" : "compact", rankingBytes: 100 } });
+    const request = JSON.parse(options.body);
+    if (request.method === "tools/list") return Response.json({ jsonrpc: "2.0", id: request.id, result: { tools: tools.map(tool => ({ ...tool,
+      inputSchema: { properties: { ...(missingCapability ? {} : { page: { type: "object" } }), ...(tool.name === "search_skills" ? { ranking: { const: "web-v1" } } : {}) } },
+    })) } });
+    const args = request.params?.arguments;
+    if (!args?.page) return old(url, options);
+    const next = !!args.page.cursor;
+    return Response.json({ jsonrpc: "2.0", id: request.id, result: { ...(toolError ? { isError: true } : {}), structuredContent: {
+      count: 1, skills: [{ id: next && !duplicate ? "example/second" : "example/first" }],
+      page: { total: 2, hasMore: !next, nextCursor: next ? null : "next", sort: args.sort, snapshot: (next && mixed ? "b" : "a").repeat(64) },
+    } } });
+  };
+}
+
+test("active verification requires actual compact ranking and two pages under all six sorts", async () => {
+  await verifyMcpEndpoint({ origin: "https://example.test", fetchImpl: activeFetch(), requireCatalogSearch: true });
+});
+test("active verification rejects full fallback, missing capabilities, mixed snapshots and duplicate results", async () => {
+  for (const options of [{ full: true }, { missingCapability: true }, { duplicate: true }, { mixed: true }, { toolError: true }]) {
+    await assert.rejects(verifyMcpEndpoint({ origin: "https://example.test", fetchImpl: activeFetch(options), requireCatalogSearch: true }));
+  }
+});

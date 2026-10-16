@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { validateProductionFeatures } from "../config/production-features.mjs";
 
 const defaultConfigUrl = new URL("../config/production-features.json", import.meta.url);
 
@@ -10,39 +11,7 @@ export async function loadProductionFeatures(configUrl = defaultConfigUrl) {
     throw new Error(`Unable to read production feature configuration: ${error.message}`);
   }
 
-  if (
-    !parsed
-    || typeof parsed !== "object"
-    || Array.isArray(parsed)
-    || typeof parsed.skillGroupsWebEnabled !== "boolean"
-    || typeof parsed.skillGroupsAuthEnabled !== "boolean"
-  ) {
-    throw new Error("production-features.json must declare skillGroupsWebEnabled and skillGroupsAuthEnabled as booleans");
-  }
-
-  if (parsed.portalRedesignEnabled !== undefined && typeof parsed.portalRedesignEnabled !== "boolean") {
-    throw new Error("portalRedesignEnabled must be a boolean when present");
-  }
-  if (parsed.portalUnifiedEnabled !== undefined && typeof parsed.portalUnifiedEnabled !== "boolean") {
-    throw new Error("portalUnifiedEnabled must be a boolean when present");
-  }
-
-  const unknownKeys = Object.keys(parsed).filter(
-    (key) => key !== "skillGroupsWebEnabled" && key !== "skillGroupsAuthEnabled" && key !== "portalRedesignEnabled" && key !== "portalUnifiedEnabled"
-  );
-  if (unknownKeys.length > 0) {
-    throw new Error(`production-features.json contains unknown keys: ${unknownKeys.join(", ")}`);
-  }
-  if (parsed.skillGroupsAuthEnabled && !parsed.skillGroupsWebEnabled) {
-    throw new Error("skillGroupsAuthEnabled requires skillGroupsWebEnabled");
-  }
-
-  return Object.freeze({
-    skillGroupsWebEnabled: parsed.skillGroupsWebEnabled,
-    skillGroupsAuthEnabled: parsed.skillGroupsAuthEnabled,
-    portalRedesignEnabled: parsed.portalRedesignEnabled === true,
-    portalUnifiedEnabled: parsed.portalUnifiedEnabled === true,
-  });
+  return validateProductionFeatures(parsed);
 }
 
 export function portalBuildEnvironment(features, baseEnvironment = process.env) {
@@ -52,6 +21,7 @@ export function portalBuildEnvironment(features, baseEnvironment = process.env) 
     VITE_SKILLGROUPS_MAC_ENABLED: features.skillGroupsAuthEnabled ? "1" : "0",
     VITE_PORTAL_REDESIGN_ENABLED: features.portalRedesignEnabled === true ? "1" : "0",
     VITE_PORTAL_UNIFIED_ENABLED: features.portalUnifiedEnabled === true ? "1" : "0",
+    VITE_CATALOG_SEARCH_ENABLED: features.catalogSearchEnabled === true ? "1" : "0",
   };
 }
 

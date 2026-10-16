@@ -49,6 +49,7 @@ import {
   Plus,
   Presentation,
   RefreshCw,
+  LoaderCircle,
   Search,
   SearchCheck,
   SearchX,
@@ -94,6 +95,7 @@ import {
 import "./unified.css";
 import type { PublicStatus } from "./use-public-catalog";
 import type { UnifiedManagement } from "./management";
+import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -689,14 +691,14 @@ export function UnifiedApp({
         <button
           type="button"
           className="ua-row-main"
-          onClick={() =>
+          onClick={event =>
             canSelect
               ? setPicked((old) =>
                   old.includes(skill.key)
                     ? old.filter((id) => id !== skill.key)
                     : [...old, skill.key],
                 )
-              : open(skill)
+              : event.detail < 2 ? open(skill) : undefined
           }
           aria-label={`Open ${skill.name}`}
           aria-expanded={selected?.key === skill.key}
@@ -712,7 +714,7 @@ export function UnifiedApp({
             </span>
             <span className="ua-row-description">
               {compact
-                ? `@${skill.author}${skill.stars !== undefined ? ` · ${starCount(skill.stars)} stars` : ""}`
+                ? [skill.author ? `@${skill.author}` : "", skill.stars !== undefined ? `${starCount(skill.stars)} stars` : ""].filter(Boolean).join(" · ")
                 : skill.description || "No description available"}
             </span>
           </span>
@@ -740,7 +742,7 @@ export function UnifiedApp({
                 type="button"
                 className="ua-pill ua-link"
                 aria-label={`Open ${skill.name} details`}
-                onClick={() => open(skill)}
+                onClick={event => { if (event.detail < 2) open(skill); }}
               >
                 Open
               </button>
@@ -1008,6 +1010,16 @@ export function UnifiedApp({
     </div>
     ) : null;
 
+  const catalogControls = publicList && publicStatus.page ? <div className="ua-catalog-controls">
+    <span className="ua-muted" role="status" aria-live="polite">{publicStatus.loaded} of {publicStatus.page.total}</span>
+    {publicPageRequest(nav)?.name !== "list_trending" && <label className="ua-filter">
+      <span className="ua-filter-label">Sort</span>
+      <select aria-label="Sort skills" value={nav.sort ?? "relevance"} onChange={event => navigate({ ...nav, sort: event.target.value as PublicSort })}>
+        {publicSorts.map(value => <option key={value} value={value}>{({ relevance: "Relevance", trending: "Trending", stars: "Stars", updated: "Recently updated", added: "Recently added", name: "Name" })[value]}</option>)}
+      </select>
+    </label>}
+  </div> : null;
+
   return (
     <div className="ua-theme ua-root" data-theme={theme}>
       {previewBar}
@@ -1260,6 +1272,7 @@ export function UnifiedApp({
                 <span className="ua-muted">{management.detail.catalog.note}</span>
                 {management.detail.catalog.state === "error" && <button type="button" className="ua-pill" onClick={management.detail.catalog.retry}>Retry catalog details</button>}
               </div>}
+              {!nav.query && catalogControls}
               {publicList && publicStatus.note && listState === "ready" && <p className="ua-muted" role="status">{publicStatus.note}</p>}
               {publicList && !progressiveDiscover && publicListError && listState === "ready" && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">Could not refresh. Showing saved results.</span>
@@ -1295,6 +1308,7 @@ export function UnifiedApp({
                   </section>
                   {!privateSearch && <section>
                     <SectionHeading title="Library" />
+                    {catalogControls}
                     {rows(matchingLibrary)}
                   </section>}
                 </>
@@ -1508,6 +1522,13 @@ export function UnifiedApp({
                       ))}
                 </>
               )}
+              {publicList && (publicStatus.page?.hasMore || publicStatus.moreError) && <div className="ua-catalog-more">
+                {publicStatus.moreError && <p className="ua-muted" role="status">{publicStatus.moreError}</p>}
+                <button type="button" className="ua-pill" disabled={publicStatus.moreState === "loading"} onClick={event => { if (event.detail < 2) publicStatus.loadMore?.(); }}>
+                  {publicStatus.moreState === "loading" && <LoaderCircle className="ua-page-spinner" aria-hidden="true" />}
+                  {publicStatus.restartPages ? "Refresh results" : publicStatus.moreError ? "Retry" : publicStatus.moreState === "loading" ? "Loading" : "Load more"}
+                </button>
+              </div>}
             </div>
           </main>
         </div>

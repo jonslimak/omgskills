@@ -31,26 +31,26 @@ test("loads the tracked production feature state", async () => {
 test("loads disabled, web-only, and full production feature states", async () => {
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":true}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false },
+    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false },
   );
 });
 
 test("maps the production state to the portal build environment", () => {
   assert.deepEqual(
     portalBuildEnvironment({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false }, { KEEP: "yes" }),
-    { KEEP: "yes", VITE_SKILLGROUPS_WEB_ENABLED: "1", VITE_SKILLGROUPS_MAC_ENABLED: "0", VITE_PORTAL_REDESIGN_ENABLED: "0", VITE_PORTAL_UNIFIED_ENABLED: "0" },
+    { KEEP: "yes", VITE_SKILLGROUPS_WEB_ENABLED: "1", VITE_SKILLGROUPS_MAC_ENABLED: "0", VITE_PORTAL_REDESIGN_ENABLED: "0", VITE_PORTAL_UNIFIED_ENABLED: "0", VITE_CATALOG_SEARCH_ENABLED: "0" },
   );
   assert.deepEqual(
     portalBuildEnvironment({ skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false }, {}),
-    { VITE_SKILLGROUPS_WEB_ENABLED: "0", VITE_SKILLGROUPS_MAC_ENABLED: "0", VITE_PORTAL_REDESIGN_ENABLED: "0", VITE_PORTAL_UNIFIED_ENABLED: "0" },
+    { VITE_SKILLGROUPS_WEB_ENABLED: "0", VITE_SKILLGROUPS_MAC_ENABLED: "0", VITE_PORTAL_REDESIGN_ENABLED: "0", VITE_PORTAL_UNIFIED_ENABLED: "0", VITE_CATALOG_SEARCH_ENABLED: "0" },
   );
 });
 
@@ -107,6 +107,19 @@ test("web-only activation keeps the public Mac release gate disabled", () => {
     publicReleaseConfig({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false }),
     { version: 1, skillGroupsAuthEnabled: false },
   );
+});
+
+test("catalog activation is explicit, boolean, and overrides ambient flags without changing Mac configuration", async () => {
+  assert.equal(typeof (await loadProductionFeatures()).catalogSearchEnabled, "boolean");
+  assert.equal((await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":false}'))).catalogSearchEnabled, false);
+  for (const enabled of [true, false]) {
+    const features = await loadProductionFeatures(await configUrl(JSON.stringify({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, catalogSearchEnabled: enabled })));
+    assert.equal(features.catalogSearchEnabled, enabled);
+    assert.equal(portalBuildEnvironment(features, { VITE_CATALOG_SEARCH_ENABLED: enabled ? "0" : "1" }).VITE_CATALOG_SEARCH_ENABLED, enabled ? "1" : "0");
+    assert.deepEqual(publicReleaseConfig(features), { version: 1, skillGroupsAuthEnabled: false });
+  }
+  for (const value of [null, "1", 1, {}, []]) await assert.rejects(loadProductionFeatures(await configUrl(JSON.stringify({ skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, catalogSearchEnabled: value }))), /catalogSearchEnabled must be a boolean/);
+  await assert.rejects(loadProductionFeatures(new URL("file:///missing-catalog-search-config.json")), /Unable to read production feature configuration/);
 });
 
 test("rejects malformed or ambiguous production feature state", async () => {

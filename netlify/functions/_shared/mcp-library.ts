@@ -140,7 +140,7 @@ function readProductionTrackVersion(track: McpCatalogTrack): Promise<string | un
   return OmgskillsLibrary.readVersion(track.manifestUrl, fetchWithTimeout);
 }
 
-const fetchWithTimeout: typeof fetch = (input, init = {}) =>
+export const fetchWithTimeout: typeof fetch = (input, init = {}) =>
   fetch(input, {
     ...init,
     signal: init.signal ?? AbortSignal.timeout(10_000)

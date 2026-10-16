@@ -1,7 +1,7 @@
 import type { OmgskillsLibrary } from "../../../mcp/src/library.js";
 import { loadCatalogReader, readCatalogVersion, type CatalogReadOptions, type SearchCatalogReader } from "../../../mcp/src/search-catalog.js";
 import type { McpLibraryLoader, McpLibrarySnapshot, McpCatalogTrack } from "./mcp-library.js";
-import { productionMcpTracks } from "./mcp-library.js";
+import { productionMcpTracks, fetchWithTimeout } from "./mcp-library.js";
 
 type ReadLibrary = OmgskillsLibrary | SearchCatalogReader;
 export type CompactMcpSnapshot = Omit<McpLibrarySnapshot, "library"> & { library: ReadLibrary };
@@ -15,6 +15,7 @@ export type CompactMcpLoader = Omit<McpLibraryLoader, "get" | "refresh" | "pendi
 export function createCompactMcpLibraryLoader(options: CatalogReadOptions & {
   tracks?: McpCatalogTrack[]; now?: () => number; maxAgeMs?: number;
 } = {}): CompactMcpLoader {
+  const readerOptions = { ...options, fetcher: options.fetcher ?? fetchWithTimeout };
   const now = options.now ?? Date.now, maxAgeMs = options.maxAgeMs ?? 10 * 60_000;
   let snapshot: CompactMcpSnapshot | null = null;
   let pending: Promise<CompactMcpSnapshot> | null = null;
@@ -25,11 +26,11 @@ export function createCompactMcpLibraryLoader(options: CatalogReadOptions & {
       try {
         if (snapshot?.library.version && snapshot.sourceTrack === track.name) {
           try {
-            const latest = await readCatalogVersion(track.manifestUrl, options);
+            const latest = await readCatalogVersion(track.manifestUrl, readerOptions);
             if (latest === snapshot.library.version) return { ...snapshot, loadedAt: now() };
           } catch { /* A failed cheap check still permits a complete load of this track. */ }
         }
-        const library = await loadCatalogReader(track.manifestUrl, options);
+        const library = await loadCatalogReader(track.manifestUrl, readerOptions);
         const stats = library.getStats();
         return { library, sourceTrack: track.name, loadedAt: now(), skillCount: stats.skills,
           trendingCount: stats.trending, goldBasketCount: stats.goldBasket };

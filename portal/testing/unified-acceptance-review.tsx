@@ -12,6 +12,7 @@ import { usePublicCatalog, usePublicCatalogPreload } from "../src/app/unified/us
 import { AccountDialogReview } from "./account-dialog-review";
 import { useSetCatalog } from "../src/app/unified/use-set-catalog";
 import { LoadingScreen } from "../src/app/LoadingScreen";
+import { publicPagingFixture } from "./public-paging-fixture";
 
 // Browser-only presentation fixture. No Clerk, backend, or account writes.
 const base = "/app/testing/unified-acceptance/";
@@ -21,7 +22,8 @@ if (!import.meta.env.DEV || !["127.0.0.1", "localhost"].includes(location.hostna
 const params = new URLSearchParams(location.search);
 const scenario = (params.get("scenario") || "populated") as Scenario;
 const catalog = makeCatalog();
-const publicClient = new PublicCatalogClient();
+const pagingReview = params.get("paging") === "1";
+const publicClient = new PublicCatalogClient(pagingReview ? publicPagingFixture(catalog, params.get("pageFailure")) : undefined, undefined, undefined, pagingReview);
 const publicReview = params.get("catalog") !== "0";
 const sample = makeFixtures(scenario);
 const setCatalogReview = params.get("setCatalog");
@@ -58,6 +60,7 @@ function Review() {
     const safe = accountNavigation(next, signedIn);
     const search = new URLSearchParams(navigationSearch(safe));
     if (!publicReview) search.set("catalog", "0");
+    if (pagingReview) search.set("paging", "1");
     history[replace ? "replaceState" : "pushState"]({}, "", base + (search.size ? `?${search}` : ""));
     setRequested(safe);
   };
@@ -70,7 +73,7 @@ function Review() {
     state: "ready" as const, error: "", retry: () => {} };
   const setCatalog = useSetCatalog(setClient, setCatalogReview ? detail.set : null);
   const baseCatalog = publicReview ? remote.catalog : catalog;
-  const shownCatalog = { ...baseCatalog, skills: [...baseCatalog.skills, ...setCatalog.skills.map(skill => ({ ...skill, avatar: undefined }))] };
+  const shownCatalog = { ...baseCatalog, skills: [...baseCatalog.skills.map(skill => pagingReview ? { ...skill, avatar: catalog.creators[0]?.avatar } : skill), ...setCatalog.skills.map(skill => ({ ...skill, avatar: undefined }))] };
   const management = useManagement({ data, mine: skillDisplays(data, shownCatalog).mine, busy: false, blocked: false,
     scope: `${nav.view}:${nav.id}:${nav.query}:${signedIn}`, saveSet: rejectWrite, saveMembership: rejectWrite,
     detail: { ...detail, catalog: setCatalogReview ? setCatalog : undefined }, base, local: true });

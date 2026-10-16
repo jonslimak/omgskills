@@ -143,6 +143,7 @@ try {
     await page.keyboard.press("Escape");
     await go("?view=discover");
     await fits();
+    if (width < 760) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
     await page.getByRole("button", { name: "Account menu", exact: true }).filter({ visible: true }).click();
     await page.getByRole("menuitem", { name: "Dark appearance", exact: true }).click();
     await page.screenshot({ path: path.join(output, `${width}-discover-dark.png`) });

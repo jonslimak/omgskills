@@ -76,11 +76,13 @@ test("production deploy paths use the tracked feature configuration", async () =
   const productionFeatures = JSON.parse(
     await readFile(new URL("../config/production-features.json", import.meta.url), "utf8"),
   );
-  assert.deepEqual(Object.keys(productionFeatures), ["skillGroupsWebEnabled", "skillGroupsAuthEnabled", "portalRedesignEnabled", "portalUnifiedEnabled"]);
+  assert.deepEqual(Object.keys(productionFeatures), ["skillGroupsWebEnabled", "skillGroupsAuthEnabled", "portalRedesignEnabled", "portalUnifiedEnabled", "catalogSearchEnabled"]);
   assert.equal(typeof productionFeatures.skillGroupsWebEnabled, "boolean");
   assert.equal(typeof productionFeatures.skillGroupsAuthEnabled, "boolean");
   assert.equal(typeof productionFeatures.portalRedesignEnabled, "boolean");
   assert.equal(typeof productionFeatures.portalUnifiedEnabled, "boolean");
+  assert.equal(typeof productionFeatures.catalogSearchEnabled, "boolean");
+  assert.doesNotMatch(script, /VITE_CATALOG_SEARCH_ENABLED/);
   assert.doesNotMatch(script, /VITE_PORTAL_REDESIGN_ENABLED/);
   assert.doesNotMatch(script, /VITE_PORTAL_UNIFIED_ENABLED/);
   assert.doesNotMatch(script, /VITE_SKILLGROUPS_(WEB|MAC)_ENABLED/);
@@ -89,6 +91,7 @@ test("production deploy paths use the tracked feature configuration", async () =
     assert.doesNotMatch(source, /VITE_SKILLGROUPS_(WEB|MAC)_ENABLED/, workflowPath);
     assert.doesNotMatch(source, /VITE_PORTAL_REDESIGN_ENABLED/, workflowPath);
     assert.doesNotMatch(source, /VITE_PORTAL_UNIFIED_ENABLED/, workflowPath);
+    assert.doesNotMatch(source, /VITE_CATALOG_SEARCH_ENABLED/, workflowPath);
   }
 });
 

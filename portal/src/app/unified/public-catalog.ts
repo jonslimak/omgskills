@@ -1,5 +1,6 @@
 import type { CatalogDisplay, CatalogSummary, Navigation } from "./model";
 import { discoveryCategories } from "./discovery-categories";
+import { parsePageInfo, publicPageRequest, PublicCatalogError, type PublicPage, type PublicPageInfo, type PublicPageRequest, type PublicListTool } from "./public-paging";
 
 export const LIST_LIMIT = 30;
 export const emptyCatalog = (): CatalogDisplay => ({
@@ -8,10 +9,10 @@ export const emptyCatalog = (): CatalogDisplay => ({
 type RecordValue = Record<string, unknown>;
 type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 type Pending = { controller: AbortController; promise: Promise<unknown>; users: number };
-type PublicView = { catalog: CatalogDisplay; note: string };
+type PublicView = { catalog: CatalogDisplay; note: string; page?: PublicPageInfo };
 export type PublicViewProgress =
   | { section: "metadata"; state: "ready"; catalog: CatalogDisplay }
-  | { section: "list"; state: "ready"; skills: CatalogSummary[] }
+  | { section: "list"; state: "ready"; skills: CatalogSummary[]; page?: PublicPageInfo; note?: string }
   | { section: "metadata" | "list"; state: "error"; error: unknown };
 
 function record(value: unknown): RecordValue {
@@ -37,11 +38,12 @@ function safeGithub(value: unknown): string {
 function parseSkill(value: unknown): CatalogSummary {
   const skill = record(value);
   const id = text(skill.id), name = text(skill.name), author = text(skill.author_handle);
-  if (!id || !name || !handle(author)) throw new Error("The catalog returned an invalid skill.");
+  // Some source records have no author; do not infer one from a mirror URL.
+  if (!id || !name || (author !== "" && !handle(author))) throw new Error("The catalog returned an invalid skill.");
   if (skill.stars !== undefined && (typeof skill.stars !== "number" || !Number.isFinite(skill.stars) || skill.stars < 0)) throw new Error("The catalog returned invalid skill statistics.");
   return {
     id, name, author, description: text(skill.description), githubUrl: safeGithub(skill.github_url),
-    stars: skill.stars as number | undefined, tags: strings(skill.tags ?? []), avatar: avatar(author),
+    stars: skill.stars as number | undefined, tags: strings(skill.tags ?? []), avatar: author ? avatar(author) : undefined,
   };
 }
 export function parseCollections(value: unknown): CatalogDisplay {
@@ -77,7 +79,8 @@ export class PublicCatalogClient {
   private pending = new Map<string, Pending>();
   private requestId = 0;
   private views = new Map<string, { at: number; value: PublicView }>();
-  constructor(private fetcher: Fetcher = (input, init) => fetch(input, init), private timeoutMs = 15_000, private now = Date.now) {}
+  constructor(private fetcher: Fetcher = (input, init) => fetch(input, init), private timeoutMs = 15_000, private now = Date.now,
+    readonly pagingEnabled = false) {}
 
   cachedView(nav: Navigation) {
     const key = publicScope(nav), hit = this.views.get(key);
@@ -90,7 +93,7 @@ export class PublicCatalogClient {
     const key = publicScope(nav);
     this.views.delete(key);
     this.views.set(key, { at: this.now(), value });
-    while (this.views.size > 20) this.views.delete(this.views.keys().next().value!);
+    while (this.views.size > 20 || [...this.views.values()].reduce((sum, view) => sum + view.value.catalog.skills.length, 0) > 600) this.views.delete(this.views.keys().next().value!);
     return value;
   }
 
@@ -181,12 +184,24 @@ export class PublicCatalogClient {
     } finally { clearTimeout(timer); signal.removeEventListener("abort", abort); }
   }
 
-  private async tool(name: string, args: RecordValue, signal: AbortSignal): Promise<unknown> {
+  private async rpc(method: string, params: RecordValue, signal: AbortSignal): Promise<RecordValue> {
     const id = ++this.requestId;
-    const envelope = record(await this.json("/mcp", signal, { jsonrpc: "2.0", id, method: "tools/call", params: { name, arguments: args } }));
+    const envelope = record(await this.json("/mcp", signal, { jsonrpc: "2.0", id, method, params }));
     if (envelope.id !== id || envelope.error) throw new Error("The catalog request failed. Try again.");
-    const result = record(envelope.result);
-    if (result.isError) throw new Error("The catalog could not complete this request. Try again.");
+    return record(envelope.result);
+  }
+
+  private async tool(name: string, args: RecordValue, signal: AbortSignal): Promise<unknown> {
+    const result = await this.rpc("tools/call", { name, arguments: args }, signal);
+    if (result.isError) {
+      const block = Array.isArray(result.content) ? result.content.find(item => item?.type === "text") : undefined;
+      let code = "catalog_unavailable";
+      try {
+        const error = record(record(JSON.parse(text(block?.text))).error);
+        if (["catalog_snapshot_changed", "invalid_cursor", "ranking_not_supported", "paging_not_supported"].includes(String(error.code))) code = String(error.code);
+      } catch { /* Do not expose arbitrary server error text. */ }
+      throw new PublicCatalogError(code, code === "catalog_snapshot_changed" ? "The catalog changed. Refresh these results." : undefined);
+    }
     if (result.structuredContent !== undefined) return result.structuredContent;
     const content = result.content;
     if (!Array.isArray(content)) throw new Error("The catalog returned an invalid tool result.");
@@ -194,8 +209,56 @@ export class PublicCatalogClient {
     try {
       const parsed: unknown = JSON.parse(text(block?.text));
       if (name === "get_skill") return record(parsed).error ? { found: false, skill: null } : { found: true, skill: parsed };
+      if (!Array.isArray(parsed) && parsed && typeof parsed === "object" && "page" in parsed) return parsed;
       return { skills: parsed };
     } catch { throw new Error("The catalog returned an invalid tool result."); }
+  }
+
+  capabilities(signal: AbortSignal): Promise<Record<PublicListTool, { paging: boolean; ranking: boolean }>> {
+    return this.cached("capabilities", async signal => {
+      const result = await this.rpc("tools/list", {}, signal);
+      if (!Array.isArray(result.tools)) throw new Error("The catalog returned invalid capabilities.");
+      const tools = result.tools;
+      const entries = (["search_skills", "list_by_author", "list_trending"] as const).map(name => {
+        const matches = tools.filter((tool: RecordValue) => tool?.name === name);
+        if (matches.length !== 1) throw new Error("The catalog returned invalid capabilities.");
+        const properties = record(record(record(matches[0]).inputSchema).properties);
+        const page = properties.page;
+        if (page !== undefined && (!page || typeof page !== "object" || Array.isArray(page) || (page as RecordValue).type !== "object")) throw new Error("The catalog returned invalid capabilities.");
+        const ranking = properties.ranking === undefined ? undefined : record(properties.ranking);
+        return [name, { paging: page !== undefined, ranking: ranking?.type === "string" && (ranking.const === "web-v1" || (Array.isArray(ranking.enum) && ranking.enum.length === 1 && ranking.enum[0] === "web-v1")) }];
+      });
+      return Object.fromEntries(entries) as Record<PublicListTool, { paging: boolean; ranking: boolean }>;
+    }, signal);
+  }
+
+  page(request: PublicPageRequest, signal: AbortSignal, cursor?: string): Promise<PublicPage> {
+    if (!this.pagingEnabled) return Promise.reject(new PublicCatalogError("paging_not_supported"));
+    return this.cached(`page:${JSON.stringify(request)}:${cursor ?? "first"}`, async signal => {
+      const support = (await this.capabilities(signal))[request.name];
+      if (!support.paging || (request.name === "search_skills" && !support.ranking)) throw new PublicCatalogError("paging_not_supported");
+      const payload = record(await this.tool(request.name, { ...request.args, page: cursor === undefined ? {} : { cursor } }, signal));
+      if (!Array.isArray(payload.skills)) throw new Error("The catalog returned an invalid page.");
+      const skills = payload.skills.map(parseSkill);
+      if (new Set(skills.map(skill => skill.id)).size !== skills.length) throw new Error("The catalog returned duplicate skills.");
+      return { skills, page: parsePageInfo(payload.page, payload.count, skills.length, request, cursor) };
+    }, signal);
+  }
+
+  async firstPage(request: PublicPageRequest, signal: AbortSignal) {
+    const support = (await this.capabilities(signal))[request.name];
+    if (support.paging && (request.name !== "search_skills" || support.ranking)) return { ...await this.page(request, signal), note: "" };
+    const { sort: _sort, ranking: _ranking, ...args } = request.args;
+    return { skills: await this.list(request.name, args, signal), note: "Search upgrades are unavailable on this server. Showing up to 30 results." };
+  }
+
+  invalidateView(nav: Navigation) {
+    this.views.delete(publicScope(nav));
+    const request = publicPageRequest(nav);
+    const pagePrefix = request ? `page:${JSON.stringify(request)}:` : "";
+    const { sort: _sort, ranking: _ranking, ...args } = request?.args ?? {};
+    const listKey = request ? `list:${request.name}:${JSON.stringify(args)}` : "";
+    for (const key of this.cache.keys()) if ((pagePrefix && key.startsWith(pagePrefix)) || key === listKey || key === "capabilities") this.cache.delete(key);
   }
 
   metadata(signal: AbortSignal) {
@@ -253,12 +316,14 @@ export class PublicCatalogClient {
 }
 
 export function publicScope(nav: Navigation) {
-  if (nav.query.trim()) return `search:${nav.query.trim()}`;
-  return `${nav.view}:${nav.id}`;
+  const scope = nav.query.trim() ? `search:${nav.query.trim()}` : `${nav.view}:${nav.id}`;
+  const request = publicPageRequest(nav);
+  return request && request.sort !== "relevance" && request.name !== "list_trending" ? `${scope}:sort:${request.sort}` : scope;
 }
 
 export async function loadPublicView(client: PublicCatalogClient, nav: Navigation, signal: AbortSignal, onProgress?: (update: PublicViewProgress) => void) {
   let note = "";
+  let page: PublicPageInfo | undefined;
   const emit = (update: PublicViewProgress) => { if (!signal.aborted) onProgress?.(update); };
   const categoryTerm = nav.view === "category" && discoveryCategories.some((group) => group.items.includes(nav.id)) ? nav.id : "";
   const query = nav.query.trim() || categoryTerm;
@@ -271,7 +336,9 @@ export async function loadPublicView(client: PublicCatalogClient, nav: Navigatio
     throw error;
   });
   // Only collection entries depend on metadata. Start all other lists immediately.
-  const list = query ? client.list("search_skills", { query }, signal)
+  const pageRequest = client.pagingEnabled ? publicPageRequest(nav) : null;
+  const list = pageRequest ? client.firstPage(pageRequest, signal).then(result => { page = "page" in result ? result.page : undefined; note = result.note; return result.skills; })
+    : query ? client.list("search_skills", { query }, signal)
     : nav.view === "top" || nav.view === "discover" ? client.list("list_trending", { limit: nav.view === "discover" ? 9 : LIST_LIMIT }, signal)
     : nav.view === "creator" ? client.list("list_by_author", { author: nav.id }, signal)
     : nav.view === "collection" ? metadata.then(async catalog => {
@@ -282,7 +349,7 @@ export async function loadPublicView(client: PublicCatalogClient, nav: Navigatio
     return result.skills;
   }) : Promise.resolve([] as CatalogSummary[]);
   const readyList = list.then(skills => {
-    emit({ section: "list", state: "ready", skills });
+    emit({ section: "list", state: "ready", skills, ...(page ? { page } : {}), ...(note ? { note } : {}) });
     return skills;
   }, error => {
     emit({ section: "list", state: "error", error });
@@ -294,6 +361,6 @@ export async function loadPublicView(client: PublicCatalogClient, nav: Navigatio
   if (metadataResult.status === "rejected") throw metadataResult.reason;
   if (listResult.status === "rejected") throw listResult.reason;
   const catalog = metadataResult.value, skills = listResult.value;
-  if ((query || nav.view === "creator" || nav.view === "top") && skills.length === LIST_LIMIT) note = `Showing up to ${LIST_LIMIT} results${query ? ". Refine your search for more specific matches." : "."}`;
-  return client.rememberView(nav, { catalog: { ...catalog, skills, resultIds: skills.map((skill) => skill.id), trendingIds: !query && ["top", "discover"].includes(nav.view) ? skills.map((skill) => skill.id) : [] }, note });
+  if (!page && !note && (query || nav.view === "creator" || nav.view === "top") && skills.length === LIST_LIMIT) note = `Showing up to ${LIST_LIMIT} results${query ? ". Refine your search for more specific matches." : "."}`;
+  return client.rememberView(nav, { catalog: { ...catalog, skills, resultIds: skills.map((skill) => skill.id), trendingIds: !query && ["top", "discover"].includes(nav.view) ? skills.map((skill) => skill.id) : [] }, note, ...(page ? { page } : {}) });
 }

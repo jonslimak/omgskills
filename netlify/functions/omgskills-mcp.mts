@@ -2,7 +2,9 @@ import type { Config, Context } from "@netlify/functions";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { createOmgskillsServer } from "../../mcp/src/server.js";
 import { loadProductionMcpLibrary, type McpLibraryLoader } from "./_shared/mcp-library.js";
-import type { CompactMcpLoader } from "./_shared/compact-mcp-library.js";
+import { createCompactMcpLibraryLoader, type CompactMcpLoader } from "./_shared/compact-mcp-library.js";
+import featureConfig from "../../config/production-features.json" with { type: "json" };
+import { validateProductionFeatures } from "../../config/production-features.mjs";
 
 const maximumRequestBytes = 64 * 1024;
 
@@ -19,7 +21,7 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
   return async (request: Request, context: Pick<Context, "waitUntil">): Promise<Response> => {
     const pathname = new URL(request.url).pathname;
     if (pathname === "/mcp/health") {
-      return healthResponse(loader, context);
+      return healthResponse(loader, context, options.ranking === true);
     }
 
     if (request.method !== "POST") {
@@ -68,7 +70,12 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
   };
 }
 
-const handler = createMcpHandler(loadProductionMcpLibrary);
+export function createConfiguredMcpHandler(enabled: boolean, loaders?: { legacy: McpLibraryLoader; compact: CompactMcpLoader }) {
+  return enabled ? createCompactMcpHandler(loaders?.compact ?? createCompactMcpLibraryLoader({ ranking: true }), { paging: true, ranking: true })
+    : createMcpHandler(loaders?.legacy ?? loadProductionMcpLibrary);
+}
+
+const handler = createConfiguredMcpHandler(validateProductionFeatures(featureConfig).catalogSearchEnabled);
 export default handler;
 
 export const config: Config = {
@@ -80,7 +87,7 @@ export const config: Config = {
   }
 };
 
-async function healthResponse(loader: McpLibraryLoader | CompactMcpLoader, context: Pick<Context, "waitUntil">): Promise<Response> {
+async function healthResponse(loader: McpLibraryLoader | CompactMcpLoader, context: Pick<Context, "waitUntil">, ranked = false): Promise<Response> {
   try {
     const snapshot = await loader.get();
     keepRefreshAlive(loader, context);
@@ -95,7 +102,8 @@ async function healthResponse(loader: McpLibraryLoader | CompactMcpLoader, conte
       stale: ageMs >= state.maxAgeMs,
       refreshing: state.refreshing,
       lastRefreshFailed: state.lastRefreshFailed,
-      ...("diagnostics" in snapshot.library ? { catalog: snapshot.library.diagnostics() } : {}),
+      ...("diagnostics" in snapshot.library ? { catalog: snapshot.library.diagnostics() }
+        : ranked ? { catalog: { mode: "full", degraded: true } } : {}),
       optionalData: {
         trending: snapshot.trendingCount > 0,
         goldBasket: snapshot.goldBasketCount > 0
