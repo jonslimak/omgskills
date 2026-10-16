@@ -19,6 +19,43 @@ struct PresenceSyncPayload: Encodable, Equatable, Sendable {
     let skills: [PresenceSyncSkill]
 }
 
+struct InventoryRootCoverage: Encodable, Equatable, Sendable {
+    enum State: String, Encodable, Sendable { case complete, incomplete, unavailable }
+    enum Reason: String, Encodable, Sendable {
+        case missing, unreadable, redirected, changed
+        case invalidEntry = "invalid-entry"
+        case invalidMetadata = "invalid-metadata"
+    }
+    let source: String
+    var state: State
+    var reason: Reason?
+
+    var isValid: Bool {
+        guard ["claude", "codex", "agents"].contains(source) else { return false }
+        switch state {
+        case .complete: return reason == nil
+        case .incomplete: return [.changed, .invalidEntry, .invalidMetadata].contains(reason)
+        case .unavailable: return [.missing, .unreadable, .redirected].contains(reason)
+        }
+    }
+}
+
+struct ReconciliationSyncPayload: Encodable, Equatable, Sendable {
+    let reportVersion = 3
+    let baseRevision: String?
+    let roots: [InventoryRootCoverage]
+    let skills: [PresenceSyncSkill]
+
+    private enum CodingKeys: String, CodingKey { case reportVersion, baseRevision, roots, skills }
+    func encode(to encoder: any Encoder) throws {
+        var values = encoder.container(keyedBy: CodingKeys.self)
+        try values.encode(reportVersion, forKey: .reportVersion)
+        try values.encode(baseRevision, forKey: .baseRevision)
+        try values.encode(roots, forKey: .roots)
+        try values.encode(skills, forKey: .skills)
+    }
+}
+
 struct PresenceSyncSkill: Encodable, Equatable, Sendable {
     let source: String
     let installationPath: String
@@ -35,6 +72,8 @@ enum PresenceSyncError: LocalizedError, Equatable {
     case invalidInstallation
     case duplicateLocation
     case missingScanner
+    case invalidCoverage
+    case invalidRevision
 
     var errorDescription: String? {
         switch self {
@@ -42,6 +81,8 @@ enum PresenceSyncError: LocalizedError, Equatable {
         case .invalidInstallation: "An installation has unsupported metadata. Nothing was uploaded."
         case .duplicateLocation: "The scan contains a duplicate installation location. Nothing was uploaded."
         case .missingScanner: "Inventory scanning is not configured."
+        case .invalidCoverage: "Inventory scan coverage is invalid. Nothing was uploaded."
+        case .invalidRevision: "Inventory revision is invalid. Nothing was uploaded."
         }
     }
 }
@@ -176,6 +217,28 @@ enum SkillSyncService {
             return row
         }
         return PresenceSyncPayload(skills: skills)
+    }
+
+    static func reconciliationPayload(
+        baseRevision: String?, scan: InstalledSkillsScanner.ScanResult
+    ) throws -> ReconciliationSyncPayload {
+        try Task.checkCancellation()
+        guard baseRevision == nil || (baseRevision?.range(of:
+            "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            options: .regularExpression) != nil) else { throw PresenceSyncError.invalidRevision }
+        guard scan.roots.count == 3, Set(scan.roots.map(\.source)) == ["claude", "codex", "agents"],
+              scan.roots.allSatisfy(\.isValid) else { throw PresenceSyncError.invalidCoverage }
+        let skills = try presencePayload(installations: scan.installations).skills
+        // A malformed observation must never disappear under a complete-root claim.
+        guard scan.issues.allSatisfy({ issue in
+            let source: String
+            switch issue {
+            case .unreadableRoot(let origin), .skippedSkill(let origin, _): source = origin.lowercased()
+            }
+            return scan.roots.contains { $0.source == source && $0.state != .complete }
+        }) else { throw PresenceSyncError.invalidCoverage }
+        try Task.checkCancellation()
+        return ReconciliationSyncPayload(baseRevision: baseRevision?.lowercased(), roots: scan.roots, skills: skills)
     }
 
     static func presencePayloadSkill(_ skill: Skill) throws -> PresenceSyncSkill {

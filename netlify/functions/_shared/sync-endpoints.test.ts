@@ -91,3 +91,62 @@ test("inventory endpoint refuses unknown or duplicate version before reading", a
     assert.equal(response.status, 400);
   }
 });
+
+const reconciliationEnv = {
+  OMGSKILLS_INVENTORY_RECONCILIATION_TEST: "1", OMGSKILLS_CONNECTED_INVENTORY_TEST: "1",
+  PORTAL_TEST_ENVIRONMENT_VERIFIED: "1", CONTEXT: "dev", NODE_ENV: "test",
+  PORTAL_TEST_API_ORIGIN: "http://127.0.0.1:8888"
+};
+const completeRoots = ["claude", "codex", "agents"].map(source => ({ source, state: "complete" }));
+const reconciliationReport = { reportVersion: 3, baseRevision: null, roots: completeRoots, skills: [presence] };
+function localRequest(body?: unknown, query = "", authorization: string | null = `Bearer ${credential}`) {
+  return new Request(`http://127.0.0.1:8888/api/portal/sync-upload${query}`, {
+    method: body === undefined ? "GET" : "POST", ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    headers: { "Content-Type": "application/json", ...(authorization ? { Authorization: authorization } : {}) }
+  });
+}
+
+test("revision endpoint is exact, device-authenticated, no-store and unavailable by default", async () => {
+  const deps = { requireSkillGroupsWebFeature() {}, getPgPool: () => pool, performSyncUpload: noDatabase,
+    getEnvironment: () => reconciliationEnv,
+    async readInventoryRevision(actualPool: Pool, req: Request) {
+      assert.equal(actualPool, pool); assert.equal(req.headers.get("authorization"), `Bearer ${credential}`);
+      return { reportVersion: 3 as const, revision: null };
+    } };
+  const response = await portalSyncUpload(localRequest(undefined, "?reportVersion=3"), context, deps);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), { reportVersion: 3, revision: null });
+  for (const query of ["?reportVersion=2", "?reportVersion=3&deviceId=other", "?reportVersion=3&reportVersion=3"])
+    assert.equal((await portalSyncUpload(localRequest(undefined, query), context, { ...deps, getPgPool: noDatabase })).status, 400);
+  assert.equal((await portalSyncUpload(localRequest(), context, { ...deps, getPgPool: noDatabase })).status, 405);
+  assert.equal((await portalSyncUpload(localRequest(undefined, "?reportVersion=3", null), context, { ...deps, getPgPool: noDatabase })).status, 401);
+  assert.equal((await portalSyncUpload(localRequest(undefined, "?reportVersion=3"), context,
+    { ...deps, getEnvironment: () => ({}), getPgPool: noDatabase })).status, 503);
+});
+
+test("version-3 upload requires the local opt-in and dispatches only parsed reconciliation facts", async () => {
+  let calls = 0;
+  const deps = { requireSkillGroupsWebFeature() {}, getPgPool: () => pool, getEnvironment: () => reconciliationEnv,
+    async performSyncUpload(actualPool: Pool, auth: Parameters<typeof import("./sync-upload.js").performSyncUpload>[1],
+      skills: Parameters<typeof import("./sync-upload.js").performSyncUpload>[2], now: Date | undefined,
+      version: number | undefined, reconciliation: Parameters<typeof import("./sync-upload.js").performSyncUpload>[5]) {
+      calls++; assert.equal(actualPool, pool); assert.equal(auth.kind, "device"); assert.equal(version, 3);
+      assert.ok(now instanceof Date); assert.equal(skills.length, 1);
+      assert.deepEqual(reconciliation, { baseRevision: null, roots: completeRoots });
+      return { syncRunId: "run", syncedSkillCount: 1 };
+    } };
+  assert.equal((await portalSyncUpload(localRequest(reconciliationReport), context, deps)).status, 200);
+  assert.equal(calls, 1);
+  for (const req of [localRequest(reconciliationReport, "?reportVersion=3"),
+    localRequest({ ...reconciliationReport, userId: "other" }),
+    localRequest({ ...reconciliationReport, baseRevision: "bad" })]) {
+    assert.equal((await portalSyncUpload(req, context, { ...deps, getPgPool: noDatabase })).status, 400);
+  }
+  assert.equal((await portalSyncUpload(localRequest(reconciliationReport), context,
+    { ...deps, getEnvironment: () => ({}), getPgPool: noDatabase })).status, 503);
+  assert.equal((await portalSyncUpload(localRequest(reconciliationReport), { deploy: { context: "production" } } as Context,
+    { ...deps, getPgPool: noDatabase })).status, 503);
+  assert.equal((await portalSyncUpload(localRequest(reconciliationReport), context,
+    { ...deps, performSyncUpload: async () => { throw new Response("Stale", { status: 409 }); } })).status, 409);
+});

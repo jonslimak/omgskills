@@ -31,6 +31,7 @@ enum InstalledSkillsScanner {
         let installations: [Skill]
         let summary: InstalledSkillSummary
         var issues: [ScanIssue] = []
+        var roots: [InventoryRootCoverage] = []
     }
 
     enum ScanIssue: Equatable, Sendable {
@@ -62,12 +63,25 @@ enum InstalledSkillsScanner {
     }
 
     static func scanForPresence(filesystemPaths: SkillFilesystemPaths, pathAnchor: URL? = nil) async throws -> ScanResult {
+        try await reportScan(filesystemPaths: filesystemPaths, pathAnchor: pathAnchor, collectCoverage: false)
+    }
+
+    static func scanForReconciliation(filesystemPaths: SkillFilesystemPaths, pathAnchor: URL? = nil) async throws -> ScanResult {
+        try await reportScan(filesystemPaths: filesystemPaths, pathAnchor: pathAnchor, collectCoverage: true)
+    }
+
+    private static func reportScan(filesystemPaths: SkillFilesystemPaths, pathAnchor: URL?, collectCoverage: Bool) async throws -> ScanResult {
         // A child task keeps synchronous filesystem work off the UI actor.
         try await withThrowingTaskGroup(of: ScanResult.self) { group in
             group.addTask {
                 try Task.checkCancellation()
-                let scan = scanWithSummary(filesystemPaths: filesystemPaths, pathAnchor: pathAnchor)
+                let scan = scan(roots: [Root(url: filesystemPaths.claudeSkillsRoot, origin: "Claude"),
+                    Root(url: filesystemPaths.codexSkillsRoot, origin: "Codex"),
+                    Root(url: filesystemPaths.agentsSkillsRoot, origin: "Agents")],
+                    pathAnchor: pathAnchor, collectCoverage: collectCoverage)
+                if collectCoverage && scan.installations.count > 1000 { throw PresenceSyncError.tooManyInstallations }
                 var issues = scan.issues
+                var coverage = scan.roots
                 let installations = scan.installations.filter { skill in
                     do {
                         _ = try SkillSyncService.presencePayloadSkill(skill)
@@ -75,17 +89,23 @@ enum InstalledSkillsScanner {
                     } catch {
                         issues.append(.skippedSkill(source: skill.origin ?? "Unknown",
                             folder: URL(fileURLWithPath: skill.installCmd).lastPathComponent))
+                        if let index = coverage.firstIndex(where: { $0.source == skill.origin?.lowercased() }) {
+                            coverage[index].state = .incomplete
+                            coverage[index].reason = .invalidMetadata
+                        }
                         return false
                     }
                 }
                 try Task.checkCancellation()
-                return ScanResult(skills: scan.skills, installations: installations, summary: scan.summary, issues: issues)
+                return ScanResult(skills: scan.skills, installations: installations, summary: scan.summary,
+                    issues: issues, roots: coverage)
             }
             return try await group.next()!
         }
     }
 
-    static func scan(roots: [Root], pathAnchor: URL? = nil) -> ScanResult {
+    static func scan(roots: [Root], pathAnchor: URL? = nil, collectCoverage: Bool = false,
+                     directoryReader: ((URL) throws -> [URL])? = nil) -> ScanResult {
         let fm = FileManager.default
         var seen = Set<String>()
         var skills: [Skill] = []
@@ -93,17 +113,26 @@ enum InstalledSkillsScanner {
         var summary = InstalledSkillSummary()
         var recent: [InstalledSkillSummary.RecentSkill] = []
         var issues: [ScanIssue] = []
+        var coverage: [InventoryRootCoverage] = []
+        let readDirectory = directoryReader ?? directoryEntries
 
         for root in roots {
+            let source = root.origin.lowercased()
+            let rootStart = collectCoverage ? fileStamp(root.url) : nil
+            let firstIssue = issues.count
             guard isWithinPathAnchor(root.url, pathAnchor: pathAnchor) else {
+                issues.append(.unreadableRoot(source: root.origin))
+                if collectCoverage { coverage.append(.init(source: source, state: .unavailable, reason: .redirected)) }
+                continue
+            }
+            if collectCoverage && root.url.resolvingSymlinksInPath().path != root.url.standardizedFileURL.path {
+                coverage.append(.init(source: source, state: .unavailable, reason: .redirected))
                 issues.append(.unreadableRoot(source: root.origin))
                 continue
             }
             let entries: [URL]
             do {
-                entries = try fm.contentsOfDirectory(at: root.url,
-                    includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey, .contentModificationDateKey],
-                    options: [.skipsHiddenFiles])
+                entries = try readDirectory(root.url)
             } catch {
                 let failure = error as NSError
                 let isLink = (try? fm.attributesOfItem(atPath: root.url.path)[.type] as? FileAttributeType) == .typeSymbolicLink
@@ -111,10 +140,18 @@ enum InstalledSkillsScanner {
                     || ![NSFileNoSuchFileError, NSFileReadNoSuchFileError].contains(failure.code) {
                     issues.append(.unreadableRoot(source: root.origin))
                 }
+                if collectCoverage {
+                    let missing = !isLink && rootStart == nil && failure.domain == NSCocoaErrorDomain
+                        && [NSFileNoSuchFileError, NSFileReadNoSuchFileError].contains(failure.code)
+                    coverage.append(.init(source: source, state: .unavailable, reason: missing ? .missing : .unreadable))
+                }
                 continue
             }
+            let observations = collectCoverage ? entryObservations(entries, pathAnchor: pathAnchor) : [:]
 
             for entry in entries {
+                // Regular files cannot contain SKILL.md; resolving that child can fail with ENOTDIR.
+                if collectCoverage && fileStamp(entry)?.type == FileAttributeType.typeRegular.rawValue { continue }
                 let skillMd = entry.appendingPathComponent("SKILL.md")
                 if let pathAnchor {
                     guard isWithinPathAnchor(entry, pathAnchor: pathAnchor),
@@ -170,10 +207,65 @@ enum InstalledSkillsScanner {
                 seen.insert(resolved)
                 skills.append(skill)
             }
+            if collectCoverage {
+                let after = try? readDirectory(root.url)
+                let stable = rootStart != nil && rootStart == fileStamp(root.url)
+                    && observations.values.allSatisfy { $0.entry != nil }
+                    && isWithinPathAnchor(root.url, pathAnchor: pathAnchor)
+                    && root.url.resolvingSymlinksInPath().path == root.url.standardizedFileURL.path
+                    && after.map { entryObservations($0, pathAnchor: pathAnchor) == observations } == true
+                let complete = stable && issues.count == firstIssue
+                coverage.append(.init(source: source, state: complete ? .complete : .incomplete,
+                    reason: complete ? nil : stable ? .invalidEntry : .changed))
+            }
         }
 
         summary.recentSkills = Array(recent.sorted { $0.installedAt > $1.installedAt }.prefix(recentSkillLimit))
-        return ScanResult(skills: skills, installations: installations, summary: summary, issues: issues)
+        return ScanResult(skills: skills, installations: installations, summary: summary, issues: issues, roots: coverage)
+    }
+
+    private struct FileStamp: Equatable {
+        let device: UInt64
+        let inode: UInt64
+        let type: String
+        let size: UInt64
+        let modified: Date
+    }
+
+    private static func fileStamp(_ url: URL) -> FileStamp? {
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
+              let device = attributes[.systemNumber] as? NSNumber,
+              let inode = attributes[.systemFileNumber] as? NSNumber,
+              let type = attributes[.type] as? FileAttributeType,
+              let size = attributes[.size] as? NSNumber,
+              let modified = attributes[.modificationDate] as? Date else { return nil }
+        return .init(device: device.uint64Value, inode: inode.uint64Value, type: type.rawValue,
+            size: size.uint64Value, modified: modified)
+    }
+
+    private struct EntryObservation: Equatable {
+        let entry: FileStamp?
+        let resolvedPath: String?
+        let skillFile: FileStamp?
+        let resolvedSkillFile: FileStamp?
+    }
+
+    private static func entryObservations(_ entries: [URL], pathAnchor: URL?) -> [String: EntryObservation] {
+        Dictionary(uniqueKeysWithValues: entries.map { entry in
+            let skillFile = entry.appendingPathComponent("SKILL.md")
+            let allowed = isWithinPathAnchor(entry, pathAnchor: pathAnchor)
+                && isWithinPathAnchor(skillFile, pathAnchor: pathAnchor)
+            return (entry.lastPathComponent, .init(entry: fileStamp(entry),
+                resolvedPath: allowed ? entry.resolvingSymlinksInPath().path : nil,
+                skillFile: allowed ? fileStamp(skillFile) : nil,
+                resolvedSkillFile: allowed ? fileStamp(skillFile.resolvingSymlinksInPath()) : nil))
+        })
+    }
+
+    private static func directoryEntries(_ url: URL) throws -> [URL] {
+        try FileManager.default.contentsOfDirectory(at: url,
+            includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey, .contentModificationDateKey],
+            options: [.skipsHiddenFiles])
     }
 
     private static func parse(skillMd: URL, dir: URL, origin: String, isSymlink: Bool,

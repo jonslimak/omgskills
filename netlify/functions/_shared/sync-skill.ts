@@ -1,4 +1,5 @@
 import { optionalString, requireString } from "./validation.js";
+import { parseReconciliationFields, type ReconciliationInput } from "./inventory-reconciliation.js";
 
 export type SyncSkill = {
   stableKey: string;
@@ -198,18 +199,24 @@ export function parsePresenceSkill(value: unknown): SyncSkill {
 
 export function parseSyncReport(body: Record<string, unknown>) {
   const reportVersion = body.reportVersion === undefined ? 1 : body.reportVersion;
-  if (body.reportVersion !== undefined && body.reportVersion !== 2) {
+  if (body.reportVersion !== undefined && body.reportVersion !== 2 && body.reportVersion !== 3) {
     throw new Response("Unsupported reportVersion", { status: 400 });
   }
   if (reportVersion === 2 && Object.keys(body).some((key) => !["reportVersion", "skills"].includes(key))) {
     throw new Response("Unsupported presence report field", { status: 400 });
   }
+  if (reportVersion === 3 && Object.keys(body).some(key => !["reportVersion", "baseRevision", "roots", "skills"].includes(key))) {
+    throw new Response("Unsupported reconciliation report field", { status: 400 });
+  }
+  const reconciliation = reportVersion === 3 ? parseReconciliationFields(body) : undefined;
   if (!Array.isArray(body.skills) || body.skills.length > 1000) {
     throw new Response("skills must be an array of at most 1000 entries", { status: 400 });
   }
-  const skills = body.skills.map(reportVersion === 2 ? parsePresenceSkill : parseSyncSkill);
+  const skills = body.skills.map(reportVersion === 1 ? parseSyncSkill : parsePresenceSkill);
   if (new Set(skills.map((skill) => skill.stableKey)).size !== skills.length) {
     throw new Response("skills contain duplicate installation locations", { status: 400 });
   }
-  return { reportVersion, skills } as { reportVersion: 1 | 2; skills: SyncSkill[] };
+  return { reportVersion, skills, ...(reconciliation ? { reconciliation } : {}) } as {
+    reportVersion: 1 | 2 | 3; skills: SyncSkill[]; reconciliation?: ReconciliationInput
+  };
 }

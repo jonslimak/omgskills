@@ -160,3 +160,24 @@ test("version 2 refuses legacy authentication before opening a database connecti
   const pool = { connect() { assert.fail("must not connect"); } } as unknown as Pool;
   await assert.rejects(performSyncUpload(pool, { kind: "legacy", token: "old" }, [], new Date(), 2), badRequest);
 });
+
+test("version 3 parses only explicit complete coverage and keeps presence metadata validation", async () => {
+  const report = { reportVersion: 3, baseRevision: null,
+    roots: ["claude", "codex", "agents"].map(source => ({ source, state: "complete" })),
+    skills: [{ source: "codex", installationPath: "review", name: "Review" }] };
+  const parsed = parseSyncReport(report);
+  assert.equal(parsed.reportVersion, 3);
+  assert.deepEqual(parsed.reconciliation, { baseRevision: null, roots: report.roots });
+  assert.equal(parsed.skills[0].stableKey, "location:v1:codex:review");
+  for (const invalid of [
+    { ...report, token: "legacy" }, { ...report, deviceId: "other" },
+    { ...report, skills: [report.skills[0], report.skills[0]] },
+    { ...report, skills: [{ ...report.skills[0], installationPath: "/Users/private/review" }] },
+    { ...report, skills: Array(1001).fill(report.skills[0]) },
+    { reportVersion: 2, skills: [], roots: report.roots },
+    { ...report, roots: report.roots.slice(1) }
+  ]) assert.throws(() => parseSyncReport(invalid), badRequest);
+  const pool = { connect() { assert.fail("must not connect"); } } as unknown as Pool;
+  await assert.rejects(performSyncUpload(pool, { kind: "legacy", token: "old" }, [], new Date(), 3, parsed.reconciliation), badRequest);
+  await assert.rejects(performSyncUpload(pool, { kind: "device", request: new Request("http://localhost") }, [], new Date(), 3), badRequest);
+});

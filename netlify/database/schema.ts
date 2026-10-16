@@ -4,6 +4,7 @@ import {
   foreignKey,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -209,6 +210,7 @@ export const syncRuns = pgTable(
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     deviceId: uuid("device_id").references(() => deviceTokens.id, { onDelete: "no action" }),
     status: text("status").notNull(),
+    scanCoverage: jsonb("scan_coverage"),
     startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
     completedAt: timestamp("completed_at", { withTimezone: true })
   },
@@ -367,6 +369,8 @@ export const deviceTokens = pgTable(
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
     deviceName: text("device_name").notNull(),
+    inventoryRevision: uuid("inventory_revision"),
+    inventoryProtocol: integer("inventory_protocol").notNull().default(1),
     grantedScopes: text("granted_scopes").array().notNull()
       .default(sql`ARRAY['sync:write', 'self:revoke']::text[]`),
     lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
@@ -376,6 +380,7 @@ export const deviceTokens = pgTable(
   },
   (table) => [
     uniqueIndex("device_tokens_token_hash_unique").on(table.tokenHash),
+    check("device_tokens_inventory_protocol_check", sql`${table.inventoryProtocol} IN (1, 2, 3)`),
     index("device_tokens_user_idx").on(table.userId),
     index("device_tokens_user_active_idx")
       .on(table.userId, table.createdAt)

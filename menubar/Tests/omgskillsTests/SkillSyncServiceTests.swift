@@ -249,6 +249,65 @@ struct SkillSyncServiceTests {
         #expect(rows[0]["identityStatus"] as? String == "localOnly")
     }
 
+    @Test func reconciliationEncodesExplicitNullRevisionAndOnlyCoverageFacts() throws {
+        let roots: [InventoryRootCoverage] = [
+            .init(source: "claude", state: .complete, reason: nil),
+            .init(source: "codex", state: .incomplete, reason: .changed),
+            .init(source: "agents", state: .unavailable, reason: .missing)
+        ]
+        let scan = InstalledSkillsScanner.ScanResult(skills: [], installations: [], summary: .init(), roots: roots)
+        let report = try SkillSyncService.reconciliationPayload(baseRevision: nil, scan: scan)
+        let body = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(report)) as? [String: Any])
+        #expect(Set(body.keys) == ["reportVersion", "baseRevision", "roots", "skills"])
+        #expect(body["reportVersion"] as? Int == 3)
+        #expect(body["baseRevision"] is NSNull)
+        let rows = try #require(body["roots"] as? [[String: Any]])
+        #expect(Set(rows[0].keys) == ["source", "state"])
+        #expect(rows[2]["reason"] as? String == "missing")
+        let revision = UUID().uuidString
+        #expect(try SkillSyncService.reconciliationPayload(baseRevision: revision, scan: scan).baseRevision == revision.lowercased())
+        #expect(throws: PresenceSyncError.invalidRevision) {
+            try SkillSyncService.reconciliationPayload(baseRevision: "not-a-revision", scan: scan)
+        }
+    }
+
+    @Test func reconciliationRejectsInvalidOrIncompleteCoverageContracts() throws {
+        let complete: [InventoryRootCoverage] = ["claude", "codex", "agents"].map { .init(source: $0, state: .complete, reason: nil) }
+        for roots in [Array(complete.dropLast()), [complete[0], complete[0], complete[2]],
+            [.init(source: "unknown", state: .complete, reason: nil), complete[1], complete[2]],
+            [.init(source: "claude", state: .complete, reason: .missing), complete[1], complete[2]],
+            [.init(source: "claude", state: .incomplete, reason: .missing), complete[1], complete[2]],
+            [.init(source: "claude", state: .unavailable, reason: nil), complete[1], complete[2]]] {
+            let scan = InstalledSkillsScanner.ScanResult(skills: [], installations: [], summary: .init(), roots: roots)
+            #expect(throws: PresenceSyncError.invalidCoverage) { try SkillSyncService.reconciliationPayload(baseRevision: nil, scan: scan) }
+        }
+        let broken = InstalledSkillsScanner.ScanResult(skills: [], installations: [], summary: .init(),
+            issues: [.skippedSkill(source: "Codex", folder: "bad")], roots: complete)
+        #expect(throws: PresenceSyncError.invalidCoverage) { try SkillSyncService.reconciliationPayload(baseRevision: nil, scan: broken) }
+    }
+
+    @Test func reconciliationNeverTruncatesDuplicateInvalidOrOversizeObservations() throws {
+        let roots: [InventoryRootCoverage] = ["claude", "codex", "agents"].map { .init(source: $0, state: .complete, reason: nil) }
+        let skill = makeSkill(name: "Local", githubUrl: "", installCmd: "/tmp/local", origin: "Codex", isLocalOnly: true)
+        for (skills, error) in [(Array(repeating: skill, count: 1001), PresenceSyncError.tooManyInstallations),
+            ([skill, skill], .duplicateLocation),
+            ([makeSkill(name: "", githubUrl: "", installCmd: "/tmp/local", origin: "Codex", isLocalOnly: true)], .invalidInstallation)] {
+            let scan = InstalledSkillsScanner.ScanResult(skills: skills, installations: skills, summary: .init(), roots: roots)
+            #expect(throws: error) { try SkillSyncService.reconciliationPayload(baseRevision: nil, scan: scan) }
+        }
+        let legacy = try SkillSyncService.presencePayload(installations: [skill])
+        #expect(legacy.reportVersion == 2)
+    }
+
+    @Test func canceledReconciliationEncodingSubmitsNothing() async {
+        let task = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            let scan = InstalledSkillsScanner.ScanResult(skills: [], installations: [], summary: .init())
+            return try SkillSyncService.reconciliationPayload(baseRevision: nil, scan: scan)
+        }
+        await #expect(throws: CancellationError.self) { try await task.value }
+    }
+
     private func makeSkill(
         name: String,
         githubUrl: String,

@@ -1,19 +1,20 @@
 import type { PoolClient } from "pg";
 import type { SyncSkill } from "./sync-skill.js";
 import { reconcileSyncedGroupReferences } from "./sync-group-reconciliation.js";
+import type { RootCoverage } from "./inventory-reconciliation.js";
 
 export async function writeSyncInventory(
   client: PoolClient,
   userId: string,
   skills: SyncSkill[],
-  options: { deviceId?: string; now?: Date } = {}
+  options: { deviceId?: string; now?: Date; roots?: RootCoverage[] } = {}
 ) {
   const deviceId = options.deviceId ?? null;
   const now = options.now ?? new Date();
   await client.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [userId]);
   const runResult = await client.query<{ id: string }>(
-    "INSERT INTO sync_runs (user_id, device_id, status) VALUES ($1, $2, 'started') RETURNING id",
-    [userId, deviceId]
+    "INSERT INTO sync_runs (user_id, device_id, status, scan_coverage) VALUES ($1, $2, 'started', $3::jsonb) RETURNING id",
+    [userId, deviceId, options.roots ? JSON.stringify(options.roots) : null]
   );
   const syncRunId = runResult.rows[0].id;
 
@@ -64,7 +65,19 @@ export async function writeSyncInventory(
     );
   }
 
-  // Only legacy snapshots infer absence. Presence reports never remove history.
+  let missingSkillCount = 0;
+  if (deviceId && options.roots) {
+    const completeSources = options.roots.filter(root => root.state === "complete").map(root => root.source);
+    const missing = await client.query(
+      `UPDATE synced_skills SET is_current = false
+       WHERE user_id = $1 AND device_id = $2 AND source = ANY($3::text[])
+         AND is_current = true AND sync_run_id <> $4`,
+      [userId, deviceId, completeSources, syncRunId]
+    );
+    missingSkillCount = missing.rowCount ?? 0;
+  }
+
+  // Legacy snapshots reconcile only their separate bucket; v2 device reports stay presence-only.
   if (!deviceId && skills.length > 0) {
     await client.query(
       `
@@ -86,5 +99,5 @@ export async function writeSyncInventory(
     "UPDATE sync_runs SET status = 'completed', completed_at = $2 WHERE id = $1",
     [syncRunId, now]
   );
-  return syncRunId;
+  return { syncRunId, missingSkillCount };
 }

@@ -361,6 +361,112 @@ struct InstalledSkillsScannerTests {
         #expect(InstalledSkillsScanner.scanWithSummary(filesystemPaths: paths).installations.first?.githubUrl == "https://github.com/outside/repository")
     }
 
+    @Test func reconciliationDistinguishesEmptyMissingAndUnreadableRoots() async throws {
+        let root = try temporaryDirectory().resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        try FileManager.default.createDirectory(at: paths.codexSkillsRoot, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: paths.agentsSkillsRoot.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("not a directory".utf8).write(to: paths.agentsSkillsRoot)
+        try Data("ordinary file".utf8).write(to: paths.codexSkillsRoot.appendingPathComponent("notes.txt"))
+        let scan = try await InstalledSkillsScanner.scanForReconciliation(filesystemPaths: paths, pathAnchor: root)
+        #expect(scan.issues == [.unreadableRoot(source: "Agents")])
+        #expect(scan.roots == [
+            .init(source: "claude", state: .unavailable, reason: .missing),
+            .init(source: "codex", state: .complete, reason: nil),
+            .init(source: "agents", state: .unavailable, reason: .unreadable)
+        ])
+        #expect(try SkillSyncService.reconciliationPayload(baseRevision: nil, scan: scan).skills.isEmpty)
+        #expect(InstalledSkillsScanner.scanWithSummary(filesystemPaths: paths).roots.isEmpty)
+    }
+
+    @Test(arguments: ["invalid", "broken", "oversize"])
+    func reconciliationKeepsOtherRootsCompleteWhenOneEntryCannotBeReported(_ failure: String) async throws {
+        let root = try temporaryDirectory().resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        for agentRoot in paths.allSkillsRoots {
+            let directory = agentRoot.appendingPathComponent("good")
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try writeSkill(at: directory, name: "good")
+        }
+        let bad = paths.claudeSkillsRoot.appendingPathComponent("bad")
+        if failure == "broken" {
+            try FileManager.default.createSymbolicLink(at: bad, withDestinationURL: root.appendingPathComponent("missing"))
+        } else {
+            try FileManager.default.createDirectory(at: bad, withIntermediateDirectories: true)
+            if failure == "invalid" {
+                try Data("invalid frontmatter".utf8).write(to: bad.appendingPathComponent("SKILL.md"))
+            } else { try writeSkill(at: bad, name: String(repeating: "x", count: 201)) }
+        }
+        let scan = try await InstalledSkillsScanner.scanForReconciliation(filesystemPaths: paths, pathAnchor: root)
+        #expect(scan.installations.count == 3)
+        #expect(scan.roots[0].state == .incomplete)
+        #expect(scan.roots[0].reason == (failure == "oversize" ? .invalidMetadata : .invalidEntry))
+        #expect(scan.roots.dropFirst().allSatisfy { $0.state == .complete })
+        #expect(try SkillSyncService.reconciliationPayload(baseRevision: nil, scan: scan).skills.count == 3)
+    }
+
+    @Test(arguments: ["replaceRoot", "removeEntry", "editSkill", "redirectRoot", "readFailure"])
+    func reconciliationDoesNotClaimCompletenessWhenTheFilesystemChanges(_ change: String) throws {
+        let root = try temporaryDirectory().resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let agentRoot = root.appendingPathComponent("codex")
+        let skill = agentRoot.appendingPathComponent("fixture")
+        try FileManager.default.createDirectory(at: skill, withIntermediateDirectories: true)
+        try writeSkill(at: skill, name: "before")
+        var reads = 0
+        let scan = InstalledSkillsScanner.scan(roots: [.init(url: agentRoot, origin: "Codex")],
+            pathAnchor: root, collectCoverage: true, directoryReader: { url in
+                if change == "readFailure" { throw CocoaError(.fileReadNoPermission) }
+                reads += 1
+                if reads == 2 {
+                    switch change {
+                    case "replaceRoot", "redirectRoot":
+                        let moved = root.appendingPathComponent("moved")
+                        try FileManager.default.moveItem(at: url, to: moved)
+                        if change == "redirectRoot" {
+                            try FileManager.default.createSymbolicLink(at: url, withDestinationURL: moved)
+                        } else { try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true) }
+                    case "removeEntry": try FileManager.default.removeItem(at: skill)
+                    default: try writeSkill(at: skill, name: "after with a different size")
+                    }
+                }
+                return try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+            })
+        #expect(scan.roots.first?.state == (change == "readFailure" ? .unavailable : .incomplete))
+        #expect(scan.roots.first?.reason == (change == "readFailure" ? .unreadable : .changed))
+    }
+
+    @Test func reconciliationRejectsRedirectedRootsButAllowsBoundedSkillLinks() async throws {
+        let root = try temporaryDirectory().resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let shared = root.appendingPathComponent("shared")
+        try FileManager.default.createDirectory(at: shared, withIntermediateDirectories: true)
+        try writeSkill(at: shared, name: "shared")
+        try FileManager.default.createDirectory(at: paths.codexSkillsRoot, withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: paths.codexSkillsRoot.appendingPathComponent("shared"), withDestinationURL: shared)
+        try FileManager.default.createDirectory(at: paths.claudeSkillsRoot.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: paths.claudeSkillsRoot, withDestinationURL: shared)
+        let scan = try await InstalledSkillsScanner.scanForReconciliation(filesystemPaths: paths, pathAnchor: root)
+        #expect(scan.roots[0].state == .unavailable)
+        #expect(scan.roots[0].reason == .redirected)
+        #expect(scan.roots[1].state == .complete)
+        #expect(scan.installations.count == 1)
+    }
+
+    @Test func canceledReconciliationScanCannotProduceAnEmptyReport() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let task = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return try await InstalledSkillsScanner.scanForReconciliation(filesystemPaths: paths)
+        }
+        await #expect(throws: CancellationError.self) { try await task.value }
+    }
+
     private func temporaryDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
