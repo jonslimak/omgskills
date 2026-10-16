@@ -5,7 +5,7 @@
     "name": "imagegen-frontend-web",
     "authorHandle": "leonxlnx",
     "description": "Elite frontend image-direction skill for generating premium, conversion-aware website design references. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.",
-    "stars": 97695,
+    "stars": 97754,
     "installs": 369873,
     "githubUrl": "https://github.com/Leonxlnx/taste-skill",
     "source": "skills.sh"
@@ -104,7 +104,7 @@
     "name": "emil-design-eng",
     "authorHandle": "emilkowalski",
     "description": "This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.",
-    "stars": 46483,
+    "stars": 46599,
     "installs": 357310,
     "githubUrl": "https://github.com/emilkowalski/skills",
     "source": "skills.sh"
@@ -379,7 +379,7 @@
     "name": "orca-cli",
     "authorHandle": "stablyai",
     "description": "Operate Orca-managed worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, worktree comments, and Orca's embedded browser through the `orca` CLI. Use when the user says \"$orca-cli\", \"Orca worktree\", \"child worktree\", \"spawn codex/claude in a worktree\", \"read/wait/send Orca terminal\", \"handoff\" / \"handover\" / \"give this to another agent\", \"Orca browser\", \"orca artifacts\", or \"share skills\". Prefer it over raw git worktree, ad hoc PTYs, or Computer Use when Orca state is involved. Use Computer Use only when a visible window needs GUI control that a CLI, filesystem, or API cannot do.",
-    "stars": 93929,
+    "stars": 94013,
     "installs": 308623,
     "githubUrl": "https://github.com/stablyai/orca",
     "source": "skills.sh"
@@ -401,7 +401,7 @@
     "name": "systematic-debugging",
     "authorHandle": "obra",
     "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
-    "stars": 300275,
+    "stars": 300357,
     "installs": 295355,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
@@ -533,7 +533,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 181458,
+    "stars": 181498,
     "installs": 236909,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -962,7 +962,7 @@
     "name": "archify",
     "authorHandle": "tt-a1i",
     "description": "Create validated architecture, workflow, sequence, data-flow, lifecycle/state, entity-relationship, class/interface, tree, timeline, and execution waterfall diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional motion, and image/SVG/WebM export. Accept plain-language requirements or Mermaid; inspect repository evidence for code-backed diagrams. Use when visualizing infrastructure, cloud/security networks, API calls, data pipelines, ETL/ELT, state machines, database schemas, class contracts, module hierarchies, incident/release histories, or request and agent-run timings. Also use for everyday subjects with steps, parts, relationships, or states: leave and travel plans, applications and approvals, renting conversations, money or document flows, and order progress. Not for numeric charts or dashboards.",
-    "stars": 84019,
+    "stars": 84284,
     "installs": 157256,
     "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
@@ -1347,7 +1347,7 @@
     "name": "browser-use",
     "authorHandle": "browser-use",
     "description": "Direct browser control via CDP for web interaction: automation, scraping, testing, screenshots, and site/app work.",
-    "stars": 118157,
+    "stars": 118165,
     "installs": 97180,
     "githubUrl": "https://github.com/browser-use/browser-use",
     "source": "skills.sh"
@@ -1798,7 +1798,7 @@
     "name": "audit",
     "authorHandle": "pbakaus",
     "description": "a user-authored audit skill",
-    "stars": 81589,
+    "stars": 81811,
     "installs": 81858,
     "githubUrl": "https://github.com/pbakaus/impeccable",
     "source": "skills.sh"
@@ -2128,7 +2128,7 @@
     "name": "herdr",
     "authorHandle": "herdrdev",
     "description": "Control Herdr, a terminal multiplexer for coding agents. Use only when the user explicitly mentions Herdr or asks to use Herdr to inspect or control panes, tabs, workspaces, commands, or another agent. Do not use merely because a task could benefit from a background terminal, delegation, or parallel work. Requires HERDR_ENV=1.",
-    "stars": 44202,
+    "stars": 44304,
     "installs": 68080,
     "githubUrl": "https://github.com/herdrdev/herdr",
     "source": "skills.sh"
