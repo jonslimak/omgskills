@@ -4,6 +4,7 @@ import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { verifyReleaseDeployArtifacts, verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
+import { validateSearchCatalog } from "./search-catalog.mjs";
 import { refreshHomepageLibraryPreview } from "./homepage-library-preview.mjs";
 import { refreshHomePreview } from "./home-preview-content.mjs";
 import {
@@ -112,6 +113,11 @@ async function main() {
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(outputDir, { recursive: true });
   await cp(siteDir, outputDir, { recursive: true });
+  for (const track of ["", "v2", "crawl4"]) {
+    const dataDir = path.join(outputDir, "data", track);
+    const manifestPath = path.join(dataDir, "manifest.json");
+    if (await exists(manifestPath)) validateSearchCatalog(dataDir, JSON.parse(await readFile(manifestPath, "utf8")));
+  }
   await refreshHomepageLibraryPreview({
     homepagePath: path.join(outputDir, "index.html"),
     siteDir: outputDir,

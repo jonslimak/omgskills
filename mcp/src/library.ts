@@ -15,6 +15,8 @@ export type Skill = {
   first_seen?: string;
   skill_md_sha?: string;
   skill_md_path?: string;
+  repo_slug?: string;
+  install_target_name?: string;
   repo_commit_sha?: string;
   skill_tree_sha?: string;
 };
@@ -71,11 +73,12 @@ export type LoadedLibrary = {
   goldBasket: GoldBasketEntry[];
 };
 
-// Fields the MCP tools can return. Published catalog records carry more (README
-// snippets, attribution, tweets); dropping them at load keeps memory and GC low.
+// Fields needed by MCP and exact install-record consumers. Published catalogs
+// carry more (README snippets, tweets); dropping those keeps memory and GC low.
 const skillFields = [
   "id", "name", "description", "github_url", "install_cmd", "author_handle", "tags", "stars",
-  "last_updated", "first_seen", "skill_md_sha", "skill_md_path", "repo_commit_sha", "skill_tree_sha"
+  "last_updated", "first_seen", "skill_md_sha", "skill_md_path", "repo_commit_sha", "skill_tree_sha",
+  "repo_slug", "install_target_name"
 ] as const satisfies readonly (keyof Skill)[];
 
 // Precomputed per-skill search data so a query never re-normalizes or copies records.
@@ -345,7 +348,7 @@ function textScore(entry: SearchEntry, terms: string[]): number {
   return score;
 }
 
-function slimSkill(skill: Skill): Skill {
+export function slimSkill(skill: Skill): Skill {
   const slim: Record<string, unknown> = {};
   for (const field of skillFields) {
     if (skill[field] !== undefined) slim[field] = skill[field];

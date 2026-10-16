@@ -1,0 +1,18 @@
+export type RawSkill = Record<string, any> & { id: string };
+export type AssetReference = { path: string; sha256: string; bytes: number };
+export type SearchDescriptor = { schemaVersion: 1; generatedAt: string; sourceSkills: AssetReference; skillCount: number; search: AssetReference; details: AssetReference };
+export type SearchPayload = { schemaVersion: 1; sourceSkillsSha256: string; skillCount: number; skills: RawSkill[] };
+export type DetailIndex = { schemaVersion: 1; sourceSkillsSha256: string; skillCount: number; partition: "sha256-first-byte"; shards: Record<string, AssetReference> };
+export const searchFields: readonly string[];
+export const searchCatalogLimits: Readonly<{ metadata: number; search: number; shard: number }>;
+export function sha256(bytes: Uint8Array): string;
+export function detailBucket(id: string): string;
+export function projectSearchSkill(skill: Record<string, any>): RawSkill;
+export function object(value: unknown): Record<string, any>;
+export function assetReference(value: unknown, maxBytes?: number): AssetReference;
+export function sameAsset(a: AssetReference, b: AssetReference): boolean;
+export function verifyBytes(bytes: Uint8Array, ref: AssetReference): void;
+export function descriptor(value: unknown, source: unknown): SearchDescriptor;
+export function searchPayload(value: unknown, source: SearchDescriptor): SearchPayload;
+export function detailIndex(value: unknown, source: SearchDescriptor): DetailIndex;
+export function validateShard(records: unknown, bucket: string, expected: ReadonlyMap<string, RawSkill>): Map<string, RawSkill>;

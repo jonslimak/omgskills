@@ -3,6 +3,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { validateSearchCatalog } from "./search-catalog.mjs";
 
 const repoRoot = process.cwd();
 const dataRoot = process.env.OMGSKILLS_DATA_ROOT ?? join(repoRoot, "site", "data");
@@ -71,6 +72,7 @@ function assertAsset(name, asset) {
 }
 
 const manifest = loadJson(manifestPath);
+validateSearchCatalog(dataDir, manifest);
 if (typeof manifest.version !== "number") {
   fail("manifest version missing");
 }

@@ -2,10 +2,20 @@ import type { Config, Context } from "@netlify/functions";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { createOmgskillsServer } from "../../mcp/src/server.js";
 import { loadProductionMcpLibrary, type McpLibraryLoader } from "./_shared/mcp-library.js";
+import type { CompactMcpLoader } from "./_shared/compact-mcp-library.js";
 
 const maximumRequestBytes = 64 * 1024;
 
+// Keep the legacy factory synchronous-reader-only for the separate install-record route.
 export function createMcpHandler(loader: McpLibraryLoader) {
+  return createReadMcpHandler(loader);
+}
+
+export function createCompactMcpHandler(loader: CompactMcpLoader) {
+  return createReadMcpHandler(loader);
+}
+
+function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader) {
   return async (request: Request, context: Pick<Context, "waitUntil">): Promise<Response> => {
     const pathname = new URL(request.url).pathname;
     if (pathname === "/mcp/health") {
@@ -70,7 +80,7 @@ export const config: Config = {
   }
 };
 
-async function healthResponse(loader: McpLibraryLoader, context: Pick<Context, "waitUntil">): Promise<Response> {
+async function healthResponse(loader: McpLibraryLoader | CompactMcpLoader, context: Pick<Context, "waitUntil">): Promise<Response> {
   try {
     const snapshot = await loader.get();
     keepRefreshAlive(loader, context);
@@ -85,6 +95,7 @@ async function healthResponse(loader: McpLibraryLoader, context: Pick<Context, "
       stale: ageMs >= state.maxAgeMs,
       refreshing: state.refreshing,
       lastRefreshFailed: state.lastRefreshFailed,
+      ...("diagnostics" in snapshot.library ? { catalog: snapshot.library.diagnostics() } : {}),
       optionalData: {
         trending: snapshot.trendingCount > 0,
         goldBasket: snapshot.goldBasketCount > 0
@@ -101,7 +112,7 @@ async function healthResponse(loader: McpLibraryLoader, context: Pick<Context, "
   }
 }
 
-function keepRefreshAlive(loader: McpLibraryLoader, context: Pick<Context, "waitUntil">) {
+function keepRefreshAlive(loader: McpLibraryLoader | CompactMcpLoader, context: Pick<Context, "waitUntil">) {
   const pendingRefresh = loader.pendingRefresh();
   if (pendingRefresh) context.waitUntil(pendingRefresh.then(() => undefined));
 }

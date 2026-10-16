@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { lstatSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { retainedSearchAssets, searchAssetPattern, validateSearchCatalog } from "./search-catalog.mjs";
 
 function referencedAssets(manifest) {
   if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
@@ -33,11 +34,18 @@ export function publishCatalogManifest({ dataDir, manifest, previousManifest, pr
   // Validate both generations before activating the new manifest or deleting anything.
   validateAssets(dataDir, currentAssets);
   validateAssets(dataDir, previousAssets);
+  const currentSearch = validateSearchCatalog(dataDir, manifest);
+  const previousSearch = validateSearchCatalog(dataDir, previousManifest);
   const currentPaths = new Set(currentAssets.map((asset) => asset.path));
   const previousPaths = new Set(previousAssets.map((asset) => asset.path));
   const keepPaths = new Set([...currentPaths, ...previousPaths]);
   const files = readdirSync(dataDir);
+  for (const name of [...(currentSearch?.paths ?? []), ...(previousSearch?.paths ?? []),
+    ...retainedSearchAssets(dataDir, files)]) keepPaths.add(name);
   const deletions = new Set();
+  if (manifest.searchCatalog?.sha256 !== previousManifest.searchCatalog?.sha256) {
+    for (const name of files) if (searchAssetPattern.test(name) && !keepPaths.has(name)) deletions.add(name);
+  }
   for (const prefix of prefixes) {
     if (!/^[a-z]+(?:-[a-z]+)*$/.test(prefix)) throw new Error(`Invalid asset prefix: ${prefix}`);
     const pattern = new RegExp(`^${prefix}-[a-f0-9]{12}\\.json$`);

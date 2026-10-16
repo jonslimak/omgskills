@@ -29,7 +29,9 @@ function fixture(t, track) {
   mkdirSync(dir, { recursive: true });
   mkdirSync(join(root, "index/shadow"), { recursive: true });
   mkdirSync(join(root, "scripts"));
-  for (const name of ["publish-data.sh", "publish-crawl4-data.mjs", "publish-catalog-manifest.mjs"]) {
+  mkdirSync(join(root, "mcp", "src"), { recursive: true });
+  cpSync(join(scripts, "..", "mcp", "src", "search-catalog-format.mjs"), join(root, "mcp", "src", "search-catalog-format.mjs"));
+  for (const name of ["publish-data.sh", "publish-crawl4-data.mjs", "publish-catalog-manifest.mjs", "search-catalog.mjs", "search-catalog-cli.mjs"]) {
     cpSync(join(scripts, name), join(root, "scripts", name));
   }
   // Health generation is unrelated to catalog retention and has its own tests.

@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { OmgskillsLibrary, type SkillResult } from "./library.js";
+import type { SkillResult } from "./library.js";
+import type { CatalogReader } from "./catalog-reader.js";
 
 const toolAnnotations = {
   readOnlyHint: true,
@@ -49,7 +50,7 @@ const skillOutputSchema = z.object({
   skill: skillResultSchema.nullable()
 });
 
-export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
+export function createOmgskillsServer(library: CatalogReader): McpServer {
   const server = new McpServer(
     {
       name: "omgskills",
@@ -81,7 +82,7 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
       annotations: toolAnnotations
     },
     async ({ query, limit, author, tag, minStars }) =>
-      skillListResult(library.searchSkills({ query, limit, author, tag, minStars }))
+      skillListResult(await library.searchSkills({ query, limit, author, tag, minStars }))
   );
 
   server.registerTool(
@@ -96,7 +97,7 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
       annotations: toolAnnotations
     },
     async ({ id }) => {
-      const rawSkill = library.getSkill(id);
+      const rawSkill = await library.getSkill(id);
       const skill = rawSkill ? publicSkill(rawSkill) : null;
       const structuredContent = { found: skill !== null, skill };
       return result(structuredContent, skill ?? { error: "Skill not found", id });
@@ -114,10 +115,7 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ ids }) => skillListResult([...new Set(ids)].flatMap(id => {
-      const skill = library.getSkill(id);
-      return skill ? [skill] : [];
-    }))
+    async ({ ids }) => skillListResult((await Promise.all([...new Set(ids)].map(id => library.getSkill(id)))).flatMap(skill => skill ? [skill] : []))
   );
 
   server.registerTool(
@@ -131,7 +129,7 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ limit }) => skillListResult(library.listTrending(limit))
+    async ({ limit }) => skillListResult(await library.listTrending(limit))
   );
 
   server.registerTool(
@@ -145,7 +143,7 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ limit }) => skillListResult(library.listGoldBasket(limit))
+    async ({ limit }) => skillListResult(await library.listGoldBasket(limit))
   );
 
   server.registerTool(
@@ -160,7 +158,7 @@ export function createOmgskillsServer(library: OmgskillsLibrary): McpServer {
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ author, limit }) => skillListResult(library.listByAuthor(author, limit))
+    async ({ author, limit }) => skillListResult(await library.listByAuthor(author, limit))
   );
 
   return server;

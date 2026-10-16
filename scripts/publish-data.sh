@@ -251,6 +251,7 @@ for key, value in existing.items():
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
 PY
 fi
+node "$REPO_ROOT/scripts/search-catalog-cli.mjs" "$DATA_DIR" "$next_manifest_tmp" "$existing_manifest_tmp"
 node "$REPO_ROOT/scripts/publish-catalog-manifest.mjs" \
     "$DATA_DIR" "$next_manifest_tmp" "$existing_manifest_tmp" \
     skills trending trending-leaderboard leaderboard-view-data x-trending \
