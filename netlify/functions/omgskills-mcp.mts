@@ -11,11 +11,11 @@ export function createMcpHandler(loader: McpLibraryLoader) {
   return createReadMcpHandler(loader);
 }
 
-export function createCompactMcpHandler(loader: CompactMcpLoader, options: { paging?: boolean } = {}) {
+export function createCompactMcpHandler(loader: CompactMcpLoader, options: { paging?: boolean; ranking?: boolean } = {}) {
   return createReadMcpHandler(loader, options);
 }
 
-function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, options: { paging?: boolean } = {}) {
+function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, options: { paging?: boolean; ranking?: boolean } = {}) {
   return async (request: Request, context: Pick<Context, "waitUntil">): Promise<Response> => {
     const pathname = new URL(request.url).pathname;
     if (pathname === "/mcp/health") {

@@ -2,14 +2,15 @@ import { createHash } from "node:crypto";
 import { OmgskillsLibrary, slimSkill, type GoldBasketEntry, type SearchOptions, type Skill, type SkillResult, type TrendingEntry } from "./library.js";
 import type { CatalogReader } from "./catalog-reader.js";
 import type { PageOptions, PagedSearchOptions, SkillPage } from "./paging.js";
+import type { RankedSearchOptions } from "./search-ranking.js";
 import {
   assetReference, descriptor, detailBucket, detailIndex, object, searchCatalogLimits,
-  searchPayload, validateShard, verifyBytes,
+  searchPayload, rankingPayload, validateShard, verifyBytes,
   type AssetReference, type DetailIndex, type RawSkill, type SearchDescriptor,
 } from "./search-catalog-format.mjs";
 
 export const defaultGoldBasketUrl = "https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json";
-export type CatalogReadOptions = { fetcher?: typeof fetch; goldBasketUrl?: string; cacheBytes?: number };
+export type CatalogReadOptions = { fetcher?: typeof fetch; goldBasketUrl?: string; cacheBytes?: number; ranking?: boolean };
 type Manifest = { skills: AssetReference; searchCatalog?: AssetReference; trending?: AssetReference };
 
 function assetUrl(manifestUrl: string, ref: AssetReference) {
@@ -65,10 +66,14 @@ function version(manifest: Manifest, gold: GoldBasketEntry[]) {
 export class SearchCatalogReader implements CatalogReader {
   private readonly expected = new Map<string, Map<string, RawSkill>>();
   private readonly cache = new Map<string, { records: Map<string, RawSkill>; bytes: number }>();
+  private readonly recordCache = new Map<string, { record: RawSkill; bytes: number }>();
+  private readonly recordBudget: number;
   private readonly pending = new Map<string, Promise<Map<string, RawSkill>>>();
   private readonly waiting: (() => void)[] = [];
   private active = 0;
   private cachedBytes = 0;
+  private recordCacheBytes = 0;
+  private recordCacheHits = 0;
   private fetchedShards = 0;
   private fetchedBytes = 0;
   private cacheHits = 0;
@@ -76,9 +81,11 @@ export class SearchCatalogReader implements CatalogReader {
   private readonly index: OmgskillsLibrary;
   private constructor(private readonly manifestUrl: string, private readonly desc: SearchDescriptor,
     private readonly details: DetailIndex, rows: RawSkill[], signalData: Awaited<ReturnType<typeof signals>>,
-    private readonly options: CatalogReadOptions, manifest: Manifest) {
+    private readonly options: CatalogReadOptions, manifest: Manifest, collectionIds?: ReadonlySet<string>) {
     this.version = signalData.complete ? version(manifest, signalData.goldBasket) : undefined;
-    this.index = OmgskillsLibrary.fromData({ skills: rows as Skill[], trending: signalData.trending, goldBasket: signalData.goldBasket }, this.version);
+    this.recordBudget = collectionIds === undefined ? 0 : Math.min(1024 * 1024, Math.floor((options.cacheBytes ?? 32 * 1024 * 1024) / 8));
+    this.index = OmgskillsLibrary.fromData({ skills: rows as Skill[], trending: signalData.trending, goldBasket: signalData.goldBasket }, this.version,
+      { ranking: collectionIds !== undefined, collectionLikeIds: collectionIds });
     for (const row of rows) {
       const bucket = detailBucket(row.id);
       if (!this.expected.has(bucket)) this.expected.set(bucket, new Map());
@@ -96,12 +103,17 @@ export class SearchCatalogReader implements CatalogReader {
       json(assetUrl(manifestUrl, desc.details), fetcher, desc.details.bytes, desc.details),
       signals(manifestUrl, manifest, options),
     ]);
-    return new SearchCatalogReader(manifestUrl, desc, detailIndex(rawIndex, desc), searchPayload(rawSearch, desc).skills, signalData, options, manifest);
+    const rows = searchPayload(rawSearch, desc).skills;
+    const collectionIds = options.ranking && desc.ranking ? new Set(rankingPayload(
+      await json(assetUrl(manifestUrl, desc.ranking), fetcher, desc.ranking.bytes, desc.ranking), desc, new Set(rows.map(row => row.id))).collectionLikeIds) : undefined;
+    return new SearchCatalogReader(manifestUrl, desc, detailIndex(rawIndex, desc), rows, signalData, options, manifest, collectionIds);
   }
   getStats() { return this.index.getStats(); }
   diagnostics() {
     return { mode: "compact", snapshot: this.desc.sourceSkills.sha256, indexBytes: this.desc.search.bytes + this.desc.details.bytes,
-      detailFetches: this.fetchedShards, detailBytes: this.fetchedBytes, detailCacheBytes: this.cachedBytes, detailCacheHits: this.cacheHits };
+      detailFetches: this.fetchedShards, detailBytes: this.fetchedBytes, detailCacheBytes: this.cachedBytes + this.recordCacheBytes,
+      detailCacheHits: this.cacheHits, shardCacheBytes: this.cachedBytes, recordCacheBytes: this.recordCacheBytes, recordCacheHits: this.recordCacheHits,
+      rankingBytes: this.options.ranking ? this.desc.ranking?.bytes ?? 0 : 0 };
   }
   private async gated<T>(work: () => Promise<T>) {
     if (this.active >= 4) await new Promise<void>(resolve => this.waiting.push(resolve));
@@ -123,7 +135,7 @@ export class SearchCatalogReader implements CatalogReader {
       this.fetchedShards++; this.fetchedBytes += ref.bytes;
       const rows = await json(assetUrl(this.manifestUrl, ref), this.options.fetcher ?? fetch, ref.bytes, ref);
       const records = validateShard(rows, bucket, this.expected.get(bucket)!);
-      const budget = this.options.cacheBytes ?? 32 * 1024 * 1024;
+      const budget = (this.options.cacheBytes ?? 32 * 1024 * 1024) - this.recordBudget;
       if (ref.bytes <= budget) {
         while (this.cachedBytes + ref.bytes > budget && this.cache.size) {
           const key = this.cache.keys().next().value!;
@@ -137,12 +149,30 @@ export class SearchCatalogReader implements CatalogReader {
     this.pending.set(ref.sha256, settled);
     return settled;
   }
+  private rememberRecord(id: string, record: RawSkill | undefined) {
+    if (!record || !this.recordBudget) return record;
+    const hit = this.recordCache.get(id);
+    if (hit) { this.recordCache.delete(id); this.recordCache.set(id, hit); return hit.record; }
+    const bytes = Buffer.byteLength(JSON.stringify(record));
+    if (bytes > this.recordBudget) return record;
+    while (this.recordCacheBytes + bytes > this.recordBudget && this.recordCache.size) {
+      const key = this.recordCache.keys().next().value!;
+      this.recordCacheBytes -= this.recordCache.get(key)!.bytes; this.recordCache.delete(key);
+    }
+    this.recordCache.set(id, { record, bytes }); this.recordCacheBytes += bytes;
+    return record;
+  }
   async getRawRecord(id: string, signal?: AbortSignal): Promise<RawSkill | undefined> {
     signal?.throwIfAborted();
     const bucket = detailBucket(id);
     if (!this.expected.get(bucket)?.has(id)) return undefined;
+    const hit = this.recordCache.get(id);
+    if (hit) {
+      this.recordCache.delete(id); this.recordCache.set(id, hit); this.recordCacheHits++;
+      return hit.record;
+    }
     // Individual cancellation never aborts a shared fetch needed by another consumer.
-    const result = this.shard(bucket).then(rows => rows.get(id));
+    const result = this.shard(bucket).then(rows => this.rememberRecord(id, rows.get(id)));
     if (!signal) return result;
     return new Promise((resolve, reject) => {
       const abort = () => reject(signal.reason);
@@ -170,6 +200,7 @@ export class SearchCatalogReader implements CatalogReader {
     return { ...result, skills: await this.hydrate(result.skills) };
   }
   searchPage(options: PagedSearchOptions) { return this.hydratePage(this.index.searchPage(options)); }
+  searchRankedPage(options: RankedSearchOptions) { return this.hydratePage(this.index.searchRankedPage(options)); }
   listByAuthorPage(author: string, options: PageOptions) { return this.hydratePage(this.index.listByAuthorPage(author, options)); }
   listTrendingPage(options: Omit<PageOptions, "sort">) { return this.hydratePage(this.index.listTrendingPage(options)); }
 }
@@ -180,7 +211,7 @@ export async function loadCatalogReader(manifestUrl: string, options: CatalogRea
   if (manifest.searchCatalog) return SearchCatalogReader.load(manifestUrl, manifest, options);
   return OmgskillsLibrary.load({ manifestUrl, goldBasketUrl: options.goldBasketUrl,
     fetcher: (input, init) => String(input) === manifestUrl ? Promise.resolve(Response.json(manifest)) : fetcher(input, init),
-    allowMissingTrending: true, allowMissingGoldBasket: true });
+    allowMissingTrending: true, allowMissingGoldBasket: true, ranking: options.ranking });
 }
 export async function readCatalogVersion(manifestUrl: string, options: CatalogReadOptions = {}) {
   const manifest = await manifestAt(manifestUrl, options.fetcher ?? fetch);

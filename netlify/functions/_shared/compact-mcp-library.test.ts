@@ -115,3 +115,34 @@ test("candidate paging is opt-in and cursors survive only unchanged complete sna
   assert.equal((await held).skills.length, 1);
   await Promise.allSettled(work);
 });
+
+test("ranked HTTP reads preserve no-store, immutable snapshots and failed-refresh recovery", async context => {
+  const f = catalogFixture(context, rows, true), options = { ...f.options, ranking: true, tracks: [{ name: "test", manifestUrl: f.url }] };
+  const loader = createCompactMcpLibraryLoader(options), handler = createCompactMcpHandler(loader, { paging: true, ranking: true });
+  const work: Promise<unknown>[] = [], ctx = { waitUntil: (promise: Promise<unknown>) => { work.push(promise); } };
+  const call = async (args: unknown) => {
+    const response = await handler(new Request("https://host.test/mcp", { method: "POST", headers: {
+      "content-type": "application/json", accept: "application/json, text/event-stream",
+    }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "search_skills", arguments: args } }) }), ctx);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    return (await response.json()).result;
+  };
+  const args = { query: "design", ranking: "web-v1" as const, limit: 1, page: {} };
+  const first = await call(args), cursor = first.structuredContent.page.nextCursor;
+  assert.equal(first.isError, undefined);
+  const before = await loader.get(), held = before.library.searchRankedPage!(args);
+  await loader.refresh();
+  assert.equal((await call({ ...args, page: { cursor } })).isError, undefined);
+  const next = catalogFixture(context, rows.map(row => ({ ...row, provenance_type: "catalog" })), true);
+  for (const [url, bytes] of next.files) f.files.set(url, bytes);
+  await loader.refresh();
+  assert.match(JSON.stringify((await call({ ...args, page: { cursor } })).content), /catalog_snapshot_changed/);
+  assert.equal((await held).skills.length, 1);
+  const current = await loader.get();
+  // Force full loading rather than an unchanged-manifest early return.
+  f.files.set(f.options.goldBasketUrl, Buffer.from(JSON.stringify([{ ...goldBasket[0], score: 5 }])));
+  for (const url of f.files.keys()) if (url.includes("search-ranking-")) f.files.set(url, Buffer.from("bad"));
+  assert.equal(await loader.refresh(), current);
+  assert.equal(loader.status().lastRefreshFailed, true);
+  await Promise.allSettled(work);
+});

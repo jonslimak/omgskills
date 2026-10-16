@@ -8,11 +8,12 @@ export type PageOptions = { limit?: number; sort?: CatalogSort; page: PageReques
 export type PagedSearchOptions = SearchOptions & PageOptions;
 export type PageInfo = { total: number; hasMore: boolean; nextCursor: string | null; snapshot: string; sort: CatalogSort };
 export type SkillPage = { skills: SkillResult[]; page: PageInfo };
-export type PagingErrorCode = "invalid_cursor" | "catalog_snapshot_changed" | "paging_not_supported" | "catalog_unavailable";
+export type PagingErrorCode = "invalid_cursor" | "catalog_snapshot_changed" | "paging_not_supported" | "ranking_not_supported" | "catalog_unavailable";
 const messages: Record<PagingErrorCode, string> = {
   invalid_cursor: "Invalid paging request or cursor.",
   catalog_snapshot_changed: "The catalog changed. Restart from the first page.",
   paging_not_supported: "Paging is not available on this reader.",
+  ranking_not_supported: "Ranking is not available on this reader.",
   catalog_unavailable: "A complete catalog snapshot is temporarily unavailable.",
 };
 export class PagingError extends Error {
@@ -24,7 +25,7 @@ const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(va
 const normalized = (value?: string) => String(value ?? "").toLowerCase().trim();
 const fail = (): never => { throw new PagingError("invalid_cursor"); };
 
-export function preparePage(version: string | undefined, tool: string, options: PageOptions & Partial<SearchOptions>): PageContext {
+export function validatePageOptions(tool: string, options: PageOptions & Partial<SearchOptions>) {
   const { page } = options, limit = options.limit ?? 20, sort = options.sort ?? (tool === "list_trending" ? "trending" : "relevance");
   if (!page || typeof page !== "object" || Array.isArray(page) || Object.keys(page).some(key => key !== "cursor")
     || !Number.isSafeInteger(limit) || limit < 1 || limit > 100 || !catalogSorts.includes(sort)
@@ -32,6 +33,11 @@ export function preparePage(version: string | undefined, tool: string, options: 
     || (options.query !== undefined && (typeof options.query !== "string" || Buffer.byteLength(options.query) > 1024))
     || [options.author, options.tag].some(value => value !== undefined && (typeof value !== "string" || value.length > 100))
     || (options.minStars !== undefined && (!Number.isSafeInteger(options.minStars) || options.minStars < 0))) fail();
+}
+
+export function preparePage(version: string | undefined, tool: string, options: PageOptions & Partial<SearchOptions>, ranking?: { policy: string; terms: string[]; exactQuery: string }): PageContext {
+  validatePageOptions(tool, options);
+  const { page } = options, limit = options.limit ?? 20, sort = options.sort ?? (tool === "list_trending" ? "trending" : "relevance");
   let cursor: Cursor | undefined;
   if (page.cursor !== undefined) {
     if (typeof page.cursor !== "string" || !/^[A-Za-z0-9_-]+$/.test(page.cursor) || Buffer.byteLength(page.cursor) > 1024) fail();
@@ -50,7 +56,8 @@ export function preparePage(version: string | undefined, tool: string, options: 
   const snapshot = digest(version);
   const request = digest({ ordering: 1, tool,
     terms: normalized(options.query).split(" ").filter(Boolean), author: normalized(options.author),
-    tag: normalized(options.tag), minStars: options.minStars ?? 0, limit, sort });
+    tag: normalized(options.tag), minStars: options.minStars ?? 0, limit, sort,
+    ...(ranking ? { ranking: ranking.policy, terms: ranking.terms, exactQuery: ranking.exactQuery } : {}) });
   if (cursor && cursor.request !== request) fail();
   if (cursor && cursor.snapshot !== snapshot) throw new PagingError("catalog_snapshot_changed");
   return { snapshot, request, offset: cursor?.offset ?? 0, limit, sort };

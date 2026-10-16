@@ -4,6 +4,6 @@ type Manifest = { skills: AssetReference; searchCatalog?: AssetReference; genera
 export const searchAssetPattern: RegExp;
 export function validateSearchCatalog(dataDir: string, manifest: Manifest, options?: { fullRecords?: boolean }):
   { descriptor: SearchDescriptor; paths: string[] } | null;
-export function buildSearchCatalog(dataDir: string, source: AssetReference, options?: { generatedAt?: string; previous?: AssetReference }): AssetReference;
-export function prepareSearchCatalog(dataDir: string, manifest: Manifest, previous?: Partial<Manifest>, enabled?: boolean): void;
+export function buildSearchCatalog(dataDir: string, source: AssetReference, options?: { generatedAt?: string; previous?: AssetReference; ranking?: boolean }): AssetReference;
+export function prepareSearchCatalog(dataDir: string, manifest: Manifest, previous?: Partial<Manifest>, enabled?: boolean, ranking?: boolean): void;
 export function retainedSearchAssets(dataDir: string, filenames: string[], now?: number): Set<string>;

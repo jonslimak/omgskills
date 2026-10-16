@@ -3,10 +3,11 @@ import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import {
   assetReference, descriptor, detailBucket, detailIndex, projectSearchSkill, searchCatalogLimits,
-  searchPayload, sha256, validateShard, verifyBytes,
+  searchPayload, rankingPayload, sha256, validateShard, verifyBytes,
 } from "../mcp/src/search-catalog-format.mjs";
+import { collectionLikeIds, collectionOriginPolicy } from "../mcp/src/search-ranking-policy.mjs";
 
-export const searchAssetPattern = /^(?:search-catalog|search-skills|skill-detail-index|skill-details)-[a-f0-9]{12}\.json$/;
+export const searchAssetPattern = /^(?:search-catalog|search-skills|search-ranking|skill-detail-index|skill-details)-[a-f0-9]{12}\.json$/;
 
 function readAsset(dataDir, ref, limit = Number.MAX_SAFE_INTEGER) {
   assetReference(ref, limit);
@@ -48,6 +49,10 @@ export function validateSearchCatalog(dataDir, manifest, { fullRecords = true } 
   if (source && (!Array.isArray(source) || source.length !== search.skillCount
     || source.some((skill, i) => !isDeepStrictEqual(projectSearchSkill(skill), search.skills[i])))) throw new Error("Search projection/source mismatch");
   const byId = source && new Map(source.map(skill => [skill.id, skill]));
+  if (desc.ranking) {
+    const ranking = rankingPayload(readAsset(dataDir, desc.ranking, searchCatalogLimits.ranking), desc, new Set(search.skills.map(row => row.id)));
+    if (source && !isDeepStrictEqual(ranking.collectionLikeIds, collectionLikeIds(source))) throw new Error("Ranking/source mismatch");
+  }
   for (const [key, expected] of buckets) {
     const shardRef = index.shards[key];
     const records = validateShard(readAsset(dataDir, shardRef, searchCatalogLimits.shard), key, expected);
@@ -55,15 +60,16 @@ export function validateSearchCatalog(dataDir, manifest, { fullRecords = true } 
       if (!isDeepStrictEqual(record, byId.get(id))) throw new Error(`Full catalog record changed: ${id}`);
     }
   }
-  return { descriptor: desc, paths: [ref.path, desc.sourceSkills.path, desc.search.path, desc.details.path, ...Object.values(index.shards).map(asset => asset.path)] };
+  return { descriptor: desc, paths: [ref.path, desc.sourceSkills.path, desc.search.path, desc.details.path, ...(desc.ranking ? [desc.ranking.path] : []), ...Object.values(index.shards).map(asset => asset.path)] };
 }
 
-export function buildSearchCatalog(dataDir, sourceRef, { generatedAt, previous } = {}) {
+export function buildSearchCatalog(dataDir, sourceRef, { generatedAt, previous, ranking = false } = {}) {
   assetReference(sourceRef);
   if (previous) {
     const raw = readAsset(dataDir, previous, searchCatalogLimits.metadata);
     const old = descriptor(raw, raw.sourceSkills);
-    if (old.sourceSkills.sha256 === sourceRef.sha256 && old.sourceSkills.path === sourceRef.path && old.sourceSkills.bytes === sourceRef.bytes) {
+    ranking ||= old.ranking !== undefined;
+    if (old.sourceSkills.sha256 === sourceRef.sha256 && old.sourceSkills.path === sourceRef.path && old.sourceSkills.bytes === sourceRef.bytes && (!ranking || old.ranking)) {
       validateSearchCatalog(dataDir, { skills: sourceRef, searchCatalog: previous });
       return previous;
     }
@@ -84,16 +90,18 @@ export function buildSearchCatalog(dataDir, sourceRef, { generatedAt, previous }
     [key, writeAsset(dataDir, "skill-details", records, searchCatalogLimits.shard)]));
   desc.search = writeAsset(dataDir, "search-skills", { schemaVersion: 1, sourceSkillsSha256: sourceRef.sha256, skillCount: rows.length, skills: rows }, searchCatalogLimits.search);
   desc.details = writeAsset(dataDir, "skill-detail-index", { schemaVersion: 1, sourceSkillsSha256: sourceRef.sha256, skillCount: rows.length, partition: "sha256-first-byte", shards }, searchCatalogLimits.metadata);
+  if (ranking) desc.ranking = writeAsset(dataDir, "search-ranking", { schemaVersion: 1, policy: collectionOriginPolicy,
+    sourceSkillsSha256: sourceRef.sha256, skillCount: skills.length, collectionLikeIds: collectionLikeIds(skills) }, searchCatalogLimits.ranking);
   const ref = writeAsset(dataDir, "search-catalog", desc, searchCatalogLimits.metadata);
   validateSearchCatalog(dataDir, { skills: sourceRef, searchCatalog: ref });
   return ref;
 }
 
-export function prepareSearchCatalog(dataDir, manifest, previousManifest = {}, enabled = process.env.OMGSKILLS_SEARCH_CATALOG === "1") {
+export function prepareSearchCatalog(dataDir, manifest, previousManifest = {}, enabled = process.env.OMGSKILLS_SEARCH_CATALOG === "1", ranking = false) {
   // Explicit opt-in for first publication; once present, every writer keeps it in sync.
   if (!enabled && !previousManifest.searchCatalog && !manifest.searchCatalog) return;
   manifest.searchCatalog = buildSearchCatalog(dataDir, manifest.skills, {
-    generatedAt: manifest.generatedAt, previous: previousManifest.searchCatalog ?? manifest.searchCatalog,
+    generatedAt: manifest.generatedAt, previous: previousManifest.searchCatalog ?? manifest.searchCatalog, ranking,
   });
 }
 

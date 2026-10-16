@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { SearchOptions, SkillResult } from "./library.js";
 import type { CatalogReader } from "./catalog-reader.js";
 import { catalogSorts, PagingError, type PageOptions, type SkillPage } from "./paging.js";
+import type { RankedSearchOptions } from "./search-ranking.js";
 
 const toolAnnotations = {
   readOnlyHint: true,
@@ -72,7 +73,8 @@ const skillOutputSchema = z.object({
   skill: skillResultSchema.nullable()
 });
 
-export function createOmgskillsServer(library: CatalogReader, options: { paging?: boolean } = {}): McpServer {
+export function createOmgskillsServer(library: CatalogReader, options: { paging?: boolean; ranking?: boolean } = {}): McpServer {
+  if (options.ranking && !options.paging) throw new Error("Candidate ranking requires paging");
   const server = new McpServer(
     {
       name: "omgskills",
@@ -93,12 +95,17 @@ export function createOmgskillsServer(library: CatalogReader, options: { paging?
     {
       title: "Search skills",
       description: "Search the omgskills catalog by keyword with optional filters. Only records with pinned_install can be installed reproducibly; discovery_only records must not be installed from a mutable branch.",
-      inputSchema: options.paging ? withPaging(searchInput, true) : searchInput,
+      inputSchema: options.paging ? (options.ranking ? withPaging(searchInput, true).extend({ ranking: z.literal("web-v1").optional()
+        .describe("Opt into Mac-informed keyword ranking and @author queries. Requires page; omitted keeps legacy matching.") }) : withPaging(searchInput, true)) : searchInput,
       outputSchema: options.paging ? pagedListOutputSchema : skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async (args: z.infer<typeof searchInput> & Partial<PageOptions>) => options.paging && usesPaging(args)
-      ? pagedResult(args, ["query", "limit", "author", "tag", "minStars", "sort", "page"], () => {
+    async (args: z.infer<typeof searchInput> & Partial<PageOptions> & { ranking?: "web-v1" }) => options.paging && (usesPaging(args) || (options.ranking && "ranking" in args))
+      ? pagedResult(args, ["query", "limit", "author", "tag", "minStars", "sort", "page", ...(options.ranking ? ["ranking"] : [])], () => {
+        if (args.ranking !== undefined) {
+          if (!options.ranking || !library.searchRankedPage) throw new PagingError("ranking_not_supported");
+          return library.searchRankedPage(args as RankedSearchOptions);
+        }
         if (!library.searchPage) throw new PagingError("paging_not_supported");
         return library.searchPage(args as SearchOptions & PageOptions);
       })

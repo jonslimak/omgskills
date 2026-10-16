@@ -18,13 +18,13 @@ export const goldBasket: GoldBasketEntry[] = [
   { ...rows[2], id: "curated/only:extra", name: "curated-only", score: 90 },
 ];
 
-export function catalogFixture(context: Pick<TestContext, "after">, skills = rows) {
+export function catalogFixture(context: Pick<TestContext, "after">, skills = rows, ranking = false) {
   const dir = mkdtempSync(join(tmpdir(), "compact-mcp-"));
   context.after(() => rmSync(dir, { recursive: true, force: true }));
   const bytes = Buffer.from(JSON.stringify(skills) + "\n");
   const hash = sha256(bytes), source = { path: `skills-${hash.slice(0, 12)}.json`, sha256: hash, bytes: bytes.length };
   writeFileSync(join(dir, source.path), bytes);
-  const ref = buildSearchCatalog(dir, source, { generatedAt: "2026-10-16" });
+  const ref = buildSearchCatalog(dir, source, { generatedAt: "2026-10-16", ranking });
   const trendBytes = Buffer.from(JSON.stringify(trending));
   const trendHash = sha256(trendBytes);
   const manifest = { skills: source, searchCatalog: ref, trending: { path: `trending-${trendHash.slice(0, 12)}.json`, sha256: trendHash, bytes: trendBytes.length } };

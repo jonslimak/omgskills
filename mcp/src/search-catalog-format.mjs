@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
+import { collectionOriginPolicy } from "./search-ranking-policy.mjs";
 
 export const searchFields = Object.freeze([
   "id", "name", "description", "github_url", "author_handle", "tags", "stars", "last_updated", "first_seen",
 ]);
-export const searchCatalogLimits = Object.freeze({ metadata: 256 * 1024, search: 64 * 1024 * 1024, shard: 4 * 1024 * 1024 });
+export const searchCatalogLimits = Object.freeze({ metadata: 256 * 1024, search: 64 * 1024 * 1024, shard: 4 * 1024 * 1024, ranking: 4 * 1024 * 1024 });
 export const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
 export const detailBucket = id => sha256(Buffer.from(id, "utf8")).slice(0, 2);
 export const projectSearchSkill = skill => Object.fromEntries(searchFields.filter(key => skill[key] !== undefined).map(key => [key, skill[key]]));
@@ -32,6 +33,20 @@ export function descriptor(value, source) {
   if (!sameAsset(declaredSource, assetReference(source))) throw new Error("Search catalog source mismatch");
   assetReference(data.search, searchCatalogLimits.search);
   assetReference(data.details, searchCatalogLimits.metadata);
+  if (data.ranking !== undefined) assetReference(data.ranking, searchCatalogLimits.ranking);
+  return data;
+}
+export function rankingPayload(value, source, ids) {
+  const data = object(value);
+  if (Object.keys(data).sort().join(",") !== "collectionLikeIds,policy,schemaVersion,skillCount,sourceSkillsSha256"
+    || data.schemaVersion !== 1 || data.policy !== collectionOriginPolicy
+    || data.sourceSkillsSha256 !== source.sourceSkills.sha256 || data.skillCount !== source.skillCount
+    || !Array.isArray(data.collectionLikeIds)) throw new Error("Invalid ranking payload");
+  let previous;
+  for (const id of data.collectionLikeIds) {
+    if (typeof id !== "string" || !ids.has(id) || (previous !== undefined && previous >= id)) throw new Error("Invalid ranking membership");
+    previous = id;
+  }
   return data;
 }
 export function searchPayload(value, source) {

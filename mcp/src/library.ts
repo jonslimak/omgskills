@@ -2,7 +2,9 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { compareOptional, compareText, dateKey, nameKey, pageInfo, PagingError, preparePage, validCount,
-  type CatalogSort, type PageOptions, type PagedSearchOptions, type SkillPage } from "./paging.js";
+  validatePageOptions, type CatalogSort, type PageOptions, type PagedSearchOptions, type SkillPage } from "./paging.js";
+import { collectionLikeIds } from "./search-ranking-policy.mjs";
+import { rankedRequest, rankingIdentity, SearchRankingIndex, type RankedSearchOptions } from "./search-ranking.js";
 
 export type Skill = {
   id: string;
@@ -21,6 +23,8 @@ export type Skill = {
   install_target_name?: string;
   repo_commit_sha?: string;
   skill_tree_sha?: string;
+  publisher_repo?: string;
+  provenance_type?: string;
 };
 
 export type TrendingEntry = {
@@ -50,6 +54,7 @@ export type LibraryPaths = {
   fetcher?: typeof fetch;
   allowMissingTrending?: boolean;
   allowMissingGoldBasket?: boolean;
+  ranking?: boolean;
 };
 
 export type SearchOptions = {
@@ -102,8 +107,9 @@ export class OmgskillsLibrary {
   private readonly goldById = new Map<string, GoldBasketEntry>();
   private readonly entries: SearchEntry[];
   private readonly entriesByAuthor = new Map<string, SearchEntry[]>();
+  private readonly ranking?: SearchRankingIndex;
 
-  private constructor(data: LoadedLibrary, readonly version?: string) {
+  private constructor(data: LoadedLibrary, readonly version?: string, options: { ranking?: boolean; collectionLikeIds?: ReadonlySet<string> } = {}) {
     this.data = { ...data, skills: data.skills.map(slimSkill) };
     for (const skill of this.data.skills) this.skillsById.set(skill.id, skill);
     for (const entry of data.trending) this.trendingById.set(entry.id, entry);
@@ -122,6 +128,7 @@ export class OmgskillsLibrary {
       if (list) list.push(entry);
       else this.entriesByAuthor.set(entry.author, [entry]);
     }
+    if (options.ranking) this.ranking = new SearchRankingIndex(this.entries, options.collectionLikeIds ?? new Set(collectionLikeIds(data.skills)));
   }
 
   static async load(paths = defaultLibraryPaths()): Promise<OmgskillsLibrary> {
@@ -144,7 +151,7 @@ export class OmgskillsLibrary {
     const version = trending.complete && goldBasket.complete &&
       !paths.skillsPath && !paths.trendingPath && !paths.goldBasketPath
       ? manifestVersion(manifest, goldBasket.data) : undefined;
-    return new OmgskillsLibrary({ skills, trending: trending.data, goldBasket: goldBasket.data }, version);
+    return new OmgskillsLibrary({ skills, trending: trending.data, goldBasket: goldBasket.data }, version, { ranking: paths.ranking });
   }
 
   /** Check hashed catalog paths and the independently published curated data. */
@@ -160,8 +167,8 @@ export class OmgskillsLibrary {
     return manifestVersion(manifest, goldBasket);
   }
 
-  static fromData(data: LoadedLibrary, version?: string): OmgskillsLibrary {
-    return new OmgskillsLibrary(data, version);
+  static fromData(data: LoadedLibrary, version?: string, options: { ranking?: boolean; collectionLikeIds?: ReadonlySet<string> } = {}): OmgskillsLibrary {
+    return new OmgskillsLibrary(data, version, options);
   }
 
   getStats() {
@@ -212,6 +219,30 @@ export class OmgskillsLibrary {
     return this.matchPage(options, "search_skills");
   }
 
+  searchRankedPage(options: RankedSearchOptions): SkillPage {
+    validatePageOptions("search_skills", options);
+    if (options.ranking !== "web-v1") throw new PagingError("invalid_cursor");
+    const request = rankedRequest(options);
+    const context = preparePage(this.version, "search_skills", { ...options, query: request.tokens.join(" "), author: request.author },
+      { policy: rankingIdentity, terms: request.tokens, exactQuery: this.skillsById.has(request.query) ? request.query : "" });
+    if (!this.ranking) throw new PagingError("ranking_not_supported");
+    if (!request.tokens.length) {
+      const matches = this.matches({ ...options, query: "", author: request.author });
+      const page = pageInfo(context, matches.length);
+      return { page, skills: this.sortMatches(matches, context.sort).slice(context.offset, context.offset + context.limit).map(({ entry, score }) => this.enrich(entry.skill, score)) };
+    }
+    if (context.sort === "relevance") {
+      const selected = this.ranking.select(options, request, context.offset, context.limit,
+        id => assertRank(this.trendingById.get(id)?.trending_rank ?? this.goldById.get(id)?.trending_rank));
+      return { page: pageInfo(context, selected.total), skills: selected.matches.map(({ skill, score }) => this.enrich(skill, score)) };
+    }
+    const matches = this.ranking.matches(options, request);
+    for (const match of matches) assertRank(this.trendingById.get(match.skill.id)?.trending_rank ?? this.goldById.get(match.skill.id)?.trending_rank);
+    const page = pageInfo(context, matches.length);
+    const selected = this.sortMatches(matches.map(match => ({ entry: { skill: match.skill, stars: match.stars }, score: match.score })), context.sort).slice(context.offset, context.offset + context.limit).map(({ entry, score }) => ({ skill: entry.skill, score }));
+    return { page, skills: selected.map(({ skill, score }) => this.enrich(skill, score)) };
+  }
+
   listByAuthorPage(author: string, options: PageOptions): SkillPage {
     return this.matchPage({ ...options, query: "", author }, "list_by_author");
   }
@@ -224,7 +255,7 @@ export class OmgskillsLibrary {
     return { page, skills: sorted.slice(context.offset, context.offset + context.limit).map(({ entry, score }) => this.enrich(entry.skill, score)) };
   }
 
-  private sortMatches(matches: { entry: SearchEntry; score: number }[], sort: CatalogSort) {
+  private sortMatches<T extends { entry: Pick<SearchEntry, "skill" | "stars">; score: number }>(matches: T[], sort: CatalogSort) {
     if (sort === "relevance") return matches.sort(compareRelevance);
     const keyed = matches.map(match => {
       const skill = match.entry.skill, trending = this.trendingById.get(skill.id), gold = this.goldById.get(skill.id);
@@ -423,7 +454,7 @@ function clampLimit(limit: number | undefined): number {
   return Math.max(1, Math.min(100, Math.floor(limit)));
 }
 
-function compareRelevance(a: { entry: SearchEntry; score: number }, b: { entry: SearchEntry; score: number }) {
+function compareRelevance(a: { entry: { stars: number }; score: number }, b: { entry: { stars: number }; score: number }) {
   // Stable sorting retains catalog order for exact legacy ties.
   return b.score !== a.score ? b.score - a.score : b.entry.stars - a.entry.stars;
 }
