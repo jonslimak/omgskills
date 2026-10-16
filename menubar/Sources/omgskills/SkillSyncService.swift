@@ -12,6 +12,7 @@ struct DeviceSkillSyncPayload: Codable, Equatable, Sendable {
 enum DeviceReportMode: Sendable {
     case legacy
     case presence
+    case reconciliation
 }
 
 struct PresenceSyncPayload: Encodable, Equatable, Sendable {
@@ -19,9 +20,9 @@ struct PresenceSyncPayload: Encodable, Equatable, Sendable {
     let skills: [PresenceSyncSkill]
 }
 
-struct InventoryRootCoverage: Encodable, Equatable, Sendable {
-    enum State: String, Encodable, Sendable { case complete, incomplete, unavailable }
-    enum Reason: String, Encodable, Sendable {
+struct InventoryRootCoverage: Codable, Equatable, Sendable {
+    enum State: String, Codable, Sendable { case complete, incomplete, unavailable }
+    enum Reason: String, Codable, Sendable {
         case missing, unreadable, redirected, changed
         case invalidEntry = "invalid-entry"
         case invalidMetadata = "invalid-metadata"
@@ -107,15 +108,39 @@ struct SkillSyncResult: Decodable, Equatable, Sendable {
     let mode: String?
     let deviceId: String?
     let completedAt: String?
+    let revision: String?
+    let missingSkillCount: Int?
+    let roots: [InventoryRootCoverage]?
+    let complete: Bool?
 
     init(syncRunId: String, syncedSkillCount: Int, reportVersion: Int? = nil,
-         mode: String? = nil, deviceId: String? = nil, completedAt: String? = nil) {
+         mode: String? = nil, deviceId: String? = nil, completedAt: String? = nil,
+         revision: String? = nil, missingSkillCount: Int? = nil,
+         roots: [InventoryRootCoverage]? = nil, complete: Bool? = nil) {
         self.syncRunId = syncRunId
         self.syncedSkillCount = syncedSkillCount
         self.reportVersion = reportVersion
         self.mode = mode
         self.deviceId = deviceId
         self.completedAt = completedAt
+        self.revision = revision
+        self.missingSkillCount = missingSkillCount
+        self.roots = roots
+        self.complete = complete
+    }
+
+    func validateReconciliation(_ payload: ReconciliationSyncPayload, deviceID: String? = nil) throws {
+        guard reportVersion == 3, mode == "reconciled",
+              let actualDevice = self.deviceId, !actualDevice.isEmpty,
+              deviceID == nil || actualDevice == deviceID,
+              UUID(uuidString: syncRunId) != nil,
+              let revision, revision.lowercased() == syncRunId.lowercased(),
+              syncedSkillCount == payload.skills.count,
+              let missingSkillCount, missingSkillCount >= 0,
+              roots == payload.roots, reportedAt != nil,
+              complete == payload.roots.allSatisfy({ $0.state == .complete }) else {
+            throw DeviceSyncAPIError.invalidResponse
+        }
     }
 
     var reportedAt: Date? {

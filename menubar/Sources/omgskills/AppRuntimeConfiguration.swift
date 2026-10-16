@@ -6,6 +6,7 @@ enum AppRuntimeConfiguration {
     static let f1WebsiteKey = "OMGSkillsF1Website"
     static let catalogInstallEnabledKey = "OMGSkillsCatalogInstallEnabled"
     static let connectedInventoryKey = "OMGSkillsConnectedInventoryTest"
+    static let inventoryReconciliationKey = "OMGSkillsInventoryReconciliationTest"
 
     struct ConnectedInventoryConfiguration: Equatable, Sendable {
         let root: URL
@@ -13,6 +14,7 @@ enum AppRuntimeConfiguration {
         let connectURL: URL
         let uploadURL: URL
         let keychainService: String
+        let inventoryReconciliation: Bool
         var filesystemPaths: SkillFilesystemPaths { .isolated(testRoot: root) }
     }
 
@@ -26,9 +28,18 @@ enum AppRuntimeConfiguration {
         info: [String: Any] = Bundle.main.infoDictionary ?? [:],
         debugAllowed: Bool = buildAllowsF1
     ) -> ConnectedInventoryMode {
-        guard let setting = info[connectedInventoryKey] else { return .disabled }
+        let reconciliation: Bool
+        if let setting = info[inventoryReconciliationKey] {
+            guard let enabled = setting as? Bool else { return .invalid("Invalid inventory reconciliation test setting.") }
+            reconciliation = enabled
+        } else { reconciliation = false }
+        guard let setting = info[connectedInventoryKey] else {
+            return reconciliation ? .invalid("Inventory reconciliation requires the connected inventory test.") : .disabled
+        }
         guard let enabled = setting as? Bool else { return .invalid("Invalid connected inventory test setting.") }
-        guard enabled else { return .disabled }
+        guard enabled else {
+            return reconciliation ? .invalid("Inventory reconciliation requires the connected inventory test.") : .disabled
+        }
         guard case .enabled(let root, let website) = catalogInstallMode(info: info, debugAllowed: debugAllowed),
               isolatedInventoryRoots(root),
               URLComponents(url: website, resolvingAgainstBaseURL: false)?.path == "/app/",
@@ -43,7 +54,8 @@ enum AppRuntimeConfiguration {
               service == "com.jonslimak.omgskills.inventory-test." + root.lastPathComponent.dropFirst("omgskills-f1-".count) else {
             return .invalid("Connected inventory requires isolated F1 storage, local endpoints and a test-only credential service.")
         }
-        return .enabled(.init(root: root, website: website, connectURL: connect, uploadURL: upload, keychainService: service))
+        return .enabled(.init(root: root, website: website, connectURL: connect, uploadURL: upload,
+            keychainService: service, inventoryReconciliation: reconciliation))
     }
 
     private static func isolatedInventoryRoots(_ root: URL) -> Bool {

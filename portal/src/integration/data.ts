@@ -1,7 +1,7 @@
 import type { PortalApi } from "../portal-api";
 import { listOwnedGroups, listSharedGroups, loadGroupDetail } from "../groups/api";
 import type { SkillGroup } from "../groups/types";
-import type { SyncedSkill } from "../synced-skill-grouping";
+import type { SyncedSkill, ScanCoverage } from "../synced-skill-grouping";
 import type { PortalData, PortalSet } from "../app/model";
 import { isPortalRead } from "../portal-read-policy";
 
@@ -36,9 +36,9 @@ export async function saveProfileData(
     published: result.profile.profilePublished, publicUrl: result.profile.publicUrl };
 }
 
-export function readOnlyApi(api: PortalApi, signal?: AbortSignal, connectedInventory = false): PortalApi {
+export function readOnlyApi(api: PortalApi, signal?: AbortSignal, connectedInventory = false, inventoryReconciliation = false): PortalApi {
   return (path, init = {}) => {
-    if (!isPortalRead(path, init.method, connectedInventory) || init.body != null) {
+    if (!isPortalRead(path, init.method, connectedInventory, inventoryReconciliation) || init.body != null) {
       return Promise.reject(
         new Error("This transport only allows portal reads."),
       );
@@ -88,9 +88,12 @@ export async function loadAccountData(
   identity: AccountIdentity,
   includeFavoriteItems = false,
   connectedInventory = false,
+  inventoryReconciliation = false,
 ): Promise<PortalData> {
+  if (inventoryReconciliation && !connectedInventory) throw new Error("Reconciliation requires connected inventory.");
   const [synced, owned, shared, profile] = await Promise.all([
-    api<{ skills: SyncedSkill[] }>(connectedInventory ? "/api/portal/synced-skills?version=2" : "/api/portal/synced-skills"),
+    api<{ skills: SyncedSkill[] }>(inventoryReconciliation ? "/api/portal/synced-skills?version=3"
+      : connectedInventory ? "/api/portal/synced-skills?version=2" : "/api/portal/synced-skills"),
     listOwnedGroups(api),
     listSharedGroups(api),
     api<{ profile: ProfileResponse }>("/api/portal/profile"),
@@ -103,7 +106,7 @@ export async function loadAccountData(
   ) {
     throw new Error("The portal returned an invalid account response.");
   }
-  const inventory = connectedInventory ? parseConnectedInventory(synced) : null;
+  const inventory = connectedInventory ? parseConnectedInventory(synced, inventoryReconciliation ? 3 : 2) : null;
   const sets = [
     ...owned.map((group) => setSummary(group, true, identity.name)),
     ...shared.map((group) => setSummary(group, false, identity.name)),
@@ -119,7 +122,7 @@ export async function loadAccountData(
       ? undefined : detail.items.flatMap(item => item.syncedSkillId ? [item.syncedSkillId] : []);
   }
   return {
-    ...(inventory ? { inventoryVersion: 2 as const } : {}),
+    ...(inventory ? { inventoryVersion: inventoryReconciliation ? 3 as const : 2 as const } : {}),
     skills: inventory?.skills ?? synced.skills,
     sets,
     devices: inventory?.devices ?? [],
@@ -133,16 +136,32 @@ export async function loadAccountData(
   };
 }
 
-type InventoryDevice = { id: string; deviceName: string; status: NonNullable<SyncedSkill["deviceStatus"]>; lastReportedAt: string | null };
-export function parseConnectedInventory(value: unknown) {
+type InventoryDevice = { id: string; deviceName: string; status: NonNullable<SyncedSkill["deviceStatus"]>; lastReportedAt: string | null; scanCoverage?: ScanCoverage[] | null };
+
+function validCoverage(value: unknown): value is ScanCoverage[] | null {
+  if (value === null) return true;
+  if (!Array.isArray(value) || value.length !== 3) return false;
+  return new Set(value.map(root => root?.source)).size === 3 && value.every(root => {
+    if (!root || typeof root !== "object" || Array.isArray(root)
+      || Object.keys(root).some(key => !["source", "state", "reason"].includes(key))
+      || !["claude", "codex", "agents"].includes(root.source)
+      || !["complete", "incomplete", "unavailable"].includes(root.state)) return false;
+    if (root.state === "complete") return !Object.hasOwn(root, "reason");
+    const reasons = root.state === "incomplete" ? ["changed", "invalid-entry", "invalid-metadata"] : ["missing", "unreadable", "redirected"];
+    return Object.hasOwn(root, "reason") && reasons.includes(root.reason);
+  });
+}
+
+export function parseConnectedInventory(value: unknown, version: 2 | 3 = 2) {
   const data = value as { inventoryVersion?: unknown; skills?: SyncedSkill[]; devices?: InventoryDevice[] } | null;
   const date = (value: unknown) => typeof value === "string" && Number.isFinite(Date.parse(value));
   const nullableString = (value: unknown) => value === null || typeof value === "string";
-  if (data?.inventoryVersion !== 2 || !Array.isArray(data.skills) || !Array.isArray(data.devices)
+  if (data?.inventoryVersion !== version || !Array.isArray(data.skills) || !Array.isArray(data.devices)
     || data.devices.some(device => !device || typeof device.id !== "string" || !device.id
       || typeof device.deviceName !== "string" || !device.deviceName.trim()
       || !["active", "revoked", "expired", "inactive"].includes(device.status)
-      || !(device.lastReportedAt === null || date(device.lastReportedAt)))
+      || !(device.lastReportedAt === null || date(device.lastReportedAt))
+      || (version === 3 && (!validCoverage(device.scanCoverage) || (device.scanCoverage !== null && device.lastReportedAt === null))))
     || new Set(data.devices.map(device => device.id)).size !== data.devices.length
     || data.skills.some(skill => !skill || typeof skill.id !== "string" || !skill.id
       || typeof skill.name !== "string" || !nullableString(skill.description)
@@ -150,6 +169,7 @@ export function parseConnectedInventory(value: unknown) {
       || !nullableString(skill.deviceId) || skill.deviceId === ""
       || !nullableString(skill.installationFolder) || !nullableString(skill.githubUrl)
       || typeof skill.isLocalOnly !== "boolean"
+      || (version === 3 && typeof skill.isCurrent !== "boolean")
       || (skill.catalogSkillId != null && typeof skill.catalogSkillId !== "string")
       || (skill.gitRelativePath != null && typeof skill.gitRelativePath !== "string")
       || (skill.catalogSkillIdHint != null && typeof skill.catalogSkillIdHint !== "string"))
@@ -160,11 +180,13 @@ export function parseConnectedInventory(value: unknown) {
   return {
     skills: data.skills.map(skill => {
       const device = skill.deviceId ? devices.get(skill.deviceId) : undefined;
-      return { ...skill, inventoryVersion: 2 as const, deviceName: device?.deviceName ?? null,
-        deviceStatus: device?.status ?? null, lastReportedAt: device?.lastReportedAt ?? null };
+      return { ...skill, inventoryVersion: version, deviceName: device?.deviceName ?? null,
+        deviceStatus: device?.status ?? null, lastReportedAt: device?.lastReportedAt ?? null,
+        ...(version === 3 ? { scanCoverage: device?.scanCoverage ?? null } : {}) };
     }),
     devices: data.devices.map(device => ({ id: device.id, name: device.deviceName,
-      status: device.status, lastActive: device.lastReportedAt ?? "", lastReportedAt: device.lastReportedAt })),
+      status: device.status, lastActive: device.lastReportedAt ?? "", lastReportedAt: device.lastReportedAt,
+      ...(version === 3 ? { scanCoverage: device.scanCoverage ?? null } : {}) })),
   };
 }
 

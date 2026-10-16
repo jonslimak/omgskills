@@ -7,6 +7,8 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
     case rateLimited
     case server(statusCode: Int)
     case invalidResponse
+    case inventoryChanged
+    case unsupportedReportMode
 
     var errorDescription: String? {
         switch self {
@@ -22,6 +24,10 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
             return "The web portal could not complete the request. Try again shortly."
         case .invalidResponse:
             return "The web portal returned an invalid response."
+        case .inventoryChanged:
+            return "Inventory changed. Resync to scan again."
+        case .unsupportedReportMode:
+            return "This inventory reporting mode is not configured."
         }
     }
 }
@@ -34,11 +40,17 @@ protocol DeviceSyncServing: Sendable {
         codeVerifier: String?
     ) async throws -> StoredDeviceCredential
     func upload(credential: String, installations: [Skill]) async throws -> SkillSyncResult
+    func inventoryRevision(credential: String) async throws -> String?
+    func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult
     func revoke(credential: String) async throws
 }
 
 extension DeviceSyncServing {
     var reportMode: DeviceReportMode { .legacy }
+    func inventoryRevision(credential: String) async throws -> String? { throw DeviceSyncAPIError.unsupportedReportMode }
+    func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
+        throw DeviceSyncAPIError.unsupportedReportMode
+    }
 }
 
 protocol DeviceHTTPSession: Sendable {
@@ -128,6 +140,8 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
             body = try encoder.encode(DeviceSkillSyncPayload(skills: SkillSyncService.payloadSkills(installations)))
         case .presence:
             body = try encoder.encode(SkillSyncService.presencePayload(installations: installations))
+        case .reconciliation:
+            throw DeviceSyncAPIError.unsupportedReportMode
         }
         let result: SkillSyncResult = try await send(
             to: endpoints.upload,
@@ -141,6 +155,39 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
                   !result.syncRunId.isEmpty, result.syncedSkillCount == installations.count,
                   result.reportedAt != nil else { throw DeviceSyncAPIError.invalidResponse }
         }
+        return result
+    }
+
+    private struct RevisionResponse: Decodable {
+        let revision: String?
+        private enum CodingKeys: String, CodingKey { case reportVersion, revision }
+        init(from decoder: any Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            guard try values.decode(Int.self, forKey: .reportVersion) == 3,
+                  values.contains(.revision) else { throw DeviceSyncAPIError.invalidResponse }
+            revision = try values.decodeIfPresent(String.self, forKey: .revision)
+            if let revision, UUID(uuidString: revision) == nil { throw DeviceSyncAPIError.invalidResponse }
+        }
+    }
+
+    func inventoryRevision(credential: String) async throws -> String? {
+        guard reportMode == .reconciliation else { throw DeviceSyncAPIError.unsupportedReportMode }
+        guard var url = URLComponents(url: endpoints.upload, resolvingAgainstBaseURL: false) else {
+            throw DeviceSyncAPIError.invalidResponse
+        }
+        url.queryItems = [.init(name: "reportVersion", value: "3")]
+        guard let endpoint = url.url else { throw DeviceSyncAPIError.invalidResponse }
+        let result: RevisionResponse = try await send(to: endpoint, body: nil, credential: credential,
+            unauthorizedError: .reconnectRequired, method: "GET", conflictError: .inventoryChanged)
+        return result.revision?.lowercased()
+    }
+
+    func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
+        guard reportMode == .reconciliation else { throw DeviceSyncAPIError.unsupportedReportMode }
+        try Task.checkCancellation()
+        let result: SkillSyncResult = try await send(to: endpoints.upload, body: encoder.encode(payload),
+            credential: credential, unauthorizedError: .reconnectRequired, conflictError: .inventoryChanged)
+        try result.validateReconciliation(payload)
         return result
     }
 
@@ -159,12 +206,16 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
 
     private func send<Response: Decodable>(
         to url: URL,
-        body: Data,
+        body: Data?,
         credential: String?,
-        unauthorizedError: DeviceSyncAPIError
+        unauthorizedError: DeviceSyncAPIError,
+        method: String = "POST",
+        conflictError: DeviceSyncAPIError = .deviceLimitReached
     ) async throws -> Response {
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        try Task.checkCancellation()
+        request.httpMethod = method
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if let credential {
             request.setValue("Bearer \(credential)", forHTTPHeaderField: "Authorization")
@@ -179,7 +230,7 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
         guard (200..<300).contains(httpResponse.statusCode) else {
             switch httpResponse.statusCode {
             case 401: throw unauthorizedError
-            case 409: throw DeviceSyncAPIError.deviceLimitReached
+            case 409: throw conflictError
             case 429: throw DeviceSyncAPIError.rateLimited
             default: throw DeviceSyncAPIError.server(statusCode: httpResponse.statusCode)
             }

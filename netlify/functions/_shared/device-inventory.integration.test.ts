@@ -288,13 +288,18 @@ test("v2 reads redact old paths/URL credentials and do not infer a Mac for legac
     const old = { ...legacy(), stableKey: "Codex:/Users/private-name/.codex/skills/review",
       githubUrl: "https://username:secret@github.com/owner/repo?token=secret#secret" };
     await performSyncUpload(pool, { kind: "device", request: request(a.credential) }, [old]);
-    const inventory = await readSyncInventory(pool, owner, 2);
-    assert.equal(inventory.skills[0].deviceId, null);
-    assert.equal(inventory.skills[0].installationFolder, null);
-    assert.equal(inventory.skills[0].githubUrl, "https://github.com/owner/repo");
-    assert.equal(inventory.devices?.[0].lastReportedAt, null);
-    for (const secret of ["private-name", "stableKey", "token_hash", "secret", "credential", "lastUsedAt"]) {
-      assert.equal(JSON.stringify(inventory).includes(secret), false);
+    for (const version of [2, 3] as const) {
+      const inventory = await readSyncInventory(pool, owner, version);
+      assert.equal(inventory.inventoryVersion, version);
+      assert.equal(inventory.skills[0].deviceId, null);
+      assert.equal(inventory.skills[0].installationFolder, null);
+      assert.equal(inventory.skills[0].githubUrl, "https://github.com/owner/repo");
+      assert.equal(inventory.devices?.[0].lastReportedAt, null);
+      if (version === 3) assert.equal(inventory.devices?.[0].scanCoverage, null);
+      else assert.equal(Object.hasOwn(inventory.devices![0], "scanCoverage"), false);
+      for (const secret of ["private-name", "stableKey", "token_hash", "secret", "credential", "lastUsedAt"]) {
+        assert.equal(JSON.stringify(inventory).includes(secret), false);
+      }
     }
     const oldRead = await readSyncInventory(pool, owner, 1);
     assert.ok(oldRead.skills[0].stableKey);

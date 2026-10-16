@@ -49,7 +49,7 @@ function validCache(data: PortalData) {
 }
 
 // A session owns its cache and requests. Disposing it cannot affect a newer account.
-export function createAccountSession({ api, identity, cacheKey, storage: suppliedStorage, changed, now = Date.now, includeFavoriteItems = false, connectedInventory = false }: {
+export function createAccountSession({ api, identity, cacheKey, storage: suppliedStorage, changed, now = Date.now, includeFavoriteItems = false, connectedInventory = false, inventoryReconciliation = false }: {
   api: PortalApi;
   identity: AccountIdentity;
   cacheKey: string;
@@ -58,7 +58,9 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
   now?: () => number;
   includeFavoriteItems?: boolean;
   connectedInventory?: boolean;
+  inventoryReconciliation?: boolean;
 }) {
+  if (inventoryReconciliation && !connectedInventory) throw new Error("Reconciliation requires connected inventory.");
   const storage = connectedInventory ? undefined : suppliedStorage;
   let active = true;
   let generation = 0;
@@ -90,7 +92,7 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
     const version = ++generation;
     const controller = new AbortController();
     emit({ refreshing: true, error: "" });
-    const promise = loadAccountData(readOnlyApi(api, controller.signal, connectedInventory), identity, includeFavoriteItems, connectedInventory).then(
+    const promise = loadAccountData(readOnlyApi(api, controller.signal, connectedInventory, inventoryReconciliation), identity, includeFavoriteItems, connectedInventory, inventoryReconciliation).then(
       (data) => {
         if (!active || version !== generation) return;
         persist(data);
@@ -175,7 +177,7 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
       persist(confirmed);
       emit({ data: confirmed });
       try {
-        const data = await loadAccountData(readOnlyApi(api, controller.signal, connectedInventory), identity, includeFavoriteItems, connectedInventory);
+        const data = await loadAccountData(readOnlyApi(api, controller.signal, connectedInventory, inventoryReconciliation), identity, includeFavoriteItems, connectedInventory, inventoryReconciliation);
         checkActive();
         persist(data);
         emit({ data, error: "", setSaving: false, revision: snapshot.revision + 1 });
@@ -239,7 +241,7 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
       // Reconcile even a partial batch; never replay writes to recover a failed read.
       let data = current;
       let refreshError = "";
-      try { data = await loadAccountData(readOnlyApi(scoped, undefined, connectedInventory), identity, includeFavoriteItems, connectedInventory); checkActive(); persist(data); }
+      try { data = await loadAccountData(readOnlyApi(scoped, undefined, connectedInventory, inventoryReconciliation), identity, includeFavoriteItems, connectedInventory, inventoryReconciliation); checkActive(); persist(data); }
       catch (error) {
         checkActive();
         if (isAccessError(error)) {

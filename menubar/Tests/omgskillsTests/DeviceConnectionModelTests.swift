@@ -427,10 +427,11 @@ struct DeviceConnectionModelTests {
         #expect(model.state == .connected(record.connection))
     }
 
-    @Test func presenceTriggersDuringScanCoalesceIntoOneFreshFollowup() async {
+    @Test(arguments: [DeviceReportMode.presence, .reconciliation])
+    func presenceTriggersDuringScanCoalesceIntoOneFreshFollowup(_ mode: DeviceReportMode) async {
         let record = makeCredential()
         let gate = TestGate()
-        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .presence)
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: mode)
         let scanner = MockInventoryScanner(result: inventoryScan(["before"]), gate: gate)
         let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(), api: api,
             inventoryScanner: { try await scanner.scan() })
@@ -462,11 +463,12 @@ struct DeviceConnectionModelTests {
         guard case .reported = model.reportStatus else { Issue.record("Expected retry success"); return }
     }
 
-    @Test func presenceDisconnectDuringUncooperativeScanDoesNotUploadOrRestoreConnection() async {
+    @Test(arguments: [DeviceReportMode.presence, .reconciliation])
+    func presenceDisconnectDuringUncooperativeScanDoesNotUploadOrRestoreConnection(_ mode: DeviceReportMode) async {
         let record = makeCredential()
         let gate = TestGate()
         let store = MockDeviceCredentialStore()
-        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .presence)
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: mode)
         let scanner = MockInventoryScanner(result: inventoryScan(["old-account"]), gate: gate)
         let model = DeviceConnectionModel(credentialStore: store, api: api, inventoryScanner: { try await scanner.scan() })
         let connect = model.connect(pairingCode: "code", deviceName: "Mac", installations: [])
@@ -481,11 +483,12 @@ struct DeviceConnectionModelTests {
         #expect(model.reportStatus == .idle)
     }
 
-    @Test func presenceReplacementDoesNotSendOldScanWithNewAccountCredential() async {
+    @Test(arguments: [DeviceReportMode.presence, .reconciliation])
+    func presenceReplacementDoesNotSendOldScanWithNewAccountCredential(_ mode: DeviceReportMode) async {
         let first = makeCredential(deviceID: "device-1", credential: "secret-1")
         let second = makeCredential(deviceID: "device-2", credential: "secret-2")
         let gate = TestGate()
-        let api = MockDeviceSyncAPI(exchangeRecords: [first, second], reportMode: .presence)
+        let api = MockDeviceSyncAPI(exchangeRecords: [first, second], reportMode: mode)
         let scanner = MockInventoryScanner(result: inventoryScan(["old-account"]), gate: gate)
         let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(), api: api,
             inventoryScanner: { try await scanner.scan() })
@@ -501,11 +504,12 @@ struct DeviceConnectionModelTests {
         #expect(model.state == .connected(second.connection))
     }
 
-    @Test func presenceLateUploadCompletionCannotOverwriteReplacementStatus() async {
+    @Test(arguments: [DeviceReportMode.presence, .reconciliation])
+    func presenceLateUploadCompletionCannotOverwriteReplacementStatus(_ mode: DeviceReportMode) async {
         let first = makeCredential(deviceID: "device-1", credential: "secret-1")
         let second = makeCredential(deviceID: "device-2", credential: "secret-2")
         let gate = TestGate()
-        let api = MockDeviceSyncAPI(exchangeRecords: [first, second], uploadGate: gate, reportMode: .presence)
+        let api = MockDeviceSyncAPI(exchangeRecords: [first, second], uploadGate: gate, reportMode: mode)
         let scanner = MockInventoryScanner(result: inventoryScan(["first"]))
         let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(), api: api,
             inventoryScanner: { try await scanner.scan() })
@@ -667,6 +671,70 @@ struct DeviceConnectionModelTests {
         await restore.value
     }
 
+    @Test(arguments: [DeviceSyncAPIError.inventoryChanged, .server(statusCode: 503), .invalidResponse])
+    func reconciliationResyncReadsRevisionBeforeANewScanAndNeverReplays(_ failure: DeviceSyncAPIError) async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, uploadFailure: failure, reportMode: .reconciliation)
+        let scanner = MockInventoryScanner(result: inventoryScan(["before"]))
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { await api.noteScan(); return try await scanner.scan() })
+        await model.restore().value
+        #expect(model.state == .connected(record.connection))
+        if failure == .inventoryChanged {
+            #expect(model.reportStatus == .failed(DeviceSyncAPIError.inventoryChanged.localizedDescription))
+        } else {
+            guard case .uncertain = model.reportStatus else { Issue.record("Submitted report may have committed"); return }
+        }
+        #expect(await api.reportEvents() == ["revision", "scan", "upload"])
+        #expect(await api.uploadedCredentials().count == 1)
+        let next = UUID().uuidString.lowercased()
+        await api.setRevision(next)
+        await api.setUploadFailure(nil)
+        await scanner.setResult(inventoryScan(["after"]))
+        await model.requestInventoryReport().value
+        #expect(await api.reportEvents() == ["revision", "scan", "upload", "revision", "scan", "upload"])
+        #expect(await api.uploadedNames() == [["before"], ["after"]])
+        #expect(await api.reconciliationBases() == [nil, next])
+        #expect(await api.exchangeCallCount() == 0)
+        guard case .reported = model.reportStatus else { Issue.record("Expected fresh report success"); return }
+    }
+
+    @Test(arguments: ["revision", "scan", "upload"])
+    func reconciliationCancellationNeverStartsTheNextStepOrClaimsRollback(_ step: String) async {
+        let record = makeCredential()
+        let gate = TestGate()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, uploadGate: step == "upload" ? gate : nil,
+            reportMode: .reconciliation, revisionGate: step == "revision" ? gate : nil)
+        let scanner = MockInventoryScanner(result: inventoryScan(["fixture"]), gate: step == "scan" ? gate : nil)
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { try await scanner.scan() })
+        let report = model.restore()
+        await gate.waitUntilBlocked()
+        model.cancelCurrentOperation()
+        if step == "upload" {
+            guard case .uncertain = model.reportStatus else { Issue.record("Do not claim cancellation rolled back a submitted upload"); await gate.open(); return }
+        }
+        await gate.open()
+        await report.value
+        #expect(await scanner.callCount() == (step == "revision" ? 0 : 1))
+        #expect(await api.uploadedCredentials().count == (step == "upload" ? 1 : 0))
+        #expect(model.state == .connected(record.connection))
+        await model.requestInventoryReport().value
+        guard case .reported = model.reportStatus else { Issue.record("Expected a fresh Resync"); return }
+    }
+
+    @Test func reconciliationWrongDeviceAcknowledgementCannotShowSuccess() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        await api.setAcknowledgementDevice("wrong-device")
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { scan })
+        await model.restore().value
+        guard case .uncertain = model.reportStatus else { Issue.record("Wrong device must never show success"); return }
+        #expect(model.state == .connected(record.connection))
+    }
+
     private func inventoryScan(_ names: [String], issueCount: Int = 0) -> InstalledSkillsScanner.ScanResult {
         let installations = names.map { name in
             Skill(id: "installed:\(name)", name: name, description: "Example", githubUrl: "",
@@ -676,7 +744,11 @@ struct DeviceConnectionModelTests {
                 origin: "Codex", isSymlink: false, isLocalOnly: true)
         }
         return InstalledSkillsScanner.ScanResult(skills: Array(installations.prefix(1)), installations: installations,
-            summary: InstalledSkillSummary(), issues: Array(repeating: .unreadableRoot(source: "Agents"), count: issueCount))
+            summary: InstalledSkillSummary(), issues: Array(repeating: .unreadableRoot(source: "Agents"), count: issueCount),
+            roots: ["claude", "codex", "agents"].map {
+                .init(source: $0, state: $0 == "agents" && issueCount > 0 ? .incomplete : .complete,
+                    reason: $0 == "agents" && issueCount > 0 ? .invalidEntry : nil)
+            })
     }
 
     private func makeCredential(
@@ -803,6 +875,12 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
     private var uploads: [String] = []
     private var uploadNames: [[String]] = []
     private var revocations: [String] = []
+    private var revision: String?
+    private let revisionGate: TestGate?
+    private var revisionReads = 0
+    private var bases: [String?] = []
+    private var events: [String] = []
+    private var acknowledgementDevice: String?
 
     init(
         exchangeRecord: StoredDeviceCredential,
@@ -811,7 +889,8 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
         uploadFailure: DeviceSyncAPIError? = nil,
         revokeFailure: DeviceSyncAPIError? = nil,
         reportMode: DeviceReportMode = .legacy,
-        revokeChecksCancellation: Bool = false
+        revokeChecksCancellation: Bool = false,
+        revisionGate: TestGate? = nil
     ) {
         self.exchangeRecords = [exchangeRecord]
         self.exchangeGate = exchangeGate
@@ -820,6 +899,7 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
         self.revokeFailure = revokeFailure
         self.reportMode = reportMode
         self.revokeChecksCancellation = revokeChecksCancellation
+        self.revisionGate = revisionGate
     }
 
     init(
@@ -837,6 +917,7 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
         self.revokeFailure = revokeFailure
         self.reportMode = reportMode
         self.revokeChecksCancellation = false
+        self.revisionGate = nil
     }
 
     func exchange(
@@ -869,6 +950,34 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
             deviceId: reportMode == .presence ? deviceID : nil,
             completedAt: reportMode == .presence ? "2026-10-16T12:00:00.123Z" : nil)
     }
+
+    func inventoryRevision(credential: String) async throws -> String? {
+        events.append("revision")
+        revisionReads += 1
+        if revisionReads == 1, let revisionGate { await revisionGate.block() }
+        return revision
+    }
+
+    func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
+        events.append("upload")
+        bases.append(payload.baseRevision)
+        uploads.append(credential)
+        uploadNames.append(payload.skills.map(\.name))
+        if uploads.count == 1, let uploadGate { await uploadGate.block() }
+        if let uploadFailure { throw uploadFailure }
+        let next = UUID().uuidString.lowercased()
+        revision = next
+        return SkillSyncResult(syncRunId: next, syncedSkillCount: payload.skills.count, reportVersion: 3,
+            mode: "reconciled", deviceId: acknowledgementDevice ?? exchangeRecords.first(where: { $0.credential == credential })?.connection.deviceID,
+            completedAt: "2026-10-16T12:00:00.123Z", revision: next, missingSkillCount: 0,
+            roots: payload.roots, complete: payload.roots.allSatisfy { $0.state == .complete })
+    }
+
+    func noteScan() { events.append("scan") }
+    func reportEvents() -> [String] { events }
+    func reconciliationBases() -> [String?] { bases }
+    func setRevision(_ value: String) { revision = value }
+    func setAcknowledgementDevice(_ value: String) { acknowledgementDevice = value }
 
     func revoke(credential: String) async throws {
         if revokeChecksCancellation { try Task.checkCancellation() }

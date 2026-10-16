@@ -23,3 +23,11 @@ export function connectedInventoryTestEnabled(input: ConnectedInventoryConfigura
   }
   return true;
 }
+
+export function inventoryReconciliationTestEnabled(input: ConnectedInventoryConfiguration & { reconciliation?: string }) {
+  if (input.reconciliation === undefined || input.reconciliation === "0") return false;
+  if (input.reconciliation !== "1" || !connectedInventoryTestEnabled(input)) {
+    throw new Error("Inventory reconciliation requires the verified connected inventory test.");
+  }
+  return true;
+}

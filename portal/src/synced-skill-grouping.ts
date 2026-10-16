@@ -1,5 +1,13 @@
+export type ScanCoverage = {
+  source: "claude" | "codex" | "agents";
+  state: "complete" | "incomplete" | "unavailable";
+  reason?: "changed" | "invalid-entry" | "invalid-metadata" | "missing" | "unreadable" | "redirected";
+};
+
 export type SyncedSkill = {
-  inventoryVersion?: 2;
+  inventoryVersion?: 2 | 3;
+  isCurrent?: boolean;
+  scanCoverage?: ScanCoverage[] | null;
   deviceId?: string | null;
   deviceName?: string | null;
   deviceStatus?: "active" | "revoked" | "expired" | "inactive" | null;
@@ -104,7 +112,7 @@ export function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
 
   for (const skill of skills) {
     // Presence rows are physical installations, not fuzzy account-wide identities.
-    if (skill.inventoryVersion === 2 || skill.deviceId != null) {
+    if (skill.inventoryVersion === 2 || skill.inventoryVersion === 3 || skill.deviceId != null) {
       physicalGroups.push([skill]);
       continue;
     }

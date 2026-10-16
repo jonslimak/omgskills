@@ -3,6 +3,32 @@ import Testing
 @testable import omgskills
 
 struct AppRuntimeConfigurationTests {
+    @Test func reconciliationRequiresAnExplicitValidatedConnectedDebugApp() throws {
+        let root = URL(fileURLWithPath: "/private/tmp/omgskills-f1-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root.appendingPathComponent("home"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        var info = connectedInfo(root: root)
+        guard case .enabled(let baseline) = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: true) else {
+            Issue.record("Expected connected baseline"); return
+        }
+        #expect(!baseline.inventoryReconciliation)
+        info[AppRuntimeConfiguration.inventoryReconciliationKey] = true
+        guard case .enabled(let enabled) = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: true) else {
+            Issue.record("Expected reconciliation configuration"); return
+        }
+        #expect(enabled.inventoryReconciliation)
+        for invalid in [info.merging([AppRuntimeConfiguration.connectedInventoryKey: false]) { _, new in new },
+                        [AppRuntimeConfiguration.inventoryReconciliationKey: true],
+                        [AppRuntimeConfiguration.inventoryReconciliationKey: "true"]] {
+            guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: invalid, debugAllowed: true) else {
+                Issue.record("Expected orphan/malformed flag refusal"); continue
+            }
+        }
+        guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: false) else {
+            Issue.record("Release must refuse reconciliation"); return
+        }
+    }
+
     @Test func connectedInventoryRequiresCompleteLocalDebugConfiguration() throws {
         let root = URL(fileURLWithPath: "/private/tmp/omgskills-f1-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: root.appendingPathComponent("home"), withIntermediateDirectories: true)

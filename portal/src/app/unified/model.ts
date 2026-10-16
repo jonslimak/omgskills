@@ -39,12 +39,34 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
 };
 
 export function inventorySummary(skill: GroupedSyncedSkill) {
-  if (skill.inventoryVersion !== 2) return null;
+  if (skill.inventoryVersion !== 2 && skill.inventoryVersion !== 3) return null;
   const location = `${skill.deviceName || "Unknown Mac"} / ${skill.source}`;
+  if (skill.inventoryVersion === 3) {
+    const source = skill.source.toLowerCase() === "claude code" ? "claude" : skill.source.toLowerCase();
+    const coverage = skill.scanCoverage?.find(root => root.source === source);
+    const reportTime = Date.parse(skill.lastReportedAt ?? "");
+    const observedInLatestReport = Number.isFinite(reportTime) && Date.parse(skill.lastSeenAt) >= reportTime;
+    const latest = coverage?.state === "complete"
+      ? observedInLatestReport ? "Seen on last scan" : "Last known - not observed in latest report"
+      : coverage ? "Last known - scan incomplete" : "Last known - scan coverage unknown";
+    const status = skill.isCurrent === false ? "Not found on last scan" : latest;
+    const observed = Number.isFinite(Date.parse(skill.lastSeenAt))
+      ? `Last seen ${new Date(skill.lastSeenAt).toLocaleString()}` : "Last seen time unknown";
+    const device = skill.deviceStatus && skill.deviceStatus !== "active" ? ` (${skill.deviceStatus})` : "";
+    const reported = skill.lastReportedAt ? `Latest report ${new Date(skill.lastReportedAt).toLocaleString()}` : "No report time";
+    const coverageLabel = coverage?.state === "complete" ? "Latest scan coverage complete"
+      : coverage ? "Latest scan incomplete" : "Latest scan coverage unknown";
+    return { location, report: `${status}${device} - ${observed}`, latestReport: `${coverageLabel} - ${reported}` };
+  }
   const time = skill.lastReportedAt ?? skill.lastSeenAt;
   const reported = Number.isFinite(Date.parse(time)) ? `Last reported ${new Date(time).toLocaleString()}` : "Report time unknown";
   const state = skill.deviceStatus && skill.deviceStatus !== "active" ? `Last known (${skill.deviceStatus})` : "Last known";
-  return { location, report: `${state} - ${reported}` };
+  return { location, report: `${state} - ${reported}`, latestReport: undefined };
+}
+
+export function inventoryCoverageSummary(coverage: GroupedSyncedSkill["scanCoverage"]) {
+  if (!coverage) return "Scan coverage unknown";
+  return coverage.every(root => root.state === "complete") ? "Scan coverage complete" : "Scan incomplete";
 }
 export type CollectionDisplay = {
   id: string;

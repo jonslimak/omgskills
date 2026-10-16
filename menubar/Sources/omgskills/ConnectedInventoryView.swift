@@ -44,7 +44,13 @@ struct ConnectedInventoryView: View {
         case .pending: return "Inventory report pending."
         case .reporting: return "Reporting installed skills..."
         case .failed(let message): return "Inventory needs attention. " + message
+        case .uncertain(let message): return "Report outcome uncertain. " + message + " Resync to check with a fresh scan."
         case .reported(let result, let issues):
+            if result.reportVersion == 3 {
+                guard result.complete == true else { return "Partial inventory reported. Some folders were not fully checked. Resync to retry." }
+                let date = result.reportedAt?.formatted(date: .abbreviated, time: .shortened) ?? "unknown time"
+                return "\(result.syncedSkillCount) installations seen; \(result.missingSkillCount ?? 0) newly not found at \(date)."
+            }
             if issues > 0 { return "Partial inventory reported. \(issues) scan issues need attention. Resync to retry." }
             let date = result.reportedAt?.formatted(date: .abbreviated, time: .shortened) ?? "unknown time"
             return "\(result.syncedSkillCount) installations reported at \(date)."

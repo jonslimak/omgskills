@@ -289,7 +289,7 @@ test("normal app entry validates before routing, keeps connect in the consent pa
   assert.doesNotMatch(source("main.tsx"), /callbackUrl:\s*request/);
 });
 
-test("ephemeral Vite proxy delivers consumed PKCE bytes and exact backend origin", { timeout: 20000 }, async () => {
+test("ephemeral Vite proxy delivers consumed PKCE bytes and exact backend origin", { timeout: 20000, skip: process.env.PORTAL_SKIP_SERVER_TESTS === "1" }, async () => {
   for (const hostname of ["127.0.0.1", "localhost"]) {
     const received: { body: string; origin: string; callback: string }[] = [];
     let backendOrigin = "";

@@ -41,7 +41,8 @@ export function parseReconciliationFields(body: Record<string, unknown>): Reconc
 }
 
 export function requireLocalInventoryReconciliation(
-  req: Request, env: Record<string, string | undefined> = process.env, deployContext?: string
+  req: Request, env: Record<string, string | undefined> = process.env, deployContext?: string,
+  endpoint: "/api/portal/sync-upload" | "/api/portal/synced-skills" = "/api/portal/sync-upload"
 ) {
   let configured: URL;
   const invalid = () => new Response("Inventory reconciliation is not enabled for this environment", { status: 503 });
@@ -55,7 +56,8 @@ export function requireLocalInventoryReconciliation(
     || configured.protocol !== "http:" || !["localhost", "127.0.0.1", "[::1]"].includes(configured.hostname)
     || !configured.port || configured.username || configured.password || configured.pathname !== "/"
     || configured.search || configured.hash || request.origin !== configured.origin
-    || request.pathname !== "/api/portal/sync-upload") throw invalid();
+    || !["/api/portal/sync-upload", "/api/portal/synced-skills"].includes(endpoint)
+    || request.pathname !== endpoint) throw invalid();
 }
 
 export async function inventoryRevisionState(client: PoolClient, userId: string, deviceId: string) {

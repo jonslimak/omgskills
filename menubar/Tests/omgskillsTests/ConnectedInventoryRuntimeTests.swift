@@ -74,8 +74,9 @@ struct ConnectedInventoryRuntimeTests {
         #expect(connection.state == .connected(inventoryCredential.connection))
     }
 
-    @Test func reportFailureDoesNotChangeSuccessfulInstallAndResyncDoesNotInstallAgain() async throws {
-        let api = InventoryAPIFixture()
+    @Test(arguments: [DeviceReportMode.presence, .reconciliation])
+    func reportFailureDoesNotChangeSuccessfulInstallAndResyncDoesNotInstallAgain(_ mode: DeviceReportMode) async throws {
+        let api = InventoryAPIFixture(reportMode: mode)
         let authorizer = InventoryAuthorizerFixture()
         let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer)
         let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer)
@@ -91,7 +92,11 @@ struct ConnectedInventoryRuntimeTests {
         await connection.requestInventoryReport().value
         #expect(model.result == .installed)
         #expect(connection.state == .connected(inventoryCredential.connection))
-        guard case .failed = connection.reportStatus else { Issue.record("Expected reporting failure"); return }
+        if mode == .reconciliation {
+            guard case .uncertain = connection.reportStatus else { Issue.record("Expected uncertain submitted report"); return }
+        } else {
+            guard case .failed = connection.reportStatus else { Issue.record("Expected reporting failure"); return }
+        }
         await api.setFailure(false)
         await connection.requestInventoryReport().value
         #expect(await service.installs == 1)
@@ -107,6 +112,14 @@ struct ConnectedInventoryRuntimeTests {
         #expect(partial.contains("attention"))
         #expect(!ConnectedInventoryView.reportMessage(.reported(result, scanIssueCount: 0)).contains("Partial"))
         #expect(ConnectedInventoryView.reportMessage(.failed("Offline")).contains("attention"))
+        let roots: [InventoryRootCoverage] = ["claude", "codex", "agents"].map {
+            .init(source: $0, state: $0 == "agents" ? .unavailable : .complete, reason: $0 == "agents" ? .missing : nil)
+        }
+        let incomplete = SkillSyncResult(syncRunId: UUID().uuidString, syncedSkillCount: 2, reportVersion: 3,
+            mode: "reconciled", deviceId: "device", completedAt: "2026-10-16T12:00:00Z",
+            missingSkillCount: 0, roots: roots, complete: false)
+        #expect(ConnectedInventoryView.reportMessage(.reported(incomplete, scanIssueCount: 0)).contains("Partial"))
+        #expect(ConnectedInventoryView.reportMessage(.uncertain("Offline")).contains("Resync"))
     }
 
     @Test func slimStartupAndWindowUseTheConnectionWithoutTheDiscoveryRuntime() throws {
@@ -143,7 +156,8 @@ struct ConnectedInventoryRuntimeTests {
         DeviceConnectionModel(credentialStore: store, api: api, browserAuthorizer: authorizer,
             portalConnectURL: URL(string: "http://127.0.0.1:5201/app/connect")!,
             callbackScheme: BrowserPairing.connectedTestCallbackScheme,
-            inventoryScanner: { .init(skills: [], installations: [], summary: .init()) })
+            inventoryScanner: { .init(skills: [], installations: [], summary: .init(),
+                roots: ["claude", "codex", "agents"].map { .init(source: $0, state: .complete, reason: nil) }) })
     }
 }
 
@@ -167,7 +181,8 @@ private actor InventoryCredentialFixture: DeviceCredentialStoring {
 }
 
 private actor InventoryAPIFixture: DeviceSyncServing {
-    let reportMode: DeviceReportMode = .presence
+    let reportMode: DeviceReportMode
+    init(reportMode: DeviceReportMode = .presence) { self.reportMode = reportMode }
     var uploads = 0
     var revocations = 0
     private var failure = false
@@ -182,6 +197,16 @@ private actor InventoryAPIFixture: DeviceSyncServing {
         if failure { throw DeviceSyncAPIError.server(statusCode: 503) }
         return SkillSyncResult(syncRunId: "test-run", syncedSkillCount: installations.count, reportVersion: 2,
             mode: "presence", deviceId: inventoryCredential.connection.deviceID, completedAt: "2026-10-16T12:00:00Z")
+    }
+    func inventoryRevision(credential: String) async throws -> String? { nil }
+    func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
+        uploads += 1
+        if failure { throw DeviceSyncAPIError.server(statusCode: 503) }
+        let run = UUID().uuidString
+        return SkillSyncResult(syncRunId: run, syncedSkillCount: payload.skills.count, reportVersion: 3,
+            mode: "reconciled", deviceId: inventoryCredential.connection.deviceID,
+            completedAt: "2026-10-16T12:00:00Z", revision: run, missingSkillCount: 0,
+            roots: payload.roots, complete: true)
     }
 }
 

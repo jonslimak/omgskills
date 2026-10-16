@@ -29,6 +29,7 @@ final class DeviceConnectionModel {
         case reporting
         case reported(SkillSyncResult, scanIssueCount: Int)
         case failed(String)
+        case uncertain(String)
     }
 
     typealias InventoryScanner = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
@@ -50,6 +51,7 @@ final class DeviceConnectionModel {
     @ObservationIgnored private var connectedCredential: StoredDeviceCredential?
     @ObservationIgnored private let inventoryScanner: InventoryScanner?
     @ObservationIgnored private var reportRequested = false
+    @ObservationIgnored private var reconciliationUploadInFlight = false
 
     init(
         credentialStore: any DeviceCredentialStoring = DeviceCredentialStore(),
@@ -73,7 +75,7 @@ final class DeviceConnectionModel {
 
     @discardableResult
     func restore() -> Task<Void, Never> {
-        if api.reportMode == .presence {
+        if api.reportMode != .legacy {
             connectedCredential = nil
             connectedInfo = nil
         }
@@ -84,9 +86,9 @@ final class DeviceConnectionModel {
                 if let stored, stored.connection.expiresAt > Date() {
                     model.connectedInfo = stored.connection
                     model.state = .connected(stored.connection)
-                    if model.api.reportMode == .presence {
+                    if model.api.reportMode != .legacy {
                         model.connectedCredential = stored
-                        await model.performPresenceReports(record: stored, attemptID: attemptID)
+                        await model.performInventoryReports(record: stored, attemptID: attemptID)
                     }
                 } else if stored != nil {
                     model.state = .failed(.reconnectRequired)
@@ -139,7 +141,7 @@ final class DeviceConnectionModel {
 
     @discardableResult
     func retrySync(installations: [Skill]) -> Task<Void, Never> {
-        if api.reportMode == .presence { return requestInventoryReport() }
+        if api.reportMode != .legacy { return requestInventoryReport() }
         return startAttempt(initialState: .syncing, trackedActivity: .portalConnection) { model, attemptID in
             do {
                 guard let stored = try await model.credentialStore.load() else {
@@ -174,7 +176,7 @@ final class DeviceConnectionModel {
 
     @discardableResult
     func requestInventoryReport() -> Task<Void, Never> {
-        guard api.reportMode == .presence else { return Task {} }
+        guard api.reportMode != .legacy else { return Task {} }
         if let activeTask, !activeTask.isCancelled {
             if connectedCredential != nil || state == .authorizing || state == .exchanging || state == .storingCredential {
                 reportRequested = true
@@ -184,7 +186,7 @@ final class DeviceConnectionModel {
         }
         guard let record = connectedCredential, case .connected = state else { return Task {} }
         return startAttempt(initialState: .connected(record.connection), trackedActivity: .portalConnection) { model, attemptID in
-            await model.performPresenceReports(record: record, attemptID: attemptID)
+            await model.performInventoryReports(record: record, attemptID: attemptID)
         }
     }
 
@@ -238,7 +240,9 @@ final class DeviceConnectionModel {
 
     func cancelCurrentOperation() {
         reportRequested = false
-        reportStatus = .idle
+        reportStatus = reconciliationUploadInFlight
+            ? .uncertain("The submitted report may have completed.") : .idle
+        reconciliationUploadInFlight = false
         activeAttemptID = nil
         browserAuthorizer?.cancel()
         activeTask?.cancel()
@@ -307,11 +311,11 @@ final class DeviceConnectionModel {
                 return
             }
 
-            if api.reportMode == .presence {
+            if api.reportMode != .legacy {
                 connectedInfo = record.connection
                 connectedCredential = record
                 state = .connected(record.connection)
-                await performPresenceReports(record: record, attemptID: attemptID)
+                await performInventoryReports(record: record, attemptID: attemptID)
                 finish(attemptID)
                 return
             }
@@ -424,6 +428,7 @@ final class DeviceConnectionModel {
         activeAttemptID = attemptID
         reportRequested = false
         reportStatus = .idle
+        reconciliationUploadInFlight = false
         state = initialState
         disconnectWarning = nil
         let activity = trackedActivity.flatMap { updateCoordinator?.beginActivity($0) }
@@ -441,23 +446,43 @@ final class DeviceConnectionModel {
         return task
     }
 
-    private func performPresenceReports(record: StoredDeviceCredential, attemptID: UUID) async {
+    private func performInventoryReports(record: StoredDeviceCredential, attemptID: UUID) async {
         repeat {
             reportRequested = false
             reportStatus = .reporting
+            var submitted = false
+            defer { if isCurrent(attemptID) { reconciliationUploadInFlight = false } }
             do {
                 guard let inventoryScanner else { throw PresenceSyncError.missingScanner }
+                var revision: String?
+                if api.reportMode == .reconciliation {
+                    revision = try await api.inventoryRevision(credential: record.credential)
+                    guard isCurrent(attemptID), connectedCredential == record else { return }
+                }
                 let scan = try await inventoryScanner()
                 guard isCurrent(attemptID), connectedCredential == record else { return }
-                let result = try await api.upload(credential: record.credential, installations: scan.installations)
-                guard isCurrent(attemptID), connectedCredential == record else { return }
-                guard result.reportVersion == 2, result.mode == "presence",
-                      result.deviceId == record.connection.deviceID, result.reportedAt != nil else {
-                    throw DeviceSyncAPIError.invalidResponse
+                let result: SkillSyncResult
+                if api.reportMode == .reconciliation {
+                    let payload = try SkillSyncService.reconciliationPayload(baseRevision: revision, scan: scan)
+                    reconciliationUploadInFlight = true
+                    submitted = true
+                    result = try await api.reconcile(credential: record.credential, payload: payload)
+                    guard isCurrent(attemptID), connectedCredential == record else { return }
+                    try result.validateReconciliation(payload, deviceID: record.connection.deviceID)
+                } else {
+                    result = try await api.upload(credential: record.credential, installations: scan.installations)
+                    guard isCurrent(attemptID), connectedCredential == record else { return }
+                    guard result.reportVersion == 2, result.mode == "presence",
+                          result.deviceId == record.connection.deviceID, result.reportedAt != nil else {
+                        throw DeviceSyncAPIError.invalidResponse
+                    }
                 }
                 reportStatus = .reported(result, scanIssueCount: scan.issues.count)
             } catch is CancellationError {
-                if isCurrent(attemptID) { reportStatus = .pending; reportRequested = false }
+                if isCurrent(attemptID) {
+                    reportStatus = submitted ? .uncertain("The submitted report may have completed.") : .pending
+                    reportRequested = false
+                }
                 return
             } catch DeviceSyncAPIError.reconnectRequired {
                 guard isCurrent(attemptID), connectedCredential == record else { return }
@@ -469,9 +494,14 @@ final class DeviceConnectionModel {
                 reportStatus = .idle
                 reportRequested = false
                 return
+            } catch DeviceSyncAPIError.inventoryChanged {
+                guard isCurrent(attemptID), connectedCredential == record else { return }
+                reportStatus = .failed(DeviceSyncAPIError.inventoryChanged.localizedDescription)
+                reportRequested = false
+                return
             } catch {
                 guard isCurrent(attemptID), connectedCredential == record else { return }
-                reportStatus = .failed(error.localizedDescription)
+                reportStatus = submitted ? .uncertain(error.localizedDescription) : .failed(error.localizedDescription)
                 reportRequested = false
                 return
             }

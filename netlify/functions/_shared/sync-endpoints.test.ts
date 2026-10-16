@@ -6,6 +6,8 @@ import { portalSyncUpload } from "../portal-sync-upload.mjs";
 import { portalSyncedSkills } from "../portal-synced-skills.mjs";
 import { createDeviceCredential } from "./crypto.js";
 import { DeviceAuthError } from "./device-auth.js";
+import { inventoryReadVersion } from "./sync-inventory-read.js";
+import type { RootCoverage } from "./inventory-reconciliation.js";
 
 const context = {} as Context;
 const pool = {} as Pool;
@@ -84,7 +86,7 @@ test("inventory endpoint authenticates before data access and uses only the auth
 });
 
 test("inventory endpoint refuses unknown or duplicate version before reading", async () => {
-  for (const query of ["version=3", "version=2&version=1"]) {
+  for (const query of ["version=4", "version=2&version=1", "version=3&version=3", "version=3&userId=other", "%76ersion=3"]) {
     const response = await portalSyncedSkills(new Request(`https://example.test/api/portal/synced-skills?${query}`), context, {
       requirePortalUser: noDatabase, getPgPool: noDatabase, readSyncInventory: noDatabase
     });
@@ -97,6 +99,58 @@ const reconciliationEnv = {
   PORTAL_TEST_ENVIRONMENT_VERIFIED: "1", CONTEXT: "dev", NODE_ENV: "test",
   PORTAL_TEST_API_ORIGIN: "http://127.0.0.1:8888"
 };
+
+test("version 3 read parsing is exact and stays opt-in without changing legacy/v2 queries", () => {
+  const read = (query = "") => new Request(`http://127.0.0.1:8888/api/portal/synced-skills${query}`);
+  assert.equal(inventoryReadVersion(read()), 1);
+  assert.equal(inventoryReadVersion(read("?version=2&userId=ignored")), 2);
+  assert.throws(() => inventoryReadVersion(read("?version=3")), error => error instanceof Response && error.status === 400);
+  assert.equal(inventoryReadVersion(read("?version=3"), true), 3);
+  for (const query of ["?version=3&userId=other", "?version=3&version=3", "?%76ersion=3", "?version=03", "?version=4"]) {
+    assert.throws(() => inventoryReadVersion(read(query), true), error => error instanceof Response && error.status === 400);
+  }
+});
+
+test("v3 inventory reads preserve retained facts, authenticate the account and require the local gate", async () => {
+  const read = (origin = "http://127.0.0.1:8888") => new Request(`${origin}/api/portal/synced-skills?version=3`);
+  const roots: RootCoverage[] = [{ source: "claude", state: "unavailable", reason: "missing" },
+    { source: "codex", state: "complete" }, { source: "agents", state: "complete" }];
+  const body = { inventoryVersion: 3 as const, skills: [{ id: "retained", deviceId: "mac", isCurrent: false }],
+    devices: [{ id: "mac", deviceName: "Test Mac", status: "active", lastReportedAt: new Date("2026-10-16T12:00:00Z"), scanCoverage: roots }] };
+  let authenticated = false;
+  const deps = {
+    getEnvironment: () => reconciliationEnv,
+    async requirePortalUser() { authenticated = true; return { id: "owner", clerkUserId: "clerk", email: "owner@example.test", displayName: null }; },
+    getPgPool() { assert.equal(authenticated, true); return pool; },
+    async readSyncInventory(actualPool: Pool, userId: string, version: number) {
+      assert.equal(actualPool, pool); assert.equal(userId, "owner"); assert.equal(version, 3); return body;
+    }
+  };
+  const response = await portalSyncedSkills(read(), context, deps);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), JSON.parse(JSON.stringify(body)));
+  const blocked = { ...deps, requirePortalUser: noDatabase, getPgPool: noDatabase, readSyncInventory: noDatabase };
+  assert.equal((await portalSyncedSkills(read(), context, { ...blocked, getEnvironment: () => ({}) })).status, 503);
+  assert.equal((await portalSyncedSkills(read("https://example.test"), context, blocked)).status, 503);
+  assert.equal((await portalSyncedSkills(read(), { deploy: { context: "production" } } as Context, blocked)).status, 503);
+  const denied = await portalSyncedSkills(read(), context, { ...blocked,
+    requirePortalUser: async () => { throw new Response("Unauthorized", { status: 401 }); } });
+  assert.equal(denied.status, 401);
+});
+
+test("default and v2 account reads ignore the reconciliation gate and retain their response shapes", async () => {
+  for (const [query, version] of [["", 1], ["?version=2", 2]] as const) {
+    const body = version === 1 ? { skills: [] } : { inventoryVersion: 2 as const, skills: [], devices: [] };
+    const response = await portalSyncedSkills(new Request(`https://example.test/api/portal/synced-skills${query}`), context, {
+      getEnvironment: noDatabase, getPgPool: () => pool,
+      requirePortalUser: async () => ({ id: "owner", clerkUserId: "clerk", email: "owner@example.test", displayName: null }),
+      async readSyncInventory(_pool, owner, actualVersion) { assert.equal(owner, "owner"); assert.equal(actualVersion, version); return body; }
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), body);
+  }
+});
 const completeRoots = ["claude", "codex", "agents"].map(source => ({ source, state: "complete" }));
 const reconciliationReport = { reportVersion: 3, baseRevision: null, roots: completeRoots, skills: [presence] };
 function localRequest(body?: unknown, query = "", authorization: string | null = `Bearer ${credential}`) {

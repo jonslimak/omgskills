@@ -5,6 +5,7 @@ import { Action, EmptyState, IconAction, Modal, StatusBadge } from "../app/ui";
 import { createDeviceSession, type Device, type DeviceSnapshot } from "./device-session";
 import { ConnectionDialog } from "./ConnectionDialog";
 import type { PortalDevice } from "../app/model";
+import { inventoryCoverageSummary } from "../app/unified/model";
 
 const formatDate = (value: string | null) => value === null ? "Never"
   : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
@@ -49,6 +50,9 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, them
           <p>Connected {formatDate(device.createdAt)} · Expires {formatDate(device.expiresAt)}</p>
           {inventoryDevices && <p>Last reported {formatDate(inventoryDevices.find(item => item.id === device.id)?.lastReportedAt ?? null)}
             {device.status !== "active" && " - Last known inventory retained"}</p>}
+          {inventoryDevices?.find(item => item.id === device.id)?.scanCoverage !== undefined && <p>
+            {inventoryCoverageSummary(inventoryDevices.find(item => item.id === device.id)?.scanCoverage)}
+          </p>}
         </div>
         <StatusBadge>{device.status}</StatusBadge>
         {device.status !== "revoked" && <Action variant="destructive" disabled={readOnly || busy || Boolean(state.error)}

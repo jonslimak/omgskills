@@ -32,10 +32,10 @@ const catalogInstallEnabled = import.meta.env.DEV ? catalogInstallTestEnabled(im
   import.meta.env.VITE_NEWMAC_CATALOG_INSTALL_TEST, location.hostname, import.meta.env.VITE_NEWMAC_WEB_INSTALL_TEST) : false;
 const rejectEdit = () => { throw new Error("Account editing is disabled in this read-only integration."); };
 
-function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean }) {
+function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean }) {
   const api = usePortalApi();
   const clerk = useClerk();
-  const account = useAccount(api, identity, signedIn, accountKey, connectedInventory);
+  const account = useAccount(api, identity, signedIn, accountKey, connectedInventory, inventoryReconciliation);
   const [leaving, setLeaving] = useState(false);
   const [sessionError, setSessionError] = useState("");
   const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
@@ -126,13 +126,13 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false }: { base?: string; local?: boolean; connectedInventory?: boolean }) {
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean }) {
   const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
   const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory}
+  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }

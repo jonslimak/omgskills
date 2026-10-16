@@ -1,10 +1,10 @@
 import { isPortalRead as isIntegrationRead } from "./src/portal-read-policy";
 import { isBrowserPairingApproval } from "./src/browser-pairing";
-import { connectedInventoryTestEnabled } from "./src/connected-inventory-test";
+import { connectedInventoryTestEnabled, inventoryReconciliationTestEnabled } from "./src/connected-inventory-test";
 export { isIntegrationRead };
 
-export function connectedInventoryServerEnabled(command: string, env: Record<string, string | undefined>) {
-  return connectedInventoryTestEnabled({
+function connectedConfiguration(command: string, env: Record<string, string | undefined>) {
+  return {
     enabled: env.VITE_NEWMAC_CONNECTED_INVENTORY_TEST,
     development: command === "serve" && env.NODE_ENV !== "production",
     integration: env.VITE_PORTAL_INTEGRATION,
@@ -15,7 +15,18 @@ export function connectedInventoryServerEnabled(command: string, env: Record<str
     legacyInstall: env.VITE_NEWMAC_WEB_INSTALL_TEST,
     preview: env.VITE_PORTAL_PREVIEW,
     hostname: "127.0.0.1", protocol: "http:",
-  });
+  };
+}
+
+export function connectedInventoryServerEnabled(command: string, env: Record<string, string | undefined>) {
+  const configuration = connectedConfiguration(command, env);
+  inventoryReconciliationTestEnabled({ ...configuration, reconciliation: env.VITE_NEWMAC_INVENTORY_RECONCILIATION_TEST });
+  return connectedInventoryTestEnabled(configuration);
+}
+
+export function inventoryReconciliationServerEnabled(command: string, env: Record<string, string | undefined>) {
+  return inventoryReconciliationTestEnabled({ ...connectedConfiguration(command, env),
+    reconciliation: env.VITE_NEWMAC_INVENTORY_RECONCILIATION_TEST });
 }
 
 // This is an explicit operator attestation, not proof that a database is isolated.
@@ -41,9 +52,9 @@ export function testBackendOrigin(env: Record<string, string | undefined>) {
   }
 }
 
-export function isIntegrationRequest(path: string, method = "GET", connectedInventory = false) {
+export function isIntegrationRequest(path: string, method = "GET", connectedInventory = false, inventoryReconciliation = false) {
   const verb = method.toUpperCase();
-  return isIntegrationRead(path, method, connectedInventory) ||
+  return isIntegrationRead(path, method, connectedInventory, inventoryReconciliation) ||
     (path === "/api/portal/private-sources" && verb === "POST") ||
     (/^\/api\/portal\/private-sources\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/releases$/i.test(path) && verb === "POST") ||
     (["/api/portal/sync-pairing-code", "/api/portal/sync-token"].includes(path) && verb === "POST") ||
@@ -57,8 +68,8 @@ export function isIntegrationRequest(path: string, method = "GET", connectedInve
 }
 
 // PKCE approval is opt-in; arbitrary callbacks, exchanges and uploads stay blocked.
-export function isIntegrationBody(path: string, method: string, body: unknown, connectedInventory = false) {
-  if (!isIntegrationRequest(path, method, connectedInventory)) return false;
+export function isIntegrationBody(path: string, method: string, body: unknown, connectedInventory = false, inventoryReconciliation = false) {
+  if (!isIntegrationRequest(path, method, connectedInventory, inventoryReconciliation)) return false;
   if (path.startsWith("/api/portal/private-sources/") && path.endsWith("/releases")) return body === undefined;
   if (method === "GET" || (method === "DELETE" && !path.endsWith("/items") && !path.endsWith("/allowed-emails"))) return body === undefined;
   if (!body || typeof body !== "object" || Array.isArray(body)) return false;

@@ -724,13 +724,14 @@ export function UnifiedApp({
               title={`${inventory.location} - ${inventory.report}`}>
               {inventory.location} - {inventory.report}
             </span>}
+            {inventory?.latestReport && <span className="ua-row-description" title={inventory.latestReport}>{inventory.latestReport}</span>}
           </span>
         </button>
         {!compact && !discovery && !nav.query && (
           <AgentTiles skill={skill} sources={sources} onlyInstalled={nav.view === "favorites"} />
         )}
         {!!skill.installed?.sources.length && <span className="ua-agent-count"
-          aria-label={`Installed in ${skill.installed.sources.length} ${skill.installed.sources.length === 1 ? "agent" : "agents"}`}
+          aria-label={`${skill.installed.inventoryVersion === 3 ? "Observed" : "Installed"} in ${skill.installed.sources.length} ${skill.installed.sources.length === 1 ? "agent" : "agents"}`}
           title={skill.installed.sources.join(", ")}>
           {skill.installed.sources.length}
         </span>}
@@ -1648,6 +1649,7 @@ export function UnifiedApp({
                     {selectedInventory && <>
                       <div><span>Mac / agent</span><strong>{selectedInventory.location}</strong></div>
                       <p>{selectedInventory.report}</p>
+                      {selectedInventory.latestReport && <p>{selectedInventory.latestReport}</p>}
                       {selected.installed.installationFolder && <div><span>Folder</span><strong>{selected.installed.installationFolder}</strong></div>}
                     </>}
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">

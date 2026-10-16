@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { IncomingMessage } from "node:http";
 import { catalogInstallMiddleware, catalogInstallServerEnabled, localCatalogLoader } from "./catalog-install-test-server";
-import { testBackendOrigin, isIntegrationRequest, isIntegrationBody, connectedInventoryServerEnabled } from "./integration-config";
+import { testBackendOrigin, isIntegrationRequest, isIntegrationBody, connectedInventoryServerEnabled, inventoryReconciliationServerEnabled } from "./integration-config";
 import {
   isPublicCatalogRequest,
   publicCatalogPathPattern,
@@ -20,6 +20,7 @@ export default defineConfig(({ mode, command }) => {
   const backend = integration ? testBackendOrigin(env) : null;
   const catalogProxy = env.PORTAL_PUBLIC_CATALOG_PROXY === "1";
   const connectedInventory = connectedInventoryServerEnabled(command, env);
+  const inventoryReconciliation = inventoryReconciliationServerEnabled(command, env);
   // Only the validated connected mode can combine catalog installs and account access.
   const catalogInstall = catalogInstallServerEnabled(command, connectedInventory
     ? { ...env, VITE_PORTAL_INTEGRATION: "0" } : env);
@@ -73,7 +74,7 @@ export default defineConfig(({ mode, command }) => {
           if (!integration) return;
           server.middlewares.use((req, res, next) => {
             if (!req.url?.startsWith("/api/portal")) return next();
-            if (!backend || !isIntegrationRequest(req.url, req.method, connectedInventory)) {
+            if (!backend || !isIntegrationRequest(req.url, req.method, connectedInventory, inventoryReconciliation)) {
               res.statusCode = backend ? 405 : 503;
               res.setHeader("Content-Type", "application/json");
               res.end(

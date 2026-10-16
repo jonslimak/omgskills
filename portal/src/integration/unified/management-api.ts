@@ -2,10 +2,10 @@ import type { PortalApi } from "../../portal-api";
 import { isPortalRead } from "../../portal-read-policy";
 
 // Explicitly allow the existing account operations; server ownership checks still apply.
-export function managementApi(api: PortalApi, connectedInventory = false): PortalApi {
+export function managementApi(api: PortalApi, connectedInventory = false, inventoryReconciliation = false): PortalApi {
   return (path, init = {}) => {
     const method = init.method ?? "GET";
-    const allowed = isPortalRead(path, method, connectedInventory) ||
+    const allowed = (isPortalRead(path, method, connectedInventory, inventoryReconciliation) && init.body == null) ||
       (path === "/api/portal/groups" && method === "POST") ||
       (path === "/api/portal/profile" && method === "PATCH") ||
       (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+$/.test(path) && method === "PATCH") ||

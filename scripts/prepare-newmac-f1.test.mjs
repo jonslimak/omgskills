@@ -198,3 +198,64 @@ test('receipt allowlist records resolved settings, never credentials or arbitrar
   assert.equal(receipt.scheme, 'omgskills-f1');
   assert.doesNotMatch(JSON.stringify(receipt), /fixture-secret|CLERK|password|token/);
 });
+
+test('missing or false reconciliation opt-in leaves ordinary, catalog and v2 configuration unchanged', t => {
+  const { root, bin } = fixture(t);
+  for (const options of [{}, { catalogInstall: true }, connectedOptions]) {
+    const config = validateInputs(bin, website, options);
+    const metadata = bundleMetadata(config, root);
+    const receipt = preparationReceipt(config, root, '/fixture/F1.app', 'fixture-hash', 'fixture-time');
+    assert.equal(Object.hasOwn(metadata, 'OMGSkillsInventoryReconciliationTest'), false);
+    assert.equal(Object.hasOwn(receipt, 'inventoryReconciliationTest'), false);
+    for (const inventoryReconciliationTest of [undefined, false]) {
+      const unchanged = validateInputs(bin, website, { ...options, inventoryReconciliationTest });
+      assert.deepEqual(unchanged, config);
+      assert.deepEqual(bundleMetadata({ ...unchanged, inventoryReconciliationTest }, root), metadata);
+      assert.deepEqual(preparationReceipt({ ...unchanged, inventoryReconciliationTest }, root,
+        '/fixture/F1.app', 'fixture-hash', 'fixture-time'), receipt);
+    }
+  }
+});
+
+test('verified reconciliation opt-in adds only true mode metadata and receipt fields', t => {
+  const { root, bin } = fixture(t);
+  const v2 = validateInputs(bin, website, connectedOptions);
+  const config = validateInputs(bin, website, { ...connectedOptions, inventoryReconciliationTest: true });
+  assert.deepEqual(config, { ...v2, inventoryReconciliationTest: true });
+  assert.deepEqual(bundleMetadata(config, root), { ...bundleMetadata(v2, root), OMGSkillsInventoryReconciliationTest: true });
+  const receipt = preparationReceipt(config, root, '/fixture/F1.app', 'fixture-hash', 'fixture-time');
+  assert.deepEqual(receipt, { ...preparationReceipt(v2, root, '/fixture/F1.app', 'fixture-hash', 'fixture-time'),
+    inventoryReconciliationTest: true });
+  assert.equal(receipt.scheme, 'omgskills-f1');
+  assert.equal(receipt.installerHome, receipt.scannerHome);
+});
+
+test('reconciliation rejects malformed flags and missing or invalid connected prerequisites', t => {
+  const { root, bin } = fixture(t);
+  const checkRejected = options => {
+    assert.throws(() => validateInputs(bin, website, options));
+    assert.throws(() => bundleMetadata({ ...options, website }, root));
+    assert.throws(() => preparationReceipt({ ...options, website }, root, '/fixture/F1.app', 'fixture-hash'));
+  };
+  for (const inventoryReconciliationTest of [null, 'true', 'false', 1, 0, [], {}]) {
+    for (const options of [{}, connectedOptions]) checkRejected({ ...options, inventoryReconciliationTest });
+  }
+  checkRejected({ inventoryReconciliationTest: true });
+  checkRejected({ catalogInstall: true, inventoryReconciliationTest: true });
+  for (const changes of [
+    { connectedInventoryTest: false }, { connectedInventoryTest: undefined },
+    { catalogInstall: false }, { catalogInstall: undefined },
+    { testEnvironmentVerified: false }, { testEnvironmentVerified: undefined },
+    { portalConnectURL: undefined }, { syncEndpoint: undefined }, { backendOrigin: undefined },
+    { portalConnectURL: 'https://omgskills.com/app/connect' },
+    { syncEndpoint: 'http://127.0.0.1:8888/api/portal/sync-upload?token=fixture' },
+  ]) checkRejected({ ...connectedOptions, inventoryReconciliationTest: true, ...changes });
+  const config = validateInputs(bin, website, { ...connectedOptions, inventoryReconciliationTest: true });
+  assert.throws(() => bundleMetadata(config, '/Users/fixture'));
+});
+
+test('CLI declares a Boolean reconciliation flag and forwards it without running preparation in tests', () => {
+  const source = readFileSync(new URL('./prepare-newmac-f1.mjs', import.meta.url), 'utf8');
+  assert.match(source, /'inventory-reconciliation-test': \{ type: 'boolean', default: false \}/);
+  assert.match(source, /inventoryReconciliationTest: values\['inventory-reconciliation-test'\]/);
+});

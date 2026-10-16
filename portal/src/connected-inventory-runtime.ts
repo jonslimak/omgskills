@@ -1,6 +1,6 @@
-import { connectedInventoryTestEnabled } from "./connected-inventory-test";
+import { connectedInventoryTestEnabled, inventoryReconciliationTestEnabled } from "./connected-inventory-test";
 
-export const connectedInventoryTest = import.meta.env.DEV ? connectedInventoryTestEnabled({
+const configuration = {
   enabled: import.meta.env.VITE_NEWMAC_CONNECTED_INVENTORY_TEST,
   development: import.meta.env.DEV,
   integration: import.meta.env.VITE_PORTAL_INTEGRATION,
@@ -12,4 +12,7 @@ export const connectedInventoryTest = import.meta.env.DEV ? connectedInventoryTe
   preview: import.meta.env.VITE_PORTAL_PREVIEW,
   hostname: location.hostname,
   protocol: location.protocol,
-}) : false;
+};
+export const connectedInventoryTest = import.meta.env.DEV ? connectedInventoryTestEnabled(configuration) : false;
+export const inventoryReconciliationTest = inventoryReconciliationTestEnabled({ ...configuration,
+  reconciliation: import.meta.env.VITE_NEWMAC_INVENTORY_RECONCILIATION_TEST });

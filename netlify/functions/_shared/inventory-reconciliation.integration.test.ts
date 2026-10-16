@@ -24,6 +24,7 @@ const { parsePresenceSkill, parseSyncSkill } = await import("./sync-skill.js");
 const { performSyncUpload } = await import("./sync-upload.js");
 const { readInventoryRevision } = await import("./inventory-reconciliation.js");
 const { addGroupItemWithClient } = await import("./group-items.js");
+const { readSyncInventory } = await import("./sync-inventory-read.js");
 const migrationRoot = new URL("../../database/migrations/", import.meta.url);
 const reconciliationMigration = "20261016130000_add_inventory_reconciliation";
 const now = new Date("2026-10-16T12:00:00Z");
@@ -209,6 +210,18 @@ test("complete scans mark missing once, preserve last-seen and Sets, and restore
     assert.equal(state.device_tokens[0].inventory_protocol, 3);
     assert.deepEqual(state.sync_runs.find(row => row.id === first.syncRunId)?.scan_coverage, roots);
     assertSetPreserved(state, pinned);
+    const retained = await readSyncInventory(pool, owner, 3, later(1));
+    assert.equal(retained.inventoryVersion, 3);
+    assert.equal(retained.skills.find(row => row.id === removed.id)?.isCurrent, false);
+    assert.deepEqual(retained.devices?.[0].scanCoverage, roots);
+    const oldRead = await readSyncInventory(pool, owner, 1, later(1));
+    const v2 = await readSyncInventory(pool, owner, 2, later(1));
+    assert.deepEqual(Object.keys(oldRead), ["skills"]);
+    assert.deepEqual(oldRead.skills, []);
+    assert.equal(v2.inventoryVersion, 2);
+    assert.deepEqual(v2.skills.map(row => row.name), ["keep"]);
+    assert.deepEqual(Object.keys(v2.devices![0]).sort(), ["deviceName", "id", "lastReportedAt", "status"]);
+    assert.deepEqual(await snapshot(pool), state);
     const empty = await upload3(pool, reporter, await revision(pool, reporter, later(2)), [], roots, later(2));
     assert.equal(empty.missingSkillCount, 1);
     assert.equal((await upload3(pool, reporter, await revision(pool, reporter, later(3)), [], roots, later(3))).missingSkillCount, 0);
@@ -219,6 +232,9 @@ test("complete scans mark missing once, preserve last-seen and Sets, and restore
     assert.deepEqual(state.synced_skills.map(row => row.id).sort(), initial.synced_skills.map(row => row.id).sort());
     assert.ok(state.synced_skills.every(row => row.is_current && row.last_seen_at.toISOString() === later(4).toISOString()));
     assertSetPreserved(state, pinned);
+    const restored = await readSyncInventory(pool, owner, 3, later(4));
+    assert.equal(restored.skills.find(row => row.id === removed.id)?.isCurrent, true);
+    assert.equal(restored.skills.find(row => row.id === removed.id)?.lastSeenAt.toISOString(), later(4).toISOString());
   });
 });
 
@@ -244,7 +260,93 @@ test("each partial/unavailable root retains unseen rows while another complete s
       }
       assert.equal(after.synced_skills.length, 3 + observed.length);
       assert.deepEqual(after.sync_runs.find(row => row.id === result.syncRunId)?.scan_coverage, roots);
+      const read = await readSyncInventory(pool, owner, 3, later(1));
+      assert.deepEqual(read.devices?.find(row => row.id === reporter.id)?.scanCoverage, roots);
+      assert.equal(read.skills.find(row => row.name === "gone")?.isCurrent, false);
+      assert.equal(read.skills.find(row => row.name === "retained")?.isCurrent, true);
     });
+  });
+});
+
+test("v3 inventory uses one latest completed report per device, including null legacy coverage, scoped to its account", async () => {
+  await withSchema(async pool => {
+    const owner = await user(pool), other = await user(pool);
+    const a = await device(pool, owner), b = await device(pool, owner), empty = await device(pool, owner);
+    const expired = await device(pool, owner), foreign = await device(pool, other);
+    const initialSkills = [presence("same", "codex"), presence("same", "claude")];
+    await upload2(pool, a, initialSkills);
+    await upload3(pool, a, await revision(pool, a), initialSkills, coverage(), later(1));
+    const latestRoots = coverage({ claude: { state: "unavailable", reason: "missing" },
+      agents: { state: "incomplete", reason: "changed" } });
+    await upload3(pool, a, await revision(pool, a, later(2)), [], latestRoots, later(2));
+    await upload2(pool, b, [presence("same")]);
+    // A newer old-style report has no coverage: never reuse coverage from an older row.
+    await pool.query(`INSERT INTO sync_runs(user_id,device_id,status,completed_at,scan_coverage)
+      VALUES($1,$2,'completed',$3,$4::jsonb)`, [owner, b.id, later(1), JSON.stringify(coverage())]);
+    await upload2(pool, b, [], later(3));
+    await pool.query("UPDATE device_tokens SET revoked_at=$2 WHERE id=$1", [b.id, later(4)]);
+    await pool.query("UPDATE device_tokens SET created_at=$2,expires_at=$3 WHERE id=$1", [expired.id, later(-3), later(-1)]);
+    await upload2(pool, foreign, [presence("foreign", "agents")]);
+    await legacyUpload(pool, owner, [legacy("unknown-mac")]);
+    await legacyUpload(pool, owner, [], later(1));
+    // Later failed/unfinished reports, and another account's row referencing this device, must not win.
+    for (const state of ["failed", "started"]) {
+      await pool.query(`INSERT INTO sync_runs(user_id,device_id,status,completed_at,scan_coverage)
+        VALUES($1,$2,$3,$4,$5::jsonb)`, [owner, a.id, state, later(10), JSON.stringify(coverage())]);
+    }
+    await pool.query(`INSERT INTO sync_runs(user_id,device_id,status,completed_at,scan_coverage)
+      VALUES($1,$2,'completed',$3,$4::jsonb)`, [other, a.id, later(20), JSON.stringify(coverage())]);
+    const before = await snapshot(pool);
+    const read = await readSyncInventory(pool, owner, 3, later(4));
+    assert.equal(read.inventoryVersion, 3);
+    assert.equal(read.skills.length, 4);
+    assert.ok(read.skills.every(row => row.id !== before.synced_skills.find(skill => skill.user_id === other)?.id));
+    assert.equal(read.devices?.length, 4);
+    assert.ok(!read.devices?.some(row => row.id === foreign.id));
+    const macA = read.devices?.find(row => row.id === a.id)!;
+    assert.deepEqual(macA.scanCoverage, latestRoots);
+    assert.equal(macA.lastReportedAt?.toISOString(), later(2).toISOString());
+    const macB = read.devices?.find(row => row.id === b.id)!;
+    assert.equal(macB.status, "revoked");
+    assert.equal(macB.scanCoverage, null);
+    assert.equal(macB.lastReportedAt?.toISOString(), later(3).toISOString());
+    for (const reporter of [empty, expired]) {
+      assert.equal(read.devices?.find(row => row.id === reporter.id)?.scanCoverage, null);
+      assert.equal(read.devices?.find(row => row.id === reporter.id)?.lastReportedAt, null);
+    }
+    assert.equal(read.devices?.find(row => row.id === expired.id)?.status, "expired");
+    const codex = read.skills.find(row => row.deviceId === a.id && row.source === "codex")!;
+    const claude = read.skills.find(row => row.deviceId === a.id && row.source === "claude")!;
+    assert.equal(codex.isCurrent, false);
+    assert.equal(claude.isCurrent, true);
+    assert.equal(codex.installationFolder, "same");
+    assert.equal(claude.installationFolder, "same");
+    assert.equal(read.skills.find(row => row.deviceId === b.id)?.isCurrent, true);
+    const unknown = read.skills.find(row => row.deviceId === null)!;
+    assert.equal(unknown.installationFolder, "unknown-mac");
+    assert.equal(unknown.isCurrent, false);
+    assert.deepEqual((await readSyncInventory(pool, owner, 1, later(4))).skills, []);
+    const v2 = await readSyncInventory(pool, owner, 2, later(4));
+    assert.equal(v2.inventoryVersion, 2);
+    assert.equal(v2.skills.length, 2);
+    assert.ok(v2.skills.every(row => row.isCurrent));
+    assert.ok(v2.devices?.every(row => !Object.hasOwn(row, "scanCoverage")));
+    const otherRead = await readSyncInventory(pool, other, 3, later(4));
+    assert.deepEqual(otherRead.devices?.map(row => row.id), [foreign.id]);
+    assert.deepEqual(otherRead.skills.map(row => row.name), ["foreign"]);
+    assert.deepEqual(await snapshot(pool), before);
+  });
+});
+
+test("v3 inventory distinguishes an empty account and a connected device without any report", async () => {
+  await withSchema(async pool => {
+    const owner = await user(pool);
+    assert.deepEqual(await readSyncInventory(pool, owner, 3), { inventoryVersion: 3, skills: [], devices: [] });
+    const reporter = await device(pool, owner);
+    const read = await readSyncInventory(pool, owner, 3, now);
+    assert.deepEqual(read.skills, []);
+    assert.deepEqual(read.devices, [{ id: reporter.id, deviceName: "Reconciliation test Mac", status: "active",
+      lastReportedAt: null, scanCoverage: null }]);
   });
 });
 

@@ -51,3 +51,22 @@ test("reconciliation remains dormant except for exact verified development loopb
   for (const url of ["https://example.com/api/portal/sync-upload", "http://127.0.0.1:8888/api/other"])
     rejects(() => requireLocalInventoryReconciliation(new Request(url), env), 503);
 });
+
+test("the local gate requires an explicit allowlisted endpoint and never broadens the upload default", () => {
+  const read = new Request("http://127.0.0.1:8888/api/portal/synced-skills?version=3");
+  rejects(() => requireLocalInventoryReconciliation(read, env, "dev"), 503);
+  requireLocalInventoryReconciliation(read, env, "dev", "/api/portal/synced-skills");
+  rejects(() => requireLocalInventoryReconciliation(request, env, "dev", "/api/portal/synced-skills"), 503);
+  rejects(() => requireLocalInventoryReconciliation(read, env, "dev", "/api/portal/profile" as never), 503);
+  for (const key of Object.keys(env)) {
+    rejects(() => requireLocalInventoryReconciliation(read, { ...env, [key]: undefined }, "dev", "/api/portal/synced-skills"), 503);
+  }
+  for (const context of ["production", "deploy-preview"]) {
+    rejects(() => requireLocalInventoryReconciliation(read, env, context, "/api/portal/synced-skills"), 503);
+  }
+  for (const url of ["https://example.test/api/portal/synced-skills?version=3",
+    "http://127.0.0.1:9999/api/portal/synced-skills?version=3",
+    "http://127.0.0.1:8888/api/portal/shared?version=3"]) {
+    rejects(() => requireLocalInventoryReconciliation(new Request(url), env, "dev", "/api/portal/synced-skills"), 503);
+  }
+});

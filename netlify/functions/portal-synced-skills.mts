@@ -3,10 +3,14 @@ import { getPgPool } from "./_shared/db.js";
 import { errorResponse, secretJsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { inventoryReadVersion, readSyncInventory } from "./_shared/sync-inventory-read.js";
+import { requireLocalInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
 
 const defaultDependencies = { getPgPool, requirePortalUser, readSyncInventory };
+type Dependencies = typeof defaultDependencies & {
+  getEnvironment?: () => Record<string, string | undefined>;
+};
 
-export async function portalSyncedSkills(req: Request, _context: Context, dependencies = defaultDependencies) {
+export async function portalSyncedSkills(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
   const { getPgPool, requirePortalUser, readSyncInventory } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
@@ -16,7 +20,11 @@ export async function portalSyncedSkills(req: Request, _context: Context, depend
   }
 
   try {
-    const version = inventoryReadVersion(req);
+    const version = inventoryReadVersion(req, true);
+    if (version === 3) {
+      requireLocalInventoryReconciliation(req, dependencies.getEnvironment?.() ?? process.env,
+        context.deploy?.context, "/api/portal/synced-skills");
+    }
     const user = await requirePortalUser(req);
     return secretJsonResponse(req, await readSyncInventory(getPgPool(), user.id, version));
   } catch (error) {

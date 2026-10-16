@@ -93,12 +93,19 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
                 onReturn: { [weak self] in self?.showStatus() })
             let connection = DeviceConnectionModel(
                 credentialStore: DeviceCredentialStore(service: connected.keychainService),
-                api: DeviceSyncAPI(uploadEndpoint: connected.uploadURL, reportMode: .presence),
+                api: DeviceSyncAPI(uploadEndpoint: connected.uploadURL,
+                    reportMode: connected.inventoryReconciliation ? .reconciliation : .presence),
                 browserAuthorizer: authorizer, portalConnectURL: connected.connectURL,
                 callbackScheme: BrowserPairing.connectedTestCallbackScheme,
                 updateCoordinator: coordinator,
-                inventoryScanner: { try await InstalledSkillsScanner.scanForPresence(
-                    filesystemPaths: connected.filesystemPaths, pathAnchor: connected.root) })
+                inventoryScanner: {
+                    if connected.inventoryReconciliation {
+                        return try await InstalledSkillsScanner.scanForReconciliation(
+                            filesystemPaths: connected.filesystemPaths, pathAnchor: connected.root)
+                    }
+                    return try await InstalledSkillsScanner.scanForPresence(
+                        filesystemPaths: connected.filesystemPaths, pathAnchor: connected.root)
+                })
             let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer)
             connectedRuntime = runtime
             model.onInstalled = { [weak runtime] in runtime?.installed() }
