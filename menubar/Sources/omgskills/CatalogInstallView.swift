@@ -5,11 +5,18 @@ import AppKit
 struct CatalogInstallView: View {
     let model: CatalogInstallModel
     let close: () -> Void
+    var connection: DeviceConnectionModel? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text(model.record?.name ?? model.appName).font(.title2.bold())
                 .textSelection(.enabled)
+            #if DEBUG
+            if let connection {
+                ConnectedInventoryView(model: connection, deviceName: Host.current().localizedName ?? "Test Mac")
+                Divider()
+            }
+            #endif
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
                     if let record = model.record, let request = model.request {
@@ -62,9 +69,13 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
     private let window: NSWindow
     private let statusItem: NSStatusItem
     private var appUpdater: CatalogCandidateUpdater?
+    #if DEBUG
+    private var connectedRuntime: ConnectedInventoryRuntime?
+    #endif
 
     #if DEBUG
-    convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator) throws {
+    convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator,
+                     connected: AppRuntimeConfiguration.ConnectedInventoryConfiguration? = nil) throws {
         let paths = SkillFilesystemPaths.isolated(testRoot: root)
         var origin = URLComponents(url: website, resolvingAgainstBaseURL: false)!
         origin.path = ""
@@ -75,7 +86,26 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
         let installer = CatalogSkillInstaller(packageFetcher: GitPublicSkillPackageFetcher(temporaryRoot: root),
             managedInstaller: managed, filesystemPaths: paths)
         let service = CatalogInstallFlowService(records: records, installer: CatalogInstallService(installer: installer))
-        self.init(model: CatalogInstallModel(service: service, coordinator: coordinator), website: website)
+        self.init(model: CatalogInstallModel(service: service, coordinator: coordinator,
+            appName: connected == nil ? nil : "OMGSkills Connected Test"), website: website)
+        if let connected {
+            let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.window },
+                onReturn: { [weak self] in self?.showStatus() })
+            let connection = DeviceConnectionModel(
+                credentialStore: DeviceCredentialStore(service: connected.keychainService),
+                api: DeviceSyncAPI(uploadEndpoint: connected.uploadURL, reportMode: .presence),
+                browserAuthorizer: authorizer, portalConnectURL: connected.connectURL,
+                callbackScheme: BrowserPairing.connectedTestCallbackScheme,
+                updateCoordinator: coordinator,
+                inventoryScanner: { try await InstalledSkillsScanner.scanForPresence(
+                    filesystemPaths: connected.filesystemPaths, pathAnchor: connected.root) })
+            let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer)
+            connectedRuntime = runtime
+            model.onInstalled = { [weak runtime] in runtime?.installed() }
+            window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
+                close: { [weak self] in self?.closeRequest() }, connection: connection))
+            runtime.start()
+        }
     }
     #endif
 
@@ -118,7 +148,18 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
         item.target = self
     }
 
-    func receive(_ url: URL) { model.receive(url); showStatus() }
+    func receive(_ url: URL) {
+        #if DEBUG
+        if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }
+        #endif
+        model.receive(url)
+        showStatus()
+    }
+    func stopReporting() async {
+        #if DEBUG
+        await connectedRuntime?.stop()
+        #endif
+    }
     @objc func showStatus() { NSApp.activate(ignoringOtherApps: true); window.makeKeyAndOrderFront(nil) }
     @objc private func openWebsite() { NSWorkspace.shared.open(website) }
     @objc private func quit() { NSApp.terminate(nil) }

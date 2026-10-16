@@ -86,6 +86,7 @@ import {
   setAccessSummary,
   starCount,
   agentKind,
+  inventorySummary,
   type CatalogDisplay,
   type Navigation,
   type SkillDisplay,
@@ -448,6 +449,7 @@ export function UnifiedApp({
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
   const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected) || pendingSelection;
+  const selectedInventory = selected?.installed ? inventorySummary(selected.installed) : null;
   const detailOpen = useRef(false);
   detailOpen.current = !!selected;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
@@ -667,6 +669,7 @@ export function UnifiedApp({
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
+    const inventory = skill.installed ? inventorySummary(skill.installed) : null;
     return (
       <div
         key={skill.key}
@@ -717,6 +720,10 @@ export function UnifiedApp({
                 ? `@${skill.author}${skill.stars !== undefined ? ` · ${starCount(skill.stars)} stars` : ""}`
                 : skill.description || "No description available"}
             </span>
+            {inventory && <span className="ua-row-description"
+              title={`${inventory.location} - ${inventory.report}`}>
+              {inventory.location} - {inventory.report}
+            </span>}
           </span>
         </button>
         {!compact && !discovery && !nav.query && (
@@ -1638,6 +1645,11 @@ export function UnifiedApp({
                       <span>Observed on</span>
                       <strong>{selected.installed.sources.join(", ")}</strong>
                     </div>
+                    {selectedInventory && <>
+                      <div><span>Mac / agent</span><strong>{selectedInventory.location}</strong></div>
+                      <p>{selectedInventory.report}</p>
+                      {selected.installed.installationFolder && <div><span>Folder</span><strong>{selected.installed.installationFolder}</strong></div>}
+                    </>}
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, selected.installed!))

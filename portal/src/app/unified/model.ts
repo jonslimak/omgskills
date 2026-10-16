@@ -37,6 +37,15 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   setItemId?: string;
   setItemKind?: PortalSet["items"][number]["kind"];
 };
+
+export function inventorySummary(skill: GroupedSyncedSkill) {
+  if (skill.inventoryVersion !== 2) return null;
+  const location = `${skill.deviceName || "Unknown Mac"} / ${skill.source}`;
+  const time = skill.lastReportedAt ?? skill.lastSeenAt;
+  const reported = Number.isFinite(Date.parse(time)) ? `Last reported ${new Date(time).toLocaleString()}` : "Report time unknown";
+  const state = skill.deviceStatus && skill.deviceStatus !== "active" ? `Last known (${skill.deviceStatus})` : "Last known";
+  return { location, report: `${state} - ${reported}` };
+}
 export type CollectionDisplay = {
   id: string;
   name: string;

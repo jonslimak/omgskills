@@ -32,10 +32,10 @@ const catalogInstallEnabled = import.meta.env.DEV ? catalogInstallTestEnabled(im
   import.meta.env.VITE_NEWMAC_CATALOG_INSTALL_TEST, location.hostname, import.meta.env.VITE_NEWMAC_WEB_INSTALL_TEST) : false;
 const rejectEdit = () => { throw new Error("Account editing is disabled in this read-only integration."); };
 
-function AccountView({ identity, signedIn, accountKey, base, local }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean }) {
+function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean }) {
   const api = usePortalApi();
   const clerk = useClerk();
-  const account = useAccount(api, identity, signedIn, accountKey);
+  const account = useAccount(api, identity, signedIn, accountKey, connectedInventory);
   const [leaving, setLeaving] = useState(false);
   const [sessionError, setSessionError] = useState("");
   const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
@@ -114,7 +114,7 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
       busy={snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing}
       blocked={!!snapshot.error || !snapshot.data || snapshot.accessDenied}
       error={snapshot.profileError || snapshot.error} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
-      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel api={api} local={local} denied={account.invalidate} theme={theme} /></div>
+      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel api={api} local={local} denied={account.invalidate} theme={theme} inventoryDevices={connectedInventory ? data.devices : undefined} /></div>
       : view === "github" ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div> : undefined : undefined}
     previewBar={(local || sessionError || (available && snapshot.error)) && <div className="ua-preview">
       {local && <span>Local test · Unified app</span>}
@@ -126,13 +126,13 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true }: { base?: string; local?: boolean }) {
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false }: { base?: string; local?: boolean; connectedInventory?: boolean }) {
   const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
   const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local}
+  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }

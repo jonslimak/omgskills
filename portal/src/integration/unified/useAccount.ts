@@ -8,7 +8,7 @@ import type { MembershipCommand } from "../membership-data";
 
 const initial: AccountSnapshot = { data: null, refreshing: true, error: "", accessDenied: false, revision: 0, profileSaving: false, profileError: "", setSaving: false };
 
-export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: boolean, key: string) {
+export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: boolean, key: string, connectedInventory = false) {
   const apiRef = useRef(api);
   apiRef.current = api;
   const session = useRef<ReturnType<typeof createAccountSession> | null>(null);
@@ -17,9 +17,10 @@ export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: b
   useEffect(() => {
     if (!enabled) { setSnapshot({ ...initial, refreshing: false }); return; }
     const account = createAccountSession({
-      api: managementApi((path, init) => apiRef.current(path, init)), identity,
+      api: managementApi((path, init) => apiRef.current(path, init), connectedInventory), identity,
       cacheKey: key, changed: setSnapshot,
       includeFavoriteItems: true,
+      connectedInventory,
       // No persistent private cache in the first authenticated unified slice.
     });
     session.current = account;
@@ -34,7 +35,7 @@ export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: b
       window.removeEventListener("focus", active);
       document.removeEventListener("visibilitychange", active);
     };
-  }, [enabled, key, identity.name, identity.email, recovery]);
+  }, [enabled, key, identity.name, identity.email, recovery, connectedInventory]);
   return {
     snapshot,
     saveProfile: (changes: { handle?: string; published?: boolean }) => session.current

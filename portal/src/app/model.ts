@@ -36,9 +36,11 @@ export type PortalDevice = {
   id: string;
   name: string;
   lastActive: string;
-  status: "active" | "revoked" | "expired";
+  status: "active" | "revoked" | "expired" | "inactive";
+  lastReportedAt?: string | null;
 };
 export type PortalData = {
+  inventoryVersion?: 2;
   skills: SyncedSkill[];
   sets: PortalSet[];
   devices: PortalDevice[];

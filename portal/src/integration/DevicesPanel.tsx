@@ -4,11 +4,12 @@ import type { PortalApi } from "../portal-api";
 import { Action, EmptyState, IconAction, Modal, StatusBadge } from "../app/ui";
 import { createDeviceSession, type Device, type DeviceSnapshot } from "./device-session";
 import { ConnectionDialog } from "./ConnectionDialog";
+import type { PortalDevice } from "../app/model";
 
 const formatDate = (value: string | null) => value === null ? "Never"
   : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
 
-export function DevicesPanel({ api, denied, local = true, readOnly = false, theme }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; theme?: string }) {
+export function DevicesPanel({ api, denied, local = true, readOnly = false, theme, inventoryDevices }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; theme?: string; inventoryDevices?: PortalDevice[] }) {
   const callbacks = useRef({ api, denied });
   callbacks.current = { api, denied };
   const sessionRef = useRef<ReturnType<typeof createDeviceSession> | null>(null);
@@ -46,6 +47,8 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, them
         <div className="rd-grow"><div className="rd-row-title">{device.deviceName}</div>
           <p>Last active {formatDate(device.lastUsedAt)}</p>
           <p>Connected {formatDate(device.createdAt)} · Expires {formatDate(device.expiresAt)}</p>
+          {inventoryDevices && <p>Last reported {formatDate(inventoryDevices.find(item => item.id === device.id)?.lastReportedAt ?? null)}
+            {device.status !== "active" && " - Last known inventory retained"}</p>}
         </div>
         <StatusBadge>{device.status}</StatusBadge>
         {device.status !== "revoked" && <Action variant="destructive" disabled={readOnly || busy || Boolean(state.error)}

@@ -50,22 +50,23 @@ enum InstalledSkillsScanner {
     }
 
     static func scanWithSummary(
-        filesystemPaths: SkillFilesystemPaths = .production()
+        filesystemPaths: SkillFilesystemPaths = .production(),
+        pathAnchor: URL? = nil
     ) -> ScanResult {
         let roots: [Root] = [
             Root(url: filesystemPaths.claudeSkillsRoot, origin: "Claude"),
             Root(url: filesystemPaths.codexSkillsRoot, origin: "Codex"),
             Root(url: filesystemPaths.agentsSkillsRoot, origin: "Agents"),
         ]
-        return scan(roots: roots)
+        return scan(roots: roots, pathAnchor: pathAnchor)
     }
 
-    static func scanForPresence(filesystemPaths: SkillFilesystemPaths) async throws -> ScanResult {
+    static func scanForPresence(filesystemPaths: SkillFilesystemPaths, pathAnchor: URL? = nil) async throws -> ScanResult {
         // A child task keeps synchronous filesystem work off the UI actor.
         try await withThrowingTaskGroup(of: ScanResult.self) { group in
             group.addTask {
                 try Task.checkCancellation()
-                let scan = scanWithSummary(filesystemPaths: filesystemPaths)
+                let scan = scanWithSummary(filesystemPaths: filesystemPaths, pathAnchor: pathAnchor)
                 var issues = scan.issues
                 let installations = scan.installations.filter { skill in
                     do {
@@ -84,7 +85,7 @@ enum InstalledSkillsScanner {
         }
     }
 
-    static func scan(roots: [Root]) -> ScanResult {
+    static func scan(roots: [Root], pathAnchor: URL? = nil) -> ScanResult {
         let fm = FileManager.default
         var seen = Set<String>()
         var skills: [Skill] = []
@@ -94,6 +95,10 @@ enum InstalledSkillsScanner {
         var issues: [ScanIssue] = []
 
         for root in roots {
+            guard isWithinPathAnchor(root.url, pathAnchor: pathAnchor) else {
+                issues.append(.unreadableRoot(source: root.origin))
+                continue
+            }
             let entries: [URL]
             do {
                 entries = try fm.contentsOfDirectory(at: root.url,
@@ -111,6 +116,20 @@ enum InstalledSkillsScanner {
 
             for entry in entries {
                 let skillMd = entry.appendingPathComponent("SKILL.md")
+                if let pathAnchor {
+                    guard isWithinPathAnchor(entry, pathAnchor: pathAnchor),
+                          isWithinPathAnchor(skillMd, pathAnchor: pathAnchor) else {
+                        issues.append(.skippedSkill(source: root.origin, folder: entry.lastPathComponent))
+                        continue
+                    }
+                    let metadata = SkillInstallProvenanceStore.metadataURL(targetRoot: root.url, targetName: entry.lastPathComponent)
+                    let managedMetadata = SkillInstallProvenanceStore.managedMetadataURL(for: entry)
+                    guard isWithinPathAnchor(metadata, pathAnchor: pathAnchor),
+                          managedMetadata.map({ isWithinPathAnchor($0, pathAnchor: pathAnchor) }) ?? true else {
+                        issues.append(.skippedSkill(source: root.origin, folder: entry.lastPathComponent))
+                        continue
+                    }
+                }
                 let isSymlink = (try? entry.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false
                 guard fm.fileExists(atPath: skillMd.path) else {
                     if isSymlink || (try? entry.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
@@ -122,7 +141,8 @@ enum InstalledSkillsScanner {
                     targetRoot: root.url,
                     targetName: entry.lastPathComponent
                 )
-                guard let skill = parse(skillMd: skillMd, dir: entry, origin: root.origin, isSymlink: isSymlink, provenance: provenance) else {
+                guard let skill = parse(skillMd: skillMd, dir: entry, origin: root.origin, isSymlink: isSymlink,
+                    provenance: provenance, pathAnchor: pathAnchor) else {
                     issues.append(.skippedSkill(source: root.origin, folder: entry.lastPathComponent))
                     continue
                 }
@@ -156,7 +176,8 @@ enum InstalledSkillsScanner {
         return ScanResult(skills: skills, installations: installations, summary: summary, issues: issues)
     }
 
-    private static func parse(skillMd: URL, dir: URL, origin: String, isSymlink: Bool, provenance: SkillInstallProvenance?) -> Skill? {
+    private static func parse(skillMd: URL, dir: URL, origin: String, isSymlink: Bool,
+                              provenance: SkillInstallProvenance?, pathAnchor: URL?) -> Skill? {
         guard let data = try? Data(contentsOf: skillMd),
               let content = String(data: data, encoding: .utf8) else { return nil }
         guard let fm = parseFrontmatter(content) else { return nil }
@@ -177,7 +198,7 @@ enum InstalledSkillsScanner {
         let iso = ISO8601DateFormatter()
         iso.formatOptions = [.withInternetDateTime]
 
-        let gitLocation = resolveGitLocation(dir: dir)
+        let gitLocation = resolveGitLocation(dir: dir, pathAnchor: pathAnchor)
         let githubUrl = provenance?.githubUrl ?? gitLocation?.githubURL ?? ""
         let authorHandle = githubUrl.split(separator: "/").dropLast().last.map(String.init) ?? ""
         let isLocalOnly = !isSymlink && githubUrl.isEmpty
@@ -214,11 +235,12 @@ enum InstalledSkillsScanner {
         return (try? Yams.load(yaml: block)) as? [String: Any]
     }
 
-    private static func resolveGitLocation(dir: URL) -> GitLocation? {
+    private static func resolveGitLocation(dir: URL, pathAnchor: URL?) -> GitLocation? {
         let resolved = dir.resolvingSymlinksInPath()
-        guard let gitRoot = enclosingGitRoot(from: resolved) else { return nil }
+        guard let gitRoot = enclosingGitRoot(from: resolved, pathAnchor: pathAnchor) else { return nil }
         let gitConfig = gitRoot.appendingPathComponent(".git/config")
-        guard let content = try? String(contentsOf: gitConfig, encoding: .utf8) else { return nil }
+        guard isWithinPathAnchor(gitConfig, pathAnchor: pathAnchor),
+              let content = try? String(contentsOf: gitConfig, encoding: .utf8) else { return nil }
         for line in content.components(separatedBy: "\n") {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             guard trimmed.hasPrefix("url = ") else { continue }
@@ -247,11 +269,14 @@ enum InstalledSkillsScanner {
         return relativeComponents.isEmpty ? "." : relativeComponents.joined(separator: "/")
     }
 
-    private static func enclosingGitRoot(from directory: URL) -> URL? {
+    private static func enclosingGitRoot(from directory: URL, pathAnchor: URL?) -> URL? {
         var current = directory
         let fm = FileManager.default
         for _ in 0..<64 {
-            if fm.fileExists(atPath: current.appendingPathComponent(".git/config").path) {
+            guard isWithinPathAnchor(current, pathAnchor: pathAnchor) else { return nil }
+            let config = current.appendingPathComponent(".git/config")
+            guard isWithinPathAnchor(config, pathAnchor: pathAnchor) else { return nil }
+            if fm.fileExists(atPath: config.path) {
                 return current
             }
             let parent = current.deletingLastPathComponent()
@@ -261,6 +286,15 @@ enum InstalledSkillsScanner {
             current = parent
         }
         return nil
+    }
+
+    private static func isWithinPathAnchor(_ url: URL, pathAnchor: URL?) -> Bool {
+        guard let pathAnchor else { return true }
+        // Keep the validated anchor fixed: resolving it anew could trust a redirected test root.
+        let anchor = pathAnchor.standardizedFileURL
+        guard anchor.resolvingSymlinksInPath().path == anchor.path,
+              (try? anchor.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true else { return false }
+        return relativePath(from: anchor, to: url.resolvingSymlinksInPath()) != nil
     }
 
     private static func normalize(_ s: String) -> String {

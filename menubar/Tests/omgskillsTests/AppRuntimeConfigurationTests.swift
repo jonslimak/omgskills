@@ -3,6 +3,88 @@ import Testing
 @testable import omgskills
 
 struct AppRuntimeConfigurationTests {
+    @Test func connectedInventoryRequiresCompleteLocalDebugConfiguration() throws {
+        let root = URL(fileURLWithPath: "/private/tmp/omgskills-f1-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root.appendingPathComponent("home"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let info = connectedInfo(root: root)
+        guard case .enabled(let configuration) = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: true) else {
+            Issue.record("Expected validated isolated connected configuration"); return
+        }
+        #expect(configuration.root == root.resolvingSymlinksInPath())
+        #expect(configuration.filesystemPaths == .isolated(testRoot: root.resolvingSymlinksInPath()))
+        #expect(configuration.connectURL.absoluteString == "http://127.0.0.1:5201/app/connect")
+        #expect(configuration.uploadURL.absoluteString == "http://127.0.0.1:8888/api/portal/sync-upload")
+        #expect(configuration.keychainService != DeviceCredentialStore.defaultService)
+        #expect(AppRuntimeConfiguration.connectedInventoryMode(info: [:], debugAllowed: false) == .disabled)
+        for key in ["OMGSkillsPortalConnectURL", "OMGSkillsSyncEndpoint", DeviceCredentialStore.serviceInfoKey,
+                    AppRuntimeConfiguration.catalogInstallEnabledKey, AppRuntimeConfiguration.f1RootKey] {
+            var missing = info
+            missing.removeValue(forKey: key)
+            guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: missing, debugAllowed: true) else {
+                Issue.record("Missing \(key) must fail closed"); continue
+            }
+        }
+        guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: false) else {
+            Issue.record("Release build cannot opt in"); return
+        }
+    }
+
+    @Test func connectedInventoryCannotUseProductStorageOrRemoteEndpoints() throws {
+        let root = URL(fileURLWithPath: "/private/tmp/omgskills-f1-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root.appendingPathComponent("home"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let invalidValues: [(String, Any)] = [
+            ("CFBundleIdentifier", "com.jonslimak.omgskills"),
+            (AppRuntimeConfiguration.connectedInventoryKey, "true"),
+            (DeviceCredentialStore.serviceInfoKey, DeviceCredentialStore.defaultService),
+            (DeviceCredentialStore.serviceInfoKey, "com.jonslimak.omgskills.inventory-test.another-run"),
+            (AppRuntimeConfiguration.f1WebsiteKey, "http://127.0.0.1:5201/other/"),
+            ("OMGSkillsPortalConnectURL", "https://omgskills.com/app/connect"),
+            ("OMGSkillsPortalConnectURL", "http://127.0.0.1:5202/app/connect"),
+            ("OMGSkillsPortalConnectURL", "http://127.0.0.1:5201/app/connect?callback=other"),
+            ("OMGSkillsSyncEndpoint", "https://omgskills.com/api/portal/sync-upload"),
+            ("OMGSkillsSyncEndpoint", "http://127.0.0.1:5201/api/portal/sync-upload"),
+            ("OMGSkillsSyncEndpoint", "http://127.0.0.1:8888/api/portal/sync-upload#secret"),
+            ("OMGSkillsSyncEndpoint", "http://user:secret@localhost:8888/api/portal/sync-upload"),
+            ("OMGSkillsSyncEndpoint", "http://localhost:8888/other")
+        ]
+        for (key, value) in invalidValues {
+            var info = connectedInfo(root: root)
+            info[key] = value
+            guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: info, debugAllowed: true) else {
+                Issue.record("Unsafe \(key) must fail closed"); continue
+            }
+        }
+        var disabled = connectedInfo(root: root)
+        disabled[AppRuntimeConfiguration.connectedInventoryKey] = false
+        #expect(AppRuntimeConfiguration.connectedInventoryMode(info: disabled, debugAllowed: true) == .disabled)
+    }
+
+    @Test func connectedInventoryRefusesRedirectedScanRoots() throws {
+        let root = URL(fileURLWithPath: "/private/tmp/omgskills-f1-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root.appendingPathComponent("home/.codex"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let outside = root.appendingPathComponent("outside")
+        try FileManager.default.createDirectory(at: outside, withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: root.appendingPathComponent("home/.codex/skills"), withDestinationURL: outside)
+        guard case .invalid = AppRuntimeConfiguration.connectedInventoryMode(info: connectedInfo(root: root), debugAllowed: true) else {
+            Issue.record("Redirected agent root must not scan another home"); return
+        }
+    }
+
+    private func connectedInfo(root: URL) -> [String: Any] {
+        ["CFBundleIdentifier": AppRuntimeConfiguration.f1BundleID,
+         "CFBundleURLTypes": [["CFBundleURLSchemes": ["omgskills-f1"]]],
+         AppRuntimeConfiguration.f1RootKey: root.path,
+         AppRuntimeConfiguration.f1WebsiteKey: "http://127.0.0.1:5201/app/",
+         AppRuntimeConfiguration.catalogInstallEnabledKey: true,
+         AppRuntimeConfiguration.connectedInventoryKey: true,
+         "OMGSkillsPortalConnectURL": "http://127.0.0.1:5201/app/connect",
+         "OMGSkillsSyncEndpoint": "http://127.0.0.1:8888/api/portal/sync-upload",
+         DeviceCredentialStore.serviceInfoKey: "com.jonslimak.omgskills.inventory-test.\(root.lastPathComponent.dropFirst("omgskills-f1-".count))"]
+    }
+
     @Test func bundledLibraryPreviewRequiresExplicitBooleanFlag() {
         #expect(!AppRuntimeConfiguration.usesBundledLibraryPreview(infoDictionary: [:]))
         #expect(!AppRuntimeConfiguration.usesBundledLibraryPreview(

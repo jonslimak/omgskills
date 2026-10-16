@@ -5,6 +5,34 @@ import Testing
 
 @MainActor
 struct CatalogInstallModelTests {
+    @Test func onlySuccessfulInstallationSchedulesOneInventoryReport() async {
+        for result: CatalogInstallService.Result in [.installed, .alreadyInstalled, .conflict, .needsGit, .unavailable, .failed("Fixture failure")] {
+            let service = FlowStub(installResult: result)
+            var reports = 0
+            let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), onInstalled: { reports += 1 })
+            model.receive(link())
+            await model.operation?.value
+            #expect(reports == 0)
+            model.install()
+            model.install()
+            await model.operation?.value
+            #expect(model.result == result)
+            #expect(reports == (result == .installed ? 1 : 0))
+            model.install()
+            #expect(reports == (result == .installed ? 1 : 0))
+        }
+    }
+
+    @Test func canceledApprovalNeverSchedulesInventory() async {
+        var reports = 0
+        let model = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator(), onInstalled: { reports += 1 })
+        model.receive(link())
+        await model.operation?.value
+        #expect(await model.close())
+        model.install()
+        #expect(reports == 0)
+    }
+
     @Test(arguments: ["claude", "codex"])
     func confirmationIsReadOnlyAndInstallRequiresOneExplicitApproval(_ agent: String) async throws {
         let service = FlowStub()

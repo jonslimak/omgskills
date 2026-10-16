@@ -5,6 +5,60 @@ enum AppRuntimeConfiguration {
     static let f1RootKey = "OMGSkillsF1Root"
     static let f1WebsiteKey = "OMGSkillsF1Website"
     static let catalogInstallEnabledKey = "OMGSkillsCatalogInstallEnabled"
+    static let connectedInventoryKey = "OMGSkillsConnectedInventoryTest"
+
+    struct ConnectedInventoryConfiguration: Equatable, Sendable {
+        let root: URL
+        let website: URL
+        let connectURL: URL
+        let uploadURL: URL
+        let keychainService: String
+        var filesystemPaths: SkillFilesystemPaths { .isolated(testRoot: root) }
+    }
+
+    enum ConnectedInventoryMode: Equatable, Sendable {
+        case disabled
+        case enabled(ConnectedInventoryConfiguration)
+        case invalid(String)
+    }
+
+    static func connectedInventoryMode(
+        info: [String: Any] = Bundle.main.infoDictionary ?? [:],
+        debugAllowed: Bool = buildAllowsF1
+    ) -> ConnectedInventoryMode {
+        guard let setting = info[connectedInventoryKey] else { return .disabled }
+        guard let enabled = setting as? Bool else { return .invalid("Invalid connected inventory test setting.") }
+        guard enabled else { return .disabled }
+        guard case .enabled(let root, let website) = catalogInstallMode(info: info, debugAllowed: debugAllowed),
+              isolatedInventoryRoots(root),
+              URLComponents(url: website, resolvingAgainstBaseURL: false)?.path == "/app/",
+              website.query == nil, website.fragment == nil,
+              let rawConnect = info[BrowserPairing.connectURLInfoKey] as? String,
+              let connect = URL(string: rawConnect), validLocalEndpoint(connect, path: "/app/connect"),
+              connect.scheme == website.scheme, connect.host == website.host, connect.port == website.port,
+              let rawUpload = info["OMGSkillsSyncEndpoint"] as? String,
+              let upload = URL(string: rawUpload), validLocalEndpoint(upload, path: "/api/portal/sync-upload"),
+              upload.port != website.port,
+              let service = info[DeviceCredentialStore.serviceInfoKey] as? String,
+              service == "com.jonslimak.omgskills.inventory-test." + root.lastPathComponent.dropFirst("omgskills-f1-".count) else {
+            return .invalid("Connected inventory requires isolated F1 storage, local endpoints and a test-only credential service.")
+        }
+        return .enabled(.init(root: root, website: website, connectURL: connect, uploadURL: upload, keychainService: service))
+    }
+
+    private static func isolatedInventoryRoots(_ root: URL) -> Bool {
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let home = paths.homeDirectory
+        return home.resolvingSymlinksInPath().path == home.path
+            && (try? home.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
+            && paths.allSkillsRoots.allSatisfy { $0.resolvingSymlinksInPath().path.hasPrefix(home.path + "/") }
+    }
+
+    private static func validLocalEndpoint(_ url: URL, path: String) -> Bool {
+        url.scheme == "http" && ["localhost", "127.0.0.1"].contains(url.host ?? "")
+            && url.port.map { (1...65535).contains($0) } == true && url.path == path
+            && url.user == nil && url.password == nil && url.query == nil && url.fragment == nil
+    }
 
     static func catalogInstallMode(
         info: [String: Any] = Bundle.main.infoDictionary ?? [:],

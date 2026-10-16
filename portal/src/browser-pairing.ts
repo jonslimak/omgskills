@@ -41,11 +41,36 @@ export function parseBrowserPairingRequest(hash: string): BrowserPairingRequest 
   return { state: states[0], codeChallenge: challenges[0], scopes };
 }
 
-export function browserPairingCancelUrl(state: string) {
+export function isBrowserPairingApproval(body: Record<string, unknown>) {
+  const keys = ["state", "codeChallenge", "codeChallengeMethod", "scopes"];
+  const scopes = body.scopes;
+  return Object.keys(body).length === keys.length && Object.keys(body).every(key => keys.includes(key))
+    && typeof body.state === "string" && OPAQUE_VALUE_PATTERN.test(body.state)
+    && typeof body.codeChallenge === "string" && OPAQUE_VALUE_PATTERN.test(body.codeChallenge)
+    && body.codeChallengeMethod === "S256" && Array.isArray(scopes)
+    && new Set(scopes).size === scopes.length
+    && scopes.every(scope => ALL_DEVICE_SCOPES.includes(scope))
+    && BASE_DEVICE_SCOPES.every(scope => scopes.includes(scope));
+}
+
+export const connectedInventoryDisclosure = "Share skill names, descriptions, agent, folder name, SKILL.md fingerprint and safe source information (repository and relative path), including skills installed outside OMGSkills. Fingerprints may identify skills. Full local paths and full skill files are not uploaded.";
+
+export function connectedPairingCallback(callback: string, state: string) {
+  const url = new URL(callback);
+  if (url.protocol !== "omgskills-f1:" || url.host !== "pair" || url.pathname || url.hash
+    || url.username || url.password || url.searchParams.get("state") !== state
+    || !OPAQUE_VALUE_PATTERN.test(state) || !/^pair_[A-Za-z0-9_-]{43}$/.test(url.searchParams.get("code") ?? "")
+    || [...url.searchParams.keys()].length !== 2) {
+    throw new Error("Invalid connected test pairing callback.");
+  }
+  return url.toString();
+}
+
+export function browserPairingCancelUrl(state: string, connectedInventory = false) {
   if (!OPAQUE_VALUE_PATTERN.test(state)) {
     throw new Error("Invalid browser pairing state");
   }
-  const callback = new URL("omgskills://pair");
+  const callback = new URL(connectedInventory ? "omgskills-f1://pair" : "omgskills://pair");
   callback.searchParams.set("error", "access_denied");
   callback.searchParams.set("state", state);
   return callback.toString();

@@ -87,7 +87,7 @@ enum SkillInstallProvenanceStore {
         return true
     }
 
-    private static func managedMetadataURL(for installationURL: URL) -> URL? {
+    static func managedMetadataURL(for installationURL: URL) -> URL? {
         guard let destination = try? FileManager.default.destinationOfSymbolicLink(
             atPath: installationURL.path
         ) else { return nil }

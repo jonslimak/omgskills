@@ -20,9 +20,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private let setupTestMode = SetupTestRuntime.mode()
     private let catalogInstallMode = AppRuntimeConfiguration.catalogInstallMode()
     private let catalogCandidateMode = CatalogCandidateRuntime.mode()
+    private let connectedInventoryMode = AppRuntimeConfiguration.connectedInventoryMode()
     #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
     private var catalogInstallController: CatalogInstallWindowController?
     private var pendingCatalogInstallURL: URL?
+    private var pendingConnectedURLs: [URL] = []
     #endif
     #if OMGSKILLS_CATALOG_CANDIDATE
     private var catalogCandidateUpdater: CatalogCandidateUpdater?
@@ -89,6 +91,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        switch connectedInventoryMode {
+        case .invalid(let reason):
+            let alert = NSAlert()
+            alert.messageText = "Cannot start connected inventory test"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        case .enabled(let configuration):
+            #if DEBUG
+            do {
+                let controller = try CatalogInstallWindowController(root: configuration.root,
+                    website: configuration.website, coordinator: updateInstallCoordinator, connected: configuration)
+                catalogInstallController = controller
+                pendingConnectedURLs.forEach(controller.receive)
+                pendingConnectedURLs.removeAll()
+            } catch {
+                let alert = NSAlert()
+                alert.messageText = "Cannot start connected inventory test"
+                alert.informativeText = error.localizedDescription
+                alert.runModal()
+                NSApp.terminate(nil)
+            }
+            #endif
+            return
+        case .disabled: break
+        }
         switch catalogCandidateMode {
         case .invalid(let reason):
             let alert = NSAlert()
@@ -265,6 +294,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             guard catalogInstallController.model.canClose else { return .terminateCancel }
             Task {
                 let closed = await catalogInstallController.model.close()
+                if closed { await catalogInstallController.stopReporting() }
                 sender.reply(toApplicationShouldTerminate: closed)
             }
             return .terminateLater
@@ -289,6 +319,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        if connectedInventoryMode != .disabled {
+            #if DEBUG
+            if case .enabled = connectedInventoryMode {
+                if let catalogInstallController { urls.forEach(catalogInstallController.receive) }
+                else { pendingConnectedURLs.append(contentsOf: urls) }
+            }
+            #endif
+            return
+        }
         if catalogCandidateMode != .disabled {
             #if OMGSKILLS_CATALOG_CANDIDATE
             if case .enabled = catalogCandidateMode, let url = urls.first {

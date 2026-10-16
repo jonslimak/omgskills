@@ -1,5 +1,22 @@
 import { isPortalRead as isIntegrationRead } from "./src/portal-read-policy";
+import { isBrowserPairingApproval } from "./src/browser-pairing";
+import { connectedInventoryTestEnabled } from "./src/connected-inventory-test";
 export { isIntegrationRead };
+
+export function connectedInventoryServerEnabled(command: string, env: Record<string, string | undefined>) {
+  return connectedInventoryTestEnabled({
+    enabled: env.VITE_NEWMAC_CONNECTED_INVENTORY_TEST,
+    development: command === "serve" && env.NODE_ENV !== "production",
+    integration: env.VITE_PORTAL_INTEGRATION,
+    ready: Boolean(testBackendOrigin(env)),
+    publishableKey: env.VITE_CLERK_PUBLISHABLE_KEY,
+    webEnabled: env.VITE_SKILLGROUPS_WEB_ENABLED,
+    catalogInstall: env.VITE_NEWMAC_CATALOG_INSTALL_TEST,
+    legacyInstall: env.VITE_NEWMAC_WEB_INSTALL_TEST,
+    preview: env.VITE_PORTAL_PREVIEW,
+    hostname: "127.0.0.1", protocol: "http:",
+  });
+}
 
 // This is an explicit operator attestation, not proof that a database is isolated.
 // Verify the backend's Clerk instance and resolved DB before setting it to 1.
@@ -24,9 +41,9 @@ export function testBackendOrigin(env: Record<string, string | undefined>) {
   }
 }
 
-export function isIntegrationRequest(path: string, method = "GET") {
+export function isIntegrationRequest(path: string, method = "GET", connectedInventory = false) {
   const verb = method.toUpperCase();
-  return isIntegrationRead(path, method) ||
+  return isIntegrationRead(path, method, connectedInventory) ||
     (path === "/api/portal/private-sources" && verb === "POST") ||
     (/^\/api\/portal\/private-sources\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/releases$/i.test(path) && verb === "POST") ||
     (["/api/portal/sync-pairing-code", "/api/portal/sync-token"].includes(path) && verb === "POST") ||
@@ -39,9 +56,9 @@ export function isIntegrationRequest(path: string, method = "GET") {
     (/^\/api\/portal\/groups\/[a-zA-Z0-9_-]+\/allowed-emails$/.test(path) && ["POST", "DELETE"].includes(verb));
 }
 
-// Connection generation accepts no scopes/callback data. Exchange and uploads stay blocked.
-export function isIntegrationBody(path: string, method: string, body: unknown) {
-  if (!isIntegrationRequest(path, method)) return false;
+// PKCE approval is opt-in; arbitrary callbacks, exchanges and uploads stay blocked.
+export function isIntegrationBody(path: string, method: string, body: unknown, connectedInventory = false) {
+  if (!isIntegrationRequest(path, method, connectedInventory)) return false;
   if (path.startsWith("/api/portal/private-sources/") && path.endsWith("/releases")) return body === undefined;
   if (method === "GET" || (method === "DELETE" && !path.endsWith("/items") && !path.endsWith("/allowed-emails"))) return body === undefined;
   if (!body || typeof body !== "object" || Array.isArray(body)) return false;
@@ -50,7 +67,8 @@ export function isIntegrationBody(path: string, method: string, body: unknown) {
   if (path === "/api/portal/private-sources") return only(["installationId", "repositoryId", "root"])
     && [value.installationId, value.repositoryId].every((id) => typeof id === "string" && /^[1-9][0-9]{0,99}$/.test(id))
     && typeof value.root === "string" && value.root.length > 0 && value.root.length <= 1000;
-  if (["/api/portal/sync-pairing-code", "/api/portal/sync-token"].includes(path)) return only([]);
+  if (path === "/api/portal/sync-pairing-code") return only([]) || (connectedInventory && isBrowserPairingApproval(value));
+  if (path === "/api/portal/sync-token") return only([]);
   if (path === "/api/portal/profile") return only(["handle", "profilePublished"]);
   const ids = (items: unknown) => Array.isArray(items) && items.every((id) => typeof id === "string" && /^[a-zA-Z0-9_-]+$/.test(id)) && new Set(items).size === items.length;
   if (path.endsWith("/allowed-emails")) return method === "POST"

@@ -1,4 +1,12 @@
 export type SyncedSkill = {
+  inventoryVersion?: 2;
+  deviceId?: string | null;
+  deviceName?: string | null;
+  deviceStatus?: "active" | "revoked" | "expired" | "inactive" | null;
+  lastReportedAt?: string | null;
+  installationFolder?: string | null;
+  gitRelativePath?: string | null;
+  catalogSkillIdHint?: string | null;
   id: string;
   name: string;
   description: string | null;
@@ -90,10 +98,16 @@ function chooseRepresentativeSkill(skills: SyncedSkill[]) {
 }
 
 export function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
+  const physicalGroups: SyncedSkill[][] = [];
   const catalogGroups = new Map<string, SyncedSkill[]>();
   const unresolvedSkills: SyncedSkill[] = [];
 
   for (const skill of skills) {
+    // Presence rows are physical installations, not fuzzy account-wide identities.
+    if (skill.inventoryVersion === 2 || skill.deviceId != null) {
+      physicalGroups.push([skill]);
+      continue;
+    }
     const catalogSkillId = skill.catalogSkillId?.trim();
     if (catalogSkillId) {
       const group = catalogGroups.get(catalogSkillId) ?? [];
@@ -125,7 +139,7 @@ export function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
     }
   }
 
-  return [...catalogGroups.values(), ...unresolvedGroups]
+  return [...physicalGroups, ...catalogGroups.values(), ...unresolvedGroups]
     .map((group) => {
       const representative = chooseRepresentativeSkill(group);
       const bestDescription =

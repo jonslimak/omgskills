@@ -46,6 +46,8 @@ import { SkillActions } from "@/groups/SkillActions";
 import { listOwnedGroups, listSharedGroups } from "@/groups/api";
 import type { SkillGroup } from "@/groups/types";
 import { usePortalApi } from "@/portal-api";
+import { connectedInventoryTest } from "./connected-inventory-runtime";
+import { connectedPairingCallback, connectedInventoryDisclosure } from "./browser-pairing";
 import { PrivateSourcesPanel } from "@/private-sources/PrivateSourcesPanel";
 import { isFeatureEnabled, portalSurface } from "@/feature-flags";
 import "./styles.css";
@@ -784,7 +786,7 @@ function ConnectPage() {
         }
       );
       setStatus("Returning to omgskills...");
-      window.location.assign(result.callbackUrl);
+      window.location.assign(connectedInventoryTest ? connectedPairingCallback(result.callbackUrl, request.state) : result.callbackUrl);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to approve connection");
       setIsApproving(false);
@@ -793,7 +795,7 @@ function ConnectPage() {
 
   function cancel() {
     if (!request) return;
-    window.location.assign(browserPairingCancelUrl(request.state));
+    window.location.assign(browserPairingCancelUrl(request.state, connectedInventoryTest));
   }
 
   return (
@@ -802,6 +804,7 @@ function ConnectPage() {
         <p className="eyebrow">omgskills</p>
         <h1>Connect this Mac?</h1>
         <p>The app will be able to sync installed skill metadata to your account.</p>
+        {connectedInventoryTest && <p>{connectedInventoryDisclosure}</p>}
         <div className="connect-permission">
           <strong>Access</strong>
           <span>Sync installed skills</span>

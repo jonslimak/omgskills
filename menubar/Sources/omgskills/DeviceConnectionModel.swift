@@ -42,6 +42,7 @@ final class DeviceConnectionModel {
     @ObservationIgnored private let browserAuthorizer: (any BrowserPairingAuthorizing)?
     @ObservationIgnored private let pairingRequestGenerator: any BrowserPairingRequestGenerating
     @ObservationIgnored private let portalConnectURL: URL
+    @ObservationIgnored private let callbackScheme: String
     @ObservationIgnored private let updateCoordinator: UpdateInstallCoordinator?
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var activeAttemptID: UUID?
@@ -56,6 +57,7 @@ final class DeviceConnectionModel {
         browserAuthorizer: (any BrowserPairingAuthorizing)? = nil,
         pairingRequestGenerator: any BrowserPairingRequestGenerating = SystemBrowserPairingRequestGenerator(),
         portalConnectURL: URL = BrowserPairing.configuredConnectURL(),
+        callbackScheme: String = BrowserPairing.callbackScheme,
         updateCoordinator: UpdateInstallCoordinator? = nil,
         inventoryScanner: InventoryScanner? = nil
     ) {
@@ -64,6 +66,7 @@ final class DeviceConnectionModel {
         self.browserAuthorizer = browserAuthorizer
         self.pairingRequestGenerator = pairingRequestGenerator
         self.portalConnectURL = portalConnectURL
+        self.callbackScheme = callbackScheme
         self.updateCoordinator = updateCoordinator
         self.inventoryScanner = inventoryScanner
     }
@@ -246,6 +249,12 @@ final class DeviceConnectionModel {
         }
     }
 
+    func cancelAndAwaitCurrentOperation() async {
+        let pending = activeTask
+        cancelCurrentOperation()
+        await pending?.value
+    }
+
     private func performConnect(
         pairingCode: String,
         codeVerifier: String?,
@@ -272,7 +281,7 @@ final class DeviceConnectionModel {
             )
             exchanged = record
             guard isCurrent(attemptID) else {
-                try? await api.revoke(credential: record.credential)
+                await cleanup(record, credentialStored: false)
                 return
             }
 
@@ -280,13 +289,13 @@ final class DeviceConnectionModel {
             do {
                 try await credentialStore.save(record, replacingExisting: replacingExisting)
             } catch DeviceCredentialStoreError.replacementRequired {
-                try? await api.revoke(credential: record.credential)
+                await cleanup(record, credentialStored: false)
                 guard isCurrent(attemptID) else { return }
                 state = .failed(.replacementRequired)
                 finish(attemptID)
                 return
             } catch {
-                try? await api.revoke(credential: record.credential)
+                await cleanup(record, credentialStored: false)
                 guard isCurrent(attemptID) else { return }
                 state = .failed(.credentialStorage)
                 finish(attemptID)
@@ -372,10 +381,10 @@ final class DeviceConnectionModel {
             )
             let callbackURL = try await browserAuthorizer.authorize(
                 url: authorizationURL,
-                callbackScheme: BrowserPairing.callbackScheme
+                callbackScheme: callbackScheme
             )
             guard isCurrent(attemptID) else { return }
-            switch try BrowserPairing.parseCallback(callbackURL, expectedState: request.state) {
+            switch try BrowserPairing.parseCallback(callbackURL, expectedState: request.state, callbackScheme: callbackScheme) {
             case .cancelled:
                 state = neutralState()
                 finish(attemptID)
@@ -473,10 +482,14 @@ final class DeviceConnectionModel {
         _ record: StoredDeviceCredential,
         credentialStored: Bool
     ) async {
-        if credentialStored {
-            try? await credentialStore.delete(deviceID: record.connection.deviceID)
+        // Cleanup must outlive cancellation; URLSession otherwise cancels the revocation immediately.
+        let cleanup = Task { [credentialStore, api] in
+            if credentialStored {
+                try? await credentialStore.delete(deviceID: record.connection.deviceID)
+            }
+            try? await api.revoke(credential: record.credential)
         }
-        try? await api.revoke(credential: record.credential)
+        await cleanup.value
     }
 
     private func isCurrent(_ attemptID: UUID) -> Bool {

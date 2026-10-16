@@ -33,19 +33,23 @@ final class CatalogInstallModel {
     private(set) var notice = ""
     private(set) var appUpdateActive = false
     let client: CatalogInstallRequest.Client
+    let appName: String
+    @ObservationIgnored var onInstalled: @MainActor () -> Void
     @ObservationIgnored private let service: any CatalogInstallFlowServing
     @ObservationIgnored private let coordinator: UpdateInstallCoordinator
     @ObservationIgnored private var activity: UpdateInstallCoordinator.ActivityToken?
     @ObservationIgnored private var operationID: UUID?
     @ObservationIgnored private(set) var operation: Task<Void, Never>?
 
-    init(service: any CatalogInstallFlowServing, coordinator: UpdateInstallCoordinator, client: CatalogInstallRequest.Client = .f1) {
+    init(service: any CatalogInstallFlowServing, coordinator: UpdateInstallCoordinator, client: CatalogInstallRequest.Client = .f1,
+         appName: String? = nil, onInstalled: @escaping @MainActor () -> Void = {}) {
         self.service = service
         self.coordinator = coordinator
         self.client = client
+        self.appName = appName ?? (client == .product ? "OMGSkills Candidate" : "OMGSkills F1 Test")
+        self.onInstalled = onInstalled
     }
 
-    var appName: String { client == .product ? "OMGSkills Candidate" : "OMGSkills F1 Test" }
     var canCheckForAppUpdates: Bool { !ownsRequest && !appUpdateActive && !coordinator.isBusy && !appReplacementBlocksRequest }
 
     func beginAppUpdate() -> Bool {
@@ -170,6 +174,7 @@ final class CatalogInstallModel {
                 let installed = await service.install(current, target: incoming.target)
                 guard operationID == id else { return }
                 finish(installed)
+                if installed == .installed { onInstalled() }
             } catch {
                 guard isCurrent(id) else { return }
                 finish(.unavailable, message: Self.fetchFailureMessage(error))
