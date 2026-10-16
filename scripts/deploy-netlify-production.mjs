@@ -194,6 +194,7 @@ function verificationCommands({
         PRODUCTION_ORIGIN: origin,
         PUBLIC_ORIGIN: publicOrigin,
         VERIFY_CANDIDATE_FEATURES: verifyCandidateFeatures ? "1" : "0",
+        VERIFY_CATALOG_SEARCH: "1",
       },
     },
     {

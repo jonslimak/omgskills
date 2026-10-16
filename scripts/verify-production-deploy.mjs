@@ -101,6 +101,7 @@ export async function verifyProductionDeploy({
   expectedFeatures,
   expectedHelperRelease,
   verifyCandidateFeatures = process.env.VERIFY_CANDIDATE_FEATURES !== "0",
+  verifyCatalogSearch = verifyCandidateFeatures || process.env.VERIFY_CATALOG_SEARCH === "1",
 } = {}) {
   origin = origin.replace(/\/$/, "");
   publicOrigin = publicOrigin.replace(/\/$/, "");
@@ -162,7 +163,7 @@ export async function verifyProductionDeploy({
   }
 
   await verifyAiCatalog(fetchImpl, origin, publicOrigin);
-  await verifyMcpEndpoint({ origin, fetchImpl, requireCatalogSearch: verifyCandidateFeatures && reviewedFeatures.catalogSearchEnabled === true });
+  await verifyMcpEndpoint({ origin, fetchImpl, requireCatalogSearch: verifyCatalogSearch && reviewedFeatures.catalogSearchEnabled === true });
 
   console.log("Production deploy verified");
 }

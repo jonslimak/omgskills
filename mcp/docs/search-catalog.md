@@ -1,8 +1,14 @@
 # Compact Search Catalog (Candidate)
 
-This reader is implemented behind a reviewed, disabled production feature. It
-does not add a public endpoint or migrate the native installer. Current production
-configuration still selects the legacy reader and app behavior.
+This reader is implemented behind a reviewed production feature. It does not add
+a public endpoint or migrate the native installer. The separate activation
+candidate enables it for review; main and the live site remain feature-off until
+an explicitly approved merge and guarded production deployment.
+
+The 2026-10-16 signed-out real-data preview passed user acceptance. Its temporary
+preview page and authentication bypass are not included in the activation branch.
+Activation changes the shared app/API feature flag, not login settings, source
+catalog records, native installers or database schemas.
 
 ## Data
 
@@ -143,7 +149,7 @@ const loader = createCompactMcpLibraryLoader({ ranking: true });
 const handler = createCompactMcpHandler(loader, { paging: true, ranking: true });
 ```
 
-With current configuration, the production export and package entries still
+With the production feature disabled, the production export and package entries
 select neither capability. Only a handler configured for both advertises `ranking: "web-v1"`
 on `search_skills`. Omitted ranking preserves slice-2 behavior, including scores,
 matching, filters and all nonranked list tools. Check advertised support before
@@ -204,10 +210,10 @@ costs. The nine real-ID expectations and original cost budgets are fixed; a
 failure is a stop point, not a reason to weaken the check. Top-result review and
 hosted measurements remain separate from agreement with a reference scorer.
 
-## App Integration (Disabled)
+## App Integration (Feature-Gated)
 
-`config/production-features.json` contains `catalogSearchEnabled: false`. One
-shared strict validator controls the deployed handler and the portal build's
+`config/production-features.json` controls `catalogSearchEnabled`. One shared
+strict validator controls the deployed handler and the portal build's
 `VITE_CATALOG_SEARCH_ENABLED` value. Ambient environment variables cannot turn
 either side on independently. The Mac release-config response is unchanged.
 
@@ -287,6 +293,13 @@ When enabled it requires compact, ranking-ready Crawl4 health and verifies two
 pages under all six search sorts. Static closure verification is separate from
 API activation and hosted timing. Observe an actual cold load before making a
 cold-start claim; capability discovery can itself warm the function.
+
+The guarded deploy helper sets `VERIFY_CATALOG_SEARCH=1` for both its fresh draft
+and production checks. This keeps public catalog activation verification enabled
+when draft-only account/helper checks are skipped. An inactive reader, missing
+ranking/paging, or inconsistent page chain must stop publication before `--prod`.
+Historical feature-off verification may explicitly use `verifyCatalogSearch:
+false` (or omit the environment override with candidate verification disabled).
 
 Rollback keeps additive assets and extension-aware writers, and restores the
 reviewed feature-off app/API through the normal combined deployment. Never

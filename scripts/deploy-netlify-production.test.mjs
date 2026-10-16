@@ -147,6 +147,12 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   );
   assert.equal(previewCheck.env.PUBLIC_ORIGIN, "https://omgskills.com");
   assert.equal(previewCheck.env.VERIFY_CANDIDATE_FEATURES, "0");
+  assert.equal(previewCheck.env.VERIFY_CATALOG_SEARCH, "1");
+  const productionCheck = harness.calls.find(
+    (call) => call.key?.includes("verify-production-deploy.mjs")
+      && call.env.PRODUCTION_ORIGIN === "https://omgskills.com",
+  );
+  assert.equal(productionCheck.env.VERIFY_CATALOG_SEARCH, "1");
   assert.equal(
     harness.calls
       .filter((call) => call.key?.includes("verify-live-manifest.mjs"))
@@ -165,6 +171,7 @@ test("draft verification failure stops before production changes", async () => {
   const deployCalls = harness.calls.filter((call) => call.key?.includes("netlify-cli deploy"));
   assert.equal(deployCalls.length, 1);
   assert.equal(deployCalls[0].key.includes("--prod"), false);
+  assert.equal(harness.calls.find((call) => call.key?.includes("verify-production-deploy.mjs")).env.VERIFY_CATALOG_SEARCH, "1");
   assert.equal(
     harness.calls.some((call) => call.path?.endsWith("/restore")),
     false,

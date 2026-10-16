@@ -44,7 +44,9 @@ function responseFor(path, options = {}, features = disabledFeatures) {
     return Response.json({ error: "Group not found" }, { status: 404 });
   }
   if (path === "/mcp/health") {
-    return Response.json({ ok: true, skillCount: 46_000 });
+    return Response.json({ ok: true, skillCount: 46_000, ...(features.catalogSearchEnabled ? {
+      sourceTrack: "crawl4", catalog: { mode: "compact", rankingBytes: 100 },
+    } : {}) });
   }
   if (path === "/.well-known/ai-catalog.json") {
     return Response.json(
@@ -72,9 +74,22 @@ function responseFor(path, options = {}, features = disabledFeatures) {
         id: request.id,
         result: {
           tools: ["search_skills", "get_skill", "get_skills", "list_trending", "list_gold_basket", "list_by_author"]
-            .map((name) => ({ name, annotations }))
+            .map((name) => ({ name, annotations, ...(features.catalogSearchEnabled ? {
+              inputSchema: { properties: {
+                page: { type: "object" },
+                ...(name === "search_skills" ? { ranking: { const: "web-v1" } } : {}),
+              } },
+            } : {}) }))
         }
       });
+    }
+    const args = request.params?.arguments;
+    if (features.catalogSearchEnabled && args?.page) {
+      const next = Boolean(args.page.cursor);
+      return Response.json({ jsonrpc: "2.0", id: request.id, result: { structuredContent: {
+        count: 1, skills: [{ id: next ? "author/repo:second" : "author/repo:first" }],
+        page: { total: 2, hasMore: !next, nextCursor: next ? null : "next", sort: args.sort, snapshot: "a".repeat(64) },
+      } } });
     }
     return Response.json({
       jsonrpc: "2.0",
@@ -164,6 +179,104 @@ test("verifies a draft origin while preserving canonical public URLs", async () 
   });
 
   assert.deepEqual(new Set(requestedOrigins), new Set([previewOrigin]));
+});
+
+test("active search draft verification cannot accept a legacy reader", async () => {
+  await assert.rejects(verifyProductionDeploy({
+    origin,
+    expectedFeatures: { ...disabledFeatures, catalogSearchEnabled: true },
+    expectedHelperRelease: disabledHelper,
+    verifyCandidateFeatures: false,
+    verifyCatalogSearch: true,
+    fetchImpl: async (url, options) => responseFor(new URL(url).pathname, options),
+  }), /not using the ready ranked compact catalog/);
+});
+
+test("active search draft verification checks all sorts and both pages without account probes", async () => {
+  const features = { ...disabledFeatures, catalogSearchEnabled: true };
+  const requests = [];
+  const pages = [];
+  await verifyProductionDeploy({
+    origin,
+    expectedFeatures: features,
+    expectedHelperRelease: disabledHelper,
+    verifyCandidateFeatures: false,
+    verifyCatalogSearch: true,
+    fetchImpl: async (url, options) => {
+      const path = new URL(url).pathname;
+      requests.push(path);
+      if (path === "/mcp") {
+        const args = JSON.parse(options.body).params?.arguments;
+        if (args?.page) pages.push([args.sort, Boolean(args.page.cursor)]);
+      }
+      return responseFor(path, options, features);
+    },
+  });
+  assert.deepEqual(pages, ["relevance", "trending", "stars", "updated", "added", "name"].flatMap(sort => [[sort, false], [sort, true]]));
+  assert.equal(requests.some(path => path.startsWith("/u/") || path.startsWith("/api/public/")), false);
+});
+
+test("active search draft verification rejects unavailable ranking, capabilities and inconsistent pages", async () => {
+  const features = { ...disabledFeatures, catalogSearchEnabled: true };
+  for (const fault of ["full", "ranking", "track", "capability", "duplicate", "snapshot"]) {
+    await assert.rejects(verifyProductionDeploy({
+      origin,
+      expectedFeatures: features,
+      expectedHelperRelease: disabledHelper,
+      verifyCandidateFeatures: false,
+      verifyCatalogSearch: true,
+      fetchImpl: async (url, options) => {
+        const path = new URL(url).pathname;
+        const response = responseFor(path, options, features);
+        if (path !== "/mcp/health" && path !== "/mcp") return response;
+        const body = await response.json();
+        if (path === "/mcp/health") {
+          if (fault === "full") body.catalog.mode = "full";
+          if (fault === "ranking") body.catalog.rankingBytes = 0;
+          if (fault === "track") body.sourceTrack = "v2";
+        } else {
+          const rpc = JSON.parse(options.body);
+          if (fault === "capability" && rpc.method === "tools/list") delete body.result.tools[0].inputSchema.properties.page;
+          if (rpc.params?.arguments?.page?.cursor) {
+            if (fault === "duplicate") body.result.structuredContent.skills[0].id = "author/repo:first";
+            if (fault === "snapshot") body.result.structuredContent.page.snapshot = "b".repeat(64);
+          }
+        }
+        return Response.json(body);
+      },
+    }), /ready ranked compact catalog|advertised search upgrade|inconsistent ranked page chain/, fault);
+  }
+});
+
+test("historical verification can explicitly check feature-off search", async () => {
+  await verifyProductionDeploy({
+    origin,
+    expectedFeatures: { ...disabledFeatures, catalogSearchEnabled: true },
+    expectedHelperRelease: disabledHelper,
+    verifyCandidateFeatures: false,
+    verifyCatalogSearch: false,
+    fetchImpl: async (url, options) => responseFor(new URL(url).pathname, options),
+  });
+});
+
+test("the deploy helper's search override enforces the reviewed flag independently", async (t) => {
+  const previous = process.env.VERIFY_CATALOG_SEARCH;
+  t.after(() => {
+    if (previous === undefined) delete process.env.VERIFY_CATALOG_SEARCH;
+    else process.env.VERIFY_CATALOG_SEARCH = previous;
+  });
+  process.env.VERIFY_CATALOG_SEARCH = "1";
+  const options = {
+    origin,
+    expectedFeatures: disabledFeatures,
+    expectedHelperRelease: disabledHelper,
+    verifyCandidateFeatures: false,
+    fetchImpl: async (url, request) => responseFor(new URL(url).pathname, request),
+  };
+  await verifyProductionDeploy(options);
+  const active = { ...options, expectedFeatures: { ...disabledFeatures, catalogSearchEnabled: true } };
+  await assert.rejects(verifyProductionDeploy(active), /not using the ready ranked compact catalog/);
+  await verifyProductionDeploy({ ...active, verifyCatalogSearch: false });
 });
 
 test("fails when a required release asset is missing", async () => {
