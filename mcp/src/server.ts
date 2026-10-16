@@ -1,7 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import type { SkillResult } from "./library.js";
+import type { SearchOptions, SkillResult } from "./library.js";
 import type { CatalogReader } from "./catalog-reader.js";
+import { catalogSorts, PagingError, type PageOptions, type SkillPage } from "./paging.js";
 
 const toolAnnotations = {
   readOnlyHint: true,
@@ -44,13 +45,34 @@ const skillListOutputSchema = z.object({
   count: z.number().int().nonnegative(),
   skills: z.array(skillResultSchema)
 });
+const pageSchema = z.object({ total: z.number().int().nonnegative(), hasMore: z.boolean(), nextCursor: z.string().nullable(),
+  snapshot: z.string().regex(/^[a-f0-9]{64}$/), sort: z.enum(catalogSorts) });
+const pagedListOutputSchema = skillListOutputSchema.extend({ page: pageSchema.optional() });
+function withPaging<T extends z.AnyZodObject>(schema: T, sorting: boolean) {
+  // Retain legacy unknown-key behavior, but reject unknown keys in paged callbacks.
+  return schema.extend({ page: z.object({ cursor: z.string().optional() }).strict().optional()
+    .describe("Opt into snapshot-bound paging: {} first, then {cursor: previous page.nextCursor} with unchanged arguments."),
+    ...(sorting ? { sort: z.enum(catalogSorts).optional().describe("Sort matching skills. Requires page; defaults to existing relevance order.") } : {}) }).passthrough();
+}
+const searchInput = z.object({
+  query: z.string().default("").describe("Keywords to match against skill names, IDs, authors, tags, descriptions, and repository URLs."),
+  limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return."),
+  author: z.string().optional().describe("Exact GitHub author handle, matched case-insensitively."),
+  tag: z.string().optional().describe("Exact catalog tag, matched case-insensitively."),
+  minStars: z.number().int().min(0).optional().describe("Minimum GitHub repository star count.")
+});
+const authorInput = z.object({
+  author: z.string().min(1).describe("GitHub author handle, matched case-insensitively."),
+  limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return.")
+});
+const trendingInput = z.object({ limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return.") });
 
 const skillOutputSchema = z.object({
   found: z.boolean(),
   skill: skillResultSchema.nullable()
 });
 
-export function createOmgskillsServer(library: CatalogReader): McpServer {
+export function createOmgskillsServer(library: CatalogReader, options: { paging?: boolean } = {}): McpServer {
   const server = new McpServer(
     {
       name: "omgskills",
@@ -71,18 +93,16 @@ export function createOmgskillsServer(library: CatalogReader): McpServer {
     {
       title: "Search skills",
       description: "Search the omgskills catalog by keyword with optional filters. Only records with pinned_install can be installed reproducibly; discovery_only records must not be installed from a mutable branch.",
-      inputSchema: {
-        query: z.string().default("").describe("Keywords to match against skill names, IDs, authors, tags, descriptions, and repository URLs."),
-        limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return."),
-        author: z.string().optional().describe("Exact GitHub author handle, matched case-insensitively."),
-        tag: z.string().optional().describe("Exact catalog tag, matched case-insensitively."),
-        minStars: z.number().int().min(0).optional().describe("Minimum GitHub repository star count.")
-      },
-      outputSchema: skillListOutputSchema,
+      inputSchema: options.paging ? withPaging(searchInput, true) : searchInput,
+      outputSchema: options.paging ? pagedListOutputSchema : skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ query, limit, author, tag, minStars }) =>
-      skillListResult(await library.searchSkills({ query, limit, author, tag, minStars }))
+    async (args: z.infer<typeof searchInput> & Partial<PageOptions>) => options.paging && usesPaging(args)
+      ? pagedResult(args, ["query", "limit", "author", "tag", "minStars", "sort", "page"], () => {
+        if (!library.searchPage) throw new PagingError("paging_not_supported");
+        return library.searchPage(args as SearchOptions & PageOptions);
+      })
+      : skillListResult(await library.searchSkills(args as SearchOptions))
   );
 
   server.registerTool(
@@ -123,13 +143,16 @@ export function createOmgskillsServer(library: CatalogReader): McpServer {
     {
       title: "List trending skills",
       description: "List skills ordered by the current omgskills trending ranking.",
-      inputSchema: {
-        limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return.")
-      },
-      outputSchema: skillListOutputSchema,
+      inputSchema: options.paging ? withPaging(trendingInput, false) : trendingInput,
+      outputSchema: options.paging ? pagedListOutputSchema : skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ limit }) => skillListResult(await library.listTrending(limit))
+    async (args: z.infer<typeof trendingInput> & Partial<PageOptions>) => options.paging && usesPaging(args)
+      ? pagedResult(args, ["limit", "page"], () => {
+        if (!library.listTrendingPage) throw new PagingError("paging_not_supported");
+        return library.listTrendingPage(args as PageOptions);
+      })
+      : skillListResult(await library.listTrending(args.limit))
   );
 
   server.registerTool(
@@ -151,17 +174,31 @@ export function createOmgskillsServer(library: CatalogReader): McpServer {
     {
       title: "List skills by author",
       description: "List skills published by an exact GitHub author handle in the omgskills catalog.",
-      inputSchema: {
-        author: z.string().min(1).describe("GitHub author handle, matched case-insensitively."),
-        limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return.")
-      },
-      outputSchema: skillListOutputSchema,
+      inputSchema: options.paging ? withPaging(authorInput, true) : authorInput,
+      outputSchema: options.paging ? pagedListOutputSchema : skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ author, limit }) => skillListResult(await library.listByAuthor(author, limit))
+    async (args: z.infer<typeof authorInput> & Partial<PageOptions>) => options.paging && usesPaging(args)
+      ? pagedResult(args, ["author", "limit", "sort", "page"], () => {
+        if (!library.listByAuthorPage) throw new PagingError("paging_not_supported");
+        return library.listByAuthorPage(args.author, args as PageOptions);
+      })
+      : skillListResult(await library.listByAuthor(args.author, args.limit))
   );
 
   return server;
+}
+
+function usesPaging(args: object) { return "page" in args || "sort" in args; }
+async function pagedResult(args: object, keys: string[], read: () => SkillPage | Promise<SkillPage>) {
+  try {
+    if (!("page" in args) || Object.keys(args).some(key => !keys.includes(key))) throw new PagingError("invalid_cursor");
+    const value = await read(), skills = value.skills.map(publicSkill);
+    return result({ count: skills.length, skills, page: value.page }, { count: skills.length, skills, page: value.page });
+  } catch (error) {
+    const safe = error instanceof PagingError ? error : new PagingError("catalog_unavailable");
+    return { isError: true, content: [{ type: "text" as const, text: JSON.stringify({ error: { code: safe.code, message: safe.message } }) }] };
+  }
 }
 
 function skillListResult(skills: SkillResult[]) {

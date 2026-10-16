@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
+import { compareOptional, compareText, dateKey, nameKey, pageInfo, PagingError, preparePage, validCount,
+  type CatalogSort, type PageOptions, type PagedSearchOptions, type SkillPage } from "./paging.js";
 
 export type Skill = {
   id: string;
@@ -176,9 +178,15 @@ export class OmgskillsLibrary {
   }
 
   searchSkills(options: SearchOptions): SkillResult[] {
+    return this.matches(options)
+      .sort(compareRelevance)
+      .slice(0, clampLimit(options.limit))
+      .map(({ entry, score }) => this.enrich(entry.skill, score));
+  }
+
+  private matches(options: SearchOptions): { entry: SearchEntry; score: number }[] {
     const query = normalize(options.query);
     const terms = query.split(" ").filter(Boolean);
-    const limit = clampLimit(options.limit);
     const author = options.author ? normalize(options.author) : undefined;
     const tag = options.tag ? normalize(options.tag) : undefined;
     const minStars = options.minStars ?? 0;
@@ -197,11 +205,55 @@ export class OmgskillsLibrary {
       matches.push({ entry, score });
     }
 
-    // Array.prototype.sort is stable, so ties keep catalog order as before.
-    return matches
-      .sort((a, b) => (b.score !== a.score ? b.score - a.score : b.entry.stars - a.entry.stars))
-      .slice(0, limit)
-      .map(({ entry, score }) => this.enrich(entry.skill, score));
+    return matches;
+  }
+
+  searchPage(options: PagedSearchOptions): SkillPage {
+    return this.matchPage(options, "search_skills");
+  }
+
+  listByAuthorPage(author: string, options: PageOptions): SkillPage {
+    return this.matchPage({ ...options, query: "", author }, "list_by_author");
+  }
+
+  private matchPage(options: PagedSearchOptions, tool: string): SkillPage {
+    const context = preparePage(this.version, tool, options), matches = this.matches(options);
+    for (const { entry } of matches) assertRank(this.trendingById.get(entry.skill.id)?.trending_rank ?? this.goldById.get(entry.skill.id)?.trending_rank);
+    const page = pageInfo(context, matches.length);
+    const sorted = this.sortMatches(matches, context.sort);
+    return { page, skills: sorted.slice(context.offset, context.offset + context.limit).map(({ entry, score }) => this.enrich(entry.skill, score)) };
+  }
+
+  private sortMatches(matches: { entry: SearchEntry; score: number }[], sort: CatalogSort) {
+    if (sort === "relevance") return matches.sort(compareRelevance);
+    const keyed = matches.map(match => {
+      const skill = match.entry.skill, trending = this.trendingById.get(skill.id), gold = this.goldById.get(skill.id);
+      const rank = trending?.trending_rank ?? gold?.trending_rank;
+      if (sort === "trending") assertRank(rank);
+      return { match, name: nameKey(skill.name), stars: validCount(skill.stars),
+        rank: validCount(rank), installs: validCount(trending?.installs ?? gold?.installs),
+        date: sort === "updated" ? dateKey(skill.last_updated) : sort === "added" ? dateKey(skill.first_seen) : undefined };
+    });
+    keyed.sort((a, b) => {
+      const primary = sort === "trending" ? compareOptional(a.rank, b.rank, false) || compareOptional(a.installs, b.installs) || compareOptional(a.stars, b.stars)
+        : sort === "stars" ? compareOptional(a.stars, b.stars)
+        : sort === "updated" || sort === "added" ? compareOptional(a.date, b.date) : 0;
+      return primary || compareText(a.name, b.name) || compareText(a.match.entry.skill.id, b.match.entry.skill.id);
+    });
+    return keyed.map(row => row.match);
+  }
+
+  listTrendingPage(options: Omit<PageOptions, "sort">): SkillPage {
+    const context = preparePage(this.version, "list_trending", options);
+    const ids = new Set<string>();
+    for (const row of this.data.trending) {
+      if (ids.has(row.id) || !this.skillsById.has(row.id)) throw new PagingError("catalog_unavailable");
+      ids.add(row.id); assertRank(row.trending_rank);
+    }
+    const page = pageInfo(context, ids.size);
+    const rows = this.data.trending.slice().sort((a, b) => (a.trending_rank ?? Number.MAX_SAFE_INTEGER) - (b.trending_rank ?? Number.MAX_SAFE_INTEGER));
+    return { page, skills: rows.slice(context.offset, context.offset + context.limit)
+      .map(row => this.enrich(this.skillsById.get(row.id)!, this.signalScoreById(row.id))) };
   }
 
   listTrending(limit?: number): SkillResult[] {
@@ -369,4 +421,12 @@ function normalize(value: unknown): string {
 function clampLimit(limit: number | undefined): number {
   if (!Number.isFinite(limit ?? 0) || limit === undefined) return 20;
   return Math.max(1, Math.min(100, Math.floor(limit)));
+}
+
+function compareRelevance(a: { entry: SearchEntry; score: number }, b: { entry: SearchEntry; score: number }) {
+  // Stable sorting retains catalog order for exact legacy ties.
+  return b.score !== a.score ? b.score - a.score : b.entry.stars - a.entry.stars;
+}
+function assertRank(value: unknown) {
+  if (value !== undefined && value !== null && (typeof value !== "number" || !Number.isSafeInteger(value) || value <= 0)) throw new PagingError("catalog_unavailable");
 }

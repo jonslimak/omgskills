@@ -82,3 +82,36 @@ test("the candidate handler serves existing MCP routes and diagnostics without c
   assert.equal(health.skillCount, rows.length);
   await Promise.allSettled(work);
 });
+
+test("candidate paging is opt-in and cursors survive only unchanged complete snapshots", async context => {
+  const f = catalogFixture(context);
+  const loader = createCompactMcpLibraryLoader({ ...f.options, tracks: [{ name: "test", manifestUrl: f.url }] });
+  const work: Promise<unknown>[] = [], ctx = { waitUntil: (promise: Promise<unknown>) => { work.push(promise); } };
+  const call = async (enabled: boolean, method: string, params?: unknown) => {
+    const handler = createCompactMcpHandler(loader, { paging: enabled });
+    const response = await handler(new Request("https://host.test/mcp", { method: "POST", headers: {
+      "content-type": "application/json", accept: "application/json, text/event-stream",
+    }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) }), ctx);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.ok(response.headers.get("server-timing"));
+    return (await response.json()).result;
+  };
+  assert.equal("page" in (await call(false, "tools/list")).tools[0].inputSchema.properties, false);
+  assert.equal("page" in (await call(true, "tools/list")).tools[0].inputSchema.properties, true);
+  // Both design matches satisfy the public schema; the Swift root fixture has an intentional null SHA.
+  const args = { query: "design", limit: 1, page: {} };
+  const first = (await call(true, "tools/call", { name: "search_skills", arguments: args })).structuredContent;
+  assert.equal(first.page.total, 2);
+  const cursor = first.page.nextCursor;
+  const before = await loader.get(), held = before.library.searchPage!({ query: "design", limit: 1, page: { cursor } });
+  await loader.refresh();
+  const unchanged = await call(true, "tools/call", { name: "search_skills", arguments: { ...args, page: { cursor } } });
+  assert.equal(unchanged.isError, undefined, JSON.stringify(unchanged));
+  f.files.set(f.options.goldBasketUrl, Buffer.from(JSON.stringify([{ ...goldBasket[0], score: 2 }])));
+  await loader.refresh();
+  const stale = await call(true, "tools/call", { name: "search_skills", arguments: { ...args, page: { cursor } } });
+  assert.equal(stale.isError, true);
+  assert.match(JSON.stringify(stale.content), /catalog_snapshot_changed/);
+  assert.equal((await held).skills.length, 1);
+  await Promise.allSettled(work);
+});

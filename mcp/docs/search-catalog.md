@@ -76,3 +76,58 @@ before reuse. A cold MCP search also reads signals and selected detail shards;
 do not report projection size as total request cost or promise lower retained
 heap. Hosted measurements and activation require a separately reviewed combined
 deployment, with existing release and install surfaces preserved.
+
+## Paged Reads (Slice 2 Candidate)
+
+Paging is separately opt-in: use `createOmgskillsServer(reader, { paging: true })`
+or `createCompactMcpHandler(loader, { paging: true })` in a local candidate. The
+default production handler, package entry points and compact factory without
+that option keep the original tool schemas. Nothing activates via an environment
+variable. Check `tools/list` for the page capability before sending new requests.
+
+`search_skills`, `list_by_author` and `list_trending` accept `page: {}` for the
+first page, then `page: { cursor: previous.page.nextCursor }`. Keep all query,
+filter and limit arguments unchanged between pages. Limit still defaults to
+20 and caps at 100, but total results are not capped at 100 or 150.
+
+Search and author reads additionally accept `sort`: `relevance` (default),
+`trending`, `stars`, `updated`, `added` or `name`. Sorting requires `page`.
+Trending preserves its published rank list; it does not accept arbitrary sort.
+Existing author/tag/minStars filters and empty-query rules are unchanged.
+This slice does not introduce new ranking or `@handle` query parsing.
+
+Paged results retain complete public skill rows and add
+`page: { total, hasMore, nextCursor, snapshot, sort }`. Count is the current
+page length. The last page has a null next cursor. Text fallback includes this
+envelope; nonpaged calls keep their original text-array fallback and schemas.
+Filtering/sorting/counting use the search index; only selected IDs are hydrated.
+
+Tokens bind the normalized request, page size, ordering version and complete
+snapshot, including independent trending/curation changes. They are not auth
+tokens or stored server sessions. An unchanged refresh retains validity; a
+changed snapshot returns `catalog_snapshot_changed`, requiring a fresh first
+page. Do not append results from different snapshots. Other safe tool errors are
+`invalid_cursor`, `paging_not_supported` and `catalog_unavailable`.
+
+Missing optional signals do not produce a complete paging version: paged reads
+fail as unavailable while legacy reads retain their existing degraded behavior.
+Malformed required data or a failed shard read is not an empty successful page.
+The legacy full-loader fallback supports paging with a complete version too;
+the native synchronous install-record contract remains unchanged.
+
+Explicit numeric/date sorts put missing or invalid values last; dates require
+valid ISO dates/timestamps with explicit zones. Name ties use lowercase NFKC
+Unicode code-point order then exact ID, independent of host locale. Relevance
+retains legacy score/stars/catalog-order ties. No per-query result cache is added.
+
+Run `node --import tsx scripts/benchmark-catalog-paging.mts` for the offline
+full-catalog and MCP demonstration. It compiles the exact slice-1 commit in a
+temporary directory, checks all six full index orderings and public first,
+middle and last pages, and compares fresh-process initialization and legacy
+warm reads. Its receipt records source hashes, timings, selected IDs and limits.
+The public APIs remain bounded; private selector access is confined to this
+offline verification script.
+
+Portal Load more/sort controls, collection batching, new ranking, README/detail
+content and hosted measurements remain separate work. The current live UI's
+30-row limit is not removed merely by adding this candidate API capability.

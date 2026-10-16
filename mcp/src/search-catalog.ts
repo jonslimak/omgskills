@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { OmgskillsLibrary, slimSkill, type GoldBasketEntry, type SearchOptions, type Skill, type SkillResult, type TrendingEntry } from "./library.js";
 import type { CatalogReader } from "./catalog-reader.js";
+import type { PageOptions, PagedSearchOptions, SkillPage } from "./paging.js";
 import {
   assetReference, descriptor, detailBucket, detailIndex, object, searchCatalogLimits,
   searchPayload, validateShard, verifyBytes,
@@ -77,7 +78,7 @@ export class SearchCatalogReader implements CatalogReader {
     private readonly details: DetailIndex, rows: RawSkill[], signalData: Awaited<ReturnType<typeof signals>>,
     private readonly options: CatalogReadOptions, manifest: Manifest) {
     this.version = signalData.complete ? version(manifest, signalData.goldBasket) : undefined;
-    this.index = OmgskillsLibrary.fromData({ skills: rows as Skill[], trending: signalData.trending, goldBasket: signalData.goldBasket });
+    this.index = OmgskillsLibrary.fromData({ skills: rows as Skill[], trending: signalData.trending, goldBasket: signalData.goldBasket }, this.version);
     for (const row of rows) {
       const bucket = detailBucket(row.id);
       if (!this.expected.has(bucket)) this.expected.set(bucket, new Map());
@@ -165,6 +166,12 @@ export class SearchCatalogReader implements CatalogReader {
   // Curated rows retain the curated record, even when their ID also exists in the catalog.
   listGoldBasket(limit?: number) { return this.index.listGoldBasket(limit); }
   listByAuthor(author: string, limit?: number) { return this.hydrate(this.index.listByAuthor(author, limit)); }
+  private async hydratePage(result: SkillPage): Promise<SkillPage> {
+    return { ...result, skills: await this.hydrate(result.skills) };
+  }
+  searchPage(options: PagedSearchOptions) { return this.hydratePage(this.index.searchPage(options)); }
+  listByAuthorPage(author: string, options: PageOptions) { return this.hydratePage(this.index.listByAuthorPage(author, options)); }
+  listTrendingPage(options: Omit<PageOptions, "sort">) { return this.hydratePage(this.index.listTrendingPage(options)); }
 }
 
 export async function loadCatalogReader(manifestUrl: string, options: CatalogReadOptions = {}): Promise<SearchCatalogReader | OmgskillsLibrary> {

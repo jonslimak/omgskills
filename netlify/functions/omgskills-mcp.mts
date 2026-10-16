@@ -11,11 +11,11 @@ export function createMcpHandler(loader: McpLibraryLoader) {
   return createReadMcpHandler(loader);
 }
 
-export function createCompactMcpHandler(loader: CompactMcpLoader) {
-  return createReadMcpHandler(loader);
+export function createCompactMcpHandler(loader: CompactMcpLoader, options: { paging?: boolean } = {}) {
+  return createReadMcpHandler(loader, options);
 }
 
-function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader) {
+function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, options: { paging?: boolean } = {}) {
   return async (request: Request, context: Pick<Context, "waitUntil">): Promise<Response> => {
     const pathname = new URL(request.url).pathname;
     if (pathname === "/mcp/health") {
@@ -49,7 +49,7 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader) {
       return jsonRpcError(503, -32603, "Catalog temporarily unavailable");
     }
 
-    const server = createOmgskillsServer(snapshot.library);
+    const server = createOmgskillsServer(snapshot.library, options);
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true
