@@ -1,5 +1,5 @@
 import type { Pool, PoolClient } from "pg";
-import { requireDeviceToken, rollback } from "./device-auth.js";
+import { requireDeviceToken, rollback, touchDeviceAfterSuccessfulUse } from "./device-auth.js";
 
 export const inventorySources = ["claude", "codex", "agents"] as const;
 type InventorySource = typeof inventorySources[number];
@@ -9,6 +9,16 @@ export type RootCoverage = {
   reason?: "changed" | "invalid-entry" | "invalid-metadata" | "missing" | "unreadable" | "redirected";
 };
 export type ReconciliationInput = { baseRevision: string | null; roots: RootCoverage[] };
+
+export function parseInventoryCheck(body: Record<string, unknown>): { baseRevision: string } {
+  if (Object.keys(body).length !== 3
+    || Object.keys(body).some(key => !["reportVersion", "mode", "baseRevision"].includes(key))
+    || body.reportVersion !== 3 || body.mode !== "check" || typeof body.baseRevision !== "string"
+    || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(body.baseRevision)) {
+    throw new Response("Use the exact version-3 check body with a non-null revision", { status: 400 });
+  }
+  return { baseRevision: body.baseRevision.toLowerCase() };
+}
 
 export function parseReconciliationFields(body: Record<string, unknown>): ReconciliationInput {
   const revision = body.baseRevision;
@@ -78,6 +88,39 @@ export async function readInventoryRevision(pool: Pool, req: Request, now = new 
     const state = await inventoryRevisionState(client, device.userId, device.deviceId);
     await client.query("COMMIT");
     return { reportVersion: 3 as const, revision: state.revision };
+  } catch (error) { await rollback(client); throw error; }
+  finally { client.release(); }
+}
+
+export async function performInventoryCheck(pool: Pool, req: Request, body: Record<string, unknown>, now = new Date()) {
+  const { baseRevision } = parseInventoryCheck(body);
+  let client: PoolClient;
+  try { client = await pool.connect(); } catch { throw new Response("Database is not available", { status: 503 }); }
+  try {
+    await client.query("BEGIN");
+    const device = await requireDeviceToken(req, client, "sync:write", now);
+    // The upload writer takes the same device lock before advancing its revision.
+    const state = await inventoryRevisionState(client, device.userId, device.deviceId);
+    const stale = () => new Response("A current complete report is required; take a fresh scan", { status: 409 });
+    if (state.protocol !== 3 || state.revision !== baseRevision) throw stale();
+    const report = await client.query<{ coverage: unknown }>(
+      `SELECT scan_coverage AS coverage FROM sync_runs
+       WHERE id=$1 AND user_id=$2 AND device_id=$3 AND status='completed' AND completed_at IS NOT NULL`,
+      [baseRevision, device.userId, device.deviceId]
+    );
+    let roots: RootCoverage[];
+    try { roots = parseReconciliationFields({ baseRevision, roots: report.rows[0]?.coverage }).roots; }
+    catch (error) { if (error instanceof Response) throw stale(); throw error; }
+    if (!roots.every(root => root.state === "complete")) throw stale();
+    const checked = await client.query<{ checkedAt: Date }>(
+      `UPDATE device_tokens SET inventory_checked_at=GREATEST(inventory_checked_at,$3::timestamptz)
+       WHERE id=$1 AND user_id=$2 RETURNING inventory_checked_at AS "checkedAt"`,
+      [device.deviceId, device.userId, now]
+    );
+    await touchDeviceAfterSuccessfulUse(client, device.deviceId, now);
+    await client.query("COMMIT");
+    return { reportVersion: 3 as const, mode: "checked" as const, deviceId: device.deviceId,
+      revision: baseRevision, checkedAt: checked.rows[0].checkedAt.toISOString() };
   } catch (error) { await rollback(client); throw error; }
   finally { client.release(); }
 }

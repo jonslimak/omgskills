@@ -22,11 +22,12 @@ if (!["postgres:", "postgresql:"].includes(target.protocol)
 const { createDeviceCredential, createSyncToken, hashToken } = await import("./crypto.js");
 const { parsePresenceSkill, parseSyncSkill } = await import("./sync-skill.js");
 const { performSyncUpload } = await import("./sync-upload.js");
-const { readInventoryRevision } = await import("./inventory-reconciliation.js");
+const { performInventoryCheck, readInventoryRevision } = await import("./inventory-reconciliation.js");
 const { addGroupItemWithClient } = await import("./group-items.js");
 const { readSyncInventory } = await import("./sync-inventory-read.js");
 const migrationRoot = new URL("../../database/migrations/", import.meta.url);
 const reconciliationMigration = "20261016130000_add_inventory_reconciliation";
+const checkMigration = "20261016140000_add_inventory_check_time";
 const now = new Date("2026-10-16T12:00:00Z");
 const later = (days: number) => new Date(now.getTime() + days * 86400_000);
 type Device = { id: string; credential: string };
@@ -49,7 +50,8 @@ async function verifyLocalDatabase(pool: Pool) {
   assert.equal((await stat(directory)).uid, getuid(), "Test cluster must belong to this user");
 }
 
-async function withSchema(run: (pool: Pool) => Promise<void>, beforeMigration?: (pool: Pool) => Promise<void>) {
+async function withSchema(run: (pool: Pool) => Promise<void>, beforeMigration?: (pool: Pool) => Promise<void>,
+  migrationBoundary = reconciliationMigration) {
   const schema = `inventory_reconciliation_${randomUUID().replaceAll("-", "")}`;
   const admin = new pg.Pool({ connectionString, max: 1, connectionTimeoutMillis: 3000 });
   // Exclude public so CREATE TABLE IF NOT EXISTS cannot silently reuse an older suite's tables.
@@ -62,6 +64,7 @@ async function withSchema(run: (pool: Pool) => Promise<void>, beforeMigration?: 
     created = true;
     const names = (await readdir(migrationRoot)).filter(name => /^\d{14}_/.test(name)).sort();
     assert.ok(names.includes(reconciliationMigration), "Reconciliation migration is required");
+    assert.ok(names.includes(checkMigration), "Inventory check migration is required");
     async function migrate(predicate: (name: string) => boolean) {
       const client = await pool.connect();
       try {
@@ -71,9 +74,9 @@ async function withSchema(run: (pool: Pool) => Promise<void>, beforeMigration?: 
         }
       } finally { client.release(); }
     }
-    await migrate(name => name < reconciliationMigration);
+    await migrate(name => name < migrationBoundary);
     if (beforeMigration) await beforeMigration(pool);
-    await migrate(name => name >= reconciliationMigration);
+    await migrate(name => name >= migrationBoundary);
     await run(pool);
   } finally {
     await pool.end();
@@ -167,10 +170,11 @@ test("additive reconciliation migration preserves old device/legacy rows and Set
   await withSchema(async pool => {
     const after = await snapshot(pool);
     const oldShape = { ...after,
-      device_tokens: after.device_tokens.map(({ inventory_revision, inventory_protocol, ...old }) => old),
+      device_tokens: after.device_tokens.map(({ inventory_revision, inventory_protocol, inventory_checked_at, ...old }) => old),
       sync_runs: after.sync_runs.map(({ scan_coverage, ...old }) => old) };
     assert.deepEqual(oldShape, before);
     assert.ok(after.device_tokens.every(row => row.inventory_revision === null && row.inventory_protocol === 1));
+    assert.ok(after.device_tokens.every(row => row.inventory_checked_at === null));
     assert.ok(after.sync_runs.every(row => row.scan_coverage === null));
     assert.equal(after.synced_skills.length, 2);
     assert.equal(after.synced_skills.filter(row => row.device_id === null).length, 1);
@@ -346,7 +350,7 @@ test("v3 inventory distinguishes an empty account and a connected device without
     const read = await readSyncInventory(pool, owner, 3, now);
     assert.deepEqual(read.skills, []);
     assert.deepEqual(read.devices, [{ id: reporter.id, deviceName: "Reconciliation test Mac", status: "active",
-      lastReportedAt: null, scanCoverage: null }]);
+      lastReportedAt: null, scanCoverage: null, lastCheckedAt: null }]);
   });
 });
 
@@ -502,5 +506,198 @@ test("revision reads and writes reject revoked, expired, forged and missing-sync
       await assert.rejects(upload3(pool, reporter, null, []), status(401));
       assert.deepEqual(await snapshot(pool), before);
     }
+  });
+});
+
+function check(pool: Pool, reporter: Pick<Device, "credential">, baseRevision: string, at = now) {
+  return performInventoryCheck(pool, request(reporter), { reportVersion: 3, mode: "check", baseRevision }, at);
+}
+
+test("check-time migration is additive, preserves prior inventory/Sets and does not invent check timestamps", async () => {
+  let before: Awaited<ReturnType<typeof snapshot>>;
+  await withSchema(async pool => {
+    const after = await snapshot(pool);
+    assert.deepEqual({ ...after, device_tokens: after.device_tokens.map(({ inventory_checked_at, ...old }) => old) }, before);
+    assert.ok(after.device_tokens.every(row => row.inventory_checked_at === null));
+    assertSetPreserved(after, before);
+  }, async pool => {
+    const owner = await user(pool), reporter = await device(pool, owner);
+    for (const deviceId of [null, reporter.id]) {
+      const run = randomUUID(), skill = randomUUID();
+      await pool.query(`INSERT INTO sync_runs(id,user_id,device_id,status,completed_at,scan_coverage)
+        VALUES($1,$2,$3,'completed',$4,$5::jsonb)`, [run, owner, deviceId, now, deviceId ? JSON.stringify(coverage()) : null]);
+      await pool.query(`INSERT INTO synced_skills(id,user_id,sync_run_id,device_id,stable_key,name,source,identity_status,is_local_only,last_seen_at)
+        VALUES($1,$2,$3,$4,'location:v1:codex:review','Review','Codex','localOnly',true,$5)`, [skill, owner, run, deviceId, now]);
+      if (deviceId) await pool.query('UPDATE device_tokens SET inventory_protocol=3,inventory_revision=$2 WHERE id=$1', [deviceId, run]);
+      await pinnedSet(pool, owner, skill);
+    }
+    before = await snapshot(pool);
+  }, checkMigration);
+});
+
+test("unchanged checks update only check/use time, retain missing rows and Sets, and separate v3 freshness from reports", async () => {
+  await withSchema(async pool => {
+    const owner = await user(pool), other = await user(pool);
+    const a = await device(pool, owner), b = await device(pool, owner), foreign = await device(pool, other);
+    const first = await upload3(pool, a, null, [presence("keep"), presence("missing")]);
+    const missing = (await snapshot(pool)).synced_skills.find(row => row.name === "missing")!;
+    await pinnedSet(pool, owner, missing.id);
+    const reportedAt = new Date(now.getTime() + 3600_000);
+    const latest = await upload3(pool, a, first.revision, [presence("keep")], coverage(), reportedAt);
+    await upload2(pool, b, [presence("other-mac")]);
+    await upload3(pool, foreign, null, [presence("foreign")]);
+    await legacyUpload(pool, owner, [legacy("older-upload")]);
+    const before = await snapshot(pool);
+    const oldRead = await readSyncInventory(pool, owner, 1, reportedAt);
+    const v2Read = await readSyncInventory(pool, owner, 2, reportedAt);
+    const checked = await check(pool, a, latest.revision.toUpperCase(), later(1));
+    assert.deepEqual(checked, { reportVersion: 3, mode: "checked", deviceId: a.id,
+      revision: latest.revision, checkedAt: later(1).toISOString() });
+    const after = await snapshot(pool);
+    assert.deepEqual(after, { ...before, device_tokens: before.device_tokens.map(row => row.id === a.id
+      ? { ...row, inventory_checked_at: later(1), last_used_at: later(1) } : row) });
+    assertSetPreserved(after, before);
+    const repeatedAt = new Date(later(1).getTime() + 60_000);
+    const repeated = await check(pool, a, latest.revision, repeatedAt);
+    assert.equal(repeated.checkedAt, repeatedAt.toISOString());
+    const repeatedState = await snapshot(pool);
+    assert.deepEqual(repeatedState, { ...after, device_tokens: after.device_tokens.map(row => row.id === a.id
+      ? { ...row, inventory_checked_at: repeatedAt } : row) });
+    const read = await readSyncInventory(pool, owner, 3, repeatedAt);
+    const mac = read.devices!.find(row => row.id === a.id)!;
+    assert.equal(mac.lastCheckedAt?.toISOString(), repeatedAt.toISOString());
+    assert.equal(mac.lastReportedAt?.toISOString(), reportedAt.toISOString());
+    assert.deepEqual(mac.scanCoverage, coverage());
+    assert.equal(read.skills.find(row => row.id === missing.id)?.isCurrent, false);
+    assert.equal(read.skills.find(row => row.id === missing.id)?.lastSeenAt.toISOString(), now.toISOString());
+    // The v3 reader may add freshness; legacy shapes and shared device lists do not change.
+    assert.deepEqual(await readSyncInventory(pool, owner, 1, reportedAt), oldRead);
+    assert.deepEqual(await readSyncInventory(pool, owner, 2, reportedAt), v2Read);
+    assert.ok(read.devices!.every(row => row.id !== foreign.id));
+    assert.equal(read.devices!.find(row => row.id === b.id)?.lastCheckedAt, null);
+    // A clock step backward must not regress the accepted check time.
+    assert.equal((await check(pool, a, latest.revision, later(1))).checkedAt, repeatedAt.toISOString());
+  });
+});
+
+test("partial coverage and invalid stored baselines cannot acknowledge an unchanged complete scan", async t => {
+  const cases = ["no-report", "v2", "stale", "other-device", "other-account", "failed", "unfinished",
+    "no-completion-time", "null-coverage", "duplicate-roots", "extra-coverage-field", "partial", "unavailable"];
+  for (const scenario of cases) await t.test(scenario, async () => {
+    await withSchema(async pool => {
+      const owner = await user(pool), reporter = await device(pool, owner);
+      let base: string = randomUUID();
+      if (scenario === "v2") base = (await upload2(pool, reporter, [presence("old")])).syncRunId;
+      else if (scenario !== "no-report") {
+        const roots = scenario === "partial" ? coverage({ codex: { state: "incomplete", reason: "changed" } })
+          : scenario === "unavailable" ? coverage({ codex: { state: "unavailable", reason: "missing" } }) : coverage();
+        base = (await upload3(pool, reporter, null, [presence("keep", "claude")], roots)).revision;
+      }
+      if (scenario === "stale") await upload3(pool, reporter, base, [presence("new")], coverage(), later(1));
+      if (scenario === "other-device" || scenario === "other-account") {
+        const otherOwner = scenario === "other-account" ? await user(pool) : owner;
+        const other = await device(pool, otherOwner);
+        base = (await upload3(pool, other, null, [])).revision;
+        // Even a corrupted device revision cannot authorize another device/account's report.
+        await pool.query("UPDATE device_tokens SET inventory_revision=$2 WHERE id=$1", [reporter.id, base]);
+      }
+      if (["failed", "unfinished", "no-completion-time"].includes(scenario)) {
+        await pool.query("UPDATE sync_runs SET status=$2,completed_at=$3 WHERE id=$1", [base,
+          scenario === "failed" ? "failed" : scenario === "unfinished" ? "started" : "completed",
+          scenario === "no-completion-time" ? null : now]);
+      }
+      if (["null-coverage", "duplicate-roots", "extra-coverage-field"].includes(scenario)) {
+        const bad = scenario === "null-coverage" ? null : scenario === "duplicate-roots"
+          ? [coverage()[0], coverage()[0], coverage()[2]] : [{ ...coverage()[0], unexpected: true }, ...coverage().slice(1)];
+        await pool.query("UPDATE sync_runs SET scan_coverage=$2::jsonb WHERE id=$1", [base, JSON.stringify(bad)]);
+      }
+      const before = await snapshot(pool);
+      await assert.rejects(check(pool, reporter, base, later(2)), status(409));
+      assert.deepEqual(await snapshot(pool), before);
+      if (scenario === "partial" || scenario === "unavailable") {
+        const read = await readSyncInventory(pool, owner, 3, later(2));
+        assert.ok(read.devices![0].scanCoverage!.some(root => root.state !== "complete"));
+        assert.equal(read.devices![0].lastCheckedAt?.toISOString(), now.toISOString());
+      }
+    });
+  });
+});
+
+test("checks require current scoped credentials and never write on authentication or body failure", async () => {
+  await withSchema(async pool => {
+    const owner = await user(pool);
+    const revoked = await device(pool, owner), expired = await device(pool, owner), noScope = await device(pool, owner);
+    const active = await device(pool, owner), inactive = await device(pool, owner);
+    const base = (await upload3(pool, active, null, [])).revision;
+    await pool.query("UPDATE device_tokens SET revoked_at=$2 WHERE id=$1", [revoked.id, now]);
+    await pool.query("UPDATE device_tokens SET created_at=$2,expires_at=$3 WHERE id=$1", [expired.id, later(-3), later(-1)]);
+    await pool.query("UPDATE device_tokens SET created_at=$2,last_used_at=NULL WHERE id=$1", [inactive.id, later(-200)]);
+    await pool.query("ALTER TABLE device_tokens DROP CONSTRAINT device_tokens_granted_scopes_check");
+    await pool.query("UPDATE device_tokens SET granted_scopes=ARRAY['self:revoke']::text[] WHERE id=$1", [noScope.id]);
+    const before = await snapshot(pool);
+    for (const reporter of [revoked, expired, noScope, inactive, { credential: createDeviceCredential() }, { credential: "bad" }]) {
+      await assert.rejects(check(pool, reporter, base), status(401));
+      assert.deepEqual(await snapshot(pool), before);
+    }
+    for (const body of [{ reportVersion: 3, mode: "check", baseRevision: base, deviceId: active.id },
+      { reportVersion: 3, mode: "check", baseRevision: base, token: "old" }]) {
+      await assert.rejects(performInventoryCheck(pool, request(active), body), status(400));
+      assert.deepEqual(await snapshot(pool), before);
+    }
+  });
+});
+
+test("deferred check failure rolls back freshness and last-use without touching inventory or Set links", async () => {
+  await withSchema(async pool => {
+    const owner = await user(pool), reporter = await device(pool, owner);
+    const report = await upload3(pool, reporter, null, [presence("keep")]);
+    await pinnedSet(pool, owner, (await snapshot(pool)).synced_skills[0].id);
+    const before = await snapshot(pool);
+    await pool.query(`CREATE FUNCTION fail_inventory_check() RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN
+        IF NEW.inventory_checked_at IS DISTINCT FROM OLD.inventory_checked_at THEN
+          IF NOT EXISTS (SELECT 1 FROM device_tokens WHERE id=NEW.id AND last_used_at > OLD.last_used_at) THEN
+            RAISE EXCEPTION 'expected last-use update before rollback' USING ERRCODE='P0002';
+          END IF;
+          RAISE EXCEPTION 'injected check commit failure' USING ERRCODE='P0001';
+        END IF;
+        RETURN NEW;
+      END $$;
+      CREATE CONSTRAINT TRIGGER fail_inventory_check AFTER UPDATE ON device_tokens
+        DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION fail_inventory_check()`);
+    await assert.rejects(check(pool, reporter, report.revision, later(2)),
+      (error: unknown) => typeof error === "object" && error !== null && "code" in error && error.code === "P0001");
+    assert.deepEqual(await snapshot(pool), before);
+    await pool.query("DROP TRIGGER fail_inventory_check ON device_tokens");
+    assert.equal((await check(pool, reporter, report.revision, later(2))).revision, report.revision);
+    assertSetPreserved(await snapshot(pool), before);
+  });
+});
+
+test("a check and a full report serialize on the same revision without stale freshness or lost inventory", async () => {
+  await withSchema(async pool => {
+    const owner = await user(pool), reporter = await device(pool, owner);
+    const original = await upload3(pool, reporter, null, [presence("original")]);
+    const before = await snapshot(pool);
+    const [checked, uploaded] = await Promise.allSettled([
+      check(pool, reporter, original.revision, later(1)),
+      upload3(pool, reporter, original.revision, [presence("replacement")], coverage(), later(1))
+    ]);
+    assert.equal(uploaded.status, "fulfilled");
+    if (uploaded.status !== "fulfilled") return;
+    if (checked.status === "fulfilled") assert.equal(checked.value.revision, original.revision);
+    else assert.ok(status(409)(checked.reason));
+    const after = await snapshot(pool);
+    assert.equal(after.sync_runs.length, before.sync_runs.length + 1);
+    assert.equal(after.device_tokens[0].inventory_revision, uploaded.value.revision);
+    assert.equal(after.device_tokens[0].inventory_checked_at.toISOString(), later(1).toISOString());
+    assert.deepEqual(after.synced_skills.filter(row => row.is_current).map(row => row.name), ["replacement"]);
+    await assert.rejects(check(pool, reporter, original.revision, later(2)), status(409));
+    assert.deepEqual(await snapshot(pool), after);
+    await check(pool, reporter, uploaded.value.revision, later(2));
+    const final = await snapshot(pool);
+    assert.deepEqual(final.synced_skills, after.synced_skills);
+    assert.deepEqual(final.sync_runs, after.sync_runs);
+    assert.equal(final.device_tokens[0].inventory_revision, uploaded.value.revision);
   });
 });

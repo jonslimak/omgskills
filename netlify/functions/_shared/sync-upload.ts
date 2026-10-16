@@ -91,7 +91,8 @@ export async function performSyncUpload(
     if (deviceId) {
       await client.query(
         `UPDATE device_tokens SET inventory_revision = $2, inventory_protocol = GREATEST(inventory_protocol, $3)
-         WHERE id = $1 AND user_id = $4`, [deviceId, syncRunId, reportVersion, userId]
+         ${reportVersion === 3 ? ", inventory_checked_at = GREATEST(inventory_checked_at, $5::timestamptz)" : ""}
+         WHERE id = $1 AND user_id = $4`, [deviceId, syncRunId, reportVersion, userId, ...(reportVersion === 3 ? [now] : [])]
       );
       await touchDeviceAfterSuccessfulUse(client, deviceId, now);
     } else if (legacyTokenId) {

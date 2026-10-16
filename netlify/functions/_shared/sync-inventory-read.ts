@@ -48,6 +48,10 @@ export async function readSyncInventory(pool: Pool, userId: string, version: 1 |
     [userId]
   );
   const lastReports = new Map(reports.rows.map((row) => [row.deviceId, row]));
+  const checks = version === 3 ? await pool.query<{ id: string; checkedAt: Date | null }>(
+    'SELECT id, inventory_checked_at AS "checkedAt" FROM device_tokens WHERE user_id=$1', [userId]
+  ) : null;
+  const lastChecks = new Map(checks?.rows.map(row => [row.id, row.checkedAt]));
   return {
     inventoryVersion: version,
     skills,
@@ -56,7 +60,8 @@ export async function readSyncInventory(pool: Pool, userId: string, version: 1 |
       deviceName: device.deviceName,
       status: device.status,
       lastReportedAt: lastReports.get(device.id)?.lastReportedAt ?? null,
-      ...(version === 3 ? { scanCoverage: lastReports.get(device.id)?.scanCoverage ?? null } : {})
+      ...(version === 3 ? { scanCoverage: lastReports.get(device.id)?.scanCoverage ?? null,
+        lastCheckedAt: lastChecks.get(device.id) ?? null } : {})
     }))
   };
 }
