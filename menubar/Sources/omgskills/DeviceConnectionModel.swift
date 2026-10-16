@@ -37,6 +37,7 @@ final class DeviceConnectionModel {
     private(set) var state: State = .disconnected
     private(set) var disconnectWarning: String?
     private(set) var reportStatus: ReportStatus = .idle
+    private(set) var lastReportOutcome: InventoryReportOutcome?
 
     @ObservationIgnored private let credentialStore: any DeviceCredentialStoring
     @ObservationIgnored private let api: any DeviceSyncServing
@@ -52,6 +53,7 @@ final class DeviceConnectionModel {
     @ObservationIgnored private let inventoryScanner: InventoryScanner?
     @ObservationIgnored private var reportRequested = false
     @ObservationIgnored private var reconciliationUploadInFlight = false
+    @ObservationIgnored private var lastReportAttemptID: UUID?
 
     init(
         credentialStore: any DeviceCredentialStoring = DeviceCredentialStore(),
@@ -190,8 +192,32 @@ final class DeviceConnectionModel {
         }
     }
 
+    // Not wired to app lifecycle yet. Reuse the same fresh, serialized reporting path.
+    func requestScheduledInventoryReport() async -> InventoryReportOutcome {
+        guard !Task.isCancelled, api.reportMode != .legacy,
+              let record = connectedCredential, case .connected = state else { return .cancelled }
+        let ownsReport = activeTask == nil || activeTask?.isCancelled == true
+        let task = requestInventoryReport()
+        let attemptID = activeAttemptID
+        await withTaskCancellationHandler {
+            await task.value
+        } onCancel: {
+            guard ownsReport else { return }
+            Task { @MainActor [weak self] in
+                guard let self, let attemptID, activeAttemptID == attemptID,
+                      connectedCredential == record else { return }
+                cancelCurrentOperation()
+            }
+        }
+        guard !Task.isCancelled, let attemptID, lastReportAttemptID == attemptID else { return .cancelled }
+        if lastReportOutcome == .reconnectRequired { return .reconnectRequired }
+        guard connectedCredential == record else { return .cancelled }
+        return lastReportOutcome ?? .cancelled
+    }
+
     @discardableResult
     func disconnect() -> Task<Void, Never> {
+        lastReportOutcome = .cancelled
         connectedCredential = nil
         reportRequested = false
         reportStatus = .idle
@@ -239,6 +265,8 @@ final class DeviceConnectionModel {
     }
 
     func cancelCurrentOperation() {
+        lastReportAttemptID = activeAttemptID
+        lastReportOutcome = .cancelled
         reportRequested = false
         reportStatus = reconciliationUploadInFlight
             ? .uncertain("The submitted report may have completed.") : .idle
@@ -428,6 +456,8 @@ final class DeviceConnectionModel {
         activeAttemptID = attemptID
         reportRequested = false
         reportStatus = .idle
+        lastReportOutcome = nil
+        lastReportAttemptID = nil
         reconciliationUploadInFlight = false
         state = initialState
         disconnectWarning = nil
@@ -478,8 +508,12 @@ final class DeviceConnectionModel {
                     }
                 }
                 reportStatus = .reported(result, scanIssueCount: scan.issues.count)
+                lastReportOutcome = .reported(partial: !scan.issues.isEmpty || result.complete == false)
+                lastReportAttemptID = attemptID
             } catch is CancellationError {
                 if isCurrent(attemptID) {
+                    lastReportOutcome = .cancelled
+                    lastReportAttemptID = attemptID
                     reportStatus = submitted ? .uncertain("The submitted report may have completed.") : .pending
                     reportRequested = false
                 }
@@ -492,16 +526,22 @@ final class DeviceConnectionModel {
                 connectedInfo = nil
                 state = .failed(.reconnectRequired)
                 reportStatus = .idle
+                lastReportOutcome = .reconnectRequired
+                lastReportAttemptID = attemptID
                 reportRequested = false
                 return
             } catch DeviceSyncAPIError.inventoryChanged {
                 guard isCurrent(attemptID), connectedCredential == record else { return }
                 reportStatus = .failed(DeviceSyncAPIError.inventoryChanged.localizedDescription)
+                lastReportOutcome = .revisionConflict
+                lastReportAttemptID = attemptID
                 reportRequested = false
                 return
             } catch {
                 guard isCurrent(attemptID), connectedCredential == record else { return }
                 reportStatus = submitted ? .uncertain(error.localizedDescription) : .failed(error.localizedDescription)
+                lastReportOutcome = InventoryReportOutcome.failure(error)
+                lastReportAttemptID = attemptID
                 reportRequested = false
                 return
             }

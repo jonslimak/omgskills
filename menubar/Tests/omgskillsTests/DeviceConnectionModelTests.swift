@@ -735,6 +735,104 @@ struct DeviceConnectionModelTests {
         #expect(model.state == .connected(record.connection))
     }
 
+    @Test func scheduledReportUsesFreshRevisionAndScanAfterUncertainSubmission() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, uploadFailure: .server(statusCode: 503), reportMode: .reconciliation)
+        let scanner = MockInventoryScanner(result: inventoryScan(["before"]))
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { await api.noteScan(); return try await scanner.scan() })
+        await model.restore().value
+        #expect(model.lastReportOutcome == .retryable(retryAfter: nil))
+        guard case .uncertain = model.reportStatus else { Issue.record("Submitted failure is uncertain"); return }
+        let revision = UUID().uuidString.lowercased()
+        await api.setRevision(revision)
+        await api.setUploadFailure(nil)
+        await scanner.setResult(inventoryScan(["after"]))
+        #expect(await model.requestScheduledInventoryReport() == .reported(partial: false))
+        #expect(await api.reportEvents() == ["revision", "scan", "upload", "revision", "scan", "upload"])
+        #expect(await api.uploadedNames() == [["before"], ["after"]])
+        #expect(await api.reconciliationBases() == [nil, revision])
+    }
+
+    @Test func scheduledPartialReportDoesNotBecomeRetryableAndDisconnectStopsRequests() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        let scan = inventoryScan(["fixture"], issueCount: 1)
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { scan })
+        await model.restore().value
+        #expect(await model.requestScheduledInventoryReport() == .reported(partial: true))
+        await model.disconnect().value
+        #expect(await model.requestScheduledInventoryReport() == .cancelled)
+        #expect(await api.uploadedCredentials().count == 2)
+    }
+
+    @Test(arguments: [DeviceSyncAPIError.invalidResponse, .reconnectRequired, .inventoryChanged,
+                      .retryableServer(statusCode: 429, retryAfter: 80)])
+    func scheduledReportReturnsTypedFailureWithoutAutomaticRetry(_ failure: DeviceSyncAPIError) async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { scan })
+        await model.restore().value
+        await api.setUploadFailure(failure)
+        #expect(await model.requestScheduledInventoryReport() == InventoryReportOutcome.failure(failure))
+        #expect(await api.uploadedCredentials().count == 2)
+    }
+
+    @Test func cancelledScheduledWaitCannotReturnASuccessFromAnotherSession() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { scan })
+        await model.restore().value
+        let task = Task { await model.requestScheduledInventoryReport() }
+        task.cancel()
+        #expect(await task.value == .cancelled)
+        #expect(await api.uploadedCredentials().count == 1)
+    }
+
+    @Test func cancellingOwnedScheduledReportStopsBeforeUploadingAndRetainsConnection() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        let gate = TestGate()
+        let scanner = MockInventoryScanner(result: inventoryScan([]), gate: gate, gateAtCall: 2)
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { try await scanner.scan() })
+        await model.restore().value
+        let scheduled = Task { await model.requestScheduledInventoryReport() }
+        await gate.waitUntilBlocked()
+        scheduled.cancel()
+        for _ in 0..<30 { await Task.yield() }
+        await gate.open()
+        #expect(await scheduled.value == .cancelled)
+        #expect(await api.uploadedCredentials().count == 1)
+        #expect(model.state == .connected(record.connection))
+    }
+
+    @Test func cancellingScheduledWaitDoesNotCancelAnExistingManualReport() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        let gate = TestGate()
+        let scanner = MockInventoryScanner(result: inventoryScan([]), gate: gate, gateAtCall: 2)
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record), api: api,
+            inventoryScanner: { try await scanner.scan() })
+        await model.restore().value
+        let manual = model.requestInventoryReport()
+        await gate.waitUntilBlocked()
+        let scheduled = Task { await model.requestScheduledInventoryReport() }
+        for _ in 0..<30 { await Task.yield() }
+        scheduled.cancel()
+        for _ in 0..<30 { await Task.yield() }
+        #expect(!manual.isCancelled)
+        await gate.open()
+        await manual.value
+        #expect(await scheduled.value == .cancelled)
+        #expect(model.lastReportOutcome == .reported(partial: false))
+    }
+
     private func inventoryScan(_ names: [String], issueCount: Int = 0) -> InstalledSkillsScanner.ScanResult {
         let installations = names.map { name in
             Skill(id: "installed:\(name)", name: name, description: "Example", githubUrl: "",
@@ -1011,16 +1109,18 @@ private actor MockInventoryScanner {
     private var result: InstalledSkillsScanner.ScanResult
     private var calls = 0
     private let gate: TestGate?
+    private let gateAtCall: Int
 
-    init(result: InstalledSkillsScanner.ScanResult, gate: TestGate? = nil) {
+    init(result: InstalledSkillsScanner.ScanResult, gate: TestGate? = nil, gateAtCall: Int = 1) {
         self.result = result
         self.gate = gate
+        self.gateAtCall = gateAtCall
     }
 
     func scan() async throws -> InstalledSkillsScanner.ScanResult {
         calls += 1
         let snapshot = result
-        if calls == 1, let gate { await gate.block() }
+        if calls == gateAtCall, let gate { await gate.block() }
         return snapshot
     }
 

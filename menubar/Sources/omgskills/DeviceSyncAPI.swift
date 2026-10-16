@@ -6,6 +6,7 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
     case deviceLimitReached
     case rateLimited
     case server(statusCode: Int)
+    case retryableServer(statusCode: Int, retryAfter: TimeInterval?)
     case invalidResponse
     case inventoryChanged
     case unsupportedReportMode
@@ -20,7 +21,7 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
             return "Your account has reached its connected-device limit. Revoke a device and try again."
         case .rateLimited:
             return "Too many attempts. Wait briefly and try again."
-        case .server:
+        case .server, .retryableServer:
             return "The web portal could not complete the request. Try again shortly."
         case .invalidResponse:
             return "The web portal returned an invalid response."
@@ -228,6 +229,11 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
             throw DeviceSyncAPIError.invalidResponse
         }
         guard (200..<300).contains(httpResponse.statusCode) else {
+            if reportMode == .reconciliation, url.path == endpoints.upload.path,
+               httpResponse.statusCode == 408 || httpResponse.statusCode == 429 || (500...599).contains(httpResponse.statusCode) {
+                throw DeviceSyncAPIError.retryableServer(statusCode: httpResponse.statusCode,
+                    retryAfter: Self.retryDelay(httpResponse.value(forHTTPHeaderField: "Retry-After")))
+            }
             switch httpResponse.statusCode {
             case 401: throw unauthorizedError
             case 409: throw conflictError
@@ -240,5 +246,18 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
         } catch {
             throw DeviceSyncAPIError.invalidResponse
         }
+    }
+
+    static func retryDelay(_ header: String?, now: Date = Date()) -> TimeInterval? {
+        guard let header else { return nil }
+        let value = header.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !value.isEmpty, value.utf8.allSatisfy({ (48...57).contains($0) }),
+           let seconds = Double(value), seconds.isFinite { return seconds }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+        formatter.isLenient = false
+        return formatter.date(from: value).map { max(0, $0.timeIntervalSince(now)) }
     }
 }

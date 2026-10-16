@@ -67,7 +67,8 @@ struct DeviceSyncAPITests {
     @Test func reconciliationConflictDoesNotBecomePairingLimitOrLegacyRetry() async {
         let payload = ReconciliationSyncPayload(baseRevision: nil, roots: [], skills: [])
         for (code, error) in [(409, DeviceSyncAPIError.inventoryChanged), (401, .reconnectRequired),
-                              (429, .rateLimited), (503, .server(statusCode: 503))] {
+                              (429, .retryableServer(statusCode: 429, retryAfter: nil)),
+                              (503, .retryableServer(statusCode: 503, retryAfter: nil))] {
             let session = MockDeviceHTTPSession(responses: [.init(statusCode: code, body: "{}")])
             let api = DeviceSyncAPI(session: session, reportMode: .reconciliation)
             await #expect(throws: error) { try await api.reconcile(credential: "secret", payload: payload) }
@@ -85,6 +86,26 @@ struct DeviceSyncAPITests {
             try await DeviceSyncAPI(session: unused, reportMode: .reconciliation).upload(credential: "secret", installations: [])
         }
         #expect(await unused.requests().isEmpty)
+    }
+
+    @Test(arguments: [408, 429, 500, 503])
+    func reconciliationPreservesServerDelayWithoutRetryingInsideTransport(_ status: Int) async {
+        let session = MockDeviceHTTPSession(responses: [.init(statusCode: status, body: "{}", headers: ["Retry-After": "90"])])
+        let api = DeviceSyncAPI(session: session, reportMode: .reconciliation)
+        await #expect(throws: DeviceSyncAPIError.retryableServer(statusCode: status, retryAfter: 90)) {
+            try await api.inventoryRevision(credential: "secret")
+        }
+        #expect(await session.requests().count == 1)
+    }
+
+    @Test func retryAfterParsesSecondsAndHTTPDateButRejectsInvalidValues() {
+        let now = Date(timeIntervalSince1970: 0)
+        #expect(DeviceSyncAPI.retryDelay(" 60 ", now: now) == 60)
+        #expect(DeviceSyncAPI.retryDelay("Thu, 01 Jan 1970 00:02:00 GMT", now: now) == 120)
+        #expect(DeviceSyncAPI.retryDelay("Thu, 01 Jan 1970 00:00:00 GMT", now: now) == 0)
+        for invalid in ["-1", "nan", "inf", "1.5", "nonsense", ""] {
+            #expect(DeviceSyncAPI.retryDelay(invalid, now: now) == nil)
+        }
     }
 
     @Test func derivesDeviceEndpointsFromConfiguredUploadEndpoint() {
@@ -252,6 +273,7 @@ private actor MockDeviceHTTPSession: DeviceHTTPSession {
     struct Response: Sendable {
         let statusCode: Int
         let body: String
+        var headers: [String: String] = [:]
     }
 
     private var responses: [Response]
@@ -271,7 +293,7 @@ private actor MockDeviceHTTPSession: DeviceHTTPSession {
             url: request.url!,
             statusCode: response.statusCode,
             httpVersion: nil,
-            headerFields: nil
+            headerFields: response.headers
         )!
         return (Data(response.body.utf8), httpResponse)
     }
