@@ -3,6 +3,74 @@ import Testing
 @testable import omgskills
 
 struct DeviceSyncAPITests {
+    @Test func checkUsesOnlyRevisionAndValidatesAcknowledgementWithoutAFullReport() async throws {
+        let revision = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        let payload = try InventoryCheckPayload(baseRevision: revision.uppercased())
+        let valid: [String: Any] = ["reportVersion": 3, "mode": "checked", "deviceId": "mac",
+            "revision": revision, "checkedAt": "2026-10-16T12:05:00.123Z"]
+        let changes: [[String: Any]] = [[:], ["reportVersion": 2], ["mode": "reconciled"], ["deviceId": ""],
+            ["revision": UUID().uuidString], ["revision": "bad"], ["checkedAt": "bad"],
+            ["checkedAt": NSNull()], ["deviceId": NSNull()], ["revision": NSNull()]]
+        for (index, change) in changes.enumerated() {
+            let body = String(decoding: try JSONSerialization.data(withJSONObject: valid.merging(change) { _, new in new }), as: UTF8.self)
+            let session = MockDeviceHTTPSession(responses: [.init(statusCode: 200, body: body)])
+            let api = DeviceSyncAPI(uploadEndpoint: URL(string: "http://127.0.0.1:8888/api/portal/sync-upload")!,
+                session: session, reportMode: .reconciliation)
+            if index == 0 {
+                let result = try await api.checkInventory(credential: "secret", payload: payload)
+                #expect(result.checkedDate != nil)
+                #expect(throws: DeviceSyncAPIError.invalidResponse) { try result.validate(payload, deviceID: "other") }
+            } else {
+                await #expect(throws: DeviceSyncAPIError.invalidResponse) { try await api.checkInventory(credential: "secret", payload: payload) }
+            }
+            #expect(await session.requests().count == 1)
+            let request = try #require(await session.requests().first)
+            #expect(request.url?.absoluteString == "http://127.0.0.1:8888/api/portal/sync-upload")
+            #expect(request.httpMethod == "POST")
+            #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer secret")
+            let data = try #require(request.httpBody)
+            let json = try #require(JSONSerialization.jsonObject(with: data) as? NSDictionary)
+            #expect(json.isEqual(to: ["reportVersion": 3, "mode": "check", "baseRevision": revision]))
+        }
+        for key in valid.keys {
+            var incomplete = valid
+            incomplete.removeValue(forKey: key)
+            let body = String(decoding: try JSONSerialization.data(withJSONObject: incomplete), as: UTF8.self)
+            let session = MockDeviceHTTPSession(responses: [.init(statusCode: 200, body: body)])
+            await #expect(throws: DeviceSyncAPIError.invalidResponse) {
+                try await DeviceSyncAPI(session: session, reportMode: .reconciliation).checkInventory(credential: "secret", payload: payload)
+            }
+        }
+    }
+
+    @Test func checkPreservesErrorsAndServerDelayWithoutRetryingOrChangingModes() async throws {
+        let payload = try InventoryCheckPayload(baseRevision: UUID().uuidString)
+        for (code, error) in [(401, DeviceSyncAPIError.reconnectRequired), (409, .inventoryChanged),
+                              (408, .retryableServer(statusCode: 408, retryAfter: 90)),
+                              (429, .retryableServer(statusCode: 429, retryAfter: 90)),
+                              (503, .retryableServer(statusCode: 503, retryAfter: 90)), (400, .server(statusCode: 400))] {
+            let session = MockDeviceHTTPSession(responses: [.init(statusCode: code, body: "{}", headers: ["Retry-After": "90"])])
+            await #expect(throws: error) {
+                try await DeviceSyncAPI(session: session, reportMode: .reconciliation).checkInventory(credential: "secret", payload: payload)
+            }
+            #expect(await session.requests().count == 1)
+        }
+        for mode in [DeviceReportMode.legacy, .presence] {
+            let session = MockDeviceHTTPSession(responses: [])
+            await #expect(throws: DeviceSyncAPIError.unsupportedReportMode) {
+                try await DeviceSyncAPI(session: session, reportMode: mode).checkInventory(credential: "secret", payload: payload)
+            }
+            #expect(await session.requests().isEmpty)
+        }
+        #expect(throws: PresenceSyncError.invalidRevision) { try InventoryCheckPayload(baseRevision: "bad") }
+        let session = MockDeviceHTTPSession(responses: [])
+        await #expect(throws: DeviceSyncAPIError.invalidResponse) {
+            try await DeviceSyncAPI(uploadEndpoint: URL(string: "http://localhost:8888/api/portal/sync-upload?extra=1")!,
+                session: session, reportMode: .reconciliation).checkInventory(credential: "secret", payload: payload)
+        }
+        #expect(await session.requests().isEmpty)
+    }
+
     @Test func revisionReadUsesExactAuthenticatedGetAndRequiresExplicitRevision() async throws {
         for value in ["null", "\"AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE\""] {
             let session = MockDeviceHTTPSession(responses: [.init(statusCode: 200,

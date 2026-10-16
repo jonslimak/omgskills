@@ -299,6 +299,46 @@ struct SkillSyncServiceTests {
         #expect(legacy.reportVersion == 2)
     }
 
+    @Test func inventoryComparisonIgnoresOrderAndRevisionButComparesEveryReportedField() {
+        let roots: [InventoryRootCoverage] = ["claude", "codex", "agents"].map { .init(source: $0, state: .complete, reason: nil) }
+        let original = PresenceSyncSkill(source: "codex", installationPath: "fixture", name: "Fixture", description: "Description",
+            skillMdSha: nil, githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: nil)
+        let other = PresenceSyncSkill(source: "claude", installationPath: "fixture", name: "Other", description: "",
+            skillMdSha: nil, githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: nil)
+        let baseline = ReconciliationSyncPayload(baseRevision: nil, roots: roots, skills: [original, other])
+        #expect(baseline.hasSameInventory(as: .init(baseRevision: UUID().uuidString,
+            roots: roots.reversed(), skills: [other, original])))
+        let changes: [PresenceSyncSkill] = [
+            .init(source: "agents", installationPath: original.installationPath, name: original.name, description: original.description,
+                skillMdSha: nil, githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: nil),
+            .init(source: original.source, installationPath: "renamed", name: original.name, description: original.description,
+                skillMdSha: nil, githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: nil),
+            .init(source: original.source, installationPath: original.installationPath, name: "Renamed", description: original.description,
+                skillMdSha: nil, githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: nil),
+            .init(source: original.source, installationPath: original.installationPath, name: original.name, description: "Changed",
+                skillMdSha: nil, githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: nil),
+            .init(source: original.source, installationPath: original.installationPath, name: original.name, description: original.description,
+                skillMdSha: String(repeating: "a", count: 64), githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: nil),
+            .init(source: original.source, installationPath: original.installationPath, name: original.name, description: original.description,
+                skillMdSha: nil, githubUrl: "https://github.com/a/b", gitRelativePath: nil, catalogSkillIdHint: nil),
+            .init(source: original.source, installationPath: original.installationPath, name: original.name, description: original.description,
+                skillMdSha: nil, githubUrl: nil, gitRelativePath: "", catalogSkillIdHint: nil),
+            .init(source: original.source, installationPath: original.installationPath, name: original.name, description: original.description,
+                skillMdSha: nil, githubUrl: nil, gitRelativePath: nil, catalogSkillIdHint: "catalog:a/b")]
+        for changed in changes {
+            let modified = ReconciliationSyncPayload(baseRevision: nil, roots: roots, skills: [changed, other])
+            #expect(!baseline.hasSameInventory(as: modified))
+            #expect(!modified.hasSameInventory(as: baseline))
+        }
+        #expect(!baseline.hasSameInventory(as: .init(baseRevision: nil, roots: roots, skills: [original])))
+        var changedRoots = roots
+        changedRoots[0] = .init(source: "claude", state: .unavailable, reason: .missing)
+        let partial = ReconciliationSyncPayload(baseRevision: nil, roots: changedRoots, skills: baseline.skills)
+        #expect(!baseline.hasSameInventory(as: partial))
+        changedRoots[0].reason = .unreadable
+        #expect(!partial.hasSameInventory(as: .init(baseRevision: nil, roots: changedRoots, skills: baseline.skills)))
+    }
+
     @Test func canceledReconciliationEncodingSubmitsNothing() async {
         let task = Task {
             withUnsafeCurrentTask { $0?.cancel() }

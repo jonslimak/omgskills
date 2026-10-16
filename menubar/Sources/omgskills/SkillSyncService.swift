@@ -48,12 +48,50 @@ struct ReconciliationSyncPayload: Encodable, Equatable, Sendable {
     let skills: [PresenceSyncSkill]
 
     private enum CodingKeys: String, CodingKey { case reportVersion, baseRevision, roots, skills }
+
+    func hasSameInventory(as other: Self) -> Bool {
+        roots.sorted { $0.source < $1.source } == other.roots.sorted { $0.source < $1.source }
+            && skills.sorted(by: Self.locationOrder) == other.skills.sorted(by: Self.locationOrder)
+    }
+
+    private static func locationOrder(_ lhs: PresenceSyncSkill, _ rhs: PresenceSyncSkill) -> Bool {
+        lhs.source == rhs.source ? lhs.installationPath < rhs.installationPath : lhs.source < rhs.source
+    }
     func encode(to encoder: any Encoder) throws {
         var values = encoder.container(keyedBy: CodingKeys.self)
         try values.encode(reportVersion, forKey: .reportVersion)
         try values.encode(baseRevision, forKey: .baseRevision)
         try values.encode(roots, forKey: .roots)
         try values.encode(skills, forKey: .skills)
+    }
+}
+
+struct InventoryCheckPayload: Encodable, Equatable, Sendable {
+    let reportVersion = 3
+    let mode = "check"
+    let baseRevision: String
+
+    init(baseRevision: String) throws {
+        guard UUID(uuidString: baseRevision) != nil else { throw PresenceSyncError.invalidRevision }
+        self.baseRevision = baseRevision.lowercased()
+    }
+}
+
+struct InventoryCheckResult: Decodable, Equatable, Sendable {
+    let reportVersion: Int
+    let mode: String
+    let deviceId: String
+    let revision: String
+    let checkedAt: String
+
+    var checkedDate: Date? { SkillSyncService.serverDate(checkedAt) }
+
+    func validate(_ payload: InventoryCheckPayload, deviceID: String? = nil) throws {
+        guard reportVersion == 3, mode == "checked", !deviceId.isEmpty,
+              deviceID == nil || deviceId == deviceID,
+              revision.lowercased() == payload.baseRevision, checkedDate != nil else {
+            throw DeviceSyncAPIError.invalidResponse
+        }
     }
 }
 
@@ -145,9 +183,7 @@ struct SkillSyncResult: Decodable, Equatable, Sendable {
 
     var reportedAt: Date? {
         guard let completedAt else { return nil }
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter.date(from: completedAt) ?? ISO8601DateFormatter().date(from: completedAt)
+        return SkillSyncService.serverDate(completedAt)
     }
 }
 
@@ -166,6 +202,12 @@ enum SkillSyncError: LocalizedError, Equatable {
 }
 
 enum SkillSyncService {
+    static func serverDate(_ value: String) -> Date? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.date(from: value) ?? ISO8601DateFormatter().date(from: value)
+    }
+
     static let defaultEndpoint = URL(string: "https://omgskills.com/api/portal/sync-upload")!
     static let endpointInfoKey = "OMGSkillsSyncEndpoint"
 

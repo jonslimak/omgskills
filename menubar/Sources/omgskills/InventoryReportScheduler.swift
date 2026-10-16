@@ -121,7 +121,7 @@ final class InventoryReportScheduler {
 
     private func finish(_ outcome: InventoryReportOutcome) {
         switch outcome {
-        case .reported:
+        case .reported, .checked:
             retries = 0
             conflicts = 0
             if let changeDeadline { schedule(at: max(now(), changeDeadline)) }

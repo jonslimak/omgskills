@@ -78,7 +78,7 @@ struct InventoryReportSchedulerTests {
     }
 
     @Test(arguments: [InventoryReportOutcome.needsAttention, .reconnectRequired, .cancelled,
-                      .reported(partial: true), .reported(partial: false)])
+                      .reported(partial: true), .reported(partial: false), .checked])
     func nonTransientOutcomesNeverRetry(_ outcome: InventoryReportOutcome) async {
         let clock = ReportTestClock()
         var calls = 0
@@ -112,7 +112,8 @@ struct InventoryReportSchedulerTests {
         scheduler.stop()
     }
 
-    @Test func eventsDuringReportCoalesceAndStopFencesLateCompletion() async {
+    @Test(arguments: [InventoryReportOutcome.reported(partial: false), .checked])
+    func eventsDuringReportCoalesceAndStopFencesLateCompletion(_ success: InventoryReportOutcome) async {
         let clock = ReportTestClock()
         var continuation: CheckedContinuation<InventoryReportOutcome, Never>?
         var calls = 0
@@ -125,7 +126,7 @@ struct InventoryReportSchedulerTests {
         await clock.advance(0)
         for _ in 0..<20 { scheduler.changed() }
         #expect(calls == 1)
-        continuation?.resume(returning: .reported(partial: false))
+        continuation?.resume(returning: success)
         await clock.advance(0)
         #expect(scheduler.deadline == 3)
         await clock.advance(3)

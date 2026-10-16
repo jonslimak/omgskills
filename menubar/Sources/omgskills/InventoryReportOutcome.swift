@@ -2,6 +2,7 @@ import Foundation
 
 enum InventoryReportOutcome: Equatable, Sendable {
     case reported(partial: Bool)
+    case checked
     case retryable(retryAfter: TimeInterval?)
     case revisionConflict
     case needsAttention

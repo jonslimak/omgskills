@@ -43,6 +43,7 @@ protocol DeviceSyncServing: Sendable {
     func upload(credential: String, installations: [Skill]) async throws -> SkillSyncResult
     func inventoryRevision(credential: String) async throws -> String?
     func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult
+    func checkInventory(credential: String, payload: InventoryCheckPayload) async throws -> InventoryCheckResult
     func revoke(credential: String) async throws
 }
 
@@ -50,6 +51,9 @@ extension DeviceSyncServing {
     var reportMode: DeviceReportMode { .legacy }
     func inventoryRevision(credential: String) async throws -> String? { throw DeviceSyncAPIError.unsupportedReportMode }
     func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
+        throw DeviceSyncAPIError.unsupportedReportMode
+    }
+    func checkInventory(credential: String, payload: InventoryCheckPayload) async throws -> InventoryCheckResult {
         throw DeviceSyncAPIError.unsupportedReportMode
     }
 }
@@ -199,6 +203,16 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
             credential: credential,
             unauthorizedError: .reconnectRequired
         )
+    }
+
+    func checkInventory(credential: String, payload: InventoryCheckPayload) async throws -> InventoryCheckResult {
+        guard reportMode == .reconciliation else { throw DeviceSyncAPIError.unsupportedReportMode }
+        guard endpoints.upload.query == nil else { throw DeviceSyncAPIError.invalidResponse }
+        try Task.checkCancellation()
+        let result: InventoryCheckResult = try await send(to: endpoints.upload, body: encoder.encode(payload),
+            credential: credential, unauthorizedError: .reconnectRequired, conflictError: .inventoryChanged)
+        try result.validate(payload)
+        return result
     }
 
     private struct DeviceRevokeResponse: Decodable {

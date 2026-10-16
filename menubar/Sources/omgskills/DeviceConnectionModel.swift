@@ -38,6 +38,7 @@ final class DeviceConnectionModel {
     private(set) var disconnectWarning: String?
     private(set) var reportStatus: ReportStatus = .idle
     private(set) var lastReportOutcome: InventoryReportOutcome?
+    private(set) var lastInventoryCheckedAt: Date?
 
     @ObservationIgnored private let credentialStore: any DeviceCredentialStoring
     @ObservationIgnored private let api: any DeviceSyncServing
@@ -54,6 +55,15 @@ final class DeviceConnectionModel {
     @ObservationIgnored private var reportRequested = false
     @ObservationIgnored private var reconciliationUploadInFlight = false
     @ObservationIgnored private var lastReportAttemptID: UUID?
+    @ObservationIgnored private let inventoryAutomationEnabled: Bool
+    @ObservationIgnored private var forceFullReportRequested = false
+    @ObservationIgnored private var inventoryBaseline: InventoryBaseline?
+
+    private struct InventoryBaseline {
+        let payload: ReconciliationSyncPayload
+        let result: SkillSyncResult
+        let credential: StoredDeviceCredential
+    }
 
     init(
         credentialStore: any DeviceCredentialStoring = DeviceCredentialStore(),
@@ -63,7 +73,8 @@ final class DeviceConnectionModel {
         portalConnectURL: URL = BrowserPairing.configuredConnectURL(),
         callbackScheme: String = BrowserPairing.callbackScheme,
         updateCoordinator: UpdateInstallCoordinator? = nil,
-        inventoryScanner: InventoryScanner? = nil
+        inventoryScanner: InventoryScanner? = nil,
+        inventoryAutomationEnabled: Bool = false
     ) {
         self.credentialStore = credentialStore
         self.api = api
@@ -73,10 +84,12 @@ final class DeviceConnectionModel {
         self.callbackScheme = callbackScheme
         self.updateCoordinator = updateCoordinator
         self.inventoryScanner = inventoryScanner
+        self.inventoryAutomationEnabled = inventoryAutomationEnabled
     }
 
     @discardableResult
     func restore() -> Task<Void, Never> {
+        resetInventoryBaseline()
         if api.reportMode != .legacy {
             connectedCredential = nil
             connectedInfo = nil
@@ -113,7 +126,8 @@ final class DeviceConnectionModel {
         installations: [Skill],
         replacingExisting: Bool = false
     ) -> Task<Void, Never> {
-        startAttempt(initialState: .exchanging, trackedActivity: .portalConnection) { model, attemptID in
+        resetInventoryBaseline()
+        return startAttempt(initialState: .exchanging, trackedActivity: .portalConnection) { model, attemptID in
             await model.performConnect(
                 pairingCode: pairingCode,
                 codeVerifier: nil,
@@ -131,7 +145,8 @@ final class DeviceConnectionModel {
         installations: [Skill],
         replacingExisting: Bool = false
     ) -> Task<Void, Never> {
-        startAttempt(initialState: .authorizing, trackedActivity: .portalConnection) { model, attemptID in
+        resetInventoryBaseline()
+        return startAttempt(initialState: .authorizing, trackedActivity: .portalConnection) { model, attemptID in
             await model.performBrowserConnect(
                 deviceName: deviceName,
                 installations: installations,
@@ -178,15 +193,21 @@ final class DeviceConnectionModel {
 
     @discardableResult
     func requestInventoryReport() -> Task<Void, Never> {
+        requestInventoryReport(forceFull: true)
+    }
+
+    private func requestInventoryReport(forceFull: Bool) -> Task<Void, Never> {
         guard api.reportMode != .legacy else { return Task {} }
         if let activeTask, !activeTask.isCancelled {
             if connectedCredential != nil || state == .authorizing || state == .exchanging || state == .storingCredential {
+                forceFullReportRequested = forceFullReportRequested || forceFull
                 reportRequested = true
                 if reportStatus != .reporting { reportStatus = .pending }
             }
             return activeTask
         }
         guard let record = connectedCredential, case .connected = state else { return Task {} }
+        forceFullReportRequested = forceFullReportRequested || forceFull
         return startAttempt(initialState: .connected(record.connection), trackedActivity: .portalConnection) { model, attemptID in
             await model.performInventoryReports(record: record, attemptID: attemptID)
         }
@@ -197,7 +218,7 @@ final class DeviceConnectionModel {
         guard !Task.isCancelled, api.reportMode != .legacy,
               let record = connectedCredential, case .connected = state else { return .cancelled }
         let ownsReport = activeTask == nil || activeTask?.isCancelled == true
-        let task = requestInventoryReport()
+        let task = requestInventoryReport(forceFull: false)
         let attemptID = activeAttemptID
         await withTaskCancellationHandler {
             await task.value
@@ -217,6 +238,7 @@ final class DeviceConnectionModel {
 
     @discardableResult
     func disconnect() -> Task<Void, Never> {
+        resetInventoryBaseline()
         lastReportOutcome = .cancelled
         connectedCredential = nil
         reportRequested = false
@@ -265,6 +287,7 @@ final class DeviceConnectionModel {
     }
 
     func cancelCurrentOperation() {
+        resetInventoryBaseline()
         lastReportAttemptID = activeAttemptID
         lastReportOutcome = .cancelled
         reportRequested = false
@@ -449,6 +472,7 @@ final class DeviceConnectionModel {
         operation: @escaping @MainActor (DeviceConnectionModel, UUID) async -> Void
     ) -> Task<Void, Never> {
         let previousTask = activeTask
+        if previousTask != nil { inventoryBaseline = nil }
         activeAttemptID = nil
         browserAuthorizer?.cancel()
         previousTask?.cancel()
@@ -479,6 +503,8 @@ final class DeviceConnectionModel {
     private func performInventoryReports(record: StoredDeviceCredential, attemptID: UUID) async {
         repeat {
             reportRequested = false
+            let forceFull = forceFullReportRequested
+            forceFullReportRequested = false
             reportStatus = .reporting
             var submitted = false
             defer { if isCurrent(attemptID) { reconciliationUploadInFlight = false } }
@@ -487,20 +513,45 @@ final class DeviceConnectionModel {
                 var revision: String?
                 if api.reportMode == .reconciliation {
                     revision = try await api.inventoryRevision(credential: record.credential)
+                    try Task.checkCancellation()
                     guard isCurrent(attemptID), connectedCredential == record else { return }
                 }
                 let scan = try await inventoryScanner()
+                try Task.checkCancellation()
                 guard isCurrent(attemptID), connectedCredential == record else { return }
                 let result: SkillSyncResult
                 if api.reportMode == .reconciliation {
                     let payload = try SkillSyncService.reconciliationPayload(baseRevision: revision, scan: scan)
                     reconciliationUploadInFlight = true
                     submitted = true
+                    if inventoryAutomationEnabled, !forceFull, scan.issues.isEmpty,
+                       payload.roots.allSatisfy({ $0.state == .complete }),
+                       let baseline = inventoryBaseline, baseline.credential == record,
+                       revision == baseline.result.revision?.lowercased(),
+                       payload.hasSameInventory(as: baseline.payload), let revision {
+                        let check = try InventoryCheckPayload(baseRevision: revision)
+                        let checked = try await api.checkInventory(credential: record.credential, payload: check)
+                        try Task.checkCancellation()
+                        guard isCurrent(attemptID), connectedCredential == record else { return }
+                        try checked.validate(check, deviceID: record.connection.deviceID)
+                        lastInventoryCheckedAt = checked.checkedDate
+                        reportStatus = .reported(baseline.result, scanIssueCount: 0)
+                        lastReportOutcome = .checked
+                        lastReportAttemptID = attemptID
+                        continue
+                    }
                     result = try await api.reconcile(credential: record.credential, payload: payload)
+                    try Task.checkCancellation()
                     guard isCurrent(attemptID), connectedCredential == record else { return }
                     try result.validateReconciliation(payload, deviceID: record.connection.deviceID)
+                    if inventoryAutomationEnabled {
+                        lastInventoryCheckedAt = result.reportedAt
+                        inventoryBaseline = scan.issues.isEmpty && result.complete == true
+                            ? InventoryBaseline(payload: payload, result: result, credential: record) : nil
+                    }
                 } else {
                     result = try await api.upload(credential: record.credential, installations: scan.installations)
+                    try Task.checkCancellation()
                     guard isCurrent(attemptID), connectedCredential == record else { return }
                     guard result.reportVersion == 2, result.mode == "presence",
                           result.deviceId == record.connection.deviceID, result.reportedAt != nil else {
@@ -511,7 +562,8 @@ final class DeviceConnectionModel {
                 lastReportOutcome = .reported(partial: !scan.issues.isEmpty || result.complete == false)
                 lastReportAttemptID = attemptID
             } catch is CancellationError {
-                if isCurrent(attemptID) {
+                if activeAttemptID == attemptID, connectedCredential == record {
+                    inventoryBaseline = nil
                     lastReportOutcome = .cancelled
                     lastReportAttemptID = attemptID
                     reportStatus = submitted ? .uncertain("The submitted report may have completed.") : .pending
@@ -520,6 +572,7 @@ final class DeviceConnectionModel {
                 return
             } catch DeviceSyncAPIError.reconnectRequired {
                 guard isCurrent(attemptID), connectedCredential == record else { return }
+                resetInventoryBaseline()
                 try? await credentialStore.delete(deviceID: record.connection.deviceID)
                 guard isCurrent(attemptID), connectedCredential == record else { return }
                 connectedCredential = nil
@@ -532,6 +585,7 @@ final class DeviceConnectionModel {
                 return
             } catch DeviceSyncAPIError.inventoryChanged {
                 guard isCurrent(attemptID), connectedCredential == record else { return }
+                inventoryBaseline = nil
                 reportStatus = .failed(DeviceSyncAPIError.inventoryChanged.localizedDescription)
                 lastReportOutcome = .revisionConflict
                 lastReportAttemptID = attemptID
@@ -539,6 +593,7 @@ final class DeviceConnectionModel {
                 return
             } catch {
                 guard isCurrent(attemptID), connectedCredential == record else { return }
+                inventoryBaseline = nil
                 reportStatus = submitted ? .uncertain(error.localizedDescription) : .failed(error.localizedDescription)
                 lastReportOutcome = InventoryReportOutcome.failure(error)
                 lastReportAttemptID = attemptID
@@ -546,6 +601,12 @@ final class DeviceConnectionModel {
                 return
             }
         } while reportRequested && isCurrent(attemptID)
+    }
+
+    private func resetInventoryBaseline() {
+        inventoryBaseline = nil
+        lastInventoryCheckedAt = nil
+        forceFullReportRequested = false
     }
 
     private func cleanup(
