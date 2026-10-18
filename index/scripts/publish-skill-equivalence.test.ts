@@ -307,14 +307,9 @@ test("full v2 and Crawl 4 publishers preserve equivalence manifests and assets",
       tracks.map((track) => [track.name, readManifest(track).skillEquivalence]),
     );
 
-    mkdirSync(join(root, "scripts"), { recursive: true });
     mkdirSync(join(root, "index", "shadow"), { recursive: true });
-    cpSync(join(repoRoot, "scripts", "publish-data.sh"), join(root, "scripts", "publish-data.sh"));
-    cpSync(join(repoRoot, "scripts", "publish-catalog-manifest.mjs"), join(root, "scripts", "publish-catalog-manifest.mjs"));
-    cpSync(
-      join(repoRoot, "scripts", "publish-crawl4-data.mjs"),
-      join(root, "scripts", "publish-crawl4-data.mjs"),
-    );
+    cpSync(join(repoRoot, "scripts"), join(root, "scripts"), { recursive: true });
+    cpSync(join(repoRoot, "mcp", "src"), join(root, "mcp", "src"), { recursive: true });
     writeFileSync(join(root, "index", "skills.json"), `${JSON.stringify(skills, null, 2)}\n`);
     writeFileSync(join(root, "index", "trending.json"), "[]\n");
     writeFileSync(
