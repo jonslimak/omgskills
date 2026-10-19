@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "./components/ui/button";
-import { usePortalApi } from "./portal-api";
+import { usePortalApi, type PortalApi } from "./portal-api";
 import { createPairingConsent, normalPairingConsent, type BrowserPairingRequest,
   type PairingConsentPolicy, type PairingConsentSnapshot } from "./browser-pairing";
 
@@ -32,18 +32,23 @@ export function ConsentContent({ request, policy, snapshot, approve, cancel }: {
   </main>;
 }
 
-export function ConnectPage({ policy = normalPairingConsent }: { policy?: PairingConsentPolicy }) {
-  const api = usePortalApi();
-  const callbacks = useRef(api);
-  callbacks.current = api;
-  const [hash] = useState(() => window.location.hash);
+export function ConnectPage({ policy = normalPairingConsent, adaptApi, pendingHash, isCurrent }: {
+  policy?: PairingConsentPolicy; adaptApi?: (api: PortalApi) => PortalApi; pendingHash?: string; isCurrent?: () => boolean;
+}) {
+  const normalApi = usePortalApi();
+  const api = adaptApi ? adaptApi(normalApi) : normalApi;
+  const callbacks = useRef({ api, isCurrent });
+  callbacks.current = { api, isCurrent };
+  const [hash] = useState(() => pendingHash ?? window.location.hash);
   const [request] = useState(() => policy.parse(hash));
   const [snapshot, setSnapshot] = useState<PairingConsentSnapshot>(() => ({ phase: request ? "ready" : "invalid",
     status: request ? "" : "This connection request is invalid or expired." }));
   const session = useRef<ConsentSession | null>(null);
   useEffect(() => {
     const current = createPairingConsent(hash, policy, {
-      api: (path, init) => callbacks.current(path, init), navigate: url => window.location.assign(url), changed: setSnapshot,
+      api: (path, init) => callbacks.current.isCurrent?.() === false
+        ? Promise.reject(new Error("This connection request changed. Review the current request.")) : callbacks.current.api(path, init),
+      navigate: url => { if (callbacks.current.isCurrent?.() !== false) window.location.assign(url); }, changed: setSnapshot,
     });
     session.current = current;
     setSnapshot(current.getSnapshot());

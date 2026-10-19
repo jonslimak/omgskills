@@ -3,7 +3,7 @@ import test from "node:test";
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { createElement, isValidElement, type ReactElement } from "react";
+import { createElement, isValidElement, type ReactElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { build } from "esbuild";
 import { createPairingConsent, f1PairingConsent, normalPairingConsent,
@@ -12,6 +12,13 @@ import { connectedCandidateOrigin as origin, connectedCandidateConsent as consen
   connectedClerkFrontend, requireConnectedCandidateBrowser, connectedCandidateReturnUrl,
   connectedCandidateNavigation, isConnectedCandidateBrowserRequest, connectedCandidateBrowserApi } from "../src/candidate/connected-policy";
 import { initialNavigation } from "../src/app/unified/model";
+import { createAccountSession, type AccountSnapshot } from "../src/integration/account-session";
+import { PortalApiError } from "../src/api-error";
+import { createDeviceSession } from "../src/integration/device-session";
+import type { PortalApi } from "../src/portal-api";
+import type { UnifiedApp } from "../src/app/unified/UnifiedApp";
+import type { PortalData } from "../src/app/model";
+import type { CatalogInstallIntentStore } from "../src/app/unified/catalog-install-intent";
 import { connectedCandidateOrigin as serverOrigin } from "../../netlify/functions/_shared/connected-candidate";
 
 const state = "a".repeat(43), challenge = "b".repeat(43), code = `pair_${"c".repeat(43)}`;
@@ -279,11 +286,258 @@ test("shared rendered consent preserves normal/F1 permission text and disables m
   assert.equal((html.match(/disabled=""/g) ?? []).length, 2); assert.match(html, /role="alert"/);
 });
 
-test("B1 extracts only consent; candidate entry and session wiring remain absent", () => {
+test("connected entry remains separate from normal/F1 bootstrap and release preparation", () => {
   const source = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8");
   assert.match(source("../src/main.tsx"), /<ConnectPage policy=\{connectedInventoryTest \? f1PairingConsent : normalPairingConsent\}/);
   assert.doesNotMatch(source("../src/main.tsx"), /candidate\/connected-policy|function ConnectPage/);
   assert.doesNotMatch(source("../src/integration/unified/Session.tsx"), /connectedCandidate|candidate\/connected/);
   assert.doesNotMatch(source("../src/bootstrap.ts"), /candidate\/connected/);
   assert.doesNotMatch(source("../../scripts/prepare-catalog-candidate-web.mjs"), /connected-main/);
+});
+
+const favoriteId = "11111111-1111-4111-8111-111111111111";
+const observed = "2026-10-16T12:00:00Z", reported = "2026-10-19T12:00:00Z";
+const identity = { name: "Candidate user", email: "candidate@example.test" };
+function accountResponse(path: string) {
+  if (path === "/api/portal/synced-skills?version=3") return { inventoryVersion: 3,
+    skills: ["mac-a", "mac-b", null].map((deviceId, index) => ({ id: `physical-${index}`, name: "Installed skill",
+      description: "Retained skill", source: index === 1 ? "claude" : "codex", deviceId, installationFolder: "skill",
+      githubUrl: null, isLocalOnly: true, isCurrent: index !== 0, lastSeenAt: observed })),
+    devices: [{ id: "mac-a", deviceName: "Mac A", status: "active", lastReportedAt: reported, lastCheckedAt: reported,
+      scanCoverage: [{ source: "codex", state: "incomplete", reason: "changed" }, { source: "claude", state: "complete" }, { source: "agents", state: "complete" }] },
+    { id: "mac-b", deviceName: "Mac B", status: "revoked", lastReportedAt: reported, lastCheckedAt: null, scanCoverage: null }] };
+  const favorite = { id: favoriteId, name: "Favorite Skills", isFavorites: true, visibility: "public", itemCount: 1,
+    syncedSkillIds: ["physical-0"], allowedEmails: [] };
+  if (path === "/api/portal/groups") return { groups: [favorite] };
+  if (path === "/api/portal/shared") return { groups: [] };
+  if (path === "/api/portal/profile") return { profile: { handle: "candidate", profilePublished: true, publicUrl: origin + "/u/candidate" } };
+  if (path === `/api/portal/groups/${favoriteId}`) return { group: favorite, accessRole: "owner", items: [
+    { id: "saved-item", kind: "synced", syncedSkillId: "physical-0", name: "Saved skill", description: "Saved note", githubUrl: null, position: 0 },
+  ] };
+  assert.fail(`Unexpected candidate read ${path}`);
+}
+
+test("candidate real account session refreshes retained per-Mac inventory and Favorites without enabling writes", async () => {
+  const requests: string[] = [], writes: string[] = [];
+  let fail = 0, storageCalls = 0;
+  const api = connectedCandidateBrowserApi(async <T>(path: string, init?: RequestInit) => {
+    requests.push(path); if ((init?.method ?? "GET") !== "GET") writes.push(path);
+    if (fail) throw new PortalApiError("Synthetic failure", fail);
+    return structuredClone(accountResponse(path)) as T;
+  });
+  const session = createAccountSession({ api, identity, cacheKey: "candidate-test", connectedInventory: true,
+    inventoryReconciliation: true, includeFavoriteItems: true, changed() {}, storage: {
+      getItem() { storageCalls++; return null; }, setItem() { storageCalls++; }, removeItem() { storageCalls++; },
+    } });
+  await session.refresh();
+  const before = session.getSnapshot().data!;
+  assert.equal(before.inventoryVersion, 3); assert.equal(before.skills.length, 3);
+  assert.equal(before.skills[0].isCurrent, false); assert.equal(before.skills[0].lastSeenAt, observed);
+  assert.equal(before.devices[0].lastCheckedAt, reported); assert.equal(before.devices[1].status, "revoked");
+  assert.equal(before.skills[2].deviceId, null); assert.equal(before.sets[0].items[0].id, "saved-item");
+  await session.refresh(); assert.deepEqual(session.getSnapshot().data, before);
+  const readCount = requests.length;
+  await assert.rejects(session.saveProfile({ handle: "not-allowed" }));
+  await assert.rejects(session.saveSet({ kind: "create", name: "Not allowed" }));
+  assert.deepEqual(writes, []);
+  assert.equal(requests.length, readCount);
+  fail = 503; await session.refresh();
+  assert.deepEqual(session.getSnapshot().data, before); assert.match(session.getSnapshot().error, /last loaded/);
+  fail = 0; await session.refresh(); assert.equal(session.getSnapshot().error, "");
+  fail = 401; await session.refresh(); assert.equal(session.getSnapshot().data, null);
+  assert.equal(session.getSnapshot().accessDenied, true); assert.equal(storageCalls, 0); session.dispose();
+});
+
+// Real React rendering with only auth, account snapshot and public-catalog boundaries mocked.
+async function compositionFixture(data: PortalData | null = null, href = origin + "/app/") {
+  const captured: ComponentProps<typeof UnifiedApp>[] = [];
+  const signIns: string[] = [], accountCalls: unknown[][] = [];
+  let signedIn = false, refreshes = 0, providerMounts = 0, tokenCalls = 0;
+  const snapshot: AccountSnapshot = { data, refreshing: false, accessDenied: false, revision: 1,
+    error: "", profileError: "", profileSaving: false, setSaving: false };
+  const catalog = { skills: [], collections: [], creators: [], categories: [], trendingIds: [] };
+  const overrides: Record<string, unknown> = {
+    "@clerk/clerk-react": {
+      ClerkProvider: ({ children }: { children: React.ReactNode }) => { providerMounts++; return children; },
+      useAuth: () => ({ isLoaded: true, isSignedIn: signedIn, userId: "user", sessionId: "session", getToken: async () => { tokenCalls++; return "fake"; } }),
+      useUser: () => ({ isLoaded: true, user: { fullName: identity.name, primaryEmailAddress: { emailAddress: identity.email } } }),
+      useClerk: () => ({ openSignIn: ({ forceRedirectUrl }: { forceRedirectUrl: string }) => { signIns.push(forceRedirectUrl); }, signOut: async () => {} }),
+    },
+    "cc2b-account": { useAccount: (...args: unknown[]) => {
+      accountCalls.push(args);
+      return { snapshot, refresh: () => { refreshes++; }, clear() {}, recover() {}, invalidate() {},
+        saveSet() { assert.fail("Candidate must not expose saves"); }, saveProfile() { assert.fail("Candidate must not expose saves"); }, saveMembership() { assert.fail("Candidate must not expose saves"); } };
+    } },
+    "cc2b-shell": { UnifiedApp: (props: ComponentProps<typeof UnifiedApp>) => { captured.push(props); return createElement("main", null, props.previewBar); }, Modal: () => null },
+    "cc2b-public": { usePublicCatalogPreload() {}, usePublicCatalog: () => ({ catalog, status: { list: "ready", detail: "ready", retry() {}, retryDetail() {} } }) },
+  };
+  const output = await build({ entryPoints: [fileURLToPath(new URL("../src/candidate/connected-app.tsx", import.meta.url))],
+    bundle: true, write: false, platform: "node", format: "cjs", packages: "external", jsx: "automatic",
+    define: { "import.meta.env": JSON.stringify({ DEV: false }) }, loader: { ".css": "empty" }, plugins: [{ name: "fake-boundaries", setup(plugin) {
+      for (const [filter, path] of [[/\/useAccount$/, "cc2b-account"], [/\/UnifiedApp$/, "cc2b-shell"], [/\/use-public-catalog$/, "cc2b-public"]] as const) {
+        plugin.onResolve({ filter }, () => ({ path, external: true }));
+      }
+    } }] });
+  const require = createRequire(import.meta.url);
+  const module = { exports: {} as typeof import("../src/candidate/connected-app") };
+  new Function("require", "module", "exports", output.outputFiles[0].text)((id: string) => overrides[id] ?? require(id), module, module.exports);
+  const descriptors = ["window", "location", "history"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
+  const location = new URL(href);
+  const stored = new Map<string, string>();
+  const storage = { getItem: (key: string) => stored.get(key) ?? null,
+    setItem(key: string, value: string) { stored.set(key, value); }, removeItem(key: string) { stored.delete(key); } };
+  Object.defineProperty(globalThis, "window", { configurable: true, value: { location, sessionStorage: storage, matchMedia: () => ({ matches: true }) } });
+  Object.defineProperty(globalThis, "location", { configurable: true, value: location });
+  Object.defineProperty(globalThis, "history", { configurable: true, value: { replaceState() {}, pushState() {} } });
+  return { captured, signIns, accountCalls, snapshot, stored, exports: module.exports,
+    setSignedIn(value: boolean) { signedIn = value; },
+    counts: () => ({ refreshes, providerMounts, tokenCalls }),
+    restore() { for (const [key, descriptor] of descriptors) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor); else Reflect.deleteProperty(globalThis, key);
+    } },
+  };
+}
+
+test("real candidate entry validates before mounting Clerk and signed-out account reads stay disabled", async () => {
+  const f = await compositionFixture();
+  try {
+    for (const invalid of [{ ...config, profile: "other" }, { ...config, publishableKey: "pk_live_ignored" }]) {
+      assert.match(renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: invalid })), /unavailable/);
+    }
+    assert.equal(f.counts().providerMounts, 0); assert.deepEqual(f.accountCalls, []);
+    renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config }));
+    assert.equal(f.counts().providerMounts, 1);
+    assert.equal(f.accountCalls[0][2], false); assert.equal(f.accountCalls[0][4], true);
+    assert.equal(f.accountCalls[0][5], true); assert.equal(f.accountCalls[0][6], true);
+    assert.equal(f.captured[0].signedIn, false); assert.equal(f.captured[0].management, undefined);
+    f.captured[0].onSignIn!(); assert.deepEqual(f.signIns, [origin + "/app/"]);
+    assert.equal(f.counts().tokenCalls, 0);
+    assert.equal(f.stored.size, 0);
+  } finally { f.restore(); }
+});
+
+test("candidate connection sign-in preserves the fragment and never mounts inventory or auto-approves", async () => {
+  const href = origin + "/app/connect" + hash;
+  const f = await compositionFixture(null, href);
+  try {
+    const { ConnectionSignIn, ConnectedCandidateApp } = f.exports;
+    renderToStaticMarkup(createElement(ConnectedCandidateApp, { configuration: config }));
+    assert.equal(f.accountCalls.length, 0); assert.equal(f.counts().tokenCalls, 0);
+    const tree = ConnectionSignIn({ href, signIn: returnUrl => { f.signIns.push(returnUrl); } });
+    const button = elements(tree).find(element => typeof element.props.onClick === "function")!;
+    (button.props.onClick as () => void)(); assert.deepEqual(f.signIns, [href]);
+    window.location.hash = "#invalid";
+    (button.props.onClick as () => void)(); assert.equal(f.signIns.length, 1, "A stale sign-in action cannot restore an obsolete request");
+    assert.match(renderToStaticMarkup(createElement(ConnectedCandidateApp, { configuration: config })), /unavailable/);
+    window.location.hash = hash;
+    f.setSignedIn(true);
+    const html = renderToStaticMarkup(createElement(ConnectedCandidateApp, { configuration: config }));
+    assert.match(html, />Approve</); assert.match(html, />Cancel</); assert.doesNotMatch(html, /Read private skills/);
+    assert.equal(f.accountCalls.length, 0); assert.equal(f.counts().tokenCalls, 0);
+    assert.equal(window.location.hash, hash);
+  } finally { f.restore(); }
+});
+
+test("candidate account/device disposal aborts old requests and cannot populate a replacement account", async () => {
+  let finish!: () => void;
+  const gate = new Promise<void>(resolve => { finish = resolve; });
+  const signals: AbortSignal[] = [];
+  let changes = 0, denied = 0;
+  const oldApi = connectedCandidateBrowserApi(async <T>(path: string, init?: RequestInit) => {
+    signals.push(init!.signal!); await gate;
+    return (path === "/api/portal/devices" ? { devices: [] } : accountResponse(path)) as T;
+  });
+  const account = createAccountSession({ api: oldApi, identity, cacheKey: "old", connectedInventory: true,
+    inventoryReconciliation: true, includeFavoriteItems: true, changed() { changes++; } });
+  const devices = createDeviceSession(oldApi, () => { changes++; }, () => { denied++; });
+  const pending = [account.refresh(), devices.refresh()];
+  account.dispose(); devices.dispose(); const before = changes;
+  assert.ok(signals.every(signal => signal.aborted));
+  const replacement = createAccountSession({ api: connectedCandidateBrowserApi(async <T>(path: string) => structuredClone(accountResponse(path)) as T),
+    identity: { name: "Other account", email: "other@example.test" }, cacheKey: "new", connectedInventory: true,
+    inventoryReconciliation: true, includeFavoriteItems: true, changed() {} });
+  await replacement.refresh(); const snapshot = replacement.getSnapshot();
+  finish(); await Promise.all(pending);
+  assert.equal(changes, before); assert.equal(denied, 0); assert.equal(replacement.getSnapshot(), snapshot);
+  assert.equal(snapshot.data!.profile.name, "Other account"); replacement.dispose();
+});
+
+test("candidate shared composition exposes refresh but no management and uses candidate-only install storage", async () => {
+  const session = createAccountSession({ api: connectedCandidateBrowserApi(async <T>(path: string) => structuredClone(accountResponse(path)) as T),
+    identity, cacheKey: "render", connectedInventory: true, inventoryReconciliation: true, includeFavoriteItems: true, changed() {} });
+  await session.refresh();
+  const f = await compositionFixture(session.getSnapshot().data, origin + "/app/?view=all");
+  try {
+    f.setSignedIn(true);
+    const html = renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config }));
+    const props = f.captured[0];
+    assert.match(html, /aria-label="Refresh account"/); assert.equal(props.management, undefined);
+    assert.deepEqual(props.supportedAccountViews, ["all", "agents", "devices", "profile"]);
+    assert.equal(props.accountPages!("profile", "light"), undefined, "Use the existing read-only profile, never its editor");
+    assert.equal(props.accountPages!("github", "light"), undefined);
+    const refresh = elements(props.previewBar).find(element => element.props["aria-label"] === "Refresh account")!;
+    (refresh.props.onClick as () => void)(); assert.equal(f.counts().refreshes, 1);
+    const devices = props.accountPages!("devices", "light") as ReactElement<{ children: ReactElement<{ readOnly: boolean; sessionKey: string; api: PortalApi }> }>;
+    assert.equal(devices.props.children.props.readOnly, true); assert.equal(devices.props.children.props.sessionKey, "user:session");
+    await assert.rejects(devices.props.children.props.api("/api/portal/devices/other", { method: "DELETE" }));
+    assert.equal(f.counts().tokenCalls, 0);
+    const skill = { key: "catalog:example/repo", catalogId: "example/repo", name: "Skill", author: "example", description: "", tags: [], githubUrl: null };
+    const install = props.publicInstallAction!(skill, true) as ReactElement<{ store: CatalogInstallIntentStore; distribution?: unknown }>;
+    assert.equal(install.props.store.client, "candidate"); assert.equal(install.props.distribution, undefined);
+    assert.match(renderToStaticMarkup(install), /Open in OMGSkills Candidate/);
+    assert.equal(f.stored.size, 0);
+    install.props.store.save({ version: 1, catalogId: skill.catalogId, agent: "codex", createdAt: Date.now(), returnRoute: "/app/?view=discover&skill=catalog%3Aexample%2Frepo" });
+    props.navigate({ ...initialNavigation, view: "discover", selected: "catalog:another/repo" });
+    assert.equal(install.props.store.read().intent, null, "Changing skills clears the candidate intent");
+    f.snapshot.error = "Could not refresh. Showing your last loaded data.";
+    assert.match(renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config })), /role="alert"/);
+    f.snapshot.accessDenied = true; f.snapshot.data = null;
+    renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config }));
+    const denied = f.captured.at(-1)!; assert.equal(denied.data.skills.length, 0); assert.equal(denied.accountPages, undefined);
+  } finally { f.restore(); session.dispose(); }
+});
+
+test("real shared candidate screens render inventory history and hide editing/setup actions", async () => {
+  const session = createAccountSession({ api: connectedCandidateBrowserApi(async <T>(path: string) => structuredClone(accountResponse(path)) as T),
+    identity, cacheKey: "screen", connectedInventory: true, inventoryReconciliation: true, includeFavoriteItems: true, changed() {} });
+  await session.refresh();
+  const f = await compositionFixture(session.getSnapshot().data, origin + "/app/?view=all");
+  try {
+    f.setSignedIn(true);
+    renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config }));
+    const output = await build({ entryPoints: [fileURLToPath(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url))],
+      bundle: true, write: false, platform: "node", format: "cjs", packages: "external", jsx: "automatic", loader: { ".css": "empty" } });
+    const module = { exports: {} as { UnifiedApp: typeof UnifiedApp } };
+    new Function("require", "module", "exports", output.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
+    const props = f.captured[0];
+    const render = (view: "all" | "profile" | "devices") => renderToStaticMarkup(createElement(module.exports.UnifiedApp, {
+      ...props, nav: { ...initialNavigation, view },
+    }));
+    const skills = render("all");
+    assert.match(skills, /Mac A/); assert.match(skills, /Mac B/); assert.match(skills, /Unknown Mac/);
+    assert.match(skills, /Not found on last scan/); assert.match(skills, /Latest scan incomplete/);
+    assert.match(skills, /aria-label="Refresh account"/);
+    assert.doesNotMatch(skills, /Add to favorites|Create set|aria-label="Favorites"/);
+    const profile = render("profile");
+    assert.match(profile, /candidate@example.test/); assert.doesNotMatch(profile, /Publish profile|Save profile|Account settings/);
+    const devices = render("devices");
+    assert.match(devices, /aria-label="Refresh devices"/); assert.doesNotMatch(devices, />Connect app<|>Revoke</);
+  } finally { f.restore(); session.dispose(); }
+});
+
+test("read-only account hook rejects all save callbacks before transport work", async () => {
+  const output = await build({ entryPoints: [fileURLToPath(new URL("../src/integration/unified/useAccount.ts", import.meta.url))],
+    bundle: true, write: false, platform: "node", format: "cjs", packages: "external" });
+  const module = { exports: {} as typeof import("../src/integration/unified/useAccount") };
+  new Function("require", "module", "exports", output.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
+  let calls = 0, account!: ReturnType<typeof module.exports.useAccount>;
+  function Probe() {
+    account = module.exports.useAccount(async <T>() => { calls++; return {} as T; }, identity, true, "read-only", true, true, true);
+    return createElement("main");
+  }
+  renderToStaticMarkup(createElement(Probe));
+  await assert.rejects(account.saveProfile({ handle: "forbidden" }), /editing is unavailable/);
+  await assert.rejects(account.saveSet({ kind: "create", name: "forbidden" }), /editing is unavailable/);
+  await assert.rejects(account.saveMembership({ kind: "create-selected", name: "forbidden", skills: [] }), /editing is unavailable/);
+  assert.equal(calls, 0);
 });

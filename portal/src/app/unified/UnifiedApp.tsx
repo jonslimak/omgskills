@@ -124,6 +124,7 @@ type Props = {
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
+  supportedAccountViews?: readonly View[];
 };
 
 function IconButton({
@@ -416,7 +417,9 @@ export function UnifiedApp({
   management,
   accountPages,
   publicInstallAction,
+  supportedAccountViews,
 }: Props) {
+  const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -524,6 +527,7 @@ export function UnifiedApp({
     return () => clearTimeout(timer);
   }, [notice]);
   function go(view: View, id = "") {
+    if (!supportsView(view)) return;
     if (drawerOpen) { drawerNavigating.current = true; setDrawerOpen(false); }
     navigate({ view, id, query: "", selected: "", source: "all" });
   }
@@ -583,6 +587,7 @@ export function UnifiedApp({
     count?: number,
     id = "",
   ) {
+    if (!supportsView(view)) return null;
     const active = nav.view === view && (!id || nav.id === id) && !nav.query;
     return (
       <button
@@ -633,21 +638,21 @@ export function UnifiedApp({
         <strong>{data.profile.name}</strong>
         <small>{data.profile.email}</small>
       </div>
-      <MenuItem icon={User} onSelect={() => goFromAccount("profile")}>
+      {supportsView("profile") && <MenuItem icon={User} onSelect={() => goFromAccount("profile")}>
         Profile
-      </MenuItem>
-      <MenuItem icon={Bot} onSelect={() => goFromAccount("agents")}>
+      </MenuItem>}
+      {supportsView("agents") && <MenuItem icon={Bot} onSelect={() => goFromAccount("agents")}>
         Agents <small>{sources.length} observed</small>
-      </MenuItem>
-      {(!readOnlyAccount || accountPages) && <><MenuItem icon={Monitor} onSelect={() => goFromAccount("devices")}>
+      </MenuItem>}
+      {(!readOnlyAccount || accountPages) && <>{supportsView("devices") && <MenuItem icon={Monitor} onSelect={() => goFromAccount("devices")}>
         Devices {!readOnlyAccount && <small>{data.devices.length}</small>}
-      </MenuItem>
-      <MenuItem icon={Code} onSelect={() => goFromAccount("github")}>
+      </MenuItem>}
+      {supportsView("github") && <MenuItem icon={Code} onSelect={() => goFromAccount("github")}>
         GitHub sources
-      </MenuItem>
-      <MenuItem icon={Server} onSelect={() => goFromAccount("mcp")}>
+      </MenuItem>}
+      {supportsView("mcp") && <MenuItem icon={Server} onSelect={() => goFromAccount("mcp")}>
         MCP server
-      </MenuItem>
+      </MenuItem>}
       </>}
       <DropdownMenu.Separator className="ua-separator" />
       <MenuItem
@@ -1161,7 +1166,7 @@ export function UnifiedApp({
                       ["top", "Trending", TrendingUp, false],
                       ["creators", "Creators", Users, false],
                       ["collections", "Collections", PlayingCardsFan, false],
-                    ] as const).map(([view, label, Icon, heading]) => <button type="button" key={view}
+                    ] as const).filter(([view]) => supportsView(view)).map(([view, label, Icon, heading]) => <button type="button" key={view}
                       className={`ua-nav-item${heading ? " ua-drawer-section" : ""}`}
                       aria-current={(nav.view === view || (view === "sets" && nav.view === "set") || (view === "creators" && nav.view === "creator") || (view === "collections" && nav.view === "collection")) && !nav.query ? "page" : undefined}
                       onClick={() => go(view)}><Icon /><span>{label}</span></button>)}

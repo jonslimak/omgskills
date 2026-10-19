@@ -12,7 +12,7 @@ const formatDate = (value: string | null) => value === null ? "Never"
 const formatInventoryDate = (value: string | null) => value === null ? "Never"
   : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
-export function DevicesPanel({ api, denied, local = true, readOnly = false, theme, inventoryDevices }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; theme?: string; inventoryDevices?: PortalDevice[] }) {
+export function DevicesPanel({ api, denied, local = true, readOnly = false, theme, inventoryDevices, sessionKey = "default" }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; theme?: string; inventoryDevices?: PortalDevice[]; sessionKey?: string }) {
   const callbacks = useRef({ api, denied });
   callbacks.current = { api, denied };
   const sessionRef = useRef<ReturnType<typeof createDeviceSession> | null>(null);
@@ -22,16 +22,17 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, them
   useEffect(() => {
     const session = createDeviceSession((path, init) => callbacks.current.api(path, init), setState, () => callbacks.current.denied());
     sessionRef.current = session;
+    setState(session.getSnapshot()); setConfirm(null); setConnecting(false);
     void session.refresh();
     const refresh = () => { if (!document.hidden) void session.refresh(); };
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     return () => {
-      session.dispose(); sessionRef.current = null;
+      session.dispose(); if (sessionRef.current === session) sessionRef.current = null;
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
     };
-  }, []);
+  }, [sessionKey]);
   useEffect(() => {
     if (state.error || (confirm && !state.devices?.some((d) => d.id === confirm.id && d.status !== "revoked"))) setConfirm(null);
   }, [state.error, state.devices, confirm]);
@@ -39,7 +40,7 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, them
   return <section aria-label="Connected devices">
     <div className="rd-section-heading"><h2>Connected devices</h2>
       <IconAction label="Refresh devices" disabled={busy} onClick={() => void sessionRef.current?.refresh()}><RefreshCw /></IconAction>
-      <Action disabled={readOnly || busy || Boolean(state.error)} onClick={() => setConnecting(true)}>Connect app</Action>
+      {!readOnly && <Action disabled={busy || Boolean(state.error)} onClick={() => setConnecting(true)}>Connect app</Action>}
     </div>
     {state.error && <p role="alert">{state.error}</p>}
     {state.notice && <p role="status">{state.notice}</p>}
@@ -61,7 +62,7 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, them
           </p>}
         </div>
         <StatusBadge>{device.status}</StatusBadge>
-        {device.status !== "revoked" && <Action variant="destructive" disabled={readOnly || busy || Boolean(state.error)}
+        {!readOnly && device.status !== "revoked" && <Action variant="destructive" disabled={busy || Boolean(state.error)}
           aria-label={`Revoke ${device.deviceName}`} onClick={() => setConfirm(device)}>Revoke</Action>}
       </div>)}
     </div>
