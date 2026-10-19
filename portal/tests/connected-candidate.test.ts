@@ -286,13 +286,30 @@ test("shared rendered consent preserves normal/F1 permission text and disables m
   assert.equal((html.match(/disabled=""/g) ?? []).length, 2); assert.match(html, /role="alert"/);
 });
 
-test("connected entry remains separate from normal/F1 bootstrap and release preparation", () => {
+test("connected entry is explicitly selected without changing normal/F1 bootstrap or install-only defaults", async () => {
   const source = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8");
   assert.match(source("../src/main.tsx"), /<ConnectPage policy=\{connectedInventoryTest \? f1PairingConsent : normalPairingConsent\}/);
   assert.doesNotMatch(source("../src/main.tsx"), /candidate\/connected-policy|function ConnectPage/);
   assert.doesNotMatch(source("../src/integration/unified/Session.tsx"), /connectedCandidate|candidate\/connected/);
   assert.doesNotMatch(source("../src/bootstrap.ts"), /candidate\/connected/);
-  assert.doesNotMatch(source("../../scripts/prepare-catalog-candidate-web.mjs"), /connected-main/);
+  const { candidateBuildOptions, hostingFiles } = await import("../../scripts/prepare-catalog-candidate-web.mjs");
+  const html = source("../index.html");
+  const entry = (options: ReturnType<typeof candidateBuildOptions>) => options.plugins
+    .find((plugin: { name: string }) => plugin.name === "catalog-candidate-entry-only").transformIndexHtml.handler(html);
+  const output = "/private/tmp/cc2b3-pure-options-not-written";
+  const defaults = candidateBuildOptions(output);
+  const installOnly = candidateBuildOptions(output, { profile: "install-only" });
+  assert.equal(entry(defaults), entry(installOnly));
+  assert.match(entry(defaults), /src\/candidate\/main.tsx/);
+  assert.doesNotMatch(entry(defaults), /connected-main/);
+  assert.equal(defaults.define, undefined);
+  assert.doesNotMatch(hostingFiles()._redirects, /\/app\/connect/);
+  assert.throws(() => candidateBuildOptions(output, { profile: "connected" }));
+  const connected = candidateBuildOptions(output, config);
+  assert.match(entry(connected), /src\/candidate\/connected-main.tsx/);
+  assert.doesNotMatch(entry(connected), /src\/bootstrap.ts|src\/candidate\/main.tsx/);
+  assert.deepEqual(JSON.parse(connected.define.__OMGSKILLS_CONNECTED_CANDIDATE__), config);
+  assert.match(hostingFiles(config)._redirects, /^\/app\/connect \/app\/index.html 200$/m);
 });
 
 const favoriteId = "11111111-1111-4111-8111-111111111111";

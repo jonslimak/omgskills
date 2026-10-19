@@ -12,30 +12,58 @@ const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const candidateOrigin = "https://omgskills-setup-test-f3b.netlify.app";
 const productionOrigin = "https://omgskills.com";
 
-export function hostingFiles() {
+function publicConfiguration(options) {
+  assert.ok(options && typeof options === "object" && !Array.isArray(options), "Candidate options must be an object");
+  const profile = options.profile === undefined ? "install-only" : options.profile;
+  if (profile === "install-only") {
+    assert.ok(Object.keys(options).every(key => key === "profile"), "Install-only does not accept connected configuration");
+    return null;
+  }
+  assert.equal(profile, "connected", "Unknown candidate profile");
+  assert.ok(Object.keys(options).every(key => ["profile", "publishableKey", "clerkFrontendOrigin"].includes(key)), "Unexpected candidate configuration field");
+  const { publishableKey, clerkFrontendOrigin } = options;
+  let frontend;
+  try {
+    assert.ok(typeof publishableKey === "string" && /^pk_test_[A-Za-z0-9+/]+={0,2}$/.test(publishableKey));
+    const decoded = atob(publishableKey.slice(8));
+    assert.match(decoded, /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.clerk\.accounts\.dev\$$/);
+    frontend = `https://${decoded.slice(0, -1)}`;
+  } catch { throw new Error("A valid Clerk development publishable key is required"); }
+  assert.ok(clerkFrontendOrigin === frontend, "Candidate Clerk frontend must match the test key");
+  return { profile, publishableKey, clerkFrontendOrigin };
+}
+
+export function hostingFiles(options = {}) {
+  const configuration = publicConfiguration(options);
+  const clerkSource = configuration ? ` ${configuration.clerkFrontendOrigin}` : "";
+  const framePolicy = configuration ? ` frame-src ${configuration.clerkFrontendOrigin};` : "";
   // Explicit public reads only. No portal/account route or public app/download fallback.
   const reads = ["/mcp", "/mcp/health", "/catalog-skill-urls.json"];
   const redirects = ["/ /app/ 302", ...reads.map(route => `${route} ${productionOrigin}${route} 200`),
     `/data/crawl4/* ${productionOrigin}/data/crawl4/:splat 200`,
     `/data/v2/* ${productionOrigin}/data/v2/:splat 200`];
+  if (configuration) redirects.push("/app/connect /app/index.html 200");
   return {
     "_redirects": redirects.join("\n") + "\n",
-    "_headers": "/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Cache-Control: no-store\n  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'\n",
+    "_headers": `/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Cache-Control: no-store\n  Content-Security-Policy: default-src 'self'; script-src 'self'${clerkSource}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com; connect-src 'self'${clerkSource};${framePolicy} frame-ancestors 'none'; base-uri 'none'; object-src 'none'\n`,
     "robots.txt": "User-agent: *\nDisallow: /\n",
     "404.html": "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>Not available</title><h1>This route is not available in the candidate test.</h1></html>\n",
   };
 }
 
-export function candidateBuildOptions(output) {
+export function candidateBuildOptions(output, options = {}) {
+  const configuration = publicConfiguration(options);
   return {
     root: path.join(root, "portal"), configFile: false, envFile: false, base: "/app/",
+    ...(configuration ? { envPrefix: [], define: { __OMGSKILLS_CONNECTED_CANDIDATE__: JSON.stringify(configuration) } } : {}),
     plugins: [react(), tailwindcss(), {
       name: "catalog-candidate-entry-only",
       transformIndexHtml: {
         order: "pre",
         handler(html) {
           assert.equal(html.split("/src/bootstrap.ts").length, 2, "Expected the unchanged normal entry marker");
-          return html.replace("/src/bootstrap.ts", "/src/candidate/main.tsx").replace("<title>omgskills</title>", "<title>OMGSkills Candidate</title>");
+          return html.replace("/src/bootstrap.ts", configuration ? "/src/candidate/connected-main.tsx" : "/src/candidate/main.tsx")
+            .replace("<title>omgskills</title>", configuration ? "<title>OMGSkills Connected Candidate</title>" : "<title>OMGSkills Candidate</title>");
         },
       },
     }],
