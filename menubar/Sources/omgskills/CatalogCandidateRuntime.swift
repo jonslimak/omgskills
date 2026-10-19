@@ -40,19 +40,30 @@ enum CatalogCandidateRuntime {
 
     struct Configuration: Equatable, Sendable {
         let home: URL
+        let connected: ConnectedCandidateConfiguration?
         var paths: SkillFilesystemPaths {
             SkillFilesystemPaths(homeDirectory: home,
                 legacyRepoCacheRoot: stateRoot.appendingPathComponent("repos", isDirectory: true))
         }
         var stateRoot: URL { home.appendingPathComponent("Library/Application Support/omgskills", isDirectory: true) }
         var managedRoot: URL { stateRoot.appendingPathComponent("managed", isDirectory: true) }
-        fileprivate init(home: URL) { self.home = home }
+        fileprivate init(home: URL, connected: ConnectedCandidateConfiguration?) {
+            self.home = home
+            self.connected = connected
+        }
     }
 
     static func mode(info: [String: Any] = Bundle.main.infoDictionary ?? [:],
                      home: URL = FileManager.default.homeDirectoryForCurrentUser,
-                     allowed: Bool = buildAllowed) -> Mode {
-        guard allowed || buildRequested || info[enabledKey] != nil || info[websiteKey] != nil || info[updateKey] != nil
+                     allowed: Bool = buildAllowed,
+                     connectedAllowed: Bool = ConnectedCandidateConfiguration.buildAllowed) -> Mode {
+        let connected: ConnectedCandidateConfiguration?
+        switch ConnectedCandidateConfiguration.mode(info: info, allowed: connectedAllowed) {
+        case .disabled: connected = nil
+        case .enabled(let configuration): connected = configuration
+        case .invalid: return .invalid("Invalid connected candidate configuration.")
+        }
+        guard allowed || buildRequested || connected != nil || info[enabledKey] != nil || info[websiteKey] != nil || info[updateKey] != nil
         else { return .disabled }
         let updateKeys = Set(info.keys.filter { $0.hasPrefix("SU") })
         let expectedKeys = Set(updatePolicy.keys).union(["SUFeedURL", "SUPublicEDKey", "SUSignedFeedFailureExpirationInterval"])
@@ -81,7 +92,7 @@ enum CatalogCandidateRuntime {
               home.resolvingSymlinksInPath().path == home.path,
               (try? FileManager.default.attributesOfItem(atPath: home.path)[.type] as? FileAttributeType) == .typeDirectory
         else { return .invalid("The catalog candidate home is unavailable or redirected.") }
-        return .enabled(Configuration(home: home))
+        return .enabled(Configuration(home: home, connected: connected))
     }
 
     static func acceptsArchive(url: URL?, build: String, version: String, installationType: String, isDelta: Bool) -> Bool {

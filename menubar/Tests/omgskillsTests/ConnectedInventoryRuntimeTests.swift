@@ -5,6 +5,139 @@ import Testing
 
 @MainActor
 struct ConnectedInventoryRuntimeTests {
+    @Test func candidatePairingUsesProductSchemeAndRestartKeepsTheStoredMac() async throws {
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        let candidate = try ConnectedCandidateConfigurationTests.configuration(home: home)
+        let config = try #require(candidate.connected)
+        let store = InventoryCredentialFixture(record: nil)
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: authorizer,
+            coordinator: UpdateInstallCoordinator(), credentialStore: store, api: api)
+        let cold = URL(string: "omgskills://pair?state=stale&code=stale")!
+        #expect(runtime.receivePairingCallback(cold))
+        #expect(authorizer.callbacks == [cold])
+        #expect(!runtime.receivePairingCallback(URL(string: "omgskills-f1://pair?state=stale")!))
+        #expect(!runtime.receivePairingCallback(URL(string: "omgskills://catalog-install?v=1&id=owner/repo&agent=codex")!))
+        #expect(await api.uploads == 0)
+        await runtime.start().value
+        await runtime.connect(deviceName: "Candidate Mac").value
+        #expect(authorizer.scheme == "omgskills")
+        #expect(authorizer.authorizationURL?.absoluteString.hasPrefix(config.connectURL.absoluteString + "#") == true)
+        #expect(runtime.connection.state == .connected(inventoryCredential.connection))
+        #expect(await store.record == inventoryCredential)
+        let warm = URL(string: "omgskills://pair?state=late&code=late")!
+        #expect(runtime.receivePairingCallback(warm))
+        #expect(authorizer.callbacks == [cold, warm])
+        await runtime.stop()
+        let reopened = config.makeRuntime(paths: candidate.paths, authorizer: authorizer,
+            coordinator: UpdateInstallCoordinator(), credentialStore: store, api: api)
+        await reopened.start().value
+        #expect(reopened.connection.state == .connected(inventoryCredential.connection))
+        #expect(await store.record == inventoryCredential)
+        #expect(await api.exchanges == 1)
+        #expect(await api.uploads == 2)
+        await reopened.stop()
+    }
+
+    @Test(arguments: [SkillInstaller.Target.claude, .codex])
+    func candidateReportsSuccessfulInstallsAndRetriesOnlyReporting(_ target: SkillInstaller.Target) async throws {
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        let candidate = try ConnectedCandidateConfigurationTests.configuration(home: home)
+        for root in candidate.paths.allSkillsRoots {
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        }
+        let config = try #require(candidate.connected)
+        let store = InventoryCredentialFixture()
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let coordinator = UpdateInstallCoordinator()
+        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
+            coordinator: coordinator, credentialStore: store, api: api)
+        await runtime.start().value
+        #expect(await api.lastPayload?.skills.isEmpty == true)
+        let service = InventoryInstallFixture(paths: candidate.paths)
+        let model = CatalogInstallModel(service: service, coordinator: coordinator, client: .product)
+        runtime.observeInstalls(in: model)
+        model.receive(URL(string: "omgskills://catalog-install?v=1&id=owner/repo&agent=\(target.rawValue.lowercased())")!)
+        await model.operation?.value
+        #expect(model.phase == .confirm)
+        #expect(await service.installs == 0)
+        await api.setFailure(true)
+        model.install()
+        await model.operation?.value
+        await runtime.connection.requestInventoryReport().value
+        #expect(model.result == .installed)
+        #expect(runtime.connection.state == .connected(inventoryCredential.connection))
+        guard case .uncertain = runtime.connection.reportStatus else { Issue.record("Expected report failure, not install failure"); return }
+        await api.setFailure(false)
+        runtime.resync()
+        await runtime.connection.requestInventoryReport().value
+        let payload = try #require(await api.lastPayload)
+        #expect(payload.skills.count == 1)
+        #expect(payload.skills.first?.source == target.rawValue.lowercased())
+        #expect(payload.skills.first?.installationPath == "fixture")
+        #expect(payload.roots.allSatisfy { $0.state == .complete })
+        #expect(await service.installs == 1)
+        #expect(model.result == .installed)
+        // Closing the install result hides the window; it must not disconnect.
+        #expect(await model.close())
+        #expect(runtime.connection.state == .connected(inventoryCredential.connection))
+        #expect(await store.record == inventoryCredential)
+        await runtime.stop()
+    }
+
+    @Test func candidateCancelDoesNotInstallOrReportAndStopDoesNotRevoke() async throws {
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        let candidate = try ConnectedCandidateConfigurationTests.configuration(home: home)
+        let config = try #require(candidate.connected)
+        let store = InventoryCredentialFixture()
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let coordinator = UpdateInstallCoordinator()
+        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
+            coordinator: coordinator, credentialStore: store, api: api)
+        await runtime.start().value
+        let service = InventoryInstallFixture(paths: candidate.paths)
+        let model = CatalogInstallModel(service: service, coordinator: coordinator, client: .product)
+        runtime.observeInstalls(in: model)
+        model.receive(URL(string: "omgskills://catalog-install?v=1&id=owner/repo&agent=claude")!)
+        await model.operation?.value
+        #expect(await model.close())
+        #expect(await service.installs == 0)
+        #expect(await api.uploads == 1)
+        await runtime.stop()
+        #expect(await api.revocations == 0)
+        #expect(await store.record == inventoryCredential)
+        #expect(!coordinator.isBusy)
+    }
+
+    @Test func candidateRestoreBlocksAppReplacementUntilReportingDrains() async throws {
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        let candidate = try ConnectedCandidateConfigurationTests.configuration(home: home)
+        let config = try #require(candidate.connected)
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let coordinator = UpdateInstallCoordinator()
+        let gate = InventoryShutdownGate()
+        await api.setReportGate(gate)
+        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
+            coordinator: coordinator, credentialStore: InventoryCredentialFixture(), api: api)
+        let model = CatalogInstallModel(service: InventoryInstallFixture(), coordinator: coordinator, client: .product)
+        let startup = runtime.start()
+        await gate.waitUntilBlocked()
+        #expect(!model.canCheckForAppUpdates)
+        var replaced = false
+        coordinator.requestInstall { replaced = true }
+        #expect(!replaced)
+        await gate.open()
+        await startup.value
+        #expect(replaced)
+        await runtime.stop()
+        #expect(!coordinator.isBusy)
+    }
+
     @Test func resyncDuringAnActiveCheckQueuesOneFullReportWithoutParallelWork() async {
         let api = InventoryAPIFixture(reportMode: .reconciliation)
         let authorizer = InventoryAuthorizerFixture()
@@ -392,6 +525,8 @@ private actor InventoryAPIFixture: DeviceSyncServing {
     var uploads = 0
     var revocations = 0
     var checks = 0
+    var exchanges = 0
+    var lastPayload: ReconciliationSyncPayload?
     private var revision: String?
     private var reportGate: InventoryShutdownGate?
     private var checkGate: InventoryShutdownGate?
@@ -401,7 +536,10 @@ private actor InventoryAPIFixture: DeviceSyncServing {
     func setCheckError(_ error: DeviceSyncAPIError) { checkError = error }
     private var failure = false
     func setFailure(_ value: Bool) { failure = value }
-    func exchange(pairingCode: String, deviceName: String, codeVerifier: String?) async throws -> StoredDeviceCredential { inventoryCredential }
+    func exchange(pairingCode: String, deviceName: String, codeVerifier: String?) async throws -> StoredDeviceCredential {
+        exchanges += 1
+        return inventoryCredential
+    }
     func revoke(credential: String) async throws {
         try Task.checkCancellation()
         revocations += 1
@@ -415,6 +553,7 @@ private actor InventoryAPIFixture: DeviceSyncServing {
     func inventoryRevision(credential: String) async throws -> String? { revision }
     func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
         uploads += 1
+        lastPayload = payload
         if let gate = reportGate { reportGate = nil; await gate.block() }
         if failure { throw DeviceSyncAPIError.server(statusCode: 503) }
         let run = UUID().uuidString
@@ -508,13 +647,28 @@ private final class InventoryAuthorizerFixture: BrowserPairingAuthorizing {
 
 private actor InventoryInstallFixture: CatalogInstallFlowServing {
     var installs = 0
+    let paths: SkillFilesystemPaths?
+    init(paths: SkillFilesystemPaths? = nil) { self.paths = paths }
     func fetch(id: String) async throws -> CatalogInstallRecord? {
         try JSONDecoder().decode(CatalogInstallRecord.self, from: Data("""
         {"id":"owner/repo","name":"Fixture","description":"Test","author_handle":"owner",
         "github_url":"https://github.com/owner/repo","install_cmd":"git clone https://github.com/owner/repo ~/.claude/skills/fixture"}
         """.utf8))
     }
-    func destination(for record: CatalogInstallRecord, target: SkillInstaller.Target) async throws -> URL { URL(fileURLWithPath: "/private/tmp/inventory-model-test/fixture") }
-    func install(_ record: CatalogInstallRecord, target: SkillInstaller.Target) async -> CatalogInstallService.Result { installs += 1; return .installed }
+    func destination(for record: CatalogInstallRecord, target: SkillInstaller.Target) async throws -> URL {
+        paths?.skillsRoot(for: target).appendingPathComponent("fixture") ?? URL(fileURLWithPath: "/private/tmp/inventory-model-test/fixture")
+    }
+    func install(_ record: CatalogInstallRecord, target: SkillInstaller.Target) async -> CatalogInstallService.Result {
+        installs += 1
+        if let paths {
+            do {
+                let folder = paths.skillsRoot(for: target).appendingPathComponent("fixture")
+                try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+                try "---\nname: Fixture\ndescription: Candidate inventory fixture\n---\nTest instructions.\n"
+                    .write(to: folder.appendingPathComponent("SKILL.md"), atomically: true, encoding: .utf8)
+            } catch { return .failed("Fixture write failed") }
+        }
+        return .installed
+    }
 }
 #endif

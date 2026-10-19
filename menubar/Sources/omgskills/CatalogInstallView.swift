@@ -6,20 +6,16 @@ struct CatalogInstallView: View {
     let model: CatalogInstallModel
     let close: () -> Void
     var connection: DeviceConnectionModel? = nil
-    #if DEBUG
     var inventoryRuntime: ConnectedInventoryRuntime? = nil
-    #endif
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text(model.record?.name ?? model.appName).font(.title2.bold())
                 .textSelection(.enabled)
-            #if DEBUG
             if let connection {
                 ConnectedInventoryView(model: connection, deviceName: Host.current().localizedName ?? "Test Mac", runtime: inventoryRuntime)
                 Divider()
             }
-            #endif
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
                     if let record = model.record, let request = model.request {
@@ -72,9 +68,7 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
     private let window: NSWindow
     private let statusItem: NSStatusItem
     private var appUpdater: CatalogCandidateUpdater?
-    #if DEBUG
     private var connectedRuntime: ConnectedInventoryRuntime?
-    #endif
 
     #if DEBUG
     convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator,
@@ -112,7 +106,7 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
             let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer,
                 automation: connected.inventoryAutomation ? .live(paths: connected.filesystemPaths) : nil)
             connectedRuntime = runtime
-            model.onInstalled = { [weak runtime] in runtime?.installed() }
+            runtime.observeInstalls(in: model)
             window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
                 close: { [weak self] in self?.closeRequest() }, connection: connection, inventoryRuntime: runtime))
             runtime.start()
@@ -127,6 +121,17 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
             installer: CatalogInstallService(installer: installer))
         self.init(model: CatalogInstallModel(service: service, coordinator: coordinator, client: .product),
             website: CatalogCandidateRuntime.website)
+        if let connected = candidate.connected {
+            let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.window },
+                onReturn: { [weak self] in self?.showStatus() })
+            let runtime = connected.makeRuntime(paths: candidate.paths, authorizer: authorizer,
+                coordinator: coordinator, automation: .live(paths: candidate.paths))
+            connectedRuntime = runtime
+            runtime.observeInstalls(in: model)
+            window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
+                close: { [weak self] in self?.closeRequest() }, connection: runtime.connection, inventoryRuntime: runtime))
+            runtime.start()
+        }
     }
 
     init(model: CatalogInstallModel, website: URL) {
@@ -160,16 +165,12 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
     }
 
     func receive(_ url: URL) {
-        #if DEBUG
         if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }
-        #endif
         model.receive(url)
         showStatus()
     }
     func stopReporting() async {
-        #if DEBUG
         await connectedRuntime?.stop()
-        #endif
     }
     @objc func showStatus() { NSApp.activate(ignoringOtherApps: true); window.makeKeyAndOrderFront(nil) }
     @objc private func openWebsite() { NSWorkspace.shared.open(website) }

@@ -136,10 +136,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             }
             catalogCandidateUpdater = updater
             controller.configureUpdates(updater)
-            if let pendingCatalogInstallURL {
-                controller.receive(pendingCatalogInstallURL)
-                self.pendingCatalogInstallURL = nil
-            }
+            pendingConnectedURLs.forEach(controller.receive)
+            pendingConnectedURLs.removeAll()
             #endif
             return
         case .disabled: break
@@ -330,9 +328,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
         if catalogCandidateMode != .disabled {
             #if OMGSKILLS_CATALOG_CANDIDATE
-            if case .enabled = catalogCandidateMode, let url = urls.first {
-                if let catalogInstallController { catalogInstallController.receive(url) }
-                else if pendingCatalogInstallURL == nil { pendingCatalogInstallURL = url }
+            if case .enabled = catalogCandidateMode {
+                if let catalogInstallController { urls.forEach(catalogInstallController.receive) }
+                else { pendingConnectedURLs.append(contentsOf: urls) }
             }
             #endif
             return

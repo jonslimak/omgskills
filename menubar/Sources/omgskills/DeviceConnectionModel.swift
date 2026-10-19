@@ -95,7 +95,8 @@ final class DeviceConnectionModel {
             connectedCredential = nil
             connectedInfo = nil
         }
-        return startAttempt(initialState: .disconnected) { model, attemptID in
+        return startAttempt(initialState: .disconnected,
+            trackedActivity: api.reportMode == .legacy ? nil : .portalConnection) { model, attemptID in
             do {
                 let stored = try await model.credentialStore.load()
                 guard model.isCurrent(attemptID) else { return }
