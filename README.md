@@ -40,7 +40,7 @@ No local repo checkout is required for MCP users. Full tool docs live in [mcp/RE
 
 ## Trust and safety
 
-This repo is public so people can inspect how omgskills works before running it. It is source-available, not open source. You may read and audit the code, but you may not copy, redistribute, or repackage it without permission.
+This repo is public so people can inspect how omgskills works before running it. It is source-available, not open source. You may read and audit the code, but you may not copy, redistribute, or repackage it without permission. The exception is the [`mcp/`](mcp/) folder (the omgskills-mcp server), which is open source under the MIT License.
 
 The app:
 

@@ -202,3 +202,7 @@ Good next steps:
 - Full-text search index for better ranking.
 - Embeddings for semantic search.
 - More advanced production search indexes if catalog size makes the current cached JSON loader too slow.
+
+## License
+
+MIT. See [LICENSE](LICENSE). This folder is open source; the rest of the omgskills repository is source-available under its own terms.
