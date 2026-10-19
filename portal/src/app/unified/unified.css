@@ -1,3 +1,14 @@
+@font-face {
+  font-family: "Collection Inter Tight";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/inter-tight-latin-600.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 .ua-theme {
   box-sizing: border-box;
   --ua-bg: #fff;
@@ -783,7 +794,12 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
-.ua-collection {
+.ua-collection,
+.ua-collection-banner {
+  --ua-cover-grey: 242 242 247;
+  --ua-cover-opacity: 70%;
+  --ua-cover-ink: #111113;
+  --ua-cover-secondary: #3f3f46;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -795,8 +811,42 @@
   border-radius: 20px;
   min-height: 150px;
 }
+.ua-theme[data-theme="dark"] :is(.ua-collection, .ua-collection-banner) {
+  --ua-cover-grey: 16 16 18;
+  --ua-cover-opacity: 50%;
+  --ua-cover-ink: #fff;
+  --ua-cover-secondary: #f5f5f7;
+}
+.ua-theme[data-theme="dark"] :is(.ua-collection, .ua-collection-banner) .ua-collection-image {
+  filter: brightness(0.65);
+}
 .ua-collection:hover {
   background: var(--ua-selection) !important;
+}
+.ua-collection-banner {
+  padding: 20px 18px;
+  gap: 24px;
+}
+.ua-collection-banner .ua-back {
+  margin-bottom: 0;
+  font-size: 13px;
+}
+.ua-collection-banner-copy {
+  min-width: 0;
+  margin-top: auto;
+}
+.ua-collection-banner h1 {
+  font-family: var(--ua-display);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.ua-collection-banner p {
+  margin-top: 2px;
+  color: var(--ua-body);
+  font-size: 13px;
+  line-height: 1.35;
 }
 .ua-collection-image {
   position: absolute;
@@ -811,30 +861,57 @@
 .ua-collection-image[data-loaded="true"] {
   opacity: 1;
 }
-.ua-collection:has(.ua-collection-image[data-loaded="true"])::after {
+:is(.ua-collection, .ua-collection-banner):has(.ua-collection-image[data-loaded="true"])::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: rgb(255 255 255 / 40%);
+  background: linear-gradient(
+    to right,
+    rgb(var(--ua-cover-grey) / var(--ua-cover-opacity)) 0 50%,
+    rgb(var(--ua-cover-grey) / 0%) 100%
+  );
   pointer-events: none;
 }
+.ua-theme[data-theme="dark"] :is(.ua-collection, .ua-collection-banner):has(.ua-collection-image[data-loaded="true"])::after {
+  background: linear-gradient(
+    to right,
+    rgb(var(--ua-cover-grey) / var(--ua-cover-opacity)) 0 50%,
+    rgb(var(--ua-cover-grey) / 49%) 55%,
+    rgb(var(--ua-cover-grey) / 45%) 60%,
+    rgb(var(--ua-cover-grey) / 40%) 65%,
+    rgb(var(--ua-cover-grey) / 33%) 70%,
+    rgb(var(--ua-cover-grey) / 25%) 75%,
+    rgb(var(--ua-cover-grey) / 17%) 80%,
+    rgb(var(--ua-cover-grey) / 10%) 85%,
+    rgb(var(--ua-cover-grey) / 5%) 90%,
+    rgb(var(--ua-cover-grey) / 1%) 95%,
+    rgb(var(--ua-cover-grey) / 0%) 100%
+  );
+}
 .ua-collection:has(.ua-collection-image[data-loaded="true"]) .ua-collection-copy,
-.ua-collection:has(.ua-collection-image[data-loaded="true"]) .ua-collection-copy > * {
-  color: #111113;
+.ua-collection:has(.ua-collection-image[data-loaded="true"]) .ua-collection-copy > *,
+.ua-collection-banner:has(.ua-collection-image[data-loaded="true"]) h1 {
+  color: var(--ua-cover-ink);
 }
 .ua-collection:has(.ua-collection-image[data-loaded="true"]) .ua-collection-copy > small,
-.ua-collection:has(.ua-collection-image[data-loaded="true"]) .ua-collection-copy > span {
-  color: #3f3f46;
+.ua-collection:has(.ua-collection-image[data-loaded="true"]) .ua-collection-copy > span,
+.ua-collection-banner:has(.ua-collection-image[data-loaded="true"]) p {
+  color: var(--ua-cover-secondary);
 }
 .ua-avatar-stack {
   display: flex;
   margin-bottom: 15px;
   min-height: 36px;
 }
+.ua-avatar-stack .ua-avatar {
+  border: 2px solid #fff;
+}
+.ua-theme[data-theme="dark"] .ua-collection .ua-avatar-stack .ua-avatar {
+  border-color: var(--ua-chip);
+}
 .ua-avatar-stack .ua-avatar + .ua-avatar {
   margin-left: -10px;
-  border: 2px solid var(--ua-chip);
 }
 .ua-collection-copy {
   display: flex;
@@ -849,9 +926,9 @@
   color: var(--ua-muted);
 }
 .ua-collection-copy > strong {
-  font-family: var(--ua-display);
-  font-size: 18px;
-  font-weight: 700;
+  font-family: "Collection Inter Tight", var(--ua-display);
+  font-size: 16px;
+  font-weight: 600;
   line-height: 1.1;
   overflow-wrap: anywhere;
 }

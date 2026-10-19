@@ -3,6 +3,28 @@
 Status: Unified app is live. Latest collection-card release: source `a9fcbbd6`, merge `79ef9b49`, published data `cafe0cce`, production deploy `6ad64830dd0f3bdf921d26c6`. Guarded draft/production checks and read-only signed-in desktop/mobile collection checks passed. All 18 covers are verified live; existing card layout and avatars are preserved. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
 Updated: 2026-10-19. Collection release worktree: `/private/tmp/omgskills-collection-posters`. Recheck main before any new implementation or release.
 
+### Collection Card Refinement And Detail Banners - Release Candidate, 2026-10-19
+
+- User approved the local presentation and requested a safe commit, merge and
+  production deploy. Deployment and live acceptance remain pending below.
+- Collection titles use locally hosted Inter Tight at 16px/600, with the font's
+  SIL Open Font License included. Every 36px avatar has a 2px outline: white in
+  light mode and charcoal in dark mode. Sizes, overlap and card layout remain.
+- Cards and collection detail banners share their existing cover loader and
+  grey fallback. The detail banner contains Discover navigation, the collection
+  title and description, without avatars. Skill-list behavior is unchanged.
+- Light covers keep a 70%-opaque grey left half and fade to transparent on the
+  right. Dark covers use white text, a 50%-opaque near-black left half, an eased
+  right-hand fade, and 65% image brightness to retain the approved colors.
+- Local checks: desktop/mobile banner layout, missing-image fallback, keyboard
+  back navigation, collection and skill-detail navigation, 18 loaded covers,
+  all 54 avatar outlines, and unchanged light-mode colors passed. The user
+  approved the final dark fade. All 246 portal tests and the full root check,
+  including 190 deployment-safety/workflow checks, passed before committing.
+- Scope: no catalog, backend, database, native, helper inventory, public-page,
+  dependency or Mac release changes. Primary dirty worktree remains untouched.
+- [ ] Guarded current-main draft/production deployment and live UI verification.
+
 ### Collection Cards And Covers - Released, 2026-10-19
 
 - Existing app cards now use all 18 approved light gradient covers, dark text,

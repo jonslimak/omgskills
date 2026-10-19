@@ -476,6 +476,7 @@ export function UnifiedApp({
     ? management?.detail.set ?? data.sets.find((set) => set.id === nav.id)
     : undefined;
   const collection = catalog.collections.find((item) => item.id === nav.id);
+  const collectionHeader = nav.view === "collection" && !nav.query ? collection : undefined;
   const creator = catalog.creators.find((item) => item.handle === nav.id);
   const categoryGroup = catalog.categories.find((group) => group.label === nav.id);
   const discovery = !signedIn || isDiscovery(nav.view);
@@ -1217,7 +1218,7 @@ export function UnifiedApp({
                   </button>
                 </div>
               )}
-              {((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
+              {!collectionHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
                 (!signedIn && (nav.view !== "discover" || !!nav.query))) && (
                   <button
                     type="button"
@@ -1228,7 +1229,23 @@ export function UnifiedApp({
                     Discover
                   </button>
                 )}
-              {management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
+              {collectionHeader ? (
+                <header className="ua-collection-banner">
+                  {collectionHeader.imageUrl && <CollectionCover key={collectionHeader.imageUrl} src={collectionHeader.imageUrl} />}
+                  <button
+                    type="button"
+                    className="ua-link ua-back"
+                    onClick={() => go("discover")}
+                  >
+                    <ArrowLeft />
+                    Discover
+                  </button>
+                  <div className="ua-collection-banner-copy">
+                    <h1>{title}</h1>
+                    {meta && <p>{meta}</p>}
+                  </div>
+                </header>
+              ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
                 <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}`}>
                 <div>
                   <h1>{title}</h1>
