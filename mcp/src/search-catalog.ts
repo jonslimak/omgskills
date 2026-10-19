@@ -203,6 +203,24 @@ export class SearchCatalogReader implements CatalogReader {
   searchRankedPage(options: RankedSearchOptions) { return this.hydratePage(this.index.searchRankedPage(options)); }
   listByAuthorPage(author: string, options: PageOptions) { return this.hydratePage(this.index.listByAuthorPage(author, options)); }
   listTrendingPage(options: Omit<PageOptions, "sort">) { return this.hydratePage(this.index.listTrendingPage(options)); }
+  // The search projection already holds every list field, so summary reads skip detail shards entirely.
+  // A cold 30-result search otherwise fetches and parses up to ~30 shards (~290 KB each).
+  summaryReader(): CatalogReader {
+    const index = this.index;
+    return {
+      getSkill: id => index.getSkill(id),
+      searchSkills: options => index.searchSkills(options),
+      listTrending: limit => index.listTrending(limit),
+      listGoldBasket: limit => index.listGoldBasket(limit),
+      listByAuthor: (author, limit) => index.listByAuthor(author, limit),
+      searchPage: options => index.searchPage(options),
+      searchRankedPage: options => index.searchRankedPage(options),
+      listByAuthorPage: (author, options) => index.listByAuthorPage(author, options),
+      listTrendingPage: options => index.listTrendingPage(options),
+      getStats: () => this.getStats(),
+      diagnostics: () => this.diagnostics(),
+    };
+  }
 }
 
 export async function loadCatalogReader(manifestUrl: string, options: CatalogReadOptions = {}): Promise<SearchCatalogReader | OmgskillsLibrary> {

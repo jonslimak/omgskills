@@ -19,7 +19,9 @@ test("set lookup sends only explicit catalog IDs, in bounded batches, without ac
     assert.equal(init?.credentials, "omit");
     const request = JSON.parse(init!.body as string);
     assert.equal(request.params.name, "get_skills");
-    assert.deepEqual(Object.keys(request.params.arguments), ["ids"]);
+    // Only catalog IDs plus the non-identifying summary flag (list fields, no install metadata).
+    assert.deepEqual(Object.keys(request.params.arguments), ["ids", "summary"]);
+    assert.equal(request.params.arguments.summary, true);
     const requested = request.params.arguments.ids as string[];
     batches.push(requested);
     return new Response(JSON.stringify({ jsonrpc: "2.0", id: request.id, result: { structuredContent: {

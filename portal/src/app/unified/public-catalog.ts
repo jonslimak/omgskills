@@ -10,6 +10,25 @@ type RecordValue = Record<string, unknown>;
 type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 type Pending = { controller: AbortController; promise: Promise<unknown>; users: number };
 type PublicView = { catalog: CatalogDisplay; note: string; page?: PublicPageInfo };
+type Capabilities = Record<PublicListTool, { paging: boolean; ranking: boolean }>;
+// Capabilities change only with a deploy; remembering them avoids a tools/list round trip before the first search.
+const CAPABILITIES_KEY = "omgskills-catalog-capabilities";
+const CAPABILITIES_MEMORY_MS = 3_600_000, CAPABILITIES_STORED_MS = 86_400_000;
+function storedCapabilities(now: number): Capabilities | undefined {
+  try {
+    const stored = JSON.parse(globalThis.localStorage?.getItem(CAPABILITIES_KEY) ?? "null");
+    if (!stored || typeof stored.at !== "number" || now - stored.at > CAPABILITIES_STORED_MS || now < stored.at) return undefined;
+    const tools = ["search_skills", "list_by_author", "list_trending"] as const;
+    if (!tools.every(name => typeof stored.value?.[name]?.paging === "boolean" && typeof stored.value?.[name]?.ranking === "boolean")) return undefined;
+    return Object.fromEntries(tools.map(name => [name, { paging: stored.value[name].paging, ranking: stored.value[name].ranking }])) as Capabilities;
+  } catch { return undefined; }
+}
+function storeCapabilities(value: Capabilities | undefined, now: number) {
+  try {
+    if (value) globalThis.localStorage?.setItem(CAPABILITIES_KEY, JSON.stringify({ at: now, value }));
+    else globalThis.localStorage?.removeItem(CAPABILITIES_KEY);
+  } catch { /* Storage is an optimization only. */ }
+}
 export type PublicViewProgress =
   | { section: "metadata"; state: "ready"; catalog: CatalogDisplay }
   | { section: "list"; state: "ready"; skills: CatalogSummary[]; page?: PublicPageInfo; note?: string }
@@ -80,7 +99,16 @@ export class PublicCatalogClient {
   private requestId = 0;
   private views = new Map<string, { at: number; value: PublicView }>();
   constructor(private fetcher: Fetcher = (input, init) => fetch(input, init), private timeoutMs = 15_000, private now = Date.now,
-    readonly pagingEnabled = false) {}
+    readonly pagingEnabled = false) {
+    const stored = storedCapabilities(this.now());
+    if (stored) this.cache.set("capabilities", { at: this.now(), value: stored });
+  }
+
+  /** Start capability discovery at startup so the first search does not wait for it. */
+  warm() {
+    if (!this.pagingEnabled) return;
+    this.capabilities(new AbortController().signal).catch(() => { /* The first real request retries and reports errors. */ });
+  }
 
   cachedView(nav: Navigation) {
     const key = publicScope(nav), hit = this.views.get(key);
@@ -104,10 +132,10 @@ export class PublicCatalogClient {
   }
 
   // Share in-flight public reads, but cancel upstream when the last consumer leaves.
-  private cached<T>(key: string, load: (signal: AbortSignal) => Promise<T>, signal: AbortSignal): Promise<T> {
+  private cached<T>(key: string, load: (signal: AbortSignal) => Promise<T>, signal: AbortSignal, ttl = 120_000): Promise<T> {
     signal.throwIfAborted();
     const hit = this.cache.get(key);
-    if (hit && this.now() - hit.at < 120_000) return Promise.resolve(hit.value as T);
+    if (hit && this.now() - hit.at < ttl) return Promise.resolve(hit.value as T);
     let entry = this.pending.get(key);
     if (!entry || entry.controller.signal.aborted) {
       const controller = new AbortController();
@@ -214,7 +242,7 @@ export class PublicCatalogClient {
     } catch { throw new Error("The catalog returned an invalid tool result."); }
   }
 
-  capabilities(signal: AbortSignal): Promise<Record<PublicListTool, { paging: boolean; ranking: boolean }>> {
+  capabilities(signal: AbortSignal): Promise<Capabilities> {
     return this.cached("capabilities", async signal => {
       const result = await this.rpc("tools/list", {}, signal);
       if (!Array.isArray(result.tools)) throw new Error("The catalog returned invalid capabilities.");
@@ -228,8 +256,10 @@ export class PublicCatalogClient {
         const ranking = properties.ranking === undefined ? undefined : record(properties.ranking);
         return [name, { paging: page !== undefined, ranking: ranking?.type === "string" && (ranking.const === "web-v1" || (Array.isArray(ranking.enum) && ranking.enum.length === 1 && ranking.enum[0] === "web-v1")) }];
       });
-      return Object.fromEntries(entries) as Record<PublicListTool, { paging: boolean; ranking: boolean }>;
-    }, signal);
+      const value = Object.fromEntries(entries) as Capabilities;
+      storeCapabilities(value, this.now());
+      return value;
+    }, signal, CAPABILITIES_MEMORY_MS);
   }
 
   page(request: PublicPageRequest, signal: AbortSignal, cursor?: string): Promise<PublicPage> {
@@ -237,7 +267,7 @@ export class PublicCatalogClient {
     return this.cached(`page:${JSON.stringify(request)}:${cursor ?? "first"}`, async signal => {
       const support = (await this.capabilities(signal))[request.name];
       if (!support.paging || (request.name === "search_skills" && !support.ranking)) throw new PublicCatalogError("paging_not_supported");
-      const payload = record(await this.tool(request.name, { ...request.args, page: cursor === undefined ? {} : { cursor } }, signal));
+      const payload = record(await this.tool(request.name, { ...request.args, page: cursor === undefined ? {} : { cursor }, summary: true }, signal));
       if (!Array.isArray(payload.skills)) throw new Error("The catalog returned an invalid page.");
       const skills = payload.skills.map(parseSkill);
       if (new Set(skills.map(skill => skill.id)).size !== skills.length) throw new Error("The catalog returned duplicate skills.");
@@ -259,6 +289,7 @@ export class PublicCatalogClient {
     const { sort: _sort, ranking: _ranking, ...args } = request?.args ?? {};
     const listKey = request ? `list:${request.name}:${JSON.stringify(args)}` : "";
     for (const key of this.cache.keys()) if ((pagePrefix && key.startsWith(pagePrefix)) || key === listKey || key === "capabilities") this.cache.delete(key);
+    storeCapabilities(undefined, this.now());
   }
 
   metadata(signal: AbortSignal) {
@@ -275,7 +306,7 @@ export class PublicCatalogClient {
   list(name: "search_skills" | "list_trending" | "list_by_author", args: RecordValue, signal: AbortSignal) {
     const input = { ...args, limit: Math.min(LIST_LIMIT, Math.max(1, Number(args.limit) || LIST_LIMIT)) };
     return this.cached(`list:${name}:${JSON.stringify(input)}`, async (signal) => {
-      const payload = record(await this.tool(name, input, signal));
+      const payload = record(await this.tool(name, { ...input, summary: true }, signal));
       if (!Array.isArray(payload.skills) || payload.skills.length > input.limit) throw new Error("The catalog returned an invalid result list.");
       const skills = payload.skills.map(parseSkill);
       return [...new Map(skills.map((skill) => [skill.id, skill])).values()];
@@ -302,7 +333,7 @@ export class PublicCatalogClient {
     const requested = [...new Set(ids)].slice(0, LIST_LIMIT);
     if (!requested.length) return { skills: [], missing: 0, limited: false };
     const skills = await this.cached(`batch:${JSON.stringify(requested)}`, async signal => {
-      const payload = record(await this.tool("get_skills", { ids: requested }, signal));
+      const payload = record(await this.tool("get_skills", { ids: requested, summary: true }, signal));
       if (!Array.isArray(payload.skills) || payload.skills.length > requested.length) throw new Error("The catalog returned an invalid collection.");
       const parsed = payload.skills.map(parseSkill);
       const byId = new Map(parsed.map(skill => [skill.id, skill]));

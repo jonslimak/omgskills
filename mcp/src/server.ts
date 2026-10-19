@@ -32,7 +32,7 @@ const skillResultSchema = z.object({
   first_seen: z.string().optional(),
   skill_md_sha: z.string().optional(),
   skill_md_path: z.string().optional(),
-  install_status: z.enum(["pinned", "discovery_only"]),
+  install_status: z.enum(["pinned", "discovery_only"]).optional().describe("Always present unless summary is true."),
   pinned_install: pinnedInstallSchema.optional(),
   score: z.number(),
   installs: z.number().optional(),
@@ -55,18 +55,22 @@ function withPaging<T extends z.AnyZodObject>(schema: T, sorting: boolean) {
     .describe("Opt into snapshot-bound paging: {} first, then {cursor: previous page.nextCursor} with unchanged arguments."),
     ...(sorting ? { sort: z.enum(catalogSorts).optional().describe("Sort matching skills. Requires page; defaults to existing relevance order.") } : {}) }).passthrough();
 }
+// Summary reads skip per-result detail loading; results omit install metadata (use get_skill for it).
+const summaryArg = z.boolean().optional().describe("Return list fields only, without install metadata. Faster for browsing; call get_skill for install details.");
 const searchInput = z.object({
   query: z.string().default("").describe("Keywords to match against skill names, IDs, authors, tags, descriptions, and repository URLs."),
   limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return."),
   author: z.string().optional().describe("Exact GitHub author handle, matched case-insensitively."),
   tag: z.string().optional().describe("Exact catalog tag, matched case-insensitively."),
-  minStars: z.number().int().min(0).optional().describe("Minimum GitHub repository star count.")
+  minStars: z.number().int().min(0).optional().describe("Minimum GitHub repository star count."),
+  summary: summaryArg
 });
 const authorInput = z.object({
   author: z.string().min(1).describe("GitHub author handle, matched case-insensitively."),
-  limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return.")
+  limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return."),
+  summary: summaryArg
 });
-const trendingInput = z.object({ limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return.") });
+const trendingInput = z.object({ limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of skills to return."), summary: summaryArg });
 
 const skillOutputSchema = z.object({
   found: z.boolean(),
@@ -100,16 +104,19 @@ export function createOmgskillsServer(library: CatalogReader, options: { paging?
       outputSchema: options.paging ? pagedListOutputSchema : skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async (args: z.infer<typeof searchInput> & Partial<PageOptions> & { ranking?: "web-v1" }) => options.paging && (usesPaging(args) || (options.ranking && "ranking" in args))
-      ? pagedResult(args, ["query", "limit", "author", "tag", "minStars", "sort", "page", ...(options.ranking ? ["ranking"] : [])], () => {
+    async (args: z.infer<typeof searchInput> & Partial<PageOptions> & { ranking?: "web-v1" }) => {
+      const reader = readerFor(library, args.summary);
+      return options.paging && (usesPaging(args) || (options.ranking && "ranking" in args))
+      ? pagedResult(args, ["query", "limit", "author", "tag", "minStars", "sort", "page", "summary", ...(options.ranking ? ["ranking"] : [])], () => {
         if (args.ranking !== undefined) {
-          if (!options.ranking || !library.searchRankedPage) throw new PagingError("ranking_not_supported");
-          return library.searchRankedPage(args as RankedSearchOptions);
+          if (!options.ranking || !reader.searchRankedPage) throw new PagingError("ranking_not_supported");
+          return reader.searchRankedPage(args as RankedSearchOptions);
         }
-        if (!library.searchPage) throw new PagingError("paging_not_supported");
-        return library.searchPage(args as SearchOptions & PageOptions);
+        if (!reader.searchPage) throw new PagingError("paging_not_supported");
+        return reader.searchPage(args as SearchOptions & PageOptions);
       })
-      : skillListResult(await library.searchSkills(args as SearchOptions))
+      : skillListResult(await reader.searchSkills(args as SearchOptions), args.summary);
+    }
   );
 
   server.registerTool(
@@ -137,12 +144,16 @@ export function createOmgskillsServer(library: CatalogReader, options: { paging?
       title: "Get skills",
       description: "Get up to 30 skills by exact catalog IDs in one read. Preserves requested order, removes duplicate IDs, and omits missing skills.",
       inputSchema: {
-        ids: z.array(z.string().min(1).max(500)).min(1).max(30).describe("Stable catalog IDs in display order.")
+        ids: z.array(z.string().min(1).max(500)).min(1).max(30).describe("Stable catalog IDs in display order."),
+        summary: summaryArg
       },
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ ids }) => skillListResult((await Promise.all([...new Set(ids)].map(id => library.getSkill(id)))).flatMap(skill => skill ? [skill] : []))
+    async ({ ids, summary }) => {
+      const reader = readerFor(library, summary);
+      return skillListResult((await Promise.all([...new Set(ids)].map(id => reader.getSkill(id)))).flatMap(skill => skill ? [skill] : []), summary);
+    }
   );
 
   server.registerTool(
@@ -154,12 +165,15 @@ export function createOmgskillsServer(library: CatalogReader, options: { paging?
       outputSchema: options.paging ? pagedListOutputSchema : skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async (args: z.infer<typeof trendingInput> & Partial<PageOptions>) => options.paging && usesPaging(args)
-      ? pagedResult(args, ["limit", "page"], () => {
-        if (!library.listTrendingPage) throw new PagingError("paging_not_supported");
-        return library.listTrendingPage(args as PageOptions);
+    async (args: z.infer<typeof trendingInput> & Partial<PageOptions>) => {
+      const reader = readerFor(library, args.summary);
+      return options.paging && usesPaging(args)
+      ? pagedResult(args, ["limit", "page", "summary"], () => {
+        if (!reader.listTrendingPage) throw new PagingError("paging_not_supported");
+        return reader.listTrendingPage(args as PageOptions);
       })
-      : skillListResult(await library.listTrending(args.limit))
+      : skillListResult(await reader.listTrending(args.limit), args.summary);
+    }
   );
 
   server.registerTool(
@@ -185,12 +199,15 @@ export function createOmgskillsServer(library: CatalogReader, options: { paging?
       outputSchema: options.paging ? pagedListOutputSchema : skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async (args: z.infer<typeof authorInput> & Partial<PageOptions>) => options.paging && usesPaging(args)
-      ? pagedResult(args, ["author", "limit", "sort", "page"], () => {
-        if (!library.listByAuthorPage) throw new PagingError("paging_not_supported");
-        return library.listByAuthorPage(args.author, args as PageOptions);
+    async (args: z.infer<typeof authorInput> & Partial<PageOptions>) => {
+      const reader = readerFor(library, args.summary);
+      return options.paging && usesPaging(args)
+      ? pagedResult(args, ["author", "limit", "sort", "page", "summary"], () => {
+        if (!reader.listByAuthorPage) throw new PagingError("paging_not_supported");
+        return reader.listByAuthorPage(args.author, args as PageOptions);
       })
-      : skillListResult(await library.listByAuthor(args.author, args.limit))
+      : skillListResult(await reader.listByAuthor(args.author, args.limit), args.summary);
+    }
   );
 
   return server;
@@ -200,7 +217,7 @@ function usesPaging(args: object) { return "page" in args || "sort" in args; }
 async function pagedResult(args: object, keys: string[], read: () => SkillPage | Promise<SkillPage>) {
   try {
     if (!("page" in args) || Object.keys(args).some(key => !keys.includes(key))) throw new PagingError("invalid_cursor");
-    const value = await read(), skills = value.skills.map(publicSkill);
+    const value = await read(), skills = value.skills.map((args as { summary?: boolean }).summary ? summarySkill : publicSkill);
     return result({ count: skills.length, skills, page: value.page }, { count: skills.length, skills, page: value.page });
   } catch (error) {
     const safe = error instanceof PagingError ? error : new PagingError("catalog_unavailable");
@@ -208,9 +225,19 @@ async function pagedResult(args: object, keys: string[], read: () => SkillPage |
   }
 }
 
-function skillListResult(skills: SkillResult[]) {
-  const publicSkills = skills.map(publicSkill);
+function readerFor(library: CatalogReader, summary: boolean | undefined): CatalogReader {
+  return summary ? library.summaryReader?.() ?? library : library;
+}
+
+function skillListResult(skills: SkillResult[], summary = false) {
+  const publicSkills = skills.map(summary ? summarySkill : publicSkill);
   return result({ count: publicSkills.length, skills: publicSkills }, publicSkills);
+}
+
+// List fields only: never derive install_status from a record whose install fields were not loaded.
+function summarySkill(skill: SkillResult) {
+  const { install_cmd: _cmd, skill_md_sha: _sha, skill_md_path: _path, repo_commit_sha: _commit, skill_tree_sha: _tree, ...rest } = skill;
+  return skillResultSchema.parse(rest);
 }
 
 function publicSkill(skill: SkillResult) {

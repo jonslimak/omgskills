@@ -15,4 +15,6 @@ export interface CatalogReader {
   listTrendingPage?(options: Omit<PageOptions, "sort">): Read<SkillPage>;
   getStats(): { skills: number; trending: number; goldBasket: number };
   diagnostics?(): Record<string, number | string>;
+  /** Same reads without per-result detail loading; results carry list fields only. */
+  summaryReader?(): CatalogReader;
 }
