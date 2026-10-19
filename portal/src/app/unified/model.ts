@@ -221,3 +221,17 @@ export function agentKind(source: string): "claude" | "codex" | "other" {
   const name = source.trim().toLowerCase();
   return name === "claude" || name === "claude code" ? "claude" : name === "codex" ? "codex" : "other";
 }
+
+export function discoverCollectionPage(collections: CatalogDisplay["collections"], requestedIndex: number) {
+  const size = 3;
+  const lastIndex = Math.max(0, Math.ceil(collections.length / size) - 1);
+  const index = Math.max(0, Math.min(requestedIndex, lastIndex));
+  const offset = index * size;
+  return {
+    index,
+    lastIndex,
+    items: collections.slice(offset, offset + size),
+    start: collections.length ? offset + 1 : 0,
+    end: Math.min(offset + size, collections.length),
+  };
+}

@@ -3,6 +3,34 @@
 Status: Unified app is live. Latest collection UI release: source `a3663fce`, merge `cf1575d5`, production deploy `6ad6587fc3c09ecce5f09864`. Card typography, theme-aware covers/avatar outlines and collection detail banners are verified live. All 2,913 non-app files, 30 backend function digests and 15 protected release assets are unchanged. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
 Updated: 2026-10-19. Collection release worktree: `/private/tmp/omgskills-collection-posters`. Recheck main before any new implementation or release.
 
+### Discover Collections And Creator Profiles - Release Candidate, 2026-10-19
+
+- User approved committing, merging, and safely deploying the reviewed local
+  collection paging and creator-banner work. Production is not yet updated.
+- Discover browses three collection cards per page with previous/next arrows.
+  Collection card titles are 15px/600 and descriptions match creator-row text.
+  Creator pages use the reviewed light/dark banner without changing skill feeds.
+- A generated 27,898-byte summary supplies all 74 existing public creator profiles
+  without loading the full skill catalog or changing the data model. Sources are
+  hash-checked; client reads are bounded, cached, read-only, and non-blocking.
+- Banners retain the short description, add the longer description, and show
+  GitHub/X artwork beside it. Stars, Skills, and Installs remain separate from
+  ranking labels; Best skill and ranking supporting counts are not displayed.
+- Rankings use regular 8px text, tight spacing, and align with the Discover link.
+  Desktop statistics align with the description bottom. Mobile statistics align
+  left with the title and description; content controls the banner height.
+  Dividers are 13px high with the darker theme-aware grey.
+- Verification before commit: 562 root checks, 256 portal tests, production-
+  configured portal build, source/generated summary byte comparison, and
+  whitespace checks passed. Desktop/mobile, light/dark, multiple rankings,
+  320px overflow, optional fields, social links, and navigation were checked
+  throughout the local review; evidence is in `design-qa.md`.
+- Release scope excludes native code, database changes, backend source,
+  public static pages, catalog publication, helper inventory, and Mac releases.
+- [ ] Guarded combined draft/production deploy and live read-only verification.
+- Production baseline: `6ad6587fc3c09ecce5f09864`; latest main remains
+  `68d9d3641de940dc7a09ba5336a9bc68b1d61c0f` before this release.
+
 ### Collection Card Refinement And Detail Banners - Released, 2026-10-19
 
 - User approved the local presentation and requested a safe commit, merge and
