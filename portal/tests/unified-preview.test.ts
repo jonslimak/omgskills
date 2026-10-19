@@ -80,7 +80,7 @@ test("creator banners stay scoped to profiles, use existing identity data and re
   assert.ok(markup.includes('name={title}'));
   assert.ok(markup.includes('src={creator?.avatar || library.find((skill) => skill.author === nav.id)?.avatar}'));
   assert.ok(markup.includes('<h1>{title}</h1>'));
-  assert.ok(markup.includes('{meta && <p>{meta}</p>}'));
+  assert.ok(markup.includes('<p className="ua-creator-tagline">{meta && <span>{meta}</span>}<CreatorSocialLinks handle={nav.id} /></p>'));
   assert.equal(markup.includes('CollectionCover'), false);
 });
 

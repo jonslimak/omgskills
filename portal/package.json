@@ -3,9 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "node ../scripts/build-creator-profiles.mjs",
     "build": "tsc -b && vite build",
+    "predev": "node ../scripts/build-creator-profiles.mjs",
     "dev": "vite --host 0.0.0.0",
+    "predev:design": "node ../scripts/build-creator-profiles.mjs",
     "dev:design": "VITE_PORTAL_PREVIEW=1 vite --host 127.0.0.1",
+    "predev:integration": "node ../scripts/build-creator-profiles.mjs",
     "dev:integration": "VITE_PORTAL_INTEGRATION=1 vite --host 127.0.0.1",
     "test:design": "node --import tsx --test tests/redesign.test.ts",
     "test:integration": "node --import tsx --test tests/integration.test.ts",

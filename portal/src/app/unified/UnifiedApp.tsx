@@ -98,6 +98,7 @@ import "./unified.css";
 import type { PublicStatus } from "./use-public-catalog";
 import type { UnifiedManagement } from "./management";
 import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
+import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -1271,9 +1272,10 @@ export function UnifiedApp({
                     />
                     <div>
                       <h1>{title}</h1>
-                      {meta && <p>{meta}</p>}
+                      <p className="ua-creator-tagline">{meta && <span>{meta}</span>}<CreatorSocialLinks handle={nav.id} /></p>
                     </div>
                   </div>
+                  <CreatorProfileDetails handle={nav.id} />
                 </header>
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
                 <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}`}>
