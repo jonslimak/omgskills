@@ -14,7 +14,7 @@ const productionOrigin = "https://omgskills.com";
 
 export function hostingFiles() {
   // Explicit public reads only. No portal/account route or public app/download fallback.
-  const reads = ["/mcp", "/mcp/health", "/api/catalog/install-record", "/catalog-skill-urls.json"];
+  const reads = ["/mcp", "/mcp/health", "/catalog-skill-urls.json"];
   const redirects = ["/ /app/ 302", ...reads.map(route => `${route} ${productionOrigin}${route} 200`),
     `/data/crawl4/* ${productionOrigin}/data/crawl4/:splat 200`,
     `/data/v2/* ${productionOrigin}/data/v2/:splat 200`];
@@ -66,7 +66,7 @@ export async function prepareCandidateWeb() {
   const receipt = {
     stage: "candidate-web-prepared-not-hosted", site, origin: candidateOrigin,
     deployable: false,
-    hostingPrerequisite: "Merge with and verify retained dedicated-site setup pages, downloads and update feeds before deployment. This web overlay is not a standalone deploy artifact.",
+    hostingPrerequisite: "Merge with and verify retained dedicated-site setup pages, downloads, update feeds and the local read-only record function before deployment. This web overlay is not a standalone deploy artifact.",
     appIdentity: "com.jonslimak.omgskills", scheme: "omgskills", targets: ["claude", "codex"],
     recordEndpoint: candidateOrigin + "/api/catalog/install-record",
     download: null, updateFeed: null,

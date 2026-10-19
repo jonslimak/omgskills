@@ -7,7 +7,7 @@ import { hostingFiles, candidateBuildOptions, candidateOrigin } from "./prepare-
 
 test("private artifact has bounded public proxy routes and no public app or update fallback", () => {
   const files = hostingFiles(), redirects = files._redirects;
-  assert.match(redirects, /^\/api\/catalog\/install-record https:\/\/omgskills.com\/api\/catalog\/install-record 200$/m);
+  assert.doesNotMatch(redirects, /install-record/, 'Record endpoint must be provided by the isolated function');
   assert.match(redirects, /^\/mcp https:\/\/omgskills.com\/mcp 200$/m);
   assert.doesNotMatch(redirects, /api\/portal|appcast|updates|\.zip|\.dmg|\/app\/\*/);
   assert.match(files._headers, /X-Robots-Tag: noindex, nofollow, noarchive/);
@@ -42,4 +42,5 @@ test("ordinary production bundle cannot import the private candidate entry", asy
   const source = (Array.isArray(result) ? result : [result]).flatMap(bundle => bundle.output)
     .filter(chunk => chunk.type === "chunk").map(chunk => chunk.code).join("\n");
   assert.doesNotMatch(source, /Candidate test unavailable|Disposable Mac VM only|signed candidate download is not available|omgskills.app.catalog-install-intent.v1.candidate/);
+  assert.doesNotMatch(source, /OMGSkills-Catalog-Candidate-0\.0\.21-21-arm64\.zip|b222aa91f16f8f4c2be97a2f0d3962d91126beaaf1c71548c7cd27d8befd6d69/);
 });

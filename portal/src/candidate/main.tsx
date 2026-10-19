@@ -10,6 +10,7 @@ import { emptyAccount } from "../integration/data";
 import { accountNavigation } from "../integration/unified/policy";
 import { entryNavigation } from "../integration/unified/entry-navigation";
 import { candidatePageAllowed } from "./policy";
+import { candidateDistribution } from "./distribution";
 import "../app/redesign.css";
 
 const client = new PublicCatalogClient();
@@ -41,7 +42,8 @@ function CandidateApp() {
     onSignIn={noAccount} onSession={noAccount} onFavorite={noAccount} onCreateSet={noAccount} onMembership={noAccount} onVisibility={noAccount}
     previewBar={<div className="ua-preview"><span>OMGSkills Candidate · Disposable Mac VM only</span></div>}
     publicInstallAction={(skill, detailReady) => <CatalogInstallSetup key={skill.key} skill={skill}
-      detailReady={detailReady} store={store} returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />} />;
+      detailReady={detailReady} store={store} distribution={candidateDistribution}
+      returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />} />;
 }
 
 createRoot(document.getElementById("root")!).render(<StrictMode>
