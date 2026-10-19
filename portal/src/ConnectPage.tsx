@@ -1,0 +1,54 @@
+import { useEffect, useRef, useState } from "react";
+import { Button } from "./components/ui/button";
+import { usePortalApi } from "./portal-api";
+import { createPairingConsent, normalPairingConsent, type BrowserPairingRequest,
+  type PairingConsentPolicy, type PairingConsentSnapshot } from "./browser-pairing";
+
+type ConsentSession = ReturnType<typeof createPairingConsent>;
+
+export function ConsentContent({ request, policy, snapshot, approve, cancel }: {
+  request: BrowserPairingRequest | null; policy: PairingConsentPolicy; snapshot: PairingConsentSnapshot;
+  approve: () => void; cancel: () => void;
+}) {
+  const pending = snapshot.phase === "approving";
+  const finished = ["returning", "cancelled"].includes(snapshot.phase);
+  return <main className="shell auth-shell connect-shell">
+    <section className="connect-panel">
+      <p className="eyebrow">omgskills</p>
+      <h1>Connect this Mac?</h1>
+      <p>The app will be able to sync installed skill metadata to your account.</p>
+      {policy.disclosure && <p>{policy.disclosure}</p>}
+      <div className="connect-permission">
+        <strong>Access</strong><span>Sync installed skills</span>
+        {request && policy.scopes(request).includes("content:read") && <span>Read private skills shared with you</span>}
+      </div>
+      {snapshot.status && <p role={snapshot.phase === "invalid" || snapshot.phase === "error" ? "alert" : "status"}
+        className={snapshot.phase === "invalid" ? "connect-error" : "status"}>{snapshot.status}</p>}
+      <div className="actions">
+        <Button type="button" disabled={!request || pending || finished} onClick={approve}>{pending ? "Approving..." : "Approve"}</Button>
+        <Button type="button" disabled={!request || finished} onClick={cancel} variant="outline">Cancel</Button>
+      </div>
+    </section>
+  </main>;
+}
+
+export function ConnectPage({ policy = normalPairingConsent }: { policy?: PairingConsentPolicy }) {
+  const api = usePortalApi();
+  const callbacks = useRef(api);
+  callbacks.current = api;
+  const [hash] = useState(() => window.location.hash);
+  const [request] = useState(() => policy.parse(hash));
+  const [snapshot, setSnapshot] = useState<PairingConsentSnapshot>(() => ({ phase: request ? "ready" : "invalid",
+    status: request ? "" : "This connection request is invalid or expired." }));
+  const session = useRef<ConsentSession | null>(null);
+  useEffect(() => {
+    const current = createPairingConsent(hash, policy, {
+      api: (path, init) => callbacks.current(path, init), navigate: url => window.location.assign(url), changed: setSnapshot,
+    });
+    session.current = current;
+    setSnapshot(current.getSnapshot());
+    return () => { current.dispose(); if (session.current === current) session.current = null; };
+  }, [hash, policy]);
+  return <ConsentContent request={request} policy={policy} snapshot={snapshot}
+    approve={() => { void session.current?.approve(); }} cancel={() => session.current?.cancel()} />;
+}
