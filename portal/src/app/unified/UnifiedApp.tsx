@@ -21,6 +21,7 @@ import {
   Bug,
   Check,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   ChevronsUpDown,
   CirclePlay,
@@ -87,6 +88,7 @@ import {
   setAccessSummary,
   starCount,
   agentKind,
+  discoverCollectionPage,
   type CatalogDisplay,
   type Navigation,
   type SkillDisplay,
@@ -444,6 +446,7 @@ export function UnifiedApp({
   const [setName, setSetName] = useState("");
   const [notice, setNotice] = useState("");
   const [showHidden, setShowHidden] = useState(false);
+  const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [wide, setWide] = useState(
     () => window.matchMedia("(min-width: 1180px)").matches,
   );
@@ -477,7 +480,11 @@ export function UnifiedApp({
     : undefined;
   const collection = catalog.collections.find((item) => item.id === nav.id);
   const collectionHeader = nav.view === "collection" && !nav.query ? collection : undefined;
+  const showCollectionPager = nav.view === "discover" && !nav.query;
+  const collectionPage = discoverCollectionPage(catalog.collections, collectionPageIndex);
+  const collectionsReady = !publicStatus || (publicStatus.metadata ?? publicStatus.list) === "ready";
   const creator = catalog.creators.find((item) => item.handle === nav.id);
+  const creatorHeader = nav.view === "creator" && !nav.query;
   const categoryGroup = catalog.categories.find((group) => group.label === nav.id);
   const discovery = !signedIn || isDiscovery(nav.view);
   const favorites = mine.filter((skill) => isFavorite(data, skill));
@@ -835,10 +842,10 @@ export function UnifiedApp({
       </div>
     );
   }
-  function CollectionCards({ limit }: { limit?: number }) {
+  function CollectionCards({ items = catalog.collections }: { items?: CatalogDisplay["collections"] }) {
     return (
       <div className="ua-collections">
-        {catalog.collections.slice(0, limit).map((item) => (
+        {items.map((item) => (
           <button
             type="button"
             className="ua-collection"
@@ -1218,7 +1225,7 @@ export function UnifiedApp({
                   </button>
                 </div>
               )}
-              {!collectionHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
+              {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
                 (!signedIn && (nav.view !== "discover" || !!nav.query))) && (
                   <button
                     type="button"
@@ -1245,13 +1252,59 @@ export function UnifiedApp({
                     {meta && <p>{meta}</p>}
                   </div>
                 </header>
+              ) : creatorHeader ? (
+                <header className="ua-creator-banner">
+                  <button
+                    type="button"
+                    className="ua-link ua-back"
+                    onClick={() => go("discover")}
+                  >
+                    <ArrowLeft />
+                    Discover
+                  </button>
+                  <div className="ua-creator-banner-identity">
+                    <Avatar
+                      key={nav.id}
+                      name={title}
+                      src={creator?.avatar || library.find((skill) => skill.author === nav.id)?.avatar}
+                      size="large"
+                    />
+                    <div>
+                      <h1>{title}</h1>
+                      {meta && <p>{meta}</p>}
+                    </div>
+                  </div>
+                </header>
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
-                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}`}>
+                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}`}>
                 <div>
                   <h1>{title}</h1>
                   {meta && <p>{meta}</p>}
                 </div>
                 {headingActions}
+                {showCollectionPager && (
+                  <div className="ua-collection-controls" role="group" aria-label="Collection pages">
+                    <IconButton
+                      label="Previous collections"
+                      aria-controls="ua-discover-collections"
+                      disabled={!collectionsReady || collectionPage.index === 0}
+                      onClick={() => setCollectionPageIndex(collectionPage.index - 1)}
+                    >
+                      <ChevronLeft />
+                    </IconButton>
+                    <IconButton
+                      label="Next collections"
+                      aria-controls="ua-discover-collections"
+                      disabled={!collectionsReady || collectionPage.index === collectionPage.lastIndex}
+                      onClick={() => setCollectionPageIndex(collectionPage.index + 1)}
+                    >
+                      <ChevronRight />
+                    </IconButton>
+                    <span className="ua-sr" role="status">
+                      {collectionsReady && `Collections ${collectionPage.start} to ${collectionPage.end} of ${catalog.collections.length}`}
+                    </span>
+                  </div>
+                )}
                 {(!readOnlyAccount || management) && nav.view === "sets" && (
                   <button
                     type="button"
@@ -1347,7 +1400,9 @@ export function UnifiedApp({
                 </>
               ) : nav.view === "discover" ? (
                 <>
-                  {publicSection("metadata", "collections", <CollectionCards limit={publicStatus ? 3 : undefined} />)}
+                  <div id="ua-discover-collections">
+                    {publicSection("metadata", "collections", <CollectionCards items={collectionPage.items} />)}
+                  </div>
                   <section>
                     <SectionHeading
                       title={publicStatus ? "Trending skills" : "Top this week"}
