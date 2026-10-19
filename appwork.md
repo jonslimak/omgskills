@@ -1,7 +1,52 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest Discover/creator UI release: source `532c13fa` (including `64c441df`), merge `20e83d64`, production deploy `6ad673f526de9591adefd787`. Three-card collection paging and creator summary banners are verified live on desktop/mobile. All 2,913 non-app files, 30 backend function digests and 15 protected release assets are unchanged. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
-Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-creator-banners-release-20261019`. Recheck main before any new implementation or release.
+Status: Unified app is live. Latest runtime dependency release: source `a6314ab0`, merge `616035f9`, production deploy `6ad67ad8b04a91d6639c86ca`. Signed-in account reads, search, paging, sorting, skill details, creator profiles and MCP are verified live. All 2,942 static files and 15 protected release assets are unchanged. The prior Discover/creator UI remains in place. Build-tool security findings remain a separate follow-up; other account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
+Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependency-release-20261019`. Recheck main before any new implementation or release.
+
+### Runtime Dependency Security Fixes - Released, 2026-10-19
+
+- Source `a6314ab0` was pushed on `codex/runtime-dependency-fixes-20261019`,
+  merged as `616035f9`, and pushed to main. The merge tree exactly matches the
+  reviewed and tested source commit. Only four dependency manifest/lock files
+  changed; no UI, native, database schema/migration, API implementation, catalog,
+  helper inventory, or release-asset source changes were included.
+- Updated Drizzle ORM from 0.44.7 to 0.45.2 and the MCP SDK from 1.29.0 to
+  1.31.0. Patched compatible supporting dependencies: proxy-addr 2.0.8,
+  fast-uri 3.1.8, qs 6.16.1, Hono 4.13.13, its Node adapter 1.19.17, and
+  ip-address 10.7.4. The root override keeps the adapter on patched 1.x rather
+  than allowing an unnecessary 2.x transition. Standalone MCP dependency files
+  are synchronized; no npm package publication was performed.
+- Local verification: 562 root checks, 256 portal tests, 34 standalone MCP
+  tests/build, and eight focused security regression assertions passed. The
+  production-configured combined build passed; all 2,940 local static files
+  matched the previous local build. All 30 functions also compiled in memory.
+  None of the remaining flagged packages appeared in that function output;
+  the standalone MCP runtime audit reports zero findings.
+- [x] Guarded draft/production deployment and read-only live verification.
+  [Workflow 39317144079](https://github.com/jonslimak/omgskills/actions/runs/39317144079)
+  succeeded. Draft `6ad679ab9b812259a6086a70` and production
+  `6ad67ad8b04a91d6639c86ca` both verified on their first attempt. The downloaded
+  receipt is `verified` for merge `616035f92b78eb428eda6d225b3c6193e6f44e5a`;
+  the public appcast is unchanged.
+- Independent before/after comparison against production
+  `6ad673f526de9591adefd787`: all 2,942 published static file hashes and sizes,
+  including all 15 protected assets, are unchanged. Exactly the 28 functions
+  using the patched libraries changed; the other two are unchanged. All 30
+  live function digests match the verified draft.
+- Live signed-in reads retain 81 skills across three sources, six favorites,
+  four sets, and the reviewed invite-only set's five skills/access controls.
+  Search for design returns 6,186 catalog results, advances from 30 to 60, and
+  sorts by Stars. Skill details, creator profiles and the public MCP health
+  endpoint work; MCP retains the compact 52,179-skill catalog. Browser errors
+  are clear. No account writes, invitations or connection resets were performed.
+- Evidence: `/private/tmp/omgskills-runtime-live-verified.jpg` and
+  `/private/tmp/omgskills-runtime-release-receipt/netlify-deploy-receipt.json`.
+- [ ] Separate build-tool security pass. The full root audit still reports
+  52 findings, including one critical tooling finding. Excluding development
+  dependencies reports 16 findings because several build tools are declared
+  as production dependencies; these are not present in the inspected runtime
+  function output. Do not use forced blanket upgrades or remove shadcn's CSS
+  import to make the audit count disappear.
 
 ### Discover Collections And Creator Profiles - Released, 2026-10-19
 
@@ -48,11 +93,10 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-creator-banners-r
 - My Skills remains at 81 skills across three sources, six favorites, and four
   sets. Browser errors are clear. No account writes or connection resets were
   performed, and the temporary viewport was restored.
-- [ ] Separately review existing dependency audit findings. The unchanged
-  production dependency set reports 24 findings (one low, five moderate,
-  17 high, one critical). The critical report is transitive `proxy-addr`;
-  runtime exposure has not been assessed. No dependency or lockfile changes
-  were included in this UI release; do not apply blanket upgrades.
+- [x] Runtime dependency findings were subsequently reviewed and patched in
+  the runtime release above. The 24-finding audit was the UI release's baseline;
+  build-tool findings remain open separately. No dependency or lockfile changes
+  were included in this historical UI release.
 
 ### Collection Card Refinement And Detail Banners - Released, 2026-10-19
 
