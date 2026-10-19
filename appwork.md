@@ -1,12 +1,12 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest collection-card release: source `a9fcbbd6`, merge `79ef9b49`, published data `cafe0cce`, production deploy `6ad64830dd0f3bdf921d26c6`. Guarded draft/production checks and read-only signed-in desktop/mobile collection checks passed. All 18 covers are verified live; existing card layout and avatars are preserved. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
+Status: Unified app is live. Latest collection UI release: source `a3663fce`, merge `cf1575d5`, production deploy `6ad6587fc3c09ecce5f09864`. Card typography, theme-aware covers/avatar outlines and collection detail banners are verified live. All 2,913 non-app files, 30 backend function digests and 15 protected release assets are unchanged. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
 Updated: 2026-10-19. Collection release worktree: `/private/tmp/omgskills-collection-posters`. Recheck main before any new implementation or release.
 
-### Collection Card Refinement And Detail Banners - Release Candidate, 2026-10-19
+### Collection Card Refinement And Detail Banners - Released, 2026-10-19
 
 - User approved the local presentation and requested a safe commit, merge and
-  production deploy. Deployment and live acceptance remain pending below.
+  production deploy. The guarded rollout and read-only live checks passed.
 - Collection titles use locally hosted Inter Tight at 16px/600, with the font's
   SIL Open Font License included. Every 36px avatar has a 2px outline: white in
   light mode and charcoal in dark mode. Sizes, overlap and card layout remain.
@@ -23,7 +23,23 @@ Updated: 2026-10-19. Collection release worktree: `/private/tmp/omgskills-collec
   including 190 deployment-safety/workflow checks, passed before committing.
 - Scope: no catalog, backend, database, native, helper inventory, public-page,
   dependency or Mac release changes. Primary dirty worktree remains untouched.
-- [ ] Guarded current-main draft/production deployment and live UI verification.
+- [x] Guarded current-main draft/production deployment and live UI verification.
+- Source `a3663fce` was merged as `cf1575d5` and pushed to main.
+  [Guarded workflow 39296735562](https://github.com/jonslimak/omgskills/actions/runs/39296735562)
+  succeeded. Draft `6ad65775cc5cf3bd22dc98a9` and production
+  `6ad6587fc3c09ecce5f09864` both verified on their first attempt. The combined
+  artifact preserved the public appcast and all signed helper pins.
+- Independent Netlify file-hash comparison: all 2,913 non-app files, all 30
+  backend function digests and all 15 protected release assets match the prior
+  production deploy. The live Inter Tight font matches the reviewed local file.
+- Live signed-in checks: 18 Collections and three Discover cards; 16px/600
+  collection titles; correct light/dark gradients and avatar outlines; the new
+  150px-minimum detail banner; collection/skill detail and keyboard back
+  navigation. At 390px there is no horizontal overflow. Card geometry and
+  avatar counts match the pre-deploy baseline exactly. My Skills still shows
+  81 skills across three sources, with six favorites and four sets. No account
+  writes or connection resets were performed. Original live theme and browser
+  size were restored; the browser error log is clear.
 
 ### Collection Cards And Covers - Released, 2026-10-19
 
