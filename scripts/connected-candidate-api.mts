@@ -3,9 +3,10 @@ import type { Pool } from "pg";
 import { requireAuth } from "../netlify/functions/_shared/auth.js";
 import { isBrowserPairingState } from "../netlify/functions/_shared/browser-pairing.js";
 import { isCodeChallenge, isCodeVerifier, isPairingCode } from "../netlify/functions/_shared/crypto.js";
-import { DeviceAuthError, deviceCredentialFromRequest, revokePresentedDevice } from "../netlify/functions/_shared/device-auth.js";
+import { DeviceAuthError, deviceCredentialFromRequest, listUserDevices, revokeOwnedDevice, revokePresentedDevice } from "../netlify/functions/_shared/device-auth.js";
 import { exchangePairingCode, issuePairingCode } from "../netlify/functions/_shared/device-pairing.js";
 import { getEnv } from "../netlify/functions/_shared/env.js";
+import { findInvitedGroupIds, findOwnedGroupIds, requireGroupAccess } from "../netlify/functions/_shared/group-access.js";
 import { parseInventoryCheck, performInventoryCheck, readInventoryRevision } from "../netlify/functions/_shared/inventory-reconciliation.js";
 import { parseSyncReport } from "../netlify/functions/_shared/sync-skill.js";
 import { readSyncInventory } from "../netlify/functions/_shared/sync-inventory-read.js";
@@ -19,6 +20,11 @@ import { portalSyncExchange } from "../netlify/functions/portal-sync-exchange.mj
 import { portalSyncUpload } from "../netlify/functions/portal-sync-upload.mjs";
 import { portalSyncedSkills } from "../netlify/functions/portal-synced-skills.mjs";
 import { portalDeviceRevoke } from "../netlify/functions/portal-device-revoke.mjs";
+import { portalDevices } from "../netlify/functions/portal-devices.mjs";
+import { portalProfile } from "../netlify/functions/portal-profile.mjs";
+import { portalGroups } from "../netlify/functions/portal-groups.mjs";
+import { portalShared } from "../netlify/functions/portal-shared.mjs";
+import { portalGroupDetail } from "../netlify/functions/portal-group-detail.mjs";
 
 const services = { issuePairingCode, exchangePairingCode, performSyncUpload,
   readSyncInventory, revokePresentedDevice, readInventoryRevision, performInventoryCheck };
@@ -66,7 +72,9 @@ function accountBearer(req: Request) {
 
 function privateResponse(response: Response): Response {
   const headers = new Headers(response.headers);
-  for (const key of [...headers.keys()]) if (key.startsWith("access-control-")) headers.delete(key);
+  const corsHeaders: string[] = [];
+  headers.forEach((_value, key) => { if (key.startsWith("access-control-")) corsHeaders.push(key); });
+  for (const key of corsHeaders) headers.delete(key);
   headers.set("Cache-Control", "no-store");
   headers.set("Referrer-Policy", "no-referrer");
   headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
@@ -86,7 +94,8 @@ export function createConnectedCandidateApi(dependencies: Dependencies = {}) {
       const route = candidateRoute(req);
       if (req.method === "OPTIONS") return privateResponse(new Response(null, { status: 204 }));
       await validateBody(req, route);
-      if (route === "pair" || route === "read") accountBearer(req);
+      const accountRead = ["read", "devices", "profile", "groups", "shared", "group-detail"].includes(route);
+      if (route === "pair" || accountRead) accountBearer(req);
       else if (route !== "exchange") deviceCredentialFromRequest(req);
 
       let pool: Pool | undefined;
@@ -119,6 +128,16 @@ export function createConnectedCandidateApi(dependencies: Dependencies = {}) {
           getPgPool: poolReady, requirePortalUser: user, readSyncInventory: operations.readSyncInventory,
           getEnvironment: () => environment, requireReconciliation: feature,
         });
+      } else if (accountRead) {
+        const reads = { getPgPool: poolReady, requirePortalUser: user };
+        switch (route) {
+          case "devices": response = await portalDevices(req, context, { ...reads, listUserDevices, revokeOwnedDevice }); break;
+          case "profile": response = await portalProfile(req, context, reads); break;
+          case "groups": response = await portalGroups(req, context, { ...reads, findOwnedGroupIds, requireGroupAccess }); break;
+          case "shared": response = await portalShared(req, context, { ...reads, findInvitedGroupIds, requireGroupAccess }); break;
+          case "group-detail": response = await portalGroupDetail(req, context, { ...reads, requireGroupAccess }); break;
+          default: throw new Response("Not found", { status: 404 });
+        }
       } else {
         await verifiedPool();
         if (route === "exchange") response = await portalSyncExchange(req, context, {

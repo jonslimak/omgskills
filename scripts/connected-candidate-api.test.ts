@@ -136,7 +136,7 @@ test("candidate dispatches pairing, exchange, revision, full/check upload, owner
 test("candidate rejects malformed contracts and wrong credentials before auth or pool access", async () => {
   const { calls, deps } = fixture(); const api = createConnectedCandidateApi(deps);
   const cases: [Request, number][] = [
-    [request("devices"), 404], [request("synced-skills?version=2"), 400], [request("synced-skills?version=3&userId=other"), 400],
+    [request("private-sources"), 404], [request("synced-skills?version=2"), 400], [request("synced-skills?version=3&userId=other"), 400],
     [request("sync-upload?reportVersion=3&deviceId=other"), 400],
     [request("sync-pairing-code", { ...pair, scopes: [...pair.scopes, "content:read"] }), 400],
     [request("sync-pairing-code", { ...pair, scopes: ["sync:write", "sync:write"] }), 400],

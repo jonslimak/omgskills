@@ -7,6 +7,8 @@ export const connectedCandidateSiteId = "16f435c1-e5d0-4b40-b174-382d839e877b";
 export const connectedCandidatePaths = [
   "/api/portal/sync-pairing-code", "/api/portal/sync-exchange", "/api/portal/sync-upload",
   "/api/portal/synced-skills", "/api/portal/device-revoke",
+  "/api/portal/devices", "/api/portal/profile", "/api/portal/groups", "/api/portal/shared",
+  "/api/portal/groups/:groupId",
 ] as const;
 const environmentKeys = [
   "OMGSKILLS_CONNECTED_CANDIDATE", "OMGSKILLS_CONNECTED_CANDIDATE_PROFILE",
@@ -22,7 +24,12 @@ export type ConnectedCandidateConfiguration = Readonly<{
   user: string;
   secretKey: string;
 }>;
-export type CandidateRoute = "pair" | "exchange" | "revision" | "upload" | "read" | "revoke";
+export type CandidateRoute = "pair" | "exchange" | "revision" | "upload" | "read" | "revoke"
+  | "devices" | "profile" | "groups" | "shared" | "group-detail";
+const accountReadRoutes: Readonly<Record<string, CandidateRoute>> = {
+  "/api/portal/devices": "devices", "/api/portal/profile": "profile",
+  "/api/portal/groups": "groups", "/api/portal/shared": "shared",
+};
 
 export function candidateEnvironment(): CandidateEnvironment {
   return Object.fromEntries(environmentKeys.map(key => [key, getEnv(key)]));
@@ -64,12 +71,20 @@ export function requireConnectedCandidate(req: Request, context: Context, env: C
 
 export function candidateRoute(req: Request): CandidateRoute {
   const { pathname, search } = new URL(req.url);
-  if (!(connectedCandidatePaths as readonly string[]).includes(pathname)) throw new Response("Not found", { status: 404 });
+  const detail = /^\/api\/portal\/groups\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(pathname);
+  if ((!detail && !(connectedCandidatePaths as readonly string[]).includes(pathname))
+    || pathname === "/api/portal/groups/:groupId") throw new Response("Not found", { status: 404 });
   const method = req.method === "OPTIONS" ? req.headers.get("access-control-request-method") : req.method;
   if (req.headers.get("origin") !== null && req.headers.get("origin") !== connectedCandidateOrigin) {
     throw new Response("Origin is not allowed", { status: 403 });
   }
   if (req.headers.get("sec-fetch-site") === "cross-site") throw new Response("Origin is not allowed", { status: 403 });
+  const accountRead = detail ? "group-detail" : accountReadRoutes[pathname];
+  if (accountRead) {
+    if (search) throw new Response("Query is not supported", { status: 400 });
+    if (method !== "GET") throw new Response("Method not allowed", { status: 405 });
+    return accountRead;
+  }
   if (pathname === "/api/portal/synced-skills" && method === "GET") {
     if (search !== "?version=3") throw new Response("Use the exact version-3 inventory read", { status: 400 });
     return "read";
