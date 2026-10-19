@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   canKeepLastGoodSkillsShData,
+  fetchSkillsShInstallTotals,
   isSkillsShUnavailableError,
   searchSkillsSh,
   SkillsShUnavailableError,
@@ -337,5 +338,33 @@ test("skills.sh keeps malformed successful responses fatal", async () => {
     );
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+test("skills.sh install totals read only all-time board pages and key by lowercased id", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalGet = octokit.rest.repos.get;
+  const urls: string[] = [];
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    const url = String(input); urls.push(url);
+    if (url.endsWith("/api/skills/all-time/1")) {
+      return new Response(JSON.stringify({ total: 4, page: 1, hasMore: false, skills: [
+        skill("Owner/Repo", "Alpha", 1_200_000),
+        skill("owner/repo", "alpha", 900),
+        skill("other/repo", "beta", 50),
+        skill("not a repo", "gamma", 10),
+      ] }), { status: 200 });
+    }
+    throw new Error(`unexpected fetch: ${url}`);
+  }) as typeof fetch;
+  octokit.rest.repos.get = (async () => { throw new Error("install totals must not call GitHub"); }) as unknown as typeof octokit.rest.repos.get;
+
+  try {
+    const totals = await fetchSkillsShInstallTotals({ topLimit: 10, pageConcurrency: 1 });
+    assert.deepEqual([...totals.entries()], [["owner/repo:alpha", 1_200_000], ["other/repo:beta", 50]]);
+    assert.ok(urls.every((url) => url.includes("/api/skills/all-time/")));
+  } finally {
+    globalThis.fetch = originalFetch;
+    octokit.rest.repos.get = originalGet;
   }
 });

@@ -228,6 +228,28 @@ async function getRepoMeta(repoFullName: string): Promise<RepoMeta | null> {
   }
 }
 
+/**
+ * All-time install totals keyed by lowercased `owner/repo:skillId`, from the board pages only
+ * (no GitHub lookups). Lets a trending-ranked list keep lifetime install counts.
+ */
+export async function fetchSkillsShInstallTotals(options: Pick<SkillsShOptions, "topLimit" | "pageConcurrency" | "pageRetryBaseDelayMs" | "requestTimeoutMs"> = {}): Promise<Map<string, number>> {
+  const { entries } = await fetchBoardEntries(
+    "all-time",
+    options.topLimit ?? 3000,
+    false,
+    options.pageConcurrency ?? DEFAULT_PAGE_CONCURRENCY,
+    options.pageRetryBaseDelayMs ?? PAGE_RETRY_BASE_DELAY_MS,
+    options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS,
+  );
+  const totals = new Map<string, number>();
+  for (const entry of entries) {
+    if (!isValidRepo(entry.source) || !entry.skillId || !Number.isFinite(entry.installs)) continue;
+    const key = deriveId(normalizeRepo(entry.source), entry.skillId).toLowerCase();
+    totals.set(key, Math.max(totals.get(key) ?? 0, entry.installs));
+  }
+  return totals;
+}
+
 export async function searchSkillsSh(options: SkillsShOptions = {}): Promise<SkillsShHit[]> {
   const board = options.board ?? "all-time";
   const topLimit = options.topLimit ?? DEFAULT_TOP_LIMIT;
