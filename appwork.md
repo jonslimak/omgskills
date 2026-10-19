@@ -1,12 +1,12 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest collection UI release: source `a3663fce`, merge `cf1575d5`, production deploy `6ad6587fc3c09ecce5f09864`. Card typography, theme-aware covers/avatar outlines and collection detail banners are verified live. All 2,913 non-app files, 30 backend function digests and 15 protected release assets are unchanged. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
-Updated: 2026-10-19. Collection release worktree: `/private/tmp/omgskills-collection-posters`. Recheck main before any new implementation or release.
+Status: Unified app is live. Latest Discover/creator UI release: source `532c13fa` (including `64c441df`), merge `20e83d64`, production deploy `6ad673f526de9591adefd787`. Three-card collection paging and creator summary banners are verified live on desktop/mobile. All 2,913 non-app files, 30 backend function digests and 15 protected release assets are unchanged. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
+Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-creator-banners-release-20261019`. Recheck main before any new implementation or release.
 
-### Discover Collections And Creator Profiles - Release Candidate, 2026-10-19
+### Discover Collections And Creator Profiles - Released, 2026-10-19
 
 - User approved committing, merging, and safely deploying the reviewed local
-  collection paging and creator-banner work. Production is not yet updated.
+  collection paging and creator-banner work. The guarded rollout is verified.
 - Discover browses three collection cards per page with previous/next arrows.
   Collection card titles are 15px/600 and descriptions match creator-row text.
   Creator pages use the reviewed light/dark banner without changing skill feeds.
@@ -27,9 +27,32 @@ Updated: 2026-10-19. Collection release worktree: `/private/tmp/omgskills-collec
   throughout the local review; evidence is in `design-qa.md`.
 - Release scope excludes native code, database changes, backend source,
   public static pages, catalog publication, helper inventory, and Mac releases.
-- [ ] Guarded combined draft/production deploy and live read-only verification.
-- Production baseline: `6ad6587fc3c09ecce5f09864`; latest main remains
-  `68d9d3641de940dc7a09ba5336a9bc68b1d61c0f` before this release.
+- [x] Guarded combined draft/production deploy and live read-only verification.
+- Source `532c13fa`, including `64c441df`, was merged as `20e83d64` and pushed
+  to main. [Guarded workflow 39313157959](https://github.com/jonslimak/omgskills/actions/runs/39313157959)
+  succeeded. Draft `6ad672f59de3682a513e875e` and production
+  `6ad673f526de9591adefd787` both verified on their first attempt. Receipt
+  status is `verified`; the public appcast is unchanged.
+- Independent comparison against baseline `6ad6587fc3c09ecce5f09864` confirms
+  all 2,913 non-app file hashes, 30 backend function digests, and 15 protected
+  release assets are unchanged. The live creator summary matches the reviewed
+  27,898-byte artifact (SHA-256
+  `f42be3790307d852415ec36d7561f770964c3c1822c054497b79f1beca97e950`).
+- Live signed-in checks: Discover advances from collections 1-3 to 4-6 of 18
+  and returns correctly; previous is disabled on the first page. Anthropic's
+  descriptions, statistics, labels, and outlined GitHub mark render correctly;
+  Huggingface retains both 14.4px social marks and real published counts.
+  Desktop banners remain 150px. At 390px statistics align beneath the title,
+  bottom padding is 16px, and there is no horizontal overflow. Ranking labels
+  use 8px/400 with 2px gaps; desktop text alignment and 13px dividers match.
+- My Skills remains at 81 skills across three sources, six favorites, and four
+  sets. Browser errors are clear. No account writes or connection resets were
+  performed, and the temporary viewport was restored.
+- [ ] Separately review existing dependency audit findings. The unchanged
+  production dependency set reports 24 findings (one low, five moderate,
+  17 high, one critical). The critical report is transitive `proxy-addr`;
+  runtime exposure has not been assessed. No dependency or lockfile changes
+  were included in this UI release; do not apply blanket upgrades.
 
 ### Collection Card Refinement And Detail Banners - Released, 2026-10-19
 

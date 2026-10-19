@@ -190,3 +190,18 @@ final result: passed
 - Latest main was independently checked at 68d9d3641de940dc7a09ba5336a9bc68b1d61c0f. Production baseline is 6ad6587fc3c09ecce5f09864.
 - Full release preflight: 562 root checks and 256 portal tests passed, the production-configured portal build passed, and the generated/built creator summary SHA-256 values match. The initial sandbox IPC restriction was resolved by rerunning the test runner with permission; no test assertion failed.
 - Only reviewed portal UI, the small static summary generator, its tests/build hooks, and work records are in scope. No native, backend, database, catalog publication, or Mac release changes. Guarded deployment and live verification remain pending.
+
+## Verified Production Release, 2026-10-19
+
+final result: passed
+
+- Source `532c13fa`, including `64c441df`, was merged as `20e83d64` and pushed to main. The exact clean merged checkout passed 562 root checks, 256 portal tests, and the complete combined Netlify build.
+- [Guarded workflow 39313157959](https://github.com/jonslimak/omgskills/actions/runs/39313157959) succeeded. Draft `6ad672f59de3682a513e875e` and production `6ad673f526de9591adefd787` both passed verification on their first attempt. The downloaded deployment receipt is `verified` for source `20e83d64d7c7830fa258a9e9e1c508b447007fc3`; the public appcast is unchanged.
+- Independent live comparison against deploy `6ad6587fc3c09ecce5f09864`: all 2,913 non-app file hashes, all 30 backend function digests, and all 15 protected release assets match. The 74-profile summary on both draft and production matches the reviewed 27,898-byte artifact and SHA-256 `f42be3790307d852415ec36d7561f770964c3c1822c054497b79f1beca97e950`.
+- Signed-in Discover advances from Starter Skills / Skills for Designers / Most used skills to the next three cards, reports collections 4-6 of 18, and returns to the originals with Previous disabled. Existing collection cover styling remains in place.
+- Anthropic's live banner shows the full descriptions, 15.7M Stars, 395 Skills, 2M Installs, and label-only Influential #1 / Most-used #6 / Peak #9. Best skill is not displayed. Desktop height remains 150px. Back-link and ranking text tops both measure 46.5px; description/statistic bottoms both measure 160px. Rankings are 8px/400 with 2px gaps; visible dividers are 13px high and use #94949b in light mode.
+- At 390 x 844, the banner is content-sized (about 200px), statistics share the title/description's 106px left edge, bottom padding is 16px, and there is no horizontal overflow. Local dark-mode and 320px checks are recorded above; live verification did not change the user's theme.
+- Huggingface shows its real 542.8K Stars, 66 Skills, and zero reported Installs, with Peak #12 and both GitHub/X links at the reviewed 14.4px mark size. External destinations are unchanged.
+- Signed-in My Skills remains at 81 skills across three sources, with six favorites and four sets. No account writes or connection resets were performed. Browser error log is clear; viewport restored.
+- Production evidence: `/private/tmp/omgskills-creator-live-desktop.jpg` and `/private/tmp/omgskills-creator-live-mobile.jpg`. Receipt: `/private/tmp/omgskills-creator-release-receipt/netlify-deploy-receipt.json`.
+- Separate follow-up: the unchanged dependency audit reports 24 production-dependency findings, including one critical transitive advisory. Runtime applicability is not yet assessed; no dependency or lockfile changes were included in this release.
