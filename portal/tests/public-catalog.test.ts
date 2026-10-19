@@ -62,6 +62,30 @@ test("published collections stay separate from Mac Discover search categories", 
   assert.throws(() => parseCollections({ collections: [{}] }));
 });
 
+test("collection cards receive their published image without changing their content", () => {
+  const imageUrl = "https://omgskills.com/images/collections/documents.webp?v=123456abcdef";
+  const source = { collections: [{ ...collections.collections[1], imageUrl }] };
+  const result = parseCollections(source).collections[0];
+  assert.equal(result.imageUrl, imageUrl);
+  assert.deepEqual({ ...result, imageUrl: undefined }, parseCollections(collections).collections[0]);
+  assert.equal(parseCollections({ collections: [{ ...source.collections[0], imageUrl: imageUrl.split("?")[0] }] }).collections[0].imageUrl,
+    "https://omgskills.com/images/collections/documents.webp");
+});
+
+test("missing or invalid collection images preserve the collection as a grey fallback", () => {
+  for (const imageUrl of [undefined, null, 1, "", "javascript:alert(1)", "data:image/png;base64,AA==",
+    "http://omgskills.com/images/collections/documents.webp", "https://example.com/documents.webp",
+    "https://omgskills.com/images/collections/other.webp", "https://omgskills.com/images/collections/documents.webp#fragment",
+    "https://omgskills.com/images/collections/documents.webp?v=bad", "https://omgskills.com/images/collections/documents.webp?other=value",
+    "https://omgskills.com/images/collections/documents.webp?v=123456abcdef&v=123456abcdef",
+    "https://user:password@omgskills.com/images/collections/documents.webp"]) {
+    const result = parseCollections({ collections: [{ ...collections.collections[1], imageUrl }] }).collections[0];
+    assert.equal(result.imageUrl, undefined);
+    assert.equal(result.name, "Document tools");
+    assert.deepEqual(result.skillIds, ["author/repo:pdf", "author/repo:missing"]);
+  }
+});
+
 test("Discover categories match the Mac app's 24 terms in screenshot row order", () => {
   assert.deepEqual(discoveryCategories, [
     { label: "Design + Apps", items: ["Design system", "React", "SwiftUI", "Remotion", "App Store", "Landing page"] },

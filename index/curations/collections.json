@@ -81,7 +81,6 @@
       "featuredSkillIds": [
         "mattpocock/skills:grill-with-docs",
         "mattpocock/skills:prototype",
-        "mattpocock/skills:tdd",
         "mattpocock/skills:design-an-interface",
         "mattpocock/skills:caveman",
         "mattpocock/skills:diagnose",
@@ -289,7 +288,7 @@
     },
     "emilkowalski": {
       "featuredSkillIds": [
-        "emilkowalski/skill:emil-design-eng"
+        "emilkowalski/skills:emil-design-eng"
       ],
       "subtitle": "Interface design engineering",
       "description": "A distinctive collection focused on interaction details and frontend quality.",
@@ -306,9 +305,9 @@
         "coreyhaines31/marketingskills:directory-submissions",
         "coreyhaines31/marketingskills:image",
         "coreyhaines31/marketingskills:lead-magnets",
-        "coreyhaines31/marketingskills:revops",
-        "coreyhaines31/marketingskills:sales-enablement",
-        "coreyhaines31/marketingskills:site-architecture",
+        "coreyhaines31/marketingskills:skills/revops",
+        "coreyhaines31/marketingskills:skills/sales-enablement",
+        "coreyhaines31/marketingskills:skills/site-architecture",
         "coreyhaines31/marketingskills:skills/ab-test-setup",
         "coreyhaines31/marketingskills:skills/ad-creative",
         "coreyhaines31/marketingskills:skills/ai-seo",
@@ -509,7 +508,7 @@
     },
     "mvanhorn": {
       "featuredSkillIds": [
-        "mvanhorn/last30days-skill",
+        "mvanhorn/last30days-skill:last30days-skill",
         "clawdbot/skills:skills/mvanhorn/search-x",
         "mvanhorn/cli-printing-press:printing-press",
         "mvanhorn/cli-printing-press:printing-press-amend",
@@ -549,7 +548,7 @@
         "yeachan-heo/oh-my-claudecode:external-context",
         "yeachan-heo/oh-my-claudecode:learner",
         "yeachan-heo/oh-my-claudecode:mcp-setup",
-        "yeachan-heo/oh-my-claudecode:omc-doctor",
+        "Yeachan-Heo/oh-my-claudecode:omc-doctor",
         "yeachan-heo/oh-my-claudecode:project-session-manager",
         "yeachan-heo/oh-my-claudecode:release",
         "yeachan-heo/oh-my-claudecode:sciomc",
@@ -868,10 +867,10 @@
         "firecrawl/firecrawl-agent:financial-research",
         "firecrawl/firecrawl-agent:pricing-tracker",
         "firecrawl/firecrawl-agent:structured-extraction",
-        "firecrawl/cli:firecrawl",
-        "firecrawl/cli:firecrawl-agent",
-        "firecrawl/cli:firecrawl-crawl",
-        "firecrawl/cli:firecrawl-download"
+        "firecrawl/firecrawl-cli:firecrawl",
+        "firecrawl/firecrawl-cli:firecrawl-agent",
+        "firecrawl/firecrawl-cli:firecrawl-crawl",
+        "firecrawl/firecrawl-cli:firecrawl-download"
       ],
       "subtitle": "Web data extraction",
       "description": "Skills for crawling, structured extraction, research, and web-scale context collection.",
@@ -958,8 +957,8 @@
     },
     "vercel": {
       "featuredSkillIds": [
-        "vercel/turborepo:turborepo",
-        "vercel-labs/ai:add-provider-package",
+        "vercel/turbo:turborepo",
+        "vercel/ai:add-provider-package",
         "vercel-labs/ai:adr-skill",
         "vercel/vercel:vercel-cli",
         "vercel/next-forge:next-forge",
@@ -975,7 +974,7 @@
     },
     "vercel-labs": {
       "featuredSkillIds": [
-        "vercel-labs/agent-browser:skills/agent-browser",
+        "vercel-labs/agent-browser:agent-browser",
         "vercel-labs/agent-browser:agentcore",
         "vercel-labs/agent-browser:core",
         "vercel-labs/agent-browser:dogfood",
@@ -1112,7 +1111,7 @@
     "lobehub": {
       "featuredSkillIds": [
         "lobehub/lobehub:zustand",
-        "lobehub/lobehub:add-provider-doc",
+        "lobehub/lobehub:.agents/skills/add-model-provider",
         "lobehub/lobehub:add-setting-env",
         "lobehub/lobehub:data-fetching",
         "lobehub/lobehub:debug",
@@ -1200,13 +1199,13 @@
         "MengTo/Skills:article-prompts-to-skills",
         "MengTo/Skills:audit-reference-originality",
         "MengTo/Skills:iterate-until-verified",
-        "MengTo/Skills:optimize-web-animations",
+        "mengto/skills:optimize-web-animations",
         "MengTo/Skills:performance-profiling",
-        "MengTo/Skills:design-first-ui-prompting",
-        "MengTo/Skills:build-awwwards-quality-sites",
-        "MengTo/Skills:animation-systems",
-        "MengTo/Skills:landing-page",
-        "MengTo/Skills:threejs"
+        "mengto/skills:design-first-ui-prompting",
+        "mengto/skills:build-awwwards-quality-sites",
+        "mengto/skills:animation-systems",
+        "mengto/skills:landing-page",
+        "mengto/skills:threejs"
       ],
       "description": "Skills for visual design, animation, landing pages, and frontend polish.",
       "xUrl": "https://x.com/MengTo"
@@ -1300,7 +1299,7 @@
       "type": "topic",
       "title": "Starter Skills",
       "subtitle": "Essential skills for a first setup",
-      "imageUrl": "https://omgskills.com/images/collections/starter-pack.webp?v=271864c83c40",
+      "imageUrl": "https://omgskills.com/images/collections/starter-pack.webp?v=3ecf0e01d807",
       "featuredSkillIds": [
         "anthropics/skills:pdf",
         "anthropics/skills:docx",
@@ -1328,12 +1327,12 @@
       "type": "topic",
       "title": "Skills for Designers",
       "subtitle": "UI, frontend, and product polish",
-      "imageUrl": "https://omgskills.com/images/collections/design-essentials.webp?v=f439b2305ed0",
+      "imageUrl": "https://omgskills.com/images/collections/design-essentials.webp?v=d014226ebe1a",
       "featuredSkillIds": [
         "pbakaus/impeccable:impeccable",
         "anthropics/skills:skills/frontend-design",
         "leonxlnx/taste-skill:image-to-code",
-        "emilkowalski/skill:emil-design-eng",
+        "emilkowalski/skills:emil-design-eng",
         "leonxlnx/taste-skill:gpt-taste",
         "leonxlnx/taste-skill:imagegen-frontend-web",
         "mattpocock/skills:design-an-interface",
@@ -1345,7 +1344,7 @@
         "leonxlnx/taste-skill:gpt-taste",
         "leonxlnx/taste-skill:image-to-code",
         "leonxlnx/taste-skill:imagegen-frontend-web",
-        "emilkowalski/skill:emil-design-eng",
+        "emilkowalski/skills:emil-design-eng",
         "mattpocock/skills:design-an-interface",
         "anthropics/skills:webapp-testing"
       ],
@@ -1356,29 +1355,29 @@
       "type": "topic",
       "title": "Most used skills",
       "subtitle": "The skills everyone is using",
-      "imageUrl": "https://omgskills.com/images/collections/the-goat-list.webp?v=ae69fc424a20",
+      "imageUrl": "https://omgskills.com/images/collections/the-goat-list.webp?v=45e434d6e5c5",
       "featuredSkillIds": [
         "garrytan/gstack",
-        "mattpocock/skills:grill-me",
+        "mattpocock/skills:batch-grill-me",
         "mattpocock/skills:design-an-interface",
         "blader/humanizer",
         "coreyhaines31/marketingskills:customer-research",
-        "coreyhaines31/marketingskills:marketing-ideas",
+        "coreyhaines31/marketingskills:skills/marketing-ideas",
         "coreyhaines31/marketingskills:skills/ad-creative",
-        "mvanhorn/last30days-skill",
+        "mvanhorn/last30days-skill:last30days-skill",
         "davidondrej/skills:effective-agent-skills",
         "anthropics/skills:skills/frontend-design",
         "twostraws/swiftui-agent-skill:swiftui-pro"
       ],
       "skillIds": [
         "garrytan/gstack",
-        "mattpocock/skills:grill-me",
+        "mattpocock/skills:batch-grill-me",
         "mattpocock/skills:design-an-interface",
         "blader/humanizer",
         "coreyhaines31/marketingskills:customer-research",
-        "coreyhaines31/marketingskills:marketing-ideas",
+        "coreyhaines31/marketingskills:skills/marketing-ideas",
         "coreyhaines31/marketingskills:skills/ad-creative",
-        "mvanhorn/last30days-skill",
+        "mvanhorn/last30days-skill:last30days-skill",
         "davidondrej/skills:effective-agent-skills",
         "anthropics/skills:skills/frontend-design",
         "twostraws/swiftui-agent-skill:swiftui-pro"
@@ -1390,7 +1389,7 @@
       "type": "topic",
       "title": "Best iOS Skills",
       "subtitle": "Pixel perfect, and performant apps",
-      "imageUrl": "https://omgskills.com/images/collections/build-ios-apps.webp?v=b13d642642ec",
+      "imageUrl": "https://omgskills.com/images/collections/build-ios-apps.webp?v=22c69aa13cc2",
       "featuredSkillIds": [
         "twostraws/swiftui-agent-skill:swiftui-pro",
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
@@ -1418,12 +1417,12 @@
       "type": "topic",
       "title": "Best Design Skills",
       "subtitle": "What worldclass designers are using",
-      "imageUrl": "https://omgskills.com/images/collections/elite-ui-design.webp?v=4c65ce96cdff",
+      "imageUrl": "https://omgskills.com/images/collections/elite-ui-design.webp?v=55851d7de667",
       "featuredSkillIds": [
         "anthropics/skills:canvas-design",
         "pbakaus/impeccable:impeccable",
         "vercel/examples:web-design-guidelines",
-        "emilkowalski/skill:emil-design-eng",
+        "emilkowalski/skills:emil-design-eng",
         "ibelick/ui-skills:baseline-ui",
         "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
         "jakubkrehel/oklch-skill:oklch-skill",
@@ -1433,7 +1432,7 @@
         "anthropics/skills:canvas-design",
         "pbakaus/impeccable:impeccable",
         "vercel/examples:web-design-guidelines",
-        "emilkowalski/skill:emil-design-eng",
+        "emilkowalski/skills:emil-design-eng",
         "ibelick/ui-skills:baseline-ui",
         "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
         "jakubkrehel/oklch-skill:oklch-skill",
@@ -1449,7 +1448,7 @@
       "featuredSkillIds": [
         "affaan-m/ecc:remotion-video-creation",
         "heygen-com/hyperframes:hyperframes",
-        "greensock/gsap-skills:gsap-core",
+        "greensock/gsap-skills:skills/gsap-core",
         "coreyhaines31/marketingskills:video",
         "inference-sh/skills:ai-video-generation",
         "danielmiessler/LifeOS:LifeOS/install/skills/Remotion",
@@ -1461,7 +1460,7 @@
       "skillIds": [
         "affaan-m/ecc:remotion-video-creation",
         "heygen-com/hyperframes:hyperframes",
-        "greensock/gsap-skills:gsap-core",
+        "greensock/gsap-skills:skills/gsap-core",
         "coreyhaines31/marketingskills:video",
         "affaan-m/ecc:video-editing",
         "nexu-io/open-design:emilkowalski-motion",
@@ -1470,7 +1469,7 @@
         "danielmiessler/LifeOS:LifeOS/install/skills/Remotion",
         "inference-sh/skills:ai-video-generation"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/video-motion-graphics.webp?v=7347ce5b4410",
+      "imageUrl": "https://omgskills.com/images/collections/video-motion-graphics.webp?v=842325eca42c",
       "description": "Best Video & Motion Graphics Skills to create amazing animations and video content"
     },
     {
@@ -1479,7 +1478,7 @@
       "title": "Skills for SEO & LLMO",
       "subtitle": "Audits and AI-search optimization",
       "featuredSkillIds": [
-        "coreyhaines31/marketingskills:programmatic-seo",
+        "coreyhaines31/marketingskills:skills/programmatic-seo",
         "agricidaniel/claude-seo:seo-page",
         "affaan-m/ecc:seo",
         "firecrawl/firecrawl-workflows:firecrawl-seo-audit",
@@ -1488,21 +1487,21 @@
         "agricidaniel/claude-seo:seo-hreflang",
         "agricidaniel/claude-seo:seo-competitor-pages",
         "coreyhaines31/marketingskills:directory-submissions",
-        "coreyhaines31/marketingskills:site-architecture"
+        "coreyhaines31/marketingskills:skills/site-architecture"
       ],
       "skillIds": [
-        "coreyhaines31/marketingskills:programmatic-seo",
+        "coreyhaines31/marketingskills:skills/programmatic-seo",
         "agricidaniel/claude-seo:seo-page",
         "affaan-m/ecc:seo",
         "firecrawl/firecrawl-workflows:firecrawl-seo-audit",
-        "coreyhaines31/marketingskills:site-architecture",
+        "coreyhaines31/marketingskills:skills/site-architecture",
         "coreyhaines31/marketingskills:directory-submissions",
         "agricidaniel/claude-seo:seo-competitor-pages",
         "agricidaniel/claude-seo:seo-hreflang",
         "resciencelab/opc-skills:seo-geo",
         "langchain-ai/deepagents:blog-post"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/seo.webp?v=eef9ad9d9b7e",
+      "imageUrl": "https://omgskills.com/images/collections/seo.webp?v=a2b4de980450",
       "description": "Best SEO & LLMO skills to help you appear in llm search results and get recommended "
     },
     {
@@ -1534,7 +1533,7 @@
         "affaan-m/ecc:ito-market-intelligence",
         "marketcalls/vectorbt-backtesting-skills:backtest"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/trading-investing.webp?v=fd3bdab06f40",
+      "imageUrl": "https://omgskills.com/images/collections/trading-investing.webp?v=564924486681",
       "description": "Best Trading & Investing Skills to help you create financial projects with agents."
     },
     {
@@ -1551,7 +1550,7 @@
         "googleworkspace/cli:gws-slides",
         "hugohe3/ppt-master:ppt-master",
         "bytedance/deer-flow:ppt-generation",
-        "coreyhaines31/marketingskills:sales-enablement",
+        "coreyhaines31/marketingskills:skills/sales-enablement",
         "anthropics/skills:theme-factory"
       ],
       "skillIds": [
@@ -1560,13 +1559,13 @@
         "slidevjs/slidev:slidev",
         "affaan-m/ecc:investor-materials",
         "anthropics/skills:theme-factory",
-        "coreyhaines31/marketingskills:sales-enablement",
+        "coreyhaines31/marketingskills:skills/sales-enablement",
         "bytedance/deer-flow:ppt-generation",
         "hugohe3/ppt-master:ppt-master",
         "googleworkspace/cli:gws-slides",
         "anthropics/financial-services-plugins:funding-digest"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/presentations-decks.webp?v=a2fc8738ffa4",
+      "imageUrl": "https://omgskills.com/images/collections/presentations-decks.webp?v=3d9df632c6ab",
       "description": "Best Presentations & Decks skills for beautiful slides and great deck design "
     },
     {
@@ -1577,7 +1576,7 @@
       "featuredSkillIds": [
         "affaan-m/ecc:content-engine",
         "coreyhaines31/marketingskills:social-content",
-        "mvanhorn/last30days-skill",
+        "mvanhorn/last30days-skill:last30days-skill",
         "wshobson/agents:plugins/social-publishing/skills/social-publishing",
         "coreyhaines31/marketingskills:image",
         "typefully/agent-skills:skills/typefully",
@@ -1588,7 +1587,7 @@
       "skillIds": [
         "affaan-m/ecc:content-engine",
         "coreyhaines31/marketingskills:social-content",
-        "mvanhorn/last30days-skill",
+        "mvanhorn/last30days-skill:last30days-skill",
         "wshobson/agents:plugins/social-publishing/skills/social-publishing",
         "affaan-m/ecc:crosspost",
         "sickn33/agentic-awesome-skills:linkedin-content-generator",
@@ -1596,7 +1595,7 @@
         "typefully/agent-skills:skills/typefully",
         "coreyhaines31/marketingskills:image"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/social-media.webp?v=af22b96597bf",
+      "imageUrl": "https://omgskills.com/images/collections/social-media.webp?v=3e1963109962",
       "description": "Best Social Media skills to automate your social media presence and grow your audience"
     },
     {
@@ -1624,7 +1623,7 @@
         "n8n-io/n8n:data-table-manager",
         "anthropics/financial-services-plugins:funding-digest"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/excel-financial-modeling.webp?v=7c7f1d1d8b8a",
+      "imageUrl": "https://omgskills.com/images/collections/excel-financial-modeling.webp?v=38450eb3ee3d",
       "description": "Best Excel & Finance Skills to build accurate financial models and projections in excel "
     },
     {
@@ -1648,7 +1647,7 @@
         "thedotmack/claude-mem:timeline-report",
         "fockus/skill-memory-bank"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/memory-context.webp?v=8b75154b39b9",
+      "imageUrl": "https://omgskills.com/images/collections/memory-context.webp?v=9db5dbe0d188",
       "description": "Best memory & context skills to help you build memory systems and so your agents don't forget"
     },
     {
@@ -1673,7 +1672,7 @@
         "juliusbrussee/caveman:compress",
         "affaan-m/ecc:cost-tracking"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/reduce-token-usage.webp?v=33b613a3f45f"
+      "imageUrl": "https://omgskills.com/images/collections/reduce-token-usage.webp?v=ffbc44a3ea8e"
     },
     {
       "id": "web-development",
@@ -1683,10 +1682,10 @@
       "description": "Best Claude skills for web development covering frontend design, React and Next.js, UI quality, and browser testing to ship polished sites faster.",
       "featuredSkillIds": [
         "anthropics/skills:skills/frontend-design",
-        "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max",
+        "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max-skill",
         "pbakaus/impeccable:impeccable",
         "microsoft/playwright:playwright-cli",
-        "MengTo/Skills:landing-page",
+        "mengto/skills:landing-page",
         "anthropics/skills:theme-factory",
         "saadeghi/daisyui:daisyui",
         "affaan-m/ecc:api-design",
@@ -1695,7 +1694,7 @@
       ],
       "skillIds": [
         "anthropics/skills:skills/frontend-design",
-        "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max",
+        "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max-skill",
         "pbakaus/impeccable:impeccable",
         "microsoft/playwright:playwright-cli",
         "anthropics/skills:web-artifacts-builder",
@@ -1703,9 +1702,9 @@
         "affaan-m/ecc:api-design",
         "saadeghi/daisyui:daisyui",
         "anthropics/skills:theme-factory",
-        "MengTo/Skills:landing-page"
+        "mengto/skills:landing-page"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/web-development.webp?v=1393cc5d2e52"
+      "imageUrl": "https://omgskills.com/images/collections/web-development.webp?v=f3660c35a2d8"
     },
     {
       "id": "writing",
@@ -1731,7 +1730,7 @@
         "langchain-ai/deepagents:blog-post",
         "anthropics/skills:docx"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/writing.webp?v=f3585cbafe76"
+      "imageUrl": "https://omgskills.com/images/collections/writing.webp?v=5d57c2470f9b"
     },
     {
       "id": "students",
@@ -1759,7 +1758,7 @@
         "TaylorHuston/local-life-manager:.claude/skills/flashcards",
         "anthropics/skills:pptx"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/students.webp?v=7322dec913f8"
+      "imageUrl": "https://omgskills.com/images/collections/students.webp?v=61ab673e4110"
     },
     {
       "id": "business",
@@ -1770,7 +1769,7 @@
       "featuredSkillIds": [
         "anthropics/skills:xlsx",
         "affaan-m/ecc:market-research",
-        "coreyhaines31/marketingskills:sales-enablement",
+        "coreyhaines31/marketingskills:skills/sales-enablement",
         "affaan-m/ecc:finance-billing-ops",
         "anthropics/skills:pptx",
         "googleworkspace/cli:gws-calendar",
@@ -1781,7 +1780,7 @@
       "skillIds": [
         "anthropics/skills:xlsx",
         "affaan-m/ecc:market-research",
-        "coreyhaines31/marketingskills:sales-enablement",
+        "coreyhaines31/marketingskills:skills/sales-enablement",
         "affaan-m/ecc:finance-billing-ops",
         "coreyhaines31/marketingskills:lead-magnets",
         "coreyhaines31/marketingskills:skills/marketing-plan",
@@ -1789,7 +1788,7 @@
         "googleworkspace/cli:gws-calendar",
         "anthropics/skills:pptx"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/business.webp?v=f3d01585616b"
+      "imageUrl": "https://omgskills.com/images/collections/business.webp?v=fcbe5a5679fd"
     },
     {
       "id": "research",
@@ -1800,26 +1799,26 @@
       "featuredSkillIds": [
         "affaan-m/ecc:deep-research",
         "affaan-m/ecc:exa-search",
-        "mvanhorn/last30days-skill",
+        "mvanhorn/last30days-skill:last30days-skill",
         "browser-use/browser-use:browser-use",
         "Lloyd-Jahn/openclaw-paper-search",
         "bytedance/deer-flow:academic-paper-review",
-        "firecrawl/cli:firecrawl",
+        "firecrawl/firecrawl-cli:firecrawl",
         "tavily-ai/skills:tavily-search",
         "d4vinci/scrapling:scrapling-official"
       ],
       "skillIds": [
         "affaan-m/ecc:deep-research",
         "affaan-m/ecc:exa-search",
-        "mvanhorn/last30days-skill",
+        "mvanhorn/last30days-skill:last30days-skill",
         "browser-use/browser-use:browser-use",
         "d4vinci/scrapling:scrapling-official",
         "tavily-ai/skills:tavily-search",
-        "firecrawl/cli:firecrawl",
+        "firecrawl/firecrawl-cli:firecrawl",
         "bytedance/deer-flow:academic-paper-review",
         "Lloyd-Jahn/openclaw-paper-search"
       ],
-      "imageUrl": "https://omgskills.com/images/collections/research.webp?v=ebd8b6f8de7d"
+      "imageUrl": "https://omgskills.com/images/collections/research.webp?v=5e8ebd74668e"
     }
   ]
 }

@@ -22,6 +22,9 @@ if (!import.meta.env.DEV || !["127.0.0.1", "localhost"].includes(location.hostna
 const params = new URLSearchParams(location.search);
 const scenario = (params.get("scenario") || "populated") as Scenario;
 const catalog = makeCatalog();
+const localCollectionCovers = import.meta.glob<string>("../../site/images/collections/*.webp", {
+  eager: true, query: "?url", import: "default",
+});
 const pagingReview = params.get("paging") === "1";
 const publicClient = new PublicCatalogClient(pagingReview ? publicPagingFixture(catalog, params.get("pageFailure")) : undefined, undefined, undefined, pagingReview);
 const publicReview = params.get("catalog") !== "0";
@@ -73,7 +76,11 @@ function Review() {
     state: "ready" as const, error: "", retry: () => {} };
   const setCatalog = useSetCatalog(setClient, setCatalogReview ? detail.set : null);
   const baseCatalog = publicReview ? remote.catalog : catalog;
-  const shownCatalog = { ...baseCatalog, skills: [...baseCatalog.skills.map(skill => pagingReview ? { ...skill, avatar: catalog.creators[0]?.avatar } : skill), ...setCatalog.skills.map(skill => ({ ...skill, avatar: undefined }))] };
+  const shownCatalog = { ...baseCatalog,
+    collections: baseCatalog.collections.map(collection => ({ ...collection,
+      imageUrl: collection.imageUrl ? localCollectionCovers[`../../site/images/collections/${collection.id}.webp`] ?? collection.imageUrl : undefined,
+    })),
+    skills: [...baseCatalog.skills.map(skill => pagingReview ? { ...skill, avatar: catalog.creators[0]?.avatar } : skill), ...setCatalog.skills.map(skill => ({ ...skill, avatar: undefined }))] };
   const management = useManagement({ data, mine: skillDisplays(data, shownCatalog).mine, busy: false, blocked: false,
     scope: `${nav.view}:${nav.id}:${nav.query}:${signedIn}`, saveSet: rejectWrite, saveMembership: rejectWrite,
     detail: { ...detail, catalog: setCatalogReview ? setCatalog : undefined }, base, local: true });
