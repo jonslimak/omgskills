@@ -16,6 +16,7 @@ type Dependencies = typeof defaultDependencies & {
   readInventoryRevision?: typeof readInventoryRevision;
   performInventoryCheck?: typeof performInventoryCheck;
   getEnvironment?: () => Record<string, string | undefined>;
+  requireReconciliation?: typeof requireLocalInventoryReconciliation;
 };
 
 export async function portalSyncUpload(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
@@ -34,14 +35,14 @@ export async function portalSyncUpload(req: Request, context: Context, dependenc
       if (new URL(req.url).search !== "?reportVersion=3") {
         return errorResponse(req, 400, "Use the exact reportVersion=3 revision request");
       }
-      requireLocalInventoryReconciliation(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
       // Validate bearer syntax before accessing the pool; the reader verifies token ownership/scopes.
       deviceCredentialFromRequest(req);
       return secretJsonResponse(req, await (dependencies.readInventoryRevision ?? readInventoryRevision)(getPgPool(), req));
     }
     const body = await requireJsonObject(req);
     if (body.reportVersion === 3 && Object.hasOwn(body, "mode")) {
-      requireLocalInventoryReconciliation(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
       if (new URL(req.url).search) throw new Response("Inventory checks do not accept query parameters", { status: 400 });
       parseInventoryCheck(body);
       deviceCredentialFromRequest(req);
@@ -51,7 +52,7 @@ export async function portalSyncUpload(req: Request, context: Context, dependenc
     }
     const { reportVersion, skills, reconciliation } = parseSyncReport(body);
     if (reportVersion === 3) {
-      requireLocalInventoryReconciliation(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
       if (new URL(req.url).search) throw new Response("Reconciliation uploads do not accept query parameters", { status: 400 });
     }
     const authentication = uploadAuthenticationFromRequest(req, body);

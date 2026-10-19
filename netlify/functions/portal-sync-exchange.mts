@@ -6,7 +6,10 @@ import { requireSkillGroupsWebFeature } from "./_shared/feature-flags.js";
 import { errorResponse, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import { requireJsonObject, requireString } from "./_shared/validation.js";
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, exchangePairingCode, requireSkillGroupsWebFeature };
+
+export async function portalSyncExchange(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, exchangePairingCode, requireSkillGroupsWebFeature } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -51,7 +54,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Pairing exchange failed");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalSyncExchange(req, context);
 
 export const config = {
   path: "/api/portal/sync-exchange",

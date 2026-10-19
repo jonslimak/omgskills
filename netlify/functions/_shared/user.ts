@@ -58,7 +58,22 @@ export async function reconcilePortalUser(
   return migrated.rows[0];
 }
 
-export async function requirePortalUser(req: Request): Promise<PortalUser> {
+type ClerkIdentity = {
+  primaryEmailAddressId: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  emailAddresses: Array<{ id: string; emailAddress: string; verification?: { status: string } | null }>;
+};
+const defaultDependencies = {
+  requireSkillGroupsWebFeature, requireAuth, getEnv,
+  getPgPool: (): PortalUserClient | Promise<PortalUserClient> => getPgPool(),
+  loadClerkUser: async (id: string, secretKey: string): Promise<ClerkIdentity> =>
+    createClerkClient({ secretKey }).users.getUser(id),
+};
+export type PortalUserDependencies = typeof defaultDependencies;
+
+export async function requirePortalUser(req: Request, overrides: Partial<PortalUserDependencies> = {}): Promise<PortalUser> {
+  const { requireSkillGroupsWebFeature, requireAuth, getEnv, getPgPool, loadClerkUser } = { ...defaultDependencies, ...overrides };
   requireSkillGroupsWebFeature();
   const auth = await requireAuth(req);
   const secretKey = getEnv("CLERK_SECRET_KEY");
@@ -66,8 +81,7 @@ export async function requirePortalUser(req: Request): Promise<PortalUser> {
     throw new Response("Missing Clerk server configuration", { status: 500 });
   }
 
-  const clerk = createClerkClient({ secretKey });
-  const clerkUser = await clerk.users.getUser(auth.clerkUserId);
+  const clerkUser = await loadClerkUser(auth.clerkUserId, secretKey);
   const primaryEmail = clerkUser.emailAddresses.find(
     (email) => email.id === clerkUser.primaryEmailAddressId
   ) ?? clerkUser.emailAddresses[0];
@@ -81,7 +95,7 @@ export async function requirePortalUser(req: Request): Promise<PortalUser> {
 
   const email = normalizeEmail(primaryEmail.emailAddress);
   const name = displayName(clerkUser.firstName, clerkUser.lastName, email);
-  return reconcilePortalUser(getPgPool(), {
+  return reconcilePortalUser(await getPgPool(), {
     clerkUserId: auth.clerkUserId,
     email,
     displayName: name

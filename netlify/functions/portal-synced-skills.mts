@@ -8,6 +8,7 @@ import { requireLocalInventoryReconciliation } from "./_shared/inventory-reconci
 const defaultDependencies = { getPgPool, requirePortalUser, readSyncInventory };
 type Dependencies = typeof defaultDependencies & {
   getEnvironment?: () => Record<string, string | undefined>;
+  requireReconciliation?: typeof requireLocalInventoryReconciliation;
 };
 
 export async function portalSyncedSkills(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
@@ -22,7 +23,7 @@ export async function portalSyncedSkills(req: Request, context: Context, depende
   try {
     const version = inventoryReadVersion(req, true);
     if (version === 3) {
-      requireLocalInventoryReconciliation(req, dependencies.getEnvironment?.() ?? process.env,
+      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env,
         context.deploy?.context, "/api/portal/synced-skills");
     }
     const user = await requirePortalUser(req);

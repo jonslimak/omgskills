@@ -17,8 +17,11 @@ import { requirePortalUser } from "./_shared/user.js";
 import { requireJsonObject } from "./_shared/validation.js";
 
 const defaultDependencies = { getPgPool, requirePortalUser, issuePairingCode, getEnvironment: () => process.env };
+type Dependencies = typeof defaultDependencies & {
+  callbackTarget?: typeof browserPairingCallbackTarget;
+};
 
-export async function portalSyncPairingCode(req: Request, context: Context, dependencies = defaultDependencies) {
+export async function portalSyncPairingCode(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
   const { getPgPool, requirePortalUser, issuePairingCode, getEnvironment } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
@@ -28,7 +31,7 @@ export async function portalSyncPairingCode(req: Request, context: Context, depe
   }
 
   try {
-    const callbackTarget = browserPairingCallbackTarget(req, getEnvironment(), context.deploy?.context);
+    const callbackTarget = (dependencies.callbackTarget ?? browserPairingCallbackTarget)(req, getEnvironment(), context.deploy?.context);
     const body = await requireJsonObject(req);
     if (Object.keys(body).some((key) => !["state", "codeChallenge", "codeChallengeMethod", "scopes"].includes(key))) {
       throw new Response("Unsupported pairing field", { status: 400 });
