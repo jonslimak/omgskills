@@ -163,7 +163,12 @@ export function createConnectedCandidateApi(dependencies: Dependencies = {}) {
 
 export default createConnectedCandidateApi();
 export const config: Config = {
-  path: [...connectedCandidatePaths],
+  path: [
+    "/api/portal/sync-pairing-code", "/api/portal/sync-exchange", "/api/portal/sync-upload",
+    "/api/portal/synced-skills", "/api/portal/device-revoke",
+    "/api/portal/devices", "/api/portal/profile", "/api/portal/groups", "/api/portal/shared",
+    "/api/portal/groups/:groupId",
+  ],
   method: ["GET", "POST", "OPTIONS"],
   rateLimit: { action: "rate_limit", aggregateBy: ["domain", "ip"], windowLimit: 30, windowSize: 60 },
 };

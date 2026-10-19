@@ -22,6 +22,58 @@ test('Netlify function manifest contains exactly the intended read-only record r
     assert.throws(() => validateFunctionPackage({ functions: [{ ...fn, ...change }] }, root));
   assert.throws(() => validateFunctionPackage({ functions: [fn, fn] }, root));
 });
+test('invalid function profiles and extra configuration fail before output writes', async () => {
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'candidate-options-test-')));
+  try {
+    for (const options of [null, [], { profile: 'production' }, { profile: '' },
+      { profile: 'connected', secretKey: 'not-allowed' }, { profile: 'install-only', database: 'not-allowed' }]) {
+      await assert.rejects(prepareCandidateFunction(root, options), /Function options|function configuration|function profile/);
+      assert.throws(() => validateFunctionPackage({ functions: [] }, root, options));
+    }
+    assert.deepEqual(await fileInventory(root), []);
+  } finally { await rm(root, { recursive: true }); }
+});
+test('explicit install-only preparation has identical bytes and cannot overwrite existing output', async () => {
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'candidate-default-test-')));
+  try {
+    for (const name of ['default', 'explicit']) await mkdir(join(root, name, 'functions'), { recursive: true });
+    await prepareCandidateFunction(join(root, 'default'));
+    await prepareCandidateFunction(join(root, 'explicit'), { profile: 'install-only' });
+    assert.deepEqual(await fileInventory(join(root, 'default')), await fileInventory(join(root, 'explicit')));
+    await assert.rejects(prepareCandidateFunction(join(root, 'default')), { code: 'EEXIST' });
+  } finally { await rm(root, { recursive: true }); }
+});
+test('connected manifest is exact, order-independent and never selected by default', () => {
+  const root = '/private/tmp/example';
+  const paths = ['/api/portal/sync-pairing-code', '/api/portal/sync-exchange', '/api/portal/sync-upload',
+    '/api/portal/synced-skills', '/api/portal/device-revoke', '/api/portal/devices', '/api/portal/profile',
+    '/api/portal/groups', '/api/portal/shared', '/api/portal/groups/:groupId'];
+  const fn = name => ({ name, runtime: 'js', mainFile: root + `/functions/${name}.mjs`,
+    path: root + `/function-check/${name}.zip` });
+  const record = { ...fn('catalog-candidate-record'),
+    routes: [{ pattern: '/api/catalog/install-record', literal: '/api/catalog/install-record', methods: [] }] };
+  const api = { ...fn('connected-candidate-api'), routes: paths.map(pattern => ({ pattern,
+    ...(pattern.endsWith('/:groupId') ? { expression: '^\\/api\\/portal\\/groups(?:\\/([^\\/]+?))\\/?$' } : { literal: pattern }),
+    methods: ['POST', 'GET', 'OPTIONS'] })) };
+  const options = { profile: 'connected' };
+  const validate = value => validateFunctionPackage({ functions: [record, value] }, root, options);
+  validate(api);
+  validateFunctionPackage({ functions: [{ ...api, routes: [...api.routes].reverse() }, record] }, root, options);
+  assert.throws(() => validateFunctionPackage({ functions: [record, api] }, root));
+  for (const functions of [[record], [api], [record, api, api], [record, record]]) {
+    assert.throws(() => validateFunctionPackage({ functions }, root, options));
+  }
+  for (const change of [{ name: 'another-function' }, { runtime: 'go' }, { mainFile: '/outside.mjs' }, { path: '/outside.zip' },
+    { invocationMode: 'background' }, { background: true }, { schedule: '* * * * *' }, { eventSubscriptions: ['deploySucceeded'] },
+    { excludedRoutes: [{ pattern: '/api/portal/*' }] }, { routes: api.routes.slice(1) },
+    { routes: [...api.routes, api.routes[0]] }, { routes: [{ pattern: '/api/portal/*', methods: ['GET'] }] },
+    { routes: api.routes.map((route, i) => i === 0 ? { ...route, methods: ['GET'] } : route) },
+    { routes: api.routes.map((route, i) => i === 0 ? { ...route, methods: ['GET', 'POST', 'DELETE', 'OPTIONS'] } : route) },
+    { routes: api.routes.map((route, i) => i === 9 ? { ...route, expression: '.*' } : route) },
+    { routes: api.routes.map((route, i) => i === 0 ? { ...route, prefer_static: true } : route) }]) {
+    assert.throws(() => validate({ ...api, ...change }));
+  }
+});
 test('prepared record function reuses the raw contract and only reads public catalog data', async t => {
   const root = await realpath(await mkdtemp(join(tmpdir(), 'candidate-record-test-')));
   try {

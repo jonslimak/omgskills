@@ -26,21 +26,56 @@ const sourceFiles = ['scripts/prepare-catalog-candidate-hosting.mjs', 'scripts/p
   'portal/src/candidate/distribution.json', 'portal/src/app/unified/CatalogInstallSetup.tsx', 'portal/tests/catalog-candidate.test.ts',
   'scripts/catalog-candidate-record.mts', 'netlify/functions/_shared/catalog-install-record.ts',
   'netlify/functions/_shared/mcp-library.ts', 'mcp/src/library.ts'];
-export async function prepareCandidateFunction(root) {
+const candidateAccountPaths = [
+  '/api/portal/sync-pairing-code', '/api/portal/sync-exchange', '/api/portal/sync-upload',
+  '/api/portal/synced-skills', '/api/portal/device-revoke', '/api/portal/devices',
+  '/api/portal/profile', '/api/portal/groups', '/api/portal/shared', '/api/portal/groups/:groupId',
+];
+const groupRouteExpression = '^\\/api\\/portal\\/groups(?:\\/([^\\/]+?))\\/?$';
+function connectedFunctions(options) {
+  assert.ok(options && typeof options === 'object' && !Array.isArray(options), 'Function options must be an object');
+  assert.ok(Object.keys(options).every(key => key === 'profile'), 'Unexpected function configuration');
+  const profile = options.profile === undefined ? 'install-only' : options.profile;
+  assert.ok(['install-only', 'connected'].includes(profile), 'Unknown function profile');
+  return profile === 'connected';
+}
+export async function prepareCandidateFunction(root, options = {}) {
+  const connected = connectedFunctions(options);
   const result = await build({ absWorkingDir: repo, entryPoints: ['scripts/catalog-candidate-record.mts'],
     bundle: true, platform: 'node', format: 'esm', target: 'node20', write: false, metafile: true });
   assert.deepEqual(Object.keys(result.metafile.inputs).sort(), ['scripts/catalog-candidate-record.mts',
     'netlify/functions/_shared/catalog-install-record.ts', 'netlify/functions/_shared/mcp-library.ts', 'mcp/src/library.ts'].sort(),
   'Candidate record function must contain only the read-only handler and public catalog loader');
+  const api = connected ? await build({ absWorkingDir: repo, entryPoints: ['scripts/connected-candidate-api.mts'],
+    bundle: true, platform: 'node', format: 'esm', target: 'node20', packages: 'external', write: false, metafile: true }) : null;
+  if (api) assert.ok(Object.keys(api.metafile.inputs).every(file => !/(?:^|\/)(?:menubar|portal)\/|\.test\.[cm]?ts$/.test(file)),
+    'Connected function cannot include native, browser or test entries');
   await writeFile(join(root, 'functions/catalog-candidate-record.mjs'), result.outputFiles[0].contents, { flag: 'wx' });
+  if (api) await writeFile(join(root, 'functions/connected-candidate-api.mjs'), api.outputFiles[0].contents, { flag: 'wx' });
 }
-export function validateFunctionPackage(manifest, root) {
-  assert.equal(manifest.functions.length, 1);
-  const fn = manifest.functions[0];
-  assert.equal(fn.name, 'catalog-candidate-record'); assert.equal(fn.runtime, 'js');
-  assert.equal(fn.mainFile, join(root, 'functions/catalog-candidate-record.mjs'));
-  assert.equal(fn.path, join(root, 'function-check/catalog-candidate-record.zip'));
-  assert.deepEqual(fn.routes, [{ pattern: '/api/catalog/install-record', literal: '/api/catalog/install-record', methods: [] }]);
+export function validateFunctionPackage(manifest, root, options = {}) {
+  const connected = connectedFunctions(options);
+  const names = connected ? ['catalog-candidate-record', 'connected-candidate-api'] : ['catalog-candidate-record'];
+  assert.deepEqual(manifest.functions.map(fn => fn.name).sort(), names);
+  for (const fn of manifest.functions) {
+    assert.equal(fn.runtime, 'js');
+    assert.equal(fn.mainFile, join(root, `functions/${fn.name}.mjs`));
+    assert.equal(fn.path, join(root, `function-check/${fn.name}.zip`));
+    assert.ok(fn.schedule === undefined && fn.background !== true
+      && (fn.invocationMode === undefined || fn.invocationMode === 'stream'), 'Unexpected execution mode');
+    assert.ok(fn.eventSubscriptions === undefined || fn.eventSubscriptions.length === 0, 'Unexpected event handler');
+    assert.ok(fn.excludedRoutes === undefined || fn.excludedRoutes.length === 0, 'Unexpected route exclusions');
+    if (fn.name === 'catalog-candidate-record') {
+      assert.deepEqual(fn.routes, [{ pattern: '/api/catalog/install-record', literal: '/api/catalog/install-record', methods: [] }]);
+      continue;
+    }
+    const routes = fn.routes.map(route => ({ ...route, methods: Array.isArray(route.methods) ? [...route.methods].sort() : route.methods }))
+      .sort((a, b) => a.pattern.localeCompare(b.pattern));
+    const expected = candidateAccountPaths.map(pattern => ({ pattern,
+      ...(pattern.endsWith('/:groupId') ? { expression: groupRouteExpression } : { literal: pattern }),
+      methods: ['GET', 'OPTIONS', 'POST'] })).sort((a, b) => a.pattern.localeCompare(b.pattern));
+    assert.deepEqual(routes, expected);
+  }
 }
 export function safeDiagnostic(error, env = process.env) {
   let text = String(error.stderr ?? '').replace(/\x1b\[[0-9;]*[A-Za-z]/g, '');
