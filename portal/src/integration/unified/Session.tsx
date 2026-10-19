@@ -20,6 +20,7 @@ import "../../app/redesign.css";
 import { LoadingScreen } from "../../app/LoadingScreen";
 
 const publicClient = new PublicCatalogClient(undefined, undefined, undefined, import.meta.env.VITE_CATALOG_SEARCH_ENABLED === "1");
+publicClient.warm();
 const rejectEdit = () => { throw new Error("Account editing is disabled in this read-only integration."); };
 
 function AccountView({ identity, signedIn, accountKey, base, local }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean }) {
