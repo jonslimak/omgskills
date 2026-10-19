@@ -1,7 +1,43 @@
 # Unified Web App Plan
 
-Status: Unified app is live. Latest app release: `562877c9`, production deploy `6ac7f21b11544c078bc5185c`. Guarded draft/production checks passed; all 2,213 public non-app files and 30 backend function digests stayed unchanged. Latest mobile header/drawer changes passed signed-in live checks; dark contrast was checked locally and its deployed CSS verified. Earlier counts, Favorites, detail close control, and all 18 collections passed signed-in live checks. Disconnect/reconnect testing remains deferred at the user's request. Planned UI work is complete; remaining account/connection and edge-case verification is listed below. Historical pending statements are not the current checklist.
-Updated: 2026-10-08. Implementation worktree: `/private/tmp/omgskills-unified-app-preview`. Recheck main before any new implementation or release.
+Status: Unified app is live. Latest collection-card release: source `a9fcbbd6`, merge `79ef9b49`, published data `cafe0cce`, production deploy `6ad64830dd0f3bdf921d26c6`. Guarded draft/production checks and read-only signed-in desktop/mobile collection checks passed. All 18 covers are verified live; existing card layout and avatars are preserved. Remaining account/connection and edge-case verification below is unchanged. Historical pending statements are not the current checklist.
+Updated: 2026-10-19. Collection release worktree: `/private/tmp/omgskills-collection-posters`. Recheck main before any new implementation or release.
+
+### Collection Cards And Covers - Released, 2026-10-19
+
+- Existing app cards now use all 18 approved light gradient covers, dark text,
+  a 40% white overlay, and 8px Collection labels. Layout, spacing, radii and
+  original 36px overlapping avatars are retained. Shared artwork also updates
+  other surfaces that use the same collection-image URLs.
+- Repaired 50 stale or case-mismatched references using unique historical and
+  current repository/path/name matches. All 18 topic lists retain their order
+  and skill counts. The user explicitly approved temporarily unpinning
+  `mattpocock/skills:tdd` from Matt Pocock's featured list because it is absent
+  from the current catalog; no catalog admission or suppression was changed.
+- Before release: strict validation had zero findings; all 18 images, 246 portal
+  tests, 39 collection/policy tests, 190 deployment-safety tests, index typecheck,
+  production-configured portal build, and full root checks passed.
+- [Guarded publisher 39286443823](https://github.com/jonslimak/omgskills/actions/runs/39286443823)
+  succeeded. It generated identical `collections-3bc6c019362f.json` assets for
+  v2 and Crawl 4 (92 entries: 74 creators and 18 topics), with zero stale
+  references. Publication impact passed without an override.
+- Draft `6ad646dfa737409162efd787` and production
+  `6ad64830dd0f3bdf921d26c6` both verified on their first attempt. All 18 live
+  image hashes passed. Public appcast SHA-256 is unchanged; all 15 protected
+  download, updater and helper asset ETags and sizes match the prior deploy.
+  The production verifier also checked pinned helper hashes, manifests,
+  downloads, public routes and MCP.
+- Live signed-in checks: Collections has 18 loaded covers; Discover has three.
+  Overlay, label size, text color and avatars match the approved preview.
+  Default-width card geometry matched before/after exactly; 1280px desktop and
+  390px mobile checks showed no horizontal overflow. Collection navigation and
+  the repaired Emil skill/detail link work. My Skills still loads 81 skills
+  across three sources. Browser size was reset; no account data was changed.
+- No native/backend/database source changes, new Mac release, signing or helper
+  inventory changes. The primary dirty checkout was left untouched.
+- [ ] Recover Matt Pocock's TDD skill through the normal catalog workflow, then
+  restore its featured reference. Do not replace it with an unrelated skill or
+  bypass catalog validation.
 
 ### Mobile Header And Dark Panels - Released, 2026-10-08
 
