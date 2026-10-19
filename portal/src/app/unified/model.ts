@@ -40,6 +40,7 @@ export type CollectionDisplay = {
   id: string;
   name: string;
   description: string;
+  imageUrl?: string;
   skillIds: string[];
   authors?: { handle: string; avatar: string }[];
 };

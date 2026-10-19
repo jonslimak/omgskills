@@ -164,6 +164,21 @@ function Avatar({
     </span>
   );
 }
+function CollectionCover({ src }: { src: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <img
+      className="ua-collection-image"
+      src={src}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      data-loaded={loaded}
+      onLoad={() => setLoaded(true)}
+      onError={() => setLoaded(false)}
+    />
+  );
+}
 function Menu({
   trigger,
   children,
@@ -829,6 +844,7 @@ export function UnifiedApp({
             key={item.id}
             onClick={() => go("collection", item.id)}
           >
+            {item.imageUrl && <CollectionCover key={item.imageUrl} src={item.imageUrl} />}
             <span className="ua-avatar-stack">
               {item.authors ? item.authors.map((author) => (
                 <Avatar key={author.handle} src={author.avatar} name={author.handle} size="medium" />

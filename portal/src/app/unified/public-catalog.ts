@@ -61,6 +61,18 @@ function safeGithub(value: unknown): string {
   if (url.protocol !== "https:" || url.hostname !== "github.com" || url.username || url.password) throw new Error("The catalog returned an invalid source link.");
   return url.href;
 }
+function collectionImage(value: unknown, id: string): string | undefined {
+  if (typeof value !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) return;
+  try {
+    const url = new URL(value);
+    if (url.origin !== "https://omgskills.com" || url.username || url.password || url.hash
+      || url.pathname !== `/images/collections/${id}.webp`
+      || [...url.searchParams.keys()].some(key => key !== "v")
+      || url.searchParams.getAll("v").length > 1
+      || (url.searchParams.has("v") && !/^[a-f0-9]{12}$/.test(url.searchParams.get("v")!))) return;
+    return url.href;
+  } catch { return; }
+}
 function parseSkill(value: unknown): CatalogSummary {
   const skill = record(value);
   const id = text(skill.id), name = text(skill.name), author = text(skill.author_handle);
@@ -88,6 +100,7 @@ export function parseCollections(value: unknown): CatalogDisplay {
       const skillIds = [...new Set(strings(item.skillIds ?? item.featuredSkillIds ?? []))];
       if (skillIds.length > 1000) throw new Error("This collection is too large to display.");
       catalog.collections.push({ id, name, description: optionalText(item.subtitle) || optionalText(item.description), skillIds,
+        imageUrl: collectionImage(item.imageUrl, id),
         authors: [...new Set(skillIds.map((id) => id.split("/")[0]).filter(handle))].slice(0, 3).map((handle) => ({ handle, avatar: avatar(handle) })),
       });
     }
