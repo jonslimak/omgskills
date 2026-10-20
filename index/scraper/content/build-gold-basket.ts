@@ -198,6 +198,7 @@ const GENERAL_NICHE = { niche: "general", label: "General & Utilities", tags: []
 interface TrendingEntry {
   id: string;
   installs: number;
+  source_rank?: number;
   trending_rank: number;
   trending_source: string;
 }
@@ -269,7 +270,7 @@ function main() {
   for (const skill of skills) {
     const trendEntry = trendingMap.get(skill.id);
     const installs = trendEntry?.installs ?? 0;
-    const trendingRank = trendEntry?.trending_rank ?? null;
+    const trendingRank = trendEntry?.source_rank ?? trendEntry?.trending_rank ?? null;
 
     const repoId = skill.github_url.replace("https://github.com/", "");
     const listCount = externalRepos.get(repoId) ?? 0;

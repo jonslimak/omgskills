@@ -28,6 +28,7 @@ const outPath      = join(here, "..", "..", "growth-report.html");
 interface TrendingEntry {
   id: string;
   installs: number;
+  source_rank?: number;
   trending_rank: number;
   trending_source: string;
 }
@@ -87,6 +88,8 @@ function computeGrowth(current: Snapshot, prev: Snapshot | null, skillMeta: Map<
 
   return current.entries.map((entry) => {
     const prevEntry = prevMap.get(entry.id) ?? null;
+    const currentRank = entry.source_rank ?? entry.trending_rank;
+    const prevRank = prevEntry?.source_rank ?? prevEntry?.trending_rank ?? null;
     const meta = skillMeta.get(entry.id);
     const name = meta?.name ?? entry.id.split(":").pop() ?? entry.id;
     const author = meta?.author_handle ?? entry.id.split("/")[0] ?? "";
@@ -95,8 +98,7 @@ function computeGrowth(current: Snapshot, prev: Snapshot | null, skillMeta: Map<
       prevEntry !== null && prevEntry.installs > 0
         ? Math.round(((entry.installs - prevEntry.installs) / prevEntry.installs) * 1000) / 10
         : null;
-    const rankDelta =
-      prevEntry !== null ? prevEntry.trending_rank - entry.trending_rank : null; // positive = climbed
+    const rankDelta = prevRank !== null ? prevRank - currentRank : null; // positive = climbed
 
     return {
       id: entry.id,
@@ -107,8 +109,8 @@ function computeGrowth(current: Snapshot, prev: Snapshot | null, skillMeta: Map<
       prevInstalls: prevEntry?.installs ?? null,
       delta,
       deltaPercent,
-      currentRank: entry.trending_rank,
-      prevRank: prevEntry?.trending_rank ?? null,
+      currentRank,
+      prevRank,
       rankDelta,
       isNew: prevEntry === null && prev !== null,
       stars: meta?.stars ?? 0,

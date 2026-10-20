@@ -53,8 +53,13 @@ test("shrink guard remains active during a ranking-board transition", () => {
 
 test("trending keeps two skills per repo at the top and moves the rest below", () => {
   const ids = ["a/r:1", "a/r:2", "a/r:3", "b/r:1", "A/R:4", "c/r:1", "b/r:2", "b/r:3"];
-  const spread = spreadTrendingByRepo(ids.map((id, index) => ({ id, trending_rank: index + 10 })));
+  const spread = spreadTrendingByRepo(ids.map((id, index) => ({
+    id,
+    source_rank: index + 10,
+    trending_rank: index + 10,
+  })));
   assert.deepEqual(spread.map((entry) => entry.id),
     ["a/r:1", "a/r:2", "b/r:1", "c/r:1", "b/r:2", "a/r:3", "A/R:4", "b/r:3"]);
   assert.deepEqual(spread.map((entry) => entry.trending_rank), [1, 2, 3, 4, 5, 6, 7, 8]);
+  assert.deepEqual(spread.map((entry) => entry.source_rank), [10, 11, 13, 15, 16, 12, 14, 17]);
 });

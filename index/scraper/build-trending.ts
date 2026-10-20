@@ -16,6 +16,8 @@ import type { Skill } from "./types.js";
 interface TrendingEntry {
   id: string;
   installs: number;
+  /** Original rank returned by the skills.sh board, before display diversification. */
+  source_rank?: number;
   trending_rank: number;
   trending_source: string;
   /** skills.sh board the rank came from; files written before 2026-10-19 used "all-time". */
@@ -159,6 +161,7 @@ async function main() {
       id: hit.id,
       // Lifetime total when skills.sh lists it; otherwise the trending-board count (a lower bound).
       installs: installCountForTrendingHit(hit, totals, existing.entries),
+      source_rank: hit.trending_rank,
       trending_rank: hit.trending_rank,
       trending_source: hit.trending_source,
       board: RANK_BOARD,
