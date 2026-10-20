@@ -128,16 +128,33 @@ export function verifyFileList(actual, expected, deployId) {
     assert.equal(f.size, e.bytes); if (e.sha1) assert.equal(f.sha, e.sha1);
   }
 }
-export function mergedHeaders(legacyHeaders, legacyFiles) {
+export function mergedHeaders(legacyHeaders, legacyFiles, options = {}) {
+  const policy = hostingFiles(options);
+  const connected = options.profile === 'connected';
   const lines = legacyHeaders.trimEnd().split('\n');
   assert.equal(lines[0], '/*');
   const legacyCSP = lines.find(line => line.trimStart().startsWith('Content-Security-Policy:'));
   assert.ok(legacyCSP && lines.filter(line => line.includes('Content-Security-Policy:')).length === 1);
+  if (connected) {
+    assert.ok(lines.slice(1).every(line => /^  [A-Za-z][A-Za-z-]*: [^\r\n]+$/.test(line)),
+      'Connected merge requires one global legacy header block');
+    const names = lines.slice(1).map(line => line.trimStart().split(':', 1)[0].toLowerCase());
+    assert.equal(new Set(names).size, names.length, 'Duplicate legacy headers');
+    assert.ok(!names.includes('content-security-policy-report-only'), 'Unsupported legacy CSP variant');
+    for (const file of legacyFiles) {
+      assert.ok(typeof file.path === 'string' && file.path.split('/').every(part => /^[A-Za-z0-9_.-]+$/.test(part)
+        && part !== '.' && part !== '..'), 'Unsupported retained header path');
+      assert.ok(file.path !== 'app/connect' && !file.path.startsWith('app/connect/'), 'Retained file conflicts with connect rewrite');
+    }
+  }
   const common = lines.filter(line => line !== legacyCSP).join('\n');
-  const paths = new Set(legacyFiles.filter(f => !f.path.startsWith('_')).map(f => '/' + f.path));
+  const paths = new Set(legacyFiles.filter(f => !f.path.startsWith('_')
+    && (!connected || (f.path !== 'app/index.html' && !f.path.startsWith('app/assets/')))).map(f => '/' + f.path));
   for (const path of [...paths]) if (path.endsWith('/index.html')) paths.add(path.slice(0, -10));
   const legacy = [...paths].sort().map(path => `${path}\n${legacyCSP}`).join('\n');
-  const candidateCSP = hostingFiles()._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+  const candidateCSP = policy._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+  if (connected) return `${common}\n${legacy ? legacy + '\n' : ''}${['/app/', '/app/index.html', '/app/connect', '/app/assets/*']
+    .map(path => `${path}\n${candidateCSP}\n`).join('')}`;
   return `${common}\n${legacy}\n/app/\n${candidateCSP}\n/app/assets/*\n${candidateCSP}\n`;
 }
 async function siteState() {

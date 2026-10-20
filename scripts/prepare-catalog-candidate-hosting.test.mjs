@@ -172,6 +172,52 @@ test('candidate CSP never becomes a global restriction on old test pages', () =>
   assert.match(result, /\/app\/\n  Content-Security-Policy: .*font-src 'self'/);
   assert.match(result, /\/app\/assets\/\*\n  Content-Security-Policy:/);
   assert.throws(() => mergedHeaders('/*\n  Missing: CSP', []));
+  assert.equal(result, mergedHeaders(old, [{ path: 'app/preview/unified/index.html' }, { path: 'updates/f3d/appcast.xml' },
+    { path: '_headers' }], { profile: 'install-only' }));
+  const csp = hostingFiles()._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+  assert.equal(mergedHeaders(old, []), `/*\n  X-Robots-Tag: noindex\n\n/app/\n${csp}\n/app/assets/*\n${csp}\n`);
+});
+const connectedHeaders = { profile: 'connected',
+  publishableKey: `pk_test_${Buffer.from('cc4a-fixture.clerk.accounts.dev$').toString('base64')}`,
+  clerkFrontendOrigin: 'https://cc4a-fixture.clerk.accounts.dev' };
+test('connected policy covers only the connected entry, connect rewrite and assets', () => {
+  const old = hostingFiles()._headers;
+  const files = ['app/index.html', 'app/assets/old.js', 'app/preview/unified/index.html',
+    'updates/history/appcast.xml', '_headers'].map(path => ({ path }));
+  const value = mergedHeaders(old, files, connectedHeaders);
+  const blocks = new Map();
+  let selector;
+  for (const line of value.trimEnd().split('\n')) {
+    if (line.startsWith('/')) { selector = line; assert.ok(!blocks.has(selector), selector); blocks.set(selector, []); }
+    else blocks.get(selector).push(line);
+  }
+  assert.deepEqual([...blocks.keys()].sort(), ['/*', '/app/', '/app/index.html', '/app/connect', '/app/assets/*',
+    '/app/preview/unified/', '/app/preview/unified/index.html', '/updates/history/appcast.xml'].sort());
+  assert.deepEqual(blocks.get('/*'), old.trimEnd().split('\n').slice(1).filter(line => !line.includes('Content-Security-Policy:')));
+  const csp = hostingFiles(connectedHeaders)._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+  for (const path of ['/app/', '/app/index.html', '/app/connect', '/app/assets/*']) {
+    assert.deepEqual(blocks.get(path), [csp]);
+    assert.doesNotMatch(csp, /\*|unsafe-eval/);
+  }
+  const legacy = old.split('\n').find(line => line.includes('Content-Security-Policy:'));
+  for (const path of ['/app/preview/unified/', '/app/preview/unified/index.html', '/updates/history/appcast.xml']) {
+    assert.deepEqual(blocks.get(path), [legacy]);
+    assert.doesNotMatch(blocks.get(path).join('\n'), /clerk/);
+  }
+});
+test('connected merge refuses unsupported policies, paths and mixed configuration', () => {
+  const old = hostingFiles()._headers;
+  for (const value of [old + '/app/*\n  Cache-Control: public\n', old + '  Cache-Control: public\n',
+    old + '  Content-Security-Policy-Report-Only: default-src *\n', old.replace('  Referrer-Policy:', '\tReferrer-Policy:')]) {
+    assert.throws(() => mergedHeaders(value, [], connectedHeaders));
+  }
+  for (const path of ['app/connect', 'app/connect/index.html', 'app/../file', '/outside', 'app/*', 'app/a\n/evil', 'app//a']) {
+    assert.throws(() => mergedHeaders(old, [{ path }], connectedHeaders));
+  }
+  for (const options of [null, [], { profile: 'production' }, { ...connectedHeaders, secretKey: 'not-allowed' },
+    { ...connectedHeaders, clerkFrontendOrigin: 'https://*.clerk.accounts.dev' }]) {
+    assert.throws(() => mergedHeaders(old, [], options));
+  }
 });
 test('publish payload inventory refuses symlinks and records bytes independently', async () => {
   const root = await realpath(await mkdtemp(join(tmpdir(), 'candidate-hosting-test-')));
