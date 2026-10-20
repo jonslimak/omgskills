@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-20T18:59:42.919Z",
+  "generatedAt": "2026-10-20T19:53:13.226Z",
   "topSkills": [
     {
       "rank": 1,
@@ -9,7 +9,7 @@
       "authorHandle": "dietrichgebert",
       "description": "Lazy senior dev mode: the smallest change that fully solves the task, and a reply a busy human understands in one read. Use on any coding task (writing, fixing, refactoring, reviewing, choosing dependencies) and when the user says \"ponytail\", \"be lazy\", \"simplest solution\", \"yagni\", or complains about over-engineering or bloat. Levels: lite, full (default), ultra.",
       "stars": 166501,
-      "installs": 98686,
+      "installs": 98821,
       "githubUrl": "https://github.com/DietrichGebert/ponytail",
       "source": "skills.sh"
     },
@@ -26,17 +26,6 @@
     },
     {
       "rank": 3,
-      "id": "lllllllama/rigorpilot-skills:paper-context-resolver",
-      "name": "paper-context-resolver",
-      "authorHandle": "lllllllama",
-      "description": "Rigor Paper Context helper for README-first deep learning repo reproduction. Use only when the README and repository files leave a narrow reproduction-critical gap and the task is to resolve a specific paper detail such as dataset split, preprocessing, evaluation protocol, checkpoint mapping, or runtime assumption from primary paper sources while recording conflicts. Do not use for general paper summary, repo scanning, environment setup, command execution, title-only paper lookup, or replacing README guidance by default.",
-      "stars": 516,
-      "installs": 1500,
-      "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
-      "source": "skills.sh"
-    },
-    {
-      "rank": 4,
       "id": "lllllllama/rigorpilot-skills:ai-research-explore",
       "name": "ai-research-explore",
       "authorHandle": "lllllllama",
@@ -47,13 +36,24 @@
       "source": "skills.sh"
     },
     {
-      "rank": 5,
-      "id": "lllllllama/rigorpilot-skills:repo-intake-and-plan",
-      "name": "repo-intake-and-plan",
+      "rank": 4,
+      "id": "lllllllama/rigorpilot-skills:paper-context-resolver",
+      "name": "paper-context-resolver",
       "authorHandle": "lllllllama",
-      "description": "Rigor Intake helper for README-first deep learning repo reproduction. Use when the task is specifically to scan a repository, read the README and common project files, extract documented commands, classify inference, evaluation, and training candidates, and return the smallest trustworthy reproduction plan to the main orchestrator. Do not use for environment setup, asset download, command execution, final reporting, paper lookup, or end-to-end orchestration.",
+      "description": "Rigor Paper Context helper for README-first deep learning repo reproduction. Use only when the README and repository files leave a narrow reproduction-critical gap and the task is to resolve a specific paper detail such as dataset split, preprocessing, evaluation protocol, checkpoint mapping, or runtime assumption from primary paper sources while recording conflicts. Do not use for general paper summary, repo scanning, environment setup, command execution, title-only paper lookup, or replacing README guidance by default.",
       "stars": 516,
-      "installs": 1499,
+      "installs": 1500,
+      "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
+      "source": "skills.sh"
+    },
+    {
+      "rank": 5,
+      "id": "lllllllama/rigorpilot-skills:explore-code",
+      "name": "explore-code",
+      "authorHandle": "lllllllama",
+      "description": "Rigor Improve implementation leaf skill for auditable candidate implementation in deep learning research repositories. Use when the researcher explicitly authorizes exploratory work on an isolated branch or worktree to transplant modules, adapt a backbone, add LoRA or adapter layers, replace a head, or stitch together meaningful low-risk migration ideas with rollback-aware records in `explore_outputs/`. Do not use for end-to-end exploration orchestration on top of `current_research`, trusted baseline reproduction, conservative debugging, environment setup, verified contribution claims, or default repository analysis.",
+      "stars": 484,
+      "installs": 327392,
       "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
       "source": "skills.sh"
     },
@@ -70,23 +70,23 @@
     },
     {
       "rank": 7,
-      "id": "lllllllama/rigorpilot-skills:explore-code",
-      "name": "explore-code",
+      "id": "lllllllama/rigorpilot-skills:repo-intake-and-plan",
+      "name": "repo-intake-and-plan",
       "authorHandle": "lllllllama",
-      "description": "Rigor Improve implementation leaf skill for auditable candidate implementation in deep learning research repositories. Use when the researcher explicitly authorizes exploratory work on an isolated branch or worktree to transplant modules, adapt a backbone, add LoRA or adapter layers, replace a head, or stitch together meaningful low-risk migration ideas with rollback-aware records in `explore_outputs/`. Do not use for end-to-end exploration orchestration on top of `current_research`, trusted baseline reproduction, conservative debugging, environment setup, verified contribution claims, or default repository analysis.",
-      "stars": 484,
-      "installs": 327391,
+      "description": "Rigor Intake helper for README-first deep learning repo reproduction. Use when the task is specifically to scan a repository, read the README and common project files, extract documented commands, classify inference, evaluation, and training candidates, and return the smallest trustworthy reproduction plan to the main orchestrator. Do not use for environment setup, asset download, command execution, final reporting, paper lookup, or end-to-end orchestration.",
+      "stars": 516,
+      "installs": 1499,
       "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
       "source": "skills.sh"
     },
     {
       "rank": 8,
-      "id": "lllllllama/rigorpilot-skills:ai-research-reproduction",
-      "name": "ai-research-reproduction",
+      "id": "lllllllama/rigorpilot-skills:explore-run",
+      "name": "explore-run",
       "authorHandle": "lllllllama",
-      "description": "Rigor Reproduce compatible skill slug for README-first deep learning repository reproduction. Use when the user wants an end-to-end, minimal-trustworthy flow that reads the repository first, selects the smallest documented inference or evaluation target, coordinates intake, setup, trusted execution, optional trusted training, optional repository analysis, and optional paper-gap resolution, enforces conservative patch rules, records evidence assumptions deviations and human decision points, and writes the standardized `repro_outputs/` bundle. Do not use for paper summary, generic environment setup, isolated repo scanning, standalone command execution, silent protocol changes, score chasing, or broad research assistance outside repository-grounded reproduction.",
+      "description": "Rigor Improve / Rigor Explore run leaf skill for bounded exploratory evidence in deep learning research repositories. Use when the researcher explicitly authorizes exploratory runs such as small-subset validation, short-cycle guess-and-check, batch sweeps, idle-GPU search, or quick transfer-learning trials, with fair-comparison caveats and no-overclaim summaries in `explore_outputs/`. Do not use for end-to-end exploration orchestration on top of `current_research`, trusted baseline execution, conservative training verification, default routing, verified SOTA claims, or implicit experimentation.",
       "stars": 484,
-      "installs": 327716,
+      "installs": 327146,
       "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
       "source": "skills.sh"
     },
@@ -103,12 +103,12 @@
     },
     {
       "rank": 10,
-      "id": "lllllllama/rigorpilot-skills:explore-run",
-      "name": "explore-run",
+      "id": "lllllllama/rigorpilot-skills:ai-research-reproduction",
+      "name": "ai-research-reproduction",
       "authorHandle": "lllllllama",
-      "description": "Rigor Improve / Rigor Explore run leaf skill for bounded exploratory evidence in deep learning research repositories. Use when the researcher explicitly authorizes exploratory runs such as small-subset validation, short-cycle guess-and-check, batch sweeps, idle-GPU search, or quick transfer-learning trials, with fair-comparison caveats and no-overclaim summaries in `explore_outputs/`. Do not use for end-to-end exploration orchestration on top of `current_research`, trusted baseline execution, conservative training verification, default routing, verified SOTA claims, or implicit experimentation.",
+      "description": "Rigor Reproduce compatible skill slug for README-first deep learning repository reproduction. Use when the user wants an end-to-end, minimal-trustworthy flow that reads the repository first, selects the smallest documented inference or evaluation target, coordinates intake, setup, trusted execution, optional trusted training, optional repository analysis, and optional paper-gap resolution, enforces conservative patch rules, records evidence assumptions deviations and human decision points, and writes the standardized `repro_outputs/` bundle. Do not use for paper summary, generic environment setup, isolated repo scanning, standalone command execution, silent protocol changes, score chasing, or broad research assistance outside repository-grounded reproduction.",
       "stars": 484,
-      "installs": 327145,
+      "installs": 327716,
       "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
       "source": "skills.sh"
     }
@@ -221,7 +221,7 @@
           "authorHandle": "facebook",
           "isVendor": true,
           "value": "2.0M ⭐",
-          "detail": "19 skills · avg 106.8k ⭐"
+          "detail": "19 skills · avg 106.9k ⭐"
         },
         {
           "authorHandle": "lllllllama",
@@ -307,31 +307,31 @@
         {
           "authorHandle": "larksuite",
           "isVendor": true,
-          "value": "972.2k",
+          "value": "972.5k",
           "detail": "32 skills · 28 with installs"
         },
         {
           "authorHandle": "microsoft",
           "isVendor": true,
-          "value": "897.7k",
+          "value": "898.1k",
           "detail": "715 skills · 24 with installs"
         },
         {
           "authorHandle": "autonnel",
           "isVendor": false,
-          "value": "581.3k",
+          "value": "581.9k",
           "detail": "6 skills · 6 with installs"
         },
         {
           "authorHandle": "coreyhaines31",
           "isVendor": false,
-          "value": "494.9k",
+          "value": "495.2k",
           "detail": "90 skills · 5 with installs"
         },
         {
           "authorHandle": "dietrichgebert",
           "isVendor": false,
-          "value": "306.7k",
+          "value": "307.2k",
           "detail": "6 skills · 6 with installs"
         },
         {
@@ -343,13 +343,13 @@
         {
           "authorHandle": "antibrow",
           "isVendor": false,
-          "value": "130.8k",
+          "value": "130.9k",
           "detail": "1 skills · 1 with installs"
         },
         {
           "authorHandle": "shadcn-ui",
           "isVendor": false,
-          "value": "116.4k",
+          "value": "116.5k",
           "detail": "2 skills · 1 with installs"
         },
         {
@@ -361,25 +361,25 @@
         {
           "authorHandle": "intellectronica",
           "isVendor": false,
-          "value": "90.7k",
+          "value": "90.8k",
           "detail": "29 skills · 1 with installs"
         },
         {
           "authorHandle": "mastra-ai",
           "isVendor": false,
-          "value": "77.9k",
+          "value": "78.1k",
           "detail": "14 skills · 1 with installs"
         },
         {
           "authorHandle": "spillwavesolutions",
           "isVendor": false,
-          "value": "75.9k",
+          "value": "76.0k",
           "detail": "3 skills · 1 with installs"
         },
         {
           "authorHandle": "herdrdev",
           "isVendor": false,
-          "value": "70.4k",
+          "value": "70.5k",
           "detail": "1 skills · 1 with installs"
         }
       ]
@@ -406,25 +406,25 @@
         {
           "authorHandle": "obra",
           "isVendor": false,
-          "value": "302.4k ⭐",
+          "value": "302.5k ⭐",
           "detail": "\"systematic-debugging\""
         },
         {
           "authorHandle": "mattpocock",
           "isVendor": false,
-          "value": "298.1k ⭐",
+          "value": "298.5k ⭐",
           "detail": "\"pr\""
         },
         {
           "authorHandle": "affaan-m",
           "isVendor": false,
-          "value": "284.4k ⭐",
+          "value": "284.7k ⭐",
           "detail": "\"security-review\""
         },
         {
           "authorHandle": "facebook",
           "isVendor": true,
-          "value": "251.5k ⭐",
+          "value": "251.6k ⭐",
           "detail": "\"feature-flags\""
         },
         {
@@ -442,13 +442,13 @@
         {
           "authorHandle": "microsoft",
           "isVendor": true,
-          "value": "194.0k ⭐",
+          "value": "194.1k ⭐",
           "detail": "\"launch\""
         },
         {
           "authorHandle": "anthropics",
           "isVendor": true,
-          "value": "182.4k ⭐",
+          "value": "182.5k ⭐",
           "detail": "\"pptx\""
         },
         {
@@ -490,7 +490,7 @@
         {
           "authorHandle": "github",
           "isVendor": true,
-          "value": "142.0k ⭐",
+          "value": "142.1k ⭐",
           "detail": "\"add-community-extension\""
         },
         {
@@ -502,13 +502,13 @@
         {
           "authorHandle": "nextlevelbuilder",
           "isVendor": false,
-          "value": "137.8k ⭐",
+          "value": "137.9k ⭐",
           "detail": "\"ui-ux-pro-max\""
         },
         {
           "authorHandle": "garrytan",
           "isVendor": false,
-          "value": "137.0k ⭐",
+          "value": "137.1k ⭐",
           "detail": "\"benchmark-models\""
         },
         {
@@ -572,7 +572,7 @@
           "authorHandle": "nextlevelbuilder",
           "isVendor": false,
           "value": "132.2k avg ⭐",
-          "detail": "7 skills · 925.3k total ⭐"
+          "detail": "7 skills · 925.5k total ⭐"
         },
         {
           "authorHandle": "langgenius",
@@ -589,7 +589,7 @@
         {
           "authorHandle": "facebook",
           "isVendor": true,
-          "value": "106.8k avg ⭐",
+          "value": "106.9k avg ⭐",
           "detail": "19 skills · 2.0M total ⭐"
         },
         {
@@ -601,8 +601,8 @@
         {
           "authorHandle": "leonxlnx",
           "isVendor": false,
-          "value": "90.5k avg ⭐",
-          "detail": "5 skills · 452.7k total ⭐"
+          "value": "90.6k avg ⭐",
+          "detail": "5 skills · 452.8k total ⭐"
         },
         {
           "authorHandle": "egonex-ai",
@@ -614,7 +614,7 @@
           "authorHandle": "stablyai",
           "isVendor": false,
           "value": "85.6k avg ⭐",
-          "detail": "9 skills · 770.3k total ⭐"
+          "detail": "9 skills · 770.8k total ⭐"
         },
         {
           "authorHandle": "bytedance",
@@ -811,13 +811,13 @@
         {
           "authorHandle": "higgsfield-ai",
           "isVendor": false,
-          "value": "109.8k",
+          "value": "109.9k",
           "detail": "8 skills with installs"
         },
         {
           "authorHandle": "autonnel",
           "isVendor": false,
-          "value": "96.9k",
+          "value": "97.0k",
           "detail": "6 skills with installs"
         },
         {
@@ -835,7 +835,7 @@
         {
           "authorHandle": "dietrichgebert",
           "isVendor": false,
-          "value": "51.1k",
+          "value": "51.2k",
           "detail": "6 skills with installs"
         },
         {
@@ -882,8 +882,8 @@
       "authorHandle": "anthropics",
       "isVendor": true,
       "skillCount": 395,
-      "totalStars": 15683075,
-      "totalInstalls": 1261248,
+      "totalStars": 15683051,
+      "totalInstalls": 1261667,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -896,8 +896,8 @@
       "authorHandle": "microsoft",
       "isVendor": true,
       "skillCount": 715,
-      "totalStars": 15163308,
-      "totalInstalls": 897693,
+      "totalStars": 15163523,
+      "totalInstalls": 898071,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -910,8 +910,8 @@
       "authorHandle": "obra",
       "isVendor": false,
       "skillCount": 59,
-      "totalStars": 4526128,
-      "totalInstalls": 3175030,
+      "totalStars": 4526273,
+      "totalInstalls": 3176237,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -924,7 +924,7 @@
       "authorHandle": "affaan-m",
       "isVendor": false,
       "skillCount": 426,
-      "totalStars": 105701831,
+      "totalStars": 105702409,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -938,7 +938,7 @@
       "isVendor": false,
       "skillCount": 34,
       "totalStars": 2428140,
-      "totalInstalls": 2036706,
+      "totalInstalls": 2038237,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -951,7 +951,7 @@
       "isVendor": false,
       "skillCount": 6,
       "totalStars": 999006,
-      "totalInstalls": 306711,
+      "totalInstalls": 307231,
       "trophies": [
         "⚡ Most Used",
         "💎 Peak Achiever",
@@ -963,7 +963,7 @@
       "authorHandle": "github",
       "isVendor": true,
       "skillCount": 477,
-      "totalStars": 12302667,
+      "totalStars": 12302750,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -975,7 +975,7 @@
       "authorHandle": "mattpocock",
       "isVendor": false,
       "skillCount": 69,
-      "totalStars": 9913790,
+      "totalStars": 9914165,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -987,7 +987,7 @@
       "authorHandle": "garrytan",
       "isVendor": false,
       "skillCount": 57,
-      "totalStars": 7654174,
+      "totalStars": 7654207,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -999,7 +999,7 @@
       "authorHandle": "n8n-io",
       "isVendor": true,
       "skillCount": 51,
-      "totalStars": 7558905,
+      "totalStars": 7558928,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -1012,7 +1012,7 @@
       "isVendor": false,
       "skillCount": 90,
       "totalStars": 2895193,
-      "totalInstalls": 494912,
+      "totalInstalls": 495165,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1023,7 +1023,7 @@
       "authorHandle": "facebook",
       "isVendor": true,
       "skillCount": 19,
-      "totalStars": 2030129,
+      "totalStars": 2030333,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -1035,8 +1035,8 @@
       "authorHandle": "cloudflare",
       "isVendor": true,
       "skillCount": 72,
-      "totalStars": 417894,
-      "totalInstalls": 1322088,
+      "totalStars": 417895,
+      "totalInstalls": 1323383,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1048,7 +1048,7 @@
       "isVendor": true,
       "skillCount": 32,
       "totalStars": 302513,
-      "totalInstalls": 972247,
+      "totalInstalls": 972451,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1060,7 +1060,7 @@
       "isVendor": false,
       "skillCount": 11,
       "totalStars": 9852,
-      "totalInstalls": 1208203,
+      "totalInstalls": 1209149,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1072,7 +1072,7 @@
       "isVendor": false,
       "skillCount": 11,
       "totalStars": 5452,
-      "totalInstalls": 2298780,
+      "totalInstalls": 2298782,
       "trophies": [
         "🏆 Most Influential",
         "⚡ Most Used",
@@ -1083,7 +1083,7 @@
       "authorHandle": "k-dense-ai",
       "isVendor": false,
       "skillCount": 143,
-      "totalStars": 7272784,
+      "totalStars": 7272887,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -1094,7 +1094,7 @@
       "authorHandle": "openai",
       "isVendor": true,
       "skillCount": 449,
-      "totalStars": 6371857,
+      "totalStars": 6371881,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever",
@@ -1105,7 +1105,7 @@
       "authorHandle": "lobehub",
       "isVendor": false,
       "skillCount": 53,
-      "totalStars": 4188680,
+      "totalStars": 4188683,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential",
@@ -1127,8 +1127,8 @@
       "authorHandle": "addyosmani",
       "isVendor": false,
       "skillCount": 35,
-      "totalStars": 2142858,
-      "totalInstalls": 1164925,
+      "totalStars": 2142998,
+      "totalInstalls": 1166435,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1149,7 +1149,7 @@
       "authorHandle": "nextlevelbuilder",
       "isVendor": false,
       "skillCount": 7,
-      "totalStars": 925306,
+      "totalStars": 925453,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever",
@@ -1160,7 +1160,7 @@
       "authorHandle": "langgenius",
       "isVendor": false,
       "skillCount": 5,
-      "totalStars": 617007,
+      "totalStars": 617045,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever",
@@ -1172,7 +1172,7 @@
       "isVendor": false,
       "skillCount": 6,
       "totalStars": 1140,
-      "totalInstalls": 581330,
+      "totalInstalls": 581918,
       "trophies": [
         "⚡ Most Used",
         "🚀 Install Efficiency"
@@ -1182,7 +1182,7 @@
       "authorHandle": "ruvnet",
       "isVendor": false,
       "skillCount": 195,
-      "totalStars": 12398788,
+      "totalStars": 12398992,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1202,7 +1202,7 @@
       "authorHandle": "nvidia",
       "isVendor": false,
       "skillCount": 904,
-      "totalStars": 3714775,
+      "totalStars": 3714976,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1212,7 +1212,7 @@
       "authorHandle": "vercel",
       "isVendor": false,
       "skillCount": 93,
-      "totalStars": 3318749,
+      "totalStars": 3318750,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever"
@@ -1222,7 +1222,7 @@
       "authorHandle": "google",
       "isVendor": false,
       "skillCount": 170,
-      "totalStars": 2953486,
+      "totalStars": 2953534,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1232,7 +1232,7 @@
       "authorHandle": "posthog",
       "isVendor": false,
       "skillCount": 197,
-      "totalStars": 2694793,
+      "totalStars": 2694798,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1252,7 +1252,7 @@
       "authorHandle": "supabase",
       "isVendor": true,
       "skillCount": 25,
-      "totalStars": 2412724,
+      "totalStars": 2412977,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1282,7 +1282,7 @@
       "authorHandle": "google-gemini",
       "isVendor": true,
       "skillCount": 47,
-      "totalStars": 2269755,
+      "totalStars": 2269763,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential"
@@ -1292,7 +1292,7 @@
       "authorHandle": "pytorch",
       "isVendor": true,
       "skillCount": 37,
-      "totalStars": 2043139,
+      "totalStars": 2043153,
       "totalInstalls": 0,
       "trophies": [
         "🏆 Most Influential"
@@ -1302,7 +1302,7 @@
       "authorHandle": "bytedance",
       "isVendor": false,
       "skillCount": 23,
-      "totalStars": 1830989,
+      "totalStars": 1830997,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1322,7 +1322,7 @@
       "authorHandle": "vercel-labs",
       "isVendor": true,
       "skillCount": 137,
-      "totalStars": 1539747,
+      "totalStars": 1539773,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1332,7 +1332,7 @@
       "authorHandle": "getsentry",
       "isVendor": true,
       "skillCount": 191,
-      "totalStars": 1493581,
+      "totalStars": 1493584,
       "totalInstalls": 0,
       "trophies": [
         "📚 Most Prolific"
@@ -1342,7 +1342,7 @@
       "authorHandle": "fission-ai",
       "isVendor": false,
       "skillCount": 16,
-      "totalStars": 1156826,
+      "totalStars": 1156930,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1362,7 +1362,7 @@
       "authorHandle": "steipete",
       "isVendor": false,
       "skillCount": 88,
-      "totalStars": 907983,
+      "totalStars": 907991,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever"
@@ -1382,8 +1382,8 @@
       "authorHandle": "stablyai",
       "isVendor": false,
       "skillCount": 9,
-      "totalStars": 770328,
-      "totalInstalls": 27457,
+      "totalStars": 770840,
+      "totalInstalls": 27514,
       "trophies": [
         "🎯 Most Consistent"
       ]
@@ -1392,7 +1392,7 @@
       "authorHandle": "huggingface",
       "isVendor": true,
       "skillCount": 66,
-      "totalStars": 542803,
+      "totalStars": 542822,
       "totalInstalls": 0,
       "trophies": [
         "💎 Peak Achiever"
@@ -1422,7 +1422,7 @@
       "authorHandle": "angular",
       "isVendor": false,
       "skillCount": 7,
-      "totalStars": 506479,
+      "totalStars": 506470,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1432,7 +1432,7 @@
       "authorHandle": "leonxlnx",
       "isVendor": false,
       "skillCount": 5,
-      "totalStars": 452669,
+      "totalStars": 452835,
       "totalInstalls": 0,
       "trophies": [
         "🎯 Most Consistent"
@@ -1442,8 +1442,8 @@
       "authorHandle": "mastra-ai",
       "isVendor": false,
       "skillCount": 14,
-      "totalStars": 318088,
-      "totalInstalls": 77921,
+      "totalStars": 318098,
+      "totalInstalls": 78069,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1453,7 +1453,7 @@
       "isVendor": false,
       "skillCount": 2,
       "totalStars": 251779,
-      "totalInstalls": 116378,
+      "totalInstalls": 116495,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1493,7 +1493,7 @@
       "isVendor": false,
       "skillCount": 1,
       "totalStars": 44635,
-      "totalInstalls": 70405,
+      "totalInstalls": 70460,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1503,7 +1503,7 @@
       "isVendor": true,
       "skillCount": 21,
       "totalStars": 18471,
-      "totalInstalls": 135774,
+      "totalInstalls": 135822,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1513,7 +1513,7 @@
       "isVendor": false,
       "skillCount": 29,
       "totalStars": 5776,
-      "totalInstalls": 90676,
+      "totalInstalls": 90790,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1523,7 +1523,7 @@
       "isVendor": false,
       "skillCount": 1,
       "totalStars": 560,
-      "totalInstalls": 92782,
+      "totalInstalls": 92788,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1533,7 +1533,7 @@
       "isVendor": false,
       "skillCount": 1,
       "totalStars": 513,
-      "totalInstalls": 130770,
+      "totalInstalls": 130867,
       "trophies": [
         "⚡ Most Used"
       ]
@@ -1543,7 +1543,7 @@
       "isVendor": false,
       "skillCount": 3,
       "totalStars": 261,
-      "totalInstalls": 75882,
+      "totalInstalls": 76031,
       "trophies": [
         "⚡ Most Used"
       ]
