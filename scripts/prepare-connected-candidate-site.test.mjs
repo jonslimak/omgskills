@@ -28,7 +28,8 @@ async function put(root, path, bytes) {
   await mkdir(dirname(join(root, path)), { recursive: true });
   await writeFile(join(root, path), bytes);
 }
-async function fixture() {
+async function fixture(layout = 'single-block') {
+  assert.ok(['single-block', 'retained-scoped'].includes(layout));
   // Stay under the repository so the installed bundler can trace its declared external dependencies.
   const parent = await realpath(await mkdtemp(join(repo, '.cc4a-site-')));
   const root = join(parent, 'output'), retainedSite = join(parent, 'retained');
@@ -38,6 +39,21 @@ async function fixture() {
     'app/assets/retained.js': '/* retained old asset */\n', 'test.css': 'body { color: black; }\n',
     'updates/history/old-0.0.21.zip': 'Opaque synthetic archive fixture, not an app',
     'updates/history/appcast.xml': '<rss>Inert test feed</rss>\n' };
+  if (layout === 'retained-scoped') {
+    const selectors = ['/OMGSkills-Setup-Test-0.1.0-arm64.dmg', '/OMGSkills-Setup-Test-0.1.0-arm64.dmg.sha256',
+      '/app/preview/unified/', '/app/preview/unified/index.html', '/robots.txt', '/test.css', '/test.js',
+      '/updates/f3d/OMGSkills-Setup-Test-0.1.1-arm64.zip', '/updates/f3d/OMGSkills-Setup-Test-0.1.2-arm64.zip',
+      '/updates/f3d/appcast.xml'];
+    const common = '/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Cache-Control: no-store\n';
+    const csp = "  Content-Security-Policy: default-src 'self'; img-src https://github.com https://avatars.githubusercontent.com; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'";
+    const candidate = hostingFiles()._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+    files._headers = common + selectors.map(path => `${path}\n${csp}\n`).join('')
+      + ['/app/', '/app/assets/*'].map(path => `${path}\n${candidate}\n`).join('');
+    for (const selector of selectors.filter(path => !path.endsWith('/'))) {
+      const path = selector.slice(1);
+      if (!Object.hasOwn(files, path)) files[path] = 'Opaque synthetic retained fixture; not a signed app or feed.\n';
+    }
+  }
   for (const [path, bytes] of Object.entries(files)) await put(retainedSite, path, bytes);
   return { parent, root, retainedSite, configuration };
 }
@@ -80,14 +96,19 @@ async function zipInventory(path) {
 async function worker() {
   let fixtureData;
   const evidence = await mkdtemp('/private/tmp/og-cc4a-evidence-');
-  const proof = { checkpoint: 'CC4A', passed: false, cleanup: false, nodeVersion: process.version };
+  const layout = process.env.CC4A_HEADER_LAYOUT ?? 'single-block';
+  const proof = { checkpoint: layout === 'retained-scoped' ? 'CC4C' : 'CC4A', headerLayout: layout,
+    passed: false, cleanup: false, nodeVersion: process.version };
   let networkCalls = 0;
   globalThis.fetch = async () => { networkCalls++; throw Error('CC4A fetch forbidden'); };
   net.Socket.prototype.connect = function () { networkCalls++; throw Error('CC4A network/database forbidden'); };
   try {
-    fixtureData = await fixture();
+    fixtureData = await fixture(layout);
     const { parent, ...options } = fixtureData;
     const before = await fileInventory(options.retainedSite);
+    const originalHeaders = await readFile(join(options.retainedSite, '_headers'), 'utf8');
+    if (layout === 'retained-scoped') assert.equal(hash(originalHeaders),
+      '16e7e32adf2ffb2b6cb975aa05b4b4a3698bc5c8990c6177c955a145aa261c68');
     const receipt = await prepareConnectedCandidateSite(options);
     assert.deepEqual(receipt, JSON.parse(await readFile(join(options.root, 'preparation.json'), 'utf8')));
     assert.equal(receipt.stage, 'offline-connected-candidate-prepared');
@@ -126,7 +147,16 @@ async function worker() {
     const policy = hostingFiles(configuration);
     assert.equal(await readFile(join(site, '_redirects'), 'utf8'), policy._redirects);
     assert.doesNotMatch(policy._redirects, /api\/portal|install-record|\/app\/\*/);
-    assert.match(await readFile(join(site, '_headers'), 'utf8'), /\/app\/connect\n  Content-Security-Policy:/);
+    const headers = await readFile(join(site, '_headers'), 'utf8');
+    assert.match(headers, /\/app\/connect\n  Content-Security-Policy:/);
+    if (layout === 'retained-scoped') {
+      const prefix = originalHeaders.slice(0, originalHeaders.indexOf('/app/\n'));
+      const csp = policy._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+      assert.equal(headers, prefix + ['/app/', '/app/index.html', '/app/connect', '/app/assets/*']
+        .map(path => `${path}\n${csp}\n`).join(''));
+      proof.retainedPolicyPrefixSHA256 = hash(prefix);
+      proof.generatedHeadersSHA256 = hash(headers);
+    }
     const manifest = JSON.parse(await readFile(join(options.root, 'function-check/manifest.json'), 'utf8'));
     validateFunctionPackage(manifest, options.root, { profile: 'connected' });
     assert.equal(manifest.functions.find(fn => fn.name === 'connected-candidate-api').routes.length, 10);
@@ -232,18 +262,40 @@ if (process.env.CC4A_MODE === 'package') {
       assert.deepEqual(await fileInventory(options.retainedSite), retained);
     } finally { await cleanup(outside); await cleanup(parent); }
   });
-  test('real offline connected site combines retained bytes, web assets and both function ZIPs', { timeout: 120000 }, async t => {
+  test('malformed scoped headers fail before preparation writes and preserve retained input', async () => {
+    const data = await fixture('retained-scoped'), { parent, ...options } = data;
+    try {
+      const path = join(options.retainedSite, '_headers'), original = await readFile(path, 'utf8');
+      for (const value of [original.replace('/test.js\n', '/app/*\n'),
+        original.replace('/test.js\n', '/test.css\n'), original.replace("style-src 'self';", "style-src *;"),
+        original + '/unknown\n  Cache-Control: public\n']) {
+        await writeFile(path, value);
+        const before = await fileInventory(options.retainedSite);
+        await assert.rejects(prepareConnectedCandidateSite(options));
+        assert.deepEqual(await readdir(options.root), [], 'Invalid policy must fail before building');
+        assert.deepEqual(await fileInventory(options.retainedSite), before);
+      }
+    } finally { await cleanup(parent); }
+  });
+  async function checkPackage(t, layout) {
     let summary;
     try {
-      const result = await execute(process.execPath, [file], { cwd: repo, env: { ...cleanEnvironment(), CC4A_MODE: 'package' },
+      const result = await execute(process.execPath, [file], { cwd: repo,
+        env: { ...cleanEnvironment(), CC4A_MODE: 'package', CC4A_HEADER_LAYOUT: layout },
         timeout: 110000, maxBuffer: 4 * 1024 * 1024 });
       summary = JSON.parse(result.stdout.trim().split('\n').at(-1));
     } catch (error) {
       if (!error.stdout) throw error;
       summary = JSON.parse(error.stdout.trim().split('\n').at(-1));
     }
-    t.diagnostic(`CC4A evidence: ${summary.evidence}`);
+    t.diagnostic(`${layout} package evidence: ${summary.evidence}`);
     assert.equal(summary.cleanup, true, 'Owned fixture must be cleaned');
     assert.equal(summary.passed, true, summary.error);
+  }
+  test('real offline connected site combines retained bytes, web assets and both function ZIPs', { timeout: 120000 }, async t => {
+    await checkPackage(t, 'single-block');
+  });
+  test('real offline retained-layout package preserves legacy policy, assets and both API ZIPs', { timeout: 120000 }, async t => {
+    await checkPackage(t, 'retained-scoped');
   });
 }

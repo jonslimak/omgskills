@@ -133,28 +133,52 @@ export function mergedHeaders(legacyHeaders, legacyFiles, options = {}) {
   const connected = options.profile === 'connected';
   const lines = legacyHeaders.trimEnd().split('\n');
   assert.equal(lines[0], '/*');
-  const legacyCSP = lines.find(line => line.trimStart().startsWith('Content-Security-Policy:'));
-  assert.ok(legacyCSP && lines.filter(line => line.includes('Content-Security-Policy:')).length === 1);
   if (connected) {
-    assert.ok(lines.slice(1).every(line => /^  [A-Za-z][A-Za-z-]*: [^\r\n]+$/.test(line)),
-      'Connected merge requires one global legacy header block');
-    const names = lines.slice(1).map(line => line.trimStart().split(':', 1)[0].toLowerCase());
-    assert.equal(new Set(names).size, names.length, 'Duplicate legacy headers');
-    assert.ok(!names.includes('content-security-policy-report-only'), 'Unsupported legacy CSP variant');
     for (const file of legacyFiles) {
       assert.ok(typeof file.path === 'string' && file.path.split('/').every(part => /^[A-Za-z0-9_.-]+$/.test(part)
         && part !== '.' && part !== '..'), 'Unsupported retained header path');
       assert.ok(file.path !== 'app/connect' && !file.path.startsWith('app/connect/'), 'Retained file conflicts with connect rewrite');
     }
   }
-  const common = lines.filter(line => line !== legacyCSP).join('\n');
   const paths = new Set(legacyFiles.filter(f => !f.path.startsWith('_')
     && (!connected || (f.path !== 'app/index.html' && !f.path.startsWith('app/assets/')))).map(f => '/' + f.path));
   for (const path of [...paths]) if (path.endsWith('/index.html')) paths.add(path.slice(0, -10));
-  const legacy = [...paths].sort().map(path => `${path}\n${legacyCSP}`).join('\n');
   const candidateCSP = policy._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
-  if (connected) return `${common}\n${legacy ? legacy + '\n' : ''}${['/app/', '/app/index.html', '/app/connect', '/app/assets/*']
-    .map(path => `${path}\n${candidateCSP}\n`).join('')}`;
+  const candidatePaths = ['/app/', '/app/index.html', '/app/connect', '/app/assets/*'];
+  const connectedBlocks = candidatePaths.map(path => `${path}\n${candidateCSP}\n`).join('');
+  const cspCount = lines.filter(line => line.includes('Content-Security-Policy:')).length;
+  if (connected && cspCount > 1) {
+    // Recognize only the previous generator's common prefix, two-line legacy blocks and candidate tail.
+    const original = hostingFiles()._headers;
+    const common = original.slice(0, original.indexOf('  Content-Security-Policy:'));
+    const oldCandidateCSP = original.split('\n').find(line => line.includes('Content-Security-Policy:'));
+    const oldTail = ['/app/', '/app/assets/*'].map(path => `${path}\n${oldCandidateCSP}\n`).join('');
+    assert.ok(legacyHeaders.startsWith(common) && legacyHeaders.endsWith(oldTail), 'Unknown retained header layout');
+    const body = legacyHeaders.slice(common.length, -oldTail.length);
+    const blocks = body.slice(0, -1).split('\n');
+    assert.ok(body.endsWith('\n') && blocks.length >= 2 && blocks.length % 2 === 0, 'Malformed retained legacy blocks');
+    const retainedCSP = "  Content-Security-Policy: default-src 'self'; img-src https://github.com https://avatars.githubusercontent.com; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'";
+    const seen = new Set(['/*', ...candidatePaths]);
+    for (let i = 0; i < blocks.length; i += 2) {
+      const selector = blocks[i];
+      assert.ok(paths.has(selector) && !seen.has(selector), 'Unknown or duplicate retained selector');
+      assert.equal(blocks[i + 1], retainedCSP, 'Unknown retained legacy policy');
+      seen.add(selector);
+    }
+    return legacyHeaders.slice(0, -oldTail.length) + connectedBlocks;
+  }
+  const legacyCSP = lines.find(line => line.trimStart().startsWith('Content-Security-Policy:'));
+  assert.ok(legacyCSP && cspCount === 1);
+  if (connected) {
+    assert.ok(lines.slice(1).every(line => /^  [A-Za-z][A-Za-z-]*: [^\r\n]+$/.test(line)),
+      'Connected merge requires one global legacy header block');
+    const names = lines.slice(1).map(line => line.trimStart().split(':', 1)[0].toLowerCase());
+    assert.equal(new Set(names).size, names.length, 'Duplicate legacy headers');
+    assert.ok(!names.includes('content-security-policy-report-only'), 'Unsupported legacy CSP variant');
+  }
+  const common = lines.filter(line => line !== legacyCSP).join('\n');
+  const legacy = [...paths].sort().map(path => `${path}\n${legacyCSP}`).join('\n');
+  if (connected) return `${common}\n${legacy ? legacy + '\n' : ''}${connectedBlocks}`;
   return `${common}\n${legacy}\n/app/\n${candidateCSP}\n/app/assets/*\n${candidateCSP}\n`;
 }
 async function siteState() {

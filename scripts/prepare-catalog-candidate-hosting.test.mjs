@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdtemp, mkdir, writeFile, symlink, rm, realpath, readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -180,6 +181,53 @@ test('candidate CSP never becomes a global restriction on old test pages', () =>
 const connectedHeaders = { profile: 'connected',
   publishableKey: `pk_test_${Buffer.from('cc4a-fixture.clerk.accounts.dev$').toString('base64')}`,
   clerkFrontendOrigin: 'https://cc4a-fixture.clerk.accounts.dev' };
+function retainedHeaderFixture() {
+  const selectors = ['/OMGSkills-Setup-Test-0.1.0-arm64.dmg', '/OMGSkills-Setup-Test-0.1.0-arm64.dmg.sha256',
+    '/app/preview/unified/', '/app/preview/unified/index.html', '/robots.txt', '/test.css', '/test.js',
+    '/updates/f3d/OMGSkills-Setup-Test-0.1.1-arm64.zip', '/updates/f3d/OMGSkills-Setup-Test-0.1.2-arm64.zip',
+    '/updates/f3d/appcast.xml'];
+  const common = '/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Cache-Control: no-store\n';
+  const csp = "  Content-Security-Policy: default-src 'self'; img-src https://github.com https://avatars.githubusercontent.com; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'";
+  const prefix = common + selectors.map(path => `${path}\n${csp}\n`).join('');
+  const candidate = hostingFiles()._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+  const tail = ['/app/', '/app/assets/*'].map(path => `${path}\n${candidate}\n`).join('');
+  const files = [...selectors.filter(path => !path.endsWith('/')).map(path => ({ path: path.slice(1) })),
+    ...['app/index.html', 'app/assets/old.js', 'updates/catalog-candidate/appcast.xml', '_headers'].map(path => ({ path }))];
+  return { headers: prefix + tail, prefix, tail, files, csp, common };
+}
+test('audited scoped layout preserves common and legacy bytes with only four connected selectors', () => {
+  const fixture = retainedHeaderFixture();
+  assert.equal(createHash('sha256').update(fixture.headers).digest('hex'),
+    '16e7e32adf2ffb2b6cb975aa05b4b4a3698bc5c8990c6177c955a145aa261c68', 'Fixture must mirror the audited header bytes');
+  const result = mergedHeaders(fixture.headers, fixture.files, connectedHeaders);
+  const candidate = hostingFiles(connectedHeaders)._headers.split('\n').find(line => line.includes('Content-Security-Policy:'));
+  const paths = ['/app/', '/app/index.html', '/app/connect', '/app/assets/*'];
+  assert.equal(result, fixture.prefix + paths.map(path => `${path}\n${candidate}\n`).join(''));
+  assert.doesNotMatch(fixture.prefix, /clerk|unsafe-eval/);
+  assert.doesNotMatch(result, /^\/app\/\*$/m);
+  for (const path of paths) assert.equal(result.split(`${path}\n`).length, 2);
+  assert.throws(() => mergedHeaders(fixture.headers, fixture.files), 'Default cannot silently select connected mode');
+  assert.throws(() => mergedHeaders(fixture.headers, fixture.files, { profile: 'install-only' }));
+});
+test('scoped adapter refuses unknown rules, duplicate/overlapping selectors and changed policies', () => {
+  const { headers, files, csp, common, tail } = retainedHeaderFixture();
+  for (const value of [headers.replace('/test.js\n', '/unlisted.js\n'), headers.replace('/test.js\n', '/test.css\n'),
+    headers.replace('/test.js\n', '/app/*\n'), headers.replace('/test.js\n', '/app/index.html\n'),
+    headers.replace('/test.js\n', '/app/connect\n'), headers.replace('/test.js\n', '/app/assets/old.js\n'),
+    headers.replace('/test.js\n', '/test.js?x=1\n'), headers.replace('/test.js\n', '/app/../test.js\n'),
+    headers.replace(csp, csp + "; script-src 'unsafe-eval'"), headers.replace(csp, csp.replace('Content-Security-Policy:', 'Content-Security-Policy-Report-Only:')),
+    headers.replace(common, common + "  Content-Security-Policy: default-src 'self'\n"),
+    headers.replace('  Cache-Control: no-store', '  Cache-Control: public'), headers.replace(csp, csp + '\n  Cache-Control: public'),
+    headers.replace('/test.js\n', '/test.js\n\n'), headers.replaceAll('\n', '\r\n'),
+    headers.slice(0, -tail.length), headers.replace(tail, tail.split('\n').slice(2, 4).join('\n') + '\n' + tail.split('\n').slice(0, 2).join('\n') + '\n'),
+    headers + `/test.js\n${csp}\n`, headers.replace(tail, tail.replace("script-src 'self'", "script-src 'self' https://other.test"))]) {
+    assert.throws(() => mergedHeaders(value, files, connectedHeaders));
+  }
+  for (const path of ['test.js', 'app/preview/unified/index.html']) {
+    assert.throws(() => mergedHeaders(headers, files.filter(file => file.path !== path), connectedHeaders));
+  }
+  assert.throws(() => mergedHeaders(headers, files, { ...connectedHeaders, clerkFrontendOrigin: 'https://other.clerk.accounts.dev' }));
+});
 test('connected policy covers only the connected entry, connect rewrite and assets', () => {
   const old = hostingFiles()._headers;
   const files = ['app/index.html', 'app/assets/old.js', 'app/preview/unified/index.html',
