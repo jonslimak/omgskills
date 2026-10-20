@@ -199,7 +199,8 @@ async function fetchBoardEntries(
 }
 
 async function getRepoMeta(repoFullName: string): Promise<RepoMeta | null> {
-  if (repoMetaCache.has(repoFullName)) return repoMetaCache.get(repoFullName)!;
+  const cacheKey = normalizeRepo(repoFullName);
+  if (repoMetaCache.has(cacheKey)) return repoMetaCache.get(cacheKey)!;
 
   const [owner, repo] = repoFullName.split("/");
   if (!owner || !repo) return null;
@@ -218,12 +219,12 @@ async function getRepoMeta(repoFullName: string): Promise<RepoMeta | null> {
       lastUpdated: data.pushed_at ?? data.updated_at ?? new Date().toISOString(),
       tags: data.topics ?? [],
     };
-    repoMetaCache.set(repoFullName, meta);
+    repoMetaCache.set(cacheKey, meta);
     return meta;
   } catch (err: unknown) {
     const e = err as { status?: number; message?: string };
     console.warn(`  skills.sh repo meta miss ${repoFullName}: ${e.status ?? "?"} ${e.message ?? String(err)}`);
-    repoMetaCache.set(repoFullName, null);
+    repoMetaCache.set(cacheKey, null);
     return null;
   }
 }
@@ -244,7 +245,8 @@ export async function fetchSkillsShInstallTotals(options: Pick<SkillsShOptions, 
   const totals = new Map<string, number>();
   for (const entry of entries) {
     if (!isValidRepo(entry.source) || !entry.skillId || !Number.isFinite(entry.installs)) continue;
-    const key = deriveId(normalizeRepo(entry.source), entry.skillId).toLowerCase();
+    const repo = repoMetaCache.get(normalizeRepo(entry.source))?.repo ?? normalizeRepo(entry.source);
+    const key = deriveId(repo, entry.skillId).toLowerCase();
     totals.set(key, Math.max(totals.get(key) ?? 0, entry.installs));
   }
   return totals;

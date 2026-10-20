@@ -368,3 +368,36 @@ test("skills.sh install totals read only all-time board pages and key by lowerca
     octokit.rest.repos.get = originalGet;
   }
 });
+
+test("skills.sh install totals reuse cached canonical repo identity", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalGet = octokit.rest.repos.get;
+  let board: "trending" | "all-time" = "trending";
+  globalThis.fetch = (async () => new Response(JSON.stringify({
+    total: 1,
+    page: 1,
+    hasMore: false,
+    skills: [skill("redirect-test/old-repo", "alpha", board === "trending" ? 25 : 5_000)],
+  }), { status: 200 })) as typeof fetch;
+  octokit.rest.repos.get = (async () => ({
+    data: {
+      full_name: "redirect-test/new-repo",
+      stargazers_count: 100,
+      pushed_at: "2026-07-01T00:00:00Z",
+      updated_at: "2026-07-01T00:00:00Z",
+      topics: [],
+    },
+  })) as unknown as typeof octokit.rest.repos.get;
+
+  try {
+    const hits = await searchSkillsSh({ board, topLimit: 1, pageConcurrency: 1, repoConcurrency: 1 });
+    board = "all-time";
+    const totals = await fetchSkillsShInstallTotals({ topLimit: 1, pageConcurrency: 1 });
+
+    assert.equal(hits[0]?.id, "redirect-test/new-repo:alpha");
+    assert.equal(totals.get("redirect-test/new-repo:alpha"), 5_000);
+  } finally {
+    globalThis.fetch = originalFetch;
+    octokit.rest.repos.get = originalGet;
+  }
+});

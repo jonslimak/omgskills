@@ -1,11 +1,12 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   canKeepLastGoodSkillsShData,
   fetchSkillsShInstallTotals,
   searchSkillsSh,
 } from "./sources/skillssh.js";
+import type { SkillsShHit } from "./sources/skillssh.js";
 
 // Rank by skills.sh's trending board (recent installs), but keep lifetime install totals for the
 // "installs" counts that skill pages, the Mac app and search signals display.
@@ -33,7 +34,7 @@ function writeAtomic(path: string, content: string) {
   renameSync(tmp, path);
 }
 
-function loadExisting(): { entries: Map<string, TrendingEntry>; lightweight: boolean; board?: string } {
+function loadExisting(): { entries: Map<string, TrendingEntry>; lightweight: boolean } {
   if (!existsSync(outPath)) return { entries: new Map(), lightweight: true };
   try {
     const arr = JSON.parse(readFileSync(outPath, "utf8")) as Array<Record<string, unknown>>;
@@ -49,11 +50,47 @@ function loadExisting(): { entries: Map<string, TrendingEntry>; lightweight: boo
     return {
       entries: new Map(entries.map((s) => [s.id, s])),
       lightweight,
-      board: entries[0]?.board ?? "all-time",
     };
   } catch {
     return { entries: new Map(), lightweight: true };
   }
+}
+
+interface TrendingSourceDependencies {
+  search: () => Promise<SkillsShHit[]>;
+  fetchInstallTotals: () => Promise<Map<string, number>>;
+  warn: (message: string) => void;
+}
+
+export async function loadTrendingSourceData(
+  dependencies: TrendingSourceDependencies = {
+    search: () => searchSkillsSh({ board: RANK_BOARD }),
+    fetchInstallTotals: () => fetchSkillsShInstallTotals(),
+    warn: console.warn,
+  },
+): Promise<{ hits: SkillsShHit[]; totals: Map<string, number> }> {
+  const hits = await dependencies.search();
+  try {
+    return { hits, totals: await dependencies.fetchInstallTotals() };
+  } catch (error) {
+    dependencies.warn(
+      `[optional-source-unavailable] lifetime install totals unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return { hits, totals: new Map() };
+  }
+}
+
+export function installCountForTrendingHit(
+  hit: SkillsShHit,
+  totals: Map<string, number>,
+  existing: Map<string, TrendingEntry>,
+): number {
+  const lifetimeInstalls = totals.get(hit.id.toLowerCase()) ?? existing.get(hit.id)?.installs;
+  return Math.max(lifetimeInstalls ?? 0, hit.installs);
+}
+
+export function isUnsafeTrendingShrink(previousCount: number, nextCount: number): boolean {
+  return previousCount > 0 && nextCount < previousCount / 2;
 }
 
 function loadMainLibrary(): Map<string, Skill> {
@@ -77,8 +114,7 @@ async function main() {
   let hits;
   let totals: Map<string, number>;
   try {
-    hits = await searchSkillsSh({ board: RANK_BOARD });
-    totals = await fetchSkillsShInstallTotals();
+    ({ hits, totals } = await loadTrendingSourceData());
   } catch (error) {
     if (!canKeepLastGoodSkillsShData(error, existing.entries.size)) throw error;
     console.warn(
@@ -101,7 +137,7 @@ async function main() {
     entries.push({
       id: hit.id,
       // Lifetime total when skills.sh lists it; otherwise the trending-board count (a lower bound).
-      installs: Math.max(totals.get(hit.id.toLowerCase()) ?? 0, hit.installs),
+      installs: installCountForTrendingHit(hit, totals, existing.entries),
       trending_rank: hit.trending_rank,
       trending_source: hit.trending_source,
       board: RANK_BOARD,
@@ -115,10 +151,7 @@ async function main() {
   entries.sort((a, b) => a.trending_rank - b.trending_rank || b.installs - a.installs);
 
   const previousCount = existing.entries.size;
-  // The shrink guard compares like with like; a one-time board switch is not a data loss signal.
-  const sameBoard = existing.board === RANK_BOARD;
-  if (!sameBoard && previousCount > 0) console.log(`Ranking board changed ${existing.board} → ${RANK_BOARD}; skipping the shrink guard once.`);
-  if (sameBoard && existing.lightweight && previousCount > 0 && entries.length < previousCount / 2) {
+  if (existing.lightweight && isUnsafeTrendingShrink(previousCount, entries.length)) {
     console.error(`[abort] Trending output dropped from ${previousCount} to ${entries.length}; keeping last good trending.json`);
     process.exit(1);
   }
@@ -141,7 +174,9 @@ async function main() {
   console.log(`→ snapshot saved: snapshots/trending-${today}.json`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
