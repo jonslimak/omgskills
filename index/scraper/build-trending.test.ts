@@ -4,6 +4,7 @@ import {
   installCountForTrendingHit,
   isUnsafeTrendingShrink,
   loadTrendingSourceData,
+  spreadTrendingByRepo,
 } from "./build-trending.js";
 import type { SkillsShHit } from "./sources/skillssh.js";
 
@@ -48,4 +49,12 @@ test("shrink guard remains active during a ranking-board transition", () => {
   assert.equal(isUnsafeTrendingShrink(275, 192), false);
   assert.equal(isUnsafeTrendingShrink(275, 0), true);
   assert.equal(isUnsafeTrendingShrink(275, 137), true);
+});
+
+test("trending keeps two skills per repo at the top and moves the rest below", () => {
+  const ids = ["a/r:1", "a/r:2", "a/r:3", "b/r:1", "A/R:4", "c/r:1", "b/r:2", "b/r:3"];
+  const spread = spreadTrendingByRepo(ids.map((id, index) => ({ id, trending_rank: index + 10 })));
+  assert.deepEqual(spread.map((entry) => entry.id),
+    ["a/r:1", "a/r:2", "b/r:1", "c/r:1", "b/r:2", "a/r:3", "A/R:4", "b/r:3"]);
+  assert.deepEqual(spread.map((entry) => entry.trending_rank), [1, 2, 3, 4, 5, 6, 7, 8]);
 });

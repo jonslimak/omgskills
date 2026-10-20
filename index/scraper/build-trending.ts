@@ -89,6 +89,27 @@ export function installCountForTrendingHit(
   return Math.max(lifetimeInstalls ?? 0, hit.installs);
 }
 
+/** Extra skills from one repo past the first few would crowd the top of the list. */
+export const TRENDING_PER_REPO = 2;
+
+// Keep every entry, but move each repo's skills past the cap below the rest, then renumber
+// ranks 1..n so every consumer that sorts by trending_rank sees the varied order.
+export function spreadTrendingByRepo<T extends { id: string; trending_rank: number }>(
+  entries: T[],
+  perRepo = TRENDING_PER_REPO,
+): T[] {
+  const seen = new Map<string, number>();
+  const head: T[] = [];
+  const tail: T[] = [];
+  for (const entry of entries) {
+    const repo = entry.id.split(":")[0].toLowerCase();
+    const count = seen.get(repo) ?? 0;
+    seen.set(repo, count + 1);
+    (count < perRepo ? head : tail).push(entry);
+  }
+  return [...head, ...tail].map((entry, index) => ({ ...entry, trending_rank: index + 1 }));
+}
+
 export function isUnsafeTrendingShrink(previousCount: number, nextCount: number): boolean {
   return previousCount > 0 && nextCount < previousCount / 2;
 }
@@ -125,7 +146,7 @@ async function main() {
   }
   console.log(`  trending candidates: ${hits.length}`);
 
-  const entries: TrendingEntry[] = [];
+  let entries: TrendingEntry[] = [];
   let skippedMissing = 0;
 
   for (const hit of hits) {
@@ -149,6 +170,7 @@ async function main() {
   }
 
   entries.sort((a, b) => a.trending_rank - b.trending_rank || b.installs - a.installs);
+  entries = spreadTrendingByRepo(entries);
 
   const previousCount = existing.entries.size;
   if (existing.lightweight && isUnsafeTrendingShrink(previousCount, entries.length)) {
