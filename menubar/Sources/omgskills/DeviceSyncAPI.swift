@@ -10,6 +10,9 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
     case invalidResponse
     case inventoryChanged
     case unsupportedReportMode
+    case unsupportedReconnect
+    case invalidReconnectKey
+    case reconnectBindingConflict
 
     var errorDescription: String? {
         switch self {
@@ -29,8 +32,25 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
             return "Inventory changed. Resync to scan again."
         case .unsupportedReportMode:
             return "This inventory reporting mode is not configured."
+        case .unsupportedReconnect:
+            return "This connection does not support reconnect continuity."
+        case .invalidReconnectKey:
+            return "The reconnect key is invalid."
+        case .reconnectBindingConflict:
+            return "This reconnect key conflicts with an existing connection."
         }
     }
+}
+
+enum DeviceReconnectSupport: Equatable, Sendable {
+    case supported
+    case unsupported
+    case invalid
+}
+
+struct DeviceReconnectExchange: Equatable, Sendable {
+    let record: StoredDeviceCredential
+    let support: DeviceReconnectSupport
 }
 
 protocol DeviceSyncServing: Sendable {
@@ -40,6 +60,9 @@ protocol DeviceSyncServing: Sendable {
         deviceName: String,
         codeVerifier: String?
     ) async throws -> StoredDeviceCredential
+    func exchangeForReconnect(pairingCode: String, deviceName: String, codeVerifier: String?,
+                              reconnectKey: String) async throws -> DeviceReconnectExchange
+    func bindReconnectKey(credential: String, reconnectKey: String, expectedDeviceID: String) async throws
     func upload(credential: String, installations: [Skill]) async throws -> SkillSyncResult
     func inventoryRevision(credential: String) async throws -> String?
     func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult
@@ -49,6 +72,13 @@ protocol DeviceSyncServing: Sendable {
 
 extension DeviceSyncServing {
     var reportMode: DeviceReportMode { .legacy }
+    func exchangeForReconnect(pairingCode: String, deviceName: String, codeVerifier: String?,
+                              reconnectKey: String) async throws -> DeviceReconnectExchange {
+        throw DeviceSyncAPIError.unsupportedReconnect
+    }
+    func bindReconnectKey(credential: String, reconnectKey: String, expectedDeviceID: String) async throws {
+        throw DeviceSyncAPIError.unsupportedReconnect
+    }
     func inventoryRevision(credential: String) async throws -> String? { throw DeviceSyncAPIError.unsupportedReportMode }
     func reconcile(credential: String, payload: ReconciliationSyncPayload) async throws -> SkillSyncResult {
         throw DeviceSyncAPIError.unsupportedReportMode
@@ -70,12 +100,14 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
         let exchange: URL
         let upload: URL
         let revoke: URL
+        let reconnectKey: URL
 
         init(upload: URL) {
             let base = upload.deletingLastPathComponent()
             self.exchange = base.appendingPathComponent("sync-exchange")
             self.upload = upload
             self.revoke = base.appendingPathComponent("device-revoke")
+            self.reconnectKey = base.appendingPathComponent("device-reconnect-key")
         }
     }
 
@@ -83,6 +115,7 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
         let pairingCode: String
         let deviceName: String
         let codeVerifier: String?
+        var reconnectKey: String? = nil
     }
 
     private struct ExchangeResponse: Decodable {
@@ -91,6 +124,38 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
         let expiresAt: Date
         let accountLabel: String
         let grantedScopes: Set<DeviceScope>?
+
+        var record: StoredDeviceCredential {
+            StoredDeviceCredential(credential: credential, connection: DeviceConnectionInfo(
+                deviceID: deviceId, accountLabel: accountLabel, expiresAt: expiresAt,
+                grantedScopes: grantedScopes ?? DeviceScope.metadataOnly))
+        }
+    }
+
+    private struct ReconnectExchangeResponse: Decodable {
+        let record: StoredDeviceCredential
+        let support: DeviceReconnectSupport
+
+        private enum CodingKeys: String, CodingKey { case reconnectSupported }
+
+        init(from decoder: any Decoder) throws {
+            record = try ExchangeResponse(from: decoder).record
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            if !values.contains(.reconnectSupported) {
+                support = .unsupported
+            } else if let supported = try? values.decode(Bool.self, forKey: .reconnectSupported) {
+                support = supported ? .supported : .unsupported
+            } else {
+                // Preserve the issued bearer for caller cleanup even when the
+                // acknowledgement is malformed; it must never authorize adoption.
+                support = .invalid
+            }
+        }
+    }
+
+    private struct ReconnectBindingResponse: Decodable {
+        let deviceId: String
+        let reconnectSupported: Bool
     }
 
     private let endpoints: Endpoints
@@ -127,15 +192,38 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
             credential: nil,
             unauthorizedError: .invalidPairingCode
         )
-        return StoredDeviceCredential(
-            credential: response.credential,
-            connection: DeviceConnectionInfo(
-                deviceID: response.deviceId,
-                accountLabel: response.accountLabel,
-                expiresAt: response.expiresAt,
-                grantedScopes: response.grantedScopes ?? DeviceScope.metadataOnly
-            )
-        )
+        return response.record
+    }
+
+    func exchangeForReconnect(pairingCode: String, deviceName: String, codeVerifier: String?,
+                              reconnectKey: String) async throws -> DeviceReconnectExchange {
+        try validateReconnectRequest(reconnectKey)
+        let payload = ExchangePayload(pairingCode: pairingCode.trimmingCharacters(in: .whitespacesAndNewlines),
+            deviceName: deviceName.trimmingCharacters(in: .whitespacesAndNewlines),
+            codeVerifier: codeVerifier, reconnectKey: reconnectKey)
+        let response: ReconnectExchangeResponse = try await send(to: endpoints.exchange,
+            body: encoder.encode(payload), credential: nil, unauthorizedError: .invalidPairingCode)
+        return DeviceReconnectExchange(record: response.record, support: response.support)
+    }
+
+    func bindReconnectKey(credential: String, reconnectKey: String, expectedDeviceID: String) async throws {
+        try validateReconnectRequest(reconnectKey)
+        guard !expectedDeviceID.isEmpty else { throw DeviceSyncAPIError.invalidResponse }
+        struct Payload: Encodable { let reconnectKey: String }
+        let response: ReconnectBindingResponse = try await send(to: endpoints.reconnectKey,
+            body: encoder.encode(Payload(reconnectKey: reconnectKey)), credential: credential,
+            unauthorizedError: .reconnectRequired, conflictError: .reconnectBindingConflict)
+        guard response.deviceId == expectedDeviceID else { throw DeviceSyncAPIError.invalidResponse }
+        guard response.reconnectSupported else { throw DeviceSyncAPIError.unsupportedReconnect }
+    }
+
+    private func validateReconnectRequest(_ key: String) throws {
+        try Task.checkCancellation()
+        guard DeviceReconnectKeyStore.isValidKey(key) else { throw DeviceSyncAPIError.invalidReconnectKey }
+        guard endpoints.upload.query == nil, endpoints.upload.fragment == nil,
+              endpoints.upload.user == nil, endpoints.upload.password == nil else {
+            throw DeviceSyncAPIError.invalidResponse
+        }
     }
 
     func upload(credential: String, installations: [Skill]) async throws -> SkillSyncResult {
