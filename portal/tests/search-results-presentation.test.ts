@@ -50,7 +50,7 @@ test("public results and sorting remain independent of the personal disclosure",
 });
 
 test("search sorting sits at the top right of the title while the subtitle spans the header", () => {
-  assert.ok(source.includes('nav.query && catalogSort ? " ua-heading-search" : ""'));
+  assert.ok(source.includes('nav.query ? " ua-heading-search" : ""'));
   assert.match(styles, /\.ua-heading-search > \.ua-filter\s*\{\s*grid-column: 2;\s*grid-row: 1;/);
   assert.match(styles, /\.ua-heading-search \.ua-search-meta\s*\{\s*grid-column: 1 \/ -1;\s*grid-row: 2;/);
   assert.ok(source.includes('{!nav.query && catalogControls}'));
@@ -91,7 +91,9 @@ test("mobile Trending removes duplicate subtitle stars and their separator only 
 
 test("search result counts sit beside the query subtitle without duplicating browse counts", () => {
   assert.ok(source.includes('const catalogCount = publicList && publicStatus.page ?'));
-  assert.ok(source.includes('<p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p>'));
+  assert.ok(source.includes('<p className="ua-search-meta"><span>{meta}</span>{catalogCount}{catalogNote && <span role="status">{catalogNote}</span>}</p>'));
+  assert.ok(source.includes('const catalogNote = publicList && listState === "ready" ? publicStatus.note : "";'));
+  assert.ok(source.includes('{!nav.query && catalogNote && <p className="ua-muted ua-catalog-note" role="status">{catalogNote}</p>}'));
   assert.ok(source.includes('{!nav.query && catalogCount}'));
   assert.equal((source.match(/\{publicStatus.loaded\} of \{publicStatus.page.total\}/g) ?? []).length, 1);
   assert.match(styles, /\.ua-search-meta\s*\{[^}]*display: flex;[^}]*flex-wrap: wrap;/);

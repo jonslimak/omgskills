@@ -96,6 +96,32 @@ test("creator banners stay scoped to profiles, use existing identity data and re
   assert.equal(markup.includes('CollectionCover'), false);
 });
 
+test("signed-out Mac downloads sit centered below Sign in and hide in the collapsed rail", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  const bottom = source.slice(source.indexOf('<div className="ua-sidebar-bottom">'), source.indexOf('{signedIn ? (', source.indexOf('<div className="ua-sidebar-bottom">')));
+  assert.equal(bottom.includes('ua-sidebar-download'), false);
+  assert.ok(bottom.indexOf('{themeToggle}') < bottom.indexOf('<PanelLeft />'));
+  const footer = source.slice(source.indexOf('{signedIn ? (', source.indexOf('<div className="ua-sidebar-bottom">')), source.indexOf('</aside>'));
+  assert.ok(footer.indexOf('<span>Sign in</span>') < footer.indexOf('className="ua-sidebar-download"'));
+  assert.ok(footer.includes('href="/downloads/omgskills-mac.dmg"'));
+  assert.ok(footer.includes('aria-label="Get the Mac app"'));
+  assert.ok(footer.includes('title="Get the Mac app"'));
+  assert.ok(footer.includes('<span className="ua-apple-mark" aria-hidden="true">&#63743;</span>'));
+  const home = readFileSync(new URL("../../site/index.html", import.meta.url), "utf8");
+  assert.ok(home.includes('<span class="apple-icon" aria-hidden="true">&#63743;</span>'));
+  assert.equal(source.includes('ua-public-actions'), false);
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  assert.match(css, /\.ua-account-footer \.ua-sidebar-download\s*\{[^}]*justify-content: center/);
+  assert.match(css, /\.ua-workspace\[data-rail="true"\] \.ua-account\s*\{\s*justify-content: center;\s*padding-inline: 0;\s*gap: 0;/);
+  assert.match(css, /\.ua-workspace\[data-rail="true"\] \.ua-account-footer \.ua-sidebar-download\s*\{\s*display: none;/);
+});
+
+test("mobile result spacing is compact without shrinking sort touch targets or Discover sections", () => {
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  assert.match(css, /@media \(max-width: 759px\)\s*\{\s*\.ua-content:has\(> :is\(\.ua-catalog-controls, \.ua-catalog-note, \.ua-heading-search, \.ua-creator-banner, \.ua-collection-banner\)\) \{ gap: 8px; \}/);
+  assert.match(css, /\.ua-sort-filter\s*\{[^}]*width: 44px;[^}]*height: 44px;/);
+});
+
 test("unified preview retains development, opt-in, loopback and preview route restrictions", () => {
   const input = {
     development: true,
