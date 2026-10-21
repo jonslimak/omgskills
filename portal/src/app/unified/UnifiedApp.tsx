@@ -101,6 +101,7 @@ import type { UnifiedManagement } from "./management";
 import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
 import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
 import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery-presentation";
+import { descriptionParagraphs } from "./description-paragraphs";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -450,6 +451,7 @@ export function UnifiedApp({
   const [notice, setNotice] = useState("");
   const [showHidden, setShowHidden] = useState(false);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
+  const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
   const [wide, setWide] = useState(
     () => window.matchMedia("(min-width: 1024px)").matches,
   );
@@ -469,6 +471,7 @@ export function UnifiedApp({
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
   const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected) || pendingSelection;
+  const detailParagraphs = selected ? descriptionParagraphs(selected.description) : [];
   const detailOpen = useRef(false);
   detailOpen.current = !!selected;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
@@ -526,6 +529,7 @@ export function UnifiedApp({
     setEditing(false);
     setPicked([]);
     setDialog(null);
+    setExpandedSearchScope(null);
     main.current?.scrollTo(0, 0);
   }, [scopeKey]);
   useEffect(() => {
@@ -1390,8 +1394,7 @@ export function UnifiedApp({
                     Try again
                   </button>
                 </Empty>
-              ) : nav.query && setPage ? rows(visible.filter(skill => matchesSearch(skill, nav.query))) : nav.query ? (
-                <>
+              ) : nav.query && setPage ? rows(visible.filter(skill => matchesSearch(skill, nav.query))) : nav.query && privateSearch ? (
                   <section>
                     <SectionHeading title="In my skills" />
                     {signedIn ? (
@@ -1400,12 +1403,31 @@ export function UnifiedApp({
                       <p className="ua-muted">Sign in to see your skills.</p>
                     )}
                   </section>
-                  {!privateSearch && <section>
-                    <SectionHeading title="Library" />
+              ) : nav.query ? (
+                <div className="ua-search-results">
+                  {matchingMine.length > 0 && <details className="ua-search-personal" key={scopeKey}
+                    open={expandedSearchScope === scopeKey}
+                    onToggle={event => setExpandedSearchScope(event.currentTarget.open ? scopeKey : null)}>
+                    <summary className="ua-search-personal-toggle">
+                      <span className="ua-search-personal-title">
+                        My library
+                        <span className="ua-search-personal-count">
+                          {matchingMine.length} {matchingMine.length === 1 ? "skill" : "skills"}
+                          <ChevronRight aria-hidden="true" />
+                        </span>
+                      </span>
+                      <span className="ua-search-personal-hide">Hide</span>
+                    </summary>
+                    {rows(matchingMine)}
+                  </details>}
+                  <section className="ua-search-library">
+                    {matchingMine.length > 0 && <h2 className="ua-search-library-label">Library</h2>}
                     {catalogControls}
-                    {rows(matchingLibrary)}
-                  </section>}
-                </>
+                    {matchingMine.length > 0 && !matchingLibrary.length ? (
+                      <Empty title="No library matches">Try a creator or a task.</Empty>
+                    ) : rows(matchingLibrary)}
+                  </section>
+                </div>
               ) : nav.view === "discover" ? (
                 <>
                   <div id="ua-discover-collections">
@@ -1749,9 +1771,11 @@ export function UnifiedApp({
                     </IconButton>
                   )}
                 </div>
-                <p className="ua-description">
-                  {selected.description || "No description available."}
-                </p>
+                <div className="ua-description">
+                  {(detailParagraphs.length ? detailParagraphs : ["No description available."]).map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
+                </div>
                 {selected.installed && (
                   <section className="ua-detail-account">
                     <h3>On this account</h3>

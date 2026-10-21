@@ -111,6 +111,11 @@ test("blue focus outlines are replaced locally without removing keyboard focus",
   assert.equal(/outline:[^;]*var\(--ua-blue\)/.test(styles), false);
 });
 
+test("selected skills use the sidebar background in both themes", () => {
+  assert.match(styles, /\.ua-row\[data-selected="true"\]\s*\{\s*background: var\(--ua-side\)/);
+  assert.match(styles, /\.ua-sidebar\s*\{[^}]*background: var\(--ua-side\)/);
+});
+
 test("skill chevrons use circular backgrounds without changing other pills", () => {
   const circle = styles.match(/\.ua-row > \.ua-row-open\s*\{([^}]+)\}/)?.[1];
   assert.ok(circle);
