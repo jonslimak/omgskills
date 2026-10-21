@@ -22,7 +22,7 @@ try {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto(origin + "/app/testing/unified-acceptance/?view=discover&catalog=0");
-    await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
+    await page.getByRole("heading", { name: "Today", exact: true }).waitFor();
     assert.equal(await mainFocused(), false, "Initial load must not move focus");
     await page.getByRole("button", { name: /^Collection Build your next thing/ }).press("Enter");
     await page.getByRole("heading", { name: "Build your next thing", exact: true }).waitFor();
@@ -59,13 +59,13 @@ try {
     }
     if (width < 760) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
     await page.getByRole("button", { name: "Discover", exact: true }).filter({ visible: true }).last().press("Enter");
-    await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
+    await page.getByRole("heading", { name: "Today", exact: true }).waitFor();
     if (!await mainFocused()) failures.push(`${width}: return navigation lost focus`);
     await page.goBack();
     await page.getByRole("heading", { name: "Build your next thing", exact: true }).waitFor();
     if (!await mainFocused()) failures.push(`${width}: browser Back lost focus`);
     await page.goForward();
-    await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
+    await page.getByRole("heading", { name: "Today", exact: true }).waitFor();
     if (!await mainFocused()) failures.push(`${width}: browser Forward lost focus`);
     const accountMenu = page.getByRole("button", { name: "Account menu", exact: true }).filter({ visible: true });
     for (const destination of ["Profile", "Agents 2 observed"]) {

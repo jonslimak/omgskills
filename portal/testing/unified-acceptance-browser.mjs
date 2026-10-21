@@ -86,7 +86,7 @@ try {
       await page.waitForURL(url => url.searchParams.get("q") === "frontend");
     }
   }
-  for (const width of [1440, 1024, 390, 320]) {
+  for (const width of [1440, 1024, 1023, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await go();
     if (width < 760) {
@@ -104,14 +104,18 @@ try {
     await page.screenshot({ path: path.join(output, `${width}-detail.png`) });
     const box = await detail.boundingBox();
     assert.ok(box && box.x >= 0 && box.x + box.width <= width && box.y >= 0 && box.y + box.height <= 845);
-    if (width >= 1180) {
+    const heading = await detail.locator(".ua-detail-heading").boundingBox();
+    const closeButton = await detail.locator(".ua-detail-top .ua-icon").boundingBox();
+    assert.ok(heading && closeButton && Math.abs(heading.y - closeButton.y) < 1,
+      "Skill identity and close button must start on the same row");
+    if (width >= 1024) {
       assert.equal(box.y, 0, "Desktop detail must start at the top of the viewport");
     } else if (width >= 760) {
       assert.equal(box.y, 44, "Tablet detail must retain its top inset");
     } else {
       assert.ok(Math.abs(box.y + box.height - 844) < 1, "Mobile detail must stay bottom-aligned");
     }
-    if (width < 1180) {
+    if (width < 1024) {
       for (let i = 0; i < 18; i++) {
         await page.keyboard.press("Tab");
         assert.equal(await detail.evaluate(node => node.contains(document.activeElement)), true, "Sheet focus escaped");
@@ -152,11 +156,11 @@ try {
   for (const view of ["top", "creators", "collections"]) {
     await go(`?view=${view}&signedOut=1`);
     await page.getByRole("button", { name: "Discover", exact: true }).filter({ visible: true }).click();
-    await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
+    await page.getByRole("heading", { name: "Today", exact: true }).waitFor();
   }
   await go("?view=discover&signedOut=1&q=design");
   await page.getByRole("button", { name: "Discover", exact: true }).filter({ visible: true }).click();
-  await page.getByRole("heading", { name: "Discover", exact: true }).waitFor();
+  await page.getByRole("heading", { name: "Today", exact: true }).waitFor();
   await go("?view=collection&id=build");
   await page.getByRole("button", { name: "Open frontend-design", exact: true }).click();
   await page.getByRole("dialog").getByRole("button", { name: /^design-system Build/ }).click();
@@ -200,5 +204,5 @@ try {
   }
   assert.deepEqual(errors, []);
   assert.deepEqual(forbidden, []);
-  console.log("PASS: 4 widths; detail/nested dialog/related focus; Back/Forward; invites; dark mode; signed-out navigation; direct-link reload; empty/loading/error/long content. No API or external requests.");
+  console.log("PASS: 5 widths; detail/nested dialog/related focus; Back/Forward; invites; dark mode; signed-out navigation; direct-link reload; empty/loading/error/long content. No API or external requests.");
 } finally { await browser.close(); }

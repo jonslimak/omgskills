@@ -19,6 +19,7 @@ import {
   Bot,
   Braces,
   Bug,
+  Building2,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -99,6 +100,7 @@ import type { PublicStatus } from "./use-public-catalog";
 import type { UnifiedManagement } from "./management";
 import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
 import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
+import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery-presentation";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -449,7 +451,7 @@ export function UnifiedApp({
   const [showHidden, setShowHidden] = useState(false);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [wide, setWide] = useState(
-    () => window.matchMedia("(min-width: 1180px)").matches,
+    () => window.matchMedia("(min-width: 1024px)").matches,
   );
   const main = useRef<HTMLElement>(null);
   const detailTrigger = useRef<HTMLElement | null>(null);
@@ -485,8 +487,8 @@ export function UnifiedApp({
   const collectionPage = discoverCollectionPage(catalog.collections, collectionPageIndex);
   const collectionsReady = !publicStatus || (publicStatus.metadata ?? publicStatus.list) === "ready";
   const creator = catalog.creators.find((item) => item.handle === nav.id);
+  const creatorGroups = useMemo(() => discoveryCreatorGroups(catalog.creators), [catalog.creators]);
   const creatorHeader = nav.view === "creator" && !nav.query;
-  const categoryGroup = catalog.categories.find((group) => group.label === nav.id);
   const discovery = !signedIn || isDiscovery(nav.view);
   const favorites = mine.filter((skill) => isFavorite(data, skill));
   const sets = signedIn
@@ -503,7 +505,7 @@ export function UnifiedApp({
   const publicList = !!publicStatus && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
   const setPage = !!management && ["set", "favorites"].includes(nav.view);
   const progressiveDiscover = publicList && nav.view === "discover" && !nav.query.trim();
-  const metadataOnly = !nav.query.trim() && (["creators", "collections"].includes(nav.view) || !!categoryGroup);
+  const metadataOnly = !nav.query.trim() && ["creators", "collections"].includes(nav.view);
   const publicListState = metadataOnly ? publicStatus?.metadata ?? publicStatus?.list : publicStatus?.list;
   const publicListError = metadataOnly ? publicStatus?.metadataError : publicStatus?.error;
   const listState = progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state : state;
@@ -535,7 +537,7 @@ export function UnifiedApp({
     return () => mq.removeEventListener("change", change);
   }, []);
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1180px)");
+    const mq = window.matchMedia("(min-width: 1024px)");
     const change = () => setWide(mq.matches);
     mq.addEventListener("change", change);
     return () => mq.removeEventListener("change", change);
@@ -605,7 +607,9 @@ export function UnifiedApp({
     count?: number,
     id = "",
   ) {
-    const active = nav.view === view && (!id || nav.id === id) && !nav.query;
+    const active = !nav.query && (view === "creators"
+      ? (nav.view === "creators" && nav.id === id) || (nav.view === "creator" && isCompany(nav.id) === (id === "companies"))
+      : nav.view === view && (!id || nav.id === id));
     return (
       <button
         type="button"
@@ -738,7 +742,15 @@ export function UnifiedApp({
             </span>
             <span className="ua-row-description">
               {compact
-                ? [skill.author ? `@${skill.author}` : "", skill.stars !== undefined ? `${starCount(skill.stars)} stars` : ""].filter(Boolean).join(" · ")
+                ? <>
+                    {skill.author && `@${skill.author}`}
+                    {skill.stars !== undefined && <>
+                      {skill.author && " · "}
+                      <span className="ua-trending-stars" aria-label={`${starCount(skill.stars)} stars`}>
+                        <Star aria-hidden="true" />{starCount(skill.stars)}
+                      </span>
+                    </>}
+                  </>
                 : skill.description || "No description available"}
             </span>
           </span>
@@ -764,11 +776,12 @@ export function UnifiedApp({
               </span>
               <button
                 type="button"
-                className="ua-pill ua-link"
+                className="ua-pill ua-link ua-row-open"
                 aria-label={`Open ${skill.name} details`}
+                title={`Open ${skill.name} details`}
                 onClick={event => { if (event.detail < 2) open(skill); }}
               >
-                Open
+                <ChevronRight aria-hidden="true" />
               </button>
             </>
           ) : (
@@ -899,10 +912,11 @@ export function UnifiedApp({
       {status !== "error" && children}
     </>;
   }
-  function CreatorList({ limit }: { limit?: number }) {
+  function CreatorList({ items, limit }: { items: CatalogDisplay["creators"]; limit?: number }) {
+    const shown = limit === undefined ? items : featuredProfiles(items, limit);
     return (
       <div className="ua-creators">
-        {catalog.creators.slice(0, limit).map((item) => (
+        {shown.map((item) => (
           <button
             type="button"
             className="ua-creator"
@@ -977,7 +991,7 @@ export function UnifiedApp({
     sets: "sets",
     discover: "Discover",
     top: publicStatus ? "Trending skills" : "Top this week",
-    creators: "Creators",
+    creators: nav.id === "companies" ? "Companies" : "Creators",
     collections: "Collections",
     set: activeSet?.name || "Set not found",
     creator: creator?.name || nav.id,
@@ -1054,10 +1068,10 @@ export function UnifiedApp({
         data-detail={!!selected && wide}
       >
         <aside className="ua-sidebar" aria-label="Main navigation">
-          <div className="ua-brand">
+          <button type="button" className="ua-brand" aria-label="Go to Discover" onClick={() => go("discover")}>
             <span aria-hidden="true">👀</span>
             <strong>omgskills</strong>
-          </div>
+          </button>
           {signedIn && (
             <div className="ua-modes" role="group" aria-label="App mode">
               <button
@@ -1092,20 +1106,9 @@ export function UnifiedApp({
               <>
                 {navItem("discover", "Discover", Compass)}
                 {navItem("top", publicStatus ? "Trending skills" : "Top this week", TrendingUp)}
+                {navItem("creators", "Companies", Building2, undefined, "companies")}
                 {navItem("creators", "Creators", Users)}
                 {navItem("collections", "Collections", PlayingCardsFan)}
-                <div className="ua-nav-group">
-                  <small>Categories</small>
-                  {catalog.categories.map((group, i) =>
-                    navItem(
-                      "category",
-                      group.label,
-                      [Palette, Target, Code, BookOpen][i],
-                      undefined,
-                      group.label,
-                    ),
-                  )}
-                </div>
               </>
             ) : (
               <>
@@ -1156,7 +1159,7 @@ export function UnifiedApp({
         </aside>
         <div className="ua-content-column">
           <header className="ua-mobile-header">
-            <span className="ua-mobile-logo" role="img" aria-label="omgskills">👀</span>
+            <button type="button" className="ua-mobile-logo" aria-label="Go to Discover" onClick={() => go("discover")}>👀</button>
             {search(true)}
             {signedIn ? <Dialog.Root open={drawerOpen} onOpenChange={open => {
               if (open) drawerNavigating.current = false;
@@ -1181,17 +1184,20 @@ export function UnifiedApp({
                   </div>
                   <nav aria-label="Mobile navigation">
                     {([
-                      ["all", "My Skills", User, true],
-                      ["favorites", "Favorites", Heart, false],
-                      ["sets", "Sets", Shapes, false],
-                      ["discover", "Discover", Compass, true],
-                      ["top", "Trending", TrendingUp, false],
-                      ["creators", "Creators", Users, false],
-                      ["collections", "Collections", PlayingCardsFan, false],
-                    ] as const).map(([view, label, Icon, heading]) => <button type="button" key={view}
+                      ["all", "My Skills", User, true, ""],
+                      ["favorites", "Favorites", Heart, false, ""],
+                      ["sets", "Sets", Shapes, false, ""],
+                      ["discover", "Discover", Compass, true, ""],
+                      ["top", "Trending", TrendingUp, false, ""],
+                      ["creators", "Companies", Building2, false, "companies"],
+                      ["creators", "Creators", Users, false, ""],
+                      ["collections", "Collections", PlayingCardsFan, false, ""],
+                    ] as const).map(([view, label, Icon, heading, id]) => <button type="button" key={`${view}:${id}`}
                       className={`ua-nav-item${heading ? " ua-drawer-section" : ""}`}
-                      aria-current={(nav.view === view || (view === "sets" && nav.view === "set") || (view === "creators" && nav.view === "creator") || (view === "collections" && nav.view === "collection")) && !nav.query ? "page" : undefined}
-                      onClick={() => go(view)}><Icon /><span>{label}</span></button>)}
+                      aria-current={(view === "creators"
+                        ? (nav.view === view && nav.id === id) || (nav.view === "creator" && isCompany(nav.id) === (id === "companies"))
+                        : nav.view === view || (view === "sets" && nav.view === "set") || (view === "collections" && nav.view === "collection")) && !nav.query ? "page" : undefined}
+                      onClick={() => go(view, id)}><Icon /><span>{label}</span></button>)}
                   </nav>
                   <div className="ua-drawer-profile">{accountMenu(true)}</div>
                 </Dialog.Content>
@@ -1280,7 +1286,7 @@ export function UnifiedApp({
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
                 <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}`}>
                 <div>
-                  <h1>{title}</h1>
+                  <h1>{showCollectionPager ? "Today" : title}</h1>
                   {meta && <p>{meta}</p>}
                 </div>
                 {headingActions}
@@ -1418,22 +1424,27 @@ export function UnifiedApp({
                   </section>
                   <section>
                     <SectionHeading
+                      title="Companies"
+                      action={() => go("creators", "companies")}
+                    />
+                    {publicSection("metadata", "companies", <CreatorList items={creatorGroups.companies} limit={9} />)}
+                  </section>
+                  <section>
+                    <SectionHeading
                       title="Creators"
                       action={() => go("creators")}
                     />
-                    {publicSection("metadata", "creators", <CreatorList limit={publicStatus ? 9 : undefined} />)}
+                    {publicSection("metadata", "creators", <CreatorList items={creatorGroups.creators} limit={9} />)}
                   </section>
                   <section>
                     <SectionHeading title="Categories" />
                     <CategoryList />
                   </section>
                 </>
-              ) : nav.view === "category" && categoryGroup ? (
-                <CategoryList groups={[categoryGroup]} />
               ) : nav.view === "collections" ? (
                 <CollectionCards />
               ) : nav.view === "creators" ? (
-                <CreatorList />
+                <CreatorList items={nav.id === "companies" ? creatorGroups.companies : creatorGroups.creators} />
               ) : nav.view === "sets" ? (
                 <div className="ua-set-list">
                   <label className="ua-hidden-filter"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)} />Show hidden sets</label>
@@ -1654,41 +1665,42 @@ export function UnifiedApp({
                       <X />
                     </IconButton>
                   </Dialog.Close>
+                  {detailPending ? <Dialog.Title>Skill details</Dialog.Title> : (
+                    <div className="ua-detail-heading">
+                      <Avatar
+                        src={selected.avatar}
+                        name={selected.author || selected.name}
+                        size="large"
+                      />
+                      <div className="ua-detail-heading-copy">
+                        <Dialog.Title>{selected.name}</Dialog.Title>
+                        <div className="ua-detail-meta">
+                          {selected.author && (
+                            <button
+                              type="button"
+                              className="ua-link"
+                              onClick={() => go("creator", selected.author)}
+                            >
+                              @{selected.author}
+                            </button>
+                          )}
+                          {selected.stars !== undefined && (
+                            <span>
+                              <Star />
+                              {starCount(selected.stars)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {detailPending ? (
                   <>
-                    <Dialog.Title>Skill details</Dialog.Title>
                     <p role="status">{publicStatus.detail === "loading" ? "Loading skill..." : publicStatus.detailError}</p>
                     {publicStatus.detail === "error" && <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>}
                   </>
                 ) : <>
-                <div className="ua-detail-heading">
-                  <Avatar
-                    src={selected.avatar}
-                    name={selected.author || selected.name}
-                    size="large"
-                  />
-                  <div className="ua-detail-heading-copy">
-                    <Dialog.Title>{selected.name}</Dialog.Title>
-                    <div className="ua-detail-meta">
-                      {selected.author && (
-                        <button
-                          type="button"
-                          className="ua-link"
-                          onClick={() => go("creator", selected.author)}
-                        >
-                          @{selected.author}
-                        </button>
-                      )}
-                      {selected.stars !== undefined && (
-                        <span>
-                          <Star />
-                          {starCount(selected.stars)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
                 <div className="ua-detail-actions">
                   {selected.githubUrl ? (
                     <a
