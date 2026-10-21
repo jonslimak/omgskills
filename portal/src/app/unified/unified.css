@@ -89,8 +89,12 @@
   text-decoration: none;
 }
 .ua-theme :focus-visible {
-  outline: 2px solid var(--ua-blue);
+  outline: 2px solid var(--ua-muted);
   outline-offset: 3px;
+}
+.ua-theme :focus:not(:focus-visible),
+.ua-main:focus {
+  outline: none;
 }
 .ua-theme svg {
   width: 16px;
@@ -176,6 +180,7 @@
   gap: 7px;
   padding: 14px 16px 10px;
   height: 49px;
+  flex-shrink: 0;
 }
 .ua-brand > span {
   font-size: 19px;
@@ -237,7 +242,7 @@
   font-size: 12px;
 }
 .ua-search:focus-within {
-  outline: 2px solid var(--ua-blue);
+  outline: 2px solid var(--ua-muted);
   outline-offset: 1px;
 }
 .ua-search input:focus-visible {
@@ -299,6 +304,11 @@
 .ua-account-footer {
   border-top: 1px solid var(--ua-line);
   padding: 8px;
+}
+.ua-account-footer > .ua-primary {
+  display: flex;
+  width: calc(100% - 16px);
+  margin-inline: auto;
 }
 .ua-account {
   display: flex;
@@ -371,9 +381,12 @@
 }
 .ua-workspace[data-rail="true"] .ua-account-footer {
   padding: 8px 2px;
+  width: 100%;
 }
 .ua-workspace[data-rail="true"] .ua-account-footer > .ua-pill {
   padding: 8px;
+  width: 36px;
+  height: 36px;
 }
 .ua-workspace[data-rail="true"] .ua-account-footer > .ua-pill span {
   display: none;
@@ -527,6 +540,65 @@
   font-weight: 700;
   line-height: 1.2;
 }
+.ua-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.ua-search-personal-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 32px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ua-search-personal-toggle::-webkit-details-marker {
+  display: none;
+}
+.ua-search-personal-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.ua-search-personal-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--ua-blue);
+  white-space: nowrap;
+}
+.ua-search-personal-count svg {
+  width: 13px;
+  height: 13px;
+}
+.ua-search-personal-hide,
+.ua-search-library-label {
+  display: none;
+}
+.ua-search-personal[open] .ua-search-personal-toggle {
+  margin-bottom: 8px;
+}
+.ua-search-personal[open] .ua-search-personal-count svg {
+  display: none;
+}
+.ua-search-personal[open] .ua-search-personal-hide {
+  display: inline;
+  color: var(--ua-blue);
+  font-size: 12px;
+  font-weight: 400;
+}
+.ua-search-personal[open] + .ua-search-library .ua-search-library-label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
 .ua-link {
   display: inline-flex;
   align-items: center;
@@ -631,7 +703,7 @@
   background: var(--ua-chip);
 }
 .ua-row[data-selected="true"] {
-  background: var(--ua-selection);
+  background: var(--ua-side);
 }
 .ua-row-main {
   display: flex;
@@ -702,6 +774,16 @@
   width: 11px;
   height: 11px;
 }
+.ua-trending-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: middle;
+}
+.ua-trending-stars svg {
+  width: 10px;
+  height: 10px;
+}
 .ua-rank {
   width: 18px;
   text-align: center;
@@ -719,6 +801,16 @@
   font-size: 11px;
   font-weight: 700;
   flex-shrink: 0;
+}
+.ua-row > .ua-row-open {
+  width: 26px;
+  min-width: 26px;
+  padding: 0;
+  border-radius: 50%;
+}
+.ua-row-open svg {
+  width: 16px;
+  height: 16px;
 }
 .ua-row > .ua-icon {
   width: 28px;
@@ -1106,9 +1198,10 @@
   font-size: 10px;
   line-height: 1.35;
 }
-.ua-trending {
+.ua-trending,
+.ua-creators {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0 28px;
 }
 .ua-row-compact {
@@ -1121,11 +1214,6 @@
 }
 .ua-row-compact .ua-rank {
   width: 16px;
-}
-.ua-creators {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0 28px;
 }
 .ua-creator {
   display: flex;
@@ -1178,12 +1266,13 @@
 .ua-categories > div > div {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: 24px;
+  column-gap: 28px;
 }
 .ua-categories button {
-  display: flex;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 12px;
   align-items: center;
-  gap: 9px;
+  gap: 12px;
   min-height: 38px;
   padding: 2px 0;
   min-width: 0;
@@ -1196,6 +1285,7 @@
   overflow-wrap: anywhere;
 }
 .ua-categories button > svg:first-child {
+  justify-self: center;
   color: var(--ua-muted);
 }
 .ua-categories button > svg:last-child {
@@ -1411,16 +1501,23 @@
   flex-shrink: 0;
 }
 .ua-detail-top {
-  display: flex;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
   min-height: 28px;
-  align-items: center;
-  margin-bottom: -8px;
+  align-items: start;
 }
 .ua-detail-top .ua-icon {
+  grid-column: 2;
+  grid-row: 1;
   background: var(--ua-chip);
   width: 26px;
   height: 26px;
+}
+.ua-detail-top > :is(.ua-detail-heading, h2) {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
 }
 .ua-detail h2 {
   font-family: var(--ua-display);
@@ -1436,7 +1533,7 @@
 }
 .ua-detail-heading {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
 }
 .ua-detail-heading-copy {
@@ -1495,6 +1592,9 @@
   line-height: 1.45;
   color: var(--ua-body);
   overflow-wrap: anywhere;
+}
+.ua-description > p + p {
+  margin-top: 12px;
 }
 .ua-detail section {
   display: flex;
@@ -1725,11 +1825,6 @@
 .ua-drawer .ua-drawer-section:not(:first-child) { margin-top: 24px; }
 .ua-drawer .ua-drawer-profile { margin-top: auto; flex-shrink: 0; }
 .ua-drawer-account-menu { z-index: 52; }
-@container (min-width: 1000px) {
-  .ua-trending {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 @container (min-width: 851px) {
   .ua-creator-profile-stats > span {
     align-items: flex-end;
@@ -1764,20 +1859,18 @@
   }
 }
 @container (max-width: 650px) {
+  .ua-trending,
   .ua-creators {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .ua-collections {
     grid-template-columns: 1fr;
   }
-  .ua-trending {
-    grid-template-columns: 1fr;
-  }
   .ua-categories > div > div {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (min-width: 760px) and (max-width: 1179px) {
+@media (min-width: 760px) and (max-width: 1023px) {
   .ua-detail {
     top: 44px;
     right: 12px;
@@ -1902,14 +1995,12 @@
   .ua-row-stars {
     display: none;
   }
+  .ua-trending,
   .ua-creators {
     grid-template-columns: 1fr;
     gap: 0;
   }
   .ua-collections {
-    grid-template-columns: 1fr;
-  }
-  .ua-trending {
     grid-template-columns: 1fr;
   }
   .ua-trending .ua-row:nth-child(n + 6) {

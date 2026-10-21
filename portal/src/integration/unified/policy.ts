@@ -4,7 +4,8 @@ export const unifiedBase = "/app/integration/unified/";
 
 export function accountNavigation(nav: Navigation, signedIn: boolean): Navigation {
   if (isDiscovery(nav.view)) {
-    return { ...nav, source: "all", selected: nav.selected.startsWith("catalog:") ? nav.selected : "" };
+    const personalResult = signedIn && !!nav.query.trim() && nav.selected.startsWith("synced:");
+    return { ...nav, source: "all", selected: nav.selected.startsWith("catalog:") || personalResult ? nav.selected : "" };
   }
   if (!signedIn) return { ...initialNavigation, view: "discover" };
   if (!["all", "favorites", "sets", "set", "agents", "profile", "devices", "github", "mcp"].includes(nav.view)) return { ...initialNavigation };
@@ -16,5 +17,7 @@ export function accountNavigation(nav: Navigation, signedIn: boolean): Navigatio
 
 // Private names/search terms must never be sent to the public search service.
 export function publicNavigation(nav: Navigation): Navigation {
-  return isDiscovery(nav.view) ? nav : { ...initialNavigation };
+  return isDiscovery(nav.view)
+    ? { ...nav, selected: nav.selected.startsWith("catalog:") ? nav.selected : "" }
+    : { ...initialNavigation };
 }

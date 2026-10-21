@@ -4,6 +4,7 @@ import {
 } from "../../synced-skill-grouping";
 import { isMember, type PortalData, type PortalSet } from "../model";
 import { validPublicSort, publicPageRequest, type PublicSort } from "./public-paging";
+import { discoveryCategories } from "./discovery-categories";
 
 // Presentation fields only; the stored skill and group models stay unchanged.
 export function setAccessSummary(set: PortalSet) {
@@ -126,6 +127,13 @@ export function parseNavigation(search: string): Navigation {
     selected: params.get("skill") || "",
     source: params.get("source") || "all",
   };
+  if (nav.view === "category") {
+    const term = discoveryCategories.some(group => group.items.includes(nav.id)) ? nav.id : "";
+    nav.view = "discover";
+    nav.query ||= term;
+    nav.id = "";
+  }
+  if (nav.view === "creators" && nav.id !== "companies") nav.id = "";
   const sort = params.get("sort");
   if (validPublicSort(sort) && sort !== "relevance" && publicPageRequest(nav)?.name !== "list_trending" && publicPageRequest(nav)) nav.sort = sort;
   return nav;

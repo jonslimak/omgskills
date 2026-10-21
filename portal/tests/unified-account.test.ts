@@ -39,6 +39,25 @@ test("private search and identifiers cannot reach the public catalog hook", () =
   const discovery = { ...initialNavigation, view: "discover" as const, query: "React" };
   assert.deepEqual(publicNavigation(discovery), discovery);
 });
+test("signed-in personal search results open in place but their IDs never reach public navigation", () => {
+  const mine = skillDisplays(makeFixtures(), { skills: [], collections: [], creators: [], categories: [], trendingIds: [] }).mine;
+  for (const view of ["discover", "top", "creators", "collections", "creator", "collection"] as const) {
+    const nav = { ...initialNavigation, view, query: "design" };
+    const opened = openSkillNavigation(nav, mine[0]);
+    assert.equal(accountNavigation(opened, true).selected, mine[0].key);
+    assert.deepEqual(publicNavigation(opened), nav);
+    assert.equal(navigationSearch(publicNavigation(opened)).includes("synced"), false);
+  }
+});
+test("personal discovery selections require a signed-in user and a nonblank search", () => {
+  const search = { ...initialNavigation, view: "discover" as const, query: "design", selected: "synced:private" };
+  assert.equal(accountNavigation(search, false).selected, "");
+  for (const query of ["", "   "]) assert.equal(accountNavigation({ ...search, query }, true).selected, "");
+  assert.equal(accountNavigation({ ...search, selected: "set-item:private" }, true).selected, "");
+  const publicSkill = { ...search, selected: "catalog:public" };
+  assert.deepEqual(accountNavigation(publicSkill, false), publicSkill);
+  assert.deepEqual(publicNavigation(publicSkill), publicSkill);
+});
 test("related skills keep installed detail local and clear private context before public navigation", () => {
   const data = makeFixtures();
   const mine = skillDisplays(data, { skills: [], collections: [], creators: [], categories: [], trendingIds: [] }).mine;
