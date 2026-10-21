@@ -54,7 +54,7 @@ test("the splitter uses the Mac app's existing paragraph and period-space bounda
 test("paragraph formatting is confined to the detail description and preserves its fallback", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.equal((source.match(/descriptionParagraphs\(/g) ?? []).length, 1);
-  assert.ok(source.includes('const detailParagraphs = selected ? descriptionParagraphs(selected.description) : [];'));
+  assert.ok(source.includes('const detailParagraphs = detail ? descriptionParagraphs(detail.description) : [];'));
   assert.ok(source.includes('<div className="ua-description">'));
   assert.ok(source.includes('detailParagraphs.length ? detailParagraphs : ["No description available."]'));
   assert.ok(source.includes('<p key={index}>{paragraph}</p>'));

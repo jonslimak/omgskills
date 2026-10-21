@@ -95,8 +95,8 @@ test("Discover shows Today while search titles and other page titles stay indepe
 });
 
 test("Discover previews nine of each group and keeps direct category search buttons", () => {
-  assert.ok(source.includes('<CreatorList items={creatorGroups.companies} limit={9} />'));
-  assert.ok(source.includes('<CreatorList items={creatorGroups.creators} limit={9} />'));
+  assert.ok(source.includes('CreatorList({ items: creatorGroups.companies, limit: 9 })'));
+  assert.ok(source.includes('CreatorList({ items: creatorGroups.creators, limit: 9 })'));
   assert.ok(source.includes('action={() => go("creators", "companies")}'));
   assert.ok(source.includes('action={() => go("creators")}'));
   assert.ok(source.includes('query: item, selected: "", source: "all"'));

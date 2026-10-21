@@ -159,11 +159,22 @@ function Avatar({
   size?: "small" | "medium" | "large";
 }) {
   const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [src]);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => { setFailed(false); setLoaded(false); }, [src]);
   return (
     <span className={`ua-avatar ua-avatar-${size}`} aria-hidden="true">
       {src && !failed ? (
-        <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} />
+        <img
+          src={src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          data-loaded={loaded}
+          // Cached images can finish before React attaches onLoad.
+          ref={(img) => { if (img?.complete && img.naturalWidth) setLoaded(true); }}
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+        />
       ) : (
         name.slice(0, 2).toUpperCase() || <Lock />
       )}
@@ -180,6 +191,7 @@ function CollectionCover({ src }: { src: string }) {
       loading="lazy"
       decoding="async"
       data-loaded={loaded}
+      ref={(img) => { if (img?.complete && img.naturalWidth) setLoaded(true); }}
       onLoad={() => setLoaded(true)}
       onError={() => setLoaded(false)}
     />
@@ -456,6 +468,10 @@ export function UnifiedApp({
   const [wide, setWide] = useState(
     () => window.matchMedia("(min-width: 1024px)").matches,
   );
+  // Phones swipe through every collection instead of paging with arrows.
+  const [phone, setPhone] = useState(
+    () => window.matchMedia("(max-width: 759px)").matches,
+  );
   const main = useRef<HTMLElement>(null);
   const detailTrigger = useRef<HTMLElement | null>(null);
   const models = useMemo(() => skillDisplays(data, catalog), [data, catalog]);
@@ -472,14 +488,21 @@ export function UnifiedApp({
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
   const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected) || pendingSelection;
-  const detailParagraphs = selected ? descriptionParagraphs(selected.description) : [];
   const detailOpen = useRef(false);
   detailOpen.current = !!selected;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
   const detailPending = remoteDetail && publicStatus.detail !== "ready";
-  const relatedSkills = selected?.author
+  // Keep the last skill rendered while the panel animates out after the selection clears.
+  const closingDetail = useRef<{ skill: SkillDisplay; pending: boolean } | null>(null);
+  if (selected) closingDetail.current = { skill: selected, pending: detailPending };
+  const detail = selected ?? closingDetail.current?.skill;
+  const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
+  // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
+  const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
+  const detailParagraphs = detail ? descriptionParagraphs(detail.description) : [];
+  const relatedSkills = detail?.author
     ? library
-        .filter((skill) => skill.author === selected.author && skill.catalogId !== selected.catalogId)
+        .filter((skill) => skill.author === detail.author && skill.catalogId !== detail.catalogId)
         .slice(0, 3)
     : [];
   const activeSet = signedIn
@@ -488,6 +511,7 @@ export function UnifiedApp({
   const collection = catalog.collections.find((item) => item.id === nav.id);
   const collectionHeader = nav.view === "collection" && !nav.query ? collection : undefined;
   const showCollectionPager = nav.view === "discover" && !nav.query;
+  const swipeCollections = showCollectionPager && phone;
   const collectionPage = discoverCollectionPage(catalog.collections, collectionPageIndex);
   const collectionsReady = !publicStatus || (publicStatus.metadata ?? publicStatus.list) === "ready";
   const creator = catalog.creators.find((item) => item.handle === nav.id);
@@ -547,6 +571,12 @@ export function UnifiedApp({
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
     const change = () => setWide(mq.matches);
+    mq.addEventListener("change", change);
+    return () => mq.removeEventListener("change", change);
+  }, []);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 759px)");
+    const change = () => setPhone(mq.matches);
     mq.addEventListener("change", change);
     return () => mq.removeEventListener("change", change);
   }, []);
@@ -870,9 +900,11 @@ export function UnifiedApp({
       </div>
     );
   }
-  function CollectionCards({ items = catalog.collections }: { items?: CatalogDisplay["collections"] }) {
+  // Called as functions, not <Components>: inner components remount (and replay their
+  // entrance fade and image loads) on every render of UnifiedApp.
+  function CollectionCards({ items = catalog.collections, swipe = false }: { items?: CatalogDisplay["collections"]; swipe?: boolean }) {
     return (
-      <div className="ua-collections">
+      <div className={`ua-collections${swipe ? " ua-collections-swipe" : ""}`}>
         {items.map((item) => (
           <button
             type="button"
@@ -1242,13 +1274,6 @@ export function UnifiedApp({
                   >
                     Get the Mac app <ArrowUpRight />
                   </a>
-                  <button
-                    type="button"
-                    className="ua-pill ua-primary"
-                    onClick={signIn}
-                  >
-                    Sign in
-                  </button>
                 </div>
               )}
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
@@ -1310,7 +1335,7 @@ export function UnifiedApp({
                 </div>
                 {headingActions}
                 {nav.query && catalogSort}
-                {showCollectionPager && (
+                {showCollectionPager && !swipeCollections && (
                   <div className="ua-collection-controls" role="group" aria-label="Collection pages">
                     <IconButton
                       label="Previous collections"
@@ -1446,7 +1471,7 @@ export function UnifiedApp({
               ) : nav.view === "discover" ? (
                 <>
                   <div id="ua-discover-collections">
-                    {publicSection("metadata", "collections", <CollectionCards items={collectionPage.items} />)}
+                    {publicSection("metadata", "collections", CollectionCards({ items: swipeCollections ? catalog.collections : collectionPage.items, swipe: swipeCollections }))}
                   </div>
                   <section>
                     <SectionHeading
@@ -1464,24 +1489,24 @@ export function UnifiedApp({
                       title="Companies"
                       action={() => go("creators", "companies")}
                     />
-                    {publicSection("metadata", "companies", <CreatorList items={creatorGroups.companies} limit={9} />)}
+                    {publicSection("metadata", "companies", CreatorList({ items: creatorGroups.companies, limit: 9 }))}
                   </section>
                   <section>
                     <SectionHeading
                       title="Creators"
                       action={() => go("creators")}
                     />
-                    {publicSection("metadata", "creators", <CreatorList items={creatorGroups.creators} limit={9} />)}
+                    {publicSection("metadata", "creators", CreatorList({ items: creatorGroups.creators, limit: 9 }))}
                   </section>
                   <section>
                     <SectionHeading title="Categories" />
-                    <CategoryList />
+                    {CategoryList({})}
                   </section>
                 </>
               ) : nav.view === "collections" ? (
-                <CollectionCards />
+                CollectionCards({})
               ) : nav.view === "creators" ? (
-                <CreatorList items={nav.id === "companies" ? creatorGroups.companies : creatorGroups.creators} />
+                CreatorList({ items: nav.id === "companies" ? creatorGroups.companies : creatorGroups.creators })
               ) : nav.view === "sets" ? (
                 <div className="ua-set-list">
                   <label className="ua-hidden-filter"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)} />Show hidden sets</label>
@@ -1670,9 +1695,9 @@ export function UnifiedApp({
             </div>
           </main>
         </div>
-        {selected && (
+        {detail && (
           <Dialog.Root
-            open
+            open={!!selected}
             modal={!wide}
             onOpenChange={(show) => !show && closeDetail()}
           >
@@ -1702,29 +1727,29 @@ export function UnifiedApp({
                       <X />
                     </IconButton>
                   </Dialog.Close>
-                  {detailPending ? <Dialog.Title>Skill details</Dialog.Title> : (
+                  {!detailHeadingKnown ? <Dialog.Title>Skill details</Dialog.Title> : (
                     <div className="ua-detail-heading">
                       <Avatar
-                        src={selected.avatar}
-                        name={selected.author || selected.name}
+                        src={detail.avatar}
+                        name={detail.author || detail.name}
                         size="large"
                       />
                       <div className="ua-detail-heading-copy">
-                        <Dialog.Title>{selected.name}</Dialog.Title>
+                        <Dialog.Title>{detail.name}</Dialog.Title>
                         <div className="ua-detail-meta">
-                          {selected.author && (
+                          {detail.author && (
                             <button
                               type="button"
                               className="ua-link"
-                              onClick={() => go("creator", selected.author)}
+                              onClick={() => go("creator", detail.author)}
                             >
-                              @{selected.author}
+                              @{detail.author}
                             </button>
                           )}
-                          {selected.stars !== undefined && (
+                          {detail.stars !== undefined && (
                             <span>
                               <Star />
-                              {starCount(selected.stars)}
+                              {starCount(detail.stars)}
                             </span>
                           )}
                         </div>
@@ -1732,17 +1757,21 @@ export function UnifiedApp({
                     </div>
                   )}
                 </div>
-                {detailPending ? (
+                {panelPending ? (
                   <>
-                    <p role="status">{publicStatus.detail === "loading" ? "Loading skill..." : publicStatus.detailError}</p>
-                    {publicStatus.detail === "error" && <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>}
+                    {publicStatus?.detail === "error" ? <>
+                      <p role="status">{publicStatus.detailError}</p>
+                      <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>
+                    </> : <div className="ua-detail-skeleton" role="status" aria-label="Loading skill">
+                      <span /><span /><span /><span />
+                    </div>}
                   </>
                 ) : <>
                 <div className="ua-detail-actions">
-                  {selected.githubUrl ? (
+                  {detail.githubUrl ? (
                     <a
                       className="ua-pill ua-primary"
-                      href={selected.githubUrl}
+                      href={detail.githubUrl}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -1750,37 +1779,37 @@ export function UnifiedApp({
                     </a>
                   ) : (
                     <span className="ua-pill">
-                      {selected.installed?.isLocalOnly && <Lock />}
-                      {selected.catalogId || selected.setItemKind === "catalog" ? "Catalog skill" : selected.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
+                      {detail.installed?.isLocalOnly && <Lock />}
+                      {detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
                     </span>
                   )}
-                  {(!readOnlyAccount || management) && signedIn && (selected.installed || (management && selected.catalogId)) && (
+                  {(!readOnlyAccount || management) && signedIn && (detail.installed || (management && detail.catalogId)) && (
                     <>
                       <IconButton
                         label={
-                          isFavorite(data, selected)
+                          isFavorite(data, detail)
                             ? "Remove from favorites"
                             : "Add to favorites"
                         }
-                        data-favorite={isFavorite(data, selected)}
+                        data-favorite={isFavorite(data, detail)}
                         disabled={!!management && !canManage}
-                        onClick={() => management ? management.favorite(selected) : onFavorite(selected)}
+                        onClick={() => management ? management.favorite(detail) : onFavorite(detail)}
                       >
                         <Heart />
                       </IconButton>
                       <IconButton
                         label="Add to set"
                         disabled={!!management && !canManage}
-                        onClick={() => addToSet([selected])}
+                        onClick={() => addToSet([detail])}
                       >
                         <ListPlus />
                       </IconButton>
                     </>
                   )}
-                  {selected.githubUrl && (
+                  {detail.githubUrl && (
                     <IconButton
                       label="Copy source link"
-                      onClick={() => void copySource(selected)}
+                      onClick={() => void copySource(detail)}
                     >
                       <Copy />
                     </IconButton>
@@ -1791,16 +1820,16 @@ export function UnifiedApp({
                     <p key={index}>{paragraph}</p>
                   ))}
                 </div>
-                {selected.installed && (
+                {detail.installed && (
                   <section className="ua-detail-account">
                     <h3>On this account</h3>
                     <div>
                       <span>Observed on</span>
-                      <strong>{selected.installed.sources.join(", ")}</strong>
+                      <strong>{detail.installed.sources.join(", ")}</strong>
                     </div>
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
-                        .filter((set) => isMember(set, selected.installed!))
+                        .filter((set) => isMember(set, detail.installed!))
                         .map((set) => (
                           <button
                             type="button"
@@ -1820,31 +1849,31 @@ export function UnifiedApp({
                 <section className="ua-about">
                   <h3>About</h3>
                   <p>
-                    {selected.githubUrl
+                    {detail.githubUrl
                       ? "Read the skill's instructions and installation guidance at its source."
-                      : selected.catalogId || selected.setItemKind === "catalog"
+                      : detail.catalogId || detail.setItemKind === "catalog"
                         ? "Catalog details are unavailable. Your saved skill is still in this set."
-                        : selected.installed?.isLocalOnly ? "This skill belongs to your local library." : "No source link is available for this skill."}
+                        : detail.installed?.isLocalOnly ? "This skill belongs to your local library." : "No source link is available for this skill."}
                   </p>
-                  {selected.githubUrl && (
+                  {detail.githubUrl && (
                     <a
                       className="ua-link"
-                      href={selected.githubUrl}
+                      href={detail.githubUrl}
                       target="_blank"
                       rel="noreferrer"
                     >
                       Open on GitHub <ArrowUpRight />
                     </a>
                   )}
-                  {selected.publicUrl && (
-                    <a className="ua-link" href={selected.publicUrl} target="_blank" rel="noreferrer">
+                  {detail.publicUrl && (
+                    <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
                       View public skill page <ArrowUpRight />
                     </a>
                   )}
                 </section>
                 {relatedSkills.length > 0 && (
                   <section className="ua-more">
-                    <h3>More from @{selected.author}</h3>
+                    <h3>More from @{detail.author}</h3>
                     {relatedSkills.map((skill) => (
                         <button
                           type="button"

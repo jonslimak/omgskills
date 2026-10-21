@@ -66,8 +66,11 @@ test("collection arrows stay scoped to Discover while Collections remains unpage
   assert.ok(source.includes('label="Next collections"'));
   assert.ok(source.includes('disabled={!collectionsReady || collectionPage.index === 0}'));
   assert.ok(source.includes('disabled={!collectionsReady || collectionPage.index === collectionPage.lastIndex}'));
-  assert.ok(source.includes('<CollectionCards items={collectionPage.items} />'));
-  assert.match(source, /nav.view === "collections" \? \(\s*<CollectionCards \/>/);
+  assert.ok(source.includes('CollectionCards({ items: swipeCollections ? catalog.collections : collectionPage.items, swipe: swipeCollections })'));
+  // Phones swipe through every collection; the arrows only page on larger screens.
+  assert.ok(source.includes('const swipeCollections = showCollectionPager && phone;'));
+  assert.ok(source.includes('{showCollectionPager && !swipeCollections && ('));
+  assert.match(source, /nav.view === "collections" \? \(\s*CollectionCards\(\{\}\)/);
 });
 
 test("creator banners stay scoped to profiles, use existing identity data and replace the standalone back link", () => {
