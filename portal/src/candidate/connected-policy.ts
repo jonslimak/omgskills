@@ -41,10 +41,22 @@ export function connectedCandidateReturnUrl(value: string): string | null {
   } catch { return null; }
 }
 
+// Let Clerk consume its callback; never retain the opaque value in an app return link.
+function connectedCandidateBootstrapUrl(value: string): string | null {
+  try {
+    const url = new URL(value);
+    const handshake = url.searchParams.getAll("__clerk_handshake");
+    if (!handshake.length) return connectedCandidateReturnUrl(value);
+    if (handshake.length !== 1 || !handshake[0]) return null;
+    url.searchParams.delete("__clerk_handshake");
+    return connectedCandidateReturnUrl(url.href);
+  } catch { return null; }
+}
+
 export function requireConnectedCandidateBrowser(input: {
   profile: unknown; publishableKey: unknown; clerkFrontendOrigin: unknown;
 }, href: string) {
-  const returnUrl = connectedCandidateReturnUrl(href);
+  const returnUrl = connectedCandidateBootstrapUrl(href);
   if (input.profile !== "connected" || !returnUrl) throw new Error("Connected candidate is unavailable.");
   const clerkFrontendOrigin = connectedClerkFrontend(input.publishableKey);
   if (input.clerkFrontendOrigin !== clerkFrontendOrigin) throw new Error("Connected candidate sign-in configuration is invalid.");

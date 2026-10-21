@@ -76,6 +76,41 @@ test("return paths preserve valid pending fragments and catalog routes without a
   }
 });
 
+const handshake = "__clerk_handshake=synthetic-not-a-token";
+test("bootstrap accepts the Clerk handshake without retaining it in application return URLs", () => {
+  for (const path of ["/app/", "/app/?view=all", "/app/?view=discover&skill=catalog%3Aa%2Fb", "/app/connect" + hash]) {
+    const clean = origin + path;
+    const decorated = new URL(clean);
+    decorated.searchParams.append("__clerk_handshake", "synthetic-not-a-token");
+    assert.equal(connectedCandidateReturnUrl(decorated.href), null, "Auth callbacks are not application return links");
+    const validated = requireConnectedCandidateBrowser(config, decorated.href);
+    assert.equal(validated.returnUrl, clean);
+    assert.equal(validated.route, path.startsWith("/app/connect") ? "connect" : "app");
+    assert.doesNotMatch(validated.returnUrl, /__clerk|synthetic-not-a-token/);
+    assert.equal(decorated.searchParams.get("__clerk_handshake"), "synthetic-not-a-token");
+  }
+});
+
+test("handshake bootstrap keeps origin, route, configuration and unknown-query restrictions", () => {
+  for (const url of [
+    "https://omgskills.com/app/?" + handshake, origin + ".evil.test/app/?" + handshake,
+    origin.replace("https://", "https://user:password@") + "/app/?" + handshake,
+    origin + "/app/index.html?" + handshake, origin + "/app/?" + handshake + "#unexpected",
+    origin + "/app/?" + handshake + "&redirect=https://evil.test",
+    origin + "/app/?" + handshake + "&__clerk_unrecognized=value",
+    origin + "/app/?" + handshake + "&view=all&view=discover",
+    origin + "/app/?" + handshake + "&" + handshake,
+    origin + "/app/?__clerk_handshake=", origin + "/app/?__clerk_handshake",
+    origin + "/app/connect?" + handshake,
+    origin + "/app/connect?" + handshake + hash + "&state=duplicate",
+    origin + "/app/connect?" + handshake + "&redirect=https://evil.test" + hash,
+  ]) assert.throws(() => requireConnectedCandidateBrowser(config, url), undefined, url);
+  for (const invalid of [{ ...config, profile: "other" }, { ...config, publishableKey: "pk_live_ignored" },
+    { ...config, clerkFrontendOrigin: "https://other.clerk.accounts.dev" }]) {
+    assert.throws(() => requireConnectedCandidateBrowser(invalid, origin + "/app/?" + handshake));
+  }
+});
+
 test("candidate parses native optional permission but rejects malformed and injected fragments", () => {
   assert.equal(consent.parse(hash)?.scopes.includes("content:read"), true);
   assert.deepEqual(consent.scopes(consent.parse(hash)!), ["sync:write", "self:revoke"]);
@@ -366,8 +401,10 @@ test("candidate real account session refreshes retained per-Mac inventory and Fa
 });
 
 // Real React rendering with only auth, account snapshot and public-catalog boundaries mocked.
-async function compositionFixture(data: PortalData | null = null, href = origin + "/app/") {
+async function compositionFixture(data: PortalData | null = null, href = origin + "/app/",
+  options: { initializeClerk?: () => void; captureConsent?: boolean } = {}) {
   const captured: ComponentProps<typeof UnifiedApp>[] = [];
+  const consentProps: { pendingHash: string; isCurrent: () => boolean; policy: PairingConsentPolicy }[] = [];
   const signIns: string[] = [], accountCalls: unknown[][] = [];
   let signedIn = false, refreshes = 0, providerMounts = 0, tokenCalls = 0;
   const snapshot: AccountSnapshot = { data, refreshing: false, accessDenied: false, revision: 1,
@@ -375,7 +412,7 @@ async function compositionFixture(data: PortalData | null = null, href = origin 
   const catalog = { skills: [], collections: [], creators: [], categories: [], trendingIds: [] };
   const overrides: Record<string, unknown> = {
     "@clerk/clerk-react": {
-      ClerkProvider: ({ children }: { children: React.ReactNode }) => { providerMounts++; return children; },
+      ClerkProvider: ({ children }: { children: React.ReactNode }) => { providerMounts++; options.initializeClerk?.(); return children; },
       useAuth: () => ({ isLoaded: true, isSignedIn: signedIn, userId: "user", sessionId: "session", getToken: async () => { tokenCalls++; return "fake"; } }),
       useUser: () => ({ isLoaded: true, user: { fullName: identity.name, primaryEmailAddress: { emailAddress: identity.email } } }),
       useClerk: () => ({ openSignIn: ({ forceRedirectUrl }: { forceRedirectUrl: string }) => { signIns.push(forceRedirectUrl); }, signOut: async () => {} }),
@@ -387,6 +424,9 @@ async function compositionFixture(data: PortalData | null = null, href = origin 
     } },
     "cc2b-shell": { UnifiedApp: (props: ComponentProps<typeof UnifiedApp>) => { captured.push(props); return createElement("main", null, props.previewBar); }, Modal: () => null },
     "cc2b-public": { usePublicCatalogPreload() {}, usePublicCatalog: () => ({ catalog, status: { list: "ready", detail: "ready", retry() {}, retryDetail() {} } }) },
+    "cc2b-consent": { ConnectPage: (props: typeof consentProps[number]) => {
+      consentProps.push(props); return createElement("main", null, "Pairing consent");
+    } },
   };
   const output = await build({ entryPoints: [fileURLToPath(new URL("../src/candidate/connected-app.tsx", import.meta.url))],
     bundle: true, write: false, platform: "node", format: "cjs", packages: "external", jsx: "automatic",
@@ -394,6 +434,7 @@ async function compositionFixture(data: PortalData | null = null, href = origin 
       for (const [filter, path] of [[/\/useAccount$/, "cc2b-account"], [/\/UnifiedApp$/, "cc2b-shell"], [/\/use-public-catalog$/, "cc2b-public"]] as const) {
         plugin.onResolve({ filter }, () => ({ path, external: true }));
       }
+      if (options.captureConsent) plugin.onResolve({ filter: /\/ConnectPage$/ }, () => ({ path: "cc2b-consent", external: true }));
     } }] });
   const require = createRequire(import.meta.url);
   const module = { exports: {} as typeof import("../src/candidate/connected-app") };
@@ -406,7 +447,7 @@ async function compositionFixture(data: PortalData | null = null, href = origin 
   Object.defineProperty(globalThis, "window", { configurable: true, value: { location, sessionStorage: storage, matchMedia: () => ({ matches: true }) } });
   Object.defineProperty(globalThis, "location", { configurable: true, value: location });
   Object.defineProperty(globalThis, "history", { configurable: true, value: { replaceState() {}, pushState() {} } });
-  return { captured, signIns, accountCalls, snapshot, stored, exports: module.exports,
+  return { captured, consentProps, signIns, accountCalls, snapshot, stored, exports: module.exports,
     setSignedIn(value: boolean) { signedIn = value; },
     counts: () => ({ refreshes, providerMounts, tokenCalls }),
     restore() { for (const [key, descriptor] of descriptors) {
@@ -431,6 +472,63 @@ test("real candidate entry validates before mounting Clerk and signed-out accoun
     assert.equal(f.counts().tokenCalls, 0);
     assert.equal(f.stored.size, 0);
   } finally { f.restore(); }
+});
+
+test("callback entry leaves the opaque handshake for Clerk and does not enable signed-out account access", async () => {
+  const clean = origin + "/app/?view=all", decorated = clean + "&" + handshake;
+  const providerLocations: string[] = [];
+  const f = await compositionFixture(null, decorated, { initializeClerk() {
+    providerLocations.push(window.location.href);
+    window.location.href = clean;
+  } });
+  try {
+    const html = renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config }));
+    assert.doesNotMatch(html, /Connected candidate unavailable/);
+    assert.deepEqual(providerLocations, [decorated], "Only Clerk gets the original callback URL");
+    assert.equal(window.location.href, clean);
+    assert.equal(f.counts().providerMounts, 1);
+    assert.equal(f.accountCalls[0][2], false);
+    assert.equal(f.captured[0].signedIn, false);
+    assert.equal(f.counts().tokenCalls, 0);
+    assert.equal(f.stored.size, 0);
+    f.captured[0].onSignIn!();
+    assert.ok(f.signIns.length === 1 && f.signIns[0].startsWith(origin + "/app/"));
+    assert.doesNotMatch(f.signIns[0], /__clerk|synthetic-not-a-token/);
+  } finally { f.restore(); }
+});
+
+test("pairing remains current after Clerk removes the callback, without automatic approval", async () => {
+  const clean = origin + "/app/connect" + hash, decorated = origin + "/app/connect?" + handshake + hash;
+  const f = await compositionFixture(null, decorated, { captureConsent: true, initializeClerk() {
+    assert.equal(window.location.href, decorated);
+    window.location.href = clean;
+  } });
+  try {
+    f.setSignedIn(true);
+    renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config }));
+    assert.equal(f.consentProps.length, 1);
+    assert.equal(f.consentProps[0].pendingHash, hash);
+    const policy = f.consentProps[0].policy;
+    assert.equal(policy.disclosure, consent.disclosure);
+    assert.deepEqual(policy.scopes(policy.parse(hash)!), ["sync:write", "self:revoke"]);
+    assert.equal(f.consentProps[0].isCurrent(), true);
+    assert.equal(f.accountCalls.length, 0); assert.equal(f.counts().tokenCalls, 0);
+    assert.equal(f.stored.size, 0); assert.deepEqual(f.signIns, []);
+    window.location.hash = "#changed";
+    assert.equal(f.consentProps[0].isCurrent(), false, "Changing the request still invalidates consent");
+  } finally { f.restore(); }
+});
+
+test("a callback cannot mount Clerk or account hooks on an unapproved URL", async () => {
+  for (const href of [origin + "/app/?" + handshake + "&redirect=https://evil.test",
+    "https://omgskills.com/app/?" + handshake, origin + "/app/?" + handshake + "&" + handshake]) {
+    const f = await compositionFixture(null, href);
+    try {
+      assert.match(renderToStaticMarkup(createElement(f.exports.ConnectedCandidateApp, { configuration: config })), /unavailable/);
+      assert.equal(f.counts().providerMounts, 0); assert.equal(f.counts().tokenCalls, 0);
+      assert.deepEqual(f.accountCalls, []); assert.equal(f.stored.size, 0);
+    } finally { f.restore(); }
+  }
 });
 
 test("candidate connection sign-in preserves the fragment and never mounts inventory or auto-approves", async () => {

@@ -69,6 +69,6 @@ export function ConnectedCandidateApp({ configuration }: { configuration: Connec
   try { validated = requireConnectedCandidateBrowser(configuration, href); }
   catch { return <Unavailable />; }
   return <ClerkProvider publishableKey={validated.publishableKey}>
-    {validated.route === "connect" ? <ConnectedConsent key={href} href={href} /> : <ConnectedAccount />}
+    {validated.route === "connect" ? <ConnectedConsent key={validated.returnUrl} href={validated.returnUrl} /> : <ConnectedAccount />}
   </ClerkProvider>;
 }
