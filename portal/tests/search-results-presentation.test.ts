@@ -56,6 +56,39 @@ test("search sorting sits at the top right of the title while the subtitle spans
   assert.ok(source.includes('{!nav.query && catalogControls}'));
 });
 
+test("mobile sorting keeps the accessible native options behind a compact icon", () => {
+  assert.ok(source.includes('className="ua-filter ua-sort-filter" title="Sort skills"'));
+  assert.ok(source.includes('<ArrowUpDown className="ua-sort-icon" aria-hidden="true" />'));
+  assert.ok(source.includes('<select aria-label="Sort skills" value={nav.sort ?? "relevance"}'));
+  assert.ok(source.includes('publicSorts.map(value => <option'));
+  const mobile = styles.slice(styles.indexOf("@media (max-width: 759px)"));
+  assert.match(mobile, /\.ua-sort-filter\s*\{[^}]*width: 44px;[^}]*height: 44px;/);
+  assert.match(mobile, /\.ua-sort-filter select\s*\{[^}]*position: absolute;[^}]*opacity: 0;/);
+  assert.match(mobile, /\.ua-sort-filter\s*\{[^}]*background: transparent;/);
+  assert.match(mobile, /\.ua-sort-filter \.ua-sort-icon\s*\{[^}]*color: var\(--ua-faint\);/);
+  assert.match(styles, /\.ua-sort-icon\s*\{\s*display: none;/);
+});
+
+test("all skill rows show available mobile star counts on their title line", () => {
+  const row = source.slice(source.indexOf('  function renderRow('), source.indexOf('  function rows('));
+  const heading = row.slice(row.indexOf('<span className="ua-row-heading">'), row.indexOf('<span className="ua-row-description">'));
+  assert.ok(heading.includes('skill.stars !== undefined && ('));
+  assert.ok(heading.includes('className="ua-row-stars ua-row-stars-mobile"'));
+  assert.ok(heading.includes('aria-label={`${starCount(skill.stars)} stars`}'));
+  assert.equal(heading.includes('!compact && skill.stars'), false);
+  assert.match(styles, /\.ua-row-stars-mobile\s*\{\s*display: none;/);
+  const mobile = styles.slice(styles.indexOf("@media (max-width: 759px)"));
+  assert.match(mobile, /\.ua-row-stars-mobile\s*\{\s*display: inline-flex;[^}]*flex-shrink: 0;[^}]*margin-left: auto;/);
+  assert.match(mobile, /\.ua-row \.ua-row-heading \.ua-row-name\s*\{\s*flex-shrink: 1;\s*min-width: 0;/);
+});
+
+test("mobile Trending removes duplicate subtitle stars and their separator only on phones", () => {
+  assert.ok(source.includes('className="ua-trending-separator" aria-hidden="true"'));
+  const mobile = styles.slice(styles.indexOf("@media (max-width: 759px)"));
+  assert.match(mobile, /\.ua-trending-stars,\s*\.ua-trending-separator\s*\{\s*display: none;/);
+  assert.match(styles, /\.ua-trending-stars\s*\{\s*display: inline-flex;/);
+});
+
 test("search result counts sit beside the query subtitle without duplicating browse counts", () => {
   assert.ok(source.includes('const catalogCount = publicList && publicStatus.page ?'));
   assert.ok(source.includes('<p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p>'));
