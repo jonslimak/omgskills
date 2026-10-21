@@ -41,11 +41,42 @@ test("the expanded disclosure replaces its chevron with a Hide affordance", () =
   assert.match(styles, /\.ua-search-personal\[open\] \.ua-search-personal-hide\s*\{\s*display: inline/);
 });
 
-test("public results and paging controls remain independent of the personal disclosure", () => {
+test("public results and sorting remain independent of the personal disclosure", () => {
   const publicResults = search.slice(search.indexOf('<section className="ua-search-library">'));
-  assert.ok(publicResults.includes('{catalogControls}'));
+  assert.equal(publicResults.includes('{catalogControls}'), false);
+  assert.ok(source.includes('{nav.query && catalogSort}'));
   assert.ok(publicResults.includes('rows(matchingLibrary)'));
   assert.ok(source.includes('const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));'));
+});
+
+test("search sorting sits at the top right of the title while the subtitle spans the header", () => {
+  assert.ok(source.includes('nav.query && catalogSort ? " ua-heading-search" : ""'));
+  assert.match(styles, /\.ua-heading-search > \.ua-filter\s*\{\s*grid-column: 2;\s*grid-row: 1;/);
+  assert.match(styles, /\.ua-heading-search \.ua-search-meta\s*\{\s*grid-column: 1 \/ -1;\s*grid-row: 2;/);
+  assert.ok(source.includes('{!nav.query && catalogControls}'));
+});
+
+test("search result counts sit beside the query subtitle without duplicating browse counts", () => {
+  assert.ok(source.includes('const catalogCount = publicList && publicStatus.page ?'));
+  assert.ok(source.includes('<p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p>'));
+  assert.ok(source.includes('{!nav.query && catalogCount}'));
+  assert.equal((source.match(/\{publicStatus.loaded\} of \{publicStatus.page.total\}/g) ?? []).length, 1);
+  assert.match(styles, /\.ua-search-meta\s*\{[^}]*display: flex;[^}]*flex-wrap: wrap;/);
+  assert.match(styles, /\.ua-catalog-count\s*\{[^}]*white-space: nowrap;/);
+  assert.match(styles, /\.ua-catalog-controls > \.ua-filter\s*\{\s*margin-left: auto;/);
+});
+
+test("Enter shows the submitted query as the title without changing live search", () => {
+  assert.ok(source.includes('const [submittedQuery, setSubmittedQuery] = useState<string | null>(null);'));
+  assert.ok(source.includes('submittedQuery === nav.query ? `\\u201c${nav.query.trim()}\\u201d` : "Search results"'));
+  assert.ok(source.includes('onChange={(event) => changeQuery(event.target.value)}'));
+  assert.ok(source.includes('event.key !== "Enter" || event.nativeEvent.isComposing || !nav.query.trim()'));
+  assert.ok(source.includes('setSubmittedQuery(nav.query);'));
+  assert.ok(source.includes('enterKeyHint="search"'));
+});
+
+test("editing the query or leaving its page resets the submitted title, unlike sorting and paging", () => {
+  assert.match(source, /useEffect\(\(\) => \{\s*setSubmittedQuery\(null\);\s*\}, \[nav.query, nav.view, nav.id, signedIn\]\);/);
 });
 
 test("personal-only matches do not show a misleading Nothing matches message", () => {
