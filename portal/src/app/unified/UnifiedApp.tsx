@@ -643,6 +643,11 @@ export function UnifiedApp({
       </button>
     );
   }
+  const themeToggle = <IconButton
+    label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+    className="ua-icon ua-theme-toggle"
+    onClick={() => setTheme(current => current === "light" ? "dark" : "light")}
+  >{theme === "light" ? <Moon /> : <Sun />}</IconButton>;
   const accountMenu = (mobile = false) => (
     <Menu
       theme={theme}
@@ -1167,6 +1172,7 @@ export function UnifiedApp({
             )}
           </nav>
           <div className="ua-sidebar-bottom">
+            {themeToggle}
             <IconButton
               label={rail ? "Expand sidebar" : "Collapse sidebar"}
               onClick={() => setRail(!rail)}
@@ -1232,7 +1238,7 @@ export function UnifiedApp({
                         : nav.view === view || (view === "sets" && nav.view === "set") || (view === "collections" && nav.view === "collection")) && !nav.query ? "page" : undefined}
                       onClick={() => go(view, id)}><Icon /><span>{label}</span></button>)}
                   </nav>
-                  <div className="ua-drawer-profile">{accountMenu(true)}</div>
+                  <div className="ua-drawer-profile">{themeToggle}{accountMenu(true)}</div>
                 </Dialog.Content>
               </Dialog.Portal>
             </Dialog.Root> : (
@@ -1834,31 +1840,11 @@ export function UnifiedApp({
                     </div>}
                   </section>
                 )}
-                <section className="ua-about">
-                  <h3>About</h3>
-                  <p>
-                    {detail.githubUrl
-                      ? "Read the skill's instructions and installation guidance at its source."
-                      : detail.catalogId || detail.setItemKind === "catalog"
-                        ? "Catalog details are unavailable. Your saved skill is still in this set."
-                        : detail.installed?.isLocalOnly ? "This skill belongs to your local library." : "No source link is available for this skill."}
-                  </p>
-                  {detail.githubUrl && (
-                    <a
-                      className="ua-link"
-                      href={detail.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open on GitHub <ArrowUpRight />
-                    </a>
-                  )}
-                  {detail.publicUrl && (
-                    <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
-                      View public skill page <ArrowUpRight />
-                    </a>
-                  )}
-                </section>
+                {detail.publicUrl && (
+                  <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
+                    View public skill page <ArrowUpRight />
+                  </a>
+                )}
                 {relatedSkills.length > 0 && (
                   <section className="ua-more">
                     <h3>More from @{detail.author}</h3>
@@ -1868,8 +1854,11 @@ export function UnifiedApp({
                           key={skill.key}
                           onClick={() => open(skill)}
                         >
-                          <strong>{skill.name}</strong>
-                          <small>{skill.description}</small>
+                          <Avatar src={skill.avatar} name={skill.author || skill.name} size="small" />
+                          <span className="ua-more-copy">
+                            <strong>{skill.name}</strong>
+                            <small>{skill.description}</small>
+                          </span>
                           <ChevronRight />
                         </button>
                       ))}
