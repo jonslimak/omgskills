@@ -483,6 +483,7 @@ export function UnifiedApp({
   const collection = catalog.collections.find((item) => item.id === nav.id);
   const collectionHeader = nav.view === "collection" && !nav.query ? collection : undefined;
   const showCollectionPager = nav.view === "discover" && !nav.query;
+  const trendingHeader = nav.view === "top" && !nav.query;
   const swipeCollections = showCollectionPager && phone;
   const collectionPage = discoverCollectionPage(catalog.collections, collectionPageIndex);
   const collectionsReady = !publicStatus || (publicStatus.metadata ?? publicStatus.list) === "ready";
@@ -1051,7 +1052,7 @@ export function UnifiedApp({
               : nav.view === "creator"
                 ? creator?.tagline
                 : nav.view === "top"
-                  ? "A little inspiration for what to try next."
+                  ? "Trending skills around the world"
                   : "";
   const headingActions = listState === "ready" && !nav.query &&
     (editableView || (readOnlyAccount && signedIn && nav.view === "all")) ? (
@@ -1091,7 +1092,7 @@ export function UnifiedApp({
       {publicSorts.map(value => <option key={value} value={value}>{({ relevance: "Relevance", trending: "Trending", stars: "Stars", updated: "Recently updated", added: "Recently added", name: "Name" })[value]}</option>)}
     </select>
   </label> : null;
-  const catalogControls = publicList && publicStatus.page ? <div className="ua-catalog-controls">
+  const catalogControls = publicList && publicStatus.page && !trendingHeader ? <div className="ua-catalog-controls">
     {!nav.query && catalogCount}
     {catalogSort}
   </div> : null;
@@ -1314,10 +1315,10 @@ export function UnifiedApp({
                   <CreatorProfileDetails handle={nav.id} />
                 </header>
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
-                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : dataPage ? null : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${nav.query ? " ua-heading-search" : ""}`}>
+                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : dataPage ? null : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${trendingHeader ? " ua-heading-trending" : ""}${nav.query ? " ua-heading-search" : ""}`}>
                 <div>
                   <h1>{showCollectionPager ? "Today" : title}</h1>
-                  {meta && (nav.query ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}{catalogNote && <span role="status">{catalogNote}</span>}</p> : <p>{meta}</p>)}
+                  {meta && (nav.query ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}{catalogNote && <span role="status">{catalogNote}</span>}</p> : trendingHeader ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p> : <p>{meta}</p>)}
                 </div>
                 {headingActions}
                 {nav.query && catalogSort}

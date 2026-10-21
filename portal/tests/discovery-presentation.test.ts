@@ -105,10 +105,16 @@ test("Discover previews nine of each group and keeps direct category search butt
   assert.ok(source.includes('showCollectionPager ? "Today" : title'));
 });
 
-test("blue focus outlines are replaced locally without removing keyboard focus", () => {
-  assert.match(styles, /\.ua-theme :focus-visible\s*\{\s*outline: 2px solid var\(--ua-muted\)/);
-  assert.match(styles, /\.ua-search:focus-within\s*\{\s*outline: 2px solid var\(--ua-muted\)/);
-  assert.equal(/outline:[^;]*var\(--ua-blue\)/.test(styles), false);
+test("app focus removes hard outlines without recoloring controls", () => {
+  assert.match(styles, /\.ua-theme :focus\s*\{\s*outline: none;/);
+  assert.equal(styles.includes('--ua-focus-bg'), false);
+  for (const rule of styles.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (rule[1].includes(':focus')) {
+      assert.doesNotMatch(rule[2], /(?:background(?:-color)?|box-shadow|filter|opacity)\s*:/);
+    }
+  }
+  assert.equal(/outline:\s*[^;}]*\bsolid\b/.test(styles), false);
+  assert.equal(styles.includes('.ua-data-filter-button:focus-visible'), false);
 });
 
 test("selected skills use the sidebar background in both themes", () => {
@@ -131,6 +137,15 @@ test("Trending uses a star icon with its count rather than visible stars text", 
   assert.ok(source.includes('<Star aria-hidden="true" />{starCount(skill.stars)}'));
   assert.equal(source.includes('`${starCount(skill.stars)} stars` : ""].filter(Boolean)'), false);
   assert.match(styles, /\.ua-trending-stars\s*\{\s*display: inline-flex/);
+});
+
+test("Trending places its result count beside the worldwide subtitle without an empty control row", () => {
+  assert.ok(source.includes('const trendingHeader = nav.view === "top" && !nav.query;'));
+  assert.ok(source.includes('"Trending skills around the world"'));
+  assert.equal(source.includes("A little inspiration for what to try next."), false);
+  assert.ok(source.includes('trendingHeader ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p>'));
+  assert.ok(source.includes('const catalogControls = publicList && publicStatus.page && !trendingHeader ?'));
+  assert.ok(source.includes('trendingHeader ? " ua-heading-trending" : ""'));
 });
 
 test("Trending shares the Companies and Creators three, two and one-column breakpoints", () => {

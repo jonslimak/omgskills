@@ -118,8 +118,13 @@ test("signed-out Mac downloads sit centered below Sign in and hide in the collap
 
 test("mobile result spacing is compact without shrinking sort touch targets or Discover sections", () => {
   const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
-  assert.match(css, /@media \(max-width: 759px\)\s*\{\s*\.ua-content:has\(> :is\(\.ua-catalog-controls, \.ua-catalog-note, \.ua-heading-search, \.ua-creator-banner, \.ua-collection-banner\)\) \{ gap: 8px; \}/);
+  assert.match(css, /@media \(max-width: 759px\)\s*\{\s*\.ua-content:has\(> :is\(\.ua-catalog-controls, \.ua-catalog-note, \.ua-heading-search, \.ua-heading-trending, \.ua-creator-banner, \.ua-collection-banner\)\) \{ gap: 8px; \}/);
   assert.match(css, /\.ua-sort-filter\s*\{[^}]*width: 44px;[^}]*height: 44px;/);
+});
+
+test("result controls do not add an extra bottom margin before the skill feed", () => {
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  assert.ok(/\.ua-catalog-controls\s*\{[^}]*\bmargin: 0;/.test(css));
 });
 
 test("unified preview retains development, opt-in, loopback and preview route restrictions", () => {
