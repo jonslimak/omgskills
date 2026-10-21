@@ -757,7 +757,7 @@ export function UnifiedApp({
           <span className="ua-row-text">
             <span className="ua-row-heading">
               <span className="ua-row-name">{skill.name}</span>
-              {!compact && (discovery || nav.query) && skill.author && (
+              {!compact && !creatorHeader && (discovery || nav.query) && skill.author && (
                 <span className="ua-row-author">@{skill.author}</span>
               )}
               {skill.installed?.isLocalOnly && <Lock aria-label="Local skill" />}
@@ -1083,6 +1083,7 @@ export function UnifiedApp({
 
   const catalogCount = publicList && publicStatus.page ?
     <span className="ua-muted ua-catalog-count" role="status" aria-live="polite">{publicStatus.loaded} of {publicStatus.page.total}</span> : null;
+  const catalogNote = publicList && listState === "ready" ? publicStatus.note : "";
   const catalogSort = publicList && publicStatus.page && publicPageRequest(nav)?.name !== "list_trending" ? <label className="ua-filter ua-sort-filter" title="Sort skills">
     <ArrowUpDown className="ua-sort-icon" aria-hidden="true" />
     <span className="ua-filter-label">Sort</span>
@@ -1192,6 +1193,14 @@ export function UnifiedApp({
                 <User />
                 <span>Sign in</span>
               </button>
+              <a
+                className="ua-sidebar-download"
+                href="/downloads/omgskills-mac.dmg"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Get the Mac app"
+                title="Get the Mac app"
+              ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app</span></a>
             </div>
           )}
         </aside>
@@ -1253,17 +1262,6 @@ export function UnifiedApp({
           </header>
           <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1}>
             <div className="ua-content">
-              {!signedIn && (
-                <div className="ua-public-actions">
-                  <a
-                    href="https://omgskills.com/download"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Get the Mac app <ArrowUpRight />
-                  </a>
-                </div>
-              )}
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
                 (!signedIn && (nav.view !== "discover" || !!nav.query))) && (
                   <button
@@ -1316,10 +1314,10 @@ export function UnifiedApp({
                   <CreatorProfileDetails handle={nav.id} />
                 </header>
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
-                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : dataPage ? null : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${nav.query && catalogSort ? " ua-heading-search" : ""}`}>
+                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : dataPage ? null : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${nav.query ? " ua-heading-search" : ""}`}>
                 <div>
                   <h1>{showCollectionPager ? "Today" : title}</h1>
-                  {meta && (nav.query ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p> : <p>{meta}</p>)}
+                  {meta && (nav.query ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}{catalogNote && <span role="status">{catalogNote}</span>}</p> : <p>{meta}</p>)}
                 </div>
                 {headingActions}
                 {nav.query && catalogSort}
@@ -1400,7 +1398,7 @@ export function UnifiedApp({
                 {management.detail.catalog.state === "error" && <button type="button" className="ua-pill" onClick={management.detail.catalog.retry}>Retry catalog details</button>}
               </div>}
               {!nav.query && catalogControls}
-              {publicList && publicStatus.note && listState === "ready" && <p className="ua-muted" role="status">{publicStatus.note}</p>}
+              {!nav.query && catalogNote && <p className="ua-muted ua-catalog-note" role="status">{catalogNote}</p>}
               {publicList && !progressiveDiscover && publicListError && listState === "ready" && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">Could not refresh. Showing saved results.</span>
                 <button type="button" className="ua-pill" onClick={publicStatus.retry}>Retry</button>

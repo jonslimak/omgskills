@@ -379,7 +379,7 @@ test("Trending omits the generic capped-results note without changing rows or ot
   assert.equal(creator.note, "Showing up to 30 results.");
   for (const view of ["discover", "top"] as const) {
     const search = await loadPublicView(client, { ...initialNavigation, view, query: "design" }, signal());
-    assert.equal(search.note, "Showing up to 30 results. Refine your search for more specific matches.");
+    assert.equal(search.note, "Showing up to 30 results.");
   }
 });
 

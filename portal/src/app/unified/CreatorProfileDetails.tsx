@@ -3,16 +3,18 @@ import { loadCreatorProfiles, rankingLabels, type CreatorProfileSummary } from "
 import { starCount } from "./model";
 
 export function CreatorProfileText({ profile }: { profile: CreatorProfileSummary }) {
+  const installs = profile.totalInstalls ?? 0;
+  const showInstalls = installs > 0;
   return <div className="ua-creator-profile-text">
     {profile.description && <p className="ua-creator-profile-description">{profile.description}</p>}
     <div className="ua-creator-profile-details">
       {profile.rankings.length > 0 && <div className="ua-creator-profile-rankings">
         {profile.rankings.map(badge => <p key={badge.category}><strong>{rankingLabels[badge.category]} #{badge.rank}</strong></p>)}
       </div>}
-      {(profile.totalStars !== undefined || profile.skillCount !== undefined || profile.totalInstalls !== undefined) && <div className="ua-creator-profile-stats" role="group" aria-label="Creator statistics">
+      {(profile.totalStars !== undefined || profile.skillCount !== undefined || showInstalls) && <div className="ua-creator-profile-stats" role="group" aria-label="Creator statistics">
         {profile.totalStars !== undefined && <span><strong>{starCount(profile.totalStars)}</strong> Stars</span>}
         {profile.skillCount !== undefined && <span><strong>{profile.skillCount.toLocaleString("en")}</strong> Skills</span>}
-        {profile.totalInstalls !== undefined && <span><strong>{starCount(profile.totalInstalls)}</strong> Installs</span>}
+        {showInstalls && <span><strong>{starCount(installs)}</strong> Installs</span>}
       </div>}
     </div>
   </div>;

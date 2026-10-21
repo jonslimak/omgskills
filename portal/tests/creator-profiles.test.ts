@@ -84,6 +84,29 @@ test("creators without published totals or rankings do not render empty statisti
   assert.equal(html.includes('class="ua-creator-profile-rankings"'), false);
 });
 
+test("zero installs leave only the other statistics and no empty install group", () => {
+  for (const totalInstalls of [0, undefined]) {
+    const profile = { ...parseCreatorProfiles(source).anthropics, totalInstalls };
+    const html = renderToStaticMarkup(createElement(CreatorProfileText, { profile }));
+    assert.ok(html.includes("</strong> Stars"));
+    assert.ok(html.includes("</strong> Skills"));
+    assert.equal(html.includes(" Installs"), false);
+    assert.equal((html.match(/<span>/g) || []).length, 2);
+  }
+  const html = renderToStaticMarkup(createElement(CreatorProfileText, { profile: { totalInstalls: 0, rankings: [] } }));
+  assert.equal(html.includes('aria-label="Creator statistics"'), false);
+});
+
+test("profile feeds omit repeated authors without hiding them in search or other feeds", () => {
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.ok(app.includes('const creatorHeader = nav.view === "creator" && !nav.query;'));
+  assert.ok(app.includes('!compact && !creatorHeader && (discovery || nav.query) && skill.author'));
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  assert.match(css, /\.ua-creator-profile-stats\s*\{[^}]*justify-content: flex-end/);
+  assert.match(css, /@container \(max-width: 850px\)[\s\S]*?\.ua-creator-profile-stats\s*\{[^}]*grid-column: 2;[^}]*justify-self: start;[^}]*justify-content: flex-start/);
+  assert.match(css, /\.ua-creator-profile-stats > span \+ span::before/);
+});
+
 test("summary loads once, is read-only and independent of public catalog requests, and expires", async () => {
   let reads = 0, now = 0;
   const loader = createCreatorProfileLoader(async (url, init) => {
