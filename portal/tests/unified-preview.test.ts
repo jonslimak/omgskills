@@ -31,6 +31,15 @@ const catalog: CatalogDisplay = {
   trendingIds: [],
 };
 
+test("skill panels animate without animating the workspace layout", () => {
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  for (const [, declarations] of css.matchAll(/\.ua-workspace(?:\[[^\]]+\])?\s*\{([^}]+)\}/g)) {
+    assert.doesNotMatch(declarations, /\b(?:transition|animation)(?:-[\w-]+)?\s*:/);
+  }
+  assert.match(css, /\.ua-detail\[data-state="open"\]\s*\{\s*animation: ua-panel-in-right/);
+  assert.match(css, /\.ua-detail\[data-state="closed"\]\s*\{\s*animation: ua-panel-out-right/);
+});
+
 test("Discover pages collections in ordered groups of three without changing the full list", () => {
   const collections: CatalogDisplay["collections"] = Array.from({ length: 18 }, (_, i) => ({
     id: `collection-${i}`, name: `Collection ${i}`, description: "", skillIds: [],

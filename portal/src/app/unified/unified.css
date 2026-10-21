@@ -2193,9 +2193,6 @@
 }
 
 /* Skill panel: slides in from where it lives and leaves the same way. */
-.ua-workspace {
-  transition: padding-right 300ms var(--ua-ease-drawer);
-}
 @keyframes ua-panel-in-right { from { transform: translateX(100%); } }
 @keyframes ua-panel-out-right { to { transform: translateX(100%); } }
 @keyframes ua-panel-in-float { from { opacity: 0; transform: translateX(24px); } }
@@ -2246,7 +2243,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ua-workspace { transition: none; }
   :is(.ua-row, .ua-collection, .ua-creator, .ua-nav-item, .ua-pill, .ua-icon, .ua-categories button):active,
   .ua-row:has(> .ua-row-main:active) { transform: none; }
   .ua-detail[data-state="open"] { animation: ua-fade-in 200ms ease; }
