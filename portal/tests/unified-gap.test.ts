@@ -1,8 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { agentKind, skillDisplays } from "../src/app/unified/model";
+import { agentKind, initialNavigation, navigationSearch, parseNavigation, skillDisplays } from "../src/app/unified/model";
 import { entryNavigation } from "../src/integration/unified/entry-navigation";
+import { accountNavigation, publicNavigation } from "../src/integration/unified/policy";
 import { addCatalogMembership } from "../src/integration/membership-data";
 import { PortalApiError } from "../src/api-error";
 import type { PortalApi } from "../src/portal-api";
@@ -18,8 +19,41 @@ test("both production bases preserve legacy set links and account destinations",
     assert.equal(entryNavigation(`${base}groups/abc-123`, "", base).id, "abc-123");
     assert.equal(entryNavigation(`${base}groups/abc-123`, "", base).view, "set");
     assert.equal(entryNavigation(`${base}home`, "", base).view, "profile");
+    assert.equal(entryNavigation(`${base}agents`, "", base).view, "agents");
+    assert.equal(entryNavigation(`${base}sets`, "", base).view, "sets");
     assert.equal(entryNavigation(base, "?view=devices", base).view, "devices");
   }
+});
+test("bare app entries open Discover for both signed-in and signed-out visitors", () => {
+  for (const base of ["/", "/app/", "/app/integration/unified/", "/app/testing/unified-acceptance/"]) {
+    for (const pathname of new Set([base, base.replace(/\/$/, "") || "/"])) {
+      for (const search of ["", "?utm_source=home"]) {
+        const nav = entryNavigation(pathname, search, base);
+        assert.deepEqual(nav, { ...initialNavigation, view: "discover" });
+        for (const signedIn of [true, false]) assert.deepEqual(accountNavigation(nav, signedIn), nav);
+      }
+    }
+  }
+});
+test("My Skills has an explicit URL and all views survive reload and history navigation", () => {
+  assert.equal(navigationSearch(initialNavigation), "?view=all");
+  for (const view of ["all", "favorites", "sets", "set", "agents", "profile", "devices", "github", "mcp", "discover", "top", "creators", "collections", "creator", "collection"] as const) {
+    const nav = { ...initialNavigation, view, id: ["set", "creator", "collection"].includes(view) ? "test-id" : "" };
+    assert.deepEqual(entryNavigation("/app/", navigationSearch(nav), "/app/"), nav);
+  }
+});
+test("implicit legacy private navigation stays private instead of becoming public search", () => {
+  for (const search of ["?q=confidential", "?skill=synced%3Aprivate", "?source=Claude", "?id=private", "?sort=name", "?q="]) {
+    const nav = entryNavigation("/app/", search, "/app/");
+    assert.deepEqual(nav, parseNavigation(search));
+    assert.equal(nav.view, "all");
+    assert.deepEqual(publicNavigation(nav), initialNavigation);
+    assert.deepEqual(entryNavigation("/app/", navigationSearch(nav), "/app/"), nav);
+  }
+});
+test("unknown app routes and explicit invalid views keep their existing fallback", () => {
+  assert.deepEqual(entryNavigation("/app/missing", "", "/app/"), initialNavigation);
+  assert.deepEqual(entryNavigation("/app/", "?view=invalid", "/app/"), initialNavigation);
 });
 test("production unified shell stays explicitly opt-in and preserves connect and review", () => {
   const bootstrap = readFileSync(new URL("../src/bootstrap.ts", import.meta.url), "utf8");

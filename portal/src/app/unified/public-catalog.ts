@@ -428,6 +428,6 @@ export async function loadPublicView(client: PublicCatalogClient, nav: Navigatio
   if (metadataResult.status === "rejected") throw metadataResult.reason;
   if (listResult.status === "rejected") throw listResult.reason;
   const catalog = metadataResult.value, skills = listResult.value;
-  if (!page && !note && (query || nav.view === "creator" || nav.view === "top") && skills.length === LIST_LIMIT) note = `Showing up to ${LIST_LIMIT} results${query ? ". Refine your search for more specific matches." : "."}`;
+  if (!page && !note && (query || nav.view === "creator") && skills.length === LIST_LIMIT) note = `Showing up to ${LIST_LIMIT} results${query ? ". Refine your search for more specific matches." : "."}`;
   return client.rememberView(nav, { catalog: { ...catalog, skills, resultIds: skills.map((skill) => skill.id), trendingIds: !query && ["top", "discover"].includes(nav.view) ? skills.map((skill) => skill.id) : [] }, note, ...(page ? { page } : {}) });
 }

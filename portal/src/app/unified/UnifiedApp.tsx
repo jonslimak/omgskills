@@ -16,6 +16,7 @@ import {
   EyeOff,
   ArrowUpRight,
   Atom,
+  ChartNoAxesColumn,
   BookOpen,
   Bot,
   Braces,
@@ -103,6 +104,8 @@ import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging
 import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
 import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery-presentation";
 import { descriptionParagraphs } from "./description-paragraphs";
+import { Avatar } from "./Avatar";
+import { DataPage } from "./DataPage";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -148,38 +151,6 @@ function IconButton({
     >
       {children}
     </button>
-  );
-}
-function Avatar({
-  name,
-  src,
-  size = "small",
-}: {
-  name: string;
-  src?: string;
-  size?: "small" | "medium" | "large";
-}) {
-  const [failed, setFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => { setFailed(false); setLoaded(false); }, [src]);
-  return (
-    <span className={`ua-avatar ua-avatar-${size}`} aria-hidden="true">
-      {src && !failed ? (
-        <img
-          src={src}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          data-loaded={loaded}
-          // Cached images can finish before React attaches onLoad.
-          ref={(img) => { if (img?.complete && img.naturalWidth) setLoaded(true); }}
-          onLoad={() => setLoaded(true)}
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        name.slice(0, 2).toUpperCase() || <Lock />
-      )}
-    </span>
   );
 }
 function CollectionCover({ src }: { src: string }) {
@@ -531,13 +502,14 @@ export function UnifiedApp({
   const remoteRows = catalog.resultIds?.flatMap((id) => library.find((skill) => skill.catalogId === id) || []) || [];
   const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
   const privateSearch = readOnlyAccount && !discovery;
-  const publicList = !!publicStatus && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
+  const dataPage = nav.view === "data" && !nav.query.trim();
+  const publicList = !!publicStatus && !dataPage && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
   const setPage = !!management && ["set", "favorites"].includes(nav.view);
   const progressiveDiscover = publicList && nav.view === "discover" && !nav.query.trim();
   const metadataOnly = !nav.query.trim() && ["creators", "collections"].includes(nav.view);
   const publicListState = metadataOnly ? publicStatus?.metadata ?? publicStatus?.list : publicStatus?.list;
   const publicListError = metadataOnly ? publicStatus?.metadataError : publicStatus?.error;
-  const listState = progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state : state;
+  const listState = dataPage || progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state : state;
   const canManage = !!management && !management.blocked && !management.busy;
   const editableSet = activeSet?.role === "owner" && !activeSet.hidden && !activeSet.isFavorites;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
@@ -1042,6 +1014,7 @@ export function UnifiedApp({
     favorites: "favorites",
     sets: "sets",
     discover: "Discover",
+    data: "Data",
     top: publicStatus ? "Trending skills" : "Top this week",
     creators: nav.id === "companies" ? "Companies" : "Creators",
     collections: "Collections",
@@ -1167,6 +1140,7 @@ export function UnifiedApp({
                 {navItem("creators", "Companies", Building2, undefined, "companies")}
                 {navItem("creators", "Creators", Users)}
                 {navItem("collections", "Collections", PlayingCardsFan)}
+                {navItem("data", "Data", ChartNoAxesColumn)}
               </>
             ) : (
               <>
@@ -1250,6 +1224,7 @@ export function UnifiedApp({
                       ["creators", "Companies", Building2, false, "companies"],
                       ["creators", "Creators", Users, false, ""],
                       ["collections", "Collections", PlayingCardsFan, false, ""],
+                      ["data", "Data", ChartNoAxesColumn, false, ""],
                     ] as const).map(([view, label, Icon, heading, id]) => <button type="button" key={`${view}:${id}`}
                       className={`ua-nav-item${heading ? " ua-drawer-section" : ""}`}
                       aria-current={(view === "creators"
@@ -1335,7 +1310,7 @@ export function UnifiedApp({
                   <CreatorProfileDetails handle={nav.id} />
                 </header>
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
-                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${nav.query && catalogSort ? " ua-heading-search" : ""}`}>
+                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : dataPage ? null : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${nav.query && catalogSort ? " ua-heading-search" : ""}`}>
                 <div>
                   <h1>{showCollectionPager ? "Today" : title}</h1>
                   {meta && (nav.query ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p> : <p>{meta}</p>)}
@@ -1475,6 +1450,12 @@ export function UnifiedApp({
                     ) : rows(matchingLibrary)}
                   </section>
                 </div>
+              ) : dataPage ? (
+                <DataPage creators={catalog.creators} onCreator={handle => go("creator", handle)} onSkill={skill => open({
+                  key: `catalog:${skill.id}`, catalogId: skill.id, name: skill.name, author: skill.authorHandle,
+                  avatar: `https://github.com/${encodeURIComponent(skill.authorHandle)}.png?size=80`,
+                  description: "", githubUrl: skill.githubUrl, stars: skill.stars, tags: [],
+                })} />
               ) : nav.view === "discover" ? (
                 <>
                   <div id="ua-discover-collections">

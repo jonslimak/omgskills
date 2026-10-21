@@ -35,7 +35,7 @@ test("set and Favorites routes survive sign-in, but clear private IDs on logout"
 test("private search and identifiers cannot reach the public catalog hook", () => {
   const privateNav = { ...initialNavigation, query: "confidential", id: "private-id", selected: "synced:secret" };
   assert.deepEqual(publicNavigation(privateNav), initialNavigation);
-  assert.equal(navigationSearch(publicNavigation(privateNav)), "");
+  assert.equal(navigationSearch(publicNavigation(privateNav)), "?view=all");
   const discovery = { ...initialNavigation, view: "discover" as const, query: "React" };
   assert.deepEqual(publicNavigation(discovery), discovery);
 });

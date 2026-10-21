@@ -64,6 +64,7 @@ export type View =
   | "favorites"
   | "sets"
   | "discover"
+  | "data"
   | "top"
   | "creators"
   | "collections"
@@ -81,6 +82,7 @@ const views: View[] = [
   "favorites",
   "sets",
   "discover",
+  "data",
   "top",
   "creators",
   "collections",
@@ -140,7 +142,7 @@ export function parseNavigation(search: string): Navigation {
 }
 export function navigationSearch(nav: Navigation) {
   const params = new URLSearchParams();
-  if (nav.view !== "all") params.set("view", nav.view);
+  params.set("view", nav.view);
   if (nav.id) params.set("id", nav.id);
   if (nav.query) params.set("q", nav.query);
   if (nav.selected) params.set("skill", nav.selected);
@@ -151,6 +153,7 @@ export function navigationSearch(nav: Navigation) {
 export function isDiscovery(view: View) {
   return [
     "discover",
+    "data",
     "top",
     "creators",
     "collections",

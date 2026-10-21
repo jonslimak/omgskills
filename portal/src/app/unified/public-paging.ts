@@ -14,7 +14,7 @@ export function validPublicSort(value: unknown): value is PublicSort {
   return typeof value === "string" && publicSorts.includes(value as PublicSort);
 }
 export function publicPageRequest(nav: Navigation): PublicPageRequest | null {
-  if (!["discover", "top", "creators", "collections", "creator", "collection", "category"].includes(nav.view)) return null;
+  if (!["discover", "data", "top", "creators", "collections", "creator", "collection", "category"].includes(nav.view)) return null;
   const category = nav.view === "category" && discoveryCategories.some(group => group.items.includes(nav.id)) ? nav.id : "";
   const query = nav.query.trim() || category;
   const sort = validPublicSort(nav.sort) ? nav.sort : "relevance";
