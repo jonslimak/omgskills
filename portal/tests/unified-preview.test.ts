@@ -31,6 +31,15 @@ const catalog: CatalogDisplay = {
   trendingIds: [],
 };
 
+test("skill panels animate without animating the workspace layout", () => {
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  for (const [, declarations] of css.matchAll(/\.ua-workspace(?:\[[^\]]+\])?\s*\{([^}]+)\}/g)) {
+    assert.doesNotMatch(declarations, /\b(?:transition|animation)(?:-[\w-]+)?\s*:/);
+  }
+  assert.match(css, /\.ua-detail\[data-state="open"\]\s*\{\s*animation: ua-panel-in-right/);
+  assert.match(css, /\.ua-detail\[data-state="closed"\]\s*\{\s*animation: ua-panel-out-right/);
+});
+
 test("Discover pages collections in ordered groups of three without changing the full list", () => {
   const collections: CatalogDisplay["collections"] = Array.from({ length: 18 }, (_, i) => ({
     id: `collection-${i}`, name: `Collection ${i}`, description: "", skillIds: [],
@@ -66,8 +75,11 @@ test("collection arrows stay scoped to Discover while Collections remains unpage
   assert.ok(source.includes('label="Next collections"'));
   assert.ok(source.includes('disabled={!collectionsReady || collectionPage.index === 0}'));
   assert.ok(source.includes('disabled={!collectionsReady || collectionPage.index === collectionPage.lastIndex}'));
-  assert.ok(source.includes('<CollectionCards items={collectionPage.items} />'));
-  assert.match(source, /nav.view === "collections" \? \(\s*<CollectionCards \/>/);
+  assert.ok(source.includes('CollectionCards({ items: swipeCollections ? catalog.collections : collectionPage.items, swipe: swipeCollections })'));
+  // Phones swipe through every collection; the arrows only page on larger screens.
+  assert.ok(source.includes('const swipeCollections = showCollectionPager && phone;'));
+  assert.ok(source.includes('{showCollectionPager && !swipeCollections && ('));
+  assert.match(source, /nav.view === "collections" \? \(\s*CollectionCards\(\{\}\)/);
 });
 
 test("creator banners stay scoped to profiles, use existing identity data and replace the standalone back link", () => {
