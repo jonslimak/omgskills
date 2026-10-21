@@ -301,6 +301,10 @@
   color: var(--ua-faint);
 }
 .ua-sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   padding: 4px 8px 6px;
 }
 .ua-account-footer {
@@ -1858,17 +1862,23 @@
 }
 .ua-detail .ua-more {
   gap: 4px;
+  margin-top: auto;
 }
 .ua-more > button {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1px;
+  display: grid;
+  grid-template-columns: 27px minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 10px;
   min-height: 44px;
-  padding: 0 22px 0 8px;
+  padding: 0 8px;
   margin: 0 -8px;
   border-radius: 10px;
+}
+.ua-more-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 @media (hover: hover) and (pointer: fine) {
   .ua-more > button:hover {
@@ -1888,11 +1898,9 @@
   text-overflow: ellipsis;
   width: 100%;
 }
-.ua-more svg {
-  position: absolute;
-  right: 0;
-  top: 16px;
+.ua-more > button > svg {
   width: 12px;
+  height: 12px;
   color: var(--ua-faint);
 }
 .ua-grabber {
@@ -2038,7 +2046,16 @@
 .ua-drawer .ua-nav-item { min-height: 48px; font-size: 15px; }
 .ua-drawer .ua-drawer-section { font-weight: 700; }
 .ua-drawer .ua-drawer-section:not(:first-child) { margin-top: 24px; }
-.ua-drawer .ua-drawer-profile { margin-top: auto; flex-shrink: 0; }
+.ua-drawer .ua-drawer-profile {
+  margin-top: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding-top: 8px;
+}
+.ua-drawer-profile .ua-theme-toggle { width: 44px; height: 44px; }
 .ua-drawer-account-menu { z-index: 52; }
 @container (min-width: 851px) {
   .ua-creator-profile-stats > span {
@@ -2292,6 +2309,20 @@
   .ua-detail-top {
     position: relative;
   }
+  .ua-detail-heading {
+    position: relative;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: center;
+    row-gap: 4px;
+    min-height: 48px;
+    padding-top: 12px;
+  }
+  .ua-detail-heading-copy { display: contents; }
+  /* Keep avatar height from adding space between the title and metadata. */
+  .ua-detail-heading > .ua-avatar { position: absolute; grid-column: 1 / 2; grid-row: 1 / 2; }
+  .ua-detail-heading h2 { grid-column: 2; grid-row: 1; }
+  .ua-detail-heading .ua-detail-meta { grid-column: 2; grid-row: 2; }
   .ua-detail-top .ua-icon { width: 44px; height: 44px; }
   .ua-detail-top .ua-icon svg { width: 24px; height: 24px; }
   .ua-grabber {
@@ -2325,8 +2356,12 @@
 }
 .ua-catalog-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 0 0 20px; }
 .ua-catalog-controls > .ua-filter { margin-left: auto; }
-.ua-catalog-more { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 24px; }
+.ua-catalog-more { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 24px; text-align: center; }
 .ua-catalog-more p { margin: 0; }
+@media (max-width: 759px) {
+  .ua-content:has(> :is(.ua-catalog-controls, .ua-creator-banner, .ua-collection-banner)) { gap: 12px; }
+  .ua-catalog-controls { margin-bottom: 0; }
+}
 .ua-page-spinner { animation: ua-page-spin 1s linear infinite; }
 @keyframes ua-page-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ua-page-spinner { animation: none; } }
