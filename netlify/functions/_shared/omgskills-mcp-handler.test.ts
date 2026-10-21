@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { OmgskillsLibrary } from "../../../mcp/src/library.js";
 import type { McpLibraryLoader } from "./mcp-library.js";
-import { config, createMcpHandler } from "../omgskills-mcp.mjs";
+import { config, createMcpHandler, createCompactMcpHandler } from "../omgskills-mcp.mjs";
 
 const loadedAt = Date.now();
 const testLibrary = OmgskillsLibrary.fromData({
@@ -146,6 +146,54 @@ test("returns 503 when the catalog has never loaded", async () => {
   const handler = createMcpHandler(unavailable);
   assert.equal((await handler(rpcRequest({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }), context().value)).status, 503);
   assert.equal((await handler(new Request("https://example.test/mcp/health"), context().value)).status, 503);
+});
+
+test("enforces the actual body limit without trusting Content-Length", async () => {
+  const handler = createMcpHandler(loader());
+  for (const length of [undefined, "1"]) {
+    const request = rpcRequest({
+      jsonrpc: "2.0", id: 1, method: "tools/call",
+      params: { name: "search_skills", arguments: { query: "x".repeat(65_536) } }
+    });
+    if (length !== undefined) request.headers.set("content-length", length);
+    const callContext = context();
+    const response = await handler(request, callContext.value);
+    assert.equal(response.status, 413);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    await callContext.finish();
+  }
+});
+
+test("rejects excessive tool input before catalog callbacks, including paged inputs", async () => {
+  let searches = 0;
+  const library = Object.create(testLibrary) as typeof testLibrary;
+  library.searchSkills = () => { searches++; return []; };
+  const guardedLoader = loader({ get: async () => ({ ...(await loader().get()), library }) });
+  for (const handler of [createMcpHandler(guardedLoader), createCompactMcpHandler(guardedLoader, { paging: true })]) {
+    const callContext = context();
+    const response = await handler(rpcRequest({
+      jsonrpc: "2.0", id: 1, method: "tools/call",
+      params: { name: "search_skills", arguments: { query: "swift", extra: Array(129).fill("x") } }
+    }), callContext.value);
+    const payload = await response.json();
+    assert.equal(payload.result?.isError, true);
+    assert.match(JSON.stringify(payload.result), /limit|elements/i);
+    assert.equal(searches, 0);
+    await callContext.finish();
+  }
+});
+
+test("still accepts the maximum supported batch of 30 skill IDs", async () => {
+  const handler = createMcpHandler(loader());
+  const callContext = context();
+  const response = await handler(rpcRequest({
+    jsonrpc: "2.0", id: 1, method: "tools/call",
+    params: { name: "get_skills", arguments: { ids: Array(30).fill("example/skills:swift-review"), summary: true } }
+  }), callContext.value);
+  const payload = await response.json();
+  assert.equal(payload.result?.isError, undefined);
+  assert.equal(payload.result?.structuredContent.count, 1);
+  await callContext.finish();
 });
 
 test("binds only the public MCP routes with a rate limit", () => {

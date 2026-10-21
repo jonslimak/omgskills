@@ -85,6 +85,7 @@ export function createOmgskillsServer(library: CatalogReader, options: { paging?
       version: "0.1.1"
     },
     {
+      maxToolInputElements: 128,
       instructions: [
         "Search and inspect the public omgskills catalog. All tools are read-only.",
         "Use search_skills for discovery, get_skill for an exact stable ID, list_by_author for a known GitHub handle, and the ranked list tools for trending or curated skills.",

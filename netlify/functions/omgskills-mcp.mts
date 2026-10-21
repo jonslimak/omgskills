@@ -54,7 +54,8 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
     const server = createOmgskillsServer(snapshot.library, options);
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
-      enableJsonResponse: true
+      enableJsonResponse: true,
+      maxRequestBodySize: maximumRequestBytes
     });
 
     try {
