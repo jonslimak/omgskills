@@ -452,6 +452,7 @@ export function UnifiedApp({
   const [showHidden, setShowHidden] = useState(false);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
+  const [submittedQuery, setSubmittedQuery] = useState<string | null>(null);
   const [wide, setWide] = useState(
     () => window.matchMedia("(min-width: 1024px)").matches,
   );
@@ -533,6 +534,9 @@ export function UnifiedApp({
     main.current?.scrollTo(0, 0);
   }, [scopeKey]);
   useEffect(() => {
+    setSubmittedQuery(null);
+  }, [nav.query, nav.view, nav.id, signedIn]);
+  useEffect(() => {
     const mq = window.matchMedia("(min-width: 760px)");
     const change = () => {
       if (mq.matches) { drawerNavigating.current = true; setDrawerOpen(false); }
@@ -598,9 +602,15 @@ export function UnifiedApp({
       <span className="ua-sr">Search skills or creators</span>
       <input
         type="search"
+        enterKeyHint="search"
         placeholder="Search skills"
         value={nav.query}
         onChange={(event) => changeQuery(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key !== "Enter" || event.nativeEvent.isComposing || !nav.query.trim()) return;
+          event.preventDefault();
+          setSubmittedQuery(nav.query);
+        }}
       />
     </label>
   );
@@ -1007,7 +1017,9 @@ export function UnifiedApp({
     github: "GitHub sources",
     mcp: "MCP server",
   };
-  const title = nav.query ? "Search results" : titles[nav.view];
+  const title = nav.query
+    ? submittedQuery === nav.query ? `\u201c${nav.query.trim()}\u201d` : "Search results"
+    : titles[nav.view];
   const meta = nav.query
     ? `Results for "${nav.query}"`
     : nav.view === "all"
@@ -1053,14 +1065,17 @@ export function UnifiedApp({
     </div>
     ) : null;
 
+  const catalogCount = publicList && publicStatus.page ?
+    <span className="ua-muted ua-catalog-count" role="status" aria-live="polite">{publicStatus.loaded} of {publicStatus.page.total}</span> : null;
+  const catalogSort = publicList && publicStatus.page && publicPageRequest(nav)?.name !== "list_trending" ? <label className="ua-filter">
+    <span className="ua-filter-label">Sort</span>
+    <select aria-label="Sort skills" value={nav.sort ?? "relevance"} onChange={event => navigate({ ...nav, sort: event.target.value as PublicSort })}>
+      {publicSorts.map(value => <option key={value} value={value}>{({ relevance: "Relevance", trending: "Trending", stars: "Stars", updated: "Recently updated", added: "Recently added", name: "Name" })[value]}</option>)}
+    </select>
+  </label> : null;
   const catalogControls = publicList && publicStatus.page ? <div className="ua-catalog-controls">
-    <span className="ua-muted" role="status" aria-live="polite">{publicStatus.loaded} of {publicStatus.page.total}</span>
-    {publicPageRequest(nav)?.name !== "list_trending" && <label className="ua-filter">
-      <span className="ua-filter-label">Sort</span>
-      <select aria-label="Sort skills" value={nav.sort ?? "relevance"} onChange={event => navigate({ ...nav, sort: event.target.value as PublicSort })}>
-        {publicSorts.map(value => <option key={value} value={value}>{({ relevance: "Relevance", trending: "Trending", stars: "Stars", updated: "Recently updated", added: "Recently added", name: "Name" })[value]}</option>)}
-      </select>
-    </label>}
+    {!nav.query && catalogCount}
+    {catalogSort}
   </div> : null;
 
   return (
@@ -1288,12 +1303,13 @@ export function UnifiedApp({
                   <CreatorProfileDetails handle={nav.id} />
                 </header>
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
-                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}`}>
+                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${nav.query && catalogSort ? " ua-heading-search" : ""}`}>
                 <div>
                   <h1>{showCollectionPager ? "Today" : title}</h1>
-                  {meta && <p>{meta}</p>}
+                  {meta && (nav.query ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p> : <p>{meta}</p>)}
                 </div>
                 {headingActions}
+                {nav.query && catalogSort}
                 {showCollectionPager && (
                   <div className="ua-collection-controls" role="group" aria-label="Collection pages">
                     <IconButton
@@ -1422,7 +1438,6 @@ export function UnifiedApp({
                   </details>}
                   <section className="ua-search-library">
                     {matchingMine.length > 0 && <h2 className="ua-search-library-label">Library</h2>}
-                    {catalogControls}
                     {matchingMine.length > 0 && !matchingLibrary.length ? (
                       <Empty title="No library matches">Try a creator or a task.</Empty>
                     ) : rows(matchingLibrary)}

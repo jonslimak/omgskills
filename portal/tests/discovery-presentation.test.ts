@@ -87,10 +87,10 @@ test("legacy category groups return to Discover while exact categories remain se
   assert.equal(parseNavigation("?view=category&id=React&q=testing").query, "testing");
 });
 
-test("Discover shows Today while searches and other pages retain their titles", () => {
+test("Discover shows Today while search titles and other page titles stay independent", () => {
   assert.ok(source.includes('const showCollectionPager = nav.view === "discover" && !nav.query;'));
   assert.ok(source.includes('<h1>{showCollectionPager ? "Today" : title}</h1>'));
-  assert.ok(source.includes('const title = nav.query ? "Search results" : titles[nav.view];'));
+  assert.ok(/const title = nav.query\s*\? submittedQuery === nav.query \? .* : "Search results"\s*: titles\[nav.view\];/.test(source));
   assert.equal(source.includes("DiscoverClock"), false);
 });
 
