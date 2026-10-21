@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   ArrowUp,
   ArrowDown,
+  ArrowUpDown,
   EyeOff,
   ArrowUpRight,
   Atom,
@@ -783,13 +784,18 @@ export function UnifiedApp({
                 <span className="ua-row-author">@{skill.author}</span>
               )}
               {skill.installed?.isLocalOnly && <Lock aria-label="Local skill" />}
+              {skill.stars !== undefined && (
+                <span className="ua-row-stars ua-row-stars-mobile" aria-label={`${starCount(skill.stars)} stars`}>
+                  <Star aria-hidden="true" />{starCount(skill.stars)}
+                </span>
+              )}
             </span>
             <span className="ua-row-description">
               {compact
                 ? <>
                     {skill.author && `@${skill.author}`}
                     {skill.stars !== undefined && <>
-                      {skill.author && " · "}
+                      {skill.author && <span className="ua-trending-separator" aria-hidden="true"> · </span>}
                       <span className="ua-trending-stars" aria-label={`${starCount(skill.stars)} stars`}>
                         <Star aria-hidden="true" />{starCount(skill.stars)}
                       </span>
@@ -1099,7 +1105,8 @@ export function UnifiedApp({
 
   const catalogCount = publicList && publicStatus.page ?
     <span className="ua-muted ua-catalog-count" role="status" aria-live="polite">{publicStatus.loaded} of {publicStatus.page.total}</span> : null;
-  const catalogSort = publicList && publicStatus.page && publicPageRequest(nav)?.name !== "list_trending" ? <label className="ua-filter">
+  const catalogSort = publicList && publicStatus.page && publicPageRequest(nav)?.name !== "list_trending" ? <label className="ua-filter ua-sort-filter" title="Sort skills">
+    <ArrowUpDown className="ua-sort-icon" aria-hidden="true" />
     <span className="ua-filter-label">Sort</span>
     <select aria-label="Sort skills" value={nav.sort ?? "relevance"} onChange={event => navigate({ ...nav, sort: event.target.value as PublicSort })}>
       {publicSorts.map(value => <option key={value} value={value}>{({ relevance: "Relevance", trending: "Trending", stars: "Stars", updated: "Recently updated", added: "Recently added", name: "Name" })[value]}</option>)}
