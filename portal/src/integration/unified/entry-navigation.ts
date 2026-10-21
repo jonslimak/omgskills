@@ -8,5 +8,10 @@ export function entryNavigation(pathname: string, search: string, base: string):
   if (route.page === "agents") return { ...initialNavigation, view: "agents" };
   if (route.page === "sets") return { ...initialNavigation, view: "sets" };
   if (route.page === "home") return { ...initialNavigation, view: "profile" };
+  const params = new URLSearchParams(search);
+  // Preserve older private links that did not include an explicit view.
+  if (route.page === "skills" && !["view", "id", "q", "skill", "source", "sort"].some(key => params.has(key))) {
+    return { ...initialNavigation, view: "discover" };
+  }
   return parseNavigation(search);
 }

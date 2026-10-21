@@ -365,6 +365,24 @@ test("Discover reads metadata and nine trending skills, without collection detai
   assert.ok(paths.every((path) => !path.includes("skills-large")));
 });
 
+test("Trending omits the generic capped-results note without changing rows or other views", async () => {
+  const client = new PublicCatalogClient(async (path, init) => {
+    if (path.endsWith("manifest.json")) return json({ collections: { path: "collections-123abc.json" } });
+    if (path.includes("collections-")) return json(collections);
+    return reply(init, { skills: Array.from({ length: LIST_LIMIT }, (_, index) => skill(`author/repo:skill-${index}`)) });
+  });
+  const trending = await loadPublicView(client, { ...initialNavigation, view: "top" }, signal());
+  assert.equal(trending.note, "");
+  assert.equal(trending.catalog.skills.length, LIST_LIMIT);
+  assert.deepEqual(trending.catalog.trendingIds, trending.catalog.skills.map(skill => skill.id));
+  const creator = await loadPublicView(client, { ...initialNavigation, view: "creator", id: "author" }, signal());
+  assert.equal(creator.note, "Showing up to 30 results.");
+  for (const view of ["discover", "top"] as const) {
+    const search = await loadPublicView(client, { ...initialNavigation, view, query: "design" }, signal());
+    assert.equal(search.note, "Showing up to 30 results. Refine your search for more specific matches.");
+  }
+});
+
 test("refresh failure preserves the last good public view without mixing search scopes", async () => {
   let now = 0, fail = false;
   const client = new PublicCatalogClient(async (path, init) => {
