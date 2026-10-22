@@ -37,7 +37,10 @@ async function uniqueHandle(preferred: string): Promise<string> {
   return randomHandle();
 }
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requirePortalUser };
+
+export async function portalProfile(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, requirePortalUser } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -110,7 +113,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Profile request failed");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalProfile(req, context);
 
 export const config: Config = {
   path: "/api/portal/profile"

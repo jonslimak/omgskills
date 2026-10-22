@@ -58,7 +58,7 @@ test("read-only review disables account editing and device pairing while retaini
   const devices = renderToStaticMarkup(createElement(DevicesPanel, {
     api: async () => { assert.fail("Rendering cannot request data"); }, denied: fail, local: false, readOnly: true,
   }));
-  assert.match(devices, /<button[^>]*disabled=""[^>]*>Connect app<\/button>/);
+  assert.doesNotMatch(devices, /Connect app|Revoke connection/);
 });
 
 test("review transport blocks every write and external path before any network request", async () => {

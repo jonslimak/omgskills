@@ -67,7 +67,7 @@ test("production unified shell stays explicitly opt-in and preserves connect and
 
 test("production account bar appears only for errors, not merely for signed-in sessions", () => {
   const source = readFileSync(new URL("../src/integration/unified/Session.tsx", import.meta.url), "utf8");
-  assert.match(source, /previewBar=\{\(local \|\| sessionError \|\| \(available && snapshot\.error\)\) &&/);
+  assert.match(source, /previewBar=\{\(local \|\| sessionError \|\| \(available && \(snapshot\.error \|\| composition\?\.readOnly\)\)\) &&/);
   assert.match(source, /role="alert"/);
   assert.match(source, /aria-label="Refresh account"[^>]*onClick=\{account\.refresh\}/);
   assert.match(source, /retry=\{account\.refresh\}/);

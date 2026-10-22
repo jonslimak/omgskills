@@ -17,7 +17,10 @@ import {
 import { requirePortalUser } from "./_shared/user.js";
 import { optionalString, requireJsonObject, requireString } from "./_shared/validation.js";
 
-async function listGroups(req: Request) {
+const readDependencies = { getPgPool, requirePortalUser, findOwnedGroupIds, requireGroupAccess };
+
+async function listGroups(req: Request, dependencies = readDependencies) {
+  const { getPgPool, requirePortalUser, findOwnedGroupIds, requireGroupAccess } = dependencies;
   const user = await requirePortalUser(req);
   const pool = getPgPool();
   const candidateIds = await findOwnedGroupIds(user.id, pool);
@@ -222,14 +225,14 @@ export async function createGroup(req: Request, dependencies = createDependencie
   }
 }
 
-export default async (req: Request, _context: Context) => {
+export async function portalGroups(req: Request, _context: Context, dependencies = readDependencies) {
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
 
   try {
     if (req.method === "GET") {
-      return await listGroups(req);
+      return await listGroups(req, dependencies);
     }
     if (req.method === "POST") {
       return await createGroup(req);
@@ -249,7 +252,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Group request failed");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalGroups(req, context);
 
 export const config: Config = {
   path: "/api/portal/groups"

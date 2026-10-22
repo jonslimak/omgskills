@@ -1,0 +1,423 @@
+{
+  "version": 1,
+  "sourceCommit": "9c201c2d",
+  "preparedAt": "2026-10-14",
+  "localOrigin": "http://127.0.0.1:5199",
+  "boundary": "Fixed sample only; no live batch executed",
+  "manualRoot": "/private/tmp/omgskills-f1-6Z3PaH",
+  "cases": [
+    {
+      "id": "anthropics/skills:skills/frontend-design",
+      "agent": "codex",
+      "status": "manual-passed",
+      "manualInstructionSHA256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3",
+      "categories": [
+        "legacy",
+        "nested"
+      ],
+      "record": {
+        "id": "anthropics/skills:skills/frontend-design",
+        "name": "frontend-design",
+        "description": "Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/skills",
+        "install_cmd": "git clone https://github.com/anthropics/skills /tmp/skills && ln -s /tmp/skills/skills/frontend-design ~/.claude/skills/frontend-design",
+        "skill_md_path": "skills/frontend-design/SKILL.md",
+        "skill_md_sha": "a5333457c414d20d625f307df945842c0952ecc3"
+      }
+    },
+    {
+      "id": "blader/humanizer",
+      "agent": "claude",
+      "status": "manual-passed",
+      "manualInstructionSHA256": "0612f1dfb1672b0ea9b97e139bf1f06cabe98d8b27424fe8ff01e1fb4cc99cad",
+      "categories": [
+        "pinned",
+        "root"
+      ],
+      "record": {
+        "id": "blader/humanizer",
+        "name": "humanizer",
+        "description": "Rewrite AI-sounding text so it reads like the writer without changing what it says. Use when editing or reviewing prose for AI tells: not-X-but-Y contrasts, one-line closers, staged openers, forced triads, dashes everywhere, inflated claims, sales language, stock AI words, bold labels, or filler. Based on Wikipedia's \"Signs of AI writing.\"",
+        "author_handle": "blader",
+        "github_url": "https://github.com/blader/humanizer",
+        "install_cmd": "git clone https://github.com/blader/humanizer ~/.claude/skills/humanizer",
+        "repo_slug": "blader/humanizer",
+        "skill_md_path": "SKILL.md",
+        "repo_commit_sha": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+        "skill_tree_sha": "8ed37b6d1d98a0bbdb599d0399a4a2185eb8fa03",
+        "skill_md_sha": "19fc634208e8cc6ae55d4ff287152583216fd244",
+        "install_target_name": "humanizer"
+      }
+    },
+    {
+      "id": "anthropics/claude-code:frontend-design",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "missing-path",
+        "nested"
+      ],
+      "record": {
+        "id": "anthropics/claude-code:frontend-design",
+        "name": "frontend-design",
+        "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/claude-code",
+        "install_cmd": "git clone https://github.com/anthropics/claude-code /tmp/claude-code && ln -s /tmp/claude-code/plugins/frontend-design/skills/frontend-design ~/.claude/skills/frontend-design",
+        "skill_md_sha": "600b6db41fac7e2081c7528ec6982960892c819d"
+      }
+    },
+    {
+      "id": "anthropics/claude-code:skill-development",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "missing-path",
+        "old-alias"
+      ],
+      "record": {
+        "id": "anthropics/claude-code:skill-development",
+        "name": "Skill Development",
+        "description": "This skill should be used when the user wants to \"create a skill\", \"add a skill to plugin\", \"write a new skill\", \"improve skill description\", \"organize skill content\", or needs guidance on skill structure, progressive disclosure, or skill development best practices for Claude Code plugins.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/claude-code",
+        "install_cmd": "git clone https://github.com/anthropics/claude-code /tmp/claude-code && ln -s /tmp/claude-code/plugins/plugin-dev/skills/skill-development ~/.claude/skills/Skill Development",
+        "skill_md_sha": "ac75eedde7ad999488211738e056aff9217f806a"
+      }
+    },
+    {
+      "id": "anthropics/claude-code:hook-development",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "missing-path",
+        "old-alias"
+      ],
+      "record": {
+        "id": "anthropics/claude-code:hook-development",
+        "name": "Hook Development",
+        "description": "This skill should be used when the user asks to \"create a hook\", \"add a PreToolUse/PostToolUse/Stop hook\", \"validate tool use\", \"implement prompt-based hooks\", \"use ${CLAUDE_PLUGIN_ROOT}\", \"set up event-driven automation\", \"block dangerous commands\", or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/claude-code",
+        "install_cmd": "git clone https://github.com/anthropics/claude-code /tmp/claude-code && ln -s /tmp/claude-code/plugins/plugin-dev/skills/hook-development ~/.claude/skills/Hook Development",
+        "skill_md_sha": "d1c0c199c70e8cef8fee8d3b792b0a27ff33046c"
+      }
+    },
+    {
+      "id": "coreyhaines31/marketingskills:aso-audit",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "missing-path"
+      ],
+      "record": {
+        "id": "coreyhaines31/marketingskills:aso-audit",
+        "name": "aso-audit",
+        "description": "When the user wants to audit or optimize an App Store or Google Play listing. Also use when the user mentions 'ASO audit,' 'app store optimization,' 'optimize my app listing,' 'improve app visibility,' 'app store ranking,' 'audit my listing,' 'why aren't people downloading my app,' 'improve my app conversion,' 'keyword optimization for app,' or 'compare my app to competitors.' Use when the user shares an App Store or Google Play URL and wants to improve it.",
+        "author_handle": "coreyhaines31",
+        "github_url": "https://github.com/coreyhaines31/marketingskills",
+        "install_cmd": "git clone https://github.com/coreyhaines31/marketingskills /tmp/marketingskills && ln -s /tmp/marketingskills/skills/aso-audit ~/.claude/skills/aso-audit",
+        "skill_md_sha": "296cad554713d7f6fe5115bf227274e9717ac646"
+      }
+    },
+    {
+      "id": "coreyhaines31/marketingskills:skills/seo-audit",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "nested"
+      ],
+      "record": {
+        "id": "coreyhaines31/marketingskills:skills/seo-audit",
+        "name": "seo-audit",
+        "description": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\" \"technical SEO,\" \"why am I not ranking,\" \"SEO issues,\" \"on-page SEO,\" \"meta tags review,\" \"SEO health check,\" \"my traffic dropped,\" \"lost rankings,\" \"not showing up in Google,\" \"site isn't ranking,\" \"Google update hit me,\" \"page speed,\" \"core web vitals,\" \"crawl errors,\" or \"indexing issues.\" Use this even if the user just says something vague like \"my SEO is bad\" or \"help with SEO\" — start with an audit. For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema. For AI search optimization, see ai-seo.",
+        "author_handle": "coreyhaines31",
+        "github_url": "https://github.com/coreyhaines31/marketingskills",
+        "install_cmd": "git clone https://github.com/coreyhaines31/marketingskills /tmp/marketingskills && ln -s /tmp/marketingskills/skills/seo-audit ~/.claude/skills/seo-audit",
+        "skill_md_path": "skills/seo-audit/SKILL.md",
+        "skill_md_sha": "af014ef82989c61a672cdab26cd898821ef9518b"
+      }
+    },
+    {
+      "id": "vercel-labs/agent-skills:skills/web-design-guidelines",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "missing-path"
+      ],
+      "record": {
+        "id": "vercel-labs/agent-skills:skills/web-design-guidelines",
+        "name": "web-design-guidelines",
+        "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+        "author_handle": "vercel-labs",
+        "github_url": "https://github.com/vercel-labs/agent-skills",
+        "install_cmd": "git clone https://github.com/vercel-labs/agent-skills /tmp/agent-skills && ln -s /tmp/agent-skills/skills/web-design-guidelines ~/.claude/skills/web-design-guidelines",
+        "skill_md_sha": "ceae92ab319216a68274168fba9b63b998b65997"
+      }
+    },
+    {
+      "id": "vercel-labs/ai:ai-sdk",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "pinned",
+        "old-alias"
+      ],
+      "record": {
+        "id": "vercel-labs/ai:ai-sdk",
+        "name": "ai-sdk",
+        "description": "Answer questions about the AI SDK and help build AI-powered features. Use when developers: (1) Ask about AI SDK functions like generateText, streamText, ToolLoopAgent, embed, or tools, (2) Want to build AI agents, chatbots, RAG systems, or text generation features, (3) Have questions about AI providers (OpenAI, Anthropic, Google, etc.), streaming, tool calling, structured output, or embeddings, (4) Use React hooks like useChat or useCompletion. Triggers on: \"AI SDK\", \"Vercel AI SDK\", \"generateText\", \"streamText\", \"add AI to my app\", \"build an agent\", \"tool calling\", \"structured output\", \"useChat\".",
+        "author_handle": "vercel-labs",
+        "github_url": "https://github.com/vercel/ai",
+        "install_cmd": "git clone https://github.com/vercel/ai /tmp/ai && ln -s /tmp/ai/skills/use-ai-sdk ~/.claude/skills/ai-sdk",
+        "repo_slug": "vercel/ai",
+        "skill_md_path": "skills/use-ai-sdk/SKILL.md",
+        "repo_commit_sha": "5028fa46b4b4e695bf0d80e968db43268e9ec5ef",
+        "skill_tree_sha": "f0a63823ca82c30c6af320e94cbed1d769503196",
+        "skill_md_sha": "728d06bbcea6cb2c128c01e114a123ebcc20e638",
+        "install_target_name": "ai-sdk"
+      }
+    },
+    {
+      "id": "vercel-labs/claude-skills:vercel-composition-patterns",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "pinned",
+        "old-alias"
+      ],
+      "record": {
+        "id": "vercel-labs/claude-skills:vercel-composition-patterns",
+        "name": "vercel-composition-patterns",
+        "description": "React composition patterns that scale. Use when refactoring components with boolean prop proliferation, building flexible component libraries, or designing reusable APIs. Triggers on tasks involving compound components, render props, context providers, or component architecture. Includes React 19 API changes.",
+        "author_handle": "vercel-labs",
+        "github_url": "https://github.com/vercel-labs/agent-skills",
+        "install_cmd": "git clone https://github.com/vercel-labs/agent-skills /tmp/agent-skills && ln -s /tmp/agent-skills/skills/composition-patterns ~/.claude/skills/vercel-composition-patterns",
+        "repo_slug": "vercel-labs/agent-skills",
+        "skill_md_path": "skills/composition-patterns/SKILL.md",
+        "repo_commit_sha": "063bee94c3f4df8453406c830b0a7df0f2860278",
+        "skill_tree_sha": "bf90d0a4b83ea054653350f9c67f6de235d3a368",
+        "skill_md_sha": "d07025bf943345bc1cf15eb923594f889ff881f0",
+        "install_target_name": "vercel-composition-patterns"
+      }
+    },
+    {
+      "id": "vercel-labs/deepsec:deepsec",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "pinned",
+        "old-alias"
+      ],
+      "record": {
+        "id": "vercel-labs/deepsec:deepsec",
+        "name": "deepsec-docs",
+        "description": "Use deepsec (an AI-powered vulnerability scanner) — one-shot initialization, resumable setup, project/model credentials, scans, generated or hand-authored matchers, and plugins. Activates when the user asks how to initialize, scan, configure, resume, or extend deepsec.",
+        "author_handle": "vercel-labs",
+        "github_url": "https://github.com/vercel-labs/deepsec",
+        "install_cmd": "git clone https://github.com/vercel-labs/deepsec /tmp/deepsec && ln -s /tmp/deepsec/packages/deepsec ~/.claude/skills/deepsec-docs",
+        "repo_slug": "vercel-labs/deepsec",
+        "skill_md_path": "packages/deepsec/SKILL.md",
+        "repo_commit_sha": "4fa67220aff67ac93dfc840206d3d32bfa4411ec",
+        "skill_tree_sha": "1b695ae3784045a0ebc03ad1973e7ca3db700d3a",
+        "skill_md_sha": "45e047614d14ba6c289458b646a6ec6cf3c378b0",
+        "install_target_name": "deepsec-docs"
+      }
+    },
+    {
+      "id": "anthropics/skills:docx",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "companion-files"
+      ],
+      "record": {
+        "id": "anthropics/skills:docx",
+        "name": "docx",
+        "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', '.dotx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx or .dotx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/skills",
+        "install_cmd": "git clone https://github.com/anthropics/skills /tmp/skills && ln -s /tmp/skills/skills/docx ~/.claude/skills/docx",
+        "skill_md_path": "skills/docx/SKILL.md",
+        "skill_md_sha": "fb954a460a1ea2294e9595e87fecce8df043eeba"
+      }
+    },
+    {
+      "id": "anthropics/skills:canvas-design",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "binary-companions",
+        "large-package"
+      ],
+      "record": {
+        "id": "anthropics/skills:canvas-design",
+        "name": "canvas-design",
+        "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/skills",
+        "install_cmd": "git clone https://github.com/anthropics/skills /tmp/skills && ln -s /tmp/skills/skills/canvas-design ~/.claude/skills/canvas-design",
+        "skill_md_path": "skills/canvas-design/SKILL.md",
+        "skill_md_sha": "9f63fee82de84cd4230e1d0e322247b61eb4c94c"
+      }
+    },
+    {
+      "id": "anthropics/skills:pptx",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "pinned",
+        "companion-files"
+      ],
+      "record": {
+        "id": "anthropics/skills:pptx",
+        "name": "pptx",
+        "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/skills",
+        "install_cmd": "git clone https://github.com/anthropics/skills /tmp/skills && ln -s /tmp/skills/skills/pptx ~/.claude/skills/pptx",
+        "repo_slug": "anthropics/skills",
+        "skill_md_path": "skills/pptx/SKILL.md",
+        "repo_commit_sha": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+        "skill_tree_sha": "64529c8b3f35fe632b7256bd2f6d46e4b40160ce",
+        "skill_md_sha": "41cd2306977f269bb1d8169a9643b35053aa66bd",
+        "install_target_name": "pptx"
+      }
+    },
+    {
+      "id": "openai/skills:pdf",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "pinned",
+        "dot-directory"
+      ],
+      "record": {
+        "id": "openai/skills:pdf",
+        "name": "pdf",
+        "description": "Use when tasks involve reading, creating, or reviewing PDF files where rendering and layout matter; prefer visual checks by rendering pages (Poppler) and use Python tools such as `reportlab`, `pdfplumber`, and `pypdf` for generation and extraction.",
+        "author_handle": "openai",
+        "github_url": "https://github.com/openai/skills",
+        "install_cmd": "git clone https://github.com/openai/skills /tmp/skills && ln -s /tmp/skills/skills/.curated/pdf ~/.claude/skills/pdf",
+        "repo_slug": "openai/skills",
+        "skill_md_path": "skills/.curated/pdf/SKILL.md",
+        "repo_commit_sha": "49f948faa9258a0c61caceaf225e179651397431",
+        "skill_tree_sha": "4cffaac4541278a5b142f9773e8a83ccbabc9231",
+        "skill_md_sha": "fd5d56058f10202e4f50a30bc2906f39696024a1",
+        "install_target_name": "pdf"
+      }
+    },
+    {
+      "id": "microsoft/skills:.github/plugins/azure-sdk-dotnet/skills/azure-ai-openai-dotnet",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "dot-directory"
+      ],
+      "record": {
+        "id": "microsoft/skills:.github/plugins/azure-sdk-dotnet/skills/azure-ai-openai-dotnet",
+        "name": "azure-ai-openai-dotnet",
+        "description": "Azure OpenAI SDK for .NET. Client library for Azure OpenAI and OpenAI services. Use for chat completions, embeddings, image generation, audio transcription, and assistants. Triggers: \"Azure OpenAI\", \"AzureOpenAIClient\", \"ChatClient\", \"chat completions .NET\", \"GPT-4\", \"embeddings\", \"DALL-E\", \"Whisper\", \"OpenAI .NET\".",
+        "author_handle": "microsoft",
+        "github_url": "https://github.com/microsoft/skills",
+        "install_cmd": "git clone https://github.com/microsoft/skills /tmp/skills && ln -s /tmp/skills/.github/plugins/azure-sdk-dotnet/skills/azure-ai-openai-dotnet ~/.claude/skills/azure-ai-openai-dotnet",
+        "skill_md_path": ".github/plugins/azure-sdk-dotnet/skills/azure-ai-openai-dotnet/SKILL.md",
+        "skill_md_sha": "4c15f34a6a12e0a7d1f198ce5a61508168c51d54"
+      }
+    },
+    {
+      "id": "anthropics/claude-agent-sdk-python:verify",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "pinned",
+        "dot-directory"
+      ],
+      "record": {
+        "id": "anthropics/claude-agent-sdk-python:verify",
+        "name": "verify",
+        "description": "Drive this repo's build/release scripts end-to-end without touching the network. Use when verifying changes to scripts/download_cli.py, scripts/build_wheel.py, scripts/update_cli_version.py, or scripts/_cli_version_validation.py.",
+        "author_handle": "anthropics",
+        "github_url": "https://github.com/anthropics/claude-agent-sdk-python",
+        "install_cmd": "git clone https://github.com/anthropics/claude-agent-sdk-python /tmp/claude-agent-sdk-python && ln -s /tmp/claude-agent-sdk-python/.claude/skills/verify ~/.claude/skills/verify",
+        "repo_slug": "anthropics/claude-agent-sdk-python",
+        "skill_md_path": ".claude/skills/verify/SKILL.md",
+        "repo_commit_sha": "9c69ce7aced5cdf2aa1ac86fe62e877b4962de8b",
+        "skill_tree_sha": "dd651e01df3b14f7e15ac05d110c20bcbffc7789",
+        "skill_md_sha": "49b608dde372b78b45afd5612b5b12899f43e370",
+        "install_target_name": "verify"
+      }
+    },
+    {
+      "id": "obra/superpowers:systematic-debugging",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "pinned",
+        "nested"
+      ],
+      "record": {
+        "id": "obra/superpowers:systematic-debugging",
+        "name": "systematic-debugging",
+        "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+        "author_handle": "obra",
+        "github_url": "https://github.com/obra/superpowers",
+        "install_cmd": "git clone https://github.com/obra/superpowers /tmp/superpowers && ln -s /tmp/superpowers/skills/systematic-debugging ~/.claude/skills/systematic-debugging",
+        "repo_slug": "obra/superpowers",
+        "skill_md_path": "skills/systematic-debugging/SKILL.md",
+        "repo_commit_sha": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+        "skill_tree_sha": "9a48dfda84bf339cba4b03fd803ba0dca2e158e3",
+        "skill_md_sha": "095d194ac041502905f15b01d22d294fb94db8b2",
+        "install_target_name": "systematic-debugging"
+      }
+    },
+    {
+      "id": "hardikpandya/stop-slop:stop-slop",
+      "agent": "claude",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "root"
+      ],
+      "record": {
+        "id": "hardikpandya/stop-slop:stop-slop",
+        "name": "stop-slop",
+        "description": "Remove AI writing patterns from prose. Use when drafting, editing, or reviewing text to eliminate predictable AI tells.",
+        "author_handle": "hardikpandya",
+        "github_url": "https://github.com/hardikpandya/stop-slop",
+        "install_cmd": "git clone https://github.com/hardikpandya/stop-slop ~/.claude/skills/stop-slop",
+        "skill_md_path": "SKILL.md",
+        "skill_md_sha": "83f2032fde406e97492ec48ee05ebe46f6403109"
+      }
+    },
+    {
+      "id": "browser-use/video-use",
+      "agent": "codex",
+      "status": "pending",
+      "categories": [
+        "legacy",
+        "root"
+      ],
+      "record": {
+        "id": "browser-use/video-use",
+        "name": "video-use",
+        "description": "Edit any video by conversation. Transcribe, cut, color grade, generate overlay animations, burn subtitles — for talking heads, montages, tutorials, travel, interviews. No presets, no menus. Ask questions, confirm the plan, execute, iterate, persist. Production-correctness rules are hard; everything else is artistic freedom.",
+        "author_handle": "browser-use",
+        "github_url": "https://github.com/browser-use/video-use",
+        "install_cmd": "git clone https://github.com/browser-use/video-use ~/.claude/skills/video-use",
+        "skill_md_path": "SKILL.md",
+        "skill_md_sha": "fa4b776d94cbc6ae500c1a8e2c1be9b2486a93d2"
+      }
+    }
+  ]
+}

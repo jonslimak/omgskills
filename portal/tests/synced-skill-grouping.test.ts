@@ -110,3 +110,16 @@ test("does not fuzzy-merge a catalog skill with an unresolved skill", () => {
 
   assert.equal(groups.length, 2);
 });
+
+test("v3 retains same-name/catalog missing, current, other-agent and unknown-Mac physical rows", () => {
+  const base: SyncedSkill = { inventoryVersion: 3, id: "missing", deviceId: "mac-a", name: "Same skill",
+    description: "Same description", catalogSkillId: "owner/repo:same", githubUrl: null,
+    isLocalOnly: true, source: "codex", lastSeenAt: "2026-10-16T12:00:00Z", isCurrent: false };
+  const skills = [base, { ...base, id: "other-mac", deviceId: "mac-b", isCurrent: true },
+    { ...base, id: "other-agent", source: "claude" }, { ...base, id: "unknown-a", deviceId: null },
+    { ...base, id: "unknown-b", deviceId: null }];
+  const grouped = groupSyncedSkills(skills);
+  assert.equal(grouped.length, 5);
+  assert.deepEqual(grouped.map(skill => skill.allSkillIds), skills.map(skill => [skill.id]));
+  assert.equal(grouped.find(skill => skill.id === "missing")?.isCurrent, false);
+});

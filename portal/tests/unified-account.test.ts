@@ -93,7 +93,12 @@ test("unified authenticated entry remains inside the local integration guard and
   assert.ok(bootstrap.indexOf("isLocalIntegration({") < bootstrap.indexOf('import("./integration/unified/main")'));
   for (const file of ["main.tsx", "Session.tsx", "useAccount.ts"]) {
     const source = readFileSync(new URL(`../src/integration/unified/${file}`, import.meta.url), "utf8");
-    assert.doesNotMatch(source, /makeFixtures|preview\/fixtures|sessionStorage|localStorage/);
+    assert.doesNotMatch(source, /makeFixtures|preview\/fixtures|localStorage/);
+    if (file === "Session.tsx") {
+      assert.match(source, /installClient && base === "\/app\/"\s*\? new InstallIntentStore\(\(\) => window.sessionStorage, installClient, "normal"\)/);
+      assert.match(source, /catalogInstallEnabled && base === "\/app\/"\s*\? new CatalogInstallIntentStore\(\(\) => window.sessionStorage\)/);
+      assert.equal(source.match(/sessionStorage/g)?.length, 2, "Only the two separately gated public install intents use storage here");
+    } else assert.doesNotMatch(source, /sessionStorage/);
   }
 });
 

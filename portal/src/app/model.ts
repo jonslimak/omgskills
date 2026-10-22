@@ -1,4 +1,4 @@
-import type { GroupedSyncedSkill, SyncedSkill } from "../synced-skill-grouping";
+import type { GroupedSyncedSkill, SyncedSkill, ScanCoverage } from "../synced-skill-grouping";
 
 export type Visibility = "public" | "restricted" | "private";
 export const visibilityLabels: Record<Visibility, string> = {
@@ -36,9 +36,13 @@ export type PortalDevice = {
   id: string;
   name: string;
   lastActive: string;
-  status: "active" | "revoked" | "expired";
+  status: "active" | "revoked" | "expired" | "inactive";
+  lastReportedAt?: string | null;
+  lastCheckedAt?: string | null;
+  scanCoverage?: ScanCoverage[] | null;
 };
 export type PortalData = {
+  inventoryVersion?: 2 | 3;
   skills: SyncedSkill[];
   sets: PortalSet[];
   devices: PortalDevice[];

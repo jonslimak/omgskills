@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "observedAt": "2026-10-09T19:57:40.092Z",
+  "removedPaths": [
+    "/private/tmp/omgskills-f1-u0pGXL",
+    "/Users/jonslimak/.codex/worktrees/newmac-f1-core/omgskills/menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-u0pGXL"
+  ],
+  "stoppedPids": [
+    68877,
+    66492
+  ],
+  "unregisteredApp": "/Users/jonslimak/.codex/worktrees/newmac-f1-core/omgskills/menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-u0pGXL/OMGSkills F1 Test.app",
+  "publicExecutableSHA256": "34f3aa9b7a96766463f7e827e521e20a4282c3ff2f71bdbe2bec9b1bc44065b1",
+  "preservedProcesses": [
+    {
+      "pid": 4331,
+      "command": "/Users/omgtest/Applications/omgskills.app/Contents/MacOS/omgskills"
+    },
+    {
+      "pid": 17951,
+      "command": "/Applications/omgskills.app/Contents/MacOS/omgskills"
+    },
+    {
+      "pid": 82256,
+      "command": "/Users/jonslimak/.npm/_npx/71532357b95fd94b/node_modules/node/bin/node ../node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5191 --strictPort"
+    }
+  ],
+  "scope": "Only named F3a temporary run and bundle; no public release or global URL-handler reset",
+  "acceptanceSHA256BeforeCleanup": "bc46fe072275441ede7e7c84d529fa2a2650083e87c51ed6502321383ebdf43f",
+  "urlHandlers": {
+    "production": "/Applications/omgskills.app",
+    "test": null
+  },
+  "port5198": "No listening process after cleanup",
+  "archiveCopies": "Six archived files hash-verified in implementation and primary checkouts before deletion and after cleanup",
+  "cleanupRecovery": "Initial deletion stopped with ENOTEMPTY. Inspection found only the sealed test package. Its exact SKILL.md blob was verified before making only its two owned directories writable and finishing removal. A read-back assertion then mistook the absent URL-handler property for a mismatch; explicit null normalization confirmed the test handler is absent.",
+  "browserTabs": "Untouched; old localhost pages no longer served"
+}

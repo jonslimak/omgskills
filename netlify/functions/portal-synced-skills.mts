@@ -1,9 +1,18 @@
 import type { Config, Context } from "@netlify/functions";
 import { getPgPool } from "./_shared/db.js";
-import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
+import { errorResponse, secretJsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
+import { inventoryReadVersion, readSyncInventory } from "./_shared/sync-inventory-read.js";
+import { requireLocalInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requirePortalUser, readSyncInventory };
+type Dependencies = typeof defaultDependencies & {
+  getEnvironment?: () => Record<string, string | undefined>;
+  requireReconciliation?: typeof requireLocalInventoryReconciliation;
+};
+
+export async function portalSyncedSkills(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
+  const { getPgPool, requirePortalUser, readSyncInventory } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -12,38 +21,22 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
+    const version = inventoryReadVersion(req, true);
+    if (version === 3) {
+      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env,
+        context.deploy?.context, "/api/portal/synced-skills");
+    }
     const user = await requirePortalUser(req);
-    const result = await getPgPool().query(
-      `
-        SELECT
-          id,
-          stable_key AS "stableKey",
-          skill_md_sha AS "skillMdSha",
-          identity_status AS "identityStatus",
-          name,
-          description,
-          catalog_skill_id AS "catalogSkillId",
-          github_url AS "githubUrl",
-          is_local_only AS "isLocalOnly",
-          source,
-          is_current AS "isCurrent",
-          last_seen_at AS "lastSeenAt"
-        FROM synced_skills
-        WHERE user_id = $1
-          AND is_current = true
-        ORDER BY lower(name), source
-      `,
-      [user.id]
-    );
-
-    return jsonResponse(req, { skills: result.rows });
+    return secretJsonResponse(req, await readSyncInventory(getPgPool(), user.id, version));
   } catch (error) {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());
     }
     return errorResponse(req, 500, "Failed to load synced skills");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalSyncedSkills(req, context);
 
 export const config: Config = {
   path: "/api/portal/synced-skills"

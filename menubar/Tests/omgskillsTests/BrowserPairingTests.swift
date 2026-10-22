@@ -103,4 +103,24 @@ struct BrowserPairingTests {
             )
         }
     }
+
+    @Test func connectedCallbackRequiresExplicitSchemeAndStillValidatesState() throws {
+        let code = "pair_" + String(repeating: "a", count: 43)
+        let approved = URL(string: "omgskills-f1://pair?code=\(code)&state=\(request.state)")!
+        let cancelled = URL(string: "omgskills-f1://pair?error=access_denied&state=\(request.state)")!
+        #expect(throws: BrowserPairingError.invalidCallback) {
+            try BrowserPairing.parseCallback(approved, expectedState: request.state)
+        }
+        #expect(try BrowserPairing.parseCallback(approved, expectedState: request.state,
+            callbackScheme: BrowserPairing.connectedTestCallbackScheme) == .approved(pairingCode: code))
+        #expect(try BrowserPairing.parseCallback(cancelled, expectedState: request.state,
+            callbackScheme: BrowserPairing.connectedTestCallbackScheme) == .cancelled)
+        #expect(throws: BrowserPairingError.stateMismatch) {
+            try BrowserPairing.parseCallback(approved, expectedState: "other", callbackScheme: BrowserPairing.connectedTestCallbackScheme)
+        }
+        #expect(throws: BrowserPairingError.invalidCallback) {
+            try BrowserPairing.parseCallback(URL(string: "custom://pair?code=\(code)&state=\(request.state)")!,
+                expectedState: request.state, callbackScheme: "custom")
+        }
+    }
 }

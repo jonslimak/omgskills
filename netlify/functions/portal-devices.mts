@@ -11,7 +11,10 @@ function deviceIdFromPath(req: Request) {
   return parts.length === 4 ? parts[3] : null;
 }
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requirePortalUser, listUserDevices, revokeOwnedDevice };
+
+export async function portalDevices(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, requirePortalUser, listUserDevices, revokeOwnedDevice } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -44,7 +47,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Device request failed");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalDevices(req, context);
 
 export const config = {
   path: ["/api/portal/devices", "/api/portal/devices/:deviceId"],

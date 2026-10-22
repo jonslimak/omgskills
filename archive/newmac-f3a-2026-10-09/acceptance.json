@@ -1,0 +1,157 @@
+{
+  "stage": "F3a",
+  "status": "passed_locally",
+  "root": "/private/tmp/omgskills-f1-u0pGXL",
+  "browserRefresh": {
+    "status": "user_confirmed",
+    "details": "Same skill/setup remained visible after refresh."
+  },
+  "cancel": {
+    "status": "user_reported_and_empty_home_verified",
+    "details": "User reported an initial wrong click, then correct cancellation. Read-back found the test home empty and no managed store; the expected isolated app was running."
+  },
+  "install": {
+    "passed": true,
+    "observedAt": "2026-10-09T19:33:21.190Z",
+    "unchanged": [],
+    "snapshots": [
+      {
+        "skill": "writing-guidelines",
+        "fileCount": 1,
+        "totalBytes": 1233,
+        "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+        "tree": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+        "link": "/tmp/omgskills-f1-u0pGXL/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/B395BF28-770B-4B97-8A07-58FBCD748D71/content",
+        "packageLink": "/tmp/omgskills-f1-u0pGXL/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+        "resolvedContent": "/private/tmp/omgskills-f1-u0pGXL/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+        "provenance": {
+          "catalogSkillId": "vercel-labs/agent-skills:skills/writing-guidelines",
+          "targetScope": "user_global",
+          "githubUrl": "https://github.com/vercel-labs/agent-skills",
+          "releaseId": "063bee94c3f4df8453406c830b0a7df0f2860278",
+          "skillMdSha": "63facf310252a990d154bed12b3dcdd295ba771a",
+          "installMode": "snapshot",
+          "sourceId": "github:vercel-labs/agent-skills:skills/writing-guidelines",
+          "targetRootIdentifier": "codex-user-global",
+          "targetAgent": "codex",
+          "installedAt": "2026-10-09T19:32:15Z",
+          "treeSha": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+          "sourceKind": "public_github",
+          "commitSha": "063bee94c3f4df8453406c830b0a7df0f2860278"
+        },
+        "provenanceSha256": "25e425267626bfa4925cd69f504a9a9a4e95d988919c786ef773de99f4fb31dd",
+        "provenanceModifiedAt": "2026-10-09T19:32:15.540Z",
+        "activationCount": 1,
+        "files": [
+          {
+            "path": "SKILL.md",
+            "blob": "63facf310252a990d154bed12b3dcdd295ba771a",
+            "bytes": 1233,
+            "mode": "100644"
+          }
+        ]
+      }
+    ]
+  },
+  "discovery": {
+    "passed": true,
+    "observedAt": "2026-10-09T19:33:34.873Z",
+    "method": "skills/list",
+    "freshProcess": true,
+    "home": "/private/tmp/omgskills-f1-u0pGXL/home",
+    "errors": [],
+    "skills": [
+      {
+        "installedSkill": "writing-guidelines",
+        "codexName": "writing-guidelines",
+        "enabled": true,
+        "scope": "user",
+        "path": "/private/tmp/omgskills-f1-u0pGXL/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content/SKILL.md",
+        "commit": "063bee94c3f4df8453406c830b0a7df0f2860278"
+      }
+    ],
+    "modelCalls": 0
+  },
+  "repeat": {
+    "passed": true,
+    "observedAt": "2026-10-09T19:48:28.859Z",
+    "unchanged": [
+      "writing-guidelines"
+    ],
+    "snapshots": [
+      {
+        "skill": "writing-guidelines",
+        "fileCount": 1,
+        "totalBytes": 1233,
+        "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+        "tree": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+        "link": "/tmp/omgskills-f1-u0pGXL/managed/activations/6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/B395BF28-770B-4B97-8A07-58FBCD748D71/content",
+        "packageLink": "/tmp/omgskills-f1-u0pGXL/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+        "resolvedContent": "/private/tmp/omgskills-f1-u0pGXL/managed/packages/58d6bdf590f4e5dcc8d9426d80d0685d8ec11cf2b97af7e8248d433c1ce3b34d/e523936396574f2f412897998366572e8a5b5f2ef63a00cc03fb54a020140be3/content",
+        "provenance": {
+          "catalogSkillId": "vercel-labs/agent-skills:skills/writing-guidelines",
+          "targetScope": "user_global",
+          "githubUrl": "https://github.com/vercel-labs/agent-skills",
+          "releaseId": "063bee94c3f4df8453406c830b0a7df0f2860278",
+          "skillMdSha": "63facf310252a990d154bed12b3dcdd295ba771a",
+          "installMode": "snapshot",
+          "sourceId": "github:vercel-labs/agent-skills:skills/writing-guidelines",
+          "targetRootIdentifier": "codex-user-global",
+          "targetAgent": "codex",
+          "installedAt": "2026-10-09T19:32:15Z",
+          "treeSha": "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8",
+          "sourceKind": "public_github",
+          "commitSha": "063bee94c3f4df8453406c830b0a7df0f2860278"
+        },
+        "provenanceSha256": "25e425267626bfa4925cd69f504a9a9a4e95d988919c786ef773de99f4fb31dd",
+        "provenanceModifiedAt": "2026-10-09T19:32:15.540Z",
+        "activationCount": 1,
+        "files": [
+          {
+            "path": "SKILL.md",
+            "blob": "63facf310252a990d154bed12b3dcdd295ba771a",
+            "bytes": 1233,
+            "mode": "100644"
+          }
+        ]
+      }
+    ],
+    "userConfirmed": "Already installed; Done showed no changes."
+  },
+  "boundaries": {
+    "productionDeployment": false,
+    "signedSetupTested": false,
+    "modelCalls": 0
+  },
+  "completedAt": "2026-10-09T19:48:28.859Z",
+  "verification": {
+    "portalTestsPassed": 249,
+    "newIntentComponentTests": 17,
+    "nativeTestsPassed": 34,
+    "nativeSuites": 7,
+    "typecheck": "passed",
+    "productionBuilds": [
+      "normal",
+      "unified"
+    ],
+    "productionFilesScanned": [
+      8,
+      11
+    ],
+    "testSetupAbsentFromProductionOutput": true,
+    "publicAppSHA256BeforeAndAfter": "34f3aa9b7a96766463f7e827e521e20a4282c3ff2f71bdbe2bec9b1bc44065b1"
+  },
+  "limitations": [
+    "User-operated browser/native acceptance, not automated browser screenshots.",
+    "Prompt and click counts were not measured.",
+    "A preinstalled Debug app was used; real signed download/setup and G1-G4 remain open.",
+    "Cleanup, scoped commit, push and release have not happened."
+  ],
+  "cleanup": {
+    "status": "pending_approval",
+    "root": "/private/tmp/omgskills-f1-u0pGXL",
+    "app": "/Users/jonslimak/.codex/worktrees/newmac-f1-core/omgskills/menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-u0pGXL/OMGSkills F1 Test.app",
+    "serverPID": 66492,
+    "serverPort": 5198
+  }
+}

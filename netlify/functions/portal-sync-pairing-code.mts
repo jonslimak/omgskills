@@ -1,5 +1,6 @@
 import type { Context } from "@netlify/functions";
 import {
+  browserPairingCallbackTarget,
   browserPairingCallbackUrl,
   isBrowserPairingState
 } from "./_shared/browser-pairing.js";
@@ -15,7 +16,13 @@ import { errorResponse, optionsResponse, secretJsonResponse } from "./_shared/ht
 import { requirePortalUser } from "./_shared/user.js";
 import { requireJsonObject } from "./_shared/validation.js";
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requirePortalUser, issuePairingCode, getEnvironment: () => process.env };
+type Dependencies = typeof defaultDependencies & {
+  callbackTarget?: typeof browserPairingCallbackTarget;
+};
+
+export async function portalSyncPairingCode(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
+  const { getPgPool, requirePortalUser, issuePairingCode, getEnvironment } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -24,7 +31,11 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
+    const callbackTarget = (dependencies.callbackTarget ?? browserPairingCallbackTarget)(req, getEnvironment(), context.deploy?.context);
     const body = await requireJsonObject(req);
+    if (Object.keys(body).some((key) => !["state", "codeChallenge", "codeChallengeMethod", "scopes"].includes(key))) {
+      throw new Response("Unsupported pairing field", { status: 400 });
+    }
     const challengeValue = body.codeChallenge;
     const methodValue = body.codeChallengeMethod;
     const stateValue = body.state;
@@ -54,7 +65,7 @@ export default async (req: Request, _context: Context) => {
     });
     return secretJsonResponse(req, browserState
       ? {
-          callbackUrl: browserPairingCallbackUrl(pairing.code, browserState),
+          callbackUrl: browserPairingCallbackUrl(pairing.code, browserState, callbackTarget),
           expiresAt: pairing.expiresAt.toISOString()
         }
       : {
@@ -73,7 +84,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Failed to create pairing code");
   }
-};
+}
+
+export default async (req: Request, context: Context) => portalSyncPairingCode(req, context);
 
 export const config = {
   path: "/api/portal/sync-pairing-code",

@@ -68,7 +68,7 @@ export async function reconcileSyncedGroupReferences(
   }
   const skills = await client.query<ReconciliationSkill>(
     `SELECT id, stable_key AS "stableKey", source, skill_md_sha AS sha, is_current AS current
-     FROM synced_skills WHERE user_id = $1`,
+     FROM synced_skills WHERE user_id = $1 AND device_id IS NULL`,
     [userId],
   );
   const items = await client.query<ReconciliationItem>(

@@ -1,0 +1,30 @@
+{
+  "catalogObservedAt": "2026-10-09T14:55:50Z",
+  "sources": [
+    {
+      "key": "humanizer",
+      "label": "Humanizer (blader)",
+      "id": "blader/humanizer",
+      "repository": "blader/humanizer",
+      "path": "SKILL.md",
+      "observedCommit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+      "previousCommit": "29deb74c89fc12d01c6eab433252c869ce08ad7b"
+    },
+    {
+      "key": "writing-guidelines",
+      "label": "Writing Guidelines (vercel-labs)",
+      "id": "vercel-labs/agent-skills:skills/writing-guidelines",
+      "repository": "vercel-labs/agent-skills",
+      "path": "skills/writing-guidelines/SKILL.md",
+      "observedCommit": "063bee94c3f4df8453406c830b0a7df0f2860278"
+    },
+    {
+      "key": "seo-audit",
+      "label": "SEO Audit (coreyhaines31)",
+      "id": "coreyhaines31/marketingskills:skills/seo-audit",
+      "repository": "coreyhaines31/marketingskills",
+      "path": "skills/seo-audit/SKILL.md",
+      "observedCommit": "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff"
+    }
+  ]
+}

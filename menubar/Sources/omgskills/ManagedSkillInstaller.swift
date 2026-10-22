@@ -278,6 +278,22 @@ actor ManagedSkillInstaller {
     private let beforeSubscriptionWrite: BeforeSubscriptionWrite
     private var mutationInProgress = false
 
+    private struct PublicInstallBase: Equatable, Sendable {
+        let targetLink: String
+        let activation: URL
+        let packageLink: String
+        let provenanceData: Data
+    }
+
+    private struct PreparedPublicInstall: Sendable {
+        let review: PublicSkillInstallReview
+        let request: ManagedSkillInstallRequest
+        let package: SkillPackage
+        let base: PublicInstallBase?
+    }
+
+    private var preparedPublicInstall: PreparedPublicInstall?
+
     init(
         managedRoot: URL = ManagedSkillInstaller.defaultManagedRoot,
         pathAnchor: URL = FileManager.default.homeDirectoryForCurrentUser,
@@ -301,12 +317,15 @@ actor ManagedSkillInstaller {
 
     func install(
         _ request: ManagedSkillInstallRequest,
+        policy: SkillInstallPolicy = .existingBehavior,
         loadPackage: PackageLoader
     ) async throws -> InstallResult {
         try beginMutation()
         defer { endMutation() }
-        try recoverPendingTransaction()
+        if policy == .existingBehavior { try recoverPendingTransaction() }
+        else if pathExists(journalURL, fileManager: .default) { throw InstallError.operationInProgress }
         try validate(request)
+        if policy == .newOnly { try requireNewCatalogDestination(request) }
 
         let package = try await loadPackage()
         try Task.checkCancellation()
@@ -317,7 +336,110 @@ actor ManagedSkillInstaller {
         )
 
         let packageContent = try storePackage(package, for: request)
-        return try activate(packageContent: packageContent, request: request)
+        return try activate(packageContent: packageContent, request: request, policy: policy)
+    }
+
+    func recognizesCatalogInstall(_ request: ManagedSkillInstallRequest) throws -> Bool {
+        let target = request.destination.rootURL.appendingPathComponent(request.destination.targetName)
+        try requireDirectoryChain(request.destination.rootURL, under: pathAnchor)
+        guard let activation = try existingManagedActivation(at: target, fileManager: .default),
+              let data = try? Data(contentsOf: activation.appendingPathComponent("provenance.json")),
+              let provenance = try? JSONDecoder().decode(SkillInstallProvenance.self, from: data) else { return false }
+        let expectedParent = activationsRoot.appendingPathComponent(
+            stableKey("\(request.destination.rootIdentifier):\(request.destination.targetName)"))
+        return activation.deletingLastPathComponent() == expectedParent
+            && provenance.catalogSkillId == request.catalogSkillId && provenance.githubUrl == request.githubUrl
+            && provenance.sourceKind == ManagedSkillSourceKind.catalog.rawValue
+            && provenance.sourceId == request.sourceId && provenance.groupId == nil
+            && provenance.targetAgent == request.destination.agent.rawValue
+            && provenance.targetScope == request.destination.scope.rawValue
+            && provenance.targetRootIdentifier == request.destination.rootIdentifier
+    }
+
+    private func requireNewCatalogDestination(_ request: ManagedSkillInstallRequest) throws {
+        try requireDirectoryChain(request.destination.rootURL, under: pathAnchor)
+        try requireDirectoryChain(request.destination.rootURL.appendingPathComponent(".omgskills"), under: pathAnchor)
+        try CatalogInstallFilesystem.requireVacant(root: request.destination.rootURL, name: request.destination.targetName)
+    }
+
+    func preparePublicInstall(
+        _ source: PublicSkillInstallRequest,
+        package: SkillPackage,
+        filesystemPaths: SkillFilesystemPaths
+    ) throws -> PublicSkillInstallReview {
+        try beginMutation()
+        defer { endMutation() }
+        guard preparedPublicInstall == nil else { throw InstallError.operationInProgress }
+        try Task.checkCancellation()
+        guard filesystemPaths.homeDirectory.standardizedFileURL == pathAnchor else {
+            throw PublicSkillReviewError.destinationConflict
+        }
+        if let commit = source.commitSha, commit != package.coordinates.commitSha.lowercased() {
+            throw SkillPackageValidationError(code: .commitShaMismatch, path: nil)
+        }
+        _ = try SkillPackageValidator.validate(package, expected: package.coordinates, limits: limits)
+        let request = ManagedSkillInstallRequest(
+            sourceKind: .publicGitHub, sourceId: source.sourceID,
+            releaseId: package.coordinates.commitSha.lowercased(),
+            groupRevision: nil,
+            catalogSkillId: source.catalogID, githubUrl: source.githubURL,
+            expectedCoordinates: package.coordinates, mode: .snapshot,
+            destination: ManagedSkillDestination(
+                agent: .codex, scope: .userGlobal, rootIdentifier: "codex-user-global",
+                rootURL: filesystemPaths.codexSkillsRoot, targetName: source.targetName
+            )
+        )
+        try validate(request)
+        let current = try publicInstallState(for: request)
+        let action: PublicSkillInstallReview.Action = current.package == nil ? .install
+            : current.package?.coordinates == package.coordinates ? .unchanged : .update
+        let review = PublicSkillInstallReview(
+            id: UUID(), action: action, source: source,
+            destination: request.destination.rootURL.appendingPathComponent(source.targetName),
+            fromCoordinates: current.package?.coordinates, toCoordinates: package.coordinates,
+            changes: try PublicSkillPackageReview.changes(from: current.package, to: package)
+        )
+        preparedPublicInstall = PreparedPublicInstall(
+            review: review, request: request, package: package, base: current.base
+        )
+        return review
+    }
+
+    func cancelPublicInstall(reviewID: UUID) {
+        if preparedPublicInstall?.review.id == reviewID { preparedPublicInstall = nil }
+    }
+
+    func applyPublicInstall(reviewID: UUID) throws -> PublicSkillInstallReview.Action {
+        try beginMutation()
+        defer { endMutation() }
+        guard let prepared = preparedPublicInstall, prepared.review.id == reviewID else {
+            throw PublicSkillReviewError.staleReview
+        }
+        // A failed or completed apply needs a fresh review; never reuse stale consent.
+        defer { preparedPublicInstall = nil }
+        try Task.checkCancellation()
+        guard try publicInstallState(for: prepared.request).base == prepared.base else {
+            throw PublicSkillReviewError.staleReview
+        }
+        if prepared.review.action == .unchanged { return .unchanged }
+
+        let content = try storePackage(prepared.package, for: prepared.request)
+        let activation = try prepareActivation(packageContent: content, request: prepared.request)
+        do {
+            try beforeActivationSwitch()
+            try Task.checkCancellation()
+            guard try publicInstallState(for: prepared.request).base == prepared.base else {
+                throw PublicSkillReviewError.staleReview
+            }
+            try switchTarget(
+                prepared.review.destination,
+                to: activation.appendingPathComponent("content", isDirectory: true)
+            )
+            return prepared.review.action
+        } catch {
+            try? FileManager.default.removeItem(at: activation)
+            throw error
+        }
     }
 
     func installGroupSnapshot(
@@ -644,6 +766,100 @@ actor ManagedSkillInstaller {
 
     private func endMutation() {
         mutationInProgress = false
+    }
+
+    private func publicInstallState(
+        for request: ManagedSkillInstallRequest
+    ) throws -> (base: PublicInstallBase?, package: SkillPackage?) {
+        // Reviews are read-only. A pending group recovery must be handled by its owner.
+        guard !pathExists(journalURL, fileManager: .default) else {
+            throw InstallError.invalidTransactionJournal
+        }
+        let destination = request.destination
+        let otherRoot = pathAnchor.appendingPathComponent(".agents/skills", isDirectory: true)
+        try requireDirectoryChain(destination.rootURL, under: pathAnchor)
+        try requireDirectoryChain(otherRoot, under: pathAnchor)
+        let alternate = otherRoot.appendingPathComponent(destination.targetName)
+        let legacyRecord = SkillInstallProvenanceStore.metadataURL(
+            targetRoot: destination.rootURL, targetName: destination.targetName
+        )
+        guard !pathExists(alternate, fileManager: .default),
+              !pathExists(legacyRecord, fileManager: .default) else {
+            throw PublicSkillReviewError.destinationConflict
+        }
+        let activationParent = activationsRoot.appendingPathComponent(
+            stableKey("\(destination.rootIdentifier):\(destination.targetName)"), isDirectory: true
+        )
+        try requireDirectoryChain(activationParent, under: managedRoot)
+        try requireDirectoryChain(packageRoot(for: request), under: managedRoot)
+        try requireDirectoryChain(stagingRoot, under: managedRoot)
+
+        let target = destination.rootURL.appendingPathComponent(destination.targetName)
+        guard let activation = try existingManagedActivation(at: target, fileManager: .default) else {
+            return (nil, nil)
+        }
+        guard activation.deletingLastPathComponent() == activationParent else {
+            throw PublicSkillReviewError.ownershipConflict
+        }
+        try requireDirectoryChain(activation, under: managedRoot)
+        let provenanceURL = activation.appendingPathComponent("provenance.json")
+        let attributes = try FileManager.default.attributesOfItem(atPath: provenanceURL.path)
+        guard attributes[.type] as? FileAttributeType == .typeRegular,
+              let size = attributes[.size] as? NSNumber, size.intValue <= 64 * 1024 else {
+            throw InstallError.invalidManagedActivation
+        }
+        let provenanceData = try Data(contentsOf: provenanceURL)
+        let provenance = try JSONDecoder().decode(SkillInstallProvenance.self, from: provenanceData)
+        guard provenance.sourceKind == request.sourceKind.rawValue,
+              provenance.sourceId == request.sourceId,
+              provenance.groupId == nil, provenance.groupRoute == nil, provenance.groupRevision == nil,
+              provenance.targetAgent == destination.agent.rawValue,
+              provenance.targetScope == destination.scope.rawValue,
+              provenance.targetRootIdentifier == destination.rootIdentifier,
+              provenance.installMode == ManagedSkillInstallMode.snapshot.rawValue,
+              let commit = provenance.commitSha, provenance.releaseId == commit,
+              let tree = provenance.treeSha, let skillMD = provenance.skillMdSha else {
+            throw PublicSkillReviewError.ownershipConflict
+        }
+        let content = packagesRoot.appendingPathComponent(stableKey(request.sourceId))
+            .appendingPathComponent(stableKey(commit)).appendingPathComponent("content", isDirectory: true)
+        guard symlinkDestination(of: activation.appendingPathComponent("content"), fileManager: .default) == content else {
+            throw PublicSkillReviewError.ownershipConflict
+        }
+        try requireDirectoryChain(content, under: managedRoot)
+        let coordinates = SkillPackageCoordinates(commitSha: commit, treeSha: tree, skillMdSha: skillMD)
+        let package: SkillPackage
+        do {
+            package = try readPackage(from: content, coordinates: coordinates)
+            _ = try SkillPackageValidator.validate(package, expected: coordinates, limits: limits)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            throw PublicSkillReviewError.localChanges
+        }
+        return (PublicInstallBase(
+            targetLink: try FileManager.default.destinationOfSymbolicLink(atPath: target.path),
+            activation: activation,
+            packageLink: try FileManager.default.destinationOfSymbolicLink(atPath: activation.appendingPathComponent("content").path),
+            provenanceData: provenanceData
+        ), package)
+    }
+
+    private func requireDirectoryChain(_ url: URL, under anchor: URL) throws {
+        guard let relative = relativePath(of: url, under: anchor) else {
+            throw PublicSkillReviewError.destinationConflict
+        }
+        var current = anchor
+        let parts = relative == "." ? [] : relative.split(separator: "/").map(String.init)
+        for part in [""] + parts {
+            if !part.isEmpty { current.appendPathComponent(part, isDirectory: true) }
+            if pathExists(current, fileManager: .default) {
+                let attributes = try FileManager.default.attributesOfItem(atPath: current.path)
+                guard attributes[.type] as? FileAttributeType == .typeDirectory else {
+                    throw PublicSkillReviewError.destinationConflict
+                }
+            }
+        }
     }
 
     private func makeGroupPlan(
@@ -1323,7 +1539,8 @@ actor ManagedSkillInstaller {
 
     private func activate(
         packageContent: URL,
-        request: ManagedSkillInstallRequest
+        request: ManagedSkillInstallRequest,
+        policy: SkillInstallPolicy = .existingBehavior
     ) throws -> InstallResult {
         let fileManager = FileManager.default
         let destination = request.destination
@@ -1331,17 +1548,31 @@ actor ManagedSkillInstaller {
             destination.targetName,
             isDirectory: true
         )
+        if policy == .newOnly { try requireNewCatalogDestination(request) }
         let existingManaged = try existingManagedActivation(
             at: targetURL,
             fileManager: fileManager
         )
+        if policy == .newOnly {
+            try fileManager.createDirectory(at: destination.rootURL, withIntermediateDirectories: true)
+        }
         let activation = try prepareActivation(packageContent: packageContent, request: request)
         do {
             try beforeActivationSwitch()
-            try switchTarget(
-                targetURL,
-                to: activation.appendingPathComponent("content", isDirectory: true)
-            )
+            if policy == .newOnly {
+                try Task.checkCancellation()
+                try requireNewCatalogDestination(request)
+                // symlink() is exclusive; unlike rename(), it cannot replace a racing destination.
+                do {
+                    try fileManager.createSymbolicLink(at: targetURL,
+                        withDestinationURL: activation.appendingPathComponent("content", isDirectory: true))
+                } catch {
+                    if pathExists(targetURL, fileManager: fileManager) { throw SkillInstaller.InstallError.destinationConflict }
+                    throw error
+                }
+            } else {
+                try switchTarget(targetURL, to: activation.appendingPathComponent("content", isDirectory: true))
+            }
             return existingManaged == nil ? .installed : .updated
         } catch {
             try? fileManager.removeItem(at: activation)
@@ -1482,19 +1713,22 @@ actor ManagedSkillInstaller {
         coordinates: SkillPackageCoordinates
     ) throws -> SkillPackage {
         let fileManager = FileManager.default
+        var enumerationFailed = false
         guard let enumerator = fileManager.enumerator(
             at: contentRoot,
-            includingPropertiesForKeys: [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey],
+            includingPropertiesForKeys: [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey],
             options: [],
-            errorHandler: { _, _ in false }
+            errorHandler: { _, _ in enumerationFailed = true; return false }
         ) else {
             throw InstallError.invalidStoredPackage
         }
 
         var entries: [SkillPackageEntry] = []
+        var totalBytes = 0
         while let item = enumerator.nextObject() as? URL {
+            try Task.checkCancellation()
             let values = try item.resourceValues(
-                forKeys: [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey]
+                forKeys: [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey]
             )
             if values.isSymbolicLink == true {
                 throw InstallError.invalidStoredPackage
@@ -1510,7 +1744,16 @@ actor ManagedSkillInstaller {
                 throw InstallError.invalidStoredPackage
             }
             let relativePath = String(itemPath.dropFirst(rootPath.count))
+            let size = values.fileSize ?? Int.max
+            guard entries.count < limits.maximumFileCount,
+                  size <= limits.maximumFileBytes,
+                  size <= limits.maximumTotalBytes - totalBytes,
+                  relativePath != "SKILL.md" || size <= limits.maximumSkillMdBytes else {
+                throw InstallError.invalidStoredPackage
+            }
             let data = try Data(contentsOf: item)
+            guard data.count == size else { throw InstallError.invalidStoredPackage }
+            totalBytes += size
             let attributes = try fileManager.attributesOfItem(atPath: item.path)
             let permissions = (attributes[.posixPermissions] as? NSNumber)?.intValue ?? 0
             let mode = (permissions & 0o111) == 0 ? "100644" : "100755"
@@ -1521,6 +1764,7 @@ actor ManagedSkillInstaller {
                 blobSha: SkillIdentityResolver.gitBlobSHA(for: data)
             ))
         }
+        guard !enumerationFailed else { throw InstallError.invalidStoredPackage }
         entries.sort { $0.path < $1.path }
         return SkillPackage(coordinates: coordinates, entries: entries)
     }

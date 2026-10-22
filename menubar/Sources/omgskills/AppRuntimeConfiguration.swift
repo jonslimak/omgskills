@@ -1,6 +1,142 @@
 import Foundation
 
 enum AppRuntimeConfiguration {
+    static let f1BundleID = "com.jonslimak.omgskills.f1"
+    static let f1RootKey = "OMGSkillsF1Root"
+    static let f1WebsiteKey = "OMGSkillsF1Website"
+    static let catalogInstallEnabledKey = "OMGSkillsCatalogInstallEnabled"
+    static let connectedInventoryKey = "OMGSkillsConnectedInventoryTest"
+    static let inventoryReconciliationKey = "OMGSkillsInventoryReconciliationTest"
+    static let inventoryAutomationKey = "OMGSkillsInventoryAutomationTest"
+
+    struct ConnectedInventoryConfiguration: Equatable, Sendable {
+        let root: URL
+        let website: URL
+        let connectURL: URL
+        let uploadURL: URL
+        let keychainService: String
+        let inventoryReconciliation: Bool
+        let inventoryAutomation: Bool
+        var filesystemPaths: SkillFilesystemPaths { .isolated(testRoot: root) }
+    }
+
+    enum ConnectedInventoryMode: Equatable, Sendable {
+        case disabled
+        case enabled(ConnectedInventoryConfiguration)
+        case invalid(String)
+    }
+
+    static func connectedInventoryMode(
+        info: [String: Any] = Bundle.main.infoDictionary ?? [:],
+        debugAllowed: Bool = buildAllowsF1
+    ) -> ConnectedInventoryMode {
+        let automation: Bool
+        if let setting = info[inventoryAutomationKey] {
+            guard let enabled = setting as? Bool else { return .invalid("Invalid inventory automation test setting.") }
+            automation = enabled
+        } else { automation = false }
+        let reconciliation: Bool
+        if let setting = info[inventoryReconciliationKey] {
+            guard let enabled = setting as? Bool else { return .invalid("Invalid inventory reconciliation test setting.") }
+            reconciliation = enabled
+        } else { reconciliation = false }
+        guard !automation || reconciliation else { return .invalid("Inventory automation requires reconciliation.") }
+        guard let setting = info[connectedInventoryKey] else {
+            return reconciliation ? .invalid("Inventory reconciliation requires the connected inventory test.") : .disabled
+        }
+        guard let enabled = setting as? Bool else { return .invalid("Invalid connected inventory test setting.") }
+        guard enabled else {
+            return reconciliation ? .invalid("Inventory reconciliation requires the connected inventory test.") : .disabled
+        }
+        guard case .enabled(let root, let website) = catalogInstallMode(info: info, debugAllowed: debugAllowed),
+              isolatedInventoryRoots(root),
+              URLComponents(url: website, resolvingAgainstBaseURL: false)?.path == "/app/",
+              website.query == nil, website.fragment == nil,
+              let rawConnect = info[BrowserPairing.connectURLInfoKey] as? String,
+              let connect = URL(string: rawConnect), validLocalEndpoint(connect, path: "/app/connect"),
+              connect.scheme == website.scheme, connect.host == website.host, connect.port == website.port,
+              let rawUpload = info["OMGSkillsSyncEndpoint"] as? String,
+              let upload = URL(string: rawUpload), validLocalEndpoint(upload, path: "/api/portal/sync-upload"),
+              upload.port != website.port,
+              let service = info[DeviceCredentialStore.serviceInfoKey] as? String,
+              service == "com.jonslimak.omgskills.inventory-test." + root.lastPathComponent.dropFirst("omgskills-f1-".count) else {
+            return .invalid("Connected inventory requires isolated F1 storage, local endpoints and a test-only credential service.")
+        }
+        return .enabled(.init(root: root, website: website, connectURL: connect, uploadURL: upload,
+            keychainService: service, inventoryReconciliation: reconciliation, inventoryAutomation: automation))
+    }
+
+    private static func isolatedInventoryRoots(_ root: URL) -> Bool {
+        let paths = SkillFilesystemPaths.isolated(testRoot: root)
+        let home = paths.homeDirectory
+        return home.resolvingSymlinksInPath().path == home.path
+            && (try? home.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
+            && paths.allSkillsRoots.allSatisfy { $0.resolvingSymlinksInPath().path.hasPrefix(home.path + "/") }
+    }
+
+    private static func validLocalEndpoint(_ url: URL, path: String) -> Bool {
+        url.scheme == "http" && ["localhost", "127.0.0.1"].contains(url.host ?? "")
+            && url.port.map { (1...65535).contains($0) } == true && url.path == path
+            && url.user == nil && url.password == nil && url.query == nil && url.fragment == nil
+    }
+
+    static func catalogInstallMode(
+        info: [String: Any] = Bundle.main.infoDictionary ?? [:],
+        debugAllowed: Bool = buildAllowsF1
+    ) -> F1Mode {
+        guard let setting = info[catalogInstallEnabledKey] else { return .disabled }
+        guard let enabled = setting as? Bool else { return .invalid("Invalid catalog install test setting.") }
+        guard enabled else { return .disabled }
+        switch f1Mode(info: info, debugAllowed: debugAllowed) {
+        case .enabled(let root, let website): return .enabled(root: root, website: website)
+        default: return .invalid("Catalog installation requires a valid isolated F1 Debug app.")
+        }
+    }
+
+    enum F1Mode: Equatable, Sendable {
+        case disabled
+        case enabled(root: URL, website: URL)
+        case invalid(String)
+    }
+
+    static var buildAllowsF1: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
+    }
+
+    static func f1Mode(
+        info: [String: Any] = Bundle.main.infoDictionary ?? [:],
+        debugAllowed: Bool = buildAllowsF1
+    ) -> F1Mode {
+        let requested = info["CFBundleIdentifier"] as? String == f1BundleID
+            || info[f1RootKey] != nil || info[f1WebsiteKey] != nil
+        guard requested else { return .disabled }
+        guard debugAllowed, info["CFBundleIdentifier"] as? String == f1BundleID,
+              let types = info["CFBundleURLTypes"] as? [[String: Any]], types.count == 1,
+              types[0]["CFBundleURLSchemes"] as? [String] == ["omgskills-f1"],
+              let path = info[f1RootKey] as? String,
+              path.range(of: "^/private/tmp/omgskills-f1-[A-Za-z0-9-]+$", options: .regularExpression) != nil,
+              let rawWebsite = info[f1WebsiteKey] as? String,
+              let website = URL(string: rawWebsite), website.scheme == "http",
+              ["localhost", "127.0.0.1"].contains(website.host ?? ""),
+              website.user == nil, website.password == nil, website.port != nil else {
+            return .invalid("Invalid F1 test identity, storage or local website configuration.")
+        }
+        let root = URL(fileURLWithPath: path, isDirectory: true)
+        // Foundation canonicalizes the system /private/tmp alias to /tmp.
+        let canonical = URL(fileURLWithPath: "/private/tmp", isDirectory: true)
+            .resolvingSymlinksInPath().appendingPathComponent(root.lastPathComponent, isDirectory: true)
+        guard root.resolvingSymlinksInPath().path == canonical.path,
+              (try? root.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true else {
+            return .invalid("The F1 test folder is missing or redirected.")
+        }
+        // Derive existing and not-yet-created child paths from the same system alias.
+        return .enabled(root: canonical, website: website)
+    }
+
     static let bundledLibraryPreviewKey = "OMGSkillsBundledLibraryPreview"
     static let skillGroupsAuthEnabledKey = "OMGSkillsSkillGroupsAuthEnabled"
     static let skillGroupsAuthPreviewEnvironmentKey = "OMGSKILLS_SKILLGROUPS_AUTH_ENABLED"
