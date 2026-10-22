@@ -112,7 +112,6 @@ private actor FlowCredentialStore: DeviceCredentialStoring {
 
     func load() async throws -> StoredDeviceCredential? { record }
     func save(_ record: StoredDeviceCredential, replacingExisting: Bool) async throws {}
-    func delete(deviceID: String) async throws {}
 }
 
 private actor RecordingManifestAPI: DeviceGroupManifestServing {

@@ -516,7 +516,11 @@ private actor InventoryCredentialFixture: DeviceCredentialStoring {
         self.record = record
         if let saveGate { await saveGate.block() }
     }
-    func delete(deviceID: String) async throws { record = nil }
+    func delete(ifMatching expected: StoredDeviceCredential) async throws -> Bool {
+        guard record == expected else { return false }
+        record = nil
+        return true
+    }
 }
 
 private actor InventoryAPIFixture: DeviceSyncServing {

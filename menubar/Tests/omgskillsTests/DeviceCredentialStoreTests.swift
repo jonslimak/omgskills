@@ -50,12 +50,11 @@ struct DeviceCredentialStoreTests {
         await #expect(throws: (any Error).self) { try await store.delete(ifMatching: record) }
     }
 
-    @Test func conditionalDeletionDefaultFailsInsteadOfUsingIDOnlyDeletion() async {
-        let store = IDOnlyCredentialStore()
+    @Test func conditionalDeletionDefaultFailsWithoutImplementation() async {
+        let store = UnsupportedConditionalCredentialStore()
         await #expect(throws: DeviceCredentialStoreError.conditionalDeletionUnsupported) {
             try await store.delete(ifMatching: makeCredential(deviceID: "id", credential: "secret"))
         }
-        #expect(await store.didDelete == false)
     }
 
     @Test func configuredServiceUsesBundleOverride() throws {
@@ -97,7 +96,7 @@ struct DeviceCredentialStoreTests {
         try await store.save(record, replacingExisting: false)
         #expect(try await store.load() == record)
 
-        try await store.delete(deviceID: record.connection.deviceID)
+        _ = try await store.delete(ifMatching: record)
         #expect(try await store.load() == nil)
     }
 
@@ -115,7 +114,7 @@ struct DeviceCredentialStoreTests {
         try await store.save(replacement, replacingExisting: true)
         #expect(try await store.load() == replacement)
 
-        try await store.delete(deviceID: replacement.connection.deviceID)
+        _ = try await store.delete(ifMatching: replacement)
     }
 
     @Test func legacyCredentialWithoutScopesDecodesAsMetadataOnly() throws {
@@ -158,11 +157,9 @@ struct DeviceCredentialStoreTests {
 
 private final class EmptyKeychainBundleMarker {}
 
-private actor IDOnlyCredentialStore: DeviceCredentialStoring {
-    private(set) var didDelete = false
+private actor UnsupportedConditionalCredentialStore: DeviceCredentialStoring {
     func load() async throws -> StoredDeviceCredential? { nil }
     func save(_ record: StoredDeviceCredential, replacingExisting: Bool) async throws {}
-    func delete(deviceID: String) async throws { didDelete = true }
 }
 
 // All mutable fake state is protected by one lock; callbacks stay synchronous,

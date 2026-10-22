@@ -59,7 +59,6 @@ enum DeviceCredentialStoreError: Error, Equatable, Sendable {
 protocol DeviceCredentialStoring: Sendable {
     func load() async throws -> StoredDeviceCredential?
     func save(_ record: StoredDeviceCredential, replacingExisting: Bool) async throws
-    func delete(deviceID: String) async throws
     func delete(ifMatching expected: StoredDeviceCredential) async throws -> Bool
 }
 
@@ -185,15 +184,6 @@ actor DeviceCredentialStore: DeviceCredentialStoring {
             throw DeviceCredentialStoreError.keychain(updateStatus)
         }
 
-    }
-
-    func delete(deviceID: String) throws {
-        var query = baseQuery()
-        query[kSecAttrAccount as String] = deviceID
-        let status = keychain.delete(query)
-        guard status == errSecSuccess || status == errSecItemNotFound else {
-            throw DeviceCredentialStoreError.keychain(status)
-        }
     }
 
     func delete(ifMatching expected: StoredDeviceCredential) async throws -> Bool {

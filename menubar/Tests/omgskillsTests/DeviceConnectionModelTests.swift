@@ -4,6 +4,466 @@ import Testing
 
 @MainActor
 struct DeviceConnectionModelTests {
+    @Test func keyedReconnectKeepsDeviceAndKeyButRotatesBearerAndFullyReports() async {
+        let first = makeCredential(credential: "first")
+        let second = StoredDeviceCredential(credential: "second", connection: .init(
+            deviceID: first.connection.deviceID, accountLabel: "Test", expiresAt: .distantFuture,
+            grantedScopes: Set(DeviceScope.allCases)))
+        let keys = MockReconnectKeyStore()
+        let store = MockDeviceCredentialStore()
+        let api = MockDeviceSyncAPI(exchangeRecords: [first, second], reportMode: .reconciliation)
+        await api.enableReconnect()
+        let scan = inventoryScan(["fixture"])
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: keys, api: api,
+            inventoryScanner: { await api.noteScan(); return scan }, inventoryAutomationEnabled: true)
+        await model.connect(pairingCode: "first-code", deviceName: "Test", installations: []).value
+        let revision = await api.currentRevision()
+        #expect(await model.requestScheduledInventoryReport() == .checked)
+        await model.disconnect().value
+        #expect(model.state == .disconnected)
+        #expect(await store.currentRecord() == nil)
+        #expect(await api.revokedCredentials() == [first.credential])
+        await model.connect(pairingCode: "fresh-code", deviceName: "Test", installations: []).value
+        #expect(model.state == .connected(second.connection))
+        #expect(await store.currentRecord() == second)
+        #expect(await api.exchangedReconnectKeys() == [keys.key, keys.key])
+        #expect(await api.boundKeys() == [keys.key])
+        #expect(await api.boundDeviceIDs() == [first.connection.deviceID])
+        #expect(await api.uploadedCredentials() == [first.credential, second.credential])
+        #expect(await api.reconciliationBases() == [nil, revision])
+        #expect(await api.checkedCredentials() == [first.credential])
+        #expect(await api.reportEvents().suffix(3) == ["revision", "scan", "upload"])
+        #expect(model.continuityWarning == nil)
+    }
+
+    @Test func optInRestoreBindsBeforeReportingAndReusesKeyAcrossModels() async {
+        let record = makeCredential()
+        let keys = MockReconnectKeyStore()
+        let store = MockDeviceCredentialStore(record: record)
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        await api.enableReconnect()
+        let scan = inventoryScan([])
+        for _ in 0..<2 {
+            let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: keys, api: api,
+                inventoryScanner: { await api.noteScan(); return scan })
+            await model.restore().value
+            #expect(model.state == .connected(record.connection))
+            #expect(model.continuityWarning == nil)
+        }
+        #expect(await api.boundCredentials() == [record.credential, record.credential])
+        #expect(await api.boundKeys() == [keys.key, keys.key])
+        #expect(await api.reportEvents() == ["bind", "revision", "scan", "upload", "bind", "revision", "scan", "upload"])
+        #expect(await api.exchangeCallCount() == 0)
+    }
+
+    @Test(arguments: [DeviceSyncAPIError.server(statusCode: 503), .unsupportedReconnect, .reconnectBindingConflict])
+    func restoreBindingFailureKeepsHealthyReportsButBlocksReplacement(_ failure: DeviceSyncAPIError) async {
+        let record = makeCredential()
+        let store = MockDeviceCredentialStore(record: record)
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        await api.enableReconnect(bindingFailure: failure)
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api,
+            inventoryScanner: { scan })
+        await model.restore().value
+        #expect(model.state == .connected(record.connection))
+        #expect(model.continuityWarning != nil)
+        await model.requestInventoryReport().value
+        #expect(model.continuityWarning != nil)
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(model.state == .connected(record.connection))
+        #expect(await store.currentRecord() == record)
+        #expect(await api.exchangeCallCount() == 0)
+        #expect(await api.uploadedCredentials().count == 2)
+        #expect(await api.revokedCredentials().isEmpty)
+    }
+
+    @Test(arguments: [false, true])
+    func keyFailurePreventsExchangeAndPreservesAnExistingConnection(_ existing: Bool) async {
+        let record = makeCredential()
+        let keys = MockReconnectKeyStore(failure: true)
+        let store = MockDeviceCredentialStore(record: existing ? record : nil)
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: keys, api: api)
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(model.state == (existing ? .connected(record.connection) : .failed(.credentialStorage)))
+        #expect(model.continuityWarning != nil)
+        #expect(await api.exchangeCallCount() == 0)
+        #expect(await api.boundCredentials().isEmpty)
+        #expect(await store.currentRecord() == (existing ? record : nil))
+    }
+
+    @Test func restoreKeyFailureKeepsReportingAndSuccessfulBindingClearsWarning() async {
+        let record = makeCredential()
+        let keys = MockReconnectKeyStore(failure: true)
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        await api.enableReconnect()
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(record: record),
+            reconnectKeyStore: keys, api: api, inventoryScanner: { scan })
+        await model.restore().value
+        #expect(model.state == .connected(record.connection))
+        #expect(model.continuityWarning != nil)
+        #expect(await api.uploadedCredentials() == [record.credential])
+        await keys.setFailure(false)
+        await model.restore().value
+        #expect(model.continuityWarning == nil)
+        #expect(await api.boundCredentials() == [record.credential])
+    }
+
+    @Test(arguments: [DeviceReconnectSupport.unsupported, .invalid])
+    func unsupportedKeyedExchangeRevokesIssuedBearerWithoutSavingOrReporting(_ support: DeviceReconnectSupport) async {
+        let record = makeCredential()
+        let keys = MockReconnectKeyStore()
+        let store = MockDeviceCredentialStore()
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        await api.enableReconnect(support: support)
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: keys, api: api)
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: []).value
+        #expect(model.state == .failed(.reconnectRequired))
+        #expect(model.continuityWarning != nil)
+        #expect(await store.currentRecord() == nil)
+        #expect(await api.revokedCredentials() == [record.credential])
+        #expect(await api.uploadedCredentials().isEmpty)
+        #expect(await keys.loadCount() == 1)
+        #expect(await api.exchangeCallCount() == 1)
+    }
+
+    @Test(arguments: ["expired", "rejected"])
+    func unusableOldBearerDoesNotBlockFreshPairingOrPromiseAdoption(_ reason: String) async {
+        let record = makeCredential()
+        let old = StoredDeviceCredential(credential: "old", connection: .init(deviceID: "old-row",
+            accountLabel: "Same display label", expiresAt: reason == "expired" ? .distantPast : .distantFuture))
+        let store = MockDeviceCredentialStore(record: old)
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        await api.enableReconnect(bindingFailure: .reconnectRequired)
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api)
+        await model.connect(pairingCode: "fresh-code", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(model.state == .connected(record.connection))
+        #expect(model.continuityWarning != nil)
+        #expect(await store.currentRecord() == record)
+        #expect(await api.exchangeCallCount() == 1)
+        #expect(await api.boundCredentials().count == (reason == "expired" ? 0 : 1))
+    }
+
+    @Test(arguments: [false, true])
+    func disconnectedLocallyDespiteBindingAndRevocationFailures(_ keyFailure: Bool) async {
+        let record = makeCredential()
+        let keys = MockReconnectKeyStore(failure: keyFailure)
+        let store = MockDeviceCredentialStore(record: record)
+        let api = MockDeviceSyncAPI(exchangeRecord: record, revokeFailure: .server(statusCode: 503))
+        await api.enableReconnect(bindingFailure: .server(statusCode: 503))
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: keys, api: api)
+        await model.disconnect().value
+        #expect(model.state == .disconnected)
+        #expect(model.continuityWarning != nil)
+        #expect(model.disconnectWarning != nil)
+        #expect(await store.currentRecord() == nil)
+        #expect(await api.revokedCredentials() == [record.credential])
+        #expect(await store.deletionAttempts() == [record])
+        #expect(await keys.loadCount() == 1)
+    }
+
+    @Test func disconnectDeletionFailureIsVisibleAndCannotResumeReports() async {
+        let record = makeCredential()
+        let store = MockDeviceCredentialStore(record: record)
+        await store.setDeleteFailure()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        await api.enableReconnect()
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api,
+            inventoryScanner: { scan })
+        await model.restore().value
+        await model.disconnect().value
+        #expect(model.state == .failed(.credentialStorage))
+        #expect(await store.currentRecord() == record)
+        #expect(await model.requestScheduledInventoryReport() == .cancelled)
+        #expect(await api.uploadedCredentials() == [record.credential])
+    }
+
+    @Test func keyMustBePersistedBeforeExchangeAndCancellationCannotContinue() async {
+        let gate = TestGate()
+        let keys = MockReconnectKeyStore(gate: gate)
+        let api = MockDeviceSyncAPI(exchangeRecord: makeCredential())
+        await api.enableReconnect()
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(), reconnectKeyStore: keys, api: api)
+        let task = model.connect(pairingCode: "code", deviceName: "Test", installations: [])
+        await gate.waitUntilBlocked()
+        #expect(await api.exchangeCallCount() == 0)
+        model.cancelCurrentOperation()
+        await gate.open()
+        await task.value
+        #expect(await api.exchangeCallCount() == 0)
+        #expect(await api.uploadedCredentials().isEmpty)
+    }
+
+    @Test(arguments: ["exchange", "save"])
+    func cancelledKeyedRotationCannotRestoreOldConnectionOrDeleteReplacement(_ step: String) async {
+        let first = makeCredential(credential: "old")
+        let issued = makeCredential(credential: "issued")
+        let replacement = makeCredential(credential: "replacement")
+        let gate = TestGate()
+        let store = MockDeviceCredentialStore(record: first, saveGate: step == "save" ? gate : nil)
+        let api = MockDeviceSyncAPI(exchangeRecord: issued, exchangeGate: step == "exchange" ? gate : nil)
+        await api.enableReconnect()
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api)
+        await model.restore().value
+        let task = model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true)
+        await gate.waitUntilBlocked()
+        model.cancelCurrentOperation()
+        #expect(model.state == .failed(.reconnectRequired))
+        await store.replaceRecord(replacement)
+        await gate.open()
+        await task.value
+        #expect(model.state == .failed(.reconnectRequired))
+        #expect(await store.currentRecord() == replacement)
+        #expect(await api.revokedCredentials().contains(replacement.credential) == false)
+        #expect(await api.uploadedCredentials().isEmpty)
+    }
+
+    @Test func failedKeyedSaveClearsSupersededCredentialAndRequiresFreshApproval() async {
+        let old = makeCredential(credential: "old")
+        let fresh = makeCredential(credential: "fresh")
+        let store = MockDeviceCredentialStore(record: old, saveFailure: .storage)
+        let api = MockDeviceSyncAPI(exchangeRecord: fresh)
+        await api.enableReconnect()
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api)
+        await model.restore().value
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(model.state == .failed(.credentialStorage))
+        #expect(await store.currentRecord() == nil)
+        #expect(await api.revokedCredentials() == [fresh.credential, old.credential])
+        model.cancelCurrentOperation()
+        #expect(model.state == .failed(.credentialStorage))
+    }
+
+    @Test func partialKeyedSaveIsDeletedEvenWhenSaveThrowsAfterWriting() async {
+        let old = makeCredential(credential: "old")
+        let issued = makeCredential(credential: "issued")
+        let store = MockDeviceCredentialStore(record: old, saveFailure: .storage, saveFailureAfterWriting: true)
+        let api = MockDeviceSyncAPI(exchangeRecord: issued)
+        await api.enableReconnect()
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api)
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(model.state == .failed(.credentialStorage))
+        #expect(await store.currentRecord() == nil)
+        #expect(await store.deletionAttempts() == [issued, old])
+        #expect(await api.uploadedCredentials().isEmpty)
+    }
+
+    @Test(arguments: [false, true])
+    func cancelledCleanupDeletionFailureStaysVisible(_ keyed: Bool) async {
+        let record = makeCredential()
+        let gate = TestGate()
+        let store = MockDeviceCredentialStore(saveGate: gate)
+        await store.setDeleteFailure()
+        let api = MockDeviceSyncAPI(exchangeRecord: record, revokeChecksCancellation: true)
+        await api.enableReconnect()
+        let model = DeviceConnectionModel(credentialStore: store,
+            reconnectKeyStore: keyed ? MockReconnectKeyStore() : nil, api: api)
+        let task = model.connect(pairingCode: "code", deviceName: "Test", installations: [])
+        await gate.waitUntilBlocked()
+        model.cancelCurrentOperation()
+        await gate.open()
+        await task.value
+        #expect(model.state == .failed(.credentialStorage))
+        #expect(await store.currentRecord() == record)
+        #expect(await api.revokedCredentials() == [record.credential])
+        #expect(await api.uploadedCredentials().isEmpty)
+        model.cancelCurrentOperation()
+        #expect(model.state == .failed(.credentialStorage))
+    }
+
+    @Test func cancelledBindingCannotExchangeOrEraseHealthyCredential() async {
+        let record = makeCredential()
+        let gate = TestGate()
+        let store = MockDeviceCredentialStore(record: record)
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        await api.enableReconnect()
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api)
+        await model.restore().value
+        await api.setBindingGate(gate)
+        let task = model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true)
+        await gate.waitUntilBlocked()
+        model.cancelCurrentOperation()
+        await gate.open()
+        await task.value
+        #expect(model.state == .connected(record.connection))
+        #expect(await store.currentRecord() == record)
+        #expect(await api.exchangeCallCount() == 0)
+        #expect(await api.revokedCredentials().isEmpty)
+    }
+
+    @Test func newerKeyedAttemptWaitsForOldCleanupWithSameDeviceID() async {
+        let first = makeCredential(credential: "first")
+        let second = makeCredential(credential: "second")
+        let gate = TestGate()
+        let store = MockDeviceCredentialStore()
+        let api = MockDeviceSyncAPI(exchangeRecords: [first, second], exchangeGate: gate)
+        await api.enableReconnect()
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api)
+        let oldTask = model.connect(pairingCode: "first", deviceName: "Test", installations: [])
+        await gate.waitUntilBlocked()
+        let newTask = model.connect(pairingCode: "second", deviceName: "Test", installations: [])
+        await gate.open()
+        await oldTask.value
+        await newTask.value
+        #expect(model.state == .connected(second.connection))
+        #expect(await store.currentRecord() == second)
+        #expect(await api.revokedCredentials() == [first.credential])
+        #expect(await api.uploadedCredentials() == [second.credential])
+    }
+
+    @Test func disconnectFinishesExactCleanupDespiteCancellationDuringRevoke() async {
+        let old = makeCredential(credential: "old")
+        let replacement = makeCredential(credential: "replacement")
+        let gate = TestGate()
+        let store = MockDeviceCredentialStore(record: old)
+        let api = MockDeviceSyncAPI(exchangeRecord: old, revokeChecksCancellation: true)
+        await api.enableReconnect()
+        await api.setRevokeGate(gate)
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api)
+        let task = model.disconnect()
+        await gate.waitUntilBlocked()
+        model.cancelCurrentOperation()
+        await store.replaceRecord(replacement)
+        await gate.open()
+        await task.value
+        #expect(model.state == .disconnected)
+        #expect(await store.deletionAttempts() == [old])
+        #expect(await store.currentRecord() == replacement)
+        #expect(await api.revokedCredentials() == [old.credential])
+    }
+
+    @Test func optInRestoreWithoutCredentialDoesNotTouchKeyOrReport() async {
+        let keys = MockReconnectKeyStore()
+        let api = MockDeviceSyncAPI(exchangeRecord: makeCredential())
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(), reconnectKeyStore: keys, api: api)
+        await model.restore().value
+        #expect(model.state == .disconnected)
+        #expect(await keys.loadCount() == 0)
+        #expect(await api.boundCredentials().isEmpty)
+        #expect(await api.uploadedCredentials().isEmpty)
+    }
+
+    @Test(arguments: [false, true])
+    func rejectedRestoreStopsReportsAndExposesDeletionFailure(_ deletionFailure: Bool) async {
+        let record = makeCredential()
+        let store = MockDeviceCredentialStore(record: record)
+        if deletionFailure { await store.setDeleteFailure() }
+        let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
+        await api.enableReconnect(bindingFailure: .reconnectRequired)
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: MockReconnectKeyStore(), api: api,
+            inventoryScanner: { scan })
+        await model.restore().value
+        #expect(model.state == .failed(deletionFailure ? .credentialStorage : .reconnectRequired))
+        #expect(await store.currentRecord() == (deletionFailure ? record : nil))
+        #expect(await api.uploadedCredentials().isEmpty)
+        #expect(await model.requestScheduledInventoryReport() == .cancelled)
+    }
+
+    @Test func activeSameDeviceRotationInvalidatesAnEligibleCheckBaseline() async {
+        let first = makeCredential(credential: "first")
+        let second = makeCredential(credential: "second")
+        let api = MockDeviceSyncAPI(exchangeRecords: [first, second], reportMode: .reconciliation)
+        await api.enableReconnect()
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(),
+            reconnectKeyStore: MockReconnectKeyStore(), api: api,
+            inventoryScanner: { scan }, inventoryAutomationEnabled: true)
+        await model.connect(pairingCode: "first", deviceName: "Test", installations: []).value
+        #expect(await model.requestScheduledInventoryReport() == .checked)
+        let base = await api.currentRevision()
+        await model.connect(pairingCode: "second", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(await api.reconciliationBases() == [nil, base])
+        #expect(await api.checkedCredentials() == [first.credential])
+        #expect(await api.uploadedCredentials() == [first.credential, second.credential])
+        #expect(model.state == .connected(second.connection))
+    }
+
+    @Test func lostExchangeResponseDoesNotRetryOrPretendToRestoreOldBearer() async {
+        let old = makeCredential(credential: "old")
+        let fresh = makeCredential(credential: "fresh")
+        let keys = MockReconnectKeyStore()
+        let store = MockDeviceCredentialStore(record: old)
+        let api = MockDeviceSyncAPI(exchangeRecord: fresh)
+        await api.enableReconnect(exchangeFailure: .server(statusCode: 503))
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: keys, api: api)
+        await model.restore().value
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(model.state == .failed(.reconnectRequired))
+        #expect(await store.currentRecord() == nil)
+        #expect(await api.revokedCredentials() == [old.credential])
+        #expect(await api.exchangeCallCount() == 1)
+        await api.enableReconnect()
+        await model.connect(pairingCode: "new-approval", deviceName: "Test", installations: []).value
+        #expect(model.state == .connected(fresh.connection))
+        #expect(await api.exchangedReconnectKeys() == [keys.key, keys.key])
+    }
+
+    @Test(arguments: ["connect", "restore"])
+    func uncertainOldCredentialCannotBeRevivedByALaterKeyFailure(_ operation: String) async {
+        let old = makeCredential(credential: "old")
+        let keys = MockReconnectKeyStore()
+        let store = MockDeviceCredentialStore(record: old)
+        let api = MockDeviceSyncAPI(exchangeRecord: makeCredential(credential: "fresh"))
+        await api.enableReconnect(exchangeFailure: .server(statusCode: 503))
+        let model = DeviceConnectionModel(credentialStore: store, reconnectKeyStore: keys, api: api)
+        await model.restore().value
+        await store.setDeleteFailure()
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: [], replacingExisting: true).value
+        #expect(model.state == .failed(.credentialStorage))
+        #expect(await store.currentRecord() == old)
+        await keys.setFailure(true)
+        if operation == "connect" {
+            await model.connect(pairingCode: "new-code", deviceName: "Test", installations: [], replacingExisting: true).value
+        } else {
+            await model.restore().value
+        }
+        guard case .failed = model.state else { Issue.record("Revived a possibly rotated old credential"); return }
+        #expect(await api.exchangeCallCount() == 1)
+        #expect(await api.uploadedCredentials().isEmpty)
+        #expect(model.continuityWarning != nil)
+    }
+
+    @Test(arguments: ["legacy", "inventory", "disconnect"])
+    func lateCleanupCannotDeleteAnotherBearerWithSameDeviceID(_ path: String) async {
+        let old = makeCredential(credential: "old")
+        let replacement = makeCredential(credential: "replacement")
+        let gate = TestGate()
+        let store = MockDeviceCredentialStore(record: old)
+        let api = MockDeviceSyncAPI(exchangeRecord: old, uploadFailure: .reconnectRequired,
+            reportMode: path == "inventory" ? .reconciliation : .legacy)
+        let scan = inventoryScan([])
+        let model = DeviceConnectionModel(credentialStore: store, api: api, inventoryScanner: { scan })
+        if path != "inventory" { await model.restore().value }
+        await store.setDeleteGate(gate)
+        let task: Task<Void, Never>
+        switch path {
+        case "inventory": task = model.restore()
+        case "disconnect": task = model.disconnect()
+        default: task = model.retrySync(installations: [])
+        }
+        await gate.waitUntilBlocked()
+        await store.replaceRecord(replacement)
+        await gate.open()
+        await task.value
+        #expect(await store.currentRecord() == replacement)
+        #expect(await store.deletionAttempts() == [old])
+    }
+
+    @Test func nilReconnectInjectionNeverUsesKeyedMethods() async {
+        let record = makeCredential()
+        let api = MockDeviceSyncAPI(exchangeRecord: record)
+        let model = DeviceConnectionModel(credentialStore: MockDeviceCredentialStore(), api: api)
+        await model.connect(pairingCode: "code", deviceName: "Test", installations: []).value
+        await model.disconnect().value
+        #expect(await api.exchangedReconnectKeys().isEmpty)
+        #expect(await api.boundCredentials().isEmpty)
+        #expect(model.continuityWarning == nil)
+    }
+
     @Test func readyHookRunsBeforeInitialScanAndManualIntentDoesNotStartWork() async {
         let record = makeCredential()
         let api = MockDeviceSyncAPI(exchangeRecord: record, reportMode: .reconciliation)
@@ -617,7 +1077,7 @@ struct DeviceConnectionModelTests {
         let scanner = MockInventoryScanner(result: inventoryScan([]))
         let model = DeviceConnectionModel(credentialStore: store, api: api, inventoryScanner: { try await scanner.scan() })
         await model.restore().value
-        try await store.delete(deviceID: record.connection.deviceID)
+        _ = try await store.delete(ifMatching: record)
         await model.restore().value
         model.cancelCurrentOperation()
         await model.requestInventoryReport().value
@@ -1242,15 +1702,21 @@ private enum MockCredentialStoreFailure: Error, Sendable {
 private actor MockDeviceCredentialStore: DeviceCredentialStoring {
     private var record: StoredDeviceCredential?
     private let saveFailure: MockCredentialStoreFailure?
+    private let saveFailureAfterWriting: Bool
     private let saveGate: TestGate?
+    private var deleteFailure = false
+    private var deleteGate: TestGate?
+    private var deletedRecords: [StoredDeviceCredential] = []
 
     init(
         record: StoredDeviceCredential? = nil,
         saveFailure: MockCredentialStoreFailure? = nil,
-        saveGate: TestGate? = nil
+        saveGate: TestGate? = nil,
+        saveFailureAfterWriting: Bool = false
     ) {
         self.record = record
         self.saveFailure = saveFailure
+        self.saveFailureAfterWriting = saveFailureAfterWriting
         self.saveGate = saveGate
     }
 
@@ -1259,7 +1725,7 @@ private actor MockDeviceCredentialStore: DeviceCredentialStoring {
     }
 
     func save(_ record: StoredDeviceCredential, replacingExisting: Bool) async throws {
-        if let saveFailure {
+        if let saveFailure, !saveFailureAfterWriting {
             throw saveFailure
         }
         if let existing = self.record,
@@ -1269,17 +1735,26 @@ private actor MockDeviceCredentialStore: DeviceCredentialStoring {
         }
         self.record = record
         if let saveGate { await saveGate.block() }
+        if let saveFailure { throw saveFailure }
     }
 
-    func delete(deviceID: String) async throws {
-        if record?.connection.deviceID == deviceID {
-            record = nil
-        }
+    func delete(ifMatching expected: StoredDeviceCredential) async throws -> Bool {
+        deletedRecords.append(expected)
+        if let gate = deleteGate { deleteGate = nil; await gate.block() }
+        if deleteFailure { throw MockCredentialStoreFailure.storage }
+        guard record == expected else { return false }
+        record = nil
+        return true
     }
 
     func currentRecord() -> StoredDeviceCredential? {
         record
     }
+
+    func replaceRecord(_ value: StoredDeviceCredential?) { record = value }
+    func setDeleteFailure() { deleteFailure = true }
+    func setDeleteGate(_ gate: TestGate) { deleteGate = gate }
+    func deletionAttempts() -> [StoredDeviceCredential] { deletedRecords }
 }
 
 private actor MockDeviceSyncAPI: DeviceSyncServing {
@@ -1306,6 +1781,14 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
     private var checkAcknowledgement: InventoryCheckResult?
     private var checks: [String] = []
     private var nextUploadGate: TestGate?
+    private var reconnectEnabled = false
+    private var reconnectSupport: DeviceReconnectSupport = .supported
+    private var reconnectFailure: DeviceSyncAPIError?
+    private var bindingFailure: DeviceSyncAPIError?
+    private var bindingGate: TestGate?
+    private var revokeGate: TestGate?
+    private var reconnectKeys: [String] = []
+    private var bindings: [(String, String, String)] = []
 
     init(
         exchangeRecord: StoredDeviceCredential,
@@ -1424,6 +1907,7 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
     func revoke(credential: String) async throws {
         if revokeChecksCancellation { try Task.checkCancellation() }
         revocations.append(credential)
+        if let gate = revokeGate { revokeGate = nil; await gate.block() }
         if let revokeFailure {
             throw revokeFailure
         }
@@ -1447,6 +1931,59 @@ private actor MockDeviceSyncAPI: DeviceSyncServing {
     func exchangedCodeVerifiers() -> [String?] {
         codeVerifiers
     }
+
+    func enableReconnect(support: DeviceReconnectSupport = .supported,
+                         exchangeFailure: DeviceSyncAPIError? = nil,
+                         bindingFailure: DeviceSyncAPIError? = nil) {
+        reconnectEnabled = true
+        reconnectSupport = support
+        reconnectFailure = exchangeFailure
+        self.bindingFailure = bindingFailure
+    }
+
+    func exchangeForReconnect(pairingCode: String, deviceName: String, codeVerifier: String?,
+                              reconnectKey: String) async throws -> DeviceReconnectExchange {
+        guard reconnectEnabled else { throw DeviceSyncAPIError.unsupportedReconnect }
+        reconnectKeys.append(reconnectKey)
+        events.append("keyed-exchange")
+        let record = try await exchange(pairingCode: pairingCode, deviceName: deviceName, codeVerifier: codeVerifier)
+        if let reconnectFailure { throw reconnectFailure }
+        return .init(record: record, support: reconnectSupport)
+    }
+
+    func bindReconnectKey(credential: String, reconnectKey: String, expectedDeviceID: String) async throws {
+        bindings.append((credential, reconnectKey, expectedDeviceID))
+        events.append("bind")
+        if let gate = bindingGate { bindingGate = nil; await gate.block() }
+        guard reconnectEnabled else { throw DeviceSyncAPIError.unsupportedReconnect }
+        if let bindingFailure { throw bindingFailure }
+    }
+
+    func setBindingGate(_ gate: TestGate) { bindingGate = gate }
+    func setRevokeGate(_ gate: TestGate) { revokeGate = gate }
+    func exchangedReconnectKeys() -> [String] { reconnectKeys }
+    func boundCredentials() -> [String] { bindings.map { $0.0 } }
+    func boundKeys() -> [String] { bindings.map { $0.1 } }
+    func boundDeviceIDs() -> [String] { bindings.map { $0.2 } }
+}
+
+private actor MockReconnectKeyStore: DeviceReconnectKeyStoring {
+    let key = String(repeating: "a", count: 64)
+    private var failure = false
+    private var calls = 0
+    private let gate: TestGate?
+
+    init(failure: Bool = false, gate: TestGate? = nil) { self.failure = failure; self.gate = gate }
+
+    func loadOrCreate() async throws -> String {
+        calls += 1
+        if let gate { await gate.block() }
+        if failure { throw DeviceReconnectKeyStoreError.corruptItem }
+        return key
+    }
+
+    func setFailure(_ value: Bool) { failure = value }
+    func loadCount() -> Int { calls }
 }
 
 private actor MockInventoryScanner {
