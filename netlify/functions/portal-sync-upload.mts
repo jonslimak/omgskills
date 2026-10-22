@@ -9,8 +9,12 @@ import {
   uploadAuthenticationFromRequest
 } from "./_shared/sync-upload.js";
 import { requireJsonObject } from "./_shared/validation.js";
+import { requireLegacyInventoryReport } from "./_shared/legacy-inventory-schema.js";
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requireSkillGroupsWebFeature, performSyncUpload };
+
+export async function portalSyncUpload(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, requireSkillGroupsWebFeature, performSyncUpload } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -21,6 +25,7 @@ export default async (req: Request, _context: Context) => {
   try {
     requireSkillGroupsWebFeature();
     const body = await requireJsonObject(req);
+    requireLegacyInventoryReport(body);
     const authentication = uploadAuthenticationFromRequest(req, body);
     const skillsValue = body.skills;
     if (!Array.isArray(skillsValue)) {
@@ -52,7 +57,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Sync upload failed");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalSyncUpload(req, context);
 
 export const config = {
   path: "/api/portal/sync-upload",

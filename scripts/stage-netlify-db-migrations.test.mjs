@@ -54,3 +54,23 @@ test("rejects a migration directory without migration.sql", async (t) => {
     /Missing migration\.sql.*20260103000000_missing/,
   );
 });
+
+test("compatibility release stages only the nine unchanged pre-inventory migrations", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "omgskills-bridge-migrations-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const sourceDir = new URL("../netlify/database/migrations/", import.meta.url);
+  const expected = [
+    "20260623180000_create_skill_groups", "20260708120000_add_sync_identity_fields",
+    "20260708123000_add_group_item_snapshots", "20260711110000_enforce_sync_identity_consistency",
+    "20260712100000_add_device_tokens", "20260827150000_add_shared_skill_release_storage",
+    "20260827203000_add_github_broker_installations", "20260828150000_add_content_fetch_audit",
+    "20260901170000_add_device_token_scopes",
+  ];
+  const destinationDir = path.join(root, "staged");
+  assert.deepEqual(await stageNetlifyDbMigrations({ destinationDir }), expected);
+  assert.deepEqual((await readdir(destinationDir)).sort(), expected);
+  for (const name of expected) {
+    assert.deepEqual(await readFile(path.join(destinationDir, name, "migration.sql")),
+      await readFile(new URL(name + "/migration.sql", sourceDir)));
+  }
+});

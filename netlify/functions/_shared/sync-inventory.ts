@@ -1,12 +1,15 @@
-import type { PoolClient } from "pg";
+import type { Pool, PoolClient } from "pg";
 import type { SyncSkill } from "./sync-skill.js";
 import { reconcileSyncedGroupReferences } from "./sync-group-reconciliation.js";
+import { lockLegacyInventorySchema } from "./legacy-inventory-schema.js";
+import { rollback } from "./device-auth.js";
 
 export async function writeSyncInventory(
   client: PoolClient,
   userId: string,
   skills: SyncSkill[]
 ) {
+  const deviceScoped = await lockLegacyInventorySchema(client);
   await client.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [userId]);
   const runResult = await client.query<{ id: string }>(
     "INSERT INTO sync_runs (user_id, status) VALUES ($1, 'started') RETURNING id",
@@ -22,7 +25,7 @@ export async function writeSyncInventory(
           catalog_skill_id, github_url, is_local_only, source, is_current, last_seen_at
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true, now())
-        ON CONFLICT (user_id, stable_key)
+        ON CONFLICT (user_id, stable_key) ${deviceScoped ? "WHERE device_id IS NULL" : ""}
         DO UPDATE SET
           sync_run_id = EXCLUDED.sync_run_id,
           skill_md_sha = EXCLUDED.skill_md_sha,
@@ -58,12 +61,14 @@ export async function writeSyncInventory(
         UPDATE synced_skills
         SET is_current = false
         WHERE user_id = $1
+          ${deviceScoped ? "AND device_id IS NULL" : ""}
           AND stable_key <> ALL($2::text[])
       `,
       [userId, skills.map((skill) => skill.stableKey)]
     );
   } else {
-    await client.query("UPDATE synced_skills SET is_current = false WHERE user_id = $1", [userId]);
+    await client.query(`UPDATE synced_skills SET is_current = false WHERE user_id = $1
+      ${deviceScoped ? "AND device_id IS NULL" : ""}`, [userId]);
   }
 
   await reconcileSyncedGroupReferences(client, userId);
@@ -73,4 +78,29 @@ export async function writeSyncInventory(
     [syncRunId]
   );
   return syncRunId;
+}
+
+export async function readLegacySyncInventory(pool: Pool, userId: string) {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN READ ONLY");
+    const deviceScoped = await lockLegacyInventorySchema(client, true);
+    const result = await client.query(
+      `SELECT id, stable_key AS "stableKey", skill_md_sha AS "skillMdSha",
+         identity_status AS "identityStatus", name, description,
+         catalog_skill_id AS "catalogSkillId", github_url AS "githubUrl",
+         is_local_only AS "isLocalOnly", source, is_current AS "isCurrent",
+         last_seen_at AS "lastSeenAt"
+       FROM synced_skills WHERE user_id = $1 AND is_current = true
+         ${deviceScoped ? "AND device_id IS NULL" : ""}
+       ORDER BY lower(name), source`, [userId]
+    );
+    await client.query("COMMIT");
+    return { skills: result.rows };
+  } catch (error) {
+    await rollback(client);
+    throw error;
+  } finally {
+    client.release();
+  }
 }
