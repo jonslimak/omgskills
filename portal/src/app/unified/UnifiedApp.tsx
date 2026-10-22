@@ -1392,7 +1392,7 @@ export function UnifiedApp({
                   </Menu>
                 )}
               </div>}
-              {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
+              {management?.notice && !detail && <p className="ua-muted" role="status">{management.notice}</p>}
               {setPage && management.detail.catalog?.state === "loading" && <p className="ua-muted" role="status">Loading catalog details...</p>}
               {setPage && management.detail.catalog?.note && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">{management.detail.catalog.note}</span>
@@ -1808,6 +1808,7 @@ export function UnifiedApp({
                     </IconButton>
                   )}
                 </div>
+                {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
                 <div className="ua-description">
                   {(detailParagraphs.length ? detailParagraphs : ["No description available."]).map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>

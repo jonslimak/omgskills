@@ -13,6 +13,8 @@ import { AccountDialogReview } from "./account-dialog-review";
 import { useSetCatalog } from "../src/app/unified/use-set-catalog";
 import { LoadingScreen } from "../src/app/LoadingScreen";
 import { publicPagingFixture } from "./public-paging-fixture";
+import { changeMembership } from "../src/preview/state";
+import { emptyMembershipResult, type MembershipCommand } from "../src/integration/membership-data";
 
 // Browser-only presentation fixture. No Clerk, backend, or account writes.
 const base = "/app/testing/unified-acceptance/";
@@ -20,6 +22,7 @@ if (!import.meta.env.DEV || !["127.0.0.1", "localhost"].includes(location.hostna
   throw new Error("This fixture only runs on the local review route.");
 }
 const params = new URLSearchParams(location.search);
+const favoritesReview = ["1", "error", "uncertain"].includes(params.get("favoritesReview") || "");
 const scenario = (params.get("scenario") || "populated") as Scenario;
 const catalog = makeCatalog();
 const localCollectionCovers = import.meta.glob<string>("../../site/images/collections/*.webp", {
@@ -45,7 +48,7 @@ const setClient = new PublicCatalogClient(async (path, init) => {
   } } }), { headers: { "content-type": "application/json" } });
 });
 if (setCatalogReview) sample.sets = sample.sets.map(set => set.isFavorites ? { ...set, items: [
-  { id: "saved-pdf", kind: "catalog", catalogSkillId: "example/skills:pdf", name: "example/skills:pdf", description: "", githubUrl: null },
+  { id: "saved-pdf", kind: "catalog", syncedSkillId: null, catalogSkillId: "example/skills:pdf", name: "example/skills:pdf", description: "", githubUrl: null },
 ] } : set);
 sample.profile = { name: "Sample Reviewer", email: "reviewer@example.test", handle: "reviewer", published: false };
 sample.sets = sample.sets.map(set => ({ ...set, ownerName: "Sample Owner",
@@ -54,16 +57,19 @@ const rejectWrite = async (): Promise<never> => { throw new Error("This review d
 
 function Review() {
   const [signedIn, setSignedIn] = useState(params.get("signedOut") !== "1");
+  const [reviewData, setReviewData] = useState(sample);
+  const [savingFavorite, setSavingFavorite] = useState(false);
   const [recovered, setRecovered] = useState(false);
   const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
   const nav = accountNavigation(requested, signedIn);
   const remote = usePublicCatalog(publicClient, publicNavigation(nav), publicReview);
-  const data = signedIn ? sample : emptyAccount({ name: "Visitor", email: "" });
+  const data = signedIn ? reviewData : emptyAccount({ name: "Visitor", email: "" });
   const navigate = (next: Navigation, replace = false) => {
     const safe = accountNavigation(next, signedIn);
     const search = new URLSearchParams(navigationSearch(safe));
     if (!publicReview) search.set("catalog", "0");
     if (pagingReview) search.set("paging", "1");
+    if (favoritesReview) search.set("favoritesReview", params.get("favoritesReview")!);
     history[replace ? "replaceState" : "pushState"]({}, "", base + (search.size ? `?${search}` : ""));
     setRequested(safe);
   };
@@ -81,8 +87,36 @@ function Review() {
       imageUrl: collection.imageUrl ? localCollectionCovers[`../../site/images/collections/${collection.id}.webp`] ?? collection.imageUrl : undefined,
     })),
     skills: [...baseCatalog.skills.map(skill => pagingReview ? { ...skill, avatar: catalog.creators[0]?.avatar } : skill), ...setCatalog.skills.map(skill => ({ ...skill, avatar: undefined }))] };
-  const management = useManagement({ data, mine: skillDisplays(data, shownCatalog).mine, busy: false, blocked: false,
-    scope: `${nav.view}:${nav.id}:${nav.query}:${signedIn}`, saveSet: rejectWrite, saveMembership: rejectWrite,
+  async function saveReviewFavorite(command: MembershipCommand) {
+    if (!favoritesReview) return rejectWrite();
+    if (!signedIn || !(command.kind === "favorites" || command.kind === "remove-favorite" || (command.kind === "catalog" && command.favorite))) return rejectWrite();
+    const favorites = data.sets.find(set => set.isFavorites && set.role === "owner");
+    if (!favorites) return rejectWrite();
+    setSavingFavorite(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 250));
+      if (params.get("favoritesReview") === "error") throw new Error("Sample save failed. Your real account is unchanged.");
+      if (params.get("favoritesReview") === "uncertain") return { ...emptyMembershipResult(), uncertain: true };
+      setReviewData(current => ({ ...current, sets: current.sets.map(set => {
+        if (set.id !== favorites.id) return set;
+        let items = set.items;
+        if (command.kind === "favorites") items = changeMembership(set, command.skills, command.add).items;
+        else if (command.kind === "catalog" && !items.some(item => item.catalogSkillId === command.catalogId)) items = [...items, {
+          id: `sample-${command.catalogId}`, kind: "catalog", syncedSkillId: null, catalogSkillId: command.catalogId,
+          name: shownCatalog.skills.find(skill => skill.id === command.catalogId)?.name || command.catalogId, description: "", githubUrl: null,
+        }];
+        else if (command.kind === "remove-favorite") {
+          const installed = skillDisplays(current, shownCatalog).mine.find(skill => skill.installed?.id === command.skillId)?.installed;
+          if (installed) items = changeMembership(set, [installed], false).items;
+          items = items.filter(item => !(command.catalogId && item.catalogSkillId === command.catalogId));
+        }
+        return { ...set, items, itemCount: items.length };
+      }) }));
+      return { ...emptyMembershipResult(), groupId: favorites.id, added: command.kind === "remove-favorite" ? 0 : 1, removed: command.kind === "remove-favorite" ? 1 : 0 };
+    } finally { setSavingFavorite(false); }
+  }
+  const management = useManagement({ data, mine: skillDisplays(data, shownCatalog).mine, busy: savingFavorite, blocked: false,
+    scope: `${nav.view}:${nav.id}:${nav.query}:${signedIn}`, saveSet: rejectWrite, saveMembership: saveReviewFavorite,
     detail: { ...detail, catalog: setCatalogReview ? setCatalog : undefined }, base, local: true });
   return <UnifiedApp key={String(signedIn)} data={data} catalog={shownCatalog} publicStatus={publicReview ? remote.status : undefined} nav={nav} navigate={navigate}
     signedIn={signedIn} onSession={next => { setSignedIn(next); setRequested({ ...initialNavigation, view: "discover" }); }}
