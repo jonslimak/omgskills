@@ -107,6 +107,7 @@ import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery
 import { descriptionParagraphs } from "./description-paragraphs";
 import { Avatar } from "./Avatar";
 import { DataPage } from "./DataPage";
+import { SkillReadme } from "./SkillReadme";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -1728,6 +1729,7 @@ export function UnifiedApp({
                   if (wide) event.preventDefault();
                 }}
               >
+                <div className="ua-detail-header">
                 <div className="ua-detail-top">
                   <span className="ua-grabber" />
                   <Dialog.Close asChild>
@@ -1765,16 +1767,7 @@ export function UnifiedApp({
                     </div>
                   )}
                 </div>
-                {panelPending ? (
-                  <>
-                    {publicStatus?.detail === "error" ? <>
-                      <p role="status">{publicStatus.detailError}</p>
-                      <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>
-                    </> : <div className="ua-detail-skeleton" role="status" aria-label="Loading skill">
-                      <span /><span /><span /><span />
-                    </div>}
-                  </>
-                ) : <>
+                {!panelPending && <>
                 <div className="ua-detail-actions">
                   {detail.githubUrl ? (
                     <a
@@ -1824,11 +1817,25 @@ export function UnifiedApp({
                   )}
                 </div>
                 {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
+                </>}
+                </div>
+                <div className="ua-detail-body" role="region" aria-label="Skill content" tabIndex={0}>
+                {panelPending ? (
+                  <>
+                    {publicStatus?.detail === "error" ? <>
+                      <p role="status">{publicStatus.detailError}</p>
+                      <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>
+                    </> : <div className="ua-detail-skeleton" role="status" aria-label="Loading skill">
+                      <span /><span /><span /><span />
+                    </div>}
+                  </>
+                ) : <>
                 <div className="ua-description">
                   {(detailParagraphs.length ? detailParagraphs : ["No description available."]).map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
                   ))}
                 </div>
+                <SkillReadme skill={detail} />
                 {detail.installed && (
                   <section className="ua-detail-account">
                     <h3>On this account</h3>
@@ -1887,6 +1894,7 @@ export function UnifiedApp({
                   </section>
                 )}
                 </>}
+                </div>
               </Dialog.Content>
             </Dialog.Portal>
           </Dialog.Root>

@@ -1,4 +1,4 @@
-const catalogPaths = ["/mcp", "/mcp/health", "/data/crawl4/*", "/data/v2/*", "/catalog-skill-urls.json"];
+const catalogPaths = ["/mcp", "/mcp/health", "/data/crawl4/*", "/data/v2/*", "/catalog-skill-urls.json", "/api/public/skill-readme"];
 
 // Public catalog exceptions must precede the app subdomain's forced SPA fallback.
 export const appDomainRedirects = [
