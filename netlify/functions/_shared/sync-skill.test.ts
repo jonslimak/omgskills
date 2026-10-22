@@ -148,8 +148,9 @@ test("report versions never downgrade; bounds and duplicate keys apply to both m
 test("read version is explicit and historical paths cannot become folder names", () => {
   const req = (suffix: string) => new Request(`https://example.test/api/portal/synced-skills${suffix}`);
   assert.equal(inventoryReadVersion(req("")), 1);
+  assert.equal(inventoryReadVersion(req("?version=1")), 1);
   assert.equal(inventoryReadVersion(req("?version=2")), 2);
-  for (const suffix of ["?version=1", "?version=3", "?version=2&version=2", "?version="]) {
+  for (const suffix of ["?version=3", "?version=1&version=1", "?version=2&version=2", "?version="]) {
     assert.throws(() => inventoryReadVersion(req(suffix)), badRequest);
   }
   assert.equal(installationFolderFromKey("codex:/Users/person/.codex/skills/review", "codex"), null);

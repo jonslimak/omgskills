@@ -55,15 +55,27 @@ export async function performSyncUpload(
     let userId: string;
     let deviceId: string | null = null;
     let legacyTokenId: string | null = null;
+    let deviceRevisionsAvailable = false;
 
     if (authentication.kind === "device") {
       const device = await requireDeviceToken(authentication.request, client, "sync:write", now);
       userId = device.userId;
       deviceId = device.deviceId;
-      const state = await inventoryRevisionState(client, userId, deviceId);
-      if ((state.protocol === 3 && reportVersion !== 3)
-        || (reportVersion === 3 && reconciliation!.baseRevision !== state.revision)) {
-        throw new Response("Inventory revision changed; take a fresh scan", { status: 409 });
+      const schema = await client.query<{ available: boolean }>(
+        `SELECT EXISTS (SELECT 1 FROM pg_attribute
+         WHERE attrelid = 'device_tokens'::regclass AND attname = 'inventory_revision'
+           AND attnum > 0 AND NOT attisdropped) AS available`
+      );
+      deviceRevisionsAvailable = schema.rows[0].available;
+      if (!deviceRevisionsAvailable && reportVersion !== 1) {
+        throw new Response("Per-Mac inventory schema is not available", { status: 503 });
+      }
+      if (deviceRevisionsAvailable) {
+        const state = await inventoryRevisionState(client, userId, deviceId);
+        if ((state.protocol === 3 && reportVersion !== 3)
+          || (reportVersion === 3 && reconciliation!.baseRevision !== state.revision)) {
+          throw new Response("Inventory revision changed; take a fresh scan", { status: 409 });
+        }
       }
     } else {
       const tokenResult = await client.query<{ id: string; user_id: string }>(
@@ -91,11 +103,13 @@ export async function performSyncUpload(
       now, roots: reconciliation?.roots
     });
     if (deviceId) {
-      await client.query(
-        `UPDATE device_tokens SET inventory_revision = $2, inventory_protocol = GREATEST(inventory_protocol, $3)
-         ${reportVersion === 3 ? ", inventory_checked_at = GREATEST(inventory_checked_at, $5::timestamptz)" : ""}
-         WHERE id = $1 AND user_id = $4`, [deviceId, syncRunId, reportVersion, userId, ...(reportVersion === 3 ? [now] : [])]
-      );
+      if (deviceRevisionsAvailable) {
+        await client.query(
+          `UPDATE device_tokens SET inventory_revision = $2, inventory_protocol = GREATEST(inventory_protocol, $3)
+           ${reportVersion === 3 ? ", inventory_checked_at = GREATEST(inventory_checked_at, $5::timestamptz)" : ""}
+           WHERE id = $1 AND user_id = $4`, [deviceId, syncRunId, reportVersion, userId, ...(reportVersion === 3 ? [now] : [])]
+        );
+      }
       await touchDeviceAfterSuccessfulUse(client, deviceId, now);
     } else if (legacyTokenId) {
       await client.query("UPDATE sync_tokens SET used_at = $2 WHERE id = $1", [legacyTokenId, now]);

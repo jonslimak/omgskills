@@ -55,7 +55,7 @@ test("rejects a migration directory without migration.sql", async (t) => {
   );
 });
 
-test("compatibility release stages only the nine unchanged pre-inventory migrations", async (t) => {
+test("merged release stages all reviewed migrations without changing their SQL", async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), "omgskills-bridge-migrations-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const sourceDir = new URL("../netlify/database/migrations/", import.meta.url);
@@ -65,6 +65,8 @@ test("compatibility release stages only the nine unchanged pre-inventory migrati
     "20260712100000_add_device_tokens", "20260827150000_add_shared_skill_release_storage",
     "20260827203000_add_github_broker_installations", "20260828150000_add_content_fetch_audit",
     "20260901170000_add_device_token_scopes",
+    "20261016120000_add_device_inventory", "20261016130000_add_inventory_reconciliation",
+    "20261016140000_add_inventory_check_time", "20261021170000_add_device_reconnect_key",
   ];
   const destinationDir = path.join(root, "staged");
   assert.deepEqual(await stageNetlifyDbMigrations({ destinationDir }), expected);

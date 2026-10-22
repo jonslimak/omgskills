@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
-import { createRequire, findPackageJSON } from 'node:module';
+import { createRequire } from 'node:module';
 import net from 'node:net';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import test from 'node:test';
@@ -19,6 +19,16 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const cleanEnvironment = () => ({ PATH: `${dirname(process.execPath)}:/usr/bin:/bin`, LC_ALL: 'C',
   TMPDIR: '/private/tmp', NODE_ENV: 'test', CLERK_SECRET_KEY: `sk_test_${sentinel}`,
   SKILLGROUPS_DATABASE_URL: `postgresql://${sentinel}@invalid.invalid/forbidden`, NETLIFY_AUTH_TOKEN: sentinel });
+
+async function findPackageManifest(name, entry) {
+  const parts = name.split('/');
+  const packageName = parts.slice(0, name.startsWith('@') ? 2 : 1).join('/');
+  for (const directory of createRequire(entry).resolve.paths(name) ?? []) {
+    try { return await realpath(join(directory, packageName, 'package.json')); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
+  throw Error('Packaged dependency manifest is missing: ' + packageName);
+}
 
 function validateEntry(entry, names) {
   assert.ok(entry.fileName && !isAbsolute(entry.fileName) && !entry.fileName.includes('\\')
@@ -97,7 +107,7 @@ async function smokeWorker() {
   const dependencies = {};
   for (const name of ['pg', '@clerk/backend', '@netlify/database', 'drizzle-orm/node-postgres']) {
     // The real ESM module already loaded above. CJS resolution can select an untraced alternate export.
-    const dependency = await realpath(findPackageJSON(name, pathToFileURL(user)));
+    const dependency = await findPackageManifest(name, user);
     assert.ok(dependency.startsWith(root + '/'), 'Runtime dependency escaped the extracted package');
     dependencies[name] = relative(root, dependency);
   }

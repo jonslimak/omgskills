@@ -89,8 +89,9 @@ struct DeviceCredentialStoreTests {
         #expect(service == DeviceCredentialStore.defaultService)
     }
 
-    @Test func persistsAndDeletesCredentialInKeychain() async throws {
-        let store = DeviceCredentialStore(service: uniqueService())
+    @Test func persistsAndDeletesCredentialUsingKeychainOperations() async throws {
+        let fake = TestDeviceKeychain()
+        let store = DeviceCredentialStore(service: uniqueService(), keychain: fake.operations)
         let record = makeCredential(deviceID: "device-1", credential: "secret-1")
 
         try await store.save(record, replacingExisting: false)
@@ -101,7 +102,8 @@ struct DeviceCredentialStoreTests {
     }
 
     @Test func replacingAnotherDeviceRequiresExplicitApproval() async throws {
-        let store = DeviceCredentialStore(service: uniqueService())
+        let fake = TestDeviceKeychain()
+        let store = DeviceCredentialStore(service: uniqueService(), keychain: fake.operations)
         let first = makeCredential(deviceID: "device-1", credential: "secret-1")
         let replacement = makeCredential(deviceID: "device-2", credential: "secret-2")
 

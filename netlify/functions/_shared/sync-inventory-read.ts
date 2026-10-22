@@ -16,7 +16,10 @@ export function inventoryReadVersion(req: Request, allowReconciliation = false):
 }
 
 export async function readSyncInventory(pool: Pool, userId: string, version: 1 | 2 | 3, now = new Date()) {
-  if (version === 1) return readLegacySyncInventory(pool, userId);
+  if (version === 1) {
+    const { skills } = await readLegacySyncInventory(pool, userId);
+    return { skills };
+  }
   const result = await pool.query(
     `SELECT id, stable_key AS "stableKey", skill_md_sha AS "skillMdSha",
        identity_status AS "identityStatus", name, description,

@@ -147,7 +147,7 @@ test("default and explicitly enabled v2 account reads retain their response shap
   for (const [query, version] of [["", 1], ["?version=2", 2]] as const) {
     const body = version === 1 ? { skills: [] } : { inventoryVersion: 2 as const, skills: [], devices: [] };
     const response = await portalSyncedSkills(new Request(`https://example.test/api/portal/synced-skills${query}`), context, {
-      getEnvironment: noDatabase, getPgPool: () => pool,
+      getEnvironment: () => ({}), getPgPool: () => pool,
       requireReconciliation() {},
       requirePortalUser: async () => ({ id: "owner", clerkUserId: "clerk", email: "owner@example.test", displayName: null }),
       async readSyncInventory(_pool, owner, actualVersion) { assert.equal(owner, "owner"); assert.equal(actualVersion, version); return body; }
