@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import type { IncomingMessage } from "node:http";
 import { catalogInstallMiddleware, catalogInstallServerEnabled, localCatalogLoader } from "./catalog-install-test-server";
 import { testBackendOrigin, isIntegrationRequest, isIntegrationBody, connectedInventoryServerEnabled, inventoryReconciliationServerEnabled } from "./integration-config";
+import { readmeDev } from "./readme-dev";
 import {
   isPublicCatalogRequest,
   publicCatalogPathPattern,
@@ -35,6 +36,7 @@ export default defineConfig(({ mode, command }) => {
     plugins: [
       react(),
       tailwindcss(),
+      readmeDev(catalogProxy),
       {
         name: "local-catalog-install-test",
         configResolved(config) {

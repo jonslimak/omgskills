@@ -111,6 +111,8 @@ test("signed-out Mac downloads sit centered below Sign in and hide in the collap
   assert.ok(home.includes('<span class="apple-icon" aria-hidden="true">&#63743;</span>'));
   assert.equal(source.includes('ua-public-actions'), false);
   const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  assert.match(css, /\.ua-sidebar-bottom\s*\{[^}]*flex-direction: column;[^}]*align-items: flex-start;/);
+  assert.match(css, /\.ua-theme-toggle svg\s*\{\s*color: color-mix\(in srgb, var\(--ua-faint\) 60%, #fff\);/);
   assert.match(css, /\.ua-account-footer \.ua-sidebar-download\s*\{[^}]*justify-content: center/);
   assert.match(css, /\.ua-workspace\[data-rail="true"\] \.ua-account\s*\{\s*justify-content: center;\s*padding-inline: 0;\s*gap: 0;/);
   assert.match(css, /\.ua-workspace\[data-rail="true"\] \.ua-account-footer \.ua-sidebar-download\s*\{\s*display: none;/);

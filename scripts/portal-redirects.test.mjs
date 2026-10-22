@@ -15,7 +15,7 @@ function destination(url) {
 
 test("public catalog exceptions win before the app fallback on both schemes", () => {
   for (const scheme of ["http", "https"]) {
-    for (const path of ["/mcp", "/mcp/health", "/data/crawl4/manifest.json", "/data/crawl4/collections-a123.json", "/data/v2/manifest.json", "/data/v2/collections-abc123.json", "/catalog-skill-urls.json"]) {
+    for (const path of ["/mcp", "/mcp/health", "/data/crawl4/manifest.json", "/data/crawl4/collections-a123.json", "/data/v2/manifest.json", "/data/v2/collections-abc123.json", "/catalog-skill-urls.json", "/api/public/skill-readme"]) {
       assert.deepEqual(destination(`${scheme}://app.omgskills.com${path}`), {
         to: `https://omgskills.com${path}`, status: "200!"
       });
