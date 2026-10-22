@@ -63,11 +63,12 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
       if (generation.current === version) setNotice(error instanceof Error ? error.message : "Could not update visibility.");
     } finally { pending.current = false; }
   }
-  async function submit() {
+  async function submit(request: Request | null, immediate = false) {
     if (!request || disabled || pending.current) return;
     pending.current = true;
     const version = generation.current;
     setError("");
+    if (immediate) setNotice("");
     try {
       let result: MembershipResult | undefined;
       let message = "Saved.";
@@ -120,7 +121,11 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
       }
       if (generation.current === version) { setRequest(null); setNotice(message); }
     } catch (error) {
-      if (generation.current === version) setError(error instanceof Error ? error.message : "Could not save. Try again.");
+      if (generation.current === version) {
+        const message = error instanceof Error ? error.message : "Could not save. Try again.";
+        if (immediate) setNotice(message);
+        else setError(message);
+      }
     } finally { pending.current = false; }
   }
   function copyLink(set: PortalSet) {
@@ -135,7 +140,10 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     busy, blocked, notice, detail,
     create: (skills = []) => show({ kind: "create", skills }),
     add: (skills, set) => show({ kind: "add", skills, set }),
-    favorite: skill => show({ kind: "favorite", skill, add: !isFavorite(data, skill) }),
+    favorite: skill => {
+      const next: Request = { kind: "favorite", skill, add: !isFavorite(data, skill) };
+      void submit(next, true);
+    },
     rename: set => show({ kind: "rename", set }),
     access: set => { if (set.role === "owner" && !set.hidden && !set.isFavorites) show({ kind: "access", set }); },
     visibility: (set, visibility) => {
@@ -166,7 +174,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         : request.kind === "favorite" ? request.add ? "Add to public Favorites?" : "Remove from Favorites?"
         : request.kind === "remove" ? "Remove from set?" : request.kind === "rename" ? "Rename set"
         : request.kind === "create" ? "New set" : "Add to set"}>
-      <form onSubmit={event => { event.preventDefault(); void submit(); }}>
+      <form onSubmit={event => { event.preventDefault(); void submit(request); }}>
         {request.kind === "publish" && <p>Anyone with the link can view {request.set.name}. Saved emails will no longer restrict access.</p>}
         {request.kind === "moderate" && <p>{request.set.hidden ? "Restore this set with its previous visibility and email access." : "Hide this set from other people. Installed skills will not be removed."}</p>}
         {request.kind === "favorite" && <p>{request.add
