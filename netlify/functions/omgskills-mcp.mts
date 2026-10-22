@@ -90,7 +90,7 @@ const handler = createConfiguredMcpHandler(validateProductionFeatures(featureCon
 export default handler;
 
 export const config: Config = {
-  path: ["/mcp", "/mcp/health", catalogInstallRecordPath],
+  path: ["/mcp", "/mcp/health", "/api/catalog/install-record"],
   rateLimit: {
     windowLimit: 600,
     windowSize: 60,
