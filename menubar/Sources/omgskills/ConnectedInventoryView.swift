@@ -45,6 +45,9 @@ struct ConnectedInventoryView: View {
                     else { model.connectWithBrowser(deviceName: deviceName, installations: [], replacingExisting: true) }
                 }
             }
+            if let warning = model.continuityWarning {
+                Text(warning).font(.caption).foregroundStyle(.secondary)
+            }
             if let warning = model.disconnectWarning {
                 Text(warning).font(.caption).foregroundStyle(.secondary)
             }

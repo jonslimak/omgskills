@@ -13,8 +13,10 @@ struct ConnectedInventoryRuntimeTests {
         let store = InventoryCredentialFixture(record: nil)
         let api = InventoryAPIFixture(reportMode: .reconciliation)
         let authorizer = InventoryAuthorizerFixture()
-        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: authorizer,
-            coordinator: UpdateInstallCoordinator(), credentialStore: store, api: api)
+        let keys = InventoryReconnectFixture()
+        let runtime = try config.makeRuntime(paths: candidate.paths, authorizer: authorizer,
+            coordinator: UpdateInstallCoordinator(), credentialStore: store,
+            makeReconnectKeyStore: { _, _ in keys }, api: api)
         let cold = URL(string: "omgskills://pair?state=stale&code=stale")!
         #expect(runtime.receivePairingCallback(cold))
         #expect(authorizer.callbacks == [cold])
@@ -31,12 +33,16 @@ struct ConnectedInventoryRuntimeTests {
         #expect(runtime.receivePairingCallback(warm))
         #expect(authorizer.callbacks == [cold, warm])
         await runtime.stop()
-        let reopened = config.makeRuntime(paths: candidate.paths, authorizer: authorizer,
-            coordinator: UpdateInstallCoordinator(), credentialStore: store, api: api)
+        let reopened = try config.makeRuntime(paths: candidate.paths, authorizer: authorizer,
+            coordinator: UpdateInstallCoordinator(), credentialStore: store,
+            makeReconnectKeyStore: { _, _ in keys }, api: api)
         await reopened.start().value
         #expect(reopened.connection.state == .connected(inventoryCredential.connection))
         #expect(await store.record == inventoryCredential)
         #expect(await api.exchanges == 1)
+        #expect(await api.legacyExchanges == 0)
+        #expect(await api.bindings == 1)
+        #expect(await keys.loads == 2)
         #expect(await api.uploads == 2)
         await reopened.stop()
     }
@@ -53,8 +59,9 @@ struct ConnectedInventoryRuntimeTests {
         let store = InventoryCredentialFixture()
         let api = InventoryAPIFixture(reportMode: .reconciliation)
         let coordinator = UpdateInstallCoordinator()
-        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
-            coordinator: coordinator, credentialStore: store, api: api)
+        let runtime = try config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
+            coordinator: coordinator, credentialStore: store,
+            makeReconnectKeyStore: { _, _ in InventoryReconnectFixture() }, api: api)
         await runtime.start().value
         #expect(await api.lastPayload?.skills.isEmpty == true)
         let service = InventoryInstallFixture(paths: candidate.paths)
@@ -96,8 +103,9 @@ struct ConnectedInventoryRuntimeTests {
         let store = InventoryCredentialFixture()
         let api = InventoryAPIFixture(reportMode: .reconciliation)
         let coordinator = UpdateInstallCoordinator()
-        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
-            coordinator: coordinator, credentialStore: store, api: api)
+        let runtime = try config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
+            coordinator: coordinator, credentialStore: store,
+            makeReconnectKeyStore: { _, _ in InventoryReconnectFixture() }, api: api)
         await runtime.start().value
         let service = InventoryInstallFixture(paths: candidate.paths)
         let model = CatalogInstallModel(service: service, coordinator: coordinator, client: .product)
@@ -122,8 +130,9 @@ struct ConnectedInventoryRuntimeTests {
         let coordinator = UpdateInstallCoordinator()
         let gate = InventoryShutdownGate()
         await api.setReportGate(gate)
-        let runtime = config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
-            coordinator: coordinator, credentialStore: InventoryCredentialFixture(), api: api)
+        let runtime = try config.makeRuntime(paths: candidate.paths, authorizer: InventoryAuthorizerFixture(),
+            coordinator: coordinator, credentialStore: InventoryCredentialFixture(),
+            makeReconnectKeyStore: { _, _ in InventoryReconnectFixture() }, api: api)
         let model = CatalogInstallModel(service: InventoryInstallFixture(), coordinator: coordinator, client: .product)
         let startup = runtime.start()
         await gate.waitUntilBlocked()
@@ -503,6 +512,14 @@ struct ConnectedInventoryRuntimeTests {
 private let inventoryCredential = StoredDeviceCredential(credential: "test-only-secret", connection: .init(
     deviceID: "inventory-test-device", accountLabel: "Test account", expiresAt: .distantFuture))
 
+private actor InventoryReconnectFixture: DeviceReconnectKeyStoring {
+    var loads = 0
+    func loadOrCreate() async throws -> String {
+        loads += 1
+        return String(repeating: "a", count: 64)
+    }
+}
+
 private actor InventoryCredentialFixture: DeviceCredentialStoring {
     var record: StoredDeviceCredential?
     var loads = 0
@@ -530,6 +547,8 @@ private actor InventoryAPIFixture: DeviceSyncServing {
     var revocations = 0
     var checks = 0
     var exchanges = 0
+    var legacyExchanges = 0
+    var bindings = 0
     var lastPayload: ReconciliationSyncPayload?
     private var revision: String?
     private var reportGate: InventoryShutdownGate?
@@ -542,7 +561,21 @@ private actor InventoryAPIFixture: DeviceSyncServing {
     func setFailure(_ value: Bool) { failure = value }
     func exchange(pairingCode: String, deviceName: String, codeVerifier: String?) async throws -> StoredDeviceCredential {
         exchanges += 1
+        legacyExchanges += 1
         return inventoryCredential
+    }
+    func exchangeForReconnect(pairingCode: String, deviceName: String, codeVerifier: String?,
+                              reconnectKey: String) async throws -> DeviceReconnectExchange {
+        guard DeviceReconnectKeyStore.isValidKey(reconnectKey), codeVerifier?.count == 43 else {
+            throw DeviceSyncAPIError.invalidPairingCode
+        }
+        exchanges += 1
+        return .init(record: inventoryCredential, support: .supported)
+    }
+    func bindReconnectKey(credential: String, reconnectKey: String, expectedDeviceID: String) async throws {
+        guard credential == inventoryCredential.credential, DeviceReconnectKeyStore.isValidKey(reconnectKey),
+              expectedDeviceID == inventoryCredential.connection.deviceID else { throw DeviceSyncAPIError.invalidResponse }
+        bindings += 1
     }
     func revoke(credential: String) async throws {
         try Task.checkCancellation()

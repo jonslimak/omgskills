@@ -66,10 +66,15 @@ extension ConnectedCandidateConfiguration {
     func makeRuntime(paths: SkillFilesystemPaths, authorizer: any BrowserPairingAuthorizing,
                      coordinator: UpdateInstallCoordinator,
                      credentialStore: (any DeviceCredentialStoring)? = nil,
+                     makeReconnectKeyStore: (URL, String) throws -> any DeviceReconnectKeyStoring = {
+                         try DeviceReconnectKeyStore(apiOrigin: $0, credentialService: $1)
+                     },
                      api: (any DeviceSyncServing)? = nil,
-                     automation: ConnectedInventoryRuntime.Automation? = nil) -> ConnectedInventoryRuntime {
+                     automation: ConnectedInventoryRuntime.Automation? = nil) throws -> ConnectedInventoryRuntime {
+        let reconnectKeyStore = try makeReconnectKeyStore(CatalogCandidateRuntime.origin, keychainService)
         let connection = DeviceConnectionModel(
             credentialStore: credentialStore ?? DeviceCredentialStore(service: keychainService),
+            reconnectKeyStore: reconnectKeyStore,
             api: api ?? DeviceSyncAPI(uploadEndpoint: uploadURL, reportMode: .reconciliation),
             browserAuthorizer: authorizer, portalConnectURL: connectURL,
             callbackScheme: callbackScheme, updateCoordinator: coordinator,

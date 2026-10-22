@@ -7,6 +7,9 @@ struct CatalogInstallView: View {
     let close: () -> Void
     var connection: DeviceConnectionModel? = nil
     var inventoryRuntime: ConnectedInventoryRuntime? = nil
+    var connectionSetupError: String? = nil
+
+    static let connectionSetupFailureMessage = "Account connection is unavailable. Skill installation is still available."
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -15,6 +18,9 @@ struct CatalogInstallView: View {
             if let connection {
                 ConnectedInventoryView(model: connection, deviceName: Host.current().localizedName ?? "Test Mac", runtime: inventoryRuntime)
                 Divider()
+            }
+            if let connectionSetupError {
+                Text(connectionSetupError).font(.callout).foregroundStyle(.red)
             }
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
@@ -124,13 +130,19 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
         if let connected = candidate.connected {
             let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.window },
                 onReturn: { [weak self] in self?.showStatus() })
-            let runtime = connected.makeRuntime(paths: candidate.paths, authorizer: authorizer,
-                coordinator: coordinator, automation: .live(paths: candidate.paths))
-            connectedRuntime = runtime
-            runtime.observeInstalls(in: model)
-            window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
-                close: { [weak self] in self?.closeRequest() }, connection: runtime.connection, inventoryRuntime: runtime))
-            runtime.start()
+            do {
+                let runtime = try connected.makeRuntime(paths: candidate.paths, authorizer: authorizer,
+                    coordinator: coordinator, automation: .live(paths: candidate.paths))
+                connectedRuntime = runtime
+                runtime.observeInstalls(in: model)
+                window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
+                    close: { [weak self] in self?.closeRequest() }, connection: runtime.connection, inventoryRuntime: runtime))
+                runtime.start()
+            } catch {
+                window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
+                    close: { [weak self] in self?.closeRequest() },
+                    connectionSetupError: CatalogInstallView.connectionSetupFailureMessage))
+            }
         }
     }
 
