@@ -92,3 +92,8 @@ test("entry wiring defaults the redesign off and retains guards, auth returns an
   assert.match(localEntry, /integrationConfigurationError/);
   assert.match(localEntry, /local installEnabled=\{false\}/);
 });
+
+test("the transitional app shell asks search engines not to index it", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /<meta name="robots" content="noindex, follow" \/>/);
+});
