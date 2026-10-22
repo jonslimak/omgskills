@@ -1,0 +1,100 @@
+{
+  "createdAt": "2026-10-08T21:34:14.596Z",
+  "root": "/private/tmp/omgskills-f1-hVqS0Y",
+  "app": "/Users/jonslimak/.codex/worktrees/newmac-f1-core/omgskills/menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-hVqS0Y/OMGSkills F1 Test.app",
+  "website": "http://127.0.0.1:5197/app/preview/unified/?view=discover&skill=catalog%3Aanthropics%2Fskills%3Askills%2Ffrontend-design",
+  "binarySHA256": "3746253a71e47f3a098057630113b72d2f500b0947554d75f70fcd1ae5850662",
+  "bundleID": "com.jonslimak.omgskills.f1",
+  "scheme": "omgskills-f1",
+  "state": "F1 local functional acceptance passed: A install/discovery, repeat no-op, Cancel A/B, local-edit refusal/restoration and B apply/discovery; uncommitted, no public release; test cleanup pending",
+  "pathFix": {
+    "date": "2026-10-09",
+    "cause": "Foundation normalized existing /private/tmp paths to /tmp but left missing child paths unchanged, causing a false destination conflict",
+    "change": "Return the validated canonical F1 root before deriving child paths; conflict and redirection checks unchanged",
+    "redTest": "runtimePathsSupportFirstInstallRepeatAndUpdate reproduced destinationConflict before the fix",
+    "greenTests": "116 tests in 16 suites passed, including app-style runtime paths, Cancel/install/repeat/update, redirected-root rejection and real public A-to-B preflight",
+    "oldBinarySHA256": "1cd42b98d5c1276724cad20257e2d81d6cf033e8d68af42b21269f1a7261c8f2",
+    "rollbackBinary": "/private/tmp/omgskills-f1-hVqS0Y/previous-omgskills-f1",
+    "productionBinarySHA256BeforeAndAfter": "34f3aa9b7a96766463f7e827e521e20a4282c3ff2f71bdbe2bec9b1bc44065b1",
+    "signature": "ad-hoc strict verification passed after replacement",
+    "manualData": "home was empty with no managed store or activation at executable replacement",
+    "delivery": "same F1-only handler and bundle path; public handler unchanged; local page HTTP 200"
+  },
+  "implementationBase": "eb92e8286137ecd3c77d4b4fbdc53a21f6351f6c",
+  "implementationBranch": "codex/newmac-f1-core",
+  "uncommitted": true,
+  "productionHandlerBeforeAndAfter": "/Applications/omgskills.app",
+  "testSchemeResolvesToExactApp": true,
+  "testHomeEmptyBeforeManualAcceptance": true,
+  "fixture": {
+    "catalogID": "anthropics/skills:skills/frontend-design",
+    "repository": "anthropics/skills",
+    "skillMDPath": "skills/frontend-design/SKILL.md",
+    "catalogInstallStatusAtPreflight": "discovery_only",
+    "catalogHasPinnedInstallAtPreflight": false,
+    "A": {
+      "commit": "2235be7c60b551f5de82ade908fd3816455afcda",
+      "tree": "0d5b74a14bdf3ebcd64f352d06376a2ef05ed296",
+      "skillBlob": "decdff43d05908b4c1fc2cfd2d80fc5743440934",
+      "skillBytes": 8260
+    },
+    "B": {
+      "commit": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f",
+      "tree": "d79e2a5bb4df4a386c2adcdd9ab8709bba28c3f6",
+      "skillBlob": "a5333457c414d20d625f307df945842c0952ecc3",
+      "skillBytes": 9390
+    },
+    "expectedChangedFiles": ["SKILL.md"],
+    "unchangedLicenseBlob": "f433b1a53f5b830a205fd2df78e2b34974656c7b"
+  },
+  "automatedChecks": {
+    "swift": "116 tests in 16 suites passed after the path fix",
+    "portal": "230 tests passed",
+    "assembler": "2 tests passed",
+    "publicPreflight": "1 real A-to-B install/update test passed with exact B-byte verification; separate temporary fixture cleaned",
+    "productionBuild": "passed; no F1 scheme or A commit in production output with F1 environment flag set",
+    "visual": "desktop and mobile test detail/button checked",
+    "codeSignature": "ad-hoc strict verification passed; not notarized or publicly released"
+  },
+  "manualChecks": {
+    "coldLaunchAndCancelA": "passed after path fix: user confirmed Cancel; home entries empty and managed store absent before install",
+    "installAAndCodexDiscovery": "passed: user completed install; exact two-file Git tree, blobs and provenance verified; fresh isolated Codex app-server skills/list discovered frontend-design as enabled user skill at the exact installed file with no errors; no login or model call",
+    "repeatANoOp": "passed: user confirmed Already installed result; target link and timestamp, provenance hash and timestamp, activation count and exact A file/tree hashes unchanged from repeatABaseline",
+    "reviewBCancel": "passed: user reported the B review/Cancel steps worked; exact A file/tree hashes, original target link and timestamp, provenance hash and timestamp, and single activation remain unchanged from repeatABaseline",
+    "localEditRefusal": "passed: user confirmed refusal; edited file hash and original activation/provenance remained unchanged; then restored exact A bytes against backup, original permissions and A tree/blob hashes; B not applied",
+    "applyBAndCodexDiscovery": "passed: user completed reviewed B update; exact two-file tree/blob hashes and B provenance verified; fresh isolated Codex skills/list discovered enabled frontend-design at the exact B file with no errors, login or model call"
+  },
+  "finalBVerification": {
+    "date": "2026-10-09",
+    "targetLink": "/tmp/omgskills-f1-hVqS0Y/managed/activations/a9c21f89002704bb396a35aa96adc2a4da9c2b322d33fc2a808d9a0bbc69eb1c/254B6CD9-9661-4BA6-8563-1FA7623EFEC3/content",
+    "provenanceSHA256": "90061b45b4a2cad195c7f54a6f35a69e53a22de313154849c46eae14489ec7c8",
+    "commit": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f",
+    "tree": "d79e2a5bb4df4a386c2adcdd9ab8709bba28c3f6",
+    "skillBlob": "a5333457c414d20d625f307df945842c0952ecc3",
+    "skillBytes": 9390,
+    "licenseBlobUnchanged": true,
+    "activationCount": 2,
+    "isolatedCodexDiscovery": "enabled user skill at exact B file; no discovery errors",
+    "productionBinarySHA256": "34f3aa9b7a96766463f7e827e521e20a4282c3ff2f71bdbe2bec9b1bc44065b1",
+    "productionBinaryUnchanged": true
+  },
+  "temporaryLocalEdit": {
+    "file": "/private/tmp/omgskills-f1-hVqS0Y/managed/packages/6cee06464f0eaea786936bece48db3c7dece935adbc91eb3b579d3c557f24cf1/df86ed335901de498e43f28a1473d63829b11ff0c9c1646f2f237120f85b63c4/content/SKILL.md",
+    "backup": "/private/tmp/omgskills-f1-hVqS0Y/local-edit-SKILL.md.backup",
+    "originalSHA256": "1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd",
+    "editedSHA256": "cb0a7cd4521220f3f04ddc3f6e292f2a39ea27eebfe003810cdef580aafe06d1",
+    "originalMode": "444",
+    "originalAtimeMs": 1791550778198.9006,
+    "originalMtimeMs": 1791550778198.5762,
+    "originalBytes": 8260,
+    "editedBytes": 8322,
+    "status": "restored after verified refusal; original bytes, 444 permissions and A tree/blob hashes verified; backup retained until test cleanup"
+  },
+  "repeatABaseline": {
+    "targetLink": "/tmp/omgskills-f1-hVqS0Y/managed/activations/a9c21f89002704bb396a35aa96adc2a4da9c2b322d33fc2a808d9a0bbc69eb1c/EFEBF355-F0C9-436C-B8BA-C4E32B6A9D1E/content",
+    "targetMtimeMs": 1791550778208.5955,
+    "provenanceSHA256": "f95327234fcd53ee5b4829e96a7961d02d2e2a38d7a81454102100b820a830e6",
+    "provenanceMtimeMs": 1791550778205.115,
+    "activationCount": 1
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "status": "passed_scoped_review",
+  "reviewedAt": "2026-10-09T19:57:40.092Z",
+  "baseCommit": "f7a964b0",
+  "scope": "Six F3a source/test files, Connect/New Mac updates and archived local evidence only",
+  "findings": [],
+  "checks": {
+    "portalTests": {
+      "passed": 249,
+      "failed": 0,
+      "newTests": 17,
+      "rerunForCommit": true
+    },
+    "typeScript": {
+      "passed": true,
+      "command": "tsc --noEmit -p .",
+      "rerunForCommit": true
+    },
+    "normalProductionBuild": {
+      "passed": true,
+      "filesChecked": 8,
+      "previewExcluded": true,
+      "rerunForCommit": true
+    },
+    "unifiedProductionBuild": {
+      "passed": true,
+      "filesChecked": 11,
+      "previewExcluded": true,
+      "rerunForCommit": true
+    },
+    "nativeRegression": {
+      "passed": 34,
+      "suites": 7,
+      "rerunForCommit": false,
+      "note": "Previous F3a run; native sources unchanged."
+    },
+    "sourceManifest": "All six hashes verified unchanged since accepted test",
+    "cleanup": "Passed; see cleanup.json",
+    "manualAcceptance": "User-operated browser/native checks with independent filesystem and Codex read-back; see acceptance.json"
+  },
+  "residualGaps": [
+    "Real signed first-time download/open/return/retry (F3b) is not tested.",
+    "No automated browser screenshots, mobile visual acceptance or measured prompt counts.",
+    "Broader catalog coverage, existing-user migration and release gates remain open."
+  ],
+  "boundaries": {
+    "push": false,
+    "deployment": false,
+    "release": false,
+    "productionAppChanged": false
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "observedAt": "2026-10-09T16:03:22.868Z",
+  "baseCommit": "33b659e6e8db50a7d21f45d7eada5f88645dd45c",
+  "scope": "F2 source/test files after acceptance; no code edits during evidence/cleanup step",
+  "files": [
+    {
+      "file": "menubar/Tests/omgskillsTests/F2PublicPreflightTests.swift",
+      "sha256": "f100e287561df59cd614b07db03fbfe83aa52503b8fb85a5592ba5543eb5d1b0"
+    },
+    {
+      "file": "menubar/Tests/omgskillsTests/MultiSourcePublicSkillInstallerTests.swift",
+      "sha256": "25172435d0f0cf28cc7ac7c3850ff1db97a6af91b7e1337143d372e2e062f30a"
+    },
+    {
+      "file": "menubar/Tests/omgskillsTests/PublicGitHubSkillPackageFetcherTests.swift",
+      "sha256": "9d44a77f436bd63f5c52fe549a6e1d64900a3e0cc6938b3e416e697eb27b08ec"
+    },
+    {
+      "file": "portal/src/app/unified/UnifiedApp.tsx",
+      "sha256": "e26a42e82ac9fc5956920b3909b4723c20f87ec952edc959e6522497b276b69e"
+    },
+    {
+      "file": "portal/src/app/unified/public-install.ts",
+      "sha256": "c48bb7583b402c2d3ea82ae6cfe8bf20edaf8eadc861bde88cb542bcd357e4f1"
+    },
+    {
+      "file": "portal/src/preview/unified/main.tsx",
+      "sha256": "df63d51c96d721191993483472999604da93ca04e54855a17335822278b8fa08"
+    },
+    {
+      "file": "portal/src/preview/unified/f2-install.ts",
+      "sha256": "e23caea4a2a2d48ee4dd18635591814928e3a8ec5a7bc610d7767c23c09d4aee"
+    },
+    {
+      "file": "portal/src/preview/unified/f2-sources.json",
+      "sha256": "0541f2f82ef5048d88cb0e04b1440017d9bf226b6357f06350fcd5b460b3c64b"
+    },
+    {
+      "file": "portal/tests/public-install.test.ts",
+      "sha256": "63367efc0da71ddaae85f8d92d5bb632508d8078e2be3e6a809e03a6dd5bbc54"
+    }
+  ]
+}

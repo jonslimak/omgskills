@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-12",
+  "status": "pass_with_codex_restart_caveat",
+  "scope": "Signed candidate browser-triggered skill update in retained VM, not app self-update or production acceptance",
+  "observationMethod": "Guest UI and read-only guest Terminal output through VirtualBuddy; no guest output files exported",
+  "vm": "OMGSkills-F3b-Test-01",
+  "guestUser": "omgtest",
+  "candidate": {
+    "path": "/Users/omgtest/Applications/OMGSkills Setup Test.app",
+    "bundleId": "com.jonslimak.omgskills.setuptest",
+    "version": "0.1.0",
+    "build": "1",
+    "processIdBeforeAndAfter": 3197,
+    "executableSha256": "b7c9076dbdabe87b84455efa3814932946097b2a447fd4a179c363e8f3a645e6",
+    "signatureCheck": "valid on disk and satisfies designated requirement"
+  },
+  "serverError": {
+    "cause": "Malformed guest Safari address from VM keyboard automation",
+    "correctUrlLoaded": true,
+    "httpStatus": 200,
+    "serverOrCodeChanges": false
+  },
+  "sourceManifest": "preflight.json",
+  "destination": "/Users/omgtest/.codex/skills/humanizer",
+  "activationParent": "/Users/omgtest/Library/Application Support/OMGSkills Setup Test/managed/activations/f9421121ca205fa6883c1c7fad8122ce46a5eca661f980173a7c0c3651852847",
+  "a": {
+    "commit": "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+    "tree": "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813",
+    "installedAt": "2026-10-12T16:47:56Z",
+    "files": 14,
+    "bytes": 66106,
+    "allSourceHashesSizesModesMatched": true,
+    "activation": "78F7D3EF-F8B0-4724-8D32-AD1F8907CD82/content",
+    "provenanceSha256": "60031842730badf6f54f6580df5d083a3ffff457032d822c010d0100e2b92d69",
+    "provenanceInode": 157700,
+    "provenanceBytes": 535,
+    "contentDirectoryInode": 157674
+  },
+  "cancelB": {
+    "status": "pass",
+    "reviewedChanges": ["CHANGELOG.md", "README.md"],
+    "aFilesHashesInodesAndLinkUnchanged": true,
+    "aProvenanceHashInodeAndModificationTimeUnchanged": true
+  },
+  "b": {
+    "commit": "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+    "tree": "8ed37b6d1d98a0bbdb599d0399a4a2185eb8fa03",
+    "installedAt": "2026-10-12T16:52:11Z",
+    "files": 14,
+    "bytes": 65888,
+    "allSourceHashesSizesModesMatched": true,
+    "activation": "1999A9A1-EA79-4A06-8AA1-4B78C16929B4/content",
+    "provenanceSha256": "996ec4a7f0ebff58af40ab80a6ae128f6c949e66a887e1f29d391545663360be",
+    "provenanceInode": 158104,
+    "provenanceBytes": 535,
+    "contentDirectoryInode": 158080,
+    "fileInodes": {
+      ".claude-plugin/marketplace.json": 158082,
+      ".claude-plugin/plugin.json": 158083,
+      ".cursor-plugin/plugin.json": 158085,
+      ".github/ISSUE_TEMPLATE/config.yml": 158088,
+      ".github/ISSUE_TEMPLATE/new-pattern.yml": 158089,
+      ".github/ISSUE_TEMPLATE/rewrite-problem.yml": 158090,
+      ".github/workflows/validate.yml": 158092,
+      "AGENTS.md": 158093,
+      "CHANGELOG.md": 158094,
+      "LICENSE": 158095,
+      "README.md": 158096,
+      "SKILL.md": 158097,
+      "agents/openai.yaml": 158099,
+      "scripts/validate-package.py": 158101
+    }
+  },
+  "repeatB": {
+    "status": "pass",
+    "nativeResult": "Already installed",
+    "all14HashesAndInodesUnchanged": true,
+    "provenanceHashInodeAndModificationTimeUnchanged": true,
+    "activeLinkUnchanged": true
+  },
+  "writingGuidelines": {
+    "status": "unchanged",
+    "skillSha256": "89a5f581193289b80af58b980090aeed535047c8df2b55ccbaae0de40283a99d",
+    "skillInode": 152047,
+    "skillBytes": 1233,
+    "provenanceSha256": "f5e9fc685b4299cbadf3297168a47c74ae0de5d8287d747ccdf998bfd404bc7e",
+    "provenanceInode": 152054,
+    "provenanceBytes": 611,
+    "modificationTimeGuestLocal": "2026-10-12 11:24:12",
+    "activation": "6e3143e579246edb70c1583c47bc12e6cc6fe8b3a0447476fec273b99c875436/C4F2C6B7-A182-4CB9-8847-52EF55A57F1B/content",
+    "hashesInodesModificationTimesAndLinkMatchBaseline": true
+  },
+  "discovery": {
+    "status": "pass_after_restart",
+    "action": "Refresh guest installed Skills, then approved normal guest Codex quit/reopen",
+    "refreshOnlyResult": "No skills found",
+    "result": "Humanizer appeared under Installed after restart; details rendered expected skill content",
+    "writingGuidelinesVisible": true,
+    "writingGuidelinesVisibleAfterRestart": true,
+    "humanizerLogMatches": 0,
+    "cause": "unknown; recovery after restart is consistent with stale discovery state but does not prove the cause",
+    "followUp": "Retain refresh-only discovery failure; do not claim restart-free discovery is proven",
+    "guestCodexRestarted": true,
+    "restartMethod": "Normal app-menu Quit, verified app closed and Dock running indicator disappeared, then reopened from guest Dock",
+    "observedAfterRestartGuestLocal": "2026-10-12 13:47-13:49",
+    "skillReinstalledOrEditedDuringRestartCheck": false,
+    "modelRun": false
+  },
+  "boundaries": {
+    "otherAgentHumanizerRootsRemainAbsent": true,
+    "packageScriptsExecuted": false,
+    "hostSkillsChanged": false,
+    "productionDeployedDuringGuestAcceptance": false,
+    "nativeRebuiltOrSigned": false,
+    "committedOrPushed": false,
+    "vmAndArtifactsRetained": true,
+    "overallAcceptanceComplete": true,
+    "acceptanceCaveat": "Bounded F3c VM flow only; discovery required Codex restart; not broader release acceptance"
+  }
+}

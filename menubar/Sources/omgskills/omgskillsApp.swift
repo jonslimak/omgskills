@@ -16,6 +16,28 @@ struct OmgskillsApp: App {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
+    private let f1Mode = AppRuntimeConfiguration.f1Mode()
+    private let setupTestMode = SetupTestRuntime.mode()
+    private let catalogInstallMode = AppRuntimeConfiguration.catalogInstallMode()
+    private let catalogCandidateMode = CatalogCandidateRuntime.mode()
+    private let connectedInventoryMode = AppRuntimeConfiguration.connectedInventoryMode()
+    #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
+    private var catalogInstallController: CatalogInstallWindowController?
+    private var pendingCatalogInstallURL: URL?
+    private var pendingConnectedURLs: [URL] = []
+    #endif
+    #if OMGSKILLS_CATALOG_CANDIDATE
+    private var catalogCandidateUpdater: CatalogCandidateUpdater?
+    private var catalogCandidateUpdaterStarted = false
+    #endif
+    #if DEBUG || OMGSKILLS_SETUP_TEST
+    private var f1Controller: PublicSkillInstallWindowController?
+    private var pendingF1URL: URL?
+    #endif
+    #if OMGSKILLS_SETUP_TEST
+    private var setupTestUpdater: SetupTestUpdater?
+    private var setupTestUpdaterStarted = false
+    #endif
     nonisolated static let debugAppcastURLEnvironmentKey = "OMGSKILLS_DEBUG_APPCAST_URL"
     private static let libraryRefreshTimerInterval: TimeInterval = 60 * 60
     private let skillGroupsBuildSupported = AppRuntimeConfiguration.skillGroupsAuthSupported
@@ -69,6 +91,127 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        switch connectedInventoryMode {
+        case .invalid(let reason):
+            let alert = NSAlert()
+            alert.messageText = "Cannot start connected inventory test"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        case .enabled(let configuration):
+            #if DEBUG
+            do {
+                let controller = try CatalogInstallWindowController(root: configuration.root,
+                    website: configuration.website, coordinator: updateInstallCoordinator, connected: configuration)
+                catalogInstallController = controller
+                pendingConnectedURLs.forEach(controller.receive)
+                pendingConnectedURLs.removeAll()
+            } catch {
+                let alert = NSAlert()
+                alert.messageText = "Cannot start connected inventory test"
+                alert.informativeText = error.localizedDescription
+                alert.runModal()
+                NSApp.terminate(nil)
+            }
+            #endif
+            return
+        case .disabled: break
+        }
+        switch catalogCandidateMode {
+        case .invalid(let reason):
+            let alert = NSAlert()
+            alert.messageText = "Cannot start OMGSkills Candidate"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        case .enabled(let configuration):
+            #if OMGSKILLS_CATALOG_CANDIDATE
+            let controller = CatalogInstallWindowController(candidate: configuration, coordinator: updateInstallCoordinator)
+            catalogInstallController = controller
+            let updater = CatalogCandidateUpdater(model: controller.model) { [weak self] in
+                guard let self else { throw Self.catalogCandidateUpdateUnavailable() }
+                try checkCatalogCandidateUpdates()
+            }
+            catalogCandidateUpdater = updater
+            controller.configureUpdates(updater)
+            pendingConnectedURLs.forEach(controller.receive)
+            pendingConnectedURLs.removeAll()
+            #endif
+            return
+        case .disabled: break
+        }
+        switch catalogInstallMode {
+        case .invalid(let reason):
+            let alert = NSAlert()
+            alert.messageText = "Cannot start catalog install test"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        case .enabled(let root, let website):
+            #if DEBUG
+            do {
+                catalogInstallController = try CatalogInstallWindowController(root: root, website: website,
+                    coordinator: updateInstallCoordinator)
+                if let pendingCatalogInstallURL {
+                    catalogInstallController?.receive(pendingCatalogInstallURL)
+                    self.pendingCatalogInstallURL = nil
+                }
+            } catch {
+                let alert = NSAlert()
+                alert.messageText = "Cannot start catalog install test"
+                alert.informativeText = error.localizedDescription
+                alert.runModal()
+                NSApp.terminate(nil)
+            }
+            #endif
+            return
+        case .disabled: break
+        }
+        switch setupTestMode {
+        case .invalid(let reason):
+            refuseSetupTestLaunch(reason)
+            return
+        case .enabled(let configuration):
+            #if OMGSKILLS_SETUP_TEST
+            do {
+                try configuration.prepareStorage()
+                f1Controller = PublicSkillInstallWindowController(service: try .setupTest(configuration),
+                    website: configuration.website, client: .setupTest)
+                if configuration.updatesEnabled, let f1Controller {
+                    let updater = SetupTestUpdater(model: f1Controller.model) { [weak self] in
+                        guard let self else { throw Self.setupUpdateUnavailable() }
+                        try self.checkSetupTestUpdates()
+                    }
+                    setupTestUpdater = updater
+                    f1Controller.configureUpdates(updater)
+                }
+                if let pendingF1URL { f1Controller?.receive(pendingF1URL); self.pendingF1URL = nil }
+                else { f1Controller?.showReview() }
+            } catch { refuseSetupTestLaunch(error.localizedDescription) }
+            #endif
+            return
+        case .disabled: break
+        }
+        switch f1Mode {
+        case .invalid(let reason):
+            let alert = NSAlert()
+            alert.messageText = "Cannot start OMGSkills F1 Test"
+            alert.informativeText = reason
+            alert.runModal()
+            NSApp.terminate(nil)
+            return
+        case .enabled(let root, let website):
+            #if DEBUG
+            f1Controller = PublicSkillInstallWindowController(root: root, website: website)
+            if let pendingF1URL { f1Controller?.receive(pendingF1URL); self.pendingF1URL = nil }
+            else { f1Controller?.showReview() }
+            #endif
+            return
+        case .disabled: break
+        }
         if case .invalid(let reason) = runtimeContext.catalogTestMode {
             let alert = NSAlert()
             alert.alertStyle = .critical
@@ -125,6 +268,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
     }
 
+    private func refuseSetupTestLaunch(_ reason: String) {
+        let alert = NSAlert()
+        alert.messageText = "Cannot start OMGSkills Setup Test"
+        alert.informativeText = reason
+        alert.runModal()
+        NSApp.terminate(nil)
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         skillGroupsFeatureRefreshTask?.cancel()
         libraryRefreshTask?.cancel()
@@ -135,12 +286,82 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         }
     }
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
+        if let catalogInstallController {
+            guard catalogInstallController.model.canClose else { return .terminateCancel }
+            Task {
+                let closed = await catalogInstallController.model.close()
+                if closed { await catalogInstallController.stopReporting() }
+                sender.reply(toApplicationShouldTerminate: closed)
+            }
+            return .terminateLater
+        }
+        #endif
+        #if DEBUG || OMGSKILLS_SETUP_TEST
+        if let f1Controller {
+            guard !f1Controller.model.isApplying, f1Controller.model.phase != .cancelling else { return .terminateCancel }
+            Task {
+                await f1Controller.model.cancel()
+                sender.reply(toApplicationShouldTerminate: true)
+            }
+            return .terminateLater
+        }
+        #endif
+        return .terminateNow
+    }
+
     func applicationDidBecomeActive(_ notification: Notification) {
         guard hasFinishedLaunching else { return }
         refreshSkillGroupsFeatureAvailability()
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        if connectedInventoryMode != .disabled {
+            #if DEBUG
+            if case .enabled = connectedInventoryMode {
+                if let catalogInstallController { urls.forEach(catalogInstallController.receive) }
+                else { pendingConnectedURLs.append(contentsOf: urls) }
+            }
+            #endif
+            return
+        }
+        if catalogCandidateMode != .disabled {
+            #if OMGSKILLS_CATALOG_CANDIDATE
+            if case .enabled = catalogCandidateMode {
+                if let catalogInstallController { urls.forEach(catalogInstallController.receive) }
+                else { pendingConnectedURLs.append(contentsOf: urls) }
+            }
+            #endif
+            return
+        }
+        if catalogInstallMode != .disabled {
+            #if DEBUG
+            if case .enabled = catalogInstallMode, let url = urls.first {
+                if let catalogInstallController { catalogInstallController.receive(url) }
+                else if pendingCatalogInstallURL == nil { pendingCatalogInstallURL = url }
+            }
+            #endif
+            return
+        }
+        if setupTestMode != .disabled {
+            #if OMGSKILLS_SETUP_TEST
+            if case .enabled = setupTestMode, let url = urls.first {
+                if let f1Controller { f1Controller.receive(url) }
+                else if pendingF1URL == nil { pendingF1URL = url }
+            }
+            #endif
+            return
+        }
+        if f1Mode != .disabled {
+            #if DEBUG
+            if case .enabled = f1Mode, let url = urls.first {
+                if let f1Controller { f1Controller.receive(url) }
+                else if pendingF1URL == nil { pendingF1URL = url }
+            }
+            #endif
+            return
+        }
         for url in urls {
             guard GroupInstallDeepLink.classify(url) != .unsupported else { continue }
             switch skillGroupsFeatureAvailability.deepLinkDisposition {
@@ -217,6 +438,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private func checkForUpdatesInBackground() {
         updaterController.updater.checkForUpdatesInBackground()
     }
+
+    #if OMGSKILLS_CATALOG_CANDIDATE
+    private static func catalogCandidateUpdateUnavailable() -> NSError {
+        NSError(domain: "com.jonslimak.omgskills.catalog-candidate.updates", code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "Finish pending work before checking for candidate app updates."])
+    }
+
+    private func checkCatalogCandidateUpdates() throws {
+        guard case .enabled = catalogCandidateMode, catalogCandidateUpdater?.phase == .checking,
+              catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
+        if updaterController == nil { setupUpdater(startingUpdater: false) }
+        if !catalogCandidateUpdaterStarted {
+            // Candidate runs are VM-only; never inherit automatic checks from the product defaults.
+            updaterController.updater.automaticallyChecksForUpdates = false
+            updaterController.updater.automaticallyDownloadsUpdates = false
+            updaterController.updater.sendsSystemProfile = false
+            try updaterController.updater.start()
+            catalogCandidateUpdaterStarted = true
+        }
+        guard updaterController.updater.canCheckForUpdates else { throw Self.catalogCandidateUpdateUnavailable() }
+        updaterController.checkForUpdates(nil)
+    }
+    #endif
+
+    #if OMGSKILLS_SETUP_TEST
+    private static func setupUpdateUnavailable() -> NSError {
+        NSError(domain: "com.jonslimak.omgskills.setuptest.updates", code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Close the skill review and finish pending work before checking for app updates."])
+    }
+
+    private func checkSetupTestUpdates() throws {
+        guard setupTestUpdater?.phase == .checking, setupTestUpdater?.permitsUpdate == true else {
+            throw Self.setupUpdateUnavailable()
+        }
+        if updaterController == nil { setupUpdater(startingUpdater: false) }
+        if !setupTestUpdaterStarted {
+            // Ignore persisted automatic-check preferences only in this isolated test identity.
+            updaterController.updater.automaticallyChecksForUpdates = false
+            updaterController.updater.automaticallyDownloadsUpdates = false
+            updaterController.updater.sendsSystemProfile = false
+            try updaterController.updater.start()
+            setupTestUpdaterStarted = true
+        }
+        guard updaterController.updater.canCheckForUpdates else { throw Self.setupUpdateUnavailable() }
+        updaterController.checkForUpdates(nil)
+    }
+    #endif
 
     private func setupLibraryRefreshObservers() {
         workspaceDidWakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -439,6 +707,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if catalogCandidateMode != .disabled { return }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled { return }
+        #endif
         Analytics.signal(
             "app.update_found",
             parameters: Analytics.updateParameters(
@@ -449,7 +723,96 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func feedURLString(for updater: SPUUpdater) -> String? {
-        Self.debugAppcastFeedURLString()
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if catalogCandidateMode != .disabled { return CatalogCandidateRuntime.feedURL }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled { return SetupTestUpdateConfiguration.feedURL }
+        #endif
+        return Self.debugAppcastFeedURLString()
+    }
+
+    func allowedSystemProfileKeys(for updater: SPUUpdater) -> [String]? {
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if catalogCandidateMode != .disabled { return [] }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled { return [] }
+        #endif
+        return nil
+    }
+
+    func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if catalogCandidateMode != .disabled {
+            guard updateCheck == .updates, catalogCandidateUpdater?.phase == .checking,
+                  catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
+        }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled {
+            guard updateCheck == .updates, setupTestUpdater?.phase == .checking,
+                  setupTestUpdater?.permitsUpdate == true else { throw Self.setupUpdateUnavailable() }
+        }
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, shouldProceedWithUpdate item: SUAppcastItem,
+                 updateCheck: SPUUpdateCheck) throws {
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if catalogCandidateMode != .disabled {
+            try self.updater(updater, mayPerform: updateCheck)
+            guard CatalogCandidateRuntime.acceptsArchive(url: item.fileURL, build: item.versionString,
+                version: item.displayVersionString, installationType: item.installationType, isDelta: item.isDeltaUpdate)
+            else { throw Self.catalogCandidateUpdateUnavailable() }
+        }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled {
+            try self.updater(updater, mayPerform: updateCheck)
+            guard SetupTestUpdateConfiguration.acceptsArchive(url: item.fileURL, build: item.versionString,
+                version: item.displayVersionString, installationType: item.installationType, isDelta: item.isDeltaUpdate) else {
+                throw Self.setupUpdateUnavailable()
+            }
+        }
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, willInstallUpdate item: SUAppcastItem) {
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        catalogCandidateUpdater?.installationStarted()
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        setupTestUpdater?.installationStarted()
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, userDidMake choice: SPUUserUpdateChoice,
+                 forUpdate item: SUAppcastItem, state: SPUUserUpdateState) {
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if state.stage == .installing { catalogCandidateUpdater?.installationStarted() }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        if state.stage == .installing { setupTestUpdater?.installationStarted() }
+        #endif
+    }
+
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if catalogCandidateMode != .disabled {
+            guard updateCheck == .updates else { return }
+            let error = error as NSError?
+            let failed = error != nil && !(error?.domain == SUSparkleErrorDomain && error?.code == Int(SUError.noUpdateError.rawValue))
+            catalogCandidateUpdater?.finish(failed: failed)
+            return
+        }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        guard updateCheck == .updates else { return }
+        let error = error as NSError?
+        let failed = error != nil && !(error?.domain == SUSparkleErrorDomain && error?.code == Int(SUError.noUpdateError.rawValue))
+        setupTestUpdater?.finish(failed: failed)
+        #endif
     }
 
     func updater(
@@ -457,7 +820,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         willInstallUpdateOnQuit item: SUAppcastItem,
         immediateInstallationBlock immediateInstallHandler: @escaping () -> Void
     ) -> Bool {
-        updateInstallHandler.handleInstallOnQuit(
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        if catalogCandidateMode != .disabled {
+            guard catalogCandidateUpdater?.permitsUpdate == true else { return true }
+            catalogCandidateUpdater?.installationStarted()
+            return updateInstallCoordinator.requestInstall(targetVersion: item.displayVersionString,
+                targetBuild: item.versionString) {
+                immediateInstallHandler()
+            }
+        }
+        #endif
+        #if OMGSKILLS_SETUP_TEST
+        if setupTestMode != .disabled {
+            // Retain the skill lock once replacement is pending, even if Sparkle's UI is dismissed.
+            guard setupTestUpdater?.permitsUpdate == true else { return true }
+            setupTestUpdater?.installationStarted()
+            immediateInstallHandler()
+            return true
+        }
+        #endif
+        return updateInstallHandler.handleInstallOnQuit(
             targetVersion: item.displayVersionString,
             targetBuild: item.versionString
         ) {

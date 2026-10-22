@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
 import { navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../../app/unified/use-public-catalog";
-import { usePortalApi } from "../../portal-api";
+import { usePortalApi, type PortalApi } from "../../portal-api";
 import { emptyAccount, type AccountIdentity } from "../data";
 import { useAccount } from "./useAccount";
 import { accountNavigation, publicNavigation, unifiedBase } from "./policy";
@@ -18,23 +18,57 @@ import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation } from "./entry-navigation";
 import "../../app/redesign.css";
 import { LoadingScreen } from "../../app/LoadingScreen";
+import { normalInstallAction, normalInstallClient, catalogInstallTestEnabled } from "../../app/unified/public-install";
+import { InstallIntentStore } from "../../app/unified/install-intent";
+import { PublicInstallSetup } from "../../app/unified/PublicInstallSetup";
+import { setupTestDistribution } from "../../app/unified/setup-test-distribution";
+import { CatalogInstallIntentStore } from "../../app/unified/catalog-install-intent";
+import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
 
 const publicClient = new PublicCatalogClient(undefined, undefined, undefined, import.meta.env.VITE_CATALOG_SEARCH_ENABLED === "1");
 publicClient.warm();
+const installClient = import.meta.env.DEV ? normalInstallClient(import.meta.env.DEV,
+  import.meta.env.VITE_NEWMAC_WEB_INSTALL_TEST, location.hostname, import.meta.env.VITE_NEWMAC_CATALOG_INSTALL_TEST) : null;
+const catalogInstallEnabled = import.meta.env.DEV ? catalogInstallTestEnabled(import.meta.env.DEV,
+  import.meta.env.VITE_NEWMAC_CATALOG_INSTALL_TEST, location.hostname, import.meta.env.VITE_NEWMAC_WEB_INSTALL_TEST) : false;
 const rejectEdit = () => { throw new Error("Account editing is disabled in this read-only integration."); };
 
-function AccountView({ identity, signedIn, accountKey, base, local }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean }) {
-  const api = usePortalApi();
+export type UnifiedSessionComposition = {
+  readOnly: boolean;
+  adaptApi: (api: PortalApi) => PortalApi;
+  navigation: typeof accountNavigation;
+  returnUrl: (href: string) => string | null;
+  supportedAccountViews: ComponentProps<typeof UnifiedApp>["supportedAccountViews"];
+  publicInstallAction: ComponentProps<typeof UnifiedApp>["publicInstallAction"];
+  clearInstallIntent: (next: Navigation) => void;
+};
+
+function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, composition }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; composition?: UnifiedSessionComposition }) {
+  const normalApi = usePortalApi();
+  const api = composition ? composition.adaptApi(normalApi) : normalApi;
   const clerk = useClerk();
-  const account = useAccount(api, identity, signedIn, accountKey);
+  const account = useAccount(api, identity, signedIn, accountKey, connectedInventory, inventoryReconciliation, composition?.readOnly);
+  const navigation = composition?.navigation ?? accountNavigation;
   const [leaving, setLeaving] = useState(false);
   const [sessionError, setSessionError] = useState("");
   const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
+  const [installStore] = useState(() => !composition && installClient && base === "/app/"
+    ? new InstallIntentStore(() => window.sessionStorage, installClient, "normal") : null);
+  const [catalogStore] = useState(() => !composition && catalogInstallEnabled && base === "/app/"
+    ? new CatalogInstallIntentStore(() => window.sessionStorage) : null);
+  const clearOtherIntent = (next: Navigation) => {
+    composition?.clearInstallIntent(next);
+    const pending = installStore?.read().intent;
+    if (pending && next.selected && next.selected !== `catalog:${pending.catalogId}`) installStore?.clear();
+    const catalogPending = catalogStore?.read().intent;
+    if (catalogPending && next.selected && next.selected !== `catalog:${catalogPending.catalogId}`) catalogStore?.clear();
+  };
   const available = signedIn && !leaving;
-  const nav = accountNavigation(requested, available);
+  const nav = navigation(requested, available);
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
   const navigate = (next: Navigation, replace = false) => {
-    const safe = accountNavigation(next, available);
+    const safe = navigation(next, available);
+    clearOtherIntent(safe);
     history[replace ? "replaceState" : "pushState"]({}, "", `${base}${navigationSearch(safe)}`);
     setRequested(safe);
   };
@@ -43,16 +77,20 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
     if (available || requested.view === "discover") history.replaceState({}, "", `${base}${search}`);
   }, [search, available, base, requested.view]);
   useEffect(() => {
-    const pop = () => setRequested(entryNavigation(location.pathname, location.search, base));
+    const pop = () => {
+      const next = entryNavigation(location.pathname, location.search, base);
+      clearOtherIntent(next);
+      setRequested(next);
+    };
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
-  }, [base]);
+  }, [base, installStore, catalogStore]);
   async function signOut() {
     if (leaving) return;
     setLeaving(true);
     setSessionError("");
     account.clear();
-    const next = accountNavigation(nav, false);
+    const next = navigation(nav, false);
     history.replaceState({}, "", `${base}${navigationSearch(next)}`);
     setRequested(next);
     try { await clerk.signOut({ redirectUrl: `${base}${navigationSearch(next)}` }); }
@@ -65,27 +103,39 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
   const setCatalog = useSetCatalog(publicClient, detail.set);
   const catalog = { ...publicData.catalog, skills: [...publicData.catalog.skills, ...setCatalog.skills] };
   const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine,
-    busy: snapshot.setSaving || snapshot.profileSaving, blocked: !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
+    busy: snapshot.setSaving || snapshot.profileSaving, blocked: !!composition?.readOnly || !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
     scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
     detail: { ...detail, catalog: setCatalog }, base, local });
   return <UnifiedApp
     key={available ? accountKey : "public"}
     data={data} catalog={catalog} publicStatus={publicData.status}
     nav={nav} navigate={navigate} signedIn={available}
+    publicInstallAction={composition?.publicInstallAction ?? (installClient && installStore ? (skill, detailReady) => <PublicInstallSetup
+      key={skill.key} skill={skill} detailReady={detailReady} client={installClient} store={installStore}
+      returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`}
+      action={normalInstallAction} distribution={setupTestDistribution} />
+      : catalogInstallEnabled && catalogStore ? (skill, detailReady) => <CatalogInstallSetup key={skill.key}
+        skill={skill} detailReady={detailReady} store={catalogStore}
+        returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined)}
     readOnlyAccount
-    management={available ? management : undefined}
-    onSignIn={() => { void clerk.openSignIn({ forceRedirectUrl: `${location.origin}${base}${navigationSearch(requested)}` }); }}
+    supportedAccountViews={composition?.supportedAccountViews}
+    management={available && !composition?.readOnly ? management : undefined}
+    onSignIn={() => {
+      const href = `${location.origin}${base}${navigationSearch(requested)}`;
+      const returnUrl = composition ? composition.returnUrl(href) : href;
+      if (returnUrl) void clerk.openSignIn({ forceRedirectUrl: returnUrl });
+    }}
     onSession={next => { if (!next) void signOut(); }}
     onFavorite={rejectEdit} onCreateSet={rejectEdit} onMembership={rejectEdit} onVisibility={rejectEdit}
     state={!available || snapshot.data ? "ready" : snapshot.error ? "error" : "loading"}
     retry={account.refresh}
-    accountPages={available ? (view, theme) => view === "profile" ? <ProfilePanel profile={data.profile} theme={theme}
+    accountPages={available && !snapshot.accessDenied ? (view, theme) => view === "profile" && !composition?.readOnly ? <ProfilePanel profile={data.profile} theme={theme}
       busy={snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing}
       blocked={!!snapshot.error || !snapshot.data || snapshot.accessDenied}
       error={snapshot.profileError || snapshot.error} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
-      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel api={api} local={local} denied={account.invalidate} theme={theme} /></div>
-      : view === "github" ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div> : undefined : undefined}
-    previewBar={(local || sessionError || (available && snapshot.error)) && <div className="ua-preview">
+      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel key={accountKey} sessionKey={accountKey} api={api} local={local} readOnly={composition?.readOnly} denied={account.invalidate} theme={theme} inventoryDevices={connectedInventory ? data.devices : undefined} /></div>
+      : view === "github" && !composition?.readOnly ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div> : undefined : undefined}
+    previewBar={(local || sessionError || (available && (snapshot.error || composition?.readOnly))) && <div className="ua-preview">
       {local && <span>Local test · Unified app</span>}
       <div>
         {(sessionError || (available && snapshot.error)) && <span role="alert">{sessionError || snapshot.error}</span>}
@@ -95,13 +145,13 @@ function AccountView({ identity, signedIn, accountKey, base, local }: { identity
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true }: { base?: string; local?: boolean }) {
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, composition }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; composition?: UnifiedSessionComposition }) {
   const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
   const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local}
+  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} composition={composition}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }

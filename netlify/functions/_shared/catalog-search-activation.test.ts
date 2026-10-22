@@ -45,6 +45,40 @@ test("production compact reads inherit the existing bounded fetch behavior", asy
   } finally { globalThis.fetch = original; }
 });
 
+test("install records retain full metadata without changing the configured MCP search reader", async context => {
+  const f = catalogFixture(context, rows, true);
+  for (const enabled of [false, true]) {
+    let fullReads = 0, compactReads = 0;
+    const full = createMcpLibraryLoader({ loadTrack: async () => f.legacy });
+    const compact = createCompactMcpLibraryLoader({ ...f.options, ranking: true,
+      tracks: [{ name: "crawl4", manifestUrl: f.url }] });
+    const handler = createConfiguredMcpHandler(enabled, {
+      legacy: { ...full, get: () => { fullReads++; return full.get(); } },
+      compact: { ...compact, get: () => { compactReads++; return compact.get(); } },
+    });
+    const work: Promise<unknown>[] = [], ctx = { waitUntil: (p: Promise<unknown>) => { work.push(p); } };
+    const response = await handler(new Request(
+      `https://test.invalid/api/catalog/install-record?id=${encodeURIComponent(rows[0].id)}`), ctx);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    const body = await response.json();
+    assert.equal(body.skill.repo_slug, rows[0].repo_slug);
+    assert.equal(body.skill.install_target_name, rows[0].install_target_name);
+    assert.equal(body.skill.repo_commit_sha, rows[0].repo_commit_sha);
+    assert.equal(body.skill.readme_snippet, undefined);
+    assert.equal(fullReads, 1);
+    assert.equal(compactReads, 0);
+    const tools = await handler(new Request("https://test.invalid/mcp", { method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+    }), ctx);
+    assert.equal(tools.status, 200);
+    assert.equal(fullReads, enabled ? 1 : 2);
+    assert.equal(compactReads, enabled ? 1 : 0);
+    await Promise.allSettled(work);
+  }
+});
+
 test("the function bundle includes the exact reviewed configuration and shared validator", async () => {
   const bundled = await build({ entryPoints: [new URL("../omgskills-mcp.mts", import.meta.url).pathname], bundle: true,
     packages: "external", platform: "node", format: "esm", write: false, metafile: true });

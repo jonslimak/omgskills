@@ -17,6 +17,13 @@ import type { PortalSet } from "../../app/model";
 import type { GroupedSyncedSkill } from "../../synced-skill-grouping";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog } from "../../app/unified/use-public-catalog";
+import { previewInstallClient } from "../../app/unified/public-install";
+import { f2Cases, f2CaseNavigation, f2NavigationSearch, readF2CaseKey } from "./f2-install";
+import { createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
+
+const installClient = import.meta.env.DEV ? previewInstallClient(import.meta.env.DEV,
+  import.meta.env.VITE_NEWMAC_F1, import.meta.env.VITE_NEWMAC_SETUP_TEST, location.hostname) : null;
+const installPreviewEnabled = installClient !== null;
 
 const catalog = makeCatalog();
 const publicClient = new PublicCatalogClient();
@@ -26,15 +33,20 @@ function installed(skills: SkillDisplay[]): GroupedSyncedSkill[] {
 }
 
 function Preview() {
+  const [installStore] = useState(() => installClient ? createPreviewInstallStore(installClient) : null);
   const [scenario, setScenario] = useState<Scenario>("populated");
   const [data, setData] = useState(() => makeFixtures());
-  const [signedIn, setSignedIn] = useState(true);
+  const [signedIn, setSignedIn] = useState(!installPreviewEnabled);
+  const [f2CaseKey, setF2CaseKey] = useState(() => readF2CaseKey(location.search));
   const [nav, setNav] = useState(() => parseNavigation(location.search));
   const [revision, setRevision] = useState(0);
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
+  const previewSearch = (next: Navigation, caseKey = f2CaseKey) =>
+    installPreviewEnabled ? f2NavigationSearch(next, caseKey) : navigationSearch(next);
   const navigate = (next: Navigation, replace = false) => {
+    if (next.selected && next.selected !== nav.selected) installStore?.clear();
     const safe =
       !signedIn && !isDiscovery(next.view)
         ? { ...initialNavigation, view: "discover" as const }
@@ -42,23 +54,37 @@ function Preview() {
     window.history[replace ? "replaceState" : "pushState"](
       {},
       "",
-      `${base}${navigationSearch(safe)}`,
+      `${base}${previewSearch(safe)}`,
     );
     setNav(safe);
   };
   useEffect(() => {
     const pop = () => {
       const next = parseNavigation(location.search);
+      const caseKey = readF2CaseKey(location.search);
+      const pending = installStore?.read().intent;
+      if (pending && next.selected && next.selected !== `catalog:${pending.catalogId}`) installStore?.clear();
+      setF2CaseKey(caseKey);
       if (!signedIn && !isDiscovery(next.view)) {
         const safe = { ...initialNavigation, view: "discover" as const };
-        history.replaceState({}, "", `${base}${navigationSearch(safe)}`);
+        history.replaceState({}, "", `${base}${installPreviewEnabled ? f2NavigationSearch(safe, caseKey) : navigationSearch(safe)}`);
         setNav(safe);
       } else setNav(next);
     };
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
-  }, [signedIn]);
+  }, [signedIn, installStore]);
+  function selectF2Case(caseKey: string) {
+    const next = f2CaseNavigation(caseKey);
+    if (!next) return;
+    installStore?.clear();
+    history.pushState({}, "", `${base}${previewSearch(next, caseKey)}`);
+    setF2CaseKey(caseKey);
+    setLiveCatalog(true);
+    setNav(next);
+  }
   function reset(next: Scenario) {
+    installStore?.clear();
     setScenario(next);
     setData(makeFixtures(next));
     setRevision((value) => value + 1);
@@ -76,13 +102,13 @@ function Preview() {
             selected: nav.selected.startsWith("catalog:") ? nav.selected : "",
           }
         : { ...initialNavigation, view: "discover" as const };
-      history.replaceState({}, "", `${base}${navigationSearch(publicNav)}`);
+      history.replaceState({}, "", `${base}${previewSearch(publicNav)}`);
       setNav(publicNav);
     } else {
       const nextNav = isDiscovery(nav.view)
         ? nav
         : signedOutNav || initialNavigation;
-      history.replaceState({}, "", `${base}${navigationSearch(nextNav)}`);
+      history.replaceState({}, "", `${base}${previewSearch(nextNav)}`);
       setNav(nextNav);
     }
   }
@@ -105,6 +131,9 @@ function Preview() {
       nav={nav}
       navigate={navigate}
       signedIn={signedIn}
+      publicInstallAction={installClient ? (skill, detailReady) => <PublicInstallSetup
+        key={`${skill.catalogId}:${f2CaseKey}`} skill={skill} detailReady={detailReady && liveCatalog}
+        caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} client={installClient} /> : undefined}
       onSession={session}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
@@ -171,6 +200,10 @@ function Preview() {
         <div className="ua-preview">
           <span>{liveCatalog ? "Local preview · live Discover · sample account" : "Local preview · sample data"}</span>
           <div>
+            {installPreviewEnabled && <select aria-label="F2 test case" value={f2CaseKey} onChange={event => selectF2Case(event.target.value)}>
+              <option value="" disabled>F2: Choose a test case</option>
+              {f2Cases.map(item => <option key={item.key} value={item.key}>{item.label}</option>)}
+            </select>}
             <select
               aria-label="Catalog data"
               value={liveCatalog ? "live" : "sample"}

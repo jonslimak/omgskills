@@ -48,7 +48,7 @@ async function withFixture(run: (pool: Pool) => Promise<void>) {
     pool = new pg.Pool({ connectionString, max: 8, connectionTimeoutMillis: 3000,
       options: `-c search_path=${schema},public -c statement_timeout=10000 -c lock_timeout=5000` });
     const migrations = new URL("../../database/migrations/", import.meta.url);
-    for (const name of (await readdir(migrations)).sort()) {
+    for (const name of (await readdir(migrations)).filter(name => !pending.includes(name)).sort()) {
       await pool.query(await readFile(new URL(name + "/migration.sql", migrations), "utf8"));
     }
     await run(pool);

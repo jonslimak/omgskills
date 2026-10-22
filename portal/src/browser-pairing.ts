@@ -1,3 +1,5 @@
+import type { PortalApi } from "./portal-api";
+
 const OPAQUE_VALUE_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
 export type BrowserPairingRequest = {
@@ -41,12 +43,127 @@ export function parseBrowserPairingRequest(hash: string): BrowserPairingRequest 
   return { state: states[0], codeChallenge: challenges[0], scopes };
 }
 
-export function browserPairingCancelUrl(state: string) {
+export function isBrowserPairingApproval(body: Record<string, unknown>) {
+  const keys = ["state", "codeChallenge", "codeChallengeMethod", "scopes"];
+  const scopes = body.scopes;
+  return Object.keys(body).length === keys.length && Object.keys(body).every(key => keys.includes(key))
+    && typeof body.state === "string" && OPAQUE_VALUE_PATTERN.test(body.state)
+    && typeof body.codeChallenge === "string" && OPAQUE_VALUE_PATTERN.test(body.codeChallenge)
+    && body.codeChallengeMethod === "S256" && Array.isArray(scopes)
+    && new Set(scopes).size === scopes.length
+    && scopes.every(scope => ALL_DEVICE_SCOPES.includes(scope))
+    && BASE_DEVICE_SCOPES.every(scope => scopes.includes(scope));
+}
+
+export const connectedInventoryDisclosure = "Share skill names, descriptions, agent, folder name, SKILL.md fingerprint and safe source information (repository and relative path), including skills installed outside OMGSkills. Fingerprints may identify skills. Full local paths and full skill files are not uploaded.";
+
+export function connectedPairingCallback(callback: string, state: string) {
+  return pairingCallback(callback, state, "omgskills-f1:");
+}
+
+export function productPairingCallback(callback: string, state: string) {
+  return pairingCallback(callback, state, "omgskills:");
+}
+
+function pairingCallback(callback: string, state: string, protocol: string) {
+  const url = new URL(callback);
+  if (url.protocol !== protocol || url.host !== "pair" || url.pathname || url.hash
+    || url.username || url.password || url.searchParams.get("state") !== state
+    || !OPAQUE_VALUE_PATTERN.test(state) || !/^pair_[A-Za-z0-9_-]{43}$/.test(url.searchParams.get("code") ?? "")
+    || [...url.searchParams.keys()].length !== 2) {
+    throw new Error("Invalid connected test pairing callback.");
+  }
+  return url.toString();
+}
+
+export function browserPairingCancelUrl(state: string, connectedInventory = false) {
   if (!OPAQUE_VALUE_PATTERN.test(state)) {
     throw new Error("Invalid browser pairing state");
   }
-  const callback = new URL("omgskills://pair");
+  const callback = new URL(connectedInventory ? "omgskills-f1://pair" : "omgskills://pair");
   callback.searchParams.set("error", "access_denied");
   callback.searchParams.set("state", state);
   return callback.toString();
+}
+
+export type PairingConsentPolicy = {
+  parse: (hash: string) => BrowserPairingRequest | null;
+  scopes: (request: BrowserPairingRequest) => readonly DeviceScope[];
+  callback: (callback: string, state: string) => string;
+  cancel: (state: string) => string;
+  disclosure?: string;
+};
+
+export const normalPairingConsent: PairingConsentPolicy = {
+  parse: parseBrowserPairingRequest,
+  scopes: request => request.scopes,
+  callback: productPairingCallback,
+  cancel: state => browserPairingCancelUrl(state),
+};
+export const f1PairingConsent: PairingConsentPolicy = {
+  ...normalPairingConsent,
+  callback: connectedPairingCallback,
+  cancel: state => browserPairingCancelUrl(state, true),
+  disclosure: connectedInventoryDisclosure,
+};
+
+export type PairingConsentSnapshot = {
+  phase: "ready" | "invalid" | "approving" | "returning" | "cancelled" | "error";
+  status: string;
+};
+
+// One page-local attempt; disposing the page makes late responses inert.
+export function createPairingConsent(hash: string, policy: PairingConsentPolicy, options: {
+  api: PortalApi;
+  navigate: (url: string) => void;
+  changed: (snapshot: PairingConsentSnapshot) => void;
+  now?: () => number;
+}) {
+  const parsed = policy.parse(hash);
+  const request = parsed ? { ...parsed, scopes: [...parsed.scopes] } : null;
+  let snapshot: PairingConsentSnapshot = { phase: request ? "ready" : "invalid",
+    status: request ? "" : "This connection request is invalid or expired." };
+  let active = true;
+  let generation = 0;
+  let controller: AbortController | undefined;
+  const emit = (next: PairingConsentSnapshot) => { snapshot = next; if (active) options.changed(next); };
+  const current = (attempt: number) => active && generation === attempt;
+  return {
+    request,
+    getSnapshot: () => snapshot,
+    async approve() {
+      if (!active || !request || !["ready", "error"].includes(snapshot.phase)) return;
+      const attempt = ++generation;
+      controller = new AbortController();
+      emit({ phase: "approving", status: "Approving connection..." });
+      try {
+        const body = { state: request.state, codeChallenge: request.codeChallenge,
+          codeChallengeMethod: "S256", scopes: [...policy.scopes(request)] };
+        if (!isBrowserPairingApproval(body)) throw new Error("Invalid connection permissions.");
+        if (!current(attempt)) return;
+        const result = await options.api<{ callbackUrl: string; expiresAt: string }>("/api/portal/sync-pairing-code", {
+          method: "POST", body: JSON.stringify(body), signal: controller.signal,
+          redirect: "error", cache: "no-store",
+        });
+        if (!current(attempt)) return;
+        if (typeof result?.callbackUrl !== "string" || typeof result.expiresAt !== "string"
+          || !Number.isFinite(Date.parse(result.expiresAt)) || Date.parse(result.expiresAt) <= (options.now ?? Date.now)()) {
+          throw new Error("This approval has expired or is invalid. Try approving again.");
+        }
+        const callback = policy.callback(result.callbackUrl, request.state);
+        emit({ phase: "returning", status: "Returning to omgskills..." });
+        if (current(attempt)) options.navigate(callback);
+      } catch (error) {
+        if (current(attempt)) emit({ phase: "error", status: error instanceof Error ? error.message : "Failed to approve connection" });
+      }
+    },
+    cancel() {
+      if (!active || !request || ["returning", "cancelled"].includes(snapshot.phase)) return;
+      generation++;
+      controller?.abort();
+      emit({ phase: "cancelled", status: "Connection cancelled." });
+      if (active) options.navigate(policy.cancel(request.state));
+    },
+    dispose() { active = false; generation++; controller?.abort(); },
+  };
 }

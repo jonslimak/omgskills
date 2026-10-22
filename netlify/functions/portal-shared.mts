@@ -4,7 +4,10 @@ import { findInvitedGroupIds, requireGroupAccess } from "./_shared/group-access.
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, requirePortalUser, findInvitedGroupIds, requireGroupAccess };
+
+export async function portalShared(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, requirePortalUser, findInvitedGroupIds, requireGroupAccess } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -59,7 +62,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Failed to load shared groups");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalShared(req, context);
 
 export const config: Config = {
   path: "/api/portal/shared"

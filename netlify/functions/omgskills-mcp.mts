@@ -5,12 +5,13 @@ import { loadProductionMcpLibrary, type McpLibraryLoader } from "./_shared/mcp-l
 import { createCompactMcpLibraryLoader, type CompactMcpLoader } from "./_shared/compact-mcp-library.js";
 import featureConfig from "../../config/production-features.json" with { type: "json" };
 import { validateProductionFeatures } from "../../config/production-features.mjs";
+import { catalogInstallRecord, catalogInstallRecordPath } from "./_shared/catalog-install-record.js";
 
 const maximumRequestBytes = 64 * 1024;
 
 // Keep the legacy factory synchronous-reader-only for the separate install-record route.
 export function createMcpHandler(loader: McpLibraryLoader) {
-  return createReadMcpHandler(loader);
+  return withInstallRecordRoute(createReadMcpHandler(loader), loader);
 }
 
 export function createCompactMcpHandler(loader: CompactMcpLoader, options: { paging?: boolean; ranking?: boolean } = {}) {
@@ -72,15 +73,24 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
 }
 
 export function createConfiguredMcpHandler(enabled: boolean, loaders?: { legacy: McpLibraryLoader; compact: CompactMcpLoader }) {
-  return enabled ? createCompactMcpHandler(loaders?.compact ?? createCompactMcpLibraryLoader({ ranking: true }), { paging: true, ranking: true })
-    : createMcpHandler(loaders?.legacy ?? loadProductionMcpLibrary);
+  const legacy = loaders?.legacy ?? loadProductionMcpLibrary;
+  return enabled ? withInstallRecordRoute(createCompactMcpHandler(
+    loaders?.compact ?? createCompactMcpLibraryLoader({ ranking: true }), { paging: true, ranking: true }), legacy)
+    : createMcpHandler(legacy);
+}
+
+function withInstallRecordRoute(handler: ReturnType<typeof createReadMcpHandler>, loader: McpLibraryLoader) {
+  return (request: Request, context: Pick<Context, "waitUntil">): Promise<Response> =>
+    new URL(request.url).pathname === catalogInstallRecordPath
+      ? catalogInstallRecord(request, loader, work => context.waitUntil(work))
+      : handler(request, context);
 }
 
 const handler = createConfiguredMcpHandler(validateProductionFeatures(featureConfig).catalogSearchEnabled);
 export default handler;
 
 export const config: Config = {
-  path: ["/mcp", "/mcp/health"],
+  path: ["/mcp", "/mcp/health", catalogInstallRecordPath],
   rateLimit: {
     windowLimit: 600,
     windowSize: 60,

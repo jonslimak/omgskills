@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "observedAt": "2026-10-09T15:58:03.004Z",
+  "removedPaths": [
+    "/private/tmp/omgskills-f1-hl5alh",
+    "/Users/jonslimak/.codex/worktrees/newmac-f1-core/omgskills/menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-hl5alh"
+  ],
+  "stoppedPids": [
+    17906,
+    24051
+  ],
+  "unregisteredApp": "/Users/jonslimak/.codex/worktrees/newmac-f1-core/omgskills/menubar/.build/arm64-apple-macosx/debug/f1-apps/omgskills-f1-hl5alh/OMGSkills F1 Test.app",
+  "publicExecutableSHA256": "34f3aa9b7a96766463f7e827e521e20a4282c3ff2f71bdbe2bec9b1bc44065b1",
+  "preservedProcesses": [
+    {
+      "pid": 17951,
+      "command": "/Applications/omgskills.app/Contents/MacOS/omgskills"
+    },
+    {
+      "pid": 4331,
+      "command": "/Users/omgtest/Applications/omgskills.app/Contents/MacOS/omgskills"
+    },
+    {
+      "pid": 82256,
+      "command": "/Users/jonslimak/.npm/_npx/71532357b95fd94b/node_modules/node/bin/node ../node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5191 --strictPort"
+    }
+  ],
+  "scope": "Only named F2 temporary run and bundle; no public release or global URL-handler reset",
+  "acceptanceSHA256BeforeCleanup": "73cb7414d6c477a8176a347ab611b8a022bdbf080446a56aab28c029fd5598d7",
+  "urlHandlers": {
+    "production": "/Applications/omgskills.app",
+    "test": null
+  },
+  "port5197": "No listening process after cleanup",
+  "archiveCopies": "Worktree and primary copies hash-verified before deletion; see acceptance.json for results."
+}

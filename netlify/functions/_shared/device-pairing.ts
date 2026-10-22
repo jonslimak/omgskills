@@ -10,6 +10,7 @@ import {
   normalizeDeviceScopes,
   type DeviceScope
 } from "./device-auth.js";
+import { findReconnectDevice, hashReconnectKey, lockDevicePairingAccount } from "./device-reconnect.js";
 
 export const PAIRING_CODE_TTL_MS = 10 * 60 * 1000;
 export const DEVICE_CREDENTIAL_TTL_MS = 365 * 24 * 60 * 60 * 1000;
@@ -97,11 +98,13 @@ type ExchangeOptions = {
   pairingCode: string;
   deviceName: string;
   codeVerifier: string | null;
+  reconnectKey?: string;
   now?: Date;
   createCredential?: () => string;
 };
 
 export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) {
+  const reconnectHash = options.reconnectKey === undefined ? null : hashReconnectKey(options.reconnectKey);
   const client = await pool.connect();
   const now = options.now ?? new Date();
   const expiresAt = new Date(now.getTime() + DEVICE_CREDENTIAL_TTL_MS);
@@ -143,7 +146,9 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
       throw new PairingError(400, "codeVerifier was not expected");
     }
 
-    await client.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [pairing.user_id]);
+    await lockDevicePairingAccount(client, pairing.user_id);
+    const reconnectDeviceId = reconnectHash === null ? null
+      : await findReconnectDevice(client, pairing.user_id, reconnectHash);
     const deviceCount = await client.query<{ count: string }>(
       `
         SELECT count(*)::text AS count
@@ -151,14 +156,23 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
         WHERE user_id = $1
           AND revoked_at IS NULL
           AND expires_at > $2
+          AND ($3::uuid IS NULL OR id <> $3)
       `,
-      [pairing.user_id, now]
+      [pairing.user_id, now, reconnectDeviceId]
     );
     if (Number(deviceCount.rows[0]?.count ?? 0) >= MAX_ACTIVE_DEVICES) {
       throw new PairingError(409, "Active device limit reached");
     }
 
-    const device = await client.query<{ id: string }>(
+    const device = reconnectDeviceId !== null
+      ? await client.query<{ id: string }>(
+        `UPDATE device_tokens
+         SET token_hash = $2, device_name = $3, granted_scopes = $4,
+             expires_at = $5, revoked_at = NULL, last_used_at = $6
+         WHERE id = $1 RETURNING id`,
+        [reconnectDeviceId, hashToken(credential), options.deviceName, grantedScopes, expiresAt, now]
+      )
+      : await client.query<{ id: string }>(
       `
         INSERT INTO device_tokens (
           user_id, token_hash, device_name, granted_scopes, expires_at, created_at
@@ -168,6 +182,10 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
       `,
       [pairing.user_id, hashToken(credential), options.deviceName, grantedScopes, expiresAt, now]
     );
+    if (reconnectHash !== null && reconnectDeviceId === null) {
+      await client.query("UPDATE device_tokens SET reconnect_key_hash = $2 WHERE id = $1",
+        [device.rows[0].id, reconnectHash]);
+    }
     await client.query("UPDATE sync_tokens SET used_at = $2 WHERE id = $1", [pairing.id, now]);
     await client.query("COMMIT");
 
@@ -176,7 +194,8 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
       deviceId: device.rows[0].id,
       expiresAt,
       accountLabel: pairing.display_name || pairing.email,
-      grantedScopes
+      grantedScopes,
+      ...(reconnectHash === null ? {} : { reconnectSupported: true as const })
     };
   } catch (error) {
     await rollback(client);

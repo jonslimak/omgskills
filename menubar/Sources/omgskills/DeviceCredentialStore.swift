@@ -53,12 +53,37 @@ enum DeviceCredentialStoreError: Error, Equatable, Sendable {
     case replacementRequired
     case corruptItem
     case keychain(OSStatus)
+    case conditionalDeletionUnsupported
 }
 
 protocol DeviceCredentialStoring: Sendable {
     func load() async throws -> StoredDeviceCredential?
     func save(_ record: StoredDeviceCredential, replacingExisting: Bool) async throws
-    func delete(deviceID: String) async throws
+    func delete(ifMatching expected: StoredDeviceCredential) async throws -> Bool
+}
+
+extension DeviceCredentialStoring {
+    func delete(ifMatching expected: StoredDeviceCredential) async throws -> Bool {
+        throw DeviceCredentialStoreError.conditionalDeletionUnsupported
+    }
+}
+
+struct DeviceKeychainOperations: Sendable {
+    let copyMatching: @Sendable ([String: Any]) -> (OSStatus, CFTypeRef?)
+    let update: @Sendable ([String: Any], [String: Any]) -> OSStatus
+    let add: @Sendable ([String: Any]) -> OSStatus
+    let delete: @Sendable ([String: Any]) -> OSStatus
+
+    static let live = DeviceKeychainOperations(
+        copyMatching: { query in
+            var result: CFTypeRef?
+            let status = SecItemCopyMatching(query as CFDictionary, &result)
+            return (status, result)
+        },
+        update: { SecItemUpdate($0 as CFDictionary, $1 as CFDictionary) },
+        add: { SecItemAdd($0 as CFDictionary, nil) },
+        delete: { SecItemDelete($0 as CFDictionary) }
+    )
 }
 
 actor DeviceCredentialStore: DeviceCredentialStoring {
@@ -74,11 +99,13 @@ actor DeviceCredentialStore: DeviceCredentialStoring {
     }
 
     private let service: String
+    private let keychain: DeviceKeychainOperations
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
-    init(service: String = defaultService) {
+    init(service: String = defaultService, keychain: DeviceKeychainOperations = .live) {
         self.service = service
+        self.keychain = keychain
     }
 
     func load() throws -> StoredDeviceCredential? {
@@ -86,8 +113,7 @@ actor DeviceCredentialStore: DeviceCredentialStoring {
         query[kSecMatchLimit as String] = kSecMatchLimitAll
         query[kSecReturnAttributes as String] = true
 
-        var result: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        let (status, result) = keychain.copyMatching(query)
         if status == errSecItemNotFound {
             return nil
         }
@@ -106,8 +132,7 @@ actor DeviceCredentialStore: DeviceCredentialStoring {
         dataQuery[kSecAttrAccount as String] = account
         dataQuery[kSecMatchLimit as String] = kSecMatchLimitOne
         dataQuery[kSecReturnData as String] = true
-        var dataResult: CFTypeRef?
-        let dataStatus = SecItemCopyMatching(dataQuery as CFDictionary, &dataResult)
+        let (dataStatus, dataResult) = keychain.copyMatching(dataQuery)
         guard dataStatus == errSecSuccess else {
             throw DeviceCredentialStoreError.keychain(dataStatus)
         }
@@ -136,7 +161,7 @@ actor DeviceCredentialStore: DeviceCredentialStoring {
                 kSecAttrAccount as String: account,
                 kSecValueData as String: data
             ]
-            let status = SecItemUpdate(existingQuery as CFDictionary, attributes as CFDictionary)
+            let status = keychain.update(existingQuery, attributes)
             guard status == errSecSuccess else {
                 throw DeviceCredentialStoreError.keychain(status)
             }
@@ -146,12 +171,12 @@ actor DeviceCredentialStore: DeviceCredentialStoring {
         var exactQuery = baseQuery()
         exactQuery[kSecAttrAccount as String] = account
         let attributes: [String: Any] = [kSecValueData as String: data]
-        let updateStatus = SecItemUpdate(exactQuery as CFDictionary, attributes as CFDictionary)
+        let updateStatus = keychain.update(exactQuery, attributes)
         if updateStatus == errSecItemNotFound {
             var addQuery = exactQuery
             addQuery[kSecValueData as String] = data
             addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-            let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+            let addStatus = keychain.add(addQuery)
             guard addStatus == errSecSuccess else {
                 throw DeviceCredentialStoreError.keychain(addStatus)
             }
@@ -161,13 +186,16 @@ actor DeviceCredentialStore: DeviceCredentialStoring {
 
     }
 
-    func delete(deviceID: String) throws {
+    func delete(ifMatching expected: StoredDeviceCredential) async throws -> Bool {
+        // No await between comparison and deletion: stale cleanup cannot delete
+        // a replacement written through this actor with the same device ID.
+        guard try load() == expected else { return false }
         var query = baseQuery()
-        query[kSecAttrAccount as String] = deviceID
-        let status = SecItemDelete(query as CFDictionary)
-        guard status == errSecSuccess || status == errSecItemNotFound else {
-            throw DeviceCredentialStoreError.keychain(status)
-        }
+        query[kSecAttrAccount as String] = expected.connection.deviceID
+        let status = keychain.delete(query)
+        if status == errSecItemNotFound { return false }
+        guard status == errSecSuccess else { throw DeviceCredentialStoreError.keychain(status) }
+        return true
     }
 
     private func baseQuery() -> [String: Any] {

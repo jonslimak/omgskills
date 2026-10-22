@@ -92,6 +92,7 @@ import {
   starCount,
   agentKind,
   discoverCollectionPage,
+  inventorySummary,
   type CatalogDisplay,
   type Navigation,
   type SkillDisplay,
@@ -134,6 +135,8 @@ type Props = {
   onSignIn?: () => void;
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
+  publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
+  supportedAccountViews?: readonly View[];
 };
 
 function IconButton({
@@ -420,7 +423,10 @@ export function UnifiedApp({
   onSignIn,
   management,
   accountPages,
+  publicInstallAction,
+  supportedAccountViews,
 }: Props) {
+  const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState("light");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -468,6 +474,7 @@ export function UnifiedApp({
   const closingDetail = useRef<{ skill: SkillDisplay; pending: boolean } | null>(null);
   if (selected) closingDetail.current = { skill: selected, pending: detailPending };
   const detail = selected ?? closingDetail.current?.skill;
+  const selectedInventory = detail?.installed ? inventorySummary(detail.installed) : null;
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
@@ -560,6 +567,7 @@ export function UnifiedApp({
     return () => clearTimeout(timer);
   }, [notice]);
   function go(view: View, id = "") {
+    if (!supportsView(view)) return;
     if (drawerOpen) { drawerNavigating.current = true; setDrawerOpen(false); }
     navigate({ view, id, query: "", selected: "", source: "all" });
   }
@@ -625,6 +633,7 @@ export function UnifiedApp({
     count?: number,
     id = "",
   ) {
+    if (!supportsView(view)) return null;
     const active = !nav.query && (view === "creators"
       ? (nav.view === "creators" && nav.id === id) || (nav.view === "creator" && isCompany(nav.id) === (id === "companies"))
       : nav.view === view && (!id || nav.id === id));
@@ -682,21 +691,21 @@ export function UnifiedApp({
         <strong>{data.profile.name}</strong>
         <small>{data.profile.email}</small>
       </div>
-      <MenuItem icon={User} onSelect={() => goFromAccount("profile")}>
+      {supportsView("profile") && <MenuItem icon={User} onSelect={() => goFromAccount("profile")}>
         Profile
-      </MenuItem>
-      <MenuItem icon={Bot} onSelect={() => goFromAccount("agents")}>
+      </MenuItem>}
+      {supportsView("agents") && <MenuItem icon={Bot} onSelect={() => goFromAccount("agents")}>
         Agents <small>{sources.length} observed</small>
-      </MenuItem>
-      {(!readOnlyAccount || accountPages) && <><MenuItem icon={Monitor} onSelect={() => goFromAccount("devices")}>
+      </MenuItem>}
+      {(!readOnlyAccount || accountPages) && <>{supportsView("devices") && <MenuItem icon={Monitor} onSelect={() => goFromAccount("devices")}>
         Devices {!readOnlyAccount && <small>{data.devices.length}</small>}
-      </MenuItem>
-      <MenuItem icon={Code} onSelect={() => goFromAccount("github")}>
+      </MenuItem>}
+      {supportsView("github") && <MenuItem icon={Code} onSelect={() => goFromAccount("github")}>
         GitHub sources
-      </MenuItem>
-      <MenuItem icon={Server} onSelect={() => goFromAccount("mcp")}>
+      </MenuItem>}
+      {supportsView("mcp") && <MenuItem icon={Server} onSelect={() => goFromAccount("mcp")}>
         MCP server
-      </MenuItem>
+      </MenuItem>}
       </>}
       <DropdownMenu.Separator className="ua-separator" />
       <MenuItem
@@ -718,6 +727,7 @@ export function UnifiedApp({
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
+    const inventory = skill.installed ? inventorySummary(skill.installed) : null;
     return (
       <div
         key={skill.key}
@@ -781,13 +791,18 @@ export function UnifiedApp({
                   </>
                 : skill.description || "No description available"}
             </span>
+            {inventory && <span className="ua-row-description"
+              title={`${inventory.location} - ${inventory.report}`}>
+              {inventory.location} - {inventory.report}
+            </span>}
+            {inventory?.latestReport && <span className="ua-row-description" title={inventory.latestReport}>{inventory.latestReport}</span>}
           </span>
         </button>
         {!compact && !discovery && !nav.query && (
           <AgentTiles skill={skill} sources={sources} onlyInstalled={nav.view === "favorites"} />
         )}
         {!!skill.installed?.sources.length && <span className="ua-agent-count"
-          aria-label={`Installed in ${skill.installed.sources.length} ${skill.installed.sources.length === 1 ? "agent" : "agents"}`}
+          aria-label={`${skill.installed.inventoryVersion === 3 ? "Observed" : "Installed"} in ${skill.installed.sources.length} ${skill.installed.sources.length === 1 ? "agent" : "agents"}`}
           title={skill.installed.sources.join(", ")}>
           {skill.installed.sources.length}
         </span>}
@@ -1194,14 +1209,14 @@ export function UnifiedApp({
                 <User />
                 <span>Sign in</span>
               </button>
-              <a
+              {!publicInstallAction && <a
                 className="ua-sidebar-download"
                 href="/downloads/omgskills-mac.dmg"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Get the Mac app"
                 title="Get the Mac app"
-              ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app</span></a>
+              ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app</span></a>}
             </div>
           )}
         </aside>
@@ -1241,7 +1256,7 @@ export function UnifiedApp({
                       ["creators", "Creators", Users, false, ""],
                       ["collections", "Collections", PlayingCardsFan, false, ""],
                       ["data", "Data", ChartNoAxesColumn, false, ""],
-                    ] as const).map(([view, label, Icon, heading, id]) => <button type="button" key={`${view}:${id}`}
+                    ] as const).filter(([view]) => supportsView(view)).map(([view, label, Icon, heading, id]) => <button type="button" key={`${view}:${id}`}
                       className={`ua-nav-item${heading ? " ua-drawer-section" : ""}`}
                       aria-current={(view === "creators"
                         ? (nav.view === view && nav.id === id) || (nav.view === "creator" && isCompany(nav.id) === (id === "companies"))
@@ -1821,6 +1836,12 @@ export function UnifiedApp({
                       <span>Observed on</span>
                       <strong>{detail.installed.sources.join(", ")}</strong>
                     </div>
+                    {selectedInventory && <>
+                      <div><span>Mac / agent</span><strong>{selectedInventory.location}</strong></div>
+                      <p>{selectedInventory.report}</p>
+                      {selectedInventory.latestReport && <p>{selectedInventory.latestReport}</p>}
+                      {detail.installed.installationFolder && <div><span>Folder</span><strong>{detail.installed.installationFolder}</strong></div>}
+                    </>}
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, detail.installed!))
@@ -1840,6 +1861,7 @@ export function UnifiedApp({
                     </div>}
                   </section>
                 )}
+                {selected && publicInstallAction?.(selected, !detailPending)}
                 {detail.publicUrl && (
                   <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
                     View public skill page <ArrowUpRight />

@@ -197,7 +197,7 @@ test("still accepts the maximum supported batch of 30 skill IDs", async () => {
 });
 
 test("binds only the public MCP routes with a rate limit", () => {
-  assert.deepEqual(config.path, ["/mcp", "/mcp/health"]);
+  assert.deepEqual(config.path, ["/mcp", "/mcp/health", "/api/catalog/install-record"]);
   assert.deepEqual(config.rateLimit, {
     windowLimit: 600,
     windowSize: 60,

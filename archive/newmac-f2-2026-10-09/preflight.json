@@ -1,0 +1,300 @@
+{
+  "observedAt" : "2026-10-09T15:06:13Z",
+  "scope" : "Public fetch and review preflight only; no installation or browser acceptance",
+  "sources" : [
+    {
+      "changedPaths" : [
+        "CHANGELOG.md",
+        "README.md"
+      ],
+      "gitFetchCount" : 2,
+      "id" : "blader\/humanizer",
+      "latest" : {
+        "commit" : "225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8",
+        "files" : [
+          {
+            "blob" : "259312e97cc3b6d84fab8556945d51a002c24858",
+            "bytes" : 521,
+            "mode" : "100644",
+            "path" : ".claude-plugin\/marketplace.json"
+          },
+          {
+            "blob" : "7c2c657ffb3edba76e1202a39d802753131dd695",
+            "bytes" : 526,
+            "mode" : "100644",
+            "path" : ".claude-plugin\/plugin.json"
+          },
+          {
+            "blob" : "a825c73bec4192a211326dd9b10ee5cffb386999",
+            "bytes" : 388,
+            "mode" : "100644",
+            "path" : ".cursor-plugin\/plugin.json"
+          },
+          {
+            "blob" : "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+            "bytes" : 393,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/config.yml"
+          },
+          {
+            "blob" : "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+            "bytes" : 681,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/new-pattern.yml"
+          },
+          {
+            "blob" : "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+            "bytes" : 1286,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/rewrite-problem.yml"
+          },
+          {
+            "blob" : "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+            "bytes" : 815,
+            "mode" : "100644",
+            "path" : ".github\/workflows\/validate.yml"
+          },
+          {
+            "blob" : "5b170fd02364e3c088897a2b417c4226a533244e",
+            "bytes" : 3439,
+            "mode" : "100644",
+            "path" : "AGENTS.md"
+          },
+          {
+            "blob" : "f84b9f4ad2c9bfcf2a3d38b258269033163f807c",
+            "bytes" : 5922,
+            "mode" : "100644",
+            "path" : "CHANGELOG.md"
+          },
+          {
+            "blob" : "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+            "bytes" : 1066,
+            "mode" : "100644",
+            "path" : "LICENSE"
+          },
+          {
+            "blob" : "22594fa2688ebb53dde0a54719a943721d31e9a7",
+            "bytes" : 12884,
+            "mode" : "100644",
+            "path" : "README.md"
+          },
+          {
+            "blob" : "19fc634208e8cc6ae55d4ff287152583216fd244",
+            "bytes" : 32348,
+            "mode" : "100644",
+            "path" : "SKILL.md"
+          },
+          {
+            "blob" : "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+            "bytes" : 201,
+            "mode" : "100644",
+            "path" : "agents\/openai.yaml"
+          },
+          {
+            "blob" : "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+            "bytes" : 5418,
+            "mode" : "100755",
+            "path" : "scripts\/validate-package.py"
+          }
+        ],
+        "skillBlob" : "19fc634208e8cc6ae55d4ff287152583216fd244",
+        "totalBytes" : 65888,
+        "tree" : "8ed37b6d1d98a0bbdb599d0399a4a2185eb8fa03"
+      },
+      "path" : "SKILL.md",
+      "previous" : {
+        "commit" : "29deb74c89fc12d01c6eab433252c869ce08ad7b",
+        "files" : [
+          {
+            "blob" : "259312e97cc3b6d84fab8556945d51a002c24858",
+            "bytes" : 521,
+            "mode" : "100644",
+            "path" : ".claude-plugin\/marketplace.json"
+          },
+          {
+            "blob" : "7c2c657ffb3edba76e1202a39d802753131dd695",
+            "bytes" : 526,
+            "mode" : "100644",
+            "path" : ".claude-plugin\/plugin.json"
+          },
+          {
+            "blob" : "a825c73bec4192a211326dd9b10ee5cffb386999",
+            "bytes" : 388,
+            "mode" : "100644",
+            "path" : ".cursor-plugin\/plugin.json"
+          },
+          {
+            "blob" : "d12c9c099c65bfa6f7ea3a032766b802c5f3669f",
+            "bytes" : 393,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/config.yml"
+          },
+          {
+            "blob" : "f154231ac3fb3b39aed0593df3fabb07d054fae7",
+            "bytes" : 681,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/new-pattern.yml"
+          },
+          {
+            "blob" : "a83f9e829106e6fbcf9f4ee22f6b80fdd8b4b3ae",
+            "bytes" : 1286,
+            "mode" : "100644",
+            "path" : ".github\/ISSUE_TEMPLATE\/rewrite-problem.yml"
+          },
+          {
+            "blob" : "3c5e8be5beb9ea61f35e8fa75ea4e88733220434",
+            "bytes" : 815,
+            "mode" : "100644",
+            "path" : ".github\/workflows\/validate.yml"
+          },
+          {
+            "blob" : "5b170fd02364e3c088897a2b417c4226a533244e",
+            "bytes" : 3439,
+            "mode" : "100644",
+            "path" : "AGENTS.md"
+          },
+          {
+            "blob" : "77738df202dcedbf4cf599d624398fcd9198269b",
+            "bytes" : 5830,
+            "mode" : "100644",
+            "path" : "CHANGELOG.md"
+          },
+          {
+            "blob" : "625297fb778f32eb39d3a5b97e3e3b611b7304d6",
+            "bytes" : 1066,
+            "mode" : "100644",
+            "path" : "LICENSE"
+          },
+          {
+            "blob" : "bf650665e14220a4c7841f049cd00c275155466a",
+            "bytes" : 13194,
+            "mode" : "100644",
+            "path" : "README.md"
+          },
+          {
+            "blob" : "19fc634208e8cc6ae55d4ff287152583216fd244",
+            "bytes" : 32348,
+            "mode" : "100644",
+            "path" : "SKILL.md"
+          },
+          {
+            "blob" : "16df2a8e1c788b20bfdf5d3c9a5fa863890fe7bc",
+            "bytes" : 201,
+            "mode" : "100644",
+            "path" : "agents\/openai.yaml"
+          },
+          {
+            "blob" : "9b20d72cecd28bb4589ca05039e8586f902e74b6",
+            "bytes" : 5418,
+            "mode" : "100755",
+            "path" : "scripts\/validate-package.py"
+          }
+        ],
+        "skillBlob" : "19fc634208e8cc6ae55d4ff287152583216fd244",
+        "totalBytes" : 66106,
+        "tree" : "6c894c1c7396aabbe86ca2d5bcdff5a58d7b2813"
+      },
+      "repository" : "blader\/humanizer",
+      "result" : "passed",
+      "reviewFileCount" : 14,
+      "seconds" : 1.614611029624939,
+      "target" : "humanizer"
+    },
+    {
+      "gitFetchCount" : 1,
+      "id" : "vercel-labs\/agent-skills:skills\/writing-guidelines",
+      "latest" : {
+        "commit" : "063bee94c3f4df8453406c830b0a7df0f2860278",
+        "files" : [
+          {
+            "blob" : "63facf310252a990d154bed12b3dcdd295ba771a",
+            "bytes" : 1233,
+            "mode" : "100644",
+            "path" : "SKILL.md"
+          }
+        ],
+        "skillBlob" : "63facf310252a990d154bed12b3dcdd295ba771a",
+        "totalBytes" : 1233,
+        "tree" : "17d954cadfb8dec50bf0c707c9e7634be9ae9fe8"
+      },
+      "path" : "skills\/writing-guidelines\/SKILL.md",
+      "repository" : "vercel-labs\/agent-skills",
+      "result" : "passed",
+      "reviewFileCount" : 1,
+      "seconds" : 0.80149805545806885,
+      "target" : "writing-guidelines"
+    },
+    {
+      "gitFetchCount" : 1,
+      "id" : "coreyhaines31\/marketingskills:skills\/seo-audit",
+      "latest" : {
+        "commit" : "1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff",
+        "files" : [
+          {
+            "blob" : "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+            "bytes" : 17665,
+            "mode" : "100644",
+            "path" : "SKILL.md"
+          },
+          {
+            "blob" : "d569ae70cf4746f7a27e7808abbaea4878c27fd7",
+            "bytes" : 15717,
+            "mode" : "100644",
+            "path" : "evals\/evals.json"
+          },
+          {
+            "blob" : "cb67ece4135f4153575bbbdfbf722364babff61d",
+            "bytes" : 6528,
+            "mode" : "100644",
+            "path" : "references\/ai-writing-detection.md"
+          },
+          {
+            "blob" : "6ba5f1f6804477f3f86aecabecc128fbe9083911",
+            "bytes" : 14622,
+            "mode" : "100644",
+            "path" : "references\/international-seo.md"
+          },
+          {
+            "blob" : "d49f0443e091c70e4778a4e33030a33d18a361a4",
+            "bytes" : 4036,
+            "mode" : "100644",
+            "path" : "references\/local-seo-pages-and-measurement.md"
+          },
+          {
+            "blob" : "d34b7e043cb7c4d2da114f04e986bd476a22d0c6",
+            "bytes" : 3971,
+            "mode" : "100644",
+            "path" : "references\/local-seo-profile-and-citations.md"
+          },
+          {
+            "blob" : "c2636ada98809d6ed8db588040817adc332add5e",
+            "bytes" : 7249,
+            "mode" : "100644",
+            "path" : "references\/local-seo.md"
+          },
+          {
+            "blob" : "7883357f7425dd90a9ce8ba7c94a9105b4f7fda7",
+            "bytes" : 4466,
+            "mode" : "100644",
+            "path" : "references\/rankings-push.md"
+          },
+          {
+            "blob" : "5d5eac8002179ac5288f3b4bbd2aa35b3a409a42",
+            "bytes" : 5533,
+            "mode" : "100644",
+            "path" : "references\/title-tags.md"
+          }
+        ],
+        "skillBlob" : "9139ffeb437f4e36e16f19a7a16b3a99e44193c5",
+        "totalBytes" : 79787,
+        "tree" : "7aa1a3602b909a511c92516da3d7d4d2b9c89159"
+      },
+      "path" : "skills\/seo-audit\/SKILL.md",
+      "repository" : "coreyhaines31\/marketingskills",
+      "result" : "passed",
+      "reviewFileCount" : 9,
+      "seconds" : 1.2992058992385864,
+      "target" : "seo-audit"
+    }
+  ]
+}

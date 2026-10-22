@@ -65,6 +65,7 @@ struct SystemBrowserPairingRequestGenerator: BrowserPairingRequestGenerating {
 
 enum BrowserPairing {
     static let callbackScheme = "omgskills"
+    static let connectedTestCallbackScheme = "omgskills-f1"
     static let defaultConnectURL = URL(string: "https://omgskills.com/app/connect")!
     static let connectURLInfoKey = "OMGSkillsPortalConnectURL"
 
@@ -116,9 +117,11 @@ enum BrowserPairing {
 
     static func parseCallback(
         _ url: URL,
-        expectedState: String
+        expectedState: String,
+        callbackScheme: String = BrowserPairing.callbackScheme
     ) throws -> BrowserPairingCallback {
         guard
+            [Self.callbackScheme, connectedTestCallbackScheme].contains(callbackScheme),
             let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
             components.scheme?.lowercased() == callbackScheme,
             components.host?.lowercased() == "pair",

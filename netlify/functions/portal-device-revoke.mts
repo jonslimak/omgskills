@@ -3,7 +3,10 @@ import { DeviceAuthError, revokePresentedDevice } from "./_shared/device-auth.js
 import { getPgPool } from "./_shared/db.js";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
 
-export default async (req: Request, _context: Context) => {
+const defaultDependencies = { getPgPool, revokePresentedDevice };
+
+export async function portalDeviceRevoke(req: Request, _context: Context, dependencies = defaultDependencies) {
+  const { getPgPool, revokePresentedDevice } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -20,7 +23,9 @@ export default async (req: Request, _context: Context) => {
     }
     return errorResponse(req, 500, "Device revocation failed");
   }
-};
+}
+
+export default (req: Request, context: Context) => portalDeviceRevoke(req, context);
 
 export const config = {
   path: "/api/portal/device-revoke",

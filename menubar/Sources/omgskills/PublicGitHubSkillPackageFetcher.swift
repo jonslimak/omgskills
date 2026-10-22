@@ -1,10 +1,19 @@
 import Foundation
 
-enum GitCommandError: Error, Equatable, Sendable {
+enum GitCommandError: LocalizedError, Equatable, Sendable {
     case unavailable
     case failed(status: Int32)
     case outputTooLarge
     case invalidOutput
+
+    var errorDescription: String? {
+        switch self {
+        case .unavailable: return "Git is not available"
+        case .failed(let status): return "Git failed (exit status \(status))"
+        case .outputTooLarge: return "Git output exceeded the supported limit"
+        case .invalidOutput: return "Git returned invalid output"
+        }
+    }
 }
 
 protocol GitCommandRunning: Sendable {
@@ -165,7 +174,7 @@ private final class ProcessExecutionState: @unchecked Sendable {
     }
 }
 
-struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
+struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, PublicSkillPackageResolving, Sendable {
     typealias RemoteURLBuilder = @Sendable (String) -> URL?
 
     private static let maximumCommandOutputBytes = 1 * 1024 * 1024
@@ -188,10 +197,33 @@ struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
         self.remoteURL = remoteURL
     }
 
+    func usingRunner(_ runner: any GitCommandRunning) -> Self {
+        Self(runner: runner, temporaryRoot: temporaryRoot, limits: limits, remoteURL: remoteURL)
+    }
+
     func fetchPackage(
         repositorySlug: String,
         normalizedRoot: String,
         expected: SkillPackageCoordinates
+    ) async throws -> SkillPackage {
+        try await fetchPackage(
+            repositorySlug: repositorySlug, normalizedRoot: normalizedRoot,
+            commitSha: expected.commitSha, expected: expected
+        )
+    }
+
+    func resolvePackage(_ request: PublicSkillInstallRequest) async throws -> SkillPackage {
+        try await fetchPackage(
+            repositorySlug: request.repositorySlug, normalizedRoot: request.packageRoot,
+            commitSha: request.commitSha, expected: nil
+        )
+    }
+
+    private func fetchPackage(
+        repositorySlug: String,
+        normalizedRoot: String,
+        commitSha: String?,
+        expected: SkillPackageCoordinates?
     ) async throws -> SkillPackage {
         guard let repository = GitHubRepositorySlug.normalized(repositorySlug),
               let remote = remoteURL(repository),
@@ -214,7 +246,7 @@ struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
                     [
                         "--git-dir", repositoryRoot.path,
                         "fetch", "--quiet", "--depth=1", "--no-tags",
-                        remote.absoluteString, expected.commitSha
+                        remote.absoluteString, commitSha ?? "HEAD"
                     ],
                     maximumOutputBytes: Self.maximumCommandOutputBytes
                 )
@@ -228,7 +260,7 @@ struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
                 "--git-dir", repositoryRoot.path,
                 "rev-parse", "--verify", "FETCH_HEAD^{commit}"
             ])
-            guard fetchedCommit.caseInsensitiveCompare(expected.commitSha) == .orderedSame else {
+            if let commitSha, fetchedCommit.caseInsensitiveCompare(commitSha) != .orderedSame {
                 throw GroupSkillPackageLoaderError.packageUnavailable
             }
 
@@ -250,7 +282,7 @@ struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
                 }
                 treeSha = children[0].sha
             }
-            guard treeSha.caseInsensitiveCompare(expected.treeSha) == .orderedSame else {
+            if let expected, treeSha.caseInsensitiveCompare(expected.treeSha) != .orderedSame {
                 throw SkillPackageValidationError(code: .treeShaMismatch, path: nil)
             }
 
@@ -317,8 +349,14 @@ struct GitPublicSkillPackageFetcher: PublicSkillPackageFetching, Sendable {
                 ))
             }
 
-            let package = SkillPackage(coordinates: expected, entries: entries)
-            _ = try SkillPackageValidator.validate(package, expected: expected, limits: limits)
+            guard let skillMD = entries.first(where: { $0.path == "SKILL.md" }) else {
+                throw SkillPackageValidationError(code: .missingSkillMd, path: nil)
+            }
+            let coordinates = expected ?? SkillPackageCoordinates(
+                commitSha: fetchedCommit, treeSha: treeSha, skillMdSha: skillMD.blobSha
+            )
+            let package = SkillPackage(coordinates: coordinates, entries: entries)
+            _ = try SkillPackageValidator.validate(package, expected: coordinates, limits: limits)
             return package
         } catch is CancellationError {
             throw CancellationError()
