@@ -4,15 +4,18 @@ import { errorResponse, secretJsonResponse, optionsResponse } from "./_shared/ht
 import { requirePortalUser } from "./_shared/user.js";
 import { inventoryReadVersion, readSyncInventory } from "./_shared/sync-inventory-read.js";
 import { requireLocalInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
+import { readLegacySyncInventory } from "./_shared/sync-inventory.js";
 
 const defaultDependencies = { getPgPool, requirePortalUser, readSyncInventory };
-type Dependencies = typeof defaultDependencies & {
+type Dependencies = Omit<typeof defaultDependencies, "readSyncInventory"> & {
+  readSyncInventory?: typeof readSyncInventory;
+  readLegacySyncInventory?: typeof readLegacySyncInventory;
   getEnvironment?: () => Record<string, string | undefined>;
   requireReconciliation?: typeof requireLocalInventoryReconciliation;
 };
 
 export async function portalSyncedSkills(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
-  const { getPgPool, requirePortalUser, readSyncInventory } = dependencies;
+  const { getPgPool, requirePortalUser } = dependencies;
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -22,12 +25,15 @@ export async function portalSyncedSkills(req: Request, context: Context, depende
 
   try {
     const version = inventoryReadVersion(req, true);
-    if (version === 3) {
+    if (version !== 1) {
       (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env,
         context.deploy?.context, "/api/portal/synced-skills");
     }
     const user = await requirePortalUser(req);
-    return secretJsonResponse(req, await readSyncInventory(getPgPool(), user.id, version));
+    if (version === 1 && dependencies.readLegacySyncInventory) {
+      return secretJsonResponse(req, await dependencies.readLegacySyncInventory(getPgPool(), user.id));
+    }
+    return secretJsonResponse(req, await (dependencies.readSyncInventory ?? readSyncInventory)(getPgPool(), user.id, version));
   } catch (error) {
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());

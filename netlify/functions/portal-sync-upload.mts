@@ -10,6 +10,7 @@ import {
 } from "./_shared/sync-upload.js";
 import { requireJsonObject } from "./_shared/validation.js";
 import { parseInventoryCheck, performInventoryCheck, readInventoryRevision, requireLocalInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
+import { requireLegacyInventoryReport } from "./_shared/legacy-inventory-schema.js";
 
 const defaultDependencies = { getPgPool, requireSkillGroupsWebFeature, performSyncUpload };
 type Dependencies = typeof defaultDependencies & {
@@ -41,6 +42,11 @@ export async function portalSyncUpload(req: Request, context: Context, dependenc
       return secretJsonResponse(req, await (dependencies.readInventoryRevision ?? readInventoryRevision)(getPgPool(), req));
     }
     const body = await requireJsonObject(req);
+    if (body.reportVersion === 2 || body.reportVersion === 3) {
+      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+    } else {
+      requireLegacyInventoryReport(body);
+    }
     if (body.reportVersion === 3 && Object.hasOwn(body, "mode")) {
       (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
       if (new URL(req.url).search) throw new Response("Inventory checks do not accept query parameters", { status: 400 });

@@ -26,6 +26,7 @@ test("upload dispatches explicit presence mode and leaves unversioned clients in
     let called = false;
     const response = await portalSyncUpload(request({ reportVersion, skills: reportVersion ? [presence] : [] }), context, {
       requireSkillGroupsWebFeature() {}, getPgPool: () => pool,
+      requireReconciliation() {},
       async performSyncUpload(actualPool, authentication, skills, now, version) {
         called = true;
         assert.equal(actualPool, pool);
@@ -44,6 +45,7 @@ test("upload dispatches explicit presence mode and leaves unversioned clients in
 
 test("invalid upload contracts and missing/malformed bearer auth cannot reach storage", async () => {
   const deps = { requireSkillGroupsWebFeature() {}, getPgPool: noDatabase,
+    requireReconciliation() {},
     performSyncUpload: noDatabase };
   for (const body of [
     { reportVersion: "2", skills: [] }, { reportVersion: null, skills: [] },
@@ -66,6 +68,7 @@ test("inventory endpoint authenticates before data access and uses only the auth
   const user = { id: "owner", clerkUserId: "clerk", email: "owner@example.test", displayName: null };
   let authenticated = false;
   const response = await portalSyncedSkills(new Request("https://example.test/api/portal/synced-skills?version=2&userId=other"), context, {
+    requireReconciliation() {},
     async requirePortalUser() { authenticated = true; return user; },
     getPgPool() { assert.equal(authenticated, true); return pool; },
     async readSyncInventory(actualPool, userId, version) {
@@ -79,6 +82,7 @@ test("inventory endpoint authenticates before data access and uses only the auth
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.deepEqual(await response.json(), { inventoryVersion: 2, skills: [], devices: [] });
   const unauthenticated = await portalSyncedSkills(new Request("https://example.test/api/portal/synced-skills?version=2"), context, {
+    requireReconciliation() {},
     requirePortalUser: async () => { throw new Response("Unauthorized", { status: 401 }); },
     getPgPool: noDatabase, readSyncInventory: noDatabase
   });
@@ -139,11 +143,12 @@ test("v3 inventory reads preserve retained facts, authenticate the account and r
   assert.equal(denied.status, 401);
 });
 
-test("default and v2 account reads ignore the reconciliation gate and retain their response shapes", async () => {
+test("default and explicitly enabled v2 account reads retain their response shapes", async () => {
   for (const [query, version] of [["", 1], ["?version=2", 2]] as const) {
     const body = version === 1 ? { skills: [] } : { inventoryVersion: 2 as const, skills: [], devices: [] };
     const response = await portalSyncedSkills(new Request(`https://example.test/api/portal/synced-skills${query}`), context, {
       getEnvironment: noDatabase, getPgPool: () => pool,
+      requireReconciliation() {},
       requirePortalUser: async () => ({ id: "owner", clerkUserId: "clerk", email: "owner@example.test", displayName: null }),
       async readSyncInventory(_pool, owner, actualVersion) { assert.equal(owner, "owner"); assert.equal(actualVersion, version); return body; }
     });

@@ -2,11 +2,12 @@ import type { Pool } from "pg";
 import { listUserDevices } from "./device-auth.js";
 import { installationFolderFromKey } from "./sync-skill.js";
 import type { RootCoverage } from "./inventory-reconciliation.js";
+import { readLegacySyncInventory } from "./sync-inventory.js";
 
 export function inventoryReadVersion(req: Request, allowReconciliation = false): 1 | 2 | 3 {
   const url = new URL(req.url);
   const versions = url.searchParams.getAll("version");
-  if (!versions.length) return 1;
+  if (!versions.length || (versions.length === 1 && versions[0] === "1")) return 1;
   if (allowReconciliation && versions.length === 1 && versions[0] === "3" && url.search === "?version=3") return 3;
   if (versions.length !== 1 || versions[0] !== "2") {
     throw new Response("Unsupported inventory version", { status: 400 });
@@ -15,19 +16,19 @@ export function inventoryReadVersion(req: Request, allowReconciliation = false):
 }
 
 export async function readSyncInventory(pool: Pool, userId: string, version: 1 | 2 | 3, now = new Date()) {
+  if (version === 1) return readLegacySyncInventory(pool, userId);
   const result = await pool.query(
     `SELECT id, stable_key AS "stableKey", skill_md_sha AS "skillMdSha",
        identity_status AS "identityStatus", name, description,
        catalog_skill_id AS "catalogSkillId", github_url AS "githubUrl",
        is_local_only AS "isLocalOnly", source, is_current AS "isCurrent",
        last_seen_at AS "lastSeenAt"
-       ${version !== 1 ? ', device_id AS "deviceId", git_relative_path AS "gitRelativePath", catalog_skill_id_hint AS "catalogSkillIdHint"' : ""}
+       , device_id AS "deviceId", git_relative_path AS "gitRelativePath", catalog_skill_id_hint AS "catalogSkillIdHint"
      FROM synced_skills
-     WHERE user_id = $1 ${version === 3 ? "" : "AND is_current = true"} ${version === 1 ? "AND device_id IS NULL" : ""}
+     WHERE user_id = $1 ${version === 3 ? "" : "AND is_current = true"}
      ORDER BY lower(name), source, id`,
     [userId]
   );
-  if (version === 1) return { skills: result.rows };
 
   const skills = result.rows.map(({ stableKey, ...row }) => ({
     ...row,
