@@ -1,5 +1,6 @@
 import type { PoolClient } from "pg";
 import { incrementGroupRevision } from "./group-storage.js";
+import { lockLegacyInventorySchema } from "./legacy-inventory-schema.js";
 
 export type ReconciliationSkill = {
   id: string;
@@ -57,6 +58,7 @@ export async function reconcileSyncedGroupReferences(
   userId: string,
   options: { dryRun?: boolean; groupId?: string } = {},
 ): Promise<SyncedReferenceRepair[]> {
+  const deviceScoped = await lockLegacyInventorySchema(client, options.dryRun === true);
   if (!options.dryRun) {
     // Same lock order as inventory writes: owner, then groups in stable order.
     await client.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [userId]);
@@ -68,7 +70,7 @@ export async function reconcileSyncedGroupReferences(
   }
   const skills = await client.query<ReconciliationSkill>(
     `SELECT id, stable_key AS "stableKey", source, skill_md_sha AS sha, is_current AS current
-     FROM synced_skills WHERE user_id = $1`,
+     FROM synced_skills WHERE user_id = $1 ${deviceScoped ? "AND device_id IS NULL" : ""}`,
     [userId],
   );
   const items = await client.query<ReconciliationItem>(

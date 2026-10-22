@@ -9,6 +9,7 @@ import {
 import { writeSyncInventory } from "./sync-inventory.js";
 import type { SyncSkill } from "./sync-skill.js";
 import { requireString } from "./validation.js";
+import { lockLegacyInventorySchema } from "./legacy-inventory-schema.js";
 
 type UploadAuthentication =
   | { kind: "device"; request: Request }
@@ -42,6 +43,7 @@ export async function performSyncUpload(
   }
   try {
     await client.query("BEGIN");
+    await lockLegacyInventorySchema(client);
     let userId: string;
     let deviceId: string | null = null;
     let legacyTokenId: string | null = null;
