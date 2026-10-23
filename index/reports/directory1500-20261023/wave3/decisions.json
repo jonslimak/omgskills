@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-10-23T20:14:00.388Z",
+  "reviewSha256": "f64cbf2c98382dbee0428a07e8d65371954c75cf8fc1bd7a4fdc98f82357e305",
+  "excludeRepos": [
+    "hadifrt20/vouch"
+  ],
+  "excludeIds": [
+    "hadifrt20/vouch:skills/vouch-promote",
+    "hadifrt20/vouch:skills/vouch-resume",
+    "hadifrt20/vouch:skills/vouch-run",
+    "hadifrt20/vouch:skills/vouch-status",
+    "hadifrt20/vouch:skills/vouch-witness"
+  ],
+  "excluded": [
+    {
+      "id": "hadifrt20/vouch:skills/vouch-promote",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "hadifrt20/vouch:skills/vouch-resume",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "hadifrt20/vouch:skills/vouch-run",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "hadifrt20/vouch:skills/vouch-status",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "hadifrt20/vouch:skills/vouch-witness",
+      "reason": "plugin-root-or-external-package-dependency"
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Reviewed original partner-source workflows across developer infrastructure, identity, analytics, CRM, payments, security and productivity. Exclude the Vouch plugin because its required helpers and named subagents are outside each installable skill folder. Hold all source, dependency, security and ambiguity findings. Service/MCP access remains a separate prerequisite. No source commands executed.",
+  "reviewed": 600,
+  "approvedCount": 418
+}

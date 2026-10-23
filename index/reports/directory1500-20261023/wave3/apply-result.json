@@ -1,0 +1,3003 @@
+{
+  "generatedAt": "2026-10-23T20:19:36.323Z",
+  "wave": "wave3",
+  "summary": {
+    "planCandidateCount": 409,
+    "finalCount": 409,
+    "pendingCount": 0,
+    "addedCount": 409,
+    "existingCount": 0,
+    "policySkippedCount": 0,
+    "stableFailedCount": 0,
+    "transientFailedCount": 0
+  },
+  "sharedApproval": {
+    "changedCreators": [
+      "mondaycom",
+      "ngrok",
+      "noibu",
+      "pinecone-io",
+      "rilldata",
+      "slackapi",
+      "taboola",
+      "airtable",
+      "launchnotes",
+      "remoteoss",
+      "wingspanhq",
+      "buildkite",
+      "canva-sdks",
+      "crowdstrike",
+      "endgame-labs",
+      "hostinger",
+      "jfrog",
+      "knocklabs",
+      "phished-bv",
+      "zocks-communications",
+      "activecampaign",
+      "atlassian",
+      "bigexchange",
+      "blackrock",
+      "dropbox",
+      "gitbookio",
+      "grasp-ai",
+      "leadfeeder",
+      "lusha-oss",
+      "sumup",
+      "supermetrics-public",
+      "tinyfish-io",
+      "vaisala-xweather",
+      "wonderwhy-er",
+      "42crunch-ai",
+      "apify",
+      "apolloio",
+      "appfollow",
+      "chronograph-pe",
+      "customerio",
+      "cypress-io",
+      "datahub-project",
+      "eon-io",
+      "fullstorydev",
+      "junipersquare-public",
+      "kobiton",
+      "morningstar",
+      "oaknational",
+      "opsera-agents",
+      "pactflow",
+      "rocketreach",
+      "starburstlabs",
+      "unstructured-io",
+      "workday",
+      "youdotcom-oss",
+      "couchbase-ecosystem",
+      "dequelabs",
+      "euler-software-inc",
+      "intercom",
+      "krea-ai",
+      "mercadopago",
+      "newrelic",
+      "riversidefm",
+      "zapier",
+      "cloudinary-devs",
+      "epicgames",
+      "gc-ai-inc",
+      "grafana",
+      "kensho-technologies",
+      "luminpdf",
+      "meshy-dev",
+      "mobbin",
+      "monta-app",
+      "semgrep",
+      "thoughtspot",
+      "unbounce",
+      "vaadin",
+      "villagesql",
+      "b12io",
+      "blaxel-ai",
+      "botify-hq",
+      "checkly",
+      "exa-labs",
+      "functionizeinc",
+      "groundcover-com",
+      "handsontable",
+      "intuit",
+      "keenableai",
+      "paypal",
+      "preset-io",
+      "sap",
+      "spotify",
+      "stackhawk",
+      "sumologic",
+      "supabase-community",
+      "synthflowai",
+      "ukg",
+      "unleash",
+      "1password",
+      "aiven",
+      "apptweak",
+      "atlanhq",
+      "cerebriumai",
+      "finchat-project-atlas",
+      "gendigitalinc",
+      "mintlify",
+      "pixeltable",
+      "privco"
+    ],
+    "beforeRevision": "sha256:f0d6ea33a9e7ac93ff178420b113fc6c5193a6ec8e712c1ec9156b9bc41689c5",
+    "afterRevision": "sha256:34f879eb1b187c1e3fc6ecf9a3326bdb7771ac38a467a4d0ab8224813e1dbf14"
+  },
+  "priorAdditionsPreserved": 1091,
+  "totalCampaignAdditions": 1500,
+  "beforeCount": 48781,
+  "afterCount": 49190,
+  "addedSkills": [
+    {
+      "id": "1password/1password-claude-plugin:skills/1password-environments",
+      "name": "1password-environments",
+      "repo": "1password/1password-claude-plugin",
+      "path": "skills/1password-environments/SKILL.md",
+      "sha": "b7c35ca0c90b0f668e20f2b0eba54f46de25fe9a"
+    },
+    {
+      "id": "42crunch-ai/claude-plugins:plugins/api-security-testing/skills/generate-oas",
+      "name": "generate-oas",
+      "repo": "42crunch-ai/claude-plugins",
+      "path": "plugins/api-security-testing/skills/generate-oas/SKILL.md",
+      "sha": "a5d3daab3f2f21ff63610babdb83ec7e886f9ef0"
+    },
+    {
+      "id": "activecampaign/activecampaign-plugin:skills/automation-builder",
+      "name": "automation-builder",
+      "repo": "activecampaign/activecampaign-plugin",
+      "path": "skills/automation-builder/SKILL.md",
+      "sha": "093b4b9be4498151b0b6f3fde5b6d9487dcbf245"
+    },
+    {
+      "id": "activecampaign/activecampaign-plugin:skills/campaign-strategist",
+      "name": "campaign-strategist",
+      "repo": "activecampaign/activecampaign-plugin",
+      "path": "skills/campaign-strategist/SKILL.md",
+      "sha": "ec1c32a8da477bd339d6f3d56ffff454748c6c0c"
+    },
+    {
+      "id": "activecampaign/activecampaign-plugin:skills/contact-operations",
+      "name": "contact-operations",
+      "repo": "activecampaign/activecampaign-plugin",
+      "path": "skills/contact-operations/SKILL.md",
+      "sha": "d9ca6680cbf92d59139eb0e794a3ea9e93b1950f"
+    },
+    {
+      "id": "activecampaign/activecampaign-plugin:skills/deals-crm",
+      "name": "deals-crm",
+      "repo": "activecampaign/activecampaign-plugin",
+      "path": "skills/deals-crm/SKILL.md",
+      "sha": "47b9afc91554c2c9473a9efb5915a9dc13d3e638"
+    },
+    {
+      "id": "activecampaign/activecampaign-plugin:skills/deliverability-advisor",
+      "name": "deliverability-advisor",
+      "repo": "activecampaign/activecampaign-plugin",
+      "path": "skills/deliverability-advisor/SKILL.md",
+      "sha": "a31a82e3c9927bdcdaca6610903d89bb26e758f4"
+    },
+    {
+      "id": "activecampaign/activecampaign-plugin:skills/reporting-analyst",
+      "name": "reporting-analyst",
+      "repo": "activecampaign/activecampaign-plugin",
+      "path": "skills/reporting-analyst/SKILL.md",
+      "sha": "197802507cfdc99488f9bcf487c8fd6810b4e041"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/agent-activity-log",
+      "name": "agent-activity-log",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/agent-activity-log/SKILL.md",
+      "sha": "35ca59a844ef99d2dea5281a2a87f62ce91580f9"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/airtable-cli",
+      "name": "airtable-cli",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/airtable-cli/SKILL.md",
+      "sha": "b0d7edfdbcf4791724fbb02ac95758be48582f72"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/airtable-filters",
+      "name": "airtable-filters",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/airtable-filters/SKILL.md",
+      "sha": "16af2c4c9a26ce2c1338dda8d73ff249dd6b1588"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/airtable-overview",
+      "name": "airtable-overview",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/airtable-overview/SKILL.md",
+      "sha": "31c6feef3ce5276ff20d86e93017851dd9a5b5f5"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/marketing-ops",
+      "name": "marketing-ops",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/marketing-ops/SKILL.md",
+      "sha": "49a35bcd4c7f2f3f118023b00ada7a2f4300dc25"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/product-ops",
+      "name": "product-ops",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/product-ops/SKILL.md",
+      "sha": "2395313f0c7b3cce40dd14c798297b10820d69ee"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/sales-ops",
+      "name": "sales-ops",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/sales-ops/SKILL.md",
+      "sha": "94f169c4d3f0be5227f67fdb7f6528aee4b8d67d"
+    },
+    {
+      "id": "airtable/skills:plugins/airtable/skills/show-airtable-link",
+      "name": "show-airtable-link",
+      "repo": "airtable/skills",
+      "path": "plugins/airtable/skills/show-airtable-link/SKILL.md",
+      "sha": "45eb7695d534f9f290b2bb9d8a809d178072deaa"
+    },
+    {
+      "id": "aiven/aiven-ai-plugins:skills/aiven-getting-started",
+      "name": "aiven-getting-started",
+      "repo": "aiven/aiven-ai-plugins",
+      "path": "skills/aiven-getting-started/SKILL.md",
+      "sha": "785cafc1a293eafc4f42e7578ee03af0888e1cae"
+    },
+    {
+      "id": "apify/apify-claude-code-plugin:skills/apify-actor-development",
+      "name": "apify-actor-development",
+      "repo": "apify/apify-claude-code-plugin",
+      "path": "skills/apify-actor-development/SKILL.md",
+      "sha": "f52a777597e8f0474740beae90ccc2c05cf89d4e"
+    },
+    {
+      "id": "apify/apify-claude-code-plugin:skills/apify-actorization",
+      "name": "apify-actorization",
+      "repo": "apify/apify-claude-code-plugin",
+      "path": "skills/apify-actorization/SKILL.md",
+      "sha": "04eab2f3127a611f695eca2cd968a479c9d41287"
+    },
+    {
+      "id": "apify/apify-claude-code-plugin:skills/apify-generate-output-schema",
+      "name": "apify-generate-output-schema",
+      "repo": "apify/apify-claude-code-plugin",
+      "path": "skills/apify-generate-output-schema/SKILL.md",
+      "sha": "6539db20d4c4d3118129dc0762c6744546ada904"
+    },
+    {
+      "id": "apify/apify-claude-code-plugin:skills/apify-sdk-integration",
+      "name": "apify-sdk-integration",
+      "repo": "apify/apify-claude-code-plugin",
+      "path": "skills/apify-sdk-integration/SKILL.md",
+      "sha": "7b86b492de542530b76c605772b8f6d8cf703a5f"
+    },
+    {
+      "id": "apify/apify-claude-code-plugin:skills/apify-ultimate-scraper",
+      "name": "apify-ultimate-scraper",
+      "repo": "apify/apify-claude-code-plugin",
+      "path": "skills/apify-ultimate-scraper/SKILL.md",
+      "sha": "816582c2f3eddd9daeefd72443a724b2285c2a38"
+    },
+    {
+      "id": "apolloio/apollo-mcp-plugin:skills/analytics",
+      "name": "analytics",
+      "repo": "apolloio/apollo-mcp-plugin",
+      "path": "skills/analytics/SKILL.md",
+      "sha": "a8aa7ba978a54bcdc286ca4cd52fcedb0bda8cee"
+    },
+    {
+      "id": "apolloio/apollo-mcp-plugin:skills/enrich-lead",
+      "name": "enrich-lead",
+      "repo": "apolloio/apollo-mcp-plugin",
+      "path": "skills/enrich-lead/SKILL.md",
+      "sha": "03908d6d63491df3ee28f205ad9a3dd74dcefaec"
+    },
+    {
+      "id": "apolloio/apollo-mcp-plugin:skills/gtm-strategist",
+      "name": "gtm-strategist",
+      "repo": "apolloio/apollo-mcp-plugin",
+      "path": "skills/gtm-strategist/SKILL.md",
+      "sha": "4de87083c5145caf51837ec60c870e7d242370d7"
+    },
+    {
+      "id": "apolloio/apollo-mcp-plugin:skills/prospect",
+      "name": "prospect",
+      "repo": "apolloio/apollo-mcp-plugin",
+      "path": "skills/prospect/SKILL.md",
+      "sha": "f0c14435bff0b2c00f47cb549211577a3c7bb4c6"
+    },
+    {
+      "id": "apolloio/apollo-mcp-plugin:skills/sequence-load",
+      "name": "sequence-load",
+      "repo": "apolloio/apollo-mcp-plugin",
+      "path": "skills/sequence-load/SKILL.md",
+      "sha": "eac9761bce599aa1cd9a41d250212bb2e7f04f9d"
+    },
+    {
+      "id": "appfollow/appfollow-ai-toolkit:skills/aso-analysis",
+      "name": "aso-analysis",
+      "repo": "appfollow/appfollow-ai-toolkit",
+      "path": "skills/aso-analysis/SKILL.md",
+      "sha": "cd2def21d3c874d43a76832b045d85086453c257"
+    },
+    {
+      "id": "appfollow/appfollow-ai-toolkit:skills/competitors",
+      "name": "competitors",
+      "repo": "appfollow/appfollow-ai-toolkit",
+      "path": "skills/competitors/SKILL.md",
+      "sha": "36c7247baa2d6701b684a9bbf060a577dbf2c2fd"
+    },
+    {
+      "id": "appfollow/appfollow-ai-toolkit:skills/using-appfollow",
+      "name": "using-appfollow",
+      "repo": "appfollow/appfollow-ai-toolkit",
+      "path": "skills/using-appfollow/SKILL.md",
+      "sha": "a53f9c764249ba1f949adb18d5b845a61143f1e4"
+    },
+    {
+      "id": "apptweak/mcp-crossclient:plugins/codex/skills/apptweak-dashboard-builder",
+      "name": "apptweak-dashboard-builder",
+      "repo": "apptweak/mcp-crossclient",
+      "path": "plugins/codex/skills/apptweak-dashboard-builder/SKILL.md",
+      "sha": "72e5dade8a632906755fa2abcc175fd6e1f26ee0"
+    },
+    {
+      "id": "atlanhq/agent-toolkit:skills/atlan-search",
+      "name": "atlan-search",
+      "repo": "atlanhq/agent-toolkit",
+      "path": "skills/atlan-search/SKILL.md",
+      "sha": "887e3c00640d90710d670477074ef8ee0d0af32d"
+    },
+    {
+      "id": "atlassian/forge-skills:skills/forge-app-builder",
+      "name": "forge-app-builder",
+      "repo": "atlassian/forge-skills",
+      "path": "skills/forge-app-builder/SKILL.md",
+      "sha": "ea7f23e881cb7f17919e6bb36298fbc318dae7c9"
+    },
+    {
+      "id": "atlassian/forge-skills:skills/forge-app-review",
+      "name": "forge-app-review",
+      "repo": "atlassian/forge-skills",
+      "path": "skills/forge-app-review/SKILL.md",
+      "sha": "f3125aad260d91214026bab318c73228332cc910"
+    },
+    {
+      "id": "atlassian/forge-skills:skills/forge-cost-optimizer",
+      "name": "forge-cost-optimizer",
+      "repo": "atlassian/forge-skills",
+      "path": "skills/forge-cost-optimizer/SKILL.md",
+      "sha": "ed02a4fc59a290bfda53c6c052c0e696b5f6c295"
+    },
+    {
+      "id": "atlassian/forge-skills:skills/forge-debugger",
+      "name": "forge-debugger",
+      "repo": "atlassian/forge-skills",
+      "path": "skills/forge-debugger/SKILL.md",
+      "sha": "b96cc3f64aaacb7b4fdaba5cae8c5b08e46e3022"
+    },
+    {
+      "id": "atlassian/forge-skills:skills/forge-security-review",
+      "name": "forge-security-review",
+      "repo": "atlassian/forge-skills",
+      "path": "skills/forge-security-review/SKILL.md",
+      "sha": "1516fd741103565cc7a1e9f858aad57369faa4b5"
+    },
+    {
+      "id": "b12io/b12-plugins:skills/b12-website-editor",
+      "name": "b12-website-editor",
+      "repo": "b12io/b12-plugins",
+      "path": "skills/b12-website-editor/SKILL.md",
+      "sha": "2db38be9fcd45fdf8ee51d51c787d37eb3973914"
+    },
+    {
+      "id": "b12io/b12-plugins:skills/website-generator",
+      "name": "website-generator",
+      "repo": "b12io/b12-plugins",
+      "path": "skills/website-generator/SKILL.md",
+      "sha": "199836df8b066ca327b24395532494a0b837ca7e"
+    },
+    {
+      "id": "bigexchange/bigid-plugin-official:skills/bigid-access-graph",
+      "name": "bigid-access-graph",
+      "repo": "bigexchange/bigid-plugin-official",
+      "path": "skills/bigid-access-graph/SKILL.md",
+      "sha": "891851abb8864d1d41903c0d3465a1b3f70e60ed"
+    },
+    {
+      "id": "bigexchange/bigid-plugin-official:skills/bigid-create-assessment-template",
+      "name": "bigid-create-assessment-template",
+      "repo": "bigexchange/bigid-plugin-official",
+      "path": "skills/bigid-create-assessment-template/SKILL.md",
+      "sha": "e99eab5decf26c3388655ff3537163d6fc502547"
+    },
+    {
+      "id": "bigexchange/bigid-plugin-official:skills/bigid-create-jira-tickets-for-policy-violations",
+      "name": "bigid-create-jira-tickets-for-policy-violations",
+      "repo": "bigexchange/bigid-plugin-official",
+      "path": "skills/bigid-create-jira-tickets-for-policy-violations/SKILL.md",
+      "sha": "63ec7eda2cef432405b5ff7fb3a5466b174a40d2"
+    },
+    {
+      "id": "bigexchange/bigid-plugin-official:skills/bigid-regulations-and-frameworks",
+      "name": "bigid-regulations-and-frameworks",
+      "repo": "bigexchange/bigid-plugin-official",
+      "path": "skills/bigid-regulations-and-frameworks/SKILL.md",
+      "sha": "b83b0c8ab06dc945698466a2c7b27d888195f270"
+    },
+    {
+      "id": "bigexchange/bigid-plugin-official:skills/bigid-security-posture",
+      "name": "bigid-security-posture",
+      "repo": "bigexchange/bigid-plugin-official",
+      "path": "skills/bigid-security-posture/SKILL.md",
+      "sha": "1a367636c7f6ca0fba3a0671f1a9d5e0e79af846"
+    },
+    {
+      "id": "bigexchange/bigid-plugin-official:skills/bigid-shadowai-and-ai-risk",
+      "name": "bigid-shadowai-and-ai-risk",
+      "repo": "bigexchange/bigid-plugin-official",
+      "path": "skills/bigid-shadowai-and-ai-risk/SKILL.md",
+      "sha": "610e4e4a9ee05bf8ffb33306394188f1ed4ecd68"
+    },
+    {
+      "id": "blackrock/advisor-center-agent-skills:skills/ac360-capability-router",
+      "name": "ac360-capability-router",
+      "repo": "blackrock/advisor-center-agent-skills",
+      "path": "skills/ac360-capability-router/SKILL.md",
+      "sha": "743f3fa4a69719d8c6da314575d2353c6e293b82"
+    },
+    {
+      "id": "blackrock/advisor-center-agent-skills:skills/guided-benchmark-selection",
+      "name": "guided-benchmark-selection",
+      "repo": "blackrock/advisor-center-agent-skills",
+      "path": "skills/guided-benchmark-selection/SKILL.md",
+      "sha": "df8c7a82a64372dcdc2c4b854f70eea8180d3feb"
+    },
+    {
+      "id": "blackrock/advisor-center-agent-skills:skills/guided-portfolio-builder",
+      "name": "guided-portfolio-builder",
+      "repo": "blackrock/advisor-center-agent-skills",
+      "path": "skills/guided-portfolio-builder/SKILL.md",
+      "sha": "950aa1194e823cf9ed7cbbe43384af668f1e6544"
+    },
+    {
+      "id": "blackrock/advisor-center-agent-skills:skills/portfolio-observations-and-opportunities",
+      "name": "portfolio-observations-and-opportunities",
+      "repo": "blackrock/advisor-center-agent-skills",
+      "path": "skills/portfolio-observations-and-opportunities/SKILL.md",
+      "sha": "96e4ba231d1f9b790c2dd201a82cd48c89ed01c5"
+    },
+    {
+      "id": "blackrock/advisor-center-agent-skills:skills/portfolio-review",
+      "name": "portfolio-review",
+      "repo": "blackrock/advisor-center-agent-skills",
+      "path": "skills/portfolio-review/SKILL.md",
+      "sha": "30cd3226d9aa60f211c425c8c046f60e21c8eb1c"
+    },
+    {
+      "id": "blackrock/advisor-center-agent-skills:skills/wealth-projections",
+      "name": "wealth-projections",
+      "repo": "blackrock/advisor-center-agent-skills",
+      "path": "skills/wealth-projections/SKILL.md",
+      "sha": "c8d0f393a28715a16d834dc386e475b114ee3755"
+    },
+    {
+      "id": "blaxel-ai/agent-skills:skills/blaxel-sdk",
+      "name": "blaxel-sdk",
+      "repo": "blaxel-ai/agent-skills",
+      "path": "skills/blaxel-sdk/SKILL.md",
+      "sha": "e75cc6b11335597af1005df5510cd7cef87ca054"
+    },
+    {
+      "id": "botify-hq/ai-plugins:skills/botify-mcp",
+      "name": "botify-mcp",
+      "repo": "botify-hq/ai-plugins",
+      "path": "skills/botify-mcp/SKILL.md",
+      "sha": "e9cc7dce7af497288f0cc306e0a5afb75ed7dfac"
+    },
+    {
+      "id": "botify-hq/ai-plugins:skills/botify-tables-sql",
+      "name": "botify-tables-sql",
+      "repo": "botify-hq/ai-plugins",
+      "path": "skills/botify-tables-sql/SKILL.md",
+      "sha": "5f01a54bce5fbf48cf0e898b865994c42c5dab9b"
+    },
+    {
+      "id": "buildkite/skills:skills/buildkite-agent-runtime",
+      "name": "buildkite-agent-runtime",
+      "repo": "buildkite/skills",
+      "path": "skills/buildkite-agent-runtime/SKILL.md",
+      "sha": "6cc27cf0919f9308954308871454bf3725888fd1"
+    },
+    {
+      "id": "buildkite/skills:skills/buildkite-api",
+      "name": "buildkite-api",
+      "repo": "buildkite/skills",
+      "path": "skills/buildkite-api/SKILL.md",
+      "sha": "c1d7fd931918de49f743cecffb0aa5d4fb4fc76c"
+    },
+    {
+      "id": "buildkite/skills:skills/buildkite-cache",
+      "name": "buildkite-cache",
+      "repo": "buildkite/skills",
+      "path": "skills/buildkite-cache/SKILL.md",
+      "sha": "5e5db8f3a9d658352b6ee1ab876eff93fa875eb3"
+    },
+    {
+      "id": "buildkite/skills:skills/buildkite-cli",
+      "name": "buildkite-cli",
+      "repo": "buildkite/skills",
+      "path": "skills/buildkite-cli/SKILL.md",
+      "sha": "e008bd25198fc0ce04c0ed4c574bb622b75089b3"
+    },
+    {
+      "id": "buildkite/skills:skills/buildkite-migration",
+      "name": "buildkite-migration",
+      "repo": "buildkite/skills",
+      "path": "skills/buildkite-migration/SKILL.md",
+      "sha": "07bb5a9af8dfce3957fe18cd2ae73fe3e019f406"
+    },
+    {
+      "id": "buildkite/skills:skills/buildkite-pipelines",
+      "name": "buildkite-pipelines",
+      "repo": "buildkite/skills",
+      "path": "skills/buildkite-pipelines/SKILL.md",
+      "sha": "7e83971b5baf071f556e9a96c7723608be19e172"
+    },
+    {
+      "id": "buildkite/skills:skills/buildkite-preflight",
+      "name": "buildkite-preflight",
+      "repo": "buildkite/skills",
+      "path": "skills/buildkite-preflight/SKILL.md",
+      "sha": "39d2ee2afb62c881ac28603a31d67bdf84ce914d"
+    },
+    {
+      "id": "canva-sdks/canva-skills:plugins/canva/skills/cli",
+      "name": "canva-cli",
+      "repo": "canva-sdks/canva-skills",
+      "path": "plugins/canva/skills/cli/SKILL.md",
+      "sha": "56ca7daa1a904650020c38285c87b6bc733dee43"
+    },
+    {
+      "id": "cerebriumai/cerebrium-skills:skills/cerebrium",
+      "name": "cerebrium",
+      "repo": "cerebriumai/cerebrium-skills",
+      "path": "skills/cerebrium/SKILL.md",
+      "sha": "0557bfe9888cdd1e2ff9105de220e2a18e230d42"
+    },
+    {
+      "id": "checkly/checkly-plugin:skills/checkly",
+      "name": "checkly",
+      "repo": "checkly/checkly-plugin",
+      "path": "skills/checkly/SKILL.md",
+      "sha": "def6897b92c365d2377efdff121dacccd5232d6a"
+    },
+    {
+      "id": "checkly/checkly-plugin:skills/playwright-best-practices-for-agents",
+      "name": "playwright-best-practices-for-agents",
+      "repo": "checkly/checkly-plugin",
+      "path": "skills/playwright-best-practices-for-agents/SKILL.md",
+      "sha": "ac5e1afed1ab947844fbd5ed7424a6df1eae8a6a"
+    },
+    {
+      "id": "chronograph-pe/chronograph-gp-claude-plugin:skills/chronograph-budget-vs-actuals-variance",
+      "name": "chronograph-budget-vs-actuals-variance",
+      "repo": "chronograph-pe/chronograph-gp-claude-plugin",
+      "path": "skills/chronograph-budget-vs-actuals-variance/SKILL.md",
+      "sha": "43e69c6a43051322150445a15062160fb2d57d0a"
+    },
+    {
+      "id": "chronograph-pe/chronograph-gp-claude-plugin:skills/chronograph-fund-quarterly-review-pack",
+      "name": "chronograph-fund-quarterly-review-pack",
+      "repo": "chronograph-pe/chronograph-gp-claude-plugin",
+      "path": "skills/chronograph-fund-quarterly-review-pack/SKILL.md",
+      "sha": "16a5730ed6b735081172370e5a61b990e6f393de"
+    },
+    {
+      "id": "chronograph-pe/chronograph-gp-claude-plugin:skills/chronograph-markup-markdown-brief",
+      "name": "chronograph-markup-markdown-brief",
+      "repo": "chronograph-pe/chronograph-gp-claude-plugin",
+      "path": "skills/chronograph-markup-markdown-brief/SKILL.md",
+      "sha": "86f521720006d5e02e89e077c90bf747b434d3e4"
+    },
+    {
+      "id": "chronograph-pe/chronograph-gp-claude-plugin:skills/chronograph-portfolio-company-one-pager",
+      "name": "chronograph-portfolio-company-one-pager",
+      "repo": "chronograph-pe/chronograph-gp-claude-plugin",
+      "path": "skills/chronograph-portfolio-company-one-pager/SKILL.md",
+      "sha": "6ee4c1e24a749d54dfa5ac887d4c2a3b3d978b9d"
+    },
+    {
+      "id": "chronograph-pe/chronograph-gp-claude-plugin:skills/chronograph-tvpi-attribution-by-company",
+      "name": "chronograph-tvpi-attribution-by-company",
+      "repo": "chronograph-pe/chronograph-gp-claude-plugin",
+      "path": "skills/chronograph-tvpi-attribution-by-company/SKILL.md",
+      "sha": "6c21ae4eca32d1204a31a92154bc459d7b99b3a4"
+    },
+    {
+      "id": "chronograph-pe/chronograph-lp-claude-plugin:skills/chronograph-cashflow-forecast",
+      "name": "chronograph-cashflow-forecast",
+      "repo": "chronograph-pe/chronograph-lp-claude-plugin",
+      "path": "skills/chronograph-cashflow-forecast/SKILL.md",
+      "sha": "0a58ec38760528192196a8045eafd7bee6d6d35f"
+    },
+    {
+      "id": "chronograph-pe/chronograph-lp-claude-plugin:skills/chronograph-commitment-pacing-planner",
+      "name": "chronograph-commitment-pacing-planner",
+      "repo": "chronograph-pe/chronograph-lp-claude-plugin",
+      "path": "skills/chronograph-commitment-pacing-planner/SKILL.md",
+      "sha": "3bd3dbe173d97e1c46705a624f5789c33c0e17ac"
+    },
+    {
+      "id": "chronograph-pe/chronograph-lp-claude-plugin:skills/chronograph-gp-meeting-prep",
+      "name": "chronograph-gp-meeting-prep",
+      "repo": "chronograph-pe/chronograph-lp-claude-plugin",
+      "path": "skills/chronograph-gp-meeting-prep/SKILL.md",
+      "sha": "93a031b8e3b1a7828082b3bcaf77a0765d4a0361"
+    },
+    {
+      "id": "chronograph-pe/chronograph-lp-claude-plugin:skills/chronograph-look-through-exposure-scan",
+      "name": "chronograph-look-through-exposure-scan",
+      "repo": "chronograph-pe/chronograph-lp-claude-plugin",
+      "path": "skills/chronograph-look-through-exposure-scan/SKILL.md",
+      "sha": "62efb8f827864f2c33fa4ab994f8982ce4d63aee"
+    },
+    {
+      "id": "cloudinary-devs/cloudinary-plugin:skills/claimable-cloud",
+      "name": "claimable-cloud",
+      "repo": "cloudinary-devs/cloudinary-plugin",
+      "path": "skills/claimable-cloud/SKILL.md",
+      "sha": "8ab552bc66415f90ae28d0c7fd131b046919fcb6"
+    },
+    {
+      "id": "cloudinary-devs/cloudinary-plugin:skills/cloudinary-docs",
+      "name": "cloudinary-docs",
+      "repo": "cloudinary-devs/cloudinary-plugin",
+      "path": "skills/cloudinary-docs/SKILL.md",
+      "sha": "232e3e78b33dc8e0066935b1be64cb8352b19ff5"
+    },
+    {
+      "id": "cloudinary-devs/cloudinary-plugin:skills/cloudinary-transformations",
+      "name": "cloudinary-transformations",
+      "repo": "cloudinary-devs/cloudinary-plugin",
+      "path": "skills/cloudinary-transformations/SKILL.md",
+      "sha": "f13674ac929cd9bab17deb860f4500df515e17ba"
+    },
+    {
+      "id": "couchbase-ecosystem/agent-skills:skills/couchbase-data-modeling",
+      "name": "couchbase-data-modeling",
+      "repo": "couchbase-ecosystem/agent-skills",
+      "path": "skills/couchbase-data-modeling/SKILL.md",
+      "sha": "405881ba4d4cafd821616e3319c6879626cea90c"
+    },
+    {
+      "id": "couchbase-ecosystem/agent-skills:skills/couchbase-natural-language-querying",
+      "name": "couchbase-natural-language-querying",
+      "repo": "couchbase-ecosystem/agent-skills",
+      "path": "skills/couchbase-natural-language-querying/SKILL.md",
+      "sha": "fa7881d2ce11761844286b4a170a17214824b70a"
+    },
+    {
+      "id": "couchbase-ecosystem/agent-skills:skills/couchbase-query-optimizer",
+      "name": "couchbase-query-optimizer",
+      "repo": "couchbase-ecosystem/agent-skills",
+      "path": "skills/couchbase-query-optimizer/SKILL.md",
+      "sha": "4b4be15a52dd6597d4839e29042b4eb9f4c8102d"
+    },
+    {
+      "id": "crowdstrike/fusion-skills:skills/foundry-redirect",
+      "name": "foundry-redirect",
+      "repo": "crowdstrike/fusion-skills",
+      "path": "skills/foundry-redirect/SKILL.md",
+      "sha": "e156f7bb2a33b0c7f18d5448f48b1f81e1ed853d"
+    },
+    {
+      "id": "customerio/claude-plugin:skills/customerio",
+      "name": "customerio",
+      "repo": "customerio/claude-plugin",
+      "path": "skills/customerio/SKILL.md",
+      "sha": "b4ab2b1a0c2f1f8f8e13a671f167fef986ed304c"
+    },
+    {
+      "id": "customerio/claude-plugin:skills/customerio-design-studio",
+      "name": "customerio-design-studio",
+      "repo": "customerio/claude-plugin",
+      "path": "skills/customerio-design-studio/SKILL.md",
+      "sha": "3f477ad17999b990587dea598f10673e5e4c3002"
+    },
+    {
+      "id": "customerio/claude-plugin:skills/customerio-journeys",
+      "name": "customerio-journeys",
+      "repo": "customerio/claude-plugin",
+      "path": "skills/customerio-journeys/SKILL.md",
+      "sha": "095c080b6ec1d40653dadae4dc5e9a7171eab585"
+    },
+    {
+      "id": "customerio/claude-plugin:skills/customerio-pipelines",
+      "name": "customerio-pipelines",
+      "repo": "customerio/claude-plugin",
+      "path": "skills/customerio-pipelines/SKILL.md",
+      "sha": "c29a0fb24866070d5e5856a8640b24e3401853df"
+    },
+    {
+      "id": "customerio/claude-plugin:skills/customerio-sdk",
+      "name": "customerio-sdk",
+      "repo": "customerio/claude-plugin",
+      "path": "skills/customerio-sdk/SKILL.md",
+      "sha": "022fb1b529097e841722f0b4bc7bf80d4b5c9a58"
+    },
+    {
+      "id": "cypress-io/ai-toolkit:skills/cypress-author",
+      "name": "cypress-author",
+      "repo": "cypress-io/ai-toolkit",
+      "path": "skills/cypress-author/SKILL.md",
+      "sha": "c4296fd107bef8221e048702c454d0e9b8d23d6c"
+    },
+    {
+      "id": "cypress-io/ai-toolkit:skills/cypress-cloud-cli",
+      "name": "cypress-cloud-cli",
+      "repo": "cypress-io/ai-toolkit",
+      "path": "skills/cypress-cloud-cli/SKILL.md",
+      "sha": "ceca1cbf12c0b8482e3992e99ec6e8de36aba54e"
+    },
+    {
+      "id": "cypress-io/ai-toolkit:skills/cypress-docs",
+      "name": "cypress-docs",
+      "repo": "cypress-io/ai-toolkit",
+      "path": "skills/cypress-docs/SKILL.md",
+      "sha": "46e53346aafe33f6b1f7355f99732cbbabf9a2b4"
+    },
+    {
+      "id": "cypress-io/ai-toolkit:skills/cypress-explain",
+      "name": "cypress-explain",
+      "repo": "cypress-io/ai-toolkit",
+      "path": "skills/cypress-explain/SKILL.md",
+      "sha": "7fe2b32de1de610d4f57025f69d677bb3a7cd2e3"
+    },
+    {
+      "id": "cypress-io/ai-toolkit:skills/cypress-tap",
+      "name": "cypress-tap",
+      "repo": "cypress-io/ai-toolkit",
+      "path": "skills/cypress-tap/SKILL.md",
+      "sha": "b62d04bf9ac3575833f30b1e5cafc992ebc10b5f"
+    },
+    {
+      "id": "datahub-project/datahub-cloud-ai-plugins:skills/datahub-lineage",
+      "name": "datahub-lineage",
+      "repo": "datahub-project/datahub-cloud-ai-plugins",
+      "path": "skills/datahub-lineage/SKILL.md",
+      "sha": "3bdc5772fb51c32bfb4ebf75b8ff75d6f924d138"
+    },
+    {
+      "id": "datahub-project/datahub-cloud-ai-plugins:skills/datahub-quality",
+      "name": "datahub-quality",
+      "repo": "datahub-project/datahub-cloud-ai-plugins",
+      "path": "skills/datahub-quality/SKILL.md",
+      "sha": "dfa664a908b44aafe5ed4bc5e17b00f1eb5cff68"
+    },
+    {
+      "id": "datahub-project/datahub-cloud-ai-plugins:skills/datahub-search",
+      "name": "datahub-search",
+      "repo": "datahub-project/datahub-cloud-ai-plugins",
+      "path": "skills/datahub-search/SKILL.md",
+      "sha": "50168d033d290a642b30492941c67b389f4089ad"
+    },
+    {
+      "id": "datahub-project/datahub-cloud-ai-plugins:skills/datahub-setup",
+      "name": "datahub-setup",
+      "repo": "datahub-project/datahub-cloud-ai-plugins",
+      "path": "skills/datahub-setup/SKILL.md",
+      "sha": "08fd42e12d55e899cef4ac84f274e21ec57f7ab3"
+    },
+    {
+      "id": "datahub-project/datahub-cloud-ai-plugins:skills/datahub-sql-workflow",
+      "name": "datahub-sql-workflow",
+      "repo": "datahub-project/datahub-cloud-ai-plugins",
+      "path": "skills/datahub-sql-workflow/SKILL.md",
+      "sha": "92bb288f351d1cbcc697571c5fd802d0d5eb6c72"
+    },
+    {
+      "id": "dequelabs/axe-accessibility:skills/mcp-generate-instructions",
+      "name": "mcp-generate-instructions",
+      "repo": "dequelabs/axe-accessibility",
+      "path": "skills/mcp-generate-instructions/SKILL.md",
+      "sha": "ffc894712c1651787beee8498a3d9ccf3d662554"
+    },
+    {
+      "id": "dequelabs/axe-accessibility:skills/mcp-setup",
+      "name": "mcp-setup",
+      "repo": "dequelabs/axe-accessibility",
+      "path": "skills/mcp-setup/SKILL.md",
+      "sha": "1ddc19ec205d25f15fd33fa7f9cdbfe89c5818bf"
+    },
+    {
+      "id": "dequelabs/axe-accessibility:skills/mcp-usage",
+      "name": "mcp-usage",
+      "repo": "dequelabs/axe-accessibility",
+      "path": "skills/mcp-usage/SKILL.md",
+      "sha": "b830ba290467b120241bba7da669f00df29b293c"
+    },
+    {
+      "id": "dropbox/dropbox-ai-plugins:claude/skills/clean-up-dropbox-content",
+      "name": "clean-up-dropbox-content",
+      "repo": "dropbox/dropbox-ai-plugins",
+      "path": "claude/skills/clean-up-dropbox-content/SKILL.md",
+      "sha": "1b7a2084828721f1c906015c526b694f5515a4ca"
+    },
+    {
+      "id": "dropbox/dropbox-ai-plugins:claude/skills/collect-files-with-request",
+      "name": "collect-files-with-request",
+      "repo": "dropbox/dropbox-ai-plugins",
+      "path": "claude/skills/collect-files-with-request/SKILL.md",
+      "sha": "77dbe27e6652463789d9bbd36591000f488085df"
+    },
+    {
+      "id": "dropbox/dropbox-ai-plugins:claude/skills/find-dropbox-content",
+      "name": "find-dropbox-content",
+      "repo": "dropbox/dropbox-ai-plugins",
+      "path": "claude/skills/find-dropbox-content/SKILL.md",
+      "sha": "8263ef3526850e47791358b52ce6888b74f86bbf"
+    },
+    {
+      "id": "dropbox/dropbox-ai-plugins:claude/skills/inspect-dropbox-file",
+      "name": "inspect-dropbox-file",
+      "repo": "dropbox/dropbox-ai-plugins",
+      "path": "claude/skills/inspect-dropbox-file/SKILL.md",
+      "sha": "b4ed633f7302a797dc51aa7c5bbcdab0f73f83a0"
+    },
+    {
+      "id": "dropbox/dropbox-ai-plugins:claude/skills/organize-dropbox-folder",
+      "name": "organize-dropbox-folder",
+      "repo": "dropbox/dropbox-ai-plugins",
+      "path": "claude/skills/organize-dropbox-folder/SKILL.md",
+      "sha": "a30195b87f1fe337cd891d3388439260690fc474"
+    },
+    {
+      "id": "dropbox/dropbox-ai-plugins:claude/skills/share-dropbox-content",
+      "name": "share-dropbox-content",
+      "repo": "dropbox/dropbox-ai-plugins",
+      "path": "claude/skills/share-dropbox-content/SKILL.md",
+      "sha": "6c75dde8dcf1b90ad425ec6958f0cf77655d41d9"
+    },
+    {
+      "id": "endgame-labs/endgame-plugin:skills/account-brief",
+      "name": "account-brief",
+      "repo": "endgame-labs/endgame-plugin",
+      "path": "skills/account-brief/SKILL.md",
+      "sha": "90b665e20c359e77cb41307f2a723ad6ff71e4c7"
+    },
+    {
+      "id": "endgame-labs/endgame-plugin:skills/call-review",
+      "name": "call-review",
+      "repo": "endgame-labs/endgame-plugin",
+      "path": "skills/call-review/SKILL.md",
+      "sha": "a160525de00952b4e4c44d9f741195c4c29c779e"
+    },
+    {
+      "id": "endgame-labs/endgame-plugin:skills/customer-evidence",
+      "name": "customer-evidence",
+      "repo": "endgame-labs/endgame-plugin",
+      "path": "skills/customer-evidence/SKILL.md",
+      "sha": "8149509f74dc8d539472e73faba53a89f1c6b9fb"
+    },
+    {
+      "id": "endgame-labs/endgame-plugin:skills/meeting-follow-up",
+      "name": "meeting-follow-up",
+      "repo": "endgame-labs/endgame-plugin",
+      "path": "skills/meeting-follow-up/SKILL.md",
+      "sha": "2df3150dbca50851161005618c53c172f9c6cf54"
+    },
+    {
+      "id": "endgame-labs/endgame-plugin:skills/meeting-prep",
+      "name": "meeting-prep",
+      "repo": "endgame-labs/endgame-plugin",
+      "path": "skills/meeting-prep/SKILL.md",
+      "sha": "d0018ddcff872aa060fdae19f7844e78822b09de"
+    },
+    {
+      "id": "endgame-labs/endgame-plugin:skills/pipeline-review",
+      "name": "pipeline-review",
+      "repo": "endgame-labs/endgame-plugin",
+      "path": "skills/pipeline-review/SKILL.md",
+      "sha": "2dc270510dfe871426d5125c3db4a926755977dc"
+    },
+    {
+      "id": "endgame-labs/endgame-plugin:skills/stakeholder-map",
+      "name": "stakeholder-map",
+      "repo": "endgame-labs/endgame-plugin",
+      "path": "skills/stakeholder-map/SKILL.md",
+      "sha": "ad7d5ddc5e8adbe0c184e3ca70f9de386a732615"
+    },
+    {
+      "id": "eon-io/claude-code-eon-plugin:skills/aws-onboarding",
+      "name": "aws-onboarding",
+      "repo": "eon-io/claude-code-eon-plugin",
+      "path": "skills/aws-onboarding/SKILL.md",
+      "sha": "eb4685e5959b3503891ec345be23ef6b6f1160f4"
+    },
+    {
+      "id": "eon-io/claude-code-eon-plugin:skills/backup-policy-creation",
+      "name": "backup-policy-creation",
+      "repo": "eon-io/claude-code-eon-plugin",
+      "path": "skills/backup-policy-creation/SKILL.md",
+      "sha": "a5a8cf8ca4fab96170b95e90d10422dec080ea00"
+    },
+    {
+      "id": "eon-io/claude-code-eon-plugin:skills/cost-explorer-query",
+      "name": "cost-explorer-query",
+      "repo": "eon-io/claude-code-eon-plugin",
+      "path": "skills/cost-explorer-query/SKILL.md",
+      "sha": "7b1561018f2af00c35076c88f3915020139c4cad"
+    },
+    {
+      "id": "eon-io/claude-code-eon-plugin:skills/gcp-onboarding",
+      "name": "gcp-onboarding",
+      "repo": "eon-io/claude-code-eon-plugin",
+      "path": "skills/gcp-onboarding/SKILL.md",
+      "sha": "959b0371cff054306e9b976643a8ffbbe04a1ab9"
+    },
+    {
+      "id": "eon-io/claude-code-eon-plugin:skills/ransomware-remediation",
+      "name": "ransomware-remediation",
+      "repo": "eon-io/claude-code-eon-plugin",
+      "path": "skills/ransomware-remediation/SKILL.md",
+      "sha": "980b5f62f6c5d0f63e04b08b4a35bd737641d053"
+    },
+    {
+      "id": "epicgames/unreal-engine-skills-for-claude-code-plugin:skills/create-toolset",
+      "name": "create-toolset",
+      "repo": "epicgames/unreal-engine-skills-for-claude-code-plugin",
+      "path": "skills/create-toolset/SKILL.md",
+      "sha": "febf5d5a70739b8bb1d65215ef8272a67f0bbfdd"
+    },
+    {
+      "id": "epicgames/unreal-engine-skills-for-claude-code-plugin:skills/unreal-mcp",
+      "name": "unreal-mcp",
+      "repo": "epicgames/unreal-engine-skills-for-claude-code-plugin",
+      "path": "skills/unreal-mcp/SKILL.md",
+      "sha": "9cd2cc2656d05a738f5814fb2945cc48daff66fc"
+    },
+    {
+      "id": "epicgames/unreal-engine-skills-for-claude-code-plugin:skills/unreal-skill",
+      "name": "unreal-skill",
+      "repo": "epicgames/unreal-engine-skills-for-claude-code-plugin",
+      "path": "skills/unreal-skill/SKILL.md",
+      "sha": "a1513865cb7299fc4c76843f426352934bb7aa47"
+    },
+    {
+      "id": "euler-software-inc/euler-skills:partner-managers/skills/generate-qbr",
+      "name": "generate-qbr",
+      "repo": "euler-software-inc/euler-skills",
+      "path": "partner-managers/skills/generate-qbr/SKILL.md",
+      "sha": "312b90f6bd7cfdf708d52d31955cc973e997b69d"
+    },
+    {
+      "id": "euler-software-inc/euler-skills:partner-managers/skills/partner-briefing",
+      "name": "partner-briefing",
+      "repo": "euler-software-inc/euler-skills",
+      "path": "partner-managers/skills/partner-briefing/SKILL.md",
+      "sha": "f1d0f8e82d709b6212122898fb29d9018e0a71f2"
+    },
+    {
+      "id": "euler-software-inc/euler-skills:partner-managers/skills/pending-approvals-triage",
+      "name": "pending-approvals-triage",
+      "repo": "euler-software-inc/euler-skills",
+      "path": "partner-managers/skills/pending-approvals-triage/SKILL.md",
+      "sha": "ca31592868c0c6b3a7db7d0e23c41a4a22a0d402"
+    },
+    {
+      "id": "euler-software-inc/euler-skills:partner-managers/skills/portfolio-pulse",
+      "name": "portfolio-pulse",
+      "repo": "euler-software-inc/euler-skills",
+      "path": "partner-managers/skills/portfolio-pulse/SKILL.md",
+      "sha": "fb1048f50465715fdbc0c88998fe97a0e5253040"
+    },
+    {
+      "id": "exa-labs/exa-mcp-server:skills/exa-agent",
+      "name": "Exa Agent",
+      "repo": "exa-labs/exa-mcp-server",
+      "path": "skills/exa-agent/SKILL.md",
+      "sha": "2654082c69949fca4a73ac1e224ea35281120520"
+    },
+    {
+      "id": "exa-labs/exa-mcp-server:skills/search",
+      "name": "search",
+      "repo": "exa-labs/exa-mcp-server",
+      "path": "skills/search/SKILL.md",
+      "sha": "e70c99cc46a8550eede16407bc3064015aa3d84f"
+    },
+    {
+      "id": "finchat-project-atlas/fiscal-ai-claude-plugin:plugins/fiscal-ai/skills/fiscal",
+      "name": "fiscal",
+      "repo": "finchat-project-atlas/fiscal-ai-claude-plugin",
+      "path": "plugins/fiscal-ai/skills/fiscal/SKILL.md",
+      "sha": "5c89d0bd499e56d533bf0967b8a91bc9432e03f0"
+    },
+    {
+      "id": "fullstorydev/fullstory-skills:skills/comparisons",
+      "name": "comparisons",
+      "repo": "fullstorydev/fullstory-skills",
+      "path": "skills/comparisons/SKILL.md",
+      "sha": "e46aec2de96e8e370b300970e88e47cd5154eba2"
+    },
+    {
+      "id": "fullstorydev/fullstory-skills:skills/friction-analysis",
+      "name": "friction-analysis",
+      "repo": "fullstorydev/fullstory-skills",
+      "path": "skills/friction-analysis/SKILL.md",
+      "sha": "2cb469bcbb80b734be78b8a4a98212a01f489fcb"
+    },
+    {
+      "id": "fullstorydev/fullstory-skills:skills/general-analysis",
+      "name": "general-analysis",
+      "repo": "fullstorydev/fullstory-skills",
+      "path": "skills/general-analysis/SKILL.md",
+      "sha": "18efb96b4c3cf5b22ac1cfbf1ac6ed209a1480bb"
+    },
+    {
+      "id": "fullstorydev/fullstory-skills:skills/session-review",
+      "name": "session-review",
+      "repo": "fullstorydev/fullstory-skills",
+      "path": "skills/session-review/SKILL.md",
+      "sha": "db502054f78d582afb528a60ac7f8196ef6f8653"
+    },
+    {
+      "id": "functionizeinc/functionize-mcp-plugin:skills/functionize",
+      "name": "functionize",
+      "repo": "functionizeinc/functionize-mcp-plugin",
+      "path": "skills/functionize/SKILL.md",
+      "sha": "f8c694090e58d18c38bf052ac8bc8b9d2b57db26"
+    },
+    {
+      "id": "gc-ai-inc/gc-ai-claude-plugin:skills/ask",
+      "name": "ask",
+      "repo": "gc-ai-inc/gc-ai-claude-plugin",
+      "path": "skills/ask/SKILL.md",
+      "sha": "009af9d074673f02f9cb65e384236f8f371a0edf"
+    },
+    {
+      "id": "gc-ai-inc/gc-ai-claude-plugin:skills/organize-matter",
+      "name": "organize-matter",
+      "repo": "gc-ai-inc/gc-ai-claude-plugin",
+      "path": "skills/organize-matter/SKILL.md",
+      "sha": "aa556a582328746e58e4450531a0611955c4d2ee"
+    },
+    {
+      "id": "gc-ai-inc/gc-ai-claude-plugin:skills/review-document",
+      "name": "review-document",
+      "repo": "gc-ai-inc/gc-ai-claude-plugin",
+      "path": "skills/review-document/SKILL.md",
+      "sha": "718a2037b7c08d47fe5656b0fbe3b413323801bd"
+    },
+    {
+      "id": "gendigitalinc/sage:skills/security-awareness",
+      "name": "security-awareness",
+      "repo": "gendigitalinc/sage",
+      "path": "skills/security-awareness/SKILL.md",
+      "sha": "4977e683524245c74606a339d605670ad6c31360"
+    },
+    {
+      "id": "gitbookio/gitbook-skills:skills/build-integration",
+      "name": "build-integration",
+      "repo": "gitbookio/gitbook-skills",
+      "path": "skills/build-integration/SKILL.md",
+      "sha": "3f8070e8a8f8d3e929afe7ee6028e180e1a38057"
+    },
+    {
+      "id": "gitbookio/gitbook-skills:skills/cr-review",
+      "name": "cr-review",
+      "repo": "gitbookio/gitbook-skills",
+      "path": "skills/cr-review/SKILL.md",
+      "sha": "d78253b07d2f1c0f6a9c7a1283b9977e7ea921a4"
+    },
+    {
+      "id": "gitbookio/gitbook-skills:skills/write-openapi",
+      "name": "write-openapi",
+      "repo": "gitbookio/gitbook-skills",
+      "path": "skills/write-openapi/SKILL.md",
+      "sha": "9cec7d8a8de7fb4331b922dcbb37312cf1625120"
+    },
+    {
+      "id": "grafana/ai-marketplace:plugins/grafana-assistant/skills/grafana-assistant-cli",
+      "name": "grafana-assistant-cli",
+      "repo": "grafana/ai-marketplace",
+      "path": "plugins/grafana-assistant/skills/grafana-assistant-cli/SKILL.md",
+      "sha": "9b84ad3fd0d173a337b1491b4f8142467aa7c5c8"
+    },
+    {
+      "id": "grafana/ai-marketplace:plugins/grafana-cloud-mcp/skills/grafana-cloud-mcp-tools",
+      "name": "grafana-cloud-mcp-tools",
+      "repo": "grafana/ai-marketplace",
+      "path": "plugins/grafana-cloud-mcp/skills/grafana-cloud-mcp-tools/SKILL.md",
+      "sha": "530fe081c4e06ff890491dafc2f8202df7f13ee1"
+    },
+    {
+      "id": "grafana/ai-marketplace:plugins/grafana-mcp/skills/grafana-mcp-tools",
+      "name": "grafana-mcp-tools",
+      "repo": "grafana/ai-marketplace",
+      "path": "plugins/grafana-mcp/skills/grafana-mcp-tools/SKILL.md",
+      "sha": "4eaa46e5ff185a4cf2ac6787f2aa273d9b03aa75"
+    },
+    {
+      "id": "grasp-ai/grasp-mcp-plugin:skills/company-lookup",
+      "name": "company-lookup",
+      "repo": "grasp-ai/grasp-mcp-plugin",
+      "path": "skills/company-lookup/SKILL.md",
+      "sha": "da840bcd277c3ec18480e06031e6a7bbdffbd6cb"
+    },
+    {
+      "id": "grasp-ai/grasp-mcp-plugin:skills/creating-tables",
+      "name": "creating-tables",
+      "repo": "grasp-ai/grasp-mcp-plugin",
+      "path": "skills/creating-tables/SKILL.md",
+      "sha": "dbbc602d8503f2e11d02cb688031e32738bdc826"
+    },
+    {
+      "id": "grasp-ai/grasp-mcp-plugin:skills/finding-contacts",
+      "name": "finding-contacts",
+      "repo": "grasp-ai/grasp-mcp-plugin",
+      "path": "skills/finding-contacts/SKILL.md",
+      "sha": "2ea04c8c31f4ad33dff837e4511b4da6dc9ce463"
+    },
+    {
+      "id": "grasp-ai/grasp-mcp-plugin:skills/screening-and-shortlisting",
+      "name": "screening-and-shortlisting",
+      "repo": "grasp-ai/grasp-mcp-plugin",
+      "path": "skills/screening-and-shortlisting/SKILL.md",
+      "sha": "a631e5332c6f7dd6148d03a20f469234af59833f"
+    },
+    {
+      "id": "grasp-ai/grasp-mcp-plugin:skills/table-enrichment",
+      "name": "table-enrichment",
+      "repo": "grasp-ai/grasp-mcp-plugin",
+      "path": "skills/table-enrichment/SKILL.md",
+      "sha": "ea6e80c2b64cad38f590b0b94fa561673c808cad"
+    },
+    {
+      "id": "grasp-ai/grasp-mcp-plugin:skills/working-with-tables",
+      "name": "working-with-tables",
+      "repo": "grasp-ai/grasp-mcp-plugin",
+      "path": "skills/working-with-tables/SKILL.md",
+      "sha": "7d0d507779c7fcce3b2c014a85d6d96e20cb0b10"
+    },
+    {
+      "id": "groundcover-com/claude-plugin-groundcover:skills/discovery",
+      "name": "discovery",
+      "repo": "groundcover-com/claude-plugin-groundcover",
+      "path": "skills/discovery/SKILL.md",
+      "sha": "5c1b41f055e25a88c62c8867be83e0c205362775"
+    },
+    {
+      "id": "groundcover-com/claude-plugin-groundcover:skills/gcql-advanced",
+      "name": "gcql-advanced",
+      "repo": "groundcover-com/claude-plugin-groundcover",
+      "path": "skills/gcql-advanced/SKILL.md",
+      "sha": "f1a1491d6ec45fd342c9e965b6fdcffaf400f3e9"
+    },
+    {
+      "id": "handsontable/handsontable-skills:skills/handsontable",
+      "name": "handsontable",
+      "repo": "handsontable/handsontable-skills",
+      "path": "skills/handsontable/SKILL.md",
+      "sha": "ccc6b792794b5b9fa4c9e9095e21188e42c10f42"
+    },
+    {
+      "id": "handsontable/handsontable-skills:skills/hyperformula",
+      "name": "hyperformula",
+      "repo": "handsontable/handsontable-skills",
+      "path": "skills/hyperformula/SKILL.md",
+      "sha": "9563aa1310560a731f3c32db339507fb2be30d08"
+    },
+    {
+      "id": "hostinger/claude-plugin:skills/audit-hosting",
+      "name": "audit-hosting",
+      "repo": "hostinger/claude-plugin",
+      "path": "skills/audit-hosting/SKILL.md",
+      "sha": "fa71453f695ae82a763cd0b5891caecc4641781b"
+    },
+    {
+      "id": "hostinger/claude-plugin:skills/connect-domain",
+      "name": "connect-domain",
+      "repo": "hostinger/claude-plugin",
+      "path": "skills/connect-domain/SKILL.md",
+      "sha": "1f4d5ebdac9de3ac10f83d83bc2ad929955ec826"
+    },
+    {
+      "id": "hostinger/claude-plugin:skills/deploy-to-hosting",
+      "name": "deploy-to-hosting",
+      "repo": "hostinger/claude-plugin",
+      "path": "skills/deploy-to-hosting/SKILL.md",
+      "sha": "96442d7688e8784407ec95eb59c6bcb8bc136973"
+    },
+    {
+      "id": "hostinger/claude-plugin:skills/hostinger-headless",
+      "name": "hostinger-headless",
+      "repo": "hostinger/claude-plugin",
+      "path": "skills/hostinger-headless/SKILL.md",
+      "sha": "d709179c277d331a5ea00c37e77ba2cc9807456e"
+    },
+    {
+      "id": "hostinger/claude-plugin:skills/maintain-wordpress",
+      "name": "maintain-wordpress",
+      "repo": "hostinger/claude-plugin",
+      "path": "skills/maintain-wordpress/SKILL.md",
+      "sha": "cfa18f3dfe9c1ea773b8c6b070fe128284edcae7"
+    },
+    {
+      "id": "hostinger/claude-plugin:skills/migrate-to-hosting",
+      "name": "migrate-to-hosting",
+      "repo": "hostinger/claude-plugin",
+      "path": "skills/migrate-to-hosting/SKILL.md",
+      "sha": "d18f365865f49c87b020bac02416f82082d0e915"
+    },
+    {
+      "id": "hostinger/claude-plugin:skills/troubleshoot-website",
+      "name": "troubleshoot-website",
+      "repo": "hostinger/claude-plugin",
+      "path": "skills/troubleshoot-website/SKILL.md",
+      "sha": "2357f0ea2f5a8d648d872b0afede22c37212c921"
+    },
+    {
+      "id": "intercom/claude-plugin-external:skills/customer-360",
+      "name": "customer-360",
+      "repo": "intercom/claude-plugin-external",
+      "path": "skills/customer-360/SKILL.md",
+      "sha": "1530de14195bec606fe9ec72603fc6c4b02f239c"
+    },
+    {
+      "id": "intercom/claude-plugin-external:skills/install-cli",
+      "name": "install-cli",
+      "repo": "intercom/claude-plugin-external",
+      "path": "skills/install-cli/SKILL.md",
+      "sha": "ed2ff594f71a20c6150011340f0b553354ba15cf"
+    },
+    {
+      "id": "intercom/claude-plugin-external:skills/install-messenger",
+      "name": "install-messenger",
+      "repo": "intercom/claude-plugin-external",
+      "path": "skills/install-messenger/SKILL.md",
+      "sha": "a0a2d77cf6b009be5e3776368164b6c75f6b23bf"
+    },
+    {
+      "id": "intercom/claude-plugin-external:skills/intercom-analysis",
+      "name": "intercom-analysis",
+      "repo": "intercom/claude-plugin-external",
+      "path": "skills/intercom-analysis/SKILL.md",
+      "sha": "f29e07a957671dc11f78c3dd86a7c1e02805374e"
+    },
+    {
+      "id": "intuit/intuit-plugins-official:plugins/intuit-developer/skills/build-quickbooks-app",
+      "name": "build-quickbooks-app",
+      "repo": "intuit/intuit-plugins-official",
+      "path": "plugins/intuit-developer/skills/build-quickbooks-app/SKILL.md",
+      "sha": "b7b2bcd71ebdddad71ac4b547267b8779c07763a"
+    },
+    {
+      "id": "intuit/intuit-plugins-official:plugins/intuit-developer/skills/connect-to-intuit-developer-platform",
+      "name": "connect-to-intuit-developer-platform",
+      "repo": "intuit/intuit-plugins-official",
+      "path": "plugins/intuit-developer/skills/connect-to-intuit-developer-platform/SKILL.md",
+      "sha": "ca8a99a281e449b1f5af40d32e3202dfd8fd981a"
+    },
+    {
+      "id": "jfrog/claude-plugin:skills/jfrog",
+      "name": "jfrog",
+      "repo": "jfrog/claude-plugin",
+      "path": "skills/jfrog/SKILL.md",
+      "sha": "6f2e8fa1ecfb15552cfc4b64520dd111936e7186"
+    },
+    {
+      "id": "jfrog/claude-plugin:skills/jfrog-reference-architecture",
+      "name": "jfrog-reference-architecture",
+      "repo": "jfrog/claude-plugin",
+      "path": "skills/jfrog-reference-architecture/SKILL.md",
+      "sha": "b331b2485c423163b4c7138a85f155bd50bb5904"
+    },
+    {
+      "id": "junipersquare-public/plugins:skills/entity-org-chart",
+      "name": "entity-org-chart",
+      "repo": "junipersquare-public/plugins",
+      "path": "skills/entity-org-chart/SKILL.md",
+      "sha": "f85de52a8c9c28814f16f086c1a83aa246d50c3d"
+    },
+    {
+      "id": "junipersquare-public/plugins:skills/investor-tearsheet",
+      "name": "investor-tearsheet",
+      "repo": "junipersquare-public/plugins",
+      "path": "skills/investor-tearsheet/SKILL.md",
+      "sha": "f678613fd6604ac721ad0ba9dbe238a6473907d2"
+    },
+    {
+      "id": "junipersquare-public/plugins:skills/jsq-report-render",
+      "name": "jsq-report-render",
+      "repo": "junipersquare-public/plugins",
+      "path": "skills/jsq-report-render/SKILL.md",
+      "sha": "d751df528380fbd3ebe56fd0287e1dbce1115bfc"
+    },
+    {
+      "id": "junipersquare-public/plugins:skills/juniper-square-data-model",
+      "name": "juniper-square-data-model",
+      "repo": "junipersquare-public/plugins",
+      "path": "skills/juniper-square-data-model/SKILL.md",
+      "sha": "29be2bb8d74af31ef68c6ad7e377c506a4979471"
+    },
+    {
+      "id": "junipersquare-public/plugins:skills/offering-action-report",
+      "name": "offering-action-report",
+      "repo": "junipersquare-public/plugins",
+      "path": "skills/offering-action-report/SKILL.md",
+      "sha": "52db0c2b2e026f8c457c2913efeaaa8a2a1baa94"
+    },
+    {
+      "id": "keenableai/keenable-claude-plugin:plugins/keenable/skills/keenable-deep-research",
+      "name": "keenable-deep-research",
+      "repo": "keenableai/keenable-claude-plugin",
+      "path": "plugins/keenable/skills/keenable-deep-research/SKILL.md",
+      "sha": "16d9467f4b59251d6ffb14489454cb83ee917715"
+    },
+    {
+      "id": "keenableai/keenable-claude-plugin:plugins/keenable/skills/keenable-web",
+      "name": "keenable-web",
+      "repo": "keenableai/keenable-claude-plugin",
+      "path": "plugins/keenable/skills/keenable-web/SKILL.md",
+      "sha": "e8ff5eba44fc87f540112d096b661af61dbba64a"
+    },
+    {
+      "id": "kensho-technologies/spglobal-agent-skills:plugins/spglobal-plugin/skills/earnings-preview-beta",
+      "name": "earnings-preview-single",
+      "repo": "kensho-technologies/spglobal-agent-skills",
+      "path": "plugins/spglobal-plugin/skills/earnings-preview-beta/SKILL.md",
+      "sha": "aab6544ec3a256ed7f6398966cbd3717e23894ab"
+    },
+    {
+      "id": "knocklabs/skills:skills/knock-cli",
+      "name": "knock-cli",
+      "repo": "knocklabs/skills",
+      "path": "skills/knock-cli/SKILL.md",
+      "sha": "24c341a2e54fe33ccad948ffc8b4071d76f4cb2c"
+    },
+    {
+      "id": "knocklabs/skills:skills/knock-in-app-ui",
+      "name": "knock-in-app-ui",
+      "repo": "knocklabs/skills",
+      "path": "skills/knock-in-app-ui/SKILL.md",
+      "sha": "255f92bdf187a3fe8ef84317b705e85ac9566b14"
+    },
+    {
+      "id": "knocklabs/skills:skills/knock-lifecycle-opportunities",
+      "name": "knock-lifecycle-opportunities",
+      "repo": "knocklabs/skills",
+      "path": "skills/knock-lifecycle-opportunities/SKILL.md",
+      "sha": "86b723bc256e14494d0e18cdca73cb9cbbba03a4"
+    },
+    {
+      "id": "knocklabs/skills:skills/knock-migrate-to-knock",
+      "name": "knock-migrate-to-knock",
+      "repo": "knocklabs/skills",
+      "path": "skills/knock-migrate-to-knock/SKILL.md",
+      "sha": "b57b65e0dd336da611ec6b150ffa6da31501aa92"
+    },
+    {
+      "id": "knocklabs/skills:skills/knock-notification-best-practices",
+      "name": "knock-notification-best-practices",
+      "repo": "knocklabs/skills",
+      "path": "skills/knock-notification-best-practices/SKILL.md",
+      "sha": "303a225e9067e74c0dee1094d89745f0215bdf22"
+    },
+    {
+      "id": "knocklabs/skills:skills/knock-product-messaging-strategy",
+      "name": "knock-product-messaging-strategy",
+      "repo": "knocklabs/skills",
+      "path": "skills/knock-product-messaging-strategy/SKILL.md",
+      "sha": "f09ea3b27ffdbb9e93e6fd0801cdd3eed6f7b716"
+    },
+    {
+      "id": "knocklabs/skills:skills/knock-setup",
+      "name": "knock-setup",
+      "repo": "knocklabs/skills",
+      "path": "skills/knock-setup/SKILL.md",
+      "sha": "541578dfdb5e290a2f9b7e14e93ca66455716f26"
+    },
+    {
+      "id": "kobiton/automate:skills/create-test-run",
+      "name": "create-test-run",
+      "repo": "kobiton/automate",
+      "path": "skills/create-test-run/SKILL.md",
+      "sha": "3b6c53023fdd5b469c0c5fdcc8b02cc02ebc9298"
+    },
+    {
+      "id": "krea-ai/skills:krea-generate",
+      "name": "krea-generate",
+      "repo": "krea-ai/skills",
+      "path": "krea-generate/SKILL.md",
+      "sha": "030ea24bc438a63f4bfd6f03fc0774f13abceed9"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-draft-from-work",
+      "name": "launchnotes-draft-from-work",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-draft-from-work/SKILL.md",
+      "sha": "365bfb40643c0acf18239d081f1e6d36faf1c7b9"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-feedback-to-roadmap",
+      "name": "launchnotes-feedback-to-roadmap",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-feedback-to-roadmap/SKILL.md",
+      "sha": "4cce1b61d4d31bcf7008aaa2c75a714c605b6d51"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-import-existing-changelog",
+      "name": "launchnotes-import-existing-changelog",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-import-existing-changelog/SKILL.md",
+      "sha": "927d0a576faa339448d5d06553bd9478c3c9fc8d"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-post-roadmap-update",
+      "name": "launchnotes-post-roadmap-update",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-post-roadmap-update/SKILL.md",
+      "sha": "e81e287be3be2a603825ec249e18312475daac62"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-release-recap",
+      "name": "launchnotes-release-recap",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-release-recap/SKILL.md",
+      "sha": "c14c94f1df0d3ea94f510f211c22a77e7d83e171"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-ship-the-roadmap",
+      "name": "launchnotes-ship-the-roadmap",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-ship-the-roadmap/SKILL.md",
+      "sha": "845d4cc6824c7d993472cc76c122012aca545a69"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-style-your-page",
+      "name": "launchnotes-style-your-page",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-style-your-page/SKILL.md",
+      "sha": "8387e18fba3458ba54655af3d1d2ecce6bd4f4cd"
+    },
+    {
+      "id": "launchnotes/mcp-server-guide:skills/launchnotes-use",
+      "name": "launchnotes-use",
+      "repo": "launchnotes/mcp-server-guide",
+      "path": "skills/launchnotes-use/SKILL.md",
+      "sha": "3a7cd5647012f3c5dace4971137ef30fce92fbb4"
+    },
+    {
+      "id": "leadfeeder/leadfeeder-mcp-plugin:skills/a-getting-started",
+      "name": "a-getting-started",
+      "repo": "leadfeeder/leadfeeder-mcp-plugin",
+      "path": "skills/a-getting-started/SKILL.md",
+      "sha": "617b3e14a5df4c740d744522513c466ba467d504"
+    },
+    {
+      "id": "leadfeeder/leadfeeder-mcp-plugin:skills/add-to-pipeline",
+      "name": "add-to-pipeline",
+      "repo": "leadfeeder/leadfeeder-mcp-plugin",
+      "path": "skills/add-to-pipeline/SKILL.md",
+      "sha": "4946eff1136acb1f9857d51e570322f8142c5ea1"
+    },
+    {
+      "id": "leadfeeder/leadfeeder-mcp-plugin:skills/daily-visitor-brief",
+      "name": "daily-visitor-brief",
+      "repo": "leadfeeder/leadfeeder-mcp-plugin",
+      "path": "skills/daily-visitor-brief/SKILL.md",
+      "sha": "fa4ffe948f5a0337c8e27ed6cd813fe430b4610f"
+    },
+    {
+      "id": "leadfeeder/leadfeeder-mcp-plugin:skills/find-my-buyer",
+      "name": "find-my-buyer",
+      "repo": "leadfeeder/leadfeeder-mcp-plugin",
+      "path": "skills/find-my-buyer/SKILL.md",
+      "sha": "f8b59b8e0536db046ddb314a93f890ec5f366356"
+    },
+    {
+      "id": "leadfeeder/leadfeeder-mcp-plugin:skills/outreach-companion",
+      "name": "outreach-companion",
+      "repo": "leadfeeder/leadfeeder-mcp-plugin",
+      "path": "skills/outreach-companion/SKILL.md",
+      "sha": "307d82358661b935ab589bd886d34f6ceb73d861"
+    },
+    {
+      "id": "leadfeeder/leadfeeder-mcp-plugin:skills/visitor-company-brief",
+      "name": "visitor-company-brief",
+      "repo": "leadfeeder/leadfeeder-mcp-plugin",
+      "path": "skills/visitor-company-brief/SKILL.md",
+      "sha": "3745e3f5e5e481aa1861ed0ca1d9a9e102b01bda"
+    },
+    {
+      "id": "luminpdf/wyatt-plugin:skills/wyatt-documents",
+      "name": "wyatt-documents",
+      "repo": "luminpdf/wyatt-plugin",
+      "path": "skills/wyatt-documents/SKILL.md",
+      "sha": "1ea782d4632d2fee686c75d1fd0c8599c237829b"
+    },
+    {
+      "id": "luminpdf/wyatt-plugin:skills/wyatt-tasks",
+      "name": "wyatt-tasks",
+      "repo": "luminpdf/wyatt-plugin",
+      "path": "skills/wyatt-tasks/SKILL.md",
+      "sha": "dc3f8c82352f3598137c1f5d0ef6cb3a53e1859e"
+    },
+    {
+      "id": "luminpdf/wyatt-plugin:skills/wyatt-workspace",
+      "name": "wyatt-workspace",
+      "repo": "luminpdf/wyatt-plugin",
+      "path": "skills/wyatt-workspace/SKILL.md",
+      "sha": "763939b33a228e6fd10ba05243b5a3fa2587f600"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-plugin:skills/enrich-contact",
+      "name": "enrich-contact",
+      "repo": "lusha-oss/lusha-mcp-plugin",
+      "path": "skills/enrich-contact/SKILL.md",
+      "sha": "958a10d7be7b9295afd53f9c8722b2f6ca430069"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-plugin:skills/lookalike-prospect",
+      "name": "lookalike-prospect",
+      "repo": "lusha-oss/lusha-mcp-plugin",
+      "path": "skills/lookalike-prospect/SKILL.md",
+      "sha": "94ac269e7b1741c431e247132fc136a4e83b0242"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-plugin:skills/outreach-research",
+      "name": "outreach-research",
+      "repo": "lusha-oss/lusha-mcp-plugin",
+      "path": "skills/outreach-research/SKILL.md",
+      "sha": "ff58430704f0bdaf4c7c3bc199b36db7edba8d54"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-plugin:skills/outreach-sequence",
+      "name": "outreach-sequence",
+      "repo": "lusha-oss/lusha-mcp-plugin",
+      "path": "skills/outreach-sequence/SKILL.md",
+      "sha": "6d9567760a80c387217a5da8f7e4b64a8ed5f2b1"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-plugin:skills/prospect",
+      "name": "prospect",
+      "repo": "lusha-oss/lusha-mcp-plugin",
+      "path": "skills/prospect/SKILL.md",
+      "sha": "3b284a8490842e74ec28dd08bf9337feaede0a9e"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-plugin:skills/signal-prospect",
+      "name": "signal-prospect",
+      "repo": "lusha-oss/lusha-mcp-plugin",
+      "path": "skills/signal-prospect/SKILL.md",
+      "sha": "07a1a10fa85d9f785ca07ec389a303022ad15bb5"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-talent-sourcing-plugin:skills/keep-a-list-live",
+      "name": "keep-a-list-live",
+      "repo": "lusha-oss/lusha-mcp-talent-sourcing-plugin",
+      "path": "skills/keep-a-list-live/SKILL.md",
+      "sha": "2e9f68fb2fd1d974e81da1dd3c1610988a47cbe9"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-talent-sourcing-plugin:skills/leadership-change-sourcing",
+      "name": "leadership-change-sourcing",
+      "repo": "lusha-oss/lusha-mcp-talent-sourcing-plugin",
+      "path": "skills/leadership-change-sourcing/SKILL.md",
+      "sha": "708e7deab8014a9beda2d5b0ea677fc8a0f4dc96"
+    },
+    {
+      "id": "lusha-oss/lusha-mcp-talent-sourcing-plugin:skills/source-movable-talent",
+      "name": "source-movable-talent",
+      "repo": "lusha-oss/lusha-mcp-talent-sourcing-plugin",
+      "path": "skills/source-movable-talent/SKILL.md",
+      "sha": "8cfe92f6e4510e77570d1c1617f52dd61302d23f"
+    },
+    {
+      "id": "mercadopago/mercadopago-claude-marketplace:plugins/mercadopago/skills/mp-review",
+      "name": "mp-review",
+      "repo": "mercadopago/mercadopago-claude-marketplace",
+      "path": "plugins/mercadopago/skills/mp-review/SKILL.md",
+      "sha": "3653c69cbeecbd7d065a7ae846254713a464c7c7"
+    },
+    {
+      "id": "mercadopago/mercadopago-claude-marketplace:plugins/mercadopago/skills/mp-webhooks",
+      "name": "mp-webhooks",
+      "repo": "mercadopago/mercadopago-claude-marketplace",
+      "path": "plugins/mercadopago/skills/mp-webhooks/SKILL.md",
+      "sha": "ddfa7cc6b48ee47885faf00d80819295e23fadd5"
+    },
+    {
+      "id": "meshy-dev/meshy-3d-agent:skills/meshy-3d-generation",
+      "name": "meshy-3d-generation",
+      "repo": "meshy-dev/meshy-3d-agent",
+      "path": "skills/meshy-3d-generation/SKILL.md",
+      "sha": "e2e595c9d1c73361818474721f95776da68a5e60"
+    },
+    {
+      "id": "meshy-dev/meshy-3d-agent:skills/meshy-3d-printing",
+      "name": "meshy-3d-printing",
+      "repo": "meshy-dev/meshy-3d-agent",
+      "path": "skills/meshy-3d-printing/SKILL.md",
+      "sha": "9a5871ca762d2e35c3829ffbdfed4cacb192b110"
+    },
+    {
+      "id": "meshy-dev/meshy-3d-agent:skills/meshy-openclaw",
+      "name": "meshy-openclaw",
+      "repo": "meshy-dev/meshy-3d-agent",
+      "path": "skills/meshy-openclaw/SKILL.md",
+      "sha": "11be1be3c4736243ce70469bb689a5c144267239"
+    },
+    {
+      "id": "mintlify/mintlify-claude-plugin:skills/mintlify",
+      "name": "mintlify",
+      "repo": "mintlify/mintlify-claude-plugin",
+      "path": "skills/mintlify/SKILL.md",
+      "sha": "c54f7f4f16d19cf1897a1bb7d735cb263ba5bf0b"
+    },
+    {
+      "id": "mobbin/skills:skills/plain-writing",
+      "name": "plain-writing",
+      "repo": "mobbin/skills",
+      "path": "skills/plain-writing/SKILL.md",
+      "sha": "cc4e168794fc7cf2ac3274e93c1e250acd60b901"
+    },
+    {
+      "id": "mobbin/skills:skills/redesign-screen",
+      "name": "redesign-screen",
+      "repo": "mobbin/skills",
+      "path": "skills/redesign-screen/SKILL.md",
+      "sha": "3f5486100c8a6c6fa47e5171b027930d07fe53cf"
+    },
+    {
+      "id": "mobbin/skills:skills/search",
+      "name": "search",
+      "repo": "mobbin/skills",
+      "path": "skills/search/SKILL.md",
+      "sha": "f5b66fe04ecb782e0df8b70073a8e8d550b0dd8e"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/activity-insights",
+      "name": "activity-insights",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/activity-insights/SKILL.md",
+      "sha": "d3e7d97dc1ea0ecd3a7fc376a8f818aee3dd99c2"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/automate-crm",
+      "name": "automate-crm",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/automate-crm/SKILL.md",
+      "sha": "33d614c2ed34c7cb17bc09877043ac58c1275cda"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/daily-briefing",
+      "name": "daily-briefing",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/daily-briefing/SKILL.md",
+      "sha": "f7fde68d6850186a214d818a48727cdcbf7ccf82"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/data-cleanup",
+      "name": "data-cleanup",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/data-cleanup/SKILL.md",
+      "sha": "fd12f878ac62a42b1e93a592a1ef59c64673ff73"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/forecast",
+      "name": "forecast",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/forecast/SKILL.md",
+      "sha": "c285980c92823eb5ceed0c55715e487a42077f20"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/log-activity",
+      "name": "log-activity",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/log-activity/SKILL.md",
+      "sha": "33d5fcf3ad0fed5a84802809399455505e759571"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/meeting-to-deal",
+      "name": "meeting-to-deal",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/meeting-to-deal/SKILL.md",
+      "sha": "905e35cb821294b5c45eba83bc08c3e2bc240504"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/run-sequence",
+      "name": "run-sequence",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/run-sequence/SKILL.md",
+      "sha": "a13db73e922ea684a8e2cecbe668a0e098bd65a5"
+    },
+    {
+      "id": "mondaycom/mcp:plugins/monday-crm/skills/workspace-builder",
+      "name": "workspace-builder",
+      "repo": "mondaycom/mcp",
+      "path": "plugins/monday-crm/skills/workspace-builder/SKILL.md",
+      "sha": "58fd65c52e0f541453bf5cad2ab1d3e5ec7e33f8"
+    },
+    {
+      "id": "mondaycom/monday-claude-cowork-plugin:skills/board-setup",
+      "name": "board-setup",
+      "repo": "mondaycom/monday-claude-cowork-plugin",
+      "path": "skills/board-setup/SKILL.md",
+      "sha": "7f6eca52be5d9c2ce1e63bc79b60ffa83eb6ee30"
+    },
+    {
+      "id": "mondaycom/monday-claude-cowork-plugin:skills/docs-collaborator",
+      "name": "docs-collaborator",
+      "repo": "mondaycom/monday-claude-cowork-plugin",
+      "path": "skills/docs-collaborator/SKILL.md",
+      "sha": "6a366943e7f205f5d14dbcdf4f467b927f3395c0"
+    },
+    {
+      "id": "mondaycom/monday-claude-cowork-plugin:skills/forms-builder",
+      "name": "forms-builder",
+      "repo": "mondaycom/monday-claude-cowork-plugin",
+      "path": "skills/forms-builder/SKILL.md",
+      "sha": "6ae91b026b6a96f16516bc2032f6bcf9529d4fe4"
+    },
+    {
+      "id": "mondaycom/monday-claude-cowork-plugin:skills/project-status-report",
+      "name": "project-status-report",
+      "repo": "mondaycom/monday-claude-cowork-plugin",
+      "path": "skills/project-status-report/SKILL.md",
+      "sha": "9045c37f0563d402b0e0b2349cdca8281c6d4562"
+    },
+    {
+      "id": "mondaycom/monday-claude-cowork-plugin:skills/task-management",
+      "name": "task-management",
+      "repo": "mondaycom/monday-claude-cowork-plugin",
+      "path": "skills/task-management/SKILL.md",
+      "sha": "4c46a9493da3c8fe76b9cd45656eacf23858baac"
+    },
+    {
+      "id": "monta-app/claude-plugin-monta:skills/monta-api",
+      "name": "monta-api",
+      "repo": "monta-app/claude-plugin-monta",
+      "path": "skills/monta-api/SKILL.md",
+      "sha": "8a77209e1c3ed610aff7c73be642c59a628b8c4c"
+    },
+    {
+      "id": "monta-app/claude-plugin-monta:skills/monta-charging-operations",
+      "name": "monta-charging-operations",
+      "repo": "monta-app/claude-plugin-monta",
+      "path": "skills/monta-charging-operations/SKILL.md",
+      "sha": "74c4966160a9a3337e163abede87526f1fd58b50"
+    },
+    {
+      "id": "monta-app/claude-plugin-monta:skills/setup",
+      "name": "setup",
+      "repo": "monta-app/claude-plugin-monta",
+      "path": "skills/setup/SKILL.md",
+      "sha": "1b5f5607abc59f67ae4b64bdf41c1bdc8cc9532f"
+    },
+    {
+      "id": "morningstar/morningstar-plugins:plugins/morningstar/skills/datapoint-finder",
+      "name": "datapoint-finder",
+      "repo": "morningstar/morningstar-plugins",
+      "path": "plugins/morningstar/skills/datapoint-finder/SKILL.md",
+      "sha": "c26acb2c6ef3ae98ff0e8fe6dc1ec25995df4c6d"
+    },
+    {
+      "id": "morningstar/morningstar-plugins:plugins/morningstar/skills/fund-comparison",
+      "name": "fund-comparison",
+      "repo": "morningstar/morningstar-plugins",
+      "path": "plugins/morningstar/skills/fund-comparison/SKILL.md",
+      "sha": "be9caa69ca8749d87c9381793680345e1de8cdef"
+    },
+    {
+      "id": "morningstar/morningstar-plugins:plugins/morningstar/skills/fund-screener",
+      "name": "fund-screener",
+      "repo": "morningstar/morningstar-plugins",
+      "path": "plugins/morningstar/skills/fund-screener/SKILL.md",
+      "sha": "7aed439e1c70a85d5e9fce5f00c8678025d329b9"
+    },
+    {
+      "id": "morningstar/morningstar-plugins:plugins/morningstar/skills/fund-summarizer",
+      "name": "fund-summarizer",
+      "repo": "morningstar/morningstar-plugins",
+      "path": "plugins/morningstar/skills/fund-summarizer/SKILL.md",
+      "sha": "3882ff26b794ab328d86747a1afd3848111a4203"
+    },
+    {
+      "id": "morningstar/morningstar-plugins:plugins/morningstar/skills/medalist-rating-analyzer",
+      "name": "medalist-rating-analyzer",
+      "repo": "morningstar/morningstar-plugins",
+      "path": "plugins/morningstar/skills/medalist-rating-analyzer/SKILL.md",
+      "sha": "dfc6d910960ab2237fc74f2c95045e4ff4675066"
+    },
+    {
+      "id": "newrelic/claude-code-plugin:skills/apm",
+      "name": "apm",
+      "repo": "newrelic/claude-code-plugin",
+      "path": "skills/apm/SKILL.md",
+      "sha": "6a67ae0d6f31a9a3fe6bd8c76c30db42a67c7dbb"
+    },
+    {
+      "id": "ngrok/skills:skills/expose-localhost",
+      "name": "expose-localhost",
+      "repo": "ngrok/skills",
+      "path": "skills/expose-localhost/SKILL.md",
+      "sha": "b3fcba24aabb6a91779601582f0d5f18fecb4955"
+    },
+    {
+      "id": "ngrok/skills:skills/ngrok-engine",
+      "name": "ngrok-engine",
+      "repo": "ngrok/skills",
+      "path": "skills/ngrok-engine/SKILL.md",
+      "sha": "931d553a95865652bb53079ec98e2f586785ab6e"
+    },
+    {
+      "id": "ngrok/skills:skills/ngrok-setup",
+      "name": "ngrok-setup",
+      "repo": "ngrok/skills",
+      "path": "skills/ngrok-setup/SKILL.md",
+      "sha": "f3e5a42971ab8c8624f467ab599298c8e1acd143"
+    },
+    {
+      "id": "ngrok/skills:skills/ngrok-surfaces",
+      "name": "ngrok-surfaces",
+      "repo": "ngrok/skills",
+      "path": "skills/ngrok-surfaces/SKILL.md",
+      "sha": "d42046503a045e074926a763281e2e22dfd27565"
+    },
+    {
+      "id": "ngrok/skills:skills/provision-sandbox-access",
+      "name": "provision-sandbox-access",
+      "repo": "ngrok/skills",
+      "path": "skills/provision-sandbox-access/SKILL.md",
+      "sha": "2293e688307d593f4ad65f414e8ee81d188c7206"
+    },
+    {
+      "id": "ngrok/skills:skills/receive-webhooks",
+      "name": "receive-webhooks",
+      "repo": "ngrok/skills",
+      "path": "skills/receive-webhooks/SKILL.md",
+      "sha": "db509aa06e278dc6d23aa2f8535e6939fef6248f"
+    },
+    {
+      "id": "ngrok/skills:skills/run-mcp-gateway",
+      "name": "run-mcp-gateway",
+      "repo": "ngrok/skills",
+      "path": "skills/run-mcp-gateway/SKILL.md",
+      "sha": "17b51813a758f6fff8cb4632e8971c90a1f97edb"
+    },
+    {
+      "id": "ngrok/skills:skills/secure-endpoint",
+      "name": "secure-endpoint",
+      "repo": "ngrok/skills",
+      "path": "skills/secure-endpoint/SKILL.md",
+      "sha": "a2e083564bf754d49ebdbc1706405603e7032872"
+    },
+    {
+      "id": "ngrok/skills:skills/troubleshoot-ngrok",
+      "name": "troubleshoot-ngrok",
+      "repo": "ngrok/skills",
+      "path": "skills/troubleshoot-ngrok/SKILL.md",
+      "sha": "e8eb81c8f997daf01b6f5413fbf0632e1391b4a0"
+    },
+    {
+      "id": "noibu/ai-plugin:src/skills/accessibility-audit",
+      "name": "accessibility-audit",
+      "repo": "noibu/ai-plugin",
+      "path": "src/skills/accessibility-audit/SKILL.md",
+      "sha": "a6bc733dcee888f173c44a27a6ea42ec05dd9501"
+    },
+    {
+      "id": "noibu/ai-plugin:src/skills/build-business-context",
+      "name": "build-business-context",
+      "repo": "noibu/ai-plugin",
+      "path": "src/skills/build-business-context/SKILL.md",
+      "sha": "82ea4fae2410dd132ef50811af02fea9581af35e"
+    },
+    {
+      "id": "noibu/ai-plugin:src/skills/checkout-analysis",
+      "name": "checkout-analysis",
+      "repo": "noibu/ai-plugin",
+      "path": "src/skills/checkout-analysis/SKILL.md",
+      "sha": "7dea71d64c6518008ad5b05b03d03fdaf4aa3ef0"
+    },
+    {
+      "id": "noibu/ai-plugin:src/skills/product-analysis",
+      "name": "product-analysis",
+      "repo": "noibu/ai-plugin",
+      "path": "src/skills/product-analysis/SKILL.md",
+      "sha": "cbb00d1b7710ba160d7a36238bdf18e0dd6be087"
+    },
+    {
+      "id": "noibu/ai-plugin:src/skills/querying-noibu-data",
+      "name": "querying-noibu-data",
+      "repo": "noibu/ai-plugin",
+      "path": "src/skills/querying-noibu-data/SKILL.md",
+      "sha": "e05c22f32d072aa75e7ff7c8d064cb98ac3e29e5"
+    },
+    {
+      "id": "noibu/ai-plugin:src/skills/segment-analysis",
+      "name": "segment-analysis",
+      "repo": "noibu/ai-plugin",
+      "path": "src/skills/segment-analysis/SKILL.md",
+      "sha": "cc2f1d38d6f533bb4bd1b93feb80b0b4f0c68f24"
+    },
+    {
+      "id": "noibu/ai-plugin:src/skills/store-pulse",
+      "name": "store-pulse",
+      "repo": "noibu/ai-plugin",
+      "path": "src/skills/store-pulse/SKILL.md",
+      "sha": "6a8a606feb8771c9e962ca66e11f3ba86a023ece"
+    },
+    {
+      "id": "oaknational/oak-ai-plugins:claude/plugins/oak-national-academy/skills/oak-accessibility",
+      "name": "oak-accessibility",
+      "repo": "oaknational/oak-ai-plugins",
+      "path": "claude/plugins/oak-national-academy/skills/oak-accessibility/SKILL.md",
+      "sha": "8954deb1910fb89e11cc37dbdb8484f3315ef598"
+    },
+    {
+      "id": "oaknational/oak-ai-plugins:claude/plugins/oak-national-academy/skills/oak-curriculum-principles",
+      "name": "oak-curriculum-principles",
+      "repo": "oaknational/oak-ai-plugins",
+      "path": "claude/plugins/oak-national-academy/skills/oak-curriculum-principles/SKILL.md",
+      "sha": "cd7c55788cdd8f6321a4caa4e11ffcfee802a38b"
+    },
+    {
+      "id": "oaknational/oak-ai-plugins:claude/plugins/oak-national-academy/skills/oak-curriculum-principles-mcp-enabled",
+      "name": "oak-curriculum-principles-mcp-enabled",
+      "repo": "oaknational/oak-ai-plugins",
+      "path": "claude/plugins/oak-national-academy/skills/oak-curriculum-principles-mcp-enabled/SKILL.md",
+      "sha": "f73ff84cdce76f65e33e584491b60f6942653526"
+    },
+    {
+      "id": "opsera-agents/opsera-devsecops:skills/architecture-analyze",
+      "name": "architecture-analyze",
+      "repo": "opsera-agents/opsera-devsecops",
+      "path": "skills/architecture-analyze/SKILL.md",
+      "sha": "68ae23cf6afcbd1a6def78e90c6db8dfee7fa022"
+    },
+    {
+      "id": "opsera-agents/opsera-devsecops:skills/compliance-audit",
+      "name": "compliance-audit",
+      "repo": "opsera-agents/opsera-devsecops",
+      "path": "skills/compliance-audit/SKILL.md",
+      "sha": "57bfbeb6a396f769e99d4f50258a50468d4a7b26"
+    },
+    {
+      "id": "opsera-agents/opsera-devsecops:skills/pre-commit-scan",
+      "name": "pre-commit-scan",
+      "repo": "opsera-agents/opsera-devsecops",
+      "path": "skills/pre-commit-scan/SKILL.md",
+      "sha": "e97381603c09152d4bab995104f320c76570a3bc"
+    },
+    {
+      "id": "opsera-agents/opsera-devsecops:skills/security-scan",
+      "name": "security-scan",
+      "repo": "opsera-agents/opsera-devsecops",
+      "path": "skills/security-scan/SKILL.md",
+      "sha": "e7a932de322c73b4def1bed1fc17dd3d9c2d1053"
+    },
+    {
+      "id": "opsera-agents/opsera-devsecops:skills/sql-security",
+      "name": "sql-security",
+      "repo": "opsera-agents/opsera-devsecops",
+      "path": "skills/sql-security/SKILL.md",
+      "sha": "184d69b62dc5d3dc5d6d4a6f714d4cdb489476ba"
+    },
+    {
+      "id": "pactflow/pactflow-agent-skills:plugins/swagger-contract-testing/skills/drift-testing",
+      "name": "drift-testing",
+      "repo": "pactflow/pactflow-agent-skills",
+      "path": "plugins/swagger-contract-testing/skills/drift-testing/SKILL.md",
+      "sha": "f566f3b895442f25ea84d57c56fd775b52dd6dac"
+    },
+    {
+      "id": "pactflow/pactflow-agent-skills:plugins/swagger-contract-testing/skills/oas-generator",
+      "name": "oas-generator",
+      "repo": "pactflow/pactflow-agent-skills",
+      "path": "plugins/swagger-contract-testing/skills/oas-generator/SKILL.md",
+      "sha": "7dc26ff02822c44977c9629f7b99a0c2b94a19d4"
+    },
+    {
+      "id": "pactflow/pactflow-agent-skills:plugins/swagger-contract-testing/skills/openapi-parser",
+      "name": "openapi-parser",
+      "repo": "pactflow/pactflow-agent-skills",
+      "path": "plugins/swagger-contract-testing/skills/openapi-parser/SKILL.md",
+      "sha": "0f1417d7130fb04ac9d58555e72e6265bac31e7a"
+    },
+    {
+      "id": "pactflow/pactflow-agent-skills:plugins/swagger-contract-testing/skills/pact-coverage",
+      "name": "pact-coverage",
+      "repo": "pactflow/pactflow-agent-skills",
+      "path": "plugins/swagger-contract-testing/skills/pact-coverage/SKILL.md",
+      "sha": "70331ca9c3189a519f1930becff8d4a4f509eafb"
+    },
+    {
+      "id": "pactflow/pactflow-agent-skills:plugins/swagger-contract-testing/skills/pactflow",
+      "name": "pactflow",
+      "repo": "pactflow/pactflow-agent-skills",
+      "path": "plugins/swagger-contract-testing/skills/pactflow/SKILL.md",
+      "sha": "30a04cc602ca31edfea9fd20f128804e737eb88d"
+    },
+    {
+      "id": "paypal/ai-toolkit:skills/paypal-best-practices",
+      "name": "paypal-best-practices",
+      "repo": "paypal/ai-toolkit",
+      "path": "skills/paypal-best-practices/SKILL.md",
+      "sha": "c337db1d5bbe2ab91957254d044c1ad5558e2e76"
+    },
+    {
+      "id": "phished-bv/phished-claude-plugin:skills/department-report",
+      "name": "department-report",
+      "repo": "phished-bv/phished-claude-plugin",
+      "path": "skills/department-report/SKILL.md",
+      "sha": "bb4b8f38d0dd65953af80f437e1c7062bf379a86"
+    },
+    {
+      "id": "phished-bv/phished-claude-plugin:skills/detect-new-in-risk-categories",
+      "name": "detect-new-in-risk-categories",
+      "repo": "phished-bv/phished-claude-plugin",
+      "path": "skills/detect-new-in-risk-categories/SKILL.md",
+      "sha": "3a5ace03fabb8777f34c66779e84a8f140ddc4e6"
+    },
+    {
+      "id": "phished-bv/phished-claude-plugin:skills/generate-simulation",
+      "name": "generate-simulation",
+      "repo": "phished-bv/phished-claude-plugin",
+      "path": "skills/generate-simulation/SKILL.md",
+      "sha": "c9a11c97fc39b386ba6b5127d2fb1154f657b6c0"
+    },
+    {
+      "id": "phished-bv/phished-claude-plugin:skills/my-department",
+      "name": "my-department",
+      "repo": "phished-bv/phished-claude-plugin",
+      "path": "skills/my-department/SKILL.md",
+      "sha": "abacac05094795c6027f4d24db35424563820aad"
+    },
+    {
+      "id": "phished-bv/phished-claude-plugin:skills/onboarding",
+      "name": "onboarding",
+      "repo": "phished-bv/phished-claude-plugin",
+      "path": "skills/onboarding/SKILL.md",
+      "sha": "07dda40ae378d9fcc8af9b091f23942b0cafc0bf"
+    },
+    {
+      "id": "phished-bv/phished-claude-plugin:skills/periodic-report",
+      "name": "periodic-report",
+      "repo": "phished-bv/phished-claude-plugin",
+      "path": "skills/periodic-report/SKILL.md",
+      "sha": "8b639e6262bc872fff33f94e0007c44efe8497e9"
+    },
+    {
+      "id": "phished-bv/phished-claude-plugin:skills/team-report",
+      "name": "team-report",
+      "repo": "phished-bv/phished-claude-plugin",
+      "path": "skills/team-report/SKILL.md",
+      "sha": "fd2ed3f73ecd6a667a92e4c38fa4594fc9de180e"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/assistant",
+      "name": "pinecone:assistant",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/assistant/SKILL.md",
+      "sha": "98e663dc9d6e806176c4fca44c477859545ea08f"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/cli",
+      "name": "pinecone:cli",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/cli/SKILL.md",
+      "sha": "c90dbd1d1136d0c78ca50f48f92d2a3b9ec007b5"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/docs",
+      "name": "pinecone:docs",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/docs/SKILL.md",
+      "sha": "614a8803effc910dc70eb6dc847e10da03c89363"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/full-text-search",
+      "name": "pinecone:full-text-search",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/full-text-search/SKILL.md",
+      "sha": "15340f322d468ea392054cef651ab1fd27d4bfbd"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/help",
+      "name": "pinecone:help",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/help/SKILL.md",
+      "sha": "0c09a503f3373c4628edae55b57f9b24515e45b6"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/mcp",
+      "name": "pinecone:mcp",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/mcp/SKILL.md",
+      "sha": "f021d1232c9f48c245bfe9d2dfb59b5db15bcd5a"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/n8n",
+      "name": "pinecone:n8n",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/n8n/SKILL.md",
+      "sha": "630849acf1512203267c544038748da16ca2c7fe"
+    },
+    {
+      "id": "pinecone-io/pinecone-claude-code-plugin:skills/query",
+      "name": "pinecone:query",
+      "repo": "pinecone-io/pinecone-claude-code-plugin",
+      "path": "skills/query/SKILL.md",
+      "sha": "3820baf4465a2933c47d7ee9eba016fd44793f74"
+    },
+    {
+      "id": "pixeltable/pixeltable-skill:skills/pixeltable-skill",
+      "name": "pixeltable",
+      "repo": "pixeltable/pixeltable-skill",
+      "path": "skills/pixeltable-skill/SKILL.md",
+      "sha": "d087c8bb4f561deed0bd39f9ce94d81c5b79c872"
+    },
+    {
+      "id": "preset-io/agent-skills:plugins/preset-cli-skills/skills/preset-cli",
+      "name": "preset-cli",
+      "repo": "preset-io/agent-skills",
+      "path": "plugins/preset-cli-skills/skills/preset-cli/SKILL.md",
+      "sha": "233e927e91890f52dbf2ab5e2c5fbbdd4c150bc3"
+    },
+    {
+      "id": "privco/privco-claude-plugin:skills/privco-mcp-search",
+      "name": "privco-mcp-search",
+      "repo": "privco/privco-claude-plugin",
+      "path": "skills/privco-mcp-search/SKILL.md",
+      "sha": "8f46a1a26d78cf51cb6e97db0466c05d5bafc676"
+    },
+    {
+      "id": "remoteoss/remote-for-ai:skills/remote-api-auth",
+      "name": "remote-api-auth",
+      "repo": "remoteoss/remote-for-ai",
+      "path": "skills/remote-api-auth/SKILL.md",
+      "sha": "daaad5a720b219b27b01c703a4a81f20a0d675fb"
+    },
+    {
+      "id": "remoteoss/remote-for-ai:skills/remote-api-forms",
+      "name": "remote-api-forms",
+      "repo": "remoteoss/remote-for-ai",
+      "path": "skills/remote-api-forms/SKILL.md",
+      "sha": "c2597282460c37aa6548e846f8bc906f7d3db81c"
+    },
+    {
+      "id": "remoteoss/remote-for-ai:skills/remote-api-integration",
+      "name": "remote-api-integration",
+      "repo": "remoteoss/remote-for-ai",
+      "path": "skills/remote-api-integration/SKILL.md",
+      "sha": "fdbfee73cf0419dbc82acfafa3c179d6c7eac43e"
+    },
+    {
+      "id": "remoteoss/remote-for-ai:skills/remote-api-webhooks",
+      "name": "remote-api-webhooks",
+      "repo": "remoteoss/remote-for-ai",
+      "path": "skills/remote-api-webhooks/SKILL.md",
+      "sha": "a893771da4e407fe99afe82d56b60cc163854b5a"
+    },
+    {
+      "id": "remoteoss/remote-for-ai:skills/remote-payroll-and-payslips",
+      "name": "remote-payroll-and-payslips",
+      "repo": "remoteoss/remote-for-ai",
+      "path": "skills/remote-payroll-and-payslips/SKILL.md",
+      "sha": "fcaf7466e3d1aac3a41fe55a8e39872cfdb5d097"
+    },
+    {
+      "id": "remoteoss/remote-for-ai:skills/remote-reporting",
+      "name": "remote-reporting",
+      "repo": "remoteoss/remote-for-ai",
+      "path": "skills/remote-reporting/SKILL.md",
+      "sha": "9c2ca2a9620fd6f280c876fd819ec36731708cb7"
+    },
+    {
+      "id": "remoteoss/remote-for-ai:skills/remote-time-off-workflow",
+      "name": "remote-time-off-workflow",
+      "repo": "remoteoss/remote-for-ai",
+      "path": "skills/remote-time-off-workflow/SKILL.md",
+      "sha": "47a32d1afbc506ddb75b68eebacd23f145c27afb"
+    },
+    {
+      "id": "rilldata/agent-skills:skills/rill-analysis",
+      "name": "rill-analysis",
+      "repo": "rilldata/agent-skills",
+      "path": "skills/rill-analysis/SKILL.md",
+      "sha": "a224c6c884fbdc792493de54ad5593e33d888c31"
+    },
+    {
+      "id": "rilldata/agent-skills:skills/rill-canvas",
+      "name": "rill-canvas",
+      "repo": "rilldata/agent-skills",
+      "path": "skills/rill-canvas/SKILL.md",
+      "sha": "20a1645c9d081b7efd1d752ca01b1691f7ca8915"
+    },
+    {
+      "id": "rilldata/agent-skills:skills/rill-connector",
+      "name": "rill-connector",
+      "repo": "rilldata/agent-skills",
+      "path": "skills/rill-connector/SKILL.md",
+      "sha": "bf36e0db665b183c62bf393eff98fb73a2050176"
+    },
+    {
+      "id": "rilldata/agent-skills:skills/rill-development",
+      "name": "rill-development",
+      "repo": "rilldata/agent-skills",
+      "path": "skills/rill-development/SKILL.md",
+      "sha": "2b524eb563a92119e91da3e316e7c8be083b565b"
+    },
+    {
+      "id": "rilldata/agent-skills:skills/rill-explore",
+      "name": "rill-explore",
+      "repo": "rilldata/agent-skills",
+      "path": "skills/rill-explore/SKILL.md",
+      "sha": "5f6d49dda6b833081ab8917ac8d5f9d3cb72e765"
+    },
+    {
+      "id": "rilldata/agent-skills:skills/rill-metrics-view",
+      "name": "rill-metrics-view",
+      "repo": "rilldata/agent-skills",
+      "path": "skills/rill-metrics-view/SKILL.md",
+      "sha": "a21e2bf247d789060db570c5c999486627e658ea"
+    },
+    {
+      "id": "rilldata/agent-skills:skills/rill-theme",
+      "name": "rill-theme",
+      "repo": "rilldata/agent-skills",
+      "path": "skills/rill-theme/SKILL.md",
+      "sha": "deec3c2c2689ceea8bd77f276b17fd0b9b144ac7"
+    },
+    {
+      "id": "riversidefm/riverside-mcp-public:skills/content-discovery",
+      "name": "content-discovery",
+      "repo": "riversidefm/riverside-mcp-public",
+      "path": "skills/content-discovery/SKILL.md",
+      "sha": "7c4e50bcedec6126da7857e1762cc18465746ef2"
+    },
+    {
+      "id": "riversidefm/riverside-mcp-public:skills/setup",
+      "name": "setup",
+      "repo": "riversidefm/riverside-mcp-public",
+      "path": "skills/setup/SKILL.md",
+      "sha": "554dcf713f45811456240eb52a96d73ab28b03f0"
+    },
+    {
+      "id": "riversidefm/riverside-mcp-public:skills/social-publishing",
+      "name": "social-publishing",
+      "repo": "riversidefm/riverside-mcp-public",
+      "path": "skills/social-publishing/SKILL.md",
+      "sha": "4b40b0d7b858f2d32aae0c2f6a00076f0c736733"
+    },
+    {
+      "id": "riversidefm/riverside-mcp-public:skills/video-editing",
+      "name": "video-editing",
+      "repo": "riversidefm/riverside-mcp-public",
+      "path": "skills/video-editing/SKILL.md",
+      "sha": "403e8700e366075d8723ac650af10b875982b514"
+    },
+    {
+      "id": "rocketreach/rocketreach-mcp-plugin:skills/build-list",
+      "name": "build-list",
+      "repo": "rocketreach/rocketreach-mcp-plugin",
+      "path": "skills/build-list/SKILL.md",
+      "sha": "a90050f1bde37f95e39385ff9dd6df38f954b084"
+    },
+    {
+      "id": "rocketreach/rocketreach-mcp-plugin:skills/enrich-company",
+      "name": "enrich-company",
+      "repo": "rocketreach/rocketreach-mcp-plugin",
+      "path": "skills/enrich-company/SKILL.md",
+      "sha": "44d5a88816a8273635ab6618cf4f9b5dff89bec9"
+    },
+    {
+      "id": "rocketreach/rocketreach-mcp-plugin:skills/enrich-person",
+      "name": "enrich-person",
+      "repo": "rocketreach/rocketreach-mcp-plugin",
+      "path": "skills/enrich-person/SKILL.md",
+      "sha": "0c276a35a1bdcfdc4c8207db267ae5b9ab466693"
+    },
+    {
+      "id": "rocketreach/rocketreach-mcp-plugin:skills/prospect",
+      "name": "prospect",
+      "repo": "rocketreach/rocketreach-mcp-plugin",
+      "path": "skills/prospect/SKILL.md",
+      "sha": "fc81caff724c2b2a013f50c6ec02ca78a8b24d25"
+    },
+    {
+      "id": "rocketreach/rocketreach-mcp-plugin:skills/verify-email",
+      "name": "verify-email",
+      "repo": "rocketreach/rocketreach-mcp-plugin",
+      "path": "skills/verify-email/SKILL.md",
+      "sha": "b8de350bacdb2703bec08daecbfcdca59b3ef503"
+    },
+    {
+      "id": "sap/ui-theme-designer-plugins-for-coding-agents:plugins/ui-theme-designer/skills/ui-theme-designer-design-tokens",
+      "name": "ui-theme-designer-design-tokens",
+      "repo": "sap/ui-theme-designer-plugins-for-coding-agents",
+      "path": "plugins/ui-theme-designer/skills/ui-theme-designer-design-tokens/SKILL.md",
+      "sha": "cf21febb82db00addf4f1ba25c3b942402758dea"
+    },
+    {
+      "id": "sap/ui-theme-designer-plugins-for-coding-agents:plugins/ui-theme-designer/skills/ui-theme-designer-help",
+      "name": "ui-theme-designer-help",
+      "repo": "sap/ui-theme-designer-plugins-for-coding-agents",
+      "path": "plugins/ui-theme-designer/skills/ui-theme-designer-help/SKILL.md",
+      "sha": "a1f807317e1ee796d829620cc965a13669b8414b"
+    },
+    {
+      "id": "semgrep/guardian:plugin/skills/add-and-validate-guardian-developer-semgrep-rule",
+      "name": "add-and-validate-guardian-developer-semgrep-rule",
+      "repo": "semgrep/guardian",
+      "path": "plugin/skills/add-and-validate-guardian-developer-semgrep-rule/SKILL.md",
+      "sha": "1a82312984bafeed940684f34b5be381d7b5dc29"
+    },
+    {
+      "id": "semgrep/guardian:plugin/skills/install-mfw",
+      "name": "install-mfw",
+      "repo": "semgrep/guardian",
+      "path": "plugin/skills/install-mfw/SKILL.md",
+      "sha": "03f25ca0a20017b9c4a2bd601d6595ffea27af3c"
+    },
+    {
+      "id": "semgrep/guardian:plugin/skills/remove-guardian-developer-semgrep-rule",
+      "name": "remove-guardian-developer-semgrep-rule",
+      "repo": "semgrep/guardian",
+      "path": "plugin/skills/remove-guardian-developer-semgrep-rule/SKILL.md",
+      "sha": "3fa43d502f7477cdb98d182df29cbadd972e793c"
+    },
+    {
+      "id": "slackapi/slack-skills-plugin:skills/block-kit",
+      "name": "block-kit",
+      "repo": "slackapi/slack-skills-plugin",
+      "path": "skills/block-kit/SKILL.md",
+      "sha": "2fcfb0ed2f0b24108d306d447a083580490921ef"
+    },
+    {
+      "id": "slackapi/slack-skills-plugin:skills/create-slack-app",
+      "name": "create-slack-app",
+      "repo": "slackapi/slack-skills-plugin",
+      "path": "skills/create-slack-app/SKILL.md",
+      "sha": "b5c40b7cbb1ef208d136d1f11624af623185adfa"
+    },
+    {
+      "id": "slackapi/slack-skills-plugin:skills/deploy-slack-app",
+      "name": "deploy-slack-app",
+      "repo": "slackapi/slack-skills-plugin",
+      "path": "skills/deploy-slack-app/SKILL.md",
+      "sha": "442b4f440c28d3629fc59fc8192fbc11bcf60fc8"
+    },
+    {
+      "id": "slackapi/slack-skills-plugin:skills/test-slack-app",
+      "name": "test-slack-app",
+      "repo": "slackapi/slack-skills-plugin",
+      "path": "skills/test-slack-app/SKILL.md",
+      "sha": "8255c23fff9af7663f7862e604dbbbcb40df3ffa"
+    },
+    {
+      "id": "spotify/save-to-spotify:plugin/skills/configure-chapter-skip",
+      "name": "configure-chapter-skip",
+      "repo": "spotify/save-to-spotify",
+      "path": "plugin/skills/configure-chapter-skip/SKILL.md",
+      "sha": "485324a873182d69636722392e9b9849122bd5f0"
+    },
+    {
+      "id": "stackhawk/agent-skills:plugins/api/skills/api",
+      "name": "api",
+      "repo": "stackhawk/agent-skills",
+      "path": "plugins/api/skills/api/SKILL.md",
+      "sha": "4cf01735dbbe6fc84d1c6769c00ea3bee4d55c86"
+    },
+    {
+      "id": "stackhawk/agent-skills:plugins/hawkscan/skills/hawkscan",
+      "name": "hawkscan",
+      "repo": "stackhawk/agent-skills",
+      "path": "plugins/hawkscan/skills/hawkscan/SKILL.md",
+      "sha": "1169b182cfa7d64997c4324a573ea982e7c762e9"
+    },
+    {
+      "id": "starburstlabs/wealthbox-plugin:skills/document-recommendation-suitability",
+      "name": "document-recommendation-suitability",
+      "repo": "starburstlabs/wealthbox-plugin",
+      "path": "skills/document-recommendation-suitability/SKILL.md",
+      "sha": "2790a052d12025238a2b8c5ebcf78fffcfd93599"
+    },
+    {
+      "id": "starburstlabs/wealthbox-plugin:skills/identify-clients-affected-by-change",
+      "name": "identify-clients-affected-by-change",
+      "repo": "starburstlabs/wealthbox-plugin",
+      "path": "skills/identify-clients-affected-by-change/SKILL.md",
+      "sha": "a1eaaac6bc99c59f2aeb65e10ff2942c0f07ceb3"
+    },
+    {
+      "id": "starburstlabs/wealthbox-plugin:skills/manage-client-service-request",
+      "name": "manage-client-service-request",
+      "repo": "starburstlabs/wealthbox-plugin",
+      "path": "skills/manage-client-service-request/SKILL.md",
+      "sha": "ee116a91005632f8ae6c96444b993cb91cc97c52"
+    },
+    {
+      "id": "starburstlabs/wealthbox-plugin:skills/orchestrate-onboarding-data",
+      "name": "orchestrate-onboarding-data",
+      "repo": "starburstlabs/wealthbox-plugin",
+      "path": "skills/orchestrate-onboarding-data/SKILL.md",
+      "sha": "92f6b1626192b15900d8e2332cc0e62c58ecf8cc"
+    },
+    {
+      "id": "starburstlabs/wealthbox-plugin:skills/prepare-client-meeting",
+      "name": "prepare-client-meeting",
+      "repo": "starburstlabs/wealthbox-plugin",
+      "path": "skills/prepare-client-meeting/SKILL.md",
+      "sha": "1077f59579a26490e525f6d609bd48723af1b245"
+    },
+    {
+      "id": "sumologic/sumologic-ai-plugins:skills/sumo-investigator",
+      "name": "sumo-investigator",
+      "repo": "sumologic/sumologic-ai-plugins",
+      "path": "skills/sumo-investigator/SKILL.md",
+      "sha": "356f41903668c7def6dfafce74cc0b82a8074868"
+    },
+    {
+      "id": "sumologic/sumologic-ai-plugins:skills/sumosetup",
+      "name": "sumosetup",
+      "repo": "sumologic/sumologic-ai-plugins",
+      "path": "skills/sumosetup/SKILL.md",
+      "sha": "67d0b3f8b01a9c6fc9601c30ca5018d4448d3ce1"
+    },
+    {
+      "id": "sumup/sumup-skills:skills/sumup",
+      "name": "sumup",
+      "repo": "sumup/sumup-skills",
+      "path": "skills/sumup/SKILL.md",
+      "sha": "8954c6da9fb5f4d8f5019983c3f48c99a775c251"
+    },
+    {
+      "id": "sumup/sumup-skills:skills/sumup-best-practices",
+      "name": "sumup-best-practices",
+      "repo": "sumup/sumup-skills",
+      "path": "skills/sumup-best-practices/SKILL.md",
+      "sha": "97d43435da940257ec5a8836ea4bc350ca6712b5"
+    },
+    {
+      "id": "sumup/sumup-skills:skills/sumup-debug",
+      "name": "sumup-debug",
+      "repo": "sumup/sumup-skills",
+      "path": "skills/sumup-debug/SKILL.md",
+      "sha": "6f54faef64f05467dd7a2256be55fbdc4099f5ae"
+    },
+    {
+      "id": "sumup/sumup-skills:skills/sumup-mcp",
+      "name": "sumup-mcp",
+      "repo": "sumup/sumup-skills",
+      "path": "skills/sumup-mcp/SKILL.md",
+      "sha": "7485320e50a833d256c0cdb49bba0f892d81e649"
+    },
+    {
+      "id": "sumup/sumup-skills:skills/sumup-testing",
+      "name": "sumup-testing",
+      "repo": "sumup/sumup-skills",
+      "path": "skills/sumup-testing/SKILL.md",
+      "sha": "976be264ee71ae352f98d28bf2654dc8170e65e9"
+    },
+    {
+      "id": "sumup/sumup-skills:skills/upgrade-sumup",
+      "name": "upgrade-sumup",
+      "repo": "sumup/sumup-skills",
+      "path": "skills/upgrade-sumup/SKILL.md",
+      "sha": "bbd433154cf7e0327b8b1233253716c01d8bbcfe"
+    },
+    {
+      "id": "supabase-community/supabase-plugin:skills/supabase",
+      "name": "supabase",
+      "repo": "supabase-community/supabase-plugin",
+      "path": "skills/supabase/SKILL.md",
+      "sha": "66093e0a0f8d9268094c1a4b38c04419b787ca89"
+    },
+    {
+      "id": "supermetrics-public/claude-marketing-plugin:plugins/supermetrics-marketing/skills/content-marketer",
+      "name": "content-marketer",
+      "repo": "supermetrics-public/claude-marketing-plugin",
+      "path": "plugins/supermetrics-marketing/skills/content-marketer/SKILL.md",
+      "sha": "382f0092ba6606b3ca054309cd653041e23d1657"
+    },
+    {
+      "id": "supermetrics-public/claude-marketing-plugin:plugins/supermetrics-marketing/skills/demand-gen",
+      "name": "demand-gen",
+      "repo": "supermetrics-public/claude-marketing-plugin",
+      "path": "plugins/supermetrics-marketing/skills/demand-gen/SKILL.md",
+      "sha": "47602f50357c26f4773a086beba0092d1a08b864"
+    },
+    {
+      "id": "supermetrics-public/claude-marketing-plugin:plugins/supermetrics-marketing/skills/ecommerce-marketer",
+      "name": "ecommerce-marketer",
+      "repo": "supermetrics-public/claude-marketing-plugin",
+      "path": "plugins/supermetrics-marketing/skills/ecommerce-marketer/SKILL.md",
+      "sha": "82c54270979163ed90cff97f5d3ef68a0075344b"
+    },
+    {
+      "id": "supermetrics-public/claude-marketing-plugin:plugins/supermetrics-marketing/skills/field-marketer",
+      "name": "field-marketer",
+      "repo": "supermetrics-public/claude-marketing-plugin",
+      "path": "plugins/supermetrics-marketing/skills/field-marketer/SKILL.md",
+      "sha": "4c878516a88afb6e2b23de817f00b0f2cdf8807a"
+    },
+    {
+      "id": "supermetrics-public/claude-marketing-plugin:plugins/supermetrics-marketing/skills/marketing-leader",
+      "name": "marketing-leader",
+      "repo": "supermetrics-public/claude-marketing-plugin",
+      "path": "plugins/supermetrics-marketing/skills/marketing-leader/SKILL.md",
+      "sha": "ee8768444f8101b066c0d470fb02516d47f15728"
+    },
+    {
+      "id": "supermetrics-public/claude-marketing-plugin:plugins/supermetrics-marketing/skills/performance-marketer",
+      "name": "performance-marketer",
+      "repo": "supermetrics-public/claude-marketing-plugin",
+      "path": "plugins/supermetrics-marketing/skills/performance-marketer/SKILL.md",
+      "sha": "6136b10a096dc3a8b288b9bdab0c1e1845c47dd3"
+    },
+    {
+      "id": "synthflowai/anthropicplugin:plugins/synthflow/skills/call-review",
+      "name": "call-review",
+      "repo": "synthflowai/anthropicplugin",
+      "path": "plugins/synthflow/skills/call-review/SKILL.md",
+      "sha": "1d6232303fb3811b7846debdc54ad4d4f71a5548"
+    },
+    {
+      "id": "synthflowai/anthropicplugin:plugins/synthflow/skills/prompt-review",
+      "name": "prompt-review",
+      "repo": "synthflowai/anthropicplugin",
+      "path": "plugins/synthflow/skills/prompt-review/SKILL.md",
+      "sha": "339c1c0fe568c26b44b87e246ea547b46c1bdb61"
+    },
+    {
+      "id": "taboola/realize-claude-plugin:skills/accounts",
+      "name": "accounts",
+      "repo": "taboola/realize-claude-plugin",
+      "path": "skills/accounts/SKILL.md",
+      "sha": "22fafb22168b718c7c0f6de220d564a2eaaa4956"
+    },
+    {
+      "id": "taboola/realize-claude-plugin:skills/manage-campaigns",
+      "name": "manage-campaigns",
+      "repo": "taboola/realize-claude-plugin",
+      "path": "skills/manage-campaigns/SKILL.md",
+      "sha": "a95c69e523e6d34908646e47b183b7a39ad07ba7"
+    },
+    {
+      "id": "taboola/realize-claude-plugin:skills/optimize-campaign",
+      "name": "optimize-campaign",
+      "repo": "taboola/realize-claude-plugin",
+      "path": "skills/optimize-campaign/SKILL.md",
+      "sha": "60b905b660041c798b3eae9d6f1614914235801e"
+    },
+    {
+      "id": "taboola/realize-claude-plugin:skills/reports",
+      "name": "reports",
+      "repo": "taboola/realize-claude-plugin",
+      "path": "skills/reports/SKILL.md",
+      "sha": "8fa282016ea067e3d968af58018f5a2dc0af35e1"
+    },
+    {
+      "id": "taboola/realize-claude-plugin:skills/web-fallback",
+      "name": "web-fallback",
+      "repo": "taboola/realize-claude-plugin",
+      "path": "skills/web-fallback/SKILL.md",
+      "sha": "72f47d7096018ce3c5c22a458651ac69735e4bc8"
+    },
+    {
+      "id": "thoughtspot/spottercode-mcp-plugin:skills/get-developer-docs-reference",
+      "name": "get-developer-docs-reference",
+      "repo": "thoughtspot/spottercode-mcp-plugin",
+      "path": "skills/get-developer-docs-reference/SKILL.md",
+      "sha": "361f1d8fa4ecb1d284e33f44f36fa60cc72fa28e"
+    },
+    {
+      "id": "thoughtspot/spottercode-mcp-plugin:skills/get-rest-api-reference",
+      "name": "get-rest-api-reference",
+      "repo": "thoughtspot/spottercode-mcp-plugin",
+      "path": "skills/get-rest-api-reference/SKILL.md",
+      "sha": "96c7e30b0d12d83214173e9f5bff6da711e7af31"
+    },
+    {
+      "id": "thoughtspot/spottercode-mcp-plugin:skills/get-visual-embed-sdk-reference",
+      "name": "get-visual-embed-sdk-reference",
+      "repo": "thoughtspot/spottercode-mcp-plugin",
+      "path": "skills/get-visual-embed-sdk-reference/SKILL.md",
+      "sha": "2e683912eaa844d0eacb87037388cd0443a29d51"
+    },
+    {
+      "id": "tinyfish-io/tinyfish-web-agent-integrations:claude/skills/agent",
+      "name": "agent",
+      "repo": "tinyfish-io/tinyfish-web-agent-integrations",
+      "path": "claude/skills/agent/SKILL.md",
+      "sha": "55e6cedfc0f037fb8219359fe89a9bbde804413f"
+    },
+    {
+      "id": "tinyfish-io/tinyfish-web-agent-integrations:claude/skills/doctor",
+      "name": "doctor",
+      "repo": "tinyfish-io/tinyfish-web-agent-integrations",
+      "path": "claude/skills/doctor/SKILL.md",
+      "sha": "b469c3d3c53f01647788f0ab831a5b243a0cad49"
+    },
+    {
+      "id": "tinyfish-io/tinyfish-web-agent-integrations:claude/skills/feedback",
+      "name": "feedback",
+      "repo": "tinyfish-io/tinyfish-web-agent-integrations",
+      "path": "claude/skills/feedback/SKILL.md",
+      "sha": "6cbe607d6bcad10d8b46669884ca819b418c1103"
+    },
+    {
+      "id": "tinyfish-io/tinyfish-web-agent-integrations:claude/skills/fetch",
+      "name": "fetch",
+      "repo": "tinyfish-io/tinyfish-web-agent-integrations",
+      "path": "claude/skills/fetch/SKILL.md",
+      "sha": "387fe4afb5fd72e982142ee3b653a697748a8d5d"
+    },
+    {
+      "id": "tinyfish-io/tinyfish-web-agent-integrations:claude/skills/monitor",
+      "name": "monitor",
+      "repo": "tinyfish-io/tinyfish-web-agent-integrations",
+      "path": "claude/skills/monitor/SKILL.md",
+      "sha": "5cd040401ed407844020e89d273981a4f686d570"
+    },
+    {
+      "id": "tinyfish-io/tinyfish-web-agent-integrations:claude/skills/search",
+      "name": "search",
+      "repo": "tinyfish-io/tinyfish-web-agent-integrations",
+      "path": "claude/skills/search/SKILL.md",
+      "sha": "c90a21b3c7441ecffba3b888347f8f54c6badc6d"
+    },
+    {
+      "id": "ukg/ukg-ai-marketplace:skills/time-off-skill",
+      "name": "time-off-skill",
+      "repo": "ukg/ukg-ai-marketplace",
+      "path": "skills/time-off-skill/SKILL.md",
+      "sha": "3f4e073fc9da023cc44583c6a71a91bb4c59f0b0"
+    },
+    {
+      "id": "ukg/ukg-ai-marketplace:skills/ukg-directory-skill",
+      "name": "ukg-directory-skill",
+      "repo": "ukg/ukg-ai-marketplace",
+      "path": "skills/ukg-directory-skill/SKILL.md",
+      "sha": "5f6e70e886d954044fef30d55e95bf5e37672cbe"
+    },
+    {
+      "id": "unbounce/agent-plugins:plugins/unbounce-mcp/skills/mcp-feedback",
+      "name": "mcp-feedback",
+      "repo": "unbounce/agent-plugins",
+      "path": "plugins/unbounce-mcp/skills/mcp-feedback/SKILL.md",
+      "sha": "86427a657ce18cace3c7bba6c2189219c26e171d"
+    },
+    {
+      "id": "unbounce/agent-plugins:plugins/unbounce-mcp/skills/mcp-page-authoring",
+      "name": "mcp-page-authoring",
+      "repo": "unbounce/agent-plugins",
+      "path": "plugins/unbounce-mcp/skills/mcp-page-authoring/SKILL.md",
+      "sha": "b179ed4e10e0412b8a470fe7e4f68b9d86c728c8"
+    },
+    {
+      "id": "unleash/unleash-claude-skills:skills/featureops",
+      "name": "featureops",
+      "repo": "unleash/unleash-claude-skills",
+      "path": "skills/featureops/SKILL.md",
+      "sha": "1a3ab07ff3a80b947e355604f9c65113c4212a22"
+    },
+    {
+      "id": "unleash/unleash-claude-skills:skills/migrate-gitlab-flags",
+      "name": "migrate-gitlab-flags",
+      "repo": "unleash/unleash-claude-skills",
+      "path": "skills/migrate-gitlab-flags/SKILL.md",
+      "sha": "e0eb888f9e4d65fd631f2577343ce53ca5654453"
+    },
+    {
+      "id": "unstructured-io/unstructured-foundation-marketplace:plugins/foundation/skills/connect",
+      "name": "connect",
+      "repo": "unstructured-io/unstructured-foundation-marketplace",
+      "path": "plugins/foundation/skills/connect/SKILL.md",
+      "sha": "dd7b19b9b6fea56e930d78b12dc246b6fb41c57e"
+    },
+    {
+      "id": "unstructured-io/unstructured-foundation-marketplace:plugins/foundation/skills/help",
+      "name": "help",
+      "repo": "unstructured-io/unstructured-foundation-marketplace",
+      "path": "plugins/foundation/skills/help/SKILL.md",
+      "sha": "411da239f4767130c380deba4da51fddb3a1c846"
+    },
+    {
+      "id": "unstructured-io/unstructured-foundation-marketplace:plugins/foundation/skills/manage",
+      "name": "manage",
+      "repo": "unstructured-io/unstructured-foundation-marketplace",
+      "path": "plugins/foundation/skills/manage/SKILL.md",
+      "sha": "4f57708874204e37bfd0d6a6495098c09a4e6f92"
+    },
+    {
+      "id": "unstructured-io/unstructured-foundation-marketplace:plugins/foundation/skills/search",
+      "name": "search",
+      "repo": "unstructured-io/unstructured-foundation-marketplace",
+      "path": "plugins/foundation/skills/search/SKILL.md",
+      "sha": "3cb39e0642aeaba9b3cb24a4213baec820fc5c0a"
+    },
+    {
+      "id": "unstructured-io/unstructured-foundation-marketplace:plugins/foundation/skills/start",
+      "name": "start",
+      "repo": "unstructured-io/unstructured-foundation-marketplace",
+      "path": "plugins/foundation/skills/start/SKILL.md",
+      "sha": "79bd6632475f2308078a6a61497cebd885f32378"
+    },
+    {
+      "id": "vaadin/agent-skills:skills/aura-theme",
+      "name": "aura-theme",
+      "repo": "vaadin/agent-skills",
+      "path": "skills/aura-theme/SKILL.md",
+      "sha": "f181de696cc706c99bde3e12ebec0473cd259233"
+    },
+    {
+      "id": "vaadin/agent-skills:skills/vaadin-form-layout",
+      "name": "vaadin-form-layout",
+      "repo": "vaadin/agent-skills",
+      "path": "skills/vaadin-form-layout/SKILL.md",
+      "sha": "9da831ae72cb27b2043ae78524ef506f1561d165"
+    },
+    {
+      "id": "vaisala-xweather/xweather-agent-skills:plugins/xweather/skills/mapsgl",
+      "name": "mapsgl",
+      "repo": "vaisala-xweather/xweather-agent-skills",
+      "path": "plugins/xweather/skills/mapsgl/SKILL.md",
+      "sha": "3c8c25579745db44a419e30d34264f533136b482"
+    },
+    {
+      "id": "vaisala-xweather/xweather-agent-skills:plugins/xweather/skills/mapsgl-android",
+      "name": "mapsgl-android",
+      "repo": "vaisala-xweather/xweather-agent-skills",
+      "path": "plugins/xweather/skills/mapsgl-android/SKILL.md",
+      "sha": "48409606de3e562779d383bf3711a13313dd661f"
+    },
+    {
+      "id": "vaisala-xweather/xweather-agent-skills:plugins/xweather/skills/mapsgl-apple",
+      "name": "mapsgl-apple",
+      "repo": "vaisala-xweather/xweather-agent-skills",
+      "path": "plugins/xweather/skills/mapsgl-apple/SKILL.md",
+      "sha": "7ab7883563a79aaa018c1a9a3247823105134aa6"
+    },
+    {
+      "id": "vaisala-xweather/xweather-agent-skills:plugins/xweather/skills/raster-maps",
+      "name": "raster-maps",
+      "repo": "vaisala-xweather/xweather-agent-skills",
+      "path": "plugins/xweather/skills/raster-maps/SKILL.md",
+      "sha": "42603ce651a70d199f7de4b4d383a883ce2383c5"
+    },
+    {
+      "id": "vaisala-xweather/xweather-agent-skills:plugins/xweather/skills/weather-api",
+      "name": "weather-api",
+      "repo": "vaisala-xweather/xweather-agent-skills",
+      "path": "plugins/xweather/skills/weather-api/SKILL.md",
+      "sha": "e1aceb7135d4c16cd893768cb3d7a70d370b1781"
+    },
+    {
+      "id": "vaisala-xweather/xweather-agent-skills:plugins/xweather/skills/webhooks",
+      "name": "webhooks",
+      "repo": "vaisala-xweather/xweather-agent-skills",
+      "path": "plugins/xweather/skills/webhooks/SKILL.md",
+      "sha": "bd2462225f7e34eba36b68caec0daa2548f1f994"
+    },
+    {
+      "id": "villagesql/villagesql-skills:skills/vsql-docs",
+      "name": "vsql-docs",
+      "repo": "villagesql/villagesql-skills",
+      "path": "skills/vsql-docs/SKILL.md",
+      "sha": "a0279c4258d35b1acdbdc34405733acc2d631c30"
+    },
+    {
+      "id": "villagesql/villagesql-skills:skills/vsql-install-server",
+      "name": "vsql-install-server",
+      "repo": "villagesql/villagesql-skills",
+      "path": "skills/vsql-install-server/SKILL.md",
+      "sha": "a71728e378e9908c67900df8df08426913c53fb9"
+    },
+    {
+      "id": "wingspanhq/mcp-claude-plugin:skills/checking-payments",
+      "name": "checking-payments",
+      "repo": "wingspanhq/mcp-claude-plugin",
+      "path": "skills/checking-payments/SKILL.md",
+      "sha": "b1a60db16a0db9222d58da230f1640a1ba504fd0"
+    },
+    {
+      "id": "wingspanhq/mcp-claude-plugin:skills/connect",
+      "name": "connect",
+      "repo": "wingspanhq/mcp-claude-plugin",
+      "path": "skills/connect/SKILL.md",
+      "sha": "32e175c0b2c5a0753acd8c6cc2cc9cdd12ff2386"
+    },
+    {
+      "id": "wingspanhq/mcp-claude-plugin:skills/creating-draft-payables",
+      "name": "creating-draft-payables",
+      "repo": "wingspanhq/mcp-claude-plugin",
+      "path": "skills/creating-draft-payables/SKILL.md",
+      "sha": "034a9a01b1889216122328b71597104470e90cc9"
+    },
+    {
+      "id": "wingspanhq/mcp-claude-plugin:skills/onboarding-contractors",
+      "name": "onboarding-contractors",
+      "repo": "wingspanhq/mcp-claude-plugin",
+      "path": "skills/onboarding-contractors/SKILL.md",
+      "sha": "a26a1ed00c8c8373aac8c032c3c41d05fe773df7"
+    },
+    {
+      "id": "wingspanhq/mcp-claude-plugin:skills/outstanding",
+      "name": "outstanding",
+      "repo": "wingspanhq/mcp-claude-plugin",
+      "path": "skills/outstanding/SKILL.md",
+      "sha": "52e3540484be9f873f47643e77e99410ad798186"
+    },
+    {
+      "id": "wingspanhq/mcp-claude-plugin:skills/troubleshooting-connection",
+      "name": "troubleshooting-connection",
+      "repo": "wingspanhq/mcp-claude-plugin",
+      "path": "skills/troubleshooting-connection/SKILL.md",
+      "sha": "8945242db1834535a6d07fa5b509038162ada34f"
+    },
+    {
+      "id": "wonderwhy-er/desktopcommandermcp:skills/desktop-commander-overview",
+      "name": "desktop-commander-overview",
+      "repo": "wonderwhy-er/desktopcommandermcp",
+      "path": "skills/desktop-commander-overview/SKILL.md",
+      "sha": "7fc41024bfcb4a014ecad06459c2c5faf1a4fadc"
+    },
+    {
+      "id": "wonderwhy-er/desktopcommandermcp:skills/obsidian-vault",
+      "name": "obsidian-vault",
+      "repo": "wonderwhy-er/desktopcommandermcp",
+      "path": "skills/obsidian-vault/SKILL.md",
+      "sha": "c8e8d9b255c98a90ed9bbc0fdda68fac37e32135"
+    },
+    {
+      "id": "workday/everywhere:plugins/sana/skills/using-workday-design",
+      "name": "using-workday-design",
+      "repo": "workday/everywhere",
+      "path": "plugins/sana/skills/using-workday-design/SKILL.md",
+      "sha": "ba105358887d22a88d7ad6a2e26e2dca5ec9583d"
+    },
+    {
+      "id": "workday/everywhere:plugins/sana/skills/workday",
+      "name": "workday",
+      "repo": "workday/everywhere",
+      "path": "plugins/sana/skills/workday/SKILL.md",
+      "sha": "5a39dc2272f9b39eed23222a4153539d2a0e800b"
+    },
+    {
+      "id": "workday/everywhere:plugins/sana/skills/workday-agent-dialogue",
+      "name": "workday-agent-dialogue",
+      "repo": "workday/everywhere",
+      "path": "plugins/sana/skills/workday-agent-dialogue/SKILL.md",
+      "sha": "e29fbcf6d71f72f4658c50f5cf3ea7eea2dcf1ce"
+    },
+    {
+      "id": "workday/everywhere:plugins/sana/skills/workday-onboard",
+      "name": "workday-onboard",
+      "repo": "workday/everywhere",
+      "path": "plugins/sana/skills/workday-onboard/SKILL.md",
+      "sha": "f033499bb5c123cf471842bdf32dd6be715a97ed"
+    },
+    {
+      "id": "workday/everywhere:plugins/sana/skills/workday-tools-only",
+      "name": "workday-tools-only",
+      "repo": "workday/everywhere",
+      "path": "plugins/sana/skills/workday-tools-only/SKILL.md",
+      "sha": "5b3395f8207747e0d583e515d7914126fc407fd3"
+    },
+    {
+      "id": "youdotcom-oss/agent-skills:skills/you-discover",
+      "name": "you-discover",
+      "repo": "youdotcom-oss/agent-skills",
+      "path": "skills/you-discover/SKILL.md",
+      "sha": "903c1a88587a69223ac2099426a6c368802555f3"
+    },
+    {
+      "id": "youdotcom-oss/agent-skills:skills/you-finance",
+      "name": "you-finance",
+      "repo": "youdotcom-oss/agent-skills",
+      "path": "skills/you-finance/SKILL.md",
+      "sha": "6897e53f7c504482449bf6a13e2fe9e2bed327e6"
+    },
+    {
+      "id": "youdotcom-oss/agent-skills:skills/you-research",
+      "name": "you-research",
+      "repo": "youdotcom-oss/agent-skills",
+      "path": "skills/you-research/SKILL.md",
+      "sha": "814b96f9acbe327596ef338dff496dc3cdc9f157"
+    },
+    {
+      "id": "zapier/zapier-mcp:plugins/zapier/skills/zapier-demo",
+      "name": "zapier-demo",
+      "repo": "zapier/zapier-mcp",
+      "path": "plugins/zapier/skills/zapier-demo/SKILL.md",
+      "sha": "1bda485002d9f1cab2d079ca957989a538e66c91"
+    },
+    {
+      "id": "zapier/zapier-mcp:plugins/zapier/skills/zapier-explore",
+      "name": "zapier-explore",
+      "repo": "zapier/zapier-mcp",
+      "path": "plugins/zapier/skills/zapier-explore/SKILL.md",
+      "sha": "12538fae155d70f27b696ad1142ecd943ae2050c"
+    },
+    {
+      "id": "zapier/zapier-mcp:plugins/zapier/skills/zapier-onboard",
+      "name": "zapier-onboard",
+      "repo": "zapier/zapier-mcp",
+      "path": "plugins/zapier/skills/zapier-onboard/SKILL.md",
+      "sha": "4b69531d538feac13a9c350ffc069c63527f8071"
+    },
+    {
+      "id": "zapier/zapier-mcp:plugins/zapier/skills/zapier-status",
+      "name": "zapier-status",
+      "repo": "zapier/zapier-mcp",
+      "path": "plugins/zapier/skills/zapier-status/SKILL.md",
+      "sha": "ec4c6697074fa590cb0b2e579c06d321cc813dfc"
+    },
+    {
+      "id": "zocks-communications/zocks-agent-plugins:skills/client-attrition-risk",
+      "name": "client-attrition-risk",
+      "repo": "zocks-communications/zocks-agent-plugins",
+      "path": "skills/client-attrition-risk/SKILL.md",
+      "sha": "6ab0365b5e2f7b7f34a14ba3fe9cce5fb03e89c2"
+    },
+    {
+      "id": "zocks-communications/zocks-agent-plugins:skills/client-behavioral-profile",
+      "name": "client-behavioral-profile",
+      "repo": "zocks-communications/zocks-agent-plugins",
+      "path": "skills/client-behavioral-profile/SKILL.md",
+      "sha": "d317370e7c252290f7003554e65cd9d33c2a9bb9"
+    },
+    {
+      "id": "zocks-communications/zocks-agent-plugins:skills/client-journey",
+      "name": "client-journey",
+      "repo": "zocks-communications/zocks-agent-plugins",
+      "path": "skills/client-journey/SKILL.md",
+      "sha": "db72f6ecdfd413a7c8e8e9c4b1bbbfd2f51c9e9f"
+    },
+    {
+      "id": "zocks-communications/zocks-agent-plugins:skills/held-away-radar",
+      "name": "held-away-radar",
+      "repo": "zocks-communications/zocks-agent-plugins",
+      "path": "skills/held-away-radar/SKILL.md",
+      "sha": "5ba37544724cd6ed1ea94f28bbfae79f06800278"
+    },
+    {
+      "id": "zocks-communications/zocks-agent-plugins:skills/household-review-pack",
+      "name": "household-review-pack",
+      "repo": "zocks-communications/zocks-agent-plugins",
+      "path": "skills/household-review-pack/SKILL.md",
+      "sha": "2293783b84d752d4b4131d2fb6fa7a8cf555c319"
+    },
+    {
+      "id": "zocks-communications/zocks-agent-plugins:skills/next-best-action",
+      "name": "next-best-action",
+      "repo": "zocks-communications/zocks-agent-plugins",
+      "path": "skills/next-best-action/SKILL.md",
+      "sha": "391e9ae731ed054af99fd8c93969adefd3bc62fa"
+    },
+    {
+      "id": "zocks-communications/zocks-agent-plugins:skills/tax-opportunity-scan",
+      "name": "tax-opportunity-scan",
+      "repo": "zocks-communications/zocks-agent-plugins",
+      "path": "skills/tax-opportunity-scan/SKILL.md",
+      "sha": "6c6baa80c81fc67086a6aea48ad9c6d2f371802a"
+    }
+  ],
+  "cutoverValidationPassed": true,
+  "existingRecordsChanged": 0,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "archive": "/Users/jonslimak/Projects/omgskills/index/shadow/directory1500-wave3-20261023"
+}

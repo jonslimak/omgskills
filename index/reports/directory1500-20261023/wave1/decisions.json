@@ -1,0 +1,7 @@
+{
+  "reviewSha256": "e7ee5253d3d0dc6f839b210eabeccba2dab78547950daa46c8b483c4eba414a3",
+  "excludeRepos": ["dominodatalab/domino-claude-plugin"],
+  "reason": "Repository explicitly says deprecated and moved to dominodatalab/domino-ai-plugin; do not admit the obsolete source.",
+  "approvedScope": "Source-verified recommended rows only; exact-path watch coverage; no featured status or broad trust roles.",
+  "reviewNotes": "11 organization-owned original-source repositories: Output.ai workflows, Zscaler administration, Amplitude analytics, Pigment planning, Meta Quest development, ZoomInfo GTM, Salesforce CRM, Windsor analytics, Bigdata research, SAP UI5, Duende Identity. Service/MCP access remains a separate prerequisite. Dependency, security and unresolved rows are held. No source commands were executed."
+}

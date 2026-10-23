@@ -1,0 +1,280 @@
+{
+  "generatedAt": "2026-10-23T16:42:39.296Z",
+  "worktree": "/private/tmp/omgskills-directory-backfill.PHz364",
+  "sourceCommit": "124d240a631a66218092f93f23dc6864519fdfd0",
+  "baselineSkillCount": 47690,
+  "finalSkillCount": 47731,
+  "addedCount": 41,
+  "progress": {
+    "planCandidateCount": 41,
+    "finalCount": 41,
+    "pendingCount": 0,
+    "addedCount": 41,
+    "existingCount": 0,
+    "policySkippedCount": 0,
+    "stableFailedCount": 0,
+    "transientFailedCount": 0
+  },
+  "missingBaselineCount": 0,
+  "cutoverValidationPassed": true,
+  "productionFilesChanged": false,
+  "addedSkills": [
+    {
+      "id": "anthropics/claude-for-financial-advisors:skills/alts-brief",
+      "name": "alts-brief",
+      "path": "skills/alts-brief/SKILL.md",
+      "sha": "00d98f0ae1270dd1d0f50e5b943b44c8c96b7b96"
+    },
+    {
+      "id": "anthropics/claude-for-financial-advisors:skills/compliance",
+      "name": "compliance",
+      "path": "skills/compliance/SKILL.md",
+      "sha": "38d0f6f5418e8567839d9926ede78676b331f276"
+    },
+    {
+      "id": "anthropics/claude-for-financial-advisors:skills/estate-and-tax-brief",
+      "name": "estate-and-tax-brief",
+      "path": "skills/estate-and-tax-brief/SKILL.md",
+      "sha": "df6950ba4bdba71bfee321c6b39ffaa990a29a2e"
+    },
+    {
+      "id": "anthropics/claude-for-financial-advisors:skills/post-meeting",
+      "name": "post-meeting",
+      "path": "skills/post-meeting/SKILL.md",
+      "sha": "88f6690f123865617663f6179bae738f07be06fe"
+    },
+    {
+      "id": "anthropics/claude-for-financial-advisors:skills/pre-meeting",
+      "name": "pre-meeting",
+      "path": "skills/pre-meeting/SKILL.md",
+      "sha": "bab91e9f9bc3a5679a5219fe194417cec65c83a9"
+    },
+    {
+      "id": "figma/mcp-server-guide:skills/figma-code-workflows",
+      "name": "figma-code-workflows",
+      "path": "skills/figma-code-workflows/SKILL.md",
+      "sha": "d4bdf11d5d2bd9f513c99db50a6335aa12095b53"
+    },
+    {
+      "id": "figma/mcp-server-guide:skills/figma-generative-plugins",
+      "name": "figma-generative-plugins",
+      "path": "skills/figma-generative-plugins/SKILL.md",
+      "sha": "e69ae3edebeee37d517f6dfb1a56fff495c8bad1"
+    },
+    {
+      "id": "figma/mcp-server-guide:skills/figma-shaders",
+      "name": "figma-shaders",
+      "path": "skills/figma-shaders/SKILL.md",
+      "sha": "4ff2ec0d9e2d79ea8c01d4cc165aa8782908d514"
+    },
+    {
+      "id": "figma/mcp-server-guide:skills/figma-spec",
+      "name": "figma-spec",
+      "path": "skills/figma-spec/SKILL.md",
+      "sha": "f9753a15675b50b81a2885b75806218c48abc3ff"
+    },
+    {
+      "id": "firecrawl/firecrawl-claude-plugin:skills/firecrawl-developer-index",
+      "name": "firecrawl-developer-index",
+      "path": "skills/firecrawl-developer-index/SKILL.md",
+      "sha": "a03bb6483b0b939f331f72ea670e91a005838163"
+    },
+    {
+      "id": "firecrawl/firecrawl-claude-plugin:skills/firecrawl-research-index",
+      "name": "firecrawl-research-index",
+      "path": "skills/firecrawl-research-index/SKILL.md",
+      "sha": "926d241a108a9cc90a4a686fbb383e1f6867a8f3"
+    },
+    {
+      "id": "getsentry/plugin-claude:skills/sentry-get-started",
+      "name": "sentry-get-started",
+      "path": "skills/sentry-get-started/SKILL.md",
+      "sha": "7017935504a2c2e328fc0dcff528b3a119cd491f"
+    },
+    {
+      "id": "getsentry/plugin-claude:skills/sentry-instrument",
+      "name": "sentry-instrument",
+      "path": "skills/sentry-instrument/SKILL.md",
+      "sha": "37975d03d8cf8e0e1483d472c513d9c8870ee01d"
+    },
+    {
+      "id": "getsentry/plugin-claude:skills/sentry-snapshots-cocoa",
+      "name": "sentry-snapshots-cocoa",
+      "path": "skills/sentry-snapshots-cocoa/SKILL.md",
+      "sha": "f1a9a041cb24446bccac6184baee45ff3e66caef"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-auth",
+      "name": "azuresql-db-auth",
+      "path": "skills/azuresql-db-auth/SKILL.md",
+      "sha": "8aad9c484fd7656768ef47919063b892ed58e1da"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-ci",
+      "name": "azuresql-db-ci",
+      "path": "skills/azuresql-db-ci/SKILL.md",
+      "sha": "61ec92ce9d17a2e65629e35eae338c9d33898d5f"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-connections",
+      "name": "azuresql-db-connections",
+      "path": "skills/azuresql-db-connections/SKILL.md",
+      "sha": "030e2a32bed40e5146b7ba3bdf37c65032688500"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-container",
+      "name": "azuresql-db-container",
+      "path": "skills/azuresql-db-container/SKILL.md",
+      "sha": "770a13b9aebb9db387e725dfa76a23f8162364f1"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-dab",
+      "name": "azuresql-db-dab",
+      "path": "skills/azuresql-db-dab/SKILL.md",
+      "sha": "4d312da40cf4c171dc31e8d6563bc0be6d1eb57c"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-faq",
+      "name": "azuresql-db-faq",
+      "path": "skills/azuresql-db-faq/SKILL.md",
+      "sha": "75cd616b2de0e30676ff6f397a89272c3594f8c7"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-feedback",
+      "name": "azuresql-db-feedback",
+      "path": "skills/azuresql-db-feedback/SKILL.md",
+      "sha": "c750264c58a97827f9a66b4eb4c3b3c38e982548"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-from-sql-server",
+      "name": "azuresql-db-from-sql-server",
+      "path": "skills/azuresql-db-from-sql-server/SKILL.md",
+      "sha": "6fe6441ad9d874fe085262c30f207f70f0eb9605"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-functions",
+      "name": "azuresql-db-functions",
+      "path": "skills/azuresql-db-functions/SKILL.md",
+      "sha": "cebba522a8f8277ab1fcfc49380aac966abe7b9e"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-import",
+      "name": "azuresql-db-import",
+      "path": "skills/azuresql-db-import/SKILL.md",
+      "sha": "a9a21f57965aa15e45d348fcb119f7bed7d16e9c"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-local-to-cloud",
+      "name": "azuresql-db-local-to-cloud",
+      "path": "skills/azuresql-db-local-to-cloud/SKILL.md",
+      "sha": "9361356759461db5153d55ab809035256f3b424d"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-rag",
+      "name": "azuresql-db-rag",
+      "path": "skills/azuresql-db-rag/SKILL.md",
+      "sha": "842c0ca0dd936ada3c3d308102447deda915c48c"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-scaffold",
+      "name": "azuresql-db-scaffold",
+      "path": "skills/azuresql-db-scaffold/SKILL.md",
+      "sha": "15408a80be9ed30e0dd5708665628a20ea488c39"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-schema-migration",
+      "name": "azuresql-db-schema-migration",
+      "path": "skills/azuresql-db-schema-migration/SKILL.md",
+      "sha": "669280b476dc0442ef7af15c951b43865dc6fa8a"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-seed",
+      "name": "azuresql-db-seed",
+      "path": "skills/azuresql-db-seed/SKILL.md",
+      "sha": "36f21896521792534f056295d7520e555e84e11e"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-sidecar",
+      "name": "azuresql-db-sidecar",
+      "path": "skills/azuresql-db-sidecar/SKILL.md",
+      "sha": "dd68c47bc984d51956a98fd01f35e50874e9e769"
+    },
+    {
+      "id": "microsoft/azure-sql-database-container:skills/azuresql-db-testing",
+      "name": "azuresql-db-testing",
+      "path": "skills/azuresql-db-testing/SKILL.md",
+      "sha": "2d11b2c227261763c21f27b9620c6cc413a7a90a"
+    },
+    {
+      "id": "microsoft/dataverse-skills:.github/plugins/dataverse/skills/erp-xpp",
+      "name": "erp-xpp",
+      "path": ".github/plugins/dataverse/skills/erp-xpp/SKILL.md",
+      "sha": "11355eb5ea8edec1dbe9be2daac4403bd427e0e3"
+    },
+    {
+      "id": "neondatabase/agent-skills:skills/neon",
+      "name": "neon",
+      "path": "skills/neon/SKILL.md",
+      "sha": "e14746355ddd8bcac120b9d03fe14c8d4802957a"
+    },
+    {
+      "id": "neondatabase/agent-skills:skills/neon-ai-gateway",
+      "name": "neon-ai-gateway",
+      "path": "skills/neon-ai-gateway/SKILL.md",
+      "sha": "e80b01f34e9d3da43e91ff17db6593a8e4d95b42"
+    },
+    {
+      "id": "neondatabase/agent-skills:skills/neon-auth",
+      "name": "neon-auth",
+      "path": "skills/neon-auth/SKILL.md",
+      "sha": "a06bbac6e9bc2789f0367f8511b3b1b2c1cc9fe6"
+    },
+    {
+      "id": "neondatabase/agent-skills:skills/neon-functions",
+      "name": "neon-functions",
+      "path": "skills/neon-functions/SKILL.md",
+      "sha": "5dda4ba1479426c15392de286279b7ecf15e26be"
+    },
+    {
+      "id": "neondatabase/agent-skills:skills/neon-object-storage",
+      "name": "neon-object-storage",
+      "path": "skills/neon-object-storage/SKILL.md",
+      "sha": "a2373e69e130ac685e982fa65c8f1e618073b415"
+    },
+    {
+      "id": "neondatabase/agent-skills:skills/neon-postgres-branches",
+      "name": "neon-postgres-branches",
+      "path": "skills/neon-postgres-branches/SKILL.md",
+      "sha": "d9cc2f8ac1f9aafcc992695037461683c533df73"
+    },
+    {
+      "id": "stripe/ai:skills/metronome",
+      "name": "metronome",
+      "path": "skills/metronome/SKILL.md",
+      "sha": "ba7294b9ebed6fb82b56d0408c0d75be527df049"
+    },
+    {
+      "id": "stripe/ai:skills/stripe-pay",
+      "name": "stripe-pay",
+      "path": "skills/stripe-pay/SKILL.md",
+      "sha": "3a253344c8a304a04151b136c13a5398feba89e7"
+    },
+    {
+      "id": "vercel/vercel-plugin:skills/create-a-backend",
+      "name": "create-a-backend",
+      "path": "skills/create-a-backend/SKILL.md",
+      "sha": "4b3e3a9b1ba666db239874f90d2d1974e35168f5"
+    }
+  ],
+  "published": false,
+  "preservedInWorkspace": "/Users/jonslimak/Projects/omgskills",
+  "preservedAt": "2026-10-23T16:43:46.354Z",
+  "coverageCommit": "124d240a631a66218092f93f23dc6864519fdfd0",
+  "coveragePushedToMain": true,
+  "workspaceBaselineSkillCount": 47690,
+  "workspaceFinalSkillCount": 47731,
+  "workspaceOutcomes": {
+    "added": 41
+  },
+  "archivedBatchState": "/Users/jonslimak/Projects/omgskills/index/shadow/directory-batch-20261023"
+}

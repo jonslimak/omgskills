@@ -1,0 +1,754 @@
+# Directory backfill review
+
+Wave: wave3; reviewed 600; recommended 425.
+
+- mondaycom/mcp: 9/9 recommended; Enable AI agents to work reliably - giving them secure access to structured data, tools to take action, and the context needed to make smart decisions.
+- ngrok/skills: 9/9 recommended; Official repository for ngrok agent skills.
+- noibu/ai-plugin: 7/9 recommended;
+- pinecone-io/pinecone-claude-code-plugin: 8/9 recommended; The official Pinecone marketplace for Claude Code Plugins
+- rilldata/agent-skills: 7/9 recommended; Agent skills for developing a Rill project
+- slackapi/slack-skills-plugin: 4/9 recommended; Claude Code, Codex, Cursor, and npx skills plugin that enables your AI tools with a Slack MCP Server and Slack Developer Skills.
+- taboola/realize-claude-plugin: 5/9 recommended;
+- topoteretes/cognee-integrations: 0/9 recommended;
+- airtable/skills: 8/8 recommended;
+- boltz-bio/boltz-api-skills: 0/8 recommended; claude code/codex skills/plugins for boltz-compute
+- launchnotes/mcp-server-guide: 8/8 recommended; A guide to using the LaunchNotes MCP server
+- lseg-api-samples/lseg-claude-plugin: 0/8 recommended;
+- remoteoss/remote-for-ai: 7/8 recommended; Remote for AI: plugins and skills that help your agents work safely with Remote.
+- runpod/runpod-plugins-official: 0/8 recommended; Official Runpod plugin for AI coding agents. Skills plus the hosted Runpod MCP server for managing pods, serverless endpoints, templates and volumes. Works with Claude Code, Codex and Gemini CLI.
+- wingspanhq/mcp-claude-plugin: 6/8 recommended;
+- buildkite/skills: 7/7 recommended; Official Buildkite skills for Claude Code, Cursor, and other AI coding agents
+- canva-sdks/canva-skills: 1/7 recommended; Ready-to-use Canva Skills that improve creative workflows using the Canva Connector.
+- crowdstrike/fusion-skills: 1/7 recommended; AI coding assistant skills for building CrowdStrike Falcon Fusion workflows: action discovery, YAML authoring, deployment, execution monitoring, and best practices for triggers, conditions, loops, and HTTP Actions.
+- endgame-labs/endgame-plugin: 7/7 recommended; Official Claude plugin from Endgame for GTM teams.
+- hadifrt20/vouch: 7/7 recommended; Pre-flight checks for AI agents — Claude Code plugin with adversary verification, atomic budgets, and tournament-gated prompt promotion.
+- hostinger/claude-plugin: 7/7 recommended; Used in order to publish Hostinger Claude Plugin
+- jfrog/claude-plugin: 2/7 recommended;
+- knocklabs/skills: 7/7 recommended;
+- phished-bv/phished-claude-plugin: 7/7 recommended; Claude Code plugin bundling the Phished MCP server with reporting, simulation and risk-detection commands
+- sap/open-ux-tools: 0/7 recommended; Enable community collaboration to jointly promote and facilitate best in class tooling capabilities
+- zocks-communications/zocks-agent-plugins: 7/7 recommended; A Zocks plugin that equips your AI tools with a Zocks MCP Server and skills for financial advisors.
+- activecampaign/activecampaign-plugin: 6/6 recommended; ActiveCampaign plugin for Claude — marketing automation, CRM, and email marketing in Claude Code and Claude Co-Work.
+- atlassian/forge-skills: 5/6 recommended; The Forge Skills Plugin bundles several Forge-focused skills plus MCP-backed tooling so your agent can scaffold apps, review them before deploy, debug production issues, and stay current on Forge APIs and the Atlassian Design System.
+- bigexchange/bigid-plugin-official: 6/6 recommended;
+- blackrock/advisor-center-agent-skills: 6/6 recommended;
+- codacy/codacy-skills: 0/6 recommended;
+- dropbox/dropbox-ai-plugins: 6/6 recommended;
+- gitbookio/gitbook-skills: 3/6 recommended; A collection of skills, agents for using GitBook in local AI tools.
+- grain-team/grain-meeting-memory-plugin: 0/6 recommended;
+- grasp-ai/grasp-mcp-plugin: 6/6 recommended; Grasp plugin for Claude — deal-work skills backed by the hosted Grasp MCP server.
+- leadfeeder/leadfeeder-mcp-plugin: 6/6 recommended; Leadfeeder Plugin & Skills
+- lusha-oss/lusha-mcp-plugin: 6/6 recommended;
+- qase-tms/qase-quality-supervisor: 0/6 recommended; Agentic QA quality-intelligence for Qase, as an installable plugin: coverage gaps, failure triage, flakiness, and release readiness — evidence-backed, read-only by default, deletions blocked in code.
+- sumup/sumup-skills: 6/6 recommended; Agent Skills for teaching agents how to build with SumUp.
+- supermetrics-public/claude-marketing-plugin: 6/6 recommended; Marketing analytics plugin for Claude Code — 42 workflows for performance marketers, marketing leaders, demand gen, content, field, and ecommerce teams. Built on the Supermetrics connector.
+- tinyfish-io/tinyfish-web-agent-integrations: 6/6 recommended; TinyFish Web Agent integrations with workflow automation tools and AI agent frameworks
+- vaisala-xweather/xweather-agent-skills: 6/6 recommended; Agent skills for the Xweather developer platform when working with Xweather services.
+- wonderwhy-er/desktopcommandermcp: 2/6 recommended; This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities
+- 42crunch-ai/claude-plugins: 1/5 recommended; 42Crunch plugin marketplace for Claude Code and AI coding tools. Provides plugins that enable OpenAPI auditing, OWASP API vulnerability scanning, and validation of fixes to enforce API security guardrails.
+- apify/apify-claude-code-plugin: 5/5 recommended;
+- apolloio/apollo-mcp-plugin: 5/5 recommended; Connect Claude Code + Cowork to Apollo MCP via this plugin
+- appfollow/appfollow-ai-toolkit: 3/5 recommended; Appfollow AI Toolkit is a native plugin that connects to your AppFollow account over MCP and gives your agent a set of guided workflows for app-store research and review analysis. No dashboards to build, no queries to write. Just ask, and the agent runs the workflow.
+- chronograph-pe/chronograph-gp-claude-plugin: 5/5 recommended; Chronograph GP — Claude plugin. Portfolio monitoring, valuations, and analytics for private capital GP teams.
+- customerio/claude-plugin: 5/5 recommended; Official Customer.io plugin for Claude Code and Cowork — MCP connector plus skills and slash commands.
+- cypress-io/ai-toolkit: 5/5 recommended; Fast, flexible, and open tooling for building intelligent workflows with Cypress.
+- datahub-project/datahub-cloud-ai-plugins: 5/5 recommended; DataHub Cloud plugin for Claude Cowork, Claude Code, Codex, & ChatGPT — catalog search, lineage, data quality, and SQL via the DataHub MCP server
+- eon-io/claude-code-eon-plugin: 5/5 recommended;
+- fullstorydev/fullstory-skills: 4/5 recommended;
+- getsentry/plugin-claude: 0/5 recommended; Official Sentry for Claude Code plugin
+- junipersquare-public/plugins: 5/5 recommended; Juniper Square plugins for Claude — query and act on your private markets data across investor contacts, fund offerings, positions, subscriptions, and documents.
+- kobiton/automate: 1/5 recommended; AI coding assistant plugin for the Kobiton mobile testing platform. Works with Claude Code, Copilot CLI, Gemini CLI Extension, Cursor CLI and Codex CLI to manage devices, upload apps, run mobile automation, and view test results directly from your workspace.
+- mondaycom/monday-claude-cowork-plugin: 5/5 recommended; The official monday.com plugin for Claude Cowork
+- morningstar/morningstar-plugins: 5/5 recommended; AI Plugins
+- oaknational/oak-ai-plugins: 3/5 recommended; Oak National Academy's Open Curriculum plugin for AI assistants
+- opsera-agents/opsera-devsecops: 5/5 recommended; Claude Code plugin that provides DevSecOps tools — architecture analysis, security scanning, compliance auditing, and SQL security — powered by the Opsera MCP server.
+- pactflow/pactflow-agent-skills: 5/5 recommended; Plugins, Subagents & Agent Skills for Pactflow, Pact & Drift
+- rocketreach/rocketreach-mcp-plugin: 5/5 recommended;
+- starburstlabs/wealthbox-plugin: 5/5 recommended;
+- unstructured-io/unstructured-foundation-marketplace: 5/5 recommended; Claude Code and Codex plugin marketplace for Unstructured Foundation.
+- workday/everywhere: 5/5 recommended; Bringing the power of Workday into your natural flow of work.
+- youdotcom-oss/agent-skills: 3/5 recommended; You.com skills and plugins for web search, content extraction, research, finance, and integration discovery, helping AI agents build with up-to-date web context.
+- chronograph-pe/chronograph-lp-claude-plugin: 4/4 recommended; Chronograph LP — Claude plugin. Portfolio monitoring and analytics for private capital LP teams.
+- couchbase-ecosystem/agent-skills: 3/4 recommended; Couchbase agent skills bring Couchbase expertise to your agents out of the box, letting them operate from authoritative knowledge rather than relying on training data or guesswork. Designed with the enterprise-supported Couchbase MCP server, these skills work against a real, live cluster — grounding every answer in your actual schema, data, and ind
+- dequelabs/axe-accessibility: 3/4 recommended; Deque's accessibility toolkit for coding agents.
+- euler-software-inc/euler-skills: 4/4 recommended;
+- growthbook/skills: 0/4 recommended; Agent Skills for GrowthBook
+- intercom/claude-plugin-external: 4/4 recommended; Intercom plugin for Claude Code
+- krea-ai/skills: 1/4 recommended;
+- mercadopago/mercadopago-claude-marketplace: 2/4 recommended; Claude Code plugin marketplace for Mercado Pago payment integrations — checkout, webhooks, credential protection, and SDK patterns.
+- newrelic/claude-code-plugin: 1/4 recommended;
+- riversidefm/riverside-mcp-public: 4/4 recommended; Riverside public plugin entry point for various AI clients — connect Riverside recordings, transcripts, editing, and social publishing to your agent.
+- zapier/zapier-mcp: 4/4 recommended; Official plugin distribution for the hosted Zapier MCP server. Install it in your AI client and connect to thousands of apps.
+- cloudinary-devs/cloudinary-plugin: 3/3 recommended; Cloudinary's official Cursor/Claude Code plugins
+- epicgames/unreal-engine-skills-for-claude-code-plugin: 3/3 recommended;
+- gc-ai-inc/gc-ai-claude-plugin: 3/3 recommended; Work in your GC AI legal knowledge base from Claude. Upload documents, run review playbooks, and ask questions grounded in your own files, all as you.
+- grafana/ai-marketplace: 3/3 recommended;
+- kensho-technologies/spglobal-agent-skills: 1/3 recommended;
+- luminpdf/wyatt-plugin: 3/3 recommended; Wyatt plugin code
+- lusha-oss/lusha-mcp-talent-sourcing-plugin: 3/3 recommended; Lusha HR MCP plugin
+- meshy-dev/meshy-3d-agent: 3/3 recommended; AI agent skills for Meshy AI 3D generation platform
+- mobbin/skills: 3/3 recommended; Official Mobbin skills for designing and building UI with Mobbin, the industry standard in UI & UX design references for mobile apps, web apps, and websites
+- monta-app/claude-plugin-monta: 3/3 recommended; Monta plugin for Claude Code and Cowork: operate EV charging infrastructure through the Monta API
+- onesignal/onesignal-agent-plugin: 0/3 recommended;
+- semgrep/guardian: 3/3 recommended; Home for the Semgrep Claude Code Plugin.
+- snowflake-labs/snowflake-ai-kit: 0/3 recommended; Snowflake AI Kit: Cortex Code plugin for automatic Snowflake routing, envelope-based permission policy, and one-command installers for Snowflake CLI + Cortex Code CLI.
+- socialinsiderio/socialinsider-claude-plugin: 0/3 recommended;
+- thoughtspot/spottercode-mcp-plugin: 3/3 recommended;
+- unbounce/agent-plugins: 2/3 recommended; Unbounce's plugin marketplace for AI agents. Install the unbounce-mcp plugin in Claude Code/Cowork and ChatGPT/Codex.
+- vaadin/agent-skills: 2/3 recommended; Agent skills for helping coding agents build, style, test, and secure Vaadin 25 applications.
+- vantainc/vanta-mcp-plugin: 0/3 recommended; Official Vanta plugin for Claude Code
+- villagesql/villagesql-skills: 2/3 recommended; Agent skills for VillageSQL - gemini-cli-extension; claude-code-plugin
+- altimateai/altimate-claude-plugin: 0/2 recommended; Claude Code plugin: delegates dbt and warehouse tasks to the altimate-code CLI (100+ data engineering tools).
+- b12io/b12-plugins: 2/2 recommended; B12 Website Generator plugin allows you to create a professional, engaging, and user-friendly website in seconds using AI. To create a website, you need to provide a name for your project/business, along with a description of the project/business (goals, structure, etc.).
+- blaxel-ai/agent-skills: 1/2 recommended;
+- botify-hq/ai-plugins: 2/2 recommended; Query and act on your Botify organic search data: crawl, log file and Search Console analysis, keyword research, and on-page fixes.
+- checkly/checkly-plugin: 2/2 recommended; Checkly ecosystem plugin — skills for Monitoring as Code and soon specialized agents.
+- exa-labs/exa-mcp-server: 2/2 recommended; Exa MCP for web search and web crawling!
+- functionizeinc/functionize-mcp-plugin: 1/2 recommended; Connects Claude to the hosted Functionize MCP server and bundles skills for driving it well: test authoring, session management, and agent-orchestration workflows.
+- groundcover-com/claude-plugin-groundcover: 2/2 recommended; Official groundcover Plugin for Claude
+- handsontable/handsontable-skills: 2/2 recommended; Claude skills for Handsontable and HyperFormula
+- intuit/intuit-plugins-official: 2/2 recommended;
+- jetbrains/teamcity-cli: 0/2 recommended; TeamCity from your terminal – or your AI's. Builds, logs, agents, agent terminals, queues.
+- keenableai/keenable-claude-plugin: 2/2 recommended; Keenable plugin for Claude: keyless web search and clean page extraction via Keenable's hosted MCP server, with web research skills.
+- middesk/plugins: 0/2 recommended; Middesk plugin for Claude Code — order, retrieve, and search businesses via the Middesk MCP server
+- paypal/ai-toolkit: 1/2 recommended; A plugin that integrates PayPal's APIs and MCP server across multiple AI coding agents (Claude Code, Cursor and more) into your development workflow.
+- preset-io/agent-skills: 1/2 recommended; Agent skills for Preset, Apache Superset and Superset MCP — `sup` CLI, HTTP/SDK and MCP workflows from a single source.
+- sap/ui-theme-designer-plugins-for-coding-agents: 2/2 recommended; Equips AI coding agents with knowledge and tooling for working with UI theme designer, the SAP Design System, and SAP Fiori design tokens.
+- spotify/save-to-spotify: 1/2 recommended; Command line interface to save your personal media to Spotify.
+- stackhawk/agent-skills: 2/2 recommended; Security testing skills for AI coding agents. Find and fix exploitable vulnerabilities without leaving your workflow.
+- sumologic/sumologic-ai-plugins: 2/2 recommended;
+- supabase-community/supabase-plugin: 1/2 recommended; Supabase plugin for AI coding assistants
+- synthflowai/anthropicplugin: 2/2 recommended;
+- ukg/ukg-ai-marketplace: 2/2 recommended;
+- unleash/unleash-claude-skills: 2/2 recommended; Unleash Claude Plugin with multiple skills for enterprise feature management
+- workos/skills: 0/2 recommended;
+- 1password/1password-claude-plugin: 1/1 recommended; 1Password Developer Environments as a Claude desktop extension (MCPB) for macOS
+- aiven/aiven-ai-plugins: 1/1 recommended; A plugin for Claude and Cursor for managing services and building applications with Aiven services.
+- apptweak/mcp-crossclient: 1/1 recommended;
+- atlanhq/agent-toolkit: 1/1 recommended; Atlan AI Agent Toolkit
+- atlassian-labs/twg-plugins: 0/1 recommended; Teamwork Graph CLI is Atlassian's agent-first interface to your entire work context: Jira issues, Confluence pages, Bitbucket PRs, along with your connected third-party data sources. Purpose-built for coding agents
+- binyamineden/letmewatch: 0/1 recommended; Give Claude eyes for video. A Claude Code plugin for analyzing videos with scene detection.
+- cerebriumai/cerebrium-skills: 1/1 recommended; Skills for using the Cerebrium platform with agents
+- confident-ai/confident-client: 0/1 recommended;
+- endorlabs/ai-plugins: 0/1 recommended; Endor Labs Agent Kit plugins for Claude Code, Codex, Gemini CLI, Antigravity CLI, Cursor, and Cursor SDK: packaged AppSec workflows for SCA remediation, AI SAST triage, CI/CD posture, malware response, findings review, Endor Labs setup, and more.
+- finchat-project-atlas/fiscal-ai-claude-plugin: 1/1 recommended; Official Fiscal.ai MCP and financial research skill package for Claude.
+- fingerprintjs/fingerprint-mcp-server: 0/1 recommended; Official Fingerprint MCP Server
+- gendigitalinc/sage: 1/1 recommended; Lightweight Agent Detection & Response (ADR) layer for AI agents — guards commands, files, and web requests. Part of Gen Agent Trust Hub.
+- getsentry/cli: 0/1 recommended; Sentry CLI
+- legalzoom/claude-plugins: 0/1 recommended; Claude plugin marketplace for LegalZoom (public release)
+- logrocket/logrocket-claude-plugin: 0/1 recommended;
+- mintlify/mintlify-claude-plugin: 1/1 recommended; Official plugin for using Mintlify in Claude Code and Claude Cowork
+- pixeltable/pixeltable-skill: 1/1 recommended; Agent skill, plugin and MCP server for building multimodal AI apps with Pixeltable in Claude Code, Cursor, Codex and Gemini CLI. Tables, computed columns, embedding search, UDFs and 30+ AI providers.
+- privco/privco-claude-plugin: 1/1 recommended; PrivCo's official Claude Code plugin + marketplace — 17 MCP tools + the PrivCo search skill in one install (API key via keychain).
+- propertyme/ai-skills: 1/1 recommended; AI Skills for the PropertyMe Platform
+- scrimba/explainer-mcp-plugin: 1/1 recommended;
+- search-atlas-group/amm-toolkit: 0/1 recommended;
+- servicenow/sdk: 1/1 recommended; Fluent SDK
+- slint-ui/ai-plugins: 1/1 recommended; Official Slint plugin and skills for AI coding agents. Generated from slint-ui/slint
+- sonatype/guide-claude-plugin: 1/1 recommended; Claude Code plugin for Sonatype Guide
+- sourcegraph-community/sourcegraph-claudecode-plugin: 1/1 recommended; Claude Code plugin for Sourcegraph
+- treblle/treblle-mcp-plugin: 0/1 recommended; Treblle plugin for Claude Code. Get read-only access to your APIs, requests, endpoints, customers, etc. using the Treblle MCP
+- upbound/skills: 1/1 recommended; Agent Skills for the Upbound Platform — Kubernetes control plane fleets, starting with Claude Code. So your agent gets fleet state right instead of confidently wrong.
+- workday/workdaydeveloperagentforclaude: 1/1 recommended; Claude Plugin materials to enable Claude Code to invoke Workday Developer Agent.
+- workiom/workiom-plugin: 1/1 recommended;
+
+- recommended: mondaycom/mcp activity-insights (plugins/monday-crm/skills/activity-insights/SKILL.md)
+- recommended: mondaycom/mcp automate-crm (plugins/monday-crm/skills/automate-crm/SKILL.md)
+- recommended: mondaycom/mcp daily-briefing (plugins/monday-crm/skills/daily-briefing/SKILL.md)
+- recommended: mondaycom/mcp data-cleanup (plugins/monday-crm/skills/data-cleanup/SKILL.md)
+- recommended: mondaycom/mcp forecast (plugins/monday-crm/skills/forecast/SKILL.md)
+- recommended: mondaycom/mcp log-activity (plugins/monday-crm/skills/log-activity/SKILL.md)
+- recommended: mondaycom/mcp meeting-to-deal (plugins/monday-crm/skills/meeting-to-deal/SKILL.md)
+- recommended: mondaycom/mcp run-sequence (plugins/monday-crm/skills/run-sequence/SKILL.md)
+- recommended: mondaycom/mcp workspace-builder (plugins/monday-crm/skills/workspace-builder/SKILL.md)
+- recommended: ngrok/skills expose-localhost (skills/expose-localhost/SKILL.md)
+- recommended: ngrok/skills ngrok-engine (skills/ngrok-engine/SKILL.md)
+- recommended: ngrok/skills ngrok-setup (skills/ngrok-setup/SKILL.md)
+- recommended: ngrok/skills ngrok-surfaces (skills/ngrok-surfaces/SKILL.md)
+- recommended: ngrok/skills provision-sandbox-access (skills/provision-sandbox-access/SKILL.md)
+- recommended: ngrok/skills receive-webhooks (skills/receive-webhooks/SKILL.md)
+- recommended: ngrok/skills run-mcp-gateway (skills/run-mcp-gateway/SKILL.md)
+- recommended: ngrok/skills secure-endpoint (skills/secure-endpoint/SKILL.md)
+- recommended: ngrok/skills troubleshoot-ngrok (skills/troubleshoot-ngrok/SKILL.md)
+- plugin-runtime-review: noibu/ai-plugin ab-test-opportunity-finder (src/skills/ab-test-opportunity-finder/SKILL.md)
+- recommended: noibu/ai-plugin accessibility-audit (src/skills/accessibility-audit/SKILL.md)
+- recommended: noibu/ai-plugin build-business-context (src/skills/build-business-context/SKILL.md)
+- recommended: noibu/ai-plugin checkout-analysis (src/skills/checkout-analysis/SKILL.md)
+- recommended: noibu/ai-plugin product-analysis (src/skills/product-analysis/SKILL.md)
+- recommended: noibu/ai-plugin querying-noibu-data (src/skills/querying-noibu-data/SKILL.md)
+- recommended: noibu/ai-plugin segment-analysis (src/skills/segment-analysis/SKILL.md)
+- recommended: noibu/ai-plugin store-pulse (src/skills/store-pulse/SKILL.md)
+- dependency-review: noibu/ai-plugin tech-diagnosis (src/skills/tech-diagnosis/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:assistant (skills/assistant/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:cli (skills/cli/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:docs (skills/docs/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:full-text-search (skills/full-text-search/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:help (skills/help/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:mcp (skills/mcp/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:n8n (skills/n8n/SKILL.md)
+- recommended: pinecone-io/pinecone-claude-code-plugin pinecone:query (skills/query/SKILL.md)
+- plugin-runtime-review: pinecone-io/pinecone-claude-code-plugin pinecone:quickstart (skills/quickstart/SKILL.md)
+- recommended: rilldata/agent-skills rill-analysis (skills/rill-analysis/SKILL.md)
+- recommended: rilldata/agent-skills rill-canvas (skills/rill-canvas/SKILL.md)
+- recommended: rilldata/agent-skills rill-connector (skills/rill-connector/SKILL.md)
+- recommended: rilldata/agent-skills rill-development (skills/rill-development/SKILL.md)
+- recommended: rilldata/agent-skills rill-explore (skills/rill-explore/SKILL.md)
+- recommended: rilldata/agent-skills rill-metrics-view (skills/rill-metrics-view/SKILL.md)
+- dependency-review: rilldata/agent-skills rill-model (skills/rill-model/SKILL.md)
+- dependency-review: rilldata/agent-skills rill-rillyaml (skills/rill-rillyaml/SKILL.md)
+- recommended: rilldata/agent-skills rill-theme (skills/rill-theme/SKILL.md)
+- recommended: slackapi/slack-skills-plugin block-kit (skills/block-kit/SKILL.md)
+- recommended: slackapi/slack-skills-plugin create-slack-app (skills/create-slack-app/SKILL.md)
+- recommended: slackapi/slack-skills-plugin deploy-slack-app (skills/deploy-slack-app/SKILL.md)
+- already-present: slackapi/slack-skills-plugin slack-api (skills/slack-api/SKILL.md)
+- security-review: slackapi/slack-skills-plugin slack-cli (skills/slack-cli/SKILL.md)
+- already-present: slackapi/slack-skills-plugin slack-docs (skills/slack-docs/SKILL.md)
+- already-present: slackapi/slack-skills-plugin slack-messaging (skills/slack-messaging/SKILL.md)
+- already-present: slackapi/slack-skills-plugin slack-search (skills/slack-search/SKILL.md)
+- recommended: slackapi/slack-skills-plugin test-slack-app (skills/test-slack-app/SKILL.md)
+- recommended: taboola/realize-claude-plugin accounts (skills/accounts/SKILL.md)
+- dependency-review: taboola/realize-claude-plugin campaigns (skills/campaigns/SKILL.md)
+- plugin-runtime-review: taboola/realize-claude-plugin diagnose-tracking (skills/diagnose-tracking/SKILL.md)
+- dependency-review: taboola/realize-claude-plugin discovery (skills/discovery/SKILL.md)
+- recommended: taboola/realize-claude-plugin manage-campaigns (skills/manage-campaigns/SKILL.md)
+- recommended: taboola/realize-claude-plugin optimize-campaign (skills/optimize-campaign/SKILL.md)
+- recommended: taboola/realize-claude-plugin reports (skills/reports/SKILL.md)
+- plugin-runtime-review: taboola/realize-claude-plugin support (skills/support/SKILL.md)
+- recommended: taboola/realize-claude-plugin web-fallback (skills/web-fallback/SKILL.md)
+- plugin-runtime-review: topoteretes/cognee-integrations cognee-code (integrations/claude-code/skills/cognee-code/SKILL.md)
+- ambiguous-paths: topoteretes/cognee-integrations cognee-digest
+- ambiguous-paths: topoteretes/cognee-integrations cognee-forget
+- ambiguous-paths: topoteretes/cognee-integrations cognee-remember
+- ambiguous-paths: topoteretes/cognee-integrations cognee-search
+- ambiguous-paths: topoteretes/cognee-integrations cognee-standup
+- ambiguous-paths: topoteretes/cognee-integrations cognee-switch-datasets
+- ambiguous-paths: topoteretes/cognee-integrations cognee-sync
+- ambiguous-paths: topoteretes/cognee-integrations cognee-timeline
+- recommended: airtable/skills agent-activity-log (plugins/airtable/skills/agent-activity-log/SKILL.md)
+- recommended: airtable/skills airtable-cli (plugins/airtable/skills/airtable-cli/SKILL.md)
+- recommended: airtable/skills airtable-filters (plugins/airtable/skills/airtable-filters/SKILL.md)
+- recommended: airtable/skills airtable-overview (plugins/airtable/skills/airtable-overview/SKILL.md)
+- recommended: airtable/skills marketing-ops (plugins/airtable/skills/marketing-ops/SKILL.md)
+- recommended: airtable/skills product-ops (plugins/airtable/skills/product-ops/SKILL.md)
+- recommended: airtable/skills sales-ops (plugins/airtable/skills/sales-ops/SKILL.md)
+- recommended: airtable/skills show-airtable-link (plugins/airtable/skills/show-airtable-link/SKILL.md)
+- ambiguous-paths: boltz-bio/boltz-api-skills boltz-check-status
+- security-review: boltz-bio/boltz-api-skills boltz-cli-setup (skills/boltz-cli-setup/SKILL.md)
+- ambiguous-paths: boltz-bio/boltz-api-skills boltz-protein-design
+- ambiguous-paths: boltz-bio/boltz-api-skills boltz-protein-screen
+- ambiguous-paths: boltz-bio/boltz-api-skills boltz-small-molecule-adme
+- ambiguous-paths: boltz-bio/boltz-api-skills boltz-small-molecule-design
+- ambiguous-paths: boltz-bio/boltz-api-skills boltz-small-molecule-screen
+- ambiguous-paths: boltz-bio/boltz-api-skills boltz-structure-and-binding
+- recommended: launchnotes/mcp-server-guide launchnotes-draft-from-work (skills/launchnotes-draft-from-work/SKILL.md)
+- recommended: launchnotes/mcp-server-guide launchnotes-feedback-to-roadmap (skills/launchnotes-feedback-to-roadmap/SKILL.md)
+- recommended: launchnotes/mcp-server-guide launchnotes-import-existing-changelog (skills/launchnotes-import-existing-changelog/SKILL.md)
+- recommended: launchnotes/mcp-server-guide launchnotes-post-roadmap-update (skills/launchnotes-post-roadmap-update/SKILL.md)
+- recommended: launchnotes/mcp-server-guide launchnotes-release-recap (skills/launchnotes-release-recap/SKILL.md)
+- recommended: launchnotes/mcp-server-guide launchnotes-ship-the-roadmap (skills/launchnotes-ship-the-roadmap/SKILL.md)
+- recommended: launchnotes/mcp-server-guide launchnotes-style-your-page (skills/launchnotes-style-your-page/SKILL.md)
+- recommended: launchnotes/mcp-server-guide launchnotes-use (skills/launchnotes-use/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin bond-futures-basis (skills/bond-futures-basis/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin bond-relative-value (skills/bond-relative-value/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin equity-research (skills/equity-research/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin fixed-income-portfolio (skills/fixed-income-portfolio/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin fx-carry-trade (skills/fx-carry-trade/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin macro-rates-monitor (skills/macro-rates-monitor/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin option-vol-analysis (skills/option-vol-analysis/SKILL.md)
+- duplicate-existing-sha: lseg-api-samples/lseg-claude-plugin swap-curve-strategy (skills/swap-curve-strategy/SKILL.md)
+- recommended: remoteoss/remote-for-ai remote-api-auth (skills/remote-api-auth/SKILL.md)
+- recommended: remoteoss/remote-for-ai remote-api-forms (skills/remote-api-forms/SKILL.md)
+- recommended: remoteoss/remote-for-ai remote-api-integration (skills/remote-api-integration/SKILL.md)
+- invalid-frontmatter: remoteoss/remote-for-ai remote-api-onboarding (skills/remote-api-onboarding/SKILL.md)
+- recommended: remoteoss/remote-for-ai remote-api-webhooks (skills/remote-api-webhooks/SKILL.md)
+- recommended: remoteoss/remote-for-ai remote-payroll-and-payslips (skills/remote-payroll-and-payslips/SKILL.md)
+- recommended: remoteoss/remote-for-ai remote-reporting (skills/remote-reporting/SKILL.md)
+- recommended: remoteoss/remote-for-ai remote-time-off-workflow (skills/remote-time-off-workflow/SKILL.md)
+- dependency-review: runpod/runpod-plugins-official companion-clis (plugins/runpod/skills/companion-clis/SKILL.md)
+- dependency-review: runpod/runpod-plugins-official flash (plugins/runpod/skills/flash/SKILL.md)
+- ambiguous-paths: runpod/runpod-plugins-official runpod
+- dependency-review: runpod/runpod-plugins-official runpod-mcp (plugins/runpod/skills/runpod-mcp/SKILL.md)
+- plugin-runtime-review: runpod/runpod-plugins-official runpod-migrate (plugins/runpod/skills/runpod-migrate/SKILL.md)
+- dependency-review: runpod/runpod-plugins-official runpod-templates (plugins/runpod/skills/runpod-templates/SKILL.md)
+- dependency-review: runpod/runpod-plugins-official runpod-usage (plugins/runpod/skills/runpod-usage/SKILL.md)
+- dependency-review: runpod/runpod-plugins-official runpodctl (plugins/runpod/skills/runpodctl/SKILL.md)
+- recommended: wingspanhq/mcp-claude-plugin checking-payments (skills/checking-payments/SKILL.md)
+- recommended: wingspanhq/mcp-claude-plugin connect (skills/connect/SKILL.md)
+- recommended: wingspanhq/mcp-claude-plugin creating-draft-payables (skills/creating-draft-payables/SKILL.md)
+- plugin-runtime-review: wingspanhq/mcp-claude-plugin finding-contractors (skills/finding-contractors/SKILL.md)
+- recommended: wingspanhq/mcp-claude-plugin onboarding-contractors (skills/onboarding-contractors/SKILL.md)
+- recommended: wingspanhq/mcp-claude-plugin outstanding (skills/outstanding/SKILL.md)
+- recommended: wingspanhq/mcp-claude-plugin troubleshooting-connection (skills/troubleshooting-connection/SKILL.md)
+- plugin-runtime-review: wingspanhq/mcp-claude-plugin using-wingspan-tools (skills/using-wingspan-tools/SKILL.md)
+- recommended: buildkite/skills buildkite-agent-runtime (skills/buildkite-agent-runtime/SKILL.md)
+- recommended: buildkite/skills buildkite-api (skills/buildkite-api/SKILL.md)
+- recommended: buildkite/skills buildkite-cache (skills/buildkite-cache/SKILL.md)
+- recommended: buildkite/skills buildkite-cli (skills/buildkite-cli/SKILL.md)
+- recommended: buildkite/skills buildkite-migration (skills/buildkite-migration/SKILL.md)
+- recommended: buildkite/skills buildkite-pipelines (skills/buildkite-pipelines/SKILL.md)
+- recommended: buildkite/skills buildkite-preflight (skills/buildkite-preflight/SKILL.md)
+- duplicate-existing-sha: canva-sdks/canva-skills canva-brand-check (plugins/canva/skills/brand-check/SKILL.md)
+- duplicate-existing-sha: canva-sdks/canva-skills canva-bulk-create (plugins/canva/skills/bulk-create/SKILL.md)
+- recommended: canva-sdks/canva-skills canva-cli (plugins/canva/skills/cli/SKILL.md)
+- duplicate-existing-sha: canva-sdks/canva-skills canva-design-feedback (plugins/canva/skills/get-design-feedback/SKILL.md)
+- duplicate-existing-sha: canva-sdks/canva-skills canva-edit-design (plugins/canva/skills/edit-design/SKILL.md)
+- duplicate-existing-sha: canva-sdks/canva-skills canva-implement-feedback (plugins/canva/skills/implement-feedback/SKILL.md)
+- dependency-review: canva-sdks/canva-skills canva-resize-for-social-media (plugins/canva/skills/resize-for-social-media/SKILL.md)
+- plugin-runtime-review: crowdstrike/fusion-skills authoring (skills/authoring/SKILL.md)
+- plugin-runtime-review: crowdstrike/fusion-skills deployment (skills/deployment/SKILL.md)
+- plugin-runtime-review: crowdstrike/fusion-skills execution (skills/execution/SKILL.md)
+- recommended: crowdstrike/fusion-skills foundry-redirect (skills/foundry-redirect/SKILL.md)
+- plugin-runtime-review: crowdstrike/fusion-skills lookup-files (skills/lookup-files/SKILL.md)
+- plugin-runtime-review: crowdstrike/fusion-skills setup (skills/setup/SKILL.md)
+- plugin-runtime-review: crowdstrike/fusion-skills workflows (skills/workflows/SKILL.md)
+- recommended: endgame-labs/endgame-plugin account-brief (skills/account-brief/SKILL.md)
+- recommended: endgame-labs/endgame-plugin call-review (skills/call-review/SKILL.md)
+- recommended: endgame-labs/endgame-plugin customer-evidence (skills/customer-evidence/SKILL.md)
+- recommended: endgame-labs/endgame-plugin meeting-follow-up (skills/meeting-follow-up/SKILL.md)
+- recommended: endgame-labs/endgame-plugin meeting-prep (skills/meeting-prep/SKILL.md)
+- recommended: endgame-labs/endgame-plugin pipeline-review (skills/pipeline-review/SKILL.md)
+- recommended: endgame-labs/endgame-plugin stakeholder-map (skills/stakeholder-map/SKILL.md)
+- recommended: hadifrt20/vouch vouch-init (skills/vouch-init/SKILL.md)
+- recommended: hadifrt20/vouch vouch-promote (skills/vouch-promote/SKILL.md)
+- recommended: hadifrt20/vouch vouch-resume (skills/vouch-resume/SKILL.md)
+- recommended: hadifrt20/vouch vouch-run (skills/vouch-run/SKILL.md)
+- recommended: hadifrt20/vouch vouch-status (skills/vouch-status/SKILL.md)
+- recommended: hadifrt20/vouch vouch-verify (skills/vouch-verify/SKILL.md)
+- recommended: hadifrt20/vouch vouch-witness (skills/vouch-witness/SKILL.md)
+- recommended: hostinger/claude-plugin audit-hosting (skills/audit-hosting/SKILL.md)
+- recommended: hostinger/claude-plugin connect-domain (skills/connect-domain/SKILL.md)
+- recommended: hostinger/claude-plugin deploy-to-hosting (skills/deploy-to-hosting/SKILL.md)
+- recommended: hostinger/claude-plugin hostinger-headless (skills/hostinger-headless/SKILL.md)
+- recommended: hostinger/claude-plugin maintain-wordpress (skills/maintain-wordpress/SKILL.md)
+- recommended: hostinger/claude-plugin migrate-to-hosting (skills/migrate-to-hosting/SKILL.md)
+- recommended: hostinger/claude-plugin troubleshoot-website (skills/troubleshoot-website/SKILL.md)
+- recommended: jfrog/claude-plugin jfrog (skills/jfrog/SKILL.md)
+- dependency-review: jfrog/claude-plugin jfrog-ai-catalog (skills/jfrog-ai-catalog/SKILL.md)
+- dependency-review: jfrog/claude-plugin jfrog-init (skills/jfrog-init/SKILL.md)
+- dependency-review: jfrog/claude-plugin jfrog-mcp-management (skills/jfrog-mcp-management/SKILL.md)
+- plugin-runtime-review: jfrog/claude-plugin jfrog-package-curation (skills/jfrog-package-curation/SKILL.md)
+- recommended: jfrog/claude-plugin jfrog-reference-architecture (skills/jfrog-reference-architecture/SKILL.md)
+- plugin-runtime-review: jfrog/claude-plugin jfrog-setup-package-managers (skills/jfrog-setup-package-managers/SKILL.md)
+- recommended: knocklabs/skills knock-cli (skills/knock-cli/SKILL.md)
+- recommended: knocklabs/skills knock-in-app-ui (skills/knock-in-app-ui/SKILL.md)
+- recommended: knocklabs/skills knock-lifecycle-opportunities (skills/knock-lifecycle-opportunities/SKILL.md)
+- recommended: knocklabs/skills knock-migrate-to-knock (skills/knock-migrate-to-knock/SKILL.md)
+- recommended: knocklabs/skills knock-notification-best-practices (skills/knock-notification-best-practices/SKILL.md)
+- recommended: knocklabs/skills knock-product-messaging-strategy (skills/knock-product-messaging-strategy/SKILL.md)
+- recommended: knocklabs/skills knock-setup (skills/knock-setup/SKILL.md)
+- recommended: phished-bv/phished-claude-plugin department-report (skills/department-report/SKILL.md)
+- recommended: phished-bv/phished-claude-plugin detect-new-in-risk-categories (skills/detect-new-in-risk-categories/SKILL.md)
+- recommended: phished-bv/phished-claude-plugin generate-simulation (skills/generate-simulation/SKILL.md)
+- recommended: phished-bv/phished-claude-plugin my-department (skills/my-department/SKILL.md)
+- recommended: phished-bv/phished-claude-plugin onboarding (skills/onboarding/SKILL.md)
+- recommended: phished-bv/phished-claude-plugin periodic-report (skills/periodic-report/SKILL.md)
+- recommended: phished-bv/phished-claude-plugin team-report (skills/team-report/SKILL.md)
+- deferred: sap/open-ux-tools sap-fiori-add-visual-filter: TimeoutError: The operation was aborted due to timeout
+- deferred: sap/open-ux-tools sap-fiori-analytical-chart: TimeoutError: The operation was aborted due to timeout
+- deferred: sap/open-ux-tools sap-fiori-app-development: TimeoutError: The operation was aborted due to timeout
+- deferred: sap/open-ux-tools sap-fiori-create-cli: TimeoutError: The operation was aborted due to timeout
+- deferred: sap/open-ux-tools sap-fiori-eslint-plugin: TimeoutError: The operation was aborted due to timeout
+- deferred: sap/open-ux-tools sap-fiori-opa5-test-development: TimeoutError: The operation was aborted due to timeout
+- deferred: sap/open-ux-tools sap-fiori-tree-table: TimeoutError: The operation was aborted due to timeout
+- recommended: zocks-communications/zocks-agent-plugins client-attrition-risk (skills/client-attrition-risk/SKILL.md)
+- recommended: zocks-communications/zocks-agent-plugins client-behavioral-profile (skills/client-behavioral-profile/SKILL.md)
+- recommended: zocks-communications/zocks-agent-plugins client-journey (skills/client-journey/SKILL.md)
+- recommended: zocks-communications/zocks-agent-plugins held-away-radar (skills/held-away-radar/SKILL.md)
+- recommended: zocks-communications/zocks-agent-plugins household-review-pack (skills/household-review-pack/SKILL.md)
+- recommended: zocks-communications/zocks-agent-plugins next-best-action (skills/next-best-action/SKILL.md)
+- recommended: zocks-communications/zocks-agent-plugins tax-opportunity-scan (skills/tax-opportunity-scan/SKILL.md)
+- recommended: activecampaign/activecampaign-plugin automation-builder (skills/automation-builder/SKILL.md)
+- recommended: activecampaign/activecampaign-plugin campaign-strategist (skills/campaign-strategist/SKILL.md)
+- recommended: activecampaign/activecampaign-plugin contact-operations (skills/contact-operations/SKILL.md)
+- recommended: activecampaign/activecampaign-plugin deals-crm (skills/deals-crm/SKILL.md)
+- recommended: activecampaign/activecampaign-plugin deliverability-advisor (skills/deliverability-advisor/SKILL.md)
+- recommended: activecampaign/activecampaign-plugin reporting-analyst (skills/reporting-analyst/SKILL.md)
+- recommended: atlassian/forge-skills forge-app-builder (skills/forge-app-builder/SKILL.md)
+- recommended: atlassian/forge-skills forge-app-review (skills/forge-app-review/SKILL.md)
+- dependency-review: atlassian/forge-skills forge-connector (skills/forge-connector/SKILL.md)
+- recommended: atlassian/forge-skills forge-cost-optimizer (skills/forge-cost-optimizer/SKILL.md)
+- recommended: atlassian/forge-skills forge-debugger (skills/forge-debugger/SKILL.md)
+- recommended: atlassian/forge-skills forge-security-review (skills/forge-security-review/SKILL.md)
+- recommended: bigexchange/bigid-plugin-official bigid-access-graph (skills/bigid-access-graph/SKILL.md)
+- recommended: bigexchange/bigid-plugin-official bigid-create-assessment-template (skills/bigid-create-assessment-template/SKILL.md)
+- recommended: bigexchange/bigid-plugin-official bigid-create-jira-tickets-for-policy-violations (skills/bigid-create-jira-tickets-for-policy-violations/SKILL.md)
+- recommended: bigexchange/bigid-plugin-official bigid-regulations-and-frameworks (skills/bigid-regulations-and-frameworks/SKILL.md)
+- recommended: bigexchange/bigid-plugin-official bigid-security-posture (skills/bigid-security-posture/SKILL.md)
+- recommended: bigexchange/bigid-plugin-official bigid-shadowai-and-ai-risk (skills/bigid-shadowai-and-ai-risk/SKILL.md)
+- recommended: blackrock/advisor-center-agent-skills ac360-capability-router (skills/ac360-capability-router/SKILL.md)
+- recommended: blackrock/advisor-center-agent-skills guided-benchmark-selection (skills/guided-benchmark-selection/SKILL.md)
+- recommended: blackrock/advisor-center-agent-skills guided-portfolio-builder (skills/guided-portfolio-builder/SKILL.md)
+- recommended: blackrock/advisor-center-agent-skills portfolio-observations-and-opportunities (skills/portfolio-observations-and-opportunities/SKILL.md)
+- recommended: blackrock/advisor-center-agent-skills portfolio-review (skills/portfolio-review/SKILL.md)
+- recommended: blackrock/advisor-center-agent-skills wealth-projections (skills/wealth-projections/SKILL.md)
+- plugin-runtime-review: codacy/codacy-skills codacy-analysis-cli (skills/codacy-analysis-cli/SKILL.md)
+- plugin-runtime-review: codacy/codacy-skills codacy-cloud-cli (skills/codacy-cloud-cli/SKILL.md)
+- plugin-runtime-review: codacy/codacy-skills codacy-code-review (skills/codacy-code-review/SKILL.md)
+- plugin-runtime-review: codacy/codacy-skills configure-codacy (skills/configure-codacy/SKILL.md)
+- plugin-runtime-review: codacy/codacy-skills configure-codacy-cloud (skills/configure-codacy-cloud/SKILL.md)
+- plugin-runtime-review: codacy/codacy-skills setup-coverage (skills/setup-coverage/SKILL.md)
+- recommended: dropbox/dropbox-ai-plugins clean-up-dropbox-content (claude/skills/clean-up-dropbox-content/SKILL.md)
+- recommended: dropbox/dropbox-ai-plugins collect-files-with-request (claude/skills/collect-files-with-request/SKILL.md)
+- recommended: dropbox/dropbox-ai-plugins find-dropbox-content (claude/skills/find-dropbox-content/SKILL.md)
+- recommended: dropbox/dropbox-ai-plugins inspect-dropbox-file (claude/skills/inspect-dropbox-file/SKILL.md)
+- recommended: dropbox/dropbox-ai-plugins organize-dropbox-folder (claude/skills/organize-dropbox-folder/SKILL.md)
+- recommended: dropbox/dropbox-ai-plugins share-dropbox-content (claude/skills/share-dropbox-content/SKILL.md)
+- recommended: gitbookio/gitbook-skills build-integration (skills/build-integration/SKILL.md)
+- dependency-review: gitbookio/gitbook-skills configure-site (skills/configure-site/SKILL.md)
+- dependency-review: gitbookio/gitbook-skills cr-create (skills/cr-create/SKILL.md)
+- recommended: gitbookio/gitbook-skills cr-review (skills/cr-review/SKILL.md)
+- dependency-review: gitbookio/gitbook-skills write-docs (skills/write-docs/SKILL.md)
+- recommended: gitbookio/gitbook-skills write-openapi (skills/write-openapi/SKILL.md)
+- plugin-runtime-review: grain-team/grain-meeting-memory-plugin follow-up (skills/follow-up/SKILL.md)
+- plugin-runtime-review: grain-team/grain-meeting-memory-plugin heads-up (skills/heads-up/SKILL.md)
+- plugin-runtime-review: grain-team/grain-meeting-memory-plugin prep-me (skills/prep-me/SKILL.md)
+- plugin-runtime-review: grain-team/grain-meeting-memory-plugin what-did-we-say (skills/what-did-we-say/SKILL.md)
+- plugin-runtime-review: grain-team/grain-meeting-memory-plugin what-do-i-owe (skills/what-do-i-owe/SKILL.md)
+- plugin-runtime-review: grain-team/grain-meeting-memory-plugin where-things-stand (skills/where-things-stand/SKILL.md)
+- recommended: grasp-ai/grasp-mcp-plugin company-lookup (skills/company-lookup/SKILL.md)
+- recommended: grasp-ai/grasp-mcp-plugin creating-tables (skills/creating-tables/SKILL.md)
+- recommended: grasp-ai/grasp-mcp-plugin finding-contacts (skills/finding-contacts/SKILL.md)
+- recommended: grasp-ai/grasp-mcp-plugin screening-and-shortlisting (skills/screening-and-shortlisting/SKILL.md)
+- recommended: grasp-ai/grasp-mcp-plugin table-enrichment (skills/table-enrichment/SKILL.md)
+- recommended: grasp-ai/grasp-mcp-plugin working-with-tables (skills/working-with-tables/SKILL.md)
+- recommended: leadfeeder/leadfeeder-mcp-plugin a-getting-started (skills/a-getting-started/SKILL.md)
+- recommended: leadfeeder/leadfeeder-mcp-plugin add-to-pipeline (skills/add-to-pipeline/SKILL.md)
+- recommended: leadfeeder/leadfeeder-mcp-plugin daily-visitor-brief (skills/daily-visitor-brief/SKILL.md)
+- recommended: leadfeeder/leadfeeder-mcp-plugin find-my-buyer (skills/find-my-buyer/SKILL.md)
+- recommended: leadfeeder/leadfeeder-mcp-plugin outreach-companion (skills/outreach-companion/SKILL.md)
+- recommended: leadfeeder/leadfeeder-mcp-plugin visitor-company-brief (skills/visitor-company-brief/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-plugin enrich-contact (skills/enrich-contact/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-plugin lookalike-prospect (skills/lookalike-prospect/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-plugin outreach-research (skills/outreach-research/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-plugin outreach-sequence (skills/outreach-sequence/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-plugin prospect (skills/prospect/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-plugin signal-prospect (skills/signal-prospect/SKILL.md)
+- dependency-review: qase-tms/qase-quality-supervisor analyzing-change-impact (skills/analyzing-change-impact/SKILL.md)
+- plugin-runtime-review: qase-tms/qase-quality-supervisor analyzing-test-coverage (skills/analyzing-test-coverage/SKILL.md)
+- plugin-runtime-review: qase-tms/qase-quality-supervisor analyzing-test-flakiness (skills/analyzing-test-flakiness/SKILL.md)
+- plugin-runtime-review: qase-tms/qase-quality-supervisor assessing-release-readiness (skills/assessing-release-readiness/SKILL.md)
+- dependency-review: qase-tms/qase-quality-supervisor reporting-quality-pulse (skills/reporting-quality-pulse/SKILL.md)
+- plugin-runtime-review: qase-tms/qase-quality-supervisor triaging-test-failures (skills/triaging-test-failures/SKILL.md)
+- recommended: sumup/sumup-skills sumup (skills/sumup/SKILL.md)
+- recommended: sumup/sumup-skills sumup-best-practices (skills/sumup-best-practices/SKILL.md)
+- recommended: sumup/sumup-skills sumup-debug (skills/sumup-debug/SKILL.md)
+- recommended: sumup/sumup-skills sumup-mcp (skills/sumup-mcp/SKILL.md)
+- recommended: sumup/sumup-skills sumup-testing (skills/sumup-testing/SKILL.md)
+- recommended: sumup/sumup-skills upgrade-sumup (skills/upgrade-sumup/SKILL.md)
+- recommended: supermetrics-public/claude-marketing-plugin content-marketer (plugins/supermetrics-marketing/skills/content-marketer/SKILL.md)
+- recommended: supermetrics-public/claude-marketing-plugin demand-gen (plugins/supermetrics-marketing/skills/demand-gen/SKILL.md)
+- recommended: supermetrics-public/claude-marketing-plugin ecommerce-marketer (plugins/supermetrics-marketing/skills/ecommerce-marketer/SKILL.md)
+- recommended: supermetrics-public/claude-marketing-plugin field-marketer (plugins/supermetrics-marketing/skills/field-marketer/SKILL.md)
+- recommended: supermetrics-public/claude-marketing-plugin marketing-leader (plugins/supermetrics-marketing/skills/marketing-leader/SKILL.md)
+- recommended: supermetrics-public/claude-marketing-plugin performance-marketer (plugins/supermetrics-marketing/skills/performance-marketer/SKILL.md)
+- recommended: tinyfish-io/tinyfish-web-agent-integrations agent (claude/skills/agent/SKILL.md)
+- recommended: tinyfish-io/tinyfish-web-agent-integrations doctor (claude/skills/doctor/SKILL.md)
+- recommended: tinyfish-io/tinyfish-web-agent-integrations feedback (claude/skills/feedback/SKILL.md)
+- recommended: tinyfish-io/tinyfish-web-agent-integrations fetch (claude/skills/fetch/SKILL.md)
+- recommended: tinyfish-io/tinyfish-web-agent-integrations monitor (claude/skills/monitor/SKILL.md)
+- recommended: tinyfish-io/tinyfish-web-agent-integrations search (claude/skills/search/SKILL.md)
+- recommended: vaisala-xweather/xweather-agent-skills mapsgl (plugins/xweather/skills/mapsgl/SKILL.md)
+- recommended: vaisala-xweather/xweather-agent-skills mapsgl-android (plugins/xweather/skills/mapsgl-android/SKILL.md)
+- recommended: vaisala-xweather/xweather-agent-skills mapsgl-apple (plugins/xweather/skills/mapsgl-apple/SKILL.md)
+- recommended: vaisala-xweather/xweather-agent-skills raster-maps (plugins/xweather/skills/raster-maps/SKILL.md)
+- recommended: vaisala-xweather/xweather-agent-skills weather-api (plugins/xweather/skills/weather-api/SKILL.md)
+- recommended: vaisala-xweather/xweather-agent-skills webhooks (plugins/xweather/skills/webhooks/SKILL.md)
+- ambiguous-paths: wonderwhy-er/desktopcommandermcp ai-tools-setup
+- ambiguous-paths: wonderwhy-er/desktopcommandermcp computer-health-check
+- recommended: wonderwhy-er/desktopcommandermcp desktop-commander-overview (skills/desktop-commander-overview/SKILL.md)
+- dependency-review: wonderwhy-er/desktopcommandermcp knowledge-base (skills/knowledge-base/SKILL.md)
+- recommended: wonderwhy-er/desktopcommandermcp obsidian-vault (skills/obsidian-vault/SKILL.md)
+- security-review: wonderwhy-er/desktopcommandermcp terminal (skills/terminal/SKILL.md)
+- plugin-runtime-review: 42crunch-ai/claude-plugins 42crunch-api-security-testing (plugins/api-security-testing/skills/42crunch-api-security-testing/SKILL.md)
+- plugin-runtime-review: 42crunch-ai/claude-plugins 42crunch-audit (plugins/api-security-testing/skills/42crunch-audit/SKILL.md)
+- plugin-runtime-review: 42crunch-ai/claude-plugins 42crunch-scan (plugins/api-security-testing/skills/42crunch-scan/SKILL.md)
+- plugin-runtime-review: 42crunch-ai/claude-plugins 42crunch-setup (plugins/api-security-testing/skills/42crunch-setup/SKILL.md)
+- recommended: 42crunch-ai/claude-plugins generate-oas (plugins/api-security-testing/skills/generate-oas/SKILL.md)
+- recommended: apify/apify-claude-code-plugin apify-actor-development (skills/apify-actor-development/SKILL.md)
+- recommended: apify/apify-claude-code-plugin apify-actorization (skills/apify-actorization/SKILL.md)
+- recommended: apify/apify-claude-code-plugin apify-generate-output-schema (skills/apify-generate-output-schema/SKILL.md)
+- recommended: apify/apify-claude-code-plugin apify-sdk-integration (skills/apify-sdk-integration/SKILL.md)
+- recommended: apify/apify-claude-code-plugin apify-ultimate-scraper (skills/apify-ultimate-scraper/SKILL.md)
+- recommended: apolloio/apollo-mcp-plugin analytics (skills/analytics/SKILL.md)
+- recommended: apolloio/apollo-mcp-plugin enrich-lead (skills/enrich-lead/SKILL.md)
+- recommended: apolloio/apollo-mcp-plugin gtm-strategist (skills/gtm-strategist/SKILL.md)
+- recommended: apolloio/apollo-mcp-plugin prospect (skills/prospect/SKILL.md)
+- recommended: apolloio/apollo-mcp-plugin sequence-load (skills/sequence-load/SKILL.md)
+- recommended: appfollow/appfollow-ai-toolkit aso-analysis (skills/aso-analysis/SKILL.md)
+- recommended: appfollow/appfollow-ai-toolkit competitors (skills/competitors/SKILL.md)
+- dependency-review: appfollow/appfollow-ai-toolkit feedback-analysis (skills/feedback-analysis/SKILL.md)
+- dependency-review: appfollow/appfollow-ai-toolkit search (skills/search/SKILL.md)
+- recommended: appfollow/appfollow-ai-toolkit using-appfollow (skills/using-appfollow/SKILL.md)
+- recommended: chronograph-pe/chronograph-gp-claude-plugin chronograph-budget-vs-actuals-variance (skills/chronograph-budget-vs-actuals-variance/SKILL.md)
+- recommended: chronograph-pe/chronograph-gp-claude-plugin chronograph-fund-quarterly-review-pack (skills/chronograph-fund-quarterly-review-pack/SKILL.md)
+- recommended: chronograph-pe/chronograph-gp-claude-plugin chronograph-markup-markdown-brief (skills/chronograph-markup-markdown-brief/SKILL.md)
+- recommended: chronograph-pe/chronograph-gp-claude-plugin chronograph-portfolio-company-one-pager (skills/chronograph-portfolio-company-one-pager/SKILL.md)
+- recommended: chronograph-pe/chronograph-gp-claude-plugin chronograph-tvpi-attribution-by-company (skills/chronograph-tvpi-attribution-by-company/SKILL.md)
+- recommended: customerio/claude-plugin customerio (skills/customerio/SKILL.md)
+- recommended: customerio/claude-plugin customerio-design-studio (skills/customerio-design-studio/SKILL.md)
+- recommended: customerio/claude-plugin customerio-journeys (skills/customerio-journeys/SKILL.md)
+- recommended: customerio/claude-plugin customerio-pipelines (skills/customerio-pipelines/SKILL.md)
+- recommended: customerio/claude-plugin customerio-sdk (skills/customerio-sdk/SKILL.md)
+- recommended: cypress-io/ai-toolkit cypress-author (skills/cypress-author/SKILL.md)
+- recommended: cypress-io/ai-toolkit cypress-cloud-cli (skills/cypress-cloud-cli/SKILL.md)
+- recommended: cypress-io/ai-toolkit cypress-docs (skills/cypress-docs/SKILL.md)
+- recommended: cypress-io/ai-toolkit cypress-explain (skills/cypress-explain/SKILL.md)
+- recommended: cypress-io/ai-toolkit cypress-tap (skills/cypress-tap/SKILL.md)
+- recommended: datahub-project/datahub-cloud-ai-plugins datahub-lineage (skills/datahub-lineage/SKILL.md)
+- recommended: datahub-project/datahub-cloud-ai-plugins datahub-quality (skills/datahub-quality/SKILL.md)
+- recommended: datahub-project/datahub-cloud-ai-plugins datahub-search (skills/datahub-search/SKILL.md)
+- recommended: datahub-project/datahub-cloud-ai-plugins datahub-setup (skills/datahub-setup/SKILL.md)
+- recommended: datahub-project/datahub-cloud-ai-plugins datahub-sql-workflow (skills/datahub-sql-workflow/SKILL.md)
+- recommended: eon-io/claude-code-eon-plugin aws-onboarding (skills/aws-onboarding/SKILL.md)
+- recommended: eon-io/claude-code-eon-plugin backup-policy-creation (skills/backup-policy-creation/SKILL.md)
+- recommended: eon-io/claude-code-eon-plugin cost-explorer-query (skills/cost-explorer-query/SKILL.md)
+- recommended: eon-io/claude-code-eon-plugin gcp-onboarding (skills/gcp-onboarding/SKILL.md)
+- recommended: eon-io/claude-code-eon-plugin ransomware-remediation (skills/ransomware-remediation/SKILL.md)
+- recommended: fullstorydev/fullstory-skills comparisons (skills/comparisons/SKILL.md)
+- recommended: fullstorydev/fullstory-skills friction-analysis (skills/friction-analysis/SKILL.md)
+- recommended: fullstorydev/fullstory-skills general-analysis (skills/general-analysis/SKILL.md)
+- dependency-review: fullstorydev/fullstory-skills idea-generation (skills/idea-generation/SKILL.md)
+- recommended: fullstorydev/fullstory-skills session-review (skills/session-review/SKILL.md)
+- duplicate-existing-sha: getsentry/plugin-claude sentry-create-alert (skills/sentry-create-alert/SKILL.md)
+- duplicate-existing-sha: getsentry/plugin-claude sentry-debug-issue (skills/sentry-debug-issue/SKILL.md)
+- duplicate-existing-sha: getsentry/plugin-claude sentry-fix-stack-traces (skills/sentry-fix-stack-traces/SKILL.md)
+- duplicate-existing-sha: getsentry/plugin-claude sentry-otel-exporter-setup (skills/sentry-otel-exporter-setup/SKILL.md)
+- duplicate-existing-sha: getsentry/plugin-claude sentry-setup-releases (skills/sentry-setup-releases/SKILL.md)
+- recommended: junipersquare-public/plugins entity-org-chart (skills/entity-org-chart/SKILL.md)
+- recommended: junipersquare-public/plugins investor-tearsheet (skills/investor-tearsheet/SKILL.md)
+- recommended: junipersquare-public/plugins jsq-report-render (skills/jsq-report-render/SKILL.md)
+- recommended: junipersquare-public/plugins juniper-square-data-model (skills/juniper-square-data-model/SKILL.md)
+- recommended: junipersquare-public/plugins offering-action-report (skills/offering-action-report/SKILL.md)
+- recommended: kobiton/automate create-test-run (skills/create-test-run/SKILL.md)
+- plugin-runtime-review: kobiton/automate drive-automation-session (skills/drive-automation-session/SKILL.md)
+- plugin-runtime-review: kobiton/automate monitor-test-run (skills/monitor-test-run/SKILL.md)
+- dependency-review: kobiton/automate run-automation-suite (skills/run-automation-suite/SKILL.md)
+- plugin-runtime-review: kobiton/automate run-interactive-session (skills/run-interactive-session/SKILL.md)
+- recommended: mondaycom/monday-claude-cowork-plugin board-setup (skills/board-setup/SKILL.md)
+- recommended: mondaycom/monday-claude-cowork-plugin docs-collaborator (skills/docs-collaborator/SKILL.md)
+- recommended: mondaycom/monday-claude-cowork-plugin forms-builder (skills/forms-builder/SKILL.md)
+- recommended: mondaycom/monday-claude-cowork-plugin project-status-report (skills/project-status-report/SKILL.md)
+- recommended: mondaycom/monday-claude-cowork-plugin task-management (skills/task-management/SKILL.md)
+- recommended: morningstar/morningstar-plugins datapoint-finder (plugins/morningstar/skills/datapoint-finder/SKILL.md)
+- recommended: morningstar/morningstar-plugins fund-comparison (plugins/morningstar/skills/fund-comparison/SKILL.md)
+- recommended: morningstar/morningstar-plugins fund-screener (plugins/morningstar/skills/fund-screener/SKILL.md)
+- recommended: morningstar/morningstar-plugins fund-summarizer (plugins/morningstar/skills/fund-summarizer/SKILL.md)
+- recommended: morningstar/morningstar-plugins medalist-rating-analyzer (plugins/morningstar/skills/medalist-rating-analyzer/SKILL.md)
+- ambiguous-paths: oaknational/oak-ai-plugins audit-sequence
+- ambiguous-paths: oaknational/oak-ai-plugins find-misconceptions
+- recommended: oaknational/oak-ai-plugins oak-accessibility (claude/plugins/oak-national-academy/skills/oak-accessibility/SKILL.md)
+- recommended: oaknational/oak-ai-plugins oak-curriculum-principles (claude/plugins/oak-national-academy/skills/oak-curriculum-principles/SKILL.md)
+- recommended: oaknational/oak-ai-plugins oak-curriculum-principles-mcp-enabled (claude/plugins/oak-national-academy/skills/oak-curriculum-principles-mcp-enabled/SKILL.md)
+- recommended: opsera-agents/opsera-devsecops architecture-analyze (skills/architecture-analyze/SKILL.md)
+- recommended: opsera-agents/opsera-devsecops compliance-audit (skills/compliance-audit/SKILL.md)
+- recommended: opsera-agents/opsera-devsecops pre-commit-scan (skills/pre-commit-scan/SKILL.md)
+- recommended: opsera-agents/opsera-devsecops security-scan (skills/security-scan/SKILL.md)
+- recommended: opsera-agents/opsera-devsecops sql-security (skills/sql-security/SKILL.md)
+- recommended: pactflow/pactflow-agent-skills drift-testing (plugins/swagger-contract-testing/skills/drift-testing/SKILL.md)
+- recommended: pactflow/pactflow-agent-skills oas-generator (plugins/swagger-contract-testing/skills/oas-generator/SKILL.md)
+- recommended: pactflow/pactflow-agent-skills openapi-parser (plugins/swagger-contract-testing/skills/openapi-parser/SKILL.md)
+- recommended: pactflow/pactflow-agent-skills pact-coverage (plugins/swagger-contract-testing/skills/pact-coverage/SKILL.md)
+- recommended: pactflow/pactflow-agent-skills pactflow (plugins/swagger-contract-testing/skills/pactflow/SKILL.md)
+- recommended: rocketreach/rocketreach-mcp-plugin build-list (skills/build-list/SKILL.md)
+- recommended: rocketreach/rocketreach-mcp-plugin enrich-company (skills/enrich-company/SKILL.md)
+- recommended: rocketreach/rocketreach-mcp-plugin enrich-person (skills/enrich-person/SKILL.md)
+- recommended: rocketreach/rocketreach-mcp-plugin prospect (skills/prospect/SKILL.md)
+- recommended: rocketreach/rocketreach-mcp-plugin verify-email (skills/verify-email/SKILL.md)
+- recommended: starburstlabs/wealthbox-plugin document-recommendation-suitability (skills/document-recommendation-suitability/SKILL.md)
+- recommended: starburstlabs/wealthbox-plugin identify-clients-affected-by-change (skills/identify-clients-affected-by-change/SKILL.md)
+- recommended: starburstlabs/wealthbox-plugin manage-client-service-request (skills/manage-client-service-request/SKILL.md)
+- recommended: starburstlabs/wealthbox-plugin orchestrate-onboarding-data (skills/orchestrate-onboarding-data/SKILL.md)
+- recommended: starburstlabs/wealthbox-plugin prepare-client-meeting (skills/prepare-client-meeting/SKILL.md)
+- recommended: unstructured-io/unstructured-foundation-marketplace connect (plugins/foundation/skills/connect/SKILL.md)
+- recommended: unstructured-io/unstructured-foundation-marketplace help (plugins/foundation/skills/help/SKILL.md)
+- recommended: unstructured-io/unstructured-foundation-marketplace manage (plugins/foundation/skills/manage/SKILL.md)
+- recommended: unstructured-io/unstructured-foundation-marketplace search (plugins/foundation/skills/search/SKILL.md)
+- recommended: unstructured-io/unstructured-foundation-marketplace start (plugins/foundation/skills/start/SKILL.md)
+- recommended: workday/everywhere using-workday-design (plugins/sana/skills/using-workday-design/SKILL.md)
+- recommended: workday/everywhere workday (plugins/sana/skills/workday/SKILL.md)
+- recommended: workday/everywhere workday-agent-dialogue (plugins/sana/skills/workday-agent-dialogue/SKILL.md)
+- recommended: workday/everywhere workday-onboard (plugins/sana/skills/workday-onboard/SKILL.md)
+- recommended: workday/everywhere workday-tools-only (plugins/sana/skills/workday-tools-only/SKILL.md)
+- recommended: youdotcom-oss/agent-skills you-discover (skills/you-discover/SKILL.md)
+- recommended: youdotcom-oss/agent-skills you-finance (skills/you-finance/SKILL.md)
+- not-found: youdotcom-oss/agent-skills you-free
+- recommended: youdotcom-oss/agent-skills you-research (skills/you-research/SKILL.md)
+- dependency-review: youdotcom-oss/agent-skills you-web (skills/you-web/SKILL.md)
+- recommended: chronograph-pe/chronograph-lp-claude-plugin chronograph-cashflow-forecast (skills/chronograph-cashflow-forecast/SKILL.md)
+- recommended: chronograph-pe/chronograph-lp-claude-plugin chronograph-commitment-pacing-planner (skills/chronograph-commitment-pacing-planner/SKILL.md)
+- recommended: chronograph-pe/chronograph-lp-claude-plugin chronograph-gp-meeting-prep (skills/chronograph-gp-meeting-prep/SKILL.md)
+- recommended: chronograph-pe/chronograph-lp-claude-plugin chronograph-look-through-exposure-scan (skills/chronograph-look-through-exposure-scan/SKILL.md)
+- recommended: couchbase-ecosystem/agent-skills couchbase-data-modeling (skills/couchbase-data-modeling/SKILL.md)
+- security-review: couchbase-ecosystem/agent-skills couchbase-mcp-setup (skills/couchbase-mcp-setup/SKILL.md)
+- recommended: couchbase-ecosystem/agent-skills couchbase-natural-language-querying (skills/couchbase-natural-language-querying/SKILL.md)
+- recommended: couchbase-ecosystem/agent-skills couchbase-query-optimizer (skills/couchbase-query-optimizer/SKILL.md)
+- dependency-review: dequelabs/axe-accessibility mcp-audit (skills/mcp-audit/SKILL.md)
+- recommended: dequelabs/axe-accessibility mcp-generate-instructions (skills/mcp-generate-instructions/SKILL.md)
+- recommended: dequelabs/axe-accessibility mcp-setup (skills/mcp-setup/SKILL.md)
+- recommended: dequelabs/axe-accessibility mcp-usage (skills/mcp-usage/SKILL.md)
+- recommended: euler-software-inc/euler-skills generate-qbr (partner-managers/skills/generate-qbr/SKILL.md)
+- recommended: euler-software-inc/euler-skills partner-briefing (partner-managers/skills/partner-briefing/SKILL.md)
+- recommended: euler-software-inc/euler-skills pending-approvals-triage (partner-managers/skills/pending-approvals-triage/SKILL.md)
+- recommended: euler-software-inc/euler-skills portfolio-pulse (partner-managers/skills/portfolio-pulse/SKILL.md)
+- unsupported-package-entry: growthbook/skills analytics (skills/analytics/SKILL.md)
+- unsupported-package-entry: growthbook/skills experiments (skills/experiments/SKILL.md)
+- unsupported-package-entry: growthbook/skills feature-flags (skills/feature-flags/SKILL.md)
+- unsupported-package-entry: growthbook/skills gb-setup (skills/gb-setup/SKILL.md)
+- recommended: intercom/claude-plugin-external customer-360 (skills/customer-360/SKILL.md)
+- recommended: intercom/claude-plugin-external install-cli (skills/install-cli/SKILL.md)
+- recommended: intercom/claude-plugin-external install-messenger (skills/install-messenger/SKILL.md)
+- recommended: intercom/claude-plugin-external intercom-analysis (skills/intercom-analysis/SKILL.md)
+- plugin-runtime-review: krea-ai/skills faceless-video (faceless-video/SKILL.md)
+- recommended: krea-ai/skills krea-generate (krea-generate/SKILL.md)
+- plugin-runtime-review: krea-ai/skills krea-marketing (krea-marketing/SKILL.md)
+- plugin-runtime-review: krea-ai/skills krea-motion (krea-motion/SKILL.md)
+- plugin-runtime-review: mercadopago/mercadopago-claude-marketplace mp-integrate (plugins/mercadopago/skills/mp-integrate/SKILL.md)
+- recommended: mercadopago/mercadopago-claude-marketplace mp-review (plugins/mercadopago/skills/mp-review/SKILL.md)
+- plugin-runtime-review: mercadopago/mercadopago-claude-marketplace mp-test-setup (plugins/mercadopago/skills/mp-test-setup/SKILL.md)
+- recommended: mercadopago/mercadopago-claude-marketplace mp-webhooks (plugins/mercadopago/skills/mp-webhooks/SKILL.md)
+- recommended: newrelic/claude-code-plugin apm (skills/apm/SKILL.md)
+- dependency-review: newrelic/claude-code-plugin finops (skills/finops/SKILL.md)
+- dependency-review: newrelic/claude-code-plugin kubernetes (skills/kubernetes/SKILL.md)
+- not-found: newrelic/claude-code-plugin newrelic-mcp
+- recommended: riversidefm/riverside-mcp-public content-discovery (skills/content-discovery/SKILL.md)
+- recommended: riversidefm/riverside-mcp-public setup (skills/setup/SKILL.md)
+- recommended: riversidefm/riverside-mcp-public social-publishing (skills/social-publishing/SKILL.md)
+- recommended: riversidefm/riverside-mcp-public video-editing (skills/video-editing/SKILL.md)
+- recommended: zapier/zapier-mcp zapier-demo (plugins/zapier/skills/zapier-demo/SKILL.md)
+- recommended: zapier/zapier-mcp zapier-explore (plugins/zapier/skills/zapier-explore/SKILL.md)
+- recommended: zapier/zapier-mcp zapier-onboard (plugins/zapier/skills/zapier-onboard/SKILL.md)
+- recommended: zapier/zapier-mcp zapier-status (plugins/zapier/skills/zapier-status/SKILL.md)
+- recommended: cloudinary-devs/cloudinary-plugin claimable-cloud (skills/claimable-cloud/SKILL.md)
+- recommended: cloudinary-devs/cloudinary-plugin cloudinary-docs (skills/cloudinary-docs/SKILL.md)
+- recommended: cloudinary-devs/cloudinary-plugin cloudinary-transformations (skills/cloudinary-transformations/SKILL.md)
+- recommended: epicgames/unreal-engine-skills-for-claude-code-plugin create-toolset (skills/create-toolset/SKILL.md)
+- recommended: epicgames/unreal-engine-skills-for-claude-code-plugin unreal-mcp (skills/unreal-mcp/SKILL.md)
+- recommended: epicgames/unreal-engine-skills-for-claude-code-plugin unreal-skill (skills/unreal-skill/SKILL.md)
+- recommended: gc-ai-inc/gc-ai-claude-plugin ask (skills/ask/SKILL.md)
+- recommended: gc-ai-inc/gc-ai-claude-plugin organize-matter (skills/organize-matter/SKILL.md)
+- recommended: gc-ai-inc/gc-ai-claude-plugin review-document (skills/review-document/SKILL.md)
+- recommended: grafana/ai-marketplace grafana-assistant-cli (plugins/grafana-assistant/skills/grafana-assistant-cli/SKILL.md)
+- recommended: grafana/ai-marketplace grafana-cloud-mcp-tools (plugins/grafana-cloud-mcp/skills/grafana-cloud-mcp-tools/SKILL.md)
+- recommended: grafana/ai-marketplace grafana-mcp-tools (plugins/grafana-mcp/skills/grafana-mcp-tools/SKILL.md)
+- recommended: kensho-technologies/spglobal-agent-skills earnings-preview-single (plugins/spglobal-plugin/skills/earnings-preview-beta/SKILL.md)
+- duplicate-existing-sha: kensho-technologies/spglobal-agent-skills funding-digest (plugins/spglobal-plugin/skills/funding-digest/SKILL.md)
+- duplicate-existing-sha: kensho-technologies/spglobal-agent-skills tear-sheet (plugins/spglobal-plugin/skills/tear-sheet/SKILL.md)
+- recommended: luminpdf/wyatt-plugin wyatt-documents (skills/wyatt-documents/SKILL.md)
+- recommended: luminpdf/wyatt-plugin wyatt-tasks (skills/wyatt-tasks/SKILL.md)
+- recommended: luminpdf/wyatt-plugin wyatt-workspace (skills/wyatt-workspace/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-talent-sourcing-plugin keep-a-list-live (skills/keep-a-list-live/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-talent-sourcing-plugin leadership-change-sourcing (skills/leadership-change-sourcing/SKILL.md)
+- recommended: lusha-oss/lusha-mcp-talent-sourcing-plugin source-movable-talent (skills/source-movable-talent/SKILL.md)
+- recommended: meshy-dev/meshy-3d-agent meshy-3d-generation (skills/meshy-3d-generation/SKILL.md)
+- recommended: meshy-dev/meshy-3d-agent meshy-3d-printing (skills/meshy-3d-printing/SKILL.md)
+- recommended: meshy-dev/meshy-3d-agent meshy-openclaw (skills/meshy-openclaw/SKILL.md)
+- recommended: mobbin/skills plain-writing (skills/plain-writing/SKILL.md)
+- recommended: mobbin/skills redesign-screen (skills/redesign-screen/SKILL.md)
+- recommended: mobbin/skills search (skills/search/SKILL.md)
+- recommended: monta-app/claude-plugin-monta monta-api (skills/monta-api/SKILL.md)
+- recommended: monta-app/claude-plugin-monta monta-charging-operations (skills/monta-charging-operations/SKILL.md)
+- recommended: monta-app/claude-plugin-monta setup (skills/setup/SKILL.md)
+- plugin-runtime-review: onesignal/onesignal-agent-plugin credentials (skills/credentials/SKILL.md)
+- plugin-runtime-review: onesignal/onesignal-agent-plugin setup (skills/setup/SKILL.md)
+- plugin-runtime-review: onesignal/onesignal-agent-plugin verify (skills/verify/SKILL.md)
+- recommended: semgrep/guardian add-and-validate-guardian-developer-semgrep-rule (plugin/skills/add-and-validate-guardian-developer-semgrep-rule/SKILL.md)
+- recommended: semgrep/guardian install-mfw (plugin/skills/install-mfw/SKILL.md)
+- recommended: semgrep/guardian remove-guardian-developer-semgrep-rule (plugin/skills/remove-guardian-developer-semgrep-rule/SKILL.md)
+- plugin-runtime-review: snowflake-labs/snowflake-ai-kit cortex-router (plugins/cortex-code/skills/cortex-router/SKILL.md)
+- plugin-runtime-review: snowflake-labs/snowflake-ai-kit cortex-run (plugins/cortex-code/skills/cortex-run/SKILL.md)
+- plugin-runtime-review: snowflake-labs/snowflake-ai-kit cortex-setup (plugins/cortex-code/skills/cortex-setup/SKILL.md)
+- invalid-frontmatter: socialinsiderio/socialinsider-claude-plugin campaign-recap (skills/campaign-recap/SKILL.md)
+- invalid-frontmatter: socialinsiderio/socialinsider-claude-plugin competitor-benchmark (skills/competitor-benchmark/SKILL.md)
+- invalid-frontmatter: socialinsiderio/socialinsider-claude-plugin profile-audit (skills/profile-audit/SKILL.md)
+- recommended: thoughtspot/spottercode-mcp-plugin get-developer-docs-reference (skills/get-developer-docs-reference/SKILL.md)
+- recommended: thoughtspot/spottercode-mcp-plugin get-rest-api-reference (skills/get-rest-api-reference/SKILL.md)
+- recommended: thoughtspot/spottercode-mcp-plugin get-visual-embed-sdk-reference (skills/get-visual-embed-sdk-reference/SKILL.md)
+- recommended: unbounce/agent-plugins mcp-feedback (plugins/unbounce-mcp/skills/mcp-feedback/SKILL.md)
+- plugin-runtime-review: unbounce/agent-plugins mcp-modernize (plugins/unbounce-mcp/skills/mcp-modernize/SKILL.md)
+- recommended: unbounce/agent-plugins mcp-page-authoring (plugins/unbounce-mcp/skills/mcp-page-authoring/SKILL.md)
+- recommended: vaadin/agent-skills aura-theme (skills/aura-theme/SKILL.md)
+- recommended: vaadin/agent-skills vaadin-form-layout (skills/vaadin-form-layout/SKILL.md)
+- dependency-review: vaadin/agent-skills vaadin-frontend-design (skills/vaadin-frontend-design/SKILL.md)
+- invalid-frontmatter: vantainc/vanta-mcp-plugin fix-test (skills/fix-test/SKILL.md)
+- invalid-frontmatter: vantainc/vanta-mcp-plugin list-tests (skills/list-tests/SKILL.md)
+- invalid-frontmatter: vantainc/vanta-mcp-plugin test-remediation (skills/test-remediation/SKILL.md)
+- recommended: villagesql/villagesql-skills vsql-docs (skills/vsql-docs/SKILL.md)
+- security-review: villagesql/villagesql-skills vsql-extension-builder (skills/vsql-extension-builder/SKILL.md)
+- recommended: villagesql/villagesql-skills vsql-install-server (skills/vsql-install-server/SKILL.md)
+- security-review: altimateai/altimate-claude-plugin altimate-code (plugins/altimate-code/skills/altimate-code/SKILL.md)
+- security-review: altimateai/altimate-claude-plugin review (plugins/altimate-code/skills/review/SKILL.md)
+- recommended: b12io/b12-plugins b12-website-editor (skills/b12-website-editor/SKILL.md)
+- recommended: b12io/b12-plugins website-generator (skills/website-generator/SKILL.md)
+- security-review: blaxel-ai/agent-skills blaxel-cli (skills/blaxel-cli/SKILL.md)
+- recommended: blaxel-ai/agent-skills blaxel-sdk (skills/blaxel-sdk/SKILL.md)
+- recommended: botify-hq/ai-plugins botify-mcp (skills/botify-mcp/SKILL.md)
+- recommended: botify-hq/ai-plugins botify-tables-sql (skills/botify-tables-sql/SKILL.md)
+- recommended: checkly/checkly-plugin checkly (skills/checkly/SKILL.md)
+- recommended: checkly/checkly-plugin playwright-best-practices-for-agents (skills/playwright-best-practices-for-agents/SKILL.md)
+- recommended: exa-labs/exa-mcp-server Exa Agent (skills/exa-agent/SKILL.md)
+- recommended: exa-labs/exa-mcp-server search (skills/search/SKILL.md)
+- recommended: functionizeinc/functionize-mcp-plugin functionize (skills/functionize/SKILL.md)
+- invalid-frontmatter: functionizeinc/functionize-mcp-plugin functionize-prompting (skills/functionize-prompting/SKILL.md)
+- recommended: groundcover-com/claude-plugin-groundcover discovery (skills/discovery/SKILL.md)
+- recommended: groundcover-com/claude-plugin-groundcover gcql-advanced (skills/gcql-advanced/SKILL.md)
+- recommended: handsontable/handsontable-skills handsontable (skills/handsontable/SKILL.md)
+- recommended: handsontable/handsontable-skills hyperformula (skills/hyperformula/SKILL.md)
+- recommended: intuit/intuit-plugins-official build-quickbooks-app (plugins/intuit-developer/skills/build-quickbooks-app/SKILL.md)
+- recommended: intuit/intuit-plugins-official connect-to-intuit-developer-platform (plugins/intuit-developer/skills/connect-to-intuit-developer-platform/SKILL.md)
+- not-found: jetbrains/teamcity-cli migrate-to-teamcity
+- not-found: jetbrains/teamcity-cli teamcity-cli
+- recommended: keenableai/keenable-claude-plugin keenable-deep-research (plugins/keenable/skills/keenable-deep-research/SKILL.md)
+- recommended: keenableai/keenable-claude-plugin keenable-web (plugins/keenable/skills/keenable-web/SKILL.md)
+- ambiguous-paths: middesk/plugins lookup
+- ambiguous-paths: middesk/plugins verify
+- recommended: paypal/ai-toolkit paypal-best-practices (skills/paypal-best-practices/SKILL.md)
+- dependency-review: paypal/ai-toolkit paypal-routing (skills/paypal-routing/SKILL.md)
+- recommended: preset-io/agent-skills preset-cli (plugins/preset-cli-skills/skills/preset-cli/SKILL.md)
+- dependency-review: preset-io/agent-skills preset-cli-mutations (plugins/preset-cli-skills/skills/preset-cli-mutations/SKILL.md)
+- recommended: sap/ui-theme-designer-plugins-for-coding-agents ui-theme-designer-design-tokens (plugins/ui-theme-designer/skills/ui-theme-designer-design-tokens/SKILL.md)
+- recommended: sap/ui-theme-designer-plugins-for-coding-agents ui-theme-designer-help (plugins/ui-theme-designer/skills/ui-theme-designer-help/SKILL.md)
+- recommended: spotify/save-to-spotify configure-chapter-skip (plugin/skills/configure-chapter-skip/SKILL.md)
+- security-review: spotify/save-to-spotify save-to-spotify (plugin/skills/save-to-spotify/SKILL.md)
+- recommended: stackhawk/agent-skills api (plugins/api/skills/api/SKILL.md)
+- recommended: stackhawk/agent-skills hawkscan (plugins/hawkscan/skills/hawkscan/SKILL.md)
+- recommended: sumologic/sumologic-ai-plugins sumo-investigator (skills/sumo-investigator/SKILL.md)
+- recommended: sumologic/sumologic-ai-plugins sumosetup (skills/sumosetup/SKILL.md)
+- recommended: supabase-community/supabase-plugin supabase (skills/supabase/SKILL.md)
+- duplicate-existing-sha: supabase-community/supabase-plugin supabase-postgres-best-practices (skills/supabase-postgres-best-practices/SKILL.md)
+- recommended: synthflowai/anthropicplugin call-review (plugins/synthflow/skills/call-review/SKILL.md)
+- recommended: synthflowai/anthropicplugin prompt-review (plugins/synthflow/skills/prompt-review/SKILL.md)
+- recommended: ukg/ukg-ai-marketplace time-off-skill (skills/time-off-skill/SKILL.md)
+- recommended: ukg/ukg-ai-marketplace ukg-directory-skill (skills/ukg-directory-skill/SKILL.md)
+- recommended: unleash/unleash-claude-skills featureops (skills/featureops/SKILL.md)
+- recommended: unleash/unleash-claude-skills migrate-gitlab-flags (skills/migrate-gitlab-flags/SKILL.md)
+- dependency-review: workos/skills workos (plugins/workos/skills/workos/SKILL.md)
+- invalid-frontmatter: workos/skills workos-widgets (plugins/workos/skills/workos-widgets/SKILL.md)
+- recommended: 1password/1password-claude-plugin 1password-environments (skills/1password-environments/SKILL.md)
+- recommended: aiven/aiven-ai-plugins aiven-getting-started (skills/aiven-getting-started/SKILL.md)
+- recommended: apptweak/mcp-crossclient apptweak-dashboard-builder (plugins/codex/skills/apptweak-dashboard-builder/SKILL.md)
+- recommended: atlanhq/agent-toolkit atlan-search (skills/atlan-search/SKILL.md)
+- ambiguous-paths: atlassian-labs/twg-plugins twg-setup
+- plugin-runtime-review: binyamineden/letmewatch letmewatch (skills/letmewatch/SKILL.md)
+- recommended: cerebriumai/cerebrium-skills cerebrium (skills/cerebrium/SKILL.md)
+- not-found: confident-ai/confident-client confident-client
+- ambiguous-paths: endorlabs/ai-plugins endor-agent-kit-setup
+- recommended: finchat-project-atlas/fiscal-ai-claude-plugin fiscal (plugins/fiscal-ai/skills/fiscal/SKILL.md)
+- not-found: fingerprintjs/fingerprint-mcp-server onboarding
+- recommended: gendigitalinc/sage security-awareness (skills/security-awareness/SKILL.md)
+- deferred: getsentry/cli sentry-cli: AssertionError [ERR_ASSERTION]: Archived, disabled or forked repo needs separate review
+- dependency-review: legalzoom/claude-plugins attorney-assist (plugins/legalzoom/skills/attorney-assist/SKILL.md)
+- invalid-frontmatter: logrocket/logrocket-claude-plugin use-logrocket (plugins/logrocket/skills/use-logrocket/SKILL.md)
+- recommended: mintlify/mintlify-claude-plugin mintlify (skills/mintlify/SKILL.md)
+- recommended: pixeltable/pixeltable-skill pixeltable (skills/pixeltable-skill/SKILL.md)
+- recommended: privco/privco-claude-plugin privco-mcp-search (skills/privco-mcp-search/SKILL.md)
+- recommended: propertyme/ai-skills propertyme-mcp (skills/propertyme-mcp/SKILL.md)
+- recommended: scrimba/explainer-mcp-plugin explain (skills/explain/SKILL.md)
+- plugin-runtime-review: search-atlas-group/amm-toolkit using-searchatlas (skills/using-searchatlas/SKILL.md)
+- recommended: servicenow/sdk now-sdk (skills/now-sdk/SKILL.md)
+- recommended: slint-ui/ai-plugins slint (skills/slint/SKILL.md)
+- recommended: sonatype/guide-claude-plugin sonatype-guide (skills/sonatype-guide/SKILL.md)
+- recommended: sourcegraph-community/sourcegraph-claudecode-plugin searching-sourcegraph (skills/searching-sourcegraph/SKILL.md)
+- invalid-frontmatter: treblle/treblle-mcp-plugin api-discovery (skills/api-discovery/SKILL.md)
+- recommended: upbound/skills upbound-hub (skills/upbound-hub/SKILL.md)
+- recommended: workday/workdaydeveloperagentforclaude workday-developer-agent (skills/workday-developer-agent/SKILL.md)
+- recommended: workiom/workiom-plugin workiom-vibe-apps (skills/workiom-vibe-apps/SKILL.md)

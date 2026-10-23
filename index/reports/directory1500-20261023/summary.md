@@ -1,0 +1,207 @@
+# Directory backfill: 1,500 staged skills
+
+Verified: 2026-10-23T20:19:53.540Z
+
+- Target reached: 1,500 distinct staged skills, including the previous 304.
+- This pass added 1,196: waves of 356, 431 and 409, applied in batches no larger than 150.
+- Repositories represented: 185. Local cutover: 49190.
+- All staged IDs and SHAs are unique and absent from the unchanged production baseline.
+- All 1,500 exist in skill/repo overlays and cutover output. Existing records preserved.
+- Exact coverage and reviewed source hashes checked for 1,419 paths; the previous 81 remain intact.
+- Validation passes. No new featured status or broad trust roles granted.
+- No combined crawl, promotion, publish, deploy, commit or push in this pass.
+- Source/package review only; not a runtime install test, exhaustive security audit or proof of technical accuracy.
+
+## Waves
+
+- wave1: 356; apply batches 150 + 150 + 56.
+- wave2: 431; apply batches 150 + 150 + 131.
+- wave3: 409; apply batches 150 + 150 + 109.
+
+## Additions By Repository
+
+- 1password/1password-claude-plugin: 1
+- 42crunch-ai/claude-plugins: 1
+- activecampaign/activecampaign-plugin: 6
+- agentmail-to/agentmail-plugins: 5
+- airtable/skills: 8
+- airwallex/airwallex-marketplace: 5
+- aiven/aiven-ai-plugins: 1
+- allium-labs/allium-claude-plugin: 11
+- amekala/adspirer-mcp-plugin: 13
+- amplitude/mcp-marketplace: 37
+- amzn/selling-partner-agentic-toolkit: 6
+- anthropics/claude-for-financial-advisors: 5
+- anthropics/knowledge-work-plugins: 26
+- apify/apify-claude-code-plugin: 5
+- apolloio/apollo-mcp-plugin: 5
+- appfollow/appfollow-ai-toolkit: 3
+- apptweak/mcp-crossclient: 1
+- appwrite/claude-plugin: 11
+- arcjet/arcjet-plugin: 4
+- atlanhq/agent-toolkit: 1
+- atlassian/forge-skills: 5
+- awslabs/startups: 1
+- b12io/b12-plugins: 2
+- betterstackhq/claude-plugin: 16
+- bigdata-com/bigdata-plugins-marketplace: 28
+- bigexchange/bigid-plugin-official: 6
+- bitmovin/skills: 5
+- blackrock/advisor-center-agent-skills: 6
+- blaxel-ai/agent-skills: 1
+- bonusly/bonusly-claude-plugin: 18
+- botify-hq/ai-plugins: 2
+- buildkite/skills: 7
+- canva-sdks/canva-skills: 1
+- catalystbyzoho/claude-plugin: 9
+- cerebriumai/cerebrium-skills: 1
+- checkly/checkly-plugin: 2
+- chronograph-pe/chronograph-gp-claude-plugin: 5
+- chronograph-pe/chronograph-lp-claude-plugin: 4
+- circlefin/skills: 16
+- cloudinary-devs/cloudinary-plugin: 3
+- couchbase-ecosystem/agent-skills: 3
+- crowdstrike/fusion-skills: 1
+- customerio/claude-plugin: 5
+- cypress-io/ai-toolkit: 5
+- daloopa/daloopa-plugin-claude: 16
+- datahub-project/datahub-cloud-ai-plugins: 5
+- datahub-project/datahub-skills: 5
+- datarobot-oss/datarobot-agent-skills: 14
+- dequelabs/axe-accessibility: 3
+- descope/skills: 6
+- devexpress/agent-skills: 20
+- dropbox/dropbox-ai-plugins: 6
+- duendesoftware/duende-skills: 23
+- elastic/claude-plugin: 26
+- endgame-labs/endgame-plugin: 7
+- eon-io/claude-code-eon-plugin: 5
+- epicgames/unreal-engine-skills-for-claude-code-plugin: 3
+- euler-software-inc/euler-skills: 4
+- exa-labs/exa-mcp-server: 2
+- figma/mcp-server-guide: 4
+- finchat-project-atlas/fiscal-ai-claude-plugin: 1
+- firecrawl/firecrawl-claude-plugin: 2
+- formio/ai: 2
+- fullstorydev/fullstory-skills: 4
+- fullstorydev/subtext: 10
+- functionizeinc/functionize-mcp-plugin: 1
+- gc-ai-inc/gc-ai-claude-plugin: 3
+- gendigitalinc/sage: 1
+- getcrossbeam/crossbeam-claude-skills: 10
+- getsentry/plugin-claude: 3
+- gitbookio/gitbook-skills: 3
+- gopigment/ai-plugins: 35
+- grafana/ai-marketplace: 3
+- grasp-ai/grasp-mcp-plugin: 6
+- grnhse/greenhouse-skills: 9
+- groundcover-com/claude-plugin-groundcover: 2
+- growthxai/output: 42
+- handsontable/handsontable-skills: 2
+- honeycombio/agent-skill: 1
+- hostinger/claude-plugin: 7
+- hubspot/hubspot-mcp-plugins: 9
+- hunter-io/claude-plugin: 13
+- incident-io/skills: 8
+- intercom/claude-plugin-external: 4
+- intuit/intuit-plugins-official: 2
+- intuit/quickbooks-claude-plugin: 9
+- jfrog/claude-plugin: 2
+- junipersquare-public/plugins: 5
+- keenableai/keenable-claude-plugin: 2
+- kensho-technologies/spglobal-agent-skills: 1
+- knocklabs/skills: 7
+- kobiton/automate: 1
+- kowalah-dev/kowalah-plugin: 10
+- krea-ai/skills: 1
+- launchnotes/mcp-server-guide: 8
+- leadfeeder/leadfeeder-mcp-plugin: 6
+- luminpdf/wyatt-plugin: 3
+- lusha-oss/lusha-mcp-plugin: 6
+- lusha-oss/lusha-mcp-talent-sourcing-plugin: 3
+- mercadopago/mercadopago-claude-marketplace: 2
+- meshy-dev/meshy-3d-agent: 3
+- meta-quest/agentic-tools: 30
+- microsoft/azure-sql-database-container: 17
+- microsoft/dataverse-skills: 1
+- mintlify/mintlify-claude-plugin: 1
+- mixpanel/ai-plugins: 1
+- mlflow/skills: 12
+- mobbin/skills: 3
+- mondaycom/mcp: 9
+- mondaycom/monday-claude-cowork-plugin: 5
+- monta-app/claude-plugin-monta: 3
+- morningstar/morningstar-plugins: 5
+- mypropper/skills: 13
+- neondatabase/agent-skills: 6
+- newrelic/claude-code-plugin: 1
+- ngrok/skills: 9
+- noibu/ai-plugin: 7
+- oaknational/oak-ai-plugins: 3
+- opsera-agents/opsera-devsecops: 5
+- oracle/netsuite-suitecloud-sdk: 7
+- ory/claude-plugins: 9
+- pactflow/pactflow-agent-skills: 5
+- pandadoc/mcp-server-guide: 10
+- paypal/ai-toolkit: 1
+- phished-bv/phished-claude-plugin: 7
+- pinecone-io/pinecone-claude-code-plugin: 8
+- pixeltable/pixeltable-skill: 1
+- planetscale/claude-plugin: 8
+- posthog/ai-plugin: 8
+- preset-io/agent-skills: 1
+- privco/privco-claude-plugin: 1
+- remoteoss/remote-for-ai: 7
+- render-oss/render-plugin-claude-code: 21
+- replohq/skills: 17
+- revenuecat/ai-toolkit: 24
+- rilldata/agent-skills: 7
+- riversidefm/riverside-mcp-public: 4
+- rocketreach/rocketreach-mcp-plugin: 5
+- rootly-ai-labs/rootly-claude-plugin: 17
+- ruvnet/ruflo: 6
+- salesforce/salesforce-skills: 30
+- sap/ui-theme-designer-plugins-for-coding-agents: 2
+- scandit/skills: 86
+- semgrep/guardian: 3
+- slackapi/slack-skills-plugin: 4
+- spotify/save-to-spotify: 1
+- stackhawk/agent-skills: 2
+- starburstlabs/wealthbox-plugin: 5
+- stripe/ai: 2
+- sumologic/sumologic-ai-plugins: 2
+- sumup/sumup-skills: 6
+- supabase-community/supabase-plugin: 1
+- supermetrics-public/claude-marketing-plugin: 6
+- surendranb/writing-skills: 9
+- synthflowai/anthropicplugin: 2
+- taboola/realize-claude-plugin: 5
+- taosdata/agent-skills: 1
+- theqtcompanyrnd/agent-skills: 12
+- thoughtspot/spottercode-mcp-plugin: 3
+- tinyfish-io/tinyfish-web-agent-integrations: 6
+- tres-finance-public/tres-claude-plugin: 20
+- twelvelabs-io/twelve-labs-claude-code-plugin: 10
+- twilio/ai: 56
+- ui5/plugins-coding-agents: 28
+- ukg/ukg-ai-marketplace: 2
+- unbounce/agent-plugins: 2
+- unity-technologies/unity-agent-plugin: 10
+- unleash/unleash-claude-skills: 2
+- unstructured-io/unstructured-foundation-marketplace: 5
+- vaadin/agent-skills: 2
+- vaisala-xweather/xweather-agent-skills: 6
+- val-town/plugins: 11
+- vercel/vercel-plugin: 1
+- vid-io/vidiq-mcp: 11
+- villagesql/villagesql-skills: 2
+- windsor-ai/claude-windsor-ai-plugin: 32
+- wingspanhq/mcp-claude-plugin: 6
+- wonderwhy-er/desktopcommandermcp: 2
+- workday/everywhere: 5
+- youdotcom-oss/agent-skills: 3
+- zapier/zapier-mcp: 4
+- zocks-communications/zocks-agent-plugins: 7
+- zoominfo/zoominfo-mcp-plugin: 35
+- zscaler/zscaler-mcp-server: 36
+- zytedata/claude-skills: 1

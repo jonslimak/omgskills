@@ -1,0 +1,298 @@
+{
+  "generatedAt": "2026-10-23T20:02:25.465Z",
+  "reviewSha256": "a45ea5f95dfa0d2f250a1a505acb1d416eaa1635274c585fb1179a4dce32e47f",
+  "excludeRepos": [],
+  "excludeIds": [
+    "tres-finance-public/tres-claude-plugin:skills/tres-asc845-swap-reprice-skill",
+    "daloopa/daloopa-plugin-claude:skills/earnings-prep",
+    "daloopa/daloopa-plugin-claude:skills/earnings-review",
+    "daloopa/daloopa-plugin-claude:skills/guidance-tracker",
+    "daloopa/daloopa-plugin-claude:skills/tearsheet",
+    "spotify/ads-agentic-tools:skills/account-admin",
+    "spotify/ads-agentic-tools:skills/ads",
+    "spotify/ads-agentic-tools:skills/assets",
+    "spotify/ads-agentic-tools:skills/audiences",
+    "spotify/ads-agentic-tools:skills/build-campaign",
+    "spotify/ads-agentic-tools:skills/bulk",
+    "spotify/ads-agentic-tools:skills/campaign-strategy",
+    "spotify/ads-agentic-tools:skills/campaigns",
+    "spotify/ads-agentic-tools:skills/change-history",
+    "spotify/ads-agentic-tools:skills/clone",
+    "spotify/ads-agentic-tools:skills/configure",
+    "spotify/ads-agentic-tools:skills/dashboard",
+    "spotify/ads-agentic-tools:skills/drafts",
+    "spotify/ads-agentic-tools:skills/export",
+    "spotify/ads-agentic-tools:skills/measurement-debug",
+    "spotify/ads-agentic-tools:skills/measurement-setup",
+    "spotify/ads-agentic-tools:skills/monitor",
+    "spotify/ads-agentic-tools:skills/report",
+    "catalystbyzoho/claude-plugin:skills/catalyst-appsail",
+    "catalystbyzoho/claude-plugin:skills/catalyst-authentication",
+    "catalystbyzoho/claude-plugin:skills/catalyst-cache",
+    "catalystbyzoho/claude-plugin:skills/catalyst-datastore",
+    "catalystbyzoho/claude-plugin:skills/catalyst-functions",
+    "catalystbyzoho/claude-plugin:skills/catalyst-slate",
+    "catalystbyzoho/claude-plugin:skills/catalyst-zoho-mcp",
+    "datarobot-oss/datarobot-agent-skills:skills/datarobot-workload-api",
+    "surendranb/writing-skills:skills/bob-ross",
+    "surendranb/writing-skills:skills/jack-sparrow",
+    "surendranb/writing-skills:skills/paddington",
+    "surendranb/writing-skills:skills/shrek",
+    "surendranb/writing-skills:skills/ted-lasso",
+    "surendranb/writing-skills:skills/winnie-the-pooh",
+    "surendranb/writing-skills:skills/yoda",
+    "zytedata/claude-skills:skills/scrape",
+    "datahub-project/datahub-skills:skills/datahub-enrich",
+    "datahub-project/datahub-skills:skills/datahub-lineage",
+    "datahub-project/datahub-skills:skills/datahub-quality",
+    "datahub-project/datahub-skills:skills/datahub-search",
+    "datahub-project/datahub-skills:skills/datahub-setup",
+    "honeycombio/agent-skill:honeycomb/skills/beeline-migration",
+    "honeycombio/agent-skill:honeycomb/skills/create-honeycomb-board",
+    "honeycombio/agent-skill:honeycomb/skills/metrics-queries",
+    "honeycombio/agent-skill:honeycomb/skills/observability-fundamentals",
+    "honeycombio/agent-skill:honeycomb/skills/otel-genai-instrumentation",
+    "honeycombio/agent-skill:honeycomb/skills/otel-instrumentation",
+    "honeycombio/agent-skill:honeycomb/skills/otel-migration",
+    "honeycombio/agent-skill:honeycomb/skills/production-investigation",
+    "honeycombio/agent-skill:honeycomb/skills/query-patterns",
+    "honeycombio/agent-skill:honeycomb/skills/slos-and-triggers",
+    "incident-io/skills:plugins/incident-io/skills/skill-authoring",
+    "oracle/netsuite-suitecloud-sdk:packages/agent-skills/netsuite-suitescript-learning",
+    "awslabs/startups:migrate/plugins/migration-to-aws/skills/tf-best-practices"
+  ],
+  "excluded": [
+    {
+      "id": "tres-finance-public/tres-claude-plugin:skills/tres-asc845-swap-reprice-skill",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "daloopa/daloopa-plugin-claude:skills/earnings-prep",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "daloopa/daloopa-plugin-claude:skills/earnings-review",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "daloopa/daloopa-plugin-claude:skills/guidance-tracker",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "daloopa/daloopa-plugin-claude:skills/tearsheet",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/account-admin",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/ads",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/assets",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/audiences",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/build-campaign",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/bulk",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/campaign-strategy",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/campaigns",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/change-history",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/clone",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/configure",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/dashboard",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/drafts",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/export",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/measurement-debug",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/measurement-setup",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/monitor",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "spotify/ads-agentic-tools:skills/report",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "catalystbyzoho/claude-plugin:skills/catalyst-appsail",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "catalystbyzoho/claude-plugin:skills/catalyst-authentication",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "catalystbyzoho/claude-plugin:skills/catalyst-cache",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "catalystbyzoho/claude-plugin:skills/catalyst-datastore",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "catalystbyzoho/claude-plugin:skills/catalyst-functions",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "catalystbyzoho/claude-plugin:skills/catalyst-slate",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "catalystbyzoho/claude-plugin:skills/catalyst-zoho-mcp",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "datarobot-oss/datarobot-agent-skills:skills/datarobot-workload-api",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "surendranb/writing-skills:skills/bob-ross",
+      "reason": "prefer-practical-style-frameworks-over-novelty-personas"
+    },
+    {
+      "id": "surendranb/writing-skills:skills/jack-sparrow",
+      "reason": "prefer-practical-style-frameworks-over-novelty-personas"
+    },
+    {
+      "id": "surendranb/writing-skills:skills/paddington",
+      "reason": "prefer-practical-style-frameworks-over-novelty-personas"
+    },
+    {
+      "id": "surendranb/writing-skills:skills/shrek",
+      "reason": "prefer-practical-style-frameworks-over-novelty-personas"
+    },
+    {
+      "id": "surendranb/writing-skills:skills/ted-lasso",
+      "reason": "prefer-practical-style-frameworks-over-novelty-personas"
+    },
+    {
+      "id": "surendranb/writing-skills:skills/winnie-the-pooh",
+      "reason": "prefer-practical-style-frameworks-over-novelty-personas"
+    },
+    {
+      "id": "surendranb/writing-skills:skills/yoda",
+      "reason": "prefer-practical-style-frameworks-over-novelty-personas"
+    },
+    {
+      "id": "zytedata/claude-skills:skills/scrape",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "datahub-project/datahub-skills:skills/datahub-enrich",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "datahub-project/datahub-skills:skills/datahub-lineage",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "datahub-project/datahub-skills:skills/datahub-quality",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "datahub-project/datahub-skills:skills/datahub-search",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "datahub-project/datahub-skills:skills/datahub-setup",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/beeline-migration",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/create-honeycomb-board",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/metrics-queries",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/observability-fundamentals",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/otel-genai-instrumentation",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/otel-instrumentation",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/otel-migration",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/production-investigation",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/query-patterns",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "honeycombio/agent-skill:honeycomb/skills/slos-and-triggers",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "incident-io/skills:plugins/incident-io/skills/skill-authoring",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "oracle/netsuite-suitecloud-sdk:packages/agent-skills/netsuite-suitescript-learning",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "awslabs/startups:migrate/plugins/migration-to-aws/skills/tf-best-practices",
+      "reason": "plugin-root-or-external-package-dependency"
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Reviewed product-specific originals from named partner repos across developer tools, CRM, analytics, identity, advertising, finance and document workflows. Hold plugin-root dependencies and novelty personas. Third-party service/MCP access and credentials are separate prerequisites; no tools or source commands executed.",
+  "reviewed": 655,
+  "approvedCount": 431
+}
