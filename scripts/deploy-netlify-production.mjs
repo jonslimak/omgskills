@@ -286,6 +286,34 @@ function rollbackIssueBody(receipt) {
     .join("\n");
 }
 
+async function migrationHistory({ run, env, branch, migrationNames }) {
+  const result = await run("npx", [
+    "netlify-cli", "database", "status", "--branch", branch, "--json",
+  ], { env });
+  let history;
+  try {
+    history = JSON.parse(result.stdout);
+  } catch {
+    throw new Error(`Invalid migration history for database branch ${branch}`);
+  }
+  if (!["applied", "pending", "missingOnDisk", "outOfOrder"].every((key) => Array.isArray(history?.[key]))
+      || history.missingOnDisk.length || history.outOfOrder.length) {
+    throw new Error(`Unsafe migration history for database branch ${branch}`);
+  }
+  const names = [...history.applied, ...history.pending].map((entry) => entry?.name);
+  const expected = [...migrationNames].sort();
+  if (names.some((name) => typeof name !== "string")
+      || names.length !== expected.length
+      || names.sort().some((name, index) => name !== expected[index])) {
+    throw new Error(`Database branch ${branch} migration history does not match committed migrations`);
+  }
+  // Return only migration names; never persist CLI connection details in the receipt.
+  return {
+    applied: history.applied.map((entry) => entry.name),
+    pending: history.pending.map((entry) => entry.name),
+  };
+}
+
 export async function deployProduction({
   env = process.env,
   run = runCommand,
@@ -422,12 +450,14 @@ export async function deployProduction({
     if (draft.site_id !== siteId || !draft.database_branch_id || draft.database_branch_id === "production") {
       throw new Error("Netlify draft must use an isolated database branch");
     }
-    const files = draft.database_migrations?.files;
-    if (!Array.isArray(files) || files.length !== migrationNames.length) {
-      throw new Error(`Netlify draft received ${Array.isArray(files) ? files.length : 0} database migrations; expected ${migrationNames.length}`);
+    const productionHistory = await migrationHistory({ run, env, branch: "production", migrationNames });
+    const previewHistory = await migrationHistory({ run, env, branch: draft.database_branch_id, migrationNames });
+    if (previewHistory.pending.length) {
+      throw new Error("Netlify draft database still has pending migrations");
     }
+    receipt.pendingProductionMigrations = productionHistory.pending;
     receipt.previewDatabaseBranchId = draft.database_branch_id;
-    receipt.previewMigrationCount = files.length;
+    receipt.previewMigrationCount = previewHistory.applied.length;
     await save();
     await verifyWithRetries({
       run,
