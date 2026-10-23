@@ -190,7 +190,14 @@ const redirects = [
     path: "/profiles/jonslimak/",
     location: "/u/jonslimak/",
   },
+  {
+    path: "/library/openai",
+    location: "/library/openai/",
+  },
 ];
+
+// Unknown creators must be real 404s, not a redirect back to the same address.
+const notFoundPaths = ["/library/omgskills-missing-creator-check/"];
 
 function localPathForUrlPath(urlPath) {
   const cleanPath = urlPath.replace(/^\/+/, "");
@@ -807,6 +814,8 @@ async function verifyLocalGeneratedRedirects() {
     }
     assertIncludes(contents, `${redirect.path}  ${location}  301`, filePath);
   }
+  assertNotIncludes(contents, "/library/:handle", filePath);
+  assertIncludes(contents, "/library/openai  /library/openai/  301", filePath);
 }
 
 async function verifyLocalHomepageLibraryPreview() {
@@ -1035,6 +1044,14 @@ async function verifyLiveRedirect(redirect) {
   }
 }
 
+async function verifyLiveNotFound(urlPath) {
+  const url = `${origin}${urlPath}`;
+  const response = await fetchLive(url, { redirect: "manual" });
+  if (response.status !== 404) {
+    throw new Error(`${url} returned ${response.status} (${response.headers.get("location") || "no redirect"}), expected 404`);
+  }
+}
+
 async function main() {
   if (isLive) {
     await verifyLiveHomepageLibraryPreview();
@@ -1054,6 +1071,7 @@ async function main() {
       await verifyLiveRedirect({ path: redirect.path, location });
     }
     for (const redirect of redirects) await verifyLiveRedirect(redirect);
+    for (const urlPath of notFoundPaths) await verifyLiveNotFound(urlPath);
     console.log("Live web library pages verified");
     return;
   }
