@@ -83,12 +83,17 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   };
   const current = address(nav);
   useEffect(() => {
-    if (available || isDiscovery(requested.view)) history.replaceState({ nav }, "", current);
+    if (!(available || isDiscovery(requested.view))) return;
+    // A taken-over static page keeps its own /library/... address while it shows that view.
+    const here = location.pathname + location.search;
+    const keep = location.pathname.startsWith("/library/")
+      && navigationLocation(entryNavigation(location.pathname, location.search, base), true) === navigationLocation(nav, true);
+    history.replaceState({ nav }, "", keep ? here : current);
   }, [current, available, base, requested.view]);
   useEffect(() => {
     const pop = () => {
       const saved = (history.state as { nav?: Navigation } | null)?.nav;
-      const next = saved && address(saved) === location.pathname + location.search
+      const next = saved && (address(saved) === location.pathname + location.search || location.pathname.startsWith("/library/"))
         ? saved : entryNavigation(location.pathname, location.search, base);
       clearOtherIntent(next);
       setRequested(next);
