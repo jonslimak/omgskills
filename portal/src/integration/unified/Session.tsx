@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentProps } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
-import { navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
+import { navigationLocation, navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../../app/unified/use-public-catalog";
 import { usePortalApi, type PortalApi } from "../../portal-api";
@@ -43,7 +43,7 @@ export type UnifiedSessionComposition = {
   clearInstallIntent: (next: Navigation) => void;
 };
 
-function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, composition }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; composition?: UnifiedSessionComposition }) {
+function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, composition, cleanPaths }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean }) {
   const normalApi = usePortalApi();
   const api = composition ? composition.adaptApi(normalApi) : normalApi;
   const clerk = useClerk();
@@ -63,22 +63,27 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     const catalogPending = catalogStore?.read().intent;
     if (catalogPending && next.selected && next.selected !== `catalog:${catalogPending.catalogId}`) catalogStore?.clear();
   };
+  // Install test flows validate ?view= return routes, so they keep that form.
+  const address = (next: Navigation) => `${base}${navigationLocation(next, cleanPaths && !installStore && !catalogStore)}`;
   const available = signedIn && !leaving;
   const nav = navigation(requested, available);
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
   const navigate = (next: Navigation, replace = false) => {
     const safe = navigation(next, available);
     clearOtherIntent(safe);
-    history[replace ? "replaceState" : "pushState"]({}, "", `${base}${navigationSearch(safe)}`);
+    // Keep the full view in history so Back restores the list behind a skill address.
+    history[replace ? "replaceState" : "pushState"]({ nav: safe }, "", address(safe));
     setRequested(safe);
   };
-  const search = navigationSearch(nav);
+  const current = address(nav);
   useEffect(() => {
-    if (available || requested.view === "discover") history.replaceState({}, "", `${base}${search}`);
-  }, [search, available, base, requested.view]);
+    if (available || requested.view === "discover") history.replaceState({ nav }, "", current);
+  }, [current, available, base, requested.view]);
   useEffect(() => {
     const pop = () => {
-      const next = entryNavigation(location.pathname, location.search, base);
+      const saved = (history.state as { nav?: Navigation } | null)?.nav;
+      const next = saved && address(saved) === location.pathname + location.search
+        ? saved : entryNavigation(location.pathname, location.search, base);
       clearOtherIntent(next);
       setRequested(next);
     };
@@ -91,8 +96,9 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     setSessionError("");
     account.clear();
     const next = navigation(nav, false);
-    history.replaceState({}, "", `${base}${navigationSearch(next)}`);
+    history.replaceState({ nav: next }, "", address(next));
     setRequested(next);
+    // Sign-in and sign-out returns keep the ?view= form; the page rewrites it on arrival.
     try { await clerk.signOut({ redirectUrl: `${base}${navigationSearch(next)}` }); }
     catch { setLeaving(false); setSessionError("Could not sign out. Try again."); account.recover(); }
   }
@@ -145,13 +151,13 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, composition }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; composition?: UnifiedSessionComposition }) {
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, composition, cleanPaths = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean }) {
   const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
   const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} composition={composition}
+  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} composition={composition} cleanPaths={cleanPaths && !composition}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }

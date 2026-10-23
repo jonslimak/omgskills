@@ -1,8 +1,11 @@
-import { initialNavigation, parseNavigation, type Navigation } from "../../app/unified/model";
+import { initialNavigation, parseNavigation, parsePublicNavigationPath, type Navigation } from "../../app/unified/model";
 import { parseRoute } from "../../app/routes";
 
 // Keep previously shared /app/groups/:id links working in the unified shell.
 export function entryNavigation(pathname: string, search: string, base: string): Navigation {
+  // Clean public addresses are always readable, even where this entry still writes ?view=.
+  const clean = pathname.startsWith(base) ? parsePublicNavigationPath(pathname.slice(base.length), search) : null;
+  if (clean) return clean;
   const route = parseRoute(pathname, search, base);
   if (route.page === "detail") return { ...initialNavigation, view: "set", id: route.groupId! };
   if (route.page === "agents") return { ...initialNavigation, view: "agents" };
