@@ -536,7 +536,6 @@ async function writeGeneratedPage(urlPath, { html, markdown, includeInGoldBundle
 async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlById) {
   const lines = [
     "# generated web-library legacy profile redirects",
-    "/library/:handle  /library/:handle/  301",
   ];
   for (const redirect of legacyCatalogSkillRedirects) {
     const targetPath = generatedSkillUrlById.get(redirect.catalogSkillId);
@@ -553,6 +552,9 @@ async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlByI
     const to = profilePath(collection.authorHandle);
     lines.push(`${from.replace(/\/$/, "")}  ${to}  301`);
     lines.push(`${from}  ${to}  301`);
+    // One rule per real creator page. A /library/:handle wildcard also matched unknown
+    // creators and, because Netlify ignores the trailing slash, redirected them to themselves.
+    lines.push(`${to.replace(/\/$/, "")}  ${to}  301`);
   }
   lines.push("/profiles/*  /u/:splat  301");
   await writeFile(path.join(siteDir, "_web-library-redirects"), `${lines.join("\n")}\n`);
