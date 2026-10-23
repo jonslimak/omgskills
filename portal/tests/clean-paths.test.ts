@@ -10,6 +10,7 @@ import {
   type Navigation,
 } from "../src/app/unified/model";
 import { entryNavigation } from "../src/integration/unified/entry-navigation";
+import { accountNavigation } from "../src/integration/unified/policy";
 
 const nav = (value: Partial<Navigation>): Navigation => ({ ...initialNavigation, view: "discover", ...value });
 const roundTrip = (value: Navigation) => {
@@ -82,6 +83,34 @@ test("entry reads clean paths, old ?view= links and legacy path routes", () => {
     "catalog:obra/superpowers:brainstorming");
   assert.deepEqual(entryNavigation("/app/groups/abc", "", "/app/"), { ...initialNavigation, view: "set", id: "abc" });
   assert.deepEqual(entryNavigation("/app/", "", "/app/"), nav({}));
+});
+
+test("signed-out public entries rewrite old links without rewriting private destinations", () => {
+  const session = readFileSync(new URL("../src/integration/unified/Session.tsx", import.meta.url), "utf8");
+  assert.match(session, /if \(available \|\| isDiscovery\(requested\.view\)\) history\.replaceState\(\{ nav \}, "", current\)/);
+  const cases: [string, string][] = [
+    ["?view=creator&id=anthropics&sort=stars", "library/anthropics/?sort=stars"],
+    ["?view=collection&id=starter-pack", "library/collections/starter-pack/"],
+    ["?view=top", "library/trending/"],
+    ["?view=data", "library/data/"],
+    ["?view=creators", "library/creators/"],
+    ["?view=creators&id=companies", "library/companies/"],
+    ["?view=collections", "library/collections/"],
+    ["?view=creator&id=anthropics&skill=catalog%3Aanthropics%2Fskills%3Apptx", "library/anthropics/skills/pptx/"],
+  ];
+  for (const [search, expected] of cases) {
+    const requested = entryNavigation("/app/", search, "/app/");
+    const safe = accountNavigation(requested, false);
+    assert.deepEqual(safe, requested);
+    assert.equal(navigationLocation(safe, true), expected);
+  }
+  for (const search of ["?view=set&id=private&skill=set-item%3Asecret", "?view=all&skill=synced%3Asecret", "?view=devices"]) {
+    const requested = entryNavigation("/app/", search, "/app/");
+    assert.equal(publicNavigationPath(requested), null);
+    assert.deepEqual(accountNavigation(requested, false), nav({}));
+  }
+  assert.match(session, /clerk\.openSignIn\(\{ forceRedirectUrl: returnUrl \}\)/);
+  assert.match(session, /clerk\.signOut\(\{ redirectUrl: `\$\{base\}\$\{navigationSearch\(next\)\}` \}\)/);
 });
 
 const manifestUrl = new URL("../../site/data/crawl4/manifest.json", import.meta.url);

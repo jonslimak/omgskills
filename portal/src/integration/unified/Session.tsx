@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentProps } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
-import { navigationLocation, navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
+import { isDiscovery, navigationLocation, navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../../app/unified/use-public-catalog";
 import { usePortalApi, type PortalApi } from "../../portal-api";
@@ -77,7 +77,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   };
   const current = address(nav);
   useEffect(() => {
-    if (available || requested.view === "discover") history.replaceState({ nav }, "", current);
+    if (available || isDiscovery(requested.view)) history.replaceState({ nav }, "", current);
   }, [current, available, base, requested.view]);
   useEffect(() => {
     const pop = () => {
