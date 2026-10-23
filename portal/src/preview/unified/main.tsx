@@ -6,8 +6,9 @@ import {
   initialNavigation,
   isDiscovery,
   isFavorite,
-  navigationSearch,
+  navigationLocation,
   parseNavigation,
+  parsePublicNavigationPath,
   type Navigation,
   type SkillDisplay,
 } from "../../app/unified/model";
@@ -28,6 +29,9 @@ const installPreviewEnabled = installClient !== null;
 const catalog = makeCatalog();
 const publicClient = new PublicCatalogClient();
 const base = "/app/preview/unified/";
+// The plain sample preview mirrors production's clean public addresses; F2 install cases keep ?view=.
+const readNavigation = () => (!installPreviewEnabled && location.pathname.startsWith(base)
+  ? parsePublicNavigationPath(location.pathname.slice(base.length), location.search) : null) ?? parseNavigation(location.search);
 function installed(skills: SkillDisplay[]): GroupedSyncedSkill[] {
   return skills.flatMap((skill) => (skill.installed ? [skill.installed] : []));
 }
@@ -38,13 +42,13 @@ function Preview() {
   const [data, setData] = useState(() => makeFixtures());
   const [signedIn, setSignedIn] = useState(!installPreviewEnabled);
   const [f2CaseKey, setF2CaseKey] = useState(() => readF2CaseKey(location.search));
-  const [nav, setNav] = useState(() => parseNavigation(location.search));
+  const [nav, setNav] = useState(readNavigation);
   const [revision, setRevision] = useState(0);
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
   const previewSearch = (next: Navigation, caseKey = f2CaseKey) =>
-    installPreviewEnabled ? f2NavigationSearch(next, caseKey) : navigationSearch(next);
+    installPreviewEnabled ? f2NavigationSearch(next, caseKey) : navigationLocation(next, true);
   const navigate = (next: Navigation, replace = false) => {
     if (next.selected && next.selected !== nav.selected) installStore?.clear();
     const safe =
@@ -52,7 +56,7 @@ function Preview() {
         ? { ...initialNavigation, view: "discover" as const }
         : next;
     window.history[replace ? "replaceState" : "pushState"](
-      {},
+      { nav: safe },
       "",
       `${base}${previewSearch(safe)}`,
     );
@@ -60,14 +64,15 @@ function Preview() {
   };
   useEffect(() => {
     const pop = () => {
-      const next = parseNavigation(location.search);
+      const saved = (history.state as { nav?: Navigation } | null)?.nav;
+      const next = saved && `${base}${previewSearch(saved)}` === location.pathname + location.search ? saved : readNavigation();
       const caseKey = readF2CaseKey(location.search);
       const pending = installStore?.read().intent;
       if (pending && next.selected && next.selected !== `catalog:${pending.catalogId}`) installStore?.clear();
       setF2CaseKey(caseKey);
       if (!signedIn && !isDiscovery(next.view)) {
         const safe = { ...initialNavigation, view: "discover" as const };
-        history.replaceState({}, "", `${base}${installPreviewEnabled ? f2NavigationSearch(safe, caseKey) : navigationSearch(safe)}`);
+        history.replaceState({ nav: safe }, "", `${base}${installPreviewEnabled ? f2NavigationSearch(safe, caseKey) : navigationLocation(safe, true)}`);
         setNav(safe);
       } else setNav(next);
     };

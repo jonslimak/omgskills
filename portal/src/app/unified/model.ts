@@ -173,6 +173,10 @@ export function parseNavigation(search: string): Navigation {
   if (validPublicSort(sort) && sort !== "relevance" && publicPageRequest(nav)?.name !== "list_trending" && publicPageRequest(nav)) nav.sort = sort;
   return nav;
 }
+function addressSort(nav: Navigation) {
+  return nav.sort && nav.sort !== "relevance" && publicPageRequest(nav)?.name !== "list_trending" && publicPageRequest(nav)
+    ? nav.sort : undefined;
+}
 export function navigationSearch(nav: Navigation) {
   const params = new URLSearchParams();
   params.set("view", nav.view);
@@ -180,8 +184,83 @@ export function navigationSearch(nav: Navigation) {
   if (nav.query) params.set("q", nav.query);
   if (nav.selected) params.set("skill", nav.selected);
   if (nav.source !== "all") params.set("source", nav.source);
-  if (nav.sort && nav.sort !== "relevance" && publicPageRequest(nav)?.name !== "list_trending" && publicPageRequest(nav)) params.set("sort", nav.sort);
+  const sort = addressSort(nav);
+  if (sort) params.set("sort", sort);
   return params.size ? `?${params}` : "";
+}
+
+// Clean public addresses (urls.md U-02), relative to the app base. Private views,
+// private selections and anything that cannot round-trip keep the ?view= form.
+const librarySections = { top: "trending", data: "data", collections: "collections", creators: "creators" } as const;
+export const reservedLibraryNames = new Set(["trending", "companies", "creators", "collections", "data", "categories", "me", "library", "search"]);
+
+function pathSegment(value: string) {
+  return value && value !== "." && value !== ".." ? encodeURIComponent(value) : null;
+}
+function ownerSegment(owner: string) {
+  return reservedLibraryNames.has(owner.toLowerCase()) ? null : pathSegment(owner);
+}
+
+/** `owner/repo:skill/path` <-> `library/owner/repo/skill/path/`; `owner/repo` has no skill part. */
+export function catalogSkillPath(id: string): string | null {
+  const colon = id.indexOf(":");
+  const [owner = "", repo = "", ...extra] = (colon < 0 ? id : id.slice(0, colon)).split("/");
+  const skill = colon < 0 ? [] : id.slice(colon + 1).split("/");
+  if (extra.length || (colon >= 0 && !id.slice(colon + 1))) return null;
+  const segments = [ownerSegment(owner), pathSegment(repo), ...skill.map(pathSegment)];
+  return segments.every(Boolean) ? `library/${segments.join("/")}/` : null;
+}
+function catalogIdFromSegments([owner, repo, ...skill]: string[]) {
+  return skill.length ? `${owner}/${repo}:${skill.join("/")}` : `${owner}/${repo}`;
+}
+
+export function publicNavigationPath(nav: Navigation): string | null {
+  if (!isDiscovery(nav.view) || nav.source !== "all") return null;
+  if (nav.selected) return nav.selected.startsWith("catalog:") ? catalogSkillPath(nav.selected.slice(8)) : null;
+  if (nav.query && nav.view !== "discover") return null;
+  let path: string | null = null;
+  if (nav.view === "discover") path = nav.id ? null : "library/";
+  else if (nav.view === "creators") path = nav.id === "companies" ? "library/companies/" : nav.id ? null : "library/creators/";
+  else if (nav.view === "top" || nav.view === "data" || nav.view === "collections") path = nav.id ? null : `library/${librarySections[nav.view]}/`;
+  else if (nav.view === "collection") path = pathSegment(nav.id) && `library/collections/${pathSegment(nav.id)}/`;
+  else if (nav.view === "creator") path = ownerSegment(nav.id) && `library/${ownerSegment(nav.id)}/`;
+  if (!path) return null;
+  const params = new URLSearchParams();
+  if (nav.query) params.set("q", nav.query);
+  const sort = addressSort(nav);
+  if (sort) params.set("sort", sort);
+  return params.size ? `${path}?${params}` : path;
+}
+
+export function parsePublicNavigationPath(relative: string, search: string): Navigation | null {
+  if (relative !== "library" && !relative.startsWith("library/")) return null;
+  const parts = relative.slice("library".length).replace(/^\//, "").replace(/\/$/, "");
+  let segments: string[];
+  try { segments = parts ? parts.split("/").map(decodeURIComponent) : []; } catch { return null; }
+  if (segments.some(segment => !segment || segment === "." || segment === "..")) return null;
+  const params = new URLSearchParams(search);
+  const base = { ...initialNavigation, view: "discover" as View };
+  let nav: Navigation | null = null;
+  const [first = "", second] = segments;
+  if (!segments.length) nav = { ...base, query: params.get("q") || "" };
+  else if (segments.length === 1 && first === "trending") nav = { ...base, view: "top" };
+  else if (segments.length === 1 && first === "companies") nav = { ...base, view: "creators", id: "companies" };
+  else if (segments.length === 1 && (first === "data" || first === "collections" || first === "creators")) nav = { ...base, view: first };
+  else if (segments.length === 2 && first === "collections") nav = { ...base, view: "collection", id: second! };
+  else if (!reservedLibraryNames.has(first.toLowerCase())) {
+    // A direct skill address opens its creator's list with that skill selected.
+    nav = segments.length === 1 ? { ...base, view: "creator", id: first }
+      : { ...base, view: "creator", id: first.toLowerCase(), selected: `catalog:${catalogIdFromSegments(segments)}` };
+  }
+  if (!nav) return null;
+  const sort = params.get("sort");
+  if (!nav.selected && validPublicSort(sort) && sort !== "relevance" && publicPageRequest(nav)?.name !== "list_trending" && publicPageRequest(nav)) nav.sort = sort;
+  return nav;
+}
+
+/** The address after the app base: a clean public path when enabled and possible, otherwise `?view=`. */
+export function navigationLocation(nav: Navigation, cleanPaths: boolean) {
+  return (cleanPaths && publicNavigationPath(nav)) || navigationSearch(nav);
 }
 export function isDiscovery(view: View) {
   return [
