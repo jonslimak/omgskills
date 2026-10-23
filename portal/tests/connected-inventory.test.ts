@@ -34,7 +34,7 @@ const identity = { name: "Test", email: "test@example.test" };
 const catalog = { skills: [], collections: [], creators: [], categories: [], trendingIds: [] };
 function inventory() {
   const skill = { id: "physical-a", name: "Same skill", description: "Same description", source: "codex",
-    skillMdSha: "a".repeat(64), identityStatus: "localOnly" as const, catalogSkillId: null, githubUrl: null,
+    skillMdSha: "a".repeat(40), identityStatus: "localOnly" as const, catalogSkillId: null, githubUrl: null,
     isLocalOnly: true, lastSeenAt: date, deviceId: "mac-a", installationFolder: "same", gitRelativePath: null, catalogSkillIdHint: null };
   return { inventoryVersion: 2, skills: [skill, { ...skill, id: "physical-b", deviceId: "mac-b" },
     { ...skill, id: "physical-c", source: "claude" }, { ...skill, id: "legacy", deviceId: null }],

@@ -117,7 +117,7 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
       const catalogId = skill.catalogSkillId?.trim();
       const fingerprint = skill.skillMdSha;
       const key = catalogId ? `catalog:${catalogId}`
-        : fingerprint && /^[a-f0-9]{64}$/.test(fingerprint) && normalizedSkillText(skill.name)
+        : fingerprint && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(fingerprint) && normalizedSkillText(skill.name)
           ? `content:${JSON.stringify([normalizedSkillText(skill.name), fingerprint])}` : null;
       if (groupInstallations && key) {
         const group = displayGroups.get(key) ?? [];

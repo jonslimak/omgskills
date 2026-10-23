@@ -148,7 +148,10 @@ test("unresolved display groups require identical fingerprints and names, not de
     catalogSkillIdHint: "owner/repo:review", githubUrl: null, isLocalOnly: true, source: "claude",
     lastSeenAt: "2026-10-23T12:00:00Z", isCurrent: true };
   const skills = [base, { ...base, id: "codex", name: " review ", source: "codex" }];
-  assert.equal(groupSyncedSkills(skills, { groupInstallations: true }).length, 1);
+  for (const length of [40, 64]) {
+    assert.equal(groupSyncedSkills(skills.map(skill => ({ ...skill, skillMdSha: "a".repeat(length) })),
+      { groupInstallations: true }).length, 1, `Group the ${length}-character fingerprint accepted by inventory uploads`);
+  }
   for (const change of [{ skillMdSha: "b".repeat(64) }, { skillMdSha: null }, { skillMdSha: "invalid" },
     { name: "other" }, { catalogSkillId: "owner/repo:review" }]) {
     assert.equal(groupSyncedSkills([base, { ...skills[1], ...change }], { groupInstallations: true }).length, 2);
