@@ -3,6 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
+  Fragment,
   type ComponentProps,
   type ReactNode,
 } from "react";
@@ -466,7 +467,9 @@ export function UnifiedApp({
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
-  const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected) || pendingSelection;
+  const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected
+    || (nav.selected.startsWith("synced:") && s.key.startsWith("synced:")
+      && s.installed?.allSkillIds.includes(nav.selected.slice(7)))) || pendingSelection;
   const detailOpen = useRef(false);
   detailOpen.current = !!selected;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
@@ -475,7 +478,7 @@ export function UnifiedApp({
   const closingDetail = useRef<{ skill: SkillDisplay; pending: boolean } | null>(null);
   if (selected) closingDetail.current = { skill: selected, pending: detailPending };
   const detail = selected ?? closingDetail.current?.skill;
-  const selectedInventory = detail?.installed ? inventorySummary(detail.installed) : null;
+  const selectedInstallations = detail?.installed?.sourceSkills ?? [];
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
@@ -728,7 +731,9 @@ export function UnifiedApp({
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
-    const inventory = skill.installed ? inventorySummary(skill.installed) : null;
+    const inventories = skill.installed?.sourceSkills.map(installation => ({
+      id: installation.id, summary: inventorySummary(installation),
+    })) ?? [];
     return (
       <div
         key={skill.key}
@@ -792,11 +797,12 @@ export function UnifiedApp({
                   </>
                 : skill.description || "No description available"}
             </span>
-            {inventory && <span className="ua-row-description"
-              title={`${inventory.location} - ${inventory.report}`}>
-              {inventory.location} - {inventory.report}
-            </span>}
-            {inventory?.latestReport && <span className="ua-row-description" title={inventory.latestReport}>{inventory.latestReport}</span>}
+            {inventories.map(({ id, summary }) => summary && <Fragment key={id}>
+              <span className="ua-row-description" title={`${summary.location} - ${summary.report}`}>
+                {summary.location} - {summary.report}
+              </span>
+              {summary.latestReport && <span className="ua-row-description" title={summary.latestReport}>{summary.latestReport}</span>}
+            </Fragment>)}
           </span>
         </button>
         {!compact && !discovery && !nav.query && (
@@ -1843,12 +1849,15 @@ export function UnifiedApp({
                       <span>Observed on</span>
                       <strong>{detail.installed.sources.join(", ")}</strong>
                     </div>
-                    {selectedInventory && <>
-                      <div><span>Mac / agent</span><strong>{selectedInventory.location}</strong></div>
-                      <p>{selectedInventory.report}</p>
-                      {selectedInventory.latestReport && <p>{selectedInventory.latestReport}</p>}
-                      {detail.installed.installationFolder && <div><span>Folder</span><strong>{detail.installed.installationFolder}</strong></div>}
-                    </>}
+                    {selectedInstallations.map(installation => {
+                      const inventory = inventorySummary(installation);
+                      return inventory && <div key={installation.id} className="ua-installation">
+                        <div><span>Mac / agent</span><strong>{inventory.location}</strong></div>
+                        <p>{inventory.report}</p>
+                        {inventory.latestReport && <p>{inventory.latestReport}</p>}
+                        {installation.installationFolder && <div><span>Folder</span><strong>{installation.installationFolder}</strong></div>}
+                      </div>;
+                    })}
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, detail.installed!))

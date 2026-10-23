@@ -276,7 +276,7 @@ test("rendered My skills and Set rows retain missing history separately from lat
       signedIn: true, readOnlyAccount: true, state: "ready", navigate: noOp, onSession: noOp, onFavorite: noOp,
       onCreateSet: noOp, onMembership: noOp, onVisibility: noOp, retry: noOp }));
     const mine = render();
-    assert.equal([...mine.matchAll(/aria-label="Open Removal fixture"/g)].length, 3);
+    assert.equal([...mine.matchAll(/aria-label="Open Removal fixture"/g)].length, 1);
     assert.match(mine, /Not found on last scan/);
     assert.match(mine, /Last seen/);
     assert.match(mine, /Latest scan incomplete/);
@@ -295,6 +295,8 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.match(managedSet, /Latest scan incomplete/);
     const selected = render({ ...initialNavigation, selected: "synced:missing-id" });
     assert.match(selected, /aria-label="Open Removal fixture" aria-expanded="true"/);
+    const existingLink = render({ ...initialNavigation, selected: "synced:other-mac" });
+    assert.match(existingLink, /aria-label="Open Removal fixture" aria-expanded="true"/);
     assert.doesNotMatch(mine, /Uninstalled|Currently live/);
     assert.deepEqual(data.sets[0].items, [item]);
   } finally {

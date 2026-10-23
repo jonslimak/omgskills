@@ -105,14 +105,26 @@ function chooseRepresentativeSkill(skills: SyncedSkill[]) {
   return representative;
 }
 
-export function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
+export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = false } = {}): GroupedSyncedSkill[] {
   const physicalGroups: SyncedSkill[][] = [];
+  const displayGroups = new Map<string, SyncedSkill[]>();
   const catalogGroups = new Map<string, SyncedSkill[]>();
   const unresolvedSkills: SyncedSkill[] = [];
 
   for (const skill of skills) {
-    // Presence rows are physical installations, not fuzzy account-wide identities.
+    // Only presentation may combine presence rows; mutation callers keep physical identities.
     if (skill.inventoryVersion === 2 || skill.inventoryVersion === 3 || skill.deviceId != null) {
+      const catalogId = skill.catalogSkillId?.trim();
+      const fingerprint = skill.skillMdSha;
+      const key = catalogId ? `catalog:${catalogId}`
+        : fingerprint && /^[a-f0-9]{64}$/.test(fingerprint) && normalizedSkillText(skill.name)
+          ? `content:${JSON.stringify([normalizedSkillText(skill.name), fingerprint])}` : null;
+      if (groupInstallations && key) {
+        const group = displayGroups.get(key) ?? [];
+        group.push(skill);
+        displayGroups.set(key, group);
+        continue;
+      }
       physicalGroups.push([skill]);
       continue;
     }
@@ -147,7 +159,7 @@ export function groupSyncedSkills(skills: SyncedSkill[]): GroupedSyncedSkill[] {
     }
   }
 
-  return [...physicalGroups, ...catalogGroups.values(), ...unresolvedGroups]
+  return [...physicalGroups, ...displayGroups.values(), ...catalogGroups.values(), ...unresolvedGroups]
     .map((group) => {
       const representative = chooseRepresentativeSkill(group);
       const bestDescription =

@@ -123,3 +123,36 @@ test("v3 retains same-name/catalog missing, current, other-agent and unknown-Mac
   assert.deepEqual(grouped.map(skill => skill.allSkillIds), skills.map(skill => [skill.id]));
   assert.equal(grouped.find(skill => skill.id === "missing")?.isCurrent, false);
 });
+
+test("display-only grouping combines exact catalog matches and preserves every installation unchanged", () => {
+  const base: SyncedSkill = { inventoryVersion: 3, id: "claude", deviceId: "mac-a", deviceName: "Work Mac",
+    name: "review", description: "Review changes", catalogSkillId: "owner/repo:review", githubUrl: null,
+    isLocalOnly: false, source: "claude", lastSeenAt: "2026-10-23T12:00:00Z", isCurrent: false };
+  const skills = [base, { ...base, id: "codex", source: "codex", isCurrent: true },
+    { ...base, id: "other-mac", deviceId: "mac-b", deviceName: "Home Mac", source: "codex" }];
+  const before = structuredClone(skills);
+  const [group] = groupSyncedSkills(skills, { groupInstallations: true });
+  assert.deepEqual(group.sources, ["claude", "codex"]);
+  assert.deepEqual(group.allSkillIds, skills.map(skill => skill.id));
+  assert.deepEqual(group.sourceSkills, before);
+  assert.ok(group.sourceSkills.every((skill, i) => skill === skills[i]));
+  assert.deepEqual(skills, before);
+  assert.equal(groupSyncedSkills(skills).length, 3, "Mutation callers still see separate records");
+  assert.equal(groupSyncedSkills([...skills, { ...base, id: "different", catalogSkillId: "other/repo:review" }],
+    { groupInstallations: true }).length, 2);
+});
+
+test("unresolved display groups require identical fingerprints and names, not descriptions or catalog hints", () => {
+  const base: SyncedSkill = { inventoryVersion: 3, id: "claude", deviceId: "mac-a", name: "Review",
+    description: "Review changes", skillMdSha: "a".repeat(64), catalogSkillId: null, identityStatus: "localOnly",
+    catalogSkillIdHint: "owner/repo:review", githubUrl: null, isLocalOnly: true, source: "claude",
+    lastSeenAt: "2026-10-23T12:00:00Z", isCurrent: true };
+  const skills = [base, { ...base, id: "codex", name: " review ", source: "codex" }];
+  assert.equal(groupSyncedSkills(skills, { groupInstallations: true }).length, 1);
+  for (const change of [{ skillMdSha: "b".repeat(64) }, { skillMdSha: null }, { skillMdSha: "invalid" },
+    { name: "other" }, { catalogSkillId: "owner/repo:review" }]) {
+    assert.equal(groupSyncedSkills([base, { ...skills[1], ...change }], { groupInstallations: true }).length, 2);
+  }
+  assert.equal(groupSyncedSkills(skills.map(skill => ({ ...skill, skillMdSha: null })),
+    { groupInstallations: true }).length, 2, "Names and hints alone cannot merge installations");
+});

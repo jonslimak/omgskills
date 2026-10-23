@@ -1,6 +1,7 @@
 import {
   groupSyncedSkills,
   type GroupedSyncedSkill,
+  type SyncedSkill,
 } from "../../synced-skill-grouping";
 import { isMember, type PortalData, type PortalSet } from "../model";
 import { validPublicSort, publicPageRequest, type PublicSort } from "./public-paging";
@@ -40,7 +41,7 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   setItemKind?: PortalSet["items"][number]["kind"];
 };
 
-export function inventorySummary(skill: GroupedSyncedSkill) {
+export function inventorySummary(skill: SyncedSkill) {
   if (skill.inventoryVersion !== 2 && skill.inventoryVersion !== 3) return null;
   const location = `${skill.deviceName || "Unknown Mac"} / ${skill.source}`;
   if (skill.inventoryVersion === 3) {
@@ -275,7 +276,7 @@ export function isDiscovery(view: View) {
   ].includes(view);
 }
 export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {
-  const grouped = groupSyncedSkills(data.skills);
+  const grouped = groupSyncedSkills(data.skills, { groupInstallations: true });
   const byId = new Map(catalog.skills.map((skill) => [skill.id, skill]));
   const mine: SkillDisplay[] = grouped.map((skill) => {
     const publicSkill = skill.catalogSkillId
@@ -317,13 +318,15 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: 
       ? mine.find(skill => skill.installed?.allSkillIds.includes(item.syncedSkillId!))
       : item.catalogSkillId ? mine.find(skill => skill.catalogId === item.catalogSkillId) : undefined;
     const publicSkill = item.kind === "catalog" && item.catalogSkillId ? byId.get(item.catalogSkillId) : undefined;
+    const installation = installed?.installed?.sourceSkills.find(skill => skill.id === item.syncedSkillId);
     return { key: `set-item:${item.id}`, setItemId: item.id, setItemKind: item.kind, name: publicSkill?.name || item.name,
       catalogId: item.catalogSkillId ?? undefined,
       description: publicSkill?.description || item.description || installed?.description || "",
       githubUrl: publicSkill?.githubUrl || item.githubUrl || installed?.githubUrl || null,
       author: publicSkill?.author || installed?.author || "", tags: publicSkill?.tags || [],
       avatar: publicSkill?.avatar || installed?.avatar, stars: publicSkill?.stars,
-      installed: installed?.installed };
+      installed: installation && (installation.inventoryVersion === 2 || installation.inventoryVersion === 3 || installation.deviceId != null)
+        ? groupSyncedSkills([installation])[0] : installed?.installed };
   });
 }
 export function isFavorite(data: PortalData, skill: SkillDisplay) {

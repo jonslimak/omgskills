@@ -164,7 +164,7 @@ test("same catalog identities and same Mac names cannot collapse v2 physical ins
   assert.match(inventorySummary(groupSyncedSkills(missingMac.skills)[0])!.location, /Unknown Mac/);
 });
 
-test("real unified list renders separate Macs, agents, unknown Mac and last-known reports", async () => {
+test("real unified list groups identical skills but retains each Mac, agent and last-known report", async () => {
   const output = await build({ entryPoints: [fileURLToPath(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url))],
     bundle: true, write: false, platform: "node", format: "cjs", packages: "external", jsx: "automatic", loader: { ".css": "empty" } });
   const module = { exports: {} as { UnifiedApp: Parameters<typeof createElement>[0] } };
@@ -177,7 +177,8 @@ test("real unified list renders separate Macs, agents, unknown Mac and last-know
     const html = renderToStaticMarkup(createElement(module.exports.UnifiedApp, { data, catalog, nav: initialNavigation,
       signedIn: true, readOnlyAccount: true, state: "ready", navigate: noOp, onSession: noOp, onFavorite: noOp,
       onCreateSet: noOp, onMembership: noOp, onVisibility: noOp, retry: noOp }));
-    assert.equal([...html.matchAll(/aria-label="Open Same skill"/g)].length, 4);
+    assert.equal([...html.matchAll(/aria-label="Open Same skill"/g)].length, 1);
+    assert.match(html, /aria-label="Installed in 2 agents"/);
     for (const text of ["Work Mac / codex", "Home Mac / codex", "Work Mac / claude", "Unknown Mac / codex", "Last known (revoked)", "Last reported"]) assert.ok(html.includes(text), text);
     assert.doesNotMatch(html, /Currently live|Currently installed/);
   } finally {
