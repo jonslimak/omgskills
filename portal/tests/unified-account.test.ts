@@ -96,7 +96,7 @@ test("unified authenticated entry remains inside the local integration guard and
     assert.doesNotMatch(source, /makeFixtures|preview\/fixtures|localStorage/);
     if (file === "Session.tsx") {
       assert.match(source, /installClient && base === "\/app\/"\s*\? new InstallIntentStore\(\(\) => window.sessionStorage, installClient, "normal"\)/);
-      assert.match(source, /catalogInstallEnabled && base === "\/app\/"\s*\? new CatalogInstallIntentStore\(\(\) => window.sessionStorage\)/);
+      assert.match(source, /!composition && \(catalogInstallEnabled \|\| productionInstall\) && base === "\/app\/"\s*\? new CatalogInstallIntentStore\(\(\) => window.sessionStorage, productionInstall \? "production" : "f1"\)/);
       assert.equal(source.match(/sessionStorage/g)?.length, 2, "Only the two separately gated public install intents use storage here");
     } else assert.doesNotMatch(source, /sessionStorage/);
   }
