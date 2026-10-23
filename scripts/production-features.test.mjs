@@ -31,15 +31,15 @@ test("loads the tracked production feature state", async () => {
 test("loads disabled, web-only, and full production feature states", async () => {
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":true}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false },
+    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false },
   );
 });
 
@@ -135,4 +135,23 @@ test("rejects malformed or ambiguous production feature state", async () => {
     loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":true}')),
     /skillGroupsAuthEnabled requires skillGroupsWebEnabled/,
   );
+});
+
+test("connected production activation defaults off and can pause reporting without losing reads", async () => {
+  const tracked = await loadProductionFeatures();
+  assert.equal(tracked.connectedInventoryReadEnabled, false);
+  assert.equal(tracked.connectedInventorySyncEnabled, false);
+  const base = { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalUnifiedEnabled: true };
+  for (const sync of [false, true]) {
+    const features = await loadProductionFeatures(await configUrl(JSON.stringify({ ...base,
+      connectedInventoryReadEnabled: true, connectedInventorySyncEnabled: sync })));
+    assert.equal(features.connectedInventoryReadEnabled, true);
+    assert.equal(features.connectedInventorySyncEnabled, sync);
+    assert.deepEqual(publicReleaseConfig(features), { version: 1, skillGroupsAuthEnabled: false });
+  }
+  for (const change of [{ connectedInventoryReadEnabled: "1" }, { connectedInventorySyncEnabled: "1" },
+    { connectedInventorySyncEnabled: true }, { connectedInventoryReadEnabled: true, portalUnifiedEnabled: false },
+    { connectedInventoryReadEnabled: true, skillGroupsWebEnabled: false }]) {
+    await assert.rejects(loadProductionFeatures(await configUrl(JSON.stringify({ ...base, ...change }))));
+  }
 });

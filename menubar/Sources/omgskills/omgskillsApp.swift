@@ -121,7 +121,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         switch catalogCandidateMode {
         case .invalid(let reason):
             let alert = NSAlert()
-            alert.messageText = "Cannot start OMGSkills Candidate"
+            alert.messageText = CatalogRuntimeProfile.compiled == .production ? "Cannot start OMGSkills" : "Cannot start OMGSkills Candidate"
             alert.informativeText = reason
             alert.runModal()
             NSApp.terminate(nil)

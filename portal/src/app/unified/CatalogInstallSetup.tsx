@@ -51,7 +51,9 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
       {state.phase !== "setup" && <button type="button" className="ua-f1-install" disabled={!action.href || busy || state.restartRequired}
         onClick={() => session.showSetup(skill)}><Settings2 /> Set up {appName}</button>}
     </div>
-    <p role="status">{!action.href ? action.reason : state.message || "Approval is required in the app. Skill updates are unavailable in this test."}</p>
+    <p role="status">{!action.href ? action.reason : state.message || (store.client === "production"
+      ? "Approval is required in OMGSkills. Skill updates are not available yet."
+      : "Approval is required in the app. Skill updates are unavailable in this test.")}</p>
     {state.phase === "setup" && <div className="ua-install-help">
       <h4>Mac setup</h4>
       {download ? <>
@@ -66,7 +68,8 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
         </ol>
       </> : <>
         <button type="button" className="ua-f1-install" disabled aria-describedby={downloadId}><Download /> Download for Mac</button>
-        <p id={downloadId}>{store.client === "candidate"
+        <p id={downloadId}>{store.client === "production" ? "The connected Mac download has not been published yet."
+        : store.client === "candidate"
         ? "A signed candidate download is not available yet. Test only in a disposable Mac VM; do not replace your normal app."
         : "A compatible test download is not available. Use the prepared OMGSkills F1 Test build."}</p>
         {store.client === "candidate" && <p>Once the candidate is available, open it in the test VM, return to this page, choose <strong>Try opening again</strong>, then <strong>Open in {appName}</strong>. The app asks for approval.</p>}

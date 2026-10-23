@@ -20,6 +20,7 @@ export type CatalogInstallAgent = "claude" | "codex";
 export const catalogInstallClients = {
   f1: { scheme: "omgskills-f1", name: "OMGSkills F1 Test" },
   candidate: { scheme: "omgskills", name: "OMGSkills Candidate" },
+  production: { scheme: "omgskills", name: "OMGSkills" },
 } as const;
 export type CatalogInstallClient = keyof typeof catalogInstallClients;
 export function catalogInstallTestEnabled(development: boolean, enabled: unknown, hostname: string, oldFlag?: unknown) {

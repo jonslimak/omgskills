@@ -1,5 +1,6 @@
 import type { Pool, PoolClient } from "pg";
 import { requireDeviceToken, rollback, touchDeviceAfterSuccessfulUse } from "./device-auth.js";
+import { requireProductionInventory } from "./production-inventory.js";
 
 export const inventorySources = ["claude", "codex", "agents"] as const;
 type InventorySource = typeof inventorySources[number];
@@ -48,6 +49,19 @@ export function parseReconciliationFields(body: Record<string, unknown>): Reconc
     throw new Response("Duplicate root coverage", { status: 400 });
   }
   return { baseRevision: revision?.toLowerCase() ?? null, roots };
+}
+
+export function requireInventoryReconciliation(
+  req: Request, env: Record<string, string | undefined> = process.env, deployContext?: string,
+  endpoint: "/api/portal/sync-upload" | "/api/portal/synced-skills" = "/api/portal/sync-upload",
+  siteId?: string,
+) {
+  if (env.CONTEXT !== "dev") {
+    requireProductionInventory(req, env, deployContext, siteId, endpoint === "/api/portal/synced-skills" ? "read" : "sync");
+    if (new URL(req.url).pathname !== endpoint) throw new Response("Invalid inventory endpoint", { status: 400 });
+    return;
+  }
+  requireLocalInventoryReconciliation(req, env, deployContext, endpoint);
 }
 
 export function requireLocalInventoryReconciliation(

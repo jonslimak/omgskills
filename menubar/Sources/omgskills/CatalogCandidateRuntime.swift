@@ -1,14 +1,43 @@
 import CoreFoundation
 import Foundation
 
+enum CatalogRuntimeProfile: Equatable, Sendable {
+    case candidate, production
+
+    static var compiled: Self {
+        #if OMGSKILLS_CONNECTED_PRODUCTION
+        .production
+        #else
+        .candidate
+        #endif
+    }
+    var origin: URL { URL(string: self == .production ? "https://omgskills.com" : "https://omgskills-setup-test-f3b.netlify.app")! }
+    var website: URL { origin.appendingPathComponent("app", isDirectory: true) }
+    var catalogPrefix: String { self == .production ? "OMGSkillsCatalogProduction" : "OMGSkillsCatalogCandidate" }
+    var connectedPrefix: String { self == .production ? "OMGSkillsConnectedProduction" : "OMGSkillsConnectedCandidate" }
+    var catalogKeys: [String] { [catalogPrefix, catalogPrefix + "Website", catalogPrefix + "UpdatePublicKey"] }
+    var connectedKeys: [String] { [connectedPrefix, connectedPrefix + "ConnectURL", connectedPrefix + "UploadURL", connectedPrefix + "CredentialService"] }
+    var connectURL: URL {
+        let base = origin.appendingPathComponent("app/connect")
+        return self == .production ? URL(string: base.absoluteString + "?inventory=3")! : base
+    }
+    var uploadURL: URL { origin.appendingPathComponent("api/portal/sync-upload") }
+    var credentialService: String {
+        self == .production ? "com.jonslimak.omgskills.connected.inventory" : "com.jonslimak.omgskills.catalog-candidate.inventory"
+    }
+    var updateBase: String { origin.absoluteString + (self == .production ? "/updates/connected/" : "/updates/catalog-candidate/") }
+    var feedURL: String { updateBase + "appcast.xml" }
+    var archivePrefix: String { self == .production ? "OMGSkills-Connected" : "OMGSkills-Catalog-Candidate" }
+}
+
 enum CatalogCandidateRuntime {
-    static let enabledKey = "OMGSkillsCatalogCandidate"
-    static let websiteKey = "OMGSkillsCatalogCandidateWebsite"
-    static let updateKey = "OMGSkillsCatalogCandidateUpdatePublicKey"
+    static let enabledKey = CatalogRuntimeProfile.compiled.catalogKeys[0]
+    static let websiteKey = CatalogRuntimeProfile.compiled.catalogKeys[1]
+    static let updateKey = CatalogRuntimeProfile.compiled.catalogKeys[2]
     static let bundleID = "com.jonslimak.omgskills"
-    static let origin = URL(string: "https://omgskills-setup-test-f3b.netlify.app")!
+    static let origin = CatalogRuntimeProfile.compiled.origin
     static let website = origin.appendingPathComponent("app", isDirectory: true)
-    static let updateBase = origin.absoluteString + "/updates/catalog-candidate/"
+    static let updateBase = CatalogRuntimeProfile.compiled.updateBase
     static let feedURL = updateBase + "appcast.xml"
     static let updatePolicy: [String: Bool] = [
         "SUEnableAutomaticChecks": false, "SUAutomaticallyUpdate": false,
@@ -17,7 +46,7 @@ enum CatalogCandidateRuntime {
     ]
 
     static var buildRequested: Bool {
-        #if OMGSKILLS_CATALOG_CANDIDATE
+        #if OMGSKILLS_CATALOG_CANDIDATE || OMGSKILLS_CONNECTED_PRODUCTION
         true
         #else
         false
@@ -25,7 +54,7 @@ enum CatalogCandidateRuntime {
     }
 
     static var buildAllowed: Bool {
-        #if OMGSKILLS_CATALOG_CANDIDATE && !OMGSKILLS_SETUP_TEST
+        #if OMGSKILLS_CATALOG_CANDIDATE && !OMGSKILLS_SETUP_TEST && !(OMGSKILLS_CONNECTED_CANDIDATE && OMGSKILLS_CONNECTED_PRODUCTION)
         true
         #else
         false
@@ -40,6 +69,7 @@ enum CatalogCandidateRuntime {
 
     struct Configuration: Equatable, Sendable {
         let home: URL
+        let profile: CatalogRuntimeProfile
         let connected: ConnectedCandidateConfiguration?
         var paths: SkillFilesystemPaths {
             SkillFilesystemPaths(homeDirectory: home,
@@ -47,18 +77,24 @@ enum CatalogCandidateRuntime {
         }
         var stateRoot: URL { home.appendingPathComponent("Library/Application Support/omgskills", isDirectory: true) }
         var managedRoot: URL { stateRoot.appendingPathComponent("managed", isDirectory: true) }
-        fileprivate init(home: URL, connected: ConnectedCandidateConfiguration?) {
+        fileprivate init(home: URL, connected: ConnectedCandidateConfiguration?, profile: CatalogRuntimeProfile) {
             self.home = home
             self.connected = connected
+            self.profile = profile
         }
     }
 
     static func mode(info: [String: Any] = Bundle.main.infoDictionary ?? [:],
                      home: URL = FileManager.default.homeDirectoryForCurrentUser,
                      allowed: Bool = buildAllowed,
-                     connectedAllowed: Bool = ConnectedCandidateConfiguration.buildAllowed) -> Mode {
+                     connectedAllowed: Bool = ConnectedCandidateConfiguration.buildAllowed,
+                     profile: CatalogRuntimeProfile = .compiled) -> Mode {
+        let enabledKey = profile.catalogKeys[0], websiteKey = profile.catalogKeys[1], updateKey = profile.catalogKeys[2]
+        let other: CatalogRuntimeProfile = profile == .production ? .candidate : .production
+        guard !(other.catalogKeys + other.connectedKeys).contains(where: { info[$0] != nil })
+        else { return .invalid("Mixed production and candidate configuration.") }
         let connected: ConnectedCandidateConfiguration?
-        switch ConnectedCandidateConfiguration.mode(info: info, allowed: connectedAllowed) {
+        switch ConnectedCandidateConfiguration.mode(info: info, allowed: connectedAllowed, profile: profile) {
         case .disabled: connected = nil
         case .enabled(let configuration): connected = configuration
         case .invalid: return .invalid("Invalid connected candidate configuration.")
@@ -67,11 +103,11 @@ enum CatalogCandidateRuntime {
         else { return .disabled }
         let updateKeys = Set(info.keys.filter { $0.hasPrefix("SU") })
         let expectedKeys = Set(updatePolicy.keys).union(["SUFeedURL", "SUPublicEDKey", "SUSignedFeedFailureExpirationInterval"])
-        guard allowed, boolean(info[enabledKey]) == true,
+        guard allowed, profile != .production || connected != nil, boolean(info[enabledKey]) == true,
               info["CFBundleIdentifier"] as? String == bundleID,
               let types = info["CFBundleURLTypes"] as? [[String: Any]], types.count == 1,
               types[0]["CFBundleURLSchemes"] as? [String] == ["omgskills"],
-              info[websiteKey] as? String == website.absoluteString,
+              info[websiteKey] as? String == profile.website.absoluteString,
               info["LSMinimumSystemVersion"] as? String == "14.0",
               boolean(info["LSUIElement"]) == true, boolean(info["LSMultipleInstancesProhibited"]) == true,
               info[AppRuntimeConfiguration.f1RootKey] == nil, info[AppRuntimeConfiguration.f1WebsiteKey] == nil,
@@ -80,7 +116,7 @@ enum CatalogCandidateRuntime {
               boolean(info[AppRuntimeConfiguration.skillGroupsAuthEnabledKey]) != true,
               let version = info["CFBundleShortVersionString"] as? String,
               let build = info["CFBundleVersion"] as? String, validVersion(version, build: build),
-              updateKeys == expectedKeys, info["SUFeedURL"] as? String == feedURL,
+              updateKeys == expectedKeys, info["SUFeedURL"] as? String == profile.feedURL,
               let key = info[updateKey] as? String, info["SUPublicEDKey"] as? String == key,
               let bytes = Data(base64Encoded: key), bytes.count == 32,
               bytes.contains(where: { $0 != 0 }), bytes.base64EncodedString() == key,
@@ -92,12 +128,13 @@ enum CatalogCandidateRuntime {
               home.resolvingSymlinksInPath().path == home.path,
               (try? FileManager.default.attributesOfItem(atPath: home.path)[.type] as? FileAttributeType) == .typeDirectory
         else { return .invalid("The catalog candidate home is unavailable or redirected.") }
-        return .enabled(Configuration(home: home, connected: connected))
+        return .enabled(Configuration(home: home, connected: connected, profile: profile))
     }
 
-    static func acceptsArchive(url: URL?, build: String, version: String, installationType: String, isDelta: Bool) -> Bool {
+    static func acceptsArchive(url: URL?, build: String, version: String, installationType: String, isDelta: Bool,
+                               profile: CatalogRuntimeProfile = .compiled) -> Bool {
         validVersion(version, build: build) && installationType == "application" && !isDelta
-            && url?.absoluteString == updateBase + "OMGSkills-Catalog-Candidate-\(version)-\(build)-arm64.zip"
+            && url?.absoluteString == profile.updateBase + "\(profile.archivePrefix)-\(version)-\(build)-arm64.zip"
     }
 
     private static func validVersion(_ version: String, build: String) -> Bool {

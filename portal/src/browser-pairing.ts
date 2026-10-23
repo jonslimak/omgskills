@@ -92,6 +92,7 @@ export type PairingConsentPolicy = {
   callback: (callback: string, state: string) => string;
   cancel: (state: string) => string;
   disclosure?: string;
+  approvalPath?: string;
 };
 
 export const normalPairingConsent: PairingConsentPolicy = {
@@ -141,7 +142,7 @@ export function createPairingConsent(hash: string, policy: PairingConsentPolicy,
           codeChallengeMethod: "S256", scopes: [...policy.scopes(request)] };
         if (!isBrowserPairingApproval(body)) throw new Error("Invalid connection permissions.");
         if (!current(attempt)) return;
-        const result = await options.api<{ callbackUrl: string; expiresAt: string }>("/api/portal/sync-pairing-code", {
+        const result = await options.api<{ callbackUrl: string; expiresAt: string }>(policy.approvalPath ?? "/api/portal/sync-pairing-code", {
           method: "POST", body: JSON.stringify(body), signal: controller.signal,
           redirect: "error", cache: "no-store",
         });
