@@ -16,6 +16,9 @@ import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation } from "./entry-navigation";
+import { renderPublicFirst } from "./public-first";
+import { announceAppReady } from "../../takeover";
+import { createPageMetadata, pageTitle } from "../../app/unified/page-metadata";
 import "../../app/redesign.css";
 import { LoadingScreen } from "../../app/LoadingScreen";
 import { normalInstallAction, normalInstallClient, catalogInstallTestEnabled } from "../../app/unified/public-install";
@@ -43,7 +46,7 @@ export type UnifiedSessionComposition = {
   clearInstallIntent: (next: Navigation) => void;
 };
 
-function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean }) {
+function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths , takeover }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean ; takeover: boolean }) {
   const normalApi = usePortalApi();
   const api = composition ? composition.adaptApi(normalApi) : normalApi;
   const clerk = useClerk();
@@ -69,6 +72,9 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const available = signedIn && !leaving;
   const nav = navigation(requested, available);
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
+  // On a static library page, swap the app in once its first public view has rendered.
+  const listState = publicData.status.list;
+  useEffect(() => { if (takeover && listState === "ready") announceAppReady(); }, [takeover, listState]);
   const navigate = (next: Navigation, replace = false) => {
     const safe = navigation(next, available);
     clearOtherIntent(safe);
@@ -78,12 +84,17 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   };
   const current = address(nav);
   useEffect(() => {
-    if (available || isDiscovery(requested.view)) history.replaceState({ nav }, "", current);
+    if (!(available || isDiscovery(requested.view))) return;
+    // A taken-over static page keeps its own /library/... address while it shows that view.
+    const here = location.pathname + location.search;
+    const keep = location.pathname.startsWith("/library/")
+      && navigationLocation(entryNavigation(location.pathname, location.search, base), true) === navigationLocation(nav, true);
+    history.replaceState({ nav }, "", keep ? here : current);
   }, [current, available, base, requested.view]);
   useEffect(() => {
     const pop = () => {
       const saved = (history.state as { nav?: Navigation } | null)?.nav;
-      const next = saved && address(saved) === location.pathname + location.search
+      const next = saved && (address(saved) === location.pathname + location.search || location.pathname.startsWith("/library/"))
         ? saved : entryNavigation(location.pathname, location.search, base);
       clearOtherIntent(next);
       setRequested(next);
@@ -109,6 +120,10 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const detail = useSetDetail(api, setId, snapshot.revision, available && !!snapshot.data && !snapshot.accessDenied);
   const setCatalog = useSetCatalog(publicClient, detail.set);
   const catalog = { ...publicData.catalog, skills: [...publicData.catalog.skills, ...setCatalog.skills] };
+  // Keep the tab title (and, on a taken-over page, its search tags) in step with the view.
+  const [syncMetadata] = useState(() => cleanPaths ? createPageMetadata(document, takeover) : null);
+  const title = pageTitle(nav, catalog);
+  useEffect(() => { syncMetadata?.(location.pathname + location.search, title); }, [syncMetadata, current, title]);
   const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine,
     busy: snapshot.setSaving || snapshot.profileSaving, blocked: !!composition?.readOnly || !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
     scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
@@ -152,13 +167,18 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean }) {
-  const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false, publicFirst = false, takeover = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean; publicFirst?: boolean; takeover?: boolean }) {
+  const [entry] = useState(() => entryNavigation(location.pathname, location.search, base));
+  const [publicEntry] = useState(() => accountNavigation(entry, false));
+  const [showPublicFirst] = useState(() => renderPublicFirst(publicFirst && !composition, entry, () => document.cookie));
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
-  if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
-  const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} productionInstall={productionInstall} composition={composition} cleanPaths={cleanPaths && !composition}
+  const loading = !isLoaded || (isSignedIn && !userLoaded);
+  if (loading && !(showPublicFirst && !isSignedIn)) return <LoadingScreen />;
+  // While sign-in loads, the public view uses the same "signed-out" key, so it stays
+  // mounted if the visitor is signed out and remounts only if a session appears.
+  const key = !loading && isSignedIn ? `${userId}:${sessionId}` : "signed-out";
+  return <AccountView key={key} accountKey={key} signedIn={!loading && !!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} productionInstall={productionInstall} composition={composition} cleanPaths={cleanPaths && !composition} takeover={takeover && !composition}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }

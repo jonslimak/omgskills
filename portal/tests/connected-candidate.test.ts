@@ -323,7 +323,7 @@ test("shared rendered consent preserves normal/F1 permission text and disables m
 
 test("connected entry is explicitly selected without changing normal/F1 bootstrap or install-only defaults", async () => {
   const source = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8");
-  assert.match(source("../src/main.tsx"), /<ConnectPage policy=\{connectedInventoryTest \? f1PairingConsent : normalPairingConsent\}/);
+  assert.match(source("../src/main.tsx"), /<ConnectPage policy=\{inventoryConnection !== "none" \? productionConsent\s*:\s*connectedInventoryTest \? f1PairingConsent : normalPairingConsent\}/);
   assert.doesNotMatch(source("../src/main.tsx"), /candidate\/connected-policy|function ConnectPage/);
   assert.doesNotMatch(source("../src/integration/unified/Session.tsx"), /connectedCandidate|candidate\/connected/);
   assert.doesNotMatch(source("../src/bootstrap.ts"), /candidate\/connected/);
