@@ -107,7 +107,10 @@ export class PublicReadmeClient {
       const value = parseDocuments(JSON.parse(new TextDecoder().decode(bytes)), id);
       signal.throwIfAborted();
       this.cache.delete(id);
-      this.cache.set(id, { expires: this.now() + (value ? 600_000 : 60_000), value });
+      // A partial upstream failure must be retried when this skill is opened again.
+      if (!response.headers.get("cache-control")?.toLowerCase().includes("no-store")) {
+        this.cache.set(id, { expires: this.now() + (value ? 600_000 : 60_000), value });
+      }
       while (this.cache.size > 64) this.cache.delete(this.cache.keys().next().value!);
       return value;
     } finally {

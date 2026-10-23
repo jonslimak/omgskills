@@ -138,3 +138,15 @@ test("both documents are read together; an older single-document SKILL.md moves 
   assert.throws(() => parseDocuments({ skillId: id, skill: readme, readme }, id), "a README cannot fill the skill tab");
   assert.throws(() => parseDocuments({ skillId: id, skill: skillDoc, readme: skillDoc }, id));
 });
+
+test("partial document responses honor no-store so reopening can recover the missing document", async () => {
+  const skillDoc = { ...readme, kind: "skill" as const, sourceUrl: "https://github.com/owner/repo/blob/HEAD/SKILL.md" };
+  let calls = 0;
+  const client = new PublicReadmeClient(async () => ++calls === 1
+    ? Response.json({ skillId: id, skill: skillDoc, readme: null }, { headers: { "cache-control": "no-store" } })
+    : Response.json({ skillId: id, skill: skillDoc, readme }));
+  assert.deepEqual(await client.load(id, signal()), { skill: skillDoc, readme: null });
+  assert.deepEqual(await client.load(id, signal()), { skill: skillDoc, readme });
+  await client.load(id, signal());
+  assert.equal(calls, 2);
+});

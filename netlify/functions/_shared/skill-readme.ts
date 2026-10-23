@@ -71,7 +71,7 @@ export function createSkillReadmeHandler(options: Options = {}) {
   const now = options.now ?? Date.now;
   const timeoutMs = options.timeoutMs ?? 8_000;
   const skillCache = new Map<string, Entry<SkillSource | null>>();
-  const readmeCache = new Map<string, Entry<SkillDocuments | null>>();
+  const readmeCache = new Map<string, Entry<SkillReadme | null>>();
   let active = 0;
 
   function cached<T>(cache: Map<string, Entry<T>>, key: string, load: () => Promise<T>): Promise<T> {
@@ -138,11 +138,13 @@ export function createSkillReadmeHandler(options: Options = {}) {
 
   // Load both documents in parallel: the SKILL.md (what the agent reads and what gets
   // installed) and the human README (the skill folder's, else the repository's).
-  async function loadDocuments({ repository, folder, skillFile }: SkillSource): Promise<SkillDocuments | null> {
+  async function loadDocuments({ repository, folder, skillFile }: SkillSource) {
     const signal = AbortSignal.timeout(timeoutMs);
-    const [skill, readmeDoc] = await Promise.all([
-      skillFile ? firstFile(repository, [skillFile], signal).then(file => file && readme(repository, "skill", file)) : null,
-      (async () => {
+    const key = repository.toLowerCase();
+    const [skillResult, readmeResult] = await Promise.allSettled([
+      skillFile ? cached(readmeCache, `${key}:skill:${skillFile}`,
+        () => firstFile(repository, [skillFile], signal).then(file => file && readme(repository, "skill", file))) : null,
+      cached(readmeCache, `${key}:readme:${folder}`, async () => {
         if (folder) {
           const own = await firstFile(repository, folderReadmeNames.map(name => `${folder}/${name}`), signal);
           const ownReadme = own && readme(repository, "skill-readme", own);
@@ -150,9 +152,13 @@ export function createSkillReadmeHandler(options: Options = {}) {
         }
         const repo = await firstFile(repository, readmeNames, signal);
         return repo && readme(repository, "repository", repo);
-      })(),
+      }),
     ]);
-    return skill || readmeDoc ? { skill: skill ?? null, readme: readmeDoc ?? null } : null;
+    const skill = skillResult.status === "fulfilled" ? skillResult.value : null;
+    const readmeDoc = readmeResult.status === "fulfilled" ? readmeResult.value : null;
+    const partial = skillResult.status === "rejected" || readmeResult.status === "rejected";
+    if (!skill && !readmeDoc && partial) throw new Error("Skill documents unavailable");
+    return { documents: skill || readmeDoc ? { skill, readme: readmeDoc } : null, partial };
   }
 
   function json(body: unknown, status = 200, ttl = 0) {
@@ -182,9 +188,8 @@ export function createSkillReadmeHandler(options: Options = {}) {
           folder: segments ? segments.slice(0, -1).join("/") : "", skillFile: segments ? segments.join("/") : null };
       });
       if (!source) return json({ error: "Public skill not found." }, 404);
-      const doc = await cached(readmeCache, `${source.repository.toLowerCase()}:${source.folder}:${source.skillFile ?? ""}`,
-        () => loadDocuments(source));
-      return json({ skillId: id, skill: doc?.skill ?? null, readme: doc?.readme ?? null }, 200, doc ? 600 : 60);
+      const { documents: doc, partial } = await loadDocuments(source);
+      return json({ skillId: id, skill: doc?.skill ?? null, readme: doc?.readme ?? null }, 200, partial ? 0 : doc ? 600 : 60);
     } catch {
       return json({ error: "README temporarily unavailable. Please try again." }, 503);
     }
