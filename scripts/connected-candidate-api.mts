@@ -5,6 +5,7 @@ import { isBrowserPairingState } from "../netlify/functions/_shared/browser-pair
 import { isCodeChallenge, isCodeVerifier, isPairingCode } from "../netlify/functions/_shared/crypto.js";
 import { DeviceAuthError, deviceCredentialFromRequest, listUserDevices, revokeOwnedDevice, revokePresentedDevice } from "../netlify/functions/_shared/device-auth.js";
 import { exchangePairingCode, issuePairingCode } from "../netlify/functions/_shared/device-pairing.js";
+import { bindDeviceReconnectKey, DeviceReconnectError, requireReconnectKey } from "../netlify/functions/_shared/device-reconnect.js";
 import { getEnv } from "../netlify/functions/_shared/env.js";
 import { findInvitedGroupIds, findOwnedGroupIds, requireGroupAccess } from "../netlify/functions/_shared/group-access.js";
 import { parseInventoryCheck, performInventoryCheck, readInventoryRevision } from "../netlify/functions/_shared/inventory-reconciliation.js";
@@ -20,6 +21,7 @@ import { portalSyncExchange } from "../netlify/functions/portal-sync-exchange.mj
 import { portalSyncUpload } from "../netlify/functions/portal-sync-upload.mjs";
 import { portalSyncedSkills } from "../netlify/functions/portal-synced-skills.mjs";
 import { portalDeviceRevoke } from "../netlify/functions/portal-device-revoke.mjs";
+import { portalDeviceReconnectKey } from "../netlify/functions/portal-device-reconnect-key.mjs";
 import { portalDevices } from "../netlify/functions/portal-devices.mjs";
 import { portalProfile } from "../netlify/functions/portal-profile.mjs";
 import { portalGroups } from "../netlify/functions/portal-groups.mjs";
@@ -27,7 +29,7 @@ import { portalShared } from "../netlify/functions/portal-shared.mjs";
 import { portalGroupDetail } from "../netlify/functions/portal-group-detail.mjs";
 
 const services = { issuePairingCode, exchangePairingCode, performSyncUpload,
-  readSyncInventory, revokePresentedDevice, readInventoryRevision, performInventoryCheck };
+  readSyncInventory, revokePresentedDevice, readInventoryRevision, performInventoryCheck, bindDeviceReconnectKey };
 type Dependencies = {
   getEnvironment?: typeof candidateEnvironment;
   getPool?: ReturnType<typeof candidateDatabase>;
@@ -49,12 +51,18 @@ async function validateBody(req: Request, route: CandidateRoute) {
       throw new Response("Use the metadata-only browser approval contract", { status: 400 });
     }
   } else if (route === "exchange") {
-    if (Object.keys(body).length !== 3 || Object.keys(body).some(key => !["pairingCode", "deviceName", "codeVerifier"].includes(key))
+    if (![3, 4].includes(Object.keys(body).length) || Object.keys(body).some(key => !["pairingCode", "deviceName", "codeVerifier", "reconnectKey"].includes(key))
       || typeof body.pairingCode !== "string" || !isPairingCode(body.pairingCode)
       || typeof body.codeVerifier !== "string" || !isCodeVerifier(body.codeVerifier)) {
       throw new Response("Pairing code and PKCE verifier are required", { status: 400 });
     }
     requireString(body.deviceName, "deviceName", 100);
+    if (Object.hasOwn(body, "reconnectKey")) requireReconnectKey(body.reconnectKey);
+  } else if (route === "reconnect-key") {
+    if (Object.keys(body).length !== 1 || !Object.hasOwn(body, "reconnectKey")) {
+      throw new Response("Only reconnectKey is accepted", { status: 400 });
+    }
+    requireReconnectKey(body.reconnectKey);
   } else if (route === "upload") {
     if (body.reportVersion !== 3) throw new Response("Only version-3 inventory is enabled", { status: 400 });
     if (Object.hasOwn(body, "mode")) parseInventoryCheck(body);
@@ -146,6 +154,9 @@ export function createConnectedCandidateApi(dependencies: Dependencies = {}) {
         else if (route === "revoke") response = await portalDeviceRevoke(req, context, {
           getPgPool: poolReady, revokePresentedDevice: operations.revokePresentedDevice,
         });
+        else if (route === "reconnect-key") response = await portalDeviceReconnectKey(req, context, {
+          getPgPool: poolReady, bindDeviceReconnectKey: operations.bindDeviceReconnectKey, requireSkillGroupsWebFeature: feature,
+        });
         else response = await portalSyncUpload(req, context, {
           getPgPool: poolReady, requireSkillGroupsWebFeature: feature, performSyncUpload: operations.performSyncUpload,
           readInventoryRevision: operations.readInventoryRevision, performInventoryCheck: operations.performInventoryCheck,
@@ -155,7 +166,7 @@ export function createConnectedCandidateApi(dependencies: Dependencies = {}) {
       return privateResponse(response);
     } catch (error) {
       return privateResponse(error instanceof Response ? error
-        : error instanceof DeviceAuthError ? new Response(error.message, { status: error.status })
+        : error instanceof DeviceAuthError || error instanceof DeviceReconnectError ? new Response(error.message, { status: error.status })
         : new Response("Connected candidate is unavailable", { status: 503 }));
     }
   };
@@ -165,7 +176,7 @@ export default createConnectedCandidateApi();
 export const config: Config = {
   path: [
     "/api/portal/sync-pairing-code", "/api/portal/sync-exchange", "/api/portal/sync-upload",
-    "/api/portal/synced-skills", "/api/portal/device-revoke",
+    "/api/portal/synced-skills", "/api/portal/device-revoke", "/api/portal/device-reconnect-key",
     "/api/portal/devices", "/api/portal/profile", "/api/portal/groups", "/api/portal/shared",
     "/api/portal/groups/:groupId",
   ],

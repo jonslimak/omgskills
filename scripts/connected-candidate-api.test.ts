@@ -26,6 +26,7 @@ const bearer = "Bearer header.payload.signature";
 const credential = `device_${"b".repeat(43)}`;
 const pairingCode = `pair_${"a".repeat(43)}`;
 const verifier = "v".repeat(43);
+const reconnectKey = "ab".repeat(32);
 const revision = "ee703c1d-f17a-456c-a9bd-02457f27b314";
 const pair = { state: "s".repeat(43), codeChallenge: codeChallengeForVerifier(verifier), codeChallengeMethod: "S256",
   scopes: ["sync:write", "self:revoke"] };
@@ -70,8 +71,10 @@ function fixture() {
       samePool(actual, "exchange");
       if (options.codeVerifier !== verifier) throw new PairingError(401, "Pairing code is invalid or expired");
       assert.equal(options.pairingCode, pairingCode); assert.equal(options.deviceName, exchange.deviceName);
+      if (options.reconnectKey !== undefined) assert.equal(options.reconnectKey, reconnectKey);
       return { credential, deviceId: "unit-mac", accountLabel: owner.email,
-        expiresAt: new Date("2027-10-19T12:00:00Z"), grantedScopes: ["sync:write", "self:revoke"] };
+        expiresAt: new Date("2027-10-19T12:00:00Z"), grantedScopes: ["sync:write", "self:revoke"],
+        ...(options.reconnectKey === undefined ? {} : { reconnectSupported: true }) };
     },
     async readInventoryRevision(actual, req) { samePool(actual, "revision"); device(req); return { reportVersion: 3, revision: null }; },
     async performSyncUpload(actual, auth, skills, now, version, reconciliation) {
@@ -91,6 +94,10 @@ function fixture() {
       return { inventoryVersion: 3, skills: [], devices: [] };
     },
     async revokePresentedDevice(actual, req) { samePool(actual, "revoke"); device(req); return "unit-mac"; },
+    async bindDeviceReconnectKey(actual, req, key) {
+      samePool(actual, "bind"); device(req); assert.equal(key, reconnectKey);
+      return { deviceId: "unit-mac", reconnectSupported: true };
+    },
   };
   const deps = {
     getEnvironment: () => environment,
@@ -120,16 +127,20 @@ async function chain(factory = createConnectedCandidateApi) {
   assert.equal(callback.protocol + "//" + callback.host, "omgskills://pair");
   assert.equal(callback.searchParams.get("code"), pairingCode);
   assert.equal(callback.searchParams.get("state"), pair.state); assert.equal(callback.hash, "");
-  for (const req of [request("sync-exchange", exchange), request("sync-upload?reportVersion=3", undefined, `Bearer ${credential}`),
+  for (const req of [request("sync-exchange", exchange), request("sync-exchange", { ...exchange, reconnectKey }),
+    request("device-reconnect-key", { reconnectKey }, `Bearer ${credential}`),
+    request("sync-upload?reportVersion=3", undefined, `Bearer ${credential}`),
     request("sync-upload", full, `Bearer ${credential}`), request("sync-upload", check, `Bearer ${credential}`),
     request("synced-skills?version=3"), request("device-revoke", {}, `Bearer ${credential}`)]) {
+    const keyed = req.url.endsWith("/sync-exchange") ? Object.hasOwn(await req.clone().json(), "reconnectKey") : null;
     const response = await api(req, context); assert.equal(response.status, 200, await response.clone().text()); privateHeaders(response);
+    if (keyed !== null) assert.equal((await response.json()).reconnectSupported, keyed ? true : undefined);
   }
-  assert.deepEqual(calls, ["auth", "clerk", "pool", "identity", "user", "pair", "exchange", "revision", "upload", "check",
+  assert.deepEqual(calls, ["auth", "clerk", "pool", "identity", "user", "pair", "exchange", "exchange", "bind", "revision", "upload", "check",
     "auth", "clerk", "user", "read", "revoke"]);
 }
 
-test("candidate dispatches pairing, exchange, revision, full/check upload, owner read and self-revoke through one private pool", async () => {
+test("candidate dispatches pairing, legacy/keyed exchange, binding, inventory and self-revoke through one private pool", async () => {
   await chain(); assert.deepEqual(config.path, [...connectedCandidatePaths]);
 });
 
@@ -146,6 +157,13 @@ test("candidate rejects malformed contracts and wrong credentials before auth or
     [request("sync-exchange", { pairingCode, deviceName: "Mac" }), 400],
     [request("sync-exchange", { ...exchange, codeVerifier: "bad" }), 400],
     [request("sync-exchange", { ...exchange, deviceId: "other" }), 400],
+    [request("sync-exchange", { ...exchange, reconnectKey: null }), 400],
+    [request("sync-exchange", { ...exchange, reconnectKey: reconnectKey + "\n" }), 400],
+    [request("device-reconnect-key", {}, `Bearer ${credential}`), 400],
+    [request("device-reconnect-key", { reconnectKey: "bad" }, `Bearer ${credential}`), 400],
+    [request("device-reconnect-key", { reconnectKey, deviceId: "other" }, `Bearer ${credential}`), 400],
+    [request("device-reconnect-key", { reconnectKey, userId: "other" }, `Bearer ${credential}`), 400],
+    [request("device-reconnect-key", { reconnectKey }, bearer), 401],
     [request("sync-upload", { ...full, reportVersion: 2 }), 400], [request("sync-upload", { ...full, reportVersion: 1 }), 400],
     [request("sync-upload", { ...full, roots: [] }), 400], [request("sync-upload", { ...check, baseRevision: "bad" }), 400],
     [request("device-revoke", { deviceId: "other" }), 400], [request("sync-pairing-code", pair, `Bearer ${credential}`), 401],
@@ -179,6 +197,7 @@ test("candidate preserves shared auth failures without falling back to cookies o
   assert.equal((await api(request("sync-exchange", { ...exchange, codeVerifier: "x".repeat(43) }), context)).status, 401);
   assert.equal((await api(request("sync-upload?reportVersion=3", undefined, `Bearer device_${"x".repeat(43)}`), context)).status, 401);
   assert.equal((await api(request("device-revoke", {}, `Bearer device_${"x".repeat(43)}`), context)).status, 401);
+  assert.equal((await api(request("device-reconnect-key", { reconnectKey }, `Bearer device_${"x".repeat(43)}`), context)).status, 401);
   const unavailable = createConnectedCandidateApi({ ...deps, getPool: async () => { throw Error("private DSN diagnostic"); } });
   const failure = await unavailable(request("sync-exchange", exchange), context);
   assert.equal(failure.status, 503); assert.doesNotMatch(await failure.text(), /DSN|diagnostic/); privateHeaders(failure);

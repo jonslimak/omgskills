@@ -220,6 +220,62 @@ test('CC2C1 real isolated candidate storage chain (fake Clerk identity only)', {
       evidence.rejectedWritesPreservedAllRows = true;
     });
 
+    await step('RC3 existing connection binds, disconnects and reconnects without losing Mac, inventory or Set identity', async () => {
+      // Simulate the native client's retained key and replaceable bearer in memory.
+      const client = { reconnectKey: randomBytes(32).toString('hex'), credential: deviceBearer as string | null };
+      const before = await snapshot();
+      const originalDevice = (before.device_tokens as any[]).find(row => row.id === deviceId);
+      const binding = await json('device-reconnect-key', { reconnectKey: client.reconnectKey }, client.credential!);
+      assert.deepEqual(binding, { deviceId, reconnectSupported: true });
+      assert.deepEqual(await json('device-reconnect-key', { reconnectKey: client.reconnectKey }, client.credential!), binding);
+      await response('device-reconnect-key', { reconnectKey: 'cd'.repeat(32) }, client.credential!, 409);
+      const oldBearer = client.credential!;
+      await json('device-revoke', {}, oldBearer);
+      client.credential = null;
+      await response('sync-upload?reportVersion=3', undefined, oldBearer, 401);
+      const disconnected = await snapshot();
+      for (const table of ['synced_skills', 'sync_runs', 'skill_groups', 'skill_group_items']) {
+        assert.deepEqual(disconnected[table], before[table], 'Disconnect retains last-known inventory and Sets');
+      }
+
+      const verifier = randomBytes(32).toString('base64url');
+      const state = randomBytes(32).toString('base64url');
+      const approval = await json('sync-pairing-code', { state, codeChallenge: codeChallengeForVerifier(verifier),
+        codeChallengeMethod: 'S256', scopes: ['sync:write', 'self:revoke'] });
+      const callback = new URL(approval.callbackUrl);
+      assert.equal(callback.searchParams.get('state'), state);
+      assert.equal(callback.href.includes(client.reconnectKey), false);
+      const exchanged = await json('sync-exchange', { pairingCode: callback.searchParams.get('code'),
+        codeVerifier: verifier, deviceName: 'RC3 reconnected Mac', reconnectKey: client.reconnectKey }, '');
+      assert.equal(exchanged.reconnectSupported, true);
+      assert.equal(exchanged.deviceId, deviceId);
+      assert.deepEqual(exchanged.grantedScopes, ['sync:write', 'self:revoke']);
+      client.credential = `Bearer ${exchanged.credential}`;
+      assert.notEqual(client.credential, oldBearer);
+      await response('sync-upload?reportVersion=3', undefined, oldBearer, 401);
+      const reconnected = await snapshot();
+      const currentDevice = (reconnected.device_tokens as any[]).find(row => row.id === deviceId);
+      assert.equal(currentDevice.created_at.getTime(), originalDevice.created_at.getTime());
+      assert.equal(currentDevice.inventory_revision, originalDevice.inventory_revision);
+      assert.equal(currentDevice.inventory_checked_at.getTime(), originalDevice.inventory_checked_at.getTime());
+      assert.equal(currentDevice.revoked_at, null);
+      for (const table of ['synced_skills', 'sync_runs', 'skill_groups', 'skill_group_items']) {
+        assert.deepEqual(reconnected[table], before[table], 'Reconnect must not recreate inventory or Set rows');
+      }
+      const report = await upload(client.credential, [skill('baseline-skill'), skill('added-skill', 'agents')]);
+      assert.equal(report.deviceId, deviceId);
+      assert.notEqual(report.revision, originalDevice.inventory_revision);
+      const view = await inventory();
+      assert.equal(view.devices.length, 2, 'One reporting Mac plus the unchanged control Mac');
+      assert.equal(view.skills.length, 3);
+      assert.equal(view.skills.filter((row: any) => row.id === rowId && row.deviceId === deviceId && row.isCurrent).length, 1);
+      assert.deepEqual((await pool.query('SELECT * FROM skill_group_items WHERE id=$1', [itemId])).rows, groupState);
+      assert.deepEqual((await pool.query('SELECT * FROM synced_skills WHERE device_id=$1', [controlId])).rows, controlState);
+      assert.equal((await json(`groups/${groupId}`)).items[0].syncedSkillId, rowId);
+      evidence.reconnect = { existingConnectionBound: true, deviceId, retainedRowId: rowId, retainedSetItemId: itemId,
+        credentialRotated: true, oldCredentialRejected: true, reportingResumed: true, devices: 2, unchangedControlMac: true };
+    });
+
     assert.equal(poolCreations, 1, 'Every operation must reuse the same verified private pool');
     evidence.privatePoolCreations = poolCreations;
     await writeFile(join(fixture.root, 'proof.json'), JSON.stringify(evidence, null, 2) + '\n', { flag: 'wx', mode: 0o600 });

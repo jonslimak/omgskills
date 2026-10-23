@@ -24,6 +24,7 @@ export const migrations = [
   '20261016120000_add_device_inventory',
   '20261016130000_add_inventory_reconciliation',
   '20261016140000_add_inventory_check_time',
+  '20261021170000_add_device_reconnect_key',
 ];
 
 export function cleanEnvironment() {

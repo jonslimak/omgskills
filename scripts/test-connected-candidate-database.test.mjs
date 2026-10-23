@@ -154,8 +154,8 @@ test('diagnostics redact generated credentials and database URLs', () => {
   }
 });
 
-test('migration contract is fixed to the twelve reviewed migrations', async () => {
-  assert.equal(migrations.length, 12);
+test('migration contract includes the thirteen reviewed migrations', async () => {
+  assert.equal(migrations.length, 13);
   assert.deepEqual(migrations, [...migrations].sort());
   for (const name of migrations) assert.ok((await readFile(new URL(`netlify/database/migrations/${name}/migration.sql`, repo))).length);
 });

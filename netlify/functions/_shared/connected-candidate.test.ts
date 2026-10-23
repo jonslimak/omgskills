@@ -59,6 +59,7 @@ test("route allowlist has exact queries, narrow methods and no cross-origin expa
     ["POST", "/api/portal/sync-pairing-code", "pair"], ["POST", "/api/portal/sync-exchange", "exchange"],
     ["POST", "/api/portal/sync-upload", "upload"], ["GET", "/api/portal/sync-upload?reportVersion=3", "revision"],
     ["GET", "/api/portal/synced-skills?version=3", "read"], ["POST", "/api/portal/device-revoke", "revoke"],
+    ["POST", "/api/portal/device-reconnect-key", "reconnect-key"],
     ["GET", "/api/portal/devices", "devices"], ["GET", "/api/portal/profile", "profile"],
     ["GET", "/api/portal/groups", "groups"], ["GET", "/api/portal/shared", "shared"],
     ["GET", "/api/portal/groups/11111111-1111-4111-8111-111111111111", "group-detail"],
@@ -68,7 +69,7 @@ test("route allowlist has exact queries, narrow methods and no cross-origin expa
     assert.equal(candidateRoute(new Request(connectedCandidateOrigin + path, { method: "OPTIONS",
       headers: { Origin: connectedCandidateOrigin, "Access-Control-Request-Method": method } })), route);
   }
-  assert.equal(connectedCandidatePaths.length, 10);
+  assert.equal(connectedCandidatePaths.length, 11);
   for (const path of ["/api/portal/groups/:groupId", "/api/portal/groups/bad", "/api/portal/groups/11111111111141118111111111111111",
     "/api/portal/groups/11111111-1111-4111-8111-111111111111/items", "/api/portal/groups/%311111111-1111-4111-8111-111111111111",
     "/api/portal/devices/11111111-1111-4111-8111-111111111111", "/api/portal/sync-token", "/api/portal/private-sources"]) {
@@ -76,13 +77,13 @@ test("route allowlist has exact queries, narrow methods and no cross-origin expa
   }
   for (const path of ["/api/portal/synced-skills", "/api/portal/synced-skills?version=2",
     "/api/portal/synced-skills?%76ersion=3", "/api/portal/synced-skills?version=3&userId=other",
-    "/api/portal/sync-upload?reportVersion=3&deviceId=other"]) {
+    "/api/portal/sync-upload?reportVersion=3&deviceId=other", "/api/portal/device-reconnect-key?deviceId=other"]) {
     assert.throws(() => candidateRoute(new Request(connectedCandidateOrigin + path)), status(400));
   }
   assert.throws(() => candidateRoute(new Request(connectedCandidateOrigin + "/api/portal/sync-upload", { method: "DELETE" })), status(405));
   assert.throws(() => candidateRoute(new Request(connectedCandidateOrigin + "/api/portal/sync-upload", {
     method: "POST", headers: { Origin: "https://omgskills.com" } })), status(403));
-  for (const [, path] of routes.slice(6)) {
+  for (const [, path] of routes.filter(([method, path]) => method === "GET" && !path.includes("?"))) {
     assert.throws(() => candidateRoute(new Request(connectedCandidateOrigin + path + "?userId=other")), status(400));
     for (const method of ["POST", "PATCH", "DELETE", "HEAD"]) {
       assert.throws(() => candidateRoute(new Request(connectedCandidateOrigin + path, { method })), status(405));
@@ -90,6 +91,7 @@ test("route allowlist has exact queries, narrow methods and no cross-origin expa
         headers: { "Access-Control-Request-Method": method } })), status(405));
     }
   }
+  assert.throws(() => candidateRoute(new Request(connectedCandidateOrigin + "/api/portal/device-reconnect-key")), status(405));
 });
 
 test("explicit pool is verified once and never constructed from an unavailable profile", async () => {
