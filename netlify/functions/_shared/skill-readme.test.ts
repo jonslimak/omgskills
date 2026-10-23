@@ -5,9 +5,8 @@ import { createSkillReadmeHandler } from "./skill-readme.js";
 const id = "owner/repo:skills/design";
 const skill = { id, github_url: "https://github.com/owner/repo" };
 const request = (value = id) => new Request(`https://omgskills.com/api/public/skill-readme?id=${encodeURIComponent(value)}`);
-function github(markdown = "# Repository\n\nRead the docs.", extra = {}) {
-  return Response.json({ encoding: "base64", size: Buffer.byteLength(markdown), content: Buffer.from(markdown).toString("base64"),
-    html_url: "https://github.com/owner/repo/blob/develop/README.md", ...extra });
+function github(markdown: string | Uint8Array<ArrayBuffer> = "# Repository\n\nRead the docs.") {
+  return new Response(markdown, { headers: { "content-type": "text/plain; charset=utf-8" } });
 }
 const lookupSkill = async (value: string) => ({ ...skill, id: value });
 
@@ -21,8 +20,7 @@ test("README lookup uses the exact public catalog ID and sends no account creden
   assert.equal(response.status, 200);
   assert.equal(calls[0].url, "https://omgskills.com/mcp");
   assert.deepEqual(JSON.parse(String(calls[0].init.body)).params, { name: "get_skill", arguments: { id } });
-  assert.equal(calls[1].url, "https://api.github.com/repos/owner/repo/readme");
-  assert.ok(!calls[1].url.includes("ref="), "GitHub must use its actual default branch");
+  assert.equal(calls[1].url, "https://raw.githubusercontent.com/owner/repo/HEAD/README.md");
   for (const call of calls) {
     const headers = new Headers(call.init.headers);
     assert.equal(headers.has("authorization"), false);
@@ -34,6 +32,7 @@ test("README lookup uses the exact public catalog ID and sends no account creden
   assert.equal(value.skillId, id);
   assert.equal(value.readme.repository, "owner/repo");
   assert.equal(value.readme.truncated, false);
+  assert.equal(value.readme.sourceUrl, "https://github.com/owner/repo/blob/HEAD/README.md");
   assert.match(response.headers.get("netlify-cdn-cache-control")!, /max-age=600/);
   assert.equal(response.headers.get("netlify-vary"), "query=id");
   assert.equal(response.headers.has("access-control-allow-origin"), false);
@@ -93,11 +92,12 @@ test("a missing README is a short-cached empty result, while GitHub failures are
   const handler = createSkillReadmeHandler({ lookupSkill, now: () => time, fetcher: async () => { calls++; return new Response("", { status: 404 }); } });
   const response = await handler(request());
   assert.deepEqual(await response.json(), { skillId: id, readme: null });
+  const names = calls; // every README name was tried once
   await handler(request());
-  assert.equal(calls, 1);
+  assert.equal(calls, names);
   time = 60_001;
   await handler(request());
-  assert.equal(calls, 2);
+  assert.equal(calls, names * 2);
   for (const status of [403, 429, 500]) {
     let attempts = 0;
     const retryable = createSkillReadmeHandler({ lookupSkill, fetcher: async () => ++attempts === 1 ? new Response("", { status }) : github() });
@@ -107,34 +107,37 @@ test("a missing README is a short-cached empty result, while GitHub failures are
   }
 });
 
-test("README text is truncated independently of the description and unsafe source links are rejected", async () => {
+test("README file names are tried in order and missing names fall through", async () => {
+  const urls: string[] = [];
+  const handler = createSkillReadmeHandler({ lookupSkill, fetcher: async input => {
+    urls.push(String(input));
+    return String(input).endsWith("/readme.md") ? github("# lower") : new Response("404: Not Found", { status: 404 });
+  } });
+  const value = await (await handler(request())).json();
+  assert.deepEqual(urls.map(url => url.split("/HEAD/")[1]), ["README.md", "readme.md"]);
+  assert.equal(value.readme.sourceUrl, "https://github.com/owner/repo/blob/HEAD/readme.md");
+});
+
+test("README text is truncated independently of the description", async () => {
   const text = "# Long README\n" + "x".repeat(22_000);
   const handler = createSkillReadmeHandler({ lookupSkill, fetcher: async () => github(text) });
   const value = await (await handler(request())).json();
   assert.equal(value.readme.markdown.length, 20_000);
   assert.equal(value.readme.truncated, true);
-  for (const html_url of ["javascript:alert(1)", "https://github.com/another/repo/blob/main/README.md", "https://example.test/readme"]) {
-    const unsafe = createSkillReadmeHandler({ lookupSkill, fetcher: async () => github("Readme", { html_url }) });
-    assert.equal((await unsafe(request())).status, 503);
-  }
 });
 
 test("oversized declared and streaming responses are bounded", async () => {
-  for (const response of [new Response("", { headers: { "content-length": "512001" } }), new Response("x".repeat(512001))]) {
+  for (const response of [new Response("", { headers: { "content-length": "256001" } }), new Response("x".repeat(256_001))]) {
     const handler = createSkillReadmeHandler({ lookupSkill, fetcher: async () => response });
     assert.equal((await handler(request())).status, 503);
   }
-  const tooLarge = createSkillReadmeHandler({ lookupSkill, fetcher: async () => github("a", { size: 256_001 }) });
-  assert.equal((await tooLarge(request())).status, 503);
 });
 
 test("malformed catalog identity or README data cannot be cached as a successful document", async () => {
   const wrong = createSkillReadmeHandler({ lookupSkill: async () => ({ ...skill, id: "wrong" }) });
   assert.equal((await wrong(request())).status, 503);
-  for (const extra of [{ encoding: "none" }, { content: "<>" }, { size: 100 }, { content: "", size: -1 }]) {
-    const handler = createSkillReadmeHandler({ lookupSkill, fetcher: async () => github("readme", extra) });
-    assert.equal((await handler(request())).status, 503);
-  }
+  const invalidUtf8 = createSkillReadmeHandler({ lookupSkill, fetcher: async () => github(new Uint8Array([0xff, 0xfe, 0xfd]) as Uint8Array<ArrayBuffer>) });
+  assert.equal((await invalidUtf8(request())).status, 503);
 });
 
 test("GitHub timeouts fail softly and do not leave a permanently pending cache entry", async () => {
