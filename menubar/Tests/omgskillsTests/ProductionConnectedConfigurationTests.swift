@@ -3,6 +3,30 @@ import Testing
 @testable import omgskills
 
 struct ProductionConnectedConfigurationTests {
+    #if OMGSKILLS_CONNECTED_PRODUCTION
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["OMGSKILLS_PRODUCTION_PACKAGE"] != nil))
+    func actualProductionPackageEnablesTheCompiledRuntimeWithoutLaunching() throws {
+        let app = try #require(ProcessInfo.processInfo.environment["OMGSKILLS_PRODUCTION_PACKAGE"])
+        let url = URL(fileURLWithPath: app).appendingPathComponent("Contents/Info.plist")
+        let info = try #require(PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil) as? [String: Any])
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        guard case .enabled(let configuration) = CatalogCandidateRuntime.mode(info: info, home: home) else {
+            Issue.record("Packaged settings did not enable the compiled production runtime"); return
+        }
+        #expect(configuration.profile == .production)
+        #expect(info["CFBundleShortVersionString"] as? String == "0.0.24")
+        #expect(info["CFBundleVersion"] as? String == "24")
+        let connected = try #require(configuration.connected)
+        #expect(connected.connectURL.absoluteString == "https://omgskills.com/app/connect?inventory=3")
+        #expect(connected.uploadURL.absoluteString == "https://omgskills.com/api/portal/sync-upload")
+        #expect(connected.keychainService == "com.jonslimak.omgskills.connected.inventory")
+        #expect(configuration.paths.codexSkillsRoot.path == home.path + "/.codex/skills")
+        #expect(configuration.paths.claudeSkillsRoot.path == home.path + "/.claude/skills")
+        #expect(try FileManager.default.contentsOfDirectory(atPath: home.path).isEmpty)
+    }
+    #endif
+
     private func info(_ profile: CatalogRuntimeProfile) -> [String: Any] {
         var value = CatalogCandidateRuntimeTests.info
         for key in CatalogRuntimeProfile.compiled.catalogKeys { value.removeValue(forKey: key) }
