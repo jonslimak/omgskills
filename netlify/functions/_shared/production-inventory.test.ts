@@ -10,6 +10,8 @@ import { createDeviceCredential, createPairingCode } from "./crypto.js";
 
 const features = { skillGroupsWebEnabled: true, portalUnifiedEnabled: true,
   connectedInventoryReadEnabled: true, connectedInventorySyncEnabled: true };
+const paused = { ...features, connectedInventorySyncEnabled: false };
+const disabled = { ...paused, connectedInventoryReadEnabled: false };
 const env = { CONTEXT: "production", CLERK_SECRET_KEY: "sk_live_fixture" };
 const context = { site: { id: "dfdb618d-b748-4c4f-a535-646dc5db449f" }, deploy: { context: "production" } } as Context;
 const pool = {} as Pool;
@@ -19,14 +21,17 @@ const request = (path: string, body?: unknown, token = createDeviceCredential())
   method: body === undefined ? "GET" : "POST", body: body === undefined ? undefined : JSON.stringify(body),
   headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
 });
-const guard = (operation: "read" | "sync", sync = true) => (req: Request) => requireProductionInventory(
-  req, env, "production", context.site.id, operation, { ...features, connectedInventorySyncEnabled: sync });
+const guard = (operation: "read" | "sync", policy = features) => (req: Request) => requireProductionInventory(
+  req, env, "production", context.site.id, operation, policy);
 
 test("production policy is opt-in, site/account-environment bound, and reads survive paused sync", () => {
   const req = request("/api/portal/synced-skills?version=3");
-  assert.throws(() => requireProductionInventory(req, env, "production", context.site.id, "read"));
-  guard("read", false)(req);
-  assert.throws(() => guard("sync", false)(req));
+  requireProductionInventory(req, env, "production", context.site.id, "read");
+  requireProductionInventory(req, env, "production", context.site.id, "sync");
+  assert.throws(() => guard("read", disabled)(req));
+  assert.throws(() => guard("sync", disabled)(req));
+  guard("read", paused)(req);
+  assert.throws(() => guard("sync", paused)(req));
   guard("sync")(req);
   for (const change of [{ CONTEXT: "dev" }, { CLERK_SECRET_KEY: "sk_test_fixture" },
     { OMGSKILLS_CONNECTED_INVENTORY_TEST: "1" }, { OMGSKILLS_INVENTORY_RECONCILIATION_TEST: "1" },
@@ -39,17 +44,19 @@ test("production policy is opt-in, site/account-environment bound, and reads sur
   }
 });
 
-test("normal production endpoints keep default-off behavior and authenticated inventory/report contracts", async () => {
+test("normal production endpoints retain disabled-policy and authenticated inventory/report contracts", async () => {
   const read = request("/api/portal/synced-skills?version=3");
   const report = { reportVersion: 3, baseRevision: null,
     roots: ["claude", "codex", "agents"].map(source => ({ source, state: "complete" })),
     skills: [{ name: "Installed skill", source: "codex", installationPath: "skill" }] };
   assert.equal((await portalSyncedSkills(read, context, { getEnvironment: () => env,
+    requireReconciliation: guard("read", disabled),
     getPgPool: noStorage, requirePortalUser: noStorage })).status, 503);
   assert.equal((await portalSyncUpload(request("/api/portal/sync-upload", report), context, {
+    requireReconciliation: guard("sync", disabled),
     getEnvironment: () => env, getPgPool: noStorage, requireSkillGroupsWebFeature() {}, performSyncUpload: noStorage })).status, 503);
   const retained = { inventoryVersion: 3 as const, skills: [{ id: "stable-row", deviceId: "same-mac", isCurrent: false }], devices: [] };
-  const deps = { getPgPool: () => pool, requireReconciliation: guard("read", false),
+  const deps = { getPgPool: () => pool, requireReconciliation: guard("read", paused),
     requirePortalUser: async () => user,
     async readSyncInventory(actual: Pool, owner: string, version: number) {
       assert.equal(actual, pool); assert.equal(owner, user.id); assert.equal(version, 3); return retained;
@@ -77,7 +84,8 @@ test("new production browser pairing is gated and metadata-only; legacy pairing 
       assert.equal(owner, user.id); assert.deepEqual(input?.grantedScopes, body.scopes);
       return { code: createPairingCode(), expiresAt: new Date(Date.now() + 60_000) };
     } };
-  assert.equal((await portalSyncPairingCode(request(path, body), context, { ...deps, getPgPool: noStorage })).status, 503);
+  assert.equal((await portalSyncPairingCode(request(path, body), context, { ...deps,
+    requireConnectedSync: guard("sync", disabled), getPgPool: noStorage })).status, 503);
   const approved = await portalSyncPairingCode(request(path, body), context, { ...deps, requireConnectedSync: guard("sync") });
   assert.equal(approved.status, 200);
   assert.match((await approved.json()).callbackUrl, /^omgskills:\/\/pair\?/);
