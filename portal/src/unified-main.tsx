@@ -14,7 +14,7 @@ const production = productionConnectedProfile(location.href, publishableKey);
 const cleanPaths = !import.meta.env.DEV && base === "/app/" && !connectedInventoryTest;
 createRoot(document.getElementById("root")!).render(<StrictMode>
   {!publishableKey ? <main><h1>Portal unavailable</h1><p>Missing sign-in configuration.</p></main>
-    : <ClerkProvider publishableKey={publishableKey}><UnifiedSession base={base} cleanPaths={cleanPaths} local={connectedInventoryTest}
+    : <ClerkProvider publishableKey={publishableKey}><UnifiedSession base={base} cleanPaths={cleanPaths} publicFirst={cleanPaths} local={connectedInventoryTest}
       productionInstall={production.sync} connectedInventory={connectedInventoryTest || production.inventory}
       inventoryReconciliation={inventoryReconciliationTest || production.inventory} /></ClerkProvider>}
 </StrictMode>);

@@ -16,6 +16,7 @@ import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation } from "./entry-navigation";
+import { renderPublicFirst } from "./public-first";
 import "../../app/redesign.css";
 import { LoadingScreen } from "../../app/LoadingScreen";
 import { normalInstallAction, normalInstallClient, catalogInstallTestEnabled } from "../../app/unified/public-install";
@@ -152,13 +153,18 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean }) {
-  const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false, publicFirst = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean; publicFirst?: boolean }) {
+  const [entry] = useState(() => entryNavigation(location.pathname, location.search, base));
+  const [publicEntry] = useState(() => accountNavigation(entry, false));
+  const [showPublicFirst] = useState(() => renderPublicFirst(publicFirst && !composition, entry, () => document.cookie));
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
-  if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
-  const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} productionInstall={productionInstall} composition={composition} cleanPaths={cleanPaths && !composition}
+  const loading = !isLoaded || (isSignedIn && !userLoaded);
+  if (loading && !(showPublicFirst && !isSignedIn)) return <LoadingScreen />;
+  // While sign-in loads, the public view uses the same "signed-out" key, so it stays
+  // mounted if the visitor is signed out and remounts only if a session appears.
+  const key = !loading && isSignedIn ? `${userId}:${sessionId}` : "signed-out";
+  return <AccountView key={key} accountKey={key} signedIn={!loading && !!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} productionInstall={productionInstall} composition={composition} cleanPaths={cleanPaths && !composition}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }
