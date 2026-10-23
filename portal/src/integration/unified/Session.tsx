@@ -17,6 +17,7 @@ import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
+import { announceAppReady } from "../../takeover";
 import "../../app/redesign.css";
 import { LoadingScreen } from "../../app/LoadingScreen";
 import { normalInstallAction, normalInstallClient, catalogInstallTestEnabled } from "../../app/unified/public-install";
@@ -44,7 +45,7 @@ export type UnifiedSessionComposition = {
   clearInstallIntent: (next: Navigation) => void;
 };
 
-function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean }) {
+function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths , takeover }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean ; takeover: boolean }) {
   const normalApi = usePortalApi();
   const api = composition ? composition.adaptApi(normalApi) : normalApi;
   const clerk = useClerk();
@@ -70,6 +71,9 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const available = signedIn && !leaving;
   const nav = navigation(requested, available);
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
+  // On a static library page, swap the app in once its first public view has rendered.
+  const listState = publicData.status.list;
+  useEffect(() => { if (takeover && listState === "ready") announceAppReady(); }, [takeover, listState]);
   const navigate = (next: Navigation, replace = false) => {
     const safe = navigation(next, available);
     clearOtherIntent(safe);
@@ -153,7 +157,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false, publicFirst = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean; publicFirst?: boolean }) {
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false, publicFirst = false, takeover = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean; publicFirst?: boolean; takeover?: boolean }) {
   const [entry] = useState(() => entryNavigation(location.pathname, location.search, base));
   const [publicEntry] = useState(() => accountNavigation(entry, false));
   const [showPublicFirst] = useState(() => renderPublicFirst(publicFirst && !composition, entry, () => document.cookie));
@@ -165,6 +169,6 @@ export function UnifiedSession({ base = unifiedBase, local = true, connectedInve
   // While sign-in loads, the public view uses the same "signed-out" key, so it stays
   // mounted if the visitor is signed out and remounts only if a session appears.
   const key = !loading && isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!loading && !!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} productionInstall={productionInstall} composition={composition} cleanPaths={cleanPaths && !composition}
+  return <AccountView key={key} accountKey={key} signedIn={!loading && !!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} productionInstall={productionInstall} composition={composition} cleanPaths={cleanPaths && !composition} takeover={takeover && !composition}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }
