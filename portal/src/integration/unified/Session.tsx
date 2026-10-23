@@ -43,7 +43,7 @@ export type UnifiedSessionComposition = {
   clearInstallIntent: (next: Navigation) => void;
 };
 
-function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, composition, cleanPaths }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean }) {
+function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean }) {
   const normalApi = usePortalApi();
   const api = composition ? composition.adaptApi(normalApi) : normalApi;
   const clerk = useClerk();
@@ -54,8 +54,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
   const [installStore] = useState(() => !composition && installClient && base === "/app/"
     ? new InstallIntentStore(() => window.sessionStorage, installClient, "normal") : null);
-  const [catalogStore] = useState(() => !composition && catalogInstallEnabled && base === "/app/"
-    ? new CatalogInstallIntentStore(() => window.sessionStorage) : null);
+  const [catalogStore] = useState(() => !composition && (catalogInstallEnabled || productionInstall) && base === "/app/"
+    ? new CatalogInstallIntentStore(() => window.sessionStorage, productionInstall ? "production" : "f1") : null);
   const clearOtherIntent = (next: Navigation) => {
     composition?.clearInstallIntent(next);
     const pending = installStore?.read().intent;
@@ -64,7 +64,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     if (catalogPending && next.selected && next.selected !== `catalog:${catalogPending.catalogId}`) catalogStore?.clear();
   };
   // Install test flows validate ?view= return routes, so they keep that form.
-  const address = (next: Navigation) => `${base}${navigationLocation(next, cleanPaths && !installStore && !catalogStore)}`;
+  const address = (next: Navigation) => `${base}${navigationLocation(next,
+    cleanPaths && !installStore && (!catalogStore || catalogStore.client === "production"))}`;
   const available = signedIn && !leaving;
   const nav = navigation(requested, available);
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
@@ -120,7 +121,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       key={skill.key} skill={skill} detailReady={detailReady} client={installClient} store={installStore}
       returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`}
       action={normalInstallAction} distribution={setupTestDistribution} />
-      : catalogInstallEnabled && catalogStore ? (skill, detailReady) => <CatalogInstallSetup key={skill.key}
+      : catalogStore ? (skill, detailReady) => <CatalogInstallSetup key={skill.key}
         skill={skill} detailReady={detailReady} store={catalogStore}
         returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined)}
     readOnlyAccount
@@ -139,7 +140,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       busy={snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing}
       blocked={!!snapshot.error || !snapshot.data || snapshot.accessDenied}
       error={snapshot.profileError || snapshot.error} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
-      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel key={accountKey} sessionKey={accountKey} api={api} local={local} readOnly={composition?.readOnly} denied={account.invalidate} theme={theme} inventoryDevices={connectedInventory ? data.devices : undefined} /></div>
+      : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel key={accountKey} sessionKey={accountKey} api={api} local={local} readOnly={composition?.readOnly} browserConnection={productionInstall} denied={account.invalidate} theme={theme} inventoryDevices={connectedInventory ? data.devices : undefined} /></div>
       : view === "github" && !composition?.readOnly ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div> : undefined : undefined}
     previewBar={(local || sessionError || (available && (snapshot.error || composition?.readOnly))) && <div className="ua-preview">
       {local && <span>Local test · Unified app</span>}
@@ -151,13 +152,13 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   />;
 }
 
-export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, composition, cleanPaths = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean }) {
+export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean }) {
   const [publicEntry] = useState(() => accountNavigation(entryNavigation(location.pathname, location.search, base), false));
   usePublicCatalogPreload(publicClient, publicEntry);
   const { isLoaded, isSignedIn, userId, sessionId } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   if (!isLoaded || (isSignedIn && !userLoaded)) return <LoadingScreen />;
   const key = isSignedIn ? `${userId}:${sessionId}` : "signed-out";
-  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} composition={composition} cleanPaths={cleanPaths && !composition}
+  return <AccountView key={key} accountKey={key} signedIn={!!isSignedIn} base={base} local={local} connectedInventory={connectedInventory} inventoryReconciliation={inventoryReconciliation} productionInstall={productionInstall} composition={composition} cleanPaths={cleanPaths && !composition}
     identity={{ name: user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your account", email: user?.primaryEmailAddress?.emailAddress || "" }} />;
 }

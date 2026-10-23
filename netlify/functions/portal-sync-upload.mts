@@ -9,7 +9,7 @@ import {
   uploadAuthenticationFromRequest
 } from "./_shared/sync-upload.js";
 import { requireJsonObject } from "./_shared/validation.js";
-import { parseInventoryCheck, performInventoryCheck, readInventoryRevision, requireLocalInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
+import { parseInventoryCheck, performInventoryCheck, readInventoryRevision, requireInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
 import { requireLegacyInventoryReport } from "./_shared/legacy-inventory-schema.js";
 
 const defaultDependencies = { getPgPool, requireSkillGroupsWebFeature, performSyncUpload };
@@ -17,11 +17,13 @@ type Dependencies = typeof defaultDependencies & {
   readInventoryRevision?: typeof readInventoryRevision;
   performInventoryCheck?: typeof performInventoryCheck;
   getEnvironment?: () => Record<string, string | undefined>;
-  requireReconciliation?: typeof requireLocalInventoryReconciliation;
+  requireReconciliation?: typeof requireInventoryReconciliation;
 };
 
 export async function portalSyncUpload(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
   const { getPgPool, requireSkillGroupsWebFeature, performSyncUpload } = dependencies;
+  const requireReconciliation = () => (dependencies.requireReconciliation ?? requireInventoryReconciliation)(
+    req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context, "/api/portal/sync-upload", context.site?.id);
   if (req.method === "OPTIONS") {
     return optionsResponse(req);
   }
@@ -36,19 +38,19 @@ export async function portalSyncUpload(req: Request, context: Context, dependenc
       if (new URL(req.url).search !== "?reportVersion=3") {
         return errorResponse(req, 400, "Use the exact reportVersion=3 revision request");
       }
-      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+      requireReconciliation();
       // Validate bearer syntax before accessing the pool; the reader verifies token ownership/scopes.
       deviceCredentialFromRequest(req);
       return secretJsonResponse(req, await (dependencies.readInventoryRevision ?? readInventoryRevision)(getPgPool(), req));
     }
     const body = await requireJsonObject(req);
     if (body.reportVersion === 2 || body.reportVersion === 3) {
-      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+      requireReconciliation();
     } else {
       requireLegacyInventoryReport(body);
     }
     if (body.reportVersion === 3 && Object.hasOwn(body, "mode")) {
-      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+      requireReconciliation();
       if (new URL(req.url).search) throw new Response("Inventory checks do not accept query parameters", { status: 400 });
       parseInventoryCheck(body);
       deviceCredentialFromRequest(req);
@@ -58,7 +60,7 @@ export async function portalSyncUpload(req: Request, context: Context, dependenc
     }
     const { reportVersion, skills, reconciliation } = parseSyncReport(body);
     if (reportVersion === 3) {
-      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env, context.deploy?.context);
+      requireReconciliation();
       if (new URL(req.url).search) throw new Response("Reconciliation uploads do not accept query parameters", { status: 400 });
     }
     const authentication = uploadAuthenticationFromRequest(req, body);

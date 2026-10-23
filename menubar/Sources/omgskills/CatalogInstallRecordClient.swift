@@ -51,7 +51,7 @@ struct CatalogInstallRecordClient: Sendable {
 
     #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
     init(catalogCandidate: CatalogCandidateRuntime.Configuration, session: URLSession = .shared) {
-        origin = CatalogCandidateRuntime.origin
+        origin = catalogCandidate.profile.origin
         self.session = session
     }
     #endif

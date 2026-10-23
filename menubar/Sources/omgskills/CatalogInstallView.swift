@@ -126,7 +126,7 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
         let service = CatalogInstallFlowService(records: CatalogInstallRecordClient(catalogCandidate: candidate),
             installer: CatalogInstallService(installer: installer))
         self.init(model: CatalogInstallModel(service: service, coordinator: coordinator, client: .product),
-            website: CatalogCandidateRuntime.website)
+            website: candidate.profile.website)
         if let connected = candidate.connected {
             let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.window },
                 onReturn: { [weak self] in self?.showStatus() })
@@ -177,6 +177,7 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
     }
 
     func receive(_ url: URL) {
+        if connectedRuntime != nil && url.absoluteString == "omgskills://connect" { showStatus(); return }
         if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }
         model.receive(url)
         showStatus()

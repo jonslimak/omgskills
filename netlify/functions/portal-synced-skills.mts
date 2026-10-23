@@ -3,7 +3,7 @@ import { getPgPool } from "./_shared/db.js";
 import { errorResponse, secretJsonResponse, optionsResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { inventoryReadVersion, readSyncInventory } from "./_shared/sync-inventory-read.js";
-import { requireLocalInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
+import { requireInventoryReconciliation } from "./_shared/inventory-reconciliation.js";
 import { readLegacySyncInventory } from "./_shared/sync-inventory.js";
 
 const defaultDependencies = { getPgPool, requirePortalUser, readSyncInventory };
@@ -11,7 +11,7 @@ type Dependencies = Omit<typeof defaultDependencies, "readSyncInventory"> & {
   readSyncInventory?: typeof readSyncInventory;
   readLegacySyncInventory?: typeof readLegacySyncInventory;
   getEnvironment?: () => Record<string, string | undefined>;
-  requireReconciliation?: typeof requireLocalInventoryReconciliation;
+  requireReconciliation?: typeof requireInventoryReconciliation;
 };
 
 export async function portalSyncedSkills(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
@@ -26,8 +26,8 @@ export async function portalSyncedSkills(req: Request, context: Context, depende
   try {
     const version = inventoryReadVersion(req, true);
     if (version !== 1) {
-      (dependencies.requireReconciliation ?? requireLocalInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env,
-        context.deploy?.context, "/api/portal/synced-skills");
+      (dependencies.requireReconciliation ?? requireInventoryReconciliation)(req, dependencies.getEnvironment?.() ?? process.env,
+        context.deploy?.context, "/api/portal/synced-skills", context.site?.id);
     }
     const user = await requirePortalUser(req);
     if (version === 1 && dependencies.readLegacySyncInventory) {

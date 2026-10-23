@@ -15,10 +15,12 @@ import { issuePairingCode, PairingError } from "./_shared/device-pairing.js";
 import { errorResponse, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { requireJsonObject } from "./_shared/validation.js";
+import { requireProductionInventory } from "./_shared/production-inventory.js";
 
 const defaultDependencies = { getPgPool, requirePortalUser, issuePairingCode, getEnvironment: () => process.env };
 type Dependencies = typeof defaultDependencies & {
   callbackTarget?: typeof browserPairingCallbackTarget;
+  requireConnectedSync?: typeof requireProductionInventory;
 };
 
 export async function portalSyncPairingCode(req: Request, context: Context, dependencies: Dependencies = defaultDependencies) {
@@ -31,6 +33,12 @@ export async function portalSyncPairingCode(req: Request, context: Context, depe
   }
 
   try {
+    const url = new URL(req.url);
+    const inventoryRequest = url.searchParams.has("inventory");
+    if (inventoryRequest) {
+      if (url.search !== "?inventory=3") throw new Response("Use the exact inventory connection request", { status: 400 });
+      (dependencies.requireConnectedSync ?? requireProductionInventory)(req, getEnvironment(), context.deploy?.context, context.site?.id, "sync");
+    }
     const callbackTarget = (dependencies.callbackTarget ?? browserPairingCallbackTarget)(req, getEnvironment(), context.deploy?.context);
     const body = await requireJsonObject(req);
     if (Object.keys(body).some((key) => !["state", "codeChallenge", "codeChallengeMethod", "scopes"].includes(key))) {
@@ -57,6 +65,9 @@ export async function portalSyncPairingCode(req: Request, context: Context, depe
       body.scopes ?? [...BASE_DEVICE_SCOPES],
       browserState !== null
     );
+    if (inventoryRequest && (browserState === null || grantedScopes.some(scope => !BASE_DEVICE_SCOPES.includes(scope as typeof BASE_DEVICE_SCOPES[number])))) {
+      throw new Response("Connected inventory requires browser approval with metadata-only permissions", { status: 400 });
+    }
 
     const user = await requirePortalUser(req);
     const pairing = await issuePairingCode(getPgPool(), user.id, {

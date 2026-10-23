@@ -283,9 +283,9 @@ test("normal app entry validates before routing, keeps connect in the consent pa
   const source = (file: string) => readFileSync(new URL(`../src/${file}`, import.meta.url), "utf8");
   assert.match(source("bootstrap.ts"), /connectedInventoryTest &&/);
   assert.ok(source("bootstrap.ts").indexOf('import("./review/main")') < source("bootstrap.ts").indexOf('import("./unified-main")'));
-  assert.match(source("unified-main.tsx"), /connectedInventory=\{connectedInventoryTest\}/);
+  assert.match(source("unified-main.tsx"), /connectedInventory=\{connectedInventoryTest \|\| production.inventory\}/);
   assert.match(source("integration/unified/useAccount.ts"), /connectedInventory,/);
-  assert.match(source("main.tsx"), /<ConnectPage policy=\{connectedInventoryTest \? f1PairingConsent : normalPairingConsent\}/);
+  assert.match(source("main.tsx"), /connectedInventoryTest \? f1PairingConsent : normalPairingConsent\}/);
   assert.match(source("ConnectPage.tsx"), /policy.disclosure && <p>\{policy.disclosure\}/);
   assert.doesNotMatch(source("main.tsx"), /callbackUrl:\s*request/);
 });

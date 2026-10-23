@@ -32,6 +32,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { f1PairingConsent, normalPairingConsent } from "./browser-pairing";
 import { ConnectPage } from "./ConnectPage";
+import { inventoryConnectionRequest, productionConnectedProfile, productionInventoryConsent } from "./production-connected";
 import {
   groupSyncedSkills,
   hasSource,
@@ -50,6 +51,9 @@ import { isFeatureEnabled, portalSurface } from "@/feature-flags";
 import "./styles.css";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const inventoryConnection = inventoryConnectionRequest(location.search);
+const productionConsent = productionInventoryConsent(inventoryConnection === "valid"
+  && productionConnectedProfile(location.href, publishableKey).sync);
 const skillGroupsWebEnabled = isFeatureEnabled(
   import.meta.env.VITE_SKILLGROUPS_WEB_ENABLED
 );
@@ -819,7 +823,8 @@ function App() {
       </SignedOut>
       <SignedIn>
         {isConnectRoute
-          ? <ConnectPage policy={connectedInventoryTest ? f1PairingConsent : normalPairingConsent} />
+          ? <ConnectPage policy={inventoryConnection !== "none" ? productionConsent
+            : connectedInventoryTest ? f1PairingConsent : normalPairingConsent} />
           : groupDetailMatch
             ? <GroupDetailPage
                 groupId={decodeURIComponent(groupDetailMatch[1])}

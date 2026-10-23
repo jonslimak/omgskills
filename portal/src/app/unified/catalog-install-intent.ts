@@ -4,6 +4,7 @@ import { INSTALL_INTENT_TTL, validInstallReturnRoute } from "./install-intent";
 
 export const CATALOG_INSTALL_INTENT_KEY = "omgskills.app.catalog-install-intent.v1.f1";
 export const CANDIDATE_CATALOG_INSTALL_INTENT_KEY = "omgskills.app.catalog-install-intent.v1.candidate";
+export const PRODUCTION_CATALOG_INSTALL_INTENT_KEY = "omgskills.app.catalog-install-intent.v1.production";
 export type CatalogInstallIntent = {
   version: 1; catalogId: string; agent: CatalogInstallAgent; returnRoute: string; createdAt: number;
 };
@@ -27,7 +28,8 @@ export class CatalogInstallIntentStore {
   private storage: Storage | null;
   private readonly key: string;
   constructor(getStorage: () => Storage | null, readonly client: CatalogInstallClient = "f1") {
-    this.key = client === "candidate" ? CANDIDATE_CATALOG_INSTALL_INTENT_KEY : CATALOG_INSTALL_INTENT_KEY;
+    this.key = client === "production" ? PRODUCTION_CATALOG_INSTALL_INTENT_KEY
+      : client === "candidate" ? CANDIDATE_CATALOG_INSTALL_INTENT_KEY : CATALOG_INSTALL_INTENT_KEY;
     try { this.storage = getStorage(); this.memory = this.storage?.getItem(this.key) ?? null; }
     catch { this.storage = null; }
   }

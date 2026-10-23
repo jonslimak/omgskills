@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Laptop, RefreshCw } from "lucide-react";
+import { ArrowUpRight, Laptop, RefreshCw } from "lucide-react";
 import type { PortalApi } from "../portal-api";
 import { Action, EmptyState, IconAction, Modal, StatusBadge } from "../app/ui";
 import { createDeviceSession, type Device, type DeviceSnapshot } from "./device-session";
@@ -12,7 +12,7 @@ const formatDate = (value: string | null) => value === null ? "Never"
 const formatInventoryDate = (value: string | null) => value === null ? "Never"
   : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
-export function DevicesPanel({ api, denied, local = true, readOnly = false, theme, inventoryDevices, sessionKey = "default" }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; theme?: string; inventoryDevices?: PortalDevice[]; sessionKey?: string }) {
+export function DevicesPanel({ api, denied, local = true, readOnly = false, browserConnection = false, theme, inventoryDevices, sessionKey = "default" }: { api: PortalApi; denied: () => void; local?: boolean; readOnly?: boolean; browserConnection?: boolean; theme?: string; inventoryDevices?: PortalDevice[]; sessionKey?: string }) {
   const callbacks = useRef({ api, denied });
   callbacks.current = { api, denied };
   const sessionRef = useRef<ReturnType<typeof createDeviceSession> | null>(null);
@@ -67,7 +67,12 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, them
       </div>)}
     </div>
     {state.devices?.length === 0 && !state.loading && !state.error && <EmptyState title="No connected devices" />}
-    {!readOnly && connecting && <ConnectionDialog api={api} denied={denied} local={local} theme={theme} close={() => setConnecting(false)} />}
+    {!readOnly && connecting && (browserConnection
+      ? <Modal title="Connect OMGSkills" theme={theme} close={() => setConnecting(false)}>
+        <p>Open OMGSkills and choose Connect account. Review and approve the connection in your browser.</p>
+        <Action asChild><a href="omgskills://connect"><ArrowUpRight /> Open OMGSkills</a></Action>
+      </Modal>
+      : <ConnectionDialog api={api} denied={denied} local={local} theme={theme} close={() => setConnecting(false)} />)}
     {!readOnly && confirm && <Modal title={`Revoke ${confirm.deviceName}?`} theme={theme} close={() => { if (!state.revoking) setConfirm(null); }}>
       <p>This stops this connection from accessing your account. Installed skills and sets are not deleted. Reconnect the app to use it again.</p>
       <div className="rd-dialog-footer"><Action disabled={busy} onClick={() => setConfirm(null)}>Cancel</Action>
