@@ -18,6 +18,7 @@ import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
 import { announceAppReady } from "../../takeover";
+import { createPageMetadata, pageTitle } from "../../app/unified/page-metadata";
 import "../../app/redesign.css";
 import { LoadingScreen } from "../../app/LoadingScreen";
 import { normalInstallAction, normalInstallClient, catalogInstallTestEnabled } from "../../app/unified/public-install";
@@ -119,6 +120,10 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const detail = useSetDetail(api, setId, snapshot.revision, available && !!snapshot.data && !snapshot.accessDenied);
   const setCatalog = useSetCatalog(publicClient, detail.set);
   const catalog = { ...publicData.catalog, skills: [...publicData.catalog.skills, ...setCatalog.skills] };
+  // Keep the tab title (and, on a taken-over page, its search tags) in step with the view.
+  const [syncMetadata] = useState(() => cleanPaths ? createPageMetadata(document, takeover) : null);
+  const title = pageTitle(nav, catalog);
+  useEffect(() => { syncMetadata?.(location.pathname + location.search, title); }, [syncMetadata, current, title]);
   const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine,
     busy: snapshot.setSaving || snapshot.profileSaving, blocked: !!composition?.readOnly || !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
     scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
