@@ -10,9 +10,12 @@ type Options = {
 
 const characterLimit = 20_000;
 const fileByteLimit = 256_000;
+// raw.githubusercontent.com has no per-IP API quota (the REST API allows 60/hour
+// unauthenticated). HEAD resolves the default branch; names are case-sensitive.
+const readmeNames = ["README.md", "readme.md", "Readme.md", "README.markdown", "README.mdx", "README.txt", "README"];
 const idPattern = /^[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9_.-]+:[^\x00-\x1f\x7f]{1,800}$/i;
 
-async function boundedText(response: Response, limit: number) {
+async function boundedBytes(response: Response, limit: number) {
   if (Number(response.headers.get("content-length")) > limit) {
     await response.body?.cancel();
     throw new Error("Response too large");
@@ -30,7 +33,11 @@ async function boundedText(response: Response, limit: number) {
       chunks.push(next.value);
     }
   } finally { reader.releaseLock(); }
-  return Buffer.concat(chunks, bytes).toString("utf8");
+  return Buffer.concat(chunks, bytes);
+}
+
+async function boundedText(response: Response, limit: number) {
+  return (await boundedBytes(response, limit)).toString("utf8");
 }
 
 function repositoryFromUrl(value: string) {
@@ -89,27 +96,24 @@ export function createSkillReadmeHandler(options: Options = {}) {
 
   async function loadReadme(repository: string): Promise<SkillReadme | null> {
     const [owner, repo] = repository.split("/");
-    const response = await fetcher(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/readme`, {
-      method: "GET", credentials: "omit", redirect: "error", referrerPolicy: "no-referrer",
-      signal: AbortSignal.timeout(timeoutMs),
-      headers: { Accept: "application/vnd.github+json", "User-Agent": "omgskills-public-readme" },
-    });
-    if (response.status === 404) { await response.body?.cancel(); return null; }
-    if (!response.ok) { await response.body?.cancel(); throw new Error("GitHub unavailable"); }
-    const data = JSON.parse(await boundedText(response, 512_000));
-    if (data.encoding !== "base64" || typeof data.content !== "string" || typeof data.html_url !== "string"
-      || !Number.isSafeInteger(data.size) || data.size < 0 || data.size > fileByteLimit) throw new Error("Invalid README");
-    const encoded = data.content.replace(/\s/g, "");
-    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded)) throw new Error("Invalid README encoding");
-    const bytes = Buffer.from(encoded, "base64");
-    if (bytes.length > fileByteLimit || bytes.length !== data.size) throw new Error("Invalid README size");
-    const source = new URL(data.html_url);
-    if (repositoryFromUrl(source.href).toLowerCase() !== repository.toLowerCase()
-      || source.pathname.split("/")[3] !== "blob" || source.search || source.hash) throw new Error("Invalid README link");
-    const markdown = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-    if (!markdown.trim()) return null;
-    return { repository, sourceUrl: source.href, truncated: markdown.length > characterLimit,
-      markdown: markdown.slice(0, characterLimit).replace(/[\uD800-\uDBFF]$/, "") };
+    const repositoryPath = `${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+    const signal = AbortSignal.timeout(timeoutMs);
+    for (const name of readmeNames) {
+      signal.throwIfAborted();
+      const response = await fetcher(`https://raw.githubusercontent.com/${repositoryPath}/HEAD/${name}`, {
+        method: "GET", credentials: "omit", redirect: "error", referrerPolicy: "no-referrer",
+        signal,
+        headers: { Accept: "text/plain", "User-Agent": "omgskills-public-readme" },
+      });
+      if (response.status === 404) { await response.body?.cancel(); continue; }
+      if (!response.ok) { await response.body?.cancel(); throw new Error("GitHub unavailable"); }
+      const markdown = new TextDecoder("utf-8", { fatal: true }).decode(await boundedBytes(response, fileByteLimit));
+      if (!markdown.trim()) return null;
+      return { repository, sourceUrl: `https://github.com/${repositoryPath}/blob/HEAD/${name}`,
+        truncated: markdown.length > characterLimit,
+        markdown: markdown.slice(0, characterLimit).replace(/[\uD800-\uDBFF]$/, "") };
+    }
+    return null;
   }
 
   function json(body: unknown, status = 200, ttl = 0) {
