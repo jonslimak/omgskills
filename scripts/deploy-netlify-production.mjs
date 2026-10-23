@@ -5,6 +5,7 @@ import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { verifyHelperReleaseAssets } from "./helper-release-assets.mjs";
+import { stageNetlifyDbMigrations } from "./stage-netlify-db-migrations.mjs";
 
 // Preserve the existing circuit-breaker issue title so older open incidents still block deploys.
 export const ROLLBACK_ISSUE_TITLE = "Production deploy rollback";
@@ -293,6 +294,7 @@ export async function deployProduction({
   now = () => new Date().toISOString(),
   writeReceipt = writeReceiptFile,
   verifyHelperAssets = () => verifyHelperReleaseAssets(path.resolve("dist/netlify-site")),
+  stageMigrations = stageNetlifyDbMigrations,
 } = {}) {
   const siteId = requireEnv(env, "NETLIFY_SITE_ID");
   const netlifyToken = requireEnv(env, "NETLIFY_AUTH_TOKEN");
@@ -387,12 +389,14 @@ export async function deployProduction({
   }
 
   receipt.previousDeployId = await currentDeployId({ fetchImpl, siteId, netlifyToken });
+  const migrationNames = await stageMigrations();
+  receipt.expectedMigrationCount = migrationNames.length;
   receipt.status = "deploying-preview";
   await save();
 
   const previewResult = await run(
     "npx",
-    ["netlify-cli", "deploy", "--dir=dist/netlify-site", "--no-build", "--json"],
+    ["netlify-cli", "deploy", "--dir=dist/netlify-site", "--build", "--context=deploy-preview", "--json"],
     { env },
   );
   const previewDeploy = parseDeployResult(previewResult.stdout);
@@ -409,6 +413,22 @@ export async function deployProduction({
   await save();
 
   try {
+    const draft = await apiJson(
+      fetchImpl,
+      `${NETLIFY_API_ORIGIN}/deploys/${encodeURIComponent(receipt.previewDeployId)}`,
+      { headers: { Authorization: `Bearer ${netlifyToken}` } },
+      "Netlify draft database lookup",
+    );
+    if (draft.site_id !== siteId || !draft.database_branch_id || draft.database_branch_id === "production") {
+      throw new Error("Netlify draft must use an isolated database branch");
+    }
+    const files = draft.database_migrations?.files;
+    if (!Array.isArray(files) || files.length !== migrationNames.length) {
+      throw new Error(`Netlify draft received ${Array.isArray(files) ? files.length : 0} database migrations; expected ${migrationNames.length}`);
+    }
+    receipt.previewDatabaseBranchId = draft.database_branch_id;
+    receipt.previewMigrationCount = files.length;
+    await save();
     await verifyWithRetries({
       run,
       env,
@@ -441,7 +461,8 @@ export async function deployProduction({
       "deploy",
       "--prod",
       "--dir=dist/netlify-site",
-      "--no-build",
+      "--build",
+      "--context=production",
       "--json",
     ],
     { env },

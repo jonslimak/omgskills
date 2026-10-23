@@ -84,6 +84,7 @@ jobs:
       - name: Deploy site to Netlify
         id: production_deploy
         env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f

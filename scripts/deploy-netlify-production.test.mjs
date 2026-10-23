@@ -27,6 +27,8 @@ function createHarness({
   liveAfterFailure = "candidate-2",
   openIssue = null,
   helperAssetError = null,
+  previewMigrationCount = 13,
+  previewDatabaseBranchId = "preview-database-1",
 } = {}) {
   const calls = [];
   const receipts = [];
@@ -82,6 +84,13 @@ function createHarness({
     if (parsed.pathname.endsWith("/restore")) {
       assert.fail("Deployment verification must never restore an older whole-site deploy");
     }
+    if (parsed.pathname === "/api/v1/deploys/preview-1") {
+      return Response.json({
+        site_id: "site-123",
+        database_branch_id: previewDatabaseBranchId,
+        database_migrations: { files: Array.from({ length: previewMigrationCount }, (_, i) => `migration-${i}`) },
+      });
+    }
     siteLookups += 1;
     const id = siteLookups === 1 ? "previous-1" : liveAfterFailure;
     return Response.json({ published_deploy: { id } });
@@ -92,6 +101,7 @@ function createHarness({
     receipts,
     run,
     fetchImpl,
+    stageMigrations: async () => Array.from({ length: 13 }, (_, i) => `migration-${i}`),
     verifyHelperAssets: async () => {
       calls.push({ type: "helper-assets" });
       if (helperAssetError) throw helperAssetError;
@@ -138,9 +148,13 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   assert.ok(helperCheckIndex >= 0);
   assert.ok(helperCheckIndex < harness.calls.indexOf(deployCalls[0]));
   assert.equal(deployCalls[0].key.includes("--prod"), false);
-  assert.equal(deployCalls[0].key.includes("--no-build"), true);
+  assert.equal(deployCalls[0].key.includes("--build"), true);
+  assert.equal(deployCalls[0].key.includes("--context=deploy-preview"), true);
   assert.equal(deployCalls[1].key.includes("--prod"), true);
-  assert.equal(deployCalls[1].key.includes("--no-build"), true);
+  assert.equal(deployCalls[1].key.includes("--build"), true);
+  assert.equal(deployCalls[1].key.includes("--context=production"), true);
+  assert.equal(receipt.previewMigrationCount, 13);
+  assert.equal(receipt.previewDatabaseBranchId, "preview-database-1");
   const previewCheck = harness.calls.find(
     (call) => call.key?.includes("verify-production-deploy.mjs")
       && call.env.PRODUCTION_ORIGIN === "https://preview-1--example.netlify.app",
@@ -159,6 +173,22 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
       .map((call) => call.key).length,
     6,
   );
+});
+
+test("missing migrations or a non-isolated draft database blocks production", async (t) => {
+  for (const options of [
+    { previewMigrationCount: 0 },
+    { previewMigrationCount: 12 },
+    { previewDatabaseBranchId: null },
+    { previewDatabaseBranchId: "production" },
+  ]) {
+    await t.test(JSON.stringify(options), async () => {
+      const harness = createHarness(options);
+      await assert.rejects(deployProduction({ env, ...harness }), /Draft verification failed/);
+      assert.equal(harness.receipts.at(-1).status, "preview-verification-failed");
+      assert.equal(harness.calls.some((call) => call.key?.includes("netlify-cli deploy") && call.key.includes("--prod")), false);
+    });
+  }
 });
 
 test("draft verification failure stops before production changes", async () => {
