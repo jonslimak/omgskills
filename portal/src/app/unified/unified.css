@@ -1940,6 +1940,21 @@
   color: var(--ua-ink);
   text-align: right;
 }
+.ua-installation {
+  border-top: 1px solid var(--ua-line);
+  padding-top: 10px;
+  min-width: 0;
+}
+.ua-installation > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 15px;
+}
+.ua-installation strong,
+.ua-installation p {
+  overflow-wrap: anywhere;
+}
 .ua-set-chips {
   display: flex;
   flex-wrap: wrap;
